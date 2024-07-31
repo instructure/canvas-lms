@@ -297,6 +297,7 @@ nn:
   a_yearly_rrule_must_include_byday_or_bymonthday_b56649f4: "Ein årleg RRULE må inkludere BYDAY eller BYMONTHDAY"
   a_z_243c3301: A–Å
   a_z_29d8e67c: "A - Å"
+  about_70c18bba: Om
   about_this_service_b10bc808: "Om denne tenesta"
   above_max_rating_64b29915: "Over maksimal vurdering"
   academic_benchmark: 
@@ -3410,6 +3411,7 @@ nn:
   announcement: 
     no_title: "Ingen tittel"
   announcement_creation_failed_f7d227f5: "Oppretting av kunngjering mislukkast"
+  announcement_e37d6dbd: kunngjering
   announcement_ends_at_4ccc2a7e: "Kunngjering sluttar på"
   announcement_external_feeds_5be3f36b: "Eksterne straumar for kunngjering"
   announcement_fb4cb645: Kunngjering
@@ -6614,6 +6616,7 @@ nn:
       concluded_conferences: "Ferdige konferansar"
       conference: Konferanse
       conference_header: Konferansar
+      conferences: Konferansar
       new_conference: "Ny konferanse"
       new_conferences: "Nye konferansar"
       page_title: Webkonferansar
@@ -13381,6 +13384,7 @@ nn:
   he_him_99aea1a8: Han
   heads_up_a_valid_salesforce_account_id_should_be_a_999cbf7d: "Obs! Ein gyldig Salesforce konto-ID er mellom 15 og 18 alfanumeriske teikn lang."
   hebrew_88fbf778: Hebraisk
+  height_69b03e15: Høgde
   hello_name_cabdd4ce: "Hei %{name}!"
   hello_name_your_outcomes_import_failed_due_to_an_e_385db5d3: |-
       Hei %{name},
@@ -14607,6 +14611,7 @@ nn:
   language_6b3e2c7c: Språk
   language_arts_35b79a8b: Språkvitskap
   languages_835813f0: Språk
+  large_9c5e80e7: Stort
   large_balsamiq_font_5fe45fae: "Skrifttype Stor Balsamiq"
   large_course_db3d58b: "Stort emne:"
   last_7_days_bd411f1f: "Siste 7 dagar"
@@ -15594,6 +15599,7 @@ nn:
   median_9b4a2bd8: "Median:"
   median_ed291842: Median
   median_score_4657e907: "Median: %{score}"
+  medium_5a8e9ead: Medium
   medium_dark_skin_tone_5134edbc: "Mellommørk hudfarge"
   medium_light_skin_tone_6c4a27fb: "Mellomlys hudfarge"
   medium_skin_tone_8608d74e: "Middels hudfarge"
@@ -17528,6 +17534,7 @@ nn:
   modified_by_user_e6c8ade3: "endra av: %{user}"
   modify_settings_ed8b9ccf: "Modifiser innstillingar"
   module_90d9fd32: Modul
+  module_9775f804: modul
   module_access_updated_successfully_b21ed967: "Tilgang til modul vart oppdatert."
   module_and_items_published_13ed5cd6: "Modul og element publisert"
   module_and_items_unpublished_e953ba4f: "Modul og element upublisert"
@@ -17870,6 +17877,7 @@ nn:
   nav_text_94206145: Navigeringstekst
   nav_text_active_a924ae88: "Navigeringstekst, aktiv"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Navigasjon gir brukar løyve til å sjå personmenyvalet i emnemenyen."
+  navigation_ee9af92d: Navigasjon
   navigation_icon_45db938e: Navigasjonsikon
   navigation_menu_fd782ff8: Navigeringsmeny
   near_3282280c: Nær
@@ -24555,6 +24563,7 @@ nn:
       forward: Vidaresend
   slovak_69f48e1b: Slovakisk
   slovenian_30ae5208: Slovensk
+  small_b070434a: Liten
   smaller_numbers_mean_higher_priority_c69f4d0a: "Lavare tall betyr høg prioritet"
   smart_alerts_44db622e: Smart-varsel
   smart_assignment_alerts_abc2224: "Smart oppgåvevarsel"
@@ -25753,6 +25762,7 @@ nn:
   text_file_73d8d08c: Tekstfil
   text_input_d3480b8c: Tekstoppføring
   text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "Spørsmålstypen Utan Spørsmål har blitt gjort om til eit Stimulusspørsmål; ver god og legg til eit spørsmål så det kan visast i quizen."
+  text_sms_4e2d82a7: "Tekst (SMS)"
   thai_8f9bc548: Thai
   thailand_66_5b3ef324: "Thailand (+66)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "Brukarkontoen er sletta.  Kontakt systemansvarleg og få kontoen aktivert på nytt."
@@ -28738,6 +28748,7 @@ nn:
       upload_media_track_form_step2_label: "Trinn 2:"
       upload_media_track_form_step3_label: "Trinn 3:"
       upload_media_track_info: "*Instruksjonar:* Følg desse tre trinna for å opprette ei undertittelfil for videoen, og last han opp her. Om du allereie har ei SRT-undertittelfil, kan du hoppe til trinn 3."
+  width_492fec76: Vidde
   wiki: 
     default_course_wiki_name: "%{course_name}-wiki"
     default_group_wiki_name: "%{group_name}-wiki"

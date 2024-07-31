@@ -4148,7 +4148,7 @@ describe ContextExternalTool do
     subject { tool.placement_allowed?(placement) }
 
     let(:developer_key) { DeveloperKey.create! }
-    let(:domain) { "http://example.com" }
+    let(:domain) { "http://www.example.com" }
     let(:tool) { external_tool_1_3_model(developer_key:, opts: { domain: }) }
 
     %w[submission_type_selection top_navigation].each do |restricted_placement|
@@ -4173,6 +4173,21 @@ describe ContextExternalTool do
           end
 
           it { is_expected.to be true }
+        end
+
+        context "when the placement is allowed by a wildcard domain" do
+          before do
+            Setting.set("#{restricted_placement}_allowed_launch_domains", "*.example.com")
+          end
+
+          it { is_expected.to be true }
+
+          it "doesn't match a different domain that happens to end with the wildcard domain" do
+            %w[fooexample.com http://fooexample.com https://fooexample.com].each do |domain|
+              tool.update!(domain:)
+              expect(tool.placement_allowed?(placement)).to be false
+            end
+          end
         end
 
         context "when the tool has no domain and domain list is containing an empty space" do

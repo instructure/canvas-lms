@@ -75,9 +75,9 @@ export function mapActivityStreamSummaries(data: any): ActivityStreamSummary[] {
         summary: activityStream
           ? activityStream.summary.map((item: any) => ({
               count: item.count,
-              notificationCategory: item.notificationCategory,
+              notification_category: item.notificationCategory,
               type: item.type,
-              unreadCount: item.unreadCount,
+              unread_count: item.unreadCount,
             }))
           : [],
       }

@@ -18,7 +18,7 @@
 
 import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -34,6 +34,8 @@ import {
   findCriterionMatchingRatingIndex,
   htmlEscapeCriteriaLongDescription,
 } from './utils/rubricUtils'
+import {possibleString} from '../Points'
+import {OutcomeTag} from './OutcomeTag'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 
@@ -210,11 +212,9 @@ export const CriterionRow = ({
   return (
     <View as="div" margin="0 0 small 0">
       {!hidePoints && (
-        <Flex direction="row-reverse" data-testid="modern-view-out-of-points">
-          <Flex.Item margin={isPreviewMode ? '0' : '0 0 0 x-small'}>
-            <Text size="small" weight="bold" aria-hidden={true}>
-              /{criterion.points}
-            </Text>
+        <Flex data-testid="modern-view-out-of-points">
+          <Flex.Item shouldGrow={true}>
+            {criterion.learningOutcomeId && <OutcomeTag displayName={criterion.description} />}
           </Flex.Item>
           <Flex.Item margin={isPreviewMode ? '0 0 0 x-small' : '0'}>
             {isPreviewMode ? (
@@ -234,21 +234,35 @@ export const CriterionRow = ({
               />
             )}
           </Flex.Item>
+          <Flex.Item margin={isPreviewMode ? '0' : '0 0 0 x-small'}>
+            <Text size="small" weight="bold" aria-hidden={true}>
+              /{criterion.points}
+            </Text>
+          </Flex.Item>
         </Flex>
       )}
       <View as="div">
         <Text size="medium" weight="bold">
-          {criterion.description}
+          {criterion.outcome?.displayName || criterion.description}
         </Text>
       </View>
       <View as="div" margin="xx-small 0 0 0" themeOverride={{marginXxSmall: '.25rem'}}>
         <Text
           size="small"
           weight="normal"
-          themeOverride={{fontSizeXSmall: '0.875rem'}}
+          themeOverride={{fontSizeXSmall: '0.875rem', paragraphMargin: 0}}
           dangerouslySetInnerHTML={htmlEscapeCriteriaLongDescription(criterion)}
         />
       </View>
+      {criterion.learningOutcomeId && (
+        <View as="div" margin="xx-small 0 0 0">
+          <Text>
+            {I18n.t('Threshold: %{threshold}', {
+              threshold: possibleString(criterion.masteryPoints),
+            })}
+          </Text>
+        </View>
+      )}
       <View as="div" margin="small 0 0 0">
         {!isFreeFormCriterionComments && renderButtonDisplay()}
       </View>

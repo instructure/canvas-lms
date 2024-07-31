@@ -122,6 +122,21 @@ describe SisBatch do
     expect(InstStatsd::Statsd).to have_received(:increment).with("sis_batch_restored", tags:)
   end
 
+  it "captures job failures on restore" do
+    batch = process_csv_data([%(user_id,login_id,status
+                        user_1,user_1,active)])
+
+    expect(Delayed::Worker).to receive(:current_job).at_least(:once).and_return(double("Delayed::Job", id: 789))
+    expect_any_instance_of(SisBatch).to receive(:roll_back_data) { raise "no roll back data for you" }
+    batch.restore_states_later
+    run_jobs
+
+    batch.reload
+    expect(batch.workflow_state).to eq "restore_failed"
+    expect(batch.data[:error_message]).to eq "no roll back data for you"
+    expect(batch.job_ids).to include 789
+  end
+
   it "creates new linked observer enrollments when restoring enrollments" do
     course = @account.courses.create!(name: "one", sis_source_id: "c1", workflow_state: "available")
     user = user_with_managed_pseudonym(account: @account, sis_user_id: "u1")

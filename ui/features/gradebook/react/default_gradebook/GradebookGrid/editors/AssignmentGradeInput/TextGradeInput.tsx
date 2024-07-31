@@ -29,6 +29,7 @@ function formatGrade(
   assignment,
   gradingScheme,
   pointsBasedGradingScheme,
+  scalingFactor,
   enterGradesAs,
   pendingGradeInfo: PendingGradeInfo
 ) {
@@ -42,6 +43,7 @@ function formatGrade(
     gradingScheme,
     pointsBasedGradingScheme,
     pointsPossible: assignment.pointsPossible,
+    scalingFactor,
     version: 'entered',
   }
 
@@ -54,6 +56,7 @@ function getGradeInfo(value, props) {
     gradingScheme: props.gradingScheme,
     pointsBasedGradingScheme: props.pointsBasedGradingScheme,
     pointsPossible: props.assignment.pointsPossible,
+    scalingFactor: props.scalingFactor,
   })
 }
 
@@ -77,6 +80,7 @@ type Props = {
     excused: boolean
     id: string
   }
+  scalingFactor: number
 }
 
 type State = {
@@ -112,6 +116,7 @@ export default class TextGradeInput extends Component<Props, State> {
       gradingScheme,
       pointsBasedGradingScheme,
       pendingGradeInfo,
+      scalingFactor,
       submission,
     } = props
     const value = formatGrade(
@@ -119,13 +124,22 @@ export default class TextGradeInput extends Component<Props, State> {
       assignment,
       gradingScheme,
       pointsBasedGradingScheme,
+      scalingFactor,
       enterGradesAs,
       pendingGradeInfo
     )
 
     this.state = {
       gradeInfo: pendingGradeInfo || getGradeInfo(submission.excused ? 'EX' : value, this.props),
-      grade: formatGrade(submission, assignment, gradingScheme, enterGradesAs, pendingGradeInfo),
+      grade: formatGrade(
+        submission,
+        assignment,
+        gradingScheme,
+        pointsBasedGradingScheme,
+        scalingFactor,
+        enterGradesAs,
+        pendingGradeInfo
+      ),
     }
   }
 
@@ -137,6 +151,7 @@ export default class TextGradeInput extends Component<Props, State> {
         gradingScheme,
         pointsBasedGradingScheme,
         pendingGradeInfo,
+        scalingFactor,
         submission,
       } = nextProps
 
@@ -146,6 +161,7 @@ export default class TextGradeInput extends Component<Props, State> {
           assignment,
           gradingScheme,
           pointsBasedGradingScheme,
+          scalingFactor,
           enterGradesAs,
           pendingGradeInfo
         ),
@@ -175,13 +191,20 @@ export default class TextGradeInput extends Component<Props, State> {
       return this.state.grade.trim() !== this.props.pendingGradeInfo.grade
     }
 
-    const {assignment, enterGradesAs, gradingScheme, pointsBasedGradingScheme, submission} =
-      this.props
+    const {
+      assignment,
+      enterGradesAs,
+      gradingScheme,
+      pointsBasedGradingScheme,
+      scalingFactor,
+      submission,
+    } = this.props
     const formattedGrade = formatGrade(
       submission,
       assignment,
       gradingScheme,
       pointsBasedGradingScheme,
+      scalingFactor,
       enterGradesAs
     )
 

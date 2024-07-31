@@ -17,6 +17,7 @@
  */
 
 import {ResourcesSection, ResourcesSectionInner} from './ResourcesSection'
+// @ts-expect-error
 import {IconFolderLine} from '@instructure/ui-icons/es/svg'
 
 const ResourcesSectionIcon = IconFolderLine?.src

@@ -341,6 +341,7 @@ ja:
   a_z_29d8e67c: "A - Z"
   ability_to_submit_annotatable_document_assignments_5bc5edd3: 注釈可能なドキュメントの課題を送信する機能。
   ability_to_submit_student_annotation_assignments_9ee47e3f: 受講生の注釈の課題を送信する機能。
+  about_smart_search_c8e7fcb4: "Smart Searchについて"
   about_this_service_b10bc808: このサービスについて
   above_max_rating_64b29915: 最大評価超
   academic_benchmark: 
@@ -2768,6 +2769,7 @@ ja:
       ライブイベント購読が
       HTTPS webhooksを介して配信されるように設定できるようにします
   allow_lor_tools: "LOR 用に設定された外部ツールの表示および使用をユーザに許可します。"
+  allow_lti_1_3_resource_links_api_341599b: "LTI 1.3 リソース リンク API を許可する"
   allow_lti_tools_to_have_an_editor_button_icon_with_15c1342a: LTIツールにエディタボタンアイコンを配置せずに許可する（デフォルトのツールアイコンを使用する）
   allow_migration_of_quizzes_during_course_copy_and__35d80756: コースのコピーおよびインポート中に、小テストの移行を許可します
   allow_moderator_to_review_multiple_independent_gra_c59d64f6: モデレータが選択した投稿の複数の独立した評定を審査できるようにする
@@ -4086,6 +4088,7 @@ ja:
   are_you_sure_you_want_to_delete_this_enrollment_74ecfeb1: この登録を削除してもよろしいですか？
   are_you_sure_you_want_to_delete_this_entry_9aecd6d3: このエントリを削除してもよろしいですか?
   are_you_sure_you_want_to_delete_this_event_824b1e33: このイベントを削除してもよろしいですか?
+  are_you_sure_you_want_to_delete_this_event_deletin_30f256d2: このイベントを削除してもよろしいですか?このイベントを削除すると、関連する課題も削除されます。
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: この採点期間セットを削除しますか？
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: この採点期間を削除してもよろしいですか?
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: この採点スキームを削除してもよろしいですか?
@@ -4150,6 +4153,7 @@ ja:
   as_of_a036fa2e: （）現在
   as_of_date_the_lti_1_3_oidc_auth_endpoint_has_chan_a8783bc6: "%{date}現在、LTI 1.3 OIDC Auth エンドポイントは https://canvas.instructure.com/api/lti/authorize_redirect から https://sso.canvaslms.com/api/lti/authorize_redirect に変更されています。この変更の理由と範囲については、*本Canvas Communityの記事で詳しく説明しています*。また、追加情報については、APIドキュメントを参照してください。この変更は小さなもので、時間はあまりかかりませんが、Canvasにインストールされているすべての LTI 1.3 ツールについて、ツール側で設定を変更する必要があります。"
   as_of_date_the_lti_1_3_platform_storage_specificat_74b82d8d: "%{date}現在、LTI 1.3 Platform Storageの仕様は、Canvasで完全にサポートされています。これを実装したいツールは、Canvas用に保存するOIDC Authエンドポイントを*https://canvas.instructure.com/api/lti/authorize_redirect*から*https://sso.canvaslms.com/api/lti/authorize_redirect*に変更する必要があります。新しい1.3ツールのインストールに推奨されるOIDC Authエンドポイントも変更されているため、できるだけ早くこの新しいエンドポイントを使用するように、すべての1.3ツールが設定を切り替えることを推奨します。"
+  as_of_june_1_2024_searchable_items_include_content_62e31b5a: "2024年6月1日現在、検索可能な項目には、コンテンツ ページ、お知らせ、ディスカッション プロンプト、課題の説明が含まれており、今後拡張される予定です。"
   as_of_june_1_2024_the_smart_search_feature_is_quer_cced176f: 2024年6月1日現在、スマート検索機能はコンテンツページ、アナウンスメント、考察プロンプト、課題の説明といったコース内のアイテム（タイトルを含む）をクエリしています。
   as_primary_c07e9394: プライマリとして
   as_secondary_ab10dec8: セカンダリとして
@@ -5424,6 +5428,7 @@ ja:
   available_from_f84e4611: 開始日時
   available_from_field_for_styleguide_7ced3861: スタイルガイドの欄から使用できます
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "次の日付けから- このような形式で YYYY-MM-DD hh:mm"
+  available_from_time_86bf4e22: 利用可能期間の開始時間
   available_pronouns_b45330b1: 利用できる代名詞
   available_submission_types_1c577ae5: 利用可能な提出タイプ
   available_to_b7350e02: 使用可能
@@ -5435,6 +5440,7 @@ ja:
   available_until_field_for_styleguide_85d5d65a: スタイルガイドの欄の使用期限は
   available_until_format_like_yyyy_mm_dd_hh_mm_622378d6: "次の日付けまで- このような形式で YYYY-MM-DD hh:mm"
   available_until_lock_at_ab022445: "%{lock_at} 終了日時"
+  available_until_time_818f35d: 利用可能機関の終了時間
   available_until_untildate_b926fe11: "%{untilDate}終了日時"
   availableslots_available_87b8b69d: "%{availableSlots} 使用可能"
   availableslots_more_available_be5193a8: "%{availableSlots} さらに利用可能"
@@ -6563,6 +6569,7 @@ ja:
   cap_the_number_of_rces_rendered_on_initial_page_lo_c3890aec: |-
       最初のページ読み込み時にレンダリングされるRCEの数を制限します。その後、
       ビューポートに入る前にそれぞれ初期化します。
+  captcha_failed_to_load_52251e9f: キャプチャの読み込みに失敗しました
   caption_1cf95987: キャプション
   captions_inherited_from_a_parent_course_cannot_be__9248fa3a: ペアレントコースから継承されたキャプションは削除することができません。
   captions_subtitles_af2c47e: キャプション/字幕
@@ -7109,6 +7116,7 @@ ja:
   common_cartridge_qti_new_quizzes_import_58b786ce: "共通カートリッジ QTI 新規小テストのインポート"
   common_timezones_2b00baba: 共通のタイムゾーン
   commons_ed0252fb: Commons
+  commons_new_quizzes_support_cb162314: "Commons の新しい小テストサポート"
   communicate_course_objectives_f457158c: コースの目的を伝える
   communicate_grading_expectations_484a1f01: 評定の予測を伝える
   communicate_to_your_students_exactly_what_will_be__57a679c5: "受講者に、コース全体を通して正確に何が必要なのかを時系列で伝えます。   作成した課題とイベントに基づいて、ビルトインシラバスを生成します。"
@@ -7452,6 +7460,7 @@ ja:
   config_url_e96ceaf3: "URL 設定"
   configurate_tool_app_5a721f2c: "%{tool} アプリを設定しますか?"
   configuration_error_906691a5: コンフィギュレーションエラー
+  configuration_json_cannot_be_empty_f3664d30: "構成 JSON は空にできません。"
   configuration_location_ee0f6592: 設定場所
   configuration_type_25a084a4: 設定のタイプ
   configure_ecb97e30: 設定
@@ -8199,6 +8208,7 @@ ja:
   contribute_4730e633: 投稿する
   contribute_to_the_page_2116bf3b: ページに投稿する
   contributed_to_this_module_item_and_is_complete_2799d5c: このモジュールアイテムに貢献し、完了しました
+  contributing_to_development_4647b24e: 開発への貢献
   controls_the_final_changes_needed_to_fully_conform_8398b749: |-
       LTI Platform Storages
       仕様に完全に準拠するために必要な最終的な変更を制御します。（正しいOIDC Auth
@@ -10022,7 +10032,7 @@ ja:
     registered_services: 登録済みサービス
     revisions: リビジョン
     rubrics: ルーブリック
-    search: 検索
+    search: "Smart Search"
     settings: 設定
     site_admin: サイト管理者
     stats: 統計
@@ -11321,6 +11331,7 @@ ja:
   display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: 表示値
   displaying_to_students_b1e92058: 受講生へ表示中
+  displayname_9410813e: "%{displayName}"
   displayname_loaded_14d71a0a: "%{displayName} 読み込み済み"
   displayname_loading_in_progress_2be325fd: "%{displayName} 読み込み中"
   displayname_loading_pending_3aa2723e: "%{displayName} 読み込み待機中"
@@ -11968,6 +11979,7 @@ ja:
   english_united_kingdom_a613f831: "英語 (イギリス)"
   enhance_color_contrast_of_content_685ddd49: コンテンツの色のコントラストを強調する
   enhance_password_options_efbf3e48: パスワードオプションの強化
+  enhance_your_canvas_experience_with_apps_that_offe_ba956afb: "コンテンツ ライブラリ、コラボレーション ツール、分析などを提供するアプリを使用して、Canvas エクスペリエンスを強化します。このページは、全アプリ機能のハブです。新しいアプリを見つけてインストールするには、[発見] ページを使用し、インストールしたアプリを確認・変更するには、[管理] ページを使用します。"
   enhanced_docviewer_url_security_72e9baa9: DocViewerURLセキュリティを強化する
   enhanced_grade_change_auditing_2b155dfa: 強化された成績の変更監査
   enhanced_gradebook_filters_a3be5e7d: 強化された評定表フィルター
@@ -13463,6 +13475,7 @@ ja:
   finnish_4df2923d: フィンランド語
   first_5744470e: 最初
   first_9685680a: 第1
+  first_item_last_item_of_total_items_displayed_a21552d9: "%{first_item} - %{last_item} / %{total_items}を表示中"
   first_last_name_9820d256: 名、次に姓
   first_name_d5c12500: （下の）名前
   first_reviewer_9ea05caa: 最初の評価者
@@ -13578,6 +13591,7 @@ ja:
   from_gravatar_58372d5a: "Gravatar から"
   from_grouptitle_860dff95: "%{groupTitle}から"
   from_the_provider_of_the_enrollments_834d5ae4: 登録のプロバイダーから
+  from_time_e23bdd0f: 開始時間
   front_page_50cae87e: トップページ
   front_page_must_be_set_first_4dbbfdbe: "トップ ページを最初に設定する必要があります"
   front_page_must_be_set_first_c5246f7d: トップページを先に設定してください
@@ -14302,6 +14316,7 @@ ja:
       buttons: 
         save: 保存
         save_settings: 設定の保存
+        show_new_sg_ui: "新しい SpeedGrader UI を使用"
         submit_comment: コメントの提出
       comment_submitted: コメントが送信されました。
       crocodoc_pending: "Crocodoc はこの文書を処理中です。"
@@ -15368,6 +15383,7 @@ ja:
   here_f44564ee: ここ。
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: カレンダーの使い方を覚えて、課題以外のイベントをコースに追加できるようになりましょう。詳しく説明しますので、心配は無用です。
   here_s_some_quick_tips_to_get_you_started_in_canva_72425979: "以下は、Canvas の使用を開始するための簡単なヒントです！"
+  hh_mm_5faafa69: "hh:mm"
   hi_contrast_373b614f: 高コントラスト
   hidden_130c3791: 非表示
   hidden_14a032a7: 非表示
@@ -15709,6 +15725,7 @@ ja:
       有効にすると、Canvas はツールがコースモジュールページで、1つのリクエストで複数のコンテンツアイテムを
       返すことを許可します
   if_enabled_canvas_will_be_able_to_export_new_quizz_504132df: "有効にすると、CanvasはCommon Cartridge Export Packagesの一部としてNew Quizzesをエクスポートできるようになります。"
+  if_enabled_canvas_will_be_able_to_share_new_quizze_784525a: "有効にすると、Canvas は新しい小テストを Commons と共有できるようになります。"
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "有効にすると、Common CartridgeインポータがHTMLファイルをページに変換します"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: 有効な場合、コンテンツの設計者は公開される前にファイルの著作権とライセンス情報を指定する必要があります。より良いファイルのブラウジングも有効になっている場合にのみ適用されます。
   if_enabled_copyright_and_license_information_must__2a551827: 有効にした場合、ファイルを公開する前に著作権とライセンス情報をファイルに提供しなければなりません。
@@ -15787,6 +15804,9 @@ ja:
   if_enabled_the_tool_installation_and_configuration_c974cdb2: |-
       有効化された場合、アカウントおよびコース設定ページにあるツールのインストールおよび設定フォームは、
       古くアクセスしにくいホームグロウンコンポーネントではなく、InstUIコンポーネントを使用します。
+  if_enabled_the_tray_that_allows_users_to_assign_le_7197db0a: |-
+      有効にすると、ユーザーが学習オブジェクトを割り当てることができるトレイが、
+      大量のオーバーライドがあるオブジェクト用に最適化されます。
   if_enabled_the_user_s_lti_url_input_on_the_select__fa539830: |-
       有効にすると、ツールが有効なLTI URLで応答した場合、
       コンテンツ選択ダイアログのユーザーのLTI URL入力は上書きされます。
@@ -17129,6 +17149,7 @@ ja:
   limit_group_members_to_leave_blank_for_no_limit_c341e248: グループのメンバーを制限する（空白にすると制限しない）
   limit_groups_to_group_limit_members_40651ea7: "グループを%{group_limit}人に限定する"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "%{num_appointments}予定への参加者の出席を制限。"
+  limit_personal_access_token_creation_to_admins_a9b8d7fe: "個人アクセス トークンの作成を管理者に制限します。"
   limit_search_to_activity_after_c1ac2449: 後のアクティビティーに絞って検索
   limit_search_to_activity_before_e05aad05: 前のアクティビティーに絞って検索
   limit_section_privileges_e6425dfd: limit_section_privileges
@@ -17360,6 +17381,8 @@ ja:
   lock_date_cannot_be_after_section_end_d37da70c: ロック日をセクションの終了日より後にすることはできません
   lock_date_cannot_be_after_term_end_cf1a188f: ロック日を期間の終了日より後にすることはできません
   lock_date_cannot_be_before_due_date_ac30f54: 終了日時を締切日より前にすることはできません
+  lock_date_cannot_be_before_reply_to_topic_due_date_fa73db43: ロック日をトピックへの返信締切日より前にすることはできません
+  lock_date_cannot_be_before_required_replies_due_da_d2763f71: ロック日を返信締切日より前にすることはできません
   lock_discussion_title_failed_9d49f2d: "ディスカッション %{title} の更新に失敗しました"
   lock_discussion_title_succeeded_fb24ebfc: "ディスカッション %{title} が正常にロックされました"
   lock_icon_a9916601: アイコンをロック
@@ -17576,6 +17599,8 @@ ja:
   lti_add_e3bc0049: "LTI - 追加"
   lti_add_edit_delete_15905170: "LTI - 追加/編集/削除"
   lti_advantage_services_c1746cb4: LTIアドバンテージサービス
+  lti_apps_discover_page_cd95458b: "LTI アプリの検出ページ"
+  lti_apps_page_bd3867af: "LTI アプリ ページ"
   lti_context_id_should_be_unique_7437a74d: "lti_context_id は一意です"
   lti_deep_linking_for_module_index_menu_881feeee: モジュールインデックスメニューのLTIディープリンク
   lti_deep_linking_line_items_5e0079f7: "LTI ディープリンキングライン項目"
@@ -17735,6 +17760,7 @@ ja:
   march_2020_responsiveness_f810a65b: "2020 年 3 月のレスポンス性"
   march_bbe310ee: ３月
   mark_all_announcement_read_eda5292b: すべてのアナウンスを既読にする
+  mark_all_announcement_read_f4fc9137: すべてのお知らせを既読にする
   mark_all_as_read_8f3bdf57: すべて既読にする
   mark_all_as_read_a995ffbe: すべてを既読としてマークする
   mark_all_as_unread_10e7f0fe: すべてを未読としてマークする
@@ -21726,6 +21752,7 @@ ja:
   outcome_mastery_scales_8c3a814d: 成果達成度スケール
   outcome_mastery_scales_add_edit_171551c: "アウトカム達成度スケール - 追加 / 編集"
   outcome_menu_4fe5813: 結果メニュー
+  outcome_name_27d81c86: アウトカム名
   outcome_outcome_id_is_not_available_in_context_con_2143db54: "アウトカム%{outcome_id}はコンテクストでは利用できません%{context_type}#%{context_id}"
   outcome_path_mastery_points: "%{path} 熟達度"
   outcome_path_result: "%{path} アウトカム"
@@ -25642,6 +25669,8 @@ ja:
   required_peer_reviews_23bea465: ピアレビューは必須です
   required_replies_8ec3e238: 必要な応答
   required_replies_due_date_f976c9af: 返信期限日必須
+  required_replies_number_d941ee4c: "返信は必須 (%{number})"
+  required_replies_required_replies_ab82825e: "返信は必須 (%{required_replies})"
   required_replies_requiredreplies_d91bed30: "返信は必須 (%{requiredReplies})"
   required_to_view_quiz_results_dba7368b: 小テストの結果を表示するために必要
   required_values_1eb5841f: 必要な値
@@ -26345,6 +26374,7 @@ ja:
   search_assignments_in_gradebook_and_new_design_for_8f966bcc: 評定表内の課題と課題や受講者用の新デザインの検索
   search_by_99d1ba5f: 検索条件
   search_by_app_name_company_name_8ea86de: アプリ名と会社名で検索
+  search_by_app_or_company_name_ad468715: アプリまたは会社名で検索
   search_by_c559efd: 検索条件
   search_by_extension_name_company_name_345e690c: 拡張子名と会社名で検索
   search_by_name_email_or_id_5fd43dc9: 名前、Eメール、またはIDで検索する
@@ -26403,6 +26433,7 @@ ja:
   search_users_48b1789e: ユーザーを検索中...
   search_within_grouptitle_4d38272f: "%{groupTitle}内で検索"
   search_within_outcome_group_7ac6ac88: 成果のグループ内で検索
+  searchable_content_7a9e0f33: 検索可能なコンテンツ
   searching_b0207e7f: 検索中
   searching_for_announcements_in_sections_must_span__80e4dfe4: セクション内の広告ウンスを検索は、正確に1コースでなされなければなりません
   second_2d4ecf45: 第２
@@ -26741,6 +26772,7 @@ ja:
       フラグを有効にしておく必要があります。このフラグが有効になると、
       ユーザーによるモジュールタイプAssignmentOverridesの作成を可能にするUIとAPIが
       有効化されるので、この機能が完全に動作するようになります。
+  selective_release_optimized_tray_873075ff: "選択的リリース - 最適化されたトレイ"
   selective_release_ui_api_changes_a60b681a: "選択的リリース - UI/API変更"
   self_enrollments: 
     already_enrolled: 
@@ -27354,7 +27386,8 @@ ja:
       name_pronunciation_header_tip: 名前の正しい発音を確認するため、表音発音を入力してください。
       name_pronunciation_label: 名前の発音
       name_pronunciation_label_tip: 名前の正しい発音を確認するため、表音発音を入力してください。
-      no_links: "%{name} はリンクを登録していません"
+      no_links: リンクが追加されていません
+      no_name_pronunciation: 名前の発音は提供されていません
       nothing_in_common: 共通のものは何もありません
       save_profile: プロフィールの保存
       service_contact: "%{service} で %{user} と連絡をとる"
@@ -27363,7 +27396,7 @@ ja:
       titles: 
         click_to_change_profile_pic: クリックして、プロフィール画像を変更
       user_enrolled: 登録
-      user_has_no_bio: "%{user} は経歴を登録していません"
+      user_has_no_bio: 略歴は追加されていません
       ways_to_contact_user: 連絡先
     recent_activity: 
       date_column: 日付
@@ -28022,8 +28055,12 @@ ja:
     threshold_24h: 24h
     threshold_36h: 36h
   smart_assignment_alerts_abc2224: スマート課題アラート
+  smart_search_community_c2a115a2: "Smart Searchコミュニティ"
+  smart_search_currently_in_development_for_canvas_u_541c3754: "現在 Canvas 向けに開発中のSmart Search（スマート検索）は、キーワード マッチングだけでなく、セマンティック アルゴリズムと AI を使用してクエリ コンテキストおよびセマンティックな意味を理解します。"
+  smart_search_employs_embeddings_to_mathematically__3c20cdd1: "Smart Searchは、多言語 AI モデルを利用し、コンテンツとクエリを比較するために数学的に表現する「埋め込み」を採用し、あらゆる言語のキーワードまたは一般的なクエリを理解します。キーワード、質問、文章など、探しているものを説明するのに最も自然なものを使用して検索クエリを作成します。"
   smart_search_fd7cd4: スマート検索
   smart_search_is_a_feature_of_canvas_that_is_curren_31f7d35d: スマート検索は、現在開発中のCanvas機能です。新しいスマート検索機能は、セマンティックアルゴリズムとAIを活用してクエリのコンテキストを理解するため、従来のブール演算子やその他の検索ツールを必要とすることなく、より正確で関連性の高い結果を提供します。
+  smart_search_is_in_feature_preview_feedback_can_be_7a80049d: "Smart Searchは機能プレビュー中です。フィードバックは、結果の評価と Smart Search Beta の Canvas コミュニティ スペースを通じて提供することができます。Canvas コミュニティ スペースは次の場所にあります: "
   smartbanner: 
     android_banner_author: "Instructure Inc."
     android_banner_in_google_play: "Google Play"
@@ -29085,7 +29122,7 @@ ja:
     quizzes: 小テスト
     rubrics: ルーブリック
     schedule: スケジュール
-    search: 検索
+    search: "Smart Search"
     settings: 設定
     syllabus: シラバス
     tab_location_error: そのタブ位置は無効です
@@ -30060,6 +30097,7 @@ ja:
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: いくつかの課題ミュートされているため、この成績は、その成績の学生のビューとは異なります
   this_grade_differs_from_the_student_s_view_of_the__f78d0023: この評定は、採点がまだ転記されていない課題があるため、受講者がみる評定とは異なります
   this_grade_has_negative_points_496400d4: この評定はマイナス点となっています
+  this_grade_is_currently_dropped_for_this_student_7bc78b78: 現在、この評定はこの受講者に対して取り下げられています。
   this_grade_is_invalid_8ab192c7: この評定は無効です
   this_grade_is_unread_fb79c002: この評定は未読です
   this_grade_is_unusually_high_60533c20: この評定は異常に高くなっています
@@ -30335,6 +30373,7 @@ ja:
   thread_addd9799: スレッド
   threshold_in_hours_to_notify_students_within_f33820aa: 受講生に通知するしきい値（時間単位）
   threshold_pts_45f0e5d8: "域値：%{pts}"
+  threshold_threshold_a67e73a1: "域値：%{threshold}"
   throttle_jobs_f61be56: ジョブをスロットル
   throttle_tag_tag_ba5b9b50: "スロットルタグ %{tag}"
   throttling_jobs_4a90578c: ジョブをスロットル中
@@ -31595,6 +31634,8 @@ ja:
   unlock_date_can_t_be_blank_43efb114: ロック解除日を空白にすることはできません
   unlock_date_cannot_be_after_due_date_8829d9ca: ロック解除日を期日より後にすることはできません
   unlock_date_cannot_be_after_lock_date_591f7fda: ロック解除日をロック日より後にすることはできません
+  unlock_date_cannot_be_after_reply_to_topic_due_dat_37eee496: ロック解除日をトピックへの返信締切日より後にすることはできません
+  unlock_date_cannot_be_after_required_replies_due_d_df13dbc7: ロック解除日を必須の返信締切日より後にすることはできません
   unlock_date_cannot_be_before_course_start_9c7b8524: ロック解除日をコース開始日より前にすることはできません
   unlock_date_cannot_be_before_section_start_793ddc66: ロック解除日をセクション開始日より前にすることはできません
   unlock_date_cannot_be_before_term_start_d3c01813: ロック解除日を期間の開始日より前にすることはできません
@@ -31699,6 +31740,7 @@ ja:
   until_date_must_be_after_the_due_date_d961566c: 「終了日」は「開始日」より後でなければなりません
   until_date_must_be_after_the_event_start_date_972f759d: 「終了日」はイベント開始日以降でなければなりません。
   until_fccd159a: 期限：
+  until_time_a6cade90: 期限時刻
   untitled_16aa4f2b: 無題
   untitled_assignment_59354b34: 無題の課題
   untitled_filter_c07b8ddc: 無題のフィルター
@@ -32491,6 +32533,7 @@ ja:
   using_login_attribute_integration_id_9067ea54: "ログイン属性: 統合ID"
   using_login_attribute_sis_user_id_b5ec538f: 使用するログイン属性：SISユーザーID
   using_login_attribute_unique_user_id_a307a9f: "ログイン属性: 一意のユーザーID"
+  using_smart_search_aecf6c76: "Smart Search の使用"
   utc_e44049af: UTC
   uuid_has_been_provisioned_ab0c6c9: UUIDがプロビジョニングされました。
   val_percent_c2ca6679: "%val パーセント"
@@ -32792,6 +32835,7 @@ ja:
   what_content_is_searchable_375a0670: どのようなコンテンツを検索できますか？
   what_does_provisioning_only_mean_eac9a4a1: 「準備のみ」とはどういう意味ですか？
   what_happened_322d8259: なにが起こったのでしょう？
+  what_if_grades_7ad8ce0b: "What If 評定"
   what_if_score_change_operation_failed_b81afd6d: 仮スコア変更操作に失敗しました
   what_if_score_input_for_assignmentname_d4092efe: "%{assignmentName} の仮スコア"
   what_if_score_updated_7565581d: 仮スコアが更新されました
@@ -32891,11 +32935,16 @@ ja:
   when_enabled_teachers_can_choose_to_allow_observer_320b555e: |-
       有効にすると、教員は、
       カレンダーに予定グループを作成する際に、オブザーバーに予定をスケジュールすることを許可するかどうかを選択できます。
+  when_enabled_the_canvas_api_for_lti_resource_links_25c51eb0: |-
+      有効にすると、LTI リソース リンク用の Canvas API が使用可能になります。管理者は
+      この API を使用して、ツールから返されたコンテンツを表示できます。
   when_enabled_the_hidden_html_forms_that_are_used_t_c5edd929: |-
       有効にすると、LTIの起動をトリガするために使用される非表示のHTMLフォームの
        ID に乱数が追加されます。無効にすると、全
       が同じ ID を持つようになりますtool_form。
   when_enabled_the_internal_access_manager_will_be_u_bc470109: 有効にすると、内部アクセスマネージャが、特定のリクエストへのアクセスをゲートするために使用されます。
+  when_enabled_the_lti_apps_discover_page_will_be_av_39ad751c: "有効にすると、LTI アプリの検出ページがアプリ ページで使用できるようになります。"
+  when_enabled_the_lti_apps_page_will_be_available_i_23ec031f: "有効にすると、LTI アプリページがアカウント ナビゲーション サイドバーで使用できるようになります。"
   when_enabled_the_lti_extensions_discover_page_will_8bb57ff6: "有効にすると、LTI拡張機能発見ページ が拡張機能ビューで利用できるようになります。"
   when_enabled_the_lti_extensions_page_will_be_avail_ac8ed3fa: "有効にすると、LTI拡張機能発見ページ がアカウントナビゲーションで利用できるようになります。"
   when_enabled_the_new_submission_type_resource_card_c0f45d0d: 有効化されると、課題編集ページに新規提出タイプのリソースカード回数を減らす表示されます。
@@ -33578,6 +33627,7 @@ ja:
   your_azure_active_directory_tenant_name_d8bb31fa: "Azure Active Directoryテナント名"
   your_browser_connectivity_may_be_slow_or_unstable__97c1f4c5: ブラウザの接続が遅いか、不安定な状態かもしれません。ブラウザのタイマーが切断されていますが、この試みでは、元の制限時間を超えてさらに5分間、回答が記録されます。
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "ご利用のブラウザは Canvas の最小要件を満たしていません。サポートされるブラウザについては *Canvas コミュニティー* を参照してください。"
+  your_canvas_administrators_have_chosen_to_limit_yo_41a4187: "Canvas 管理者は、独自のアクセス トークンを生成する機能を制限することを選択しています。Canvas 管理者に連絡して、あなたの代わりにアクセス トークンを生成してもらってください。"
   your_classic_quizzes_have_been_migrated_to_new_qui_e49244da: クラシック小テストは、新しい小テストに移行されました。
   your_comment_is_not_posted_12677035: あなたのコメントは投稿されていません
   your_comment_was_auto_saved_as_a_draft_c49d3510: コメントは下書きとして自動的に保存されました。
@@ -33634,6 +33684,7 @@ ja:
   your_unpublished_changes_will_be_reverted_to_their_fd4ba075: 公開されていない変更内容は、以前に保存された状態に戻されます。
   your_webcam_may_already_be_in_use_6cd64c25: あなたのウェブカメラは既に使用中かもしれません。
   your_work_has_been_submitted_519058f8: あなたの課題が提出されました。
+  yyyy_mm_dd_cbbd9959: YYYY-MM-DD
   yyyy_mm_dd_hh_mm_a01b6081: "YYYY-MM-DD hh:mm"
   z_a_b48d8903: "Z - A"
   z_a_be2ab67c: Z-A

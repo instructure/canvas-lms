@@ -38,6 +38,12 @@
     "afrikaans_da0fe6ee": {
         "message": "Afrikaans"
     },
+    "ai_response_9624e8e8": {
+        "message": "Odpowiedź AI"
+    },
+    "ai_tools_fda01177": {
+        "message": "Narzędzia IA"
+    },
     "albanian_21ed929e": {
         "message": "Albański"
     },
@@ -76,6 +82,9 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Wystąpił błąd podczas przesyłania żądania sieciowego"
+    },
+    "an_error_occurred_processing_your_request_a3a38d84": {
+        "message": "Podczas przetwarzania żądania wystąpił błąd."
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "Podczas wysyłania multimediów wystąpił błąd."
@@ -347,6 +356,9 @@
     "complex_numbers_a543d004": {
         "message": "Liczby zespolone"
     },
+    "compose_44c904f4": {
+        "message": "Utwórz"
+    },
     "computer_1d7dfa6f": {
         "message": "Komputer"
     },
@@ -373,6 +385,9 @@
     },
     "coproduct_e7838082": {
         "message": "Suma"
+    },
+    "copy_9748f9f": {
+        "message": "Kopiuj"
     },
     "copyright_holder_66ee111": {
         "message": "Właściciel praw autorskich:"
@@ -551,6 +566,9 @@
     "disjoint_union_e74351a8": {
         "message": "Suma rozłączna"
     },
+    "dislike_14befc48": {
+        "message": "Odrzuć"
+    },
     "display_options_315aba85": {
         "message": "Opcje wyświetlania"
     },
@@ -695,6 +713,9 @@
     "enter_search_text_26cb4459": {
         "message": "Wpisz tekst do wyszukania"
     },
+    "enter_text_8b35c65b": {
+        "message": "Wpisz tekst"
+    },
     "epsilon_54bb8afa": {
         "message": "Epsilon"
     },
@@ -760,6 +781,9 @@
     },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Nie udało się pobrać zawartości pliku"
+    },
+    "failed_to_copy_response_d3def551": {
+        "message": "Nie udało się skopiować odpowiedzi"
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Nie udało się pobrać zawartości z zewnętrznego narzędzia"
@@ -962,6 +986,12 @@
     "height_69b03e15": {
         "message": "Wysokość"
     },
+    "hello_please_describe_the_modifications_you_would__49b19837": {
+        "message": "Witaj. Opisz, co powinno zmienić się w Twoim wypracowaniu."
+    },
+    "hello_please_describe_the_modifications_you_would__600dbbf0": {
+        "message": "Witaj. Opisz, co powinno zmienić się w Twoich wyborach."
+    },
     "hexagon_d8468e0d": {
         "message": "Sześciobok"
     },
@@ -994,6 +1024,9 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Posiadam prawa autorskie"
+    },
+    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
+        "message": "Przepraszam, nie mogę znaleźć odpowiedzi AI"
     },
     "icelandic_9d6d35de": {
         "message": "Islandzki"
@@ -1382,6 +1415,9 @@
     "miscellaneous_e9818229": {
         "message": "Różne"
     },
+    "modify_6b0b13e3": {
+        "message": "Zmień"
+    },
     "module_90d9fd32": {
         "message": "Moduł"
     },
@@ -1682,6 +1718,9 @@
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Zezwól Canvas na łączenie się z kamerą sieciową i mikrofonem."
     },
+    "please_decribe_what_you_would_like_to_compose_27a51be5": {
+        "message": "Opisz, jakie chcesz stworzyć wypracowanie."
+    },
     "plus_d43cd4ec": {
         "message": "Plus"
     },
@@ -1832,11 +1871,17 @@
     "resize_ec83d538": {
         "message": "Zmień rozmiar"
     },
+    "response_copied_to_clipboard_130d66cd": {
+        "message": "Skopiowano odpowiedź do schowka."
+    },
     "restore_auto_save_deccd84b": {
         "message": "Przywrócić automatycznie zapisaną zawartość?"
     },
     "result_index_of_max_7db5ad8b": {
         "message": "Wynik { index } z { max }."
+    },
+    "retry_ebd5f8ba": {
+        "message": "Ponów próbę"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Kołowrót zwrotny (nie spełnia)"
@@ -1996,6 +2041,9 @@
     },
     "shortcut_911d6255": {
         "message": "Skrót"
+    },
+    "show_all_967a90f0": {
+        "message": "Pokaż wszystko"
     },
     "show_audio_options_b489926b": {
         "message": "Pokaż opcje audio"
@@ -2552,6 +2600,9 @@
     "view_word_and_character_counts_a743dd0c": {
         "message": "Wyświetl liczbę słów i znaków"
     },
+    "waiting_for_response_1efd0c50": {
+        "message": "Oczekiwanie na odpowiedź"
+    },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "Nie udało się wykryć działającego mikrofonu podłączonego do urządzenia."
     },
@@ -2572,6 +2623,9 @@
     },
     "welsh_42ab94b1": {
         "message": "Walijski"
+    },
+    "what_would_you_like_to_do_6dc0d541": {
+        "message": "Co chcesz robić?"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "Gdy używane jest oznaczenie, które wizualnie formatuje elementy jako listę, ale nie wskazuje na relacje w liście, użytkownicy mogą mieć problem z nawigowaniem po informacjach."
@@ -2602,6 +2656,9 @@
     },
     "wreath_product_200b38ef": {
         "message": "Produkt splotowy"
+    },
+    "writing_assistant_a30ac16a": {
+        "message": "Asystent pisania"
     },
     "xi_149681d0": {
         "message": "Ksi"

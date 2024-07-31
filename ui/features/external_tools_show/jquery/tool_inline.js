@@ -21,7 +21,6 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/module-sequence-footer'
 import MarkAsDone from '@canvas/util/jquery/markAsDone'
 import ToolLaunchResizer from '@canvas/lti/jquery/tool_launch_resizer'
-import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import ready from '@instructure/ready'
 import MutexManager from '@canvas/mutex-manager/MutexManager'
 
@@ -187,5 +186,3 @@ ready(() => {
     MarkAsDone.toggle(this)
   })
 })
-
-monitorLtiMessages()

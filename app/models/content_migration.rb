@@ -1357,7 +1357,8 @@ class ContentMigration < ActiveRecord::Base
       "source_host" => source_course&.root_account&.domain(ApplicationController.test_cluster_name),
       "source_course" => source_course_id&.to_s,
       "contains_migration_ids" => Account.site_admin.feature_enabled?(:content_migration_asset_map_v2),
-      "resource_mapping" => data
+      "resource_mapping" => data,
+      "migration_user_uuid" => user&.uuid
     }
 
     if asset_map_v2?

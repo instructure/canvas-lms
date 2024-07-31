@@ -24,10 +24,9 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Tray} from '@instructure/ui-tray'
-import {View, type ViewOwnProps} from '@instructure/ui-view'
+import {View} from '@instructure/ui-view'
 import {SVGIcon} from '@instructure/ui-svg-images'
 
-// import {Container, ContainerIcon} from '../user/blocks/Container'
 import {ButtonBlock, ButtonBlockIcon} from '../user/blocks/ButtonBlock'
 import {TextBlock, TextBlockIcon} from '../user/blocks/TextBlock'
 import {HeadingBlock, HeadingBlockIcon} from '../user/blocks/HeadingBlock'
@@ -35,6 +34,7 @@ import {ResourceCard, ResourceCardIcon} from '../user/blocks/ResourceCard'
 import {ImageBlock, ImageBlockIcon} from '../user/blocks/ImageBlock'
 import {IconBlock, IconBlockIcon} from '../user/blocks/IconBlock'
 import {RCEBlock, RCEBlockIcon} from '../user/blocks/RCEBlock'
+import {TabsBlock, TabsBlockIcon} from '../user/blocks/TabsBlock'
 
 type ToolboxProps = {
   open: boolean
@@ -44,7 +44,6 @@ type ToolboxProps = {
 
 export const Toolbox = ({open, container, onClose}: ToolboxProps) => {
   const {connectors} = useEditor()
-  const [activeTab, setActiveTab] = useState(1)
   const [trayRef, setTrayRef] = useState<HTMLElement | null>(null)
   const [containerStyle] = useState<Partial<CSSStyleDeclaration>>(() => {
     if (container) {
@@ -136,6 +135,7 @@ export const Toolbox = ({open, container, onClose}: ToolboxProps) => {
           {renderBox('Heading', HeadingBlockIcon, <HeadingBlock />)}
           {renderBox('Resource Card', ResourceCardIcon, <ResourceCard />)}
           {renderBox('Image', ImageBlockIcon, <ImageBlock />)}
+          {renderBox('Tabs', TabsBlockIcon, <TabsBlock />)}
         </Flex>
       </View>
     </Tray>

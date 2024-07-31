@@ -190,6 +190,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       args << "studentIds: [#{date[:studentIds].map { |id| "\"#{id}\"" }.join(", ")}]" if date[:studentIds]
       args << "setType: #{date[:setType]}" if date[:setType]
       args << "setId: #{date[:setId]}" if date[:setId]
+      args << "id: #{date[:id]}" if date[:id]
 
       dates_out << "{ #{args.join(", ")} }"
     end
@@ -668,6 +669,58 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
 
       @checkpoint1.reload
       expect(@checkpoint1.due_at).to be_within(1.second).of(new_due_at)
+    end
+
+    it "updates checkpoints with overrides due dates" do
+      section = add_section("M03")
+      result1 = run_mutation(id: @graded_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
+                               { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC,
+                                 dates: [
+                                   { type: "override", dueAt: @due_at1.iso8601, setType: "CourseSection", setId: section.id }
+                                 ],
+                                 pointsPossible: 5 },
+                               { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY,
+                                 dates: [
+                                   { type: "override", dueAt: @due_at1.iso8601, setType: "CourseSection", setId: section.id }
+                                 ],
+                                 pointsPossible: 10,
+                                 repliesRequired: 2 }
+                             ])
+
+      expect(result1["errors"]).to be_nil
+      @checkpoint1.reload
+      @checkpoint2.reload
+
+      c1_assignment_override = @checkpoint1.assignment_overrides.active.first
+      c2_assignment_override = @checkpoint2.assignment_overrides.active.first
+
+      expect(c1_assignment_override.due_at).to be_within(1.second).of(@due_at1)
+      expect(c2_assignment_override.due_at).to be_within(1.second).of(@due_at1)
+
+      result2 = run_mutation(id: @graded_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
+                               { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC,
+                                 dates: [
+                                   { type: "override", id: c1_assignment_override.id, dueAt: @due_at2.iso8601, setType: "CourseSection", setId: section.id }
+                                 ],
+                                 pointsPossible: 5 },
+                               { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY,
+                                 dates: [
+                                   { type: "override", id: c2_assignment_override.id, dueAt: @due_at2.iso8601, setType: "CourseSection", setId: section.id }
+                                 ],
+                                 pointsPossible: 10,
+                                 repliesRequired: 2 }
+                             ])
+
+      expect(result2["errors"]).to be_nil
+
+      @checkpoint1.reload
+      @checkpoint2.reload
+
+      c1_assignment_override = @checkpoint1.assignment_overrides.active.first
+      c2_assignment_override = @checkpoint2.assignment_overrides.active.first
+
+      expect(c1_assignment_override.due_at).to be_within(1.second).of(@due_at2)
+      expect(c2_assignment_override.due_at).to be_within(1.second).of(@due_at2)
     end
 
     it "updates the reply to topic overrides to add a section override and then, remove it" do

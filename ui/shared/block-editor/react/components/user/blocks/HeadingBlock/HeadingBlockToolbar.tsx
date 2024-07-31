@@ -42,6 +42,7 @@ import {Menu, type MenuItemProps, type MenuItem} from '@instructure/ui-menu'
 import {IconMiniArrowDownLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {type ViewOwnProps} from '@instructure/ui-view'
+import {type HeadingBlockProps} from './types'
 
 const HeadingBlockToolbar = () => {
   const {
@@ -58,7 +59,8 @@ const HeadingBlockToolbar = () => {
       _selected: MenuItemProps['selected'],
       _args: MenuItem
     ) => {
-      setProp(prps => (prps.level = value))
+      const level = value as HeadingBlockProps['level']
+      setProp((prps: HeadingBlockProps) => (prps.level = level))
     },
     [setProp]
   )

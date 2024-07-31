@@ -42,4 +42,9 @@ describe('CompletionProgressBar', () => {
     renderComponent({workflowState: 'failed'})
     await waitFor(() => expect(document.body.firstChild).toBeEmptyDOMElement())
   })
+
+  it('does not render when the migration is waiting for select', async () => {
+    renderComponent({workflowState: 'waiting_for_select'})
+    await waitFor(() => expect(document.body.firstChild).toBeEmptyDOMElement())
+  })
 })

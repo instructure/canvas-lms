@@ -96,8 +96,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     SQL
     set_search_path("guard_excessive_updates")
 
-    metadata = ActiveRecord::InternalMetadata
-    metadata = metadata.new(connection) if $canvas_rails == "7.1"
+    metadata = ActiveRecord::InternalMetadata.new(connection)
     metadata[:guard_dangerous_changes_installed] = "true"
 
     # there may already be tables from plugins

@@ -41,11 +41,8 @@ describe DataFixup::CreateMediaObjectsForMediaAttachmentsLacking do
       allow(MediaObject).to receive(:where).and_call_original
       expect(@fake_child_attachment.media_entry_id).to be_nil
       DataFixup::CreateMediaObjectsForMediaAttachmentsLacking.run
-      expect(Attachment).to have_received(:where).with({
-                                                         filename: "whatever.flv",
-                                                         context_id: [course.id]
-                                                       })
-      expect(MediaObject).not_to have_received(:where).with({ title: "whatever.flv" })
+      expect(Attachment).to have_received(:where).with({ context_id: [course.id] })
+      expect(MediaObject).not_to have_received(:where).with("title LIKE ?", "whatever.flv%")
       @fake_child_attachment.reload
       expect(@fake_child_attachment.media_entry_id).to eq("m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW")
     end
@@ -65,7 +62,7 @@ describe DataFixup::CreateMediaObjectsForMediaAttachmentsLacking do
       allow(MediaObject).to receive(:where).and_call_original
       expect(@fake_child_attachment.media_entry_id).to be_nil
       DataFixup::CreateMediaObjectsForMediaAttachmentsLacking.run
-      expect(MediaObject).to have_received(:where).with({ title: "whatever.flv" }) # Looked (and found) directly in media objects
+      expect(MediaObject).to have_received(:where).with("title LIKE ?", "whatever.flv%") # Looked (and found) directly in media objects
       expect(Attachment).not_to have_received(:where).with({ filename: "whatever.flv" }) # Didn't need to look at *all* the attachments
       @fake_child_attachment.reload
       expect(@fake_child_attachment.media_entry_id).to eq("m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW")
@@ -86,10 +83,34 @@ describe DataFixup::CreateMediaObjectsForMediaAttachmentsLacking do
       allow(MediaObject).to receive(:where).and_call_original
       expect(@fake_child_attachment.media_entry_id).to be_nil
       DataFixup::CreateMediaObjectsForMediaAttachmentsLacking.run
-      expect(MediaObject).to have_received(:where).with({ title: "whatever.flv" }) # Tried media object searching
+      expect(MediaObject).to have_received(:where).with("title LIKE ?", "whatever.flv%") # Tried media object searching
       expect(Attachment).to have_received(:where).with({ filename: "whatever.flv" }) # Didn't take... so we tried aaaall attachments
       @fake_child_attachment.reload
       expect(@fake_child_attachment.media_entry_id).to eq("m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW")
+    end
+  end
+
+  context "Couldn't find media id for attachment" do
+    before do
+      @fake_child_course = course_model
+      @fake_child_attachment = Attachment.create! context: @fake_child_course, filename: "whatever.flv", content_type: "unknown/unknown", migration_id: "doesntmatter"
+      @fake_child_course.assignments.create!(submission_types: "online_text_entry", points_possible: 2, description: "<iframe width=0 height=0 src=\"/media_attachments_iframe/#{@fake_child_attachment.id}/?type=video&amp;embedded=true\"></iframe>")
+    end
+
+    it "creates a failure report" do
+      allow(Attachment).to receive(:where).and_call_original
+      allow(MediaObject).to receive(:where).and_call_original
+      expect(@fake_child_attachment.media_entry_id).to be_nil
+      DataFixup::CreateMediaObjectsForMediaAttachmentsLacking.run
+      expect(MediaObject).to have_received(:where).with("title LIKE ?", "whatever.flv%") # Tried media object searching
+      expect(Attachment).to have_received(:where).with({ filename: "whatever.flv" }) # Didn't take... so we tried aaaall attachments
+      expect(JSON.parse(Account.site_admin.attachments.last.open.read)).to eq([
+                                                                                {
+                                                                                  "attachment_id" => @fake_child_attachment.id.to_s,
+                                                                                  "media_id" => nil,
+                                                                                  "record_id" => "Assignment: #{@fake_child_course.assignments.last.id}"
+                                                                                }
+                                                                              ])
     end
   end
 
@@ -124,7 +145,7 @@ describe DataFixup::CreateMediaObjectsForMediaAttachmentsLacking do
       expect(MediaObject).to have_received(:where).with({ media_id: "m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW" })
       expect(MediaObject).to have_received(:where).with({ media_id: "m-Ec5DCESB732dGZAmbnEHAUkGCSe2Kx5e" })
       # Didn't have to run the worst queries
-      expect(MediaObject).not_to have_received(:where).with({ title: "whatever.flv" })
+      expect(MediaObject).not_to have_received(:where).with("title LIKE ?", "whatever.flv%")
       expect(Attachment).not_to have_received(:where).with({ title: "whatever.flv" })
       @fake_child_attachment.reload
       expect(@fake_child_attachment.reload.media_entry_id).to eq("m-2dGZAmbnEHAUkGCSe2Kx5eEc5DCESB73") # Got the data from the id markup

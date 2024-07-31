@@ -17,12 +17,12 @@
  */
 
 import React, {useCallback, useState} from 'react'
-import {useEditor, useNode, type Node} from '@craftjs/core'
+import {useNode, type Node} from '@craftjs/core'
 import {SectionMenu, type SectionMenuProps} from '../../../editor/SectionMenu'
 import {QuizModal} from './QuizModal'
+import {type QuizSectionProps} from './types'
 
 const QuizSectionMenu = ({onAddSection}: SectionMenuProps) => {
-  const {actions} = useEditor()
   const {
     actions: {setProp},
     props,
@@ -41,7 +41,7 @@ const QuizSectionMenu = ({onAddSection}: SectionMenuProps) => {
 
   const handleSelectQuestion = useCallback(
     (newQuestionId: string) => {
-      setProp(prps => {
+      setProp((prps: QuizSectionProps) => {
         prps.questionId = newQuestionId
       })
     },

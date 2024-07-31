@@ -286,6 +286,14 @@ class Rubric < ActiveRecord::Base
     OutcomeFriendlyDescription.where(learning_outcome_id: data_outcome_ids)
   end
 
+  def outcome_data
+    return [] unless data_outcome_ids.present?
+
+    LearningOutcome.where(id: data_outcome_ids).map do |outcome|
+      { id: outcome.id, display_name: outcome.display_name }
+    end
+  end
+
   def criteria_object
     reconstitute_criteria(data)
   end

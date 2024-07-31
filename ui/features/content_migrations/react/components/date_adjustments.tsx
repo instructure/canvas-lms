@@ -53,9 +53,11 @@ export const remapSubstitutions = (
 export const DateAdjustments = ({
   dateAdjustments,
   setDateAdjustments,
+  disabled,
 }: {
   dateAdjustments: DateAdjustmentConfig | false
   setDateAdjustments: (arg0: DateAdjustmentConfig) => void
+  disabled?: boolean
 }) => {
   const [dateOperation, setDateOperation] = useState<'shift_dates' | 'remove_dates'>('shift_dates')
   const [start_from_date, setStartFromDate] = useState('')
@@ -118,6 +120,7 @@ export const DateAdjustments = ({
                 const treated_value = value as 'shift_dates' | 'remove_dates'
                 changeDateOperation(treated_value)
               }}
+              disabled={disabled}
               name="date_operation"
               defaultValue="shift_dates"
               layout="stacked"
@@ -157,7 +160,7 @@ export const DateAdjustments = ({
                           {I18n.t('Select original beginning date')}
                         </ScreenReaderContent>
                       }
-                      interaction="enabled"
+                      interaction={disabled ? 'disabled' : 'enabled'}
                       width={matches?.includes('small') ? '100%' : '18.75rem'}
                     />
                     <View
@@ -181,7 +184,7 @@ export const DateAdjustments = ({
                           {I18n.t('Select new beginning date')}
                         </ScreenReaderContent>
                       }
-                      interaction="enabled"
+                      interaction={disabled ? 'disabled' : 'enabled'}
                       width={matches?.includes('small') ? '100%' : '18.75rem'}
                     />
                   </Flex>
@@ -205,7 +208,7 @@ export const DateAdjustments = ({
                           {I18n.t('Select original end date')}
                         </ScreenReaderContent>
                       }
-                      interaction="enabled"
+                      interaction={disabled ? 'disabled' : 'enabled'}
                       width={matches?.includes('small') ? '100%' : '18.75rem'}
                     />
                     <View
@@ -227,7 +230,7 @@ export const DateAdjustments = ({
                       renderLabel={
                         <ScreenReaderContent>{I18n.t('Select new end date')}</ScreenReaderContent>
                       }
-                      interaction="enabled"
+                      interaction={disabled ? 'disabled' : 'enabled'}
                       width={matches?.includes('small') ? '100%' : '18.75rem'}
                     />
                   </Flex>
@@ -238,6 +241,7 @@ export const DateAdjustments = ({
                     <Flex as="div" direction={matches?.includes('small') ? 'column' : 'row'}>
                       <SimpleSelect
                         autoFocus={true}
+                        interaction={disabled ? 'disabled' : 'enabled'}
                         onChange={(
                           _e: React.SyntheticEvent<Element, Event>,
                           data: {value?: string | number | undefined; id?: string | undefined}
@@ -270,6 +274,7 @@ export const DateAdjustments = ({
                           setSubstitution(substitution.id, data, 'to')
                         }}
                         renderLabel=""
+                        interaction={disabled ? 'disabled' : 'enabled'}
                         width={matches?.includes('small') ? '100%' : '18.75rem'}
                       >
                         {weekDays.map((d, index) => (
@@ -281,6 +286,7 @@ export const DateAdjustments = ({
                       <IconButton
                         withBorder={false}
                         withBackground={false}
+                        disabled={disabled}
                         onClick={() => {
                           const tmp = JSON.parse(JSON.stringify(dateAdjustments))
                           tmp.date_shift_options.day_substitutions =
@@ -312,6 +318,7 @@ export const DateAdjustments = ({
                   }}
                   color="secondary"
                   width={matches?.includes('small') ? '100%' : '8.5rem'}
+                  disabled={disabled}
                 >
                   <PresentationContent>
                     <IconAddLine /> {I18n.t('Substitution')}

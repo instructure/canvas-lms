@@ -173,7 +173,7 @@ describe ExternalToolsController do
 
         it "caches the the LTI 1.3 launch" do
           subject
-          expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
+          expect(cached_launch["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
         end
 
         it 'sets the "canvas_domain" to the request domain' do
@@ -184,7 +184,7 @@ describe ExternalToolsController do
 
         it "defaults placement to context navigation" do
           subject
-          expect(cached_launch["https://www.instructure.com/placement"]).to eq "course_navigation"
+          expect(cached_launch["post_payload"]["https://www.instructure.com/placement"]).to eq "course_navigation"
         end
 
         context "in the student_context_card placement" do
@@ -230,7 +230,7 @@ describe ExternalToolsController do
 
             it "includes lti_student_id in launch" do
               subject
-              expect(cached_launch["https://www.instructure.com/lti_student_id"]).to eq(student.global_id.to_s)
+              expect(cached_launch["post_payload"]["https://www.instructure.com/lti_student_id"]).to eq(student.global_id.to_s)
             end
           end
         end
@@ -253,7 +253,7 @@ describe ExternalToolsController do
 
         it "returns the TestUser claim when viewing as a student" do
           get :show, params: { course_id: @course.id, id: tool.id }
-          expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/roles"]).to include("http://purl.imsglobal.org/vocab/lti/system/person#TestUser")
+          expect(cached_launch["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/roles"]).to include("http://purl.imsglobal.org/vocab/lti/system/person#TestUser")
         end
       end
 
@@ -264,12 +264,12 @@ describe ExternalToolsController do
 
         it "get passed in target_link_uri" do
           get :show, params: { course_id: @course.id, id: tool.id, launch_url: "http://www.example.com/deep_link" }
-          expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/target_link_uri"]).to eq "http://www.example.com/deep_link"
+          expect(cached_launch["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/target_link_uri"]).to eq "http://www.example.com/deep_link"
         end
 
         it "does not pass in target_link_uri if it doesn't match the tool domain" do
           get :show, params: { course_id: @course.id, id: tool.id, launch_url: "http://www.hi.com/deep_link" }
-          expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/target_link_uri"]).to eq "http://www.example.com/basic_lti"
+          expect(cached_launch["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/target_link_uri"]).to eq "http://www.example.com/basic_lti"
         end
       end
     end
@@ -1008,7 +1008,7 @@ describe ExternalToolsController do
         context "when launch_type is not provided" do
           it "does not include placement in launch" do
             get_page
-            expect(launch_hash["https://www.instructure.com/placement"]).to be_nil
+            expect(launch_hash["post_payload"]["https://www.instructure.com/placement"]).to be_nil
           end
         end
 
@@ -1023,13 +1023,13 @@ describe ExternalToolsController do
 
           it "includes placement in launch" do
             get_page
-            expect(launch_hash["https://www.instructure.com/placement"]).to eq launch_type
+            expect(launch_hash["post_payload"]["https://www.instructure.com/placement"]).to eq launch_type
           end
         end
 
         it "sets the custom parameters in the launch hash" do
           get_page
-          expect(launch_hash["https://purl.imsglobal.org/spec/lti/claim/custom"]).to include(
+          expect(launch_hash["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/custom"]).to include(
             "abc" => "def",
             "expans" => @teacher.id.to_s
           )
@@ -1042,7 +1042,7 @@ describe ExternalToolsController do
             resource_link_lookup_id: rl.lookup_uuid
           }
 
-          expect(launch_hash["https://purl.imsglobal.org/spec/lti/claim/custom"]).to include(
+          expect(launch_hash["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/custom"]).to include(
             "abc" => "def",
             "expans" => @teacher.id.to_s
           )
@@ -1104,7 +1104,7 @@ describe ExternalToolsController do
           )
           rl.update(context_external_tool: tool2)
           get_page
-          expect(launch_params["https://purl.imsglobal.org/spec/lti/claim/custom"]).to be_blank
+          expect(launch_params["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/custom"]).to be_blank
         end
 
         it "succeeds if the resource_link is for a tool with the same host" do
@@ -1119,7 +1119,7 @@ describe ExternalToolsController do
           rl.update(context_external_tool: tool2)
           get_page
           expect(
-            launch_params["https://purl.imsglobal.org/spec/lti/claim/custom"]
+            launch_params["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/custom"]
           ).to eq({ "abc" => "def", "expans" => @teacher.id.to_s })
         end
 
@@ -1147,7 +1147,7 @@ describe ExternalToolsController do
           lti_assignment_id = SecureRandom.uuid
           jwt = Canvas::Security.create_jwt({ lti_assignment_id: })
           get :show, params: { course_id: @course.id, id: lti_1_3_tool.id, secure_params: jwt, launch_type: "assignment_selection" }
-          expect(launch_hash["https://purl.imsglobal.org/spec/lti/claim/custom"]["assignment_id"]).to eq(lti_assignment_id)
+          expect(launch_hash["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/custom"]["assignment_id"]).to eq(lti_assignment_id)
         end
       end
 
@@ -1174,7 +1174,7 @@ describe ExternalToolsController do
         # end
 
         let(:jwt) do
-          deep_link_return_url = launch_params["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]["deep_link_return_url"]
+          deep_link_return_url = launch_params["post_payload"]["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]["deep_link_return_url"]
           return_jwt = deep_link_return_url.match(/data=([^&]*)/)[1]
           JSON::JWT.decode(return_jwt, :skip_verification)
         end
@@ -1959,8 +1959,8 @@ describe ExternalToolsController do
           let(:message_type) { "LtiDeepLinkingRequest" }
 
           it_behaves_like "includes editor variables" do
-            let(:selection_launch_param) { launch_params.dig("https://purl.imsglobal.org/spec/lti/claim/custom", "selection") }
-            let(:contents_launch_param) { launch_params.dig("https://purl.imsglobal.org/spec/lti/claim/custom", "contents") }
+            let(:selection_launch_param) { launch_params["post_payload"].dig("https://purl.imsglobal.org/spec/lti/claim/custom", "selection") }
+            let(:contents_launch_param) { launch_params["post_payload"].dig("https://purl.imsglobal.org/spec/lti/claim/custom", "contents") }
           end
 
           context "when the parent_frame_context param is sent" do
@@ -1972,7 +1972,7 @@ describe ExternalToolsController do
             end
 
             it "forwards parent_frame_context to the deep link return url" do
-              deep_link_return_url = launch_params["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]["deep_link_return_url"]
+              deep_link_return_url = launch_params["post_payload"]["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]["deep_link_return_url"]
               return_jwt = deep_link_return_url.match(/data=([^&]*)/)[1]
               jwt = JSON::JWT.decode(return_jwt, :skip_verification)
               expect(jwt[:parent_frame_context]).to eq tool.id.to_s

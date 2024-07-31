@@ -45,9 +45,13 @@ const I18n = useI18nScope('discussions_v2')
 
 const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
 const SEARCH_DELAY = 750
+const discussionssFilter = {
+  all: {name: I18n.t('All Discussions'), title: I18n.t('Discussions')},
+  unread: {name: I18n.t('Unread Discussions'), title: I18n.t('Unread Discussions')},
+}
 const getFilters = () => ({
-  all: instUINavEnabled() ? I18n.t('All Discussions') : I18n.t('All'),
-  unread: instUINavEnabled() ? I18n.t('Unread Discussions') : I18n.t('Unread'),
+  all: instUINavEnabled() ? discussionssFilter.all : I18n.t('All'),
+  unread: instUINavEnabled() ? discussionssFilter.unread : I18n.t('Unread'),
 })
 
 export default class IndexHeader extends Component {
@@ -170,45 +174,65 @@ export default class IndexHeader extends Component {
   }
 
   renderActionButtons() {
-    const buttonsDirection = !instUINavEnabled() ? 'row' : 'row-reverse'
+    const {breakpoints} = this.props
+    const instUIICEDesktop = instUINavEnabled() && breakpoints.ICEDesktop
+    const tabletDirection = breakpoints.tablet ? 'row-reverse' : 'column'
+    const directionWithInstUi = instUINavEnabled() ? tabletDirection : 'row'
+    const buttonsDirection = instUIICEDesktop ? 'row-reverse' : directionWithInstUi
 
     return (
-      <Flex wrap="no-wrap" direction={buttonsDirection} gap="small" justifyItems="end">
+      <Flex
+        wrap="no-wrap"
+        direction={buttonsDirection}
+        gap="small"
+        justifyItems="end"
+        overflowX="hidden"
+        overflowY="hidden"
+        width="100%"
+        height="100%"
+      >
         {this.props.permissions.create && (
-          <Flex.Item>
-            <Button
-              href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new`}
-              color="primary"
-              id="add_discussion"
-              renderIcon={IconPlusLine}
-            >
-              <ScreenReaderContent>{I18n.t('Add discussion')}</ScreenReaderContent>
-              <PresentationContent>{I18n.t('Discussion')}</PresentationContent>
-            </Button>
-          </Flex.Item>
+          <Button
+            href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new`}
+            color="primary"
+            id="add_discussion"
+            renderIcon={IconPlusLine}
+          >
+            <ScreenReaderContent>{I18n.t('Add discussion')}</ScreenReaderContent>
+            <PresentationContent>{I18n.t('Discussion')}</PresentationContent>
+          </Button>
         )}
         {Object.keys(this.props.userSettings).length ? (
-          <Flex.Item>
-            <DiscussionSettings
-              courseSettings={this.props.courseSettings}
-              userSettings={this.props.userSettings}
-              permissions={this.props.permissions}
-              saveSettings={this.props.saveSettings}
-              toggleModalOpen={this.props.toggleModalOpen}
-              isSettingsModalOpen={this.props.isSettingsModalOpen}
-              isSavingSettings={this.props.isSavingSettings}
-            />
-          </Flex.Item>
+          <DiscussionSettings
+            courseSettings={this.props.courseSettings}
+            userSettings={this.props.userSettings}
+            permissions={this.props.permissions}
+            saveSettings={this.props.saveSettings}
+            toggleModalOpen={this.props.toggleModalOpen}
+            isSettingsModalOpen={this.props.isSettingsModalOpen}
+            isSavingSettings={this.props.isSavingSettings}
+            buttonText={!breakpoints.tablet ? I18n.t('Settings') : ''}
+          />
         ) : null}
         {this.renderTrayToolsMenu()}
       </Flex>
     )
   }
 
+  renderSearchField() {
+    return (
+      <SearchField
+        name="discussion_search"
+        searchInputRef={this.props.searchInputRef}
+        onSearchEvent={this.onSearchChange}
+        placeholder={I18n.t('Search by title or author...')}
+      />
+    )
+  }
+
   renderOldHeader(breakpoints) {
-    const ddSize = breakpoints.desktopOnly ? '100px' : '100%'
+    const ddSize = breakpoints.ICEDesktop ? '100px' : '100%'
     const containerSize = breakpoints.tablet ? 'auto' : '100%'
-    const {searchInputRef, searchDiscussions} = this.props
 
     return (
       <View>
@@ -242,13 +266,9 @@ export default class IndexHeader extends Component {
               </FormField>
             </Flex.Item>
             <Flex.Item size={containerSize} shouldGrow={true} shouldShrink={true} margin="0">
-              <SearchField
-                name="discussion_search"
-                searchInputRef={searchInputRef}
-                onSearchEvent={searchDiscussions}
-              />
+              {this.renderSearchField()}
             </Flex.Item>
-            <Flex.Item>{this.renderActionButtons()}</Flex.Item>
+            <Flex.Item overflowY="visible">{this.renderActionButtons()}</Flex.Item>
           </Flex>
         </View>
       </View>
@@ -256,48 +276,41 @@ export default class IndexHeader extends Component {
   }
 
   render() {
-    const {breakpoints, searchInputRef} = this.props
-    const containerSize = breakpoints.tablet ? 'auto' : '100%'
-
+    const {breakpoints} = this.props
+    const containerSize = breakpoints.tablet
     if (!instUINavEnabled()) {
       return this.renderOldHeader(breakpoints)
     }
 
-    let flexBasis = 'auto'
-    let flexDirection = 'row'
-    let headerShrink = false
-
-    if (breakpoints.mobileOnly) {
-      flexBasis = '100%'
-      flexDirection = 'column-reverse'
-      headerShrink = true
-    }
+    const flexBasis = breakpoints.ICEDesktop ? 'auto' : '100%'
+    const headerShrink = !breakpoints.ICEDesktop
 
     return (
-      <Flex direction="column" as="div" gap="medium">
-        <Flex.Item dmargin="0 0 large" overflow="hidden">
-          <Flex as="div" direction="row" justifyItems="space-between" wrap="wrap" gap="small">
+      <Flex direction="column" as="div" gap="small">
+        <Flex.Item margin="0 0 small" overflowY="visible">
+          <Flex
+            as="div"
+            direction="row"
+            justifyItems="space-between"
+            wrap="wrap"
+            gap="small"
+            width="99%"
+          >
             <Flex.Item width={flexBasis} shouldGrow={true} shouldShrink={headerShrink}>
               <HeadingMenu
                 name={I18n.t('Discussion Filter')}
                 filters={getFilters()}
                 defaultSelectedFilter="all"
                 onSelectFilter={this.onFilterChange}
+                mobileHeader={breakpoints.mobileOnly}
               />
             </Flex.Item>
-            <Flex.Item width={flexBasis} overflowX="hidden" overflowY="hidden">
-              <Flex direction={flexDirection}>
-                <Flex.Item size={containerSize}>{this.renderActionButtons()}</Flex.Item>
-              </Flex>
+            <Flex.Item width={flexBasis} size={containerSize}>
+              {this.renderActionButtons()}
             </Flex.Item>
           </Flex>
         </Flex.Item>
-        <SearchField
-          name="discussion_search"
-          searchInputRef={searchInputRef}
-          onSearchEvent={this.onSearchChange}
-        />
-        <Flex.Item margin="large 0 0 0" />
+        <Flex.Item overflowY="visible">{this.renderSearchField()}</Flex.Item>
       </Flex>
     )
   }

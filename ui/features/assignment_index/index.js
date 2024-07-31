@@ -27,7 +27,6 @@ import AssignmentGroupWeightsView from './backbone/views/AssignmentGroupWeightsV
 import ToggleShowByView from './backbone/views/ToggleShowByView'
 import splitAssetString from '@canvas/util/splitAssetString'
 import {getPrefetchedXHR} from '@canvas/util/xhr'
-import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import ready from '@instructure/ready'
 import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
 import {
@@ -134,7 +133,6 @@ ready(() => {
       }
     })
 
-  monitorLtiMessages()
   alertIfDeepLinkingCreatedModule()
 
   if (ENV.FEATURES?.lti_multiple_assignment_deep_linking) {

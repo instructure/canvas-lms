@@ -37,6 +37,8 @@ const locale = {
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "Lyen Adjasan ak menm URL yo dwe yon lyen inik."
   },
+  "ai_response_9624e8e8": { "message": "Repons AI" },
+  "ai_tools_fda01177": { "message": "Zouti AI" },
   "aleph_f4ffd155": { "message": "Aleph" },
   "align_11050992": { "message": "Aliyen" },
   "alignment_and_lists_5cebcb69": { "message": "Aliyman ak Lis" },
@@ -54,6 +56,9 @@ const locale = {
   },
   "an_error_occurred_making_a_network_request_d1bda348": {
     "message": "Gen yon erè ki fèt pandan demann rezo a"
+  },
+  "an_error_occurred_processing_your_request_a3a38d84": {
+    "message": "Gen yon erè ki fèt nan tretman demann ou an"
   },
   "an_error_occurred_uploading_your_media_71f1444d": {
     "message": "Gen yon erè ki pase pandan chajman medya ou a."
@@ -172,6 +177,7 @@ const locale = {
   "column_e1ae5c64": { "message": "Kolonn" },
   "column_group_1c062368": { "message": "Gwoup Kolonn" },
   "complex_numbers_a543d004": { "message": "Nonm Konplèks" },
+  "compose_44c904f4": { "message": "Konpoze" },
   "computer_1d7dfa6f": { "message": "Òdinatè" },
   "congruent_5a244acd": { "message": "Kongriyan" },
   "contains_311f37b7": { "message": "Kontni" },
@@ -185,6 +191,7 @@ const locale = {
   "content_subtype_5ce35e88": { "message": "Kontni Subtype" },
   "content_type_2cf90d95": { "message": "Tip Kontni" },
   "coproduct_e7838082": { "message": "Kopwodui" },
+  "copy_9748f9f": { "message": "Kopye" },
   "copyright_holder_66ee111": { "message": "Titilè Dwa Otè:" },
   "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
     "message": "Paka ensere kontni: \"{ itemType }\" atik pa konpatib a Canvas pou kounye a."
@@ -253,6 +260,7 @@ const locale = {
   "discussions_a5f96392": { "message": "Diskisyon" },
   "discussions_index_6c36ced": { "message": "Endis Diskisyon" },
   "disjoint_union_e74351a8": { "message": "Inyon Disosye" },
+  "dislike_14befc48": { "message": "Pa renmen" },
   "display_options_315aba85": { "message": "Opsyon Afichaj" },
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Lyen Afichaj Tèks (Ouvri nan yon nouvo onglè)"
@@ -318,6 +326,7 @@ const locale = {
   },
   "enter_replacement_text_17631bbc": { "message": "Antre tèks ranplasman an" },
   "enter_search_text_26cb4459": { "message": "Antre tèks rechèch la" },
+  "enter_text_8b35c65b": { "message": "Antre tèks" },
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (Varyan)" },
   "equals_sign_c51bdc58": { "message": "Siy Egal" },
@@ -341,6 +350,7 @@ const locale = {
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Echèk rekiperasyon kontni fichye yo"
   },
+  "failed_to_copy_response_d3def551": { "message": "Echwe pou kopye repons" },
   "failed_to_retrieve_content_from_external_tool_5899c213": {
     "message": "Echwe pou rekipere kontni nan zouti ekstèn nan"
   },
@@ -422,6 +432,12 @@ const locale = {
   "health_icon_8d292eb5": { "message": "Ikòn Sante" },
   "hearts_suit_e50e04ca": { "message": "Kè (Konbinezon)" },
   "height_69b03e15": { "message": "Wotè" },
+  "hello_please_describe_the_modifications_you_would__49b19837": {
+    "message": "Bonjou. Tanpri, dekri chanjman ou ta renmen fè nan konpozisyon ou an."
+  },
+  "hello_please_describe_the_modifications_you_would__600dbbf0": {
+    "message": "Bonjou. Tanpri, dekri chanjman ou ta renmen fè nan seleksyon ou an."
+  },
   "hexagon_d8468e0d": { "message": "Egzagòn" },
   "hide_description_bfb5502e": { "message": "Kache deskripsyon" },
   "hide_title_description_caf092ef": {
@@ -437,6 +453,9 @@ const locale = {
     "message": "Mwen gen otorizasyon pou itilize fichye sa a."
   },
   "i_hold_the_copyright_71ee91b1": { "message": "Mwen gen dwa dotè a" },
+  "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
+    "message": "Dezole, mwen paka jwenn reponn AI a"
+  },
   "icon_215a1dc6": { "message": "Ikòn" },
   "icon_8168b2f8": { "message": "ikòn" },
   "icon_color_b86dd6d6": { "message": "Ikòn Koulè" },
@@ -610,6 +629,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Mwens/Plis" },
   "misc_3b692ea7": { "message": "Divès" },
   "miscellaneous_e9818229": { "message": "Divès" },
+  "modify_6b0b13e3": { "message": "Modifye" },
   "module_90d9fd32": { "message": "Modil" },
   "modules_c4325335": { "message": "Modil" },
   "moving_image_to_crop_directionword_6f66cde2": {
@@ -750,6 +770,9 @@ const locale = {
   "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
     "message": "Tanpri pèmèt Canvas gen aksè a mikwofòn e kamera ou a."
   },
+  "please_decribe_what_you_would_like_to_compose_27a51be5": {
+    "message": "Tanpri dekri kisa w ta renmen konpoze."
+  },
   "plus_d43cd4ec": { "message": "Plis" },
   "plus_minus_f8be2e83": { "message": "Plis/Mwens" },
   "posted_when_a578f5ab": { "message": "Poste: { when }" },
@@ -812,12 +835,16 @@ const locale = {
   },
   "reset_95a81614": { "message": "Reinisyalize" },
   "resize_ec83d538": { "message": "Redimansyone" },
+  "response_copied_to_clipboard_130d66cd": {
+    "message": "Repons kopye nan près papye"
+  },
   "restore_auto_save_deccd84b": {
     "message": "Restore anrejistreman otomatik?"
   },
   "result_index_of_max_7db5ad8b": {
     "message": "Rezilta { index } sou { max }."
   },
+  "retry_ebd5f8ba": { "message": "Re eseye" },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "Tounikè Envèse (pa sede)"
   },
@@ -894,6 +921,7 @@ const locale = {
     "message": "Shift-O pou ka ouvri bèl editè html la."
   },
   "shortcut_911d6255": { "message": "Rakousi" },
+  "show_all_967a90f0": { "message": "Afiche tout" },
   "show_audio_options_b489926b": { "message": "Afiche opsyon odyo" },
   "show_image_options_1e2ecc6b": { "message": "Afiche opsyon imaj" },
   "show_link_options_545338fd": { "message": "Afiche opsyon lyen" },
@@ -1184,6 +1212,7 @@ const locale = {
   "view_word_and_character_counts_a743dd0c": {
     "message": "Afiche kantite mo ak karaktè"
   },
+  "waiting_for_response_1efd0c50": { "message": "Ap tann repons" },
   "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
     "message": "Nou pa detekte yon mikwo ki an fonksyon sou aparèy ou a."
   },
@@ -1198,6 +1227,7 @@ const locale = {
   "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
     "message": "Paj wèb yo dwe gen yon sèl H1 Tit paj la ap itilize otomatikman. Premye antèt nan kontni w lan ta dwe yon H2."
   },
+  "what_would_you_like_to_do_6dc0d541": { "message": "Kisa w ta renmen fè?" },
   "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
     "message": "Lè yo itilize balizaj pou yo ka fòmate eleman yo vizyèlman tankou lis men ki pa di relasyon lis la, itilizatè yo ka rankontre difikilte pou navige nan enfómasyon yo."
   },
@@ -1212,6 +1242,7 @@ const locale = {
   "word_count_c77fe3a6": { "message": "Kantite Mo" },
   "words_b448b7d5": { "message": "Mo" },
   "wreath_product_200b38ef": { "message": "Pwodui Kouwòn" },
+  "writing_assistant_a30ac16a": { "message": "Asistan Redaksyon" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "Wi" },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {

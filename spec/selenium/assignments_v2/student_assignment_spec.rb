@@ -48,7 +48,6 @@ describe "as a student" do
 
       context "not submitted" do
         it "does not show points possible for points grading_type" do
-          skip "FOO-3525 (10/6/2023)"
           assignment = @course.assignments.create!(
             name: "assignment",
             due_at: 5.days.ago,
@@ -61,7 +60,7 @@ describe "as a student" do
           StudentAssignmentPageV2.visit(@course, assignment)
           wait_for_ajaximations
 
-          expect(f("body")).not_to contain_jqcss("span:contains('#{assignment.points_possible}'))")
+          expect(f("body")).not_to contain_jqcss("span:contains('#{assignment.points_possible}')")
         end
       end
 
@@ -1199,7 +1198,7 @@ describe "as a student" do
           expect(StudentAssignmentPageV2.comment_container).to include_text("great job!")
         end
 
-        it "allows the student to complete a group peer review with a rubric by completing the rubric and submitting", skip: "flaky" do
+        it "allows the student to complete a group peer review with a rubric by completing the rubric and submitting" do
           rubric_model
           @association = @rubric.associate_with(@peer_review_assignment, @course, purpose: "grading", use_for_grading: true)
           @peer_review_assignment.assign_peer_review(@student1, @student2)

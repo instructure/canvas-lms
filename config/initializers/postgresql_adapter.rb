@@ -34,8 +34,7 @@ module PostgreSQLAdapterExtensions
   def configure_connection
     super
 
-    conn = (Rails.version < "7.1") ? @connection : @raw_connection
-    conn.set_notice_receiver do |result|
+    @raw_connection.set_notice_receiver do |result|
       severity = result.result_error_field(PG::PG_DIAG_SEVERITY_NONLOCALIZED)
       rails_severity = case severity
                        when "WARNING", "NOTICE"
@@ -191,16 +190,7 @@ module PostgreSQLAdapterExtensions
       if indkey.include?(0)
         columns = expressions
       else
-        columns = if $canvas_rails == "7.0"
-                    query(<<~SQL.squish, "SCHEMA").to_h.values_at(*indkey).compact
-                      SELECT a.attnum, a.attname
-                      FROM pg_attribute a
-                      WHERE a.attrelid = #{oid}
-                      AND a.attnum IN (#{indkey.join(",")})
-                    SQL
-                  else
-                    column_names_from_column_numbers(oid, indkey)
-                  end
+        columns = column_names_from_column_numbers(oid, indkey)
 
         # prevent INCLUDE columns from being matched
         columns.reject! { |c| include_columns.include?(c) }
@@ -282,7 +272,7 @@ module PostgreSQLAdapterExtensions
     # internal_metadata to exist and this guard isn't really useful there either
     return if [ActiveRecord::Base.internal_metadata_table_name, ActiveRecord::Base.schema_migrations_table_name].include?(table_name)
     # If the function doesn't exist yet it will be backfilled
-    return unless ((Rails.version < "7.1") ? ::ActiveRecord::InternalMetadata : ::ActiveRecord::InternalMetadata.new(self))[:guard_dangerous_changes_installed]
+    return unless ::ActiveRecord::InternalMetadata.new(self)[:guard_dangerous_changes_installed]
 
     ["UPDATE", "DELETE"].each do |operation|
       trigger_name = "guard_excessive_#{operation.downcase}s"
@@ -396,14 +386,14 @@ module PostgreSQLAdapterExtensions
   def execute(...)
     super
   rescue AbortExceptionMatcher
-    (($canvas_rails == "7.1") ? @raw_connection : @connection).cancel
+    @raw_connection.cancel
     raise
   end
 
   def exec_query(...)
     super
   rescue AbortExceptionMatcher
-    (($canvas_rails == "7.1") ? @raw_connection : @connection).cancel
+    @raw_connection.cancel
     raise
   end
 
@@ -531,11 +521,6 @@ module IndexDefinitionExtensions
 
   def initialize(*args, replica_identity: false, **kwargs)
     @replica_identity = replica_identity
-    if $canvas_rails == "7.0"
-      kwargs.delete(:include)
-      kwargs.delete(:nulls_not_distinct)
-      kwargs.delete(:valid)
-    end
 
     super(*args, **kwargs)
   end

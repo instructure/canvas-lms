@@ -190,6 +190,61 @@ describe TokensController do
         put "update", params: { id: token.id }
         assert_status(404)
       end
+
+      context "with admin manage access tokens feature flag on" do
+        before(:once) { Account.default.root_account.enable_feature!(:admin_manage_access_tokens) }
+
+        context "with limit_personal_access_tokens setting on" do
+          before(:once) { Account.default.change_root_account_setting!(:limit_personal_access_tokens, true) }
+
+          context "as non-admin" do
+            it "does not allow creating an access token" do
+              post "create", params: { access_token: { purpose: "test", permanent_expires_at: "" } }
+              assert_status(401)
+            end
+
+            it "does not allow updating an access token" do
+              token = @user.access_tokens.create!
+              put "update", params: { id: token.id, access_token: { regenerate: "1" } }
+              assert_status(401)
+            end
+          end
+
+          context "as admin" do
+            before(:once) { @admin = account_admin_user }
+
+            before { user_session(@admin) }
+
+            it "allows creating an access token" do
+              post "create", params: { access_token: { purpose: "test", permanent_expires_at: "" } }
+              assert_status(200)
+            end
+
+            it "allows updating an access token" do
+              token = @admin.access_tokens.create!
+              put "update", params: { id: token.id, access_token: { regenerate: "1" } }
+              assert_status(200)
+            end
+          end
+        end
+
+        context "with limit_personal_access_tokens setting off" do
+          before(:once) { Account.default.change_root_account_setting!(:limit_personal_access_tokens, false) }
+
+          context "as non-admin" do
+            it "allows creating an access token" do
+              post "create", params: { access_token: { purpose: "test", permanent_expires_at: "" } }
+              assert_status(200)
+            end
+
+            it "allows updating an access token" do
+              token = @user.access_tokens.create!
+              put "update", params: { id: token.id, access_token: { regenerate: "1" } }
+              assert_status(200)
+            end
+          end
+        end
+      end
     end
   end
 end

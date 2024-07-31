@@ -287,6 +287,7 @@ hu:
   a_yearly_rrule_must_include_byday_or_bymonthday_b56649f4: "Az éves RRULE-nak tartalmaznia kell a BYDAY vagy BYMONTHDAY kifejezést."
   a_z_243c3301: A–Z
   a_z_29d8e67c: A–Z
+  about_70c18bba: Névjegy
   about_this_service_b10bc808: "A szolgáltatásról"
   above_max_rating_64b29915: "Maximum érték felett"
   academic_benchmark: 
@@ -3081,6 +3082,7 @@ hu:
   announcement: 
     no_title: "Nincs cím"
   announcement_creation_failed_f7d227f5: "A hirdetmény létrehozása sikertelen"
+  announcement_e37d6dbd: hirdetmény
   announcement_ends_at_4ccc2a7e: "Hirdetmény befejeződik ekkor"
   announcement_external_feeds_5be3f36b: "hirdetmények Külső Hírfolyamok"
   announcement_fb4cb645: Hirdetmény
@@ -6115,6 +6117,7 @@ hu:
       concluded_conferences: "Befejeződött konferenciák"
       conference: Konferencia
       conference_header: Konferenciák
+      conferences: Konferenciák
       new_conference: "Új konferencia"
       new_conferences: "Új konferenciák"
       page_title: Webkonferenciák
@@ -12175,6 +12178,7 @@ hu:
   he_him_99aea1a8: Ő
   heads_up_a_valid_salesforce_account_id_should_be_a_999cbf7d: "Fel a fejjel! Az érvényes Salesforce-fiókazonosítónak 15–18 alfanumerikus karakterből álló sorozatnak kell lennie."
   hebrew_88fbf778: Héber
+  height_69b03e15: Magasság
   hello_name_cabdd4ce: "Hello%{name}!"
   hello_name_your_outcomes_import_failed_due_to_an_e_385db5d3: "Üdvözöljük %{name}! Az eredmények importálása meghiúsult az importálás során történt hiba miatt. Kérjük, vizsgálja meg a fájlt, és próbálja meg újra feltölteni itt: %{url} A következő hiba történt: %{row} A megfelelő importálási formátum megtekintéséhez tekintse át a Canvas API-dokumentumokat a következő címen: %{doc_url} Köszönjük, Instructure"
   hello_name_your_outcomes_were_successfully_importe_a510e0d: "Üdvözöljük %{name}! Eredményei sikeresen importálva. Mostantól a %{url} címen kezelheti őket. Köszönjük, Instructure"
@@ -12592,6 +12596,9 @@ hu:
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Ha egyik sincs kiválasztva, mutasd meg mindenkinek a teljes fiókban)"
   if_one_or_all_permissions_are_disabled_user_can_st_f83271b3: "Ha egy vagy az összes engedély le van tiltva, a felhasználó továbbra is megtekintheti és letöltheti a fájlokat zip fájlba."
   if_provided_this_name_will_be_used_in_preference_t_4079100a: "Ha megadja, akkor ez a név kerül előnyben a kurzus tényleges nevével szemben a vezérlőpulton  és az értesítésekben."
+  if_restrict_view_of_quantitative_data_is_enabled_t_29613e6f: |-
+      Ha a "Mennyiségi adatok megtekintésének korlátozása" opció engedélyezve van, akkor a kurzusnak
+                alapértelmezett osztályozási sémát kell engedélyeznie.
   if_set_allows_submission_status_to_be_changed_from_156f57f: "Ha be van állítva, lehetővé teszi a beküldés állapotának módosítását a Gyorsértékelő belsejéből"
   if_set_deprioritizes_using_due_dates_lock_dates_an_b7303ae9: |-
       Ha be van állítva, akkor az olyan szekciófelülírásokból származó esedékességi, zárolási és feloldási
@@ -13405,6 +13412,7 @@ hu:
   language_6b3e2c7c: Nyelv
   language_arts_35b79a8b: "Nyelvi művészet"
   languages_835813f0: Nyelvek
+  large_9c5e80e7: Nagy
   large_balsamiq_font_5fe45fae: "Nagy Balsamiq betűtípus"
   large_course_db3d58b: "Nagy Kurzus:"
   last_7_days_bd411f1f: "Utolsó 7 nap"
@@ -14366,6 +14374,7 @@ hu:
   median_ed291842: Medián
   median_median_high_high_low_low_f356c5f1: "Medián %{median}, Legnagyobb %{high}, Legkisebb %{low}"
   median_score_4657e907: "Medián: %{score}"
+  medium_5a8e9ead: Közepes
   medium_dark_skin_tone_5134edbc: "Közepes-sötét bőrszín"
   medium_light_skin_tone_6c4a27fb: "Közepes-fényes bőrtónus"
   medium_skin_tone_8608d74e: "Közepes bőrtónus"
@@ -16269,6 +16278,7 @@ hu:
   modified_by_user_e6c8ade3: "módosította:%{user}"
   modify_settings_ed8b9ccf: "Beállítások módosítása"
   module_90d9fd32: Modul
+  module_9775f804: modul
   module_access_updated_successfully_b21ed967: "A modulhoz való hozzáférés sikeresen frissült."
   module_and_items_published_13ed5cd6: "Publikált modulok és elemek"
   module_and_items_unpublished_e953ba4f: "Nem publikált modulok és elemek"
@@ -16595,6 +16605,7 @@ hu:
   navigate_to_speedgrader_for_title_assignment_47da92db: "Navigáljon a Gyorsértékelőben ehhez a feladathoz: %{title}"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Navigáció Engedélyezi a felhasználó számára a személyek link megtekintését a kurzusnavigációban.\n\
       \x20       "
+  navigation_ee9af92d: Navigáció
   navigation_menu_fd782ff8: "Navigációs menü"
   near_3282280c: Közel
   near_mastery_f25174a4: "Közel a jártassági szinthez"
@@ -22942,6 +22953,7 @@ hu:
   slack_notifications_3a0288e6: "Slack értesítések"
   slovak_69f48e1b: Szlovák
   slovenian_30ae5208: Szlovén
+  small_b070434a: Kicsi
   smaller_numbers_mean_higher_priority_c69f4d0a: "A kisebb számok magasabb prioritást jelentenek"
   smart_alerts_44db622e: "Intelligens figyelmeztetések"
   smart_assignment_alerts_abc2224: "Intelligens hozzárendelési riasztások"
@@ -24084,6 +24096,7 @@ hu:
   text_file_73d8d08c: "Szöveges fájl"
   text_input_d3480b8c: "Szöveges bemenet"
   text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "A szöveg No Question átkerült egy Stimulusba; kérjük, adjon hozzá egy kérdést, hogy megjelenhessen a kvízben."
+  text_sms_4e2d82a7: "Szöveg (SMS)"
   thai_8f9bc548: Thai
   thailand_66_5b3ef324: "Thaiföld (+66)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "A felhasználói fiók törlésre került. Lépjen kapcsolatba a rendszer-adminisztrátorral, a fiók újraaktiválása érdekében."
@@ -26923,6 +26936,7 @@ hu:
       upload_media_track_form_step2_label: "2. lépés:"
       upload_media_track_form_step3_label: "3. lépés:"
       upload_media_track_info: "*Utasítások:* Kövesse az alábbi három lépést, hogy feliratfájlt készítsen a videójához, majd töltse fel itt. Ha már rendelkezik SRT felirat fájllal, ugorjon a 3. lépéshez."
+  width_492fec76: Szélesség
   wiki: 
     default_course_wiki_name: "%{course_name} Wiki"
     default_group_wiki_name: "%{group_name} Wiki"

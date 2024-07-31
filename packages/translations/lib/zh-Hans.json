@@ -38,6 +38,12 @@
     "afrikaans_da0fe6ee": {
         "message": "南非语"
     },
+    "ai_response_9624e8e8": {
+        "message": "AI 响应"
+    },
+    "ai_tools_fda01177": {
+        "message": "AI 工具"
+    },
     "albanian_21ed929e": {
         "message": "阿尔巴尼亚语"
     },
@@ -76,6 +82,9 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "发出网络请求时出错"
+    },
+    "an_error_occurred_processing_your_request_a3a38d84": {
+        "message": "处理您的请求时出错"
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "上传媒体时出错。"
@@ -347,6 +356,9 @@
     "complex_numbers_a543d004": {
         "message": "复数"
     },
+    "compose_44c904f4": {
+        "message": "撰写"
+    },
     "computer_1d7dfa6f": {
         "message": "计算机"
     },
@@ -373,6 +385,9 @@
     },
     "coproduct_e7838082": {
         "message": "余积"
+    },
+    "copy_9748f9f": {
+        "message": "复制"
     },
     "copyright_holder_66ee111": {
         "message": "版权持有者："
@@ -551,6 +566,9 @@
     "disjoint_union_e74351a8": {
         "message": "不交并"
     },
+    "dislike_14befc48": {
+        "message": "不喜欢"
+    },
     "display_options_315aba85": {
         "message": "显示选项"
     },
@@ -695,6 +713,9 @@
     "enter_search_text_26cb4459": {
         "message": "输入搜索文本"
     },
+    "enter_text_8b35c65b": {
+        "message": "输入文本"
+    },
     "epsilon_54bb8afa": {
         "message": "Epsilon"
     },
@@ -760,6 +781,9 @@
     },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "文件内容获取失败"
+    },
+    "failed_to_copy_response_d3def551": {
+        "message": "无法复制响应"
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "无法从外部工具检索内容"
@@ -962,6 +986,12 @@
     "height_69b03e15": {
         "message": "高度"
     },
+    "hello_please_describe_the_modifications_you_would__49b19837": {
+        "message": "您好。请描述您要对您撰写的内容进行的修改。"
+    },
+    "hello_please_describe_the_modifications_you_would__600dbbf0": {
+        "message": "您好。请描述您要对您的选择进行的修改。"
+    },
     "hexagon_d8468e0d": {
         "message": "六边形"
     },
@@ -994,6 +1024,9 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "我持有版权"
+    },
+    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
+        "message": "抱歉，找不到 AI 回答"
     },
     "icelandic_9d6d35de": {
         "message": "冰岛语"
@@ -1382,6 +1415,9 @@
     "miscellaneous_e9818229": {
         "message": "其他"
     },
+    "modify_6b0b13e3": {
+        "message": "修改"
+    },
     "module_90d9fd32": {
         "message": "单元"
     },
@@ -1682,6 +1718,9 @@
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "请允许 Canvas 访问您的麦克风和网络摄像头。"
     },
+    "please_decribe_what_you_would_like_to_compose_27a51be5": {
+        "message": "请描述您要撰写的内容。"
+    },
     "plus_d43cd4ec": {
         "message": "加号"
     },
@@ -1832,11 +1871,17 @@
     "resize_ec83d538": {
         "message": "调整大小"
     },
+    "response_copied_to_clipboard_130d66cd": {
+        "message": "响应已复制到剪贴板"
+    },
     "restore_auto_save_deccd84b": {
         "message": "是否恢复自动保存？"
     },
     "result_index_of_max_7db5ad8b": {
         "message": "结果 { index }/{ max }。"
+    },
+    "retry_ebd5f8ba": {
+        "message": "重试"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "反十字转门（不产生）"
@@ -1996,6 +2041,9 @@
     },
     "shortcut_911d6255": {
         "message": "快捷方式"
+    },
+    "show_all_967a90f0": {
+        "message": "显示全部"
     },
     "show_audio_options_b489926b": {
         "message": "显示音频选项"
@@ -2552,6 +2600,9 @@
     "view_word_and_character_counts_a743dd0c": {
         "message": "查看字数和字符数"
     },
+    "waiting_for_response_1efd0c50": {
+        "message": "正在等待响应"
+    },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "我们未发现正常工作的麦克风连接到设备。"
     },
@@ -2572,6 +2623,9 @@
     },
     "welsh_42ab94b1": {
         "message": "威尔士语"
+    },
+    "what_would_you_like_to_do_6dc0d541": {
+        "message": "您想做什么？"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "如果对使用列表格式显示的项目使用标记，但不指示列表关系，用户可能在浏览信息时会遇到困难。"
@@ -2602,6 +2656,9 @@
     },
     "wreath_product_200b38ef": {
         "message": "圈积"
+    },
+    "writing_assistant_a30ac16a": {
+        "message": "写作助手"
     },
     "xi_149681d0": {
         "message": "Xi"

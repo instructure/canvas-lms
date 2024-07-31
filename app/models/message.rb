@@ -518,7 +518,7 @@ class Message < ActiveRecord::Base
     end
   end
   UnescapedBuffer.include(OutputBufferDeleteSuffix)
-  ActionView::OutputBuffer.include(OutputBufferDeleteSuffix) if $canvas_rails == "7.1"
+  ActionView::OutputBuffer.include(OutputBufferDeleteSuffix)
 
   # Public: Store content in a message_content_... instance variable.
   #

@@ -19,6 +19,7 @@
 import React from 'react'
 import {ProgressBar} from '@instructure/ui-progress'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import type {ContentMigrationWorkflowState} from './types'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -26,20 +27,29 @@ export const CompletionProgressBar = ({
   workflowState,
   completion,
 }: {
-  workflowState: string
+  workflowState: ContentMigrationWorkflowState
   completion?: number
 }) => {
-  if (!completion || ['failed', 'completed'].includes(workflowState)) return null
+  if (typeof completion !== 'number') {
+    return null
+  }
 
-  return (
-    <ProgressBar
-      size="small"
-      meterColor="info"
-      screenReaderLabel={I18n.t('Loading completion')}
-      valueNow={completion || 0}
-      valueMax={100}
-      // @ts-ignore
-      shouldAnimate={true}
-    />
-  )
+  switch (workflowState) {
+    case 'failed':
+    case 'completed':
+    case 'waiting_for_select':
+      return null
+    default:
+      return (
+        <ProgressBar
+          size="small"
+          meterColor="info"
+          screenReaderLabel={I18n.t('Loading completion')}
+          valueNow={completion}
+          valueMax={100}
+          // @ts-ignore
+          shouldAnimate={true}
+        />
+      )
+  }
 }

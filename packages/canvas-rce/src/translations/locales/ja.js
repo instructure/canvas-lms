@@ -38,6 +38,8 @@ const locale = {
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "同じURLを持つ隣接リンクは1つのリンクでなければなりません。"
   },
+  "ai_response_9624e8e8": { "message": "AI レスポンス" },
+  "ai_tools_fda01177": { "message": "AI ツール" },
   "aleph_f4ffd155": { "message": "アレフ" },
   "align_11050992": { "message": "位置調整" },
   "alignment_and_lists_5cebcb69": { "message": "配置とリスト" },
@@ -55,6 +57,9 @@ const locale = {
   },
   "an_error_occurred_making_a_network_request_d1bda348": {
     "message": "ネットワーク要求の作成中にエラーが発生しました"
+  },
+  "an_error_occurred_processing_your_request_a3a38d84": {
+    "message": "あなたのリクエストを処理中にエラーが発生しました。"
   },
   "an_error_occurred_uploading_your_media_71f1444d": {
     "message": "あなたのメディアをアップロードする際にエラーが発生しました。"
@@ -187,6 +192,7 @@ const locale = {
   "column_e1ae5c64": { "message": "列" },
   "column_group_1c062368": { "message": "列グループ" },
   "complex_numbers_a543d004": { "message": "複素数" },
+  "compose_44c904f4": { "message": "作成する" },
   "computer_1d7dfa6f": { "message": "コンピュータ" },
   "congruent_5a244acd": { "message": "合同" },
   "contains_311f37b7": { "message": "含有" },
@@ -200,6 +206,7 @@ const locale = {
   "content_subtype_5ce35e88": { "message": "コンテンツのサブタイプ" },
   "content_type_2cf90d95": { "message": "コンテンツ タイプ" },
   "coproduct_e7838082": { "message": "共製品" },
+  "copy_9748f9f": { "message": "コピー" },
   "copyright_holder_66ee111": { "message": "著作権保有者:" },
   "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
     "message": "コンテンツを挿入できません：\"{ itemType }\" アイテムは、現在Canvasにサポートされていません。"
@@ -272,6 +279,7 @@ const locale = {
   "discussions_a5f96392": { "message": "ディスカッション" },
   "discussions_index_6c36ced": { "message": "ディスカッションのインデックス" },
   "disjoint_union_e74351a8": { "message": "不連続ユニオン" },
+  "dislike_14befc48": { "message": "低く評価" },
   "display_options_315aba85": { "message": "オプションを表示する" },
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "テキストリンクを表示する (新しいタブが開きます)"
@@ -331,6 +339,7 @@ const locale = {
   },
   "enter_replacement_text_17631bbc": { "message": "代替テキストを入力する" },
   "enter_search_text_26cb4459": { "message": "検索テキストを入力する" },
+  "enter_text_8b35c65b": { "message": "テキストを入力する" },
   "epsilon_54bb8afa": { "message": "エプシロン" },
   "epsilon_variant_d31f1e77": { "message": "イプシロン(変形)" },
   "equals_sign_c51bdc58": { "message": "等記号" },
@@ -355,6 +364,9 @@ const locale = {
   "f_function_fe422d65": { "message": "F (関数)" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "ファイルのコンテンツ取得に失敗しました"
+  },
+  "failed_to_copy_response_d3def551": {
+    "message": "回答へのコピーに失敗しました"
   },
   "failed_to_retrieve_content_from_external_tool_5899c213": {
     "message": "外部ツールからのコンテンツ取得に失敗しました"
@@ -443,6 +455,12 @@ const locale = {
   "health_icon_8d292eb5": { "message": "健康のアイコン" },
   "hearts_suit_e50e04ca": { "message": "ハート（1組）" },
   "height_69b03e15": { "message": "高さ" },
+  "hello_please_describe_the_modifications_you_would__49b19837": {
+    "message": "こんにちは。あなたの構成に加えたい修正を記入してください。"
+  },
+  "hello_please_describe_the_modifications_you_would__600dbbf0": {
+    "message": "こんにちは。あなたのセレクションに加えたい修正を記入してください。"
+  },
   "hexagon_d8468e0d": { "message": "六角形" },
   "hide_description_bfb5502e": { "message": "説明を非表示にする" },
   "hide_title_description_caf092ef": {
@@ -458,6 +476,9 @@ const locale = {
     "message": "このファイルを使用する権限を取得しています。"
   },
   "i_hold_the_copyright_71ee91b1": { "message": "著作権を保有しています" },
+  "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
+    "message": "申し訳ありませんが、AIの回答が見つかりません。"
+  },
   "icon_215a1dc6": { "message": "アイコン" },
   "icon_8168b2f8": { "message": "アイコン" },
   "icon_color_b86dd6d6": { "message": "アイコンカラー" },
@@ -625,6 +646,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "マイナス/プラス" },
   "misc_3b692ea7": { "message": "その他" },
   "miscellaneous_e9818229": { "message": "その他" },
+  "modify_6b0b13e3": { "message": "修正" },
   "module_90d9fd32": { "message": "モジュール" },
   "modules_c4325335": { "message": "モジュール" },
   "moving_image_to_crop_directionword_6f66cde2": {
@@ -777,6 +799,9 @@ const locale = {
   "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
     "message": "Canvas があなたのマイクとウェブカメラにアクセスできるようにしてください。"
   },
+  "please_decribe_what_you_would_like_to_compose_27a51be5": {
+    "message": "構成したい内容を記入してください。"
+  },
   "plus_d43cd4ec": { "message": "プラス" },
   "plus_minus_f8be2e83": { "message": "プラス/マイナス" },
   "posted_when_a578f5ab": { "message": "投稿済み:{ when }" },
@@ -839,10 +864,14 @@ const locale = {
   },
   "reset_95a81614": { "message": "リセット" },
   "resize_ec83d538": { "message": "サイズ変更" },
+  "response_copied_to_clipboard_130d66cd": {
+    "message": "回答がクリップボードにコピーされました"
+  },
   "restore_auto_save_deccd84b": {
     "message": "自動保存したものを復元しますか？"
   },
   "result_index_of_max_7db5ad8b": { "message": "{ index } / { max }の結果。" },
+  "retry_ebd5f8ba": { "message": "再試行" },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "逆向きの回転式改札(イールドなし)"
   },
@@ -915,6 +944,7 @@ const locale = {
     "message": "Shift-Oでpretty HTMLエディタを開きます。"
   },
   "shortcut_911d6255": { "message": "ショートカット" },
+  "show_all_967a90f0": { "message": "すべて表示" },
   "show_audio_options_b489926b": {
     "message": "オーディオオプションを表示する"
   },
@@ -1203,6 +1233,7 @@ const locale = {
   "view_word_and_character_counts_a743dd0c": {
     "message": "語数・文字数を表示"
   },
+  "waiting_for_response_1efd0c50": { "message": "回答待ち中" },
   "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
     "message": "デバイスに接続されているオンになっているマイクを検出できませんでした。"
   },
@@ -1217,6 +1248,7 @@ const locale = {
   "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
     "message": "ウェブページのH1は1つだけであるべきで、これはページのタイトルに自動的に使用されます。コンテンツの最初のヘッダーはH2であるべきです。"
   },
+  "what_would_you_like_to_do_6dc0d541": { "message": "何をしたいですか？" },
   "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
     "message": "アイテムをリスト形式に視覚的にフォーマットするマークアップが使用されますが、リストの関係を示唆するものではなく、ユーザが情報をナビゲートするのは難しいかもしれません。"
   },
@@ -1231,6 +1263,7 @@ const locale = {
   "word_count_c77fe3a6": { "message": "語数" },
   "words_b448b7d5": { "message": "語" },
   "wreath_product_200b38ef": { "message": "花輪製品" },
+  "writing_assistant_a30ac16a": { "message": "ライティング・アシスタント" },
   "xi_149681d0": { "message": "クシー" },
   "yes_dde87d5": { "message": "はい" },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {

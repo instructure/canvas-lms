@@ -206,6 +206,7 @@ describe('RubricForm Tests', () => {
       const criteriaRows = queryAllByTestId('rubric-criteria-row')
       const criteriaRowDescriptions = queryAllByTestId('rubric-criteria-row-description')
       const criteriaRowLongDescriptions = queryAllByTestId('rubric-criteria-row-long-description')
+      const criteriaRowThresholds = queryAllByTestId('rubric-criteria-row-threshold')
       const criteriaRowPoints = queryAllByTestId('rubric-criteria-row-points')
       const criteriaRowIndexes = queryAllByTestId('rubric-criteria-row-index')
       expect(criteriaRows.length).toEqual(2)
@@ -216,6 +217,8 @@ describe('RubricForm Tests', () => {
       expect(criteriaRowPoints[1]).toHaveTextContent(criteria[1].points.toString())
       expect(criteriaRowIndexes[0]).toHaveTextContent('1.')
       expect(criteriaRowIndexes[1]).toHaveTextContent('2')
+      expect(criteriaRowThresholds.length).toEqual(1)
+      expect(criteriaRowThresholds[0]).toHaveTextContent('Threshold: 3')
     })
 
     it('renders the criterion ratings accordion button', () => {

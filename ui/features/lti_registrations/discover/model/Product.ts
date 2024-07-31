@@ -26,9 +26,9 @@ export type Product = {
   description: string
   updated_at: any
   tool_integration_configurations: Lti
-  tags: {id: number; name: string}[]
   badges: Badges[]
   screenshots: string[]
+  tags: Tag[]
 }
 
 export type Company = {
@@ -46,4 +46,15 @@ export type Badges = {
   name: string
   image_url: string
   link: string
+}
+
+export type TagGroup = {
+  id: string
+  name: string
+  description: string
+}
+
+export type Tag = {
+  id: string
+  name: string
 }

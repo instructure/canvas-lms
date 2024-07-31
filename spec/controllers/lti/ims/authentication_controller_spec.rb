@@ -209,15 +209,25 @@ describe Lti::IMS::AuthenticationController do
       let(:account) { context.root_account }
       let(:lti_launch) do
         {
-          "aud" => developer_key.global_id,
-          "https://purl.imsglobal.org/spec/lti/claim/deployment_id" => "265:37750cbd4487fb044c4faf195c195b5fb9ed9636",
-          "iss" => "https://canvas.instructure.com",
-          "nonce" => "a854dc79-be3b-476a-b0db-2963a7f4158c",
-          "sub" => "535fa085f22b4655f48cd5a36a9215f64c062838",
-          "picture" => "http://canvas.instructure.com/images/messages/avatar-50.png",
-          "email" => "wdransfield@instructure.com",
-          "name" => "wdransfield@instructure.com",
-          "given_name" => "wdransfield@instructure.com",
+          "post_payload" => {
+            "aud" => developer_key.global_id,
+            "https://purl.imsglobal.org/spec/lti/claim/deployment_id" => "265:37750cbd4487fb044c4faf195c195b5fb9ed9636",
+            "iss" => "https://canvas.instructure.com",
+            "nonce" => "a854dc79-be3b-476a-b0db-2963a7f4158c",
+            "sub" => "535fa085f22b4655f48cd5a36a9215f64c062838",
+            "picture" => "http://canvas.instructure.com/images/messages/avatar-50.png",
+            "email" => "wdransfield@instructure.com",
+            "name" => "wdransfield@instructure.com",
+            "given_name" => "wdransfield@instructure.com",
+            "https://purl.imsglobal.org/spec/lti/claim/lti1p1" => {
+              "oauth_consumer_key" => "fake_consumer_key",
+              "oauth_consumer_key_sign" => "fake_signature"
+            },
+          },
+          "assoc_tool_data" => {
+            "shared_secret" => "fake_shared_secret",
+            "consumer_key" => "fake_consumer_key"
+          }
         }
       end
       let(:verifier) { cache_launch(lti_launch, context) }
@@ -234,7 +244,7 @@ describe Lti::IMS::AuthenticationController do
 
       it "generates an id token" do
         authorize
-        expect(id_token.except("nonce")).to eq lti_launch.except("nonce")
+        expect(id_token.except("nonce").except("https://purl.imsglobal.org/spec/lti/claim/lti1p1")).to eq lti_launch["post_payload"].except("nonce").except("https://purl.imsglobal.org/spec/lti/claim/lti1p1")
       end
 
       it "sends the state" do
@@ -336,7 +346,7 @@ describe Lti::IMS::AuthenticationController do
 
           it "generates an id token" do
             authorize
-            expect(id_token.except("nonce")).to eq lti_launch.except("nonce")
+            expect(id_token.except("nonce").except("https://purl.imsglobal.org/spec/lti/claim/lti1p1")).to eq lti_launch["post_payload"].except("nonce").except("https://purl.imsglobal.org/spec/lti/claim/lti1p1")
           end
         end
       end

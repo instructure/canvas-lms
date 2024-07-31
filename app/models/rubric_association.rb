@@ -231,7 +231,7 @@ class RubricAssociation < ActiveRecord::Base
   end
 
   def update_rubric
-    cnt = rubric.rubric_associations.for_grading.length rescue 0
+    cnt = rubric.rubric_associations.for_grading.count
     rubric&.with_versioning(false) do
       rubric.read_only = cnt > 1
       rubric.association_count = cnt

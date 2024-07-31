@@ -162,6 +162,7 @@ el:
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Ένας πίνακας απαντήσεων και σύντομων στατιστικών αναφορικά με τις επιλογές απάντησης των σπουδαστών."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Ένας πίνακας που περιέχει τα δεδομένα του κανονισμού βαθμολόγησης. Κάθε σειρά περιέχει ένα όνομα, μια μέγιστη ποσόστοση, και μια ελάχιστη ποσόστοση. Επιπροσθέτως, κάθε σειρά περιέχει ένα κουμπί για πρόσθεση καινούργιας σειράς απο κάτω, και μια ένα κουμπί για αφαίρεση της τρέχοντας σειράς."
   a_z_29d8e67c: "Α - Ζ"
+  about_70c18bba: Σχετικά
   about_this_service_b10bc808: "Σχετικά με αυτήν την υπηρεσία"
   academic_benchmark: 
     plugin_settings: 
@@ -1804,6 +1805,7 @@ el:
   announcement: 
     no_title: "Δεν υπάρχει Τίτλος"
   announcement_creation_failed_f7d227f5: "Απέτυχε η δημιουργία ανακοίνωσης"
+  announcement_e37d6dbd: ανακοίνωση
   announcement_ends_at_4ccc2a7e: "Τέλος ανακοίνωσης στο"
   announcement_fb4cb645: Ανακοίνωση
   announcement_not_found_d6d124c3: "Η Ανακοίνωση δεν βρέθηκε"
@@ -3582,6 +3584,7 @@ el:
       concluded_conferences: "Ολοκληρωμένες Συνδιασκέψεις"
       conference: Συνεδρία
       conference_header: Συνέδρια
+      conferences: Συνέδρια
       new_conference: "Νέα Συνδιάσκεψη"
       new_conferences: "Νέες Συνδιασκέψεις"
       page_title: "Συνεδρίες Διαδικτύου"
@@ -9834,6 +9837,7 @@ el:
   moderator_49b9f2e1: Συντονιστής
   modified_by_c1584b3c: "Τροποποιήθηκε Από"
   module_90d9fd32: Ενότητα
+  module_9775f804: "λειτουργική μονάδα"
   module_completed_50c50762: "Η Ενότητα Ολοκληρώθηκε"
   module_in_progress_fa600662: "Η Ενότητα βρίσκεται Σε Εξέλιξη"
   module_item_module_item_name_was_successfully_dele_8626d846: "Το στοιχείο %{module_item_name} της ενότητας διαγράφηκε επιτυχώς."
@@ -9944,6 +9948,7 @@ el:
   nav_logo_background_ba33fb7f: "Φόντο Λογότυπου Πλοήγησης"
   nav_text_94206145: "Κείμενο Πλοήγησης"
   nav_text_active_a924ae88: "Ενεργό Κείμενο Πλοήγησης"
+  navigation_ee9af92d: Πλοήγηση
   near_mastery_f25174a4: "Κοντά στο Επίπεδο Επιδεξιότητας"
   need_a_canvas_account_221d18ed: "Χρειάζεστε Λογαριασμό Canvas;"
   never_1ed1244d: ποτέ
@@ -13693,7 +13698,9 @@ el:
       user_has_no_bio: "Ο χρήστης %{user} δεν έχει προσθέσει βιογραφικό"
     recent_activity: 
       date_column: Ημερομηνία
+      edit_group: "Επεξεργασία Ομάδας"
       message_column: Μήνυμα
+      new_announcement: Ανακοίνωση
       recent_activity: "Πρόσφατη Δραστηριότητα"
       recent_activity_in_course: "Πρόσφατη Δραστηριότητα στο μάθημα/στην ομάδα %{course_or_group}"
       unread_column: "Μη αναγνωσμένα"
@@ -14594,6 +14601,7 @@ el:
   text_entry_e1808b2f: "Καταχώριση Κειμένου"
   text_entry_submission_cannot_be_empty_3d187cae: "Η υποβολή καταχώρισης κειμένου δεν μπορεί να είναι κενή"
   text_input_d3480b8c: "Εισαγωγή κειμένου"
+  text_sms_4e2d82a7: "Κείμενο (SMS)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "<mrk mid=\"3666\" mtype=\"seg\">Ο λογαριασμός αυτού του χρήστη έχει διαγραφεί.</mrk>  <mrk mid=\"3667\" mtype=\"seg\">Παρακαλώ επικοινωνήστε με τον διαχειριστή των υπολογιστικών συστημάτων σας για την επανενεργοποίηση του λογαριασμού σας.</mrk>"
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "Το ID λογαριασμού του λογαριασμού στον οποίο ανήκει ο χρήστης που αναφέρει το σφάλμα"
   the_app_was_activated_a84e055f: "Η εφαρμογή ενεργοποιήθηκε"

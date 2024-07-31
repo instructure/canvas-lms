@@ -38,6 +38,7 @@ import {
   rangingFrom,
   findCriterionMatchingRatingIndex,
 } from './utils/rubricUtils'
+import {OutcomeTag} from './OutcomeTag'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 const {licorice, tiara} = colors
@@ -232,15 +233,31 @@ const CriterionRow = ({
             height="13.75rem"
             overflowY="auto"
           >
+            {criterion.learningOutcomeId && (
+              <View as="div" margin="0 0 small 0">
+                <OutcomeTag displayName={criterion.description} />
+              </View>
+            )}
             <View as="div">
-              <Text weight="bold">{criterion.description}</Text>
+              <Text weight="bold">{criterion.outcome?.displayName || criterion.description}</Text>
             </View>
             <View as="div" margin="small 0 0 0">
               <Text
+                as="span"
                 size="small"
+                themeOverride={{paragraphMargin: '0'}}
                 dangerouslySetInnerHTML={htmlEscapeCriteriaLongDescription(criterion)}
               />
             </View>
+            {criterion.learningOutcomeId && (
+              <View as="div" margin="xxx-small 0 0 0">
+                <Text size="small">
+                  {I18n.t('Threshold: %{threshold}', {
+                    threshold: possibleString(criterion.masteryPoints),
+                  })}
+                </Text>
+              </View>
+            )}
           </View>
         </Flex.Item>
         {isFreeFormCriterionComments ? (

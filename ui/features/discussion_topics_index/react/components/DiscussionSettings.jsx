@@ -48,10 +48,12 @@ export default class DiscussionSettings extends Component {
     saveSettings: func.isRequired,
     toggleModalOpen: func.isRequired,
     userSettings: propTypes.userSettings.isRequired,
+    buttonText: propTypes.buttonText,
   }
 
   static defaultProps = {
     courseSettings: {},
+    buttonText: '',
   }
 
   state = {
@@ -183,8 +185,13 @@ export default class DiscussionSettings extends Component {
             this._settingsButton = button
           }}
           onClick={this.props.toggleModalOpen}
+          as="span"
+          display="block"
+          textAlign="center"
+          renderIcon={IconSettingsLine}
+          data-testid="discussion-setting-button"
         >
-          <IconSettingsLine />
+          {this.props.buttonText}
           <ScreenReaderContent>{I18n.t('Discussion Settings')}</ScreenReaderContent>
         </Button>
         <Modal

@@ -28,17 +28,10 @@ import {
   addNewNodeAsNextSibling,
   deleteNodeAndSelectPrevSibling,
 } from '../../../../utils'
-import {HeadingBlockSettings} from './HeadingBlockSettings'
 import {HeadingBlockToolbar} from './HeadingBlockToolbar'
+import {type HeadingBlockProps, type HeadingLevel} from './types'
 
-type HeadingLevels = 'h2' | 'h3' | 'h4'
-
-type HeadingBlockProps = {
-  text?: string
-  level?: HeadingLevels
-}
-
-export const HeadingBlock = ({text = '', level = 'h2'}: HeadingBlockProps) => {
+export const HeadingBlock = ({text, level}: HeadingBlockProps) => {
   const {actions, query, enabled} = useEditor(state => {
     return {
       enabled: state.options.enabled,
@@ -69,7 +62,7 @@ export const HeadingBlock = ({text = '', level = 'h2'}: HeadingBlockProps) => {
 
   const handleChange = useCallback(
     e => {
-      setProp((props: Partial<HeadingBlockProps>) => {
+      setProp((props: HeadingBlockProps) => {
         props.text = e.target.value.replace(/<\/?[^>]+(>|$)/g, '')
       })
     },
@@ -123,7 +116,8 @@ export const HeadingBlock = ({text = '', level = 'h2'}: HeadingBlockProps) => {
 HeadingBlock.craft = {
   displayName: 'Heading',
   defaultProps: {
-    level: 'h2',
+    text: '',
+    level: 'h2' as HeadingLevel,
   },
   related: {
     toolbar: HeadingBlockToolbar,

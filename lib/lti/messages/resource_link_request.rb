@@ -44,12 +44,12 @@ module Lti::Messages
 
     def generate_post_payload_for_assignment(assignment, _outcome_service_url, _legacy_outcome_service_url, _lti_turnitin_outcomes_placement_url)
       @assignment = assignment
-      generate_post_payload
+      to_cached_hash
     end
 
     def generate_post_payload_for_homework_submission(assignment)
       @assignment = assignment
-      generate_post_payload
+      to_cached_hash
     end
 
     private
@@ -61,7 +61,7 @@ module Lti::Messages
     def add_resource_link_request_claims!
       @message.resource_link.id = launch_resource_link_id
       @message.resource_link.description = @assignment&.description
-      @message.resource_link.title = resource_link&.title.presence || @assignment&.title.presence || tag_from_resource_link&.title.presence || @context.name
+      @message.resource_link.title = @assignment&.title.presence || resource_link&.title.presence || tag_from_resource_link&.title.presence || @context.name
     end
 
     def add_lti1p1_claims!

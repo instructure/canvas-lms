@@ -1631,6 +1631,7 @@ CanvasRails::Application.routes.draw do
       delete "users/mobile_sessions", action: :expire_mobile_sessions
       delete "users/:id", action: :destroy, as: "destroy_user"
       delete "users/:id/sessions", action: :terminate_sessions
+      delete "users/:id/mobile_sessions", action: :expire_mobile_sessions
 
       post "users/:user_id/files", action: :create_file
       get  "users/:user_id/files", controller: :files, action: :api_index, as: "user_files"
@@ -1935,6 +1936,12 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/lti_registrations/:id", action: :show
       put "accounts/:account_id/lti_registrations/:id", action: :update
       post "accounts/:account_id/lti_registrations/:id/bind", action: :bind
+    end
+
+    scope(controller: "lti/resource_links") do
+      get "courses/:course_id/lti_resource_links", action: :index
+      get "courses/:course_id/lti_resource_links/:id", action: :show
+      put "courses/:course_id/lti_resource_links/:id", action: :update
     end
 
     scope(controller: :immersive_reader) do
@@ -2683,6 +2690,10 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: "user_notes") do
       put "users/:user_id/user_notes/suppress_deprecation_notice", action: :suppress_deprecation_notice
+    end
+
+    scope(controller: :what_if_grades_api) do
+      put "submissions/:id/what_if_grades", action: :update
     end
 
     scope(controller: :plugins) do

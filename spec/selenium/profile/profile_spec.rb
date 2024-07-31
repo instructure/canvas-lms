@@ -321,7 +321,7 @@ describe "profile" do
     it "views the details of an access token" do
       get "/profile/settings"
       generate_access_token("testing", true)
-      # had to use :visible because it was failing saying element wasn't visible
+      # using :visible because we don't want to grab the template element
       fj("#access_tokens .show_token_link:visible").click
       expect(f("#token_details_dialog")).to be_displayed
     end
@@ -330,7 +330,7 @@ describe "profile" do
       skip_if_safari(:alert)
       get "/profile/settings"
       generate_access_token("testing", true)
-      # had to use :visible because it was failing saying element wasn't visible
+      # using :visible because we don't want to grab the template element
       fj("#access_tokens .delete_key_link:visible").click
       expect(driver.switch_to.alert).not_to be_nil
       driver.switch_to.alert.accept
@@ -348,6 +348,27 @@ describe "profile" do
       driver.switch_to.alert.accept
       wait_for_ajaximations
       check_element_has_focus fj(".delete_key_link[rel$='#{@token1.token_hint}']")
+    end
+
+    context "when access token restrictions are enabled" do
+      before do
+        @course.root_account.enable_feature!(:admin_manage_access_tokens)
+        @course.root_account.settings[:limit_personal_access_tokens] = true
+        @course.root_account.save!
+      end
+
+      it "the new token button is disabled for non-admins" do
+        get "/profile/settings"
+        expect(f(".add_access_token_link")).to be_disabled
+      end
+
+      it "doesn't show the regenerate button for non-admins" do
+        @user.access_tokens.create! purpose: "token_one"
+        get "/profile/settings"
+        # using :visible because we don't want to grab the template element
+        fj("#access_tokens .show_token_link:visible").click
+        expect(element_exists?(".regenerate_token")).to be_falsey
+      end
     end
   end
 
@@ -409,6 +430,19 @@ describe "profile" do
     account.save!
     get "/profile"
     expect(fj("h1:contains('User Profile')").attribute("class")).to eq "screenreader-only"
+  end
+
+  it "renders empty state messages when missing information in profile" do
+    user_logged_in
+    account = Account.default
+    account.settings[:enable_profiles] = true
+    account.settings[:enable_name_pronunciation] = true
+    account.save!
+    get "/profile"
+
+    expect(f("#name_pronunciation_empty_message").text).to eq "No name pronunciation provided"
+    expect(f("#biography_empty_message").text).to eq "No biography has been added"
+    expect(f("#links_empty_message").text).to eq "No links have been added"
   end
 
   describe "profile pictures s3 tests" do

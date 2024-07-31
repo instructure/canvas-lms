@@ -30,9 +30,15 @@ type MoodleZipImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
   onCancel: () => void
   fileUploadProgress: number | null
+  isSubmitting: boolean
 }
 
-const MoodleZipImporter = ({onSubmit, onCancel, fileUploadProgress}: MoodleZipImporterProps) => {
+const MoodleZipImporter = ({
+  onSubmit,
+  onCancel,
+  fileUploadProgress,
+  isSubmitting,
+}: MoodleZipImporterProps) => {
   const [file, setFile] = useState<File | null>(null)
   const [fileError, setFileError] = useState<boolean>(false)
   const [questionBankSettings, setQuestionBankSettings] = useState<QuestionBankSettings | null>()
@@ -65,7 +71,11 @@ const MoodleZipImporter = ({onSubmit, onCancel, fileUploadProgress}: MoodleZipIm
 
   return (
     <>
-      <MigrationFileInput fileUploadProgress={fileUploadProgress} onChange={setFile} />
+      <MigrationFileInput
+        fileUploadProgress={fileUploadProgress}
+        onChange={setFile}
+        isSubmitting={isSubmitting}
+      />
       {fileError && (
         <p>
           <Text color="danger">{I18n.t('You must select a file to import content from')}</Text>
@@ -74,9 +84,11 @@ const MoodleZipImporter = ({onSubmit, onCancel, fileUploadProgress}: MoodleZipIm
       <QuestionBankSelector
         onChange={setQuestionBankSettings}
         questionBankError={questionBankError}
+        disable={isSubmitting}
       />
       <CommonMigratorControls
         fileUploadProgress={fileUploadProgress}
+        isSubmitting={isSubmitting}
         canAdjustDates={true}
         onSubmit={handleSubmit}
         onCancel={onCancel}

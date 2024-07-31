@@ -442,7 +442,7 @@ describe('DiscussionTopicForm', () => {
       const document = setup({
         groupCategories: [{_id: '1', name: 'Mutant Power Training Group 1'}],
         isEditing: true,
-        currentDiscussionTopic: DiscussionTopic.mock({groupSet: GroupSet.mock(), canGroup: false}),
+        currentDiscussionTopic: DiscussionTopic.mock({groupSet: GroupSet.mock(), canGroup: false, entryCounts: {repliesCount: 1}}),
       })
 
       expect(document.queryByTestId('group-category-not-editable')).toBeTruthy()
@@ -482,6 +482,24 @@ describe('DiscussionTopicForm', () => {
       getByLabelText('Graded').click()
 
       expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
+    })
+
+    it('does not display "Allow Participants to Comment" when the setting is turned off', () => {
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
+      window.ENV.ANNOUNCEMENTS_COMMENTS_DISABLED = true
+
+      const {queryByText} = setup()
+
+      expect(queryByText('Allow Participants to Comment')).not.toBeInTheDocument()
+    })
+
+    it('displays "Allow Participants to Comment" when the setting is turned on', () => {
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
+      window.ENV.ANNOUNCEMENTS_COMMENTS_DISABLED = false
+
+      const {queryByText} = setup()
+
+      expect(queryByText('Allow Participants to Comment')).toBeInTheDocument()
     })
   })
 
@@ -773,7 +791,7 @@ describe('DiscussionTopicForm', () => {
         expect(document.queryByLabelText('Allow liking')).toBeInTheDocument()
         expect(document.queryByLabelText('Add to student to-do')).toBeInTheDocument()
         expect(document.queryByTestId('group-discussion-checkbox')).toBeTruthy()
-        expect(document.queryAllByText('Manage Assign To')).toBeTruthy()
+        expect(document.queryAllByText('Manage Due Dates and Assign To')).toBeTruthy()
 
         // Hides announcement options
         expect(document.queryByLabelText('Delay Posting')).not.toBeInTheDocument()

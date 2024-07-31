@@ -22,16 +22,16 @@ module TestDatabaseUtils
     def check_migrations!
       if ENV["SKIP_MIGRATION_CHECK"] != "1"
         migrations = ActiveRecord::Base.connection.migration_context.migrations
-        skipped_migrations = if $canvas_rails == "7.1"
-                               internal_metadata = ActiveRecord::InternalMetadata.new(ActiveRecord::Base.connection)
-                               ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration, internal_metadata).skipped_migrations
-                             else
-                               ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).skipped_migrations
-                             end
+        skipped_migrations = ActiveRecord::Migrator.new(
+          :up,
+          migrations,
+          ActiveRecord::Base.connection.schema_migration,
+          ActiveRecord::InternalMetadata.new(ActiveRecord::Base.connection)
+        ).skipped_migrations
 
         # total migration - all run migrations - all skipped migrations
         needs_migration =
-          ActiveRecord::Base.connection.migration_context.migrations.map(&:version) -
+          migrations.map(&:version) -
           ActiveRecord::Base.connection.migration_context.get_all_versions -
           skipped_migrations.map(&:version)
 

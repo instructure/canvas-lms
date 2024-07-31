@@ -359,6 +359,7 @@ class ApplicationController < ActionController::Base
     featured_help_links
     account_level_blackout_dates
     render_both_to_do_lists
+    commons_new_quizzes
     course_paces_redesign
     course_paces_for_students
     explicit_latex_typesetting
@@ -377,6 +378,7 @@ class ApplicationController < ActionController::Base
     courses_popout_sisid
     dashboard_graphql_integration
     discussion_checkpoints
+    speedgrader_studio_media_capture
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours

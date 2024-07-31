@@ -382,6 +382,7 @@ export const updateDiscussionEntryMock = ({
   message = '<p>This is the parent reply</p>',
   fileId = '7',
   removeAttachment = !fileId,
+  quotedEntryId = null,
 } = {}) => [
   {
     request: {
@@ -391,6 +392,7 @@ export const updateDiscussionEntryMock = ({
         message,
         ...(fileId !== null && {fileId}),
         removeAttachment,
+        quotedEntryId,
       },
     },
     result: {

@@ -33,7 +33,7 @@ type TopbarProps = {
 }
 
 export const Topbar = ({toolboxOpen, onToolboxChange}: TopbarProps) => {
-  const {canUndo, canRedo, actions, query} = useEditor((state, qry) => ({
+  const {canUndo, canRedo, actions} = useEditor((state, qry) => ({
     canUndo: qry.history.canUndo(),
     canRedo: qry.history.canRedo(),
     query: qry,

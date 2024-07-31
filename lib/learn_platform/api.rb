@@ -38,7 +38,7 @@ module LearnPlatform
         cache_key = ["learnplatform", endpoint, authorization, params].cache_key
         json = Rails.cache.fetch(cache_key, expires_in: expires) do
           uri = URI.parse("#{base_url}#{endpoint}")
-          uri.query = URI.encode_www_form(params)
+          uri.query = params.to_param unless params.empty?
           response = CanvasHttp.get(uri.to_s, { Authorization: authorization })
           json = JSON.parse(response.body)
 
@@ -80,7 +80,7 @@ module LearnPlatform
     def product_filters
       return {} unless valid_learnplatform?
 
-      endpoint = "/api/v2/lti/filters"
+      endpoint = "/api/v2/lti/tools_filters"
       fetch_learnplatform_response(endpoint, 1.hour)
     end
   end

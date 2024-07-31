@@ -746,23 +746,16 @@ class ActiveRecord::Base
     self.updated_at = Time.now.utc if touch
     if new_record?
       self.created_at = updated_at if touch
-      if Rails.version < "7.1"
-        self.id = self.class._insert_record(
-          attributes_with_values(attribute_names_for_partial_inserts)
-            .transform_values { |attr| attr.is_a?(ActiveModel::Attribute) ? attr.value : attr }
-        )
-      else
-        returning_columns = self.class._returning_columns_for_insert
-        returning_values = self.class._insert_record(
-          attributes_with_values(attribute_names_for_partial_inserts)
-            .transform_values { |attr| attr.is_a?(ActiveModel::Attribute) ? attr.value : attr },
-          returning_columns
-        )
+      returning_columns = self.class._returning_columns_for_insert
+      returning_values = self.class._insert_record(
+        attributes_with_values(attribute_names_for_partial_inserts)
+          .transform_values { |attr| attr.is_a?(ActiveModel::Attribute) ? attr.value : attr },
+        returning_columns
+      )
 
-        if returning_values
-          returning_columns.zip(returning_values).each do |column, value|
-            _write_attribute(column, value) unless _read_attribute(column)
-          end
+      if returning_values
+        returning_columns.zip(returning_values).each do |column, value|
+          _write_attribute(column, value) unless _read_attribute(column)
         end
       end
       @new_record = false
@@ -802,7 +795,7 @@ module UsefulFindInBatches
     else
       enum_for(:find_each, start:, finish:, order:, **kwargs) do
         relation = self
-        order = build_batch_orders(order) if $canvas_rails == "7.1"
+        order = build_batch_orders(order)
         apply_limits(relation, start, finish, order).size
       end
     end
@@ -813,7 +806,7 @@ module UsefulFindInBatches
     relation = self
     unless block_given?
       return to_enum(:find_in_batches, start:, finish:, order:, batch_size:, **kwargs) do
-        order = build_batch_orders(order) if $canvas_rails == "7.1"
+        order = build_batch_orders(order)
         total = apply_limits(relation, start, finish, order).size
         (total - 1).div(batch_size) + 1
       end
@@ -885,7 +878,7 @@ module UsefulFindInBatches
 
   def in_batches_with_cursor(of: 1000, start: nil, finish: nil, order: :asc, load: false)
     klass.transaction do
-      order = build_batch_orders(order) if $canvas_rails == "7.1"
+      order = build_batch_orders(order)
       relation = apply_limits(clone, start, finish, order)
 
       relation.skip_query_cache!
@@ -926,7 +919,7 @@ module UsefulFindInBatches
     limited_query = limit(0).to_sql
 
     relation = self
-    order = build_batch_orders(order) if $canvas_rails == "7.1"
+    order = build_batch_orders(order)
     relation_for_copy = apply_limits(relation, start, finish, order)
     unless load
       relation_for_copy = relation_for_copy.except(:select).select(primary_key)
@@ -1021,7 +1014,7 @@ module UsefulFindInBatches
   # and yields the objects in batches in the same order as the scope specified
   # so the DB connection can be fully recycled during each block.
   def in_batches_with_pluck_ids(of: 1000, start: nil, finish: nil, order: :asc, load: false)
-    order = build_batch_orders(order) if $canvas_rails == "7.1"
+    order = build_batch_orders(order)
     relation = apply_limits(self, start, finish, order)
     all_object_ids = relation.pluck(:id)
     current_order_values = order_values
@@ -1050,7 +1043,7 @@ module UsefulFindInBatches
              group, or order)."
       end
 
-      order = build_batch_orders(order) if $canvas_rails == "7.1"
+      order = build_batch_orders(order)
       relation = apply_limits(self, start, finish, order)
       sql = relation.to_sql
       table = "#{table_name}_in_batches_temp_table_#{sql.hash.abs.to_s(36)}"
@@ -1756,7 +1749,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     fks = foreign_keys(from_table).select { |fk| fk.defined_for?(**options) }
     # prefer a FK on a column named after the table
     if options[:to_table]
-      column = (Rails.version < "7.1") ? foreign_key_column_for(options[:to_table]) : foreign_key_column_for(options[:to_table], "id")
+      column = foreign_key_column_for(options[:to_table], "id")
       return fks.find { |fk| fk.column == column } || fks.first
     end
     fks.first
@@ -1979,20 +1972,11 @@ ActiveRecord::Relation.prepend(ExplainAnalyze)
 module TableRename
   RENAMES = {}.freeze
 
-  if Rails.version < "7.1"
-    def columns(table_name)
-      if (old_name = RENAMES[table_name]) && connection.table_exists?(old_name)
-        table_name = old_name
-      end
-      super
+  def columns(connection, table_name)
+    if (old_name = RENAMES[table_name]) && connection.table_exists?(old_name)
+      table_name = old_name
     end
-  else
-    def columns(connection, table_name)
-      if (old_name = RENAMES[table_name]) && connection.table_exists?(old_name)
-        table_name = old_name
-      end
-      super
-    end
+    super
   end
 end
 
@@ -2136,11 +2120,7 @@ Rails.application.config.after_initialize do
     cache = MultiCache.fetch("schema_cache")
     next if cache.nil?
 
-    if $canvas_rails == "7.1"
-      connection_pool.schema_reflection.set_schema_cache(cache)
-    else
-      connection_pool.set_schema_cache(cache)
-    end
+    connection_pool.schema_reflection.set_schema_cache(cache)
     LoadAccount.schema_cache_loaded!
   end
 end
@@ -2164,64 +2144,6 @@ module UserContentSerialization
   end
 end
 ActiveRecord::Base.include(UserContentSerialization)
-
-if Rails.version >= "6.1" && Rails.version < "7.1"
-  # Hopefully this can be removed with https://github.com/rails/rails/commit/6beee45c3f071c6a17149be0fabb1697609edbe8
-  # having made a released version of rails; if not bump the rails version in this comment and leave the comment to be revisited
-  # on the next rails bump
-
-  # This code is direcly copied from rails except the INST commented line, hence the rubocop disables
-  # rubocop:disable Lint/RescueException
-  # rubocop:disable Naming/RescuedExceptionsVariableName
-  require "active_record/connection_adapters/abstract/transaction"
-  module ActiveRecord
-    module ConnectionAdapters
-      class TransactionManager
-        def within_new_transaction(isolation: nil, joinable: true)
-          @connection.lock.synchronize do
-            transaction = begin_transaction(isolation:, joinable:)
-            ret = yield
-            completed = true
-            ret
-          rescue Exception => error
-            if transaction
-              # INST: The one functional change, since on postgres this is unnecessary, and the above-linked commit disables it
-              # transaction.state.invalidate! if error.is_a? ActiveRecord::TransactionRollbackError
-              rollback_transaction
-              after_failure_actions(transaction, error)
-            end
-
-            raise
-          ensure
-            if transaction
-              if error
-                # @connection still holds an open or invalid transaction, so we must not
-                # put it back in the pool for reuse.
-                @connection.throw_away! unless transaction.state.rolledback?
-              elsif Thread.current.status == "aborting" || (!completed && transaction.written)
-                # The transaction is still open but the block returned earlier.
-                #
-                # The block could return early because of a timeout or because the thread is aborting,
-                # so we are rolling back to make sure the timeout didn't caused the transaction to be
-                # committed incompletely.
-                rollback_transaction
-              else
-                begin
-                  commit_transaction
-                rescue Exception
-                  rollback_transaction(transaction) unless transaction.state.completed?
-                  raise
-                end
-              end
-            end
-          end
-        end
-      end
-    end
-  end
-  # rubocop:enable Lint/RescueException
-  # rubocop:enable Naming/RescuedExceptionsVariableName
-end
 
 module AdditionalIgnoredColumns
   def self.included(klass)
@@ -2261,22 +2183,9 @@ module AdditionalIgnoredColumns
 end
 ActiveRecord::Base.singleton_class.include(AdditionalIgnoredColumns)
 
-if $canvas_rails == "7.0"
-  module SerializeCompat
-    def serialize(attr_name, *args, coder: nil, type: Object, **kwargs)
-      args = [coder || type] if args.empty?
-      super(attr_name, *args, **kwargs)
-    end
-  end
-  ActiveRecord::Base.singleton_class.prepend(SerializeCompat)
-
-  ActiveRecord::Relation.send(:public, :null_relation?)
-end
-
 module CreateIcuCollationsBeforeMigrations
   def migrate_without_lock(*)
-    c = ($canvas_rails == "7.1") ? connection : ActiveRecord::Base.connection
-    c.create_icu_collations if up?
+    connection.create_icu_collations if up?
 
     super
   end
@@ -2288,9 +2197,7 @@ module RollbackIgnoreNonDatedMigrations
     if direction == :down
       # we need to back up over any migrations that are not dated
       steps += migrations.count { |migration| migration.version.to_s.length > 14 && migration.runnable? }
-      args = [direction, migrations, schema_migration]
-      args << internal_metadata if $canvas_rails == "7.1"
-      migrator = ActiveRecord::Migrator.new(*args)
+      migrator = ActiveRecord::Migrator.new(direction, migrations, schema_migration, internal_metadata)
 
       if current_version != 0 && !migrator.current_migration
         raise ActiveRecord::UnknownMigrationVersionError, current_version

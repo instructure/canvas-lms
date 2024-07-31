@@ -49,6 +49,7 @@ const RUBRIC_QUERY = gql`
           title
         }
         learningOutcomeId
+        masteryPoints
         points
         longDescription
         description

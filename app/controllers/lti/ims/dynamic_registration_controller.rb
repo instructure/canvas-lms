@@ -57,6 +57,7 @@ module Lti
         user_id = @current_user.id
         root_account_global_id = account_context.global_id
         unified_tool_id = params[:unified_tool_id].presence
+        registration_url = params[:registration_url]
 
         token = Canvas::Security.create_jwt(
           {
@@ -64,7 +65,8 @@ module Lti
             initiated_at: current_time,
             user_id:,
             unified_tool_id:,
-            root_account_global_id:
+            root_account_global_id:,
+            registration_url:
           },
           REGISTRATION_TOKEN_EXPIRATION.from_now
         )
@@ -112,8 +114,7 @@ module Lti
         access_token = AuthenticationMethods.access_token(request)
         jwt = Canvas::Security.decode_jwt(access_token)
 
-        expected_jwt_keys = %w[user_id initiated_at root_account_global_id exp uuid unified_tool_id]
-
+        expected_jwt_keys = %w[user_id initiated_at root_account_global_id exp uuid unified_tool_id registration_url]
         if jwt.keys.sort != expected_jwt_keys.sort
           respond_with_error(:unauthorized, "JWT did not include expected contents")
           return
@@ -134,7 +135,10 @@ module Lti
         registration_params = params.permit(*expected_registration_params)
         registration_params["lti_tool_configuration"] = registration_params["https://purl.imsglobal.org/spec/lti-tool-configuration"]
         registration_params.delete("https://purl.imsglobal.org/spec/lti-tool-configuration")
-        scopes = registration_params["scope"].split
+        scopes = []
+        if registration_params["scope"]
+          scopes = registration_params["scope"].split
+        end
         registration_params.delete("scope")
         error_messages = validate_registration_params(registration_params)
 
@@ -142,6 +146,8 @@ module Lti
           render status: :unprocessable_entity, json: { errors: error_messages }
           return
         end
+
+        registration_url = jwt["registration_url"]
 
         root_account.shard.activate do
           developer_key = DeveloperKey.new(
@@ -161,6 +167,7 @@ module Lti
             scopes:,
             guid: jwt["uuid"],
             unified_tool_id: jwt["unified_tool_id"],
+            registration_url:,
             **registration_params
           )
 

@@ -342,6 +342,7 @@ pt:
   a_z_29d8e67c: "A - Z"
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "Capacidade de submeter atribuições de documentos anotáveis."
   ability_to_submit_student_annotation_assignments_9ee47e3f: "Capacidade de submeter tarefas de anotação de alunos."
+  about_smart_search_c8e7fcb4: "Acerca da Busca inteligente"
   about_this_service_b10bc808: "Sobre este serviço"
   above_max_rating_64b29915: "Acima da classificação máxima"
   academic_benchmark: 
@@ -2770,6 +2771,7 @@ pt:
       Permitir que a assinatura de eventos ao vivo seja definida para ser entregue
       através de ganchos HTTPS
   allow_lor_tools: "Permitir que os utilizadores vejam e utilizem ferramentas externas configuradas para LOR."
+  allow_lti_1_3_resource_links_api_341599b: "Permitir a API de ligações de recursos LTI 1.3"
   allow_lti_tools_to_have_an_editor_button_icon_with_15c1342a: "Permitir que as ferramentas LTI tenham um ícone de botão de editor sem colocação (utilizar o ícone de ferramenta predefinido)"
   allow_migration_of_quizzes_during_course_copy_and__35d80756: "Permitir a migração de testes durante a cópia e importação da disciplina"
   allow_moderator_to_review_multiple_independent_gra_c59d64f6: "Permitir que o moderador revise várias classificações independentes para submissões selecionadas"
@@ -4089,6 +4091,7 @@ pt:
   are_you_sure_you_want_to_delete_this_enrollment_74ecfeb1: "Tem a certeza de que deseja eliminar esta inscrição?"
   are_you_sure_you_want_to_delete_this_entry_9aecd6d3: "Tem certeza de que deseja excluir esta entrada?"
   are_you_sure_you_want_to_delete_this_event_824b1e33: "Tem certeza de que deseja excluir este evento?"
+  are_you_sure_you_want_to_delete_this_event_deletin_30f256d2: "Tem certeza de que deseja excluir este evento? A eliminação deste evento também eliminará a tarefa associada."
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "Tem a certeza de que pretende eliminar este período de avaliação?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Tem a certeza de que pretende eliminar este período de avaliação?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Tem a certeza de que pretende eliminar este esquema de avaliação?"
@@ -4154,6 +4157,7 @@ pt:
   as_of_a036fa2e: "A partir de"
   as_of_date_the_lti_1_3_oidc_auth_endpoint_has_chan_a8783bc6: "A partir de %{date}, o endpoint do LTI 1.3 OIDC Auth foi alterado de https://canvas.instructure.com/api/lti/authorize_redirect para https://sso.canvaslms.com/api/lti/authorize_redirect. O raciocínio e o âmbito desta alteração está detalhado em *este artigo do Canvas Community*, e informação adicional está disponível nos nossos documentos API. Esta mudança é pequena e não vai demorar muito tempo, mas requer uma mudança de configuração no lado da ferramenta para cada ferramenta LTI 1.3 que é instalada no Canvas."
   as_of_date_the_lti_1_3_platform_storage_specificat_74b82d8d: "A partir de %{date}, a especificação LTI 1.3 Armazenamento da Plataforma é totalmente suportado pelo Canvas. As ferramentas que pretendam implementar esta especificação devem alterar o ponto final do OIDC Auth que armazenam para o Canvas de *https://canvas.instructure.com/api/lti/authorize_redirect* para *https://sso.canvaslms.com/api/lti/authorize_redirect*. O ponto de extremidade de autenticação do OIDC recomendado para novas instalações de ferramentas 1.3 também foi alterado e recomendamos que todas as ferramentas 1.3 mudem sua configuração para usar esse novo ponto de extremidade assim que possível."
+  as_of_june_1_2024_searchable_items_include_content_62e31b5a: "A partir de 1 de junho de 2024, os itens pesquisáveis incluem páginas de conteúdo, anúncios, sugestões de discussão e descrições de trabalhos, com planos de expansão."
   as_of_june_1_2024_the_smart_search_feature_is_quer_cced176f: "A partir de 1 de junho de 2024, o recurso Pesquisa inteligente está consultando os seguintes itens (incluindo títulos) em um curso: páginas de conteúdo, avisos, prompts de discussão, descrições de exercícios."
   as_primary_c07e9394: "Como principal"
   as_secondary_ab10dec8: "Como secundário"
@@ -5430,6 +5434,7 @@ pt:
   available_from_f84e4611: "Disponível de"
   available_from_field_for_styleguide_7ced3861: "Disponível por campo de assunto"
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "Disponível por - Formato como AAAA-MM-DD hh:mm"
+  available_from_time_86bf4e22: "Disponível a partir da hora"
   available_pronouns_b45330b1: "Pronomes disponíveis"
   available_submission_types_1c577ae5: "Tipos de submissão disponíveis"
   available_to_b7350e02: "Disponível para"
@@ -5441,6 +5446,7 @@ pt:
   available_until_field_for_styleguide_85d5d65a: "Disponível até campo de assunto"
   available_until_format_like_yyyy_mm_dd_hh_mm_622378d6: "Disponível até - Formato como AAAA-MM-DD hh:mm"
   available_until_lock_at_ab022445: "Disponível até %{lock_at}"
+  available_until_time_818f35d: "Disponível até à hora"
   available_until_untildate_b926fe11: "Disponível até %{untilDate}"
   availableslots_available_87b8b69d: "%{availableSlots} Disponível"
   availableslots_more_available_be5193a8: "%{availableSlots} mais disponível"
@@ -6566,6 +6572,7 @@ pt:
   cap_the_number_of_rces_rendered_on_initial_page_lo_c3890aec: |-
       Limite o número de RCEs apresentadas no carregamento inicial da página. Depois disso,
       inicialize cada uma delas, uma vez que estão prestes a entrar no viewport.
+  captcha_failed_to_load_52251e9f: "Falha ao carregar o Captcha"
   caption_1cf95987: Legenda
   captions_inherited_from_a_parent_course_cannot_be__9248fa3a: "As legendas herdadas de uma disciplina-mãe não podem ser removidas."
   captions_subtitles_af2c47e: Legendas/Legendas
@@ -7113,6 +7120,7 @@ pt:
   common_cartridge_qti_new_quizzes_import_58b786ce: "Cartucho comum QTI Importação de novos questionários"
   common_timezones_2b00baba: "Fusos Horários comuns"
   commons_ed0252fb: Commons
+  commons_new_quizzes_support_cb162314: "Suporte para novos questionários do Commons"
   communicate_course_objectives_f457158c: "Comunicar os objectivos da disciplina"
   communicate_grading_expectations_484a1f01: "Comunicar as expectativas em classificação"
   communicate_to_your_students_exactly_what_will_be__57a679c5: |-
@@ -7463,6 +7471,7 @@ pt:
   config_url_e96ceaf3: "URL Config."
   configurate_tool_app_5a721f2c: "Configurar a aplicação %{tool}?"
   configuration_error_906691a5: "Erro de configuração"
+  configuration_json_cannot_be_empty_f3664d30: "O JSON de configuração não pode estar vazio."
   configuration_location_ee0f6592: "Configurar Localização"
   configuration_type_25a084a4: "Tipo de configuração"
   configure_ecb97e30: Configurar
@@ -8210,6 +8219,7 @@ pt:
   contribute_4730e633: Contribuir
   contribute_to_the_page_2116bf3b: "Contribuir para a página"
   contributed_to_this_module_item_and_is_complete_2799d5c: "Contribuiu para este módulo e está completo"
+  contributing_to_development_4647b24e: "Contribuir para o desenvolvimento"
   controls_the_final_changes_needed_to_fully_conform_8398b749: |-
       Controla as alterações finais necessárias para estar totalmente em conformidade com o LTI Platform Storage
       spec, incluindo o recebimento de mensagens endereçadas à origem OIDC Auth
@@ -10037,7 +10047,7 @@ pt:
     registered_services: "Serviços registrados"
     revisions: Revisões
     rubrics: Protocolos
-    search: Pesquisar
+    search: "Busca inteligente"
     settings: ~
     site_admin: "Administrador do site"
     stats: Estatísticas
@@ -11338,6 +11348,7 @@ pt:
   display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "Exibir valores"
   displaying_to_students_b1e92058: "Exibir para os alunos"
+  displayname_9410813e: "%{displayName}"
   displayname_loaded_14d71a0a: "%{displayName} carregado"
   displayname_loading_in_progress_2be325fd: "%{displayName} carregamento em progresso"
   displayname_loading_pending_3aa2723e: "%{displayName} carregamento pendente"
@@ -11982,6 +11993,7 @@ pt:
   english_united_kingdom_a613f831: "Inglês (Reino Unido)"
   enhance_color_contrast_of_content_685ddd49: "Aumentar o contraste de cor do conteúdo"
   enhance_password_options_efbf3e48: "Melhorar as opções de palavra-passe"
+  enhance_your_canvas_experience_with_apps_that_offe_ba956afb: "Melhore a sua experiência no Canvas com aplicações que oferecem bibliotecas de conteúdos, ferramentas de colaboração, análises e muito mais. Esta página é o seu centro para todos os recursos da aplicação! Utilize a página Descobrir para encontrar e instalar novas aplicações e a página Gerir para rever e modificar as aplicações instaladas."
   enhanced_docviewer_url_security_72e9baa9: "Segurança de URL DocViewer aprimorada"
   enhanced_grade_change_auditing_2b155dfa: "Auditoria de alteração de classificação melhorada"
   enhanced_gradebook_filters_a3be5e7d: "Filtros do livro de classificação mMelhorados"
@@ -13474,6 +13486,7 @@ pt:
   finnish_4df2923d: Finlandês
   first_5744470e: Primeira
   first_9685680a: primeiro
+  first_item_last_item_of_total_items_displayed_a21552d9: "%{first_item} - %{last_item} de %{total_items} exibidos"
   first_last_name_9820d256: "Nome, apelido"
   first_name_d5c12500: "Primeiro Nome"
   first_reviewer_9ea05caa: "Primeiro revisor"
@@ -13589,6 +13602,7 @@ pt:
   from_gravatar_58372d5a: "Do Gravatar"
   from_grouptitle_860dff95: "A partir de %{groupTitle}"
   from_the_provider_of_the_enrollments_834d5ae4: "do fornecedor das inscrições"
+  from_time_e23bdd0f: "A partir da hora"
   front_page_50cae87e: "Primeira página"
   front_page_must_be_set_first_4dbbfdbe: "É necessário definir primeiro a primeira página"
   front_page_must_be_set_first_c5246f7d: "A primeira página deve ser configurada primeiro"
@@ -14314,6 +14328,7 @@ pt:
       buttons: 
         save: Guardar
         save_settings: "Guardar configurações"
+        show_new_sg_ui: "Utilizar a nova IU do speedgrader"
         submit_comment: "Enviar comentário"
       comment_submitted: "O seu comentário foi enviado."
       crocodoc_pending: "O Crocodoc ainda está a processar este documento."
@@ -15382,6 +15397,7 @@ pt:
   here_f44564ee: aqui.
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Aqui está uma boa oportunidade para ficar a conhecer melhor o calendário e adicionar à disciplina quaisquer eventos que não sejam tarefas que possa ter. Não se preocupe, nós ajudamos."
   here_s_some_quick_tips_to_get_you_started_in_canva_72425979: "Aqui ficam algumas dicas rápidas para começar no Canvas!"
+  hh_mm_5faafa69: "hh:mm"
   hi_contrast_373b614f: Alto-contraste
   hidden_130c3791: oculto
   hidden_14a032a7: Ocultar
@@ -15724,6 +15740,7 @@ pt:
       Se ativado, o Canvas permitirá ferramentas para retornar múltiplos itens
       de conteúdo em um único pedido na página de módulos da disciplina
   if_enabled_canvas_will_be_able_to_export_new_quizz_504132df: "Se ativado, o Canvas poderá exportar Novos Questionários como parte dos Pacotes de Exportação de Cartuchos Comuns."
+  if_enabled_canvas_will_be_able_to_share_new_quizze_784525a: "Se ativado, o Canvas poderá partilhar Novos Testes com o Commons."
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Se ativado, os importadores de Cartucho Comum converterão ficheiros HTML em Páginas"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Se permitido, os criadores do conteúdo têm de fornecer direitos de autor e licença de informação para os ficheiros antes de serem publicados. Apenas se aplica se também for permitido Procurar Melhor Ficheiro."
   if_enabled_copyright_and_license_information_must__2a551827: "Se ativado, as informações sobre direitos autorais e licença devem ser fornecidas para os ficheiros antes de serem publicados."
@@ -15803,6 +15820,9 @@ pt:
   if_enabled_the_tool_installation_and_configuration_c974cdb2: |-
       Se ativado, os formulários de instalação e configuração da ferramenta localizados nas páginas Configurações da conta e da disciplina usarão
       componentes InstUI, em vez dos componentes internos mais antigos e menos acessíveis.
+  if_enabled_the_tray_that_allows_users_to_assign_le_7197db0a: |-
+      Se ativado, o tabuleiro que permite aos utilizadores atribuir objetos de aprendizado será optimizado para
+      objetos com grandes quantidades de substituições.
   if_enabled_the_user_s_lti_url_input_on_the_select__fa539830: |-
       Se estiver ativada, a entrada do URL de LTI do utilizador na caixa de diálogo de seleção de conteúdo será substituída
       se a ferramenta responder com um URL de LTI válido.
@@ -17147,6 +17167,7 @@ pt:
   limit_group_members_to_leave_blank_for_no_limit_c341e248: "Limitar os membros do grupo para (deixar em branco, sem limite)"
   limit_groups_to_group_limit_members_40651ea7: "Limitar grupos a membros %{group_limit}"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Limitar participantes para assistir %{num_appointments} marcações."
+  limit_personal_access_token_creation_to_admins_a9b8d7fe: "Limitar a criação de tokens de acesso pessoal aos administradores."
   limit_search_to_activity_after_c1ac2449: "Limitar pesquisa a actividade depois"
   limit_search_to_activity_before_e05aad05: "Limitar pesquisa a actividade anterior"
   limit_section_privileges_e6425dfd: limit_section_privileges
@@ -17378,6 +17399,8 @@ pt:
   lock_date_cannot_be_after_section_end_d37da70c: "A data de bloqueio não pode ser posterior ao fim da secção"
   lock_date_cannot_be_after_term_end_cf1a188f: "A data de bloqueio não pode ser posterior ao fim do período"
   lock_date_cannot_be_before_due_date_ac30f54: "A data de bloqueio não pode ser anterior à data de entrega"
+  lock_date_cannot_be_before_reply_to_topic_due_date_fa73db43: "A data de bloqueio não pode ser anterior à data de expiração da resposta ao tópico"
+  lock_date_cannot_be_before_required_replies_due_da_d2763f71: "A data de bloqueio não pode ser anterior à data de expiração das respostas obrigatórias"
   lock_discussion_title_failed_9d49f2d: "Bloquear discussão %{title} falhou"
   lock_discussion_title_succeeded_fb24ebfc: "Bloquear discussão %{title} foi bem sucedida"
   lock_icon_a9916601: "bloquear ícone"
@@ -17594,6 +17617,8 @@ pt:
   lti_add_e3bc0049: "LTI - adicionar"
   lti_add_edit_delete_15905170: "LTI - adicionar/editar/eliminar"
   lti_advantage_services_c1746cb4: "Serviços de vantagem da LTI"
+  lti_apps_discover_page_cd95458b: "Página de descoberta das aplicações LTI"
+  lti_apps_page_bd3867af: "Página de aplicações LTI"
   lti_context_id_should_be_unique_7437a74d: "lti_context_id deve ser único"
   lti_deep_linking_for_module_index_menu_881feeee: "Ligação profunda LTI para Menu Índice de Módulos"
   lti_deep_linking_line_items_5e0079f7: "Itens de linha de ligação direta de LTI"
@@ -17753,6 +17778,7 @@ pt:
   march_2020_responsiveness_f810a65b: "Responsividade Março de 2020"
   march_bbe310ee: Março
   mark_all_announcement_read_eda5292b: "Marcar todos os anúncios como lidos"
+  mark_all_announcement_read_f4fc9137: "Marcar todos os anúncios como lidos"
   mark_all_as_read_8f3bdf57: "Marcar tudo como lido"
   mark_all_as_read_a995ffbe: "Marcar tudo como lido"
   mark_all_as_unread_10e7f0fe: "Marcar tudo como não lido"
@@ -21746,6 +21772,7 @@ pt:
   outcome_mastery_scales_8c3a814d: "Escalas de domínio dos resultados"
   outcome_mastery_scales_add_edit_171551c: "Escalas de domínio dos resultados - adicionar / editar"
   outcome_menu_4fe5813: "Menu de resultados"
+  outcome_name_27d81c86: "Nome do resultado"
   outcome_outcome_id_is_not_available_in_context_con_2143db54: "O resultado %{outcome_id} não está disponível no contexto %{context_type}#%{context_id}"
   outcome_path_mastery_points: "Pontos de domínio de %{path}"
   outcome_path_result: "Resultado de %{path}"
@@ -25668,6 +25695,8 @@ pt:
   required_peer_reviews_23bea465: "Revisões por pares necessárias"
   required_replies_8ec3e238: "Respostas obrigatórias"
   required_replies_due_date_f976c9af: "Data de vencimento das respostas obrigatórias"
+  required_replies_number_d941ee4c: "Respostas obrigatórias (%{number})"
+  required_replies_required_replies_ab82825e: "Respostas obrigatórias (%{required_replies})"
   required_replies_requiredreplies_d91bed30: "Respostas obrigatórias (%{requiredReplies})"
   required_to_view_quiz_results_dba7368b: "Necessário para exibir os resultados do teste"
   required_values_1eb5841f: "Valores obrigatórios"
@@ -26371,6 +26400,7 @@ pt:
   search_assignments_in_gradebook_and_new_design_for_8f966bcc: "Pesquisa de trabalhos no Livro de notas e novo design para trabalhos e pesquisa de alunos"
   search_by_99d1ba5f: "Pesquisar por"
   search_by_app_name_company_name_8ea86de: "Pesquisar por nome da aplicação e nome da empresa"
+  search_by_app_or_company_name_ad468715: "Pesquisar por nome da aplicação ou da empresa"
   search_by_c559efd: "Procurar por"
   search_by_extension_name_company_name_345e690c: "Procurar por nome da extensão e nome da empresa"
   search_by_name_email_or_id_5fd43dc9: "Procurar por nome, e-mail ou ID"
@@ -26429,6 +26459,7 @@ pt:
   search_users_48b1789e: "Procurar utilizadores..."
   search_within_grouptitle_4d38272f: "Pesquisar dentro de %{groupTitle}"
   search_within_outcome_group_7ac6ac88: "Pesquisa dentro do grupo de resultados"
+  searchable_content_7a9e0f33: "Conteúdo pesquisável"
   searching_b0207e7f: Procurando
   searching_for_announcements_in_sections_must_span__80e4dfe4: "A procura de anúncios em secções deve abranger exatamente uma disciplina"
   searching_for_courses_8cc5f904: "A procurar disciplinas..."
@@ -26768,6 +26799,7 @@ pt:
       sinalizador DEVE ser ativado antes de este sinalizador poder ser ativado. Quando este sinalizador estiver
       ativado, a IU e a API que permitem aos utilizadores criar tipos de módulos AssignmentOverrides serão
       ativadas, pelo que a funcionalidade estará totalmente funcional.
+  selective_release_optimized_tray_873075ff: "Libertação seletiva - Tabuleiro otimizado"
   selective_release_ui_api_changes_a60b681a: "Libertação seletiva - Alterações da IU/API"
   self_enrollments: 
     already_enrolled: 
@@ -27383,7 +27415,8 @@ pt:
       name_pronunciation_header_tip: "Para confirmar a pronúncia correta do seu nome, introduza uma pronúncia fonética."
       name_pronunciation_label: "Pronúncia do nome:"
       name_pronunciation_label_tip: "Para confirmar a pronúncia correta do seu nome, introduza uma pronúncia fonética."
-      no_links: "%{name} não adicionou ligações"
+      no_links: "Não foram adicionadas ligações"
+      no_name_pronunciation: "Não foi fornecida nenhuma pronúncia do nome"
       nothing_in_common: "Não têm nada em comum"
       save_profile: "Guardar perfil"
       service_contact: "contactar %{user} com %{service}"
@@ -27392,7 +27425,7 @@ pt:
       titles: 
         click_to_change_profile_pic: "Clique para alterar a imagem do perfil"
       user_enrolled: Inscrições
-      user_has_no_bio: "%{user} não adicionou uma biografia"
+      user_has_no_bio: "Não foi adicionada nenhuma biografia"
       ways_to_contact_user: Contatar
     recent_activity: 
       date_column: Data
@@ -28059,8 +28092,12 @@ pt:
     threshold_24h: 24h
     threshold_36h: 36h
   smart_assignment_alerts_abc2224: "Alertas de Tarefa Inteligente"
+  smart_search_community_c2a115a2: "Comunidade da Pesquisa Inteligente"
+  smart_search_currently_in_development_for_canvas_u_541c3754: "A Pesquisa Inteligente, atualmente em desenvolvimento para o Canvas, utiliza algoritmos semânticos e IA para compreender o contexto da consulta e o significado semântico, e não apenas a correspondência de palavras-chave."
+  smart_search_employs_embeddings_to_mathematically__3c20cdd1: "A Pesquisa Inteligente utiliza \"incrustações\" para representar matematicamente o conteúdo e as consultas para comparação, compreendendo palavras-chave ou consultas gerais em qualquer idioma, graças ao seu modelo de IA multilingue. Escreva consultas de pesquisa utilizando palavras-chave, perguntas, frases ou o que for mais natural para si para descrever o que está a tentar encontrar."
   smart_search_fd7cd4: "Busca inteligente"
   smart_search_is_a_feature_of_canvas_that_is_curren_31f7d35d: "A Pesquisa Inteligente é uma funcionalidade do Canvas que está atualmente em desenvolvimento.  Aproveitando algoritmos semânticos e IA, a nova funcionalidade de Pesquisa Inteligente compreende o contexto das consultas, fornecendo resultados mais precisos e relevantes sem a necessidade de operadores booleanos tradicionais ou outras ferramentas de pesquisa."
+  smart_search_is_in_feature_preview_feedback_can_be_7a80049d: "A Pesquisa Inteligente está em fase de pré-visualização. Os comentários podem ser fornecidos através de classificações de resultados e do espaço da Comunidade Canvas para a Pesquisa Inteligente Beta. O espaço da comunidade do Canvas pode ser encontrado aqui: "
   smartbanner: 
     android_banner_author: "Instructure Inc."
     android_banner_in_google_play: "No Google Play"
@@ -29124,7 +29161,7 @@ pt:
     quizzes: Testes
     rubrics: Protocolos
     schedule: Cronograma
-    search: Pesquisar
+    search: "Busca inteligente"
     settings: Configurações
     syllabus: Programa
     tab_location_error: "A localização do separador não é válida"
@@ -30102,6 +30139,7 @@ pt:
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "Esta nota é diferente da vista do estudante porque algumas tarefas foram alteradas"
   this_grade_differs_from_the_student_s_view_of_the__f78d0023: "Esta nota difere da visão do aluno sobre a nota porque algumas notas da tarefa ainda não foram postadas"
   this_grade_has_negative_points_496400d4: "Esta nota tem pontos negativos"
+  this_grade_is_currently_dropped_for_this_student_7bc78b78: "Esta nota está eliminada para este aluno."
   this_grade_is_invalid_8ab192c7: "Esta nota não é válida"
   this_grade_is_unread_fb79c002: "Esta nota não foi lida"
   this_grade_is_unusually_high_60533c20: "Esta nota é excepcionalmente alta"
@@ -30377,6 +30415,7 @@ pt:
   thread_addd9799: Tópico
   threshold_in_hours_to_notify_students_within_f33820aa: "Limiar (em horas) para notificar os alunos no prazo de"
   threshold_pts_45f0e5d8: "limite: %{pts}"
+  threshold_threshold_a67e73a1: "Limite: %{threshold}"
   throttle_jobs_f61be56: "Trabalhos de aceleração"
   throttle_tag_tag_ba5b9b50: "Etiqueta de estrangulamento “%{tag}”"
   throttling_jobs_4a90578c: "Trabalhos de engarrafamento"
@@ -31637,6 +31676,8 @@ pt:
   unlock_date_can_t_be_blank_43efb114: "A data de desbloqueio não pode estar em branco"
   unlock_date_cannot_be_after_due_date_8829d9ca: "A data de desbloqueio não pode ser posterior à data de entrega"
   unlock_date_cannot_be_after_lock_date_591f7fda: "A data de desbloqueio não pode ser posterior à data de bloqueio"
+  unlock_date_cannot_be_after_reply_to_topic_due_dat_37eee496: "A data de desbloqueio não pode ser posterior à data de expiração da resposta ao tópico"
+  unlock_date_cannot_be_after_required_replies_due_d_df13dbc7: "A data de desbloqueio não pode ser posterior à data de entrega das respostas obrigatórias"
   unlock_date_cannot_be_before_course_start_9c7b8524: "A data de desbloqueio não pode ser anterior ao início da disciplina"
   unlock_date_cannot_be_before_section_start_793ddc66: "A data de desbloqueio não pode ser anterior ao início da secção"
   unlock_date_cannot_be_before_term_start_d3c01813: "A data de desbloqueio não pode ser anterior ao início do período"
@@ -31741,6 +31782,7 @@ pt:
   until_date_must_be_after_the_due_date_d961566c: "Até a data deve ser após a data limite"
   until_date_must_be_after_the_event_start_date_972f759d: "A data até deve ser posterior à data de início do evento"
   until_fccd159a: "Até:"
+  until_time_a6cade90: "Até a hora"
   untitled_16aa4f2b: "Sem título"
   untitled_assignment_59354b34: "tarefa sem nome"
   untitled_filter_c07b8ddc: "Filtro sem título"
@@ -32533,6 +32575,7 @@ pt:
   using_login_attribute_integration_id_9067ea54: "Utilizar o atributo de início de sessão: ID de integração"
   using_login_attribute_sis_user_id_b5ec538f: "Utilizar atributo de início de sessão: ID de utilizador SIS"
   using_login_attribute_unique_user_id_a307a9f: "Utilizar atributo de início de sessão: ID de utilizador único"
+  using_smart_search_aecf6c76: "Utilizando a Pesquisa inteligente"
   utc_e44049af: UTC
   uuid_has_been_provisioned_ab0c6c9: "A UUID foi provisionada."
   val_percent_c2ca6679: "%val porcento"
@@ -32839,6 +32882,7 @@ pt:
   what_content_is_searchable_375a0670: "Que conteúdos são pesquisáveis?"
   what_does_provisioning_only_mean_eac9a4a1: "O que significa Apenas Aprovisionamento?"
   what_happened_322d8259: "O que aconteceu?"
+  what_if_grades_7ad8ce0b: "E se as Notas"
   what_if_score_change_operation_failed_b81afd6d: "E se a operação de alteração da nota falhar?"
   what_if_score_input_for_assignmentname_d4092efe: "E se a pontuação for introduzida para %{assignmentName}"
   what_if_score_updated_7565581d: "E se a nota for atualizada"
@@ -32938,11 +32982,16 @@ pt:
   when_enabled_teachers_can_choose_to_allow_observer_320b555e: |-
       Quando ativado, os professores podem optar por permitir que os observadores agendem marcações
       quando criam grupos de marcações no calendário.
+  when_enabled_the_canvas_api_for_lti_resource_links_25c51eb0: |-
+      Quando ativada, a API do Canvas para ligações de recursos LTI pode ser utilizada. Os administradores podem
+      utilizar esta API para obter visibilidade do conteúdo devolvido pelas ferramentas.
   when_enabled_the_hidden_html_forms_that_are_used_t_c5edd929: |-
       Quando ativado, os formulários HTML ocultos que são utilizados para ativar um lançamento LTI
       terão um número aleatório anexado ao seu ID. Quando desativado, cada um
       tem o mesmo id de tool_form.
   when_enabled_the_internal_access_manager_will_be_u_bc470109: "Quando ativado, o gestor de acesso interno será utilizado para bloquear o acesso a determinados pedidos"
+  when_enabled_the_lti_apps_discover_page_will_be_av_39ad751c: "Quando ativada, a página Descobrir aplicações LTI estará disponível na página Aplicações."
+  when_enabled_the_lti_apps_page_will_be_available_i_23ec031f: "Quando ativada, a página Aplicações LTI estará disponível na barra lateral de navegação da Conta."
   when_enabled_the_lti_extensions_discover_page_will_8bb57ff6: "Quando ativada, a página Descobrir Extensões LTI estará disponível na vista Extensões."
   when_enabled_the_lti_extensions_page_will_be_avail_ac8ed3fa: "Quando ativada, a página Extensões de LTI estará disponível na navegação da Conta."
   when_enabled_the_new_submission_type_resource_card_c0f45d0d: "Quando ativado, o cartão de recurso do novo tipo de envio será mostrado na página de edição do exercício."
@@ -33633,6 +33682,7 @@ pt:
   your_azure_active_directory_tenant_name_d8bb31fa: "O seu Nome do inquilino do Azure Active Directory"
   your_browser_connectivity_may_be_slow_or_unstable__97c1f4c5: "A conectividade do seu navegador pode ser lenta ou instável. Apesar do temporizador do seu navegador estar desligado, as suas respostas serão registadas por mais 5 minutos para além do limite de tempo original nesta tentativa."
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "O seu navegador não cumpre os requisitos para Canvas. Por favor visite a *Comunidade Canvas* para uma lista completa de navegadores suportados."
+  your_canvas_administrators_have_chosen_to_limit_yo_41a4187: "Os seus administradores do Canvas optaram por limitar a sua capacidade de gerar o seu próprio token de acesso. Contacte os administradores do Canvas para que eles gerem um token de acesso em seu nome."
   your_classic_quizzes_have_been_migrated_to_new_qui_e49244da: "Os seus testes clássicos foram migrados para Novos Testes!"
   your_comment_is_not_posted_12677035: "O seu comentário não é publicado"
   your_comment_was_auto_saved_as_a_draft_c49d3510: "O seu comentário foi guardado automaticamente como rascunho."
@@ -33689,6 +33739,7 @@ pt:
   your_unpublished_changes_will_be_reverted_to_their_fd4ba075: "As suas alterações não publicadas serão revertidas para o seu estado previamente guardado."
   your_webcam_may_already_be_in_use_6cd64c25: "Sua webcam já pode estar em uso."
   your_work_has_been_submitted_519058f8: "O seu trabalho foi submetido."
+  yyyy_mm_dd_cbbd9959: AAAA-MM-DD
   yyyy_mm_dd_hh_mm_a01b6081: "YYYY-MM-DD hh:mm"
   z_a_b48d8903: "Z - A"
   z_a_be2ab67c: Z-A

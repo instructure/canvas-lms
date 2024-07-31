@@ -155,6 +155,7 @@ hy:
   a_problem_occurred_adding_reviewers_57b083d9: "Կարծիք ներկայացնողներ ավելացնելու ընթացքում խնդիր է առաջացել:"
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Աղյուսակ, որը պարունակում է գնահատականների սխեմայի անվանումը և սխեման խմբագրելու կամ ջնջելու նշանները:"
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Աղյուսակ, որը պարունակում է գնահատականների սխեմայի տվյալները: Յուրաքանչյուր տող պարունակում է անուն, ազգանունը, առավելագույն և նվազագույն տոկոսները: Ի լրումն, յուրաքանչյուր տող ունի նշան՝ անմիջապես դրանից ներքև նոր տող ավելացնելու և տվյալ տողը ջնջելու համար:"
+  about_70c18bba: մասին
   academic_benchmark: 
     api_error: "Հնարավոր չէր թարմացնել լիազորությունների ստանդարտները %{auth}:"
     bad_ab_file: "Ակադեմիական ստանդարտների ներկայացված ֆայլը սխալ է պարունակում:"
@@ -1802,6 +1803,7 @@ hy:
   angel_file_description: "Zip ֆորմատով Angel-ի արտահանում "
   announcement: 
     no_title: "Առանց անվանման"
+  announcement_e37d6dbd: հայտարարություն
   announcement_ends_at_4ccc2a7e: "Հայտարարության ժամկետը ավարտվում է "
   announcement_fb4cb645: Հայտարարություն
   announcement_starts_at_2e987a38: "Հայտարարության ժամկետը սկսվում է"
@@ -3713,6 +3715,7 @@ hy:
       concluded_conferences: "Ավարտված կոնֆերանսներ"
       conference: Կոնֆերանս
       conference_header: Կոնֆերանսներ
+      conferences: Կոնֆերանսներ
       new_conference: "Նոր կոնֆերանս"
       new_conferences: "Նոր կոնֆերանսներ"
       page_title: Վեբ-կոնֆերանսներ
@@ -10945,6 +10948,7 @@ hy:
   moderated_grading_setting_cannot_be_enabled_for_un_e40e6cd4: "Չգնահատվող հանձնարարությունների համար մոդերացվող գնահատումը չի կարող կարգաբերվել"
   moderator_49b9f2e1: Մոդերատոր
   modified_by_c1584b3c: "Ում կողմից է փոփոխվել"
+  module_9775f804: մոդուլ
   module_completed_50c50762: "Մոդուլն ավարտված է"
   module_in_progress_fa600662: "Մոդուլի աշխատանքը կատարվում է"
   module_item_module_item_name_was_successfully_dele_8626d846: "%{module_item_name} մոդուլի տարրը հաջողությամբ ջնջվել է:"
@@ -11174,6 +11178,7 @@ hy:
   name_is_currently_status_9065c996: "*անունը* ներկա պահին **կարգավիճակն** է:"
   name_is_required_ba379522: "Պահանջվում է նշել անունը"
   name_only_5f56718e: "Միայն անունը"
+  navigation_ee9af92d: Նավարկում
   near_mastery_f25174a4: "Մոտ է անցողիկ միավորին"
   never_1ed1244d: երբեք
   new_13daf639: Նոր
@@ -16356,6 +16361,7 @@ hy:
   text_entry_e1808b2f: "Տեքստի մուտքագրում"
   text_entry_submission_cannot_be_empty_3d187cae: "Տեքստային դաշտը չի կարող դատարկ լինել"
   text_input_d3480b8c: "Տեքստի մուտք"
+  text_sms_4e2d82a7: "Տեքստ (SMS)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "Օգտատիրոջ այդ հաշիվը ջնջվել է: Խնդրում ենք դիմել ձեր համակարգի ադմինիստրատորին կրկին ակտիվացնելու ձեր հաշիվը:"
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "Հաշվի ID, որի հետ կապված է հաշվետու օգտատերը"
   the_app_was_activated_a84e055f: "Հավելվածը ակտիվացվել է"

@@ -37,6 +37,7 @@ import {FooterSection} from './user/sections/FooterSection'
 import {QuizSection} from './user/sections/QuizSection'
 import {AnnouncementSection} from './user/sections/AnnouncementSection'
 import {BlankSection} from './user/sections/BlankSection'
+import {TabsBlock, TabBlock} from './user/blocks/TabsBlock'
 
 import {NoSections} from './user/common'
 
@@ -64,6 +65,8 @@ const blocks = {
   AboutTextHalf,
   FooterSection,
   BlankSection,
+  TabsBlock,
+  TabBlock,
 }
 
 export {blocks}

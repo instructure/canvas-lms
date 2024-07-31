@@ -41,6 +41,7 @@ type CommonMigratorControlsProps = {
   onSubmit: onSubmitMigrationFormCallback
   onCancel: () => void
   fileUploadProgress: number | null
+  isSubmitting: boolean
 }
 
 const generateNewQuizzesLabel = () => (
@@ -101,7 +102,7 @@ export const CommonMigratorControls = ({
   canImportBPSettings = false,
   onSubmit,
   onCancel,
-  fileUploadProgress,
+  isSubmitting,
 }: CommonMigratorControlsProps) => {
   const [selectiveImport, setSelectiveImport] = useState<null | boolean>(null)
   const [importBPSettings, setImportBPSettings] = useState<null | boolean>(null)
@@ -160,7 +161,7 @@ export const CommonMigratorControls = ({
           name="existing_quizzes_as_new_quizzes"
           value="existing_quizzes_as_new_quizzes"
           label={generateNewQuizzesLabel()}
-          disabled={!ENV.QUIZZES_NEXT_ENABLED}
+          disabled={!ENV.QUIZZES_NEXT_ENABLED || isSubmitting}
           defaultChecked={!!ENV.NEW_QUIZZES_MIGRATION_DEFAULT}
           onChange={(e: React.SyntheticEvent<Element, Event>) => {
             const target = e.target as HTMLInputElement
@@ -174,6 +175,7 @@ export const CommonMigratorControls = ({
           key="overwrite_assessment_content"
           name="overwrite_assessment_content"
           value="overwrite_assessment_content"
+          disabled={isSubmitting}
           label={generateOverwriteLabel()}
           onChange={(e: React.SyntheticEvent<Element, Event>) => {
             const target = e.target as HTMLInputElement
@@ -187,6 +189,7 @@ export const CommonMigratorControls = ({
           key="adjust_dates[enabled]"
           name="adjust_dates[enabled]"
           value="adjust_dates[enabled]"
+          disabled={isSubmitting}
           label={I18n.t('Adjust events and due dates')}
           onChange={(e: React.SyntheticEvent<Element, Event>) => {
             const target = e.target as HTMLInputElement
@@ -199,7 +202,13 @@ export const CommonMigratorControls = ({
         />
       )
     return result
-  }, [canImportAsNewQuizzes, canOverwriteAssessmentContent, canAdjustDates, dateAdjustments])
+  }, [
+    canImportAsNewQuizzes,
+    canOverwriteAssessmentContent,
+    canAdjustDates,
+    dateAdjustments,
+    isSubmitting,
+  ])
 
   const allContentText = (
     <>
@@ -235,6 +244,7 @@ export const CommonMigratorControls = ({
                 setSelectiveImport(!target.checked)
               }}
               checked={selectiveImport === true}
+              disabled={isSubmitting}
             />
             <>
               {selectiveImport === false && canImportBPSettings ? (
@@ -242,6 +252,7 @@ export const CommonMigratorControls = ({
                   <Checkbox
                     label={I18n.t('Import Blueprint Course settings')}
                     value="medium"
+                    disabled={isSubmitting}
                     onChange={(e: React.SyntheticEvent<Element, Event>) => {
                       const target = e.target as HTMLInputElement
                       setImportBPSettings(target.checked)
@@ -259,6 +270,7 @@ export const CommonMigratorControls = ({
                 setSelectiveImport(target.checked)
               }}
               checked={selectiveImport === false}
+              disabled={isSubmitting}
             />
           </RadioInputGroup>
           {contentError && (
@@ -271,28 +283,36 @@ export const CommonMigratorControls = ({
 
       {options.length > 0 && (
         <View as="div" margin="medium none none none">
-          <CheckboxGroup name={I18n.t('Options')} layout="stacked" description={I18n.t('Options')}>
+          <CheckboxGroup
+            disabled={isSubmitting}
+            name={I18n.t('Options')}
+            layout="stacked"
+            description={I18n.t('Options')}
+          >
             {options}
           </CheckboxGroup>
           {showAdjustDates ? (
             <DateAdjustments
               dateAdjustments={dateAdjustments}
               setDateAdjustments={setDateAdjustments}
+              disabled={isSubmitting}
             />
           ) : null}
         </View>
       )}
 
       <View as="div" margin="medium none none none">
-        <Button onClick={onCancel}>{I18n.t('Cancel')}</Button>
+        <Button disabled={isSubmitting} onClick={onCancel}>
+          {I18n.t('Cancel')}
+        </Button>
         <Button
-          disabled={!!(fileUploadProgress && fileUploadProgress < 100)}
+          disabled={isSubmitting}
           data-testid="submitMigration"
           onClick={handleSubmit}
           margin="small"
           color="primary"
         >
-          {fileUploadProgress && fileUploadProgress < 100 ? (
+          {isSubmitting ? (
             <>
               <Spinner size="x-small" renderTitle={I18n.t('Adding')} /> &nbsp;
               {I18n.t('Adding...')}

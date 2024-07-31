@@ -256,6 +256,7 @@ export type SiteAdminFeatureId =
   | 'lti_registrations_discover_page'
   | 'courses_popout_sisid'
   | 'dashboard_graphql_integration'
+  | 'speedgrader_studio_media_capture'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES

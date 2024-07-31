@@ -976,6 +976,12 @@
 - verb: GET
   path: "/api/v1/courses/:course_id/lti_apps/launch_definitions"
 - verb: GET
+  path: "/api/v1/courses/:course_id/lti_resource_links"
+- verb: GET
+  path: "/api/v1/courses/:course_id/lti_resource_links/:id"
+- verb: PUT
+  path: "/api/v1/courses/:course_id/lti_resource_links/:id"
+- verb: GET
   path: "/api/v1/courses/:course_id/mastery_paths/rules"
 - verb: POST
   path: "/api/v1/courses/:course_id/mastery_paths/rules"
@@ -1923,6 +1929,8 @@
   path: "/api/v1/shared_brand_configs/:id"
 - verb: GET
   path: "/api/v1/show_k5_dashboard"
+- verb: PUT
+  path: "/api/v1/submissions/:id/what_if_grades"
 - verb: GET
   path: "/api/v1/support_helpers/crocodoc/shard"
 - verb: GET
@@ -1973,6 +1981,8 @@
   path: "/api/v1/users/:id/merge_into/:destination_user_id"
 - verb: PUT
   path: "/api/v1/users/:id/merge_into/accounts/:destination_account_id/users/:destination_user_id"
+- verb: DELETE
+  path: "/api/v1/users/:id/mobile_sessions"
 - verb: GET
   path: "/api/v1/users/:id/new_user_tutorial_statuses"
 - verb: PUT

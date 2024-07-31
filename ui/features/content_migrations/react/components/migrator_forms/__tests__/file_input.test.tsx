@@ -109,7 +109,12 @@ describe('MigrationFileInput', () => {
   })
 
   it('renders the progressbar with the passed progress', async () => {
-    renderComponent({fileUploadProgress: 29})
+    renderComponent({isSubmitting: true, fileUploadProgress: 29})
     expect(screen.getByText('29%')).toBeInTheDocument()
+  })
+
+  it('disable input while uploading', async () => {
+    renderComponent({isSubmitting: true})
+    expect(screen.getByRole('button', {name: 'Choose File'})).toBeDisabled()
   })
 })

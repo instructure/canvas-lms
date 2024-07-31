@@ -20,18 +20,18 @@
 
 const MASQUERADE_SELECTOR = 'body.is-masquerading-or-student-view'
 
-let trayHeight: string = ''
+const trayHeight: string = ''
 
 // Adjusts the height that slide-out trays should take up based on the presence
 // or absence of the masquerade bottom bar. Caches the result of this check
 // forever, since we always reload the bundle when you enter/leave masquerade.
-export const getTrayHeight = () => {
-  if (!trayHeight) {
-    const masqueradeBar = document.querySelector(MASQUERADE_SELECTOR)
-    trayHeight = masqueradeBar ? 'calc(100vh - 50px)' : '100vh'
-  }
-  return trayHeight
-}
+// export const getTrayHeight = () => {
+//   if (!trayHeight) {
+//     const masqueradeBar = document.querySelector(MASQUERADE_SELECTOR)
+//     trayHeight = masqueradeBar ? 'calc(100vh - 50px)' : '100vh'
+//   }
+//   return trayHeight
+// }
 
 export type isStyledFunction = (node: Element) => boolean
 export type unstyleFunction = (node: Element) => void
@@ -199,11 +199,11 @@ export function scrollIntoViewWithCallback(
   element.scrollIntoView(scrollIntoViewOpts)
 }
 
-export function validateSVG(svg: string): boolean {
-  const parser = new DOMParser()
-  const doc = parser.parseFromString(svg, 'image/svg+xml')
-  if (doc.documentElement.childElementCount !== 1 || doc.querySelector('svg') === null) {
-    return false
-  }
-  return true
-}
+// export function validateSVG(svg: string): boolean {
+//   const parser = new DOMParser()
+//   const doc = parser.parseFromString(svg, 'image/svg+xml')
+//   if (doc.documentElement.childElementCount !== 1 || doc.querySelector('svg') === null) {
+//     return false
+//   }
+//   return true
+// }

@@ -25,6 +25,7 @@ import {Popover} from '@instructure/ui-popover'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import {IconResize} from '../../../../assets/internal-icons'
+import {type ImageBlockProps} from './types'
 
 type IconSizePopupProps = {
   width: number
@@ -50,7 +51,6 @@ const IconSizePopup = ({width, height}: IconSizePopupProps) => {
     const h = height || domnode.clientHeight
     return w / h
   })
-  const [messages, setMessages] = useState<FormMessage[]>([])
   const [isShowingContent, setIsShowingContent] = useState(false)
 
   useEffect(() => {
@@ -68,7 +68,7 @@ const IconSizePopup = ({width, height}: IconSizePopupProps) => {
 
   const handleChangeWidth = useCallback(
     (value: number | string) => {
-      const w = value as number
+      const w = typeof value === 'number' ? value : parseInt(value, 10)
       const h = Math.round(w / aspectRatio)
       setWidthValue(w)
       setHeightValue(h)
@@ -78,7 +78,7 @@ const IconSizePopup = ({width, height}: IconSizePopupProps) => {
 
   const handleChangeHeight = useCallback(
     (value: number | string) => {
-      const h = value as number
+      const h = typeof value === 'number' ? value : parseInt(value, 10)
       setHeightValue(h)
       const w = Math.round(h * aspectRatio)
       setWidthValue(w)
@@ -87,7 +87,7 @@ const IconSizePopup = ({width, height}: IconSizePopupProps) => {
   )
 
   const setImageSize = useCallback(() => {
-    setProp(prps => {
+    setProp((prps: ImageBlockProps) => {
       prps.width = widthValue
       prps.height = heightValue
     })
@@ -120,7 +120,6 @@ const IconSizePopup = ({width, height}: IconSizePopupProps) => {
           description={<ScreenReaderContent>Image size</ScreenReaderContent>}
           rowSpacing="small"
           layout="stacked"
-          messages={messages}
         >
           <RangeInput
             label="Width"
@@ -146,12 +145,7 @@ const IconSizePopup = ({width, height}: IconSizePopupProps) => {
           />
         </FormFieldGroup>
         <View as="div" textAlign="end" margin="x-small 0 0 0">
-          <Button
-            onClick={setImageSize}
-            interaction={messages.length === 0 ? 'enabled' : 'disabled'}
-          >
-            Set
-          </Button>
+          <Button onClick={setImageSize}>Set</Button>
         </View>
       </View>
     </Popover>

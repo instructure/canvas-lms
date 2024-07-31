@@ -21,7 +21,7 @@ import tinycolor from 'tinycolor2'
 import {ColorIndicator, ColorMixer, ColorPreset} from '@instructure/ui-color-picker'
 import {FormFieldGroup, type FormMessage} from '@instructure/ui-form-field'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {TextInput, type TextInputOwnProps} from '@instructure/ui-text-input'
+import {TextInput, type TextInputProps} from '@instructure/ui-text-input'
 
 type ColorPickerProps = {
   label: React.ReactNode
@@ -48,7 +48,7 @@ const ColorPicker = ({label, disabled, value, onChange}: ColorPickerProps) => {
     (_event: React.ChangeEvent<HTMLInputElement>, typedvalue: string) => {
       setTypedColor(typedvalue)
       const color = tinycolor(typedvalue)
-      if (color.isValid(typedvalue)) {
+      if (color.isValid()) {
         setMessages([{text: 'Hit enter to set this color', type: 'hint'}])
       } else {
         setMessages([{text: 'Not a valid color', type: 'error'}])
@@ -58,10 +58,10 @@ const ColorPicker = ({label, disabled, value, onChange}: ColorPickerProps) => {
   )
 
   const handleHexKey = useCallback(
-    (event: React.KeyboardEvent<TextInputOwnProps>) => {
+    (event: React.KeyboardEvent<TextInputProps>) => {
       if (event.key === 'Enter') {
         const color = tinycolor(typedColor)
-        if (color.isValid(typedColor)) {
+        if (color.isValid()) {
           const hex = color.toHex()
           setValidColor(hex)
         }

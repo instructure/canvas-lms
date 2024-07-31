@@ -171,6 +171,7 @@ uk:
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Таблиця містить дані схеми оцінювання. Кожен рядок містить ім'я, максимальний і мінімальний відсотки. Крім того, кожен рядок містить кнопки для додавання нового та видалення поточного рядків."
   a_z_243c3301: "А – Я"
   a_z_29d8e67c: "А - Я"
+  about_70c18bba: Про
   about_this_service_b10bc808: "Про цю послугу"
   academic_benchmark: 
     plugin_settings: 
@@ -2076,6 +2077,7 @@ uk:
   announcement: 
     no_title: "Без назви"
   announcement_creation_failed_f7d227f5: "Створити Оголошення не вдалося"
+  announcement_e37d6dbd: Оголошення
   announcement_ends_at_4ccc2a7e: "Оголошення закінчується в "
   announcement_fb4cb645: Оголошення
   announcement_not_found_d6d124c3: "Оголошення не знайдено"
@@ -4196,6 +4198,7 @@ uk:
       concluded_conferences: "Завершені конференції "
       conference: Конференція
       conference_header: Конференції
+      conferences: Конференції
       new_conference: "Нова конференція"
       new_conferences: "Нові конференції"
       page_title: Веб-конференції
@@ -11534,6 +11537,7 @@ uk:
   moderator_sortorder_18063692: "Модератор %{sortOrder}"
   modified_by_c1584b3c: Модифікував
   module_90d9fd32: Розділ
+  module_9775f804: розділ
   module_completed_50c50762: "Модуль завершено"
   module_filter_63b17d11: "Фільтр Модуля"
   module_first_to_last_6921f3ec: "Модуль - від першого до останнього"
@@ -11732,6 +11736,7 @@ uk:
   nav_logo_background_ba33fb7f: "Фон логотипу навігації"
   nav_text_94206145: "Текст навігації"
   nav_text_active_a924ae88: "Текст навігації активовано"
+  navigation_ee9af92d: Навігація
   near_mastery_f25174a4: "Майже майстерність"
   need_a_canvas_account_221d18ed: "Необхідний обліковий запис Canvas?"
   netherlands_31_63e4f1b9: "Нідерланди (+31)"
@@ -17174,6 +17179,7 @@ uk:
   text_entry_submission_7b0ae0c5: "Відправлення текстового елементу"
   text_entry_submission_cannot_be_empty_3d187cae: "Текстовий елемент відправлення не може бути пустим "
   text_input_d3480b8c: "Поле вводу тексту"
+  text_sms_4e2d82a7: "Текст (SMS)"
   thailand_66_5b3ef324: "Таїланд (+66)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "Цей профіль користувача було видалено. Будь ласка,  зв'яжіться з вашим системним адміністратором для повторної активації вашого облікового запису."
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "ID облікового запису, до якого належить звітний користувач"

@@ -48,6 +48,7 @@ type Getters = {
   getEnterGradesAsSetting(assignmentId: string): ReturnType<Gradebook['getEnterGradesAsSetting']>
   getGradingSchemeData(assignmentId: string): undefined | GradingStandard[]
   getPointsBasedGradingScheme(assignmentId: string): undefined | boolean
+  getScalingFactor(assignmentId: string): undefined | number
   getPendingGradeInfo(submission: {
     assignmentId: string
     userId: string
@@ -91,6 +92,7 @@ function formatGrade(submissionData: SubmissionData, assignment: Assignment, opt
     gradingScheme: options.getGradingSchemeData(assignment.id),
     pointsBasedGradingScheme: options.getPointsBasedGradingScheme(assignment.id),
     pointsPossible: assignment.points_possible,
+    scalingFactor: options.getScalingFactor(assignment.id),
     version: 'final',
   }
 
@@ -177,6 +179,9 @@ export default class AssignmentCellFormatter {
       },
       getPendingGradeInfo(submission: {assignmentId: string; userId: string}) {
         return gradebook.getPendingGradeInfo(submission)
+      },
+      getScalingFactor(assignmentId: string): undefined | number {
+        return gradebook.getAssignmentGradingScheme(assignmentId)?.scalingFactor
       },
       getStudent(studentId: string) {
         return gradebook.student(studentId)

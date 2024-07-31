@@ -18,7 +18,6 @@
 
 import createDiscussionsIndex from './react/index'
 import ready from '@instructure/ready'
-import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 
 ready(() => {
   const [contextType, contextId] = ENV.context_asset_string.split('_')
@@ -39,4 +38,3 @@ ready(() => {
   })
   app.render()
 })
-monitorLtiMessages()

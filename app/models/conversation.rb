@@ -335,7 +335,7 @@ class Conversation < ActiveRecord::Base
 
     # Grab snapshot hash of user's inbox settings and save to message (If FF is enabled)
     if Account.site_admin.feature_enabled?(:inbox_settings)
-      message.inbox_settings_ooo_snapshot = Inbox::InboxService.inbox_settings_ooo_snapshot(user_id: current_user.id, root_account_id: options[:root_account_id])
+      message.inbox_settings_ooo_hash = Inbox::InboxService.inbox_settings_ooo_hash(user_id: current_user.id, root_account_id: options[:root_account_id])
     end
 
     message

@@ -28,15 +28,15 @@ describe Lti::Messages::ResourceLinkRequest do
     let(:opts) { super().merge({ claim_group_blacklist: [:rlid] }) }
 
     it "does not set the resource link id" do
-      expect(jws).not_to include("https://purl.imsglobal.org/spec/lti/claim/resource_link")
+      expect(jws[:post_payload]).not_to include("https://purl.imsglobal.org/spec/lti/claim/resource_link")
     end
   end
 
   describe "#initialize" do
-    let(:jws) { jwt_message.generate_post_payload }
+    let(:jws) { jwt_message.to_cached_hash }
 
     it "sets the resource link id" do
-      expect_course_resource_link_id(jws)
+      expect_course_resource_link_id(jws[:post_payload])
     end
 
     describe "with resource link passed in" do
@@ -54,11 +54,11 @@ describe Lti::Messages::ResourceLinkRequest do
       let(:opts) { super().merge(resource_link:) }
 
       it "uses resource link uuid for rlid claim" do
-        expect(jws.dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "id")).to eq resource_link.resource_link_uuid
+        expect(jws[:post_payload].dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "id")).to eq resource_link.resource_link_uuid
       end
 
       it "uses context title for rlid title" do
-        expect(jws.dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "title")).to eq course.name
+        expect(jws[:post_payload].dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "title")).to eq course.name
       end
 
       context "when resource_link is associated with a content tag" do
@@ -76,13 +76,13 @@ describe Lti::Messages::ResourceLinkRequest do
         end
 
         it "uses content_tag_title for rlid title" do
-          expect(jws.dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "title")).to eq content_tag.title
+          expect(jws[:post_payload].dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "title")).to eq content_tag.title
         end
       end
 
       context "when link-level custom params are given in resource_link" do
         it "merges them in with tool/placement parameters" do
-          expect(jws["https://purl.imsglobal.org/spec/lti/claim/custom"]).to eq(
+          expect(jws[:post_payload]["https://purl.imsglobal.org/spec/lti/claim/custom"]).to eq(
             "link_has_expansion2" => assignment.id.to_s,
             "has_expansion" => user.id.to_s,
             "no_expansion" => "overrides tool param!"
@@ -106,7 +106,7 @@ describe Lti::Messages::ResourceLinkRequest do
         end
 
         it "uses title for rlid title" do
-          expect(jws.dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "title")).to eq title
+          expect(jws[:post_payload].dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "title")).to eq title
         end
       end
     end
@@ -119,7 +119,7 @@ describe Lti::Messages::ResourceLinkRequest do
   shared_examples "assignment resource link id check" do
     let(:launch_error) { Lti::IMS::AdvantageErrors::InvalidLaunchError }
     let(:api_message) { raise "set in example" }
-    let(:course_jws) { jwt_message.generate_post_payload }
+    let(:course_jws) { jwt_message.to_cached_hash }
 
     shared_examples "launch error check" do
       it "raises launch error" do
@@ -130,15 +130,15 @@ describe Lti::Messages::ResourceLinkRequest do
     end
 
     it "sets the assignment as resource link id" do
-      expect_assignment_resource_link_id(jws)
+      expect_assignment_resource_link_id(jws[:post_payload])
     end
 
     it "sets the assignment description" do
-      expect(jws.dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "description")).to eq assignment.description
+      expect(jws[:post_payload].dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "description")).to eq assignment.description
     end
 
     it "sets the assignment title" do
-      expect(jws.dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "title")).to eq assignment.title
+      expect(jws[:post_payload].dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "title")).to eq assignment.title
     end
 
     describe "custom parameters" do
@@ -150,7 +150,7 @@ describe Lti::Messages::ResourceLinkRequest do
               no_expansion: "overrides tool param"
             }
           )
-          expect(jws["https://purl.imsglobal.org/spec/lti/claim/custom"]).to eq(
+          expect(jws[:post_payload]["https://purl.imsglobal.org/spec/lti/claim/custom"]).to eq(
             "link_has_expansion" => assignment.id.to_s,
             "has_expansion" => user.id.to_s,
             "no_expansion" => "overrides tool param"
@@ -164,7 +164,7 @@ describe Lti::Messages::ResourceLinkRequest do
             custom: nil
           )
 
-          expect(jws["https://purl.imsglobal.org/spec/lti/claim/custom"]).to eq(
+          expect(jws[:post_payload]["https://purl.imsglobal.org/spec/lti/claim/custom"]).to eq(
             "has_expansion" => user.id.to_s,
             "no_expansion" => "foo"
           )
@@ -203,22 +203,22 @@ describe Lti::Messages::ResourceLinkRequest do
 
       shared_examples_for "an authorized launch" do
         it "sets the AGS scopes" do
-          expect_assignment_and_grade_scope(jws)
+          expect_assignment_and_grade_scope(jws[:post_payload])
         end
 
         it "sets the AGS line items url" do
-          expect_assignment_and_grade_line_items_url(jws)
+          expect_assignment_and_grade_line_items_url(jws[:post_payload])
         end
 
         it "sets the AGS line item url" do
-          expect_assignment_and_grade_line_item_url(jws)
+          expect_assignment_and_grade_line_item_url(jws[:post_payload])
         end
 
         it "can still be used to output a course launch after an assignment launch" do
-          expect_assignment_resource_link_id(jws)
-          expect_course_resource_link_id(course_jws)
-          expect_assignment_and_grade_scope(course_jws)
-          expect_assignment_and_grade_line_item_url_absent(course_jws)
+          expect_assignment_resource_link_id(jws[:post_payload])
+          expect_course_resource_link_id(course_jws[:post_payload])
+          expect_assignment_and_grade_scope(course_jws[:post_payload])
+          expect_assignment_and_grade_line_item_url_absent(course_jws[:post_payload])
         end
 
         describe "line_items and line_item urls" do
@@ -229,11 +229,11 @@ describe Lti::Messages::ResourceLinkRequest do
           let(:line_items_url_params) { { host: "canonical-account-domain", course_id: course.id } }
 
           it "uses the Account#domain in the line_items URL" do
-            expect_assignment_and_grade_line_items_url(jws)
+            expect_assignment_and_grade_line_items_url(jws[:post_payload])
           end
 
           it "uses the Account#domain in the line_item URL" do
-            expect_assignment_and_grade_line_item_url(jws)
+            expect_assignment_and_grade_line_item_url(jws[:post_payload])
           end
         end
       end
@@ -298,7 +298,7 @@ describe Lti::Messages::ResourceLinkRequest do
           t
         end
 
-        context "but the tool is associated with the assignment (i.e. an upgrade or reinstallation occured)" do
+        context "but the tool is associated with the assignment (i.e. an upgrade or reinstallation occurred)" do
           before do
             assignment.line_items
                       .find(&:assignment_line_item?)
@@ -317,8 +317,8 @@ describe Lti::Messages::ResourceLinkRequest do
 
     context "lti1p1 claims" do
       let(:lti1p1_claim) { "https://purl.imsglobal.org/spec/lti/claim/lti1p1" }
-      let(:message_lti1p1) { jws[lti1p1_claim] }
-      let(:message_resource_link_id) { jws.dig(lti1p1_claim, "resource_link_id") }
+      let(:message_lti1p1) { jws[:post_payload][lti1p1_claim] }
+      let(:message_resource_link_id) { jws[:post_payload].dig(lti1p1_claim, "resource_link_id") }
 
       context "resource_link_id claim" do
         context "the LTI 1.1 resource_link_id is the same as the LTI 1.3 resource_link_id" do
@@ -369,43 +369,72 @@ describe Lti::Messages::ResourceLinkRequest do
 
     # Bunch of negative tests for claims that were previously added but then support was intentionally removed from the impl
     it "does not add lis_result_sourcedid" do
-      expect(jws).not_to include "https://www.instructure.com/lis_result_sourcedid"
+      expect(jws[:post_payload]).not_to include "https://www.instructure.com/lis_result_sourcedid"
     end
 
     it "does not add lis_outcome_service_url" do
-      expect(jws).not_to include "https://www.instructure.com/lis_outcome_service_url"
+      expect(jws[:post_payload]).not_to include "https://www.instructure.com/lis_outcome_service_url"
     end
 
     it "does not add ims_lis_basic_outcome_url" do
-      expect(jws).not_to include "https://www.instructure.com/ims_lis_basic_outcome_url"
+      expect(jws[:post_payload]).not_to include "https://www.instructure.com/ims_lis_basic_outcome_url"
     end
 
     it "does not add outcome_data_values_accepted" do
-      expect(jws).not_to include "https://www.instructure.com/outcome_data_values_accepted"
+      expect(jws[:post_payload]).not_to include "https://www.instructure.com/outcome_data_values_accepted"
     end
 
     it "does not add outcome_result_total_score_accepted" do
-      expect(jws).not_to include "https://www.instructure.com/outcome_result_total_score_accepted"
+      expect(jws[:post_payload]).not_to include "https://www.instructure.com/outcome_result_total_score_accepted"
     end
 
     it "does not add outcome_submission_submitted_at_accepted" do
-      expect(jws).not_to include "https://www.instructure.com/outcome_submission_submitted_at_accepted"
+      expect(jws[:post_payload]).not_to include "https://www.instructure.com/outcome_submission_submitted_at_accepted"
     end
 
     it "does not add outcomes_tool_placement_url" do
-      expect(jws).not_to include "https://www.instructure.com/outcomes_tool_placement_url"
+      expect(jws[:post_payload]).not_to include "https://www.instructure.com/outcomes_tool_placement_url"
     end
 
     it_behaves_like "assignment resource link id check"
 
-    context "the resource link has a blank title but the assignment has a title" do
-      before do
-        expected_assignment_line_item.resource_link.update!(title: "")
-        assignment.update!(title: "foo")
+    context "uses the appropriate title for the resource link claim title" do
+      let(:content_tag) do
+        ContentTag.create!(
+          context: course,
+          title: "fake title",
+          url: "https://example.com",
+          associated_asset: expected_assignment_line_item.resource_link
+        )
       end
 
-      it "uses the assignment title for the resource link title" do
-        expect(jws.dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "title")).to eq assignment.title
+      before do
+        content_tag
+        assignment.update!(title: "foo")
+        expected_assignment_line_item.resource_link.update!(title: "bar")
+        expected_assignment_line_item.resource_link.content_tag.update!(title: "baz")
+      end
+
+      it "prefers the assignment title over other options" do
+        expect(jws[:post_payload].dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "title")).to eq assignment.title
+      end
+
+      it "uses the resource link title if assignment title is blank" do
+        assignment.title = ""
+        expect(jws[:post_payload].dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "title")).to eq expected_assignment_line_item.resource_link.title
+      end
+
+      it "uses the resource link tag for the title if the assignment title and the resource link title are blank" do
+        assignment.title = ""
+        expected_assignment_line_item.resource_link.update!(title: "")
+        expect(jws[:post_payload].dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "title")).to eq expected_assignment_line_item.resource_link.content_tag.title
+      end
+
+      it "uses the context name if all other options are blank" do
+        assignment.title = ""
+        expected_assignment_line_item.resource_link.update!(title: "")
+        expected_assignment_line_item.resource_link.content_tag.update!(title: "")
+        expect(jws[:post_payload].dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "title")).to eq course.name
       end
     end
   end

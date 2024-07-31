@@ -17,3 +17,8 @@
  */
 
 export type ColumnsSectionVariant = 'fixed' | 'fluid' | 'simple'
+
+export type ColumnsSectionProps = {
+  columns: number
+  variant?: ColumnsSectionVariant
+}

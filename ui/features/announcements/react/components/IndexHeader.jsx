@@ -43,6 +43,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import {HeadingMenu} from '@canvas/discussions/react/components/HeadingMenu'
 import {SearchField} from '@canvas/discussions/react/components/SearchField'
+import {ActionDropDown} from '@canvas/announcements/react/components/ActionDropDown'
 
 const I18n = useI18nScope('announcements_v2')
 
@@ -50,10 +51,13 @@ const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
 
 // Delay the search so as not to overzealously read out the number
 // of search results to the user
-
+const announcementsFilter = {
+  all: {name: I18n.t('All Announcements'), title: I18n.t('Announcements')},
+  unread: {name: I18n.t('Unread Announcements'), title: I18n.t('Unread Announcements')},
+}
 const getFilters = () => ({
-  all: instUINavEnabled() ? I18n.t('All Announcements') : I18n.t('All'),
-  unread: instUINavEnabled() ? I18n.t('Unread Announcements') : I18n.t('Unread'),
+  all: instUINavEnabled() ? announcementsFilter.all : I18n.t('All'),
+  unread: instUINavEnabled() ? announcementsFilter.unread : I18n.t('Unread'),
 })
 
 export default class IndexHeader extends Component {
@@ -125,52 +129,58 @@ export default class IndexHeader extends Component {
     )
   }
 
-  renderActionButtons(responsiveStyles) {
+  renderButtonMenu = () => {
     return (
-      <>
-        {this.props.permissions.manage_course_content_edit &&
-          !this.props.announcementsLocked &&
-          (this.props.isToggleLocking
-            ? this.renderLockToggleButton(
-                <IconLockLine />,
-                I18n.t('Lock'),
-                I18n.t('Lock Selected Announcements'),
-                responsiveStyles
-              )
-            : this.renderLockToggleButton(
-                <IconUnlockLine />,
-                I18n.t('Unlock'),
-                I18n.t('Unlock Selected Announcements'),
-                responsiveStyles
-              ))}
-        {this.props.permissions.manage_course_content_delete && (
-          <Button
-            disabled={this.props.isBusy || this.props.selectedCount === 0}
-            size="medium"
-            display={responsiveStyles.buttonDisplay}
-            id="delete_announcements"
-            data-testid="delete-announcements-button"
-            onClick={this.onDelete}
-            renderIcon={<IconTrashLine />}
-            ref={c => {
-              this.deleteBtn = c
-            }}
-          >
-            {instUINavEnabled() && <PresentationContent>{I18n.t('Delete')}</PresentationContent>}
-            <ScreenReaderContent>{I18n.t('Delete Selected Announcements')}</ScreenReaderContent>
-          </Button>
-        )}
-        <Button
-          id="mark_all_announcement_read"
-          data-testid="mark-all-announcement-read"
-          renderIcon={IconInvitationLine}
-          display={responsiveStyles.buttonDisplay}
-          onClick={this.props.markAllAnnouncementRead}
-          disabled={this.props.isBusy}
-        >
-          <ScreenReaderContent>{I18n.t('Mark all announcement read')}</ScreenReaderContent>
-          <PresentationContent>{I18n.t('Mark all as read')}</PresentationContent>
-        </Button>
+      <ActionDropDown
+        label={I18n.t('More')}
+        disabled={this.props.isBusy || this.props.selectedCount === 0}
+        actions={[
+          {
+            icon: IconTrashLine,
+            label: I18n.t('Delete'),
+            screenReaderLabel: I18n.t('Delete Selected Announcements'),
+            action: this.onDelete,
+            disabled: this.props.isBusy || this.props.selectedCount === 0,
+          },
+          {
+            icon:
+              !this.props.announcementsLocked && this.props.isToggleLocking
+                ? IconLockLine
+                : IconUnlockLine,
+            label:
+              !this.props.announcementsLocked && this.props.isToggleLocking
+                ? I18n.t('Lock')
+                : I18n.t('Unlock'),
+            screenReaderLabel:
+              !this.props.announcementsLocked && this.props.isToggleLocking
+                ? I18n.t('Lock Selected Announcements')
+                : I18n.t('Unlock Selected Announcements'),
+            action: this.props.toggleSelectedAnnouncementsLock,
+            disabled: this.props.isBusy || this.props.selectedCount === 0,
+          },
+        ]}
+      />
+    )
+  }
+
+  renderActionButtons(responsiveStyles) {
+    const {breakpoints} = this.props
+    const instUIICEDesktop = instUINavEnabled() && breakpoints.ICEDesktop
+    const tabletDirection = breakpoints.tablet ? 'row-reverse' : 'column'
+    const directionWithInstUi = instUINavEnabled() ? tabletDirection : 'row'
+    const buttonsDirection = instUIICEDesktop ? 'row-reverse' : directionWithInstUi
+
+    return (
+      <Flex
+        wrap="no-wrap"
+        direction={buttonsDirection}
+        gap="small"
+        justifyItems="end"
+        overflowX="hidden"
+        overflowY="hidden"
+        width="100%"
+        height="100%"
+      >
         {this.props.permissions.create && (
           <Button
             href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new?is_announcement=true`}
@@ -183,14 +193,75 @@ export default class IndexHeader extends Component {
             <PresentationContent>{I18n.t('Announcement')}</PresentationContent>
           </Button>
         )}
-      </>
+        <Button
+          id="mark_all_announcement_read"
+          data-testid="mark-all-announcement-read"
+          renderIcon={IconInvitationLine}
+          display={responsiveStyles.buttonDisplay}
+          onClick={this.props.markAllAnnouncementRead}
+          disabled={this.props.isBusy}
+        >
+          <ScreenReaderContent>{I18n.t('Mark All Announcement Read')}</ScreenReaderContent>
+          <PresentationContent>{I18n.t('Mark All as Read')}</PresentationContent>
+        </Button>
+        {instUINavEnabled && breakpoints.mobileOnly ? (
+          this.renderButtonMenu()
+        ) : (
+          <>
+            {this.props.permissions.manage_course_content_delete && (
+              <Button
+                disabled={this.props.isBusy || this.props.selectedCount === 0}
+                size="medium"
+                display={responsiveStyles.buttonDisplay}
+                id="delete_announcements"
+                data-testid="delete-announcements-button"
+                onClick={this.onDelete}
+                renderIcon={<IconTrashLine />}
+                ref={c => {
+                  this.deleteBtn = c
+                }}
+              >
+                {instUINavEnabled() && (
+                  <PresentationContent>{I18n.t('Delete')}</PresentationContent>
+                )}
+                <ScreenReaderContent>{I18n.t('Delete Selected Announcements')}</ScreenReaderContent>
+              </Button>
+            )}
+            {this.props.permissions.manage_course_content_edit &&
+              !this.props.announcementsLocked &&
+              (this.props.isToggleLocking
+                ? this.renderLockToggleButton(
+                    <IconLockLine />,
+                    I18n.t('Lock'),
+                    I18n.t('Lock Selected Announcements'),
+                    responsiveStyles
+                  )
+                : this.renderLockToggleButton(
+                    <IconUnlockLine />,
+                    I18n.t('Unlock'),
+                    I18n.t('Unlock Selected Announcements'),
+                    responsiveStyles
+                  ))}
+          </>
+        )}
+      </Flex>
+    )
+  }
+
+  renderSearchField() {
+    return (
+      <SearchField
+        name="announcements_search"
+        searchInputRef={this.props.searchInputRef}
+        onSearchEvent={this.onSearchChange}
+        placeholder={I18n.t('Search...')}
+      />
     )
   }
 
   renderOldHeader(breakpoints) {
-    const ddSize = breakpoints.desktopOnly ? '100px' : '100%'
+    const ddSize = breakpoints.ICEDesktopOnly ? '100px' : '100%'
     const containerSize = breakpoints.tablet ? 'auto' : '100%'
-    const {searchInputRef} = this.props
 
     return (
       <View>
@@ -218,11 +289,7 @@ export default class IndexHeader extends Component {
               </FormField>
             </Flex.Item>
             <Flex.Item size={containerSize} shouldGrow={true} shouldShrink={true}>
-              <SearchField
-                name="announcements_search"
-                searchInputRef={searchInputRef}
-                onSearchEvent={this.onSearchChange}
-              />
+              {this.renderSearchField()}
             </Flex.Item>
             <Flex.Item>
               <Flex wrap="wrap" gap="small">
@@ -243,50 +310,43 @@ export default class IndexHeader extends Component {
   }
 
   render() {
-    const {breakpoints, searchInputRef} = this.props
-
+    const {breakpoints} = this.props
     if (!instUINavEnabled()) {
       return this.renderOldHeader(breakpoints)
     }
 
-    let flexBasis = 'auto'
-    let buttonDisplay = 'inline-block'
-    let flexDirection = 'row'
-    let headerShrink = false
-
-    if (breakpoints.mobileOnly) {
-      flexBasis = '100%'
-      buttonDisplay = 'block'
-      flexDirection = 'column-reverse'
-      headerShrink = true
-    }
+    const flexBasis = breakpoints.ICEDesktop ? 'auto' : '100%'
+    const buttonDisplay = breakpoints.ICEDesktop ? 'inline-block' : 'block'
+    const headerShrink = !breakpoints.ICEDesktop
+    const containerSize = breakpoints.tablet
 
     return (
       <Flex direction="column" as="div" gap="medium">
-        <Flex.Item overflow="hidden">
+        <Flex.Item overflowY="visible">
           <Flex as="div" direction="row" justifyItems="space-between" wrap="wrap" gap="small">
-            <Flex.Item width={flexBasis} shouldGrow={true} shouldShrink={headerShrink}>
+            <Flex.Item
+              width={flexBasis}
+              shouldGrow={true}
+              shouldShrink={headerShrink}
+              overflowX="hidden"
+              overflowY="hidden"
+            >
               <HeadingMenu
                 name={I18n.t('Announcement Filter')}
                 filters={getFilters()}
                 defaultSelectedFilter="all"
                 onSelectFilter={this.onFilterChange}
+                mobileHeader={breakpoints.mobileOnly}
               />
             </Flex.Item>
-            <Flex.Item width={flexBasis} overflowX="hidden" overflowY="hidden">
-              <Flex direction={flexDirection} wrap="wrap" gap="small">
-                {this.renderActionButtons({
-                  buttonDisplay,
-                })}
-              </Flex>
+            <Flex.Item width={flexBasis} size={containerSize} overflowY="visible">
+              {this.renderActionButtons({
+                buttonDisplay,
+              })}
             </Flex.Item>
           </Flex>
         </Flex.Item>
-        <SearchField
-          name="announcements_search"
-          searchInputRef={searchInputRef}
-          onSearchEvent={this.onSearchChange}
-        />
+        {this.renderSearchField()}
         <Flex.Item margin="large 0 0 0">
           <ExternalFeedsTray
             atomFeedUrl={this.props.atomFeedUrl}

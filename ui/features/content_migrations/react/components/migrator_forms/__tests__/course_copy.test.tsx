@@ -125,4 +125,35 @@ describe('CourseCopyImporter', () => {
     await userEvent.click(getByLabelText(/All content/))
     expect(screen.queryByText('Import Blueprint Course settings')).toBeNull()
   })
+
+  it('disable inputs while uploading', async () => {
+    renderComponent({isSubmitting: true})
+    await waitFor(() => {
+      expect(screen.getByRole('button', {name: 'Cancel'})).toBeDisabled()
+      expect(screen.getByRole('button', {name: /Adding.../})).toBeDisabled()
+      expect(screen.getByRole('combobox', {name: 'Search for a course'})).toBeDisabled()
+      expect(screen.getByRole('radio', {name: /All content/})).toBeDisabled()
+      expect(screen.getByRole('radio', {name: 'Select specific content'})).toBeDisabled()
+      expect(screen.getByRole('checkbox', {name: 'Adjust events and due dates'})).toBeDisabled()
+    })
+  })
+
+  it('disable "Adjust events and due dates" inputs while uploading', async () => {
+    const {getByRole, rerender, getByLabelText} = renderComponent()
+
+    await userEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
+
+    rerender(<CourseCopyImporter onSubmit={onSubmit} onCancel={onCancel} isSubmitting={true} />)
+
+    await waitFor(() => {
+      expect(getByRole('radio', {name: 'Shift dates'})).toBeInTheDocument()
+      expect(getByRole('radio', {name: 'Shift dates'})).toBeDisabled()
+      expect(getByRole('radio', {name: 'Remove dates'})).toBeDisabled()
+      expect(getByLabelText('Select original beginning date')).toBeDisabled()
+      expect(getByLabelText('Select new beginning date')).toBeDisabled()
+      expect(getByLabelText('Select original end date')).toBeDisabled()
+      expect(getByLabelText('Select new end date')).toBeDisabled()
+      expect(getByRole('button', {name: 'Add substitution'})).toBeDisabled()
+    })
+  })
 })

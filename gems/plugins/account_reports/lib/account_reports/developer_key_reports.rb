@@ -54,13 +54,14 @@ module AccountReports
     private
 
     def write_key(csv, key)
+      placements = key.tool_configuration&.placements
       row = []
       row << key.global_id
       row << key.name
       row << (key.account != account)
       row << key.email
       row << (key.is_lti_key ? "LTI Key" : "API Key")
-      row << (key.tool_configuration&.placements&.pluck("placement").presence || "None")
+      row << (placements&.pluck("placement")&.compact.presence || placements&.pluck(:placement)&.compact.presence || "None")
       row << (key.account_binding_for(account)&.workflow_state&.capitalize.presence || "Allow")
       row << (key.scopes.presence || "All")
       csv << row

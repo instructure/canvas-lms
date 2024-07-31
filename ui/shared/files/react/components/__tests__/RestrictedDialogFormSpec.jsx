@@ -24,6 +24,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import RestrictedDialogForm from '@canvas/files/react/components/RestrictedDialogForm'
 import Folder from '@canvas/files/backbone/models/Folder'
+import { mergeTimeAndDate } from '@instructure/moment-utils'
 
 QUnit.module('RestrictedDialogForm Multiple Selected Items', {
   setup() {
@@ -99,9 +100,13 @@ test(
     const refs = this.restrictedDialogForm
     this.restrictedDialogForm.restrictedSelection.setState({selectedOption: 'date_range'})
     const startDate = new Date(2016, 5, 1)
+    const startTime = '5 AM'
     const endDate = new Date(2016, 5, 4)
+    const endTime = '5 PM'
     $(refs.restrictedSelection.unlock_at).data('unfudged-date', startDate)
+    $(refs.restrictedSelection.unlock_at_time).val(startTime)
     $(refs.restrictedSelection.lock_at).data('unfudged-date', endDate)
+    $(refs.restrictedSelection.lock_at_time).val(endTime)
     const stubbedSave = sandbox.spy(this.restrictedDialogForm.props.models[0], 'save')
     Simulate.submit(refs.dialogForm)
     ok(
@@ -110,8 +115,8 @@ test(
         {
           attrs: {
             hidden: false,
-            lock_at: endDate,
-            unlock_at: startDate,
+            lock_at: mergeTimeAndDate(endTime, endDate),
+            unlock_at: mergeTimeAndDate(startTime, startDate),
             locked: false,
           },
         }
@@ -125,8 +130,11 @@ test('accepts blank unlock_at date', function () {
   const refs = this.restrictedDialogForm
   this.restrictedDialogForm.restrictedSelection.setState({selectedOption: 'date_range'})
   const endDate = new Date(2016, 5, 4)
+  const endTime = '5 PM'
   $(refs.restrictedSelection.unlock_at).data('unfudged-date', null)
+  $(refs.restrictedSelection.unlock_at_time).val('')
   $(refs.restrictedSelection.lock_at).data('unfudged-date', endDate)
+  $(refs.restrictedSelection.lock_at_time).val(endTime)
   const stubbedSave = sandbox.spy(this.restrictedDialogForm.props.models[0], 'save')
   Simulate.submit(refs.dialogForm)
   ok(
@@ -135,7 +143,7 @@ test('accepts blank unlock_at date', function () {
       {
         attrs: {
           hidden: false,
-          lock_at: endDate,
+          lock_at: mergeTimeAndDate(endTime, endDate),
           unlock_at: '',
           locked: false,
         },
@@ -149,8 +157,11 @@ test('accepts blank lock_at date', function () {
   const refs = this.restrictedDialogForm
   this.restrictedDialogForm.restrictedSelection.setState({selectedOption: 'date_range'})
   const startDate = new Date(2016, 5, 4)
+  const startTime = '5 PM'
   $(refs.restrictedSelection.unlock_at).data('unfudged-date', startDate)
+  $(refs.restrictedSelection.unlock_at_time).val(startTime)
   $(refs.restrictedSelection.lock_at).data('unfudged-date', null)
+  $(refs.restrictedSelection.lock_at_time).val('')
   const stubbedSave = sandbox.spy(this.restrictedDialogForm.props.models[0], 'save')
   Simulate.submit(refs.dialogForm)
   ok(
@@ -160,7 +171,7 @@ test('accepts blank lock_at date', function () {
         attrs: {
           hidden: false,
           lock_at: '',
-          unlock_at: startDate,
+          unlock_at: mergeTimeAndDate(startTime, startDate),
           locked: false,
         },
       }
@@ -173,9 +184,13 @@ test('rejects unlock_at date after lock_at date', function () {
   const refs = this.restrictedDialogForm
   this.restrictedDialogForm.restrictedSelection.setState({selectedOption: 'date_range'})
   const startDate = new Date(2016, 5, 4)
+  const startTime = '5 AM'
   const endDate = new Date(2016, 5, 1)
+  const endTime = '5 AM'
   $(refs.restrictedSelection.unlock_at).data('unfudged-date', startDate)
+  $(refs.restrictedSelection.unlock_at_time).val(startTime)
   $(refs.restrictedSelection.lock_at).data('unfudged-date', endDate)
+  $(refs.restrictedSelection.lock_at_time).val(endTime)
   const stubbedSave = sandbox.spy(this.restrictedDialogForm.props.models[0], 'save')
   Simulate.submit(refs.dialogForm)
   equal(stubbedSave.callCount, 0)

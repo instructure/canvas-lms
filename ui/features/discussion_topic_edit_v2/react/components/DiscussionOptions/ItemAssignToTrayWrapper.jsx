@@ -70,6 +70,8 @@ export const ItemAssignToTrayWrapper = () => {
       noop_id: null,
       stagedOverrideId: inputObj.stagedOverrideId || null,
       rowKey: inputObj.rowKey || null,
+      replyToEntryOverrideId: inputObj.replyToEntryOverrideId || null,
+      replyToTopicOverrideId: inputObj.replyToTopicOverrideId || null,
     }
 
     // Add context_module_id and context_module_name fields if they exist on inputObj
@@ -125,16 +127,18 @@ export const ItemAssignToTrayWrapper = () => {
     const outputObj = {
       dueDateId: inputObj.rowKey || inputObj.stagedOverrideId || null,
       assignedList: [],
-      replyToTopicDueDate: inputObj.reply_to_topic_due_at_overridden ? inputObj.reply_to_topic_due_at : null,
-      requiredRepliesDueDate: inputObj.required_replies_due_at_overridden ? inputObj.required_replies_due_at : null,
+      replyToTopicDueDate: inputObj.reply_to_topic_due_at || null,
+      requiredRepliesDueDate: inputObj.required_replies_due_at || null,
       dueDate: inputObj.due_at ? inputObj.due_at : null,
-      availableFrom: inputObj.unlock_at_overridden ? inputObj.unlock_at : null,
-      availableUntil: inputObj.lock_at_overridden ? inputObj.lock_at : null,
+      availableFrom: inputObj.unlock_at || null,
+      availableUntil: inputObj.lock_at || null,
       unassignItem: inputObj.unassign_item || false,
       context_module_id: inputObj.context_module_id || null,
       context_module_name: inputObj.context_module_name || null,
       stagedOverrideId: inputObj.stagedOverrideId || null,
       rowKey: inputObj.rowKey || null,
+      replyToEntryOverrideId: inputObj.replyToEntryOverrideId || null,
+      replyToTopicOverrideId: inputObj.replyToTopicOverrideId || null,
     }
 
     if (inputObj.noop_id === '1') {

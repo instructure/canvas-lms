@@ -30,39 +30,34 @@ describe "New SideNav Navigation" do
       @course.root_account.enable_feature!(:instui_nav)
     end
 
-    it "minimizes and expand the side nav when clicked" do
-      get "/"
+    def toggle_side_nav
       primary_nav_toggle = f("#sidenav-toggle")
       primary_nav_toggle.click
       wait_for_ajaximations
-      expect(f("body")).not_to have_class("primary-nav-expanded")
-      primary_nav_toggle.click
-      wait_for_ajaximations
-      expect(f("body")).to have_class("primary-nav-expanded")
     end
 
-    describe "Profile Link" do
-      it "shows the profile tray upon clicking" do
+    context "when side nav is collapsed" do
+      before do
         get "/"
-        user_tray = f("#profile-tray")
-        user_tray.click
-        wait_for_ajaximations
-        expect(f('[aria-label="User profile picture"]')).to be_displayed
+        toggle_side_nav
       end
-    end
 
-    describe "Courses Link" do
-      it "shows the courses tray upon clicking" do
+      it "collapses the side nav" do
+        expect(f("body")).not_to have_class("primary-nav-expanded")
+      end
+
+      it "handles tray navigation correctly" do
         get "/"
-        courses_tray = f("#courses-tray")
-        courses_tray.click
-        wait_for_ajaximations
-        expect(f("[aria-label='Courses tray']")).to be_displayed
+        tray_ids = %w[profile-tray courses-tray history-tray help-tray]
+        tray_ids.each do |tray_id|
+          tray = f("##{tray_id}")
+          tray.click
+          wait_for_ajaximations
+          expect(tray["data-selected"]).to eq("true")
+        end
       end
-    end
 
-    describe "LTI Tools" do
-      it "shows a custom logo/link for LTI tools" do
+      it "shows custom LTI tool logo/link" do
         @tool = Account.default.context_external_tools.new({
                                                              name: "Commons",
                                                              domain: "canvaslms.com",
@@ -80,10 +75,13 @@ describe "New SideNav Navigation" do
         get "/"
         expect(f("#commons-external-tool-tray")).to be_displayed
       end
-    end
 
-    describe "Recent History" do
-      before do
+      it "displays dynamic elements correctly" do
+        avatar = f("#user-avatar")
+        expect(avatar[:src]).to match(%r{/images/messages/avatar-50\.png$})
+      end
+
+      it "shows recent history tray" do
         Setting.set("enable_page_views", "db")
         @assignment = @course.assignments.create(name: "another assessment")
         @quiz = Quizzes::Quiz.create!(title: "quiz1", context: @course)
@@ -97,9 +95,74 @@ describe "New SideNav Navigation" do
                       created_at: 1.minute.ago,
                       asset_category: "quizzes",
                       asset_code: @quiz.asset_string
+
+        get "/"
+        wait_for_ajaximations
+        expect(f("#history-tray")).to be_displayed
+      end
+    end
+
+    context "when side nav is expanded" do
+      before do
+        get "/"
+        toggle_side_nav
+        toggle_side_nav
       end
 
-      it "shows the Recent History tray upon clicking" do
+      it "expands the side nav" do
+        expect(f("body")).to have_class("primary-nav-expanded")
+      end
+
+      it "handles tray navigation correctly" do
+        get "/"
+        tray_ids = %w[profile-tray courses-tray history-tray help-tray]
+        tray_ids.each do |tray_id|
+          tray = f("##{tray_id}")
+          tray.click
+          wait_for_ajaximations
+          expect(tray["data-selected"]).to eq("true")
+        end
+      end
+
+      it "shows custom LTI tool logo/link" do
+        @tool = Account.default.context_external_tools.new({
+                                                             name: "Commons",
+                                                             domain: "canvaslms.com",
+                                                             consumer_key: "12345",
+                                                             shared_secret: "secret"
+                                                           })
+        @tool.set_extension_setting(:global_navigation, {
+                                      url: "canvaslms.com",
+                                      visibility: "admins",
+                                      display_type: "full_width",
+                                      text: "Commons",
+                                      icon_svg_path_64: "M100,37L70.1,10.5v17.6H38.6c-4.9,0-8.8,3.9-8.8,8.8s3.9,8.8,8.8,8.8h31.5v17.6L100,37z"
+                                    })
+        @tool.save!
+        get "/"
+        expect(f("#commons-external-tool-tray")).to be_displayed
+      end
+
+      it "displays dynamic elements correctly" do
+        avatar = f("#user-avatar")
+        expect(avatar[:src]).to match(%r{/images/messages/avatar-50\.png$})
+      end
+
+      it "shows recent history tray" do
+        Setting.set("enable_page_views", "db")
+        @assignment = @course.assignments.create(name: "another assessment")
+        @quiz = Quizzes::Quiz.create!(title: "quiz1", context: @course)
+        page_view_for url: app_url + "/courses/#{@course.id}/assignments/#{@assignment.id}",
+                      context: @course,
+                      created_at: 5.minutes.ago,
+                      asset_category: "assignments",
+                      asset_code: @assignment.asset_string
+        page_view_for url: app_url + "/courses/#{@course.id}/quizzes/#{@quiz.id}",
+                      context: @course,
+                      created_at: 1.minute.ago,
+                      asset_category: "quizzes",
+                      asset_code: @quiz.asset_string
+
         get "/"
         wait_for_ajaximations
         expect(f("#history-tray")).to be_displayed

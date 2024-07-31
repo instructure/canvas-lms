@@ -19,13 +19,19 @@ import React, {useCallback} from 'react'
 import {useEditor, useNode} from '@craftjs/core'
 import {ButtonBlockToolbar} from './ButtonBlockToolbar'
 
-import {getIcon} from '../../../../assets/icons'
+import {getIcon} from '../../../../assets/user-icons'
 import {Button, CondensedButton} from '@instructure/ui-buttons'
 import {type ViewProps} from '@instructure/ui-view'
 import {darken, lighten} from '@instructure/ui-color-utils'
 import {getContrastingColor, white} from '../../../../utils'
-import {isInstuiButtonColor} from './common'
-import type {InstuiButtonColor, ButtonSize, ButtonVariant, ButtonBlockProps} from './common'
+import {isInstuiButtonColor} from './types'
+import type {
+  InstuiButtonColor,
+  ButtonSize,
+  ButtonVariant,
+  ButtonBlockProps,
+  InstuiCondensedButtonColor,
+} from './types'
 
 const ButtonBlock = ({
   text,
@@ -89,7 +95,7 @@ const ButtonBlock = ({
       <CondensedButton
         elementRef={el => el && connect(drag(el as HTMLElement))}
         size={size}
-        color={color}
+        color={color as InstuiCondensedButtonColor}
         href={href?.trim() || '#'}
         renderIcon={iconName ? renderIcon : undefined}
         themeOverride={themeOverride}

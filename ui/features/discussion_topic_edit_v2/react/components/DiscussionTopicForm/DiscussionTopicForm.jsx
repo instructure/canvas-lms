@@ -282,7 +282,6 @@ function DiscussionTopicForm({
 
   const [attachment, setAttachment] = useState(currentDiscussionTopic?.attachment || null)
   const [attachmentToUpload, setAttachmentToUpload] = useState(false)
-  const affectUserFileQuota = false
 
   const [usageRightsData, setUsageRightsData] = useState(
     currentDiscussionTopic?.attachment?.usageRights || {}
@@ -376,6 +375,20 @@ function DiscussionTopicForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  useEffect(() => {
+    const assignmentInfo = {
+      id: null,
+      grading_standard_id: gradingSchemeId,
+      grading_type: displayGradeAs,
+      points_possible: pointsPossible,
+      submission_types: 'discussion_topic',
+    }
+
+    window.dispatchEvent(
+      new CustomEvent('triggerMasteryPathsUpdateAssignment', {detail: {assignmentInfo}})
+    )
+  }, [gradingSchemeId, displayGradeAs, pointsPossible, isGraded])
+
   const {
     shouldShowTodoSettings,
     shouldShowPostToSectionOption,
@@ -391,6 +404,7 @@ function DiscussionTopicForm({
     shouldShowPodcastFeedOption,
     shouldShowCheckpointsOptions,
     shouldShowAssignToForUngradedDiscussions,
+    shouldShowAllowParticipantsToCommentOption,
   } = useShouldShowContent(
     isGraded,
     isAnnouncement,
@@ -440,6 +454,7 @@ function DiscussionTopicForm({
         currentDiscussionTopic?.assignment
       ),
       checkpoints: prepareCheckpointsPayload(
+        assignedInfoList,
         pointsPossibleReplyToTopic,
         pointsPossibleReplyToEntry,
         replyToEntryRequiredCount,
@@ -574,7 +589,7 @@ function DiscussionTopicForm({
           section => !selectedSectionIds.includes(section.id)
         )
 
-        if (missingSectionObjs.length > 0) {
+        if (missingSectionObjs.length > 0 && isGraded) {
           setLastShouldPublish(shouldPublish)
           setMissingSections(missingSectionObjs)
           setShouldShowMissingSectionsWarning(true)
@@ -777,7 +792,7 @@ function DiscussionTopicForm({
               setAttachmentToUpload={setAttachmentToUpload}
               attachmentToUpload={attachmentToUpload}
               responsiveQuerySizes={responsiveQuerySizes}
-              isGradedDiscussion={!affectUserFileQuota}
+              checkContextQuota={true}
               canAttach={ENV.DISCUSSION_TOPIC?.PERMISSIONS.CAN_ATTACH}
             />
           )}
@@ -830,7 +845,7 @@ function DiscussionTopicForm({
               discussionAnonymousState={discussionAnonymousState}
               setDiscussionAnonymousState={setDiscussionAnonymousState}
               isSelectDisabled={
-                (isEditing && currentDiscussionTopic?.entryCounts?.repliesCount) || isGraded
+                (isEditing && currentDiscussionTopic?.entryCounts?.repliesCount > 0) || isGraded
               }
               setIsGraded={setIsGraded}
               setIsGroupDiscussion={setIsGroupDiscussion}
@@ -840,7 +855,7 @@ function DiscussionTopicForm({
             />
           )}
           <FormFieldGroup description="" rowSpacing="small">
-            {shouldShowAnnouncementOnlyOptions && (
+            {shouldShowAllowParticipantsToCommentOption && (
               <Checkbox
                 label={I18n.t('Allow Participants to Comment')}
                 value="enable-participants-commenting"
@@ -1058,12 +1073,10 @@ function DiscussionTopicForm({
                 )}
               </View>
             )}
-            {!canGroupDiscussion && isEditing && (
+            {!canGroupDiscussion && isEditing && !isAnnouncement && currentDiscussionTopic?.entryCounts?.repliesCount > 0 && (
               <View display="block" data-testid="group-category-not-editable">
                 <Alert variant="warning" margin="small none small none">
-                  {I18n.t(
-                    'Students have already submitted to this discussion, so group settings cannot be changed.'
-                  )}
+                  {I18n.t('Students have already submitted to this discussion, so group settings cannot be changed.')}
                 </Alert>
               </View>
             )}
@@ -1085,7 +1098,7 @@ function DiscussionTopicForm({
       <div style={{display: selectedView === Views.MasteryPaths ? 'block' : 'none'}}>
         {ENV.CONDITIONAL_RELEASE_ENV && (
           <MasteryPathsReactWrapper
-            type={I18n.t('discussion topic')}
+            type="discussion topic"
             env={ENV.CONDITIONAL_RELEASE_ENV}
           />
         )}

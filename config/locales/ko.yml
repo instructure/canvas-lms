@@ -133,6 +133,7 @@ ko:
   _5a374287: "..."
   _at_the_bottom__4360f2b4: "-- 맨 밑으로 --"
   _b4455c8b: "%"
+  about_70c18bba: 정보
   academic_benchmark: 
     api_error: "기관 %{auth}에 대한 표준을 업데이트할 수 없습니다."
     bad_ab_file: "제공한 Academic Benchmark 파일에 오류가 있습니다."
@@ -1488,6 +1489,7 @@ ko:
   angel_file_description: "Angel 내보내기 .zip 형식"
   announcement: 
     no_title: "제목 없음"
+  announcement_e37d6dbd: "공지 사항"
   announcement_external_feeds_5be3f36b: "공지 외부 피드"
   announcement_fb4cb645: "공지 사항"
   announcement_successfully_created_731a707f: "공지가 성공적으로 생성됨"
@@ -3174,6 +3176,7 @@ ko:
     index: 
       concluded_conferences: "종결된 회의"
       conference_header: 회의
+      conferences: 회의
       new_conference: "새 회의"
       new_conferences: "새 회의"
       page_title: "웹 회의"
@@ -9285,6 +9288,7 @@ ko:
     no_recipients_choose_another_group: "이 그룹에 수신인이 없습니다. 다른 그룹을 선택하시기 바랍니다."
   modified_by_c1584b3c: "수정한 사람"
   modified_by_user_e6c8ade3: "수정한 사람: %{user}"
+  module_9775f804: 모듈
   module_item_types: 
     assignment: 과제
     disuccsion: 토론
@@ -9433,6 +9437,7 @@ ko:
   name_1aed4a1b: 이름
   name_3806192d: "이름:"
   name_only_5f56718e: 이름만
+  navigation_ee9af92d: 탐색
   never_1ed1244d: "한 적 없음"
   new_13daf639: "새 항목"
   new_discussion_dae4fae3: "새 토론"
@@ -13485,6 +13490,7 @@ ko:
       timespan: "%{start_at}*부터* %{end_at}까지"
   testing_state_effd4a82: "테스트 상태"
   text_entry_e1808b2f: "텍스트 항목"
+  text_sms_4e2d82a7: "텍스트 (SMS)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "해당 사용자 계정은 삭제되었습니다.  계정을 다시 활성화하려면 시스템 관리자에게 문의하시기 바랍니다."
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "이 계정에 구성되어 있지 않은 기관에서 로그인했습니다."
   the_profile_picture_has_been_reported_d609d6dd: "프로필 사진이 신고되었습니다"

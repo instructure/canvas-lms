@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import MoodleZipImporter from '../moodle_zip'
 
@@ -59,7 +59,65 @@ describe('CanvasCartridgeImporter', () => {
   })
 
   it('renders the progressbar info', async () => {
-    renderComponent({fileUploadProgress: 10})
+    renderComponent({isSubmitting: true, fileUploadProgress: 10})
     expect(screen.getByText('Uploading File')).toBeInTheDocument()
+  })
+
+  it('disable inputs while uploading', async () => {
+    renderComponent({isSubmitting: true})
+    await waitFor(() => {
+      expect(screen.getByRole('button', {name: 'Choose File'})).toBeDisabled()
+      expect(screen.getByRole('button', {name: 'Cancel'})).toBeDisabled()
+      expect(screen.getByRole('button', {name: /Adding.../})).toBeDisabled()
+      expect(screen.getByRole('checkbox', {name: 'Adjust events and due dates'})).toBeDisabled()
+    })
+  })
+
+  it('disable "Adjust events and due dates" inputs while uploading', async () => {
+    const {getByRole, rerender, getByLabelText} = renderComponent()
+
+    await userEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
+
+    rerender(
+      <MoodleZipImporter
+        onSubmit={onSubmit}
+        onCancel={onCancel}
+        isSubmitting={true}
+        fileUploadProgress={10}
+      />
+    )
+
+    await waitFor(() => {
+      expect(getByRole('radio', {name: 'Shift dates'})).toBeInTheDocument()
+      expect(getByRole('radio', {name: 'Shift dates'})).toBeDisabled()
+      expect(getByRole('radio', {name: 'Remove dates'})).toBeDisabled()
+      expect(getByLabelText('Select original beginning date')).toBeDisabled()
+      expect(getByLabelText('Select new beginning date')).toBeDisabled()
+      expect(getByLabelText('Select original end date')).toBeDisabled()
+      expect(getByLabelText('Select new end date')).toBeDisabled()
+      expect(getByRole('button', {name: 'Add substitution'})).toBeDisabled()
+    })
+  })
+
+  it('disable question bank inputs while uploading', async () => {
+    const {getByRole, rerender, getByPlaceholderText} = renderComponent()
+
+    await userEvent.click(getByRole('combobox', {name: 'Default Question bank'}))
+    await userEvent.click(getByRole('option', {name: 'Create new question bank...'}))
+
+    rerender(
+      <MoodleZipImporter
+        onSubmit={onSubmit}
+        onCancel={onCancel}
+        isSubmitting={true}
+        fileUploadProgress={10}
+      />
+    )
+
+    await waitFor(() => {
+      expect(getByPlaceholderText('New question bank')).toBeInTheDocument()
+      expect(getByPlaceholderText('New question bank')).toBeDisabled()
+      expect(getByRole('combobox', {name: 'Default Question bank'})).toBeDisabled()
+    })
   })
 })

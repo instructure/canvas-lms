@@ -358,6 +358,7 @@ ru:
   a_z_29d8e67c: "A - Z"
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "Возможность отправки заданий аннотированных документов."
   ability_to_submit_student_annotation_assignments_9ee47e3f: "Возможность отправлять назначение аннотаций учащихся."
+  about_smart_search_c8e7fcb4: "Об Интеллектуальном поиске"
   about_this_service_b10bc808: "Об этом сервисе"
   above_max_rating_64b29915: "Выше максимальной оценки"
   academic_benchmark: 
@@ -2799,6 +2800,7 @@ ru:
       Позволяют настроить подписку на «живые» мероприятия для доставки
       посредством веб-хуков HTTPS
   allow_lor_tools: "Разрешить пользователям просматривать и использовать внешние инструменты, сконфигурированные для LOR."
+  allow_lti_1_3_resource_links_api_341599b: "Разрешить ссылки LTI 1.3 API на ресурсы"
   allow_lti_tools_to_have_an_editor_button_icon_with_15c1342a: "Разрешает инструментам LTI использовать иконку кнопки редактора без размещения (использовать иконку инструмента по умолчанию)"
   allow_migration_of_quizzes_during_course_copy_and__35d80756: "Разрешить миграцию тестирований во время копирования и импорта курса"
   allow_moderator_to_review_multiple_independent_gra_c59d64f6: "Разрешить модератору рассмотреть несколько независимых оценок для выбранных документов"
@@ -4146,6 +4148,7 @@ ru:
   are_you_sure_you_want_to_delete_this_enrollment_74ecfeb1: "Удалить это зачисление?"
   are_you_sure_you_want_to_delete_this_entry_9aecd6d3: "Действительно хотите удалить эту запись?"
   are_you_sure_you_want_to_delete_this_event_824b1e33: "Вы действительно хотите удалить это событие?"
+  are_you_sure_you_want_to_delete_this_event_deletin_30f256d2: "Вы действительно хотите удалить это событие? При удалении этого события будет удалено и связанное с ним задание."
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "Вы уверены, что хотите удалить этот набор периодов выставления оценок?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Вы уверены, что хотите удалить этот период выставления оценок?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Вы уверены, что хотите удалить эту схему оценок?"
@@ -4217,6 +4220,7 @@ ru:
   as_of_a036fa2e: "По состоянию на"
   as_of_date_the_lti_1_3_oidc_auth_endpoint_has_chan_a8783bc6: "По данным на %{date}, конечная точка LTI 1.3 OIDC Auth была изменена с https://canvas.instructure.com/api/lti/authorize_redirect на https://sso.canvaslms.com/api/lti/authorize_redirect. Обоснование и масштаб этого изменения подробно описаны в *этой статье сообщества Canvas*, а дополнительная информация доступна в наших документах по API. Это изменение небольшое и не займет много времени, но требует изменения конфигурации на стороне инструмента для каждого инструмента LTI 1.3, установленного в Canvas."
   as_of_date_the_lti_1_3_platform_storage_specificat_74b82d8d: "По состоянию на %{date} спецификация LTI 1.3 Platform Storage полностью поддерживается Canvas. Инструменты, желающие реализовать это, должны изменить конечную точку OIDC Auth, которую они хранят для Canvas, с *https://canvas.instructure.com/api/lti/authorize_redirect* на *https://sso.canvaslms.com/api/lti/authorize_redirect*. Конечная точка OIDC Auth, рекомендуемая для новых инсталляций инструментов 1.3, также изменилась, и мы рекомендуем как можно скорее переключить конфигурацию всех инструментов 1.3 на использование этой новой конечной точки."
+  as_of_june_1_2024_searchable_items_include_content_62e31b5a: "По состоянию на 1 июня 2024 года в число поисковых элементов входят страницы содержания, объявления, подсказки для обсуждения и описания заданий."
   as_of_june_1_2024_the_smart_search_feature_is_quer_cced176f: "Начиная с 1 июня 2024 года функция интеллектуального поиска запрашивает следующие элементы (включая названия) в рамках курса: страницы содержания, объявления, подсказки для обсуждения, описания заданий."
   as_primary_c07e9394: "В качестве основного"
   as_secondary_ab10dec8: "В качестве вторичного"
@@ -5518,6 +5522,7 @@ ru:
   available_from_f84e4611: "Доступно с"
   available_from_field_for_styleguide_7ced3861: "Поле Доступно с для styleguide"
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "Доступно с - Формат: ГГГГ-MM-ДД чч:мм"
+  available_from_time_86bf4e22: "Доступно с времени"
   available_pronouns_b45330b1: "Доступные местоимения"
   available_submission_types_1c577ae5: "Доступные типы отправки"
   available_to_b7350e02: "Доступно для"
@@ -5529,6 +5534,7 @@ ru:
   available_until_field_for_styleguide_85d5d65a: "Поле Доступно до для styleguide"
   available_until_format_like_yyyy_mm_dd_hh_mm_622378d6: "Доступно до - Формат: ГГГГ-MM-ДД чч:мм"
   available_until_lock_at_ab022445: "Доступно до %{lock_at}"
+  available_until_time_818f35d: "Доступно до времени"
   available_until_untildate_b926fe11: "Доступно до %{untilDate}"
   availableslots_available_87b8b69d: "%{availableSlots} Доступно"
   availableslots_more_available_be5193a8: "%{availableSlots} имеются и другие"
@@ -6659,6 +6665,7 @@ ru:
   cap_the_number_of_rces_rendered_on_initial_page_lo_c3890aec: |-
       Ограничение количества RCE, отображаемых при первоначальной загрузке страницы. После этого
       инициализируйте каждый при входе в область просмотра.
+  captcha_failed_to_load_52251e9f: "Не удалось загрузить код с картинки"
   caption_1cf95987: Надписи
   captions_inherited_from_a_parent_course_cannot_be__9248fa3a: "Заголовки, унаследованные из родительского курса, не могут быть удалены."
   captions_subtitles_af2c47e: Надписи/субтитры
@@ -7210,6 +7217,7 @@ ru:
   common_cartridge_qti_new_quizzes_import_58b786ce: "Общий картридж QTI Импортирование Новых тестирований"
   common_timezones_2b00baba: "Обычные часовые пояса"
   commons_ed0252fb: Commons
+  commons_new_quizzes_support_cb162314: "Commons Новые тесты Поддержка"
   communicate_course_objectives_f457158c: "Проинформируйте окружающих о целях учебного курса"
   communicate_grading_expectations_484a1f01: "Сообщите об ожиданиях в отношении оценок"
   communicate_to_your_students_exactly_what_will_be__57a679c5: "Сообщайте вашим учащимся то, что от них требуется при изучении курса, в хронологическом порядке. Составляйте вложенные Учебные планы на основе созданных вами Заданий и Событий."
@@ -7553,6 +7561,7 @@ ru:
   config_url_e96ceaf3: "Настройка URL-адреса"
   configurate_tool_app_5a721f2c: "Настроить приложение %{tool}?"
   configuration_error_906691a5: "Ошибка конфигурации"
+  configuration_json_cannot_be_empty_f3664d30: "Конфигурация JSON не может быть пустой."
   configuration_location_ee0f6592: "Местоположение конфигурации"
   configuration_type_25a084a4: "Тип конфигурации"
   configure_ecb97e30: Конфигурация
@@ -8302,6 +8311,7 @@ ru:
   contribute_4730e633: Предоставить
   contribute_to_the_page_2116bf3b: "Добавить информацию на страницу"
   contributed_to_this_module_item_and_is_complete_2799d5c: "Этот модуль элемента добавлен и является полным"
+  contributing_to_development_4647b24e: "Вклад в развитие"
   controls_the_final_changes_needed_to_fully_conform_8398b749: |-
       Контролирует окончательные изменения, необходимые для полного соответствия спецификации LTI Platform Storage
       , включая получение сообщений, адресованных правильному источнику OIDC Auth
@@ -10279,7 +10289,7 @@ ru:
     registered_services: "Зарегистрированные сервисы"
     revisions: Редакции
     rubrics: Рубрики
-    search: Поиск
+    search: "Интеллектуальный поиск"
     settings: ~
     site_admin: "Администратор сайта"
     stats: Статистика
@@ -11632,6 +11642,7 @@ ru:
   display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "Отобразить значения"
   displaying_to_students_b1e92058: "Показывается студентам"
+  displayname_9410813e: "%{displayName}"
   displayname_loaded_14d71a0a: "%{displayName} загружено"
   displayname_loading_in_progress_2be325fd: "Выполняется загрузка %{displayName}"
   displayname_loading_pending_3aa2723e: "%{displayName} ожидает загрузки"
@@ -12283,6 +12294,7 @@ ru:
   english_united_kingdom_a613f831: "Английский язык (Великобритания)"
   enhance_color_contrast_of_content_685ddd49: "Повысить цветовую контрастность содержимого"
   enhance_password_options_efbf3e48: "Расширение возможностей паролей"
+  enhance_your_canvas_experience_with_apps_that_offe_ba956afb: "Расширьте возможности Canvas с помощью приложений, которые предлагают библиотеки содержимого, инструменты для совместной работы, аналитику и многое другое. На этой странице вы найдете все функции приложения! Используйте страницу Discover для поиска и установки новых приложений, а страницу Manage — для просмотра и изменения установленных приложений."
   enhanced_docviewer_url_security_72e9baa9: "Расширенная безопасность URL DocViewer"
   enhanced_grade_change_auditing_2b155dfa: "Расширенная проверка изменения оценок"
   enhanced_gradebook_filters_a3be5e7d: "Усовершенствованные фильтры журнала успеваемости"
@@ -13833,6 +13845,7 @@ ru:
   finnish_4df2923d: Финский
   first_5744470e: Первая
   first_9685680a: первый
+  first_item_last_item_of_total_items_displayed_a21552d9: "%{first_item} - %{last_item} из %{total_items} отображается"
   first_last_name_9820d256: "Имя и фамилия"
   first_name_d5c12500: Имя
   first_reviewer_9ea05caa: "Первый рецензент"
@@ -13960,6 +13973,7 @@ ru:
   from_gravatar_58372d5a: "Из Gravatar"
   from_grouptitle_860dff95: "От %{groupTitle}"
   from_the_provider_of_the_enrollments_834d5ae4: "от провайдера регистраций"
+  from_time_e23bdd0f: "С времени"
   front_page_50cae87e: "Первая страница"
   front_page_must_be_set_first_4dbbfdbe: "Вначале должна быть установлена титульная страница"
   front_page_must_be_set_first_c5246f7d: "Сначала следует задать первую страницу"
@@ -14703,6 +14717,7 @@ ru:
       buttons: 
         save: Сохранить
         save_settings: "Сохранить настройки"
+        show_new_sg_ui: "Используйте новый пользовательский интерфейс speedgrader"
         submit_comment: "Отправить комментарий"
       comment_submitted: "Ваш комментарий был отправлен."
       crocodoc_pending: "Crocodoc все еще обрабатывает документ."
@@ -15791,6 +15806,7 @@ ru:
   here_f44564ee: здесь.
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Вот отличная возможность познакомиться с календарем и добавить любые не связанные с заданиями события, которые вы бы хотели провести с курсом. Не волнуйтесь, мы поможем вам разобраться."
   here_s_some_quick_tips_to_get_you_started_in_canva_72425979: "Несколько советов, которые помогут вам начать работать в Canvas!"
+  hh_mm_5faafa69: "чч:мм"
   hi_contrast_373b614f: "Высокий контраст"
   hidden_130c3791: скрыто
   hidden_14a032a7: Скрыто
@@ -16137,6 +16153,7 @@ ru:
       В случае активации Canvas позволяет пользователям возвращать несколько элементов курса
       за один запрос на странице модулей курса
   if_enabled_canvas_will_be_able_to_export_new_quizz_504132df: "Если эта функция включена, Canvas сможет экспортировать новые тесты как часть пакетов экспорта Common Cartridge."
+  if_enabled_canvas_will_be_able_to_share_new_quizze_784525a: "Если эта функция включена, Canvas сможет делиться новыми тестами с Commons."
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Если включено, модули импорта Common Cartridge преобразуют HTML-файлы в станицы"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Если опция включена, дизайнеры контента должны предоставить информацию об авторских правах и лицензии для файлов, прежде чем они будут опубликованы. Применяется только если также включен Просмотр лучшего файла."
   if_enabled_copyright_and_license_information_must__2a551827: "Если включено, информация об авторских правах и лицензии должна предоставляться для файлов до их публикации."
@@ -16216,6 +16233,9 @@ ru:
   if_enabled_the_tool_installation_and_configuration_c974cdb2: |-
       Если эта опция включена, то в формах установки и настройки инструмента, расположенных на страницах настроек учетной записи и курса, будут использоваться
       компоненты InstUI, а не старые, менее доступные собственные компоненты.
+  if_enabled_the_tray_that_allows_users_to_assign_le_7197db0a: |-
+      Если эта опция включена, лоток, позволяющий пользователям назначать объекты изучения, будет оптимизирован для
+      объектов с большим количеством переопределений.
   if_enabled_the_user_s_lti_url_input_on_the_select__fa539830: |-
       Если эта опция включена, то введенный пользователем LTI URL в диалоговом окне выбора содержимого будет перезаписан,
       если инструмент ответит с правильным LTI URL.
@@ -17580,6 +17600,7 @@ ru:
   limit_group_members_to_leave_blank_for_no_limit_c341e248: "Ограничить количество членов группы до (оставьте поле пустым, если ограничение не требуется)"
   limit_groups_to_group_limit_members_40651ea7: "Ограничить группы до %{group_limit} членов"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Ограничить участников для участия в %{num_appointments} мероприятии (мероприятиях)."
+  limit_personal_access_token_creation_to_admins_a9b8d7fe: "Ограничьте создание маркера персонального доступа для администраторов."
   limit_search_to_activity_after_c1ac2449: "Ограничить поиск до событий после"
   limit_search_to_activity_before_e05aad05: "Ограничить поиск до событий до"
   limit_section_privileges_e6425dfd: limit_section_privileges
@@ -17815,6 +17836,8 @@ ru:
   lock_date_cannot_be_after_section_end_d37da70c: "Дата блокировки не может быть позднее окончания раздела"
   lock_date_cannot_be_after_term_end_cf1a188f: "Дата блокировки не может быть позднее окончания семестра"
   lock_date_cannot_be_before_due_date_ac30f54: "Дата блокировки не может быть раньше даты выполнения"
+  lock_date_cannot_be_before_reply_to_topic_due_date_fa73db43: "Дата блокировки не может быть раньше даты отправки ответа в тему"
+  lock_date_cannot_be_before_required_replies_due_da_d2763f71: "Дата блокировки не может быть раньше даты подачи ответов"
   lock_discussion_title_failed_9d49f2d: "Не удалось заблокировать дискуссию %{title}"
   lock_discussion_title_succeeded_fb24ebfc: "Дискуссия %{title} заблокирована"
   lock_icon_a9916601: "заблокировать иконку"
@@ -18031,6 +18054,8 @@ ru:
   lti_add_e3bc0049: "LTI - добавить"
   lti_add_edit_delete_15905170: "LTI - добавить / редактировать / удалить"
   lti_advantage_services_c1746cb4: "Службы LTI Advantage"
+  lti_apps_discover_page_cd95458b: "Страница ознакомления с приложениями LTI"
+  lti_apps_page_bd3867af: "Страница приложений LTI"
   lti_context_id_should_be_unique_7437a74d: "lti_context_id должен быть уникальным"
   lti_deep_linking_for_module_index_menu_881feeee: "Установка глубинных ссылок LTI Deep Linking для меню индекса модулей"
   lti_deep_linking_line_items_5e0079f7: "Элементы строки создания глубинных ссылок LTI"
@@ -18190,6 +18215,7 @@ ru:
   march_2020_responsiveness_f810a65b: "Март 2020 Динамичность"
   march_bbe310ee: Март
   mark_all_announcement_read_eda5292b: "Отметить все объявление как прочитанные"
+  mark_all_announcement_read_f4fc9137: "Отметить все объявление как прочитанные"
   mark_all_as_read_8f3bdf57: "Отметить все как прочитанное"
   mark_all_as_read_a995ffbe: "Отметить все как прочитанные"
   mark_all_as_unread_10e7f0fe: "Отметить все как непрочитанные"
@@ -22233,6 +22259,7 @@ ru:
   outcome_mastery_scales_8c3a814d: "Шкалы выходного уровня усвоения"
   outcome_mastery_scales_add_edit_171551c: "Шкалы выходного уровня усвоения — добавить / редактировать"
   outcome_menu_4fe5813: "Меню результатов"
+  outcome_name_27d81c86: "Имя результата"
   outcome_outcome_id_is_not_available_in_context_con_2143db54: "Результат %{outcome_id} недоступен в контексте %{context_type}#%{context_id}"
   outcome_path_mastery_points: "%{path} баллы усвоения"
   outcome_path_result: "%{path} результат"
@@ -26275,6 +26302,8 @@ ru:
   required_peer_reviews_23bea465: "Требуются рассмотрения коллегами"
   required_replies_8ec3e238: "Требуемые ответы"
   required_replies_due_date_f976c9af: "Дата предоставления требуемого ответа"
+  required_replies_number_d941ee4c: "Требуемые ответы (%{number})"
+  required_replies_required_replies_ab82825e: "Требуемые ответы (%{required_replies})"
   required_replies_requiredreplies_d91bed30: "Требуемые ответы (%{requiredReplies})"
   required_to_view_quiz_results_dba7368b: "Требуется для просмотра результатов контрольной работы"
   required_values_1eb5841f: "Требуемые значения"
@@ -26988,6 +27017,7 @@ ru:
   search_assignments_in_gradebook_and_new_design_for_8f966bcc: "Поиск заданий в Журнале успеваемости и новый дизайн для поиска заданий и учащихся"
   search_by_99d1ba5f: "Поиск по"
   search_by_app_name_company_name_8ea86de: "Поиск по имени приложения и названию компании"
+  search_by_app_or_company_name_ad468715: "Поиск по приложению и названию компании"
   search_by_c559efd: "Поиск по"
   search_by_extension_name_company_name_345e690c: "Поиск по имени расширения и названию компании"
   search_by_name_email_or_id_5fd43dc9: "Поиск по имени, электронной почте или ID"
@@ -27046,6 +27076,7 @@ ru:
   search_users_48b1789e: "Поиск пользователей..."
   search_within_grouptitle_4d38272f: "Искать в %{groupTitle}"
   search_within_outcome_group_7ac6ac88: "Поиск в группе результатов"
+  searchable_content_7a9e0f33: "Доступное для поиска содержание"
   searching_b0207e7f: "Идет поиск"
   searching_for_announcements_in_sections_must_span__80e4dfe4: "Поиск объявлений в разделах должен распространяться только на один курс"
   searching_for_courses_8cc5f904: "Поиск курсов для..."
@@ -27393,6 +27424,7 @@ ru:
       . После установки этого флажка
       UI и API, позволяющие пользователям создавать модули-типы AssignmentOverrides, будут
       включены, и, таким образом, функция будет полностью функциональна.
+  selective_release_optimized_tray_873075ff: "Выборочный выпуск - оптимизированный лоток"
   selective_release_ui_api_changes_a60b681a: "Выборочный выпуск - Изменения UI/API"
   self_enrollments: 
     already_enrolled: 
@@ -28010,7 +28042,8 @@ ru:
       name_pronunciation_header_tip: "Чтобы подтвердить правильность произношения своего имени, введите фонетическое произношение."
       name_pronunciation_label: "Произношение имени:"
       name_pronunciation_label_tip: "Чтобы подтвердить правильность произношения своего имени, введите фонетическое произношение."
-      no_links: "%{name} не добавил ссылки"
+      no_links: "Ссылки не были добавлены"
+      no_name_pronunciation: "Произношение имени не предусмотрено"
       nothing_in_common: "У вас нет ничего общего"
       save_profile: "Сохранить профиль"
       service_contact: "связаться с %{user} при помощи %{service}"
@@ -28019,7 +28052,7 @@ ru:
       titles: 
         click_to_change_profile_pic: "Щелкните, чтобы изменить изображение профиля"
       user_enrolled: Регистрации
-      user_has_no_bio: "%{user} не добавил биографию"
+      user_has_no_bio: "Биография не была добавлена"
       ways_to_contact_user: Контакт
     recent_activity: 
       date_column: Дата
@@ -28700,8 +28733,12 @@ ru:
     threshold_24h: 24h
     threshold_36h: 36h
   smart_assignment_alerts_abc2224: "Умные оповещения о заданиях"
+  smart_search_community_c2a115a2: "Сообщество интеллектуального поиска"
+  smart_search_currently_in_development_for_canvas_u_541c3754: "Интеллектуальный поиск, который в настоящее время разрабатывается для Canvas, использует семантические алгоритмы и искусственный интеллект для понимания контекста запроса и семантического значения, а не только для подбора ключевых слов."
+  smart_search_employs_embeddings_to_mathematically__3c20cdd1: "Интеллектуальный поиск использует «вставки» для математического представления контента и запросов для сравнения, понимания ключевых слов или общих запросов на любом языке благодаря многоязычной модели искусственного интеллекта. Пишите поисковые запросы, используя ключевые слова, вопросы, предложения или то, что наиболее естественно для вас, чтобы описать то, что вы пытаетесь найти."
   smart_search_fd7cd4: "Интеллектуальный поиск"
   smart_search_is_a_feature_of_canvas_that_is_curren_31f7d35d: "Интеллектуальный поиск Smart Search - это функция Canvas, которая в настоящее время находится в разработке.  Используя семантические алгоритмы и искусственный интеллект, новая функция Smart Search понимает контекст запросов, предоставляя более точные и релевантные результаты без необходимости использования традиционных логических операторов или других инструментов поиска."
+  smart_search_is_in_feature_preview_feedback_can_be_7a80049d: "Интеллектуальный поиск находится в стадии предварительного просмотра. Отзывы можно оставлять посредством рейтингов результатов и в сообществе Canvas для Smart Search Beta. Место для сообщества Canvas можно найти здесь: "
   smartbanner: 
     android_banner_author: "Instructure Inc."
     android_banner_in_google_play: "В Google Play"
@@ -29783,7 +29820,7 @@ ru:
     quizzes: "Контрольные работы"
     rubrics: Рубрики
     schedule: Расписание
-    search: Поиск
+    search: "Интеллектуальный поиск"
     settings: Настройки
     syllabus: "Программа обучения"
     tab_location_error: "Неверное расположение вкладки"
@@ -30784,6 +30821,7 @@ ru:
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "Эта оценка отличается от оценки, которую видит студент, потому что некоторые задания были заброкированы"
   this_grade_differs_from_the_student_s_view_of_the__f78d0023: "Эта оценка отличается от взгляда учащегося на оценку, потому что некоторые оценки заданий еще не опубликованы"
   this_grade_has_negative_points_496400d4: "Данная оценка содержит отрицательные баллы"
+  this_grade_is_currently_dropped_for_this_student_7bc78b78: "Эта оценка данного студента в данный момент снята."
   this_grade_is_invalid_8ab192c7: "Данная оценка недействительна"
   this_grade_is_unread_fb79c002: "Эта оценка не прочитана"
   this_grade_is_unusually_high_60533c20: "Данная оценка чрезмерно высокая"
@@ -31061,6 +31099,7 @@ ru:
   thread_addd9799: Путь
   threshold_in_hours_to_notify_students_within_f33820aa: "Порог (в часах) для оповещения студентов в течение"
   threshold_pts_45f0e5d8: "порог: %{pts}"
+  threshold_threshold_a67e73a1: "Порог: %{threshold}"
   throttle_jobs_f61be56: "Отрегулировать задания"
   throttle_tag_tag_ba5b9b50: "Отрегулировать тег \"%{tag}\""
   throttling_jobs_4a90578c: "Регулирование заданий"
@@ -32331,6 +32370,8 @@ ru:
   unlock_date_can_t_be_blank_43efb114: "Дата разблокировки не может быть пустой."
   unlock_date_cannot_be_after_due_date_8829d9ca: "Дата разблокирования не может быть позже даты выполнения"
   unlock_date_cannot_be_after_lock_date_591f7fda: "Дата разблокирования не может быть позже даты блокировки"
+  unlock_date_cannot_be_after_reply_to_topic_due_dat_37eee496: "Дата разблокировки не может быть позже даты ответа в тему"
+  unlock_date_cannot_be_after_required_replies_due_d_df13dbc7: "Дата разблокировки не может быть позже даты отправки ответов"
   unlock_date_cannot_be_before_course_start_9c7b8524: "Дата разблокировки не может быть раньше начала курса"
   unlock_date_cannot_be_before_section_start_793ddc66: "Дата разблокировки не может быть раньше начала раздела"
   unlock_date_cannot_be_before_term_start_d3c01813: "Дата разблокировки не может быть раньше начала семестра"
@@ -32435,6 +32476,7 @@ ru:
   until_date_must_be_after_the_due_date_d961566c: "Дата «До» должна быть после даты «Срок»"
   until_date_must_be_after_the_event_start_date_972f759d: "Дата «До» должна быть после даты начала события"
   until_fccd159a: "До тех пор, пока:"
+  until_time_a6cade90: "До времени"
   untitled_16aa4f2b: "Без названия"
   untitled_assignment_59354b34: "задание без названия"
   untitled_filter_c07b8ddc: "Неназванный фильтр"
@@ -33243,6 +33285,7 @@ ru:
   using_login_attribute_integration_id_9067ea54: "Использование атрибута входа: ID интеграции"
   using_login_attribute_sis_user_id_b5ec538f: "Использование атрибута входа: ID пользователя SIS"
   using_login_attribute_unique_user_id_a307a9f: "Использование атрибута входа: ID уникального пользователя"
+  using_smart_search_aecf6c76: "Использование интеллектуального поиска"
   utc_e44049af: UTC
   uuid_has_been_provisioned_ab0c6c9: "УУИД был предоставлен."
   val_percent_c2ca6679: "%val процент"
@@ -33555,6 +33598,7 @@ ru:
   what_content_is_searchable_375a0670: "Какой контент можно искать?"
   what_does_provisioning_only_mean_eac9a4a1: "Что означает Только Наполнение данными?"
   what_happened_322d8259: "Что случилось?"
+  what_if_grades_7ad8ce0b: "Возможные оценки"
   what_if_score_change_operation_failed_b81afd6d: "Операция по изменению возможной оценки не удалась"
   what_if_score_input_for_assignmentname_d4092efe: "Ввод возможной оценки для %{assignmentName}"
   what_if_score_updated_7565581d: "Возможная оценка обновлена"
@@ -33654,11 +33698,16 @@ ru:
   when_enabled_teachers_can_choose_to_allow_observer_320b555e: |-
       Если эта функция включена, преподаватели могут разрешить наблюдателям назначать встречи
       при создании групп встреч в календаре.
+  when_enabled_the_canvas_api_for_lti_resource_links_25c51eb0: |-
+      Если эта функция включена, можно использовать API Canvas для ссылок на ресурсы LTI. Администраторы могут
+      использовать этот API для получения информации о содержании, возвращаемом инструментами.
   when_enabled_the_hidden_html_forms_that_are_used_t_c5edd929: |-
       При включении этой функции скрытые HTML-формы, используемые для запуска LTI,
       будут иметь случайное число, добавляемое к их идентификатору. В выключенном состоянии каждая из них
       будет иметь одинаковый идентификатор tool_form.
   when_enabled_the_internal_access_manager_will_be_u_bc470109: "Если эта функция включена, то диспетчер внутреннего доступа будет использоваться для управления доступом к определенным запросам"
+  when_enabled_the_lti_apps_discover_page_will_be_av_39ad751c: "Если эта функция включена, страница ознакомления с приложениями LTI будет доступна на странице приложений."
+  when_enabled_the_lti_apps_page_will_be_available_i_23ec031f: "Если эта функция включена, страница приложений LTI будет доступна на боковой панели навигации по учетной записи."
   when_enabled_the_lti_extensions_discover_page_will_8bb57ff6: "Если включено, страница поиска расширений LTI будет доступна на экране расширений."
   when_enabled_the_lti_extensions_page_will_be_avail_ac8ed3fa: "Если включено, страница поиска расширений LTI будет доступна в разделе навигации учетной записи."
   when_enabled_the_new_submission_type_resource_card_c0f45d0d: "Если эта функция включена, то карточка ресурса типа сдаваемой работы будет отображаться на странице редактирования задания."
@@ -34371,6 +34420,7 @@ ru:
   your_azure_active_directory_tenant_name_d8bb31fa: "Ваше имя клиента Azure Active Directory"
   your_browser_connectivity_may_be_slow_or_unstable__97c1f4c5: "Подключение вашего браузера может быть медленным или нестабильным. Несмотря на то, что таймер вашего браузера отключен, ваши ответы будут записываться еще в течение 5 минут после первоначальной продолжительности данной попытки."
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "Ваш браузер не соответствует минимальным требованиям Canvas. Посетите *Сообщество Canvas* для получения полного списка поддерживаемых браузеров."
+  your_canvas_administrators_have_chosen_to_limit_yo_41a4187: "Ваши администраторы Canvas решили ограничить вашу возможность генерировать собственный маркер доступа. Обратитесь к администраторам Canvas, чтобы они сгенерировали маркер доступа от вашего имени."
   your_classic_quizzes_have_been_migrated_to_new_qui_e49244da: "Ваши Классические тестирования были перенесены в Новые тестирования!"
   your_comment_is_not_posted_12677035: "Ваш комментарий не опубликован"
   your_comment_was_auto_saved_as_a_draft_c49d3510: "Ваш комментарий был автоматически сохранен в виде проекта."
@@ -34429,6 +34479,7 @@ ru:
   your_unpublished_changes_will_be_reverted_to_their_fd4ba075: "Ваши неопубликованные изменения будут возвращены в их предыдущее сохраненное состояние."
   your_webcam_may_already_be_in_use_6cd64c25: "Ваша веб-камера может уже использоваться."
   your_work_has_been_submitted_519058f8: "Ваш работа была отправлена."
+  yyyy_mm_dd_cbbd9959: ГГГГ-ММ-ДД
   yyyy_mm_dd_hh_mm_a01b6081: "ГГГГ-ММ-ДД чч:мм"
   z_a_b48d8903: "Z - A"
   z_a_be2ab67c: Z–A

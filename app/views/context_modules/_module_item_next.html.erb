@@ -23,6 +23,7 @@
   completion_criteria ||= nil
   can_direct_share = can_do(@context, @current_user, :direct_share)
   criterion = completion_criteria && completion_criteria.find{|c| c[:id] == module_item.id}
+  show_checkpoints = @context.root_account.feature_enabled?(:discussion_checkpoints) && module_item && module_item.content_type == 'DiscussionTopic' && module_item.content.checkpoints?
 
   @module_item_image_tags ||= {
     'indent' => "<i class='icon-arrow-right'></i>".html_safe,
@@ -55,6 +56,11 @@
     <%= 'student-view' if @is_student %>
     <% if module_item&.content&.respond_to?("can_duplicate?") %>
       <%= 'cannot-duplicate' if !module_item&.content&.can_duplicate?%>
+    <% end %>
+    <% if module_item&.content&.is_a?(Assignment) %>
+      <% if !module_item.content.quiz_lti? || Account.site_admin.feature_enabled?(:commons_new_quizzes) %>
+        <%= 'show_assignment_menu' %>
+      <% end %>
     <% end %>
     <%= module_item.content_type_class(@is_student) if module_item %>
     <%= 'also_assignment' if module_item && module_item.graded? %>
@@ -141,6 +147,14 @@
       </div>
 
       <div class="ig-details">
+        <% if !@is_student && show_checkpoints %>
+            <div class="ig-details__item">
+              <b><%= t('Reply to Topic') %>:</b> <%= datetime_string(module_item.content.reply_to_topic_checkpoint.due_at) || t('No Due Date') %>
+            </div>
+            <div class="ig-details__item">
+              <b><%= t('Required Replies (%{required_replies})', required_replies: module_item.content.reply_to_entry_required_count) %>:</b> <%= datetime_string(module_item.content.reply_to_entry_checkpoint.due_at) || t('No Due Date') %>
+            </div>
+        <%end%>
         <div class="due_date_display ig-details__item"></div>
         <% if module_item&.graded? && (!module_item.try_rescue(:assignment).restrict_quantitative_data?(@current_user, check_extra_permissions: true))%>
             <div class="points_possible_display ig-details__item"></div>
@@ -402,8 +416,43 @@
       </div>
     <% end %>
   </div>
+  <% if @is_student && @context.root_account.feature_enabled?(:discussion_checkpoints) && module_item && module_item.content_type == 'DiscussionTopic' && module_item.content.checkpoints? %>
+    <div class="context_module_item indent_<%= module_item.try_rescue(:indent) || '0' %>">
+      <% checkpoints = [module_item.content.reply_to_topic_checkpoint, module_item.content.reply_to_entry_checkpoint] %>
+      <% checkpoints.each do |checkpoint| %>
+        <div class="ig-row" data-testid="checkpoint" style="display: block;">
+          <% left_padding = case module_item.try_rescue(:indent)
+            when 1 then "60px"
+            when 2 then "80px"
+            when 3 then "100px"
+            when 4 then "120px"
+            when 5 then "140px"
+            else "40px"
+          end %>
+          <span class="ig-type-icon" aria-hidden="true" style="display: inline-block; font-size: 1.125rem; padding-left: <%= left_padding %>">
+            <i class='icon-arrow-nest'></i>
+          </span>
+          <div style="display: inline-block">
+            <div class="module-item-title" style="display: block; margin-left: 10px;">
+              <span class="item_name">
+                <span class="ig-title">
+                  <%= checkpoint.sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC ? t("Reply to Topic") : t("Required Replies (%{number})", number: module_item.content.reply_to_entry_required_count) %>
+                </span>
+              </span>
+            </div>
+            <% if checkpoint.overridden_for(@current_user).due_at %>
+              <div class="ig-details" style="display: block; margin-left: 10px;">
+                <div class="ig-details__item">
+                  <%= datetime_string(checkpoint.overridden_for(@current_user).due_at) %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
 </li>
-
 
 <% if @is_student && @context.feature_enabled?(:peer_reviews_for_a2) && module_item && module_item.content_type == 'Assignment' %>
   <div id="module_student_view_peer_reviews_<%= module_item.content_id %>_<%= module_item.context_module_id %>"></div>

@@ -17,12 +17,12 @@
  */
 
 import React, {useCallback, useState} from 'react'
-import {useEditor, useNode, type Node} from '@craftjs/core'
-import {SectionMenu, SectionMenuProps} from '../../../editor/SectionMenu'
+import {useNode, type Node} from '@craftjs/core'
+import {SectionMenu, type SectionMenuProps} from '../../../editor/SectionMenu'
 import {AnnouncementModal} from './AnnouncementModal'
+import {type AnnouncementSectionProps} from './types'
 
 const AnnouncementSectionMenu = ({onAddSection}: SectionMenuProps) => {
-  const {actions} = useEditor()
   const {
     actions: {setProp},
     props,
@@ -41,7 +41,7 @@ const AnnouncementSectionMenu = ({onAddSection}: SectionMenuProps) => {
 
   const handleSelectAnnouncement = useCallback(
     (newAnnouncementId: string) => {
-      setProp(prps => {
+      setProp((prps: AnnouncementSectionProps) => {
         prps.announcementId = newAnnouncementId
       })
     },

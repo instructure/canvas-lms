@@ -182,6 +182,7 @@ he:
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "טבלה שכוללת את נתוני סכימת ההערכה. כל שורה כוללת שם, אחוז מרבי, ואחוז מזערי. בנוסף, כל שורה כוללת כפתור להוספה של שורה חדשה מתחת, וכפתור לביטול השורה הנוכחית."
   a_z_243c3301: A-Z
   a_z_29d8e67c: "א - ת"
+  about_70c18bba: אודות
   about_this_service_b10bc808: "אודות שירות זה"
   academic_benchmark: 
     no_api_key: "נדרש מפתח API כדי להשתמש באמות מדה אקדמיות"
@@ -2246,6 +2247,7 @@ he:
   announcement: 
     no_title: "אין כותרת"
   announcement_creation_failed_f7d227f5: "יצירת הכרזה נכשלה"
+  announcement_e37d6dbd: הכרזה
   announcement_ends_at_4ccc2a7e: "תוקף ההכרזה מסתיים במועד"
   announcement_fb4cb645: הכרזה
   announcement_not_found_d6d124c3: "ההכרזה לא נמצאה"
@@ -4575,6 +4577,7 @@ he:
       concluded_conferences: "שיחות ועידה שנסתיימו וסוכמו"
       conference: "שיחת ועידה"
       conference_header: "שיחות ועידה"
+      conferences: כנסים
       new_conference: "שיחת ועידה חדשה"
       new_conferences: "שיחות ועידה חדשות"
       page_title: "ועידות אינטרנטיות"
@@ -12958,6 +12961,7 @@ he:
   moderator_sortorder_18063692: "מנחה%{sortOrder}"
   modified_by_c1584b3c: "עודכן ע\"י"
   module_90d9fd32: מודול
+  module_9775f804: מודול
   module_completed_50c50762: "המודול הושלם"
   module_filter_63b17d11: "מסנן מודולים"
   module_first_to_last_6921f3ec: "מודולים - מראשון לאחרון"
@@ -13204,6 +13208,7 @@ he:
   nav_logo_background_ba33fb7f: "רקע לוגו ניווט"
   nav_text_94206145: "כותרת ניווט"
   nav_text_active_a924ae88: "מלל ניווט במצב פעיל"
+  navigation_ee9af92d: ניווט
   near_mastery_f25174a4: "קרוב להתמחות"
   need_a_canvas_account_221d18ed: "זקוקים לחשבון קנבס?"
   need_help_setting_up_your_course_2b763141: "יש צורך בעזרה בהקמת הקורס שלך?"
@@ -19062,6 +19067,7 @@ he:
   text_entry_submission_7b0ae0c5: "הגשת מלל מוקלד"
   text_entry_submission_cannot_be_empty_3d187cae: "הגשת תוכן מילולי אינה יכולה להשאר ריקה"
   text_input_d3480b8c: "קלט מילולי"
+  text_sms_4e2d82a7: "טקסט (מסרון)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "חשבון המשתמש בוטל. יש ליצור קשר עם מנהל המערכת שלך כדי שיפעיל את החשבון מחדש."
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "מזהה החשבון של החשבון אליו המשתמש המדווח שייך"
   the_announcement_title_could_not_be_linked_to_the__78c747f3: "לא ניתן היה לקשר את ההכרזה \"%{title}\" למודול \"%{mod_title}\""

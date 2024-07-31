@@ -38,6 +38,8 @@ const locale = {
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "Соседние ссылки с одним и тем же URL-адресом должны быть объединены в одну ссылку."
   },
+  "ai_response_9624e8e8": { "message": "Ответ ИИ" },
+  "ai_tools_fda01177": { "message": "Инструменты ИИ" },
   "aleph_f4ffd155": { "message": "Алеф" },
   "align_11050992": { "message": "Согласовать" },
   "alignment_and_lists_5cebcb69": { "message": "Согласование и списки" },
@@ -55,6 +57,9 @@ const locale = {
   },
   "an_error_occurred_making_a_network_request_d1bda348": {
     "message": "Произошла ошибка, что привело к созданию сетевого запроса"
+  },
+  "an_error_occurred_processing_your_request_a3a38d84": {
+    "message": "Произошла ошибка при обработке вашего запроса"
   },
   "an_error_occurred_uploading_your_media_71f1444d": {
     "message": "Произошла ошибка при отправке вашего мультимедиа."
@@ -191,6 +196,7 @@ const locale = {
   "column_e1ae5c64": { "message": "Колонка" },
   "column_group_1c062368": { "message": "Группа колонок" },
   "complex_numbers_a543d004": { "message": "Комплексные числа" },
+  "compose_44c904f4": { "message": "Составить" },
   "computer_1d7dfa6f": { "message": "Компьютер" },
   "congruent_5a244acd": { "message": "Согласующийся" },
   "contains_311f37b7": { "message": "Содержит" },
@@ -204,6 +210,7 @@ const locale = {
   "content_subtype_5ce35e88": { "message": "Подтип контента" },
   "content_type_2cf90d95": { "message": "Тип содержимого" },
   "coproduct_e7838082": { "message": "Сопутствующий продукт" },
+  "copy_9748f9f": { "message": "Копировать" },
   "copyright_holder_66ee111": { "message": "Правообладатель:" },
   "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
     "message": "Не удалось вставить содержимое: Элементы \"{ itemType }\" в настоящее время не поддерживаются в Canvas."
@@ -280,6 +287,7 @@ const locale = {
   "discussions_a5f96392": { "message": "Обсуждения" },
   "discussions_index_6c36ced": { "message": "Индекс обсуждений" },
   "disjoint_union_e74351a8": { "message": "Несвязное объединение" },
+  "dislike_14befc48": { "message": "Не нравится" },
   "display_options_315aba85": { "message": "Опции отображения" },
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Показать текстовую ссылку (открывается в новой вкладке)"
@@ -345,6 +353,7 @@ const locale = {
   },
   "enter_replacement_text_17631bbc": { "message": "ввести текст для замены" },
   "enter_search_text_26cb4459": { "message": "ввести текст для поиска" },
+  "enter_text_8b35c65b": { "message": "Введите текст" },
   "epsilon_54bb8afa": { "message": "Эпсилон" },
   "epsilon_variant_d31f1e77": { "message": "Эпсилон (вариант)" },
   "equals_sign_c51bdc58": { "message": "Знак равенства" },
@@ -375,6 +384,9 @@ const locale = {
   "f_function_fe422d65": { "message": "F (функция)" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Не удалось получить содержание файлов"
+  },
+  "failed_to_copy_response_d3def551": {
+    "message": "Не удалось скопировать ответ"
   },
   "failed_to_retrieve_content_from_external_tool_5899c213": {
     "message": "Не удалось получить содержимое из внешнего инструмента"
@@ -465,6 +477,12 @@ const locale = {
   "health_icon_8d292eb5": { "message": "Значок здоровья" },
   "hearts_suit_e50e04ca": { "message": "Червы (масть)" },
   "height_69b03e15": { "message": "Высота" },
+  "hello_please_describe_the_modifications_you_would__49b19837": {
+    "message": "Здравствуйте! Опишите изменения, которые вы хотели бы внести в свое сочинение."
+  },
+  "hello_please_describe_the_modifications_you_would__600dbbf0": {
+    "message": "Здравствуйте! Опишите изменения, которые вы хотели бы внести в свой выбор."
+  },
   "hexagon_d8468e0d": { "message": "Шестиугольник" },
   "hide_description_bfb5502e": { "message": "Скрыть описание" },
   "hide_title_description_caf092ef": { "message": "Скрыть описание { title }" },
@@ -478,6 +496,9 @@ const locale = {
     "message": "Разрешение на использование данного файла получено."
   },
   "i_hold_the_copyright_71ee91b1": { "message": "Я являюсь правообладателем" },
+  "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
+    "message": "Извините, но я не могу найти ответ ИИ."
+  },
   "icon_215a1dc6": { "message": "Значок" },
   "icon_8168b2f8": { "message": "значок" },
   "icon_color_b86dd6d6": { "message": "Цвет значка" },
@@ -667,6 +688,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Минус/Плюс" },
   "misc_3b692ea7": { "message": "Различное" },
   "miscellaneous_e9818229": { "message": "Разное" },
+  "modify_6b0b13e3": { "message": "Изменить" },
   "module_90d9fd32": { "message": "Модуль" },
   "modules_c4325335": { "message": "Модули" },
   "moving_image_to_crop_directionword_6f66cde2": {
@@ -817,6 +839,9 @@ const locale = {
   "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
     "message": "Разрешите Canvas доступ к вашему микрофону и веб-камере."
   },
+  "please_decribe_what_you_would_like_to_compose_27a51be5": {
+    "message": "Опишите, что вы хотите сочинить."
+  },
   "plus_d43cd4ec": { "message": "Плюс" },
   "plus_minus_f8be2e83": { "message": "Плюс/Минус" },
   "posted_when_a578f5ab": { "message": "Размещено: { when }" },
@@ -885,10 +910,14 @@ const locale = {
   },
   "reset_95a81614": { "message": "Восстановить" },
   "resize_ec83d538": { "message": "Изменить размер" },
+  "response_copied_to_clipboard_130d66cd": {
+    "message": "Ответ скопирован в буфер обмена"
+  },
   "restore_auto_save_deccd84b": { "message": "Восстановить автосохранение?" },
   "result_index_of_max_7db5ad8b": {
     "message": "Результат { index } из { max }."
   },
+  "retry_ebd5f8ba": { "message": "Повторить" },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "Перевернутый турникет (не возвращает значение)"
   },
@@ -973,6 +1002,7 @@ const locale = {
     "message": "Нажать Shift-O, чтобы открыть редактор Pretty HTML."
   },
   "shortcut_911d6255": { "message": "Ярлык" },
+  "show_all_967a90f0": { "message": "Показать все" },
   "show_audio_options_b489926b": { "message": "Показать параметры звука" },
   "show_image_options_1e2ecc6b": { "message": "Показать варианты изображения" },
   "show_link_options_545338fd": { "message": "Показать параметры ссылки" },
@@ -1283,6 +1313,7 @@ const locale = {
   "view_word_and_character_counts_a743dd0c": {
     "message": "Просмотреть подсчет количества слов и символов"
   },
+  "waiting_for_response_1efd0c50": { "message": "В ожидании ответа" },
   "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
     "message": "Не удалось обнаружить работающий микрофон, подключенный к вашему устройству."
   },
@@ -1297,6 +1328,7 @@ const locale = {
   "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
     "message": "Веб-страницы должны иметь только один H1, который автоматически используется в качестве заголовка страницы. Первый заголовок в вашем содержимом должен быть H2."
   },
+  "what_would_you_like_to_do_6dc0d541": { "message": "Что вы хотите сделать?" },
   "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
     "message": "Когда используется разметка, которая визуально форматирует элементы в виде списка, но не указывает на отношение списка, пользователи могут испытывать трудности при просмотре информации."
   },
@@ -1311,6 +1343,7 @@ const locale = {
   "word_count_c77fe3a6": { "message": "Количество слов" },
   "words_b448b7d5": { "message": "Cлова" },
   "wreath_product_200b38ef": { "message": "Веночное произведение" },
+  "writing_assistant_a30ac16a": { "message": "Помощник по написанию текстов" },
   "xi_149681d0": { "message": "Кси" },
   "yes_dde87d5": { "message": "Да" },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {

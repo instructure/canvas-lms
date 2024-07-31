@@ -69,6 +69,10 @@
 .font7 {font-family: 'trebuchet ms', geneva;}
 .font8 {font-family: verdana, geneva;}
 
+.block {
+  position: relative;
+}
+
 .page-block {
   background: transparent;
   padding: 16px;

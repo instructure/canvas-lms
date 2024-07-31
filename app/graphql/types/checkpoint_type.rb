@@ -42,6 +42,16 @@ module Types
           "when this checkpoint is due for 'Everyone'",
           null: true
 
+    field :unlock_at,
+          DateTimeType,
+          "when this checkpoint is available from for 'Everyone'",
+          null: true
+
+    field :lock_at,
+          DateTimeType,
+          "when this checkpoint is closed for 'Everyone'",
+          null: true
+
     field :only_visible_to_overrides,
           Boolean,
           "specifies that this checkpoint is only assigned to students for whom an override applies",

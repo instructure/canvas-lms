@@ -454,6 +454,7 @@ export function K5Course({
   gradingScheme,
   pointsBasedGradingScheme,
   restrictQuantitativeData,
+  scalingFactor,
 }) {
   const initialObservedId = observedUsersList.find(o => o.id === savedObservedId(currentUser.id))
     ? savedObservedId(currentUser.id)
@@ -671,6 +672,7 @@ export function K5Course({
             gradingScheme={gradingScheme}
             pointsBasedGradingScheme={pointsBasedGradingScheme}
             restrictQuantitativeData={restrictQuantitativeData}
+            scalingFactor={scalingFactor}
           />
         )}
         <ResourcesPage
@@ -737,6 +739,7 @@ K5Course.propTypes = {
   gradingScheme: PropTypes.array,
   pointsBasedGradingScheme: PropTypes.bool,
   restrictQuantitativeData: PropTypes.bool,
+  scalingFactor: PropTypes.number,
 }
 
 const WrappedK5Course = connect(mapStateToProps)(K5Course)

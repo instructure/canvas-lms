@@ -190,7 +190,7 @@ module Lti
           launch_payload = fetch_and_delete_launch(context, verifier)
           raise InvalidLaunch, "no payload found in cache" if launch_payload.nil?
 
-          JSON.parse(launch_payload).merge({ nonce: oidc_params[:nonce] })
+          Lti::Messages::JwtMessage.cached_hash_to_launch(JSON.parse(launch_payload), oidc_params[:nonce])
         end
       end
 

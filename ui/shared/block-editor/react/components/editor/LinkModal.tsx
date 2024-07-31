@@ -18,7 +18,6 @@
 
 import React, {useCallback, useState} from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {TextInput} from '@instructure/ui-text-input'

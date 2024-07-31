@@ -147,6 +147,22 @@ module CustomWaitMethods
     wait_for_animations(bridge)
   end
 
+  DIALOG_COUNT_SCRIPT = "return document.querySelectorAll('[role=dialog]').length"
+
+  # ensure InstUI React modals are properly closed
+  def wait_for_dialog_close(bridge = nil)
+    bridge = driver if bridge.nil?
+
+    if (count = bridge.execute_script(DIALOG_COUNT_SCRIPT)) > 1
+      raise SlowCodePerformance, "Multiple dialogs found: #{count}"
+    end
+
+    res = StatePoller.await(0) { bridge.execute_script(DIALOG_COUNT_SCRIPT) || 0 }
+    if res[:got] > 0
+      raise SlowCodePerformance, "Dialog did not close within #{res[:spent]}s: found #{res[:got]} dialogs"
+    end
+  end
+
   def wait_for_initializers(bridge = nil)
     bridge = driver if bridge.nil?
 

@@ -19,11 +19,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
+import {QueryProvider, queryClient} from '@canvas/query'
 
 import ready from '@instructure/ready'
 
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.disableWhileLoading'
+import DashboardWrapper from './react/DashboardWrapper'
 // eslint-disable-next-line import/no-named-as-default
 import DashboardHeader from './react/DashboardHeader'
 
@@ -32,20 +34,30 @@ ready(() => {
   if (dashboardHeaderContainer) {
     const dashboard_view = ENV.PREFERENCES.dashboard_view
 
-    ReactDOM.render(
-      <DashboardHeader
-        dashboard_view={dashboard_view}
-        allowElementaryDashboard={!!ENV.ALLOW_ELEMENTARY_DASHBOARD}
-        isElementaryUser={!!ENV.K5_USER}
-        planner_enabled={ENV.STUDENT_PLANNER_ENABLED}
-        flashError={$.flashError}
-        flashMessage={$.flashMessage}
-        screenReaderFlashMessage={$.screenReaderFlashMessage}
-        env={window.ENV}
-        {...$(dashboardHeaderContainer).data('props')}
-      />,
-      dashboardHeaderContainer
-    )
+    const dashcard_query_enabled = !!ENV?.FEATURES?.dashboard_graphql_integration
+
+    const dashboardProps = {
+      dashboard_view,
+      allowElementaryDashboard: !!ENV.ALLOW_ELEMENTARY_DASHBOARD,
+      isElementaryUser: !!ENV.K5_USER,
+      planner_enabled: ENV.STUDENT_PLANNER_ENABLED,
+      flashError: $.flashError,
+      flashMessage: $.flashMessage,
+      screenReaderFlashMessage: $.screenReaderFlashMessage,
+      env: window.ENV,
+      ...$(dashboardHeaderContainer).data('props'),
+    }
+
+    if (dashcard_query_enabled) {
+      ReactDOM.render(
+        <QueryProvider>
+          <DashboardWrapper {...dashboardProps} />
+        </QueryProvider>,
+        dashboardHeaderContainer
+      )
+    } else {
+      ReactDOM.render(<DashboardHeader {...dashboardProps} />, dashboardHeaderContainer)
+    }
   } else {
     // if we are on the root dashboard page, then we conditinally load the
     // stream items and initialize the backbone view in DashboardHeader

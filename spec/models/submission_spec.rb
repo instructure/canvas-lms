@@ -7138,20 +7138,32 @@ describe Submission do
     before do
       @teacher = course_with_user("TeacherEnrollment", course: @course, name: "Teacher", active_all: true).user
       ta = course_with_user("TaEnrollment", course: @course, name: "First Ta", active_all: true).user
-      student = course_with_user("StudentEnrollment", course: @course, name: "Student", active_all: true).user
-      assignment = @course.assignments.create!(name: "plain assignment")
-      assignment.ensure_post_policy(post_manually: true)
-      @submission = assignment.submissions.find_by(user: student)
-      @student_comment = @submission.add_comment(author: student, comment: "Student comment")
+      @student = course_with_user("StudentEnrollment", course: @course, name: "Student", active_all: true).user
+      @assignment = @course.assignments.create!(name: "plain assignment")
+      @assignment.ensure_post_policy(post_manually: true)
+      @submission = @assignment.submissions.find_by(user: @student)
+      @student_comment = @submission.add_comment(author: @student, comment: "Student comment")
       @teacher_comment = @submission.add_comment(author: @teacher, comment: "Teacher comment", draft_comment: true)
       @ta_comment = @submission.add_comment(author: ta, comment: "Ta comment")
     end
 
     describe "#comments_excluding_drafts_for" do
+      it "doesn't blow up when the submission has no course" do
+        @submission.course = nil
+        expect { @submission.comments_excluding_drafts_for(@teacher) }.not_to raise_error
+      end
+
       it "returns non-draft comments, filtering out draft comments" do
         comments = @submission.comments_excluding_drafts_for(@teacher)
         expect(comments).to include @student_comment, @ta_comment
         expect(comments).not_to include @teacher_comment
+      end
+
+      it "does not return hidden comments if the user is a student and the comment has not been posted" do
+        hidden_comment = @submission.add_comment(author: @teacher, comment: "Hidden comment", hidden: true)
+        @assignment.ensure_post_policy(post_manually: false)
+        comments = @submission.comments_excluding_drafts_for(@student)
+        expect(comments).not_to include hidden_comment
       end
 
       context "when comments are preloaded" do

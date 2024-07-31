@@ -25,6 +25,7 @@ import {Modal} from '@instructure/ui-modal'
 import {Link} from '@instructure/ui-link'
 import {Heading} from '@instructure/ui-heading'
 import {CloseButton} from '@instructure/ui-buttons'
+import type {ViewOwnProps} from '@instructure/ui-view'
 
 const I18n = useI18nScope('HelpLinks')
 
@@ -32,14 +33,31 @@ interface LoginHelpProps {
   linkText: string
 }
 
+export const getVisibleTextContent = (element: HTMLElement): string => {
+  return (
+    Array.from(element.childNodes)
+      .filter(
+        node =>
+          node.nodeType === Node.TEXT_NODE ||
+          (node instanceof HTMLElement && getComputedStyle(node).display !== 'none')
+      )
+      .map(node => node.textContent?.trim())
+      // remove empty strings using Boolean operation
+      .filter(Boolean)
+      .join(' ')
+      .trim()
+  )
+}
+
 const modalLabel = () => I18n.t('Login Help for %{canvas}', {canvas: 'Canvas LMS'})
 
 const LoginHelp = ({linkText}: LoginHelpProps): JSX.Element => {
   // Initial modal state is open, because this whole thing initially
-  // loads in response to to the user clicking on the bare "help" link.
+  // loads in response to the user clicking on the bare "help" link.
   const [open, setOpen] = useState(true)
 
-  function openHelpModal(): void {
+  function openHelpModal(event: React.MouseEvent<ViewOwnProps>): void {
+    event.preventDefault()
     setOpen(true)
   }
 
@@ -77,11 +95,14 @@ export function renderLoginHelp(loginLink: Element): void {
   // wrap the help link in a span we can hang the modal off of.
   // then render the React modal into it. Be sure we're actually
   // getting an anchor element.
-  if (loginLink.tagName !== 'A') throw new TypeError('loginLink must be an <a> element')
-  const linkText = loginLink.textContent ?? ''
+  const anchorElement = loginLink.closest('a')
+  if (!anchorElement) {
+    throw new TypeError('Element must be an <a> element or a descendant of an <a> element')
+  }
+  const linkText = getVisibleTextContent(anchorElement as HTMLElement)
   const wrapper = document.createElement('span')
-  loginLink.replaceWith(wrapper)
-  wrapper.appendChild(loginLink)
+  anchorElement.replaceWith(wrapper)
+  wrapper.appendChild(anchorElement)
   ReactDOM.render(
     <QueryProvider>
       <LoginHelp linkText={linkText} />
@@ -89,3 +110,5 @@ export function renderLoginHelp(loginLink: Element): void {
     wrapper
   )
 }
+
+export default LoginHelp

@@ -56,6 +56,7 @@ const GradeSummaryShape = {
   gradingScheme: PropTypes.array,
   pointsBasedGradingScheme: PropTypes.bool,
   restrictQuantitativeData: PropTypes.bool,
+  scalingFactor: PropTypes.number,
 }
 
 export const GradeCourseImage = ({onClick, courseImage, courseColor, size = DEFAULT_SIZE}) => (
@@ -102,11 +103,12 @@ export const GradeSummaryLine = ({
   gradingScheme,
   pointsBasedGradingScheme,
   restrictQuantitativeData,
+  scalingFactor,
 }) => {
   let gradeText = grade
   let isPercentage = false
   if (restrictQuantitativeData) {
-    gradeText = scoreToGrade(score, gradingScheme, pointsBasedGradingScheme)
+    gradeText = scoreToGrade(score, gradingScheme, pointsBasedGradingScheme, scalingFactor)
   } else if (!grade) {
     if (score || score === 0) {
       gradeText = I18n.toPercentage(score, {

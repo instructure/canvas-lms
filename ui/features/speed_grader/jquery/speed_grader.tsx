@@ -157,6 +157,7 @@ import replaceTags from '@canvas/util/replaceTags'
 import type {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
 import type {
   RubricAssessmentUnderscore,
+  RubricOutcomeUnderscore,
   RubricUnderscoreType,
 } from '../react/RubricAssessmentTrayWrapper/utils'
 
@@ -554,6 +555,18 @@ function handleStudentOrSectionSelected(
 function initDropdown() {
   const hideStudentNames = utils.shouldHideStudentNames()
   $('#hide_student_names').prop('checked', hideStudentNames)
+
+  $('#show_new_sg_ui').on('click', function () {
+    const searchParams = new URLSearchParams(window.location.search)
+
+    if (searchParams.has('platform_sg')) {
+      searchParams.set('platform_sg', 'true')
+
+      const newUrl = window.location.pathname + '?' + searchParams.toString()
+
+      window.location.href = newUrl
+    }
+  })
 
   const optionsArray = window.jsonData.studentsWithSubmissions.map(
     (student: StudentWithSubmission) => {
@@ -1910,6 +1923,7 @@ EG = {
     ReactDOM.render(
       <RubricAssessmentTrayWrapper
         rubric={ENV.rubric as RubricUnderscoreType}
+        rubricOutcomeData={ENV.rubric_outcome_data as RubricOutcomeUnderscore[]}
         onAccessorChange={accessorId => {
           $('#rubric_assessments_select').val(accessorId)
           handleSelectedRubricAssessmentChanged()

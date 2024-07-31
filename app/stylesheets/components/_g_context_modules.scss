@@ -585,7 +585,7 @@ $context_module_bg_color: $ic-color-light;
   }
 }
 
-.context_module_item:not(.assignment) {
+.context_module_item:not(.show_assignment_menu) {
   li.assignment_menu {
     display: none;
   }

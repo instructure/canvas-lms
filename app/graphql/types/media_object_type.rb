@@ -55,6 +55,8 @@ module Types
     field :media_tracks, [Types::MediaTrackType], null: true
 
     field :media_download_url, String, null: true
+
+    field :thumbnail_url, String, null: true
     def media_download_url
       opts = {
         download: "1",

@@ -342,6 +342,7 @@ en-AU:
   a_z_29d8e67c: "A - Z"
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "Ability to submit annotatable document assignments."
   ability_to_submit_student_annotation_assignments_9ee47e3f: "Ability to submit student annotation assignments."
+  about_smart_search_c8e7fcb4: "About Smart Search"
   about_this_service_b10bc808: "About this service"
   above_max_rating_64b29915: "Above max rating"
   academic_benchmark: 
@@ -2769,6 +2770,7 @@ en-AU:
       Allow Live Event Subscription to be set to be delivered
       via HTTPS webhooks
   allow_lor_tools: "Allow users to view and use external tools configured for LOR."
+  allow_lti_1_3_resource_links_api_341599b: "Allow LTI 1.3 Resource Links API"
   allow_lti_tools_to_have_an_editor_button_icon_with_15c1342a: "Allow LTI tools to have an editor button icon without placement (use the default tool icon)"
   allow_migration_of_quizzes_during_course_copy_and__35d80756: "Allow migration of quizzes during course copy and import"
   allow_moderator_to_review_multiple_independent_gra_c59d64f6: "Allow moderator to review multiple independent marks for selected submissions"
@@ -4092,6 +4094,7 @@ en-AU:
   are_you_sure_you_want_to_delete_this_enrollment_74ecfeb1: "Are you sure you want to delete this enrolment?"
   are_you_sure_you_want_to_delete_this_entry_9aecd6d3: "Are you sure you want to delete this entry?"
   are_you_sure_you_want_to_delete_this_event_824b1e33: "Are you sure you want to delete this event?"
+  are_you_sure_you_want_to_delete_this_event_deletin_30f256d2: "Are you sure you want to delete this event? Deleting this event will also delete the associated assignment."
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "Are you sure you want to delete this marking period set?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Are you sure you want to delete this marking period?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Are you sure you want to delete this marking scheme?"
@@ -4157,6 +4160,7 @@ en-AU:
   as_of_a036fa2e: "As of"
   as_of_date_the_lti_1_3_oidc_auth_endpoint_has_chan_a8783bc6: "As of %{date}, the LTI 1.3 OIDC Auth endpoint has changed from https://canvas.instructure.com/api/lti/authorize_redirect to https://sso.canvaslms.com/api/lti/authorize_redirect. The reasoning and scope of this change is detailed in *this Canvas Community article*, and additional information is available in our API docs. This change is small and will not take very long, but requires configuration change on the tool side for every LTI 1.3 tool that is installed in Canvas."
   as_of_date_the_lti_1_3_platform_storage_specificat_74b82d8d: "As of %{date}, the LTI 1.3 Platform Storage specification is fully supported by Canvas. Tools wishing to implement this must change the OIDC Auth endpoint they store for Canvas from *https://canvas.instructure.com/api/lti/authorize_redirect* to *https://sso.canvaslms.com/api/lti/authorize_redirect*. The OIDC Auth endpoint recommended for new 1.3 tool installations has also changed, and we recommend that all 1.3 tools switch their configuration to use this new endpoint as soon as they can."
+  as_of_june_1_2024_searchable_items_include_content_62e31b5a: "As of June 1, 2024, searchable items include content pages, announcements, discussion prompts, and assignment descriptions, with plans to expand."
   as_of_june_1_2024_the_smart_search_feature_is_quer_cced176f: "As of June 1, 2024, the Smart Search feature is querying the following items (including titles) within a course: content pages, announcements, discussion prompts, assignment descriptions."
   as_primary_c07e9394: "As primary"
   as_secondary_ab10dec8: "As secondary"
@@ -5434,6 +5438,7 @@ en-AU:
   available_from_f84e4611: "Available from"
   available_from_field_for_styleguide_7ced3861: "Available From field for styleguide"
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "Available from - Format Like YYYY-MM-DD hh:mm"
+  available_from_time_86bf4e22: "Available From Time"
   available_pronouns_b45330b1: "Available Pronouns"
   available_submission_types_1c577ae5: "Available submission types"
   available_to_b7350e02: "Available to"
@@ -5445,6 +5450,7 @@ en-AU:
   available_until_field_for_styleguide_85d5d65a: "Available Until field for styleguide"
   available_until_format_like_yyyy_mm_dd_hh_mm_622378d6: "Available until - Format Like YYYY-MM-DD hh:mm"
   available_until_lock_at_ab022445: "Available until %{lock_at}"
+  available_until_time_818f35d: "Available Until Time"
   available_until_untildate_b926fe11: "Available until %{untilDate}"
   availableslots_available_87b8b69d: "%{availableSlots} Available"
   availableslots_more_available_be5193a8: "%{availableSlots} more available"
@@ -6570,6 +6576,7 @@ en-AU:
   cap_the_number_of_rces_rendered_on_initial_page_lo_c3890aec: |-
       Cap the number of RCEs rendered on initial page load. After that
       initialise each as it is about to enter the viewport.
+  captcha_failed_to_load_52251e9f: "Captcha failed to load"
   caption_1cf95987: Caption
   captions_inherited_from_a_parent_course_cannot_be__9248fa3a: "Captions inherited from a parent course cannot be removed."
   captions_subtitles_af2c47e: Captions/Subtitles
@@ -7117,6 +7124,7 @@ en-AU:
   common_cartridge_qti_new_quizzes_import_58b786ce: "Common Cartridge QTI New Quizzes Import"
   common_timezones_2b00baba: "Common Time Zones"
   commons_ed0252fb: Commons
+  commons_new_quizzes_support_cb162314: "Commons New Quizzes Support"
   communicate_course_objectives_f457158c: "Communicate course objectives"
   communicate_grading_expectations_484a1f01: "Communicate marking expectations"
   communicate_to_your_students_exactly_what_will_be__57a679c5: |-
@@ -7467,6 +7475,7 @@ en-AU:
   config_url_e96ceaf3: "Config URL"
   configurate_tool_app_5a721f2c: "Configurate %{tool} App?"
   configuration_error_906691a5: "Configuration error"
+  configuration_json_cannot_be_empty_f3664d30: "Configuration JSON cannot be empty."
   configuration_location_ee0f6592: "Configuration Location"
   configuration_type_25a084a4: "Configuration Type"
   configure_ecb97e30: Configure
@@ -8217,6 +8226,7 @@ en-AU:
   contribute_4730e633: Contribute
   contribute_to_the_page_2116bf3b: "Contribute to the page"
   contributed_to_this_module_item_and_is_complete_2799d5c: "Contributed to this module item and is complete"
+  contributing_to_development_4647b24e: "Contributing to Development"
   controls_the_final_changes_needed_to_fully_conform_8398b749: |-
       Controls the final changes needed to fully conform to the LTI Platform Storage
       spec, including receiving messages addressed to the correct OIDC Auth
@@ -10045,7 +10055,7 @@ en-AU:
     registered_services: "Registered Services"
     revisions: Revisions
     rubrics: Rubrics
-    search: Search
+    search: "Smart Search"
     settings: ~
     site_admin: "Site Admin"
     stats: Statistics
@@ -11346,6 +11356,7 @@ en-AU:
   display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "Display Values"
   displaying_to_students_b1e92058: "Displaying to Students"
+  displayname_9410813e: "%{displayName}"
   displayname_loaded_14d71a0a: "%{displayName} loaded"
   displayname_loading_in_progress_2be325fd: "%{displayName} loading in progress"
   displayname_loading_pending_3aa2723e: "%{displayName} loading pending"
@@ -11993,6 +12004,7 @@ en-AU:
   english_united_kingdom_a613f831: "English (United Kingdom)"
   enhance_color_contrast_of_content_685ddd49: "Enhance colour contrast of content"
   enhance_password_options_efbf3e48: "Enhance password options"
+  enhance_your_canvas_experience_with_apps_that_offe_ba956afb: "Enhance your Canvas experience with apps that offer content libraries, collaboration tools, analytics, and more. This page is your hub for all app features! Use the Discover page to find and install new apps, and the Manage page to review and modify your installed apps."
   enhanced_docviewer_url_security_72e9baa9: "Enhanced DocViewer URL Security"
   enhanced_grade_change_auditing_2b155dfa: "Enhanced grade change auditing"
   enhanced_gradebook_filters_a3be5e7d: "Enhanced Markbook Filters"
@@ -13485,6 +13497,7 @@ en-AU:
   finnish_4df2923d: Finnish
   first_5744470e: First
   first_9685680a: first
+  first_item_last_item_of_total_items_displayed_a21552d9: "%{first_item} - %{last_item} of %{total_items} displayed"
   first_last_name_9820d256: "First, Last Name"
   first_name_d5c12500: "First Name"
   first_reviewer_9ea05caa: "First reviewer"
@@ -13600,6 +13613,7 @@ en-AU:
   from_gravatar_58372d5a: "From Gravatar"
   from_grouptitle_860dff95: "From %{groupTitle}"
   from_the_provider_of_the_enrollments_834d5ae4: "from the provider of the enrolments"
+  from_time_e23bdd0f: "From Time"
   front_page_50cae87e: "Front Page"
   front_page_must_be_set_first_4dbbfdbe: "Front page must be set first"
   front_page_must_be_set_first_c5246f7d: "Front Page must be set first"
@@ -14325,6 +14339,7 @@ en-AU:
       buttons: 
         save: Save
         save_settings: "Save Settings"
+        show_new_sg_ui: "Use new speedgrader UI"
         submit_comment: "Submit Comment"
       comment_submitted: "Your comment has been submitted."
       crocodoc_pending: "Crocodoc is still processing this document."
@@ -15398,6 +15413,7 @@ en-AU:
   here_f44564ee: here.
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Here's a great chance to get to know the calendar and add any non-assignment events you might have to the course. Don't worry, we'll help you through it."
   here_s_some_quick_tips_to_get_you_started_in_canva_72425979: "Here's some quick tips to get you started in Canvas!"
+  hh_mm_5faafa69: "hh:mm"
   hi_contrast_373b614f: Hi-contrast
   hidden_130c3791: hidden
   hidden_14a032a7: Hidden
@@ -15740,6 +15756,7 @@ en-AU:
       If enabled, Canvas will allow tools to return multiple content items
       in a single request at the course modules page
   if_enabled_canvas_will_be_able_to_export_new_quizz_504132df: "If enabled, Canvas will be able to export New Quizzes as a part of Common Cartridge Export Packages."
+  if_enabled_canvas_will_be_able_to_share_new_quizze_784525a: "If enabled, Canvas will be able to share New Quizzes to Commons."
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "If enabled, Common Cartridge importers will convert HTML files into Pages"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "If enabled, content designers must provide copyright and license information for files before they are published. This only applies if Better File Browsing is also enabled."
   if_enabled_copyright_and_license_information_must__2a551827: "If enabled, copyright and licence information must be provided for files before they are published."
@@ -15819,6 +15836,9 @@ en-AU:
   if_enabled_the_tool_installation_and_configuration_c974cdb2: |-
       If enabled, the tool installation and configuration forms located on the Account and Course settings pages will use
       InstUI components, as opposed to the older, less accessible homegrown components.
+  if_enabled_the_tray_that_allows_users_to_assign_le_7197db0a: |-
+      If enabled, the tray that allows users to assign learning objects will be optimised for
+      objects with large amounts of overrides.
   if_enabled_the_user_s_lti_url_input_on_the_select__fa539830: |-
       If enabled, the user's LTI URL input on the select content dialogue will be overwritten
       if the tool responds with a valid LTI URL.
@@ -17178,6 +17198,7 @@ en-AU:
   limit_group_members_to_leave_blank_for_no_limit_c341e248: "Limit group members to (leave blank for no limit)"
   limit_groups_to_group_limit_members_40651ea7: "Limit groups to %{group_limit} members"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Limit participants to attend %{num_appointments} appointment(s)."
+  limit_personal_access_token_creation_to_admins_a9b8d7fe: "Limit personal access token creation to Admins."
   limit_search_to_activity_after_c1ac2449: "Limit search to activity after"
   limit_search_to_activity_before_e05aad05: "Limit search to activity before"
   limit_section_privileges_e6425dfd: limit_section_privileges
@@ -17409,6 +17430,8 @@ en-AU:
   lock_date_cannot_be_after_section_end_d37da70c: "Lock date cannot be after section end"
   lock_date_cannot_be_after_term_end_cf1a188f: "Lock date cannot be after term end"
   lock_date_cannot_be_before_due_date_ac30f54: "Lock date cannot be before due date"
+  lock_date_cannot_be_before_reply_to_topic_due_date_fa73db43: "Lock date cannot be before reply to topic due date"
+  lock_date_cannot_be_before_required_replies_due_da_d2763f71: "Lock date cannot be before required replies due date"
   lock_discussion_title_failed_9d49f2d: "Lock discussion %{title} failed"
   lock_discussion_title_succeeded_fb24ebfc: "Lock discussion %{title} succeeded"
   lock_icon_a9916601: "lock icon"
@@ -17625,6 +17648,8 @@ en-AU:
   lti_add_e3bc0049: "LTI - add"
   lti_add_edit_delete_15905170: "LTI - add / edit / delete"
   lti_advantage_services_c1746cb4: "LTI Advantage Services"
+  lti_apps_discover_page_cd95458b: "LTI Apps Discover Page"
+  lti_apps_page_bd3867af: "LTI Apps Page"
   lti_context_id_should_be_unique_7437a74d: "lti_context_id should be unique"
   lti_deep_linking_for_module_index_menu_881feeee: "LTI Deep Linking for Module Index Menu"
   lti_deep_linking_line_items_5e0079f7: "LTI Deep Linking Line Items"
@@ -17784,6 +17809,7 @@ en-AU:
   march_2020_responsiveness_f810a65b: "March 2020 Responsiveness"
   march_bbe310ee: March
   mark_all_announcement_read_eda5292b: "Mark all announcements that are read"
+  mark_all_announcement_read_f4fc9137: "Mark All Announcement Read"
   mark_all_as_read_8f3bdf57: "Mark All as Read"
   mark_all_as_read_a995ffbe: "Mark all as read"
   mark_all_as_unread_10e7f0fe: "Mark all as unread"
@@ -21780,6 +21806,7 @@ en-AU:
   outcome_mastery_scales_8c3a814d: "Outcome Mastery Scales"
   outcome_mastery_scales_add_edit_171551c: "Outcome Mastery Scales - add / edit"
   outcome_menu_4fe5813: "Outcome Menu"
+  outcome_name_27d81c86: "Outcome Name"
   outcome_outcome_id_is_not_available_in_context_con_2143db54: "Outcome %{outcome_id} is not available in context %{context_type}#%{context_id}"
   outcome_path_mastery_points: "%{path} mastery points"
   outcome_path_result: "%{path} result"
@@ -25706,6 +25733,8 @@ en-AU:
   required_peer_reviews_23bea465: "Required Peer Reviews"
   required_replies_8ec3e238: "Required Replies"
   required_replies_due_date_f976c9af: "Required Replies Due Date"
+  required_replies_number_d941ee4c: "Required Replies (%{number})"
+  required_replies_required_replies_ab82825e: "Required Replies (%{required_replies})"
   required_replies_requiredreplies_d91bed30: "Required Replies (%{requiredReplies})"
   required_to_view_quiz_results_dba7368b: "Required to view quiz results"
   required_values_1eb5841f: "Required Values"
@@ -26409,6 +26438,7 @@ en-AU:
   search_assignments_in_gradebook_and_new_design_for_8f966bcc: "Search assignments in Gradebook and new design for assignment and student search"
   search_by_99d1ba5f: "Search by"
   search_by_app_name_company_name_8ea86de: "Search by app name & company name"
+  search_by_app_or_company_name_ad468715: "Search by app or company name"
   search_by_c559efd: "Search By"
   search_by_extension_name_company_name_345e690c: "Search by extension name & company name"
   search_by_name_email_or_id_5fd43dc9: "Search by name, email, or ID"
@@ -26467,6 +26497,7 @@ en-AU:
   search_users_48b1789e: "Search users..."
   search_within_grouptitle_4d38272f: "Search within %{groupTitle}"
   search_within_outcome_group_7ac6ac88: "Search within outcome group"
+  searchable_content_7a9e0f33: "Searchable Content"
   searching_b0207e7f: Searching...
   searching_for_announcements_in_sections_must_span__80e4dfe4: "Searching for announcements in sections must span exactly one course"
   searching_for_courses_8cc5f904: "Searching for courses..."
@@ -26806,6 +26837,7 @@ en-AU:
       flag MUST be enabled before this flag can be enabled. When this flag is enabled,
       the UI and API that allow users to create module-type AssignmentOverrides will be
       enabled, and thus the feature will be fully functional.
+  selective_release_optimized_tray_873075ff: "Selective Release - Optimised Tray"
   selective_release_ui_api_changes_a60b681a: "Selective Release - UI/API Changes"
   self_enrollments: 
     already_enrolled: 
@@ -27421,7 +27453,8 @@ en-AU:
       name_pronunciation_header_tip: "To confirm the correct pronunciation of your name, enter a phonetic pronunciation."
       name_pronunciation_label: "Name Pronunciation:"
       name_pronunciation_label_tip: "To confirm the correct pronunciation of your name, enter a phonetic pronunciation."
-      no_links: "%{name} hasn't added any links"
+      no_links: "No links have been added"
+      no_name_pronunciation: "No name pronunciation provided"
       nothing_in_common: "You don't have anything in common"
       save_profile: "Save Profile"
       service_contact: "contact %{user} with %{service}"
@@ -27430,7 +27463,7 @@ en-AU:
       titles: 
         click_to_change_profile_pic: "Click to change profile pic"
       user_enrolled: Enrolments
-      user_has_no_bio: "%{user} hasn't added a bio"
+      user_has_no_bio: "No biography has been added"
       ways_to_contact_user: Contact
     recent_activity: 
       date_column: Date
@@ -28097,8 +28130,12 @@ en-AU:
     threshold_24h: 24h
     threshold_36h: 36h
   smart_assignment_alerts_abc2224: "Smart Assignment Alerts"
+  smart_search_community_c2a115a2: "Smart Search Community"
+  smart_search_currently_in_development_for_canvas_u_541c3754: "Smart Search, currently in development for Canvas, uses semantic algorithms and AI to understand query context and semantic meaning, not just keyword matching."
+  smart_search_employs_embeddings_to_mathematically__3c20cdd1: "Smart Search employs \"embeddings\" to mathematically represent content and queries for comparison, understanding keywords or general queries in any language, thanks to its multilingual AI model. Write search queries using keywords, questions, sentences, or whatever is most natural for you to describe what you are trying to find."
   smart_search_fd7cd4: "Smart Search"
   smart_search_is_a_feature_of_canvas_that_is_curren_31f7d35d: "Smart Search is a feature of Canvas that is currently in development.  Leveraging semantic algorithms and AI, the new Smart Search feature understands the context of queries, providing more accurate and relevant results without the need for traditional Boolean operators or other search tools."
+  smart_search_is_in_feature_preview_feedback_can_be_7a80049d: "Smart Search is in feature preview. Feedback can be provided through result ratings and the Canvas Community space for Smart Search Beta. Canvas community space can be found here: "
   smartbanner: 
     android_banner_author: "Instructure Inc."
     android_banner_in_google_play: "In Google Play"
@@ -29162,7 +29199,7 @@ en-AU:
     quizzes: Quizzes
     rubrics: Rubrics
     schedule: Schedule
-    search: Search
+    search: "Smart Search"
     settings: Settings
     syllabus: Syllabus
     tab_location_error: "That tab location is invalid"
@@ -30141,6 +30178,7 @@ en-AU:
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "This grade differs from the student's view of the grade because some assignments are muted."
   this_grade_differs_from_the_student_s_view_of_the__f78d0023: "This mark differs from the student's view of the mark because some assignment marks are not yet posted"
   this_grade_has_negative_points_496400d4: "This mark has negative points"
+  this_grade_is_currently_dropped_for_this_student_7bc78b78: "This mark is currently dropped for this student."
   this_grade_is_invalid_8ab192c7: "This mark is invalid"
   this_grade_is_unread_fb79c002: "This grade is unread"
   this_grade_is_unusually_high_60533c20: "This mark is unusually high"
@@ -30416,6 +30454,7 @@ en-AU:
   thread_addd9799: Thread
   threshold_in_hours_to_notify_students_within_f33820aa: "Threshold (in hours) to notify students within"
   threshold_pts_45f0e5d8: "threshold: %{pts}"
+  threshold_threshold_a67e73a1: "Threshold: %{threshold}"
   throttle_jobs_f61be56: "Throttle Jobs"
   throttle_tag_tag_ba5b9b50: "Throttle tag \"%{tag}\""
   throttling_jobs_4a90578c: "Throttling jobs"
@@ -31676,6 +31715,8 @@ en-AU:
   unlock_date_can_t_be_blank_43efb114: "Unlock date can’t be blank"
   unlock_date_cannot_be_after_due_date_8829d9ca: "Unlock date cannot be after due date"
   unlock_date_cannot_be_after_lock_date_591f7fda: "Unlock date cannot be after lock date"
+  unlock_date_cannot_be_after_reply_to_topic_due_dat_37eee496: "Unlock date cannot be after reply to topic due date"
+  unlock_date_cannot_be_after_required_replies_due_d_df13dbc7: "Unlock date cannot be after required replies due date"
   unlock_date_cannot_be_before_course_start_9c7b8524: "Unlock date cannot be before course start"
   unlock_date_cannot_be_before_section_start_793ddc66: "Unlock date cannot be before section start"
   unlock_date_cannot_be_before_term_start_d3c01813: "Unlock date cannot be before term start"
@@ -31780,6 +31821,7 @@ en-AU:
   until_date_must_be_after_the_due_date_d961566c: "Until date must be after the Due date"
   until_date_must_be_after_the_event_start_date_972f759d: "Until date must be after the event start date"
   until_fccd159a: "Until:"
+  until_time_a6cade90: "Until Time"
   untitled_16aa4f2b: Untitled
   untitled_assignment_59354b34: "untitled assignment"
   untitled_filter_c07b8ddc: "Untitled filter"
@@ -32574,6 +32616,7 @@ en-AU:
   using_login_attribute_integration_id_9067ea54: "Using login attribute: integration ID"
   using_login_attribute_sis_user_id_b5ec538f: "Using login attribute: SIS user ID"
   using_login_attribute_unique_user_id_a307a9f: "Using login attribute: unique user ID"
+  using_smart_search_aecf6c76: "Using Smart Search"
   utc_e44049af: UTC
   uuid_has_been_provisioned_ab0c6c9: "UUID has been provisioned."
   val_percent_c2ca6679: "%val percent"
@@ -32880,6 +32923,7 @@ en-AU:
   what_content_is_searchable_375a0670: "What content is searchable?"
   what_does_provisioning_only_mean_eac9a4a1: "What does Provisioning Only mean?"
   what_happened_322d8259: "What happened?"
+  what_if_grades_7ad8ce0b: "What If Grades"
   what_if_score_change_operation_failed_b81afd6d: "What if score change operation failed"
   what_if_score_input_for_assignmentname_d4092efe: "What if score input for %{assignmentName}"
   what_if_score_updated_7565581d: "What if score updated"
@@ -32979,11 +33023,16 @@ en-AU:
   when_enabled_teachers_can_choose_to_allow_observer_320b555e: |-
       When enabled, teachers can choose to allow observers to schedule appointments
       when creating appointment groups in the calendar.
+  when_enabled_the_canvas_api_for_lti_resource_links_25c51eb0: |-
+      When enabled, the Canvas API for LTI Resource Links is usable. Admins can
+      use this API for visibility into content returned from tools.
   when_enabled_the_hidden_html_forms_that_are_used_t_c5edd929: |-
       When enabled, the hidden HTML forms that are used to trigger an LTI launch
       will each have a random number appended to their id. When disabled, each
       one has the same id of tool_form.
   when_enabled_the_internal_access_manager_will_be_u_bc470109: "When enabled, the internal access manager will be used to gate access to certain requests"
+  when_enabled_the_lti_apps_discover_page_will_be_av_39ad751c: "When enabled, the LTI Apps Discover page will be available in the Apps page."
+  when_enabled_the_lti_apps_page_will_be_available_i_23ec031f: "When enabled, the LTI Apps page will be available in the Account navigation sidebar."
   when_enabled_the_lti_extensions_discover_page_will_8bb57ff6: "When enabled, the LTI Extensions Discover page will be available in the Extensions view."
   when_enabled_the_lti_extensions_page_will_be_avail_ac8ed3fa: "When enabled, the LTI Extensions page will be available in the Account navigation."
   when_enabled_the_new_submission_type_resource_card_c0f45d0d: "When enabled, the new submission type resource card will be shown in the assignment edit page."
@@ -33676,6 +33725,7 @@ en-AU:
   your_azure_active_directory_tenant_name_d8bb31fa: "Your Azure Active Directory Tenant Name"
   your_browser_connectivity_may_be_slow_or_unstable__97c1f4c5: "Your browser connectivity may be slow or unstable. In spite of your browser's timer being disconnected, your answers will be recorded for an additional 5 minutes beyond the original time limit on this attempt."
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Community* for a complete list of supported browsers."
+  your_canvas_administrators_have_chosen_to_limit_yo_41a4187: "Your Canvas administrators have chosen to limit your ability to generate your own access token. Please reach out to your Canvas administrators to have them generate an access token on your behalf."
   your_classic_quizzes_have_been_migrated_to_new_qui_e49244da: "Your Classic Quizzes have been migrated to New Quizzes!"
   your_comment_is_not_posted_12677035: "Your comment is not posted"
   your_comment_was_auto_saved_as_a_draft_c49d3510: "Your comment was auto-saved as a draft."
@@ -33732,6 +33782,7 @@ en-AU:
   your_unpublished_changes_will_be_reverted_to_their_fd4ba075: "Your unpublished changes will be reverted to their previously saved state."
   your_webcam_may_already_be_in_use_6cd64c25: "Your webcam may already be in use."
   your_work_has_been_submitted_519058f8: "Your work has been submitted."
+  yyyy_mm_dd_cbbd9959: YYYY-MM-DD
   yyyy_mm_dd_hh_mm_a01b6081: "YYYY-MM-DD hh:mm"
   z_a_b48d8903: "Z - A"
   z_a_be2ab67c: Z–A

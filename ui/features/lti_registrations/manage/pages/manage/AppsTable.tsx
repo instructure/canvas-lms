@@ -37,6 +37,8 @@ import {useManageSearchParams, type ManageSearchParams} from './ManageSearchPara
 import {colors} from '@instructure/canvas-theme'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {Tooltip} from '@instructure/ui-tooltip'
+import {Pagination} from '@instructure/ui-pagination'
+import {MANAGE_APPS_PAGE_LIMIT} from './ManagePageLoadingState'
 
 type CallbackWithRegistration = (registration: LtiRegistration) => void
 
@@ -47,6 +49,7 @@ export type AppsTableProps = {
   stale: boolean
   updateSearchParams: ReturnType<typeof useManageSearchParams>[1]
   deleteApp: CallbackWithRegistration
+  page: number
 }
 
 const I18n = useI18nScope('lti_registrations')
@@ -295,7 +298,7 @@ const ResponsiveProps = {
 }
 
 const AppsTableResponsiveWrapper = React.memo(
-  (tableProps: Omit<AppsTableProps, 'stale' | 'page' | 'pageCount' | 'updatePage'>) => {
+  (tableProps: Omit<AppsTableProps, 'stale' | 'pageCount' | 'updatePage'>) => {
     return (
       <Responsive query={ResponsiveQuery} props={ResponsiveProps}>
         {responsiveProps => (
@@ -308,10 +311,13 @@ const AppsTableResponsiveWrapper = React.memo(
 
 type AppsTableInnerProps = {
   responsiveProps: ResponsivePropsObject | null | undefined
-  tableProps: Omit<AppsTableProps, 'stale' | 'page' | 'pageCount' | 'updatePage'>
+  tableProps: Omit<AppsTableProps, 'stale' | 'pageCount' | 'updatePage'>
 }
 
 export const AppsTableInner = React.memo((props: AppsTableInnerProps) => {
+  const [, setManageSearchParams] = useManageSearchParams()
+  const responsiveProps = props.responsiveProps
+  const {page, apps} = props.tableProps
   const rows = React.useMemo(() => {
     return props.tableProps.apps.data.map(row => (
       <Table.Row key={row.id}>
@@ -324,20 +330,57 @@ export const AppsTableInner = React.memo((props: AppsTableInnerProps) => {
     ))
   }, [props.tableProps.apps, props.tableProps.deleteApp])
 
+  const layout = responsiveProps && responsiveProps.layout === 'stacked' ? 'stacked' : 'fixed'
+
   return (
     <>
-      <Table
-        {...props.responsiveProps}
-        caption={I18n.t('Installed Apps')}
-        layout={
-          props.responsiveProps && props.responsiveProps.layout === 'stacked' ? 'stacked' : 'fixed'
-        }
-      >
+      <Table {...props.responsiveProps} caption={I18n.t('Installed Apps')} layout={layout}>
         <Table.Head renderSortLabel={I18n.t('Sort by')}>
           {renderHeaderRow(props.tableProps)}
         </Table.Head>
         <Table.Body>{rows}</Table.Body>
       </Table>
+
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: layout === 'stacked' ? 'space-between' : 'center',
+          width: '100%',
+          alignItems: 'center',
+        }}
+      >
+        <div style={{flex: layout === 'stacked' ? undefined : 1}}>
+          {I18n.t('%{first_item} - %{last_item} of %{total_items} displayed', {
+            first_item: (page - 1) * MANAGE_APPS_PAGE_LIMIT + 1,
+            last_item: Math.min(page * MANAGE_APPS_PAGE_LIMIT, apps.total),
+            total_items: apps.total,
+          })}
+        </div>
+        <div style={{flex: layout === 'stacked' ? undefined : 1}}>
+          <Pagination
+            as="nav"
+            margin="small"
+            variant="compact"
+            labelNext="Next Page"
+            labelPrev="Previous Page"
+          >
+            {Array.from(Array(Math.ceil(apps.total / MANAGE_APPS_PAGE_LIMIT))).map((_, i) => (
+              <Pagination.Page
+                // eslint-disable-next-line react/no-array-index-key
+                key={i}
+                current={i === page - 1}
+                onClick={() => {
+                  setManageSearchParams({page: (i + 1).toString()})
+                }}
+              >
+                {i + 1}
+              </Pagination.Page>
+            ))}
+          </Pagination>
+        </div>
+        {layout === 'stacked' ? null : <div style={{flex: 1}} />}
+      </div>
     </>
   )
 })
