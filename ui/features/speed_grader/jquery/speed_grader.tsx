@@ -3025,7 +3025,6 @@ EG = {
       ENV.RUBRIC_ASSESSMENT.assessment_user_id = this.currentStudent[anonymizableId]
 
       const isModerator = ENV.grading_role === 'moderator'
-      const isGrader = ENV.grading_role === 'grader'
       const selectMenuOptions: {id: string; name: string | null}[] = []
 
       const assessmentsByMe = EG.currentStudent.rubric_assessments.filter(assessment =>
@@ -3039,8 +3038,6 @@ EG = {
       } else if (isModerator) {
         // Moderators can create a custom assessment if they don't have one
         selectMenuOptions.push({id: '', name: customProvisionalGraderLabel})
-      } else if (isGrader) {
-        selectMenuOptions.push({id: '', name: ENV.current_user?.display_name})
       }
 
       const assessmentsByOthers = EG.currentStudent.rubric_assessments.filter(
