@@ -6616,6 +6616,7 @@ nn:
       concluded_conferences: "Ferdige konferansar"
       conference: Konferanse
       conference_header: Konferansar
+      conferences: Konferansar
       new_conference: "Ny konferanse"
       new_conferences: "Nye konferansar"
       page_title: Webkonferansar
