@@ -34,6 +34,8 @@ class DeveloperKeyAccountBinding < ApplicationRecord
   validates :account, :developer_key, presence: true
 
   before_save :set_root_account
+  before_create :enable_default_key
+  before_update :protect_default_key_binding
   after_save :update_lti_registration_account_binding
   after_update :clear_cache_if_site_admin
   after_update :update_tools!
@@ -120,6 +122,18 @@ class DeveloperKeyAccountBinding < ApplicationRecord
   alias_method :allowed?, :allow?
 
   private
+
+  # DeveloperKey.default is for user-generated tokens and must always be ON
+  def enable_default_key
+    if developer_key.name == DeveloperKey::DEFAULT_KEY_NAME && developer_key == DeveloperKey.default
+      self.workflow_state = :on
+    end
+  end
+
+  # DeveloperKey.default is for user-generated tokens and must always be ON
+  def protect_default_key_binding
+    raise "Please don't turn off the default developer key" if developer_key.name == DeveloperKey::DEFAULT_KEY_NAME && developer_key == DeveloperKey.default && !on?
+  end
 
   def update_lti_registration_account_binding
     if skip_lime_sync
