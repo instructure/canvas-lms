@@ -122,6 +122,7 @@ class DiscussionTopic < ActiveRecord::Base
   before_create :set_root_account_id
   before_save :default_values
   before_save :set_schedule_delayed_transitions
+  before_save :set_edited_at
   after_save :update_assignment
   after_save :update_subtopics
   after_save :touch_context
@@ -2094,6 +2095,12 @@ class DiscussionTopic < ActiveRecord::Base
       section_specific_ids = ids_visible_to_sections[student_id] || []
       ungraded_differentiated_specific_ids = ungraded_differentiated_topic_ids_per_user[student_id] || []
       assignment_item_ids.concat(ids_visible_to_all).concat(section_specific_ids).concat(ungraded_differentiated_specific_ids)
+    end
+  end
+
+  def set_edited_at
+    if (will_save_change_to_message? || will_save_change_to_title?) && !new_record?
+      self.edited_at = Time.now.utc
     end
   end
 

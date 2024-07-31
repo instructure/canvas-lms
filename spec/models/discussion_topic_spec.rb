@@ -3718,4 +3718,30 @@ describe DiscussionTopic do
       end
     end
   end
+
+  describe "edited_at" do
+    it "returns null if no change to the title or message occurred" do
+      topic = discussion_topic_model
+      expect(topic.edited_at).to be_nil
+      topic.context_code = "other context"
+      topic.save!
+      expect(topic.edited_at).to be_nil
+    end
+
+    it "returns not null if a change to the title occured" do
+      topic = discussion_topic_model
+      expect(topic.edited_at).to be_nil
+      topic.title = "Brand new shinny title"
+      topic.save!
+      expect(topic.edited_at).not_to be_nil
+    end
+
+    it "returns not null if a change to the message occured" do
+      topic = discussion_topic_model
+      expect(topic.edited_at).to be_nil
+      topic.message = "Brand new shinny message"
+      topic.save!
+      expect(topic.edited_at).not_to be_nil
+    end
+  end
 end

@@ -413,12 +413,12 @@ export const DiscussionTopicContainer = ({
                             isSplitView={false}
                             editor={props.discussionTopic.editor}
                             createdAt={props.discussionTopic.createdAt}
-                            updatedAt={props.discussionTopic.updatedAt}
+                            editedAt={props.discussionTopic.editedAt}
                             timingDisplay={DateHelper.formatDatetimeForDiscussions(
                               props.discussionTopic.createdAt
                             )}
                             editedTimingDisplay={DateHelper.formatDatetimeForDiscussions(
-                              props.discussionTopic.updatedAt
+                              props.discussionTopic.editedAt
                             )}
                             isTopicAuthor={true}
                             attachment={props.discussionTopic.attachment}

@@ -140,7 +140,10 @@ export const DiscussionThreadContainer = props => {
     }
   }
 
-  const {createDiscussionEntry, isSubmitting} = useCreateDiscussionEntry(onEntryCreationCompletion, updateCache)
+  const {createDiscussionEntry, isSubmitting} = useCreateDiscussionEntry(
+    onEntryCreationCompletion,
+    updateCache
+  )
 
   const [deleteDiscussionEntry] = useMutation(DELETE_DISCUSSION_ENTRY, {
     onCompleted: data => {
@@ -499,22 +502,26 @@ export const DiscussionThreadContainer = props => {
                                 }
                               : null
                           }
-                          onMarkThreadAsRead={props.discussionTopic.discussionType !== 'threaded' ? undefined : readState => {
-                            window['ENV'].discussions_deep_link = {
-                              root_entry_id: props.discussionEntry.rootEntryId,
-                              parent_id: props.discussionEntry.parentId,
-                              entry_id: props.discussionEntry._id,
-                            }
-                            updateDiscussionThreadReadState({
-                              variables: {
-                                discussionEntryId: props.discussionEntry.rootEntryId
-                                  ? props.discussionEntry.rootEntryId
-                                  : props.discussionEntry.id,
-                                read: readState,
-                              },
-                            })
-                            props.setHighlightEntryId(props.discussionEntry._id)
-                          }}
+                          onMarkThreadAsRead={
+                            props.discussionTopic.discussionType !== 'threaded'
+                              ? undefined
+                              : readState => {
+                                  window['ENV'].discussions_deep_link = {
+                                    root_entry_id: props.discussionEntry.rootEntryId,
+                                    parent_id: props.discussionEntry.parentId,
+                                    entry_id: props.discussionEntry._id,
+                                  }
+                                  updateDiscussionThreadReadState({
+                                    variables: {
+                                      discussionEntryId: props.discussionEntry.rootEntryId
+                                        ? props.discussionEntry.rootEntryId
+                                        : props.discussionEntry.id,
+                                      read: readState,
+                                    },
+                                  })
+                                  props.setHighlightEntryId(props.discussionEntry._id)
+                                }
+                          }
                         />
                       ) : null
                     }
@@ -534,12 +541,11 @@ export const DiscussionThreadContainer = props => {
                     isUnread={!props.discussionEntry.entryParticipant?.read}
                     isForcedRead={props.discussionEntry.entryParticipant?.forcedReadState}
                     createdAt={props.discussionEntry.createdAt}
-                    updatedAt={props.discussionEntry.updatedAt}
                     timingDisplay={DateHelper.formatDatetimeForDiscussions(
                       props.discussionEntry.createdAt
                     )}
                     editedTimingDisplay={DateHelper.formatDatetimeForDiscussions(
-                      props.discussionEntry.updatedAt
+                      props.discussionEntry.editedAt
                     )}
                     lastReplyAtDisplay={DateHelper.formatDatetimeForDiscussions(
                       props.discussionEntry.lastReply?.createdAt

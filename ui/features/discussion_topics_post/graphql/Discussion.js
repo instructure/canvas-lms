@@ -39,6 +39,7 @@ export const Discussion = {
       message
       createdAt
       updatedAt
+      editedAt
       postedAt
       requireInitialPost
       initialPostRequiredForCurrentUser
@@ -108,6 +109,7 @@ export const Discussion = {
     message: string,
     createdAt: string,
     updatedAt: string,
+    editedAt: string,
     postedAt: string,
     requireInitialPost: bool,
     initialPostRequiredForCurrentUser: bool,
@@ -154,6 +156,7 @@ export const Discussion = {
     message = 'This is a Discussion Topic Message',
     createdAt = '2020-11-23T11:40:44-07:00',
     updatedAt = '2021-04-22T12:41:56-06:00',
+    editedAt = '2021-04-22T12:41:56-06:00',
     postedAt = '2020-11-23T11:40:44-07:00',
     requireInitialPost = false,
     initialPostRequiredForCurrentUser = false,
@@ -203,6 +206,7 @@ export const Discussion = {
     message,
     createdAt,
     updatedAt,
+    editedAt,
     postedAt,
     requireInitialPost,
     initialPostRequiredForCurrentUser,
