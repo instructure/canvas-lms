@@ -58,9 +58,10 @@ GEM
       faraday (>= 0.9, < 3.0, != 2.0.0)
     drb (2.2.1)
     erubi (1.13.0)
-    faraday (2.9.2)
+    faraday (2.10.1)
       faraday-net_http (>= 2.0, < 3.2)
-    faraday-net_http (3.1.0)
+      logger
+    faraday-net_http (3.1.1)
       net-http
     i18n (1.14.5)
       concurrent-ruby (~> 1.0)
@@ -68,6 +69,7 @@ GEM
     irb (1.14.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
+    logger (1.6.0)
     loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
