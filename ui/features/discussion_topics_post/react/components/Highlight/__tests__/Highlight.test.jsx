@@ -26,8 +26,17 @@ const setup = props => {
 
 describe('Highlight', () => {
   it('displays the highlight', () => {
-    const {queryByTestId} = setup({isHighlighted: true})
+    const {queryByTestId, container} = setup({isHighlighted: true})
     expect(queryByTestId('isHighlighted')).toBeTruthy()
+    expect(container.querySelector('.highlight-fadeout')).toBeInTheDocument()
+  })
+
+  it('displays the highlight with persist', () => {
+    delete window.location
+    window.location = {search: '?persist=1'}
+    const {container} = setup({isHighlighted: true})
+
+    expect(container.querySelector('.highlight-discussion')).toBeInTheDocument()
   })
 
   it('does not display the highlight', () => {
