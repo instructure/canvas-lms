@@ -522,7 +522,7 @@ GEM
     diplomat (2.6.4)
       deep_merge (~> 1.2)
       faraday (>= 0.9, < 3.0, != 2.0.0)
-    docile (1.4.0)
+    docile (1.4.1)
     docx (0.8.0)
       nokogiri (~> 1.13, >= 1.13.0)
       rubyzip (~> 2.0)
