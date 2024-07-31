@@ -219,7 +219,7 @@ module CanvasHttp
 
   # returns [normalized_url_string, URI] if valid, raises otherwise
   def self.validate_url(value, host: nil, scheme: nil, allowed_schemes: %w[http https], check_host: false)
-    value = value.strip
+    value = value&.strip || ""
     raise ArgumentError if value.empty?
 
     uri = nil
