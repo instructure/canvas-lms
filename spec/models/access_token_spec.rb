@@ -345,7 +345,7 @@ describe AccessToken do
       @at = AccessToken.create!(user: user_model, developer_key: @dk)
 
       @dk_without_account = DeveloperKey.create!
-      @at_without_account = AccessToken.create!(user: user_model, developer_key: @dk2)
+      @at_without_account = AccessToken.create!(user: user_model, developer_key: @dk_without_account)
     end
 
     it "account should be set" do

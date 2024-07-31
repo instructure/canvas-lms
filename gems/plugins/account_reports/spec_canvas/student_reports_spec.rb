@@ -865,21 +865,21 @@ describe "Student reports" do
          "never",
          "never",
          DeveloperKey.default.id,
-         "User-Generated"],
+         DeveloperKey::DEFAULT_KEY_NAME],
         [@user2.id,
          "Bolton, Michael",
          @at2.token_hint.gsub(/.+~/, ""),
          @at2.permanent_expires_at.iso8601,
          @at2.last_used_at.iso8601,
          DeveloperKey.default.id,
-         "User-Generated"],
+         DeveloperKey::DEFAULT_KEY_NAME],
         [@user1.id,
          "Clair, John St.",
          @at1.token_hint.gsub(/.+~/, ""),
          @at1.permanent_expires_at.iso8601,
          "never",
          DeveloperKey.default.id,
-         "User-Generated"]
+         DeveloperKey::DEFAULT_KEY_NAME]
       ]
     end
 

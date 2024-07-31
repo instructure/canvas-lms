@@ -779,7 +779,7 @@ describe "Users API", type: :request do
       json.each { |j| expect(j["url"]).to eq "http://www.example.com/courses/1" }
       expect(json[0]["created_at"]).to be > json[1]["created_at"]
       expect(json[0]["app_name"]).to be_nil
-      expect(json[1]["app_name"]).to eq "User-Generated"
+      expect(json[1]["app_name"]).to eq DeveloperKey::DEFAULT_KEY_NAME
       expect(response.headers["Link"]).to match(/next/)
       response.headers["Link"].split(",").find { |l| l =~ /<([^>]+)>.+next/ }
       url = $1

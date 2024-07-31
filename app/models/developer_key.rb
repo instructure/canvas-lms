@@ -100,6 +100,8 @@ class DeveloperKey < ActiveRecord::Base
     state :deleted
   end
 
+  DEFAULT_KEY_NAME = "User-Generated"
+
   # https://stackoverflow.com/a/2500819
   alias_method :referenced_tool_configuration, :tool_configuration
 
@@ -176,7 +178,7 @@ class DeveloperKey < ActiveRecord::Base
 
   class << self
     def default
-      get_special_key("User-Generated")
+      get_special_key(DeveloperKey::DEFAULT_KEY_NAME)
     end
 
     def get_special_key(default_key_name)
