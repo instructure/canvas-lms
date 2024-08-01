@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,5 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export {FinalGradeOverrideTextBox} from './react'
-export {finalGradeOverrideUtils} from './utils'
+function restrictToTwoDigitsAfterSeparator(value: string) {
+  const moreThanTwoDigitsAfterSeparator = /(^\s*[+-]?\d+[.,]\d{2})\d+(\s*[^%]*)$/
+  if (moreThanTwoDigitsAfterSeparator.test(value)) {
+    return value.replace(moreThanTwoDigitsAfterSeparator, '$1$2')
+  }
+  return value
+}
+
+export const finalGradeOverrideUtils = {
+  restrictToTwoDigitsAfterSeparator,
+}
