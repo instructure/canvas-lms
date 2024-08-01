@@ -29,6 +29,8 @@ module Lti
 
     after_update :update_external_tools!, if: :update_external_tools?
 
+    after_commit :update_unified_tool_id, if: :update_unified_tool_id?
+
     validates :developer_key_id, :settings, presence: true
     validates :developer_key_id, uniqueness: true
     validate :validate_configuration, unless: proc { |c| c.developer_key_id.blank? || c.settings.blank? }
@@ -239,6 +241,28 @@ module Lti
 
     def normalize_configuration
       self.configuration = JSON.parse(configuration) if configuration.is_a? String
+    end
+
+    def update_unified_tool_id
+      return unless developer_key.root_account.feature_enabled?(:update_unified_tool_id)
+
+      unified_tool_id = LearnPlatform::GlobalApi.get_unified_tool_id(**params_for_unified_tool_id)
+      update_column(:unified_tool_id, unified_tool_id) if unified_tool_id
+    end
+    handle_asynchronously :update_unified_tool_id, priority: Delayed::LOW_PRIORITY
+
+    def params_for_unified_tool_id
+      {
+        lti_name: settings["title"],
+        lti_tool_id: canvas_extensions["tool_id"],
+        lti_domain: canvas_extensions["domain"],
+        lti_version: "1.3",
+        lti_url: settings["target_link_uri"],
+      }
+    end
+
+    def update_unified_tool_id?
+      saved_change_to_settings?
     end
   end
 end
