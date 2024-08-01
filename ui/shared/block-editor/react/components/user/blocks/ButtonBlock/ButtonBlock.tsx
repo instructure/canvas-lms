@@ -93,6 +93,7 @@ const ButtonBlock = ({
   if (variant === 'condensed') {
     return (
       <CondensedButton
+        data-testid="button-block"
         elementRef={el => el && connect(drag(el as HTMLElement))}
         size={size}
         color={color as InstuiCondensedButtonColor}
@@ -107,6 +108,7 @@ const ButtonBlock = ({
   } else {
     return (
       <Button
+        data-testid="button-block"
         themeOverride={themeOverride}
         elementRef={el => el && connect(drag(el as HTMLElement))}
         size={size}
@@ -130,6 +132,7 @@ ButtonBlock.craft = {
     size: 'medium',
     variant: 'filled',
     color: 'primary',
+    iconName: '',
   },
   related: {
     toolbar: ButtonBlockToolbar,
