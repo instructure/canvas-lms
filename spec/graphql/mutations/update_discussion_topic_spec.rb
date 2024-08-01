@@ -609,6 +609,16 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(result["errors"]).to be_nil
       expect(Assignment.last.ab_guid).to eq(["1E20776E-7053-11DF-8EBF-BE719DFF4B22"])
     end
+
+    it "allows to update the discussion assignment by a user with custom role without :delete assignment permission" do
+      special_role = @course.account.roles.create!(name: "teacher without assignment delete", base_role_type: "TeacherEnrollment")
+      special_role.role_overrides.create!(permission: "manage_assignments_delete", context: @course.account, enabled: false)
+      @teacher.enrollments.first.update!(role: special_role)
+
+      result = run_mutation(id: @topic.id, published: false, assignment: { pointsPossible: 10 }) # assignment is needed to trigger the if
+
+      expect(result["errors"]).to be_nil
+    end
   end
 
   context "discussion checkpoints" do
