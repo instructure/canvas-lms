@@ -453,6 +453,50 @@ module Lti::IMS
         end
       end
 
+      describe "placement_disabled?" do
+        let(:lti_tool_configuration) do
+          {
+            domain: "example.com",
+            claims: [],
+            messages: [{
+              type: "LtiResourceLinkRequest",
+              target_link_uri: "http://example.com/launch",
+              placements: ["global_navigation", "https://canvas.instructure.com/lti/course_navigation"],
+              "https://canvas.instructure.com/lti/visibility": "admins",
+            }],
+          }
+        end
+
+        let(:global_nav_placement) { registration.placements.find { |p| p[:placement] == "global_navigation" } }
+        let(:course_nav_placement) { registration.placements.find { |p| p[:placement] == "course_navigation" } }
+
+        it "says the placement is disabled when tool config is using the non-prefixed placement name" do
+          registration.registration_overlay["disabledPlacements"] = ["global_navigation"]
+          expect(registration.placement_disabled?("course_navigation")).to be false
+          expect(registration.placement_disabled?("global_navigation")).to be true
+
+          expect(course_nav_placement[:enabled]).to be true
+          expect(global_nav_placement[:enabled]).to be false
+        end
+
+        it "says the placement is disabled when tool config is using the prefixed placement name" do
+          registration.registration_overlay["disabledPlacements"] = ["course_navigation"]
+          expect(registration.placement_disabled?("course_navigation")).to be true
+          expect(registration.placement_disabled?("global_navigation")).to be false
+
+          expect(course_nav_placement[:enabled]).to be false
+          expect(global_nav_placement[:enabled]).to be true
+        end
+
+        it "rejects invalid placement names in the disabledPlacements array" do
+          pending("INTEROP-8538, create a schema that rejects invalid names for disabledPlacements")
+          expect(registration.valid?).to be true # ensure that we aren't invalid for other reasons
+          # disabledPlacements array should have non-prefixed placement names
+          registration.registration_overlay["disabledPlacements"] = ["https://canvas.instructure.com/lti/course_navigation"]
+          expect(registration.valid?).to be false
+        end
+      end
+
       describe "when extension visibility is supplied" do
         let(:lti_tool_configuration) do
           {
