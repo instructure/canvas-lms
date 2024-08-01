@@ -295,9 +295,9 @@ class Mutations::AssignmentBase::Mutation < Mutations::BaseMutation
   end
 
   def ensure_restored
-    raise GraphQL::ExecutionError, "insufficient permission" unless @working_assignment.grants_right? current_user, :delete
     # if we are already not destroyed, then dont do anything
     return if @working_assignment.workflow_state != "deleted"
+    raise GraphQL::ExecutionError, "insufficient permission" unless @working_assignment.grants_right? current_user, :delete
 
     @working_assignment.restore
   end
