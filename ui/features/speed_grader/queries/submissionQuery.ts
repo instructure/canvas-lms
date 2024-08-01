@@ -188,6 +188,7 @@ function transform(result: any) {
       comments: submission?.commentsConnection?.nodes,
       rubricAssessments: submission.rubricAssessmentsConnection?.nodes,
       submissionHistory: submission.submissionHistoriesConnection?.nodes,
+      // @ts-expect-error
       submissionState: speedGraderHelpers.submissionState(submission, ENV.grading_role ?? ''),
     }
   }
