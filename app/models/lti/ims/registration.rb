@@ -190,7 +190,7 @@ class Lti::IMS::Registration < ApplicationRecord
 
     text = apply_overlay ? (placement_overlay["label"] || message["label"]) : message["label"]
     icon_url = apply_overlay ? (placement_overlay["icon_url"] || message["icon_uri"]) : message["icon_uri"]
-    enabled = apply_overlay ? !placement_disabled?(placement_type) : true
+    enabled = apply_overlay ? !placement_disabled?(placement_name) : true
     default = if apply_overlay && placement_name == "course_navigation"
                 # The placement overlay stores everything in the Canvas proprietary format, in which
                 # default is either 'enabled' or 'disabled', so we can fetch the
@@ -238,8 +238,8 @@ class Lti::IMS::Registration < ApplicationRecord
     registration_overlay["placements"]&.find { |p| p["type"] == placement_type }
   end
 
-  def placement_disabled?(placement_type)
-    registration_overlay["disabledPlacements"]&.include?(placement_type) || false
+  def placement_disabled?(placement_name)
+    registration_overlay["disabledPlacements"]&.include?(placement_name) || false
   end
 
   def canvas_extensions
