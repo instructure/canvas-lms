@@ -121,6 +121,14 @@ class TokensController < ApplicationController
     render json: token_json(@token, @current_user, session)
   end
 
+  def activate
+    render_unauthorized_action unless @current_user == @token.user
+    return render json: { errors: { token: ["is already active"] } }, status: :bad_request unless @token.pending?
+
+    @token.activate!
+    render json: token_json(@token, @current_user, session)
+  end
+
   private
 
   def find_token

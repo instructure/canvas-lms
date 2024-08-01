@@ -194,6 +194,40 @@ describe TokensController do
         assert_status(404)
       end
 
+      it "allows activating a pending token" do
+        token = @user.access_tokens.new(workflow_state: "pending")
+        token.developer_key = DeveloperKey.default
+        token.save!
+        expect(token.user_id).to eq @user.id
+        expect(token.manually_created?).to be true
+        post "activate", params: { id: token.id, token: { purpose: "new purpose" } }
+        expect(response).to be_successful
+        expect(assigns[:token]).to eq token
+        expect(assigns[:token]).to be_active
+      end
+
+      it "does not allow activating an active token" do
+        token = @user.access_tokens.new
+        token.developer_key = DeveloperKey.default
+        token.save!
+        expect(token.user_id).to eq @user.id
+        expect(token.manually_created?).to be true
+        post "activate", params: { id: token.id, token: { purpose: "new purpose" } }
+        assert_status(400)
+      end
+
+      it "does not allow activating a pending token while masquerading" do
+        Account.site_admin.account_users.create!(user: @user)
+        session[:become_user_id] = user_with_pseudonym(active_all: true).id
+        token = @user.access_tokens.new(workflow_state: "pending")
+        token.developer_key = DeveloperKey.default
+        token.save!
+        expect(token.user_id).to eq @user.id
+        expect(token.manually_created?).to be true
+        put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
+        assert_status(401)
+      end
+
       context "with admin manage access tokens feature flag on" do
         before(:once) { Account.default.root_account.enable_feature!(:admin_manage_access_tokens) }
 

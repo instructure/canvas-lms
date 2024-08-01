@@ -976,6 +976,11 @@ CanvasRails::Application.routes.draw do
   get "message_templates" => "messages#templates"
   resource :profile, controller: :profile, only: [:show, :update] do
     resources :pseudonyms, except: :index
+    resources :tokens, only: [] do
+      member do
+        post :activate
+      end
+    end
     member do
       put :update_profile
       get :communication

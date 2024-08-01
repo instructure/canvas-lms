@@ -43,6 +43,17 @@ const $profile_table = $('.profile_table'),
 
 const maximumStringLength = 255
 
+const localizeWorkflowState = function (state) {
+  switch (state) {
+    case 'active':
+      return I18n.t('active')
+    case 'pending':
+      return I18n.t('pending')
+    default:
+      return state
+  }
+}
+
 $edit_settings_link.click(function () {
   $(this).hide()
   $profile_table
@@ -306,6 +317,7 @@ $('#access_token_form').formSubmit({
     data.created = datetimeString(data.created_at) || '--'
     data.expires = datetimeString(data.expires_at) || I18n.t('token_never_expires', 'never')
     data.used = '--'
+    data.workflow_state = localizeWorkflowState(data.workflow_state)
     $token.fillTemplateData({
       data,
       hrefValues: ['id'],
@@ -347,16 +359,36 @@ $('#token_details_dialog .regenerate_token').click(function () {
       data.expires = datetimeString(data.expires_at) || I18n.t('token_never_expires', 'never')
       data.used = datetimeString(data.last_used_at) || '--'
       data.visible_token = data.visible_token || 'protected'
+      data.workflow_state = localizeWorkflowState(data.workflow_state)
       $dialog
         .fillTemplateData({data})
         .find('.full_token_warning')
         .showIf(data.visible_token.length > 10)
       $token.data('token', data)
+      $token.fillTemplateData({data})
       $button.text(I18n.t('buttons.regenerate_token', 'Regenerate Token')).prop('disabled', false)
     },
     () => {
       $button
         .text(I18n.t('errors.regenerating_token_failed', 'Regenerating Token Failed'))
+        .prop('disabled', false)
+    }
+  )
+})
+$('.access_token .activate_token_link').click(function () {
+  const $button = $(this)
+  const url = $button.attr('rel')
+  $button.text(I18n.t('buttons.activating_token', 'activating...')).prop('disabled', true)
+  $.ajaxJSON(
+    url,
+    'POST',
+    {},
+    data => {
+      $button.parentElement.replaceChildren(localizeWorkflowState(data.workflow_state))
+    },
+    () => {
+      $button
+        .text(I18n.t('errors.activating_token_failed', 'Activating Token Failed'))
         .prop('disabled', false)
     }
   )

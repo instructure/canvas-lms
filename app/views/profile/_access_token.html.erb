@@ -20,7 +20,13 @@
 <tr class="access_token <%= 'blank' unless access_token %>" style="<%= hidden unless access_token %>">
   <td class="app_name"><%= access_token&.app_name || t(:default_app_name, "No App") %></td>
   <% if @current_user&.account.feature_enabled?(:admin_manage_access_tokens) %>
-    <td class="state"><%= access_token&.expired? ? t("expired") : access_token&.workflow_state%></td>
+    <td class="workflow_state">
+      <%= access_token&.localized_workflow_state %>
+    <% if access_token&.pending? && @real_current_user.nil? %>
+      (<a href="#" class="activate_token_link" rel="<%= activate_profile_token_url(access_token)%>"><%= t("activate") %></a>)
+    <% else %>
+    <% end %>
+    </td>
   <% end %>
   <td class="purpose"><%= access_token&.purpose || nbsp %></td>
   <td class="dates">
