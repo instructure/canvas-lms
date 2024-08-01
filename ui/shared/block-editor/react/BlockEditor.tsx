@@ -112,6 +112,11 @@ export default function BlockEditor({
       <ErrorBoundary>
         <Editor
           enabled={enabled}
+          indicator={{
+            className: 'block-editor-dnd-indicator',
+            error: 'red',
+            success: 'rgb(98, 196, 98)',
+          }}
           resolver={blocks}
           onNodesChange={handleNodesChange}
           onRender={RenderNode}
