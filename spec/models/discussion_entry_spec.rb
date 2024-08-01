@@ -596,18 +596,7 @@ describe DiscussionEntry do
       course_with_teacher
     end
 
-    it "forces a root entry as parent if the discussion isn't threaded" do
-      discussion_topic_model
-      root = @topic.reply_from(user: @teacher, text: "root entry")
-      sub1 = root.reply_from(user: @teacher, html: "sub entry")
-      expect(sub1.parent_entry).to eq root
-      expect(sub1.root_entry).to eq root
-      sub2 = sub1.reply_from(user: @teacher, html: "sub-sub entry")
-      expect(sub2.parent_entry).to eq root
-      expect(sub2.root_entry).to eq root
-    end
-
-    it "allows a sub-entry as parent if the discussion is threaded" do
+    it "allows a sub-entry as parent" do
       discussion_topic_model(threaded: true)
       root = @topic.reply_from(user: @teacher, text: "root entry")
       sub1 = root.reply_from(user: @teacher, html: "sub entry")

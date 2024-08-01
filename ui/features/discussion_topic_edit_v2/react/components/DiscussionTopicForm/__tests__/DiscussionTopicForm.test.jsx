@@ -505,6 +505,25 @@ describe('DiscussionTopicForm', () => {
     })
   })
 
+  describe('Disallow threaded replies', () => {
+    it('disallow threaded replies checkbox is checked when discussion type is side comment and does not has threaded reply', () => {
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.has_threaded_replies = false
+      const {getByTestId} = setup({currentDiscussionTopic: {discussionType: "side_comment"}})
+
+      const checkbox = getByTestId('disallow_threaded_replies')
+      expect(checkbox.checked).toBe(true)
+    })
+
+    it('disallow threaded replies checkbox is disabled when discussion type is side comment and has threaded replies', () => {
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.has_threaded_replies = true
+      const {getByTestId} = setup({currentDiscussionTopic: {discussionType: "side_comment"}})
+
+      const checkbox = getByTestId('disallow_threaded_replies')
+      expect(checkbox.disabled).toBe(true)
+      expect(checkbox.checked).toBe(false)
+    })
+  })
+
   describe('Graded', () => {
     it('does not allow the automatic peer review per student input to go below 1', () => {
       const {getByTestId, getByLabelText} = setup()
