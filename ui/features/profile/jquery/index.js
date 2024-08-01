@@ -273,7 +273,7 @@ $('#add_access_token_dialog .cancel_button').click(() => {
   $('#add_access_token_dialog').dialog('close')
 })
 $('#access_token_form').formSubmit({
-  object_name: 'access_token',
+  object_name: 'token',
   property_validations: {
     purpose(value) {
       if (!value || value === '') {
@@ -304,8 +304,7 @@ $('#access_token_form').formSubmit({
     $('#access_tokens_holder').show()
     const $token = $('.access_token.blank:first').clone(true).removeClass('blank')
     data.created = datetimeString(data.created_at) || '--'
-    data.expires =
-      datetimeString(data.permanent_expires_at) || I18n.t('token_never_expires', 'never')
+    data.expires = datetimeString(data.expires_at) || I18n.t('token_never_expires', 'never')
     data.used = '--'
     $token.fillTemplateData({
       data,
@@ -342,11 +341,10 @@ $('#token_details_dialog .regenerate_token').click(function () {
   $.ajaxJSON(
     url,
     'PUT',
-    {'access_token[regenerate]': '1'},
+    {'token[regenerate]': '1'},
     data => {
       data.created = datetimeString(data.created_at) || '--'
-      data.expires =
-        datetimeString(data.permanent_expires_at) || I18n.t('token_never_expires', 'never')
+      data.expires = datetimeString(data.expires_at) || I18n.t('token_never_expires', 'never')
       data.used = datetimeString(data.last_used_at) || '--'
       data.visible_token = data.visible_token || 'protected'
       $dialog
@@ -405,8 +403,7 @@ $('.show_token_link').click(function (event) {
       {},
       data => {
         data.created = datetimeString(data.created_at) || '--'
-        data.expires =
-          datetimeString(data.permanent_expires_at) || I18n.t('token_never_expires', 'never')
+        data.expires = datetimeString(data.expires_at) || I18n.t('token_never_expires', 'never')
         data.used = datetimeString(data.last_used_at) || '--'
         data.visible_token = data.visible_token || 'protected'
         $token.data('token', data)

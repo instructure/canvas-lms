@@ -61,14 +61,20 @@ class AccessToken < ActiveRecord::Base
 
   set_policy do
     given do |user|
-      !user.account.feature_enabled?(:admin_manage_access_tokens) ||
-        !user.account.limit_personal_access_tokens? ||
-        self.user.check_accounts_right?(user, :create_access_tokens)
+      user.id == user_id && (
+        !user.account.feature_enabled?(:admin_manage_access_tokens) ||
+        !user.account.limit_personal_access_tokens?
+      )
+    end
+    can :create and can :update
+
+    given do |user|
+      self.user.check_accounts_right?(user, :create_access_tokens)
     end
     can :create and can :update
 
     given { |user| user.id == user_id }
-    can :delete
+    can :read and can :delete
 
     given { |user| self.user.check_accounts_right?(user, :delete_access_tokens) }
     can :delete
@@ -246,12 +252,6 @@ class AccessToken < ActiveRecord::Base
 
   def clear_plaintext_refresh_token!
     @plaintext_refresh_token = nil
-  end
-
-  def regenerate=(val)
-    if val == "1" && manually_created?
-      generate_token(true)
-    end
   end
 
   def regenerate_access_token
