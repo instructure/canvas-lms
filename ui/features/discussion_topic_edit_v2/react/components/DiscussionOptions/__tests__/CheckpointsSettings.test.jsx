@@ -71,6 +71,14 @@ describe('CheckpointsSettings', () => {
       })
       expect(getByText('Total Points Possible: 17')).toBeInTheDocument()
     })
+
+    it('adds decimal points', () => {
+      const {getByText} = setup({
+        pointsPossibleReplyToEntry: 2.5,
+        pointsPossibleReplyToTopic: 3.25,
+      })
+      expect(getByText('Total Points Possible: 5.75')).toBeInTheDocument()
+    })
   })
   describe('Additional Replies Required', () => {
     it('displays the correct additional replies required passed from the useContext', () => {

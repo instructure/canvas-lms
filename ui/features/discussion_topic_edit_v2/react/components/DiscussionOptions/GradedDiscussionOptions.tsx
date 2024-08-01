@@ -35,7 +35,7 @@ import CoursePacingNotice from '@canvas/due-dates/react/CoursePacingNotice'
 type Props = {
   assignmentGroups: [{_id: string; name: string}]
   pointsPossible: number
-  setPointsPossible: (points: number) => void
+  setPointsPossible: (points: number | string) => void
   displayGradeAs: string
   setDisplayGradeAs: (id: string | undefined) => void
   assignmentGroup: string
@@ -105,7 +105,7 @@ export const GradedDiscussionOptions = ({
       {!isCheckpoints && (
         <View as="div" margin="medium 0">
           <PointsPossible
-            pointsPossible={pointsPossible || 0}
+            pointsPossible={pointsPossible}
             setPointsPossible={setPointsPossible}
             pointsPossibleLabel={I18n.t('Points Possible')}
             pointsPossibleDataTestId="points-possible-input"
