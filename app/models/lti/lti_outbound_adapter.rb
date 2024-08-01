@@ -120,10 +120,10 @@ module Lti
       generate_post_payload
     end
 
-    def generate_post_payload_for_student_context_card(student_id:)
+    def generate_post_payload_for_student_context_card(student:)
       raise("Called generate_post_payload_for_student_context_card before calling prepare_tool_launch") unless @tool_launch
 
-      @overrides[:lti_student_id] = student_id
+      @overrides[:lti_student_id] = student.global_id
       generate_post_payload
     end
 

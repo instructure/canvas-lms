@@ -83,11 +83,15 @@ describe Lti::LtiAdvantageAdapter do
   end
 
   describe "#generate_post_payload_for_student_context_card" do
-    let(:login_message) { adapter.generate_post_payload_for_student_context_card(student_id:) }
-    let(:student_id) { "123" }
+    let(:login_message) { adapter.generate_post_payload_for_student_context_card(student:) }
+    let(:student) { @student }
 
     it "includes extension lti_student_id claim in the id_token" do
-      expect(params["post_payload"]["https://www.instructure.com/lti_student_id"]).to eq(student_id)
+      expect(params["post_payload"]["https://www.instructure.com/lti_student_id"]).to eq(@student.global_id.to_s)
+    end
+
+    it "includes extension student_context claim in the id_token" do
+      expect(params["post_payload"]["https://www.instructure.com/student_context"]).to eq({ "id" => @student.lti_id })
     end
   end
 

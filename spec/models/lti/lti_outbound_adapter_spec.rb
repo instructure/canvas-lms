@@ -375,11 +375,12 @@ describe Lti::LtiOutboundAdapter do
   end
 
   describe "#generate_post_payload_for_student_context_card" do
-    let(:student_id) { user_model.global_id }
+    let(:student_id) { user.global_id }
+    let(:student) { user }
 
     it "raises a not prepared error if the tool launch has not been prepared" do
       expect do
-        adapter.generate_post_payload_for_student_context_card(student_id:)
+        adapter.generate_post_payload_for_student_context_card(student: @student)
       end.to raise_error(RuntimeError, "Called generate_post_payload_for_student_context_card before calling prepare_tool_launch")
     end
 
@@ -388,7 +389,7 @@ describe Lti::LtiOutboundAdapter do
       allow(LtiOutbound::ToolLaunch).to receive(:new).and_return(tool_launch)
 
       adapter.prepare_tool_launch(return_url, variable_expander)
-      adapter.generate_post_payload_for_student_context_card(student_id:)
+      adapter.generate_post_payload_for_student_context_card(student:)
       expect(tool_launch).to have_received(:generate).with(hash_including(lti_student_id: student_id))
     end
   end

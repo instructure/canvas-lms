@@ -75,7 +75,7 @@ module Lti::Messages
       add_lti1p1_claims! if include_lti1p1_claims?
       add_extension("placement", @opts[:resource_type])
       add_extension("lti_student_id", @opts[:student_id].to_s) if @opts[:student_id].present?
-
+      add_extension("student_context", { "id" => @opts[:student_lti_id] }) if @opts[:student_lti_id].present?
       @expander.expand_variables!(@message.extensions)
       @message.validate! if validate_launch
       @message
