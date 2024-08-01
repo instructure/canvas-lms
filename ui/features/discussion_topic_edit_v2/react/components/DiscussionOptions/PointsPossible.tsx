@@ -18,10 +18,11 @@
 
 import React from 'react'
 import {NumberInput} from '@instructure/ui-number-input'
+import numberHelper from '@canvas/i18n/numberHelper'
 
 type Props = {
   pointsPossible: number
-  setPointsPossible: (points: number) => void
+  setPointsPossible: (points: string | number) => void
   pointsPossibleLabel: string
   pointsPossibleDataTestId: string
 }
@@ -34,16 +35,26 @@ export const PointsPossible = ({
 }: Props) => {
   return (
     <NumberInput
+      inputMode="decimal"
+      showArrows={false}
       data-testid={pointsPossibleDataTestId}
       renderLabel={pointsPossibleLabel}
-      onIncrement={() => setPointsPossible(Math.max(0, pointsPossible + 1))}
-      onDecrement={() => setPointsPossible(Math.max(0, pointsPossible - 1))}
-      value={pointsPossible.toString()}
+      value={pointsPossible}
+      onBlur={event => {
+        const value = numberHelper.parse(event.target.value)
+        if (value) {
+          // cut off any decimal places beyond 2 and re-parse
+          setPointsPossible(Number.isInteger(value) ? value : numberHelper.parse(value.toFixed(2)))
+        } else {
+          // default to 0 if the value is invalid
+          setPointsPossible(0)
+        }
+      }}
       onChange={event => {
         // don't allow non-numeric values
-        if (!/^\d*\.?\d*$/.test(event.target.value)) return
-        const value = parseInt(event.target.value, 10)
-        setPointsPossible(Number.isNaN(value) ? 0 : value)
+        const value = event.target.value
+        if (!/^\d*\.?\d*$/.test(value)) return
+        setPointsPossible(value)
       }}
     />
   )

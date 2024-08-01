@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useContext, useRef} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -30,6 +30,7 @@ import {
   minimumReplyToEntryRequiredCount,
   maximumReplyToEntryRequiredCount,
 } from '../../util/constants'
+import numberHelper from '@canvas/i18n/numberHelper'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -50,6 +51,16 @@ export const CheckpointsSettings = () => {
     replyToEntryRequiredCount,
     setReplyToEntryRequiredCount,
   } = useContext(DiscussionDueDatesContext)
+
+  const [totalPoints, setTotalPoints] = useState(0)
+
+  useEffect(() => {
+    const replyToEntryPoints = numberHelper.parse(pointsPossibleReplyToEntry)
+    const replyToTopicPoints = numberHelper.parse(pointsPossibleReplyToTopic)
+    if (!Number.isNaN(replyToEntryPoints) && !Number.isNaN(replyToTopicPoints)) {
+      setTotalPoints(replyToEntryPoints + replyToTopicPoints)
+    }
+  }, [pointsPossibleReplyToTopic, pointsPossibleReplyToEntry])
 
   return (
     <>
@@ -131,7 +142,7 @@ export const CheckpointsSettings = () => {
       <View as="div" margin="0 0 medium 0">
         <Text size="large">
           {I18n.t('Total Points Possible: %{totalPoints}', {
-            totalPoints: pointsPossibleReplyToTopic + pointsPossibleReplyToEntry,
+            totalPoints,
           })}
         </Text>
       </View>
