@@ -232,6 +232,11 @@ describe ExternalToolsController do
               subject
               expect(cached_launch["post_payload"]["https://www.instructure.com/lti_student_id"]).to eq(student.global_id.to_s)
             end
+
+            it "includes student context in launch" do
+              subject
+              expect(cached_launch["post_payload"]["https://www.instructure.com/student_context"]).to eq({ "id" => student.lti_id.to_s })
+            end
           end
         end
       end
