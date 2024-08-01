@@ -190,7 +190,7 @@ function DiscussionTopicForm({
     currentDiscussionTopic?.isAnonymousAuthor || true
   )
   const [isThreaded, setIsThreaded] = useState(
-    currentDiscussionTopic?.discussionType === "threaded" || Object.keys(currentDiscussionTopic).length === 0
+    currentDiscussionTopic?.discussionType === "threaded" || (currentDiscussionTopic?.discussionType === "side_comment" && ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.has_threaded_replies) || Object.keys(currentDiscussionTopic).length === 0
   )
   const [requireInitialPost, setRequireInitialPost] = useState(
     currentDiscussionTopic?.requireInitialPost || false
