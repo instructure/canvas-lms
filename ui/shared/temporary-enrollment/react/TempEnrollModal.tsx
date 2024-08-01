@@ -136,10 +136,14 @@ export function TempEnrollModal(props: Props) {
     resetCommonState()
   }
 
-  const handleEnrollmentSubmission = (isSuccess: boolean) => {
+  const handleEnrollmentSubmission = (isSuccess: boolean, isUpdate: boolean) => {
     if (isSuccess) {
       setOpen(false)
-      showFlashSuccess(I18n.t('Temporary enrollment was successfully created.'))()
+      if (isUpdate) {
+        showFlashSuccess(I18n.t('Temporary enrollment was successfully updated.'))()
+      } else {
+        showFlashSuccess(I18n.t('Temporary enrollment was successfully created.'))()
+      }
     } else {
       setPage(2)
     }
