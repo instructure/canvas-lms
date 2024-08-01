@@ -250,6 +250,21 @@ describe DiscussionTopic do
     expect(@course.discussion_topics.first.message).to eql("<a href=\"#\">only this should stay</a>")
   end
 
+  it "side-comment discussion type is threaded when it has threaded replies" do
+    topic = @course.discussion_topics.create!(message: "test")
+    topic.discussion_type = "side_comment"
+    entry = topic.discussion_entries.create!(message: "test")
+    entry.reply_from(user: @student, html: "reply 1")
+    expect(topic.threaded?).to be true
+  end
+
+  it "side-comment discussion type is not threaded when it does not have threaded replies" do
+    topic = @course.discussion_topics.create!(message: "test")
+    topic.discussion_type = "side_comment"
+    topic.discussion_entries.create!(message: "test")
+    expect(topic.threaded?).to be false
+  end
+
   it "defaults to not_threaded type" do
     d = DiscussionTopic.new
     expect(d.discussion_type).to eq "not_threaded"
