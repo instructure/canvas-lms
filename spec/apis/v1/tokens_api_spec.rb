@@ -51,7 +51,7 @@ describe TokensController, type: :request do
                format: "json",
                user_id: user.id,
                id: token.id)
-      assert_status(401)
+      assert_status(404)
       expect(token.reload).not_to be_deleted
     end
 
@@ -117,7 +117,7 @@ describe TokensController, type: :request do
                    format: "json",
                    user_id: user.id,
                    id: token.id)
-          assert_status(401)
+          assert_status(404)
           expect(token.reload).not_to be_deleted
         end
       end
