@@ -119,7 +119,7 @@ class TokenScopes
   def self.api_routes
     return @_api_routes if @_api_routes
 
-    routes = Rails.application.routes.routes.select { |route| %r{^/api/(v1|sis)} =~ route.path.spec.to_s }.map do |route|
+    routes = Rails.application.routes.routes.select { |route| %r{^/api/(v1|sis|quiz/v1)} =~ route.path.spec.to_s }.map do |route|
       {
         controller: route.defaults[:controller]&.to_sym,
         action: route.defaults[:action]&.to_sym,

@@ -25,6 +25,7 @@ describe TokenScopes do
 
   describe ".named_scopes" do
     let!(:user_info_scope) { TokenScopes.named_scopes.find { |s| s[:scope] == TokenScopes::USER_INFO_SCOPE[:scope] } }
+    let(:new_quizzes_scopes) { TokenScopes.named_scopes.filter { |s| s[:path]&.include? "api/quiz/v1" } }
 
     it "includes the resource_name" do
       expect(user_info_scope[:resource_name].to_s).to eq "oauth2"
@@ -45,6 +46,10 @@ describe TokenScopes do
       allow(ApiScopeMapper).to receive(:name_for_resource).and_return(nil)
       expect(TokenScopes.named_scopes).to eq []
       TokenScopes.instance_variable_set(:@_named_scopes, nil) # we don't want to have this version stored
+    end
+
+    it "includes new quizzes API scopes" do
+      expect(new_quizzes_scopes).not_to be_empty
     end
   end
 
