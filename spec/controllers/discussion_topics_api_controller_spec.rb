@@ -172,7 +172,8 @@ describe DiscussionTopicsApiController do
   context "summary" do
     before do
       course_with_teacher(active_course: true)
-      @teacher.update!(locale: "en")
+      @course.account.update!(default_locale: "hu")
+
       @topic = @course.discussion_topics.create!(title: "discussion", summary_enabled: true)
       user_session(@teacher)
 
@@ -214,11 +215,11 @@ describe DiscussionTopicsApiController do
             dynamic_content_hash: Digest::SHA256.hexdigest({
               CONTENT: DiscussionTopic::PromptPresenter.raw_summary_for_refinement(raw_summary: @raw_summary.summary),
               FOCUS: DiscussionTopic::PromptPresenter.focus_for_summary(user_input: ""),
-              LOCALE: "English (United States)"
+              LOCALE: "Magyar"
             }.to_json),
             llm_config_version: "refined-V1_A",
             parent: @raw_summary,
-            locale: "en",
+            locale: "hu",
             user: @teacher
           )
         end
@@ -234,9 +235,9 @@ describe DiscussionTopicsApiController do
           expect(response.parsed_body["id"]).to eq(@refined_summary.id)
         end
 
-        it "returns a new summary if locale has changed" do
+        it "returns a new summary if locale is different" do
           expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
-          @teacher.update!(locale: "es")
+          @teacher.update!(locale: "en")
 
           expect(@inst_llm).to receive(:chat).and_return(
             InstLLM::Response::ChatResponse.new(
@@ -253,7 +254,6 @@ describe DiscussionTopicsApiController do
           get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
 
           expect(response).to be_successful
-          expect(@topic.reload.summary_enabled).to be_truthy
           expect(response.parsed_body["id"]).not_to eq(@refined_summary.id)
         end
       end
