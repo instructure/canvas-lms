@@ -19,6 +19,7 @@
 import {z} from 'zod'
 import {executeQuery} from '@canvas/query/graphql'
 import gql from 'graphql-tag'
+import speedGraderHelpers from '../jquery/speed_grader_helpers'
 
 const SUBMISSIONS_BY_ASSIGNMENT_QUERY = gql`
   query SubmissionsByAssignmentQuery($assignmentId: ID!) {
@@ -36,14 +37,15 @@ const SUBMISSIONS_BY_ASSIGNMENT_QUERY = gql`
           cachedDueDate
           customGradeStatus
           excused
-          excused
           gradeMatchesCurrentSubmission
           submissionCommentDownloadUrl
           gradingPeriodId
           gradingStatus
           groupId
           postedAt
+          grade
           score
+          state
           submissionStatus
           submittedAt
           attachments {
@@ -63,7 +65,16 @@ const SUBMISSIONS_BY_ASSIGNMENT_QUERY = gql`
 
 function transform(result: any) {
   if (result.assignment?.submissionsConnection?.nodes) {
-    return result.assignment.submissionsConnection.nodes
+    const submissions = result.assignment.submissionsConnection.nodes
+    submissions.forEach((submission: any) => {
+      submission.submissionState = speedGraderHelpers.steelThreadSubmissionState(
+        submission.user,
+        // @ts-expect-error
+        ENV.grading_role ?? '',
+        submission
+      )
+    })
+    return submissions
   }
   return null
 }
