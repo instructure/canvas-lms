@@ -2449,11 +2449,11 @@ class Submission < ActiveRecord::Base
   end
 
   def assessment_request_count
-    @assessment_requests_count ||= assessment_requests.length
+    @assessment_requests_count ||= assessment_requests.size
   end
 
   def assigned_assessment_count
-    @assigned_assessment_count ||= assigned_assessments.length
+    @assigned_assessment_count ||= assigned_assessments.size
   end
 
   def assign_assessment(obj)
