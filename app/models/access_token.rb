@@ -63,14 +63,14 @@ class AccessToken < ActiveRecord::Base
     given do |user|
       !user.account.feature_enabled?(:admin_manage_access_tokens) ||
         !user.account.limit_personal_access_tokens? ||
-        self.user.check_accounts_right?(user, :manage_access_tokens)
+        self.user.check_accounts_right?(user, :create_access_tokens)
     end
     can :create and can :update
 
     given { |user| user.id == user_id }
     can :delete
 
-    given { |user| self.user.check_accounts_right?(user, :manage_access_tokens) }
+    given { |user| self.user.check_accounts_right?(user, :delete_access_tokens) }
     can :delete
   end
 
