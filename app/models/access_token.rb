@@ -149,6 +149,18 @@ class AccessToken < ActiveRecord::Base
     !!authenticate(token_string)&.site_admin?
   end
 
+  def localized_workflow_state
+    if expired?
+      I18n.t("expired")
+    elsif pending?
+      I18n.t("pending")
+    elsif active?
+      I18n.t("active")
+    else
+      workflow_state
+    end
+  end
+
   def usable?(token_key = :crypted_token)
     return false if expired? || pending?
 
