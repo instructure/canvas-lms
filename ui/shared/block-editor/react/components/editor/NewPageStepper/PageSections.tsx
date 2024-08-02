@@ -24,8 +24,11 @@ import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-
 import {type PageSection} from './types'
+
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor')
 
 type PageSectionsProps = {
   selectedSections: PageSection[]
@@ -47,43 +50,54 @@ const PageSections = ({selectedSections, onSelectSections}: PageSectionsProps) =
   )
 
   return (
-    <Flex as="div" direction="column" alignItems="center" gap="small">
+    <Flex
+      as="div"
+      direction="column"
+      alignItems="center"
+      gap="small"
+      data-testid="stepper-page-sections"
+    >
       <Heading level="h3">Select Page Sections</Heading>
       <View as="div" maxWidth="400px" textAlign="center">
         <Text as="p">
-          Preload your page with section placeholders. You will be able to edit, delete, or add more
-          sections later.
+          {I18n.t(`Preload your page with section placeholders. You will be able to edit, delete, or add more
+          sections later.`)}
         </Text>
       </View>
       <Flex direction="row" alignItems="center" gap="medium">
         <Flex.Item textAlign="start">
           <FormFieldGroup layout="stacked" description="Standard">
             <Checkbox
-              label="Hero image with text"
+              id="heroWithText"
+              label={I18n.t('Hero image with text')}
               value="heroWithText"
               checked={selectedSections.includes('heroWithText')}
               onChange={handleChangeSelections}
             />
             <Checkbox
-              label="Navigation"
+              id="navigation"
+              label={I18n.t('Navigation')}
               value="navigation"
               checked={selectedSections.includes('navigation')}
               onChange={handleChangeSelections}
             />
             <Checkbox
-              label="About (Intro)"
+              id="about"
+              label={I18n.t('About (Intro)')}
               value="about"
               checked={selectedSections.includes('about')}
               onChange={handleChangeSelections}
             />
             <Checkbox
-              label="Highlights or services"
+              id="resources"
+              label={I18n.t('Highlights or services')}
               value="resources"
               checked={selectedSections.includes('resources')}
               onChange={handleChangeSelections}
             />
             <Checkbox
-              label="Footer"
+              id="footer"
+              label={I18n.t('Footer')}
               value="footer"
               checked={selectedSections.includes('footer')}
               onChange={handleChangeSelections}
@@ -93,33 +107,38 @@ const PageSections = ({selectedSections, onSelectSections}: PageSectionsProps) =
         <Flex.Item textAlign="start">
           <FormFieldGroup description="Canvas" layout="stacked">
             <Checkbox
-              label="Quiz question"
+              id="question"
+              label={I18n.t('Quiz question')}
               value="question"
               checked={selectedSections.includes('question')}
               onChange={handleChangeSelections}
             />
             <Checkbox
-              label="Announcement"
+              id="announcement"
+              label={I18n.t('Announcement')}
               value="announcement"
               checked={selectedSections.includes('announcement')}
               onChange={handleChangeSelections}
             />
             <Checkbox
-              label="Discussion topic"
+              id="discussion"
+              label={I18n.t('Discussion topic')}
               value="discussion"
               checked={selectedSections.includes('discussion')}
               onChange={handleChangeSelections}
               disabled={true}
             />
             <Checkbox
-              label="Assignment"
+              id="assignment"
+              label={I18n.t('Assignment')}
               value="assignment"
               checked={selectedSections.includes('discussion')}
               onChange={handleChangeSelections}
               disabled={true}
             />
             <Checkbox
-              label="Module"
+              id="module"
+              label={I18n.t('Module')}
               value="module"
               checked={selectedSections.includes('module')}
               onChange={handleChangeSelections}
