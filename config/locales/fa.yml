@@ -18213,6 +18213,7 @@ fa:
         registered_services: "سرویس‌های ثبت‌شده"
         remove: حذف
         share_skype_id: "به اشتراک گذاری شناسه اسکایپ"
+        state: وضعیت
         twitter_access: "دسترسی به توییتر"
         users_profile: "تنظیمات %{user}"
         ways_to_log_in: "راه های ورود"
