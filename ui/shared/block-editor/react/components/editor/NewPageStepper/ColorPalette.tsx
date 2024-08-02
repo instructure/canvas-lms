@@ -24,6 +24,10 @@ import {RadioInput} from '@instructure/ui-radio-input'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor')
+
 const PALETTES0 = [
   ['#083B64', '#0E5F8C', '#066B65', '#FFFFFF'],
   ['#1A2729', '#0ACC94', '#E5E9F3', '#FFFBF7'],
@@ -70,13 +74,19 @@ const ColorPalette = ({paletteId, onSelectPalette}: ColorPaletteProps) => {
     )
   }
   return (
-    <Flex as="div" direction="column" alignItems="center" gap="small">
+    <Flex
+      as="div"
+      direction="column"
+      alignItems="center"
+      gap="small"
+      data-testid="stepper-color-palette"
+    >
       <Heading level="h3" id="palette-label">
         Select a Color Palette
       </Heading>
       <View as="div" maxWidth="400px" textAlign="center">
         <Text as="p">
-          Theme your page with a preselected, accessibility compliant color palette.
+          {I18n.t('Theme your page with a preselected, accessibility compliant color palette.')}
         </Text>
       </View>
       <Flex direction="row" justifyItems="space-between" alignItems="center">

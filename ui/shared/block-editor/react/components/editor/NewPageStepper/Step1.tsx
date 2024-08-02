@@ -25,6 +25,10 @@ import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor')
+
 type Step1Selection = 'scratch' | 'template'
 
 type Step1Props = {
@@ -53,7 +57,7 @@ const Step1 = ({start = 'scratch', onSelect}: Step1Props) => {
   }, [onSelect])
 
   return (
-    <View as="div">
+    <View as="div" data-testid="step-1">
       <Flex direction="row" gap="large">
         <Flex direction="column" width="300px">
           <View
@@ -68,14 +72,20 @@ const Step1 = ({start = 'scratch', onSelect}: Step1Props) => {
                 if (el) scratchRef.current = el as HTMLButtonElement
               }}
             >
-              <Img src="/images/block_editor/scratch.png" alt="" width="300px" height="300px" />
+              <Img
+                src="/images/block_editor/scratch.png"
+                alt=""
+                width="300px"
+                height="300px"
+                aria-labelledby="start-from-scratch-desc"
+              />
             </CondensedButton>
           </View>
-          <View as="div" margin="x-small 0 0 0">
-            <Heading level="h3">Start from Scratch</Heading>
+          <View as="div" margin="x-small 0 0 0" id="start-from-scratch-desc">
+            <Heading level="h3">{I18n.t('Start from Scratch')}</Heading>
             <Text as="p">
-              Select from a variety of style options or start with a blank canvas to create a page
-              tailored to your specific needs.
+              {I18n.t(`Select from a variety of style options or start with a blank canvas to create a page
+              tailored to your specific needs.`)}
             </Text>
           </View>
         </Flex>
@@ -92,14 +102,20 @@ const Step1 = ({start = 'scratch', onSelect}: Step1Props) => {
                 if (el) templateRef.current = el as HTMLButtonElement
               }}
             >
-              <Img src="/images/block_editor/template.png" alt="" width="300px" height="300px" />
+              <Img
+                src="/images/block_editor/template.png"
+                alt=""
+                width="300px"
+                height="300px"
+                aria-labelledby="select-a-template-desc"
+              />
             </CondensedButton>
           </View>
-          <View as="div" margin="x-small 0 0 0">
-            <Heading level="h3">Select a Template</Heading>
+          <View as="div" margin="x-small 0 0 0" id="select-a-template-desc">
+            <Heading level="h3">{I18n.t('Select a Template')}</Heading>
             <Text as="p">
-              Select from a variety of pre-designed page layouts that are ready to be filled with
-              your content.
+              {I18n.t(`Select from a variety of pre-designed page layouts that are ready to be filled with
+              your content.`)}
             </Text>
           </View>
         </Flex>
