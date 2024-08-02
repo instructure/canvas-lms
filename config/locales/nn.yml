@@ -20236,6 +20236,7 @@ nn:
         registered_services: "Registrerte tenester"
         remove: Fjern
         share_skype_id: "Del Skype-ID"
+        state: Status
         twitter_access: Twitter-tilgang
         ways_to_log_in: "Måtar å logge på"
         web_services: Webtenester
