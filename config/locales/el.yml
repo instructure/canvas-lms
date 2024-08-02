@@ -11203,6 +11203,7 @@ el:
         registered_services: "Υπηρεσίες στις οποίες έχετε Εγγραφεί"
         remove: Αφαίρεση
         share_skype_id: "Μοιραστείτε το Skype ID σας"
+        state: Κατάσταση
         twitter_access: "Πρόσβαση Twitter"
         ways_to_log_in: "Τρόποι για σύνδεση"
         web_services: "Υπηρεσίες Web"
