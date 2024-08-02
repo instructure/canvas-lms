@@ -18912,6 +18912,7 @@ hu:
         registered_services: "Regisztrált szolgáltatások"
         remove: Eltávolítás
         share_skype_id: "Ossza meg Skype-azonosítóját"
+        state: Státusz
         twitter_access: Twitter-hozzáférés
         ways_to_log_in: "A bejelentkezés lehetőségei"
         web_services: Webszolgáltatások
