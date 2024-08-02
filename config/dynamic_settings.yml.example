@@ -85,6 +85,15 @@ development:
         aws_access_key_id: key
         aws_secret_access_key_dec: secret
         # stub_credentials: true # can be used in dev to print creds to stdout
+      # bedrock configuration for smart search and discussion summaries
+      bedrock.yml: |-
+        bedrock_region: us-west-2
+        vault_credential_path: sts/testaccount/sts/bedrock-dev
+      # sagemaker configuration for translations
+      sagemaker.yml: |
+        endpoint_name: translation-endpoint-dev
+        translation_region: us-west-2
+        vault_credential_path: sts/testaccount/sts/sagemaker-dev
       # datadog_apm.yml: |
       #   sample_rate: 0.0
       #   host_sample_rate: 0.0

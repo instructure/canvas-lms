@@ -76,6 +76,15 @@ development:
         write_paths:
           - active_record
         read_path: active_record
+      # bedrock configuration for smart search and discussion summaries
+      bedrock.yml: |-
+        vault_credential_path: sts/testaccount/sts/bedrock-dev
+        bedrock_region: us-west-2
+      # sagemaker configuration for translations
+      sagemaker.yml: |
+        endpoint_name: translation-endpoint-dev
+        translation_region: us-west-2
+        vault_credential_path: sts/testaccount/sts/sagemaker-dev
       datadog_apm.yml: |
         sample_rate: 0.0
         host_sample_rate: 0.0
