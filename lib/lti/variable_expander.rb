@@ -82,22 +82,16 @@ module Lti
     end
 
     CONTROLLER_GUARD = -> { !!@controller }
-    COURSE_GUARD = -> { @context.is_a? Course }
-    TERM_START_DATE_GUARD = lambda do
-      @context.is_a?(Course) && @context.enrollment_term &&
-        @context.enrollment_term.start_at
-    end
-    TERM_END_DATE_GUARD = lambda do
-      @context.is_a?(Course) && @context.enrollment_term &&
-        @context.enrollment_term.end_at
-    end
-    TERM_NAME_GUARD = -> { @context.is_a?(Course) && @context.enrollment_term&.name }
-    TERM_ID_GUARD = -> { @context.is_a?(Course) && @context.enrollment_term_id }
+    COURSE_GUARD = -> { lti_helper.course }
+    TERM_START_DATE_GUARD = -> { lti_helper.course&.enrollment_term&.start_at }
+    TERM_END_DATE_GUARD = -> { lti_helper.course&.enrollment_term&.end_at }
+    TERM_NAME_GUARD = -> { lti_helper.course&.enrollment_term&.name }
+    TERM_ID_GUARD = -> { lti_helper.course&.enrollment_term_id }
     USER_GUARD = -> { @current_user }
     SIS_USER_GUARD = -> { sis_pseudonym&.sis_user_id }
     PSEUDONYM_GUARD = -> { sis_pseudonym }
-    ENROLLMENT_GUARD = -> { @current_user && @context.is_a?(Course) }
-    ROLES_GUARD = -> { @current_user && (@context.is_a?(Course) || @context.is_a?(Account)) }
+    ENROLLMENT_GUARD = -> { @current_user && lti_helper.course }
+    ROLES_GUARD = -> { @current_user && lti_helper.course_or_account }
     CONTENT_TAG_GUARD = -> { @content_tag }
     ASSIGNMENT_GUARD = -> { @assignment }
     FILE_UPLOAD_GUARD = -> { !!@assignment && @assignment.submission_types.split(",").include?("online_upload") }
@@ -114,7 +108,7 @@ module Lti
     LTI_ASSIGN_ID = -> { @assignment.present? || @originality_report.present? || @secure_params.present? }
     LTI_ASSIGN_DESCRIPTION = -> { @assignment.present? || @originality_report.present? || @secure_params.present? }
     EDITOR_GUARD = -> { @editor_contents.present? }
-    STUDENT_ASSIGNMENT_GUARD = -> { @context.is_a?(Course) && @context.user_is_student?(@current_user) && @assignment }
+    STUDENT_ASSIGNMENT_GUARD = -> { lti_helper.course&.user_is_student?(@current_user) && @assignment }
 
     def initialize(root_account, context, controller, opts = {})
       @root_account = root_account
@@ -282,10 +276,10 @@ module Lti
                        [],
                        lambda {
                          observed_users =
-                           ObserverEnrollment.observed_students(@context, @current_user)
+                           ObserverEnrollment.observed_students(lti_helper.course, @current_user)
                                              .keys
                          if @tool.use_1_3?
-                           observed_users.map { |u| u.lookup_lti_id(@context) }.join(",")
+                           observed_users.map { |u| u.lookup_lti_id(lti_helper.course) }.join(",")
                          else
                            observed_users.map { |u| Lti::Asset.opaque_identifier_for(u) }.join(",")
                          end
@@ -303,7 +297,17 @@ module Lti
     #   ```
     register_expansion "com.instructure.User.sectionNames",
                        [],
-                       -> { @context.enrollments.active.joins(:course_section).where(user_id: @current_user.id).order(:course_section_id).pluck(:name)&.to_json },
+                       lambda {
+                         lti_helper.course
+                                   .enrollments.active
+                                   .joins(:course_section)
+                                   .where(user_id: @current_user.id)
+                                   .order(:course_section_id)
+                                   .pluck(:name, :course_section_id) # create pairs of [ [name, 1] , [other_name, 2] ]
+                                   .uniq(&:last) # the last element in the [name, 1] pairs is the ID. Only keep ones with unique IDs.
+                                   .map(&:first) # and now just get the first element of those pairs, which is the name
+                                   &.to_json
+                       },
                        ENROLLMENT_GUARD,
                        default_name: "com_instructure_user_section_names"
 
@@ -373,7 +377,7 @@ module Lti
     register_expansion "com.instructure.Observee.sisIds",
                        [],
                        lambda {
-                         observed_users = ObserverEnrollment.observed_students(@context, @current_user).keys
+                         observed_users = ObserverEnrollment.observed_students(lti_helper.course, @current_user).keys
                          observed_users&.filter_map { |user| find_sis_user_id_for(user) }&.join(",")
                        },
                        COURSE_GUARD,
@@ -534,7 +538,7 @@ module Lti
     #   ```
     register_expansion "CourseOffering.sourcedId",
                        [],
-                       -> { @context.sis_source_id },
+                       -> { lti_helper.course.sis_source_id },
                        COURSE_GUARD,
                        default_name: "lis_course_offering_sourcedid"
 
@@ -593,13 +597,14 @@ module Lti
                        },
                        -> { @context.is_a?(Course) || (@placement == :user_navigation && @context.is_a?(User) && sis_pseudonym) }
 
-    # Returns a string with a comma-separated list of the context ids of the
-    # courses in reverse chronological order from which content has been copied.
-    # Will show a limit of 1000 context ids.  When the number passes 1000,
-    # 'truncated' will show at the end of the list.
+    # With respect to the current course, recursively returns the context ids of the courses from which content has been copied (excludes cartridge imports).
+    # Will show a limit of 1000 context ids.  When the number passes 1000, 'truncated' will show at the end of the list.
+    #
+    # This is an alias of `Canvas.course.previousContextIds.recursive`.
+    #
     # @example
     #   ```
-    #   "789,456,123"
+    #   "1234,4567"
     #   ```
     register_expansion "Context.id.history",
                        [],
@@ -855,7 +860,7 @@ module Lti
     #   ```
     register_expansion "Canvas.course.id",
                        [],
-                       -> { @context.id },
+                       -> { lti_helper.course.id },
                        COURSE_GUARD
 
     # returns the current course uuid.
@@ -865,7 +870,7 @@ module Lti
     #   ```
     register_expansion "vnd.instructure.Course.uuid",
                        [],
-                       -> { @context.uuid },
+                       -> { lti_helper.course.uuid },
                        COURSE_GUARD
 
     # returns the current course name.
@@ -875,7 +880,7 @@ module Lti
     #   ```
     register_expansion "Canvas.course.name",
                        [],
-                       -> { @context.name },
+                       -> { lti_helper.course.name },
                        COURSE_GUARD
 
     # returns the current course sis source id.
@@ -885,7 +890,7 @@ module Lti
     #   ```
     register_expansion "Canvas.course.sisSourceId",
                        [],
-                       -> { @context.sis_source_id },
+                       -> { lti_helper.course.sis_source_id },
                        COURSE_GUARD
 
     # returns the current course integration id.
@@ -895,7 +900,7 @@ module Lti
     #   ```
     register_expansion "com.instructure.Course.integrationId",
                        [],
-                       -> { @context.integration_id },
+                       -> { lti_helper.course.integration_id },
                        COURSE_GUARD
 
     # returns the current course start date.
@@ -905,7 +910,7 @@ module Lti
     #   ```
     register_expansion "Canvas.course.startAt",
                        [],
-                       -> { @context.start_at },
+                       -> { lti_helper.course.start_at },
                        COURSE_GUARD
 
     # returns the current course end date.
@@ -915,7 +920,7 @@ module Lti
     #   ```
     register_expansion "Canvas.course.endAt",
                        [],
-                       -> { @context.end_at },
+                       -> { lti_helper.course.end_at },
                        COURSE_GUARD
 
     # returns the current course workflow state. Workflow states of "claimed" or "created"
@@ -926,21 +931,21 @@ module Lti
     #   ```
     register_expansion "Canvas.course.workflowState",
                        [],
-                       -> { @context.workflow_state },
+                       -> { lti_helper.course.workflow_state },
                        COURSE_GUARD
 
     # returns true if the current course has the setting "Hide grade distribution graphs from students" enabled
     # @internal
     register_expansion "Canvas.course.hideDistributionGraphs",
                        [],
-                       -> { @context.hide_distribution_graphs? },
+                       -> { lti_helper.course.hide_distribution_graphs? },
                        COURSE_GUARD
 
     # returns grade passback setting for the course.
     # @internal
     register_expansion "Canvas.course.gradePassbackSetting",
                        [],
-                       -> { @context.grade_passback_setting },
+                       -> { lti_helper.course.grade_passback_setting },
                        COURSE_GUARD
 
     # returns the current course's term start date.
@@ -950,7 +955,7 @@ module Lti
     #   ```
     register_expansion "Canvas.term.startAt",
                        [],
-                       -> { @context.enrollment_term.start_at },
+                       -> { lti_helper.course.enrollment_term.start_at },
                        TERM_START_DATE_GUARD
 
     # returns the current course's term end date.
@@ -960,7 +965,7 @@ module Lti
     #   ```
     register_expansion "Canvas.term.endAt",
                        [],
-                       -> { @context.enrollment_term.end_at },
+                       -> { lti_helper.course.enrollment_term.end_at },
                        TERM_END_DATE_GUARD
 
     # returns the current course's term name.
@@ -970,7 +975,7 @@ module Lti
     #   ```
     register_expansion "Canvas.term.name",
                        [],
-                       -> { @context.enrollment_term.name },
+                       -> { lti_helper.course.enrollment_term.name },
                        TERM_NAME_GUARD,
                        default_name: "canvas_term_name"
 
@@ -981,7 +986,7 @@ module Lti
     #   ```
     register_expansion "Canvas.term.id",
                        [],
-                       -> { @context.enrollment_term_id },
+                       -> { lti_helper.course.enrollment_term_id },
                        TERM_ID_GUARD,
                        default_name: "canvas_term_id"
 
@@ -994,7 +999,7 @@ module Lti
     #   ```
     register_expansion "CourseSection.sourcedId",
                        [],
-                       -> { @context.sis_source_id },
+                       -> { lti_helper.course.sis_source_id },
                        COURSE_GUARD,
                        default_name: "lis_course_section_sourcedid"
 
@@ -1044,7 +1049,7 @@ module Lti
     #  ```
     register_expansion "com.instructure.Course.gradingScheme",
                        [],
-                       -> { @context.grading_standard_or_default.data.map { |grading_standard_data_row| { name: grading_standard_data_row[0], value: grading_standard_data_row[1] } }.to_json },
+                       -> { lti_helper.course.grading_standard_or_default.data.map { |grading_standard_data_row| { name: grading_standard_data_row[0], value: grading_standard_data_row[1] } }.to_json },
                        COURSE_GUARD,
                        default_name: "com_instructure_course_grading_scheme"
 
@@ -1107,6 +1112,8 @@ module Lti
 
     # With respect to the current course, recursively returns the context ids of the courses from which content has been copied (excludes cartridge imports).
     # Will show a limit of 1000 context ids.  When the number passes 1000, 'truncated' will show at the end of the list.
+    #
+    # This is an alias of `$Context.id.history`.
     #
     # @example
     #   ```
@@ -1306,7 +1313,7 @@ module Lti
     #   ```
     register_expansion "com.instructure.Course.groupIds",
                        [],
-                       -> { @context.groups.active.pluck(:id).join(",") },
+                       -> { lti_helper.course.groups.active.pluck(:id).join(",") },
                        COURSE_GUARD,
                        default_name: "com_instructure_course_groupids"
 
@@ -1390,10 +1397,23 @@ module Lti
     # the tool was launched under. This list includes the IDs of
     # all subaccounts of these accounts (and their subaccounts, etc.), since
     # the admin privileges carry from an account to all its subaccounts.
+    # Root account admins are not supported by this variable,
+    # use `Canvas.user.isRootAccountAdmin` instead.
+    #
+    # ### Example:
+    # * Root account
+    #     * Subaccount 1 (user is account admin)
+    #         * Subaccount 2
+    #             * Subaccount 3
+    #         * Subaccount 4
+    #     * Subaccount 5
+    #
+    # Result: `"1,2,4,3"`
     #
     # Will show a limit of 40000 characters. If the account IDs list is too big
     # to fit into 40000 characters, 'truncated' will show at the end of the
     # list.
+    # The result is cached for 5 minutes.
     #
     # @example
     #   ```
@@ -1578,7 +1598,7 @@ module Lti
     #   ```
     register_expansion "com.instructure.contextLabel",
                        [],
-                       -> { @context.course_code },
+                       -> { lti_helper.course.course_code },
                        COURSE_GUARD,
                        default_name: "context_label"
 

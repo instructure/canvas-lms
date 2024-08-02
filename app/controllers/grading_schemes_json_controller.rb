@@ -40,7 +40,9 @@ class GradingSchemesJsonController < ApplicationController
   end
 
   def detail_list
-    grading_standards = grading_standards_for_context.preload(:assignments, :courses, :accounts).sorted.limit(GRADING_SCHEMES_LIMIT)
+    grading_standards = grading_standards_for_context(include_parent_accounts: false)
+                        .preload(:assignments, :courses, :accounts)
+                        .sorted.limit(GRADING_SCHEMES_LIMIT)
     respond_to do |format|
       format.json do
         render json: grading_standards.map { |grading_standard|
@@ -138,7 +140,7 @@ class GradingSchemesJsonController < ApplicationController
   end
 
   def update
-    grading_standard = grading_standards_for_context.find(params[:id])
+    grading_standard = grading_standards_for_context(include_parent_accounts: false).find(params[:id])
     if authorized_action(grading_standard, @current_user, :manage)
       grading_standard.user = @current_user
 
@@ -252,13 +254,13 @@ class GradingSchemesJsonController < ApplicationController
     %w[id title scaling_factor points_based context_type context_id workflow_state]
   end
 
-  def grading_standards_for_context
+  def grading_standards_for_context(include_parent_accounts: true)
     include_archived = params[:include_archived] == "true"
     if params[:assignment_id]
       @assignment = @context.assignments.find(params[:assignment_id])
       return GradingStandard.for(@assignment, include_archived:)
     end
-    GradingStandard.for(@context, include_archived:)
+    GradingStandard.for(@context, include_archived:, include_parent_accounts:)
   end
 
   def self.default_canvas_grading_standard(context)

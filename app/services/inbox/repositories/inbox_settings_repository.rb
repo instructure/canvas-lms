@@ -22,6 +22,7 @@ module Inbox
     class InboxSettingsRepository
       class InboxSettingsRecord < ActiveRecord::Base
         self.table_name = "inbox_settings"
+        self.ignored_columns += %w[inbox_settings_ooo_snapshot]
       end
 
       class << self

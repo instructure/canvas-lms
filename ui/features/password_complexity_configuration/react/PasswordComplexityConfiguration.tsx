@@ -34,12 +34,39 @@ import {Modal} from '@instructure/ui-modal'
 import {FileDrop} from '@instructure/ui-file-drop'
 import {Billboard} from '@instructure/ui-billboard'
 import {Img} from '@instructure/ui-img'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 
 const I18n = useI18nScope('password_complexity_configuration')
 
+declare const ENV: GlobalEnv
+
+interface PasswordPolicy {
+  require_number_characters: boolean
+  require_symbol_characters: boolean
+  allow_login_suspension: boolean
+  maximum_login_attempts?: number
+  minimum_character_length?: number
+}
+
+interface Settings {
+  password_policy: PasswordPolicy
+}
+
+interface Account {
+  settings: Settings
+}
+
+interface QueryParams {
+  account: Account
+}
+
 const PasswordComplexityConfiguration = () => {
   const [showTray, setShowTray] = useState(false)
+  const [enableApplyButton, setEnableApplyButton] = useState(true)
   const [minimumCharacterLengthEnabled, setMinimumCharacterLengthEnabled] = useState(true)
+  const [minimumCharacterLength, setMinimumCharacterLength] = useState(8)
   const [requireNumbersEnabled, setRequireNumbersEnabled] = useState(true)
   const [requireSymbolsEnabled, setRequireSymbolsEnabled] = useState(true)
   const [customForbiddenWordsEnabled, setCustomForbiddenWordsEnabled] = useState(false)
@@ -47,10 +74,25 @@ const PasswordComplexityConfiguration = () => {
   const [customListUploaded, setCustomListUploaded] = useState(false)
   const [fileModalOpen, setFileModalOpen] = useState(false)
   const [customMaxLoginAttemptsEnabled, setCustomMaxLoginAttemptsEnabled] = useState(false)
+  const [allowLoginSuspensionEnabled, setAllowLoginSuspensionEnabled] = useState(false)
+  const [maxLoginAttempts, setMaxLoginAttempts] = useState(10)
 
   const handleCustomMaxLoginAttemptToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked
     setCustomMaxLoginAttemptsEnabled(checked)
+  }
+
+  const handleAllowLoginSuspensionToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const checked = event.target.checked
+    setAllowLoginSuspensionEnabled(checked)
+  }
+
+  const handleMinimumCharacterChange = (value: number) => {
+    setMinimumCharacterLength(value)
+  }
+
+  const handleMaxLoginAttemptsChange = (value: number) => {
+    setMaxLoginAttempts(value)
   }
 
   const handleFileDrop = (file: File) => {
@@ -72,6 +114,57 @@ const PasswordComplexityConfiguration = () => {
     setCustomListUploaded(false)
   }
 
+  const saveChanges = async () => {
+    setEnableApplyButton(false)
+
+    const updateAccountUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/`
+    const passwordPolicy: PasswordPolicy = {
+      require_number_characters: requireNumbersEnabled,
+      require_symbol_characters: requireSymbolsEnabled,
+      allow_login_suspension: allowLoginSuspensionEnabled,
+    }
+
+    if (customMaxLoginAttemptsEnabled) {
+      passwordPolicy.maximum_login_attempts = maxLoginAttempts
+    }
+
+    if (minimumCharacterLengthEnabled) {
+      passwordPolicy.minimum_character_length = minimumCharacterLength
+    }
+
+    const requestBody: QueryParams = {
+      account: {
+        settings: {
+          password_policy: passwordPolicy,
+        },
+      },
+    }
+
+    try {
+      const {status} = await executeApiRequest<QueryParams>({
+        path: updateAccountUrl,
+        body: requestBody,
+        method: 'PUT',
+      })
+      if (status === 200) {
+        showFlashAlert({
+          message: I18n.t('Password settings saved successfully.'),
+          type: 'success',
+        })
+        setShowTray(false)
+      }
+    } catch (err: any) {
+      // err type has to be any because the error object is not defined
+      showFlashAlert({
+        message: I18n.t('An error occurred applying password policy settings.'),
+        err,
+        type: 'error',
+      })
+    } finally {
+      setEnableApplyButton(true)
+    }
+  }
+
   return (
     <>
       <Heading margin="small auto xx-small auto" level="h4">
@@ -81,6 +174,7 @@ const PasswordComplexityConfiguration = () => {
         onClick={() => {
           setShowTray(true)
         }}
+        color="primary"
       >
         {I18n.t('View Options')}
       </Button>
@@ -112,7 +206,7 @@ const PasswordComplexityConfiguration = () => {
               <View as="div" margin="xxx-small auto small auto">
                 <Text size="small" lineHeight="fit">
                   {I18n.t(
-                    'Some institutions have very strict policies regarding passwords. This feature enables customization of password requirements and options for this auth provider. Modifications to password options will customize the password configuration text as seen below.'
+                    'Some institutions have very strict policies regarding passwords. This feature enables customization of password requirements and options for this auth provider. Modifications to password options will customize the password configuration text as seen below. If a custom minimum character length or maximum login attempts is not set, their default values will be used.'
                   )}
                 </Text>
               </View>
@@ -120,7 +214,6 @@ const PasswordComplexityConfiguration = () => {
             </View>
             <Alert variant="info" margin="small medium medium medium">
               {I18n.t('Your password must meet the following requirements')}
-
               <List margin="xxx-small">
                 <List.Item>{I18n.t('Must be at least 8 Characters in length.')}</List.Item>
                 <List.Item>
@@ -144,7 +237,8 @@ const PasswordComplexityConfiguration = () => {
                 <NumberInputControlled
                   minimum={8}
                   maximum={255}
-                  defaultValue={8}
+                  currentValue={minimumCharacterLength}
+                  updateCurrentValue={handleMinimumCharacterChange}
                   disabled={!minimumCharacterLengthEnabled}
                   data-testid="minimumCharacterLengthInput"
                 />
@@ -168,7 +262,6 @@ const PasswordComplexityConfiguration = () => {
                 data-testid="requireSymbolsCheckbox"
               />
             </View>
-
             <View as="div" margin="medium">
               <Checkbox
                 checked={customForbiddenWordsEnabled}
@@ -178,7 +271,6 @@ const PasswordComplexityConfiguration = () => {
                 label={I18n.t('Customize forbidden words/termslist (see default list here)')}
                 data-testid="customForbiddenWordsCheckbox"
               />
-
               <View
                 as="div"
                 insetInlineStart="1.75em"
@@ -190,7 +282,6 @@ const PasswordComplexityConfiguration = () => {
                     'Upload a list of forbidden words/terms in addition to the default list. The file should be text file (.txt) with a single word or term per line.'
                   )}
                 </Text>
-
                 {!customListUploaded && (
                   <View as="div" margin="small 0">
                     <Button
@@ -209,7 +300,6 @@ const PasswordComplexityConfiguration = () => {
               <View as="div" margin="0 medium medium medium">
                 <Heading level="h4">{I18n.t('Current Custom List')}</Heading>
                 <hr />
-
                 <Flex justifyItems="space-between">
                   <Flex.Item>
                     <Link href="#">{customListFile?.name}</Link>
@@ -237,7 +327,6 @@ const PasswordComplexityConfiguration = () => {
                 label={I18n.t('Customize maximum login attempts (default 10 attempts)')}
                 data-testid="customMaxLoginAttemptsCheckbox"
               />
-
               <View
                 as="div"
                 insetInlineStart="1.75em"
@@ -256,11 +345,20 @@ const PasswordComplexityConfiguration = () => {
                 <NumberInputControlled
                   minimum={3}
                   maximum={20}
-                  defaultValue={10}
+                  currentValue={maxLoginAttempts}
+                  updateCurrentValue={handleMaxLoginAttemptsChange}
                   disabled={!customMaxLoginAttemptsEnabled}
                   data-testid="customMaxLoginAttemptsInput"
                 />
               </View>
+            </View>
+            <View as="div" margin="medium medium small medium">
+              <Checkbox
+                onChange={handleAllowLoginSuspensionToggle}
+                checked={allowLoginSuspensionEnabled}
+                label={I18n.t('Allow login suspension')}
+                data-testid="allowLoginSuspensionCheckbox"
+              />
             </View>
           </Flex.Item>
 
@@ -275,7 +373,13 @@ const PasswordComplexityConfiguration = () => {
                 >
                   {I18n.t('Cancel')}
                 </Button>
-                <Button margin="small" color="primary">
+                <Button
+                  margin="small"
+                  color="primary"
+                  onClick={saveChanges}
+                  disabled={!enableApplyButton}
+                  data-testid="saveButton"
+                >
                   {I18n.t('Apply')}
                 </Button>
               </View>

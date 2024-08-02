@@ -533,3 +533,7 @@ table.response-fields td.param-desc ul {
 .field-effective {
   width: 10em;
 }
+
+.lti-placement-image {
+  width: 100%;
+}

@@ -23,28 +23,46 @@ import {List} from '@instructure/ui-list'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+
+declare const ENV: GlobalEnv
 
 const I18n = useI18nScope('CoursesTray')
 
 const UNPUBLISHED = 'unpublished'
 
-export function CourseListItemContent({course}: {course: Course}) {
-  const subtexts = []
-  if (course.enrollment_term_id > 1) {
-    subtexts.push(course.term.name)
-  }
-  if (ENV.FEATURES?.courses_popout_sisid && course.sis_course_id) {
-    subtexts.push(course.sis_course_id)
-  }
+export const CourseListItemContent = ({course}: {course: Course}) => {
+  const sectionNames = (course.sections || []).map(section => section.name)
+  const sectionDetails = sectionNames.length > 0 ? sectionNames.sort().join(', ') : null
+  const courseDetails =
+    ENV.FEATURES?.courses_popout_sisid && course.sis_course_id
+      ? course.enrollment_term_id > 1
+        ? I18n.t('SIS ID: %{courseSisId} | Term: %{termName}', {
+            courseSisId: course.sis_course_id,
+            termName: course.term.name,
+          })
+        : I18n.t('SIS ID: %{courseSisId}', {
+            courseSisId: course.sis_course_id,
+          })
+      : course.enrollment_term_id > 1
+      ? I18n.t('Term: %{termName}', {
+          termName: course.term.name,
+        })
+      : null
 
   return (
     <>
       <Link isWithinText={false} href={`/courses/${course.id}`}>
         {course.name}
       </Link>
-      {subtexts.length > 0 && (
+      {sectionDetails && (
         <Text as="div" size="x-small" weight="light">
-          {subtexts.join(' - ')}
+          {sectionDetails}
+        </Text>
+      )}
+      {courseDetails && (
+        <Text as="div" size="x-small" weight="light">
+          {courseDetails}
         </Text>
       )}
     </>
@@ -57,29 +75,33 @@ export function SplitCoursesList({courses, k5User}: {courses: Course[]; k5User: 
   return (
     <>
       {publishedCourses.length > 0 && (
-        <Heading level="h4" as="h3" key="published_courses">
-          {k5User ? I18n.t('Published Subjects') : I18n.t('Published Courses')}
-        </Heading>
+        <>
+          <Heading level="h4" as="h3" key="published_courses">
+            {k5User ? I18n.t('Published Subjects') : I18n.t('Published Courses')}
+          </Heading>
+          <List key="published" isUnstyled={true} margin="small small" itemSpacing="small">
+            {publishedCourses.map(course => (
+              <List.Item key={course.id}>
+                <CourseListItemContent course={course} />
+              </List.Item>
+            ))}
+          </List>
+        </>
       )}
-      <List key="published" isUnstyled={true} margin="small small" itemSpacing="small">
-        {publishedCourses.map(course => (
-          <List.Item key={course.id}>
-            <CourseListItemContent course={course} />
-          </List.Item>
-        ))}
-      </List>
       {unpublishedCourses.length > 0 && (
-        <Heading level="h4" as="h3" key="unpublished_courses">
-          {k5User ? I18n.t('Unpublished Subjects') : I18n.t('Unpublished Courses')}
-        </Heading>
+        <>
+          <Heading level="h4" as="h3" key="unpublished_courses">
+            {k5User ? I18n.t('Unpublished Subjects') : I18n.t('Unpublished Courses')}
+          </Heading>
+          <List key="unpublished" isUnstyled={true} margin="small small" itemSpacing="small">
+            {unpublishedCourses.map(course => (
+              <List.Item key={course.id}>
+                <CourseListItemContent course={course} />
+              </List.Item>
+            ))}
+          </List>
+        </>
       )}
-      <List key="unpublished" isUnstyled={true} margin="small small" itemSpacing="small">
-        {unpublishedCourses.map(course => (
-          <List.Item key={course.id}>
-            <CourseListItemContent course={course} />
-          </List.Item>
-        ))}
-      </List>
     </>
   )
 }

@@ -123,5 +123,10 @@ module Types
       # should be changed as well in order to keep everything consistent.
       object.attempt.nil? ? 0 : object.attempt
     end
+
+    field :can_reply, Boolean, null: true
+    def can_reply
+      object.submission.grants_right?(current_user, :comment)
+    end
   end
 end

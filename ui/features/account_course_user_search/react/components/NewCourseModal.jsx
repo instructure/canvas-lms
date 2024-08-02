@@ -32,7 +32,7 @@ import AccountsTreeStore from '../store/AccountsTreeStore'
 import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import preventDefault from '@canvas/util/preventDefault'
 import {flatten} from 'lodash'
-import {clearDashboardCache} from '../../../../shared/dashboard-card'
+import {clearDashboardCache} from '../../../../shared/dashboard-card/dashboardCardQueries'
 
 const I18n = useI18nScope('account_course_user_search')
 

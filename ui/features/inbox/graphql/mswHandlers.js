@@ -278,6 +278,7 @@ export const handlers = [
               submissionId: '3',
               createdAt: '2022-04-04T12:19:38-06:00',
               attempt: 0,
+              canReply: false,
               author: User.mock(),
               assignment: {
                 id: 'QXNzaWdubWVudC0x',
@@ -322,6 +323,7 @@ export const handlers = [
                     submissionId: '3',
                     createdAt: '2022-04-04T12:19:38-06:00',
                     attempt: 0,
+                    canReply: false,
                     author: User.mock(),
                     assignment: {
                       id: 'QXNzaWdubWVudC0x',
@@ -349,6 +351,7 @@ export const handlers = [
                     submissionId: '3',
                     createdAt: '2022-04-04T12:19:38-06:00',
                     attempt: 0,
+                    canReply: false,
                     author: User.mock(),
                     assignment: {
                       id: 'QXNzaWdubWVudC0x',

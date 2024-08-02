@@ -500,6 +500,17 @@ describe Folder do
         expect(student_can_download?).to be false
       end
     end
+
+    context "clears user permissions" do
+      before do
+        allow(folder.context).to receive(:active_users).and_return([@student])
+      end
+
+      it "calls clear_caches on user" do
+        expect(@student).to receive(:clear_caches)
+        folder.clear_active_users_cache
+      end
+    end
   end
 
   describe "icon_maker_folder" do

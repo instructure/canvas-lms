@@ -20,6 +20,10 @@ import React from 'react'
 import {useEditor, useNode, type Node} from '@craftjs/core'
 import {useClassNames} from '../../../utils'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor/no-sections')
+
 export type NoSectionsProps = {
   className?: string
   children?: React.ReactNode
@@ -32,13 +36,13 @@ export const NoSections = ({className = '', children}: NoSectionsProps) => {
   const {
     connectors: {connect},
   } = useNode()
-  const clazz = useClassNames(enabled, {empty: !children}, [className])
+  const clazz = useClassNames(enabled, {empty: !children}, [className, 'no-sections'])
 
   return (
     <div
       ref={el => el && connect(el)}
       className={clazz}
-      data-placeholder="Drop a block to add it here"
+      data-placeholder={I18n.t('Drop a block to add it here')}
     >
       {children}
     </div>
@@ -46,7 +50,6 @@ export const NoSections = ({className = '', children}: NoSectionsProps) => {
 }
 
 NoSections.craft = {
-  displayName: 'Column',
   rules: {
     canMoveIn: (nodes: Node[]) => !nodes.some(node => node.data.custom.isSection),
   },

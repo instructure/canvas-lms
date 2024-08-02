@@ -56,7 +56,6 @@ const I18n = useI18nScope('differentiated_modules')
 
 export interface ItemAssignToTrayContentProps
   extends Omit<ItemAssignToTrayProps, 'iconType' | 'itemName'> {
-  assignToCards: ItemAssignToCardSpec[]
   setAssignToCards: (cards: ItemAssignToCardSpec[]) => void
   blueprintDateLocks?: DateLockTypes[]
   setBlueprintDateLocks: (locks?: DateLockTypes[]) => void
@@ -80,6 +79,7 @@ export interface ItemAssignToTrayContentProps
   postToSIS?: boolean
   assignToCardsRef: React.MutableRefObject<ItemAssignToCardSpec[]>
   disabledOptionIdsRef: React.MutableRefObject<string[]>
+  isTray: boolean
 }
 
 const MAX_PAGES = 10
@@ -94,10 +94,9 @@ const ItemAssignToCardMemo = memo(
   ItemAssignToCard,
   (prevProps: OptimizedItemAssignToCardProps, nextProps: OptimizedItemAssignToCardProps) => {
     return (
-      prevProps.everyoneOption?.value === nextProps.everyoneOption?.value &&
+      nextProps.persistEveryoneOption &&
       prevProps.selectedAssigneeIds?.length === nextProps.selectedAssigneeIds?.length &&
       prevProps.highlightCard === nextProps.highlightCard &&
-      prevProps.isOpen === nextProps.isOpen &&
       prevProps.due_at === nextProps.due_at &&
       prevProps.original_due_at === nextProps.original_due_at &&
       prevProps.unlock_at === nextProps.unlock_at &&
@@ -115,7 +114,6 @@ const ItemAssignToCardMemo = memo(
 
 const ItemAssignToTrayContent = ({
   open,
-  assignToCards,
   initialLoadRef,
   setAssignToCards,
   courseId,
@@ -153,6 +151,7 @@ const ItemAssignToTrayContent = ({
   postToSIS = false,
   assignToCardsRef,
   disabledOptionIdsRef,
+  isTray,
 }: ItemAssignToTrayContentProps) => {
   const [initialCards, setInitialCards] = useState<ItemAssignToCardSpec[]>([])
   const [fetchInFlight, setFetchInFlight] = useState(false)
@@ -160,6 +159,12 @@ const ItemAssignToTrayContent = ({
 
   const lastPerformedAction = useRef<{action: 'add' | 'delete'; index?: number} | null>(null)
   const addCardButtonRef = useRef<Element | null>(null)
+
+  const isOpenRef = useRef<boolean>(false)
+
+  useEffect(() => {
+    isOpenRef.current = open
+  }, [open])
 
   useEffect(() => {
     if (
@@ -219,24 +224,24 @@ const ItemAssignToTrayContent = ({
   }, [defaultGroupCategoryId, setGroupCategoryId])
 
   useEffect(() => {
-    if (assignToCards.length === 0 && !lastPerformedAction.current) return
+    if (assignToCardsRef.current.length === 0 && !lastPerformedAction.current) return
     const action = lastPerformedAction.current?.action
     const index = lastPerformedAction.current?.index || 0
     // If only a card remains, we should focus the add button
-    const shouldFocusAddButton = action === 'delete' && assignToCards.length <= 1
+    const shouldFocusAddButton = action === 'delete' && assignToCardsRef.current.length <= 1
     let focusIndex
     if (shouldFocusAddButton && addCardButtonRef?.current instanceof HTMLButtonElement) {
       addCardButtonRef.current.disabled = false // so it can be focused
       addCardButtonRef.current.focus()
     } else if (action === 'add') {
       // Focus the last card
-      focusIndex = assignToCards.length - 1
+      focusIndex = assignToCardsRef.current.length - 1
     } else if (action === 'delete') {
       // Focus the previous card
       focusIndex = index <= 0 ? 0 : index - 1
     }
     if (focusIndex !== undefined) {
-      const card = assignToCards.at(focusIndex)
+      const card = assignToCardsRef.current.at(focusIndex)
       if (card) {
         const cardRef = cardsRefs.current[card.key]
         if (cardRef?.current) {
@@ -245,23 +250,25 @@ const ItemAssignToTrayContent = ({
         }
       }
     }
-  }, [assignToCards, cardsRefs])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assignToCardsRef.current, cardsRefs])
 
   useEffect(() => {
     // Remove extra refs if cards array has shrunk
     Object.keys(cardsRefs.current).forEach(key => {
-      if (!assignToCards.some(card => card.key === key)) {
+      if (!assignToCardsRef.current.some(card => card.key === key)) {
         delete cardsRefs.current[key]
       }
     })
 
     // Ensure cardsRefs has refs for all items
-    assignToCards.forEach(card => {
+    assignToCardsRef.current.forEach(card => {
       if (!cardsRefs.current[card.key]) {
         cardsRefs.current[card.key] = React.createRef<ItemAssignToCardRef>()
       }
     })
-  }, [assignToCards, cardsRefs])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assignToCardsRef.current, cardsRefs])
 
   useEffect(() => {
     if (defaultCards !== undefined) {
@@ -333,7 +340,7 @@ const ItemAssignToTrayContent = ({
         if (!onlyOverrides && !hasCourseOverride) {
           // only add the regular everyone card if there isn't a course override
           const cardId = makeCardId()
-          const selectedOption = [getEveryoneOption(assignToCards.length > 1).id]
+          const selectedOption = [getEveryoneOption(assignToCardsRef.current.length > 1).id]
           cards.push({
             key: cardId,
             isValid: true,
@@ -445,7 +452,7 @@ const ItemAssignToTrayContent = ({
     }
     const cardId = makeCardId()
     const cards: ItemAssignToCardSpec[] = [
-      ...assignToCards,
+      ...assignToCardsRef.current,
       {
         key: cardId,
         isValid: true,
@@ -481,17 +488,19 @@ const ItemAssignToTrayContent = ({
 
   const handleCardValidityChange = useCallback(
     (cardId: string, isValid: boolean) => {
-      const priorCard = assignToCards.find(card => card.key === cardId)
+      const priorCard = assignToCardsRef.current.find(card => card.key === cardId)
       if (priorCard) {
         const validityChanged = priorCard.isValid !== isValid
         if (!validityChanged) {
           return
         }
       }
-      const cards = assignToCards.map(card => (card.key === cardId ? {...card, isValid} : card))
+      const cards = assignToCardsRef.current.map(card =>
+        card.key === cardId ? {...card, isValid} : card
+      )
       setAssignToCards(cards)
     },
-    [assignToCards, setAssignToCards]
+    [assignToCardsRef, setAssignToCards]
   )
 
   const handleCustomAssigneesChange = useCallback(
@@ -627,12 +636,17 @@ const ItemAssignToTrayContent = ({
     return assignToCardsRef.current.every(card => card.hasAssignees)
   }
 
-  const renderCardsOptimized = useCallback(
-    (isOpen?: boolean) => {
-      const cardCount = assignToCards.length
-      return assignToCards.map(card => (
+  const renderCards = useCallback(
+    () => {
+      const cardCount = assignToCardsRef.current.length
+      return assignToCardsRef.current.map(card => (
         <View key={`${card.key}`} as="div" margin="small 0 0 0">
           <ItemAssignToCardMemo
+            // Make sure the cards get rendered when there is only one card or when jumping to two cards
+            // since the everyone option needs to be updated.
+            // Having cardCount > 2 will prevent the cards to be rendered when having more cards
+            // since in that snacerio the everyone option won't change.
+            persistEveryoneOption={cardCount !== 1 && cardCount > 2}
             ref={cardsRefs.current[card.key]}
             courseId={courseId}
             contextModuleId={card.contextModuleId}
@@ -650,7 +664,7 @@ const ItemAssignToTrayContent = ({
             onCardAssignmentChange={handleCardAssignment}
             onCardDatesChange={handleDatesChange}
             onValidityChange={handleCardValidityChange}
-            isOpen={isOpen}
+            isOpenRef={isOpenRef}
             disabledOptionIds={disabledOptionIdsRef.current}
             everyoneOption={everyoneOption}
             selectedAssigneeIds={card.selectedAssigneeIds}
@@ -665,8 +679,9 @@ const ItemAssignToTrayContent = ({
         </View>
       ))
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
-      assignToCards,
+      assignToCardsRef,
       cardsRefs,
       courseId,
       removeDueDateInput,
@@ -682,65 +697,27 @@ const ItemAssignToTrayContent = ({
       blueprintDateLocks,
       postToSIS,
       disabledOptionIdsRef,
+      defaultGroupCategoryId,
     ]
   )
-
-  function renderCards(isOpen?: boolean) {
-    const cardCount = assignToCards.length
-    return assignToCards.map((card, i) => {
-      return (
-        // eslint-disable-next-line react/no-array-index-key
-        <View key={`${card.key}-${i}`} as="div" margin="small 0 0 0">
-          <ItemAssignToCard
-            ref={cardsRefs.current[card.key]}
-            courseId={courseId}
-            contextModuleId={card.contextModuleId}
-            contextModuleName={card.contextModuleName}
-            removeDueDateInput={removeDueDateInput}
-            isCheckpointed={isCheckpointed}
-            cardId={card.key}
-            reply_to_topic_due_at={card.reply_to_topic_due_at}
-            required_replies_due_at={card.required_replies_due_at}
-            due_at={card.due_at}
-            original_due_at={card.original_due_at}
-            unlock_at={card.unlock_at}
-            lock_at={card.lock_at}
-            onDelete={cardCount === 1 ? undefined : handleDeleteCard}
-            onCardAssignmentChange={handleCardAssignment}
-            onCardDatesChange={handleDatesChange}
-            onValidityChange={handleCardValidityChange}
-            isOpen={isOpen}
-            disabledOptionIds={disabledOptionIdsRef.current}
-            everyoneOption={everyoneOption}
-            selectedAssigneeIds={card.selectedAssigneeIds}
-            customAllOptions={allOptions}
-            customIsLoading={isLoadingAssignees}
-            customSetSearchTerm={setSearchTerm}
-            highlightCard={card.highlightCard}
-            blueprintDateLocks={blueprintDateLocks}
-            postToSIS={postToSIS}
-            disabledOptionIdsRef={disabledOptionIdsRef}
-          />
-        </View>
-      )
-    })
-  }
 
   return (
     <Flex.Item padding="small medium" shouldGrow={true} shouldShrink={true}>
       {fetchInFlight || !loadedAssignees || isLoading ? (
-        <Mask>
+        isTray ? (
+          <Mask>
+            <Spinner data-testid="cards-loading" renderTitle={I18n.t('Loading')} />
+          </Mask>
+        ) : (
           <Spinner data-testid="cards-loading" renderTitle={I18n.t('Loading')} />
-        </Mask>
+        )
       ) : (
         <ApplyLocale locale={locale} timezone={timezone}>
-          {ENV.FEATURES?.selective_release_optimized_tray
-            ? renderCardsOptimized(open)
-            : renderCards(open)}
+          {renderCards()}
         </ApplyLocale>
       )}
-
       <Button
+        display={isTray ? undefined : 'block'}
         onClick={handleAddCard}
         data-testid="add-card"
         margin="small 0 0 0"
@@ -748,7 +725,7 @@ const ItemAssignToTrayContent = ({
         interaction={!allCardsAssigned() || !!blueprintDateLocks?.length ? 'disabled' : 'enabled'}
         elementRef={el => (addCardButtonRef.current = el)}
       >
-        {I18n.t('Add')}
+        {isTray ? I18n.t('Add') : I18n.t('Assign To')}
       </Button>
     </Flex.Item>
   )

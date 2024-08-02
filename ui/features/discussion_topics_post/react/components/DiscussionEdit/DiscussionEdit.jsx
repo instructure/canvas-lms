@@ -203,7 +203,7 @@ export const DiscussionEdit = props => {
                     color="primary"
                     data-testid="DiscussionEdit-submit"
                     key="rce-reply-button"
-                    interaction={attachmentToUpload ? 'disabled' : 'enabled'}
+                    interaction={(attachmentToUpload || props.isSubmitting) ? 'disabled' : 'enabled'}
                   >
                     <Text size="medium">{props.isEdit ? I18n.t('Save') : I18n.t('Reply')}</Text>
                   </Button>
@@ -267,6 +267,7 @@ DiscussionEdit.propTypes = {
   quotedEntry: PropTypes.object,
   onInit: PropTypes.func,
   isAnnouncement: PropTypes.bool.isRequired,
+  isSubmitting: PropTypes.bool
 }
 
 DiscussionEdit.defaultProps = {

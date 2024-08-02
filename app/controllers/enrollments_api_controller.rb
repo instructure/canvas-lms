@@ -510,9 +510,19 @@ class EnrollmentsApiController < ApplicationController
       collection =
         if use_bookmarking?
           enrollments = enrollments.select("users.sortable_name AS sortable_name")
-          bookmarker = BookmarkedCollection::SimpleBookmarker.new(Enrollment,
-                                                                  { type: { skip_collation: true }, sortable_name: { type: :string, null: false } },
-                                                                  :id)
+
+          if @domain_root_account&.feature_enabled?(:temporary_enrollments)
+            temp_enroll_params = params.slice(:temporary_enrollments_for_recipient,
+                                              :temporary_enrollment_recipients_for_provider)
+          end
+
+          sorting_column = if temp_enroll_params.present?
+                             { type: { skip_collation: true }, start_at: { type: :datetime, null: false }, end_at: { type: :datetime, null: false } }
+                           else
+                             { type: { skip_collation: true }, sortable_name: { type: :string, null: false } }
+                           end
+
+          bookmarker = BookmarkedCollection::SimpleBookmarker.new(Enrollment, sorting_column, :id)
           ShardedBookmarkedCollection.build(bookmarker, enrollments, always_use_bookmarks: true)
         else
           enrollments.order(:type, User.sortable_name_order_by_clause("users"), :id)

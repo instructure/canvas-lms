@@ -122,6 +122,7 @@ export default class IndexHeader extends Component {
         data-testid="lock_announcements"
         onClick={this.props.toggleSelectedAnnouncementsLock}
         renderIcon={icon}
+        key="lockButton"
       >
         {instUINavEnabled() && <PresentationContent>{label}</PresentationContent>}
         <ScreenReaderContent>{screenReaderLabel}</ScreenReaderContent>
@@ -134,6 +135,7 @@ export default class IndexHeader extends Component {
       <ActionDropDown
         label={I18n.t('More')}
         disabled={this.props.isBusy || this.props.selectedCount === 0}
+        key="actionDropDown"
         actions={[
           {
             icon: IconTrashLine,
@@ -163,12 +165,104 @@ export default class IndexHeader extends Component {
     )
   }
 
+  renderAddAnnouncementButton(responsiveStyles) {
+    return (
+      this.props.permissions.create && (
+        <Button
+          href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new?is_announcement=true`}
+          color="primary"
+          display={responsiveStyles.buttonDisplay}
+          id="add_announcement"
+          renderIcon={IconPlusLine}
+          key="addAnnouncementButton"
+        >
+          <ScreenReaderContent>{I18n.t('Add announcement')}</ScreenReaderContent>
+          <PresentationContent>{I18n.t('Announcement')}</PresentationContent>
+        </Button>
+      )
+    )
+  }
+
+  renderMarkAllAsReadButton(responsiveStyles) {
+    return (
+      <Button
+        id="mark_all_announcement_read"
+        data-testid="mark-all-announcement-read"
+        renderIcon={IconInvitationLine}
+        display={responsiveStyles.buttonDisplay}
+        onClick={this.props.markAllAnnouncementRead}
+        disabled={this.props.isBusy}
+        key="markAllAsReadButton"
+      >
+        <ScreenReaderContent>{I18n.t('Mark All Announcement Read')}</ScreenReaderContent>
+        <PresentationContent>{I18n.t('Mark All as Read')}</PresentationContent>
+      </Button>
+    )
+  }
+
+  renderDeleteButton(responsiveStyles) {
+    return (
+      this.props.permissions.manage_course_content_delete && (
+        <Button
+          disabled={this.props.isBusy || this.props.selectedCount === 0}
+          size="medium"
+          display={responsiveStyles.buttonDisplay}
+          id="delete_announcements"
+          data-testid="delete-announcements-button"
+          onClick={this.onDelete}
+          renderIcon={<IconTrashLine />}
+          ref={c => {
+            this.deleteBtn = c
+          }}
+          key="deleteButton"
+        >
+          {instUINavEnabled() && <PresentationContent>{I18n.t('Delete')}</PresentationContent>}
+          <ScreenReaderContent>{I18n.t('Delete Selected Announcements')}</ScreenReaderContent>
+        </Button>
+      )
+    )
+  }
+
+  renderLockButton(responsiveStyles) {
+    return (
+      this.props.permissions.manage_course_content_edit &&
+      !this.props.announcementsLocked &&
+      (this.props.isToggleLocking
+        ? this.renderLockToggleButton(
+            <IconLockLine />,
+            I18n.t('Lock'),
+            I18n.t('Lock Selected Announcements'),
+            responsiveStyles
+          )
+        : this.renderLockToggleButton(
+            <IconUnlockLine />,
+            I18n.t('Unlock'),
+            I18n.t('Unlock Selected Announcements'),
+            responsiveStyles
+          ))
+    )
+  }
+
   renderActionButtons(responsiveStyles) {
     const {breakpoints} = this.props
-    const instUIICEDesktop = instUINavEnabled() && breakpoints.ICEDesktop
-    const tabletDirection = breakpoints.tablet ? 'row-reverse' : 'column'
-    const directionWithInstUi = instUINavEnabled() ? tabletDirection : 'row'
-    const buttonsDirection = instUIICEDesktop ? 'row-reverse' : directionWithInstUi
+
+    const buttonsDirection = !instUINavEnabled() || breakpoints.ICEDesktop ? 'row' : 'column'
+    const buttonsDesktop = [
+      this.renderLockButton(responsiveStyles),
+      this.renderDeleteButton(responsiveStyles),
+      this.renderMarkAllAsReadButton(responsiveStyles),
+      this.renderAddAnnouncementButton(responsiveStyles),
+    ]
+
+    const buttonsMobile = [
+      this.renderAddAnnouncementButton(responsiveStyles),
+      this.renderMarkAllAsReadButton(responsiveStyles),
+      this.renderButtonMenu(),
+    ]
+
+    if (!instUINavEnabled()) {
+      buttonsDesktop.reverse()
+    }
 
     return (
       <Flex
@@ -181,69 +275,8 @@ export default class IndexHeader extends Component {
         width="100%"
         height="100%"
       >
-        {this.props.permissions.create && (
-          <Button
-            href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new?is_announcement=true`}
-            color="primary"
-            display={responsiveStyles.buttonDisplay}
-            id="add_announcement"
-            renderIcon={IconPlusLine}
-          >
-            <ScreenReaderContent>{I18n.t('Add announcement')}</ScreenReaderContent>
-            <PresentationContent>{I18n.t('Announcement')}</PresentationContent>
-          </Button>
-        )}
-        <Button
-          id="mark_all_announcement_read"
-          data-testid="mark-all-announcement-read"
-          renderIcon={IconInvitationLine}
-          display={responsiveStyles.buttonDisplay}
-          onClick={this.props.markAllAnnouncementRead}
-          disabled={this.props.isBusy}
-        >
-          <ScreenReaderContent>{I18n.t('Mark All Announcement Read')}</ScreenReaderContent>
-          <PresentationContent>{I18n.t('Mark All as Read')}</PresentationContent>
-        </Button>
-        {instUINavEnabled && breakpoints.mobileOnly ? (
-          this.renderButtonMenu()
-        ) : (
-          <>
-            {this.props.permissions.manage_course_content_delete && (
-              <Button
-                disabled={this.props.isBusy || this.props.selectedCount === 0}
-                size="medium"
-                display={responsiveStyles.buttonDisplay}
-                id="delete_announcements"
-                data-testid="delete-announcements-button"
-                onClick={this.onDelete}
-                renderIcon={<IconTrashLine />}
-                ref={c => {
-                  this.deleteBtn = c
-                }}
-              >
-                {instUINavEnabled() && (
-                  <PresentationContent>{I18n.t('Delete')}</PresentationContent>
-                )}
-                <ScreenReaderContent>{I18n.t('Delete Selected Announcements')}</ScreenReaderContent>
-              </Button>
-            )}
-            {this.props.permissions.manage_course_content_edit &&
-              !this.props.announcementsLocked &&
-              (this.props.isToggleLocking
-                ? this.renderLockToggleButton(
-                    <IconLockLine />,
-                    I18n.t('Lock'),
-                    I18n.t('Lock Selected Announcements'),
-                    responsiveStyles
-                  )
-                : this.renderLockToggleButton(
-                    <IconUnlockLine />,
-                    I18n.t('Unlock'),
-                    I18n.t('Unlock Selected Announcements'),
-                    responsiveStyles
-                  ))}
-          </>
-        )}
+        {instUINavEnabled() && (breakpoints.ICEDesktop ? buttonsDesktop : buttonsMobile)}
+        {!instUINavEnabled() && buttonsDesktop}
       </Flex>
     )
   }

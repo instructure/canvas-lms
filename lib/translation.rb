@@ -105,7 +105,7 @@ module Translation
         { id: "cy", name: "Welsh" },
         { id: "da", name: "Danish" },
         { id: "de", name: "German" },
-        { id: "el", name: "Greeek" },
+        { id: "el", name: "Greek" },
         { id: "en", name: "English" },
         { id: "es", name: "Spanish" },
         { id: "et", name: "Estonian" },

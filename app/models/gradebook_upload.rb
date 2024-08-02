@@ -31,8 +31,15 @@ class GradebookUpload < ActiveRecord::Base
       p.user = user
     end
     gradebook_upload = GradebookUpload.create!(course:, user:, progress:)
-    gradebook_upload_attachment = gradebook_upload.attachments.create!(attachment_data)
-    progress.process_job(GradebookImporter, :create_from, {}, gradebook_upload, user, gradebook_upload_attachment)
+    begin
+      gradebook_upload_attachment = gradebook_upload.attachments.create!(attachment_data)
+      progress.process_job(GradebookImporter, :create_from, {}, gradebook_upload, user, gradebook_upload_attachment)
+    rescue ActiveRecord::RecordInvalid => e
+      progress.message = "Invalid attachment"
+      progress.workflow_state = "failed"
+      progress.save
+      Canvas::Errors.capture_exception(:gradebook_import, e, :info)
+    end
     progress
   end
 

@@ -29,6 +29,7 @@ import DueDates from '../../react/DueDates'
 import CoursePacingNotice from '../../react/CoursePacingNotice'
 import StudentGroupStore from '../../react/StudentGroupStore'
 import DifferentiatedModulesSection from '../../react/DifferentiatedModulesSection'
+import AssignToContent from '../../react/AssignToContent'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import * as tz from '@instructure/moment-utils'
 import '@canvas/jquery/jquery.instructure_forms'
@@ -82,8 +83,9 @@ DueDateOverrideView.prototype.render = function () {
     )
   }
 
+  const selective_release_section = ENV.FEATURES?.selective_release_edit_page ? AssignToContent : DifferentiatedModulesSection
   const assignToSection = ENV.FEATURES?.selective_release_ui_api
-    ? React.createElement(DifferentiatedModulesSection, {
+    ? React.createElement(selective_release_section, {
         onSync: this.setNewOverridesCollection,
         defaultSectionId: this.model.defaultDueDateSectionId,
         overrides: this.model.overrides.models.map(model => model.toJSON().assignment_override),

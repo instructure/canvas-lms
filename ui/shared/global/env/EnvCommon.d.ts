@@ -222,6 +222,7 @@ export interface EnvCommon {
     classes?: string
   }>
   breadcrumbs: {name: string; url: string | null}[]
+  enhanced_rubrics_enabled?: boolean
 
   /**
    * Used by ui/features/top_navigation_tools/react/TopNavigationTools.tsx
@@ -240,9 +241,8 @@ export type SiteAdminFeatureId =
   | 'course_paces_redesign'
   | 'selective_release_backend'
   | 'selective_release_ui_api'
-  | 'selective_release_optimized_tray'
+  | 'selective_release_edit_page'
   | 'enhanced_course_creation_account_fetching'
-  | 'enhanced_rubrics'
   | 'explicit_latex_typesetting'
   | 'featured_help_links'
   | 'instui_for_import_page'
@@ -279,6 +279,7 @@ export type RootAccountFeatureId =
   | 'usage_rights_discussion_topics'
   | 'account_level_mastery_scales'
   | 'non_scoring_rubrics'
+  | 'rubric_criterion_range'
 
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES

@@ -1151,6 +1151,8 @@ module ApplicationHelper
   end
 
   def planner_enabled?
+    return false if @current_user&.student_in_limited_access_account?
+
     !!@current_user&.has_student_enrollment? ||
       (@current_user&.roles(@domain_root_account)&.include?("observer") && k5_user?) ||
       !!@current_user&.roles(@domain_root_account)&.include?("observer") # TODO: ensure observee is a student?

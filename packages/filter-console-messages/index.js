@@ -59,6 +59,9 @@ const consoleMessagesToIgnore = {
 
     // https://github.com/reactwg/react-18/discussions/82
     /Can't perform a React state update on an unmounted component/,
+
+    // the block editor includes a ContentEditable and a delete button w/in an INSTUI Tab.
+    '[Focusable] Exactly one focusable child is required',
   ],
 }
 

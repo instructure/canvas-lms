@@ -47,19 +47,12 @@ export type PlacementsConfirmationProps = {
 const I18n = useI18nScope('lti_registration.wizard')
 
 /**
- * These placements currently don't have a corresponding image in the API docs. Additionally,
- * some of them are also locked down to only Instructure-allowed tools to prevent abuse,
- * namely top_navigation and submission_type_selection. As such, we're going to avoid showing a tooltip for them.
- *
- * @todo Update/Remove this list once INTEROP-8713 is finished as part of INTEROP-8714
+ * These placements don't have images in the API docs, so we don't show the tooltip.
+ * We have purposefully chosen to leave them undocumented.
  */
 export const UNDOCUMENTED_PLACEMENTS = [
-  LtiPlacements.TopNavigation,
-  LtiPlacements.ConferenceSelection,
-  LtiPlacements.ModuleGroupMenu,
-  LtiPlacements.ModuleMenuModal,
-  LtiPlacements.SubmissionTypeSelection,
-  LtiPlacements.SimilarityDetection,
+  LtiPlacements.ConferenceSelection, // Locked behind a Site Admin FF that's off
+  LtiPlacements.SimilarityDetection, // Only really relevant for LTI 2
 ]
 
 export const PlacementsConfirmation = ({

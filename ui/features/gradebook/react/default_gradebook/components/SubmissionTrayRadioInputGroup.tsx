@@ -76,6 +76,7 @@ export type PendingUpdateData = {
   latePolicyStatus?: string
   secondsLateOverride?: number
   customGradeStatusId?: string
+  subAssignmentTag?: string
 }
 
 type RadioInputOption = {

@@ -263,3 +263,78 @@ export const IMPORTANT_DATES_CONTEXTS = [
   {assetString: 'course_2', name: 'Home Room', color: 'blue'},
   {assetString: 'course_3', name: 'The Maths', color: 'red'},
 ]
+
+export const MOCK_QUERY_CARDS_RESPONSE = {
+  legacyNode: {
+    favoriteCoursesConnection: {
+      nodes: [
+        {
+          _id: '1',
+          dashboardCard: {
+            id: '1',
+            assetString: 'course_1',
+            href: '/courses/1',
+            shortName: 'Economics 101',
+            originalName: 'UGLY-SIS-ECON-101',
+            color: 'yellow',
+            courseCode: 'ECON-001',
+            enrollmentState: 'active',
+            isHomeroom: false,
+            isK5Subject: true,
+            canManage: true,
+            canReadAnnouncements: true,
+            published: true,
+            term: {
+              id: 'VGVybS0x',
+              name: "fake term's name",
+            },
+          },
+        },
+        {
+          _id: '2',
+          dashboardCard: {
+            id: '2',
+            assetString: 'course_2',
+            href: '/courses/2',
+            shortName: 'Home Room',
+            originalName: 'UGLY-SIS-HOMEROOM-007',
+            color: 'blue',
+            courseCode: 'HOME-001',
+            enrollmentState: 'active',
+            isHomeroom: true,
+            isK5Subject: false,
+            canManage: true,
+            canReadAnnouncements: true,
+            published: false,
+            term: {
+              id: 'VGVybS0x',
+              name: "fake term's name",
+            },
+          },
+        },
+        {
+          _id: '3',
+          dashboardCard: {
+            id: '3',
+            assetString: 'course_3',
+            href: '/courses/3',
+            shortName: 'The Maths',
+            originalName: 'UGLY-SIS-BEG-ALG-101',
+            color: 'red',
+            courseCode: 'DA-MATHS',
+            enrollmentState: 'invited',
+            isHomeroom: false,
+            isK5Subject: true,
+            canManage: true,
+            canReadAnnouncements: true,
+            published: true,
+            term: {
+              id: 'VGVybS0x',
+              name: "fake term's name",
+            },
+          },
+        },
+      ],
+    },
+  },
+}

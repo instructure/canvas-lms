@@ -184,6 +184,48 @@ describe "wiki pages show page assign to" do
       option_names = option_elements.map(&:text)
       expect(option_names).to include("Mastery Paths")
     end
+
+    it "allows mastery path to be re-assigned after a previous assignment to mastery paths and removal" do
+      @course.conditional_release = true
+      @course.save!
+
+      visit_wiki_page_view(@course.id, @page.title)
+
+      assign_to_btn.click
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      click_delete_assign_to_item("Remove Everyone", 0)
+      select_module_item_assignee(0, "Mastery Paths")
+      click_save_button
+      keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+      assign_to_btn.click
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      click_delete_assign_to_item("Remove Mastery Paths", 0)
+      select_module_item_assignee(0, @student1.name)
+
+      click_save_button
+      keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+      assign_to_btn.click
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      click_delete_assign_to_item("Remove #{@student1.name}", 0)
+      select_module_item_assignee(0, "Mastery Paths")
+
+      click_save_button
+      keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+      assign_to_btn.click
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      expect(assign_to_in_tray("Remove Mastery Paths")[0]).to be_displayed
+    end
   end
 
   context "as a student" do

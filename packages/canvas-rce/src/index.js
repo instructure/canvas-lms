@@ -30,6 +30,8 @@ export const defaultConfiguration = defaultTinymceConfig
 export {instuiPopupMountNode} from './util/fullscreenHelpers'
 export {Mathml}
 
+export {RCEVariantValues} from './rce/RCEVariants'
+
 export function renderIntoDiv(editorEl, props, cb) {
   const language = normalizeLocale(props.language)
   setLocale(language)

@@ -38,6 +38,7 @@ describe "selective_release modules for students" do
   include K5Common
   include QuizzesIndexPage
   include SelectiveReleaseCommon
+  include ModulesSettingsTray
 
   context "provides modules for correct students" do
     before(:once) do
@@ -108,6 +109,31 @@ describe "selective_release modules for students" do
       keep_trying_until do
         expect(element_exists?(context_module_selector(module2.id))).to be_truthy
       end
+    end
+
+    it "shows prerequisites to student that is assigned to" do
+      module1 = @course.context_modules.create!(name: "Prerequisite 1", workflow_state: "active")
+      module2 = @course.context_modules.create!(name: "Prerequisite 2", workflow_state: "active")
+      module3 = @course.context_modules.create!(name: "Test Module", workflow_state: "active")
+
+      module1_override = module1.assignment_overrides.create!(set_type: "ADHOC")
+      module1_override.assignment_override_students.create!(user: @student1)
+
+      module2_override = module2.assignment_overrides.create!
+      module2_override.set_type = "CourseSection"
+      module2_override.set_id = @section
+      module2_override.save!
+
+      module3_override = module3.assignment_overrides.create!(set_type: "ADHOC")
+      module3_override.assignment_override_students.create!(user: @student1)
+
+      module3.prerequisites = "module_#{module1.id},module_#{module2.id}"
+      module3.save!
+
+      user_session(@student1)
+      go_to_modules
+
+      expect(prerequisite_message(module3).text).to eq("Prerequisites: #{module1.name}")
     end
 
     it "shows only the assignment for student who is not assigned to module" do

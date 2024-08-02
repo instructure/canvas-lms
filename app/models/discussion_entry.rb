@@ -322,7 +322,7 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user| self.user && self.user == user }
     can :read
 
-    given { |user| self.user && self.user == user && discussion_topic.available_for?(user) && discussion_topic.can_participate_in_course?(user) && !discussion_topic.comments_disabled? }
+    given { |user| self.user && self.user == user && discussion_topic.available_for?(user) && discussion_topic.can_participate_in_course?(user) && !discussion_topic.comments_disabled? && discussion_topic.threaded? }
     can :reply
 
     given { |user| self.user && self.user == user && discussion_topic.available_for?(user) && context.user_can_manage_own_discussion_posts?(user) && discussion_topic.can_participate_in_course?(user) }
@@ -340,8 +340,11 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user, session| context.grants_right?(user, session, :post_to_forum) && !discussion_topic.locked_for?(user) && discussion_topic.visible_for?(user) }
     can :read
 
+    given { |user, session| context.grants_right?(user, session, :post_to_forum) && !discussion_topic.locked_for?(user) && discussion_topic.visible_for?(user) && !discussion_topic.comments_disabled? && discussion_topic.threaded? }
+    can :reply
+
     given { |user, session| context.grants_right?(user, session, :post_to_forum) && !discussion_topic.locked_for?(user) && discussion_topic.visible_for?(user) && !discussion_topic.comments_disabled? }
-    can :reply and can :create
+    can :create
 
     given { |user, session| context.grants_right?(user, session, :post_to_forum) && discussion_topic.visible_for?(user) }
     can :read
@@ -352,8 +355,11 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user, session| !discussion_topic.root_topic_id && context.grants_right?(user, session, :moderate_forum) && !discussion_topic.locked_for?(user, check_policies: true) }
     can :update and can :delete and can :read and can :attach
 
+    given { |user, session| !discussion_topic.root_topic_id && context.grants_right?(user, session, :moderate_forum) && !discussion_topic.locked_for?(user, check_policies: true) && !discussion_topic.comments_disabled? && discussion_topic.threaded? }
+    can :reply
+
     given { |user, session| !discussion_topic.root_topic_id && context.grants_right?(user, session, :moderate_forum) && !discussion_topic.locked_for?(user, check_policies: true) && !discussion_topic.comments_disabled? }
-    can :reply and can :create
+    can :create
 
     given { |user, session| !discussion_topic.root_topic_id && context.grants_right?(user, session, :moderate_forum) }
     can :update and can :delete and can :read

@@ -50,6 +50,7 @@ export const LtiScopes = {
   AccountExternalToolsShow: 'https://canvas.instructure.com/lti/account_external_tools/scope/show',
   AccountExternalToolsDestroy:
     'https://canvas.instructure.com/lti/account_external_tools/scope/destroy',
+  AccessPageContent: 'https://canvas.instructure.com/lti/page_content/show',
 } as const
 
 const AllLtiScopes = [
@@ -73,6 +74,7 @@ const AllLtiScopes = [
   LtiScopes.AccountExternalToolsList,
   LtiScopes.AccountExternalToolsShow,
   LtiScopes.AccountExternalToolsDestroy,
+  LtiScopes.AccessPageContent,
 ] as const
 
 export const ZLtiScope = z.enum(AllLtiScopes)
@@ -112,6 +114,7 @@ const LtiScopeTranslations: Record<LtiScope, string> = {
   [LtiScopes.AgsProgressShow]: I18n.t(
     'Can view Progress records associated with the context the tool is installed in'
   ),
+  [LtiScopes.AccessPageContent]: I18n.t('Can access page content'),
 }
 
 /**

@@ -131,15 +131,18 @@ export default class TextGradeInput extends Component<Props, State> {
 
     this.state = {
       gradeInfo: pendingGradeInfo || getGradeInfo(submission.excused ? 'EX' : value, this.props),
-      grade: formatGrade(
-        submission,
-        assignment,
-        gradingScheme,
-        pointsBasedGradingScheme,
-        scalingFactor,
-        enterGradesAs,
-        pendingGradeInfo
-      ),
+      grade:
+        enterGradesAs === 'percent'
+          ? value
+          : formatGrade(
+              submission,
+              assignment,
+              gradingScheme,
+              pointsBasedGradingScheme,
+              scalingFactor,
+              enterGradesAs,
+              pendingGradeInfo
+            ),
     }
   }
 

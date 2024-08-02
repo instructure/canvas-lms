@@ -94,6 +94,22 @@ const renderMigrator = (props: MigratorProps) => {
   }
 }
 
+/*
+  This override is needed to set the default workflow state to 'queued' for the migration,
+  because in the StatusPill we want to use the progress workflow state to determine
+  the status of the migration. For example course copy create ContentMigration with default
+  running state.
+
+  The only exception is when the migration is in the 'waiting_for_select' state, because it cannot
+  be represented by the Progress record.
+*/
+const overrideDefaultWorkflowState = (cm: ContentMigrationItem): ContentMigrationItem => {
+  return {
+    ...cm,
+    workflow_state: cm.workflow_state === 'waiting_for_select' ? cm.workflow_state : 'queued',
+  }
+}
+
 export const ContentMigrationsForm = ({
   setMigrations,
 }: {
@@ -147,7 +163,8 @@ export const ContentMigrationsForm = ({
         })
       } else {
         onResetForm()
-        setMigrations(prevMigrations => [json as ContentMigrationItem].concat(prevMigrations))
+        const overriddenJson = overrideDefaultWorkflowState(json as ContentMigrationItem)
+        setMigrations(prevMigrations => [overriddenJson].concat(prevMigrations))
       }
     },
     [chosenMigrator, handleFileProgress, onResetForm, setMigrations]

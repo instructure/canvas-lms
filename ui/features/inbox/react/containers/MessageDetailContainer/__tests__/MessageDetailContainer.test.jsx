@@ -208,6 +208,14 @@ describe('MessageDetailContainer', () => {
         expect(await container.findByText('my student comment')).toBeInTheDocument()
       })
 
+      it('should not render the reply or reply_all option in header if student lacks permission', async () => {
+        const container = setup({
+          isSubmissionCommentsType: true,
+          conversation: mockSubmissionComment,
+        })
+        expect(container.queryByTestId('message-detail-header-reply-btn')).not.toBeInTheDocument()
+      })
+
       it('should render with link in title', async () => {
         const container = setup({
           isSubmissionCommentsType: true,

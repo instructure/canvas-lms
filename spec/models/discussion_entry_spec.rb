@@ -857,6 +857,24 @@ describe DiscussionEntry do
     let(:entry) { topic.discussion_entries.create!(message: "Hello!", user:) }
 
     describe "reply" do
+      context "reply permission" do
+        before :once do
+          course_with_teacher active_all: true
+        end
+
+        it "reply permission is true if the discussion is threaded" do
+          discussion_topic_model(discussion_type: "threaded")
+          entry = @topic.discussion_entries.create!(message: "entry", user: @teacher)
+          expect(entry.grants_right?(@teacher, :reply)).to be true
+        end
+
+        it "reply permission is false if the discussion is not threaded" do
+          discussion_topic_model(discussion_type: "not_threaded")
+          entry = @topic.discussion_entries.create!(message: "entry", user: @teacher)
+          expect(entry.grants_right?(@teacher, :reply)).to be false
+        end
+      end
+
       context "when a user is no longer enrolled in the course" do
         before do
           create_enrollment(topic.course, user, { enrollment_state: "completed" })
@@ -881,6 +899,8 @@ describe DiscussionEntry do
         end
 
         it "returns true for non-announcement discussions" do
+          topic.discussion_type = "threaded"
+          topic.save!
           expect(entry.grants_right?(user, :reply)).to be true
         end
       end

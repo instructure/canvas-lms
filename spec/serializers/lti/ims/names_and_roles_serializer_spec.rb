@@ -331,9 +331,9 @@ describe Lti::IMS::NamesAndRolesSerializer do
       end
     end
 
-    context "with a group" do
+    context "with a account-based group" do
       let(:context_type) { :group }
-      let(:group_record) { group_with_user(context: course, active_all: true, name: "Marta Perkins").group }
+      let(:group_record) { group_with_user(context: course.account, active_all: true, name: "Marta Perkins").group }
       let(:group_member) do
         enrollment = group_record.group_memberships.first
         user = enrollment.user

@@ -87,6 +87,7 @@ module Lti
                                                     lti_version: "1.1",
                                                     deployment_id: external_tool.deployment_id,
                                                     editor_button_settings: external_tool.editor_button,
+                                                    migration_running: false,
                                                     top_navigation_settings: external_tool.top_navigation))
       end
 
@@ -103,6 +104,7 @@ module Lti
                                                     lti_version: "1.3",
                                                     deployment_id: external_tool.deployment_id,
                                                     editor_button_settings: external_tool.editor_button,
+                                                    migration_running: false,
                                                     top_navigation_settings: external_tool.top_navigation))
       end
 
@@ -120,6 +122,7 @@ module Lti
                                                     deployment_id: external_tool.deployment_id,
                                                     editor_button_settings: external_tool.editor_button,
                                                     top_navigation_settings: external_tool.top_navigation,
+                                                    migration_running: false,
                                                     is_rce_favorite: false))
       end
 
@@ -139,7 +142,8 @@ module Lti
             deployment_id: external_tool.deployment_id,
             editor_button_settings: nil,
             top_navigation_settings: nil,
-            is_top_nav_favorite: false
+            is_top_nav_favorite: false,
+            migration_running: false
           )
         )
       end

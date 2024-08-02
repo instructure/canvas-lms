@@ -43,6 +43,7 @@ export const SUBMISSION_FRAGMENT = gql`
     wordCount
     late
     missing
+    latePolicyStatus
     submissionStatus
     customGradeStatus
     submittedAt
@@ -184,8 +185,8 @@ function transform(result: any) {
 }
 
 export const ZGetSubmissionParams = z.object({
-  assignmentId: z.string(),
-  userId: z.string(),
+  assignmentId: z.string().min(1),
+  userId: z.string().min(1),
 })
 
 type GetSubmissionParams = z.infer<typeof ZGetSubmissionParams>

@@ -27,26 +27,30 @@ import {
 } from '@instructure/ui-icons'
 import {type IconProps} from './iconTypes'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor/user-icons')
+
 export const IconAnnouncement = ({elementRef, size = 'small'}: IconProps) => {
-  return <IconAnnouncementLine elementRef={elementRef} size={size} />
+  return <IconAnnouncementLine elementRef={elementRef} size={size} title={I18n.t('announcement')} />
 }
 
 export const IconVideo = ({elementRef, size = 'small'}: IconProps) => {
-  return <IconVideoLine elementRef={elementRef} size={size} />
+  return <IconVideoLine elementRef={elementRef} size={size} title={I18n.t('video')} />
 }
 
 export const IconModule = ({elementRef, size = 'small'}: IconProps) => {
-  return <IconModuleLine elementRef={elementRef} size={size} />
+  return <IconModuleLine elementRef={elementRef} size={size} title={I18n.t('module')} />
 }
 
 export const IconGradebook = ({elementRef, size = 'small'}: IconProps) => {
-  return <IconGradebookLine elementRef={elementRef} size={size} />
+  return <IconGradebookLine elementRef={elementRef} size={size} title={I18n.t('gradebook')} />
 }
 
 export const IconArrowUp = ({elementRef, size = 'small'}: IconProps) => {
-  return <IconArrowUpLine elementRef={elementRef} size={size} />
+  return <IconArrowUpLine elementRef={elementRef} size={size} title={I18n.t('up arrow')} />
 }
 
 export const IconLike = ({elementRef, size = 'small'}: IconProps) => {
-  return <IconLikeLine elementRef={elementRef} size={size} />
+  return <IconLikeLine elementRef={elementRef} size={size} title={I18n.t('like')} />
 }

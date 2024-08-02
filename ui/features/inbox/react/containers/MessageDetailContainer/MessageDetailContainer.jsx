@@ -162,7 +162,9 @@ export const MessageDetailContainer = props => {
       : conversationMessagesQuery.data?.legacyNode
 
     if (data) {
-      const canReply = isSubmissionCommentsType ? true : data?.canReply
+      const canReply = isSubmissionCommentsType
+        ? !data?.commentsConnection?.nodes?.some(el => el?.canReply === false)
+        : data?.canReply
       props.setCanReply(canReply)
     }
 

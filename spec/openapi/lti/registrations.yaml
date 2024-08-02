@@ -5,332 +5,1324 @@ info:
   version: 1.0.0
 servers: []
 paths:
-  "/api/lti/registrations":
-    post:
-      summary: create
+  "/accounts/{account_id}/apps":
+    get:
+      summary: index
       tags:
-      - Lti::IMS::DynamicRegistration
+      - Lti::Registration
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 6699
       responses:
         '200':
-          description: accepts valid params and creates a registration model
+          description: TBD
+          content:
+            text/html:
+              schema:
+                type: string
+              example: ''
+  "/api/v1/accounts/{account_id}/lti_registrations":
+    get:
+      summary: list
+      tags:
+      - Lti::Registration
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 6699
+      - name: dir
+        in: query
+        required: false
+        schema:
+          type: string
+        example: asc
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+        example: 2
+      - name: per_page
+        in: query
+        required: false
+        schema:
+          type: integer
+        example: 5
+      - name: query
+        in: query
+        required: false
+        schema:
+          type: string
+        example: searchterm
+      - name: sort
+        in: query
+        required: false
+        schema:
+          type: string
+        example: installed_by
+      responses:
+        '200':
+          description: TBD
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  client_id:
-                    type: string
-                  application_type:
-                    type: string
-                  grant_types:
+                  total:
+                    type: integer
+                  data:
                     type: array
                     items:
-                      type: string
-                  initiate_login_uri:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        internal_service:
+                          type: boolean
+                        account_id:
+                          type: integer
+                        root_account_id:
+                          type: integer
+                        name:
+                          type: string
+                        admin_nickname:
+                          nullable: true
+                          type: string
+                        vendor:
+                          nullable: true
+                          type: string
+                        workflow_state:
+                          type: string
+                        created_at:
+                          type: string
+                        updated_at:
+                          type: string
+                        inherited:
+                          type: boolean
+                        lti_version:
+                          type: string
+                        icon_url:
+                          nullable: true
+                        developer_key_id:
+                          nullable: true
+                        created_by:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                            created_at:
+                              type: string
+                            sortable_name:
+                              type: string
+                            short_name:
+                              type: string
+                            sis_user_id:
+                              nullable: true
+                            integration_id:
+                              nullable: true
+                            sis_import_id:
+                              nullable: true
+                          required:
+                          - id
+                          - name
+                          - created_at
+                          - sortable_name
+                          - short_name
+                          - sis_user_id
+                          - integration_id
+                          - sis_import_id
+                        updated_by:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                            created_at:
+                              type: string
+                            sortable_name:
+                              type: string
+                            short_name:
+                              type: string
+                            sis_user_id:
+                              nullable: true
+                            integration_id:
+                              nullable: true
+                            sis_import_id:
+                              nullable: true
+                          required:
+                          - id
+                          - name
+                          - created_at
+                          - sortable_name
+                          - short_name
+                          - sis_user_id
+                          - integration_id
+                          - sis_import_id
+                        account_binding:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            registration_id:
+                              type: integer
+                            account_id:
+                              type: integer
+                            workflow_state:
+                              type: string
+                            root_account_id:
+                              type: integer
+                            created_at:
+                              type: string
+                            updated_at:
+                              type: string
+                            created_by:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                name:
+                                  type: string
+                                created_at:
+                                  type: string
+                                sortable_name:
+                                  type: string
+                                short_name:
+                                  type: string
+                                sis_user_id:
+                                  nullable: true
+                                integration_id:
+                                  nullable: true
+                                sis_import_id:
+                                  nullable: true
+                              required:
+                              - id
+                              - name
+                              - created_at
+                              - sortable_name
+                              - short_name
+                              - sis_user_id
+                              - integration_id
+                              - sis_import_id
+                            updated_by:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                name:
+                                  type: string
+                                created_at:
+                                  type: string
+                                sortable_name:
+                                  type: string
+                                short_name:
+                                  type: string
+                                sis_user_id:
+                                  nullable: true
+                                integration_id:
+                                  nullable: true
+                                sis_import_id:
+                                  nullable: true
+                              required:
+                              - id
+                              - name
+                              - created_at
+                              - sortable_name
+                              - short_name
+                              - sis_user_id
+                              - integration_id
+                              - sis_import_id
+                          required:
+                          - id
+                          - registration_id
+                          - account_id
+                          - workflow_state
+                          - root_account_id
+                          - created_at
+                          - updated_at
+                          - created_by
+                          - updated_by
+                      required:
+                      - id
+                      - internal_service
+                      - account_id
+                      - root_account_id
+                      - name
+                      - admin_nickname
+                      - vendor
+                      - workflow_state
+                      - created_at
+                      - updated_at
+                      - inherited
+                      - lti_version
+                      - icon_url
+                      - developer_key_id
+                      - created_by
+                      - updated_by
+                required:
+                - total
+                - data
+              example:
+                total: 15
+                data:
+                - id: 9730
+                  internal_service: false
+                  account_id: 6700
+                  root_account_id: 6700
+                  name: Site admin registration
+                  admin_nickname: 
+                  vendor: 
+                  workflow_state: active
+                  created_at: '2024-07-11T00:04:54Z'
+                  updated_at: '2024-07-11T00:04:54Z'
+                  inherited: true
+                  lti_version: '1.3'
+                  icon_url: 
+                  developer_key_id: 
+                  created_by:
+                    id: 15122
+                    name: value for name
+                    created_at: '2024-07-11T00:04:54Z'
+                    sortable_name: name, value for
+                    short_name: value for name
+                    sis_user_id: 
+                    integration_id: 
+                    sis_import_id: 
+                  updated_by:
+                    id: 15122
+                    name: value for name
+                    created_at: '2024-07-11T00:04:54Z'
+                    sortable_name: name, value for
+                    short_name: value for name
+                    sis_user_id: 
+                    integration_id: 
+                    sis_import_id: 
+                  account_binding:
+                    id: 8314
+                    registration_id: 9730
+                    account_id: 6699
+                    workflow_state: 'on'
+                    root_account_id: 6699
+                    created_at: '2024-07-11T00:04:55Z'
+                    updated_at: '2024-07-11T00:04:55Z'
+                    created_by:
+                      id: 15123
+                      name: value for name
+                      created_at: '2024-07-11T00:04:55Z'
+                      sortable_name: name, value for
+                      short_name: value for name
+                      sis_user_id: 
+                      integration_id: 
+                      sis_import_id: 
+                    updated_by:
+                      id: 15123
+                      name: value for name
+                      created_at: '2024-07-11T00:04:55Z'
+                      sortable_name: name, value for
+                      short_name: value for name
+                      sis_user_id: 
+                      integration_id: 
+                      sis_import_id: 
+                - id: 9729
+                  internal_service: false
+                  account_id: 6700
+                  root_account_id: 6700
+                  name: Site admin registration
+                  admin_nickname: 
+                  vendor: 
+                  workflow_state: active
+                  created_at: '2024-07-11T00:04:54Z'
+                  updated_at: '2024-07-11T00:04:54Z'
+                  inherited: true
+                  lti_version: '1.3'
+                  icon_url: 
+                  developer_key_id: 
+                  created_by:
+                    id: 15120
+                    name: value for name
+                    created_at: '2024-07-11T00:04:54Z'
+                    sortable_name: name, value for
+                    short_name: value for name
+                    sis_user_id: 
+                    integration_id: 
+                    sis_import_id: 
+                  updated_by:
+                    id: 15120
+                    name: value for name
+                    created_at: '2024-07-11T00:04:54Z'
+                    sortable_name: name, value for
+                    short_name: value for name
+                    sis_user_id: 
+                    integration_id: 
+                    sis_import_id: 
+                  account_binding:
+                    id: 8313
+                    registration_id: 9729
+                    account_id: 6699
+                    workflow_state: 'on'
+                    root_account_id: 6699
+                    created_at: '2024-07-11T00:04:54Z'
+                    updated_at: '2024-07-11T00:04:54Z'
+                    created_by:
+                      id: 15121
+                      name: value for name
+                      created_at: '2024-07-11T00:04:54Z'
+                      sortable_name: name, value for
+                      short_name: value for name
+                      sis_user_id: 
+                      integration_id: 
+                      sis_import_id: 
+                    updated_by:
+                      id: 15121
+                      name: value for name
+                      created_at: '2024-07-11T00:04:54Z'
+                      sortable_name: name, value for
+                      short_name: value for name
+                      sis_user_id: 
+                      integration_id: 
+                      sis_import_id: 
+                - id: 9728
+                  internal_service: false
+                  account_id: 6700
+                  root_account_id: 6700
+                  name: Site admin registration
+                  admin_nickname: 
+                  vendor: 
+                  workflow_state: active
+                  created_at: '2024-07-11T00:04:54Z'
+                  updated_at: '2024-07-11T00:04:54Z'
+                  inherited: true
+                  lti_version: '1.3'
+                  icon_url: 
+                  developer_key_id: 
+                  created_by:
+                    id: 15118
+                    name: value for name
+                    created_at: '2024-07-11T00:04:54Z'
+                    sortable_name: name, value for
+                    short_name: value for name
+                    sis_user_id: 
+                    integration_id: 
+                    sis_import_id: 
+                  updated_by:
+                    id: 15118
+                    name: value for name
+                    created_at: '2024-07-11T00:04:54Z'
+                    sortable_name: name, value for
+                    short_name: value for name
+                    sis_user_id: 
+                    integration_id: 
+                    sis_import_id: 
+                  account_binding:
+                    id: 8312
+                    registration_id: 9728
+                    account_id: 6699
+                    workflow_state: 'on'
+                    root_account_id: 6699
+                    created_at: '2024-07-11T00:04:54Z'
+                    updated_at: '2024-07-11T00:04:54Z'
+                    created_by:
+                      id: 15119
+                      name: value for name
+                      created_at: '2024-07-11T00:04:54Z'
+                      sortable_name: name, value for
+                      short_name: value for name
+                      sis_user_id: 
+                      integration_id: 
+                      sis_import_id: 
+                    updated_by:
+                      id: 15119
+                      name: value for name
+                      created_at: '2024-07-11T00:04:54Z'
+                      sortable_name: name, value for
+                      short_name: value for name
+                      sis_user_id: 
+                      integration_id: 
+                      sis_import_id: 
+  "/api/v1/accounts/{account_id}/lti_registrations/{id}":
+    delete:
+      summary: destroy
+      tags:
+      - Lti::Registration
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 6699
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 9461
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties: {}
+            example: {}
+      responses:
+        '200':
+          description: TBD
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workflow_state:
                     type: string
-                  redirect_uris:
-                    type: array
-                    items:
-                      type: string
-                  response_types:
-                    type: array
-                    items:
-                      type: string
-                  client_name:
+                  root_account_id:
+                    type: integer
+                  id:
+                    type: integer
+                  internal_service:
+                    type: boolean
+                  account_id:
+                    type: integer
+                  name:
                     type: string
-                  jwks_uri:
+                  admin_nickname:
+                    nullable: true
+                  vendor:
+                    nullable: true
+                  created_at:
                     type: string
-                  token_endpoint_auth_method:
+                  updated_at:
                     type: string
-                  scope:
+                  inherited:
+                    type: boolean
+                  lti_version:
                     type: string
-                  https://purl.imsglobal.org/spec/lti-tool-configuration:
+                  icon_url:
+                    type: string
+                  dynamic_registration:
+                    type: boolean
+                  developer_key_id:
+                    nullable: true
+                  created_by:
                     type: object
                     properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      created_at:
+                        type: string
+                      sortable_name:
+                        type: string
+                      short_name:
+                        type: string
+                      sis_user_id:
+                        nullable: true
+                      integration_id:
+                        nullable: true
+                      sis_import_id:
+                        nullable: true
+                    required:
+                    - id
+                    - name
+                    - created_at
+                    - sortable_name
+                    - short_name
+                    - sis_user_id
+                    - integration_id
+                    - sis_import_id
+                  updated_by:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      created_at:
+                        type: string
+                      sortable_name:
+                        type: string
+                      short_name:
+                        type: string
+                      sis_user_id:
+                        nullable: true
+                      integration_id:
+                        nullable: true
+                      sis_import_id:
+                        nullable: true
+                    required:
+                    - id
+                    - name
+                    - created_at
+                    - sortable_name
+                    - short_name
+                    - sis_user_id
+                    - integration_id
+                    - sis_import_id
+                  configuration:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      description:
+                        nullable: true
                       domain:
                         type: string
-                      messages:
+                      custom_fields:
+                        type: object
+                        properties: {}
+                      target_link_uri:
+                        type: string
+                      privacy_level:
+                        type: string
+                      icon_url:
+                        type: string
+                      oidc_initiation_url:
+                        type: string
+                      redirect_uris:
+                        type: array
+                        items:
+                          type: string
+                      public_jwk_url:
+                        type: string
+                      scopes:
+                        type: array
+                        items:
+                          type: string
+                      placements:
                         type: array
                         items:
                           type: object
                           properties:
-                            type:
+                            placement:
+                              type: string
+                            enabled:
+                              type: boolean
+                            message_type:
                               type: string
                             target_link_uri:
                               type: string
-                            label:
+                            text:
                               type: string
-                            icon_uri:
+                            icon_url:
                               type: string
-                            custom_parameters:
+                            custom_fields:
                               type: object
                               properties:
                                 foo:
                                   type: string
+                                context_id:
+                                  type: string
                               required:
                               - foo
-                            roles:
-                              type: array
-                              items:
-                                type: string
-                            placements:
-                              type: array
-                              items:
-                                type: string
+                              - context_id
                           required:
-                          - type
+                          - placement
+                          - enabled
+                          - message_type
                           - target_link_uri
-                          - label
-                          - icon_uri
-                          - custom_parameters
-                          - roles
-                          - placements
-                      claims:
-                        type: array
-                        items:
-                          type: string
-                      target_link_uri:
-                        type: string
-                      https://canvas.instructure.com/lti/privacy_level:
-                        type: string
-                      https://canvas.instructure.com/lti/registration_config_url:
-                        type: string
+                          - text
+                          - icon_url
+                          - custom_fields
+                      tool_id:
+                        nullable: true
                     required:
+                    - name
+                    - description
                     - domain
-                    - messages
-                    - claims
+                    - custom_fields
                     - target_link_uri
+                    - privacy_level
+                    - icon_url
+                    - oidc_initiation_url
+                    - redirect_uris
+                    - public_jwk_url
+                    - scopes
+                    - placements
+                    - tool_id
                 required:
-                - client_id
-                - application_type
-                - grant_types
-                - initiate_login_uri
-                - redirect_uris
-                - response_types
-                - client_name
-                - jwks_uri
-                - token_endpoint_auth_method
-                - scope
-                - https://purl.imsglobal.org/spec/lti-tool-configuration
+                - workflow_state
+                - root_account_id
+                - id
+                - internal_service
+                - account_id
+                - name
+                - admin_nickname
+                - vendor
+                - created_at
+                - updated_at
+                - inherited
+                - lti_version
+                - icon_url
+                - dynamic_registration
+                - developer_key_id
+                - created_by
+                - updated_by
+                - configuration
               example:
-                client_id: '200000000000981'
-                application_type: web
-                grant_types:
-                - client_credentials
-                - implicit
-                initiate_login_uri: https://example.com/login
-                redirect_uris:
-                - https://example.com/launch
-                response_types:
-                - id_token
-                client_name: the client name
-                jwks_uri: https://example.com/api/jwks
-                token_endpoint_auth_method: private_key_jwt
-                scope: https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly
-                  https://purl.imsglobal.org/spec/lti-ags/scope/score
-                https://purl.imsglobal.org/spec/lti-tool-configuration:
+                workflow_state: deleted
+                root_account_id: 6699
+                id: 9461
+                internal_service: false
+                account_id: 6699
+                name: Test Registration
+                admin_nickname: 
+                vendor: 
+                created_at: '2024-07-11T00:03:36Z'
+                updated_at: '2024-07-11T00:03:41Z'
+                inherited: false
+                lti_version: '1.3'
+                icon_url: https://example.com/api/apps/1/icon.svg
+                dynamic_registration: true
+                developer_key_id: 
+                created_by:
+                  id: 14752
+                  name: value for name
+                  created_at: '2024-07-11T00:03:36Z'
+                  sortable_name: name, value for
+                  short_name: value for name
+                  sis_user_id: 
+                  integration_id: 
+                  sis_import_id: 
+                updated_by:
+                  id: 14752
+                  name: value for name
+                  created_at: '2024-07-11T00:03:36Z'
+                  sortable_name: name, value for
+                  short_name: value for name
+                  sis_user_id: 
+                  integration_id: 
+                  sis_import_id: 
+                configuration:
+                  name: Test Dynamic Registration
+                  description: 
                   domain: example.com
-                  messages:
-                  - type: LtiResourceLinkRequest
-                    target_link_uri: https://example.com/launch
-                    label: deep link label
-                    icon_uri: https://example.com/icon.jpg
-                    custom_parameters:
+                  custom_fields: {}
+                  target_link_uri: https://example.com/api/registrations/3/launch
+                  privacy_level: public
+                  icon_url: https://example.com/api/apps/1/icon.svg
+                  oidc_initiation_url: https://example.com/api/registrations/3/login
+                  redirect_uris:
+                  - https://example.com/api/registrations/3/launch
+                  public_jwk_url: https://example.com/api/registrations/3/jwks
+                  scopes:
+                  - https://purl.imsglobal.org/spec/lti-ags/scope/lineitem
+                  - https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly
+                  - https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly
+                  - https://purl.imsglobal.org/spec/lti-ags/scope/score
+                  - https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly
+                  - https://canvas.instructure.com/lti/public_jwk/scope/update
+                  - https://canvas.instructure.com/lti/account_lookup/scope/show
+                  - https://canvas.instructure.com/lti-ags/progress/scope/show
+                  placements:
+                  - placement: global_navigation
+                    enabled: true
+                    message_type: LtiResourceLinkRequest
+                    target_link_uri: https://example.com/api/registrations/3/launch?placement=global_navigation
+                    text: Test Dynamic Registration (Global Navigation)
+                    icon_url: https://example.com/api/apps/1/icon.svg
+                    custom_fields:
                       foo: bar
-                    roles:
-                    - http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper
-                    - http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor
-                    placements:
-                    - course_navigation
-                  claims:
-                  - iss
-                  - sub
-                  target_link_uri: https://example.com/launch
-                  https://canvas.instructure.com/lti/privacy_level: email_only
-                  https://canvas.instructure.com/lti/registration_config_url: http://test.host/api/lti/registrations/200000000000168/view
-        '401':
-          description: returns a 401
+                      context_id: "$Context.id"
+                  tool_id: 
+    get:
+      summary: show
+      tags:
+      - Lti::Registration
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 6699
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 9462
+      responses:
+        '200':
+          description: TBD
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  errors:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        message:
-                          type: string
-                        error_code:
-                          type: string
-                      required:
-                      - message
-                      - error_code
+                  id:
+                    type: integer
+                  internal_service:
+                    type: boolean
+                  account_id:
+                    type: integer
+                  root_account_id:
+                    type: integer
+                  name:
+                    type: string
+                  admin_nickname:
+                    nullable: true
+                  vendor:
+                    nullable: true
+                  workflow_state:
+                    type: string
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
+                  inherited:
+                    type: boolean
+                  lti_version:
+                    type: string
+                  icon_url:
+                    nullable: true
+                  developer_key_id:
+                    nullable: true
+                  created_by:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      created_at:
+                        type: string
+                      sortable_name:
+                        type: string
+                      short_name:
+                        type: string
+                      sis_user_id:
+                        nullable: true
+                      integration_id:
+                        nullable: true
+                      sis_import_id:
+                        nullable: true
+                    required:
+                    - id
+                    - name
+                    - created_at
+                    - sortable_name
+                    - short_name
+                    - sis_user_id
+                    - integration_id
+                    - sis_import_id
+                  updated_by:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      created_at:
+                        type: string
+                      sortable_name:
+                        type: string
+                      short_name:
+                        type: string
+                      sis_user_id:
+                        nullable: true
+                      integration_id:
+                        nullable: true
+                      sis_import_id:
+                        nullable: true
+                    required:
+                    - id
+                    - name
+                    - created_at
+                    - sortable_name
+                    - short_name
+                    - sis_user_id
+                    - integration_id
+                    - sis_import_id
+                  configuration:
+                    type: object
+                    properties: {}
+                  account_binding:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      registration_id:
+                        type: integer
+                      account_id:
+                        type: integer
+                      workflow_state:
+                        type: string
+                      root_account_id:
+                        type: integer
+                      created_at:
+                        type: string
+                      updated_at:
+                        type: string
+                      created_by:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          created_at:
+                            type: string
+                          sortable_name:
+                            type: string
+                          short_name:
+                            type: string
+                          sis_user_id:
+                            nullable: true
+                          integration_id:
+                            nullable: true
+                          sis_import_id:
+                            nullable: true
+                        required:
+                        - id
+                        - name
+                        - created_at
+                        - sortable_name
+                        - short_name
+                        - sis_user_id
+                        - integration_id
+                        - sis_import_id
+                      updated_by:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          created_at:
+                            type: string
+                          sortable_name:
+                            type: string
+                          short_name:
+                            type: string
+                          sis_user_id:
+                            nullable: true
+                          integration_id:
+                            nullable: true
+                          sis_import_id:
+                            nullable: true
+                        required:
+                        - id
+                        - name
+                        - created_at
+                        - sortable_name
+                        - short_name
+                        - sis_user_id
+                        - integration_id
+                        - sis_import_id
+                    required:
+                    - id
+                    - registration_id
+                    - account_id
+                    - workflow_state
+                    - root_account_id
+                    - created_at
+                    - updated_at
+                    - created_by
+                    - updated_by
                 required:
-                - errors
+                - id
+                - internal_service
+                - account_id
+                - root_account_id
+                - name
+                - admin_nickname
+                - vendor
+                - workflow_state
+                - created_at
+                - updated_at
+                - inherited
+                - lti_version
+                - icon_url
+                - developer_key_id
+                - created_by
+                - updated_by
+                - configuration
+                - account_binding
               example:
-                errors:
-                - message: An error occurred.
-                  error_code: unauthorized
-        '422':
-          description: returns a 422 with validation errors
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  errors:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        field:
-                          type: string
-                        message:
-                          type: string
-                        error_code:
-                          nullable: true
-                      required:
-                      - field
-                      - message
-                      - error_code
-                required:
-                - errors
-              example:
-                errors:
-                - field: grant_types
-                  message: Must include client_credentials, implicit
-                  error_code: 
+                id: 9462
+                internal_service: false
+                account_id: 6699
+                root_account_id: 6699
+                name: Test Registration
+                admin_nickname: 
+                vendor: 
+                workflow_state: active
+                created_at: '2024-07-11T00:03:46Z'
+                updated_at: '2024-07-11T00:03:46Z'
+                inherited: false
+                lti_version: '1.3'
+                icon_url: 
+                developer_key_id: 
+                created_by:
+                  id: 14754
+                  name: value for name
+                  created_at: '2024-07-11T00:03:46Z'
+                  sortable_name: name, value for
+                  short_name: value for name
+                  sis_user_id: 
+                  integration_id: 
+                  sis_import_id: 
+                updated_by:
+                  id: 14754
+                  name: value for name
+                  created_at: '2024-07-11T00:03:46Z'
+                  sortable_name: name, value for
+                  short_name: value for name
+                  sis_user_id: 
+                  integration_id: 
+                  sis_import_id: 
+                configuration: {}
+                account_binding:
+                  id: 8087
+                  registration_id: 9462
+                  account_id: 6699
+                  workflow_state: 'off'
+                  root_account_id: 6699
+                  created_at: '2024-07-11T00:03:46Z'
+                  updated_at: '2024-07-11T00:03:46Z'
+                  created_by:
+                    id: 14755
+                    name: value for name
+                    created_at: '2024-07-11T00:03:46Z'
+                    sortable_name: name, value for
+                    short_name: value for name
+                    sis_user_id: 
+                    integration_id: 
+                    sis_import_id: 
+                  updated_by:
+                    id: 14755
+                    name: value for name
+                    created_at: '2024-07-11T00:03:46Z'
+                    sortable_name: name, value for
+                    short_name: value for name
+                    sis_user_id: 
+                    integration_id: 
+                    sis_import_id: 
+    put:
+      summary: update
+      tags:
+      - Lti::Registration
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 6699
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 9463
       requestBody:
         content:
           application/x-www-form-urlencoded:
             schema:
               type: object
               properties:
-                application_type:
-                  type: string
-                client_name:
-                  type: string
-                grant_types:
-                  type: array
-                  items:
-                    type: string
-                https://purl.imsglobal.org/spec/lti-tool-configuration:
-                  type: object
-                  properties:
-                    claims:
-                      type: array
-                      items:
-                        type: string
-                    domain:
-                      type: string
-                    messages:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          type:
-                            type: string
-                          label:
-                            type: string
-                          placements:
-                            type: array
-                            items:
-                              type: string
-                          target_link_uri:
-                            type: string
-                          custom_parameters:
-                            type: object
-                            properties:
-                              foo:
-                                type: string
-                            required:
-                            - foo
-                          roles:
-                            type: array
-                            items:
-                              type: string
-                          icon_uri:
-                            type: string
-                        required:
-                        - type
-                        - label
-                        - placements
-                        - target_link_uri
-                        - custom_parameters
-                        - roles
-                        - icon_uri
-                    target_link_uri:
-                      type: string
-                    https://canvas.instructure.com/lti/privacy_level:
-                      type: string
-                  required:
-                  - claims
-                  - domain
-                  - messages
-                  - target_link_uri
-                initiate_login_uri:
-                  type: string
-                jwks_uri:
-                  type: string
-                redirect_uris:
-                  type: array
-                  items:
-                    type: string
-                registration_token:
-                  type: string
-                response_types:
-                  type: array
-                  items:
-                    type: string
-                scope:
-                  type: string
-                token_endpoint_auth_method:
+                admin_nickname:
                   type: string
               required:
-              - application_type
-              - client_name
-              - grant_types
-              - https://purl.imsglobal.org/spec/lti-tool-configuration
-              - initiate_login_uri
-              - jwks_uri
-              - redirect_uris
-              - response_types
-              - scope
-              - token_endpoint_auth_method
+              - admin_nickname
             example:
-              application_type: web
-              client_name: the client name
-              grant_types:
-              - client_credentials
-              - implicit
-              https://purl.imsglobal.org/spec/lti-tool-configuration:
-                claims:
-                - iss
-                - sub
-                domain: example.com
-                messages:
-                - type: LtiResourceLinkRequest
-                  label: deep link label
-                  placements:
-                  - course_navigation
-                  target_link_uri: https://example.com/launch
-                  custom_parameters:
-                    foo: bar
-                  roles:
-                  - http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper
-                  - http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor
-                  icon_uri: https://example.com/icon.jpg
-                target_link_uri: https://example.com/launch
-                https://canvas.instructure.com/lti/privacy_level: email_only
-              initiate_login_uri: https://example.com/login
-              jwks_uri: https://example.com/api/jwks
-              redirect_uris:
-              - https://example.com/launch
-              registration_token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxNzY4LCJpbml0aWF0ZWRfYXQiOiIyMDIzLTEyLTE1VDAyOjM5OjM3WiIsInJvb3RfYWNjb3VudF9nbG9iYWxfaWQiOjAsInV1aWQiOiIzN2ExN2E2NC03ODlhLTQ5NGYtYjFjNy1lNjllN2I3ZjRlNzIiLCJleHAiOjE3MDI2MTE2Mzd9.Q9mhBLdBY8gXf_cQxB2RYOoPk6_a47gqNLpUXjVnFcc
-              response_types:
-              - id_token
-              scope: https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly
-                https://purl.imsglobal.org/spec/lti-ags/scope/score
-              token_endpoint_auth_method: private_key_jwt
+              admin_nickname: New Name
+      responses:
+        '200':
+          description: TBD
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  admin_nickname:
+                    type: string
+                  workflow_state:
+                    type: string
+                  root_account_id:
+                    type: integer
+                  id:
+                    type: integer
+                  internal_service:
+                    type: boolean
+                  account_id:
+                    type: integer
+                  name:
+                    type: string
+                  vendor:
+                    nullable: true
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
+                  inherited:
+                    type: boolean
+                  lti_version:
+                    type: string
+                  icon_url:
+                    type: string
+                  dynamic_registration:
+                    type: boolean
+                  developer_key_id:
+                    nullable: true
+                  created_by:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      created_at:
+                        type: string
+                      sortable_name:
+                        type: string
+                      short_name:
+                        type: string
+                      sis_user_id:
+                        nullable: true
+                      integration_id:
+                        nullable: true
+                      sis_import_id:
+                        nullable: true
+                    required:
+                    - id
+                    - name
+                    - created_at
+                    - sortable_name
+                    - short_name
+                    - sis_user_id
+                    - integration_id
+                    - sis_import_id
+                  updated_by:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      created_at:
+                        type: string
+                      sortable_name:
+                        type: string
+                      short_name:
+                        type: string
+                      sis_user_id:
+                        nullable: true
+                      integration_id:
+                        nullable: true
+                      sis_import_id:
+                        nullable: true
+                    required:
+                    - id
+                    - name
+                    - created_at
+                    - sortable_name
+                    - short_name
+                    - sis_user_id
+                    - integration_id
+                    - sis_import_id
+                required:
+                - admin_nickname
+                - workflow_state
+                - root_account_id
+                - id
+                - internal_service
+                - account_id
+                - name
+                - vendor
+                - created_at
+                - updated_at
+                - inherited
+                - lti_version
+                - icon_url
+                - dynamic_registration
+                - developer_key_id
+                - created_by
+                - updated_by
+              example:
+                admin_nickname: New Name
+                workflow_state: active
+                root_account_id: 6699
+                id: 9463
+                internal_service: false
+                account_id: 6699
+                name: Test Registration
+                vendor: 
+                created_at: '2024-07-11T00:03:59Z'
+                updated_at: '2024-07-11T00:04:05Z'
+                inherited: false
+                lti_version: '1.3'
+                icon_url: https://example.com/api/apps/1/icon.svg
+                dynamic_registration: true
+                developer_key_id: 
+                created_by:
+                  id: 14757
+                  name: User
+                  created_at: '2024-07-11T00:03:58Z'
+                  sortable_name: User
+                  short_name: User
+                  sis_user_id: 
+                  integration_id: 
+                  sis_import_id: 
+                updated_by:
+                  id: 14751
+                  name: A User
+                  created_at: '2024-07-11T00:03:35Z'
+                  sortable_name: User, A
+                  short_name: A User
+                  sis_user_id: 
+                  integration_id: 
+                  sis_import_id: 
+  "/api/v1/accounts/{account_id}/lti_registrations/{id}/bind":
+    post:
+      summary: bind
+      tags:
+      - Lti::Registration
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 6699
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 9472
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                workflow_state:
+                  type: string
+              required:
+              - workflow_state
+            example:
+              workflow_state: 'off'
+      responses:
+        '200':
+          description: TBD
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  registration_id:
+                    type: integer
+                  account_id:
+                    type: integer
+                  workflow_state:
+                    type: string
+                  root_account_id:
+                    type: integer
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
+                  created_by:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      created_at:
+                        type: string
+                      sortable_name:
+                        type: string
+                      short_name:
+                        type: string
+                      sis_user_id:
+                        nullable: true
+                      integration_id:
+                        nullable: true
+                      sis_import_id:
+                        nullable: true
+                    required:
+                    - id
+                    - name
+                    - created_at
+                    - sortable_name
+                    - short_name
+                    - sis_user_id
+                    - integration_id
+                    - sis_import_id
+                  updated_by:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      created_at:
+                        type: string
+                      sortable_name:
+                        type: string
+                      short_name:
+                        type: string
+                      sis_user_id:
+                        nullable: true
+                      integration_id:
+                        nullable: true
+                      sis_import_id:
+                        nullable: true
+                    required:
+                    - id
+                    - name
+                    - created_at
+                    - sortable_name
+                    - short_name
+                    - sis_user_id
+                    - integration_id
+                    - sis_import_id
+                required:
+                - workflow_state
+                - root_account_id
+                - id
+                - registration_id
+                - account_id
+                - created_at
+                - updated_at
+                - created_by
+                - updated_by
+              example:
+                id: 8092
+                registration_id: 9472
+                account_id: 6699
+                workflow_state: 'off'
+                root_account_id: 6699
+                created_at: '2024-07-11T00:04:12Z'
+                updated_at: '2024-07-11T00:04:12Z'
+                created_by:
+                  id: 14771
+                  name: value for name
+                  created_at: '2024-07-11T00:04:12Z'
+                  sortable_name: name, value for
+                  short_name: value for name
+                  sis_user_id: 
+                  integration_id: 
+                  sis_import_id: 
+                updated_by:
+                  id: 14751
+                  name: A User
+                  created_at: '2024-07-11T00:03:35Z'
+                  sortable_name: User, A
+                  short_name: A User
+                  sis_user_id: 
+                  integration_id: 
+                  sis_import_id: 

@@ -83,6 +83,7 @@ class ContextModulesController < ApplicationController
       @can_view_grades = can_do(@context, @current_user, :view_all_grades)
       @is_student = @context.grants_right?(@current_user, session, :participate_as_student)
       @can_view_unpublished = @context.grants_right?(@current_user, session, :read_as_admin)
+      @viewable_module_ids = @context.modules_visible_to(@current_user).pluck(:id)
 
       if Account.site_admin.feature_enabled?(:selective_release_backend)
         @module_ids_with_overrides = AssignmentOverride.where(context_module_id: @modules).active.distinct.pluck(:context_module_id)
@@ -819,10 +820,16 @@ class ContextModulesController < ApplicationController
     if user_is_admin && should_preload_override_data?
       assignments = assignment_tags.filter_map(&:assignment)
       plain_quizzes = assignment_tags.select { |ct| ct.content.is_a?(Quizzes::Quiz) && !ct.content.assignment }.map(&:content)
-      sub_assignments = assignments.flat_map(&:sub_assignments)
       preload_has_too_many_overrides(assignments, :assignment_id)
-      preload_has_too_many_overrides(sub_assignments, :assignment_id)
       preload_has_too_many_overrides(plain_quizzes, :quiz_id)
+
+      sub_assignments = []
+      if @context.root_account.feature_enabled?(:discussion_checkpoints)
+        ActiveRecord::Associations.preload(content_with_assignments, assignment: :sub_assignments) if content_with_assignments.any?
+        sub_assignments = assignments.flat_map(&:sub_assignments)
+        preload_has_too_many_overrides(sub_assignments, :assignment_id)
+      end
+
       overrideables = (assignments + plain_quizzes + sub_assignments).reject(&:has_too_many_overrides)
 
       if overrideables.any?

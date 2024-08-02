@@ -158,4 +158,19 @@ describe FilePreviewsController do
     get :show, params: { course_id: @course.id, file_id: @attachment.id }
     expect(response).to be_successful
   end
+
+  context "student in limited access account" do
+    before do
+      @account.root_account.enable_feature!(:allow_limited_access_for_students)
+      @account.settings[:enable_limited_access_for_students] = true
+      @account.save!
+    end
+
+    it "renders unauthorized" do
+      course_model
+      attachment_model
+      get :show, params: { course_id: @course.id, file_id: @attachment.id, verifier: @attachment.uuid }
+      expect(response).to have_http_status :unauthorized
+    end
+  end
 end

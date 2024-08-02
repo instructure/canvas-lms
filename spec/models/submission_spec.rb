@@ -2474,6 +2474,26 @@ describe Submission do
         expect(@submission.grants_right?(@student, :read_grade)).to be true
       end
     end
+
+    describe "can :comment" do
+      before(:once) do
+        @course = Course.create!
+        @student = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
+        @assignment = @course.assignments.create!
+        @submission = @assignment.submissions.find_by(user: @student)
+      end
+
+      it "allows students to comment on own submission" do
+        expect(@submission.grants_right?(@student, :comment)).to be true
+      end
+
+      it "does not allow students in limited access accounts to comment on submissions" do
+        @course.root_account.enable_feature!(:allow_limited_access_for_students)
+        @course.account.settings[:enable_limited_access_for_students] = true
+        @course.account.save!
+        expect(@submission.grants_right?(@student, :comment)).to be false
+      end
+    end
   end
 
   describe "computation of scores" do

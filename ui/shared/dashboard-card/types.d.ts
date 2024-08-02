@@ -39,6 +39,9 @@ export type Card = {
   frontPageTitle: string
   isK5Subject: boolean
   isHomeroom: boolean
+  canReadAnnouncements: boolean
+  canManage: boolean
+  longName: string
 }
 
 export type ActivityStreamSummary = {

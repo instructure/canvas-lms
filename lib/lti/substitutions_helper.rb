@@ -123,6 +123,12 @@ module Lti
           @context
         when Course
           @context.account
+        when Group
+          if @root_account&.feature_enabled?(:lti_variable_expansions_use_group_course_as_course)
+            @context.account
+          else
+            @root_account
+          end
         else
           @root_account
         end
@@ -157,16 +163,42 @@ module Lti
       end
     end
 
-    def course_enrollments
-      return [] unless @context.is_a?(Course) && @user
+    def course
+      if @context.is_a?(Course)
+        @context
+      elsif @context.is_a?(Group) && @context.context_type == "Course" &&
+            @root_account&.feature_enabled?(:lti_variable_expansions_use_group_course_as_course)
+        @context.context
+      else
+        nil
+      end
+    end
 
-      @current_course_enrollments ||= @context.current_enrollments.where(user_id: @user.id)
+    # Course (if @context is a Course or a Course-based Group), falling back
+    # to the Account (if @context is an Account or Account-based Group)
+    def course_or_account
+      if course
+        course
+      elsif @context.is_a?(Account)
+        @context
+      elsif @context.is_a?(Group) && @context.context_type == "Account" &&
+            @root_account&.feature_enabled?(:lti_variable_expansions_use_group_course_as_course)
+        @context.context
+      else
+        nil
+      end
+    end
+
+    def course_enrollments
+      return [] unless course && @user
+
+      @course_enrollments ||= course.current_enrollments.where(user_id: @user.id)
     end
 
     def course_sections
-      return [] unless @context.is_a?(Course) && @user
+      return [] unless course && @user
 
-      @current_course_sections ||= @context.course_sections.where(id: course_enrollments.map(&:course_section_id)).select("id, sis_source_id")
+      @course_sections ||= course.course_sections.where(id: course_enrollments.map(&:course_section_id)).select("id, sis_source_id")
     end
 
     def account_enrollments
@@ -191,7 +223,7 @@ module Lti
 
     def concluded_course_enrollments
       @concluded_course_enrollments ||=
-        (@context.is_a?(Course) && @user) ? @user.enrollments.concluded.where(course_id: @context.id).shard(@context.shard) : []
+        (course && @user) ? @user.enrollments.concluded.where(course_id: course.id).shard(course.shard) : []
     end
 
     def concluded_lis_roles
@@ -215,7 +247,9 @@ module Lti
     end
 
     def enrollment_state
-      enrollments = @user ? @context.enrollments.where(user_id: @user.id).preload(:enrollment_state) : []
+      return nil unless course
+
+      enrollments = @user ? course.enrollments.where(user_id: @user.id).preload(:enrollment_state) : []
       return "" if enrollments.empty?
 
       (enrollments.any? { |membership| membership.state_based_on_date == :active }) ? LtiOutbound::LTIUser::ACTIVE_STATE : LtiOutbound::LTIUser::INACTIVE_STATE
@@ -234,7 +268,7 @@ module Lti
     end
 
     def section_restricted
-      @context.is_a?(Course) && @user && @context.visibility_limited_to_course_sections?(@user)
+      course && @user && course.visibility_limited_to_course_sections?(@user)
     end
 
     def section_sis_ids
@@ -280,17 +314,17 @@ module Lti
     end
 
     def recursively_fetch_previous_lti_context_ids(limit: 1000)
-      return "" unless @context.is_a?(Course)
+      return "" unless course
 
       # now find all parents for locked folders
-      last_migration_id = @context.content_migrations.where(workflow_state: :imported).order(id: :desc).limit(1).pick(:id)
+      last_migration_id = course.content_migrations.where(workflow_state: :imported).order(id: :desc).limit(1).pick(:id)
       return "" unless last_migration_id
 
       use_alternate_settings = @root_account.feature_enabled?(:tune_lti_context_id_history_query)
 
       # we can cache on the last migration because even if copies are done elsewhere they won't affect anything
       # until a new copy is made to _this_ course
-      Rails.cache.fetch(["recursive_copied_course_lti_context_ids", @context.global_id, last_migration_id, use_alternate_settings].cache_key) do
+      Rails.cache.fetch(["recursive_copied_course_lti_context_ids", course.global_id, last_migration_id, use_alternate_settings].cache_key) do
         # Finds content migrations for this course and recursively, all content
         # migrations for the source course of the migration -- that is, all
         # content migrations that directly or indirectly provided content to
@@ -303,7 +337,7 @@ module Lti
             (WITH RECURSIVE all_contexts AS (
               SELECT context_id, source_course_id
               FROM #{ContentMigration.quoted_table_name}
-              WHERE context_id=#{@context.id}
+              WHERE context_id=#{course.id}
               UNION
               SELECT content_migrations.context_id, content_migrations.source_course_id
               FROM #{ContentMigration.quoted_table_name}
@@ -340,10 +374,10 @@ module Lti
     end
 
     def previous_course_ids_and_context_ids
-      return [] unless @context.is_a?(Course)
+      return [] unless course
 
       @previous_ids ||= Course.where(
-        ContentMigration.where(context_id: @context.id, workflow_state: :imported).where("content_migrations.source_course_id = courses.id").arel.exists
+        ContentMigration.where(context_id: course.id, workflow_state: :imported).where("content_migrations.source_course_id = courses.id").arel.exists
       ).pluck(:id, :lti_context_id)
     end
   end

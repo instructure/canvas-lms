@@ -29,8 +29,8 @@ describe "Peer reviews with in rubrics" do
   before do
     Account.default.enable_feature!(:assignments_2_student)
     Account.default.enable_feature!(:peer_reviews_for_a2)
-    Account.default.enable_feature!(:enhanced_rubrics)
     @course = course_factory(name: "course", active_course: true)
+    @course.account.enable_feature!(:enhanced_rubrics)
     @teacher = teacher_in_course(name: "teacher", course: @course, enrollment_state: :active).user
     @student1 = student_in_course(name: "Student 1", course: @course, enrollment_state: :active).user
     @student2 = student_in_course(name: "Student 2", course: @course, enrollment_state: :active).user

@@ -70,13 +70,12 @@ export const Rating = props => {
   const shaderClasses = classNames('shader', shaderClass)
 
   const ratingPoints = () => (
-    <div className="rating-points">
+    <div className="rating-points" data-testid="rating-points">
       <Text size="small" weight="bold">
         {pointString(points, endOfRangePoints)}
       </Text>
     </div>
   )
-
   return (
     // eslint is unhappy here because it's not smart enough to understand that
     // when this is interact-able (via tabIndex), it will always have a role
@@ -89,7 +88,7 @@ export const Rating = props => {
       // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
       tabIndex={assessing ? 0 : null}
     >
-      {hidePoints ? null : ratingPoints()}
+      {hidePoints || ENV['restrict_quantitative_data'] ? null : ratingPoints()}
       <div className="rating-description">
         <Text size="small" lineHeight="condensed" weight="bold">
           {description}

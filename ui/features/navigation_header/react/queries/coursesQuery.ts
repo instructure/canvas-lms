@@ -21,10 +21,14 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 
 import type {QueryFunctionContext} from '@tanstack/react-query'
 import type {Course} from '../../../../api.d'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+
+declare const window: Window & {ENV: GlobalEnv}
+declare const ENV: GlobalEnv
 
 export function getFirstPageUrl() {
   const defaultFirstPageUrl =
-    '/api/v1/users/self/favorites/courses?include[]=term&exclude[]=enrollments&sort=nickname'
+    '/api/v1/users/self/favorites/courses?include[]=term&include[]=sections&sort=nickname'
 
   const isObserver = window.ENV.current_user_roles?.includes('observer')
 

@@ -2766,6 +2766,20 @@ describe CoursesController do
       expect(@course.workflow_state).to eq "completed"
     end
 
+    it "sets the grading standard id on concluding courses when inheriting a default scheme from the account level" do
+      gs = GradingStandard.new(context: @course.account, title: "My Grading Standard", data: { "A" => 0.94, "B" => 0, })
+      gs.save!
+      Account.site_admin.enable_feature!(:default_account_grading_scheme)
+      @course.update!(grading_standard_id: nil)
+      @course.root_account.update!(grading_standard_id: gs.id)
+      user_session(@teacher)
+      put "update", params: { id: @course.id, course: { event: "conclude" }, format: :json }
+      json = response.parsed_body
+      expect(json["course"]["grading_standard_id"]).to eq gs.id
+      @course.reload
+      expect(@course.grading_standard_id).to eq gs.id
+    end
+
     it "concludes a course if given :manage_courses_conclude (granular permissions)" do
       @course.root_account.enable_feature!(:granular_permissions_manage_courses)
       @course.root_account.role_overrides.create!(

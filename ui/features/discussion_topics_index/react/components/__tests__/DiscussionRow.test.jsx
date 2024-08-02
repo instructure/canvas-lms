@@ -87,6 +87,7 @@ describe('DiscussionRow', () => {
         DIRECT_SHARE_ENABLED: false,
         contextType: '',
         dateFormatter,
+        breakpoints: {mobileOnly: false},
       },
       props
     )
@@ -413,8 +414,8 @@ describe('DiscussionRow', () => {
     const ref = React.createRef()
     render(<DiscussionRow ref={ref} {...makeProps({masterCourseData})} />)
     expect(ref.current.masterCourseLock).toBeFalsy()
-    const container = screen.getByTestId('ic-master-course-icon-container')
-    expect(container.hasAttribute('data-tooltip')).toBe(false)
+    const container = screen.queryByTestId('ic-master-course-icon-container')
+    expect(container).not.toBeInTheDocument()
   })
 
   it('renders master course lock icon if masterCourseData is provided', () => {

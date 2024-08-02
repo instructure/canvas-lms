@@ -26,6 +26,10 @@ import {useClassNames} from '../../../../utils'
 import {SectionMenu} from '../../../editor/SectionMenu'
 import {type ColumnsSectionProps} from './types'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor/columns-section')
+
 export const ColumnsSection = ({columns, variant}: ColumnsSectionProps) => {
   const {enabled} = useEditor(state => ({
     enabled: state.options.enabled,
@@ -62,7 +66,7 @@ export const ColumnsSection = ({columns, variant}: ColumnsSectionProps) => {
 }
 
 ColumnsSection.craft = {
-  displayName: 'Columns',
+  displayName: I18n.t('Columns'),
   defaultProps: {
     columns: 2,
     variant: 'fixed',

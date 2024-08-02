@@ -16,4 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
+
+export interface RenderNodeProps {
+  render: React.ReactElement
+}
+
 export type AddSectionPlacement = 'prepend' | 'append' | undefined

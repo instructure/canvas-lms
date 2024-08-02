@@ -48,7 +48,7 @@ export const HeadingBlock = ({text, level}: HeadingBlockProps) => {
     selected: state.events.selected,
     themeOverride: state.data.custom.themeOverride,
   }))
-  const clazz = useClassNames(enabled, {empty: !text}, 'HeadingBlock')
+  const clazz = useClassNames(enabled, {empty: !text}, ['block', 'heading-block'])
   const focusableElem = useRef<HTMLElement | null>(null)
   const [editable, setEditable] = useState(false)
   const lastChar = useRef<string>('Enter') // so 1 Enter creates a new text node
@@ -93,10 +93,10 @@ export const HeadingBlock = ({text, level}: HeadingBlockProps) => {
         <Heading level={level} color="primary" themeOverride={themeOverride}>
           <ContentEditable
             innerRef={focusableElem}
-            data-placeholder={`Heading ${level.replace('h', '')}`}
+            data-placeholder={`Heading ${level?.replace('h', '')}`}
             className={clazz}
             disabled={!editable}
-            html={text}
+            html={text || ''}
             onChange={handleChange}
             onKeyDown={handleKey}
             tagName="span"

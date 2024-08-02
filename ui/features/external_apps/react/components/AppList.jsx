@@ -62,7 +62,7 @@ export default class AppList extends React.Component {
   }
 
   manageAppListButton = () => {
-    if (this.isAccountContext()) {
+    if (this.isAccountContext() && ENV.APP_CENTER?.can_set_token) {
       return (
         <ManageAppListButton onUpdateAccessToken={this.refreshAppList} extAppStore={extStore} />
       )

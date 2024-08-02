@@ -367,7 +367,7 @@ class ApplicationController < ActionController::Base
     permanent_page_links
     selective_release_backend
     selective_release_ui_api
-    selective_release_optimized_tray
+    selective_release_edit_page
     enhanced_course_creation_account_fetching
     instui_for_import_page
     multiselect_gradebook_filters
@@ -400,10 +400,11 @@ class ApplicationController < ActionController::Base
     instui_nav
     enhanced_developer_keys_tables
     lti_registrations_discover_page
-    enhanced_rubrics
     account_level_mastery_scales
     non_scoring_rubrics
     top_navigation_placement
+    rubric_criterion_range
+    lti_migration_info
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
@@ -2783,6 +2784,38 @@ class ApplicationController < ActionController::Base
 
     @unauthorized_message ||= t("#application.errors.student_view_unauthorized", "You cannot access this functionality in student view.")
     render_unauthorized_action
+  end
+
+  def check_limited_access_for_students
+    return unless @domain_root_account.feature_enabled?(:allow_limited_access_for_students)
+    return unless @context.present? || @current_user.present?
+
+    limit_access = if @context.is_a?(User)
+                     @context.student_in_limited_access_account?
+                   elsif @context.nil? && @current_user.present?
+                     @current_user.student_in_limited_access_account?
+                   else
+                     context_account&.limited_access_for_user?(@current_user)
+                   end
+
+    render_unauthorized_action if limit_access
+  end
+
+  def context_account
+    @context_account ||= if @context.is_a?(Account)
+                           @context
+                         elsif @context.is_a?(Course) || @context.is_a?(Group)
+                           @context.account
+                         elsif @context.is_a?(User)
+                           raise "Account can't be derived from a User context"
+                         elsif @context.is_a?(CourseSection)
+                           @context.course.account
+                         else
+                           a = @context.try(:account)
+                           raise ActiveRecord::RecordNotFound, "No account found for context" unless a.present?
+
+                           a
+                         end
   end
 
   def set_site_admin_context

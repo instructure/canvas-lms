@@ -55,8 +55,5 @@ group :test do
   gem "factory_bot", "~> 6.3", require: false
   gem "stormbreaker", "~> 1.0", require: false
 
-  # performance tools for instrumenting rspec tests
-  gem "stackprof", "~> 0.2"
-
   gem "crystalball", github: "wrapbook/crystalball", require: false
 end

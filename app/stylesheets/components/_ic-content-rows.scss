@@ -22,13 +22,13 @@
   margin-#{direction(left)}: 11px;
 }
 
-.ic-item-row__icon-col-student{
+.ic-item-row__icon-col-student {
   display: flex;
   align-items: center;
   margin-#{direction(left)}: 11px;
 }
 
-.ic-item-row__icon-col-teacher{
+.ic-item-row__icon-col-teacher {
   margin-#{direction(right)}: -11px;
 }
 
@@ -39,6 +39,31 @@
   justify-content: space-between;
   align-items: center;
   position: relative;
+}
+
+.ic-button-line-left,
+.ic-button-line-right {
+  align-content: center;
+}
+
+.ic-button-line-left.mobile > span:not(:last-child) {
+  margin-right: 16px;
+}
+
+.ic-button-line-right.mobile > span > button {
+  padding: 0;
+}
+
+.mobile .discussions-index-manage-menu {
+  margin-left: -9px;
+}
+
+.ic-button-line-right.mobile > span {
+  padding: 0 8px;
+}
+
+.ic-button-line-right.mobile > span:last-child {
+  padding-right: 0;
 }
 
 .ic-item-row__content-link {
@@ -143,12 +168,12 @@
   padding: direction-sides(8px 8px 7px 8px);
 }
 
-.ic-drag-handle-container{
+.ic-drag-handle-container {
   padding: 0.375rem;
   flex-shrink: 1;
 }
 
-.ic-discussion-content-container{
+.ic-discussion-content-container {
   flex-grow: 1;
   flex-shrink: 1;
   box-sizing: border-box;
@@ -167,18 +192,25 @@
     align-items: center;
 
     .ic-item-row__master-course-lock {
-      &:focus { @include ic-focus-variant; }
+      &:focus {
+        @include ic-focus-variant;
+      }
       margin-#{direction(left)}: 2px;
       margin-#{direction(right)}: 2px;
     }
   }
 }
 
-.ic-discussion-row-container{
+.ic-discussion-row-container {
   display: flex;
   width: 100%;
   align-items: center;
   justify-content: flex-start;
+}
+
+.mobile .discussions-index-manage-menu span button span {
+  border: none;
+  background: none;
 }
 
 .ic-discussion-row {
@@ -197,7 +229,9 @@
 
   .ic-item-row__meta-actions {
     .ic-item-row__master-course-lock {
-      &:focus { @include ic-focus-variant; }
+      &:focus {
+        @include ic-focus-variant;
+      }
       vertical-align: text-bottom;
       margin-#{direction(left)}: 10px;
       margin-#{direction(right)}: 2px;

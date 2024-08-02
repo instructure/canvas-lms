@@ -445,6 +445,7 @@ $(document).ready(function () {
   })
   $course_form.formSubmit({
     beforeSubmit(data) {
+
       // If Restrict Quantitative Data is checked, then the course must have a default grading scheme selected
       const rqdEnabled =
         $course_form.find('#course_restrict_quantitative_data')?.prop('value') === 'true'
@@ -452,13 +453,21 @@ $(document).ready(function () {
         .find('.grading_standard_checkbox')
         .prop('checked')
 
-      if (rqdEnabled && !hasCourseDefaultGradingScheme) {
-        $.flashError(
-          I18n.t(
-            'errors.restrict_quantitative_data',
-            'If "Restrict view of quantitative data" is enabled, then the course must have a default grading scheme enabled.'
-          )
+      const errorMessages = []
+      if ((rqdEnabled && !hasCourseDefaultGradingScheme)) {
+        errorMessages.push(
+          I18n.t('If "Restrict view of quantitative data" is enabled, then the course must have a default grading scheme enabled.')
         )
+      }
+
+      if (data["course[conclude_at]"] < data["course[start_at]"]) {
+        errorMessages.push(
+          I18n.t('The course end date can not occur before the course start date.')
+        )
+      }
+
+      if(errorMessages.length > 0) {
+        renderFlashError(errorMessages.join(' '))
         return false
       }
 
@@ -471,6 +480,7 @@ $(document).ready(function () {
       $('#course_reload_form').submit()
     },
     error(_data) {
+      renderFlashError(I18n.t('There was an error saving the changes to the course.'))
       $(this).loadingImage('remove')
     },
     disableWhileLoading: 'spin_on_success',
@@ -542,6 +552,10 @@ $(document).ready(function () {
       }
     )
   })
+
+  const renderFlashError = (errorMessage) => {
+    $.flashError(errorMessage)
+  }
 
   const $default_edit_roles_select = $('#course_default_wiki_editing_roles')
   $default_edit_roles_select.data(

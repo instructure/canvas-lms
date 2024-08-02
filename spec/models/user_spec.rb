@@ -4594,4 +4594,50 @@ describe User do
       expect(@user.learning_object_visibilities(@course).keys).to contain_exactly(:assignment_ids, :quiz_ids, :context_module_ids, :discussion_topic_ids, :wiki_page_ids)
     end
   end
+
+  describe "#active_student_enrollments_in_account?" do
+    before(:once) do
+      @account = Account.default
+      @account_other = @account.sub_accounts.create!
+      @user = user_with_pseudonym
+      course_with_user("StudentEnrollment", { user: @user, account: @account })
+    end
+
+    it "returns true if there are active student enrollments in the specified account" do
+      expect(@user.active_student_enrollments_in_account?(@account)).to be true
+    end
+
+    it "returns false if there are no active student enrollments in the specified account" do
+      expect(@user.active_student_enrollments_in_account?(@account_other)).to be false
+    end
+
+    it "returns false if user has active student enrollment in descendant account" do
+      @user.enrollments.destroy_all
+      course_with_user("StudentEnrollment", { user: @user, account: @account_other })
+      expect(@user.active_student_enrollments_in_account?(@account)).to be false
+    end
+  end
+
+  describe "#student_in_limited_access_account??" do
+    before(:once) do
+      @limited_access_account = Account.default
+      @account_other = Account.create!
+
+      @limited_access_account.root_account.enable_feature!(:allow_limited_access_for_students)
+      @limited_access_account.settings[:enable_limited_access_for_students] = true
+      @limited_access_account.save!
+
+      @user = user_with_pseudonym
+      course_with_user("StudentEnrollment", { user: @user, account: @account_other })
+    end
+
+    it "returns true if user has active student enrollment in locked down account" do
+      course_with_user("StudentEnrollment", { user: @user, account: @limited_access_account })
+      expect(@user.student_in_limited_access_account?).to be true
+    end
+
+    it "returns false if user has no active student enrollments in locked down accounts" do
+      expect(@user.student_in_limited_access_account?).to be false
+    end
+  end
 end

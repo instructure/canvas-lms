@@ -33,7 +33,6 @@ import {
   REPLY_TO_ENTRY,
 } from './utils/constants'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
 import PropTypes from 'prop-types'
 import React, {useEffect, useRef, useState} from 'react'
@@ -46,6 +45,7 @@ import {View} from '@instructure/ui-view'
 import useCreateDiscussionEntry from './hooks/useCreateDiscussionEntry'
 import {flushSync} from 'react-dom'
 import {captureException} from '@sentry/react'
+import {LoadingSpinner} from './components/LoadingSpinner/LoadingSpinner'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -317,7 +317,7 @@ const DiscussionTopicManager = props => {
   }
 
   // Used when replying to the Topic directly
-  const {createDiscussionEntry} = useCreateDiscussionEntry(onEntryCreationCompletion, updateCache)
+  const {createDiscussionEntry, isSubmitting} = useCreateDiscussionEntry(onEntryCreationCompletion, updateCache)
 
   // why || waitForUnreadFilter: when waitForUnreadFilter, discussionTopicQuery is skipped, but this does not set loading.
   // why && !searchTerm: this is for the search if you type it triggers useQuery and you lose the search.
@@ -329,11 +329,13 @@ const DiscussionTopicManager = props => {
       discussionTopicQuery?.data &&
       Object.keys(discussionTopicQuery.data).length === 0)
   ) {
-    return <LoadingIndicator />
+    return <LoadingSpinner />
   }
 
   if (discussionTopicQuery.error || !discussionTopicQuery?.data?.legacyNode) {
-    captureException(new Error(`Error received from discussionTopicQuery: ${discussionTopicQuery.error}`))
+    captureException(
+      new Error(`Error received from discussionTopicQuery: ${discussionTopicQuery.error}`)
+    )
 
     return (
       <GenericErrorPage
@@ -413,6 +415,7 @@ const DiscussionTopicManager = props => {
                       replyToEntrySubmission={replyToEntrySubmission}
                       isSummaryEnabled={ENV.user_can_summarize && isSummaryEnabled}
                       setIsSummaryEnabled={setIsSummaryEnabled}
+                      isSubmitting={isSubmitting}
                     />
 
                     {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes

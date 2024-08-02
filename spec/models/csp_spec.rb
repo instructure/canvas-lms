@@ -244,8 +244,10 @@ describe Csp do
             create_tool(sub1, domain: "example2.com", developer_key: dk2)
             create_tool(sub1, domain: "example3.com", developer_key: dk3)
             create_tool(sub1, domain: "example4.com", developer_key: dk4)
+            # Check that an extra tool with no developer key is doesn't confuse it
+            create_tool(sub1, domain: "example5.com", developer_key: nil)
 
-            expect(sub1.cached_tool_domains(internal_service_only: false)).to match_array example_domains(1, 2, 3, 4)
+            expect(sub1.cached_tool_domains(internal_service_only: false)).to match_array example_domains(1, 2, 3, 4, 5)
             expect(sub1.cached_tool_domains(internal_service_only: true)).to match_array example_domains(2, 4)
           end
         end

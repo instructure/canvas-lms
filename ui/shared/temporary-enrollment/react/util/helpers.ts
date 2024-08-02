@@ -15,8 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+import type {EnvCommon} from '@canvas/global/env/EnvCommon'
+import moment from 'moment'
+import type {FormMessage} from '@instructure/ui-form-field'
 import {captureException} from '@sentry/browser'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+declare const ENV: GlobalEnv & EnvCommon
+
+const I18n = useI18nScope('temporary_enrollment')
 
 /**
  * Remove prefix or suffix (default) from input string
@@ -62,6 +70,43 @@ export function getDayBoundaries(date: Date = new Date()): [Date, Date] {
   end.setHours(23, 59, 59, 999)
 
   return [start, end]
+}
+
+/**
+ * Display message with local and account datetime
+ *
+ * @param {string} value An ISO format of the datetime
+ * @param {boolean} isInvalid True if the value cannot be parsed
+ * @return {FormMessage[]} Array of messages to display in a DateTimeInput
+ */
+export function generateDateTimeMessage(value: string | null, isInvalid: boolean): FormMessage[] {
+  if (isInvalid) {
+    return [{type: 'error', text: I18n.t('The chosen date and time is invalid.')}]
+  } else if (
+    ENV.CONTEXT_TIMEZONE &&
+    ENV.TIMEZONE !== ENV.CONTEXT_TIMEZONE &&
+    ENV.context_asset_string.startsWith('account')
+  ) {
+    return [
+      {
+        type: 'success',
+        text: I18n.t('Local: %{datetime}', {
+          datetime: moment.tz(value, ENV.TIMEZONE).format('ddd, MMM D, YYYY, h:mm A'),
+        }),
+      },
+      {
+        type: 'success',
+        text: I18n.t('Account: %{datetime}', {
+          datetime: moment.tz(value, ENV.CONTEXT_TIMEZONE).format('ddd, MMM D, YYYY, h:mm A'),
+        }),
+      },
+    ]
+  } else {
+    // default to returning local datetime if local and account are the same timezone
+    return [
+      {type: 'success', text: moment.tz(value, ENV.TIMEZONE).format('ddd, MMM D, YYYY, h:mm A')},
+    ]
+  }
 }
 
 /**

@@ -163,8 +163,9 @@ export const generateDateDetailsPayload = (
 
   const masteryPathsCard = cards.find(card => card.selectedAssigneeIds.includes('mastery_paths'))
   if (masteryPathsCard !== undefined) {
+    const isAlreadyMasteryPath = masteryPathsCard.defaultOptions?.[0]?.includes('Mastery Paths')
     payload.assignment_overrides.push({
-      id: masteryPathsCard.overrideId,
+      id: isAlreadyMasteryPath ? masteryPathsCard.overrideId : undefined,
       title: 'Mastery Paths',
       due_at: masteryPathsCard.due_at || null,
       unlock_at: masteryPathsCard.unlock_at || null,

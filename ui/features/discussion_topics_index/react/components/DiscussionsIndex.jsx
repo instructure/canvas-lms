@@ -54,7 +54,7 @@ import propTypes from '../propTypes'
 import actions from '../actions'
 import {reorderDiscussionsURL} from '../utils'
 import {CONTENT_SHARE_TYPES} from '@canvas/content-sharing/react/proptypes/contentShare'
-
+import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 const I18n = useI18nScope('discussions_v2')
 
 export default class DiscussionsIndex extends Component {
@@ -81,6 +81,7 @@ export default class DiscussionsIndex extends Component {
     }),
     DIRECT_SHARE_ENABLED: bool.isRequired,
     COURSE_ID: string,
+    breakpoints: breakpointsShape.isRequired,
   }
 
   state = {
@@ -163,11 +164,16 @@ export default class DiscussionsIndex extends Component {
   }
 
   renderStudentView() {
+    const mobileThemeOverride = {
+      padding: '10px 0',
+      border: 'none',
+    }
     return (
       <View margin="medium">
         {this.props.pinnedDiscussions.length ? (
           <div
             className="pinned-discussions-v2__wrapper"
+            style={this.props.breakpoints.mobileOnly ? mobileThemeOverride : {}}
             data-testid="discussion-connected-container"
           >
             <ConnectedDiscussionsContainer
@@ -185,6 +191,7 @@ export default class DiscussionsIndex extends Component {
         ) : null}
         <div
           className="unpinned-discussions-v2__wrapper"
+          style={this.props.breakpoints.mobileOnly ? mobileThemeOverride : {}}
           data-testid="discussion-connected-container"
         >
           <ConnectedDiscussionsContainer
@@ -202,6 +209,7 @@ export default class DiscussionsIndex extends Component {
         </div>
         <div
           className="closed-for-comments-discussions-v2__wrapper"
+          style={this.props.breakpoints.mobileOnly ? mobileThemeOverride : {}}
           data-testid="discussion-connected-container"
         >
           <ConnectedDiscussionsContainer
@@ -227,10 +235,15 @@ export default class DiscussionsIndex extends Component {
   }
 
   renderTeacherView() {
+    const mobileThemeOverride = {
+      padding: '10px 0',
+      border: 'none',
+    }
     return (
       <View margin="medium">
         <div
           className="pinned-discussions-v2__wrapper"
+          style={this.props.breakpoints.mobileOnly ? mobileThemeOverride : {}}
           data-testid="discussion-droppable-connected-container"
         >
           <DroppableConnectedDiscussionsContainer
@@ -249,6 +262,7 @@ export default class DiscussionsIndex extends Component {
         </div>
         <div
           className="unpinned-discussions-v2__wrapper"
+          style={this.props.breakpoints.mobileOnly ? mobileThemeOverride : {}}
           data-testid="discussion-droppable-connected-container"
         >
           <DroppableConnectedDiscussionsContainer
@@ -268,6 +282,7 @@ export default class DiscussionsIndex extends Component {
         </div>
         <div
           className="closed-for-comments-discussions-v2__wrapper"
+          style={this.props.breakpoints.mobileOnly ? mobileThemeOverride : {}}
           data-testid="discussion-droppable-connected-container"
         >
           <DroppableConnectedDiscussionsContainer
@@ -383,5 +398,5 @@ const connectActions = dispatch =>
     dispatch
   )
 export const ConnectedDiscussionsIndex = DragDropContext(HTML5Backend)(
-  connect(connectState, connectActions)(DiscussionsIndex)
+  WithBreakpoints(connect(connectState, connectActions)(DiscussionsIndex))
 )

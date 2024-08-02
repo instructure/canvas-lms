@@ -39,6 +39,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
     $podcastEnabled: Boolean
     $podcastHasStudentPosts: Boolean
     $locked: Boolean
+    $discussionType: DiscussionTopicDiscussionType
     $isAnnouncement: Boolean
     $specificSections: String
     $groupCategoryId: ID
@@ -58,6 +59,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         anonymousState: $anonymousState
         delayedPostAt: $delayedPostAt
         lockAt: $lockAt
+        discussionType: $discussionType
         isAnonymousAuthor: $isAnonymousAuthor
         allowRating: $allowRating
         onlyGradersCanRate: $onlyGradersCanRate
@@ -85,6 +87,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         anonymousState
         delayedPostAt
         lockAt
+        discussionType
         isAnonymousAuthor
         allowRating
         onlyGradersCanRate
@@ -158,6 +161,7 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
     $podcastEnabled: Boolean
     $podcastHasStudentPosts: Boolean
     $locked: Boolean
+    $discussionType: DiscussionTopicDiscussionType
     $specificSections: String
     $fileId: ID
     $groupCategoryId: ID
@@ -178,6 +182,7 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         requireInitialPost: $requireInitialPost
         delayedPostAt: $delayedPostAt
         lockAt: $lockAt
+        discussionType: $discussionType
         allowRating: $allowRating
         onlyGradersCanRate: $onlyGradersCanRate
         onlyVisibleToOverrides: $onlyVisibleToOverrides
@@ -207,6 +212,7 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         anonymousState
         delayedPostAt
         lockAt
+        discussionType
         isAnonymousAuthor
         allowRating
         onlyGradersCanRate

@@ -50,6 +50,7 @@ export const Component = () => {
       <Portal open={true} mountNode={mountPoint}>
         <RubricForm
           canManageRubrics={ENV.PERMISSIONS?.manage_rubrics}
+          criterionUseRangeEnabled={ENV.FEATURES.rubric_criterion_range}
           rootOutcomeGroup={ENV.ROOT_OUTCOME_GROUP}
           onLoadRubric={rubricTitle => setRubricTitle(rubricTitle)}
         />

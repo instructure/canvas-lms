@@ -121,6 +121,8 @@ module SectionTabHelper
           elsif tab_is?(tab, "TAB_PEOPLE")
             # can't manage people in template courses
             context.is_a?(Course) && context.template?
+          elsif tab_is?(tab, "TAB_FILES")
+            context.is_a?(Course) && context&.account&.limited_access_for_user?(current_user)
           end
         end
       end

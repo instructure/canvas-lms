@@ -24,6 +24,10 @@ import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {View} from '@instructure/ui-view'
 import BlockEditorView from '../../BlockEditorView'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor')
+
 type ViewSize = 'desktop' | 'tablet' | 'mobile'
 
 type PreviewModalProps = {
@@ -63,10 +67,15 @@ const PreviewModal = ({open, onDismiss}: PreviewModalProps) => {
     }
   }
   return (
-    <Modal open={open} size="fullscreen" label="Preview">
+    <Modal open={open} size="fullscreen" label={I18n.t('Preview')}>
       <Modal.Header>
-        <Heading level="h2">Preview</Heading>
-        <CloseButton placement="end" offset="small" onClick={onDismiss} screenReaderLabel="Close" />
+        <Heading level="h2">{I18n.t('Preview')}</Heading>
+        <CloseButton
+          placement="end"
+          offset="small"
+          onClick={onDismiss}
+          screenReaderLabel={I18n.t('Close')}
+        />
       </Modal.Header>
       <Modal.Body>
         <View as="div">
@@ -76,17 +85,17 @@ const PreviewModal = ({open, onDismiss}: PreviewModalProps) => {
               name="uiVersion"
               value={viewSize}
               onChange={handleViewSizeChange}
-              description="View Size"
+              description={I18n.t('View Size')}
             >
-              <RadioInput value="desktop" label="Desktop" />
-              <RadioInput value="tablet" label="Tablet" />
-              <RadioInput value="mobile" label="Mobile" />
+              <RadioInput value="desktop" label={I18n.t('Desktop')} />
+              <RadioInput value="tablet" label={I18n.t('Tablet')} />
+              <RadioInput value="mobile" label={I18n.t('Mobile')} />
             </RadioInputGroup>
           </div>
           <View
             as="div"
             className={`block-editor-view ${viewSize}`}
-            maxWidth={getViewWidth()}
+            width={getViewWidth()}
             shadow="resting"
             padding="0"
             margin="0 auto"

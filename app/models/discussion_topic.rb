@@ -54,6 +54,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   module DiscussionTypes
     SIDE_COMMENT = "side_comment"
+    NOT_THREADED = "not_threaded"
     THREADED     = "threaded"
     FLAT         = "flat"
     TYPES        = DiscussionTypes.constants.map { |c| DiscussionTypes.const_get(c) }
@@ -213,16 +214,16 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def threaded=(v)
-    self.discussion_type = Canvas::Plugin.value_to_boolean(v) ? DiscussionTypes::THREADED : DiscussionTypes::SIDE_COMMENT
+    self.discussion_type = Canvas::Plugin.value_to_boolean(v) ? DiscussionTypes::THREADED : DiscussionTypes::NOT_THREADED
   end
 
   def threaded?
-    discussion_type == DiscussionTypes::THREADED || context.feature_enabled?("react_discussions_post")
+    discussion_type == DiscussionTypes::THREADED || (root_account&.feature_enabled?(:discussion_checkpoints) && checkpoints?)
   end
   alias_method :threaded, :threaded?
 
   def discussion_type
-    read_attribute(:discussion_type) || DiscussionTypes::SIDE_COMMENT
+    read_attribute(:discussion_type) || DiscussionTypes::NOT_THREADED
   end
 
   def validate_draft_state_change
@@ -243,7 +244,7 @@ class DiscussionTopic < ActiveRecord::Base
     end
 
     d_type = read_attribute(:discussion_type)
-    d_type ||= context.feature_enabled?("react_discussions_post") ? DiscussionTypes::THREADED : DiscussionTypes::SIDE_COMMENT
+    d_type ||= context.feature_enabled?("react_discussions_post") ? DiscussionTypes::THREADED : DiscussionTypes::NOT_THREADED
     self.discussion_type = d_type
 
     @content_changed = message_changed? || title_changed?
@@ -498,7 +499,8 @@ class DiscussionTopic < ActiveRecord::Base
                           sort_by_rating:,
                           todo_date:,
                           is_section_specific:,
-                          anonymous_state:
+                          anonymous_state:,
+                          reply_to_entry_required_count:
                         })
   end
 
@@ -529,7 +531,8 @@ class DiscussionTopic < ActiveRecord::Base
     if assignment && opts_with_default[:duplicate_assignment]
       result.assignment = assignment.duplicate({
                                                  duplicate_discussion_topic: false,
-                                                 copy_title: result.title
+                                                 copy_title: result.title,
+                                                 discussion_topic_for_checkpoints: result
                                                })
     end
 
@@ -1742,15 +1745,15 @@ class DiscussionTopic < ActiveRecord::Base
       end
 
       # topic is not published
-      if !published?
-        next false
-      elsif is_announcement && (unlock_at = available_from_for(user))
-        # unlock date exists and has passed
-        next unlock_at < Time.now.utc
-      # everything else
-      else
-        next true
+      next false unless published?
+
+      # unlock_at and lock_at determine visibility for announcements
+      if is_announcement
+        next false if lock_at && Time.now.utc > lock_at
+        next false if unlock_at && unlock_at > Time.now.utc
       end
+
+      next true
     end
   end
 
@@ -1850,6 +1853,14 @@ class DiscussionTopic < ActiveRecord::Base
       entries = entries.where(user_id: context.admins)
     end
     entries
+  end
+
+  def all_child_entries_from_user(user)
+    return [] unless for_group_discussion?
+
+    child_topics.map do |t|
+      t.discussion_entries.active.for_user(user)
+    end.flatten.sort_by(&:created_at)
   end
 
   def self.podcast_elements(messages, context)

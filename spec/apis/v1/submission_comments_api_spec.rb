@@ -96,6 +96,14 @@ describe "Submissions Comment API", type: :request do
       expect(response).to be_successful
     end
 
+    it "checks permissions for an assignment in a limited access account" do
+      @course.account.root_account.enable_feature!(:allow_limited_access_for_students)
+      @course.account.settings[:enable_limited_access_for_students] = true
+      @course.account.save!
+      preflight(name: "Hello World")
+      assert_status(401)
+    end
+
     it "creates an attachment with the right the user_id" do
       preflight(name: "blah blah blah")
       expect(response).to be_successful

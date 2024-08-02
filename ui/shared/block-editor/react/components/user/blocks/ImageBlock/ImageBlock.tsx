@@ -25,6 +25,10 @@ import {ImageBlockToolbar} from './ImageBlockToolbar'
 import {useClassNames} from '../../../../utils'
 import {type ImageBlockProps, type ImageVariant, type ImageConstraint} from './types'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor/image-block')
+
 const ImageBlock = ({src, width, height, constraint}: ImageBlockProps) => {
   const {enabled} = useEditor(state => ({
     enabled: state.options.enabled,
@@ -52,7 +56,7 @@ const ImageBlock = ({src, width, height, constraint}: ImageBlockProps) => {
 }
 
 ImageBlock.craft = {
-  displayName: 'Image',
+  displayName: I18n.t('Image'),
   defaultProps: {
     src: '',
     variant: 'default' as ImageVariant,

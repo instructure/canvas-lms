@@ -34,8 +34,10 @@ unless defined?($canvas_rails)
 
   if ENV["CANVAS_RAILS"]
     $canvas_rails = ENV["CANVAS_RAILS"]
+    source = "the CANVAS_RAILS environment variable"
   elsif File.exist?(file_path)
     $canvas_rails = File.read(file_path).strip
+    source = file_path
   else
     begin
       # have to do the consul communication without any gems, because
@@ -64,7 +66,10 @@ unless defined?($canvas_rails)
         keys.each do |key|
           result = http.request_get("/v1/kv/#{key}?stale")
           result = nil unless result.is_a?(Net::HTTPSuccess)
-          break if result
+          if result
+            source = "the Consul key #{key}"
+            break
+          end
         end
       end
       $canvas_rails = result ? Base64.decode64(JSON.parse(result.body).first["Value"]).strip : SUPPORTED_RAILS_VERSIONS.first
@@ -75,5 +80,5 @@ unless defined?($canvas_rails)
 end
 
 unless SUPPORTED_RAILS_VERSIONS.any?($canvas_rails)
-  raise "unsupported Rails version specified #{$canvas_rails}"
+  raise "unsupported Rails version #{$canvas_rails} specified in #{source}"
 end

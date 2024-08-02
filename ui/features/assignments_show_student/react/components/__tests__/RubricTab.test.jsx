@@ -156,11 +156,11 @@ describe('RubricTab', () => {
 
     describe('enhanced rubrics', () => {
       beforeAll(() => {
-        window.ENV.FEATURES.enhanced_rubrics = true
+        window.ENV.enhanced_rubrics_enabled = true
       })
 
       afterAll(() => {
-        window.ENV.FEATURES.enhanced_rubrics = false
+        window.ENV.enhanced_rubrics_enabled = false
       })
 
       it('contains "View Rubric" when peer review mode is OFF', async () => {
@@ -240,11 +240,11 @@ describe('RubricTab', () => {
 
     describe('enhanced rubrics', () => {
       beforeAll(() => {
-        window.ENV.FEATURES.enhanced_rubrics = true
+        window.ENV.enhanced_rubrics_enabled = true
       })
 
       afterAll(() => {
-        window.ENV.FEATURES.enhanced_rubrics = false
+        window.ENV.enhanced_rubrics_enabled = false
       })
 
       it('opens rubric assessment tray by default', async () => {
@@ -366,11 +366,11 @@ describe('RubricTab', () => {
 
     describe('enhanced rubrics', () => {
       beforeAll(() => {
-        window.ENV.FEATURES.enhanced_rubrics = true
+        window.ENV.enhanced_rubrics_enabled = true
       })
 
       afterAll(() => {
-        window.ENV.FEATURES.enhanced_rubrics = false
+        window.ENV.enhanced_rubrics_enabled = false
       })
 
       it('displays the name of the assessor if present', async () => {

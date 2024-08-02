@@ -17,11 +17,17 @@
  */
 
 import React, {useCallback} from 'react'
+import classNames from 'classnames'
 import {Flex} from '@instructure/ui-flex'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
 import {iconMap} from '../../../../assets/user-icons'
+
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor/icon-block')
 
 type IconPickerProps = {
   iconName?: string
@@ -44,31 +50,20 @@ const IconPicker = ({iconName, onSelect}: IconPickerProps) => {
     [handleSelectIcon]
   )
 
-  const selectedStyle = {borderColor: 'var(--ic-brand-primary)'}
-  const iconButtonStyle = {
-    padding: '2px',
-    display: 'inline-block',
-    cursor: 'pointer',
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: 'transparent',
-    borderRadius: '4px',
-  }
-
   const renderNoIcon = () => {
     const isSelected = !iconName
-    let style = {...iconButtonStyle}
-    if (isSelected) style = {...style, ...selectedStyle}
 
     return (
       <div
+        className={classNames('icon-picker__icon', {
+          selected: isSelected,
+        })}
         role="button"
-        style={style}
         tabIndex={0}
         onClick={() => handleSelectIcon('')}
         onKeyDown={(event: React.KeyboardEvent) => handleKey(event, '')}
       >
-        <Text size="small">No Icon</Text>
+        <Text size="small">{I18n.t('No Icon')}</Text>
       </div>
     )
   }
@@ -76,18 +71,17 @@ const IconPicker = ({iconName, onSelect}: IconPickerProps) => {
   return (
     <View as="div" margin="small" borderWidth="small" maxWidth="17rem">
       <Flex wrap="wrap" gap="small" justifyItems="space-between" margin="x-small">
+        <ScreenReaderContent>{I18n.t('Select an icon')}</ScreenReaderContent>
         {Object.keys(iconMap).map(icon => {
           const Icon = iconMap[icon]
           const isSelected = icon === iconName
-          let style = {...iconButtonStyle}
-          if (isSelected) {
-            style = {...style, ...selectedStyle}
-          }
           return (
             <div
+              className={classNames('icon-picker__icon', {
+                selected: isSelected,
+              })}
               key={icon}
               role="button"
-              style={style}
               tabIndex={0}
               onClick={() => handleSelectIcon(icon)}
               onKeyDown={(event: React.KeyboardEvent) => handleKey(event, icon)}

@@ -35,15 +35,25 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
       ce ||= create_content_export(source, cm)
       cm.content_export = ce
       if ce.workflow_state == "exported_for_course_copy"
-        # use the exported attachment as the import archive
-        cm.attachment = ce.attachment
-        cm.migration_settings[:migration_ids_to_import] ||= { copy: {} }
-        cm.migration_settings[:migration_ids_to_import][:copy][:everything] = true
-        cm.save
-        worker = CC::Importer::CCWorker.new
-        worker.migration_id = cm.id
-        worker.perform
-        cm.reload
+        if cm.for_course_template?
+          # the conversion has already been done as part of the export;
+          # link the exported attachment to the content migration
+          cm.attachment = cm.exported_attachment = ce.attachment
+          cm.workflow_state = :exported
+          cm.migration_settings[:worker_class] = CC::Importer::Canvas::Converter.name
+          cm.save!
+        else
+          # use the exported attachment as the import archive
+          cm.attachment = ce.attachment
+          cm.migration_settings[:migration_ids_to_import] ||= { copy: {} }
+          cm.migration_settings[:migration_ids_to_import][:copy][:everything] = true
+          cm.save
+
+          worker = CC::Importer::CCWorker.new
+          worker.migration_id = cm.id
+          worker.perform
+          cm.reload
+        end
         if cm.workflow_state == "exported"
           cm.workflow_state = :pre_processed
           cm.update_import_progress(10)
@@ -74,21 +84,17 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
   end
 
   def find_suitable_content_export(source, cm)
-    return unless cm.user_id.nil?
+    return unless cm.for_course_template?
 
     candidate_exports = source.content_exports
-                              .where(export_type: ContentExport::COURSE_COPY,
+                              .where(export_type: ContentExport::COURSE_TEMPLATE_COPY,
                                      workflow_state: "exported_for_course_copy",
                                      created_at: source.updated_at..,
                                      user_id: nil)
                               .order(id: :desc)
                               .limit(5)
                               .to_a
-    candidate_exports.detect do |ce|
-      !ce.expired? &&
-        ce.selected_content.slice(*cm.copy_options.keys) == cm.copy_options &&
-        ce.selected_content.key?("attachments")
-    end
+    candidate_exports.find { |ce| !ce.expired? && ce.selected_content.key?("attachments") }
   end
 
   def create_content_export(source, cm)
@@ -97,7 +103,7 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
     ce.context = source
     ce.content_migration = cm
     ce.selected_content = cm.copy_options
-    ce.export_type = ContentExport::COURSE_COPY
+    ce.export_type = cm.for_course_template? ? ContentExport::COURSE_TEMPLATE_COPY : ContentExport::COURSE_COPY
     ce.user = cm.user
     ce.save!
 

@@ -267,18 +267,13 @@ const DifferentiatedModulesSection = ({
     // revert changes in the overrides of the page
     resetOverrides(overrides, preSavedOverrides)
     // revert changes in the tray cards
-    const preSaved = stagedOverridesRef.current.filter(o =>
+    let preSaved = stagedOverridesRef.current.filter(o =>
       preSavedOverrides.find(override => o.stagedOverrideId === override.stagedOverrideId)
     )
+    const deletedOverrides = preSavedOverrides.filter(o => stagedOverridesRef.current.find(override => o.stagedOverrideId === override.stagedOverrideId) === undefined)
+    preSaved = [...preSaved, ...deletedOverrides]
     const defaultState = getParsedOverrides(preSaved, checkPoint)
-    const checkPointOverrides = getAllOverridesFromCards(defaultState).filter(
-      card =>
-        card.course_section_id ||
-        card.student_ids ||
-        card.noop_id ||
-        card.course_id ||
-        card.group_id
-    )
+    const checkPointOverrides = getAllOverridesFromCards(defaultState)
     setStagedOverrides(checkPointOverrides)
     const newStagedCards = resetStagedCards(stagedCardsRef.current, checkPoint, defaultState)
     setStagedCards(newStagedCards)

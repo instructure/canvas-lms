@@ -60,7 +60,7 @@ class Checkpoint
   end
 
   def overrides
-    assignment_overrides_json(@assignment.assignment_overrides.select(&:active?), @user)
+    @assignment.grants_right?(@user, :update) ? assignment_overrides_json(@assignment.assignment_overrides.select(&:active?), @user) : []
   end
 
   def session

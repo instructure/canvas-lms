@@ -32,13 +32,13 @@ describe "SpeedGrader - discussion submissions" do
       submission_types: "discussion_topic",
       description: "a little bit of content"
     )
-    student = user_with_pseudonym(
+    @student = user_with_pseudonym(
       name: "first student",
       active_user: true,
       username: "student@example.com",
       password: "qwertyuiop"
     )
-    @course.enroll_user(student, "StudentEnrollment", enrollment_state: "active")
+    @course.enroll_user(@student, "StudentEnrollment", enrollment_state: "active")
     # create and enroll second student
     student_2 = user_with_pseudonym(
       name: "second student",
@@ -53,7 +53,7 @@ describe "SpeedGrader - discussion submissions" do
     @second_message = "second student message"
     @discussion_topic = DiscussionTopic.find_by(assignment_id: @assignment.id)
     entry = @discussion_topic.discussion_entries
-                             .create!(user: student, message: @first_message)
+                             .create!(user: @student, message: @first_message)
     entry.update_topic
     entry.context_module_action
     @attachment_thing = attachment_model(context: student_2, filename: "horse.doc", content_type: "application/msword")
@@ -79,6 +79,55 @@ describe "SpeedGrader - discussion submissions" do
       url = f("#main div.attachment_data a")["href"]
       expect(url).to include "/files/#{@attachment_thing.id}/download?verifier=#{@attachment_thing.uuid}"
       expect(url).not_to include "/courses/#{@course}"
+    end
+  end
+
+  it "displays all entries for group discussion submission" do
+    entry_text = "first student message in group1"
+    root_topic = group_discussion_assignment
+    @group1.add_user(@student, "accepted")
+
+    root_topic.child_topic_for(@student).discussion_entries.create!(user: @student, message: entry_text)
+    Speedgrader.visit(@course.id, root_topic.assignment.id)
+
+    in_frame "speedgrader_iframe", "#discussion_view_link" do
+      expect(f("#main")).to include_text("The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for")
+      expect(f("#main")).to include_text(entry_text)
+    end
+  end
+
+  context "discussion_checkpoints" do
+    before do
+      Account.site_admin.enable_feature!(:react_discussions_post)
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+    end
+
+    it "displays whole discussion" do
+      Speedgrader.visit(@course.id, @assignment.id)
+      in_frame("speedgrader_iframe") do
+        in_frame("discussion_preview_iframe") do
+          wait_for_ajaximations
+          expect(f("div[data-testid='isHighlighted']").text).to include(@student.name)
+          expect(f(".discussions-search-filter")).to be_displayed
+        end
+      end
+    end
+
+    it "displays whole discussion for group discussion submission" do
+      entry_text = "first student message in group1"
+      root_topic = group_discussion_assignment
+      @group1.add_user(@student, "accepted")
+
+      root_topic.child_topic_for(@student).discussion_entries.create!(user: @student, message: entry_text)
+      Speedgrader.visit(@course.id, root_topic.assignment.id)
+
+      in_frame("speedgrader_iframe") do
+        in_frame("discussion_preview_iframe") do
+          wait_for_ajaximations
+          expect(f("div[data-testid='isHighlighted']").text).to include(@student.name)
+          expect(f(".discussions-search-filter")).to be_displayed
+        end
+      end
     end
   end
 
@@ -147,6 +196,30 @@ describe "SpeedGrader - discussion submissions" do
       in_frame "speedgrader_iframe", "#discussion_view_link" do
         f(".header_title a").click
         expect(f("body")).not_to contain_css(".avatar")
+      end
+    end
+
+    context "discussion_checkpoints" do
+      it "displays whole discussion with hidden student names" do
+        Account.site_admin.enable_feature!(:react_discussions_post)
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        Speedgrader.visit(@course.id, @assignment.id)
+
+        Speedgrader.click_settings_link
+        Speedgrader.click_options_link
+        Speedgrader.select_hide_student_names
+        expect_new_page_load { fj(".ui-dialog-buttonset .ui-button:visible:last").click }
+
+        in_frame("speedgrader_iframe") do
+          in_frame("discussion_preview_iframe") do
+            wait_for_ajaximations
+            # this verifies full discussion is displayed, and highlight is set to the first
+            # student's entry
+            expect(f("div[data-testid='isHighlighted']").text).to include("This Student")
+            expect(fj("span:contains('Discussion Participant')")).to be_displayed
+            expect(f("body")).not_to contain_css(".discussions-search-filter")
+          end
+        end
       end
     end
   end

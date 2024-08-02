@@ -53,24 +53,24 @@ const SectionMenu = ({
   const {actions, selected, query} = useEditor((state, qry) => {
     const [currentNodeId] = state.events.selected
     return {
-      selected: qry.node(currentNodeId),
+      selected: currentNodeId ? qry.node(currentNodeId) : null,
     }
   })
   const [sectionLocation, setSectionLocation] = useState<SectionLocation>(() => {
-    if (selected.get()) {
+    if (selected?.get()) {
       return getSectionLocation(selected.get(), query)
     }
     return 'middle'
   })
 
   useEffect(() => {
-    if (selected.get()) {
+    if (selected?.get()) {
       setSectionLocation(getSectionLocation(selected.get(), query))
     }
   }, [selected, query])
 
   const handleEditSection = useCallback(() => {
-    if (onEditSection) {
+    if (onEditSection && selected) {
       onEditSection(selected.get())
     }
   }, [onEditSection, selected])
@@ -99,6 +99,8 @@ const SectionMenu = ({
   // }, [actions, onDuplicateSection, query, selected])
 
   const handleMoveUp = useCallback(() => {
+    if (!selected) return
+
     if (onMoveUp) {
       onMoveUp(selected.get())
     } else {
@@ -119,6 +121,8 @@ const SectionMenu = ({
   }, [actions, onMoveUp, query, selected])
 
   const handleMoveDown = useCallback(() => {
+    if (!selected) return
+
     if (onMoveDown) {
       onMoveDown(selected.get())
     } else {
@@ -139,6 +143,8 @@ const SectionMenu = ({
   }, [actions, onMoveDown, query, selected])
 
   const handleRemove = useCallback(() => {
+    if (!selected) return
+
     if (onRemove) {
       onRemove(selected.get())
     } else if (selected.get()?.id) {
@@ -171,7 +177,7 @@ const SectionMenu = ({
       >
         Move Down
       </Menu.Item>
-      <Menu.Item onSelect={handleRemove} disabled={!selected.isDeletable()}>
+      <Menu.Item onSelect={handleRemove} disabled={!selected?.isDeletable()}>
         Remove
       </Menu.Item>
     </Menu>

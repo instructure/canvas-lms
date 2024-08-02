@@ -4591,23 +4591,46 @@ describe Assignment do
   end
 
   describe "#peer_reviews_assigned" do
-    before :once do
+    before do
       @assignment = assignment_model(course: @course)
       @assignment.peer_reviews = true
       @assignment.automatic_peer_reviews = true
-      @assignment.due_at = 1.day.ago
-      @assignment.peer_reviews_assigned = true
-      @assignment.save!
+      @assignment.peer_review_count = 1
+      @assignment.peer_reviews_assign_at = nil
     end
 
     it "is set to `true` when all peer reviews have been assigned" do
+      @assignment.due_at = 1.day.ago
+      @assignment.peer_reviews_assigned = true
+      @assignment.save!
       @assignment.assign_peer_reviews
       expect(@assignment.peer_reviews_assigned).to be true
     end
 
     it "is set to `false` when the #assign_at time changes" do
+      @assignment.due_at = 1.day.ago
+      @assignment.peer_reviews_assigned = true
+      @assignment.save!
       @assignment.assign_peer_reviews
       @assignment.peer_reviews_assign_at = 1.day.from_now
+      @assignment.save!
+      expect(@assignment.peer_reviews_assigned).to be false
+    end
+
+    it "is set to 'false' when the due_date passes even though peer_reviews_assign_at did not change" do
+      @assignment.due_at = 1.day.from_now
+      @assignment.peer_reviews_assigned = true
+      @assignment.save!
+      @assignment.due_at = 1.day.ago
+      @assignment.save!
+      expect(@assignment.peer_reviews_assigned).to be false
+    end
+
+    it "is set to 'false' when the due_date passes with initial peer_reviews_assigned as false" do
+      @assignment.due_at = 1.day.from_now
+      @assignment.peer_reviews_assigned = false
+      @assignment.save!
+      @assignment.due_at = 1.day.ago
       @assignment.save!
       expect(@assignment.peer_reviews_assigned).to be false
     end
@@ -5287,6 +5310,13 @@ describe Assignment do
         @assignment.submission_types = "online_quiz"
         @assignment.save!
         expect(@assignment.grants_right?(@student, :attach_submission_comment_files)).to be true
+      end
+
+      it "is false when user is student in a limited access account" do
+        @course.account.root_account.enable_feature!(:allow_limited_access_for_students)
+        @course.account.settings[:enable_limited_access_for_students] = true
+        @course.account.save!
+        expect(@assignment.grants_right?(@student, :attach_submission_comment_files)).to be false
       end
     end
 
@@ -11387,8 +11417,9 @@ describe Assignment do
   describe "checkpointed assignments" do
     before do
       @course.root_account.enable_feature!(:discussion_checkpoints)
-      @parent = @course.assignments.create!(has_sub_assignments: true)
-      @child = @parent.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+      @parent = @course.assignments.create!(has_sub_assignments: true, workflow_state: "published")
+      @first_checkpoint = @parent.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+      @second_checkpoint = @parent.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
     end
 
     it "does not allow assignments to have parent assignments (only sub assignments can have parent assignments)" do
@@ -11399,16 +11430,30 @@ describe Assignment do
     end
 
     it "excludes soft-deleted child assignments from the sub_assignments association" do
-      expect { @child.destroy }.to change { @parent.sub_assignments.exists? }.from(true).to(false)
+      expect do
+        @first_checkpoint.destroy
+        @second_checkpoint.destroy
+      end.to change { @parent.sub_assignments.count }.from(2).to(0)
     end
 
     it "soft-deletes child assignments when the parent assignment is soft-deleted" do
-      expect { @parent.destroy }.to change { @child.reload.deleted? }.from(false).to(true)
+      expect { @parent.destroy }.to(
+        change { @first_checkpoint.reload.deleted? }.from(false).to(true)
+        .and(change { @second_checkpoint.reload.deleted? }.from(false).to(true))
+      )
     end
 
     it "has correct values for is_checkpoints_parent?" do
       expect(@parent.checkpoints_parent?).to be true
-      expect(@child.checkpoints_parent?).to be false
+      expect(@first_checkpoint.checkpoints_parent?).to be false
+    end
+
+    it "will update the sub_assignment workflow_state when parent updates" do
+      expect(@first_checkpoint.reload.workflow_state).to eq "published"
+      expect(@second_checkpoint.reload.workflow_state).to eq "published"
+      @parent.update!(workflow_state: "unpublished")
+      expect(@first_checkpoint.reload.workflow_state).to eq "unpublished"
+      expect(@second_checkpoint.reload.workflow_state).to eq "unpublished"
     end
   end
 

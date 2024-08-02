@@ -23,35 +23,6 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 
-const CONTENT_OPTIONS = [
-  {
-    display: formatMessage('Choose usage rights...'),
-    value: 'choose',
-  },
-  {
-    display: formatMessage('I hold the copyright'),
-    value: 'own_copyright',
-  },
-  {
-    display: formatMessage('I have obtained permission to use this file.'),
-    value: 'used_by_permission',
-  },
-  {
-    display: formatMessage('The material is in the public domain'),
-    value: 'public_domain',
-  },
-  {
-    display: formatMessage(
-      'The material is subject to an exception - e.g. fair use, the right to quote, or others under applicable copyright laws'
-    ),
-    value: 'fair_use',
-  },
-  {
-    display: formatMessage('The material is licensed under Creative Commons'),
-    value: 'creative_commons',
-  },
-]
-
 const ShowCreativeCommonsOptions = ({ccLicense, setCCLicense, licenseOptions}) => {
   const onlyCC = licenseOptions.filter(license => license.id.indexOf('cc') === 0)
 
@@ -99,6 +70,33 @@ const UsageRightsSelectBox = ({
   const showCreativeCommonsOptions = usageRight === 'creative_commons'
   const [licenseOptions, setLicenseOptions] = React.useState([])
   const [showMessage, setShowMessage] = React.useState(showMessageProp)
+  const CONTENT_OPTIONS = [
+    {
+      display: formatMessage('Choose usage rights...'),
+      value: 'choose',
+    },
+    {
+      display: formatMessage('I hold the copyright'),
+      value: 'own_copyright',
+    },
+    {
+      display: formatMessage('I have obtained permission to use this file.'),
+      value: 'used_by_permission',
+    },
+    {
+      display: formatMessage('The material is in the public domain'),
+      value: 'public_domain',
+    },
+    {
+      display: formatMessage('The material is subject to an exception - e.g. fair use, the right to quote, or others under applicable copyright laws'),
+      value: 'fair_use',
+    },
+    {
+      display: formatMessage('The material is licensed under Creative Commons'),
+      value: 'creative_commons',
+    },
+  ]
+
   React.useEffect(() => {
     function getUsageRightsOptions() {
       fetch(apiUrl())
@@ -169,7 +167,7 @@ const UsageRightsSelectBox = ({
 UsageRightsSelectBox.propTypes = {
   usageRightsState: PropTypes.shape({
     ccLicense: PropTypes.string,
-    usageRight: PropTypes.oneOf(Object.values(CONTENT_OPTIONS).map(o => o.value)),
+    usageRight: PropTypes.oneOf(['choose', 'own_copyright', 'used_by_permission', 'public_domain', 'fair_use', 'creative_commons']),
     copyrightHolder: PropTypes.string,
   }),
   setUsageRightsState: PropTypes.func,

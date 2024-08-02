@@ -19,11 +19,14 @@
 
 import React from 'react'
 import moxios from 'moxios'
-import {act, render, waitFor} from '@testing-library/react'
+import {act, render as testingLibraryRender, waitFor} from '@testing-library/react'
 import K5Dashboard from '../K5Dashboard'
 import {defaultK5DashboardProps as defaultProps} from './mocks'
+import {QueryProvider} from '@canvas/query'
 
 jest.useFakeTimers()
+
+const render = children => testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
 
 // getByRole() causes these tests to be very slow, so provide a much faster helper
 // function that does the same thing

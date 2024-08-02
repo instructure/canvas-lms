@@ -34,11 +34,19 @@ type TopNavigationToolsProps = {
   handleToolLaunch: (tool: Tool) => void
 }
 
+export const handleToolIconError = (tool: Tool) => (event: any) => {
+  event.target.src = `/lti/tool_default_icon?name=${tool.title[0]}`
+  event.onerror = null
+}
+
 function getToolIcon(tool: Tool) {
   return (
-    (tool.icon_url && (
-      <Img src={tool.icon_url} height="1rem" alt={tool.title || 'Tool Icon'} />
-    )) || <IconLtiLine title={tool.title || 'Tool Icon'} />
+    <Img
+      src={tool.icon_url || ''}
+      height="1rem"
+      alt={tool.title}
+      onError={handleToolIconError(tool)}
+    />
   )
 }
 

@@ -117,6 +117,7 @@ export const inboxMessagesWrapper = (data, isSubmissionComments = false) => {
         inboxMessage.attachmentsConnection = null
         inboxMessage.mediaComment = null
         contextName = message?.course?.contextName
+        canReply = canReply && message?.canReply
       } else {
         inboxMessage.id = message?.id
         inboxMessage._id = message?._id

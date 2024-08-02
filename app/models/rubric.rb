@@ -507,7 +507,7 @@ class Rubric < ActiveRecord::Base
   end
 
   def reconcile_criteria_models(current_user)
-    return unless context.root_account.feature_enabled?(:enhanced_rubrics)
+    return unless enhanced_rubrics_enabled?
 
     return unless criteria.present? && criteria.is_a?(Array)
 
@@ -571,7 +571,17 @@ class Rubric < ActiveRecord::Base
   end
 
   def enhanced_rubrics_enabled?
-    context.root_account.feature_enabled?(:enhanced_rubrics)
+    return context.feature_enabled?(:enhanced_rubrics) if context_type == "Account"
+
+    context.account.feature_enabled?(:enhanced_rubrics)
+  end
+
+  def self.enhanced_rubrics_enabled_for_context?(context)
+    return false unless context
+    return context.feature_enabled?(:enhanced_rubrics) if context.is_a?(Account)
+    return context.account.feature_enabled?(:enhanced_rubrics) if context.is_a?(Course)
+
+    false
   end
 
   def learning_outcome_ids_from_results

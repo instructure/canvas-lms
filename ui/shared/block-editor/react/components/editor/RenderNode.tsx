@@ -49,9 +49,8 @@ import {IconArrowUpLine, IconTrashLine, IconDragHandleLine} from '@instructure/u
 import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View, type ViewProps} from '@instructure/ui-view'
-import {ToolbarSeparator} from './ToolbarSeparator'
 
-import type {AddSectionPlacement} from './types'
+import type {AddSectionPlacement, RenderNodeProps} from './types'
 import {SectionBrowser} from './SectionBrowser'
 
 const findUpNode = (node: Node, query: any): Node | undefined => {
@@ -69,10 +68,6 @@ const findContainingSection = (node: Node, query: any): Node | undefined => {
     upnode = findUpNode(upnode, query)
   }
   return upnode && upnode.data.custom?.isSection ? upnode : undefined
-}
-
-interface RenderNodeProps {
-  render: React.ReactElement
 }
 
 interface RenderNodeComponent extends React.FC<RenderNodeProps> {
@@ -269,13 +264,13 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
         )}
         {node.related.toolbar && (
           <>
-            <ToolbarSeparator />
+            <div className="toolbar-separator" />
             {React.createElement(node.related.toolbar)}
           </>
         )}
         {deletable ? (
           <>
-            <ToolbarSeparator />
+            <div className="toolbar-separator" />
             <IconButton
               cursor="pointer"
               size="small"

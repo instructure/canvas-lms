@@ -114,6 +114,7 @@ module Api::V1::User
       if !excludes.include?("personal_info") && @domain_root_account&.enable_profiles? && user.profile
         json[:bio] = user.profile.bio if includes.include?("bio")
         json[:title] = user.profile.title if includes.include?("title")
+        json[:pronunciation] = user.profile.pronunciation if includes.include?("pronunciation") && @domain_root_account.enable_name_pronunciation?
       end
 
       if includes.include?("sections")

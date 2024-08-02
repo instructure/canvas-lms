@@ -19,10 +19,15 @@
 import {TempEnrollModal} from './TempEnrollModal'
 import {Button} from '@instructure/ui-buttons'
 import {IconCalendarClockLine} from '@instructure/ui-icons'
-import React, {useState} from 'react'
-import {type Role, type Permissions, type TempEnrollPermissions, PROVIDER} from './types'
+import React, {useCallback, useState} from 'react'
+import {
+  type Role,
+  type RolePermissions,
+  type TemporaryEnrollmentStatus,
+  type ModifyPermissions,
+  PROVIDER,
+} from './types'
 import useFetchApi from '@canvas/use-fetch-api-hook'
-import type {TemporaryEnrollmentData} from './TempEnrollUsersListRow'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -33,30 +38,33 @@ interface Props {
     id: string
     name: string
   }
-  tempEnrollPermissions: TempEnrollPermissions
+  modifyPermissions: ModifyPermissions
   can_read_sis: boolean
   roles: Role[]
-  enrollPerm: Permissions
+  rolePermissions: RolePermissions
 }
 
 function ManageTempEnrollButton(props: Props) {
   const [isProvider, setIsProvider] = useState(false)
   const [editMode, setEditMode] = useState(false)
 
+  const setProvider = useCallback((json: TemporaryEnrollmentStatus) => {
+    setIsProvider(json.is_provider)
+  }, [])
+
   useFetchApi(
     // @ts-ignore - this hook isn't ts-ified
     {
       path: `/api/v1/users/${props.user.id}/temporary_enrollment_status`,
       ...(ENV.ACCOUNT_ID !== ENV.ROOT_ACCOUNT_ID && {params: {account_id: ENV.ACCOUNT_ID}}),
-      success: (json: TemporaryEnrollmentData) => setEnrollmentState(json),
-      error: showFlashError(I18n.t('Failed to fetch temporary enrollment data')),
+      success: setProvider,
+      error: useCallback(
+        () => showFlashError(I18n.t('Failed to fetch temporary enrollment data')),
+        []
+      ),
     },
     [props.user.id]
   )
-
-  const setEnrollmentState = (res: TemporaryEnrollmentData) => {
-    setIsProvider(res.is_provider)
-  }
 
   function toggleEditMode() {
     setEditMode(prev => !prev)
@@ -68,11 +76,11 @@ function ManageTempEnrollButton(props: Props) {
         enrollmentType={PROVIDER}
         user={props.user}
         canReadSIS={props.can_read_sis}
-        permissions={props.enrollPerm}
+        rolePermissions={props.rolePermissions}
         roles={props.roles}
         isEditMode={editMode}
         onToggleEditMode={toggleEditMode}
-        tempEnrollPermissions={props.tempEnrollPermissions}
+        modifyPermissions={props.modifyPermissions}
       >
         <Button
           onClick={toggleEditMode}

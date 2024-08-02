@@ -289,6 +289,23 @@ describe "threaded discussions" do
   context "when discussions redesign feature flag is ON", :ignore_js_errors do
     before :once do
       Account.site_admin.enable_feature! :react_discussions_post
+      Account.site_admin.enable_feature! :discussion_create
+    end
+
+    context "not-threaded discussion" do
+      before do
+        user_session(@student)
+        @topic = create_discussion("not_threaded discussion", "not_threaded")
+        @first_reply = @topic.discussion_entries.create!(
+          user: @student,
+          message: "1st level reply"
+        )
+        Discussion.visit(@course, @topic)
+      end
+
+      it "does not display reply button in threading toolbar" do
+        expect(f("body")).not_to contain_jqcss("button[data-testid='threading-toolbar-reply']:contains('Reply')")
+      end
     end
 
     context "reply flow" do
@@ -330,6 +347,38 @@ describe "threaded discussions" do
         before do
           user_session(@student)
           get "/courses/#{@course.id}/discussion_topics/#{@threaded_topic.id}"
+        end
+
+        it "debounces the entry creation" do
+          # Click reply button
+          f("button[data-testid='discussion-topic-reply']").click
+          wait_for_ajaximations
+
+          entry_count = @threaded_topic.discussion_entries.count
+
+          # Type content
+          reply_content = "This is a reply to topic that should not be lost."
+          type_in_tiny("textarea", reply_content)
+
+          # Try to submit the reply
+          f("button[data-testid='DiscussionEdit-submit']")
+
+          # Simulate multiple rapid clicks using JavaScript
+          driver.execute_script(<<~JS)
+            let button = document.querySelector("button[data-testid='DiscussionEdit-submit']");
+            let event = new MouseEvent('click', {
+              view: window,
+              bubbles: true,
+              cancelable: true
+            });
+            for (let i = 0; i < 2; i++) {
+              button.dispatchEvent(event);
+            }
+          JS
+
+          wait_for_ajaximations
+
+          expect(@threaded_topic.discussion_entries.count).to eq entry_count + 1
         end
 
         describe "Discussion replies with network interruptions" do

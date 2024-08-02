@@ -30,6 +30,10 @@ import {UploadFileModal} from '../../../../FileUpload/UploadFileModal'
 import {IconSizePopup} from './ImageSizePopup'
 import {type ImageBlockProps, type ImageConstraint} from './types'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor/image-block')
+
 const ImageBlockToolbar = () => {
   const {
     actions: {setProp},
@@ -71,7 +75,7 @@ const ImageBlockToolbar = () => {
   return (
     <Flex gap="small">
       <IconButton
-        screenReaderLabel="Upload Image"
+        screenReaderLabel={I18n.t('Upload Image')}
         withBackground={false}
         withBorder={false}
         onClick={handleShowUploadModal}
@@ -79,7 +83,7 @@ const ImageBlockToolbar = () => {
         <IconUploadLine size="x-small" />
       </IconButton>
       <Menu
-        label="Constraint"
+        label={I18n.t('Constraint')}
         trigger={
           <Button size="small">
             <Flex gap="small">
@@ -95,7 +99,7 @@ const ImageBlockToolbar = () => {
           onSelect={handleConstraintChange}
           selected={props.constraint === 'cover'}
         >
-          <Text size="small">Cover</Text>
+          <Text size="small">{I18n.t('Cover')}</Text>
         </Menu.Item>
         <Menu.Item
           type="checkbox"
@@ -103,7 +107,7 @@ const ImageBlockToolbar = () => {
           onSelect={handleConstraintChange}
           selected={props.constraint === 'contain'}
         >
-          <Text size="small">Contain</Text>
+          <Text size="small">{I18n.t('Contain')}</Text>
         </Menu.Item>
       </Menu>
 

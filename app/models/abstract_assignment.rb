@@ -128,8 +128,8 @@ class AbstractAssignment < ActiveRecord::Base
   has_many :enrollments_for_assigned_students, -> { active.not_fake.where("enrollments.course_id = submissions.course_id") }, through: :assigned_students, source: :enrollments
   has_many :sections_for_assigned_students, -> { active.distinct }, through: :enrollments_for_assigned_students, source: :course_section
 
-  belongs_to :duplicate_of, class_name: "Assignment", optional: true, inverse_of: :duplicates
-  has_many :duplicates, class_name: "Assignment", inverse_of: :duplicate_of, foreign_key: "duplicate_of_id"
+  belongs_to :duplicate_of, class_name: "AbstractAssignment", optional: true, inverse_of: :duplicates
+  has_many :duplicates, class_name: "AbstractAssignment", inverse_of: :duplicate_of, foreign_key: "duplicate_of_id"
 
   has_many :assignment_configuration_tool_lookups, dependent: :delete_all, inverse_of: :assignment, foreign_key: :assignment_id
   has_many :tool_settings_context_external_tools, through: :assignment_configuration_tool_lookups, source: :tool, source_type: "ContextExternalTool"
@@ -320,6 +320,7 @@ class AbstractAssignment < ActiveRecord::Base
     return self if new_record?
 
     default_opts = {
+      discussion_topic_for_checkpoints: nil,
       duplicate_wiki_page: true,
       duplicate_discussion_topic: true,
       duplicate_plagiarism_tool_association: true,
@@ -365,6 +366,21 @@ class AbstractAssignment < ActiveRecord::Base
                                                              copy_title: result.title,
                                                              user: opts_with_default[:user]
                                                            })
+    end
+
+    if checkpoints_parent? && opts_with_default[:discussion_topic_for_checkpoints]
+      result.discussion_topic = opts_with_default[:discussion_topic_for_checkpoints]
+
+      # we have to save result here because we have to set it as a parent_assignment
+      result.save!
+      sub_assignments.each do |sub_assignment|
+        new_sa = sub_assignment.duplicate({
+                                            duplicate_wiki_page: false,
+                                            duplicate_discussion_topic: false,
+                                          })
+        new_sa.parent_assignment = result
+        new_sa.save!
+      end
     end
 
     result.discussion_topic&.assignment = result
@@ -1056,7 +1072,14 @@ class AbstractAssignment < ActiveRecord::Base
     if will_save_change_to_submission_types? && ["none", "on_paper"].include?(self.submission_types)
       self.allowed_attempts = nil
     end
-    self.peer_reviews_assigned = false if peer_reviews_due_at_changed?
+
+    peer_review_assign_changed = peer_reviews_due_at_changed?
+    due_at_changed_with_no_peer_review_assign_date = peer_reviews_due_at.nil? && due_at_changed? && due_at.present? && next_auto_peer_review_date(Time.zone.now)
+
+    if peer_review_assign_changed || due_at_changed_with_no_peer_review_assign_date
+      self.peer_reviews_assigned = false
+    end
+
     %i[
       all_day
       could_be_locked
@@ -1224,7 +1247,7 @@ class AbstractAssignment < ActiveRecord::Base
   # filtered by context during migrate_content_to_1_3
   # @see Lti::Migratable
   def self.directly_associated_items(tool_id)
-    Assignment.nondeleted.joins(:external_tool_tag).where(content_tags: { content_id: tool_id })
+    Assignment.nondeleted.joins(:external_tool_tag).where(content_tags: { content_type: ContextExternalTool, content_id: tool_id })
   end
 
   # filtered by context during migrate_content_to_1_3
@@ -1933,7 +1956,8 @@ class AbstractAssignment < ActiveRecord::Base
     given do |user, session|
       (submittable_type? || %w[discussion_topic online_quiz none not_graded].include?(submission_types)) &&
         context.grants_right?(user, session, :participate_as_student) &&
-        visible_to_user?(user)
+        visible_to_user?(user) &&
+        !course.account.limited_access_for_user?(user)
     end
     can :attach_submission_comment_files
 

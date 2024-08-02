@@ -92,6 +92,7 @@ export const reorder = ({list, startIndex, endIndex}: ReorderProps) => {
 
 export type CriterionModalProps = {
   criterion?: RubricCriterion
+  criterionUseRangeEnabled: boolean
   isOpen: boolean
   unassessed: boolean
   onSave: (criterion: RubricCriterion) => void
@@ -99,6 +100,7 @@ export type CriterionModalProps = {
 }
 export const CriterionModal = ({
   criterion,
+  criterionUseRangeEnabled,
   isOpen,
   unassessed,
   onDismiss,
@@ -296,7 +298,7 @@ export const CriterionModal = ({
         <View as="div" margin="medium 0 0 0" themeOverride={{marginMedium: '1.25rem'}}>
           <Flex>
             <Flex.Item shouldGrow={true}>
-              {unassessed && (
+              {unassessed && criterionUseRangeEnabled && (
                 <Checkbox
                   label="Enable Range"
                   checked={criterionUseRange}

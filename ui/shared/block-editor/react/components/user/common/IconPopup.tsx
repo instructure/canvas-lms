@@ -22,16 +22,18 @@ import {Button} from '@instructure/ui-buttons'
 import {Popover} from '@instructure/ui-popover'
 import {IconPicker} from '../blocks/IconBlock'
 
-type IconPopupProps = {
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor/icon-popup')
+
+export type IconPopupProps = {
   iconName?: string
 }
 
 const IconPopup = ({iconName}: IconPopupProps) => {
   const {
     actions: {setProp},
-  } = useNode(node => ({
-    props: node.data.props,
-  }))
+  } = useNode()
   const [isShowingContent, setIsShowingContent] = useState(false)
   const [selectedIcon, setSelectedIcon] = useState(iconName)
 
@@ -64,7 +66,7 @@ const IconPopup = ({iconName}: IconPopupProps) => {
       on="click"
       placement="bottom start"
       shadow="resting"
-      screenReaderLabel="Popover Dialog Example"
+      screenReaderLabel={I18n.t('Select an icon')}
       shouldAlignArrow={true}
       shouldContainFocus={true}
       shouldReturnFocus={true}
