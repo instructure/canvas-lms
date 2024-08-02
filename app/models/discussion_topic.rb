@@ -980,6 +980,7 @@ class DiscussionTopic < ActiveRecord::Base
     state :unpublished
     state :post_delayed do
       event :delayed_post, transitions_to: :active do
+        self.notify_users = true
         self.last_reply_at = Time.now
         self.posted_at = Time.now
       end
