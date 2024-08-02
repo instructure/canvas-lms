@@ -93,7 +93,7 @@ class Lti::Registration < ActiveRecord::Base
     account_bindings.each do |acct_binding|
       global_registration_id = Shard.global_id_for(acct_binding.registration_id, Shard.current)
       registration = registrations_by_id[global_registration_id]
-      registration.account_binding = acct_binding
+      registration&.account_binding = acct_binding
     end
   end
   private_class_method :associate_bindings
