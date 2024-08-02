@@ -23,6 +23,7 @@ import {type AccountId} from '../model/AccountId'
 import type {DynamicRegistrationTokenUUID} from '../model/DynamicRegistrationTokenUUID'
 import type {LtiImsRegistrationId} from '../model/lti_ims_registration/LtiImsRegistrationId'
 import {defaultFetchOptions} from '@canvas/util/xhr'
+import type {UnifiedToolId} from '../model/UnifiedToolId'
 
 /**
  * Fetch a newly generated registration token which will
@@ -37,11 +38,13 @@ import {defaultFetchOptions} from '@canvas/util/xhr'
 export const fetchRegistrationToken = (
   accountId: AccountId,
   registrationUrl: string,
-  unifiedToolId: string = ''
+  unifiedToolId?: UnifiedToolId
 ) =>
   parseFetchResult(ZDynamicRegistrationToken)(
     fetch(
-      `/api/lti/accounts/${accountId}/registration_token?unified_tool_id=${unifiedToolId}&registration_url=${registrationUrl}`,
+      `/api/lti/accounts/${accountId}/registration_token?unified_tool_id=${
+        unifiedToolId || ''
+      }&registration_url=${registrationUrl}`,
       defaultFetchOptions()
     )
   )

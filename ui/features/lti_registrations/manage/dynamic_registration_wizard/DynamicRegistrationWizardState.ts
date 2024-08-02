@@ -30,6 +30,7 @@ import {
 import type {DynamicRegistrationWizardService} from './DynamicRegistrationWizardService'
 import {formatApiResultError, type ApiResult} from '../../common/lib/apiResult/ApiResult'
 import type {LtiRegistrationId} from '../model/LtiRegistrationId'
+import type {UnifiedToolId} from '../model/UnifiedToolId'
 
 /**
  * Steps are:
@@ -56,7 +57,7 @@ export interface DynamicRegistrationActions {
   loadRegistrationToken: (
     accountId: AccountId,
     dynamicRegistrationUrl: string,
-    unifiedToolId?: string
+    unifiedToolId?: UnifiedToolId
   ) => void
   /**
    * Enables the developer key for the given registration
@@ -261,7 +262,7 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
       loadRegistrationToken: (
         accountId: AccountId,
         dynamicRegistrationUrl: string,
-        unifiedToolId: string = ''
+        unifiedToolId?: UnifiedToolId
       ) => {
         set(stateFor({_type: 'RequestingToken'}))
         // eslint-disable-next-line promise/catch-or-return

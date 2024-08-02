@@ -39,13 +39,14 @@ import {IconConfirmation} from './components/IconConfirmation'
 import {ReviewScreen} from './components/ReviewScreen'
 import {ProgressBar} from '@instructure/ui-progress'
 import {RegistrationModalBody} from '../registration_wizard/RegistrationModalBody'
+import type {UnifiedToolId} from '../model/UnifiedToolId'
 
 const I18n = useI18nScope('lti_registrations')
 
 export type DynamicRegistrationWizardProps = {
   dynamicRegistrationUrl: string
   accountId: AccountId
-  unifiedToolId?: string
+  unifiedToolId?: UnifiedToolId
   unregister: () => void
   onSuccessfulRegistration: () => void
   service: DynamicRegistrationWizardService

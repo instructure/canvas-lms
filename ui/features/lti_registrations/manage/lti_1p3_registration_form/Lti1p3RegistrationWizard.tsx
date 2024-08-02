@@ -22,6 +22,7 @@ import {Modal} from '@instructure/ui-modal'
 import {Button} from '@instructure/ui-buttons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {AccountId} from '../model/AccountId'
+import type {UnifiedToolId} from '../model/UnifiedToolId'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -29,7 +30,7 @@ export type Lti1p3RegistrationWizardProps = {
   accountId: AccountId
   configuration?: LtiConfiguration
   unregister: () => void
-  unifiedToolId?: string
+  unifiedToolId?: UnifiedToolId
   onSuccessfulRegistration: () => void
 }
 

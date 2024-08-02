@@ -18,6 +18,7 @@
 import type {ApiResult} from '../../common/lib/apiResult/ApiResult'
 import create from 'zustand'
 import type {LtiConfiguration} from '../model/lti_tool_configuration/LtiConfiguration'
+import type {UnifiedToolId} from '../model/UnifiedToolId'
 
 type JsonUrlFetchStatus =
   | {
@@ -48,7 +49,7 @@ export type RegistrationWizardModalState = {
   method: InstallMethod
   dynamicRegistrationUrl: string
   jsonUrl: string
-  unifiedToolId?: string
+  unifiedToolId?: UnifiedToolId
   /**
    * Contains the state of fetching the JSON for the
    * JSON url method
@@ -132,7 +133,7 @@ export const openRegistrationWizard = (
  */
 export const openDynamicRegistrationWizard = (
   dynamicRegistrationUrl: string,
-  unifiedToolId: string = '',
+  unifiedToolId?: UnifiedToolId,
   onSuccessfulInstallation?: () => void
 ) => {
   openRegistrationWizard({
