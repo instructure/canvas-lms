@@ -14761,6 +14761,7 @@ he:
         registered_services: "שרותים רשומים"
         remove: הסרה
         share_skype_id: "שיתוף מזהה הסקייפ שלך"
+        state: מצב
         twitter_access: "גישה לטוויטר"
         ways_to_log_in: "דרכים להתחבר"
         web_services: "Web Services"

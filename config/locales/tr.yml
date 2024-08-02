@@ -14826,6 +14826,7 @@ tr:
         registered_services: "Kayıt olunan Servisler"
         remove: Kaldır
         share_skype_id: "Skype ID'nizi Paylaşın"
+        state: Durum
         twitter_access: "Twitter Erişimi"
         users_profile: "%{user}'ın Ayarları"
         ways_to_log_in: "Oturum Açma Yolları"
