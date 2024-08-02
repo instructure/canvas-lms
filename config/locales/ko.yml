@@ -10384,6 +10384,7 @@ ko:
         registered_services: "등록된 서비스"
         remove: 제거
         share_skype_id: "Skype 아이디 공유"
+        state: 상태
         twitter_access: "Twitter 액세스"
         users_profile: "%{user}의 설정"
         ways_to_log_in: "로그인 방법"
