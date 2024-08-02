@@ -118,7 +118,7 @@ module SmartSearch
           next unless item_scope
 
           item_scope = item_scope.select(
-            ActiveRecord::Base.send(:sanitize_sql, ["#{klass.table_name}.*, MIN(embedding <=> ?) AS distance", embedding.to_s])
+            ActiveRecord::Base.send(:sanitize_sql, ["#{klass.table_name}.*, MIN(embedding OPERATOR(#{PG::Connection.quote_ident(ActiveRecord::Base.connection.extension("vector").schema)}.<=>) ?) AS distance", embedding.to_s])
           )
                                  .joins(:embeddings)
                                  .where(klass.embedding_class.table_name => { version: })
