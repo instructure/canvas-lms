@@ -25,13 +25,14 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {i18nLtiScope} from '../../model/LtiScope'
 import {mockRegistration, mockDynamicRegistrationWizardService} from './helpers'
 import {htmlEscape} from '@instructure/html-escape'
+import {ZUnifiedToolId} from '../../model/UnifiedToolId'
 
 const mockAlert = jest.fn() as jest.Mock<typeof showFlashAlert>
 
 describe('DynamicRegistrationWizard', () => {
   it('renders a loading screen when fetching the registration token', () => {
     const accountId = ZAccountId.parse('123')
-    const unifiedToolId = 'asdf'
+    const unifiedToolId = ZUnifiedToolId.parse('asdf')
 
     const fetchRegistrationToken = jest.fn().mockImplementation(() => new Promise(() => {}))
 
@@ -64,7 +65,7 @@ describe('DynamicRegistrationWizard', () => {
 
   it('forwards users to the tool', async () => {
     const accountId = ZAccountId.parse('123')
-    const unifiedToolId = 'asdf'
+    const unifiedToolId = ZUnifiedToolId.parse('asdf')
     const fetchRegistrationToken = jest.fn().mockResolvedValue(
       success({
         token: 'reg_token_value',

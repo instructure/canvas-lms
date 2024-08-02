@@ -29,6 +29,7 @@ import {mockToolConfiguration, mockJsonUrlWizardService} from './helpers'
 import {ZLtiConfiguration} from '../../model/lti_tool_configuration/LtiConfiguration'
 import {mockDynamicRegistrationWizardService} from '../../dynamic_registration_wizard/__tests__/helpers'
 import userEvent from '@testing-library/user-event'
+import {ZUnifiedToolId} from '../../model/UnifiedToolId'
 
 describe('RegistrationWizardModal', () => {
   let error: (...data: any[]) => void
@@ -274,7 +275,7 @@ describe('RegistrationWizardModal', () => {
     it('should exit the modal when the cancel button is clicked & exitOnCancel is true', async () => {
       openRegistrationWizard({
         dynamicRegistrationUrl: 'http://example.com',
-        unifiedToolId: 'asdf',
+        unifiedToolId: ZUnifiedToolId.parse('asdf'),
         lti_version: '1p3',
         method: 'dynamic_registration',
         registering: true,
