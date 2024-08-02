@@ -1128,6 +1128,30 @@ describe "Accounts API", type: :request do
           expect(@a1.settings).not_to have_key(:password_policy)
         end
       end
+
+      context "Canvas for Elementary settings" do
+        it "enable_as_k5_account is enabled for the given account" do
+          expect(@a1.enable_as_k5_account?).to be false
+          json = api_call(:put,
+                          "/api/v1/accounts/#{@a1.id}",
+                          { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                          { account: { settings: { enable_as_k5_account: { value: true } } } })
+          expect(@a1.reload.enable_as_k5_account?).to be true
+          expect(response).to have_http_status(:ok)
+          expect(json).not_to have_key("errors")
+        end
+
+        it "sets use_classic_font_in_k5 for the given account" do
+          @a1.update settings: { enable_as_k5_account: { locked: true, value: true }, use_classic_font_in_k5: { locked: true, value: false } }
+          json = api_call(:put,
+                          "/api/v1/accounts/#{@a1.id}",
+                          { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                          { account: { settings: { use_classic_font_in_k5: { value: true } } } })
+          expect(@a1.reload.use_classic_font_in_k5?).to be true
+          expect(response).to have_http_status(:ok)
+          expect(json).not_to have_key("errors")
+        end
+      end
     end
   end
 
@@ -2185,6 +2209,23 @@ describe "Accounts API", type: :request do
         @a1.save!
         json = api_call(:get, show_settings_path, show_settings_header, {}, { expected_status: 200 })
         expect(json["password_policy"]).not_to be_present
+      end
+    end
+
+    describe "Canvas for Elementary" do
+      it "gets enable_as_k5_account setting" do
+        @a1.update settings: { enable_as_k5_account: { locked: true, value: true }, use_classic_font_in_k5: { locked: true, value: false } }
+        json = api_call(:get, show_settings_path, show_settings_header, {}, { expected_status: 200 })
+        expect(json["enable_as_k5_account"]["locked"]).to be true
+        expect(json["enable_as_k5_account"]["value"]).to be true
+        expect(json["use_classic_font_in_k5"]["locked"]).to be true
+        expect(json["use_classic_font_in_k5"]["value"]).to be false
+      end
+
+      it "does not return any settings if none are set" do
+        json = api_call(:get, show_settings_path, show_settings_header, {}, { expected_status: 200 })
+        expect(json["enable_as_k5_account"]).to be_nil
+        expect(json["use_classic_font_in_k5"]).to be_nil
       end
     end
   end

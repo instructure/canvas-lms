@@ -490,7 +490,9 @@ class AccountsController < ApplicationController
                       microsoft_sync_tenant
                       microsoft_sync_login_attribute
                       microsoft_sync_login_attribute_suffix
-                      microsoft_sync_remote_attribute]
+                      microsoft_sync_remote_attribute
+                      enable_as_k5_account
+                      use_classic_font_in_k5]
     public_attrs << :password_policy if @account.password_complexity_enabled? && !@account.site_admin?
 
     render json: public_attrs.index_with { |key| @account.settings[key] }.compact
@@ -966,6 +968,11 @@ class AccountsController < ApplicationController
                 @account.validate_password_policy_for(setting, setting_value)
               end
             end
+
+            enable_k5 = params.dig(:account, :settings, :enable_as_k5_account, :value) || @account.enable_as_k5_account?
+            use_classic_font = params.dig(:account, :settings, :use_classic_font_in_k5, :value) || @account.use_classic_font_in_k5?
+            K5::EnablementService.new(@account).set_k5_settings(value_to_boolean(enable_k5), value_to_boolean(use_classic_font))
+
             account_settings[:settings].slice!(*permitted_api_account_settings)
             account_settings[:settings][:password_policy] = policy_settings if policy_settings
             ensure_sis_max_name_length_value!(account_settings)
@@ -1123,6 +1130,12 @@ class AccountsController < ApplicationController
   #
   #   _Required_ feature option:
   #     Enhance password options
+  #
+  # @argument account[settings][enable_as_k5_account][value] [Boolean]
+  #   Enable or disable Canvas for Elementary for this account
+  #
+  # @argument account[settings][use_classic_font_in_k5][value] [Boolean]
+  #   Whether or not the classic font is used on the dashboard. Only applies if enable_as_k5_account is true.
   #
   # @argument override_sis_stickiness [boolean]
   #   Default is true. If false, any fields containing “sticky” changes will not be updated.
@@ -2049,7 +2062,9 @@ class AccountsController < ApplicationController
                                    :enable_inbox_auto_response,
                                    :disable_inbox_auto_response_for_students,
                                    :enable_name_pronunciation,
-                                   :enable_limited_access_for_students].freeze
+                                   :enable_limited_access_for_students,
+                                   :enable_as_k5_account,
+                                   :use_classic_font_in_k5].freeze
 
   def permitted_account_attributes
     [:name,
