@@ -85,7 +85,7 @@ export const Toolbox = ({open, container, onClose}: ToolboxProps) => {
     return (
       <View
         shadow="resting"
-        className="toolbox-item"
+        className={`toolbox-item item-${label.toLowerCase().replaceAll(' ', '')}`}
         textAlign="center"
         elementRef={(ref: Element | null) => ref && connectors.create(ref as HTMLElement, element)}
       >
