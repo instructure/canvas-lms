@@ -10,6 +10,14 @@ development:
     access_key: 'fake-access-key'
     secret_key: 'fake-secret-key'
     security_token: 'fake-security-token'
+  # credentials used by smart search and discussion summaries
+  'sts/testaccount/sts/bedrock-dev':
+    access_key: aws-key-id-goes-here
+    secret_key: secret-goes-here
+  # credentials used by translations
+  'sts/testaccount/sts/sagemaker-dev':
+    access_key: aws-key-id-goes-here
+    secret_key: secret-goes-here
   'sts/testaccount/sts/canvas-release-notes':
     access_key: 'fake-access-key'
     secret_key: 'fake-secret-key'
