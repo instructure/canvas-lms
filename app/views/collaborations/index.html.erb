@@ -28,18 +28,29 @@ Teachers or students can set up group collaborations."
   </p>
 <% end %>
 <a href="#" class="external_link" target="_blank" style="display: none;">&nbsp;</a>
-
-<header class="collaborations-header clearfix">
-  <h1><%= t 'titles.current', "Current Collaborations" %></h1>
-
-  <% if can_do(@context, @current_user, :create_collaborations) && !@hide_create_ui %>
-    <a role="button" href="#" class="btn add_collaboration_link">
-      <i class="icon-add" aria-hidden="true"></i>
-      <%= t('links.new', 'Start a new collaboration') %>
-    </a>
-  <% end %>
-</header>
-
+<% if @domain_root_account.feature_enabled?(:instui_nav) %>
+  <div class="page_header_container">
+    <h1 class="collab-page_header"><%= t 'titles.collaborations', "Collaborations" %></h1>
+    <div class="actions_buttons-container">
+      <% if can_do(@context, @current_user, :create_collaborations) && !@hide_create_ui %>
+        <a role="button" class="Button Button--primary add_collaboration_link" href="#">
+          <i class="icon-add" aria-hidden="true"></i>
+          <%= t('links.collaboration', 'Collaboration') %>
+        </a>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <header class="collaborations-header clearfix">
+    <h1><%= t 'titles.current', "Current Collaborations" %></h1>
+    <% if can_do(@context, @current_user, :create_collaborations) && !@hide_create_ui %>
+      <a role="button" href="#" class="btn add_collaboration_link">
+        <i class="icon-add" aria-hidden="true"></i>
+        <%= t('links.new', 'Start a new collaboration') %>
+      </a>
+    <% end %>
+  </header>
+<% end %>
 <div id="no_collaborations_message" style="<%= hidden unless @collaborations.empty? %>">
   <% if can_do(@context, @current_user, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) %>
     <p>
