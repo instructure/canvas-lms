@@ -12450,6 +12450,7 @@ hy:
         registered_services: "Գրանցված ծառայություններ"
         remove: Հանել
         share_skype_id: "Նշել Skype ձեր նույնականացուցիչը"
+        state: Կարգավիճակ
         twitter_access: "Twitter հասանելիություն"
         users_profile: "%{user} կարգաբերումներ"
         ways_to_log_in: "Համակարգ մուտք գործելու եղանակներ"
