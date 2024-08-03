@@ -345,31 +345,29 @@ describe "override assignees" do
       end
 
       it "blocks saving empty due dates when enabled", :ignore_js_errors do
-        skip("LX-1878 - post to sis on create/edit page directly")
-
         AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @assignment_.id)
 
         AssignmentCreateEditPage.click_post_to_sis_checkbox
 
         wait_for_ajaximations
 
-        expect(driver.current_url).to include("edit")
-
         AssignmentCreateEditPage.save_assignment
+        expect(driver.current_url).to include("edit")
 
         expect_instui_flash_message("Please set a due date or change your selection for the “Sync to SIS” option.")
 
+        check_element_has_focus(assign_to_due_date(0))
         expect(assign_to_date_and_time[0].text).to include("Please add a due date")
 
         update_due_date(0, format_date_for_view(Time.zone.now, "%-m/%-d/%Y"))
         update_due_time(0, "11:59 PM")
 
         expect(is_checked(AssignmentCreateEditPage.post_to_sis_checkbox_selector)).to be_truthy
+        AssignmentCreateEditPage.save_assignment
+        expect(driver.current_url).not_to include("edit")
       end
 
       it "does not block empty due dates when disabled" do
-        skip("LX-1878 - post to sis on create/edit page directly")
-
         AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @assignment_.id)
 
         AssignmentCreateEditPage.save_assignment
@@ -381,14 +379,16 @@ describe "override assignees" do
       end
 
       it "validates due date when user checks/unchecks the option", :ignore_js_errors do
-        skip("LX-1878 - post to sis on create/edit page directly")
-
         AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @assignment_.id)
 
         expect(assign_to_date_and_time[0].text).not_to include("Please add a due date")
 
         AssignmentCreateEditPage.click_post_to_sis_checkbox
 
+        AssignmentCreateEditPage.save_assignment
+        expect(driver.current_url).to include("edit")
+
+        check_element_has_focus(assign_to_due_date(0))
         expect(assign_to_date_and_time[0].text).to include("Please add a due date")
 
         update_due_date(0, format_date_for_view(Time.zone.now, "%-m/%-d/%Y"))

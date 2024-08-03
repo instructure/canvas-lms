@@ -293,25 +293,31 @@ export const processModuleOverridesV2 = (overrides, initialModuleOverrides) => {
   return withoutModuleOverrides
 }
 
-export const showPostToSisFlashAlert = assignToButtonId => () =>
-  showFlashAlert({
-    message: (
-      <>
-        {I18n.t('Please set a due date or change your selection for the “Sync to SIS” option.')}
-        <br />
-        <View display="flex">
-          <View as="div" margin="xx-small none none none" width="25px">
-            <IconEditLine size="x-small" color="primary" />
-          </View>
-          <Link
-            margin="xx-small none none none"
-            isWithinText={false}
-            onClick={() => document.getElementById(assignToButtonId)?.click()}
-          >
-            {I18n.t('Manage Due Dates and Assign To')}
-          </Link>
-        </View>
-      </>
-    ),
-    type: 'error',
-  })
+export const showPostToSisFlashAlert =
+  (assignToButtonId, isTray = false) =>
+  () =>
+    showFlashAlert({
+      message: (
+        <>
+          {I18n.t('Please set a due date or change your selection for the “Sync to SIS” option.')}
+          {isTray && (
+            <>
+              <br />
+              <View display="flex">
+                <View as="div" margin="xx-small none none none" width="25px">
+                  <IconEditLine size="x-small" color="primary" />
+                </View>
+                <Link
+                  margin="xx-small none none none"
+                  isWithinText={false}
+                  onClick={() => document.getElementById(assignToButtonId)?.click()}
+                >
+                  {I18n.t('Manage Due Dates and Assign To')}
+                </Link>
+              </View>
+            </>
+          )}
+        </>
+      ),
+      type: 'error',
+    })

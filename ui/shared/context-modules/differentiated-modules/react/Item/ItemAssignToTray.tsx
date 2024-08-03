@@ -16,7 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useMemo, useRef, useState, type RefObject} from 'react'
+import React, {
+  createRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type RefObject,
+} from 'react'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -208,8 +216,8 @@ export default function ItemAssignToTray({
     undefined
   )
   const assignToCardsRef = useRef(assignToCards)
-
   const disabledOptionIdsRef = useRef(defaultDisabledOptionIds)
+  const sectionViewRef = createRef<View>()
 
   useEffect(() => {
     // When tray closes and the initial load already happened,
@@ -257,18 +265,23 @@ export default function ItemAssignToTray({
     onError: handleDismiss,
   })
 
-  const handleUpdate = useCallback(() => {
-    const hasErrors = assignToCardsRef.current.some(card => !card.isValid)
+  const focusErrors = useCallback(() => {
+    const hasErrors = assignToCards.some(card => !card.isValid)
     // If a card has errors it should not save and the respective card should be focused
     if (hasErrors) {
-      const firstCardWithError = assignToCardsRef.current.find(card => !card.isValid)
-      if (!firstCardWithError) return
+      const firstCardWithError = assignToCards.find(card => !card.isValid)
+      if (!firstCardWithError) return false
       const firstCardWithErrorRef = cardsRefs.current[firstCardWithError.key]
 
       Object.values(cardsRefs.current).forEach(c => c.current?.showValidations())
       firstCardWithErrorRef?.current?.focusInputs()
-      return
+      return true
     }
+    return false
+  }, [assignToCards])
+
+  const handleUpdate = useCallback(() => {
+    if (focusErrors()) return
     // compare original module assignees to see if they were removed for unassign_item overrides
     const deletedModuleAssignees = moduleAssignees.filter(
       override => !disabledOptionIdsRef.current.includes(override)
@@ -314,6 +327,7 @@ export default function ItemAssignToTray({
     itemType,
     itemName,
     handleDismiss,
+    focusErrors,
   ])
 
   const allCardsValid = useCallback(() => {
@@ -327,6 +341,17 @@ export default function ItemAssignToTray({
       setIsLoading(false)
     }
   }, [open])
+
+  useEffect(() => {
+    if (!isTray && sectionViewRef.current?.ref) {
+      // @ts-ignore: Property 'reactComponentInstance' does not exist on type 'Element'
+      sectionViewRef.current.ref.reactComponentInstance = {
+        focusErrors,
+        allCardsValid,
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isTray, focusErrors])
 
   const renderPointsPossible = () =>
     pointsPossible === 1 ? I18n.t('1 pt') : I18n.t('%{pointsPossible} pts', {pointsPossible})
@@ -465,7 +490,7 @@ export default function ItemAssignToTray({
   )
 
   const sectionView = (
-    <View width="100%" display="block">
+    <View id="manage-assign-to-container" width="100%" display="block" ref={sectionViewRef}>
       {blueprintDateLocks && blueprintDateLocks.length > 0 ? (
         <Alert liveRegion={getLiveRegion} variant="info" margin="small 0 0">
           <Text weight="bold" size="small">
