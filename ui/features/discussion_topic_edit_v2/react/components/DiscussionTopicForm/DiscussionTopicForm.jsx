@@ -560,7 +560,7 @@ function DiscussionTopicForm({
         sectionIdsToPostTo,
         assignedInfoList,
         postToSis,
-        showPostToSisFlashAlert('manage-assign-to')
+        showPostToSisFlashAlert('manage-assign-to', true)
       )
     ) {
       const payload = createSubmitPayload(shouldPublish)
