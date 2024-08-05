@@ -6707,6 +6707,7 @@ nn:
   consider_selecting_multiple_submission_types_to_ac_f7e624d5: "Vurder å velje fleire innleveringstypar for å tilpasse innleveringen for studentar som kanskje ikkje får til å lage merknader"
   consumer_key_57d9fcf1: Forbrukarnøkkel
   consumer_key_6f94ba11: Forbrukarnøkkel
+  contact_a6e7f6da: Kontakt
   contact_info_8e3304d1: Kontaktinformasjon
   contact_your_administrator_if_you_need_to_change_c_9002a501: "Kontakt ein administrator dersom du må endre synlegheita for emnet."
   content_1440204b: Innhald
@@ -11357,6 +11358,7 @@ nn:
   external_feeds_b6345379: "Eksterne straumar"
   external_images_in_this_resource_were_unreachable_5d9cbad2: "Eksterne bilder i denne ressursen er utilgjengelege:"
   external_integration_keys_8b4f4548: "Eksterne integrasjonsnøklar"
+  external_links_3d9f074e: "Eksterne lenker"
   external_links_in_this_resource_were_unreachable_ad00a7e3: "Ekstern lenke i denne ressursen er utilgjengeleg: "
   external_tool_6594ee34: "Eksternt verktøy"
   external_tool_c5a6410a: "Eksternt verktøy"
@@ -20109,6 +20111,7 @@ nn:
   priority_dd4381ee: Prioritet
   privacy_290109ea: Personvern
   privacy_level_f0ec09a3: Personvernnivå
+  privacy_policy_c68f482a: "Retningslinjer for personvern"
   private_3883d133: Privat
   pro_tip_30e41fa3: PROFFTIPS!
   proceed_f3d33864: Fortsett
@@ -28616,6 +28619,7 @@ nn:
   webct_name: "Blackboard Vista/CE (WebCT)"
   webhooks_subscriptions_ed524e73: "Webhooks Subscriptions"
   webhooks_subscriptions_for_plagiarism_platform_84bdd5a9: "Webhook-abonnement for Plagiat Platform"
+  website_adea4d05: Nettstad
   website_url_177fc1dc: URL
   website_url_b995c5b6: Nettstad-URL
   website_url_input_1a3eab25: "Innputt til nettstad-URL"

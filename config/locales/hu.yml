@@ -6199,6 +6199,7 @@ hu:
   consider_selecting_multiple_submission_types_to_ac_f7e624d5: "Fontolja meg több beküldési típus kiválasztását, hogy megfeleljen azoknak a hallgatóknak, akik esetleg nem tudnak megjegyzéseket létrehozni."
   consortium_parent_keys_803547b: "Konzorcium szülői kulcsok"
   consumer_key_6f94ba11: Vevőazonosító
+  contact_a6e7f6da: Kapcsolat
   contact_info_8e3304d1: Kapcsolatfelvétel
   contact_your_administrator_if_you_need_to_change_c_9002a501: "Forduljon a rendszergazdához, ha módosítania kell a kurzus láthatóságát."
   content_1440204b: Tartalom
@@ -10623,6 +10624,7 @@ hu:
   external_feeds_b6345379: "Külső hírfolyamok"
   external_images_in_this_resource_were_unreachable_5d9cbad2: "Az erőforrás külső képei nem voltak elérhetők:"
   external_integration_keys_8b4f4548: "Külső integrációs kulcsok"
+  external_links_3d9f074e: "Külső linkek"
   external_links_in_this_resource_were_unreachable_ad00a7e3: "Az erőforrás külső hivatkozásai elérhetetlenek voltak:"
   external_tool_6594ee34: "Külső eszköz"
   external_tool_c5a6410a: "Külső eszköz"
@@ -18787,6 +18789,7 @@ hu:
   priority_dd4381ee: Prioritás
   privacy_290109ea: Adatvédelem
   privacy_level_f0ec09a3: "Adatvédelmi szint"
+  privacy_policy_c68f482a: "Adatvédelmi irányelvek"
   private_3883d133: Privát
   private_key_is_present_in_certificate_file_1a1b7b42: "A magánkulcs jelen van a tanúsítványfájlban"
   pro_tip_30e41fa3: "PRO TIPP!"
@@ -26769,6 +26772,7 @@ hu:
   webct_name: "Blackboard Vista/CE (WebCT)"
   webhooks_subscriptions_ed524e73: "Webhooks Előfizetések"
   webhooks_subscriptions_for_plagiarism_platform_84bdd5a9: "Webhooks előfizetések a plágium platformhoz"
+  website_adea4d05: Weboldal
   website_url_177fc1dc: Webcím
   website_url_input_1a3eab25: "Weboldal url bevitele"
   website_url_url_bd07233d: "Weboldal URL: %{url}"

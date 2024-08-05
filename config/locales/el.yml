@@ -3630,6 +3630,7 @@ el:
   confirmation_code_required_22984955: "Κωδικός επιβεβαίωσης (απαιτείται)"
   confirmation_failed_please_try_again_ae566d37: "<mrk mid=\"5637\" mtype=\"seg\">Απέτυχε η επιβεβαίωση.</mrk>  <mrk mid=\"5638\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά.</mrk>"
   consumer_key_6f94ba11: "Κλειδί Καταναλωτή"
+  contact_a6e7f6da: "Τρόποι επικοινωνίας"
   content_exports: 
     buttons: 
       process: "Επεξεργασία Δεδομένων"
@@ -15532,6 +15533,7 @@ el:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Μάθημα Blackboard Vista/CE, WebCT 6+"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  website_adea4d05: Ιστοσελίδα
   website_url_177fc1dc: "URL ιστοσελίδας"
   week_1f945ddd: Εβδομάδα
   week_s_cb1492ee: Εβδομάδα/ες
