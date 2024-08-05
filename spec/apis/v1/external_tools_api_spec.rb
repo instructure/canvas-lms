@@ -796,14 +796,13 @@ describe ExternalToolsController, type: :request do
                       "#{type.singularize}_id": context.id.to_s },
                     post_hash)
     expect(context.context_external_tools.count).to eq 1
-
     et = context.context_external_tools.last
     expect(json).to eq example_json(et)
   end
 
   def update_call(context, successful: true)
     type = context.class.table_name
-    et = context.context_external_tools.create!(name: "test", consumer_key: "fakefake", shared_secret: "sofakefake", url: "http://www.example.com/ims/lti")
+    et = context.context_external_tools.create!(name: "test", consumer_key: "fakefake", shared_secret: "sofakefake", url: "http://www.example.com/ims/lti", unified_tool_id: "utid_12345")
 
     json = api_call(:put,
                     "/api/v1/#{type}/#{context.id}/external_tools/#{et.id}.json",
@@ -945,6 +944,7 @@ describe ExternalToolsController, type: :request do
     et.context_external_tool_placements.new(placement_type: opts[:placement]) if opts[:placement]
     et.allow_membership_service_access = opts[:allow_membership_service_access] if opts[:allow_membership_service_access]
     et.conference_selection = { url: "http://www.example.com/ims/lti/conference", icon_url: "/images/delete.png", text: "conference selection" }
+    et.unified_tool_id = "utid_12345"
     et.save!
     et
   end
@@ -1015,6 +1015,7 @@ describe ExternalToolsController, type: :request do
       "workflow_state" => "public",
       "vendor_help_link" => nil,
       "version" => "1.1",
+      "unified_tool_id" => "utid_12345",
       "deployment_id" => et&.deployment_id,
       "resource_selection" => {
         "enabled" => true,
