@@ -18,14 +18,19 @@
 
 import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {HorizontalButtonDisplay} from './HorizontalButtonDisplay'
 import {VerticalButtonDisplay} from './VerticalButtonDisplay'
-import type {RubricAssessmentData, RubricCriterion, UpdateAssessmentData} from '../types/rubric'
+import type {
+  RubricAssessmentData,
+  RubricCriterion,
+  RubricRating,
+  UpdateAssessmentData,
+} from '../types/rubric'
 import {TextArea} from '@instructure/ui-text-area'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {CommentLibrary} from './CommentLibrary'
@@ -123,16 +128,12 @@ export const CriterionRow = ({
   onUpdateAssessmentData,
 }: CriterionRowProps) => {
   const {ratings} = criterion
-  const selectedRatingIndex = findCriterionMatchingRatingIndex(
-    criterion.ratings,
-    criterionAssessment?.points,
-    criterion.criterionUseRange
-  )
 
   const [pointsInput, setPointsInput] = useState<string>()
-  const [selectedRatingDescription, setSelectedRatingDescription] = useState<string>()
   const [commentText, setCommentText] = useState<string>(criterionAssessment?.comments ?? '')
   const [isSaveCommentChecked, setIsSaveCommentChecked] = useState(false)
+
+  const selectedRatingId = criterionAssessment?.ratingId
 
   useEffect(() => {
     setCommentText(criterionAssessment?.comments ?? '')
@@ -148,30 +149,30 @@ export const CriterionRow = ({
     onUpdateAssessmentData(updatedCriterionAssessment)
   }
 
-  const selectRating = (index: number) => {
-    if (selectedRatingIndex === index) {
-      updateAssessmentData({points: undefined})
-      setPoints('')
+  const selectRating = (rating: RubricRating) => {
+    if (selectedRatingId === rating.id) {
+      updateAssessmentData({points: undefined, ratingId: undefined})
       return
     }
 
-    const selectedRating = ratings[index]
-    setPoints(selectedRating?.points.toString() ?? '')
-    setSelectedRatingDescription(selectedRating?.description)
+    updateAssessmentData({
+      ratingId: rating.id,
+      points: rating.points,
+    })
   }
 
   const setPoints = (value: string) => {
     const points = Number(value)
 
     if (!value.trim().length || Number.isNaN(points)) {
-      updateAssessmentData({points: undefined})
+      updateAssessmentData({points: undefined, ratingId: undefined})
       setPointsInput('')
       return
     }
 
     updateAssessmentData({
       points,
-      description: selectedRatingDescription,
+      ratingId: undefined,
     })
     setPointsInput(points.toString())
   }
@@ -183,7 +184,7 @@ export const CriterionRow = ({
           isPreviewMode={isPreviewMode}
           ratings={ratings}
           ratingOrder={ratingOrder}
-          selectedRatingIndex={selectedRatingIndex}
+          selectedRatingId={selectedRatingId}
           onSelectRating={selectRating}
           criterionUseRange={criterionUseRange}
         />
@@ -195,7 +196,7 @@ export const CriterionRow = ({
         isPreviewMode={isPreviewMode}
         ratings={ratings}
         ratingOrder={ratingOrder}
-        selectedRatingIndex={selectedRatingIndex}
+        selectedRatingId={selectedRatingId}
         onSelectRating={selectRating}
         criterionUseRange={criterionUseRange}
       />

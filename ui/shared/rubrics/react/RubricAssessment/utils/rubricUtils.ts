@@ -27,7 +27,7 @@ export const htmlEscapeCriteriaLongDescription = (criteria: RubricCriterion) => 
   }
 }
 
-export const escapeNewLineText = (text: string) => {
+export const escapeNewLineText = (text?: string) => {
   return {
     __html: htmlEscape(text ?? '').replace(/\n/g, '<br />'),
   }

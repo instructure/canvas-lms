@@ -32,15 +32,15 @@ type VerticalButtonDisplayProps = {
   isPreviewMode: boolean
   ratings: RubricRating[]
   ratingOrder: string
-  selectedRatingIndex?: number
-  onSelectRating: (index: number) => void
+  selectedRatingId?: string
+  onSelectRating: (rating: RubricRating) => void
   criterionUseRange: boolean
 }
 export const VerticalButtonDisplay = ({
   isPreviewMode,
   ratings,
   ratingOrder,
-  selectedRatingIndex,
+  selectedRatingId,
   onSelectRating,
   criterionUseRange,
 }: VerticalButtonDisplayProps) => {
@@ -52,7 +52,7 @@ export const VerticalButtonDisplay = ({
     >
       {ratings.map((rating, index) => {
         const buttonDisplay = (ratings.length - (index + 1)).toString()
-        const isSelected = selectedRatingIndex === index
+        const isSelected = ratings[index]?.id === selectedRatingId
 
         const min = criterionUseRange ? rangingFrom(ratings, index) : undefined
 
@@ -77,7 +77,7 @@ export const VerticalButtonDisplay = ({
                   isPreviewMode={isPreviewMode}
                   isSelected={isSelected}
                   selectedArrowDirection="right"
-                  onClick={() => onSelectRating(index)}
+                  onClick={() => onSelectRating(rating)}
                 />
               </Flex.Item>
               <Flex.Item

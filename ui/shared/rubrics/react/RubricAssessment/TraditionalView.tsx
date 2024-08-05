@@ -183,12 +183,6 @@ const CriterionRow = ({
     criterionRatings.reverse()
   }
 
-  const selectedRatingIndex = findCriterionMatchingRatingIndex(
-    criterionRatings,
-    criterionAssessment?.points,
-    criterion.criterionUseRange
-  )
-
   const updateAssessmentData = (params: Partial<UpdateAssessmentData>) => {
     const updatedCriterionAssessment: UpdateAssessmentData = {
       ...criterionAssessment,
@@ -207,20 +201,20 @@ const CriterionRow = ({
     const points = Number(value)
 
     if (!value.trim().length || Number.isNaN(points)) {
-      updateAssessmentData({points: undefined})
+      updateAssessmentData({points: undefined, ratingId: undefined})
       return
     }
 
-    const selectedRating = criterionRatings.find(rating => rating.points === points)
-
     updateAssessmentData({
       points,
-      description: selectedRating?.description,
+      ratingId: undefined,
     })
   }
 
   const hideComments =
     isFreeFormCriterionComments || (isPreviewMode && !criterionAssessment?.comments?.length)
+
+  const selectedRatingId = criterionAssessment?.ratingId
 
   return (
     <View as="div" maxWidth="100%">
@@ -338,18 +332,21 @@ const CriterionRow = ({
                 <Grid.Row colSpacing="none">
                   {criterionRatings.map((rating, index) => {
                     const isHovered = hoveredRatingIndex === index
-                    const isSelected = selectedRatingIndex === index
+                    const isSelected = selectedRatingId === rating.id
                     const isLastIndex = criterionRatings.length - 1 === index
 
                     const borderColor = isHovered || isSelected ? 'brand' : 'primary'
 
-                    const onClickRating = (ratingIndex: number) => {
-                      if (selectedRatingIndex === ratingIndex) {
-                        updateAssessmentData({points: undefined})
+                    const onClickRating = (ratingId: string) => {
+                      if (selectedRatingId === ratingId) {
+                        updateAssessmentData({
+                          points: undefined,
+                          ratingId: undefined,
+                        })
                       } else {
                         updateAssessmentData({
                           points: rating.points,
-                          description: rating.description,
+                          ratingId,
                         })
                       }
                     }
@@ -393,7 +390,7 @@ const CriterionRow = ({
                             padding="xxx-small x-small 0 x-small"
                             onMouseOver={() => setHoveredRatingIndex(isPreviewMode ? -1 : index)}
                             onMouseOut={() => setHoveredRatingIndex(undefined)}
-                            onClick={() => onClickRating(index)}
+                            onClick={() => onClickRating(rating.id)}
                             themeOverride={{
                               borderWidthSmall: '0.125rem',
                               borderColorBrand: licorice,

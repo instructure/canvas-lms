@@ -25,6 +25,7 @@ import type {
   Rubric,
   RubricAssessmentData,
   RubricAssessmentSelect,
+  RubricRating,
   UpdateAssessmentData,
 } from '../types/rubric'
 import {findCriterionMatchingRatingIndex} from './utils/rubricUtils'
@@ -73,23 +74,26 @@ export const RubricAssessmentTray = ({
   }, [rubricAssessmentData, isOpen])
 
   const onUpdateAssessmentData = (params: UpdateAssessmentData) => {
-    const {criterionId, points, description, comments = '', saveCommentsForLater} = params
+    const {criterionId, points, comments = '', saveCommentsForLater, ratingId} = params
 
     const existingAssessmentIndex = rubricAssessmentDraftData.findIndex(
       a => a.criterionId === criterionId
     )
 
-    const ratingDescription = description ?? ''
-
     const matchingCriteria = rubric?.criteria?.find(c => c.id === criterionId)
-    const matchingRatingIndex = findCriterionMatchingRatingIndex(
-      matchingCriteria?.ratings ?? [],
-      points,
-      matchingCriteria?.criterionUseRange
-    )
-    const matchingRating = matchingCriteria?.ratings?.[matchingRatingIndex]
+    const criteriaRatings = matchingCriteria?.ratings ?? []
+    const matchingRating: RubricRating | undefined = ratingId
+      ? criteriaRatings.find(r => r.id === ratingId)
+      : criteriaRatings[
+          findCriterionMatchingRatingIndex(
+            matchingCriteria?.ratings ?? [],
+            points,
+            matchingCriteria?.criterionUseRange
+          )
+        ]
 
     const matchingRatingId = matchingRating?.id ?? ''
+    const ratingDescription = matchingRating?.description ?? ''
 
     if (existingAssessmentIndex === -1) {
       setRubricAssessmentDraftData([
@@ -102,6 +106,7 @@ export const RubricAssessmentTray = ({
           commentsEnabled: true,
           description: ratingDescription,
           saveCommentsForLater,
+          ratingId: matchingRatingId,
         },
       ])
     } else {
@@ -115,6 +120,7 @@ export const RubricAssessmentTray = ({
                 points,
                 description: ratingDescription,
                 saveCommentsForLater,
+                ratingId: matchingRatingId,
               }
             : a
         )
