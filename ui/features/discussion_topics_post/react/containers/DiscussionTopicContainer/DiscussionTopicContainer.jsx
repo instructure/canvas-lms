@@ -76,10 +76,14 @@ export const DiscussionTopicContainer = ({
     assignmentRubricDialog.initTriggers()
   }
 
+  const isAnnouncement = props.discussionTopic.isAnnouncement
+
   const [deleteDiscussionTopic] = useMutation(DELETE_DISCUSSION_TOPIC, {
     onCompleted: () => {
       setOnSuccess(I18n.t('The discussion topic was successfully deleted.'))
-      window.location.assign(`/courses/${ENV.course_id}/discussion_topics`)
+      window.location.assign(
+        `/courses/${ENV.course_id}/${isAnnouncement ? 'announcements' : 'discussion_topics'}`
+      )
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error deleting the discussion topic.'))
@@ -141,8 +145,11 @@ export const DiscussionTopicContainer = ({
   })
 
   const onDelete = () => {
+    const message = isAnnouncement
+      ? I18n.t('Are you sure you want to delete this announcement?')
+      : I18n.t('Are you sure you want to delete this topic?')
     // eslint-disable-next-line no-alert
-    if (window.confirm(I18n.t('Are you sure you want to delete this topic?'))) {
+    if (window.confirm(message)) {
       deleteDiscussionTopic({
         variables: {
           id: props.discussionTopic._id,
@@ -495,7 +502,7 @@ export const DiscussionTopicContainer = ({
                                     ?.focus()
                                 }, 0)
                               }}
-                              isAnnouncement={props.discussionTopic.isAnnouncement}
+                              isAnnouncement={isAnnouncement}
                             />
                           )}
                         </Flex.Item>
