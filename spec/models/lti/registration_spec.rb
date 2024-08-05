@@ -248,6 +248,33 @@ RSpec.describe Lti::Registration do
     end
   end
 
+  describe ".associate_bindings" do
+    subject { Lti::Registration.send :associate_bindings, registrations, account_bindings }
+
+    let(:registrations) { [lti_registration_model] }
+    let(:account_bindings) { [lti_registration_account_binding_model(registration: registrations.first)] }
+
+    context "when binding has no matching registration" do
+      before do
+        account_bindings << lti_registration_account_binding_model
+      end
+
+      it "does not error" do
+        expect { subject }.not_to raise_error
+      end
+
+      it "associates bindings with registrations" do
+        subject
+        expect(registrations.first.account_binding).to eq(account_bindings.first)
+      end
+    end
+
+    it "associates bindings with registrations" do
+      subject
+      expect(registrations.first.account_binding).to eq(account_bindings.first)
+    end
+  end
+
   describe "#inherited?" do
     subject { registration.inherited_for?(account) }
 
