@@ -300,15 +300,6 @@ quizzes_next_submission_history:
     separately.
   applies_to: RootAccount
   root_opt_in: true
-restrict_students_from_annotating:
-  state: allowed
-  display_name: Restrict Students from Annotating
-  description: Prevents students from leaving annotations in assignments. Does not
-    apply to peer-reviewed assignments.
-  applies_to: Course
-  environments:
-    production:
-      state: disabled
 rubric_criterion_range:
   state: allowed
   display_name: Rubric Criterion Range
