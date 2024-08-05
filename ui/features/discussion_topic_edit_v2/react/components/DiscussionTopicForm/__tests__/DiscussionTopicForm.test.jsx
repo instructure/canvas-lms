@@ -137,7 +137,6 @@ describe('DiscussionTopicForm', () => {
     expect(document.queryByTestId('section-select')).toBeTruthy()
     expect(document.queryByLabelText('Allow Participants to Comment')).toBeInTheDocument()
     expect(document.queryByLabelText('Disallow threaded replies')).toBeInTheDocument()
-    expect(document.queryByTestId('require-initial-post-checkbox')).toBeTruthy()
     expect(document.queryByLabelText('Enable podcast feed')).toBeInTheDocument()
     expect(document.queryByLabelText('Allow liking')).toBeInTheDocument()
     expect(document.queryByTestId('non-graded-date-options')).toBeTruthy()
@@ -145,6 +144,7 @@ describe('DiscussionTopicForm', () => {
     expect(document.queryAllByText('Until')).toBeTruthy()
 
     // Hides discussion only options
+    expect(document.queryByTestId('require-initial-post-checkbox')).not.toBeInTheDocument()
     expect(document.queryByLabelText('Add to student to-do')).not.toBeInTheDocument()
     expect(document.queryByText('Anonymous Discussion')).not.toBeTruthy()
     expect(document.queryByTestId('graded-checkbox')).not.toBeTruthy()
@@ -251,7 +251,7 @@ describe('DiscussionTopicForm', () => {
       const document = setup()
       expect(
         document.getByText(
-          'Notifications will not be sent retroactively for announcements created before publishing your course or before the course start date. You may consider using the Delay Posting option and set to publish on a future date.'
+          'Notifications will not be sent retroactively for announcements created before publishing your course or before the course start date. You may consider using the Available from option and set to publish on a future date.'
         )
       ).toBeInTheDocument()
     })
@@ -266,7 +266,7 @@ describe('DiscussionTopicForm', () => {
       const document = setup()
       expect(
         document.getByText(
-          'Notifications will not be sent retroactively for announcements created before publishing your course or before the course start date. You may consider using the Delay Posting option and set to publish on a future date.'
+          'Notifications will not be sent retroactively for announcements created before publishing your course or before the course start date. You may consider using the Available from option and set to publish on a future date.'
         )
       ).toBeInTheDocument()
     })

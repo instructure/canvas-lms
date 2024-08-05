@@ -1006,7 +1006,6 @@ describe "discussions" do
           get "/courses/#{course.id}/discussion_topics/#{@announcement_all_options.id}/edit"
 
           expect(f("input[value='enable-participants-commenting']").selected?).to be_truthy
-          expect(f("input[value='must-respond-before-viewing-replies']").selected?).to be_truthy
           expect(f("input[value='allow-liking']").selected?).to be_truthy
           expect(f("input[value='only-graders-can-like']").selected?).to be_truthy
           expect(f("input[value='enable-podcast-feed']").selected?).to be_truthy
@@ -1021,7 +1020,6 @@ describe "discussions" do
           get "/courses/#{course.id}/discussion_topics/#{@announcement_no_options.id}/edit"
 
           expect(f("input[value='enable-participants-commenting']").selected?).to be_falsey
-          expect(f("input[value='must-respond-before-viewing-replies']").selected?).to be_falsey
           expect(f("input[value='allow-liking']").selected?).to be_falsey
           expect(f("input[value='enable-podcast-feed']").selected?).to be_falsey
         end

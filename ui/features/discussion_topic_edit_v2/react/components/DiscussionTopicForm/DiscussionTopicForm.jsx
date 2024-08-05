@@ -145,7 +145,7 @@ function DiscussionTopicForm({
         key: 'announcement-course-unpublished-alert',
         variant: 'warning',
         text: I18n.t(
-          'Notifications will not be sent retroactively for announcements created before publishing your course or before the course start date. You may consider using the Delay Posting option and set to publish on a future date.'
+          'Notifications will not be sent retroactively for announcements created before publishing your course or before the course start date. You may consider using the Available from option and set to publish on a future date.'
         ),
       }
     } else {
@@ -884,7 +884,7 @@ function DiscussionTopicForm({
               />
             )}
 
-            {!isGroupContext && (
+            {!isGroupContext && !isAnnouncement && (
               <Checkbox
                 data-testid="require-initial-post-checkbox"
                 label={I18n.t(
@@ -893,7 +893,6 @@ function DiscussionTopicForm({
                 value="must-respond-before-viewing-replies"
                 checked={requireInitialPost}
                 onChange={() => setRequireInitialPost(!requireInitialPost)}
-                disabled={!(isAnnouncement === false || (isAnnouncement && !locked))}
               />
             )}
 
