@@ -4251,6 +4251,7 @@ uk:
   confirmation_code_required_22984955: "Код підтвердження (обов'язково)"
   confirmation_failed_please_try_again_ae566d37: "Підтвердження не вдале.  Будь ласка, спробуйте ще раз."
   consumer_key_6f94ba11: "Ключ клієнта"
+  contact_a6e7f6da: Зв'язатися
   content_1440204b: Вміст
   content_changed_exceptions_e8bff81e: "Виключення до зміни вмісту:"
   content_choice_51f4ca0f: "Вибір контенту"
@@ -13144,6 +13145,7 @@ uk:
   print_d0e3d53f: Розрдрукувати
   priority_dd4381ee: Пріоритет
   privacy_290109ea: Приватність
+  privacy_policy_c68f482a: "Політика конфіденційності"
   proceed_f3d33864: Продовжувати
   processing_2fcc9739: Обробка
   product_name: Canvas
@@ -18465,6 +18467,7 @@ uk:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ Курс"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  website_adea4d05: Веб-сайт
   website_url_177fc1dc: "URL вебсайту"
   week_1f945ddd: Тиждень
   week_s_cb1492ee: Тиждень(нів)
