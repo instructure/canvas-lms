@@ -43,6 +43,7 @@ const fixtures = {
       <div class="module_item_icons nobr">
         <span class="type" style="display: none;">assignment</span>
         <span class="id" style="display: none;">93</span>
+        <span class="graded" style="display: none;">1</span>
       </div>
     </div>
     <div class="ig-row with-completion-requirements ig-published">
@@ -56,6 +57,52 @@ const fixtures = {
       <div class="module_item_icons nobr">
         <span class="type" style="display: none;">quiz</span>
         <span class="id" style="display: none;">94</span>
+        <span class="graded" style="display: none;">1</span>
+      </div>
+    </div>
+    <div class="ig-row with-completion-requirements ig-published">
+      <span class="item_name">
+        <a title="Discussion 1" class="ig-title title item_link" href="/courses/13/modules/items/55">Discussion 1</a>
+      </span>
+      <span class="requirement_type min_score_requirement" style="display: block;">
+        <span class="unfulfilled">
+          Score at least
+          <span class="min_score">5</span>
+        </span>
+      </span>
+      <span class="requirement_type must_submit_requirement" style="display: none;"></span>
+      <span class="points_possible_display">10 pts</span>
+      <div class="module_item_icons nobr">
+        <span class="type" style="display: none;">discussion_topic</span>
+        <span class="id" style="display: none;">95</span>
+        <span class="graded" style="display: none;">1</span>
+      </div>
+    </div>
+    <div class="ig-row with-completion-requirements ig-published">
+      <span class="item_name">
+        <a title="Discussion 2" class="ig-title title item_link" href="/courses/13/modules/items/56">Discussion 2</a>
+      </span>
+      <span class="requirement_type min_score_requirement" style="display: none;"></span>
+      <span class="requirement_type must_submit_requirement" style="display: block;"></span>
+      <div class="module_item_icons nobr">
+        <span class="type" style="display: none;">discussion_topic</span>
+        <span class="id" style="display: none;">96</span>
+        <span class="graded" style="display: none;">0</span>
+      </div>
+    </div>
+  `,
+  moduleItems: `
+    <div class="ig-row">
+      <span class="item_name">
+        <a title="HW 1" class="ig-title title item_link" href="/courses/13/modules/items/45">HW 1</a>
+      </span>
+      <span class="requirement_type min_score_requirement" style="display: none;"></span>
+      <span class="requirement_type must_mark_done_requirement" style="display: none;"></span>
+      <span class="points_possible_display">10 pts</span>
+      <div class="module_item_icons nobr">
+        <span class="type" style="display: none;">assignment</span>
+        <span class="id" style="display: none;">93</span>
+        <span class="graded" style="display: none;">1</span>
       </div>
     </div>
   `,

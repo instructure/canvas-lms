@@ -133,44 +133,14 @@ function parseRequirements(element: HTMLDivElement) {
   const requirementElements = Array.from(
     element.querySelectorAll('.ig-row.with-completion-requirements')
   )
-  return requirementElements.map((requirementNode: Element) => {
-    const id = requirementNode.querySelector('.id')?.textContent
-    const name = requirementNode.querySelector('.item_name a')?.getAttribute('title')?.trim() || ''
-    const resource =
-      resourceTypeMap[requirementNode.querySelector('.type')?.textContent || 'external_url']
-    // One of these (the active one) has "display: block;" and the others are hidden
-    const activeRequirementNode = Array.from(
-      requirementNode.querySelectorAll('.requirement_type')
-    ).filter(node => window.getComputedStyle(node).display !== 'none')[0]
-    const type = requirementTypeMap[activeRequirementNode.classList[1] as Requirement['type']]
-    if (resource === 'assignment' || resource === 'quiz') {
-      const minimumScore = activeRequirementNode.querySelector('.min_score')?.textContent || '0'
-      const pointsPossibleString = requirementNode.querySelector(
-        '.points_possible_display'
-      )?.textContent
-      const pointsPossible = pointsPossibleString ? pointsPossibleString.split(/\s/)[0] : null
-      return {id, name, resource, type, minimumScore, pointsPossible}
-    } else {
-      return {id, name, resource, type}
-    }
-  }) as Requirement[]
+  return requirementElements.map((requirementNode: Element) =>
+    parseModuleItemData(requirementNode, true)
+  ) as Requirement[]
 }
 
 function parseModuleItems(element: HTMLDivElement) {
   const moduleItemElements = Array.from(element.querySelectorAll('.ig-row'))
-  return moduleItemElements.map(moduleItem => {
-    const id = moduleItem.querySelector('.id')?.textContent
-    const name = moduleItem.querySelector('.item_name a')?.getAttribute('title')?.trim() || ''
-    const resource =
-      resourceTypeMap[moduleItem.querySelector('.type')?.textContent || 'external_url']
-    if (resource === 'assignment' || resource === 'quiz') {
-      const pointsPossibleString = moduleItem.querySelector('.points_possible_display')?.textContent
-      const pointsPossible = pointsPossibleString ? pointsPossibleString.split(/\s/)[0] : null
-      return {id, name, resource, pointsPossible}
-    } else {
-      return {id, name, resource}
-    }
-  })
+  return moduleItemElements.map(moduleItem => parseModuleItemData(moduleItem, false))
 }
 
 export function updateModuleUI(moduleElement: HTMLDivElement, moduleSettings: SettingsPanelState) {
@@ -377,7 +347,7 @@ function updateRequirements(moduleElement: HTMLDivElement, moduleSettings: Setti
 
       const pointsPossibleElement = moduleItemElement.querySelector('.points_possible_display')
       if (pointsPossibleElement) {
-        if (requirement.type === 'score' && requirement.pointsPossible) {
+        if (requirement.pointsPossible) {
           pointsPossibleElement.textContent = I18n.t('%{points} pts', {
             points: I18n.n(requirement.pointsPossible),
           })
@@ -387,6 +357,36 @@ function updateRequirements(moduleElement: HTMLDivElement, moduleSettings: Setti
       }
     }
   })
+}
+
+function parseModuleItemData(element: Element, isRequirement: boolean) {
+  const data = {
+    id: element.querySelector('.id')?.textContent,
+    name: element.querySelector('.item_name a')?.getAttribute('title')?.trim() || '',
+    resource: resourceTypeMap[element.querySelector('.type')?.textContent || 'external_url'],
+  }
+  let activeRequirementNode
+  if (isRequirement) {
+    // One of these (the active one) has "display: block;" and the others are hidden
+    activeRequirementNode = Array.from(element.querySelectorAll('.requirement_type')).filter(
+      node => window.getComputedStyle(node).display !== 'none'
+    )[0]
+    data.type = requirementTypeMap[activeRequirementNode.classList[1] as Requirement['type']]
+  }
+
+  if (
+    data.resource === 'assignment' ||
+    data.resource === 'quiz' ||
+    data.resource === 'discussion'
+  ) {
+    data.graded = element.querySelector('.graded')?.textContent === '1'
+    const pointsPossibleString = element.querySelector('.points_possible_display')?.textContent
+    data.pointsPossible = pointsPossibleString ? pointsPossibleString.split(/\s/)[0] : null
+    if (isRequirement) {
+      data.minimumScore = activeRequirementNode.querySelector('.min_score')?.textContent || '0'
+    }
+  }
+  return data
 }
 
 function updatePublishFinalGrade(
