@@ -72,6 +72,7 @@ describe "Account Reports API", type: :request do
     end
 
     it "works with parameters" do
+      @admin.account.enrollment_terms.create! sis_source_id: "a_term"
       report = api_call(:post,
                         "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}",
                         { report: @report.report_type,
@@ -79,7 +80,7 @@ describe "Account Reports API", type: :request do
                           action: "create",
                           format: "json",
                           account_id: @admin.account.id.to_s,
-                          parameters: { "some_param" => 1 } })
+                          parameters: { "enrollment_term_id" => "sis_term_id:a_term" } })
       expect(report).to have_key("id")
     end
 
@@ -88,6 +89,18 @@ describe "Account Reports API", type: :request do
                    "/api/v1/accounts/#{@admin.account.id}/reports/bad_report_csv",
                    { report: "bad_report_csv", controller: "account_reports", action: "create", format: "json", account_id: @admin.account.id.to_s })
       assert_status(404)
+    end
+
+    it "400s for invalid enrollment_term_id" do
+      raw_api_call(:post,
+                   "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}",
+                   { report: @report.report_type,
+                     controller: "account_reports",
+                     action: "create",
+                     format: "json",
+                     account_id: @admin.account.id.to_s,
+                     parameters: { "enrollment_term_id" => "sis_term_id:invalid" } })
+      assert_status(400)
     end
   end
 
