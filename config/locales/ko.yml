@@ -3221,6 +3221,7 @@ ko:
     ok: 확인
   confirm_unenrollment_64333263: "등록 취소 확인"
   consumer_key_6f94ba11: "소비자 키"
+  contact_a6e7f6da: 연락처
   content_exports: 
     buttons: 
       process: "자료 처리"
@@ -5780,6 +5781,7 @@ ko:
       phrase_to_look_for: "검색할 구"
       posts_added: "게시물 추가됨"
   external_feeds_b6345379: "외부 피드"
+  external_links_3d9f074e: "외부 링크"
   external_tool_c5a6410a: "외부 도구"
   external_tools: 
     account_navigation_configured: "계정 탐색이 구성됨"
@@ -10277,6 +10279,7 @@ ko:
   priority_dd4381ee: "우선 순위"
   privacy_290109ea: "개인 정보"
   privacy_level_f0ec09a3: "개인 정보 보호 수준"
+  privacy_policy_c68f482a: "개인 정보 보호 정책"
   private_3883d133: 비공개
   product_name: Canvas
   profile: 
@@ -14239,6 +14242,7 @@ ko:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ 과목"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  website_adea4d05: 웹사이트
   website_url_177fc1dc: "웹 사이트 URL"
   week_1f945ddd: 주
   welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: "나의 과목에 오신 것을 환영합니다! 과목들의 목록을 편집하려면 \"모든 과목\"을 클릭하고 표시할 과목들에 별표 표시를 하십시오."
