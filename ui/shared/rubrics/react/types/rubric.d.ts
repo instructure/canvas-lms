@@ -67,6 +67,7 @@ export type RubricAssessmentData = {
   id: string
   points?: number
   criterionId: string
+  ratingId?: string
   learningOutcomeId?: string
   comments: string
   commentsEnabled: boolean
@@ -78,7 +79,7 @@ export type RubricAssessmentData = {
 export type UpdateAssessmentData = {
   criterionId: string
   points?: number
-  description?: string
+  ratingId?: string
   comments?: string
   saveCommentsForLater?: boolean
 }
