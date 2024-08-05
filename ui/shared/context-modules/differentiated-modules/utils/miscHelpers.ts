@@ -18,7 +18,7 @@
 
 import * as tz from '@instructure/moment-utils'
 import type {SettingsPanelState} from '../react/settingsReducer'
-import type {ModuleItem, Requirement} from '../react/types'
+import type {ModuleItem, Requirement, DiscussionRequirement} from '../react/types'
 
 export function calculatePanelHeight(withinTabs: boolean): string {
   let headerHeight = 79.5
@@ -63,10 +63,8 @@ export function convertModuleSettingsForApi(moduleSettings: SettingsPanelState) 
   }
 }
 
-export function requirementTypesForResource(
-  resource: ModuleItem['resource']
-): Requirement['type'][] {
-  switch (resource) {
+export function requirementTypesForResource(requirement: Requirement): Requirement['type'][] {
+  switch (requirement.resource) {
     case 'assignment':
       return ['view', 'mark', 'submit', 'score']
     case 'quiz':
@@ -75,8 +73,9 @@ export function requirementTypesForResource(
       return ['view']
     case 'page':
       return ['view', 'mark', 'contribute']
-    case 'discussion':
-      return ['view', 'contribute']
+    case 'discussion': {
+      return requirement.graded ? ['view', 'contribute', 'submit', 'score'] : ['view', 'contribute']
+    }
     case 'externalUrl':
       return ['view']
     case 'externalTool':

@@ -122,6 +122,7 @@ describe('parseModule', () => {
         name: 'HW 1',
         resource: 'assignment',
         type: 'mark',
+        graded: true,
         minimumScore: '0',
         pointsPossible: '10',
       },
@@ -130,8 +131,40 @@ describe('parseModule', () => {
         name: 'Quiz 1',
         resource: 'quiz',
         type: 'score',
+        graded: true,
         minimumScore: '70',
         pointsPossible: null,
+      },
+      {
+        id: '95',
+        name: 'Discussion 1',
+        resource: 'discussion',
+        type: 'score',
+        graded: true,
+        minimumScore: '5',
+        pointsPossible: '10',
+      },
+      {
+        id: '96',
+        name: 'Discussion 2',
+        resource: 'discussion',
+        type: 'submit',
+        graded: false,
+        minimumScore: '0',
+        pointsPossible: null,
+      },
+    ])
+  })
+
+  it('parses moduleItems', () => {
+    const element = getFixture('moduleItems')
+    expect(parseModule(element).moduleItems).toEqual([
+      {
+        id: '93',
+        name: 'HW 1',
+        resource: 'assignment',
+        graded: true,
+        pointsPossible: '10',
       },
     ])
   })

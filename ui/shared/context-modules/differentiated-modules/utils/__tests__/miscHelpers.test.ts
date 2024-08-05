@@ -22,6 +22,7 @@ import {
   calculatePanelHeight,
   convertFriendlyDatetimeToUTC,
   convertModuleSettingsForApi,
+  requirementTypesForResource,
 } from '../miscHelpers'
 import type {Requirement} from '../../react/types'
 
@@ -142,5 +143,52 @@ describe('convertModuleSettingsForApi', () => {
       requireSequentialProgress: true,
     })
     expect(formattedSettings.context_module.require_sequential_progress).toBe(false)
+  })
+})
+
+describe('requirementTypesForResource', () => {
+  it('returns types for assignment', () => {
+    expect(requirementTypesForResource({resource: 'assignment'})).toEqual([
+      'view',
+      'mark',
+      'submit',
+      'score',
+    ])
+  })
+
+  it('returns types for quiz', () => {
+    expect(requirementTypesForResource({resource: 'quiz'})).toEqual(['view', 'submit', 'score'])
+  })
+
+  it('returns types for file', () => {
+    expect(requirementTypesForResource({resource: 'file'})).toEqual(['view'])
+  })
+
+  it('returns types for page', () => {
+    expect(requirementTypesForResource({resource: 'page'})).toEqual(['view', 'mark', 'contribute'])
+  })
+
+  it('returns types for graded discussion', () => {
+    expect(requirementTypesForResource({resource: 'discussion', graded: true})).toEqual([
+      'view',
+      'contribute',
+      'submit',
+      'score',
+    ])
+  })
+
+  it('returns types for ungraded discussion', () => {
+    expect(requirementTypesForResource({resource: 'discussion', graded: false})).toEqual([
+      'view',
+      'contribute',
+    ])
+  })
+
+  it('returns types for externalUrl', () => {
+    expect(requirementTypesForResource({resource: 'externalUrl'})).toEqual(['view'])
+  })
+
+  it('returns types for externalTool', () => {
+    expect(requirementTypesForResource({resource: 'externalTool'})).toEqual(['view'])
   })
 })

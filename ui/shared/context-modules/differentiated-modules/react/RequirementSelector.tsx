@@ -72,11 +72,12 @@ export default function RequirementSelector({
   const removeButton = useRef<Element | null>(null)
   const dropdown = useRef<HTMLInputElement | null>(null)
   const requirementTypeOptions = useMemo(() => {
-    const requirementTypes = requirementTypesForResource(requirement.resource)
+    const requirementTypes = requirementTypesForResource(requirement)
     return requirementTypes.map(type => {
       return {type, label: requirementTypeLabelMap[type]}
     })
-  }, [requirement.resource])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [requirement.resource, requirement.graded])
 
   const options = useMemo(() => groupBy(moduleItems, 'resource'), [moduleItems])
 
