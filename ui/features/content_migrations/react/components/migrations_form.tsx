@@ -126,14 +126,10 @@ export const ContentMigrationsForm = ({
   }, [])
 
   const handleFileProgress = useCallback(
-    (json: ContentMigrationItem, {loaded, total}: AttachmentProgressResponse) => {
+    ({loaded, total}: AttachmentProgressResponse) => {
       setFileUploadProgress(Math.trunc((loaded / total) * 100))
-      if (loaded === total) {
-        onResetForm()
-        setMigrations(prevMigrations => [json].concat(prevMigrations))
-      }
     },
-    [setFileUploadProgress, onResetForm, setMigrations]
+    [setFileUploadProgress]
   )
   const onSubmitForm: onSubmitMigrationFormCallback = useCallback(
     async (formData, preAttachmentFile) => {
@@ -155,12 +151,18 @@ export const ContentMigrationsForm = ({
         body: requestBody,
       })
       if (preAttachmentFile && json.pre_attachment) {
-        completeUpload(json.pre_attachment, preAttachmentFile, {
+        const attachment = await completeUpload(json.pre_attachment, preAttachmentFile, {
           ignoreResult: true,
           onProgress: (response: any) => {
-            handleFileProgress(json, response)
+            handleFileProgress(response)
           },
         })
+        const jsonWithAttachment: ContentMigrationItem = {
+          ...json,
+          attachment,
+        }
+        onResetForm()
+        setMigrations(prevMigrations => [jsonWithAttachment].concat(prevMigrations))
       } else {
         onResetForm()
         const overriddenJson = overrideDefaultWorkflowState(json as ContentMigrationItem)
