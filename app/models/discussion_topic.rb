@@ -1849,6 +1849,16 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
+  def show_in_search_for_user?(user)
+    return false unless user && !deleted?
+    return false if anonymous? && !context.feature_enabled?(:react_discussions_post)
+    return true if context.grants_right?(user, :read_as_admin)
+    return false if locked_by_module_item?(user)
+
+    locked = locked_for?(user, check_policies: true, deep_check_if_needed: true)
+    locked.is_a?(Hash) ? !!locked[:can_view] : visible_for?(user)
+  end
+
   def self.reject_context_module_locked_topics(topics, user)
     progressions = ContextModuleProgression
                    .joins(context_module: :content_tags)
