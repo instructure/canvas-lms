@@ -438,6 +438,17 @@ class WikiPage < ActiveRecord::Base
     false
   end
 
+  def show_in_search_for_user?(user)
+    return false unless user
+    return true if can_edit_page?(user)
+
+    if context.tab_hidden?(Course::TAB_PAGES)
+      return false unless context_module_tags.where(context:).any? { |tag| tag.context_module&.available_for?(user) }
+    end
+
+    !locked_for?(user)
+  end
+
   def effective_roles
     context_roles = context.default_wiki_editing_roles rescue nil
     roles = (editing_roles || context_roles || default_roles).split(",")
