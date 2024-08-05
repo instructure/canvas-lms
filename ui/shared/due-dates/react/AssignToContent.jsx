@@ -290,7 +290,7 @@ const AssignToContent = ({
     delete newStagedCards[cardId]
     setStagedCards(newStagedCards)
 
-    const newStagedOverrides = stagedOverridesRef.current.filter(override => override.rowKey.toString() !== cardId)
+    const newStagedOverrides = stagedOverrides.filter(override => override.rowKey.toString() !== cardId)
     setStagedOverrides(newStagedOverrides)
   }
 
