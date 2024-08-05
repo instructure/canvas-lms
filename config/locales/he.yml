@@ -4637,6 +4637,7 @@ he:
   confirmation_failed_please_try_again_ae566d37: "אישור נכשל. יש לנסות שוב."
   consumer_key_57d9fcf1: "מפתח מערכת הלקוח"
   consumer_key_6f94ba11: "מפתח מערכת הלקוח"
+  contact_a6e7f6da: התקשרות
   content_1440204b: תוכן
   content_changed_exceptions_e8bff81e: "חריגי תוכן ששונה"
   content_choice_51f4ca0f: "אפשרויות תוכן"
@@ -14653,6 +14654,7 @@ he:
   print_d0e3d53f: הדפסה
   priority_dd4381ee: עדיפות
   privacy_290109ea: פרטיות
+  privacy_policy_c68f482a: "מדיניות פרטיות"
   processing_2fcc9739: מעבד
   product_name: קנבס
   profile: 
@@ -20337,6 +20339,7 @@ he:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: " קורס  +Blackboard Vista/CE, WebCT 6"
   webct_name: "Blackboard Vista/CE (WebCT) "
+  website_adea4d05: אתר
   website_url_177fc1dc: "כתובת אתר"
   week_1f945ddd: שבוע
   week_s_cb1492ee: שבוע(ות)
