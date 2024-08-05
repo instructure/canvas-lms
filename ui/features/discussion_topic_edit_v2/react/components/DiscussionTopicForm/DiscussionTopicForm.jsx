@@ -772,23 +772,27 @@ function DiscussionTopicForm({
             autoFocus={true}
             width={inputWidth}
           />
-          <CanvasRce
-            textareaId="discussion-topic-message-body"
-            onFocus={() => {}}
-            onBlur={() => {}}
-            onInit={() => {}}
-            ref={rceRef}
-            onContentChange={setRceContent}
-            editorOptions={{
-              focus: false,
-              plugins: [],
-            }}
-            height={300}
-            defaultContent={isEditing ? currentDiscussionTopic?.message : ''}
-            autosave={false}
-            resourceType={isAnnouncement ? 'announcement.body' : 'discussion_topic.body'}
-            resourceId={currentDiscussionTopic?._id}
-          />
+          <View>
+            <span className="discussions-editor">
+              <CanvasRce
+                textareaId="discussion-topic-message-body"
+                onFocus={() => {}}
+                onBlur={() => {}}
+                onInit={() => {}}
+                ref={rceRef}
+                onContentChange={setRceContent}
+                editorOptions={{
+                  focus: false,
+                  plugins: [],
+                }}
+                height={300}
+                defaultContent={isEditing ? currentDiscussionTopic?.message : ''}
+                autosave={false}
+                resourceType={isAnnouncement ? 'announcement.body' : 'discussion_topic.body'}
+                resourceId={currentDiscussionTopic?._id}
+              />
+            </span>
+          </View>
           {ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_ATTACH && (
             <AttachmentDisplay
               attachment={attachment}
