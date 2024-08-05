@@ -170,6 +170,12 @@ class Announcement < DiscussionTopic
     nil
   end
 
+  def show_in_search_for_user?(user)
+    return false if locked? && !grants_right?(user, :read_as_admin)
+
+    super
+  end
+
   def create_observer_alerts_job
     return if !saved_changes.key?("workflow_state") || saved_changes["workflow_state"][1] != "active"
     return if context_type != "Course"

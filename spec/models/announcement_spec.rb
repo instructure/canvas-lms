@@ -280,4 +280,31 @@ describe Announcement do
       end.to change { @a.messages_sent[notification_name] }
     end
   end
+
+  describe "show_in_search_for_user?" do
+    shared_examples_for "expected_values_for_teacher_student" do |teacher_expected, student_expected|
+      it "returns #{teacher_expected} for teacher" do
+        expect(announcement.show_in_search_for_user?(@teacher)).to eq(teacher_expected)
+      end
+
+      it "returns #{student_expected} for student" do
+        expect(announcement.show_in_search_for_user?(@student)).to eq(student_expected)
+      end
+    end
+
+    let(:announcement) { @course.announcements.create!(message: "announcement") }
+
+    before(:once) do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+    end
+
+    include_examples "expected_values_for_teacher_student", true, true
+
+    context "when locked" do
+      let(:announcement) { @course.announcements.create!(message: "announcement", locked: true) }
+
+      include_examples "expected_values_for_teacher_student", true, false
+    end
+  end
 end
