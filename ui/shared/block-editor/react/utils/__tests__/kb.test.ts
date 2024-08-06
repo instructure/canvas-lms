@@ -16,14 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {KeyboardEvent} from 'react'
+import {type KeyboardEvent} from 'react'
 import {
   isAnyModifierKeyPressed,
   getCaretPosition,
   isCaretAtEnd,
   setCaretToEnd,
+  setCaretToOffset,
   shouldAddNewNode,
-  removeLastParagraphTag,
+  removeTrailingEmptyParagraphTags,
   shouldDeleteNode,
 } from '../kb'
 
@@ -125,6 +126,26 @@ describe('keyboard utilities', () => {
     })
   })
 
+  describe('setCaretToOffset', () => {
+    it('should set the caret to the offset', () => {
+      const div = document.createElement('div')
+      div.innerHTML = '<p>hello world</p>'
+      document.body.appendChild(div)
+      const p = div.querySelector('p') as HTMLElement
+      const textNode = p.firstChild as Text
+      const range = document.createRange()
+      range.setStart(textNode, 0)
+      range.setEnd(textNode, 0)
+      const sel = window.getSelection()
+      sel?.removeAllRanges()
+      sel?.addRange(range)
+      expect(getCaretPosition(div)).toBe(0)
+
+      setCaretToOffset(p, 5)
+      expect(getCaretPosition(div)).toBe(5)
+    })
+  })
+
   describe('shouldAddNewNode', () => {
     it('should return true if this is the 2nd Enter key press', () => {
       const div = document.createElement('div')
@@ -185,21 +206,37 @@ describe('keyboard utilities', () => {
     })
   })
 
-  describe('removeLastParagraphTag', () => {
-    it('should remove the last paragraph tag', () => {
+  describe('removeTrailingEmptyParagraphTags', () => {
+    it('should remove the last paragraph tag if it is empty', () => {
+      const div = document.createElement('div')
+      div.innerHTML = '<p id="p1">hello</p><p id="p2"></p>'
+      document.body.appendChild(div)
+      removeTrailingEmptyParagraphTags(div)
+      expect(div.innerHTML).toBe('<p id="p1">hello</p>')
+    })
+
+    it('should not remove the last paragraph tag if it has content', () => {
       const div = document.createElement('div')
       div.innerHTML = '<p id="p1">hello</p><p id="p2">world</p>'
       document.body.appendChild(div)
-      removeLastParagraphTag(div)
-      expect(div.innerHTML).toBe('<p id="p1">hello</p>')
+      removeTrailingEmptyParagraphTags(div)
+      expect(div.innerHTML).toBe('<p id="p1">hello</p><p id="p2">world</p>')
     })
 
     it('should do nothing if there are no paragraph tags', () => {
       const div = document.createElement('div')
       div.innerHTML = 'hello world'
       document.body.appendChild(div)
-      removeLastParagraphTag(div)
+      removeTrailingEmptyParagraphTags(div)
       expect(div.innerHTML).toBe('hello world')
+    })
+
+    it('should do nothing if the last element is not a paragraph tag', () => {
+      const div = document.createElement('div')
+      div.innerHTML = '<p id="p1">hello</p><div id="p2"></div>'
+      document.body.appendChild(div)
+      removeTrailingEmptyParagraphTags(div)
+      expect(div.innerHTML).toBe('<p id="p1">hello</p><div id="p2"></div>')
     })
   })
 

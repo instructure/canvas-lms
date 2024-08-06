@@ -79,15 +79,13 @@ export const RCEBlock = ({id, text, onContentChange}: RCEBlockProps) => {
         }}
         className={clazz}
         role="textbox"
+        style={{minWidth: '50%'}}
         onClick={e => setEditable(true)}
       >
         <CanvasRce
           ref={rceRef}
           autosave={false}
           defaultContent={text}
-          editorOptions={{
-            focus: false,
-          }}
           height={300}
           textareaId={`rceblock_text-${id}`}
           onFocus={handleRCEFocus}

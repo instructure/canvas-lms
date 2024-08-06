@@ -86,19 +86,35 @@ export const HeadingBlock = ({text, level}: HeadingBlockProps) => {
     setEditable(true)
   }, [])
 
+  // TODO: this doesn't work because selectNode selects the section
+  //       due to the our behavior that the first select is the section
+  //       There's something now right with that logic in RenderNode
+  //       Managing selection vs. focus needs work.
+  const handleFocus = useCallback(() => {
+    //   if (!selected) {
+    //     actions.selectNode(id)
+    //   }
+  }, [])
+
   if (enabled) {
     return (
       // eslint-disable-next-line jsx-a11y/interactive-supports-focus, jsx-a11y/click-events-have-key-events
-      <div ref={el => el && connect(drag(el))} role="textbox" onClick={handleClick}>
+      <div
+        ref={el => el && connect(drag(el))}
+        role="textbox"
+        onClick={handleClick}
+        className={clazz}
+      >
         <Heading level={level} color="primary" themeOverride={themeOverride}>
           <ContentEditable
             innerRef={focusableElem}
             data-placeholder={`Heading ${level?.replace('h', '')}`}
-            className={clazz}
+            className={!text ? 'empty' : ''}
             disabled={!editable}
             html={text || ''}
             onChange={handleChange}
             onKeyDown={handleKey}
+            onFocus={handleFocus}
             tagName="span"
           />
         </Heading>

@@ -26,6 +26,7 @@ import {TextBlock} from '../TextBlock'
 import {ButtonBlock} from '../ButtonBlock'
 import {IconBlock} from '../IconBlock'
 import {type ResourceCardProps} from './types'
+import {notDeletableIfLastChild} from '../../../../utils'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -93,14 +94,7 @@ ResourceCard.craft = {
     linkUrl: '',
   },
   custom: {
-    isDeletable: (myId: Node, query: any) => {
-      const target = query.node(myId).get()
-      const parent = query.node(target.data.parent).get()
-      if (parent.rules?.canMoveOut) {
-        return parent.rules.canMoveOut([target], parent)
-      }
-      return true
-    },
+    isDeletable: notDeletableIfLastChild,
   },
 }
 

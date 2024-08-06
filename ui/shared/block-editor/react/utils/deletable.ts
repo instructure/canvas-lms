@@ -16,12 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './useClassNames'
-export * from './kb'
-export * from './dom'
-export * from './constants'
-export * from './getScrollParent'
-export * from './getCloneTree'
-export * from './colorUtils'
-export * from './getNodeIndex'
-export * from './deletable'
+// Used as part of the isDeletable logic.
+// Return false if the Node identified my nodeId is the last child
+// of its parent.
+// This is true of all sections (so this is called in RenderNode to
+// save you from having to add it to each section) and some blocks
+export const notDeletableIfLastChild = (nodeId: string, query: any) => {
+  const target = query.node(nodeId).get()
+  if (target.data.parent) {
+    const siblings = query.node(target.data.parent).descendants()
+    return siblings.length > 1
+  }
+  return false
+}
