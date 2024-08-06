@@ -1700,6 +1700,28 @@ module Lti
                        -> { TextHelper.round_if_whole(@assignment.points_possible) },
                        ASSIGNMENT_GUARD
 
+    # Returns true if the assignment is hidden in the gradebook.
+    #
+    # @example
+    #   ```
+    #   true
+    #   ```
+    register_expansion "Canvas.assignment.hideInGradebook",
+                       [],
+                       -> { @assignment.hide_in_gradebook },
+                       ASSIGNMENT_GUARD
+
+    # Returns true if the assignment is omitted from students' final grade.
+    #
+    # @example
+    #   ```
+    #   true
+    #   ```
+    register_expansion "Canvas.assignment.omitFromFinalGrade",
+                       [],
+                       -> { @assignment.omit_from_final_grade },
+                       ASSIGNMENT_GUARD
+
     # @deprecated in favor of ISO8601
     register_expansion "Canvas.assignment.unlockAt",
                        [],
