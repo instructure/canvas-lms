@@ -212,7 +212,7 @@ describe Submission do
 
     it { is_expected.to be_blank }
 
-    it "sets an anoymous_id on validation" do
+    it "sets an anonymous_id on validation" do
       submission.validate
       expect(submission.anonymous_id).to be_present
     end
@@ -1863,7 +1863,7 @@ describe Submission do
       called_times = 0
       expect(@submission.versions).to receive(:create) { |attributes|
         called_times += 1
-        # This is a hacky way of mimicing a bug where two responses, received very quickly,
+        # This is a hacky way of mimicking a bug where two responses, received very quickly,
         # would create a RecordNotUnique error when the tried to increment the version
         # number at the same time.
         v = Version.create(
@@ -2914,7 +2914,7 @@ describe Submission do
                                                   })
       end
 
-      it "overrites the tii data with the originality data" do
+      it "overwrites the tii data with the originality data" do
         originality_report.originality_report_url = "http://example.com"
         originality_report.save!
         tii_data = {
@@ -5024,7 +5024,69 @@ describe Submission do
     end
   end
 
+  shared_examples_for "a method which finds versioned originality reports" do |get_reports_fn|
+    def make_attachment(mod)
+      attachment_model(filename: "attachment_#{mod}.doc", context: @student)
+    end
+
+    it "works correctly on originality reports without submission times with multiple text entry or same attachment ids" do
+      reports = []
+      submissions = (1..3).map do |i|
+        sub = @assignment.submit_homework(@student, body: "body #{i}")
+        report = OriginalityReport.create!(attachment: nil, originality_score: i, submission: sub)
+        report.update_columns(submission_time: nil)
+        reports << report
+        sub
+      end
+      attachment = attachment_model(filename: "submission.doc", context: @student)
+      submissions += (1..3).map do |i|
+        sub = @assignment.submit_homework(@student, attachments: [attachment])
+        report = OriginalityReport.create!(attachment:, originality_score: i, submission: sub)
+        report.update_columns(submission_time: nil)
+        reports << report
+        sub
+      end
+
+      versioned_reports = get_reports_fn.call(submissions)
+
+      # Submissions/originality reports without attachments.
+      # Match based on `o.created_at > submitted_at`
+      (0..2).each do |i|
+        expect(versioned_reports[i]).to match_array reports[i..2]
+      end
+
+      # Submissions/originality report with attachment. Match all originality reports with matching attachment
+      (3..5).each do |i|
+        expect(versioned_reports[i]).to match_array reports[3..]
+      end
+    end
+
+    it "works correctly on originality reports with different submission times and same attachment ids (ie. student resubmits a previous attachment from files)" do
+      attachment1 = make_attachment(1)
+      sub1 = @assignment.submit_homework(@student, attachments: [attachment1])
+      report1 = OriginalityReport.create!(attachment: attachment1, originality_score: 1, submission: sub1)
+
+      attachment2 = make_attachment(2)
+      sub2 = @assignment.submit_homework(@student, attachments: [attachment2])
+      report2 = OriginalityReport.create!(attachment: attachment2, originality_score: 2, submission: sub2)
+
+      # the last submission has a resubmission of the first attachment created
+      sub3 = @assignment.submit_homework(@student, attachments: [attachment1])
+      # TII got back to us with a report but no change in score
+      report1.touch
+
+      versioned_reports = get_reports_fn.call([sub1, sub2, sub3])
+      expect(versioned_reports[0]).to eq [report1]
+      expect(versioned_reports[1]).to eq [report2]
+      expect(versioned_reports[2]).to eq [report1]
+    end
+  end
+
   describe "#versioned_originality_reports" do
+    it_behaves_like "a method which finds versioned originality reports", lambda { |submissions|
+      submissions.map(&:versioned_originality_reports)
+    }
+
     it "loads originality reports for the submission" do
       student_in_course(active_all: true)
       attachment = attachment_model(filename: "submission.doc", context: @student)
@@ -5059,38 +5121,17 @@ describe Submission do
 
       expect(submission.versioned_originality_reports).to eq []
     end
-
-    it "works correctly on originality reports without submission times with multiple text entry or same attachment ids" do
-      reports = []
-      submissions = (1..3).map do |i|
-        sub = @assignment.submit_homework(@student, body: "body #{i}")
-        report = OriginalityReport.create!(attachment: nil, originality_score: i, submission: sub)
-        report.update_columns(submission_time: nil)
-        reports << report
-        sub
-      end
-      attachment = attachment_model(filename: "submission.doc", context: @student)
-      submissions += (1..3).map do |i|
-        sub = @assignment.submit_homework(@student, attachments: [attachment])
-        report = OriginalityReport.create!(attachment:, originality_score: i, submission: sub)
-        report.update_columns(submission_time: nil)
-        reports << report
-        sub
-      end
-
-      submissions[0..2].each_with_index do |s, i|
-        expect(s.versioned_originality_reports).to match_array reports[i..2]
-      end
-      submissions[3..].each_with_index do |s, i|
-        expect(s.versioned_originality_reports).to match_array reports[(i + 3)..]
-      end
-    end
   end
 
   describe "#bulk_load_versioned_originality_reports" do
     before :once do
       student_in_course(active_all: true)
     end
+
+    it_behaves_like "a method which finds versioned originality reports", lambda { |submissions|
+      Submission.bulk_load_versioned_originality_reports(submissions)
+      submissions.map(&:versioned_originality_reports)
+    }
 
     it "bulk loads originality reports for many submissions at once" do
       originality_reports = []
@@ -5167,33 +5208,6 @@ describe Submission do
       Submission.bulk_load_versioned_originality_reports(submissions)
       submissions.each do |s|
         expect(s.versioned_originality_reports).to eq []
-      end
-    end
-
-    it "works correctly on originality reports without submission times with multiple text entry or same attachment ids" do
-      reports = []
-      submissions = (1..3).map do |i|
-        sub = @assignment.submit_homework(@student, body: "body #{i}")
-        report = OriginalityReport.create!(attachment: nil, originality_score: i, submission: sub)
-        report.update_columns(submission_time: nil)
-        reports << report
-        sub
-      end
-      attachment = attachment_model(filename: "submission.doc", context: @student)
-      submissions += (1..3).map do |i|
-        sub = @assignment.submit_homework(@student, attachments: [attachment])
-        report = OriginalityReport.create!(attachment:, originality_score: i, submission: sub)
-        report.update_columns(submission_time: nil)
-        reports << report
-        sub
-      end
-
-      Submission.bulk_load_versioned_originality_reports(submissions)
-      submissions[0..2].each_with_index do |s, i|
-        expect(s.versioned_originality_reports).to match_array reports[i..2]
-      end
-      submissions[3..].each_with_index do |s, i|
-        expect(s.versioned_originality_reports).to match_array reports[(i + 3)..]
       end
     end
   end
@@ -8702,7 +8716,7 @@ describe Submission do
     it { is_expected.to validate_numericality_of(:extra_attempts).is_greater_than_or_equal_to(0).allow_nil }
 
     describe "#extra_attempts_can_only_be_set_on_online_uploads" do
-      it "does not allowe extra_attempts to be set for non online upload submission types" do
+      it "does not allow extra_attempts to be set for non online upload submission types" do
         submission = @assignment.submissions.first
 
         %w[online_upload online_url online_text_entry].each do |submission_type|
@@ -9030,7 +9044,7 @@ describe Submission do
     end
 
     describe "#handle_posted_at_changed" do
-      describe "when an studen that is also admin posts an submission" do
+      describe "when an student that is also admin posts an submission" do
         it "unmutes the assignment if all submissions are now posted" do
           admin = account_admin_user(account: @account, name: "default admin")
           @course.enroll_student(admin)
@@ -9189,14 +9203,14 @@ describe Submission do
     describe "creating a new submission" do
       subject(:submission) { @assignment.submissions.new user: User.create, workflow_state: "submitted" }
 
-      it "invalidates submited count cache if submitted" do
+      it "invalidates submitted count cache if submitted" do
         Rails.cache.write(["submitted_count", @assignment].cache_key, "test")
         expect(Rails.cache.exist?(["submitted_count", @assignment].cache_key)).to be(true)
         subject.run_callbacks :create
         expect(Rails.cache.exist?(["submitted_count", @assignment].cache_key)).to be(false)
       end
 
-      it "does not invalidate submitted count cache if unsubmtted" do
+      it "does not invalidate submitted count cache if unsubmitted" do
         Rails.cache.write(["submitted_count", @assignment].cache_key, "test")
         expect(Rails.cache.exist?(["submitted_count", @assignment].cache_key)).to be(true)
         subject.workflow_state = "unsubmitted"
@@ -9213,7 +9227,7 @@ describe Submission do
         expect(Rails.cache.exist?(["graded_count", @assignment].cache_key)).to be(false)
       end
 
-      it "does not invalidate graded count cache if unsubmtted" do
+      it "does not invalidate graded count cache if unsubmitted" do
         Rails.cache.write(["graded_count", @assignment].cache_key, "test")
         expect(Rails.cache.exist?(["graded_count", @assignment].cache_key)).to be(true)
         subject.run_callbacks :create
@@ -9224,7 +9238,7 @@ describe Submission do
     describe "updating a submission" do
       subject(:submission) { @assignment.submissions.first }
 
-      it "invalidates submited count cache if submitted" do
+      it "invalidates submitted count cache if submitted" do
         Rails.cache.write(["submitted_count", @assignment].cache_key, "test")
         expect(Rails.cache.exist?(["submitted_count", @assignment].cache_key)).to be(true)
         subject.workflow_state = "submitted"
@@ -9232,7 +9246,7 @@ describe Submission do
         expect(Rails.cache.exist?(["submitted_count", @assignment].cache_key)).to be(false)
       end
 
-      it "does not invalidate submitted count cache if unsubmtted" do
+      it "does not invalidate submitted count cache if unsubmitted" do
         Rails.cache.write(["submitted_count", @assignment].cache_key, "test")
         expect(Rails.cache.exist?(["submitted_count", @assignment].cache_key)).to be(true)
         subject.workflow_state = "unsubmitted"
@@ -9249,7 +9263,7 @@ describe Submission do
         expect(Rails.cache.exist?(["graded_count", @assignment].cache_key)).to be(false)
       end
 
-      it "does not invalidate graded count cache if unsubmtted" do
+      it "does not invalidate graded count cache if unsubmitted" do
         Rails.cache.write(["graded_count", @assignment].cache_key, "test")
         expect(Rails.cache.exist?(["graded_count", @assignment].cache_key)).to be(true)
         subject.workflow_state = "submitted"

@@ -200,7 +200,7 @@ module Lti
           render json: @report.errors, status: :bad_request
         end
       end
-    rescue StandError => e
+    rescue => e
       logger.warn e.message
     end
 
@@ -243,8 +243,19 @@ module Lti
     #
     # @returns OriginalityReport
     def update
+      updated = false
       updates = { error_message: nil }.merge(update_report_params)
-      if @report.update(updates)
+      # Check if the score is the same as the current score and if so,
+      # only .touch to update the updated_at timestamp
+
+      if !@report.originality_score.nil? && (updates["originality_score"].to_f - @report.originality_score).abs < Float::EPSILON
+        @report.touch
+        updated = true
+      else
+        updated = @report.update(updates)
+      end
+
+      if updated
         @report.copy_to_group_submissions_later!
         render json: api_json(@report, @current_user, session)
       else
@@ -402,7 +413,7 @@ module Lti
         # For Text Entry cases (there is never an attachment), in the `create`
         # method, clients can choose which submission version the report is for
         # by supplying the attempt number.  Thus we can tell if they are
-        # updating an exising report or making a new one for a new version.
+        # updating an existing report or making a new one for a new version.
         @report ||=
           if params.require(:originality_report)[:attempt].present?
             report_by_attempt(params[:originality_report][:attempt])
