@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
+import {RubricAssessmentContainer} from '@canvas/rubrics/react/RubricAssessment'
 import useStore from '../../stores'
 import type {RubricAssessmentData} from '@canvas/rubrics/react/types/rubric'
 import {
@@ -26,6 +26,8 @@ import {
   type RubricOutcomeUnderscore,
   type RubricUnderscoreType,
 } from './utils'
+import {Transition} from '@instructure/ui-motion'
+import {View} from '@instructure/ui-view'
 
 const convertSubmittedAssessment = (assessments: RubricAssessmentData[]): any => {
   const {assessment_user_id, anonymous_id, assessment_type} = ENV.RUBRIC_ASSESSMENT ?? {}
@@ -53,22 +55,21 @@ const convertSubmittedAssessment = (assessments: RubricAssessmentData[]): any =>
   return data
 }
 
-type RubricAssessmentTrayWrapperProps = {
+type RubricAssessmentContainerWrapperProps = {
   rubric: RubricUnderscoreType
   rubricOutcomeData?: RubricOutcomeUnderscore[]
-  onAccessorChange: (assessorId: string) => void
+  onDismiss: () => void
   onSave: (assessmentData: any) => void
 }
 export default ({
   rubric,
   rubricOutcomeData,
-  onAccessorChange,
+  onDismiss,
   onSave,
-}: RubricAssessmentTrayWrapperProps) => {
+}: RubricAssessmentContainerWrapperProps) => {
   const {
     rubricAssessmentTrayOpen,
     studentAssessment,
-    rubricAssessors,
     rubricHidePoints,
     rubricSavedComments = {},
   } = useStore()
@@ -78,28 +79,32 @@ export default ({
     onSave(data)
   }
 
-  const isPreviewPeerMode =
-    !!studentAssessment?.assessor_id &&
-    studentAssessment.assessor_id !== ENV.RUBRIC_ASSESSMENT?.assessor_id
+  const mappedRubric = mapRubricUnderscoredKeysToCamelCase(rubric, rubricOutcomeData)
+  const mappedAssessmentData = mapRubricAssessmentDataUnderscoredKeysToCamelCase(
+    studentAssessment?.data ?? []
+  )
 
   const isPeerReview = studentAssessment?.assessment_type === 'peer_review'
+  const rubricAssessmentData = isPeerReview ? [] : mappedAssessmentData
 
   return (
-    <RubricAssessmentTray
-      hidePoints={rubricHidePoints}
-      isOpen={rubricAssessmentTrayOpen}
-      isPreviewMode={isPreviewPeerMode}
-      isPeerReview={isPeerReview}
-      rubric={mapRubricUnderscoredKeysToCamelCase(rubric, rubricOutcomeData)}
-      rubricAssessmentData={mapRubricAssessmentDataUnderscoredKeysToCamelCase(
-        studentAssessment?.data ?? []
-      )}
-      rubricAssessmentId={studentAssessment?.id}
-      rubricAssessors={rubricAssessors}
-      rubricSavedComments={rubricSavedComments}
-      onAccessorChange={onAccessorChange}
-      onDismiss={() => useStore.setState({rubricAssessmentTrayOpen: false})}
-      onSubmit={handleSubmit}
-    />
+    <Transition transitionOnMount={true} in={rubricAssessmentTrayOpen} type="fade">
+      <View as="div">
+        <RubricAssessmentContainer
+          criteria={mappedRubric?.criteria ?? []}
+          hidePoints={rubricHidePoints}
+          isPreviewMode={false}
+          isPeerReview={false}
+          isFreeFormCriterionComments={mappedRubric?.freeFormCriterionComments ?? false}
+          isStandaloneContainer={true}
+          ratingOrder={mappedRubric?.ratingOrder ?? 'descending'}
+          rubricTitle={rubric.title}
+          rubricAssessmentData={rubricAssessmentData}
+          rubricSavedComments={rubricSavedComments}
+          onDismiss={onDismiss}
+          onSubmit={handleSubmit}
+        />
+      </View>
+    </Transition>
   )
 }

@@ -17,7 +17,7 @@
  */
 
 import htmlEscape from '@instructure/html-escape'
-import type {RubricCriterion, RubricRating} from '../../types/rubric'
+import type {RubricAssessmentData, RubricCriterion, RubricRating} from '../../types/rubric'
 
 export const htmlEscapeCriteriaLongDescription = (criteria: RubricCriterion) => {
   const {longDescription} = criteria
@@ -73,4 +73,18 @@ export const findCriterionMatchingRatingIndex = (
   return criterionUseRange
     ? ratings.findLastIndex(rating => rating.points >= points)
     : ratings.findIndex(rating => rating.points === points)
+}
+
+export const findCriterionMatchingRatingId = (
+  ratings: RubricRating[],
+  criterionUseRange: boolean,
+  rubricAssessmentData?: RubricAssessmentData
+) => {
+  const {id, points} = rubricAssessmentData || {}
+  if (points == null) {
+    return undefined
+  }
+
+  return ratings.find(rating => rating.id === id && (criterionUseRange || rating.points === points))
+    ?.id
 }

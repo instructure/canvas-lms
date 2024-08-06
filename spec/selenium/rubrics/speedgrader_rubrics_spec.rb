@@ -39,10 +39,10 @@ describe "Rubrics in speedgrader" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     end
 
-    it "opens the rubric assessment tray when the “View Rubric” button is clicked" do
+    it "opens the rubric assessment container when the “View Rubric” button is clicked" do
       Speedgrader.view_rubric_button.click
 
-      expect(RubricAssessmentTray.tray).to be_displayed
+      expect(RubricAssessmentTray.container).to be_displayed
     end
 
     it "allows assessing a submission in traditional view by selecting ratings and clicking submit assessment" do

@@ -44,7 +44,7 @@ export const HorizontalButtonDisplay = ({
   onSelectRating,
   criterionUseRange,
 }: HorizontalButtonDisplayProps) => {
-  const selectedRating = ratings.find(rating => rating.id === selectedRatingId)
+  const selectedRating = ratings.find(rating => rating.id && rating.id === selectedRatingId)
   const selectedRatingIndex = selectedRating ? ratings.indexOf(selectedRating) : -1
   const min = criterionUseRange ? rangingFrom(ratings, selectedRatingIndex) : undefined
 
