@@ -37,6 +37,7 @@ import type {
 import {MODULE_NAME, RECIPIENT} from './types'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {createAnalyticPropsGenerator, setAnalyticPropsOnRef} from './util/analytics'
+import {QueryProvider} from '@canvas/query'
 
 const I18n = useI18nScope('temporary_enrollment')
 
@@ -211,14 +212,16 @@ export function TempEnrollModal(props: Props) {
   const renderBody = () => {
     if (props.isEditMode) {
       return (
-        <TempEnrollView
-          user={props.user}
-          onAddNew={handleModalReset}
-          onEdit={handleGoToAssignPageWithEnrollment}
-          enrollmentType={props.enrollmentType}
-          modifyPermissions={props.modifyPermissions}
-          disableModal={(isDisabled: boolean) => setButtonsDisabled(isDisabled)}
-        />
+        <QueryProvider>
+          <TempEnrollView
+            user={props.user}
+            onAddNew={handleModalReset}
+            onEdit={handleGoToAssignPageWithEnrollment}
+            enrollmentType={props.enrollmentType}
+            modifyPermissions={props.modifyPermissions}
+            disableModal={(isDisabled: boolean) => setButtonsDisabled(isDisabled)}
+          />
+        </QueryProvider>
       )
     } else {
       if (page >= 2) {
