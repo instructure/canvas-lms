@@ -17,34 +17,63 @@
  */
 
 import React, {useState} from 'react'
-import {Element, useEditor} from '@craftjs/core'
-import {Container} from '../Container'
-import {NoSections} from '../../common'
+import {Element, useEditor, useNode, type Node} from '@craftjs/core'
 import {useClassNames} from '../../../../utils'
 import {type TabBlockProps} from './types'
+
+// TabContent is a copy of NoSections with a canMoveIn rule
+// preventing nested TabBlocks
+export type TabContentProps = {
+  className?: string
+  children?: React.ReactNode
+}
+
+export const TabContent = ({className = '', children}: TabContentProps) => {
+  const {enabled} = useEditor(state => ({
+    enabled: state.options.enabled,
+  }))
+  const {
+    connectors: {connect},
+  } = useNode()
+  const clazz = useClassNames(enabled, {empty: !children}, [className])
+
+  return (
+    <div
+      ref={el => el && connect(el)}
+      className={clazz}
+      data-placeholder="Drop a block to add it here"
+    >
+      {children}
+    </div>
+  )
+}
+
+TabContent.craft = {
+  displayName: 'Tab Content',
+  rules: {
+    canMoveIn: (nodes: Node[]) => {
+      return !nodes.some(node => node.data.custom.isSection || node.data.custom.notTabContent)
+    },
+  },
+  custom: {
+    noToolbar: true,
+    notTabContent: true, // cannot be used as tab content
+  },
+}
 
 const TabBlock = ({tabId}: TabBlockProps) => {
   const {enabled} = useEditor(state => ({
     enabled: state.options.enabled,
   }))
-  const [cid] = useState<string>('tab-block')
   const clazz = useClassNames(enabled, {empty: false}, ['block', 'tab-block'])
-  return (
-    <Container id={tabId} className={clazz}>
-      <Element
-        id={`${cid}_nosection1`}
-        is={NoSections}
-        canvas={true}
-        className="tab-block__inner"
-      />
-    </Container>
-  )
+  return <Element id={tabId} is={TabContent} canvas={true} className={clazz} />
 }
 
 TabBlock.craft = {
   displayName: 'Tab',
   custom: {
     noToolbar: true,
+    notTabContent: true,
   },
 }
 

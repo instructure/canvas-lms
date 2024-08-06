@@ -188,7 +188,9 @@ TabsBlock.craft = {
   related: {
     toolbar: TabsBlockToolbar,
   },
-  custom: {},
+  custom: {
+    notTabContent: true,
+  },
 }
 
 export {TabsBlock}

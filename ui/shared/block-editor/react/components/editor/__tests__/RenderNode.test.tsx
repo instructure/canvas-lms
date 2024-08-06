@@ -187,7 +187,7 @@ describe('BlockEditor', () => {
   it('chnages the rendered dom when changing props via the toolbar', async () => {
     renderEditor()
     const headingBlock = getHeading()
-    expect(headingBlock?.parentElement?.tagName).toBe('H2')
+    expect(headingBlock.firstElementChild?.tagName).toBe('H2')
 
     await user.click(headingBlock)
     await user.click(headingBlock)
@@ -203,6 +203,6 @@ describe('BlockEditor', () => {
     })
     await user.click(screen.getByText('Heading 3'))
 
-    expect(getHeading().parentElement?.tagName).toBe('H3')
+    expect(getHeading().firstElementChild?.tagName).toBe('H3')
   })
 })
