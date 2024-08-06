@@ -77,7 +77,7 @@ const AuthorInfoBase = ({breakpoints, ...props}) => {
   } else if (breakpoints.mobileOnly) {
     avatarSize = 'small'
   } else {
-    //tablet
+    // tablet
     avatarSize = props.threadMode ? 'x-small' : 'small'
   }
 
@@ -399,8 +399,9 @@ NameLink.propTypes = {
   userType: PropTypes.string,
   user: User.shape,
   searchTerm: PropTypes.string,
-  timestampTextSize: PropTypes.string,
   mobileOnly: PropTypes.bool,
+  authorNameTextSize: PropTypes.string,
+  discussionEntryProps: PropTypes.object,
 }
 
 export const AuthorInfo = WithBreakpoints(AuthorInfoBase)

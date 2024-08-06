@@ -40,7 +40,6 @@
   end
 
   show_full_discussion_immediately = @context.root_account.feature_enabled?(:discussion_checkpoints)
-  discussion_preview_div_style = show_full_discussion_immediately ? 'width: 100%' : 'width: 600px; margin: 10px auto;'
 %>
 
 <% css_bundle :submission %>
@@ -50,8 +49,13 @@
 
 <% provide :page_title do %><%= join_title @assignment.title, t("Submission Preview") %><% end %>
 <% if @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic %>
-  <div style="<%= discussion_preview_div_style %>">
-    <% unless show_full_discussion_immediately %>
+  <%
+    @entries = @assignment.discussion_topic.for_group_discussion? ? @assignment.discussion_topic.all_child_entries_from_user(@user) : @assignment.discussion_topic.discussion_entries.active.for_user(@user)
+    hidden_user_id = params[:hide_student_name] ? @user.id : nil
+    discussion_iframe_src = context_url(@entries.first.discussion_topic.context, :context_discussion_topic_url, @entries.first.discussion_topic.id, :embed => true, :entry_id => @entries.first.id, :hidden_user_id => hidden_user_id, :speed_grader => 1)
+  %>
+  <% unless show_full_discussion_immediately %>
+    <div style="width: 600px; margin: 10px auto;">
       <p>
         <% if assignment_visible_to_user = @assignment.visible_to_user?(@current_user)%>
           <% if @assignment.discussion_topic.for_group_discussion? && (group = @assignment.discussion_topic.group_category.group_for(@user)) %>
@@ -78,30 +82,23 @@
           <% end %>
         <% end %>
       </p>
-    <% end %>
-    <%
-      @entries = @assignment.discussion_topic.for_group_discussion? ? @assignment.discussion_topic.all_child_entries_from_user(@user) : @assignment.discussion_topic.discussion_entries.active.for_user(@user)
-      hidden_user_id = params[:hide_student_name] ? @user.id : nil
-      discussion_iframe_src = context_url(@entries.first.discussion_topic.context, :context_discussion_topic_url, @entries.first.discussion_topic.id, :embed => true, :entry_id => @entries.first.id, :hidden_user_id => hidden_user_id, :speed_grader => 1)
-    %>
-    <% if show_full_discussion_immediately %>
-      <div class="ef-file-preview-stretch">
-        <iframe
-          id="discussion_preview_iframe"
-          title="<%= t "Graded discussion submission" %>"
-          src="<%= discussion_iframe_src %>"
-          class="ef-file-preview-frame">
-        </iframe>
-      </div>
-    <% else %>
-      <% @entries.each do |entry| %>
-        <%= render :partial => 'discussion_topics/entry', :object => entry, :locals => {:out_of_context => true, :skip_sub_entries => true, :link_to_headless => true, :hide_student_names => params[:hide_student_name], :assignment_visible_to_user => assignment_visible_to_user} %>
-      <% end %>
-      <div style="text-align: center; font-size: 1.2em; margin-top: 10px; display: none;">
-        <a href="<%= context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :headless => 1, :combined => 1, :embed => true, :speed_grader => 1) %>" class="forward"><%= t('show_entire_discussion', 'Show the Entire Discussion') %></a>
-      </div>
-    <% end %>
-  </div>
+        <% @entries.each do |entry| %>
+          <%= render :partial => 'discussion_topics/entry', :object => entry, :locals => {:out_of_context => true, :skip_sub_entries => true, :link_to_headless => true, :hide_student_names => params[:hide_student_name], :assignment_visible_to_user => assignment_visible_to_user} %>
+        <% end %>
+        <div style="text-align: center; font-size: 1.2em; margin-top: 10px; display: none;">
+          <a href="<%= context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :headless => 1, :combined => 1, :embed => true, :speed_grader => 1) %>" class="forward"><%= t('show_entire_discussion', 'Show the Entire Discussion') %></a>
+        </div>
+    </div>
+  <% else %>
+    <div class="ef-file-preview-stretch">
+      <iframe
+        id="discussion_preview_iframe"
+        title="<%= t 'Graded discussion submission' %>"
+        src="<%= discussion_iframe_src %>"
+        class="ef-file-preview-frame"
+      </iframe>
+    </div>
+  <% end %>
 <% elsif @submission.submission_type == "online_url" %>
   <div style="text-align: center; width: 500px; margin: 10px auto; font-size: 0.8em;">
     <% image = @submission.attachment if @submission.processed? %>
