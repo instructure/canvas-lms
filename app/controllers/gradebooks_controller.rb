@@ -1040,6 +1040,23 @@ class GradebooksController < ApplicationController
 
     return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
 
+    if @context.feature_enabled?(:platform_service_speedgrader) && (params[:platform_sg].nil? || value_to_boolean(params[:platform_sg]))
+      @page_title = t("SpeedGrader")
+      @body_classes << "full-width padless-content"
+
+      remote_env(speedgrader: Services::PlatformServiceSpeedgrader.launch_url)
+
+      env = {
+        GRADE_BY_QUESTION_SUPPORTED: nil
+      }
+      js_env(env)
+
+      deferred_js_bundle :platform_speedgrader
+
+      render html: "".html_safe, layout: "bare"
+      return
+    end
+
     @assignment = @context.assignments.active.find(params[:assignment_id])
 
     if @assignment.unpublished?
@@ -1170,26 +1187,10 @@ class GradebooksController < ApplicationController
 
         append_sis_data(env)
 
-        if @context.feature_enabled?(:platform_service_speedgrader) &&
-           (params[:platform_sg].nil? || value_to_boolean(params[:platform_sg]))
-
-          @page_title = t("SpeedGrader")
-          @body_classes << "full-width padless-content"
-
-          remote_env(speedgrader: Services::PlatformServiceSpeedgrader.launch_url)
-
-          env[:GRADE_BY_QUESTION_SUPPORTED] = @assignment.supports_grade_by_question?
-          js_env(env)
-
-          deferred_js_bundle :platform_speedgrader
-
-          render html: "".html_safe, layout: "bare"
-        else
-          js_env(env)
-          render :speed_grader, locals: {
-            anonymize_students: @assignment.anonymize_students?
-          }
-        end
+        js_env(env)
+        render :speed_grader, locals: {
+          anonymize_students: @assignment.anonymize_students?
+        }
       end
 
       format.json do

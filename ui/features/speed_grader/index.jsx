@@ -122,6 +122,7 @@ ready(() => {
       })
   } else {
     // touch punch simulates mouse events for touch devices
+    // eslint-disable-next-line import/extensions
     require('./touch_punch.js')
 
     const mountPoint = document.getElementById('speed_grader_loading')
