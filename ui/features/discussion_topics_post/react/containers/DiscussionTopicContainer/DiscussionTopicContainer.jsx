@@ -32,7 +32,7 @@ import {
   DELETE_DISCUSSION_TOPIC,
   SUBSCRIBE_TO_DISCUSSION_TOPIC,
   UPDATE_DISCUSSION_READ_STATE,
-  UPDATE_DISCUSSION_TOPIC
+  UPDATE_DISCUSSION_TOPIC,
 } from '../../../graphql/Mutations'
 import {LockedDiscussion} from '../../components/LockedDiscussion/LockedDiscussion'
 import {PodcastFeed} from '../../components/PodcastFeed/PodcastFeed'
@@ -598,4 +598,6 @@ DiscussionTopicContainer.propTypes = {
    * useState function to set the Discussion Summary
    */
   setIsSummaryEnabled: PropTypes.func,
+  expandedTopicReply: PropTypes.bool,
+  setExpandedTopicReply: PropTypes.func,
 }

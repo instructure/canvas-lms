@@ -40,13 +40,13 @@ describe "SpeedGrader - discussion submissions" do
     )
     @course.enroll_user(@student, "StudentEnrollment", enrollment_state: "active")
     # create and enroll second student
-    student_2 = user_with_pseudonym(
+    @student_2 = user_with_pseudonym(
       name: "second student",
       active_user: true,
       username: "student2@example.com",
       password: "qwertyuiop"
     )
-    @course.enroll_user(student_2, "StudentEnrollment", enrollment_state: "active")
+    @course.enroll_user(@student_2, "StudentEnrollment", enrollment_state: "active")
 
     # create discussion entries
     @first_message = "first student message"
@@ -56,9 +56,9 @@ describe "SpeedGrader - discussion submissions" do
                              .create!(user: @student, message: @first_message)
     entry.update_topic
     entry.context_module_action
-    @attachment_thing = attachment_model(context: student_2, filename: "horse.doc", content_type: "application/msword")
+    @attachment_thing = attachment_model(context: @student_2, filename: "horse.doc", content_type: "application/msword")
     entry_2 = @discussion_topic.discussion_entries
-                               .create!(user: student_2, message: @second_message, attachment: @attachment_thing)
+                               .create!(user: @student_2, message: @second_message, attachment: @attachment_thing)
     entry_2.update_topic
     entry_2.context_module_action
   end
@@ -265,6 +265,18 @@ describe "SpeedGrader - discussion submissions" do
         end
 
         check_element_has_focus f("#prev-student-button")
+      end
+
+      it "opens the student context card when clicking on the student name" do
+        Speedgrader.visit(@course.id, @assignment.id)
+
+        in_frame("speedgrader_iframe") do
+          in_frame("discussion_preview_iframe") do
+            wait_for_ajaximations
+            f("[data-testid='author_name']").click
+            expect(f(".StudentContextTray-Header")).to be_present
+          end
+        end
       end
 
       it "displays whole discussion with hidden student names" do
