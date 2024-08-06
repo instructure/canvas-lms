@@ -226,6 +226,52 @@ describe "Block Editor", :ignore_js_errors do
       expect(f(".block.image-block").size.height).to eq(110)
       expect(f(".block.image-block").size.width).to eq(110)
     end
+
+    context "image block" do
+      before do
+        stub_rcs_config
+      end
+
+      it "can add course images" do
+        @root_folder = Folder.root_folders(@course).first
+        @image = @root_folder.attachments.build(context: @course)
+        path = File.expand_path(File.dirname(__FILE__) + "/../../../public/images/email.png")
+        @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+        @image.save!
+
+        get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+        wait_for_block_editor
+        block_toolbox_toggle.click
+
+        drag_and_drop_element(block_toolbox_image, blank_section)
+        image_block_upload_button.click
+        course_images_tab.click
+        image_thumbnails[0].click
+        submit_button.click
+        expected_src = "/courses/#{@course.id}/files/#{@image.id}/preview"
+        expect(image_block_image["src"]).to include(expected_src)
+      end
+
+      it "can add user images" do
+        @root_folder = Folder.root_folders(@course).first
+        @image = @root_folder.attachments.build(context: @user)
+        path = File.expand_path(File.dirname(__FILE__) + "/../../../public/images/email.png")
+        @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+        @image.save!
+
+        get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+        wait_for_block_editor
+        block_toolbox_toggle.click
+
+        drag_and_drop_element(block_toolbox_image, blank_section)
+        image_block_upload_button.click
+        user_images_tab.click
+        image_thumbnails[0].click
+        submit_button.click
+        expected_src = "/users/#{@user.id}/files/#{@image.id}/preview"
+        expect(image_block_image["src"]).to include(expected_src)
+      end
+    end
   end
 
   describe("resizing images that maintain aspect ratio") do

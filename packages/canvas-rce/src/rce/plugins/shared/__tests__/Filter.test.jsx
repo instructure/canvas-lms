@@ -18,7 +18,8 @@
 
 import React from 'react'
 import {fireEvent, render, waitFor} from '@testing-library/react'
-import Filter, {useFilterSettings} from '../Filter'
+import Filter from '../Filter'
+import { useFilterSettings } from '../useFilterSettings'
 import {ICON_MAKER_ICONS} from '../../instructure_icon_maker/svg/constants'
 
 describe('RCE Plugins > Filter', () => {

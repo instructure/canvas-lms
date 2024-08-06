@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useCallback, useContext, useState} from 'react'
 import {useNode, type Node} from '@craftjs/core'
 
 import {Button, IconButton} from '@instructure/ui-buttons'
@@ -26,7 +26,6 @@ import {Text} from '@instructure/ui-text'
 import {IconArrowOpenDownLine, IconUploadLine} from '@instructure/ui-icons'
 import {type ViewOwnProps} from '@instructure/ui-view'
 
-import {UploadFileModal} from '../../../../FileUpload/UploadFileModal'
 import {IconSizePopup} from './ImageSizePopup'
 import {
   EMPTY_IMAGE_WIDTH,
@@ -34,7 +33,7 @@ import {
   type ImageBlockProps,
   type ImageConstraint,
 } from './types'
-
+import {AddImageModal} from '../../../editor/AddImageModal'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('block-editor/image-block')
@@ -114,6 +113,7 @@ const ImageBlockToolbar = () => {
         withBackground={false}
         withBorder={false}
         onClick={handleShowUploadModal}
+        data-testid="upload-image-button"
       >
         <IconUploadLine size="x-small" />
       </IconButton>
@@ -160,14 +160,7 @@ const ImageBlockToolbar = () => {
         maintainAspectRatio={props.maintainAspectRatio}
         onChange={handleChangeSz}
       />
-
-      <UploadFileModal
-        imageUrl={null}
-        open={showUploadModal}
-        variant={props.variant}
-        onDismiss={handleDismissModal}
-        onSave={handleSave}
-      />
+      <AddImageModal open={showUploadModal} onSubmit={handleSave} onDismiss={handleDismissModal} />
     </Flex>
   )
 }

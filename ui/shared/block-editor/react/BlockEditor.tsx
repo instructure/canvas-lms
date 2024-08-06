@@ -77,7 +77,7 @@ export default function BlockEditor({
     }
   }, [json, version])
 
-  const handleNodesChange = useCallback(query => {
+  const handleNodesChange = useCallback((query: any) => {
     // @ts-expect-error
     window.block_editor = query
     // console.log(JSON.parse(query.serialize()))
