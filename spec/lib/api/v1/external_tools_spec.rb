@@ -35,7 +35,8 @@ describe Api::V1::ExternalTools do
                  domain: "google.com",
                  consumer_key: "12345",
                  shared_secret: "secret",
-                 privacy_level: "public" }
+                 privacy_level: "public",
+                 unified_tool_id: "12345" }
       tool = @course.context_external_tools.new(params)
       tool.settings = { selection_width: 1234, selection_height: 99, icon_url: "www.google.com/icon" }
       tool.save
@@ -55,6 +56,7 @@ describe Api::V1::ExternalTools do
       expect(json["privacy_level"]).to eq tool.privacy_level
       expect(json["custom_fields"]).to eq tool.custom_fields
       expect(json["version"]).to eq "1.1"
+      expect(json["unified_tool_id"]).to eq tool.unified_tool_id
     end
 
     it "generates json with 1.3 version" do
