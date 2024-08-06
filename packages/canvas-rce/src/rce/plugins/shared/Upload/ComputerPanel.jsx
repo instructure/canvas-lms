@@ -256,6 +256,7 @@ export default function ComputerPanel({theFile, setFile, setError, accept, label
   return (
     <div ref={panelRef}>
       <FileDrop
+        data-testid="filedrop"
         accept={accept}
         onDropAccepted={([file]) => {
           if (messages.length) {

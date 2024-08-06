@@ -31,8 +31,11 @@ import UploadFileModal from './UploadFileModal'
 import RCEWrapper from '../../../RCEWrapper'
 import {Editor} from 'tinymce'
 
+import {UploadCanvasPanelIds} from '../canvasContentUtils'
+
 export const UploadFilePanelIds = ['COMPUTER', 'URL'] as const
-export type UploadFilePanelId = (typeof UploadFilePanelIds)[number]
+export const FullPanelIds = [...UploadCanvasPanelIds, ...UploadFilePanelIds]
+export type UploadFilePanelId = (typeof FullPanelIds)[number]
 
 /**
  * Handles uploading data based on what type of data is submitted.
@@ -43,7 +46,7 @@ export const handleSubmit = (
   selectedPanel: UploadFilePanelId,
   uploadData,
   storeProps,
-  source,
+  _source,
   afterInsert: Function = () => undefined
 ) => {
   Bridge.focusEditor(RCEWrapper.getByEditor(editor)) // necessary since it blurred when the modal opened
@@ -99,7 +102,7 @@ export interface UploadFileProps {
   onSubmit?: Function
   onDismiss: Function
   accept?: string[] | string
-  editor: Editor
+  editor?: Editor
   label: string
   panels?: UploadFilePanelId[]
   requireA11yAttributes?: boolean

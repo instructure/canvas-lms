@@ -19,6 +19,7 @@
 require_relative "../../common"
 
 module BlockEditorPage
+  # Stepper
   def stepper_modal_selector
     '[role="dialog"][aria-label="Create a new page"]'
   end
@@ -63,6 +64,7 @@ module BlockEditorPage
     f('[data-testid="stepper-font-pairings"]')
   end
 
+  # Block Toolbox
   def block_toolbox_toggle
     f("#toolbox-toggle+label")
   end
@@ -71,6 +73,11 @@ module BlockEditorPage
     f('[role="dialog"][aria-label="Toolbox"]')
   end
 
+  def block_toolbox_image
+    f(".toolbox-item.item-image")
+  end
+
+  # Blocks
   def block_resize_handle_se
     f(".block-resizer.se")
   end
@@ -82,5 +89,39 @@ module BlockEditorPage
   def click_block_toolbar_menu_item(menu_button_name, menu_item_name)
     fj("button:contains('#{menu_button_name}')").click
     fj("[role=\"menuitemcheckbox\"]:contains('#{menu_item_name}')").click
+  end
+
+  def image_block_image
+    f(".block.image-block > img")
+  end
+
+  def image_block_upload_button
+    f('[data-testid="upload-image-button"]')
+  end
+
+  # Sections
+  def blank_section
+    f(".blank-section__inner")
+  end
+
+  # Add Image Modal
+  def image_modal_tabs
+    ff('[role="tab"]')
+  end
+
+  def course_images_tab
+    image_modal_tabs[2]
+  end
+
+  def user_images_tab
+    image_modal_tabs[3]
+  end
+
+  def image_thumbnails
+    ff('[class*="view--block-img"]')
+  end
+
+  def submit_button
+    f('button[type="submit"]')
   end
 end

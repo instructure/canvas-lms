@@ -31,8 +31,15 @@ export {instuiPopupMountNode} from './util/fullscreenHelpers'
 export {Mathml}
 
 export {RCEVariantValues} from './rce/RCEVariants'
+export {
+  UploadFilePanelIds,
+  handleSubmit,
+  UploadFile,
+  type UploadFilePanelId,
+  type UploadFileProps,
+} from './rce/plugins/shared/Upload'
 
-export function renderIntoDiv(editorEl, props, cb) {
+export function renderIntoDiv(editorEl: HTMLElement, props: any, cb?: (ref: any) => void) {
   const language = normalizeLocale(props.language)
   setLocale(language)
   if (process.env.BUILD_LOCALE || language === 'en') {
@@ -56,10 +63,10 @@ export function renderIntoDiv(editorEl, props, cb) {
   }
 }
 
-export function getRCSAuthenticationHeaders(jwt) {
+export function getRCSAuthenticationHeaders(jwt: string) {
   return headerFor(jwt)
 }
 
-export function getRCSOriginFromHost(host) {
+export function getRCSOriginFromHost(host: string) {
   return originFromHost(host)
 }
