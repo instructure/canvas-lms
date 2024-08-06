@@ -375,7 +375,12 @@ const DiscussionTopicManager = props => {
                 {isSplitScreenViewOverlayed && isSplitScreenViewOpen && (
                   <Mask onClick={() => closeView()} />
                 )}
-                <DrawerLayout.Content label="Splitscreen View Content">
+                <DrawerLayout.Content 
+                  label="Splitscreen View Content"
+                  themeOverride={{
+                    overflowY: 'unset'
+                  }}
+                >
                   <View
                     display="block"
                     height={isModuleItem ? '85vh' : '90vh'}
