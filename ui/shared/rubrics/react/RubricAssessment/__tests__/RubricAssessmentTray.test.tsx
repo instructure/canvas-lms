@@ -75,19 +75,6 @@ describe('RubricAssessmentTray Tests', () => {
       expect(getByTestId('rubric-assessment-footer')).toBeInTheDocument()
     })
 
-    it('should render the vertical view option by default if a criterion has greater than 5 ratings', () => {
-      const rubric = {...RUBRIC_DATA}
-      rubric.criteria = [...rubric.criteria]
-      const ratings = [...rubric.criteria[0].ratings]
-      ratings.push({description: '6', points: 6, id: '6', longDescription: '6th rating'})
-      rubric.criteria[0] = {...rubric.criteria[0], ratings}
-      const {getByTestId, queryAllByTestId} = renderComponent({rubric})
-      const viewModeSelect = getByTestId('rubric-assessment-view-mode-select') as HTMLSelectElement
-
-      expect(viewModeSelect.value).toBe('Vertical')
-      expect(queryAllByTestId('rubric-assessment-vertical-display')).toHaveLength(2)
-    })
-
     it('should switch to the horizontal view when the horizontal option is selected', () => {
       const {getByTestId, queryAllByTestId, queryByRole} = renderComponent()
       const viewModeSelect = getByTestId('rubric-assessment-view-mode-select') as HTMLSelectElement
@@ -586,31 +573,13 @@ describe('RubricAssessmentTray Tests', () => {
   })
 
   describe('Peer Review tests', () => {
-    const rubricAssessors = [
-      {id: '1', name: 'Teacher'},
-      {id: '2', name: 'Peer Reviewer'},
-    ]
-
     const renderPeerReviewComponent = () => {
-      return renderComponent({isPeerReview: true, rubricAssessors, rubricAssessmentId: '2'})
+      return renderComponent({isPeerReview: true})
     }
 
     it('should display the peer review text when in peer review mode', () => {
       const {getByTestId} = renderPeerReviewComponent()
       expect(getByTestId('rubric-assessment-header')).toHaveTextContent('Peer Review')
-    })
-
-    it('should render the peer review assessment dropdown', () => {
-      const {getByTestId, queryAllByRole} = renderPeerReviewComponent()
-      const assessorSelect = getByTestId('rubric-assessment-accessor-select') as HTMLSelectElement
-      expect(assessorSelect).toBeInTheDocument()
-      expect(assessorSelect.value).toBe('Peer Reviewer')
-
-      fireEvent.click(assessorSelect)
-      const assessors = queryAllByRole('option') as HTMLElement[]
-      expect(assessors.length).toBe(2)
-      expect(assessors[0].innerHTML).toBe('Teacher')
-      expect(assessors[1].innerHTML).toBe('Peer Reviewer')
     })
   })
 

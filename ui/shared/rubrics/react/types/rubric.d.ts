@@ -22,7 +22,6 @@ export type Rubric = {
   criteriaCount: number
   hidePoints?: boolean
   freeFormCriterionComments?: boolean
-  locations: string[]
   buttonDisplay?: string
   ratingOrder?: string
   pointsPossible: number
@@ -67,7 +66,6 @@ export type RubricAssessmentData = {
   id: string
   points?: number
   criterionId: string
-  ratingId?: string
   learningOutcomeId?: string
   comments: string
   commentsEnabled: boolean

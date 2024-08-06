@@ -27,6 +27,10 @@ class RubricAssessmentTray
       f("[data-testid='enhanced-rubric-assessment-tray']")
     end
 
+    def container
+      f("[data-testid='enhanced-rubric-assessment-container']")
+    end
+
     def traditional_grid_rubric_assessment_view
       f("[data-testid='rubric-assessment-traditional-view']")
     end

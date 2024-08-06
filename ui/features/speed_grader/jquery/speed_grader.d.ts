@@ -545,7 +545,7 @@ export type SpeedGrader = {
   renderProvisionalGradeSelector: (options?: {showingNewStudent?: boolean}) => void
   revertFromFormSubmit: (options?: {draftComment?: boolean; errorSubmitting?: boolean}) => void
   setUpAssessmentAuditTray: () => void
-  setUpRubricAssessmentTrayWrapper: () => void
+  setUpRubricAssessmentContainerWrapper: () => void
   saveRubricAssessment: (
     rubricAssessmentData: {[key: string]: string | boolean | number},
     jqueryElement?: JQuery<HTMLElement>

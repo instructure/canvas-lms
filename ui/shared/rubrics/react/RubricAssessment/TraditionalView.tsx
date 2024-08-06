@@ -36,7 +36,7 @@ import {
   escapeNewLineText,
   htmlEscapeCriteriaLongDescription,
   rangingFrom,
-  findCriterionMatchingRatingIndex,
+  findCriterionMatchingRatingId,
 } from './utils/rubricUtils'
 import {OutcomeTag} from './OutcomeTag'
 
@@ -67,8 +67,19 @@ export const TraditionalView = ({
   rubricSavedComments,
   onUpdateAssessmentData,
 }: TraditionalViewProps) => {
+  const pointsColumnWidth = hidePoints ? 0 : 8.875
+  const criteriaColumnWidth = 11.25
+  const maxRatingsCount = Math.max(...criteria.map(criterion => criterion.ratings.length))
+  const ratingsColumnMinWidth = 8.5 * maxRatingsCount
+  const gridMinWidth = `${pointsColumnWidth + criteriaColumnWidth + ratingsColumnMinWidth}rem`
+
   return (
-    <View as="div" margin="0 0 small 0" data-testid="rubric-assessment-traditional-view">
+    <View
+      as="div"
+      margin="0 0 small 0"
+      data-testid="rubric-assessment-traditional-view"
+      minWidth={gridMinWidth}
+    >
       <View
         as="div"
         width="100%"
@@ -214,7 +225,11 @@ const CriterionRow = ({
   const hideComments =
     isFreeFormCriterionComments || (isPreviewMode && !criterionAssessment?.comments?.length)
 
-  const selectedRatingId = criterionAssessment?.ratingId
+  const selectedRatingId = findCriterionMatchingRatingId(
+    criterion.ratings,
+    criterion.criterionUseRange,
+    criterionAssessment
+  )
 
   return (
     <View as="div" maxWidth="100%">
@@ -332,7 +347,7 @@ const CriterionRow = ({
                 <Grid.Row colSpacing="none">
                   {criterionRatings.map((rating, index) => {
                     const isHovered = hoveredRatingIndex === index
-                    const isSelected = selectedRatingId === rating.id
+                    const isSelected = rating.id && selectedRatingId === rating.id
                     const isLastIndex = criterionRatings.length - 1 === index
 
                     const borderColor = isHovered || isSelected ? 'brand' : 'primary'

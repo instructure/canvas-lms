@@ -35,10 +35,7 @@ import {TextArea} from '@instructure/ui-text-area'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {CommentLibrary} from './CommentLibrary'
 import {CriteriaReadonlyComment} from './CriteriaReadonlyComment'
-import {
-  findCriterionMatchingRatingIndex,
-  htmlEscapeCriteriaLongDescription,
-} from './utils/rubricUtils'
+import {findCriterionMatchingRatingId, htmlEscapeCriteriaLongDescription} from './utils/rubricUtils'
 import {possibleString} from '../Points'
 import {OutcomeTag} from './OutcomeTag'
 
@@ -133,7 +130,11 @@ export const CriterionRow = ({
   const [commentText, setCommentText] = useState<string>(criterionAssessment?.comments ?? '')
   const [isSaveCommentChecked, setIsSaveCommentChecked] = useState(false)
 
-  const selectedRatingId = criterionAssessment?.ratingId
+  const selectedRatingId = findCriterionMatchingRatingId(
+    criterion.ratings,
+    criterion.criterionUseRange,
+    criterionAssessment
+  )
 
   useEffect(() => {
     setCommentText(criterionAssessment?.comments ?? '')

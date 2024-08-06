@@ -141,7 +141,6 @@ export const ViewRubrics = ({canManageRubrics = false, showHeader = true}: ViewR
               title: curr.title,
               pointsPossible: curr.pointsPossible,
               criteriaCount: curr.criteriaCount,
-              locations: [], // TODO: add locations once we have them
               ratingOrder: curr.ratingOrder,
               hidePoints: curr.hidePoints,
               freeFormCriterionComments: curr.freeFormCriterionComments,

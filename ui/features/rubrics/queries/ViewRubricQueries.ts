@@ -44,6 +44,7 @@ const COURSE_RUBRICS_QUERY = gql`
               description
               longDescription
               points
+              id: _id
             }
             points
             longDescription
@@ -103,6 +104,7 @@ const RUBRIC_PREVIEW_QUERY = gql`
           description
           longDescription
           points
+          id: _id
         }
         points
         longDescription

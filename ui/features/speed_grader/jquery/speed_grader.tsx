@@ -55,7 +55,7 @@ import AssessmentAuditButton from '../react/AssessmentAuditTray/components/Asses
 import AssessmentAuditTray from '../react/AssessmentAuditTray/index'
 import CommentArea from '../react/CommentArea'
 import GradeLoadingSpinner from '../react/GradeLoadingSpinner'
-import RubricAssessmentTrayWrapper from '../react/RubricAssessmentTrayWrapper'
+import RubricAssessmentContainerWrapper from '../react/RubricAssessmentContainerWrapper'
 import ScreenCaptureIcon from '../react/ScreenCaptureIcon'
 import {originalityReportSubmissionKey} from '@canvas/grading/originalityReportHelper'
 import PostPolicies from '../react/PostPolicies/index'
@@ -159,7 +159,7 @@ import type {
   RubricAssessmentUnderscore,
   RubricOutcomeUnderscore,
   RubricUnderscoreType,
-} from '../react/RubricAssessmentTrayWrapper/utils'
+} from '../react/RubricAssessmentContainerWrapper/utils'
 import {SpeedGraderCheckpointsWrapper} from '../react/SpeedGraderCheckpoints/SpeedGraderCheckpointsWrapper'
 
 declare global {
@@ -1547,7 +1547,13 @@ EG = {
     if (enhanced_rubrics_enabled) {
       const isOpen = isClosed ? false : !useStore.getState().rubricAssessmentTrayOpen
       useStore.setState({rubricAssessmentTrayOpen: isOpen})
+      toggleGradeVisibility(!isOpen)
       this.refreshFullRubric()
+
+      if (!isOpen) {
+        $('.toggle_full_rubric').focus()
+      }
+
       return
     }
 
@@ -1938,21 +1944,18 @@ EG = {
     ReactDOM.render(button, document.getElementById(ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT))
   },
 
-  setUpRubricAssessmentTrayWrapper() {
+  setUpRubricAssessmentContainerWrapper() {
     ReactDOM.render(
-      <RubricAssessmentTrayWrapper
+      <RubricAssessmentContainerWrapper
         rubric={ENV.rubric as RubricUnderscoreType}
         rubricOutcomeData={ENV.rubric_outcome_data as RubricOutcomeUnderscore[]}
-        onAccessorChange={accessorId => {
-          $('#rubric_assessments_select').val(accessorId)
-          handleSelectedRubricAssessmentChanged()
-        }}
+        onDismiss={() => EG.toggleFullRubric('close')}
         onSave={data => {
           useStore.setState({rubricAssessmentTrayOpen: false})
           this.saveRubricAssessment(data)
         }}
       />,
-      document.getElementById('speed_grader_rubric_assessment_tray_wrapper')
+      document.getElementById('enhanced-rubric-assessment-container')
     )
   },
 
@@ -3108,7 +3111,6 @@ EG = {
 
       const {hide_points} = (window?.jsonData?.rubric_association ?? {}) as {hide_points: boolean}
       useStore.setState({
-        rubricAssessors: showSelectMenu ? selectMenuOptions : [],
         rubricHidePoints: hide_points,
       })
       handleSelectedRubricAssessmentChanged({validateEnteredData})
@@ -4279,7 +4281,7 @@ function setupSpeedGrader(
     useStore.setState({
       rubricSavedComments: rubricAssociation.summary_data?.saved_comments,
     })
-    EG.setUpRubricAssessmentTrayWrapper()
+    EG.setUpRubricAssessmentContainerWrapper()
   }
 }
 

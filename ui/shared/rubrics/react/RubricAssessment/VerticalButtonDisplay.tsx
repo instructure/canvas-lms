@@ -52,7 +52,7 @@ export const VerticalButtonDisplay = ({
     >
       {ratings.map((rating, index) => {
         const buttonDisplay = (ratings.length - (index + 1)).toString()
-        const isSelected = ratings[index]?.id === selectedRatingId
+        const isSelected = rating.id != null && rating.id === selectedRatingId
 
         const min = criterionUseRange ? rangingFrom(ratings, index) : undefined
 
