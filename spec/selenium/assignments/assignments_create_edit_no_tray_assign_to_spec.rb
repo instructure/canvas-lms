@@ -92,13 +92,17 @@ shared_examples_for "item assign to on page during assignment creation/update" d
   end
 
   it "does not recover a deleted card when adding an assignee" do
-    skip("needs a jira ticket for fixing")
     # Bug fix of LX-1619
     click_add_assign_to_card
     click_delete_assign_to_card(0)
     select_module_item_assignee(0, @section1.name)
 
     expect(selected_assignee_options.count).to be(1)
+  end
+
+  it "focuses on trashcan of new card when new card added" do
+    click_add_assign_to_card
+    check_element_has_focus(assign_to_card_delete_button[1])
   end
 
   context "Module overrides" do
