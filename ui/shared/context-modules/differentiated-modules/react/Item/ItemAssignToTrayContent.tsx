@@ -446,6 +446,7 @@ const ItemAssignToTrayContent = ({
   }, [courseId, itemContentId, itemType, JSON.stringify(defaultCards)])
 
   const handleAddCard = () => {
+    lastPerformedAction.current = {action: 'add'}
     if (onAddCard) {
       onAddCard()
       return
@@ -467,7 +468,6 @@ const ItemAssignToTrayContent = ({
         selectedAssigneeIds: [] as string[],
       } as ItemAssignToCardSpec,
     ]
-    lastPerformedAction.current = {action: 'add'}
     setAssignToCards(cards)
   }
 
