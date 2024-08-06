@@ -160,6 +160,7 @@ import type {
   RubricOutcomeUnderscore,
   RubricUnderscoreType,
 } from '../react/RubricAssessmentTrayWrapper/utils'
+import {SpeedGraderCheckpointsWrapper} from '../react/SpeedGraderCheckpoints/SpeedGraderCheckpointsWrapper'
 
 declare global {
   interface Window {
@@ -181,6 +182,7 @@ const SPEED_GRADER_SUBMISSION_COMMENTS_DOWNLOAD_MOUNT_POINT =
   'speed_grader_submission_comments_download_mount_point'
 const SPEED_GRADER_HIDDEN_SUBMISSION_PILL_MOUNT_POINT =
   'speed_grader_hidden_submission_pill_mount_point'
+const SPEED_GRADER_CHECKPOINTS_MOUNT_POINT = 'speed_grader_checkpoints_mount_point'
 const SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT = 'speed_grader_edit_status_mount_point'
 const SPEED_GRADER_EDIT_STATUS_MENU_SECONDARY_MOUNT_POINT =
   'speed_grader_edit_status_secondary_mount_point'
@@ -840,6 +842,21 @@ function renderHiddenSubmissionPill(submission: Submission) {
   }
 }
 
+function renderCheckpoints(submission: Submission) {
+  const mountPoint = document.getElementById(SPEED_GRADER_CHECKPOINTS_MOUNT_POINT)
+
+  if (mountPoint) {
+    ReactDOM.render(
+      <SpeedGraderCheckpointsWrapper
+        courseId={ENV.course_id}
+        assignmentId={submission.assignment_id}
+        studentId={submission.user_id}
+      />,
+      mountPoint
+    )
+  }
+}
+
 function renderCommentTextArea() {
   // unmounting is a temporary workaround for INSTUI-870 to allow
   // for textarea minheight to be reset
@@ -1189,7 +1206,9 @@ function updateSubmissionAndPageEffects(data?: {
         if (availableMountPointForStatusMenu()) {
           const mountPoint = availableMountPointForStatusMenu()
           if (!mountPoint) throw new Error('SpeedGrader: mount point for status menu not found')
-          renderStatusMenu(statusMenuComponent(submission), mountPoint)
+          if (!window.jsonData.has_sub_assignments) {
+            renderStatusMenu(statusMenuComponent(submission), mountPoint)
+          }
         }
       })
     })
@@ -2584,7 +2603,9 @@ EG = {
       const isInModeration = isModerated && !window.jsonData.grades_published_at
       const shouldRender = isMostRecent && !isClosedForSubmission && !isConcluded && !isInModeration
       const component = shouldRender ? statusMenuComponent(this.currentStudent.submission) : null
-      renderStatusMenu(component, mountPoint)
+      if (!window.jsonData.has_sub_assignments) {
+        renderStatusMenu(component, mountPoint)
+      }
     }
 
     EG.showDiscussion()
@@ -3782,6 +3803,9 @@ EG = {
     if (ENV.MANAGE_GRADES || (window.jsonData.context.concluded && ENV.READ_AS_ADMIN)) {
       renderHiddenSubmissionPill(submission)
     }
+
+    renderCheckpoints(submission)
+
     EG.updateStatsInHeader()
   },
 

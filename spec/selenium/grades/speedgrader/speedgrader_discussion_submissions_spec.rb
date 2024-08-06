@@ -203,6 +203,24 @@ describe "SpeedGrader - discussion submissions" do
       before do
         Account.site_admin.enable_feature!(:react_discussions_post)
         @course.root_account.enable_feature!(:discussion_checkpoints)
+
+        @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @checkpointed_discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 2.days.from_now }],
+          points_possible: 3
+        )
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @checkpointed_discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 3.days.from_now }],
+          points_possible: 9,
+          replies_required: 3
+        )
+
+        @custom_status = CustomGradeStatus.create!(name: "Custom Status", color: "#000000", root_account_id: @course.root_account_id, created_by: @teacher)
       end
 
       it "displays the SpeedGraderNavigator" do
@@ -244,6 +262,86 @@ describe "SpeedGrader - discussion submissions" do
             expect(f("body")).not_to contain_css(".discussions-search-filter")
           end
         end
+      end
+
+      it "changes grade and status and persist it correctly" do
+        # Loads Speedgrader for a student
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
+        wait_for_ajaximations
+
+        # Sets the grade for the reply_to_topic checkpoint
+
+        reply_to_topic_grade_input = ff("[data-testid='grade-input']")[0]
+        reply_to_topic_grade_input.send_keys("2")
+        reply_to_topic_grade_input.send_keys(:tab)
+        wait_for_ajaximations
+
+        reply_to_topic_assignment = @checkpointed_discussion.assignment.sub_assignments.find_by(sub_assignment_tag: "reply_to_topic")
+        reply_to_topic_submission = reply_to_topic_assignment.submissions.find_by(user: @student)
+
+        expect(reply_to_topic_submission.score).to eq 2
+
+        # Sets the grade for the reply_to_entry checkpoint
+
+        reply_to_entry_grade_input = ff("[data-testid='grade-input']")[1]
+        reply_to_entry_grade_input.send_keys("5")
+        reply_to_entry_grade_input.send_keys(:tab)
+        wait_for_ajaximations
+
+        reply_to_entry_assignment = @checkpointed_discussion.assignment.sub_assignments.find_by(sub_assignment_tag: "reply_to_entry")
+        reply_to_entry_submission = reply_to_entry_assignment.submissions.find_by(user: @student)
+
+        expect(reply_to_entry_submission.score).to eq 5
+
+        # Change the status of the reply_to_topic checkpoint to late and set the time late to 2 days
+
+        reply_to_topic_select = f("[data-testid='reply_to_topic-checkpoint-status-select']")
+
+        reply_to_topic_select.click
+        fj("span[role='option']:contains('Late')").click
+        wait_for_ajaximations
+
+        time_late_input = f("[data-testid='reply_to_topic-checkpoint-time-late-input']")
+        time_late_input.send_keys("2")
+        time_late_input.send_keys(:tab)
+        wait_for_ajaximations
+
+        reply_to_topic_submission.reload
+        expect(reply_to_topic_submission.late).to be true
+        expect(reply_to_topic_submission.late_policy_status).to eq "late"
+        expect(reply_to_topic_submission.seconds_late_override).to eq 2 * 24 * 3600
+
+        # Change the status of the reply_to_entry checkpoint to "Custom Status"
+
+        reply_to_entry_select = f("[data-testid='reply_to_entry-checkpoint-status-select']")
+
+        reply_to_entry_select.click
+        fj("span[role='option']:contains('Custom Status')").click
+        wait_for_ajaximations
+
+        reply_to_entry_submission.reload
+
+        expect(reply_to_entry_submission.custom_grade_status_id).to eq @custom_status.id
+
+        # Reload the page to make sure the grades, statuses and time late are persisted
+
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
+        wait_for_ajaximations
+
+        reply_to_topic_grade_input = ff("[data-testid='grade-input']")[0]
+        expect(reply_to_topic_grade_input).to have_value "2"
+
+        reply_to_entry_grade_input = ff("[data-testid='grade-input']")[1]
+        expect(reply_to_entry_grade_input).to have_value "5"
+
+        reply_to_topic_select = f("[data-testid='reply_to_topic-checkpoint-status-select']")
+        expect(reply_to_topic_select).to have_value "Late"
+
+        time_late_input = f("[data-testid='reply_to_topic-checkpoint-time-late-input']")
+        expect(time_late_input).to have_value "2"
+
+        reply_to_entry_select = f("[data-testid='reply_to_entry-checkpoint-status-select']")
+        expect(reply_to_entry_select).to have_value "Custom Status"
       end
     end
   end
