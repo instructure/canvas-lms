@@ -221,7 +221,12 @@ DueDateOverrideView.prototype.validateBeforeSave = function (data, errors) {
       this.render()
     } else if (!sectionViewRef?.allCardsValid()) {
       // Focuses inmmediately the visible errors in the component
-      sectionViewRef?.focusErrors()
+      const invalidInput = sectionViewRef?.focusErrors()
+      if(invalidInput){
+        errors.invalid_card = {$input: null, showError: this.showError}
+      }else{
+        delete errors.invalid_card;
+      }
     }
   } else {
     const hasEmptyDueDates = data.assignment_overrides.some(o => o.due_at === null)

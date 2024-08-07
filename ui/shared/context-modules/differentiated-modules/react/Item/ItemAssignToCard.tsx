@@ -267,7 +267,10 @@ export default forwardRef(function ItemAssignToCard(
       } else if (unparsedFieldKeys.size > 0) {
         key = dateInputKeys.find(k => unparsedFieldKeys.has(k))
       }
-      if (key) dateInputRefs.current[key]?.focus()
+      if (key) {
+        dateInputRefs.current[key]?.focus()
+        return dateInputRefs.current[key]
+      }
     },
   }))
 
