@@ -30,6 +30,7 @@ import {getSectionsByAssignment} from './queries/sectionsByAssignmentQuery'
 import {getSubmission} from './queries/submissionQuery'
 import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery'
 import {getSubmissionsByStudentIds} from './queries/submissionsByStudentsIdsQuery'
+import {getAssignmentsByCourseId} from './queries/assignmentsByCourseIdQuery'
 
 import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
 import {createSubmissionComment} from './mutations/createSubmissionCommentMutation'
@@ -68,6 +69,7 @@ ready(() => {
           theme,
           queryFns: {
             getAssignment,
+            getAssignmentsByCourseId,
             getCourse,
             getSectionsByAssignment,
             getSubmission,
