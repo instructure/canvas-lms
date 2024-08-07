@@ -12,6 +12,11 @@
     {{/unless}}
   </td>
 {{/if}}
+{{#if block_editor}}
+<td role="gridcell">
+  <i class="icon-document {{#if page_is_block}}icon-Solid{{/if}}" aria-label="{{page_type_label}}" />
+</td>
+{{/if}}
 <td role="gridcell">
   <div class="hide-overflow" role="text">
     <div class="wiki-page-title">

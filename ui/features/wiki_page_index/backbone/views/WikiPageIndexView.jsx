@@ -102,6 +102,8 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     if (!this.selectedPages) this.selectedPages = {}
     this.itemViewOptions.selectedPages = this.selectedPages
 
+    this.createNewPageWithBlockEditor = !!ENV.FEATURES?.BLOCK_EDITOR
+
     this.collection.on('fetch', () => {
       if (!this.fetched) {
         this.fetched = true
@@ -191,7 +193,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
   }
 
   toggleBlockEditor(ev) {
-    ENV.BLOCK_EDITOR = ev.target.checked
+    this.createNewPageWithBlockEditor = ev.target.checked
   }
 
   confirmDeletePages(ev) {
@@ -232,10 +234,17 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     $('body').removeClass('index')
     $('body').addClass('edit')
 
-    this.editModel = new WikiPage(
-      {editing_roles: this.default_editing_roles},
-      {contextAssetString: this.contextAssetString}
-    )
+    this.editModel = new WikiPage({
+      editing_roles: this.default_editing_roles,
+      contextAssetString: this.contextAssetString,
+      editor: this.createNewPageWithBlockEditor ? 'block_editor' : 'rce',
+      block_editor_attributes: this.createNewPageWithBlockEditor
+        ? {
+            version: '1',
+            blocks: [{data: undefined}],
+          }
+        : null,
+    })
     this.editView = new WikiPageEditView({
       model: this.editModel,
       wiki_pages_path: ENV.WIKI_PAGES_PATH,
@@ -390,7 +399,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     json.hasWikiIndexPlacements = this.wikiIndexPlacements.length > 0
     json.wikiIndexPlacements = this.wikiIndexPlacements
 
-    json.block_editor = ENV.BLOCK_EDITOR
+    json.block_editor = !!ENV.FEATURES?.BLOCK_EDITOR
     return json
   }
 }

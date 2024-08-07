@@ -38,6 +38,13 @@ describe WikiPagesController do
       expect(response).to be_successful
       expect(assigns[:js_env][:DISPLAY_SHOW_ALL_LINK]).to be(true)
     end
+
+    it "sets up js_env for the block editor" do
+      @course.account.enable_feature!(:block_editor)
+      get "index", params: { course_id: @course.id }
+      expect(response).to be_successful
+      expect(assigns[:js_env][:FEATURES][:BLOCK_EDITOR]).to be(true)
+    end
   end
 
   context "with page" do
