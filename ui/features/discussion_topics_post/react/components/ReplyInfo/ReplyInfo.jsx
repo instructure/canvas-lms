@@ -80,8 +80,16 @@ export const ReplyInfo = props => {
         },
       }}
       render={responsiveProps => (
-        <AccessibleContent alt={responsiveProps.screenReaderLabel}>
-          <div data-testid="replies-counter">{responsiveProps.displayText}</div>
+        <AccessibleContent alt={
+          props.showHide ?
+          I18n.t('Hide %{details}', {details: responsiveProps.screenReaderLabel}) :
+          responsiveProps.screenReaderLabel
+        }>
+          <div data-testid="replies-counter">{
+            props.showHide ?
+            I18n.t(`Hide %{details}`, {details: responsiveProps.displayText}) :
+            responsiveProps.displayText
+        }</div>
         </AccessibleContent>
       )}
     />
@@ -97,4 +105,8 @@ ReplyInfo.propTypes = {
    * The number of unread replies
    */
   unreadCount: PropTypes.number,
+  /**
+   * If the component should display "Hide"
+   */
+  showHide: PropTypes.bool,
 }

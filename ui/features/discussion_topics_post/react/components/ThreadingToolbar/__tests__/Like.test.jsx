@@ -64,15 +64,15 @@ describe('Like', () => {
   })
 
   it('displays like count', () => {
-    const {getByText} = setup({likeCount: 2})
+    const {getByText, getByTestId} = setup({likeCount: 2})
     expect(getByText('Like count: 2')).toBeTruthy()
-    expect(getByText('2 Likes')).toBeTruthy()
+    expect(getByTestId('like-count').textContent).toContain('2 Likes')
   })
 
   it('displays 1 like', () => {
-    const {getByText} = setup({likeCount: 1})
+    const {getByText, getByTestId} = setup({likeCount: 1})
     expect(getByText('Like count: 1')).toBeTruthy()
-    expect(getByText('1 Like')).toBeTruthy()
+    expect(getByTestId('like-count').textContent).toContain('1 Like')
   })
 
   it('indicates like status', () => {
@@ -98,20 +98,5 @@ describe('Like', () => {
     expect(queryByTestId('liked-icon')).toBeTruthy()
     expect(queryByText('Like post from Xerxes')).toBeFalsy()
     expect(queryByText('Unlike post from Xerxes')).toBeTruthy()
-  })
-
-  describe('Mobile', () => {
-    beforeEach(() => {
-      responsiveQuerySizes.mockImplementation(() => ({
-        mobile: {maxWidth: '1024px'},
-      }))
-    })
-
-    it('uses mobile prop values', () => {
-      const container = setup()
-      expect(container.getByTestId('like-button').parentNode).toHaveStyle(
-        'margin: 0px 0.375rem 0px 0px'
-      )
-    })
   })
 })

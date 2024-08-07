@@ -57,27 +57,25 @@ export function Like({...props}) {
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {
-          itemSpacing: '0 xx-small 0 0',
           isMobile: true,
         },
         desktop: {
-          itemSpacing: 'none',
           isMobile: false,
         },
       }}
       render={responsiveProps => (
-        <View className="discussion-like-btn" margin={responsiveProps.itemSpacing}>
+        <View className="discussion-like-btn">
           <Link
             isWithinText={false}
             as="button"
             onClick={props.onClick}
-            renderIcon={icon()}
             data-testid="like-button"
             interaction={props.interaction}
           >
             <PresentationContent>
               <Text weight="bold" data-testid="like-count" size='medium'>
-                {props.likeCount > 0 && props.likeCount}
+                {icon()}
+                {props.likeCount > 0 && <View margin="0 0 0 xx-small">{props.likeCount}</View>}
                 {!responsiveProps.isMobile &&
                   !props.isSplitScreenView &&
                   ` ${I18n.t(

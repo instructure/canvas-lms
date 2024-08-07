@@ -21,7 +21,9 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import { IconArrowOpenEndLine, IconArrowOpenDownLine } from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
+import { Flex } from '@instructure/ui-flex'
 
 const I18n = useI18nScope('discussion_posts')
 
@@ -50,13 +52,16 @@ export function Expansion({...props}) {
                     author: props.authorName,
                   })}
             </ScreenReaderContent>
-            <Text
-              weight="bold"
-              size="medium"
-              data-testid={`text-medium`}
-            >
-              {props.expandText}
-            </Text>
+            <Flex gap='x-small'>
+              { props.isExpanded ? <IconArrowOpenDownLine /> : <IconArrowOpenEndLine /> }
+              <Text
+                weight="bold"
+                size="medium"
+                data-testid={`text-medium`}
+                >
+                {props.expandText}
+              </Text>
+            </Flex>
           </Link>
         </span>
   )

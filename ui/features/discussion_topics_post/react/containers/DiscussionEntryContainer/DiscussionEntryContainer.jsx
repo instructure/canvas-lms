@@ -55,21 +55,22 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
 
   const hasAuthor = Boolean(props.author || props.anonymousAuthor)
 
-  const threadMode = (props.discussionEntry?.depth > 1 && !searchTerm) || props.threadParent
+  const depth = props.discussionEntry?.depth || 0
+  const threadMode = (depth > 1 && !searchTerm) || props.threadParent
+  const hrMarginLeftRem = -2 - ((depth - 1) * 1.5)
 
-  const containerPadding = breakpoints.mobileOnly ? 'xx-small 0' : '0 0 small small'
   const direction = breakpoints.desktopNavOpen ? 'row' : 'column-reverse'
   const postUtilitiesAlign = breakpoints.desktopNavOpen && !threadMode ? 'start' : 'stretch'
-  const postMessageMargin = breakpoints.tablet ? 'xx-small 0 0 0' : '0'
+  const additionalSeparatorStyles = breakpoints.mobileOnly ? {width: '100vw', marginLeft: `${hrMarginLeftRem}rem`} : {}
   let authorInfoPadding = '0 0 0 x-small'
   let postUtilitiesMargin = '0 0 x-small 0'
   let postMessagePaddingNoAuthor = '0 x-small x-small x-small'
-  let postMessagePadding = '0 x-small x-small x-small'
+  let postMessagePadding = '0 x-small 0 x-small'
 
   if (breakpoints.desktopNavOpen) {
     postUtilitiesMargin = threadMode ? '0 0 x-small small' : '0'
-    authorInfoPadding = threadMode ? '0 0 small xx-small' : 'xx-small 0 0 0'
-    postMessagePadding = threadMode || props.isTopic ? '0 0 small xx-small' : '0 0 small xx-large'
+    authorInfoPadding = threadMode ? '0 0 small xx-small' : '0'
+    postMessagePadding = props.isTopic ? '0 0 small xx-small' : '0 0 0 xx-large'
     postMessagePaddingNoAuthor = '0 0 small small'
   } else if (breakpoints.tablet) {
     postMessagePadding = '0 xx-small xx-small'
@@ -77,7 +78,7 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
   }
 
   return (
-    <Flex direction="column" padding={containerPadding} data-authorid={props.author?._id}>
+    <Flex direction="column" data-authorid={props.author?._id}>
       <Flex.Item shouldGrow={true} shouldShrink={true} overflowY="visible">
         <Flex direction={props.isTopic ? direction : 'row'}>
           {hasAuthor && (
@@ -113,7 +114,6 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
             overflowX="hidden"
             overflowY="hidden"
             shouldGrow={!hasAuthor}
-            padding="xx-small"
           >
             {props.postUtilities}
           </Flex.Item>
@@ -121,9 +121,8 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
       </Flex.Item>
       <Flex.Item
         padding={hasAuthor ? postMessagePadding : postMessagePaddingNoAuthor}
-        margin={props.isTopic ? '0' : postMessageMargin}
-        overflowY="hidden"
-        overflowX="hidden"
+        overflowY="visible"
+        overflowX="visible"
       >
         {props.quotedEntry && <ReplyPreview {...props.quotedEntry} />}
         <PostMessage
@@ -147,17 +146,19 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
             </View>
           )}
           {props.children}
+          {!props.isTopic && (
+            <hr
+              data-testid="post-separator"
+              style={{
+                height: theme.variables.borders.widthSmall,
+                color: theme.variables.colors.borderMedium,
+                margin: `${theme.variables.spacing.medium} 0`,
+                ...additionalSeparatorStyles
+              }}
+            />
+          )}
         </PostMessage>
       </Flex.Item>
-      {!props.isTopic && (
-        <hr
-          data-testid="post-separator"
-          style={{
-            height: theme.variables.borders.widthSmall,
-            color: theme.variables.colors.borderMedium,
-          }}
-        />
-      )}
     </Flex>
   )
 }

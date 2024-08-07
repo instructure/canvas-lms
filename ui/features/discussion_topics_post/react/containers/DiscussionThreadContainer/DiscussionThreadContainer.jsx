@@ -230,77 +230,83 @@ export const DiscussionThreadContainer = props => {
   // Condense SplitScreen to one variable & link with the SplitScreenButton
   const splitScreenOn = props.userSplitScreenPreference
 
-  const threadActions = []
-  if (props?.discussionEntry?.permissions?.reply) {
-    threadActions.push(
-      <ThreadingToolbar.Reply
-        replyButtonRef={replyButtonRef}
-        key={`reply-${props.discussionEntry._id}`}
-        authorName={getDisplayName(props.discussionEntry)}
-        delimiterKey={`reply-delimiter-${props.discussionEntry._id}`}
-        onClick={() => {
-          const newEditorExpanded = !editorExpanded
-          setEditorExpanded(newEditorExpanded)
+  const showReplies = <ThreadingToolbar.Expansion
+    expansionButtonRef={expansionButtonRef}
+    key={`expand-${props.discussionEntry._id}`}
+    delimiterKey={`expand-delimiter-${props.discussionEntry._id}`}
+    authorName={getDisplayName(props.discussionEntry)}
+    expandText={
+      <ReplyInfo
+        replyCount={props.discussionEntry.rootEntryParticipantCounts?.repliesCount}
+        unreadCount={props.discussionEntry.rootEntryParticipantCounts?.unreadCount}
+        showHide={expandReplies}
+      />
+    }
+    onClick={() => {
+      if (splitScreenOn) {
+        usedThreadingToolbarChildRef.current = expansionButtonRef.current
+        props.onOpenSplitView(props.discussionEntry._id, false)
+      } else {
+        setExpandReplies(!expandReplies)
+      }
+    }}
+    isExpanded={expandReplies}
+  />
 
-          if (splitScreenOn) {
-            usedThreadingToolbarChildRef.current = replyButtonRef.current
-            props.onOpenSplitView(props.discussionEntry._id, true)
-          }
-        }}
+  const getThreadActions = responsiveProp => {
+    const threadActions = []
+
+    // On mobile, we display it in another row
+    if (!responsiveProp.isMobile && props.depth === 0 && props.discussionEntry.lastReply) {
+      threadActions.push(showReplies)
+    }
+
+    if (props?.discussionEntry?.permissions?.reply) {
+      threadActions.push(
+        <ThreadingToolbar.Reply
+          replyButtonRef={replyButtonRef}
+          key={`reply-${props.discussionEntry._id}`}
+          authorName={getDisplayName(props.discussionEntry)}
+          delimiterKey={`reply-delimiter-${props.discussionEntry._id}`}
+          onClick={() => {
+            const newEditorExpanded = !editorExpanded
+            setEditorExpanded(newEditorExpanded)
+
+            if (splitScreenOn) {
+              usedThreadingToolbarChildRef.current = replyButtonRef.current
+              props.onOpenSplitView(props.discussionEntry._id, true)
+            }
+          }}
+        />
+      )
+    }
+    if (
+      props.discussionEntry.permissions.viewRating &&
+      (props.discussionEntry.permissions.rate || props.discussionEntry.ratingSum > 0)
+    ) {
+      threadActions.push(
+        <ThreadingToolbar.Like
+          key={`like-${props.discussionEntry._id}`}
+          delimiterKey={`like-delimiter-${props.discussionEntry._id}`}
+          onClick={toggleRating}
+          authorName={getDisplayName(props.discussionEntry)}
+          isLiked={!!props.discussionEntry.entryParticipant?.rating}
+          likeCount={props.discussionEntry.ratingSum || 0}
+          interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
+        />
+      )
+    }
+
+    threadActions.push(
+      <ThreadingToolbar.MarkAsRead
+        key={`mark-as-read-${props.discussionEntry._id}`}
+        delimiterKey={`mark-as-read-delimiter-${props.discussionEntry._id}`}
+        isRead={props.discussionEntry.entryParticipant?.read}
+        authorName={getDisplayName(props.discussionEntry)}
+        onClick={toggleUnread}
       />
     )
-  }
-  if (
-    props.discussionEntry.permissions.viewRating &&
-    (props.discussionEntry.permissions.rate || props.discussionEntry.ratingSum > 0)
-  ) {
-    threadActions.push(
-      <ThreadingToolbar.Like
-        key={`like-${props.discussionEntry._id}`}
-        delimiterKey={`like-delimiter-${props.discussionEntry._id}`}
-        onClick={toggleRating}
-        authorName={getDisplayName(props.discussionEntry)}
-        isLiked={!!props.discussionEntry.entryParticipant?.rating}
-        likeCount={props.discussionEntry.ratingSum || 0}
-        interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
-      />
-    )
-  }
-
-  threadActions.push(
-    <ThreadingToolbar.MarkAsRead
-      key={`mark-as-read-${props.discussionEntry._id}`}
-      delimiterKey={`mark-as-read-delimiter-${props.discussionEntry._id}`}
-      isRead={props.discussionEntry.entryParticipant?.read}
-      authorName={getDisplayName(props.discussionEntry)}
-      onClick={toggleUnread}
-    />
-  )
-
-  if (props.depth === 0 && props.discussionEntry.lastReply) {
-    threadActions.push(
-      <ThreadingToolbar.Expansion
-        expansionButtonRef={expansionButtonRef}
-        key={`expand-${props.discussionEntry._id}`}
-        delimiterKey={`expand-delimiter-${props.discussionEntry._id}`}
-        authorName={getDisplayName(props.discussionEntry)}
-        expandText={
-          <ReplyInfo
-            replyCount={props.discussionEntry.rootEntryParticipantCounts?.repliesCount}
-            unreadCount={props.discussionEntry.rootEntryParticipantCounts?.unreadCount}
-          />
-        }
-        onClick={() => {
-          if (splitScreenOn) {
-            usedThreadingToolbarChildRef.current = expansionButtonRef.current
-            props.onOpenSplitView(props.discussionEntry._id, false)
-          } else {
-            setExpandReplies(!expandReplies)
-          }
-        }}
-        isExpanded={expandReplies}
-      />
-    )
+    return threadActions
   }
 
   const onDelete = () => {
@@ -434,11 +440,13 @@ export const DiscussionThreadContainer = props => {
           marginDepth: `calc(${theme.variables.spacing.medium} * ${props.depth})`,
           padding: '0',
           toolbarLeftPadding: undefined,
+          isMobile: true
         },
         desktop: {
           marginDepth: `calc(${theme.variables.spacing.xxLarge} * ${props.depth})`,
-          padding: 'small medium small',
+          padding: '0 mediumSmall',
           toolbarLeftPadding: props.depth === 0 ? '0 0 0 xx-small' : undefined,
+          isMobile: false
         },
       }}
       render={responsiveProps => (
@@ -558,8 +566,19 @@ export const DiscussionThreadContainer = props => {
                     attachment={props.discussionEntry.attachment}
                     quotedEntry={props.discussionEntry.quotedEntry}
                   >
-                    {threadActions.length > 0 && (
-                      <View as="div" padding={responsiveProps.toolbarLeftPadding}>
+                    <View as="div" padding={responsiveProps.toolbarLeftPadding}>
+                      <ThreadingToolbar
+                        searchTerm={searchTerm}
+                        discussionEntry={props.discussionEntry}
+                        onOpenSplitView={props.onOpenSplitView}
+                        isSplitView={false}
+                        filter={filter}
+                      >
+                        {getThreadActions(responsiveProps)}
+                      </ThreadingToolbar>
+                    </View>
+                    {responsiveProps.isMobile && props.depth === 0 && props.discussionEntry.lastReply && (
+                      <View as="div" margin="small 0">
                         <ThreadingToolbar
                           searchTerm={searchTerm}
                           discussionEntry={props.discussionEntry}
@@ -567,7 +586,7 @@ export const DiscussionThreadContainer = props => {
                           isSplitView={false}
                           filter={filter}
                         >
-                          {threadActions}
+                          {[showReplies]}
                         </ThreadingToolbar>
                       </View>
                     )}
@@ -593,8 +612,8 @@ export const DiscussionThreadContainer = props => {
               </Flex>
             </div>
           </Highlight>
-          <div style={{marginLeft: getReplyLeftMargin(responsiveProps)}}>
-            {editorExpanded && !splitScreenOn && (
+          {editorExpanded && !splitScreenOn && (
+            <div style={{marginLeft: getReplyLeftMargin(responsiveProps)}}>
               <View
                 display="block"
                 background="primary"
@@ -631,8 +650,8 @@ export const DiscussionThreadContainer = props => {
                   isAnnouncement={props.discussionTopic.isAnnouncement}
                 />
               </View>
-            )}
-          </div>
+            </div>
+          )}
           {((expandReplies && !searchTerm) || props.depth > 0 || firstSubReply) &&
             !splitScreenOn &&
             (props.discussionEntry.subentriesCount > 0 || firstSubReply) && (
@@ -723,6 +742,7 @@ const DiscussionSubentries = props => {
 
   return (
     <>
+      <LoadingReplies isLoading={isLoading} />
       {loadedSubentries.map(entry => (
         <DiscussionSubentriesMemo
           key={`discussion-thread-${entry._id}`}
@@ -737,7 +757,6 @@ const DiscussionSubentries = props => {
           setLoadedSubentries={setLoadedSubentries}
         />
       ))}
-      <LoadingReplies isLoading={isLoading} />
     </>
   )
 }
