@@ -61,8 +61,10 @@ export type RegistrationWizardModalProps = {
 export const RegistrationWizardModal = (props: RegistrationWizardModalProps) => {
   const state = useRegistrationModalWizardState(s => s)
 
+  const label = state.ltiImsRegistrationId ? I18n.t('Edit App') : I18n.t('Install App')
+
   return (
-    <Modal label={I18n.t('Install App')} open={state.open} size="medium">
+    <Modal label={label} open={state.open} size="medium">
       <Modal.Header>
         <CloseButton
           placement="end"
@@ -70,7 +72,7 @@ export const RegistrationWizardModal = (props: RegistrationWizardModalProps) => 
           onClick={state.close}
           screenReaderLabel={I18n.t('Close')}
         />
-        <Heading>{I18n.t('Install App')}</Heading>
+        <Heading>{label}</Heading>
       </Modal.Header>
       {!state.registering ? (
         <ProgressBar
@@ -134,9 +136,14 @@ const ModalBodyWrapper = ({
           accountId={accountId}
           unifiedToolId={state.unifiedToolId}
           unregister={state.unregister}
+          registrationId={state.ltiImsRegistrationId}
           onSuccessfulRegistration={() => {
             state.close()
-            showFlashSuccess(I18n.t('App installed successfully!'))()
+            showFlashSuccess(
+              state.ltiImsRegistrationId
+                ? I18n.t('App updated successfully!')
+                : I18n.t('App installed successfully!')
+            )()
             state.onSuccessfulInstallation?.()
           }}
         />
@@ -197,7 +204,7 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
                 assistiveText="Use arrow keys to navigate options."
                 value={props.state.method}
                 disabled={!window.ENV.FEATURES.lti_registrations_next}
-                onChange={(e, {id, value}) => {
+                onChange={(e, {value}) => {
                   if (value === 'dynamic_registration') {
                     props.state.updateMethod('dynamic_registration')
                   } else if (value === 'json_url') {

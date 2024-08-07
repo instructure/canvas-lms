@@ -281,6 +281,73 @@ describe Lti::IMS::DynamicRegistrationController do
     end
   end
 
+  describe "#show" do
+    subject do
+      get :show, params: { registration_id: registration.id, account_id: account.id }
+    end
+
+    let(:response_data) { response.parsed_body }
+    let(:account) { Account.default }
+    let(:registration) { lti_ims_registration_model(account:) }
+
+    before do
+      account.enable_feature!(:lti_dynamic_registration)
+    end
+
+    context "with a user session" do
+      let(:user) { account_admin_user(account:) }
+
+      before do
+        user_session(user)
+      end
+
+      it { is_expected.to be_successful }
+
+      it "returns the expected fields" do
+        subject
+        expected = %w[
+          id
+          lti_registration_id
+          developer_key_id
+          overlay
+          lti_tool_configuration
+          application_type
+          grant_types
+          response_types
+          redirect_uris
+          initiate_login_uri
+          client_name
+          jwks_uri
+          logo_uri
+          token_endpoint_auth_method
+          contacts
+          client_uri
+          policy_uri
+          tos_uri
+          scopes
+          created_at
+          updated_at
+          guid
+          tool_configuration
+          default_configuration
+        ]
+        expect(response_data).to include(*expected)
+      end
+    end
+
+    context "without a user session" do
+      it { is_expected.to be_redirect }
+    end
+
+    context "without the feature flag enabled" do
+      before do
+        account.disable_feature!(:lti_dynamic_registration)
+      end
+
+      it { is_expected.to be_not_found }
+    end
+  end
+
   describe "#registration_token" do
     subject do
       get :registration_token, params: { account_id: Account.default.id }

@@ -492,6 +492,7 @@ class Lti::RegistrationsController < ApplicationController
     GuardRail.activate(:secondary) do
       eager_load_models = [
         { lti_registration_account_bindings: [:created_by, :updated_by] },
+        :ims_registration,
         :created_by, # registration's created_by
         :updated_by  # registration's updated_by
       ]

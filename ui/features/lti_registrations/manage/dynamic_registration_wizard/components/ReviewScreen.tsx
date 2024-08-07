@@ -40,7 +40,6 @@ import {
   type LtiPlacementWithIcon,
 } from '../../model/LtiPlacement'
 import {htmlEscape} from '@instructure/html-escape'
-import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
 
 const I18n = useI18nScope('lti_registration.wizard')
 

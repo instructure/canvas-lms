@@ -41,6 +41,24 @@ paths:
                 $ref: "#/components/schemas/registration"
         401:
           description: TBD
+  /api/lti/accounts/:account_id/registrations/:registration_id:
+    get:
+      summary: TBD
+      parameters:
+        - in: path
+          name: registration_id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: TBD
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/registration"
+        401:
+          description: TBD
   /api/lti/accounts/:account_id/registrations/:registration_id/overlay:
     put:
       summary: TBD

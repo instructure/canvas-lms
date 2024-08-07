@@ -72,6 +72,19 @@ export const getRegistrationByUUID = (
   )
 
 /**
+ * Retrieve a registration by its ID. Useful for managing a registration
+ * after it's been created.
+ *
+ * @param accountId
+ * @param registrationId ID of the registration
+ * @returns
+ */
+export const getRegistrationById = (accountId: AccountId, registrationId: LtiImsRegistrationId) =>
+  parseFetchResult(ZLtiImsRegistration)(
+    fetch(`/api/lti/accounts/${accountId}/registrations/${registrationId}`, defaultFetchOptions())
+  )
+
+/**
  * Updates the overlay for an LtiImsRegistration.
  * @param accountId
  * @param registrationId
