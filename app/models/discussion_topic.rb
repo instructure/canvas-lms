@@ -1715,20 +1715,24 @@ class DiscussionTopic < ActiveRecord::Base
         next false if section_visibilities == :none
 
         if section_visibilities != :all
-          course_specific_sections = course_sections.pluck(:id)
-          next false unless section_visibilities.intersect?(course_specific_sections)
+          course_section_ids = shard.activate { course_sections.ids }
+
+          next false unless section_visibilities.intersect?(course_section_ids)
         end
       end
       # Verify that section limited teachers/ta's are properly restricted when selective_release_backend is enabled
-      if context.is_a?(Course) && (Account.site_admin.feature_enabled?(:selective_release_backend) && !visible_to_everyone && context.user_is_instructor?(user))
+      if context.is_a?(Course) && (Account.site_admin.feature_enabled?(:selective_release_backend) &&
+         !visible_to_everyone && context.user_is_instructor?(user))
+
         section_overrides = assignment_overrides.active.where(set_type: "CourseSection").pluck(:set_id)
         visible_sections_for_user = context.course_section_visibility(user)
         next false if visible_sections_for_user == :none
 
         # If there are no section_overrides, then no check for section_specific instructor roles is needed
         if visible_sections_for_user != :all && section_overrides.any?
-          course_specific_sections = course_sections.pluck(:id)
-          next false unless visible_sections_for_user.intersect?(course_specific_sections)
+          course_section_ids = shard.activate { course_sections.ids }
+
+          next false unless visible_sections_for_user.intersect?(course_section_ids)
         end
       end
       # user is an admin in the context (teacher/ta/designer) OR
