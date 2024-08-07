@@ -29,6 +29,7 @@ import {RegistrationWizardModal} from './manage/registration_wizard/Registration
 import type {DynamicRegistrationWizardService} from './manage/dynamic_registration_wizard/DynamicRegistrationWizardService'
 import {
   fetchRegistrationToken,
+  getRegistrationById,
   getRegistrationByUUID,
   updateRegistrationOverlay,
 } from './manage/api/ltiImsRegistration'
@@ -76,6 +77,7 @@ const dynamicRegistrationWizardService: DynamicRegistrationWizardService = {
   deleteDeveloperKey,
   fetchRegistrationToken,
   getRegistrationByUUID,
+  getRegistrationById,
   updateDeveloperKeyWorkflowState,
   updateAdminNickname,
   updateRegistrationOverlay,

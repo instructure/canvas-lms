@@ -17,10 +17,9 @@
  */
 
 import {ZLtiRegistration, type LtiRegistration} from '../model/LtiRegistration'
-import {success, type ApiResult, parseFetchResult} from '../../common/lib/apiResult/ApiResult'
+import {type ApiResult, parseFetchResult} from '../../common/lib/apiResult/ApiResult'
 import {ZPaginatedList, type PaginatedList} from './PaginatedList'
 import {type LtiRegistrationId} from '../model/LtiRegistrationId'
-import {mockFetchSampleLtiRegistrations, mockDeleteRegistration} from './sampleLtiRegistrations'
 import type {AccountId} from '../model/AccountId'
 import {defaultFetchOptions} from '@canvas/util/xhr'
 import * as z from 'zod'

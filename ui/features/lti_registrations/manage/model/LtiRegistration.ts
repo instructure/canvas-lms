@@ -22,6 +22,7 @@ import {ZLtiRegistrationId} from './LtiRegistrationId'
 import {ZDeveloperKeyId} from './developer_key/DeveloperKeyId'
 import {ZLtiRegistrationAccountBinding} from './LtiRegistrationAccountBinding'
 import {ZUser} from './User'
+import {ZLtiImsRegistrationId} from './lti_ims_registration/LtiImsRegistrationId'
 
 export const ZLtiRegistration = z.object({
   id: ZLtiRegistrationId,
@@ -37,7 +38,7 @@ export const ZLtiRegistration = z.object({
   vendor: z.string().optional().nullable(),
   internal_service: z.boolean(),
   developer_key_id: ZDeveloperKeyId.optional().nullable(),
-  ims_registration_id: z.string().optional().nullable(),
+  ims_registration_id: ZLtiImsRegistrationId.optional().nullable(),
   manual_configuration_id: z.string().optional().nullable(),
   legacy_configuration_id: z.string().optional().nullable(),
   account_binding: ZLtiRegistrationAccountBinding.optional().nullable(),
