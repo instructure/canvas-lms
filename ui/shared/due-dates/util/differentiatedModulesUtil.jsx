@@ -269,7 +269,7 @@ export const processModuleOverridesV2 = (overrides, initialModuleOverrides) => {
       } = o
 
       const hasDates = currentAttributes.due_at || currentAttributes.lock_at || currentAttributes.unlock_at
-      const hasChanges = hasDates || currentAttributes.stagedOverrideId != previousAttributes.stagedOverrideId || JSON.stringify(currentAttributes.student_ids)!=JSON.stringify(previousAttributes.student_ids)
+      const hasChanges = !(!hasDates && currentAttributes.course_section_id == previousAttributes.course_section_id && JSON.stringify(currentAttributes.student_ids)== JSON.stringify(previousAttributes.student_ids))
 
       //   If there are changes, remove the context_module override information
       return hasChanges

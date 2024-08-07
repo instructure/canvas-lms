@@ -123,9 +123,9 @@ const AssignToContent = ({
   }, [overrides])
 
   useEffect(() => {
-    if (stagedOverrides === null) return
+    if (stagedOverridesRef.current === null) return
     const parsedOverrides = getParsedOverrides(
-      stagedOverrides,
+      stagedOverridesRef.current,
       stagedCards,
       groupCategoryId
     )
@@ -200,8 +200,9 @@ const AssignToContent = ({
     resetOverrides(newOverrides, withoutModuleOverrides)
     stagedOverridesRef.current = newOverrides
 
-    onSync(newOverrides, stagedImportantDates)
-  }, [stagedOverrides])
+    const noModuleOverrides = newOverrides.filter(o => !o.context_module_id)
+    onSync(noModuleOverrides, stagedImportantDates)
+  }, [stagedCards, stagedOverrides])
 
   const cards = useMemo(() => {
     const selectedOptionIds = []
@@ -292,9 +293,6 @@ const AssignToContent = ({
     const newStagedCards = {...stagedCardsRef.current}
     delete newStagedCards[cardId]
     setStagedCards(newStagedCards)
-
-    const newStagedOverrides = stagedOverrides.filter(override => override.rowKey.toString() !== cardId)
-    setStagedOverrides(newStagedOverrides)
   }
 
   const updateCard = (cardId, newOverrides, cardDates) => {
@@ -331,27 +329,24 @@ const AssignToContent = ({
     const oldDates = card.dates
     const date = newDate === '' ? null : newDate
 
+    const initialModuleOverrideState = initialModuleOverrides.find(obj => obj.rowKey === cardId)
+
+    const tmp = {}
+    tmp[dateType] = date
+    const newDates = _.extend(oldDates, tmp)
+    const hasDates = !(Object.values(newDates).every(value => value === null || value === undefined || value === ''))
+
     const newOverrides = oldOverrides.map(override => {
       return {
         ...override,
         [dateType]: date,
         [`${dateType}_overridden`]: !!date,
+        context_module_id: hasDates ? null : initialModuleOverrideState?.context_module_id,
+        context_module_name: hasDates ? null : initialModuleOverrideState?.context_module_name,
       }
     })
-
-    const tmp = {}
-    tmp[dateType] = date
-    const newDates = _.extend(oldDates, tmp)
 
     updateCard(cardId, newOverrides, newDates)
-
-    const updatedOverrides = [...stagedOverridesRef.current]
-    updatedOverrides.forEach(override => {
-      if (String(override.rowKey) === String(cardId)) {
-        override[dateType] = newDate
-      }
-    })
-    setStagedOverrides(updatedOverrides)
   }
 
   const handleAssigneeAddition = (cardId, newAssignee) => {
@@ -415,6 +410,8 @@ const AssignToContent = ({
       delete existingOverrideData.group_id
       delete existingOverrideData.noop_id
       delete existingOverrideData.course_id
+      delete existingOverrideData.context_module_id
+      delete existingOverrideData.context_module_name
       remainingCardOverrides = [existingOverrideData]
     }
 
