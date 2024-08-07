@@ -8555,7 +8555,7 @@ es-ES:
       save: Guardar
       saving: Guardando...
       sort_by_likes: "Ordenar por Me gusta"
-      topic_title: "Título del tema"
+      topic_title: "Título del foro"
       until: Hasta
       use_for_grading: Evaluado
       users_must_post_before_seeing_replies: "Los usuarios deben publicar antes de ver las respuestas"
@@ -24338,7 +24338,7 @@ es-ES:
   top_navigation_favorite_eb8ff09e: "Favorito de navegación superior"
   top_navigation_placement_78239065: "Ubicación de la navegación superior"
   topic_podcast_feed_9ab6f5ac: "Tema: Comentarios del pódcast"
-  topic_title_85384ce8: "Título del tema"
+  topic_title_85384ce8: "Título del foro"
   total_71a4807: "Nota total"
   total_activity_21022e7c: "Actividad total"
   total_grade_b0c33841: "Total: %{grade}"
