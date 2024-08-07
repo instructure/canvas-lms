@@ -20,6 +20,13 @@ import React from 'react'
 import {render, act} from '@testing-library/react'
 import App from '../App'
 
+import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+  showFlashSuccess: jest.fn(() => jest.fn(() => {})),
+}))
+
 const makeKey = ({id, name, inherited_from = 'global', account_owns_binding = true}) => ({
   id,
   name,
@@ -79,7 +86,6 @@ const initialApplicationState = inheritedList => {
     },
   }
 }
-
 const renderApp = ({ENV, inheritedList, ...overrides}) => {
   const props = {
     applicationState: initialApplicationState(inheritedList),
@@ -111,8 +117,11 @@ const renderApp = ({ENV, inheritedList, ...overrides}) => {
     },
     ...overrides,
   }
-
-  return render(<App {...props} />)
+  const ref = React.createRef()
+  return {
+    ref,
+    wrapper: render(<App {...props} ref={ref} />),
+  }
 }
 describe('DeveloperKeys App', () => {
   let getByText
@@ -121,7 +130,7 @@ describe('DeveloperKeys App', () => {
   let queryByTestId
 
   const setup = (ENV, inheritedList) => {
-    const wrapper = renderApp({ENV, inheritedList})
+    const wrapper = renderApp({ENV, inheritedList}).wrapper
     getByText = wrapper.getByText
     queryByText = wrapper.queryByText
     getAllByRole = wrapper.getAllByRole
@@ -176,6 +185,76 @@ describe('DeveloperKeys App', () => {
 
       it('does not render Global Keys heading', () => {
         expect(queryByText('Global Keys')).not.toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('when developer keys saved ', () => {
+    jest.useFakeTimers()
+    let ref
+    beforeEach(() => {
+      const ENV = {FEATURES: {developer_key_page_checkboxes: true}}
+      const inheritedList = [...parentKeys, ...siteAdminKeys]
+      ref = renderApp({ENV, inheritedList}).ref
+    })
+
+    describe('with list of warnings', () => {
+      beforeEach(() => {
+        jest.clearAllMocks()
+        jest.clearAllTimers()
+        ref.current.developerKeySaveSuccessfulHandler(['warning1', 'warning2'])
+      })
+      it('Alert is shown for each warning message', () => {
+        jest.runOnlyPendingTimers()
+        expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(2)
+      })
+    })
+
+    describe('with a warning', () => {
+      beforeEach(() => {
+        jest.clearAllMocks()
+        jest.clearAllTimers()
+        ref.current.developerKeySaveSuccessfulHandler('warning1')
+      })
+      it('Alert is shown for each warning message', () => {
+        jest.runOnlyPendingTimers()
+        expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('without a warning (null)', () => {
+      beforeEach(() => {
+        jest.clearAllMocks()
+        jest.clearAllTimers()
+        ref.current.developerKeySaveSuccessfulHandler(null)
+      })
+      it('No alert is shown', () => {
+        jest.runOnlyPendingTimers()
+        expect(FlashAlert.showFlashAlert).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('without a warning (undefined)', () => {
+      beforeEach(() => {
+        jest.clearAllMocks()
+        jest.clearAllTimers()
+        ref.current.developerKeySaveSuccessfulHandler(undefined)
+      })
+      it('No Alert is shown', () => {
+        jest.runOnlyPendingTimers()
+        expect(FlashAlert.showFlashAlert).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('without a warning (empty array)', () => {
+      beforeEach(() => {
+        jest.clearAllMocks()
+        jest.clearAllTimers()
+        ref.current.developerKeySaveSuccessfulHandler([])
+      })
+      it('Alert is shown for each warning message', () => {
+        jest.runOnlyPendingTimers()
+        expect(FlashAlert.showFlashAlert).not.toHaveBeenCalled()
       })
     })
   })

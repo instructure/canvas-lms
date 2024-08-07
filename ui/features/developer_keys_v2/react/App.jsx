@@ -139,12 +139,18 @@ class DeveloperKeysApp extends React.Component {
    * workaround and do it.
    * @todo Find a better way to avoid modal-focus-screenreader-bulldozing so
    * this isn't necessary.
-   * @param {string} warningMessage - A warning message to show to the user.
+   * @param {string | string[]} warningMessage - A warning message or a list of warning messages to show to the user.
    */
   developerKeySaveSuccessfulHandler(warningMessage) {
     setTimeout(() => {
       showFlashSuccess(I18n.t('Save successful.'))()
-      if (warningMessage) {
+      if (Array.isArray(warningMessage)) {
+        for (const message of warningMessage) {
+          if (message) {
+            showFlashAlert({message, type: 'warning'})
+          }
+        }
+      } else if (warningMessage) {
         showFlashAlert({message: warningMessage, type: 'warning'})
       }
     }, ALERT_WAIT_TIME)
