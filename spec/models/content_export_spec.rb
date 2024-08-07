@@ -470,6 +470,8 @@ describe ContentExport do
       @course.root_account.settings[:provision] = { "lti" => "lti url" }
       @course.root_account.save!
       @ce = @course.content_exports.create!
+      @ce.settings[:selected_content] = { "everything" => true }
+      @ce.save!
     end
 
     context "with feature flags enabled" do
@@ -481,14 +483,23 @@ describe ContentExport do
         expect(@ce.settings[:contains_new_quizzes]).to be_nil
       end
 
-      context "when setting the contains_new_quizzes" do
-        before do
-          @ce.set_contains_new_quizzes_settings
-        end
-
+      describe "setting the contains_new_quizzes setting" do
         context "when the course has New Quizzes assignments" do
           it "the settings to contains_new_quizzes should be set to true" do
+            @ce.set_contains_new_quizzes_settings
             expect(@ce.settings[:contains_new_quizzes]).to be true
+          end
+
+          context "But the export settings have selected content" do
+            before do
+              @ce.settings[:selected_content] = { "assignments" => { CC::CCHelper.create_key(@assignment) => "1" } }
+              @ce.save!
+            end
+
+            it "sets the settings contains_new_quizzes as false" do
+              @ce.set_contains_new_quizzes_settings
+              expect(@ce.settings[:contains_new_quizzes]).to be false
+            end
           end
         end
 
@@ -496,10 +507,10 @@ describe ContentExport do
           before do
             @another_course = course_model
             @ce = @another_course.content_exports.create!
-            @ce.set_contains_new_quizzes_settings
           end
 
           it "the settings to contains_new_quizzes should be set to false" do
+            @ce.set_contains_new_quizzes_settings
             expect(@ce.settings[:contains_new_quizzes]).to be false
           end
         end

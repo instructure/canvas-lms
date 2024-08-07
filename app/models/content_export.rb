@@ -604,17 +604,21 @@ class ContentExport < ActiveRecord::Base
 
   def prepare_new_quizzes_export
     set_contains_new_quizzes_settings
-    mark_waiting_for_external_tool if contains_new_quizzes?
+    mark_waiting_for_external_tool if contains_new_quizzes_setting?
   end
 
   def set_contains_new_quizzes_settings
-    settings[:contains_new_quizzes] = contains_new_quizzes?
+    settings[:contains_new_quizzes] = !selective_export? && contains_new_quizzes?
   end
 
   def contains_new_quizzes?
     return false unless new_quizzes_common_cartridge_enabled?
 
     context.assignments.active.type_quiz_lti.count.positive?
+  end
+
+  def contains_new_quizzes_setting?
+    settings[:contains_new_quizzes] == true
   end
 
   def include_new_quizzes_in_export?
