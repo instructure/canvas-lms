@@ -37,7 +37,7 @@ module Lti
                                                  ),
                                                })
 
-      json[:warning_message] = @tool_configuration.verify_placements if @include_warnings
+      json[:warning_message] = @tool_configuration.placement_warnings if @include_warnings
       json
     end
   end

@@ -40,6 +40,7 @@ Placements are the "entry points" into an External Tool. They determine where an
 - [Page Menu](#page-menu)
 - [Pages Index Menu](#pages-index-menu)
 - [Top Navigation](#top-navigation)
+- [Resource Selection ⚠️](#resource-selection)
 
 # Global Navigation
 name: global_navigation
@@ -230,3 +231,16 @@ name: top_navigation
 This is a restricted placement, contact your CSM (Customers) or [Developer Relations](mailto:dev-relations@instructure.com) (Partners) for more information.
 
 <img class="lti-placement-image" src="./images/placements/top_navigation.png" alt="Top Navigation Screenshot">
+
+<div class="warning-message">
+    Deprecated placements
+</div>
+
+# Resource Selection
+name: resource_selection <span title="this placement is deprecated!">⚠️</span>
+
+This is a placement that once was the default for 1.1 tools, and was one of the very first placements for Canvas. It makes the tool show up both in - [assignment_selection](#assignment-selection) and [link_selection](#link-selection) (new module item), but is deprecated now. 
+
+For 1.3 tools using this placement we highly recommend to use assignment_selection or link_selection instead!
+You can read about those in details [here](file.assignment_selection_placement.html) and [here](file.link_selection_placement.html).
+
