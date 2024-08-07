@@ -174,7 +174,9 @@ export default class WikiPageView extends Backbone.View {
     } else if (this.$sequenceFooter != null) {
       this.$sequenceFooter.msfAnimation(false)
     }
-    if (this.$sequenceFooter) return this.$sequenceFooter.appendTo($('#module_navigation_target'))
+    if (this.$sequenceFooter) this.$sequenceFooter.appendTo($('#module_navigation_target'))
+
+    this.maybeRenderBlockEditorContent()
   }
 
   navigateToLinkAnchor() {
@@ -190,8 +192,11 @@ export default class WikiPageView extends Backbone.View {
     }
   }
 
-  renderBlockEditorContent() {
-    if (ENV.BLOCK_EDITOR && this.model.get('block_editor_attributes')?.blocks?.[0]?.data) {
+  maybeRenderBlockEditorContent() {
+    if (
+      this.model.get('editor') === 'block_editor' &&
+      this.model.get('block_editor_attributes')?.blocks?.[0]?.data
+    ) {
       import('@canvas/block-editor')
         .then(({renderBlockEditorView}) => {
           const container = document.getElementById('block-editor-content')
@@ -200,6 +205,7 @@ export default class WikiPageView extends Backbone.View {
           renderBlockEditorView(content, container)
         })
         .catch(e => {
+          // eslint-disable-next-line no-alert
           window.alert('Error loading block editor content')
         })
     }
@@ -207,7 +213,6 @@ export default class WikiPageView extends Backbone.View {
 
   afterRender() {
     super.afterRender(...arguments)
-    this.renderBlockEditorContent()
     this.navigateToLinkAnchor()
     this.reloadView = new WikiPageReloadView({
       el: this.$pageChangedAlert,
@@ -337,13 +342,8 @@ export default class WikiPageView extends Backbone.View {
   toJSON() {
     const json = super.toJSON(...arguments)
     json.page_id = this.model.get('page_id')
-    if (ENV.BLOCK_EDITOR && json.block_editor_attributes?.blocks?.[0]?.data) {
-      json.body = '<div id="block-editor-content"></div>'
-      // json.body = `<pre>${JSON.stringify(
-      //   JSON.parse(json.block_editor_attributes.blocks[0].data),
-      //   null,
-      //   2
-      // )}</pre>`
+    if (this.model.get('editor') === 'block_editor') {
+      json.body = '<div id="block-editor-content"/>' // this is where the BlockEditorView will be rendered
     }
     json.modules_path = this.modules_path
     json.wiki_pages_path = this.wiki_pages_path

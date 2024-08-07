@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
 #
 # some if the specs in here include "ignore_js_errors: true". This is because
@@ -31,35 +32,77 @@ describe "Block Editor", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include BlockEditorPage
 
-  def create_wiki_page_with_block_editor_content(page_title)
-    @page = @course.wiki_pages.create!(title: page_title)
-    @page.update!(
-      title: "#{page_title}-2",
-      block_editor_attributes: {
-        time: Time.now.to_i,
-        version: "1",
-        blocks: [
-          {
-            data: '{"ROOT":{"type":{"resolvedName":"PageBlock"},"isCanvas":true,"props":{},"displayName":"Page","custom":{},"hidden":false,"nodes":["UO_WRGQgSQ"],"linkedNodes":{}},"UO_WRGQgSQ":{"type":{"resolvedName":"BlankSection"},"isCanvas":false,"props":{},"displayName":"Blank Section","custom":{"isSection":true},"parent":"ROOT","hidden":false,"nodes":[],"linkedNodes":{"blank-section_nosection1":"e33NpD3Ck3"}},"e33NpD3Ck3":{"type":{"resolvedName":"NoSections"},"isCanvas":true,"props":{"className":"blank-section__inner"},"displayName":"NoSections","custom":{"noToolbar":true},"parent":"UO_WRGQgSQ","hidden":false,"nodes":[],"linkedNodes":{}}}'
-          }
-        ]
-      }
-    )
+  let(:block_page_content) do
+    '{
+  "ROOT": {
+    "type": {
+      "resolvedName": "PageBlock"
+    },
+    "isCanvas": true,
+    "props": {},
+    "displayName": "Page",
+    "custom": {},
+    "hidden": false,
+    "nodes": [
+      "UO_WRGQgSQ"
+    ],
+    "linkedNodes": {}
+  },
+  "UO_WRGQgSQ": {
+    "type": {
+      "resolvedName": "BlankSection"
+    },
+    "isCanvas": false,
+    "props": {},
+    "displayName": "Blank Section",
+    "custom": {
+      "isSection": true
+    },
+    "parent": "ROOT",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {
+      "blank-section_nosection1": "e33NpD3Ck3"
+    }
+  },
+  "e33NpD3Ck3": {
+    "type": {
+      "resolvedName": "NoSections"
+    },
+    "isCanvas": true,
+    "props": {
+      "className": "blank-section__inner"
+    },
+    "displayName": "NoSections",
+    "custom": {
+      "noToolbar": true
+    },
+    "parent": "UO_WRGQgSQ",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  }
+}'
   end
 
   before do
     course_with_teacher_logged_in
     @course.account.enable_feature!(:block_editor)
     @context = @course
-  end
-
-  def wait_for_block_editor
-    keep_trying_until do
-      disable_implicit_wait { f(".block-editor-editor") } # rubocop:disable Specs/NoDisableImplicitWait
-    rescue => e
-      puts e.inspect
-      false
-    end
+    @rce_page = @course.wiki_pages.create!(title: "RCE Page", body: "RCE Page Body")
+    @block_page = @course.wiki_pages.create!(title: "Block Page")
+    puts ">>>", block_page_content
+    @block_page.update!(
+      block_editor_attributes: {
+        time: Time.now.to_i,
+        version: "1",
+        blocks: [
+          {
+            data: block_page_content
+          }
+        ]
+      }
+    )
   end
 
   def create_wiki_page(course)
@@ -104,13 +147,21 @@ describe "Block Editor", :ignore_js_errors do
   end
 
   context "Edit a page" do
-    before do
-      create_wiki_page_with_block_editor_content("block editor test")
+    it "edits an rce page with the rce" do
+      get "/courses/#{@course.id}/pages/#{@rce_page.url}/edit"
+      wait_for_rce
+      expect(f("textarea.body").attribute("value")).to eq("<p>RCE Page Body</p>")
     end
 
-    it "loads the editor" do
-      get "/courses/#{@course.id}/pages/block-editor-test/edit"
-      expect(f(".block-editor-editor")).to be_displayed
+    it "edits a block page with the block editor" do
+      get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+      wait_for_block_editor
+      expect(f(".page-block")).to be_displayed
+    end
+
+    it "can drag and drop blocks from the toolbox" do
+      get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+      wait_for_block_editor
       block_toolbox_toggle.click
       expect(block_toolbox).to be_displayed
       drag_and_drop_element(f(".toolbox-item.item-button"), f(".blank-section__inner"))
