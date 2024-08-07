@@ -1,0 +1,21 @@
+<% remove_profile_url_in_layout = true %>
+
+<% define_content :link do %>
+  <% if user&.account&.primary_domain&.host %>
+    <%= url_for({ controller: :profile, action: :settings, host: user.account.primary_domain.host }) %>
+  <% else %>
+    <%= settings_profile_url %>
+  <% end %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t "Access Token Created or Regenerated" %>
+<% end %>
+
+<%= t "A Canvas security token was just generated for your account by someone else. Before it can be used, the token needs to be activated by you here:" %>
+
+<div>
+  <a href="<%= content(:link) %>">
+    <%= t "Manage User Settings" %>
+  </a>
+</div>

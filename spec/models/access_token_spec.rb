@@ -542,12 +542,14 @@ describe AccessToken do
   context "broadcast policy" do
     before(:once) do
       Notification.create!(name: "Manually Created Access Token Created")
+      Notification.create!(name: "Access Token Created On Behalf Of User")
       user_model
     end
 
     it "sends a notification when a new manually created access token is created" do
       access_token = AccessToken.create!(user: @user)
       expect(access_token.messages_sent).to include("Manually Created Access Token Created")
+      expect(access_token.messages_sent).not_to include("Access Token Created On Behalf Of User")
     end
 
     it "sends a notification when a manually created access token is regenerated" do
@@ -568,6 +570,12 @@ describe AccessToken do
       developer_key = DeveloperKey.create!
       access_token = AccessToken.create!(user: @user, developer_key:)
       expect(access_token.messages_sent).not_to include("Manually Created Access Token Created")
+    end
+
+    it "sends a different notification if the token is pending" do
+      access_token = AccessToken.create!(user: @user, workflow_state: "pending")
+      expect(access_token.messages_sent).not_to include("Manually Created Access Token Created")
+      expect(access_token.messages_sent).to include("Access Token Created On Behalf Of User")
     end
   end
 
