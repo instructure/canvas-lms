@@ -55,7 +55,14 @@ class AccessToken < ActiveRecord::Base
     p.dispatch :manually_created_access_token_created
     p.to(&:user)
     p.whenever do |access_token|
-      access_token.crypted_token_previously_changed? && access_token.manually_created?
+      access_token.crypted_token_previously_changed? && access_token.manually_created? &&
+        access_token.active?
+    end
+    p.dispatch :access_token_created_on_behalf_of_user
+    p.to(&:user)
+    p.whenever do |access_token|
+      access_token.crypted_token_previously_changed? && access_token.manually_created? &&
+        access_token.pending?
     end
   end
 
