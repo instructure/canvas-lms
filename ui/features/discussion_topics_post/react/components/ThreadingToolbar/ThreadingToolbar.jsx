@@ -41,15 +41,7 @@ export function ThreadingToolbar({...props}) {
     <Responsive
       match="media"
       query={responsiveQuerySizes({mobile: true, desktop: true})}
-      props={{
-        mobile: {
-          itemSpacing: '0 xx-small 0 0',
-        },
-        desktop: {
-          itemSpacing: 'none',
-        },
-      }}
-      render={(responsiveProps, matches) => (
+      render={(_responsiveProps, matches) => (
         <View>
           {(props.searchTerm || props.filter !== 'all') && !props.isSplitView ? (
             <Link
@@ -67,23 +59,21 @@ export function ThreadingToolbar({...props}) {
                 props.onOpenSplitView(parentId, false, relativeId, props.discussionEntry._id)
               }}
             >
-              <Text weight="bold" size={responsiveProps.textSize}>
+              <Text weight="bold">
                 {I18n.t('Go to Reply')}
               </Text>
             </Link>
           ) : (
             <InlineList delimiter="pipe" display="inline-flex">
-              {React.Children.map(props.children, c => (
+              {React.Children.map(props.children, (c, i) => (
                 <InlineList.Item
                   delimiter="pipe"
                   key={c.props.delimiterKey}
-                  margin={responsiveProps.itemSpacing}
-                  size={responsiveProps.textSize}
                   data-testid={
                     matches.includes('mobile') ? 'mobile-thread-tool' : 'desktop-thread-tool'
                   }
                 >
-                  <View style={{display: 'inline-flex'}}>{c}</View>
+                  <View margin={i === 0 ? "0 x-small 0 0" : "0 x-small"} style={{display: 'inline-flex'}}>{c}</View>
                 </InlineList.Item>
               ))}
             </InlineList>

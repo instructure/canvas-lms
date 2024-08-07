@@ -282,7 +282,7 @@ export const DiscussionTopicContainer = ({
                     borderRadius={responsiveProps?.border?.radius}
                     borderStyle="solid"
                     borderColor="primary"
-                    padding="xx-small 0 small"
+                    padding="small"
                     margin="0 0 small 0"
                   >
                     {!props.discussionTopic.availableForUser ? (
@@ -319,7 +319,7 @@ export const DiscussionTopicContainer = ({
                             )
                           )}
                         </Flex.Item>
-                        <Flex.Item shouldShrink={true} shouldGrow={true}>
+                        <Flex.Item shouldShrink={true} shouldGrow={true} overflowY='hidden'>
                           <DiscussionEntryContainer
                             isTopic={true}
                             postUtilities={
