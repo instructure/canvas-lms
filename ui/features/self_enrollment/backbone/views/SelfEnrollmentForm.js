@@ -40,33 +40,36 @@ export default class SelfEnrollmentForm extends Backbone.View {
     this.action = this.initialAction = this.$el
       .find('input[type=hidden][name=initial_action]')
       .val()
+    this.timerId = null
 
     const retryCount = 5
-    function loadCaptcha(attempts) {
-      const that = this
-
+    // need to pass class context to loadCaptcha
+    const loadCaptcha = attempts => {
       if (!window.hasOwnProperty('grecaptcha')) {
         if (attempts < retryCount) {
-          setTimeout(() => loadCaptcha(attempts + 1), 500)
+          const boundLoad = loadCaptcha.bind(this, attempts + 1)
+          this.timerId = setTimeout(boundLoad, 500)
         } else {
           $.flashError(I18n.t('Captcha failed to load'))
         }
         return
+      } else if (this.timerId !== null) {
+        clearTimeout(this.timerId)
       }
 
       // this code will not be reached unless grecaptcha is defined
       // eslint-disable-next-line no-undef
-      grecaptcha.ready(function () {
+      grecaptcha.ready(() => {
         // eslint-disable-next-line no-undef
-        that.dataCaptchaId = grecaptcha.render(that.$el.find('.g-recaptcha')[0], {
+        this.dataCaptchaId = grecaptcha.render(this.$el.find('.g-recaptcha')[0], {
           sitekey: ENV.ACCOUNT.recaptcha_key,
           callback: () => {
-            that.recaptchaPassed = true
-            that.$el.find('#submit_button').prop('disabled', false)
+            this.recaptchaPassed = true
+            this.$el.find('#submit_button').prop('disabled', false)
           },
           'expired-callback': () => {
-            that.recaptchaPassed = false
-            that.$el.find('#submit_button').prop('disabled', true)
+            this.recaptchaPassed = false
+            this.$el.find('#submit_button').prop('disabled', true)
           },
         })
       })
