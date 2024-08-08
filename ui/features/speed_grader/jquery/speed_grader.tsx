@@ -2819,6 +2819,12 @@ EG = {
     clearInterval(sessionTimer)
     $submissions_container.children().hide()
     $('.speedgrader_alert').hide()
+
+    if (this.currentStudent.submission && this.currentStudent.submission['partially_submitted?']) {
+      this.renderSubmissionPreview()
+      return
+    }
+
     if (
       !this.currentStudent.submission ||
       !this.currentStudent.submission.submission_type ||

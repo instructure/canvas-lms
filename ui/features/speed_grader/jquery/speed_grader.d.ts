@@ -161,6 +161,7 @@ const ZBaseSubmission = z.object({
   word_count: z.null(),
   workflow_state: z.string(),
   versioned_attachments: z.array(ZVersionedAttachment).optional(),
+  'partially_submitted?': z.boolean().optional(),
 })
 
 export const ZHistoricalSubmission = ZBaseSubmission
