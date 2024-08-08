@@ -6281,6 +6281,7 @@ fa:
         user_privileges: مجوزها
       legends: 
         memberships: عضویت(ها)
+        recent_messages: "پیام های اخیر"
       links: 
         access_report: "گزارش دسترسی برای %{user}"
         cant_delete: "نمی توان حذف کرد"
@@ -6298,6 +6299,7 @@ fa:
         user_only_view_section: "این کاربر را محدود شود تا فقط کاربران هم بخش را مشاهده کند"
         user_outcomes: "نتایج مربوط به %{user}"
         user_view_all_sections: "به این کاربر اجازه داده شود همه کاربران درس را مشاهده کند"
+      no_messages: "هیچ پیامی موجود نیست"
       user_only_view_section: "این کاربر فقط می تواند دانشجویان را در بخش (های) درس اختصاص داده شده خود ببیند"
       user_view_all_sections: "این کاربر می تواند دانشجویان را در همه بخش های درس ببیند"
     no_user: 
