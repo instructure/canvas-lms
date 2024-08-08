@@ -6998,6 +6998,7 @@ nn:
         user_privileges: Privilegium
       legends: 
         memberships: Medlemskap
+        recent_messages: "Siste meldingar"
       links: 
         access_report: "Tilgangsrapport for %{user}"
         cant_delete: "Kan ikkje slette"
@@ -7014,6 +7015,7 @@ nn:
         user_only_view_section: "avgrens brukaren til å sjå berre brukarar i same seksjon"
         user_outcomes: "Resultat for %{user}"
         user_view_all_sections: "la brukaren sjå alle emnebrukarane"
+      no_messages: "Ingen meldingar"
       user_only_view_section: "brukaren kan berre sjå studentar i tildelte seksjon(ar)"
       user_view_all_sections: "brukaren kan sjå studentar i alle seksjonar"
     no_user: 
