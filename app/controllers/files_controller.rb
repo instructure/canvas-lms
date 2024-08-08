@@ -1572,7 +1572,7 @@ class FilesController < ApplicationController
       nil
     end
     att_ids = parsed_file_urls.pluck(:id, :attachment_id, :file_id).flatten.compact
-    att_list = Attachment.where(id: att_ids).merge(Attachment.active.or(Attachment.where.not(replacement_attachment_id: nil))).preload(:context, replacement_attachment: :context)
+    att_list = Attachment.where(id: att_ids).merge(Attachment.not_deleted.or(Attachment.where.not(replacement_attachment_id: nil))).preload(:context, replacement_attachment: :context)
     att_hash_list = att_list.index_by { |att| att.id.to_s }
 
     file_context_keys = %i[account_id course_id group_id user_id].freeze
@@ -1581,7 +1581,7 @@ class FilesController < ApplicationController
       file_id = parsed_file_url[:id] || parsed_file_url[:attachment_id] || parsed_file_url[:file_id]
       att = att_hash_list[file_id]
       if att&.replacement_attachment_id
-        parsed_file_url[:old_att_id] = att.id
+        parsed_file_url[:id] ||= att.id
         att = att.replacement_attachment
       end
       next unless att
@@ -1599,17 +1599,31 @@ class FilesController < ApplicationController
       next unless context.grants_any_right?(@current_user, session, :manage_files_create, :manage_files_edit, :moderate_user_content, :become_user) &&
                   context.grants_any_right?(user, session, :manage_files_create, :manage_files_edit)
 
+      canvas_display_files = []
       file_list.each do |file|
         att = file[:attachment]
         if att.media_entry_id.present? || att.canvadocable?
-          file_metadata[:canvas_urls] ||= {}
-          url = file[:url]
-          old_att_id = file[:old_att_id]
-          file_metadata[:canvas_urls][file[:url]] = old_att_id.present? ? url.sub(%r{(files|iframe)/#{old_att_id}}, "\\1/#{att.id}") : url
+          canvas_display_files << file
         else
           file_metadata[:instfs_ids] ||= {}
           file_metadata[:instfs_ids][file[:url]] = att.instfs_uuid
         end
+      end
+
+      canvas_display_files.each do |file|
+        file_metadata[:canvas_urls] ||= {}
+        # TODO: Work with InstFS to make a bulk duplicate API for this
+        url = file[:url]
+        att = file[:attachment]
+        unless params[:location].present? && (new_instfs_ref = att.create_rce_reference(params[:location]))
+          file_metadata[:canvas_urls][url] = url
+          next
+        end
+        old_att_id = file[:id] if file[:id] != att.id.to_s
+        new_url = old_att_id.present? ? url.sub(%r{(files|iframe)/#{old_att_id}}, "\\1/#{att.id}") : url
+        parsed_url = Addressable::URI.parse(CGI.unescape_html(new_url))
+        parsed_url.query_values = (parsed_url.query_values || {}).merge({ instfs_id: new_instfs_ref })
+        file_metadata[:canvas_urls][url] = parsed_url.to_s
       end
     end
 

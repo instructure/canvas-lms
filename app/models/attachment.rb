@@ -1783,6 +1783,20 @@ class Attachment < ActiveRecord::Base
     end
   end
 
+  def create_rce_reference(location, context: nil)
+    if instfs_hosted? && InstFS.enabled?
+      tenant_auth = { location: }
+      if context.present?
+        tenant_auth[:application] = Lti::Oauth2::AccessToken::ISS
+        tenant_auth[:context_type] = context.table_name
+        tenant_auth[:context_uuid] = context.uuid
+        tenant_auth[:account_uuid] = context.account.uuid
+        tenant_auth[:root_account_uuid] = context.root_account.uuid
+      end
+      InstFS.duplicate_file(instfs_uuid, tenant_auth:)
+    end
+  end
+
   def self.file_removed_path
     Rails.public_path.join("file_removed/file_removed.pdf")
   end
