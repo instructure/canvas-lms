@@ -3462,6 +3462,7 @@ ko:
         user_privileges: 권한
       legends: 
         memberships: "멤버 자격"
+        recent_messages: "최근 메시지"
       links: 
         access_report: "%{user}의 보고서 액세스"
         cant_delete: "삭제할 수 없음"
@@ -3476,6 +3477,7 @@ ko:
         user_only_view_section: "이 사용자가 동료 섹션 사용자만 보도록 제한"
         user_outcomes: "%{user}의 성과"
         user_view_all_sections: "이 사용자가 모든 과목 사용자를 보도록 허용"
+      no_messages: "메시지 없음"
       user_only_view_section: "이 사용자는 할당된 과목 섹션에 있는 사용자만 볼 수 있음"
       user_view_all_sections: "이 사용자는 모든 과목 섹션에 있는 사용자를 볼 수 있음"
     no_user: 

@@ -4904,6 +4904,7 @@ he:
         user_privileges: זכויות
       legends: 
         memberships: חברות(יות)
+        recent_messages: "הודעות אחרונות"
       links: 
         access_report: "דוח כניסות למערכת עבור %{user}"
         cant_delete: "אין אפשרות לבטל"
@@ -4921,6 +4922,7 @@ he:
         user_only_view_section: "הגבל את צפיית המשתמש לראות רק משתמשי אותן ההקבצות"
         user_outcomes: "תוצאות ל%{user}"
         user_view_all_sections: "הרשאה למשתמש זה לצפות בכל משתמשי הקורס"
+      no_messages: "אין הודעות"
       user_only_view_section: "משתמש זה יכול לעיין רק בתלמידים שבהקבצה(ות) הקורס שהוקצו להם"
       user_view_all_sections: "משתמש זה יכול לראות תלמידים בכל הקבצות הקורס"
     no_user: 

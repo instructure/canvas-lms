@@ -1940,7 +1940,7 @@ el:
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     one: "Είσαστε σίγουροι πως θέλετε να αφαιρέσετε %{name};"
     other: "Είσαστε σίγουροι πως θέλετε να αφαιρέσετε αυτά τα %{count} στοιχεία;"
-  are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Είστε βέβαιος ότι επιθυμείτε να διαγράψετε αυτή την ανακοίνωση;"
+  are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Είστε βέβαιοι ότι επιθυμείτε να διαγράψετε αυτή την ανακοίνωση;"
   are_you_sure_you_want_to_delete_this_comment_4ee386d: "Είσαστε σίγουροι πως θέλετε να αφαιρέσετε αυτό το σχόλιο;"
   are_you_sure_you_want_to_delete_this_developer_key_9937481a: "Είστε σίγουρος/η ότι θέλετε να διαγράψετε το κλειδί προγραμματιστή/ιας;"
   are_you_sure_you_want_to_delete_this_discussion_334554e0: "Είστε σίγουρος/η ότι επιθυμείτε να διαγράψετε αυτή τη συζήτηση;"
@@ -3877,6 +3877,7 @@ el:
         user_privileges: Προνόμια
       legends: 
         memberships: Συνδρομή(ες)
+        recent_messages: "Πρόσφατα Μυνήματα"
       links: 
         cant_delete: "Αδύντη η Διαγραφή"
         conclude_enrollment: "Ολοκλήρωση αυτής της Εγγραφής"
