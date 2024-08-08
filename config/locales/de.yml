@@ -16827,8 +16827,8 @@ de:
     other: "Strafe für Verspätung: %{count} Punkte Abzug"
     zero: "Strafe für Verspätung: Keine"
   late_percent_b91d01b3: "Spät: %{percent}"
-  late_policies_42bac80: "Letzte Richtlinien"
-  late_policies_fd5dced6: "Letzte Richtlinien"
+  late_policies_42bac80: "Richtlinien für verspätete Abgaben"
+  late_policies_fd5dced6: "Richtlinien für verspätete Abgaben"
   late_policies_updated_2ecf9aff: "Letzte Richtlinien aktualisieren"
   late_policy_9d0e76b5: "Richtlinie bei Verspätung"
   late_policy_d3f95a91: "Richtlinie bei Verspätung:"
@@ -20002,7 +20002,7 @@ de:
   module_item_has_been_viewed_and_is_complete_6d180117: "Modulelement wurde angesehen und ist abgeschlossen."
   module_item_is_locked_19fa60b4: "Das Modulelement ist gesperrt."
   module_item_marked_as_done_and_is_complete_ad240246: "Modulelement wurde als erledigt markiert und ist abgeschlossen."
-  module_item_module_item_name_was_successfully_dele_8626d846: "Modul-Element %{module_item_name} wurde gelöscht."
+  module_item_module_item_name_was_successfully_dele_8626d846: "Modul-Element %{module_item_name} wurde entfernt."
   module_item_submitted_and_is_complete_d61a909f: "Modulelement wurde abgeschickt und ist abgeschlossen."
   module_item_types: 
     assignment: Aufgabe
