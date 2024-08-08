@@ -6489,6 +6489,7 @@ hu:
         user_privileges: Jogosultságok
       legends: 
         memberships: Tagság(ok)
+        recent_messages: "Legutóbbi üzenetek"
       links: 
         cant_delete: "Nem lehet törölni"
         conclude_enrollment: Befejezés/lezárás
@@ -6499,6 +6500,7 @@ hu:
         user_account_details: "Felhasználói fiók részletei"
         user_only_view_section: "Ez a felhasználó csak a saját szekciójába tartozó társait láthassa!"
         user_view_all_sections: "engedélyezi, hogy ez a felhasználó minden kurzusfelhasználót lásson"
+      no_messages: "Nincsenek üzenetek"
       user_only_view_section: "ez a felhasználó csak a hozzárendelt kurzusszekció(k) hallgatóit láthatja"
       user_view_all_sections: "ez a felhasználó láthatja a hallgatókat minden kurzusszekcióban"
     no_user: 
