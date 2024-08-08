@@ -66,7 +66,9 @@ class SubmissionsBaseController < ApplicationController
 
         set_active_tab "assignments"
 
-        render "submissions/show", stream: can_stream_template?
+        render "submissions/show",
+               stream: can_stream_template?,
+               layout: (params[:embed] == "true") ? "mobile_embed" : true
       end
 
       format.json do

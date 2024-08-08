@@ -70,6 +70,38 @@ describe "submissions" do
       expect(f(".entered_grade")).to include_text "B−"
     end
 
+    it "show canvas menu when is not embedded within mobile apps" do
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher)
+
+      first_period_assignment = @course.assignments.create!(
+        due_at: @due_date,
+        points_possible: 10,
+        submission_types: "online_text_entry"
+      )
+
+      get "/courses/#{@course.id}/assignments/#{first_period_assignment.id}/submissions/#{@student.id}"
+
+      expect(f("body")).to contain_jqcss("header#mobile-header")
+      expect(f("body")).to contain_jqcss("header#header")
+    end
+
+    it "remove canvas menu when embedded within mobile apps" do
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher)
+
+      first_period_assignment = @course.assignments.create!(
+        due_at: @due_date,
+        points_possible: 10,
+        submission_types: "online_text_entry"
+      )
+
+      get "/courses/#{@course.id}/assignments/#{first_period_assignment.id}/submissions/#{@student.id}?embed=true"
+
+      expect(f("body")).not_to contain_jqcss("header#mobile-header")
+      expect(f("body")).not_to contain_jqcss("header#header")
+    end
+
     it "show score if not RDQ" do
       # truthy feature flag
       Account.default.enable_feature! :restrict_quantitative_data
