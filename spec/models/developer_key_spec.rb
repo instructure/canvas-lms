@@ -1186,6 +1186,26 @@ describe DeveloperKey do
   end
 
   describe "default" do
+    context "when create_if_missing: false is passed" do
+      before do
+        allow(DeveloperKey).to receive(:get_special_key) do |*args, **kwargs|
+          DeveloperKey.original_get_special_key(*args, **kwargs)
+        end
+      end
+
+      it "does not create a key" do
+        DeveloperKey.delete_all
+        expect(DeveloperKey.count).to eq 0
+        DeveloperKey.default(create_if_missing: false)
+        expect(DeveloperKey.count).to eq 0
+      end
+
+      it "finds existing keys" do
+        expect(DeveloperKey.default).to_not be_nil
+        expect(DeveloperKey.default(create_if_missing: false)).to_not be_nil
+      end
+    end
+
     context "sharding" do
       specs_require_sharding
 
