@@ -41,6 +41,8 @@ export default class SelfEnrollmentForm extends Backbone.View {
       .find('input[type=hidden][name=initial_action]')
       .val()
     this.timerId = null
+    // this is the registration form if the radio to register exists
+    this.canRegister = this.$el.find('input[id="selfEnrollmentAuthRegCreate"]').length > 0
 
     const retryCount = 5
     // need to pass class context to loadCaptcha
@@ -79,7 +81,9 @@ export default class SelfEnrollmentForm extends Backbone.View {
       if (this.action === 'create') {
         this.$el.find('#submit_button').prop('disabled', true)
       }
-      loadCaptcha(0)
+      if (this.canRegister) {
+        loadCaptcha(0)
+      }
     }
     return this.$el.formSubmit({
       beforeSubmit: data => this.beforeSubmit(data),
