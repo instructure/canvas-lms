@@ -16,27 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import {useEffect, useState} from 'react'
 
-export default function useIsInSpeedGrader() {
+export default function useSpeedGrader() {
   const [isInSpeedGrader, setIsInSpeedGrader] = useState(false)
 
   useEffect(() => {
     const checkSpeedGrader = () => {
       try {
         const currentUrl = new URL(window.location.href)
-
-        // Check if speed_grader parameter is set to 1
         const params = new URLSearchParams(currentUrl.search)
-        if (params.get('speed_grader') === '1') {
-          setIsInSpeedGrader(true)
-          return
-        }
-
-        setIsInSpeedGrader(false)
+        setIsInSpeedGrader(params.get('speed_grader') === '1')
       } catch (error) {
-        // If we can't access top window location due to cross-origin restrictions,
-        // we assume we're not in SpeedGrader
         setIsInSpeedGrader(false)
       }
     }
@@ -44,5 +35,23 @@ export default function useIsInSpeedGrader() {
     checkSpeedGrader()
   }, [])
 
-  return isInSpeedGrader
+  // These will be implemented later
+  const handlePreviousStudentReply = null
+  const handleNextStudentReply = null
+
+  const handleJumpFocusToSpeedGrader = () => {
+    window.top.postMessage(
+      {
+        subject: 'SG.focusPreviousStudentButton',
+      },
+      '*'
+    )
+  }
+
+  return {
+    isInSpeedGrader,
+    handlePreviousStudentReply,
+    handleNextStudentReply,
+    handleJumpFocusToSpeedGrader,
+  }
 }

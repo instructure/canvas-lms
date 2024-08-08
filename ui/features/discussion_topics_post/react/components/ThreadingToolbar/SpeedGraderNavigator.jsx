@@ -20,42 +20,50 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState, useRef} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
+import useSpeedGrader from '../../hooks/useSpeedGrader'
 
 const I18n = useI18nScope('speed_grader')
 
 const visuallyHiddenStyles = {
   border: 0,
+  clip: 'rect(0 0 0 0)',
   height: '1px',
   margin: '-1px',
   overflow: 'hidden',
   padding: 0,
+  position: 'absolute',
   width: '1px',
 }
 
-export const SpeedGraderNavigator = props => {
+export const SpeedGraderNavigator = () => {
   const [isVisible, setIsVisible] = useState(false)
   const containerRef = useRef(null)
 
-  const handlePrevious = () => {
-    // Handle previous action
-  }
-
-  const handleNext = () => {
-    // Handle next action
-  }
-
-  const handleJump = () => {
-    // Handle jump action
-  }
+  const {
+    handlePreviousStudentReply,
+    handleNextStudentReply,
+    handleJumpFocusToSpeedGrader
+  } = useSpeedGrader()
 
   const handleFocus = () => {
     setIsVisible(true)
   }
 
   const handleBlur = (event) => {
-    if (!containerRef.current.contains(event.relatedTarget)) {
+    if (!containerRef.current?.contains(event.relatedTarget)) {
       setIsVisible(false)
     }
+  }
+
+  const renderButton = (handler, testId, text) => {
+    if (!handler) return null
+    return (
+      <Flex.Item padding="0 x-small">
+        <Button data-testid={testId} onClick={handler}>
+          {text}
+        </Button>
+      </Flex.Item>
+    )
   }
 
   return (
@@ -67,30 +75,9 @@ export const SpeedGraderNavigator = props => {
       onBlur={handleBlur}
     >
       <Flex as="nav" justifyItems="start">
-        <Flex.Item padding="0 x-small 0 0">
-          <Button
-            data-testid="previous-in-speedgrader"
-            onClick={handlePrevious}
-          >
-            {I18n.t('Previous in SpeedGrader')}
-          </Button>
-        </Flex.Item>
-        <Flex.Item padding="0 x-small">
-          <Button
-            data-testid="next-in-speedgrader"
-            onClick={handleNext}
-          >
-            {I18n.t('Next in SpeedGrader')}
-          </Button>
-        </Flex.Item>
-        <Flex.Item padding="0 0 0 x-small">
-          <Button
-            data-testid="jump-to-speedgrader-navigation"
-            onClick={handleJump}
-          >
-            {I18n.t('Jump to SpeedGrader Navigation')}
-          </Button>
-        </Flex.Item>
+        {renderButton(handlePreviousStudentReply, "previous-in-speedgrader", I18n.t('Previous in SpeedGrader'))}
+        {renderButton(handleNextStudentReply, "next-in-speedgrader", I18n.t('Next in SpeedGrader'))}
+        {renderButton(handleJumpFocusToSpeedGrader, "jump-to-speedgrader-navigation", I18n.t('Jump to SpeedGrader Navigation'))}
       </Flex>
     </div>
   )

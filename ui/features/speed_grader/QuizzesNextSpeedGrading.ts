@@ -81,6 +81,7 @@ function setup(EG, $iframe_holder, registerCb, refreshGradesCb, speedGraderWindo
 
   function onMessage(e) {
     const message = e.data
+    const prevButton = document.getElementById('prev-student-button')
     switch (message.subject) {
       case 'quizzesNext.register':
         EG.setGradeReadOnly(true)
@@ -91,6 +92,10 @@ function setup(EG, $iframe_holder, registerCb, refreshGradesCb, speedGraderWindo
         return EG.prev()
       case 'quizzesNext.nextStudent':
         return EG.next()
+      case 'SG.focusPreviousStudentButton':
+        if (prevButton) {
+          prevButton.focus()
+        }
     }
   }
 

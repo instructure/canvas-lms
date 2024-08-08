@@ -230,18 +230,41 @@ describe "SpeedGrader - discussion submissions" do
           in_frame("discussion_preview_iframe") do
             wait_for_ajaximations
 
-            expect(f("[data-testid='previous-in-speedgrader']")).not_to be_displayed
-            expect(f("[data-testid='next-in-speedgrader']")).not_to be_displayed
+            # These should be uncommented out when the implementation is done in the closing
+            # Patchset for VICE-3920
+            # expect(f("[data-testid='previous-in-speedgrader']")).not_to be_displayed
+            # expect(f("[data-testid='next-in-speedgrader']")).not_to be_displayed
             expect(f("[data-testid='jump-to-speedgrader-navigation']")).not_to be_displayed
 
-            driver.execute_script("document.querySelector('[data-testid=\"previous-in-speedgrader\"]').focus()")
+            driver.execute_script("document.querySelector('[data-testid=\"jump-to-speedgrader-navigation\"]').focus()")
             wait_for_ajaximations
 
-            expect(f("[data-testid='previous-in-speedgrader']")).to be_displayed
-            expect(f("[data-testid='next-in-speedgrader']")).to be_displayed
+            # These should be uncommented out when the implementation is done in the closing
+            # Patchset for VICE-3920
+            # expect(f("[data-testid='previous-in-speedgrader']")).to be_displayed
+            # expect(f("[data-testid='next-in-speedgrader']")).to be_displayed
             expect(f("[data-testid='jump-to-speedgrader-navigation']")).to be_displayed
           end
         end
+      end
+
+      it "can focus on speedgrader previous student button" do
+        Speedgrader.visit(@course.id, @assignment.id)
+
+        in_frame("speedgrader_iframe") do
+          in_frame("discussion_preview_iframe") do
+            wait_for_ajaximations
+
+            driver.execute_script("document.querySelector('[data-testid=\"jump-to-speedgrader-navigation\"]').focus()")
+            wait_for_ajaximations
+
+            expect(f("[data-testid='jump-to-speedgrader-navigation']")).to be_displayed
+
+            f("[data-testid='jump-to-speedgrader-navigation']").click
+          end
+        end
+
+        check_element_has_focus f("#prev-student-button")
       end
 
       it "displays whole discussion with hidden student names" do
