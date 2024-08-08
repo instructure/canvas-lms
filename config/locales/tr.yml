@@ -5130,6 +5130,7 @@ tr:
         user_privileges: Ayrıcalıklar
       legends: 
         memberships: Üyelik(ler)
+        recent_messages: "Son Mesajlar"
       links: 
         access_report: "%{user} kullanıcısının Erişim Raporu"
         cant_delete: Silinemez
@@ -5147,6 +5148,7 @@ tr:
         user_only_view_section: "bu kullanıcı sadece bölüm arkadaşlarını görebilsin"
         user_outcomes: "%{user}'ın öğrenme çıktıları"
         user_view_all_sections: "bu kullanıcı tüm ders katılımcılarını görebilsin"
+      no_messages: "Mesaj Yok"
       user_only_view_section: "bu kullanıcı sadece atandığı dersin bölüm(ler)indeki öğrencileri görebilir"
       user_view_all_sections: "bu kullanıcı herhangi bir ders bölümündeki öğrencileri görebilir"
     no_user: 
