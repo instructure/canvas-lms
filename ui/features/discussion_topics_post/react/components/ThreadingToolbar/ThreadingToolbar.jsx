@@ -30,12 +30,12 @@ import {Text} from '@instructure/ui-text'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../utils'
 import {View} from '@instructure/ui-view'
-import useIsInSpeedGrader from '../../hooks/useIsInSpeedGrader'
+import useSpeedGrader from '../../hooks/useSpeedGrader'
 
 const I18n = useI18nScope('discussion_posts')
 
 export function ThreadingToolbar({...props}) {
-  const isInSpeedGrader = useIsInSpeedGrader()
+  const { isInSpeedGrader } = useSpeedGrader()
 
   return (
     <Responsive
