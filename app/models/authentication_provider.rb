@@ -335,6 +335,7 @@ class AuthenticationProvider < ActiveRecord::Base
         account_users_to_activate.each(&:reactivate)
       when "sis_user_id", "integration_id"
         next if value.empty?
+        next if pseudonym.account.pseudonyms.where(sis_user_id: value).exists?
 
         pseudonym[attribute] = value
       when "display_name"
