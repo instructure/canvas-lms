@@ -821,6 +821,8 @@ describe "Importing assignments" do
       end
 
       it "creates a assignment_configuration_tool_lookup" do
+        allow(Lti::ToolProxy)
+          .to receive(:find_active_proxies_for_context_by_vendor_code_and_product_code) { [tool_proxy] }
         assignment
         Importers::AssignmentImporter.import_from_migration(assign_hash, course, migration)
         assignment.reload
@@ -841,38 +843,100 @@ describe "Importing assignments" do
         expect(assignment.assignment_configuration_tool_lookups.count).to eq 1
       end
 
-      it "creates assignment_configuration_tool_lookups with the proper context_type" do
-        actl1 = assignment.assignment_configuration_tool_lookups.create!(
-          tool_vendor_code: vendor_code,
-          tool_product_code: product_code,
-          tool_resource_type_code: resource_type_code,
+      it "clears out extra tool settings" do
+        allow(Lti::ToolProxy)
+          .to receive(:find_active_proxies_for_context_by_vendor_code_and_product_code) { [tool_proxy] }
+        assignment.assignment_configuration_tool_lookups.create!(
+          tool_vendor_code: "extra_vendor_code",
+          tool_product_code: "extra_product_code",
+          tool_resource_type_code: "extra_resource_type_code",
           tool_type: "Lti::MessageHandler",
-          context_type: "Account"
+          context_type: "Course"
         )
-
         Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
         assignment.reload
-        expect(assignment.assignment_configuration_tool_lookups.count).to eq 2
-        new_actls = assignment.assignment_configuration_tool_lookups.reject do |actl|
-          actl.id == actl1.id
+        expect(assignment.assignment_configuration_tool_lookups.count).to eq 1
+        tool_lookup = assignment.assignment_configuration_tool_lookups.first
+        expect(tool_lookup.tool_vendor_code).to eq vendor_code
+        expect(tool_lookup.tool_product_code).to eq product_code
+        expect(tool_lookup.tool_resource_type_code).to eq resource_type_code
+        expect(tool_lookup.tool_type).to eq "Lti::MessageHandler"
+        expect(tool_lookup.context_type).to eq "Course"
+      end
+
+      context "when similarity_detection_tool is empty in hash" do
+        let(:empty_similarity_tool_assign_hash) do
+          assign_hash[:similarity_detection_tool] = nil
+          assign_hash
         end
-        expect(new_actls.map(&:context_type)).to eq(["Course"])
+
+        before do
+          allow(Lti::ToolProxy)
+            .to receive(:find_active_proxies_for_context_by_vendor_code_and_product_code) { [tool_proxy] }
+          assignment.assignment_configuration_tool_lookups.create!(
+            tool_vendor_code: vendor_code,
+            tool_product_code: product_code,
+            tool_resource_type_code: resource_type_code,
+            tool_type: "Lti::MessageHandler",
+            context_type: "Account"
+          )
+        end
+
+        context "when import is not master migration" do
+          it "does not remove ACTLs on empty similarity_detection_tool" do
+            Importers::AssignmentImporter.import_from_migration(empty_similarity_tool_assign_hash, @course, migration)
+            assignment.reload
+            expect(assignment.assignment_configuration_tool_lookups.count).to eq 1
+            tool_lookup = assignment.assignment_configuration_tool_lookups.first
+            expect(tool_lookup.tool_vendor_code).to eq vendor_code
+            expect(tool_lookup.tool_product_code).to eq product_code
+            expect(tool_lookup.tool_resource_type_code).to eq resource_type_code
+          end
+        end
+
+        context "when import is a master migration" do
+          let(:migration) { double("Migration") }
+          let(:master_course_subscription) { double("MasterCourseSubscription") }
+          let(:item) { double("Item") }
+          let(:content_tag) { double("ContentTag", downstream_changes: ["none"]) }
+
+          let(:master_migration) do
+            migration = course.content_migrations.create!
+            allow_any_instance_of(Assignment).to receive(:mark_as_importing!)
+            allow(migration).to receive_messages(for_master_course_import?: true, master_course_subscription:)
+            allow(master_course_subscription).to receive(:content_tag_for).with(assignment).and_return(content_tag)
+            migration
+          end
+
+          it "removes ACTLs on empty similarity_detection_tool" do
+            Importers::AssignmentImporter.import_from_migration(empty_similarity_tool_assign_hash, @course, master_migration)
+            assignment.reload
+            expect(assignment.assignment_configuration_tool_lookups.count).to eq 0
+          end
+        end
       end
     end
 
     it "sets the vendor/product/resource_type codes" do
+      allow(Lti::ToolProxy)
+        .to receive(:find_active_proxies_for_context_by_vendor_code_and_product_code) { [tool_proxy] }
       course_model
       migration = @course.content_migrations.create!
       assignment = @course.assignments.create!(title: "test", due_at: Time.now, unlock_at: 1.day.ago, lock_at: 1.day.from_now, peer_reviews_due_at: 2.days.from_now, migration_id:)
       Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
       assignment.reload
+      expect(assignment.assignment_configuration_tool_lookups.count).to eq 1
       tool_lookup = assignment.assignment_configuration_tool_lookups.first
       expect(tool_lookup.tool_vendor_code).to eq vendor_code
       expect(tool_lookup.tool_product_code).to eq product_code
       expect(tool_lookup.tool_resource_type_code).to eq resource_type_code
+      expect(tool_lookup.tool_type).to eq "Lti::MessageHandler"
+      expect(tool_lookup.context_type).to eq "Course"
     end
 
     it "sets the tool_type to 'LTI::MessageHandler'" do
+      allow(Lti::ToolProxy)
+        .to receive(:find_active_proxies_for_context_by_vendor_code_and_product_code) { [tool_proxy] }
       course_model
       migration = @course.content_migrations.create!
       assignment = @course.assignments.create!(title: "test", due_at: Time.now, unlock_at: 1.day.ago, lock_at: 1.day.from_now, peer_reviews_due_at: 2.days.from_now, migration_id:)
@@ -883,6 +947,8 @@ describe "Importing assignments" do
     end
 
     it "sets the visibility" do
+      allow(Lti::ToolProxy)
+        .to receive(:find_active_proxies_for_context_by_vendor_code_and_product_code) { [tool_proxy] }
       course_model
       migration = @course.content_migrations.create!
       assignment = @course.assignments.create!(title: "test", due_at: Time.now, unlock_at: 1.day.ago, lock_at: 1.day.from_now, peer_reviews_due_at: 2.days.from_now, migration_id:)

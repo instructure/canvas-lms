@@ -388,33 +388,7 @@ module Importers
 
       create_lti_13_models(hash, context, migration, item)
 
-      if hash["similarity_detection_tool"].present?
-        similarity_tool = hash["similarity_detection_tool"]
-        vendor_code = similarity_tool["vendor_code"]
-        product_code = similarity_tool["product_code"]
-        resource_type_code = similarity_tool["resource_type_code"]
-        item.assignment_configuration_tool_lookups.find_or_create_by!(
-          tool_vendor_code: vendor_code,
-          tool_product_code: product_code,
-          tool_resource_type_code: resource_type_code,
-          tool_type: "Lti::MessageHandler",
-          context_type: context.class.name
-        )
-        active_proxies = Lti::ToolProxy.find_active_proxies_for_context_by_vendor_code_and_product_code(
-          context:, vendor_code:, product_code:
-        )
-
-        if active_proxies.blank?
-          migration.add_warning(I18n.t(
-                                  "We were unable to find a tool profile match for vendor_code: \"%{vendor_code}\" product_code: \"%{product_code}\".",
-                                  vendor_code:,
-                                  product_code:
-                                ))
-        else
-          item.lti_context_id ||= SecureRandom.uuid
-          create_tool_settings(hash["tool_setting"], active_proxies.first, item)
-        end
-      end
+      import_similarity_detection_tool(hash, context, migration, item)
 
       # Ensure anonymous and moderated assignments always start out manually
       # posted, even if the moderated assignment in the old course was switched
@@ -423,6 +397,33 @@ module Importers
       item.post_policy.update!(post_manually: !!post_manually)
 
       item
+    end
+
+    def self.import_similarity_detection_tool(hash, context, migration, item)
+      tool_hash = hash["similarity_detection_tool"]
+
+      if tool_hash
+        active_proxies = Lti::ToolProxy.find_active_proxies_for_context_by_vendor_code_and_product_code(context:, vendor_code: tool_hash["vendor_code"], product_code: tool_hash["product_code"])
+        return migration.add_warning(I18n.t("We were unable to find a tool profile match for vendor_code: \"%{vendor_code}\" product_code: \"%{product_code}\".", vendor_code: tool_hash["vendor_code"], product_code: tool_hash["product_code"])) if active_proxies.blank?
+      else
+        item.assignment_configuration_tool_lookups.destroy_all if migration.for_master_course_import?
+        return
+      end
+
+      actl = item.assignment_configuration_tool_lookups.find_or_create_by!(actl_query_hash(context, tool_hash))
+      item.assignment_configuration_tool_lookups.where.not(id: actl.reload.id).destroy_all if item.assignment_configuration_tool_lookups.count > 1
+      item.lti_context_id ||= SecureRandom.uuid
+      create_tool_settings(hash["tool_setting"], active_proxies.first, item)
+    end
+
+    def self.actl_query_hash(context, similarity_detection_tool_hash)
+      {
+        tool_vendor_code: similarity_detection_tool_hash["vendor_code"],
+        tool_product_code: similarity_detection_tool_hash["product_code"],
+        tool_resource_type_code: similarity_detection_tool_hash["resource_type_code"],
+        tool_type: "Lti::MessageHandler",
+        context_type: context.class.name
+      }
     end
 
     # Create the interrelated LTI 1.3 models (ContentTag, Lti::ResourceLink,
