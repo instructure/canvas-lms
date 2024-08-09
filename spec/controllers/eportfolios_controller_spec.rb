@@ -553,8 +553,8 @@ describe EportfoliosController do
 
     it "deals with long page names" do
       @portfolio.update name: "blah"
-      long_category = @portfolio.eportfolio_categories.create! name: "A" * 200
-      long_category.eportfolio_entries.create! name: "B" * 200, eportfolio: @portfolio
+      long_category = @portfolio.eportfolio_categories.create! name: "A" * 255
+      long_category.eportfolio_entries.create! name: "B" * 255, eportfolio: @portfolio
       to_zip = @portfolio.attachments.first
       ContentZipper.new.zip_eportfolio(to_zip, @portfolio)
       expect(@portfolio.attachments.first.workflow_state).to eq "zipped"
