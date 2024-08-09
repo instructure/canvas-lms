@@ -68,7 +68,6 @@ describe Canvas::LiveEvents do
         @data["body"]
       end
     end.new
-    allow(LiveEvents).to receive(:get_context).and_return({ compact_live_events: true })
   end
 
   let(:course_context) do
@@ -103,7 +102,6 @@ describe Canvas::LiveEvents do
           root_account_id:,
           root_account_uuid: root_account_uuid.to_s,
           root_account_lti_guid: root_account_lti_guid.to_s,
-          compact_live_events: true
         }
       )
     end
@@ -116,7 +114,6 @@ describe Canvas::LiveEvents do
                                       context_account_id: nil,
                                       context_id: user.global_id,
                                       context_type: "User",
-                                      compact_live_events: true
                                     })
     end
   end
@@ -301,7 +298,7 @@ describe Canvas::LiveEvents do
                    hash_including(
                      conversation_id: @convo.id.to_s
                    ),
-                   { compact_live_events: true }).once
+                   {}).once
       Canvas::LiveEvents.conversation_forwarded(@convo)
     end
   end
@@ -838,7 +835,7 @@ describe Canvas::LiveEvents do
                      role: "role",
                      level: "participation"
                    }.compact!,
-                   { compact_live_events: true }).once
+                   {}).once
 
       Canvas::LiveEvents.asset_access(@course, "category", "role", "participation")
     end
@@ -856,7 +853,7 @@ describe Canvas::LiveEvents do
                      role: "role",
                      level: "participation"
                    },
-                   { compact_live_events: true }).once
+                   {}).once
 
       Canvas::LiveEvents.asset_access(["assignments", @course], "category", "role", "participation")
     end
@@ -874,7 +871,7 @@ describe Canvas::LiveEvents do
                      role: "role",
                      level: "participation"
                    },
-                   { compact_live_events: true }).once
+                   {}).once
 
       Canvas::LiveEvents.asset_access(@page, "category", "role", "participation")
     end
@@ -894,7 +891,7 @@ describe Canvas::LiveEvents do
                      filename: @attachment.filename,
                      display_name: @attachment.display_name
                    }.compact!,
-                   { compact_live_events: true }).once
+                   {}).once
 
       Canvas::LiveEvents.asset_access(@attachment, "files", "role", "participation")
     end
@@ -916,7 +913,6 @@ describe Canvas::LiveEvents do
                      display_name: @attachment.display_name
                    }.compact!,
                    {
-                     compact_live_events: true,
                      context_account_id: context.account&.global_id&.to_s,
                      context_type: context.class.to_s,
                      context_id: "1"
@@ -940,7 +936,7 @@ describe Canvas::LiveEvents do
                      enrollment_id: @enrollment.id.to_s,
                      section_id: @enrollment.course_section_id.to_s
                    },
-                   { compact_live_events: true }).once
+                   {}).once
 
       Canvas::LiveEvents.asset_access(["assignments", @course],
                                       "category",
