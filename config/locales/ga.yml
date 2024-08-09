@@ -2371,7 +2371,7 @@ ga:
   allows_user_to_edit_course_pages_30f188b4: "Ligeann sé don úsáideoir leathanaigh an chúrsa a chur in eagar."
   allows_user_to_edit_course_tabs_95968064: "Ligeann sé don úsáideoir tábanna an chúrsa a chur in eagar."
   allows_user_to_edit_discussion_topics_5576aeb1: "Ligeann sé don úsáideoir topaicí fóraim a chur in eagar."
-  allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: "Ligeann sé don úsáideoir marcanna a chur in eagar agus ráitis a chur leis i LuasMharcálaí"
+  allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: "Ligeann sé don úsáideoir marcanna a chur in eagar agus ráitis a chur leis i SpeedGrader"
   allows_user_to_edit_grades_in_the_gradebook_83fa5c4f: "Ligeann sé don úsáideoir marcanna a chur in eagar i Leabhar na Marcanna."
   allows_user_to_edit_grading_schemes_98c35117: "Ligeann sé don úsáideoir scéimeanna marcála a chur in eagar."
   allows_user_to_edit_lock_settings_on_individual_as_80ed188a: "Ligeann sé don úsáideoir socruithe glais a chur in eagar ar thascanna aonair, leathanaigh nó fóraim."
@@ -2506,7 +2506,7 @@ ga:
   allows_user_to_view_faculty_journal_information_fo_3c725307: "Ligeann sé don úsáideoir faisnéis Iris Dáimhe do mhic léinn aonair a fheiceáil."
   allows_user_to_view_feature_options_in_account_set_befc6b83: "Ligeann sé seo don úsáideoir breathnú ar Gné-Roghanna i Socruithe Cuntais."
   allows_user_to_view_gradebook_9720b3e2: "Ligeann sé don úsáideoir Leabhar na Marcanna a fheiceáil."
-  allows_user_to_view_grader_comments_on_a_rubric_in_2ac9f890: "Ligeann sé seo don úsáideoir ráitis an marcálaí a fheiceáil ar rúibric i LuasMharcálaí."
+  allows_user_to_view_grader_comments_on_a_rubric_in_2ac9f890: "Ligeann sé seo don úsáideoir ráitis an marcálaí a fheiceáil ar rúibric i SpeedGrader."
   allows_user_to_view_groups_in_a_course_8a95805b: "Ligeann sé don úsáideoir féachaint ar ghrúpaí i gcúrsa."
   allows_user_to_view_last_activity_and_total_activi_105b5bc3: "Ligeann sé don úsáideoir féachaint ar an ngníomhaíocht dheireanach agus ar fhaisnéis iomlán na gníomhaíochta ar leathanach na nDaoine."
   allows_user_to_view_last_activity_and_total_activi_1455c521: "Ligeann sé don úsáideoir féachaint ar thuairiscí Gníomhaíocht Deiridh agus Gníomhaíocht Iomlán."
@@ -2528,7 +2528,7 @@ ga:
   allows_user_to_view_student_context_cards_in_annou_dadef934: "Ligeann sé don úsáideoir cártaí comhthéacs na mic léinn a fheiceáil i bhfreagraí fógra agus fóram."
   allows_user_to_view_student_grades_pages_e0091b20: "Ligeann sé don úsáideoir leathanaigh Marcanna na mac léinn a fheiceáil."
   allows_user_to_view_student_quiz_logs_e1c4491: "Ligeann sé don úsáideoir logaí quiz na mac léinn a fheiceáil."
-  allows_user_to_view_student_results_view_quiz_stat_7d77640a: "Ligeann sé don úsáideoir féachaint ar thorthaí na mac léinn, féachaint ar staitisticí quiz, agus teacht ar thráth na gceist i LuasMharcálaí."
+  allows_user_to_view_student_results_view_quiz_stat_7d77640a: "Ligeann sé don úsáideoir féachaint ar thorthaí na mac léinn, féachaint ar staitisticí quiz, agus teacht ar quiz i SpeedGrader."
   allows_user_to_view_student_specific_data_in_analy_4abbf6be: "Ligeann sé don úsáideoir sonraí mac léinn ar leith a fheiceáil in Anailísíocht."
   allows_user_to_view_the_announcements_link_in_cour_b3522273: "Ligeann sé don úsáideoir féachaint ar an nasc Fógraí i Nascleanúint Cúrsa."
   allows_user_to_view_the_clone_group_set_button_for_d68aab98: "Ligeann sé seo don úsáideoir féachaint ar an gcnaipe Clónáil Sraith Grúpaí le haghaidh cuntas nó grúpa cúrsa."
@@ -2571,7 +2571,7 @@ ga:
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Ligeann sé d'úsáideoirí an rogha \"Seoladh SpeedGrader arna scagadh de réir Grúpa Mac Léinn\" a chumasú do chúrsaí ar leathanach socruithe an chúrsa. Nuair a bheidh sé gníomhach agus grúpa mac léinn roghnaithe i Leabhar na Marcanna Nua, ní luchtóidh SpeedGrader ach na mic léinn sa ghrúpa roghnaithe."
   allows_users_to_import_groups_in_a_course_a8b5c73e: "Ligeann sé d'úsáideoirí grúpaí a iompórtáil i gcúrsa."
   allows_users_to_merge_multiple_accounts_together_g_e4ceeae6: "Ligeann sé d’úsáideoirí cuntais iolracha a chumasc le chéile (ag tabhairt faisnéis aitheantais chuí)."
-  allows_users_to_save_and_search_frequently_used_fe_806f8999: "Ligeann sé d'úsáideoirí aiseolas a úsáidtear go minic a shábháil agus a chuardach i leabharlann ráitis atá le húsáid i LuasMharcálaí."
+  allows_users_to_save_and_search_frequently_used_fe_806f8999: "Ligeann sé d'úsáideoirí aiseolas a úsáidtear go minic a shábháil agus a chuardach i leabharlann ráitis atá le húsáid i SpeedGrader."
   allows_users_to_use_average_as_a_calculation_metho_874f4b25: "Ligeann sé d'úsáideoirí meán a úsáid mar mhodh ríofa do thoradh ar leith."
   allows_users_to_use_average_as_a_calulcation_metho_e5031470: "Ligeann sé d'úsáideoirí meán a úsáid mar mhodh ríofa do thoradh ar leith."
   allows_users_to_use_new_decaying_average_as_a_calc_9c285038: "Ligeann sé d'úsáideoirí meán nua meathlaithe a úsáid mar mhodh ríofa do thoradh ar leith."
@@ -3490,7 +3490,7 @@ ga:
       no_points: "Ceann ar Bith"
       no_submission: Tada
       points: Pointí
-      speed_grader: LuasMharcálaí
+      speed_grader: SpeedGrader
       submission_types: "Cineálacha Comhad"
       submitting: "Ag cur isteach"
       turnitin: Turnitin
@@ -3708,7 +3708,7 @@ ga:
   assignments_loaded_72ee472c: "Tascanna lódáilte"
   assignments_report_faea72b9: "Tuairisc Tascanna"
   assignments_settings_30613d0c: "Socruithe Tascanna"
-  assignments_speedgrader_2fbd6df4: "Tascanna, LuasMharcálaí"
+  assignments_speedgrader_2fbd6df4: "Tascanna, SpeedGrader"
   assignments_tutorial_tray_4cc844b: "Tráidire Teagaisc Tascanna"
   assignments_usage_report_50671804: "Tuairisc Úsáide Tascanna"
   assignmenttype_title_41101dc0: "%{assignmentType} %{title}."
@@ -5358,7 +5358,7 @@ ga:
     instructor_edit_syllabus: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-edit-the-Syllabus-in-a-course/ta-p/1178"
     instructor_gradebook_individual_view: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-assignments-or-students-individually-in-the/ta-p/1247"
     instructor_guide: "https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor"
-    instructor_guide_speedgrader: "https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor#LuasMharcálaí"
+    instructor_guide_speedgrader: "https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor#SpeedGrader"
     instructor_homepage_layout_options: "https://community.canvaslms.com/t5/Instructor-Guide/What-layout-options-are-available-in-the-Course-Home-Page-as-an/ta-p/1291"
     instructor_import_grades: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-import-grades-in-the-Gradebook/ta-p/807"
     instructor_import_outcomes: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-import-outcomes-for-a-course/ta-p/702"
@@ -8189,7 +8189,7 @@ ga:
       mark_all_as_unread: "Marcáil iad Go Léir mar Neamhléite"
       retrieved_from_feed: "Aisghafa ó %{feed}"
       show_rubric: "Taispeáin Rúibric"
-      speed_grader: LuasMharcálaí
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: "Ní féidir é a dhífhoilsiú má tá freagraí mac léinn ann"
       topic: Topaic
@@ -8228,7 +8228,7 @@ ga:
       go_to_topic: "Téigh Go Topaic"
       like_entry: "Tabhair ‘is maith liom’ don iontráil"
       manage_discussion_entry: "Bainistigh Iontráil Fóraim"
-      open_in_speedgrader: "Oscail i LuasMharcálaí"
+      open_in_speedgrader: "Oscail i SpeedGrader"
       write_a_reply: Freagair
     entry_stats: 
       show_more: "Taispeáin tuilleadh"
@@ -8489,7 +8489,7 @@ ga:
   due_time_9acd6b69: "Dlite %{time}"
   due_to_the_size_of_your_course_you_must_select_a_s_f834ba66: "\n\
       \x20               Mar gheall ar mhéid do chúrsa caithfidh tú grúpa mac léinn a roghnú roimh \n\
-      LuasMharcálaí\n\
+      \x20               SpeedGrader\n\
       \x20a sheoladh.              "
   duplicate_31cec192: Cóipeáil
   duplicate_assignment_name_3ca7d753: "Cóipeáil Tasc %{name}"
@@ -9237,7 +9237,7 @@ ga:
   error_starting_save_operation_81bcb99: "Earráid agus an oibríocht shábháil á thosú:"
   error_submitting_rubric_83daca8b: "Earráid agus rúibric á chur isteach"
   error_submitting_to_plagiarism_service_9b0748cb: "Earráid ag cur isteach don tseirbhís bradaíola"
-  error_submitting_to_plagiarism_service_you_may_res_3c89e82d: "Earráid ag cur isteach don tseirbhís bradaíola. Is féidir leat cuir isteach arís ó LuasMharcálaí."
+  error_submitting_to_plagiarism_service_you_may_res_3c89e82d: "Earráid ag cur isteach don tseirbhís bradaíola. Is féidir leat cuir isteach arís ó SpeedGrader."
   error_the_tool_did_not_return_a_url_to_canvas_a9afa641: "Earráid: Níor chuir an uirlis URL ar ais chuig Canvas"
   error_the_tool_returned_an_invalid_content_type_co_10a11c07: "Earráid: Cuireadh cineál ábhair neamhbhailí ar ais ón uirlis \"%{contentType}\""
   error_un_archiving_rubric_efc6fb15: "Earráid an Rúibric a Dhí-Chartlannú"
@@ -10114,7 +10114,7 @@ ga:
       message_students_who: "Cuir Teachtaireacht chuig mic léinní a..."
       re_upload_submissions: "Athíoslódáil Uaslódálacha"
       set_default_grade: "Socraigh Marc Réamhshocraithe"
-      speedgrader: LuasMharcálaí
+      speedgrader: SpeedGrader
     header_filter: 
       course_average: "Meán cúrsa"
       course_median: "Airmheán cúrsa"
@@ -10163,7 +10163,7 @@ ga:
   gradebook_menu_dropdown_3692d623: "Clár anuas leabhar na Marcanna"
   gradebook_settings_b45c6df9: "Socruithe Leabhar na Marcanna"
   gradebook_settings_updated_fef63d60: "Nuashonraíodh Socruithe Leabhar na Marcanna"
-  gradebook_speedgrader_66cb7a6a: "Leabhar na Marcanna, LuasMharcálaí"
+  gradebook_speedgrader_66cb7a6a: "Leabhar na Marcanna, SpeedGrader"
   gradebook_tutorial_tray_d835c750: "Tráidire Leabhar na Marcanna Teagaisc"
   gradebook_uploads: 
     errors: 
@@ -10259,7 +10259,7 @@ ga:
       all_sections: "Gach Roinn"
       buttons: 
         save_settings: "Sábháil Socruithe"
-        show_new_sg_ui: "Úsáid Chomhéadain LuasMharcálaí nua"
+        show_new_sg_ui: "Úsáid Chomhéadain SpeedGrader nua"
       comment_submitted: "Tá do nóta Ráiteasa curtha isteach."
       crocodoc_pending: "Tá Crocodoc fós ag próiseáil an doiciméid seo."
       headers: 
@@ -10281,7 +10281,7 @@ ga:
         previous_student: k
         use_rubric: r
       labels: 
-        hide_names: "Folaigh ainmneacha na mic léinn i LuasMharcálaí"
+        hide_names: "Folaigh ainmneacha na mic léinn i SpeedGrader"
         showing: "Ag taispeáint"
         sort_by: "Sórtáil liosta na mac léinn"
       links: 
@@ -10290,8 +10290,8 @@ ga:
         submit_same_score: "Úsáid an Marc céanna seo don t-athuaslódáil"
       no_annotation: "Níl nótaí mínithe ar fáil don doiciméad seo"
       not_newest_notice: "Nóta: Ní hé seo an uaslódáil is déanaí"
-      page_header_title: LuasMharcálaí
-      page_title: "%{assignment_name}, LuasMharcálaí, %{course_name}"
+      page_header_title: SpeedGrader
+      page_title: "%{assignment_name}, SpeedGrader, %{course_name}"
       sort_by: 
         randomize: "mic léinn a randamú"
         status: "de réir stádas uaslódáa (marcáil ag teastáil, nár cuireadh isteach, srl)"
@@ -11050,7 +11050,7 @@ ga:
   how_do_i_upload_a_file_to_a_course_e8332cfe: "Conas is féidir liom comhad a uaslódáil chuig cúrsa?"
   how_do_i_use_course_settings_1e8467e6: "Conas a úsáidim socruithe cúrsa?"
   how_do_i_use_files_as_an_instructor_70a996b: "Conas a úsáidim Comhaid mar theagascóir?"
-  how_do_i_use_speedgrader_e18e4ca2: "Conas a úsáidim LuasMharcálaí?"
+  how_do_i_use_speedgrader_e18e4ca2: "Conas a úsáidim SpeedGrader?"
   how_do_i_use_the_announcements_index_page_94a14011: "Conas a bhainim úsáid as an Leathanach Innéacs Fógraí?"
   how_do_i_use_the_collaborations_index_page_68ee88b5: "Conas a bhainim úsáid as an Leathanach Innéacs Comhoibrithe?"
   how_do_i_use_the_course_home_page_as_an_instructor_af32848e: "Conas a úsáidim Leathanach Baile an Chúrsa mar theagascóir?"
@@ -11066,7 +11066,7 @@ ga:
   how_do_i_view_analytics_for_an_individual_student_724134ed: "Conas is féidir liom féachaint ar anailísíocht do mhac léinn aonair?"
   how_do_i_view_and_sort_discussion_replies_as_an_in_a73217e3: "Conas is féidir liom féachaint ar fhreagraí fóraim agus iad a shórtáil mar theagascóir?"
   how_do_i_view_assignments_or_students_individually_2b7211f8: "Conas a fhéachaim ar thascanna nó ar mhic léinn ina n-aonar i Leabhar na Marcanna?"
-  how_do_i_view_the_details_of_a_submission_for_a_st_3ba83fb3: "Conas a fhéachaim ar shonraí uaslódála do mhic léinn i LuasMharcálaí?"
+  how_do_i_view_the_details_of_a_submission_for_a_st_3ba83fb3: "Conas a fhéachaim ar shonraí uaslódála do mhac léinn i SpeedGrader?"
   how_do_i_view_user_details_for_an_enrollment_in_a__308e9ac0: "Conas a fhéachaim ar shonraí úsáideora le haghaidh rollú ar chúrsa?"
   how_do_you_feel_about_this_search_result_e797abbf: "Conas a mhothaíonn tú faoin toradh cuardaigh seo?"
   how_is_the_grade_determined_bb75bf53: "Conas a Chinntear an Marc?"
@@ -11238,7 +11238,7 @@ ga:
   if_set_deprioritizes_using_due_dates_lock_dates_an_b7303ae9: "Má shocraítear, dírítear tosaíocht ag baint úsáid as dátaí dlite, dátaí glasála, agus dátaí díghlasála ó sháruithe grúpa ar thasc a bhaineann le rollú díghníomhachtaithe, críochnaithe nó neamhghníomhach ar bhealach eile do mhac léinn."
   if_set_displays_originality_reports_with_assignmen_c5d0276f: "Má shocraítear, taispeánann sé tuairiscí úrnuachta agus Feabhsuithe Taisc curtha ar siúl"
   if_set_displays_updated_mastery_connect_icon_b6a93002: "Má shocraítear, taispeánann sé deilbhín ceangail forlámhais muashonraithe"
-  if_set_quizzes_next_will_operate_using_a_single_la_1adc9c47: "Má shocraítear, Quizzes.Next oibreoidh sé trí úsáid a bhaint as seisiún seolta amháin i LuasMharcálaí"
+  if_set_quizzes_next_will_operate_using_a_single_la_1adc9c47: "Má shocraítear, Quizzes.Next oibreoidh sé trí úsáid a bhaint as seisiún seolta amháin i SpeedGrader"
   if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: "Má shocraítear, déanfaidh an t-áireamhán Marc neamhaird ar thascanna anaithnide nár postáladh agus na hiomláin á ríomh."
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Má shocraítear, múchfaidh sé an fheidhmiúlacht postáil-go-SIS le haghaidh tascanna nuair a dhúnann a dtréimhse mharcála. Ní bhaineann sé seo ach amháin má tá an ghné \"Cumasaigh socruithe nua um chomhtháthú SIS\" cumasaithe."
   if_sis_data_manage_is_disabled_and_sis_data_read_i_3db0be5: "Má tá Sonraí SIS - bainistigh díchumasaithe agus má tá Sonraí SIS - léigh cumasaithe, ní féidir le húsáideoirí ach aitheantais cúrsa, úsáideora agus fochuntais SIS a fheiceáil."
@@ -14642,7 +14642,7 @@ ga:
   more_cf9cc661: Tuilleadh
   more_control_over_password_settings_at_institution_78d7e069: "Tuilleadh smachta ar shocruithe pasfhocail ag leibhéal na hinstitiúide"
   more_courses_5ebbe998: "Tuilleadh Cúrsaí"
-  more_details_in_speedgrader_a97fead1: "Tuilleadh sonraí i LuasMharcálaí"
+  more_details_in_speedgrader_a97fead1: "Tuilleadh sonraí i SpeedGrader"
   more_details_in_the_speedgrader_8702f408: "Tuilleadh sonraí sa LuasMharcálaí"
   more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "Níos tábhachtaí fós, ligeann Canvas duit torthaí a chur le do rúibricí marcála ionas gur féidir leat Forlámhas a mheas agus tú ag marcáil tascanna. Nuair a bheidh na torthaí socraithe agat, cliceáil ar Bainistigh Rúibricí chun do thorthaí a úsáid le haghaidh marcáil."
   more_info_at_url_41b4764b: "Tuilleadh eolais ag %{url}"
@@ -14884,8 +14884,8 @@ ga:
   nav_text_active_a924ae88: "Téacs Nascleanúna Gníomhach"
   navigate_to_speed_grader_for_name_f28cb5b1: "Déan nascleanúint chuig Luasmharcálaí le haghaidh %{name}"
   navigate_to_speed_grader_for_title_assignment_828b1366: "Déan nascleanúint chuig Luasmharcálaí le haghaidh tasc %{title}"
-  navigate_to_speedgrader_for_name_c6408892: "Déan nascleanúint chuig LuasMharcálaí le haghaidh %{name}"
-  navigate_to_speedgrader_for_title_assignment_47da92db: "Déan nascleanúint chuig LuasMharcálaí le haghaidh tasc %{title}"
+  navigate_to_speedgrader_for_name_c6408892: "Déan nascleanúint chuig SpeedGrader le haghaidh %{name}"
+  navigate_to_speedgrader_for_title_assignment_47da92db: "Déan nascleanúint chuig SpeedGrader le haghaidh tasc %{title}"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Ligeann nascleanúint don úsáideoir féachaint ar an nasc Daoine i Nascleanúint Cúrsa."
   navigation_menu_fd782ff8: "Roghchlár Nascleanúna"
   near_3282280c: "In aice"
@@ -15748,14 +15748,14 @@ ga:
   open_for_comments_f8f7641e: "Oscailte le haghaidh Ráitis"
   open_grading_scheme_menu_5f889203: "Oscail roghchlár na Scéime Marcaithe"
   open_in_speedgrader_506a4ad5: "Oscail i LuasMharcálaí"
-  open_in_speedgrader_57c64fe3: "Oscail i LuasMharcálaí"
+  open_in_speedgrader_57c64fe3: "Oscail i SpeedGrader"
   open_in_theme_editor_156028e2: "Oscail in Eagarthóir Téama"
   open_label_menu_97538918: "Oscail %{label} Roghchlár"
   open_message_d7b12975: "Oscail Teachtaireacht"
   open_name_color_picker_a2646a33: "Oscail Roghnóir Dathanna %{name}"
   open_new_subject_modal_c9049e1d: "Oscail Modhach ábhar nua"
   open_search_menu_1c4d4685: "Oscail Roghchlár Cuardach"
-  open_speedgrader_11604608: "Oscailte LuasMharcálaí"
+  open_speedgrader_11604608: "Oscailte SpeedGrader"
   open_student_context_tray_24c1b1d6: "Oscail tráidire comhthéacs an mac léinn"
   open_submission_tray_4eb14e96: "Oscail an tráidire uaslódáila"
   open_the_grade_detail_tray_cea682a5: "Oscail an tráidire sonraí Marc"
@@ -16558,7 +16558,7 @@ ga:
         domain_settings: "Socruithe Fearainn"
         misc_settings: "Éags. Socruithe"
         ui_conf_ids: "Aitheantais Chumraíochta an Chomhéadain úsáideora"
-      hide_rte_button_note: "(fós ann le haghaidh comhráite/LuasMharcálaí/Taifeadtaí Meáin Uaslódálacha obair bhaile)"
+      hide_rte_button_note: "(fós ann le haghaidh comhráite/SpeedGrader/Taifeadtaí Meáin Uaslódálacha obair bhaile)"
       hints: 
         domain: "Le haghaidh cuntais óstailte, bain úsáid as “www.kaltura.com\""
         resource_domain: "Le haghaidh cuntais óstailte, bain úsáid as \"cdn.kaltura.com\""
@@ -17523,7 +17523,7 @@ ga:
     question_header: "Ceist %{position}"
     quiz-stats-noshow-warning: "Tá teorainneacha fiú ag a bheith iontach. Ní féidir linn staitisticí a sholáthar don quiz seo, ach is féidir leat na tuarascálacha a íoslódáil."
     sad-panda-alttext: "Rudaí brónach i dtír panda."
-    speedgrader: "Amharc i LuasMharcálaí"
+    speedgrader: "Amharc i SpeedGrader"
     summary: 
       audible_chart_description: "Scoráil %{above_average} mac léinn os cionn nó ag an meán, agus %{below_average} thíos. "
       avg_time: "Meán Am"
@@ -18039,7 +18039,7 @@ ga:
           quiz_instructions: "Treoracha Quiz"
           quiz_score: Scór
       quiz_edit_header: 
-        speed_grader: LuasMharcálaí
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           one: "Iarracht 1 eile ar fáil"
@@ -18160,7 +18160,7 @@ ga:
           one: "Athmharcáladh an Quiz seo; bhí tionchar ar do scór."
           other: "Athmharcáladh an Quiz seo; léiríonn do scór nua %{count} ceist a raibh tionchar orthu."
         quiz_regraded_your_score_not_affected: "Athmharcáladh an Quiz seo; ní raibh tionchar ar do scór."
-        speed_grader: LuasMharcálaí
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           one: "Chuir mac léinn 1 an tasc isteach go dtí seo"
           other: "Chuir %{count} mac léinn tasc isteach go dtí seo"
@@ -18315,7 +18315,7 @@ ga:
       surveys: Suirbhéanna
     toggle_message: "scoránaigh infheictheacht quiz"
   quizzes_index_menu_1ce11b54: "Roghchlár Innéacs Quizeanna"
-  quizzes_next_grade_by_question_in_speedgrader_c565bb5f: "Quizzes.Next Marcáil de réir Ceiste i LuasMharcálaí"
+  quizzes_next_grade_by_question_in_speedgrader_c565bb5f: "Quizzes.Next Marcáil de réir Ceiste i SpeedGrader"
   quizzes_public: 
     alerts: 
       no_valid_combinations: "Níorbh fhéidir leis an gcóras aon teaglaim bhailí a ghiniúint do na paraiméadair a tugadh"
@@ -18789,7 +18789,7 @@ ga:
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "Tabhair an dá liosta Le Déanamh do mhúinteoirí a bhfuil rolluithe mic léinn acu"
   renderheadertitle_5015f4da: "%{renderHeaderTitle}"
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "Léiríonn sé an dá liosta Le Déanamh ar thaobh-bharra an deais do mhúinteoirí a bhfuil rollaithe mic léinn acu."
-  reorders_some_menu_options_for_more_consistency_an_90efff07: "Athordaíonn sé roinnt roghanna roghchláir le haghaidh comhsheasmhachta níos fearr agus cuireann sé nasc go LuasMharcálaí leis."
+  reorders_some_menu_options_for_more_consistency_an_90efff07: "Athordaíonn sé roinnt roghanna roghchláir le haghaidh comhsheasmhachta níos fearr agus cuireann sé nasc go SpeedGrader leis."
   repeat_every_e653d6d0: "Athdhéan gach:"
   repeats_on_61ecde30: "Athdhéantar ar:"
   replace_attachmentdisplayname_button_94dd8ba1: "Ionadaigh cnaipe %{attachmentDisplayName}"
@@ -19184,7 +19184,7 @@ ga:
           marcáil bunaithe ar thorthaí gan pointí. Is féidir torthaí a chur leis mar mhíreanna critéir
           míreanna i rúibricí.
   rubrics_export_report_76d30288: "Tuairisc Easpórtála Rúibric"
-  rubrics_speedgrader_a6ebec57: "Ruibricí, LuasMharcálaí"
+  rubrics_speedgrader_a6ebec57: "Ruibricí, SpeedGrader"
   rubrics_tutorial_tray_be65d10d: "Tráidire Teagaisc Ruibricí"
   run_at_759b47d: "Rith Ag"
   run_at_92dd90df: "Rith ag"
@@ -19324,7 +19324,7 @@ ga:
         points_possible: "Pointí féideartha"
         submission_types: "Sórt uaslódála"
       index: 
-        assignment_in_speedgrader: "Amharc ar an tasc seo i LuasMharcálaí"
+        assignment_in_speedgrader: "Amharc ar an tasc seo i SpeedGrader"
         assignment_info: "Eolas an Taisc"
         empty_assignment_selection: "Roghnaigh tasc chun eolas bhreise a fheiceáil anseo."
     components: 
@@ -19600,7 +19600,7 @@ ga:
   see_rubric_results_62a6447d: "Amharc ar torthaí rúibric"
   see_scoring_details_f7fd1f3b: "Amharc ar sonraí scórála"
   see_some_lti_tools_that_work_great_with_canvas_53e92091: "Amharc ar chuid de na huirlisí LTI a oibríonn go seoigh le Canvas."
-  see_this_assignment_in_speedgrader_14b8abaf: "Amharc ar an tasc seo i LuasMharcálaí"
+  see_this_assignment_in_speedgrader_14b8abaf: "Amharc ar an tasc seo i SpeedGrader"
   see_turnitin_results_cd9d4a6c: "Amharc ar torthaí Turnitin"
   see_vericite_results_b44dd8c8: "Amharc ar torthaí VeriCite"
   select_1e849959: "[ Roghnaigh ]"
@@ -20507,7 +20507,7 @@ ga:
   similarityscore_similarity_score_52236e85: "%{similarityScore}% scór cosúlachta"
   simple_tls_45df2648: "TLS simplí"
   singapore_65_b4927585: "Singeapór (+65)"
-  single_quizzes_next_session_in_speedgrader_c71915f8: "Seisiún Quizzes.Next Aonair i LuasMharcálaí"
+  single_quizzes_next_session_in_speedgrader_c71915f8: "Seisiún Quizzes.Next Aonair i SpeedGrader"
   singleton_46df7e3b: Aonarán
   singleton_name_has_no_next_in_strand_653b83b8: "Níl next_in_strand ag Aonarán \"%{name}\"."
   singletons_99a47787: Aonaráin
@@ -20717,8 +20717,8 @@ ga:
   speed_grader: 
     alerts: 
       no_active_students: "Is oth linn nach bhfuil aon mhac léinn gníomhach sa chúrsa nó níl aon duine inmharcáilte agat."
-      no_students_in_groups_back: "Ár leithscéal, ní féidir uaslódálacha don tasc seo a mharcáil i LuasMharcálaí toisc nach bhfuil aon úsáideoirí sannta. Sann úsáideoirí don shraith grúpa seo le do thoil agus bain triail eile as. Cliceáil 'CGL' chun dul ar ais."
-      no_students_in_groups_close: "Ár leithscéal, ní féidir uaslódálacha don tasc seo a mharcáil i LuasMharcálaí toisc nach bhfuil aon úsáideoirí sannta. Sann úsáideoirí don shraith grúpa seo le do thoil agus bain triail eile as. Cliceáil 'CGL' chun an fhuinneog seo a dhúnadh."
+      no_students_in_groups_back: "Ár leithscéal, ní féidir uaslódálacha don tasc seo a mharcáil i SpeedGrader toisc nach bhfuil aon úsáideoirí sannta. Sann úsáideoirí don shraith grúpa seo le do thoil agus bain triail eile as. Cliceáil 'CGL' chun dul ar ais."
+      no_students_in_groups_close: "Ár leithscéal, ní féidir uaslódálacha don tasc seo a mharcáil i SpeedGrader toisc nach bhfuil aon úsáideoirí sannta. Sann úsáideoirí don shraith grúpa seo le do thoil agus bain triail eile as. Cliceáil 'CGL' chun an fhuinneog seo a dhúnadh."
       no_students_in_section: "Níorbh fhéidir aon mhac léinn a aimsiú sa rannán sin, ag titim siar ar gach rannán a thaispeáint."
     allow_message: "Cliceáil ar an gcnaipe \"Ceadaigh\" chun tús a chur leis an dtaifeadadh."
     begin_record_prompt: "Cliceáil ar an gcnaipe \"Taifead\" chun tús a chur leis."
@@ -20776,9 +20776,9 @@ ga:
     not_submitted: "nach bhfuil curtha isteach"
     turnitin: 
       resubmitting: "Á chur isteach arís..."
-  speedgrader_2_steel_thread_ee5814b5: "LuasMharcálaí 2: Snáithe Cruach"
+  speedgrader_2_steel_thread_ee5814b5: "SpeedGrader 2: Snáithe Cruach"
   speedgrader_d9a6fa90: LuasMharcálaí
-  speedgrader_de0affa6: LuasMharcálaí
+  speedgrader_de0affa6: SpeedGrader
   speedgrader_error_page_d9c4a075: "SpeedGrader Leathanach Earráide"
   speedgrader_loading_error_235fd2e2: "SpeedGrader earráid luchtaithe"
   speedgrader_settings_4195099b: "SpeedGrader Socruithe"
@@ -21245,7 +21245,7 @@ ga:
       see_vericite_results: "Amharc ar torthaí VeriCite"
       sent_to_whole_group: "Seol ráiteas chuig an ngrúpa ar fad"
       show_rubric: "Taispeáin Rúibric"
-      speedgrader: LuasMharcálaí
+      speedgrader: SpeedGrader
       student_mute_notification: "Níl na marcanna ar fáil toisc go bhfuil an teagascóir ag obair orthu."
       submission_details: "Sonraí Uaslódála"
       submitted_at: "%{submit_date} curtha isteach"
@@ -22363,7 +22363,7 @@ ga:
   this_student_was_just_awarded_negative_points_55741a37: "Bronnadh pointí diúltacha ar an mac léinn seo."
   this_student_wrote_f1a3f22d: "Scríobh an mac léinn seo:"
   this_submission_has_already_been_graded_and_is_rea_8ec61c52: "Tá an uaslódáil seo marcáilte cheana féin agus tá sé réidh le modhnóireacht a bheith déanta air."
-  this_submission_has_plagiarism_data_for_multiple_a_335c881d: "Tá sonraí bradaíola ag an uaslódáil seo maidir le ceangaltáin iolracha. Chun na tuairiscí go léir a fheiceáil, oscail LuasMharcálaí."
+  this_submission_has_plagiarism_data_for_multiple_a_335c881d: "Tá sonraí bradaíola ag an uaslódáil seo maidir le ceangaltáin iolracha. Chun na tuairiscí go léir a fheiceáil, oscail SpeedGrader."
   this_submission_is_in_a_closed_grading_period_cc9ecb8a: "Tá an uaslódáil seo laistigh de thréimhse mharcála dúnta"
   this_submission_is_in_another_grading_period_36bc720b: "Tá an uaslódáil seo i dtréimhse mharcála eile"
   this_submission_is_not_being_autograded_4fd68d32: "Níl an uaslódáil seo á uathmhárcáil"
@@ -22822,7 +22822,7 @@ ga:
       Is féidir leat a shonrú do *microsoft* chun cuntais Microsoft pearsanta a cheadú.
       Má tá d'ID Entra cumraithe chun aoi-úsáideoirí ó thionóntaí eile a cheadú, is féidir leat *aíonna* a shonrú chun ligean dóibh gan a dtionónta a ainmniú go sonrach.
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: "Chun é a shrianadh go úsáideoirí Azure Active Directory, cuir isteach do thionónta anseo."
-  to_review_a_moderated_assignment_in_speedgrader_gr_33227412: "Chun athbhreithniú a dhéanamh ar thasc modhnaithe i LuasMharcálaí, ní mór Marcanna - cuir in eagar a bheith cumasaithe freisin."
+  to_review_a_moderated_assignment_in_speedgrader_gr_33227412: "Chun athbhreithniú a dhéanamh ar thasc modhnaithe i SpeedGrader, ní mór Marcanna - cuir in eagar a bheith cumasaithe freisin."
   to_search_and_view_notifications_for_a_user_users__fab7293a: "Chun fógraí d'úsáideoir a chuardach agus a fheiceáil, ní mór Úsáideoirí - amharc a chumasú freisin."
   to_search_by_assignment_id_only_grades_view_all_gr_6c58d9bb: "Chun cuardach de réir ID an taisc amháin, ní mór Marcanna - amharc ar gach marc a bheith cumasaithe freisin."
   to_search_by_course_id_or_assignment_id_grades_edi_ac2c7b94: "Chun cuardach a dhéanamh de réir ID an chúrsa nó ID an taisc, ní mór Marcanna - cuir in eagar a chumasú freisin."
@@ -23025,7 +23025,7 @@ ga:
   ultimately_this_feature_is_still_classified_as_an__253b07c4: "Ar deireadh thiar, tá an ghné seo fós rangaithe mar bhéite turgnamhach. Ba mhaith linn deiseanna a sholáthar do rannpháirtithe aiseolas a sholáthar. Má chliceálann tú ordóga suas agus ordóga síos ar do thorthaí cuardaigh agus má insíonn tú dúinn cén fáth a bhfuil na torthaí go maith nó go holc, cabhróidh sé sin linn a chinneadh cathain ba cheart nó nár cheart torthaí a thaispeáint duit. Is féidir leat aiseolas a sholáthar freisin inár spás Pobail Canvas le haghaidh Béite Cuardach Cliste."
   un_archive_25b58c77: "Bain ón gCartlann"
   unable_to_accept_update_fd53a7e2: "Ní féidir glacadh leis an nuashonrú"
-  unable_to_access_specific_student_go_to_assignment_585e05e9: "Ní féidir rochtain a fháil ar mac léinn ar leith. Téigh chuig an tasc i LuasMharcálaí?"
+  unable_to_access_specific_student_go_to_assignment_585e05e9: "Ní féidir rochtain a fháil ar mac léinn ar leith. Téigh chuig an tasc i SpeedGrader?"
   unable_to_align_some_outcomes_to_a_page_65f7d412: "Ní féidir roinnt torthaí a ailíniú le leathanach"
   unable_to_align_some_outcomes_to_title_53467231: "Ní féidir roinnt torthaí a ailíniú le \"%{title}\""
   unable_to_check_for_lock_on_sftp_users_table_pleas_1084e348: |-
@@ -23982,7 +23982,7 @@ ga:
   view_question_banks_188a9e0f: "Amharc ar Bhainc Ceisteanna"
   view_range_student_details_8116d68a: "Amharc ar shonraí raon na mac léinn"
   view_replies_8565a729: "Amharc ar Fhreagraí"
-  view_rubric_assessment_in_speedgrader_984576d: "Féach ar an Measúnú Rúibrice i LuasMharcálaí"
+  view_rubric_assessment_in_speedgrader_984576d: "Féach ar an Measúnú Rúibrice i SpeedGrader"
   view_rubric_d71cce10: "Amharc ar an rúibric"
   view_split_screen_ca35b78a: "Amharc ar Scáileán Scoilte"
   view_submission_ff3da5d: "Amharc ar Uaslódáil"
