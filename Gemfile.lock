@@ -844,7 +844,7 @@ GEM
       table_print (~> 1.5)
       term-ansicolor (~> 1.7)
       thor (>= 0.20, < 2.0)
-    parallel (1.25.1)
+    parallel (1.26.1)
     parser (3.3.4.0)
       ast (~> 2.4.1)
       racc
