@@ -939,40 +939,6 @@ CanvasRails::Application.routes.draw do
     end
   end
 
-  resources :users, only: [:passport] do
-    get "passport" => "learner_passport#index"
-
-    get "passport/data/achievements" => "learner_passport#achievements_index"
-
-    get "passport/data/portfolios" => "learner_passport#portfolios_index"
-    put "passport/data/portfolios/create" => "learner_passport#portfolio_create"
-    post "passport/data/portfolios/:portfolio_id" => "learner_passport#portfolio_update"
-    get "passport/data/portfolios/show/:portfolio_id" => "learner_passport#portfolio_show"
-    put "passport/data/portfolios/duplicate" => "learner_passport#portfolio_duplicate"
-    put "passport/data/portfolios/delete" => "learner_passport#portfolio_delete"
-
-    get "passport/data/projects" => "learner_passport#projects_index"
-    put "passport/data/projects/create" => "learner_passport#project_create"
-    post "passport/data/projects/:project_id" => "learner_passport#project_update"
-    get "passport/data/projects/show/:project_id" => "learner_passport#project_show"
-    put "passport/data/projects/duplicate" => "learner_passport#project_duplicate"
-    put "passport/data/projects/delete" => "learner_passport#project_delete"
-
-    get "passport/data/pathways" => "learner_passport#pathways_index"
-    get "passport/data/pathways/badges" => "learner_passport#pathway_badges_index"
-    get "passport/data/pathways/learner_groups" => "learner_passport#pathway_learner_groups_index"
-    get "passport/data/pathways/canvas_requirements" => "learner_passport#pathway_canvas_requirements_index"
-    put "passport/data/pathways/create" => "learner_passport#pathway_create"
-    post "passport/data/pathways/:pathway_id" => "learner_passport#pathway_update"
-    get "passport/data/pathways/show/:pathway_id" => "learner_passport#pathway_show"
-    get "passport/data/pathways/share_users" => "learner_passport#pathway_share_users"
-
-    get "passport/data/skills" => "learner_passport#skills_index"
-    get "passport/data/reset" => "learner_passport#reset"
-
-    get "passport/*path" => "learner_passport#index"
-  end
-
   get "show_message_template" => "messages#show_message_template"
   get "message_templates" => "messages#templates"
   resource :profile, controller: :profile, only: [:show, :update] do
