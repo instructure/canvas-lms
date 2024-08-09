@@ -1,11 +1,4 @@
 ---
-file_verifiers_for_quiz_links:
-  state: allowed_on
-  display_name: Use file verifier authentication for New Quiz file links
-  description: |-
-    Links to Canvas files created in New Quizzes will always add file verifiers to allow authentication
-  applies_to: RootAccount
-
 ai_text_tools:
   applies_to: Account
   state: hidden
@@ -13,3 +6,118 @@ ai_text_tools:
   description: |-
     Enable AI text tools in the Rich Content Editor
   beta: true
+
+authenticated_iframe_content:
+  state: hidden
+  display_name: 'Authenticated IFrame Content'
+  description: This flag changes the way RCE content is loaded in iframes to proxy the request through canvas.
+  applies_to: SiteAdmin
+
+auto_show_cc:
+  type: setting
+  state: allowed
+  display_name: Auto Show Closed Captions
+  description: |-
+    Automatically show closed captions in the user's current
+    language (if available) when playing canvas media.
+  applies_to: User
+
+block_editor:
+  applies_to: Account
+  state: hidden
+  display_name: Block Editor
+  description: |-
+    Enable the new block editor for the rich content editor.
+  beta: true
+
+buttons_and_icons_root_account:
+  state: allowed
+  applies_to: RootAccount
+  display_name: RCE Icon Maker
+  description: |-
+    Manage a library of custom icons from the RCE.
+  environments:
+    production:
+      state: hidden
+
+explicit_latex_typesetting:
+  state: hidden
+  display_name: Explicit LaTeX Typesetting
+  description: |-
+    Instead of typesetting LaTeX anywhere, only typeset LaTeX where
+    it is explicitly enabled.
+  applies_to: SiteAdmin
+
+file_verifiers_for_quiz_links:
+  state: allowed_on
+  display_name: Use file verifier authentication for New Quiz file links
+  description: |-
+    Links to Canvas files created in New Quizzes will always add file verifiers to allow authentication
+  applies_to: RootAccount
+
+learner_passport:
+  state: hidden
+  applies_to: RootAccount
+  root_opt_in: true
+  display_name: Learner Passport Prototype
+  description: An in-progress working prototype of the Learner Passport feature.
+
+media_links_use_attachment_id:
+  state: hidden
+  display_name: Use Attachment IDs in Media Links
+  description: |-
+    Use attachment ids in media links so that users are always pointed to the correct instance of media
+    instead of the original
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
+permanent_page_links:
+  state: hidden
+  display_name: 'Permanent Page Links'
+  description: |-
+    When the title to a page is changed, old links to that page will link to the correct page.
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
+precise_link_replacements:
+  state: hidden
+  display_name: Precise link replacement on content migrations
+  description: |-
+    Apply link replacement logic to a select list of
+    elements only, as opposed to all texts
+  applies_to: SiteAdmin
+
+rce_find_replace:
+  state: hidden
+  display_name: Find and Replace RCE Plugin
+  description: |-
+    Enable a plugin which can find and replace content when editing in an RCE
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
+rce_transform_loaded_content:
+  state: hidden
+  display_name: Transform RCE Content on Load
+  description: |-
+    Transforms absolute URLs to relative URLs and removes extraneous attributes from RCE content on load.
+    Needed for the RCE to function fully in New Quizzes.
+  applies_to: RootAccount
+  environments:
+    development:
+      state: allowed_on
+    beta:
+      state: allowed_on
+    ci:
+      state: allowed_on
