@@ -74,9 +74,7 @@ class EportfolioEntry < ActiveRecord::Base
   end
 
   def full_slug
-    fs = (eportfolio_category.slug rescue "") + "_" + slug
-    fs = Digest::SHA256.hexdigest(fs) if fs.length > 250 # ".html" will push this over the 255-char max filename
-    fs
+    (eportfolio_category&.slug || "") + "_" + slug
   end
 
   def attachments
