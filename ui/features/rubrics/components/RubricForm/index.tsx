@@ -177,7 +177,7 @@ export const RubricForm = ({
   const duplicateCriterion = (criterion: RubricCriterion) => {
     const newCriterion: RubricCriterion = {
       ...criterion,
-      id: ``,
+      id: Date.now().toString(),
       outcome: undefined,
       learningOutcomeId: undefined,
       description: stripHtmlTags(criterion.description) ?? '',
