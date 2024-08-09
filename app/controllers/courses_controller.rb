@@ -2451,7 +2451,6 @@ class CoursesController < ApplicationController
         { :priority => Delayed::LOW_PRIORITY }, changes)
       Rails.logger.info("Referrer: #{request.referer}")
       if @course.errors.none? && @course.save
-        course.set_course_start_end_time_from_school.save if param[:update_timezone]
         @course.set_course_start_end_time_from_school.save if params[:update_timezone]
         Auditors::Course.record_updated(@course, @current_user, changes, source: logging_source)
         @current_user.touch
