@@ -469,7 +469,8 @@ GEM
       rack
     canvas_webex (0.18.2)
       railties
-    childprocess (5.0.0)
+    childprocess (5.1.0)
+      logger (~> 1.5)
     chunky_png (1.4.0)
     cld (0.13.0)
       ffi
