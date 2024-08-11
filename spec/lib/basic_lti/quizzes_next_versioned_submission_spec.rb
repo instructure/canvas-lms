@@ -357,6 +357,7 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
 
     before do
       allow(Submission).to receive(:find_or_initialize_by).and_return(submission)
+      allow(submission).to receive_messages(grader_can_grade?: true, autograded?: false)
     end
 
     let(:submission) do
