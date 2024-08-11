@@ -74,6 +74,7 @@ module BroadcastPolicies
     def should_dispatch_submission_graded?
       broadcasting_grades? &&
         user_has_visibility? &&
+        !submission.autograded? &&
         (submission.changed_state_to(:graded) || (grade_updated? && graded_recently?))
     end
 
