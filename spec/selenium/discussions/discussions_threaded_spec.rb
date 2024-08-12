@@ -1206,6 +1206,28 @@ describe "threaded discussions" do
       expect(entry.workflow_state).to eq "deleted"
     end
 
+    it "deletes a reply and checks data for Initial Post Required discussion" do
+      skip_if_safari(:alert)
+      @topic.require_initial_post = true
+      entry = @topic.discussion_entries.create!(
+        user: @student,
+        message: "new threaded reply from student"
+      )
+      user_session(@student)
+
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      expect(fj("span:contains('1 Reply')")).to be_present
+      f("button[data-testid='thread-actions-menu']").click
+      fj("li:contains('Delete')").click
+      driver.switch_to.alert.accept
+      wait_for_ajax_requests
+      entry.reload
+      expect do
+        fj("span:contains('1 Reply')")
+      end.to raise_error(Selenium::WebDriver::Error::NoSuchElementError) # rubocop:disable Specs/NoNoSuchElementError
+      expect(entry.workflow_state).to eq "deleted"
+    end
+
     it "replies to 3rd level stay 3rd level" do
       topic = create_discussion("flatten 3rd level replies", "threaded")
       first_reply = topic.discussion_entries.create!(
@@ -1507,7 +1529,7 @@ describe "threaded discussions" do
         expect(f("body")).not_to contain_jqcss("div:contains('students can only see this if they reply')")
         f("button[data-testid='discussion-topic-reply']").click
         type_in_tiny("textarea", "student here")
-        fj("button:contains('Reply')").click
+        f("button[data-testid='DiscussionEdit-submit']").click
         wait_for_ajaximations
         expect(f("body")).to contain_jqcss("div:contains('students can only see this if they reply')")
         expect(f("body")).to contain_jqcss("div:contains('student here')")

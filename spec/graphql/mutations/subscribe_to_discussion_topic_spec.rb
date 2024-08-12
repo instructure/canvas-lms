@@ -77,4 +77,12 @@ RSpec.describe Mutations::SubscribeToDiscussionTopic do
     @topic.reload
     expect(@topic.subscribed?(@teacher)).to be false
   end
+
+  it "cannot subscribe without a post" do
+    @topic.update_attribute(:require_initial_post, true)
+    course_with_student_logged_in(active_all: true)
+    result = run_mutation({ id: @topic.id, subscribed: true })
+    expect(result["errors"]).not_to be_nil
+    expect(result.dig("errors", 0, "message")).to be "unauthorized"
+  end
 end

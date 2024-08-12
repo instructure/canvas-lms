@@ -74,7 +74,6 @@ import ToggleIcon from './ToggleIcon'
 import UnreadBadge from '@canvas/unread-badge'
 import {isPassedDelayedPostAt} from '@canvas/datetime/react/date-utils'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
-import DiscussionsIndex from './DiscussionsIndex'
 
 const I18n = useI18nScope('discussion_row')
 
@@ -978,7 +977,7 @@ class DiscussionRow extends Component {
                   <Grid.Col textAlign="start">
                     <span
                       aria-hidden="true"
-                      style={!!this.renderLastReplyAt() ? timestampStyleOverride : {}}
+                      style={this.renderLastReplyAt() ? timestampStyleOverride : {}}
                     >
                       {this.renderLastReplyAt(timestampTextSize)}
                     </span>
@@ -986,7 +985,7 @@ class DiscussionRow extends Component {
                   <Grid.Col textAlign="center">
                     <span
                       aria-hidden="true"
-                      style={!!this.renderAvailabilityDate() ? timestampStyleOverride : {}}
+                      style={this.renderAvailabilityDate() ? timestampStyleOverride : {}}
                     >
                       {this.renderAvailabilityDate(timestampTextSize)}
                     </span>
@@ -994,7 +993,7 @@ class DiscussionRow extends Component {
                   <Grid.Col textAlign="end">
                     <span
                       aria-hidden="true"
-                      style={!!this.renderDueDate() ? timestampStyleOverride : {}}
+                      style={this.renderDueDate() ? timestampStyleOverride : {}}
                     >
                       {this.renderDueDate(timestampTextSize)}
                     </span>

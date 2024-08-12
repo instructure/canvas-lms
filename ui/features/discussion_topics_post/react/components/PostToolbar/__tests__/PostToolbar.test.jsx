@@ -152,6 +152,21 @@ describe('PostToolbar', () => {
       })
       expect(queryByText('Subscribed')).toBeFalsy()
     })
+
+    it('makes the button disabled if cannot subscribe', () => {
+      window.ENV.current_user_roles = ['student']
+      const onToggleSubscriptionMock = jest.fn()
+      const {queryAllByText} = setup({
+        onToggleSubscription: onToggleSubscriptionMock,
+        discussion: Discussion.mock({
+          subscriptionDisabledForUser: true,
+          groupSet: null,
+        }),
+        isSubscribed: false,
+      })
+      const buttonElement = queryAllByText('Reply to subscribe')[0].closest('button')
+      expect(buttonElement.disabled).toBe(true)
+    })
   })
 
   describe('menu options', () => {

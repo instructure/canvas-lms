@@ -108,15 +108,7 @@ export const DiscussionThreadContainer = props => {
 
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
-    const variables = {
-      discussionEntryID: newDiscussionEntry.parentId,
-      first: ENV.per_page,
-      sort: 'asc',
-    }
-
     updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {repliesCountChange: 1})
-    const foundParentEntryQuery = addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
-    if (props.refetchDiscussionEntries && !foundParentEntryQuery) props.refetchDiscussionEntries()
     addReplyToAllRootEntries(cache, newDiscussionEntry)
     addSubentriesCountToParentEntry(cache, newDiscussionEntry)
     props.setHighlightEntryId(newDiscussionEntry._id)
@@ -156,6 +148,9 @@ export const DiscussionThreadContainer = props => {
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error while deleting the reply.'))
+    },
+    update: () => {
+      if (props.refetchDiscussionEntries) props.refetchDiscussionEntries()
     },
   })
 
