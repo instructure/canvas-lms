@@ -138,4 +138,7 @@ HeadingBlock.craft = {
   related: {
     toolbar: HeadingBlockToolbar,
   },
+  custom: {
+    isResizable: true,
+  },
 }

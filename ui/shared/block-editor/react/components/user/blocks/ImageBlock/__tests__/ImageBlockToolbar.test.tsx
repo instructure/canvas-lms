@@ -33,11 +33,16 @@ const mockSetProp = jest.fn((callback: (props: Record<string, any>) => void) => 
 })
 
 jest.mock('@craftjs/core', () => {
+  const module = jest.requireActual('@craftjs/core')
   return {
+    ...module,
     useNode: jest.fn(_node => {
       return {
         props,
         actions: {setProp: mockSetProp},
+        node: {
+          dom: document.createElement('img'),
+        },
         domnode: document.createElement('img'),
       }
     }),

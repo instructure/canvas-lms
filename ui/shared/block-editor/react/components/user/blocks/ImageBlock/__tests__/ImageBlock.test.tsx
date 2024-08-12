@@ -45,7 +45,7 @@ describe('ImageBlock', () => {
 
   it('should render with width and height', () => {
     const {container} = renderBlock({src: 'https://example.com/image.jpg', width: 101, height: 201})
-    const img = container.querySelector('img')
+    const img = container.querySelector('.image-block')
     expect(img).toHaveStyle({width: '101px', height: '201px'})
   })
 

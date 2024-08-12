@@ -17,8 +17,8 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import {useNode} from '@craftjs/core'
-import {FormFieldGroup, type FormMessage} from '@instructure/ui-form-field'
+import {useNode, type Node} from '@craftjs/core'
+import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {RangeInput} from '@instructure/ui-range-input'
 import {Popover} from '@instructure/ui-popover'
@@ -40,10 +40,11 @@ const IconSizePopup = ({width, height}: IconSizePopupProps) => {
   const {
     actions: {setProp},
     domnode,
-  } = useNode(node => ({
-    props: node.data.props,
-    domnode: node.dom as HTMLImageElement,
-  }))
+  } = useNode((node: Node) => {
+    return {
+      domnode: node.dom as HTMLImageElement,
+    }
+  })
   const [widthValue, setWidthValue] = useState<number>(() => {
     return width || domnode.clientWidth
   })

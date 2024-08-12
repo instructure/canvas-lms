@@ -40,7 +40,7 @@
  * SOFTWARE.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import ReactDOM from 'react-dom'
 import {useNode, useEditor, type Node} from '@craftjs/core'
 import {ROOT_NODE} from '@craftjs/utils'
@@ -53,6 +53,11 @@ import {View, type ViewProps} from '@instructure/ui-view'
 import type {AddSectionPlacement, RenderNodeProps} from './types'
 import {SectionBrowser} from './SectionBrowser'
 import {notDeletableIfLastChild} from '../../utils'
+import {BlockResizer} from './BlockResizer'
+import {
+  getToolbarPos as getToolbarPosUtil,
+  getMenuPos as getMenuPosUtil,
+} from '../../utils/renderNodeHelpers'
 
 const findUpNode = (node: Node, query: any): Node | undefined => {
   let upnode = node.data.parent ? query.node(node.data.parent).get() : undefined
@@ -74,6 +79,7 @@ const findContainingSection = (node: Node, query: any): Node | undefined => {
 interface RenderNodeComponent extends React.FC<RenderNodeProps> {
   globals: {
     selectedSectionId: string
+    enableResizer: boolean
   }
 }
 
@@ -116,6 +122,15 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
   const [currentMenuRef, setCurrentMenuRef] = useState<HTMLDivElement | null>(null)
   const [upnodeId] = useState<string | undefined>(findUpNode(node, query)?.id)
   const [sectionBrowserOpen, setSectionBrowserOpen] = useState<AddSectionPlacement>(undefined)
+  const [mountPoint, setMountPoint] = useState(
+    document.querySelector('.block-editor-editor') as HTMLElement
+  )
+
+  useEffect(() => {
+    if (mountPoint === null) {
+      setMountPoint(document.querySelector('.block-editor-editor') as HTMLElement)
+    }
+  }, [mountPoint])
 
   useEffect(() => {
     // get a newly dropped block selected
@@ -162,48 +177,16 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
   }, [dom, selected, hovered])
 
   const getToolbarPos = useCallback(
-    (domNode: HTMLElement | null, mountPoint: HTMLElement) => {
-      if (!domNode) return {top: 0, left: 0}
-
-      const nodeRect = domNode.getBoundingClientRect()
-      const ntop = nodeRect.top
-      const nleft = nodeRect.left
-
-      const refRect = mountPoint.getBoundingClientRect()
-      const ptop = refRect.top
-      const pleft = refRect.left
-
-      // 5 is the offset of the hover/focus rings
-      const offset = currentToolbarOrTagRef
-        ? currentToolbarOrTagRef.getBoundingClientRect().height + 5
-        : 0
-
-      return {
-        top: `${ntop - ptop - offset}px`,
-        left: `${nleft - pleft - 5}px`,
-      }
+    (includeOffset: boolean = true) => {
+      return getToolbarPosUtil(dom, mountPoint, currentToolbarOrTagRef, includeOffset)
     },
-    [currentToolbarOrTagRef]
+    [currentToolbarOrTagRef, dom, mountPoint]
   )
 
-  const getMenuPos = useCallback(
-    (domNode: HTMLElement | null, mountPoint: HTMLElement) => {
-      if (!domNode) return {top: 0, left: 0}
-
-      const nodeRect = domNode.getBoundingClientRect()
-      const refRect = mountPoint.getBoundingClientRect()
-
-      const top = nodeRect.top - refRect.top
-      const menuWidth = currentMenuRef ? currentMenuRef.getBoundingClientRect().width : 0
-      const left = nodeRect.left + nodeRect.width - refRect.left - menuWidth
-
-      return {
-        top: `${top}px`,
-        left: `${left}px`,
-      }
-    },
-    [currentMenuRef]
-  )
+  const getMenuPos = useCallback(() => {
+    const {top, left} = getMenuPosUtil(dom, mountPoint, currentMenuRef)
+    return {top: `${top}px`, left: `${left}px`}
+  }, [currentMenuRef, dom, mountPoint])
 
   // TODO: maybe setState the upnode so we know whether to show the up button or not
   const handleGoUp = useCallback(
@@ -225,16 +208,17 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
   // TODO: this should be role="toolbar" and nav with arrow keys
   const renderBlockToolbar = () => {
     if (node.data?.custom?.noToolbar) return null
-    const mountPoint = document.querySelector('.block-editor-editor') as HTMLElement | null
     if (!mountPoint) return null
+
+    const {left, top} = getToolbarPos()
 
     return ReactDOM.createPortal(
       <div
         ref={(el: HTMLDivElement) => setCurrentToolbarOrTagRef(el)}
         className="block-toolbar"
         style={{
-          left: getToolbarPos(dom, mountPoint).left,
-          top: getToolbarPos(dom, mountPoint).top,
+          left: `${left}px`,
+          top: `${top}px`,
         }}
       >
         <View as="div" background="brand" padding="0 xx-small" borderRadius="small">
@@ -292,10 +276,9 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
   }
 
   const renderSectionMenu = () => {
-    const mountPoint = document.querySelector('.block-editor-editor') as HTMLElement | null
     if (!mountPoint) return null
     if (node.related?.sectionMenu) {
-      const {left, top} = getMenuPos(dom, mountPoint)
+      const {left, top} = getMenuPos()
 
       return ReactDOM.createPortal(
         <div
@@ -320,15 +303,17 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
     const isMySectionSelected = RenderNode.globals.selectedSectionId === parentSection.id
     if (!isMySectionSelected) return null
 
-    const mountPoint = document.querySelector('.block-editor-editor') as HTMLElement | null
     if (!mountPoint) return null
 
-    const {left, top} = getToolbarPos(dom, mountPoint)
+    const {left, top} = getToolbarPos()
     return ReactDOM.createPortal(
       <div
         ref={(el: HTMLDivElement) => setCurrentToolbarOrTagRef(el)}
         className="block-tag"
-        style={{left, top}}
+        style={{
+          left: `${left}px`,
+          top: `${top}px`,
+        }}
       >
         <View as="div" background="secondary" padding="0 xx-small" borderRadius="small">
           <Text size="small">{name}</Text>
@@ -336,6 +321,12 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
       </div>,
       mountPoint
     )
+  }
+
+  const renderResizer = () => {
+    if (!mountPoint) return null
+
+    return ReactDOM.createPortal(<BlockResizer mountPoint={mountPoint} />, mountPoint)
   }
 
   const renderRelated = () => {
@@ -367,6 +358,10 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
     <>
       {!selected && hovered && renderHoverTag()}
       {selected && node.related && renderRelated()}
+      {RenderNode.globals.enableResizer &&
+        selected &&
+        node.data.custom?.isResizable &&
+        renderResizer()}
       {render}
       {node.data.custom?.isSection && renderSectionAdder()}
     </>
@@ -375,4 +370,5 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
 
 RenderNode.globals = {
   selectedSectionId: '',
+  enableResizer: true,
 }
