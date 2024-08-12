@@ -124,7 +124,14 @@ export const AssessmentGradeInput = ({
   header = '',
   isDisabled = false,
 }: AssessmentGradeInputProps) => {
-  const [gradeValue, setGradeValue] = useState<string>(submission?.grade || '')
+  const gradeToUse = useCallback(
+    (gradeToUseSubmission: SubAssignmentSubmission) => {
+      return (isDisabled ? gradeToUseSubmission?.grade : gradeToUseSubmission?.entered_grade) || ''
+    },
+    [isDisabled]
+  )
+
+  const [gradeValue, setGradeValue] = useState<string>(gradeToUse(submission))
 
   const formatGradeForSubmission = useCallback(
     (grade: string, excused: boolean) => {
@@ -150,8 +157,8 @@ export const AssessmentGradeInput = ({
   )
 
   useEffect(() => {
-    setGradeValue(formatGradeForSubmission(submission?.grade || '', submission?.excused || false))
-  }, [formatGradeForSubmission, submission.excused, submission.grade])
+    setGradeValue(formatGradeForSubmission(gradeToUse(submission), submission?.excused || false))
+  }, [formatGradeForSubmission, gradeToUse, submission, submission.excused, submission.grade])
 
   const isValidPreliminaryGrade = (formattedGrade: string): boolean => {
     if (formattedGrade === '' || formattedGrade === 'EX' || formattedGrade === 'MI') {
@@ -172,7 +179,7 @@ export const AssessmentGradeInput = ({
 
     const formattedGrade = formatGradeForSubmission(grade, excuse)
     if (!isValidPreliminaryGrade(formattedGrade)) {
-      setGradeValue(formatGradeForSubmission(submission?.grade || '', submission?.excused || false))
+      setGradeValue(formatGradeForSubmission(gradeToUse(submission), submission?.excused || false))
       showAlert(I18n.t('Invalid grade value'), 'error')
       return
     }
