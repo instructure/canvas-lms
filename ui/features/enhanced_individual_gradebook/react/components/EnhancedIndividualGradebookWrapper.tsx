@@ -57,9 +57,6 @@ export default function EnhancedIndividualGradebookWrapper() {
       <GradebookMenu
         courseUrl={ENV.GRADEBOOK_OPTIONS.context_url}
         learningMasteryEnabled={Boolean(ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled)}
-        enhancedIndividualGradebookEnabled={Boolean(
-          ENV.GRADEBOOK_OPTIONS.individual_gradebook_enhancements
-        )}
         variant="EnhancedIndividualGradebook"
       />
       <ApolloProvider client={client}>

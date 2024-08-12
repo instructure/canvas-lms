@@ -89,11 +89,6 @@ module.exports = {
         ],
       },
       {
-        test: /\.hbs$/,
-        include: [path.join(canvasDir, 'ui/features/screenreader_gradebook/jst')],
-        use: [require.resolve('#webpack-ember-handlebars-loader')],
-      },
-      {
         test: /\.css$/,
         use: ['style-loader', 'css-loader'],
       },

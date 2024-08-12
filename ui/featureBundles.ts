@@ -187,7 +187,6 @@ const featureBundles: {
   rubric_assessment: () => import('./features/rubric_assessment/index'),
   rubrics_index: () => import('./features/rubrics_index/index'),
   rubrics_show: () => import('./features/rubrics_show/index'),
-  screenreader_gradebook: () => import('./features/screenreader_gradebook/index'),
   search: () => import('./features/search/index'),
   section: () => import('./features/section/index'),
   select_content_dialog: () => import('./features/select_content_dialog/index'),

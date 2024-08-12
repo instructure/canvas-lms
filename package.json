@@ -286,7 +286,6 @@
     "core-js-builder": "^3",
     "css-loader": "^3",
     "dependency-cruiser": "^16.3.1",
-    "ember-template-compiler": "^1.8.0",
     "enzyme": "^3",
     "enzyme-adapter-react-16": "^1.15.7",
     "enzyme-to-json": "^3.3.4",

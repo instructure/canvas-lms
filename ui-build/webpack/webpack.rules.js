@@ -171,12 +171,6 @@ exports.handlebars = {
   ],
 }
 
-exports.emberHandlebars = {
-  test: /\.hbs$/,
-  include: [join(canvasDir, 'ui/features/screenreader_gradebook/jst')],
-  use: [require.resolve('./emberHandlebars')],
-}
-
 // since istanbul-instrumenter-loader adds so much overhead,
 // only use it when generating crystalball map
 // i.e. process.env.CRYSTALBALL_MAP === '1'
