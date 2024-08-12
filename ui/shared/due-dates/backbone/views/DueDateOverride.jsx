@@ -114,6 +114,9 @@ DueDateOverrideView.prototype.render = function () {
           if (groupCategory?.value === undefined) {
             return ENV.ASSIGNMENT?.group_category_id
           } else if (document.getElementById('has_group_category')?.checked) {
+            if (groupCategory.value === 'blank') {
+              return null
+            }  
             return groupCategory.value
           }
           return null

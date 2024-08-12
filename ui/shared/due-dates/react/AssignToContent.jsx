@@ -66,6 +66,7 @@ const AssignToContent = ({
   const [hasModuleOverrides, setHasModuleOverrides] = useState(false)
   const [moduleAssignees, setModuleAssignees] = useState([])
   const [initialModuleOverrides, setInitialModuleOverrides] = useState([])
+  const [groupCategoryId, setGroupCategoryId] = useState(getGroupCategoryId?.())
   const dateValidator = useMemo(
     () =>
       new DateValidator({
@@ -97,14 +98,16 @@ const AssignToContent = ({
     [type]
   )
 
-  // TODO: ensure group category id is passed in correctly when it's changed
-  const formData = useMemo(
-    () => ({
-      groupCategoryId: getGroupCategoryId?.(),
-    }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [open]
-  )
+  useEffect(() => {
+    document.getElementById('assignment_group_category_id')?.addEventListener(
+      'change',
+      () => setGroupCategoryId(getGroupCategoryId?.())
+    )
+    document.getElementById('has_group_category')?.addEventListener(
+      'change',
+      () => setGroupCategoryId(getGroupCategoryId?.())
+    )
+  }, [])
 
   useEffect(() => {
     const updatedOverrides = overrides.map(override => {
@@ -124,7 +127,7 @@ const AssignToContent = ({
     const parsedOverrides = getParsedOverrides(
       stagedOverrides,
       stagedCards,
-      formData.groupCategoryId
+      groupCategoryId
     )
     const uniqueOverrides = removeOverriddenAssignees(overrides, parsedOverrides)
     setStagedCards(uniqueOverrides)
@@ -154,7 +157,7 @@ const AssignToContent = ({
       setModuleAssignees(allModuleAssignees)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stagedOverrides, formData.groupCategoryId])
+  }, [stagedOverrides, groupCategoryId])
 
   useEffect(() => {
     const newOverrides = getAllOverridesFromCards(stagedCardsRef.current).filter(
@@ -465,7 +468,7 @@ const AssignToContent = ({
           itemType={type}
           itemContentId={assignmentId}
           initHasModuleOverrides={hasModuleOverrides}
-          defaultGroupCategoryId={formData.groupCategoryId}
+          defaultGroupCategoryId={groupCategoryId}
           useApplyButton={true}
           locale={ENV.LOCALE || 'en'}
           timezone={ENV.TIMEZONE || 'UTC'}
