@@ -233,7 +233,7 @@
   min-width: 2rem;
   &.page-block {
     background: transparent;
-    padding: 16px;
+    padding: 8px;
     min-height: 10rem;
     margin: 2px;
   }
@@ -270,70 +270,84 @@
   flex-flow: row wrap;
 }
 
-.columns-section {
+.columns-section > .columns-section__inner {
   min-height: 1.5rem;
   line-height: 1.5rem;
-  &.fluid {
-    .columns-section__inner {
-      position: relative;
-      column-gap: 16px;
-    }
-    &.columns-1 .columns-section__inner {
-      column-count: 1;
-    }
-    &.columns-2 .columns-section__inner {
-      column-count: 2;
-    }
-    &.columns-3 .columns-section__inner {
-      column-count: 3;
-    }
-    &.columns-4 .columns-section__inner {
-      column-count: 4;
-    }
-  }
-  &.fixed {
-    display: grid;
-    gap: 16px;
-    .columns-section__inner {
-      position: relative;
-    }
-    &.columns-1 {
+  position: relative;
+  display: grid;
+  column-gap: 16px;
+  row-gap: 8px;
+  padding: 0 8px;
+}
+
+.columns-section {
+  &.columns-1 {
+    &>.columns-section__inner {
       grid-template-columns: 1fr;
     }
-    &.columns-2 {
+  }
+  &.columns-2 {
+    &>.columns-section__inner {
       grid-template-columns: repeat(2, 1fr);
     }
-    &.columns-3 {
+  }
+  &.columns-3 {
+    &>.columns-section__inner {
       grid-template-columns: repeat(3, 1fr);
     }
-    &.columns-4 {
+  }
+  &.columns-4 {
+    &>.columns-section__inner {
       grid-template-columns: repeat(4, 1fr);
     }
   }
 }
 
-.enabled .columns-section.fluid .columns-section__inner {
-  column-rule: 2px dotted var(--active-border-color);
-}
+.group-block {
+  overflow: auto;
+  .no-sections {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    flex-direction: column;
+  }
+  &.row-layout {
+    &> .no-sections {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+    &.center-align > .no-sections {
+      justify-content: center;
+    }
+    &.end-align > .no-sections {
+      justify-content: flex-end;
+    }
+  }
+  &.column-layout {
+    &.center-align > .no-sections {
+      align-items: center;
+    }
+    &.end-align > .no-sections {
+      align-items: flex-end;
+    }
+  }
 
-.columns-section .columns-section__inner::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: -0.5rem;  /* half the gap */
-  width: 1;
-}
-
-.enabled .columns-section .columns-section__inner::after {
-  border-left: 2px dotted var(--active-border-color);
-}
-
-.columns-section .columns-section__inner:last-child::after {
-  border-style: none;
+  &.enabled { /* always show the outline for a column */
+    outline-color: var(--hover-border-color);
+    outline-style: dashed;
+    outline-width: 1px;
+    outline-offset: -1px;
+    border-radius: 4px;
+  }
+  .no-sections:hover {
+    outline-style: none;
+  }
 }
 
 .hero-section {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, 1fr);
   .hero-section__inner-start {
     overflow: hidden;
     .hero-section__text {
@@ -350,7 +364,13 @@
 }
 
 .about-section {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, 1fr);
   padding: 0.5rem;
+  .about-section__inner-end .image-block {
+    min-height: 240px;
+  }
 }
 .navigation-section {
   .navigation-section__inner {
@@ -525,22 +545,13 @@
 
 @container block-editor-view (320px < width <= 768px) {
   .columns-section {
-    &.fluid {
-      &.columns-3 .columns-section__inner,
-      &.columns-4 .columns-section__inner {
-        column-count: 2;
-      }
-    }
-    &.fixed {
-      &.columns-3,
-      &.columns-4 {
+    &.columns-3,
+    &.columns-4 {
+      &>.columns-section__inner {
         grid-template-columns:  1fr 1fr;
       }
     }
   }
-}
-.columns-section__inner.empty::before {
-  content: "Drop a block to add it to this column";
 }
 
 .icon-picker__icon {
@@ -561,24 +572,17 @@
     padding: 0;
   }
   .columns-section {
-    &.fluid {
-      &.columns-1 .columns-section__inner,
-      &.columns-2 .columns-section__inner,
-      &.columns-3 .columns-section__inner,
-      &.columns-4 .columns-section__inner {
-        column-count: 1;
-      }
-    }
-    &.fixed {
-      &.columns-1,
-      &.columns-2,
-      &.columns-3,
-      &.columns-4 {
+    &.columns-1,
+    &.columns-2,
+    &.columns-3,
+    &.columns-4 {
+      &>.columns-section__inner {
         grid-template-columns:  1fr;
       }
     }
   }
   .hero-section {
+    grid-template-columns: 1fr;
     .hero-section__inner-start {
       padding: 2px;
       .hero-section__text {
@@ -589,6 +593,9 @@
         }
       }
     }
+  }
+  .about-section {
+    grid-template-columns: 1fr;
   }
   .quiz-section {
     .matching-question__question {

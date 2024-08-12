@@ -23,7 +23,7 @@ export const HeroImageHeight: string = '184px'
 export type ImageBlockProps = {
   src?: string
   width?: number
-  height?: number
+  height?: number | 'auto'
   constraint?: ImageConstraint
   maintainAspectRatio?: boolean
 }

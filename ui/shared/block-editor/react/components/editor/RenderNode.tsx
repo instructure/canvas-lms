@@ -275,7 +275,11 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
     )
   }
 
-  const renderSectionMenu = () => {
+  const handleAddSection = useCallback((where: AddSectionPlacement) => {
+    setSectionBrowserOpen(where)
+  }, [])
+
+  const renderSectionMenu = useCallback(() => {
     if (!mountPoint) return null
     if (node.related?.sectionMenu) {
       const {left, top} = getMenuPos()
@@ -292,7 +296,7 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
       )
     }
     return null
-  }
+  }, [getMenuPos, handleAddSection, mountPoint, node.related.sectionMenu])
 
   const renderHoverTag = () => {
     if (node.data?.custom?.noToolbar) return null
@@ -337,10 +341,6 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
       </>
     )
   }
-
-  const handleAddSection = useCallback((where: AddSectionPlacement) => {
-    setSectionBrowserOpen(where)
-  }, [])
 
   const renderSectionAdder = () => {
     return (

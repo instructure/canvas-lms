@@ -32,7 +32,6 @@ import {AboutSection} from '../user/sections/AboutSection'
 import {QuizSection} from '../user/sections/QuizSection'
 import {AnnouncementSection} from '../user/sections/AnnouncementSection'
 import {FooterSection} from '../user/sections/FooterSection'
-import {BlankSection} from '../user/sections/BlankSection'
 import {getNodeIndex} from '../../utils'
 import {type AddSectionPlacement} from './types'
 
@@ -45,7 +44,7 @@ const nameToSection = (name: string) => {
     case 'Callout Cards':
       return <ResourcesSection />
     case 'Columns':
-      return <ColumnsSection columns={2} variant="fixed" />
+      return <ColumnsSection columns={2} />
     case 'Hero':
       return <HeroSection />
     case 'Navigation':
@@ -58,10 +57,8 @@ const nameToSection = (name: string) => {
       return <AnnouncementSection />
     case 'Footer':
       return <FooterSection />
-    case 'Blank':
-      return <BlankSection />
     default:
-      return <BlankSection />
+      return <ColumnsSection columns={2} />
   }
 }
 export type SectionBrowserProps = {
@@ -211,17 +208,10 @@ const SectionBrowser = ({open, where, onClose}: SectionBrowserProps) => {
             )
           )}
           {renderBox(
-            I18n.t('Columns'),
+            I18n.t('Blank'),
             'section-columns.png',
             I18n.t(
               'The columns section is a flexible layout that allows you to add multiple blocks side by side.'
-            )
-          )}
-          {renderBox(
-            I18n.t('Blank'),
-            'section-blank.png',
-            I18n.t(
-              'The blank section is a simple, empty section that you can use to add your own custom content.'
             )
           )}
         </Flex>

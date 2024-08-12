@@ -357,9 +357,9 @@ export default class WikiPageEditView extends ValidatedFormView {
         'manage-assign-to-container'
       )?.reactComponentInstance
       const invalidInput = sectionViewRef?.focusErrors()
-      if(invalidInput){
-        errors.invalid_card = { $input: null, showError: this.showError }
-      }else{
+      if (invalidInput) {
+        errors.invalid_card = {$input: null, showError: this.showError}
+      } else {
         delete errors.invalid_card
       }
     }
@@ -405,7 +405,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       this.blockEditorData = {
         time: Date.now(),
         version: '1',
-        blocks: [{data: window.block_editor.serialize()}],
+        blocks: [{data: window.block_editor().serialize()}],
       }
     }
 

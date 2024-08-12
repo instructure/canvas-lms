@@ -19,34 +19,45 @@
 import React, {useEffect, useState} from 'react'
 import classNames from 'classnames'
 
-const useClassNames = (
+type NodeState = {
+  empty: boolean
+  selected?: boolean
+  hovered?: boolean
+}
+
+const buildClassNames = (
   enabled: boolean,
-  nodeState: {
-    empty: boolean
-    selected?: boolean
-    hovered?: boolean
-  },
-  others?: string | string[]
+  empty: boolean,
+  selected: boolean,
+  hovered: boolean,
+  others: string[]
 ) => {
+  const newClassNames = classNames({
+    ...others.reduce((prev: Record<string, boolean>, curr: string) => {
+      const next = {...prev}
+      next[curr] = true
+      return next
+    }, {}),
+    enabled,
+    empty: empty && enabled,
+    selected,
+    hovered,
+  })
+  return newClassNames
+}
+
+const useClassNames = (enabled: boolean, nodeState: NodeState, others?: string | string[]) => {
   const {empty, selected = false, hovered = false} = nodeState
   const rest: string[] = others ? (Array.isArray(others) ? others : [others]) : []
 
-  const [classNameState, setClassNameState] = useState<string>('')
+  const [classNameState, setClassNameState] = useState<string>(
+    buildClassNames(enabled, empty, selected, hovered, rest)
+  )
 
   useEffect(() => {
-    const newClassNames = classNames({
-      ...rest.reduce((prev: Record<string, boolean>, curr: string) => {
-        const next = {...prev}
-        next[curr] = true
-        return next
-      }, {}),
-      enabled,
-      empty: empty && enabled,
-      selected,
-      hovered,
-    })
+    const newClassNames = buildClassNames(enabled, empty, selected, hovered, rest)
     setClassNameState(newClassNames)
-  }, [empty, hovered, selected, rest, enabled])
+  }, [enabled, empty, selected, hovered, rest])
 
   return classNameState
 }
