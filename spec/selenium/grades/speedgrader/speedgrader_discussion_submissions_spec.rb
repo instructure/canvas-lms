@@ -314,6 +314,16 @@ describe "SpeedGrader - discussion submissions" do
       end
 
       it "changes grade and status and persist it correctly" do
+        @course.create_late_policy(
+          missing_submission_deduction_enabled: true,
+          missing_submission_deduction: 25.0,
+          late_submission_deduction_enabled: true,
+          late_submission_deduction: 10.0,
+          late_submission_interval: "day",
+          late_submission_minimum_percent_enabled: true,
+          late_submission_minimum_percent: 50.0
+        )
+
         # Loads Speedgrader for a student
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
         wait_for_ajaximations
@@ -324,6 +334,9 @@ describe "SpeedGrader - discussion submissions" do
         reply_to_topic_grade_input.send_keys("2")
         reply_to_topic_grade_input.send_keys(:tab)
         wait_for_ajaximations
+        # this is the screenreader alert that gets announced when the grade is saved
+        # using be_truthy since the alert is not visible
+        expect(fj("div:contains('Current Total Updated: 2')")).to be_truthy
 
         reply_to_topic_assignment = @checkpointed_discussion.assignment.sub_assignments.find_by(sub_assignment_tag: "reply_to_topic")
         reply_to_topic_submission = reply_to_topic_assignment.submissions.find_by(user: @student)
@@ -336,6 +349,7 @@ describe "SpeedGrader - discussion submissions" do
         reply_to_entry_grade_input.send_keys("5")
         reply_to_entry_grade_input.send_keys(:tab)
         wait_for_ajaximations
+        expect(fj("div:contains('Current Total Updated: 7')")).to be_truthy
 
         reply_to_entry_assignment = @checkpointed_discussion.assignment.sub_assignments.find_by(sub_assignment_tag: "reply_to_entry")
         reply_to_entry_submission = reply_to_entry_assignment.submissions.find_by(user: @student)
@@ -354,6 +368,7 @@ describe "SpeedGrader - discussion submissions" do
         time_late_input.send_keys("2")
         time_late_input.send_keys(:tab)
         wait_for_ajaximations
+        expect(fj("div:contains('Current Total Updated: 6.5')")).to be_truthy
 
         reply_to_topic_submission.reload
         expect(reply_to_topic_submission.late).to be true
@@ -393,7 +408,7 @@ describe "SpeedGrader - discussion submissions" do
         expect(reply_to_entry_select).to have_value "Custom Status"
       end
 
-      it "does not displays the no submission message if student has a partial submission" do
+      it "does not display the no submission message if student has a partial submission" do
         DiscussionEntry.create!(
           message: "1st level reply",
           discussion_topic_id: @checkpointed_discussion.discussion_topic_id,
