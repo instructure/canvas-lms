@@ -378,6 +378,37 @@ describe AccountsController do
       expect(@account.settings[:sis_assignment_name_length_input][:value]).to eq "255"
     end
 
+    it "updates 'show_sections_in_course_tray'" do
+      account_with_admin_logged_in
+      post(
+        :update,
+        params: {
+          id: @account.id,
+          account: {
+            settings: {
+              show_sections_in_course_tray: false
+            }
+          }
+        }
+      )
+      @account.reload
+      expect(@account.settings[:show_sections_in_course_tray]).to be false
+
+      post(
+        :update,
+        params: {
+          id: @account.id,
+          account: {
+            settings: {
+              show_sections_in_course_tray: true
+            }
+          }
+        }
+      )
+      @account.reload
+      expect(@account.settings[:show_sections_in_course_tray]).to be true
+    end
+
     it "allows admins to set the sis_source_id on sub accounts" do
       account_with_admin_logged_in
       @account = @account.sub_accounts.create!
