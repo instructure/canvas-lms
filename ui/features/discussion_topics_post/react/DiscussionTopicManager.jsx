@@ -471,6 +471,7 @@ const DiscussionTopicManager = props => {
                           setHighlightEntryId={setHighlightEntryId}
                           isSearchResults={!!searchTerm}
                           userSplitScreenPreference={userSplitScreenPreference}
+                          refetchDiscussionEntries={discussionTopicQuery.refetch}
                         />
                       )
                     )}

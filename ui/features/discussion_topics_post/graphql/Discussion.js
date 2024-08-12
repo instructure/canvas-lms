@@ -60,6 +60,7 @@ export const Discussion = {
       replyToEntryRequiredCount
       contextType
       lockInformation
+      subscriptionDisabledForUser
       editor {
         ...User
       }
@@ -147,6 +148,7 @@ export const Discussion = {
     rootTopic: RootTopic.shape,
     rootEntriesTotalPages: number,
     entriesTotalPages: number,
+    subscriptionDisabledForUser: bool,
   }),
 
   mock: ({
@@ -199,6 +201,7 @@ export const Discussion = {
       pageInfo: PageInfo.mock(),
       __typename: 'DiscussionEntriesConnection',
     },
+    subscriptionDisabledForUser = false,
   } = {}) => ({
     id,
     _id,
@@ -241,6 +244,7 @@ export const Discussion = {
     searchEntryCount,
     entriesTotalPages,
     discussionEntriesConnection,
+    subscriptionDisabledForUser,
     __typename: 'Discussion',
   }),
 }

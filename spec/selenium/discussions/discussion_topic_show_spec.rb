@@ -223,7 +223,7 @@ describe "Discussion Topic Show" do
       f("button[data-testid='discussion-topic-reply']").click
       wait_for_ajaximations
       type_in_tiny "textarea", "Test Reply"
-      fj("button:contains('Reply')").click
+      f("button[data-testid='DiscussionEdit-submit']").click
       wait_for_ajaximations
       expect(fj("p:contains('Test Reply')")).to be_present
     end

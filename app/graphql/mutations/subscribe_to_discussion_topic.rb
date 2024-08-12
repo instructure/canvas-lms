@@ -27,6 +27,8 @@ class Mutations::SubscribeToDiscussionTopic < Mutations::BaseMutation
   field :discussion_topic, Types::DiscussionType, null: false
   def resolve(input:)
     discussion_topic = DiscussionTopic.find(input[:discussion_topic_id])
+    raise GraphQL::ExecutionError, "unauthorized" if input[:subscribed] && !discussion_topic.is_announcement && discussion_topic.subscription_hold(current_user, session)
+
     discussion_topic.change_subscribed_state(input[:subscribed], current_user)
 
     {
