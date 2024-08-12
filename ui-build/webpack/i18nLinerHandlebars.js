@@ -23,7 +23,6 @@
 // template in an AMD module, giving it dependencies on handlebars, it's scoped
 // i18n object if it needs one.
 const Handlebars = require('handlebars')
-const {EmberHandlebars} = require('ember-template-compiler')
 const ScopedHbsExtractor = require('@instructure/i18nliner-canvas/scoped_hbs_extractor')
 const ScopedHbsPreProcessor = require('@instructure/i18nliner-canvas/scoped_hbs_pre_processor')
 const {readI18nScopeFromJSONFile} = require('@instructure/i18nliner-canvas/scoped_hbs_resolver')
@@ -44,7 +43,7 @@ const compileHandlebars = data => {
     ScopedHbsPreProcessor.processWithScope(scope, ast)
     extractor.forEach(() => translationCount++)
 
-    const precompiler = data.ember ? EmberHandlebars : Handlebars
+    const precompiler = Handlebars
     const template = precompiler.precompile(ast).toString()
     return {template, scope, translationCount}
   } catch (e) {

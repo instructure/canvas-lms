@@ -51,32 +51,6 @@ describe "Final Grade Override" do
     end
   end
 
-  context "Individual Gradebook" do
-    before do
-      @course.root_account.disable_feature!(:individual_gradebook_enhancements)
-      @student = @students.first
-      @enrollment = @course.enrollments.find_by(user: @student)
-      @enrollment.scores.find_by(course_score: true).update!(override_score: 97.1)
-      user_session(@teacher)
-      SRGB.visit(@course.id)
-      SRGB.allow_final_grade_override_option.click
-      SRGB.select_student(@student)
-    end
-
-    it "display override percent in individual gradebook", priority: "1" do
-      expect(SRGB.final_grade_override.text).to include "97.1%"
-    end
-
-    it "display override grade in individual gradebook", priority: "1" do
-      expect(SRGB.final_grade_override_input).to have_value "A"
-    end
-
-    it "saves overridden grade in SRGB", priority: "1" do
-      SRGB.enter_override_grade("D-")
-      expect(@enrollment.scores.find_by(course_score: true).override_score).to be 61.0
-    end
-  end
-
   it "displays the override column", priority: "1" do
     user_session(@teacher)
     Gradebook.visit(@course)

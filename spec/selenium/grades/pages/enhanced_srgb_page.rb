@@ -301,7 +301,7 @@ class EnhancedSRGB
     end
 
     def visit(course_id)
-      get "/courses/#{course_id}/gradebook/change_gradebook_version?version=individual_enhanced"
+      get "/courses/#{course_id}/gradebook/change_gradebook_version?version=individual"
     end
 
     def sort_assignments_by(sort_order)
