@@ -68,7 +68,7 @@ end
 class Mutations::DiscussionCheckpoints < GraphQL::Schema::InputObject
   argument :checkpoint_label, Types::CheckpointLabelType, required: true
   argument :dates, [Mutations::DiscussionCheckpointDate], required: true
-  argument :points_possible, Integer, required: true
+  argument :points_possible, Float, required: true
   argument :replies_required, Integer, required: false
 end
 

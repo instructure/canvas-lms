@@ -37,7 +37,7 @@ describe('PointsPossible', () => {
     expect(getByText('Points Possible')).toBeInTheDocument()
   })
 
-  it('does not allow negative values on decrement', () => {
+  it('parses float number', () => {
     const mockSetPointsPossible = jest.fn()
     const {getByTestId} = render(
       <PointsPossible
@@ -47,12 +47,49 @@ describe('PointsPossible', () => {
       />
     )
 
-    // Assuming your decrement button has a test id of 'decrement-button', adjust if necessary
     const input = getByTestId('points-possible-input')
-    fireEvent.click(input)
-    fireEvent.keyDown(input, {keyCode: 40})
+    fireEvent.change(input, {target: {value: '10.5'}})
 
-    expect(mockSetPointsPossible).not.toHaveBeenCalledWith(-1)
+    expect(mockSetPointsPossible).toHaveBeenCalledWith('10.5')
+  })
+
+  it('ignores invalid number', () => {
+    const mockSetPointsPossible = jest.fn()
+    const {getByTestId} = render(
+      <PointsPossible
+        {...defaultProps}
+        pointsPossible={0}
+        setPointsPossible={mockSetPointsPossible}
+      />
+    )
+
+    const input = getByTestId('points-possible-input')
+
+    input.value = '15asd'
+    fireEvent.blur(input)
+
     expect(mockSetPointsPossible).toHaveBeenCalledWith(0)
+
+    input.value = '15.'
+    fireEvent.blur(input)
+
+    expect(mockSetPointsPossible).toHaveBeenCalledWith(0)
+  })
+
+  it('cuts the number to 2 decimal points', () => {
+    const mockSetPointsPossible = jest.fn()
+    const {getByTestId} = render(
+      <PointsPossible
+        {...defaultProps}
+        pointsPossible={0}
+        setPointsPossible={mockSetPointsPossible}
+      />
+    )
+
+    const input = getByTestId('points-possible-input')
+    input.value = '10.551234'
+    fireEvent.blur(input)
+
+    expect(mockSetPointsPossible).toHaveBeenCalledWith(10.55)
   })
 })
