@@ -342,6 +342,7 @@ export function IconMakerTray({editor, onUnmount, editing, canvasOrigin}) {
       onDismiss={onClose}
       onUnmount={onUnmount}
       mountNode={mountNode}
+      shouldCloseOnDocumentClick={false}
       renderHeader={() => renderHeader(title, settings, onKeyDown, handleAlertDismissal, onClose)}
       renderBody={() =>
         renderBody(
