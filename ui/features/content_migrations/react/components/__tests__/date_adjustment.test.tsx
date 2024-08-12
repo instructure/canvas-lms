@@ -65,6 +65,28 @@ describe('DateAdjustment', () => {
     expect(screen.getByRole('radio', {name: 'Remove dates', hidden: false})).toBeInTheDocument()
   })
 
+  it('Fill in with empty values the start and end date fileds', () => {
+    render(
+      <DateAdjustments dateAdjustments={dateAdjustments} setDateAdjustments={setDateAdjustments} />
+    )
+    expect(screen.getByLabelText('Select new beginning date').closest('input')?.value).toBe('')
+    expect(screen.getByLabelText('Select new end date').closest('input')?.value).toBe('')
+  })
+
+  it('Fill in with start and end dates came from global', () => {
+    ENV.OLD_START_DATE = '2024-08-08T08:00:00+00:00'
+    ENV.OLD_END_DATE = '2024-08-09T08:00:00+00:00'
+    render(
+      <DateAdjustments dateAdjustments={dateAdjustments} setDateAdjustments={setDateAdjustments} />
+    )
+    expect(screen.getByLabelText('Select new beginning date').closest('input')?.value).toBe(
+      'Aug 8 at 8am'
+    )
+    expect(screen.getByLabelText('Select new end date').closest('input')?.value).toBe(
+      'Aug 9 at 8am'
+    )
+  })
+
   it('Renders/hides date shifting UI when appropriate', async () => {
     render(
       <DateAdjustments dateAdjustments={dateAdjustments} setDateAdjustments={setDateAdjustments} />
