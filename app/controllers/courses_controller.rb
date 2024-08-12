@@ -2449,8 +2449,9 @@ class CoursesController < ApplicationController
 
       @course.send_later_if_production_enqueue_args(:touch_content_if_public_visibility_changed,
         { :priority => Delayed::LOW_PRIORITY }, changes)
-
-      if @course.errors.none? && @course.save
+      Rails.logger.info("Referrer: #{request.referer}")
+      course_saved = @course.errors.none? && (params[:update_timezone] ? @course.save_with_account_times : @course.save)
+      if course_saved
         Auditors::Course.record_updated(@course, @current_user, changes, source: logging_source)
         @current_user.touch
         if params[:update_default_pages]
