@@ -2064,7 +2064,8 @@ class AccountsController < ApplicationController
                                    :enable_name_pronunciation,
                                    :enable_limited_access_for_students,
                                    :enable_as_k5_account,
-                                   :use_classic_font_in_k5].freeze
+                                   :use_classic_font_in_k5,
+                                   :show_sections_in_course_tray].freeze
 
   def permitted_account_attributes
     [:name,

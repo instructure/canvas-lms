@@ -254,7 +254,8 @@ class ApplicationController < ActionController::Base
             open_registration: @domain_root_account&.open_registration?,
             collapse_global_nav: @current_user&.collapse_global_nav?,
             release_notes_badge_disabled: @current_user&.release_notes_badge_disabled?,
-            can_add_pronouns: @domain_root_account&.can_add_pronouns?
+            can_add_pronouns: @domain_root_account&.can_add_pronouns?,
+            show_sections_in_course_tray: @domain_root_account&.show_sections_in_course_tray?
           },
           RAILS_ENVIRONMENT: Canvas.environment,
         }

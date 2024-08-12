@@ -33,7 +33,9 @@ const UNPUBLISHED = 'unpublished'
 
 export const CourseListItemContent = ({course}: {course: Course}) => {
   const sectionNames = (course.sections || []).map(section => section.name)
-  const sectionDetails = sectionNames.length > 0 ? sectionNames.sort().join(', ') : null
+  const showSections = ENV.SETTINGS?.show_sections_in_course_tray
+  const sectionDetails =
+    showSections && sectionNames.length > 0 ? sectionNames.sort().join(', ') : null
   const courseDetails =
     ENV.FEATURES?.courses_popout_sisid && course.sis_course_id
       ? course.enrollment_term_id > 1
