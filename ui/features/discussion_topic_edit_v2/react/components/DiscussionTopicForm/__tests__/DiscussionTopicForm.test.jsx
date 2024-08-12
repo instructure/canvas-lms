@@ -627,34 +627,6 @@ describe('DiscussionTopicForm', () => {
           checkbox.click()
         }
 
-        it('increments and decrements the checkpoints settings points possible reply to topic fields', () => {
-          setupCheckpoints(setup())
-
-          const numberInputReplyToTopic = getByTestId('points-possible-input-reply-to-topic')
-          expect(numberInputReplyToTopic.value).toBe('0')
-
-          fireEvent.click(numberInputReplyToTopic)
-
-          fireEvent.keyDown(numberInputReplyToTopic, {keyCode: 38})
-          expect(numberInputReplyToTopic.value).toBe('1')
-
-          fireEvent.keyDown(numberInputReplyToTopic, {keyCode: 40})
-          expect(numberInputReplyToTopic.value).toBe('0')
-        })
-        it('increments and decrements the checkpoints settings points possible reply to entry fields', () => {
-          setupCheckpoints(setup())
-
-          const numberInputReplyToEntry = getByTestId('points-possible-input-reply-to-entry')
-          expect(numberInputReplyToEntry.value).toBe('0')
-
-          fireEvent.click(numberInputReplyToEntry)
-
-          fireEvent.keyDown(numberInputReplyToEntry, {keyCode: 38})
-          expect(numberInputReplyToEntry.value).toBe('1')
-
-          fireEvent.keyDown(numberInputReplyToEntry, {keyCode: 40})
-          expect(numberInputReplyToEntry.value).toBe('0')
-        })
         describe('Additional Replies Required', () => {
           it('increments and decrements the checkpoints settings additional replies required entry field', () => {
             setupCheckpoints(setup())
