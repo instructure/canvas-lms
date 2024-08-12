@@ -473,7 +473,7 @@ export default function StatusBar(props) {
         {isHtmlView() ? renderHtmlEditorMessage() : renderPath()}
       </Flex.Item>
 
-      <Flex.Item role="toolbar" title={formatMessage('Editor Statusbar')}>
+      <Flex.Item role="toolbar" title={formatMessage('Editor Status Bar')}>
         {renderIconButtons()}
 
         {isFeature('word_count') && isAvailable('instructure_wordcount') && renderWordCount()}
