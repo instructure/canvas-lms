@@ -91,7 +91,7 @@ describe "Block Editor", :ignore_js_errors do
     @context = @course
     @rce_page = @course.wiki_pages.create!(title: "RCE Page", body: "RCE Page Body")
     @block_page = @course.wiki_pages.create!(title: "Block Page")
-    puts ">>>", block_page_content
+
     @block_page.update!(
       block_editor_attributes: {
         time: Time.now.to_i,
@@ -166,6 +166,58 @@ describe "Block Editor", :ignore_js_errors do
       expect(block_toolbox).to be_displayed
       drag_and_drop_element(f(".toolbox-item.item-button"), f(".blank-section__inner"))
       expect(fj(".blank-section a:contains('Click me')")).to be_displayed
+    end
+
+    it "can resize blocks with the mouse" do
+      get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+      wait_for_block_editor
+      block_toolbox_toggle.click
+      drag_and_drop_element(f(".toolbox-item.item-image"), f(".blank-section__inner"))
+      f(".block.image-block").click  # select the section
+      f(".block.image-block").click  # select the block
+      expect(block_resize_handle_se).to be_displayed
+      expect(f(".block.image-block").size.height).to eq(100)
+      expect(f(".block.image-block").size.width).to eq(100)
+
+      drag_and_drop_element_by(block_resize_handle_se, 100, 50)
+      expect(f(".block.image-block").size.width).to eq(200)
+      expect(f(".block.image-block").size.height).to eq(150)
+    end
+
+    it "can resize blocks with the keyboard" do
+      get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+      wait_for_block_editor
+      block_toolbox_toggle.click
+      drag_and_drop_element(f(".toolbox-item.item-image"), f(".blank-section__inner"))
+      f(".block.image-block").click  # select the section
+      f(".block.image-block").click  # select the block
+      expect(block_resize_handle_se).to be_displayed
+      expect(f(".block.image-block").size.height).to eq(100)
+      expect(f(".block.image-block").size.width).to eq(100)
+
+      f("body").send_keys(:alt, :arrow_down)
+      expect(f(".block.image-block").size.height).to eq(101)
+      expect(f(".block.image-block").size.width).to eq(100)
+
+      f("body").send_keys(:alt, :arrow_right)
+      expect(f(".block.image-block").size.height).to eq(101)
+      expect(f(".block.image-block").size.width).to eq(101)
+
+      f("body").send_keys(:alt, :arrow_left)
+      expect(f(".block.image-block").size.height).to eq(101)
+      expect(f(".block.image-block").size.width).to eq(100)
+
+      f("body").send_keys(:alt, :arrow_up)
+      expect(f(".block.image-block").size.height).to eq(100)
+      expect(f(".block.image-block").size.width).to eq(100)
+
+      f("body").send_keys(:alt, :shift, :arrow_right)
+      expect(f(".block.image-block").size.height).to eq(100)
+      expect(f(".block.image-block").size.width).to eq(110)
+
+      f("body").send_keys(:alt, :shift, :arrow_down)
+      expect(f(".block.image-block").size.height).to eq(110)
+      expect(f(".block.image-block").size.width).to eq(110)
     end
   end
 end

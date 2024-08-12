@@ -17,13 +17,14 @@
  */
 
 import React from 'react'
-import {useEditor, useNode} from '@craftjs/core'
+import {useEditor, useNode, type Node} from '@craftjs/core'
 
 import {Img} from '@instructure/ui-img'
 
 import {ImageBlockToolbar} from './ImageBlockToolbar'
 import {useClassNames} from '../../../../utils'
 import {type ImageBlockProps, type ImageVariant, type ImageConstraint} from './types'
+import {BlockResizer} from '../../../editor/BlockResizer'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -35,20 +36,31 @@ const ImageBlock = ({src, width, height, constraint}: ImageBlockProps) => {
   }))
   const {
     connectors: {connect, drag},
-  } = useNode()
+  } = useNode((n: Node) => {
+    return {
+      selected: n.events.selected,
+    }
+  })
   const clazz = useClassNames(enabled, {empty: !src}, ['block', 'image-block'])
+  const sty: any = {}
+  if (width) {
+    sty.width = `${width}px`
+  }
+  if (height) {
+    sty.height = `${height}px`
+  }
 
   if (!src) {
-    return <div className={clazz} ref={el => el && connect(drag(el as HTMLDivElement))} />
+    return (
+      <div className={clazz} style={sty} ref={el => el && connect(drag(el as HTMLDivElement))} />
+    )
   } else {
     return (
-      <div className={clazz} ref={el => el && connect(drag(el as HTMLDivElement))}>
+      <div className={clazz} style={sty} ref={el => el && connect(drag(el as HTMLDivElement))}>
         <Img
           display="inline-block"
           src={src || ImageBlock.craft.defaultProps.src}
           constrain={constraint || ImageBlock.craft.defaultProps.constraint}
-          width={`${width}px`}
-          height={`${height}px`}
         />
       </div>
     )
@@ -64,6 +76,10 @@ ImageBlock.craft = {
   },
   related: {
     toolbar: ImageBlockToolbar,
+    resizer: BlockResizer,
+  },
+  custom: {
+    isResizable: true,
   },
 }
 

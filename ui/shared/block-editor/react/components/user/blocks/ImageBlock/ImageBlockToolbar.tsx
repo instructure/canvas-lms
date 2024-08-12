@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useState} from 'react'
-import {useNode} from '@craftjs/core'
+import {useNode, type Node} from '@craftjs/core'
 
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -37,9 +37,11 @@ const I18n = useI18nScope('block-editor/image-block')
 const ImageBlockToolbar = () => {
   const {
     actions: {setProp},
+    node,
     props,
-  } = useNode(node => ({
-    props: node.data.props,
+  } = useNode((n: Node) => ({
+    props: n.data.props,
+    node: n,
   }))
   const [showUploadModal, setShowUploadModal] = useState(false)
 
@@ -66,10 +68,18 @@ const ImageBlockToolbar = () => {
 
   const handleSave = useCallback(
     (imageURL: string | null) => {
-      setProp((prps: ImageBlockProps) => (prps.src = imageURL || undefined))
+      setProp((prps: ImageBlockProps) => {
+        prps.src = imageURL || undefined
+        // make sure the width and height are set to constrain the size of the new image
+        if (node.dom && (!props.width || !props.height)) {
+          const {width, height} = node.dom.getBoundingClientRect()
+          prps.width = width
+          prps.height = height
+        }
+      })
       setShowUploadModal(false)
     },
-    [setProp]
+    [node.dom, props.height, props.width, setProp]
   )
 
   return (

@@ -70,4 +70,8 @@ module BlockEditorPage
   def block_toolbox
     f('[role="dialog"][aria-label="Toolbox"]')
   end
+
+  def block_resize_handle_se
+    f(".block-resizer.se")
+  end
 end
