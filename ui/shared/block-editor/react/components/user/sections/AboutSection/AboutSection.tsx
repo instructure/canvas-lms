@@ -36,13 +36,7 @@ export const AboutSection = ({background}: AboutSectionProps) => {
     enabled: state.options.enabled,
   }))
   const [cid] = useState<string>('about-section')
-  const clazz = useClassNames(enabled, {empty: false}, [
-    'section',
-    'columns-section',
-    'about-section',
-    'fixed',
-    'columns-2',
-  ])
+  const clazz = useClassNames(enabled, {empty: false}, ['section', 'about-section'])
 
   const backgroundColor = background || AboutSection.craft.defaultProps.background
   const textColor = getContrastingColor(backgroundColor)

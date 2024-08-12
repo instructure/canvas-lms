@@ -38,7 +38,11 @@ const IconBlock = ({iconName, size}: IconBlockProps) => {
     setIcon(() => getIcon(iconName) || IconAlarm)
   }, [iconName])
 
-  return <Icon elementRef={el => el && connect(drag(el as HTMLElement))} size={size} />
+  return (
+    <div className="block icon-block" ref={el => el && connect(drag(el as HTMLElement))}>
+      <Icon size={size} />
+    </div>
+  )
 }
 
 IconBlock.craft = {

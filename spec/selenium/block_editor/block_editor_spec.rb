@@ -32,57 +32,10 @@ describe "Block Editor", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include BlockEditorPage
 
+  # a default page that's had an apple icon block added
   let(:block_page_content) do
-    '{
-  "ROOT": {
-    "type": {
-      "resolvedName": "PageBlock"
-    },
-    "isCanvas": true,
-    "props": {},
-    "displayName": "Page",
-    "custom": {},
-    "hidden": false,
-    "nodes": [
-      "UO_WRGQgSQ"
-    ],
-    "linkedNodes": {}
-  },
-  "UO_WRGQgSQ": {
-    "type": {
-      "resolvedName": "BlankSection"
-    },
-    "isCanvas": false,
-    "props": {},
-    "displayName": "Blank Section",
-    "custom": {
-      "isSection": true
-    },
-    "parent": "ROOT",
-    "hidden": false,
-    "nodes": [],
-    "linkedNodes": {
-      "blank-section_nosection1": "e33NpD3Ck3"
-    }
-  },
-  "e33NpD3Ck3": {
-    "type": {
-      "resolvedName": "NoSections"
-    },
-    "isCanvas": true,
-    "props": {
-      "className": "blank-section__inner"
-    },
-    "displayName": "NoSections",
-    "custom": {
-      "noToolbar": true
-    },
-    "parent": "UO_WRGQgSQ",
-    "hidden": false,
-    "nodes": [],
-    "linkedNodes": {}
-  }
-}'
+    file = File.open(File.expand_path(File.dirname(__FILE__) + "/../../fixtures/block-editor/page-with-apple-icon.json"))
+    file.read
   end
 
   before do
@@ -105,18 +58,25 @@ describe "Block Editor", :ignore_js_errors do
     )
   end
 
-  def create_wiki_page(course)
-    get "/courses/#{course.id}/pages"
-    f("a.new_page").click
-    wait_for_block_editor
-  end
-
   context "Create new page" do
     before do
       create_wiki_page(@course)
     end
 
     context "Start from Scratch" do
+      it "creates a default empty page" do
+        expect(stepper_modal).to be_displayed
+        stepper_start_from_scratch.click
+        stepper_next_button.click
+        stepper_next_button.click
+        stepper_next_button.click
+        stepper_start_creating_button.click
+        expect(f("body")).not_to contain_css(stepper_modal_selector)
+        expect(page_block).to be_displayed
+        expect(columns_section).to be_displayed
+        expect(group_blocks.count).to be(1)
+      end
+
       it "walks through the stepper" do
         expect(stepper_modal).to be_displayed
         stepper_start_from_scratch.click
@@ -129,7 +89,7 @@ describe "Block Editor", :ignore_js_errors do
         expect(stepper_select_font_pirings).to be_displayed
         stepper_start_creating_button.click
         expect(f("body")).not_to contain_css(stepper_modal_selector)
-        expect(f(".hero-section")).to be_displayed
+        expect(hero_section).to be_displayed
       end
     end
 
@@ -141,7 +101,7 @@ describe "Block Editor", :ignore_js_errors do
         f("#template-1").click
         stepper_start_editing_button.click
         expect(f("body")).not_to contain_css(stepper_modal_selector)
-        expect(f(".hero-section")).to be_displayed
+        expect(hero_section).to be_displayed
       end
     end
   end
@@ -156,7 +116,9 @@ describe "Block Editor", :ignore_js_errors do
     it "edits a block page with the block editor" do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
-      expect(f(".page-block")).to be_displayed
+      expect(page_block).to be_displayed
+      expect(icon_block).to be_displayed
+      expect(icon_block_title.attribute("textContent")).to eq("apple")
     end
 
     it "can drag and drop blocks from the toolbox" do
@@ -164,67 +126,67 @@ describe "Block Editor", :ignore_js_errors do
       wait_for_block_editor
       block_toolbox_toggle.click
       expect(block_toolbox).to be_displayed
-      drag_and_drop_element(f(".toolbox-item.item-button"), f(".blank-section__inner"))
-      expect(fj(".blank-section a:contains('Click me')")).to be_displayed
+      drag_and_drop_element(block_toolbox_button, group_block_dropzone)
+      expect(fj("#{group_block_inner_selector} a:contains('Click me')")).to be_displayed
     end
 
     it "can resize blocks with the mouse" do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
       block_toolbox_toggle.click
-      drag_and_drop_element(f(".toolbox-item.item-image"), f(".blank-section__inner"))
-      f(".block.image-block").click  # select the section
-      f(".block.image-block").click  # select the block
+      drag_and_drop_element(block_toolbox_image, group_block_dropzone)
+      image_block.click  # select the section
+      image_block.click  # select the block
       expect(block_toolbar).to be_displayed
       click_block_toolbar_menu_item("Constraint", "Cover")
 
       expect(block_resize_handle_se).to be_displayed
-      expect(f(".block.image-block").size.height).to eq(100)
-      expect(f(".block.image-block").size.width).to eq(100)
+      expect(image_block.size.height).to eq(100)
+      expect(image_block.size.width).to eq(100)
 
       drag_and_drop_element_by(block_resize_handle_se, 100, 0)
       drag_and_drop_element_by(block_resize_handle_se, 0, 50)
-      expect(f(".block.image-block").size.width).to eq(200)
-      expect(f(".block.image-block").size.height).to eq(150)
+      expect(image_block.size.width).to eq(200)
+      expect(image_block.size.height).to eq(150)
     end
 
     it "can resize blocks with the keyboard" do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
       block_toolbox_toggle.click
-      drag_and_drop_element(f(".toolbox-item.item-image"), f(".blank-section__inner"))
-      f(".block.image-block").click  # select the section
-      f(".block.image-block").click  # select the block
+      drag_and_drop_element(block_toolbox_image, group_block_dropzone)
+      image_block.click  # select the section
+      image_block.click  # select the block
       expect(block_toolbar).to be_displayed
       click_block_toolbar_menu_item("Constraint", "Cover")
 
       expect(block_resize_handle_se).to be_displayed
-      expect(f(".block.image-block").size.height).to eq(100)
-      expect(f(".block.image-block").size.width).to eq(100)
+      expect(image_block.size.height).to eq(100)
+      expect(image_block.size.width).to eq(100)
 
       f("body").send_keys(:alt, :arrow_down)
-      expect(f(".block.image-block").size.height).to eq(101)
-      expect(f(".block.image-block").size.width).to eq(100)
+      expect(image_block.size.height).to eq(101)
+      expect(image_block.size.width).to eq(100)
 
       f("body").send_keys(:alt, :arrow_right)
-      expect(f(".block.image-block").size.height).to eq(101)
-      expect(f(".block.image-block").size.width).to eq(101)
+      expect(image_block.size.height).to eq(101)
+      expect(image_block.size.width).to eq(101)
 
       f("body").send_keys(:alt, :arrow_left)
-      expect(f(".block.image-block").size.height).to eq(101)
-      expect(f(".block.image-block").size.width).to eq(100)
+      expect(image_block.size.height).to eq(101)
+      expect(image_block.size.width).to eq(100)
 
       f("body").send_keys(:alt, :arrow_up)
-      expect(f(".block.image-block").size.height).to eq(100)
-      expect(f(".block.image-block").size.width).to eq(100)
+      expect(image_block.size.height).to eq(100)
+      expect(image_block.size.width).to eq(100)
 
       f("body").send_keys(:alt, :shift, :arrow_right)
-      expect(f(".block.image-block").size.height).to eq(100)
-      expect(f(".block.image-block").size.width).to eq(110)
+      expect(image_block.size.height).to eq(100)
+      expect(image_block.size.width).to eq(110)
 
       f("body").send_keys(:alt, :shift, :arrow_down)
-      expect(f(".block.image-block").size.height).to eq(110)
-      expect(f(".block.image-block").size.width).to eq(110)
+      expect(image_block.size.height).to eq(110)
+      expect(image_block.size.width).to eq(110)
     end
 
     context "image block" do
@@ -243,7 +205,7 @@ describe "Block Editor", :ignore_js_errors do
         wait_for_block_editor
         block_toolbox_toggle.click
 
-        drag_and_drop_element(block_toolbox_image, blank_section)
+        drag_and_drop_element(block_toolbox_image, group_block_dropzone)
         image_block_upload_button.click
         course_images_tab.click
         image_thumbnails[0].click
@@ -263,7 +225,7 @@ describe "Block Editor", :ignore_js_errors do
         wait_for_block_editor
         block_toolbox_toggle.click
 
-        drag_and_drop_element(block_toolbox_image, blank_section)
+        drag_and_drop_element(block_toolbox_image, group_block_dropzone)
         image_block_upload_button.click
         user_images_tab.click
         image_thumbnails[0].click
@@ -300,15 +262,15 @@ describe "Block Editor", :ignore_js_errors do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
 
-      f(".block.image-block").click  # select the section
-      f(".block.image-block").click  # select the block
+      image_block.click  # select the section
+      image_block.click  # select the block
       expect(block_resize_handle_se).to be_displayed
-      expect(f(".block.image-block").size.width).to eq(100)
-      expect(f(".block.image-block").size.height).to eq(50)
+      expect(image_block.size.width).to eq(100)
+      expect(image_block.size.height).to eq(50)
 
       f("body").send_keys(:alt, :shift, :arrow_right)
-      expect(f(".block.image-block").size.width).to eq(110)
-      expect(f(".block.image-block").size.height).to eq(55)
+      expect(image_block.size.width).to eq(110)
+      expect(image_block.size.height).to eq(55)
     end
   end
 end

@@ -37,19 +37,15 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import {Editor, Frame} from '@craftjs/core'
-import {Container} from '../../../blocks/Container'
-import {ColumnsSection, ColumnsSectionInner, type ColumnsSectionProps} from '..'
-import {GroupBlock} from '../../../blocks/GroupBlock'
+import {Container} from '../../Container'
+import {GroupBlock, type GroupBlockProps} from '..'
 import {NoSections} from '../../../common'
 
-const renderSection = (props: Partial<ColumnsSectionProps> = {}) => {
+const renderBlock = (props: Partial<GroupBlockProps> = {}) => {
   return render(
-    <Editor
-      enabled={true}
-      resolver={{ColumnsSection, ColumnsSectionInner, GroupBlock, NoSections, Container}}
-    >
+    <Editor enabled={true} resolver={{GroupBlock, NoSections, Container}}>
       <Frame>
-        <ColumnsSection columns={2} {...props} />
+        <GroupBlock {...props} />
       </Frame>
     </Editor>
   )
@@ -57,16 +53,14 @@ const renderSection = (props: Partial<ColumnsSectionProps> = {}) => {
 
 describe('ColumnsSection', () => {
   it('should render ', () => {
-    const {container} = renderSection()
-    expect(container.querySelector('.section.columns-section.columns-2')).toBeInTheDocument()
-    expect(container.querySelectorAll('.group-block')).toHaveLength(2)
+    const {container} = renderBlock()
+    expect(container.querySelector('.group-block')).toBeInTheDocument()
+    expect(container.querySelector('.group-block')).toHaveClass('column-layout')
   })
 
-  it('is tagged as a section', () => {
-    expect(ColumnsSection.craft.custom.isSection).toBe(true)
-  })
-
-  it('has a section menu', () => {
-    expect(ColumnsSection.craft.related.sectionMenu).toBeDefined()
+  it('should render with row direction', () => {
+    const {container} = renderBlock({layout: 'row'})
+    expect(container.querySelector('.group-block')).toBeInTheDocument()
+    expect(container.querySelector('.group-block')).toHaveClass('row-layout')
   })
 })

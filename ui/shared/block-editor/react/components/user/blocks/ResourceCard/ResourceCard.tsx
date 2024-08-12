@@ -94,7 +94,11 @@ ResourceCard.craft = {
     linkUrl: '',
   },
   custom: {
-    isDeletable: notDeletableIfLastChild,
+    isDeletable: (nodeId: string, query: any) => {
+      const parentId = query.node(nodeId).get().data.parent
+      const parent = query.node(parentId).get()
+      return parent?.data.name !== 'ResourcesSectionInner' || notDeletableIfLastChild(nodeId, query)
+    },
   },
 }
 

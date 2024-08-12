@@ -16,17 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {IconTableInsertColumnAfterLine} from '@instructure/ui-icons/es/svg'
-import {ColumnsSection, ColumnsSectionInner} from './ColumnsSection'
-import {type ColumnsSectionProps} from './types'
-import {ColumnsSectionToolbar} from './ColumnsSectionToolbar'
+export type GroupLayout = 'row' | 'column'
+export type GroupAlignment = 'start' | 'center' | 'end'
 
-const ColumnsSectionIcon = IconTableInsertColumnAfterLine?.src
-
-export {
-  ColumnsSection,
-  ColumnsSectionInner,
-  ColumnsSectionToolbar,
-  ColumnsSectionIcon,
-  type ColumnsSectionProps,
+export type GroupBlockProps = {
+  layout?: GroupLayout
+  alignment?: GroupAlignment
+  resizable?: boolean
 }

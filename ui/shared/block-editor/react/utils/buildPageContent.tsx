@@ -23,8 +23,9 @@ import {NavigationSection} from '../components/user/sections/NavigationSection'
 import {AboutSection} from '../components/user/sections/AboutSection'
 import {FooterSection} from '../components/user/sections/FooterSection'
 import {QuizSection} from '../components/user/sections/QuizSection'
-import {BlankSection} from '../components/user/sections/BlankSection'
 import {AnnouncementSection} from '../components/user/sections/AnnouncementSection'
+// import {ColumnsSection} from '../components/user/sections/ColumnsSection'
+import {scratchPage} from '../assets/data/scratchPage'
 
 import {type PageSection} from '../components/editor/NewPageStepper/types'
 
@@ -36,8 +37,7 @@ export const buildPageContent = (
   _fontName: string
 ) => {
   if (selectedSections.length === 0) {
-    const nodeTree = query.parseReactElement(<BlankSection />).toNodeTree()
-    actions.addNodeTree(nodeTree, 'ROOT')
+    actions.deserialize(scratchPage)
     return
   }
   selectedSections.forEach(section => {

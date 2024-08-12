@@ -19,6 +19,12 @@
 require_relative "../../common"
 
 module BlockEditorPage
+  def create_wiki_page(course)
+    get "/courses/#{course.id}/pages"
+    f("a.new_page").click
+    wait_for_block_editor
+  end
+
   # Stepper
   def stepper_modal_selector
     '[role="dialog"][aria-label="Create a new page"]'
@@ -74,7 +80,11 @@ module BlockEditorPage
   end
 
   def block_toolbox_image
-    f(".toolbox-item.item-image")
+    f(".toolbox-item.item-image-block")
+  end
+
+  def block_toolbox_button
+    f(".toolbox-item.item-button-block")
   end
 
   # Blocks
@@ -84,6 +94,14 @@ module BlockEditorPage
 
   def block_toolbar
     f(".block-toolbar")
+  end
+
+  def block_toolbar_delete_button_selector
+    ".block-toolbar button:contains('Delete')"
+  end
+
+  def block_toolbar_delete_button
+    fj(block_toolbar_delete_button_selector)
   end
 
   def click_block_toolbar_menu_item(menu_button_name, menu_item_name)
@@ -99,9 +117,21 @@ module BlockEditorPage
     f('[data-testid="upload-image-button"]')
   end
 
+  def group_block_inner_selector
+    ".group-block__inner"
+  end
+
+  def group_block_dropzone
+    f(group_block_inner_selector)
+  end
+
   # Sections
   def blank_section
     f(".blank-section__inner")
+  end
+
+  def hero_section
+    f(".hero-section")
   end
 
   # Add Image Modal
@@ -123,5 +153,47 @@ module BlockEditorPage
 
   def submit_button
     f('button[type="submit"]')
+  end
+
+  # columns section
+  def columns_section
+    f(".columns-section")
+  end
+
+  def columns_input
+    f('[data-testid="columns-input"]')
+  end
+
+  def columns_input_increment
+    fxpath("//*[@data-testid='columns-input']/following-sibling::*//button[1]")
+  end
+
+  def columns_input_decrement
+    fxpath("//*[@data-testid='columns-input']/following-sibling::*//button[2]")
+  end
+
+  # blocks
+  def page_block
+    f(".page-block")
+  end
+
+  def group_block
+    f(".group-block")
+  end
+
+  def group_blocks
+    ff(".group-block")
+  end
+
+  def icon_block
+    f(".icon-block")
+  end
+
+  def icon_block_title
+    f(".icon-block > svg > title")
+  end
+
+  def image_block
+    f(".image-block")
   end
 end

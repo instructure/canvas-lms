@@ -73,14 +73,13 @@ export default function BlockEditor({
   useEffect(() => {
     if (version !== '1') {
       // eslint-disable-next-line no-alert
-      alert('wrong version, mayhem may ensue')
+      alert(I18n.t('wrong version, mayhem may ensue'))
     }
   }, [json, version])
 
   const handleNodesChange = useCallback((query: any) => {
     // @ts-expect-error
-    window.block_editor = query
-    // console.log(JSON.parse(query.serialize()))
+    window.block_editor = () => query
   }, [])
 
   const handleCloseToolbox = useCallback(() => {
