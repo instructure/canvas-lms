@@ -243,7 +243,7 @@ export default function ItemAssignToTray({
     if (defaultCards) {
       setAssignToCards(defaultCards)
     }
-    onDismiss()
+    onDismiss?.()
   }, [defaultCards, onDismiss])
 
   const masteryPathsAllowed = !(
