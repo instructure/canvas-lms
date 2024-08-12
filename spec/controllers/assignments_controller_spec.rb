@@ -1224,6 +1224,18 @@ describe AssignmentsController do
       end
     end
 
+    describe "assignment_enhancements_teacher_view" do
+      before do
+        @course.root_account.enable_feature!(:assignment_enhancements_teacher_view)
+        @course.save!
+      end
+
+      it "does not render the 'old' assignment page layout" do
+        get :show, params: { course_id: @course.id, id: @assignment.id }
+        expect(response).not_to render_template("assignments/show")
+      end
+    end
+
     it "does not show locked external tool assignments" do
       user_session(@student)
 

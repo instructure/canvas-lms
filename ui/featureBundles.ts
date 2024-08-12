@@ -40,6 +40,8 @@ const featureBundles: {
   assignment_show: () => import('./features/assignment_show/index'),
   assignments_peer_reviews: () => import('./features/assignments_peer_reviews/index'),
   assignments_show_student: () => import('./features/assignments_show_student/index'),
+  assignments_show_teacher_deprecated: () =>
+    import('./features/assignments_show_teacher_deprecated/index'),
   assignments_show_teacher: () => import('./features/assignments_show_teacher/index'),
   authentication_providers: () => import('./features/authentication_providers/index'),
   available_pronouns_list: () => import('./features/available_pronouns_list/index'),
