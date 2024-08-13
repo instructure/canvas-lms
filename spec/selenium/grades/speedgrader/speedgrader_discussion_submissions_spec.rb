@@ -199,25 +199,50 @@ describe "SpeedGrader - discussion submissions" do
       end
     end
 
+    it "displays all entries for group discussion submission" do
+      entry_text = "first student message in group1"
+      root_topic = group_discussion_assignment
+      @group1.add_user(@student, "accepted")
+
+      root_topic.child_topic_for(@student).discussion_entries.create!(user: @student, message: entry_text)
+      Speedgrader.visit(@course.id, root_topic.assignment.id)
+
+      in_frame "speedgrader_iframe", "#discussion_view_link" do
+        expect(f("#main")).to include_text("The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for")
+        expect(f("#main")).to include_text(entry_text)
+      end
+    end
+
     context "discussion_checkpoints" do
-      it "displays whole discussion with hidden student names" do
+      before do
         Account.site_admin.enable_feature!(:react_discussions_post)
         @course.root_account.enable_feature!(:discussion_checkpoints)
-        Speedgrader.visit(@course.id, @assignment.id)
+      end
 
-        Speedgrader.click_settings_link
-        Speedgrader.click_options_link
-        Speedgrader.select_hide_student_names
-        expect_new_page_load { fj(".ui-dialog-buttonset .ui-button:visible:last").click }
+      it "displays whole discussion" do
+        Speedgrader.visit(@course.id, @assignment.id)
+        in_frame("speedgrader_iframe") do
+          in_frame("discussion_preview_iframe") do
+            wait_for_ajaximations
+            expect(f("div[data-testid='isHighlighted']").text).to include(@student.name)
+            expect(f(".discussions-search-filter")).to be_displayed
+          end
+        end
+      end
+
+      it "displays whole discussion for group discussion submission" do
+        entry_text = "first student message in group1"
+        root_topic = group_discussion_assignment
+        @group1.add_user(@student, "accepted")
+
+        root_topic.child_topic_for(@student).discussion_entries.create!(user: @student, message: entry_text)
+        Speedgrader.visit(@course.id, root_topic.assignment.id)
 
         in_frame("speedgrader_iframe") do
           in_frame("discussion_preview_iframe") do
             wait_for_ajaximations
-            # this verifies full discussion is displayed, and highlight is set to the first
-            # student's entry
-            expect(f("div[data-testid='isHighlighted']").text).to include("This Student")
-            expect(fj("span:contains('Discussion Participant')")).to be_displayed
-            expect(f("body")).not_to contain_css(".discussions-search-filter")
+            expect(f("div[data-testid='isHighlighted']").text).to include(@student.name)
+            expect(f(".discussions-search-filter")).to be_displayed
           end
         end
       end
