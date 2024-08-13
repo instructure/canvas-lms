@@ -32,7 +32,10 @@ import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery
 import {getSubmissionsByStudentIds} from './queries/submissionsByStudentsIdsQuery'
 import {getAssignmentsByCourseId} from './queries/assignmentsByCourseIdQuery'
 
-import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
+import {
+  updateSubmissionGrade,
+  updateCheckpointedSubmissionGrade,
+} from './mutations/updateSubmissionGradeMutation'
 import {createSubmissionComment} from './mutations/createSubmissionCommentMutation'
 import {hideAssignmentGradesForSections} from './mutations/hideAssignmentGradesForSectionsMutation'
 import {postDraftSubmissionComment} from './mutations/postDraftSubmissionCommentMutation'
