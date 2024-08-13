@@ -300,7 +300,7 @@ archived_grading_schemes:
 enhanced_rubrics:
   state: hidden
   beta: true
-  applies_to: Account
+  applies_to: Course
   root_opt_in: true
   display_name: Rubric Enhancements
   description: This feature provides visual and functional enhancements to rubrics across Canvas.

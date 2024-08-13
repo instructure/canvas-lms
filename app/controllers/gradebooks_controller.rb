@@ -1074,7 +1074,7 @@ class GradebooksController < ApplicationController
 
     @can_reassign_submissions = @assignment.can_reassign?(@current_user)
 
-    enhanced_rubrics_enabled = @context.account.feature_enabled?(:enhanced_rubrics)
+    enhanced_rubrics_enabled = @context.feature_enabled?(:enhanced_rubrics)
 
     respond_to do |format|
       format.html do
