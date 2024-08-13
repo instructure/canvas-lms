@@ -581,10 +581,59 @@ class Lti::RegistrationsController < ApplicationController
   end
 
   # @internal
-  def fetch_lti_configuration
-    result = CanvasHttp.get(params[:url])
+  # @API Validate LtiConfiguration
+  # Validates the provided LTI 1.3 JSON config against the LtiConfiguration schema,
+  # and returns any errors found. Also transforms the JSON from LtiConfiguration
+  # to InternalLtiConfiguration format before returning.
+  # JSON config can be provided via url that points to an endpoint hosted by a tool,
+  # or directly in the request body.
+  # This is a utility endpoint for the LTI registration UI. Fetching tool config server-side
+  # prevents CORS issues for the tool.
+  #
+  # @argument lti_configuration [Optional, JSON] The LTI 1.3 JSON config to validate.
+  # @argument url [Optional, String] The URL to fetch the LTI 1.3 JSON config from.
+  #
+  # @returns { configuration: Lti::ToolConfiguration } | { errors: [String] }
+  #
+  # @example_request
+  #
+  #   This would return the JSON in InternalLtiConfiguration format
+  #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/registrations/configuration/validate' \
+  #        -d '{"lti_configuration": <LTI JSON config>}' \
+  #        -H "Content-Type: application/json" \
+  #        -H "Authorization: Bearer <token>"
+  def validate_lti_configuration
+    unless params[:lti_configuration].present? || params[:url].present?
+      return render_configuration_errors(["one of lti_configuration or url is required"])
+    end
+    if params[:lti_configuration].present? && params[:url].present?
+      return render_configuration_errors(["only one of lti_configuration or url is allowed"])
+    end
 
-    render json: result.body
+    if params[:lti_configuration].present?
+      config = params.require(:lti_configuration).to_unsafe_h
+    else
+      begin
+        result = CanvasHttp.get(params.require(:url))
+
+        unless result.is_a?(Net::HTTPSuccess)
+          return render_configuration_errors(["invalid configuration url"])
+        end
+
+        config = JSON.parse(result.body)
+      rescue CanvasHttp::Error
+        return render_configuration_errors(["invalid configuration url"])
+      rescue JSON::ParserError
+        return render_configuration_errors(["url does not return JSON"])
+      end
+    end
+
+    errors = Schemas::LtiConfiguration.validation_errors(config)
+    if errors.present?
+      return render_configuration_errors(errors)
+    end
+
+    render json: { configuration: Schemas::InternalLtiConfiguration.from_lti_configuration(config) }
   end
 
   # @API Show an LTI Registration
@@ -692,6 +741,10 @@ class Lti::RegistrationsController < ApplicationController
   end
 
   private
+
+  def render_configuration_errors(errors)
+    render json: { errors: }, status: :unprocessable_entity
+  end
 
   def update_params
     params.permit(:admin_nickname).merge({ updated_by: @current_user })

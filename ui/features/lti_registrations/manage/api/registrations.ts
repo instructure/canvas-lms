@@ -74,7 +74,7 @@ export const fetchThirdPartyToolConfiguration: FetchThirdPartyToolConfiguration 
 ) =>
   parseFetchResult(ZLtiConfiguration)(
     fetch(
-      `/api/v1/accounts/${accountId}/lti_registrations/fetch_lti_configuration?` +
+      `/api/v1/accounts/${accountId}/lti_registrations/configuration/fetch?` +
         new URLSearchParams({url})
     )
   )

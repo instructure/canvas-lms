@@ -209,8 +209,8 @@
   path: "/api/v1/accounts/:account_id/lti_registrations/:id"
 - verb: POST
   path: "/api/v1/accounts/:account_id/lti_registrations/:id/bind"
-- verb: GET
-  path: "/api/v1/accounts/:account_id/lti_registrations/fetch_lti_configuration"
+- verb: POST
+  path: "/api/v1/accounts/:account_id/lti_registrations/configuration/validate"
 - verb: GET
   path: "/api/v1/accounts/:account_id/outcome_group_links"
 - verb: GET
