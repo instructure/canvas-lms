@@ -311,13 +311,13 @@ class Enrollment < ActiveRecord::Base
   scope :not_fake, -> { where("enrollments.type<>'StudentViewEnrollment'") }
 
   scope :temporary_enrollment_recipients_for_provider, lambda { |user|
-    joins(:course).where(temporary_enrollment_source_user_id: user,
-                         courses: { workflow_state: %w[available claimed created] })
+    active.joins(:course).where(temporary_enrollment_source_user_id: user,
+                                courses: { workflow_state: %w[available claimed created] })
   }
 
   scope :temporary_enrollments_for_recipient, lambda { |user|
-    joins(:course).where(user_id: user, courses: { workflow_state: %w[available claimed created] })
-                  .where.not(temporary_enrollment_source_user_id: nil)
+    active.joins(:course).where(user_id: user, courses: { workflow_state: %w[available claimed created] })
+          .where.not(temporary_enrollment_source_user_id: nil)
   }
 
   def self.readable_types
