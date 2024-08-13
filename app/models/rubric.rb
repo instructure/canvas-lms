@@ -571,17 +571,7 @@ class Rubric < ActiveRecord::Base
   end
 
   def enhanced_rubrics_enabled?
-    return context.feature_enabled?(:enhanced_rubrics) if context_type == "Account"
-
-    context.account.feature_enabled?(:enhanced_rubrics)
-  end
-
-  def self.enhanced_rubrics_enabled_for_context?(context)
-    return false unless context
-    return context.feature_enabled?(:enhanced_rubrics) if context.is_a?(Account)
-    return context.account.feature_enabled?(:enhanced_rubrics) if context.is_a?(Course)
-
-    false
+    context.feature_enabled?(:enhanced_rubrics)
   end
 
   def learning_outcome_ids_from_results
