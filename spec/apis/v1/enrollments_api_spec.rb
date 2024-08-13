@@ -1237,6 +1237,18 @@ describe EnrollmentsApiController, type: :request do
           expect(json.first["user_id"]).to eq(@recipient.id)
         end
 
+        it "handles an empty result set" do
+          user_path = "/api/v1/users/#{@provider.id}/enrollments"
+          @recipient.enrollments.destroy_all
+          json = api_call_as_user(account_admin_user,
+                                  :get,
+                                  user_path,
+                                  @user_params.merge(temporary_enrollment_recipients_for_provider: true,
+                                                     user_id: @provider.id))
+          expect(response).to have_http_status(:ok)
+          expect(json).to be_empty
+        end
+
         it "renders unauthorized if user is not an account admin" do
           user_path = "/api/v1/users/#{@recipient.id}/enrollments"
           api_call_as_user(@provider,
