@@ -319,7 +319,6 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Redigera ikon" },
   "edit_link_7f53bebb": { "message": "Redigera länk" },
-  "editor_statusbar_26ac81fc": { "message": "Statusfält för redigeraren" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Element som börjar med { start }"
   },
@@ -617,6 +616,7 @@ const locale = {
   "links_to_an_external_site_de74145d": {
     "message": "Länkar till en extern sida."
   },
+  "lists_cd1336fc": { "message": "Listor" },
   "lists_should_be_formatted_as_lists_f862de8d": {
     "message": "Listor ska formateras som listor."
   },

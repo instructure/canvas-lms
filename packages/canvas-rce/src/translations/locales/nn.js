@@ -302,7 +302,6 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Rediger ikon" },
   "edit_link_7f53bebb": { "message": "Endre lenke" },
-  "editor_statusbar_26ac81fc": { "message": "Statusrad editor" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Element som startar med { start }"
   },

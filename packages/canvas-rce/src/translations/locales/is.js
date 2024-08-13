@@ -312,7 +312,6 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Breyta tákni" },
   "edit_link_7f53bebb": { "message": "Breyta tengli" },
-  "editor_statusbar_26ac81fc": { "message": "Stöðuslá ritils" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Eining byrjar á { start }"
   },
@@ -600,6 +599,7 @@ const locale = {
   },
   "links_14b70841": { "message": "Tenglar" },
   "links_to_an_external_site_de74145d": { "message": "Tenglar á ytra svæði." },
+  "lists_cd1336fc": { "message": "Listar" },
   "lists_should_be_formatted_as_lists_f862de8d": {
     "message": "Lista ætti að sníða sem lista."
   },

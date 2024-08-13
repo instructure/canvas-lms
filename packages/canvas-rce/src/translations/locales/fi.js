@@ -329,7 +329,6 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Muokkaa kuvaketta" },
   "edit_link_7f53bebb": { "message": "Muokkaa linkkiä" },
-  "editor_statusbar_26ac81fc": { "message": "Editorin tilapalkki" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Elementti, joka alkaa { start }"
   },
@@ -627,6 +626,7 @@ const locale = {
   "links_to_an_external_site_de74145d": {
     "message": "Linkittyy ulkoiselle sivustolle."
   },
+  "lists_cd1336fc": { "message": "Listat" },
   "lists_should_be_formatted_as_lists_f862de8d": {
     "message": "Luettelot pitäisi muotoilla luetteloina."
   },
