@@ -43,6 +43,7 @@ const MigrationFileInput = ({
 }: MigrationFileInputProps) => {
   const fileInput = createRef<HTMLInputElement>()
   const [file, setFile] = useState<File | null>(null)
+  const ellipsisStyle = {overflow: 'hidden', textOverflow: 'ellipsis', display: 'block'}
 
   const handleSelectFile = useCallback(() => {
     const files = fileInput.current?.files
@@ -90,7 +91,9 @@ const MigrationFileInput = ({
         {I18n.t('Choose File')}
       </Button>
       <View margin="none none none medium">
-        <Text>{file ? file.name : I18n.t('No file chosen')}</Text>
+        <Text>
+          <span style={ellipsisStyle}>{file ? file.name : I18n.t('No file chosen')}</span>
+        </Text>
       </View>
       {isSubmitting && (
         <View as="div" margin="small 0 0" style={{position: 'relative'}}>

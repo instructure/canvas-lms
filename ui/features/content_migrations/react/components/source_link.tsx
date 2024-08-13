@@ -65,6 +65,20 @@ const obtainLink = ({
 export const SourceLink = ({item}: {item: ContentMigrationItem}) => {
   const text = obtainText(item)
   const link = obtainLink(item)
+  const ellipsisStyle = {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    display: 'block',
+    maxWidth: '40vw',
+  }
 
-  return link ? <Link href={link}>{text}</Link> : <Text>{text}</Text>
+  return link ? (
+    <Link href={link}>
+      <span style={ellipsisStyle}>{text}</span>
+    </Link>
+  ) : (
+    <Text>
+      <span style={ellipsisStyle}>{text}</span>
+    </Text>
+  )
 }
