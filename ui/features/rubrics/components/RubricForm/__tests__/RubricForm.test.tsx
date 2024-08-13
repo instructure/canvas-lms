@@ -22,7 +22,7 @@ import {BrowserRouter} from 'react-router-dom'
 import {fireEvent, render} from '@testing-library/react'
 import {QueryProvider, queryClient} from '@canvas/query'
 import {RubricForm, reorder} from '../index'
-import {RUBRICS_QUERY_RESPONSE} from './fixtures'
+import {RUBRIC_CRITERIA_IGNORED_FOR_SCORING, RUBRICS_QUERY_RESPONSE} from './fixtures'
 import * as RubricFormQueries from '../../../queries/RubricFormQueries'
 import FindDialog from '@canvas/outcomes/backbone/views/FindDialog'
 
@@ -221,6 +221,17 @@ describe('RubricForm Tests', () => {
       expect(criteriaRowThresholds[0]).toHaveTextContent('Threshold: 3')
     })
 
+    it('renders the criteria rows without pill if is ignore for scoring', () => {
+      queryClient.setQueryData(['fetch-rubric-1'], RUBRIC_CRITERIA_IGNORED_FOR_SCORING)
+
+      const {queryAllByTestId} = renderComponent()
+      const criteriaRows = queryAllByTestId('rubric-criteria-row')
+      const criteriaRowPoints = queryAllByTestId('rubric-criteria-row-points')
+
+      expect(criteriaRows.length).toEqual(1)
+      expect(criteriaRowPoints.length).toEqual(0)
+    })
+
     it('renders the criterion ratings accordion button', () => {
       queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
 
@@ -399,6 +410,37 @@ describe('RubricForm Tests', () => {
         expect(queryAllByTestId('rubric-criteria-row-outcome-tag')[1]).toHaveTextContent(
           'Sample Outcome Title'
         )
+        expect(queryAllByTestId('rubric-points-possible-1')).toHaveTextContent('20 Points Possible')
+      })
+
+      it('imports an outcome linked criteria but ignore for scoring', () => {
+        const outcomeData = {
+          attributes: {
+            points_possible: 10,
+            description: '<p>Sample description</p>',
+            display_name: 'Sample Outcome Display Name',
+            ignore_for_scoring: true,
+            mastery_points: 8,
+            ratings: ['A', 'B', 'C'],
+          },
+          outcomeLink: {
+            outcome: {
+              title: 'Sample Outcome Title',
+              id: '123',
+            },
+          },
+        }
+        jest.spyOn(FindDialog.prototype, 'import').mockImplementation(function () {
+          // @ts-ignore
+          ;(this as FindDialog).trigger('import', {...outcomeData})
+        })
+        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText, queryAllByTestId} = renderComponent()
+        fireEvent.click(getByTestId('create-from-outcome-button'))
+        fireEvent.click(getByText('Import'))
+
+        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(3)
+        expect(queryAllByTestId('rubric-points-possible-1')).toHaveTextContent('10 Points Possible')
       })
 
       it('displays a flash error if the outcome has already been imported into the current rubric', () => {
