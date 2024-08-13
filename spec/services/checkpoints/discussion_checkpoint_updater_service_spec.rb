@@ -123,6 +123,7 @@ describe Checkpoints::DiscussionCheckpointUpdaterService do
         expect(original_assignment_override.set_type).to eq "ADHOC"
         expect(original_assignment_override.due_at).to be_within(1.second).of(original_due_at)
         expect(original_student_ids).to match_array([students[0].id, students[1].id])
+        expect(original_assignment_override.title).to eq "2 students"
 
         # Updates the ADHOC override removing student 0, adding 2-4, and updating the due_at
 
@@ -178,7 +179,10 @@ describe Checkpoints::DiscussionCheckpointUpdaterService do
           points_possible: 6
         )
 
-        expect(updated_checkpoint3.assignment_overrides.active.count).to eq 1
+        assignment_overrides = updated_checkpoint3.assignment_overrides.active
+
+        expect(assignment_overrides.count).to eq 1
+        expect(assignment_overrides.first.title).to eq "4 students"
       end
 
       it "can create section overrides and update them" do

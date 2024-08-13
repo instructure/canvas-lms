@@ -160,5 +160,21 @@ describe Checkpoints::AdhocOverrideCreatorService do
         end
       end
     end
+
+    describe "title" do
+      it "is 1 student when there is only one student" do
+        override = { student_ids: [@student1.id], due_at: 2.days.from_now }
+        created_override = service.call(checkpoint: @checkpoint, override:)
+
+        expect(created_override.title).to eq "1 student"
+      end
+
+      it "is n students when there are n students" do
+        override = { student_ids: [@student1.id, @student2.id], due_at: 2.days.from_now }
+        created_override = service.call(checkpoint: @checkpoint, override:)
+
+        expect(created_override.title).to eq "2 students"
+      end
+    end
   end
 end
