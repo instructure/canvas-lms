@@ -319,9 +319,6 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Biểu Tượng Chỉnh Sửa" },
   "edit_link_7f53bebb": { "message": "Chỉnh Sửa Liên Kết" },
-  "editor_statusbar_26ac81fc": {
-    "message": "Thanh Trạng Thái Trình Chỉnh Sửa"
-  },
   "element_starting_with_start_91bf4c3b": {
     "message": "Yếu tố bắt đầu bằng { start }"
   },
@@ -617,6 +614,7 @@ const locale = {
   "links_to_an_external_site_de74145d": {
     "message": "Liên kết đến một trang bên ngoài."
   },
+  "lists_cd1336fc": { "message": "Danh Sách" },
   "lists_should_be_formatted_as_lists_f862de8d": {
     "message": "Các danh sách phải được định dạng dưới dạng danh sách."
   },

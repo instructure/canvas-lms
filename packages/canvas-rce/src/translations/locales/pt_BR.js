@@ -323,7 +323,6 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Editar ícone" },
   "edit_link_7f53bebb": { "message": "Editar link" },
-  "editor_statusbar_26ac81fc": { "message": "Barra de status do Editor" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Elemento começando com { start }"
   },
@@ -625,6 +624,7 @@ const locale = {
   "links_to_an_external_site_de74145d": {
     "message": "Links para um site externo."
   },
+  "lists_cd1336fc": { "message": "Listas" },
   "lists_should_be_formatted_as_lists_f862de8d": {
     "message": "Listas devem ser formatadas como listas."
   },

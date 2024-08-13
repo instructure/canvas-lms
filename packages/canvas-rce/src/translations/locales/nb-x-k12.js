@@ -313,7 +313,6 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Rediger ikon" },
   "edit_link_7f53bebb": { "message": "Rediger lenke" },
-  "editor_statusbar_26ac81fc": { "message": "Redigering Statusbar" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Element som starter med { start }"
   },

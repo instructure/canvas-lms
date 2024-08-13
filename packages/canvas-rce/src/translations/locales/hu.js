@@ -317,7 +317,6 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Szerkesztés ikon" },
   "edit_link_7f53bebb": { "message": "Link szerkesztése" },
-  "editor_statusbar_26ac81fc": { "message": "Szerkesztő állapotsor" },
   "element_starting_with_start_91bf4c3b": {
     "message": "{ start } karakterrel kezdődő elem"
   },

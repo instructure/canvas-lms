@@ -305,7 +305,6 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "ไอคอนแก้ไข" },
   "edit_link_7f53bebb": { "message": "แก้ไขลิงค์" },
-  "editor_statusbar_26ac81fc": { "message": "แถบสถานะโปรแกรมแก้ไข" },
   "element_starting_with_start_91bf4c3b": {
     "message": "องค์ประกอบเริ่มต้นด้วย { start }"
   },
@@ -585,6 +584,7 @@ const locale = {
   },
   "links_14b70841": { "message": "ลิงค์" },
   "links_to_an_external_site_de74145d": { "message": "ลิงค์ไปยังไซต์ภายนอก" },
+  "lists_cd1336fc": { "message": "รายการ" },
   "lists_should_be_formatted_as_lists_f862de8d": {
     "message": "รายการควรกำหนดรูปแบบเป็นแสดงรายการ"
   },

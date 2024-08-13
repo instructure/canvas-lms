@@ -312,7 +312,7 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Edit Icon" },
   "edit_link_7f53bebb": { "message": "Edit Link" },
-  "editor_statusbar_26ac81fc": { "message": "Editor Statusbar" },
+  "editor_status_bar_653f44ee": { "message": "Editor Status Bar" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Element starting with { start }"
   },
