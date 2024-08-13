@@ -22,7 +22,7 @@ import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPos
 import {PostMessage} from '../../components/PostMessage/PostMessage'
 import PropTypes from 'prop-types'
 import React, {useContext} from 'react'
-import {responsiveQuerySizes, userNameToShow} from '../../utils'
+import {responsiveQuerySizes, getDisplayName, userNameToShow} from '../../utils'
 import {SearchContext} from '../../utils/constants'
 import {Attachment} from '../../../graphql/Attachment'
 import {User} from '../../../graphql/User'
@@ -37,15 +37,34 @@ import theme from '@instructure/canvas-theme'
 export const DiscussionEntryContainer = props => {
   const {searchTerm} = useContext(SearchContext)
 
-  const getDeletedDisplayName = (author, editor = null) => {
-    const user = editor || author
-    return userNameToShow(user.displayName, author._id, user.courseRoles)
+  const getDeletedDisplayName = discussionEntry => {
+    const editor = discussionEntry.editor
+    const author = discussionEntry.author
+    const anonymousAuthor = discussionEntry.anonymousAuthor
+    if (editor) {
+      if (author) {
+        return userNameToShow(
+          editor.displayName || editor.shortName,
+          author._id,
+          editor.courseRoles
+        )
+      }
+      if (anonymousAuthor) {
+        return userNameToShow(
+          editor.displayName || editor.shortName,
+          anonymousAuthor._id,
+          editor.courseRoles
+        )
+      }
+    } else {
+      return getDisplayName(discussionEntry)
+    }
   }
 
   if (props.deleted) {
     return (
       <DeletedPostMessage
-        deleterName={getDeletedDisplayName(props.author, props.editor)}
+        deleterName={getDeletedDisplayName(props.discussionEntry)}
         timingDisplay={props.timingDisplay}
         deletedTimingDisplay={props.editedTimingDisplay}
       >
