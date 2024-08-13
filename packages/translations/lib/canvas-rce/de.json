@@ -294,7 +294,6 @@
   },
   "edit_icon_2c6b0e91": { "message": "Symbol für Bearbeiten" },
   "edit_link_7f53bebb": { "message": "Link bearbeiten" },
-  "editor_statusbar_26ac81fc": { "message": "Editor-Statusleiste" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Element beginnt mit { start }"
   },
@@ -592,6 +591,7 @@
   "links_to_an_external_site_de74145d": {
     "message": "Links zu einer externen Website"
   },
+  "lists_cd1336fc": { "message": "Listen" },
   "lists_should_be_formatted_as_lists_f862de8d": {
     "message": "Listen sollten als Listen formatiert werden."
   },
