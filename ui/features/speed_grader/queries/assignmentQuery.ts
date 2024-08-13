@@ -34,6 +34,10 @@ const ASSIGNMENT_QUERY = gql`
       gradeAsGroup
       groupAssignment: hasGroupCategory
       htmlUrl
+      checkpoints {
+        pointsPossible
+        tag
+      }
       groupSet {
         groupsConnection {
           nodes {
