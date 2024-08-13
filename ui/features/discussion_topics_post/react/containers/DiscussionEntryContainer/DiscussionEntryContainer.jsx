@@ -22,7 +22,7 @@ import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPos
 import {PostMessage} from '../../components/PostMessage/PostMessage'
 import PropTypes from 'prop-types'
 import React, {useContext} from 'react'
-import {userNameToShow} from '../../utils'
+import {getDisplayName, userNameToShow} from '../../utils'
 import {SearchContext} from '../../utils/constants'
 import {Attachment} from '../../../graphql/Attachment'
 import {User} from '../../../graphql/User'
@@ -36,15 +36,34 @@ import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
   const {searchTerm} = useContext(SearchContext)
 
-  const getDeletedDisplayName = (author, editor = null) => {
-    const user = editor || author
-    return userNameToShow(user.displayName, author._id, user.courseRoles)
+  const getDeletedDisplayName = discussionEntry => {
+    const editor = discussionEntry.editor
+    const author = discussionEntry.author
+    const anonymousAuthor = discussionEntry.anonymousAuthor
+    if (editor) {
+      if (author) {
+        return userNameToShow(
+          editor.displayName || editor.shortName,
+          author._id,
+          editor.courseRoles
+        )
+      }
+      if (anonymousAuthor) {
+        return userNameToShow(
+          editor.displayName || editor.shortName,
+          anonymousAuthor._id,
+          editor.courseRoles
+        )
+      }
+    } else {
+      return getDisplayName(discussionEntry)
+    }
   }
 
   if (props.deleted) {
     return (
       <DeletedPostMessage
-        deleterName={getDeletedDisplayName(props.author, props.editor)}
+        deleterName={getDeletedDisplayName(props.discussionEntry)}
         timingDisplay={props.timingDisplay}
         deletedTimingDisplay={props.editedTimingDisplay}
       >
@@ -57,11 +76,13 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
 
   const depth = props.discussionEntry?.depth || 0
   const threadMode = (depth > 1 && !searchTerm) || props.threadParent
-  const hrMarginLeftRem = -2 - ((depth - 1) * 1.5)
+  const hrMarginLeftRem = -2 - (depth - 1) * 1.5
 
   const direction = breakpoints.desktopNavOpen ? 'row' : 'column-reverse'
   const postUtilitiesAlign = breakpoints.desktopNavOpen && !threadMode ? 'start' : 'stretch'
-  const additionalSeparatorStyles = breakpoints.mobileOnly ? {width: '100vw', marginLeft: `${hrMarginLeftRem}rem`} : {}
+  const additionalSeparatorStyles = breakpoints.mobileOnly
+    ? {width: '100vw', marginLeft: `${hrMarginLeftRem}rem`}
+    : {}
   let authorInfoPadding = '0 0 0 x-small'
   let postUtilitiesMargin = '0 0 x-small 0'
   let postMessagePaddingNoAuthor = '0 x-small x-small x-small'
@@ -153,7 +174,7 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
                 height: theme.variables.borders.widthSmall,
                 color: theme.variables.colors.borderMedium,
                 margin: `${theme.variables.spacing.medium} 0`,
-                ...additionalSeparatorStyles
+                ...additionalSeparatorStyles,
               }}
             />
           )}
