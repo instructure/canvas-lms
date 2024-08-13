@@ -34,6 +34,7 @@ const I18n = useI18nScope('content_migrations_redesign')
 type CourseOption = {
   id: string
   label: string
+  term: string
 }
 
 type CourseCopyImporterProps = {
@@ -149,6 +150,11 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
               return (
                 <Select.Option id={option.id} key={option.id} value={option.id}>
                   {option.label}
+                  {!!option.term && (
+                    <Text as="div" size="x-small" color="secondary">
+                      {I18n.t('Term: %{termName}', {termName: option.term})}
+                    </Text>
+                  )}
                 </Select.Option>
               )
             })
