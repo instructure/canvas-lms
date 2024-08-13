@@ -40,7 +40,8 @@ class Checkpoints::AdhocOverrideCreatorService < Checkpoints::AdhocOverrideCommo
     override = assignment.assignment_overrides.build(
       set_id: nil,
       set_type: AssignmentOverride::SET_TYPE_ADHOC,
-      dont_touch_assignment: true
+      dont_touch_assignment: true,
+      title: get_title(student_ids:)
     )
     apply_overridden_dates(override, @override, shell_override:)
     override
