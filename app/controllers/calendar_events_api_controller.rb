@@ -1670,6 +1670,13 @@ class CalendarEventsApiController < ApplicationController
       # specific people, sections, etc. This applies the base assignment due_at for ordering
       # as a more sane default then natural DB order. No, it isn't perfect but much better.
       scope = assignment_context_scope(user, sub_assignment:)
+
+      # exclude undated assignments with sub assignments because the
+      # parent assignment does not have due date, only the sub assignments do
+      if @undated && !sub_assignment && discussion_checkpoints_enabled?
+        scope = scope.where(has_sub_assignments: false)
+      end
+
       next unless scope
 
       scope = scope.order(:due_at, :id)

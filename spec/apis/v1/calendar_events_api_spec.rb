@@ -27,6 +27,16 @@ describe CalendarEventsApiController, type: :request do
     @me = @user
   end
 
+  def create_checkpoint(topic:, type: "reply_to_topic", due_at: nil, points_possible: 5)
+    checkpoint_label = (type == "reply_to_topic") ? CheckpointLabels::REPLY_TO_TOPIC : CheckpointLabels::REPLY_TO_ENTRY
+    Checkpoints::DiscussionCheckpointCreatorService.call(
+      discussion_topic: topic,
+      checkpoint_label:,
+      dates: due_at.nil? ? [] : [{ type: "everyone", due_at: }],
+      points_possible:
+    )
+  end
+
   context "events" do
     expected_fields = %w[
       all_context_codes
@@ -2843,19 +2853,38 @@ describe CalendarEventsApiController, type: :request do
       expect(json.size).to be 9 # first context has no events
     end
 
-    it "returns undated assignments" do
-      @course.assignments.create(title: "undated")
-      @course.assignments.create(title: "dated", due_at: "2012-01-08 12:00:00")
-      json = api_call(:get, "/api/v1/calendar_events?type=assignment&undated=1&context_codes[]=course_#{@course.id}", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        type: "assignment",
-                        context_codes: ["course_#{@course.id}"],
-                        undated: "1"
-                      })
-      expect(json.size).to be 1
-      expect(json.first["due_at"]).to be_nil
+    context "undated assignments" do
+      it "returns undated assignments" do
+        @course.assignments.create(title: "undated")
+        @course.assignments.create(title: "dated", due_at: "2012-01-08 12:00:00")
+        json = api_call(:get, "/api/v1/calendar_events?type=assignment&undated=1&context_codes[]=course_#{@course.id}", {
+                          controller: "calendar_events_api",
+                          action: "index",
+                          format: "json",
+                          type: "assignment",
+                          context_codes: ["course_#{@course.id}"],
+                          undated: "1"
+                        })
+        expect(json.size).to be 1
+        expect(json.first["due_at"]).to be_nil
+      end
+
+      it "does not return undated assignments associated with discussions with checkpoints" do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title: "#{@course.id} - graded topic with checkpoints")
+        create_checkpoint(topic:, due_at: "2024-08-01 12:00:00")
+        create_checkpoint(topic:, type: "reply_to_entry", due_at: "2024-08-02 12:00:00")
+
+        json = api_call(:get, "/api/v1/calendar_events", {
+                          controller: "calendar_events_api",
+                          action: "index",
+                          format: "json",
+                          type: "assignment",
+                          context_codes: ["course_#{@course.id}"],
+                          undated: "1"
+                        })
+        expect(json.size).to be 0
+      end
     end
 
     context "mark_submitted_assignments" do
@@ -4232,16 +4261,6 @@ describe CalendarEventsApiController, type: :request do
       @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic with checkpoints")
       @checkpoint_1 = create_checkpoint(topic: @topic, due_at: "2024-08-01 12:00:00")
       @checkpoint_2 = create_checkpoint(topic: @topic, type: "reply_to_entry", due_at: "2024-08-02 12:00:00")
-    end
-
-    def create_checkpoint(topic:, type: "reply_to_topic", due_at: nil, points_possible: 5)
-      checkpoint_label = (type == "reply_to_topic") ? CheckpointLabels::REPLY_TO_TOPIC : CheckpointLabels::REPLY_TO_ENTRY
-      Checkpoints::DiscussionCheckpointCreatorService.call(
-        discussion_topic: topic,
-        checkpoint_label:,
-        dates: due_at.nil? ? [] : [{ type: "everyone", due_at: }],
-        points_possible:
-      )
     end
 
     expected_sub_assignment_fields = %w[
