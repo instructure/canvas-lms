@@ -72,7 +72,7 @@ window.parent.postMessage({subject: 'lti.capabilities'}, '*')
 
 ## lti.getPageContent
 
-Responds with an html object containing page content. This will contain all markup and children elements of the main content area of the page. Some content may be filtered from this response. The scope `https://canvas.instructure.com/lti/page_content/show` is required to use this functionality.
+Responds with an html object containing page content. This will contain all markup and children elements of the main content area of the page. Some content may be filtered from this response. The scope `https://canvas.instructure.com/lti/page_content/show` is required to use this functionality. Currently, only `Assignments` and `Wiki Pages` are supported by getPageContent, but support for additional pages is planned.
 
 **Required properties:**
 
