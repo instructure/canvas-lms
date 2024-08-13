@@ -69,7 +69,7 @@ export default async function doFetchApi<T = unknown>({
   const finalFetchOptions = {...defaultFetchOptions()}
   finalFetchOptions.headers['X-CSRF-Token'] = getCookie('_csrf_token')
 
-  if (body && typeof body !== 'string') {
+  if (body && !(body instanceof FormData) && !(typeof body === 'string')) {
     body = JSON.stringify(body)
     finalFetchOptions.headers['Content-Type'] = 'application/json'
   }
