@@ -44,7 +44,10 @@ import {lockLabels} from '@canvas/blueprint-courses/react/labels'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {DateDetails, DateLockTypes, ItemAssignToCardSpec} from './types'
-import {type ItemAssignToCardRef} from './ItemAssignToCard'
+import {
+  type ItemAssignToCardCustomValidationArgs,
+  type ItemAssignToCardRef,
+} from './ItemAssignToCard'
 import TrayFooter from '../Footer'
 import {generateDateDetailsPayload, itemTypeToApiURL} from '../../utils/assignToHelper'
 import {Text} from '@instructure/ui-text'
@@ -372,6 +375,11 @@ export default function ItemAssignToTray({
       sectionViewRef.current.ref.reactComponentInstance = {
         focusErrors,
         allCardsValid,
+        // Runs custom card validations with current data and returns true if all cards are valid
+        allCardsValidCustom: (params: ItemAssignToCardCustomValidationArgs) =>
+          !Object.values(cardsRefs.current).some(
+            c => c.current && Object.keys(c.current.runCustomValidations(params)).length !== 0
+          ),
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
