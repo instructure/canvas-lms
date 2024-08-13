@@ -216,6 +216,16 @@ describe "context modules" do
       expect(f(".due_date_display").text).to eq date_string(todo_date, :no_words)
     end
 
+    it "does not show the todo date on an graded discussion in a module", priority: "2" do
+      due_at = 3.days.from_now
+      todo_date = 3.days.from_now
+      @assignment = @course.assignments.create!(name: "assignemnt", due_at:)
+      @discussion = @course.discussion_topics.create!(title: "Graded Discussion", assignment: @assignment, todo_date:)
+      @mod.add_item(type: "discussion_topic", id: @discussion.id)
+      go_to_modules
+      expect(f(".due_date_display").text).to eq date_string(due_at, :no_words)
+    end
+
     it "edits available/until dates on a ungraded discussion in a module", priority: "2" do
       available_from = 2.days.from_now
       available_until = 4.days.from_now
