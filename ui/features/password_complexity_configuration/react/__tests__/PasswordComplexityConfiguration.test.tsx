@@ -17,88 +17,129 @@
  */
 
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 import PasswordComplexityConfiguration from '../PasswordComplexityConfiguration'
+import userEvent from '@testing-library/user-event'
 
 jest.mock('@canvas/do-fetch-api-effect/apiRequest')
+jest.mock('@canvas/do-fetch-api-effect')
+
+const getViewOptionsButton = async () => {
+  const viewOptions = await waitFor(() => {
+    const button = screen.getByText('View Options')
+    return button.closest('button')
+  })
+  if (!viewOptions) {
+    throw new Error('View Options button not found')
+  }
+  return viewOptions
+}
 
 describe('PasswordComplexityConfiguration', () => {
-  it('opens the Tray when "View Options" button is clicked', () => {
-    const {getByText} = render(<PasswordComplexityConfiguration />)
-    fireEvent.click(getByText('View Options'))
-    expect(getByText('Current Password Configuration')).toBeInTheDocument()
+  beforeEach(() => {
+    doFetchApi.mockResolvedValue({
+      response: {ok: true},
+      json: {
+        public_url: 'mock_public_url',
+        filename: 'mock_filename',
+      },
+    })
+  })
+
+  it('opens the Tray when "View Options" button is clicked', async () => {
+    render(<PasswordComplexityConfiguration />)
+    await userEvent.click(await getViewOptionsButton())
+    expect(screen.getByText('Current Password Configuration')).toBeInTheDocument()
   })
 
   it('toggles all checkboxes with defaults set', async () => {
-    const {getByText, findByTestId} = render(<PasswordComplexityConfiguration />)
-    fireEvent.click(getByText('View Options'))
-
-    let checkbox = await findByTestId('minimumCharacterLengthCheckbox')
-    fireEvent.click(checkbox)
+    render(<PasswordComplexityConfiguration />)
+    await userEvent.click(await getViewOptionsButton())
+    let checkbox = await screen.findByTestId('minimumCharacterLengthCheckbox')
+    await userEvent.click(checkbox)
     expect(checkbox).not.toBeChecked()
-
-    fireEvent.click(checkbox)
+    await userEvent.click(checkbox)
     expect(checkbox).toBeChecked()
-
-    checkbox = await findByTestId('requireNumbersCheckbox')
-    fireEvent.click(checkbox)
+    checkbox = await screen.findByTestId('requireNumbersCheckbox')
+    await userEvent.click(checkbox)
     expect(checkbox).not.toBeChecked()
-
-    fireEvent.click(checkbox)
+    await userEvent.click(checkbox)
     expect(checkbox).toBeChecked()
-
-    checkbox = await findByTestId('requireSymbolsCheckbox')
-    fireEvent.click(checkbox)
+    checkbox = await screen.findByTestId('requireSymbolsCheckbox')
+    await userEvent.click(checkbox)
     expect(checkbox).not.toBeChecked()
-
-    fireEvent.click(checkbox)
+    await userEvent.click(checkbox)
     expect(checkbox).toBeChecked()
-
-    checkbox = await findByTestId('customForbiddenWordsCheckbox')
-    fireEvent.click(checkbox)
+    checkbox = await screen.findByTestId('customForbiddenWordsCheckbox')
+    await userEvent.click(checkbox)
     expect(checkbox).toBeChecked()
-
-    fireEvent.click(checkbox)
+    await userEvent.click(checkbox)
     expect(checkbox).not.toBeChecked()
   })
 
-  it('toggle input fields when checkbox is checked', async () => {
-    const {getByText, findByTestId} = render(<PasswordComplexityConfiguration />)
-    fireEvent.click(getByText('View Options'))
-
-    let checkbox = await findByTestId('minimumCharacterLengthCheckbox')
-    let input = await findByTestId('minimumCharacterLengthInput')
+  it('toggles input fields when checkbox is checked', async () => {
+    render(<PasswordComplexityConfiguration />)
+    await userEvent.click(await getViewOptionsButton())
+    let checkbox = await screen.findByTestId('minimumCharacterLengthCheckbox')
+    let input = await screen.findByTestId('minimumCharacterLengthInput')
     expect(input).toBeEnabled()
-
-    checkbox = await findByTestId('customMaxLoginAttemptsCheckbox')
-    fireEvent.click(checkbox)
-    input = await findByTestId('customMaxLoginAttemptsInput')
+    checkbox = await screen.findByTestId('customMaxLoginAttemptsCheckbox')
+    await userEvent.click(checkbox)
+    input = await screen.findByTestId('customMaxLoginAttemptsInput')
     expect(input).toBeEnabled()
   })
 
-  it('opens the file upload modal when "Upload" button is clicked', async () => {
-    const {getByText, findByTestId} = render(<PasswordComplexityConfiguration />)
-    fireEvent.click(getByText('View Options'))
-    const checkbox = await findByTestId('customForbiddenWordsCheckbox')
-    fireEvent.click(checkbox)
-    fireEvent.click(getByText('Upload'))
-    expect(getByText('Upload Forbidden Words/Terms List')).toBeInTheDocument()
+  it('opens the file upload modal when “Upload” button is clicked', async () => {
+    render(<PasswordComplexityConfiguration />)
+    await userEvent.click(await getViewOptionsButton())
+    const checkbox = await screen.findByTestId('customForbiddenWordsCheckbox')
+    await userEvent.click(checkbox)
+    await userEvent.click(await screen.findByTestId('uploadButton'))
+    expect(screen.getByText('Upload Forbidden Words/Terms List')).toBeInTheDocument()
+  })
+
+  it('shows “Upload” button but not “Current Custom List” when no file is uploaded', async () => {
+    doFetchApi.mockResolvedValueOnce({
+      response: {ok: true},
+      json: null,
+    })
+    const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation(() => {})
+    render(<PasswordComplexityConfiguration />)
+    await userEvent.click(await getViewOptionsButton())
+    const uploadButton = await screen.findByTestId('uploadButton')
+    expect(uploadButton).toBeInTheDocument()
+    expect(screen.queryByText('Current Custom List')).not.toBeInTheDocument()
+    consoleErrorMock.mockRestore()
+  })
+
+  it('shows "Current Custom List" when a file is uploaded', async () => {
+    render(<PasswordComplexityConfiguration />)
+    await userEvent.click(await getViewOptionsButton())
+    const uploadButton = await screen.findByTestId('uploadButton')
+    expect(uploadButton).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('Current Custom List')).toBeInTheDocument()
+      expect(screen.getByText('mock_filename')).toBeInTheDocument()
+      const linkElement = screen.getByText('mock_filename').closest('a')
+      expect(linkElement).toHaveAttribute('href', 'mock_public_url')
+    })
   })
 
   it('closes the Tray when "Cancel" button is clicked', async () => {
-    const {getByText, queryByText, findByTestId} = render(<PasswordComplexityConfiguration />)
-    fireEvent.click(getByText('View Options'))
-    const cancelButton = await findByTestId('cancelButton')
-    fireEvent.click(cancelButton)
-    expect(queryByText('Password Options Tray')).not.toBeInTheDocument()
+    render(<PasswordComplexityConfiguration />)
+    await userEvent.click(await getViewOptionsButton())
+    const cancelButton = await screen.findByTestId('cancelButton')
+    await userEvent.click(cancelButton)
+    expect(screen.queryByText('Password Options Tray')).not.toBeInTheDocument()
   })
 
   it('makes a PUT request with the correct method and path', async () => {
-    const {getByText, findByTestId} = render(<PasswordComplexityConfiguration />)
-    fireEvent.click(getByText('View Options'))
-    const saveButton = await findByTestId('saveButton')
-    fireEvent.click(saveButton)
+    render(<PasswordComplexityConfiguration />)
+    await userEvent.click(await getViewOptionsButton())
+    const saveButton = await screen.findByTestId('saveButton')
+    await userEvent.click(saveButton)
     expect(executeApiRequest).toHaveBeenCalledWith({
       method: 'PUT',
       body: {
