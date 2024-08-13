@@ -158,6 +158,19 @@ describe('RubricAssessmentTray Tests', () => {
       expect(getByTestId('traditional-criterion-2-ratings-0-selected')).toBeInTheDocument()
     })
 
+    it('should not render score input if criterion is ignoreForScoring', () => {
+      const updatedRubric = {
+        ...RUBRIC_DATA,
+        criteria: RUBRIC_DATA.criteria.map(criterion =>
+          criterion.id === '2' ? {...criterion, ignoreForScoring: true} : criterion
+        ),
+      }
+
+      const {queryByTestId} = renderComponent({rubric: updatedRubric})
+      expect(queryByTestId('criterion-score-1')).toBeInTheDocument()
+      expect(queryByTestId('criterion-score-2')).not.toBeInTheDocument()
+    })
+
     it('should not select a rating when user entered points do not match a rating points value', () => {
       const {getByTestId, queryByTestId} = renderComponent()
       expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('0 pts')
@@ -463,6 +476,21 @@ describe('RubricAssessmentTray Tests', () => {
           expect(queryByTestId('save-comment-checkbox-2')).not.toBeInTheDocument()
         })
       })
+
+      it('should not render score input if criterion is ignoreForScoring', () => {
+        const updatedRubric = {
+          ...RUBRIC_DATA,
+          criteria: RUBRIC_DATA.criteria.map(criterion =>
+            criterion.id === '2' ? {...criterion, ignoreForScoring: true} : criterion
+          ),
+        }
+
+        const {queryByTestId} = renderComponentModern('Horizontal', false, false, {
+          rubric: updatedRubric,
+        })
+        expect(queryByTestId('criterion-score-1')).toBeInTheDocument()
+        expect(queryByTestId('criterion-score-2')).not.toBeInTheDocument()
+      })
     })
 
     describe('Vertical Display tests', () => {
@@ -539,6 +567,21 @@ describe('RubricAssessmentTray Tests', () => {
         fireEvent.click(viewModeSelect)
 
         expect(queryByRole('option', {name: 'Vertical'}) as HTMLElement).not.toBeInTheDocument()
+      })
+
+      it('should not render score input if criterion is ignoreForScoring', () => {
+        const updatedRubric = {
+          ...RUBRIC_DATA,
+          criteria: RUBRIC_DATA.criteria.map(criterion =>
+            criterion.id === '2' ? {...criterion, ignoreForScoring: true} : criterion
+          ),
+        }
+
+        const {queryByTestId} = renderComponentModern('Vertical', false, false, {
+          rubric: updatedRubric,
+        })
+        expect(queryByTestId('criterion-score-1')).toBeInTheDocument()
+        expect(queryByTestId('criterion-score-2')).not.toBeInTheDocument()
       })
     })
 

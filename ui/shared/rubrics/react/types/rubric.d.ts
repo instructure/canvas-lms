@@ -70,6 +70,7 @@ export type RubricAssessmentData = {
   comments: string
   commentsEnabled: boolean
   description: string
+  ignoreForScoring?: boolean
   rubricSavedComments?: string[]
   saveCommentsForLater?: boolean
 }

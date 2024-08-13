@@ -82,3 +82,40 @@ export const RUBRICS_QUERY_RESPONSE: Rubric = {
     },
   ],
 }
+
+export const RUBRIC_CRITERIA_IGNORED_FOR_SCORING: Rubric = {
+  id: '1',
+  title: 'Rubric 1',
+  criteriaCount: 1,
+  locations: [],
+  pointsPossible: 10,
+  workflowState: 'active',
+  buttonDisplay: 'numeric',
+  ratingOrder: 'ascending',
+  freeFormCriterionComments: false,
+  criteria: [
+    {
+      id: '1',
+      points: 5,
+      description: 'Criterion 1',
+      longDescription: 'Long description for criterion 1',
+      ignoreForScoring: true,
+      masteryPoints: 3,
+      criterionUseRange: false,
+      ratings: [
+        {
+          id: '1',
+          description: 'Rating 1',
+          longDescription: 'Long description for rating 1',
+          points: 5,
+        },
+        {
+          id: '2',
+          description: 'Rating 2',
+          longDescription: 'Long description for rating 2',
+          points: 0,
+        },
+      ],
+    },
+  ],
+}

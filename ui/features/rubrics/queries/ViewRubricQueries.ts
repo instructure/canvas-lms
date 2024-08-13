@@ -49,6 +49,7 @@ const COURSE_RUBRICS_QUERY = gql`
             points
             longDescription
             description
+            ignoreForScoring
           }
           hasRubricAssociations
           hidePoints
@@ -81,6 +82,7 @@ const ACCOUNT_RUBRICS_QUERY = gql`
             points
             longDescription
             description
+            ignoreForScoring
           }
           hasRubricAssociations
           hidePoints
@@ -111,6 +113,7 @@ const RUBRIC_PREVIEW_QUERY = gql`
         description
         criterionUseRange
         learningOutcomeId
+        ignoreForScoring
         masteryPoints
         outcome {
           displayName

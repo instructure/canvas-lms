@@ -474,7 +474,7 @@ const CriterionRow = ({
               <Flex direction="column" height="100%">
                 <div style={{display: 'flex', alignItems: 'center'}}>
                   <Flex.Item margin="small 0 0 0">
-                    {!isPreviewMode && (
+                    {!isPreviewMode && !criterion.ignoreForScoring && (
                       <TextInput
                         renderLabel={
                           <ScreenReaderContent>{I18n.t('Criterion Score')}</ScreenReaderContent>
@@ -491,10 +491,14 @@ const CriterionRow = ({
                     )}
                   </Flex.Item>
                   <Flex.Item margin="small 0 0 x-small">
-                    {isPreviewMode && (
-                      <Text data-testid={`criterion-score-${criterion.id}-readonly`}>
-                        {pointTextInput}
-                      </Text>
+                    {criterion.ignoreForScoring ? (
+                      <Text>--</Text>
+                    ) : (
+                      isPreviewMode && (
+                        <Text data-testid={`criterion-score-${criterion.id}-readonly`}>
+                          {pointTextInput}
+                        </Text>
+                      )
                     )}
                     <Text>{'/' + possibleString(criterion.points)}</Text>
                   </Flex.Item>
