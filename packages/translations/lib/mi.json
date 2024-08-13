@@ -647,9 +647,6 @@
     "edit_link_7f53bebb": {
         "message": "Whakatika hononga"
     },
-    "editor_statusbar_26ac81fc": {
-        "message": "Editor Pae tūnga"
-    },
     "element_starting_with_start_91bf4c3b": {
         "message": "Te tīmatanga o te kaupapa { start }"
     },
@@ -1294,6 +1291,9 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Hononga ki te pae o waho."
+    },
+    "lists_cd1336fc": {
+        "message": "Nga rarangi"
     },
     "lists_should_be_formatted_as_lists_f862de8d": {
         "message": "Me whakaritehia ngā rārangi hei rārangi."
