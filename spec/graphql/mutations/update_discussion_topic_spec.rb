@@ -927,6 +927,15 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(Announcement.last.course_sections.pluck(:id)).to eq([section1.id])
     end
 
+    it "updates a section specific announcement to be unspecific" do
+      section1 = @course.course_sections.create!(name: "Section 1")
+      announcement1 = @course.announcements.create!(title: "Announcement Title", message: "Announcement Message", user: @teacher, course_sections: [section1], is_section_specific: true)
+      result = run_mutation(id: announcement1.id, specific_sections: "all")
+      expect(result["errors"]).to be_nil
+      expect(Announcement.last.is_section_specific).to be_falsy
+      expect(Announcement.last.course_sections.pluck(:id)).to eq([])
+    end
+
     it "does not update ungraded assignment overrides if flag is off" do
       Account.site_admin.disable_feature!(:selective_release_ui_api)
 
