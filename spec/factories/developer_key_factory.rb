@@ -46,6 +46,12 @@ module Factories
       settings: opts[:settings].presence || JSON.parse(Rails.root.join(LTI_1_3_CONFIG_PATH).read)
     }.with_indifferent_access
     Lti::ToolConfiguration.create_tool_config_and_key!(opts[:account], tool_configuration_params)
+
+    # special case to remove the account if the account was site admin; when the dev
+    # key is created, if the account is site admin, the account on the dev key will be set
+    # to nil. We need to keep it that way and not stomp over it with a new account value here.
+    opts[:account] = nil if opts[:account].site_admin?
+
     DeveloperKey.last.update!(opts)
     DeveloperKey.last
   end
