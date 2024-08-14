@@ -33,6 +33,9 @@ export default class InfiniteScroll extends React.Component {
 
   componentDidMount() {
     this.pageLoaded = this.props.pageStart
+    if (document.getElementById('drawer-layout-content')) {
+      this.scrollContainer = document.getElementById('drawer-layout-content')
+    }
     if (this.props.scrollContainer) {
       this.scrollContainer = this.props.scrollContainer
     }
