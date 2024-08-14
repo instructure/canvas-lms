@@ -278,7 +278,8 @@ const Timestamps = props => {
       return null
     }
 
-    if (props.editor && props.editor?._id !== props.author?._id) {
+    // do not show edited by info for anonymous discussions
+    if (props.editor && props.author && props.editor?._id !== props.author?._id) {
       return (
         <span data-testid="editedByText">
           {!hideStudentNames ? (
@@ -291,8 +292,8 @@ const Timestamps = props => {
           ) : (
             I18n.t('Edited by %{editorName} %{editedTimingDisplay}', {
               editorName: userNameToShow(
-                props.editor.displayName,
-                props.author.id,
+                props.editor.displayName || props.editor.shortName,
+                props.author._id,
                 props.editor.courseRoles
               ),
               editedTimingDisplay: props.editedTimingDisplay,
