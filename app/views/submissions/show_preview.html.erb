@@ -49,11 +49,20 @@
 
 <% provide :page_title do %><%= join_title @assignment.title, t("Submission Preview") %><% end %>
 <% if @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic %>
-  <%
-    @entries = @assignment.discussion_topic.for_group_discussion? ? @assignment.discussion_topic.all_child_entries_from_user(@user) : @assignment.discussion_topic.discussion_entries.active.for_user(@user)
-    hidden_user_id = params[:hide_student_name] ? @user.id : nil
-    discussion_iframe_src = context_url(@entries.first.discussion_topic.context, :context_discussion_topic_url, @entries.first.discussion_topic.id, :embed => true, :entry_id => @entries.first.id, :hidden_user_id => hidden_user_id, :speed_grader => 1)
-  %>
+    <%
+      @entries = @assignment.discussion_topic.for_group_discussion? ? @assignment.discussion_topic.all_child_entries_from_user(@user) : @assignment.discussion_topic.discussion_entries.active.for_user(@user)
+      hidden_user_id = params[:hide_student_name] ? @user.id : nil
+      url_opts = {
+        embed: true,
+        hidden_user_id:,
+        speed_grader: 1,
+      }
+      url_opts[:entry_id] = @entries.first.id if @entries&.first
+
+      topic_to_show = @assignment.discussion_topic.for_group_discussion? ? @assignment.discussion_topic.child_topic_for(@user) : @assignment.discussion_topic
+      topic_to_show ||= @assignment.discussion_topic
+      discussion_iframe_src = context_url(topic_to_show.context, :context_discussion_topic_url, topic_to_show.id, url_opts)
+    %>
   <% unless show_full_discussion_immediately %>
     <div style="width: 600px; margin: 10px auto;">
       <p>
