@@ -38,14 +38,23 @@ import {AppsTable} from './AppsTable'
 import {mkUseManagePageState} from './ManagePageLoadingState'
 import {useManageSearchParams, type ManageSearchParams} from './ManageSearchParams'
 import {isSuccessful} from '../../../common/lib/apiResult/ApiResult'
+import {useAppendBreadcrumbsToDefaults} from '@canvas/breadcrumbs/useAppendBreadcrumbsToDefaults'
 
 const SEARCH_DEBOUNCE_MS = 250
 
 const I18n = useI18nScope('lti_registrations')
 
 export const ManagePage = () => {
-  const [searchParams] = useManageSearchParams()
   const accountId = ZAccountId.parse(window.location.pathname.split('/')[2])
+  useAppendBreadcrumbsToDefaults(
+    {
+      name: I18n.t('Manage'),
+      url: `/accounts/${accountId}/apps/manage`,
+    },
+    !!window.ENV.FEATURES.lti_registrations_next
+  )
+  const [searchParams] = useManageSearchParams()
+
   return searchParams.success ? (
     <ManagePageInner searchParams={searchParams.value} accountId={accountId} />
   ) : (
