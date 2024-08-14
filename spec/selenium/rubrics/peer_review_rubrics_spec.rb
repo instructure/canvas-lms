@@ -55,7 +55,7 @@ describe "Peer reviews with in rubrics" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
     expect(RubricAssessmentTray.traditional_grid_rubric_assessment_view).to be_displayed
-    expect(RubricAssessmentTray.criterion_score_input(@rubric.data[0][:id]).attribute(:readonly)).to eq("true")
+    expect(RubricAssessmentTray.criterion_score_readonly(@rubric.data[0][:id]).text).to eq("")
   end
 
   it "students are shown a notification reading “Fill out the rubric below after reviewing the student submission to complete this review.” with a button to open the rubric" do
@@ -151,12 +151,9 @@ describe "Peer reviews with in rubrics" do
 
     expect(RubricAssessmentTray.tray).to include_text("Peer Review Score")
     expect(RubricAssessmentTray.tray).to include_text("17 pts")
-    expect(RubricAssessmentTray.criterion_score_input(@rubric.data[0][:id]).attribute(:readonly)).to eq("true")
-    expect(RubricAssessmentTray.criterion_score_input(@rubric.data[0][:id]).attribute(:value)).to eq("10")
-    expect(RubricAssessmentTray.criterion_score_input(@rubric.data[1][:id]).attribute(:readonly)).to eq("true")
-    expect(RubricAssessmentTray.criterion_score_input(@rubric.data[1][:id]).attribute(:value)).to eq("7")
-    expect(RubricAssessmentTray.criterion_score_input(@rubric.data[2][:id]).attribute(:readonly)).to eq("true")
-    expect(RubricAssessmentTray.criterion_score_input(@rubric.data[2][:id]).attribute(:value)).to eq("0")
+    expect(RubricAssessmentTray.criterion_score_readonly(@rubric.data[0][:id]).text).to eq("10")
+    expect(RubricAssessmentTray.criterion_score_readonly(@rubric.data[1][:id]).text).to eq("7")
+    expect(RubricAssessmentTray.criterion_score_readonly(@rubric.data[2][:id]).text).to eq("0")
   end
 
   it "students can fill out free form rubric for a peer review" do

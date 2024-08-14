@@ -102,9 +102,28 @@ export default function RubricTab(props) {
       return null
     }
 
+    const rubricCriteria = (props.rubric.criteria ?? []).map(criterion => {
+      return {
+        ...criterion,
+        longDescription: criterion.long_description,
+        criterionUseRange: criterion.criterion_use_range,
+        learningOutcomeId: criterion.learning_outcome_id,
+        ignoreForScoring: criterion.ignore_for_scoring,
+        masteryPoints: criterion.mastery_points,
+        ratings: criterion.ratings.map(rating => {
+          return {
+            ...rating,
+            longDescription: rating.long_description,
+            points: rating.points,
+            criterionId: criterion.id,
+          }
+        }),
+      }
+    })
+
     return enhancedRubricsEnabled ? (
       <TraditionalView
-        criteria={props.rubric.criteria}
+        criteria={rubricCriteria}
         hidePoints={hidePoints}
         isPreviewMode={true}
         isFreeFormCriterionComments={props.rubric.free_form_criterion_comments}
