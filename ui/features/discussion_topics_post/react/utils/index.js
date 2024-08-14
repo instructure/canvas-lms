@@ -413,8 +413,7 @@ const hiddenUserId = urlParams.get('hidden_user_id')
 export const hideStudentNames = !!hiddenUserId
 
 export const userNameToShow = (originalName, authorId, course_roles) => {
-  // if discussion is anonymous, no need to use hide student names at all
-  if (hideStudentNames && !isAnonymous() && course_roles?.includes('StudentEnrollment')) {
+  if (hideStudentNames && course_roles?.includes('StudentEnrollment')) {
     return hiddenUserId === authorId ? I18n.t('This Student') : I18n.t('Discussion Participant')
   }
   return originalName
