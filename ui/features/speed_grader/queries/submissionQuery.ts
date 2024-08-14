@@ -111,6 +111,13 @@ export const SUBMISSION_FRAGMENT = gql`
         }
       }
     }
+    subAssignmentSubmissions {
+      subAssignmentTag
+      grade
+      score
+      publishedGrade
+      publishedScore
+    }
   }
 `
 
