@@ -23,6 +23,10 @@ module QuizzesEditPage
     "[data-testid='manage-assign-to']"
   end
 
+  def manage_assign_to_container_selector
+    "#manage-assign-to-container"
+  end
+
   def pending_changes_pill_selector
     "[data-testid='pending_changes_pill']"
   end
@@ -47,6 +51,10 @@ module QuizzesEditPage
 
   def manage_assign_to_button
     f(manage_assign_to_button_selector)
+  end
+
+  def manage_assign_to_container
+    f(manage_assign_to_container_selector)
   end
 
   def pending_changes_pill
