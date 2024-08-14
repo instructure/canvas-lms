@@ -604,6 +604,7 @@ const locale = {
   "links_to_an_external_site_de74145d": {
     "message": "Lenker til en ekstern side."
   },
+  "lists_cd1336fc": { "message": "Lister" },
   "lists_should_be_formatted_as_lists_f862de8d": {
     "message": "Lister må formateres som lister."
   },

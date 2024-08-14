@@ -616,6 +616,7 @@ const locale = {
   "links_to_an_external_site_de74145d": {
     "message": "Länkar till en extern sida."
   },
+  "lists_cd1336fc": { "message": "Listor" },
   "lists_should_be_formatted_as_lists_f862de8d": {
     "message": "Listor ska formateras som listor."
   },
