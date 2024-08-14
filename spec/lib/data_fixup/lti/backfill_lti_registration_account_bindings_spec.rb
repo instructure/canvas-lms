@@ -91,6 +91,20 @@ RSpec.describe DataFixup::Lti::BackfillLtiRegistrationAccountBindings do
     end
   end
 
+  context "when the developer key is for a non-root account" do
+    let(:subaccount) { account_model(parent_account: account) }
+    let!(:binding) { DeveloperKeyAccountBinding.create!(skip_lime_sync: true, account: subaccount, developer_key: dev_key, workflow_state: "on") }
+
+    it "skips the account binding" do
+      # should just move on to the next account binding and not log an error
+      expect(Sentry).not_to receive(:with_scope)
+      # should create one LRAB for the dev key created at the top of this spec file,
+      # but not two. should skip the subaccount one created in this context block.
+      expect { described_class.run }.to change { Lti::RegistrationAccountBinding.count }.by(1)
+      expect(binding.lti_registration_account_binding).to be_nil
+    end
+  end
+
   context "when dealing with inherited account bindings" do
     let(:site_admin_key) do
       key = dev_key_model_1_3(account: Account.site_admin)
