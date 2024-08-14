@@ -1,4 +1,4 @@
-// @ts-nocheck
+/* eslint-disable no-console */
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -22,6 +22,9 @@ import parseLinkHeader, {type Links} from '@canvas/parse-link-header'
 import {defaultFetchOptions} from '@canvas/util/xhr'
 import {toQueryString} from '@canvas/query-string-encoding'
 import type {QueryParameterRecord} from '@canvas/query-string-encoding'
+import z from 'zod'
+
+type RequestCredentials = 'include' | 'omit' | 'same-origin'
 
 function constructRelativeUrl({
   path,
@@ -32,7 +35,7 @@ function constructRelativeUrl({
 }): string {
   const queryString = toQueryString(params)
   if (queryString.length === 0) return path
-  return path + '?' + queryString
+  return `${path}?${queryString}`
 }
 
 // https://fetch.spec.whatwg.org/#requestinit
@@ -48,6 +51,7 @@ export type DoFetchApiOpts = {
   // eslint-disable-next-line no-undef
   body?: BodyInit
   fetchOpts?: RequestInit
+  signal?: AbortSignal
 }
 
 export type DoFetchApiResults<T> = {
@@ -56,15 +60,14 @@ export type DoFetchApiResults<T> = {
   link?: Links
 }
 
-// NOTE: we do NOT deep-merge customFetchOptions.headers, they should be passed
-// in the headers arg instead.
 export default async function doFetchApi<T = unknown>({
   path,
   method = 'GET',
   headers = {},
   params = {},
   body,
-  fetchOpts = {},
+  signal,
+  fetchOpts = {}, // we do not deep-merge fetchOptions.headers
 }: DoFetchApiOpts): Promise<DoFetchApiResults<T>> {
   const finalFetchOptions = {...defaultFetchOptions()}
   finalFetchOptions.headers['X-CSRF-Token'] = getCookie('_csrf_token')
@@ -81,7 +84,7 @@ export default async function doFetchApi<T = unknown>({
     body,
     method,
     ...finalFetchOptions,
-    // eslint-disable-next-line no-undef
+    signal,
     credentials: finalFetchOptions.credentials as RequestCredentials,
   })
   if (!response.ok) {
@@ -95,5 +98,40 @@ export default async function doFetchApi<T = unknown>({
   const link = (linkHeader && parseLinkHeader(linkHeader)) || undefined
   const text = await response.text()
   const json = text.length > 0 ? (JSON.parse(text) as T) : undefined
+  return {json, response, link}
+}
+
+export type SafelyFetchResults<T> = {
+  json?: T
+  response: Response
+  link?: Links
+}
+
+export async function safelyFetch<T = unknown>(
+  {path, method = 'GET', headers = {}, params = {}, signal, body}: DoFetchApiOpts,
+  schema: z.Schema<T>
+): Promise<SafelyFetchResults<T>> {
+  if (!schema) {
+    throw new Error('safelyFetch requires a schema')
+  }
+
+  const {json, response, link} = await doFetchApi<T>({path, method, headers, params, signal, body})
+
+  if (process.env.NODE_ENV !== 'production') {
+    try {
+      schema.parse(json)
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        console.group(`Zod parsing error for ${path}`)
+        for (const issue of err.issues) {
+          console.error(`Error at ${issue.path.join('.')} - ${issue.message}`)
+        }
+        console.groupEnd()
+
+        throw err
+      }
+    }
+  }
+
   return {json, response, link}
 }

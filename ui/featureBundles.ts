@@ -24,7 +24,6 @@ const featureBundles: {
   account_calendar_settings: () => import('./features/account_calendar_settings/index'),
   account_course_user_search: () => import('./features/account_course_user_search/index'),
   account_grading_standards: () => import('./features/account_grading_standards/index'),
-  account_manage: () => import('./features/account_manage/index'),
   account_notification_settings: () => import('./features/account_notification_settings/index'),
   account_search: () => import('./features/account_search/index'),
   account_settings: () => import('./features/account_settings/index'),

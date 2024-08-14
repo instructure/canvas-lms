@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,18 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
-import {AccountList} from './AccountList'
+import {z} from 'zod'
 
-export function AccountContainer() {
-  const [pageIndex, setPageIndex] = useState(1)
+export const ZAccount = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    workflow_state: z.string(),
+    parent_account_id: z.string().nullable(),
+    root_account_id: z.string().nullable(),
+    uuid: z.string(),
+    default_storage_quota_mb: z.number(),
+    default_user_storage_quota_mb: z.number(),
+    default_group_storage_quota_mb: z.number(),
+    default_time_zone: z.string(),
+  })
+  .strict()
 
-  return (
-    <AccountList
-      pageIndex={pageIndex}
-      onPageClick={page => {
-        setPageIndex(page)
-      }}
-    />
-  )
-}
+export type Account = z.infer<typeof ZAccount>
+
+export const ZAccounts = z.array(ZAccount)
+
+export type Accounts = z.infer<typeof ZAccounts>

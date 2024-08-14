@@ -17,12 +17,17 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-import {AccountContainer} from './react/AccountContainer'
-import ready from '@instructure/ready'
+import {Portal} from '@instructure/ui-portal'
+import {AccountList} from './AccountList'
 
-ready(() => {
-  if (document.getElementById('context_list') !== null) {
-    ReactDOM.render(<AccountContainer />, document.getElementById('context_list'))
+export function Component() {
+  const mountPoint: HTMLElement | null = document.querySelector('#context_list')
+  if (!mountPoint) {
+    return null
   }
-})
+  return (
+    <Portal open={true} mountNode={mountPoint}>
+      <AccountList />
+    </Portal>
+  )
+}
