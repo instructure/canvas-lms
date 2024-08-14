@@ -256,7 +256,7 @@ const SingleItemCheckbox = ({
     >
       {/* Needed to do that to properly indent the item */}
       {!isRoot && <FlexItem margin="0 xxx-small 0 0" />}
-      <FlexItem margin="0 x-small 0 0" shouldShrink={true}>
+      <FlexItem margin="0 x-small 0 0">
         <Checkbox
           checked={innerState === 'checked'}
           onChange={(e: any) => handleCheck(e.target.checked)}
@@ -265,7 +265,7 @@ const SingleItemCheckbox = ({
         />
       </FlexItem>
       {ParentIcon && (
-        <FlexItem margin="0 small 0 0" shouldShrink={true}>
+        <FlexItem margin="0 small 0 0">
           <ParentIcon size="small" />
         </FlexItem>
       )}
