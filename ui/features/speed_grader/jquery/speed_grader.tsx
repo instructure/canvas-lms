@@ -289,7 +289,7 @@ const anonymousAssignmentDetailedReportTooltip = I18n.t(
 const HISTORY_PUSH = 'push'
 const HISTORY_REPLACE = 'replace'
 
-const {enhanced_rubrics} = ENV.FEATURES ?? {}
+const {enhanced_rubrics_enabled} = ENV ?? {}
 type RubricSavedComments = {summary_data?: {saved_comments: Record<string, string[]>}}
 
 function setGradeLoading(studentId: string, loading: boolean) {
@@ -1014,7 +1014,7 @@ function handleSelectedRubricAssessmentChanged({validateEnteredData = true} = {}
   }
   $('#rubric_assessments_list_and_edit_button_holder .edit').showIf(showEditButton)
 
-  if (enhanced_rubrics) {
+  if (enhanced_rubrics_enabled) {
     useStore.setState({
       studentAssessment: (selectedAssessment ?? {}) as RubricAssessmentUnderscore,
     })
@@ -1525,7 +1525,7 @@ EG = {
 
     const isClosed = force === 'close'
 
-    if (enhanced_rubrics) {
+    if (enhanced_rubrics_enabled) {
       const isOpen = isClosed ? false : !useStore.getState().rubricAssessmentTrayOpen
       useStore.setState({rubricAssessmentTrayOpen: isOpen})
       this.refreshFullRubric()
@@ -1548,7 +1548,7 @@ EG = {
   },
 
   refreshFullRubric() {
-    if (enhanced_rubrics) {
+    if (enhanced_rubrics_enabled) {
       return
     }
 
@@ -1977,7 +1977,7 @@ EG = {
       }) => {
         let found = false
         if (response && response.rubric_association) {
-          if (!enhanced_rubrics) {
+          if (!enhanced_rubrics_enabled) {
             rubricAssessment.updateRubricAssociation(rubricElement, response.rubric_association)
           } else {
             const rubricAssociation: RubricSavedComments = response?.rubric_association ?? {}
@@ -4244,7 +4244,7 @@ function setupSpeedGrader(
   EG.setInitiallyLoadedStudent()
   EG.setupGradeLoadingSpinner()
 
-  if (enhanced_rubrics && ENV.rubric) {
+  if (enhanced_rubrics_enabled && ENV.rubric) {
     const rubricAssociation: RubricSavedComments = window.jsonData?.rubric_association ?? {}
     useStore.setState({
       rubricSavedComments: rubricAssociation.summary_data?.saved_comments,

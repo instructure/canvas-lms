@@ -135,6 +135,11 @@ module Api::V1::Assignment
 
     if opts[:override_dates] && !assignment.new_record?
       assignment = assignment.overridden_for(user)
+      if assignment.has_sub_assignments?
+        assignment.sub_assignments = assignment.sub_assignments.map do |sub_assignment|
+          sub_assignment.overridden_for(user)
+        end
+      end
     end
 
     fields = assignment.new_record? ? API_ASSIGNMENT_NEW_RECORD_FIELDS : API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS

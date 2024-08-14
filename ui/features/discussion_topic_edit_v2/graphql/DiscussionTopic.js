@@ -36,6 +36,7 @@ export const DiscussionTopic = {
       podcastHasStudentPosts
       isSectionSpecific
       isAnnouncement
+      discussionType
       anonymousState
       allowRating
       todoDate
@@ -86,6 +87,7 @@ export const DiscussionTopic = {
     podcastHasStudentPosts: bool,
     isSectionSpecific: bool,
     isAnnouncement: bool,
+    discussionType: string,
     anonymousState: string,
     allowRating: bool,
     todoDate: string,
@@ -117,6 +119,7 @@ export const DiscussionTopic = {
     podcastHasStudentPosts = true,
     isSectionSpecific = false,
     isAnnouncement = false,
+    discussionType = 'threaded',
     anonymousState = null,
     allowRating = true,
     todoDate = '2023-08-12T23:59:00-06:00',

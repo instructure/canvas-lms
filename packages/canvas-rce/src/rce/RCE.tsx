@@ -22,6 +22,7 @@ import React, {forwardRef, useState} from 'react'
 import formatMessage from '../format-message'
 import RCEWrapper from './RCEWrapper'
 import {EditorOptionsPropType, type ExternalToolsConfig, LtiToolsPropType} from './RCEWrapperProps'
+import {RCEVariant} from './RCEVariants'
 import editorLanguage from './editorLanguage'
 import normalizeLocale from './normalizeLocale'
 import wrapInitCb from './wrapInitCb'
@@ -59,6 +60,7 @@ const RCE = forwardRef<RCEWrapper, RCEPropTypes>(function RCE(props, rceRef) {
     rcsProps,
     use_rce_icon_maker,
     features,
+    variant,
     onFocus,
     onBlur,
     onInit,
@@ -109,6 +111,7 @@ const RCE = forwardRef<RCEWrapper, RCEPropTypes>(function RCE(props, rceRef) {
         height,
         language: editorLanguage(props.language),
       },
+      variant,
     }
     wrapInitCb(mirroredAttrs, iProps.editorOptions)
 
@@ -274,6 +277,11 @@ export interface RCEPropTypes {
    * user's timezone
    */
   timezone?: string
+
+  /**
+   * RCE variant. See RCEVariants.ts for details
+   */
+  variant?: RCEVariant
 
   /**
    * user's cache key to be used to encrypt and decrypt autosaved content

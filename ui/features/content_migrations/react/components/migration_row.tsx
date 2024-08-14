@@ -16,8 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useCallback} from 'react'
-import type {ContentMigrationItem, ProgressWorkflowState} from './types'
+import React, {useEffect, useCallback, useState} from 'react'
+import type {
+  ContentMigrationItem,
+  ContentMigrationWorkflowState,
+  ProgressWorkflowState,
+  StatusPillState,
+  UpdateMigrationItemType,
+} from './types'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {Grid} from '@instructure/ui-grid'
 import {View} from '@instructure/ui-view'
@@ -35,13 +41,7 @@ import {ContentSelectionModal} from './content_selection_modal'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
-const done_states = ['completed', 'failed']
-
-type UpdateMigrationItemType = (
-  contentMigrationItemId: string,
-  data?: object,
-  noXHR?: boolean
-) => void
+const done_states = ['completed', 'failed', 'waiting_for_select']
 
 type ContentMigrationsRowProps = {
   migration: ContentMigrationItem
@@ -63,55 +63,82 @@ type CompletionProgressResponse = {
   url: string
 }
 
-const MigrationRow = ({migration, view, updateMigrationItem}: ContentMigrationsRowProps) => {
-  const fetchProgress = useCallback(() => {
-    if (!migration.progress_url || done_states.includes(migration.workflow_state)) return null
+const supportedContentMigrationWorkflowStates = [
+  'failed',
+  'waiting_for_select',
+  'running',
+  'completed',
+  'queued',
+]
 
-    doFetchApi({path: migration.progress_url, method: 'GET'})
-      .then(async ({json}: {json: CompletionProgressResponse}) => {
-        await timeout(1000)
-        if (!done_states.includes(json.workflow_state)) {
-          fetchProgress()
-          updateMigrationItem?.(migration.id, {completion: json.completion}, true)
-        } else {
-          updateMigrationItem?.(migration.id, {completion: json.completion})
-        }
+const mapProgress = (cm_workflow_state: ContentMigrationWorkflowState): StatusPillState => {
+  return supportedContentMigrationWorkflowStates.includes(cm_workflow_state)
+    ? (cm_workflow_state as StatusPillState)
+    : 'queued'
+}
+
+const MigrationRow = ({migration, view, updateMigrationItem}: ContentMigrationsRowProps) => {
+  const [statusPillState, setStatusPillState] = useState<StatusPillState>(
+    mapProgress(migration.workflow_state)
+  )
+
+  const fetchProgress = useCallback(async () => {
+    const response = await doFetchApi({
+      path: migration.progress_url,
+      method: 'GET',
+    })
+    const json = response.json as CompletionProgressResponse
+    await timeout(1000)
+    if (!done_states.includes(json.workflow_state)) {
+      updateMigrationItem?.(migration.id, {completion: json.completion}, true)
+      setStatusPillState(json.workflow_state)
+      await fetchProgress()
+    } else {
+      const updatedContentMigration = await updateMigrationItem?.(migration.id, {
+        completion: json.completion,
       })
-      .catch(() => {})
-  }, [migration.id, migration.progress_url, migration.workflow_state, updateMigrationItem])
+      // Do not set to 'completed' state if there is waiting for select with selective import
+      if (updatedContentMigration?.workflow_state !== 'waiting_for_select') {
+        setStatusPillState(json.workflow_state)
+      }
+    }
+  }, [migration.id, migration.progress_url, updateMigrationItem])
 
   useEffect(() => {
-    fetchProgress()
-  }, [fetchProgress])
+    if (migration.progress_url && !done_states.includes(migration.workflow_state)) fetchProgress()
+    if (migration.workflow_state === 'waiting_for_select') {
+      setStatusPillState('waiting_for_select')
+    }
+  }, [fetchProgress, migration.progress_url, migration.workflow_state])
 
   return view === 'condensed'
-    ? condensedMarkup(migration, updateMigrationItem)
-    : extendedMarkup(migration, updateMigrationItem)
+    ? condensedMarkup(migration, updateMigrationItem, statusPillState)
+    : extendedMarkup(migration, updateMigrationItem, statusPillState)
 }
 MigrationRow.displayName = 'Row'
 
 const extendedMarkup = (
   migration: ContentMigrationItem,
-  updateMigrationItem: UpdateMigrationItemType
+  updateMigrationItem: UpdateMigrationItemType,
+  statusPillState: StatusPillState
 ) => {
+  const cellPaddingStyle = {padding: '1.1rem 0rem'}
   return (
     <Table.Row key={migration.id}>
-      <Table.Cell themeOverride={{padding: '1.1rem 0rem'}}>
-        {migration.migration_type_title}
-      </Table.Cell>
-      <Table.Cell>
+      <Table.Cell themeOverride={cellPaddingStyle}>{migration.migration_type_title}</Table.Cell>
+      <Table.Cell themeOverride={cellPaddingStyle}>
         <SourceLink item={migration} />
       </Table.Cell>
-      <Table.Cell>
+      <Table.Cell themeOverride={cellPaddingStyle}>
         {datetimeString(migration.created_at, {timezone: ENV.CONTEXT_TIMEZONE})}
       </Table.Cell>
-      <Table.Cell>
+      <Table.Cell themeOverride={cellPaddingStyle} textAlign="center">
         <StatusPill
           hasIssues={migration.migration_issues_count !== 0}
-          workflowState={migration.workflow_state}
+          workflowState={statusPillState}
         />
       </Table.Cell>
-      <Table.Cell>
+      <Table.Cell themeOverride={cellPaddingStyle} textAlign="center">
         {['failed', 'completed'].includes(migration.workflow_state) &&
         migration.migration_issues_count > 0 ? (
           <Text>{I18n.t('%{count} issues', {count: migration.migration_issues_count})}</Text>
@@ -126,7 +153,7 @@ const extendedMarkup = (
           updateMigrationItem={updateMigrationItem}
         />
       </Table.Cell>
-      <Table.Cell>
+      <Table.Cell themeOverride={cellPaddingStyle} textAlign="center">
         <ActionButton
           migration_type_title={migration.migration_type_title}
           migration_issues_count={migration.migration_issues_count}
@@ -139,7 +166,8 @@ const extendedMarkup = (
 
 const condensedMarkup = (
   migration: ContentMigrationItem,
-  updateMigrationItem: UpdateMigrationItemType
+  updateMigrationItem: UpdateMigrationItemType,
+  statusPillState: StatusPillState
 ) => {
   return (
     <Flex.Item key={migration.id}>
@@ -176,7 +204,7 @@ const condensedMarkup = (
             <Grid.Col as="td">
               <StatusPill
                 hasIssues={migration.migration_issues_count !== 0}
-                workflowState={migration.workflow_state}
+                workflowState={statusPillState}
               />
             </Grid.Col>
           </Grid.Row>

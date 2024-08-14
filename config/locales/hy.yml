@@ -4028,6 +4028,7 @@ hy:
         user_privileges: Իրավասություններ
       legends: 
         memberships: Անդամակցություն(ներ)
+        recent_messages: "Վերջին հաղորդագրությունները"
       links: 
         access_report: "%{user}-ի համար հասանելիության մասին հաշվետվություն "
         cant_delete: "Հնարավոր չէ ջնջել"
@@ -4042,6 +4043,7 @@ hy:
         user_only_view_section: "այս օգտատերը կարող է տեսնել միայն իր բաժնի օգտատերերին"
         user_outcomes: "%{user}-ի արդյունքները"
         user_view_all_sections: "Թույլ տալ այս օգտատիրոջը տեսնել դասընթացի բոլոր օգտատերերին"
+      no_messages: "Հաղորդագրություններ չկան"
       user_only_view_section: "այս օգտատերը կարող է դիտել ունկնդիրներին միայն դասընթացի նախատեսված բաժին(ներ)ում: "
       user_view_all_sections: "այս օգտատերը կարող է դիտել ունկնդիրներին  դասընթացի ցանկացած բաժնում: "
     no_user: 
@@ -12335,6 +12337,7 @@ hy:
   primary_color_button_disabled_9081ddff: "Առաջնային գույնի կոճակը անջատվել է"
   priority_dd4381ee: Առաջնահերթություն
   privacy_290109ea: Գաղտնիություն
+  privacy_policy_c68f482a: "Գաղտնիության պահպանման քաղաքականություն"
   product_name: Canvas
   profile: 
     access_token: 
@@ -12450,6 +12453,7 @@ hy:
         registered_services: "Գրանցված ծառայություններ"
         remove: Հանել
         share_skype_id: "Նշել Skype ձեր նույնականացուցիչը"
+        state: Կարգավիճակ
         twitter_access: "Twitter հասանելիություն"
         users_profile: "%{user} կարգաբերումներ"
         ways_to_log_in: "Համակարգ մուտք գործելու եղանակներ"
@@ -12466,7 +12470,7 @@ hy:
         confirm_password: "Հաստատել գաղտնաբառը"
         default_email: "Լռությամբ ընդունվող էլեկտրոնային փոստի հասցեն"
         disable_inbox: "Անջատել մուտքային խոսակցությունների արկղի չընթերցված հաղորդագրությունների նշանը և անմիջապես ուղարկել խոսակցության բոլոր հաղորդագրությունները և ծանուցումները էլեկտրոնային փոստով:  "
-        expires_at: "Լրանում է"
+        expires_at: "Ժամկետը լրանում է"
         headers: 
           approved_integrations: "Հաստատված ինտեգրումներ"
         locale: Լեզուն
@@ -17345,6 +17349,7 @@ hy:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ դասընթաց"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  website_adea4d05: Վեբ-կայք
   website_url_177fc1dc: "Վեբ-կայքի url հասցեն"
   week_1f945ddd: Շաբաթ
   week_s_cb1492ee: Շաբաթ(ներ)

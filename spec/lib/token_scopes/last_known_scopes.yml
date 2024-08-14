@@ -133,6 +133,8 @@
   path: "/api/v1/accounts/:account_id/external_tools/:external_tool_id"
 - verb: PUT
   path: "/api/v1/accounts/:account_id/external_tools/:external_tool_id"
+- verb: GET
+  path: "/api/v1/accounts/:account_id/external_tools/:external_tool_id/migration_info"
 - verb: DELETE
   path: "/api/v1/accounts/:account_id/external_tools/rce_favorites/:id"
 - verb: POST
@@ -281,6 +283,10 @@
   path: "/api/v1/accounts/:account_id/rubrics/:id"
 - verb: GET
   path: "/api/v1/accounts/:account_id/rubrics/:id/used_locations"
+- verb: POST
+  path: "/api/v1/accounts/:account_id/rubrics/upload"
+- verb: GET
+  path: "/api/v1/accounts/:account_id/rubrics/upload/:id"
 - verb: GET
   path: "/api/v1/accounts/:account_id/scopes"
 - verb: POST
@@ -872,6 +878,8 @@
 - verb: PUT
   path: "/api/v1/courses/:course_id/external_tools/:external_tool_id"
 - verb: GET
+  path: "/api/v1/courses/:course_id/external_tools/:external_tool_id/migration_info"
+- verb: GET
   path: "/api/v1/courses/:course_id/external_tools/sessionless_launch"
 - verb: GET
   path: "/api/v1/courses/:course_id/external_tools/visible_course_nav_tools"
@@ -1109,16 +1117,16 @@
   path: "/api/v1/courses/:course_id/pages"
 - verb: POST
   path: "/api/v1/courses/:course_id/pages"
-- verb: GET
-  path: "/api/v1/courses/:course_id/pages/:page_id/date_details"
-- verb: PUT
-  path: "/api/v1/courses/:course_id/pages/:page_id/date_details"
 - verb: DELETE
   path: "/api/v1/courses/:course_id/pages/:url_or_id"
 - verb: GET
   path: "/api/v1/courses/:course_id/pages/:url_or_id"
 - verb: PUT
   path: "/api/v1/courses/:course_id/pages/:url_or_id"
+- verb: GET
+  path: "/api/v1/courses/:course_id/pages/:url_or_id/date_details"
+- verb: PUT
+  path: "/api/v1/courses/:course_id/pages/:url_or_id/date_details"
 - verb: POST
   path: "/api/v1/courses/:course_id/pages/:url_or_id/duplicate"
 - verb: GET
@@ -1251,6 +1259,10 @@
   path: "/api/v1/courses/:course_id/rubrics/:id"
 - verb: GET
   path: "/api/v1/courses/:course_id/rubrics/:id/used_locations"
+- verb: POST
+  path: "/api/v1/courses/:course_id/rubrics/upload"
+- verb: GET
+  path: "/api/v1/courses/:course_id/rubrics/upload/:id"
 - verb: GET
   path: "/api/v1/courses/:course_id/search_users"
 - verb: GET

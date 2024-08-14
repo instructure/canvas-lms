@@ -621,6 +621,13 @@
               </div>
             </div>
 
+            <% if @account.grants_right?(@current_user, :manage_account_settings) && @account.root_account.feature_enabled?(:allow_limited_access_for_students)%>
+              <div>
+                <%= settings.check_box :enable_limited_access_for_students, :checked => @account.enable_limited_access_for_students? %>
+                <%= settings.label :enable_limited_access_for_students, :en => "Enable Limited Access for Students for this account" %>
+              </div>
+            <% end %>
+
             <% if @account.primary_settings_root_account? %>
               <% if @account.grants_right?(@current_user, :manage_site_settings) %>
                 <div>

@@ -22,6 +22,7 @@ class Lti::Registration < ActiveRecord::Base
   include Canvas::SoftDeletable
 
   attr_accessor :skip_lti_sync, :account_binding
+  attr_writer :account_binding_loaded
 
   belongs_to :account, inverse_of: :lti_registrations, optional: false
   belongs_to :created_by, class_name: "User", inverse_of: :created_lti_registrations, optional: true
@@ -48,7 +49,7 @@ class Lti::Registration < ActiveRecord::Base
   # @return [Lti::RegistrationAccountBinding | nil]
   def account_binding_for(account)
     return nil unless account
-    return account_binding if account_binding
+    return account_binding if @account_binding_loaded
 
     # If subaccount support/bindings are needed in the future, reference
     # DeveloperKey#account_binding_for and DeveloperKeyAccountBinding#find_in_account_priority
@@ -86,6 +87,8 @@ class Lti::Registration < ActiveRecord::Base
 
   def self.associate_bindings(registrations, account_bindings)
     registrations_by_id = registrations.index_by(&:global_id)
+
+    registrations.each { |registration| registration.account_binding_loaded = true }
 
     account_bindings.each do |acct_binding|
       global_registration_id = Shard.global_id_for(acct_binding.registration_id, Shard.current)

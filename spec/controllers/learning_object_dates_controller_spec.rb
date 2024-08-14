@@ -102,6 +102,8 @@ describe LearningObjectDatesController do
     it "returns date details for a module" do
       context_module = @course.context_modules.create!(name: "module")
       @override.assignment_id = nil
+      @override.due_at = nil
+      @override.due_at_overridden = false
       @override.context_module_id = context_module.id
       @override.save!
 
@@ -119,9 +121,6 @@ describe LearningObjectDatesController do
                                    "context_module_name" => "module",
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
-                                   "due_at" => "2022-02-01T01:00:00Z",
-                                   "all_day" => false,
-                                   "all_day_date" => "2022-02-01",
                                    "unassign_item" => false
                                  }]
                                })
@@ -300,7 +299,7 @@ describe LearningObjectDatesController do
       override = wiki_page.assignment_overrides.create!(set: @course.default_section,
                                                         unlock_at: "2022-01-04T00:00:00Z",
                                                         unlock_at_overridden: true)
-      get :show, params: { course_id: @course.id, page_id: wiki_page.id }
+      get :show, params: { course_id: @course.id, url_or_id: wiki_page.id }
       expect(response).to be_successful
       expect(json_parse).to eq({
                                  "id" => wiki_page.id,
@@ -337,7 +336,7 @@ describe LearningObjectDatesController do
       override = wiki_page.assignment.assignment_overrides.create!(set: @course.default_section,
                                                                    unlock_at: "2022-01-07T00:00:00Z",
                                                                    unlock_at_overridden: true)
-      get :show, params: { course_id: @course.id, page_id: wiki_page.id }
+      get :show, params: { course_id: @course.id, url_or_id: wiki_page.id }
       expect(response).to be_successful
       expect(json_parse).to eq({
                                  "id" => wiki_page.id,
@@ -457,6 +456,50 @@ describe LearningObjectDatesController do
       expect(response).to be_successful
       json = json_parse
       expect(json["id"]).to eq @assignment.id
+      expect(json["overrides"].length).to eq 1
+      expect(json["overrides"][0]["id"]).to eq override2.id
+    end
+
+    it "paginates overrides for wiki pages using page id" do
+      wiki_page = @course.wiki_pages.create!(title: "My Page")
+      override1 = wiki_page.assignment_overrides.create!
+      override2 = wiki_page.assignment_overrides.create!
+
+      get :show, params: { course_id: @course.id, url_or_id: wiki_page.id, per_page: 1 }
+
+      expect(response).to be_successful
+      json = json_parse
+      expect(json["id"]).to eq wiki_page.id
+      expect(json["overrides"].length).to eq 1
+      expect(json["overrides"][0]["id"]).to eq override1.id
+
+      get :show, params: { course_id: @course.id, url_or_id: wiki_page.id, per_page: 1, page: 2 }
+
+      expect(response).to be_successful
+      json = json_parse
+      expect(json["id"]).to eq wiki_page.id
+      expect(json["overrides"].length).to eq 1
+      expect(json["overrides"][0]["id"]).to eq override2.id
+    end
+
+    it "paginates overrides for wiki pages using page url" do
+      wiki_page = @course.wiki_pages.create!(title: "My Page")
+      override1 = wiki_page.assignment_overrides.create!
+      override2 = wiki_page.assignment_overrides.create!
+
+      get :show, params: { course_id: @course.id, url_or_id: wiki_page.url, per_page: 1 }
+
+      expect(response).to be_successful
+      json = json_parse
+      expect(json["id"]).to eq wiki_page.id
+      expect(json["overrides"].length).to eq 1
+      expect(json["overrides"][0]["id"]).to eq override1.id
+
+      get :show, params: { course_id: @course.id, url_or_id: wiki_page.url, per_page: 1, page: 2 }
+
+      expect(response).to be_successful
+      json = json_parse
+      expect(json["id"]).to eq wiki_page.id
       expect(json["overrides"].length).to eq 1
       expect(json["overrides"][0]["id"]).to eq override2.id
     end
@@ -900,7 +943,7 @@ describe LearningObjectDatesController do
       let_once(:default_params) do
         {
           course_id: @course.id,
-          page_id: learning_object.id
+          url_or_id: learning_object.id
         }
       end
 
@@ -977,7 +1020,7 @@ describe LearningObjectDatesController do
       let_once(:default_params) do
         {
           course_id: @course.id,
-          page_id: learning_object.id
+          url_or_id: learning_object.id
         }
       end
 

@@ -36,7 +36,7 @@ import {IconBlock, IconBlockIcon} from '../user/blocks/IconBlock'
 import {RCEBlock, RCEBlockIcon} from '../user/blocks/RCEBlock'
 import {TabsBlock, TabsBlockIcon} from '../user/blocks/TabsBlock'
 
-type ToolboxProps = {
+export type ToolboxProps = {
   open: boolean
   container: HTMLElement
   onClose: () => void

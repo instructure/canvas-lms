@@ -33,22 +33,6 @@ interface LoginHelpProps {
   linkText: string
 }
 
-export const getVisibleTextContent = (element: HTMLElement): string => {
-  return (
-    Array.from(element.childNodes)
-      .filter(
-        node =>
-          node.nodeType === Node.TEXT_NODE ||
-          (node instanceof HTMLElement && getComputedStyle(node).display !== 'none')
-      )
-      .map(node => node.textContent?.trim())
-      // remove empty strings using Boolean operation
-      .filter(Boolean)
-      .join(' ')
-      .trim()
-  )
-}
-
 const modalLabel = () => I18n.t('Login Help for %{canvas}', {canvas: 'Canvas LMS'})
 
 const LoginHelp = ({linkText}: LoginHelpProps): JSX.Element => {
@@ -99,13 +83,12 @@ export function renderLoginHelp(loginLink: Element): void {
   if (!anchorElement) {
     throw new TypeError('Element must be an <a> element or a descendant of an <a> element')
   }
-  const linkText = getVisibleTextContent(anchorElement as HTMLElement)
   const wrapper = document.createElement('span')
   anchorElement.replaceWith(wrapper)
   wrapper.appendChild(anchorElement)
   ReactDOM.render(
     <QueryProvider>
-      <LoginHelp linkText={linkText} />
+      <LoginHelp linkText={anchorElement.innerText} />
     </QueryProvider>,
     wrapper
   )

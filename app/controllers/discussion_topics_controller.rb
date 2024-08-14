@@ -197,12 +197,13 @@
 #           "type": "string"
 #         },
 #         "discussion_type": {
-#           "description": "The type of discussion. Values are 'side_comment', for discussions that only allow one level of nested comments, and 'threaded' for fully threaded discussions.",
+#           "description": "The type of discussion. Values are 'side_comment' or 'not_threaded', for discussions that only allow one level of nested comments, and 'threaded' for fully threaded discussions.",
 #           "example": "side_comment",
 #           "type": "string",
 #           "allowableValues": {
 #             "values": [
 #               "side_comment",
+#               "not_threaded",
 #               "threaded"
 #             ]
 #           }
@@ -559,6 +560,7 @@ class DiscussionTopicsController < ApplicationController
         override_dates: false,
         include_usage_rights:
       )
+      hash[:ATTRIBUTES][:has_threaded_replies] = @topic.discussion_entries.where.not(parent_id: nil).where.not(workflow_state: "deleted").exists?
     end
     (hash[:ATTRIBUTES] ||= {})[:is_announcement] = @topic.is_announcement
     hash[:ATTRIBUTES][:can_group] = @topic.can_group?
@@ -764,8 +766,7 @@ class DiscussionTopicsController < ApplicationController
         current_page: 0
       }
       env_hash[:context_rubric_associations_url] = context_url(@context, :context_rubric_associations_url) rescue nil
-      if params[:entry_id]
-        entry = @topic.discussion_entries.find(params[:entry_id])
+      if params[:entry_id] && (entry = @topic.discussion_entries.find_by(id: params[:entry_id]))
         env_hash[:discussions_deep_link] = {
           root_entry_id: entry.root_entry_id,
           parent_id: entry.parent_id,
@@ -1042,8 +1043,8 @@ class DiscussionTopicsController < ApplicationController
   #
   # @argument message [String]
   #
-  # @argument discussion_type [String, "side_comment"|"threaded"]
-  #   The type of discussion. Defaults to side_comment if not value is given. Accepted values are 'side_comment', for discussions that only allow one level of nested comments, and 'threaded' for fully threaded discussions.
+  # @argument discussion_type [String, "side_comment"|"threaded"|"not_threaded"]
+  #   The type of discussion. Defaults to side_comment or not_threaded if not value is given. Accepted values are 'side_comment', 'not_threaded' for discussions that only allow one level of nested comments, and 'threaded' for fully threaded discussions.
   #
   # @argument published [Boolean]
   #   Whether this topic is published (true) or draft state (false). Only
@@ -1140,8 +1141,8 @@ class DiscussionTopicsController < ApplicationController
   #
   # @argument message [String]
   #
-  # @argument discussion_type [String, "side_comment"|"threaded"]
-  #   The type of discussion. Defaults to side_comment if not value is given. Accepted values are 'side_comment', for discussions that only allow one level of nested comments, and 'threaded' for fully threaded discussions.
+  # @argument discussion_type [String, "side_comment"|"threaded"|"not_threaded"]
+  #   The type of discussion. Defaults to side_comment or not_threaded if not value is given. Accepted values are 'side_comment', 'not_threaded' for discussions that only allow one level of nested comments, and 'threaded' for fully threaded discussions.
   #
   # @argument published [Boolean]
   #   Whether this topic is published (true) or draft state (false). Only

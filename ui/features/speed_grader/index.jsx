@@ -29,11 +29,13 @@ import {getCourse} from './queries/courseQuery'
 import {getSectionsByAssignment} from './queries/sectionsByAssignmentQuery'
 import {getSubmission} from './queries/submissionQuery'
 import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery'
+import {getSubmissionsByStudentIds} from './queries/submissionsByStudentsIdsQuery'
 
 import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
 import {createSubmissionComment} from './mutations/createSubmissionCommentMutation'
 import {hideAssignmentGradesForSections} from './mutations/hideAssignmentGradesForSectionsMutation'
 import {postDraftSubmissionComment} from './mutations/postDraftSubmissionCommentMutation'
+import {updateSubmissionGradeStatus} from './mutations/updateSubmissionGradeStatusMutation'
 import {deleteSubmissionComment} from './mutations/deleteSubmissionCommentMutation'
 import {
   postAssignmentGradesForSections,
@@ -65,11 +67,12 @@ ready(() => {
         module.render(mountPoint, {
           theme,
           queryFns: {
-            getCourse,
             getAssignment,
+            getCourse,
+            getSectionsByAssignment,
             getSubmission,
             getSubmissionsByAssignment,
-            getSectionsByAssignment,
+            getSubmissionsByStudentIds,
             resolvePostAssignmentGradesStatus,
           },
           mutationFns: {
@@ -79,10 +82,12 @@ ready(() => {
             hideAssignmentGradesForSections,
             postAssignmentGradesForSections,
             postDraftSubmissionComment,
+            updateSubmissionGradeStatus,
           },
           postMessageAliases,
           context: {
             courseId: window.ENV.course_id,
+            userId: window.ENV.current_user_id,
             assignmentId: params.get('assignment_id'),
             studentId: params.get('student_id'),
             hrefs: {

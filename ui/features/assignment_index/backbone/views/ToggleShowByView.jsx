@@ -54,25 +54,34 @@ export default class ToggleShowByView extends Backbone.View {
   }
 
   initializeDateGroups() {
-    const assignments = flatten(this.assignmentGroups.map(ag => ag.get('assignments').models))
-    const dated = filter(assignments, a => a.dueAt())
-    const undated = difference(assignments, dated)
-    const past = []
-    const overdue = []
-    const upcoming = []
-    each(dated, a => {
-      if (new Date() < Date.parse(a.dueAt())) return upcoming.push(a)
+    const assignments = flatten(this.assignmentGroups.map(ag => ag.get('assignments').models));
+    const undated = [];
+    const past = [];
+    const overdue = [];
+    const upcoming = [];
 
-      const isOverdue = a.allowedToSubmit() && a.withoutGradedSubmission()
-      // only handles observer observing one student, this needs to change to handle multiple users in the future
-      const canHaveOverdueAssignment =
-        !ENV.current_user_has_been_observer_in_this_course ||
-        (ENV.observed_student_ids && ENV.observed_student_ids.length) === 1
-
-      if (isOverdue && canHaveOverdueAssignment) return overdue.push(a)
-      past.push(a)
-    })
-
+    each(assignments, a => {
+      let group;
+      if (a.hasSubAssignments()) {
+        group = a.getCheckpointDateGroup();
+      } else {
+        group = a.getDateSortGroup();
+      }
+      switch(group) {
+        case 'undated':
+          undated.push(a);
+          break;
+        case 'upcoming':
+          upcoming.push(a);
+          break;
+        case 'overdue':
+          overdue.push(a);
+          break;
+        case 'past':
+          past.push(a);
+          break;
+      }
+    });
     const overdue_group = new AssignmentGroup({
       id: 'overdue',
       name: I18n.t('overdue_assignments', 'Overdue Assignments'),

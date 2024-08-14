@@ -821,6 +821,15 @@ describe ApplicationHelper do
       expect(planner_enabled?).to be false
     end
 
+    it "returns false for student in at least one limited access account" do
+      course_with_student(active_all: true)
+      @current_user = @user
+      @course.root_account.enable_feature!(:allow_limited_access_for_students)
+      @course.account.settings[:enable_limited_access_for_students] = true
+      @course.account.save!
+      expect(planner_enabled?).to be false
+    end
+
     context "for observers" do
       before :once do
         @course1 = course_factory(active_all: true)

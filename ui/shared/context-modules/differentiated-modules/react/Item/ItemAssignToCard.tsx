@@ -87,7 +87,6 @@ export type ItemAssignToCardProps = {
   ) => void
   onCardDatesChange?: (cardId: string, dateAttribute: string, dateValue: string | null) => void
   selectedAssigneeIds: string[]
-  isOpen?: boolean
   everyoneOption?: AssigneeOption
   customAllOptions?: AssigneeOption[]
   customIsLoading?: boolean
@@ -98,6 +97,8 @@ export type ItemAssignToCardProps = {
   blueprintDateLocks?: DateLockTypes[]
   postToSIS?: boolean
   disabledOptionIdsRef?: React.MutableRefObject<string[]>
+  isOpenRef?: React.MutableRefObject<boolean>
+  persistEveryoneOption?: boolean
 }
 
 export type ItemAssignToCardRef = {
@@ -119,7 +120,6 @@ export default forwardRef(function ItemAssignToCard(
     onValidityChange,
     onCardAssignmentChange,
     selectedAssigneeIds,
-    isOpen,
     everyoneOption,
     customAllOptions,
     customIsLoading,
@@ -131,6 +131,7 @@ export default forwardRef(function ItemAssignToCard(
     original_due_at,
     postToSIS,
     disabledOptionIdsRef,
+    isOpenRef,
   } = props
   const [
     requiredRepliesDueDate,
@@ -180,7 +181,6 @@ export default forwardRef(function ItemAssignToCard(
   )
 
   const dueAtHasChanged = () => {
-    // console.log('>> dates', original_due_at, dueDate)
     const originalDueAt = new Date(original_due_at || 0)
     const newDueAt = new Date(dueDate || 0)
     // Since a user can't edit the seconds field in the UI and the form also
@@ -363,7 +363,7 @@ export default forwardRef(function ItemAssignToCard(
           size="medium"
           messages={showValidations ? error : []}
           disabledOptionIds={disabledOptionIdsRef.current}
-          disableFetch={!isOpen}
+          disableFetch={!isOpenRef?.current ?? false}
           customAllOptions={customAllOptions}
           customIsLoading={customIsLoading}
           customSetSearchTerm={customSetSearchTerm}

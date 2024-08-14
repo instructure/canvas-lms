@@ -326,6 +326,10 @@ describe "CanvasHttp" do
   end
 
   describe ".validate_url" do
+    it "raises an ArgumentError when passed a nil url" do
+      expect { CanvasHttp.validate_url(nil) }.to raise_error(ArgumentError)
+    end
+
     it "accepts a valid url" do
       value, _ = CanvasHttp.validate_url("http://example.com")
       expect(value).to eq "http://example.com"

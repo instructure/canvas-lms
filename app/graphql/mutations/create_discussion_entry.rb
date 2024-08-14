@@ -35,6 +35,11 @@ class Mutations::CreateDiscussionEntry < Mutations::BaseMutation
     topic = DiscussionTopic.find(input[:discussion_topic_id])
     raise ActiveRecord::RecordNotFound unless topic.grants_right?(current_user, session, :read)
 
+    # if the user is writing a threaded reply when the allow threaded replies feature is disabled
+    if !topic.threaded? && !input[:parent_entry_id].nil?
+      return validation_error(I18n.t("Threaded replies are not allowed in this context"))
+    end
+
     association = topic.discussion_entries
     entry = build_entry(association, input[:message], topic, !!input[:is_anonymous_author])
 

@@ -19,18 +19,13 @@
 import React, {useEffect, useState} from 'react'
 // eslint-disable-next-line import/no-named-as-default
 import DashboardHeader, {observerMode} from './DashboardHeader'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {observedUserId} from '../../../shared/planner/utilities/apiUtils'
 import {useFetchDashboardCards} from '../../../shared/dashboard-card/dashboardCardQueries'
 
-import {mapDashboardResponseToCard} from '../../../shared/dashboard-card/util/dashboardUtils'
+import {handleDashboardCardError} from '../../../shared/dashboard-card/util/dashboardUtils'
 import type {Card} from '@canvas/dashboard-card/types'
+import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 
-const I18n = useI18nScope('load_card_dashboard')
-
-// TODO: update types from any to something more specific
 interface DashboardWrapperProps {
   dashboard_view: string
   allowElementaryDashboard: boolean
@@ -56,36 +51,33 @@ const DashboardWrapper = ({
 }: DashboardWrapperProps) => {
   const userID = ENV.current_user_id
   const [isReady, setIsReady] = useState(false)
-  const [mappedCards, setMappedCards] = useState<Card[]>([])
+  const [cards, setCards] = useState<Card[]>([])
 
-  const observedUserID = observerMode() ? observedUserId() : null
+  const observedUserID =
+    observerMode() && ENV.OBSERVED_USERS_LIST.length > 0 ? savedObservedId(userID) : null
 
   const {
     data: dashCardData,
-    isFetching: dashCardFetching,
+    isSuccess: dashCardSuccess,
     isError: isDashCardError,
     error: dashCardError,
-  } = useFetchDashboardCards(userID, observedUserID)
-
-  const handleError = (e: Error) => {
-    showFlashAlert({message: I18n.t('Failed loading course cards'), err: e, type: 'error'})
-  }
+    refetch: refetchDashboardCards,
+  } = useFetchDashboardCards(userID, observedUserID ?? null)
 
   useEffect(() => {
-    if (!dashCardFetching && !isDashCardError && dashCardData) {
+    if (dashCardSuccess && dashCardData) {
       try {
-        const mapped = mapDashboardResponseToCard(dashCardData)
-        setMappedCards(mapped)
+        setCards(dashCardData)
         setIsReady(true)
       } catch (err) {
-        handleError(err)
+        handleDashboardCardError(err as Error)
       }
-    } else if (isDashCardError && dashCardError instanceof Error) {
-      handleError(dashCardError)
+    } else if (isDashCardError) {
+      handleDashboardCardError(dashCardError as Error)
     }
-  }, [dashCardFetching, isDashCardError, dashCardData, dashCardError])
+  }, [isDashCardError, dashCardData, dashCardError, dashCardSuccess])
 
-  if (!isReady || !mappedCards.length) {
+  if (!isReady) {
     return null
   }
 
@@ -100,7 +92,8 @@ const DashboardWrapper = ({
       screenReaderFlashMessage={screenReaderFlashMessage}
       env={env}
       {...props}
-      preloadedCards={mappedCards}
+      preloadedCards={cards}
+      refetchDashboardCards={refetchDashboardCards}
     />
   )
 }

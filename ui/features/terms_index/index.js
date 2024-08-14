@@ -151,9 +151,9 @@ $(document).ready(() => {
       $tr.fillTemplateData({data: term})
       $tr.attr('id', `term_${term.id}`)
       $tr.fillFormData(data, {object_name: 'enrollment_term'})
-
       $tr.removeClass('editing_term')
       $('.edit_term_link', $tr).focus()
+      $('#term_' + term.id + ' a.filter_link').prop('href', term.filter_courses_by_term)
     },
 
     error(data) {

@@ -481,6 +481,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, setExpandedTopi
                                   createDiscussionEntry(message, file, anonymousAuthorState)
                                 }
                               }}
+                              isSubmitting={props.isSubmitting}
                               onCancel={() => {
                                 setExpandedTopicReply(false)
                                 setTimeout(() => {

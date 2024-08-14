@@ -2232,6 +2232,15 @@ class User < ActiveRecord::Base
     end
   end
 
+  def active_student_enrollments_in_account?(account)
+    return false unless account.is_a?(Account)
+    return false if account.workflow_state == "deleted"
+
+    Rails.cache.fetch([self, "has_student_enrollments_in_account", account].cache_key, expires_in: 1.hour) do
+      student_enrollments.active.joins(:course).where(courses: { account_id: account.id }).any?
+    end
+  end
+
   def cached_current_group_memberships
     @cached_current_group_memberships ||= shard.activate do
       Rails.cache.fetch_with_batched_keys(["current_group_memberships", ApplicationController.region].cache_key, batch_object: self, batched_keys: :groups) do
@@ -3541,4 +3550,9 @@ class User < ActiveRecord::Base
     ].cache_key
   end
   private :adminable_account_ids_cache_key
+
+  def student_in_limited_access_account?
+    accounts = Account.where(id: student_enrollments.active.joins(:course).select("#{Course.quoted_table_name}.account_id"))
+    accounts.any?(&:limited_access_for_students?)
+  end
 end

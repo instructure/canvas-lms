@@ -92,12 +92,14 @@ describe AssignmentsApiController, type: :request do
         user = user_factory(active_all: true)
         @course.enroll_student(user).accept!
         @students = [user]
+        @course.enroll_teacher(@teacher, enrollment_state: "active")
 
         create_adhoc_override_for_assignment(@c2, @students, due_at: 2.days.from_now)
+        create_adhoc_override_for_assignment(@c1, @students, due_at: 2.days.from_now)
       end
 
-      it "returns the assignments list with API-formatted Checkpoint data" do
-        json = api_get_assignments_index_from_course(@course, include: ["checkpoints"])
+      it "Returns overrides for teacher" do
+        json = api_get_assignments_index_from_course_as_user(@course, @teacher, include: ["checkpoints"])
         assignment = json.first
         checkpoints = assignment["checkpoints"]
         first_checkpoint = checkpoints.find { |c| c["tag"] == CheckpointLabels::REPLY_TO_TOPIC }
@@ -109,12 +111,31 @@ describe AssignmentsApiController, type: :request do
         expect(checkpoints.pluck("name")).to match_array [@c1.name, @c2.name]
         expect(checkpoints.pluck("tag")).to match_array [@c1.sub_assignment_tag, @c2.sub_assignment_tag]
         expect(checkpoints.pluck("points_possible")).to match_array [@c1.points_possible, @c2.points_possible]
-        expect(checkpoints.pluck("due_at")).to match_array [@c1.due_at.iso8601, @c2.due_at.iso8601]
+        expect(checkpoints.pluck("due_at")).to match_array [@c1.assignment_overrides.first.due_at.iso8601, @c2.assignment_overrides.first.due_at.iso8601]
         expect(checkpoints.pluck("only_visible_to_overrides")).to match_array [@c1.only_visible_to_overrides, @c2.only_visible_to_overrides]
-        expect(first_checkpoint["overrides"].length).to eq 0
+        expect(first_checkpoint["overrides"].length).to eq 1
         expect(second_checkpoint["overrides"].length).to eq 1
         expect(second_checkpoint["overrides"].first["assignment_id"]).to eq @c2.id
         expect(second_checkpoint["overrides"].first["student_ids"]).to match_array @students.map(&:id)
+      end
+
+      it "hides cehckpoint override info from students" do
+        json = api_get_assignments_index_from_course_as_user(@course, @students.first, include: ["checkpoints"])
+        assignment = json.first
+        checkpoints = assignment["checkpoints"]
+        first_checkpoint = checkpoints.find { |c| c["tag"] == CheckpointLabels::REPLY_TO_TOPIC }
+        second_checkpoint = checkpoints.find { |c| c["tag"] == CheckpointLabels::REPLY_TO_ENTRY }
+
+        expect(assignment["has_sub_assignments"]).to be_truthy
+
+        expect(checkpoints.length).to eq 2
+        expect(checkpoints.pluck("name")).to match_array [@c1.name, @c2.name]
+        expect(checkpoints.pluck("tag")).to match_array [@c1.sub_assignment_tag, @c2.sub_assignment_tag]
+        expect(checkpoints.pluck("points_possible")).to match_array [@c1.points_possible, @c2.points_possible]
+        expect(checkpoints.pluck("due_at")).to match_array [@c1.assignment_overrides.first.due_at.iso8601, @c2.assignment_overrides.first.due_at.iso8601]
+        expect(checkpoints.pluck("only_visible_to_overrides")).to match_array [@c1.only_visible_to_overrides, @c2.only_visible_to_overrides]
+        expect(first_checkpoint["overrides"].length).to eq 0
+        expect(second_checkpoint["overrides"].length).to eq 0
       end
     end
 
@@ -5991,7 +6012,7 @@ describe AssignmentsApiController, type: :request do
             "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                                                  "attachments" => [],
                                                  "permissions" => { "attach" => true, "update" => true, "reply" => true, "delete" => true, "manage_assign_to" => true },
-                                                 "discussion_type" => "side_comment",
+                                                 "discussion_type" => "not_threaded",
                                                  "group_category_id" => nil,
                                                  "can_group" => true,
                                                  "allow_rating" => false,
@@ -7576,6 +7597,17 @@ describe AssignmentsApiController, type: :request do
       end
     end
   end
+end
+
+def api_get_assignments_index_from_course_as_user(course, user, params = {})
+  options = {
+    controller: "assignments_api",
+    action: "index",
+    format: "json",
+    course_id: course.id.to_s
+  }
+  options = options.merge(params)
+  api_call_as_user(user, :get, "/api/v1/courses/#{course.id}/assignments.json", options)
 end
 
 def api_get_assignments_index_from_course(course, params = {})

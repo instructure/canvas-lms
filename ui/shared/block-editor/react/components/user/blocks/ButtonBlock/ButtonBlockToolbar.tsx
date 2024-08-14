@@ -179,7 +179,7 @@ const ButtonBlockToolbar = () => {
         <IconBackgroundColor size="x-small" />
       </IconButton>
 
-      <IconPopup />
+      <IconPopup iconName={props.iconName} />
 
       <LinkModal
         open={linkModalOpen}

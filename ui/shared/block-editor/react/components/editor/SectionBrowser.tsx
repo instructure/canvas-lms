@@ -36,6 +36,10 @@ import {BlankSection} from '../user/sections/BlankSection'
 import {getNodeIndex} from '../../utils'
 import {type AddSectionPlacement} from './types'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor')
+
 const nameToSection = (name: string) => {
   switch (name) {
     case 'Callout Cards':
@@ -60,7 +64,7 @@ const nameToSection = (name: string) => {
       return <BlankSection />
   }
 }
-type SectionBrowserProps = {
+export type SectionBrowserProps = {
   open: boolean
   where: AddSectionPlacement
   onClose: () => void
@@ -154,59 +158,71 @@ const SectionBrowser = ({open, where, onClose}: SectionBrowserProps) => {
       open={open}
       onDismiss={onClose}
       size="medium"
-      label="Section Browser"
+      label={I18n.t('Section Browser')}
       shouldCloseOnDocumentClick={true}
     >
       <Modal.Header>
         <Heading level="h2">Section Browser</Heading>
-        <CloseButton placement="end" onClick={onClose} screenReaderLabel="Close" />
+        <CloseButton placement="end" onClick={onClose} screenReaderLabel={I18n.t('Close')} />
       </Modal.Header>
       <Modal.Body>
         <Flex gap="small" direction="column" padding="x-small">
           {renderBox(
-            'Hero',
+            I18n.t('Hero'),
             'section-hero.png',
-            "The hero section is the large, attention-grabbing area at the top. It's the first thing visitors see when they land on your Page, so it's crucial for making a strong first impression."
+            I18n.t(
+              "The hero section is the large, attention-grabbing area at the top. It's the first thing visitors see when they land on your Page, so it's crucial for making a strong first impression."
+            )
           )}
           {renderBox(
-            'Navigation',
+            I18n.t('Navigation'),
             'section-navigation.png',
-            'Navigation sections help visitors move around the course efficiently. Good navigation is crucial for enhancing the user experience, making it easy to find the information quickly and without frustration.'
+            I18n.t(
+              'Navigation sections help visitors move around the course efficiently. Good navigation is crucial for enhancing the user experience, making it easy to find the information quickly and without frustration.'
+            )
           )}
           {renderBox(
-            'About',
+            I18n.t('About'),
             'section-about.png',
-            'The about section is a great place to introduce yourself or your course. '
+            I18n.t('The about section is a great place to introduce yourself or your course. ')
           )}
           {renderBox(
-            'Callout Cards',
+            I18n.t('Callout Cards'),
             'section-resources.png',
-            'Callout cards guide page viewers to important information. An effective callout card provides a short summary of what visitors can find along with a button or link to additional content.'
+            I18n.t(
+              'Callout cards guide page viewers to important information. An effective callout card provides a short summary of what visitors can find along with a button or link to additional content.'
+            )
           )}
           {renderBox(
-            'Quiz',
+            I18n.t('Quiz'),
             'section-quiz.png',
-            'The quiz section is where you can add a quiz to your page.'
+            I18n.t('The quiz section is where you can add a quiz to your page.')
           )}
           {renderBox(
-            'Announcement',
+            I18n.t('Announcement'),
             'section-announcement.png',
-            'The announcement section is where you can add an announcement to your page.'
+            I18n.t('The announcement section is where you can add an announcement to your page.')
           )}
           {renderBox(
-            'Footer',
+            I18n.t('Footer'),
             'section-footer.png',
-            'The footer is the section located at the very bottom of each page. It serves several important purposes, providing additional information and functionality that complement the main content.'
+            I18n.t(
+              'The footer is the section located at the very bottom of each page. It serves several important purposes, providing additional information and functionality that complement the main content.'
+            )
           )}
           {renderBox(
-            'Columns',
+            I18n.t('Columns'),
             'section-columns.png',
-            'The columns section is a flexible layout that allows you to add multiple blocks side by side.'
+            I18n.t(
+              'The columns section is a flexible layout that allows you to add multiple blocks side by side.'
+            )
           )}
           {renderBox(
-            'Blank',
+            I18n.t('Blank'),
             'section-blank.png',
-            'The blank section is a simple, empty section that you can use to add your own custom content.'
+            I18n.t(
+              'The blank section is a simple, empty section that you can use to add your own custom content.'
+            )
           )}
         </Flex>
       </Modal.Body>

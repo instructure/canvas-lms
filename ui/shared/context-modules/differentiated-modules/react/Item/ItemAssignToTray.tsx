@@ -120,7 +120,8 @@ export interface ItemAssignToTrayProps {
   onSave?: (
     overrides: ItemAssignToCardSpec[],
     hasModuleOverrides: boolean,
-    deletedModuleAssignees: String[]
+    deletedModuleAssignees: String[],
+    disabledOptionIds?: String[]
   ) => void
   onClose: () => void
   onDismiss: () => void
@@ -151,6 +152,7 @@ export interface ItemAssignToTrayProps {
   onCardRemove?: (cardId: string) => void
   onInitialStateSet?: (cards: ItemAssignToCardSpec[]) => void
   postToSIS?: boolean
+  isTray?: boolean
 }
 
 export default function ItemAssignToTray({
@@ -181,6 +183,7 @@ export default function ItemAssignToTray({
   isCheckpointed = false,
   onInitialStateSet,
   postToSIS = false,
+  isTray = true,
 }: ItemAssignToTrayProps) {
   const isPacedCourse = ENV.IN_PACED_COURSE
   const initialLoadRef = useRef(false)
@@ -208,14 +211,25 @@ export default function ItemAssignToTray({
 
   const disabledOptionIdsRef = useRef(defaultDisabledOptionIds)
 
+  useEffect(() => {
+    // When tray closes and the initial load already happened,
+    // the next time it opens it will show the loading spinner
+    // because the cards rendering is a heavy process, letting
+    // the user knows the tray is loading instead of being frozen
+    if (!open && initialLoadRef.current) {
+      setIsLoading(true)
+    }
+  }, [open])
+
   const everyoneOption = useMemo(() => {
     const hasOverrides =
       (disabledOptionIdsRef.current.length === 1 &&
         !disabledOptionIdsRef.current.includes('everyone')) ||
       disabledOptionIdsRef.current.length > 1 ||
-      assignToCards.length > 1
+      assignToCardsRef.current.length > 1
     return getEveryoneOption(hasOverrides)
-  }, [disabledOptionIdsRef, assignToCards])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabledOptionIdsRef, assignToCardsRef.current])
 
   const handleDismiss = useCallback(() => {
     if (defaultCards) {
@@ -244,10 +258,10 @@ export default function ItemAssignToTray({
   })
 
   const handleUpdate = useCallback(() => {
-    const hasErrors = assignToCards.some(card => !card.isValid)
+    const hasErrors = assignToCardsRef.current.some(card => !card.isValid)
     // If a card has errors it should not save and the respective card should be focused
     if (hasErrors) {
-      const firstCardWithError = assignToCards.find(card => !card.isValid)
+      const firstCardWithError = assignToCardsRef.current.find(card => !card.isValid)
       if (!firstCardWithError) return
       const firstCardWithErrorRef = cardsRefs.current[firstCardWithError.key]
 
@@ -261,10 +275,15 @@ export default function ItemAssignToTray({
     )
 
     if (onSave !== undefined) {
-      onSave(assignToCards, hasModuleOverrides, deletedModuleAssignees)
+      onSave(
+        assignToCardsRef.current,
+        hasModuleOverrides,
+        deletedModuleAssignees,
+        disabledOptionIdsRef.current
+      )
       return
     }
-    const filteredCards = assignToCards.filter(
+    const filteredCards = assignToCardsRef.current.filter(
       card =>
         [null, undefined, ''].includes(card.contextModuleId) ||
         (card.contextModuleId !== null && card.isEdited)
@@ -286,7 +305,7 @@ export default function ItemAssignToTray({
       })
     }
   }, [
-    assignToCards,
+    assignToCardsRef,
     moduleAssignees,
     onSave,
     hasModuleOverrides,
@@ -298,8 +317,16 @@ export default function ItemAssignToTray({
   ])
 
   const allCardsValid = useCallback(() => {
-    return assignToCards.every(card => card.isValid)
-  }, [assignToCards])
+    return assignToCardsRef.current.every(card => card.isValid)
+  }, [assignToCardsRef])
+
+  const handleEntered = useCallback(() => {
+    // When tray entered and the initial load already happened,
+    // this will start the cards render process
+    if (open && initialLoadRef.current) {
+      setIsLoading(false)
+    }
+  }, [open])
 
   const renderPointsPossible = () =>
     pointsPossible === 1 ? I18n.t('1 pt') : I18n.t('%{pointsPossible} pts', {pointsPossible})
@@ -352,8 +379,10 @@ export default function ItemAssignToTray({
   }
 
   function Footer() {
+    const masqueradeBar = document.querySelector('body.is-masquerading-or-student-view')
+    const padding = masqueradeBar ? '0 0 x-large 0' : 'none'
     return (
-      <Flex.Item data-testid="module-item-edit-tray-footer" width="100%">
+      <Flex.Item data-testid="module-item-edit-tray-footer" width="100%" padding={padding}>
         <TrayFooter
           disableSave={isPacedCourse}
           saveButtonLabel={useApplyButton ? I18n.t('Apply') : I18n.t('Save')}
@@ -365,11 +394,12 @@ export default function ItemAssignToTray({
     )
   }
 
-  return (
+  const trayView = (
     <Tray
       data-testid="module-item-edit-tray"
       onClose={onClose}
       onExited={onExited}
+      onEntered={handleEntered}
       label={I18n.t('Edit assignment %{name}', {
         name: itemName,
       })}
@@ -406,7 +436,6 @@ export default function ItemAssignToTray({
             onAssigneesChange={onAssigneesChange}
             onDatesChange={onDatesChange}
             onCardRemove={onCardRemove}
-            assignToCards={assignToCards}
             setAssignToCards={setAssignToCards}
             blueprintDateLocks={blueprintDateLocks}
             setBlueprintDateLocks={setBlueprintDateLocks}
@@ -427,10 +456,76 @@ export default function ItemAssignToTray({
             postToSIS={postToSIS}
             assignToCardsRef={assignToCardsRef}
             disabledOptionIdsRef={disabledOptionIdsRef}
+            isTray={isTray}
           />
         )}
         {Footer()}
       </Flex>
     </Tray>
   )
+
+  const sectionView = (
+    <View width="100%" display="block">
+      {blueprintDateLocks && blueprintDateLocks.length > 0 ? (
+        <Alert liveRegion={getLiveRegion} variant="info" margin="small 0 0">
+          <Text weight="bold" size="small">
+            {I18n.t('Locked: ')}
+          </Text>
+          <Text size="small">{blueprintDateLocks.map(i => lockLabels[i]).join(' & ')}</Text>
+        </Alert>
+      ) : null}
+      {isPacedCourse ? (
+        <Flex.Item padding="small medium" shouldGrow={true} shouldShrink={true}>
+          <CoursePacingNotice courseId={courseId} />
+        </Flex.Item>
+      ) : (
+        <ItemAssignToTrayContent
+          open={open}
+          initialLoadRef={initialLoadRef}
+          onClose={onClose}
+          onDismiss={onDismiss}
+          courseId={courseId}
+          itemType={itemType}
+          itemContentId={itemContentId}
+          locale={locale}
+          timezone={timezone}
+          initHasModuleOverrides={initHasModuleOverrides}
+          removeDueDateInput={removeDueDateInput}
+          isCheckpointed={isCheckpointed}
+          onInitialStateSet={onInitialStateSet}
+          defaultCards={defaultCards}
+          defaultSectionId={defaultSectionId}
+          defaultDisabledOptionIds={defaultDisabledOptionIds}
+          onSave={onSave}
+          onAddCard={onAddCard}
+          onAssigneesChange={onAssigneesChange}
+          onDatesChange={onDatesChange}
+          onCardRemove={onCardRemove}
+          setAssignToCards={setAssignToCards}
+          blueprintDateLocks={blueprintDateLocks}
+          setBlueprintDateLocks={setBlueprintDateLocks}
+          handleDismiss={handleDismiss}
+          hasModuleOverrides={hasModuleOverrides}
+          setHasModuleOverrides={setHasModuleOverrides}
+          cardsRefs={cardsRefs}
+          setModuleAssignees={setModuleAssignees}
+          defaultGroupCategoryId={defaultGroupCategoryId}
+          allOptions={allOptions}
+          isLoadingAssignees={isLoadingAssignees}
+          isLoading={isLoading}
+          loadedAssignees={loadedAssignees}
+          setSearchTerm={setSearchTerm}
+          everyoneOption={everyoneOption}
+          setGroupCategoryId={setGroupCategoryId}
+          setOverridesFetched={setOverridesFetched}
+          postToSIS={postToSIS}
+          assignToCardsRef={assignToCardsRef}
+          disabledOptionIdsRef={disabledOptionIdsRef}
+          isTray={isTray}
+        />
+      )}
+    </View>
+  )
+
+  return <>{isTray ? trayView : sectionView}</>
 }

@@ -69,7 +69,8 @@ module Lti
         lti_version: external_tool.use_1_3? ? "1.3" : "1.1",
         deployment_id: external_tool.deployment_id,
         editor_button_settings: external_tool.editor_button,
-        top_navigation_settings: external_tool.top_navigation
+        top_navigation_settings: external_tool.top_navigation,
+        migration_running: external_tool.migrating?
       }
       result[:is_rce_favorite] = external_tool.is_rce_favorite_in_context?(@context) if external_tool.can_be_rce_favorite?
       result[:is_top_nav_favorite] = external_tool.top_nav_favorite_in_context?(@context) if external_tool.can_be_top_nav_favorite?

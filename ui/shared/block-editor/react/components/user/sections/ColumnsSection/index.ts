@@ -16,12 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// @ts-expect-error
 import {IconTableInsertColumnAfterLine} from '@instructure/ui-icons/es/svg'
 import {ColumnsSection} from './ColumnsSection'
-import {type ColumnsSectionVariant} from './types'
+import {type ColumnsSectionVariant, type ColumnsSectionProps} from './types'
 import {ColumnsSectionToolbar} from './ColumnsSectionToolbar'
 
 const ColumnsSectionIcon = IconTableInsertColumnAfterLine?.src
 
-export {ColumnsSection, ColumnsSectionToolbar, ColumnsSectionIcon, type ColumnsSectionVariant}
+export {
+  ColumnsSection,
+  ColumnsSectionToolbar,
+  ColumnsSectionIcon,
+  type ColumnsSectionVariant,
+  type ColumnsSectionProps,
+}

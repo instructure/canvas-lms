@@ -723,6 +723,45 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(c2_assignment_override.due_at).to be_within(1.second).of(@due_at2)
     end
 
+    it "updates assignments and checkpoints on topic published status" do
+      # check unpublished
+      total_sub_assignments = SubAssignment.count
+      @graded_topic.unpublish!
+      @graded_topic.assignment.unpublish!
+
+      expect(@graded_topic.published?).to be false
+      expect(@graded_topic.assignment.published?).to be false
+      expect(@checkpoint1.published?).to be false
+      expect(@checkpoint2.published?).to be false
+
+      # check publish topic,
+      result = run_mutation({ id: @graded_topic.id, published: true })
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "published")).to be true
+      @graded_topic.reload
+      @checkpoint1.reload
+      @checkpoint2.reload
+      expect(@graded_topic.published?).to be true
+      expect(@graded_topic.assignment.published?).to be true
+      expect(@checkpoint1.published?).to be true
+      expect(@checkpoint2.published?).to be true
+
+      # check unpublish topic
+      result = run_mutation({ id: @graded_topic.id, published: false })
+
+      @graded_topic.reload
+      @checkpoint1.reload
+      @checkpoint2.reload
+      expect(@graded_topic.published?).to be false
+      expect(@graded_topic.assignment.published?).to be false
+      expect(@checkpoint1.published?).to be false
+      expect(@checkpoint2.published?).to be false
+
+      # confirm no extra sub assignments are created
+      expect(total_sub_assignments).to eq(SubAssignment.count)
+      expect(result["errors"]).to be_nil
+    end
+
     it "updates the reply to topic overrides to add a section override and then, remove it" do
       section = add_section("M03")
 

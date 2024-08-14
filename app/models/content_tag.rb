@@ -768,7 +768,7 @@ class ContentTag < ActiveRecord::Base
   # filtered by context during migrate_content_to_1_3
   # @see Lti::Migratable
   def self.directly_associated_items(tool_id)
-    ContentTag.nondeleted.where(tag_type: :context_module, content_id: tool_id)
+    ContentTag.nondeleted.where(tag_type: :context_module, content_type: ContextExternalTool, content_id: tool_id)
   end
 
   # filtered by context during migrate_content_to_1_3

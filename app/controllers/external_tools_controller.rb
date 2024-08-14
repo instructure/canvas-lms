@@ -503,6 +503,27 @@ class ExternalToolsController < ApplicationController
     end
   end
 
+  def migration_info
+    # Define tool to be the external tool associated with the external tool id from the route
+    tool = ContextExternalTool.find(params[:external_tool_id])
+
+    # Instance variable for the migration status -- this will be used for conditional rendering
+    migration_running = tool.migrating?
+
+    unless migration_running
+      return render json: { migration_running: }
+    end
+
+    migration_progress = tool.progresses.where.not(workflow_state: "completed").first
+
+    total_items = migration_progress.results[:total_batches]
+
+    tool_id = migration_progress.results[:tool_id]
+    completed_items = total_items - Delayed::Job.where(strand: "ContextExternalTool#migrate_content_to_1_3/#{tool_id}").count
+
+    render json: { migration_running:, total_items:, completed_items: }
+  end
+
   def tool_return_success_url(selection_type = nil)
     case @context
     when Course

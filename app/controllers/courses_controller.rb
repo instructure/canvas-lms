@@ -363,6 +363,7 @@ class CoursesController < ApplicationController
   before_action :require_user_or_observer, only: [:user_index]
   before_action :require_context, only: %i[roster locks create_file ping confirm_action copy effective_due_dates offline_web_exports link_validator settings start_offline_web_export statistics user_progress]
   skip_after_action :update_enrollment_last_activity_at, only: [:enrollment_invitation, :activity_stream_summary]
+  before_action :check_limited_access_for_students, only: %i[create_file]
 
   include Api::V1::Course
   include Api::V1::Progress
@@ -1455,6 +1456,9 @@ class CoursesController < ApplicationController
     else
       @context.complete
       if (success = @context.save)
+        if Account.site_admin.feature_enabled?(:default_account_grading_scheme) && @context.grading_standard_id.nil? && @context.root_account.grading_standard_id
+          @context.update!(grading_standard_id: @context.root_account.grading_standard_id)
+        end
         Auditors::Course.record_concluded(@context, @current_user, source: (api_request? ? :api : :manual))
         flash[:notice] = t("notices.concluded", "Course successfully concluded")
       else
@@ -3445,6 +3449,9 @@ class CoursesController < ApplicationController
         when :claim
           Auditors::Course.record_claimed(@course, @current_user, opts)
         when :complete
+          if Account.site_admin.feature_enabled?(:default_account_grading_scheme) && @course.grading_standard_id.nil? && @course.root_account.grading_standard_id
+            @course.update!(grading_standard_id: @course.root_account.grading_standard_id)
+          end
           Auditors::Course.record_concluded(@course, @current_user, opts)
         when :delete
           Auditors::Course.record_deleted(@course, @current_user, opts)

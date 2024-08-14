@@ -1171,7 +1171,7 @@ describe DiscussionTopicsController do
       expect(@topic.reload.read_state(@student)).to eq "unread"
     end
 
-    it "marks as read if visible but locked" do
+    it "redirects while accessing locked announcements" do
       user_session(@student)
       course_topic(skip_set_user: true)
       @announcement = @course.announcements.create!(
@@ -1180,9 +1180,8 @@ describe DiscussionTopicsController do
         unlock_at: 1.week.ago,
         lock_at: 1.day.ago
       )
-      expect(@announcement.read_state(@student)).to eq "unread"
       get "show", params: { course_id: @course.id, id: @announcement.id }
-      expect(@announcement.reload.read_state(@student)).to eq "read"
+      expect(response).to be_redirect
     end
 
     it "allows concluded teachers to see discussions" do

@@ -269,6 +269,30 @@ describe('Should load <AddressBookContainer> normally', () => {
       const tags = await screen.findAllByTestId('address-book-tag')
       expect(tags.length).toBe(1)
     })
+
+    it('should properly update navigation state when activeCourseFilter changes mid navigation', async () => {
+      jest.useFakeTimers()
+      const {rerender} = setup()
+      let items = await screen.findAllByTestId('address-book-item')
+      fireEvent.mouseDown(items[1])
+      await act(async () => jest.advanceTimersByTime(1000))
+      items = await screen.findAllByTestId('address-book-item')
+      // Expects there to be 3 users and 1 backbutton
+      expect(items.length).toBe(4)
+
+      rerender(
+        <ApolloProvider client={mswClient}>
+          <AddressBookContainer
+            open={true}
+            activeCourseFilter={{contextID: 'course_123', contextName: 'course name'}}
+          />
+        </ApolloProvider>
+      )
+      await act(async () => jest.advanceTimersByTime(1000))
+      items = await screen.findAllByTestId('address-book-item')
+      // Expects there to be only Frederick Dukes, see mswHandlers.js GetAddressBookRecipients if (variables.context)
+      expect(items.length).toBe(1)
+    })
   })
 
   describe('Callbacks', () => {

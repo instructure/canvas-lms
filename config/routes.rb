@@ -1533,6 +1533,10 @@ CanvasRails::Application.routes.draw do
       %w[course account].each do |context|
         get "#{context}s/:#{context}_id/external_tools/sessionless_launch", action: :generate_sessionless_launch, as: "#{context}_external_tool_sessionless_launch"
         get "#{context}s/:#{context}_id/external_tools/:external_tool_id", action: :show, as: "#{context}_external_tool_show"
+
+        # Migration URL
+        get "#{context}s/:#{context}_id/external_tools/:external_tool_id/migration_info", action: :migration_info, as: "#{context}_external_tool_migration_info"
+
         get "#{context}s/:#{context}_id/external_tools", action: :index, as: "#{context}_external_tools"
         post "#{context}s/:#{context}_id/external_tools", action: :create, as: "#{context}_external_tools_create"
         post "#{context}s/:#{context}_id/create_tool_with_verification", action: :create_tool_with_verification, as: "#{context}_create_tool_with_verification"
@@ -1683,12 +1687,12 @@ CanvasRails::Application.routes.draw do
         get "courses/:course_id/assignments/:assignment_id/date_details", action: :show, as: "course_assignment_date_details"
         get "courses/:course_id/quizzes/:quiz_id/date_details", action: :show, as: "course_quizzes_quiz_date_details"
         get "courses/:course_id/discussion_topics/:discussion_topic_id/date_details", action: :show, as: "course_discussion_topic_date_details"
-        get "courses/:course_id/pages/:page_id/date_details", action: :show, as: "course_wiki_page_date_details"
+        get "courses/:course_id/pages/:url_or_id/date_details", action: :show, as: "course_wiki_page_date_details"
         get "courses/:course_id/files/:attachment_id/date_details", action: :show, as: "course_attachment_date_details"
         put "courses/:course_id/assignments/:assignment_id/date_details", action: :update
         put "courses/:course_id/quizzes/:quiz_id/date_details", action: :update
         put "courses/:course_id/discussion_topics/:discussion_topic_id/date_details", action: :update
-        put "courses/:course_id/pages/:page_id/date_details", action: :update
+        put "courses/:course_id/pages/:url_or_id/date_details", action: :update
         put "courses/:course_id/files/:attachment_id/date_details", action: :update
       end
 
@@ -2502,6 +2506,10 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/rubrics/:id", action: :show
       get "courses/:course_id/rubrics/:id/used_locations", action: "used_locations", as: "rubrics_course_used_locations"
       get "accounts/:account_id/rubrics/:id/used_locations", action: "used_locations", as: "rubrics_account_used_locations"
+      post "courses/:course_id/rubrics/upload", action: "upload", as: "rubrics_course_upload"
+      post "accounts/:account_id/rubrics/upload", action: "upload", as: "rubrics_account_upload"
+      get "courses/:course_id/rubrics/upload/:id", action: "upload_status", as: "rubrics_course_upload_status"
+      get "accounts/:account_id/rubrics/upload/:id", action: "upload_status", as: "rubrics_account_upload_status"
       post "courses/:course_id/rubrics", controller: :rubrics, action: :create
       put "courses/:course_id/rubrics/:id", controller: :rubrics, action: :update
       delete "courses/:course_id/rubrics/:id", controller: :rubrics, action: :destroy

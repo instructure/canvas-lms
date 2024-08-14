@@ -23,6 +23,9 @@ class Assignment < AbstractAssignment
 
   before_save :before_soft_delete, if: -> { will_save_change_to_workflow_state?(to: "deleted") }
 
+  SUB_ASSIGNMENT_SYNC_ATTRIBUTES = %w[workflow_state].freeze
+  after_commit :update_sub_assignments, if: :sync_attributes_changed?
+
   set_broadcast_policy do |p|
     p.dispatch :assignment_due_date_changed
     p.to do |assignment|
@@ -103,5 +106,28 @@ class Assignment < AbstractAssignment
 
   def governs_submittable?
     true
+  end
+
+  def update_sub_assignments
+    return unless has_sub_assignments?
+
+    changed_attributes = sync_attributes_changes
+    sub_assignments.each do |checkpoint|
+      updates = {}
+      changed_attributes.each do |attr, (*, new_value)|
+        updates[attr] = new_value if checkpoint.respond_to?(:"#{attr}=")
+      end
+      if updates.any?
+        checkpoint.update!(updates)
+      end
+    end
+  end
+
+  def sync_attributes_changed?
+    previous_changes.keys.intersect?(SUB_ASSIGNMENT_SYNC_ATTRIBUTES)
+  end
+
+  def sync_attributes_changes
+    previous_changes.slice(*SUB_ASSIGNMENT_SYNC_ATTRIBUTES)
   end
 end

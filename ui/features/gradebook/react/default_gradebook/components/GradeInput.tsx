@@ -149,6 +149,7 @@ type Props = {
   submissionUpdating: boolean
   subAssignmentTag?: string
   header?: string
+  inputDisplay?: 'inline-block' | 'block'
 }
 
 type State = {
@@ -165,6 +166,7 @@ export default class GradeInput extends Component<Props, State> {
     pendingGradeInfo: null,
     scalingFactor: 1.0,
     submissionUpdating: false,
+    inputDisplay: 'inline-block',
   }
 
   constructor(props: Props) {
@@ -322,7 +324,7 @@ export default class GradeInput extends Component<Props, State> {
           </Text>
         )}
         <TextInput
-          display="inline-block"
+          display={this.props.inputDisplay}
           id="grade-detail-tray--grade-input"
           interaction={interaction}
           messages={messages}

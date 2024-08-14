@@ -39,7 +39,9 @@ import SimilarityScore from './SimilarityScore'
 import SubmissionCommentListItem from './SubmissionCommentListItem'
 import SubmissionCommentCreateForm from './SubmissionCommentCreateForm'
 import SubmissionStatus from './SubmissionStatus'
-import SubmissionTrayRadioInputGroup from './SubmissionTrayRadioInputGroup'
+import SubmissionTrayRadioInputGroup, {
+  type PendingUpdateData,
+} from './SubmissionTrayRadioInputGroup'
 import ProxyUploadModal from '@canvas/proxy-submission/react/ProxyUploadModal'
 import {extractSimilarityInfo} from '@canvas/grading/SubmissionHelper'
 import type {
@@ -56,6 +58,7 @@ import {
 } from '@canvas/grading/grading.d'
 
 import {Link} from '@instructure/ui-link'
+import {InputsForCheckpoints} from './InputsForCheckpoints'
 
 const I18n = useI18nScope('gradebook')
 
@@ -139,9 +142,32 @@ export type SubmissionTrayProps = {
   contentRef?: React.RefObject<HTMLDivElement>
 }
 
+export type CheckpointState = {
+  label: 'reply_to_topic' | 'reply_to_entry'
+  status: 'none' | 'late' | 'missing' | 'excused'
+  timeLate: string
+  secondsLate: number
+  customGradeStatusId: string | null
+}
+
 type SubmissionTrayState = {
   proxyUploadModalOpen: boolean
+  checkpointStates: CheckpointState[]
 }
+
+export const NONE = 'none'
+export const LATE = 'late'
+export const MISSING = 'missing'
+export const EXCUSED = 'excused'
+export const EXTENDED = 'extended'
+
+export const REPLY_TO_TOPIC = 'reply_to_topic'
+export const REPLY_TO_ENTRY = 'reply_to_entry'
+
+const DEFAULT_CHECKPOINT_STATES = [
+  {label: REPLY_TO_TOPIC, status: NONE, timeLate: '0', secondsLate: 0, customGradeStatusId: null},
+  {label: REPLY_TO_ENTRY, status: NONE, timeLate: '0', secondsLate: 0, customGradeStatusId: null},
+]
 
 export default class SubmissionTray extends React.Component<
   SubmissionTrayProps,
@@ -156,6 +182,56 @@ export default class SubmissionTray extends React.Component<
 
   state = {
     proxyUploadModalOpen: false,
+    checkpointStates: DEFAULT_CHECKPOINT_STATES,
+  }
+
+  componentDidMount() {
+    this.initializeCheckpointStates()
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.submission !== this.props.submission) {
+      this.initializeCheckpointStates()
+    }
+  }
+
+  initializeCheckpointStates = () => {
+    const {submission, latePolicy} = this.props
+
+    if (submission.hasSubAssignmentSubmissions && submission.subAssignmentSubmissions.length > 0) {
+      const checkpointStates = submission.subAssignmentSubmissions.map(subSubmission => {
+        let status = NONE
+        let timeLate = '0'
+        const secondsLate = subSubmission.seconds_late || 0
+        const customGradeStatusId = subSubmission.custom_grade_status_id || null
+
+        if (subSubmission.late_policy_status === 'extended') {
+          status = EXTENDED
+        } else if (subSubmission.late) {
+          status = LATE
+          timeLate =
+            latePolicy.lateSubmissionInterval === 'hour'
+              ? (secondsLate / 3600).toString()
+              : (secondsLate / (24 * 3600)).toString()
+        } else if (subSubmission.missing) {
+          status = MISSING
+        } else if (subSubmission.excused) {
+          status = EXCUSED
+        }
+
+        return {
+          label: subSubmission.sub_assignment_tag,
+          status,
+          timeLate,
+          secondsLate,
+          customGradeStatusId,
+        }
+      })
+
+      this.setState({checkpointStates})
+    } else {
+      this.setState({checkpointStates: DEFAULT_CHECKPOINT_STATES})
+    }
   }
 
   cancelCommenting = () => {
@@ -388,7 +464,51 @@ export default class SubmissionTray extends React.Component<
       }
     }
 
-    const renderGradeInputForCheckpoints = (
+    const updateCheckpointStates = (subAssignmentTag, field, value) => {
+      this.setState(prevState => {
+        return {
+          checkpointStates: prevState.checkpointStates.map(checkpoint =>
+            checkpoint.label === subAssignmentTag ? {...checkpoint, [field]: value} : checkpoint
+          ),
+        }
+      })
+
+      if (field === 'timeLate') {
+        const timeLate = parseInt(value, 10)
+
+        if (Number.isNaN(timeLate)) {
+          return
+        }
+
+        const secondsLate =
+          this.props.latePolicy.lateSubmissionInterval === 'hour'
+            ? timeLate * 3600
+            : timeLate * 24 * 3600
+
+        updateCheckpointStates(subAssignmentTag, 'secondsLate', secondsLate)
+      } else if (field === 'status') {
+        const data: PendingUpdateData = {subAssignmentTag}
+
+        if (value === EXCUSED) {
+          data.excuse = true
+        } else {
+          data.excuse = false
+          data.latePolicyStatus = value
+        }
+
+        this.props.updateSubmission(data)
+      } else if (field === 'secondsLate') {
+        const data: PendingUpdateData = {subAssignmentTag, secondsLateOverride: value}
+
+        this.props.updateSubmission(data)
+      } else if (field === 'customGradeStatusId') {
+        const data: PendingUpdateData = {subAssignmentTag, customGradeStatusId: value}
+
+        this.props.updateSubmission(data)
+      }
+    }
+
+    const renderInputsForCheckpoints = (
       hasCheckpoints,
       props,
       subAssignmentTag,
@@ -396,22 +516,26 @@ export default class SubmissionTray extends React.Component<
       header
     ) => {
       return (
-        hasCheckpoints && (
-          <GradeInput
-            assignment={getSubAssignment(hasCheckpoints, props.assignment, subAssignmentTag)}
-            disabled={props.gradingDisabled}
-            enterGradesAs={props.enterGradesAs}
-            gradingScheme={props.gradingScheme}
-            pointsBasedGradingScheme={props.pointsBasedGradingScheme}
-            pendingGradeInfo={props.pendingGradeInfo}
-            onSubmissionUpdate={props.onGradeSubmission}
-            scalingFactor={props.scalingFactor}
-            submission={submission}
-            submissionUpdating={props.submissionUpdating}
-            subAssignmentTag={subAssignmentTag}
-            header={header}
-          />
-        )
+        <InputsForCheckpoints
+          hasCheckpoints={hasCheckpoints}
+          checkpointStates={this.state.checkpointStates}
+          subAssignmentTag={subAssignmentTag}
+          assignment={props.assignment}
+          gradingDisabled={props.gradingDisabled}
+          enterGradesAs={props.enterGradesAs}
+          gradingScheme={props.gradingScheme}
+          pointsBasedGradingScheme={props.pointsBasedGradingScheme}
+          pendingGradeInfo={props.pendingGradeInfo}
+          onGradeSubmission={props.onGradeSubmission}
+          scalingFactor={props.scalingFactor}
+          submission={submission}
+          submissionUpdating={props.submissionUpdating}
+          header={header}
+          updateCheckpointStates={updateCheckpointStates}
+          latePolicy={props.latePolicy}
+          customGradeStatusesEnabled={props.customGradeStatusesEnabled}
+          customGradeStatuses={props.customGradeStatuses}
+        />
       )
     }
 
@@ -435,31 +559,26 @@ export default class SubmissionTray extends React.Component<
       }
     }
 
-    const getSubAssignment = (hasCheckpoints, assignment, subAssignmentTag) => {
-      if (!hasCheckpoints) {
-        return assignment
-      }
-
-      const subAssignment = assignment.checkpoints.find(sub => sub.tag === subAssignmentTag)
-
-      return {
-        ...assignment,
-        pointsPossible: subAssignment.points_possible,
-      }
-    }
-
     const hasCheckpoints =
       this.props.assignment.hasSubAssignments && this.props.assignment.checkpoints.length > 0
     const replyToTopicSubmission = getSubAssignmentSubmission(
       hasCheckpoints,
       this.props.submission,
-      'reply_to_topic'
+      REPLY_TO_TOPIC
     )
     const replyToEntrySubmission = getSubAssignmentSubmission(
       hasCheckpoints,
       this.props.submission,
-      'reply_to_entry'
+      REPLY_TO_ENTRY
     )
+
+    const onRequestClose = () => {
+      this.props.onRequestClose()
+    }
+
+    const onClose = () => {
+      this.props.onClose()
+    }
 
     return (
       <ApolloProvider client={createClient()}>
@@ -469,12 +588,12 @@ export default class SubmissionTray extends React.Component<
           open={this.props.isOpen}
           shouldContainFocus={true}
           placement="end"
-          onDismiss={this.props.onRequestClose}
-          onClose={this.props.onClose}
+          onDismiss={onRequestClose}
+          onClose={onClose}
         >
           <CloseButton
             placement="start"
-            onClick={this.props.onRequestClose}
+            onClick={onRequestClose}
             screenReaderLabel={I18n.t('Close submission tray')}
           />
           <div className="SubmissionTray__Container">
@@ -544,17 +663,17 @@ export default class SubmissionTray extends React.Component<
                   isNotCountedForScore={this.props.isNotCountedForScore}
                   submission={this.props.submission}
                 />
-                {renderGradeInputForCheckpoints(
+                {renderInputsForCheckpoints(
                   hasCheckpoints,
                   this.props,
-                  'reply_to_topic',
+                  REPLY_TO_TOPIC,
                   replyToTopicSubmission,
                   I18n.t('Reply to Topic')
                 )}
-                {renderGradeInputForCheckpoints(
+                {renderInputsForCheckpoints(
                   hasCheckpoints,
                   this.props,
-                  'reply_to_entry',
+                  REPLY_TO_ENTRY,
                   replyToEntrySubmission,
                   I18n.t('Required Replies')
                 )}
@@ -583,21 +702,29 @@ export default class SubmissionTray extends React.Component<
                     />
                   </View>
                 )}
-                <View as="div" margin="small 0" className="hr" />
-                <View as="div" margin="0 0 small 0" data-testid="SubmissionTray__RadioInputGroup">
-                  <SubmissionTrayRadioInputGroup
-                    assignment={this.props.assignment}
-                    colors={this.props.colors}
-                    customGradeStatuses={this.props.customGradeStatuses}
-                    customGradeStatusesEnabled={this.props.customGradeStatusesEnabled}
-                    disabled={this.props.gradingDisabled}
-                    locale={this.props.locale}
-                    latePolicy={this.props.latePolicy}
-                    submission={this.props.submission}
-                    submissionUpdating={this.props.submissionUpdating}
-                    updateSubmission={this.props.updateSubmission}
-                  />
-                </View>
+                {!hasCheckpoints && (
+                  <>
+                    <View as="div" margin="small 0" className="hr" />
+                    <View
+                      as="div"
+                      margin="0 0 small 0"
+                      data-testid="SubmissionTray__RadioInputGroup"
+                    >
+                      <SubmissionTrayRadioInputGroup
+                        assignment={this.props.assignment}
+                        colors={this.props.colors}
+                        customGradeStatuses={this.props.customGradeStatuses}
+                        customGradeStatusesEnabled={this.props.customGradeStatusesEnabled}
+                        disabled={this.props.gradingDisabled}
+                        locale={this.props.locale}
+                        latePolicy={this.props.latePolicy}
+                        submission={this.props.submission}
+                        submissionUpdating={this.props.submissionUpdating}
+                        updateSubmission={this.props.updateSubmission}
+                      />
+                    </View>
+                  </>
+                )}
                 <View as="div" margin="small 0" className="hr" />
                 <View as="div" padding="xx-small">
                   <div id="SubmissionTray__Comments">

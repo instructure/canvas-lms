@@ -20,6 +20,10 @@ import {useEditor, useNode, type Node} from '@craftjs/core'
 import {useClassNames, getScrollParent} from '../../../../utils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor/page-block')
+
 export type PageBlockProps = {
   children?: React.ReactNode
 }
@@ -35,7 +39,7 @@ export const PageBlock = ({children}: PageBlockProps) => {
   const {
     connectors: {connect},
   } = useNode()
-  const clazz = useClassNames(enabled, {empty: !children}, ['page-block'])
+  const clazz = useClassNames(enabled, {empty: !children}, ['block', 'page-block'])
 
   // So that a section newly dropped in the editor gets selected,
   // RenderNode selects them on initial render. As a side-effect this also
@@ -75,7 +79,7 @@ export const PageBlock = ({children}: PageBlockProps) => {
   return (
     <div
       className={clazz}
-      data-placeholder="Add a section to start your page"
+      data-placeholder={I18n.t('Add a section to start your page')}
       ref={el => el && connect(el)}
       onPaste={handlePaste}
     >
@@ -88,7 +92,7 @@ export const PageBlock = ({children}: PageBlockProps) => {
 }
 
 PageBlock.craft = {
-  displayName: 'Page',
+  displayName: I18n.t('Page'),
   rules: {
     canMoveIn: (incomingNodes: Node[]) => {
       return incomingNodes.every((incomingNode: Node) => incomingNode.data.custom.isSection)

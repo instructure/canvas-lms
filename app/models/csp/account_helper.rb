@@ -154,6 +154,7 @@ module Csp::AccountHelper
     csp_tool_scope = ContextExternalTool.where(context_type: "Account", context_id: account_chain_ids).active
 
     if internal_service_only
+      csp_tool_scope = csp_tool_scope.where.not(developer_key_id: nil)
       unique_dev_keys = csp_tool_scope.distinct.pluck(:developer_key_id)
       internal_service_dev_keys = DeveloperKey.where(id: unique_dev_keys, internal_service: true).pluck(:id)
       csp_tool_scope = csp_tool_scope.where(developer_key_id: internal_service_dev_keys)

@@ -27,7 +27,7 @@ import {View} from '@instructure/ui-view'
 import {PreviewModal} from './PreviewModal'
 import {IconUndo, IconRedo} from '../../assets/internal-icons'
 
-type TopbarProps = {
+export type TopbarProps = {
   toolboxOpen: boolean
   onToolboxChange: (open: boolean) => void
 }

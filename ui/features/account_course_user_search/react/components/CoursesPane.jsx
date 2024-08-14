@@ -78,7 +78,8 @@ class CoursesPane extends React.Component {
 
   componentDidMount() {
     this.fetchCourses()
-    TermsStore.loadAll()
+    const accountId = TermsStore.getAccountId()
+    TermsStore.loadAll({subaccount_id: accountId})
   }
 
   componentWillUnmount() {
@@ -168,7 +169,12 @@ class CoursesPane extends React.Component {
     if (!courses || !courses.data) {
       courses = this.state.previousCourses
     }
-    const terms = TermsStore.get()
+    const accountId = TermsStore.getAccountId()
+    const terms = TermsStore.get({ subaccount_id: accountId })
+    let filteredTerms = []
+    if (terms.data) {
+      filteredTerms = terms.data.filter(term => term.used_in_subaccount)
+    }
     const isLoading = !(courses && !courses.loading)
 
     return (
@@ -181,6 +187,7 @@ class CoursesPane extends React.Component {
           onUpdateFilters={this.onUpdateFilters}
           onApplyFilters={this.onApplyFilters}
           terms={terms}
+          filteredTerms={filteredTerms}
           isLoading={isLoading}
           errors={errors}
           draftFilters={draftFilters}

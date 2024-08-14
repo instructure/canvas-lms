@@ -185,7 +185,7 @@ class TermsController < ApplicationController
     if api_request?
       enrollment_term_json(@term, @current_user, session, nil, ["overrides"])
     else
-      @term.as_json(include: :enrollment_dates_overrides)
+      @term.as_json(include: :enrollment_dates_overrides, methods: :filter_courses_by_term)
     end
   end
 end

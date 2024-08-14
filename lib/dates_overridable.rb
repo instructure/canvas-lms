@@ -391,8 +391,7 @@ module DatesOverridable
 
   def override_aware_due_date_hash(user, user_is_admin: false, assignment_object: self)
     hash = {}
-
-    if user_is_admin && assignment_object.has_too_many_overrides
+    if user_is_admin && assignment_object.has_too_many_overrides && !(assignment_object.is_a?(AbstractAssignment) && assignment_object.has_sub_assignments)
       hash[:has_many_overrides] = true
     elsif assignment_object.multiple_due_dates_apply_to?(user)
       hash[:vdd_tooltip] = OverrideTooltipPresenter.new(assignment_object, user).as_json

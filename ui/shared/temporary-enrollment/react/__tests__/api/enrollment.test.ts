@@ -87,51 +87,53 @@ describe('enrollment api', () => {
 
     describe('fetchTemporaryEnrollments', () => {
       it('fetches enrollments where the user is a recipient', async () => {
-        const mockJson = Promise.resolve([
-          {
-            ...mockEnrollment,
-            user: mockRecipientUser,
-            temporary_enrollment_provider: mockProviderUser,
-          },
-        ])
+        const mockJson = {
+          ...mockEnrollment,
+          user: mockRecipientUser,
+          temporary_enrollment_provider: mockProviderUser,
+        }
         ;(doFetchApi as jest.Mock).mockResolvedValue({
           response: {status: 200, ok: true},
           json: mockJson,
+          link: {current: {}, next: {}},
         })
 
-        const result = await fetchTemporaryEnrollments('1', true)
-        expect(result).toEqual(await mockJson)
+        const result = await fetchTemporaryEnrollments('1', true, '')
+        expect(result.enrollments).toEqual(mockJson)
       })
 
       it('fetches enrollments where the user is a provider', async () => {
-        const mockJson = Promise.resolve([
-          {
-            ...mockEnrollment,
-            user: mockRecipientUser,
-          },
-        ])
+        const mockJson = {
+          ...mockEnrollment,
+          user: mockRecipientUser,
+        }
+
         ;(doFetchApi as jest.Mock).mockResolvedValue({
           response: {status: 200, ok: true},
           json: mockJson,
+          link: {current: {}, next: {}},
         })
 
-        const result = await fetchTemporaryEnrollments('1', false)
-        expect(result).toEqual(await mockJson)
+        const result = await fetchTemporaryEnrollments('1', false, 'first')
+        expect(result.enrollments).toEqual(mockJson)
       })
 
       it('returns empty array when no enrollments are found', async () => {
         ;(doFetchApi as jest.Mock).mockResolvedValue({
           response: {status: 204, ok: true},
           json: [],
+          link: {current: {}, next: {}},
         })
 
-        const result = await fetchTemporaryEnrollments('1', true)
-        expect(result).toEqual([])
+        const result = await fetchTemporaryEnrollments('1', true, 'first')
+        expect(result.enrollments).toEqual([])
       })
 
       it('should throw an error when doFetchApi fails', async () => {
         ;(doFetchApi as jest.Mock).mockRejectedValue(new Error('An error occurred'))
-        await expect(fetchTemporaryEnrollments('1', true)).rejects.toThrow('An error occurred')
+        await expect(fetchTemporaryEnrollments('1', true, 'first')).rejects.toThrow(
+          'An error occurred'
+        )
       })
 
       it.each([
@@ -145,7 +147,7 @@ describe('enrollment api', () => {
           response: {status, statusText, ok: false},
           json: Promise.resolve({error: statusText}),
         })
-        await expect(fetchTemporaryEnrollments('1', true)).rejects.toThrow(
+        await expect(fetchTemporaryEnrollments('1', true, 'first')).rejects.toThrow(
           new Error(`Failed to get temporary enrollments for recipient`)
         )
       })
@@ -153,10 +155,10 @@ describe('enrollment api', () => {
       it('should return enrollment data with the correct type for a provider', async () => {
         ;(doFetchApi as jest.Mock).mockResolvedValue({
           response: {status: 200, ok: true},
-          json: Promise.resolve([{}]),
+          json: [{}],
           link: null,
         })
-        await fetchTemporaryEnrollments('1', false)
+        await fetchTemporaryEnrollments('1', false, 'first')
         expect(doFetchApi).toHaveBeenCalledWith(
           expect.objectContaining({
             path: '/api/v1/users/1/enrollments',
@@ -175,7 +177,7 @@ describe('enrollment api', () => {
           json: Promise.resolve([{}]),
           link: null,
         })
-        await fetchTemporaryEnrollments('1', true)
+        await fetchTemporaryEnrollments('1', true, 'first')
         expect(doFetchApi).toHaveBeenCalledWith(
           expect.objectContaining({
             path: '/api/v1/users/1/enrollments',

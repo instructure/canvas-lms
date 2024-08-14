@@ -4000,6 +4000,10 @@ class Course < ActiveRecord::Base
     when "conclude"
       unless completed?
         complete!
+        if Account.site_admin.feature_enabled?(:default_account_grading_scheme) && grading_standard_id.nil? && root_account.grading_standard_id
+          self.grading_standard_id = root_account.grading_standard_id
+          save!
+        end
         Auditors::Course.record_concluded(self, user, options)
       end
     when "delete"

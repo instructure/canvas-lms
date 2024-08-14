@@ -99,7 +99,7 @@ module Lti
 
       def update_registration_overlay
         registration = Lti::IMS::Registration.find(params[:registration_id])
-        # TODO: validate overlay against a schema
+        # TODO: validate overlay against a schema (see INTEROP-8538)
         registration.registration_overlay = JSON.parse(request.body.read)
         registration.save!
         registration.update_external_tools!

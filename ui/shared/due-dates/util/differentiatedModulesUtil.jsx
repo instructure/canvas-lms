@@ -137,9 +137,10 @@ export const resetStagedCards = (cards, newCardsState, defaultState) => {
   const newState = cloneObject(newCardsState)
   Object.keys(newState).forEach(rowKey => {
     const card = cards[rowKey] ?? defaultState[rowKey]
+    if(!card) return undefined;
     const newCard = newState[rowKey]
     const validOverrides = card.overrides.filter(o =>
-      newCard.overrides.find(override => o.stagedOverrideId === override.stagedOverrideId)
+      newCard?.overrides.find(override => o.stagedOverrideId === override.stagedOverrideId)
     )
 
     newCard.overrides = resetOverrides(validOverrides, newCard.overrides)
@@ -240,6 +241,50 @@ export const processModuleOverrides = (overrides, lastCheckpoint) => {
             id: undefined,
           }
         : o // If there are no changes, use the current override as is
+    }
+
+    return o
+  })
+
+  return withoutModuleOverrides
+}
+
+// This is a slightly modified version of the processModuleOverrides function for AssignToContent
+// The original function can be removed once we remove DifferentiatedModulesSection
+export const processModuleOverridesV2 = (overrides, initialModuleOverrides) => {
+  const rowKeyModuleOverrides = initialModuleOverrides.map(obj => obj.rowKey);
+  const withoutModuleOverrides = overrides.map(o => {
+    if (rowKeyModuleOverrides.includes(o.rowKey)) {
+      const initialModuleOverrideState = initialModuleOverrides.find(obj => obj.rowKey === o.rowKey)
+
+      const {persisted, id, context_module_id, context_module_name, ...previousAttributes} =
+        initialModuleOverrideState || {}
+
+      const {
+        persisted: _p,
+        id: id_,
+        context_module_id: cId,
+        context_module_name: cName,
+        ...currentAttributes
+      } = o
+
+      const hasDates = currentAttributes.due_at || currentAttributes.lock_at || currentAttributes.unlock_at
+      const hasChanges = hasDates || currentAttributes.stagedOverrideId != previousAttributes.stagedOverrideId || JSON.stringify(currentAttributes.student_ids)!=JSON.stringify(previousAttributes.student_ids)
+
+      //   If there are changes, remove the context_module override information
+      return hasChanges
+        ? {
+            ...o,
+            context_module_id: undefined,
+            context_module_name: undefined,
+            id: undefined,
+          }
+        : {
+          ...o,
+          context_module_id: initialModuleOverrideState.context_module_id,
+          context_module_name: initialModuleOverrideState.context_module_name,
+          id: initialModuleOverrideState.id,
+        } // If there are no changes, use the current override as is
     }
 
     return o

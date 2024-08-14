@@ -208,4 +208,41 @@ describe Types::SubmissionCommentType do
       ).to eq [0, 1, 2]
     end
   end
+
+  describe "#can_reply" do
+    context "course account limits student access" do
+      before(:once) do
+        account = @submission.course.account
+        account.settings[:enable_limited_access_for_students] = true
+        account.save!
+        account.root_account.enable_feature!(:allow_limited_access_for_students)
+      end
+
+      it "returns false for students" do
+        expect(
+          GraphQLTypeTester.new(@submission, current_user: @student1).resolve("commentsConnection(filter: {allComments: true}) { nodes { canReply }}")
+        ).to eq [false, false, false]
+      end
+
+      it "returns true for teachers" do
+        expect(
+          submission_type.resolve("commentsConnection(filter: {allComments: true}) { nodes { canReply }}")
+        ).to eq [true, true, true]
+      end
+    end
+
+    context "course account does not limit student access" do
+      it "returns true for students" do
+        expect(
+          GraphQLTypeTester.new(@submission, current_user: @student1).resolve("commentsConnection(filter: {allComments: true}) { nodes { canReply }}")
+        ).to eq [true, true, true]
+      end
+
+      it "returns true for teachers" do
+        expect(
+          submission_type.resolve("commentsConnection(filter: {allComments: true}) { nodes { canReply }}")
+        ).to eq [true, true, true]
+      end
+    end
+  end
 end

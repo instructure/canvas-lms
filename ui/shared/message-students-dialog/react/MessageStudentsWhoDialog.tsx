@@ -154,12 +154,6 @@ const isSubmittableAssignment = (assignment: CamelizedAssignment) =>
 const filterCriteria: FilterCriterion[] = [
   {
     requiresCutoff: false,
-    shouldShow: isSubmittableAssignment,
-    title: I18n.t('Have submitted'),
-    value: 'submitted',
-  },
-  {
-    requiresCutoff: false,
     shouldShow: () => false, // Will never show in dropdown, but is used with radio button group on "Have submitted" option
     title: I18n.t('Have submitted and been graded'),
     value: 'submitted_and_graded',
@@ -181,6 +175,12 @@ const filterCriteria: FilterCriterion[] = [
     shouldShow: () => false, // Will never show in dropdown, but is used with checkbox on "Have not yet submitted" option
     title: I18n.t('Have not yet submitted and excused'),
     value: 'unsubmitted_skip_excused',
+  },
+  {
+    requiresCutoff: false,
+    shouldShow: isSubmittableAssignment,
+    title: I18n.t('Have submitted'),
+    value: 'submitted',
   },
   {
     requiresCutoff: false,
@@ -215,13 +215,13 @@ const filterCriteria: FilterCriterion[] = [
   {
     requiresCutoff: true,
     shouldShow: assignment => !assignment,
-    title: I18n.t('Total grade higher than'),
+    title: I18n.t('Have total grade higher than'),
     value: 'total_grade_higher_than',
   },
   {
     requiresCutoff: true,
     shouldShow: assignment => !assignment,
-    title: I18n.t('Total grade lower than'),
+    title: I18n.t('Have total grade lower than'),
     value: 'total_grade_lower_than',
   },
 ]
@@ -238,6 +238,11 @@ function filterStudents(criterion, students, cutoff) {
   const newfilteredStudents: Student[] = []
   for (const student of students) {
     switch (criterion?.value) {
+      case 'unsubmitted':
+        if (!student.submittedAt) {
+          newfilteredStudents.push(student)
+        }
+        break
       case 'submitted':
         if (student.submittedAt) {
           newfilteredStudents.push(student)
@@ -250,11 +255,6 @@ function filterStudents(criterion, students, cutoff) {
         break
       case 'submitted_and_not_graded':
         if (student.submittedAt && (!student.grade || student.workflowState === 'pending_review')) {
-          newfilteredStudents.push(student)
-        }
-        break
-      case 'unsubmitted':
-        if (!student.submittedAt) {
           newfilteredStudents.push(student)
         }
         break
@@ -329,14 +329,14 @@ function defaultSubject(
 
   if (assignment) {
     switch (criterion) {
+      case 'unsubmitted':
+        return I18n.t('No submission for %{assignment}', {assignment: assignment.name})
       case 'submitted':
         return I18n.t('Submission for %{assignment}', {assignment: assignment.name})
       case 'submitted_and_graded':
         return I18n.t('Submission and grade for %{assignment}', {assignment: assignment.name})
       case 'submitted_and_not_graded':
         return I18n.t('Submission and no grade for %{assignment}', {assignment: assignment.name})
-      case 'unsubmitted':
-        return I18n.t('No submission for %{assignment}', {assignment: assignment.name})
       case 'graded':
         return I18n.t('Grade for %{assignment}', {assignment: assignment.name})
       case 'ungraded':

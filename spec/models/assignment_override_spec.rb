@@ -474,6 +474,16 @@ describe AssignmentOverride do
       @override.wiki_page = wiki_page_model
       expect(@override).not_to be_valid
     end
+
+    it "rejects a context module override with dates" do
+      @override = AssignmentOverride.new
+      @override.due_at = 5.days.from_now
+      @override.context_module = @course.context_modules.create!(name: "some module")
+      @override.save
+
+      expect(@override).not_to be_valid
+      expect(@override.errors[:base].first).to eq "cannot set dates for context module overrides"
+    end
   end
 
   describe "title" do

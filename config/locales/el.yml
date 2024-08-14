@@ -1940,7 +1940,7 @@ el:
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     one: "Είσαστε σίγουροι πως θέλετε να αφαιρέσετε %{name};"
     other: "Είσαστε σίγουροι πως θέλετε να αφαιρέσετε αυτά τα %{count} στοιχεία;"
-  are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Είστε βέβαιος ότι επιθυμείτε να διαγράψετε αυτή την ανακοίνωση;"
+  are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Είστε βέβαιοι ότι επιθυμείτε να διαγράψετε αυτή την ανακοίνωση;"
   are_you_sure_you_want_to_delete_this_comment_4ee386d: "Είσαστε σίγουροι πως θέλετε να αφαιρέσετε αυτό το σχόλιο;"
   are_you_sure_you_want_to_delete_this_developer_key_9937481a: "Είστε σίγουρος/η ότι θέλετε να διαγράψετε το κλειδί προγραμματιστή/ιας;"
   are_you_sure_you_want_to_delete_this_discussion_334554e0: "Είστε σίγουρος/η ότι επιθυμείτε να διαγράψετε αυτή τη συζήτηση;"
@@ -3630,6 +3630,7 @@ el:
   confirmation_code_required_22984955: "Κωδικός επιβεβαίωσης (απαιτείται)"
   confirmation_failed_please_try_again_ae566d37: "<mrk mid=\"5637\" mtype=\"seg\">Απέτυχε η επιβεβαίωση.</mrk>  <mrk mid=\"5638\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά.</mrk>"
   consumer_key_6f94ba11: "Κλειδί Καταναλωτή"
+  contact_a6e7f6da: "Τρόποι επικοινωνίας"
   content_exports: 
     buttons: 
       process: "Επεξεργασία Δεδομένων"
@@ -3876,6 +3877,7 @@ el:
         user_privileges: Προνόμια
       legends: 
         memberships: Συνδρομή(ες)
+        recent_messages: "Πρόσφατα Μυνήματα"
       links: 
         cant_delete: "Αδύντη η Διαγραφή"
         conclude_enrollment: "Ολοκλήρωση αυτής της Εγγραφής"
@@ -3885,6 +3887,7 @@ el:
         user_account_details: "Λεπτομέρειες Λογαριασμού Χρήστη"
         user_only_view_section: "περιορίστε αυτόν τον χρήστη να βλέπει μόνο χρήστες του τομέα του"
         user_view_all_sections: "επιτρέψτε σε αυτόν τον χρήστη να βλέπει όλους τους χρήστες του μαθήματος"
+      no_messages: "Κανένα μήνυμα"
       user_only_view_section: "αυτός ο χρήστης μπορεί να δει μόνο τους σπουδαστές του/των τομέα/ων μαθήματος που του έχει/ουν ανατεθεί"
       user_view_all_sections: "αυτός ο χρήστης μπορεί να δει σπουδαστές οποιουδήποτε τομέα μαθήματος"
     no_user: 
@@ -11096,6 +11099,7 @@ el:
   primary_color_button_disabled_9081ddff: "Το κουμπί βασικού χρώματος έχει απενεργοποιηθεί"
   priority_dd4381ee: Προτεραιότητα
   privacy_290109ea: Απόρρητο
+  privacy_policy_c68f482a: "Πολιτική Απορρήτου"
   processing_2fcc9739: "Γίνεται Επεξεργασία"
   product_name: Canvas
   profile: 
@@ -11203,6 +11207,7 @@ el:
         registered_services: "Υπηρεσίες στις οποίες έχετε Εγγραφεί"
         remove: Αφαίρεση
         share_skype_id: "Μοιραστείτε το Skype ID σας"
+        state: Κατάσταση
         twitter_access: "Πρόσβαση Twitter"
         ways_to_log_in: "Τρόποι για σύνδεση"
         web_services: "Υπηρεσίες Web"
@@ -15531,6 +15536,7 @@ el:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Μάθημα Blackboard Vista/CE, WebCT 6+"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  website_adea4d05: Ιστοσελίδα
   website_url_177fc1dc: "URL ιστοσελίδας"
   week_1f945ddd: Εβδομάδα
   week_s_cb1492ee: Εβδομάδα/ες

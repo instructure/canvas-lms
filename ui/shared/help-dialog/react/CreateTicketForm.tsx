@@ -115,14 +115,7 @@ function CreateTicketForm({onSubmit, onCancel}: Props) {
           <span
             className="ic-Form-help-text"
             dangerouslySetInnerHTML={{
-              __html: I18n.t(
-                'Include a link to a screencast/screenshot using something like *Jing*.',
-                {
-                  wrappers: [
-                    '<a target="_blank" href="http://www.techsmith.com/download/jing">$1</a>',
-                  ],
-                }
-              ),
+              __html: I18n.t('If you’re able, include a link to a screencast/screenshot.'),
             }}
           />
         </label>

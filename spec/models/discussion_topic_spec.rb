@@ -250,15 +250,30 @@ describe DiscussionTopic do
     expect(@course.discussion_topics.first.message).to eql("<a href=\"#\">only this should stay</a>")
   end
 
-  it "defaults to side_comment type" do
+  it "side-comment discussion type is threaded when it has threaded replies" do
+    topic = @course.discussion_topics.create!(message: "test")
+    topic.discussion_type = "side_comment"
+    entry = topic.discussion_entries.create!(message: "test")
+    entry.reply_from(user: @student, html: "reply 1")
+    expect(topic.threaded?).to be true
+  end
+
+  it "side-comment discussion type is not threaded when it does not have threaded replies" do
+    topic = @course.discussion_topics.create!(message: "test")
+    topic.discussion_type = "side_comment"
+    topic.discussion_entries.create!(message: "test")
+    expect(topic.threaded?).to be false
+  end
+
+  it "defaults to not_threaded type" do
     d = DiscussionTopic.new
-    expect(d.discussion_type).to eq "side_comment"
+    expect(d.discussion_type).to eq "not_threaded"
 
     d.threaded = "1"
     expect(d.discussion_type).to eq "threaded"
 
     d.threaded = ""
-    expect(d.discussion_type).to eq "side_comment"
+    expect(d.discussion_type).to eq "not_threaded"
   end
 
   it "defaults to threaded type with react_discussions_post" do
@@ -307,12 +322,15 @@ describe DiscussionTopic do
 
   context "permissions" do
     before do
+      @course.enable_feature!(:react_discussions_post)
+      @course.root_account.enable_feature!(:discussion_create)
       @teacher1 = @teacher
       @teacher2 = user_factory
       teacher_in_course(course: @course, user: @teacher2, active_all: true)
 
       @topic = @course.discussion_topics.create!(user: @teacher1)
       @topic.unpublish!
+      @topic.discussion_type = "threaded"
       @entry = @topic.discussion_entries.create!(user: @teacher1)
       @entry.discussion_topic = @topic
 
@@ -1143,7 +1161,7 @@ describe DiscussionTopic do
         @topic.refresh_subtopics
         subtopics = @topic.reload.child_topics
         subtopics.each do |st|
-          expect(st.discussion_type).to eq "side_comment"
+          expect(st.discussion_type).to eq "not_threaded"
           expect(st.attachment_id).to be_nil
         end
 
@@ -2326,7 +2344,7 @@ describe DiscussionTopic do
     end
 
     it "returns empty data for a materialized view on a new (unsaved) topic" do
-      new_topic = DiscussionTopic.new(context: @topic.context, discussion_type: DiscussionTopic::DiscussionTypes::SIDE_COMMENT)
+      new_topic = DiscussionTopic.new(context: @topic.context, discussion_type: DiscussionTopic::DiscussionTypes::NOT_THREADED)
       expect(new_topic).to be_new_record
       expect(new_topic.materialized_view).to eq ["[]", [], [], []]
       expect(Delayed::Job.where(singleton: "materialized_discussion:#{new_topic.id}").count).to eq 0

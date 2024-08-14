@@ -35,6 +35,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
           Ratings
         </ColHeader>
         <ColHeader
+          data-testid="table-heading-points"
           id="table-heading-points"
           key="TableHeadingPoints"
           scope="col"
@@ -75,6 +76,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
           Ratings
         </ColHeader>
         <ColHeader
+          data-testid="table-heading-points"
           id="table-heading-points"
           key="TableHeadingPoints"
           scope="col"
@@ -252,6 +254,7 @@ exports[`the Rubric component points column does have a points column if points 
           Ratings
         </ColHeader>
         <ColHeader
+          data-testid="table-heading-points"
           id="table-heading-points"
           key="TableHeadingPoints"
           scope="col"
@@ -292,6 +295,7 @@ exports[`the Rubric component points column does have a points column if points 
           Ratings
         </ColHeader>
         <ColHeader
+          data-testid="table-heading-points"
           id="table-heading-points"
           key="TableHeadingPoints"
           scope="col"
@@ -1039,6 +1043,7 @@ exports[`the Rubric component points column does not have a points column in sum
             <Item
               as="span"
               data-selenium="rubric_total"
+              data-testid="rubric-total"
               shouldGrow={false}
               shouldShrink={false}
             >
@@ -1087,6 +1092,7 @@ exports[`the Rubric component points column has a points column if points visibl
           Ratings
         </ColHeader>
         <ColHeader
+          data-testid="table-heading-points"
           id="table-heading-points"
           key="TableHeadingPoints"
           scope="col"
@@ -1127,6 +1133,7 @@ exports[`the Rubric component points column has a points column if points visibl
           Ratings
         </ColHeader>
         <ColHeader
+          data-testid="table-heading-points"
           id="table-heading-points"
           key="TableHeadingPoints"
           scope="col"
@@ -1281,6 +1288,7 @@ exports[`the Rubric component points column has a points column if points visibl
             <Item
               as="span"
               data-selenium="rubric_total"
+              data-testid="rubric-total"
               shouldGrow={false}
               shouldShrink={false}
             >
@@ -1329,6 +1337,7 @@ exports[`the Rubric component renders as expected 1`] = `
           Ratings
         </ColHeader>
         <ColHeader
+          data-testid="table-heading-points"
           id="table-heading-points"
           key="TableHeadingPoints"
           scope="col"
@@ -1369,6 +1378,7 @@ exports[`the Rubric component renders as expected 1`] = `
           Ratings
         </ColHeader>
         <ColHeader
+          data-testid="table-heading-points"
           id="table-heading-points"
           key="TableHeadingPoints"
           scope="col"
@@ -1523,6 +1533,7 @@ exports[`the Rubric component renders as expected 1`] = `
             <Item
               as="span"
               data-selenium="rubric_total"
+              data-testid="rubric-total"
               shouldGrow={false}
               shouldShrink={false}
             >
@@ -1571,6 +1582,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
           Ratings
         </ColHeader>
         <ColHeader
+          data-testid="table-heading-points"
           id="table-heading-points"
           key="TableHeadingPoints"
           scope="col"
@@ -1611,6 +1623,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
           Ratings
         </ColHeader>
         <ColHeader
+          data-testid="table-heading-points"
           id="table-heading-points"
           key="TableHeadingPoints"
           scope="col"
@@ -1734,6 +1747,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
             <Item
               as="span"
               data-selenium="rubric_total"
+              data-testid="rubric-total"
               shouldGrow={false}
               shouldShrink={false}
             >
@@ -1782,6 +1796,7 @@ exports[`the Rubric component updates the total score when an individual criteri
           Ratings
         </ColHeader>
         <ColHeader
+          data-testid="table-heading-points"
           id="table-heading-points"
           key="TableHeadingPoints"
           scope="col"
@@ -1822,6 +1837,7 @@ exports[`the Rubric component updates the total score when an individual criteri
           Ratings
         </ColHeader>
         <ColHeader
+          data-testid="table-heading-points"
           id="table-heading-points"
           key="TableHeadingPoints"
           scope="col"
@@ -1975,6 +1991,7 @@ exports[`the Rubric component updates the total score when an individual criteri
             <Item
               as="span"
               data-selenium="rubric_total"
+              data-testid="rubric-total"
               shouldGrow={false}
               shouldShrink={false}
             >

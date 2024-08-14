@@ -29,4 +29,4 @@ const getContrastingButtonColor = (color1: string) => {
   return buttonColor
 }
 
-export {getContrastingColor, getContrastingButtonColor}
+export {getContrastingColor, getContrastingButtonColor, white, black}

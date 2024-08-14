@@ -28,6 +28,9 @@ import {useQuery} from '@canvas/query'
 import {SplitCoursesList, CourseListItemContent} from '../lists/SplitCoursesList'
 import coursesQuery, {hideHomeroomCourseIfK5Student} from '../queries/coursesQuery'
 import type {Course} from '../../../../api.d'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+
+declare const window: Window & {ENV: GlobalEnv}
 
 const I18n = useI18nScope('CoursesTray')
 

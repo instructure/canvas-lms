@@ -67,6 +67,14 @@ module Factories
     section_id = options[:section_id] || options[:section].try(:id) || course.default_section.id
     type = options[:enrollment_type] || "StudentEnrollment"
     role_id = options[:role].try(:id) || Role.get_built_in_role(type, root_account_id: course.root_account_id).id
+
+    source_user_id = options[:temporary_enrollment_source_user_id] || nil
+    pairing_hash = {}
+    if source_user_id
+      pairing = create_records(TemporaryEnrollmentPairing, user_ids.map { { root_account_id: course.account_id, ending_enrollment_state: "deleted", created_at: now, updated_at: now } })
+      user_ids.each_with_index { |id, index| pairing_hash[id] = pairing[index] }
+    end
+
     result = create_records(Enrollment,
                             user_ids.map do |id|
                               {
@@ -81,7 +89,9 @@ module Factories
                                 associated_user_id:,
                                 limit_privileges_to_course_section:,
                                 created_at: now,
-                                updated_at: now
+                                updated_at: now,
+                                temporary_enrollment_source_user_id: source_user_id,
+                                temporary_enrollment_pairing_id: pairing_hash[id]
                               }
                             end,
                             options[:return_type])

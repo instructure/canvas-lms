@@ -16,6 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {PageBlock} from './PageBlock'
+import {PageBlock, type PageBlockProps} from './PageBlock'
 
-export {PageBlock}
+export {PageBlock, type PageBlockProps}

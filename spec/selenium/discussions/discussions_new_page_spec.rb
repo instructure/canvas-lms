@@ -997,6 +997,52 @@ describe "discussions" do
           expect(rule_first_assignment.id).to eq(@assignment_for_mp.id)
         end
       end
+
+      context "when instui_nav feature flag on" do
+        page_header_title_discussion = "Create Discussion"
+        page_header_title_announcement = "Create Announcement"
+
+        before do
+          course.root_account.enable_feature!(:instui_nav)
+        end
+
+        it "create discussion header title rendered correctly" do
+          get "/courses/#{course.id}/discussion_topics/new"
+          expect(fj("h1:contains('#{page_header_title_discussion}')").text).to eq page_header_title_discussion
+        end
+
+        it "Use tab style filter element in normal view and dropdown in mobile view" do
+          get "/courses/#{course.id}/discussion_topics/new"
+          expect(f("div[role='tab']").text).to eq "Details"
+          resize_screen_to_mobile_width
+          expect(f("input[id='Select_0']").attribute("title")).to eq "Details"
+        end
+
+        it "After Save and publish need to see a publish pill in edit page" do
+          get "/courses/#{course.id}/discussion_topics/new"
+
+          title = "My Test Topic"
+
+          expect(fj("span[data-testid='publish-status-pill']:contains('Unpublished')").text).to eq "Unpublished"
+          f("input[placeholder='Topic Title']").send_keys title
+          f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+
+          dt = DiscussionTopic.last
+
+          expect(dt).to be_published
+          expect(driver.current_url).to end_with("/courses/#{course.id}/discussion_topics/#{dt.id}")
+
+          get "/courses/#{course.id}/discussion_topics/#{dt.id}/edit"
+
+          expect(fj("span[data-testid='publish-status-pill']:contains('Published')").text).to eq "Published"
+        end
+
+        it "create announcement header title rendered correctly" do
+          get "/courses/#{course.id}/discussion_topics/new?is_announcement=true"
+          expect(fj("h1:contains('#{page_header_title_announcement}')").text).to eq page_header_title_announcement
+        end
+      end
     end
 
     context "announcements" do

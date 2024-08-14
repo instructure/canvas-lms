@@ -49,10 +49,22 @@ describe PlannerNotesController do
         user_session(@student)
       end
 
+      def enable_limited_access_for_account
+        @course.root_account.enable_feature!(:allow_limited_access_for_students)
+        @course.account.settings[:enable_limited_access_for_students] = true
+        @course.account.save!
+      end
+
       describe "GET #index" do
         it "returns http success" do
           get :index
           expect(response).to be_successful
+        end
+
+        it "renders unauthorized if student in limited access account" do
+          enable_limited_access_for_account
+          get :index
+          assert_unauthorized
         end
 
         it "excludes deleted courses" do
@@ -124,6 +136,12 @@ describe PlannerNotesController do
           expect(response).to be_successful
         end
 
+        it "renders unauthorized if student in limited access account" do
+          enable_limited_access_for_account
+          get :show, params: { id: @student_note.id }
+          assert_unauthorized
+        end
+
         it "returns http not found for notes not yours" do
           u = user_factory(active_all: true)
           u_note = planner_note_model(user: u, todo_date: 1.week.from_now)
@@ -138,6 +156,12 @@ describe PlannerNotesController do
           put :update, params: { id: @student_note.id, title: updated_title }
           expect(response).to be_successful
           expect(@student_note.reload.title).to eq updated_title
+        end
+
+        it "renders unauthorized if student in limited access account" do
+          enable_limited_access_for_account
+          put :update, params: { id: @student_note.id, title: "updated_title" }
+          assert_unauthorized
         end
 
         it "invalidates the planner cache" do
@@ -190,6 +214,12 @@ describe PlannerNotesController do
           post :create, params: { title: "A title about things", details: "Details about now", todo_date: 1.day.from_now }
           expect(response).to have_http_status(:created)
           expect(PlannerNote.where(user_id: @student.id).count).to eq 4
+        end
+
+        it "renders unauthorized if student in limited access account" do
+          enable_limited_access_for_account
+          post :create, params: { title: "A title about things", details: "Details about now", todo_date: 1.day.from_now }
+          assert_unauthorized
         end
 
         it "invalidates the planner cache" do
@@ -410,6 +440,12 @@ describe PlannerNotesController do
           delete :destroy, params: { id: @student_note.id }
           expect(response).to be_successful
           expect(@student_note.reload).to be_deleted
+        end
+
+        it "renders unauthorized if student in limited access account" do
+          enable_limited_access_for_account
+          delete :destroy, params: { id: @student_note.id }
+          assert_unauthorized
         end
 
         it "invalidates the planner cache" do

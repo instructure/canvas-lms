@@ -27,15 +27,15 @@ ready(() => {
   const pairing_container = document.getElementById('pairing-code')
 
   const permissions = ENV.PERMISSIONS
-  
-  const tempEnrollPermissions = {
+
+  const modifyPermissions = {
     canAdd: permissions.can_add_temporary_enrollments,
     canEdit: permissions.can_edit_temporary_enrollments,
     canDelete: permissions.can_delete_temporary_enrollments,
     canView: permissions.can_view_temporary_enrollments,
   }
 
-  const enrollPerm = {
+  const rolePermissions = {
     teacher: permissions.can_add_teacher,
     ta: permissions.can_add_ta,
     student: permissions.can_add_student,
@@ -52,16 +52,16 @@ ready(() => {
     )
   }
 
-  if (tempEnrollPermissions.canView !== undefined) {
+  if (modifyPermissions.canView !== undefined) {
     const temp_enrollments_container = document.getElementById('manage-temp-enrollments-mount-point')
 
     if (temp_enrollments_container) {
       ReactDOM.render(
         <ManageTempEnrollButton
          user={{id: ENV.USER_ID, name: ENV.CONTEXT_USER_DISPLAY_NAME}}
-         tempEnrollPermissions={tempEnrollPermissions}
+         modifyPermissions={modifyPermissions}
          roles={roles}
-         enrollPerm={enrollPerm}
+         rolePermissions={rolePermissions}
          can_read_sis={permissions.can_read_sis}
         />,
         temp_enrollments_container

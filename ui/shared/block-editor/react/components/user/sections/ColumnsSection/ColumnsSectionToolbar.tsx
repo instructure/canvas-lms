@@ -19,21 +19,24 @@
 import React, {useCallback, useState} from 'react'
 import {useNode} from '@craftjs/core'
 import {IconButton} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
 import {Menu, type MenuItemProps, type MenuItem} from '@instructure/ui-menu'
 import {IconCheckLine} from '@instructure/ui-icons'
 import {type ColumnsSectionVariant, type ColumnsSectionProps} from './types'
 import {ColumnCountPopup} from './ColumnCountPopup'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor/columnss-block')
+
 const ColumnsSectionToolbar = () => {
   const {
-    columns,
-    variant,
     actions: {setProp},
+    props,
   } = useNode(node => ({
-    columns: node.data.props.columns,
-    variant: node.data.props.variant,
+    props: node.data.props,
   }))
-  const [vart, setVart] = useState<ColumnsSectionVariant>(variant)
+  const [vart, setVart] = useState<ColumnsSectionVariant>(props.variant)
 
   const handleChangeVariant = useCallback(
     (
@@ -42,16 +45,16 @@ const ColumnsSectionToolbar = () => {
       _selected: MenuItemProps['selected'],
       _args: MenuItem
     ) => {
-      const vart = value as ColumnsSectionVariant
-      setVart(vart)
-      setProp((prps: ColumnsSectionProps) => (prps.variant = vart))
+      const val = value as ColumnsSectionVariant
+      setVart(val)
+      setProp((prps: ColumnsSectionProps) => (prps.variant = val))
     },
     [setProp]
   )
 
   return (
-    <div>
-      <ColumnCountPopup columns={columns} />
+    <Flex gap="small">
+      <ColumnCountPopup columns={props.columns} />
 
       <Menu
         trigger={
@@ -59,21 +62,21 @@ const ColumnsSectionToolbar = () => {
             size="small"
             withBorder={false}
             withBackground={false}
-            screenReaderLabel="variant"
+            screenReaderLabel={I18n.t('Column style')}
           >
             <IconCheckLine size="x-small" />
           </IconButton>
         }
         onSelect={handleChangeVariant}
       >
-        <Menu.Item type="checkbox" value="fixed" selected={vart === 'fixed'}>
-          Fixed
+        <Menu.Item type="checkbox" value="fixed" defaultSelected={vart === 'fixed'}>
+          {I18n.t('Fixed')}
         </Menu.Item>
-        <Menu.Item type="checkbox" value="fluid" selected={vart === 'fluid'}>
-          Fluid
+        <Menu.Item type="checkbox" value="fluid" defaultSelected={vart === 'fluid'}>
+          {I18n.t('Fluid')}
         </Menu.Item>
       </Menu>
-    </div>
+    </Flex>
   )
 }
 

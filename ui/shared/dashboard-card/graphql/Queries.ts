@@ -23,10 +23,10 @@ import {ActivityStreamSummary} from './ActivityStream'
 const dashcard_query_enabled = !!ENV?.FEATURES?.dashboard_graphql_integration
 
 export const LOAD_DASHBOARD_CARDS_QUERY = gql`
-  query GetDashboardCards($userID: ID!, $observedUserId: ID = null) {
+  query GetDashboardCards($userID: ID!, $observedUserID: ID = null) {
     legacyNode(_id: $userID, type: User) {
       ... on User {
-        favoriteCoursesConnection(dashboardFilter: {observedUserId: $observedUserId}) {
+        favoriteCoursesConnection(dashboardFilter: {observedUserId: $observedUserID}) {
           nodes {
             _id
             dashboardCard {

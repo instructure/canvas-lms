@@ -4709,6 +4709,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       grade: submission.entered_grade,
       score: submission.entered_score,
       valid: true,
+      subAssignmentTag: submissionData?.subAssignmentTag,
     }
     return this.apiUpdateSubmission(submissionData, gradeInfo)
   }

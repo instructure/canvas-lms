@@ -589,6 +589,7 @@ class Folder < ActiveRecord::Base
       next_clear_cache = next_lock_change
       if next_clear_cache.present? && next_clear_cache < (Time.zone.now + AdheresToPolicy::Cache::CACHE_EXPIRES_IN)
         delay(run_at: next_clear_cache, singleton: "clear_permissions_cache_#{global_id}").clear_permissions_cache
+        delay(run_at: next_clear_cache, singleton: "clear_active_users_cache_#{global_id}").clear_active_users_cache
       end
     end
   end
@@ -596,6 +597,10 @@ class Folder < ActiveRecord::Base
   def clear_downstream_permissions
     active_file_attachments.touch_all
     active_sub_folders.each(&:clear_permissions_cache)
+  end
+
+  def clear_active_users_cache
+    context.active_users.each(&:clear_caches) if context.is_a?(Course)
   end
 
   def next_lock_change

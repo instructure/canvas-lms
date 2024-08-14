@@ -50,6 +50,8 @@ export async function waitForProcessing(progress, sleep_time = 2000) {
     return uploadedGradebook
   } else if (progress.message?.includes('Invalid header row')) {
     throw new Error(I18n.t('The CSV header row is invalid.'))
+  } else if (progress.message?.includes('Invalid attachment')) {
+    throw new Error(I18n.t('The CSV file is empty or invalid.'))
   } else {
     throw new Error(
       I18n.t('An unknown error has occurred. Verify the CSV file or try again later.')

@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+# test selenium run
+require_relative "../common"
 require_relative "pages/discussions_index_page"
 require_relative "../helpers/discussions_common"
 require_relative "../helpers/context_modules_common"
@@ -348,6 +350,39 @@ describe "discussions index" do
         login_and_visit_course(@teacher, @course)
         DiscussionsIndex.discussion_menu(discussion.title).click
         expect(DiscussionsIndex.manage_discussions_menu).not_to include_text("Assign To")
+      end
+    end
+
+    context "when instui nav feature flag on" do
+      page_header_title_all = "Discussions"
+      page_header_title_unread = "Unread Discussions"
+
+      before do
+        @course.root_account.enable_feature!(:instui_nav)
+        login_and_visit_course(@teacher, @course)
+      end
+
+      it "discussions header title rendered correctly without filter selection" do
+        expect(DiscussionsIndex.discussion_header_title(page_header_title_all)).to eq page_header_title_all
+      end
+
+      it "discussions header title rendered correctly with all filter" do
+        DiscussionsIndex.select_filter_from_menu("all")
+        current_title = DiscussionsIndex.discussion_header_title(page_header_title_all)
+        expect(current_title).to eq page_header_title_all
+      end
+
+      it "discussions header title rendered correctly with unread filter" do
+        DiscussionsIndex.select_filter_from_menu("unread")
+        current_title = DiscussionsIndex.discussion_header_title(page_header_title_unread)
+        expect(current_title).to eq page_header_title_unread
+      end
+
+      it "discussions can be filtered with unread filter" do
+        DiscussionsIndex.select_filter_from_menu("unread")
+        expect(DiscussionsIndex.discussion(discussion1_title)).to be_displayed
+        expect(DiscussionsIndex.discussion_group("Closed for Comments"))
+          .not_to contain_jqcss(DiscussionsIndex.discussion_title_css(discussion2_title))
       end
     end
   end

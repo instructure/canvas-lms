@@ -79,17 +79,28 @@ $('.add_federated_attribute_button').click(function (event) {
   const $selected_canvas_attribute = $canvas_attribute_select.find('option:selected')
   const id_suffix = $template.data('idsuffix')
   const canvas_attribute_html = $selected_canvas_attribute.text()
-  const checkbox_name = `authentication_provider[federated_attributes][${canvas_attribute_html}][provisioning_only]`
-  const checkbox_id = `aacfa_${canvas_attribute_html}_provisioning_only_${id_suffix}`
-  $template.find('.provisioning_only_column label').attr('for', checkbox_id)
-  $template.find("input[type='checkbox']").attr('name', checkbox_name)
-  $template.find("input[type='checkbox']").attr('id', checkbox_id)
+  const provisioning_only_checkbox_name = `authentication_provider[federated_attributes][${canvas_attribute_html}][provisioning_only]`
+  const provisioning_only_checkbox_id = `aacfa_${canvas_attribute_html}_provisioning_only_${id_suffix}`
+  $template.find('.provisioning_only_column label').attr('for', provisioning_only_checkbox_id)
+  $template.find("input[type='checkbox']").attr('name', provisioning_only_checkbox_name)
+  $template.find("input[type='checkbox']").attr('id', provisioning_only_checkbox_id)
   $template.find('.canvas_attribute_name').append($selected_canvas_attribute.text())
   const provider_attribute_name = `authentication_provider[federated_attributes][${canvas_attribute_html}][attribute]`
   const provider_attribute_id = `aacfa_${canvas_attribute_html}_attribute_${id_suffix}`
   $template.find('.provider_attribute_column label').attr('for', provider_attribute_id)
   $provider_attribute.attr('name', provider_attribute_name)
   $provider_attribute.attr('id', provider_attribute_id)
+  const $autoconfirm_column = $template.find('.autoconfirm_column')
+  if (canvas_attribute_html === 'email') {
+    const autoconfirm_checkbox_name = `authentication_provider[federated_attributes][email][autoconfirm]`
+    const autoconfirm_checkbox_id = `aacfa_email_autoconfirm_${id_suffix}`
+    $autoconfirm_column.find('label').attr('for', autoconfirm_checkbox_id)
+    $autoconfirm_column.find("input[type='checkbox']").attr('name', autoconfirm_checkbox_name)
+    $autoconfirm_column.find("input[type='checkbox']").attr('id', autoconfirm_checkbox_id)
+  } else {
+    $autoconfirm_column.empty()
+    $autoconfirm_column.append('&nbsp;')
+  }
   $federated_attributes.find('tbody').append($template)
   $selected_canvas_attribute.remove()
   $template.show()

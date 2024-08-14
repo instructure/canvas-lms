@@ -71,6 +71,14 @@
 
 .block {
   position: relative;
+  line-height: 1.2rem;
+  min-height: 1.2rem;
+  &.empty {
+    border: 1px dotted #ababab;
+  }
+  &.rce-text-block {
+    min-width: 50%;
+  }
 }
 
 .page-block {
@@ -99,6 +107,17 @@
   border-style: solid solid solid none;
 }
 
+.block-editor-editor .block-toolbar {
+  .toolbar-separator {
+    display: inline-block;
+    box-sizing: border-box;
+    border-inline-end: 1px solid #C7CDD1;
+    width: 1px;
+    height: 1.5rem;
+    background: #ababab;
+    margin-inline-end: 2px;
+  }
+}
 .block-editor-editor .block-toolbar, .block-editor-editor .block-tag {
   position: absolute;
   display: flex;
@@ -136,6 +155,7 @@
 }
 
 .selected, .hovered {
+  border-radius: 4px;
   outline-offset: 1px;
   outline-width: 1px;
   outline-style: dashed;
@@ -185,9 +205,6 @@
   padding: .25rem;
   min-height: 2.5rem;
   min-width: 2.5rem;
-  &.empty {
-    border: 1px dotted #ababab;
-  }
 }
 
 .paragraph-block {
@@ -480,6 +497,19 @@
 }
 .columns-section__inner.empty::before {
   content: "Drop a block to add it to this column";
+}
+
+.icon-picker__icon {
+  padding:2px;
+  display:inline-block;
+  cursor:pointer;
+  border-radius:4px;
+  &.selected {
+
+  }
+  &:focus {
+    border: 2px solid var(--ic-brand-primary);
+  }
 }
 
 @container block-editor-view (width <= 320px) {

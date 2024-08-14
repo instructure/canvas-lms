@@ -921,6 +921,16 @@ describe SectionsController, type: :request do
         expect(json["error"]).to eq "cannot crosslist into blueprint courses"
       end
 
+      it "does not fail if the destination course is a course which was once a blueprint" do
+        MasterCourses::MasterTemplate.set_as_master_course(@dest_course).update_attribute(:workflow_state, "deleted")
+        api_call(:post,
+                 "/api/v1/sections/#{@section.id}/crosslist/#{@dest_course.id}",
+                 @params.merge(id: @section.to_param, new_course_id: @dest_course.to_param),
+                 {},
+                 {},
+                 expected_status: 200)
+      end
+
       it "fails if the destination course is under a different root account" do
         foreign_account = Account.create!
         foreign_course = foreign_account.courses.create!

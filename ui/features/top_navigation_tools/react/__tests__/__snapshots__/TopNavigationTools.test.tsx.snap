@@ -51,6 +51,7 @@ exports[`MobileTopNavigationTools renders 1`] = `
         alt="Tool 2"
         display="inline-block"
         height="1rem"
+        onError={[Function]}
         src="https://instructure.com"
         withBlur={false}
         withGrayscale={false}
@@ -95,6 +96,7 @@ exports[`MobileTopNavigationTools renders 1`] = `
         alt="Tool 1"
         display="inline-block"
         height="1rem"
+        onError={[Function]}
         src="https://instructure.com"
         withBlur={false}
         withGrayscale={false}
@@ -192,8 +194,14 @@ exports[`TopNavigationTools renders 1`] = `
           withVisualDebug={false}
           wrap="no-wrap"
         >
-          <IconLtiLine
-            title="Tool 2"
+          <Img
+            alt="Tool 2"
+            display="inline-block"
+            height="1rem"
+            onError={[Function]}
+            src=""
+            withBlur={false}
+            withGrayscale={false}
           />
           <TruncateText
             debounce={0}
@@ -242,6 +250,7 @@ exports[`TopNavigationTools renders 1`] = `
             alt="Tool 1"
             display="inline-block"
             height="1rem"
+            onError={[Function]}
             src="https://instructure.com"
             withBlur={false}
             withGrayscale={false}
@@ -335,6 +344,7 @@ exports[`TopNavigationTools renders with no pinned tools 1`] = `
             alt="Tool 1"
             display="inline-block"
             height="1rem"
+            onError={[Function]}
             src="https://instructure.com"
             withBlur={false}
             withGrayscale={false}
@@ -378,6 +388,7 @@ exports[`TopNavigationTools renders with no pinned tools 1`] = `
             alt="Tool 2"
             display="inline-block"
             height="1rem"
+            onError={[Function]}
             src="https://instructure.com"
             withBlur={false}
             withGrayscale={false}

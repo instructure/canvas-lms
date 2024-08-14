@@ -21,6 +21,20 @@ RSpec.describe VideoCaptionService, type: :service do
   let(:service) { VideoCaptionService.new(media_object, skip_polling: true) }
 
   describe "#call" do
+    context "when media type is nil" do
+      it "handles the request gracefully and sets status to failed_initial_validation" do
+        media_object.update!(media_type: nil)
+        allow(service).to receive_messages(
+          config: { "app-host" => "https://example.com" },
+          auth_token: "token"
+        )
+
+        expect { service.call }.to change {
+          media_object.reload.auto_caption_status
+        }.from(nil).to("failed_initial_validation")
+      end
+    end
+
     context "when media type is video and media id is present" do
       before do
         allow(service).to receive_messages(

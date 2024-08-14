@@ -26,6 +26,7 @@ class ContextExternalTool < ActiveRecord::Base
   has_many :content_tags, as: :content
   has_many :context_external_tool_placements, autosave: true
   has_many :lti_resource_links, class_name: "Lti::ResourceLink"
+  has_many :progresses, as: :context, inverse_of: :context
 
   belongs_to :context, polymorphic: [:course, :account]
   belongs_to :developer_key
@@ -1481,6 +1482,7 @@ class ContextExternalTool < ActiveRecord::Base
 
     # is there a 1.1 tool that matches this one?
     matching_1_1_tool = self.class.find_external_tool(url || domain, context, nil, id, prefer_1_1: true)
+
     return if matching_1_1_tool.nil? || matching_1_1_tool.use_1_3?
 
     delay_if_production(priority: Delayed::LOW_PRIORITY).migrate_content_to_1_3(matching_1_1_tool.id)
@@ -1493,6 +1495,10 @@ class ContextExternalTool < ActiveRecord::Base
   # @see Lti::Migratable
   def migrate_content_to_1_3(tool_id)
     tool_id ||= id
+
+    # Counters for tracking migration progress
+    total_batches = 0
+
     GuardRail.activate(:secondary) do
       VALID_MIGRATION_TYPES.each do |type|
         next unless type.include?(Lti::Migratable)
@@ -1504,7 +1510,9 @@ class ContextExternalTool < ActiveRecord::Base
             priority: Delayed::LOW_PRIORITY,
             n_strand: ["ContextExternalTool#migrate_content_to_1_3", tool_id]
           ).prepare_direct_batch_for_migration(ids, type)
+          total_batches += 1
         end
+
         type.scope_to_context(
           type.indirectly_associated_items(tool_id), context
         ).find_ids_in_batches do |ids|
@@ -1512,9 +1520,22 @@ class ContextExternalTool < ActiveRecord::Base
             priority: Delayed::LOW_PRIORITY,
             n_strand: ["ContextExternalTool#migrate_content_to_1_3", tool_id]
           ).prepare_indirect_batch_for_migration(tool_id, ids, type)
+          total_batches += 1
         end
       end
     end
+
+    prog = Progress.create!(context: self, tag: "migrate_content_to_1_3", workflow_state: "queued", results: { total_batches: total_batches + 1, tool_id: })
+
+    delay_if_production(
+      priority: Delayed::LOW_PRIORITY,
+      n_strand: ["ContextExternalTool#migrate_content_to_1_3", tool_id]
+    ).mark_migration_completed(prog.id)
+  end
+
+  def mark_migration_completed(prog_id)
+    prog = Progress.find(prog_id)
+    prog.update!(workflow_state: "completed")
   end
 
   # For the given content_type, migrates the direct batch
@@ -1554,6 +1575,11 @@ class ContextExternalTool < ActiveRecord::Base
       )
       Sentry.capture_message("ContextExternalTool#prepare_content_for_migration", level: :warning)
     end
+  end
+
+  # The result of this method should correspond with conditional rendering of the ExternalMigrationInfo component
+  def migrating?
+    progresses.where.not(workflow_state: "completed").exists?
   end
 
   # Intended to return true only for Instructure-owned tools that have been

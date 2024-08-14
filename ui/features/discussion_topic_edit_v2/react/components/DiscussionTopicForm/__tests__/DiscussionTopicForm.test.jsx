@@ -100,6 +100,7 @@ describe('DiscussionTopicForm', () => {
     expect(document.queryByText('Attach')).toBeTruthy()
     expect(document.queryByTestId('section-select')).toBeTruthy()
     expect(document.queryAllByText('Anonymous Discussion')).toBeTruthy()
+    expect(document.queryByLabelText('Disallow threaded replies')).toBeInTheDocument()
     expect(document.queryByTestId('require-initial-post-checkbox')).toBeTruthy()
     expect(document.queryByLabelText('Enable podcast feed')).toBeInTheDocument()
     expect(document.queryByTestId('graded-checkbox')).toBeTruthy()
@@ -135,6 +136,7 @@ describe('DiscussionTopicForm', () => {
     expect(document.queryByText('Attach')).toBeTruthy()
     expect(document.queryByTestId('section-select')).toBeTruthy()
     expect(document.queryByLabelText('Allow Participants to Comment')).toBeInTheDocument()
+    expect(document.queryByLabelText('Disallow threaded replies')).toBeInTheDocument()
     expect(document.queryByTestId('require-initial-post-checkbox')).toBeTruthy()
     expect(document.queryByLabelText('Enable podcast feed')).toBeInTheDocument()
     expect(document.queryByLabelText('Allow liking')).toBeInTheDocument()
@@ -500,6 +502,25 @@ describe('DiscussionTopicForm', () => {
       const {queryByText} = setup()
 
       expect(queryByText('Allow Participants to Comment')).toBeInTheDocument()
+    })
+  })
+
+  describe('Disallow threaded replies', () => {
+    it('disallow threaded replies checkbox is checked when discussion type is side comment and does not has threaded reply', () => {
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.has_threaded_replies = false
+      const {getByTestId} = setup({currentDiscussionTopic: {discussionType: "side_comment"}})
+
+      const checkbox = getByTestId('disallow_threaded_replies')
+      expect(checkbox.checked).toBe(true)
+    })
+
+    it('disallow threaded replies checkbox is disabled when discussion type is side comment and has threaded replies', () => {
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.has_threaded_replies = true
+      const {getByTestId} = setup({currentDiscussionTopic: {discussionType: "side_comment"}})
+
+      const checkbox = getByTestId('disallow_threaded_replies')
+      expect(checkbox.disabled).toBe(true)
+      expect(checkbox.checked).toBe(false)
     })
   })
 

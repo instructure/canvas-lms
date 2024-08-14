@@ -298,9 +298,9 @@ archived_grading_schemes:
     development:
       state: allowed_on
 enhanced_rubrics:
-  beta: true
   state: hidden
-  applies_to: RootAccount
+  beta: true
+  applies_to: Account
   root_opt_in: true
   display_name: Rubric Enhancements
   description: This feature provides visual and functional enhancements to rubrics across Canvas.
@@ -359,3 +359,15 @@ speedgrader_studio_media_capture:
       state: allowed
     development:
       state: allowed
+rubric_imports_exports:
+  state: hidden
+  applies_to: RootAccount
+  root_opt_in: true
+  display_name: Rubric Imports and Exports
+  description: This feature allows users to import and export rubrics from CSV and XML files.
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed
+  

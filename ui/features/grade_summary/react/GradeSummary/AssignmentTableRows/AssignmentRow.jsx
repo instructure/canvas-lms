@@ -263,8 +263,7 @@ export const assignmentRow = (
       <Table.Cell textAlign="end">
         <Flex justifyItems="end">
           <Flex.Item>
-            {!ENV.restrict_quantitative_data &&
-            assignment?.rubric &&
+            {assignment?.rubric &&
             assignment?.submissionsConnection?.nodes[0]?.rubricAssessmentsConnection?.nodes.length >
               0 ? (
               renderRubricButton()

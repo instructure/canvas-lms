@@ -4853,6 +4853,7 @@ tr:
   confirmation_failed_please_try_again_ae566d37: "Onaylama başarısız. Lütfen tekrar deneyin."
   consumer_key_57d9fcf1: "Kullanıcı anahtarı"
   consumer_key_6f94ba11: "Kullanıcı Anahtarı"
+  contact_a6e7f6da: İletişim
   content_1440204b: İçerik
   content_changed_exceptions_e8bff81e: "İçerik değişimi istisnaları:"
   content_choice_51f4ca0f: "İçerik Seçimi"
@@ -5129,6 +5130,7 @@ tr:
         user_privileges: Ayrıcalıklar
       legends: 
         memberships: Üyelik(ler)
+        recent_messages: "Son Mesajlar"
       links: 
         access_report: "%{user} kullanıcısının Erişim Raporu"
         cant_delete: Silinemez
@@ -5146,6 +5148,7 @@ tr:
         user_only_view_section: "bu kullanıcı sadece bölüm arkadaşlarını görebilsin"
         user_outcomes: "%{user}'ın öğrenme çıktıları"
         user_view_all_sections: "bu kullanıcı tüm ders katılımcılarını görebilsin"
+      no_messages: "Mesaj Yok"
       user_only_view_section: "bu kullanıcı sadece atandığı dersin bölüm(ler)indeki öğrencileri görebilir"
       user_view_all_sections: "bu kullanıcı herhangi bir ders bölümündeki öğrencileri görebilir"
     no_user: 
@@ -8459,6 +8462,7 @@ tr:
       remove_feed: "%{display_name}'ı kaldır"
   external_feeds_b6345379: "Harici Beslemeler"
   external_integration_keys_8b4f4548: "Harici Entegrasyon Anahtarları"
+  external_links_3d9f074e: "Harici Bağlantılar"
   external_tool_6594ee34: "Harici araç"
   external_tool_c5a6410a: "Harici Araç"
   external_tool_url_cannot_be_left_blank_a34b6bb2: "Harici Araç URL'si boş bırakılamaz"
@@ -14045,6 +14049,7 @@ tr:
     everyone_else: "Geri kalan herkes"
     overrides: 
       everyone: Herkes
+  overview_58268c72: "Genel Bakış"
   overwrite_848c08f: "Üzerine yaz"
   overwrite_already_entered_grades_64a98037: "Önceden girilmiş notların üzerine yaz"
   overwrite_assessment_content_with_matching_ids_b388f114: "Eşleşen kimliklere sahip değerlendirme içeriğinin üzerine yaz"
@@ -14707,6 +14712,7 @@ tr:
   print_d0e3d53f: Yazdır
   priority_dd4381ee: Öncelik
   privacy_290109ea: Gizlilik
+  privacy_policy_c68f482a: "Gizlilik Sözleşmesi"
   private_3883d133: Özel
   product_name: Canvas
   profile: 
@@ -14826,6 +14832,7 @@ tr:
         registered_services: "Kayıt olunan Servisler"
         remove: Kaldır
         share_skype_id: "Skype ID'nizi Paylaşın"
+        state: Durum
         twitter_access: "Twitter Erişimi"
         users_profile: "%{user}'ın Ayarları"
         ways_to_log_in: "Oturum Açma Yolları"
@@ -19989,6 +19996,7 @@ tr:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ Dersi"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  website_adea4d05: "Web Sayfası"
   website_url_177fc1dc: "Web Sayfası URL"
   week_1f945ddd: Hafta
   week_s_cb1492ee: Hafta(lar)

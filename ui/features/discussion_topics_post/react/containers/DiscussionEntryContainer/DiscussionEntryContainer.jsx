@@ -22,7 +22,7 @@ import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPos
 import {PostMessage} from '../../components/PostMessage/PostMessage'
 import PropTypes from 'prop-types'
 import React, {useContext} from 'react'
-import {responsiveQuerySizes} from '../../utils'
+import {responsiveQuerySizes, getDisplayName, userNameToShow} from '../../utils'
 import {SearchContext} from '../../utils/constants'
 import {Attachment} from '../../../graphql/Attachment'
 import {User} from '../../../graphql/User'
@@ -32,14 +32,39 @@ import {Responsive} from '@instructure/ui-responsive'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import {ReplyPreview} from '../../components/ReplyPreview/ReplyPreview'
+import theme from '@instructure/canvas-theme'
 
 export const DiscussionEntryContainer = props => {
   const {searchTerm} = useContext(SearchContext)
 
+  const getDeletedDisplayName = discussionEntry => {
+    const editor = discussionEntry.editor
+    const author = discussionEntry.author
+    const anonymousAuthor = discussionEntry.anonymousAuthor
+    if (editor) {
+      if (author) {
+        return userNameToShow(
+          editor.displayName || editor.shortName,
+          author._id,
+          editor.courseRoles
+        )
+      }
+      if (anonymousAuthor) {
+        return userNameToShow(
+          editor.displayName || editor.shortName,
+          anonymousAuthor._id,
+          editor.courseRoles
+        )
+      }
+    } else {
+      return getDisplayName(discussionEntry)
+    }
+  }
+
   if (props.deleted) {
     return (
       <DeletedPostMessage
-        deleterName={props.editor ? props.editor?.displayName : props.author?.displayName}
+        deleterName={getDeletedDisplayName(props.discussionEntry)}
         timingDisplay={props.timingDisplay}
         deletedTimingDisplay={props.editedTimingDisplay}
       >
@@ -187,6 +212,15 @@ export const DiscussionEntryContainer = props => {
               {props.children}
             </PostMessage>
           </Flex.Item>
+          {!props.isTopic && (
+            <hr
+              data-testid="post-separator"
+              style={{
+                height: theme.variables.borders.widthSmall,
+                color: theme.variables.colors.borderMedium,
+              }}
+            />
+          )}
         </Flex>
       )}
     />

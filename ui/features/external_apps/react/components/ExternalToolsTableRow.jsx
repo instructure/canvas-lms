@@ -33,6 +33,7 @@ import store from '../lib/ExternalAppsStore'
 import classMunger from '../lib/classMunger'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
+import ExternalToolMigrationInfo from './ExternalToolMigrationInfo'
 
 const I18n = useI18nScope('external_tools')
 
@@ -261,6 +262,7 @@ export default class ExternalToolsTableRow extends React.Component {
     const {tool} = this.props
     const show_top_nav_toggles = !!ENV.FEATURES?.top_navigation_placement
 
+
     return (
       <tr className="ExternalToolsTableRow external_tool_item">
         <td className="e-tool-table-data center-text">{this.locked()}</td>
@@ -269,7 +271,17 @@ export default class ExternalToolsTableRow extends React.Component {
           className={`${this.nameClassNames()} e-tool-table-data`}
           title={tool.name}
         >
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           {tool.name} {this.disabledFlag()}
+           {(ENV.FEATURES.lti_migration_info && tool.migration_running) ? (
+
+              <ExternalToolMigrationInfo 
+              tool={tool}
+              canAddEdit={this.props.canAddEdit}/>
+                
+              ) : null}
+        </div>
+         
         </td>
         {this.props.showLTIFavoriteToggles && show_top_nav_toggles && (
           <td>

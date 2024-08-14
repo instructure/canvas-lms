@@ -148,12 +148,8 @@
 
       <div class="ig-details">
         <% if !@is_student && show_checkpoints %>
-            <div class="ig-details__item">
-              <b><%= t('Reply to Topic') %>:</b> <%= datetime_string(module_item.content.reply_to_topic_checkpoint.due_at) || t('No Due Date') %>
-            </div>
-            <div class="ig-details__item">
-              <b><%= t('Required Replies (%{required_replies})', required_replies: module_item.content.reply_to_entry_required_count) %>:</b> <%= datetime_string(module_item.content.reply_to_entry_checkpoint.due_at) || t('No Due Date') %>
-            </div>
+            <div class="ig-details__item reply_to_topic_display"></div>
+            <div class="ig-details__item reply_to_entry_display"></div>
         <%end%>
         <div class="due_date_display ig-details__item"></div>
         <% if module_item&.graded? && (!module_item.try_rescue(:assignment).restrict_quantitative_data?(@current_user, check_extra_permissions: true))%>

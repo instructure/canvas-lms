@@ -97,14 +97,14 @@ class GradingStandard < ActiveRecord::Base
     can :manage
   end
 
-  def self.for(context, include_archived: false)
+  def self.for(context, include_archived: false, include_parent_accounts: true)
     unless Account.site_admin.feature_enabled?(:archived_grading_schemes)
       return GradingStandard.active.for_context(context)
     end
 
     case context
     when Account
-      for_account(context)
+      for_account(context, include_parent_accounts:)
     when Course
       for_course(context, include_archived:)
     else
@@ -130,8 +130,11 @@ class GradingStandard < ActiveRecord::Base
     standards
   end
 
-  def self.for_account(account)
-    GradingStandard.active.union(GradingStandard.archived).for_context(account)
+  def self.for_account(account, include_parent_accounts: true)
+    scope = GradingStandard.active.union(GradingStandard.archived)
+    return scope.for_context(account) if include_parent_accounts
+
+    scope.where(context_type: Account.to_s, context_id: account.id)
   end
 
   def version

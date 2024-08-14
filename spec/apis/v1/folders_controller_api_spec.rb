@@ -727,6 +727,25 @@ describe "Folders API", type: :request do
                  { expected_status: 401 })
       end
     end
+
+    context "as student in limited access account" do
+      before do
+        course_with_student
+        @course.root_account.enable_feature!(:allow_limited_access_for_students)
+        @course.account.settings[:enable_limited_access_for_students] = true
+        @course.account.save!
+      end
+
+      it "renders unauthorized" do
+        @root_folder = Folder.root_folders(@course).first
+        api_call(:post,
+                 "/api/v1/folders/#{@root_folder.id}/files",
+                 { controller: "folders", action: "create_file", format: "json", folder_id: @root_folder.id.to_param },
+                 { name: "with_path.txt" },
+                 {},
+                 { expected_status: 401 })
+      end
+    end
   end
 
   describe "#resolve_path" do

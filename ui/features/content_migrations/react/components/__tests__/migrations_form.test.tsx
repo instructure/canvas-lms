@@ -40,7 +40,26 @@ const setMigrationsMock = jest.fn()
 const renderComponent = (overrideProps?: any) =>
   render(<ContentMigrationsForm setMigrations={setMigrationsMock} {...overrideProps} />)
 
+const submitAMigration = async () => {
+  await userEvent.click(await screen.findByTitle('Select one'))
+  await userEvent.click(screen.getByText('Copy a Canvas Course'))
+
+  await userEvent.type(screen.getByPlaceholderText('Search...'), 'MyCourse')
+  await userEvent.click(await screen.findByRole('option', {name: 'MyCourse'}))
+
+  await userEvent.click(screen.getByText('All content'))
+
+  await userEvent.click(screen.getByTestId('submitMigration'))
+}
+
 describe('ContentMigrationForm', () => {
+  const postResponseMock = {
+    id: '4',
+    migration_type: 'course_copy_importer',
+    migration_type_title: 'Test',
+    pre_attachment: true,
+  }
+
   beforeEach(() => {
     window.ENV.COURSE_ID = '0'
     window.ENV.NEW_QUIZZES_MIGRATION = true
@@ -61,18 +80,9 @@ describe('ContentMigrationForm', () => {
         type: 'common_cartridge_importer',
       },
     ])
-    fetchMock.mock(
-      '/api/v1/courses/0/content_migrations',
-      {
-        id: '4',
-        migration_type: 'course_copy_importer',
-        migration_type_title: 'Test',
-        pre_attachment: true,
-      },
-      {
-        overwriteRoutes: true,
-      }
-    )
+    fetchMock.mock('/api/v1/courses/0/content_migrations', postResponseMock, {
+      overwriteRoutes: true,
+    })
     fetchMock.mock(/users\/1\/manageable_courses\?term=(.*)/, [{id: '3', label: 'MyCourse'}])
   })
 
@@ -184,17 +194,7 @@ describe('ContentMigrationForm', () => {
 
   it('calls setMigrations when submitting', async () => {
     renderComponent()
-
-    await userEvent.click(await screen.findByTitle('Select one'))
-    await userEvent.click(screen.getByText('Copy a Canvas Course'))
-
-    await userEvent.type(screen.getByPlaceholderText('Search...'), 'MyCourse')
-    await userEvent.click(await screen.findByRole('option', {name: 'MyCourse'}))
-
-    await userEvent.click(screen.getByText('All content'))
-
-    await userEvent.click(screen.getByTestId('submitMigration'))
-
+    await submitAMigration()
     expect(setMigrationsMock).toHaveBeenCalled()
   })
 
@@ -219,5 +219,53 @@ describe('ContentMigrationForm', () => {
 
     await userEvent.click(screen.getByTestId('submitMigration'))
     expect(screen.queryByTestId('submitMigration')).not.toBeInTheDocument()
+  })
+
+  describe('workflow_state setting', () => {
+    afterEach(() => {
+      setMigrationsMock.mockReset()
+    })
+
+    describe('when content_migration workflow_state is not waiting_for_select', () => {
+      const workflow_state = 'running'
+
+      it('set workflow_state to queued', async () => {
+        fetchMock.mock(
+          '/api/v1/courses/0/content_migrations',
+          {...postResponseMock, workflow_state},
+          {
+            overwriteRoutes: true,
+          }
+        )
+        renderComponent()
+        await submitAMigration()
+
+        const setterFunction = setMigrationsMock.mock.calls[0][0]
+        const setterFunctionResult = setterFunction([])
+        expect(setterFunctionResult.length).toBe(1)
+        expect(setterFunctionResult[0].workflow_state).toBe('queued')
+      })
+    })
+
+    describe('when content_migration workflow_state is in waiting_for_select', () => {
+      const workflow_state = 'waiting_for_select'
+
+      it('set workflow_state to queued', async () => {
+        fetchMock.mock(
+          '/api/v1/courses/0/content_migrations',
+          {...postResponseMock, workflow_state},
+          {
+            overwriteRoutes: true,
+          }
+        )
+        renderComponent()
+        await submitAMigration()
+
+        const setterFunction = setMigrationsMock.mock.calls[0][0]
+        const setterFunctionResult = setterFunction([])
+        expect(setterFunctionResult.length).toBe(1)
+        expect(setterFunctionResult[0].workflow_state).toBe('waiting_for_select')
+      })
+    })
   })
 })

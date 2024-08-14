@@ -5989,6 +5989,7 @@ fa:
   consider_selecting_multiple_submission_types_to_ac_f7e624d5: "انتخاب چندین نوع ارسال را در نظر بگیرید چون که ممکن است دانشجویانی قادر به ایجاد حاشیه نویسی نباشند."
   consumer_key_57d9fcf1: "کلید مصرف کننده"
   consumer_key_6f94ba11: "کلید مصرف کننده"
+  contact_a6e7f6da: مخاطب
   contact_your_administrator_if_you_need_to_change_c_9002a501: "در صورت نیاز به تغییر نمایان بودن دوره با سرپرست خود تماس بگیرید."
   content_1440204b: محتوا
   content_access_id_601d931e: "شناسه ی دسترسی محتوا"
@@ -6280,6 +6281,7 @@ fa:
         user_privileges: مجوزها
       legends: 
         memberships: عضویت(ها)
+        recent_messages: "پیام های اخیر"
       links: 
         access_report: "گزارش دسترسی برای %{user}"
         cant_delete: "نمی توان حذف کرد"
@@ -6297,6 +6299,7 @@ fa:
         user_only_view_section: "این کاربر را محدود شود تا فقط کاربران هم بخش را مشاهده کند"
         user_outcomes: "نتایج مربوط به %{user}"
         user_view_all_sections: "به این کاربر اجازه داده شود همه کاربران درس را مشاهده کند"
+      no_messages: "هیچ پیامی موجود نیست"
       user_only_view_section: "این کاربر فقط می تواند دانشجویان را در بخش (های) درس اختصاص داده شده خود ببیند"
       user_view_all_sections: "این کاربر می تواند دانشجویان را در همه بخش های درس ببیند"
     no_user: 
@@ -17273,6 +17276,7 @@ fa:
     invalid_group_override: "نمی توانید به یک گروه خارج از مجموعه گروه تکلیف تخصیص دهید"
     overrides: 
       everyone: همه
+  overview_58268c72: "مرور کلی"
   overview_of_student_status_a004bcf3: "مرور کلی بر وضعیت دانشجویی"
   overwrite_848c08f: رونویسی
   overwrite_all_users_existing_default_dashboard_pre_9b2ad7d1: "تنظیمات دلخواه داشبورد پیش‌فرض‌های موجود همه‌ی کاربران را رونویسی کنید."
@@ -18092,6 +18096,7 @@ fa:
   priority_dd4381ee: اولویت
   privacy_290109ea: "حریم خصوصی"
   privacy_level_f0ec09a3: "سطح حریم خصوصی"
+  privacy_policy_c68f482a: "سیاست حریم خصوصی"
   private_3883d133: خصوصی
   proceed_f3d33864: "ادامه دادن"
   processing_2fcc9739: "در حال پردازش"
@@ -18213,6 +18218,7 @@ fa:
         registered_services: "سرویس‌های ثبت‌شده"
         remove: حذف
         share_skype_id: "به اشتراک گذاری شناسه اسکایپ"
+        state: وضعیت
         twitter_access: "دسترسی به توییتر"
         users_profile: "تنظیمات %{user}"
         ways_to_log_in: "راه های ورود"
@@ -25345,6 +25351,7 @@ fa:
   webct_file_description: "درس Blackboard Vista/CE ،WebCT 6+ Course"
   webct_name: "Blackboard Vista/CE (WebCT)"
   webhooks_subscriptions_ed524e73: "پیکربندی وب هوک ها"
+  website_adea4d05: تارنما
   website_url_177fc1dc: "نشانی اینترنتی تارنما"
   website_url_b995c5b6: "آدرس وب سایت"
   website_url_input_1a3eab25: "ورودی آدرس وب سایت"

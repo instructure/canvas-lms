@@ -252,13 +252,19 @@ module CustomSeleniumRSpecMatchers
     end
 
     failure_message do |element|
-      "expected #{element.inspect}'s opacity to be 0.5, actual opacity is: #{element.style("opacity")}" if element.style("opacity") != "0.5"
-      "expected #{element.inspect}'s pointer-events to be 'none', actual pointer-events is : #{element.style("pointer-events")}" if element.style("pointer-events") != "none"
+      if element.style("opacity") != "0.5"
+        "expected #{element.inspect}'s opacity to be 0.5, actual opacity is: #{element.style("opacity")}"
+      elsif element.style("pointer-events") != "none"
+        "expected #{element.inspect}'s pointer-events to be 'none', actual pointer-events is : #{element.style("pointer-events")}"
+      end
     end
 
     failure_message_when_negated do |element|
-      "expected #{element.inspect}'s opacity to be 1, actual opacity is: #{element.style("opacity")}" if element.style("opacity") != "1"
-      "expected #{element.inspect}'s pointer-events to be 'auto', actual pointer-events is : #{element.style("pointer-events")}" if element.style("pointer-events") != "auto"
+      if element.style("opacity") != "1"
+        "expected #{element.inspect}'s opacity to be 1, actual opacity is: #{element.style("opacity")}"
+      elsif element.style("pointer-events") != "auto"
+        "expected #{element.inspect}'s pointer-events to be 'auto', actual pointer-events is : #{element.style("pointer-events")}"
+      end
     end
   end
 

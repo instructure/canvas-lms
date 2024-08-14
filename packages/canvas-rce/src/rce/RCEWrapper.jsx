@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Lazy, Suspense} from 'react'
+import React, {Suspense} from 'react'
 import {Editor} from '@tinymce/tinymce-react'
 import _ from 'lodash'
 import {StoreProvider} from './plugins/shared/StoreContext'
@@ -70,6 +70,12 @@ import {IconMoreSolid} from '@instructure/ui-icons/es/svg'
 import EncryptedStorage from '../util/encrypted-storage'
 import buildStyle from './style'
 import {externalToolsForToolbar} from './plugins/instructure_rce_external_tools/RceToolWrapper'
+import {
+  getMenubarForVariant,
+  getMenuForVariant,
+  getToolbarForVariant,
+  getStatusBarFeaturesForVariant,
+} from './RCEVariants'
 
 const RestoreAutoSaveModal = React.lazy(() => import('./RestoreAutoSaveModal'))
 const RceHtmlEditor = React.lazy(() => import('./RceHtmlEditor'))
@@ -180,6 +186,7 @@ class RCEWrapper extends React.Component {
     features: {},
     timezone: Intl?.DateTimeFormat()?.resolvedOptions()?.timeZone,
     canvasOrigin: '',
+    variant: 'full',
   }
 
   static skinCssInjected = false
@@ -266,6 +273,8 @@ class RCEWrapper extends React.Component {
 
     this.resourceType = props.resourceType
     this.resourceId = props.resourceId
+
+    this.variant = window.RCE_VARIANT || props.variant // to facilitate testing
 
     this.tinymceInitOptions = this.wrapOptions(props.editorOptions)
 
@@ -1595,7 +1604,7 @@ class RCEWrapper extends React.Component {
       content_css: options.content_css || [],
       content_style: contentCSS,
 
-      menubar: mergeMenuItems('edit view insert format tools table', possibleNewMenubarItems),
+      menubar: mergeMenuItems(getMenubarForVariant(this.variant), possibleNewMenubarItems),
 
       // default menu options listed at https://www.tiny.cloud/docs/configure/editor-appearance/#menu
       // tinymce's default edit and table menus are fine
@@ -1603,75 +1612,10 @@ class RCEWrapper extends React.Component {
       // since we currently can't effectively paste using the clipboard api anyway.
       // we include all the canvas specific items in the menu and toolbar
       // and rely on tinymce only showing them if the plugin is provided.
-      menu: mergeMenu(
-        {
-          edit: {
-            title: formatMessage('Edit'),
-            items: `undo redo | cut copy paste | selectall`,
-          },
-          format: {
-            title: formatMessage('Format'),
-            items:
-              'bold italic underline strikethrough superscript subscript codeformat | formats blockformats fontformats fontsizes align directionality | forecolor backcolor | removeformat',
-          },
-          insert: {
-            title: formatMessage('Insert'),
-            items:
-              'instructure_links instructure_image instructure_media instructure_document instructure_icon_maker | instructure_equation inserttable instructure_media_embed | hr',
-          },
-          tools: {
-            title: formatMessage('Tools'),
-            items: 'instructure_wordcount lti_tools_menuitem instructure_search_and_replace',
-          },
-          view: {
-            title: formatMessage('View'),
-            items: 'instructure_fullscreen instructure_exit_fullscreen instructure_html_view',
-          },
-        },
-        options.menu
-      ),
+      menu: mergeMenu(getMenuForVariant(this.variant), options.menu),
 
       toolbar: mergeToolbar(
-        [
-          {
-            name: formatMessage('Styles'),
-            items: ['fontsizeselect', 'formatselect'],
-          },
-          {
-            name: formatMessage('Formatting'),
-            items: [
-              'bold',
-              'italic',
-              'underline',
-              'forecolor',
-              'backcolor',
-              'inst_subscript',
-              'inst_superscript',
-            ],
-          },
-          {
-            name: formatMessage('Content'),
-            items: [
-              'instructure_links',
-              'instructure_image',
-              'instructure_record',
-              'instructure_documents',
-              'instructure_icon_maker',
-            ],
-          },
-          {
-            name: formatMessage('External Tools'),
-            items: [...this.ltiToolFavorites, 'lti_tool_dropdown', 'lti_mru_button'],
-          },
-          {
-            name: formatMessage('Alignment and Lists'),
-            items: ['align', 'bullist', 'inst_indent', 'inst_outdent'],
-          },
-          {
-            name: formatMessage('Miscellaneous'),
-            items: ['removeformat', 'table', 'instructure_equation', 'instructure_media_embed'],
-          },
-        ],
+        getToolbarForVariant(this.variant, this.ltiToolFavorites),
         options.toolbar
       ),
 
@@ -1908,6 +1852,7 @@ class RCEWrapper extends React.Component {
         />
       )
     }
+    const statusBarFeatures = getStatusBarFeaturesForVariant(this.variant, this.props.ai_text_tools)
     return (
       <>
         <style>{this.style.css}</style>
@@ -1925,6 +1870,7 @@ class RCEWrapper extends React.Component {
                 key={this.id}
                 className={`${this.style.classNames.root} rce-wrapper`}
                 ref={this._elementRef}
+                style={this.variant === 'full' ? {marginBottom: '.5rem'} : undefined}
                 onFocus={this.handleFocusRCE}
                 onBlur={this.handleBlurRCE}
               >
@@ -1967,28 +1913,30 @@ class RCEWrapper extends React.Component {
                     liveRegion={this.props.liveRegion}
                   />
                 </div>
-                <StatusBar
-                  id={this._statusBarId}
-                  rceIsFullscreen={this._isFullscreen()}
-                  readOnly={this.props.readOnly}
-                  onChangeView={newView => this.toggleView(newView)}
-                  path={this.state.path}
-                  wordCount={this.state.wordCount}
-                  editorView={this.state.editorView}
-                  preferredHtmlEditor={this.getHtmlEditorStorage()}
-                  onResize={this.onResize}
-                  onKBShortcutModalOpen={this.openKBShortcutModal}
-                  onA11yChecker={this.onA11yChecker}
-                  onFullscreen={this.handleClickFullscreen}
-                  a11yBadgeColor={this.style.theme.canvasBadgeBackgroundColor}
-                  a11yErrorsCount={this.state.a11yErrorsCount}
-                  onWordcountModalOpen={() =>
-                    launchWordcountModal(this.mceInstance(), document, {skipEditorFocus: true})
-                  }
-                  disabledPlugins={this.pluginsToExclude}
-                  ai_text_tools={this.props.ai_text_tools}
-                  onAI={this.handleAIClick}
-                />
+                {statusBarFeatures.length > 0 && (
+                  <StatusBar
+                    id={this._statusBarId}
+                    rceIsFullscreen={this._isFullscreen()}
+                    readOnly={this.props.readOnly}
+                    onChangeView={newView => this.toggleView(newView)}
+                    path={this.state.path}
+                    wordCount={this.state.wordCount}
+                    editorView={this.state.editorView}
+                    preferredHtmlEditor={this.getHtmlEditorStorage()}
+                    onResize={this.onResize}
+                    onKBShortcutModalOpen={this.openKBShortcutModal}
+                    onA11yChecker={this.onA11yChecker}
+                    onFullscreen={this.handleClickFullscreen}
+                    a11yBadgeColor={this.style.theme.canvasBadgeBackgroundColor}
+                    a11yErrorsCount={this.state.a11yErrorsCount}
+                    onWordcountModalOpen={() =>
+                      launchWordcountModal(this.mceInstance(), document, {skipEditorFocus: true})
+                    }
+                    disabledPlugins={this.pluginsToExclude}
+                    features={statusBarFeatures}
+                    onAI={this.handleAIClick}
+                  />
+                )}
                 {this.props.trayProps?.containingContext && (
                   <CanvasContentTray
                     mountNode={instuiPopupMountNode}

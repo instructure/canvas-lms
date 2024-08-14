@@ -154,4 +154,25 @@ describe BrokenLinkHelper, type: :controller do
       expect(error_type(@course, "/yo")).to eq :missing_item
     end
   end
+
+  describe AssignmentsController, type: :controller do
+    render_views
+
+    context "in a rendered page" do
+      it "sends a notification for bad links" do
+        @teacher = User.create!
+        @course.enroll_teacher(@teacher)
+        @course.update(workflow_state: "active")
+        linked_assignment = @assignment
+        assignment_model(course: @course).update(workflow_state: "unpublished")
+        linked_assignment.update(description: "<a href='/courses/#{@course.id}/assignments/#{@assignment.id}'>Unpublished Assignment</a>")
+
+        user_session(@student)
+        @request.env["HTTP_REFERER"] = "/courses/#{@course.id}/assignments/#{linked_assignment.id}"
+        get :show, params: { course_id: @course.id, id: @assignment.id }
+        expect(response.status).to eq(401)
+        expect(response.body).to include("We&#39;ve let your instructor know to review this link as soon as possible.")
+      end
+    end
+  end
 end

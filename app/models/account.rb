@@ -97,6 +97,7 @@ class Account < ActiveRecord::Base
   has_many :canvadocs_annotation_contexts
   has_one :outcome_proficiency, -> { preload(:outcome_proficiency_ratings) }, as: :context, inverse_of: :context, dependent: :destroy
   has_one :outcome_calculation_method, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :rubric_imports, inverse_of: :root_account, foreign_key: :root_account_id
 
   has_many :auditor_authentication_records,
            class_name: "Auditors::ActiveRecord::AuthenticationRecord",
@@ -412,6 +413,8 @@ class Account < ActiveRecord::Base
                                                                         minimum_character_length
                                                                         maximum_login_attempts]
 
+  add_setting :enable_limited_access_for_students, boolean: true, root_only: false, default: false, inheritable: false
+
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
       hash.each do |key, val|
@@ -530,6 +533,14 @@ class Account < ActiveRecord::Base
 
   def use_classic_font_in_k5?
     use_classic_font_in_k5[:value]
+  end
+
+  def limited_access_for_students?
+    root_account.feature_enabled?(:allow_limited_access_for_students) && settings[:enable_limited_access_for_students]
+  end
+
+  def limited_access_for_user?(user)
+    limited_access_for_students? && user.active_student_enrollments_in_account?(self)
   end
 
   def conditional_release?
@@ -1517,6 +1528,11 @@ class Account < ActiveRecord::Base
         (account_calendar_visible || grants_right?(user, :manage_account_calendar_visibility))
     end
     can :view_account_calendar_details
+
+    given do |user|
+      limited_access_for_user?(user)
+    end
+    can :make_submission_comments
   end
 
   def reload(*)

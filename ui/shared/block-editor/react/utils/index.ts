@@ -19,7 +19,6 @@
 export * from './useClassNames'
 export * from './kb'
 export * from './dom'
-export * from './buildPageContent'
 export * from './constants'
 export * from './getScrollParent'
 export * from './getCloneTree'

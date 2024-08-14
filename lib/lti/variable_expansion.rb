@@ -45,8 +45,7 @@ module Lti
     private
 
     def expand_for?(expander)
-      @guards.map { |guard| expander.instance_exec(&guard) }
-             .inject { |memo, obj| memo && obj }
+      @guards.all? { |guard| expander.instance_exec(&guard) }
     end
   end
 end

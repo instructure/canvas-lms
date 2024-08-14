@@ -59,6 +59,10 @@ import {
 import {ColorModal} from '../../common/ColorModal'
 import {type TextBlockProps} from './types'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor/text-block')
+
 const TextBlockToolbar = () => {
   const {
     actions: {setProp},
@@ -117,13 +121,17 @@ const TextBlockToolbar = () => {
       >
         <IconBoldLine size="x-small" />
       </IconButton>
-      <IconButton screenReaderLabel="Italic" withBackground={false} withBorder={false}>
+      <IconButton screenReaderLabel={I18n.t('Italic')} withBackground={false} withBorder={false}>
         <IconItalicLine size="x-small" />
       </IconButton>
-      <IconButton screenReaderLabel="Underline" withBackground={false} withBorder={false}>
+      <IconButton screenReaderLabel={I18n.t('Underline')} withBackground={false} withBorder={false}>
         <IconUnderlineLine size="x-small" />
       </IconButton>
-      <IconButton screenReaderLabel="Strikethrough" withBackground={false} withBorder={false}>
+      <IconButton
+        screenReaderLabel={I18n.t('Strikethrough')}
+        withBackground={false}
+        withBorder={false}
+      >
         <IconStrikethroughLine size="x-small" />
       </IconButton>
       <Menu
@@ -131,7 +139,7 @@ const TextBlockToolbar = () => {
         trigger={
           <Button size="small">
             <Flex gap="x-small">
-              <Text size="small">{props.fontSize || 'Size'}</Text>
+              <Text size="small">{props.fontSize || I18n.t('Size')}</Text>
               <IconMiniArrowDownLine size="x-small" />
             </Flex>
           </Button>
@@ -154,7 +162,7 @@ const TextBlockToolbar = () => {
         size="small"
         withBackground={false}
         withBorder={false}
-        screenReaderLabel="Color"
+        screenReaderLabel={I18n.t('Color')}
         onClick={handleColorButtonClick}
       >
         <IconTextColorLine size="x-small" />

@@ -50,6 +50,7 @@ describe('DiscussionIndex', () => {
     DIRECT_SHARE_ENABLED: false,
     pinnedDiscussions: [],
     pinnedDiscussionIds: [],
+    breakpoints: {mobileOnly: false},
   }
 
   const initialState = {

@@ -227,6 +227,7 @@ class UsersController < ApplicationController
                                                        masquerade]
   skip_before_action :load_user, only: [:create_self_registered_user]
   before_action :require_self_registration, only: %i[new create create_self_registered_user]
+  before_action :check_limited_access_for_students, only: %i[create_file set_custom_color]
 
   def grades
     @user = User.where(id: params[:user_id]).first if params[:user_id].present?
@@ -2109,6 +2110,10 @@ class UsersController < ApplicationController
   #   Sets a bio on the user profile. (See {api:ProfileController#settings Get user profile}.)
   #   Profiles must be enabled on the root account.
   #
+  # @argument user[pronunciation] [String]
+  #   Sets name pronunciation on the user profile. (See {api:ProfileController#settings Get user profile}.)
+  #   Profiles and name pronunciation must be enabled on the root account.
+  #
   # @argument user[pronouns] [String]
   #   Sets pronouns on the user profile.
   #   Passing an empty string will empty the user's pronouns
@@ -2155,6 +2160,7 @@ class UsersController < ApplicationController
     if @domain_root_account.enable_profiles?
       managed_attributes << :bio if @user.grants_right?(@current_user, :manage_user_details)
       managed_attributes << :title if @user.grants_right?(@current_user, :rename)
+      managed_attributes << :pronunciation if @domain_root_account.enable_name_pronunciation? && @user.grants_right?(@current_user, :manage_user_details)
     end
 
     can_admin_change_pronouns = @domain_root_account.can_add_pronouns? && @user.grants_right?(@current_user, :manage_user_details)
@@ -2207,13 +2213,20 @@ class UsersController < ApplicationController
 
     includes = %w[locale avatar_url email time_zone]
     includes << "avatar_state" if @user.grants_right?(@current_user, :manage_user_details)
+
     if (title = user_params.delete(:title))
       @user.profile.title = title
       includes << "title"
     end
+
     if (bio = user_params.delete(:bio))
       @user.profile.bio = bio
       includes << "bio"
+    end
+
+    if (pronunciation = user_params.delete(:pronunciation))
+      @user.profile.pronunciation = pronunciation
+      includes << "pronunciation"
     end
 
     if (pronouns = user_params.delete(:pronouns))

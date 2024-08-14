@@ -27,6 +27,10 @@ import {ButtonBlock} from '../ButtonBlock'
 import {IconBlock} from '../IconBlock'
 import {type ResourceCardProps} from './types'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor/resource-card')
+
 const ResourceCard = ({id, title, description, iconName, linkText, linkUrl}: ResourceCardProps) => {
   const [myId] = useState(id)
   const [myTitle] = useState(title || ResourceCard.craft.defaultProps.title)
@@ -36,7 +40,7 @@ const ResourceCard = ({id, title, description, iconName, linkText, linkUrl}: Res
   const [myLinkUrl] = useState(linkUrl || ResourceCard.craft.defaultProps.linkUrl)
 
   return (
-    <Container className="resource-card" id={myId} background="#fff">
+    <Container className="block resource-card" id={myId} background="#fff">
       <Flex
         direction="column"
         justifyItems="center"
@@ -49,21 +53,21 @@ const ResourceCard = ({id, title, description, iconName, linkText, linkUrl}: Res
           id={`${myId}__icon`}
           is={IconBlock}
           iconName={myIcon}
-          custom={{displayName: 'Icon'}}
+          custom={{displayName: I18n.t('Icon')}}
         />
         <Element
           id={`${myId}__title`}
           is={HeadingBlock}
           text={myTitle}
           level="h3"
-          custom={{displayName: 'Title'}}
+          custom={{displayName: I18n.t('Title')}}
         />
         <Element
           id={`${myId}__desc`}
           is={TextBlock}
           text={myDescription}
           textAlign="center"
-          custom={{displayName: 'Description'}}
+          custom={{displayName: I18n.t('Description')}}
         />
         <Element
           id={`${myId}__link`}
@@ -71,7 +75,7 @@ const ResourceCard = ({id, title, description, iconName, linkText, linkUrl}: Res
           href={myLinkUrl}
           color="#fff"
           text={myLinkText}
-          custom={{displayName: 'Link'}}
+          custom={{displayName: I18n.t('Link')}}
         />
       </Flex>
     </Container>
@@ -79,7 +83,7 @@ const ResourceCard = ({id, title, description, iconName, linkText, linkUrl}: Res
 }
 
 ResourceCard.craft = {
-  displayName: 'Resource Card',
+  displayName: I18n.t('Resource Card'),
   defaultProps: {
     id: uid('resource-card', 2),
     title: 'Title',
@@ -91,10 +95,9 @@ ResourceCard.craft = {
   custom: {
     isDeletable: (myId: Node, query: any) => {
       const target = query.node(myId).get()
-      const ancestors = query.node(myId).ancestors()
-      const parent = query.node(ancestors[0])
-      if (parent.get().rules?.canMoveOut) {
-        return parent.get().rules.canMoveOut([target], parent.get())
+      const parent = query.node(target.data.parent).get()
+      if (parent.rules?.canMoveOut) {
+        return parent.rules.canMoveOut([target], parent)
       }
       return true
     },

@@ -48,7 +48,7 @@ gem "bigdecimal", "~> 3.1"
 gem "browser", "~> 5.3", require: false
 gem "business_time", "0.13.0"
 gem "canvas_connect", "0.3.16"
-gem "canvas_link_migrator", "~> 1.0.12"
+gem "canvas_link_migrator", "~> 1.0.13"
 gem "canvas_webex", "0.18.2"
 gem "cld", "~> 0.13"
 gem "crocodoc-ruby", "0.0.1", require: false
@@ -110,6 +110,7 @@ gem "ruby-rtf", "0.0.5"
 gem "rubyzip", "~> 2.3", require: "zip"
 gem "saml2", "~> 3.1"
 gem "sanitize", "~> 6.0", require: false
+gem "stackprof", "~> 0.2" # must be loaded before Sentry
 gem "sentry-rails", "~> 5.10"
 gem "sentry-inst_jobs", "~> 5.10"
 gem "soap4r-ng", github: "instructure/soap4r", require: false # dependency of respondus_soap_endpoint, but we need to use an unreleased fork

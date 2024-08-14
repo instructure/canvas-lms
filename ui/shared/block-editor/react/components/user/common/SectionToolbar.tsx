@@ -26,6 +26,10 @@ import {IconBackgroundColor} from '../../../assets/internal-icons'
 import {ColorModal} from './ColorModal'
 import {type ContainerProps} from '../blocks/Container/types'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor/section-toolbar')
+
 const SectionToolbar = () => {
   const {
     actions: {setProp},
@@ -57,7 +61,7 @@ const SectionToolbar = () => {
         size="small"
         withBackground={false}
         withBorder={false}
-        screenReaderLabel="Color"
+        screenReaderLabel={I18n.t('Background Color')}
         disabled={props.variant === 'condensed'}
         onClick={handleBackgroundColorButtonClick}
       >
