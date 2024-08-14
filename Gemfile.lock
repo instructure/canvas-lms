@@ -505,8 +505,8 @@ GEM
       libddwaf (~> 1.14.0.0.0)
       msgpack
     date (3.3.4)
-    db-query-matchers (0.12.0)
-      activesupport (>= 4.0, < 7.2)
+    db-query-matchers (0.13.0)
+      activesupport (>= 4.0, < 7.3)
       rspec (>= 3.0)
     debase-ruby_core_source (3.3.1)
     debug (1.9.2)
