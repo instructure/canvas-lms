@@ -89,6 +89,7 @@
       url_opts[:entry_id] = @entries.first.id if @entries&.first
 
       topic_to_show = @assignment.discussion_topic.for_group_discussion? ? @assignment.discussion_topic.child_topic_for(@user) : @assignment.discussion_topic
+      topic_to_show ||= @assignment.discussion_topic
       discussion_iframe_src = context_url(topic_to_show.context, :context_discussion_topic_url, topic_to_show.id, url_opts)
     %>
     <% if show_full_discussion_immediately %>

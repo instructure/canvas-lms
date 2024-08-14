@@ -246,6 +246,27 @@ describe "SpeedGrader - discussion submissions" do
           end
         end
       end
+
+      it "displays the root topic for group discussion if groups have no users" do
+        entry_text = "first student message"
+        root_topic = group_discussion_assignment
+        root_topic.discussion_entries.create!(user: @student, message: entry_text)
+        Speedgrader.visit(@course.id, root_topic.assignment.id)
+
+        Speedgrader.click_settings_link
+        Speedgrader.click_options_link
+        Speedgrader.select_hide_student_names
+        expect_new_page_load { fj(".ui-dialog-buttonset .ui-button:visible:last").click }
+
+        in_frame("speedgrader_iframe") do
+          in_frame("discussion_preview_iframe") do
+            wait_for_ajaximations
+            expect(f("div[data-testid='discussion-root-entry-container']").text).to include("This Student")
+            expect(f("div[data-testid='discussion-root-entry-container']").text).to include(entry_text)
+            expect(f("body")).not_to contain_jqcss(".discussions-search-filter")
+          end
+        end
+      end
     end
   end
 end
