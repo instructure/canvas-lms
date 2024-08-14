@@ -41,7 +41,7 @@ GEM
     irb (1.14.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
-    minitest (5.24.1)
+    minitest (5.25.1)
     mutex_m (0.2.0)
     psych (5.1.2)
       stringio
