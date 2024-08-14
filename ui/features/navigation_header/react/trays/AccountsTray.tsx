@@ -24,14 +24,13 @@ import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Link} from '@instructure/ui-link'
 import {useQuery} from '@canvas/query'
-import accountsQuery from '../queries/accountsQuery'
-import type {Account} from '../../../../api.d'
+import getAccounts from '@canvas/api/accounts/getAccounts'
 
 const I18n = useI18nScope('AccountsTray')
 export default function AccountsTray() {
-  const {data, isLoading, isSuccess} = useQuery<Account[], Error>({
-    queryKey: ['accounts'],
-    queryFn: accountsQuery,
+  const {data, isLoading, isSuccess} = useQuery({
+    queryKey: ['accounts', {pageIndex: 1}],
+    queryFn: getAccounts,
     fetchAtLeastOnce: true,
   })
 
@@ -56,7 +55,7 @@ export default function AccountsTray() {
           </List.Item>
         )}
         {isSuccess &&
-          data.map(account => (
+          data?.json?.map(account => (
             <List.Item key={account.id}>
               <Link isWithinText={false} href={`/accounts/${account.id}`}>
                 {account.name}

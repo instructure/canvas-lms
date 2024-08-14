@@ -19,6 +19,7 @@
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Pagination} from '@instructure/ui-pagination'
+import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('account_manage')
 const {Page} = Pagination as any
@@ -47,12 +48,14 @@ export function AccountNavigation(props: Props) {
   }
 
   return (
-    <Pagination
-      labelNext={I18n.t('Next Page')}
-      labelPrev={I18n.t('Previous Page')}
-      variant="compact"
-    >
-      {pageButtons}
-    </Pagination>
+    <View padding="0 x-small">
+      <Pagination
+        labelNext={I18n.t('Next Page')}
+        labelPrev={I18n.t('Previous Page')}
+        variant="compact"
+      >
+        {pageButtons}
+      </Pagination>
+    </View>
   )
 }
