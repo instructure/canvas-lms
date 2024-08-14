@@ -88,7 +88,12 @@ export default ({
   const rubricAssessmentData = isPeerReview ? [] : mappedAssessmentData
 
   return (
-    <Transition transitionOnMount={true} in={rubricAssessmentTrayOpen} type="fade">
+    <Transition
+      unmountOnExit={true}
+      transitionOnMount={true}
+      in={rubricAssessmentTrayOpen}
+      type="fade"
+    >
       <View as="div">
         <RubricAssessmentContainer
           criteria={mappedRubric?.criteria ?? []}

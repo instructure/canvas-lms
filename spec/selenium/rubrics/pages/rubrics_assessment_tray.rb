@@ -87,6 +87,10 @@ class RubricAssessmentTray
       f("[data-testid='criterion-score-#{criterion_id}']")
     end
 
+    def criterion_score_readonly(criterion_id)
+      f("[data-testid='criterion-score-#{criterion_id}-readonly']")
+    end
+
     def modern_view_points_inputs(criterion_id)
       f("[data-testid='criterion-score-#{criterion_id}']")
     end
