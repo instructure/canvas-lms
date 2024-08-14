@@ -309,7 +309,7 @@ module SIS
       end
 
       def should_stop_import?
-        !@batch.workflow_state == "importing"
+        SisBatch.where(id: @batch).pick(:workflow_state) == "aborted"
       end
 
       def run_all_importers
