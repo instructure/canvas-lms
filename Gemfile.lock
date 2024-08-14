@@ -859,8 +859,7 @@ GEM
     pg (1.5.7)
     pg_query (5.1.0)
       google-protobuf (>= 3.22.3)
-    pragmatic_segmenter (0.3.23)
-      unicode
+    pragmatic_segmenter (0.3.24)
     prawn (2.5.0)
       matrix (~> 0.4)
       pdf-core (~> 0.10.0)
@@ -1172,7 +1171,6 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.9.1)
-    unicode (0.4.4.5)
     unicode-display_width (2.5.0)
     unicode-emoji (3.4.0)
       unicode-version (~> 1.0)
