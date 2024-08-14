@@ -450,7 +450,12 @@ class Lti::RegistrationsController < ApplicationController
 
   def index
     set_active_tab "apps"
-    add_crumb t("#crumbs.apps", "Apps")
+    breadcrumb_path = if @account.feature_enabled?(:lti_registrations_discover_page)
+                        account_lti_registrations_path(account_id: @account.id)
+                      else
+                        account_lti_manage_registrations_path(account_id: @account.id)
+                      end
+    add_crumb(t("#crumbs.apps", "Apps"), breadcrumb_path)
 
     # allows override of DR url hard-coded into Discover page
     # todo: remove once Discover page retrieves and uses correct DR url
