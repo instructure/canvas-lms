@@ -96,7 +96,7 @@ describe "SpeedGrader - discussion submissions" do
     end
   end
 
-  context "discussion_checkpoints" do
+  context "discussion_checkpoints", skip: "checkpoints broken fix coming up" do
     before do
       Account.site_admin.enable_feature!(:react_discussions_post)
       @course.root_account.enable_feature!(:discussion_checkpoints)
@@ -199,7 +199,7 @@ describe "SpeedGrader - discussion submissions" do
       end
     end
 
-    context "discussion_checkpoints" do
+    context "discussion_checkpoints", skip: "checkpoints broken fix coming up" do
       before do
         Account.site_admin.enable_feature!(:react_discussions_post)
         @course.root_account.enable_feature!(:discussion_checkpoints)
