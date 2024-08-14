@@ -636,6 +636,7 @@ const locale = {
   "links_to_an_external_site_de74145d": {
     "message": "Liens vers un site externe."
   },
+  "lists_cd1336fc": { "message": "Listes" },
   "lists_should_be_formatted_as_lists_f862de8d": {
     "message": "Les listes doivent être formatées comme une liste."
   },
