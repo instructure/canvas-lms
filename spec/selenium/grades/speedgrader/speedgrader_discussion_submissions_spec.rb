@@ -413,6 +413,30 @@ describe "SpeedGrader - discussion submissions" do
         expect(f("#this_student_does_not_have_a_submission")).to be_displayed
       end
 
+      context "discussions navigation" do
+        it "does not display if student has no submission" do
+          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
+          wait_for_ajaximations
+
+          expect(f("body")).to_not contain_jqcss("button[data-testid='discussions-previous-reply-button']")
+          expect(f("body")).to_not contain_jqcss("button[data-testid='discussions-next-reply-button']")
+        end
+
+        it "does display if student has submission" do
+          DiscussionEntry.create!(
+            message: "1st level reply",
+            discussion_topic_id: @checkpointed_discussion.discussion_topic_id,
+            user_id: @student.id
+          )
+
+          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
+          wait_for_ajaximations
+
+          expect(f("button[data-testid='discussions-previous-reply-button']")).to be_displayed
+          expect(f("button[data-testid='discussions-next-reply-button']")).to be_displayed
+        end
+      end
+
       it "displays the root topic for group discussion if groups have no users" do
         entry_text = "first student message"
         root_topic = group_discussion_assignment
