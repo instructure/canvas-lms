@@ -18,10 +18,17 @@
 
 /* eslint-disable no-void */
 
+import React from 'react'
+import ReactDOM from 'react-dom'
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
+import {Spinner} from '@instructure/ui-spinner'
 import CollectionView from '@canvas/backbone-collection-view'
 import template from '../../jst/paginatedCollection.handlebars'
+import {View} from '@instructure/ui-view'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('pagination')
 
 extend(PaginatedCollectionView, CollectionView)
 
@@ -194,8 +201,17 @@ PaginatedCollectionView.prototype.hideLoadingIndicator = function () {
 //
 // @api private
 PaginatedCollectionView.prototype.showLoadingIndicator = function () {
-  let ref
-  return (ref = this.$loadingIndicator) != null ? ref.show() : void 0
+  const ref = this.$loadingIndicator
+  const node = ref?.get(0)
+  if (node instanceof HTMLElement) {
+    ReactDOM.render(
+      <View padding="x-small" textAlign="center" as="div" display="block">
+        <Spinner delay={300} size="x-small" renderTitle={() => I18n.t('Loading')} />
+      </View>,
+      node
+    )
+  }
+  return ref != null ? ref.show() : void 0
 }
 
 export default PaginatedCollectionView
