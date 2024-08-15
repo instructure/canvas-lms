@@ -31,6 +31,7 @@ class AddEmbeddings < ActiveRecord::Migration[7.0]
       t.column :embedding, "#{connection.extension("vector").schema}.vector", limit: 1536, null: false
       t.timestamps
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.integer :version, null: false, default: 1
 
       t.replica_identity_index
     end
@@ -40,6 +41,7 @@ class AddEmbeddings < ActiveRecord::Migration[7.0]
       t.column :embedding, "#{connection.extension("vector").schema}.vector", limit: 1536, null: false
       t.timestamps
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.integer :version, null: false, default: 1
 
       t.replica_identity_index
     end
@@ -49,6 +51,7 @@ class AddEmbeddings < ActiveRecord::Migration[7.0]
       t.column :embedding, "#{connection.extension("vector").schema}.vector", limit: 1536, null: false
       t.timestamps
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.integer :version, null: false, default: 1
 
       t.replica_identity_index
     end
