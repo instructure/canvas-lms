@@ -131,6 +131,12 @@ export interface ItemAssignToTrayProps {
     deletedModuleAssignees: String[],
     disabledOptionIds?: String[]
   ) => void
+  onChange?: (
+    overrides: ItemAssignToCardSpec[],
+    hasModuleOverrides: boolean,
+    deletedModuleAssignees: String[],
+    disabledOptionIds?: String[]
+  ) => void
   onClose: () => void
   onDismiss: () => void
   onExited?: () => void
@@ -166,6 +172,7 @@ export interface ItemAssignToTrayProps {
 export default function ItemAssignToTray({
   open,
   onSave,
+  onChange,
   onClose,
   onExited,
   onDismiss,
@@ -228,6 +235,19 @@ export default function ItemAssignToTray({
       setIsLoading(true)
     }
   }, [open])
+
+  useEffect(() => {
+    if (!ENV.FEATURES?.selective_release_edit_page || onChange === undefined) return
+    const deletedModuleAssignees = moduleAssignees.filter(
+      override => !disabledOptionIdsRef.current.includes(override)
+    )
+    onChange(
+      assignToCardsRef.current,
+      hasModuleOverrides,
+      deletedModuleAssignees,
+      disabledOptionIdsRef.current
+    )
+  }, [assignToCards, hasModuleOverrides, moduleAssignees, onChange])
 
   const everyoneOption = useMemo(() => {
     const hasOverrides =
