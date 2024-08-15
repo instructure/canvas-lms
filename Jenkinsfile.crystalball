@@ -121,7 +121,6 @@ pipeline {
     PATCHSET_TAG = getPatchsetTag()
 
     BASE_RUNNER_PREFIX = configuration.buildRegistryPath('base-runner')
-    CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
     DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')
     KARMA_RUNNER_PREFIX = configuration.buildRegistryPath('karma-runner')
     LINTERS_RUNNER_PREFIX = configuration.buildRegistryPath('linters-runner')
@@ -133,7 +132,6 @@ pipeline {
 
     IMAGE_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
 
-    CASSANDRA_IMAGE_TAG = "$CASSANDRA_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
     DYNAMODB_IMAGE_TAG = "$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
     POSTGRES_IMAGE_TAG = "$POSTGRES_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
     POSTGRES_CLIENT = configuration.postgresClient()

@@ -28,8 +28,6 @@ def call() {
       "CACHE_LOAD_SCOPE=${cacheLoadScope}",
       "CACHE_SAVE_SCOPE=${cacheSaveScope}",
       "CACHE_UNIQUE_SCOPE=${env.IMAGE_CACHE_UNIQUE_SCOPE}",
-      "CASSANDRA_IMAGE_TAG=${imageTag.cassandra()}",
-      "CASSANDRA_PREFIX=${env.CASSANDRA_PREFIX}",
       'COMPOSE_FILE=docker-compose.new-jenkins.yml',
       "DYNAMODB_IMAGE_TAG=${imageTag.dynamodb()}",
       "DYNAMODB_PREFIX=${env.DYNAMODB_PREFIX}",
@@ -42,7 +40,6 @@ def call() {
         export CACHE_LOAD_SCOPE=\${CACHE_LOAD_SCOPE:-}
         export CACHE_SAVE_SCOPE=\${CACHE_SAVE_SCOPE:-}
         ./build/new-jenkins/run-migrations.sh
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $CASSANDRA_PREFIX || true
         ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $DYNAMODB_PREFIX || true
         ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $POSTGRES_PREFIX || true
       """

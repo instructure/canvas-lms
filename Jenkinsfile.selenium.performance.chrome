@@ -37,7 +37,6 @@ pipeline {
     RERUNS_RETRY = 0 // no reruns
     POSTGRES_PASSWORD = 'sekret'
 
-    CASSANDRA_IMAGE_TAG = imageTag.cassandra()
     DYNAMODB_IMAGE_TAG = imageTag.dynamodb()
     POSTGRES_IMAGE_TAG = imageTag.postgres()
   }

@@ -15,35 +15,11 @@ GIT
     soap4r-ng (2.0.4)
 
 GIT
-  remote: https://github.com/kreynolds/cassandra-cql.git
-  revision: 02b5abbe441a345c051a180327932566fd66bb36
-  ref: 02b5abbe441a345c051a180327932566fd66bb36
-  specs:
-    cassandra-cql (1.2.3)
-      simple_uuid (>= 0.2.0)
-      thrift_client (>= 0.7.1, < 0.10)
-
-GIT
-  remote: https://github.com/twitter/thrift_client.git
-  revision: 5c10d59881825cb8e26ab1aa8f1d2738e88c0e83
-  ref: 5c10d59881825cb8e26ab1aa8f1d2738e88c0e83
-  specs:
-    thrift_client (0.9.3)
-      thrift (~> 0.9.0)
-
-GIT
   remote: https://github.com/wrapbook/crystalball.git
   revision: 59837f892594816705b7bb6611191a7bda0c3fb5
   specs:
     crystalball (0.7.0)
       git
-
-PATH
-  remote: gems/canvas_cassandra
-  specs:
-    canvas_cassandra (0.1.0)
-      cassandra-cql (~> 1.2.2)
-      config_file
 
 PATH
   remote: gems/i18n_extraction
@@ -1098,7 +1074,6 @@ GEM
       jwt (>= 1.5, < 3.0)
       multi_json (~> 1.10)
     simple_oauth (0.3.1)
-    simple_uuid (0.4.0)
     simplecov (0.22.0)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
@@ -1159,7 +1134,6 @@ GEM
       testrail_client
     thor (1.3.2)
     thread_safe (0.3.6)
-    thrift (0.9.3.0)
     timecop (0.9.10)
     timeout (0.4.1)
     tins (1.36.1)
@@ -1251,7 +1225,6 @@ DEPENDENCIES
   business_time (= 0.13.0)
   canvas_breach_mitigation!
   canvas_cache!
-  canvas_cassandra!
   canvas_color!
   canvas_connect (= 0.3.16)
   canvas_crummy!
@@ -1274,7 +1247,6 @@ DEPENDENCIES
   canvas_time!
   canvas_unzip!
   canvas_webex (= 0.18.2)
-  cassandra-cql (= 1.2.3)!
   cld (~> 0.13)
   code_ownership (~> 1.33)
   colorize (~> 1.0)
@@ -1417,7 +1389,6 @@ DEPENDENCIES
   switchman-inst-jobs (~> 4.0)
   syslog (~> 0.1)
   testrailtagging (= 0.3.8.7)
-  thrift_client (= 0.9.3)!
   timecop (~> 0.9)
   turnitin_api!
   twilio-ruby (~> 7.0)
