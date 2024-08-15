@@ -618,6 +618,7 @@ const locale = {
   "links_to_an_external_site_de74145d": {
     "message": "Dolenni at safle allanol."
   },
+  "lists_cd1336fc": { "message": "Rhestrau" },
   "lists_should_be_formatted_as_lists_f862de8d": {
     "message": "Dylai rhestrau gael eu fformatio fel rhestrau."
   },
