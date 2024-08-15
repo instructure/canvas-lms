@@ -125,9 +125,6 @@ export const LtiPlacements = {
   UserNavigation: 'user_navigation',
   WikiPageMenu: 'wiki_page_menu',
   WikiIndexMenu: 'wiki_index_menu',
-  DefaultPlacements: 'default_placements',
-  ContentArea: 'ContentArea',
-  RichTextEditor: 'RichTextEditor',
 } as const
 
 export const AllLtiPlacements = [
@@ -169,9 +166,6 @@ export const AllLtiPlacements = [
   LtiPlacements.UserNavigation,
   LtiPlacements.WikiPageMenu,
   LtiPlacements.WikiIndexMenu,
-  LtiPlacements.DefaultPlacements,
-  LtiPlacements.ContentArea,
-  LtiPlacements.RichTextEditor,
 ] as const
 
 export const ZLtiPlacement = z.enum(AllLtiPlacements)
