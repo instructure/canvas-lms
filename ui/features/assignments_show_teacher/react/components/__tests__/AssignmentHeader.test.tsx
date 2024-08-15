@@ -28,4 +28,13 @@ describe('assignment enhancement teacher view header', () => {
     expect(getByTestId('assignment-name')).toBeInTheDocument()
     expect(getByTestId('assignment-name')).toHaveTextContent(assignment.name)
   })
+
+  it('renders assignment status pill', () => {
+    const assignment = mockAssignment()
+    const getByTestId1 = render(<AssignmentHeader assignment={assignment} />).getByTestId
+    expect(() => getByTestId1('assignment-status-pill')).toThrow()
+    assignment.hasSubmittedSubmissions = true
+    const getByTestId2 = render(<AssignmentHeader assignment={assignment} />).getByTestId
+    expect(getByTestId2('assignment-status-pill')).toBeInTheDocument()
+  })
 })

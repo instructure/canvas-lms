@@ -19,19 +19,53 @@
 import React from 'react'
 import {Heading} from '@instructure/ui-heading'
 import type {TeacherAssignmentType} from '../../graphql/AssignmentTeacherTypes'
+import AssignmentPublishButton from './AssignmentPublishButton'
+import {Pill} from '@instructure/ui-pill'
+import {useScope as useI18nScope} from '@canvas/i18n'
+import {IconPublishSolid} from '@instructure/ui-icons'
+import WithBreakpoints, {type Breakpoints} from '@canvas/with-breakpoints'
+
+const I18n = useI18nScope('assignment_teacher_header')
 
 interface HeaderProps {
   assignment: TeacherAssignmentType
+  breakpoints: Breakpoints
 }
 
 const AssignmentHeader: React.FC<HeaderProps> = props => {
+  const isMobile = props.breakpoints.mobileOnly
   return (
-    <div id="assignments-2-teacher-header">
-      <Heading data-testid="assignment-name" level="h1">
-        {props.assignment?.name}
-      </Heading>
+    <div className={isMobile ? 'mobile' : 'desktop'}>
+      <div id="assignments-2-teacher-header">
+        <Heading data-testid="assignment-name" level="h1">
+          {props.assignment?.name}
+        </Heading>
+        <div id="header-buttons">
+          {!props.assignment.hasSubmittedSubmissions && (
+            <AssignmentPublishButton
+              isPublished={props.assignment.state === 'published'}
+              assignmentLid={props.assignment.lid}
+              breakpoints={props.breakpoints}
+            />
+          )}
+        </div>
+      </div>
+
+      <div id="submission-status">
+        {props.assignment.hasSubmittedSubmissions && (
+          <Pill
+            statusLabel="Status"
+            renderIcon={<IconPublishSolid />}
+            color="success"
+            margin="x-small auto"
+            data-testid="assignment-status-pill"
+          >
+            {I18n.t('Published')}
+          </Pill>
+        )}
+      </div>
     </div>
   )
 }
 
-export default AssignmentHeader
+export default WithBreakpoints(AssignmentHeader)

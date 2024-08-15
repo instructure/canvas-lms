@@ -17,6 +17,7 @@
  */
 
 import type {TeacherAssignmentType} from '../graphql/AssignmentTeacherTypes'
+import {SET_WORKFLOW} from '../graphql/Mutations'
 
 export function mockCourse(overrides = {}) {
   return {
@@ -48,7 +49,7 @@ export function mockAssignment(overrides = {}): TeacherAssignmentType {
     __typename: 'Assignment',
     id: 'assignment-gid',
     gid: 'assignment-gid',
-    lid: 'assignment-lid',
+    lid: '5',
     name: 'Basic Mock Assignment',
     pointsPossible: 5,
     dueAt: '2018-11-28T13:00-05:00',
@@ -75,10 +76,37 @@ export function mockAssignment(overrides = {}): TeacherAssignmentType {
       pageInfo: mockPageInfo(),
       nodes: [],
     },
+    hasSubmittedSubmissions: false,
     submissions: {
       pageInfo: mockPageInfo(),
       nodes: [],
     },
     ...overrides,
   }
+}
+
+export const mockSetWorkflowSuccess = {
+  request: {
+    query: SET_WORKFLOW,
+    variables: {id: 5, workflow: 'unpublished'},
+  },
+  result: {
+    data: {
+      updateAssignment: {
+        assignment: {
+          __typename: 'Assignment',
+          id: 'assignment-gid',
+          state: 'unpublished',
+        },
+      },
+    },
+  },
+}
+
+export const mockSetWorkflowFailure = {
+  request: {
+    query: SET_WORKFLOW,
+    variables: {id: 'assignment-lid', workflow: 'unpublished'},
+  },
+  error: new Error('An error occurred'),
 }
