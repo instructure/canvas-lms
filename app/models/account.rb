@@ -394,6 +394,7 @@ class Account < ActiveRecord::Base
   add_setting :disable_login_search_indexing, boolean: true, root_only: true, default: false
   add_setting :allow_additional_email_at_registration, boolean: true, root_only: true, default: false
   add_setting :limit_personal_access_tokens, boolean: true, root_only: true, default: false
+  add_setting :show_sections_in_course_tray, boolean: true, root_only: true, default: true
 
   # Allow enabling metrics like Heap for sandboxes and other accounts without Salesforce data
   add_setting :enable_usage_metrics, boolean: true, root_only: true, default: false

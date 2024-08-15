@@ -111,6 +111,7 @@ describe('CoursesTray', () => {
     window.ENV.K5_USER = false
     window.ENV.FEATURES.courses_popout_sisid = true
     window.ENV.current_user_roles = []
+    window.ENV.SETTINGS = {show_sections_in_course_tray: true}
   })
 
   afterEach(() => {
@@ -182,6 +183,12 @@ describe('CoursesTray', () => {
   it('sorts section names in alphabetical and ascending order', () => {
     const {getByText} = render(<CoursesTray />)
     expect(getByText('Section3, Section4, Section5')).toBeInTheDocument()
+  })
+
+  it('does not render sections if setting show_sections_in_course_tray is disabled', () => {
+    window.ENV.SETTINGS.show_sections_in_course_tray = false
+    const {queryByText} = render(<CoursesTray />)
+    expect(queryByText('Section3, Section4, Section5')).not.toBeInTheDocument()
   })
 
   it('renders the correct URL for each course', () => {
