@@ -38,6 +38,8 @@ import {RegistrationModalBody} from './RegistrationModalBody'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {Lti1p3RegistrationWizard} from '../lti_1p3_registration_form/Lti1p3RegistrationWizard'
 import type {JsonUrlWizardService} from './JsonUrlWizardService'
+import * as z from 'zod'
+import {isSuccessful, isUnsuccessful} from '../../common/lib/apiResult/ApiResult'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -114,7 +116,7 @@ const ModalBodyWrapper = ({
     if (
       state.method === 'json_url' &&
       state.jsonUrlFetch._tag === 'loaded' &&
-      state.jsonUrlFetch.result._type === 'success'
+      isSuccessful(state.jsonUrlFetch.result)
     ) {
       return (
         <Lti1p3RegistrationWizard
@@ -300,7 +302,7 @@ const validForm = (state: RegistrationWizardModalState) => {
 
 const jsonUrlFetchMessages = (state: RegistrationWizardModalState) => {
   const jsonUrlFetch = state.jsonUrlFetch
-  if (jsonUrlFetch._tag === 'loaded' && jsonUrlFetch.result._type !== 'success') {
+  if (jsonUrlFetch._tag === 'loaded' && isUnsuccessful(jsonUrlFetch.result)) {
     const errorType = jsonUrlFetch.result._type
     return [
       {
