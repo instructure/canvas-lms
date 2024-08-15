@@ -1195,6 +1195,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :context_code, limit: 255
       t.string :type, limit: 255
       t.uuid :resource_link_lookup_uuid
+      t.references :root_account, foreign_key: { to_table: :accounts }
 
       t.index [:context_id, :context_type]
     end
@@ -1499,6 +1500,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :is_rce_favorite, default: false, null: false
       t.string :identity_hash, limit: 64, index: { where: "identity_hash <> 'duplicate'" }
       t.text :lti_version, null: false, limit: 8, default: "1.1"
+      t.string :unified_tool_id, limit: 255
 
       t.replica_identity_index
       t.index [:context_id, :context_type]
@@ -1597,7 +1599,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :has_media_objects
       t.text :root_account_ids
       t.boolean :automated, default: false, null: false
-      t.bigint :inbox_settings_ooo_snapshot
+      t.text :inbox_settings_ooo_hash
 
       t.index [:conversation_id, :created_at]
     end
@@ -2051,9 +2053,17 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.integer :input_tokens
       t.integer :output_tokens
       t.float :generation_time
+      t.references :parent, foreign_key: { to_table: :discussion_topic_summaries }
+      t.string :locale, if_not_exists: true
 
-      t.index %i[discussion_topic_id llm_config_version dynamic_content_hash], name: "index_summaries_on_topic_id_and_llm_config_version_and_hash"
-      t.index %i[discussion_topic_id created_at], name: "index_summaries_on_topic_id_and_created_at", order: { created_at: :desc }
+      t.index %i[discussion_topic_id
+                 llm_config_version
+                 dynamic_content_hash
+                 parent_id
+                 locale
+                 created_at],
+              name: "index_summaries_for_lookup",
+              order: { created_at: :desc }
     end
 
     create_table :discussion_topic_summary_feedback do |t|
@@ -2710,6 +2720,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
                    foreign_key: { to_table: :lti_registrations },
                    null: true
       t.string :workflow_state, limit: 255, default: "active"
+      t.string :unified_tool_id, limit: 255
 
       t.replica_identity_index
     end
@@ -2797,7 +2808,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :lti_registration_account_bindings do |t|
-      t.belongs_to :registration, null: false, foreign_key: { to_table: :lti_registrations }
+      t.belongs_to :registration, null: false
       t.belongs_to :account, null: false, foreign_key: true
       t.belongs_to :created_by, foreign_key: { to_table: :users }
       t.belongs_to :updated_by, foreign_key: { to_table: :users }
@@ -2886,6 +2897,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamps precision: nil
       t.string :disabled_placements, array: true, default: []
       t.string :privacy_level
+      t.string :unified_tool_id, limit: 255
     end
 
     create_table :lti_tool_consumer_profiles do |t|
@@ -3080,6 +3092,10 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :attachment
       t.integer :total_size
       t.string :old_media_id, limit: 255, index: true
+      t.string :auto_caption_status, limit: 255
+
+      t.check_constraint "auto_caption_status IN ('complete', 'processing', 'failed_initial_validation', 'failed_handoff', 'failed_request', 'non_english_captions', 'failed_captions', 'failed_to_pull')",
+                         name: "chk_auto_caption_status_enum"
 
       t.index [:context_id, :context_type]
     end
