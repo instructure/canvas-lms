@@ -66,6 +66,28 @@ const AssignToOption = (props: Props) => {
     }
   }, [props.pageId])
 
+  const onChange = (
+    assignToCards: ItemAssignToCardSpec[],
+    hasModuleOverrides: boolean,
+    deletedModuleAssignees: string[],
+    newDisabledOptionIds: string[]
+  ) => {
+    if (!ENV.FEATURES?.selective_release_edit_page) return
+
+    const filteredCards = assignToCards.filter(
+      card =>
+        [null, undefined, ''].includes(card.contextModuleId) ||
+        (card.contextModuleId !== null && card.isEdited)
+    )
+    const overrides = generateDateDetailsPayload(
+      filteredCards,
+      hasModuleOverrides,
+      deletedModuleAssignees
+    )
+    props.onSync(overrides)
+    setDisabledOptionIds(newDisabledOptionIds)
+  }
+
   const handleSave = (
     assignToCards: ItemAssignToCardSpec[],
     hasModuleOverrides: boolean,
@@ -92,7 +114,7 @@ const AssignToOption = (props: Props) => {
     handleClose()
   }
 
-  return (
+  const trayView = (
     <>
       <View display="flex">
         <View as="div" margin="none none" width="25px">
@@ -134,6 +156,34 @@ const AssignToOption = (props: Props) => {
         onInitialStateSet={setCheckPoint}
       />
     </>
+  )
+
+  const embeddedView = (
+    <>
+      <ItemAssignToTray
+        data-testid="manage-assign-to"
+        courseId={ENV.COURSE_ID}
+        itemName={itemName}
+        itemType="page"
+        iconType="page"
+        itemContentId={props.pageId}
+        useApplyButton={true}
+        locale={ENV.LOCALE || 'en'}
+        timezone={ENV.TIMEZONE || 'UTC'}
+        removeDueDateInput={true}
+        defaultCards={checkPoint}
+        defaultDisabledOptionIds={disabledOptionIds}
+        onInitialStateSet={setCheckPoint}
+        isTray={false}
+        onChange={onChange}
+      />
+    </>
+  )
+
+  return (
+    <View as="div" maxWidth="478px">
+      {ENV.FEATURES?.selective_release_edit_page ? embeddedView : trayView}
+    </View>
   )
 }
 
