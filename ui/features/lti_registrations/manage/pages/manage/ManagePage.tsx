@@ -37,6 +37,7 @@ import type {LtiRegistration} from '../../model/LtiRegistration'
 import {AppsTable} from './AppsTable'
 import {mkUseManagePageState} from './ManagePageLoadingState'
 import {useManageSearchParams, type ManageSearchParams} from './ManageSearchParams'
+import {isSuccessful} from '../../../common/lib/apiResult/ApiResult'
 
 const SEARCH_DEBOUNCE_MS = 250
 
@@ -105,11 +106,11 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
     async (app: LtiRegistration) => {
       if (await confirmDeletion(app)) {
         const deleteResult = await deleteRegistration(app)
-        const type = deleteResult._type === 'success' ? 'success' : 'error'
+        const type = isSuccessful(deleteResult) ? 'success' : 'error'
         showFlashAlert({
           type,
           message:
-            deleteResult._type !== 'success'
+            deleteResult._type !== 'Success'
               ? I18n.t('There was an error deleting “%{appName}”', {appName: app.name})
               : I18n.t('App “%{appName}” successfully deleted', {appName: app.name}),
         })

@@ -41,6 +41,7 @@ import {PermissionConfirmation} from './components/PermissionConfirmation'
 import {PlacementsConfirmation} from './components/PlacementsConfirmation'
 import {PrivacyConfirmation} from './components/PrivacyConfirmation'
 import {ReviewScreen} from './components/ReviewScreen'
+import {isUnsuccessful} from '../../common/lib/apiResult/ApiResult'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -180,7 +181,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
                     state._type,
                     state.registration.developer_key_id
                   )
-                  if (result._type !== 'success') {
+                  if (isUnsuccessful(result)) {
                     showFlashAlert({
                       message: I18n.t(
                         'Something went wrong deleting the registration. The registration can still be deleted manually on the Manage page.'
