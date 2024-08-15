@@ -29,7 +29,7 @@ import type {RegistrationOverlayStore} from '../../registration_wizard/registrat
 import {useOverlayStore} from '../hooks/useOverlayStore'
 import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
 import {usePlacements} from '../hooks/usePlacements'
-import {i18nLtiPlacement} from '../../model/LtiPlacement'
+import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
 
 const I18n = useI18nScope('lti_registration.wizard')
 

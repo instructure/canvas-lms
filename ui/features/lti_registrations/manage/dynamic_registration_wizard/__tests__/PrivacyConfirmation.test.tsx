@@ -23,11 +23,8 @@ import {PrivacyConfirmation, type PrivacyConfirmationProps} from '../components/
 import {createRegistrationOverlayStore} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
 import {mockRegistration} from './helpers'
 import React from 'react'
-import {
-  type LtiPrivacyLevel,
-  i18nLtiPrivacyLevel,
-  i18nLtiPrivacyLevelDescription,
-} from '../../model/LtiPrivacyLevel'
+import {type LtiPrivacyLevel} from '../../model/LtiPrivacyLevel'
+import {i18nLtiPrivacyLevel, i18nLtiPrivacyLevelDescription} from '../../model/i18nLtiPrivacyLevel'
 
 const mockProps = ({
   toolName = 'Tool Name',
