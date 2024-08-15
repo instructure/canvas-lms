@@ -21,13 +21,14 @@ import {screen, render} from '@testing-library/react'
 import React from 'react'
 import {ReviewScreen} from '../components/ReviewScreen'
 import {mockConfigWithPlacements, mockRegistration} from './helpers'
-import {i18nLtiPlacement, LtiPlacements, type LtiPlacementWithIcon} from '../../model/LtiPlacement'
+import {LtiPlacements, type LtiPlacementWithIcon} from '../../model/LtiPlacement'
+import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
 import {
   canvasPlatformSettings,
   createRegistrationOverlayStore,
 } from '../../registration_wizard/registration_settings/RegistrationOverlayState'
-import {i18nLtiScope} from '../../model/LtiScope'
-import {i18nLtiPrivacyLevelDescription} from '../../model/LtiPrivacyLevel'
+import {i18nLtiScope} from '../../model/i18nLtiScope'
+import {i18nLtiPrivacyLevelDescription} from '../../model/i18nLtiPrivacyLevel'
 
 describe('ReviewScreen', () => {
   it('renders without error', () => {

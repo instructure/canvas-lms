@@ -22,7 +22,8 @@ import {createRegistrationOverlayStore} from '../../registration_wizard/registra
 import {IconConfirmation} from '../components/IconConfirmation'
 import {render, screen} from '@testing-library/react'
 import * as ue from '@testing-library/user-event'
-import {LtiPlacements, LtiPlacementsWithIcons, i18nLtiPlacement} from '../../model/LtiPlacement'
+import {LtiPlacements, LtiPlacementsWithIcons} from '../../model/LtiPlacement'
+import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
 
 const userEvent = ue.userEvent.setup({advanceTimers: jest.advanceTimersByTime})
 

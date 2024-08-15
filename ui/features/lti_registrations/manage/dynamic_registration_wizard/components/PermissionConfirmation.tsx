@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {i18nLtiScope} from '../../model/LtiScope'
+import {i18nLtiScope} from '../../model/i18nLtiScope'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'

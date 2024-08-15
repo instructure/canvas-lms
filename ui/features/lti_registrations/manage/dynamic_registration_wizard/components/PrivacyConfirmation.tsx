@@ -24,13 +24,8 @@ import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import type {RegistrationOverlayStore} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
 import {htmlEscape} from '@instructure/html-escape'
-import {
-  AllLtiPrivacyLevels,
-  i18nLtiPrivacyLevel,
-  i18nLtiPrivacyLevelDescription,
-  isLtiPrivacyLevel,
-} from '../../model/LtiPrivacyLevel'
-import {Flex} from '@instructure/ui-flex'
+import {AllLtiPrivacyLevels, isLtiPrivacyLevel} from '../../model/LtiPrivacyLevel'
+import {i18nLtiPrivacyLevel, i18nLtiPrivacyLevelDescription} from '../../model/i18nLtiPrivacyLevel'
 
 export type PrivacyConfirmationProps = {
   toolName: string
