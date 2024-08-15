@@ -425,6 +425,15 @@
                   </tr>
                 <% end %>
 
+                 <% if !@account.site_admin? && @account.primary_settings_root_account? %>
+                  <tr>
+                    <td colspan="2">
+                      <%= settings.check_box :show_sections_in_course_tray, checked: @account.show_sections_in_course_tray? %>
+                      <%= settings.label :show_sections_in_course_tray, t("Show Sections in Course Tray.") %>
+                    </td>
+                  </tr>
+                <% end %>
+
                 <% if !@account.site_admin? && @account.primary_settings_root_account? && @account.feature_enabled?(:admin_manage_access_tokens)%>
                   <tr>
                     <td colspan="2">
