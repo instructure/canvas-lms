@@ -236,6 +236,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
       t.replica_identity_index
       t.index [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
+      t.index :grading_standard_id, name: "index_courses_on_grading_standard"
       if (trgm = connection.extension(:pg_trgm)&.schema)
         t.index "(
             coalesce(lower(name), '') || ' ' ||
@@ -723,6 +724,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.index :duplication_started_at,
               where: "workflow_state = 'migrating' AND duplication_started_at IS NOT NULL",
               name: "index_assignments_duplicating_on_started_at"
+      t.index %i[context_id grading_standard_id grading_type],
+              name: "index_assignments_on_context_grading_standard_grading_type"
     end
 
     create_table :assignment_configuration_tool_lookups do |t|
@@ -1048,6 +1051,17 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :event_title, limit: 255, null: false
       t.timestamps precision: 6
       t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
+
+      t.replica_identity_index
+    end
+
+    create_table :block_editors do |t|
+      t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
+      t.references :context, polymorphic: true, null: false
+      t.bigint :time
+      t.jsonb :blocks, default: [], null: false
+      t.string :editor_version
+      t.timestamps
 
       t.replica_identity_index
     end
@@ -2022,6 +2036,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamp :end_at
       t.timestamps precision: nil
       t.references :root_account, foreign_key: { to_table: :accounts }
+      t.text :stuck_sis_fields
 
       t.replica_identity_index :context_id
     end
@@ -2738,7 +2753,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.uuid :lookup_uuid, null: false
       t.uuid :resource_link_uuid, null: false, index: { unique: true }
       t.string :url
-      t.string :lti_1_1_id, index: { unique: true, where: "lti_1_1_id IS NOT NULL" }
+      t.string :lti_1_1_id
       t.string :title
 
       t.replica_identity_index
@@ -4122,6 +4137,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
               name: "index_submissions_with_grade"
       t.index [:course_id, :cached_due_date]
       t.index :user_id, where: "late_policy_status='missing'", name: "index_on_submissions_missing_for_user"
+      t.index :assignment_id, name: "index_graded_submissions_on_assignments", where: "workflow_state='graded'"
     end
 
     create_table :submission_comments do |t|
@@ -4726,9 +4742,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
         AND ao.workflow_state = 'active'
     SQL
 
-    execute(MigrationHelpers::StudentVisibilities::StudentVisibilitiesV5.new(connection.quote_table_name("module_student_visibilities"), ContextModule).view_sql)
-    execute(MigrationHelpers::StudentVisibilities::StudentVisibilitiesV5.new(connection.quote_table_name("assignment_student_visibilities_v2"), Assignment).view_sql)
-    execute(MigrationHelpers::StudentVisibilities::StudentVisibilitiesV5.new(connection.quote_table_name("quiz_student_visibilities_v2"), Quizzes::Quiz).view_sql)
+    execute(MigrationHelpers::StudentVisibilities::StudentVisibilitiesV6.new(connection.quote_table_name("module_student_visibilities"), ContextModule).view_sql)
+    execute(MigrationHelpers::StudentVisibilities::StudentVisibilitiesV6.new(connection.quote_table_name("assignment_student_visibilities_v2"), Assignment).view_sql)
+    execute(MigrationHelpers::StudentVisibilities::StudentVisibilitiesV6.new(connection.quote_table_name("quiz_student_visibilities_v2"), Quizzes::Quiz).view_sql)
   end
 
   def readonly_user_exists?
