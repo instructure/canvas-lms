@@ -1663,7 +1663,7 @@ class ActiveRecord::Migration
 end
 
 class ActiveRecord::MigrationProxy
-  delegate :connection, :cassandra_cluster, to: :migration
+  delegate :connection, to: :migration
 
   def initialize(*)
     super

@@ -13,7 +13,6 @@ ECR_BASE=948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io
 
 DOCKER_IMAGES=(
   $PATCHSET_TAG
-  $CASSANDRA_IMAGE_TAG
   $DYNAMODB_IMAGE_TAG
   $POSTGRES_IMAGE_TAG
   $REGISTRY_BASE/canvas-rce-api

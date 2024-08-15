@@ -107,7 +107,6 @@ def postFn(status) {
 
       if (status == 'SUCCESS' && configuration.isChangeMerged() && isPatchsetPublishable()) {
         dockerUtils.tagRemote(env.PATCHSET_TAG, env.MERGE_TAG)
-        dockerUtils.tagRemote(env.CASSANDRA_IMAGE_TAG, env.CASSANDRA_MERGE_IMAGE)
         dockerUtils.tagRemote(env.DYNAMODB_IMAGE_TAG, env.DYNAMODB_MERGE_IMAGE)
         dockerUtils.tagRemote(env.POSTGRES_IMAGE_TAG, env.POSTGRES_MERGE_IMAGE)
         dockerUtils.tagRemote(env.KARMA_RUNNER_IMAGE, env.KARMA_MERGE_IMAGE)
@@ -265,7 +264,6 @@ pipeline {
     FORCE_CRYSTALBALL = "${commitMessageFlag('force-crystalball').asBooleanInteger()}"
 
     BASE_RUNNER_PREFIX = configuration.buildRegistryPath('base-runner')
-    CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
     DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')
     KARMA_RUNNER_PREFIX = configuration.buildRegistryPath('karma-runner')
     LINTERS_RUNNER_PREFIX = configuration.buildRegistryPath('linters-runner')
@@ -280,13 +278,11 @@ pipeline {
     IMAGE_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
     IMAGE_CACHE_UNIQUE_SCOPE = "${imageTagVersion()}-$TAG_SUFFIX"
 
-    CASSANDRA_IMAGE_TAG = "$CASSANDRA_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     DYNAMODB_IMAGE_TAG = "$DYNAMODB_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     POSTGRES_IMAGE_TAG = "$POSTGRES_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     WEBPACK_BUILDER_IMAGE = "$WEBPACK_BUILDER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     WEBPACK_ASSETS_IMAGE = "$WEBPACK_ASSETS_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
 
-    CASSANDRA_MERGE_IMAGE = "$CASSANDRA_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-${env.RSPEC_PROCESSES ?: '4'}"
     DYNAMODB_MERGE_IMAGE = "$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-${env.RSPEC_PROCESSES ?: '4'}"
     KARMA_RUNNER_IMAGE = "$KARMA_RUNNER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     KARMA_MERGE_IMAGE = "$KARMA_RUNNER_PREFIX:$IMAGE_CACHE_MERGE_SCOPE"
@@ -625,7 +621,6 @@ pipeline {
                   extendedStage('Contract Tests')
                     .hooks(buildSummaryReportHooks.call())
                     .queue(nestedStages, jobName: '/Canvas/test-suites/contract-tests', buildParameters: buildParameters + [
-                      string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                     ])
@@ -640,7 +635,6 @@ pipeline {
                     .hooks(buildSummaryReportHooks.call())
                     .required(!configuration.isChangeMerged() && filesChangedStage.hasSpecFiles(buildConfig) || commitMessageFlag('force-failure-fsc') as Boolean)
                     .queue(nestedStages, jobName: '/Canvas/test-suites/flakey-spec-catcher', buildParameters: buildParameters + [
-                      string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                     ])
@@ -648,7 +642,6 @@ pipeline {
                   extendedStage('Vendored Gems')
                     .hooks(buildSummaryReportHooks.call())
                     .queue(nestedStages, jobName: '/Canvas/test-suites/vendored-gems', buildParameters: buildParameters + [
-                      string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                     ])
@@ -656,7 +649,6 @@ pipeline {
                   extendedStage('RspecQ Tests')
                     .hooks(buildSummaryReportHooks.withRunManifest())
                     .queue(nestedStages, jobName: '/Canvas/test-suites/test-queue', buildParameters: buildParameters + [
-                      string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                       string(name: 'SKIP_CRYSTALBALL', value: "${env.SKIP_CRYSTALBALL || setupStage.hasGemOverrides()}"),

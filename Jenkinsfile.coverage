@@ -118,14 +118,12 @@ pipeline {
     RSPECQ_REDIS_URL = redisUrl()
     PATCHSET_TAG = getPatchsetTag()
 
-    CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
     DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')
     POSTGRES_PREFIX = configuration.buildRegistryPath('postgres-migrations')
 
     IMAGE_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
     RSPEC_PROCESSES = 6
 
-    CASSANDRA_IMAGE_TAG = "$CASSANDRA_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
     DYNAMODB_IMAGE_TAG = "$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
     POSTGRES_IMAGE_TAG = "$POSTGRES_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
 
