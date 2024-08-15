@@ -1587,6 +1587,45 @@ describe OutcomeResultsController do
         expect(json["rollups"].count { |r| r["links"]["user"] == @student2.id.to_s }).to eq(0)
       end
 
+      context "with user enrollments from different shards (trust relationships)" do
+        specs_require_sharding
+
+        before do
+          @shard1.activate do
+            @student_from_another_shard = user_factory(name: "Distant Traveler", short_name: "Traveler")
+          end
+          student_in_course(active_all: true, course: outcome_course, user: @student_from_another_shard)
+        end
+
+        it "student is not canonical in the current shard" do
+          student = outcome_course.students.find_by(id: @student_from_another_shard.id)
+          expect(student.canonical?).to be_falsey
+        end
+
+        it "displays rollups for students from different shards" do
+          json = parse_response(get_rollups(exclude: ["inactive_enrollments", "concluded_enrollments"]))
+          expect(json["rollups"].count { |r| r["links"]["user"] == @student_from_another_shard.id.to_s }).to eq(1)
+        end
+
+        it "does not display rollups for students from different shards when they are inactive" do
+          outcome_course.enrollments.find_by(user_id: @student_from_another_shard.id).deactivate
+          json = parse_response(get_rollups(exclude: "inactive_enrollments"))
+          expect(json["rollups"].count { |r| r["links"]["user"] == @student_from_another_shard.id.to_s }).to eq(0)
+        end
+
+        it "does not display rollups for students from different shards when they are concluded" do
+          outcome_course.enrollments.find_by(user_id: @student_from_another_shard.id).conclude
+          json = parse_response(get_rollups(exclude: "concluded_enrollments"))
+          expect(json["rollups"].count { |r| r["links"]["user"] == @student_from_another_shard.id.to_s }).to eq(0)
+        end
+
+        it "does not display rollups for students from different shards when they are deleted" do
+          outcome_course.enrollments.find_by(user_id: @student_from_another_shard.id).update(workflow_state: "deleted")
+          json = parse_response(get_rollups({}))
+          expect(json["rollups"].count { |r| r["links"]["user"] == @student_from_another_shard.id.to_s }).to eq(0)
+        end
+      end
+
       context "users with enrollments of different enrollment states" do
         before do
           StudentEnrollment.find_by(user_id: @student2.id).deactivate
