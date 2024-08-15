@@ -4586,12 +4586,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
               unique: true
     end
 
-    if Rails.env.test?
-      create_table :stories do |t|
-        t.string :text
-      end
-    end
-
     unless Rails.env.production?
       # this user is *not* used in production! it's only used to simulate a read-only secondary database in dev/test
 
