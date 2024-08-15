@@ -20,8 +20,8 @@
 import getCookie from '@instructure/get-cookie'
 import parseLinkHeader, {type Links} from '@canvas/parse-link-header'
 import {defaultFetchOptions} from '@canvas/util/xhr'
-import {toQueryString} from '@canvas/query-string-encoding'
-import type {QueryParameterRecord} from '@canvas/query-string-encoding'
+import {toQueryString} from '@instructure/query-string-encoding'
+import type {QueryParameterRecord} from '@instructure/query-string-encoding/index.d'
 import z from 'zod'
 
 type RequestCredentials = 'include' | 'omit' | 'same-origin'

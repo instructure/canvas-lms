@@ -17,7 +17,7 @@
  */
 
 import {toQueryString, encodeQueryString, decodeQueryString} from '../index'
-import type {QueryParameterRecord} from '../index'
+import type {QueryParameterRecord} from '../index.d'
 import $ from 'jquery'
 
 type EncodeQueryStringParams = Array<Record<string, string | null>>

@@ -26,32 +26,20 @@
 // ... so we have to do a lot of massaging with the params object before using it
 // So fun!
 
-type QueryParameterElement =
-  | string
-  | number
-  | boolean
-  | null
-  | undefined
-  | (() => string) // n.b. for jQuery compatibility, this does not expect a generic return
-  | Array<QueryParameterElement>
-  | QueryParameterRecord
-
-export type QueryParameterRecord = {[k: string]: QueryParameterElement}
-
-export function toQueryString(params: QueryParameterRecord): string {
-  const paramsWithIndexes: Array<[k: string, v: string]> = []
+export function toQueryString(params) {
+  const paramsWithIndexes = []
 
   // encode each key/value pair using encodeURIComponent, to ensure that each
   // key and value are properly encoded URI componeent strings. Otherwise,
   // URLSearchParams will convert blanks into '+' which is not what we want.
-  const asStringValue = (parms: URLSearchParams): string => {
+  const asStringValue = parms => {
     return Array.from(parms)
       .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
       .join('&')
   }
 
   // fix up the array/object indexes to match the PHP standard
-  const fixIndexes = (elt: [string, string]): [string, string] => [
+  const fixIndexes = elt => [
     elt[0]
       .replace(/\[\d+\]$/, '[]')
       .replace(/{/g, '[')
@@ -59,7 +47,7 @@ export function toQueryString(params: QueryParameterRecord): string {
     elt[1],
   ]
 
-  function serialize(k: string, elt: QueryParameterElement, suffix: string): void {
+  function serialize(k, elt, suffix) {
     if (elt instanceof Function) {
       paramsWithIndexes.push([k + suffix, elt()])
     } else if (elt instanceof Array) {
@@ -85,22 +73,18 @@ export function toQueryString(params: QueryParameterRecord): string {
 // This is just to implement backward-compatibility from the old package. Almost
 // nothing uses it anyway and we recommend toQueryString() for new needs.
 // Need to be careful about duplicated keys, which have to be mapped into arrays.
-export function encodeQueryString(
-  unknownParams:
-    | Record<string, string | null | undefined>[]
-    | Record<string, string | null | undefined>
-): string {
-  let params: Record<string, string | null | undefined>[]
+export function encodeQueryString(unknownParams) {
+  let params
 
   if (Array.isArray(unknownParams)) {
     params = unknownParams
   } else if (typeof unknownParams === 'object') {
-    params = [unknownParams as Record<string, string | null | undefined>]
+    params = [unknownParams]
   } else {
     throw new TypeError('encodeQueryString() expects an array or object')
   }
 
-  const realParms: QueryParameterRecord = {}
+  const realParms = {}
   params.forEach(p => {
     const k = Object.keys(p)[0]
     const m = k.match(/(.+)\[\]/)
@@ -130,7 +114,7 @@ export function encodeQueryString(
 // in terms of how things like  foo[]=1&foo[]=2  would be decoded. But it doesn't
 // seem like any current usage cares about that kind of thing.
 
-export function decodeQueryString(string: string) {
+export function decodeQueryString(string) {
   return string
     .split('&')
     .map(pair => pair.split('='))
