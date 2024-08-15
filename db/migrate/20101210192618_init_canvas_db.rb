@@ -597,6 +597,12 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.index %i[context_id context_type user_id updated_at], name: "index_asset_user_accesses_on_ci_ct_ui_ua"
       t.index %i[user_id context_id asset_code id],
               name: "index_asset_user_accesses_on_user_id_context_id_asset_code"
+
+      # add a partial index on the updated_at column for rows where context_type
+      # is 'Group', optimizing queries filtering by this context
+      t.index :updated_at,
+              name: "index_on_updated_at_for_group_context",
+              where: "context_type = 'Group'"
     end
 
     # one table for each day of week, they'll periodically
@@ -805,9 +811,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :workflow_state, default: "active", null: false, index: true
       t.references :root_account, foreign_key: { to_table: :accounts }
       t.references :context_module, foreign_key: true, index: false
-      t.references :wiki_page, foreign_key: true, index: false
-      t.references :discussion_topic, foreign_key: true, index: false
-      t.references :attachment, foreign_key: true, index: false
+      t.references :wiki_page, foreign_key: true, index: { where: "wiki_page_id IS NOT NULL" }
+      t.references :discussion_topic, foreign_key: true, index: { where: "discussion_topic_id IS NOT NULL" }
+      t.references :attachment, foreign_key: true, index: { where: "attachment_id IS NOT NULL" }
 
       t.index [:assignment_id, :user_id], unique: true, where: "workflow_state = 'active'"
       t.index [:user_id, :quiz_id]
@@ -815,14 +821,18 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
               where: "context_module_id IS NOT NULL",
               unique: true,
               name: "index_assignment_override_students_on_context_module_and_user"
-      t.index [:wiki_page_id, :user_id], unique: true, where: "wiki_page_id IS NOT NULL"
+      t.index [:wiki_page_id, :user_id],
+              unique: true,
+              where: "wiki_page_id IS NOT NULL AND workflow_state = 'active'",
+              name: "index_aos_on_active_wiki_page_and_user"
       t.index [:discussion_topic_id, :user_id],
               unique: true,
-              where: "discussion_topic_id IS NOT NULL",
-              name: "index_assignment_override_students_on_discussion_topic_and_user"
+              where: "discussion_topic_id IS NOT NULL AND workflow_state = 'active'",
+              name: "index_aos_on_active_discussion_topic_and_user"
       t.index [:attachment_id, :user_id],
               unique: true,
-              where: "attachment_id IS NOT NULL"
+              where: "attachment_id IS NOT NULL AND workflow_state = 'active'",
+              name: "index_aos_on_active_attachment_and_user"
     end
 
     create_table :attachments do |t|
@@ -1987,6 +1997,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.integer :reply_to_entry_required_count, null: false, default: 0
       t.timestamp :unlock_at, precision: 6
       t.boolean :only_visible_to_overrides, null: false, default: false
+      t.boolean :summary_enabled, default: false, null: false
 
       t.replica_identity_index
       t.index [:context_id, :position]
@@ -2027,6 +2038,38 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :course_section, null: false, foreign_key: true, index: { name: "idx_discussion_topic_section_visibility_on_section" }
       t.timestamps precision: nil
       t.string :workflow_state, null: false, limit: 255
+    end
+
+    create_table :discussion_topic_summaries do |t|
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.replica_identity_index
+      t.references :discussion_topic, null: false, foreign_key: true, index: { name: "index_summaries_on_topic_id" }
+      t.string :llm_config_version, null: false, limit: 255
+      t.string :dynamic_content_hash, null: false, limit: 255
+      t.timestamps
+      t.text :summary
+      t.integer :input_tokens
+      t.integer :output_tokens
+      t.float :generation_time
+
+      t.index %i[discussion_topic_id llm_config_version dynamic_content_hash], name: "index_summaries_on_topic_id_and_llm_config_version_and_hash"
+      t.index %i[discussion_topic_id created_at], name: "index_summaries_on_topic_id_and_created_at", order: { created_at: :desc }
+    end
+
+    create_table :discussion_topic_summary_feedback do |t|
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.replica_identity_index
+      t.references :discussion_topic_summary, null: false, foreign_key: true, index: false
+      t.references :user, null: false, foreign_key: true
+      t.boolean :liked, default: false, null: false
+      t.boolean :disliked, default: false, null: false
+      t.boolean :regenerated, null: false, default: false
+      t.boolean :summary_disabled, null: false, default: false
+      t.timestamps
+
+      t.index %i[discussion_topic_summary_id user_id], unique: true, name: "index_feedback_on_summary_id_and_user_id"
+
+      t.check_constraint "NOT (liked AND disliked)"
     end
 
     create_table :enrollment_dates_overrides do |t|
@@ -2135,6 +2178,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
               where: "temporary_enrollment_source_user_id IS NOT NULL",
               name: "index_enrollments_on_temp_enrollment_user_type_role_section",
               unique: true
+      t.index [:user_id, :course_section_id],
+              name: "index_on_user_id_and_course_section_id"
     end
 
     create_table :eportfolios do |t|
@@ -2739,8 +2784,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :internal_service, null: false, default: false
       t.belongs_to :account, null: false, foreign_key: true
       t.belongs_to :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
-      t.belongs_to :created_by, null: false, foreign_key: { to_table: :users }, index: { if_not_exists: true }
-      t.belongs_to :updated_by, null: false, foreign_key: { to_table: :users }, index: { if_not_exists: true }
+      t.belongs_to :created_by, foreign_key: { to_table: :users }, index: { if_not_exists: true }
+      t.belongs_to :updated_by, foreign_key: { to_table: :users }, index: { if_not_exists: true }
       t.string :name, null: false, index: true, limit: 255
       t.string :admin_nickname, limit: 255
       t.string :vendor, limit: 255
@@ -3591,6 +3636,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       # a hash of all login attribute names to their value; allows migrating to
       # different login attributes in the future
       t.jsonb :unique_ids, null: false, default: {}, if_not_exists: true
+      t.string :verification_token, limit: 255
 
       # login_attribute can only be set if authentication_provider_id is set
       # conversely, if authentication_provider_id IS NULL, login_attribute MUST be NULL
