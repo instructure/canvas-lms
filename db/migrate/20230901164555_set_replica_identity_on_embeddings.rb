@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-#
-# Copyright (C) 2024 - present Instructure, Inc.
+# Copyright (C) 2023 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,12 +15,21 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-class RemoveExtraCommentBankItemsRootAccountIdIndex < ActiveRecord::Migration[7.0]
-  tag :postdeploy
+class SetReplicaIdentityOnEmbeddings < ActiveRecord::Migration[7.0]
+  tag :predeploy
 
-  def change
-    remove_index :comment_bank_items, :root_account_id
+  def self.runnable?
+    connection.extension_available?(:vector)
+  end
+
+  def up
+    set_replica_identity :assignment_embeddings
+    set_replica_identity :discussion_topic_embeddings
+    set_replica_identity :wiki_page_embeddings
+  end
+
+  def down
+    set_replica_identity :wiki_page_embeddings, :default
   end
 end

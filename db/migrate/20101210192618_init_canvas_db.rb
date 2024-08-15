@@ -39,12 +39,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
   def up
     connection.transaction(requires_new: true) do
-      create_extension(:pg_collkey, schema: connection.shard.name, if_not_exists: true)
-    rescue ActiveRecord::StatementInvalid
-      raise ActiveRecord::Rollback
-    end
-
-    connection.transaction(requires_new: true) do
       create_extension(:pg_trgm, schema: connection.shard.name, if_not_exists: true)
     rescue ActiveRecord::StatementInvalid
       raise ActiveRecord::Rollback
@@ -339,7 +333,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
                 using: :gin,
                 where: "workflow_state IN ('registered', 'pre_registered')"
       end
-      t.index "#{User.best_unicode_collation_key("sortable_name")}, id", name: "index_users_on_sortable_name"
+      t.index "(sortable_name COLLATE public.\"und-u-kn-true\"), id",
+              name: :index_users_on_sortable_name
       t.index :id, where: "workflow_state <> 'deleted'", name: "index_active_users_on_id"
     end
 
@@ -538,7 +533,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :migration_id, limit: 255
       t.references :root_account, foreign_key: { to_table: :accounts }
 
-      t.index [:context_id, :context_type], name: "index_on_aqb_on_context_id_and_context_type"
       t.index %i[context_id context_type title id],
               name: "index_aqb_context_and_title"
     end
@@ -891,6 +885,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
               name: "index_attachments_on_context_and_migration_id_pattern_ops"
       t.index :created_at, where: "context_type IN ('ContentExport', 'ContentMigration') and file_state NOT IN ('deleted', 'broken') and root_attachment_id is null"
       t.index :context_type, where: "workflow_state = 'deleted' and file_state = 'deleted'"
+      t.index "folder_id, file_state, (display_name COLLATE public.\"und-u-kn-true\")",
+              name: :index_attachments_on_folder_id_and_file_state_and_display_name,
+              where: "folder_id IS NOT NULL"
     end
 
     execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
@@ -1203,7 +1200,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :comment_bank_items do |t|
       t.references :course, null: false, foreign_key: true
-      t.references :root_account, null: false, foreign_key: { to_table: :accounts }
+      t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
       t.references :user, null: false, foreign_key: true
       t.text :comment, null: false
       t.timestamps precision: 6
@@ -1358,7 +1355,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :content_migrations do |t|
-      t.bigint :context_id, null: false, index: true
+      t.bigint :context_id, null: false
       t.references :user, foreign_key: true, index: { where: "user_id IS NOT NULL" }
       t.string :workflow_state, null: false, limit: 255
       t.text :migration_settings
@@ -2255,7 +2252,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :favorites do |t|
-      t.references :user, foreign_key: true
+      t.references :user, foreign_key: true, index: false
       t.bigint :context_id
       t.string :context_type, limit: 255
       t.timestamps precision: nil
@@ -2371,10 +2368,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamps precision: nil
       t.string :title, limit: 255
       t.string :workflow_state, default: "active", null: false, limit: 255, index: true
-      # someone used change_column instead of change_column_null and
-      # accidentally lost the limit: 8 on this foreign key
-      # (went from bigint -> int). needs to be fixed.
-      t.references :grading_period_group, type: :integer, null: false, foreign_key: true
+      t.references :grading_period_group, null: false, foreign_key: true
       t.timestamp :close_date
       t.references :root_account, foreign_key: { to_table: :accounts }
     end
@@ -2468,6 +2462,20 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :attachment, foreign_key: true, index: { where: "attachment_id IS NOT NULL" }
       t.string :workflow_state, null: false, default: "active"
       t.timestamps precision: nil
+    end
+
+    create_table :inbox_settings do |t|
+      t.string :user_id, index: true, null: false
+      t.boolean :use_signature, default: false, null: false
+      t.string :signature, limit: 255
+      t.boolean :use_out_of_office, default: false, null: false
+      t.datetime :out_of_office_first_date
+      t.datetime :out_of_office_last_date
+      t.string :out_of_office_subject, limit: 255
+      t.string :out_of_office_message, limit: 255
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.replica_identity_index
+      t.timestamps
     end
 
     create_table :ignores do |t|
@@ -2674,6 +2682,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
       t.boolean :coupled, default: true, null: false
       t.timestamp :end_date_time
+      t.datetime :start_date_time
 
       t.replica_identity_index
     end
@@ -3566,8 +3575,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
               where: "workflow_state IN ('active', 'suspended') AND authentication_provider_id IS NULL"
       t.index "LOWER(unique_id), account_id", name: "index_pseudonyms_on_unique_id_and_account_id"
     end
-    execute "CREATE UNIQUE INDEX index_pseudonyms_on_unique_id_and_account_id_and_authentication_provider_id ON #{Pseudonym.quoted_table_name} (LOWER(unique_id), account_id, authentication_provider_id) WHERE workflow_state='active'"
-    execute "CREATE UNIQUE INDEX index_pseudonyms_on_unique_id_and_account_id_no_authentication_provider_id ON #{Pseudonym.quoted_table_name} (LOWER(unique_id), account_id) WHERE workflow_state='active' AND authentication_provider_id IS NULL"
 
     create_table :purgatories do |t|
       t.references :attachment, null: false, foreign_key: true, index: { unique: true }
@@ -4441,7 +4448,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     create_table :user_profiles do |t|
       t.text :bio
       t.string :title, limit: 255
-      t.references :user, foreign_key: true
+      t.references :user, foreign_key: true, null: false
     end
 
     create_table :user_profile_links do |t|
@@ -4469,8 +4476,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :last_result_id, limit: 255
       t.timestamp :refresh_at
       t.boolean :visible
-
-      t.index [:id, :type]
     end
 
     create_table :versions do |t|
