@@ -1393,7 +1393,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     create_table :content_participation_counts do |t|
       t.string :content_type, limit: 255
       t.references :context, polymorphic: { limit: 255 }, index: false
-      t.references :user, index: false
+      t.references :user, index: { where: "user_id IS NOT NULL" }
       t.integer :unread_count, default: 0
       t.timestamps precision: nil
       t.references :root_account, foreign_key: { to_table: :accounts }
@@ -2164,7 +2164,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :url
       t.text :message
       t.text :comments
-      t.references :user, index: false
+      t.references :user, index: { where: "user_id IS NOT NULL" }
       t.timestamps null: true, precision: nil
       t.string :email, limit: 255
       t.boolean :during_tests, default: false
@@ -3807,6 +3807,12 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :hide_score_total
       t.string :workflow_state, default: "active", null: false, limit: 255
       t.references :root_account, foreign_key: { to_table: :accounts }
+      t.boolean :hide_points, default: false, null: false
+      t.string :rating_order, default: "descending", null: false
+      t.string :button_display, default: "numeric", null: false
+
+      t.check_constraint "rating_order IN ('descending', 'ascending')", name: "check_rating_order"
+      t.check_constraint "button_display IN ('numeric', 'emoji', 'letter')", name: "check_button_display"
 
       t.index [:context_id, :context_type]
     end
@@ -4268,6 +4274,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamps
       t.references :created_by, foreign_key: { to_table: :users }
       t.references :deleted_by, foreign_key: { to_table: :users }
+      t.text :ending_enrollment_state
 
       t.replica_identity_index
     end
@@ -4719,8 +4726,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
         AND ao.workflow_state = 'active'
     SQL
 
-    execute(MigrationHelpers::StudentVisibilities::StudentVisibilitiesV4.view(connection.quote_table_name("assignment_student_visibilities_v2"), Assignment.quoted_table_name, is_assignment: true))
-    execute(MigrationHelpers::StudentVisibilities::StudentVisibilitiesV4.view(connection.quote_table_name("quiz_student_visibilities_v2"), Quizzes::Quiz.quoted_table_name))
+    execute(MigrationHelpers::StudentVisibilities::StudentVisibilitiesV5.new(connection.quote_table_name("module_student_visibilities"), ContextModule).view_sql)
+    execute(MigrationHelpers::StudentVisibilities::StudentVisibilitiesV5.new(connection.quote_table_name("assignment_student_visibilities_v2"), Assignment).view_sql)
+    execute(MigrationHelpers::StudentVisibilities::StudentVisibilitiesV5.new(connection.quote_table_name("quiz_student_visibilities_v2"), Quizzes::Quiz).view_sql)
   end
 
   def readonly_user_exists?
