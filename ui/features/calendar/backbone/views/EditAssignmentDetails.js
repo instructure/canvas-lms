@@ -37,7 +37,7 @@ import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '../../fcMomentHandlebarsHelpers'
-import {encodeQueryString} from '@canvas/query-string-encoding'
+import {encodeQueryString} from '@instructure/query-string-encoding'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 const I18n = useI18nScope('calendar')

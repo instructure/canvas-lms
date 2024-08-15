@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {encodeQueryString} from '@canvas/query-string-encoding'
+import {encodeQueryString} from '@instructure/query-string-encoding'
 import $ from 'jquery'
 import 'jquery.cookie'
 import {clone, throttle} from 'lodash'

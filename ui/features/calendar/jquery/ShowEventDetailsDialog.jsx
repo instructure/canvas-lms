@@ -33,7 +33,7 @@ import reservationOverLimitDialog from '../jst/reservationOverLimitDialog.handle
 import MessageParticipantsDialog from '@canvas/calendar/jquery/MessageParticipantsDialog'
 import preventDefault from '@canvas/util/preventDefault'
 import axios from '@canvas/axios'
-import {encodeQueryString} from '@canvas/query-string-encoding'
+import {encodeQueryString} from '@instructure/query-string-encoding'
 import {publish} from 'jquery-tinypubsub'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
