@@ -2328,16 +2328,19 @@ class AbstractAssignment < ActiveRecord::Base
   private :save_grade_to_submission
 
   def find_or_create_submission(user, skip_grader_check: false)
-    Assignment.unique_constraint_retry do
-      s = all_submissions.where(user_id: user).first
-      unless s
-        s = submissions.build
-        user.is_a?(User) ? s.user = user : s.user_id = user
-        s.skip_grader_check = true if skip_grader_check
-        s.save!
+    s = all_submissions.find_by(user:)
+
+    unless s
+      s = submissions.build
+      user.is_a?(User) ? s.user = user : s.user_id = user
+      s.skip_grader_check = true if skip_grader_check
+
+      s.shard.activate do
+        s.insert(on_conflict: -> { find_or_create_submission(user, skip_grader_check:) })
       end
-      s
     end
+
+    s
   end
 
   def find_or_create_submissions(students, relation = nil)
