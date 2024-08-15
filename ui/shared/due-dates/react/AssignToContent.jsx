@@ -276,7 +276,7 @@ const AssignToContent = ({
     const newCard = CardActions.handleAssigneeAdd({}, [], cardId, {})[0]
     delete newCard.student_ids
     newCard.draft = true
-    newCard.index = cards[cards.length -1].index + 1
+    newCard.index = cardId
     const oldOverrides = getAllOverridesFromCards(stagedCardsRef.current).filter(
       card =>
         card.course_section_id ||
@@ -306,8 +306,8 @@ const AssignToContent = ({
   }
 
   const addOverride = () => {
-    const cardsCount = cards[cards.length -1].index + 1
-    generateCard(cardsCount)
+    const lastCard = cards.at(-1)
+    generateCard(lastCard ? lastCard.index + 1 : 1)
   }
 
   const handleChange = (cardId, newAssignee, deletedAssignees) => {
