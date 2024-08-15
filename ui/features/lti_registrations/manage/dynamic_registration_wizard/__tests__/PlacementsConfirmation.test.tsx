@@ -106,7 +106,7 @@ describe('PlacementsConfirmation', () => {
     const config = mockConfigWithPlacements([
       LtiPlacements.CourseNavigation,
       LtiPlacements.AccountNavigation,
-      LtiPlacements.RichTextEditor,
+      LtiPlacements.EditorButton,
     ])
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
@@ -179,7 +179,7 @@ describe('PlacementsConfirmation', () => {
     const placements = [
       LtiPlacements.CourseNavigation,
       LtiPlacements.AssignmentSelection,
-      LtiPlacements.ContentArea,
+      LtiPlacements.LinkSelection,
     ]
     const config = mockConfigWithPlacements(placements)
     const reg = mockRegistration({}, config)

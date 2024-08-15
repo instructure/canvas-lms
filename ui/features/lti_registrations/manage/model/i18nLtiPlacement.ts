@@ -61,9 +61,6 @@ export const LtiPlacementTranslations: Record<LtiPlacement, string> = {
   user_navigation: I18n.t('User Navigation'),
   wiki_page_menu: I18n.t('Page Menu'),
   wiki_index_menu: I18n.t('Pages Index Menu'),
-  default_placements: I18n.t('Assignment and Link Selection'),
-  ContentArea: I18n.t('Content Area'),
-  RichTextEditor: I18n.t('Rich Text Editor'),
 }
 export const i18nLtiPlacement = (placement: LtiPlacement): string =>
   LtiPlacementTranslations[placement]
