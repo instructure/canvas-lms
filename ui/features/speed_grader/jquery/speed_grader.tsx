@@ -161,6 +161,7 @@ import type {
   RubricUnderscoreType,
 } from '../react/RubricAssessmentContainerWrapper/utils'
 import {SpeedGraderCheckpointsWrapper} from '../react/SpeedGraderCheckpoints/SpeedGraderCheckpointsWrapper'
+import {SpeedGraderDiscussionsNavigation} from '../react/SpeedGraderDiscussionsNavigation'
 
 declare global {
   interface Window {
@@ -186,6 +187,8 @@ const SPEED_GRADER_CHECKPOINTS_MOUNT_POINT = 'speed_grader_checkpoints_mount_poi
 const SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT = 'speed_grader_edit_status_mount_point'
 const SPEED_GRADER_EDIT_STATUS_MENU_SECONDARY_MOUNT_POINT =
   'speed_grader_edit_status_secondary_mount_point'
+const SPEED_GRADER_DISCUSSIONS_NAVIGATION_MOUNT_POINT =
+  'speed_grader_discussions_navigation_mount_point'
 const ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT = 'speed_grader_assessment_audit_button_mount_point'
 const ASSESSMENT_AUDIT_TRAY_MOUNT_POINT = 'speed_grader_assessment_audit_tray_mount_point'
 const SCREEN_CAPTURE_ICON_MOUNT_POINT = 'screen-capture-icon-mount-point'
@@ -854,6 +857,22 @@ function renderCheckpoints(submission: Submission) {
       />,
       mountPoint
     )
+  }
+}
+
+function renderDiscussionsNavigation() {
+  const mountPoint = document.getElementById(SPEED_GRADER_DISCUSSIONS_NAVIGATION_MOUNT_POINT)
+
+  if (mountPoint) {
+    ReactDOM.render(<SpeedGraderDiscussionsNavigation />, mountPoint)
+  }
+}
+
+function clearDiscussionsNavigation() {
+  const mountPoint = document.getElementById(SPEED_GRADER_DISCUSSIONS_NAVIGATION_MOUNT_POINT)
+
+  if (mountPoint) {
+    ReactDOM.unmountComponentAtNode(mountPoint)
   }
 }
 
@@ -1690,6 +1709,8 @@ EG = {
   },
 
   handleStudentChanged(historyBehavior = null) {
+    clearDiscussionsNavigation()
+
     // Save any draft comments before loading the new student
     if ($add_a_comment_textarea.hasClass('ui-state-disabled')) {
       $add_a_comment_textarea.val('')
@@ -2892,6 +2913,8 @@ EG = {
       domElement
     )
     $iframe_holder.html(iframe).show()
+
+    renderDiscussionsNavigation()
   },
 
   renderLtiLaunch($div: JQuery, urlBase: string, submission: HistoricalSubmission) {
