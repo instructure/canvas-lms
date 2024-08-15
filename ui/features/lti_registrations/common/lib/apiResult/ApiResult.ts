@@ -40,7 +40,7 @@ export type ApiResult<A> =
       /** Indicates an error response from the backend */
       _type: 'ApiError'
       status: number
-      body: unknown
+      body?: unknown
     }
   | {
       _type: 'GenericError'

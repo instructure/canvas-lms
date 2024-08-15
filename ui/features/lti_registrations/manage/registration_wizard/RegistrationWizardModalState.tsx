@@ -18,10 +18,10 @@
 import create from 'zustand'
 import {isSuccessful, type ApiResult} from '../../common/lib/apiResult/ApiResult'
 import type {LtiImsRegistrationId} from '../model/lti_ims_registration/LtiImsRegistrationId'
-import type {LtiConfiguration} from '../model/lti_tool_configuration/LtiConfiguration'
 import {ZUnifiedToolId, type UnifiedToolId} from '../model/UnifiedToolId'
+import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 
-type JsonUrlFetchStatus =
+export type JsonUrlFetchStatus =
   | {
       _tag: 'initial'
     }
@@ -30,7 +30,7 @@ type JsonUrlFetchStatus =
     }
   | {
       _tag: 'loaded'
-      result: ApiResult<LtiConfiguration>
+      result: ApiResult<InternalLtiConfiguration>
     }
 
 export type RegistrationWizardModalState = {

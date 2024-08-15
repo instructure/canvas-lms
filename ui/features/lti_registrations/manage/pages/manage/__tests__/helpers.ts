@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {ZLtiImsRegistrationId} from '../../../model/lti_ims_registration/LtiImsRegistrationId'
 import type {PaginatedList} from '../../../api/PaginatedList'
 import type {AccountId} from '../../../model/AccountId'
 import type {LtiRegistration} from '../../../model/LtiRegistration'
@@ -69,7 +70,7 @@ export const mockRegistration = (n: string, i: number): LtiRegistration => {
     },
     developer_key_id: id as DeveloperKeyId,
     internal_service: false,
-    ims_registration_id: id,
+    ims_registration_id: ZLtiImsRegistrationId.parse(id),
     legacy_configuration_id: null,
     manual_configuration_id: null,
     admin_nickname: n,

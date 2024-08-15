@@ -24,7 +24,12 @@ import {
   openRegistrationWizard,
   useRegistrationModalWizardState,
 } from '../RegistrationWizardModalState'
-import {apiParseError, genericError, success} from '../../../common/lib/apiResult/ApiResult'
+import {
+  apiError,
+  apiParseError,
+  genericError,
+  success,
+} from '../../../common/lib/apiResult/ApiResult'
 import {mockToolConfiguration, mockJsonUrlWizardService} from './helpers'
 import {ZLtiConfiguration} from '../../model/lti_tool_configuration/LtiConfiguration'
 import {mockDynamicRegistrationWizardService} from '../../dynamic_registration_wizard/__tests__/helpers'
@@ -178,7 +183,7 @@ describe('RegistrationWizardModal', () => {
       })
 
       expect(fetchThirdPartyToolConfiguration).toHaveBeenCalledWith(
-        'https://example.com/json',
+        {url: 'https://example.com/json'},
         accountId
       )
     })
@@ -213,32 +218,17 @@ describe('RegistrationWizardModal', () => {
       })
 
       expect(fetchThirdPartyToolConfiguration).toHaveBeenCalledWith(
-        'https://example.com/json',
+        {url: 'https://example.com/json'},
         accountId
       )
     })
 
     it('renders an error screen when the third party configuration is invalid', async () => {
       const accountId = ZAccountId.parse('123')
-      const result = ZLtiConfiguration.safeParse({
-        title: 'An invalid tool',
-        description: 'This tool is invalid',
-        target_link_uri: 'http://example.com',
-        oidc_initiation_url: 'http://example.com',
-        custom_fields: 'An invalid custom field',
-        oidc_initiation_urls: {},
-        public_jwk_url: 'http://example.com',
-        scopes: [],
-        extensions: [],
-      })
-
-      if (result.success) {
-        throw new Error('Expected an error')
-      }
 
       const fetchThirdPartyToolConfiguration = jest
         .fn()
-        .mockResolvedValue(apiParseError(result.error, 'http://example.com'))
+        .mockResolvedValue(apiError(422, {errors: ['Bad config']}))
 
       const jsonUrlWizardService = mockJsonUrlWizardService({fetchThirdPartyToolConfiguration})
 
@@ -265,7 +255,7 @@ describe('RegistrationWizardModal', () => {
       })
 
       expect(fetchThirdPartyToolConfiguration).toHaveBeenCalledWith(
-        'https://example.com/json',
+        {url: 'https://example.com/json'},
         accountId
       )
     })

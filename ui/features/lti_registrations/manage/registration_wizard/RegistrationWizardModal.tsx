@@ -23,6 +23,7 @@ import {
   useRegistrationModalWizardState,
   type RegistrationWizardModalState,
   type RegistrationWizardModalStateActions,
+  type JsonUrlFetchStatus,
 } from './RegistrationWizardModalState'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextInput} from '@instructure/ui-text-input'
@@ -121,7 +122,7 @@ const ModalBodyWrapper = ({
       return (
         <Lti1p3RegistrationWizard
           accountId={accountId}
-          configuration={state.jsonUrlFetch.result.data}
+          internalConfiguration={state.jsonUrlFetch.result.data}
           unifiedToolId={state.unifiedToolId}
           onSuccessfulRegistration={() => {
             state.close()
@@ -176,7 +177,31 @@ export type InitializationModalBodyProps = {
   accountId: AccountId
 }
 
+const renderDebugMessage = (jsonUrlFetch: JsonUrlFetchStatus) => {
+  if (jsonUrlFetch._tag === 'loaded' && jsonUrlFetch.result._type === 'ApiError') {
+    const result = z.object({errors: z.array(z.string())}).safeParse(jsonUrlFetch.result.body)
+    if (result.success) {
+      // eslint-disable-next-line react/no-array-index-key
+      return result.data.errors.map((err, i) => <div key={i}>{err}</div>)
+    }
+  }
+}
+
 const InitializationModalBody = (props: InitializationModalBodyProps) => {
+  const [debugging, setDebugging] = React.useState(false)
+
+  React.useEffect(() => {
+    const listener = (event: KeyboardEvent) => {
+      if (event.metaKey && event.key === 'b') {
+        setDebugging(prev => !prev)
+      }
+    }
+    document.addEventListener('keydown', listener)
+    return () => {
+      document.removeEventListener('keydown', listener)
+    }
+  })
+
   return (
     <>
       <RegistrationModalBody>
@@ -206,7 +231,7 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
                 assistiveText="Use arrow keys to navigate options."
                 value={props.state.method}
                 disabled={!window.ENV.FEATURES.lti_registrations_next}
-                onChange={(e, {value}) => {
+                onChange={(_e, {value}) => {
                   if (value === 'dynamic_registration') {
                     props.state.updateMethod('dynamic_registration')
                   } else if (value === 'json_url') {
@@ -254,6 +279,7 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
                 />
               </View>
             )}
+            {debugging && renderDebugMessage(props.state.jsonUrlFetch)}
           </>
         )}
       </RegistrationModalBody>
@@ -269,10 +295,14 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
             // if it's json_url, we need to fetch the configuration first
             if (props.state.method === 'json_url') {
               props.state.updateJsonFetchStatus({_tag: 'loading'})
+              // eslint-disable-next-line promise/catch-or-return
               props.jsonUrlWizardService
-                .fetchThirdPartyToolConfiguration(props.state.jsonUrl, props.accountId)
+                .fetchThirdPartyToolConfiguration({url: props.state.jsonUrl}, props.accountId)
                 .then(result => {
-                  props.state.updateJsonFetchStatus({_tag: 'loaded', result})
+                  props.state.updateJsonFetchStatus({
+                    _tag: 'loaded',
+                    result,
+                  })
                 })
             } else {
               props.state.register()
@@ -304,14 +334,21 @@ const jsonUrlFetchMessages = (state: RegistrationWizardModalState) => {
   const jsonUrlFetch = state.jsonUrlFetch
   if (jsonUrlFetch._tag === 'loaded' && isUnsuccessful(jsonUrlFetch.result)) {
     const errorType = jsonUrlFetch.result._type
+
+    /**
+     * True if the configuration is invalid or the JSON is invalid,
+     * the implication being that the tool provider needs to fix the configuration
+     */
+    const configurationError =
+      errorType === 'InvalidJson' ||
+      (errorType === 'ApiError' && jsonUrlFetch.result.status === 422)
     return [
       {
-        text:
-          errorType === 'ApiParseError' || errorType === 'InvalidJson'
-            ? I18n.t(
-                'The configuration is invalid. Please reach out to the app provider for assistance.'
-              )
-            : I18n.t('An error occurred. Please try again.'),
+        text: configurationError
+          ? I18n.t(
+              'The configuration is invalid. Please reach out to the app provider for assistance.'
+            )
+          : I18n.t('An error occurred. Please try again.'),
         type: 'error',
       } as const,
     ]

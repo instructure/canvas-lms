@@ -16,19 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as React from 'react'
-import type {LtiConfiguration} from '../model/lti_tool_configuration/LtiConfiguration'
-import {Modal} from '@instructure/ui-modal'
-import {Button} from '@instructure/ui-buttons'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {Button} from '@instructure/ui-buttons'
+import {Modal} from '@instructure/ui-modal'
+import * as React from 'react'
 import type {AccountId} from '../model/AccountId'
+import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 import type {UnifiedToolId} from '../model/UnifiedToolId'
 
 const I18n = useI18nScope('lti_registrations')
 
 export type Lti1p3RegistrationWizardProps = {
   accountId: AccountId
-  configuration?: LtiConfiguration
+  internalConfiguration?: InternalLtiConfiguration
   unregister: () => void
   unifiedToolId?: UnifiedToolId
   onSuccessfulRegistration: () => void
@@ -40,7 +40,9 @@ export const Lti1p3RegistrationWizard = (props: Lti1p3RegistrationWizardProps) =
       <Modal.Body>
         <div>
           {/* todo: render the generalized form for manual configurations */}
-          <pre>{JSON.stringify(props.configuration, null, 2)}</pre>
+          <pre>
+            {props.internalConfiguration && JSON.stringify(props.internalConfiguration, null, 2)}
+          </pre>
         </div>
       </Modal.Body>
       <Modal.Footer>
