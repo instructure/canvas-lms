@@ -121,7 +121,7 @@ module DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks
       attachment = get_attachment(active_record, media_id)
       new_src = "/media_attachments_iframe/#{attachment.id}"
       new_src = add_verifier_to_link(new_src, attachment) if attachment.context_type == "User"
-      iframe = doc.document.create_element "iframe", { "src" => new_src }
+      iframe = doc.document.create_element "iframe", { "src" => new_src, "data-media-type" => attachment.content_type&.split("/")&.[](0) }
       set_iframe_width_and_height(iframe, media_id)
       e.replace iframe
     end
@@ -136,6 +136,7 @@ module DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks
       new_src = "#{source_parts[1]}media_attachments_iframe/#{attachment.id}#{source_parts[3]}"
       new_src = add_verifier_to_link(new_src, attachment) if attachment.context_type == "User"
       e.set_attribute("src", new_src)
+      e.set_attribute("data-media-type", attachment.content_type&.split("/")&.[](0))
       set_iframe_width_and_height(e, media_id)
     end
 
@@ -165,7 +166,9 @@ module DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks
     chosen_context = get_preferred_contexts(active_record).compact[0]
     return unless chosen_context
 
-    Attachment.create!(context: chosen_context, media_entry_id: media_id, filename: media_id, content_type: "unknown/unknown")
+    media_type = MediaObject.where(media_id:).last&.media_type
+    media_type ||= "video/*"
+    Attachment.create!(context: chosen_context, media_entry_id: media_id, filename: media_id, content_type: media_type)
   end
 
   def self.get_valid_candidate(candidates, active_record)

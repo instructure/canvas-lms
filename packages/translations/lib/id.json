@@ -647,9 +647,6 @@
     "edit_link_7f53bebb": {
         "message": "Edit Tautan"
     },
-    "editor_statusbar_26ac81fc": {
-        "message": "Editor Bilah Status"
-    },
     "element_starting_with_start_91bf4c3b": {
         "message": "Elemen yang mulai dengan { start }"
     },
@@ -1294,6 +1291,9 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Tautan ke situs eksternal."
+    },
+    "lists_cd1336fc": {
+        "message": "Daftar"
     },
     "lists_should_be_formatted_as_lists_f862de8d": {
         "message": "Daftar harus diformat sebagai daftar."

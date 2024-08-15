@@ -1,0 +1,22 @@
+# to use this add inst-cli/docker-compose/pgweb.override.yml
+# to your COMPOSE_FILE var in .env
+
+version: '3'
+services:
+  pgweb:
+    image: sosedoff/pgweb
+    command: [
+      /usr/bin/pgweb, --bind=0.0.0.0, --ssl=disable, --db=canvas_development,
+      --host=canvas-postgres, --user=postgres, --pass=sekret
+    ]
+    env_file: .env
+    environment:
+      VIRTUAL_HOST: canvas-pgweb.$INST_DOMAIN
+    labels:
+      - traefik.enable=true
+    depends_on:
+      - postgres
+    networks:
+      default:
+        aliases:
+          - canvas-pgweb

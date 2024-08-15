@@ -32,6 +32,7 @@ export const DiscussionEntry = {
       _id
       createdAt
       updatedAt
+      editedAt
       deleted
       message
       ratingCount
@@ -106,6 +107,7 @@ export const DiscussionEntry = {
     _id: string,
     createdAt: string,
     updatedAt: string,
+    editedAt: string,
     deleted: bool,
     message: string,
     ratingCount: number,
@@ -162,6 +164,7 @@ export const DiscussionEntry = {
     _id = 'DiscussionEntry-default-mock',
     createdAt = '2021-02-08T13:35:56-07:00',
     updatedAt = '2021-04-13T10:00:20-06:00',
+    editedAt = '2021-04-13T10:00:20-06:00',
     deleted = false,
     message = '<p>This is the parent reply</p>',
     ratingCount = null,
@@ -217,6 +220,7 @@ export const DiscussionEntry = {
     _id,
     createdAt,
     updatedAt,
+    editedAt,
     deleted,
     message,
     ratingCount,

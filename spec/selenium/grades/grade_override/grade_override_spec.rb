@@ -53,6 +53,7 @@ describe "Final Grade Override" do
 
   context "Individual Gradebook" do
     before do
+      @course.root_account.disable_feature!(:individual_gradebook_enhancements)
       @student = @students.first
       @enrollment = @course.enrollments.find_by(user: @student)
       @enrollment.scores.find_by(course_score: true).update!(override_score: 97.1)

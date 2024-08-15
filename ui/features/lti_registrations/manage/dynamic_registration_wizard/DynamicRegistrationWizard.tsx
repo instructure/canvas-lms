@@ -16,53 +16,67 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import GenericErrorPage from '@canvas/generic-error-page/react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {Button} from '@instructure/ui-buttons'
-import {Modal} from '@instructure/ui-modal'
-import React from 'react'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
+import {Modal} from '@instructure/ui-modal'
+import {ProgressBar} from '@instructure/ui-progress'
+import {Spinner} from '@instructure/ui-spinner'
+import React from 'react'
 import type {AccountId} from '../model/AccountId'
+import type {UnifiedToolId} from '../model/UnifiedToolId'
+import type {LtiImsRegistrationId} from '../model/lti_ims_registration/LtiImsRegistrationId'
+import {RegistrationModalBody} from '../registration_wizard/RegistrationModalBody'
+import type {DynamicRegistrationWizardService} from './DynamicRegistrationWizardService'
 import {
   mkUseDynamicRegistrationWizardState,
   type DynamicRegistrationWizardState,
 } from './DynamicRegistrationWizardState'
-import type {DynamicRegistrationWizardService} from './DynamicRegistrationWizardService'
-import {Flex} from '@instructure/ui-flex'
-import {Spinner} from '@instructure/ui-spinner'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import GenericErrorPage from '@canvas/generic-error-page/react'
-import {PermissionConfirmation} from './components/PermissionConfirmation'
-import {PrivacyConfirmation} from './components/PrivacyConfirmation'
-import {PlacementsConfirmation} from './components/PlacementsConfirmation'
-import {NamingConfirmation} from './components/NamingConfirmation'
 import {IconConfirmation} from './components/IconConfirmation'
+import {NamingConfirmation} from './components/NamingConfirmation'
+import {PermissionConfirmation} from './components/PermissionConfirmation'
+import {PlacementsConfirmation} from './components/PlacementsConfirmation'
+import {PrivacyConfirmation} from './components/PrivacyConfirmation'
 import {ReviewScreen} from './components/ReviewScreen'
-import {ProgressBar} from '@instructure/ui-progress'
-import {RegistrationModalBody} from '../registration_wizard/RegistrationModalBody'
 
 const I18n = useI18nScope('lti_registrations')
 
 export type DynamicRegistrationWizardProps = {
   dynamicRegistrationUrl: string
   accountId: AccountId
-  unifiedToolId?: string
+  unifiedToolId?: UnifiedToolId
   unregister: () => void
   onSuccessfulRegistration: () => void
   service: DynamicRegistrationWizardService
+  registrationId?: LtiImsRegistrationId
 }
 
 export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps) => {
-  const {accountId, dynamicRegistrationUrl, service, unifiedToolId} = props
+  const {accountId, dynamicRegistrationUrl, service, unifiedToolId, registrationId} = props
   const useDynamicRegistrationWizardState = React.useMemo(() => {
     return mkUseDynamicRegistrationWizardState(service)
   }, [service])
   const dynamicRegistrationWizardState = useDynamicRegistrationWizardState()
 
-  const {loadRegistrationToken} = dynamicRegistrationWizardState
+  const {loadRegistrationToken, loadRegistration} = dynamicRegistrationWizardState
 
   React.useEffect(() => {
-    loadRegistrationToken(accountId, dynamicRegistrationUrl, unifiedToolId)
-  }, [accountId, dynamicRegistrationUrl, loadRegistrationToken, unifiedToolId])
+    if (registrationId) {
+      loadRegistration(accountId, registrationId)
+    } else {
+      loadRegistrationToken(accountId, dynamicRegistrationUrl, unifiedToolId)
+    }
+  }, [
+    accountId,
+    dynamicRegistrationUrl,
+    loadRegistrationToken,
+    unifiedToolId,
+    registrationId,
+    loadRegistration,
+  ])
 
   const state = dynamicRegistrationWizardState.state
 
@@ -161,17 +175,19 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
               disabled={false}
               onClick={async () => {
                 props.unregister()
-                const result = await dynamicRegistrationWizardState.deleteKey(
-                  state._type,
-                  state.registration.developer_key_id
-                )
-                if (result._type !== 'success') {
-                  showFlashAlert({
-                    message: I18n.t(
-                      'Something went wrong deleting the registration. The registration can still be deleted manually on the Manage page.'
-                    ),
-                    type: 'error',
-                  })
+                if (!props.registrationId) {
+                  const result = await dynamicRegistrationWizardState.deleteKey(
+                    state._type,
+                    state.registration.developer_key_id
+                  )
+                  if (result._type !== 'success') {
+                    showFlashAlert({
+                      message: I18n.t(
+                        'Something went wrong deleting the registration. The registration can still be deleted manually on the Manage page.'
+                      ),
+                      type: 'error',
+                    })
+                  }
                 }
               }}
             >
@@ -391,19 +407,31 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
               color="primary"
               type="submit"
               onClick={() => {
-                dynamicRegistrationWizardState.enableAndClose(
-                  accountId,
-                  state.registration.id,
-                  state.registration.lti_registration_id,
-                  state.registration.developer_key_id,
-                  state.overlayStore.getState().state.registration,
-                  state.overlayStore.getState().state.adminNickname ??
-                    state.registration.client_name,
-                  props.onSuccessfulRegistration
-                )
+                if (registrationId) {
+                  dynamicRegistrationWizardState.updateAndClose(
+                    accountId,
+                    state.registration.id,
+                    state.registration.lti_registration_id,
+                    state.overlayStore.getState().state.registration,
+                    state.overlayStore.getState().state.adminNickname ??
+                      state.registration.client_name,
+                    props.onSuccessfulRegistration
+                  )
+                } else {
+                  dynamicRegistrationWizardState.enableAndClose(
+                    accountId,
+                    state.registration.id,
+                    state.registration.lti_registration_id,
+                    state.registration.developer_key_id,
+                    state.overlayStore.getState().state.registration,
+                    state.overlayStore.getState().state.adminNickname ??
+                      state.registration.client_name,
+                    props.onSuccessfulRegistration
+                  )
+                }
               }}
             >
-              {I18n.t('Install App')}
+              {registrationId ? I18n.t('Update App') : I18n.t('Install App')}
             </Button>
           </Modal.Footer>
         </>
@@ -433,6 +461,20 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
           </RegistrationModalBody>
         </>
       )
+    case 'Updating':
+      return (
+        <>
+          {progressBar(state)}
+          <RegistrationModalBody>
+            <Flex justifyItems="center" alignItems="center" height="100%">
+              <Flex.Item>
+                <Spinner renderTitle={I18n.t('Updating App')} />
+              </Flex.Item>
+              <Flex.Item>{I18n.t('Updating App')}</Flex.Item>
+            </Flex>
+          </RegistrationModalBody>
+        </>
+      )
     case 'Error':
       return (
         <RegistrationModalBody>
@@ -457,7 +499,7 @@ const addParams = (url: string, params: Record<string, string>) => {
 
 const TotalProgressLevels = 7
 
-const ProgressLevels = {
+const ProgressLevels: Record<DynamicRegistrationWizardState['_type'], number> = {
   RequestingToken: 0,
   WaitingForTool: 1,
   LoadingRegistration: 1,
@@ -467,6 +509,7 @@ const ProgressLevels = {
   NamingConfirmation: 5,
   IconConfirmation: 6,
   Reviewing: 7,
+  Updating: 7,
   Enabling: 7,
   DeletingDevKey: 7,
   Error: 0,

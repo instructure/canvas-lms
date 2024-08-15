@@ -2933,13 +2933,20 @@ class Course < ActiveRecord::Base
       enrollment_rows = all_enrollments
                         .where(user:)
                         .where.not(workflow_state: workflow_not)
-                        .pluck(
-                          :course_section_id,
-                          :limit_privileges_to_course_section,
-                          :type,
-                          :associated_user_id,
-                          :workflow_state
-                        )
+                        .preload(:enrollment_state)
+
+      enrollment_rows = enrollment_rows.filter do |e|
+        # only keep temporary enrollments if they are active, and keep all permanent enrollments
+        e.temporary_enrollment? ? e.enrollment_state.active? : true
+      end
+
+      enrollment_rows = enrollment_rows.pluck(
+        :course_section_id,
+        :limit_privileges_to_course_section,
+        :type,
+        :associated_user_id,
+        :workflow_state
+      )
 
       enrollment_rows.map do |section_id, limit_privileges, type, associated_user_id, workflow_state|
         {

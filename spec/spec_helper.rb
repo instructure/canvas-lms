@@ -1027,12 +1027,20 @@ Shoulda::Matchers.configure do |config|
 end
 
 module DeveloperKeyStubs
-  def get_special_key(default_key_name)
+  @@original_get_special_key = DeveloperKey.method(:get_special_key)
+
+  def original_get_special_key(*args, **kwargs)
+    @@original_get_special_key.call(*args, **kwargs)
+  end
+
+  def get_special_key(default_key_name, create_if_missing: true)
     Shard.birth.activate do
       @special_keys ||= {}
 
       # TODO: we have to do this because tests run in transactions
       testkey = DeveloperKey.where(name: default_key_name).first_or_initialize
+      return nil if testkey.new_record? && !create_if_missing
+
       testkey.auto_expire_tokens = false if testkey.new_record?
       testkey.sns_arn = "arn:aws:s3:us-east-1:12345678910:foo/bar"
       testkey.save! if testkey.changed?

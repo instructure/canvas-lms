@@ -131,6 +131,8 @@ function DiscussionTopicForm({
   const dateInputRef = useRef()
   const groupOptionsRef = useRef()
   const gradedDiscussionRef = useRef()
+  const shouldForceFocusAfterRenderRef = useRef(false)
+  const postToSisForCards = useRef(!!currentDiscussionTopic?.assignment?.postToSis || false)
   const {setOnFailure} = useContext(AlertManagerContext)
 
   const isAnnouncement = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.is_announcement ?? false
@@ -145,7 +147,7 @@ function DiscussionTopicForm({
         key: 'announcement-course-unpublished-alert',
         variant: 'warning',
         text: I18n.t(
-          'Notifications will not be sent retroactively for announcements created before publishing your course or before the course start date. You may consider using the Delay Posting option and set to publish on a future date.'
+          'Notifications will not be sent retroactively for announcements created before publishing your course or before the course start date. You may consider using the Available from option and set to publish on a future date.'
         ),
       }
     } else {
@@ -190,7 +192,10 @@ function DiscussionTopicForm({
     currentDiscussionTopic?.isAnonymousAuthor || true
   )
   const [isThreaded, setIsThreaded] = useState(
-    currentDiscussionTopic?.discussionType === "threaded" || (currentDiscussionTopic?.discussionType === "side_comment" && ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.has_threaded_replies) || Object.keys(currentDiscussionTopic).length === 0
+    currentDiscussionTopic?.discussionType === 'threaded' ||
+      (currentDiscussionTopic?.discussionType === 'side_comment' &&
+        ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.has_threaded_replies) ||
+      Object.keys(currentDiscussionTopic).length === 0
   )
   const [requireInitialPost, setRequireInitialPost] = useState(
     currentDiscussionTopic?.requireInitialPost || false
@@ -340,8 +345,24 @@ function DiscussionTopicForm({
     pointsPossible,
     isGraded,
     isCheckpoints,
-    postToSis,
+    postToSis: ENV.FEATURES.selective_release_edit_page ? postToSisForCards.current : postToSis,
   }
+
+  useEffect(() => {
+    // Expects to force the focus the errors on re-render once
+    if (
+      shouldForceFocusAfterRenderRef.current &&
+      ENV.FEATURES.selective_release_ui_api &&
+      ENV.FEATURES.selective_release_edit_page
+    ) {
+      const sectionViewRef = document.getElementById(
+        'manage-assign-to-container'
+      )?.reactComponentInstance
+      if (sectionViewRef?.focusErrors()) {
+        shouldForceFocusAfterRenderRef.current = false
+      }
+    }
+  })
 
   useEffect(() => {
     if (isAnnouncement && availableFrom) {
@@ -476,11 +497,7 @@ function DiscussionTopicForm({
       ...(shouldShowUsageRightsOption && {usageRightsData}),
     }
 
-    if (
-      !isGraded &&
-      ENV.FEATURES?.selective_release_ui_api &&
-      !isAnnouncement
-    ) {
+    if (!isGraded && ENV.FEATURES?.selective_release_ui_api && !isAnnouncement) {
       delete payload.specificSections
       Object.assign(
         payload,
@@ -532,6 +549,7 @@ function DiscussionTopicForm({
 
   const continueSubmitForm = (shouldPublish, shouldNotifyUsers = false) => {
     setTimeout(() => {
+      postToSisForCards.current = postToSis
       setIsSubmitting(true)
     }, 0)
 
@@ -560,7 +578,7 @@ function DiscussionTopicForm({
         sectionIdsToPostTo,
         assignedInfoList,
         postToSis,
-        showPostToSisFlashAlert('manage-assign-to')
+        showPostToSisFlashAlert('manage-assign-to', !ENV.FEATURES.selective_release_edit_page)
       )
     ) {
       const payload = createSubmitPayload(shouldPublish)
@@ -569,6 +587,23 @@ function DiscussionTopicForm({
     }
 
     setTimeout(() => {
+      if (
+        isGraded &&
+        ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT &&
+        ENV.FEATURES.selective_release_ui_api &&
+        ENV.FEATURES.selective_release_edit_page &&
+        assignedInfoList.length > 0 &&
+        postToSis
+      ) {
+        const sectionViewRef = document.getElementById(
+          'manage-assign-to-container'
+        )?.reactComponentInstance
+        const aDueDateMissing = assignedInfoList.some(assignee => !assignee.dueDate)
+        // If there are errors visible already don't force the focus
+        if (sectionViewRef?.allCardsValid() && aDueDateMissing) {
+          shouldForceFocusAfterRenderRef.current = true
+        }
+      }
       setIsSubmitting(false)
     }, 0)
 
@@ -772,23 +807,27 @@ function DiscussionTopicForm({
             autoFocus={true}
             width={inputWidth}
           />
-          <CanvasRce
-            textareaId="discussion-topic-message-body"
-            onFocus={() => {}}
-            onBlur={() => {}}
-            onInit={() => {}}
-            ref={rceRef}
-            onContentChange={setRceContent}
-            editorOptions={{
-              focus: false,
-              plugins: [],
-            }}
-            height={300}
-            defaultContent={isEditing ? currentDiscussionTopic?.message : ''}
-            autosave={false}
-            resourceType={isAnnouncement ? 'announcement.body' : 'discussion_topic.body'}
-            resourceId={currentDiscussionTopic?._id}
-          />
+          <View>
+            <span className="discussions-editor">
+              <CanvasRce
+                textareaId="discussion-topic-message-body"
+                onFocus={() => {}}
+                onBlur={() => {}}
+                onInit={() => {}}
+                ref={rceRef}
+                onContentChange={setRceContent}
+                editorOptions={{
+                  focus: false,
+                  plugins: [],
+                }}
+                height={300}
+                defaultContent={isEditing ? currentDiscussionTopic?.message : ''}
+                autosave={false}
+                resourceType={isAnnouncement ? 'announcement.body' : 'discussion_topic.body'}
+                resourceId={currentDiscussionTopic?._id}
+              />
+            </span>
+          </View>
           {ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_ATTACH && (
             <AttachmentDisplay
               attachment={attachment}
@@ -884,7 +923,7 @@ function DiscussionTopicForm({
               />
             )}
 
-            {!isGroupContext && (
+            {!isGroupContext && !isAnnouncement && (
               <Checkbox
                 data-testid="require-initial-post-checkbox"
                 label={I18n.t(
@@ -893,7 +932,6 @@ function DiscussionTopicForm({
                 value="must-respond-before-viewing-replies"
                 checked={requireInitialPost}
                 onChange={() => setRequireInitialPost(!requireInitialPost)}
-                disabled={!(isAnnouncement === false || (isAnnouncement && !locked))}
               />
             )}
 
@@ -1094,13 +1132,18 @@ function DiscussionTopicForm({
                 )}
               </View>
             )}
-            {!canGroupDiscussion && isEditing && !isAnnouncement && currentDiscussionTopic?.entryCounts?.repliesCount > 0 && (
-              <View display="block" data-testid="group-category-not-editable">
-                <Alert variant="warning" margin="small none small none">
-                  {I18n.t('Students have already submitted to this discussion, so group settings cannot be changed.')}
-                </Alert>
-              </View>
-            )}
+            {!canGroupDiscussion &&
+              isEditing &&
+              !isAnnouncement &&
+              currentDiscussionTopic?.entryCounts?.repliesCount > 0 && (
+                <View display="block" data-testid="group-category-not-editable">
+                  <Alert variant="warning" margin="small none small none">
+                    {I18n.t(
+                      'Students have already submitted to this discussion, so group settings cannot be changed.'
+                    )}
+                  </Alert>
+                </View>
+              )}
           </FormFieldGroup>
           {discussionAnonymousState.includes('anonymity') && !isEditing && (
             <View width="580px" display="block" data-testid="groups_grading_not_allowed">
@@ -1118,10 +1161,7 @@ function DiscussionTopicForm({
       </div>
       <div style={{display: selectedView === Views.MasteryPaths ? 'block' : 'none'}}>
         {ENV.CONDITIONAL_RELEASE_ENV && (
-          <MasteryPathsReactWrapper
-            type="discussion topic"
-            env={ENV.CONDITIONAL_RELEASE_ENV}
-          />
+          <MasteryPathsReactWrapper type="discussion topic" env={ENV.CONDITIONAL_RELEASE_ENV} />
         )}
       </div>
       <FormFieldGroup description="" rowSpacing="small">

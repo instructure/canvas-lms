@@ -30,7 +30,7 @@ describe "Peer reviews with in rubrics" do
     Account.default.enable_feature!(:assignments_2_student)
     Account.default.enable_feature!(:peer_reviews_for_a2)
     @course = course_factory(name: "course", active_course: true)
-    @course.account.enable_feature!(:enhanced_rubrics)
+    @course.enable_feature!(:enhanced_rubrics)
     @teacher = teacher_in_course(name: "teacher", course: @course, enrollment_state: :active).user
     @student1 = student_in_course(name: "Student 1", course: @course, enrollment_state: :active).user
     @student2 = student_in_course(name: "Student 2", course: @course, enrollment_state: :active).user
@@ -55,7 +55,7 @@ describe "Peer reviews with in rubrics" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
     expect(RubricAssessmentTray.traditional_grid_rubric_assessment_view).to be_displayed
-    expect(RubricAssessmentTray.criterion_score_input(@rubric.data[0][:id]).attribute(:readonly)).to eq("true")
+    expect(RubricAssessmentTray.criterion_score_readonly(@rubric.data[0][:id]).text).to eq("")
   end
 
   it "students are shown a notification reading “Fill out the rubric below after reviewing the student submission to complete this review.” with a button to open the rubric" do
@@ -151,12 +151,9 @@ describe "Peer reviews with in rubrics" do
 
     expect(RubricAssessmentTray.tray).to include_text("Peer Review Score")
     expect(RubricAssessmentTray.tray).to include_text("17 pts")
-    expect(RubricAssessmentTray.criterion_score_input(@rubric.data[0][:id]).attribute(:readonly)).to eq("true")
-    expect(RubricAssessmentTray.criterion_score_input(@rubric.data[0][:id]).attribute(:value)).to eq("10")
-    expect(RubricAssessmentTray.criterion_score_input(@rubric.data[1][:id]).attribute(:readonly)).to eq("true")
-    expect(RubricAssessmentTray.criterion_score_input(@rubric.data[1][:id]).attribute(:value)).to eq("7")
-    expect(RubricAssessmentTray.criterion_score_input(@rubric.data[2][:id]).attribute(:readonly)).to eq("true")
-    expect(RubricAssessmentTray.criterion_score_input(@rubric.data[2][:id]).attribute(:value)).to eq("0")
+    expect(RubricAssessmentTray.criterion_score_readonly(@rubric.data[0][:id]).text).to eq("10")
+    expect(RubricAssessmentTray.criterion_score_readonly(@rubric.data[1][:id]).text).to eq("7")
+    expect(RubricAssessmentTray.criterion_score_readonly(@rubric.data[2][:id]).text).to eq("0")
   end
 
   it "students can fill out free form rubric for a peer review" do

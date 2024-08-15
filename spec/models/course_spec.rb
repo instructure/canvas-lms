@@ -5471,6 +5471,35 @@ describe Course do
         expect(@course.enrollment_visibility_level_for(@student1, @course.section_visibilities_for(@student1), require_message_permission: true)).to be :restricted
       end
     end
+
+    context "section_visibilities_for" do
+      before :once do
+        @course.root_account.enable_feature!(:temporary_enrollments)
+        temporary_enrollment_pairing = TemporaryEnrollmentPairing.create!(root_account: @course.root_account, created_by: @teacher)
+        @temp_enrollment = @course.enroll_teacher(
+          @teacher,
+          section: @other_section,
+          temporary_enrollment_source_user_id: @ta.id,
+          temporary_enrollment_pairing_id: temporary_enrollment_pairing.id,
+          limit_privileges_to_course_section: true,
+          allow_multiple_enrollments: true
+        )
+      end
+
+      it "filters out sections from non active temporary enrolments" do
+        @temp_enrollment.enrollment_state.update(state: "inactive")
+
+        section_ids = @course.section_visibilities_for(@teacher).pluck(:course_section_id)
+        expect(section_ids).to match_array([@course.default_section.id])
+      end
+
+      it "returns temp enrollment section if enrollment_state of that is active" do
+        @temp_enrollment.enrollment_state.update(state: "active")
+
+        section_ids = @course.section_visibilities_for(@teacher).pluck(:course_section_id)
+        expect(section_ids).to match_array([@course.default_section.id, @other_section.id])
+      end
+    end
   end
 
   context "enrollments" do

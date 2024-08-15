@@ -432,6 +432,9 @@ TEXT
       <thead>
         <tr>
           <th scope="col"><%= t('headers.application_abbrev', "App") %></th>
+          <% if @current_user&.account.feature_enabled?(:admin_manage_access_tokens) %>
+            <th scope="col"><%= t('headers.state', "Status") %></th>
+          <% end %>
           <th scope="col"><%= t('headers.purpose', "Purpose") %></th>
           <th scope="col"><%= t('headers.dates', "Dates") %></th>
           <th scope="col"><%= t('headers.action', "Details") %></th>
@@ -444,15 +447,13 @@ TEXT
       </tbody>
     </table>
   </div>
-  <% unless @real_current_user %>
-    <% prohibit_token_creation = !@current_user.access_tokens.temp_record.grants_right?(@current_user, :create) %>
-    <% prohibit_info_text = t("Your Canvas administrators have chosen to limit your ability to generate your own access token. Please reach out to your Canvas administrators to have them generate an access token on your behalf.") %>
-    <div style="margin-top: 10px;" title="<%= prohibit_token_creation ? prohibit_info_text : nil %>" >
-      <a href="#" class="btn btn-primary add_access_token_link" <%= prohibit_token_creation ? "disabled" : nil %> >
-        <i class="icon-plus" aria-hidden="true"></i> <%= t('buttons.new_access_token', "New Access Token") %>
-      </a>
-    </div>
-  <% end %>
+  <% allow_token_creation = @current_user.access_tokens.temp_record.grants_right?(logged_in_user, :create) %>
+  <% prohibit_info_text = t("Your Canvas administrators have chosen to limit your ability to generate your own access token. Please reach out to your Canvas administrators to have them generate an access token on your behalf.") %>
+  <div style="margin-top: 10px;" title="<%= prohibit_info_text unless allow_token_creation || @real_current_user %>" >
+    <a href="#" class="btn btn-primary add_access_token_link" <%= "disabled" unless allow_token_creation %> >
+      <i class="icon-plus" aria-hidden="true"></i> <%= t('buttons.new_access_token', "New Access Token") %>
+    </a>
+  </div>
   <div id="token_details_dialog" style="display: none;" title="<%= t('titles.access_token_details', "Access Token Details") %>">
     <p><%= t(<<~TEXT, :wrapper => '<a href="https://canvas.instructure.com/doc/api/index.html" target="_blank" class="external">\1</a>')
       Access tokens can be used to allow other applications to make API calls
@@ -492,7 +493,7 @@ TEXT
           <th scope="row"><%= before_label(:token_expires, "Expires") %></th>
           <td class="expires">&nbsp;</td>
         </tr>
-        <% unless @real_current_user || !@current_user.access_tokens.temp_record.grants_right?(@current_user, :update) %>
+        <% unless !@current_user.access_tokens.temp_record.grants_right?(logged_in_user, :update) %>
           <tr class="refresh_token">
             <td colspan="2">
               <div class="button-container">
@@ -513,7 +514,7 @@ applications as needed, but if [you're developing a new or limited
 project](%{documentation_url}) you can just generate the token from here.
 TEXT
     %>
-    <%= form_for :access_token, :url => profile_tokens_url, :html => {:id => "access_token_form", :style => "margin-top: 10px;"} do |f| %>
+    <%= form_for :token, :url => api_v1_tokens_url("self"), :html => {:id => "access_token_form", :style => "margin-top: 10px;"} do |f| %>
       <table class="formtable" role="presentation">
         <tr>
           <td><%= f.blabel :purpose, :en => "Purpose" %></td>
@@ -521,11 +522,11 @@ TEXT
         </tr>
         <tr>
           <td>
-            <%= f.blabel :permanent_expires_at, en: "Expires", id: "token_expires_at_accessible_label" %>
+            <%= f.blabel :expires_at, en: "Expires", id: "token_expires_at_accessible_label" %>
           </td>
           <td>
             <div>
-              <%= f.text_field :permanent_expires_at,
+              <%= f.text_field :expires_at,
                                class: "expires_field datetime_field",
                                style: "width: 120px;",
                                "aria-describedby" => "leave_blank_for_no_expiration",

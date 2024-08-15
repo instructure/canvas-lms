@@ -63,7 +63,7 @@
 class SmartSearchController < ApplicationController
   include Api::V1::SearchResult
 
-  before_action :require_context, only: :search
+  before_action :require_context
   before_action :require_user
 
   # TODO: Other ways of tuning results?
@@ -117,8 +117,6 @@ class SmartSearchController < ApplicationController
   end
 
   def show
-    @context = Course.find(params[:course_id])
-
     return render_unauthorized_action unless SmartSearch.smart_search_available?(@context)
 
     set_active_tab("search")
@@ -131,7 +129,6 @@ class SmartSearchController < ApplicationController
   end
 
   def index_status
-    @context = Course.find(params[:course_id])
     return render_unauthorized_action unless SmartSearch.smart_search_available?(@context)
 
     ready, progress = SmartSearch.check_course(@context)

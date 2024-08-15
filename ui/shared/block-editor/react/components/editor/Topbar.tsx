@@ -83,6 +83,7 @@ export const Topbar = ({toolboxOpen, onToolboxChange}: TopbarProps) => {
         </Flex.Item>
         <Flex.Item>
           <Checkbox
+            id="toolbox-toggle"
             label="Block Toolbox"
             variant="toggle"
             size="small"

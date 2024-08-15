@@ -29,10 +29,6 @@ import accountGradingSettingsRoutes from '../../features/account_grading_setting
 import {RubricRoutes} from '../../features/rubrics/routes/rubricRoutes'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {QueryProvider} from '@canvas/query'
-import {
-  LearnerPassportLearnerRoutes,
-  LearnerPassportAdminRoutes,
-} from '../../features/learner_passport/routes/LearnerPassportRoutes'
 
 const portalRouter = createBrowserRouter(
   createRoutesFromElements(
@@ -58,9 +54,6 @@ const portalRouter = createBrowserRouter(
         ))}
 
       {window.ENV.enhanced_rubrics_enabled && RubricRoutes}
-
-      {window.ENV.FEATURES.learner_passport && LearnerPassportLearnerRoutes}
-      {window.ENV.FEATURES.learner_passport && LearnerPassportAdminRoutes}
 
       <Route path="*" element={<></>} />
     </Route>

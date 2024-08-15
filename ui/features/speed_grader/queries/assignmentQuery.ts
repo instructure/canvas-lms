@@ -24,6 +24,7 @@ import {omit} from 'lodash'
 const ASSIGNMENT_QUERY = gql`
   query AssignmentQuery($assignmentId: ID!) {
     assignment(id: $assignmentId) {
+      allowedAttempts
       dueAt
       gradingType
       id
@@ -33,6 +34,10 @@ const ASSIGNMENT_QUERY = gql`
       gradeAsGroup
       groupAssignment: hasGroupCategory
       htmlUrl
+      checkpoints {
+        pointsPossible
+        tag
+      }
       groupSet {
         groupsConnection {
           nodes {

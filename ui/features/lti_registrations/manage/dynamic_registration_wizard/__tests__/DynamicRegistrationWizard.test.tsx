@@ -23,21 +23,25 @@ import {success} from '../../../common/lib/apiResult/ApiResult'
 import userEvent from '@testing-library/user-event'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {i18nLtiScope} from '../../model/LtiScope'
-import {mockRegistration, mockService} from './helpers'
+import {mockRegistration, mockDynamicRegistrationWizardService} from './helpers'
 import {htmlEscape} from '@instructure/html-escape'
+import {ZUnifiedToolId} from '../../model/UnifiedToolId'
 
 const mockAlert = jest.fn() as jest.Mock<typeof showFlashAlert>
 
 describe('DynamicRegistrationWizard', () => {
   it('renders a loading screen when fetching the registration token', () => {
     const accountId = ZAccountId.parse('123')
-    const unifiedToolId = 'asdf'
+    const unifiedToolId = ZUnifiedToolId.parse('asdf')
 
     const fetchRegistrationToken = jest.fn().mockImplementation(() => new Promise(() => {}))
 
     const getRegistrationByUUID = jest.fn().mockResolvedValue(success(mockRegistration()))
 
-    const service = mockService({fetchRegistrationToken, getRegistrationByUUID})
+    const service = mockDynamicRegistrationWizardService({
+      fetchRegistrationToken,
+      getRegistrationByUUID,
+    })
 
     render(
       <DynamicRegistrationWizard
@@ -61,7 +65,7 @@ describe('DynamicRegistrationWizard', () => {
 
   it('forwards users to the tool', async () => {
     const accountId = ZAccountId.parse('123')
-    const unifiedToolId = 'asdf'
+    const unifiedToolId = ZUnifiedToolId.parse('asdf')
     const fetchRegistrationToken = jest.fn().mockResolvedValue(
       success({
         token: 'reg_token_value',
@@ -70,7 +74,10 @@ describe('DynamicRegistrationWizard', () => {
       })
     )
     const getRegistrationByUUID = jest.fn().mockResolvedValue(success(mockRegistration()))
-    const service = mockService({fetchRegistrationToken, getRegistrationByUUID})
+    const service = mockDynamicRegistrationWizardService({
+      fetchRegistrationToken,
+      getRegistrationByUUID,
+    })
 
     render(
       <DynamicRegistrationWizard
@@ -106,7 +113,10 @@ describe('DynamicRegistrationWizard', () => {
       })
     )
     const getRegistrationByUUID = jest.fn().mockResolvedValue(success(mockRegistration()))
-    const service = mockService({fetchRegistrationToken, getRegistrationByUUID})
+    const service = mockDynamicRegistrationWizardService({
+      fetchRegistrationToken,
+      getRegistrationByUUID,
+    })
 
     render(
       <DynamicRegistrationWizard
@@ -156,7 +166,7 @@ describe('DynamicRegistrationWizard', () => {
     let reg = mockRegistration()
     const getRegistrationByUUID = jest.fn().mockImplementation(async () => success(reg))
     const deleteDeveloperKey = jest.fn().mockImplementation(async () => success(reg))
-    const service = mockService({
+    const service = mockDynamicRegistrationWizardService({
       fetchRegistrationToken,
       getRegistrationByUUID,
       deleteDeveloperKey,

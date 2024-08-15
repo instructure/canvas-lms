@@ -26,8 +26,13 @@ import React, {useCallback} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {RadioInput} from '@instructure/ui-radio-input'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor')
 
 const FONTS: Record<string, string> = {
   font0: "lato, 'Helvetica Neue', Helvetica, Arial, sans-serif",
@@ -39,6 +44,12 @@ const FONTS: Record<string, string> = {
   font7: "'trebuchet ms', geneva",
   font8: 'verdana, geneva',
 }
+
+const FONTNAMES: Record<string, string> = Object.keys(FONTS).reduce((acc, key) => {
+  const name = FONTS[key].split(',')[0].replace(/["']/g, '')
+  acc[key] = name
+  return acc
+}, {})
 
 type FontPairingsProps = {
   fontName: string
@@ -56,6 +67,7 @@ const FontPairings = ({fontName, onSelectFont}: FontPairingsProps) => {
   const renderFont = (fontname: string) => {
     return (
       <div className={fontname} style={{marginBlockStart: '-0.5rem'}}>
+        <ScreenReaderContent>{FONTNAMES[fontname]}</ScreenReaderContent>
         <Text size="x-large" themeOverride={{fontFamily: FONTS[fontname]}}>
           Aa
         </Text>
@@ -71,14 +83,20 @@ const FontPairings = ({fontName, onSelectFont}: FontPairingsProps) => {
     )
   }
   return (
-    <Flex as="div" direction="column" alignItems="center" gap="small">
+    <Flex
+      as="div"
+      direction="column"
+      alignItems="center"
+      gap="small"
+      data-testid="stepper-font-pairings"
+    >
       <Heading level="h3" id="font-label">
-        Select Font Pairings
+        {I18n.t('Select Font Pairings')}
       </Heading>
       <View as="div" maxWidth="400px" textAlign="center">
         <Text as="p">
-          Choose complimentary font pairings for your h1, h2, and paragraph text, or choose your own
-          later.
+          {I18n.t(`Choose complimentary font pairings for your h1, h2, and paragraph text, or choose your own
+          later.`)}
         </Text>
       </View>
       <Flex direction="row" justifyItems="space-between" alignItems="center">

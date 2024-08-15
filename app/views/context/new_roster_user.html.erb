@@ -162,4 +162,18 @@
   <%= render :partial => 'users/logins' %>
 </div>
 <% end %>
-
+<% if @messages %>
+  <div class="more_user_information">
+    <fieldset>
+      <legend>
+        <h4 class="profileHeader">
+          <%= t('legends.recent_messages', %{Recent Messages}) %>
+        </h4>
+      </legend>
+      <%= t('no_messages', "No Messages") if @messages.empty? %>
+      <% @messages.each do |message| %>
+          <%= render :partial => 'discussion_topics/entry', :object => message, :locals => {:out_of_context => true, :show_context => true, :assignment_visible_to_user => message.discussion_topic.visible_for?(@current_user)} %>
+      <% end %>
+    </fieldset>
+  </div>
+<% end %>

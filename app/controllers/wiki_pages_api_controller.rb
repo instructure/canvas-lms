@@ -670,10 +670,6 @@ class WikiPagesApiController < ApplicationController
     end
     change_front_page = !!@set_front_page
 
-    if page_params.key?(:block_editor_attributes)
-      page_params[:block_editor_attributes][:root_account_id] = @context.root_account_id
-    end
-
     # check user permissions
     rejected_fields = Set[]
     if @wiki.grants_right?(@current_user, session, :update)

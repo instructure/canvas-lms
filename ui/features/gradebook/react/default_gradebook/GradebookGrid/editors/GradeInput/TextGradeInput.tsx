@@ -22,6 +22,7 @@ import {bool, element} from 'prop-types'
 import {TextInput} from '@instructure/ui-text-input'
 
 import {gradeEntry, gradeInfo, messages} from './PropTypes'
+import {finalGradeOverrideUtils} from '@canvas/final-grade-override'
 
 export default class TextGradeInput extends PureComponent {
   textInput?: HTMLInputElement
@@ -79,9 +80,14 @@ export default class TextGradeInput extends PureComponent {
   }
 
   handleTextChange(event) {
+    let {value} = event.target
+    if (this.props.gradeEntry.restrictToTwoDigitsAfterSeparator) {
+      value = finalGradeOverrideUtils.restrictToTwoDigitsAfterSeparator(value)
+    }
+
     this.setState({
-      gradeInfo: this.props.gradeEntry.parseValue(event.target.value, true),
-      inputValue: event.target.value,
+      gradeInfo: this.props.gradeEntry.parseValue(value, true),
+      inputValue: value,
     })
   }
 

@@ -33,7 +33,10 @@ class Mutations::SetCoursePostPolicy < Mutations::BaseMutation
       raise GraphQL::ExecutionError, "A course with that id does not exist"
     end
 
-    verify_authorized_action!(course, :manage_grades)
+    # checking if the current user has manage_content or
+    # manage_course_content_edit permission in the current course
+    perms = %i[manage_content manage_course_content_edit]
+    verify_any_authorized_actions!(course, perms)
 
     course.apply_post_policy!(post_manually: input[:post_manually])
     { post_policy: course.default_post_policy }

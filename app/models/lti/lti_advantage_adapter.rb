@@ -121,8 +121,9 @@ module Lti
     # For information on how the cached ID token is eventually retrieved
     # and sent to a tool, please refer to the inline documentation of
     # app/controllers/lti/ims/authentication_controller.rb
-    def generate_post_payload_for_student_context_card(student_id:)
-      @opts[:student_id] = student_id
+    def generate_post_payload_for_student_context_card(student:)
+      @opts[:student_id] = student.global_id
+      @opts[:student_lti_id] = student.lti_id
       login_request(resource_link_request.to_cached_hash)
     end
 

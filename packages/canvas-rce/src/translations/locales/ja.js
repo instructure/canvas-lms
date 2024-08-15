@@ -315,7 +315,6 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "アイコンを編集する" },
   "edit_link_7f53bebb": { "message": "リンクの編集" },
-  "editor_statusbar_26ac81fc": { "message": "エディタ ステータスバー" },
   "element_starting_with_start_91bf4c3b": {
     "message": "{ start } で始まる要素"
   },
@@ -597,6 +596,7 @@ const locale = {
   "links_to_an_external_site_de74145d": {
     "message": "外部サイトにリンクしています。"
   },
+  "lists_cd1336fc": { "message": "リスト" },
   "lists_should_be_formatted_as_lists_f862de8d": {
     "message": "リストはリスト形式にしなければなりません。"
   },

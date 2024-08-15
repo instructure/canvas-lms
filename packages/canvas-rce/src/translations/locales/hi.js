@@ -314,7 +314,6 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "आइकन संपादित करें" },
   "edit_link_7f53bebb": { "message": "लिंक संपादित करें" },
-  "editor_statusbar_26ac81fc": { "message": "संपादक स्टेटसबार " },
   "element_starting_with_start_91bf4c3b": {
     "message": "{ start } से शुरू होता तत्व"
   },
@@ -604,6 +603,7 @@ const locale = {
   "links_to_an_external_site_de74145d": {
     "message": "बाहरी साइट के लिए लिंक।"
   },
+  "lists_cd1336fc": { "message": "सूचियां" },
   "lists_should_be_formatted_as_lists_f862de8d": {
     "message": "सूचियों को सूचियों के रूप में स्वरूपित किया जाना चाहिए।"
   },

@@ -116,8 +116,6 @@ const DiscussionTopicManager = props => {
   const [replyToTopicSubmission, setReplyToTopicSubmission] = useState({})
   const [replyToEntrySubmission, setReplyToEntrySubmission] = useState({})
 
-  const [isUserMissingInitialPost, setIsUserMissingInitialPost] = useState(null)
-
   const [isGradedDiscussion, setIsGradedDiscussion] = useState(false)
 
   // The DrawTray will cause the DiscussionEdit to mount first when it starts transitioning open, then un-mount and remount when it finishes opening
@@ -232,11 +230,9 @@ const DiscussionTopicManager = props => {
   const waitForUnreadFilter =
     (filter === 'unread' && !unreadBefore) || (filter !== 'unread' && unreadBefore)
 
-  // in some cases, we want to refresh the results rather that use the current cache:
-  // in the case: 'isUserMissingInitialPost' the cache is empty so we need to get the entries.
   const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {
     variables,
-    fetchPolicy: isUserMissingInitialPost || searchTerm ? 'network-only' : 'cache-and-network',
+    fetchPolicy: searchTerm ? 'network-only' : 'cache-and-network',
     skip: waitForUnreadFilter,
   })
 
@@ -266,15 +262,15 @@ const DiscussionTopicManager = props => {
       }
       const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
       const currentDiscussion = JSON.parse(JSON.stringify(cache.readQuery(options)))
+      const isInitialPostRequired = currentDiscussion.legacyNode.initialPostRequiredForCurrentUser
 
       // if the current user hasn't made the required inital post, then this entry will be it.
-      // In that case, we are required to do a page refresh to get all the entries (implemented with isUserMissingInitialPost)
-      // thus we bascially want to not do 'else if (currentDiscussion && newDiscussionEntry)' which contains updateCache logic.
-      // Discussion.initialPostRequiredForCurrentUser is based on user and topic so if the user meets this reuqire, then
+      // In that case, we are required to do a page refresh to get all the entries (implemented in onComplete, as updateCache is fired twice,
+      // once for the optimistic response, and once for the real one...)
+      // thus we basically want to not do this if that contains updateCache logic.
+      // Discussion.initialPostRequiredForCurrentUser is based on user and topic so if the user meets this requirement, then
       // this doesnt run and caching resumes as normal.
-      if (currentDiscussion.legacyNode.initialPostRequiredForCurrentUser) {
-        setIsUserMissingInitialPost(currentDiscussion.legacyNode.initialPostRequiredForCurrentUser)
-      } else if (currentDiscussion && newDiscussionEntry) {
+      if (!isInitialPostRequired && currentDiscussion && newDiscussionEntry) {
         // if we have a new entry update the counts, because we are about to add to the cache (something useMutation dont do, that useQuery does)
         currentDiscussion.legacyNode.entryCounts.repliesCount += 1
         // add the new entry to the current entries in the cache
@@ -317,7 +313,10 @@ const DiscussionTopicManager = props => {
   }
 
   // Used when replying to the Topic directly
-  const {createDiscussionEntry, isSubmitting} = useCreateDiscussionEntry(onEntryCreationCompletion, updateCache)
+  const {createDiscussionEntry, isSubmitting} = useCreateDiscussionEntry(
+    onEntryCreationCompletion,
+    updateCache
+  )
 
   // why || waitForUnreadFilter: when waitForUnreadFilter, discussionTopicQuery is skipped, but this does not set loading.
   // why && !searchTerm: this is for the search if you type it triggers useQuery and you lose the search.
@@ -355,9 +354,11 @@ const DiscussionTopicManager = props => {
           props={{
             mobile: {
               viewPortWidth: '100vw',
+              padding: 'medium x-small 0',
             },
             desktop: {
               viewPortWidth: '480px',
+              padding: 'medium medium 0 small',
             },
           }}
           render={responsiveProps => {
@@ -370,11 +371,16 @@ const DiscussionTopicManager = props => {
                 {isSplitScreenViewOverlayed && isSplitScreenViewOpen && (
                   <Mask onClick={() => closeView()} />
                 )}
-                <DrawerLayout.Content label="Splitscreen View Content">
+                <DrawerLayout.Content
+                  label="Splitscreen View Content"
+                  themeOverride={{
+                    overflowY: 'unset'
+                  }}
+                >
                   <View
                     display="block"
-                    padding="medium medium 0 small"
                     height={isModuleItem ? '85vh' : '90vh'}
+                    padding={responsiveProps.padding}
                   >
                     <DiscussionTopicHeaderContainer
                       discussionTopicTitle={discussionTopicQuery.data.legacyNode.title}

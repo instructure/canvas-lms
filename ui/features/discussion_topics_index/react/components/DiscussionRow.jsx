@@ -868,15 +868,13 @@ class DiscussionRow extends Component {
           className={'ic-button-line-right ' + (this.props.breakpoints.mobileOnly ? 'mobile' : '')}
         >
           {actionsContent}
-          {this.props.masterCourseData &&
-            this.props.masterCourseData.isMasterCourse &&
-            !this.masterCourseLock && (
-              <span
-                ref={this.initializeMasterCourseIcon}
-                data-testid="ic-master-course-icon-container"
-                className="ic-item-row__master-course-lock"
-              />
-            )}
+          {this.props.masterCourseData && (
+            <span
+              ref={this.initializeMasterCourseIcon}
+              data-testid="ic-master-course-icon-container"
+              className="ic-item-row__master-course-lock"
+            />
+          )}
           {maybeDisplayManageMenu}
         </div>
       </div>

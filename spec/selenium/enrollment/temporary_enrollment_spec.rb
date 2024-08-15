@@ -50,6 +50,10 @@ describe "temporary enrollment" do
     get "/accounts/#{Account.default.id}/users"
   end
 
+  def flash_alert
+    f(".flashalert-message")
+  end
+
   # nearly every page of the modal requires an api call, so we wait before interacting with each
   it "creates pairing" do
     # open modal
@@ -70,6 +74,7 @@ describe "temporary enrollment" do
 
     # create user
     f("button[data-analytics='TempEnrollSubmit']").click
+    expect(flash_alert.text).to include("successfully created")
 
     # expect icons to reflect temp enrollment
     load_people_page
@@ -95,6 +100,7 @@ describe "temporary enrollment" do
       expect(f("body")).not_to contain_css("svg[role='img'] circle")
       f("button[data-analytics='TempEnrollDelete']").click
       accept_alert
+      expect(flash_alert.text).to include("deleted successfully")
 
       # expect no recipient/provider icons
       load_people_page
@@ -119,6 +125,7 @@ describe "temporary enrollment" do
       f("input[data-analytics='TempEnrollRole']").click
       f("span[label='Designer']").click
       f("button[data-analytics='TempEnrollSubmit']").click
+      expect(flash_alert.text).to include("successfully updated")
 
       # reopen modal to confirm change
       wait_for_ajax_requests

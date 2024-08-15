@@ -7,7 +7,7 @@
         {{#if block_editor}}
           <label class="checkbox" for="toggle_block_editor" style="margin-inline-end: 4px;">
             <input type="checkbox" value="1" id="toggle_block_editor" aria-label="toggle block editor" checked>
-            {{#t}}Use block Editor{{/t}}
+            {{#t}}Create with block editor{{/t}}
           </label>
         {{/if}}
         {{#if CAN.DELETE}}
@@ -87,6 +87,11 @@
               {{#if CAN.DELETE}}
                 <th width="2%" role="columnheader">
                   <span class="screenreader-only">{{#t}}Select page{{/t}}</span>
+                </th>
+              {{/if}}
+              {{#if block_editor}}
+                <th scope="col" width="24px" role="columnheader">
+                  <span class="screenreader-only">{{#t}}page type{{/t}}</span>
                 </th>
               {{/if}}
               <th scope="col" width="{{#if CAN.MANAGE}}{{#if CAN.PUBLISH}}42%{{else}}46%{{/if}}{{else}}60%{{/if}}" role="columnheader">

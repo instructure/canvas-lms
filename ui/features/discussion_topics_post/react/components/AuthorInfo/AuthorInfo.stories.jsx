@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AuthorInfo} from './AuthorInfo'
 import React from 'react'
 import {User} from '../../../graphql/User'
+import {AuthorInfo} from '../AuthorInfo'
 
 export default {
   title: 'Examples/Discussion Posts/Components/Author Info',

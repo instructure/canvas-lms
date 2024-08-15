@@ -160,14 +160,16 @@ export default forwardRef(function ItemAssignToCard(
   const assigneeSelectorRef = useRef<HTMLInputElement | null>(null)
   const dateInputRefs = useRef<Record<string, HTMLInputElement>>({})
   const timeInputRefs = useRef<Record<string, HTMLInputElement>>({})
-  const dateValidator = useRef<DateValidator>(
-    new DateValidator({
-      date_range: {...ENV.VALID_DATE_RANGE},
-      hasGradingPeriods: ENV.HAS_GRADING_PERIODS,
-      gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods),
-      userIsAdmin: ENV.current_user_is_admin,
-      postToSIS,
-    })
+  const dateValidator = useMemo(
+    () =>
+      new DateValidator({
+        date_range: {...ENV.VALID_DATE_RANGE},
+        hasGradingPeriods: ENV.HAS_GRADING_PERIODS,
+        gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods),
+        userIsAdmin: ENV.current_user_is_admin,
+        postToSIS,
+      }),
+    [postToSIS]
   )
 
   const cardActionLabels = useMemo(
@@ -213,12 +215,19 @@ export default forwardRef(function ItemAssignToCard(
       persisted: !dueAtHasChanged(),
       skip_grading_periods: dueDate === null,
     }
-    const newErrors = dateValidator.current.validateDatetimes(data)
+    const newErrors = dateValidator.validateDatetimes(data)
     const newBadDates = Object.keys(newErrors)
     const oldBadDates = Object.keys(validationErrors)
     if (!arrayEquals(newBadDates, oldBadDates)) setValidationErrors(newErrors)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dueDate, availableFromDate, availableToDate, replyToTopicDueDate, requiredRepliesDueDate])
+  }, [
+    dueDate,
+    availableFromDate,
+    availableToDate,
+    replyToTopicDueDate,
+    requiredRepliesDueDate,
+    postToSIS,
+  ])
 
   useEffect(() => {
     const errorMessage: FormMessage = {
@@ -258,7 +267,10 @@ export default forwardRef(function ItemAssignToCard(
       } else if (unparsedFieldKeys.size > 0) {
         key = dateInputKeys.find(k => unparsedFieldKeys.has(k))
       }
-      if (key) dateInputRefs.current[key]?.focus()
+      if (key) {
+        dateInputRefs.current[key]?.focus()
+        return dateInputRefs.current[key]
+      }
     },
   }))
 
@@ -309,7 +321,7 @@ export default forwardRef(function ItemAssignToCard(
   const wrapperProps = useMemo(() => generateWrapperStyleProps(highlightCard), [highlightCard])
 
   const isInClosedGradingPeriod =
-    dateValidator.current.isDateInClosedGradingPeriod(dueDate) && !dueAtHasChanged()
+    dateValidator.isDateInClosedGradingPeriod(dueDate) && !dueAtHasChanged()
 
   const commonDateTimeInputProps = {
     breakpoints: {},

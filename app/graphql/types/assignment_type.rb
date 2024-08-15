@@ -327,6 +327,8 @@ module Types
       load_association(:quiz)
     end
 
+    field :supports_grade_by_question, Boolean, method: :supports_grade_by_question?, null: false
+
     field :discussion, Types::DiscussionType, null: true
     def discussion
       load_association(:discussion_topic)

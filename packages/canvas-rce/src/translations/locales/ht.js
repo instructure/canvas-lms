@@ -302,7 +302,6 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Chanje Ikòn" },
   "edit_link_7f53bebb": { "message": "Chanje Lyen" },
-  "editor_statusbar_26ac81fc": { "message": "Editè Ba Estati" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Eleman kòmanse a { start }"
   },
@@ -584,6 +583,7 @@ const locale = {
   "links_to_an_external_site_de74145d": {
     "message": "Lyen pou ale sou sit ekstèn."
   },
+  "lists_cd1336fc": { "message": "Lis" },
   "lists_should_be_formatted_as_lists_f862de8d": {
     "message": "Lis yo dwe fòmate tankou lis."
   },

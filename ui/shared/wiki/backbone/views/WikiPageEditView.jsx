@@ -142,6 +142,7 @@ export default class WikiPageEditView extends ValidatedFormView {
 
     json.content_is_locked = this.lockedItems.content
     json.show_assign_to = this.enableAssignTo
+    json.edit_with_block_editor = this.model.get('editor') === 'block_editor'
 
     return json
   }
@@ -224,13 +225,10 @@ export default class WikiPageEditView extends ValidatedFormView {
       }
       renderAssignToTray(mountElement, {pageId, onSync, pageName})
     }
-    if (window.ENV.BLOCK_EDITOR) {
+    if (this.model.get('editor') === 'block_editor' && this.model.get('block_editor_attributes')) {
       const BlockEditor = lazy(() => import('@canvas/block-editor'))
 
-      const blockEditorData = ENV.WIKI_PAGE?.block_editor_attributes || {
-        version: '1',
-        blocks: [{data: undefined}],
-      }
+      const blockEditorData = this.model.get('block_editor_attributes')
 
       const container = document.getElementById('content')
       container.style.boxSizing = 'border-box'
@@ -299,10 +297,11 @@ export default class WikiPageEditView extends ValidatedFormView {
   destroyEditor() {
     // hack fix for LF-1134
     try {
-      if (!window.ENV.BLOCK_EDITOR) {
+      if (this.model.get('editor') !== 'block_editor') {
         RichContentEditor.destroyRCE(this.$wikiPageBody)
       }
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.warn(e)
     } finally {
       this.$el.remove()
@@ -451,7 +450,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     // eslint-disable-next-line no-alert
     if (!this.hasUnsavedChanges() || window.confirm(this.unsavedWarning())) {
       this.checkUnsavedOnLeave = false
-      if (!window.ENV.BLOCK_EDITOR) {
+      if (this.model.get('editor') !== 'block_editor') {
         RichContentEditor.closeRCE(this.$wikiPageBody)
       }
       return this.trigger('cancel')

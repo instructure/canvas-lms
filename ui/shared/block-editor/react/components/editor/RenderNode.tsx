@@ -52,6 +52,7 @@ import {View, type ViewProps} from '@instructure/ui-view'
 
 import type {AddSectionPlacement, RenderNodeProps} from './types'
 import {SectionBrowser} from './SectionBrowser'
+import {notDeletableIfLastChild} from '../../utils'
 
 const findUpNode = (node: Node, query: any): Node | undefined => {
   let upnode = node.data.parent ? query.node(node.data.parent).get() : undefined
@@ -102,10 +103,11 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
       dom: n.dom,
       name: n.data.custom.displayName || n.data.displayName,
       moveable: node_helpers.isDraggable(),
-      deletable:
-        (typeof n.data.custom?.isDeletable === 'function'
-          ? n.data.custom.isDeletable?.(n.id, query)
-          : true) && node_helpers.isDeletable(),
+      deletable: n.data.custom?.isSection
+        ? notDeletableIfLastChild(n.id, query)
+        : (typeof n.data.custom?.isDeletable === 'function'
+            ? n.data.custom.isDeletable?.(n.id, query)
+            : true) && node_helpers.isDeletable(),
       props: n.data.props,
     }
   })

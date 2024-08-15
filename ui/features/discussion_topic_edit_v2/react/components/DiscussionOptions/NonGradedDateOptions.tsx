@@ -61,6 +61,9 @@ export const NonGradedDateOptions = ({
         nextMonthLabel={I18n.t('next')}
         value={availableFrom}
         onChange={(_event, newAvailableFrom = '') => {
+          if (newAvailableFrom === "") {
+            newAvailableFrom = null
+          }
           validateAvailability(
             newAvailableFrom,
             availableUntil,
@@ -94,6 +97,9 @@ export const NonGradedDateOptions = ({
         nextMonthLabel={I18n.t('next')}
         value={availableUntil}
         onChange={(_event, newAvailableUntil = '') => {
+          if (newAvailableUntil === "") {
+            newAvailableUntil = null
+          }
           validateAvailability(
             availableFrom,
             newAvailableUntil,

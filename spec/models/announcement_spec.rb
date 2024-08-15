@@ -243,5 +243,41 @@ describe Announcement do
       expect(to_users).to include(@student)
       expect(to_users).to_not include(other_student)
     end
+
+    it "does not broadcast if it just got edited to active, if notify_users is false" do
+      course_with_student(active_all: true)
+      notification_name = "New Announcement"
+      Notification.create(name: notification_name, category: "TestImmediately")
+
+      announcement_model(user: @teacher, workflow_state: :post_delayed, notify_users: false, context: @course)
+
+      expect do
+        @a.publish!
+      end.not_to change { @a.messages_sent[notification_name] }
+    end
+
+    it "still broadcasts if it just got edited to active, if notify_users is true" do
+      course_with_student(active_all: true)
+      notification_name = "New Announcement"
+      Notification.create(name: notification_name, category: "TestImmediately")
+
+      announcement_model(user: @teacher, workflow_state: :post_delayed, notify_users: true, context: @course)
+
+      expect do
+        @a.publish!
+      end.to change { @a.messages_sent[notification_name] }
+    end
+
+    it "still broadcasts on delayed_post event even if notify_users was false" do
+      course_with_student(active_all: true)
+      notification_name = "New Announcement"
+      Notification.create(name: notification_name, category: "TestImmediately")
+
+      announcement_model(user: @teacher, workflow_state: :post_delayed, notify_users: false, context: @course)
+
+      expect do
+        @a.delayed_post
+      end.to change { @a.messages_sent[notification_name] }
+    end
   end
 end

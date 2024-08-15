@@ -124,6 +124,7 @@ class LoadInitialData < ActiveRecord::Migration[7.0]
                              "Enrollment Notification",
                              "Forgot Password",
                              "Manually Created Access Token Created",
+                             "Access Token Created On Behalf Of User",
                              "Merge Email Communication Channel",
                              "Pseudonym Registration",
                              "Pseudonym Registration Done",

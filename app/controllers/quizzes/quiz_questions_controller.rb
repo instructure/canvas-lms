@@ -364,7 +364,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
         @group = @quiz.quiz_groups.find(question_data[:quiz_group_id])
         if question_data[:quiz_group_id] != @question.quiz_group_id
           @question.quiz_group_id = question_data[:quiz_group_id]
-          @question.position = @group.quiz_questions.active.length
+          @question.position = @group.quiz_questions.active.size
         end
       end
 

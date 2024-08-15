@@ -260,6 +260,10 @@
   }
 }
 
+.userMessage.mobile p:first-child {
+  margin-top : 0px;
+}
+
 // TODO: We should try to not need this CSS
 .discussion-row-mastery-paths-pill {
   margin-#{direction(left)}: 6px;

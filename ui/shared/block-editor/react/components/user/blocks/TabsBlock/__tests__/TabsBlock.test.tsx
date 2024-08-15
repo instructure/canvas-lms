@@ -20,14 +20,13 @@ import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import {Editor, Frame} from '@craftjs/core'
-import {NoSections} from '../../../common/NoSections'
-import {TabsBlock, TabBlock, type TabsBlockProps} from '..'
+import {TabsBlock, TabBlock, TabContent, type TabsBlockProps} from '..'
 
 const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
 
 const renderBlock = (enabled: boolean, props: Partial<TabsBlockProps> = {}) => {
   return render(
-    <Editor enabled={enabled} resolver={{TabsBlock, TabBlock, NoSections}}>
+    <Editor enabled={enabled} resolver={{TabsBlock, TabBlock, TabContent}}>
       <Frame>
         <TabsBlock {...props} />
       </Frame>

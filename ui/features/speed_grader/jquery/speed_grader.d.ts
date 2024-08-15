@@ -161,6 +161,7 @@ const ZBaseSubmission = z.object({
   word_count: z.null(),
   workflow_state: z.string(),
   versioned_attachments: z.array(ZVersionedAttachment).optional(),
+  'partially_submitted?': z.boolean().optional(),
 })
 
 export const ZHistoricalSubmission = ZBaseSubmission
@@ -544,7 +545,7 @@ export type SpeedGrader = {
   renderProvisionalGradeSelector: (options?: {showingNewStudent?: boolean}) => void
   revertFromFormSubmit: (options?: {draftComment?: boolean; errorSubmitting?: boolean}) => void
   setUpAssessmentAuditTray: () => void
-  setUpRubricAssessmentTrayWrapper: () => void
+  setUpRubricAssessmentContainerWrapper: () => void
   saveRubricAssessment: (
     rubricAssessmentData: {[key: string]: string | boolean | number},
     jqueryElement?: JQuery<HTMLElement>

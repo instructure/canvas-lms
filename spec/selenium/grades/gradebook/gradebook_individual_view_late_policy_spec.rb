@@ -37,6 +37,7 @@ describe "Late Policies:" do
 
   context "grade detail tray other" do
     before do
+      @course.root_account.disable_feature!(:individual_gradebook_enhancements)
       user_session(@teacher)
       GradebookIndividualViewPage.visit(@course.id)
     end

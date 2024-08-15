@@ -31,7 +31,7 @@ const I18n = useI18nScope('react_developer_keys')
 export type LtiDeveloperKeyApiResponse = {
   developer_key: DeveloperKey
   tool_configuration: LtiToolConfiguration
-  warning_message?: string
+  warning_message?: string | string[]
 }
 /**
  * Type function that takes a action type name in all caps and snake case

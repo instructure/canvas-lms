@@ -416,7 +416,7 @@ class CoursePace < ActiveRecord::Base
   def log_average_item_duration
     return if course_pace_module_items.empty?
 
-    average_duration = course_pace_module_items.pluck(:duration).sum / course_pace_module_items.length
+    average_duration = course_pace_module_items.pluck(:duration).sum / course_pace_module_items.size
     InstStatsd::Statsd.count("course_pacing.average_assignment_duration", average_duration)
   end
 

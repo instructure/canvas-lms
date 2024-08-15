@@ -302,7 +302,7 @@ window.modules = (function () {
               }
               if (ENV.IN_PACED_COURSE && !ENV.IS_STUDENT) {
                 $context_module_item.find('.due_date_display').remove()
-              } else if (info.todo_date != null) {
+              } else if (info.todo_date != null && info.points_possible == null) {
                 data.due_date_display = dateString(info.todo_date)
               } else if (info.due_date != null) {
                 if (info.past_due != null) {

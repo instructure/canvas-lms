@@ -21,6 +21,51 @@ import getCookie from '@instructure/get-cookie'
 import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import type {Submission} from 'api'
 
+export const ZUpdateSubmissionGradeParams = z.object({
+  assignmentId: z.string(),
+  userId: z.string(),
+  courseId: z.string(),
+  gradedAnonymously: z.boolean(),
+  grade: z.string().nullable(),
+  excuse: z.boolean(),
+  checkpointTag: z.string().nullable(),
+})
+
+type UpdateSubmissionGradeParams = z.infer<typeof ZUpdateSubmissionGradeParams>
+
+export async function updateSubmissionGrade({
+  assignmentId,
+  userId,
+  courseId,
+  gradedAnonymously,
+  grade,
+  excuse,
+  checkpointTag,
+}: UpdateSubmissionGradeParams): Promise<any> {
+  if (checkpointTag) {
+    return updateCheckpointedSubmissionGrade({
+      checkpointTag,
+      courseId,
+      assignmentId,
+      studentId: userId,
+      grade,
+    })
+  }
+
+  return updateNonCheckpointedSubmissionGrade({
+    assignmentId,
+    userId,
+    courseId,
+    gradedAnonymously,
+    grade,
+    excuse,
+  })
+}
+
+/** *********************************************************** */
+/* Non-Checkpoint grading code below */
+/** *********************************************************** */
+
 function transform(result: any) {
   if (result.errors?.length > 0) {
     throw new Error(result.errors[0].message)
@@ -36,7 +81,7 @@ function transform(result: any) {
   }
 }
 
-export const ZUpdateSubmissionGradeParams = z.object({
+export const ZUpdateNonCheckpointSubmissionGradeParams = z.object({
   assignmentId: z.string(),
   userId: z.string(),
   courseId: z.string(),
@@ -45,16 +90,16 @@ export const ZUpdateSubmissionGradeParams = z.object({
   excuse: z.boolean(),
 })
 
-type UpdateSubmissionGradeParams = z.infer<typeof ZUpdateSubmissionGradeParams>
+type NonCheckpointSubmissionGradeParams = z.infer<typeof ZUpdateNonCheckpointSubmissionGradeParams>
 
-export async function updateSubmissionGrade({
+async function updateNonCheckpointedSubmissionGrade({
   assignmentId,
   userId,
   courseId,
   gradedAnonymously,
   grade,
   excuse,
-}: UpdateSubmissionGradeParams): Promise<any> {
+}: NonCheckpointSubmissionGradeParams): Promise<any> {
   const body: Record<any, any> = {
     originator: 'speed_grader',
     submission: {
@@ -74,4 +119,42 @@ export async function updateSubmissionGrade({
     body,
   })
   return transform(data)
+}
+
+/** *********************************************************** */
+/* Checkpoint grading code below */
+/** *********************************************************** */
+
+const ZUpdateCheckpointSubmissionGradeParams = z.object({
+  checkpointTag: z.string(),
+  courseId: z.string(),
+  assignmentId: z.string(),
+  studentId: z.string(),
+  grade: z.string().nullable(),
+})
+
+type CheckpointSubmissionGradeParams = z.infer<typeof ZUpdateCheckpointSubmissionGradeParams>
+
+const updateCheckpointedSubmissionGrade = async ({
+  checkpointTag,
+  courseId,
+  assignmentId,
+  studentId,
+  grade,
+}: CheckpointSubmissionGradeParams): Promise<any> => {
+  const {data} = await executeApiRequest({
+    method: 'PUT',
+    path: `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${studentId}`,
+    body: {
+      course_id: courseId,
+      sub_assignment_tag: checkpointTag,
+      submission: {
+        assignment_id: assignmentId,
+        user_id: studentId,
+        posted_grade: grade,
+      },
+    },
+  })
+
+  return data
 }

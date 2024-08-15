@@ -38,23 +38,23 @@ const QUERY = gql`
 const defaultStandardStatusesMap: Record<string, Pick<GradeStatus, 'id' | 'name'>> = {
   late: {
     id: '-1',
-    name: 'late',
+    name: 'Late',
   },
   missing: {
     id: '-2',
-    name: 'missing',
+    name: 'Missing',
   },
   excused: {
     id: '-5',
-    name: 'excused',
+    name: 'Excused',
   },
   extended: {
     id: '-6',
-    name: 'extended',
+    name: 'Extended',
   },
   none: {
     id: '-7',
-    name: 'none',
+    name: 'None',
   },
 }
 

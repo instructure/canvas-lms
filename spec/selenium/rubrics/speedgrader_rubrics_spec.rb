@@ -32,17 +32,17 @@ describe "Rubrics in speedgrader" do
       student_in_course
       @assignment = @course.assignments.create!(name: "Assignment 1", points_possible: 30)
       @submission = @assignment.find_or_create_submission(@student)
-      @course.account.enable_feature!(:enhanced_rubrics)
+      @course.enable_feature!(:enhanced_rubrics)
       @rubric = @course.rubrics.create!(title: "Rubric 1", user: @user, context: @course, data: largest_rubric_data, points_possible: 30)
       RubricAssociation.create!(rubric: @rubric, context: @course, association_object: @course, purpose: "bookmark")
       @rubric.associate_with(@assignment, @course, purpose: "grading")
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     end
 
-    it "opens the rubric assessment tray when the “View Rubric” button is clicked" do
+    it "opens the rubric assessment container when the “View Rubric” button is clicked" do
       Speedgrader.view_rubric_button.click
 
-      expect(RubricAssessmentTray.tray).to be_displayed
+      expect(RubricAssessmentTray.container).to be_displayed
     end
 
     it "allows assessing a submission in traditional view by selecting ratings and clicking submit assessment" do
@@ -256,7 +256,7 @@ describe "Rubrics in speedgrader" do
       student_in_course
       @assignment = @course.assignments.create!(name: "Assignment 1", points_possible: 30)
       @submission = @assignment.find_or_create_submission(@student)
-      @course.account.enable_feature!(:enhanced_rubrics)
+      @course.enable_feature!(:enhanced_rubrics)
       @rubric = @course.rubrics.create!(title: "Rubric 1", user: @user, context: @course, data: largest_rubric_data, points_possible: 30, free_form_criterion_comments: true)
       RubricAssociation.create!(rubric: @rubric, context: @course, association_object: @course, purpose: "bookmark")
       @rubric.associate_with(@assignment, @course, purpose: "grading")
@@ -321,7 +321,7 @@ describe "Rubrics in speedgrader" do
       student_in_course
       @assignment = @course.assignments.create!(name: "Assignment 1", points_possible: 30)
       @submission = @assignment.find_or_create_submission(@student)
-      @course.account.enable_feature!(:enhanced_rubrics)
+      @course.enable_feature!(:enhanced_rubrics)
       @rubric = @course.rubrics.create!(title: "Rubric 1", user: @user, context: @course, data: largest_rubric_data, points_possible: 30)
       RubricAssociation.create!(rubric: @rubric, context: @course, association_object: @course, purpose: "grading")
       ra = @rubric.associate_with(@assignment, @course, purpose: "grading")
@@ -357,7 +357,7 @@ describe "Rubrics in speedgrader" do
       student_in_course
       @assignment = @course.assignments.create!(name: "Assignment 1", points_possible: 30)
       @submission = @assignment.find_or_create_submission(@student)
-      @course.account.enable_feature!(:enhanced_rubrics)
+      @course.enable_feature!(:enhanced_rubrics)
       @rubric = @course.rubrics.create!(title: "Rubric 1", user: @user, context: @course, data: largest_rubric_data, points_possible: 30)
       RubricAssociation.create!(rubric: @rubric, context: @course, association_object: @course, purpose: "grading")
       @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
@@ -382,7 +382,7 @@ describe "Rubrics in speedgrader" do
       student_in_course
       @assignment = @course.assignments.create!(name: "Assignment 1", points_possible: 30)
       @submission = @assignment.find_or_create_submission(@student)
-      @course.account.enable_feature!(:enhanced_rubrics)
+      @course.enable_feature!(:enhanced_rubrics)
       @rubric = @course.rubrics.create!(title: "Rubric 1", user: @user, context: @course, data: largest_rubric_data, points_possible: 30)
       RubricAssociation.create!(rubric: @rubric, context: @course, association_object: @course, purpose: "grading")
       ra = @rubric.associate_with(@assignment, @course, purpose: "grading")

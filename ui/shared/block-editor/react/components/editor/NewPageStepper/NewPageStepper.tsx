@@ -35,7 +35,11 @@ import {getScrollParent} from '../../../utils'
 import {type PageSection} from './types'
 import {getTemplate} from '../../../assets/templates'
 
-type NewPageStepperProps = {
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor')
+
+export type NewPageStepperProps = {
   open: boolean
   onFinish: () => void
   onCancel: () => void
@@ -137,18 +141,18 @@ const NewPageStepper = ({open, onFinish, onCancel}: NewPageStepperProps) => {
       case 3:
         return <FontPairings fontName={fontName} onSelectFont={handleSelectFont} />
       default:
-        throw new Error('Invalid step')
+        throw new Error(I18n.t('Invalid step'))
     }
   }
 
   return (
     <Modal open={open} label="Create a new page" onDismiss={onCancel} onClose={handleClosed}>
       <Modal.Header>
-        <Heading>Create a new page</Heading>
+        <Heading>{I18n.t('Create a new page')}</Heading>
         <CloseButton
           data-instui-modal-close-button="true"
           onClick={onCancel}
-          screenReaderLabel="Close"
+          screenReaderLabel={I18n.t('Close')}
           placement="end"
           offset="medium"
         />
@@ -161,7 +165,7 @@ const NewPageStepper = ({open, onFinish, onCancel}: NewPageStepperProps) => {
               margin="0 0 small"
               onClick={handlePrevStep}
             >
-              Back
+              {I18n.t('Back')}
             </CondensedButton>
           )}
           {renderActiveStep()}
@@ -169,7 +173,7 @@ const NewPageStepper = ({open, onFinish, onCancel}: NewPageStepperProps) => {
       </Modal.Body>
       <Modal.Footer>
         <Button color="secondary" onClick={onCancel}>
-          Cancel
+          {I18n.t('Cancel')}
         </Button>
         <Button
           color="primary"
@@ -177,7 +181,11 @@ const NewPageStepper = ({open, onFinish, onCancel}: NewPageStepperProps) => {
           onClick={handleNextStep}
           interaction={isTemplateButtonDisabled ? 'disabled' : 'enabled'}
         >
-          {isTemplateSelection ? 'Start Editing' : step < 3 ? 'Next' : 'Start Creating'}
+          {isTemplateSelection
+            ? I18n.t('Start Editing')
+            : step < 3
+            ? I18n.t('Next')
+            : I18n.t('Start Creating')}
         </Button>
       </Modal.Footer>
     </Modal>

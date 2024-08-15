@@ -191,6 +191,17 @@ describe Lti::RegistrationsController do
           subject
         end
 
+        context "with a Lti::IMS::Registration in the list" do
+          let(:registration) { lti_registration_model(account:) }
+          let(:ims_registration) { lti_ims_registration_model(lti_registration: registration) }
+
+          it "includes the ims_registration_id" do
+            ims_registration
+            subject
+            expect(response_data.find { |r| r["id"] == ims_registration.lti_registration_id }["ims_registration_id"]).to eq(ims_registration.id)
+          end
+        end
+
         context "when sorting by installed_by" do
           subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=installed_by" }
 

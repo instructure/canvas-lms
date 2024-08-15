@@ -93,7 +93,12 @@ type OptimizedItemAssignToCardProps = ItemAssignToCardProps & RefAttributes<Item
 const ItemAssignToCardMemo = memo(
   ItemAssignToCard,
   (prevProps: OptimizedItemAssignToCardProps, nextProps: OptimizedItemAssignToCardProps) => {
-    return (
+    // For improving performance, we should only validate Post to SIS if due_at is abscent
+    const shouldValidatePostToSIS =
+      prevProps.postToSIS !== nextProps.postToSIS &&
+      (nextProps.due_at === null || nextProps.due_at === '')
+
+    return !!(
       nextProps.persistEveryoneOption &&
       prevProps.selectedAssigneeIds?.length === nextProps.selectedAssigneeIds?.length &&
       prevProps.highlightCard === nextProps.highlightCard &&
@@ -107,7 +112,8 @@ const ItemAssignToCardMemo = memo(
       prevProps.isCheckpointed === nextProps.isCheckpointed &&
       prevProps.courseId === nextProps.courseId &&
       prevProps.contextModuleId === nextProps.contextModuleId &&
-      prevProps.contextModuleName === nextProps.contextModuleName
+      prevProps.contextModuleName === nextProps.contextModuleName &&
+      !shouldValidatePostToSIS
     )
   }
 )
@@ -446,6 +452,7 @@ const ItemAssignToTrayContent = ({
   }, [courseId, itemContentId, itemType, JSON.stringify(defaultCards)])
 
   const handleAddCard = () => {
+    lastPerformedAction.current = {action: 'add'}
     if (onAddCard) {
       onAddCard()
       return
@@ -467,7 +474,6 @@ const ItemAssignToTrayContent = ({
         selectedAssigneeIds: [] as string[],
       } as ItemAssignToCardSpec,
     ]
-    lastPerformedAction.current = {action: 'add'}
     setAssignToCards(cards)
   }
 

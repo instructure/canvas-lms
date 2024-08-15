@@ -329,7 +329,6 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Cuir Deilbhín in Eagar" },
   "edit_link_7f53bebb": { "message": "Cuir Nasc in Eagar" },
-  "editor_statusbar_26ac81fc": { "message": "Barra Stádas Eagarthóra" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Eilimint ag tosú le { start }"
   },

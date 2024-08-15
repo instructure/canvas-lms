@@ -33,6 +33,19 @@ export type UsedLocation = {
     id: string
     title: string
   }[]
+  with_assignments?: boolean
+  assignments_next_page?: string
+  assignments_last_page?: boolean
+}
+
+export type AssignmentUsedLocation = {
+  id: string
+  title: string
+}
+
+export type AccountUsedLocation = {
+  id: string
+  name: string
 }
 
 export interface GradingScheme {
@@ -47,6 +60,7 @@ export interface GradingScheme {
   scaling_factor: number
   points_based: boolean
   used_locations?: UsedLocation[]
+  account_used_locations?: AccountUsedLocation[]
   workflow_state: 'active' | 'archived' | 'deleted'
   used_as_default: boolean
 }

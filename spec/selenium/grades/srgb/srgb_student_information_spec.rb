@@ -38,6 +38,7 @@ describe "Screenreader Gradebook Student Information" do
   context "in Student Information section" do
     before do
       course_setup
+      @course.root_account.disable_feature!(:individual_gradebook_enhancements)
       user_session(teacher)
       srgb_page.visit(test_course.id)
     end

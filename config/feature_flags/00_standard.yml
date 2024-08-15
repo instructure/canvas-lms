@@ -33,12 +33,6 @@ common_cartridge_page_conversion:
   description: If enabled, Common Cartridge importers will convert HTML files into
     Pages
   applies_to: Course
-compact_live_event_payloads:
-  state: allowed
-  applies_to: RootAccount
-  display_name: Remove null values from live event payloads
-  description: Canvas will remove keys with null values from live event payloads if
-    this feature is enabled.
 default_due_time:
   state: hidden
   display_name: Default Due Time
@@ -306,15 +300,6 @@ quizzes_next_submission_history:
     separately.
   applies_to: RootAccount
   root_opt_in: true
-restrict_students_from_annotating:
-  state: allowed
-  display_name: Restrict Students from Annotating
-  description: Prevents students from leaving annotations in assignments. Does not
-    apply to peer-reviewed assignments.
-  applies_to: Course
-  environments:
-    production:
-      state: disabled
 rubric_criterion_range:
   state: allowed
   display_name: Rubric Criterion Range

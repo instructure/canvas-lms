@@ -25,38 +25,38 @@ describe DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks do
 
   context "using media object dimensions in iframe" do
     it "does not overwrite preexisting iframe dimensions" do
-      MediaObject.create! media_id: "m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW", data: { extensions: { mp4: { width: 640, height: 400 } } }
+      MediaObject.create! media_id: "m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW", data: { extensions: { mp4: { width: 640, height: 400 } } }, media_type: "video/mp4"
       assignment.update! description: '<iframe width=0 height=0 src="/media_objects_iframe/m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW/?type=video&amp;embedded=true"></iframe>'
       DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks.run
-      expect(assignment.reload.description).to eq "<iframe width=\"0\" height=\"0\" src=\"/media_attachments_iframe/#{Attachment.last.id}/?type=video&amp;embedded=true\" style=\"width:640px; height:400px; \"></iframe>"
+      expect(assignment.reload.description).to eq "<iframe width=\"0\" height=\"0\" src=\"/media_attachments_iframe/#{Attachment.last.id}/?type=video&amp;embedded=true\" data-media-type=\"video\" style=\"width:640px; height:400px; \"></iframe>"
     end
 
     it "does not lose preexisting style settings" do
-      MediaObject.create! media_id: "m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW", data: { extensions: { mp4: { width: 640, height: 400 } } }
+      MediaObject.create! media_id: "m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW", data: { extensions: { mp4: { width: 640, height: 400 } } }, media_type: "video/mp4"
       assignment.update! description: '<iframe width=0 height=0 src="/media_objects_iframe/m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW/?type=video&amp;embedded=true" style="background:#ffffff"></iframe>'
       DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks.run
-      expect(assignment.reload.description).to eq "<iframe width=\"0\" height=\"0\" src=\"/media_attachments_iframe/#{Attachment.last.id}/?type=video&amp;embedded=true\" style=\"width:640px; height:400px; background:#ffffff\"></iframe>"
+      expect(assignment.reload.description).to eq "<iframe width=\"0\" height=\"0\" src=\"/media_attachments_iframe/#{Attachment.last.id}/?type=video&amp;embedded=true\" style=\"width:640px; height:400px; background:#ffffff\" data-media-type=\"video\"></iframe>"
     end
 
     it "does not overwrite preexisting dimension style settings" do
-      MediaObject.create! media_id: "m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW", data: { extensions: { mp4: { width: 640, height: 400 } } }
+      MediaObject.create! media_id: "m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW", data: { extensions: { mp4: { width: 640, height: 400 } } }, media_type: "video/mp4"
       assignment.update! description: '<iframe width=0 height=0 src="/media_objects_iframe/m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW/?type=video&amp;embedded=true" style="width:0px; height:0px"></iframe>'
       DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks.run
-      expect(assignment.reload.description).to eq "<iframe width=\"0\" height=\"0\" src=\"/media_attachments_iframe/#{Attachment.last.id}/?type=video&amp;embedded=true\" style=\"width:0px; height:0px\"></iframe>"
+      expect(assignment.reload.description).to eq "<iframe width=\"0\" height=\"0\" src=\"/media_attachments_iframe/#{Attachment.last.id}/?type=video&amp;embedded=true\" style=\"width:0px; height:0px\" data-media-type=\"video\"></iframe>"
     end
 
     it "places the dimensions in their own attributes and styles properly" do
-      MediaObject.create! media_id: "m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW", data: { extensions: { mp4: { width: 640, height: 400 } } }
+      MediaObject.create! media_id: "m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW", data: { extensions: { mp4: { width: 640, height: 400 } } }, media_type: "video/mp4"
       assignment.update! description: '<iframe src="/media_objects_iframe/m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW/?type=video&amp;embedded=true"></iframe>'
       DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks.run
-      expect(assignment.reload.description).to eq "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}/?type=video&amp;embedded=true\" style=\"width:640px; height:400px; \"></iframe>"
+      expect(assignment.reload.description).to eq "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}/?type=video&amp;embedded=true\" data-media-type=\"video\" style=\"width:640px; height:400px; \"></iframe>"
     end
 
     it "defaults to a 320px width and 14.25rem height in the abscence of dimension data for media extension" do
-      MediaObject.create! media_id: "m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW", data: { extensions: { mp4: {} } }
+      MediaObject.create! media_id: "m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW", data: { extensions: { mp4: {} } }, media_type: "video/mp4"
       assignment.update! description: '<iframe src="/media_objects_iframe/m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW/?type=video&amp;embedded=true"></iframe>'
       DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks.run
-      expect(assignment.reload.description).to eq "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}/?type=video&amp;embedded=true\" style=\"width:320px; height:14.25rem; \"></iframe>"
+      expect(assignment.reload.description).to eq "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}/?type=video&amp;embedded=true\" data-media-type=\"video\" style=\"width:320px; height:14.25rem; \"></iframe>"
     end
   end
 
@@ -64,14 +64,16 @@ describe DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks do
     it "replaces media object iframes" do
       assignment.update! description: '<iframe src="/media_objects_iframe/m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW/?type=video&amp;embedded=true"></iframe>'
       DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks.run
-      expect(Assignment.last.description).to eq "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}/?type=video&amp;embedded=true\" style=\"width:320px; height:14.25rem; \"></iframe>"
+      att = Attachment.last
+      expect(Assignment.last.description).to eq "<iframe src=\"/media_attachments_iframe/#{att.id}/?type=video&amp;embedded=true\" data-media-type=\"#{att.content_type&.split("/")&.[](0)}\" style=\"width:320px; height:14.25rem; \"></iframe>"
       expect(Attachment.last.context).to eq assignment.context
     end
 
     it "replaces media comments" do
       assignment.update! description: '<a id="media_comment_m-4uoGqVdEqXhpqu2ZMytHSy9XMV73aQ7E" class="instructure_inline_media_comment video_comment" data-media_comment_type="video" data-alt=""></a>'
       DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks.run
-      expect(Assignment.last.description).to eq "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}\" style=\"width:320px; height:14.25rem; \"></iframe>"
+      att = Attachment.last
+      expect(Assignment.last.description).to eq "<iframe src=\"/media_attachments_iframe/#{att.id}\" data-media-type=\"#{att.content_type&.split("/")&.[](0)}\" style=\"width:320px; height:14.25rem; \"></iframe>"
       expect(Attachment.last.context).to eq assignment.context
     end
 
@@ -79,40 +81,42 @@ describe DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks do
       non_matching_attachment = Attachment.create! context: Course.create!, media_entry_id: "m-4uoGqVdEqXhpqu2ZMytHSy9XMV73aQ7E", filename: "whatever", content_type: "unknown/unknown"
       assignment.update! description: '<a id="media_comment_m-4uoGqVdEqXhpqu2ZMytHSy9XMV73aQ7E" class="instructure_inline_media_comment video_comment" data-media_comment_type="video" data-alt=""></a>'
       DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks.run
+      att = Attachment.last
       expect(Assignment.last.description).not_to eq "<iframe src=\"/media_attachments_iframe/#{non_matching_attachment.id}\" style=\"width:320px; height:14.25rem; \"></iframe>"
-      expect(Assignment.last.description).to eq "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}\" style=\"width:320px; height:14.25rem; \"></iframe>"
+      expect(Assignment.last.description).to eq "<iframe src=\"/media_attachments_iframe/#{att.id}\" data-media-type=\"#{att.content_type&.split("/")&.[](0)}\" style=\"width:320px; height:14.25rem; \"></iframe>"
       expect(Attachment.last.context).to eq assignment.context
     end
   end
 
   context "picking up preexisting attachments" do
     it "replaces media object iframes" do
-      matching_attachment = Attachment.create! context: course, media_entry_id: "m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW", filename: "whatever", content_type: "unknown/unknown"
+      matching_attachment = Attachment.create! context: course, media_entry_id: "m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW", filename: "whatever", content_type: "video/mp4"
       assignment.update! description: '<iframe src="/media_objects_iframe/m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW/?type=video&amp;embedded=true"></iframe>'
       DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks.run
-      expect(Assignment.last.description).to eq "<iframe src=\"/media_attachments_iframe/#{matching_attachment.id}/?type=video&amp;embedded=true\" style=\"width:320px; height:14.25rem; \"></iframe>"
+      expect(Assignment.last.description).to eq "<iframe src=\"/media_attachments_iframe/#{matching_attachment.id}/?type=video&amp;embedded=true\" data-media-type=\"video\" style=\"width:320px; height:14.25rem; \"></iframe>"
       expect(matching_attachment.context).to eq assignment.context
     end
 
     it "replaces media comments" do
-      matching_attachment = Attachment.create! context: course, media_entry_id: "m-4uoGqVdEqXhpqu2ZMytHSy9XMV73aQ7E", filename: "whatever", content_type: "unknown/unknown"
+      matching_attachment = Attachment.create! context: course, media_entry_id: "m-4uoGqVdEqXhpqu2ZMytHSy9XMV73aQ7E", filename: "whatever", content_type: "audio/webm"
       assignment.update! description: '<a id="media_comment_m-4uoGqVdEqXhpqu2ZMytHSy9XMV73aQ7E" class="instructure_inline_media_comment video_comment" data-media_comment_type="video" data-alt=""></a>'
       DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks.run
-      expect(Assignment.last.description).to eq "<iframe src=\"/media_attachments_iframe/#{matching_attachment.id}\" style=\"width:320px; height:14.25rem; \"></iframe>"
+      expect(Assignment.last.description).to eq "<iframe src=\"/media_attachments_iframe/#{matching_attachment.id}\" data-media-type=\"audio\" style=\"width:320px; height:14.25rem; \"></iframe>"
       expect(matching_attachment.context).to eq assignment.context
     end
   end
 
   def expected_body(context)
     att = context.attachments.last
-    return "<iframe src=\"/media_attachments_iframe/#{att.id}/?verifier=#{att.uuid}&amp;type=video&amp;embedded=true\" style=\"width:320px; height:14.25rem; \"></iframe>" if att.context.is_a?(User)
+    return "<iframe src=\"/media_attachments_iframe/#{att.id}/?verifier=#{att.uuid}&amp;type=video&amp;embedded=true\" data-media-type=\"#{att.content_type&.split("/")&.[](0)}\" style=\"width:320px; height:14.25rem; \"></iframe>" if att.context.is_a?(User)
 
-    "<iframe src=\"/media_attachments_iframe/#{att.id}/?type=video&amp;embedded=true\" style=\"width:320px; height:14.25rem; \"></iframe>"
+    "<iframe src=\"/media_attachments_iframe/#{att.id}/?type=video&amp;embedded=true\" data-media-type=\"#{att.content_type&.split("/")&.[](0)}\" style=\"width:320px; height:14.25rem; \"></iframe>"
   end
 
   context "context matching to pre existing attachments" do
     it "chooses the proper attachments and rejects unmatching context ones" do
       media_id = "m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW"
+      MediaObject.create!(media_id:, media_type: "video/*")
       record_body = "<iframe src=\"/media_objects_iframe/#{media_id}/?type=video&amp;embedded=true\"></iframe>"
       another_course = course_model
       another_course.update! syllabus_body: record_body
@@ -137,9 +141,9 @@ describe DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks do
 
   context "with multiple media uses in content quiz" do
     it "replaces all the old media links throughout the data" do
-      first_matching_attachment = Attachment.create! context: course, media_entry_id: "m-media_1", filename: "whatever", content_type: "unknown/unknown"
-      second_matching_attachment = Attachment.create! context: course, media_entry_id: "m-media_2", filename: "whatever", content_type: "unknown/unknown"
-      third_matching_attachment = Attachment.create! context: course, media_entry_id: "m-media_3", filename: "whatever", content_type: "unknown/unknown"
+      first_matching_attachment = Attachment.create! context: course, media_entry_id: "m-media_1", filename: "whatever", content_type: "video/webm"
+      second_matching_attachment = Attachment.create! context: course, media_entry_id: "m-media_2", filename: "whatever", content_type: "video/webm"
+      third_matching_attachment = Attachment.create! context: course, media_entry_id: "m-media_3", filename: "whatever", content_type: "video/webm"
 
       quiz_description = "<iframe src=\"/media_objects_iframe/m-media_2/?type=video&amp;embedded=true\"></iframe>"
       question_text_1 = "<a id=\"media_comment_m-media_3\" class=\"instructure_inline_media_comment video_comment\" data-media_comment_type=\"video\" data-alt=''></a>"
@@ -177,16 +181,16 @@ describe DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks do
       }
       DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks.run
       q.reload
-      expect(q.description).to eq("<iframe src=\"/media_attachments_iframe/#{second_matching_attachment.id}/?type=video&amp;embedded=true\" style=\"width:320px; height:14.25rem; \"></iframe>")
-      expect(q.quiz_data[0]["question_text"]).to eq("<iframe src=\"/media_attachments_iframe/#{third_matching_attachment.id}\" style=\"width:320px; height:14.25rem; \"></iframe>")
-      expect(q.quiz_data[0]["answers"][0]["text"]).to eq("<iframe src=\"/media_attachments_iframe/#{first_matching_attachment.id}/?type=video&amp;embedded=true\" style=\"width:320px; height:14.25rem; \"></iframe>")
-      expect(q.quiz_data[0]["answers"][1]["text"]).to eq("<iframe src=\"/media_attachments_iframe/#{second_matching_attachment.id}/?type=video&amp;embedded=true\" style=\"width:320px; height:14.25rem; \"></iframe>")
-      expect(q.quiz_data[1]["question_text"]).to eq("<iframe src=\"/media_attachments_iframe/#{second_matching_attachment.id}\" style=\"width:320px; height:14.25rem; \"></iframe>")
-      expect(q.quiz_data[1]["answers"][0]["text"]).to eq("<iframe src=\"/media_attachments_iframe/#{third_matching_attachment.id}/?type=video&amp;embedded=true\" style=\"width:320px; height:14.25rem; \"></iframe>")
-      expect(q.quiz_data[1]["answers"][1]["text"]).to eq("<iframe src=\"/media_attachments_iframe/#{first_matching_attachment.id}/?type=video&amp;embedded=true\" style=\"width:320px; height:14.25rem; \"></iframe>")
-      expect(q.quiz_questions.first.question_data["question_text"]).to eq("<iframe src=\"/media_attachments_iframe/#{first_matching_attachment.id}\" style=\"width:320px; height:14.25rem; \"></iframe>")
-      expect(q.quiz_questions.first.question_data["answers"][0]["text"]).to eq("<iframe src=\"/media_attachments_iframe/#{second_matching_attachment.id}/?type=video&amp;embedded=true\" style=\"width:320px; height:14.25rem; \"></iframe>")
-      expect(q.quiz_questions.first.question_data["answers"][1]["text"]).to eq("<iframe src=\"/media_attachments_iframe/#{third_matching_attachment.id}/?type=video&amp;embedded=true\" style=\"width:320px; height:14.25rem; \"></iframe>")
+      expect(q.description).to eq("<iframe src=\"/media_attachments_iframe/#{second_matching_attachment.id}/?type=video&amp;embedded=true\" data-media-type=\"#{second_matching_attachment.content_type&.split("/")&.[](0)}\" style=\"width:320px; height:14.25rem; \"></iframe>")
+      expect(q.quiz_data[0]["question_text"]).to eq("<iframe src=\"/media_attachments_iframe/#{third_matching_attachment.id}\" data-media-type=\"#{third_matching_attachment.content_type&.split("/")&.[](0)}\" style=\"width:320px; height:14.25rem; \"></iframe>")
+      expect(q.quiz_data[0]["answers"][0]["text"]).to eq("<iframe src=\"/media_attachments_iframe/#{first_matching_attachment.id}/?type=video&amp;embedded=true\" data-media-type=\"#{first_matching_attachment.content_type&.split("/")&.[](0)}\" style=\"width:320px; height:14.25rem; \"></iframe>")
+      expect(q.quiz_data[0]["answers"][1]["text"]).to eq("<iframe src=\"/media_attachments_iframe/#{second_matching_attachment.id}/?type=video&amp;embedded=true\" data-media-type=\"#{second_matching_attachment.content_type&.split("/")&.[](0)}\" style=\"width:320px; height:14.25rem; \"></iframe>")
+      expect(q.quiz_data[1]["question_text"]).to eq("<iframe src=\"/media_attachments_iframe/#{second_matching_attachment.id}\" data-media-type=\"#{second_matching_attachment.content_type&.split("/")&.[](0)}\" style=\"width:320px; height:14.25rem; \"></iframe>")
+      expect(q.quiz_data[1]["answers"][0]["text"]).to eq("<iframe src=\"/media_attachments_iframe/#{third_matching_attachment.id}/?type=video&amp;embedded=true\" data-media-type=\"#{third_matching_attachment.content_type&.split("/")&.[](0)}\" style=\"width:320px; height:14.25rem; \"></iframe>")
+      expect(q.quiz_data[1]["answers"][1]["text"]).to eq("<iframe src=\"/media_attachments_iframe/#{first_matching_attachment.id}/?type=video&amp;embedded=true\" data-media-type=\"#{first_matching_attachment.content_type&.split("/")&.[](0)}\" style=\"width:320px; height:14.25rem; \"></iframe>")
+      expect(q.quiz_questions.first.question_data["question_text"]).to eq("<iframe src=\"/media_attachments_iframe/#{first_matching_attachment.id}\" data-media-type=\"#{first_matching_attachment.content_type&.split("/")&.[](0)}\" style=\"width:320px; height:14.25rem; \"></iframe>")
+      expect(q.quiz_questions.first.question_data["answers"][0]["text"]).to eq("<iframe src=\"/media_attachments_iframe/#{second_matching_attachment.id}/?type=video&amp;embedded=true\" data-media-type=\"#{second_matching_attachment.content_type&.split("/")&.[](0)}\" style=\"width:320px; height:14.25rem; \"></iframe>")
+      expect(q.quiz_questions.first.question_data["answers"][1]["text"]).to eq("<iframe src=\"/media_attachments_iframe/#{third_matching_attachment.id}/?type=video&amp;embedded=true\" data-media-type=\"#{third_matching_attachment.content_type&.split("/")&.[](0)}\" style=\"width:320px; height:14.25rem; \"></iframe>")
     end
   end
 end

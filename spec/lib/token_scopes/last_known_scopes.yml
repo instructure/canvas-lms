@@ -210,6 +210,8 @@
 - verb: POST
   path: "/api/v1/accounts/:account_id/lti_registrations/:id/bind"
 - verb: GET
+  path: "/api/v1/accounts/:account_id/lti_registrations/fetch_lti_configuration"
+- verb: GET
   path: "/api/v1/accounts/:account_id/outcome_group_links"
 - verb: GET
   path: "/api/v1/accounts/:account_id/outcome_groups"
@@ -1837,6 +1839,8 @@
   path: "/api/v1/quiz_submissions/:quiz_submission_id/questions/:id/formatted_answer"
 - verb: PUT
   path: "/api/v1/quiz_submissions/:quiz_submission_id/questions/:id/unflag"
+- verb: POST
+  path: "/api/v1/rce_linked_file_urls"
 - verb: GET
   path: "/api/v1/release_notes"
 - verb: POST
@@ -2177,7 +2181,13 @@
   path: "/api/v1/users/:user_id/tabs"
 - verb: GET
   path: "/api/v1/users/:user_id/temporary_enrollment_status"
+- verb: POST
+  path: "/api/v1/users/:user_id/tokens"
 - verb: DELETE
+  path: "/api/v1/users/:user_id/tokens/:id"
+- verb: GET
+  path: "/api/v1/users/:user_id/tokens/:id"
+- verb: PUT
   path: "/api/v1/users/:user_id/tokens/:id"
 - verb: DELETE
   path: "/api/v1/users/:user_id/usage_rights"

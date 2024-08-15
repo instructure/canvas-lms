@@ -19,6 +19,15 @@
 <% access_token ||= nil %>
 <tr class="access_token <%= 'blank' unless access_token %>" style="<%= hidden unless access_token %>">
   <td class="app_name"><%= access_token&.app_name || t(:default_app_name, "No App") %></td>
+  <% if @current_user&.account.feature_enabled?(:admin_manage_access_tokens) %>
+    <td class="workflow_state">
+      <%= access_token&.localized_workflow_state %>
+    <% if access_token&.pending? && @real_current_user.nil? %>
+      (<a href="#" class="activate_token_link" rel="<%= activate_profile_token_url(access_token)%>"><%= t("activate") %></a>)
+    <% else %>
+    <% end %>
+    </td>
+  <% end %>
   <td class="purpose"><%= access_token&.purpose || nbsp %></td>
   <td class="dates">
     <table class="subtable" role="presentation">
@@ -32,10 +41,10 @@
     </table>
   </td>
   <td>
-    <a href="#" aria-label="<%= t('%{appName} Details', appName: access_token&.app_name) %>" rel="<%= profile_token_url(access_token || "{{ id }}") %>" class="show_token_link"><%= t('links.token_details', "details") %></a>
+    <a href="#" aria-label="<%= t('%{appName} Details', appName: access_token&.app_name) %>" rel="<%= api_v1_token_url("self", access_token || "{{ id }}") %>" class="show_token_link"><%= t('links.token_details', "details") %></a>
   </td>
   <td class="links">
-    <% if access_token.nil? || @real_current_user && access_token.grants_right?(@real_current_user, :delete) || access_token.grants_right?(@current_user, :delete) %>
+    <% if access_token.nil? || access_token.grants_right?(logged_in_user, :delete) %>
       <a href="#" aria-label="<%= t('Delete %{appName} Token', appName: access_token&.app_name) %>" class="delete_key_link" rel="<%= api_v1_token_url("self", access_token&.token_hint || "{{ id }}") %>" title="<%= t('titles.delete_this_token', "Delete this Token") %>"><i class="icon-trash" role="presentation"></i></a>
     <% end %>
   </td>

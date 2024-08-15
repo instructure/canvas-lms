@@ -141,6 +141,21 @@ module Lti
       nil
     end
 
+    # @return [String[]] A list of warning messages for deprecated placements
+    def placement_warnings
+      warnings = []
+      if placements.any? { |placement| placement["placement"] == "resource_selection" }
+        warnings.push(
+          t(
+            "Warning: the resource_selection placement is deprecated. Please use assignment_selection and/or link_selection instead."
+          )
+        )
+      end
+      may_be_warning = verify_placements
+      warnings.push(may_be_warning) unless may_be_warning.nil?
+      warnings
+    end
+
     private
 
     def self.retrieve_and_extract_configuration(url)

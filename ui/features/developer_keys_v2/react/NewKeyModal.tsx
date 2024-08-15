@@ -49,7 +49,7 @@ type Props = {
   }
   actions: typeof actions
   selectedScopes: Array<string>
-  handleSuccessfulSave: (warningMessage?: string) => void
+  handleSuccessfulSave: (warningMessage?: string | string[]) => void
 }
 
 type ConfigurationMethod = 'manual' | 'json' | 'url'

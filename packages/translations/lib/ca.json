@@ -647,9 +647,6 @@
     "edit_link_7f53bebb": {
         "message": "Edita l''enllaç"
     },
-    "editor_statusbar_26ac81fc": {
-        "message": "Editor de la barra d''estat"
-    },
     "element_starting_with_start_91bf4c3b": {
         "message": "L’element comença per { start }"
     },
@@ -1294,6 +1291,9 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Enllaça a un lloc extern."
+    },
+    "lists_cd1336fc": {
+        "message": "Llistes"
     },
     "lists_should_be_formatted_as_lists_f862de8d": {
         "message": "Les llistes han de tenir el format de llista."

@@ -97,5 +97,13 @@ PageBlock.craft = {
     canMoveIn: (incomingNodes: Node[]) => {
       return incomingNodes.every((incomingNode: Node) => incomingNode.data.custom.isSection)
     },
+    canMoveOut: (outgoingNodes: Node[], currentNode: Node) => {
+      return currentNode.data.nodes.length > outgoingNodes.length
+    },
+  },
+  custom: {
+    isDeletable: (_myId: Node, _query: any) => {
+      return false
+    },
   },
 }

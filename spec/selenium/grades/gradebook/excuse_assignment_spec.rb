@@ -158,6 +158,7 @@ describe "Excuse an Assignment" do
     context "Group Assignments", :group do
       it "preserves assignment excused status", priority: "1" do
         course_with_teacher_logged_in
+        @course.root_account.disable_feature!(:individual_gradebook_enhancements)
         group_test_setup 4, 1, 1
 
         @students.each { |student| @testgroup[0].add_user student }
@@ -194,6 +195,7 @@ describe "Excuse an Assignment" do
 
       it "excuses assignments on individual basis", priority: "1" do
         course_with_teacher_logged_in
+        @course.root_account.disable_feature!(:individual_gradebook_enhancements)
         group_test_setup 2, 1, 1
 
         @students.each { |student| @testgroup[0].add_user student }

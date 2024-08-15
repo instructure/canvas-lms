@@ -42,9 +42,9 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   alias_method :application_secret=, :client_secret=
   alias_method :login_attribute_for_pseudonyms, :login_attribute
 
-  validates :tenants, presence: true
-  validate :tenants, :validate_tenants
-  validate :login_attribute, :validate_secure_login_attribute
+  validates :tenants, presence: true, if: :active?
+  validate :tenants, :validate_tenants, if: :active?
+  validate :login_attribute, :validate_secure_login_attribute, if: :active?
 
   def client_id
     application_id

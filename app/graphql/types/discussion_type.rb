@@ -69,6 +69,7 @@ module Types
     field :context_id, ID, null: false
     field :context_type, String, null: false
     field :delayed_post_at, Types::DateTimeType, null: true
+    field :edited_at, Types::DateTimeType, null: true
     field :lock_at, Types::DateTimeType, null: true
     field :locked, Boolean, null: false
     field :last_reply_at, Types::DateTimeType, null: true
@@ -303,7 +304,7 @@ module Types
           course_sections
         else
           Loaders::CourseRoleLoader.for(course_id: course.id, role_types: nil, built_in_only: nil).load(current_user).then do |roles|
-            if roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment") || roles&.include?("DesignerEnrollment")
+            if course.grants_right?(current_user, :update) || roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment") || roles&.include?("DesignerEnrollment")
               course_sections
             else
               course_sections.joins(:student_enrollments).where(enrollments: { user_id: current_user.id })

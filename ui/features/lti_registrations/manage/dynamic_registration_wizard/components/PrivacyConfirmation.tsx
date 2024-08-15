@@ -80,7 +80,7 @@ export const PrivacyConfirmation = ({toolName, overlayStore}: PrivacyConfirmatio
         <SimpleSelect
           messages={messages}
           renderLabel={I18n.t('User Data Shared With This App')}
-          value={selectedPrivacyLevel}
+          value={selectedPrivacyLevel === null ? undefined : selectedPrivacyLevel}
           onChange={(_, {value}) => {
             if (isLtiPrivacyLevel(value)) {
               actions.updatePrivacyLevel(value)

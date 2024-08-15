@@ -66,6 +66,7 @@ const AssignToContent = ({
   const [hasModuleOverrides, setHasModuleOverrides] = useState(false)
   const [moduleAssignees, setModuleAssignees] = useState([])
   const [initialModuleOverrides, setInitialModuleOverrides] = useState([])
+  const [groupCategoryId, setGroupCategoryId] = useState(getGroupCategoryId?.())
   const dateValidator = useMemo(
     () =>
       new DateValidator({
@@ -97,14 +98,16 @@ const AssignToContent = ({
     [type]
   )
 
-  // TODO: ensure group category id is passed in correctly when it's changed
-  const formData = useMemo(
-    () => ({
-      groupCategoryId: getGroupCategoryId?.(),
-    }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [open]
-  )
+  useEffect(() => {
+    document.getElementById('assignment_group_category_id')?.addEventListener(
+      'change',
+      () => setGroupCategoryId(getGroupCategoryId?.())
+    )
+    document.getElementById('has_group_category')?.addEventListener(
+      'change',
+      () => setGroupCategoryId(getGroupCategoryId?.())
+    )
+  }, [])
 
   useEffect(() => {
     const updatedOverrides = overrides.map(override => {
@@ -120,11 +123,11 @@ const AssignToContent = ({
   }, [overrides])
 
   useEffect(() => {
-    if (stagedOverrides === null) return
+    if (stagedOverridesRef.current === null) return
     const parsedOverrides = getParsedOverrides(
-      stagedOverrides,
+      stagedOverridesRef.current,
       stagedCards,
-      formData.groupCategoryId
+      groupCategoryId
     )
     const uniqueOverrides = removeOverriddenAssignees(overrides, parsedOverrides)
     setStagedCards(uniqueOverrides)
@@ -154,7 +157,7 @@ const AssignToContent = ({
       setModuleAssignees(allModuleAssignees)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stagedOverrides, formData.groupCategoryId])
+  }, [stagedOverrides, groupCategoryId])
 
   useEffect(() => {
     const newOverrides = getAllOverridesFromCards(stagedCardsRef.current).filter(
@@ -197,8 +200,9 @@ const AssignToContent = ({
     resetOverrides(newOverrides, withoutModuleOverrides)
     stagedOverridesRef.current = newOverrides
 
-    onSync(newOverrides, stagedImportantDates)
-  }, [stagedOverrides])
+    const noModuleOverrides = newOverrides.filter(o => !o.context_module_id)
+    onSync(noModuleOverrides, stagedImportantDates)
+  }, [stagedCards, stagedOverrides])
 
   const cards = useMemo(() => {
     const selectedOptionIds = []
@@ -289,9 +293,6 @@ const AssignToContent = ({
     const newStagedCards = {...stagedCardsRef.current}
     delete newStagedCards[cardId]
     setStagedCards(newStagedCards)
-
-    const newStagedOverrides = stagedOverridesRef.current.filter(override => override.rowKey.toString() !== cardId)
-    setStagedOverrides(newStagedOverrides)
   }
 
   const updateCard = (cardId, newOverrides, cardDates) => {
@@ -328,27 +329,24 @@ const AssignToContent = ({
     const oldDates = card.dates
     const date = newDate === '' ? null : newDate
 
+    const initialModuleOverrideState = initialModuleOverrides.find(obj => obj.rowKey === cardId)
+
+    const tmp = {}
+    tmp[dateType] = date
+    const newDates = _.extend(oldDates, tmp)
+    const hasDates = !(Object.values(newDates).every(value => value === null || value === undefined || value === ''))
+
     const newOverrides = oldOverrides.map(override => {
       return {
         ...override,
         [dateType]: date,
         [`${dateType}_overridden`]: !!date,
+        context_module_id: hasDates ? null : initialModuleOverrideState?.context_module_id,
+        context_module_name: hasDates ? null : initialModuleOverrideState?.context_module_name,
       }
     })
-
-    const tmp = {}
-    tmp[dateType] = date
-    const newDates = _.extend(oldDates, tmp)
 
     updateCard(cardId, newOverrides, newDates)
-
-    const updatedOverrides = [...stagedOverridesRef.current]
-    updatedOverrides.forEach(override => {
-      if (String(override.rowKey) === String(cardId)) {
-        override[dateType] = newDate
-      }
-    })
-    setStagedOverrides(updatedOverrides)
   }
 
   const handleAssigneeAddition = (cardId, newAssignee) => {
@@ -412,6 +410,8 @@ const AssignToContent = ({
       delete existingOverrideData.group_id
       delete existingOverrideData.noop_id
       delete existingOverrideData.course_id
+      delete existingOverrideData.context_module_id
+      delete existingOverrideData.context_module_name
       remainingCardOverrides = [existingOverrideData]
     }
 
@@ -465,7 +465,7 @@ const AssignToContent = ({
           itemType={type}
           itemContentId={assignmentId}
           initHasModuleOverrides={hasModuleOverrides}
-          defaultGroupCategoryId={formData.groupCategoryId}
+          defaultGroupCategoryId={groupCategoryId}
           useApplyButton={true}
           locale={ENV.LOCALE || 'en'}
           timezone={ENV.TIMEZONE || 'UTC'}

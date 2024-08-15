@@ -125,4 +125,87 @@ describe('doFetchApi', () => {
     expect(JSON.parse(fetchOptions.body)).toEqual({the: 'body'})
     expect(fetchOptions.headers['Content-Type']).toBe('application/json')
   })
+
+  it('handles string body correctly without altering it or setting Content-Type', () => {
+    const path = '/api/v1/string-body-test'
+    const body = 'this is a plain string'
+    fetchMock.mock(`path:${path}`, 200)
+    doFetchApi({path, body})
+    const [, fetchOptions] = fetchMock.lastCall()
+    expect(fetchOptions.body).toBe(body)
+    expect(fetchOptions.headers['Content-Type']).toBeUndefined()
+  })
+
+  describe('handles FormData correctly', () => {
+    it('does not stringify FormData and does not set Content-Type to application/json', () => {
+      const path = '/api/v1/formdata-test'
+      fetchMock.mock(`path:${path}`, 200)
+      const formData = new FormData()
+      formData.append('key', 'value')
+      doFetchApi({path, body: formData})
+      const [, fetchOptions] = fetchMock.lastCall()
+      expect(fetchOptions.body).toBeInstanceOf(FormData)
+      expect(fetchOptions.headers['Content-Type']).toBeUndefined()
+    })
+
+    it('sends FormData along with other headers correctly', () => {
+      const path = '/api/v1/formdata-headers-test'
+      fetchMock.mock(`path:${path}`, 200)
+      const formData = new FormData()
+      formData.append('key', 'value')
+      const headers = {foo: 'bar'}
+      doFetchApi({path, body: formData, headers})
+      const [, fetchOptions] = fetchMock.lastCall()
+      expect(fetchOptions.body).toBeInstanceOf(FormData)
+      expect(fetchOptions.headers.foo).toBe('bar')
+      expect(fetchOptions.headers['Content-Type']).toBeUndefined()
+    })
+
+    it('handles FormData with no additional headers', () => {
+      const path = '/api/v1/formdata-no-headers'
+      fetchMock.mock(`path:${path}`, 200)
+      const formData = new FormData()
+      formData.append('key', 'value')
+      doFetchApi({path, body: formData})
+      const [, fetchOptions] = fetchMock.lastCall()
+      expect(fetchOptions.body).toBeInstanceOf(FormData)
+      expect(fetchOptions.headers).not.toHaveProperty('Content-Type')
+    })
+
+    it('handles FormData with multiple values for a single key', () => {
+      const path = '/api/v1/formdata-multiple-values'
+      fetchMock.mock(`path:${path}`, 200)
+      const formData = new FormData()
+      formData.append('files', new Blob(['file1']), 'file1.txt')
+      formData.append('files', new Blob(['file2']), 'file2.txt')
+      doFetchApi({path, body: formData})
+      const [, fetchOptions] = fetchMock.lastCall()
+      expect(fetchOptions.body).toBeInstanceOf(FormData)
+      expect(fetchOptions.headers['Content-Type']).toBeUndefined()
+    })
+
+    it('respects manually set Content-Type header when using FormData', () => {
+      const path = '/api/v1/formdata-custom-content-type'
+      fetchMock.mock(`path:${path}`, 200)
+      const formData = new FormData()
+      formData.append('key', 'value')
+      const headers = {'Content-Type': 'multipart/form-data'}
+      doFetchApi({path, body: formData, headers})
+      const [, fetchOptions] = fetchMock.lastCall()
+      expect(fetchOptions.body).toBeInstanceOf(FormData)
+      expect(fetchOptions.headers['Content-Type']).toBe('multipart/form-data')
+    })
+
+    it('handles FormData with empty entries correctly', () => {
+      const path = '/api/v1/formdata-empty-entries'
+      fetchMock.mock(`path:${path}`, 200)
+      const formData = new FormData()
+      formData.append('key1', 'value1')
+      formData.append('emptyKey', '')
+      doFetchApi({path, body: formData})
+      const [, fetchOptions] = fetchMock.lastCall()
+      expect(fetchOptions.body).toBeInstanceOf(FormData)
+      expect(fetchOptions.headers['Content-Type']).toBeUndefined()
+    })
+  })
 })

@@ -43,6 +43,17 @@ const $profile_table = $('.profile_table'),
 
 const maximumStringLength = 255
 
+const localizeWorkflowState = function (state) {
+  switch (state) {
+    case 'active':
+      return I18n.t('active')
+    case 'pending':
+      return I18n.t('pending')
+    default:
+      return state
+  }
+}
+
 $edit_settings_link.click(function () {
   $(this).hide()
   $profile_table
@@ -273,7 +284,7 @@ $('#add_access_token_dialog .cancel_button').click(() => {
   $('#add_access_token_dialog').dialog('close')
 })
 $('#access_token_form').formSubmit({
-  object_name: 'access_token',
+  object_name: 'token',
   property_validations: {
     purpose(value) {
       if (!value || value === '') {
@@ -304,9 +315,9 @@ $('#access_token_form').formSubmit({
     $('#access_tokens_holder').show()
     const $token = $('.access_token.blank:first').clone(true).removeClass('blank')
     data.created = datetimeString(data.created_at) || '--'
-    data.expires =
-      datetimeString(data.permanent_expires_at) || I18n.t('token_never_expires', 'never')
+    data.expires = datetimeString(data.expires_at) || I18n.t('token_never_expires', 'never')
     data.used = '--'
+    data.workflow_state = localizeWorkflowState(data.workflow_state)
     $token.fillTemplateData({
       data,
       hrefValues: ['id'],
@@ -342,23 +353,42 @@ $('#token_details_dialog .regenerate_token').click(function () {
   $.ajaxJSON(
     url,
     'PUT',
-    {'access_token[regenerate]': '1'},
+    {'token[regenerate]': '1'},
     data => {
       data.created = datetimeString(data.created_at) || '--'
-      data.expires =
-        datetimeString(data.permanent_expires_at) || I18n.t('token_never_expires', 'never')
+      data.expires = datetimeString(data.expires_at) || I18n.t('token_never_expires', 'never')
       data.used = datetimeString(data.last_used_at) || '--'
       data.visible_token = data.visible_token || 'protected'
+      data.workflow_state = localizeWorkflowState(data.workflow_state)
       $dialog
         .fillTemplateData({data})
         .find('.full_token_warning')
         .showIf(data.visible_token.length > 10)
       $token.data('token', data)
+      $token.fillTemplateData({data})
       $button.text(I18n.t('buttons.regenerate_token', 'Regenerate Token')).prop('disabled', false)
     },
     () => {
       $button
         .text(I18n.t('errors.regenerating_token_failed', 'Regenerating Token Failed'))
+        .prop('disabled', false)
+    }
+  )
+})
+$('.access_token .activate_token_link').click(function () {
+  const $button = $(this)
+  const url = $button.attr('rel')
+  $button.text(I18n.t('buttons.activating_token', 'activating...')).prop('disabled', true)
+  $.ajaxJSON(
+    url,
+    'POST',
+    {},
+    data => {
+      $button.parentElement.replaceChildren(localizeWorkflowState(data.workflow_state))
+    },
+    () => {
+      $button
+        .text(I18n.t('errors.activating_token_failed', 'Activating Token Failed'))
         .prop('disabled', false)
     }
   )
@@ -405,8 +435,7 @@ $('.show_token_link').click(function (event) {
       {},
       data => {
         data.created = datetimeString(data.created_at) || '--'
-        data.expires =
-          datetimeString(data.permanent_expires_at) || I18n.t('token_never_expires', 'never')
+        data.expires = datetimeString(data.expires_at) || I18n.t('token_never_expires', 'never')
         data.used = datetimeString(data.last_used_at) || '--'
         data.visible_token = data.visible_token || 'protected'
         $token.data('token', data)

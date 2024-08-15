@@ -14,7 +14,6 @@ x-base-service: &BASE-SERVICE
       - .:/usr/src/app
       # needed to prevent local .bundle/plugin/index file from being copied into the container
       - /usr/src/app/.bundle/plugin
-      - api_docs:/usr/src/app/public/doc/api
       - brandable_css_brands:/usr/src/app/app/stylesheets/brandable_css_brands
       - bundler:/home/docker/.bundle/
       - canvas-docker-gems:/home/docker/.gem/
@@ -130,7 +129,6 @@ networks:
     name: "inst_shared"
 
 volumes:
-  api_docs: {}
   brandable_css_brands: {}
   bundler: {}
   canvas-docker-gems: {}

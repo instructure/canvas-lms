@@ -145,7 +145,7 @@ module Qti
           mig_id = ::Canvas::Migration::MigratorHelper.prepend_id(mig_id, id_prepender)
           @course[:file_map][mig_id] = {
             migration_id: mig_id,
-            path_name: attachment,
+            path_name: attachment.delete_prefix("web_resources/"),
           }
         end
       rescue => e

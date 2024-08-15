@@ -21,7 +21,7 @@ require_relative "../pages/srgb_page"
 require_relative "weighting_setup"
 require_relative "a_gradebook_shared_example"
 
-describe "individual view" do
+describe.skip "individual view EVAL-4360 remove test file with FF individual_gradebook_enhancements" do
   include_context "in-process server selenium tests"
   include WeightingSetup
 
@@ -42,6 +42,7 @@ describe "individual view" do
 
   before(:once) do
     weighted_grading_setup
+    @course.root_account.disable_feature!(:individual_gradebook_enhancements)
   end
 
   after do

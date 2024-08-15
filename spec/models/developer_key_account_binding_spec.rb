@@ -34,6 +34,10 @@ RSpec.describe DeveloperKeyAccountBinding do
   let(:root_account_key) { DeveloperKey.create!(account:, **params) }
   let(:root_account_binding) { root_account_key.developer_key_account_bindings.first }
 
+  before do
+    DeveloperKey.default # create default before any other needed keys
+  end
+
   describe "validations and callbacks" do
     it "requires an account" do
       dev_key_binding.account = nil
@@ -73,6 +77,21 @@ RSpec.describe DeveloperKeyAccountBinding do
       lrab = dev_key_binding.lti_registration_account_binding
       expect(lrab.workflow_state).to eq("on")
       expect(lrab.updated_by).to eq(user2)
+    end
+
+    context "for default key" do
+      let(:developer_key) { DeveloperKey.default }
+      let(:account) { Account.site_admin }
+
+      it "does not allow default key to be set to off" do
+        binding = DeveloperKeyAccountBinding.where(developer_key_id: developer_key.id).first
+        expect { binding.update!(workflow_state: "off") }.to raise_error("Please don't turn off the default developer key")
+      end
+
+      it "does not allow default key to be set to allow" do
+        binding = DeveloperKeyAccountBinding.where(developer_key_id: developer_key.id).first
+        expect { binding.update!(workflow_state: "allow") }.to raise_error("Please don't turn off the default developer key")
+      end
     end
 
     describe "workflow state" do

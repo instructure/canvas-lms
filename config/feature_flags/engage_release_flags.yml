@@ -1,0 +1,6 @@
+---
+assignment_enhancements_teacher_view:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Assignment Enhancements Teacher View
+  description: Updates to the Teacher view of assignments.

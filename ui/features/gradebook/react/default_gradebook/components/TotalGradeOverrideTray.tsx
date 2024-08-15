@@ -212,6 +212,7 @@ export function TotalGradeOverrideTray({
               finalGradeOverride={studentFinalGradeOverrides}
               gradingPeriodId={gradingPeriodId}
               gradingScheme={gradeEntry?.gradingScheme}
+              restrictToTwoDigitsAfterSeparator={!!gradeEntry?.restrictToTwoDigitsAfterSeparator}
               showPercentageLabel={false}
               width="4rem"
               disabled={selectedCustomStatus?.allow_final_grade_value === false}

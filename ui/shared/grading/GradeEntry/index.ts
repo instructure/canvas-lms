@@ -44,6 +44,10 @@ export default class GradeEntry {
     return this.options.gradingScheme || null
   }
 
+  get restrictToTwoDigitsAfterSeparator() {
+    return !!this.options.restrictPointsBasedInput && !!this.gradingScheme?.pointsBased
+  }
+
   formatGradeInfoForDisplay(_gradeInfo) {
     return null
   }

@@ -40,6 +40,7 @@ module Api::V1::WikiPage
     hash["html_url"] = polymorphic_url([wiki_page.context, wiki_page])
     hash["todo_date"] = wiki_page.todo_date
     hash["publish_at"] = wiki_page.publish_at
+    hash["editor"] = wiki_page.block_editor ? "block_editor" : "rce" if @context.account.feature_enabled?(:block_editor)
 
     hash["updated_at"] = wiki_page.revised_at
     if opts[:include_assignment] && wiki_page.for_assignment?
@@ -51,12 +52,11 @@ module Api::V1::WikiPage
     end
     locked_json(hash, wiki_page, current_user, "page", deep_check_if_needed: opts[:deep_check_if_needed])
     if include_body && !hash["locked_for_user"] && !hash["lock_info"]
-      if @context.account.feature_enabled?(:block_editor)
-        block_editor = wiki_page.block_editor
+      if @context.account.feature_enabled?(:block_editor) && wiki_page.block_editor
         hash["block_editor_attributes"] = {
-          id: block_editor&.id,
-          version: block_editor&.editor_version,
-          blocks: block_editor&.blocks
+          id: wiki_page.block_editor.id,
+          version: wiki_page.block_editor.editor_version,
+          blocks: wiki_page.block_editor.blocks
         }
       else
         hash["body"] = api_user_content(wiki_page.body, wiki_page.context)

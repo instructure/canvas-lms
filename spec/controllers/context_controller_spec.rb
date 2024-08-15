@@ -402,6 +402,28 @@ describe ContextController do
         expect(assigns[:_crumbs]).to include(["People", "/courses/#{@course.id}/users", {}])
         expect(assigns[:_crumbs]).to include([@student.short_name.to_s, "/courses/#{@course.id}/users/#{@student.id}", {}])
       end
+
+      it "does not assign messages if show_recent_messages_on_new_roster_user_page ff is disabled" do
+        user_session(@admin)
+        Account.site_admin.disable_feature!(:show_recent_messages_on_new_roster_user_page)
+        get "roster_user", params: { course_id: @course.id, id: @student.id }
+        expect(assigns[:messages]).to be_nil
+      end
+
+      context "show_recent_messages_on_new_roster_user_page enabled" do
+        it "only shows 10 most recent messages" do
+          Account.site_admin.enable_feature!(:show_recent_messages_on_new_roster_user_page)
+          user_session(@admin)
+          topic = @course.discussion_topics.create!(user: @student, message: "Discussion")
+          (1..15).each do |number|
+            topic.discussion_entries.create!(message: number, user: @student)
+          end
+          get "roster_user", params: { course_id: @course.id, id: @student.id }
+          messages = assigns[:messages]
+          expect(messages.count).to eq(10)
+          expect(messages.pluck(:message)).to eq(%w[15 14 13 12 11 10 9 8 7 6])
+        end
+      end
     end
   end
 

@@ -2449,11 +2449,11 @@ class Submission < ActiveRecord::Base
   end
 
   def assessment_request_count
-    @assessment_requests_count ||= assessment_requests.length
+    @assessment_requests_count ||= assessment_requests.size
   end
 
   def assigned_assessment_count
-    @assigned_assessment_count ||= assigned_assessments.length
+    @assigned_assessment_count ||= assigned_assessments.size
   end
 
   def assign_assessment(obj)
@@ -3103,6 +3103,17 @@ class Submission < ActiveRecord::Base
       assignment: assignment.parent_assignment,
       student: user
     )
+  end
+
+  def partially_submitted?
+    return false if assignment.nil?
+    return false unless assignment.checkpoints_parent?
+
+    assignment.sub_assignments.each do |sub_assignment|
+      return true if sub_assignment.submissions.where(user_id:, submission_type: "discussion_topic").where.not(submitted_at: nil).exists?
+    end
+
+    false
   end
 
   private
