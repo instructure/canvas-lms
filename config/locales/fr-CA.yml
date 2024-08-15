@@ -578,7 +578,7 @@ fr-CA:
   account_level_mastery_scales_a5bdff29: "Échelles de maîtrise au niveau du compte"
   account_level_notification_preferences_require_an__66467cd7: "Les préférences de notification au niveau du compte nécessitent une account_id mise à jour"
   account_level_notification_preferences_ui_update_f5e189a4: "Mise à jour de l’IU des préférences de notification au niveau du compte"
-  account_level_notifications_apply_to_all_courses_n_8b99c5b0: "Les notifications au niveau du compte s’appliquent à tous les cours. Les notifications pour des cours individuels peuvent être modifiées au sein de chaque cours et surclasseront ces notifications."
+  account_level_notifications_apply_to_all_courses_n_8b99c5b0: "Les notifications relatives au compte concernent tous les cours. Les notifications relatives à chacun des cours peuvent être modifiées dans chaque cours et remplaceront les notifications relatives au compte."
   account_level_settings_manage_4fca6f8e: "Définitions de niveau du compte - gestion"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "nom du compte"
@@ -1690,7 +1690,7 @@ fr-CA:
         example: "Exemple :"
         external_services: "Notifications envoyées aux services externes"
         external_services_label: "Afficher une alerte contextuelle unique sur la page Préférences de notification."
-        external_services_warning: "Remarque : certaines notifications peuvent contenir des informations confidentielles. Si vous décidez de recevoir les notifications à une autre adresse courriel que celle fournie par votre institution, des détails confidentiels sur les cours et les groupes Canvas risquent de sortir du cadre de l’institution."
+        external_services_warning: "Remarque : Certaines notifications peuvent contenir des renseignements confidentiels. Si vous choisissez de recevoir les notifications à une autre adresse courriel que celle de l’organisation, des données sensibles sur les cours et les groupes Canvas risquent d’être transmises en dehors du système organisationnel."
         external_services_warning_label: "Contenu du message contextuel :"
         from: De
         sample_subject: "Notifications Canvas récentes"
@@ -15387,7 +15387,7 @@ fr-CA:
   include_quoted_reply_in_message_d0c8af8a: "Inclure la réponse citée dans le message"
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Inclure les scores lors de message d’alerte à propos des notations.
-      Si votre courriel n’était pas une adresse officielle de votre institution, il se pourrait que des données sensibles soient envoyées hors du réseau de votre institution.
+      Si votre courriel n’est pas celui de votre organisation, cela signifie que du contenu de nature délicate sera envoyé à l’extérieur de votre organisation.
   include_sis_batch_info_f79dd131: "Inclure les informations sur le lot SIS;"
   include_sis_batch_information_75bf66c4: "Inclure les informations sur le lot SIS"
   include_speedgrader_in_assignment_header_menu_69cd8656: "Inclure SpeedGrader dans le menu d'entête des tâches"
@@ -15417,7 +15417,7 @@ fr-CA:
   incomplete_da3c2ea2: Incomplet
   incompleteregistration: 
     get_started: "Premiers pas"
-    welcome_to_canvas: "Bienvenue à Canvas!"
+    welcome_to_canvas: "Bienvenue dans Canvas!"
   incorrect_answer_7c17e63b: "Réponse incorrecte"
   increase_calendar_context_limit_575ad9ff: "Augmenter la limite du contexte du calendrier"
   increase_indent_6af90f7c: "Augmenter le retrait"
@@ -19891,7 +19891,7 @@ fr-CA:
   nothing_to_split_off_of_this_user_28ba9dd5: "Rien à détacher de cet utilisateur"
   notice_concluded_student_6d416c4: "Notice : Étudiant ayant terminé"
   notice_inactive_student_bcc4248a: "Notice : Étudiant inactif"
-  notice_some_notifications_may_contain_confidential_5985f52a: "Avis : Certaines notifications peuvent contenir des informations confidentielles. Si vous décidez de recevoir les notifications à une autre adresse courriel que celle fournie par votre institution, des détails confidentiels sur les cours et les groupes Canvas risquent de sortir du cadre de l’institution."
+  notice_some_notifications_may_contain_confidential_5985f52a: "Avis : Certaines notifications peuvent contenir des renseignements confidentiels. Si vous choisissez de recevoir les notifications à une autre adresse courriel que celle de l’organisation, des données sensibles sur les cours et les groupes Canvas risquent d’être transmises en dehors du système organisationnel."
   notice_the_grading_period_is_closed_for_this_stude_6c3ce0f9: "Note : La période de notation est fermée pour cet étudiant"
   notification: 
     account_notification_description: "Annonces à l'échelle de l'institution (également affichées sur les pages du tableau de bord)"
@@ -19937,7 +19937,7 @@ fr-CA:
       due_date: "Date d’échéance"
       files: Fichiers
       grading: Notation
-      grading_policies: "Règles de notation"
+      grading_policies: "Règles sur la notation"
       invitiation: Invitation
       late_grading: "Notation en retard"
       membership_update: "Mise à jour de l’adhésion"
@@ -19955,7 +19955,7 @@ fr-CA:
         Emplacement et contenu d'un lien manqué avec lequel un étudiant a interagi
     content_link_error_display: "Erreur de lien de contenu"
     conversation_created_description: "Vous avez créé une conversation"
-    conversation_created_display: "Conversations créées par moi"
+    conversation_created_display: "Conversations que j’ai entamées"
     conversation_message_description: "Nouveaux messages dans la boîte aux lettres"
     conversation_message_display: "Message de conversation"
     course_content_description: |-
@@ -19987,7 +19987,7 @@ fr-CA:
         * Changement du coefficient de la note
     grading_display: Notation
     grading_policies_description: "Modification des règles de notation du cours"
-    grading_policies_display: "Règles de notation"
+    grading_policies_display: "Règles sur la notation"
     invitation_description: |-
         Invitation pour : 
         
@@ -22148,10 +22148,10 @@ fr-CA:
         merge_users_aria_label: "Un autre utilisateur a déjà cette adresse de messagerie. Cliquez ici pour combiner les comptes d’utilisateurs."
       validations: 
         should_be_10_digits: "doit contenir 10 chiffres"
-    ways_to_contact_me: Contacter
+    ways_to_contact_me: Contact
     yo_select: 
       yo: Yo
-    you_have_no_services: "Aucun service enregistré, vous pouvez en ajouter sur la page *paramètres*."
+    you_have_no_services: "Aucun service enregistré. Vous pouvez ajouter des services dans la page *Paramètres*."
   profile_6bd2baed: Profil
   profile_has_been_saved_successfully_12ffc6ea: "Le profil a été enregistré avec succès"
   profile_photo_save_failed_too_many_times_e1ebda5: "La sauvegarde de la photo du profil a échoué trop de fois"
@@ -25834,7 +25834,7 @@ fr-CA:
         click_to_change_profile_pic: "Cliquez pour modifier l’image du profil"
       user_enrolled: Inscriptions
       user_has_no_bio: "Aucune biographie n’a été ajoutée"
-      ways_to_contact_user: Contacter
+      ways_to_contact_user: Contact
     recent_activity: 
       date_column: Date
       edit_group: "Modifier le groupe"
@@ -30269,7 +30269,7 @@ fr-CA:
   use_experimental_features_before_they_are_generall_3dfaddd1: "Utiliser des fonctionnalités expérimentales avant qu'elles ne soient généralement activées en production"
   use_file_verifier_authentication_for_new_quiz_file_3f0594ef: "Utiliser l’authentification du vérificateur de fichiers pour les liens vers les fichiers de nouveau questionnaire"
   use_gem_during_course_import_to_update_canvas_reso_3fcd9a8b: "Utiliser Gem lors de l’importation du cours pour mettre à jour les liens vers les ressources de Canvas"
-  use_high_contrast_ui_a5917282: "Utiliser IU à contraste élevé"
+  use_high_contrast_ui_a5917282: "Utiliser l’IU à contraste élevé"
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "Utiliser l'enregistreur HTML5 dans l'éditeur de contenu au lieu de Flash"
   use_improved_placeholders_for_inserted_content_in__433adfaa: "Utilisez des espaces réservés améliorés pour le contenu inséré dans le RCE."
   use_instui_for_the_course_import_page_1906ef55: "Utiliser InstUI pour la page d’importation de cours"
@@ -30788,15 +30788,15 @@ fr-CA:
     user_updated: "L’utilisateur a été mis à jour."
     welcome: 
       no_courses_message: |-
-          Vous n’avez pas de cours, par conséquent cette page n’est pas très intéressante pour l’instant.
-                  Lorsque vous aurez créé un cours ou quand vous vous serez inscrit à des cours, vous verrez
-                  des conversations apparaître pour toutes vos classes.
+          Vous n’avez aucun cours. Par conséquent, cette page ne vous est pas très utile pour l’instant.
+                  Lorsque vous aurez créé un cours ou effectué votre inscription à des cours, les conversations
+                  associées à vos cours commenceront à s’afficher dans cette page.
       unpublished_courses_message: |-
           Vous vous êtes inscrit à un ou plusieurs cours qui n’ont pas encore commencé.
                   Une fois que ces cours sont disponibles, vous verrez des informations à leur sujet ici
                   et dans la navigation sur le côté gauche. En attendant, vous pouvez vous inscrire à plusieurs cours
                   ou configurer votre profil.
-      welcome_to_happiness: "Bienvenue à Canvas!"
+      welcome_to_happiness: "Bienvenue dans Canvas!"
   users_act_as_d922940: "Utilisateurs - Agir en tant que"
   users_add_remove_observers_d1273d9: "Utilisateurs - ajouter/retirer des observateurs"
   users_add_remove_students_in_courses_efe7e748: "Utilisateurs - ajouter/retirer des étudiants dans des cours"
