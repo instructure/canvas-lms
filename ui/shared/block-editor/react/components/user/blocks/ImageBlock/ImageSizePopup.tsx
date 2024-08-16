@@ -17,7 +17,6 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import {useNode, type Node} from '@craftjs/core'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {RangeInput} from '@instructure/ui-range-input'
@@ -25,47 +24,36 @@ import {Popover} from '@instructure/ui-popover'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import {IconResize} from '../../../../assets/internal-icons'
-import {type ImageBlockProps} from './types'
+import {getAspectRatio} from '../../../../utils'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('block-editor/image-block')
 
-type IconSizePopupProps = {
+type ImageSizePopupProps = {
   width: number
   height: number
+  maintainAspectRatio: boolean
+  onChange: (width: number, height: number) => void
 }
 
-const IconSizePopup = ({width, height}: IconSizePopupProps) => {
-  const {
-    actions: {setProp},
-    domnode,
-  } = useNode((node: Node) => {
-    return {
-      domnode: node.dom as HTMLImageElement,
-    }
-  })
-  const [widthValue, setWidthValue] = useState<number>(() => {
-    return width || domnode.clientWidth
-  })
-  const [heightValue, setHeightValue] = useState<number>(() => {
-    return height || domnode.clientHeight
-  })
-  const [aspectRatio] = useState<number>(() => {
-    const w = width || domnode.clientWidth
-    const h = height || domnode.clientHeight
-    return w / h
-  })
+const IconSizePopup = ({width, height, maintainAspectRatio, onChange}: ImageSizePopupProps) => {
+  const [widthValue, setWidthValue] = useState<number>(width)
+  const [heightValue, setHeightValue] = useState<number>(height)
+  const [aspectRatio, setAspectRatio] = useState<number>(getAspectRatio(width, height))
   const [isShowingContent, setIsShowingContent] = useState(false)
 
   useEffect(() => {
-    setWidthValue(width || domnode.clientWidth)
-    setHeightValue(height || domnode.clientHeight)
-  }, [width, height, domnode.clientWidth, domnode.clientHeight])
+    setWidthValue(width)
+    setHeightValue(height)
+    setAspectRatio(getAspectRatio(width, height))
+  }, [width, height])
 
   const handleShowContent = useCallback(() => {
+    setWidthValue(width)
+    setHeightValue(height)
     setIsShowingContent(true)
-  }, [])
+  }, [height, width])
 
   const handleHideContent = useCallback(() => {
     setIsShowingContent(false)
@@ -74,30 +62,31 @@ const IconSizePopup = ({width, height}: IconSizePopupProps) => {
   const handleChangeWidth = useCallback(
     (value: number | string) => {
       const w = typeof value === 'number' ? value : parseInt(value, 10)
-      const h = Math.round(w / aspectRatio)
       setWidthValue(w)
-      setHeightValue(h)
+      if (maintainAspectRatio) {
+        const h = Math.round(w / aspectRatio)
+        setHeightValue(h)
+      }
     },
-    [aspectRatio]
+    [aspectRatio, maintainAspectRatio]
   )
 
   const handleChangeHeight = useCallback(
     (value: number | string) => {
       const h = typeof value === 'number' ? value : parseInt(value, 10)
       setHeightValue(h)
-      const w = Math.round(h * aspectRatio)
-      setWidthValue(w)
+      if (maintainAspectRatio) {
+        const w = Math.round(h * aspectRatio)
+        setWidthValue(w)
+      }
     },
-    [aspectRatio]
+    [aspectRatio, maintainAspectRatio]
   )
 
   const setImageSize = useCallback(() => {
-    setProp((prps: ImageBlockProps) => {
-      prps.width = widthValue
-      prps.height = heightValue
-    })
+    onChange(widthValue, heightValue)
     setIsShowingContent(false)
-  }, [heightValue, setProp, widthValue])
+  }, [heightValue, onChange, widthValue])
 
   return (
     <Popover

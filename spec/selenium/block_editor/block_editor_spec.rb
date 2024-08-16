@@ -175,11 +175,15 @@ describe "Block Editor", :ignore_js_errors do
       drag_and_drop_element(f(".toolbox-item.item-image"), f(".blank-section__inner"))
       f(".block.image-block").click  # select the section
       f(".block.image-block").click  # select the block
+      expect(block_toolbar).to be_displayed
+      click_block_toolbar_menu_item("Constraint", "Cover")
+
       expect(block_resize_handle_se).to be_displayed
       expect(f(".block.image-block").size.height).to eq(100)
       expect(f(".block.image-block").size.width).to eq(100)
 
-      drag_and_drop_element_by(block_resize_handle_se, 100, 50)
+      drag_and_drop_element_by(block_resize_handle_se, 100, 0)
+      drag_and_drop_element_by(block_resize_handle_se, 0, 50)
       expect(f(".block.image-block").size.width).to eq(200)
       expect(f(".block.image-block").size.height).to eq(150)
     end
@@ -191,6 +195,9 @@ describe "Block Editor", :ignore_js_errors do
       drag_and_drop_element(f(".toolbox-item.item-image"), f(".blank-section__inner"))
       f(".block.image-block").click  # select the section
       f(".block.image-block").click  # select the block
+      expect(block_toolbar).to be_displayed
+      click_block_toolbar_menu_item("Constraint", "Cover")
+
       expect(block_resize_handle_se).to be_displayed
       expect(f(".block.image-block").size.height).to eq(100)
       expect(f(".block.image-block").size.width).to eq(100)
@@ -218,6 +225,43 @@ describe "Block Editor", :ignore_js_errors do
       f("body").send_keys(:alt, :shift, :arrow_down)
       expect(f(".block.image-block").size.height).to eq(110)
       expect(f(".block.image-block").size.width).to eq(110)
+    end
+  end
+
+  describe("resizing images that maintain aspect ratio") do
+    before do
+      @root_folder = Folder.root_folders(@course).first
+      @image = @root_folder.attachments.build(context: @course)
+      path = File.expand_path(File.dirname(__FILE__) + "/../../fixtures/block-editor/white-sands.jpg")
+      @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+      @image.save!
+      # image is 2000w x 1000h
+
+      @block_page.update!(
+        block_editor_attributes: {
+          time: Time.now.to_i,
+          version: "1",
+          blocks: [
+            {
+              data: "{\"ROOT\":{\"type\":{\"resolvedName\":\"PageBlock\"},\"isCanvas\":true,\"props\":{},\"displayName\":\"Page\",\"custom\":{},\"hidden\":false,\"nodes\":[\"AcfL3KeXTT\"],\"linkedNodes\":{}},\"AcfL3KeXTT\":{\"type\":{\"resolvedName\":\"BlankSection\"},\"isCanvas\":false,\"props\":{},\"displayName\":\"Blank Section\",\"custom\":{\"isSection\":true},\"parent\":\"ROOT\",\"hidden\":false,\"nodes\":[],\"linkedNodes\":{\"blank-section_nosection1\":\"0ZWqBwA2Ou\"}},\"0ZWqBwA2Ou\":{\"type\":{\"resolvedName\":\"NoSections\"},\"isCanvas\":true,\"props\":{\"className\":\"blank-section__inner\"},\"displayName\":\"NoSections\",\"custom\":{\"noToolbar\":true},\"parent\":\"AcfL3KeXTT\",\"hidden\":false,\"nodes\":[\"lLVSJCBPWm\"],\"linkedNodes\":{}},\"lLVSJCBPWm\":{\"type\":{\"resolvedName\":\"ImageBlock\"},\"isCanvas\":false,\"props\":{\"src\":\"/courses/#{@course.id}/files/#{@image.id}/preview\",\"variant\":\"default\",\"constraint\":\"cover\",\"maintainAspectRatio\":true,\"width\":100,\"height\":50},\"displayName\":\"Image\",\"custom\":{\"isResizable\":true},\"parent\":\"0ZWqBwA2Ou\",\"hidden\":false,\"nodes\":[],\"linkedNodes\":{}}}"
+            }
+          ]
+        }
+      )
+    end
+
+    it "adjusts the width when the height is changed" do
+      get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+      wait_for_block_editor
+      f(".block.image-block").click  # select the section
+      f(".block.image-block").click  # select the block
+      expect(block_resize_handle_se).to be_displayed
+      expect(f(".block.image-block").size.width).to eq(100)
+      expect(f(".block.image-block").size.height).to eq(50)
+
+      drag_and_drop_element_by(block_resize_handle_se, 10, 50)
+      expect(f(".block.image-block").size.width).to eq(200)
+      expect(f(".block.image-block").size.height).to eq(100)
     end
   end
 end

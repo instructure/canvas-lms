@@ -28,7 +28,12 @@ import {type ViewOwnProps} from '@instructure/ui-view'
 
 import {UploadFileModal} from '../../../../FileUpload/UploadFileModal'
 import {IconSizePopup} from './ImageSizePopup'
-import {type ImageBlockProps, type ImageConstraint} from './types'
+import {
+  EMPTY_IMAGE_WIDTH,
+  EMPTY_IMAGE_HEIGHT,
+  type ImageBlockProps,
+  type ImageConstraint,
+} from './types'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -52,8 +57,18 @@ const ImageBlockToolbar = () => {
       _selected: MenuItemProps['selected'],
       _args: MenuItem
     ) => {
-      const constraint = value as ImageConstraint
-      setProp((prps: ImageBlockProps) => (prps.constraint = constraint))
+      const constraint = value as ImageConstraint | 'aspect-ratio'
+      if (constraint === 'aspect-ratio') {
+        setProp((prps: ImageBlockProps) => {
+          prps.constraint = 'cover'
+          prps.maintainAspectRatio = true
+        })
+      } else {
+        setProp((prps: ImageBlockProps) => {
+          prps.constraint = constraint
+          prps.maintainAspectRatio = false
+        })
+      }
     },
     [setProp]
   )
@@ -82,6 +97,16 @@ const ImageBlockToolbar = () => {
     [node.dom, props.height, props.width, setProp]
   )
 
+  const handleChangeSz = useCallback(
+    (width: number, height: number) => {
+      setProp((prps: ImageBlockProps) => {
+        prps.width = width
+        prps.height = height
+      })
+    },
+    [setProp]
+  )
+
   return (
     <Flex gap="small">
       <IconButton
@@ -107,7 +132,7 @@ const ImageBlockToolbar = () => {
           type="checkbox"
           value="cover"
           onSelect={handleConstraintChange}
-          selected={props.constraint === 'cover'}
+          selected={!props.maintainAspectRatio && props.constraint === 'cover'}
         >
           <Text size="small">{I18n.t('Cover')}</Text>
         </Menu.Item>
@@ -115,13 +140,26 @@ const ImageBlockToolbar = () => {
           type="checkbox"
           value="contain"
           onSelect={handleConstraintChange}
-          selected={props.constraint === 'contain'}
+          selected={!props.maintainAspectRatio && props.constraint === 'contain'}
         >
           <Text size="small">{I18n.t('Contain')}</Text>
         </Menu.Item>
+        <Menu.Item
+          type="checkbox"
+          value="aspect-ratio"
+          onSelect={handleConstraintChange}
+          selected={props.maintainAspectRatio}
+        >
+          <Text size="small">{I18n.t('Match Aspect Ratio')}</Text>
+        </Menu.Item>
       </Menu>
 
-      <IconSizePopup width={props.width} height={props.height} />
+      <IconSizePopup
+        width={props.width || EMPTY_IMAGE_WIDTH}
+        height={props.height || EMPTY_IMAGE_HEIGHT}
+        maintainAspectRatio={props.maintainAspectRatio}
+        onChange={handleChangeSz}
+      />
 
       <UploadFileModal
         imageUrl={null}

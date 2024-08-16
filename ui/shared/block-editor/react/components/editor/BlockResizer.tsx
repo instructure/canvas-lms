@@ -19,6 +19,7 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useNode, type Node} from '@craftjs/core'
 import {getToolbarPos as getToolbarPosUtil} from '../../utils/renderNodeHelpers'
+import {getAspectRatio} from '../../utils/size'
 
 const offset = 5
 
@@ -68,8 +69,10 @@ const BlockResizer = ({mountPoint}: BlockResizeProps) => {
   const {
     actions: {setProp},
     node,
+    maintainAspectRatio,
   } = useNode((n: Node) => {
     return {
+      maintainAspectRatio: !!node?.data?.props?.maintainAspectRatio,
       node: n,
     }
   })
@@ -117,6 +120,14 @@ const BlockResizer = ({mountPoint}: BlockResizeProps) => {
       if (newWidth > 0 && newHeight > 0) {
         newWidth = Math.max(newWidth, 24)
         newHeight = Math.max(newHeight, 24)
+        if (maintainAspectRatio) {
+          const aspectRatio = getAspectRatio(currRect.width, currRect.height)
+          if (newHeight !== currRect.height) {
+            newWidth = newHeight * aspectRatio
+          } else {
+            newHeight = newWidth / aspectRatio
+          }
+        }
         const myblock = node.dom as HTMLElement
         myblock.style.width = `${newWidth}px`
         myblock.style.height = `${newHeight}px`
@@ -128,7 +139,7 @@ const BlockResizer = ({mountPoint}: BlockResizeProps) => {
         })
       }
     },
-    [currRect.height, currRect.width, getToolbarPos, node.dom, setProp]
+    [currRect.height, currRect.width, getToolbarPos, maintainAspectRatio, node.dom, setProp]
   )
 
   useEffect(() => {
@@ -181,13 +192,21 @@ const BlockResizer = ({mountPoint}: BlockResizeProps) => {
       if (width > 0 && height > 0) {
         width = Math.max(width, 24)
         height = Math.max(height, 24)
+        if (maintainAspectRatio) {
+          const aspectRatio = getAspectRatio(currRect.width, currRect.height)
+          if (aspectRatio > 1) {
+            width = height * aspectRatio
+          } else {
+            height = width / aspectRatio
+          }
+        }
         myblock.style.width = `${width}px`
         myblock.style.height = `${height}px`
         const {top, left} = getToolbarPos()
         setCurrRect({left, top, width, height})
       }
     },
-    [currRect, getToolbarPos, node.dom]
+    [currRect, getToolbarPos, maintainAspectRatio, node.dom]
   )
 
   const handleDragEnd = useCallback(
