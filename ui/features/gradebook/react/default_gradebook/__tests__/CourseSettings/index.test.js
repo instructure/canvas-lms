@@ -18,11 +18,11 @@
 
 import {createGradebook} from '../GradebookSpecHelper'
 
-QUnit.module('Gradebook CourseSettings', suiteHooks => {
+describe('Gradebook CourseSettings', () => {
   let gradebook
   let gradebookOptions
 
-  suiteHooks.beforeEach(() => {
+  beforeEach(() => {
     gradebookOptions = {
       course_settings: {
         allow_final_grade_override: false,
@@ -36,43 +36,43 @@ QUnit.module('Gradebook CourseSettings', suiteHooks => {
     gradebook = createGradebook(gradebookOptions)
   }
 
-  QUnit.module('#allowFinalGradeOverride', () => {
-    test('is true when final grade overrides are allowed for the course', () => {
+  describe('#allowFinalGradeOverride', () => {
+    it('is true when final grade overrides are allowed for the course', () => {
       gradebookOptions.course_settings.allow_final_grade_override = true
       buildGradebook()
-      strictEqual(gradebook.courseSettings.allowFinalGradeOverride, true)
+      expect(gradebook.courseSettings.allowFinalGradeOverride).toBe(true)
     })
 
-    test('is false when final grade overrides are not allowed for the course', () => {
+    it('is false when final grade overrides are not allowed for the course', () => {
       gradebookOptions.course_settings.allow_final_grade_override = false
       buildGradebook()
-      strictEqual(gradebook.courseSettings.allowFinalGradeOverride, false)
+      expect(gradebook.courseSettings.allowFinalGradeOverride).toBe(false)
     })
   })
 
-  QUnit.module('#setAllowFinalGradeOverride()', () => {
-    test('optionally enables "allow final grade override"', () => {
+  describe('#setAllowFinalGradeOverride()', () => {
+    it('optionally enables "allow final grade override"', () => {
       buildGradebook()
       gradebook.courseSettings.setAllowFinalGradeOverride(true)
-      strictEqual(gradebook.courseSettings.allowFinalGradeOverride, true)
+      expect(gradebook.courseSettings.allowFinalGradeOverride).toBe(true)
     })
 
-    test('optionally disables "allow final grade override"', () => {
+    it('optionally disables "allow final grade override"', () => {
       gradebookOptions.course_settings.allow_final_grade_override = true
       buildGradebook()
       gradebook.courseSettings.setAllowFinalGradeOverride(false)
-      strictEqual(gradebook.courseSettings.allowFinalGradeOverride, false)
+      expect(gradebook.courseSettings.allowFinalGradeOverride).toBe(false)
     })
   })
 
-  QUnit.module('#handleUpdated()', hooks => {
-    hooks.beforeEach(() => {
+  describe('#handleUpdated()', () => {
+    beforeEach(() => {
       buildGradebook()
-      sinon.stub(gradebook, 'updateColumns')
+      jest.spyOn(gradebook, 'updateColumns')
     })
 
-    QUnit.module('when "allow final grade override" becomes enabled', contextHooks => {
-      contextHooks.beforeEach(() => {
+    describe('when "allow final grade override" becomes enabled', () => {
+      beforeEach(() => {
         gradebook.courseSettings.setAllowFinalGradeOverride(false)
         gradebook.courseSettings.handleUpdated(
           {
@@ -82,13 +82,13 @@ QUnit.module('Gradebook CourseSettings', suiteHooks => {
         )
       })
 
-      test('updates columns in the Gradebook grid', () => {
-        strictEqual(gradebook.updateColumns.callCount, 1)
+      it('updates columns in the Gradebook grid', () => {
+        expect(gradebook.updateColumns).toHaveBeenCalledTimes(1)
       })
     })
 
-    QUnit.module('when "allow final grade override" becomes disabled', contextHooks => {
-      contextHooks.beforeEach(() => {
+    describe('when "allow final grade override" becomes disabled', () => {
+      beforeEach(() => {
         gradebook.courseSettings.setAllowFinalGradeOverride(true)
         gradebook.courseSettings.handleUpdated(
           {
@@ -98,8 +98,8 @@ QUnit.module('Gradebook CourseSettings', suiteHooks => {
         )
       })
 
-      test('updates columns in the Gradebook grid', () => {
-        strictEqual(gradebook.updateColumns.callCount, 1)
+      it('updates columns in the Gradebook grid', () => {
+        expect(gradebook.updateColumns).toHaveBeenCalledTimes(1)
       })
     })
   })
