@@ -135,8 +135,9 @@ export interface ItemAssignToTrayProps {
     overrides: ItemAssignToCardSpec[],
     hasModuleOverrides: boolean,
     deletedModuleAssignees: String[],
-    disabledOptionIds?: String[]
-  ) => void
+    disabledOptionIds?: String[],
+    moduleOverrides?: ItemAssignToCardSpec[]
+  ) => ItemAssignToCardSpec[]
   onClose: () => void
   onDismiss: () => void
   onExited?: () => void
@@ -241,13 +242,16 @@ export default function ItemAssignToTray({
     const deletedModuleAssignees = moduleAssignees.filter(
       override => !disabledOptionIdsRef.current.includes(override)
     )
-    onChange(
+    const moduleOverrides = hasModuleOverrides ? defaultCards?.filter(o => o.contextModuleId) : []
+    const newCards = onChange(
       assignToCardsRef.current,
       hasModuleOverrides,
       deletedModuleAssignees,
-      disabledOptionIdsRef.current
+      disabledOptionIdsRef.current,
+      moduleOverrides
     )
-  }, [assignToCards, hasModuleOverrides, moduleAssignees, onChange])
+    setAssignToCards(newCards)
+  }, [assignToCards, defaultCards, hasModuleOverrides, moduleAssignees, onChange])
 
   const everyoneOption = useMemo(() => {
     const hasOverrides =
