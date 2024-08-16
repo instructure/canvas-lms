@@ -23,8 +23,7 @@
 #
 # If any active AssignmentOverrides exist on a ContextModule, then only students who have an
 # applicable override can access the module and are assigned its items. AssignmentOverrides can
-# be created for a (group of) student(s) or a section. *This module overrides feature is still
-# under development and is not yet enabled.*
+# be created for a (group of) student(s) or a section.
 #
 # @model ModuleAssignmentOverride
 #     {
@@ -85,8 +84,6 @@ class ModuleAssignmentOverridesController < ApplicationController
   #
   # Returns a paginated list of AssignmentOverrides that apply to the ContextModule.
   #
-  # Note: this API is still under development and will not function until the feature is enabled.
-  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/:course_id/modules/:context_module_id/assignment_overrides \
   #     -H 'Authorization: Bearer <token>'
@@ -104,8 +101,6 @@ class ModuleAssignmentOverridesController < ApplicationController
   #
   # Accepts a list of overrides and applies them to the ContextModule. Returns 204 No Content response
   # code if successful.
-  #
-  # Note: this API is still under development and will not function until the feature is enabled.
   #
   # @argument overrides[] [Required, Array]
   #   List of overrides to apply to the module. Overrides that already exist should include an ID
