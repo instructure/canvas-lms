@@ -163,7 +163,8 @@ module Api::V1::DiscussionTopics
                                             override_dates: opts[:override_dates],
                                             include_all_dates: opts[:include_all_dates],
                                             exclude_response_fields: excludes,
-                                            include_overrides: opts[:include_overrides] }.merge(opts[:assignment_opts]))
+                                            include_overrides: opts[:include_overrides],
+                                            include_checkpoints: true }.merge(opts[:assignment_opts]))
     end
 
     # ignore :include_sections_user_count for non-course contexts like groups

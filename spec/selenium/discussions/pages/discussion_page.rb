@@ -39,6 +39,10 @@ class Discussion
       "input[type=checkbox][value='graded']"
     end
 
+    def checkpoints_checkbox_selector
+      "input[data-testid='checkpoints-checkbox']"
+    end
+
     def topic_input_selector
       "input[placeholder='Topic Title']"
     end
@@ -49,6 +53,18 @@ class Discussion
 
     def points_possible_input_selector
       "input[data-testid='points-possible-input']"
+    end
+
+    def reply_to_topic_points_possible_input_selector
+      "input[data-testid='points-possible-input-reply-to-topic']"
+    end
+
+    def reply_to_entry_required_count_input_selector
+      "input[data-testid='reply-to-entry-required-count']"
+    end
+
+    def points_possible_reply_to_entry_input_selector
+      "input[data-testid='points-possible-input-reply-to-entry']"
     end
 
     def save_and_publish_button_selector
@@ -133,6 +149,10 @@ class Discussion
       f(grade_checkbox_selector)
     end
 
+    def checkpoints_checkbox
+      f(checkpoints_checkbox_selector)
+    end
+
     def post_reply_button
       fj('button:contains("Post Reply")')
     end
@@ -215,6 +235,18 @@ class Discussion
       f(points_possible_input_selector)
     end
 
+    def reply_to_topic_points_possible_input
+      f(reply_to_topic_points_possible_input_selector)
+    end
+
+    def reply_to_entry_required_count_input
+      f(reply_to_entry_required_count_input_selector)
+    end
+
+    def points_possible_reply_to_entry_input
+      f(points_possible_reply_to_entry_input_selector)
+    end
+
     def save_and_publish_button
       f(save_and_publish_button_selector)
     end
@@ -251,6 +283,10 @@ class Discussion
 
     def click_graded_checkbox
       force_click_native(grade_checkbox_selector)
+    end
+
+    def click_checkpoints_checkbox
+      force_click_native(checkpoints_checkbox_selector)
     end
 
     def click_summarize_button
