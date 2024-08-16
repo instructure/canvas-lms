@@ -42,6 +42,7 @@ const deserializedPeriods = [
     weight: 60,
   },
 ]
+
 const serializedPeriods = {
   grading_periods: [
     {
@@ -62,6 +63,7 @@ const serializedPeriods = {
     },
   ],
 }
+
 const periodsData = {
   grading_periods: [
     {
@@ -87,43 +89,46 @@ const periodsData = {
   ],
 }
 
-QUnit.module('batchUpdate', {
-  setup() {
+describe('batchUpdate', () => {
+  beforeEach(() => {
     fakeENV.setup()
     ENV.GRADING_PERIODS_UPDATE_URL = 'api/{{ set_id }}/batch_update'
-  },
-  teardown() {
+  })
+
+  afterEach(() => {
     fakeENV.teardown()
-  },
+    jest.restoreAllMocks()
+  })
+
+  it('calls the resolved endpoint with serialized grading periods', () => {
+    const apiSpy = jest.spyOn(axios, 'patch').mockReturnValue(new Promise(() => {}))
+    api.batchUpdate(123, deserializedPeriods)
+    expect(axios.patch).toHaveBeenCalledWith('api/123/batch_update', serializedPeriods)
+  })
+
+  it('deserializes returned grading periods', async () => {
+    jest.spyOn(axios, 'patch').mockResolvedValue({data: periodsData})
+    const periods = await api.batchUpdate(123, deserializedPeriods)
+    expect(periods).toEqual(deserializedPeriods)
+  })
+
+  it('rejects the promise upon errors', async () => {
+    jest.spyOn(axios, 'patch').mockRejectedValue('FAIL')
+    await expect(api.batchUpdate(123, deserializedPeriods)).rejects.toEqual('FAIL')
+  })
 })
 
-test('calls the resolved endpoint with serialized grading periods', () => {
-  const apiSpy = sandbox.stub(axios, 'patch').returns(new Promise(() => {}))
-  api.batchUpdate(123, deserializedPeriods)
-  ok(axios.patch.calledWith('api/123/batch_update', serializedPeriods))
-})
+describe('deserializePeriods', () => {
+  it('returns an empty array if passed undefined', () => {
+    expect(api.deserializePeriods(undefined)).toEqual([])
+  })
 
-test('deserializes returned grading periods', () => {
-  sandbox.stub(axios, 'patch').returns(Promise.resolve({data: periodsData}))
-  return api
-    .batchUpdate(123, deserializedPeriods)
-    .then(periods => deepEqual(periods, deserializedPeriods))
-})
+  it('returns an empty array if passed null', () => {
+    expect(api.deserializePeriods(null)).toEqual([])
+  })
 
-test('rejects the promise upon errors', () => {
-  // eslint-disable-next-line prefer-promise-reject-errors
-  sandbox.stub(axios, 'patch').returns(Promise.reject('FAIL'))
-  return api.batchUpdate(123, deserializedPeriods).catch(error => equal(error, 'FAIL'))
-})
-
-QUnit.module('deserializePeriods')
-
-test('returns an empty array if passed undefined', () =>
-  propEqual(api.deserializePeriods(undefined), []))
-
-test('returns an empty array if passed null', () => propEqual(api.deserializePeriods(null), []))
-
-test('deserializes periods', () => {
-  const result = api.deserializePeriods(periodsData.grading_periods)
-  propEqual(result, deserializedPeriods)
+  it('deserializes periods', () => {
+    const result = api.deserializePeriods(periodsData.grading_periods)
+    expect(result).toEqual(deserializedPeriods)
+  })
 })

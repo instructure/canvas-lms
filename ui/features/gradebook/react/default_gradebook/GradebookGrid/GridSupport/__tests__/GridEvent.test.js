@@ -18,17 +18,17 @@
 
 import GridEvent from '../GridEvent'
 
-QUnit.module('GradebookGrid GridEvent', hooks => {
+describe('GradebookGrid GridEvent', () => {
   let spyValues
   let supportEvent
 
-  hooks.beforeEach(() => {
+  beforeEach(() => {
     supportEvent = new GridEvent()
     spyValues = []
   })
 
-  QUnit.module('#trigger()', () => {
-    test('executes all subscribed handlers in order of subscription', () => {
+  describe('#trigger()', () => {
+    it('executes all subscribed handlers in order of subscription', () => {
       supportEvent.subscribe((_event, _datum) => {
         spyValues.push(1)
       })
@@ -39,10 +39,10 @@ QUnit.module('GradebookGrid GridEvent', hooks => {
         spyValues.push(3)
       })
       supportEvent.trigger()
-      deepEqual(spyValues, [1, 2, 3])
+      expect(spyValues).toEqual([1, 2, 3])
     })
 
-    test('includes the given event with each trigger', () => {
+    it('includes the given event with each trigger', () => {
       const exampleEvent = new Event('example')
       supportEvent.subscribe((event, _datum) => {
         spyValues.push(event)
@@ -54,10 +54,10 @@ QUnit.module('GradebookGrid GridEvent', hooks => {
         spyValues.push(event)
       })
       supportEvent.trigger(exampleEvent)
-      deepEqual(spyValues, [exampleEvent, exampleEvent, exampleEvent])
+      expect(spyValues).toEqual([exampleEvent, exampleEvent, exampleEvent])
     })
 
-    test('includes optional data with each trigger', () => {
+    it('includes optional data with each trigger', () => {
       supportEvent.subscribe((_event, datum) => {
         spyValues.push(datum)
       })
@@ -68,10 +68,10 @@ QUnit.module('GradebookGrid GridEvent', hooks => {
         spyValues.push(datum)
       })
       supportEvent.trigger(null, 'example datum')
-      deepEqual(spyValues, ['example datum', 'example datum', 'example datum'])
+      expect(spyValues).toEqual(['example datum', 'example datum', 'example datum'])
     })
 
-    test('does not call subsequent handlers after any one returns false', () => {
+    it('does not call subsequent handlers after any one returns false', () => {
       supportEvent.subscribe((_event, _datum) => {
         spyValues.push(1)
       })
@@ -83,10 +83,10 @@ QUnit.module('GradebookGrid GridEvent', hooks => {
         spyValues.push(3)
       })
       supportEvent.trigger()
-      deepEqual(spyValues, [1, 2])
+      expect(spyValues).toEqual([1, 2])
     })
 
-    test('does not call unsubscribed handlers', () => {
+    it('does not call unsubscribed handlers', () => {
       const handler = (_event, _datum) => {
         spyValues.push(2)
       }
@@ -99,10 +99,10 @@ QUnit.module('GradebookGrid GridEvent', hooks => {
       })
       supportEvent.unsubscribe(handler)
       supportEvent.trigger()
-      deepEqual(spyValues, [1, 3])
+      expect(spyValues).toEqual([1, 3])
     })
 
-    test('does not subscribe the same handler multiple times', () => {
+    it('does not subscribe the same handler multiple times', () => {
       const handler = (_event, _datum) => {
         spyValues.push(2)
       }
@@ -115,7 +115,7 @@ QUnit.module('GradebookGrid GridEvent', hooks => {
       })
       supportEvent.subscribe(handler)
       supportEvent.trigger()
-      deepEqual(spyValues, [1, 2, 3])
+      expect(spyValues).toEqual([1, 2, 3])
     })
   })
 })

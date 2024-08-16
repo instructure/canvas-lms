@@ -18,8 +18,9 @@
 
 import SubmissionCommentApi from '../SubmissionCommentApi'
 import {underscoreProperties} from '@canvas/convert-case'
+import sinon from 'sinon'
 
-QUnit.module('SubmissionCommentApi.updateSubmissionComment', hooks => {
+describe('SubmissionCommentApi.updateSubmissionComment', () => {
   let server
   const commentId = '12'
   const url = `/submission_comments/${commentId}`
@@ -33,41 +34,37 @@ QUnit.module('SubmissionCommentApi.updateSubmissionComment', hooks => {
   }
   const responseBody = JSON.stringify({submission_comment: underscoreProperties(submissionComment)})
 
-  hooks.beforeEach(() => {
+  beforeEach(() => {
     server = sinon.fakeServer.create({respondImmediately: true})
   })
 
-  hooks.afterEach(() => {
+  afterEach(() => {
     server.restore()
   })
 
-  test('on success, returns the submission comment with the updated comment', () => {
+  it('on success, returns the submission comment with the updated comment', async () => {
     server.respondWith('PUT', url, [200, {'Content-Type': 'application/json'}, responseBody])
-    return SubmissionCommentApi.updateSubmissionComment(commentId, updatedComment).then(
-      response => {
-        strictEqual(response.data.comment, updatedComment)
-      }
-    )
+    const response = await SubmissionCommentApi.updateSubmissionComment(commentId, updatedComment)
+    expect(response.data.comment).toBe(updatedComment)
   })
 
-  test('on success, returns the submission comment with an updated editedAt', () => {
+  it('on success, returns the submission comment with an updated editedAt', async () => {
     server.respondWith('PUT', url, [200, {'Content-Type': 'application/json'}, responseBody])
-    return SubmissionCommentApi.updateSubmissionComment(commentId, updatedComment).then(
-      response => {
-        strictEqual(response.data.editedAt.getTime(), new Date(editedAt).getTime())
-      }
-    )
+    const response = await SubmissionCommentApi.updateSubmissionComment(commentId, updatedComment)
+    expect(response.data.editedAt.getTime()).toBe(new Date(editedAt).getTime())
   })
 
-  test('on failure, returns a rejected promise with the error', () => {
+  it('on failure, returns a rejected promise with the error', async () => {
     server.respondWith('PUT', url, [500, {'Content-Type': 'application/json'}, JSON.stringify({})])
-    return SubmissionCommentApi.updateSubmissionComment(commentId, updatedComment).catch(error => {
-      strictEqual(error.response.status, 500)
-    })
+    try {
+      await SubmissionCommentApi.updateSubmissionComment(commentId, updatedComment)
+    } catch (error) {
+      expect(error.response.status).toBe(500)
+    }
   })
 })
 
-QUnit.module('SubmissionCommentApi.createSubmissionComment', hooks => {
+describe('SubmissionCommentApi.createSubmissionComment', () => {
   let assignmentId
   let commentData
   let courseId
@@ -75,7 +72,7 @@ QUnit.module('SubmissionCommentApi.createSubmissionComment', hooks => {
   let studentId
   let url
 
-  hooks.beforeEach(() => {
+  beforeEach(() => {
     assignmentId = '2301'
     commentData = {group_comment: 0, text_comment: 'comment!'}
     courseId = '1201'
@@ -84,11 +81,11 @@ QUnit.module('SubmissionCommentApi.createSubmissionComment', hooks => {
     url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${studentId}`
   })
 
-  hooks.afterEach(() => {
+  afterEach(() => {
     server.restore()
   })
 
-  test('builds data from comment data', async () => {
+  it('builds data from comment data', async () => {
     const response = [
       200,
       {'Content-Type': 'application/json'},
@@ -102,6 +99,6 @@ QUnit.module('SubmissionCommentApi.createSubmissionComment', hooks => {
       commentData
     )
     const {requestBody} = server.requests[0]
-    deepEqual(JSON.parse(requestBody), {comment: {group_comment: 0, text_comment: 'comment!'}})
+    expect(JSON.parse(requestBody)).toEqual({comment: {group_comment: 0, text_comment: 'comment!'}})
   })
 })
