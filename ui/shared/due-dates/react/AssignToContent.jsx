@@ -198,7 +198,6 @@ const AssignToContent = ({
 
     const withoutModuleOverrides = processModuleOverridesV2(newOverrides, initialModuleOverrides)
     resetOverrides(newOverrides, withoutModuleOverrides)
-    stagedOverridesRef.current = newOverrides
 
     const noModuleOverrides = newOverrides.filter(o => !o.context_module_id)
     onSync(noModuleOverrides, stagedImportantDates)
@@ -217,7 +216,6 @@ const AssignToContent = ({
           defaultOptions.push('mastery_paths')
           selectedOptionIds.push(...defaultOptions)
         } else if (override?.course_section_id === defaultSectionId) {
-          card.index = 0
           defaultOptions.push(everyoneOptionKey)
           selectedOptionIds.push(...defaultOptions)
         } else if (override?.course_id) {
@@ -293,6 +291,9 @@ const AssignToContent = ({
     const newStagedCards = {...stagedCardsRef.current}
     delete newStagedCards[cardId]
     setStagedCards(newStagedCards)
+
+    const newStagedOverrides = stagedOverridesRef.current.filter(override => override.rowKey.toString() !== cardId)
+    setStagedOverrides(newStagedOverrides)
   }
 
   const updateCard = (cardId, newOverrides, cardDates) => {
