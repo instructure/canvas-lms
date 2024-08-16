@@ -162,6 +162,7 @@ import type {
 } from '../react/RubricAssessmentContainerWrapper/utils'
 import {SpeedGraderCheckpointsWrapper} from '../react/SpeedGraderCheckpoints/SpeedGraderCheckpointsWrapper'
 import {SpeedGraderDiscussionsNavigation} from '../react/SpeedGraderDiscussionsNavigation'
+import sanitizeHtml from 'sanitize-html-with-tinymce'
 
 declare global {
   interface Window {
@@ -296,6 +297,8 @@ const HISTORY_REPLACE = 'replace'
 
 const {enhanced_rubrics_enabled} = ENV ?? {}
 type RubricSavedComments = {summary_data?: {saved_comments: Record<string, string[]>}}
+
+const isRceLiteEnabled = () => ENV.FEATURES?.rce_lite_enabled_speedgrader_comments
 
 function setGradeLoading(studentId: string, loading: boolean) {
   useStore.setState(state => {
@@ -876,7 +879,16 @@ function clearDiscussionsNavigation() {
   }
 }
 
-function renderCommentTextArea() {
+const setCommentText = (comment: string, shouldRerender: boolean) => {
+  if ($add_a_comment_textarea) {
+    $add_a_comment_textarea.data('textarea', comment)
+  }
+  if (shouldRerender) {
+    renderCommentTextArea()
+  }
+}
+
+function renderCommentTextArea(readOnly = false) {
   // unmounting is a temporary workaround for INSTUI-870 to allow
   // for textarea minheight to be reset
   unmountCommentTextArea()
@@ -884,11 +896,17 @@ function renderCommentTextArea() {
     $add_a_comment_textarea = $(textarea)
   }
 
+  const currentText = $add_a_comment_textarea.data('textarea')
+
   ReactDOM.render(
     <CommentArea
       getTextAreaRef={getTextAreaRef}
       courseId={ENV.course_id}
       userId={ENV.current_user_id!}
+      useRCELite={isRceLiteEnabled()}
+      handleCommentChange={setCommentText}
+      currentText={currentText}
+      readOnly={readOnly}
     />,
     document.getElementById(SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT)
   )
@@ -953,7 +971,12 @@ function initCommentBox() {
       if ($('#record_button').attr('recording') === 'true') {
         recognition.stop()
         const current_comment = $('#final_results').html() + $('#interim_results').html()
-        $add_a_comment_textarea.val(formatComment(current_comment))
+        if (isRceLiteEnabled()) {
+          $add_a_comment_textarea.data('textarea', formatComment(current_comment))
+          renderCommentTextArea()
+        } else {
+          $add_a_comment_textarea.val(formatComment(current_comment))
+        }
         $this.dialog('close').remove()
       } else {
         recognition.start()
@@ -1449,8 +1472,11 @@ EG = {
   },
 
   anyUnpostedComment() {
+    const comment = isRceLiteEnabled()
+      ? $add_a_comment_textarea.data('textarea')
+      : $add_a_comment_textarea.val()
     return !!(
-      $.trim($add_a_comment_textarea.val() as string).length ||
+      $.trim(comment as string).length ||
       $('#media_media_recording').data('comment_id') ||
       $add_a_comment.find("input[type='file']:visible").length
     )
@@ -1713,7 +1739,11 @@ EG = {
 
     // Save any draft comments before loading the new student
     if ($add_a_comment_textarea.hasClass('ui-state-disabled')) {
-      $add_a_comment_textarea.val('')
+      if (isRceLiteEnabled()) {
+        $add_a_comment_textarea.data('textarea', '')
+      } else {
+        $add_a_comment_textarea.val('')
+      }
     } else {
       EG.addSubmissionComment(true)
     }
@@ -3273,6 +3303,12 @@ EG = {
       .showIf(comment.publishable && !isConcluded)
   },
 
+  addCommentEditDraftHandler(commentElement, comment) {
+    commentElement.find('.edit_comment_link').click(_event => {
+      setCommentText(comment.comment, true)
+    })
+  },
+
   renderComment(commentData: SubmissionComment, incomingOpts?: CommentRenderingOptions) {
     const self = this
     let comment = commentData
@@ -3328,12 +3364,18 @@ EG = {
         commentText: spokenComment,
       })
       commentElement.find('.submit_comment_button').attr('aria-label', submitCommentButtonText)
+      if (!isRceLiteEnabled()) {
+        // With the addition of RCE Lite, we are introducing the ability to continue editing
+        // draft comments
+        commentElement.find('.edit_comment_link').remove()
+      }
     } else {
       commentElement.find('.draft-marker').remove()
       commentElement.find('.submit_comment_button').remove()
+      commentElement.find('.edit_comment_link').remove()
     }
 
-    commentElement.find('span.comment').html(htmlEscape(comment.comment).replace(/\n/g, '<br />'))
+    commentElement.find('span.comment').html(sanitizeHtml(comment.comment))
 
     deleteCommentLinkText = I18n.t('Delete comment: %{commentText}', {commentText: spokenComment})
     commentElement.find('.delete_comment_link .screenreader-only').text(deleteCommentLinkText)
@@ -3356,10 +3398,11 @@ EG = {
       }
     )
 
-    /* Submit a comment and Delete a comment listeners */
+    /* Submit a comment,  Delete a comment, and Edit a draft comment listeners */
 
     this.addCommentDeletionHandler(commentElement, comment)
     this.addCommentSubmissionHandler(commentElement, comment)
+    this.addCommentEditDraftHandler(commentElement, comment)
 
     return commentElement
   },
@@ -3498,8 +3541,12 @@ EG = {
 
     $comment_submitted.hide()
     $comment_saved.hide()
+    const comment = isRceLiteEnabled()
+      ? $add_a_comment_textarea.data('textarea')
+      : $add_a_comment_textarea.val()
+
     if (
-      !$.trim($add_a_comment_textarea.val() as string).length &&
+      !$.trim(comment as string).length &&
       !$('#media_media_recording').data('comment_id') &&
       !$add_a_comment.find("input[type='file']:visible").length
     ) {
@@ -3515,7 +3562,7 @@ EG = {
     const formData = {
       'submission[assignment_id]': window.jsonData.id,
       'submission[group_comment]': $('#submission_group_comment').prop('checked') ? '1' : '0',
-      'submission[comment]': $add_a_comment_textarea.val(),
+      'submission[comment]': comment,
       'submission[draft_comment]': draftComment,
       [`submission[${anonymizableId}]`]: EG.currentStudent[anonymizableId],
     }
@@ -3544,6 +3591,11 @@ EG = {
         EG.setOrUpdateSubmission(this.submission)
       })
       EG.revertFromFormSubmit({draftComment})
+      // Clear the RCE Lite text area
+      if (isRceLiteEnabled()) {
+        $add_a_comment_textarea.data('textarea', '')
+        renderCommentTextArea()
+      }
       window.setTimeout(() => {
         $rightside_inner.scrollTo($rightside_inner[0].scrollHeight, 500)
       })
@@ -3575,7 +3627,11 @@ EG = {
     }
 
     $('#comment_attachments').empty()
-    $add_a_comment.find(':input').prop('disabled', true)
+    if (isRceLiteEnabled()) {
+      renderCommentTextArea(true)
+    } else {
+      $add_a_comment.find(':input').prop('disabled', true)
+    }
     $add_a_comment_submit_button.text(I18n.t('buttons.submitting', 'Submitting...'))
     hideMediaRecorderContainer()
   },
@@ -4029,7 +4085,10 @@ EG = {
     }
 
     function hasUnsubmittedComments() {
-      return $.trim($add_a_comment_textarea.val() as string) !== ''
+      const comment = isRceLiteEnabled()
+        ? $add_a_comment_textarea.data('textarea')
+        : $add_a_comment_textarea.val()
+      return $.trim(comment as string) !== ''
     }
 
     const isNewGradeSaved = ($grade.val() || null) === EG.currentStudent.submission.grade

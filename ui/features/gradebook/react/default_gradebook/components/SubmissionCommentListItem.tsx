@@ -27,6 +27,7 @@ import {IconEditLine, IconTrashLine} from '@instructure/ui-icons'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {truncateText} from '@canvas/util/TextHelper'
 import SubmissionCommentUpdateForm from './SubmissionCommentUpdateForm'
+import sanitizeHtml from 'sanitize-html-with-tinymce'
 
 const I18n = useI18nScope('gradebook')
 
@@ -95,7 +96,10 @@ export default class SubmissionCommentListItem extends React.Component<Props> {
     return (
       <div>
         <Text size="small" lineHeight="condensed">
-          <p style={{margin: '0 0 0.75rem'}}>{this.props.comment}</p>
+          <p
+            style={{margin: '0 0 0.75rem'}}
+            dangerouslySetInnerHTML={{__html: sanitizeHtml(this.props.comment)}}
+          />
         </Text>
       </div>
     )

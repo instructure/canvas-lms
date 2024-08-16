@@ -339,7 +339,7 @@
                 %>
               <div class="comment <%= 'draft' if comment.draft? %>" id="submission_comment_<%= comment.id %>" style="margin-bottom: 10px;">
                 <div class="comment" style="color: #444;">
-                  <span style="white-space: pre-wrap;"><%= comment.comment %></span>
+                  <span class="comment_content" data-content="<%= comment.comment %>" style="white-space: pre-wrap;"></span>
                   <% if comment.media_comment_id %>
                     <div class="comment_media">
                       <%= t(

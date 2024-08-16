@@ -40,12 +40,19 @@ import {setupSubmitHandler} from '@canvas/assignments/jquery/reuploadSubmissions
 import ready from '@instructure/ready'
 import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 import {captureException} from '@sentry/browser'
+import sanitizeHtml from 'sanitize-html-with-tinymce'
 
 if (!('INST' in window)) window.INST = {}
 
 const I18n = useI18nScope('assignment')
 
 ready(() => {
+  const comments = document.getElementsByClassName("comment_content")
+  Array.from(comments).forEach((comment) => {
+    const content = comment.dataset.content
+    comment.innerHTML = sanitizeHtml(content)
+  })
+
   const lockManager = new LockManager()
   lockManager.init({itemType: 'assignment', page: 'show'})
   renderCoursePacingNotice()
