@@ -137,6 +137,37 @@ describe "Wiki Pages" do
       course_with_teacher_logged_in
     end
 
+    it "does not display load more button if no pages" do
+      get "/courses/#{@course.id}/pages"
+      expect(f(".index-content-container")).not_to contain_css(".fetch_next")
+    end
+
+    it "can load more pages" do
+      60.times do |i|
+        @course.wiki_pages.create!(title: "Page#{i}")
+      end
+      get "/courses/#{@course.id}/pages"
+      expect(f(".fetch_next")).to be_displayed
+      expect(ff(".wiki-page-link").size).not_to eq 60
+      f(".fetch_next").click
+      wait_for_ajaximations
+      expect(f(".fetch_next")).not_to be_displayed
+      expect(ff(".wiki-page-link").size).to eq 60
+    end
+
+    it "displays load more button after sorting entire collection" do
+      60.times do |i|
+        @course.wiki_pages.create!(title: "Page#{i}")
+      end
+      get "/courses/#{@course.id}/pages"
+      f(".fetch_next").click
+      wait_for_ajaximations
+      f("[data-sort-field='created_at']").click
+      wait_for_ajaximations
+      expect(ff(".wiki-page-link").size).not_to eq 60
+      expect(f(".fetch_next")).to be_displayed
+    end
+
     it "edits page title from pages index", priority: "1" do
       @course.wiki_pages.create!(title: "B-Team")
       get "/courses/#{@course.id}/pages"
