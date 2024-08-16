@@ -64,4 +64,8 @@ module NewQuizzesFeaturesHelper
   def common_cartridge_qti_new_quizzes_import_enabled?(context = @context)
     context.root_account.feature_enabled?(:new_quizzes_migration) && Account.site_admin.feature_enabled?(:common_cartridge_qti_new_quizzes_import)
   end
+
+  def results_visible_after_conclusion?(context = @context)
+    context.root_account.feature_enabled?(:new_quizzes_enable_quiz_visibility_after_course_conclusion)
+  end
 end
