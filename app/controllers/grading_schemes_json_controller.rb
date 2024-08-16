@@ -28,7 +28,7 @@ class GradingSchemesJsonController < ApplicationController
   before_action :validate_read_permission, only: %i[grouped_list detail_list summary_list show]
 
   def grouped_list
-    standards = grading_standards_for_context.preload(:assignments, :courses, :accounts).sorted.limit(GRADING_SCHEMES_LIMIT)
+    standards = grading_standards_for_context.sorted.limit(GRADING_SCHEMES_LIMIT)
     render json: {
       archived: standards.select(&:archived?).map do |grading_standard|
         GradingSchemesJsonController.to_grading_scheme_json(grading_standard, @current_user)
@@ -41,7 +41,6 @@ class GradingSchemesJsonController < ApplicationController
 
   def detail_list
     grading_standards = grading_standards_for_context(include_parent_accounts: false)
-                        .preload(:assignments, :courses, :accounts)
                         .sorted.limit(GRADING_SCHEMES_LIMIT)
     respond_to do |format|
       format.json do

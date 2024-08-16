@@ -267,7 +267,9 @@ class GradingStandard < ActiveRecord::Base
         return assignments.active.joins(:submissions).where("submissions.workflow_state='graded'").exists?
       end
 
-      return true if assessed_course_assignments.exists? || assessed_assignments.exists?
+      return true if accounts.active.any?
+      return true if courses.active.any?
+      return true if assignments.active.joins(:submissions).where("submissions.workflow_state='graded'").exists?
 
       false
     end
