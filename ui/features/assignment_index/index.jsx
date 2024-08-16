@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
+import ReactDOM from 'react-dom'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
 import Course from '@canvas/courses/backbone/models/Course'
 import AssignmentGroupListView from './backbone/views/AssignmentGroupListView'
@@ -33,6 +35,11 @@ import {
   handleAssignmentIndexDeepLinking,
   alertIfDeepLinkingCreatedModule,
 } from './helpers/deepLinkingHelper'
+import {View} from '@instructure/ui-view'
+import {Spinner} from '@instructure/ui-spinner'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('assignment_index')
 
 const course = new Course({
   id: encodeURIComponent(splitAssetString(ENV.context_asset_string)[1]),
@@ -106,6 +113,16 @@ ready(() => {
 
   // kick it all off
   course.trigger('change')
+
+  const node = document.querySelector('.loadingIndicator')
+  if (node instanceof HTMLElement) {
+    ReactDOM.render(
+      <View padding="x-small" textAlign="center" as="div" display="block">
+        <Spinner delay={300} size="x-small" renderTitle={() => I18n.t('Loading')} />
+      </View>,
+      node
+    )
+  }
   // eslint-disable-next-line promise/catch-or-return
   getPrefetchedXHR('assignment_groups_url')
     .then(res =>

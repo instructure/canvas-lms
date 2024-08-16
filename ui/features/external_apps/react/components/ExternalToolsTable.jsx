@@ -29,6 +29,8 @@ import InfiniteScroll from '@canvas/infinite-scroll'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import splitAssetString from '@canvas/util/splitAssetString'
+import {Spinner} from '@instructure/ui-spinner'
+import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('external_tools')
 
@@ -68,7 +70,13 @@ export default class ExternalToolsTable extends React.Component {
     }
   }
 
-  loader = () => <div className="loadingIndicator" />
+  loader = () => (
+    <div className="loadingIndicator">
+      <View padding="x-small" textAlign="center" as="div" display="block">
+        <Spinner delay={300} size="x-small" renderTitle={() => I18n.t('Loading')} />
+      </View>
+    </div>
+  )
 
   setFocusAbove = tool => () => {
     const toolRow = tool && this[`externalTool${tool.app_id}`]
