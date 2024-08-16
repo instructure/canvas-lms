@@ -302,7 +302,7 @@ enhanced_rubrics:
   beta: true
   applies_to: Course
   root_opt_in: true
-  display_name: Rubric Enhancements
+  display_name: Enhanced Rubrics
   description: This feature provides visual and functional enhancements to rubrics across Canvas.
   environments:
     ci:
