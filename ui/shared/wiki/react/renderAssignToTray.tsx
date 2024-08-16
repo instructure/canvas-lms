@@ -70,7 +70,8 @@ const AssignToOption = (props: Props) => {
     assignToCards: ItemAssignToCardSpec[],
     hasModuleOverrides: boolean,
     deletedModuleAssignees: string[],
-    newDisabledOptionIds: string[]
+    newDisabledOptionIds: string[],
+    moduleOverrides: ItemAssignToCardSpec[]
   ) => {
     if (!ENV.FEATURES?.selective_release_edit_page) return
 
@@ -79,6 +80,34 @@ const AssignToOption = (props: Props) => {
         [null, undefined, ''].includes(card.contextModuleId) ||
         (card.contextModuleId !== null && card.isEdited)
     )
+    if (hasModuleOverrides) {
+      assignToCards.forEach(card => {
+        const hasUnlockOrLock = card.unlock_at != null || card.lock_at != null
+
+        if (
+          card.contextModuleId &&
+          card.isEdited &&
+          (hasUnlockOrLock || !card.hasInitialOverride)
+        ) {
+          card.contextModuleId = null
+          card.contextModuleName = null
+          return
+        } else if (hasUnlockOrLock) {
+          return
+        }
+
+        const moduleCard = moduleOverrides.find(moduleOverride => moduleOverride.key === card.key)
+        if (
+          moduleCard &&
+          !hasUnlockOrLock &&
+          (card.hasInitialOverride === undefined || card.hasInitialOverride)
+        ) {
+          card.contextModuleId = moduleCard.contextModuleId
+          card.contextModuleName = moduleCard.contextModuleName
+        }
+      })
+    }
+
     const overrides = generateDateDetailsPayload(
       filteredCards,
       hasModuleOverrides,
@@ -86,6 +115,7 @@ const AssignToOption = (props: Props) => {
     )
     props.onSync(overrides)
     setDisabledOptionIds(newDisabledOptionIds)
+    return assignToCards
   }
 
   const handleSave = (
