@@ -54,7 +54,7 @@ prawn_document(page_layout: :portrait, page_size:) do |pdf|
   current_author = nil
   submission_comments.find_each do |comment|
     draft_markup = comment.draft? ? " <color rgb='ff0000'>#{draft}</color>" : ""
-    comment_body = "#{comment.body}#{draft_markup}"
+    comment_body = "#{html_to_text(comment.body)}#{draft_markup}"
     comment_body_and_timestamp = "#{comment_body} #{timestamps_by_id.fetch(comment.id)}"
 
     if comment.author_id.nil? || comment.author_id != current_author

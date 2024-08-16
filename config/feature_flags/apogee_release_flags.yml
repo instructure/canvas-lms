@@ -370,4 +370,8 @@ rubric_imports_exports:
       state: allowed
     development:
       state: allowed
-  
+rce_lite_enabled_speedgrader_comments:
+  state: hidden
+  applies_to: RootAccount
+  display_name: RCE lite in Speedgrader comments
+  description: Allows Speedgrader comments to be formatted using RCE lite.

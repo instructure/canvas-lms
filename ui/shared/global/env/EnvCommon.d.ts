@@ -281,6 +281,7 @@ export type RootAccountFeatureId =
   | 'account_level_mastery_scales'
   | 'non_scoring_rubrics'
   | 'rubric_criterion_range'
+  | 'rce_lite_enabled_speedgrader_comments'
 
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES
