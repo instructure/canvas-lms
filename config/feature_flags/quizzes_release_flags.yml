@@ -86,3 +86,9 @@ impact_integration:
   description: Allow Impact services to reach New Quizzes
   applies_to: SiteAdmin
   shadow: true
+new_quizzes_enable_quiz_visibility_after_course_conclusion:
+  state: hidden
+  display_name: Enable quiz visibility after course conclusion
+  description: Enable quiz visibility after course conclusion
+  applies_to: RootAccount
+  shadow: true
