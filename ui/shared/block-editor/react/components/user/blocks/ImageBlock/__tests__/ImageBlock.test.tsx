@@ -55,8 +55,22 @@ describe('ImageBlock', () => {
     expect(img).toHaveStyle({objectFit: 'cover'})
   })
 
+  it('should render with cover constraint when maintainAspectRatio is true, regardless of constraint prop', () => {
+    const {container} = renderBlock({
+      src: 'https://example.com/image.jpg',
+      constraint: 'contain',
+      maintainAspectRatio: true,
+    })
+    const img = container.querySelector('img')
+    expect(img).toHaveStyle({objectFit: 'cover'})
+  })
+
   it('should render with contain constraint', () => {
-    const {container} = renderBlock({src: 'https://example.com/image.jpg', constraint: 'contain'})
+    const {container} = renderBlock({
+      src: 'https://example.com/image.jpg',
+      constraint: 'contain',
+      maintainAspectRatio: false,
+    })
     const img = container.querySelector('img')
     expect(img).toHaveStyle({objectFit: 'contain'})
   })

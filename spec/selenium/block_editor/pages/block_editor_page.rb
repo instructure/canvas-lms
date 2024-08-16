@@ -74,4 +74,13 @@ module BlockEditorPage
   def block_resize_handle_se
     f(".block-resizer.se")
   end
+
+  def block_toolbar
+    f(".block-toolbar")
+  end
+
+  def click_block_toolbar_menu_item(menu_button_name, menu_item_name)
+    fj("button:contains('#{menu_button_name}')").click
+    fj("[role=\"menuitemcheckbox\"]:contains('#{menu_item_name}')").click
+  end
 end

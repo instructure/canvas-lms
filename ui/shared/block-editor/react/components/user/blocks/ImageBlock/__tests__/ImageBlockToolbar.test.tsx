@@ -70,11 +70,13 @@ describe('ImageBlockToolbar', () => {
 
     const coverMenuItem = screen.getByText('Cover')
     const containMenuItem = screen.getByText('Contain')
+    const aspectRatioMenuItem = screen.getByText('Match Aspect Ratio')
 
     expect(coverMenuItem).toBeInTheDocument()
     expect(containMenuItem).toBeInTheDocument()
+    expect(aspectRatioMenuItem).toBeInTheDocument()
 
-    const li = coverMenuItem.closest('li') as HTMLLIElement
+    const li = aspectRatioMenuItem.closest('li') as HTMLLIElement
     expect(li.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
   })
 
@@ -89,6 +91,29 @@ describe('ImageBlockToolbar', () => {
 
     expect(mockSetProp).toHaveBeenCalled()
     expect(props.constraint).toBe('contain')
+    expect(props.maintainAspectRatio).toBe(false)
+  })
+
+  it('changes the maintainAspectRatio prop', async () => {
+    props.maintainAspectRatio = false
+    const {getByText} = render(<ImageBlockToolbar />)
+
+    const btn = getByText('Constraint').closest('button') as HTMLButtonElement
+    await user.click(btn)
+
+    const coverMenuItem = screen.getByText('Cover')
+    let li = coverMenuItem.closest('li') as HTMLLIElement
+    expect(li.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
+
+    const aspectRatioMenuItem = screen.getByText('Match Aspect Ratio')
+    li = aspectRatioMenuItem.closest('li') as HTMLLIElement
+    expect(li.querySelector('svg[name="IconCheck"]')).not.toBeInTheDocument()
+
+    await user.click(aspectRatioMenuItem)
+
+    expect(mockSetProp).toHaveBeenCalled()
+    expect(props.maintainAspectRatio).toBe(true)
+    expect(props.constraint).toBe('cover')
   })
 
   it('shows the size popup', async () => {

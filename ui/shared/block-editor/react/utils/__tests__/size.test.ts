@@ -16,17 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type ImageConstraint = 'cover' | 'contain'
-export type ImageVariant = 'default' | 'hero'
-export const HeroImageHeight: string = '184px'
+import {getAspectRatio} from '../size'
 
-export type ImageBlockProps = {
-  src?: string
-  width?: number
-  height?: number
-  constraint?: ImageConstraint
-  maintainAspectRatio?: boolean
-}
+describe('getAspectRatio', () => {
+  it('should return the aspect ratio of the width and height', () => {
+    expect(getAspectRatio(100, 100)).toEqual(1)
+    expect(getAspectRatio(200, 100)).toEqual(2)
+    expect(getAspectRatio(100, 200)).toEqual(0.5)
+  })
 
-export const EMPTY_IMAGE_WIDTH = 100
-export const EMPTY_IMAGE_HEIGHT = 100
+  it('should return 1 if the aspect ratio is not a number or not finite', () => {
+    expect(getAspectRatio(100, 0)).toEqual(1)
+    expect(getAspectRatio(Number.NaN, 100)).toEqual(1)
+    expect(getAspectRatio(0, 0)).toEqual(1)
+  })
+})

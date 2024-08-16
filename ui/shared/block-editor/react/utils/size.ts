@@ -16,17 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type ImageConstraint = 'cover' | 'contain'
-export type ImageVariant = 'default' | 'hero'
-export const HeroImageHeight: string = '184px'
-
-export type ImageBlockProps = {
-  src?: string
-  width?: number
-  height?: number
-  constraint?: ImageConstraint
-  maintainAspectRatio?: boolean
+export const getAspectRatio = (width: number, height: number) => {
+  let ar = width / height
+  if (Number.isNaN(ar) || !Number.isFinite(ar)) ar = 1
+  return ar
 }
-
-export const EMPTY_IMAGE_WIDTH = 100
-export const EMPTY_IMAGE_HEIGHT = 100
