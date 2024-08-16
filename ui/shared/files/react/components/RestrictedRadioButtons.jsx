@@ -120,8 +120,18 @@ class RestrictedRadioButtons extends React.Component {
   }
 
   extractFormValues = () => {
-    const unlock_at_datetime = $(this.unlock_at_time).val() && $(this.unlock_at).data('unfudged-date') ? mergeTimeAndDate($(this.unlock_at_time).val(), $(this.unlock_at).data('unfudged-date')) : ''
-    const lock_at_datetime = $(this.lock_at_time).val() && $(this.lock_at).data('unfudged-date') ? mergeTimeAndDate($(this.lock_at_time).val(), $(this.lock_at).data('unfudged-date')) : ''
+    let unlock_at_datetime = ''
+    let lock_at_datetime = ''
+
+    if (this.state.selectedOption === 'date_range') {
+      unlock_at_datetime = $(this.unlock_at).data('unfudged-date') || ''
+      if ($(this.unlock_at_time).val()) { unlock_at_datetime = mergeTimeAndDate($(this.unlock_at_time).val(), $(this.unlock_at).data('unfudged-date')) || '' }
+
+
+      lock_at_datetime = $(this.lock_at).data('unfudged-date') || ''
+      if ($(this.lock_at_time).val()) { lock_at_datetime = mergeTimeAndDate($(this.lock_at_time).val(), $(this.lock_at).data('unfudged-date')) || '' }
+    }
+
     const opts = {
       hidden: this.state.selectedOption === 'link_only',
       unlock_at:
