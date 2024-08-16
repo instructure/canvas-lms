@@ -264,6 +264,9 @@ class OutcomeResultsController < ApplicationController
       reject! "Outcomes do not belong to Course" unless course_outcome_ids.include?(outcome["outcome_id"])
     end
 
+    # Associate user with shard if they are not already
+    @current_user.associate_with_shard(@context.shard, :shadow) unless @current_user.associated_shards.include?(@context.shard)
+
     # Save Lmgb Outcome Ordering
     UserLmgbOutcomeOrderings.set_lmgb_outcome_ordering(@context.root_account_id, @current_user.id, @context.id, outcome_position_map)
   end

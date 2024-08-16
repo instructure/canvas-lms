@@ -668,6 +668,53 @@ describe OutcomeResultsController do
         expect(response_outcomes_ordering).to eq(outcome_ids)
       end
 
+      context "cross-shard access" do
+        specs_require_sharding
+
+        before do
+          @shard1.activate do
+            @shard1_account = Account.create!
+            @shard1_course = course_factory(account: @shard1_account)
+          end
+        end
+
+        it "ordering request is successful if site-admin user is from a different shard" do
+          admin_user = nil
+
+          @shard2.activate do
+            opts = { active_user: true, account: Account.site_admin, name: "site-admin", short_name: "site-admin" }
+            admin_user = Account.site_admin.account_users.create!(user: user_factory(opts)).user
+          end
+
+          @shard1.activate do
+            outcome_ids = create_outcomes(@shard1_course, 3)
+            position_map = create_outcome_position_map(outcome_ids)
+
+            user_session(admin_user)
+
+            post "outcome_order",
+                 params: { course_id: @shard1_course.id, },
+                 body: position_map.to_json,
+                 as: :json
+
+            expect(response.successful?).to be_truthy
+
+            get "rollups",
+                params: { context_id: @shard1_course.id,
+                          course_id: @shard1_course.id,
+                          context_type: "Course",
+                          user_outcome_ordering: "true",
+                          include: ["outcomes"] },
+                format: "json"
+
+            json = response.parsed_body
+            response_outcomes = json["linked"]["outcomes"]
+            response_outcomes_ordering = get_response_ordering(response_outcomes)
+            expect(response_outcomes_ordering).to eq(outcome_ids)
+          end
+        end
+      end
+
       context "with multiple outcome groups" do
         it "outcomes ordered correctly with large number of outcome groups" do
           user_session(@teacher)
