@@ -19,13 +19,14 @@
 import {createGradebook} from '../../../__tests__/GradebookSpecHelper'
 import TotalGradeOverrideCellFormatter from '../TotalGradeOverrideCellFormatter'
 import useStore from '../../../stores'
+import sinon from 'sinon'
 
-QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', suiteHooks => {
+describe('GradebookGrid TotalGradeOverrideCellFormatter', () => {
   let $fixture
   let finalGradeOverrides
   let gradebook
 
-  suiteHooks.beforeEach(() => {
+  beforeEach(() => {
     $fixture = document.body.appendChild(document.createElement('div'))
 
     gradebook = createGradebook({
@@ -54,7 +55,7 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', suiteHooks => {
     gradebook.gradingPeriodId = '1501'
   })
 
-  suiteHooks.afterEach(() => {
+  afterEach(() => {
     $fixture.remove()
   })
 
@@ -76,118 +77,118 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', suiteHooks => {
     return $percentageGrade && $percentageGrade.innerText.trim()
   }
 
-  QUnit.module('when displaying course grade overrides', () => {
-    QUnit.module('when using a grading scheme', () => {
+  describe('when displaying course grade overrides', () => {
+    describe('when using a grading scheme', () => {
       test('displays the scheme grade', () => {
-        equal(getGrade(), 'A')
+        expect(getGrade()).toBe('A')
       })
 
       test('escapes the scheme grade', () => {
         finalGradeOverrides[1101].courseGrade.percentage = 10.0
-        equal(getGrade(), '<b>F</b>')
+        expect(getGrade()).toBe('<b>F</b>')
       })
 
       test('renders "–" (en dash) when the student has no grade overrides', () => {
         finalGradeOverrides = {}
-        equal(getGrade(), '–')
+        expect(getGrade()).toBe('–')
       })
 
       test('renders "–" (en dash) when the student has no course grade overrides', () => {
         delete finalGradeOverrides[1101].courseGrade
         gradebook.finalGradeOverrides._datastore.setGrades({})
-        equal(getGrade(), '–')
+        expect(getGrade()).toBe('–')
       })
     })
 
-    QUnit.module('when not using a grading scheme', hooks => {
-      hooks.beforeEach(() => {
+    describe('when not using a grading scheme', () => {
+      beforeEach(() => {
         sinon.stub(gradebook, 'getCourseGradingScheme').returns(null)
       })
 
       test('renders the percentage of the grade', () => {
-        equal(getGrade(), '90%')
+        expect(getGrade()).toBe('90%')
       })
 
       test('rounds the percentage to two decimal places', () => {
         finalGradeOverrides[1101].courseGrade.percentage = 92.345
-        equal(getGrade(), '92.35%')
+        expect(getGrade()).toBe('92.35%')
       })
 
       test('renders "–" (en dash) when the student has no grade overrides', () => {
         finalGradeOverrides = {}
-        equal(getGrade(), '–')
+        expect(getGrade()).toBe('–')
       })
 
       test('renders "–" (en dash) when the student has no course grade overrides', () => {
         delete finalGradeOverrides[1101].courseGrade
         gradebook.finalGradeOverrides._datastore.setGrades({})
-        equal(getGrade(), '–')
+        expect(getGrade()).toBe('–')
       })
     })
   })
 
-  QUnit.module('when displaying grading period grade overrides', contextHooks => {
-    contextHooks.beforeEach(() => {
+  describe('when displaying grading period grade overrides', () => {
+    beforeEach(() => {
       gradebook.isFilteringColumnsByGradingPeriod.returns(true)
     })
 
-    QUnit.module('when using a grading scheme', () => {
+    describe('when using a grading scheme', () => {
       test('displays the scheme grade', () => {
-        equal(getGrade(), 'B')
+        expect(getGrade()).toBe('B')
       })
 
       test('escapes the scheme grade', () => {
         finalGradeOverrides[1101].gradingPeriodGrades[1501].percentage = 10.0
-        equal(getGrade(), '<b>F</b>')
+        expect(getGrade()).toBe('<b>F</b>')
       })
 
       test('renders "–" (en dash) when the student has no grade overrides', () => {
         finalGradeOverrides = {}
-        equal(getGrade(), '–')
+        expect(getGrade()).toBe('–')
       })
 
       test('renders "–" (en dash) when the student has no grading period grade overrides', () => {
         delete finalGradeOverrides[1101].gradingPeriodGrades
-        equal(getGrade(), '–')
+        expect(getGrade()).toBe('–')
       })
 
       test('renders "–" (en dash) when the student has no grade override for the selected grading period', () => {
         gradebook.gradingPeriodId = '1502'
-        equal(getGrade(), '–')
+        expect(getGrade()).toBe('–')
       })
     })
 
-    QUnit.module('when not using a grading scheme', hooks => {
-      hooks.beforeEach(() => {
+    describe('when not using a grading scheme', () => {
+      beforeEach(() => {
         sinon.stub(gradebook, 'getCourseGradingScheme').returns(null)
       })
 
       test('renders the percentage of the grade', () => {
-        equal(getGrade(), '80%')
+        expect(getGrade()).toBe('80%')
       })
 
       test('rounds the percentage to two decimal places', () => {
         finalGradeOverrides[1101].gradingPeriodGrades[1501].percentage = 82.345
-        equal(getGrade(), '82.35%')
+        expect(getGrade()).toBe('82.35%')
       })
 
       test('renders "–" (en dash) when the student has no grade overrides', () => {
         finalGradeOverrides = {}
-        equal(getGrade(), '–')
+        expect(getGrade()).toBe('–')
       })
 
       test('renders "–" (en dash) when the student has no grading period grade overrides', () => {
         delete finalGradeOverrides[1101].gradingPeriodGrades
-        equal(getGrade(), '–')
+        expect(getGrade()).toBe('–')
       })
 
       test('renders "–" (en dash) when the student has no grade override for the selected grading period', () => {
         gradebook.gradingPeriodId = '1502'
-        equal(getGrade(), '–')
+        expect(getGrade()).toBe('–')
       })
     })
 
-    QUnit.module('when final grade override has custom status', hooks => {
+    describe('when final grade override has custom status', () => {
       function renderCustomStatusCell(gradingPeriodId = '0', featureFlagEnabled = true) {
         gradebook.finalGradeOverrides._datastore.setGrades(finalGradeOverrides)
         gradebook.options.custom_grade_statuses_enabled = featureFlagEnabled
@@ -203,7 +204,7 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', suiteHooks => {
         return $fixture
       }
 
-      hooks.beforeEach(() => {
+      beforeEach(() => {
         useStore.setState({
           finalGradeOverrides: {
             1101: {
@@ -222,22 +223,30 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', suiteHooks => {
 
       test('does not render cell color change when custom status FF is OFF', () => {
         renderCustomStatusCell('0', false)
-        notOk($fixture.querySelector('.gradebook-cell').classList.contains('custom-grade-status-1'))
+        expect(
+          $fixture.querySelector('.gradebook-cell').classList.contains('custom-grade-status-1')
+        ).toBe(false)
       })
 
       test('renders the custom grade status cell color', () => {
         renderCustomStatusCell()
-        ok($fixture.querySelector('.gradebook-cell').classList.contains('custom-grade-status-1'))
+        expect(
+          $fixture.querySelector('.gradebook-cell').classList.contains('custom-grade-status-1')
+        ).toBe(true)
       })
 
       test('renders the custom grade status cell color for correct grading period', () => {
         renderCustomStatusCell('11')
-        ok($fixture.querySelector('.gradebook-cell').classList.contains('custom-grade-status-2'))
+        expect(
+          $fixture.querySelector('.gradebook-cell').classList.contains('custom-grade-status-2')
+        ).toBe(true)
       })
 
       test('renders no color class when non existent grading period is passed', () => {
         renderCustomStatusCell('12')
-        notOk($fixture.querySelector('.gradebook-cell').classList.contains('custom-grade-status-2'))
+        expect(
+          $fixture.querySelector('.gradebook-cell').classList.contains('custom-grade-status-2')
+        ).toBe(false)
       })
     })
   })

@@ -18,14 +18,15 @@
 
 import {createGradebook, setFixtureHtml} from '../../../__tests__/GradebookSpecHelper'
 import StudentCellFormatter from '../StudentCellFormatter'
+import sinon from 'sinon'
 
-QUnit.module('GradebookGrid StudentCellFormatter', hooks => {
+describe('GradebookGrid StudentCellFormatter', () => {
   let $fixture
   let gradebook
   let formatter
   let student
 
-  hooks.beforeEach(() => {
+  beforeEach(() => {
     $fixture = document.body.appendChild(document.createElement('div'))
     setFixtureHtml($fixture)
 
@@ -74,7 +75,7 @@ QUnit.module('GradebookGrid StudentCellFormatter', hooks => {
     }
   })
 
-  hooks.afterEach(() => {
+  afterEach(() => {
     $fixture.remove()
   })
 
@@ -93,57 +94,54 @@ QUnit.module('GradebookGrid StudentCellFormatter', hooks => {
     return renderCell().querySelector('.student-grades-link')
   }
 
-  QUnit.module('when the student is a placeholder', () => {
+  describe('when the student is a placeholder', () => {
     test('renders no content when the student is a placeholder', () => {
       student = {isPlaceholder: true}
-      strictEqual(renderCell().innerHTML, '')
+      expect(renderCell().innerHTML).toBe('')
     })
   })
 
-  QUnit.module('#render() with an active student', () => {
+  describe('#render() with an active student', () => {
     test('includes a link to the student grades', () => {
       const expectedUrl = 'http://example.com/grades/1101#tab-assignments'
-      equal(studentGradesLink().href, expectedUrl)
+      expect(studentGradesLink().href).toBe(expectedUrl)
     })
 
     test('renders the student name when displaying names as "first, last"', () => {
-      equal(studentGradesLink().innerHTML, student.name)
+      expect(studentGradesLink().innerHTML).toBe(student.name)
     })
 
     test('escapes HTML in the student name when displaying names as "first, last"', () => {
       student.name = '<span>Adam Jones</span>'
-      equal(studentGradesLink().innerHTML, '&lt;span&gt;Adam Jones&lt;/span&gt;')
+      expect(studentGradesLink().innerHTML).toBe('&lt;span&gt;Adam Jones&lt;/span&gt;')
     })
 
     test('renders the sortable name when displaying names as "last, first"', () => {
       gradebook.setSelectedPrimaryInfo('last_first', true) // skipRedraw
-      equal(studentGradesLink().innerHTML, 'Jones, Adam')
+      expect(studentGradesLink().innerHTML).toBe('Jones, Adam')
     })
 
     test('escapes HTML in the student name when displaying names as "last, first"', () => {
       gradebook.setSelectedPrimaryInfo('last_first', true) // skipRedraw
       student.sortable_name = '<span>Jones, Adam</span>'
-      equal(studentGradesLink().innerHTML, '&lt;span&gt;Jones, Adam&lt;/span&gt;')
+      expect(studentGradesLink().innerHTML).toBe('&lt;span&gt;Jones, Adam&lt;/span&gt;')
     })
 
     test('does not render an enrollment status label', () => {
-      strictEqual(renderCell().querySelector('.label'), null)
+      expect(renderCell().querySelector('.label')).toBeNull()
     })
 
     test('renders section names when secondary info is "section"', () => {
       gradebook.setSelectedSecondaryInfo('section', true) // skipRedraw
-      equal(
-        renderCell().querySelector('.secondary-info').innerText,
+      expect(renderCell().querySelector('.secondary-info').innerText).toBe(
         'Freshmen, Juniors, and Seniors'
       )
     })
 
     test('does not escape html in the section names', () => {
-      //  section names have already been escaped
       gradebook.sections[2001].name = '&lt;span&gt;Freshmen&lt;/span&gt;'
       gradebook.setSelectedSecondaryInfo('section', true) // skipRedraw
-      equal(
-        renderCell().querySelector('.secondary-info').innerHTML,
+      expect(renderCell().querySelector('.secondary-info').innerHTML).toBe(
         '&lt;span&gt;Freshmen&lt;/span&gt;, Juniors, and Seniors'
       )
     })
@@ -151,35 +149,34 @@ QUnit.module('GradebookGrid StudentCellFormatter', hooks => {
     test('does not render section names when sections should not be visible', () => {
       gradebook.setSections([])
       gradebook.setSelectedSecondaryInfo('section', true) // skipRedraw
-      strictEqual(renderCell().querySelector('.secondary-info'), null)
+      expect(renderCell().querySelector('.secondary-info')).toBeNull()
     })
 
     test('ignores section IDs referencing sections not loaded in the gradebook', () => {
       student.sections.push('9005')
       gradebook.setSelectedSecondaryInfo('section', true) // skipRedraw
       renderCell()
-      ok('nonexistent section should not cause error')
+      expect(true).toBe(true) // no error should occur
     })
 
-    test('renders the student login id when secondary info is "login_in"', () => {
+    test('renders the student login id when secondary info is "login_id"', () => {
       gradebook.setSelectedSecondaryInfo('login_id', true) // skipRedraw
-      equal(renderCell().querySelector('.secondary-info').innerText, student.login_id)
+      expect(renderCell().querySelector('.secondary-info').innerText).toBe(student.login_id)
     })
 
     test('renders the student SIS user id when secondary info is "sis_id"', () => {
       gradebook.setSelectedSecondaryInfo('sis_id', true) // skipRedraw
-      equal(renderCell().querySelector('.secondary-info').innerText, student.sis_user_id)
+      expect(renderCell().querySelector('.secondary-info').innerText).toBe(student.sis_user_id)
     })
 
     test('renders the Integration ID when secondary info is "integration_id"', () => {
       gradebook.setSelectedSecondaryInfo('integration_id', true) // skipRedraw
-      equal(renderCell().querySelector('.secondary-info').innerText, student.integration_id)
+      expect(renderCell().querySelector('.secondary-info').innerText).toBe(student.integration_id)
     })
 
     test('renders student group names when secondary info is "group"', () => {
       gradebook.setSelectedSecondaryInfo('group')
-      equal(
-        renderCell().querySelector('.secondary-info').innerText,
+      expect(renderCell().querySelector('.secondary-info').innerText).toBe(
         'First Category 1 and Second Category 2'
       )
     })
@@ -199,8 +196,7 @@ QUnit.module('GradebookGrid StudentCellFormatter', hooks => {
       ])
 
       gradebook.setSelectedSecondaryInfo('group')
-      equal(
-        renderCell().querySelector('.secondary-info').innerText,
+      expect(renderCell().querySelector('.secondary-info').innerText).toBe(
         '&lt;span&gt;First Category 1&lt;/span&gt; and Second Category 2'
       )
     })
@@ -208,44 +204,44 @@ QUnit.module('GradebookGrid StudentCellFormatter', hooks => {
     test('does not render student group names when groups should not be visible', () => {
       gradebook.setStudentGroups([])
       gradebook.setSelectedSecondaryInfo('group')
-      strictEqual(renderCell().querySelector('.secondary-info'), null)
+      expect(renderCell().querySelector('.secondary-info')).toBeNull()
     })
 
     test('does not render secondary info when any secondary info is null and secondary info is not "none"', () => {
       student.login_id = null
       gradebook.setSelectedSecondaryInfo('login_id', true) // skipRedraw
-      equal(renderCell().querySelector('.secondary-info'), null)
+      expect(renderCell().querySelector('.secondary-info')).toBeNull()
     })
 
     test('does not render secondary info when secondary info is "none"', () => {
       gradebook.setSelectedSecondaryInfo('none', true) // skipRedraw
-      strictEqual(renderCell().querySelector('.secondary-info'), null)
+      expect(renderCell().querySelector('.secondary-info')).toBeNull()
     })
 
     test('student grades link doubles as a context card trigger', () => {
-      strictEqual(studentGradesLink().classList.contains('student_context_card_trigger'), true)
+      expect(studentGradesLink().classList.contains('student_context_card_trigger')).toBe(true)
     })
 
     test('student grades link includes the student id as a data attribute', () => {
-      strictEqual(studentGradesLink().getAttribute('data-student_id'), student.id)
+      expect(studentGradesLink().getAttribute('data-student_id')).toBe(student.id)
     })
 
     test('student grades link includes the course id as a data attribute', () => {
-      strictEqual(studentGradesLink().getAttribute('data-course_id'), gradebook.options.context_id)
+      expect(studentGradesLink().getAttribute('data-course_id')).toBe(gradebook.options.context_id)
     })
   })
 
-  QUnit.module('when the student is inactive', () => {
+  describe('when the student is inactive', () => {
     test('renders the "inactive" status label', () => {
       student.isInactive = true
-      equal(renderCell().querySelector('.label').innerText, 'inactive')
+      expect(renderCell().querySelector('.label').innerText).toBe('inactive')
     })
   })
 
-  QUnit.module('when the student is concluded', () => {
+  describe('when the student is concluded', () => {
     test('renders the "concluded" status label', () => {
       student.isConcluded = true
-      equal(renderCell().querySelector('.label').innerText, 'concluded')
+      expect(renderCell().querySelector('.label').innerText).toBe('concluded')
     })
   })
 })
