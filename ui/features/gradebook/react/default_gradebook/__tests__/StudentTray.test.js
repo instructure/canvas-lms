@@ -17,11 +17,12 @@
  */
 
 import {createGradebook} from './GradebookSpecHelper'
+import sinon from 'sinon'
 
-QUnit.module('Gradebook#loadTrayStudent', hooks => {
+describe('Gradebook#loadTrayStudent', () => {
   let gradebook
 
-  hooks.beforeEach(() => {
+  beforeEach(() => {
     gradebook = createGradebook()
     gradebook.gradebookGrid.gridSupport = {
       state: {
@@ -29,7 +30,7 @@ QUnit.module('Gradebook#loadTrayStudent', hooks => {
         setActiveLocation: sinon.stub(),
       },
       helper: {
-        commitCurrentEdit() {},
+        commitCurrentEdit: jest.fn(),
       },
     }
     gradebook.students = {
@@ -72,17 +73,16 @@ QUnit.module('Gradebook#loadTrayStudent', hooks => {
     sinon.stub(gradebook, 'unloadSubmissionComments')
   })
 
-  test('when called with "previous", changes the highlighted cell to the previous row', () => {
+  it('changes the highlighted cell to the previous row when called with "previous"', () => {
     gradebook.loadTrayStudent('previous')
 
     const expectation = ['body', {cell: 0, row: 0}]
-    deepEqual(
-      gradebook.gradebookGrid.gridSupport.state.setActiveLocation.firstCall.args,
+    expect(gradebook.gradebookGrid.gridSupport.state.setActiveLocation.firstCall.args).toEqual(
       expectation
     )
   })
 
-  test('when called with "previous", updates the submission tray state', () => {
+  it('updates the submission tray state when called with "previous"', () => {
     gradebook.loadTrayStudent('previous')
 
     const submissionTrayState = gradebook.getSubmissionTrayState()
@@ -94,54 +94,53 @@ QUnit.module('Gradebook#loadTrayStudent', hooks => {
     })
 
     const expectation = {open: true, studentId: '1100'}
-    deepEqual(actual, expectation)
+    expect(actual).toEqual(expectation)
   })
 
-  test('when called with "previous", updates and renders the submission tray with the new student', () => {
+  it('updates and renders the submission tray with the new student when called with "previous"', () => {
     gradebook.loadTrayStudent('previous')
 
-    deepEqual(gradebook.updateRowAndRenderSubmissionTray.firstCall.args, ['1100'])
+    expect(gradebook.updateRowAndRenderSubmissionTray.firstCall.args).toEqual(['1100'])
   })
 
-  test('when called with "previous" while on the first row, does not change the highlighted cell', () => {
+  it('does not change the highlighted cell when called with "previous" while on the first row', () => {
     sinon
       .stub(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation')
       .returns({region: 'body', cell: 0, row: 0})
     gradebook.loadTrayStudent('previous')
 
-    strictEqual(gradebook.gradebookGrid.gridSupport.state.setActiveLocation.callCount, 0)
+    expect(gradebook.gradebookGrid.gridSupport.state.setActiveLocation.callCount).toBe(0)
   })
 
-  test('when called with "previous" while on the first row, does not update the submission tray state', () => {
+  it('does not update the submission tray state when called with "previous" while on the first row', () => {
     sinon
       .stub(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation')
       .returns({region: 'body', cell: 0, row: 0})
     sinon.stub(gradebook, 'setSubmissionTrayState')
     gradebook.loadTrayStudent('previous')
 
-    strictEqual(gradebook.setSubmissionTrayState.callCount, 0)
+    expect(gradebook.setSubmissionTrayState.callCount).toBe(0)
   })
 
-  test('when called with "previous" while on the first row, does not update and render the submission tray', () => {
+  it('does not update and render the submission tray when called with "previous" while on the first row', () => {
     sinon
       .stub(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation')
       .returns({region: 'body', cell: 0, row: 0})
     gradebook.loadTrayStudent('previous')
 
-    strictEqual(gradebook.updateRowAndRenderSubmissionTray.callCount, 0)
+    expect(gradebook.updateRowAndRenderSubmissionTray.callCount).toBe(0)
   })
 
-  test('when called with "next", changes the highlighted cell to the next row', () => {
+  it('changes the highlighted cell to the next row when called with "next"', () => {
     gradebook.loadTrayStudent('next')
 
     const expectation = ['body', {cell: 0, row: 2}]
-    deepEqual(
-      gradebook.gradebookGrid.gridSupport.state.setActiveLocation.firstCall.args,
+    expect(gradebook.gradebookGrid.gridSupport.state.setActiveLocation.firstCall.args).toEqual(
       expectation
     )
   })
 
-  test('when called with "next", updates the submission tray state', () => {
+  it('updates the submission tray state when called with "next"', () => {
     gradebook.loadTrayStudent('next')
 
     const submissionTrayState = gradebook.getSubmissionTrayState()
@@ -153,40 +152,40 @@ QUnit.module('Gradebook#loadTrayStudent', hooks => {
     })
 
     const expectation = {open: true, studentId: '1102'}
-    deepEqual(actual, expectation)
+    expect(actual).toEqual(expectation)
   })
 
-  test('when called with "next", updates and renders the submission tray with the new student', () => {
+  it('updates and renders the submission tray with the new student when called with "next"', () => {
     gradebook.loadTrayStudent('next')
 
-    deepEqual(gradebook.updateRowAndRenderSubmissionTray.firstCall.args, ['1102'])
+    expect(gradebook.updateRowAndRenderSubmissionTray.firstCall.args).toEqual(['1102'])
   })
 
-  test('when called with "next" while on the last row, does not change the highlighted cell', () => {
+  it('does not change the highlighted cell when called with "next" while on the last row', () => {
     sinon
       .stub(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation')
       .returns({region: 'body', cell: 0, row: 2})
     gradebook.loadTrayStudent('next')
 
-    strictEqual(gradebook.gradebookGrid.gridSupport.state.setActiveLocation.callCount, 0)
+    expect(gradebook.gradebookGrid.gridSupport.state.setActiveLocation.callCount).toBe(0)
   })
 
-  test('when called with "next" while on the last row, does not update the submission tray state', () => {
+  it('does not update the submission tray state when called with "next" while on the last row', () => {
     sinon
       .stub(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation')
       .returns({region: 'body', cell: 0, row: 2})
     sinon.stub(gradebook, 'setSubmissionTrayState')
     gradebook.loadTrayStudent('next')
 
-    strictEqual(gradebook.setSubmissionTrayState.callCount, 0)
+    expect(gradebook.setSubmissionTrayState.callCount).toBe(0)
   })
 
-  test('when called with "next" while on the last row, does not update and render the submission tray', () => {
+  it('does not update and render the submission tray when called with "next" while on the last row', () => {
     sinon
       .stub(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation')
       .returns({region: 'body', cell: 0, row: 2})
     gradebook.loadTrayStudent('next')
 
-    strictEqual(gradebook.updateRowAndRenderSubmissionTray.callCount, 0)
+    expect(gradebook.updateRowAndRenderSubmissionTray.callCount).toBe(0)
   })
 })

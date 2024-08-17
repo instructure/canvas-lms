@@ -18,14 +18,15 @@
 
 import MockCanvasClient from '@canvas/test-utils/MockCanvasClient'
 import * as Api from '../Api'
+import sinon from 'sinon'
 
-QUnit.module('HideAssignmentGradesTray Api', suiteHooks => {
+describe('HideAssignmentGradesTray Api', () => {
   const ASSIGNMENT_ID = '23'
   const BAD_ASSIGNMENT_ID = '24'
   const PROGRESS_ID = 7331
   const SECTION_IDS = ['2001', '2002', '2003']
 
-  suiteHooks.beforeEach(() => {
+  beforeEach(() => {
     MockCanvasClient.install([
       {
         request: {
@@ -86,55 +87,51 @@ QUnit.module('HideAssignmentGradesTray Api', suiteHooks => {
     ])
   })
 
-  suiteHooks.afterEach(() => {
+  afterEach(() => {
     MockCanvasClient.uninstall()
   })
 
-  QUnit.module('.hideAssignmentGrades()', () => {
-    test('returns the Progress id', async () => {
+  describe('.hideAssignmentGrades()', () => {
+    it('returns the Progress id', async () => {
       const progress = await Api.hideAssignmentGrades(ASSIGNMENT_ID)
       const expectedProgress = {id: PROGRESS_ID, workflowState: 'queued'}
-      deepEqual(progress, expectedProgress)
+      expect(progress).toEqual(expectedProgress)
     })
 
-    test('consumers are required to handle when mutating rejects', async () => {
-      try {
-        await Api.hideAssignmentGrades(BAD_ASSIGNMENT_ID)
-      } catch (error) {
-        strictEqual(error.message, 'GraphQL error: a graphql error')
-      }
+    it('consumers are required to handle when mutating rejects', async () => {
+      await expect(Api.hideAssignmentGrades(BAD_ASSIGNMENT_ID)).rejects.toThrow(
+        'GraphQL error: a graphql error'
+      )
     })
   })
 
-  QUnit.module('.hideAssignmentGradesForSections()', () => {
-    test('returns the Progress', async () => {
+  describe('.hideAssignmentGradesForSections()', () => {
+    it('returns the Progress', async () => {
       const progress = await Api.hideAssignmentGradesForSections(ASSIGNMENT_ID, SECTION_IDS)
       const expectedProgress = {id: PROGRESS_ID, workflowState: 'queued'}
-      deepEqual(progress, expectedProgress)
+      expect(progress).toEqual(expectedProgress)
     })
 
-    test('consumers are required to handle when mutating rejects', async () => {
-      try {
-        await Api.hideAssignmentGradesForSections(BAD_ASSIGNMENT_ID, SECTION_IDS)
-      } catch (error) {
-        strictEqual(error.message, 'GraphQL error: a graphql error')
-      }
+    it('consumers are required to handle when mutating rejects', async () => {
+      await expect(
+        Api.hideAssignmentGradesForSections(BAD_ASSIGNMENT_ID, SECTION_IDS)
+      ).rejects.toThrow('GraphQL error: a graphql error')
     })
   })
 
-  QUnit.module('.resolveHideAssignmentGradesStatus', contextHooks => {
+  describe('.resolveHideAssignmentGradesStatus', () => {
     let server
 
-    contextHooks.beforeEach(() => {
+    beforeEach(() => {
       server = sinon.createFakeServer()
       server.respondImmediately = true
     })
 
-    contextHooks.afterEach(() => {
+    afterEach(() => {
       server.restore()
     })
 
-    test('returns ids of submissions hidden when job finishes', async () => {
+    it('returns ids of submissions hidden when job finishes', async () => {
       const responseData = {
         results: {submission_ids: ['201', '202', '203']},
         url: `/api/v1/progress/${PROGRESS_ID}`,
@@ -149,10 +146,10 @@ QUnit.module('HideAssignmentGradesTray Api', suiteHooks => {
         id: PROGRESS_ID,
         workflowState: 'queued',
       })
-      deepEqual(results.submissionIds, ['201', '202', '203'])
+      expect(results.submissionIds).toEqual(['201', '202', '203'])
     })
 
-    test('consumers are required to handle when job fails', async () => {
+    it('consumers are required to handle when job fails', async () => {
       const responseData = {
         message: 'job failed',
         url: `/api/v1/progress/${PROGRESS_ID}`,
@@ -164,11 +161,9 @@ QUnit.module('HideAssignmentGradesTray Api', suiteHooks => {
         JSON.stringify(responseData),
       ])
 
-      try {
-        await Api.resolveHideAssignmentGradesStatus({id: PROGRESS_ID, workflowState: 'queued'})
-      } catch (error) {
-        strictEqual(error, 'job failed')
-      }
+      await expect(
+        Api.resolveHideAssignmentGradesStatus({id: PROGRESS_ID, workflowState: 'queued'})
+      ).rejects.toEqual('job failed')
     })
   })
 })
