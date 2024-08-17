@@ -100,6 +100,7 @@ const ItemAssignToCardMemo = memo(
 
     return !!(
       nextProps.persistEveryoneOption &&
+      JSON.stringify(prevProps.customAllOptions) === JSON.stringify(nextProps.customAllOptions) &&
       prevProps.selectedAssigneeIds?.length === nextProps.selectedAssigneeIds?.length &&
       prevProps.highlightCard === nextProps.highlightCard &&
       prevProps.due_at === nextProps.due_at &&
@@ -690,6 +691,7 @@ const ItemAssignToTrayContent = ({
             blueprintDateLocks={blueprintDateLocks}
             postToSIS={postToSIS}
             disabledOptionIdsRef={disabledOptionIdsRef}
+            loadedAssignees={loadedAssignees}
           />
         </View>
       ))

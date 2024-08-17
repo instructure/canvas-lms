@@ -86,7 +86,6 @@ export const ItemAssignToTrayWrapper = () => {
 
     let courseSectionId = null
     const studentIds = []
-    const groupIds = []
 
     inputObj.assignedList.forEach(item => {
       if (item === 'everyone') {
@@ -199,10 +198,11 @@ export const ItemAssignToTrayWrapper = () => {
         onSync={onSync}
         overrides={overrides}
         assignmentId={assignmentID}
-        getGroupCategoryId={() => groupCategoryId}
+        defaultGroupCategoryId={groupCategoryId}        
         importantDates={importantDates}
         defaultSectionId={DEFAULT_SECTION_ID}
         supportDueDates={isGraded}
+        type="discussion"
         isCheckpointed={isCheckpoints}
         postToSIS={postToSis}
       />) :
