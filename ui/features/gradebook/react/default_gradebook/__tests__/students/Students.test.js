@@ -18,16 +18,16 @@
 
 import {createGradebook, setFixtureHtml} from '../GradebookSpecHelper'
 
-QUnit.module('Gradebook > Students', suiteHooks => {
+describe('Gradebook > Students', () => {
   let $container
   let gradebook
 
-  suiteHooks.beforeEach(() => {
+  beforeEach(() => {
     $container = document.body.appendChild(document.createElement('div'))
     setFixtureHtml($container)
   })
 
-  suiteHooks.afterEach(() => {
+  afterEach(() => {
     gradebook.destroy()
     $container.remove()
   })
@@ -40,161 +40,161 @@ QUnit.module('Gradebook > Students', suiteHooks => {
     return gradebook.gridData.rows.find(row => row.id === studentId)
   }
 
-  QUnit.module('#updateStudentIds()', hooks => {
+  describe('#updateStudentIds()', () => {
     let studentIds
 
-    hooks.beforeEach(() => {
+    beforeEach(() => {
       gradebook = createGradebook()
       studentIds = ['1101', '1102', '1103']
     })
 
-    test('stores the loaded student ids in the Gradebook', () => {
+    it('stores the loaded student ids in the Gradebook', () => {
       gradebook.updateStudentIds(studentIds)
-      deepEqual(gradebook.courseContent.students.listStudentIds(), studentIds)
+      expect(gradebook.courseContent.students.listStudentIds()).toEqual(studentIds)
     })
 
-    test('sets the student ids loaded status to true', () => {
+    it('sets the student ids loaded status to true', () => {
       gradebook.updateStudentIds(studentIds)
-      strictEqual(gradebook.contentLoadStates.studentIdsLoaded, true)
+      expect(gradebook.contentLoadStates.studentIdsLoaded).toBe(true)
     })
 
-    test('resets student assignment student visibility', () => {
+    it('resets student assignment student visibility', () => {
       gradebook.assignmentStudentVisibility = {2301: ['1101', '1102']}
       gradebook.updateStudentIds(studentIds)
-      deepEqual(gradebook.assignmentStudentVisibility, {})
+      expect(gradebook.assignmentStudentVisibility).toEqual({})
     })
 
-    test('rebuilds grid rows', () => {
-      sinon.stub(gradebook, 'buildRows')
+    it('rebuilds grid rows', () => {
+      jest.spyOn(gradebook, 'buildRows')
       gradebook.updateStudentIds(studentIds)
-      strictEqual(gradebook.buildRows.callCount, 1)
+      expect(gradebook.buildRows).toHaveBeenCalledTimes(1)
     })
 
-    test('rebuilds grid rows after storing the student ids', () => {
-      sinon.stub(gradebook, 'buildRows').callsFake(() => {
-        deepEqual(gradebook.courseContent.students.listStudentIds(), studentIds)
+    it('rebuilds grid rows after storing the student ids', () => {
+      jest.spyOn(gradebook, 'buildRows').mockImplementation(() => {
+        expect(gradebook.courseContent.students.listStudentIds()).toEqual(studentIds)
       })
       gradebook.updateStudentIds(studentIds)
     })
 
-    test('rebuilds grid rows after updating assignment student visibility', () => {
+    it('rebuilds grid rows after updating assignment student visibility', () => {
       gradebook.assignmentStudentVisibility = {2301: ['1101', '1102']}
-      sinon.stub(gradebook, 'buildRows').callsFake(() => {
-        deepEqual(gradebook.assignmentStudentVisibility, {})
+      jest.spyOn(gradebook, 'buildRows').mockImplementation(() => {
+        expect(gradebook.assignmentStudentVisibility).toEqual({})
       })
       gradebook.updateStudentIds(studentIds)
     })
 
-    test('updates essential data load status', () => {
-      sinon.spy(gradebook, '_updateEssentialDataLoaded')
+    it('updates essential data load status', () => {
+      jest.spyOn(gradebook, '_updateEssentialDataLoaded')
       gradebook.updateStudentIds(studentIds)
-      strictEqual(gradebook._updateEssentialDataLoaded.callCount, 1)
+      expect(gradebook._updateEssentialDataLoaded).toHaveBeenCalledTimes(1)
     })
 
-    test('updates essential data load status after updating student ids loaded status', () => {
-      sinon.spy(gradebook, 'renderFilters')
-      sinon.stub(gradebook, '_updateEssentialDataLoaded').callsFake(() => {
-        strictEqual(gradebook.contentLoadStates.studentIdsLoaded, true)
+    it('updates essential data load status after updating student ids loaded status', () => {
+      jest.spyOn(gradebook, 'renderFilters')
+      jest.spyOn(gradebook, '_updateEssentialDataLoaded').mockImplementation(() => {
+        expect(gradebook.contentLoadStates.studentIdsLoaded).toBe(true)
       })
       gradebook.updateStudentIds(studentIds)
     })
 
-    test('updates essential data load status after building rows', () => {
-      sinon.spy(gradebook, 'buildRows')
-      sinon.stub(gradebook, '_updateEssentialDataLoaded').callsFake(() => {
-        strictEqual(gradebook.buildRows.callCount, 1)
+    it('updates essential data load status after building rows', () => {
+      jest.spyOn(gradebook, 'buildRows')
+      jest.spyOn(gradebook, '_updateEssentialDataLoaded').mockImplementation(() => {
+        expect(gradebook.buildRows).toHaveBeenCalledTimes(1)
       })
       gradebook.updateStudentIds(studentIds)
     })
   })
 
-  QUnit.module('#updateStudentsLoaded()', hooks => {
-    hooks.beforeEach(() => {
+  describe('#updateStudentsLoaded()', () => {
+    beforeEach(() => {
       gradebook = createGradebook()
     })
 
-    test('optionally sets the students loaded status to true', () => {
+    it('optionally sets the students loaded status to true', () => {
       gradebook.updateStudentsLoaded(true)
-      strictEqual(gradebook.contentLoadStates.studentsLoaded, true)
+      expect(gradebook.contentLoadStates.studentsLoaded).toBe(true)
     })
 
-    test('optionally sets the students loaded status to false', () => {
+    it('optionally sets the students loaded status to false', () => {
       gradebook.updateStudentsLoaded(false)
-      strictEqual(gradebook.contentLoadStates.studentsLoaded, false)
+      expect(gradebook.contentLoadStates.studentsLoaded).toBe(false)
     })
 
-    test('updates column headers when the grid has rendered', () => {
-      sinon.stub(gradebook, '_gridHasRendered').returns(true)
-      sinon.spy(gradebook, 'updateColumnHeaders')
+    it('updates column headers when the grid has rendered', () => {
+      jest.spyOn(gradebook, '_gridHasRendered').mockReturnValue(true)
+      jest.spyOn(gradebook, 'updateColumnHeaders')
       gradebook.updateStudentsLoaded(true)
-      strictEqual(gradebook.updateColumnHeaders.callCount, 1)
+      expect(gradebook.updateColumnHeaders).toHaveBeenCalledTimes(1)
     })
 
-    test('updates column headers after updating the students loaded status', () => {
-      sinon.stub(gradebook, '_gridHasRendered').returns(true)
-      sinon.stub(gradebook, 'updateColumnHeaders').callsFake(() => {
-        strictEqual(gradebook.contentLoadStates.studentsLoaded, true)
+    it('updates column headers after updating the students loaded status', () => {
+      jest.spyOn(gradebook, '_gridHasRendered').mockReturnValue(true)
+      jest.spyOn(gradebook, 'updateColumnHeaders').mockImplementation(() => {
+        expect(gradebook.contentLoadStates.studentsLoaded).toBe(true)
       })
       gradebook.updateStudentsLoaded(true)
     })
 
-    test('does not update column headers when the grid has not yet rendered', () => {
-      sinon.stub(gradebook, '_gridHasRendered').returns(false)
-      sinon.spy(gradebook, 'updateColumnHeaders')
+    it('does not update column headers when the grid has not yet rendered', () => {
+      jest.spyOn(gradebook, '_gridHasRendered').mockReturnValue(false)
+      jest.spyOn(gradebook, 'updateColumnHeaders')
       gradebook.updateStudentsLoaded(true)
-      strictEqual(gradebook.updateColumnHeaders.callCount, 0)
+      expect(gradebook.updateColumnHeaders).not.toHaveBeenCalled()
     })
 
-    test('renders filters', () => {
-      sinon.spy(gradebook, 'renderFilters')
+    it('renders filters', () => {
+      jest.spyOn(gradebook, 'renderFilters')
       gradebook.updateStudentsLoaded(true)
-      strictEqual(gradebook.renderFilters.callCount, 1)
+      expect(gradebook.renderFilters).toHaveBeenCalledTimes(1)
     })
 
-    test('renders filters after updating the students loaded status', () => {
-      sinon.stub(gradebook, 'renderFilters').callsFake(() => {
-        strictEqual(gradebook.contentLoadStates.studentsLoaded, true)
+    it('renders filters after updating the students loaded status', () => {
+      jest.spyOn(gradebook, 'renderFilters').mockImplementation(() => {
+        expect(gradebook.contentLoadStates.studentsLoaded).toBe(true)
       })
       gradebook.updateStudentsLoaded(true)
     })
 
-    test('updates the total grade column when students and submissions are loaded', () => {
+    it('updates the total grade column when students and submissions are loaded', () => {
       gradebook.setSubmissionsLoaded(true)
-      sinon.spy(gradebook, 'updateTotalGradeColumn')
+      jest.spyOn(gradebook, 'updateTotalGradeColumn')
       gradebook.updateStudentsLoaded(true)
-      strictEqual(gradebook.updateTotalGradeColumn.callCount, 1)
+      expect(gradebook.updateTotalGradeColumn).toHaveBeenCalledTimes(1)
     })
 
-    test('updates the total grade column after updating the students loaded status', () => {
+    it('updates the total grade column after updating the students loaded status', () => {
       gradebook.setSubmissionsLoaded(true)
-      sinon.stub(gradebook, 'updateTotalGradeColumn').callsFake(() => {
-        strictEqual(gradebook.contentLoadStates.studentsLoaded, true)
+      jest.spyOn(gradebook, 'updateTotalGradeColumn').mockImplementation(() => {
+        expect(gradebook.contentLoadStates.studentsLoaded).toBe(true)
       })
       gradebook.updateStudentsLoaded(true)
     })
 
-    test('does not update the total grade column when submissions are not loaded', () => {
+    it('does not update the total grade column when submissions are not loaded', () => {
       gradebook.setSubmissionsLoaded(false)
-      sinon.spy(gradebook, 'updateTotalGradeColumn')
+      jest.spyOn(gradebook, 'updateTotalGradeColumn')
       gradebook.updateStudentsLoaded(true)
-      strictEqual(gradebook.updateTotalGradeColumn.callCount, 0)
+      expect(gradebook.updateTotalGradeColumn).not.toHaveBeenCalled()
     })
 
-    test('does not update the total grade column when students are being reloaded', () => {
+    it('does not update the total grade column when students are being reloaded', () => {
       gradebook.setSubmissionsLoaded(true)
       gradebook.setStudentsLoaded(true)
-      sinon.spy(gradebook, 'updateTotalGradeColumn')
+      jest.spyOn(gradebook, 'updateTotalGradeColumn')
       gradebook.updateStudentsLoaded(false)
-      strictEqual(gradebook.updateTotalGradeColumn.callCount, 0)
+      expect(gradebook.updateTotalGradeColumn).not.toHaveBeenCalled()
     })
   })
 
-  QUnit.module('#gotChunkOfStudents()', hooks => {
+  describe('#gotChunkOfStudents()', () => {
     let studentData
 
-    hooks.beforeEach(() => {
+    beforeEach(() => {
       gradebook = createGradebook()
-      sinon.stub(gradebook.gradebookGrid, 'render')
+      jest.spyOn(gradebook.gradebookGrid, 'render').mockImplementation(() => {})
 
       studentData = [
         {
@@ -208,7 +208,6 @@ QUnit.module('Gradebook > Students', suiteHooks => {
             },
           ],
         },
-
         {
           id: '1102',
           name: 'Betty Ford',
@@ -220,7 +219,6 @@ QUnit.module('Gradebook > Students', suiteHooks => {
             },
           ],
         },
-
         {
           id: '1199',
           name: 'Test Student',
@@ -238,55 +236,55 @@ QUnit.module('Gradebook > Students', suiteHooks => {
       gradebook.buildRows()
     })
 
-    test('updates the student map with each student', () => {
+    it('updates the student map with each student', () => {
       gradebook.gotChunkOfStudents(studentData)
-      ok(gradebook.students[1101], 'student map includes Adam Jones')
-      ok(gradebook.students[1102], 'student map includes Betty Ford')
+      expect(gradebook.students[1101]).toBeTruthy()
+      expect(gradebook.students[1102]).toBeTruthy()
     })
 
-    test('replaces matching students in the student map', () => {
+    it('replaces matching students in the student map', () => {
       gradebook.gotChunkOfStudents(studentData)
-      equal(gradebook.students[1101].name, 'Adam Jones')
+      expect(gradebook.students[1101].name).toBe('Adam Jones')
     })
 
-    test('updates the test student map with each test student', () => {
+    it('updates the test student map with each test student', () => {
       gradebook.gotChunkOfStudents(studentData)
-      ok(gradebook.studentViewStudents[1199], 'test student map includes Test Student')
+      expect(gradebook.studentViewStudents[1199]).toBeTruthy()
     })
 
-    test('replaces matching students in the test student map', () => {
+    it('replaces matching students in the test student map', () => {
       gradebook.courseContent.students.addTestStudents([{id: '1199'}])
       gradebook.gotChunkOfStudents(studentData)
-      equal(gradebook.studentViewStudents[1199].name, 'Test Student')
+      expect(gradebook.studentViewStudents[1199].name).toBe('Test Student')
     })
 
-    test('defaults the computed current score for each student to 0', () => {
+    it('defaults the computed current score for each student to 0', () => {
       gradebook.gotChunkOfStudents(studentData)
       ;['1101', '1102', '1199'].forEach(studentId => {
-        strictEqual(getStudent(studentId).computed_current_score, 0)
+        expect(getStudent(studentId).computed_current_score).toBe(0)
       })
     })
 
-    test('preserves an existing computed current score', () => {
+    it('preserves an existing computed current score', () => {
       studentData[0].computed_current_score = 95
       gradebook.gotChunkOfStudents(studentData)
-      strictEqual(getStudent('1101').computed_current_score, '95')
+      expect(getStudent('1101').computed_current_score).toBe('95')
     })
 
-    test('defaults the computed final score for each student to 0', () => {
+    it('defaults the computed final score for each student to 0', () => {
       gradebook.gotChunkOfStudents(studentData)
       ;['1101', '1102', '1199'].forEach(studentId => {
-        strictEqual(getStudent(studentId).computed_final_score, 0)
+        expect(getStudent(studentId).computed_final_score).toBe(0)
       })
     })
 
-    test('preserves an existing computed final score', () => {
+    it('preserves an existing computed final score', () => {
       studentData[0].computed_final_score = 95
       gradebook.gotChunkOfStudents(studentData)
-      strictEqual(getStudent('1101').computed_final_score, '95')
+      expect(getStudent('1101').computed_final_score).toBe('95')
     })
 
-    test('sets a student as "concluded" when all enrollments for that student are "completed"', () => {
+    it('sets a student as "concluded" when all enrollments for that student are "completed"', () => {
       const {enrollments} = studentData[0]
       enrollments[0].enrollment_state = 'completed'
       enrollments.push({
@@ -295,20 +293,20 @@ QUnit.module('Gradebook > Students', suiteHooks => {
         type: 'StudentEnrollment',
       })
       gradebook.gotChunkOfStudents(studentData)
-      strictEqual(getStudent('1101').isConcluded, true)
+      expect(getStudent('1101').isConcluded).toBe(true)
     })
 
-    test('sets a student as "not concluded" when not all enrollments for that student are "completed"', () => {
+    it('sets a student as "not concluded" when not all enrollments for that student are "completed"', () => {
       studentData[0].enrollments.push({
         enrollment_state: 'completed',
         grades: {html_url: 'http://example.url/'},
         type: 'StudentEnrollment',
       })
       gradebook.gotChunkOfStudents(studentData)
-      strictEqual(getStudent('1101').isConcluded, false)
+      expect(getStudent('1101').isConcluded).toBe(false)
     })
 
-    test('sets a student as "inactive" when all enrollments for that student are "inactive"', () => {
+    it('sets a student as "inactive" when all enrollments for that student are "inactive"', () => {
       const {enrollments} = studentData[0]
       enrollments[0].enrollment_state = 'inactive'
       enrollments.push({
@@ -317,64 +315,69 @@ QUnit.module('Gradebook > Students', suiteHooks => {
         type: 'StudentEnrollment',
       })
       gradebook.gotChunkOfStudents(studentData)
-      strictEqual(getStudent('1101').isInactive, true)
+      expect(getStudent('1101').isInactive).toBe(true)
     })
 
-    test('sets a student as "not inactive" when not all enrollments for that student are "inactive"', () => {
+    it('sets a student as "not inactive" when not all enrollments for that student are "inactive"', () => {
       studentData[0].enrollments.push({
         enrollment_state: 'inactive',
         grades: {html_url: 'http://example.url/'},
         type: 'StudentEnrollment',
       })
       gradebook.gotChunkOfStudents(studentData)
-      strictEqual(getStudent('1101').isInactive, false)
+      expect(getStudent('1101').isInactive).toBe(false)
     })
 
-    test('sets the css class on the row for each student', () => {
+    it('sets the css class on the row for each student', () => {
       gradebook.gotChunkOfStudents(studentData)
       ;['1101', '1102', '1199'].forEach(studentId => {
-        equal(getStudentRow(studentId).cssClass, `student_${studentId}`)
+        expect(getStudentRow(studentId).cssClass).toBe(`student_${studentId}`)
       })
     })
 
-    test('builds rows', () => {
+    it('builds rows', () => {
       gradebook.searchFilteredStudentIds = [1101]
-      sinon.spy(gradebook, 'buildRows')
+      jest.spyOn(gradebook, 'buildRows')
       gradebook.gotChunkOfStudents(studentData)
-      strictEqual(gradebook.buildRows.callCount, 1)
+      expect(gradebook.buildRows).toHaveBeenCalledTimes(1)
     })
   })
 
-  QUnit.module('#isStudentGradeable()', hooks => {
-    hooks.beforeEach(() => {
+  describe('#isStudentGradeable()', () => {
+    beforeEach(() => {
       gradebook = createGradebook()
       gradebook.students = {1101: {id: '1101', isConcluded: false}}
     })
 
-    test('returns true when the student enrollment is active', () => {
-      strictEqual(gradebook.isStudentGradeable('1101'), true)
+    it('returns true when the student enrollment is active', () => {
+      expect(gradebook.isStudentGradeable('1101')).toBe(true)
     })
 
-    test('returns false when the student enrollment is concluded', () => {
+    it('returns false when the student enrollment is concluded', () => {
       gradebook.students[1101].isConcluded = true
-      strictEqual(gradebook.isStudentGradeable('1101'), false)
+      expect(gradebook.isStudentGradeable('1101')).toBe(false)
     })
 
-    test('returns false when the student is not loaded', () => {
+    it('returns false when the student is not loaded', () => {
       delete gradebook.students[1101]
-      strictEqual(gradebook.isStudentGradeable('1101'), false)
+      expect(gradebook.isStudentGradeable('1101')).toBe(false)
     })
   })
 
-  QUnit.module('#studentCanReceiveGradeOverride()', hooks => {
+  describe('#studentCanReceiveGradeOverride()', () => {
     let submissionData
 
-    hooks.beforeEach(() => {
+    beforeEach(() => {
       gradebook = createGradebook()
 
       const studentData = [
         {
-          enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}],
+          enrollments: [
+            {
+              type: 'StudentEnrollment',
+              grades: {html_url: 'http://example.url/'},
+            },
+          ],
           id: '1101',
           name: 'Adam Jones',
         },
@@ -392,7 +395,6 @@ QUnit.module('Gradebook > Students', suiteHooks => {
           name: 'Math Assignment',
           published: true,
         },
-
         2302: {
           assignment_group_id: '2201',
           id: '2302',
@@ -413,7 +415,6 @@ QUnit.module('Gradebook > Students', suiteHooks => {
               user_id: '1101',
               workflow_state: 'graded',
             },
-
             {
               assignment_id: '2302',
               assignment_visible: true,
@@ -424,52 +425,51 @@ QUnit.module('Gradebook > Students', suiteHooks => {
               workflow_state: 'graded',
             },
           ],
-
           user_id: '1101',
         },
       ]
     })
 
-    test('returns true when the student has been graded on one assignment', () => {
+    it('returns true when the student has been graded on one assignment', () => {
       gradebook.gotSubmissionsChunk(submissionData)
-      strictEqual(gradebook.studentCanReceiveGradeOverride('1101'), true)
+      expect(gradebook.studentCanReceiveGradeOverride('1101')).toBe(true)
     })
 
-    test('returns false when the student has not been graded on any assignments', () => {
+    it('returns false when the student has not been graded on any assignments', () => {
       submissionData[0].submissions[0].workflow_state = 'submitted'
       submissionData[0].submissions[1].workflow_state = 'unsubmitted'
       gradebook.gotSubmissionsChunk(submissionData)
-      strictEqual(gradebook.studentCanReceiveGradeOverride('1101'), false)
+      expect(gradebook.studentCanReceiveGradeOverride('1101')).toBe(false)
     })
 
-    test('considers a submission with a cleared grade to be not yet graded', () => {
+    it('considers a submission with a cleared grade to be not yet graded', () => {
       submissionData[0].submissions[0].score = null
       submissionData[0].submissions[1].score = null
       gradebook.gotSubmissionsChunk(submissionData)
-      strictEqual(gradebook.studentCanReceiveGradeOverride('1101'), false)
+      expect(gradebook.studentCanReceiveGradeOverride('1101')).toBe(false)
     })
 
-    test('considers an excused submission to be graded', () => {
+    it('considers an excused submission to be graded', () => {
       submissionData[0].submissions[0].excused = true
       submissionData[0].submissions[1].workflow_state = 'submitted'
       gradebook.gotSubmissionsChunk(submissionData)
-      strictEqual(gradebook.studentCanReceiveGradeOverride('1101'), true)
+      expect(gradebook.studentCanReceiveGradeOverride('1101')).toBe(true)
     })
 
-    test('returns false when the student is not assigned to any assignments', () => {
-      strictEqual(gradebook.studentCanReceiveGradeOverride('1101'), false)
+    it('returns false when the student is not assigned to any assignments', () => {
+      expect(gradebook.studentCanReceiveGradeOverride('1101')).toBe(false)
     })
 
-    test('returns false when the student enrollment is concluded', () => {
+    it('returns false when the student enrollment is concluded', () => {
       gradebook.gotSubmissionsChunk(submissionData)
       gradebook.students[1101].isConcluded = true
-      strictEqual(gradebook.studentCanReceiveGradeOverride('1101'), false)
+      expect(gradebook.studentCanReceiveGradeOverride('1101')).toBe(false)
     })
 
-    test('returns false when the student is not loaded', () => {
+    it('returns false when the student is not loaded', () => {
       gradebook.gotSubmissionsChunk(submissionData)
       delete gradebook.students[1101]
-      strictEqual(gradebook.studentCanReceiveGradeOverride('1101'), false)
+      expect(gradebook.studentCanReceiveGradeOverride('1101')).toBe(false)
     })
   })
 })
