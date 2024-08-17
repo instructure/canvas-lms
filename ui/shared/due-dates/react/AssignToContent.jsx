@@ -54,6 +54,7 @@ const AssignToContent = ({
   supportDueDates = true,
   isCheckpointed,
   postToSIS = false,
+  defaultGroupCategoryId = null,
 }) => {
   // stagedCards are the itemAssignToCards that will be saved when the assignment is saved
   const [stagedCards, setStagedCardsInner] = useState([])
@@ -99,15 +100,26 @@ const AssignToContent = ({
   )
 
   useEffect(() => {
-    document.getElementById('assignment_group_category_id')?.addEventListener(
-      'change',
-      () => setGroupCategoryId(getGroupCategoryId?.())
+    if(getGroupCategoryId === undefined) return;
+
+    const handleGroupChange = () => setGroupCategoryId(getGroupCategoryId?.())
+
+    const itemGroupCategoryId =  document.getElementById('assignment_group_category_id')
+    const hasGroupCategory = document.getElementById('has_group_category');
+    itemGroupCategoryId?.addEventListener(
+      'change', handleGroupChange
     )
-    document.getElementById('has_group_category')?.addEventListener(
+    hasGroupCategory?.addEventListener(
       'change',
-      () => setGroupCategoryId(getGroupCategoryId?.())
+      handleGroupChange
     )
+    return () => {
+      itemGroupCategoryId?.removeEventListener("change", handleGroupChange);
+      hasGroupCategory?.removeEventListener("change", handleGroupChange);
+    }
   }, [])
+
+  useEffect(() => setGroupCategoryId(defaultGroupCategoryId), [defaultGroupCategoryId])
 
   useEffect(() => {
     const updatedOverrides = overrides.map(override => {
@@ -488,14 +500,13 @@ const AssignToContent = ({
 
 AssignToContent.propTypes = {
   onSync: func.isRequired,
-  getAssignmentName: func.isRequired,
   assignmentId: string,
   type: string.isRequired,
-  getPointsPossible: func.isRequired,
   overrides: array.isRequired,
   defaultSectionId: oneOfType([number, string]),
   importantDates: bool,
   getGroupCategoryId: func,
+  defaultGroupCategoryId: string,
   onTrayOpen: func,
   onTrayClose: func,
   supportDueDates: bool,
