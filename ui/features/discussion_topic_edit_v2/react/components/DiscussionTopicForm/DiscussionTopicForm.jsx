@@ -1065,6 +1065,7 @@ function DiscussionTopicForm({
             )}
             {shouldShowGroupOptions && (
               <Checkbox
+                id="has_group_category"
                 data-testid="group-discussion-checkbox"
                 label={I18n.t('This is a Group Discussion')}
                 value="group-discussion"
@@ -1079,6 +1080,7 @@ function DiscussionTopicForm({
             {shouldShowGroupOptions && isGroupDiscussion && (
               <View display="block" padding="none none none large">
                 <SimpleSelect
+                id="discussion_group_category_id"
                   renderLabel={I18n.t('Group Set')}
                   defaultValue=""
                   value={groupCategoryId}
