@@ -198,7 +198,7 @@ fr-CA:
   UploadMediaTrackForm: 
     cancel: Annuler
     track_uploaded_successfully: "Informations téléversées, veuillez actualiser votre navigateur."
-    upload: Téléversement
+    upload: Téléverser
     uploading: "Téléversement en cours..."
   _2d4c0d31: …
   _5a374287: "..."
@@ -381,7 +381,7 @@ fr-CA:
   accepted_formats_svg_png_jpg_gif_f793e4bc: "Formats acceptés : SVG, PNG, JPG et GIF"
   accepted_user_role_type_course_course_2ce91589: "Accepté : %{user}, %{role_type}, cours, %{course}"
   accepting_40ba3b70: Accepter
-  access_canvas_training_videos_and_courses_ea43173a: "Accéder aux vidéos de formation et aux cours sur Canvas"
+  access_canvas_training_videos_and_courses_ea43173a: "Accéder aux vidéos et cours de formation Canvas"
   access_denied_f922a9ff: "Accès refusé"
   access_report_80d28095: "Accéder au rapport"
   access_reports_66128235: "Accéder aux rapports"
@@ -408,7 +408,7 @@ fr-CA:
       invalid_discovery_url: "Cette URL de découverte n’est pas valide."
     feedback_coach: "Demander à la communauté"
     feedback_coach_sub: "Demander de l'aide à un spécialiste de Canvas"
-    feedback_feature_request_sub: "Vous avez une suggestion d'amélioration de Canvas?"
+    feedback_feature_request_sub: "Vous avez une suggestion pour améliorer Canvas?"
     manually_created_courses: "Cours créés manuellement"
     root_account_cant_have_sis_id: "Les ID SIS ne peuvent pas être définis sur les comptes racines."
     sis_id_in_use: "L’ID SIS « %{sis_id} » est déjà utilisé."
@@ -5781,7 +5781,7 @@ fr-CA:
       done_go_back_to_list: "Terminé, revenir à la liste"
       links: 
         accessibility_warning: "Avertissement : pour une meilleure accessibilité aux événements du calendrier, veuillez utiliser le mode agenda."
-        calendar_agenda: "À faire"
+        calendar_agenda: Agenda
         calendar_month: Mois
         calendar_scheduler: Planificateur
         calendar_week: Semaine
@@ -8676,7 +8676,7 @@ fr-CA:
       corrupted: "Détails non disponibles"
       created: Créé
       deleted: Supprimé
-      published: "Date de publication"
+      published: Publié
       reset_from: "Réinitialisés à partir de"
       reset_to: "Réinitialisés vers"
       restored: Restauré
@@ -8735,7 +8735,7 @@ fr-CA:
   course_members_are_free_to_join_9b2603d4: "Adhésion libre pour les membres du cours"
   course_modules_795cb95e: "Modules du cours"
   course_name_45175338: "Nom du cours"
-  course_name_63b973d1: "Intitulé du cours"
+  course_name_63b973d1: "Nom du cours"
   course_name_cannot_be_added_to_the_courses_menu_un_fb0af421: "%{course_name} ne peut être ajouté au menu des cours que si le cours est actif."
   course_name_is_required_90919349: "Un nom de cours est requis"
   course_name_successfully_added_48116a50: "%{course_name} a été ajouté."
@@ -10679,7 +10679,7 @@ fr-CA:
     published_button: 
       buttons: 
         not_published: "Non publiés"
-        published: "Date de publication"
+        published: Publié
     reply_count_tooltip: 
       one: "1 réponse."
       other: "%{count} réponses."
@@ -12667,7 +12667,7 @@ fr-CA:
   file_size_limit_user_file_quota_applies_19b9b466: "Le quota de fichier d'utilisateur de %{file_size_limit} s'applique"
   file_status: 
     hidden_status: "Masqué. Disponible via un lien"
-    published_status: "Date de publication"
+    published_status: Publié
     restricted_status: "Disponible du %{from_date} au %{until_date}"
     unpublished_status: "Non publié"
   file_storage_32477f6: "Stockage de fichier"
@@ -14524,7 +14524,7 @@ fr-CA:
     message_will_be_sent_to_all_the_teachers_tas_in_the_course: "Le message va être envoyé à tous les enseignants/assistants du cours."
     please_select_one: "Veuillez sélectionner une option..."
     report_problem: "Signaler un problème"
-    report_problem_sub: "Indiquez-nous tout comportement anormal de Canvas"
+    report_problem_sub: "Signalez-nous tout mauvais fonctionnement de Canvas"
     search_the_canvas_guides: "Rechercher dans les manuels Canvas"
     see_if_your_issue_is_addressed_in_the_canvas_guides: "Vérifiez si votre question est traitée dans les *manuels Canvas*."
     send_message: "Envoyer le message"
@@ -14533,7 +14533,7 @@ fr-CA:
     subject: Sujet
     submit_this_support_request: "Soumettre le billet"
     training_services_portal: "Portail des services de formation"
-    training_services_portal_sub: "Accéder aux vidéos de formation et aux cours sur Canvas"
+    training_services_portal_sub: "Accéder aux vidéos et cours de formation Canvas"
     which_course_is_this_question_about: "À quel cours cette question se rapporte-t-elle?"
     your_email_address: "Votre adresse courriel"
   help_ec7bc78f: Aide
@@ -15472,7 +15472,7 @@ fr-CA:
       Entrer et distribuer les notes pour les étudiants. Afficher les classements comme
                 points, pourcentages, complet ou incomplet, réussite ou échec, échelle GPA,
                 et classement en lettre. Grouper les tâches pour la pondération des notes.
-  input_event_location_39b0fbf3: "Saisir l’emplacement de l’événement…"
+  input_event_location_39b0fbf3: "Saisir le lieu de l’événement…"
   input_event_title_1d4c8b10: "Saisir le titre de l’événement"
   input_event_title_b2445e30: "Saisir le titre de l’événement…"
   input_is_not_a_valid_number_5c1b572e: "%{INPUT} n’est pas un chiffre valide."
@@ -15487,7 +15487,7 @@ fr-CA:
   insert_row_below_25187f89: "Insérer une ligne ci-dessous"
   insert_row_below_name_a5b3bd41: "Insérer une ligne sous %{name}"
   insert_row_in_edit_mode_5976f269: "Insérer une ligne en mode de modification"
-  insert_subject_9f0d8e49: "Insérer le sujet"
+  insert_subject_9f0d8e49: "Insérer l’objet"
   insights_b514ad8d: Perspectives
   instaccess_tokens_b13a8390: "InstAccess jetons"
   install_a_new_app_bfae9444: "Installer une nouvelle application"
@@ -16794,7 +16794,7 @@ fr-CA:
   mailbox_selection_92d9cbf: "Sélection de la boîte aux lettres"
   main_navigation_3f080c80: "Navigation principale"
   main_text_color_7d65ab1b: "Couleur du texte principal"
-  maintenance_windows_days_weekday_of_the_month_from_e0113bb1: "Périodes d’entretien : %{days} %{weekday} du mois à partir de %{time_range} (%{utc_time_range} UTC)"
+  maintenance_windows_days_weekday_of_the_month_from_e0113bb1: "Périodes de maintenance : %{days} %{weekday} du mois à partir de %{time_range} (%{utc_time_range} UTC)"
   make_key_developername_invisible_212ecf72: "Rendre la clé %{developerName} invisible"
   make_key_developername_visible_97c404bf: "Rendre la clé %{developerName} visible"
   make_key_invisible_e66af89: "Rendre la clé invisible"
@@ -18993,7 +18993,7 @@ fr-CA:
   mobile_app_javascript_file_faea55d5: "Fichier JavaScript de l'application mobile"
   mobile_global_nav_logo_a189f7bb: "Logo de navigation mondiale mobile"
   mobile_homescreen_icon_f85d6b63: "Icône de l'écran d'accueil mobile"
-  mobile_number_5fc2967d: "Numéro de téléphone mobile"
+  mobile_number_5fc2967d: "Numéro de cellulaire"
   mobile_offline_mode_7eaff590: "Mode mobile hors ligne"
   modal_dialog_add_people_bc1c6e14: "Dialogue modal : Ajouter des personnes"
   modal_dialog_add_to_course_aec33759: "Dialogue modal : Ajouter au cours"
@@ -19512,7 +19512,7 @@ fr-CA:
   new_group_category_66be9cbd: "Nouvelle catégorie de groupe"
   new_group_set_7241a581: "Nouvel ensemble de groupes"
   new_instui_navbar_72a69783: "Nouvelle barre de navigation InstUI"
-  new_mention_ad04b872: "Nouvelle Mention"
+  new_mention_ad04b872: "Nouvelle mention"
   new_mention_in_a_discussion_efceb170: "Nouvelle mention dans une discussion"
   new_mention_in_a_discussion_post_235706f7: "Nouvelle mention dans un message de discussion."
   new_module_4e9287e4: "Nouveau module"
@@ -19623,7 +19623,7 @@ fr-CA:
   no_allowed_domains_b6633d12: "Aucun domaine autorisé"
   no_analytics_data_available_aa32c101: "Aucune donnée analytique disponible."
   no_announcements_280df147: "Aucune annonce"
-  no_announcements_to_display_fbf9ed1e: "Aucunes annonces à afficher"
+  no_announcements_to_display_fbf9ed1e: "Aucune annonce à afficher"
   no_artifacts_with_that_name_found_b8679f53: "Aucun artefact à ce nom trouvé"
   no_assignment_group_assigned_8f1cdb9b: "Aucun groupe de tâches attribué"
   no_assignment_name_adbb215b: "Pas de nom de tâche"
@@ -21005,7 +21005,7 @@ fr-CA:
   people_page_upgrade_4adc3c37: "Mise à jour de la page des personnes"
   people_totalrecipientcount_5ec1456a: "Les gens : %{totalRecipientCount}"
   people_tutorial_tray_a87a6c48: "Tutoriel volant des gens"
-  people_will_see_this_name_in_discussions_messages__fca9ebb2: "Ce nom sera visible publiquement dans les discussions, les messages et les commentaires."
+  people_will_see_this_name_in_discussions_messages__fca9ebb2: "Ce nom sera visible dans les discussions, les messages et les commentaires."
   per_section_course_paces_4ce20ab7: "Rythme de cours par section"
   per_student_course_paces_159026d2: "Rythmes de cours par étudiant"
   percent_448ea947: "pour cent"
@@ -21999,9 +21999,9 @@ fr-CA:
       hints: 
         expires_at: "laisser vide pour aucune date d’expiration"
         language: "Les paramètres de navigateurs ou de comptes seront remplacés."
-        name: "Ce nom sera utilisé par les enseignants pour la notation."
-        short_name: "Ce nom sera visible publiquement dans les discussions, les messages et les commentaires."
-        sortable_name: "Ce nom apparaît dans des listes de tri."
+        name: "Ce nom sera utilisé pour la notation."
+        short_name: "Ce nom sera visible dans les discussions, les messages et les commentaires."
+        sortable_name: "Ce nom s’affiche dans des listes de tri."
       labels: 
         change_password: "Modifier le mot de passe"
         confirm_password: "Confirmer le mot de passe"
@@ -22014,7 +22014,7 @@ fr-CA:
         name: "Nom complet"
         new_password: "Nouveau mot de passe"
         old_password: "Ancien mot de passe"
-        other_services: "Cliquez ci-dessous sur un service pour vous enregistrer"
+        other_services: "Cliquez sur n’importe quel service ci-dessous pour vous inscrire"
         password: "Mot de passe"
         password_for: "Mot de passe pour"
         permanent_expires_at: Expire
@@ -22052,7 +22052,7 @@ fr-CA:
         view_your_profile: "afficher votre profil"
         yo: Yo
       loading_token_details: "Chargement des informations de jeton..."
-      no_approved_integrations: "Les applications tierces peuvent demander l’autorisation d’accéder au site Canvas de votre part. Au fur et à mesure que vous autorisez les applications, vous les verrez s’inscrire dans cette liste."
+      no_approved_integrations: "Les applications tierces peuvent demander l’autorisation d’accéder au site Canvas de votre partDes applications tierces peuvent requérir votre permission pour accéder au site Canvas. À mesure que vous autorisez des applications, celles-ci s’afficheront dans cette liste."
       no_registered_services: "Aucun service enregistré"
       none: Aucun
       profile_pictures: "Sélectionnez l’image à utiliser comme votre image de profil, ou téléversez une nouvelle image :"
@@ -22309,7 +22309,7 @@ fr-CA:
   publish_btn_module: 
     buttons: 
       publish: Publier
-      published: "Date de publication"
+      published: Publié
       publishing: "Publication en cours..."
       unpublish: "Annuler la publication"
       unpublishing: "Annulation de la publication..."
@@ -22324,7 +22324,7 @@ fr-CA:
   publish_upon_association_53cb0450: "Publier lors de l’association"
   publishable: 
     cant_unpublish: "Impossible d’annuler la publication"
-  published_4bb5209e: "Date de publication"
+  published_4bb5209e: Publié
   published_c944a23d: publié
   published_click_to_modify_233c0d4: "Publié - Cliquer pour modifier"
   published_click_to_unpublish_db016671: "Publié  Cliquer pour enlever la publication."
@@ -25339,7 +25339,7 @@ fr-CA:
   send_a_message_to_student_b2e72576: "Envoyer un message à %{student}"
   send_a_message_to_the_teacher_1ae115b6: "Envoyer un message à l’enseignant"
   send_a_message_to_this_student_ec46b8dd: "Envoyer un message à cet étudiant"
-  send_an_individual_message_to_each_recipient_e9ddaeb8: "Envoyer un message individuel à chacun des destinataires"
+  send_an_individual_message_to_each_recipient_e9ddaeb8: "Envoyer un message à chacun des destinataires"
   send_assignment_name_to_another_user_e2ca494d: "Envoyer la tâche %{name} à un autre utilisateur"
   send_authorization_url_in_lti2_registration_287fcb33: "Envoyez l’URL d’autorisation à l'inscription LTI2"
   send_automatic_replies_to_incoming_mail_c18da8eb: "Envoyer des réponses automatiques au courrier entrant."
@@ -25782,8 +25782,8 @@ fr-CA:
       labels: 
         course_code: "Nom abrégé"
         license: "Licence de contenu"
-        name: "Intitulé du cours"
-      new_course_name_placeholder: "Intitulé du cours"
+        name: "Nom du cours"
+      new_course_name_placeholder: "Nom du cours"
       sample_course_code: Cours-101
       start_a_new_course: "Commencer un nouveau cours"
     new_nav_header: 
@@ -26749,7 +26749,7 @@ fr-CA:
   start_over_f7552aa9: Recommencer
   start_participating_f0c75256: "Commencer à participer"
   start_recording_9a65141a: "Démarrer l'enregistrement"
-  start_time_2c3d11b5: "Heure de démarrage"
+  start_time_2c3d11b5: "Heure de début"
   start_time_8c0fbe8b: "Heure de début"
   start_time_cannot_be_after_end_time_7e734a43: "L’heure de début ne peut pas être postérieure à l’heure de fin"
   start_time_cannot_be_in_the_future_e91be4a9: "start_time ne peut pas être dans le futur"
@@ -28566,7 +28566,7 @@ fr-CA:
   this_module_is_visible_to_everyone_afc6dfc4: "Ce module est visible par tout le monde."
   this_module_will_be_visible_to_everyone_adf05126: "Ce module sera visible par tout le monde."
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Cela est très probablement dû au fait que vous avez importé le contenu du cours sans ses fichiers associés."
-  this_name_appears_in_sorted_lists_dccbd84b: "Ce nom apparaît dans des listes de tri."
+  this_name_appears_in_sorted_lists_dccbd84b: "Ce nom s’affiche dans des listes de tri."
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "Ce nom sera utilisé par les enseignants pour la notation."
   this_number_must_be_between_1_and_10_d8400fc6: "Ce nombre doit être compris entre 1 et 10"
   this_option_controls_the_number_of_attempts_a_sing_f6340675: "Cette option permet de contrôler le nombre de tentatives consécutives de connexion d’un utilisateur unique qui n’aboutissent pas avant que la connexion de cet utilisateur ne soit suspendue. Les utilisateurs peuvent être libérés de la suspension par les administrateurs institutionnels. Le nombre de tentatives ne peut être supérieur à 20."
@@ -28615,7 +28615,7 @@ fr-CA:
   this_process_could_take_a_few_minutes_click_the_st_fc9bb32a: "Ce processus peut prendre quelques minutes. Cliquez sur le bouton Arrêt pour interrompre le traitement. Les éléments qui ont déjà été traités ne retrouveront pas leur état précédent."
   this_process_could_take_a_few_minutes_hitting_canc_dd7dc00c: "Ce processus peut prendre quelques minutes. Le fait d’appuyer sur le bouton « Annuler » arrêtera le processus, mais les éléments qui ont déjà été traités ne seront pas rétablis dans leur état antérieur."
   this_process_could_take_a_few_minutes_you_may_clos_c763aad6: "Ce processus peut prendre quelques minutes. Vous pouvez fermer le modal ou quitter la page pendant ce processus."
-  this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: "Ce pronom apparaîtra après votre nom lorsqu’il sera activé"
+  this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: "Ce pronom figurera après votre nom une fois qu’il aura été activé"
   this_question_group_is_set_to_pick_more_questions__2e3552c4: "Ce groupe de questions est réglé pour sélectionner plus de questions qu'il en existe."
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: "Cette question affichera une case à cocher à côté de chaque réponse."
   this_quiz_has_been_excused_d89d2b74: "Ce questionnaire n'est plus obligatoire"
@@ -30169,7 +30169,7 @@ fr-CA:
   updating_discussion_failed_aadb2d35: "La mise à jour de discussion a échouée"
   updating_publication_date_62cc1622: "Mise à jour de la date de publication"
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "La mise à jour de l'URL du catalogue rendra votre ancienne URL inaccessible aux utilisateurs dès maintenant! Si un processeur de paiement existant est configuré, les changements nécessiteront l'aide d'un ingénieur de catalogue."
-  upload_8b403d05: Téléversement
+  upload_8b403d05: Téléverser
   upload_a_file_228b8cf9: "Téléverser un fichier"
   upload_a_list_of_forbidden_words_terms_in_addition_e9ac69d3: "Téléverser une liste de mots/termes interdits en plus de la liste par défaut. Le fichier doit être un fichier texte (.txt) avec un seul mot ou terme par ligne."
   upload_a_picture_9f5f6e3c: "Fournir une image"
@@ -31133,9 +31133,9 @@ fr-CA:
   welcome_name_a16afa7f: "Bienvenue, %{name}!"
   welcome_to_the_canvas_theme_editor_73091d1: "Bienvenue dans l'éditeur de thème de Canvas"
   welcome_to_the_cold_dark_void_of_name_65fc9839: "Bienvenue dans le vide froid et sombre de %{name}."
-  welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Bienvenue à vos cours! Pour personnaliser la liste des cours, cliquez sur le lien « Tous les cours » (All Courses) et marquez d’un astérisque les cours à afficher."
+  welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Bienvenue à vos cours! Pour personnaliser la liste des cours, cliquez sur le lien « Tous les cours » puis et marquez d’un astérisque les cours à afficher."
   welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: "Bienvenue à vos cours! Pour personnaliser la liste des cours, cliquez sur le lien « Tous les cours » (All Courses) et marquez d’un astérisque les cours à afficher."
-  welcome_to_your_subjects_to_customize_the_list_of__a735c17f: "Bienvenue à vos sujets! Pour personnaliser la liste des sujets, cliquez sur le lien « Tous les sujets » (All Subjects) et marquez d’un astérisque les sujets à afficher."
+  welcome_to_your_subjects_to_customize_the_list_of__a735c17f: "Bienvenue à vos sujets! Pour personnaliser la liste des sujets, cliquez sur le lien « Tous les sujets » puis et marquez d’un astérisque les sujets à afficher."
   welcome_to_your_subjects_to_customize_the_list_of__f6574116: "Bienvenue à vos Objets! Pour personnaliser la liste des Objets, cliquez sur le lien « Tous les Objets » (All Subjects) et marquez d’un astérisque les Objets à afficher."
   welcome_your_students_e1d96088: "Accueillez vos étudiants"
   well_below_mastery_37664bdc: "Bien inférieur au niveau de maîtrise"
@@ -31390,7 +31390,7 @@ fr-CA:
         front_page: "%{frontPageText}"
       menu: 
         use_front_page: "Utiliser comme %{frontPageText}"
-      published_indicator: "Date de publication"
+      published_indicator: Publié
       toolbar_menu: 
         settings: Paramètres
       unpublished_indicator: "Non publiés"
