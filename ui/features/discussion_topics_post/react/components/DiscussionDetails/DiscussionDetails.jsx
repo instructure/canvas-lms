@@ -32,6 +32,12 @@ import {DiscussionAvailabilityContainer} from '../DiscussionAvailabilityContaine
 const I18n = useI18nScope('discussion_posts')
 
 export function DiscussionDetails({...props}) {
+  const showAssignTo =
+    ENV.FEATURES?.selective_release_ui_api &&
+    !props.discussionTopic.isAnnouncement &&
+    props.discussionTopic.permissions.manageAssignTo &&
+    props.discussionTopic.contextType === 'Course' &&
+    props.discussionTopic.assignment
   const pointsPossible = props.discussionTopic?.assignment?.pointsPossible || 0
   const formattedPoints = pointsPossible
     ? numberFormat._format(pointsPossible, {
@@ -39,7 +45,6 @@ export function DiscussionDetails({...props}) {
         strip_insignificant_zeros: true,
       })
     : 0
-
   return (
     <Responsive
       match="media"
@@ -74,7 +79,7 @@ export function DiscussionDetails({...props}) {
       }}
       render={responsiveProps => (
         <>
-          {props.discussionTopic.assignment ? (
+          {props.discussionTopic.assignment && !showAssignTo ? (
             <Flex data-testid="graded-discussion-info">
               <Flex.Item padding="xx-small" shouldGrow={true} shouldShrink={true} align="start">
                 <AssignmentAvailabilityContainer

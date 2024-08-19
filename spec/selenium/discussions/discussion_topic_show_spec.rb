@@ -254,7 +254,7 @@ describe "Discussion Topic Show" do
       it "lets students see the checkpoints tray" do
         user_session(@student)
         get "/courses/#{@course.id}/discussion_topics/#{@checkpointed_discussion.id}"
-
+        wait_for_ajaximations
         fj("button:contains('View Due Dates')").click
         wait_for_ajaximations
         expect(fj("span:contains('Due Dates')")).to be_present
@@ -303,22 +303,6 @@ describe "Discussion Topic Show" do
         reply_to_topic_contents = f("span[data-testid='reply_to_topic_section']").text
         expect(reply_to_topic_contents).to include("Completed #{format_date_for_view(@checkpointed_discussion.reload.discussion_entries.last.created_at)}")
       end
-
-      it "lets teachers see checkpoints tray" do
-        user_session(@teacher)
-        get "/courses/#{@course.id}/discussion_topics/#{@checkpointed_discussion.id}"
-
-        fj("button:contains('View Due Dates')").click
-        wait_for_ajaximations
-        expect(fj("span:contains('Due Dates')")).to be_present
-        reply_to_topic_contents = f("span[data-testid='reply_to_topic_section']").text
-        expect(reply_to_topic_contents).to include("Reply to Topic")
-        expect(reply_to_topic_contents).to include(format_date_for_view(@due_at))
-
-        reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
-        expect(reply_to_entry_contents).to include("Additional Replies Required: #{@replies_required}")
-        expect(reply_to_entry_contents).to include(format_date_for_view(@due_at))
-      end
     end
 
     context "Assign To option" do
@@ -335,9 +319,9 @@ describe "Discussion Topic Show" do
         )
       end
 
-      it "renders Assign To option" do
+      it "renders Assign To option but not due dates button" do
         get "/courses/#{@course.id}/discussion_topics/#{@discussion.id}"
-
+        expect(f("body")).not_to contain_jqcss("button:contains('Due Dates')")
         Discussion.click_assign_to_button
         expect(icon_type_exists?("Discussion")).to be true
         expect(tray_header.text).to eq("Discussion 1")
