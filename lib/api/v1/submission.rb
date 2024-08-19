@@ -412,9 +412,24 @@ module Api::V1::Submission
   )
 
     json = submission_json(submission, assignment, current_user, session, context, includes, params, avatars)
-    json["sub_assignment_tag"] = assignment.sub_assignment_tag
-    json.delete("id")
-    json
+
+    # we want to make a clear distinction between a submission and a sub assignment submission, we will do this by
+    # keeping the sub assignment submission json as minimal as possible, only keeping exactly what clients need
+    sub_assignment_json = json.slice(
+      "seconds_late",
+      "custom_grade_status_id",
+      "late_policy_status",
+      "late",
+      "missing",
+      "excused",
+      "entered_grade",
+      "entered_score",
+      "grade",
+      "score",
+      "user_id"
+    )
+    sub_assignment_json["sub_assignment_tag"] = assignment.sub_assignment_tag
+    sub_assignment_json
   end
 
   # Create an attachment with a ZIP archive of an assignment's submissions.
