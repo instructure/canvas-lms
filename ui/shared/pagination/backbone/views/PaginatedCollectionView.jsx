@@ -57,7 +57,7 @@ PaginatedCollectionView.prototype.defaults = {
   buffer: 500,
   // Container with observed scroll position, can be a jQuery element, raw
   // dom node, or selector
-  scrollContainer: window,
+  scrollContainer: document.getElementById('drawer-layout-content') || window,
 }
 
 // Adds a loading indicator element
