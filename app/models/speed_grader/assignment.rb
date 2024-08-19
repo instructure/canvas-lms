@@ -124,8 +124,12 @@ module SpeedGrader
         ) { |rep, others| others.each { |s| res[:context][:rep_for_student][s.id] = rep.id } }
 
       unless assignment.anonymize_students?
-        # Ensure that any test students are sorted last
-        students = students.sort_by { |r| (r.preferences[:fake_student] == true) ? 1 : 0 }
+        num_students = students.length
+        students = students.sort_by.with_index do |student, idx|
+          # Ensure that any test students are sorted last. sort_by is not stable,
+          # so return idx for real students to preserve their original order.
+          (student.preferences[:fake_student] == true) ? num_students + idx : idx
+        end
       end
 
       enrollments =
