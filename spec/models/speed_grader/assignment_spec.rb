@@ -275,6 +275,23 @@ describe SpeedGrader::Assignment do
       expect(json[:context][:students].last[:id]).to eq(test_student.id.to_s)
     end
 
+    it "keeps the original order of real students when placing student view students last" do
+      x_user = User.create!(name: "XÆA-12")
+      @course.enroll_student(x_user, enrollment_state: "active", section: @section1)
+      a_user = User.create!(name: "Aardvark")
+      @course.enroll_student(a_user, enrollment_state: "active", section: @section1)
+      test_student = @course.student_view_student
+      json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+      students = json.dig(:context, :students)
+
+      aggregate_failures do
+        expect(students.first["name"]).to eq("Aardvark")
+        expect(students.second["name"]).to eq("User")
+        expect(students.third["name"]).to eq("XÆA-12")
+        expect(students.fourth["name"]).to eq(test_student.name)
+      end
+    end
+
     it "includes all students when is only_visible_to_overrides false" do
       @assignment.only_visible_to_overrides = false
       @assignment.save!
