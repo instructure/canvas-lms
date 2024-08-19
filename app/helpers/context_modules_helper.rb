@@ -112,7 +112,7 @@ module ContextModulesHelper
   end
 
   def preload_modules_content(modules)
-    ActiveRecord::Associations.preload(modules, content_tags: :content)
+    ActiveRecord::Associations.preload(modules, content_tags: { content: [:context, :external_tool_tag] })
     preload_can_unpublish(@context, modules) if @can_view
   end
 
