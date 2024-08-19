@@ -49,7 +49,6 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
         'click .header-bar-right .menu_tool_link': 'openExternalTool',
         'click .pages-mobile-header a[data-sort-mobile-field]': 'sortBySelect',
         'click #toggle_block_editor': 'toggleBlockEditor',
-        'click .fetch_next': 'fetchNext',
       },
 
       els: {
@@ -113,7 +112,6 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     })
     this.collection.on('fetched:last', () => {
       this.fetchedLast = true
-      $('.fetch_next')?.hide()
       if (this.focusAfterRenderSelector) {
         // We do a setTimeout here just to force it to the next tick.
         return setTimeout(() => {
@@ -191,12 +189,6 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
 
     if (this.lastFocusField) {
       $(`[data-sort-field='${this.lastFocusField}']`).focus()
-    }
-
-    if (this.collection.canFetch('next')) {
-      $('.fetch_next')?.show()
-    } else {
-      $('.fetch_next')?.hide()
     }
   }
 
@@ -386,12 +378,6 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
 
   collectionHasTodoDate() {
     return !!this.collection.find(m => m.has('todo_date'))
-  }
-
-  fetchNext() {
-    this.collection.fetch({
-      page: 'next',
-    })
   }
 
   toJSON() {
