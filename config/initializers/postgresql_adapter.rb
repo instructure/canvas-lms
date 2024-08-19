@@ -114,10 +114,6 @@ module PostgreSQLAdapterExtensions
     end
   end
 
-  def set_standard_conforming_strings
-    # not needed in PG 9.1+
-  end
-
   # we always use the default sequence name, so override it to not actually query the db
   # (also, it doesn't matter if you're using PG 8.2+)
   def default_sequence_name(table, pk)
