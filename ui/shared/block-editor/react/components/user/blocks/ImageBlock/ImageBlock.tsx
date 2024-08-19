@@ -16,20 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback} from 'react'
+import React, {useCallback, useEffect} from 'react'
 import {useEditor, useNode, type Node} from '@craftjs/core'
 
 import {Img} from '@instructure/ui-img'
 
 import {ImageBlockToolbar} from './ImageBlockToolbar'
 import {useClassNames, getAspectRatio} from '../../../../utils'
-import {
-  EMPTY_IMAGE_WIDTH,
-  EMPTY_IMAGE_HEIGHT,
-  type ImageBlockProps,
-  type ImageVariant,
-  type ImageConstraint,
-} from './types'
+import {type ImageBlockProps, type ImageVariant, type ImageConstraint} from './types'
 import {BlockResizer} from '../../../editor/BlockResizer'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -59,7 +53,7 @@ const ImageBlock = ({src, width, height, constraint, maintainAspectRatio}: Image
   }
 
   const setAspectRatio = useCallback(
-    (img: HTMLImageElement) => {
+    (img?: HTMLImageElement) => {
       if (img) {
         const aspectRatio = getAspectRatio(img.naturalWidth, img.naturalHeight)
         if (!Number.isNaN(aspectRatio)) {
@@ -75,6 +69,15 @@ const ImageBlock = ({src, width, height, constraint, maintainAspectRatio}: Image
     },
     [node.data.props.height, node.data.props.width, setProp]
   )
+
+  useEffect(() => {
+    if (maintainAspectRatio) {
+      const img = node.dom?.querySelector('img')
+      if (img) {
+        setAspectRatio(img)
+      }
+    }
+  }, [maintainAspectRatio, node.dom, setAspectRatio])
 
   const handleLoad = useCallback(
     (event: React.SyntheticEvent<HTMLImageElement>) => {
@@ -107,11 +110,9 @@ ImageBlock.craft = {
   displayName: I18n.t('Image'),
   defaultProps: {
     src: '',
-    width: EMPTY_IMAGE_WIDTH,
-    height: EMPTY_IMAGE_HEIGHT,
     variant: 'default' as ImageVariant,
     constraint: 'cover' as ImageConstraint,
-    maintainAspectRatio: true,
+    maintainAspectRatio: false,
   },
   related: {
     toolbar: ImageBlockToolbar,

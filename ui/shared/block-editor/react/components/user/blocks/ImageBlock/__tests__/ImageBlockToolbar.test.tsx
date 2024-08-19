@@ -169,7 +169,7 @@ describe('ImageBlockToolbar', () => {
     expect(containMenuItem).toBeInTheDocument()
     expect(aspectRatioMenuItem).toBeInTheDocument()
 
-    const li = aspectRatioMenuItem.closest('li') as HTMLLIElement
+    const li = coverMenuItem.closest('li') as HTMLLIElement
     expect(li.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
   })
 
@@ -227,6 +227,7 @@ describe('ImageBlockToolbar', () => {
   it('sets the width and height props', async () => {
     props.width = 117
     props.height = 217
+    props.maintainAspectRatio = true
     const {getByText} = render(<ImageBlockToolbar />)
 
     const btn = getByText('Image Size').closest('button') as HTMLButtonElement

@@ -117,7 +117,7 @@ const IconSizePopup = ({width, height, maintainAspectRatio, onChange}: ImageSize
         >
           <RangeInput
             label={I18n.t('Width')}
-            value={widthValue}
+            value={Math.round(widthValue)}
             width="15rem"
             min={1}
             max={window.innerWidth}
@@ -128,7 +128,7 @@ const IconSizePopup = ({width, height, maintainAspectRatio, onChange}: ImageSize
           />
           <RangeInput
             label={I18n.t('Height')}
-            value={heightValue}
+            value={Math.round(heightValue)}
             width="15rem"
             min={1}
             max={window.innerWidth / aspectRatio}
