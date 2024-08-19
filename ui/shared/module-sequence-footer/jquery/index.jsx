@@ -15,6 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {Flex} from '@instructure/ui-flex'
+import {Button} from '@instructure/ui-buttons'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {IconMiniArrowEndLine, IconMiniArrowStartLine} from '@instructure/ui-icons'
 import $ from 'jquery'
 import {find} from 'lodash'
 import template from '../jst/ModuleSequenceFooter.handlebars'
@@ -84,6 +90,53 @@ $.fn.moduleSequenceFooter = function (options = {}) {
       if (options && options.animation !== undefined) {
         this.msfAnimation(options.animation)
       }
+
+      const previousButton = document.querySelector('.module-sequence-footer-button--previous')
+      if (previousButton instanceof HTMLElement) {
+        const label = `Previous Module Item${
+          this.msfInstance.previous.externalItem ? ` - ${I18n.t('opens in new window')}` : ''
+        }`
+        ReactDOM.render(
+          <Tooltip
+            aria-label={label}
+            as={Button}
+            href={this.msfInstance.previous.url}
+            renderTip={this.msfInstance.previous.tooltip}
+            placement="end"
+            offsetX={5}
+            disabled={Boolean(this.msfInstance.previous.modules_tab_disabled)}
+          >
+            <Flex alignItems="center">
+              <IconMiniArrowStartLine /> {I18n.t('Previous')}
+            </Flex>
+          </Tooltip>,
+          previousButton
+        )
+      }
+
+      const nextButton = document.querySelector('.module-sequence-footer-button--next')
+      if (nextButton instanceof HTMLElement) {
+        const label = `Next Module Item${
+          this.msfInstance.next.externalItem ? ` - ${I18n.t('opens in new window')}` : ''
+        }`
+        ReactDOM.render(
+          <Tooltip
+            aria-label={label}
+            as={Button}
+            href={this.msfInstance.next.url}
+            renderTip={this.msfInstance.next.tooltip}
+            placement="start"
+            offsetX={5}
+            disabled={Boolean(this.msfInstance.next.modules_tab_disabled)}
+          >
+            <Flex alignItems="center">
+              {I18n.t('Next')} <IconMiniArrowEndLine />
+            </Flex>
+          </Tooltip>,
+          nextButton
+        )
+      }
+
       this.show()
       $(window).triggerHandler('resize')
 
@@ -215,18 +268,22 @@ export default class ModuleSequenceFooter {
     this.previous.externalItem = this.item.prev.type === 'ExternalUrl' && this.item.prev.new_tab
 
     if (this.item.current.module_id === this.item.prev.module_id) {
-      this.previous.tooltip = `<i class='${htmlEscape(
-        this.iconClasses[this.item.prev.type]
-      )}'></i> ${htmlEscape(this.item.prev.title)}`
+      this.previous.tooltip = (
+        <>
+          <i className={this.iconClasses[this.item.prev.type]} /> {this.item.prev.title}
+        </>
+      )
       this.previous.tooltipText = I18n.t('prev_module_item_desc', 'Previous: *item*', {
         wrapper: this.item.prev.title,
       })
     } else {
       // module id is different
       const module = find(this.modules, m => m.id === this.item.prev.module_id)
-      this.previous.tooltip = `<strong style='float:left'>${htmlEscape(
-        I18n.t('prev_module', 'Previous Module:')
-      )}</strong> <br> ${htmlEscape(module.name)}`
+      this.previous.tooltip = (
+        <>
+          <strong>{I18n.t('prev_module', 'Previous Module:')}</strong> <br /> {module.name}
+        </>
+      )
       this.previous.tooltipText = I18n.t('prev_module_desc', 'Previous Module: *module*', {
         wrapper: module.name,
       })
@@ -272,16 +329,20 @@ export default class ModuleSequenceFooter {
     this.next.externalItem = this.item.next.type === 'ExternalUrl' && this.item.next.new_tab
 
     if (this.item.current.module_id === this.item.next.module_id) {
-      this.next.tooltip = `<i class='${htmlEscape(
-        this.iconClasses[this.item.next.type]
-      )}'></i> ${htmlEscape(this.item.next.title)}`
+      this.next.tooltip = (
+        <>
+          <i className={this.iconClasses[this.item.next.type]} /> {this.item.next.title}
+        </>
+      )
       this.next.tooltipText = I18n.t('Next: *item*', {wrapper: this.item.next.title})
     } else {
       // module id is different
       const module = find(this.modules, m => m.id === this.item.next.module_id)
-      this.next.tooltip = `<strong style='float:left'>${htmlEscape(
-        I18n.t('next_module', 'Next Module:')
-      )}</strong> <br> ${htmlEscape(module.name)}`
+      this.next.tooltip = (
+        <>
+          <strong>{I18n.t('next_module', 'Next Module:')}</strong> <br /> {module.name}
+        </>
+      )
       this.next.tooltipText = I18n.t('next_module_desc', 'Next Module: *module*', {
         wrapper: module.name,
       })
