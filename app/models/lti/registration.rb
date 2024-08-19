@@ -27,8 +27,15 @@ class Lti::Registration < ActiveRecord::Base
   belongs_to :account, inverse_of: :lti_registrations, optional: false
   belongs_to :created_by, class_name: "User", inverse_of: :created_lti_registrations, optional: true
   belongs_to :updated_by, class_name: "User", inverse_of: :updated_lti_registrations, optional: true
+
+  # If this tool has been installed via dynamic registration, it will have an ims_registration.
   has_one :ims_registration, class_name: "Lti::IMS::Registration", inverse_of: :lti_registration, foreign_key: :lti_registration_id
+
   has_one :developer_key, inverse_of: :lti_registration, foreign_key: :lti_registration_id
+
+  # If this tool has been installed via "paste JSON" or other manual install methods, it will have a manual_configuration.
+  has_one :manual_configuration, class_name: "Lti::ToolConfiguration", inverse_of: :lti_registration, foreign_key: :lti_registration_id
+
   has_many :lti_registration_account_bindings, class_name: "Lti::RegistrationAccountBinding", inverse_of: :registration
 
   after_update :update_developer_key
@@ -106,14 +113,14 @@ class Lti::Registration < ActiveRecord::Base
     account != self.account
   end
 
-  # TODO: this will eventually need to account for manual 1.3 and 1.1 registrations
+  # TODO: this will eventually need to account for 1.1 registrations
   def icon_url
-    ims_registration&.logo_uri
+    ims_registration&.logo_uri || manual_configuration&.settings&.dig("extensions", 0, "settings", "icon_url")
   end
 
-  # TODO: this will eventually need to account for manual 1.3 and 1.1 registrations
+  # TODO: this will eventually need to account for 1.1 registrations
   def configuration
-    ims_registration&.registration_configuration || {}
+    ims_registration&.registration_configuration || manual_configuration&.settings || {}
   end
 
   # TODO: this will eventually need to account for 1.1 registrations
@@ -129,6 +136,7 @@ class Lti::Registration < ActiveRecord::Base
     ims_registration&.undestroy
     developer_key&.update!(workflow_state: active_state)
     lti_registration_account_bindings.each(&:undestroy)
+    manual_configuration&.undestroy
     super
   end
 
@@ -142,6 +150,7 @@ class Lti::Registration < ActiveRecord::Base
     ims_registration&.destroy
     developer_key&.destroy
     lti_registration_account_bindings.each(&:destroy)
+    manual_configuration&.destroy
   end
 
   def update_developer_key
