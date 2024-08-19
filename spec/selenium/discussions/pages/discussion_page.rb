@@ -31,6 +31,10 @@ class Discussion
       "button[data-testid='manage-assign-to']"
     end
 
+    def assign_to_section_selector
+      "#manage-assign-to-container"
+    end
+
     def grade_checkbox_selector
       "input[type=checkbox][value='graded']"
     end
