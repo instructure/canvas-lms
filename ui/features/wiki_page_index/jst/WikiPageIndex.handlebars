@@ -140,15 +140,9 @@
         {{#unless fetched}}{{#t 'loading'}}Loading ...{{/t}}{{else}}{{#t 'loading_more'}}Loading more ...{{/t}}{{/unless}}
       </div>
     {{#if fetched}}
-      {{#if collection.length}}
-        <div style="text-align: center; padding: 10px;">
-          <button class="btn fetch_next" tabindex="0" aria-label="{{#t}}Load more{{/t}}">
-            {{#t}}Load more{{/t}}
-          </button>
-        </div>
-      {{else}}
+      {{#unless collection.length}}
         <div style="text-align: center">{{#t 'no_pages'}}No pages created yet.{{/t}}{{#if CAN.CREATE}} <a class="new_page" href="#">{{#t 'add_page'}}Add one!{{/t}}</a>{{/if}}</div>
-      {{/if}}
+      {{/unless}}
     {{/if}}
   </div>
 </div>
