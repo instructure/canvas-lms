@@ -21,13 +21,19 @@ import {useNode, type Node} from '@craftjs/core'
 import {getToolbarPos as getToolbarPosUtil} from '../../utils/renderNodeHelpers'
 import {getAspectRatio} from '../../utils/size'
 
-const offset = 5
+const CORNER_OFFSET = 5 // half the corder box width
 
 type Rect = {
   top: number
   left: number
   width: number
   height: number
+}
+
+type Corner = 'nw' | 'ne' | 'se' | 'sw'
+type CoordVal = {
+  left: number
+  top: number
 }
 
 export const getNewSz = (
@@ -267,45 +273,130 @@ const BlockResizer = ({mountPoint}: BlockResizeProps) => {
     }
   }, [handleDragEnd, handleDragStart, neRef, nwRef, seRef, swRef])
 
+  const getCoord = (corner: Corner): CoordVal => {
+    switch (corner) {
+      case 'nw':
+        return {left: currRect.left, top: currRect.top}
+      case 'ne':
+        return {
+          left: currRect.left + currRect.width,
+          top: currRect.top,
+        }
+      case 'se':
+        return {
+          left: currRect.left + currRect.width,
+          top: currRect.top + currRect.height,
+        }
+      case 'sw':
+        return {
+          left: currRect.left,
+          top: currRect.top + currRect.height,
+        }
+    }
+  }
+
+  const renderCorners = () => {
+    const nw = getCoord('nw')
+    const ne = getCoord('ne')
+    const se = getCoord('se')
+    const sw = getCoord('sw')
+
+    return (
+      <>
+        <div
+          ref={el => setnwRef(el)}
+          data-corner="nw"
+          className="block-resizer nw"
+          draggable="true"
+          style={{
+            left: `${nw.left - CORNER_OFFSET}px`,
+            top: `${nw.top - CORNER_OFFSET}px`,
+          }}
+        />
+        <div
+          ref={el => setneRef(el)}
+          data-corner="ne"
+          className="block-resizer ne"
+          draggable="true"
+          style={{
+            left: `${ne.left - CORNER_OFFSET}px`,
+            top: `${ne.top - CORNER_OFFSET}px`,
+          }}
+        />
+        <div
+          ref={el => setseRef(el)}
+          data-corner="se"
+          className="block-resizer se"
+          draggable="true"
+          style={{
+            left: `${se.left - CORNER_OFFSET}px`,
+            top: `${se.top - CORNER_OFFSET}px`,
+          }}
+        />
+        <div
+          ref={el => setswRef(el)}
+          data-corner="sw"
+          className="block-resizer sw"
+          draggable="true"
+          style={{
+            left: `${sw.left - CORNER_OFFSET}px`,
+            top: `${sw.top - CORNER_OFFSET}px`,
+          }}
+        />
+      </>
+    )
+  }
+
+  const renderEdges = () => {
+    const nw = getCoord('nw')
+    const ne = getCoord('ne')
+    const sw = getCoord('sw')
+    return (
+      <>
+        <div
+          className="block-resizer edge n"
+          style={{
+            top: `${nw.top}px`,
+            left: `${nw.left}px`,
+            width: `${currRect.width}px`,
+            height: '1px',
+          }}
+        />
+        <div
+          className="block-resizer edge e"
+          style={{
+            top: `${ne.top}px`,
+            left: `${ne.left}px`,
+            width: '1px',
+            height: `${currRect.height}px`,
+          }}
+        />
+        <div
+          className="block-resizer edge s"
+          style={{
+            top: `${sw.top}px`,
+            left: `${sw.left}px`,
+            width: `${currRect.width}px`,
+            height: '1px',
+          }}
+        />
+        <div
+          className="block-resizer edge w"
+          style={{
+            top: `${nw.top}px`,
+            left: `${nw.left}px`,
+            width: '1px',
+            height: `${currRect.height}px`,
+          }}
+        />
+      </>
+    )
+  }
+
   return (
     <>
-      <div
-        ref={el => setnwRef(el)}
-        data-corner="nw"
-        className="block-resizer nw"
-        draggable="true"
-        style={{left: `${currRect.left - offset}px`, top: `${currRect.top - offset}px`}}
-      />
-      <div
-        ref={el => setneRef(el)}
-        data-corner="ne"
-        className="block-resizer ne"
-        draggable="true"
-        style={{
-          left: `${currRect.left + currRect.width - offset}px`,
-          top: `${currRect.top - offset}px`,
-        }}
-      />
-      <div
-        ref={el => setseRef(el)}
-        data-corner="se"
-        className="block-resizer se"
-        draggable="true"
-        style={{
-          left: `${currRect.left + currRect.width - offset}px`,
-          top: `${currRect.top + currRect.height - offset}px`,
-        }}
-      />
-      <div
-        ref={el => setswRef(el)}
-        data-corner="sw"
-        className="block-resizer sw"
-        draggable="true"
-        style={{
-          left: `${currRect.left - offset}px`,
-          top: `${currRect.top + currRect.height - offset}px`,
-        }}
-      />
+      {renderEdges()}
+      {renderCorners()}
     </>
   )
 }

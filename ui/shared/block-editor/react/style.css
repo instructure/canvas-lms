@@ -127,7 +127,8 @@
     position: absolute;
     width: 10px;
     height: 10px;
-    background-color: dodgerblue;
+    border: 1px solid dodgerblue;
+    background-color: white;
   }
   &.nw {
     cursor: nw-resize;
@@ -140,6 +141,10 @@
   }
   &.se {
     cursor: se-resize;
+  }
+  &.edge {
+    position:absolute;
+    border: 1px solid dodgerblue;
   }
 }
 
