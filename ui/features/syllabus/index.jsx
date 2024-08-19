@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {map} from 'lodash'
 import SyllabusBehaviors from '@canvas/syllabus/backbone/behaviors/SyllabusBehaviors'
@@ -26,6 +29,10 @@ import SyllabusPlannerCollection from './backbone/collections/SyllabusPlannerCol
 import SyllabusView from './backbone/views/SyllabusView'
 import {attachImmersiveReaderButton} from './util/utils'
 import ready from '@instructure/ready'
+import {View} from '@instructure/ui-view'
+import {Spinner} from '@instructure/ui-spinner'
+
+const I18n = useI18nScope('syllabus')
 
 const immersive_reader_mount_point = () => document.getElementById('immersive_reader_mount_point')
 const immersive_reader_mobile_mount_point = () =>
@@ -126,7 +133,15 @@ ready(() => {
   }
 
   // Add the loading indicator now that the collections are fetching
-  $('#loading_indicator').replaceWith('<img src="/images/ajax-reload-animated.gif">')
+  const node = document.querySelector('#loading_indicator')
+  if (node instanceof HTMLElement) {
+    ReactDOM.render(
+      <View padding="x-small" textAlign="center" as="div" display="block">
+        <Spinner delay={300} size="x-small" renderTitle={() => I18n.t('Loading')} />
+      </View>,
+      node
+    )
+  }
 
   // Binding to the mini calendar must take place after sidebar initializes,
   // so this must be done on dom ready

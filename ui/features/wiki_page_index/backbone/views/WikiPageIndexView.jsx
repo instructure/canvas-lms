@@ -34,6 +34,8 @@ import DirectShareUserModal from '@canvas/direct-sharing/react/components/Direct
 import '@canvas/jquery/jquery.disableWhileLoading'
 import {ltiState} from '@canvas/lti/jquery/messages'
 import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+import {View} from '@instructure/ui-view'
+import {Spinner} from '@instructure/ui-spinner'
 
 const I18n = useI18nScope('pages')
 
@@ -133,6 +135,16 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
       return setTimeout(() => {
         $(this.focusAfterRenderSelector).focus()
       }, 1)
+    }
+
+    const node = document.querySelector('.paginatedLoadingIndicator')
+    if (node instanceof HTMLElement) {
+      ReactDOM.render(
+        <View padding="x-small" textAlign="center" as="div" display="block">
+          <Spinner delay={300} size="x-small" renderTitle={() => I18n.t('Loading')} />
+        </View>,
+        node
+      )
     }
   }
 
