@@ -43,6 +43,7 @@ import deparam from 'deparam'
 import htmlEscape from '@instructure/html-escape'
 import calendarEventFilter from '../CalendarEventFilter'
 import schedulerActions from '../react/scheduler/actions'
+import {subAssignmentOrOverride} from '@canvas/calendar/jquery/CommonEvent/SubAssignment'
 import 'fullcalendar'
 // import '../ext/patches-to-fullcalendar'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
@@ -497,6 +498,18 @@ export default class Calendar {
 
   _eventDrop(event, minuteDelta, allDay, revertFunc) {
     let endDate, startDate
+    if (subAssignmentOrOverride(event.eventType)) {
+      revertFunc()
+      showFlashAlert({
+        message: I18n.t(
+          'Discussion checkpoints are not draggable. You can update their due dates by editing the parent discussion topic.'
+        ),
+        err: null,
+        type: 'error',
+      })
+      return
+    }
+
     if (this.currentView === 'week' && allDay && event.eventType === 'assignment') {
       revertFunc()
       return

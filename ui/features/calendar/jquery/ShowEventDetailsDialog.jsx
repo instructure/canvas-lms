@@ -41,6 +41,7 @@ import '@canvas/jquery/jquery.instructure_misc_plugins'
 import Conference from '@canvas/calendar-conferences/react/Conference'
 import getConferenceType from '@canvas/calendar-conferences/getConferenceType'
 import replaceTags from '@canvas/util/replaceTags'
+import {subAssignmentOrOverride} from '@canvas/calendar/jquery/CommonEvent/SubAssignment'
 
 const I18n = useI18nScope('calendar')
 
@@ -61,6 +62,15 @@ export default class ShowEventDetailsDialog {
     new EditEventDetailsDialog(this.event).show()
   }
 
+  deleteChildrenEvents = (deletedEvent, context) => {
+    const eventsInContext = this.dataSource.cache.contexts[context].events
+    const eventsToBeDeleted = []
+    Object.values(eventsInContext).forEach(e => {
+      if (deletedEvent.id === e.assignment.parent_assignment_id) eventsToBeDeleted.push(e)
+    })
+    eventsToBeDeleted.forEach(e => $.publish('CommonEvent/eventDeleted', e))
+  }
+
   deleteEvent = (event, _opts = {}) => {
     $('.event-details').attr('aria-hidden', true)
     if (event == null) event = this.event
@@ -71,6 +81,8 @@ export default class ShowEventDetailsDialog {
     // We can't delete todo items or assignments via the synthetic calendar_event
     if (event.deleteObjectURL) {
       url = event.deleteObjectURL
+    } else if (subAssignmentOrOverride(event.eventType)) {
+      url = event.deleteURL
     } else if (event.assignment) {
       url = replaceTags(this.event.deleteURL, 'id', this.event.object.id)
     }
@@ -94,7 +106,13 @@ export default class ShowEventDetailsDialog {
       onDeleted: deletedEvents => {
         ReactDOM.unmountComponentAtNode(delModalContainer)
         if (!Array.isArray(deletedEvents) || deletedEvents.length === 1) {
-          publish('CommonEvent/eventDeleted', event)
+          const deletedEvent = Array.isArray(deletedEvents) ? deletedEvents[0] : deletedEvents
+          if (subAssignmentOrOverride(event.eventType)) {
+            // delete parent assignment then remove its children events from the calendar
+            this.deleteChildrenEvents(deletedEvent, event.contextCode())
+          } else {
+            publish('CommonEvent/eventDeleted', event)
+          }
         } else {
           publish('CommonEvent/eventsDeletedFromSeries', {deletedEvents})
         }
@@ -272,6 +290,8 @@ export default class ShowEventDetailsDialog {
     })
   }
 
+  editSubAssignment = () => (window.location.href = `${this.event.assignment.html_url}/edit`)
+
   show = jsEvent => {
     const params = $.extend(true, {}, this.event, {
       can_reserve: this.event.object && this.event.object.reserve_url,
@@ -407,7 +427,12 @@ export default class ShowEventDetailsDialog {
 
     this.popover.el.find('.view_event_link').click(preventDefault(this.openShowPage))
 
-    this.popover.el.find('.edit_event_link').click(preventDefault(this.showEditDialog))
+    const editButton = this.popover.el.find('.edit_event_link')
+    if (subAssignmentOrOverride(this.event.eventType)) {
+      editButton.click(preventDefault(this.editSubAssignment))
+    } else {
+      editButton.click(preventDefault(this.showEditDialog))
+    }
 
     this.popover.el
       .find('.delete_event_link')
