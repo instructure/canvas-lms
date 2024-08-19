@@ -63,13 +63,14 @@ const ALL_PLACEMENTS = {
   post_grades: I18n.t('Sync Grades'),
   quiz_menu: I18n.t('Quiz Menu'),
   quiz_index_menu: I18n.t('Quizzes Index Menu'),
+  resource_selection: I18n.t('Resource Selection'),
   submission_type_selection: I18n.t('Submission Type Selection'),
   student_context_card: I18n.t('Student Context Card'),
   tool_configuration: I18n.t('Tool Configuration'),
   user_navigation: I18n.t('User Navigation'),
   wiki_page_menu: I18n.t('Page Menu'),
   wiki_index_menu: I18n.t('Pages Index Menu'),
-  default_placements: I18n.t('Assignment and Link Selection'),
+  default_placements: I18n.t('Assignment and Link Selection'), // for 1.1 display only
 }
 
 const DEFAULT_1_1_PLACEMENTS = ['assignment_selection', 'link_selection', 'resource_selection']
@@ -180,7 +181,8 @@ export default class ExternalToolPlacementList extends React.Component {
 
   /**
    * Placements should only be allowed to be toggled when:
-   * 1. the tool is a 1.1 tool, since toggling is a 1.1 to 1.3 migration feature,
+   * 1. the tool is a 1.1 tool, since toggling is a 1.1 to 1.3 migration feature OR
+   *  the `lti_toggle_placements` feature flag is enabled, which allows toggling for 1.3 tools,
    * 2. the user has permission to update the tool (teacher in a course view or admin),
    * 3. the tool is being viewed in the context in which it was installed (no
    *  toggling an account-level tool from a course).
@@ -188,6 +190,7 @@ export default class ExternalToolPlacementList extends React.Component {
   shouldShowToggleButtons = () => {
     const tool = this.state.tool
     const is_1_1_tool = tool.version === '1.1'
+    const isFlagEnabled = ENV.FEATURES.lti_toggle_placements
     const canUpdateTool =
       ENV.PERMISSIONS &&
       (ENV.PERMISSIONS.create_tool_manually || ENV.PERMISSIONS.edit_tool_manually)
@@ -196,7 +199,7 @@ export default class ExternalToolPlacementList extends React.Component {
       tool.context &&
       ENV.CONTEXT_BASE_URL.includes(tool.context.toLowerCase())
 
-    return is_1_1_tool && canUpdateTool && isEditableContext
+    return (is_1_1_tool || isFlagEnabled) && canUpdateTool && isEditableContext
   }
 
   /**
@@ -235,23 +238,23 @@ export default class ExternalToolPlacementList extends React.Component {
    * Returns placements that are defined by a 1.3 tool.
    *
    * The `resource_selection` placement is deprecated and includes both
-   * assignment_ and link_selection. If it's present in the tool config,
-   * show both of those if the tool doesn't have them enabled.
+   * assignment_ and link_selection, but still show it in the list.
    *
-   * @returns array of divs, each with placement text
+   * @returns array of placements, either as a div or a text line with a toggle
    */
   placementsFor1_3 = () => {
     const tool = this.state.tool
-    return Object.keys(ALL_PLACEMENTS)
-      .filter(
-        key =>
-          // include placements that tool has defined and enabled
-          this.isPlacementEnabled(tool, key) ||
-          // always include both assignment and link selection for 1.3 tools with resource_selection
-          // note that resource_selection is deprecated!
-          (DEFAULT_1_1_PLACEMENTS.includes(key) && !tool[key] && tool.resource_selection?.enabled)
+    const placements = Object.keys(ALL_PLACEMENTS).filter(key => tool[key])
+
+    if (this.shouldShowToggleButtons()) {
+      return placements.map(key =>
+        this.placementToggle(key, ALL_PLACEMENTS[key], this.isPlacementEnabled(tool, key))
       )
-      .map(key => <div key={key}>{ALL_PLACEMENTS[key]}</div>)
+    } else {
+      return placements
+        .filter(key => this.isPlacementEnabled(tool, key))
+        .map(key => <div key={key}>{ALL_PLACEMENTS[key]}</div>)
+    }
   }
 
   /**
@@ -334,6 +337,14 @@ export default class ExternalToolPlacementList extends React.Component {
               'You can also clear your cache and hard refresh on pages where you expect placements to change.'
           )}
         </p>
+        {this.state.tool.version === '1.3' && (
+          <p style={{margin: '8px 0 0 0'}}>
+            {I18n.t(
+              'Changes made to placements here for 1.3 tools will be reset by any changes made to the ' +
+                'LTI developer key, including changes made by Instructure to inherited LTI keys.'
+            )}
+          </p>
+        )}
       </Text>
     </View>
   )

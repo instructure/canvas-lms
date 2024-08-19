@@ -36,6 +36,19 @@ describe('ExternalToolPlacementList', () => {
     )
   }
 
+  let env
+
+  beforeAll(() => {
+    env = window.ENV
+    window.ENV = {
+      FEATURES: {lti_toggle_placements: true},
+    }
+  })
+
+  afterAll(() => {
+    window.ENV = env
+  })
+
   afterEach(() => {
     jest.clearAllMocks()
   })
@@ -55,13 +68,72 @@ describe('ExternalToolPlacementList', () => {
       expect(queryByText(/Homework Submission/)).toBeInTheDocument()
       expect(queryByText(/Editor Button/)).not.toBeInTheDocument()
     })
+  })
 
-    it('shows assignment_ and link_selection if tool has resource_selection enabled', () => {
-      const {queryByText} = renderComponent({
-        tool: tool({resource_selection: {enabled: true}, assignment_selection: {enabled: true}}),
+  describe('with 1.3 tool in an editable context', () => {
+    beforeAll(() => {
+      window.ENV.PERMISSIONS = {create_tool_manually: true, edit_tool_manually: true}
+      window.ENV.CONTEXT_BASE_URL = '/accounts/1'
+
+      store.togglePlacements.mockImplementation(({onSuccess}) => onSuccess())
+    })
+
+    afterAll(() => {
+      delete window.ENV.PERMISSIONS
+      delete window.ENV.CONTEXT_BASE_URL
+    })
+
+    it('shows notice about caching', () => {
+      const {getByText} = renderComponent({
+        tool: tool({homework_submission: {enabled: true}, editor_button: {enabled: false}}),
       })
-      expect(queryByText(/Assignment Selection/)).toBeInTheDocument()
-      expect(queryByText(/Link Selection/)).toBeInTheDocument()
+      expect(getByText(/It may take some time/)).toBeInTheDocument()
+    })
+
+    it('shows notice about placement reset', () => {
+      const {getByText} = renderComponent({
+        tool: tool({homework_submission: {enabled: true}, editor_button: {enabled: false}}),
+      })
+      expect(getByText(/Changes made to placements here for 1.3 tools/)).toBeInTheDocument()
+    })
+
+    it('shows toggle buttons along with placement names', () => {
+      const {getByRole} = renderComponent({
+        tool: tool({homework_submission: {enabled: true}, editor_button: {enabled: false}}),
+      })
+      expect(getByRole('button', {name: /Placement active/})).toBeInTheDocument()
+    })
+
+    describe('when placement is active', () => {
+      it('shows checkmark', () => {
+        renderComponent({
+          tool: tool({homework_submission: {enabled: true}}),
+        })
+        expect(document.querySelector('svg').getAttribute('name')).toBe('IconCheckMark')
+      })
+
+      it('shows Active tooltip', () => {
+        const {getByRole} = renderComponent({
+          tool: tool({homework_submission: {enabled: true}}),
+        })
+        expect(getByRole('tooltip', {name: /Active/})).toBeInTheDocument()
+      })
+    })
+
+    describe('when placement is inactive', () => {
+      it('shows X', () => {
+        renderComponent({
+          tool: tool({editor_button: {enabled: false}}),
+        })
+        expect(document.querySelector('svg').getAttribute('name')).toBe('IconEnd')
+      })
+
+      it('shows Inactive tooltip', () => {
+        const {getByRole} = renderComponent({
+          tool: tool({editor_button: {enabled: false}}),
+        })
+        expect(getByRole('tooltip', {name: /Inactive/})).toBeInTheDocument()
+      })
     })
   })
 
@@ -119,19 +191,16 @@ describe('ExternalToolPlacementList', () => {
   })
 
   describe('with 1.1 tool in an editable context', () => {
-    let oldEnv
-
     beforeAll(() => {
-      oldEnv = window.ENV
-      window.ENV = {
-        PERMISSIONS: {create_tool_manually: true, edit_tool_manually: true},
-        CONTEXT_BASE_URL: '/accounts/1',
-      }
+      window.ENV.PERMISSIONS = {create_tool_manually: true, edit_tool_manually: true}
+      window.ENV.CONTEXT_BASE_URL = '/accounts/1'
+
       store.togglePlacements.mockImplementation(({onSuccess}) => onSuccess())
     })
 
     afterAll(() => {
-      window.ENV = oldEnv
+      delete window.ENV.PERMISSIONS
+      delete window.ENV.CONTEXT_BASE_URL
     })
 
     it('shows notice about caching', () => {

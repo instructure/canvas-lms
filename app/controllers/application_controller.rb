@@ -408,6 +408,7 @@ class ApplicationController < ActionController::Base
     rubric_criterion_range
     lti_migration_info
     rce_lite_enabled_speedgrader_comments
+    lti_toggle_placements
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
