@@ -1139,6 +1139,7 @@ GEM
       railties (>= 6.1, < 7.2)
       switchman (~> 3.1, >= 3.5.14)
     sync (0.5.0)
+    syslog (0.1.2)
     table_print (1.5.7)
     term-ansicolor (1.11.2)
       tins (~> 1.0)
@@ -1406,6 +1407,7 @@ DEPENDENCIES
   stringify_ids!
   switchman (~> 3.5)
   switchman-inst-jobs (~> 4.0)
+  syslog (~> 0.1)
   testrailtagging (= 0.3.8.7)
   thrift_client (= 0.9.3)!
   timecop (~> 0.9)
