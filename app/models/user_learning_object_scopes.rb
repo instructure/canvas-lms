@@ -38,13 +38,11 @@ module UserLearningObjectScopes
   end
 
   def ignore_item!(asset, purpose, permanent = false)
-    asset.shard.activate do
-      asset.ignores.upsert(
-        { user_id: id, purpose:, permanent: },
-        unique_by: %i[asset_id asset_type user_id purpose],
-        update_only: :permanent
-      )
-    end
+    asset.ignores.upsert(
+      { user_id: id, purpose:, permanent: },
+      unique_by: %i[asset_id asset_type user_id purpose],
+      update_only: :permanent
+    )
 
     touch
   end
