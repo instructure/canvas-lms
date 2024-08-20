@@ -626,7 +626,13 @@ class Lti::RegistrationsController < ApplicationController
         end
 
         config = JSON.parse(result.body)
-      rescue CanvasHttp::Error
+      rescue CanvasHttp::Error,
+             CanvasHttp::RelativeUriError,
+             CanvasHttp::InsecureUriError,
+             Timeout::Error,
+             SocketError,
+             SystemCallError,
+             OpenSSL::SSL::SSLError
         return render_configuration_errors(["invalid configuration url"])
       rescue JSON::ParserError
         return render_configuration_errors(["url does not return JSON"])

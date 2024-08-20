@@ -848,6 +848,17 @@ describe Lti::RegistrationsController do
         end
       end
 
+      context "when url can't connect" do
+        before do
+          allow(CanvasHttp).to receive(:get).with(url).and_raise(SocketError)
+        end
+
+        it "returns 422" do
+          subject
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+
       context "when url responds with non-200" do
         let(:result) { double(class: Net::HTTPBadRequest, code: 400) }
 
