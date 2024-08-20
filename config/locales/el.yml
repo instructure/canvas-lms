@@ -10648,8 +10648,14 @@ el:
   performance_ac5f9e70: Απόδοση
   permission_not_found_620b80d1: "Δεν βρέθηκε άδεια"
   permissions: 
+    manage_assignments: "Διαχείριση (προσθήκη/επεξεργασία/διαγραφή) εργασιών και κουίζ"
+    manage_frozen_assignment: "Διαχείριση (επεξεργασία/διαγραφή) εργασιών που έχουν παγώσει"
+    manage_grades: "Επεξεργασία βαθμών"
+    manage_role_overrides: "Διαχείριση αδειών"
+    manage_students: "Προσθήκη/Αφαίρεση σπουδαστών στο μάθημα"
     manage_webhooks: "Διαχείριση webhook"
     provision_catalog: "Παροχή Καταλόγου"
+    send_messages_all: "Αποστολή μηνυμάτων σε όλη την τάξη"
   permissions_365c49e: Δικαιώματα
   pick_a_destination_we_ll_send_you_errors_fa0cb0e0: "επιλέξτε προορισμό, θα σας στείλουμε τα σφάλματα"
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "επιλέξτε τελικό σημείο, θα σας στείλουμε τις αναφορές σφαλμάτων εκεί"
