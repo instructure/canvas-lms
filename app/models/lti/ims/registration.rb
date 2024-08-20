@@ -22,11 +22,15 @@ class Lti::IMS::Registration < ApplicationRecord
   extend RootAccountResolver
   self.table_name = "lti_ims_registrations"
 
-  REQUIRED_GRANT_TYPES = ["client_credentials", "implicit"].freeze
-  REQUIRED_RESPONSE_TYPES = ["id_token"].freeze
+  # These attributes are in the spec (config JSON) but not stored in the
+  # database because the particular values are required/implied.
+  IMPLIED_SPEC_ATTRIBUTES = %w[grant_types response_types application_type token_endpoint_auth_method].freeze
+  REQUIRED_GRANT_TYPES = %w[client_credentials implicit].freeze
+  REQUIRED_RESPONSE_TYPE = "id_token"
   REQUIRED_APPLICATION_TYPE = "web"
   REQUIRED_TOKEN_ENDPOINT_AUTH_METHOD = "private_key_jwt"
-  PLACEMENT_VISIBILITY_OPTIONS = %(admins members public)
+
+  PLACEMENT_VISIBILITY_OPTIONS = %w[admins members public].freeze
 
   CANVAS_EXTENSION_LABEL = "canvas.instructure.com"
   CANVAS_EXTENSION_PREFIX = "https://#{CANVAS_EXTENSION_LABEL}/lti".freeze
@@ -37,8 +41,6 @@ class Lti::IMS::Registration < ApplicationRecord
   LAUNCH_WIDTH_EXTENSION = "#{CANVAS_EXTENSION_PREFIX}/launch_width".freeze
   LAUNCH_HEIGHT_EXTENSION = "#{CANVAS_EXTENSION_PREFIX}/launch_height".freeze
   TOOL_ID_EXTENSION = "#{CANVAS_EXTENSION_PREFIX}/tool_id".freeze
-
-  self.ignored_columns += %i[application_type grant_types response_types token_endpoint_auth_method]
 
   validates :redirect_uris,
             :initiate_login_uri,
@@ -283,7 +285,7 @@ class Lti::IMS::Registration < ApplicationRecord
       lti_tool_configuration:,
       application_type: REQUIRED_APPLICATION_TYPE,
       grant_types: REQUIRED_GRANT_TYPES,
-      response_types: REQUIRED_RESPONSE_TYPES,
+      response_types: [REQUIRED_RESPONSE_TYPE],
       redirect_uris:,
       initiate_login_uri:,
       client_name:,
@@ -319,7 +321,7 @@ class Lti::IMS::Registration < ApplicationRecord
   end
 
   def lti_tool_configuration_is_valid
-    config_errors = Schemas::Lti::IMS::LtiToolConfiguration.simple_validation_errors(
+    config_errors = Schemas::Lti::IMS::LtiToolConfiguration.simple_validation_first_error(
       lti_tool_configuration,
       error_format: :hash
     )

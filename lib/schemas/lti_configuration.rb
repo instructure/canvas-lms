@@ -42,7 +42,7 @@ module Schemas
                 platform: { type: "string", description: "Must be canvas.instructure.com" },
                 domain: { type: "string" },
                 tool_id: { type: "string" },
-                privacy_level: { type: "string", enum: %w[public email_only name_only anonymous] },
+                privacy_level: { type: "string", enum: ::Lti::PrivacyLevelExpander::SUPPORTED_LEVELS },
                 settings: {
                   type: "object",
                   required: %w[placements],
