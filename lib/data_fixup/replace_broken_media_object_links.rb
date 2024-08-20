@@ -23,8 +23,11 @@ module DataFixup::ReplaceBrokenMediaObjectLinks
   CONTENT_MAP = {
     AssessmentQuestion => :question_data,
     Assignment => :description,
+    CalendarEvent => :description,
     Course => :syllabus_body,
     DiscussionTopic => :message,
+    LearningOutcome => :description,
+    LearningOutcomeGroup => :description,
     Quizzes::Quiz => nil,
     Quizzes::QuizQuestion => :question_data,
     WikiPage => :body
@@ -50,6 +53,7 @@ module DataFixup::ReplaceBrokenMediaObjectLinks
         if active_record.question_data.to_hash != question_data.to_hash
           csv << [Shard.current.id, active_record.class.table_name, active_record.id, active_record.question_data.to_hash, question_data.to_hash]
           csv_stuff = true
+          active_record.instance_variable_set(:@skip_downstream_changes, true)
           active_record.update!(question_data:)
         end
       elsif active_record.is_a?(Quizzes::Quiz)
@@ -64,6 +68,7 @@ module DataFixup::ReplaceBrokenMediaObjectLinks
         if active_record.changed?
           csv << [Shard.current.id, active_record.class.table_name, active_record.id, active_record.changed_attributes.to_hash, active_record.attributes.slice(*active_record.changed_attributes.keys).to_hash]
           csv_stuff = true
+          active_record.instance_variable_set(:@skip_downstream_changes, true)
           active_record.save!
         end
       else
@@ -71,6 +76,7 @@ module DataFixup::ReplaceBrokenMediaObjectLinks
         if active_record[field] != new_html
           csv << [Shard.current.id, active_record.class.table_name, active_record.id, active_record[field], new_html]
           csv_stuff = true
+          active_record.instance_variable_set(:@skip_downstream_changes, true)
           active_record.update!(field => new_html)
         end
       end
