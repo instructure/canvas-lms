@@ -268,7 +268,6 @@ class GradingStandard < ActiveRecord::Base
       end
 
       return true if accounts.active.any?
-      return true if courses.active.any?
       return true if assignments.active.joins(:submissions).where("submissions.workflow_state='graded'").exists?
 
       false
