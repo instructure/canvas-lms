@@ -30,6 +30,10 @@
       {{#if fieldLabel}}{{fieldLabel}}{{else}}{{#t "is_group_assignment"}}This is a Group Assignment{{/t}}{{/if}}
     </label>
 
+    <span id="has_group_category_blocked_error" style="font-size: 14px; display: none; color: crimson;">
+      {{#t "has_group_category_blocked_error"}}You must remove any groups from the Assign Access section to change this setting.{{/t}}
+    </span>
+
     {{!-- Individual grading? --}}
     <div id="group_category_options" style="{{hiddenUnless groupCategoryId}}">
       <div class="nested" style="padding-left: 32px;">
@@ -76,6 +80,7 @@
             {{/each}}
           </select>
         </div>
+        <span id="assignment_group_category_id_blocked_error" style="font-size: 14px; display: none; color: crimson"></span>
         <div>
           <button class="Button" type="button" id="create_group_category_id"
             {{disabledIf inClosedGradingPeriod}}

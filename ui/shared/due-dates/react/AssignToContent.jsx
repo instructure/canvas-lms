@@ -101,25 +101,17 @@ const AssignToContent = ({
 
   useEffect(() => {
     if(getGroupCategoryId === undefined) return;
-
     const handleGroupChange = () => setGroupCategoryId(getGroupCategoryId?.())
-
-    const itemGroupCategoryId =  document.getElementById('assignment_group_category_id')
-    const hasGroupCategory = document.getElementById('has_group_category');
-    itemGroupCategoryId?.addEventListener(
-      'change', handleGroupChange
-    )
-    hasGroupCategory?.addEventListener(
-      'change',
-      handleGroupChange
-    )
+    document.addEventListener('group_category_changed', handleGroupChange)
     return () => {
-      itemGroupCategoryId?.removeEventListener("change", handleGroupChange);
-      hasGroupCategory?.removeEventListener("change", handleGroupChange);
+      document.removeEventListener("group_category_changed", handleGroupChange)
     }
   }, [])
 
-  useEffect(() => setGroupCategoryId(defaultGroupCategoryId), [defaultGroupCategoryId])
+  useEffect(() => {
+    if(getGroupCategoryId !== undefined) return;
+    setGroupCategoryId(defaultGroupCategoryId)
+  }, [defaultGroupCategoryId])
 
   useEffect(() => {
     const updatedOverrides = overrides.map(override => {
