@@ -191,7 +191,7 @@ module Types
           if !apply_overrides && course.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
             assignment.send(field_name)
           else
-            OverrideAssignmentLoader.for(current_user).load(assignment).then(&field_name)
+            Loaders::OverrideAssignmentLoader.for(current_user).load(assignment).then(&field_name)
           end
         end
       end
@@ -200,19 +200,6 @@ module Types
     overridden_field :due_at, "when this assignment is due"
     overridden_field :lock_at, "the lock date (assignment is locked after this date)"
     overridden_field :unlock_at, "the unlock date (assignment is unlocked after this date)"
-
-    class OverrideAssignmentLoader < GraphQL::Batch::Loader
-      def initialize(current_user)
-        super()
-        @current_user = current_user
-      end
-
-      def perform(assignments)
-        assignments.each do |assignment|
-          fulfill(assignment, assignment.overridden_for(@current_user))
-        end
-      end
-    end
 
     field :lock_info, LockInfoType, null: true
 

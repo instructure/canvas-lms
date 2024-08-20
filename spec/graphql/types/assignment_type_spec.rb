@@ -940,7 +940,7 @@ describe Types::AssignmentType do
           query = GraphQLTypeTester.new(@topic.assignment, current_user: student)
 
           expect(query.resolve("checkpoints {pointsPossible}")).to eq [10]
-          expect(query.resolve("checkpoints {dueAt}")).to eq [@everyone_due_at.iso8601]
+          expect(query.resolve("checkpoints {dueAt}")).to eq [@section_due_at.iso8601]
           expect(query.resolve("checkpoints {assignmentOverrides {nodes {dueAt}}}")).to eq [[@section_due_at.iso8601]]
         end
       end
