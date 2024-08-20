@@ -74,7 +74,7 @@ class AuthenticationProvider < ActiveRecord::Base
     false
   end
 
-  def self.enabled?(_account = nil)
+  def self.enabled?(_account = nil, _user = nil)
     true
   end
 
@@ -142,6 +142,10 @@ class AuthenticationProvider < ActiveRecord::Base
 
   def self.login_button?
     Rails.root.join("app/views/shared/svg/_svg_icon_#{sti_name}.svg").exist?
+  end
+
+  def visible_to?(_user)
+    true
   end
 
   def login_attribute_for_pseudonyms
