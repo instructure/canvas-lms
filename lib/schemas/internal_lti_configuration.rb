@@ -61,7 +61,7 @@ module Schemas
           redirect_uris: { type: "array", items: { type: "string" }, minItems: 1 },
           domain: { type: "string" },
           tool_id: { type: "string" },
-          privacy_level: { type: "string", enum: %w[public email_only name_only anonymous] },
+          privacy_level: { type: "string", enum: ::Lti::PrivacyLevelExpander::SUPPORTED_LEVELS },
           launch_settings: {
             type: "object",
             properties: self.class.base_settings_properties
@@ -88,7 +88,7 @@ module Schemas
 
     def self.base_settings_properties
       {
-        message_type: { type: "string", enum: %w[LtiDeepLinkingRequest LtiResourceLinkRequest] },
+        message_type: { type: "string", enum: ::Lti::ResourcePlacement::LTI_ADVANTAGE_MESSAGE_TYPES },
         text: { type: "string" },
         labels: { type: "object" },
         custom_fields: { type: "object" },

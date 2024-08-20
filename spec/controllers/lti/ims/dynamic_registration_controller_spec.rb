@@ -162,6 +162,22 @@ describe Lti::IMS::DynamicRegistrationController do
           expect(created_registration.registration_url).to eq("https://example.com/registration")
         end
 
+        it "validates using the schema's to_model_attrs" do
+          expect(Schemas::Lti::IMS::OidcRegistration).to receive(:to_model_attrs).and_call_original
+          subject
+          expect(response).to have_http_status(:ok)
+        end
+
+        it "returns the errors if to_model_attrs returns errors" do
+          to_model_attrs_result = { errors: ["oopsy"], registration_attrs: nil }
+          expect(Schemas::Lti::IMS::OidcRegistration).to \
+            receive(:to_model_attrs).and_return(to_model_attrs_result)
+
+          subject
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.body).to match(/oopsy/)
+        end
+
         it "fills in values on the developer key" do
           subject
           dk = DeveloperKey.last
@@ -192,7 +208,7 @@ describe Lti::IMS::DynamicRegistrationController do
           it "returns a 422 with validation errors" do
             subject
             expect(response).to have_http_status(:unprocessable_entity)
-            expect(response.body).to include("Must include client_credentials, implicit")
+            expect(response.body).to match(/grant_types.*client_credentials/)
           end
 
           it "doesn't create a stray developer key" do
@@ -210,7 +226,7 @@ describe Lti::IMS::DynamicRegistrationController do
           it "returns a 422 with validation errors" do
             subject
             expect(response).to have_http_status(:unprocessable_entity)
-            expect(response.body).to include("Must include id_token")
+            expect(response.body).to match(/response_types.*id_token/)
           end
 
           it "doesn't create a stray developer key" do
@@ -228,7 +244,7 @@ describe Lti::IMS::DynamicRegistrationController do
           it "returns a 422 with validation errors" do
             subject
             expect(response).to have_http_status(:unprocessable_entity)
-            expect(response.body).to include("Must be 'private_key_jwt'")
+            expect(response.body).to match(/token_endpoint_auth_method.*private_key_jwt/)
           end
 
           it "doesn't create a stray developer key" do

@@ -58,6 +58,9 @@ describe Schemas::Lti::IMS::LtiToolConfiguration do
       }
     end
 
+    # More tested as part of OidcRegistration schema in
+    # spec/lib/schemas/lti/ims/oidc_registration_spec.rb
+
     it "succeeds if configuration is valid" do
       config_errors = Schemas::Lti::IMS::LtiToolConfiguration.simple_validation_errors(
         valid_configuration,
@@ -78,7 +81,7 @@ describe Schemas::Lti::IMS::LtiToolConfiguration do
         ]
       }
       invalid_configuration = valid_configuration.deep_merge(invalid_placement)
-      config_errors = Schemas::Lti::IMS::LtiToolConfiguration.simple_validation_errors(
+      config_errors = Schemas::Lti::IMS::LtiToolConfiguration.simple_validation_first_error(
         invalid_configuration,
         error_format: :hash
       )
