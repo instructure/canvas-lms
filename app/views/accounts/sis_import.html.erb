@@ -29,6 +29,8 @@
       <%= link_to t(:try_import_again_link, "Try import again"), account_sis_import_path %>
     </div>
 
+    <div id="confirmation_modal_root"></div>
+
     <div class="form" style="<%= hidden if @current_batch && @current_batch.importing? %>">
       <%= form_tag account_sis_imports_path(@account.id), :multipart => true, :id => "sis_importer" do %>
         <p class="instruction"><%= mt(:select_file_instructions,
@@ -36,6 +38,7 @@
                                           "For a description of how to generate these zip files, [please see this documentation](%{url}).",
                                       :url => "/doc/api/file.sis_csv.html") %></p>
         <div>
+          <input type="hidden" id="safe_to_submit" name="safe_to_submit" value="false">
           <input type="file" name="attachment" style="font-size: 1.2em;"/>
           <p/>
           <label for="import_type"><%= before_label(t(:import_type_label, "Import type")) %></label>
@@ -52,10 +55,7 @@
             <input type="checkbox" name="batch_mode" value="1" id="batch_mode"/>
             <label for="batch_mode"><%= t(:batch_mode_label, "This is a full batch update") %></label>
             <br>
-            <p class='instruction'>
-              <%= mt(:batch_import_instructions,
-                     "If selected, this will delete everything for this term, which includes all courses and enrollments that are not in the selected import file above.  \nSee the documentation for details.") %>
-            </p>
+            <div id='batch_import_instructions'></div>
             <label id="batch_mode_term_id_label" for="batch_mode_term_id">
               <%= t('Term:') %>
             </label>
