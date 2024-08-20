@@ -83,7 +83,6 @@ DueDateOverrideView.prototype.render = function () {
       div
     )
   }
-
   const selective_release_section = ENV.FEATURES?.selective_release_edit_page
     ? AssignToContent
     : DifferentiatedModulesSection
