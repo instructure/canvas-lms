@@ -32,9 +32,6 @@
         <%= t 'links.message_user', "Send Message" %>
       </a>
     <% end %>
-    <% if @domain_root_account.enable_user_notes and can_do(@user, @current_user, :read_user_notes) %>
-      <a href="<%= user_user_notes_path(@user) %>"> <%= t 'links.faculty_journal', "Faculty Journal" %></a>
-    <% end %>
     <% if @context.is_a?(Course)%>
       <% if @context.user_is_instructor?(@user) && can_do(@user, @current_user, :read_reports) && can_do(@context, @current_user, :view_all_grades) %>
         <a href="<%= user_course_teacher_activity_url(@user, @context) %>">

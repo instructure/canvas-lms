@@ -83,14 +83,5 @@
     alert_data[:POSSIBLE_RECIPIENTS_ORDER] << role[:id]
     alert_data[:POSSIBLE_RECIPIENTS][role[:id]] = {:label => role[:label]}
   end
-  if @context.enable_user_notes
-    alert_data[:POSSIBLE_CRITERIA_ORDER] << 'UserNote'
-    alert_data[:POSSIBLE_CRITERIA]['UserNote'] = {
-      :label => t(:usernote_description, "No faculty journal entry has been added for %{count} days", :count => count),
-      :option => t(:usernote_option, "No Faculty Journal Entry"),
-      :title => t(:usernote_title, "Days since a faculty journal has been added"),
-      :default_threshold => 7
-    }
-  end
   js_env :ALERTS => alert_data
 %>

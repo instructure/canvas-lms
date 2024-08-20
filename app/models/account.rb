@@ -33,9 +33,6 @@ class Account < ActiveRecord::Base
   belongs_to :root_account, class_name: "Account"
   belongs_to :parent_account, class_name: "Account"
 
-  # temporary scope to allow us to deprecate the faculty journal feature. should be removed (along with all references) upon deprecation completion
-  scope :having_user_notes_enabled, -> { Account.site_admin.feature_enabled?(:deprecate_faculty_journal) ? Account.none : where(enable_user_notes: true) }
-
   has_many :courses
   has_many :custom_grade_statuses, inverse_of: :root_account, foreign_key: :root_account_id
   has_many :standard_grade_statuses, inverse_of: :root_account, foreign_key: :root_account_id
@@ -1931,7 +1928,6 @@ class Account < ActiveRecord::Base
   TAB_OUTCOMES = 7
   TAB_RUBRICS = 8
   TAB_SETTINGS = 9
-  TAB_FACULTY_JOURNAL = 10
   TAB_SIS_IMPORT = 11
   TAB_GRADING_STANDARDS = 12
   TAB_QUESTION_BANKS = 13
@@ -1994,7 +1990,6 @@ class Account < ActiveRecord::Base
       tabs << { id: TAB_QUESTION_BANKS, label: t("#account.tab_question_banks", "Question Banks"), css_class: "question_banks", href: :account_question_banks_path } if user && grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
       tabs << { id: TAB_SUB_ACCOUNTS, label: t("#account.tab_sub_accounts", "Sub-Accounts"), css_class: "sub_accounts", href: :account_sub_accounts_path } if manage_settings
       tabs << { id: TAB_ACCOUNT_CALENDARS, label: t("Account Calendars"), css_class: "account_calendars", href: :account_calendar_settings_path } if user && grants_right?(user, :manage_account_calendar_visibility)
-      tabs << { id: TAB_FACULTY_JOURNAL, label: t("#account.tab_faculty_journal", "Faculty Journal"), css_class: "faculty_journal", href: :account_user_notes_path } if enable_user_notes && user && grants_right?(user, :manage_user_notes)
       tabs << { id: TAB_TERMS, label: t("#account.tab_terms", "Terms"), css_class: "terms", href: :account_terms_path } if root_account? && manage_settings
       tabs << { id: TAB_AUTHENTICATION, label: t("#account.tab_authentication", "Authentication"), css_class: "authentication", href: :account_authentication_providers_path } if root_account? && manage_settings
       if root_account? && allow_sis_import && user && grants_any_right?(user, :manage_sis, :import_sis)
@@ -2522,12 +2517,6 @@ class Account < ActiveRecord::Base
     if has_attribute?(:course_template_id)
       self.course_template_id = nil
     end
-  end
-
-  def enable_user_notes
-    return false if Account.site_admin.feature_enabled?(:deprecate_faculty_journal)
-
-    read_attribute(:enable_user_notes)
   end
 
   def banned_email_domains

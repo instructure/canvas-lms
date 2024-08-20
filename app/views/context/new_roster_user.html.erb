@@ -25,12 +25,6 @@
         <%= t "Student Grades" %>
       </a>
     <% end %>
-    <% if @domain_root_account.enable_user_notes and can_do(@user, @current_user, :read_user_notes) %>
-      <a href="<%= user_user_notes_path(@user) %>" class="btn button-sidebar-wide">
-        <i class="icon-note-light" aria-hidden="true"></i>
-        <%= t "Faculty Journal" %>
-      </a>
-    <% end %>
     <% if @context.is_a?(Course)%>
       <% if @context.user_is_instructor?(@user) && can_do(@user, @current_user, :read_reports) && can_do(@context, @current_user, :view_all_grades) %>
         <a href="<%= user_course_teacher_activity_url(@user, @context) %>" class="btn button-sidebar-wide">

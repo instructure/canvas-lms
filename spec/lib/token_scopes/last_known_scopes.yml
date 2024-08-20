@@ -2193,8 +2193,6 @@
   path: "/api/v1/users/:user_id/usage_rights"
 - verb: PUT
   path: "/api/v1/users/:user_id/usage_rights"
-- verb: PUT
-  path: "/api/v1/users/:user_id/user_notes/suppress_deprecation_notice"
 - verb: GET
   path: "/api/v1/users/activity_stream"
 - verb: DELETE

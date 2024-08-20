@@ -197,7 +197,6 @@ class User < ActiveRecord::Base
   has_many :account_users
   has_many :media_objects, as: :context, inverse_of: :context
   has_many :user_generated_media_objects, class_name: "MediaObject"
-  has_many :user_notes
   has_many :content_shares, dependent: :destroy
   has_many :received_content_shares
   has_many :sent_content_shares
@@ -1389,9 +1388,6 @@ class User < ActiveRecord::Base
     given { |user| check_courses_right?(user, :read_reports) }
     can :read_profile and can :remove_avatar and can :read_reports
 
-    given { |user| check_courses_right?(user, :manage_user_notes) }
-    can :create_user_notes and can :read_user_notes
-
     %i[read_email_addresses read_sis manage_sis].each do |permission|
       given { |user| check_courses_right?(user, permission) }
       can permission
@@ -1399,9 +1395,6 @@ class User < ActiveRecord::Base
 
     given { |user| check_courses_right?(user, :generate_observer_pairing_code, enrollments.not_deleted) }
     can :generate_observer_pairing_code
-
-    given { |user| check_accounts_right?(user, :manage_user_notes) }
-    can :create_user_notes and can :read_user_notes and can :delete_user_notes
 
     given { |user| check_accounts_right?(user, :view_statistics) }
     can :view_statistics
@@ -2819,11 +2812,6 @@ class User < ActiveRecord::Base
 
   def self.default_storage_quota
     Setting.get("user_default_quota", 50.decimal_megabytes.to_s).to_i
-  end
-
-  def update_last_user_note
-    note = user_notes.active.order("user_notes.created_at").last
-    self.last_user_note = note ? note.created_at : nil
   end
 
   TAB_PROFILE = 0

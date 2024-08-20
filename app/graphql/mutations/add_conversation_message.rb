@@ -31,7 +31,6 @@ class Mutations::AddConversationMessage < Mutations::BaseMutation
   argument :media_comment_id, ID, required: false
   argument :media_comment_type, String, required: false
   argument :context_code, String, required: false
-  argument :user_note, Boolean, required: false
 
   field :conversation_message, Types::ConversationMessageType, null: true
 
@@ -50,8 +49,7 @@ class Mutations::AddConversationMessage < Mutations::BaseMutation
       attachment_ids: input[:attachment_ids],
       domain_root_account_id: context[:domain_root_account].id,
       media_comment_id: input[:media_comment_id],
-      media_comment_type: input[:media_comment_type],
-      user_note: input[:user_note]
+      media_comment_type: input[:media_comment_type]
     )
     InstStatsd::Statsd.increment("inbox.message.sent.isReply.react")
     InstStatsd::Statsd.increment("inbox.message.sent.react")

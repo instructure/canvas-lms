@@ -1370,22 +1370,6 @@ Rails.application.config.to_prepare do
         group: "manage_temporary_enrollments",
         group_label: -> { I18n.t("Users - Temporary Enrollments") }
       },
-      manage_user_notes: {
-        label: -> { I18n.t("permissions.manage_user_notes", "Manage faculty journal entries") },
-        label_v2: -> { I18n.t("Faculty Journal - manage entries") },
-        available_to: %w[
-          TaEnrollment
-          TeacherEnrollment
-          AccountAdmin
-          AccountMembership
-        ],
-        true_for: %w[
-          TaEnrollment
-          TeacherEnrollment
-          AccountAdmin
-        ],
-        account_allows: ->(a) { a.root_account.enable_user_notes }
-      },
       manage_rubrics: {
         label: -> { I18n.t("permissions.manage_rubrics", "Create and edit assessing rubrics") },
         label_v2: -> { I18n.t("Rubrics - add / edit / delete") },

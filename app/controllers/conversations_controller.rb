@@ -308,18 +308,6 @@ class ConversationsController < ApplicationController
                                              @domain_root_account.enable_inbox_auto_response? &&
                                              (!is_student || (is_student && !@domain_root_account.disable_inbox_auto_response_for_students?))
 
-        notes_enabled_accounts = @current_user.associated_accounts.having_user_notes_enabled
-
-        hash[:NOTES_ENABLED] = notes_enabled_accounts.any?
-        hash[:CAN_ADD_NOTES_FOR_ACCOUNT] = notes_enabled_accounts.any? { |a| a.grants_right?(@current_user, :manage_students) }
-
-        if hash[:NOTES_ENABLED] && !hash[:CAN_ADD_NOTES_FOR_ACCOUNT]
-          course_note_permissions = {}
-          @current_user.enrollments.active.of_instructor_type.preload(:course).each do |enrollment|
-            course_note_permissions[enrollment.course_id] = true if enrollment.has_permission_to?(:manage_user_notes)
-          end
-          hash[:CAN_ADD_NOTES_FOR_COURSES] = course_note_permissions
-        end
         js_env({
                  CONVERSATIONS: hash,
                  apollo_caching: Account.site_admin.feature_enabled?(:apollo_caching),
@@ -380,11 +368,6 @@ class ConversationsController < ApplicationController
   #
   # @argument media_comment_type [String, "audio"|"video"]
   #   Type of the associated media file
-  #
-  # @argument user_note [Boolean]
-  #   Will add a faculty journal entry for each recipient as long as the user
-  #   making the api call has permission, the recipient is a student and
-  #   faculty journals are enabled in the account.
   #
   # @argument mode [String, "sync"|"async"]
   #   Determines whether the messages will be created/sent synchronously or
@@ -484,9 +467,6 @@ class ConversationsController < ApplicationController
         if context_type == "Account" || context_type.nil?
           InstStatsd::Statsd.increment("inbox.conversation.sent.account_context.legacy")
         end
-        if !Account.site_admin.feature_enabled?(:deprecate_faculty_journal) && params[:user_note] == "1"
-          InstStatsd::Statsd.increment("inbox.conversation.sent.faculty_journal.legacy")
-        end
         if params[:bulk_message] == "1"
           InstStatsd::Statsd.increment("inbox.conversation.sent.individual_message_option.legacy")
         end
@@ -518,9 +498,6 @@ class ConversationsController < ApplicationController
         end
         if !message[:attachment_ids].nil? && message[:attachment_ids] != ""
           InstStatsd::Statsd.increment("inbox.message.sent.attachment.legacy")
-        end
-        if params[:user_note] == "1"
-          InstStatsd::Statsd.increment("inbox.conversation.sent.faculty_journal.legacy")
         end
         InstStatsd::Statsd.count("inbox.message.sent.recipients.legacy", @recipients.count)
         render json: [conversation_json(@conversation.reload, @current_user, session, include_indirect_participants: true, messages: [message])], status: :created
@@ -933,11 +910,6 @@ class ConversationsController < ApplicationController
   # of the new message. Recipients who already had a copy of included
   # messages will not be affected.
   #
-  # @argument user_note [Boolean]
-  #   Will add a faculty journal entry for each recipient as long as the user
-  #   making the api call has permission, the recipient is a student and
-  #   faculty journals are enabled in the account.
-  #
   # @example_response
   #   {
   #     "id": 2,
@@ -989,8 +961,7 @@ class ConversationsController < ApplicationController
       attachment_ids: params[:attachment_ids],
       domain_root_account_id: @domain_root_account.id,
       media_comment_id: params[:media_comment_id],
-      media_comment_type: params[:media_comment_type],
-      user_note: params[:user_note]
+      media_comment_type: params[:media_comment_type]
     )
     InstStatsd::Statsd.increment("inbox.message.sent.legacy")
     InstStatsd::Statsd.increment("inbox.message.sent.isReply.legacy")
