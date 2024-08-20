@@ -3581,10 +3581,6 @@ class Course < ActiveRecord::Base
     self.enrollment_term.name rescue nil
   end
 
-  def enable_user_notes
-    root_account.enable_user_notes rescue false
-  end
-
   def equella_settings
     account = self.account
     while account

@@ -31,7 +31,6 @@ module ConversationsHelper
     domain_root_account_id:,
     media_comment_id:,
     media_comment_type:,
-    user_note:,
     automated: false
   )
     if conversation.conversation.replies_locked_for?(current_user, recipients)
@@ -76,7 +75,6 @@ module ConversationsHelper
       domain_root_account_id:,
       media_comment_id:,
       media_comment_type:,
-      user_note:,
       current_user:,
       automated:
     )
@@ -226,7 +224,6 @@ module ConversationsHelper
     domain_root_account_id: nil,
     media_comment_id: nil,
     media_comment_type: nil,
-    user_note: nil,
     current_user: @current_user,
     automated: false
   )
@@ -237,7 +234,6 @@ module ConversationsHelper
       domain_root_account_id ||= @domain_root_account.id
       media_comment_id ||= params[:media_comment_id]
       media_comment_type ||= params[:media_comment_type]
-      user_note = value_to_boolean(params[:user_note]) if user_note.nil?
     end
     [
       current_user,
@@ -248,7 +244,6 @@ module ConversationsHelper
         automated:,
         root_account_id: domain_root_account_id,
         media_comment: infer_media_comment(media_comment_id, media_comment_type, domain_root_account_id, current_user),
-        generate_user_note: user_note
       }
     ]
   end
@@ -400,7 +395,6 @@ module ConversationsHelper
         domain_root_account_id: root_account_id,
         media_comment_id: nil,
         media_comment_type: nil,
-        user_note: nil,
         automated: true
       )
     end

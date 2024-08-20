@@ -54,7 +54,6 @@ RSpec.describe Mutations::CreateConversation do
     media_comment_type: nil,
     context_code: nil,
     conversation_id: nil,
-    user_note: nil,
     tags: nil
   )
     <<~GQL
@@ -71,7 +70,6 @@ RSpec.describe Mutations::CreateConversation do
           #{"mediaCommentType: \"#{media_comment_type}\"" if media_comment_type}
           #{"contextCode: \"#{context_code}\"" if context_code}
           #{"conversationId: \"#{conversation_id}\"" if conversation_id}
-          #{"userNote: #{user_note}" unless user_note.nil?}
           #{"tags: #{tags}" if tags}
         }) {
           conversations {
@@ -479,37 +477,6 @@ RSpec.describe Mutations::CreateConversation do
       expect(
         result.dig("data", "createConversation", "errors", 0, "message")
       ).to eql "Invalid recipients"
-    end
-  end
-
-  context "user_notes" do
-    before do
-      Account.default.update_attribute(:enable_user_notes, true)
-      @students = create_users_in_course(@course, 2, account_associations: true, return_type: :record)
-    end
-
-    context "when the deprecate_faculty_journal feature flag is disabled" do
-      before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
-
-      it "creates user notes" do
-        run_mutation({ recipients: @students.map { |u| u.id.to_s }, body: "yo", subject: "greetings", user_note: true, context_code: @course.asset_string }, @teacher)
-        @students.each { |x| expect(x.user_notes.size).to be(1) }
-        expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.faculty_journal.react")
-      end
-
-      it "includes the domain root account in the user note" do
-        run_mutation({ recipients: @students.map { |u| u.id.to_s }, body: "hi there", subject: "hi there", user_note: true, context_code: @course.asset_string }, @teacher)
-        note = UserNote.last
-        expect(note.root_account_id).to eql Account.default.id
-      end
-    end
-
-    context "when the deprecate_faculty_journal feature flag is enabled" do
-      it "does not create user notes" do
-        run_mutation({ recipients: @students.map { |u| u.id.to_s }, body: "yo", subject: "greetings", user_note: true, context_code: @course.asset_string }, @teacher)
-        @students.each { |x| expect(x.user_notes.size).to be(0) }
-        expect(InstStatsd::Statsd).to_not have_received(:increment).with("inbox.conversation.sent.faculty_journal.react")
-      end
     end
   end
 

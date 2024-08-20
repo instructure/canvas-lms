@@ -218,8 +218,6 @@ const featureBundles: {
   user_lists: () => import('./features/user_lists/index'),
   user_logins: () => import('./features/user_logins/index'),
   user_name: () => import('./features/user_name/index'),
-  user_notes: () => import('./features/user_notes/index'),
-  user_notes_deprecation: () => import('./features/user_notes_deprecation/index'),
   user_observees: () => import('./features/user_observees/index'),
   user_outcome_results: () => import('./features/user_outcome_results/index'),
   user: () => import('./features/user/index'),

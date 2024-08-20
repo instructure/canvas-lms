@@ -488,7 +488,6 @@ CanvasRails::Application.routes.draw do
     get :copy, as: :start_copy
     post "copy" => "courses#copy_course", :as => :copy_course
     concerns :media
-    get "user_notes" => "user_notes#user_notes"
     get "details/sis_publish" => "courses#sis_publish_status", :as => :sis_publish_status
     post "details/sis_publish" => "courses#publish_to_sis", :as => :publish_to_sis
 
@@ -773,7 +772,6 @@ CanvasRails::Application.routes.draw do
     resources :outcomes
     get :courses
     get "courses/:id" => "accounts#courses_redirect", :as => :courses_redirect
-    get "user_notes" => "user_notes#user_notes"
     resources :alerts
     resources :question_banks do
       post :bookmark
@@ -928,7 +926,6 @@ CanvasRails::Application.routes.draw do
     get :admin_split
     post :merge
     get :grades
-    resources :user_notes
     get :manageable_courses
     get "outcomes" => "outcomes#user_outcome_results"
     get "teacher_activity/course/:course_id" => "users#teacher_activity", :as => :course_teacher_activity
@@ -2670,10 +2667,6 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/smartsearch/log", action: :log
       get "courses/:course_id/smartsearch/index_status", action: :index_status
       # TODO: add account level search
-    end
-
-    scope(controller: "user_notes") do
-      put "users/:user_id/user_notes/suppress_deprecation_notice", action: :suppress_deprecation_notice
     end
 
     scope(controller: :what_if_grades_api) do

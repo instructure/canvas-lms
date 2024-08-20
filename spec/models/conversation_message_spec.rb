@@ -131,56 +131,6 @@ describe ConversationMessage do
     end
   end
 
-  context "generate_user_note" do
-    context "when the deprecate_faculty_journal flag is disabled" do
-      before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
-
-      it "adds a user note under nominal circumstances" do
-        Account.default.update_attribute :enable_user_notes, true
-        course_with_teacher(active_all: true)
-        student = student_in_course(active_all: true).user
-        conversation = @teacher.initiate_conversation([student])
-        conversation.add_message("reprimanded!", generate_user_note: true, root_account_id: Account.default.id)
-        expect(student.user_notes.size).to be(1)
-        note = student.user_notes.first
-        expect(note.creator).to eql(@teacher)
-        expect(note.title).to eql("Private message")
-        expect(note.note).to eql("reprimanded!")
-      end
-
-      it "allows user notes on more than one recipient" do
-        Account.default.update_attribute :enable_user_notes, true
-        course_with_teacher(active_all: true)
-        student1 = student_in_course(active_all: true).user
-        student2 = student_in_course(active_all: true).user
-        conversation = @teacher.initiate_conversation([student1, student2])
-        conversation.add_message("reprimanded!", generate_user_note: true, root_account_id: Account.default.id)
-        expect(student1.user_notes.size).to be(1)
-        expect(student2.user_notes.size).to be(1)
-      end
-    end
-
-    context "when the deprecate_faculty_journal flag is enabled" do
-      it "does not add a user note under nominal circumstances" do
-        Account.default.update_attribute :enable_user_notes, true
-        course_with_teacher(active_all: true)
-        student = student_in_course(active_all: true).user
-        conversation = @teacher.initiate_conversation([student])
-        conversation.add_message("reprimanded!", generate_user_note: true, root_account_id: Account.default.id)
-        expect(student.user_notes.size).to be(0)
-      end
-    end
-
-    it "fails if notes are disabled on the account" do
-      Account.default.update_attribute :enable_user_notes, false
-      course_with_teacher(active_all: true)
-      student = student_in_course(active_all: true).user
-      conversation = @teacher.initiate_conversation([student])
-      conversation.add_message("reprimanded!", generate_user_note: true, root_account_id: Account.default.id)
-      expect(student.user_notes.size).to be(0)
-    end
-  end
-
   context "stream_items" do
     before :once do
       course_with_teacher
@@ -253,37 +203,6 @@ describe ConversationMessage do
       end
       @shard1.activate do
         expect(m.attachments).to match_array([a])
-      end
-    end
-
-    context "when the deprecate_faculty_journal flag is disabled" do
-      before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
-
-      it "user_note uses the recipients shard" do
-        conversation = nil
-        acc = nil
-        @shard1.activate do
-          acc = Account.default
-          acc.enable_user_notes = true
-          acc.save!
-          course_with_teacher(active_all: true)
-        end
-        a = @teacher.shard.activate do
-          attachment_model(context: @teacher, folder: @teacher.conversation_attachments_folder)
-        end
-        m = nil
-        @shard2.activate do
-          student_in_course(active_all: true)
-          m = @teacher.initiate_conversation([@student]).add_message("test", attachment_ids: [a.id])
-          conversation = m.conversation
-        end
-        @shard1.activate do
-          allow(Account).to receive(:default) { acc }
-          conversation_participant = conversation.conversation_participants.where(user_id: @teacher.id).first
-          conversation_participant.add_message("reprimanded!", generate_user_note: true, root_account_id: acc)
-          conversation_participant.reload
-          expect(@student.user_notes.last.root_account_id).to eq(Shard.relative_id_for(acc.id, acc.shard, @student.shard))
-        end
       end
     end
 
@@ -398,7 +317,7 @@ describe ConversationMessage do
       course_with_teacher(active_all: true)
       student1 = student_in_course(active_all: true).user
       conversation = @teacher.initiate_conversation([student1])
-      conversation.add_message("hello", generate_user_note: false, root_account_id: Account.default.id)
+      conversation.add_message("hello", root_account_id: Account.default.id)
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.created.react").at_least(:once)
     end
   end

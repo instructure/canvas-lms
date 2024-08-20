@@ -38,7 +38,6 @@ class ConversationMessage < ActiveRecord::Base
   delegate :subscribed_participants, to: :conversation
 
   before_create :set_root_account_ids
-  after_create :generate_user_note!
   after_create :log_conversation_message_metrics
   after_create :check_for_out_of_office_participants, unless: :automated_message?
   after_save :update_attachment_associations
@@ -117,7 +116,6 @@ class ConversationMessage < ActiveRecord::Base
     @re_send_message = true
     broadcast_notifications
     queue_create_stream_items
-    generate_user_note!
   end
 
   before_save :infer_values
@@ -228,27 +226,6 @@ class ConversationMessage < ActiveRecord::Base
     when :users_added
       user_names = User.where(id: event_data[:user_ids]).order(:id).pluck(:name, :short_name).map { |name, short_name| short_name || name }
       EventFormatter.users_added(author.short_name, user_names)
-    end
-  end
-
-  attr_accessor :generate_user_note
-
-  def generate_user_note!
-    return if skip_broadcasts
-    return unless @generate_user_note
-
-    valid_recipients = recipients.select { |recipient| recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any?(&:enable_user_notes) }
-    return unless valid_recipients.any?
-
-    valid_recipients = User.where(id: valid_recipients) # need to reload to get all the attributes needed for User#save
-    valid_recipients.each do |recipient|
-      title = if conversation.subject
-                t(:subject_specified, "Private message: %{subject}", subject: conversation.subject)
-              else
-                t(:subject, "Private message")
-              end
-      note = format_message(body).first
-      recipient.user_notes.create(creator: author, title:, note:, root_account_id: Shard.relative_id_for(root_account_id, context.shard, recipient.shard))
     end
   end
 

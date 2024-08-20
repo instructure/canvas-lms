@@ -1360,8 +1360,7 @@ describe Course do
           expect(c.grants_right?(@designer, :read)).to be_truthy
         end
 
-        it "does not grant read_user_notes or view_all_grades to designer" do
-          expect(c.grants_right?(@designer, :read_user_notes)).to be_falsey
+        it "does not grant view_all_grades to designer" do
           expect(c.grants_right?(@designer, :view_all_grades)).to be_falsey
         end
       end
