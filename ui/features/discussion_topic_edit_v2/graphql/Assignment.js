@@ -57,9 +57,9 @@ export const Assignment = {
       }
       hasSubAssignments
       checkpoints {
-        dueAt
-        unlockAt
-        lockAt
+        dueAt(applyOverrides: false)
+        unlockAt(applyOverrides: false)
+        lockAt(applyOverrides: false)
         name
         onlyVisibleToOverrides
         pointsPossible

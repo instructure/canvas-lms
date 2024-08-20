@@ -32,25 +32,38 @@ module Types
       checkpoint.sub_assignment_tag
     end
 
+    def self.overridden_field(field_name, description)
+      field field_name, DateTimeType, description, null: true do
+        argument :apply_overrides, Boolean, <<~MD, required: false, default_value: true
+          When true, return the overridden dates.
+
+          Not all roles have permission to view un-overridden dates (in which
+          case the overridden dates will be returned)
+        MD
+      end
+
+      define_method(field_name) do |apply_overrides:|
+        load_association(:context).then do |course|
+          if !apply_overrides && course.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+            checkpoint.send(field_name)
+          else
+            # Due to how assigment overrides are caluclated for teachers/admins in self.overrides_for_assignment_and_user,
+            # A user with read_as_admin permissions will have this due date overrideen based on all overrides on the assignment.
+            # This matches the existing behavior on the Assignment date fields.
+            Loaders::OverrideAssignmentLoader.for(current_user).load(checkpoint).then(&field_name)
+          end
+        end
+      end
+    end
+
+    overridden_field :due_at, "when this checkpoint is due"
+    overridden_field :unlock_at, "when this checkpoint is available"
+    overridden_field :lock_at, "when this checkpoint is closed"
+
     field :points_possible,
           Float,
           "the checkpoint is out of this many points",
           null: false
-
-    field :due_at,
-          DateTimeType,
-          "when this checkpoint is due for 'Everyone'",
-          null: true
-
-    field :unlock_at,
-          DateTimeType,
-          "when this checkpoint is available from for 'Everyone'",
-          null: true
-
-    field :lock_at,
-          DateTimeType,
-          "when this checkpoint is closed for 'Everyone'",
-          null: true
 
     field :only_visible_to_overrides,
           Boolean,
