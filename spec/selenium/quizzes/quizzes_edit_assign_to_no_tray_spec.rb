@@ -132,20 +132,6 @@ describe "quiz edit page assign to" do
       @quiz.post_to_sis = "1"
     end
 
-    it "validates due date inputs when sync to sis is enabled" do
-      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
-
-      expect(assign_to_date_and_time[0].text).not_to include("Please add a due date")
-
-      click_post_to_sis_checkbox
-
-      expect(assign_to_date_and_time[0].text).to include("Please add a due date")
-
-      update_due_date(0, format_date_for_view(due_date, "%-m/%-d/%Y"))
-      update_due_time(0, "11:59 PM")
-      expect(assign_to_date_and_time[0].text).not_to include("Please add a due date")
-    end
-
     it "blocks saving empty due dates when enabled", :ignore_js_errors do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
 
@@ -179,18 +165,30 @@ describe "quiz edit page assign to" do
       expect(is_checked(post_to_sis_checkbox_selector)).to be_falsey
     end
 
-    it "validates due date when user checks/unchecks the option" do
+    it "validates due date only after user tries to save" do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
 
       expect(assign_to_date_and_time[0].text).not_to include("Please add a due date")
 
       click_post_to_sis_checkbox
 
+      # No Sync to SIS validations ran, message didn't change
+      expect(assign_to_date_and_time[0].text).not_to include("Please add a due date")
+
+      expect(is_checked(post_to_sis_checkbox_selector)).to be_truthy
+      # Perform Sync to SIS validations
+      click_quiz_save_button
+
+      # Show validation messages
       expect(assign_to_date_and_time[0].text).to include("Please add a due date")
 
-      update_due_date(0, format_date_for_view(Time.zone.now, "%-m/%-d/%Y"))
-      update_due_time(0, "11:59 PM")
+      click_post_to_sis_checkbox
 
+      # No Sync to SIS validations ran, message didn't change
+      expect(assign_to_date_and_time[0].text).to include("Please add a due date")
+
+      expect(is_checked(post_to_sis_checkbox_selector)).to be_falsey
+      # Perform Sync to SIS validations
       click_quiz_save_button
       expect(driver.current_url).not_to include("edit")
     end
