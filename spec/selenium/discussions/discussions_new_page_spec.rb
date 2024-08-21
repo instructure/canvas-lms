@@ -2191,6 +2191,35 @@ describe "discussions" do
             Account.site_admin.enable_feature!(:selective_release_edit_page)
           end
 
+          it "allows create with group category", :ignore_js_errors do
+            group_cat = course.group_categories.create!(name: "Groupies")
+            get "/courses/#{course.id}/discussion_topics/new"
+
+            Discussion.update_discussion_topic_title
+            Discussion.click_group_discussion_checkbox
+            Discussion.click_group_category_select
+            Discussion.click_group_category_option(group_cat.name)
+            Discussion.save_button.click
+            wait_for_ajaximations
+
+            expect(driver.current_url).not_to end_with("/courses/#{course.id}/discussion_topics/new")
+          end
+
+          it "allows create with group category and graded", :ignore_js_errors do
+            group_cat = course.group_categories.create!(name: "Groupies")
+            get "/courses/#{course.id}/discussion_topics/new"
+
+            Discussion.update_discussion_topic_title
+            Discussion.click_graded_checkbox
+            Discussion.click_group_discussion_checkbox
+            Discussion.click_group_category_select
+            Discussion.click_group_category_option(group_cat.name)
+            Discussion.save_button.click
+            wait_for_ajaximations
+
+            expect(driver.current_url).not_to end_with("/courses/#{course.id}/discussion_topics/new")
+          end
+
           context "set with Assign to Cards" do
             before do
               course.conditional_release = true

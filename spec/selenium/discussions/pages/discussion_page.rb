@@ -107,6 +107,18 @@ class Discussion
       "input[type=checkbox][value='post_to_sis']"
     end
 
+    def group_discussion_checkbox_selector
+      "input[type=checkbox][value='group-discussion']"
+    end
+
+    def group_category_select_selector
+      "input[placeholder='Select a group category']"
+    end
+
+    def group_category_option_selector(group_cat_name)
+      "li:contains('#{group_cat_name}')"
+    end
+
     # ---------------------- Elements ----------------------
 
     def discussion_page_body
@@ -215,6 +227,10 @@ class Discussion
       f(section_warning_continue_selector)
     end
 
+    def group_category_option(group_cat_name)
+      fj(group_category_option_selector(group_cat_name))
+    end
+
     # ---------------------- Actions ----------------------
     def visit(course, discussion)
       get("/courses/#{course.id}/discussion_topics/#{discussion.id}")
@@ -259,6 +275,18 @@ class Discussion
 
     def click_sync_to_sis_checkbox
       force_click_native(sync_to_sis_checkbox_selector)
+    end
+
+    def click_group_discussion_checkbox
+      force_click_native(group_discussion_checkbox_selector)
+    end
+
+    def click_group_category_select
+      force_click_native(group_category_select_selector)
+    end
+
+    def click_group_category_option(group_cat_name)
+      group_category_option(group_cat_name).click
     end
 
     def update_summary_user_input(user_input)
