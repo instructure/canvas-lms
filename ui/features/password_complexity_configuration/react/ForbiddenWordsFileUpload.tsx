@@ -18,12 +18,8 @@
 
 import React, {useCallback, useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {IconTrashLine} from '@instructure/ui-icons'
 import {RocketSVG} from '@instructure/canvas-media'
 import type {FormMessage} from '@instructure/ui-form-field'
-import {Table} from '@instructure/ui-table'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Flex} from '@instructure/ui-flex'
 import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Modal} from '@instructure/ui-modal'
@@ -31,17 +27,22 @@ import {Heading} from '@instructure/ui-heading'
 import {FileDrop} from '@instructure/ui-file-drop'
 import {Billboard} from '@instructure/ui-billboard'
 import {Text} from '@instructure/ui-text'
+import {Table} from '@instructure/ui-table'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Flex} from '@instructure/ui-flex'
+import {IconTrashLine} from '@instructure/ui-icons'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
 const I18n = useI18nScope('password_complexity_configuration')
+
+declare const ENV: GlobalEnv
 
 type Props = {
   open: boolean
   onDismiss: () => void
   onSave: () => void
-  forbiddenWordsUrl: string | null
   setForbiddenWordsUrl: (url: string | null) => void
-  forbiddenWordsFilename: string | null
   setForbiddenWordsFilename: (filename: string | null) => void
 }
 
@@ -49,34 +50,37 @@ const ForbiddenWordsFileUpload = ({
   open,
   onDismiss,
   onSave,
-  forbiddenWordsUrl,
   setForbiddenWordsUrl,
-  forbiddenWordsFilename,
   setForbiddenWordsFilename,
 }: Props) => {
   const [fileDropMessages, setFileDropMessages] = useState<FormMessage[]>([])
   const [uploadInFlight, setUploadInFlight] = useState(false)
-  const [localForbiddenWordsUrl, setLocalForbiddenWordsUrl] = useState(forbiddenWordsUrl)
-  const [localForbiddenWordsFilename, setLocalForbiddenWordsFilename] =
-    useState(forbiddenWordsFilename)
+  const [localForbiddenWordsUrl, setLocalForbiddenWordsUrl] = useState<string | null>(null)
+  const [localForbiddenWordsFilename, setLocalForbiddenWordsFilename] = useState<string | null>(
+    null
+  )
   const [isValidFile, setIsValidFile] = useState(false)
 
   useEffect(() => {
     if (open) {
-      setLocalForbiddenWordsUrl(forbiddenWordsUrl)
-      setLocalForbiddenWordsFilename(forbiddenWordsFilename)
+      setLocalForbiddenWordsUrl(null)
+      setLocalForbiddenWordsFilename(null)
+      setIsValidFile(false)
     }
-  }, [open, forbiddenWordsUrl, forbiddenWordsFilename])
+  }, [open])
 
   const resetState = useCallback(() => {
     setFileDropMessages([])
+    setLocalForbiddenWordsUrl(null)
+    setLocalForbiddenWordsFilename(null)
+    setIsValidFile(false)
   }, [])
 
   const handleDropAccepted = useCallback((acceptedFiles: ArrayLike<File | DataTransferItem>) => {
     setFileDropMessages([])
     const newFile = acceptedFiles[0] as File
     if (newFile.type !== 'text/plain') {
-      setFileDropMessages([{text: 'Invalid file type', type: 'error'}])
+      setFileDropMessages([{text: I18n.t('Invalid file type'), type: 'error'}])
       setIsValidFile(false)
       return
     }
@@ -88,6 +92,7 @@ const ForbiddenWordsFileUpload = ({
   const handleRemoveFile = useCallback(() => {
     setLocalForbiddenWordsUrl(null)
     setLocalForbiddenWordsFilename(null)
+    setIsValidFile(false)
   }, [])
 
   const handleUpload = useCallback(async () => {
@@ -112,25 +117,19 @@ const ForbiddenWordsFileUpload = ({
         onSave()
         resetState()
       } else {
-        const errorData = await uploadResponse.json()
         setFileDropMessages([
           {
-            text: I18n.t('Upload failed: %{error}', {
-              error: errorData.error || uploadResponse.response.statusText,
-            }),
+            text: I18n.t('Upload failed. Please try again later.'),
             type: 'error',
           },
         ])
       }
     } catch (error) {
-      let errorMessage = I18n.t('An unknown error occurred')
-      if (error instanceof Error) {
-        errorMessage = error.message
-      } else if (typeof error === 'string') {
-        errorMessage = error
-      }
       setFileDropMessages([
-        {text: I18n.t('Upload failed: %{error}', {error: errorMessage}), type: 'error'},
+        {
+          text: I18n.t('An error occurred during the upload. Please try again later.'),
+          type: 'error',
+        },
       ])
     } finally {
       setUploadInFlight(false)
@@ -186,7 +185,7 @@ const ForbiddenWordsFileUpload = ({
           onDismiss()
         }}
         size="medium"
-        label="Upload Forbidden Words/Terms List"
+        label={I18n.t('Upload Forbidden Words/Terms List')}
         shouldCloseOnDocumentClick={true}
         overflow="scroll"
       >
