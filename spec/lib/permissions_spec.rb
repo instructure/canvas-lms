@@ -37,11 +37,16 @@ describe Permissions, type: :module do
       end.to raise_error(RuntimeError, "Cannot register permissions after the application has been fully initialized")
     end
 
-    it "raises an error if trying to register duplicate permissions" do
-      Permissions.register(read: { description: "Read Permission" })
+    it "logs a warning and skips the duplicate permission" do
+      key = :read
+      Permissions.register(key => { description: "Read Permission" })
+      allow(Rails.logger).to receive(:warn)
       expect do
-        Permissions.register(read: { description: "Another Read Permission" })
-      end.to raise_error(RuntimeError, "Duplicate permission detected: read")
+        Permissions.register(key => { description: "Duplicate Read Permission" })
+      end.not_to raise_error
+      expect(Rails.logger).to have_received(:warn).with("Duplicate permission detected: #{key}")
+      # Ensure the duplicate permission is not added
+      expect(Permissions.instance_variable_get(:@permissions)[key][:description]).to eq("Read Permission")
     end
 
     it "raises an error if the input is not a hash" do
