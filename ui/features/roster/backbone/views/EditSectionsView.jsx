@@ -57,7 +57,7 @@ export default class EditSectionsView extends DialogBaseView {
     const enrollments = this.model.sectionEditableEnrollments()
 
     const excludeSections = enrollments.map(enrollment => {
-      const section = ENV.CONTEXTS.sections[enrollment.course_section_id]
+      const section = ENV.SECTIONS.find(s => s.id === enrollment.course_section_id)
 
       return {
         id: section.id,
