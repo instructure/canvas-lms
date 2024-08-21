@@ -23,7 +23,6 @@ group :test do
   gem "dotenv", "~> 3.0", require: false
   gem "brakeman", "~> 6.0", require: false
   gem "simplecov-rcov", "~> 0.3", require: false
-  gem "puma", "~> 6.3", require: false
 
   gem "db-query-matchers", "~> 0.12"
   gem "rspec", "~> 3.12"
