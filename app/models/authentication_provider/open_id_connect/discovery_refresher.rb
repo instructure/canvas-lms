@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2016 - present Instructure, Inc.
+# Copyright (C) 2024 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,15 +18,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "saml2"
-
-class AuthenticationProvider::SAML::MetadataRefresher < AuthenticationProvider::ProviderRefresher
+class AuthenticationProvider::OpenIDConnect::DiscoveryRefresher < AuthenticationProvider::ProviderRefresher
   class << self
     def refresh_providers(shard_scope: Shard.current, providers: nil)
-      federations = AuthenticationProvider::SAML::Federation.descendants.map { |federation| federation::URN }
-      providers ||= AuthenticationProvider::SAML.active
-                                                .where.not(metadata_uri: [nil, ""] + federations)
-                                                .shard(shard_scope)
+      # _only_ refresh OpenID Connect providers; any sub-classes likely need the same metadata for
+      # all instances, so they should inherit from this class and implement caching
+      providers ||= AuthenticationProvider.active
+                                          .where.not(metadata_uri: [nil, ""])
+                                          .where(auth_type: "openid_connect")
+                                          .shard(shard_scope)
       super
     end
   end

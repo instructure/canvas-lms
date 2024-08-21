@@ -44,7 +44,8 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
        end_session_endpoint
        userinfo_endpoint
        jit_provisioning
-       token_endpoint_auth_method].freeze
+       token_endpoint_auth_method
+       discovery_url].freeze
   end
 
   def self.recognized_params
@@ -80,7 +81,10 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
   end
   validates :token_endpoint_auth_method, inclusion: { in: VALID_AUTH_METHODS }
 
+  before_validation :download_discovery
+
   alias_attribute :end_session_endpoint, :log_out_url
+  alias_attribute :discovery_url, :metadata_uri
 
   def raw_login_attribute
     read_attribute(:login_attribute).presence
@@ -150,6 +154,18 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
     settings["token_endpoint_auth_method"] = value.presence
   end
 
+  def populate_from_discovery_json(json)
+    populate_from_discovery(JSON.parse(json))
+  end
+  alias_method :metadata=, :populate_from_discovery_json
+
+  def populate_from_discovery(json)
+    self.authorize_url = json["authorization_endpoint"]
+    self.token_url = json["token_endpoint"]
+    self.userinfo_endpoint = json["userinfo_endpoint"]
+    self.end_session_endpoint = json["end_session_endpoint"]
+  end
+
   protected
 
   def authorize_options
@@ -168,6 +184,28 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
   end
 
   private
+
+  def download_discovery
+    return if discovery_url.blank?
+    return unless discovery_url_changed?
+
+    begin
+      populate_from_discovery_url(discovery_url)
+    rescue => e
+      ::Canvas::Errors.capture_exception(:oidc_discovery_refresh, e)
+      errors.add(:discovery_url, e.message)
+    end
+  end
+
+  def populate_from_discovery_url(url)
+    ::Canvas.timeout_protection("oidc_discovery_fetch") do
+      CanvasHttp.get(url) do |response|
+        # raise error unless it's a 2xx
+        response.value
+        populate_from_discovery_json(JSON.parse(response.body))
+      end
+    end
+  end
 
   def claims(token)
     token.options[:claims] ||= begin

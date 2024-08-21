@@ -277,6 +277,10 @@ Rails.configuration.after_initialize do
     end
   end
 
+  Delayed::Periodic.cron "AuthenticationProvider::OpenIDConnect::DiscoveryRefresher.refresh_providers", "15 1 * * *" do
+    with_each_shard_by_database(AuthenticationProvider::OpenIDConnect::DiscoveryRefresher, :refresh_providers, local_offset: true)
+  end
+
   Delayed::Periodic.cron "AuthenticationProvider::LDAP.ensure_tls_cert_validity", "30 0 * * *" do
     with_each_shard_by_database(AuthenticationProvider::LDAP, :ensure_tls_cert_validity, local_offset: true)
   end

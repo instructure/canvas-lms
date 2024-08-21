@@ -43,6 +43,23 @@ describe AuthenticationProvider::OpenIDConnect do
     end
   end
 
+  describe "#populate_from_discovery" do
+    it "sets fields" do
+      subject.populate_from_discovery(
+        {
+          "authorization_endpoint" => "http://auth/authorize",
+          "token_endpoint" => "http://auth/token",
+          "userinfo_endpoint" => "http://auth/userinfo",
+          "end_session_endpoint" => "http://auth/logout"
+        }
+      )
+      expect(subject.authorize_url).to eq "http://auth/authorize"
+      expect(subject.token_url).to eq "http://auth/token"
+      expect(subject.userinfo_endpoint).to eq "http://auth/userinfo"
+      expect(subject.end_session_endpoint).to eq "http://auth/logout"
+    end
+  end
+
   describe "#scope_for_options" do
     it "automatically infers according to requested claims" do
       subject.federated_attributes = { "email" => { "attribute" => "email" } }
