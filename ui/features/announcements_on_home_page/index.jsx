@@ -33,7 +33,7 @@ if (ENV.SHOW_ANNOUNCEMENTS) {
   ready(() => {
     const container = document.querySelector('#announcements_on_home_page')
     ReactDOM.render(
-      <Spinner renderTitle={I18n.t('Loading Announcements')} size="small" />,
+      <Spinner delay={500} renderTitle={I18n.t('Loading Announcements')} size="small" />,
       container
     )
 
