@@ -190,6 +190,43 @@
     <th scope="row"><%= before_label(:password, "Password") %></th>
     <td><label for="change_password_checkbox" class="checkbox"><input type="checkbox" id="change_password_checkbox" name="pseudonym[change_password]" value="1"/><%= t('labels.change_password', "Change Password") %></label></td>
   </tr>
+    <% @domain_root_account.password_policy.each do |key, value| %>
+      <% if key == :minimum_character_length %>
+        <tr class="change_password_row" style="display: none;">
+          <td colspan="2">
+            <%= t("
+              Must be at least %{value} Characters in length",
+              :value => value
+            ) %>
+          </td>
+        </tr>
+      <% end %>
+      <% if key == :require_number_characters %>
+        <tr class="change_password_row" style="display: none;">
+          <td colspan="2">
+            <%= t("
+              Must contain a number character (ie: 0...9).",
+            ) %>
+          </td>
+        </tr>
+      <% end %>
+      <% if key == :require_symbol_characters %>
+        <tr class="change_password_row" style="display: none;">
+          <td colspan="2">
+            <%= t("
+              Must contain a symbol character (ie: ! @ # $ %).",
+            ) %>
+          </td>
+        </tr>
+      <% end %>
+    <% end %>
+    <tr class="change_password_row" style="display: none;">
+      <td colspan="2">
+        <%= t("
+          Must not use words or sequences of characters common in passwords (ie: password, 12345, etc...)",
+        ) %>
+      </td>
+    </tr>
   <% end %>
   <tr class="change_password_row" style="display: none;">
     <th class="nobr" scope="row"><label for="profile_pseudonym_id"><%= before_label(:password_for, "Password For") %></label></th>

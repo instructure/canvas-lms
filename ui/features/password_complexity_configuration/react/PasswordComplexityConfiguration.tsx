@@ -52,6 +52,16 @@ interface Settings {
   password_policy: PasswordPolicy
 }
 
+interface DataResponse {
+  password_policy: {
+    require_number_characters: string
+    require_symbol_characters: string
+    allow_login_suspension: string
+    maximum_login_attempts?: number
+    minimum_character_length?: number
+  }
+}
+
 interface Account {
   settings: Settings
 }
@@ -116,8 +126,11 @@ const PasswordComplexityConfiguration = () => {
   const [enableApplyButton, setEnableApplyButton] = useState(true)
   const [minimumCharacterLengthEnabled, setMinimumCharacterLengthEnabled] = useState(true)
   const [minimumCharacterLength, setMinimumCharacterLength] = useState(8)
+  const [minimumCharacterLengthSaved, setMinimumCharacterLengthSaved] = useState(8)
   const [requireNumbersEnabled, setRequireNumbersEnabled] = useState(true)
+  const [requireNumbersEnabledSaved, setRequireNumbersEnabledSaved] = useState(false)
   const [requireSymbolsEnabled, setRequireSymbolsEnabled] = useState(true)
+  const [requireSymbolsEnabledSaved, setRequireSymbolsEnabledSaved] = useState(false)
   const [customForbiddenWordsEnabled, setCustomForbiddenWordsEnabled] = useState(false)
   const [customMaxLoginAttemptsEnabled, setCustomMaxLoginAttemptsEnabled] = useState(false)
   const [allowLoginSuspensionEnabled, setAllowLoginSuspensionEnabled] = useState(false)
@@ -156,6 +169,43 @@ const PasswordComplexityConfiguration = () => {
   const handleOpenTray = () => {
     setShowTray(true)
   }
+
+  useEffect(() => {
+    const currentSettingsUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`
+
+    const fetchCurrentSettings = async () => {
+      try {
+        const {status, data} = await executeApiRequest<DataResponse>({
+          path: currentSettingsUrl,
+          method: 'GET',
+        })
+
+        if (status === 200) {
+          const passwordPolicy = data.password_policy
+
+          if (passwordPolicy.require_number_characters === 'true') {
+            setRequireNumbersEnabledSaved(true)
+          }
+          if (passwordPolicy.require_symbol_characters === 'true') {
+            setRequireSymbolsEnabledSaved(true)
+          }
+          setMinimumCharacterLengthSaved(passwordPolicy.minimum_character_length || 0)
+        }
+      } catch (err: any) {
+        // err type has to be any because the error object is not defined
+        showFlashAlert({
+          message: I18n.t('An error occurred fetching password policy settings.'),
+          err,
+          type: 'error',
+        })
+      }
+    }
+
+    fetchCurrentSettings()
+
+    setMinimumCharacterLengthSaved(minimumCharacterLength)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleCustomMaxLoginAttemptToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked
@@ -254,7 +304,7 @@ const PasswordComplexityConfiguration = () => {
       <Heading margin="small auto xx-small auto" level="h4">
         {I18n.t('Password Options')}
       </Heading>
-      <Button onClick={handleOpenTray} color="primary">
+      <Button onClick={handleOpenTray} color="secondary">
         {I18n.t('View Options')}
       </Button>
       <Tray
@@ -294,7 +344,19 @@ const PasswordComplexityConfiguration = () => {
             <Alert variant="info" margin="small medium medium medium">
               {I18n.t('Your password must meet the following requirements')}
               <List margin="xxx-small">
-                <List.Item>{I18n.t('Must be at least 8 Characters in length.')}</List.Item>
+                <List.Item>
+                  {I18n.t('Must be at least %{minimumCharacterLengthSaved} Characters in length.', {
+                    minimumCharacterLengthSaved,
+                  })}
+                </List.Item>
+                {requireNumbersEnabledSaved && (
+                  <List.Item>{I18n.t('Must contain a number character (ie: 0...9).')}</List.Item>
+                )}
+                {requireSymbolsEnabledSaved && (
+                  <List.Item>
+                    {I18n.t('Must contain a symbol character (ie: ! @ # $ %).')}
+                  </List.Item>
+                )}
                 <List.Item>
                   {I18n.t(
                     'Must not use words or sequences of characters common in passwords (ie: password, 12345, etc...)'
