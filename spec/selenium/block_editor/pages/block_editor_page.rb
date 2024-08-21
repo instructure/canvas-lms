@@ -79,7 +79,7 @@ module BlockEditorPage
 
   # Blocks
   def block_resize_handle_se
-    f(".block-resizer.se")
+    f(".block-resizer .moveable-se")
   end
 
   def block_toolbar

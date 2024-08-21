@@ -299,15 +299,16 @@ describe "Block Editor", :ignore_js_errors do
     it "adjusts the width when the height is changed" do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
+
       f(".block.image-block").click  # select the section
       f(".block.image-block").click  # select the block
       expect(block_resize_handle_se).to be_displayed
       expect(f(".block.image-block").size.width).to eq(100)
       expect(f(".block.image-block").size.height).to eq(50)
 
-      drag_and_drop_element_by(block_resize_handle_se, 10, 50)
-      expect(f(".block.image-block").size.width).to eq(200)
-      expect(f(".block.image-block").size.height).to eq(100)
+      f("body").send_keys(:alt, :shift, :arrow_right)
+      expect(f(".block.image-block").size.width).to eq(110)
+      expect(f(".block.image-block").size.height).to eq(55)
     end
   end
 end

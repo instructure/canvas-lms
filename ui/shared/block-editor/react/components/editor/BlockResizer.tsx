@@ -18,53 +18,12 @@
 
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useNode, type Node} from '@craftjs/core'
-import {getToolbarPos as getToolbarPosUtil} from '../../utils/renderNodeHelpers'
 import {getAspectRatio} from '../../utils/size'
+import Moveable, {type OnResize} from 'react-moveable'
 
-const CORNER_OFFSET = 5 // half the corder box width
-
-type Rect = {
-  top: number
-  left: number
+type Sz = {
   width: number
   height: number
-}
-
-type Corner = 'nw' | 'ne' | 'se' | 'sw'
-type CoordVal = {
-  left: number
-  top: number
-}
-
-export const getNewSz = (
-  corner: string,
-  currRect: Rect,
-  dragStart: {x: number; y: number},
-  event: DragEvent
-) => {
-  let width = 0
-  switch (corner) {
-    case 'nw':
-    case 'sw':
-      width = currRect.width - (event.clientX - dragStart.x)
-      break
-    case 'ne':
-    case 'se':
-      width = currRect.width + (event.clientX - dragStart.x)
-      break
-  }
-  let height = 0
-  switch (corner) {
-    case 'nw':
-    case 'ne':
-      height = currRect.height - (event.clientY - dragStart.y)
-      break
-    case 'sw':
-    case 'se':
-      height = currRect.height + (event.clientY - dragStart.y)
-      break
-  }
-  return {width, height}
 }
 
 type BlockResizeProps = {
@@ -82,18 +41,19 @@ const BlockResizer = ({mountPoint}: BlockResizeProps) => {
       node: n,
     }
   })
-  const [nwRef, setnwRef] = useState<HTMLDivElement | null>(null)
-  const [neRef, setneRef] = useState<HTMLDivElement | null>(null)
-  const [seRef, setseRef] = useState<HTMLDivElement | null>(null)
-  const [swRef, setswRef] = useState<HTMLDivElement | null>(null)
-  const [currRect, setCurrRect] = useState<Rect>({left: 0, top: 0, width: 0, height: 0})
+  const [currSz, setCurrSz] = useState<Sz>(() => {
+    const {width, height} = node.data.props
+    if (width) {
+      return {width, height}
+    } else if (node.dom) {
+      const rect = node.dom.getBoundingClientRect()
+      return {width: rect.width, height: rect.height}
+    } else {
+      return {width: 0, height: 0}
+    }
+  })
 
-  const dragHandleStart = useRef({x: 0, y: 0})
   const isDragging = useRef(false)
-
-  const getToolbarPos = useCallback(() => {
-    return getToolbarPosUtil(node.dom as HTMLElement, mountPoint, null, false)
-  }, [mountPoint, node.dom])
 
   const handleResizeKeys = useCallback(
     event => {
@@ -107,8 +67,8 @@ const BlockResizer = ({mountPoint}: BlockResizeProps) => {
       }
       const step = event.shiftKey ? 10 : 1
 
-      let newWidth = currRect.width
-      let newHeight = currRect.height
+      let newWidth = currSz.width
+      let newHeight = currSz.height
       switch (event.key) {
         case 'ArrowRight':
           newWidth += step * dir
@@ -127,8 +87,8 @@ const BlockResizer = ({mountPoint}: BlockResizeProps) => {
         newWidth = Math.max(newWidth, 24)
         newHeight = Math.max(newHeight, 24)
         if (maintainAspectRatio) {
-          const aspectRatio = getAspectRatio(currRect.width, currRect.height)
-          if (newHeight !== currRect.height) {
+          const aspectRatio = getAspectRatio(currSz.width, currSz.height)
+          if (newHeight !== currSz.height) {
             newWidth = newHeight * aspectRatio
           } else {
             newHeight = newWidth / aspectRatio
@@ -137,15 +97,15 @@ const BlockResizer = ({mountPoint}: BlockResizeProps) => {
         const myblock = node.dom as HTMLElement
         myblock.style.width = `${newWidth}px`
         myblock.style.height = `${newHeight}px`
-        const {top, left} = getToolbarPos()
-        setCurrRect({left, top, width: newWidth, height: newHeight})
+
+        setCurrSz({width: newWidth, height: newHeight})
         setProp((props: any) => {
           props.width = newWidth
           props.height = newHeight
         })
       }
     },
-    [currRect.height, currRect.width, getToolbarPos, maintainAspectRatio, node.dom, setProp]
+    [currSz.height, currSz.width, maintainAspectRatio, node.dom, setProp]
   )
 
   useEffect(() => {
@@ -156,248 +116,56 @@ const BlockResizer = ({mountPoint}: BlockResizeProps) => {
   }, [handleResizeKeys])
 
   useEffect(() => {
-    if (node.dom && (currRect.width === 0 || currRect.height === 0)) {
-      const {top, left} = getToolbarPosUtil(node.dom as HTMLElement, mountPoint, null, false)
-      const {width, height} = (node.dom as HTMLElement).getBoundingClientRect()
-      setCurrRect({left, top, width, height})
-    }
-  }, [currRect.height, currRect.width, mountPoint, node.dom])
-
-  useEffect(() => {
     if (
       !isDragging.current &&
       'width' in node.data.props &&
-      (node.data.props.width !== currRect.width || node.data.props.height !== currRect.height)
+      (node.data.props.width !== currSz.width || node.data.props.height !== currSz.height)
     ) {
-      // assume height is there too then
-      const {top, left} = getToolbarPosUtil(node.dom as HTMLElement, mountPoint, null, false)
-      setCurrRect({
-        left,
-        top,
+      setCurrSz({
         width: node.data.props.width,
         height: node.data.props.height,
       })
     }
-  }, [
-    currRect.height,
-    currRect.left,
-    currRect.top,
-    currRect.width,
-    mountPoint,
-    node.data.props,
-    node.dom,
-  ])
+  }, [currSz.height, currSz.width, node.data.props.height, node.data.props.width, node.data.props])
 
-  const handleDrag = useCallback(
-    (event: DragEvent) => {
-      const myblock = node.dom as HTMLElement
-      const corner = (event.currentTarget as HTMLElement).dataset.corner
-      if (!corner) return
-      let {width, height} = getNewSz(corner, currRect, dragHandleStart.current, event)
-
-      if (width > 0 && height > 0) {
-        width = Math.max(width, 24)
-        height = Math.max(height, 24)
-        if (maintainAspectRatio) {
-          const aspectRatio = getAspectRatio(currRect.width, currRect.height)
-          if (aspectRatio > 1) {
-            width = height * aspectRatio
-          } else {
-            height = width / aspectRatio
-          }
-        }
-        myblock.style.width = `${width}px`
-        myblock.style.height = `${height}px`
-        const {top, left} = getToolbarPos()
-        setCurrRect({left, top, width, height})
-      }
-    },
-    [currRect, getToolbarPos, maintainAspectRatio, node.dom]
-  )
-
-  const handleDragEnd = useCallback(
-    (event: Event) => {
-      event.currentTarget?.removeEventListener('drag', handleDrag)
-      event.currentTarget?.removeEventListener('dragend', handleDragEnd)
-
-      const {width, height} = (node.dom as HTMLElement).getBoundingClientRect()
-      const {top, left} = getToolbarPos()
-      setProp((props: any) => {
-        props.width = width
-        props.height = height
-      })
-      setCurrRect({left, top, width, height})
-      isDragging.current = false
-      const myToolbar = document.querySelector('.block-editor-editor .block-toolbar') as HTMLElement
-      if (myToolbar) {
-        myToolbar.style.visibility = 'initial'
-      }
-    },
-    [getToolbarPos, handleDrag, node.dom, setProp]
-  )
-
-  const handleDragStart = useCallback(
-    (event: DragEvent) => {
-      event.stopPropagation()
-      if (!event.dataTransfer) return
-      // @ts-expect-error
-      event.dataTransfer.mozShowFailAnimation = false // see https://github.com/whatwg/html/issues/10039
-      event.dataTransfer.setDragImage(event.target as HTMLElement, 0, 0)
-      const target = event.currentTarget as HTMLElement
-
-      dragHandleStart.current = {x: event.clientX, y: event.clientY}
-      target.addEventListener('drag', handleDrag)
-      target.addEventListener('dragend', handleDragEnd)
-      isDragging.current = true
-
-      const myToolbar = document.querySelector('.block-editor-editor .block-toolbar') as HTMLElement
-      if (myToolbar) {
-        myToolbar.style.visibility = 'hidden'
-      }
-    },
-    [handleDrag, handleDragEnd]
-  )
-
-  useEffect(() => {
-    if (nwRef && neRef && seRef && swRef) {
-      nwRef.addEventListener('dragstart', handleDragStart)
-      neRef.addEventListener('dragstart', handleDragStart)
-      seRef.addEventListener('dragstart', handleDragStart)
-      swRef.addEventListener('dragstart', handleDragStart)
+  const handleResizeStart = useCallback(() => {
+    isDragging.current = true
+    const myToolbar = mountPoint.querySelector('.block-editor-editor .block-toolbar') as HTMLElement
+    if (myToolbar) {
+      myToolbar.style.visibility = 'hidden'
     }
-    return () => {
-      nwRef?.removeEventListener('dragstart', handleDragStart)
-      neRef?.removeEventListener('dragstart', handleDragStart)
-      seRef?.removeEventListener('dragstart', handleDragStart)
-      swRef?.removeEventListener('dragstart', handleDragStart)
+  }, [mountPoint])
+
+  const handleResize = useCallback(({target, width, height, delta}: OnResize) => {
+    delta[0] && (target!.style.width = `${width}px`)
+    delta[1] && (target!.style.height = `${height}px`)
+    setCurrSz({width, height})
+  }, [])
+
+  const handleResizeEnd = useCallback(() => {
+    isDragging.current = false
+    setProp((props: any) => {
+      props.width = currSz.width
+      props.height = currSz.height
+    })
+    const myToolbar = mountPoint.querySelector('.block-editor-editor .block-toolbar') as HTMLElement
+    if (myToolbar) {
+      myToolbar.style.visibility = 'visible'
     }
-  }, [handleDragEnd, handleDragStart, neRef, nwRef, seRef, swRef])
-
-  const getCoord = (corner: Corner): CoordVal => {
-    switch (corner) {
-      case 'nw':
-        return {left: currRect.left, top: currRect.top}
-      case 'ne':
-        return {
-          left: currRect.left + currRect.width,
-          top: currRect.top,
-        }
-      case 'se':
-        return {
-          left: currRect.left + currRect.width,
-          top: currRect.top + currRect.height,
-        }
-      case 'sw':
-        return {
-          left: currRect.left,
-          top: currRect.top + currRect.height,
-        }
-    }
-  }
-
-  const renderCorners = () => {
-    const nw = getCoord('nw')
-    const ne = getCoord('ne')
-    const se = getCoord('se')
-    const sw = getCoord('sw')
-
-    return (
-      <>
-        <div
-          ref={el => setnwRef(el)}
-          data-corner="nw"
-          className="block-resizer nw"
-          draggable="true"
-          style={{
-            left: `${nw.left - CORNER_OFFSET}px`,
-            top: `${nw.top - CORNER_OFFSET}px`,
-          }}
-        />
-        <div
-          ref={el => setneRef(el)}
-          data-corner="ne"
-          className="block-resizer ne"
-          draggable="true"
-          style={{
-            left: `${ne.left - CORNER_OFFSET}px`,
-            top: `${ne.top - CORNER_OFFSET}px`,
-          }}
-        />
-        <div
-          ref={el => setseRef(el)}
-          data-corner="se"
-          className="block-resizer se"
-          draggable="true"
-          style={{
-            left: `${se.left - CORNER_OFFSET}px`,
-            top: `${se.top - CORNER_OFFSET}px`,
-          }}
-        />
-        <div
-          ref={el => setswRef(el)}
-          data-corner="sw"
-          className="block-resizer sw"
-          draggable="true"
-          style={{
-            left: `${sw.left - CORNER_OFFSET}px`,
-            top: `${sw.top - CORNER_OFFSET}px`,
-          }}
-        />
-      </>
-    )
-  }
-
-  const renderEdges = () => {
-    const nw = getCoord('nw')
-    const ne = getCoord('ne')
-    const sw = getCoord('sw')
-    return (
-      <>
-        <div
-          className="block-resizer edge n"
-          style={{
-            top: `${nw.top}px`,
-            left: `${nw.left}px`,
-            width: `${currRect.width}px`,
-            height: '1px',
-          }}
-        />
-        <div
-          className="block-resizer edge e"
-          style={{
-            top: `${ne.top}px`,
-            left: `${ne.left}px`,
-            width: '1px',
-            height: `${currRect.height}px`,
-          }}
-        />
-        <div
-          className="block-resizer edge s"
-          style={{
-            top: `${sw.top}px`,
-            left: `${sw.left}px`,
-            width: `${currRect.width}px`,
-            height: '1px',
-          }}
-        />
-        <div
-          className="block-resizer edge w"
-          style={{
-            top: `${nw.top}px`,
-            left: `${nw.left}px`,
-            width: '1px',
-            height: `${currRect.height}px`,
-          }}
-        />
-      </>
-    )
-  }
+  }, [currSz.height, currSz.width, mountPoint, setProp])
 
   return (
-    <>
-      {renderEdges()}
-      {renderCorners()}
-    </>
+    <Moveable
+      className="block-resizer"
+      target={node.dom}
+      resizable={true}
+      throttleSize={1}
+      keepRatio={maintainAspectRatio}
+      useResizeObserver={true}
+      onResizeStart={handleResizeStart}
+      onResize={handleResize}
+      onResizeEnd={handleResizeEnd}
+    />
   )
 }
 

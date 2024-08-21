@@ -49,6 +49,8 @@ jest.mock('@craftjs/core', () => {
 
 describe('BlockResizer', () => {
   beforeAll(() => {
+    nodeDomNode.style.width = '100px'
+    nodeDomNode.style.height = '125px'
     document.body.appendChild(nodeDomNode)
     const mountNode = document.createElement('div')
     mountNode.id = 'mountNode'
@@ -58,17 +60,25 @@ describe('BlockResizer', () => {
   it('renders', () => {
     const mountNode = document.getElementById('mountNode') as HTMLElement
     render(<BlockResizer mountPoint={mountNode} />)
-    expect(document.querySelector('.block-resizer.nw')).toBeInTheDocument()
-    expect(document.querySelector('.block-resizer.ne')).toBeInTheDocument()
-    expect(document.querySelector('.block-resizer.sw')).toBeInTheDocument()
-    expect(document.querySelector('.block-resizer.se')).toBeInTheDocument()
-    expect(document.querySelector('.block-resizer.edge.n')).toBeInTheDocument()
-    expect(document.querySelector('.block-resizer.edge.e')).toBeInTheDocument()
-    expect(document.querySelector('.block-resizer.edge.s')).toBeInTheDocument()
-    expect(document.querySelector('.block-resizer.edge.w')).toBeInTheDocument()
-    expect(document.querySelector('.block-resizer.edge.n')).toHaveStyle({width: '100px'})
-    expect(document.querySelector('.block-resizer.edge.e')).toHaveStyle({height: '125px'})
-    expect(document.querySelector('.block-resizer.edge.s')).toHaveStyle({width: '100px'})
-    expect(document.querySelector('.block-resizer.edge.w')).toHaveStyle({height: '125px'})
+    expect(document.querySelector('.block-resizer .moveable-nw')).toBeInTheDocument()
+    expect(document.querySelector('.block-resizer .moveable-ne')).toBeInTheDocument()
+    expect(document.querySelector('.block-resizer .moveable-sw')).toBeInTheDocument()
+    expect(document.querySelector('.block-resizer .moveable-se')).toBeInTheDocument()
+
+    expect(document.querySelector('.block-resizer .moveable-n')).toBeInTheDocument()
+    expect(document.querySelector('.block-resizer .moveable-s')).toBeInTheDocument()
+    expect(document.querySelector('.block-resizer .moveable-e')).toBeInTheDocument()
+    expect(document.querySelector('.block-resizer .moveable-w')).toBeInTheDocument()
+
+    const edges = document.querySelectorAll('.block-resizer .moveable-line')
+    expect(edges).toHaveLength(4)
+    expect(edges[0]).toHaveStyle({width: '101px'})
+    expect(edges[1]).toHaveStyle({width: '126px'})
+    expect(edges[2]).toHaveStyle({width: '101px'})
+    expect(edges[3]).toHaveStyle({width: '126px'})
+    expect(edges[0]).toHaveStyle({height: '1px'})
+    expect(edges[1]).toHaveStyle({height: '1px'})
+    expect(edges[2]).toHaveStyle({height: '1px'})
+    expect(edges[3]).toHaveStyle({height: '1px'})
   })
 })
