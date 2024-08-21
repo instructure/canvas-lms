@@ -157,7 +157,7 @@ describe "RCE Next toolbar features", :ignore_js_errors do
         visit_front_page_edit(@course)
         click_course_images_toolbar_menuitem
         click_image_link(title)
-
+        click_close_button
         select_all_wiki
         increase_indent_toolbar_menuitem.click
 

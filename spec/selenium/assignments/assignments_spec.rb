@@ -423,9 +423,14 @@ describe "assignments" do
           expect(f("#assignment_points_possible").attribute(:value)).to include(points)
 
           if Account.site_admin.feature_enabled?(:selective_release_ui_api)
-            AssignmentCreateEditPage.click_manage_assign_to_button
+            unless Account.site_admin.feature_enabled?(:selective_release_edit_page)
+              AssignmentCreateEditPage.click_manage_assign_to_button
+            end
+
             expect(element_value_for_attr(assign_to_due_date, "value") + ", " + element_value_for_attr(assign_to_due_time, "value")).to eq due_at
-            click_cancel_button
+            unless Account.site_admin.feature_enabled?(:selective_release_edit_page)
+              click_cancel_button
+            end
           else
             due_at_field = fj(".date_field[data-date-type='due_at']:first")
             expect(due_at_field).to have_value due_at
@@ -470,8 +475,13 @@ describe "assignments" do
         expect(f("#assignment_points_possible").text).to match ""
 
         if Account.site_admin.feature_enabled?(:selective_release_ui_api)
-          AssignmentCreateEditPage.click_manage_assign_to_button
-          expect(element_value_for_attr(assign_to_due_date, "value")).to match expected_date
+          unless Account.site_admin.feature_enabled?(:selective_release_edit_page)
+            AssignmentCreateEditPage.click_manage_assign_to_button
+            expect(element_value_for_attr(assign_to_due_date, "value")).to match expected_date
+            expect(element_value_for_attr(assign_to_due_date(1), "value")).to eq("")
+          end
+
+          expect(element_value_for_attr(assign_to_due_date(0), "value")).to match expected_date
           expect(element_value_for_attr(assign_to_due_date(1), "value")).to eq("")
         else
           first_input_val = driver.execute_script("return $('.DueDateInput__Container:first input').val();")
@@ -711,13 +721,17 @@ describe "assignments" do
         expect(@frozen_assign.reload.due_at.to_i).not_to eq old_due_at.to_i
       end
 
-      it "allows editing the due date even if completely frozen", :ignore_js_errors do
-        differentiated_modules_on
+      it "allows editing the due date even if completely frozen with SR on", :ignore_js_errors do
         old_due_at = @frozen_assign.due_at
         run_assignment_edit(@frozen_assign) do
-          AssignmentCreateEditPage.click_manage_assign_to_button
+          unless Account.site_admin.feature_enabled?(:selective_release_edit_page)
+            AssignmentCreateEditPage.click_manage_assign_to_button
+          end
+          assign_to_due_date.send_keys(:control, "a", :backspace)
           update_due_date(0, "Sep 20, 2012")
-          click_save_button("Apply")
+          unless Account.site_admin.feature_enabled?(:selective_release_edit_page)
+            click_save_button("Apply")
+          end
         end
 
         expect(f(".assignment_dates").text).to match(/Sep 20, 2012/)

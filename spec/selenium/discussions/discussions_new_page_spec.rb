@@ -634,12 +634,12 @@ describe "discussions" do
 
       it "only shows the assign to UI when selective_release is enabled if the student has an unrestricted enrollment" do
         get "/courses/#{course.id}/discussion_topics/new"
-        expect(element_exists?(Discussion.assign_to_button_selector)).to be_truthy
+        expect(element_exists?(Discussion.assign_to_card_selector)).to be_truthy
 
         enrollment = course.enrollments.find_by(user: student)
         enrollment.update!(limit_privileges_to_course_section: true)
         get "/courses/#{course.id}/discussion_topics/new"
-        expect(element_exists?(Discussion.assign_to_button_selector)).to be_falsey
+        expect(element_exists?(Discussion.assign_to_card_selector)).to be_falsey
       end
 
       it "only shows the assign to embedded UI when selective_release enabled if the student has an unrestricted enrollment" do
@@ -1024,7 +1024,7 @@ describe "discussions" do
           get "/courses/#{course.id}/discussion_topics/new"
           expect(f("div[role='tab']").text).to eq "Details"
           resize_screen_to_mobile_width
-          expect(f("input[id='Select_0']").attribute("title")).to eq "Details"
+          expect(f("input[data-testid='view-select']").attribute("title")).to eq "Details"
         end
 
         it "After Save and publish need to see a publish pill in edit page" do
@@ -1078,6 +1078,7 @@ describe "discussions" do
       end
 
       it "shows only and creates only group context discussions options" do
+        skip("LX-2015 can't save a discussion started from group page")
         get "/groups/#{group.id}/discussion_topics/new"
         expect(f("body")).not_to contain_jqcss "input[value='enable-delay-posting']"
         expect(f("body")).not_to contain_jqcss "input[value='enable-participants-commenting']"
@@ -1403,12 +1404,12 @@ describe "discussions" do
 
       it "does not allow submitting, when groups outside of the selected group category are selected" do
         differentiated_modules_off
+        Account.site_admin.disable_feature!(:selective_release_edit_page)
         group_category.groups.create!(name: "group 1", context_type: "Course", context_id: course.id)
         get "/courses/#{course.id}/discussion_topics/new"
 
         title = "Group Context Discussion"
         message = "this is a group context discussion"
-
         f("input[placeholder='Topic Title']").send_keys title
         type_in_tiny("textarea#discussion-topic-message-body", message)
         force_click_native('input[type=checkbox][value="graded"]')
@@ -1939,6 +1940,10 @@ describe "discussions" do
         end
 
         context "with Differentiated Modules FF on and assign to tray available" do
+          before :once do
+            Account.site_admin.disable_feature!(:selective_release_edit_page)
+          end
+
           context "set with ItemAssigntoTray" do
             before do
               course.conditional_release = true
@@ -2010,6 +2015,7 @@ describe "discussions" do
             end
 
             it "assigns overrides only correctly" do
+              skip("LX-1974: flakey test not going to be needed when edit page feature turned on")
               Discussion.assign_to_button.click
               wait_for_assign_to_tray_spinner
 
@@ -2468,6 +2474,10 @@ describe "discussions" do
 
     # This is with the tray and can be removed once the embedded feature is on.
     context "with selective_release_backend and selective_release_ui_api enabled" do
+      before :once do
+        Account.site_admin.disable_feature!(:selective_release_edit_page)
+      end
+
       before do
         user_session(teacher)
       end

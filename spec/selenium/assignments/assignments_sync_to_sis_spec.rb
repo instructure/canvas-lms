@@ -155,9 +155,10 @@ describe "assignments sync to sis" do
       let(:error) { "Please add a due date" }
       let(:settings_enable) { { sis_require_assignment_due_date: { value: true } } }
 
-      context "with selective release flags on" do
-        before(:once) do
+      context "with selective release flags on with the assign to tray" do
+        before :once do
           differentiated_modules_on
+          Account.site_admin.disable_feature!(:selective_release_edit_page)
         end
 
         it "validates due date while sis is on", :ignore_js_errors do
@@ -288,6 +289,88 @@ describe "assignments sync to sis" do
             select_module_item_assignee(1, section_to_set)
             click_save_button("Apply")
             keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+            AssignmentCreateEditPage.save_assignment
+
+            check_due_date_table(section_to_set)
+            check_due_date_table("Everyone else")
+          end
+        end
+      end
+
+      context "with selective release flags on and the embedded assign to cards" do
+        before :once do
+          differentiated_modules_on
+        end
+
+        it "validates due date while sis is on", :ignore_js_errors do
+          AssignmentCreateEditPage.save_assignment
+
+          expect(assign_to_date_and_time[0].text).to include("Please add a due date")
+
+          update_due_date(0, format_date_for_view(due_date, "%-m/%-d/%Y"))
+          update_due_time(0, "11:59 PM")
+
+          AssignmentCreateEditPage.save_assignment
+
+          check_due_date_table("Everyone", short_date)
+        end
+
+        it "does not validate when sis is off" do
+          AssignmentCreateEditPage.click_post_to_sis_checkbox
+          AssignmentCreateEditPage.save_assignment
+
+          check_due_date_table("Everyone")
+        end
+
+        describe "differentiated assignment" do
+          let(:differentiate) { true }
+          let(:section_to_set) { "Section B" }
+
+          it "checks each due date when on", :ignore_js_errors do
+            AssignmentCreateEditPage.save_assignment
+
+            update_due_date(0, format_date_for_view(due_date, "%-m/%-d/%Y"))
+            update_due_time(0, "11:59 PM")
+
+            click_add_assign_to_card
+
+            expect(assign_to_date_and_time[3].text).to include("Please add a due date")
+
+            select_module_item_assignee(1, section_to_set)
+            update_due_date(1, format_date_for_view(due_date, "%-m/%-d/%Y"))
+            update_due_time(1, "11:59 PM")
+
+            AssignmentCreateEditPage.save_assignment
+
+            check_due_date_table(section_to_set, short_date)
+          end
+
+          it "checks due date when first add cards then fill fields", :ignore_js_errors do
+            skip("LX-2031: update to date won't save")
+            AssignmentCreateEditPage.save_assignment
+
+            expect(assign_to_date_and_time[0].text).to include("Please add a due date")
+            click_add_assign_to_card
+
+            update_due_date(0, format_date_for_view(due_date, "%-m/%-d/%Y"))
+            update_due_time(0, "11:59 PM")
+
+            expect(assign_to_date_and_time[3].text).to include("Please add a due date")
+
+            select_module_item_assignee(1, section_to_set)
+            update_due_date(1, format_date_for_view(due_date, "%-m/%-d/%Y"))
+            update_due_time(1, "11:59 PM")
+            AssignmentCreateEditPage.save_assignment
+
+            check_due_date_table(section_to_set, short_date)
+          end
+
+          it "does not check when sis is off", :ignore_js_errors do
+            AssignmentCreateEditPage.click_post_to_sis_checkbox
+
+            click_add_assign_to_card
+            select_module_item_assignee(1, section_to_set)
 
             AssignmentCreateEditPage.save_assignment
 

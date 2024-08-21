@@ -31,6 +31,10 @@ class Discussion
       "button[data-testid='manage-assign-to']"
     end
 
+    def assign_to_card_selector
+      "[data-testid='item-assign-to-card']"
+    end
+
     def assign_to_section_selector
       "#manage-assign-to-container"
     end
@@ -136,6 +140,9 @@ class Discussion
     end
 
     # ---------------------- Elements ----------------------
+    def assign_to_card
+      f(assign_to_card_selector)
+    end
 
     def discussion_page_body
       f("body")

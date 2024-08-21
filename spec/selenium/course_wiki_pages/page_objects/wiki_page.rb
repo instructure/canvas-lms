@@ -21,6 +21,10 @@ require_relative "../../common"
 
 module CourseWikiPage
   #------------------------------ Selectors -----------------------------
+  def assign_to_card_selector
+    "[data-testid='item-assign-to-card']"
+  end
+
   def publish_btn_selector
     ".btn-publish"
   end
@@ -62,6 +66,10 @@ module CourseWikiPage
   end
 
   #------------------------------ Elements ------------------------------
+  def assign_to_card
+    f(assign_to_card_selector)
+  end
+
   def publish_btn
     f(publish_btn_selector)
   end
