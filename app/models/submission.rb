@@ -882,7 +882,7 @@ class Submission < ActiveRecord::Base
         similarity_score: originality_report.originality_score&.round(2),
         state: originality_report.state,
         attachment_id: originality_report.attachment_id,
-        report_url: originality_report.report_launch_path,
+        report_url: originality_report.report_launch_path(assignment),
         status: originality_report.workflow_state,
         error_message: originality_report.error_message,
         created_at: originality_report.created_at,
@@ -933,7 +933,7 @@ class Submission < ActiveRecord::Base
       WHEN workflow_state = 'pending' THEN 2
       END"),
                                                                  updated_at: :desc).first
-    report&.report_launch_path
+    report&.report_launch_path(assignment)
   end
 
   def has_originality_report?
