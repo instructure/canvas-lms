@@ -101,6 +101,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
           # Instantiate and execute UpdateAssignment mutation
           assignment_mutation = Mutations::UpdateAssignment.new(object: nil, context:, field: nil)
           assignment_result = assignment_mutation.resolve(input: updated_assignment_args)
+          discussion_topic.lock_at = input[:assignment][:lock_at] if input[:assignment][:lock_at]
 
           if assignment_result[:errors]
             return { errors: assignment_result[:errors] }
