@@ -2935,7 +2935,8 @@ EG = {
       this.currentStudent.submission
     )
     const hideStudentNames = utils.shouldHideStudentNames() ? '&hide_student_name=1' : ''
-    const queryParams = `${iframePreviewVersion}${hideStudentNames}`
+    const entryId = ENV.ENTRY_ID ? `&entry_id=${ENV.ENTRY_ID}` : ''
+    const queryParams = `${iframePreviewVersion}${hideStudentNames}${entryId}`
     const src = `/courses/${courseId}/assignments/${assignmentId}/${resourceSegment}/${anonymizableSubmissionId}?preview=true${queryParams}`
     const iframe = SpeedgraderHelpers.buildIframe(
       htmlEscape(src),

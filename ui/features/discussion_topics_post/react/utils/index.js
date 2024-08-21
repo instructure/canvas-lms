@@ -29,10 +29,14 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const I18n = useI18nScope('discussion_topics_post')
 
-export const getSpeedGraderUrl = (authorId = null) => {
+export const getSpeedGraderUrl = (authorId = null, entryId = null) => {
   let speedGraderUrl = ENV.SPEEDGRADER_URL_TEMPLATE
   if (authorId !== null) {
     speedGraderUrl = speedGraderUrl.replace(/%3Astudent_id/, authorId)
+  }
+
+  if (entryId !== null) {
+    speedGraderUrl = speedGraderUrl.concat(`&entry_id=${entryId}`)
   }
 
   return speedGraderUrl
