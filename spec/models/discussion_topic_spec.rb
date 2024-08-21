@@ -3590,6 +3590,20 @@ describe DiscussionTopic do
       expect(@topic.user_can_summarize?(@observer)).to be false
       expect(@topic.user_can_summarize?(@student)).to be false
     end
+
+    it "does not crash if the topic is in the context of a group with account context" do
+      account = @course.root_account
+      account.enable_feature!(:discussion_summary)
+      group = account.groups.create!
+      topic = group.discussion_topics.create!(title: "topic")
+
+      expect(topic.user_can_summarize?(@teacher)).to be false
+      expect(topic.user_can_summarize?(@ta)).to be false
+      expect(topic.user_can_summarize?(@admin)).to be false
+      expect(topic.user_can_summarize?(@designer)).to be false
+      expect(topic.user_can_summarize?(@observer)).to be false
+      expect(topic.user_can_summarize?(@student)).to be false
+    end
   end
 
   describe "low_level_locked_for?" do
