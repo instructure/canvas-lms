@@ -539,7 +539,7 @@ class Lti::RegistrationsController < ApplicationController
 
       registration_ids = inherited_on_registration_bindings.map(&:registration_id)
       inherited_on_registrations = Shard.partition_by_shard(registration_ids) do |registration_ids_for_shard|
-        Lti::Registration.where(id: registration_ids_for_shard).eager_load(eager_load_models)
+        Lti::Registration.active.where(id: registration_ids_for_shard).eager_load(eager_load_models)
       end.flatten
 
       all_registrations = account_registrations + forced_on_in_site_admin + inherited_on_registrations + consortia_registrations
