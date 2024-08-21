@@ -24,6 +24,8 @@ class Account < ActiveRecord::Base
   include Pronouns
   include SearchTermHelper
 
+  self.ignored_columns += ["enable_user_notes"]
+
   INSTANCE_GUID_SUFFIX = "canvas-lms"
   CALENDAR_SUBSCRIPTION_TYPES = %w[manual auto].freeze
 
