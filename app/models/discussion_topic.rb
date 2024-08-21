@@ -1427,6 +1427,12 @@ class DiscussionTopic < ActiveRecord::Base
       return false
     end
 
+    # course can be an account in case the topic context is group
+    # and the group context is account
+    unless course.is_a?(Course)
+      return false
+    end
+
     course.feature_enabled?(:discussion_summary) && (
       course.user_is_instructor?(user) || course.grants_right?(user, :read_as_admin)
     )
