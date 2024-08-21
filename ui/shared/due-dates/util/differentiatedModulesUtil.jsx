@@ -148,7 +148,7 @@ export const resetStagedCards = (cards, newCardsState, defaultState) => {
   return newState
 }
 
-export const getParsedOverrides = (stagedOverrides, cards, groupCategoryId) => {
+export const getParsedOverrides = (stagedOverrides, cards, groupCategoryId, defaultSectionId) => {
   let index = 0
   const validOverrides = stagedOverrides.filter(override =>
     [undefined, groupCategoryId].includes(override.group_category_id)
@@ -167,7 +167,9 @@ export const getParsedOverrides = (stagedOverrides, cards, groupCategoryId) => {
   const parsedOverrides = Object.entries(overridesByKey).reduce((acc, [key, overrides]) => {
     const datesForGroup = datesFromOverride(overrides[0])
     index++
-    index = cards?.[key]?.index ?? overrides[0].index ?? index
+    // ensure on initial load of the cards, the everyone option is first
+    const everyoneOption = ENV.FEATURES?.selective_release_edit_page && overrides[0].course_section_id === defaultSectionId ? 0 : undefined
+    index = cards?.[key]?.index ?? overrides[0].index ?? everyoneOption ?? index
     acc[key] = {overrides, dates: datesForGroup, index}
     return acc
   }, {})

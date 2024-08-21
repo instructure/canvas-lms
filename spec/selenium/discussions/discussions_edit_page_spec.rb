@@ -1044,12 +1044,12 @@ describe "discussions" do
 
             get "/courses/#{course.id}/discussion_topics/#{discussion_topic.id}/edit"
 
-            expect(assign_to_due_date(0).attribute("value")).to eq("")
-            expect(assign_to_due_time(0).attribute("value")).to eq("")
-            expect(assign_to_available_from_date(0).attribute("value")).to eq(format_date_for_view(available_from, "%b %-e, %Y"))
-            expect(assign_to_available_from_time(0).attribute("value")).to eq(available_from.strftime("%-l:%M %p"))
-            expect(assign_to_until_date(0).attribute("value")).to eq(format_date_for_view(available_until, "%b %-e, %Y"))
-            expect(assign_to_until_time(0).attribute("value")).to eq(available_until.strftime("%-l:%M %p"))
+            expect(assign_to_due_date(1).attribute("value")).to eq("")
+            expect(assign_to_due_time(1).attribute("value")).to eq("")
+            expect(assign_to_available_from_date(1).attribute("value")).to eq(format_date_for_view(available_from, "%b %-e, %Y"))
+            expect(assign_to_available_from_time(1).attribute("value")).to eq(available_from.strftime("%-l:%M %p"))
+            expect(assign_to_until_date(1).attribute("value")).to eq(format_date_for_view(available_until, "%b %-e, %Y"))
+            expect(assign_to_until_time(1).attribute("value")).to eq(available_until.strftime("%-l:%M %p"))
           end
 
           it "transitions from graded to ungraded and overrides are ok", :ignore_js_errors do
@@ -1082,11 +1082,11 @@ describe "discussions" do
 
             get "/courses/#{course.id}/discussion_topics/#{discussion_topic.id}/edit"
 
-            expect(assign_to_date_and_time[0].text).not_to include("Due Date")
-            expect(assign_to_available_from_date(0, true).attribute("value")).to eq(format_date_for_view(available_from, "%b %-e, %Y"))
-            expect(assign_to_available_from_time(0, true).attribute("value")).to eq(available_from.strftime("%-l:%M %p"))
-            expect(assign_to_until_date(0, true).attribute("value")).to eq(format_date_for_view(available_until, "%b %-e, %Y"))
-            expect(assign_to_until_time(0, true).attribute("value")).to eq(available_until.strftime("%-l:%M %p"))
+            expect(assign_to_date_and_time[1].text).not_to include("Due Date")
+            expect(assign_to_available_from_date(1, true).attribute("value")).to eq(format_date_for_view(available_from, "%b %-e, %Y"))
+            expect(assign_to_available_from_time(1, true).attribute("value")).to eq(available_from.strftime("%-l:%M %p"))
+            expect(assign_to_until_date(1, true).attribute("value")).to eq(format_date_for_view(available_until, "%b %-e, %Y"))
+            expect(assign_to_until_time(1, true).attribute("value")).to eq(available_until.strftime("%-l:%M %p"))
           end
 
           it "does not recover a deleted card when adding an assignee", :ignore_js_errors do
@@ -2287,7 +2287,7 @@ describe "discussions" do
             get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
 
             # Remove the section override
-            click_delete_assign_to_card(0)
+            click_delete_assign_to_card(1)
 
             Discussion.save_button.click
             wait_for_ajaximations
