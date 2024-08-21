@@ -1188,6 +1188,7 @@ class GradebooksController < ApplicationController
         end
 
         append_sis_data(env)
+        @entry_id = params[:entry_id]
 
         js_env(env)
         render :speed_grader, locals: {

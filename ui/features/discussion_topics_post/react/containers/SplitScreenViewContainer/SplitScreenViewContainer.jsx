@@ -210,7 +210,7 @@ export const SplitScreenViewContainer = props => {
   }
 
   const onOpenInSpeedGrader = discussionEntry => {
-    window.open(getSpeedGraderUrl(discussionEntry.author._id), '_blank')
+    window.open(getSpeedGraderUrl(discussionEntry.author._id, discussionEntry._id), '_blank')
   }
 
   // This reply method is used for the split-screen reply

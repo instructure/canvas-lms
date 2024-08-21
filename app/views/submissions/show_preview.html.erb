@@ -58,7 +58,10 @@
         speed_grader: 1,
         persist: 1,
       }
-      url_opts[:entry_id] = @entries.first.id if @entries&.first
+
+      if params[:entry_id] || @entries&.first
+        url_opts[:entry_id] = params[:entry_id] || @entries.first.id
+      end
 
       topic_to_show = @assignment.discussion_topic.for_group_discussion? ? @assignment.discussion_topic.child_topic_for(@user) : @assignment.discussion_topic
       topic_to_show ||= @assignment.discussion_topic

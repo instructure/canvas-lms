@@ -129,6 +129,93 @@ describe "SpeedGrader - discussion submissions" do
         end
       end
     end
+
+    it "displays the SpeedGraderNavigator" do
+      Speedgrader.visit(@course.id, @assignment.id)
+
+      in_frame("speedgrader_iframe") do
+        in_frame("discussion_preview_iframe") do
+          wait_for_ajaximations
+
+          # These should be uncommented out when the implementation is done in the closing
+          # Patchset for VICE-3920
+          # expect(f("[data-testid='previous-in-speedgrader']")).not_to be_displayed
+          # expect(f("[data-testid='next-in-speedgrader']")).not_to be_displayed
+          expect(f("[data-testid='jump-to-speedgrader-navigation']")).not_to be_displayed
+
+          # rubocop:disable Specs/NoExecuteScript
+          driver.execute_script("document.querySelector('[data-testid=\"jump-to-speedgrader-navigation\"]').focus()")
+          # rubocop:enable Specs/NoExecuteScript
+          wait_for_ajaximations
+
+          # These should be uncommented out when the implementation is done in the closing
+          # Patchset for VICE-3920
+          # expect(f("[data-testid='previous-in-speedgrader']")).to be_displayed
+          # expect(f("[data-testid='next-in-speedgrader']")).to be_displayed
+          expect(f("[data-testid='jump-to-speedgrader-navigation']")).to be_displayed
+        end
+      end
+    end
+
+    it "can focus on speedgrader previous student button" do
+      Speedgrader.visit(@course.id, @assignment.id)
+
+      in_frame("speedgrader_iframe") do
+        in_frame("discussion_preview_iframe") do
+          wait_for_ajaximations
+          # rubocop:disable Specs/NoExecuteScript
+          driver.execute_script("document.querySelector('[data-testid=\"jump-to-speedgrader-navigation\"]').focus()")
+          # rubocop:enable Specs/NoExecuteScript
+          wait_for_ajaximations
+
+          expect(f("[data-testid='jump-to-speedgrader-navigation']")).to be_displayed
+
+          f("[data-testid='jump-to-speedgrader-navigation']").click
+        end
+      end
+
+      check_element_has_focus f("#prev-student-button")
+    end
+
+    it "opens the student context card when clicking on the student name" do
+      Speedgrader.visit(@course.id, @assignment.id)
+
+      in_frame("speedgrader_iframe") do
+        in_frame("discussion_preview_iframe") do
+          wait_for_ajaximations
+          f("[data-testid='author_name']").click
+          expect(f(".StudentContextTray-Header")).to be_present
+        end
+      end
+    end
+
+    it "focuses on the entry_id defined in the speegrader url (splitscreen)" do
+      entry_3 = @discussion_topic.discussion_entries.create!(user: @student, message: "third student message", parent_id: @discussion_topic.discussion_entries.first.id)
+      @teacher.preferences[:discussions_splitscreen_view] = true
+      @teacher.save!
+      Speedgrader.visit(@course.id, @assignment.id, entry_id: entry_3.id)
+
+      in_frame("speedgrader_iframe") do
+        in_frame("discussion_preview_iframe") do
+          wait_for_ajaximations
+          expect(f("span.discussions-split-screen-view-content div.highlight-discussion").text).to include entry_3.message
+        end
+      end
+    end
+
+    it "focuses on the entry_id defined in the speegrader url (inline)" do
+      entry_3 = @discussion_topic.discussion_entries.create!(user: @student, message: "third student message", parent_id: @discussion_topic.discussion_entries.first.id)
+      @teacher.preferences[:discussions_splitscreen_view] = false
+      @teacher.save!
+      Speedgrader.visit(@course.id, @assignment.id, entry_id: entry_3.id)
+
+      in_frame("speedgrader_iframe") do
+        in_frame("discussion_preview_iframe") do
+          wait_for_ajaximations
+          expect(f("div[data-testid='discussion-root-entry-container'] div.highlight-discussion").text).to include entry_3.message
+        end
+      end
+    end
   end
 
   context "when student names hidden" do
@@ -235,62 +322,6 @@ describe "SpeedGrader - discussion submissions" do
         )
 
         @custom_status = CustomGradeStatus.create!(name: "Custom Status", color: "#000000", root_account_id: @course.root_account_id, created_by: @teacher)
-      end
-
-      it "displays the SpeedGraderNavigator" do
-        Speedgrader.visit(@course.id, @assignment.id)
-
-        in_frame("speedgrader_iframe") do
-          in_frame("discussion_preview_iframe") do
-            wait_for_ajaximations
-
-            # These should be uncommented out when the implementation is done in the closing
-            # Patchset for VICE-3920
-            # expect(f("[data-testid='previous-in-speedgrader']")).not_to be_displayed
-            # expect(f("[data-testid='next-in-speedgrader']")).not_to be_displayed
-            expect(f("[data-testid='jump-to-speedgrader-navigation']")).not_to be_displayed
-
-            driver.execute_script("document.querySelector('[data-testid=\"jump-to-speedgrader-navigation\"]').focus()")
-            wait_for_ajaximations
-
-            # These should be uncommented out when the implementation is done in the closing
-            # Patchset for VICE-3920
-            # expect(f("[data-testid='previous-in-speedgrader']")).to be_displayed
-            # expect(f("[data-testid='next-in-speedgrader']")).to be_displayed
-            expect(f("[data-testid='jump-to-speedgrader-navigation']")).to be_displayed
-          end
-        end
-      end
-
-      it "can focus on speedgrader previous student button" do
-        Speedgrader.visit(@course.id, @assignment.id)
-
-        in_frame("speedgrader_iframe") do
-          in_frame("discussion_preview_iframe") do
-            wait_for_ajaximations
-
-            driver.execute_script("document.querySelector('[data-testid=\"jump-to-speedgrader-navigation\"]').focus()")
-            wait_for_ajaximations
-
-            expect(f("[data-testid='jump-to-speedgrader-navigation']")).to be_displayed
-
-            f("[data-testid='jump-to-speedgrader-navigation']").click
-          end
-        end
-
-        check_element_has_focus f("#prev-student-button")
-      end
-
-      it "opens the student context card when clicking on the student name" do
-        Speedgrader.visit(@course.id, @assignment.id)
-
-        in_frame("speedgrader_iframe") do
-          in_frame("discussion_preview_iframe") do
-            wait_for_ajaximations
-            f("[data-testid='author_name']").click
-            expect(f(".StudentContextTray-Header")).to be_present
-          end
-        end
       end
 
       it "displays whole discussion with hidden student names" do
