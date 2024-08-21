@@ -131,7 +131,8 @@ const AssignToContent = ({
     const parsedOverrides = getParsedOverrides(
       stagedOverridesRef.current,
       stagedCards,
-      groupCategoryId
+      groupCategoryId,
+      defaultSectionId
     )
     const uniqueOverrides = removeOverriddenAssignees(overrides, parsedOverrides)
     setStagedCards(uniqueOverrides)
