@@ -45,7 +45,8 @@ module Permissions
     elsif permissions.is_a?(Hash)
       permissions.each do |key, value|
         if @permissions.key?(key)
-          raise "Duplicate permission detected: #{key}"
+          Rails.logger.warn("Duplicate permission detected: #{key}")
+          next
         else
           @permissions[key] = value
         end
