@@ -204,6 +204,27 @@ describe Lti::RegistrationsController do
           end
         end
 
+        context "when developer key is deleted" do
+          # introduces `tool_configuration`
+          include_context "lti_1_3_tool_configuration_spec_helper"
+
+          let(:developer_key) { developer_key_model(account:, lti_registration: registration, is_lti_key: true, public_jwk_url: "https://example.com") }
+          let(:registration) { lti_registration_model(account:) }
+
+          before do
+            tool_configuration
+            # enable key
+            developer_key.developer_key_account_bindings.first.update! workflow_state: :on
+            developer_key.destroy
+          end
+
+          it "should not include registration" do
+            expect(registration.reload).to be_deleted
+            subject
+            expect(response_data.pluck(:id)).not_to include(registration.id)
+          end
+        end
+
         context "when sorting by installed_by" do
           subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=installed_by" }
 
