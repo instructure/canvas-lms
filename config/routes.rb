@@ -2474,6 +2474,7 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :rubrics_api) do
+      get "rubrics/upload_template", action: "upload_template", as: "rubrics_account_upload_template"
       get "accounts/:account_id/rubrics", action: :index, as: :account_rubrics
       get "accounts/:account_id/rubrics/:id", action: :show
       get "courses/:course_id/rubrics", action: :index, as: :course_rubrics
@@ -2484,6 +2485,8 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/rubrics/upload", action: "upload", as: "rubrics_account_upload"
       get "courses/:course_id/rubrics/upload/:id", action: "upload_status", as: "rubrics_course_upload_status"
       get "accounts/:account_id/rubrics/upload/:id", action: "upload_status", as: "rubrics_account_upload_status"
+      get "courses/:course_id/rubrics/upload/:id/rubrics", action: "rubrics_by_import_id", as: "rubrics_course_upload_rubrics"
+      get "accounts/:account_id/rubrics/upload/:id/rubrics", action: "rubrics_by_import_id", as: "rubrics_account_upload_rubrics"
       post "courses/:course_id/rubrics", controller: :rubrics, action: :create
       put "courses/:course_id/rubrics/:id", controller: :rubrics, action: :update
       delete "courses/:course_id/rubrics/:id", controller: :rubrics, action: :destroy

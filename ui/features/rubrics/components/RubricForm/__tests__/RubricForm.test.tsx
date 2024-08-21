@@ -69,7 +69,7 @@ describe('RubricForm Tests', () => {
     return render(
       <QueryProvider>
         <BrowserRouter>
-          <RubricForm rootOutcomeGroup={ROOT_OUTCOME_GROUP} />
+          <RubricForm rootOutcomeGroup={ROOT_OUTCOME_GROUP} criterionUseRangeEnabled={false} />
         </BrowserRouter>
       </QueryProvider>
     )

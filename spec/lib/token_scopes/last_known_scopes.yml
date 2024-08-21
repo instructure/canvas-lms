@@ -292,6 +292,8 @@
 - verb: GET
   path: "/api/v1/accounts/:account_id/rubrics/upload/:id"
 - verb: GET
+  path: "/api/v1/accounts/:account_id/rubrics/upload/:id/rubrics"
+- verb: GET
   path: "/api/v1/accounts/:account_id/scopes"
 - verb: POST
   path: "/api/v1/accounts/:account_id/self_registration"
@@ -1268,6 +1270,8 @@
 - verb: GET
   path: "/api/v1/courses/:course_id/rubrics/upload/:id"
 - verb: GET
+  path: "/api/v1/courses/:course_id/rubrics/upload/:id/rubrics"
+- verb: GET
   path: "/api/v1/courses/:course_id/search_users"
 - verb: GET
   path: "/api/v1/courses/:course_id/sections"
@@ -1861,6 +1865,8 @@
   path: "/api/v1/release_notes/unread_count"
 - verb: POST
   path: "/api/v1/rich_content/generate"
+- verb: GET
+  path: "/api/v1/rubrics/upload_template"
 - verb: GET
   path: "/api/v1/search/all_courses"
 - verb: GET
