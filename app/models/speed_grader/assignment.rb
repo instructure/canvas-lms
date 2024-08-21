@@ -164,7 +164,7 @@ module SpeedGrader
         :user,
         :attachment_associations,
         :assignment,
-        :originality_reports
+        { originality_reports: :lti_link }
       ]
       includes << {
         all_submission_comments: {
