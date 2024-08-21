@@ -460,7 +460,7 @@ $(document).ready(function () {
         )
       }
 
-      if (data["course[conclude_at]"] < data["course[start_at]"]) {
+      if (data["course[start_at]"].length > 0 && data["course[conclude_at]"].length > 0 && data["course[conclude_at]"] < data["course[start_at]"]) {
         errorMessages.push(
           I18n.t('The course end date can not occur before the course start date.')
         )
