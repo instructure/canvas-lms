@@ -16,16 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as z from 'zod'
-import {ZLtiPlacement} from '../../LtiPlacement'
-import {ZInternalBaseLaunchSettings} from '../InternalBaseLaunchSettings'
+import {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
+import {LtiScopes} from '../../model/LtiScope'
 
-export const ZInternalPlacementConfiguration = ZInternalBaseLaunchSettings.merge(
-  z.object({
-    placement: ZLtiPlacement,
-    enabled: z.boolean().optional(),
-  })
-)
-
-export interface InternalPlacementConfiguration
-  extends z.infer<typeof ZInternalPlacementConfiguration> {}
+export const mockInternalConfiguration = (
+  overrides?: Partial<InternalLtiConfiguration>
+): InternalLtiConfiguration => {
+  return {
+    title: 'title',
+    description: 'description',
+    target_link_uri: 'https://example.com',
+    oidc_initiation_url: 'https://example.com/oidc',
+    custom_fields: {
+      foo: 'bar',
+    },
+    scopes: [...Object.values(LtiScopes)],
+    placements: [{placement: 'course_navigation'}, {placement: 'global_navigation'}],
+    ...overrides,
+  }
+}
