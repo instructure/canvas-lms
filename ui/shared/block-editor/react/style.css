@@ -16,6 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+.block-resizer .moveable-control.moveable-origin {
+  display: none;
+}
+/* per the Moveable documentation, we need !important */
+.block-resizer .moveable-control.moveable-direction {
+  border-radius: 0;
+  border: 2px solid var(--moveable-color);
+  background-color: #fff;
+}
+
 .block-editor-editor {
   --active-border-color: var(--ic-brand-primary); /*rgba(38,128,235,1); */
   --hover-border-color: #ababab;
