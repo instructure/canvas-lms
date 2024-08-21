@@ -961,6 +961,33 @@ describe "discussions" do
             Account.site_admin.enable_feature!(:selective_release_edit_page)
           end
 
+          it "allows edit with group category", :ignore_js_errors do
+            group_cat = course.group_categories.create!(name: "Groupies")
+            get "/courses/#{course.id}/discussion_topics/#{teacher_topic.id}/edit"
+
+            Discussion.click_group_discussion_checkbox
+            Discussion.click_group_category_select
+            Discussion.click_group_category_option(group_cat.name)
+            Discussion.save_button.click
+            wait_for_ajaximations
+
+            expect(driver.current_url).not_to end_with("/courses/#{course.id}/discussion_topics/#{teacher_topic.id}/edit")
+          end
+
+          it "allows edit with group category and graded", :ignore_js_errors do
+            group_cat = course.group_categories.create!(name: "Groupies")
+            get "/courses/#{course.id}/discussion_topics/#{teacher_topic.id}/edit"
+
+            Discussion.click_graded_checkbox
+            Discussion.click_group_discussion_checkbox
+            Discussion.click_group_category_select
+            Discussion.click_group_category_option(group_cat.name)
+            Discussion.save_button.click
+            wait_for_ajaximations
+
+            expect(driver.current_url).not_to end_with("/courses/#{course.id}/discussion_topics/#{teacher_topic.id}/edit")
+          end
+
           it "does not show the assign to UI when the user does not have permission even if user can access edit page" do
             # i.e., they have moderate_forum permission but not admin or unrestricted student enrollment
             RoleOverride.create!(context: @course.account, permission: "moderate_forum", role: student_role, enabled: true)

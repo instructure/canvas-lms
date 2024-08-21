@@ -585,7 +585,13 @@ function DiscussionTopicForm({
     )
     let hasAfterRenderIssue = false
     let sectionViewRef = null
-    if (ENV.FEATURES.selective_release_ui_api && ENV.FEATURES.selective_release_edit_page) {
+
+    if (
+      // Not validate override dates for announcements or ungraded group discussions
+      !(isAnnouncement || (isGroupDiscussion && !isGraded)) &&
+      ENV.FEATURES.selective_release_ui_api &&
+      ENV.FEATURES.selective_release_edit_page
+    ) {
       sectionViewRef = document.getElementById('manage-assign-to-container')?.reactComponentInstance
       const aDueDateMissing = assignedInfoList.some(assignee => !assignee.dueDate)
       const postToSisEnabled = isGraded && postToSis && ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
