@@ -28,7 +28,7 @@ module CC
       scope = WikiPages::ScopedToUser.new(@course, @user, scope).scope if @user
       scope.each do |page|
         next unless export_object?(page)
-        next if @user && page.locked_for?(@user)
+        next if @user && page.locked_for?(@user, check_policies: true)
 
         begin
           add_exported_asset(page)

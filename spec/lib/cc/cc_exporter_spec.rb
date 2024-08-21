@@ -1327,6 +1327,12 @@ describe "Common Cartridge exporting" do
         check_resource_node(page, CC::CCHelper::WEBCONTENT, false)
       end
 
+      it "includes wiki page with future availability for teacher" do
+        page = @course.wiki_pages.create!(title: "wiki", body: "ohai", unlock_at: 1.week.from_now)
+        run_export
+        check_resource_node(page, CC::CCHelper::WEBCONTENT)
+      end
+
       describe "for teachers in concluded courses" do
         before :once do
           teacher_in_course active_all: true
