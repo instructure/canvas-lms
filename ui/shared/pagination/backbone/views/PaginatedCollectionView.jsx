@@ -83,6 +83,13 @@ PaginatedCollectionView.prototype.template = template
 // Initializes
 PaginatedCollectionView.prototype.initialize = function () {
   PaginatedCollectionView.__super__.initialize.apply(this, arguments)
+  // the drawer is not always loaded when PaginatedCollectionView is initalized
+  // such as when the page is cached
+  window.addEventListener( "load", () => {
+    if (document.getElementById('drawer-layout-content')) {
+      this.resetScrollContainer(document.getElementById('drawer-layout-content'))
+    }
+  });
   return this.initScrollContainer()
 }
 
