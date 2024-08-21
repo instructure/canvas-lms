@@ -18,7 +18,7 @@
 
 import React, {useEffect, useRef, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
-import {useQuery} from '@canvas/query'
+import {queryClient, useQuery} from '@canvas/query'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import type {Rubric} from '@canvas/rubrics/react/types/rubric'
@@ -26,7 +26,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {IconAddLine, IconSearchLine} from '@instructure/ui-icons'
+import {IconAddLine, IconSearchLine, IconImportLine} from '@instructure/ui-icons'
 import {TextInput} from '@instructure/ui-text-input'
 import {Tabs} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-view'
@@ -44,6 +44,7 @@ import {
 import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {type FetchUsedLocationResponse, UsedLocationsModal} from './UsedLocationsModal'
+import {ImportRubric} from './ImportRubric'
 
 const {Item: FlexItem} = Flex
 
@@ -72,6 +73,7 @@ export const ViewRubrics = ({canManageRubrics = false, showHeader = true}: ViewR
   const [archivedRubrics, setArchivedRubrics] = useState<Rubric[]>([])
   const [rubricIdForLocations, setRubricIdForLocations] = useState<string>()
   const [loadingUsedLocations, setLoadingUsedLocations] = useState(false)
+  const [importTrayIsOpen, setImportTrayIsOpen] = useState(false)
   const path = useRef<string | undefined>(undefined)
 
   const handleArchiveRubric = async (rubricId: string) => {
@@ -227,6 +229,11 @@ export const ViewRubrics = ({canManageRubrics = false, showHeader = true}: ViewR
     }
   }
 
+  const handleImportSuccess = async (importedRubrics: Rubric[]) => {
+    setActiveRubrics(prevState => [...prevState, ...importedRubrics])
+    await queryClient.invalidateQueries([queryKey], undefined, {cancelRefetch: true})
+  }
+
   return (
     <View as="div">
       <Flex>
@@ -251,9 +258,21 @@ export const ViewRubrics = ({canManageRubrics = false, showHeader = true}: ViewR
         <FlexItem>
           {canManageRubrics && (
             <Button
+              renderIcon={IconImportLine}
+              color="secondary"
+              margin="small"
+              data-testid="import-rubric-button"
+              onClick={() => setImportTrayIsOpen(true)}
+            >
+              {I18n.t('Import Rubric')}
+            </Button>
+          )}
+        </FlexItem>
+        <FlexItem>
+          {canManageRubrics && (
+            <Button
               renderIcon={IconAddLine}
               color="primary"
-              margin="small"
               onClick={() => navigate('./create')}
               data-testid="create-new-rubric-button"
             >
@@ -324,6 +343,14 @@ export const ViewRubrics = ({canManageRubrics = false, showHeader = true}: ViewR
         itemId={rubricIdForLocations}
         isOpen={!!rubricIdForLocations}
         onClose={handleLocationsUsedModalClose}
+      />
+
+      <ImportRubric
+        accountId={accountId}
+        courseId={courseId}
+        isTrayOpen={importTrayIsOpen}
+        handleImportSuccess={handleImportSuccess}
+        handleTrayClose={() => setImportTrayIsOpen(false)}
       />
     </View>
   )

@@ -261,9 +261,10 @@
 class RubricsApiController < ApplicationController
   include Api::V1::Rubric
   include Api::V1::RubricAssessment
+  include Api::V1::Attachment
 
   before_action :require_user
-  before_action :require_context
+  before_action :require_context, except: [:upload_template]
   before_action :validate_args
 
   VALID_ASSESSMENT_SCOPES = %w[assessments graded_assessments peer_assessments].freeze
@@ -338,7 +339,19 @@ class RubricsApiController < ApplicationController
 
     import_response = api_json(import, @current_user, session)
     import_response[:user] = user_json(import.user, @current_user, session) if import.user
+    import_response[:attachment] = import.attachment.slice(:id, :filename, :size)
     render json: import_response
+  end
+
+  # @API Templated file for importing a rubric
+  # @returns a CSV file in the format that can be imported
+  def upload_template
+    send_data(
+      RubricImport.template_file,
+      type: "text/csv",
+      filename: "import_rubric_template.csv",
+      disposition: "attachment"
+    )
   end
 
   # @API Get the status of a rubric import
@@ -354,11 +367,19 @@ class RubricsApiController < ApplicationController
                  RubricImport.find_specific_rubric_import(@context, params[:id]) or raise ActiveRecord::RecordNotFound
                end
       import_response = api_json(import, @current_user, session)
-      import_response[:user] = user_json(import.user, @current_user, session) if import.user
+      import_response[:user] = user_json(import.user, import.user, session) if import.user
+      import_response[:attachment] = import.attachment.slice(:id, :filename, :size) if import.attachment
       render json: import_response
     rescue ActiveRecord::RecordNotFound => e
       render json: { message: e.message }, status: :not_found
     end
+  end
+
+  def rubrics_by_import_id
+    return unless authorized_action(@context, @current_user, :manage_rubrics)
+
+    rubrics = Rubric.where(rubric_imports_id: params[:id], context: @context)
+    render json: rubrics_json(rubrics, @current_user, session)
   end
 
   private
