@@ -19,12 +19,15 @@
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import PasswordComplexityConfiguration from '../PasswordComplexityConfiguration'
 import userEvent from '@testing-library/user-event'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+
+jest.mock('@canvas/do-fetch-api-effect')
+const mockedDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
 
 jest.mock('@canvas/do-fetch-api-effect/apiRequest')
-jest.mock('@canvas/do-fetch-api-effect')
+const mockedExecuteApiRequest = executeApiRequest as jest.MockedFunction<typeof executeApiRequest>
 
 const getViewOptionsButton = async () => {
   const viewOptions = await waitFor(() => {
@@ -39,16 +42,23 @@ const getViewOptionsButton = async () => {
 
 describe('PasswordComplexityConfiguration', () => {
   beforeEach(() => {
-    doFetchApi.mockResolvedValue({
-      response: {ok: true},
-      json: {
-        public_url: 'mock_public_url',
-        filename: 'mock_filename',
-      },
+    mockedDoFetchApi.mockResolvedValue({
+      json: {fileUrl: 'mockFileUrl', filename: 'mockFilename'},
+      response: {
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        text: jest.fn().mockResolvedValue('{}'),
+        headers: new Headers(),
+      } as Partial<Response> as Response,
     })
   })
 
-  it('opens the Tray when "View Options" button is clicked', async () => {
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('opens the Tray when “View Options” button is clicked', async () => {
     render(<PasswordComplexityConfiguration />)
     await userEvent.click(await getViewOptionsButton())
     expect(screen.getByText('Current Password Configuration')).toBeInTheDocument()
@@ -79,55 +89,18 @@ describe('PasswordComplexityConfiguration', () => {
     expect(checkbox).not.toBeChecked()
   })
 
-  it('toggles input fields when checkbox is checked', async () => {
+  it('toggle input fields when checkbox is checked', async () => {
     render(<PasswordComplexityConfiguration />)
     await userEvent.click(await getViewOptionsButton())
-    let checkbox = await screen.findByTestId('minimumCharacterLengthCheckbox')
     let input = await screen.findByTestId('minimumCharacterLengthInput')
     expect(input).toBeEnabled()
-    checkbox = await screen.findByTestId('customMaxLoginAttemptsCheckbox')
+    const checkbox = await screen.findByTestId('customMaxLoginAttemptsCheckbox')
     await userEvent.click(checkbox)
     input = await screen.findByTestId('customMaxLoginAttemptsInput')
     expect(input).toBeEnabled()
   })
 
-  it('opens the file upload modal when “Upload” button is clicked', async () => {
-    render(<PasswordComplexityConfiguration />)
-    await userEvent.click(await getViewOptionsButton())
-    const checkbox = await screen.findByTestId('customForbiddenWordsCheckbox')
-    await userEvent.click(checkbox)
-    await userEvent.click(await screen.findByTestId('uploadButton'))
-    expect(screen.getByText('Upload Forbidden Words/Terms List')).toBeInTheDocument()
-  })
-
-  it('shows “Upload” button but not “Current Custom List” when no file is uploaded', async () => {
-    doFetchApi.mockResolvedValueOnce({
-      response: {ok: true},
-      json: null,
-    })
-    const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation(() => {})
-    render(<PasswordComplexityConfiguration />)
-    await userEvent.click(await getViewOptionsButton())
-    const uploadButton = await screen.findByTestId('uploadButton')
-    expect(uploadButton).toBeInTheDocument()
-    expect(screen.queryByText('Current Custom List')).not.toBeInTheDocument()
-    consoleErrorMock.mockRestore()
-  })
-
-  it('shows "Current Custom List" when a file is uploaded', async () => {
-    render(<PasswordComplexityConfiguration />)
-    await userEvent.click(await getViewOptionsButton())
-    const uploadButton = await screen.findByTestId('uploadButton')
-    expect(uploadButton).toBeInTheDocument()
-    await waitFor(() => {
-      expect(screen.getByText('Current Custom List')).toBeInTheDocument()
-      expect(screen.getByText('mock_filename')).toBeInTheDocument()
-      const linkElement = screen.getByText('mock_filename').closest('a')
-      expect(linkElement).toHaveAttribute('href', 'mock_public_url')
-    })
-  })
-
-  it('closes the Tray when "Cancel" button is clicked', async () => {
+  it('closes the Tray when “Cancel” button is clicked', async () => {
     render(<PasswordComplexityConfiguration />)
     await userEvent.click(await getViewOptionsButton())
     const cancelButton = await screen.findByTestId('cancelButton')
@@ -140,7 +113,7 @@ describe('PasswordComplexityConfiguration', () => {
     await userEvent.click(await getViewOptionsButton())
     const saveButton = await screen.findByTestId('saveButton')
     await userEvent.click(saveButton)
-    expect(executeApiRequest).toHaveBeenCalledWith({
+    expect(mockedExecuteApiRequest).toHaveBeenCalledWith({
       method: 'PUT',
       body: {
         account: {

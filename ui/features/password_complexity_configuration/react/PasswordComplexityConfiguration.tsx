@@ -16,25 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Tray} from '@instructure/ui-tray'
 import {Alert} from '@instructure/ui-alerts'
 import {List} from '@instructure/ui-list'
 import {Checkbox} from '@instructure/ui-checkbox'
 import NumberInputControlled from './NumberInputControlled'
-import {IconTrashLine, IconUploadSolid} from '@instructure/ui-icons'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
-import ForbiddenWordsFileUpload from './ForbiddenWordsFileUpload'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {Flex} from '@instructure/ui-flex'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import {Link} from '@instructure/ui-link'
+import CustomForbiddenWordsSection from './CustomForbiddenWordsSection'
 
 const I18n = useI18nScope('password_complexity_configuration')
 
@@ -70,57 +67,6 @@ interface QueryParams {
   account: Account
 }
 
-interface ForbiddenWordsResponse {
-  public_url: string
-  filename: string
-}
-
-export const fetchLatestForbiddenWords = async (): Promise<ForbiddenWordsResponse | null> => {
-  const {response, json} = await doFetchApi({
-    path: `/api/v1/accounts/${ENV.ACCOUNT_ID}/password_complexity/latest_forbidden_words`,
-    method: 'GET',
-  })
-  return response.ok ? (json as ForbiddenWordsResponse) ?? null : null
-}
-
-// TODO: FOO-4640
-const deleteForbiddenWordsFile = async () => {
-  try {
-    // mocked response as placeholder
-    const mockResponse = {
-      response: {
-        ok: true,
-      },
-      json: {
-        workflow_state: 'deleted',
-      },
-    }
-
-    // un-comment the real API call when ready to switch from mock to live
-    // const response = await doFetchApi({
-    //   path: `/api/v1/accounts/${ENV.ACCOUNT_ID}/password_complexity/delete_forbidden_words`,
-    //   method: 'PUT',
-    //   body: {
-    //     workflow_state: 'deleted',
-    //   },
-    // })
-
-    if (!mockResponse.response.ok) {
-      throw new Error('Failed to delete forbidden words file.')
-    }
-
-    // return the mock response for now
-    return mockResponse
-
-    // un-comment the following line when using the real API call
-    // return response
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error deleting forbidden words file:', error)
-    throw error
-  }
-}
-
 const PasswordComplexityConfiguration = () => {
   const [showTray, setShowTray] = useState(false)
   const [enableApplyButton, setEnableApplyButton] = useState(true)
@@ -131,40 +77,9 @@ const PasswordComplexityConfiguration = () => {
   const [requireNumbersEnabledSaved, setRequireNumbersEnabledSaved] = useState(false)
   const [requireSymbolsEnabled, setRequireSymbolsEnabled] = useState(true)
   const [requireSymbolsEnabledSaved, setRequireSymbolsEnabledSaved] = useState(false)
-  const [customForbiddenWordsEnabled, setCustomForbiddenWordsEnabled] = useState(false)
   const [customMaxLoginAttemptsEnabled, setCustomMaxLoginAttemptsEnabled] = useState(false)
   const [allowLoginSuspensionEnabled, setAllowLoginSuspensionEnabled] = useState(false)
   const [maxLoginAttempts, setMaxLoginAttempts] = useState(10)
-  const [fileModalOpen, setFileModalOpen] = useState(false)
-  const [forbiddenWordsUrl, setForbiddenWordsUrl] = useState<string | null>(null)
-  const [forbiddenWordsFilename, setForbiddenWordsFilename] = useState<string | null>(null)
-
-  const fetchAndSetForbiddenWords = useCallback(async () => {
-    try {
-      const data = await fetchLatestForbiddenWords()
-      if (data) {
-        setForbiddenWordsUrl(data.public_url)
-        setForbiddenWordsFilename(data.filename)
-      } else {
-        setForbiddenWordsUrl(null)
-        setForbiddenWordsFilename(null)
-      }
-    } catch (error: any) {
-      if (error.response?.status === 404) {
-        setForbiddenWordsUrl(null)
-        setForbiddenWordsFilename(null)
-      } else {
-        // eslint-disable-next-line no-console
-        console.error('Failed to fetch forbidden words:', error)
-      }
-    }
-  }, [])
-
-  useEffect(() => {
-    if (showTray) {
-      fetchAndSetForbiddenWords()
-    }
-  }, [showTray, fetchAndSetForbiddenWords])
 
   const handleOpenTray = () => {
     setShowTray(true)
@@ -276,29 +191,6 @@ const PasswordComplexityConfiguration = () => {
     }
   }
 
-  const deleteForbiddenWords = useCallback(async () => {
-    try {
-      await deleteForbiddenWordsFile()
-
-      setForbiddenWordsUrl(null)
-      setForbiddenWordsFilename(null)
-
-      showFlashAlert({
-        message: I18n.t('Forbidden words list deleted successfully.'),
-        type: 'success',
-      })
-    } catch (error) {
-      showFlashAlert({
-        message: I18n.t('Failed to delete forbidden words list.'),
-        type: 'error',
-      })
-    }
-  }, [])
-
-  const handleCancelUploadModal = useCallback(() => {
-    setFileModalOpen(false)
-  }, [])
-
   return (
     <>
       <Heading margin="small auto xx-small auto" level="h4">
@@ -403,62 +295,7 @@ const PasswordComplexityConfiguration = () => {
                 data-testid="requireSymbolsCheckbox"
               />
             </View>
-            <View as="div" margin="medium">
-              <Checkbox
-                checked={customForbiddenWordsEnabled}
-                onChange={() => {
-                  setCustomForbiddenWordsEnabled(!customForbiddenWordsEnabled)
-                }}
-                label={I18n.t('Customize forbidden words/terms list (see default list here)')}
-                data-testid="customForbiddenWordsCheckbox"
-              />
-              <View
-                as="div"
-                insetInlineStart="1.75em"
-                position="relative"
-                margin="xx-small small small 0"
-              >
-                <Text size="small">
-                  {I18n.t(
-                    'Upload a list of forbidden words/terms in addition to the default list. The file should be text file (.txt) with a single word or term per line.'
-                  )}
-                </Text>
-                <View as="div" margin="small 0">
-                  <Button
-                    disabled={!customForbiddenWordsEnabled}
-                    renderIcon={IconUploadSolid}
-                    onClick={() => setFileModalOpen(true)}
-                    data-testid="uploadButton"
-                  >
-                    {I18n.t('Upload')}
-                  </Button>
-                </View>
-              </View>
-              {forbiddenWordsUrl && forbiddenWordsFilename && (
-                <View as="div" margin="0 medium medium medium">
-                  <Heading level="h4">{I18n.t('Current Custom List')}</Heading>
-                  <hr />
-                  <Flex justifyItems="space-between">
-                    <Flex.Item>
-                      <Link href={forbiddenWordsUrl} target="_blank">
-                        {forbiddenWordsFilename}
-                      </Link>
-                    </Flex.Item>
-                    <Flex.Item>
-                      <IconButton
-                        withBackground={false}
-                        withBorder={false}
-                        screenReaderLabel="Delete list"
-                        onClick={deleteForbiddenWords}
-                      >
-                        <IconTrashLine color="warning" />
-                      </IconButton>
-                    </Flex.Item>
-                  </Flex>
-                  <hr />
-                </View>
-              )}
-            </View>
+            <CustomForbiddenWordsSection />
             <View as="div" margin="medium medium small medium">
               <Checkbox
                 onChange={handleCustomMaxLoginAttemptToggle}
@@ -526,19 +363,6 @@ const PasswordComplexityConfiguration = () => {
           </Flex.Item>
         </Flex>
       </Tray>
-
-      <ForbiddenWordsFileUpload
-        open={fileModalOpen}
-        onDismiss={handleCancelUploadModal}
-        onSave={() => {
-          setFileModalOpen(false)
-          fetchAndSetForbiddenWords()
-        }}
-        forbiddenWordsUrl={forbiddenWordsUrl}
-        setForbiddenWordsUrl={setForbiddenWordsUrl}
-        forbiddenWordsFilename={forbiddenWordsFilename}
-        setForbiddenWordsFilename={setForbiddenWordsFilename}
-      />
     </>
   )
 }
