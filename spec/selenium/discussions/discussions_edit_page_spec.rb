@@ -749,6 +749,10 @@ describe "discussions" do
 
         # Assign to Tray in discussions edit page
         context "with selective_release_backend and selective_release_ui_api enabled" do
+          before :once do
+            Account.site_admin.disable_feature!(:selective_release_edit_page)
+          end
+
           it "does not show the assign to UI when the user does not have permission even if user can access edit page" do
             # i.e., they have moderate_forum permission but not admin or unrestricted student enrollment
             RoleOverride.create!(context: @course.account, permission: "moderate_forum", role: student_role, enabled: true)
@@ -1250,8 +1254,10 @@ describe "discussions" do
           expect(ff("input[placeholder='Select Date']")[0].attribute("value")).not_to be_empty
 
           if Account.site_admin.feature_enabled?(:selective_release_ui_api)
-            expect(Discussion.assign_to_button).to be_displayed
-            Discussion.assign_to_button.click
+            unless Account.site_admin.feature_enabled?(:selective_release_edit_page)
+              expect(Discussion.assign_to_button).to be_displayed
+              Discussion.assign_to_button.click
+            end
             expect(assign_to_in_tray("Remove #{course_section.name}")[0]).to be_displayed
           else
             expect(f("span[data-testid='assign-to-select-span']").present?).to be_truthy
@@ -1450,6 +1456,10 @@ describe "discussions" do
         end
 
         context "selective release with assign to tray", :ignore_js_errors do
+          before :once do
+            Account.site_admin.disable_feature!(:selective_release_edit_page)
+          end
+
           before do
             @student1 = student_in_course(course:, active_all: true).user
             @student2 = student_in_course(course:, active_all: true).user
