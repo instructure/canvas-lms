@@ -25,7 +25,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import getAccounts from '@canvas/api/accounts/getAccounts'
 import {useQuery} from '@canvas/query'
-import {IconCoursesLine, IconSettingsLine} from '@instructure/ui-icons'
+import {IconSettingsLine} from '@instructure/ui-icons'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import {Table} from '@instructure/ui-table'
 import {IconButton} from '@instructure/ui-buttons'
@@ -96,7 +96,6 @@ export function AccountList() {
         <Table.Body>
           {accounts?.map(account => {
             const settingsTip = I18n.t('Settings for %{name}', {name: account.name})
-            const courseTemplateTip = I18n.t('Course template for %{name}', {name: account.name})
 
             return (
               <Table.Row key={account.id}>
@@ -108,20 +107,6 @@ export function AccountList() {
                 </Table.Cell>
                 <Table.Cell>{account.course_count}</Table.Cell>
                 <Table.Cell textAlign="end">
-                  {account.course_template_id && (
-                    <Tooltip placement="start center" offsetX={5} renderTip={courseTemplateTip}>
-                      <IconButton
-                        withBorder={false}
-                        withBackground={false}
-                        size="small"
-                        href={`/courses/${account.course_template_id}`}
-                        screenReaderLabel={courseTemplateTip}
-                      >
-                        <IconCoursesLine title={courseTemplateTip} />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-
                   <Tooltip placement="start center" offsetX={5} renderTip={settingsTip}>
                     <IconButton
                       withBorder={false}
