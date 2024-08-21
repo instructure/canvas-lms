@@ -20,21 +20,15 @@ import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {RegistrationWizardModal} from '../RegistrationWizardModal'
 import {ZAccountId} from '../../model/AccountId'
 import {
-  openDynamicRegistrationWizard,
   openRegistrationWizard,
   useRegistrationModalWizardState,
 } from '../RegistrationWizardModalState'
-import {
-  apiError,
-  apiParseError,
-  genericError,
-  success,
-} from '../../../common/lib/apiResult/ApiResult'
-import {mockToolConfiguration, mockJsonUrlWizardService} from './helpers'
-import {ZLtiConfiguration} from '../../model/lti_tool_configuration/LtiConfiguration'
+import {apiError, genericError, success} from '../../../common/lib/apiResult/ApiResult'
+import {mockJsonUrlWizardService} from './helpers'
 import {mockDynamicRegistrationWizardService} from '../../dynamic_registration_wizard/__tests__/helpers'
 import userEvent from '@testing-library/user-event'
 import {ZUnifiedToolId} from '../../model/UnifiedToolId'
+import {mockInternalConfiguration} from '../../lti_1p3_registration_form/__tests__/helpers'
 
 describe('RegistrationWizardModal', () => {
   let error: (...data: any[]) => void
@@ -155,13 +149,9 @@ describe('RegistrationWizardModal', () => {
 
     it('should validate the json configuration from the URL', async () => {
       const accountId = ZAccountId.parse('123')
-      const fetchThirdPartyToolConfiguration = jest.fn().mockResolvedValue(
-        success(
-          mockToolConfiguration({
-            title: 'Test Tool',
-          })
-        )
-      )
+      const fetchThirdPartyToolConfiguration = jest
+        .fn()
+        .mockResolvedValue(success(mockInternalConfiguration()))
 
       const jsonUrlWizardService = mockJsonUrlWizardService({fetchThirdPartyToolConfiguration})
 
@@ -177,10 +167,6 @@ describe('RegistrationWizardModal', () => {
       await userEvent.paste('https://example.com/json')
 
       await userEvent.click(screen.getByTestId('registration-wizard-next-button'))
-
-      await waitFor(() => {
-        expect(screen.getByText(/Test Tool/i, {ignore: 'title'})).toBeInTheDocument()
-      })
 
       expect(fetchThirdPartyToolConfiguration).toHaveBeenCalledWith(
         {url: 'https://example.com/json'},

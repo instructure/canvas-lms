@@ -16,16 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as z from 'zod'
-import {ZLtiPlacement} from '../../LtiPlacement'
-import {ZInternalBaseLaunchSettings} from '../InternalBaseLaunchSettings'
+export const isValidDomainName = (str: string) => {
+  const regex = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/)
 
-export const ZInternalPlacementConfiguration = ZInternalBaseLaunchSettings.merge(
-  z.object({
-    placement: ZLtiPlacement,
-    enabled: z.boolean().optional(),
-  })
-)
-
-export interface InternalPlacementConfiguration
-  extends z.infer<typeof ZInternalPlacementConfiguration> {}
+  return regex.test(str) || str.startsWith('localhost')
+}

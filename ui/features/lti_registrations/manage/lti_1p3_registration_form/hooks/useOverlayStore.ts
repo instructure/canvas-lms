@@ -16,16 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as z from 'zod'
-import {ZLtiPlacement} from '../../LtiPlacement'
-import {ZInternalBaseLaunchSettings} from '../InternalBaseLaunchSettings'
+import React from 'react'
+import type {
+  Lti1p3RegistrationOverlayStore,
+  Lti1p3RegistrationOverlayState,
+  Lti1p3RegistrationOverlayActions,
+} from '../Lti1p3RegistrationOverlayState'
 
-export const ZInternalPlacementConfiguration = ZInternalBaseLaunchSettings.merge(
-  z.object({
-    placement: ZLtiPlacement,
-    enabled: z.boolean().optional(),
-  })
-)
+export const useOverlayStore = (
+  overlayStore: Lti1p3RegistrationOverlayStore
+): [Lti1p3RegistrationOverlayState, Lti1p3RegistrationOverlayActions] => {
+  const [{state, ...actions}, setState] = React.useState(overlayStore.getState())
 
-export interface InternalPlacementConfiguration
-  extends z.infer<typeof ZInternalPlacementConfiguration> {}
+  React.useEffect(() => overlayStore.subscribe(setState), [overlayStore])
+
+  return [state, actions]
+}
