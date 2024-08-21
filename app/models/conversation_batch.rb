@@ -21,6 +21,8 @@ class ConversationBatch < ActiveRecord::Base
   include SimpleTags
   include Workflow
 
+  self.ignored_columns += ["generate_user_note"]
+
   belongs_to :user
   belongs_to :root_conversation_message, class_name: "ConversationMessage"
   belongs_to :context, polymorphic: [:account, :course, { context_group: "Group" }]

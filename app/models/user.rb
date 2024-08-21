@@ -19,6 +19,8 @@
 #
 
 class User < ActiveRecord::Base
+  self.ignored_columns += ["last_user_note"]
+
   GRAVATAR_PATTERN = %r{^https?://[a-zA-Z0-9.-]+\.gravatar\.com/}
   MAX_ROOT_ACCOUNT_ID_SYNC_ATTEMPTS = 5
   MINIMAL_COLUMNS_TO_SAVE = %i[avatar_image_source
