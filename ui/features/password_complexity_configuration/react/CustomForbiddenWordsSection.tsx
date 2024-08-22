@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useCallback} from 'react'
+import React, {useState, useEffect, useCallback, useRef} from 'react'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
@@ -87,6 +87,7 @@ const deleteForbiddenWordsFile = async () => {
 }
 
 const CustomForbiddenWordsSection = () => {
+  const linkRef = useRef<HTMLAnchorElement | null>(null)
   const [forbiddenWordsUrl, setForbiddenWordsUrl] = useState<string | null>(null)
   const [forbiddenWordsFilename, setForbiddenWordsFilename] = useState<string | null>(null)
   const [fileModalOpen, setFileModalOpen] = useState(false)
@@ -124,6 +125,13 @@ const CustomForbiddenWordsSection = () => {
       setCustomForbiddenWordsEnabled(true)
     }
   }, [forbiddenWordsUrl, forbiddenWordsFilename])
+
+  // focus on the link after forbidden words are updated
+  useEffect(() => {
+    if (!fileModalOpen && linkRef.current && forbiddenWordsUrl && forbiddenWordsFilename) {
+      linkRef.current.focus()
+    }
+  }, [fileModalOpen, forbiddenWordsUrl, forbiddenWordsFilename])
 
   const deleteForbiddenWords = useCallback(async () => {
     try {
@@ -189,7 +197,13 @@ const CustomForbiddenWordsSection = () => {
             <hr />
             <Flex justifyItems="space-between">
               <Flex.Item>
-                <Link href={forbiddenWordsUrl} target="_blank">
+                <Link
+                  href={forbiddenWordsUrl}
+                  target="_blank"
+                  elementRef={element => {
+                    linkRef.current = element as HTMLAnchorElement | null
+                  }}
+                >
                   {forbiddenWordsFilename}
                 </Link>
               </Flex.Item>
