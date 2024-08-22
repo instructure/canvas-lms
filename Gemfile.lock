@@ -451,7 +451,7 @@ GEM
     bluecloth (2.2.0)
     bootsnap (1.18.4)
       msgpack (~> 1.2)
-    brakeman (6.1.2)
+    brakeman (6.2.1)
       racc
     brotli (0.6.0)
     browser (5.3.1)
