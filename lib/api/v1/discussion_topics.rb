@@ -152,6 +152,7 @@ module Api::V1::DiscussionTopics
     end
     if topic.checkpoints?
       json[:reply_to_entry_required_count] = topic.reply_to_entry_required_count
+      json[:is_checkpointed] = topic.checkpoints?
     end
     if opts[:include_assignment] && topic.assignment
       excludes = opts[:exclude_assignment_description] ? ["description"] : []
