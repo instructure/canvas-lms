@@ -147,11 +147,8 @@ class VideoCaptionService < ApplicationService
 
   def process_captions_ready
     response = media
-    if response.dig("media", "captions", 0, "language") && response.dig("media", "captions", 0, "status") == "succeeded"
-      srclang = response.dig("media", "captions", 0, "language")
-      srclang = nil unless srclang.start_with?("en")
-      return update_status(:non_english_captions) unless srclang
-
+    srclang = response.dig("media", "captions", 0, "language")
+    if srclang && response.dig("media", "captions", 0, "status") == "succeeded"
       save_media_track(grab_captions(srclang), srclang)
     else
       update_status(:failed_captions)
@@ -173,14 +170,10 @@ class VideoCaptionService < ApplicationService
   def poll_captions_ready(attempts = 1)
     response = media
     response_succeeded = response.dig("media", "captions", 0, "status") == "succeeded"
-    language_detected = response.dig("media", "captions", 0, "language")
+    srclang = response.dig("media", "captions", 0, "language")
 
-    if response_succeeded && language_detected
-      if language_detected.start_with?("en")
-        save_media_track(grab_captions(language_detected), language_detected)
-      else
-        update_status(:non_english_captions)
-      end
+    if response_succeeded && srclang
+      save_media_track(grab_captions(srclang), srclang)
     elsif attempts < 10
       delay(run_at: reschedule_time(attempts)).poll_captions_ready(attempts + 1)
     else
