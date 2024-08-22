@@ -330,4 +330,24 @@ describe CoursesHelper do
       end
     end
   end
+
+  describe "#recent_event_url" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @assignment = factory_with_protected_attributes(@course.assignments,
+                                                      assignment_valid_attributes.merge({ points_possible: 10,
+                                                                                          submission_types: "online_text_entry" }))
+      @checkpoint_topic, @checkpoint_entry = graded_discussion_topic_with_checkpoints(context: @course)
+    end
+
+    it "returns url for the parent assignment when event is SubAssignment" do
+      expect(recent_event_url(@checkpoint_topic)).to eq "/courses/#{@course.id}/assignments/#{@checkpoint_topic.parent_assignment.id}"
+      expect(recent_event_url(@checkpoint_entry)).to eq "/courses/#{@course.id}/assignments/#{@checkpoint_entry.parent_assignment.id}"
+    end
+
+    it "returns url for the assignment itself when event is Assignment" do
+      expect(recent_event_url(@assignment)).to eq "/courses/#{@course.id}/assignments/#{@assignment.id}"
+    end
+  end
 end

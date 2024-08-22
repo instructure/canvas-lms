@@ -2428,6 +2428,14 @@ describe User do
         expect(events.first).to eq assignment2
       end
 
+      it "includes sub assignments when include_sub_assignments is true" do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        reply_to_topic, reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+        context_codes = [@user.asset_string] + @user.cached_context_codes
+        events = @user.upcoming_events(context_codes:, include_sub_assignments: true)
+        expect(events).to match_array([reply_to_topic, reply_to_entry])
+      end
+
       it "doesn't include events for enrollments that are inactive due to date" do
         @enrollment.start_at = 1.day.ago
         @enrollment.end_at = 2.days.from_now
