@@ -87,8 +87,40 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
     claims(token)[login_attribute]
   end
 
-  def user_logout_redirect(_controller, _current_user)
-    end_session_endpoint.presence || super
+  def persist_to_session(session, token)
+    return unless token.options[:jwt_string]
+
+    # the raw JWT for RP Initiated Logout
+    session[:oidc_id_token] = token.options[:jwt_string]
+  end
+
+  def user_logout_redirect(controller, _current_user)
+    return super unless end_session_endpoint.present?
+    return end_session_endpoint unless account.feature_enabled?(:oidc_rp_initiated_logout_params)
+
+    uri = URI.parse(end_session_endpoint)
+    params = post_logout_redirect_params(controller)
+
+    # anything explicitly set on the end_session_endpoint overrides what Canvas adds
+    explicit_params = URI.decode_www_form(uri.query || "").to_h
+    uri.query = URI.encode_www_form(explicit_params.reverse_merge(params.stringify_keys))
+    uri.to_s
+  rescue URI::InvalidURIError
+    super
+  end
+
+  def post_logout_redirect_params(controller)
+    result = { client_id:, post_logout_redirect_uri: self.class.post_logout_redirect_uri(controller) }
+    if (id_token = controller.session[:oidc_id_token])
+      # theoretically we could use POST, especially since this might be large, but
+      # that might be a breaking change from before we sent these parameters
+      result[:id_token_hint] = id_token
+    end
+    result
+  end
+
+  def self.post_logout_redirect_uri(controller)
+    controller.login_url
   end
 
   def provider_attributes(token)
@@ -121,7 +153,7 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
 
   def claims(token)
     token.options[:claims] ||= begin
-      jwt_string = token.params["id_token"] || token.token
+      jwt_string = token.options[:jwt_string] = token.params["id_token"] || token.token
       debug_set(:id_token, jwt_string) if instance_debugging
       id_token = {} if jwt_string.blank?
 
