@@ -24,6 +24,25 @@ describe GroupCategoriesController do
     student_in_course(active_all: true)
   end
 
+  def expect_imported_groups
+    group_1 = Group.where(name: "group1").first
+    expect(group_1).not_to be_nil
+    expect(group_1.users.count).to eq 2
+    expect(group_1.users).to include(Pseudonym.where(unique_id: "user1").first.user)
+    expect(group_1.users).to include(Pseudonym.where(unique_id: "user2").first.user)
+
+    group_2 = Group.where(name: "group2").first
+    expect(group_2).not_to be_nil
+    expect(group_2.users.count).to eq 2
+    expect(group_2.users).to include(Pseudonym.where(unique_id: "user3").first.user)
+    expect(group_2.users).to include(Pseudonym.where(unique_id: "user4").first.user)
+
+    group_3 = Group.where(name: "group3").first
+    expect(group_3).not_to be_nil
+    expect(group_3.users.count).to eq 1
+    expect(group_3.users).to include(Pseudonym.where(unique_id: "user5").first.user)
+  end
+
   describe "POST create" do
     it "requires authorization" do
       user_session(@student)
@@ -406,22 +425,21 @@ describe GroupCategoriesController do
 
       run_jobs
 
-      group_1 = Group.where(name: "group1").first
-      expect(group_1).not_to be_nil
-      expect(group_1.users.count).to eq 2
-      expect(group_1.users).to include(Pseudonym.where(unique_id: "user1").first.user)
-      expect(group_1.users).to include(Pseudonym.where(unique_id: "user2").first.user)
+      expect_imported_groups
+    end
 
-      group_2 = Group.where(name: "group2").first
-      expect(group_2).not_to be_nil
-      expect(group_2.users.count).to eq 2
-      expect(group_2.users).to include(Pseudonym.where(unique_id: "user3").first.user)
-      expect(group_2.users).to include(Pseudonym.where(unique_id: "user4").first.user)
+    it "creates the groups for a student organized group" do
+      user_session(@teacher)
+      post "import", params: {
+        course_id: @course.id,
+        group_category_id: GroupCategory.student_organized_for(@course).id,
+        attachment: fixture_file_upload("group_categories/test_group_categories.csv", "text/csv")
+      }
+      expect(response).to be_successful
 
-      group_3 = Group.where(name: "group3").first
-      expect(group_3).not_to be_nil
-      expect(group_3.users.count).to eq 1
-      expect(group_3.users).to include(Pseudonym.where(unique_id: "user5").first.user)
+      run_jobs
+
+      expect_imported_groups
     end
   end
 end
