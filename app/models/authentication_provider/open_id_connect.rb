@@ -129,6 +129,13 @@ class AuthenticationProvider
 
       # the raw JWT for RP Initiated Logout
       session[:oidc_id_token] = token.options[:jwt_string]
+
+      return unless (id_token = claims(token))
+
+      # useful claims for back channel logout
+      session[:oidc_id_token_iss] = id_token["iss"]
+      session[:oidc_id_token_sub] = id_token["sub"]
+      session[:oidc_id_token_sid] = id_token["sid"] if id_token["sid"]
     end
 
     def user_logout_redirect(controller, _current_user)
@@ -234,6 +241,22 @@ class AuthenticationProvider
       self.jwks_uri = json["jwks_uri"]
     end
 
+    def validate_signature(token)
+      if token.alg&.to_sym == :none
+        return "Token is not signed"
+      elsif token.send(:hmac?)
+        token.verify!(client_secret)
+      elsif (jwks = self.jwks).nil?
+        return "No JWKS available to validate signature"
+      else
+        token.verify!(jwks)
+      end
+
+      nil
+    rescue JSON::JWT::VerificationFailed => e
+      e.message
+    end
+
     protected
 
     def authorize_options
@@ -249,22 +272,6 @@ class AuthenticationProvider
           options[:auth_scheme] = :request_body
         end
       end
-    end
-
-    def validate_signature(token)
-      if token.alg&.to_sym == :none
-        return "Token is not signed"
-      elsif token.send(:hmac?)
-        token.verify!(client_secret)
-      elsif (jwks = self.jwks).nil?
-        return "No JWKS available to validate signature"
-      else
-        token.verify!(jwks)
-      end
-
-      nil
-    rescue JSON::JWT::VerificationFailed => e
-      e.message
     end
 
     private

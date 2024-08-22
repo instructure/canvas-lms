@@ -212,6 +212,15 @@ module AuthenticationMethods
             return
           end
 
+          if @current_pseudonym &&
+             session[:oidc_id_token_iss] &&
+             Pseudonym.oidc_session_expired?(session)
+
+            logger.info "[AUTH] Invalidating session: OIDC token expired."
+            invalidate_session
+            return
+          end
+
           if @current_pseudonym.suspended?
             logger.info "[AUTH] Invalidating session: Pseudonym is suspended."
             invalidate_session

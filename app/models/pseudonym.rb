@@ -737,4 +737,33 @@ class Pseudonym < ActiveRecord::Base
 
     Canvas.redis.set(redis_key, true, ex: CAS_TICKET_TTL)
   end
+
+  def self.oidc_session_key(*subkeys)
+    ["oidc_session_slo", Digest::SHA512.new.update(subkeys.cache_key).hexdigest].cache_key
+  end
+
+  def self.oidc_session_expired?(session)
+    return false unless Canvas.redis_enabled?
+
+    iss = session[:oidc_id_token_iss]
+    sid = session[:oidc_id_token_sid]
+    sub = session[:oidc_id_token_sub]
+    return false unless iss && (sid || sub)
+
+    keys = [sid, sub].compact.map do |key|
+      oidc_session_key("sid", iss, key)
+    end
+    keys.any? do |key|
+      !Canvas.redis.get("oidc_session_slo_#{key}", failsafe: nil).nil?
+    end
+  end
+
+  def self.expire_oidc_session(logout_token)
+    key = if logout_token["sid"]
+            oidc_session_key("sid", logout_token["iss"], logout_token["sid"])
+          else
+            oidc_session_key("sid", logout_token["iss"], logout_token["sub"])
+          end
+    Canvas.redis.set("oidc_session_slo_#{key}", true, ex: CAS_TICKET_TTL)
+  end
 end
