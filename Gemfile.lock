@@ -569,7 +569,7 @@ GEM
       rspec (~> 3.10)
       timecop (~> 0.9)
     folio-pagination (0.0.12)
-    fugit (1.11.0)
+    fugit (1.11.1)
       et-orbi (~> 1, >= 1.2.11)
       raabro (~> 1.4)
     gepub (1.0.17)
