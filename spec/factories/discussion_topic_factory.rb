@@ -134,4 +134,30 @@ module Factories
     @topic.save
     @topic
   end
+
+  def graded_discussion_topic_with_checkpoints(opts = {})
+    @context = opts[:context] || @context || course_factory(active_all: true)
+    @topic = discussion_topic_model(opts.merge!(title: opts[:title] || "graded discussion with checkpoints"))
+    @assignment = @topic.context.assignments.build(submission_types: "discussion_topic", title: @topic.title)
+    @assignment.infer_times
+    @assignment.saved_by = :discussion_topic
+    @topic.assignment = @assignment
+    @topic.save
+    due_date_reply_to_topic = [{ type: "everyone", due_at: opts[:due_date_reply_to_topic] || 1.day.from_now }]
+    due_date_reply_to_entry = [{ type: "everyone", due_at: opts[:due_date_reply_to_entry] || 3.days.from_now }]
+    reply_to_topic = Checkpoints::DiscussionCheckpointCreatorService.call(
+      discussion_topic: @topic,
+      checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+      dates: due_date_reply_to_topic,
+      points_possible: opts[:points_possible_reply_to_topic] || 5
+    )
+    reply_to_entry = Checkpoints::DiscussionCheckpointCreatorService.call(
+      discussion_topic: @topic,
+      checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+      dates: due_date_reply_to_entry,
+      points_possible: opts[:points_possible_reply_to_entry] || 5,
+      replies_required: opts[:reply_to_entry_required_count] || 3
+    )
+    [reply_to_topic, reply_to_entry, @topic]
+  end
 end

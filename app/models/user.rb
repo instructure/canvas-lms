@@ -2527,6 +2527,23 @@ class User < ActiveRecord::Base
       )
     end
 
+    if opts[:include_sub_assignments]
+      sub_assignments = SubAssignment.published
+                                     .for_context_codes(context_codes)
+                                     .due_between_with_overrides(now, opts[:end_at])
+                                     .include_submitted_count.to_a
+
+      if sub_assignments.any?
+        if AssignmentOverrideApplicator.should_preload_override_students?(sub_assignments, self, "upcoming_events")
+          AssignmentOverrideApplicator.preload_assignment_override_students(sub_assignments, self)
+        end
+
+        events += select_available_assignments(
+          select_upcoming_assignments(sub_assignments.map { |a| a.overridden_for(self) }, opts.merge(time: now))
+        )
+      end
+    end
+
     sorted_events = events.sort_by do |e|
       due_date = e.start_at
       if e.respond_to? :dates_hash_visible_to
