@@ -153,10 +153,11 @@ describe('ItemAssignToTray', () => {
     render(<ItemAssignToTray {...props} {...overrides} />)
 
   it('renders', async () => {
-    const {getByTestId, getByText, getByLabelText, findAllByTestId} = renderComponent()
+    const {getByTestId, getByText, getByLabelText, findAllByTestId, container} = renderComponent()
     expect(getByText('Item Name')).toBeInTheDocument()
     expect(getByText('Assignment | 10 pts')).toBeInTheDocument()
     expect(getByLabelText('Edit assignment Item Name')).toBeInTheDocument()
+    expect(container.querySelector('#manage-assign-to-container')).toBeInTheDocument()
     // the tray is mocking an api response that makes 2 cards
     const cards = await findAllByTestId('item-assign-to-card')
     expect(cards).toHaveLength(2)
@@ -165,13 +166,14 @@ describe('ItemAssignToTray', () => {
   })
 
   it('does not render header or footer if not a tray', async () => {
-    const {getByTestId, queryByText, queryByLabelText, findAllByTestId} = renderComponent({
+    const {queryByText, queryByLabelText, findAllByTestId, container} = renderComponent({
       isTray: false,
     })
     expect(queryByText('Item Name')).not.toBeInTheDocument()
     expect(queryByText('Assignment | 10 pts')).not.toBeInTheDocument()
     expect(queryByLabelText('Edit assignment Item Name')).not.toBeInTheDocument()
     expect(queryByText('Save')).not.toBeInTheDocument()
+    expect(container.querySelector('#manage-assign-to-container')).toBeInTheDocument()
     // the tray is mocking an api response that makes 2 cards
     const cards = await findAllByTestId('item-assign-to-card')
     expect(cards).toHaveLength(2)

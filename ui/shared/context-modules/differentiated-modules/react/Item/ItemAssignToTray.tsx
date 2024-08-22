@@ -461,73 +461,75 @@ export default function ItemAssignToTray({
   }
 
   const trayView = (
-    <Tray
-      data-testid="module-item-edit-tray"
-      onClose={onClose}
-      onExited={onExited}
-      onEntered={handleEntered}
-      label={I18n.t('Edit assignment %{name}', {
-        name: itemName,
-      })}
-      open={open}
-      placement="end"
-      size="regular"
-    >
-      <Flex direction="column" height="100vh" width="100%">
-        {Header()}
-        {isPacedCourse ? (
-          <Flex.Item padding="small medium" shouldGrow={true} shouldShrink={true}>
-            <CoursePacingNotice courseId={courseId} />
-          </Flex.Item>
-        ) : (
-          <ItemAssignToTrayContent
-            open={open}
-            initialLoadRef={initialLoadRef}
-            onClose={onClose}
-            onDismiss={onDismiss}
-            courseId={courseId}
-            itemType={itemType}
-            itemContentId={itemContentId}
-            locale={locale}
-            timezone={timezone}
-            initHasModuleOverrides={initHasModuleOverrides}
-            removeDueDateInput={removeDueDateInput}
-            isCheckpointed={isCheckpointed}
-            onInitialStateSet={onInitialStateSet}
-            defaultCards={defaultCards}
-            defaultSectionId={defaultSectionId}
-            defaultDisabledOptionIds={defaultDisabledOptionIds}
-            onSave={onSave}
-            onAddCard={onAddCard}
-            onAssigneesChange={onAssigneesChange}
-            onDatesChange={onDatesChange}
-            onCardRemove={onCardRemove}
-            setAssignToCards={setAssignToCards}
-            blueprintDateLocks={blueprintDateLocks}
-            setBlueprintDateLocks={setBlueprintDateLocks}
-            handleDismiss={handleDismiss}
-            hasModuleOverrides={hasModuleOverrides}
-            setHasModuleOverrides={setHasModuleOverrides}
-            cardsRefs={cardsRefs}
-            setModuleAssignees={setModuleAssignees}
-            defaultGroupCategoryId={defaultGroupCategoryId}
-            allOptions={allOptions}
-            isLoadingAssignees={isLoadingAssignees}
-            isLoading={isLoading}
-            loadedAssignees={loadedAssignees}
-            setSearchTerm={setSearchTerm}
-            everyoneOption={everyoneOption}
-            setGroupCategoryId={setGroupCategoryId}
-            setOverridesFetched={setOverridesFetched}
-            postToSIS={postToSIS}
-            assignToCardsRef={assignToCardsRef}
-            disabledOptionIdsRef={disabledOptionIdsRef}
-            isTray={isTray}
-          />
-        )}
-        {Footer()}
-      </Flex>
-    </Tray>
+    <View id="manage-assign-to-container" width="100%" display="block" ref={sectionViewRef}>
+      <Tray
+        data-testid="module-item-edit-tray"
+        onClose={onClose}
+        onExited={onExited}
+        onEntered={handleEntered}
+        label={I18n.t('Edit assignment %{name}', {
+          name: itemName,
+        })}
+        open={open}
+        placement="end"
+        size="regular"
+      >
+        <Flex direction="column" height="100vh" width="100%">
+          {Header()}
+          {isPacedCourse ? (
+            <Flex.Item padding="small medium" shouldGrow={true} shouldShrink={true}>
+              <CoursePacingNotice courseId={courseId} />
+            </Flex.Item>
+          ) : (
+            <ItemAssignToTrayContent
+              open={open}
+              initialLoadRef={initialLoadRef}
+              onClose={onClose}
+              onDismiss={onDismiss}
+              courseId={courseId}
+              itemType={itemType}
+              itemContentId={itemContentId}
+              locale={locale}
+              timezone={timezone}
+              initHasModuleOverrides={initHasModuleOverrides}
+              removeDueDateInput={removeDueDateInput}
+              isCheckpointed={isCheckpointed}
+              onInitialStateSet={onInitialStateSet}
+              defaultCards={defaultCards}
+              defaultSectionId={defaultSectionId}
+              defaultDisabledOptionIds={defaultDisabledOptionIds}
+              onSave={onSave}
+              onAddCard={onAddCard}
+              onAssigneesChange={onAssigneesChange}
+              onDatesChange={onDatesChange}
+              onCardRemove={onCardRemove}
+              setAssignToCards={setAssignToCards}
+              blueprintDateLocks={blueprintDateLocks}
+              setBlueprintDateLocks={setBlueprintDateLocks}
+              handleDismiss={handleDismiss}
+              hasModuleOverrides={hasModuleOverrides}
+              setHasModuleOverrides={setHasModuleOverrides}
+              cardsRefs={cardsRefs}
+              setModuleAssignees={setModuleAssignees}
+              defaultGroupCategoryId={defaultGroupCategoryId}
+              allOptions={allOptions}
+              isLoadingAssignees={isLoadingAssignees}
+              isLoading={isLoading}
+              loadedAssignees={loadedAssignees}
+              setSearchTerm={setSearchTerm}
+              everyoneOption={everyoneOption}
+              setGroupCategoryId={setGroupCategoryId}
+              setOverridesFetched={setOverridesFetched}
+              postToSIS={postToSIS}
+              assignToCardsRef={assignToCardsRef}
+              disabledOptionIdsRef={disabledOptionIdsRef}
+              isTray={isTray}
+            />
+          )}
+          {Footer()}
+        </Flex>
+      </Tray>
+    </View>
   )
 
   const sectionView = (
