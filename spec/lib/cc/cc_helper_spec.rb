@@ -44,6 +44,30 @@ describe CC::CCHelper do
   end
 
   describe CC::CCHelper::HtmlContentExporter do
+    let :flavor_asset do
+      [
+        {
+          isOriginal: 1,
+          containerFormat: "mp4",
+          fileExt: "mp4",
+          id: "one",
+          size: 15,
+        },
+        {
+          containerFormat: "flash video",
+          fileExt: "flv",
+          id: "smaller",
+          size: 3,
+        },
+        {
+          containerFormat: "flash video",
+          fileExt: "flv",
+          id: "two",
+          size: 5,
+        },
+      ]
+    end
+
     before :once do
       course_with_teacher
       @obj = @course.media_objects.create!(media_id: "abcde", title: "some_media.mp4")
@@ -52,27 +76,8 @@ describe CC::CCHelper do
     before do
       @kaltura = double("CanvasKaltura::ClientV3")
       allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(@kaltura)
-      allow(@kaltura).to receive(:flavorAssetGetByEntryId).with("abcde").and_return([
-                                                                                      {
-                                                                                        isOriginal: 1,
-                                                                                        containerFormat: "mp4",
-                                                                                        fileExt: "mp4",
-                                                                                        id: "one",
-                                                                                        size: 15,
-                                                                                      },
-                                                                                      {
-                                                                                        containerFormat: "flash video",
-                                                                                        fileExt: "flv",
-                                                                                        id: "smaller",
-                                                                                        size: 3,
-                                                                                      },
-                                                                                      {
-                                                                                        containerFormat: "flash video",
-                                                                                        fileExt: "flv",
-                                                                                        id: "two",
-                                                                                        size: 5,
-                                                                                      },
-                                                                                    ])
+      allow(@kaltura).to receive(:flavorAssetGetByEntryId).with("m-noattachment").and_return(flavor_asset)
+      allow(@kaltura).to receive(:flavorAssetGetByEntryId).with("abcde").and_return(flavor_asset)
       allow(@kaltura).to receive(:flavorAssetGetOriginalAsset).and_return(@kaltura.flavorAssetGetByEntryId("abcde").first)
       allow(CanvasKaltura::ClientV3).to receive_messages(new: @kaltura)
       allow(@kaltura).to receive_messages(media_sources: {})
@@ -160,6 +165,13 @@ describe CC::CCHelper do
       translated = @exporter.html_content(orig)
       expect(translated).to eq orig
       expect(@exporter.media_object_infos[@obj.id]).to be_nil
+    end
+
+    it "handles media comments with no attachments" do
+      MediaObject.create! media_id: "m-noattachment"
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+      orig = '<a id="media_comment_m-noattachment" class="instructure_inline_media_comment"></a>'
+      expect { @exporter.html_content(orig) }.not_to raise_error
     end
 
     it "translates media links using an alternate flavor" do
