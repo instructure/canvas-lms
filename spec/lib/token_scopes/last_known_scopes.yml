@@ -155,6 +155,8 @@
   path: "/api/v1/accounts/:account_id/features/flags/:feature"
 - verb: PUT
   path: "/api/v1/accounts/:account_id/features/flags/:feature"
+- verb: POST
+  path: "/api/v1/accounts/:account_id/folders"
 - verb: GET
   path: "/api/v1/accounts/:account_id/grading_period_sets"
 - verb: POST

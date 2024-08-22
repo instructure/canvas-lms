@@ -1978,6 +1978,7 @@ CanvasRails::Application.routes.draw do
       delete "folders/:id", action: :api_destroy
       put "folders/:id", action: :update
       post "folders/:folder_id/folders", action: :create, as: "create_folder"
+      post "accounts/:account_id/folders", action: :create
       post "folders/:folder_id/files", action: :create_file
       post "folders/:dest_folder_id/copy_file", action: :copy_file
       post "folders/:dest_folder_id/copy_folder", action: :copy_folder
