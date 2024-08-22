@@ -52,6 +52,7 @@ class Login::OAuth2Controller < Login::OAuthBaseController
 
     unique_id = nil
     provider_attributes = {}
+    token = nil
     return unless timeout_protection do
       begin
         token = @aac.get_token(params[:code], oauth2_login_callback_url, params)
@@ -72,7 +73,7 @@ class Login::OAuth2Controller < Login::OAuthBaseController
       end
     end
 
-    find_pseudonym(unique_id, provider_attributes)
+    find_pseudonym(unique_id, provider_attributes, token)
   end
 
   protected

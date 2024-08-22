@@ -104,10 +104,10 @@ class LoginController < ApplicationController
       redirect = aac.try(:user_logout_redirect, self, @current_user)
     end
 
+    flash[:logged_out] = true if redirect.nil?
     redirect ||= login_url
     logout_current_user
 
-    flash[:logged_out] = true
     redirect_to redirect
   end
 
