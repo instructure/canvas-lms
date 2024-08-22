@@ -20,8 +20,8 @@ import {z} from 'zod'
 import {executeQuery} from '@canvas/query/graphql'
 import gql from 'graphql-tag'
 
-const ASSIGNMENTS_BY_COURSE_ID_QUERY = gql`
-  query AssignmentsByCourseIdQuery($courseId: ID!) {
+const QUERY = gql`
+  query SpeedGrader_AssignmentsByCourseIdQuery($courseId: ID!) {
     course(id: $courseId) {
       _id
       id
@@ -75,7 +75,7 @@ export async function getAssignmentsByCourseId<T extends GetSectionsParams>({
   ZParams.parse(queryKey[1])
   const {courseId} = queryKey[1]
 
-  const result = await executeQuery<any>(ASSIGNMENTS_BY_COURSE_ID_QUERY, {
+  const result = await executeQuery<any>(QUERY, {
     courseId,
   })
 

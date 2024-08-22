@@ -21,17 +21,15 @@ import {executeQuery} from '@canvas/query/graphql'
 import gql from 'graphql-tag'
 
 const QUERY = gql`
-  query SpeedGrader_SubmissionsByStudentsQuery($courseId: ID!, $studentIds: [ID!]!) {
+  query SpeedGrader_EnrollmentsByCourseQuery($courseId: ID!) {
     course(id: $courseId) {
-      submissionsConnection(studentIds: $studentIds) {
+      enrollmentsConnection(filter: {types: StudentEnrollment}) {
         nodes {
-          assignmentId
-          id
-          late
-          score
-          state
-          submittedAt
-          userId
+          user {
+            name
+            _id
+            sortableName
+          }
         }
       }
     }
@@ -39,30 +37,25 @@ const QUERY = gql`
 `
 
 function transform(result: any) {
-  if (result.course?.submissionsConnection?.nodes) {
-    return result.course.submissionsConnection.nodes
-  }
-  return null
+  return result.course.enrollmentsConnection.nodes.map((node: any) => node.user)
 }
 
-export const ZGetSubmissionsByStudentIdsParams = z.object({
+export const ZParams = z.object({
   courseId: z.string().min(1),
-  studentIds: z.array(z.string().min(1)),
 })
 
-type GetSubmissionsByStudentIdsParams = z.infer<typeof ZGetSubmissionsByStudentIdsParams>
+type Params = z.infer<typeof ZParams>
 
-export async function getSubmissionsByStudentIds<T extends GetSubmissionsByStudentIdsParams>({
+export async function getEnrollmentsByCourse<T extends Params>({
   queryKey,
 }: {
   queryKey: [string, T]
 }): Promise<any> {
-  ZGetSubmissionsByStudentIdsParams.parse(queryKey[1])
-  const {courseId, studentIds} = queryKey[1]
+  ZParams.parse(queryKey[1])
+  const {courseId} = queryKey[1]
 
   const result = await executeQuery<any>(QUERY, {
     courseId,
-    studentIds,
   })
 
   return transform(result)
