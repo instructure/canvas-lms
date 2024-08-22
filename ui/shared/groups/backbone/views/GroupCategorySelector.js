@@ -147,15 +147,18 @@ GroupCategorySelector.prototype.showGroupCategoryCreateDialog = function () {
             $newCategory = document.createElement('option')
             $newCategory.value = result.id
             $newCategory.text = result.name
+            $newCategory.setAttribute('selected', true)
             _this.$groupCategoryID.append($newCategory)
+            _this.$groupCategoryID.val(result.id)
+            _this.groupCategories.push(result)
 
-            if (!ENV.FEATURES?.selective_release_edit_page) {
-              $newCategory.setAttribute('selected', true)
-              _this.$groupCategoryID.val(result.id)
+            if (ENV.FEATURES?.selective_release_edit_page) {
+              // Runs the validations and shows an error if there is
+              // an group override that belongs to the previous group set
+              _this.groupCategorySelected()
             }
 
-            _this.groupCategories.push(result)
-            return (_this.$groupCategory.toggleAccessibly = true)
+            return _this.$groupCategory.toggleAccessibly(true)
           }
         }
       })(this)
