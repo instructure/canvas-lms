@@ -50,26 +50,10 @@ describe('ForbiddenWordsFileUpload Component', () => {
       expect(screen.getByText('Upload File')).toBeInTheDocument()
       expect(screen.getByText('Drag and drop, or upload from your computer')).toBeInTheDocument()
     })
-
-    it('displays the file table when a file is uploaded', () => {
-      render(
-        <ForbiddenWordsFileUpload
-          {...defaultProps}
-          setForbiddenWordsUrl={jest.fn()}
-          setForbiddenWordsFilename={jest.fn()}
-        />
-      )
-      const file = new File(['dummy content'], 'test.txt', {type: 'text/plain'})
-      const input = screen.getByLabelText(/drag and drop, or upload from your computer/i)
-      userEvent.upload(input, file)
-      waitFor(() => {
-        expect(screen.getByText('test.txt')).toBeInTheDocument()
-      })
-    })
   })
 
-  describe('User Interactions with API', () => {
-    beforeEach(() => {
+  describe('File Handling', () => {
+    it('handles file drop, uploads the file, and closes the modal on success', async () => {
       const mockResponse = {
         ok: true,
         status: 200,
@@ -80,57 +64,28 @@ describe('ForbiddenWordsFileUpload Component', () => {
         }),
         headers: new Headers(),
       } as Partial<Response> as Response
-
       mockedDoFetchApi.mockResolvedValueOnce({
         json: {fileUrl: 'mockFileUrl', filename: 'mockFilename'},
         response: mockResponse,
       })
-    })
-
-    it('handles file drop and sets the file name and URL on upload', async () => {
-      const file = new File(['dummy content'], 'test.txt', {type: 'text/plain'})
       render(<ForbiddenWordsFileUpload {...defaultProps} />)
+      const file = new File(['dummy content'], 'test.txt', {type: 'text/plain'})
       const input = screen.getByLabelText(/drag and drop, or upload from your computer/i)
       await userEvent.upload(input, file)
-      await waitFor(() => screen.getByText('test.txt'))
-      expect(defaultProps.setForbiddenWordsFilename).not.toHaveBeenCalled()
-      expect(defaultProps.setForbiddenWordsUrl).not.toHaveBeenCalled()
-      const uploadButton = await waitFor(() => screen.getByText('Upload').closest('button'))
-      if (!uploadButton) {
-        throw new Error('Upload button not found')
-      }
-      await userEvent.click(uploadButton)
       await waitFor(() => {
-        expect(defaultProps.setForbiddenWordsFilename).toHaveBeenCalledWith('test.txt')
-        expect(defaultProps.setForbiddenWordsUrl).toHaveBeenCalledWith(expect.any(String))
+        expect(screen.getByText('Uploading...')).toBeInTheDocument()
       })
-    })
-
-    it('calls onSave after a successful file upload', async () => {
-      render(<ForbiddenWordsFileUpload {...defaultProps} />)
-      const file = new File(['dummy content'], 'test.txt', {type: 'text/plain'})
-      const input = screen.getByLabelText(/drag and drop, or upload from your computer/i)
-      await userEvent.upload(input, file)
-      await waitFor(() => screen.getByText('test.txt'))
-      const uploadButton = screen.getByText('Upload').closest('button')
-      if (!uploadButton) {
-        throw new Error('Upload button not found')
-      }
-      await userEvent.click(uploadButton)
       await waitFor(() => {
         expect(defaultProps.onSave).toHaveBeenCalled()
+        expect(defaultProps.onDismiss).toHaveBeenCalled()
       })
     })
   })
 
-  describe('User Interactions without API', () => {
+  describe('Modal Interactions', () => {
     it('resets state on cancel and does not call prop functions', async () => {
       render(<ForbiddenWordsFileUpload {...defaultProps} />)
-      const file = new File(['dummy content'], 'test.txt', {type: 'text/plain'})
-      const input = screen.getByLabelText(/drag and drop, or upload from your computer/i)
-      await userEvent.upload(input, file)
-      await waitFor(() => screen.getByText('test.txt'))
-      const cancelButton = await waitFor(() => screen.getByText('Cancel').closest('button'))
+      const cancelButton = screen.getByText('Cancel').closest('button')
       if (!cancelButton) {
         throw new Error('Cancel button not found')
       }

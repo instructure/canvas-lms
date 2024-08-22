@@ -89,7 +89,7 @@ describe('PasswordComplexityConfiguration', () => {
     expect(checkbox).not.toBeChecked()
   })
 
-  it('toggle input fields when checkbox is checked', async () => {
+  it('toggles input fields when checkbox is checked', async () => {
     render(<PasswordComplexityConfiguration />)
     await userEvent.click(await getViewOptionsButton())
     let input = await screen.findByTestId('minimumCharacterLengthInput')

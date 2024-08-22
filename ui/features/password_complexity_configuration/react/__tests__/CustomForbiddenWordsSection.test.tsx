@@ -87,7 +87,10 @@ describe('CustomForbiddenWordsSection', () => {
         expect(screen.getByText('Current Custom List')).toBeInTheDocument()
         expect(screen.getByText('mock_filename')).toBeInTheDocument()
       })
-      const deleteButton = screen.getByRole('button', {name: /delete list/i})
+      const deleteButton = await waitFor(() => screen.getByText(/delete list/i).closest('button'))
+      if (!deleteButton) {
+        throw new Error('Delete button not found')
+      }
       await userEvent.click(deleteButton)
       const uploadButton = await screen.findByTestId('uploadButton')
       expect(uploadButton).toBeInTheDocument()

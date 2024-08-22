@@ -37,6 +37,12 @@ const I18n = useI18nScope('password_complexity_configuration')
 
 declare const ENV: GlobalEnv
 
+const MINIMUM_CHARACTER_LENGTH = 8
+const MAXIMUM_CHARACTER_LENGTH = 255
+const DEFAULT_MAX_LOGIN_ATTEMPTS = 10
+const MINIMUM_LOGIN_ATTEMPTS = 3
+const MAXIMUM_LOGIN_ATTEMPTS = 20
+
 interface PasswordPolicy {
   require_number_characters: boolean
   require_symbol_characters: boolean
@@ -71,15 +77,16 @@ const PasswordComplexityConfiguration = () => {
   const [showTray, setShowTray] = useState(false)
   const [enableApplyButton, setEnableApplyButton] = useState(true)
   const [minimumCharacterLengthEnabled, setMinimumCharacterLengthEnabled] = useState(true)
-  const [minimumCharacterLength, setMinimumCharacterLength] = useState(8)
-  const [minimumCharacterLengthSaved, setMinimumCharacterLengthSaved] = useState(8)
+  const [minimumCharacterLength, setMinimumCharacterLength] = useState(MINIMUM_CHARACTER_LENGTH)
+  const [minimumCharacterLengthSaved, setMinimumCharacterLengthSaved] =
+    useState(MINIMUM_CHARACTER_LENGTH)
   const [requireNumbersEnabled, setRequireNumbersEnabled] = useState(true)
   const [requireNumbersEnabledSaved, setRequireNumbersEnabledSaved] = useState(false)
   const [requireSymbolsEnabled, setRequireSymbolsEnabled] = useState(true)
   const [requireSymbolsEnabledSaved, setRequireSymbolsEnabledSaved] = useState(false)
   const [customMaxLoginAttemptsEnabled, setCustomMaxLoginAttemptsEnabled] = useState(false)
   const [allowLoginSuspensionEnabled, setAllowLoginSuspensionEnabled] = useState(false)
-  const [maxLoginAttempts, setMaxLoginAttempts] = useState(10)
+  const [maxLoginAttempts, setMaxLoginAttempts] = useState(DEFAULT_MAX_LOGIN_ATTEMPTS)
 
   const handleOpenTray = () => {
     setShowTray(true)
@@ -268,8 +275,8 @@ const PasswordComplexityConfiguration = () => {
             <View as="div" maxWidth="9rem" margin="0 medium medium medium">
               <View as="div" margin="0 medium medium medium">
                 <NumberInputControlled
-                  minimum={8}
-                  maximum={255}
+                  minimum={MINIMUM_CHARACTER_LENGTH}
+                  maximum={MAXIMUM_CHARACTER_LENGTH}
                   currentValue={minimumCharacterLength}
                   updateCurrentValue={handleMinimumCharacterChange}
                   disabled={!minimumCharacterLengthEnabled}
@@ -319,8 +326,8 @@ const PasswordComplexityConfiguration = () => {
             <View as="div" maxWidth="9rem" margin="0 medium medium medium">
               <View as="div" margin="0 medium medium medium">
                 <NumberInputControlled
-                  minimum={3}
-                  maximum={20}
+                  minimum={MINIMUM_LOGIN_ATTEMPTS}
+                  maximum={MAXIMUM_LOGIN_ATTEMPTS}
                   currentValue={maxLoginAttempts}
                   updateCurrentValue={handleMaxLoginAttemptsChange}
                   disabled={!customMaxLoginAttemptsEnabled}

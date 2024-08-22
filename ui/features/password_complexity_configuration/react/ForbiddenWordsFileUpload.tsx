@@ -20,31 +20,36 @@ import React, {useCallback, useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {RocketSVG} from '@instructure/canvas-media'
 import type {FormMessage} from '@instructure/ui-form-field'
-import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
-import {View} from '@instructure/ui-view'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import {FileDrop} from '@instructure/ui-file-drop'
 import {Billboard} from '@instructure/ui-billboard'
 import {Text} from '@instructure/ui-text'
-import {Table} from '@instructure/ui-table'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
-import {IconTrashLine} from '@instructure/ui-icons'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import './ForbiddenWordsFileUpload.module.css'
 
 const I18n = useI18nScope('password_complexity_configuration')
 
 declare const ENV: GlobalEnv
 
-type Props = {
+interface FileDetails {
+  url: string | null
+  filename: string | null
+}
+
+interface Props {
   open: boolean
   onDismiss: () => void
   onSave: () => void
   setForbiddenWordsUrl: (url: string | null) => void
   setForbiddenWordsFilename: (filename: string | null) => void
 }
+
+const initialFileDetails: FileDetails = {url: null, filename: null}
 
 const ForbiddenWordsFileUpload = ({
   open,
@@ -54,68 +59,46 @@ const ForbiddenWordsFileUpload = ({
   setForbiddenWordsFilename,
 }: Props) => {
   const [fileDropMessages, setFileDropMessages] = useState<FormMessage[]>([])
-  const [uploadInFlight, setUploadInFlight] = useState(false)
-  const [localForbiddenWordsUrl, setLocalForbiddenWordsUrl] = useState<string | null>(null)
-  const [localForbiddenWordsFilename, setLocalForbiddenWordsFilename] = useState<string | null>(
-    null
-  )
-  const [isValidFile, setIsValidFile] = useState(false)
-
-  useEffect(() => {
-    if (open) {
-      setLocalForbiddenWordsUrl(null)
-      setLocalForbiddenWordsFilename(null)
-      setIsValidFile(false)
-    }
-  }, [open])
+  const [fileDetails, setFileDetails] = useState<FileDetails>(initialFileDetails)
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadAttempted, setUploadAttempted] = useState(false)
+  const [modalClosing, setModalClosing] = useState(false)
 
   const resetState = useCallback(() => {
     setFileDropMessages([])
-    setLocalForbiddenWordsUrl(null)
-    setLocalForbiddenWordsFilename(null)
-    setIsValidFile(false)
-  }, [])
-
-  const handleDropAccepted = useCallback((acceptedFiles: ArrayLike<File | DataTransferItem>) => {
-    setFileDropMessages([])
-    const newFile = acceptedFiles[0] as File
-    if (newFile.type !== 'text/plain') {
-      setFileDropMessages([{text: I18n.t('Invalid file type'), type: 'error'}])
-      setIsValidFile(false)
-      return
-    }
-    setLocalForbiddenWordsUrl(URL.createObjectURL(newFile))
-    setLocalForbiddenWordsFilename(newFile.name)
-    setIsValidFile(true)
-  }, [])
-
-  const handleRemoveFile = useCallback(() => {
-    setLocalForbiddenWordsUrl(null)
-    setLocalForbiddenWordsFilename(null)
-    setIsValidFile(false)
+    setFileDetails(initialFileDetails)
+    setIsUploading(false)
+    setUploadAttempted(false)
+    setModalClosing(false)
   }, [])
 
   const handleUpload = useCallback(async () => {
-    if (!localForbiddenWordsUrl || !localForbiddenWordsFilename) return
+    const {url, filename} = fileDetails
 
-    setUploadInFlight(true)
+    if (!url || !filename || isUploading || uploadAttempted) return
+
+    setIsUploading(true)
+    setUploadAttempted(true)
 
     try {
-      const response = await fetch(localForbiddenWordsUrl)
+      const response = await fetch(url)
       const fileBlob = await response.blob()
-      const newFile = new File([fileBlob], localForbiddenWordsFilename, {type: fileBlob.type})
+      const newFile = new File([fileBlob], filename, {type: fileBlob.type})
       const formData = new FormData()
       formData.append('file', newFile)
+
       const uploadResponse = await doFetchApi({
         method: 'POST',
         path: `/api/v1/accounts/${ENV.ACCOUNT_ID}/password_complexity/upload_forbidden_words`,
         body: formData,
       })
+
       if (uploadResponse.response.ok) {
-        setForbiddenWordsUrl(localForbiddenWordsUrl)
-        setForbiddenWordsFilename(localForbiddenWordsFilename)
+        setForbiddenWordsUrl(url)
+        setForbiddenWordsFilename(filename)
         onSave()
-        resetState()
+        setModalClosing(true)
+        onDismiss()
       } else {
         setFileDropMessages([
           {
@@ -132,133 +115,124 @@ const ForbiddenWordsFileUpload = ({
         },
       ])
     } finally {
-      setUploadInFlight(false)
+      setIsUploading(false)
     }
   }, [
-    localForbiddenWordsUrl,
-    localForbiddenWordsFilename,
+    fileDetails,
     setForbiddenWordsUrl,
     setForbiddenWordsFilename,
     onSave,
-    resetState,
+    onDismiss,
+    isUploading,
+    uploadAttempted,
   ])
 
-  const renderFilesTable = () => {
-    if (!localForbiddenWordsFilename) return null
-    return (
-      <Table caption="files" layout="auto">
-        <Table.Head>
-          <Table.Row>
-            <Table.ColHeader id="filename">File name</Table.ColHeader>
-            <Table.ColHeader id="action" width="2rem">
-              <ScreenReaderContent>Action</ScreenReaderContent>
-            </Table.ColHeader>
-          </Table.Row>
-        </Table.Head>
-        <Table.Body>
-          <Table.Row key={localForbiddenWordsFilename}>
-            <Table.Cell>
-              <Flex gap="small">
-                <Flex.Item shouldGrow={true}>{localForbiddenWordsFilename}</Flex.Item>
-              </Flex>
-            </Table.Cell>
-            <Table.Cell>
-              <IconButton
-                screenReaderLabel={`remove ${localForbiddenWordsFilename}`}
-                onClick={handleRemoveFile}
-              >
-                <IconTrashLine />
-              </IconButton>
-            </Table.Cell>
-          </Table.Row>
-        </Table.Body>
-      </Table>
-    )
-  }
+  const handleDropAccepted = useCallback((acceptedFiles: ArrayLike<File | DataTransferItem>) => {
+    const newFile = acceptedFiles[0] as File
+    if (newFile.type !== 'text/plain') {
+      setFileDropMessages([{text: I18n.t('Invalid file type'), type: 'error'}])
+      return
+    }
+    const url = URL.createObjectURL(newFile)
+    const filename = newFile.name
+
+    setFileDetails({url, filename})
+    setUploadAttempted(false)
+  }, [])
+
+  const handleDropRejected = useCallback(() => {
+    setFileDropMessages([{text: I18n.t('Invalid file type'), type: 'error'}])
+  }, [])
+
+  useEffect(() => {
+    if (fileDetails.url && fileDetails.filename && !isUploading && !uploadAttempted) {
+      handleUpload()
+    }
+  }, [fileDetails, handleUpload, isUploading, uploadAttempted])
+
+  useEffect(() => {
+    if (open) {
+      resetState()
+    }
+  }, [open, resetState])
 
   return (
-    <View as="div">
-      <Modal
-        open={open}
-        onDismiss={() => {
-          resetState()
-          onDismiss()
-        }}
-        size="medium"
-        label={I18n.t('Upload Forbidden Words/Terms List')}
-        shouldCloseOnDocumentClick={true}
-        overflow="scroll"
-      >
-        <Modal.Header>
-          <Heading>{I18n.t('Upload Forbidden Words/Terms List')}</Heading>
-          <CloseButton
-            margin="small 0 0 0"
-            placement="end"
-            offset="small"
-            onClick={() => {
-              resetState()
-              onDismiss()
-            }}
-            screenReaderLabel={I18n.t('Close')}
-          />
-        </Modal.Header>
-        <Modal.Body>
-          {!localForbiddenWordsUrl && (
-            <div style={{overflowY: 'clip'}}>
-              <FileDrop
-                accept="text/plain"
-                messages={fileDropMessages}
-                onDropAccepted={handleDropAccepted}
-                renderLabel={() => (
-                  <Billboard
-                    size="medium"
-                    heading={I18n.t('Upload File')}
-                    headingLevel="h2"
-                    hero={<RocketSVG width="3em" height="3em" />}
-                    message={
-                      <>
-                        <View as="div" margin="small 0">
-                          <Text>{I18n.t('Drag and drop, or upload from your computer')}</Text>
-                        </View>
-                        <View as="div" margin="small 0">
-                          <Text>{I18n.t('Supported format: TXT')}</Text>
-                        </View>
-                      </>
-                    }
-                  />
-                )}
-                shouldAllowMultiple={false}
-                shouldEnablePreview={false}
-                width="942px"
+    <Modal
+      open={open}
+      onDismiss={() => {
+        resetState()
+        onDismiss()
+      }}
+      label={I18n.t('Upload Forbidden Words/Terms List')}
+      shouldCloseOnDocumentClick={true}
+      size="large"
+    >
+      <Modal.Header>
+        <Heading>{I18n.t('Upload Forbidden Words/Terms List')}</Heading>
+        <CloseButton
+          margin="small 0 0 0"
+          placement="end"
+          offset="small"
+          onClick={() => {
+            resetState()
+            onDismiss()
+          }}
+          screenReaderLabel={I18n.t('Close')}
+        />
+      </Modal.Header>
+      <Modal.Body padding="large">
+        {isUploading || modalClosing ? (
+          <Flex justifyItems="center" alignItems="center" height="400px">
+            <Flex.Item>
+              <Spinner renderTitle={I18n.t('Uploading...')} />
+            </Flex.Item>
+          </Flex>
+        ) : (
+          <FileDrop
+            id="fileDropContainer"
+            accept="text/plain"
+            messages={fileDropMessages}
+            onDropAccepted={handleDropAccepted}
+            onDropRejected={handleDropRejected}
+            interaction={isUploading ? 'disabled' : 'enabled'}
+            renderLabel={() => (
+              <Billboard
+                as="div"
+                size="medium"
+                heading={I18n.t('Upload File')}
+                headingLevel="h2"
+                hero={<RocketSVG width="179px" />}
+                message={
+                  <Flex direction="column" alignItems="center" justifyItems="center" gap="small">
+                    <Flex.Item>
+                      <Text>{I18n.t('Drag and drop, or upload from your computer')}</Text>
+                    </Flex.Item>
+                    <Flex.Item>
+                      <Text>{I18n.t('Supported format: TXT')}</Text>
+                    </Flex.Item>
+                  </Flex>
+                }
               />
-            </div>
-          )}
-          {localForbiddenWordsUrl && (
-            <View as="div" margin="small 0">
-              {renderFilesTable()}
-            </View>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            onClick={() => {
-              resetState()
-              onDismiss()
-            }}
-          >
-            {I18n.t('Cancel')}
-          </Button>
-          <Button
-            color="primary"
-            margin="0 0 0 small"
-            onClick={handleUpload}
-            disabled={uploadInFlight || !isValidFile}
-          >
-            {uploadInFlight ? I18n.t('Uploading...') : I18n.t('Upload')}
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </View>
+            )}
+            shouldAllowMultiple={false}
+            shouldEnablePreview={false}
+            height="400px"
+            margin="0"
+          />
+        )}
+      </Modal.Body>
+      <Modal.Footer>
+        <Button
+          onClick={() => {
+            resetState()
+            onDismiss()
+          }}
+          disabled={isUploading}
+        >
+          {I18n.t('Cancel')}
+        </Button>
+      </Modal.Footer>
+    </Modal>
   )
 }
 
