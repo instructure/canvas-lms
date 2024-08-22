@@ -44,7 +44,10 @@ import {lockLabels} from '@canvas/blueprint-courses/react/labels'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {DateDetails, DateLockTypes, ItemAssignToCardSpec} from './types'
-import {type ItemAssignToCardRef} from './ItemAssignToCard'
+import {
+  type ItemAssignToCardCustomValidationArgs,
+  type ItemAssignToCardRef,
+} from './ItemAssignToCard'
 import TrayFooter from '../Footer'
 import {generateDateDetailsPayload, itemTypeToApiURL} from '../../utils/assignToHelper'
 import {Text} from '@instructure/ui-text'
@@ -131,6 +134,13 @@ export interface ItemAssignToTrayProps {
     deletedModuleAssignees: String[],
     disabledOptionIds?: String[]
   ) => void
+  onChange?: (
+    overrides: ItemAssignToCardSpec[],
+    hasModuleOverrides: boolean,
+    deletedModuleAssignees: String[],
+    disabledOptionIds?: String[],
+    moduleOverrides?: ItemAssignToCardSpec[]
+  ) => ItemAssignToCardSpec[]
   onClose: () => void
   onDismiss: () => void
   onExited?: () => void
@@ -166,6 +176,7 @@ export interface ItemAssignToTrayProps {
 export default function ItemAssignToTray({
   open,
   onSave,
+  onChange,
   onClose,
   onExited,
   onDismiss,
@@ -213,7 +224,15 @@ export default function ItemAssignToTray({
     defaultCards !== undefined && defaultCards.length > 0
   )
   const [blueprintDateLocks, setBlueprintDateLocks] = useState<DateLockTypes[] | undefined>(
-    undefined
+    // On the edit pages, the ENV will contain this data, so we can initialize the lock info here. We'll fall back to
+    // fetching it via the date details API in other cases.
+    ENV.MASTER_COURSE_DATA?.is_master_course_child_content &&
+      ENV.MASTER_COURSE_DATA?.restricted_by_master_course
+      ? (Object.entries(ENV.MASTER_COURSE_DATA?.master_course_restrictions ?? {})
+          .filter(([_lockType, locked]) => locked)
+          .filter(([lockType]) => ['due_dates', 'availability_dates'].includes(lockType))
+          .map(([lockType]) => lockType) as DateLockTypes[])
+      : undefined
   )
   const assignToCardsRef = useRef(assignToCards)
   const disabledOptionIdsRef = useRef(defaultDisabledOptionIds)
@@ -228,6 +247,22 @@ export default function ItemAssignToTray({
       setIsLoading(true)
     }
   }, [open])
+
+  useEffect(() => {
+    if (!ENV.FEATURES?.selective_release_edit_page || onChange === undefined) return
+    const deletedModuleAssignees = moduleAssignees.filter(
+      override => !disabledOptionIdsRef.current.includes(override)
+    )
+    const moduleOverrides = hasModuleOverrides ? defaultCards?.filter(o => o.contextModuleId) : []
+    const newCards = onChange(
+      assignToCardsRef.current,
+      hasModuleOverrides,
+      deletedModuleAssignees,
+      disabledOptionIdsRef.current,
+      moduleOverrides
+    )
+    setAssignToCards(newCards)
+  }, [assignToCards, defaultCards, hasModuleOverrides, moduleAssignees, onChange])
 
   const everyoneOption = useMemo(() => {
     const hasOverrides =
@@ -348,6 +383,11 @@ export default function ItemAssignToTray({
       sectionViewRef.current.ref.reactComponentInstance = {
         focusErrors,
         allCardsValid,
+        // Runs custom card validations with current data and returns true if all cards are valid
+        allCardsValidCustom: (params: ItemAssignToCardCustomValidationArgs) =>
+          !Object.values(cardsRefs.current).some(
+            c => c.current && Object.keys(c.current.runCustomValidations(params)).length !== 0
+          ),
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

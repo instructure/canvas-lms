@@ -98,7 +98,7 @@ module ItemsAssignToTray
   end
 
   def inherited_from_selector
-    "#{module_item_edit_tray_selector} [data-testid='context-module-text']"
+    "#{module_item_assign_to_card_selector} [data-testid='context-module-text']"
   end
 
   def item_type_text_selector

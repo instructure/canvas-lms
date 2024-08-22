@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, act} from '@testing-library/react'
+import {render, act, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import AssignToContent from '../AssignToContent'
 import AssignmentOverrideCollection from '@canvas/assignments/backbone/collections/AssignmentOverrideCollection'
 import fetchMock from 'fetch-mock'
@@ -76,7 +77,11 @@ describe('AssignToContent', () => {
   })
 
   beforeEach(() => {
-    fetchMock.get(STUDENTS_URL, []).get(SECTIONS_URL, SECTIONS_DATA).get(DATE_DETAILS, {}).get(SETTINGS_URL, {})
+    fetchMock
+      .get(STUDENTS_URL, [])
+      .get(SECTIONS_URL, SECTIONS_DATA)
+      .get(DATE_DETAILS, {})
+      .get(SETTINGS_URL, {})
   })
 
   afterEach(() => {
@@ -97,6 +102,14 @@ describe('AssignToContent', () => {
     expect(getAllByTestId('item-assign-to-card')).toHaveLength(2)
   })
 
+  it("adds a new card even if there's no cards", async () => {
+    render(<AssignToContent {...props} overrides={[]} />)
+    const cards = await screen.queryAllByTestId('item-assign-to-card')
+    expect(cards).toHaveLength(0)
+    await userEvent.click(screen.getByTestId('add-card'))
+    expect(screen.getAllByTestId('item-assign-to-card')).toHaveLength(1)
+  })
+
   describe('pending changes', () => {
     const addAssignee = async (getByTestId, findByTestId, findByText) => {
       const assigneeSelector = await findByTestId('assignee_selector')
@@ -106,9 +119,7 @@ describe('AssignToContent', () => {
     }
 
     it('highlights card if it has changes', async () => {
-      const {getByTestId, findByTestId, findByText} = render(
-        <AssignToContent {...props} />
-      )
+      const {getByTestId, findByTestId, findByText} = render(<AssignToContent {...props} />)
       await addAssignee(getByTestId, findByTestId, findByText)
       expect(getByTestId('highlighted_card')).toBeInTheDocument()
     })
@@ -209,9 +220,7 @@ describe('AssignToContent', () => {
     it('disables the importantDates check when no due dates are set', () => {
       const override = assignmentcollection.models[0]
       override.set('due_at', '')
-      const {getByTestId} = render(
-        <AssignToContent {...props} overrides={[override]} />
-      )
+      const {getByTestId} = render(<AssignToContent {...props} overrides={[override]} />)
 
       expect(getByTestId('important_dates')).toBeDisabled()
     })

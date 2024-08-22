@@ -316,11 +316,15 @@ function DiscussionTopicForm({
   const [showEditAnnouncementModal, setShowEditAnnouncementModal] = useState(false)
   const [shouldPublish, setShouldPublish] = useState(false)
 
+  const [groupDiscussionErrors, setGroupDiscussionErrors] = useState([])
+
   const handleSettingUsageRightsData = data => {
     setUsageRightsErrorState(false)
     setUsageRightsData(data)
   }
 
+  const hasGroupOverrides = () => assignedInfoList.some(info => info.assignedList.find(assetCode => assetCode.includes('group')) !== undefined)
+ 
   const assignmentDueDateContext = {
     assignedInfoList,
     setAssignedInfoList,
@@ -553,55 +557,67 @@ function DiscussionTopicForm({
       setIsSubmitting(true)
     }, 0)
 
+    let formIsValid = validateFormFields(
+      title,
+      availableFrom,
+      availableUntil,
+      isGraded,
+      textInputRef,
+      sectionInputRef,
+      groupOptionsRef,
+      dateInputRef,
+      gradedDiscussionRef,
+      gradedDiscussionRefMap,
+      attachment,
+      usageRightsData,
+      setUsageRightsErrorState,
+      setOnFailure,
+      isGroupDiscussion,
+      groupCategoryId,
+      setGroupCategorySelectError,
+      setTitleValidationMessages,
+      setAvailabilityValidationMessages,
+      shouldShowPostToSectionOption,
+      sectionIdsToPostTo,
+      assignedInfoList,
+      postToSis,
+      showPostToSisFlashAlert('manage-assign-to', !ENV.FEATURES.selective_release_edit_page)
+    )
+    let hasAfterRenderIssue = false
+    let sectionViewRef = null
+
     if (
-      validateFormFields(
-        title,
-        availableFrom,
-        availableUntil,
-        isGraded,
-        textInputRef,
-        sectionInputRef,
-        groupOptionsRef,
-        dateInputRef,
-        gradedDiscussionRef,
-        gradedDiscussionRefMap,
-        attachment,
-        usageRightsData,
-        setUsageRightsErrorState,
-        setOnFailure,
-        isGroupDiscussion,
-        groupCategoryId,
-        setGroupCategorySelectError,
-        setTitleValidationMessages,
-        setAvailabilityValidationMessages,
-        shouldShowPostToSectionOption,
-        sectionIdsToPostTo,
-        assignedInfoList,
-        postToSis,
-        showPostToSisFlashAlert('manage-assign-to', !ENV.FEATURES.selective_release_edit_page)
-      )
+      // Not validate override dates for announcements or ungraded group discussions
+      !(isAnnouncement || (isGroupDiscussion && !isGraded)) &&
+      ENV.FEATURES.selective_release_ui_api &&
+      ENV.FEATURES.selective_release_edit_page
     ) {
+      sectionViewRef = document.getElementById('manage-assign-to-container')?.reactComponentInstance
+      const aDueDateMissing = assignedInfoList.some(assignee => !assignee.dueDate)
+      const postToSisEnabled = isGraded && postToSis && ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
+      // Runs custom validation for all cards with the current post to sis selection without re-renders
+      formIsValid =
+        formIsValid && sectionViewRef?.allCardsValidCustom({dueDateRequired: postToSisEnabled})
+      // If hasAfterRenderIssue is true, a useEffect hook will be responsible to run the focus logic
+      hasAfterRenderIssue = postToSisEnabled && aDueDateMissing
+    }
+
+    if (formIsValid) {
       const payload = createSubmitPayload(shouldPublish)
       onSubmit(payload, shouldNotifyUsers)
       return true
     }
 
     setTimeout(() => {
-      if (
-        isGraded &&
-        ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT &&
-        ENV.FEATURES.selective_release_ui_api &&
-        ENV.FEATURES.selective_release_edit_page &&
-        assignedInfoList.length > 0 &&
-        postToSis
-      ) {
-        const sectionViewRef = document.getElementById(
-          'manage-assign-to-container'
-        )?.reactComponentInstance
-        const aDueDateMissing = assignedInfoList.some(assignee => !assignee.dueDate)
-        // If there are errors visible already don't force the focus
-        if (sectionViewRef?.allCardsValid() && aDueDateMissing) {
-          shouldForceFocusAfterRenderRef.current = true
+      if (ENV.FEATURES.selective_release_ui_api && ENV.FEATURES.selective_release_edit_page) {
+        if (!formIsValid) {
+          // If there are errors visible already don't force the focus
+          if (hasAfterRenderIssue) {
+            shouldForceFocusAfterRenderRef.current = true
+          } else {
+            // Focus errors that are already visible
+            sectionViewRef?.focusErrors()
+          }
         }
       }
       setIsSubmitting(false)
@@ -1058,25 +1074,36 @@ function DiscussionTopicForm({
               </>
             )}
             {shouldShowGroupOptions && (
-              <Checkbox
-                data-testid="group-discussion-checkbox"
-                label={I18n.t('This is a Group Discussion')}
-                value="group-discussion"
-                checked={isGroupDiscussion}
-                onChange={() => {
-                  setGroupCategoryId(!isGroupDiscussion ? '' : groupCategoryId)
-                  setIsGroupDiscussion(!isGroupDiscussion)
-                }}
-                disabled={!canGroupDiscussion}
-              />
+                <Checkbox
+                  id="has_group_category"
+                  data-testid="group-discussion-checkbox"
+                  label={I18n.t('This is a Group Discussion')}
+                  value="group-discussion"
+                  checked={isGroupDiscussion}
+                  messages={groupDiscussionErrors}
+                  onChange={() => {
+                    if (ENV.FEATURES.selective_release_edit_page && hasGroupOverrides()) {
+                      setGroupDiscussionErrors([{type: 'error', text: I18n.t('You must remove any groups from the Assign Access section to change this setting.')}])
+                      return;
+                    }
+                    setGroupCategoryId(!isGroupDiscussion ? '' : groupCategoryId)
+                    setIsGroupDiscussion(!isGroupDiscussion)
+                  }}
+                  disabled={!canGroupDiscussion}
+                />
             )}
             {shouldShowGroupOptions && isGroupDiscussion && (
               <View display="block" padding="none none none large">
                 <SimpleSelect
+                  id="discussion_group_category_id"
                   renderLabel={I18n.t('Group Set')}
                   defaultValue=""
                   value={groupCategoryId}
                   onChange={(_event, newChoice) => {
+                    if(ENV.FEATURES.selective_release_edit_page && hasGroupOverrides()) {
+                      setGroupCategorySelectError([{type: 'error', text: I18n.t('You must remove any groups belonging to %{groupCategory} from the Assign Access section before you can change to another Group Set.', {groupCategory: groupCategories.find(groupCategory => groupCategory._id === groupCategoryId)?.name})}])
+                      return
+                    };
                     const value = newChoice.value
                     if (value === 'new-group-category') {
                       // new group category workflow here

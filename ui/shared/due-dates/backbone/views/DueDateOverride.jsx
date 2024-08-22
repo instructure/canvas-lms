@@ -83,7 +83,6 @@ DueDateOverrideView.prototype.render = function () {
       div
     )
   }
-
   const selective_release_section = ENV.FEATURES?.selective_release_edit_page
     ? AssignToContent
     : DifferentiatedModulesSection
@@ -116,7 +115,7 @@ DueDateOverrideView.prototype.render = function () {
           } else if (document.getElementById('has_group_category')?.checked) {
             if (groupCategory.value === 'blank') {
               return null
-            }  
+            }
             return groupCategory.value
           }
           return null
@@ -207,25 +206,32 @@ DueDateOverrideView.prototype.validateBeforeSave = function (data, errors) {
   errors = this.validateGroupOverrides(data, errors)
   const requiredDueDates = ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
   if (ENV.FEATURES.selective_release_edit_page) {
-    const emptyDueDates = data.assignment_overrides.filter(
-      o => o.due_at === null || o.due_at === ''
-    )
     const sectionViewRef = document.getElementById(
       'manage-assign-to-container'
     )?.reactComponentInstance
+    const postToSisEnabled = data.postToSIS && requiredDueDates
+    // Runs custom validation for all cards with the current post to sis selection without re-renders
+    const formIsValid = sectionViewRef?.allCardsValidCustom({dueDateRequired: postToSisEnabled})
 
-    if (emptyDueDates.length > 0 && data.postToSIS && requiredDueDates) {
-      showPostToSisFlashAlert('manage-assign-to')()
-      // Forces focus after the re-render process is made
-      this.shouldForceFocusAfterRender = true
-      this.render()
-    } else if (!sectionViewRef?.allCardsValid()) {
-      // Focuses inmmediately the visible errors in the component
-      const invalidInput = sectionViewRef?.focusErrors()
-      if(invalidInput){
-        errors.invalid_card = {$input: null, showError: this.showError}
-      }else{
-        delete errors.invalid_card;
+    if (!formIsValid) {
+      const aDueDateMissing = data.assignment_overrides.some(
+        o => o.due_at === null || o.due_at === ''
+      )
+      const hasAfterRenderIssue = postToSisEnabled && aDueDateMissing
+      // If there are errors visible already don't force the focus
+      if (hasAfterRenderIssue) {
+        showPostToSisFlashAlert('manage-assign-to')()
+        // Forces focus after the re-render process is made
+        this.shouldForceFocusAfterRender = true
+        this.render()
+      } else {
+        // Focuses inmmediately the visible errors in the component
+        const invalidInput = sectionViewRef?.focusErrors()
+        if (invalidInput) {
+          errors.invalid_card = {$input: null, showError: this.showError}
+        } else {
+          delete errors.invalid_card
+        }
       }
     }
   } else {

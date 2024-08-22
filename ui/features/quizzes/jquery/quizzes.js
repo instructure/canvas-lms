@@ -151,7 +151,11 @@ const renderDueDates = lockedItems => {
       $('#quiz_post_to_sis').on('change', e => {
         const postToSISChecked = e.target.checked
         quizModel.set('post_to_sis', postToSISChecked)
-        overrideView.render()
+
+        // Disabling this to not run the Post to SIS validations on check/uncheck
+        if (!ENV.FEATURES?.selective_release_edit_page) {
+          overrideView.render()
+        }
       })
     }
 
