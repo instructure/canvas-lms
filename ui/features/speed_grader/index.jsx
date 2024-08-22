@@ -31,6 +31,7 @@ import {getSubmission} from './queries/submissionQuery'
 import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery'
 import {getSubmissionsByStudentIds} from './queries/submissionsByStudentsIdsQuery'
 import {getAssignmentsByCourseId} from './queries/assignmentsByCourseIdQuery'
+import {getEnrollmentsByCourse} from './queries/enrollmentsByCourseQuery'
 
 import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
 import {createSubmissionComment} from './mutations/createSubmissionCommentMutation'
@@ -71,6 +72,7 @@ ready(() => {
             getAssignment,
             getAssignmentsByCourseId,
             getCourse,
+            getEnrollmentsByCourse,
             getSectionsByAssignment,
             getSubmission,
             getSubmissionsByAssignment,

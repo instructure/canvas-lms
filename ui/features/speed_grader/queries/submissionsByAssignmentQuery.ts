@@ -21,8 +21,8 @@ import {executeQuery} from '@canvas/query/graphql'
 import gql from 'graphql-tag'
 import speedGraderHelpers from '../jquery/speed_grader_helpers'
 
-const SUBMISSIONS_BY_ASSIGNMENT_QUERY = gql`
-  query SubmissionsByAssignmentQuery($assignmentId: ID!) {
+const QUERY = gql`
+  query SpeedGrader_SubmissionsByAssignmentQuery($assignmentId: ID!) {
     assignment(id: $assignmentId) {
       submissionsConnection(
         filter: {
@@ -93,7 +93,7 @@ export async function getSubmissionsByAssignment<T extends GetSubmissionsByAssig
   ZGetAssignmentParams.parse(queryKey[1])
   const {assignmentId} = queryKey[1]
 
-  const result = await executeQuery<any>(SUBMISSIONS_BY_ASSIGNMENT_QUERY, {
+  const result = await executeQuery<any>(QUERY, {
     assignmentId,
   })
 

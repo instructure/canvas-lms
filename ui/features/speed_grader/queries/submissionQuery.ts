@@ -121,8 +121,8 @@ export const SUBMISSION_FRAGMENT = gql`
   }
 `
 
-const SUBMISSION_QUERY = gql`
-  query SubmissionQuery($assignmentId: ID!, $userId: ID!) {
+const QUERY = gql`
+  query SpeedGrader_SubmissionQuery($assignmentId: ID!, $userId: ID!) {
     assignment(id: $assignmentId) {
       id
       _id
@@ -216,7 +216,7 @@ export async function getSubmission<T extends GetSubmissionParams>({
   ZGetSubmissionParams.parse(queryKey[1])
   const {assignmentId, userId} = queryKey[1]
 
-  const result = await executeQuery<any>(SUBMISSION_QUERY, {
+  const result = await executeQuery<any>(QUERY, {
     assignmentId,
     userId,
   })
