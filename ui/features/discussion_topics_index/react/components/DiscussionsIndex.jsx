@@ -337,6 +337,7 @@ export default class DiscussionsIndex extends Component {
               locale={ENV.LOCALE || 'en'}
               timezone={ENV.TIMEZONE || 'UTC'}
               removeDueDateInput={!this.state?.discussionDetails?.assignment_id}
+              isCheckpointed={this.state?.discussionDetails.is_checkpointed}
             />
           )}
       </View>
