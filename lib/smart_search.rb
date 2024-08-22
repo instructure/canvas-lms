@@ -232,7 +232,7 @@ module SmartSearch
                     SmartSearch.smart_search_available?(content_migration.context)
 
       content_migration.imported_asset_id_map&.each do |class_name, id_mapping|
-        klass = class_name.constantize
+        klass = class_name.safe_constantize
         next unless klass.respond_to?(:embedding_class)
 
         fk = klass.embedding_foreign_key # i.e. :wiki_page_id
