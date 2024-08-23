@@ -28,7 +28,7 @@ import {Billboard} from '@instructure/ui-billboard'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import './ForbiddenWordsFileUpload.module.css'
 
@@ -47,6 +47,7 @@ interface Props {
   onSave: () => void
   setForbiddenWordsUrl: (url: string | null) => void
   setForbiddenWordsFilename: (filename: string | null) => void
+  folderId: number
 }
 
 const initialFileDetails: FileDetails = {url: null, filename: null}
@@ -57,6 +58,7 @@ const ForbiddenWordsFileUpload = ({
   onSave,
   setForbiddenWordsUrl,
   setForbiddenWordsFilename,
+  folderId,
 }: Props) => {
   const [fileDropMessages, setFileDropMessages] = useState<FormMessage[]>([])
   const [fileDetails, setFileDetails] = useState<FileDetails>(initialFileDetails)
@@ -72,6 +74,28 @@ const ForbiddenWordsFileUpload = ({
     setModalClosing(false)
   }, [])
 
+  const createFolder = async (): Promise<number | null> => {
+    try {
+      const formData = new FormData()
+      formData.append('name', `password_policy`)
+      formData.append('parent_folder_path', 'files/')
+
+      const {status, data} = await executeApiRequest({
+        method: 'POST',
+        path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/folders`,
+        body: formData,
+      })
+
+      if (status === 200) {
+        return data.id
+      } else {
+        throw new Error('Failed to create folder')
+      }
+    } catch (error) {
+      return null
+    }
+  }
+
   const handleUpload = useCallback(async () => {
     const {url, filename} = fileDetails
 
@@ -81,31 +105,97 @@ const ForbiddenWordsFileUpload = ({
     setUploadAttempted(true)
 
     try {
-      const response = await fetch(url)
-      const fileBlob = await response.blob()
-      const newFile = new File([fileBlob], filename, {type: fileBlob.type})
-      const formData = new FormData()
-      formData.append('file', newFile)
+      const folderId = await createFolder()
+      if (!folderId) throw new Error('Failed to create folder')
 
-      const uploadResponse = await doFetchApi({
+      const fetchResponse = await fetch(url)
+      const fileBlob = await fetchResponse.blob()
+
+      const newFile = new File([fileBlob], filename, {type: fileBlob.type})
+
+      const initialRequestFormData = new FormData()
+      initialRequestFormData.append('name', filename)
+
+      const requestResponse = await executeApiRequest({
         method: 'POST',
-        path: `/api/v1/accounts/${ENV.ACCOUNT_ID}/password_complexity/upload_forbidden_words`,
-        body: formData,
+        path: `/api/v1/folders/${folderId}/files`,
+        body: initialRequestFormData,
+      })
+      const upload_url = requestResponse.data.upload_url
+      const upload_params = requestResponse.data.upload_params
+
+      const uploadFileFormData = new FormData()
+
+      for (const [key, value] of Object.entries(upload_params)) {
+        uploadFileFormData.append(key, value)
+      }
+
+      uploadFileFormData.append('file', newFile)
+
+      const uploadResponse = await fetch(upload_url, {
+        method: 'POST',
+        body: uploadFileFormData,
       })
 
-      if (uploadResponse.response.ok) {
+      if (!uploadResponse.ok) {
+        throw new Error('File upload failed')
+      }
+
+      let finalResponse
+
+      if (uploadResponse.status >= 300 && uploadResponse.status < 400) {
+        const redirectUrl = uploadResponse.headers.get('Location')
+        if (!redirectUrl) {
+          throw new Error('Redirect URL not found')
+        }
+
+        finalResponse = await fetch(redirectUrl, {
+          method: 'GET',
+        })
+      } else if (uploadResponse.status === 201) {
+        const locationUrl = uploadResponse.headers.get('Location')
+        if (!locationUrl) {
+          throw new Error('Location URL not found in 201 response')
+        }
+
+        finalResponse = await fetch(locationUrl, {
+          method: 'GET',
+          headers: {
+            'Authorization:': `Bearer ${ENV.CANVAS_API_TOKEN}`, // Replace with your actual token
+          },
+        })
+      }
+
+      if (!finalResponse.ok) {
+        throw new Error('Failed to complete the file upload')
+      }
+
+      const fileData = await finalResponse.json()
+
+      const fileId = fileData.id
+
+      const updateAccountUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/`
+      const requestBody = {
+        password_policy: {
+          forbidden_words_folder_id: folderId,
+          forbidden_words_file_id: fileId,
+        },
+      }
+
+      const saveResponse = await executeApiRequest({
+        path: updateAccountUrl,
+        body: JSON.stringify(requestBody),
+        method: 'PUT',
+      })
+
+      if (saveResponse.status === 200) {
         setForbiddenWordsUrl(url)
         setForbiddenWordsFilename(filename)
         onSave()
         setModalClosing(true)
         onDismiss()
       } else {
-        setFileDropMessages([
-          {
-            text: I18n.t('Upload failed. Please try again later.'),
-            type: 'error',
-          },
-        ])
+        throw new Error('Failed to save password policy settings')
       }
     } catch (error) {
       setFileDropMessages([

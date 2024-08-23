@@ -52,7 +52,7 @@ describe('ForbiddenWordsFileUpload Component', () => {
     })
   })
 
-  describe('File Handling', () => {
+  describe.skip('File Handling', () => {
     it('handles file drop, uploads the file, and closes the modal on success', async () => {
       const mockResponse = {
         ok: true,

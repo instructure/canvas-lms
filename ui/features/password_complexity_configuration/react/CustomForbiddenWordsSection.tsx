@@ -40,6 +40,11 @@ interface ForbiddenWordsResponse {
   filename: string
 }
 
+interface Props {
+  commonPasswordsAttachmentId: number
+  passwordPolicyFolderId: number
+}
+
 export const fetchLatestForbiddenWords = async (): Promise<ForbiddenWordsResponse | null> => {
   const {response, json} = await doFetchApi({
     path: `/api/v1/accounts/${ENV.ACCOUNT_ID}/password_complexity/latest_forbidden_words`,
@@ -86,7 +91,10 @@ const deleteForbiddenWordsFile = async () => {
   }
 }
 
-const CustomForbiddenWordsSection = () => {
+const CustomForbiddenWordsSection = ({
+  commonPasswordsAttachmentId,
+  passwordPolicyFolderId,
+}: Props) => {
   const linkRef = useRef<HTMLAnchorElement | null>(null)
   const [forbiddenWordsUrl, setForbiddenWordsUrl] = useState<string | null>(null)
   const [forbiddenWordsFilename, setForbiddenWordsFilename] = useState<string | null>(null)
@@ -245,6 +253,7 @@ const CustomForbiddenWordsSection = () => {
         }}
         setForbiddenWordsUrl={setForbiddenWordsUrl}
         setForbiddenWordsFilename={setForbiddenWordsFilename}
+        folderId={passwordPolicyFolderId}
       />
     </>
   )
