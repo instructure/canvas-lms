@@ -345,14 +345,23 @@ class Folder < ActiveRecord::Base
     return root_folders unless context.respond_to?(:folders)
 
     context.shard.activate do
-      Folder.unique_constraint_retry do
-        root_folder = context.folders.active.where(parent_folder_id: nil, name:).first
-        root_folder ||= GuardRail.activate(:primary) { context.folders.create!(name:, full_name: name, workflow_state: "visible") }
-        root_folders = [root_folder]
-      end
+      root_folder = get_or_create_root_folder_for(context, name)
+      root_folders = Array(root_folder)
     end
 
     root_folders
+  end
+
+  def self.get_or_create_root_folder_for(context, name)
+    root_folder = get_root_folder_for(context, name)
+    root_folder || GuardRail.activate(:primary) do
+      folder = context.folders.build(name:, full_name: name, workflow_state: "visible")
+      folder.insert(on_conflict: -> { get_root_folder_for(context, name) })
+    end
+  end
+
+  def self.get_root_folder_for(context, name)
+    context.folders.active.where(parent_folder_id: nil, name:).first
   end
 
   def self.unique_folder(context, unique_type, default_name_proc)
