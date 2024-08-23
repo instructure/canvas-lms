@@ -501,7 +501,7 @@ function DiscussionTopicForm({
       ...(shouldShowUsageRightsOption && {usageRightsData}),
     }
 
-    if (!isGraded && ENV.FEATURES?.selective_release_ui_api && !isAnnouncement) {
+    if (!isGraded && ENV.FEATURES?.selective_release_ui_api && !isAnnouncement && ENV.context_type !== 'Group') {
       delete payload.specificSections
       Object.assign(
         payload,
@@ -588,7 +588,7 @@ function DiscussionTopicForm({
 
     if (
       // Not validate override dates for announcements or ungraded group discussions
-      !(isAnnouncement || (isGroupDiscussion && !isGraded)) &&
+      !(isAnnouncement || (isGroupDiscussion && !isGraded) || ENV?.context_type == 'Group') &&
       ENV.FEATURES.selective_release_ui_api &&
       ENV.FEATURES.selective_release_edit_page
     ) {
