@@ -30,6 +30,7 @@ const QUERY = gql`
         nodes {
           _id
           id
+          name
           assignmentsConnection {
             nodes {
               _id
@@ -47,10 +48,12 @@ const QUERY = gql`
 function transform({course}: any) {
   return {
     id: course.id,
+    _id: course._id,
     name: course.name,
     assignmentGroups: course.assignmentGroupsConnection.nodes.map((group: any) => ({
       _id: group._id,
       id: group.id,
+      name: group.name,
       assignments: group.assignmentsConnection.nodes.map((assignment: any) => ({
         _id: assignment._id,
         id: assignment.id,
