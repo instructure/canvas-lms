@@ -2205,6 +2205,20 @@ describe "discussions" do
             expect(driver.current_url).not_to end_with("/courses/#{course.id}/discussion_topics/new")
           end
 
+          it "allows create with group context", :ignore_js_errors do
+            get "/groups/#{group.id}/discussion_topics/new"
+
+            title = "Group Context Discussion"
+            message = "this is a group context discussion"
+
+            f("input[placeholder='Topic Title']").send_keys title
+            type_in_tiny("textarea#discussion-topic-message-body", message)
+            f("button[data-testid='save-and-publish-button']").click
+            wait_for_ajaximations
+
+            expect(driver.current_url).not_to end_with("/groups/#{group.id}/discussion_topics/new")
+          end
+
           it "allows create with group category and graded", :ignore_js_errors do
             group_cat = course.group_categories.create!(name: "Groupies")
             get "/courses/#{course.id}/discussion_topics/new"
