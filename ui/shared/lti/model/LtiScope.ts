@@ -20,7 +20,9 @@ import * as z from 'zod'
 /**
  * Scopes are permissions that an LTI tool can request from the platform.
  * Each value represents the name of a scope that the platform can grant.
+ * This should be kept up to date with lib/token_scopes.rb
  */
+
 export const LtiScopes = {
   AgsLineItem: 'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem',
   AgsLineItemReadonly: 'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly',
@@ -48,6 +50,7 @@ export const LtiScopes = {
   AccountExternalToolsDestroy:
     'https://canvas.instructure.com/lti/account_external_tools/scope/destroy',
   AccessPageContent: 'https://canvas.instructure.com/lti/page_content/show',
+  ReplaceEditorContent: 'https://canvas.instructure.com/lti/replace_editor_contents',
 } as const
 
 const AllLtiScopes = [
@@ -72,6 +75,7 @@ const AllLtiScopes = [
   LtiScopes.AccountExternalToolsShow,
   LtiScopes.AccountExternalToolsDestroy,
   LtiScopes.AccessPageContent,
+  LtiScopes.ReplaceEditorContent,
 ] as const
 
 export const ZLtiScope = z.enum(AllLtiScopes)

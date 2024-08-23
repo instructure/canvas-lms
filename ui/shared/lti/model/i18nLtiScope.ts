@@ -55,7 +55,8 @@ export const LtiScopeTranslations: Record<LtiScope, string> = {
   [LtiScopes.AgsProgressShow]: I18n.t(
     'Can view Progress records associated with the context the tool is installed in'
   ),
-  [LtiScopes.AccessPageContent]: I18n.t('Can access page content'),
+  [LtiScopes.AccessPageContent]: I18n.t('Can view the content of a page the tool is launched from'),
+  [LtiScopes.ReplaceEditorContent]: I18n.t('Can replace the entire contents of the RCE'),
 }
 
 /**

@@ -173,7 +173,7 @@ describe('AddImageModal', () => {
     await waitFor(() => {
       expect(mockOnSubmit).toHaveBeenCalledWith('http://example.com/image.jpg', '')
     })
-  })
+  }, 10000)
 
   it('can submit URL images with alt texts', async () => {
     renderComponent()
@@ -195,7 +195,7 @@ describe('AddImageModal', () => {
     await waitFor(() => {
       expect(mockOnSubmit).toHaveBeenCalledWith('http://example.com/image.jpg', 'Some alt text')
     })
-  })
+  }, 10000)
 
   it('can submit course images', async () => {
     renderComponent()

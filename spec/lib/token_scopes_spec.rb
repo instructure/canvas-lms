@@ -93,4 +93,71 @@ describe TokenScopes do
       end
     end
   end
+
+  describe "testing scopes in sync with documentation and typescript scopes (via YAML file)" do
+    let(:tools_intro_md_content) { Rails.root.join("doc/api/tools_intro.md").read }
+
+    let(:scopes_from_yaml_file) do
+      arr = YAML.load_file(Rails.root.join("spec/fixtures/lti/lti_scopes.yml"))
+      arr.to_h { |scope| [scope["scope"], scope.except("scope")] }
+    end
+
+    let(:documented_scopes_and_descs) do
+      scopes_from_yaml_file
+        .reject { |_scope, obj| obj["undocumented"] }
+        .transform_values { _1["description"] }
+    end
+
+    let(:undocumented_hidden_scopes_and_descs) do
+      scopes_from_yaml_file
+        .select { |_scope, obj| obj["undocumented"] }
+        .transform_values { _1["description"] }
+    end
+
+    describe "LTI_SCOPES" do
+      it "contains exactly the documented scopes in the YAML file" do
+        expect(TokenScopes::LTI_SCOPES.keys).to match_array(documented_scopes_and_descs.keys)
+      end
+
+      it "matches the descriptions of the scopes in the YAML file (except the Ruby descriptions have a trailing period)" do
+        TokenScopes::LTI_SCOPES.each do |scope, description|
+          expect(description).to eq(documented_scopes_and_descs[scope] + ".")
+        end
+      end
+
+      it "matches the list and documentation in tools_intro.md" do
+        TokenScopes::LTI_SCOPES.each do |scope, description|
+          expect(tools_intro_md_content).to include(scope)
+          desc_without_period = description.gsub(/\.$/, "")
+          expect(tools_intro_md_content).to include(desc_without_period)
+        end
+      end
+    end
+
+    describe "LTI_HIDDEN_SCOPES" do
+      it "contains exactly the undocumented hidden scopes in the YAML file" do
+        expect(TokenScopes::LTI_HIDDEN_SCOPES.keys).to match_array(undocumented_hidden_scopes_and_descs.keys)
+      end
+
+      it "matches the descriptions of the undocumented hidden scopes in the YAML file (except the Ruby descriptions have a trailing period)" do
+        TokenScopes::LTI_HIDDEN_SCOPES.each do |scope, description|
+          expect(description).to eq(undocumented_hidden_scopes_and_descs[scope] + ".")
+        end
+      end
+
+      it "contains only scopes that are not documented in tools_intro.md" do
+        TokenScopes::LTI_HIDDEN_SCOPES.each do |scope, description|
+          expect(tools_intro_md_content).not_to include(scope)
+          desc_without_period = description.gsub(/\.$/, "")
+          expect(tools_intro_md_content).not_to include(desc_without_period)
+        end
+      end
+    end
+
+    describe "ALL_LTI_SCOPES" do
+      it "consists of LTI_SCOPES and LTI_HIDDEN_SCOPES keys" do
+        expect(TokenScopes::ALL_LTI_SCOPES).to match_array(TokenScopes::LTI_SCOPES.keys + TokenScopes::LTI_HIDDEN_SCOPES.keys)
+      end
+    end
+  end
 end

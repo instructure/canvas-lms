@@ -20,7 +20,7 @@ import type {StoreApi} from 'zustand'
 import type {LtiMessageType} from '../model/LtiMessageType'
 import type {LtiPlacement} from '../model/LtiPlacement'
 import type {LtiPrivacyLevel} from '../model/LtiPrivacyLevel'
-import type {LtiScope} from '../model/LtiScope'
+import type {LtiScope} from '@canvas/lti/model/LtiScope'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 import create from 'zustand'
 
