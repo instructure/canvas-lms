@@ -302,7 +302,10 @@ const PasswordComplexityConfiguration = () => {
                 data-testid="requireSymbolsCheckbox"
               />
             </View>
-            <CustomForbiddenWordsSection />
+            <CustomForbiddenWordsSection
+              commonPasswordsAttachmentId={1}
+              passwordPolicyFolderId={1}
+            />
             <View as="div" margin="medium medium small medium">
               <Checkbox
                 onChange={handleCustomMaxLoginAttemptToggle}
