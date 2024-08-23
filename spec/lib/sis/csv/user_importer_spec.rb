@@ -305,6 +305,18 @@ describe SIS::CSV::UserImporter do
       )
       expect(user.reload.pronouns).to eq "he/him"
     end
+
+    it "does not add pronouns when the option is turned off" do
+      @account.settings[:can_add_pronouns] = false
+      @account.save!
+
+      process_csv_data_cleanly(
+        "user_id,login_id,full_name,status,pronouns",
+        "user_1,user1,tom riddle,active,He/Him"
+      )
+      user = Pseudonym.by_unique_id("user1").first.user
+      expect(user.pronouns).to be_nil
+    end
   end
 
   describe "declared_user_type" do
