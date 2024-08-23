@@ -28,14 +28,9 @@ import {View} from '@instructure/ui-view'
 import React from 'react'
 import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
 import {i18nLtiPrivacyLevelDescription} from '../../model/i18nLtiPrivacyLevel'
-import {type LtiPrivacyLevel} from '../../model/LtiPrivacyLevel'
-import {i18nLtiScope} from '../../model/i18nLtiScope'
+import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
 import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
-import {
-  LtiPlacementsWithIcons,
-  type LtiPlacement,
-  type LtiPlacementWithIcon,
-} from '../../model/LtiPlacement'
+import {LtiPlacementsWithIcons, type LtiPlacementWithIcon} from '../../model/LtiPlacement'
 import {
   canvasPlatformSettings,
   type RegistrationOverlayStore,

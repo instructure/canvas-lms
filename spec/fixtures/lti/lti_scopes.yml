@@ -1,0 +1,86 @@
+# This file is used in Typescript tests and Ruby specs (grep codebase for this
+# file) to ensure LTI scopes used in the frontend and backend are in sync, and
+# that the documentation lists (only) public scopes. When adding a scope, you
+# will need to add it to this file. The tests (and TS type checking) will
+# ensure it is added to the correct places in TS, Ruby, and the docs (if
+# applicable)
+
+- scope: https://canvas.instructure.com/lti/page_content/show
+  description: Can view the content of a page the tool is launched from
+
+- scope: https://canvas.instructure.com/lti/account_external_tools/scope/create
+  description: Can create external tools
+  undocumented: true
+
+- scope: https://canvas.instructure.com/lti/account_external_tools/scope/destroy
+  description: Can destroy external tools
+  undocumented: true
+
+- scope: https://canvas.instructure.com/lti/account_external_tools/scope/list
+  description: Can list external tools
+  undocumented: true
+
+- scope: https://canvas.instructure.com/lti/account_external_tools/scope/show
+  description: Can show external tools
+  undocumented: true
+
+- scope: https://canvas.instructure.com/lti/account_external_tools/scope/update
+  description: Can update external tools
+  undocumented: true
+
+- scope: https://canvas.instructure.com/lti/account_lookup/scope/show
+  description: Can lookup Account information
+
+- scope: https://purl.imsglobal.org/spec/lti-ags/scope/lineitem
+  description: Can create and view assignment data in the gradebook associated with the tool
+
+- scope: https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly
+  description: Can view assignment data in the gradebook associated with the tool
+
+- scope: https://canvas.instructure.com/lti-ags/progress/scope/show
+  description: Can view Progress records associated with the context the tool is installed in
+
+- scope: https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly
+  description: Can view submission data for assignments associated with the tool
+
+- scope: https://purl.imsglobal.org/spec/lti-ags/scope/score
+  description: Can create and update submission results for assignments associated with the tool
+
+- scope: https://canvas.instructure.com/lti/data_services/scope/create
+  description: Can create subscription to data service data
+  undocumented: true
+
+- scope: https://canvas.instructure.com/lti/data_services/scope/destroy
+  description: Can destroy subscription to data service data
+  undocumented: true
+
+- scope: https://canvas.instructure.com/lti/data_services/scope/list_event_types
+  description: Can list categorized event types
+  undocumented: true
+
+- scope: https://canvas.instructure.com/lti/data_services/scope/list
+  description: Can list subscriptions to data service data
+  undocumented: true
+
+- scope: https://canvas.instructure.com/lti/data_services/scope/show
+  description: Can show subscription to data service data
+  undocumented: true
+
+- scope: https://canvas.instructure.com/lti/data_services/scope/update
+  description: Can update subscription to data service data
+  undocumented: true
+
+- scope: https://canvas.instructure.com/lti/feature_flags/scope/show
+  description: Can view feature flags
+  undocumented: true
+
+- scope: https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly
+  description: Can retrieve user data associated with the context the tool is installed in
+
+- scope: https://canvas.instructure.com/lti/public_jwk/scope/update
+  description: Can update public jwk for LTI services
+
+- scope: https://canvas.instructure.com/lti/replace_editor_contents
+  description: Can replace the entire contents of the RCE
+  undocumented: true
+

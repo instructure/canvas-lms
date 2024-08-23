@@ -17,7 +17,7 @@
  */
 import * as z from 'zod'
 import {ZExtension} from './Extension'
-import {ZLtiScope} from '../LtiScope'
+import {ZLtiScope} from '@canvas/lti/model/LtiScope'
 
 export interface LtiConfiguration extends z.infer<typeof ZLtiConfiguration> {}
 

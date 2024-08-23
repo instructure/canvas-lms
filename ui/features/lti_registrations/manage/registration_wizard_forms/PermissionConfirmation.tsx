@@ -23,8 +23,8 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import React from 'react'
-import {type LtiScope} from '../model/LtiScope'
-import {i18nLtiScope} from '../model/i18nLtiScope'
+import {type LtiScope} from '@canvas/lti/model/LtiScope'
+import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
 
 const I18n = useI18nScope('lti_registration.wizard')
 
