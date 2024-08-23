@@ -221,8 +221,9 @@ function DiscussionTopicForm({
     currentDiscussionTopic?.groupSet?._id || null
   )
   const [groupCategorySelectError, setGroupCategorySelectError] = useState([])
-  const [locked, setLocked] = useState((currentDiscussionTopic.locked && isAnnouncement) || false)
-
+  const [locked, setLocked] = useState(
+    isAnnouncement ? currentDiscussionTopic.locked ?? !ENV.CREATE_ANNOUNCEMENTS_UNLOCKED : false
+  )
   const [availableFrom, setAvailableFrom] = useState(currentDiscussionTopic?.delayedPostAt || null)
   const [availableUntil, setAvailableUntil] = useState(currentDiscussionTopic?.lockAt || null)
   const [willAnnouncementPostRightAway, setWillAnnouncementPostRightAway] = useState(true)
@@ -322,12 +323,10 @@ function DiscussionTopicForm({
     setUsageRightsErrorState(false)
     setUsageRightsData(data)
   }
-
   const hasGroupOverrides = () =>
     assignedInfoList.some(
       info => info.assignedList.find(assetCode => assetCode.includes('group')) !== undefined
     )
-
   const assignmentDueDateContext = {
     assignedInfoList,
     setAssignedInfoList,
