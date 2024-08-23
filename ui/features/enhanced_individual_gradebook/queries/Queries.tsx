@@ -79,6 +79,15 @@ export const GRADEBOOK_QUERY = gql`
           state
           gradingPeriodId
           excused
+          subAssignmentSubmissions {
+            grade
+            score
+            publishedGrade
+            publishedScore
+            assignmentId
+            gradeMatchesCurrentSubmission
+            subAssignmentTag
+          }
         }
       }
       assignmentGroupsConnection {
@@ -116,6 +125,14 @@ export const GRADEBOOK_QUERY = gql`
               published
               hasSubmittedSubmissions
               inClosedGradingPeriod
+              checkpoints {
+                unlockAt
+                lockAt
+                dueAt
+                name
+                pointsPossible
+                tag
+              }
             }
           }
         }
@@ -178,6 +195,15 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
           enteredGrade
           gradeMatchesCurrentSubmission
           customGradeStatus
+          subAssignmentSubmissions {
+            grade
+            score
+            publishedGrade
+            publishedScore
+            assignmentId
+            gradeMatchesCurrentSubmission
+            subAssignmentTag
+          }
         }
       }
     }
