@@ -40,4 +40,15 @@ describe('defaultTinymceConfig', () => {
       })
     })
   })
+
+  describe('font_formats', () => {
+    it('includes Lato Extended and does not include lato', () => {
+      const {font_formats} = defaultTinymceConfig
+
+      expect(font_formats).toMatchInlineSnapshot(
+        `"Lato Extended=Lato Extended,Helvetica Neue,Helvetica,Arial,sans-serif; Balsamiq Sans=Balsamiq Sans,Lato Extended,Helvetica Neue,Helvetica,Arial,sans-serif; Architect's Daughter=Architects Daughter,Lato Extended,Helvetica Neue,Helvetica,Arial,sans-serif; Arial=arial,helvetica,sans-serif; Arial Black=arial black,avant garde; Courier New=courier new,courier; Georgia=georgia,palatino; Tahoma=tahoma,arial,helvetica,sans-serif; Times New Roman=times new roman,times; Trebuchet MS=trebuchet ms,geneva; Verdana=verdana,geneva"`
+      )
+      expect(font_formats).not.toMatch(/lato/)
+    })
+  })
 })
