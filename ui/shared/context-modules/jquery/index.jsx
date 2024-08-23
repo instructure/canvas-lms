@@ -357,15 +357,20 @@ window.modules = (function () {
     loadMasterCourseData(tag_id) {
       if (ENV.MASTER_COURSE_SETTINGS) {
         // Grab the stuff for master courses if needed
-        $.ajaxJSON(ENV.MASTER_COURSE_SETTINGS.MASTER_COURSE_DATA_URL, 'GET', {tag_id}, data => {
+        $.ajaxJSON(ENV.MASTER_COURSE_SETTINGS.MASTER_COURSE_DATA_URL, 'GET', { tag_id }, data => {
           if (data.tag_restrictions) {
-            $.each(data.tag_restrictions, (id, restriction) => {
-              const $item = $('#context_module_item_' + id).not('.master_course_content')
-              $item.addClass('master_course_content')
-              if (Object.keys(restriction).some(r => restriction[r])) {
-                $item.attr('data-master_course_restrictions', JSON.stringify(restriction)) // need it if user selects Edit from cog menu
+            Object.entries(data.tag_restrictions).forEach(([id, restriction]) => {
+              const item = document.querySelector(
+                `#context_module_item_${id}:not(.master_course_content)`
+              )
+              if (item) {
+                item.classList.add('master_course_content')
+                if (Object.keys(restriction).some(r => restriction[r])) {
+                  item.setAttribute('data-master_course_restrictions', JSON.stringify(restriction))
+                }
+
+                this.initMasterCourseLockButton(item, restriction)
               }
-              this.initMasterCourseLockButton($item, restriction)
             })
           }
         })
@@ -800,19 +805,21 @@ window.modules = (function () {
       axis: 'y',
       containment: '#content',
     },
-    initMasterCourseLockButton($item, tagRestriction) {
+    async initMasterCourseLockButton(item, tagRestriction) {
       // add the lock button|icon
-      const $lockCell = $item.find('.lock-icon')
-      const data = $($lockCell).data() || {}
+      const lockCell = item.querySelector('.lock-icon')
+      const data = lockCell ? $($(lockCell)).data() : {}
+
+      const moduleItemId = data.moduleItemId
 
       const isMasterCourseMasterContent = !!(
-        'moduleItemId' in data && ENV.MASTER_COURSE_SETTINGS.IS_MASTER_COURSE
+        moduleItemId && ENV.MASTER_COURSE_SETTINGS.IS_MASTER_COURSE
       )
       const isMasterCourseChildContent = !!(
-        'moduleItemId' in data && ENV.MASTER_COURSE_SETTINGS.IS_CHILD_COURSE
+        moduleItemId && ENV.MASTER_COURSE_SETTINGS.IS_CHILD_COURSE
       )
       const restricted = !!(
-        'moduleItemId' in data && Object.keys(tagRestriction).some(r => tagRestriction[r])
+        moduleItemId && Object.keys(tagRestriction).some(r => tagRestriction[r])
       )
 
       const model = new MasterCourseModuleLock({
@@ -823,7 +830,7 @@ window.modules = (function () {
 
       const viewOptions = {
         model,
-        el: $lockCell[0],
+        el: lockCell,
         course_id: ENV.COURSE_ID,
         content_type: data.moduleType,
         content_id: data.contentId,
@@ -1961,13 +1968,10 @@ modules.initModuleManagement = function (duplicate) {
     modules.hideEditModule(true)
   })
   requestAnimationFrame(function () {
-    const $items = []
-    $('#context_modules .context_module_items').each(function () {
-      $items.push($(this))
-    })
+    const items = Array.from(document.querySelectorAll('#context_modules .context_module_items'))
     const next = function () {
-      if ($items.length > 0) {
-        const $item = $items.shift()
+      if (items.length > 0) {
+        const $item = $(items.shift())
         const opts = modules.sortable_module_options
         const k5TabsContainer = $('#k5-course-header').closest('.ic-Dashboard-tabs').eq(0)
         const k5ModulesContainer = $('#k5-modules-container')
