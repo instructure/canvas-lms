@@ -97,7 +97,7 @@ describe('AttachmentDisplay', () => {
     expect(attachmentProps['attachment[intent]']).toEqual('submit')
   })
 
-  it('uploads file with upload intent if we pass the checkContextQuota param', async () => {
+  it('uploads file with attach_discussion_file intent if we pass the checkContextQuota param', async () => {
     uploadFileModule.uploadFile = jest.fn()
     const {findByTestId} = setup({canAttach: true, checkContextQuota: true})
     const input = await findByTestId('attachment-input')
@@ -105,6 +105,6 @@ describe('AttachmentDisplay', () => {
 
     expect(uploadFileModule.uploadFile).toHaveBeenCalledTimes(1)
     const attachmentProps = uploadFileModule.uploadFile.mock.calls[0][1]
-    expect(attachmentProps['attachment[intent]']).toEqual('upload')
+    expect(attachmentProps['attachment[intent]']).toEqual('attach_discussion_file')
   })
 })

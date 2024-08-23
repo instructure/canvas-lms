@@ -94,11 +94,12 @@ export function AttachmentDisplay(props) {
         // This is useful for making it work with usage rights and the Discussion Topic Create/Edit process.
         const context = !assetString ? discussionContext : userContext || discussionContext
 
+
         attachmentInformation['attachment[filename]'] = fileToUpload.name
         attachmentInformation['attachment[content_type]'] = fileToUpload.type
         attachmentInformation['attachment[size]'] = fileToUpload.size
-        // uploads are checked against the user quota, but submissions are not
-        attachmentInformation['attachment[intent]'] = props.checkContextQuota ? 'upload' : 'submit'
+        // attach_discussion_file is checked against the user quota, but submissions are not
+        attachmentInformation['attachment[intent]'] = props.checkContextQuota ? 'attach_discussion_file' : 'submit'
         attachmentInformation['attachment[context_code]'] = `${context}` // used to find the correct course folder
         attachmentInformation['attachment[asset_string]'] = `${assetString}` // required for downloads to go to submission folder; Doesn't Apply to Topic attachments, but Legacy Topic Attachments don't apply to user quota.
       }
@@ -177,7 +178,7 @@ AttachmentDisplay.propTypes = {
    */
   responsiveQuerySizes: PropTypes.func.isRequired,
   /**
-   * toggles file uploadUrl
+   * toggles file uploadUrl and default upload intent
    */
   checkContextQuota: PropTypes.bool,
 
