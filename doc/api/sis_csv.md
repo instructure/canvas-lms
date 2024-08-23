@@ -276,7 +276,7 @@ recommended to omit this field over using fake email addresses for testing.</td>
 <td>text</td>
 <td></td>
 <td>✓</td>
-<td>User's preferred pronouns. Can pass "&lt;delete>" to remove the pronoun from the user.</td>
+<td>User's preferred pronouns. Can pass "&lt;delete>" to remove the pronoun from the user. This column will be ignored unless the "Enable Personal Pronouns" account setting is enabled.</td>
 </tr>
 <tr>
 <td>declared_user_type</td>
