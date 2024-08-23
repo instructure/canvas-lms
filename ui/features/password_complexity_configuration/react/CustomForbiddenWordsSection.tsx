@@ -159,14 +159,28 @@ const CustomForbiddenWordsSection = () => {
   return (
     <>
       <View as="div" margin="medium">
-        <Checkbox
-          checked={customForbiddenWordsEnabled}
-          onChange={() => {
-            setCustomForbiddenWordsEnabled(!customForbiddenWordsEnabled)
-          }}
-          label={I18n.t('Customize forbidden words/terms list (see default list here)')}
-          data-testid="customForbiddenWordsCheckbox"
-        />
+        <Flex alignItems="center" gap="x-small" wrap="wrap">
+          <Flex.Item>
+            <Checkbox
+              checked={customForbiddenWordsEnabled}
+              onChange={() => {
+                setCustomForbiddenWordsEnabled(!customForbiddenWordsEnabled)
+              }}
+              label={I18n.t('Customize forbidden words/terms list')}
+              data-testid="customForbiddenWordsCheckbox"
+            />
+          </Flex.Item>
+          <Flex.Item>
+            (
+            <Link
+              href="https://github.com/instructure/canvas-lms/blob/master/lib/canvas/security/password_policy.rb#L83"
+              target="_blank"
+            >
+              {I18n.t('see default list here')}
+            </Link>
+            )
+          </Flex.Item>
+        </Flex>
         <View
           as="div"
           insetInlineStart="1.75em"
