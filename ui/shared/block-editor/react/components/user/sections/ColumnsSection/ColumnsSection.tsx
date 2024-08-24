@@ -64,7 +64,7 @@ ColumnsSectionInner.craft = {
   },
 }
 
-export const ColumnsSection = (props: ColumnsSectionProps) => {
+export const ColumnsSection = (_props: ColumnsSectionProps) => {
   const {enabled} = useEditor(state => ({
     enabled: state.options.enabled,
   }))

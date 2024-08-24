@@ -140,7 +140,7 @@ const BlockResizer = ({mountPoint}: BlockResizeProps) => {
 
   const handleResizeStart = useCallback(() => {
     isDragging.current = true
-    const myToolbar = mountPoint.querySelector('.block-editor-editor .block-toolbar') as HTMLElement
+    const myToolbar = mountPoint.querySelector('.block-toolbar') as HTMLElement
     if (myToolbar) {
       myToolbar.style.visibility = 'hidden'
     }
@@ -155,7 +155,7 @@ const BlockResizer = ({mountPoint}: BlockResizeProps) => {
   const handleResizeEnd = useCallback(() => {
     isDragging.current = false
     setNewSize(currSz.width, currSz.height)
-    const myToolbar = mountPoint.querySelector('.block-editor-editor .block-toolbar') as HTMLElement
+    const myToolbar = mountPoint.querySelector('.block-toolbar') as HTMLElement
     if (myToolbar) {
       myToolbar.style.visibility = 'visible'
     }
@@ -165,6 +165,7 @@ const BlockResizer = ({mountPoint}: BlockResizeProps) => {
     <Moveable
       className="block-resizer"
       target={node.dom}
+      renderDirections={['nw', 'ne', 'sw', 'se']}
       resizable={true}
       throttleSize={1}
       keepRatio={maintainAspectRatio}

@@ -145,11 +145,21 @@ const ImageBlock = ({
     (maintainAspectRatio ? 'cover' : constraint) || ImageBlock.craft.defaultProps.constraint
   if (!src) {
     return (
-      <div className={clazz} style={styl} ref={el => el && connect(drag(el as HTMLDivElement))} />
+      <div
+        role="treeitem"
+        aria-label={ImageBlock.craft.displayName}
+        tabIndex={-1}
+        className={clazz}
+        style={styl}
+        ref={el => el && connect(drag(el as HTMLDivElement))}
+      />
     )
   } else {
     return (
       <div
+        role="treeitem"
+        aria-label={ImageBlock.craft.displayName}
+        tabIndex={-1}
         className={clazz}
         style={styl}
         ref={el => {
@@ -194,6 +204,7 @@ ImageBlock.craft = {
   },
   custom: {
     isResizable: true,
+    isBlock: true,
   },
 }
 

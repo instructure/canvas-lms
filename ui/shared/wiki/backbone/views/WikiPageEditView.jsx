@@ -405,7 +405,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       this.blockEditorData = {
         time: Date.now(),
         version: '1',
-        blocks: [{data: window.block_editor().serialize()}],
+        blocks: [{data: window.block_editor().getBlocks()}],
       }
     }
 

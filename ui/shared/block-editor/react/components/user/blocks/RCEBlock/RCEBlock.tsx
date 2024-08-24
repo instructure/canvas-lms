@@ -67,20 +67,40 @@ export const RCEBlock = ({id, text, onContentChange}: RCEBlockProps) => {
     [onContentChange, setProp]
   )
 
+  const handleKey = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (editable) {
+        if (e.key === 'Escape') {
+          e.preventDefault()
+          e.stopPropagation()
+          setEditable(false)
+        } else if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+          e.stopPropagation()
+        }
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        setEditable(true)
+      }
+    },
+    [editable]
+  )
+
   if (enabled && selected) {
     return (
-      // eslint-disable-next-line jsx-a11y/interactive-supports-focus, jsx-a11y/click-events-have-key-events
       <div
         id={id}
+        role="treeitem"
+        aria-label={RCEBlock.craft.displayName}
+        tabIndex={-1}
         ref={el => {
           if (el) {
             connect(drag(el))
           }
         }}
         className={clazz}
-        role="textbox"
         style={{minWidth: '50%'}}
         onClick={e => setEditable(true)}
+        onKeyDown={handleKey}
       >
         <CanvasRce
           ref={rceRef}
@@ -97,6 +117,14 @@ export const RCEBlock = ({id, text, onContentChange}: RCEBlockProps) => {
     return (
       <div
         id={id}
+        role="treeitem"
+        aria-label={RCEBlock.craft.displayName}
+        tabIndex={-1}
+        ref={el => {
+          if (el) {
+            connect(drag(el))
+          }
+        }}
         className={clazz}
         data-placeholder={I18n.t('Click to enter rich text')}
         dangerouslySetInnerHTML={{__html: text || ''}}
@@ -106,7 +134,7 @@ export const RCEBlock = ({id, text, onContentChange}: RCEBlockProps) => {
 }
 
 RCEBlock.craft = {
-  displayName: I18n.t('Rich Text'),
+  displayName: I18n.t('RCE'),
   defaultProps: {
     id: uid('rce-block', 2),
     text: '',

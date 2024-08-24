@@ -56,7 +56,7 @@ export const Topbar = ({toolboxOpen, onToolboxChange}: TopbarProps) => {
   )
 
   return (
-    <View as="div" background="secondary">
+    <View as="div" background="secondary" className="topbar" tabIndex={-1}>
       <Flex justifyItems="space-between" padding="x-small">
         <Flex.Item>
           <Flex gap="small">
@@ -101,7 +101,7 @@ export const Topbar = ({toolboxOpen, onToolboxChange}: TopbarProps) => {
           </Button> */}
         </Flex.Item>
       </Flex>
-      <PreviewModal open={previewOpen} onDismiss={handleClosePreview} />
+      {previewOpen && <PreviewModal open={previewOpen} onDismiss={handleClosePreview} />}
     </View>
   )
 }

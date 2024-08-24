@@ -112,6 +112,10 @@ export function scrollIntoViewWithCallback(
   element.scrollIntoView(scrollIntoViewOpts)
 }
 
+export function mountNode(): HTMLElement {
+  return document.querySelector('.block-editor-editor') as HTMLElement
+}
+
 // export function validateSVG(svg: string): boolean {
 //   const parser = new DOMParser()
 //   const doc = parser.parseFromString(svg, 'image/svg+xml')
