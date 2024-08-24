@@ -305,6 +305,7 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "ไอคอนแก้ไข" },
   "edit_link_7f53bebb": { "message": "แก้ไขลิงค์" },
+  "editor_status_bar_653f44ee": { "message": "แถบสถานะโปรแกรมแก้ไข" },
   "element_starting_with_start_91bf4c3b": {
     "message": "องค์ประกอบเริ่มต้นด้วย { start }"
   },

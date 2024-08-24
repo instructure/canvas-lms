@@ -333,6 +333,7 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Edita la icona" },
   "edit_link_7f53bebb": { "message": "Edita l''enllaç" },
+  "editor_status_bar_653f44ee": { "message": "Barra d''estat de l’editor" },
   "element_starting_with_start_91bf4c3b": {
     "message": "L’element comença per { start }"
   },

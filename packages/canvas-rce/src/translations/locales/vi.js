@@ -319,6 +319,9 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Biểu Tượng Chỉnh Sửa" },
   "edit_link_7f53bebb": { "message": "Chỉnh Sửa Liên Kết" },
+  "editor_status_bar_653f44ee": {
+    "message": "Thanh Trạng Thái Trình Chỉnh Sửa"
+  },
   "element_starting_with_start_91bf4c3b": {
     "message": "Yếu tố bắt đầu bằng { start }"
   },

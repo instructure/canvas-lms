@@ -312,6 +312,7 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Breyta tákni" },
   "edit_link_7f53bebb": { "message": "Breyta tengli" },
+  "editor_status_bar_653f44ee": { "message": "Stöðustika ritils" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Eining byrjar á { start }"
   },
