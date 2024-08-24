@@ -2725,20 +2725,38 @@ describe ContextExternalTool do
         expect(tool.display_type(:course_navigation)).to eq "in_context"
         tool.course_navigation = { enabled: true }
         tool.save!
-        expect(tool.display_type(:course_navigation)).to eq "in_context"
+        expect(tool.display_type("course_navigation")).to eq "in_context"
       end
 
       it "is configurable by a property" do
         tool.course_navigation = { enabled: true }
         tool.settings[:display_type] = "custom_display_type"
         tool.save!
-        expect(tool.display_type(:course_navigation)).to eq "custom_display_type"
+        expect(tool.display_type("course_navigation")).to eq "custom_display_type"
       end
 
       it "is configurable in extension" do
         tool.course_navigation = { display_type: "other_display_type" }
         tool.save!
-        expect(tool.display_type(:course_navigation)).to eq "other_display_type"
+        expect(tool.display_type("course_navigation")).to eq "other_display_type"
+      end
+
+      it "is 'full_width' for global_navigation by default" do
+        tool.global_navigation = { enabled: true }
+        tool.save!
+        expect(tool.display_type("global_navigation")).to eq "full_width"
+      end
+
+      it "allows the 'full_width' default for global_navigation to be overridden with accepted type" do
+        tool.global_navigation = { display_type: "borderless" }
+        tool.save!
+        expect(tool.display_type("global_navigation")).to eq "borderless"
+      end
+
+      it "does not allow the 'full_width' default for global_navigation to be overridden with unaccepted type" do
+        tool.global_navigation = { display_type: "other_display_type" }
+        tool.save!
+        expect(tool.display_type("global_navigation")).to eq "full_width"
       end
     end
 
