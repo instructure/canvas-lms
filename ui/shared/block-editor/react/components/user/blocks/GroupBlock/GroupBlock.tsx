@@ -33,6 +33,7 @@ const I18n = useI18nScope('block-editor')
 export const GroupBlock = (props: GroupBlockProps) => {
   const {
     alignment = GroupBlock.craft.defaultProps.alignment,
+    verticalAlignment = GroupBlock.craft.defaultProps.verticalAlignment,
     layout = GroupBlock.craft.defaultProps.layout,
     resizable = GroupBlock.craft.defaultProps.resizable,
   } = props
@@ -44,6 +45,7 @@ export const GroupBlock = (props: GroupBlockProps) => {
     'group-block',
     `${layout}-layout`,
     `${alignment}-align`,
+    `${verticalAlignment}-valign`,
   ])
   const {node} = useNode((n: Node) => {
     return {
@@ -76,6 +78,7 @@ GroupBlock.craft = {
   displayName: I18n.t('Group'),
   defaultProps: {
     alignment: 'start',
+    verticalAlignment: 'start',
     layout: 'column',
     resizable: true,
   },
