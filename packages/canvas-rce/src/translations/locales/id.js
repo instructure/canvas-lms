@@ -319,6 +319,7 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Edit Ikon" },
   "edit_link_7f53bebb": { "message": "Edit Tautan" },
+  "editor_status_bar_653f44ee": { "message": "Bilah Status Editor" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Elemen yang mulai dengan { start }"
   },

@@ -323,6 +323,7 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Golygu Eicon" },
   "edit_link_7f53bebb": { "message": "Golygu Dolen" },
+  "editor_status_bar_653f44ee": { "message": "Bar Statws Golygydd" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Elfen yn dechrau gyda { start }"
   },

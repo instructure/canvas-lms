@@ -289,6 +289,7 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "编辑图标" },
   "edit_link_7f53bebb": { "message": "编辑链接" },
+  "editor_status_bar_653f44ee": { "message": "编辑器状态栏" },
   "element_starting_with_start_91bf4c3b": {
     "message": "以{ start }开始的元素"
   },
