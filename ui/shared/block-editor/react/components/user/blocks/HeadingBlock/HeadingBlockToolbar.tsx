@@ -44,6 +44,10 @@ import {Text} from '@instructure/ui-text'
 import {type ViewOwnProps} from '@instructure/ui-view'
 import {type HeadingBlockProps} from './types'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor')
+
 const HeadingBlockToolbar = () => {
   const {
     actions: {setProp},
@@ -64,44 +68,93 @@ const HeadingBlockToolbar = () => {
     },
     [setProp]
   )
+  const handleFontSizeChange = useCallback(
+    (
+      e: React.MouseEvent<ViewOwnProps, MouseEvent>,
+      value: MenuItemProps['value'] | MenuItemProps['value'][],
+      _selected: MenuItemProps['selected'],
+      _args: MenuItem
+    ) => {
+      if (value === 'default') {
+        setProp((prps: HeadingBlockProps) => delete prps.fontSize)
+      } else {
+        setProp((prps: HeadingBlockProps) => (prps.fontSize = value as string))
+      }
+    },
+    [setProp]
+  )
 
   return (
-    <Menu
-      label="Heading level"
-      trigger={
-        <Button size="small">
-          <Flex gap="x-small">
-            <Text size="small">Level</Text>
-            <IconMiniArrowDownLine size="x-small" />
-          </Flex>
-        </Button>
-      }
-    >
-      <Menu.Item
-        type="checkbox"
-        value="h2"
-        onSelect={handleLevelChange}
-        selected={props.level === 'h2'}
+    <Flex gap="x-small">
+      <Menu
+        label="Heading level"
+        trigger={
+          <Button size="small">
+            <Flex gap="x-small">
+              <Text size="small">Level</Text>
+              <IconMiniArrowDownLine size="x-small" />
+            </Flex>
+          </Button>
+        }
       >
-        <Text size="small">Heading 2</Text>
-      </Menu.Item>
-      <Menu.Item
-        type="checkbox"
-        value="h3"
-        onSelect={handleLevelChange}
-        selected={props.level === 'h3'}
+        <Menu.Item
+          type="checkbox"
+          value="h2"
+          onSelect={handleLevelChange}
+          selected={props.level === 'h2'}
+        >
+          <Text size="small">Heading 2</Text>
+        </Menu.Item>
+        <Menu.Item
+          type="checkbox"
+          value="h3"
+          onSelect={handleLevelChange}
+          selected={props.level === 'h3'}
+        >
+          <Text size="small">Heading 3</Text>
+        </Menu.Item>
+        <Menu.Item
+          type="checkbox"
+          value="h4"
+          onSelect={handleLevelChange}
+          selected={props.level === 'h4'}
+        >
+          <Text size="small">Heading 4</Text>
+        </Menu.Item>
+      </Menu>
+
+      <Menu
+        label="Font size"
+        trigger={
+          <Button size="small">
+            <Flex gap="x-small">
+              <Text size="small">{I18n.t('Font Size')}</Text>
+              <IconMiniArrowDownLine size="x-small" />
+            </Flex>
+          </Button>
+        }
       >
-        <Text size="small">Heading 3</Text>
-      </Menu.Item>
-      <Menu.Item
-        type="checkbox"
-        value="h4"
-        onSelect={handleLevelChange}
-        selected={props.level === 'h4'}
-      >
-        <Text size="small">Heading 4</Text>
-      </Menu.Item>
-    </Menu>
+        <Menu.Item
+          type="checkbox"
+          value="default"
+          onSelect={handleFontSizeChange}
+          selected={props.fontSize === undefined}
+        >
+          {I18n.t('Default')}
+        </Menu.Item>
+        {['0.875rem', '1rem', '1.375rem', '1.75rem', '2.375rem', '3rem', '4rem'].map(size => (
+          <Menu.Item
+            type="checkbox"
+            key={size}
+            value={size}
+            onSelect={handleFontSizeChange}
+            selected={props.fontSize === size}
+          >
+            <Text size="small">{size}</Text>
+          </Menu.Item>
+        ))}
+      </Menu>
+    </Flex>
   )
 }
 

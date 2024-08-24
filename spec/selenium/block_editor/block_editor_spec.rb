@@ -32,10 +32,8 @@ describe "Block Editor", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include BlockEditorPage
 
-  # a default page that's had an apple icon block added
-  let(:block_page_content) do
-    file = File.open(File.expand_path(File.dirname(__FILE__) + "/../../fixtures/block-editor/page-with-apple-icon.json"))
-    file.read
+  def drop_new_block(block_name, where)
+    drag_and_drop_element(block_toolbox_box_by_block_name(block_name), where)
   end
 
   before do
@@ -43,19 +41,8 @@ describe "Block Editor", :ignore_js_errors do
     @course.account.enable_feature!(:block_editor)
     @context = @course
     @rce_page = @course.wiki_pages.create!(title: "RCE Page", body: "RCE Page Body")
-    @block_page = @course.wiki_pages.create!(title: "Block Page")
 
-    @block_page.update!(
-      block_editor_attributes: {
-        time: Time.now.to_i,
-        version: "1",
-        blocks: [
-          {
-            data: block_page_content
-          }
-        ]
-      }
-    )
+    @block_page = build_wiki_page("page-with-apple-icon.json")
   end
 
   context "Create new page" do
@@ -126,7 +113,7 @@ describe "Block Editor", :ignore_js_errors do
       wait_for_block_editor
       block_toolbox_toggle.click
       expect(block_toolbox).to be_displayed
-      drag_and_drop_element(block_toolbox_button, group_block_dropzone)
+      drop_new_block("button", group_block_dropzone)
       expect(fj("#{group_block_inner_selector} a:contains('Click me')")).to be_displayed
     end
 
@@ -134,7 +121,7 @@ describe "Block Editor", :ignore_js_errors do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
       block_toolbox_toggle.click
-      drag_and_drop_element(block_toolbox_image, group_block_dropzone)
+      drop_new_block("image", group_block_dropzone)
       image_block.click  # select the section
       image_block.click  # select the block
       expect(block_toolbar).to be_displayed
@@ -145,7 +132,7 @@ describe "Block Editor", :ignore_js_errors do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
       block_toolbox_toggle.click
-      drag_and_drop_element(block_toolbox_text, group_block_dropzone)
+      drop_new_block("text", group_block_dropzone)
       expect(block_toolbar).to be_displayed
 
       expect(block_resize_handle("se")).to be_displayed
@@ -162,7 +149,7 @@ describe "Block Editor", :ignore_js_errors do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
       block_toolbox_toggle.click
-      drag_and_drop_element(block_toolbox_text, group_block_dropzone)
+      drop_new_block("text", group_block_dropzone)
       expect(block_toolbar).to be_displayed
 
       expect(block_resize_handle("se")).to be_displayed
@@ -210,7 +197,7 @@ describe "Block Editor", :ignore_js_errors do
         wait_for_block_editor
         block_toolbox_toggle.click
 
-        drag_and_drop_element(block_toolbox_image, group_block_dropzone)
+        drop_new_block("image", group_block_dropzone)
         image_block_upload_button.click
         course_images_tab.click
         image_thumbnails[0].click
@@ -230,7 +217,7 @@ describe "Block Editor", :ignore_js_errors do
         wait_for_block_editor
         block_toolbox_toggle.click
 
-        drag_and_drop_element(block_toolbox_image, group_block_dropzone)
+        drop_new_block("image", group_block_dropzone)
         image_block_upload_button.click
         user_images_tab.click
         image_thumbnails[0].click

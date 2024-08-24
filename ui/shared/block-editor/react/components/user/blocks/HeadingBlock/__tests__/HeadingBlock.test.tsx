@@ -24,11 +24,14 @@ import {HeadingBlock, type HeadingBlockProps} from '..'
 
 const renderBlock = (enabled: boolean, props: Partial<HeadingBlockProps> = {}) => {
   return render(
-    <Editor enabled={enabled} resolver={{HeadingBlock}}>
-      <Frame>
-        <HeadingBlock text="A Heading" {...props} />
-      </Frame>
-    </Editor>
+    <>
+      <div id="another-element" tabIndex={-1} />
+      <Editor enabled={enabled} resolver={{HeadingBlock}}>
+        <Frame>
+          <HeadingBlock text="A Heading" {...props} />
+        </Frame>
+      </Editor>
+    </>
   )
 }
 
@@ -38,22 +41,31 @@ describe('HeadingBlock', () => {
       const {container, getByText} = renderBlock(true)
       expect(getByText('A Heading')).toBeInTheDocument()
 
-      const heading = container.querySelector('h2')
+      const heading = container.querySelector('h2') as HTMLElement
       expect(heading).toBeInTheDocument()
+      expect(heading.getAttribute('contenteditable')).toBe('true')
+      expect(heading.getAttribute('data-placeholder')).toBe('Heading 2')
+    })
 
-      const contentEditable = container.querySelector('[contenteditable]') as HTMLElement
-      expect(contentEditable).toBeInTheDocument()
-      expect(contentEditable.getAttribute('data-placeholder')).toBe('Heading 2')
-      expect(contentEditable.getAttribute('disabled')).not.toBeNull()
+    it('should stop being editaaable on blur', async () => {
+      const {container} = renderBlock(true)
+      const heading = container.querySelector('h2') as HTMLElement
+      heading.focus()
+      expect(heading.getAttribute('contenteditable')).toBe('true')
+
+      document.getElementById('another-element')?.focus()
+      expect(heading.getAttribute('contenteditable')).toBe('false')
     })
 
     it('should render active editable version on click', async () => {
       const {container} = renderBlock(true)
-      const contentEditable = container.querySelector('[contenteditable]') as HTMLElement
-      await userEvent.click(contentEditable)
+      const heading = container.querySelector('h2') as HTMLElement
+      heading.focus()
+      document.getElementById('another-element')?.focus()
+      expect(heading.getAttribute('contenteditable')).toBe('false')
 
-      expect(contentEditable.getAttribute('contenteditable')).toBe('true')
-      expect(contentEditable.getAttribute('disabled')).toBeNull()
+      await userEvent.click(heading)
+      expect(heading.getAttribute('contenteditable')).toBe('true')
     })
 
     it('respects the level prop', () => {

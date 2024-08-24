@@ -25,12 +25,39 @@ module BlockEditorPage
     wait_for_block_editor
   end
 
+  def build_wiki_page(page)
+    file = File.open(File.expand_path(File.dirname(__FILE__) + "../../../../fixtures/block-editor/#{page}"))
+    block_page_content = file.read
+    block_page = @course.wiki_pages.create!(title: "Block Page")
+
+    block_page.update!(
+      block_editor_attributes: {
+        time: Time.now.to_i,
+        version: "1",
+        blocks: [
+          {
+            data: block_page_content
+          }
+        ]
+      }
+    )
+    block_page
+  end
+
+  def active_element
+    driver.execute_script("return document.activeElement") # rubocop:disable Specs/NoExecuteScript
+  end
+
   def block_editor
     f(".block-editor")
   end
 
   def block_editor_editor
     f(".block-editor-editor")
+  end
+
+  def topbar
+    f(".topbar")
   end
 
   # Stepper
@@ -87,6 +114,10 @@ module BlockEditorPage
     f('[role="dialog"][aria-label="Toolbox"]')
   end
 
+  def block_toolbox_box_by_block_name(block_name)
+    f(".toolbox-item.item-#{block_name}-block")
+  end
+
   def block_toolbox_image
     f(".toolbox-item.item-image-block")
   end
@@ -114,6 +145,10 @@ module BlockEditorPage
 
   def block_toolbar
     f(".block-toolbar")
+  end
+
+  def block_toolbar_up_button
+    driver.execute_script("return document.querySelector('svg[name=\"IconArrowUp\"]').closest('button')") # rubocop:disable Specs/NoExecuteScript
   end
 
   def block_toolbar_delete_button_selector
@@ -213,11 +248,27 @@ module BlockEditorPage
     f(".icon-block")
   end
 
+  def icon_blocks
+    ff(".icon-block")
+  end
+
   def icon_block_title
     f(".icon-block > svg > title")
   end
 
+  def icon_block_titles
+    ff(".icon-block > svg > title")
+  end
+
   def image_block
     f(".image-block")
+  end
+
+  def section_menu
+    f(".section-menu")
+  end
+
+  def section_menu_menu
+    f(".section-menu ul[role='menu']")
   end
 end

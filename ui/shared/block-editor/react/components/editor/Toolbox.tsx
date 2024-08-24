@@ -36,6 +36,7 @@ import {IconBlock, IconBlockIcon} from '../user/blocks/IconBlock'
 import {RCEBlock, RCEBlockIcon} from '../user/blocks/RCEBlock'
 import {TabsBlock, TabsBlockIcon} from '../user/blocks/TabsBlock'
 import {GroupBlock, GroupBlockIcon} from '../user/blocks/GroupBlock'
+import {mountNode} from '../../utils'
 
 export type ToolboxProps = {
   open: boolean
@@ -108,7 +109,7 @@ export const Toolbox = ({open, container, onClose}: ToolboxProps) => {
     <Tray
       contentRef={el => setTrayRef(el)}
       label="Toolbox"
-      mountNode={document.querySelector('.block-editor-editor') as HTMLElement}
+      mountNode={mountNode()}
       open={open}
       placement="end"
       size="small"

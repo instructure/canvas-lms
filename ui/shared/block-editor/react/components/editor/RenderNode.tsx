@@ -40,7 +40,7 @@
  * SOFTWARE.
  */
 
-import React, {useCallback, useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import ReactDOM from 'react-dom'
 import {useNode, useEditor, type Node} from '@craftjs/core'
 import {ROOT_NODE} from '@craftjs/utils'
@@ -52,7 +52,7 @@ import {View, type ViewProps} from '@instructure/ui-view'
 
 import type {AddSectionPlacement, RenderNodeProps} from './types'
 import {SectionBrowser} from './SectionBrowser'
-import {notDeletableIfLastChild} from '../../utils'
+import {notDeletableIfLastChild, mountNode} from '../../utils'
 import {BlockResizer} from './BlockResizer'
 import {
   getToolbarPos as getToolbarPosUtil,
@@ -94,7 +94,6 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
     hovered,
     selected,
     node,
-    dom,
     name,
     moveable,
     deletable,
@@ -106,7 +105,6 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
       node: n,
       hovered: n.events.hovered,
       selected: n.events.selected,
-      dom: n.dom,
       name: n.data.custom.displayName || n.data.displayName,
       moveable: node_helpers.isDraggable(),
       deletable: n.data.custom?.isSection
@@ -122,79 +120,103 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
   const [currentMenuRef, setCurrentMenuRef] = useState<HTMLDivElement | null>(null)
   const [upnodeId] = useState<string | undefined>(findUpNode(node, query)?.id)
   const [sectionBrowserOpen, setSectionBrowserOpen] = useState<AddSectionPlacement>(undefined)
-  const [mountPoint, setMountPoint] = useState(
-    document.querySelector('.block-editor-editor') as HTMLElement
-  )
+  const [mountPoint, setMountPoint] = useState(mountNode())
 
   useEffect(() => {
     if (mountPoint === null) {
-      setMountPoint(document.querySelector('.block-editor-editor') as HTMLElement)
+      setMountPoint(mountNode())
     }
   }, [mountPoint])
 
-  useEffect(() => {
-    // get a newly dropped block selected
-    // select once will select it's section
-    // select again to get the block
-    // (see the following useEffect for details)
-    if (node.id !== 'ROOT') {
-      actions.selectNode(node.id)
-      requestAnimationFrame(() => {
-        actions.selectNode(node.id)
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // TODO: this commented out code is what implenents the click-once for section, again for the block
+  // useEffect(() => {
+  //   // get a newly dropped block selected
+  //   // select once will select it's section
+  //   // select again to get the block
+  //   // (see the following useEffect for details)
+  //   if (node.id !== 'ROOT') {
+  //     actions.selectNode(node.id)
+  //     requestAnimationFrame(() => {
+  //       actions.selectNode(node.id)
+  //     })
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [])
 
-  // first click/select on a block will select its parent section
-  // if the section is selected, a click on a block will select the block
+  // // first click/select on a block will select its parent section
+  // // if the section is selected, a click on a block will select the block
+  // useEffect(() => {
+  //   if (selected) {
+  //     const parentSection = findContainingSection(node, query)
+  //     if (parentSection) {
+  //       const isMySectionSelected = RenderNode.globals.selectedSectionId === parentSection.id
+  //       if (!isMySectionSelected) {
+  //         RenderNode.globals.selectedSectionId = parentSection.id
+  //         actions.selectNode(parentSection.id)
+  //       } else if (node.data.custom?.noToolbar) {
+  //         const upnode = findUpNode(node, query)
+  //         if (upnode) {
+  //           actions.selectNode(upnode.id)
+  //         }
+  //       }
+  //     }
+  //   }
+  // }, [actions, node, nodeActions, query, selected])
+
+  // TODO: while this gets newly dropped blocks selected,
+  //       it interferes with kb nav selenium tests
+  //       To get tests written, comment this out, return to figure
+  //       out block focusing
+  // useEffect(() => {
+  //   // get a newly dropped block selected
+  //   if (node.id !== 'ROOT') {
+  //     actions.selectNode(node.id)
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [])
+
+  // the next 2 useEffects implemnt click just once to select the block
   useEffect(() => {
-    if (selected) {
-      const parentSection = findContainingSection(node, query)
-      if (parentSection) {
-        const isMySectionSelected = RenderNode.globals.selectedSectionId === parentSection.id
-        if (!isMySectionSelected) {
-          RenderNode.globals.selectedSectionId = parentSection.id
-          actions.selectNode(parentSection.id)
-        } else if (node.data.custom?.noToolbar) {
-          const upnode = findUpNode(node, query)
-          if (upnode) {
-            actions.selectNode(upnode.id)
-          }
-        }
+    if (selected && node.data.custom?.noToolbar) {
+      const upnode = findUpNode(node, query)
+      if (upnode && upnode.id !== node.id) {
+        actions.selectNode(upnode.id)
       }
     }
-  }, [actions, node, nodeActions, query, selected])
+  }, [actions, node, query, selected])
 
   useEffect(() => {
-    if (dom) {
-      if (selected) dom.classList.add('selected')
-      else dom.classList.remove('selected')
+    if (node.dom) {
+      if (selected) node.dom.classList.add('selected')
+      else node.dom.classList.remove('selected')
 
-      if (hovered) dom.classList.add('hovered')
-      else dom.classList.remove('hovered')
+      if (hovered) node.dom.classList.add('hovered')
+      else node.dom.classList.remove('hovered')
     }
-  }, [dom, selected, hovered])
+  }, [hovered, node.dom, selected])
 
   const getToolbarPos = useCallback(
     (includeOffset: boolean = true) => {
-      return getToolbarPosUtil(dom, mountPoint, currentToolbarOrTagRef, includeOffset)
+      return getToolbarPosUtil(node.dom, mountPoint, currentToolbarOrTagRef, includeOffset)
     },
-    [currentToolbarOrTagRef, dom, mountPoint]
+    [currentToolbarOrTagRef, node.dom, mountPoint]
   )
 
   const getMenuPos = useCallback(() => {
-    const {top, left} = getMenuPosUtil(dom, mountPoint, currentMenuRef)
+    const {top, left} = getMenuPosUtil(node.dom, mountPoint, currentMenuRef)
     return {top: `${top}px`, left: `${left}px`}
-  }, [currentMenuRef, dom, mountPoint])
+  }, [currentMenuRef, node.dom, mountPoint])
 
   // TODO: maybe setState the upnode so we know whether to show the up button or not
   const handleGoUp = useCallback(
     (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps>) => {
       e.stopPropagation()
       actions.selectNode(upnodeId)
+      if (upnodeId) {
+        query.node(upnodeId).get()?.dom?.focus()
+      }
     },
-    [actions, upnodeId]
+    [actions, query, upnodeId]
   )
 
   const handleDeleteNode = useCallback(
@@ -220,6 +242,7 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
           left: `${left}px`,
           top: `${top}px`,
         }}
+        tabIndex={-1}
       >
         <View as="div" background="brand" padding="0 xx-small" borderRadius="small">
           <Text size="small">{name}</Text>

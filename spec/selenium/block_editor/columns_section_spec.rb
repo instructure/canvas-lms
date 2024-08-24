@@ -63,7 +63,9 @@ describe "Block Editor", :ignore_js_errors do
       expect(columns_section).to be_displayed
       expect(columns_section.attribute("class")).to include("columns-1")
       expect(ff(".group-block").count).to eq 1
-      columns_section.click # shows the toolbar
+
+      columns_section.click # shows the group toolbar
+      block_toolbar_up_button.click # now the columns-section toolbar
 
       columns_input_increment.click
       expect(ff(".group-block").count).to eq 2
@@ -83,6 +85,7 @@ describe "Block Editor", :ignore_js_errors do
       expect(columns_section.attribute("class")).to include("columns-1")
       expect(ff(".group-block").count).to eq 1
       columns_section.click # shows the toolbar
+      block_toolbar_up_button.click # now the columns-section toolbar
 
       columns_input_increment.click
       expect(ff(".group-block").count).to eq 2

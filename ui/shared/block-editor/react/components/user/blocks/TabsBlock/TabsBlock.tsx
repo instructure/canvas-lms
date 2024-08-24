@@ -25,6 +25,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Tabs} from '@instructure/ui-tabs'
 import {type ViewOwnProps} from '@instructure/ui-view'
 import {IconXLine} from '@instructure/ui-icons'
+import {uid} from '@instructure/uid'
 
 import {Container} from '../Container'
 import {TabBlock} from './TabBlock'
@@ -43,11 +44,14 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
   const {
     actions: {setProp},
     id,
+    selected,
   } = useNode(state => ({
     id: state.id,
     selected: state.events.selected,
   }))
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0)
+  const [editable, setEditable] = useState(false)
+  const [blockid] = useState(() => uid('tabs-block-', 2))
   const clazz = useClassNames(enabled, {empty: !tabs?.length}, ['block', 'tabs-block'])
 
   useEffect(() => {
@@ -106,6 +110,28 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
     [setProp, tabs]
   )
 
+  const handleKey = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (editable) {
+        if (e.key === 'Escape') {
+          e.preventDefault()
+          e.stopPropagation()
+          setEditable(false)
+          document.getElementById(blockid)?.focus()
+        }
+      } else if (selected && tabs?.length && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault()
+        setEditable(true)
+        const firstTab = document.getElementById(`tab-${tabs[0].id}`)
+        if (firstTab) {
+          const tabTitle = firstTab.querySelector('[contenteditable]') as HTMLElement
+          tabTitle?.focus()
+        }
+      }
+    },
+    [blockid, editable, selected, tabs]
+  )
+
   const renderTabTitle = (title: string, index: number) => {
     return enabled ? (
       <Flex gap="small">
@@ -159,7 +185,7 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
   }
 
   return (
-    <Container className={clazz}>
+    <Container id={blockid} className={clazz} onKeyDown={handleKey}>
       <Tabs
         variant={variant === 'classic' ? 'secondary' : 'default'}
         onRequestTabChange={handleTabChange}
@@ -190,6 +216,7 @@ TabsBlock.craft = {
   },
   custom: {
     notTabContent: true,
+    isBlock: true,
   },
 }
 
