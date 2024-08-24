@@ -63,4 +63,16 @@ describe('ColumnsSection', () => {
     expect(container.querySelector('.group-block')).toBeInTheDocument()
     expect(container.querySelector('.group-block')).toHaveClass('row-layout')
   })
+
+  it('should render with center horizontal alignment', () => {
+    const {container} = renderBlock({alignment: 'center'})
+    expect(container.querySelector('.group-block')).toBeInTheDocument()
+    expect(container.querySelector('.group-block')).toHaveClass('center-align')
+  })
+
+  it('should render with center vertical alignment', () => {
+    const {container} = renderBlock({verticalAlignment: 'center'})
+    expect(container.querySelector('.group-block')).toBeInTheDocument()
+    expect(container.querySelector('.group-block')).toHaveClass('center-valign')
+  })
 })

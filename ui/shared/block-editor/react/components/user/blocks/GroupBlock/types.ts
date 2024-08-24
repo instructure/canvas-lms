@@ -22,5 +22,6 @@ export type GroupAlignment = 'start' | 'center' | 'end'
 export type GroupBlockProps = {
   layout?: GroupLayout
   alignment?: GroupAlignment
+  verticalAlignment?: GroupAlignment
   resizable?: boolean
 }

@@ -60,15 +60,33 @@ export const GroupBlockToolbar = () => {
     [setProp]
   )
 
-  const renderAlignmentIcon = () => {
-    switch (props.alignment) {
+  const handleChangeVerticalAlignment = useCallback(
+    (e, value) => {
+      setProp((prps: GroupBlockProps) => {
+        prps.verticalAlignment = value as GroupAlignment
+      })
+    },
+    [setProp]
+  )
+
+  const rotate = {
+    rotate: '90deg',
+  }
+
+  const renderAlignmentIcon = (vertical: boolean) => {
+    let icon
+    const align = vertical ? props.verticalAlignment : props.alignment
+    switch (align) {
       case 'start':
-        return <IconTextStartLine size="x-small" />
+        icon = <IconTextStartLine size="x-small" />
+        break
       case 'center':
-        return <IconTextCenteredLine size="x-small" />
+        icon = <IconTextCenteredLine size="x-small" />
+        break
       case 'end':
-        return <IconTextEndLine size="x-small" />
+        icon = <IconTextEndLine size="x-small" />
     }
+    return vertical ? <span style={rotate}>{icon}</span> : icon
   }
 
   return (
@@ -93,15 +111,16 @@ export const GroupBlockToolbar = () => {
           {I18n.t('Row')}
         </Menu.Item>
       </Menu>
+
       <Menu
         trigger={
           <IconButton
             size="small"
             withBorder={false}
             withBackground={false}
-            screenReaderLabel={I18n.t('Align')}
+            screenReaderLabel={I18n.t('Align Horizontally')}
           >
-            {renderAlignmentIcon()}
+            {renderAlignmentIcon(false)}
           </IconButton>
         }
         onSelect={handleChangeAlignment}
@@ -112,15 +131,62 @@ export const GroupBlockToolbar = () => {
             <Text>{I18n.t('Align to start')}</Text>
           </Flex>
         </Menu.Item>
-        <Menu.Item type="checkbox" value="center" defaultSelected={props.layout === 'center'}>
+        <Menu.Item type="checkbox" value="center" defaultSelected={props.alignment === 'center'}>
           <Flex gap="x-small">
             <IconTextCenteredLine size="x-small" />
             <Text>{I18n.t('Align to center')}</Text>
           </Flex>
         </Menu.Item>
-        <Menu.Item type="checkbox" value="end" defaultSelected={props.layout === 'end'}>
+        <Menu.Item type="checkbox" value="end" defaultSelected={props.alignment === 'end'}>
           <Flex gap="x-small">
             <IconTextEndLine size="x-small" />
+            <Text>{I18n.t('Align to end')}</Text>
+          </Flex>
+        </Menu.Item>
+      </Menu>
+
+      <Menu
+        trigger={
+          <IconButton
+            size="small"
+            withBorder={false}
+            withBackground={false}
+            screenReaderLabel={I18n.t('Align Vertically')}
+          >
+            {renderAlignmentIcon(true)}
+          </IconButton>
+        }
+        onSelect={handleChangeVerticalAlignment}
+      >
+        <Menu.Item
+          type="checkbox"
+          value="start"
+          defaultSelected={props.verticalAlignment === 'start'}
+        >
+          <Flex gap="x-small">
+            <span style={rotate}>
+              <IconTextStartLine size="x-small" />
+            </span>
+            <Text>{I18n.t('Align to start')}</Text>
+          </Flex>
+        </Menu.Item>
+        <Menu.Item
+          type="checkbox"
+          value="center"
+          defaultSelected={props.verticalAlignment === 'center'}
+        >
+          <Flex gap="x-small">
+            <span style={rotate}>
+              <IconTextCenteredLine size="x-small" />
+            </span>
+            <Text>{I18n.t('Align to center')}</Text>
+          </Flex>
+        </Menu.Item>
+        <Menu.Item type="checkbox" value="end" defaultSelected={props.verticalAlignment === 'end'}>
+          <Flex gap="x-small">
+            <span style={rotate}>
+              <IconTextEndLine size="x-small" />
+            </span>
             <Text>{I18n.t('Align to end')}</Text>
           </Flex>
         </Menu.Item>
