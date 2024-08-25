@@ -18,16 +18,17 @@
 
 import {createGradebook, setFixtureHtml} from '../../../__tests__/GradebookSpecHelper'
 import TotalGradeCellFormatter from '../TotalGradeCellFormatter'
+import sinon from 'sinon'
 
-QUnit.module('GradebookGrid TotalGradeCellFormatter', hooks => {
-  let $fixture
+describe('GradebookGrid TotalGradeCellFormatter', () => {
+  let fixture
   let gradebook
   let formatter
   let grade
 
-  hooks.beforeEach(() => {
-    $fixture = document.body.appendChild(document.createElement('div'))
-    setFixtureHtml($fixture)
+  beforeEach(() => {
+    fixture = document.body.appendChild(document.createElement('div'))
+    setFixtureHtml(fixture)
 
     gradebook = createGradebook({
       grading_standard: [
@@ -41,6 +42,7 @@ QUnit.module('GradebookGrid TotalGradeCellFormatter', hooks => {
       grading_standard_scaling_factor: 1.0,
       show_total_grade_as_points: true,
     })
+
     sinon.stub(gradebook, 'getTotalPointsPossible').returns(10)
     sinon.stub(gradebook, 'listInvalidAssignmentGroups').returns([])
     sinon.stub(gradebook, 'listHiddenAssignments').returns([])
@@ -50,99 +52,99 @@ QUnit.module('GradebookGrid TotalGradeCellFormatter', hooks => {
     grade = {score: 8, possible: 10}
   })
 
-  hooks.afterEach(() => {
+  afterEach(() => {
     gradebook.getTotalPointsPossible.restore()
     gradebook.listInvalidAssignmentGroups.restore()
     gradebook.listHiddenAssignments.restore()
-    $fixture.remove()
+    fixture.remove()
   })
 
-  function renderCell() {
-    $fixture.innerHTML = formatter.render(
+  const renderCell = () => {
+    fixture.innerHTML = formatter.render(
       0, // row
       0, // cell
       grade, // value
       null, // column definition
       {id: '1001'} // student/dataContext
     )
-    return $fixture
+    return fixture
   }
 
-  function getPercentageGrade() {
-    const $percentageGrade = renderCell().querySelector('.percentage')
-    return $percentageGrade.innerText.trim()
+  const getPercentageGrade = () => {
+    const percentageGrade = renderCell().querySelector('.percentage')
+    return percentageGrade.innerText.trim()
   }
 
-  function getTooltip() {
-    const $tooltip = renderCell().querySelector('.gradebook-tooltip')
-    return $tooltip.innerText.trim()
+  const getTooltip = () => {
+    const tooltip = renderCell().querySelector('.gradebook-tooltip')
+    return tooltip.innerText.trim()
   }
 
   test('renders no content when the grade is null', () => {
     grade = null
-    strictEqual(renderCell().innerHTML, '')
+    expect(renderCell().innerHTML).toBe('')
   })
 
-  QUnit.module('when displaying the grade as points', () => {
+  describe('when displaying the grade as points', () => {
     test('renders the score of the grade', () => {
-      equal(getPercentageGrade(), '8')
+      expect(getPercentageGrade()).toBe('8')
     })
 
     test('rounds the score to two decimal places', () => {
       grade.score = 8.345
-      equal(getPercentageGrade(), '8.35')
+      expect(getPercentageGrade()).toBe('8.35')
     })
 
     test('renders the percentage of the grade in the tooltip', () => {
       grade.score = 8.2345
-      equal(getTooltip(), '82.35%')
+      expect(getTooltip()).toBe('82.35%')
     })
 
     test('avoids floating point calculation issues when computing the percentage', () => {
       grade.score = 946.65
       grade.possible = 1000
-      equal(getTooltip(), '94.67%')
+      expect(getTooltip()).toBe('94.67%')
     })
 
     test('renders "–" (en dash) in the tooltip when the grade has zero points possible', () => {
       grade.possible = 0
-      equal(getTooltip(), '–')
+      expect(getTooltip()).toBe('–')
     })
 
     test('renders "–" (en dash) in the tooltip when the grade has undefined points possible', () => {
       grade.possible = null
-      equal(getTooltip(), '–')
+      expect(getTooltip()).toBe('–')
     })
   })
 
-  QUnit.module('when displaying the grade as a percentage', contextHooks => {
-    contextHooks.beforeEach(() => {
+  describe('when displaying the grade as a percentage', () => {
+    beforeEach(() => {
       gradebook.options.show_total_grade_as_points = false
     })
 
     test('renders the percentage of the grade', () => {
-      equal(getPercentageGrade(), '80%')
+      expect(getPercentageGrade()).toBe('80%')
     })
 
     test('rounds the percentage to two decimal places', () => {
       grade.score = 8.2345
-      equal(getPercentageGrade(), '82.35%')
+      expect(getPercentageGrade()).toBe('82.35%')
     })
 
     test('renders "–" (en dash) when the grade has zero points possible', () => {
       grade.possible = 0
-      equal(renderCell().querySelector('.percentage').innerText, '–')
+      expect(renderCell().querySelector('.percentage').innerText).toBe('–')
     })
 
     test('renders "–" (en dash) when the grade has undefined points possible', () => {
       grade.possible = null
-      equal(renderCell().querySelector('.percentage').innerText, '–')
+      expect(renderCell().querySelector('.percentage').innerText).toBe('–')
     })
 
     test('renders the score and points possible in the tooltip', () => {
       grade.score = 8.345
       grade.possible = 10.345
-      equal(getTooltip(), '8.35 / 10.35')
+      expect(getTooltip()).toBe('8.35 / 10.35')
     })
   })
 
@@ -150,22 +152,22 @@ QUnit.module('GradebookGrid TotalGradeCellFormatter', hooks => {
     gradebook.listHiddenAssignments.returns([{id: '2301'}])
     const expectedTooltip =
       "This grade may differ from the student's view of the grade because some assignment grades are not yet posted"
-    strictEqual(getTooltip(), expectedTooltip)
+    expect(getTooltip()).toBe(expectedTooltip)
   })
 
   test('renders a warning icon when there are hidden assignments', () => {
     gradebook.listHiddenAssignments.returns([{id: '2301'}])
-    strictEqual(renderCell().querySelectorAll('i.icon-off').length, 1)
+    expect(renderCell().querySelectorAll('i.icon-off').length).toBe(1)
   })
 
   test('renders a warning when there is an invalid assignment group', () => {
     gradebook.listInvalidAssignmentGroups.returns([{id: '2401', name: '<Math>'}])
-    equal(getTooltip(), 'Score does not include <Math> because it has no points possible')
+    expect(getTooltip()).toBe('Score does not include <Math> because it has no points possible')
   })
 
   test('renders a warning icon when there is an invalid assignment group', () => {
     gradebook.listInvalidAssignmentGroups.returns([{id: '2401', name: 'Math'}])
-    strictEqual(renderCell().querySelectorAll('i.icon-warning').length, 1)
+    expect(renderCell().querySelectorAll('i.icon-warning').length).toBe(1)
   })
 
   test('renders a warning when there are multiple invalid assignment groups', () => {
@@ -173,44 +175,43 @@ QUnit.module('GradebookGrid TotalGradeCellFormatter', hooks => {
       {id: '2401', name: 'Math'},
       {id: '2402', name: '<English>'},
     ])
-    equal(
-      getTooltip(),
+    expect(getTooltip()).toBe(
       'Score does not include Math and <English> because they have no points possible'
     )
   })
 
   test('renders a warning when total points possible is zero', () => {
     gradebook.getTotalPointsPossible.returns(0)
-    equal(getTooltip(), "Can't compute score until an assignment has points possible")
+    expect(getTooltip()).toBe("Can't compute score until an assignment has points possible")
   })
 
   test('renders a warning icon when total points possible is zero', () => {
     gradebook.getTotalPointsPossible.returns(0)
-    strictEqual(renderCell().querySelectorAll('i.icon-warning').length, 1)
+    expect(renderCell().querySelectorAll('i.icon-warning').length).toBe(1)
   })
 
   test('renders a letter grade (with trailing en-dashes replaced with minus) when using a grading standard', () => {
-    equal(renderCell().querySelector('.letter-grade-points').innerText, 'B−')
+    expect(renderCell().querySelector('.letter-grade-points').innerText).toBe('B−')
   })
 
   test('escapes the value of the letter grade when using a grading standard', () => {
     grade = {score: 1, possible: 10}
-    equal(renderCell().querySelector('.letter-grade-points').innerText, '<b>F</b>')
+    expect(renderCell().querySelector('.letter-grade-points').innerText).toBe('<b>F</b>')
   })
 
   test('does not render a letter grade when not using a grading standard', () => {
     sinon.stub(gradebook, 'getCourseGradingScheme').returns(null)
-    strictEqual(renderCell().querySelector('.letter-grade-points'), null)
+    expect(renderCell().querySelector('.letter-grade-points')).toBeNull()
     gradebook.getCourseGradingScheme.restore()
   })
 
   test('does not render a letter grade when the grade has zero points possible', () => {
     grade.possible = 0
-    strictEqual(renderCell().querySelector('.letter-grade-points'), null)
+    expect(renderCell().querySelector('.letter-grade-points')).toBeNull()
   })
 
   test('does not render a letter grade when the grade has undefined points possible', () => {
     grade.possible = undefined
-    strictEqual(renderCell().querySelector('.letter-grade-points'), null)
+    expect(renderCell().querySelector('.letter-grade-points')).toBeNull()
   })
 })
