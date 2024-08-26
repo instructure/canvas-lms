@@ -103,6 +103,19 @@ module WikiPageVisibility
 
         if Account.site_admin.feature_enabled?(:selective_release_optimized_services_v3)
           WikiPageVisibility::Repositories::WikiPageVisibleToStudentRepository.full_wiki_page_visibility_query(course_id_params:, user_id_params:, wiki_page_id_params:)
+        elsif Account.site_admin.feature_enabled?(:selective_release_optimized_services_v2)
+          visible_wiki_pages = []
+
+          # add wiki pages visible to everyone
+          wiki_pages_visible_to_all = WikiPageVisibility::Repositories::WikiPageVisibleToStudentRepository
+                                      .find_wiki_pages_visible_to_everyone(course_id_params:, user_id_params:, wiki_page_id_params:)
+          visible_wiki_pages |= wiki_pages_visible_to_all
+
+          # add wiki pages assigned to sections, students, or the course
+          wiki_pages_assigned_to_others = WikiPageVisibility::Repositories::WikiPageVisibleToStudentRepository
+                                          .find_wiki_pages_assigned_to_others(course_id_params:, user_id_params:, wiki_page_id_params:)
+
+          visible_wiki_pages | wiki_pages_assigned_to_others
         else
           visible_wiki_pages = []
 
