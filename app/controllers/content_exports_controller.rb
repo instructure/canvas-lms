@@ -62,8 +62,8 @@ class ContentExportsController < ApplicationController
           export.selected_content = params[:copy].to_unsafe_h
         else
           export.export_type = ContentExport::COMMON_CARTRIDGE
-          export.prepare_new_quizzes_export
           export.selected_content = { everything: true }
+          export.prepare_new_quizzes_export
         end
       when User
         export.export_type = ContentExport::USER_DATA

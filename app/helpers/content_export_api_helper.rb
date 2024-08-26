@@ -31,6 +31,8 @@ module ContentExportApiHelper
                                                               for_content_export: true,
                                                               return_asset_strings: params[:export_type] == ContentExport::ZIP,
                                                               global_identifiers: export.can_use_global_identifiers?)
+
+      selected_assignments = params&.dig(:select, :assignments)
     end
 
     case params[:export_type]
@@ -54,7 +56,8 @@ module ContentExportApiHelper
     else
       export.export_type = ContentExport::COMMON_CARTRIDGE
       export.selected_content = selected_content || { everything: true }
-      export.prepare_new_quizzes_export
+
+      export.prepare_new_quizzes_export selected_assignments
     end
     # recheck, since the export type influences permissions (e.g., students can download zips of non-locked files, but not common cartridges)
     return unless authorized_action(export, current_user, :create)
@@ -66,7 +69,7 @@ module ContentExportApiHelper
     tz_identifier = ActiveSupport::TimeZone::MAPPING[Time.zone.name]
     export.settings[:user_time_zone] = tz_identifier if tz_identifier.present?
     if export.save
-      export.queue_api_job(opts)
+      export.queue_api_job(opts) unless export.waiting_for_external_tool?
     end
     export
   end

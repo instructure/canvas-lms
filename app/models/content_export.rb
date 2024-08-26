@@ -449,6 +449,14 @@ class ContentExport < ActiveRecord::Base
     end
   end
 
+  def selected_new_quizzes=(copy_settings)
+    settings[:selected_new_quizzes] = copy_settings
+  end
+
+  def selected_new_quizzes
+    settings[:selected_new_quizzes]
+  end
+
   def create_key(obj, prepend = "")
     shard.activate do
       if for_master_migration? && !is_external_object?(obj)
@@ -607,20 +615,29 @@ class ContentExport < ActiveRecord::Base
     end
   end
 
-  def prepare_new_quizzes_export
-    set_contains_new_quizzes_settings
+  def prepare_new_quizzes_export(selected_assignments = nil)
+    unless new_quizzes_common_cartridge_enabled?
+      settings[:contains_new_quizzes] = false
+      return
+    end
+
+    nq_assignments = course.assignments.active.type_quiz_lti.where.not(workflow_state: "failed_to_duplicate")
+
+    is_selective_export = !selected_assignments.nil?
+    if is_selective_export
+      selected_new_quizzes_ids = nq_assignments.where(id: selected_assignments).map { |id| Shard.global_id_for(id) }
+
+      unless selected_new_quizzes_ids.blank?
+        self.selected_new_quizzes = selected_new_quizzes_ids
+      end
+    end
+
+    settings[:contains_new_quizzes] = is_selective_export ? selected_new_quizzes.present? : nq_assignments.count.positive?
     mark_waiting_for_external_tool if contains_new_quizzes_setting?
   end
 
-  def set_contains_new_quizzes_settings
-    settings[:contains_new_quizzes] = !selective_export? && contains_new_quizzes?
-  end
-
   def contains_new_quizzes?
-    return false unless new_quizzes_common_cartridge_enabled?
-
-    course.assignments.active.type_quiz_lti
-          .where.not(workflow_state: "failed_to_duplicate").count.positive?
+    new_quizzes_common_cartridge_enabled? && contains_new_quizzes_setting?
   end
 
   def contains_new_quizzes_setting?
