@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {type ResizableProps} from '../../../editor/types'
+
 export type GroupLayout = 'row' | 'column'
 export type GroupAlignment = 'start' | 'center' | 'end'
 
@@ -24,4 +26,4 @@ export type GroupBlockProps = {
   alignment?: GroupAlignment
   verticalAlignment?: GroupAlignment
   resizable?: boolean
-}
+} & ResizableProps

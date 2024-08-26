@@ -23,3 +23,10 @@ export interface RenderNodeProps {
 }
 
 export type AddSectionPlacement = 'prepend' | 'append' | undefined
+export type SizeVariant = 'auto' | 'pixel' | 'percent'
+
+export type ResizableProps = {
+  width?: number
+  height?: number
+  maintainAspectRatio?: boolean
+}

@@ -105,20 +105,18 @@ export const AddImageModal = ({
   const modalPanels = panels || defaultPanels
   const label = title || I18n.t('Upload Image')
 
-  return (
-    open && (
-      <UploadFile
-        accept={accept}
-        trayProps={trayProps}
-        label={label}
-        panels={modalPanels}
-        onDismiss={onDismiss}
-        onSubmit={handleSubmit}
-        requireA11yAttributes={requireA11yAttributes}
-        canvasOrigin={trayProps?.canvasOrigin}
-      />
-    )
-  )
+  return open ? (
+    <UploadFile
+      accept={accept}
+      trayProps={trayProps}
+      label={label}
+      panels={modalPanels}
+      onDismiss={onDismiss}
+      onSubmit={handleSubmit}
+      requireA11yAttributes={requireA11yAttributes}
+      canvasOrigin={trayProps?.canvasOrigin}
+    />
+  ) : null
 }
 
 type UploadData = {

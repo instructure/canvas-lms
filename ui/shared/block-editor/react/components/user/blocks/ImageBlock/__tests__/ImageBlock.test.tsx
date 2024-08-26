@@ -43,39 +43,79 @@ describe('ImageBlock', () => {
     expect(img?.getAttribute('src')).toBe('https://example.com/image.jpg')
   })
 
-  it('should render with width and height', () => {
-    const {container} = renderBlock({
-      src: 'https://example.com/image.jpg',
-      width: 101,
-      height: 201,
+  describe('sizing', () => {
+    it('should render auto width and height with default sizeVariant', () => {
+      const {container} = renderBlock({
+        src: 'https://example.com/image.jpg',
+        width: 101,
+        height: 201,
+      })
+      const img = container.querySelector('.image-block')
+      expect(img).toHaveStyle({width: 'auto', height: 'auto'})
     })
-    const img = container.querySelector('.image-block')
-    expect(img).toHaveStyle({width: '101px', height: '201px'})
+
+    it('should render px width and height with pixel sizeVariant', () => {
+      const {container} = renderBlock({
+        src: 'https://example.com/image.jpg',
+        sizeVariant: 'pixel',
+        width: 101,
+        height: 201,
+      })
+      const img = container.querySelector('.image-block')
+      expect(img).toHaveStyle({width: '101px', height: '201px'})
+    })
+
+    it('should render % width and px height with "percent" sizeVariant', () => {
+      const {container} = renderBlock({
+        src: 'https://example.com/image.jpg',
+        sizeVariant: 'percent',
+        width: 101,
+        height: 201,
+      })
+      const img = container.querySelector('.image-block') as HTMLElement
+      expect(img).toHaveStyle({height: '201px'})
+      expect(img.style.width).toMatch(/%$/)
+    })
+
+    it('should render %width and auto height with "percent" sizeVariant and maintainAspectRatio', () => {
+      const {container} = renderBlock({
+        src: 'https://example.com/image.jpg',
+        sizeVariant: 'percent',
+        width: 101,
+        height: 201,
+        maintainAspectRatio: true,
+      })
+      const img = container.querySelector('.image-block') as HTMLElement
+      expect(img).toHaveStyle({height: 'auto'})
+      expect(img.style.width).toMatch(/%$/)
+    })
   })
 
-  it('should render with default cover constraint', () => {
-    const {container} = renderBlock({src: 'https://example.com/image.jpg'})
-    const img = container.querySelector('img')
-    expect(img).toHaveStyle({objectFit: 'cover'})
-  })
-
-  it('should render with cover constraint when maintainAspectRatio is true, regardless of constraint prop', () => {
-    const {container} = renderBlock({
-      src: 'https://example.com/image.jpg',
-      constraint: 'contain',
-      maintainAspectRatio: true,
+  describe('constraints', () => {
+    it('should render with default cover constraint', () => {
+      const {container} = renderBlock({src: 'https://example.com/image.jpg'})
+      const img = container.querySelector('img')
+      expect(img).toHaveStyle({objectFit: 'cover'})
     })
-    const img = container.querySelector('img')
-    expect(img).toHaveStyle({objectFit: 'cover'})
-  })
 
-  it('should render with contain constraint', () => {
-    const {container} = renderBlock({
-      src: 'https://example.com/image.jpg',
-      constraint: 'contain',
-      maintainAspectRatio: false,
+    it('should render with cover constraint when maintainAspectRatio is true, regardless of constraint prop', () => {
+      const {container} = renderBlock({
+        src: 'https://example.com/image.jpg',
+        constraint: 'contain',
+        maintainAspectRatio: true,
+      })
+      const img = container.querySelector('img')
+      expect(img).toHaveStyle({objectFit: 'cover'})
     })
-    const img = container.querySelector('img')
-    expect(img).toHaveStyle({objectFit: 'contain'})
+
+    it('should render with contain constraint', () => {
+      const {container} = renderBlock({
+        src: 'https://example.com/image.jpg',
+        constraint: 'contain',
+        maintainAspectRatio: false,
+      })
+      const img = container.querySelector('img')
+      expect(img).toHaveStyle({objectFit: 'contain'})
+    })
   })
 })

@@ -17,13 +17,12 @@
  */
 
 import React from 'react'
-import {render, waitFor} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {useEditor, useNode} from '@craftjs/core'
 import {ColumnsSection} from '../ColumnsSection'
 import {ColumnsSectionToolbar} from '../ColumnsSectionToolbar'
-import {get} from 'jquery'
 
 const user = userEvent.setup()
 
