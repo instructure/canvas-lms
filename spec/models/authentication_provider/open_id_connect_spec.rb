@@ -20,6 +20,29 @@
 require_relative "../../spec_helper"
 
 describe AuthenticationProvider::OpenIDConnect do
+  describe "#token_endpoint_auth_method" do
+    it "defaults to client_secret_post" do
+      expect(subject.token_endpoint_auth_method).to eq "client_secret_post"
+    end
+
+    it "sets the auth schema for client_secret_basic" do
+      subject.token_endpoint_auth_method = "client_secret_basic"
+      expect(subject.client.options[:auth_scheme]).to eq :basic_auth
+    end
+
+    it "sets the auth schema for client_secret_post" do
+      subject.token_endpoint_auth_method = "client_secret_post"
+      expect(subject.client.options[:auth_scheme]).to eq :request_body
+      expect(subject.client.options[:token_method]).to eq :post
+    end
+
+    it "raises an error for an invalid auth method" do
+      subject.token_endpoint_auth_method = "invalid"
+      expect(subject).not_to be_valid
+      expect(subject.errors).to have_key(:token_endpoint_auth_method)
+    end
+  end
+
   describe "#scope_for_options" do
     it "automatically infers according to requested claims" do
       subject.federated_attributes = { "email" => { "attribute" => "email" } }
