@@ -103,6 +103,7 @@ export const DiscussionTopicToolbarContainer = props => {
         contextType={props.discussionTopic.contextType}
         manageAssignTo={props.discussionTopic.permissions.manageAssignTo}
         isGroupDiscussion={props.discussionTopic.groupSet !== null}
+        isCheckpointed={props?.discussionTopic?.assignment?.checkpoints?.length > 0}
       />
       {showTranslationControl && <TranslationControls />}
     </View>
