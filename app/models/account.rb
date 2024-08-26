@@ -409,7 +409,9 @@ class Account < ActiveRecord::Base
                                                                         require_number_characters
                                                                         require_symbol_characters
                                                                         minimum_character_length
-                                                                        maximum_login_attempts]
+                                                                        maximum_login_attempts
+                                                                        common_passwords_attachment_id
+                                                                        common_passwords_folder_id]
 
   add_setting :enable_limited_access_for_students, boolean: true, root_only: false, default: false, inheritable: false
 

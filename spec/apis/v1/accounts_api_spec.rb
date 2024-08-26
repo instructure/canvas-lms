@@ -2191,6 +2191,8 @@ describe "Accounts API", type: :request do
           require_symbol_characters: "true",
           minimum_character_length: "10",
           maximum_login_attempts: "3",
+          common_passwords_attachment_id: "1",
+          common_passwords_folder_id: "2"
         }
       end
 

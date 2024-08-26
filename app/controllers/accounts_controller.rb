@@ -2017,7 +2017,9 @@ class AccountsController < ApplicationController
                                                          minimum_character_length
                                                          maximum_login_attempts
                                                          require_number_characters
-                                                         require_symbol_characters] }.freeze,
+                                                         require_symbol_characters
+                                                         common_passwords_attachment_id
+                                                         common_passwords_folder_id] }.freeze,
                                    :prevent_course_availability_editing_by_teachers,
                                    :prevent_course_renaming_by_teachers,
                                    :restrict_quiz_questions,
