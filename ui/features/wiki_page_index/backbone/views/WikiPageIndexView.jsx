@@ -246,17 +246,19 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     $('body').removeClass('index')
     $('body').addClass('edit')
 
-    this.editModel = new WikiPage({
-      editing_roles: this.default_editing_roles,
-      contextAssetString: this.contextAssetString,
-      editor: this.createNewPageWithBlockEditor ? 'block_editor' : 'rce',
-      block_editor_attributes: this.createNewPageWithBlockEditor
-        ? {
-            version: '1',
-            blocks: [{data: undefined}],
-          }
-        : null,
-    })
+    this.editModel = new WikiPage(
+      {
+        editing_roles: this.default_editing_roles,
+        editor: this.createNewPageWithBlockEditor ? 'block_editor' : 'rce',
+        block_editor_attributes: this.createNewPageWithBlockEditor
+          ? {
+              version: '1',
+              blocks: [{data: undefined}],
+            }
+          : null,
+      },
+      {contextAssetString: this.contextAssetString}
+    )
     this.editView = new WikiPageEditView({
       model: this.editModel,
       wiki_pages_path: ENV.WIKI_PAGES_PATH,
