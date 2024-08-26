@@ -298,16 +298,23 @@ const CriterionRow = ({
                   <Text weight="bold">{I18n.t('Comment')}</Text>
                 </Flex.Item>
                 <Flex.Item margin="x-small 0 0 0" shouldGrow={true}>
-                  <TextArea
-                    label={<ScreenReaderContent>{I18n.t('Criterion Comment')}</ScreenReaderContent>}
-                    readOnly={isPreviewMode}
-                    data-testid={`free-form-comment-area-${criterion.id}`}
-                    width="100%"
-                    height="38px"
-                    value={commentText}
-                    onChange={e => setCommentText(e.target.value)}
-                    onBlur={e => updateAssessmentData({comments: e.target.value})}
-                  />
+                  {isPreviewMode ? (
+                    <View as="div" margin="0 0 0 0" height="48px">
+                      <Text>{commentText}</Text>
+                    </View>
+                  ) : (
+                    <TextArea
+                      label={
+                        <ScreenReaderContent>{I18n.t('Criterion Comment')}</ScreenReaderContent>
+                      }
+                      data-testid={`free-form-comment-area-${criterion.id}`}
+                      width="100%"
+                      height="38px"
+                      value={commentText}
+                      onChange={e => setCommentText(e.target.value)}
+                      onBlur={e => updateAssessmentData({comments: e.target.value})}
+                    />
+                  )}
                 </Flex.Item>
                 {!isPeerReview && !isPreviewMode && (
                   <Flex.Item margin="medium 0 x-small 0" shouldGrow={true}>
