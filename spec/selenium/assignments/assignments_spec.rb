@@ -1463,32 +1463,49 @@ describe "assignments" do
 
   context "with discussion_checkpoints" do
     before :once do
-      Account.site_admin.enable_feature! :discussion_checkpoints
-    end
+      course_with_teacher({ user: @teacher, active_course: true, active_enrollment: true })
 
-    it "does not show points possible and due date fields for checkpointed assignments" do
-      course_with_teacher_logged_in(active_all: true, course: @course)
-      checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+      Account.site_admin.enable_feature! :discussion_checkpoints
+      @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
       Checkpoints::DiscussionCheckpointCreatorService.call(
-        discussion_topic: checkpointed_discussion,
+        discussion_topic: @checkpointed_discussion,
         checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
         dates: [{ type: "everyone", due_at: 2.days.from_now }],
         points_possible: 6
       )
       Checkpoints::DiscussionCheckpointCreatorService.call(
-        discussion_topic: checkpointed_discussion,
+        discussion_topic: @checkpointed_discussion,
         checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
         dates: [{ type: "everyone", due_at: 3.days.from_now }],
         points_possible: 7,
         replies_required: 2
       )
+    end
+
+    it "does not show points possible and due date fields for checkpointed assignments" do
+      user_session(@teacher)
 
       get "/courses/#{@course.id}/assignments"
-      f("div#assignment_#{checkpointed_discussion.assignment.id} button.al-trigger").click
+      f("div#assignment_#{@checkpointed_discussion.assignment.id} button.al-trigger").click
       f("li a.edit_assignment").click
-      expect(f("input#assign_#{checkpointed_discussion.assignment.id}_assignment_name")).to be_present
-      expect(f("body")).not_to contain_jqcss "label[for='#{checkpointed_discussion.assignment.id}_assignment_due_at']"
-      expect(f("body")).not_to contain_jqcss "label[for='#{checkpointed_discussion.assignment.id}_assignment_points']"
+      expect(f("input#assign_#{@checkpointed_discussion.assignment.id}_assignment_name")).to be_present
+      expect(f("body")).not_to contain_jqcss "label[for='#{@checkpointed_discussion.assignment.id}_assignment_due_at']"
+      expect(f("body")).not_to contain_jqcss "label[for='#{@checkpointed_discussion.assignment.id}_assignment_points']"
+    end
+
+    it "displays the correct date input fields in the assign to tray" do
+      user_session(@teacher)
+      get "/courses/#{@course.id}/assignments"
+
+      fj("#assign_#{@checkpointed_discussion.assignment.id}_manage_link").click
+      wait_for_ajaximations
+
+      f("#assignment_#{@checkpointed_discussion.assignment.id} .assign-to-link").click
+      wait_for_assign_to_tray_spinner
+
+      expect(module_item_assign_to_card.first).not_to contain_css(due_date_input_selector)
+      expect(module_item_assign_to_card.first).to contain_css(reply_to_topic_due_date_input_selector)
+      expect(module_item_assign_to_card.first).to contain_css(required_replies_due_date_input_selector)
     end
   end
 end

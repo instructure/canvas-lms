@@ -480,6 +480,7 @@ export default AssignmentListItemView = (function () {
             tool.base_url +
             `&discussion_topics[]=${__guard__(this.model.get('discussion_topic'), x => x.id)}`)
         })
+        data.item_assignment_type = "discussion_topic"
       } else {
         const isNewQuizzes = this.model.isQuizLTIAssignment()
         const isShareToCommons = (tool) => tool.canvas_icon_class === 'icon-commons'
@@ -614,6 +615,7 @@ export default AssignmentListItemView = (function () {
           itemType="assignment"
           locale={ENV.LOCALE || 'en'}
           timezone={ENV.TIMEZONE || 'UTC'}
+          isCheckpointed={itemProps.isCheckpoint}
           {...itemProps}
         />,
         document.getElementById('assign-to-mount-point')
@@ -629,12 +631,14 @@ export default AssignmentListItemView = (function () {
       const itemContentId = e.target.getAttribute('data-assignment-id')
       const pointsPossible = this.model.get('points_possible')
       const iconType = e.target.getAttribute('data-assignment-type')
+      const isCheckpoint = e.target.getAttribute('data-assignment-has-checkpoint')
       this.renderItemAssignToTray(true, returnFocusTo, {
         courseId,
         itemName,
         itemContentId,
         pointsPossible,
         iconType,
+        isCheckpoint,
       })
     }
 
