@@ -2106,7 +2106,9 @@ class AccountsController < ApplicationController
        minimum_character_length
        maximum_login_attempts
        require_number_characters
-       require_symbol_characters]
+       require_symbol_characters
+       common_passwords_attachment_id
+       common_passwords_folder_id]
   end
 
   def strong_account_params
