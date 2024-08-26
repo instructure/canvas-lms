@@ -397,17 +397,10 @@ describe ContentExportsApiController, type: :request do
           expect(export.export_type).to eql "common_cartridge"
           expect(export.settings["selected_content"]["everything"]).to be_truthy
           expect(export.settings["contains_new_quizzes"]).to be true
-
-          run_jobs
-
-          export.reload
-          expect(export.workflow_state).to eql "exported"
-          expect(export.job_progress).to be_completed
-          expect(export.attachment).not_to be_nil
         end
 
         context "but the export settings have 'selected content'" do
-          it "creates a common cartridge export without new quizzes" do
+          it "contains new quizzes ids creates a common cartridge export with new quizzes" do
             json = api_call_as_user(t_teacher,
                                     :post,
                                     "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
@@ -415,9 +408,44 @@ describe ContentExportsApiController, type: :request do
                                     { select: { assignments: [t_course.assignments.first.id] } })
             export = t_course.content_exports.where(id: json["id"]).first
 
+            expect(export.workflow_state).to eql "waiting_for_external_tool"
+            expect(export.export_type).to eql "common_cartridge"
+            expect(export.settings["selected_content"]["everything"]).to be_nil
+            expect(export.settings["selected_new_quizzes"])
+              .to match_array [t_course.assignments.first.id]
+            expect(export.settings["contains_new_quizzes"]).to be true
+          end
+
+          it "contains new quizzes ids which is not in this course creates a common cartridge export without new quizzes" do
+            json = api_call_as_user(t_teacher,
+                                    :post,
+                                    "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                    { controller: "content_exports_api", action: "create", format: "json", course_id: t_course.to_param, export_type: "common_cartridge" },
+                                    { select: { assignments: [88_888] } })
+            export = t_course.content_exports.where(id: json["id"]).first
+
             expect(export.workflow_state).to eql "created"
             expect(export.export_type).to eql "common_cartridge"
             expect(export.settings["selected_content"]["everything"]).to be_nil
+            expect(export.settings["selected_new_quizzes"]).to be_nil
+            expect(export.settings["contains_new_quizzes"]).to be_falsey
+          end
+        end
+
+        context "but the export settings have an empty selected content" do
+          it "creates a common cartridge export without new quizzes" do
+            json = api_call_as_user(t_teacher,
+                                    :post,
+                                    "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                    { controller: "content_exports_api", action: "create", format: "json", course_id: t_course.to_param, export_type: "common_cartridge" },
+                                    { select: { assignments: [] } })
+            export = t_course.content_exports.where(id: json["id"]).first
+
+            expect(export.workflow_state).to eql "created"
+            expect(export.export_type).to eql "common_cartridge"
+            expect(export.settings["selected_content"]["everything"]).to be_nil
+            expect(export.settings["selected_new_quizzes"])
+              .to be_nil
             expect(export.settings["contains_new_quizzes"]).to be false
 
             run_jobs
@@ -442,6 +470,7 @@ describe ContentExportsApiController, type: :request do
           expect(export.export_type).to eql "common_cartridge"
           expect(export.settings["selected_content"]["everything"]).to be_truthy
           expect(export.settings["contains_new_quizzes"]).to be_falsey
+          expect(export.settings["selected_new_quizzes"]).to be_nil
 
           run_jobs
 
