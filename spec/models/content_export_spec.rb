@@ -455,8 +455,10 @@ describe ContentExport do
   end
 
   describe "common_cartridge" do
-    before :once do
-      assignment_model(submission_types: "external_tool", course: @course)
+    let(:new_quiz_assignment) { assignment_model(submission_types: "external_tool", course: @course) }
+
+    before do
+      new_quiz_assignment
       tool = @c.context_external_tools.create!(
         name: "Quizzes.Next",
         consumer_key: "test_key",
@@ -470,7 +472,6 @@ describe ContentExport do
       @course.root_account.settings[:provision] = { "lti" => "lti url" }
       @course.root_account.save!
       @ce = @course.content_exports.create!
-      @ce.settings[:selected_content] = { "everything" => true }
       @ce.save!
     end
 
@@ -495,21 +496,45 @@ describe ContentExport do
       end
 
       describe "setting the contains_new_quizzes setting" do
-        context "when the course has New Quizzes assignments" do
-          it "the settings to contains_new_quizzes should be set to true" do
-            @ce.set_contains_new_quizzes_settings
-            expect(@ce.settings[:contains_new_quizzes]).to be true
+        context "when the course has New Quizzes assignments and selected_content is { everything: true }" do
+          before do
+            @ce.settings[:selected_content] = { "everything" => true }
+            @ce.save!
           end
 
-          context "But the export settings have selected content" do
-            before do
-              @ce.settings[:selected_content] = { "assignments" => { CC::CCHelper.create_key(@assignment) => "1" } }
-              @ce.save!
-            end
+          it "the settings to contains_new_quizzes should be set to true" do
+            @ce.prepare_new_quizzes_export
+            expect(@ce.settings[:contains_new_quizzes]).to be true
+            expect(@ce.settings[:selected_new_quizzes]).to be_nil
+          end
+        end
 
-            it "sets the settings contains_new_quizzes as false" do
-              @ce.set_contains_new_quizzes_settings
+        context "when the export settings have selected content" do
+          before do
+            new_quiz_assignment
+            @ce.settings[:selected_content] = { "assignments" => { CC::CCHelper.create_key(@assignment) => "1" } }
+            @ce.save!
+          end
+
+          it "sets the selected new quiz in selected_new_quizzes" do
+            @ce.prepare_new_quizzes_export [new_quiz_assignment.id]
+            expect(@ce.settings[:contains_new_quizzes]).to be true
+            expect(@ce.settings[:selected_new_quizzes]).to match_array [Shard.global_id_for(new_quiz_assignment.id)]
+          end
+
+          context "when the given selected ids are not associated to a new quiz assignment" do
+            it "sets contains_new_quizzes to false" do
+              @ce.prepare_new_quizzes_export [888_888]
               expect(@ce.settings[:contains_new_quizzes]).to be false
+              expect(@ce.settings[:selected_new_quizzes]).to be_nil
+            end
+          end
+
+          context "when selected assignments is empty array" do
+            it "sets contains_new_quizzes to false" do
+              @ce.prepare_new_quizzes_export []
+              expect(@ce.settings[:contains_new_quizzes]).to be false
+              expect(@ce.settings[:selected_new_quizzes]).to be_nil
             end
           end
         end
@@ -521,7 +546,7 @@ describe ContentExport do
           end
 
           it "the settings to contains_new_quizzes should be set to false" do
-            @ce.set_contains_new_quizzes_settings
+            @ce.prepare_new_quizzes_export
             expect(@ce.settings[:contains_new_quizzes]).to be false
           end
         end
@@ -530,7 +555,7 @@ describe ContentExport do
 
     context "with feature flags disabled" do
       before do
-        @ce.set_contains_new_quizzes_settings
+        @ce.prepare_new_quizzes_export
       end
 
       context "when the course has New Quizzes assignments" do
@@ -543,7 +568,7 @@ describe ContentExport do
         before do
           @another_course = course_model
           @ce = @another_course.content_exports.create!
-          @ce.set_contains_new_quizzes_settings
+          @ce.prepare_new_quizzes_export
         end
 
         it "should not contain a New Quiz in the export" do
