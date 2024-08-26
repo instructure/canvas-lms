@@ -26,6 +26,7 @@ class ModuleItemsVisibleLoader < GraphQL::Batch::Loader
 
   def perform(context_modules)
     GuardRail.activate(:secondary) do
+      ActiveRecord::Associations.preload(context_modules, content_tags: { content: :context })
       context_modules.each do |context_module|
         content_tags = context_module.content_tags_visible_to(@user)
         fulfill(context_module, content_tags)
