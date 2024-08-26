@@ -741,6 +741,7 @@ class ContextModuleItemsApiController < ApplicationController
           graded: new_tag.graded?,
           content_details: content_details(new_tag, @current_user),
           assignment_id: new_tag.assignment.try(:id),
+          is_checkpointed: new_tag.assignment.try(:has_sub_assignments),
           is_duplicate_able: new_tag.duplicate_able?,
           can_manage_assign_to: new_tag.content&.grants_right?(@current_user, session, :manage_assign_to)
         )

@@ -704,6 +704,7 @@ class ContextModulesController < ApplicationController
         graded: @tag.graded?,
         content_details: content_details(@tag, @current_user),
         assignment_id: @tag.assignment.try(:id),
+        is_checkpointed: @tag.assignment.try(:has_sub_assignments),
         is_cyoe_able: cyoe_able?(@tag),
         is_duplicate_able: @tag.duplicate_able?,
         can_manage_assign_to: @tag.content&.grants_right?(@current_user, session, :manage_assign_to)

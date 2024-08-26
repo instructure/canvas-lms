@@ -630,6 +630,7 @@ window.modules = (function () {
           $a.attr('data-item-context-type', data.context_type)
           $a.attr('data-item-content-id', data.content_id)
           $a.attr('data-item-has-assignment', data.assignment_id ? 'true' : 'false')
+          $a.attr('data-item-has-assignment-checkpoint', data.is_checkpointed ? 'true' : 'false')
         }
       }
 
@@ -2581,6 +2582,7 @@ $(document).ready(function () {
         locale={ENV.LOCALE || 'en'}
         timezone={ENV.TIMEZONE || 'UTC'}
         removeDueDateInput={handleRemoveDueDateInput(itemProps)}
+        isCheckpointed={itemProps.moduleItemHasCheckpoint === 'true'}
       />,
       document.getElementById('differentiated-modules-mount-point')
     )
@@ -2604,6 +2606,8 @@ $(document).ready(function () {
     const courseId = event.target.getAttribute('data-item-context-id')
     const moduleItemContentId = event.target.getAttribute('data-item-content-id')
     const moduleItemHasAssignment = event.target.getAttribute('data-item-has-assignment')
+    const moduleItemHasCheckpoint = event.target.getAttribute('data-item-has-assignment-checkpoint')
+
     const itemProps = parseModuleItemElement(
       document.getElementById(`context_module_item_${moduleItemId}`)
     )
@@ -2613,6 +2617,7 @@ $(document).ready(function () {
       moduleItemType,
       moduleItemContentId,
       moduleItemHasAssignment,
+      moduleItemHasCheckpoint,
       ...itemProps,
     })
   })
