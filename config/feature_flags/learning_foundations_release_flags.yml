@@ -233,6 +233,13 @@ selective_release_edit_page:
     of in a tray.
   applies_to: SiteAdmin
 
+selective_release_optimized_services:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: 'Selective Release - Optimized Visibility Services'
+  description: |-
+    Optimized the visibility services used by Selective Release.
+
 differentiated_files:
   state: hidden
   display_name: Selective Release - Files
