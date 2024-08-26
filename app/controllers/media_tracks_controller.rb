@@ -112,7 +112,8 @@ class MediaTracksController < ApplicationController
   #
   # @returns MediaObject | MediaTrack
   def create
-    if authorized_action(@media_object, @current_user, :add_captions)
+    captioned_record = @attachment || @media_object
+    if authorized_action(captioned_record, @current_user, :add_captions)
       track = find_or_create_track(locale: params[:locale], attachment: @attachment, new_params: params)
       if @attachment.present?
         render json: media_track_api_json(track)
@@ -158,7 +159,8 @@ class MediaTracksController < ApplicationController
   #
   # @returns MediaObject | MediaTrack
   def destroy
-    if authorized_action(@media_object, @current_user, :delete_captions)
+    captioned_record = @attachment || @media_object
+    if authorized_action(captioned_record, @current_user, :delete_captions)
       @media_track = find_track_from_media_object(track_id: params[:id]).first
       raise ActiveRecord::RecordNotFound unless @media_track.present?
 
