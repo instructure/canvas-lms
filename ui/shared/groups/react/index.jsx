@@ -244,6 +244,47 @@ const StudentView = createReactClass({
     )
   },
 
+  replaceHashAndFocus(tabHref) {
+    const activeTab = $('#group_categories_tabs')
+      .find('li')
+      .filter(function () {
+        return /ui-(state|tabs)-active/.test(this.className)
+      })
+    const activeItemHref = tabHref || activeTab.not('.static').find('a').attr('href')
+    if (activeItemHref) {
+      window.history.replaceState({}, document.title, activeItemHref)
+    }
+    if (activeTab) {
+      activeTab.find('a').trigger('focus')
+    }
+  },
+
+  componentDidMount() {
+    requestAnimationFrame(() => {
+      this.replaceHashAndFocus()
+    })
+    const $tabs = $('#group_categories_tabs')
+    const $groupTabs = $tabs.find('li')
+    $groupTabs.find('a').off()
+    const oldTab = $tabs.find('li.ui-state-active')
+    const newTab = $groupTabs.not('li.ui-state-active')
+    $groupTabs.on('click keyup', function(event) {
+      event.stopPropagation()
+      const $activeItemHref = $(this).find('a').attr('href')
+      window.history.replaceState({}, document.title, $activeItemHref)
+      if (event.type === 'click' || event.key === 'Enter' || event.key === ' ') {
+        window.location.href = $activeItemHref
+        window.location.reload()
+      }
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        oldTab.removeClass('ui-state-active ui-tabs-active')
+        newTab.addClass('ui-state-active ui-tabs-active')
+        newTab.find('a').trigger('focus')
+        window.location.href = newTab.find('a').attr('href')
+      }
+    })
+  },
+
   render() {
     const groups = this.state.groupCollection.toJSON()
     const {groupCollection} = this.state
@@ -277,7 +318,7 @@ const StudentView = createReactClass({
                 <a href={`/courses/${ENV.course_id}/users`}>{I18n.t('Everyone')}</a>
               </li>
               <li className="ui-state-default ui-corner-top ui-tabs-active ui-state-active">
-                <a href="#" tabIndex="-1">
+                <a href="#" tabIndex="0">
                   {I18n.t('Groups')}
                 </a>
               </li>
