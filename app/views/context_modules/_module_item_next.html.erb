@@ -281,6 +281,7 @@
                     data-item-context-id="<%= module_item ? module_item.context_id : '' %>"
                     data-item-content-id="<%= module_item ? module_item.content_id : '' %>"
                     data-item-has-assignment="<%= module_item ? module_item&.assignment&.present? : '' %>"
+                    data-item-has-assignment-checkpoint="<%= module_item ? module_item&.assignment&.has_sub_assignments : '' %>"
                     title="<%= t('Assign this module') %>"
                   >
                     <%= @module_item_image_tags['assign_to'] %> <%= t('Assign To...') %>

@@ -22,6 +22,7 @@ require_relative "../helpers/public_courses_context"
 require_relative "page_objects/modules_index_page"
 require_relative "page_objects/modules_settings_tray"
 require_relative "../../helpers/selective_release_common"
+require_relative "../helpers/items_assign_to_tray"
 
 describe "context modules" do
   include_context "in-process server selenium tests"
@@ -29,6 +30,7 @@ describe "context modules" do
   include ModulesIndexPage
   include ModulesSettingsTray
   include SelectiveReleaseCommon
+  include ItemsAssignToTray
 
   context "as a teacher", priority: "1" do
     before(:once) do
@@ -963,6 +965,32 @@ describe "context modules" do
         # check that due dates are still equal to the original checkpoints' due dates
         details = f("div.ig-details").text
         expect(details).to eq "Reply to Topic: #{date_string(c1.due_at)}\nRequired Replies (#{@topic.reply_to_entry_required_count}): #{date_string(c2.due_at)}\n10 pts"
+      end
+
+      it "Shows the correct dates inputs in the assign to tray", :ignore_js_errors do
+        @modules[0].add_item({ id: @topic.id, type: "discussion_topic" })
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 5.years.ago }],
+          points_possible: 5
+        )
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 5.years.ago }],
+          points_possible: 5,
+          replies_required: 2
+        )
+        get "/courses/#{@course.id}/modules"
+
+        checkpointed_item = @modules[0].content_tags.first
+        manage_module_item_button(checkpointed_item).click
+        click_manage_module_item_assign_to(checkpointed_item)
+        wait_for_assign_to_tray_spinner
+        expect(module_item_assign_to_card.first).not_to contain_css(due_date_input_selector)
+        expect(module_item_assign_to_card.first).to contain_css(reply_to_topic_due_date_input_selector)
+        expect(module_item_assign_to_card.first).to contain_css(required_replies_due_date_input_selector)
       end
     end
   end
