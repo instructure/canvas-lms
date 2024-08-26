@@ -384,6 +384,43 @@ describe "Discussion Topic Show" do
         expect(module_item_assign_to_card.last).to contain_css(due_date_input_selector)
       end
 
+      it "shows correct date inputs for checkpointed discussion" do
+        Account.site_admin.enable_feature! :discussion_checkpoints
+        assignment = @course.assignments.create!(
+          name: "Assignment",
+          submission_types: ["online_text_entry"]
+        )
+        dt = @course.discussion_topics.create!(
+          title: "Graded Discussion",
+          discussion_type: "threaded",
+          posted_at: "2017-07-09 16:32:34",
+          user: @teacher,
+          assignment:
+        )
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: dt,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 2.days.from_now }],
+          points_possible: 6
+        )
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: dt,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 3.days.from_now }],
+          points_possible: 7,
+          replies_required: 2
+        )
+
+        get "/courses/#{@course.id}/discussion_topics/#{dt.id}"
+        Discussion.click_assign_to_button
+        wait_for_assign_to_tray_spinner
+
+        expect(module_item_assign_to_card.first).not_to contain_css(due_date_input_selector)
+        expect(module_item_assign_to_card.first).to contain_css(reply_to_topic_due_date_input_selector)
+        expect(module_item_assign_to_card.first).to contain_css(required_replies_due_date_input_selector)
+      end
+
       it "does not show the button when the user does not have the moderate_forum permission" do
         get "/courses/#{@course.id}/discussion_topics/#{@discussion.id}"
         expect(element_exists?(Discussion.assign_to_button_selector)).to be_truthy
