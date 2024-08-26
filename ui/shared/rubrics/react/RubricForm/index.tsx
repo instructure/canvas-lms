@@ -17,13 +17,12 @@
  */
 
 import React, {useCallback, useEffect, useRef, useState} from 'react'
-import {useNavigate, useParams} from 'react-router-dom'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import LoadingIndicator from '@canvas/loading-indicator/react'
 import {useQuery, useMutation, queryClient} from '@canvas/query'
-import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
+import type {Rubric, RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 import {colors} from '@instructure/canvas-theme'
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
@@ -37,8 +36,8 @@ import {Button} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {RubricCriteriaRow} from './RubricCriteriaRow'
 import {NewCriteriaRow} from './NewCriteriaRow'
-import {fetchRubric, saveRubric, type RubricQueryResponse} from '../../queries/RubricFormQueries'
-import type {RubricFormProps} from '../../types/RubricForm'
+import {fetchRubric, saveRubric, type SaveRubricResponse} from './queries/RubricFormQueries'
+import type {RubricFormProps} from './types/RubricForm'
 import {CriterionModal} from './CriterionModal'
 import {DragDropContext as DragAndDrop, Droppable} from 'react-beautiful-dnd'
 import type {DropResult} from 'react-beautiful-dnd'
@@ -48,12 +47,13 @@ import FindDialog from '@canvas/outcomes/backbone/views/FindDialog'
 import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup'
 import type {GroupOutcome} from '@canvas/global/env/EnvCommon'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
+import {reorder, stripPTags, translateRubricData, translateRubricQueryResponse} from './utils'
 
 const I18n = useI18nScope('rubrics-form')
 
 const {Option: SimpleSelectOption} = SimpleSelect
 
-const defaultRubricForm: RubricFormProps = {
+export const defaultRubricForm: RubricFormProps = {
   title: '',
   hasRubricAssociations: false,
   hidePoints: false,
@@ -66,56 +66,35 @@ const defaultRubricForm: RubricFormProps = {
   freeFormCriterionComments: false,
 }
 
-const translateRubricData = (fields: RubricQueryResponse): RubricFormProps => {
-  return {
-    id: fields.id,
-    title: fields.title ?? '',
-    hasRubricAssociations: fields.hasRubricAssociations ?? false,
-    hidePoints: fields.hidePoints ?? false,
-    criteria: fields.criteria ?? [],
-    pointsPossible: fields.pointsPossible ?? 0,
-    buttonDisplay: fields.buttonDisplay ?? 'numeric',
-    ratingOrder: fields.ratingOrder ?? 'descending',
-    unassessed: fields.unassessed ?? true,
-    workflowState: fields.workflowState ?? 'active',
-    freeFormCriterionComments: fields.freeFormCriterionComments ?? false, // Add the missing property here
-  }
-}
-
-type ReorderProps = {
-  list: RubricCriterion[]
-  startIndex: number
-  endIndex: number
-}
-
-export const reorder = ({list, startIndex, endIndex}: ReorderProps) => {
-  const result = Array.from(list)
-  const [removed] = result.splice(startIndex, 1)
-  result.splice(endIndex, 0, removed)
-
-  return result
-}
-
-const stripPTags = (htmlString: string) => {
-  return htmlString.replace(/^<p>(.*)<\/p>$/, '$1')
-}
-
-type RubricFormComponentProp = {
+export type RubricFormComponentProp = {
+  rubricId?: string
+  accountId?: string
+  assignmentId?: string
+  courseId?: string
+  canManageRubrics: boolean
   rootOutcomeGroup: GroupOutcome
-  canManageRubrics?: boolean
   criterionUseRangeEnabled: boolean
+  hideHeader?: boolean
+  rubric?: Rubric
   onLoadRubric?: (rubricTitle: string) => void
+  onSaveRubric: (savedRubricResponse: SaveRubricResponse) => void
+  onCancel: () => void
 }
 
 export const RubricForm = ({
-  canManageRubrics = false,
+  rubricId,
+  assignmentId,
+  accountId,
+  courseId,
+  canManageRubrics,
   criterionUseRangeEnabled,
   rootOutcomeGroup,
+  hideHeader = false,
+  rubric,
   onLoadRubric,
+  onSaveRubric,
+  onCancel,
 }: RubricFormComponentProp) => {
-  const {rubricId, accountId, courseId} = useParams()
-  const navigate = useNavigate()
-  const navigateUrl = accountId ? `/accounts/${accountId}/rubrics` : `/courses/${courseId}/rubrics`
   const [rubricForm, setRubricForm] = useState<RubricFormProps>({
     ...defaultRubricForm,
     accountId,
@@ -127,6 +106,7 @@ export const RubricForm = ({
   const [isOutcomeCriterionModalOpen, setIsOutcomeCriterionModalOpen] = useState(false)
   const [isPreviewTrayOpen, setIsPreviewTrayOpen] = useState(false)
   const [outcomeDialogOpen, setOutcomeDialogOpen] = useState(false)
+  const [savedRubricResponse, setSavedRubricResponse] = useState<SaveRubricResponse>()
   const criteriaRef = useRef(rubricForm.criteria)
 
   const header = rubricId ? I18n.t('Edit Rubric') : I18n.t('Create New Rubric')
@@ -134,7 +114,7 @@ export const RubricForm = ({
   const {data, isLoading} = useQuery({
     queryKey: [`fetch-rubric-${rubricId}`],
     queryFn: async () => fetchRubric(rubricId),
-    enabled: !!rubricId && canManageRubrics,
+    enabled: !!rubricId && canManageRubrics && !rubric,
   })
 
   const {
@@ -143,10 +123,11 @@ export const RubricForm = ({
     isError: saveError,
     mutate,
   } = useMutation({
-    mutationFn: async () => saveRubric(rubricForm),
+    mutationFn: async () => saveRubric(rubricForm, assignmentId),
     mutationKey: ['save-rubric'],
-    onSuccess: async () => {
+    onSuccess: async successResponse => {
       showFlashSuccess(I18n.t('Rubric saved successfully'))()
+      setSavedRubricResponse(successResponse as SaveRubricResponse)
       const queryKey = accountId ? `accountRubrics-${accountId}` : `courseRubrics-${courseId}`
       await queryClient.invalidateQueries([`fetch-rubric-${rubricId}`], {}, {cancelRefetch: true})
       await queryClient.invalidateQueries([queryKey], undefined, {cancelRefetch: true})
@@ -310,23 +291,24 @@ export const RubricForm = ({
     }
 
     if (data) {
-      const rubricFormData = translateRubricData(data)
+      const rubricFormData = translateRubricQueryResponse(data)
       setRubricForm({...rubricFormData, accountId, courseId})
       onLoadRubric?.(rubricFormData.title)
     }
   }, [accountId, courseId, data, rubricId, onLoadRubric])
 
   useEffect(() => {
-    if (saveSuccess) {
-      navigate(navigateUrl)
+    if (rubric) {
+      const rubricFormData = translateRubricData(rubric)
+      setRubricForm({...rubricFormData, accountId, courseId})
     }
-  }, [navigate, navigateUrl, saveSuccess])
+  }, [accountId, courseId, rubric])
 
   useEffect(() => {
-    if (!canManageRubrics) {
-      navigate(navigateUrl)
+    if (saveSuccess && savedRubricResponse) {
+      onSaveRubric(savedRubricResponse)
     }
-  }, [canManageRubrics, navigate, navigateUrl])
+  }, [saveSuccess, savedRubricResponse, onSaveRubric])
 
   if (isLoading && !!rubricId) {
     return <LoadingIndicator />
@@ -349,11 +331,13 @@ export const RubricForm = ({
           )}
         </Flex.Item>
 
-        <Flex.Item>
-          <Heading level="h1" as="h1" themeOverride={{h1FontWeight: 700}}>
-            {header}
-          </Heading>
-        </Flex.Item>
+        {!hideHeader && (
+          <Flex.Item>
+            <Heading level="h1" as="h1" themeOverride={{h1FontWeight: 700}}>
+              {header}
+            </Heading>
+          </Flex.Item>
+        )}
 
         {!rubricForm.unassessed && (
           <Flex.Item data-testid="rubric-limited-edit-mode-alert">
@@ -380,20 +364,12 @@ export const RubricForm = ({
               />
             </Flex.Item>
             {rubricForm.unassessed && (
-              <>
-                {/* <Flex.Item margin="0 0 0 small">
-                  <RubricHidePointsSelect
-                    hidePoints={rubricForm.hidePoints}
-                    onChangeHidePoints={hidePoints => setRubricFormField('hidePoints', hidePoints)}
-                  />
-                </Flex.Item> */}
-                <Flex.Item margin="0 0 0 small">
-                  <RubricRatingOrderSelect
-                    ratingOrder={rubricForm.ratingOrder}
-                    onChangeOrder={ratingOrder => setRubricFormField('ratingOrder', ratingOrder)}
-                  />
-                </Flex.Item>
-              </>
+              <Flex.Item margin="0 0 0 small">
+                <RubricRatingOrderSelect
+                  ratingOrder={rubricForm.ratingOrder}
+                  onChangeOrder={ratingOrder => setRubricFormField('ratingOrder', ratingOrder)}
+                />
+              </Flex.Item>
             )}
           </Flex>
 
@@ -467,11 +443,11 @@ export const RubricForm = ({
         >
           <Flex justifyItems="end">
             <Flex.Item margin="0 medium 0 0">
-              <Button onClick={() => navigate(navigateUrl)} data-testid="cancel-rubric-save-button">
+              <Button onClick={onCancel} data-testid="cancel-rubric-save-button">
                 {I18n.t('Cancel')}
               </Button>
 
-              {!rubricForm.hasRubricAssociations && (
+              {!rubricForm.hasRubricAssociations && !assignmentId && (
                 <Button
                   margin="0 0 0 small"
                   disabled={saveLoading || !formValid()}
@@ -535,33 +511,6 @@ export const RubricForm = ({
         onDismiss={() => setIsPreviewTrayOpen(false)}
       />
     </View>
-  )
-}
-
-type RubricHidePointsSelectProps = {
-  hidePoints: boolean
-  onChangeHidePoints: (hidePoints: boolean) => void
-}
-const RubricHidePointsSelect = ({hidePoints, onChangeHidePoints}: RubricHidePointsSelectProps) => {
-  const onChange = (value?: string | number) => {
-    onChangeHidePoints(value === 'unscored')
-  }
-
-  return (
-    <SimpleSelect
-      renderLabel={I18n.t('Type')}
-      width="10.563rem"
-      value={hidePoints ? 'unscored' : 'scored'}
-      onChange={(e, {value}) => onChange(value)}
-      data-testid="rubric-hide-points-select"
-    >
-      <SimpleSelectOption id="scoredOption" value="scored">
-        {I18n.t('Scored')}
-      </SimpleSelectOption>
-      <SimpleSelectOption id="unscoredOption" value="unscored">
-        {I18n.t('Unscored')}
-      </SimpleSelectOption>
-    </SimpleSelect>
   )
 }
 

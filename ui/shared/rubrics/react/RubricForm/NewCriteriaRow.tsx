@@ -18,17 +18,10 @@
 
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {
-  IconDragHandleLine,
-  IconDuplicateLine,
-  IconEditLine,
-  IconOutcomesLine,
-  IconTrashLine,
-} from '@instructure/ui-icons'
+import {IconDragHandleLine, IconEditLine, IconOutcomesLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
-import {Pill} from '@instructure/ui-pill'
 import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('rubrics-criteria-new-row')

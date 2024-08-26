@@ -17,11 +17,8 @@
  */
 
 import type {RubricAssessment} from '@canvas/grading/grading'
-import type {Rubric, RubricAssessmentData, RubricOutcome} from '@canvas/rubrics/react/types/rubric'
+import type {Rubric, RubricAssessmentData} from '@canvas/rubrics/react/types/rubric'
 
-export type RubricTrayType =
-  | Pick<Rubric, 'title' | 'criteria' | 'ratingOrder' | 'freeFormCriterionComments'>
-  | undefined
 export type RubricUnderscoreType = {
   title: string
   criteria: {
@@ -41,8 +38,12 @@ export type RubricUnderscoreType = {
       points: number
     }[]
   }[]
+  id: string
   rating_order: string
   free_form_criterion_comments: boolean
+  points_possible: number
+  unassessed?: boolean
+  workflow_state: string
 }
 
 export type RubricOutcomeUnderscore = {
@@ -66,11 +67,11 @@ export type RubricAssessmentDataUnderscore = {
 export const mapRubricUnderscoredKeysToCamelCase = (
   rubric: RubricUnderscoreType,
   rubricOutcomeData: RubricOutcomeUnderscore[] = []
-): RubricTrayType => {
+): Rubric => {
   const rubricOutcomeMap = rubricOutcomeData.reduce((prev, curr) => {
     prev[curr.id] = curr.display_name
     return prev
-  }, {})
+  }, {} as Record<string, string>)
 
   return {
     title: rubric.title,
@@ -105,6 +106,11 @@ export const mapRubricUnderscoredKeysToCamelCase = (
     }),
     ratingOrder: rubric.rating_order,
     freeFormCriterionComments: rubric.free_form_criterion_comments,
+    pointsPossible: rubric.points_possible,
+    criteriaCount: rubric.criteria.length,
+    id: rubric.id,
+    unassessed: rubric.unassessed,
+    workflowState: rubric.workflow_state,
   }
 }
 

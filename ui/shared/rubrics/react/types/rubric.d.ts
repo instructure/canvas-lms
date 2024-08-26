@@ -27,7 +27,15 @@ export type Rubric = {
   pointsPossible: number
   title: string
   workflowState?: string
+  unassessed?: boolean
   hasRubricAssociations?: boolean
+}
+
+export type RubricAssociation = {
+  hidePoints: boolean
+  hideScoreTotal: boolean
+  useForGrading: boolean
+  id: string
 }
 
 export type RubricCriterion = {
