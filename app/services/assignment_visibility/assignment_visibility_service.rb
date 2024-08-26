@@ -197,6 +197,24 @@ module AssignmentVisibility
 
         if Account.site_admin.feature_enabled?(:selective_release_optimized_services_v3)
           AssignmentVisibility::Repositories::AssignmentVisibleToStudentRepository.full_assignment_visibility_query(course_id_params:, user_id_params:, assignment_id_params:)
+        elsif Account.site_admin.feature_enabled?(:selective_release_optimized_services_v2)
+          visible_assignments = []
+
+          # add assignments visible to everyone
+          assignments_visible_to_all = AssignmentVisibility::Repositories::AssignmentVisibleToStudentRepository
+                                       .find_assignments_visible_to_everyone(course_id_params:, user_id_params:, assignment_id_params:)
+          visible_assignments |= assignments_visible_to_all
+
+          # add assignments visible to groups (only assignments can have group overrides)
+          assignments_visible_to_groups = AssignmentVisibility::Repositories::AssignmentVisibleToStudentRepository
+                                          .find_assignments_visible_to_groups(course_id_params:, user_id_params:, assignment_id_params:)
+          visible_assignments |= assignments_visible_to_groups
+
+          # add assignments assigned to sections, students, or the course
+          assignments_assigned_to_others = AssignmentVisibility::Repositories::AssignmentVisibleToStudentRepository
+                                           .find_assignments_assigned_to_others(course_id_params:, user_id_params:, assignment_id_params:)
+
+          visible_assignments | assignments_assigned_to_others
         else
           visible_assignments = []
 
