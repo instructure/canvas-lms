@@ -47,6 +47,43 @@ module AssignmentVisibility
           exec_find_assignment_visibility_query(query_sql:, query_params:)
         end
 
+        def find_assignments_assigned_to_sections(course_id_params:, user_id_params:, assignment_id_params:)
+          filter_condition_sql = filter_condition_sql(course_id_params:, user_id_params:, assignment_id_params:)
+          query_sql = <<~SQL.squish
+            WITH #{assignment_module_items_cte_sql(course_id_params:, assignment_id_params:)}
+
+            #{assignment_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* (logical) join context modules */
+            #{assignment_module_items_join_sql}
+
+            /* join assignment overrides (assignment or related context module) for CourseSection */
+            #{VisibilitySqlHelper.assignment_override_section_join_sql(id_column_name: "assignment_id")}
+
+            /* filtered to course_id, user_id, assignment_id, and additional conditions */
+            #{VisibilitySqlHelper.section_override_filter_sql(filter_condition_sql:)}
+
+            EXCEPT
+
+            #{assignment_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* join assignment override for 'CourseSection' (no module check) */
+            #{VisibilitySqlHelper.assignment_override_unassign_section_join_sql(id_column_name: "assignment_id")}
+
+            /* filtered to course_id, user_id, assignment_id, and additional conditions */
+            #{VisibilitySqlHelper.assignment_override_unassign_section_filter_sql(filter_condition_sql:)}
+          SQL
+
+          query_params = query_params(course_id_params:, user_id_params:, assignment_id_params:)
+          exec_find_assignment_visibility_query(query_sql:, query_params:)
+        end
+
         # section overrides and related module section overrides
         def find_assignments_visible_to_sections(course_id_params:, user_id_params:, assignment_id_params:)
           filter_condition_sql = filter_condition_sql(course_id_params:, user_id_params:, assignment_id_params:)
@@ -86,6 +123,46 @@ module AssignmentVisibility
 
             /* filtered to course_id, user_id, assignment_id, and additional conditions */
             #{VisibilitySqlHelper.assignment_override_unassign_section_filter_sql(filter_condition_sql:)}
+          SQL
+
+          query_params = query_params(course_id_params:, user_id_params:, assignment_id_params:)
+          exec_find_assignment_visibility_query(query_sql:, query_params:)
+        end
+
+        def find_assignments_assigned_to_adhoc_overrides(course_id_params:, user_id_params:, assignment_id_params:)
+          filter_condition_sql = filter_condition_sql(course_id_params:, user_id_params:, assignment_id_params:)
+          query_sql = <<~SQL.squish
+            WITH #{assignment_module_items_cte_sql(course_id_params:, assignment_id_params:)}
+
+            #{assignment_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* (logical) join context modules */
+            #{assignment_module_items_join_sql}
+
+            /* join assignment override for 'ADHOC' */
+            #{VisibilitySqlHelper.assignment_override_adhoc_join_sql(id_column_name: "assignment_id")}
+
+            /* join AssignmentOverrideStudent */
+            #{VisibilitySqlHelper.assignment_override_student_join_sql}
+
+            /* filtered to course_id, user_id, assignment_id, and additional conditions */
+            #{VisibilitySqlHelper.adhoc_override_filter_sql(filter_condition_sql:)}
+
+            EXCEPT
+
+            #{assignment_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* join assignment overrides for 'ADHOC' (no module check) */
+            #{VisibilitySqlHelper.assignment_override_unassign_adhoc_join_sql(id_column_name: "assignment_id")}
+
+            /* filtered to course_id, user_id, assignment_id, and additional conditions */
+            #{VisibilitySqlHelper.assignment_override_unassign_adhoc_filter_sql(filter_condition_sql:)}
           SQL
 
           query_params = query_params(course_id_params:, user_id_params:, assignment_id_params:)
