@@ -32,6 +32,7 @@ import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery
 import {getSubmissionsByStudentIds} from './queries/submissionsByStudentsIdsQuery'
 import {getAssignmentsByCourseId} from './queries/assignmentsByCourseIdQuery'
 import {getEnrollmentsByCourse} from './queries/enrollmentsByCourseQuery'
+import {getCommentBankItems} from './queries/commentBankQuery'
 
 import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
 import {createSubmissionComment} from './mutations/createSubmissionCommentMutation'
@@ -43,6 +44,9 @@ import {
   postAssignmentGradesForSections,
   resolvePostAssignmentGradesStatus,
 } from './mutations/postAssignmentGradesForSectionsMutation'
+import {createCommentBankItem} from './mutations/comment_bank/createCommentBankItemMutation'
+import {deleteCommentBankItem} from './mutations/comment_bank/deleteCommentBankItemMutation'
+import {updateCommentBankItem} from './mutations/comment_bank/updateCommentBankItemMutation'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import GenericErrorPage from '@canvas/generic-error-page'
@@ -77,6 +81,7 @@ ready(() => {
             getSubmission,
             getSubmissionsByAssignment,
             getSubmissionsByStudentIds,
+            getCommentBankItems,
             resolvePostAssignmentGradesStatus,
           },
           mutationFns: {
@@ -87,6 +92,9 @@ ready(() => {
             postAssignmentGradesForSections,
             postDraftSubmissionComment,
             updateSubmissionGradeStatus,
+            createCommentBankItem,
+            deleteCommentBankItem,
+            updateCommentBankItem,
           },
           postMessageAliases,
           context: {
@@ -108,6 +116,7 @@ ready(() => {
               enabled: window.ENV.GRADE_BY_QUESTION,
             },
             emojisEnabled: !!window.ENV.EMOJIS_ENABLED,
+            commentLibraryEnabled: ENV.assignment_comment_library_feature_enabled,
           },
         })
       })
