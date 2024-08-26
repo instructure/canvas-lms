@@ -77,9 +77,23 @@ export default class GroupCategoriesView extends CollectionView {
       this.$tabs.tabs({cookie: {}}).show()
     }
 
+    requestAnimationFrame(() => {
+      const activeTab = this.$tabs.find('li.ui-tabs-active')
+      activeTab.trigger('focus')
+    })
+
     this.$tabs.tabs({
       beforeActivate(event, ui) {
+        ui.newTab.trigger('focus')
         return !ui.newTab.hasClass('static')
+      },
+      activate: (event, ui) => {
+        requestAnimationFrame(() => {
+          ui.oldTab.removeClass('ui-state-focus')
+          const activeItemHref = ui.newTab.find('a').attr('href')
+          window.history.replaceState({}, document.title, activeItemHref)
+          ui.newTab.trigger('focus')
+        })
       },
     })
 
