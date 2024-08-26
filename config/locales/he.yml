@@ -4402,12 +4402,14 @@ he:
             description: "כדי להכנס לשיתוף זה עליך להרשות לקנבס לגשת לחשבון הגוגל שלך."
       how_to_start_a_new_collaboration: "כדי ללמוד עוד על סוג שיתוף פעולה כלשהו, יש להקליק על \"התחלת שיתוף פעולה חדש\" ואז לבחור את הסוג מתוך רשימה נפתחת."
       links: 
+        collaboration: "שיתוף פעולה "
         delete: "ביטול שיתוף פעולה זה"
         edit: "עריכת שיתוף פעולה זה"
         new: "יצירת שיתוף פעולה חדש"
       page_title: "שיתוף פעולה "
       started_by: "נפתח ע\"י *%{user}* ב, %{at}"
       titles: 
+        collaborations: "שיתופי פעולה"
         current: "שיתופי פעולה מקוונים"
     lti_collaborations: LTICollaborations
     show: 
