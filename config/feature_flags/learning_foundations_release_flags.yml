@@ -239,6 +239,11 @@ selective_release_optimized_services:
   display_name: 'Selective Release - Optimized Visibility Services'
   description: |-
     Optimized the visibility services used by Selective Release.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
 
 differentiated_files:
   state: hidden
