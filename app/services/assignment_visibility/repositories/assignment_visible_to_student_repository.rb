@@ -258,6 +258,211 @@ module AssignmentVisibility
           exec_find_assignment_visibility_query(query_sql:, query_params:)
         end
 
+        def full_assignment_visibility_query(course_id_params:, user_id_params:, assignment_id_params:)
+          filter_condition_sql = filter_condition_sql(course_id_params:, user_id_params:, assignment_id_params:)
+          query_sql = <<~SQL.squish
+            WITH #{assignment_module_items_cte_sql(course_id_params:, assignment_id_params:)}
+
+            /* assignments visible to everyone */
+            #{assignment_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* (logical) join context modules */
+            #{assignment_module_items_join_sql}
+
+            /* join assignment override */
+            #{VisibilitySqlHelper.assignment_override_everyone_join_sql}
+
+            /* filtered to course_id, user_id, assignment_id, and additional conditions */
+            #{VisibilitySqlHelper.assignment_override_everyone_filter_sql(filter_condition_sql:)}
+
+            UNION
+
+            /* assignments visible to groups */
+            #{assignment_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* join assignment group overrides */
+            #{assignment_group_override_join_sql}
+
+            /* filtered to course_id, user_id, assignment_id, and additional conditions */
+            #{assignment_group_override_filter_sql(filter_condition_sql:)}
+
+            UNION
+
+            /* assignments visible to sections */
+            #{assignment_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* (logical) join context modules */
+            #{assignment_module_items_join_sql}
+
+            /* join assignment overrides (assignment or related context module) for CourseSection */
+            #{VisibilitySqlHelper.assignment_override_section_join_sql(id_column_name: "assignment_id")}
+
+            /* filtered to course_id, user_id, assignment_id, and additional conditions */
+            #{VisibilitySqlHelper.section_override_filter_sql(filter_condition_sql:)}
+
+            EXCEPT
+
+            /* remove assignments with unassigned section overrides */
+            #{assignment_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* join assignment override for 'CourseSection' (no module check) */
+            #{VisibilitySqlHelper.assignment_override_unassign_section_join_sql(id_column_name: "assignment_id")}
+
+            /* filtered to course_id, user_id, assignment_id, and additional conditions */
+            #{VisibilitySqlHelper.assignment_override_unassign_section_filter_sql(filter_condition_sql:)}
+
+            UNION
+
+            /* assignments visible to adhoc overrides */
+            #{assignment_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* (logical) join context modules */
+            #{assignment_module_items_join_sql}
+
+            /* join assignment override for 'ADHOC' */
+            #{VisibilitySqlHelper.assignment_override_adhoc_join_sql(id_column_name: "assignment_id")}
+
+            /* join AssignmentOverrideStudent */
+            #{VisibilitySqlHelper.assignment_override_student_join_sql}
+
+            /* filtered to course_id, user_id, assignment_id, and additional conditions */
+            #{VisibilitySqlHelper.adhoc_override_filter_sql(filter_condition_sql:)}
+
+            EXCEPT
+
+            /* remove assignments with unassigned adhoc overrides */
+            #{assignment_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* join assignment overrides for 'ADHOC' (no module check) */
+            #{VisibilitySqlHelper.assignment_override_unassign_adhoc_join_sql(id_column_name: "assignment_id")}
+
+            /* filtered to course_id, user_id, assignment_id, and additional conditions */
+            #{VisibilitySqlHelper.assignment_override_unassign_adhoc_filter_sql(filter_condition_sql:)}
+
+            UNION
+
+            /* assignments visible to course overrides */
+            #{assignment_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* join assignment override for 'Course' */
+            #{VisibilitySqlHelper.assignment_override_course_join_sql(id_column_name: "assignment_id")}
+
+            /* filtered to course_id, user_id, assignment_id, and additional conditions */
+            #{VisibilitySqlHelper.course_override_filter_sql(filter_condition_sql:)}
+          SQL
+
+          query_params = query_params(course_id_params:, user_id_params:, assignment_id_params:)
+          exec_find_assignment_visibility_query(query_sql:, query_params:)
+        end
+
+        def find_assignments_assigned_to_others(course_id_params:, user_id_params:, assignment_id_params:)
+          filter_condition_sql = filter_condition_sql(course_id_params:, user_id_params:, assignment_id_params:)
+          query_sql = <<~SQL.squish
+            WITH #{assignment_module_items_cte_sql(course_id_params:, assignment_id_params:)}
+
+            /* assignments visible to sections */
+            #{assignment_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* (logical) join context modules */
+            #{assignment_module_items_join_sql}
+
+            /* join assignment overrides (assignment or related context module) for CourseSection */
+            #{VisibilitySqlHelper.assignment_override_section_join_sql(id_column_name: "assignment_id")}
+
+            /* filtered to course_id, user_id, assignment_id, and additional conditions */
+            #{VisibilitySqlHelper.section_override_filter_sql(filter_condition_sql:)}
+
+            EXCEPT
+
+            /* remove assignments with unassigned section overrides */
+            #{assignment_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* join assignment override for 'CourseSection' (no module check) */
+            #{VisibilitySqlHelper.assignment_override_unassign_section_join_sql(id_column_name: "assignment_id")}
+
+            /* filtered to course_id, user_id, assignment_id, and additional conditions */
+            #{VisibilitySqlHelper.assignment_override_unassign_section_filter_sql(filter_condition_sql:)}
+
+            UNION
+
+            /* assignments visible to adhoc overrides */
+            #{assignment_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* (logical) join context modules */
+            #{assignment_module_items_join_sql}
+
+            /* join assignment override for 'ADHOC' */
+            #{VisibilitySqlHelper.assignment_override_adhoc_join_sql(id_column_name: "assignment_id")}
+
+            /* join AssignmentOverrideStudent */
+            #{VisibilitySqlHelper.assignment_override_student_join_sql}
+
+            /* filtered to course_id, user_id, assignment_id, and additional conditions */
+            #{VisibilitySqlHelper.adhoc_override_filter_sql(filter_condition_sql:)}
+
+            EXCEPT
+
+            /* remove assignments with unassigned adhoc overrides */
+            #{assignment_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* join assignment overrides for 'ADHOC' (no module check) */
+            #{VisibilitySqlHelper.assignment_override_unassign_adhoc_join_sql(id_column_name: "assignment_id")}
+
+            /* filtered to course_id, user_id, assignment_id, and additional conditions */
+            #{VisibilitySqlHelper.assignment_override_unassign_adhoc_filter_sql(filter_condition_sql:)}
+
+            UNION
+
+            /* assignments visible to course overrides */
+            #{assignment_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* join assignment override for 'Course' */
+            #{VisibilitySqlHelper.assignment_override_course_join_sql(id_column_name: "assignment_id")}
+
+            /* filtered to course_id, user_id, assignment_id, and additional conditions */
+            #{VisibilitySqlHelper.course_override_filter_sql(filter_condition_sql:)}
+          SQL
+
+          query_params = query_params(course_id_params:, user_id_params:, assignment_id_params:)
+          exec_find_assignment_visibility_query(query_sql:, query_params:)
+        end
+
         private
 
         def exec_find_assignment_visibility_query(query_sql:, query_params:)
