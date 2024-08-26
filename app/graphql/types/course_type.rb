@@ -129,6 +129,11 @@ module Types
           method: :assignment_groups,
           null: true
 
+    def assignment_groups_connection
+      assignment_groups = object.assignment_groups
+      assignment_groups.where(workflow_state: "available")
+    end
+
     field :apply_group_weights, Boolean, null: true
     def apply_group_weights
       object.apply_group_weights?
