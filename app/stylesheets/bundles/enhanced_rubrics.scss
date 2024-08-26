@@ -47,3 +47,7 @@ body.is-masquerading-or-student-view {
     #{direction(right)}: 3px;
   }
 }
+
+.ui-dialog {
+  z-index: 10000 !important;
+}

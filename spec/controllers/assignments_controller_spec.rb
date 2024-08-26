@@ -1750,6 +1750,39 @@ describe AssignmentsController do
           expect(assigns[:js_env][:DEFAULT_DUE_TIME]).to eq "22:00:00"
         end
       end
+
+      context "assigned_rubric and rubric_association" do
+        before do
+          @course.enable_feature!(:enhanced_rubrics_assignments)
+          @course.enable_feature!(:enhanced_rubrics)
+          rubric = @course.rubrics.create! { |r| r.user = @teacher }
+          rubric_association_params = ActiveSupport::HashWithIndifferentAccess.new({
+                                                                                     hide_score_total: "0",
+                                                                                     purpose: "grading",
+                                                                                     skip_updating_points_possible: false,
+                                                                                     update_if_existing: true,
+                                                                                     use_for_grading: "1",
+                                                                                     association_object: @assignment
+                                                                                   })
+          rubric_assoc = RubricAssociation.generate(@teacher, rubric, @course, rubric_association_params)
+          @assignment.rubric_association = rubric_assoc
+          @assignment.save!
+        end
+
+        it "sets assigned_rubric and rubric_association in the ENV when FF is ON" do
+          get :show, params: { course_id: @course.id, id: @assignment.id }
+          expect(assigns[:js_env][:assigned_rubric][:id]).to eq @assignment.rubric_association.rubric_id
+          expect(assigns[:js_env][:assigned_rubric][:title]).to eq "Unnamed Course Rubric"
+          expect(assigns[:js_env][:rubric_association][:id]).to eq @assignment.rubric_association.id
+        end
+
+        it "does not set assigned_rubric and rubric_association in the ENV when FF is OFF" do
+          @course.disable_feature!(:enhanced_rubrics_assignments)
+          get :show, params: { course_id: @course.id, id: @assignment.id }
+          expect(assigns[:js_env][:assigned_rubric]).to be_nil
+          expect(assigns[:js_env][:rubric_association]).to be_nil
+        end
+      end
     end
   end
 

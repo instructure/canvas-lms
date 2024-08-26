@@ -25,7 +25,7 @@ import {
   mapRubricUnderscoredKeysToCamelCase,
   type RubricOutcomeUnderscore,
   type RubricUnderscoreType,
-} from './utils'
+} from '@canvas/rubrics/react/utils'
 import {Transition} from '@instructure/ui-motion'
 import {View} from '@instructure/ui-view'
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,12 +16,4 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "pages/assignments/assignments.scss";
-@import "pages/shared/grading_standards.scss";
-@import "pages/shared/mark_as_done.scss";
-@import "vendor/embed_content.scss";
-@import "components/webcam_modal";
-@import "components/conditional_release";
-@import "components/emoji";
-@import "bundles/enhanced_rubrics"
+export * from './components/RubricAssignmentContainer'

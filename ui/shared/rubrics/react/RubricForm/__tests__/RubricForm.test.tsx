@@ -17,23 +17,17 @@
  */
 
 import React from 'react'
-import Router from 'react-router'
-import {BrowserRouter} from 'react-router-dom'
 import {fireEvent, render} from '@testing-library/react'
 import {QueryProvider, queryClient} from '@canvas/query'
-import {RubricForm, reorder} from '../index'
+import {RubricForm, type RubricFormComponentProp} from '../index'
 import {RUBRIC_CRITERIA_IGNORED_FOR_SCORING, RUBRICS_QUERY_RESPONSE} from './fixtures'
-import * as RubricFormQueries from '../../../queries/RubricFormQueries'
+import * as RubricFormQueries from '../queries/RubricFormQueries'
 import FindDialog from '@canvas/outcomes/backbone/views/FindDialog'
-
-jest.mock('react-router', () => ({
-  ...jest.requireActual('react-router'),
-  useParams: jest.fn(),
-}))
+import {reorder} from '../CriterionModal'
 
 const saveRubricMock = jest.fn()
-jest.mock('../../../queries/RubricFormQueries', () => ({
-  ...jest.requireActual('../../../queries/RubricFormQueries'),
+jest.mock('../queries/RubricFormQueries', () => ({
+  ...jest.requireActual('../queries/RubricFormQueries'),
   saveRubric: () => saveRubricMock,
 }))
 
@@ -53,8 +47,6 @@ const ROOT_OUTCOME_GROUP = {
 
 describe('RubricForm Tests', () => {
   beforeEach(() => {
-    jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
-
     window.ENV = {
       ...window.ENV,
       context_asset_string: 'user_1',
@@ -65,12 +57,18 @@ describe('RubricForm Tests', () => {
     jest.resetAllMocks()
   })
 
-  const renderComponent = () => {
+  const renderComponent = (props?: Partial<RubricFormComponentProp>) => {
     return render(
       <QueryProvider>
-        <BrowserRouter>
-          <RubricForm rootOutcomeGroup={ROOT_OUTCOME_GROUP} criterionUseRangeEnabled={false} />
-        </BrowserRouter>
+        <RubricForm
+          rootOutcomeGroup={ROOT_OUTCOME_GROUP}
+          criterionUseRangeEnabled={false}
+          canManageRubrics={true}
+          onCancel={() => {}}
+          onSaveRubric={() => {}}
+          accountId="1"
+          {...props}
+        />
       </QueryProvider>
     )
   }
@@ -91,10 +89,6 @@ describe('RubricForm Tests', () => {
   })
 
   describe('with rubricId', () => {
-    beforeEach(() => {
-      jest.spyOn(Router, 'useParams').mockReturnValue({rubricId: '1'})
-    })
-
     afterEach(() => {
       jest.resetAllMocks()
     })
@@ -102,16 +96,12 @@ describe('RubricForm Tests', () => {
     it('loads rubric data and populates appropriate fields', () => {
       queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
 
-      const {getByTestId} = renderComponent()
+      const {getByTestId} = renderComponent({rubricId: '1'})
       expect(getByTestId('rubric-form-title')).toHaveValue('Rubric 1')
     })
   })
 
   describe('save rubric', () => {
-    beforeEach(() => {
-      jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
-    })
-
     afterEach(() => {
       jest.resetAllMocks()
     })
@@ -154,13 +144,27 @@ describe('RubricForm Tests', () => {
     it('will navigate back to /rubrics after successfully saving', async () => {
       jest.spyOn(RubricFormQueries, 'saveRubric').mockImplementation(() =>
         Promise.resolve({
-          id: '1',
-          title: 'Rubric 1',
-          pointsPossible: 10,
-          buttonDisplay: 'numeric',
-          ratingOrder: 'descending',
-          unassessed: true,
-          hasRubricAssociations: false,
+          rubric: {
+            id: '1',
+            criteriaCount: 1,
+            pointsPossible: 10,
+            title: 'Rubric 1',
+            criteria: [
+              {
+                id: '1',
+                description: 'Criterion 1',
+                points: 10,
+                criterionUseRange: false,
+                ratings: [],
+              },
+            ],
+          },
+          rubricAssociation: {
+            hidePoints: false,
+            hideScoreTotal: false,
+            id: '1',
+            useForGrading: true,
+          },
         })
       )
       const {getByTestId} = renderComponent()
@@ -180,29 +184,23 @@ describe('RubricForm Tests', () => {
     })
 
     it('does not display save as draft button if rubric has associations', () => {
-      jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1', rubricId: '1'})
-
       queryClient.setQueryData(['fetch-rubric-1'], {
         ...RUBRICS_QUERY_RESPONSE,
         hasRubricAssociations: true,
       })
 
-      const {queryByTestId} = renderComponent()
+      const {queryByTestId} = renderComponent({rubricId: '1'})
       expect(queryByTestId('save-as-draft-button')).toBeNull()
     })
   })
 
   describe('rubric criteria', () => {
-    beforeEach(() => {
-      jest.spyOn(Router, 'useParams').mockReturnValue({rubricId: '1'})
-    })
-
     it('renders all criteria rows for a rubric', () => {
       queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
 
       const {criteria = []} = RUBRICS_QUERY_RESPONSE
 
-      const {queryAllByTestId} = renderComponent()
+      const {queryAllByTestId} = renderComponent({rubricId: '1'})
       const criteriaRows = queryAllByTestId('rubric-criteria-row')
       const criteriaRowDescriptions = queryAllByTestId('rubric-criteria-row-description')
       const criteriaRowLongDescriptions = queryAllByTestId('rubric-criteria-row-long-description')
@@ -224,7 +222,7 @@ describe('RubricForm Tests', () => {
     it('renders the criteria rows without pill if is ignore for scoring', () => {
       queryClient.setQueryData(['fetch-rubric-1'], RUBRIC_CRITERIA_IGNORED_FOR_SCORING)
 
-      const {queryAllByTestId} = renderComponent()
+      const {queryAllByTestId} = renderComponent({rubricId: '1'})
       const criteriaRows = queryAllByTestId('rubric-criteria-row')
       const criteriaRowPoints = queryAllByTestId('rubric-criteria-row-points')
 
@@ -237,7 +235,7 @@ describe('RubricForm Tests', () => {
 
       const {criteria = []} = RUBRICS_QUERY_RESPONSE
 
-      const {queryAllByTestId} = renderComponent()
+      const {queryAllByTestId} = renderComponent({rubricId: '1'})
       const ratingScaleAccordion = queryAllByTestId('criterion-row-rating-accordion')
       expect(ratingScaleAccordion.length).toEqual(2)
       expect(ratingScaleAccordion[0]).toHaveTextContent(
@@ -253,7 +251,7 @@ describe('RubricForm Tests', () => {
 
       const {criteria = []} = RUBRICS_QUERY_RESPONSE
 
-      const {queryAllByTestId} = renderComponent()
+      const {queryAllByTestId} = renderComponent({rubricId: '1'})
       const ratingScaleAccordion = queryAllByTestId('criterion-row-rating-accordion')
       fireEvent.click(ratingScaleAccordion[0])
       const ratingScaleAccordionItems = queryAllByTestId('rating-scale-accordion-item')
@@ -263,7 +261,7 @@ describe('RubricForm Tests', () => {
     it('does not render the criterion ratings accordion items when accordion is closed', () => {
       queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
 
-      const {queryAllByTestId} = renderComponent()
+      const {queryAllByTestId} = renderComponent({rubricId: '1'})
       const ratingScaleAccordion = queryAllByTestId('criterion-row-rating-accordion')
       fireEvent.click(ratingScaleAccordion[0])
       fireEvent.click(ratingScaleAccordion[0])
@@ -358,9 +356,7 @@ describe('RubricForm Tests', () => {
     it('renders a lock icon with a tooltip next to the outcome name', async () => {
       queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
 
-      const {criteria = []} = RUBRICS_QUERY_RESPONSE
-
-      const {queryAllByTestId, getByTestId} = renderComponent()
+      const {queryAllByTestId, getByTestId} = renderComponent({rubricId: '1'})
 
       const outcomeLockIcons = queryAllByTestId(/^outcome-lock-icon/)
       expect(outcomeLockIcons.length).toEqual(1)
@@ -478,7 +474,7 @@ describe('RubricForm Tests', () => {
       it('opens the criterion modal when the add criterion button is clicked', async () => {
         queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
 
-        const {getByTestId, queryByTestId} = renderComponent()
+        const {getByTestId, queryByTestId} = renderComponent({rubricId: '1'})
         expect(queryByTestId('rubric-criterion-modal')).toBeNull()
         fireEvent.click(getByTestId('add-criterion-button'))
 
@@ -489,7 +485,7 @@ describe('RubricForm Tests', () => {
       it('does not save new criterion when the cancel button is clicked', async () => {
         queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
 
-        const {getByTestId, queryAllByTestId} = renderComponent()
+        const {getByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
         fireEvent.click(getByTestId('add-criterion-button'))
         await new Promise(resolve => setTimeout(resolve, 0))
         expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
@@ -503,7 +499,7 @@ describe('RubricForm Tests', () => {
       it('saves new criterion when the save button is clicked', async () => {
         queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
 
-        const {getByTestId, queryAllByTestId} = renderComponent()
+        const {getByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
         expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
 
         fireEvent.click(getByTestId('add-criterion-button'))
@@ -522,7 +518,7 @@ describe('RubricForm Tests', () => {
       it('updates existing criterion when the save button is clicked', async () => {
         queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
 
-        const {getByTestId, queryAllByTestId} = renderComponent()
+        const {getByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
         expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
 
         fireEvent.click(queryAllByTestId('rubric-criteria-row-edit-button')[0])
@@ -541,7 +537,7 @@ describe('RubricForm Tests', () => {
       it('does not update existing criterion when the cancel button is clicked', async () => {
         queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
 
-        const {getByTestId, queryAllByTestId} = renderComponent()
+        const {getByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
         expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
 
         fireEvent.click(queryAllByTestId('rubric-criteria-row-edit-button')[0])
@@ -560,10 +556,6 @@ describe('RubricForm Tests', () => {
   })
 
   describe('assessed rubrics', () => {
-    beforeEach(() => {
-      jest.spyOn(Router, 'useParams').mockReturnValue({rubricId: '1'})
-    })
-
     afterEach(() => {
       jest.resetAllMocks()
     })
@@ -572,7 +564,7 @@ describe('RubricForm Tests', () => {
       const rubricQueryResponse = {...RUBRICS_QUERY_RESPONSE, unassessed: false}
       queryClient.setQueryData(['fetch-rubric-1'], rubricQueryResponse)
 
-      const {getByTestId, queryByTestId, queryAllByTestId} = renderComponent()
+      const {getByTestId, queryByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
       expect(getByTestId('rubric-form-title')).toHaveValue('Rubric 1')
       // expect(queryByTestId('rubric-hide-points-select')).toBeNull()
       expect(queryByTestId('rubric-rating-order-select')).toBeNull()
