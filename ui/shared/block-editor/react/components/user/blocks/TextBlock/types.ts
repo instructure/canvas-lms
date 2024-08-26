@@ -17,10 +17,11 @@
  */
 
 import React from 'react'
+import {type ResizableProps} from '../../../editor/types'
 
 export type TextBlockProps = {
   text?: string
   fontSize?: string
   textAlign?: React.CSSProperties['textAlign']
   color?: string
-}
+} & ResizableProps

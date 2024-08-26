@@ -119,7 +119,7 @@ const mockTrayProps = {
 
 const user = userEvent.setup()
 
-let props = {...ImageBlock.craft.defaultProps} as Partial<ImageBlockProps>
+let props: Partial<ImageBlockProps>
 
 const mockSetProp = jest.fn((callback: (props: Record<string, any>) => void) => {
   callback(props)
@@ -144,7 +144,7 @@ jest.mock('@craftjs/core', () => {
 
 describe('ImageBlockToolbar', () => {
   beforeEach(() => {
-    props = {...ImageBlock.craft.defaultProps}
+    props = {...(ImageBlock.craft.defaultProps as Partial<ImageBlockProps>)}
   })
 
   it('should render', () => {
@@ -209,7 +209,7 @@ describe('ImageBlockToolbar', () => {
     expect(props.constraint).toBe('cover')
   })
 
-  it('shows the size popup', async () => {
+  it('changes the image size prop', async () => {
     props.width = 117
     props.height = 217
     const {getByText} = render(<ImageBlockToolbar />)
@@ -217,40 +217,15 @@ describe('ImageBlockToolbar', () => {
     const btn = getByText('Image Size').closest('button') as HTMLButtonElement
     await user.click(btn)
 
-    expect(screen.getByText('Image size')).toBeInTheDocument()
-    expect(screen.getByText('Width')).toBeInTheDocument()
-    expect(screen.getByText('Height')).toBeInTheDocument()
-    expect(screen.getByText('117')).toBeInTheDocument()
-    expect(screen.getByText('217')).toBeInTheDocument()
-  })
+    expect(screen.getByText('Auto')).toBeInTheDocument()
+    expect(screen.getByText('Fixed size')).toBeInTheDocument()
+    expect(screen.getByText('Percent size')).toBeInTheDocument()
+    expect(
+      screen.getByText('Auto').closest('li')?.querySelector('svg[name="IconCheck"')
+    ).toBeInTheDocument()
 
-  it('sets the width and height props', async () => {
-    props.width = 117
-    props.height = 217
-    props.maintainAspectRatio = true
-    const {getByText} = render(<ImageBlockToolbar />)
-
-    const btn = getByText('Image Size').closest('button') as HTMLButtonElement
-    await user.click(btn)
-    expect(screen.getByText('Image size')).toBeInTheDocument()
-    expect(screen.getByText('Width')).toBeInTheDocument()
-    expect(screen.getByText('Height')).toBeInTheDocument()
-    expect(screen.getByText('117')).toBeInTheDocument()
-    expect(screen.getByText('217')).toBeInTheDocument()
-
-    const widthInput = screen.getByLabelText('Width') as HTMLInputElement
-    fireEvent.change(widthInput, {target: {value: '119'}})
-
-    expect(screen.getByText('119')).toBeInTheDocument()
-    expect(screen.getByText('221')).toBeInTheDocument()
-
-    const setButton = screen.getByText('Set').closest('button') as HTMLButtonElement
-    expect(setButton).toBeInTheDocument()
-    await user.click(setButton)
-
-    expect(mockSetProp).toHaveBeenCalled()
-    expect(props.width).toBe(119)
-    expect(props.height).toBe(221)
+    await user.click(screen.getByText('Fixed size'))
+    expect(props.sizeVariant).toBe('pixel')
   })
 
   it('can add an image from the AddImageModal', async () => {

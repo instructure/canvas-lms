@@ -17,12 +17,26 @@
  */
 
 import React from 'react'
+import userEvent from '@testing-library/user-event'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {useNode} from '@craftjs/core'
-import {render, screen} from '@testing-library/react'
-import {BlockResizer} from '../BlockResizer'
+import {render} from '@testing-library/react'
+import {BlockResizer, type Sz} from '../BlockResizer'
+import {eq} from 'lodash'
+
+const user = userEvent.setup()
+
+let props: Sz = {width: 100, height: 125}
+let maintainAspectRatio = false
 
 const nodeDomNode = document.createElement('div')
+nodeDomNode.getBoundingClientRect = jest.fn(() => {
+  return {top: 0, left: 0, ...props}
+})
+
+const mockSetProp = jest.fn((callback: (props: Record<string, any>) => void) => {
+  callback(props)
+})
 
 jest.mock('@craftjs/core', () => {
   const module = jest.requireActual('@craftjs/core')
@@ -31,24 +45,19 @@ jest.mock('@craftjs/core', () => {
     useNode: jest.fn(() => {
       return {
         actions: {
-          setProp: jest.fn(),
+          setProp: mockSetProp,
         },
         node: {
           dom: nodeDomNode,
-          data: {
-            props: {
-              width: 100,
-              height: 125,
-            },
-          },
         },
+        nodeProps: props,
+        maintainAspectRatio,
       }
     }),
   }
 })
 
-describe.skip('BlockResizer', () => {
-  // fixed with RCX-2259
+describe('BlockResizer', () => {
   beforeAll(() => {
     nodeDomNode.style.width = '100px'
     nodeDomNode.style.height = '125px'
@@ -56,6 +65,11 @@ describe.skip('BlockResizer', () => {
     const mountNode = document.createElement('div')
     mountNode.id = 'mountNode'
     document.body.appendChild(mountNode)
+  })
+
+  beforeEach(() => {
+    props = {width: 100, height: 125}
+    maintainAspectRatio = false
   })
 
   it('renders', () => {
@@ -81,5 +95,25 @@ describe.skip('BlockResizer', () => {
     expect(edges[1]).toHaveStyle({height: '1px'})
     expect(edges[2]).toHaveStyle({height: '1px'})
     expect(edges[3]).toHaveStyle({height: '1px'})
+  })
+
+  it('resizes using keyboard events', async () => {
+    const mountNode = document.getElementById('mountNode') as HTMLElement
+    render(<BlockResizer mountPoint={mountNode} />)
+
+    await user.keyboard('{Shift>}{Alt>}{ArrowRight}')
+    expect(props.width).toEqual(110)
+    expect(props.height).toEqual(125)
+  })
+
+  it('respects the aspect ratio', async () => {
+    maintainAspectRatio = true
+    const mountNode = document.getElementById('mountNode') as HTMLElement
+    render(<BlockResizer mountPoint={mountNode} />)
+
+    await user.keyboard('{Shift>}{Alt>}{ArrowRight}')
+    const ht = 110 * (125 / 100)
+    expect(props.width).toEqual(110)
+    expect(props.height).toEqual(ht)
   })
 })
