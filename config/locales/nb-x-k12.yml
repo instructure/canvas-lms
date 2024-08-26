@@ -208,6 +208,8 @@ nb-x-k12:
   _e59b5cb1: —
   a_and_b_cannot_be_used_together_77ee6a2a: "{a} og {b} kan ikke brukes sammen"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Det brukes ikke kalkuleringsverdi med denne beregningsmetoden"
+  a_canvas_security_token_was_just_generated_for_you_b03be18b: "Et Canvas sikkerhetsnøkkel ble nettopp generert for kontoen din av noen andre. Før den kan brukes, må nøkkelen aktiveres av deg her:"
+  a_canvas_security_token_was_just_generated_for_you_ef4021aa: "Et Canvas sikkerhetsnøkkel ble nettopp generert for kontoen din av noen andre. Hvis du forespurte et brukernøkkel er ingen ytterligere handlinger nødvendig. Før den kan brukes, må nøkkelen aktiveres av deg her:"
   a_canvas_security_token_was_just_generated_for_you_efeeac68: "Et Canvas sikkerhetsnøkkel ble nettopp generert for kontoen din. Hvis du forespurte et brukernøkkel er ingen ytterligere handlinger nødvendig. Hvis du ikke forespurte et nøkkel, eller ønsker å administrere sine Canvas-tilgangsnøkler, kan du gjøre det her"
   a_comma_delimited_list_of_external_tools_urls_to_i_ffe707f2: "En kommaseparert liste over lenker til eksterne verktøy som skal inkluderes i kolonnen ‘Antall Drop Box-innleveringer’"
   a_comma_delimited_list_of_user_ids_to_report_on_49e05a7: "En kommaseparert liste over user_ids å rapportere på"
@@ -224,6 +226,10 @@ nb-x-k12:
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "En logo i full størrelse som vises i det høyre sidefeltet på Canvas-skrivebordet. Ideell størrelse er 360 x 140 piksler. Aksepterte format: svg, png, jpeg og gif"
   a_great_discussion_6526a6d9: "En flott diskusjon"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Et praktisk nøkkel/verdi utslipp av mye interessant miljøinfo for rapporteringsbrukeren"
+  a_home_page_is_the_main_or_introductory_page_of_a__8c6b935b: |-
+      En startside er hoved- eller introduksjonssiden til et fag. Startsiden er vanligvis den
+              første siden du ser. Den fungerer som et sentralt knutepunkt, og veileder besøkende til andre deler av
+              faget.
   a_json_url_is_required_please_supply_one_ed03101c: "En json URL er nødvendig, vennligst skaff en."
   a_locked_file_named_name_already_exists_in_this_fo_33ca9a0c: "En låst fil med navnet “%{name}” finnes allerede i denne mappen. Skriv inn et nytt navn."
   a_locked_file_named_name_already_exists_please_ent_3b2e65a: "En låst fil med navnet “%{name}” finnes allerede. Skriv inn et nytt navn."
@@ -333,6 +339,7 @@ nb-x-k12:
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "Evne til å sende inn annoterte dokumentoppgaver."
   ability_to_submit_student_annotation_assignments_9ee47e3f: "Evne til å sende inn elevoppgaver."
   about_70c18bba: Om
+  about_intro_d50f2d36: "Om (intro)"
   about_smart_search_c8e7fcb4: "Om Smart søk"
   about_this_service_b10bc808: "Angående denne tjenesten"
   above_max_rating_64b29915: "Over maks. vurdering"
@@ -383,8 +390,11 @@ nb-x-k12:
   access_token_created_or_regenerated_4ce9ed1f: "Tilgangsnøkkel opprettet eller regenerert"
   access_token_manage_a626f071: "Tilgangsnøkkel – administrer"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Tilgangsnøkkel kan brukes for å tillate andre applikasjoner til å gjøre API-oppkall på dine vegne. Du kan også generere tilgangsnøkler og bruke *Canvas Open API* for å finne på dine egne integrasjoner."
+  access_tokens_create_update_bf2448af: "Tilgangsnøkler – opprett/oppdater"
+  access_tokens_delete_8ffe05d: "Tilgangsnøkler – slett"
   access_tokens_eea7e69f: Tilgangsnøkler
   access_your_courses_and_groups_using_any_ios_or_an_cdb6ad63: "Få tilgang til fagene og gruppene dine ved hjelp av en iOS eller Android mobilenhet og finn mer informasjon i Hjelpemenyen."
+  accessibility_a662153d: Tilgjengelighet
   accessibility_checker_notifications_da5a49e6: "Merknader for tilgjengelighetsquizer"
   accordion_section_1_7888782d: "Nedtrekksmeny-seksjon 1"
   accordion_section_2_e1812997: "Nedtrekksmeny-seksjon 2"
@@ -2084,9 +2094,11 @@ nb-x-k12:
   actions_efcde10d: Handlinger
   actions_for_course_312ff446: "Aksjonspunkter for %{course}"
   actions_taken_6fb20fd0: "Iverksatte tiltak"
+  activate_f0f53b32: aktiver
   activate_key_name_a99df672: "Aktiver nøkkel %{name}"
   activate_this_key_6cd98f4b: "Aktiver denne nøkkelen"
   active_announcements_6b67f33b: "Aktive beskjeder"
+  active_d04f222e: aktiv
   active_d7e32718: Aktiv
   active_development_53f63899: "Aktiv utvikling"
   active_directory_lookup_attribute_d317cb60: "Active Directory oppslagsattributt"
@@ -2637,6 +2649,7 @@ nb-x-k12:
   allow_reassigning_assignments_from_speedgrader_to__ff856a96: "Tillat tildeling av oppgaver på nytt fra SpeedGrader til en elevs gjøremålsliste"
   allow_reorder_dashboard_cards_78215947: "Tillat ny bestilling av kort til oversikten"
   allow_replies_for_title_cfe7af6c: "Tillat svar for %{title}"
+  allow_rich_content_from_other_sources_to_create_fi_fcd3bca: "Tillat Rich-innhold fra andre kilder å lage filkoblinger."
   allow_rtl_users_to_see_rtl_interface_3c4f8b86: "Tillat RTL-brukere for å se RTL-grensesnittet"
   allow_searching_grade_change_audit_logs_by_multipl_4aaa0110: "Tillat søk etter revisjonslogger for vurderingsendring etter flere kriterier"
   allow_self_sign_up_7520f8c5: "Tillat egenregistrering"
@@ -2897,6 +2910,7 @@ nb-x-k12:
   allows_user_to_configure_alerts_in_course_settings_f8acd7ba: "Lar en bruker konfigurere varslinger i faginnstillinger. Varslinger er en lite brukt funksjon designet for å sende et varsel til elever, lærere eller administratorer for spesifikke utløsere (f.eks. ingen lærer-elev-interaksjon i løpet av 7 dager). De sjekkes hver dag og varslinger vil sendes ut til eleven og/eller læreren frem til det utløsende problemet er løst."
   allows_user_to_copy_individual_course_items_to_ano_46ba40d6: "Lar en bruker kopiere individuelle fag-elementer til et annet fag."
   allows_user_to_create_a_course_pace_via_course_pac_2ec549c: "Lar brukeren opprette et fagtempo via Fagtempo."
+  allows_user_to_create_access_tokens_on_behalf_of_a_a7d37924: "Lar brukeren å opprette tilgangsnøkler på vegne av andre brukere."
   allows_user_to_create_account_or_course_groups_1d5c4aaf: "Lar brukeren opprette konto- eller faggrupper."
   allows_user_to_create_accounts_for_new_users_allow_bb7575e9: "Lar en bruker opprette kontoer for nye brukere. Lar en bruker fjerne og flette sammen brukere i en konto. Lar en bruker endre brukerkontodetaljer. Lar en bruker vise og modifisere innloggingsinformasjon for en bruker."
   allows_user_to_create_accounts_for_new_users_e4ec27c3: "Lar en bruker opprette kontoer for nye brukere."
@@ -2947,6 +2961,7 @@ nb-x-k12:
   allows_user_to_define_users_allowed_to_edit_the_pa_39fddc1c: "Lar en bruker definere brukere som har lov til å redigere siden."
   allows_user_to_delete_a_submission_file_65f1dd7d: "Lar en bruker slette en innsendingsfil."
   allows_user_to_delete_a_user_from_a_course_section_4b99a5c4: "Lar en bruker slette en bruker fra en fagseksjon."
+  allows_user_to_delete_access_tokens_on_behalf_of_a_404db3b1: "Lar brukeren å slette tilgangsnøkler på vegne av andre brukere."
   allows_user_to_delete_account_or_course_groups_3078d0c5: "Lar brukeren slette konto- eller faggrupper."
   allows_user_to_delete_assignment_groups_in_a_cours_88c89c76: "Lar brukeren slette oppgavegrupper i et fag."
   allows_user_to_delete_assignments_in_a_course_b0f220c4: "Lar brukeren slette oppgaver i et fag."
@@ -3083,6 +3098,7 @@ nb-x-k12:
   allows_user_to_publish_conclude_and_delete_courses_336cf352: "Lar en bruker publisere, fullføre og slette fag."
   allows_user_to_randomly_assign_users_to_a_course_g_e866fc4: "Lar brukeren tilfeldig tilordne brukere til en faggruppe."
   allows_user_to_randomly_assign_users_to_an_account_f6f24e8b: "Lar brukeren tilfeldig tilordne brukere til en konto- eller faggruppe."
+  allows_user_to_regenerate_access_tokens_on_behalf__10b03152: "Lar brukeren å regenerere tilgangsnøkler på vegne av andre brukere."
   allows_user_to_remove_a_course_as_a_course_templat_15e653d3: "Lar en bruker fjerne et fag som en fagmal i Faginnstillinger."
   allows_user_to_remove_a_course_as_a_course_templat_5a171e4c: "Lar brukeren fjerne et fag som en fagmal i Faginnstillinger. Lar brukeren angi at en konto ikke skal bruke en mal."
   allows_user_to_remove_a_student_s_section_enrollme_78d1916e: "Lar en bruker fjerne en elevs seksjonsregistrering eller rolle."
@@ -3155,12 +3171,16 @@ nb-x-k12:
   allows_user_to_share_course_items_directly_with_ot_b5a68ecc: "Lar brukeren dele fag-elementer med andre brukere. Lar brukeren kopiere individuelle fag-elementer til et annet fag."
   allows_user_to_share_course_items_directly_with_ot_e5793d35: "Lar en bruker dele fag-elementer med andre brukere."
   allows_user_to_start_conferences_they_created_281b03ea: "Lar en bruker starte videomøter de har opprettet"
+  allows_user_to_still_create_access_tokens_for_them_cc41a840: "Lar brukeren fortsatt opprette tilgangsnøkler for seg selv når innstillingen Begrens oppretting av personlig tilgangsnøkkel er på."
+  allows_user_to_still_regenerate_their_access_token_c5a4f856: "Lar brukeren fortsatt regenerere tilgangsnøklene sine når innstillingen Begrens oppretting av personlig tilgangsnøkkel er på."
+  allows_user_to_still_update_their_access_tokens_wh_bd1521d7: "Lar brukeren fortsatt oppdatere tilgangsnøklene sine når innstillingen Begrens oppretting av personlig tilgangsnøkkel er på."
   allows_user_to_sync_blueprint_courses_allows_user__61af2285: |-
       Lar brukeren synkronisere Blueprint-fag. Lar brukeren vise Blueprint-synkroniseringslogg. Lar en bruker vise og administrere fag i kontoen. Lar brukeren vise knappen Sjekkliste for fagetablering.
               Gir brukeren tilgang til Navigasjon-fanen i faginnstillinger. Lar brukeren redigere fagbilde, navn, fagkode, tidssone, underkonto, termin og andre alternativer i Fagdetaljer-fanen.
               Lar brukeren få tilgang til knappene Vis som elev (testelev), Kopier dette faget, Tilbakestill faginnhold og Slett fag permanent. Lar en bruker vise kontekstkort for elever i beskjeds- og diskusjonssvar.
   allows_user_to_sync_blueprint_courses_db4fcc03: "Lar en bruker synkronisere Blueprint-fag."
   allows_user_to_update_a_student_s_section_enrollme_80420ac9: "Lar en bruker oppdatere en elevs seksjonsregistrering eller rolle."
+  allows_user_to_update_access_tokens_on_behalf_of_a_7694f244: "Lar brukeren å oppdatere tilgangsnøkler på vegne av andre brukere."
   allows_user_to_update_modules_edit_module_settings_1f5cf0ae: "Lar brukeren oppdatere moduler (redigere modulinnstillinger, publisere, fjerne publisering, redigere gruppevis)."
   allows_user_to_update_modules_edit_module_settings_3a2636b: "Lar brukeren oppdatere moduler (redigere modulinnstillinger, publisere, fjerne publisering, redigere gruppevis, tildele moduler)."
   allows_user_to_view_a_content_migration_content_li_6906f889: "Lar brukeren se en innholdsmigreringsliste etter type."
@@ -3752,6 +3772,7 @@ nb-x-k12:
   app_name_3f58de4f: App-navn
   app_placements_6d877225: App-plasseringer
   app_reregistration_87cc8817: App-registrering
+  app_updated_successfully_6c353a8e: "Appen ble oppdatert!"
   app_was_installed_by_admin_and_is_locked_3bee4d39: "%{app} ble installert av Admin og er låst"
   app_was_installed_by_the_master_course_and_is_lock_dbeb24a6: "%{app} ble installert av moderfaget og er låst"
   app_was_installed_by_the_master_course_e55ba1d7: "%{app} ble installert av moderfaget"
@@ -4113,6 +4134,7 @@ nb-x-k12:
     select_external_tool_dialog_title: "Konfigurer eksternt verktøy"
     vericite_submission_types_validation: "VeriCite støtter kun filinnleveringer og tekstinntasting"
   assignment_enhancements_student_557372ab: "Oppgaveforbedringer - Elev"
+  assignment_enhancements_teacher_view_b10534ca: "Oppgaveforbedringer i Lærer-visning"
   assignment_excused_eb6c08fa: "Oppgave unnskyldt"
   assignment_extensions_cac06daa: Oppgaveutsettelse
   assignment_graded_grade_on_assignment_name_in_cour_5082fd1: "Oppgave vurdert: %{grade} på %{assignment_name} i %{course_code}"
@@ -5108,6 +5130,7 @@ nb-x-k12:
   back_to_title_39e7a8f4: "Tilbake til %{title}"
   background_color_b92b52ac: Bakgrunnsfarge
   background_image_1a401e1a: Bakgrunnsbilde
+  badges_e40b8880: Merker
   bank_grouped_quiz_submissions_479ad830: "Bankgrupperte quizinnleveringer"
   banner_image_id_is_not_a_valid_id_21ecc6: "banner_image_id er ikke en gyldig ID"
   banner_image_url_and_banner_image_id_cannot_both_b_955615f5: "banner_image_url og banner_image_id kan ikke begge settes."
@@ -5182,6 +5205,7 @@ nb-x-k12:
   blank_f91e6d3c: Blank
   blank_section_e1ef53d0: "Blank del"
   block_editor_2e266d9c: Blokkredigeringsverktøy
+  block_page_411bac87: "blokker side"
   blocked_30d0fb62: Blokkert
   blocked_by_running_migration_d8a57cb7: "Utsatt av pågående migrasjon"
   blocked_domain_name_b5b93150: "Sperret domene-navn"
@@ -5437,6 +5461,7 @@ nb-x-k12:
     unpublished: Upublisert
     update: Oppdater
   buttons_and_icons_e66ee12c: "Knapper og ikoner"
+  by_2c884fcd: av
   by_assignment_group_and_position_57a4be14: "Etter oppgavegruppe og posisjon"
   by_b90c6b6f: Av
   by_client_id_4f2fe02c: "Av klient-ID"
@@ -6147,6 +6172,12 @@ nb-x-k12:
   captured_image_91838f78: "Tatt bilde"
   card_view_eaf73185: Kortvisning
   careful_changes_to_group_membership_will_apply_to__19a9089c: "Forsiktig! Endringer til gruppemedlemskap blir brukt på alle grupper som allerede har oppgave-innsendinger. Det kan hende at gruppe-oppgave-innsendinger ikke blir justert på grunn av det. Vil du opprette en ny gruppe for fremtidige oppgaver?"
+  carousel_next_badge_button_5e69cc66: "Neste merke-knapp i Karusell"
+  carousel_next_product_button_f4828808: "Neste produkt-knapp i Karusell"
+  carousel_next_screenshot_button_7badba4d: "Neste skjermbilde-knapp i Karusell"
+  carousel_previous_badge_button_f8baae36: "Forrige merke-knapp i Karusell"
+  carousel_previous_product_button_15b585a6: "Forrige produkt-knapp i Karusell"
+  carousel_previous_screenshot_button_efff3847: "Forrige skjermbilde-knapp i Karusell"
   cas_server_rejected_ticket_5dc2a0bc: "CAS-server avviste billetten."
   cas_server_rejected_ticket_message_code_a6ef4093: "CAS-server avviste billetten: %{message} (%{code})"
   cas_url_4ba2843e: CAS-URL
@@ -6294,6 +6325,9 @@ nb-x-k12:
   choose_attribute_to_add_866e128d: "Velg en attributt å legge til"
   choose_calendars_to_add_be60ea17: "Velg kalendere for å legge til"
   choose_canvas_account_ec2f0279: "Velg Canvas-konto …"
+  choose_complimentary_font_pairings_for_your_h1_h2__2a6189c6: |-
+      Velg gratis skrifttyper for h1, h2, og avsnittstekst, eller velg din egen
+                senere.
   choose_course_home_page_d8642f9e: "Velg fag hjemmeside"
   choose_file_8d89ccab: "Velg fil"
   choose_home_page_80cef4ee: "Velg hjemmeside"
@@ -6317,6 +6351,7 @@ nb-x-k12:
   claims_225ec8a4: Krav
   clark_county_gradebook_c5ea74bb: "Clark County vurderingsoversikt"
   classic_596a314f: Klassisk
+  classic_page_6106fc1e: "klassisk side"
   classic_quizzes_dee3c7b7: "Klassisk Quizzes"
   classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Klassiske quizalternativer for tidsbestemte quizer uten innlevering"
   classic_quizzes_strip_origin_from_canvas_file_urls_78379a9a: "Klassiske tester: Fjern opphav fra URL-er til Canvas-fil i svar"
@@ -7026,6 +7061,7 @@ nb-x-k12:
   consortium_parent_keys_803547b: "Consortium Parent-nøkler"
   constraint_9eeab2e0: Begrensning
   consumer_key_6f94ba11: "Forbruker nøkkel"
+  contact_a6e7f6da: Kontakt
   contact_info_8e3304d1: Kontaktinformasjon
   contact_your_administrator_if_you_need_to_change_c_9002a501: "Ta kontakt med administratoren din om du trenger å endre fagsynlighet."
   contain_a16ae72a: Inneholde
@@ -7322,6 +7358,7 @@ nb-x-k12:
         user_privileges: Privilegier
       legends: 
         memberships: Medlemsskap
+        recent_messages: "Nylige beskjeder"
       links: 
         cant_delete: "Kan ikke slette"
         conclude_enrollment: Avslutt
@@ -7332,6 +7369,7 @@ nb-x-k12:
         user_account_details: "Brukerkonto detaljer"
         user_only_view_section: "begrens denne brukeren til kun å se brukere i samme klasse"
         user_view_all_sections: "la denne brukeren se alle fagdeltagere"
+      no_messages: "Ingen meldinger"
       user_only_view_section: "denne brukeren kan kun vise elever i deres tildelte fag(r)"
       user_view_all_sections: "denne brukeren kan vise elever i hele faget"
     no_user: 
@@ -9057,6 +9095,7 @@ nb-x-k12:
   create_a_new_announcement_for_coursename_8dede2d0: "Opprett en beskjed for %{courseName}"
   create_a_new_domain_lookup_1830a512: "Opprett nytt domeneoppslag"
   create_a_new_module_6f31b0fe: "Opprett en ny Modul"
+  create_a_new_page_b6d24490: "Opprett en ny side"
   create_a_new_user_for_address_7487e9c9: "Opprett en ny bruker for \"%{address}\""
   create_a_temporary_enrollment_167f05f1: "Opprett en midlertidig påmelding"
   create_a_temporary_enrollment_43de562a: "Opprett en midlertidig påmelding"
@@ -9138,8 +9177,11 @@ nb-x-k12:
   create_temporary_enrollment_pairing_for_name_33086b8b: "Opprett midlertidig påmeldingsparing for %{name}"
   create_theme_based_on_40651ed3: "Opprett tema basert på"
   create_theme_based_on_name_7b1bd318: "Lag tema basert på %{name}"
+  create_update_delete_ab4ba2f4: "Opprett / oppdater / slett"
+  create_user_access_tokens_99197175: "Opprett brukers tilgangsnøkkel"
   create_users_view: 
     required: "Vennligst skriv inn noen e-postadresser"
+  create_with_block_editor_53190c6d: "Opprett med blokkredigeringsverktøy"
   created_58b8a75a: Opprettet
   created_6ee36dff: "Opprettet:"
   created_ascending_cff48774: "Opprettet: Stigende"
@@ -9735,6 +9777,7 @@ nb-x-k12:
   delete_tool_app_9c9f6d35: "Slett %{tool} App?"
   delete_toolname_app_85f9d4ee: "Slett %{toolName} App"
   delete_track_fc21128b: "Slett spor"
+  delete_user_access_tokens_de51ff65: "Slett brukers tilgangsnøkkel"
   delete_work_e377128b: "Slett arbeid"
   delete_your_work_fe136221: "Slette arbeidet ditt?"
   deleted_1be5ed1: Slettet
@@ -10860,6 +10903,7 @@ nb-x-k12:
       formatting: "Formatering, trykk nedover for å velge"
       rte_help: "Riktekstområde. Trykk ALT+F8 for hjelp"
   editor_button_6647db9c: Editor-knapp
+  editsection_1bf813f5: EditSection
   either_course_or_student_c42bb055: "Enten ‘fag’ eller ‘elev’'"
   either_groupid_or_outcomeid_values_are_required_1ea29e33: "Enten gruppe-ID eller mål-ID kreves"
   either_the_url_or_domain_should_be_set_c29cf8c1: "Enten URL-en eller domenet må angis."
@@ -11796,6 +11840,7 @@ nb-x-k12:
   expected_array_of_objects_b09ead01: "Forventet oppstilling av objekter"
   expected_filter_param_to_be_one_of_visible_hidden_c658bc3: "Forventet at %{filter}-parameter er en av: %{visible}, %{hidden}"
   experimental_graphql_api_75c5eb8f: "EKSPERIMENTELL GraphQL API."
+  expired_3c77c435: utløp
   expires_at_6214b43f: Utløper
   explanation_of_statuses_90a26d07: "Forklaring av statuser:"
   explicit_latex_typesetting_c1c569c9: "Eksplisitt LaTeX-typesetting"
@@ -11864,6 +11909,7 @@ nb-x-k12:
   external_feeds_b6345379: "Eksterne strømmer"
   external_images_in_this_resource_were_unreachable_5d9cbad2: "Eksterne bilder i denne ressursen var utilgjengelige:"
   external_integration_keys_8b4f4548: "Eksterne integrasjonsnøkler"
+  external_links_3d9f074e: "Eksterne lenker"
   external_links_in_this_resource_were_unreachable_ad00a7e3: "Eksterne lenker i denne ressursen var utilgjengelige:"
   external_tool_6594ee34: "Eksternt verktøy"
   external_tool_c5a6410a: "Eksternt verktøy"
@@ -11979,11 +12025,13 @@ nb-x-k12:
   failed_to_import_media_objects_4c1fcb4f: "Feil ved import av medieobjekter"
   failed_to_import_some_lti_resource_links_ab124c3f: "Kunne ikke importere noen LTI-ressurslenker"
   failed_to_invalidate_portal_path_5bc31b91: "Kunne ikke ugyldiggjøre portalbanen"
+  failed_to_load_account_used_locations_c017dae7: "Kunne ikke laste inn kontoens brukte plasseringer"
   failed_to_load_announcement_for_originalname_5ae2eedc: "Kunne ikke laste inn beskjeder for %{originalName}."
   failed_to_load_announcements_429c16fc: "Kunne ikke laste inn beskjeder."
   failed_to_load_apps_db37e651: "Mislykket innlasting av apper."
   failed_to_load_apps_for_name_fc6ce1c: "Kunne ikke laste inn apper for %{name}."
   failed_to_load_assignments_in_important_dates_ce3b4227: "Kunne ikke laste oppgaver på viktige datoer."
+  failed_to_load_assignments_used_locations_2b37a5dd: "Kunne ikke laste inn oppgavenes brukte plasseringer"
   failed_to_load_conversation_messages_9b4546fc: "Kunne ikke laste inn samtalemeldinger."
   failed_to_load_course_navigation_for_name_aded3650: "Kunne ikke laste inn fagnavigasjon for %{name}."
   failed_to_load_course_settings_74168426: "Kunne ikke laste inn faginnstillinger"
@@ -12588,18 +12636,22 @@ nb-x-k12:
   grade_for_ungraded_artifacts_d0b6fb57: "Vurdering for artefakter uten vurdering"
   grade_for_ungraded_submissions_59f72299: "Vurdering for oppgaver uten vurdering"
   grade_grade_7e52dd1c: "Vurdering: %{grade}"
+  grade_grade_86a549c: "Vurdering ({{grade}})"
+  grade_grade_pointspossible_2292e404: "Vurdering ({{grade}} / {{pointsPossible}})"
   grade_high_to_low_1cea0381: "Vurdering – Høy til Lav"
   grade_info_19fb9875: Vurderinginfo
   grade_loading_bc1ad721: "Vurdering lastes inn"
   grade_low_to_high_1678b713: "Vurdering – lav til høy"
   grade_out_of_percentage_1972bf52: "Vurdering av %{percentage}"
   grade_out_of_points_d401b79d: "Vurdering av %{points}"
+  grade_out_of_pointspossible_5d484e03: "Vurdering av {{pointsPossible}}"
   grade_percentage_for_missing_submissions_dc7ccac: "Vurderingsprosent for forsinket innlevering"
   grade_posting_policy_42c8a94b: "Retningslinjer for vurderingsinnlegg"
   grade_posting_policy_name_a6d6f178: "Retningslinjer for vurderingsinnleggsbrett: %{name}"
   grade_posting_policy_tray_c929cfd: "Retningslinjer for vurderingsinnleggsbrett"
   grade_saved_300616e9: "Vurdering lagret"
   grade_saved_ab539b53: "Vurdering lagret."
+  grade_score_pointspossible_2892a99: "Vurdering ({{score}} / {{pointsPossible}})"
   grade_selection_table_dcf9d1ea: "Vurdering utvalgstabell"
   grade_summary: 
     graph_title: "Gjennomsnitt %{mean}, Høy %{high}, Lav %{low}"
@@ -13717,6 +13769,7 @@ nb-x-k12:
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Her er en flott mulighet til å bli kjent med kalenderen og legge til ikke-oppgave-relaterte hendelser du kanskje har til faget. Ikke bekymre deg, vi vil hjelpe deg gjennom det."
   here_s_some_quick_tips_to_get_you_started_in_canva_72425979: "Her er noen raske tips for å komme i gang med Canvas!"
   hero_15005a9b: Helt
+  hero_image_with_text_a1e032df: "Hero-bilde med tekst"
   hh_mm_5faafa69: "tt:mm"
   hi_contrast_373b614f: "Høy kontrast"
   hidden_130c3791: skjult
@@ -13741,6 +13794,7 @@ nb-x-k12:
   hide_courses_navigation_menu_6f7c4cfd: "Skjul menyen for fag navigering"
   hide_courses_without_enrollments_6df4dfad: "Skjul emner uten påmeldinger"
   hide_courses_without_students_fc6fc7a0: "Skjul fag uten elever"
+  hide_details_a38c2218: "Skjul %{details}"
   hide_details_df9ef4a2: "Skjul detaljer"
   hide_e057ff36: Skjul
   hide_from_everyone_9fc3e6d0: "Skjul for alle"
@@ -13786,6 +13840,7 @@ nb-x-k12:
   high_score_47924c1a: "Høy: %{score}"
   highest_28ad71e6: Høyest
   highest_score_e080551e: "Høyeste poengsum"
+  highlights_or_services_c81cc209: "Høydepunkter eller tjenester"
   hindi_9bcd4b34: Hindi
   historical_data_lacks_records_for_installed_by_9448a7b2: "Historiske data mangler poster for «installert av.\""
   historical_data_lacks_records_for_updated_by_f9d9fe48: "Historiske data mangler poster for «oppdatert av.\""
@@ -14019,6 +14074,7 @@ nb-x-k12:
               tillatelsen la en bruker vise faginnhold uten å være registrert i faget.
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "Hvis deaktivert vil brukeren fortsatt ha tilgang til faginnstillinger. Brukeren kan ikke administrere spesifikt faginnhold uten tilsvarende tillatelser for den innholdsartikkelen. Hvis fagsynlighet er begrenset til brukere som er registrert i faget vil denne tillatelsen la brukeren vise faginnhold uten å være registrert i faget."
   if_disabled_user_will_still_have_access_to_course__fbf32c87: "Hvis deaktivert vil brukeren fortsatt ha tilgang til faginnstillinger."
+  if_enable_profiles_is_checked_at_the_account_setti_b206d8d1: "Hvis Aktiver profil er merket av i Kontoinnstillinger og dette flagget er «På», vil Nylige meldinger vises på siden Ny brukerliste."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "Om de er aktivert, vil tilgang til LTI 1,3 og LTI Fordel bli aktivert."
   if_enabled_ags_scores_api_requests_that_include_a__4f0e6bec: |-
       Hvis aktivert, vil AGS Scores API-forespørsler som inkluderer en filopplasting fra en URL som går ut,
@@ -14801,6 +14857,7 @@ nb-x-k12:
   invalid_freq_freq_84b0427d: "Ugyldig FREQ '%{freq}'"
   invalid_grade_9726cbc6: "Ugyldig karakter"
   invalid_grade_passback_setting_a1d209d1: "Ugyldig grade_passback_setting"
+  invalid_grade_value_ee0f694: "Ugyldig vurderingsverdi"
   invalid_grading_scheme_4a95ba92: "Ugyldig vurderingsskala"
   invalid_hexcode_9124519f: "Ugyldig hex-kode"
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "Ugyldig hex-kode. Angi en gyldig hex-kode her for å velge en tilpasset farge."
@@ -14841,6 +14898,7 @@ nb-x-k12:
   invalid_sis_sync_status_b68db497: "Ugyldig SIS synkroniseringsstatus"
   invalid_state_parameter_7a5aa108: "Ugyldig tilstandsparameter"
   invalid_status_1f4c0fd2: "ugyldig status"
+  invalid_step_6305dd03: "Ugyldig trinn"
   invalid_submission_file_type_cda6742a: "Ugyldig filtype for innsending"
   invalid_targetcontexttype_53b96e87: "Ugyldig targetContextType"
   invalid_tenant_tenant_da757c4b: "Ugyldig bruker %{tenant}"
@@ -15026,6 +15084,7 @@ nb-x-k12:
   json_url_adbee260: "JSON URL"
   july_83babbee: Juli
   jump_to_navigation_toolbar_2952cd8b: "Hopp til verktøylinjen for navigasjon"
+  jump_to_speedgrader_navigation_4d008e0a: "Hopp til SpeedGrader-navigasjon"
   jump_to_today_254ccf41: "Hopp til i dag"
   june_a58d8523: Juni
   just_a_casual_question_comment_idea_or_suggestion_1579d069: "Bare et tilfeldig spørsmål, kommentar, idé eller forslag"
@@ -15488,12 +15547,14 @@ nb-x-k12:
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Abonnement-tjenesten Live-arrangementer er ikke konfigurert"
   liveassessments_92d9edc0: Sanntidsvurderinger
   lms_7100682c: LMS
+  load_assignments_1510530d: "Laster inn oppgaver …"
   load_bank: 
     error_loading_banks: "Kunne ikke laste banker"
     loading_banks: "Laster banker …"
   load_gradebook_assignments_by_grading_period_919dfd3c: "Last inn vurderingsoversiktoppgaver etter vurderingsperiode"
   load_more_35d33c7: "Last inn mer"
   load_more_a36f9cf9: "Last inn flere"
+  load_more_assignments_f708f2e7: "Laster inn flere oppgaver …"
   load_more_comments_dc00ac34: "Last  Flere Kommentarer"
   load_more_results_460f49a9: "Last flere resultater"
   load_previous_comments_c3aaa07d: "Last inn tidligere kommentarer"
@@ -15823,6 +15884,7 @@ nb-x-k12:
   lti_advantage_services_c1746cb4: "LTI-fordel tjenester"
   lti_apps_discover_page_cd95458b: "Oppdagelsesside for LTI-apper"
   lti_apps_page_bd3867af: "Side for LTI-apper"
+  lti_apps_page_features_in_development_99c65559: "Sidefunksjon for LTI-apper under utvikling"
   lti_context_id_should_be_unique_7437a74d: "lti_context_id må være unik"
   lti_deep_linking_for_module_index_menu_881feeee: "LTI dyp kobling for modulens indeksmeny"
   lti_deep_linking_line_items_5e0079f7: "LTI dyplenke-linjeelementer"
@@ -18201,6 +18263,7 @@ nb-x-k12:
   more_options_for_subject_e18d421: "Flere alternativer for %{subject}"
   more_outcomes_have_been_loaded_9acafe9c: "Flere mål er lastet inn"
   more_people_options_730e9686: "Alternativer for flere deltakere"
+  more_products_by_21cbfa37: "Flere produkter fra"
   more_registration_options_9ebbdfe9: "Flere registreringsalternativer"
   more_results_were_added_at_the_bottom_of_the_page_dc323877: "Flere resultater ble lagt til på bunnen av siden."
   more_search_results_have_been_loaded_13f3872a: "Flere søkeresultater er lastet inn"
@@ -18232,6 +18295,7 @@ nb-x-k12:
   move_discussion_9ff5b2d1: "Flytt Diskusjoner"
   move_discussion_title_93ea7be1: "Flytt diskusjon %{title}"
   move_down_4a9c9b18: "Flytt ned"
+  move_down_eaae3426: "Flytt ned"
   move_group_3dd7f76e: "Flytt gruppe"
   move_group_77ae285d: "Flytt gruppe…"
   move_grouptitle_20927676: "Flytt «%{groupTitle}»\""
@@ -18267,6 +18331,7 @@ nb-x-k12:
   move_to_top_e0d7d66e: "Flytt til toppen"
   move_to_using_instui_for_several_components_and_im_21898396: "Gå over til å bruke InstUI for flere komponenter og implementer et lagersystem"
   move_up_2440f707: "Flytt opp"
+  move_up_b1c4d3a5: "Flytt opp"
   moved_assignment_name_to_scoring_range_lower_upper_edd6fc4e: "Flyttet oppgave %{name} til vurderingsområde %{lower} - %{upper}"
   moves_406183ad: "Flytt:"
   moving_a4d552df: Flytting…
@@ -18554,6 +18619,10 @@ nb-x-k12:
   new_quiz_deleted_user_restore_pending_review_state_a117d744: "Ny quiz slettet brukergjenoppretting venter på gjennomgang ved registrering"
   new_quiz_items_3c850331: "Nye quiz-elementer"
   new_quizzes_account_and_course_level_item_banks_9152fb1: "Nye quizer-konto og elementbanker på fagnivå"
+  new_quizzes_and_eventually_others_need_a_way_to_cr_c6062bc8: |-
+      Nye quizer (og etter hvert andre) trenger en måte å lage fillenker på som fungerer mer uavhengig
+      av Canvas. Denne API-en tillater opprettelse av lenkeplasseringer slik at vi kan spore filer koblet i det rike
+      innholdet av andre verktøy og gi tilgang til dem fra disse stedene.
   new_quizzes_assignment_build_button_72b6531a: "Bygge-knapp for Nye quizer-oppgaver"
   new_quizzes_banks_migrations_9ab4de4a: "Nye quizer bankoverføringer"
   new_quizzes_build_button_in_module_items_10f651fb: "Bygg nye tester-knappen i modulelementer"
@@ -18613,6 +18682,7 @@ nb-x-k12:
   next_assignment_8ec51175: "Neste oppgave"
   next_assignment_c19812a5: "Neste oppgave"
   next_e0d38b1f: neste
+  next_in_speedgrader_5d064c99: "Neste i SpeedGrader"
   next_item_2d1ddc96: "Neste: *element*"
   next_maintenance_at_window_59f7f603: "Neste vedlikehold den: %{window}"
   next_mastery_path_is_currently_locked_a9253711: "Neste mestringsvei er for øyeblikket låst"
@@ -19026,6 +19096,7 @@ nb-x-k12:
     missing_description_description: "For %{category}-varslinger"
     missing_display_display: "For %{category}-varslinger"
     names: 
+      access_token_created_on_behalf_of_user: "Tilgangsnøkkel opprettet på vegne av bruker"
       account_notification: Kontovarslinger
       account_user_notification: "Kontobruker varslinger"
       account_user_registration: Kontobrukerregistrering
@@ -19171,6 +19242,7 @@ nb-x-k12:
   notifications_search_results_80a0b06f: "Varslinger Søkeresultater"
   notifications_unsupported_65f6bf65: "Varslinger støttes ikke"
   notifications_view_f9a60770: "Varslinger - vis"
+  notifications_will_not_be_sent_retroactively_for_a_8f22b9b0: "Varslinger vil ikke bli sendt med tilbakevirkende kraft for beskjeder som ble opprettet før faget ble publisert eller startdato for fag. Du kan vurdere å bruke alternativet Tilgjengelig fra og angi publisering på en fremtidig dato."
   notifications_will_not_be_sent_retroactively_for_a_e84dc84e: "Varslinger vil ikke bli sendt med tilbakevirkende kraft for beskjeder som ble opprettet før faget ble publisert eller startdato for fag. Du kan vurdere å bruke alternativet Utsett publisering og angi publisering på en fremtidig dato."
   notify_immediately_d1749c07: "Varsle umiddelbart"
   notify_students_in_time_of_assignments_that_requir_332ef10e: "Gi beskjed til elevene om oppgaver som krever deres oppmerksomhet."
@@ -19821,6 +19893,7 @@ nb-x-k12:
   page_title_ascending_b5df950c: "Sidetittel: Stigende"
   page_title_d1a22bbf: Sideoverskrift
   page_title_descending_70c1483d: "Sidetittel: Synkende"
+  page_type_d1e0fec7: sidetype
   page_views: 
     browsers: 
       unrecognized: "Ukjent nettleser"
@@ -20725,6 +20798,9 @@ nb-x-k12:
   precise_link_replacement_on_content_migrations_51976596: "Presis lenkeerstatning på innholdsflyttinger"
   prefer_lti_tools_with_a_matching_client_id_when_fi_b6cf4809: "Foretrekk LTI-verktøy med en matchende klient-ID når du finner et eksternt verktøy"
   prefetch_user_ids_in_gradebook_b96521b0: "Forhåndslastet Bruker-ID i Vurderingsoversikt"
+  preload_your_page_with_section_placeholders_you_wi_607400a8: |-
+      Last inn siden med seksjonsplassholdere på forhånd Du vil kunne redigere, slette eller legge til flere
+                seksjoner senere.
   prerequisite_completion_period_c562d63: "Forhåndskrav fullføringsperiode"
   prerequisite_f361cd61: Forutsetning
   prerequisites_49659f16: "Forhåndskrav:"
@@ -20772,6 +20848,7 @@ nb-x-k12:
   previous_csv_file_time_d7bfe7ef: "Forrige CSV-fil (%{time})"
   previous_csv_timestamp_6673c69c: "Forrige CSV (%{timestamp})"
   previous_export_c6a997f7: "Forrige eksport"
+  previous_in_speedgrader_3567f09b: "Tidligere i SpeedGrader"
   previous_message_8804f87e: "Forrige melding"
   previous_module_8801a74b: "Forrige modul"
   previous_module_item_2bb5e499: "Forrige modul/element"
@@ -20796,6 +20873,7 @@ nb-x-k12:
   priority_dd4381ee: Prioritet
   privacy_290109ea: Personvern
   privacy_level_f0ec09a3: Personvern-nivå
+  privacy_policy_c68f482a: "Retningslinjer for personvern"
   private_3883d133: Privat
   private_key_is_present_in_certificate_file_1a1b7b42: "Privat nøkkel finnes i sertifikatfilen"
   pro_tip_30e41fa3: PROFFTIPS!
@@ -20830,6 +20908,7 @@ nb-x-k12:
         delete_this_token: "Slett denne nøkkelen"
     account_notification_settings_title: Varslingsinnstillinger
     buttons: 
+      activating_token: "aktiverer …"
       generate_token: "Generer nøkkel"
       generating_token: "Genererer nøkkel …"
       regenerate_token: "Regenerer nøkkel"
@@ -20862,6 +20941,7 @@ nb-x-k12:
       default_email_option: "[Velg e-post]"
       new_email_option: "Ny e-postadresse"
     errors: 
+      activating_token_failed: "Aktiveringsnøkkel mislyktes"
       generating_token_failed: "Generering av nøkkel mislyktes"
       invalid_old_passowrd: "Ugyldig gammelt passord for logg inn %{pseudonym}"
       profile_update_failed: "Oppdatering av logg inn mislyktes"
@@ -20928,6 +21008,7 @@ nb-x-k12:
         registered_services: "Registrerte tjenester"
         remove: Fjern
         share_skype_id: "Del Skype-ID-en din"
+        state: Status
         twitter_access: Twitter-tilgang
         ways_to_log_in: "Måter å logge inn"
         web_services: Web-tjenester
@@ -21481,6 +21562,7 @@ nb-x-k12:
   quiz_menu_4fcd5e61: quiz-meny
   quiz_not_assigned_to_student_4b1846d5: "Quiz ikke tildelt elev"
   quiz_question_1da5198e: Quizspørsmål
+  quiz_question_e4d37bd8: Quizspørsmål
   quiz_question_groups_bd0bb222: "Grupper for quizspørsmål"
   quiz_questions_ecea3c40: Quizspørsmål
   quiz_reports: 
@@ -23131,6 +23213,7 @@ nb-x-k12:
   resource_card_697e279e: Ressurskort
   resource_link_not_found_for_given_resource_link_lo_43f5183a: "Ressurs-lenken ble ikke funnet for gitt `resource_link_lookup_uuid`"
   resource_url_must_match_the_resource_handler_s_dom_b768cf: "URL-adressen må samsvare med handler-domenet"
+  resources_and_documents_60843bbb: "Ressurser og dokumenter"
   resources_ccefab27: Ressurser
   respond_to_all_lti_postmessages_sent_from_tools_la_51029001: |-
       Svar på alle LTI postMessages som er sendt fra verktøy som er startet innenfor iframes i et aktivt RCE
@@ -23850,7 +23933,9 @@ nb-x-k12:
       confirming_course: "Bekrefter %{course_name}…"
       removing_crosslisting_of_section: "Fjerner krysslisting av seksjon…"
   section_84b5391: seksjon
+  section_above_4c8f6e29: "+ seksjoner over"
   section_added_83879254: "%{section} lagt til"
+  section_below_fc074a49: "+ seksjoner under"
   section_browser_ded460ac: Seksjonsleser
   section_c7f66a0d: Seksjon
   section_course_pacing_8fb7efac: "Fagtempo for seksjon"
@@ -23978,6 +24063,7 @@ nb-x-k12:
   select_a_student_to_view_281d17b9: "Velg en elev for å vise"
   select_a_student_to_view_additional_information_he_c371e40c: "Velg en elev for å vise mer informasjon her."
   select_a_student_to_view_the_page_will_refresh_aut_eaa5d00c: "Velg en elev for å vise. Siden oppdateres automatisk."
+  select_a_template_7e398a55: "Velg en mal"
   select_a_template_account_e0c03ee8: "Velg en malkonto"
   select_a_type_to_restore_de2c0d04: "Velg en type å gjenopprette"
   select_access_type_e5955544: "Velg tilgangstype"
@@ -24040,6 +24126,14 @@ nb-x-k12:
   select_dates_to_remove_be55b14c: "Velg datoer du vil fjerne"
   select_embedded_content_type_966f048a: "Velg innebygd innholdstype"
   select_final_grade_for_moderation_b76a0baf: "Velg siste vurdering for moderasjon"
+  select_font_pairings_a970429e: "Velg skrifttyper"
+  select_from_a_variety_of_pre_designed_page_layouts_6041d222: "Velg fra en rekke av forhåndsdesignede sideoppsett som er klare til å fylles med innholdet ditt."
+  select_from_a_variety_of_pre_designed_page_layouts_7f3e867a: |-
+      Velg fra en rekke av forhåndsdesignede sideoppsett som er klare til å fylles med
+                    innholdet ditt.
+  select_from_a_variety_of_style_options_or_start_wi_2330fb6d: |-
+      Velg fra en rekke slike alternativer eller start med et tomt lerret for å lage en side
+                    som er skreddersydd for dine spesifikke behov.
   select_from_saved_comments_dd398cd4: "Velg fra lagrede kommentarer"
   select_grader_782af48: "Lagre moderator"
   select_grading_period_4ce4cd3a: "Velg vurderingsperiode"
@@ -25065,9 +25159,11 @@ nb-x-k12:
   show_projections_32a3756: "Vis anslag"
   show_quartiles_for_grades_and_use_them_for_box_and_e9be0a23: "Vis kvartiler for karakterer og bruk dem til boksplott"
   show_question_details_b059df00: "Vis spørsmålsdetaljer"
+  show_recent_messages_on_new_roster_user_page_38451867: "Vis nylige meldinger på ny brukerside"
   show_report_to_students_a07888a6: "Vis rapport til elevene"
   show_rubric_dca783f2: "Vis vurderingskriterier"
   show_saved_what_if_scores_358bfe5f: "Vis lagrede hva-om resultater"
+  show_sections_in_course_tray_2fa08349: "Vis seksjoner i fagskuffen."
   show_sub_accounts_for_account_name_fa71a658: "Vis under-kontoer for %{account_name}"
   show_suggestions_when_typing_b72545de: "Vis forslag når du skriver"
   show_to_d57767f: "Vis til"
@@ -25489,6 +25585,7 @@ nb-x-k12:
   start_at_c7a5789: "Start: "
   start_at_end_at_b375cbe7: "| %{start_at} - %{end_at}"
   start_auto_refresh_e2feafb2: "Start automatisk oppdatering"
+  start_creating_1b8a6134: "Begynn å opprette"
   start_date_e937be8a: Startdato
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
   start_date_field_for_styleguide_8a8ab1d6: "Startdato-felt for styleguide"
@@ -25502,9 +25599,11 @@ nb-x-k12:
   start_date_to_1e6e6bbe: "Startdato til:"
   start_date_value_817cab96: "Startdato %{value}"
   start_dates_8f1c22a8: "Startdatoer:"
+  start_editing_29a4b05e: "Start redigering"
   start_end_date_4a7a56da: "Start- og sluttdato"
   start_end_dates_aaa00ecf: "Start- og sluttdatoer"
   start_entry_4b491f60: "Start innlevering"
+  start_from_scratch_ea99d7e6: "Start fra bunnen av"
   start_link_validation_dc0ac99c: "Start lenke-validering"
   start_over_f7552aa9: "Start på nytt"
   start_participating_f0c75256: "Begynn å delta"
@@ -26286,6 +26385,8 @@ nb-x-k12:
   teal_f729a294: Blågrønn
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Fortell oss hvordan og når du ønsker å bli varslet om hendelser i Canvas."
   tempe_grade_export_c611da01: "Tempe vurderingseksport"
+  template_1_f0d858b8: "mal 1"
+  template_2_69d10902: "mal 2"
   template_account_21ac8f4f: Malkonto
   template_account_is_not_a_root_account_83ae89bc: "Malkontoen er ikke en rotkonto"
   template_account_is_not_a_template_account_d80200ae: "Malkontoen er ikke en malkonto"
@@ -26298,6 +26399,7 @@ nb-x-k12:
   temporary_enrollment_option_links_eb9b8b2e: "Midlertidig påmeldingsalternativ-lenker"
   temporary_enrollment_pairings_56f35f5c: "Midlertidige påmeldingsparinger"
   temporary_enrollment_was_successfully_created_78b48a7a: "Midlertidig påmelding ble opprettet."
+  temporary_enrollment_was_successfully_updated_9ea3705a: "Midlertidig påmelding ble oppdatert."
   temporary_enrollments_add_373181b7: "Midlertidige påmeldinger – legg til"
   temporary_enrollments_delete_52ffaae4: "Midlertidige påmeldinger – slett"
   temporary_enrollments_edit_67c01325: "Midlertidige påmeldinger – rediger"
@@ -26422,7 +26524,7 @@ nb-x-k12:
       timespan: "%{start_at} *til* %{end_at}"
   terms_not_found_terms_must_be_included_with_multi__ca2e5c25: "Termin ikke funnet. Termin må inkluderes med multi_term_batch_mode"
   terms_of_service_attributes_not_valid_f3f9fca9: "Attributter for brukervilkår ikke gyldige"
-  terms_of_service_f183ff7f: Brukervilkår
+  terms_of_service_f183ff7f: Tjenestevilkår
   test_cluster_only_70e61c19: "Kun quizklynger"
   test_feature_flag_980151e0: Funksjonsflagget
   test_tube_22b34165: testrør
@@ -26504,6 +26606,7 @@ nb-x-k12:
   the_chosen_date_and_time_is_invalid_a7c96651: "Valgt dato og tidspunkt er ugyldig."
   the_client_id_clientid_is_disabled_b4a02cb1: "Klient-IDen %{clientId} er slått av"
   the_columns_section_is_a_flexible_layout_that_allo_a6b3df4: "Kolonnedelen er en fleksibel layout som lar deg legge til flere blokker side ved side."
+  the_configuration_is_invalid_please_reach_out_to_t_3710068b: "Konfigurasjonen er ugyldig. Ta kontakt med appleverandøren for å få hjelp."
   the_content_security_policy_allows_you_to_restrict_197ca4ff: |-
       Innholdet sikkerhetspolitikk tillater deg å begrense tilpasset
                      JavaScript som kjører i din variant av Canvas. Du kan manuelt legge til
@@ -26826,6 +26929,7 @@ nb-x-k12:
   theme_editor_changes_have_been_cancelled_2af5cc5f: "Endringer i Temaeditor har blitt avbrutt."
   theme_editor_refactor_f8d8bdfa: "Theme Editor Refactor"
   theme_name_68f46e09: Temanavn
+  theme_your_page_with_a_preselected_accessibility_c_e0b84c0d: "Gi siden din et tema med en forhåndsvalgt, tilgjengelighetskompatibel fargepalett."
   themes_89bfe9c4: Tema
   then_adjust_sections_and_students_pacing_individua_48a4feb9: "Juster deretter Seksjoner og Elevtempo individuelt for en tilpasset timeplan"
   there_are_count_associations_906edb03: 
@@ -28650,6 +28754,7 @@ nb-x-k12:
   unknown_881e8eb9: ukjent
   unknown_account_74d30b82: "ukjent konto"
   unknown_answers_9688a2bc: "Ukjente svar"
+  unknown_checkpoint_5ae4fea6: "Ukjent sjekkpunkt"
   unknown_compression_method_b6a850b5: "ukjent kompresjons-metode"
   unknown_conference_c4f13ad0: "Ukjent videomøte"
   unknown_content_type_ae6d08e8: "Ukjent innholdstype"
@@ -28786,6 +28891,7 @@ nb-x-k12:
       Oppdater og vis seksjoner, fagdetaljer, navigasjon, funksjonsvalg
       og eksterne appintegrasjoner, bare synlig for instruktører.
   update_announcement_discussion_edit_page_to_use_re_94972b60: "Oppdater redigeringssiden for beskjeder/diskusjon for å bruke react/instu"
+  update_app_b2b8c794: "Oppdater app"
   update_comment_8cedb4f0: "Oppdater kommentar"
   update_comments_21991be0: "Oppdater kommentarer"
   update_criterion_edcbd330: "Oppdater kriterium"
@@ -28833,7 +28939,9 @@ nb-x-k12:
   updates_the_student_facing_assignment_statistics_t_e1c9aecb: "Oppdaterer statistikken for elevvendte oppgaver så den inkluderer kvartiler, og ferdigstiller det fullstendige boksplottet."
   updates_to_json_api_auth_error_http_code_and_json__5936d452: "Oppdateringer til JSON API-autentiseringsfeil HTTP-kode og JSON-statusfelt."
   updates_to_oauth_2_0_flow_to_stop_redirecting_in_t_51c14b07: "Oppdateringer til OAuth 2.0-flyt for å stoppe omdirigering av ‘token’-autentiseringen"
+  updates_to_the_teacher_view_of_assignments_71e9bded: "Oppdateringer av Lærer-visningen for oppgaver."
   updating_6edbab78: Oppdaterer
+  updating_app_9d772fe4: "Oppdaterer app"
   updating_discussion_failed_aadb2d35: "Kunne ikke oppdatere diskusjon"
   updating_publication_date_62cc1622: "Oppdaterer publiseringsdato"
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "Oppdatering av Catalog URL vil gjøre den gamle URL-en utilgjengelig for brukere umiddelbart! Hvis det er konfigurert en eksisterende betalingsbehandler, vil endringer kreve hjelp fra en Catalog-ingeniør."
@@ -29457,6 +29565,7 @@ nb-x-k12:
   users_do_not_receive_updated_notifications_when_ed_11038e1a: "Brukere mottar ikke oppdaterte varsler når en beskjed redigeres. Hvis du ønsker at brukerne skal bli varslet om denne oppdateringen via sine varslingsinnstillinger, må du opprette en ny beskjed."
   users_generate_observer_pairing_codes_for_students_2c25d52a: "Brukere - genererer observasjon-paringskoder for elever"
   users_generate_observer_pairing_codes_for_students_6975caad: "Brukere - generer observatørparingskoder for elever"
+  users_manage_access_tokens_6fc61f72: "Brukere – Administrer tilgangsnøkler"
   users_manage_log_in_details_b944568b: "Brukere - behandle innloggingsdetaljer"
   users_manage_login_details_9462b30f: "Brukere - administrer innloggingsdetaljer"
   users_manage_observers_126f03a3: "Brukere - administrer observatører"
@@ -29665,6 +29774,7 @@ nb-x-k12:
   warning_step_has_children_that_aren_t_stepitem_com_32a3f351: "Advarsel Steg har barn som ikke er StepItem komponenter"
   warning_step_has_two_stepitems_with_a_status_of_in_77138e9e: "Advarsel: Steg har to StepItems med en status pågående"
   warning_the_placement_placement_is_only_allowed_fo_4e119a65: "Advarsel: plasseringen %{placement} er kun tillatt for LTI-verktøy godkjent av Instructure. Hvis du mener at du mottatt denne denne meldingen ved en feiltakelse, kontakt support."
+  warning_the_resource_selection_placement_is_deprec_458af5b2: "Advarsel: resource_selection-plasseringen er utdatert. Bruk assignment_selection og/eller link_selection i stedet."
   warning_the_submission_type_selection_placement_is_d327c8d: "Advarsel: plasseringen submission_type_selection er kun tillatt for LTI-verktøy godkjent av Instructure. Hvis du mener at du mottatt denne denne meldingen ved en feiltakelse, kontakt support."
   warning_you_are_about_to_adjust_this_group_s_membe_a04281b6: "Advarsel! Du er i ferd med å endre medlemskapet i denne gruppen. *Denne endringen vil påvirke eksisterende gruppeinnleveringer, merknader og kommentarer og resultater som tap av data for BÅDE denne gruppen og elevens tidligere gruppe.*** For å forhindre utilsiktede konsekvenser med eksisterende gruppeinnleveringer, lag en ny gruppe for fremtidige oppgaver. **"
   warnings: 
@@ -29728,6 +29838,7 @@ nb-x-k12:
   webct_name: "Blackboard Vista/CE (WebCT)"
   webhooks_subscriptions_ed524e73: "Webhooks abonnementer"
   webhooks_subscriptions_for_plagiarism_platform_84bdd5a9: "Webhooks-abonnementer for plagiatplattform"
+  website_adea4d05: Nettside
   website_url_177fc1dc: "Nettstedets URL"
   website_url_b995c5b6: "Nettsidens Url"
   website_url_input_1a3eab25: "Nettside url-input"
@@ -29887,6 +29998,7 @@ nb-x-k12:
   when_enabled_the_internal_access_manager_will_be_u_bc470109: "Når aktivert, vil intern tilgangsbehandling brukes for å regulere tilgangen til visse forespørsler"
   when_enabled_the_lti_apps_discover_page_will_be_av_39ad751c: "Når aktivert, vil Oppdag-siden for LTI-apper være tilgjengelig på Apper-siden."
   when_enabled_the_lti_apps_page_will_be_available_i_23ec031f: "Når aktivert, vil siden for LTI-apper være tilgjengelig i sidefeltet Kontonavigering."
+  when_enabled_the_lti_apps_page_will_have_features__53fc471d: "Når den er aktivert, vil siden for LTI-apper ha funksjoner som for øyeblikket er under utvikling."
   when_enabled_the_lti_extensions_discover_page_will_8bb57ff6: "Når aktivert, vil Oppdagelsessiden for LTI-utvidelser være tilgjengelig i Utvidelsesvisningen."
   when_enabled_the_lti_extensions_page_will_be_avail_ac8ed3fa: "Når aktivert, vil siden for LTI-utvidelser være tilgjengelig i Kontonavigering."
   when_enabled_the_new_submission_type_resource_card_c0f45d0d: "Når de er aktivert, vil nye ressurskort for innleveringstype vises på redigeringssiden for oppgaven."
