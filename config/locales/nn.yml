@@ -6260,9 +6260,11 @@ nn:
           utan å måtte utveksle e-postadresser.
       how_to_start_a_new_collaboration: "Dersom du vil vite meir om ein bestemt type samarbeid, kan du klikke på \"Start nytt samarbeid\" og deretter velje samarbeidstype i rullegardinmenyen."
       links: 
+        collaboration: Samarbeid
         new: "Start nytt samarbeid"
       page_title: Samarbeid
       titles: 
+        collaborations: Samarbeid
         current: "Gjeldande samarbeid"
     lti_collaborations: "Eksterne samarbeid"
     show: 
