@@ -48,6 +48,41 @@ module QuizVisibility
           exec_find_quiz_visibility_query(query_sql:, query_params:)
         end
 
+        def find_quizzes_assigned_to_sections(course_id_params:, user_id_params:, quiz_id_params:)
+          filter_condition_sql = filter_condition_sql(course_id_params:, user_id_params:, quiz_id_params:)
+          query_sql = <<~SQL.squish
+            #{quiz_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* join context modules */
+            #{VisibilitySqlHelper.module_items_join_sql(content_tag_type: "Quizzes::Quiz")}
+
+            /* join assignment overrides (assignment or related context module) for CourseSection */
+            #{VisibilitySqlHelper.assignment_override_section_join_sql(id_column_name: "quiz_id")}
+
+            /* filtered to course_id, user_id, quiz_id, and additional conditions */
+            #{VisibilitySqlHelper.section_override_filter_sql(filter_condition_sql:)}
+
+            EXCEPT
+
+            #{quiz_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* join assignment override for 'CourseSection' (no module check) */
+            #{VisibilitySqlHelper.assignment_override_unassign_section_join_sql(id_column_name: "quiz_id")}
+
+            /* filtered to course_id, user_id, quiz_id, and additional conditions */
+            #{VisibilitySqlHelper.assignment_override_unassign_section_filter_sql(filter_condition_sql:)}
+          SQL
+
+          query_params = query_params(course_id_params:, user_id_params:, quiz_id_params:)
+          exec_find_quiz_visibility_query(query_sql:, query_params:)
+        end
+
         # section overrides and related module section overrides
         def find_quizzes_visible_to_sections(course_id_params:, user_id_params:, quiz_id_params:)
           filter_condition_sql = filter_condition_sql(course_id_params:, user_id_params:, quiz_id_params:)
@@ -85,6 +120,44 @@ module QuizVisibility
 
             /* filtered to course_id, user_id, quiz_id, and additional conditions */
             #{VisibilitySqlHelper.assignment_override_unassign_section_filter_sql(filter_condition_sql:)}
+          SQL
+
+          query_params = query_params(course_id_params:, user_id_params:, quiz_id_params:)
+          exec_find_quiz_visibility_query(query_sql:, query_params:)
+        end
+
+        def find_quizzes_assigned_to_adhoc_overrides(course_id_params:, user_id_params:, quiz_id_params:)
+          filter_condition_sql = filter_condition_sql(course_id_params:, user_id_params:, quiz_id_params:)
+          query_sql = <<~SQL.squish
+            #{quiz_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* join context modules */
+            #{VisibilitySqlHelper.module_items_join_sql(content_tag_type: "Quizzes::Quiz")}
+
+            /* join assignment override for 'ADHOC' */
+            #{VisibilitySqlHelper.assignment_override_adhoc_join_sql(id_column_name: "quiz_id")}
+
+            /* join AssignmentOverrideStudent */
+            #{VisibilitySqlHelper.assignment_override_student_join_sql}
+
+            /* filtered to course_id, user_id, quiz_id, and additional conditions */
+            #{VisibilitySqlHelper.adhoc_override_filter_sql(filter_condition_sql:)}
+
+            EXCEPT
+
+            #{quiz_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* join assignment overrides for 'ADHOC' (no module check) */
+            #{VisibilitySqlHelper.assignment_override_unassign_adhoc_join_sql(id_column_name: "quiz_id")}
+
+            /* filtered to course_id, user_id, quiz_id, and additional conditions */
+            #{VisibilitySqlHelper.assignment_override_unassign_adhoc_filter_sql(filter_condition_sql:)}
           SQL
 
           query_params = query_params(course_id_params:, user_id_params:, quiz_id_params:)
