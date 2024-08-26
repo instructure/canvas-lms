@@ -61,6 +61,8 @@ module Canvas::Security
         # require_number_characters: false,
         # require_symbol_characters: false,
         # allow_login_suspension: false,
+        # common_passwords_attachment_id: nil,
+        # common_passwords_folder_id: nil,
         minimum_character_length: DEFAULT_CHARACTER_LENGTH,
         maximum_login_attempts: DEFAULT_LOGIN_ATTEMPTS
       }
