@@ -110,6 +110,19 @@ module UngradedDiscussionVisibility
 
         if Account.site_admin.feature_enabled?(:selective_release_optimized_services_v3)
           UngradedDiscussionVisibility::Repositories::UngradedDiscussionVisibleToStudentRepository.full_discussion_topic_visibility_query(course_id_params:, user_id_params:, discussion_topic_id_params:)
+        elsif Account.site_admin.feature_enabled?(:selective_release_optimized_services_v2)
+          visible_discussion_topics = []
+
+          # add discussion topics visible to everyone
+          discussion_topics_visible_to_all = UngradedDiscussionVisibility::Repositories::UngradedDiscussionVisibleToStudentRepository
+                                             .find_discussion_topics_visible_to_everyone(course_id_params:, user_id_params:, discussion_topic_id_params:)
+          visible_discussion_topics |= discussion_topics_visible_to_all
+
+          # add discussion topics assigned to sections, students, or the course
+          discussion_topics_assigned_to_others = UngradedDiscussionVisibility::Repositories::UngradedDiscussionVisibleToStudentRepository
+                                                 .find_discussion_topics_assigned_to_others(course_id_params:, user_id_params:, discussion_topic_id_params:)
+
+          visible_discussion_topics | discussion_topics_assigned_to_others
         else
           visible_discussion_topics = []
 
