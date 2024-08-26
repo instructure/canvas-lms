@@ -5769,9 +5769,11 @@ hu:
           Ezen az oldalon könnyen nyomon követhetik (ahogy Ön is) az együttműködés alakulását, és még az e-mail címükre sincs szükség hozzá.
       how_to_start_a_new_collaboration: "Ha adott típusú együttműködésről szeretne bővebb információt, akkor az \"Új együttműködés kezdeményezése\" szakaszban válassza ki a kívánt típust a legördülő listából."
       links: 
+        collaboration: Együttműködés
         new: "Új együttműködés kezdeményezése"
       page_title: Együttműködés
       titles: 
+        collaborations: Együttműködés
         current: "Aktuális együttműködések"
     lti_collaborations: "Külső együttműködések"
     show: 
