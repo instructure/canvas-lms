@@ -4620,12 +4620,14 @@ tr:
           Belirli bir türde işbirliği hakkında billgi edinmek için "Yeni Bir İşbirliği Başlat" a tıklayıp sarkık menüden uygun
           plan türü seçin.
       links: 
+        collaboration: İşbirliği
         delete: "Bu İşbirliğini Sil"
         edit: "Bu İşbirliğini Düzenle"
         new: "Yeni bir işbirliği başlat"
       page_title: İşbirliği
       started_by: "*%{user}*, tarafından %{at} 'de başlatıldı"
       titles: 
+        collaborations: "İşbirliğine Yönelik Çalışmalar"
         current: "Geçerli İşbirliği Çalışmaları"
     lti_collaborations: LTICollaborations
     show: 
