@@ -33,6 +33,13 @@ If the provider can configure valid callback or redirect URIs, use %{callback_ur
   <%= f.text_field :token_url, class: 'ic-Input', id: "token_url_#{presenter.id_suffix(aac)}" %>
 </div>
 <div class="ic-Form-control">
+  <%= f.label :token_endpoint_auth_method, 'Token Endpoint Authentication Method', class: 'ic-Label', for: "token_endpoint_auth_method_#{presenter.id_suffix(aac)}" %>
+  <%= f.select(:token_endpoint_auth_method,
+               AuthenticationProvider::OpenIDConnect::VALID_AUTH_METHODS,
+               {},
+               class: 'ic-Input', id: "token_endpoint_auth_method_#{presenter.id_suffix(aac)}") %>
+</div>
+<div class="ic-Form-control">
   <%= f.label :end_session_endpoint, 'End Session Endpoint', class: 'ic-Label', for: "end_session_endpoint_#{presenter.id_suffix(aac)}" %>
   <%= f.text_field :end_session_endpoint, class: 'ic-Input', id: "end_session_endpoint_#{presenter.id_suffix(aac)}" %>
   <% if @domain_root_account.feature_enabled?(:oidc_rp_initiated_logout_params) %>

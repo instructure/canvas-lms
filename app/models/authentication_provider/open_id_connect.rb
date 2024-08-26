@@ -21,6 +21,11 @@
 class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
   attr_accessor :instance_debugging
 
+  VALID_AUTH_METHODS = %w[
+    client_secret_basic
+    client_secret_post
+  ].freeze
+
   def self.sti_name
     (self == OpenIDConnect) ? "openid_connect" : super
   end
@@ -38,7 +43,8 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
        login_attribute
        end_session_endpoint
        userinfo_endpoint
-       jit_provisioning].freeze
+       jit_provisioning
+       token_endpoint_auth_method].freeze
   end
 
   def self.recognized_params
@@ -72,6 +78,7 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
       userinfo: -> { t("Userinfo") },
     }]
   end
+  validates :token_endpoint_auth_method, inclusion: { in: VALID_AUTH_METHODS }
 
   alias_attribute :end_session_endpoint, :log_out_url
 
@@ -132,11 +139,15 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
   end
 
   def userinfo_endpoint=(value)
-    value = value.presence
-    unless userinfo_endpoint == value
-      settings_will_change!
-      settings["userinfo_endpoint"] = value
-    end
+    settings["userinfo_endpoint"] = value.presence
+  end
+
+  def token_endpoint_auth_method
+    settings["token_endpoint_auth_method"] || "client_secret_post"
+  end
+
+  def token_endpoint_auth_method=(value)
+    settings["token_endpoint_auth_method"] = value.presence
   end
 
   protected
@@ -146,7 +157,14 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
   end
 
   def client_options
-    super.merge(auth_scheme: :request_body)
+    super.tap do |options|
+      case token_endpoint_auth_method
+      when "client_secret_basic"
+        options[:auth_scheme] = :basic_auth
+      when "client_secret_post"
+        options[:auth_scheme] = :request_body
+      end
+    end
   end
 
   private
