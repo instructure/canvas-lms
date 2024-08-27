@@ -6304,6 +6304,7 @@ nn:
   color_a363e1b0: Farge
   color_color_for_mastery_level_position_35079de: "Farge %{color} for ekspertisenivå %{position}"
   color_overlay_fb5ecce7: Fargelag
+  column_e1ae5c64: kollonne
   columns_464bd055: Kolonnar
   come_back_later_5eab7dba: "Kom tilbake seinare"
   coming_soon_79d46687: "KJEM SNART"
@@ -22723,6 +22724,7 @@ nn:
     filter_multiple_users_found: "Funne %{userCount} brukarar."
     filter_no_users_found: "Finn ikkje samsvarande brukarar."
     filter_one_user_found: "Funne 1 brukar."
+  row_fc0944a7: Rad
   row_row_message_e369e49e: "Rad %{row}: %{message}"
   rsa_sha1_c457d751: RSA-SHA1
   rsa_sha256_3d41d605: RSA-SHA256
