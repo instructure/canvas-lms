@@ -381,6 +381,8 @@ const DiscussionTopicManager = props => {
                     display="block"
                     height={isModuleItem ? '85vh' : '90vh'}
                     padding={responsiveProps.padding}
+                    overflowX='auto'
+                    overflowY='auto'
                   >
                     <DiscussionTopicHeaderContainer
                       discussionTopicTitle={discussionTopicQuery.data.legacyNode.title}
