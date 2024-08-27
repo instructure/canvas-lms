@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
+import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 import {LtiScopes} from '../../model/LtiScope'
 
 export const mockInternalConfiguration = (

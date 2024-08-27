@@ -17,19 +17,17 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {Button} from '@instructure/ui-buttons'
-import {Modal} from '@instructure/ui-modal'
 import * as React from 'react'
 import type {AccountId} from '../model/AccountId'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 import type {UnifiedToolId} from '../model/UnifiedToolId'
-import {Heading} from '@instructure/ui-heading'
-import {Text} from '@instructure/ui-text'
 import {LaunchSettings} from './components/LaunchSettings'
 import {createLti1p3RegistrationWizardState} from './Lti1p3RegistrationWizardState'
+import {PermissionConfirmationWrapper} from './components/PermissionConfirmationWrapper'
+import {Button} from '@instructure/ui-buttons'
+import {Modal} from '@instructure/ui-modal'
+import {Text} from '@instructure/ui-text'
 import {RegistrationModalBody} from '../registration_wizard/RegistrationModalBody'
-import {useValidateLaunchSettings} from './hooks/useValidateLaunchSettings'
-import {useOverlayStore} from './hooks/useOverlayStore'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -61,14 +59,31 @@ export const Lti1p3RegistrationWizard = (props: Lti1p3RegistrationWizardProps) =
         <LaunchSettings
           overlayStore={store.state.overlayStore}
           unregister={props.unregister}
-          onNextClicked={() => store.setStep('DataSharing')}
+          onNextClicked={() => store.setStep('Permissions')}
         />
+      )
+    case 'Permissions':
+      // TODO: Handle the case where the internal config is undefined and allow for manual configuration
+      return (
+        <>
+          <PermissionConfirmationWrapper
+            overlayStore={store.state.overlayStore}
+            internalConfig={props.internalConfiguration!}
+          />
+          <Modal.Footer>
+            <Button onClick={() => store.setStep('LaunchSettings')} margin="small">
+              {I18n.t('Previous')}
+            </Button>
+            <Button onClick={() => store.setStep('DataSharing')} color="primary" margin="small">
+              {I18n.t('Next')}
+            </Button>
+          </Modal.Footer>
+        </>
       )
     case 'DataSharing':
     case 'Icons':
     case 'Naming':
     case 'OverrideURIs':
-    case 'Permissions':
     case 'Placements':
     case 'Review':
       return (
@@ -77,7 +92,7 @@ export const Lti1p3RegistrationWizard = (props: Lti1p3RegistrationWizardProps) =
             <Text>TODO: Implement the rest of the steps</Text>
           </RegistrationModalBody>
           <Modal.Footer>
-            <Button onClick={() => store.setStep('LaunchSettings')}>Back</Button>
+            <Button onClick={() => store.setStep('Permissions')}>Back</Button>
           </Modal.Footer>
         </div>
       )
