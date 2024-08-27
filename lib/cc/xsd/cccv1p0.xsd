@@ -340,6 +340,7 @@
               <xs:enumeration value="side_comment"/>
               <xs:enumeration value="threaded"/>
               <xs:enumeration value="flat"/>
+              <xs:enumeration value="not_threaded"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
