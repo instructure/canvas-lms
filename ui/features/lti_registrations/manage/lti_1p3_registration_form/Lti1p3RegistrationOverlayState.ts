@@ -86,6 +86,7 @@ export interface Lti1p3RegistrationOverlayActions {
   setDomain: (domain: string) => void
   setCustomFields: (customFields: string) => void
   toggleScope: (scope: LtiScope) => void
+  setPrivacyLevel: (privacyLevel: LtiPrivacyLevel) => void
 }
 
 export type Lti1p3RegistrationOverlayStore = StoreApi<
@@ -145,6 +146,15 @@ export const createLti1p3RegistrationOverlayStore = (internalConfig: InternalLti
         })
       )
     },
+    setPrivacyLevel: privacyLevel =>
+      set(
+        updateState(state => ({
+          ...state,
+          data_sharing: {
+            privacy_level: privacyLevel,
+          },
+        }))
+      ),
   }))
 
 const initialOverlayStateFromInternalConfig = (
