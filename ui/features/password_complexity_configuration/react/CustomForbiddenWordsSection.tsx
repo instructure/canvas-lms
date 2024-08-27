@@ -77,7 +77,6 @@ const deleteForbiddenWordsFile = async (attachmentId: number): Promise<void> => 
         },
       },
     }
-    delete updatedPasswordPolicy.account.settings.password_policy.common_passwords_folder_id
     delete updatedPasswordPolicy.account.settings.password_policy.common_passwords_attachment_id
 
     const updateAccountUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/`
