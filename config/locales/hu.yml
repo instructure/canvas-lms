@@ -5812,6 +5812,7 @@ hu:
   color_option_colorlabel_hex_code_hexcode_ba314ad3: "Színválaszték %{colorLabel}, hex kód:%{hexcode}"
   color_overlay_fb5ecce7: "Színes réteg"
   columbia_college_chicago_custom_canvas_usage_repor_b6e2ee88: "Columbia College - Chicago Egyedi Canvas használati jelentés"
+  column_e1ae5c64: Oszlop
   columns_464bd055: Oszlopok
   come_back_later_5eab7dba: "Jöjjön vissza később!"
   coming_soon_79d46687: HAMAROSAN
@@ -21302,6 +21303,7 @@ hu:
     filter_multiple_users_found: "%{userCount} talált felhasználó."
     filter_no_users_found: "Egy egyező felhasználó sincs"
     filter_one_user_found: "1 talált felhasználó."
+  row_fc0944a7: Sor
   row_row_message_e369e49e: "Sor %{row}: %{message}"
   rsa_sha1_c457d751: RSA-SHA1
   rsa_sha256_3d41d605: RSA-SHA256
