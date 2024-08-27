@@ -292,6 +292,31 @@ describe DiscussionTopicsController do
             expect(visible_ids_to_student).to include(@topic.id)
           end
         end
+
+        it "is visible to teacher" do
+          @shard1.activate do
+            @account_admin = account_admin_user(account: @course.root_account)
+          end
+          @topic = @course.discussion_topics.create!(title: "student topic", message: "Hello", user: @account_admin)
+          @topic.update!(only_visible_to_overrides: true)
+          @topic.assignment_overrides.create!(set: @course_section)
+          @shard2.activate do
+            @teacher = user_factory(active_all: true)
+          end
+          Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
+          @course.enroll_teacher(@teacher, section: @course_section, allow_multiple_enrollments: true).accept!
+
+          user_session(@teacher)
+          @shard2.activate do
+            get "index", params: { course_id: @course }, format: :json
+            parsed_json = json_parse(response.body)
+            visible_ids_to_teacher = parsed_json.pluck("id")
+
+            expect(@topic.visible_for?(@teacher)).to be_truthy
+            expect(response).to have_http_status(:success)
+            expect(visible_ids_to_teacher).to include(@topic.id)
+          end
+        end
       end
     end
 
