@@ -20,5 +20,9 @@
 
 threads 0, 1
 
-# Phased restart cannot be used if `preload_app` is enabled
-preload_app! false if ENV["RAILS_ENV"] == "production"
+if ENV["RAILS_ENV"] == "production"
+  # Phased restart cannot be used if `preload_app` is enabled
+  preload_app! false
+
+  worker_boot_timeout 240 # seconds
+end
