@@ -90,7 +90,7 @@ export default ({
   return (
     <Transition
       unmountOnExit={true}
-      transitionOnMount={true}
+      transitionOnMount={false}
       in={rubricAssessmentTrayOpen}
       type="fade"
     >
