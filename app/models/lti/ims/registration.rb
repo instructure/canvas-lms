@@ -51,7 +51,8 @@ class Lti::IMS::Registration < ApplicationRecord
 
   validate :redirect_uris_contains_uris,
            :lti_tool_configuration_is_valid,
-           :scopes_are_valid
+           :scopes_are_valid,
+           :validate_overlay
 
   validates :initiate_login_uri,
             :jwks_uri,
@@ -332,6 +333,15 @@ class Lti::IMS::Registration < ApplicationRecord
       # Convert errors represented as a Hash to JSON
       config_errors.is_a?(Hash) ? config_errors.to_json : config_errors
     )
+  end
+
+  def validate_overlay
+    return if registration_overlay.blank?
+
+    overlay_errors = Schemas::Lti::IMS::RegistrationOverlay.simple_validation_errors(registration_overlay)
+    if overlay_errors.present?
+      errors.add(:registration_overlay, overlay_errors.join("; "))
+    end
   end
 
   def canvas_placement_name(placement)

@@ -91,6 +91,8 @@ class TokenScopes
     LTI_REPLACE_EDITOR_CONTENT_SCOPE => I18n.t("Can replace the entire contents of the RCE.")
   }.freeze
 
+  ALL_LTI_SCOPES = [*LTI_SCOPES.keys, *LTI_HIDDEN_SCOPES.keys].uniq.freeze
+
   def self.named_scopes
     return @_named_scopes if @_named_scopes
 

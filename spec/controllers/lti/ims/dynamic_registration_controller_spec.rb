@@ -501,4 +501,33 @@ describe Lti::IMS::DynamicRegistrationController do
       expect(response.headers["Content-Security-Policy"]).to include("testexample.com")
     end
   end
+
+  describe "#update_registration_overlay" do
+    let(:overlay) do
+      {
+        disabledPlacements: ["course_navigation"],
+        placements: [
+          {
+            type: "account_navigation",
+            icon_url: "https://example.com/icon.jpg"
+          }
+        ]
+      }
+    end
+
+    it "updates the registration_overlay on the registration" do
+      registration = lti_ims_registration_model(account: Account.default)
+      user_session(account_admin_user(account: Account.default))
+      put :update_registration_overlay, params: { account_id: Account.default.id, registration_id: registration.id }, body: overlay.to_json
+      expect(response).to be_successful
+      expect(Lti::IMS::Registration.find(registration.id).registration_overlay).to eq(overlay.deep_stringify_keys)
+    end
+
+    it "returns a 422 if the request body does not meet the schema" do
+      registration = lti_ims_registration_model(account: Account.default)
+      user_session(account_admin_user(account: Account.default))
+      put :update_registration_overlay, params: { account_id: Account.default.id, registration_id: registration.id }, body: overlay.merge({ invalid: "data" }).to_json
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+  end
 end
