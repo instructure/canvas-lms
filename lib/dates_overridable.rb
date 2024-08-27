@@ -140,31 +140,66 @@ module DatesOverridable
   end
 
   def self.preload_overrides(learning_objects)
-    learning_objects_overrides = AssignmentOverride.where(assignment_id: learning_objects.select { |lo| lo.is_a?(Assignment) }.map(&:id))
-                                                   .or(AssignmentOverride.where(quiz_id: learning_objects.select { |lo| lo.is_a?(Quizzes::Quiz) }.map(&:id)))
-                                                   .or(AssignmentOverride.where(discussion_topic_id: learning_objects.select { |lo| lo.is_a?(DiscussionTopic) }.map(&:id)))
-                                                   .or(AssignmentOverride.where(wiki_page_id: learning_objects.select { |lo| lo.is_a?(WikiPage) }.map(&:id)))
+    assignment_ids, quiz_ids, discussion_topic_ids, wiki_page_ids = learning_objects.each_with_object([[], [], [], []]) do |lo, (a_ids, q_ids, d_ids, w_ids)|
+      a_ids << lo.id if lo.is_a?(Assignment)
+      q_ids << lo.id if lo.is_a?(Quizzes::Quiz)
+      d_ids << lo.id if lo.is_a?(DiscussionTopic)
+      w_ids << lo.id if lo.is_a?(WikiPage)
+    end
+
+    learning_objects_overrides = AssignmentOverride.where(assignment_id: assignment_ids)
+                                                   .or(AssignmentOverride.where(quiz_id: quiz_ids))
+                                                   .or(AssignmentOverride.where(discussion_topic_id: discussion_topic_ids))
+                                                   .or(AssignmentOverride.where(wiki_page_id: wiki_page_ids))
+
+    grouped_overrides = learning_objects_overrides.each_with_object({
+                                                                      assignments: hash_with_default_array_values,
+                                                                      quizzes: hash_with_default_array_values,
+                                                                      discussion_topics: hash_with_default_array_values,
+                                                                      wiki_pages: hash_with_default_array_values
+                                                                    }) do |override, acc|
+      acc[:assignments][override.assignment_id] << override if override.assignment_id
+      acc[:quizzes][override.quiz_id] << override if override.quiz_id
+      acc[:discussion_topics][override.discussion_topic_id] << override if override.discussion_topic_id
+      acc[:wiki_pages][override.wiki_page_id] << override if override.wiki_page_id
+    end
+
     learning_objects.each do |lo|
-      lo.preloaded_overrides = if lo.is_a?(AbstractAssignment)
-                                 learning_objects_overrides.select { |ao| ao.assignment_id == lo.id }
-                               elsif lo.is_a?(Quizzes::Quiz)
-                                 learning_objects_overrides.select { |ao| ao.quiz_id == lo.id }
-                               elsif lo.is_a?(DiscussionTopic)
-                                 learning_objects_overrides.select { |ao| ao.discussion_topic_id == lo.id }
-                               elsif lo.is_a?(WikiPage)
-                                 learning_objects_overrides.select { |ao| ao.wiki_page_id == lo.id }
-                               end
+      category = category(lo)
+      overrides = grouped_overrides.dig(category, lo.id) || []
+      lo.preloaded_overrides = overrides
+    end
+  end
+
+  def self.hash_with_default_array_values
+    Hash.new { |h, k| h[k] = [] }
+  end
+
+  def self.category(learning_object)
+    if learning_object.is_a?(AbstractAssignment)
+      :assignments
+    elsif learning_object.is_a?(Quizzes::Quiz)
+      :quizzes
+    elsif learning_object.is_a?(DiscussionTopic)
+      :discussion_topics
+    elsif learning_object.is_a?(WikiPage)
+      :wiki_pages
     end
   end
 
   def self.preload_module_ids(learning_objects)
-    assignments = learning_objects.select { |lo| lo.is_a?(AbstractAssignment) }
-    quizzes_with_assignments = Quizzes::Quiz.where(assignment_id: assignments.map(&:id))
-    quizzes = learning_objects.select { |lo| lo.is_a?(Quizzes::Quiz) } + quizzes_with_assignments
-    discussions_with_assignments = DiscussionTopic.where(assignment_id: assignments.map(&:id))
-    discussion_topics = learning_objects.select { |lo| lo.is_a?(DiscussionTopic) } + discussions_with_assignments
-    pages_with_assignments = WikiPage.where(assignment_id: assignments.map(&:id))
-    wiki_pages = learning_objects.select { |lo| lo.is_a?(WikiPage) } + pages_with_assignments
+    assignments, lo_quizzes, lo_discussions, lo_wiki_pages = learning_objects.each_with_object([[], [], [], []]) do |lo, (a, q, d, w)|
+      a << lo if lo.is_a?(AbstractAssignment)
+      q << lo if lo.is_a?(Quizzes::Quiz)
+      d << lo if lo.is_a?(DiscussionTopic)
+      w << lo if lo.is_a?(WikiPage)
+    end
+    quizzes_with_assignments = Quizzes::Quiz.where(assignment_id: assignments)
+    quizzes = lo_quizzes + quizzes_with_assignments
+    discussions_with_assignments = DiscussionTopic.where(assignment_id: assignments)
+    discussion_topics = lo_discussions + discussions_with_assignments
+    pages_with_assignments = WikiPage.where(assignment_id: assignments)
+    wiki_pages = lo_wiki_pages + pages_with_assignments
     tags_scope = ContentTag.not_deleted.where(tag_type: "context_module")
     module_ids = tags_scope.where(content_type: "Assignment", content_id: assignments.map(&:id))
                            .or(tags_scope.where(content_type: "Quizzes::Quiz", content_id: quizzes.map(&:id)))
