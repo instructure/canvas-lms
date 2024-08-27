@@ -27,6 +27,7 @@ import {PermissionConfirmationWrapper} from './components/PermissionConfirmation
 import {Button} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
 import {Text} from '@instructure/ui-text'
+import {PrivacyConfirmationWrapper} from './components/PrivacyConfirmationWrapper'
 import {RegistrationModalBody} from '../registration_wizard/RegistrationModalBody'
 
 const I18n = useI18nScope('lti_registrations')
@@ -81,10 +82,26 @@ export const Lti1p3RegistrationWizard = (props: Lti1p3RegistrationWizardProps) =
         </>
       )
     case 'DataSharing':
-    case 'Icons':
-    case 'Naming':
-    case 'OverrideURIs':
+      return (
+        <>
+          <PrivacyConfirmationWrapper
+            appName={internalConfiguration!.title}
+            overlayStore={store.state.overlayStore}
+          />
+          <Modal.Footer>
+            <Button onClick={() => store.setStep('Permissions')} margin="small">
+              {I18n.t('Previous')}
+            </Button>
+            <Button onClick={() => store.setStep('Placements')} color="primary" margin="small">
+              {I18n.t('Next')}
+            </Button>
+          </Modal.Footer>
+        </>
+      )
     case 'Placements':
+    case 'OverrideURIs':
+    case 'Naming':
+    case 'Icons':
     case 'Review':
       return (
         <div>
@@ -92,7 +109,9 @@ export const Lti1p3RegistrationWizard = (props: Lti1p3RegistrationWizardProps) =
             <Text>TODO: Implement the rest of the steps</Text>
           </RegistrationModalBody>
           <Modal.Footer>
-            <Button onClick={() => store.setStep('Permissions')}>Back</Button>
+            <Button onClick={() => store.setStep('DataSharing')} margin="small">
+              {I18n.t('Previous')}
+            </Button>
           </Modal.Footer>
         </div>
       )
