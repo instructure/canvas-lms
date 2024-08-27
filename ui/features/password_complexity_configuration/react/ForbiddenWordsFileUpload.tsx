@@ -31,6 +31,7 @@ import {Flex} from '@instructure/ui-flex'
 import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import './ForbiddenWordsFileUpload.module.css'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const I18n = useI18nScope('password_complexity_configuration')
 
@@ -44,10 +45,10 @@ interface FileDetails {
 interface Props {
   open: boolean
   onDismiss: () => void
-  onSave: () => void
+  onSave: (attachmentId: number | null) => void
   setForbiddenWordsUrl: (url: string | null) => void
   setForbiddenWordsFilename: (filename: string | null) => void
-  folderId: number
+  // folderId: number | null
 }
 
 const initialFileDetails: FileDetails = {url: null, filename: null}
@@ -58,7 +59,6 @@ const ForbiddenWordsFileUpload = ({
   onSave,
   setForbiddenWordsUrl,
   setForbiddenWordsFilename,
-  folderId,
 }: Props) => {
   const [fileDropMessages, setFileDropMessages] = useState<FormMessage[]>([])
   const [fileDetails, setFileDetails] = useState<FileDetails>(initialFileDetails)
@@ -105,6 +105,16 @@ const ForbiddenWordsFileUpload = ({
     setUploadAttempted(true)
 
     try {
+      const currentSettingsUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`
+      const settingsResult = await doFetchApi({
+        path: currentSettingsUrl,
+        method: 'GET',
+      })
+
+      if (!settingsResult.response.ok) {
+        throw new Error('Failed to fetch current settings.')
+      }
+
       const folderId = await createFolder()
       if (!folderId) throw new Error('Failed to create folder')
 
@@ -138,60 +148,35 @@ const ForbiddenWordsFileUpload = ({
       })
 
       if (!uploadResponse.ok) {
-        throw new Error('File upload failed')
-      }
-
-      let finalResponse
-
-      if (uploadResponse.status >= 300 && uploadResponse.status < 400) {
-        const redirectUrl = uploadResponse.headers.get('Location')
-        if (!redirectUrl) {
-          throw new Error('Redirect URL not found')
-        }
-
-        finalResponse = await fetch(redirectUrl, {
-          method: 'GET',
-        })
-      } else if (uploadResponse.status === 201) {
-        const locationUrl = uploadResponse.headers.get('Location')
-        if (!locationUrl) {
-          throw new Error('Location URL not found in 201 response')
-        }
-
-        finalResponse = await fetch(locationUrl, {
-          method: 'GET',
-          headers: {
-            'Authorization:': `Bearer ${ENV.CANVAS_API_TOKEN}`, // Replace with your actual token
-          },
-        })
-      }
-
-      if (!finalResponse.ok) {
         throw new Error('Failed to complete the file upload')
       }
 
-      const fileData = await finalResponse.json()
-
+      const fileData = await uploadResponse.json()
       const fileId = fileData.id
 
-      const updateAccountUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/`
-      const requestBody = {
-        password_policy: {
-          forbidden_words_folder_id: folderId,
-          forbidden_words_file_id: fileId,
+      const updatedPasswordPolicy = {
+        account: {
+          settings: {
+            password_policy: {
+              ...settingsResult.json.password_policy,
+              common_passwords_folder_id: folderId,
+              common_passwords_attachment_id: fileId,
+            },
+          },
         },
       }
 
-      const saveResponse = await executeApiRequest({
+      const updateAccountUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/`
+      const saveResponse = await doFetchApi({
         path: updateAccountUrl,
-        body: JSON.stringify(requestBody),
+        body: updatedPasswordPolicy,
         method: 'PUT',
       })
 
-      if (saveResponse.status === 200) {
+      if (saveResponse.response.ok) {
         setForbiddenWordsUrl(url)
         setForbiddenWordsFilename(filename)
-        onSave()
+        onSave(fileId)
         setModalClosing(true)
         onDismiss()
       } else {

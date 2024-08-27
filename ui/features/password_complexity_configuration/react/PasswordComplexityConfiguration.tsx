@@ -32,6 +32,8 @@ import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {Flex} from '@instructure/ui-flex'
 import CustomForbiddenWordsSection from './CustomForbiddenWordsSection'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import type {PasswordSettingsResponse} from './types'
 
 const I18n = useI18nScope('password_complexity_configuration')
 
@@ -49,20 +51,12 @@ interface PasswordPolicy {
   allow_login_suspension: boolean
   maximum_login_attempts?: number
   minimum_character_length?: number
+  common_passwords_attachment_id?: number | null
+  common_passwords_folder_id?: number | null
 }
 
 interface Settings {
   password_policy: PasswordPolicy
-}
-
-interface DataResponse {
-  password_policy: {
-    require_number_characters: string
-    require_symbol_characters: string
-    allow_login_suspension: string
-    maximum_login_attempts?: number
-    minimum_character_length?: number
-  }
 }
 
 interface Account {
@@ -87,47 +81,56 @@ const PasswordComplexityConfiguration = () => {
   const [customMaxLoginAttemptsEnabled, setCustomMaxLoginAttemptsEnabled] = useState(false)
   const [allowLoginSuspensionEnabled, setAllowLoginSuspensionEnabled] = useState(false)
   const [maxLoginAttempts, setMaxLoginAttempts] = useState(DEFAULT_MAX_LOGIN_ATTEMPTS)
+  const [commonPasswordsAttachmentId, setCommonPasswordsAttachmentId] = useState<number | null>(
+    null
+  )
+  const [commonPasswordsFolderId, setCommonPasswordsFolderId] = useState<number | null>(null)
 
   const handleOpenTray = () => {
     setShowTray(true)
   }
 
   useEffect(() => {
-    const currentSettingsUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`
+    if (showTray) {
+      const currentSettingsUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`
 
-    const fetchCurrentSettings = async () => {
-      try {
-        const {status, data} = await executeApiRequest<DataResponse>({
-          path: currentSettingsUrl,
-          method: 'GET',
-        })
+      const fetchCurrentSettings = async () => {
+        try {
+          const {status, data} = await executeApiRequest<PasswordSettingsResponse>({
+            path: currentSettingsUrl,
+            method: 'GET',
+          })
 
-        if (status === 200) {
-          const passwordPolicy = data.password_policy
+          if (status === 200) {
+            const passwordPolicy = data.password_policy
 
-          if (passwordPolicy.require_number_characters === 'true') {
-            setRequireNumbersEnabledSaved(true)
+            if (passwordPolicy.require_number_characters === 'true') {
+              setRequireNumbersEnabledSaved(true)
+            }
+            if (passwordPolicy.require_symbol_characters === 'true') {
+              setRequireSymbolsEnabledSaved(true)
+            }
+            setMinimumCharacterLengthSaved(passwordPolicy.minimum_character_length || 0)
+
+            setCommonPasswordsAttachmentId(passwordPolicy.common_passwords_attachment_id || null)
+            setCommonPasswordsFolderId(passwordPolicy.common_passwords_folder_id || null)
           }
-          if (passwordPolicy.require_symbol_characters === 'true') {
-            setRequireSymbolsEnabledSaved(true)
-          }
-          setMinimumCharacterLengthSaved(passwordPolicy.minimum_character_length || 0)
+        } catch (err: any) {
+          // err type has to be any because the error object is not defined
+          showFlashAlert({
+            message: I18n.t('An error occurred fetching password policy settings.'),
+            err,
+            type: 'error',
+          })
         }
-      } catch (err: any) {
-        // err type has to be any because the error object is not defined
-        showFlashAlert({
-          message: I18n.t('An error occurred fetching password policy settings.'),
-          err,
-          type: 'error',
-        })
       }
+
+      fetchCurrentSettings()
+
+      setMinimumCharacterLengthSaved(minimumCharacterLength)
     }
-
-    fetchCurrentSettings()
-
-    setMinimumCharacterLengthSaved(minimumCharacterLength)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [showTray])
 
   const handleCustomMaxLoginAttemptToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked
@@ -147,14 +150,40 @@ const PasswordComplexityConfiguration = () => {
     setMaxLoginAttempts(value)
   }
 
+  const cancelChanges = async () => {
+    setShowTray(false)
+  }
+
   const saveChanges = async () => {
     setEnableApplyButton(false)
+
+    const currentSettingsUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`
+    const settingsResult: any = await doFetchApi({
+      path: currentSettingsUrl,
+      method: 'GET',
+    })
+
+    if (!settingsResult.response.ok) {
+      throw new Error('Failed to fetch current settings.')
+    }
 
     const updateAccountUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/`
     const passwordPolicy: PasswordPolicy = {
       require_number_characters: requireNumbersEnabled,
       require_symbol_characters: requireSymbolsEnabled,
       allow_login_suspension: allowLoginSuspensionEnabled,
+    }
+
+    if (settingsResult.json.password_policy.common_passwords_attachment_id) {
+      passwordPolicy.common_passwords_attachment_id =
+        settingsResult.json.password_policy.common_passwords_attachment_id
+      setCommonPasswordsAttachmentId(passwordPolicy.common_passwords_attachment_id || null)
+    }
+
+    if (settingsResult.json.password_policy.common_passwords_folder_id) {
+      passwordPolicy.common_passwords_folder_id =
+        settingsResult.json.password_policy.common_passwords_folder_id
+      setCommonPasswordsFolderId(passwordPolicy.common_passwords_folder_id || null)
     }
 
     if (customMaxLoginAttemptsEnabled) {
@@ -302,10 +331,7 @@ const PasswordComplexityConfiguration = () => {
                 data-testid="requireSymbolsCheckbox"
               />
             </View>
-            <CustomForbiddenWordsSection
-              commonPasswordsAttachmentId={1}
-              passwordPolicyFolderId={1}
-            />
+            <CustomForbiddenWordsSection />
             <View as="div" margin="medium medium small medium">
               <Checkbox
                 onChange={handleCustomMaxLoginAttemptToggle}
@@ -354,7 +380,7 @@ const PasswordComplexityConfiguration = () => {
                 <Button
                   margin="small 0"
                   color="secondary"
-                  onClick={() => setShowTray(false)}
+                  onClick={cancelChanges}
                   data-testid="cancelButton"
                 >
                   {I18n.t('Cancel')}

@@ -29,61 +29,67 @@ import ForbiddenWordsFileUpload from './ForbiddenWordsFileUpload'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
 const I18n = useI18nScope('password_complexity_configuration')
 
-declare const ENV: GlobalEnv
-
 interface ForbiddenWordsResponse {
-  public_url: string
-  filename: string
+  url: string
+  display_name: string
 }
 
-interface Props {
-  commonPasswordsAttachmentId: number
-  passwordPolicyFolderId: number
-}
-
-export const fetchLatestForbiddenWords = async (): Promise<ForbiddenWordsResponse | null> => {
+export const fetchLatestForbiddenWords = async (
+  attachmentId: number
+): Promise<ForbiddenWordsResponse | null> => {
   const {response, json} = await doFetchApi({
-    path: `/api/v1/accounts/${ENV.ACCOUNT_ID}/password_complexity/latest_forbidden_words`,
+    path: `/api/v1/files/${attachmentId}`,
     method: 'GET',
   })
   return response.ok ? (json as ForbiddenWordsResponse) ?? null : null
 }
 
-// TODO: FOO-4640
-const deleteForbiddenWordsFile = async () => {
+const deleteForbiddenWordsFile = async (attachmentId: number): Promise<void> => {
   try {
-    // mocked response as placeholder
-    const mockResponse = {
-      response: {
-        ok: true,
-      },
-      json: {
-        workflow_state: 'deleted',
-      },
+    // Fetch the latest settings
+    const currentSettingsUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`
+    const settingsResult = await doFetchApi({
+      path: currentSettingsUrl,
+      method: 'GET',
+    })
+
+    if (!settingsResult.response.ok) {
+      throw new Error('Failed to fetch current settings.')
     }
 
-    // un-comment the real API call when ready to switch from mock to live
-    // const response = await doFetchApi({
-    //   path: `/api/v1/accounts/${ENV.ACCOUNT_ID}/password_complexity/delete_forbidden_words`,
-    //   method: 'PUT',
-    //   body: {
-    //     workflow_state: 'deleted',
-    //   },
-    // })
+    // Delete the forbidden words file
+    const deleteResult = await doFetchApi({
+      path: `/api/v1/files/${attachmentId}`,
+      method: 'DELETE',
+    })
 
-    if (!mockResponse.response.ok) {
+    if (!deleteResult.response.ok) {
       throw new Error('Failed to delete forbidden words file.')
     }
 
-    // return the mock response for now
-    return mockResponse
+    const updatedPasswordPolicy = {
+      account: {
+        settings: {
+          ...settingsResult.json,
+        },
+      },
+    }
+    delete updatedPasswordPolicy.account.settings.password_policy.common_passwords_folder_id
+    delete updatedPasswordPolicy.account.settings.password_policy.common_passwords_attachment_id
 
-    // un-comment the following line when using the real API call
-    // return response
+    const updateAccountUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/`
+    const updateResult = await doFetchApi({
+      path: updateAccountUrl,
+      body: updatedPasswordPolicy,
+      method: 'PUT',
+    })
+
+    if (!updateResult.response.ok) {
+      throw new Error('Failed to update password policy settings.')
+    }
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Error deleting forbidden words file:', error)
@@ -91,30 +97,44 @@ const deleteForbiddenWordsFile = async () => {
   }
 }
 
-const CustomForbiddenWordsSection = ({
-  commonPasswordsAttachmentId,
-  passwordPolicyFolderId,
-}: Props) => {
+const CustomForbiddenWordsSection = () => {
   const linkRef = useRef<HTMLAnchorElement | null>(null)
   const [forbiddenWordsUrl, setForbiddenWordsUrl] = useState<string | null>(null)
-  const [forbiddenWordsFilename, setForbiddenWordsFilename] = useState<string | null>(null)
+  const [forbiddenWordsName, setForbiddenWordsName] = useState<string | null>(null)
   const [fileModalOpen, setFileModalOpen] = useState(false)
   const [customForbiddenWordsEnabled, setCustomForbiddenWordsEnabled] = useState(false)
+  const [commonPasswordsAttachmentId, setCommonPasswordsAttachmentId] = useState<number | null>(
+    null
+  )
 
   const fetchAndSetForbiddenWords = useCallback(async () => {
+    const currentSettingsUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`
+    const settingsResult = await doFetchApi({
+      path: currentSettingsUrl,
+      method: 'GET',
+    })
+
+    if (!settingsResult.response.ok) {
+      throw new Error('Failed to fetch current settings.')
+    }
+
+    const attachmentId = settingsResult.json.password_policy.common_passwords_attachment_id
+
+    setCommonPasswordsAttachmentId(attachmentId)
+
     try {
-      const data = await fetchLatestForbiddenWords()
+      const data = await fetchLatestForbiddenWords(attachmentId)
       if (data) {
-        setForbiddenWordsUrl(data.public_url)
-        setForbiddenWordsFilename(data.filename)
+        setForbiddenWordsUrl(data.url)
+        setForbiddenWordsName(data.display_name)
       } else {
         setForbiddenWordsUrl(null)
-        setForbiddenWordsFilename(null)
+        setForbiddenWordsName(null)
       }
     } catch (error: any) {
       if (error.response?.status === 404) {
         setForbiddenWordsUrl(null)
-        setForbiddenWordsFilename(null)
+        setForbiddenWordsName(null)
       } else {
         // eslint-disable-next-line no-console
         console.error('Failed to fetch forbidden words:', error)
@@ -129,36 +149,44 @@ const CustomForbiddenWordsSection = ({
 
   // enable the checkbox if a custom forbidden words list exists
   useEffect(() => {
-    if (forbiddenWordsUrl && forbiddenWordsFilename) {
+    if (forbiddenWordsUrl && forbiddenWordsName) {
       setCustomForbiddenWordsEnabled(true)
     }
-  }, [forbiddenWordsUrl, forbiddenWordsFilename])
+  }, [forbiddenWordsUrl, forbiddenWordsName])
 
   // focus on the link after forbidden words are updated
   useEffect(() => {
-    if (!fileModalOpen && linkRef.current && forbiddenWordsUrl && forbiddenWordsFilename) {
+    if (!fileModalOpen && linkRef.current && forbiddenWordsUrl && forbiddenWordsName) {
       linkRef.current.focus()
     }
-  }, [fileModalOpen, forbiddenWordsUrl, forbiddenWordsFilename])
+  }, [fileModalOpen, forbiddenWordsUrl, forbiddenWordsName])
 
   const deleteForbiddenWords = useCallback(async () => {
-    try {
-      await deleteForbiddenWordsFile()
+    if (commonPasswordsAttachmentId !== null) {
+      try {
+        await deleteForbiddenWordsFile(commonPasswordsAttachmentId)
 
-      setForbiddenWordsUrl(null)
-      setForbiddenWordsFilename(null)
+        setForbiddenWordsUrl(null)
+        setForbiddenWordsName(null)
+        setCommonPasswordsAttachmentId(null)
 
+        showFlashAlert({
+          message: I18n.t('Forbidden words list deleted successfully.'),
+          type: 'success',
+        })
+      } catch (error) {
+        showFlashAlert({
+          message: I18n.t('Failed to delete forbidden words list.'),
+          type: 'error',
+        })
+      }
+    } else {
       showFlashAlert({
-        message: I18n.t('Forbidden words list deleted successfully.'),
-        type: 'success',
-      })
-    } catch (error) {
-      showFlashAlert({
-        message: I18n.t('Failed to delete forbidden words list.'),
-        type: 'error',
+        message: I18n.t('No forbidden words list to delete.'),
+        type: 'warning',
       })
     }
-  }, [])
+  }, [commonPasswordsAttachmentId])
 
   const handleCancelUploadModal = useCallback(() => {
     setFileModalOpen(false)
@@ -200,7 +228,7 @@ const CustomForbiddenWordsSection = ({
               'Upload a list of forbidden words/terms in addition to the default list. The file should be text file (.txt) with a single word or term per line.'
             )}
           </Text>
-          {(!forbiddenWordsUrl || !forbiddenWordsFilename || !customForbiddenWordsEnabled) && (
+          {(!forbiddenWordsUrl || !forbiddenWordsName || !customForbiddenWordsEnabled) && (
             <View as="div" margin="small 0">
               <Button
                 disabled={!customForbiddenWordsEnabled}
@@ -213,47 +241,51 @@ const CustomForbiddenWordsSection = ({
             </View>
           )}
         </View>
-        {customForbiddenWordsEnabled && forbiddenWordsUrl && forbiddenWordsFilename && (
-          <View as="div" margin="0 medium medium medium">
-            <Heading level="h4">{I18n.t('Current Custom List')}</Heading>
-            <hr />
-            <Flex justifyItems="space-between">
-              <Flex.Item>
-                <Link
-                  href={forbiddenWordsUrl}
-                  target="_blank"
-                  elementRef={element => {
-                    linkRef.current = element as HTMLAnchorElement | null
-                  }}
-                >
-                  {forbiddenWordsFilename}
-                </Link>
-              </Flex.Item>
-              <Flex.Item>
-                <IconButton
-                  withBackground={false}
-                  withBorder={false}
-                  screenReaderLabel="Delete list"
-                  onClick={deleteForbiddenWords}
-                >
-                  <IconTrashLine color="warning" />
-                </IconButton>
-              </Flex.Item>
-            </Flex>
-            <hr />
-          </View>
-        )}
+        {customForbiddenWordsEnabled &&
+          forbiddenWordsUrl &&
+          forbiddenWordsName &&
+          commonPasswordsAttachmentId && (
+            <View as="div" margin="0 medium medium medium">
+              <Heading level="h4">{I18n.t('Current Custom List')}</Heading>
+              <hr />
+              <Flex justifyItems="space-between">
+                <Flex.Item>
+                  <Link
+                    href={forbiddenWordsUrl}
+                    target="_blank"
+                    elementRef={element => {
+                      linkRef.current = element as HTMLAnchorElement | null
+                    }}
+                  >
+                    {forbiddenWordsName}
+                  </Link>
+                </Flex.Item>
+                <Flex.Item>
+                  <IconButton
+                    withBackground={false}
+                    withBorder={false}
+                    screenReaderLabel="Delete list"
+                    onClick={deleteForbiddenWords}
+                  >
+                    <IconTrashLine color="warning" />
+                  </IconButton>
+                </Flex.Item>
+              </Flex>
+              <hr />
+            </View>
+          )}
       </View>
       <ForbiddenWordsFileUpload
         open={fileModalOpen}
         onDismiss={handleCancelUploadModal}
-        onSave={() => {
+        onSave={newAttachmentId => {
           setFileModalOpen(false)
+          setCommonPasswordsAttachmentId(newAttachmentId)
           fetchAndSetForbiddenWords()
         }}
         setForbiddenWordsUrl={setForbiddenWordsUrl}
-        setForbiddenWordsFilename={setForbiddenWordsFilename}
-        folderId={passwordPolicyFolderId}
+        setForbiddenWordsFilename={setForbiddenWordsName}
+        // folderId={commonPasswordsFolderId}
       />
     </>
   )
