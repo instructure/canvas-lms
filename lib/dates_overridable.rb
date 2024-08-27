@@ -172,24 +172,30 @@ module DatesOverridable
                            .or(tags_scope.where(content_type: "WikiPage", content_id: wiki_pages.map(&:id)))
                            .distinct
                            .pluck(:content_type, :content_id, :context_module_id)
+
+    quiz_ids_by_assignment_ids = quizzes_with_assignments.index_by(&:assignment_id).transform_values(&:id)
+    discussion_ids_by_assignment_ids = discussions_with_assignments.index_by(&:assignment_id).transform_values(&:id)
+    page_ids_by_assignment_ids = pages_with_assignments.index_by(&:assignment_id).transform_values(&:id)
+
+    grouped_mids = module_ids.group_by { |m| [m[0], m[1]] }
+    grouped_mids.default = []
+
     learning_objects.each do |lo|
+      lo_id = lo.id
       lo.preloaded_module_ids = if lo.is_a?(Quizzes::Quiz)
-                                  module_ids.select { |m| m[0] == "Quizzes::Quiz" && m[1] == lo.id }.map(&:last)
+                                  grouped_mids[["Quizzes::Quiz", lo_id]].map(&:last)
                                 elsif lo.is_a?(DiscussionTopic)
-                                  module_ids.select { |m| m[0] == "DiscussionTopic" && m[1] == lo.id }.map(&:last)
+                                  grouped_mids[["DiscussionTopic", lo_id]].map(&:last)
                                 elsif lo.is_a?(WikiPage)
-                                  module_ids.select { |m| m[0] == "WikiPage" && m[1] == lo.id }.map(&:last)
-                                elsif lo.is_a?(AbstractAssignment) && quizzes_with_assignments.map(&:assignment_id).include?(lo.id)
-                                  quiz_id = quizzes_with_assignments.find { |q| q.assignment_id == lo.id }.id
-                                  module_ids.select { |m| m[0] == "Quizzes::Quiz" && m[1] == quiz_id }.map(&:last)
-                                elsif lo.is_a?(AbstractAssignment) && discussions_with_assignments.map(&:assignment_id).include?(lo.id)
-                                  discussion_id = discussions_with_assignments.find { |d| d.assignment_id == lo.id }.id
-                                  module_ids.select { |m| m[0] == "DiscussionTopic" && m[1] == discussion_id }.map(&:last)
-                                elsif lo.is_a?(AbstractAssignment) && pages_with_assignments.map(&:assignment_id).include?(lo.id)
-                                  page_id = pages_with_assignments.find { |p| p.assignment_id == lo.id }.id
-                                  module_ids.select { |m| m[0] == "WikiPage" && m[1] == page_id }.map(&:last)
+                                  grouped_mids[["WikiPage", lo_id]].map(&:last)
+                                elsif lo.is_a?(AbstractAssignment) && quiz_ids_by_assignment_ids[lo_id]
+                                  grouped_mids[["Quizzes::Quiz", quiz_ids_by_assignment_ids[lo_id]]].map(&:last)
+                                elsif lo.is_a?(AbstractAssignment) && discussion_ids_by_assignment_ids[lo_id]
+                                  grouped_mids[["DiscussionTopic", discussion_ids_by_assignment_ids[lo_id]]].map(&:last)
+                                elsif lo.is_a?(AbstractAssignment) && page_ids_by_assignment_ids[lo_id]
+                                  grouped_mids[["WikiPage", page_ids_by_assignment_ids[lo_id]]].map(&:last)
                                 else
-                                  module_ids.select { |m| m[0] == "Assignment" && m[1] == lo.id }.map(&:last)
+                                  grouped_mids[["Assignment", lo_id]].map(&:last)
                                 end
     end
   end
