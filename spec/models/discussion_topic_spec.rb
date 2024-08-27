@@ -651,6 +651,17 @@ describe DiscussionTopic do
             expect(@topic.visible_for?(@teacher1)).to be_truthy
             expect(@topic.visible_for?(@teacher2_limited_to_section)).to be_truthy
           end
+
+          it "is visible to teachers with section limited access" do
+            account_admin = account_admin_user(account: @course.root_account)
+            @course.enroll_teacher(@teacher2_limited_to_section, section: @course_section, allow_multiple_enrollments: true).accept!
+            Enrollment.limit_privileges_to_course_section!(@course, @teacher2_limited_to_section, true)
+            @topic = discussion_topic_model(user: account_admin, context: @course)
+            @topic.update!(only_visible_to_overrides: true)
+            @topic.assignment_overrides.create!(set: @course_section)
+
+            expect(@topic.visible_for?(@teacher2_limited_to_section)).to be_truthy
+          end
         end
       end
     end

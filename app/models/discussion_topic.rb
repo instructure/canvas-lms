@@ -1738,9 +1738,7 @@ class DiscussionTopic < ActiveRecord::Base
 
         # If there are no section_overrides, then no check for section_specific instructor roles is needed
         if visible_sections_for_user != :all && section_overrides.any?
-          course_section_ids = shard.activate { course_sections.ids }
-
-          next false unless visible_sections_for_user.intersect?(course_section_ids)
+          next false unless visible_sections_for_user.intersect?(section_overrides)
         end
       end
       # user is an admin in the context (teacher/ta/designer) OR
