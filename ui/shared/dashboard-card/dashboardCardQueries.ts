@@ -39,7 +39,7 @@ export const useFetchDashboardCards = (
     queryKey: ['dashboard_cards', {userID, observedUserID}] as DashboardQueryKey,
     queryFn: fetchDashboardCardsAsync,
     enabled: userID !== null && !!ENV?.FEATURES?.dashboard_graphql_integration && observerSettled,
-    staleTime: 1000 * 5, // 5 seconds
+    staleTime: 1000 * 60, // 1 minute
     select: processDashboardCards,
   })
 }
