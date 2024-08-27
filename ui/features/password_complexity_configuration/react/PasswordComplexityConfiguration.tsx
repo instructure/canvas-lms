@@ -135,6 +135,9 @@ const PasswordComplexityConfiguration = () => {
   const handleCustomMaxLoginAttemptToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked
     setCustomMaxLoginAttemptsEnabled(checked)
+    if (allowLoginSuspensionEnabled && !checked) {
+      setAllowLoginSuspensionEnabled(false)
+    }
   }
 
   const handleAllowLoginSuspensionToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -347,13 +350,13 @@ const PasswordComplexityConfiguration = () => {
               >
                 <Text size="small">
                   {I18n.t(
-                    'This option controls the number of attempts a single user can make consecutively to login without success before their user’s login is suspended. Users can be unsuspended by institutional admins. Cannot be higher than 20 attempts.'
+                    'This option controls the number of attempts a single user can make consecutively to login without success before their user’s login is suspended temporarily (5 min). Cannot be higher than 20 attempts.'
                   )}
                 </Text>
               </View>
             </View>
-            <View as="div" maxWidth="9rem" margin="0 medium medium medium">
-              <View as="div" margin="0 medium medium medium">
+            <View as="div" margin="0 medium medium medium">
+              <View as="div" maxWidth="6rem" margin="0 medium medium medium">
                 <NumberInputControlled
                   minimum={MINIMUM_LOGIN_ATTEMPTS}
                   maximum={MAXIMUM_LOGIN_ATTEMPTS}
@@ -363,14 +366,27 @@ const PasswordComplexityConfiguration = () => {
                   data-testid="customMaxLoginAttemptsInput"
                 />
               </View>
-            </View>
-            <View as="div" margin="medium medium small medium">
-              <Checkbox
-                onChange={handleAllowLoginSuspensionToggle}
-                checked={allowLoginSuspensionEnabled}
-                label={I18n.t('Allow login suspension')}
-                data-testid="allowLoginSuspensionCheckbox"
-              />
+              <View as="div" margin="medium medium small medium">
+                <Checkbox
+                  onChange={handleAllowLoginSuspensionToggle}
+                  checked={allowLoginSuspensionEnabled}
+                  label={I18n.t('Make login suspension persistent')}
+                  data-testid="allowLoginSuspensionCheckbox"
+                  disabled={!customMaxLoginAttemptsEnabled}
+                />
+                <View
+                  as="div"
+                  insetInlineStart="1.75em"
+                  position="relative"
+                  margin="xx-small small xxx-small 0"
+                >
+                  <Text size="small">
+                    {I18n.t(
+                      'Users with a suspended login (because of maximum login attempt policy) must be unsuspended by institutional admins.'
+                    )}
+                  </Text>
+                </View>
+              </View>
             </View>
           </Flex.Item>
 
