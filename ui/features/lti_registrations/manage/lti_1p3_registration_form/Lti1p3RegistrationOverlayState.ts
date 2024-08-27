@@ -85,6 +85,7 @@ export interface Lti1p3RegistrationOverlayActions {
   setJwk: (jwk: string) => void
   setDomain: (domain: string) => void
   setCustomFields: (customFields: string) => void
+  toggleScope: (scope: LtiScope) => void
 }
 
 export type Lti1p3RegistrationOverlayStore = StoreApi<
@@ -125,6 +126,25 @@ export const createLti1p3RegistrationOverlayStore = (internalConfig: InternalLti
     setJwkMethod: jwkMethod => set(updateLaunchSetting('JwkMethod', jwkMethod)),
     setDomain: domain => set(updateLaunchSetting('domain', domain)),
     setCustomFields: customFields => set(updateLaunchSetting('customFields', customFields)),
+    toggleScope: scope => {
+      set(
+        updateState(state => {
+          let updatedScopes = state.permissions.scopes
+
+          if (updatedScopes?.includes(scope)) {
+            updatedScopes = updatedScopes.filter(s => s !== scope)
+          } else {
+            updatedScopes = [...(updatedScopes ?? []), scope]
+          }
+          return {
+            ...state,
+            permissions: {
+              scopes: updatedScopes,
+            },
+          }
+        })
+      )
+    },
   }))
 
 const initialOverlayStateFromInternalConfig = (
