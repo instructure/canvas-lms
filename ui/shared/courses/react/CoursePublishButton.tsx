@@ -35,7 +35,6 @@ import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import * as apiClient from '@canvas/courses/courseAPIClient'
 import type {BaseButtonTheme} from '@instructure/shared-types'
-import {clearDashboardCache} from '@canvas/dashboard-card/dashboardCardQueries'
 
 const I18n = useI18nScope('course_publish_button')
 
@@ -65,9 +64,6 @@ const CoursePublishButton = ({
   }
 
   const handleUpdatePublishSuccess = (isPublishing: boolean) => {
-    if (ENV?.FEATURES?.dashboard_graphql_integration) {
-      clearDashboardCache()
-    }
     if (isPublishing && setCoursePublished instanceof Function) {
       setCoursePublished()
     } else if (!isPublishing && setCourseUnpublished instanceof Function) {
