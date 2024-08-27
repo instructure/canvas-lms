@@ -115,7 +115,12 @@ const ForbiddenWordsFileUpload = ({
         throw new Error('Failed to fetch current settings.')
       }
 
-      const folderId = await createFolder()
+      let folderId
+      if (settingsResult.json.password_policy.common_passwords_folder_id) {
+        folderId = settingsResult.json.password_policy.common_passwords_folder_id
+      } else {
+        folderId = await createFolder()
+      }
       if (!folderId) throw new Error('Failed to create folder')
 
       const fetchResponse = await fetch(url)
