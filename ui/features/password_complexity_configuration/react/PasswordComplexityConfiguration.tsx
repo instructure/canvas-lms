@@ -63,10 +63,6 @@ const PasswordComplexityConfiguration = () => {
   const [allowLoginSuspensionEnabled, setAllowLoginSuspensionEnabled] = useState(false)
   const [maxLoginAttempts, setMaxLoginAttempts] = useState(DEFAULT_MAX_LOGIN_ATTEMPTS)
 
-  const handleOpenTray = () => {
-    setShowTray(true)
-  }
-
   useEffect(() => {
     if (showTray) {
       const fetchCurrentSettings = async () => {
@@ -124,6 +120,17 @@ const PasswordComplexityConfiguration = () => {
       fetchCurrentSettings()
     }
   }, [showTray])
+
+  const handleOpenTray = () => {
+    setShowTray(true)
+  }
+
+  const handleMinimumCharacterLengthEnabledChange = () => {
+    setMinimumCharacterLengthEnabled(!minimumCharacterLengthEnabled)
+    if (minimumCharacterLengthEnabled) {
+      setMinimumCharacterLength(MINIMUM_CHARACTER_LENGTH)
+    }
+  }
 
   const handleCustomMaxLoginAttemptToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked
@@ -289,7 +296,7 @@ const PasswordComplexityConfiguration = () => {
               <Checkbox
                 label={I18n.t('Minimum character length (minimum: 8 | maximum: 255)')}
                 checked={minimumCharacterLengthEnabled}
-                onChange={() => setMinimumCharacterLengthEnabled(!minimumCharacterLengthEnabled)}
+                onChange={() => handleMinimumCharacterLengthEnabledChange()}
                 defaultChecked={true}
                 data-testid="minimumCharacterLengthCheckbox"
               />
