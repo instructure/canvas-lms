@@ -32,8 +32,7 @@ import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {Flex} from '@instructure/ui-flex'
 import CustomForbiddenWordsSection from './CustomForbiddenWordsSection'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import type {PasswordSettingsResponse} from './types'
+import type {PasswordPolicy, PasswordSettings, PasswordSettingsResponse} from './types'
 
 const I18n = useI18nScope('password_complexity_configuration')
 
@@ -45,22 +44,8 @@ const DEFAULT_MAX_LOGIN_ATTEMPTS = 10
 const MINIMUM_LOGIN_ATTEMPTS = 3
 const MAXIMUM_LOGIN_ATTEMPTS = 20
 
-interface PasswordPolicy {
-  require_number_characters: boolean
-  require_symbol_characters: boolean
-  allow_login_suspension: boolean
-  maximum_login_attempts?: number
-  minimum_character_length?: number
-  common_passwords_attachment_id?: number | null
-  common_passwords_folder_id?: number | null
-}
-
-interface Settings {
-  password_policy: PasswordPolicy
-}
-
 interface Account {
-  settings: Settings
+  settings: PasswordSettings
 }
 
 interface QueryParams {
@@ -84,12 +69,10 @@ const PasswordComplexityConfiguration = () => {
 
   useEffect(() => {
     if (showTray) {
-      const currentSettingsUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`
-
       const fetchCurrentSettings = async () => {
         try {
           const {status, data} = await executeApiRequest<PasswordSettingsResponse>({
-            path: currentSettingsUrl,
+            path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`,
             method: 'GET',
           })
 
@@ -171,30 +154,29 @@ const PasswordComplexityConfiguration = () => {
     setEnableApplyButton(false)
 
     const currentSettingsUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`
-    const settingsResult: any = await doFetchApi<PasswordSettingsResponse>({
+    const {status, data: settingsResult} = await executeApiRequest<PasswordSettingsResponse>({
       path: currentSettingsUrl,
       method: 'GET',
     })
 
-    if (!settingsResult.response.ok) {
+    if (status !== 200) {
       throw new Error('Failed to fetch current settings.')
     }
 
-    const updateAccountUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/`
     const passwordPolicy: PasswordPolicy = {
       require_number_characters: requireNumbersEnabled,
       require_symbol_characters: requireSymbolsEnabled,
       allow_login_suspension: allowLoginSuspensionEnabled,
     }
 
-    if (settingsResult.json.password_policy.common_passwords_attachment_id) {
+    if (settingsResult.password_policy.common_passwords_attachment_id) {
       passwordPolicy.common_passwords_attachment_id =
-        settingsResult.json.password_policy.common_passwords_attachment_id
+        settingsResult.password_policy.common_passwords_attachment_id
     }
 
-    if (settingsResult.json.password_policy.common_passwords_folder_id) {
+    if (settingsResult.password_policy.common_passwords_folder_id) {
       passwordPolicy.common_passwords_folder_id =
-        settingsResult.json.password_policy.common_passwords_folder_id
+        settingsResult.password_policy.common_passwords_folder_id
     }
 
     if (customMaxLoginAttemptsEnabled) {
@@ -214,12 +196,12 @@ const PasswordComplexityConfiguration = () => {
     }
 
     try {
-      const {status} = await executeApiRequest<QueryParams>({
-        path: updateAccountUrl,
+      const {status: accountStatus} = await executeApiRequest<QueryParams>({
+        path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/`,
         body: requestBody,
         method: 'PUT',
       })
-      if (status === 200) {
+      if (accountStatus === 200) {
         showFlashAlert({
           message: I18n.t('Password settings saved successfully.'),
           type: 'success',
@@ -395,7 +377,6 @@ const PasswordComplexityConfiguration = () => {
               </View>
             </View>
           </Flex.Item>
-
           <Flex.Item as="footer">
             <View as="div" background="secondary" width="100%" textAlign="end">
               <View as="div" display="inline-block">
