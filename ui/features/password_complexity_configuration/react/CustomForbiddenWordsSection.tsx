@@ -37,6 +37,10 @@ declare const ENV: GlobalEnv
 
 const I18n = useI18nScope('password_complexity_configuration')
 
+interface Props {
+  setNewlyUploadedAttachmentId: (attachmentId: number | null) => void
+}
+
 interface ForbiddenWordsResponse {
   url: string
   display_name: string
@@ -52,7 +56,7 @@ export const fetchLatestForbiddenWords = async (
   return status === 200 ? data ?? null : null
 }
 
-const CustomForbiddenWordsSection = () => {
+const CustomForbiddenWordsSection = ({setNewlyUploadedAttachmentId}: Props) => {
   const linkRef = useRef<HTMLAnchorElement | null>(null)
   const [forbiddenWordsUrl, setForbiddenWordsUrl] = useState<string | null>(null)
   const [forbiddenWordsName, setForbiddenWordsName] = useState<string | null>(null)
@@ -236,6 +240,7 @@ const CustomForbiddenWordsSection = () => {
         onSave={newAttachmentId => {
           setFileModalOpen(false)
           setCommonPasswordsAttachmentId(newAttachmentId)
+          setNewlyUploadedAttachmentId(newAttachmentId)
           fetchAndSetForbiddenWords()
         }}
         setForbiddenWordsUrl={setForbiddenWordsUrl}
