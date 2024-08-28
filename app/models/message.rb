@@ -1006,7 +1006,7 @@ self.user,
   #
   # Returns nothing.
   def data=(values_hash)
-    @data = OpenStruct.new(values_hash)
+    @data = OpenStruct.new(values_hash) # rubocop:disable Style/OpenStructUse
   end
 
   # Public: Before save, close this message if it has no user or a deleted

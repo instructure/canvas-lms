@@ -67,7 +67,7 @@ module SpeedGrader
         end
       end
 
-      OpenStruct.new(group: resolved_group, reason_for_change:)
+      { group: resolved_group, reason_for_change: }
     end
 
     def group_containing_student(student_id:)
