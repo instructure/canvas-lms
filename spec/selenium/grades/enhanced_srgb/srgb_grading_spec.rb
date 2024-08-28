@@ -285,4 +285,42 @@ describe "Screenreader Gradebook grading" do
       expect(EnhancedSRGB.proxy_submitter_label).to include_text("Submitted by Test Teacher")
     end
   end
+
+  context "checkpoints" do
+    before do
+      course_setup
+      Account.site_admin.enable_feature! :discussion_checkpoints
+
+      @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: test_course, title: "Checkpointed Discussion")
+      @checkpointed_assignment = @checkpointed_discussion.assignment
+
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @checkpointed_discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: 2.days.from_now }],
+        points_possible: 5
+      )
+
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @checkpointed_discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "everyone", due_at: 5.days.from_now }],
+        points_possible: 15,
+        replies_required: 3
+      )
+    end
+
+    it "excusing assignment excuses reply to topic checkpoint and thus, the parent" do
+      login_to_srgb
+      EnhancedSRGB.select_assignment(@checkpointed_assignment)
+
+      EnhancedSRGB.excuse_checkbox.click
+      wait_for_ajaximations
+
+      reply_to_topic_checkpoint = @checkpointed_assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+
+      expect(reply_to_topic_checkpoint.submission_for_student(student).excused?).to be_truthy
+      expect(@checkpointed_assignment.submission_for_student(student).excused?).to be_truthy
+    end
+  end
 end
