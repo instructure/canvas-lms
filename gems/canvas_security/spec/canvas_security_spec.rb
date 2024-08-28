@@ -217,7 +217,8 @@ describe CanvasSecurity do
     it "falls back to Vault for the encryption key if not defined in the config file" do
       config = "test:\n  another_key: true"
       expect(File).to receive(:read).with(Rails.root.join("config/security.yml").to_s).and_return(config)
-      expect(Rails).to receive(:application).and_return(OpenStruct.new({ credentials: OpenStruct.new({ security_encryption_key: "secret" }) }))
+      credentials = double(security_encryption_key: "secret")
+      expect(Rails).to receive(:application).and_return(instance_double("Rails::Application", credentials:))
       expect(CanvasSecurity.config).to eq("encryption_key" => "secret", "another_key" => true)
     end
   end
