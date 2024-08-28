@@ -32,7 +32,6 @@ describe "simply_versioned" do
 
   after :all do
     Woozel.connection.drop_table :woozels
-    ActiveSupport::Dependencies::Reference.instance_variable_get(:@store).delete("Woozel")
     Object.send(:remove_const, :Woozel) # rubocop:disable RSpec/RemoveConst
     GC.start
   end
