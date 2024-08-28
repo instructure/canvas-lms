@@ -529,7 +529,10 @@ describe "course settings" do
         ff("input[id*='Selectable_']").last.send_keys(yesterday.to_s)
 
         fj("button:contains('Update Course Details')").click
+        # Adding expectation for the error shown after the end field
         expect(fj("span:contains('The end date can not occur before the start date.')")).to be_present
+        # Adding expectation for the error shown in the Flash notification
+        expect(fj("span:contains('The course end date can not occur before the course start date.')")).to be_present
       end
     end
 
