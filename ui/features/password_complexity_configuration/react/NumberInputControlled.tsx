@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {NumberInput} from '@instructure/ui-number-input'
 
 interface NumberInputControlledProps {
@@ -40,6 +40,10 @@ const NumberInputControlled: React.FC<NumberInputControlledProps> = ({
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>, value: string) => {
     setNumber(value ? Number(value) : 0) // Replace null with 0
   }
+
+  useEffect(() => {
+    setNumber(currentValue)
+  }, [currentValue])
 
   const handleDecrement = () => {
     if (Number.isNaN(number)) return
