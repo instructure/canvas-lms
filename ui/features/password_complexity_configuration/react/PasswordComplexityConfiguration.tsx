@@ -72,12 +72,8 @@ const PasswordComplexityConfiguration = () => {
   const [enableApplyButton, setEnableApplyButton] = useState(true)
   const [minimumCharacterLengthEnabled, setMinimumCharacterLengthEnabled] = useState(true)
   const [minimumCharacterLength, setMinimumCharacterLength] = useState(MINIMUM_CHARACTER_LENGTH)
-  const [minimumCharacterLengthSaved, setMinimumCharacterLengthSaved] =
-    useState(MINIMUM_CHARACTER_LENGTH)
   const [requireNumbersEnabled, setRequireNumbersEnabled] = useState(true)
-  const [requireNumbersEnabledSaved, setRequireNumbersEnabledSaved] = useState(false)
-  const [requireSymbolsEnabled, setRequireSymbolsEnabled] = useState(true)
-  const [requireSymbolsEnabledSaved, setRequireSymbolsEnabledSaved] = useState(false)
+  const [requireSymbolsEnabled, setRequireSymbolsEnabled] = useState(false)
   const [customMaxLoginAttemptsEnabled, setCustomMaxLoginAttemptsEnabled] = useState(false)
   const [allowLoginSuspensionEnabled, setAllowLoginSuspensionEnabled] = useState(false)
   const [maxLoginAttempts, setMaxLoginAttempts] = useState(DEFAULT_MAX_LOGIN_ATTEMPTS)
@@ -105,12 +101,37 @@ const PasswordComplexityConfiguration = () => {
             const passwordPolicy = data.password_policy
 
             if (passwordPolicy.require_number_characters === 'true') {
-              setRequireNumbersEnabledSaved(true)
+              setRequireNumbersEnabled(true)
+            } else {
+              setRequireNumbersEnabled(false)
             }
+
             if (passwordPolicy.require_symbol_characters === 'true') {
-              setRequireSymbolsEnabledSaved(true)
+              setRequireSymbolsEnabled(true)
+            } else {
+              setRequireSymbolsEnabled(false)
             }
-            setMinimumCharacterLengthSaved(passwordPolicy.minimum_character_length || 0)
+
+            if (passwordPolicy.minimum_character_length) {
+              console.log("it's defined")
+              setMinimumCharacterLength(passwordPolicy.minimum_character_length)
+              setMinimumCharacterLengthEnabled(true)
+            } else {
+              setMinimumCharacterLengthEnabled(false)
+            }
+
+            if (passwordPolicy.maximum_login_attempts) {
+              setMaxLoginAttempts(passwordPolicy.maximum_login_attempts)
+              setCustomMaxLoginAttemptsEnabled(true)
+            } else {
+              setCustomMaxLoginAttemptsEnabled(false)
+            }
+
+            if (passwordPolicy.allow_login_suspension === 'true') {
+              setAllowLoginSuspensionEnabled(true)
+            } else {
+              setAllowLoginSuspensionEnabled(false)
+            }
 
             setCommonPasswordsAttachmentId(passwordPolicy.common_passwords_attachment_id || null)
             setCommonPasswordsFolderId(passwordPolicy.common_passwords_folder_id || null)
@@ -126,10 +147,7 @@ const PasswordComplexityConfiguration = () => {
       }
 
       fetchCurrentSettings()
-
-      setMinimumCharacterLengthSaved(minimumCharacterLength)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showTray])
 
   const handleCustomMaxLoginAttemptToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -276,14 +294,14 @@ const PasswordComplexityConfiguration = () => {
               {I18n.t('Your password must meet the following requirements')}
               <List margin="xxx-small">
                 <List.Item>
-                  {I18n.t('Must be at least %{minimumCharacterLengthSaved} Characters in length.', {
-                    minimumCharacterLengthSaved,
+                  {I18n.t('Must be at least %{minimumCharacterLength} Characters in length.', {
+                    minimumCharacterLength,
                   })}
                 </List.Item>
-                {requireNumbersEnabledSaved && (
+                {requireNumbersEnabled && (
                   <List.Item>{I18n.t('Must contain a number character (ie: 0...9).')}</List.Item>
                 )}
-                {requireSymbolsEnabledSaved && (
+                {requireSymbolsEnabled && (
                   <List.Item>
                     {I18n.t('Must contain a symbol character (ie: ! @ # $ %).')}
                   </List.Item>
@@ -321,7 +339,6 @@ const PasswordComplexityConfiguration = () => {
                 label={I18n.t('Require number characters (0...9)')}
                 checked={requireNumbersEnabled}
                 onChange={() => setRequireNumbersEnabled(!requireNumbersEnabled)}
-                defaultChecked={true}
                 data-testid="requireNumbersCheckbox"
               />
             </View>
@@ -330,7 +347,6 @@ const PasswordComplexityConfiguration = () => {
                 label={I18n.t('Require symbol characters (ie: ! @ # $ %)')}
                 checked={requireSymbolsEnabled}
                 onChange={() => setRequireSymbolsEnabled(!requireSymbolsEnabled)}
-                defaultChecked={true}
                 data-testid="requireSymbolsCheckbox"
               />
             </View>
