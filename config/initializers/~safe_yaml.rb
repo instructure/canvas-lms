@@ -30,7 +30,7 @@ ADDITIONAL_ALLOWED_CLASSES = [
   Mime::Type,
   Mime::NullType,
   OpenObject,
-  OpenStruct,
+  OpenStruct, # rubocop:disable Style/OpenStructUse
   Symbol,
   Time,
   URI::HTTP,

@@ -46,12 +46,12 @@ describe SpeedGrader::StudentGroupSelection do
     context "when no group was previously selected" do
       it "returns the first group containing that student" do
         selection = group_selector.select_group(student_id: group2_student.id)
-        expect(selection.group).to eq group2
+        expect(selection[:group]).to eq group2
       end
 
       it "returns :no_group_selected as the reason for the change" do
         selection = group_selector.select_group(student_id: group2_student.id)
-        expect(selection.reason_for_change).to eq :no_group_selected
+        expect(selection[:reason_for_change]).to eq :no_group_selected
       end
     end
 
@@ -61,7 +61,7 @@ describe SpeedGrader::StudentGroupSelection do
         @teacher.save!
 
         selection = group_selector.select_group(student_id: group1_student.id)
-        expect(selection.group).to eq group1
+        expect(selection[:group]).to eq group1
       end
     end
 
@@ -74,24 +74,24 @@ describe SpeedGrader::StudentGroupSelection do
       context "when the selected student belongs to at least one group" do
         it "returns the first group containing that student" do
           selection = group_selector.select_group(student_id: group2_student.id)
-          expect(selection.group).to eq group2
+          expect(selection[:group]).to eq group2
         end
 
         it "returns :student_not_in_selected_group as the reason for the change" do
           selection = group_selector.select_group(student_id: group2_student.id)
-          expect(selection.reason_for_change).to eq :student_not_in_selected_group
+          expect(selection[:reason_for_change]).to eq :student_not_in_selected_group
         end
       end
 
       context "when the selected student belongs to no groups" do
         it "returns a nil group" do
           selection = group_selector.select_group(student_id: groupless_student.id)
-          expect(selection.group).to be_nil
+          expect(selection[:group]).to be_nil
         end
 
         it "returns :student_in_no_groups as the reason for the change" do
           selection = group_selector.select_group(student_id: groupless_student.id)
-          expect(selection.reason_for_change).to eq :student_in_no_groups
+          expect(selection[:reason_for_change]).to eq :student_in_no_groups
         end
       end
     end
@@ -101,12 +101,12 @@ describe SpeedGrader::StudentGroupSelection do
     context "when no group is selected" do
       it "selects the first non-empty group in the course" do
         selection = group_selector.select_group(student_id: nil)
-        expect(selection.group).to eq group1
+        expect(selection[:group]).to eq group1
       end
 
       it "returns :no_group_selected as the reason for the change" do
         selection = group_selector.select_group(student_id: nil)
-        expect(selection.reason_for_change).to eq :no_group_selected
+        expect(selection[:reason_for_change]).to eq :no_group_selected
       end
     end
 
@@ -128,12 +128,12 @@ describe SpeedGrader::StudentGroupSelection do
         @teacher.save!
 
         selection = group_selector.select_group(student_id: nil)
-        expect(selection.group).to eq nil_moderator_group
+        expect(selection[:group]).to eq nil_moderator_group
       end
 
       it "returns the currently-selected group" do
         selection = group_selector.select_group(student_id: nil)
-        expect(selection.group).to eq group2
+        expect(selection[:group]).to eq group2
       end
     end
 
@@ -145,12 +145,12 @@ describe SpeedGrader::StudentGroupSelection do
 
       it "returns the first non-empty group in the course" do
         selection = group_selector.select_group(student_id: nil)
-        expect(selection.group).to eq group1
+        expect(selection[:group]).to eq group1
       end
 
       it "returns :no_students_in_group as the reason for the change" do
         selection = group_selector.select_group(student_id: nil)
-        expect(selection.reason_for_change).to eq :no_students_in_group
+        expect(selection[:reason_for_change]).to eq :no_students_in_group
       end
     end
   end

@@ -1170,8 +1170,8 @@ class GradebooksController < ApplicationController
           group_selection = SpeedGrader::StudentGroupSelection.new(current_user: @current_user, course: @context)
           updated_group_info = group_selection.select_group(student_id: requested_student_id)
 
-          if updated_group_info.group != group_selection.initial_group
-            new_group_id = updated_group_info.group.present? ? updated_group_info.group.id.to_s : nil
+          if updated_group_info[:group] != group_selection.initial_group
+            new_group_id = updated_group_info[:group].present? ? updated_group_info[:group].id.to_s : nil
             context_settings = gradebook_settings(context.global_id)
             context_settings.deep_merge!({
                                            "filter_rows_by" => {
@@ -1181,10 +1181,10 @@ class GradebooksController < ApplicationController
             @current_user.set_preference(:gradebook_settings, context.global_id, context_settings)
           end
 
-          if updated_group_info.group.present?
-            env[:selected_student_group] = group_json(updated_group_info.group, @current_user, session)
+          if updated_group_info[:group].present?
+            env[:selected_student_group] = group_json(updated_group_info[:group], @current_user, session)
           end
-          env[:student_group_reason_for_change] = updated_group_info.reason_for_change if updated_group_info.reason_for_change.present?
+          env[:student_group_reason_for_change] = updated_group_info[:reason_for_change] if updated_group_info[:reason_for_change].present?
         end
 
         if @assignment.active_rubric_association?
