@@ -381,6 +381,12 @@ export const DiscussionThreadContainer = props => {
   }, [threadRefCurrent, props.discussionEntry.entryParticipant.read, props, updateReadState])
 
   useEffect(() => {
+    if (expandedThreads.includes(props.discussionEntry._id)){
+      setExpandReplies(true)
+    }
+  }, [expandedThreads])
+
+  useEffect(() => {
     if (allThreadsStatus === AllThreadsState.Expanded && !expandReplies) {
       setExpandReplies(true)
     }

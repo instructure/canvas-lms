@@ -1484,6 +1484,8 @@ EG = {
 
   skipRelativeToCurrentIndex(offset) {
     const nextStudent = (offset_: number) => {
+      // if we switch student, we don't have the data for the correct entry. so for now we empty it.
+      ENV.ENTRY_ID = ''
       const {length: students} = window.jsonData.studentsWithSubmissions
       const newIndex = (this.currentIndex() + offset_ + students) % students
       this.goToStudent(

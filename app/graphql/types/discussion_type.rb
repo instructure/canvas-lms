@@ -28,12 +28,6 @@ module Types
     value "deleted"
   end
 
-  class DiscussionSortOrderType < Types::BaseEnum
-    graphql_name "DiscussionSortOrderType"
-    value "asc", value: :asc
-    value "desc", value: :desc
-  end
-
   class Types::DiscussionTopicAnonymousStateType < Types::BaseEnum
     graphql_name "DiscussionTopicAnonymousStateType"
     description "Anonymous states for discussionTopics"
