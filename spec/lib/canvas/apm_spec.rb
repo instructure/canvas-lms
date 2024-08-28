@@ -130,9 +130,9 @@ describe Canvas::Apm do
     it "adds shard and account tags to active span" do
       Canvas::Apm.hostname = "testbox"
       Canvas::Apm.tracer.trace("TESTING") do |span|
-        shard = OpenStruct.new({ id: 42 })
-        account = OpenStruct.new({ global_id: 420_000_042 })
-        user = OpenStruct.new({ global_id: 42_100_000_421 })
+        shard = instance_double("Shard", { id: 42 })
+        account = instance_double("Account", { global_id: 420_000_042 })
+        user = instance_double("User", { global_id: 42_100_000_421 })
         generate_request_id = "1234567890"
         expect(tracer.active_root_span).to eq(span)
         Canvas::Apm.annotate_trace(shard, account, generate_request_id, user)

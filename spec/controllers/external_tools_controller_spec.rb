@@ -2034,7 +2034,7 @@ describe ExternalToolsController do
         </cartridge_basiclti_link>
       XML
     end
-    let(:xml_response) { OpenStruct.new({ body: xml }) }
+    let(:xml_response) { instance_double("Net::HTTPResponse", body: xml) }
 
     context "with client id" do
       subject do
@@ -2407,7 +2407,7 @@ describe ExternalToolsController do
             <cartridge_icon identifierref="BLTI001_Icon"/>
         </cartridge_basiclti_link>
       XML
-      obj = OpenStruct.new({ body: xml })
+      obj = instance_double("Net::HTTPResponse", body: xml)
       allow(CanvasHttp).to receive(:get).and_return(obj)
       post "create", params: { course_id: @course.id, external_tool: { name: "tool name", url: "http://example.com", consumer_key: "key", shared_secret: "secret", config_type: "by_url", config_url: "http://config.example.com" } }, format: "json"
 

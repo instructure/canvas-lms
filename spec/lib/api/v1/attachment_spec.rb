@@ -247,7 +247,7 @@ describe Api::V1::Attachment do
 
   describe "#api_attachment_preflight" do
     let_once(:context) { course_model }
-    let(:request) { OpenStruct.new({ params: ActionController::Parameters.new(params) }) }
+    let(:request) { instance_double("Rack::Request", { params: ActionController::Parameters.new(params), ssl?: false }) }
     let(:params) { { name: "name", filename: "filename.png" } }
     let(:opts) { {} }
 

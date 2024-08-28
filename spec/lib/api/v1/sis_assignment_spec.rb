@@ -82,7 +82,7 @@ describe Api::V1::SisAssignment do
       allow(course_sections).to receive_messages(
         loaded?: true,
         active_course_sections: course_sections,
-        association: OpenStruct.new(loaded?: true)
+        association: instance_double("ActiveRecord::Association", loaded?: true)
       )
     end
 

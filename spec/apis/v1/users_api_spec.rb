@@ -44,7 +44,7 @@ class TestUserApi
   def initialize
     @domain_root_account = Account.default
     @params = {}
-    @request = OpenStruct.new
+    @request = ActionDispatch::Request.new({})
   end
 end
 
@@ -62,7 +62,7 @@ describe Api::V1::User do
   before do
     @test_api = TestUserApi.new
     @test_api.services_enabled = []
-    @test_api.request.protocol = "http"
+    allow(@test_api.request).to receive_messages(protocol: "http://", host: "host")
   end
 
   context "user_json" do
@@ -83,7 +83,7 @@ describe Api::V1::User do
       @student.account.set_service_availability(:avatars, true)
       @student.account.save!
       expect(@test_api.user_json(@student, @admin, {}, [], @course)).not_to have_key("avatar_url")
-      expect(@test_api.user_json(@student, @admin, {}, ["avatar_url"], @course)["avatar_url"]).to match("h:/images/messages/avatar-50.png")
+      expect(@test_api.user_json(@student, @admin, {}, ["avatar_url"], @course)["avatar_url"]).to eql "http://host/images/messages/avatar-50.png"
     end
 
     it "only loads pseudonyms for the user once, even if there are multiple enrollments" do
