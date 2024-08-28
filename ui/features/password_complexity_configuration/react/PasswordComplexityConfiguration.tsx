@@ -77,10 +77,6 @@ const PasswordComplexityConfiguration = () => {
   const [customMaxLoginAttemptsEnabled, setCustomMaxLoginAttemptsEnabled] = useState(false)
   const [allowLoginSuspensionEnabled, setAllowLoginSuspensionEnabled] = useState(false)
   const [maxLoginAttempts, setMaxLoginAttempts] = useState(DEFAULT_MAX_LOGIN_ATTEMPTS)
-  const [commonPasswordsAttachmentId, setCommonPasswordsAttachmentId] = useState<number | null>(
-    null
-  )
-  const [commonPasswordsFolderId, setCommonPasswordsFolderId] = useState<number | null>(null)
 
   const handleOpenTray = () => {
     setShowTray(true)
@@ -113,7 +109,6 @@ const PasswordComplexityConfiguration = () => {
             }
 
             if (passwordPolicy.minimum_character_length) {
-              console.log("it's defined")
               setMinimumCharacterLength(passwordPolicy.minimum_character_length)
               setMinimumCharacterLengthEnabled(true)
             } else {
@@ -132,9 +127,6 @@ const PasswordComplexityConfiguration = () => {
             } else {
               setAllowLoginSuspensionEnabled(false)
             }
-
-            setCommonPasswordsAttachmentId(passwordPolicy.common_passwords_attachment_id || null)
-            setCommonPasswordsFolderId(passwordPolicy.common_passwords_folder_id || null)
           }
         } catch (err: any) {
           // err type has to be any because the error object is not defined
@@ -179,7 +171,7 @@ const PasswordComplexityConfiguration = () => {
     setEnableApplyButton(false)
 
     const currentSettingsUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`
-    const settingsResult: any = await doFetchApi({
+    const settingsResult: any = await doFetchApi<PasswordSettingsResponse>({
       path: currentSettingsUrl,
       method: 'GET',
     })
@@ -198,13 +190,11 @@ const PasswordComplexityConfiguration = () => {
     if (settingsResult.json.password_policy.common_passwords_attachment_id) {
       passwordPolicy.common_passwords_attachment_id =
         settingsResult.json.password_policy.common_passwords_attachment_id
-      setCommonPasswordsAttachmentId(passwordPolicy.common_passwords_attachment_id || null)
     }
 
     if (settingsResult.json.password_policy.common_passwords_folder_id) {
       passwordPolicy.common_passwords_folder_id =
         settingsResult.json.password_policy.common_passwords_folder_id
-      setCommonPasswordsFolderId(passwordPolicy.common_passwords_folder_id || null)
     }
 
     if (customMaxLoginAttemptsEnabled) {

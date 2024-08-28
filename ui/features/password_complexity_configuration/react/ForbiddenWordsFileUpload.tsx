@@ -32,6 +32,7 @@ import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import './ForbiddenWordsFileUpload.module.css'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import type {PasswordSettingsResponse} from './types'
 
 const I18n = useI18nScope('password_complexity_configuration')
 
@@ -42,13 +43,21 @@ interface FileDetails {
   filename: string | null
 }
 
+interface FolderResponse {
+  id: number
+}
+
+interface FileResponse {
+  upload_url: string
+  upload_params: Record<string, string>
+}
+
 interface Props {
   open: boolean
   onDismiss: () => void
   onSave: (attachmentId: number | null) => void
   setForbiddenWordsUrl: (url: string | null) => void
   setForbiddenWordsFilename: (filename: string | null) => void
-  // folderId: number | null
 }
 
 const initialFileDetails: FileDetails = {url: null, filename: null}
@@ -80,7 +89,7 @@ const ForbiddenWordsFileUpload = ({
       formData.append('name', `password_policy`)
       formData.append('parent_folder_path', 'files/')
 
-      const {status, data} = await executeApiRequest({
+      const {status, data} = await executeApiRequest<FolderResponse>({
         method: 'POST',
         path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/folders`,
         body: formData,
@@ -106,7 +115,7 @@ const ForbiddenWordsFileUpload = ({
 
     try {
       const currentSettingsUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`
-      const settingsResult = await doFetchApi({
+      const settingsResult = await doFetchApi<PasswordSettingsResponse>({
         path: currentSettingsUrl,
         method: 'GET',
       })
@@ -116,8 +125,8 @@ const ForbiddenWordsFileUpload = ({
       }
 
       let folderId
-      if (settingsResult.json.password_policy.common_passwords_folder_id) {
-        folderId = settingsResult.json.password_policy.common_passwords_folder_id
+      if (settingsResult.json?.password_policy.common_passwords_folder_id) {
+        folderId = settingsResult.json?.password_policy.common_passwords_folder_id
       } else {
         folderId = await createFolder()
       }
@@ -131,13 +140,13 @@ const ForbiddenWordsFileUpload = ({
       const initialRequestFormData = new FormData()
       initialRequestFormData.append('name', filename)
 
-      const requestResponse = await executeApiRequest({
+      const {data} = await executeApiRequest<FileResponse>({
         method: 'POST',
         path: `/api/v1/folders/${folderId}/files`,
         body: initialRequestFormData,
       })
-      const upload_url = requestResponse.data.upload_url
-      const upload_params = requestResponse.data.upload_params
+      const upload_url = data.upload_url
+      const upload_params = data.upload_params
 
       const uploadFileFormData = new FormData()
 
@@ -163,7 +172,7 @@ const ForbiddenWordsFileUpload = ({
         account: {
           settings: {
             password_policy: {
-              ...settingsResult.json.password_policy,
+              ...settingsResult.json?.password_policy,
               common_passwords_folder_id: folderId,
               common_passwords_attachment_id: fileId,
             },
@@ -171,14 +180,13 @@ const ForbiddenWordsFileUpload = ({
         },
       }
 
-      const updateAccountUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/`
-      const saveResponse = await doFetchApi({
-        path: updateAccountUrl,
+      const {status: accountsSettingsStatus} = await executeApiRequest({
+        path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/`,
         body: updatedPasswordPolicy,
         method: 'PUT',
       })
 
-      if (saveResponse.response.ok) {
+      if (accountsSettingsStatus === 200) {
         setForbiddenWordsUrl(url)
         setForbiddenWordsFilename(filename)
         onSave(fileId)
