@@ -36,12 +36,31 @@ module Types
 
     field :message, String, null: true
     def message
-      if object.deleted?
-        nil
-      elsif object.message&.include?("instructure_inline_media_comment")
+      return nil if object.deleted?
+
+      if object.message&.include?("<span class=\"mceNonEditable mention\"")
+        doc = Nokogiri::HTML::DocumentFragment.parse(object.message)
+        mentioned_spans = doc.css("span[data-mention]")
+        mentioned_user_ids = mentioned_spans.pluck("data-mention").map(&:to_i)
+
+        users = GraphQL::Batch.batch do
+          Loaders::DiscussionEntryUserLoader.load_many(mentioned_user_ids).sync
+        end
+
+        mentioned_spans.each do |span|
+          user = users.find { |u| u.id == span["data-mention"].to_i }
+          if user
+            mention_node = span.children.find { |node| node.text? && node.content.start_with?("@") }
+            mention_node.content = "@" + user.name if mention_node
+          end
+        end
+        object.message = doc.to_html
+      end
+
+      if object.message&.include?("instructure_inline_media_comment")
         load_association(:discussion_topic).then do |topic|
           Loaders::ApiContentAttachmentLoader.for(topic.context).load(object.message).then do |preloaded_attachments|
-            GraphQLHelpers::UserContent.process(
+            object.message = GraphQLHelpers::UserContent.process(
               object.message,
               context: topic.context,
               in_app: true,
@@ -52,9 +71,9 @@ module Types
             )
           end
         end
-      else
-        object.message
       end
+
+      object.message
     end
 
     field :root_entry_page_number, Integer, null: true do

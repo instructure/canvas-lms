@@ -28,6 +28,7 @@ export const MENTIONABLE_USERS_QUERY = gql`
             id
             _id
             name
+            shortName
           }
         }
       }
