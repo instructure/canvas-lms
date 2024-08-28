@@ -39,7 +39,7 @@ RSpec.describe VideoCaptionService, type: :service do
       before do
         allow(service).to receive_messages(
           url: "https://example.com/video.mp4",
-          request_handoff: { "media" => { "id" => "1234" } },
+          handoff_video_for_processing: "1234",
           request_caption: double("Response", code: 200),
           media: { "media" => { "captions" => [{ "language" => "en", "status" => "succeeded" }] } },
           grab_captions: "Captions for the video",
@@ -112,7 +112,7 @@ RSpec.describe VideoCaptionService, type: :service do
       before do
         allow(service).to receive_messages(
           url: "https://example.com/video.mp4",
-          request_handoff: nil,
+          handoff_video_for_processing: nil,
           config: { "app-host" => "https://example.com" },
           auth_token: "token"
         )
@@ -133,7 +133,7 @@ RSpec.describe VideoCaptionService, type: :service do
       before do
         allow(service).to receive_messages(
           url: "https://example.com/video.mp4",
-          request_handoff: { "media" => { "id" => "1234" } },
+          handoff_video_for_processing: "1234",
           request_caption: double("Response", code: 500),
           config: { "app-host" => "https://example.com" },
           auth_token: "token"
@@ -155,7 +155,7 @@ RSpec.describe VideoCaptionService, type: :service do
       before do
         allow(service).to receive_messages(
           url: "https://example.com/video.mp4",
-          request_handoff: { "media" => { "id" => "1234" } },
+          handoff_video_for_processing: "1234",
           request_caption: double("Response", code: 200),
           media: { "media" => { "captions" => [{ "status" => "in_progress" }] } },
           config: { "app-host" => "https://example.com" },
@@ -178,7 +178,7 @@ RSpec.describe VideoCaptionService, type: :service do
       before do
         allow(service).to receive_messages(
           url: "https://example.com/video.mp4",
-          request_handoff: { "media" => { "id" => "1234" } },
+          handoff_video_for_processing: "1234",
           request_caption: double("Response", code: 200),
           media: { "media" => { "captions" => [{ "language" => "en", "status" => "succeeded" }] } },
           grab_captions: nil,
