@@ -36,15 +36,22 @@ module Services
     end
     let(:submit_assignment) { true }
     let(:failure_email) do
-      OpenStruct.new(
-        from_name: "notifications@instructure.com",
-        subject: "Submission upload failed: #{assignment.name}",
-        to: user.email,
-        body: "Your file, #{attachment.display_name}, failed to upload to your " \
-              "Canvas assignment, #{assignment.name}. Please re-submit to " \
-              "the assignment or contact your instructor if you are no " \
-              "longer able to do so."
-      )
+      instance_double("Message",
+                      from_name: "notifications@instructure.com",
+                      subject: "Submission upload failed: #{assignment.name}",
+                      to: user.email,
+                      path_type: "email",
+                      context: nil,
+                      context_type: nil,
+                      id: nil,
+                      global_id: nil,
+                      created_at: nil,
+                      reply_to_name: nil,
+                      html_body: nil,
+                      body: "Your file, #{attachment.display_name}, failed to upload to your " \
+                            "Canvas assignment, #{assignment.name}. Please re-submit to " \
+                            "the assignment or contact your instructor if you are no " \
+                            "longer able to do so.")
     end
     let(:eula_agreement_timestamp) { "1522419910" }
     let(:comment) { "what a comment" }

@@ -898,7 +898,7 @@ describe Canvas::LiveEvents do
 
     it "provides a different context if a different context is provided" do
       attachment_model
-      context = OpenStruct.new(global_id: "1")
+      context = instance_double("Course", global_id: "1", account: nil)
 
       expect_event("asset_accessed",
                    {

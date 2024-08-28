@@ -947,7 +947,7 @@ describe Api do
         extend Api
 
         def self.request
-          OpenStruct.new({ host: "some-host.com", port: 80 })
+          @request ||= ActionDispatch::Request.new("HTTP_HOST" => "some-host.com")
         end
       end
     end
