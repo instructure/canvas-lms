@@ -33,6 +33,7 @@ import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {Flex} from '@instructure/ui-flex'
 import CustomForbiddenWordsSection from './CustomForbiddenWordsSection'
 import type {PasswordPolicy, PasswordSettings, PasswordSettingsResponse} from './types'
+import {deleteForbiddenWordsFile} from './apiClient'
 
 const I18n = useI18nScope('password_complexity_configuration')
 
@@ -62,6 +63,7 @@ const PasswordComplexityConfiguration = () => {
   const [customMaxLoginAttemptsEnabled, setCustomMaxLoginAttemptsEnabled] = useState(false)
   const [allowLoginSuspensionEnabled, setAllowLoginSuspensionEnabled] = useState(false)
   const [maxLoginAttempts, setMaxLoginAttempts] = useState(DEFAULT_MAX_LOGIN_ATTEMPTS)
+  const [newlyUploadedAttachmentId, setNewlyUploadedAttachmentId] = useState<number | null>(null)
 
   useEffect(() => {
     if (showTray) {
@@ -154,6 +156,15 @@ const PasswordComplexityConfiguration = () => {
   }
 
   const cancelChanges = async () => {
+    if (newlyUploadedAttachmentId) {
+      try {
+        await deleteForbiddenWordsFile(newlyUploadedAttachmentId)
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error deleting forbidden words file on cancel:', error)
+      }
+      setNewlyUploadedAttachmentId(null)
+    }
     setShowTray(false)
   }
 
@@ -214,6 +225,7 @@ const PasswordComplexityConfiguration = () => {
           type: 'success',
         })
         setShowTray(false)
+        setNewlyUploadedAttachmentId(null)
       }
     } catch (err: any) {
       // err type has to be any because the error object is not defined
@@ -255,7 +267,7 @@ const PasswordComplexityConfiguration = () => {
                   margin="xxx-small 0 0 0"
                   offset="small"
                   screenReaderLabel="Close"
-                  onClick={() => setShowTray(false)}
+                  onClick={cancelChanges}
                 />
               </Flex.Item>
             </Flex>
@@ -329,7 +341,10 @@ const PasswordComplexityConfiguration = () => {
                 data-testid="requireSymbolsCheckbox"
               />
             </View>
-            <CustomForbiddenWordsSection />
+            <CustomForbiddenWordsSection
+              setNewlyUploadedAttachmentId={setNewlyUploadedAttachmentId}
+            />
+
             <View as="div" margin="medium medium small medium">
               <Checkbox
                 onChange={handleCustomMaxLoginAttemptToggle}
