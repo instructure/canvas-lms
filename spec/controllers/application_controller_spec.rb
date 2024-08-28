@@ -1542,7 +1542,8 @@ RSpec.describe ApplicationController do
             user:,
             session_id: nil,
             placement: nil,
-            launch_type: :content_item
+            launch_type: :content_item,
+            launch_url: "http://www.example.com/basic_lti"
           )
         end
 

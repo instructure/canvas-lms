@@ -19,7 +19,7 @@
 
 describe Lti::LogService do
   let(:service) do
-    Lti::LogService.new(tool:, context:, user:, session_id:, placement:, launch_type:)
+    Lti::LogService.new(tool:, context:, user:, session_id:, placement:, launch_type:, launch_url:)
   end
 
   let_once(:session_id) { SecureRandom.hex }
@@ -29,6 +29,7 @@ describe Lti::LogService do
   let_once(:context) { course_model(root_account: account) }
   let_once(:placement) { :course_navigation }
   let_once(:launch_type) { :direct_link }
+  let_once(:launch_url) { "https://example.com/basic_lti_tool/" }
 
   describe ".new" do
     context "when context is not valid type" do
@@ -124,6 +125,7 @@ describe Lti::LogService do
                               account_id: account.id.to_s,
                               root_account_uuid: account.uuid,
                               launch_type:,
+                              launch_url:,
                               message_type: service.message_type,
                               placement:,
                               context_id: context.id.to_s,
