@@ -829,6 +829,17 @@ This is a list of IMS LIS roles should have a different key.
 ```
 "urn:lti:sysrole:ims/lis/None"
 ```
+## Canvas.membership.permissions<>
+Returns a comma-separated list of permissions granted to the user in the current context,
+given a comma-separated set to check using the format
+`$Canvas.membership.permissions<example_permission,example_permission2,..>`.
+
+**Availability**: *when launched from a course or an account (or a Group within a course or account)*  
+
+
+```
+"example_permission_1,example_permission_2"
+```
 ## Canvas.course.previousContextIds
 With respect to the current course, returns the context ids of the courses from which content has been copied (excludes cartridge imports).
 
