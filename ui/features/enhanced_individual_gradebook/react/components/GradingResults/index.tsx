@@ -57,6 +57,8 @@ export type GradingResultsComponentProps = {
   dropped: boolean
 }
 
+const REPLY_TO_TOPIC = 'reply_to_topic'
+
 export default function GradingResults({
   assignment,
   courseId,
@@ -188,7 +190,15 @@ export default function GradingResults({
     const {
       target: {checked},
     } = event
-    await submitExcused(checked, submitScoreUrl)
+
+    // This is preparing for the future, when we might have other checkpoints. Just making sure that the checkpoint
+    // we are marking as excused exists.
+    const subAssignmentTag =
+      assignment.checkpoints && assignment.checkpoints.find(({tag}) => tag === REPLY_TO_TOPIC)
+        ? REPLY_TO_TOPIC
+        : null
+
+    await submitExcused(checked, submitScoreUrl, subAssignmentTag)
   }
 
   const submitGrade = async () => {
