@@ -4237,7 +4237,7 @@ ja:
   assign_this_module_a4685e57: このモジュールを割り当てる
   assign_this_quiz_e7d789f: この小テストを割り当てる
   assign_to_6b806cd9: 課題対象者：
-  assign_to_95404a83: ～へ割り当てられました
+  assign_to_95404a83: 割り当て先
   assign_to_b976cebc: 割り当て対象者...
   assign_to_c46e21: 対象者
   assigned_pace_e954962a: 割り当てられたペース
@@ -33319,7 +33319,7 @@ ja:
         select_folder_for_uploads: "ファイル アップロードのためのフォルダを選択します"
     wiki_page: 
       buttons: 
-        assign_to: ～へ割り当てられました
+        assign_to: 割り当て先
         edit: 編集
         view_all_pages: ページ一覧を表示
       delete_wiki: 削除
