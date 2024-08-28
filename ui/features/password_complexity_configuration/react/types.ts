@@ -16,6 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+export interface PasswordPolicy {
+  require_number_characters: boolean
+  require_symbol_characters: boolean
+  allow_login_suspension: boolean
+  maximum_login_attempts?: number
+  minimum_character_length?: number
+  common_passwords_attachment_id?: number | null
+  common_passwords_folder_id?: number | null
+}
+
+export interface PasswordSettings {
+  password_policy: PasswordPolicy
+}
+
 interface PasswordPolicyApiResponse {
   require_number_characters: string
   require_symbol_characters: string

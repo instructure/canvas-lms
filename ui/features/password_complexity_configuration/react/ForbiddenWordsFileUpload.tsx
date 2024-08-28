@@ -31,7 +31,6 @@ import {Flex} from '@instructure/ui-flex'
 import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import './ForbiddenWordsFileUpload.module.css'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {PasswordSettingsResponse} from './types'
 
 const I18n = useI18nScope('password_complexity_configuration')
@@ -114,19 +113,18 @@ const ForbiddenWordsFileUpload = ({
     setUploadAttempted(true)
 
     try {
-      const currentSettingsUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`
-      const settingsResult = await doFetchApi<PasswordSettingsResponse>({
-        path: currentSettingsUrl,
+      const {status, data: settingsResult} = await executeApiRequest<PasswordSettingsResponse>({
+        path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`,
         method: 'GET',
       })
 
-      if (!settingsResult.response.ok) {
+      if (status !== 200) {
         throw new Error('Failed to fetch current settings.')
       }
 
       let folderId
-      if (settingsResult.json?.password_policy.common_passwords_folder_id) {
-        folderId = settingsResult.json?.password_policy.common_passwords_folder_id
+      if (settingsResult?.password_policy.common_passwords_folder_id) {
+        folderId = settingsResult?.password_policy.common_passwords_folder_id
       } else {
         folderId = await createFolder()
       }
@@ -172,7 +170,7 @@ const ForbiddenWordsFileUpload = ({
         account: {
           settings: {
             password_policy: {
-              ...settingsResult.json?.password_policy,
+              ...settingsResult?.password_policy,
               common_passwords_folder_id: folderId,
               common_passwords_attachment_id: fileId,
             },

@@ -26,11 +26,11 @@ import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import {IconTrashLine, IconUploadSolid} from '@instructure/ui-icons'
 import ForbiddenWordsFileUpload from './ForbiddenWordsFileUpload'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import type {PasswordSettingsResponse} from './types'
+import {deleteForbiddenWordsFile} from './apiClient'
 import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 
 declare const ENV: GlobalEnv
@@ -45,54 +45,11 @@ interface ForbiddenWordsResponse {
 export const fetchLatestForbiddenWords = async (
   attachmentId: number
 ): Promise<ForbiddenWordsResponse | null> => {
-  const {response, json} = await doFetchApi({
+  const {status, data} = await executeApiRequest<ForbiddenWordsResponse>({
     path: `/api/v1/files/${attachmentId}`,
     method: 'GET',
   })
-  return response.ok ? (json as ForbiddenWordsResponse) ?? null : null
-}
-
-const deleteForbiddenWordsFile = async (attachmentId: number): Promise<void> => {
-  try {
-    const settingsResult = await doFetchApi<PasswordSettingsResponse>({
-      path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`,
-      method: 'GET',
-    })
-
-    if (!settingsResult.response.ok) {
-      throw new Error('Failed to fetch current settings.')
-    }
-
-    const deleteResult = await doFetchApi({
-      path: `/api/v1/files/${attachmentId}`,
-      method: 'DELETE',
-    })
-
-    if (!deleteResult.response.ok) {
-      throw new Error('Failed to delete forbidden words file.')
-    }
-
-    const updatedPasswordPolicy = {
-      account: {
-        settings: {
-          ...settingsResult.json,
-        },
-      },
-    }
-    delete updatedPasswordPolicy.account.settings.password_policy?.common_passwords_attachment_id
-    const {status} = await executeApiRequest({
-      path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/`,
-      body: updatedPasswordPolicy,
-      method: 'PUT',
-    })
-    if (status !== 200) {
-      throw new Error('Failed to update password policy settings.')
-    }
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error deleting forbidden words file:', error)
-    throw error
-  }
+  return status === 200 ? data ?? null : null
 }
 
 const CustomForbiddenWordsSection = () => {
@@ -106,22 +63,18 @@ const CustomForbiddenWordsSection = () => {
   )
 
   const fetchAndSetForbiddenWords = useCallback(async () => {
-    const currentSettingsUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`
-    const settingsResult = await doFetchApi<PasswordSettingsResponse>({
-      path: currentSettingsUrl,
+    const {status, data: settingsResult} = await executeApiRequest<PasswordSettingsResponse>({
+      path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`,
       method: 'GET',
     })
-
-    if (!settingsResult.response.ok) {
+    if (status !== 200) {
       throw new Error('Failed to fetch current settings.')
     }
 
-    const attachmentId = settingsResult.json?.password_policy.common_passwords_attachment_id
-
+    const attachmentId = settingsResult.password_policy.common_passwords_attachment_id
     if (!attachmentId) {
       return
     }
-
     setCommonPasswordsAttachmentId(attachmentId)
 
     try {
@@ -287,7 +240,6 @@ const CustomForbiddenWordsSection = () => {
         }}
         setForbiddenWordsUrl={setForbiddenWordsUrl}
         setForbiddenWordsFilename={setForbiddenWordsName}
-        // folderId={commonPasswordsFolderId}
       />
     </>
   )
