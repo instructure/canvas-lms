@@ -66,8 +66,7 @@ describe('CanvasCartridgeImporter', () => {
   it('disable inputs while uploading', async () => {
     renderComponent({isSubmitting: true})
     await waitFor(() => {
-      expect(screen.getByRole('button', {name: 'Choose File'})).toBeInTheDocument()
-      expect(screen.getByRole('button', {name: 'Choose File'})).toBeDisabled()
+      expect(screen.getByTestId('migrationFileUpload')).toBeDisabled()
       expect(screen.getByRole('button', {name: 'Cancel'})).toBeDisabled()
       expect(screen.getByRole('button', {name: /Adding.../})).toBeDisabled()
       expect(screen.getByRole('radio', {name: /All content/})).toBeDisabled()
