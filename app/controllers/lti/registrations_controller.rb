@@ -543,15 +543,13 @@ class Lti::RegistrationsController < ApplicationController
       end.flatten
 
       all_registrations = account_registrations + forced_on_in_site_admin + inherited_on_registrations + consortia_registrations
+      Lti::Registration.preload_account_bindings(all_registrations, @account)
 
       search_terms = params[:query]&.downcase&.split
       all_registrations = filter_registrations_by_search_query(all_registrations, search_terms) if search_terms
 
       # sort by the 'sort' parameter, or installed (a.k.a. created_at) if no parameter was given
       sort_field = params[:sort]&.to_sym || :installed
-
-      Lti::Registration.preload_account_bindings(all_registrations, @account)
-
       sorted_registrations = all_registrations.sort_by do |reg|
         case sort_field
         when :name
