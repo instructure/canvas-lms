@@ -72,7 +72,7 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, rceRef}) => {
 
   const filteredOptions = useMemo(() => {
     return mentionData?.filter(o => {
-      return o.name.toLowerCase().includes(inputText?.toLowerCase().trim())
+      return o.name.toLowerCase().includes(inputText?.toLowerCase().trim()) || o.shortName.toLowerCase().includes(inputText?.toLowerCase().trim())
     })
   }, [mentionData, inputText])
 
