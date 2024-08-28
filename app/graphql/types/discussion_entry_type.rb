@@ -57,6 +57,21 @@ module Types
       end
     end
 
+    field :root_entry_page_number, Integer, null: true do
+      argument :per_page, Integer, required: false
+      argument :sort_order, Types::DiscussionSortOrderType, required: false
+    end
+    def root_entry_page_number(per_page: 20, sort_order: "desc")
+      load_association(:discussion_topic).then do |topic|
+        # we display deleted entries in discussions
+        topic_root_entries_ids = topic.discussion_entries.where(parent_id: nil).reorder("created_at #{sort_order}").map(&:id)
+        entry_root_id = object.root_entry_id || object.id
+        # we can have erroneous entries, if so at least we don't break
+        root_entry_index = topic_root_entries_ids.find_index(entry_root_id) || 0
+        (root_entry_index / per_page).floor
+      end
+    end
+
     field :preview_message, String, null: true
     def preview_message
       object.deleted? ? nil : object.summary(ActiveRecord::Base.maximum_text_length)

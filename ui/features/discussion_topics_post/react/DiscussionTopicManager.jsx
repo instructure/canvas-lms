@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DISCUSSION_QUERY} from '../graphql/Queries'
+import {DISCUSSION_QUERY, STUDENT_DISCUSSION_QUERY} from '../graphql/Queries'
 import {DiscussionTopicToolbarContainer} from './containers/DiscussionTopicToolbarContainer/DiscussionTopicToolbarContainer'
 import {DiscussionTopicRepliesContainer} from './containers/DiscussionTopicRepliesContainer/DiscussionTopicRepliesContainer'
 import {DiscussionTopicHeaderContainer} from './containers/DiscussionTopicHeaderContainer/DiscussionTopicHeaderContainer'
@@ -35,7 +35,7 @@ import {
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
 import PropTypes from 'prop-types'
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useRef, useState, useCallback} from 'react'
 import {useQuery} from 'react-apollo'
 import {SplitScreenViewContainer} from './containers/SplitScreenViewContainer/SplitScreenViewContainer'
 import {DrawerLayout} from '@instructure/ui-drawer-layout'
@@ -46,6 +46,7 @@ import useCreateDiscussionEntry from './hooks/useCreateDiscussionEntry'
 import {flushSync} from 'react-dom'
 import {captureException} from '@sentry/react'
 import {LoadingSpinner} from './components/LoadingSpinner/LoadingSpinner'
+import useSpeedGrader from './hooks/useSpeedGrader'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -178,14 +179,6 @@ const DiscussionTopicManager = props => {
     }
   }, [isTopicHighlighted])
 
-  useEffect(() => {
-    if (highlightEntryId && !isPersistEnabled) {
-      setTimeout(() => {
-        setHighlightEntryId(null)
-      }, HIGHLIGHT_TIMEOUT)
-    }
-  }, [highlightEntryId])
-
   /**
    * Opens a split-screen view for a discussion entry.
    *
@@ -237,6 +230,73 @@ const DiscussionTopicManager = props => {
     fetchPolicy: searchTerm ? 'network-only' : 'cache-and-network',
     skip: waitForUnreadFilter,
   })
+
+  const speedGraderHook = useSpeedGrader()
+
+  const studenTopicVariables = {
+    discussionID: discussionTopicQuery?.data?.legacyNode?._id,
+    userSearchId: speedGraderHook.currentStudentId,
+    perPage: ENV.per_page,
+    sort,
+  }
+
+  const studentTopicQuery = useQuery(STUDENT_DISCUSSION_QUERY, {
+    variables: studenTopicVariables,
+    fetchPolicy: 'cache-and-network',
+    skip: !(
+      speedGraderHook.isInSpeedGrader &&
+      speedGraderHook.currentStudentId &&
+      studenTopicVariables.discussionID
+    ),
+  })
+
+  const onMessage = useCallback(
+    e => {
+      const message = e.data
+      if (highlightEntryId) {
+        switch (message.subject) {
+          case 'DT.previousStudentReply': {
+            const previousStudentEntry = speedGraderHook.getStudentPreviousEntry(
+              highlightEntryId,
+              studentTopicQuery
+            )
+            setHighlightEntryId(previousStudentEntry?._id)
+            setPageNumber(previousStudentEntry?.rootEntryPageNumber)
+            if (previousStudentEntry?.rootEntryId){
+              setExpandedThreads([...expandedThreads, previousStudentEntry.rootEntryId])
+            }
+            break
+          }
+          case 'DT.nextStudentReply': {
+            const nextStudentEntry = speedGraderHook.getStudentNextEntry(
+              highlightEntryId,
+              studentTopicQuery
+            )
+            setHighlightEntryId(nextStudentEntry?._id)
+            setPageNumber(nextStudentEntry?.rootEntryPageNumber)
+            if (nextStudentEntry?.rootEntryId){
+              setExpandedThreads([...expandedThreads, nextStudentEntry.rootEntryId])
+            }
+            break
+          }
+        }
+      }
+    },
+    [studentTopicQuery.loading, highlightEntryId]
+  )
+
+  useEffect(() => {
+    if (highlightEntryId && !isPersistEnabled) {
+      setTimeout(() => {
+        setHighlightEntryId(null)
+      }, HIGHLIGHT_TIMEOUT)
+    }
+
+    window.addEventListener('message', onMessage)
+    return () => {
+      window.removeEventListener('message', onMessage)
+    }
+  }, [highlightEntryId, discussionTopicQuery.loading, onMessage])
 
   useEffect(() => {
     setIsGradedDiscussion(!!discussionTopicQuery?.data?.legacyNode?.assignment)
