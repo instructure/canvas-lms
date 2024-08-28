@@ -772,11 +772,6 @@ class ActiveRecord::Base
     override
   end
 
-  def self.with_pgvector(&)
-    vector_schema = connection.extension("vector").schema
-    connection.add_schema_to_search_path(vector_schema, &)
-  end
-
   def insert(on_conflict: -> { raise ActiveRecord::RecordNotUnique })
     validate!
 

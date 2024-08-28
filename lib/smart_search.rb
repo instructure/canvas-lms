@@ -112,24 +112,22 @@ module SmartSearch
       version = context.search_embedding_version || EMBEDDING_VERSION
       embedding = SmartSearch.generate_embedding(query, version:, query: true)
       collections = []
-      ActiveRecord::Base.with_pgvector do
-        SmartSearch.search_scopes(context, user).each do |klass, item_scope|
-          item_scope = apply_filter(klass, item_scope, type_filter)
-          next unless item_scope
+      SmartSearch.search_scopes(context, user).each do |klass, item_scope|
+        item_scope = apply_filter(klass, item_scope, type_filter)
+        next unless item_scope
 
-          item_scope = item_scope.select(
-            ActiveRecord::Base.send(:sanitize_sql, ["#{klass.table_name}.*, MIN(embedding OPERATOR(#{PG::Connection.quote_ident(ActiveRecord::Base.connection.extension("vector").schema)}.<=>) ?) AS distance", embedding.to_s])
-          )
-                                 .joins(:embeddings)
-                                 .where(klass.embedding_class.table_name => { version: })
-                                 .group("#{klass.table_name}.id")
-                                 .reorder("distance ASC")
-          collections << [klass.name,
-                          BookmarkedCollection.wrap(
-                            BookmarkedCollection::SimpleBookmarker.new(klass, { distance: { type: :float, null: false } }, :id),
-                            item_scope
-                          )]
-        end
+        item_scope = item_scope.select(
+          ActiveRecord::Base.send(:sanitize_sql, ["#{klass.table_name}.*, MIN(embedding OPERATOR(#{PG::Connection.quote_ident(ActiveRecord::Base.connection.extension("vector").schema)}.<=>) ?) AS distance", embedding.to_s])
+        )
+                               .joins(:embeddings)
+                               .where(klass.embedding_class.table_name => { version: })
+                               .group("#{klass.table_name}.id")
+                               .reorder("distance ASC")
+        collections << [klass.name,
+                        BookmarkedCollection.wrap(
+                          BookmarkedCollection::SimpleBookmarker.new(klass, { distance: { type: :float, null: false } }, :id),
+                          item_scope
+                        )]
       end
       BookmarkedCollection.merge(*collections)
     end
