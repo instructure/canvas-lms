@@ -137,6 +137,12 @@ module ErrorContext
       !example.exception || ErrorSummary.discard_remaining?
     end
 
+    def selenium_crashed?
+      # this is a common error, there have been many bugs reported to selenium
+      # one example bug https://github.com/SeleniumHQ/selenium/issues/14438
+      example.exception&.message&.include?("disconnected: not connected to DevTools")
+    end
+
     def selenium?
       return @selenium unless @selenium.nil?
 
@@ -190,7 +196,7 @@ module ErrorContext
     end
 
     def capture_screenshot?
-      selenium?
+      selenium? && !selenium_crashed?
     end
 
     # def capture_video?
@@ -198,7 +204,7 @@ module ErrorContext
     # end
 
     def js_errors
-      return unless selenium?
+      return if !selenium? || selenium_crashed?
 
       @js_errors ||= begin
         js_errors = SeleniumDriverSetup.js_errors

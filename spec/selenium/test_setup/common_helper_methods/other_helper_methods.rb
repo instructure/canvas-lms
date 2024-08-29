@@ -150,6 +150,10 @@ module OtherHelperMethods
     driver.execute_script "localStorage.clear();"
   end
 
+  def clear_session_storage
+    driver.execute_script "sessionStorage.clear();"
+  end
+
   def scroll_height
     driver.execute_script "return window.pageYOffset"
   end
