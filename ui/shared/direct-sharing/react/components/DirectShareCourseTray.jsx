@@ -27,6 +27,7 @@ const DirectShareCoursePanel = lazy(() => import('./DirectShareCoursePanel'))
 export default function DirectShareCourseTray({
   sourceCourseId,
   contentSelection,
+  showAssignments = false,
   onDismiss,
   ...trayProps
 }) {
@@ -42,6 +43,7 @@ export default function DirectShareCourseTray({
         sourceCourseId={sourceCourseId}
         contentSelection={contentSelection}
         onCancel={onDismiss}
+        showAssignments={showAssignments}
       />
     </CanvasLazyTray>
   )
