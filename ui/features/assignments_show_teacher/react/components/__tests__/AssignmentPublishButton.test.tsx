@@ -22,11 +22,16 @@ import {render, screen} from '@testing-library/react'
 import {mockAssignment, mockSetWorkflowSuccess, mockSetWorkflowFailure} from '../../test-utils'
 import AssignmentHeader from '../AssignmentHeader'
 import AssignmentPublishButton from '../AssignmentPublishButton'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 describe('Publish/Unpublish Button', () => {
   it('renders publish/unpublish button', () => {
     const assignment = mockAssignment()
-    const getByTestId = render(<AssignmentHeader assignment={assignment} />).getByTestId
+    const getByTestId = render(
+      <QueryClientProvider client={new QueryClient()}>
+        <AssignmentHeader assignment={assignment} breakpoints={{}} />
+      </QueryClientProvider>
+    ).getByTestId
     const isPublished = assignment.state === 'published'
     const workFlowState = isPublished ? 'Published' : 'Unpublished'
     expect(getByTestId('assignment-publish-menu')).toBeInTheDocument()

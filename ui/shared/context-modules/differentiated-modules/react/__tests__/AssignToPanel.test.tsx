@@ -23,6 +23,7 @@ import {ASSIGNMENT_OVERRIDES_DATA, SECTIONS_DATA, STUDENTS_DATA} from './mocks'
 import * as utils from '../../utils/assignToHelper'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 jest.mock('../../utils/assignToHelper', () => {
   const originalModule = jest.requireActual('../../utils/assignToHelper')
@@ -50,6 +51,7 @@ describe('AssignToPanel', () => {
 
   const ASSIGNMENT_OVERRIDES_URL = `/api/v1/courses/${props.courseId}/modules/${props.moduleId}/assignment_overrides?per_page=100`
   const ASSIGNMENT_OVERRIDES_URL_PUT = `/api/v1/courses/${props.courseId}/modules/${props.moduleId}/assignment_overrides`
+  const COURSE_SETTINGS_URL = `/api/v1/courses/${props.courseId}/settings`
   const SECTIONS_URL = /\/api\/v1\/courses\/.+\/sections\?per_page=\d+/
   const STUDENTS_URL = /\/api\/v1\/courses\/.+\/users\?per_page=\d+&enrollment_type=student/
 
@@ -63,16 +65,33 @@ describe('AssignToPanel', () => {
   })
 
   beforeEach(() => {
-    fetchMock.getOnce(SECTIONS_URL, SECTIONS_DATA)
-    fetchMock.getOnce(STUDENTS_URL, STUDENTS_DATA)
-    fetchMock.getOnce(ASSIGNMENT_OVERRIDES_URL, [])
+    fetchMock.get(SECTIONS_URL, SECTIONS_DATA)
+    fetchMock.get(STUDENTS_URL, STUDENTS_DATA)
+    fetchMock.get(ASSIGNMENT_OVERRIDES_URL, [])
+    fetchMock.get(COURSE_SETTINGS_URL, {hide_final_grades: false})
   })
 
   afterEach(() => {
     fetchMock.restore()
   })
 
-  const renderComponent = (overrides = {}) => render(<AssignToPanel {...props} {...overrides} />)
+  const renderComponent = (overrides = {}) =>
+    render(
+      <QueryClientProvider
+        client={
+          new QueryClient({
+            defaultOptions: {
+              queries: {
+                staleTime: 1000 * 60 * 60 * 24, // 1 day,
+                cacheTime: 1000 * 60 * 60 * 24 * 2, // 2 days,
+              },
+            },
+          })
+        }
+      >
+        <AssignToPanel {...props} {...overrides} />
+      </QueryClientProvider>
+    )
 
   it('renders', async () => {
     const {findByText} = renderComponent()
@@ -99,7 +118,7 @@ describe('AssignToPanel', () => {
   })
 
   it('renders custom access as the default option if there are assignmentOverrides', async () => {
-    fetchMock.getOnce(ASSIGNMENT_OVERRIDES_URL, ASSIGNMENT_OVERRIDES_DATA, {
+    fetchMock.get(ASSIGNMENT_OVERRIDES_URL, ASSIGNMENT_OVERRIDES_DATA, {
       overwriteRoutes: true,
     })
     const {findByTestId} = renderComponent()
@@ -108,7 +127,7 @@ describe('AssignToPanel', () => {
   })
 
   it('not render custom access as the default option if default option is called', async () => {
-    fetchMock.getOnce(ASSIGNMENT_OVERRIDES_URL, ASSIGNMENT_OVERRIDES_DATA, {
+    fetchMock.get(ASSIGNMENT_OVERRIDES_URL, ASSIGNMENT_OVERRIDES_DATA, {
       overwriteRoutes: true,
     })
     const {findByTestId} = renderComponent({defaultOption: 'everyone'})
@@ -171,7 +190,7 @@ describe('AssignToPanel', () => {
     })
 
     it('shows existing assignmentOverrides as the default selection', async () => {
-      fetchMock.getOnce(ASSIGNMENT_OVERRIDES_URL, ASSIGNMENT_OVERRIDES_DATA, {
+      fetchMock.get(ASSIGNMENT_OVERRIDES_URL, ASSIGNMENT_OVERRIDES_DATA, {
         overwriteRoutes: true,
       })
       const assignedSections = ASSIGNMENT_OVERRIDES_DATA.filter(
@@ -282,7 +301,7 @@ describe('AssignToPanel', () => {
     })
 
     it('displays empty assignee error on clearAll after component is rendered with pills', async () => {
-      fetchMock.getOnce(ASSIGNMENT_OVERRIDES_URL, ASSIGNMENT_OVERRIDES_DATA, {
+      fetchMock.get(ASSIGNMENT_OVERRIDES_URL, ASSIGNMENT_OVERRIDES_DATA, {
         overwriteRoutes: true,
       })
       renderComponent()

@@ -44,7 +44,7 @@ import template from '../../jst/AssignmentListItem.handlebars'
 import scoreTemplate from '../../jst/_assignmentListItemScore.handlebars'
 import AssignmentKeyBindingsMixin from '../mixins/AssignmentKeyBindingsMixin'
 import CreateAssignmentView from './CreateAssignmentView'
-import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import {captureException} from '@sentry/browser'
 
 const I18n = useI18nScope('AssignmentListItemView')
@@ -608,7 +608,7 @@ export default AssignmentListItemView = (function () {
         mountPoint.innerHTML = ''
       }
       ReactDOM.render(
-        <ItemAssignToTray
+        <ItemAssignToManager
           open={open}
           onClose={() => {
             ReactDOM.unmountComponentAtNode(mountPoint)

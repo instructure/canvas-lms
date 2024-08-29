@@ -20,50 +20,59 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import {mockAssignment} from '../../test-utils'
 import AssignmentHeader from '../AssignmentHeader'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
-describe('assignment enhancement teacher view header', () => {
+const setUp = (propOverrides = {}) => {
+  const assignment = mockAssignment()
+  const props = {
+    assignment,
+    breakpoints: {},
+    ...propOverrides,
+  }
+  return render(
+    <QueryClientProvider client={new QueryClient()}>
+      <AssignmentHeader {...props} />
+    </QueryClientProvider>
+  )
+}
+
+describe('AssignmentHeader - assignment enhancement teacher view header', () => {
   it('renders assignment name', () => {
-    const assignment = mockAssignment()
-    const {queryByTestId} = render(<AssignmentHeader assignment={assignment} />)
+    const {queryByTestId} = setUp()
     expect(queryByTestId('assignment-name')).toBeInTheDocument()
-    expect(queryByTestId('assignment-name')).toHaveTextContent(assignment.name)
+    expect(queryByTestId('assignment-name')).toHaveTextContent(mockAssignment().name)
   })
 
   it('assignment status pill does not render', () => {
-    const assignment = mockAssignment()
-    const {queryByTestId} = render(<AssignmentHeader assignment={assignment} />)
+    const {queryByTestId} = setUp()
     expect(queryByTestId('assignment-status-pill')).not.toBeInTheDocument()
   })
 
   it('renders assignment status pill', () => {
-    const assignment = mockAssignment()
-    assignment.hasSubmittedSubmissions = true
-    const {queryByTestId} = render(<AssignmentHeader assignment={assignment} />)
+    const {queryByTestId} = setUp({
+      assignment: {...mockAssignment(), hasSubmittedSubmissions: true},
+    })
     expect(queryByTestId('assignment-status-pill')).toBeInTheDocument()
   })
 
   it('renders edit button', () => {
-    const assignment = mockAssignment()
-    const {queryByTestId} = render(<AssignmentHeader assignment={assignment} />)
+    const {queryByTestId} = setUp()
     expect(queryByTestId('edit-button')).toBeInTheDocument()
   })
 
   it('renders assign to button', () => {
-    const assignment = mockAssignment()
-    const {queryByTestId} = render(<AssignmentHeader assignment={assignment} />)
+    const {queryByTestId} = setUp()
     expect(queryByTestId('assign-to-button')).toBeInTheDocument()
   })
 
   it('renders speedgrader button', () => {
-    const assignment = mockAssignment()
-    const {queryByTestId} = render(<AssignmentHeader assignment={assignment} />)
+    const {queryByTestId} = setUp()
     expect(queryByTestId('speedgrader-button')).toBeInTheDocument()
   })
 
   it('speedgrader does not render', () => {
     const assignment = mockAssignment()
-    assignment.state = 'unpublished'
-    const {queryByTestId} = render(<AssignmentHeader assignment={assignment} />)
+    const {queryByTestId} = setUp({assignment: {...assignment, state: 'unpublished'}})
     expect(queryByTestId('speedgrader-button')).not.toBeInTheDocument()
   })
 })
