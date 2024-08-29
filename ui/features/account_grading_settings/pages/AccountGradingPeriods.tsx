@@ -27,6 +27,7 @@ export function Component() {
   }
   const accountId = pathMatch.params.accountId
   const rootAccountId = ENV.DOMAIN_ROOT_ACCOUNT_ID
+  const isRootAccount = ENV.IS_ROOT_ACCOUNT
 
   // Note: these env vars are required downstream in api callers used by the grading periods management page,
   // in addition to being required to be passed in to this component itself as props
@@ -44,5 +45,5 @@ export function Component() {
     document.title = 'Account Grading Periods'
   }, [])
 
-  return <GradingPeriodSetCollection readOnly={false} urls={urls} />
+  return <GradingPeriodSetCollection readOnly={!isRootAccount} urls={urls} />
 }
