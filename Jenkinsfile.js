@@ -36,8 +36,8 @@ pipeline {
     DOCKER_BUILDKIT = 1
     FORCE_FAILURE = commitMessageFlag('force-failure-js').asBooleanInteger()
     PROGRESS_NO_TRUNC = 1
-    SELENIUM_NODE_IMAGE = "starlord.inscloudgate.net/jenkins/selenium-node-chrome:120.0"
-    SELENIUM_HUB_IMAGE = "starlord.inscloudgate.net/jenkins/selenium-hub:4.16"
+    SELENIUM_NODE_IMAGE = "948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/selenium/node-chromium:126.0-20240621"
+    SELENIUM_HUB_IMAGE = "948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/selenium/hub:4.22.0"
   }
 
   stages {

@@ -152,7 +152,7 @@ describe "calendar2" do
         replace_content(more_options_title_field, "")
         more_options_submit_button.click
         wait_for_ajaximations
-
+        scroll_page_to_top
         expect(more_options_error_box).to include_text("You must enter a title")
         expect(@course.calendar_events.count).to eq(0)
       end

@@ -233,7 +233,7 @@ describe "threaded discussions" do
       expect(fj("span:contains('Due Dates')")).to be_present
       reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
       expect(reply_to_entry_contents).to include("Additional Replies Required: #{@replies_required}")
-      expect(reply_to_entry_contents).not_to include("Competed")
+      expect(reply_to_entry_contents).not_to include("Completed")
       fj("button:contains('Close')").click
 
       f("button[data-testid='threading-toolbar-reply']").click
