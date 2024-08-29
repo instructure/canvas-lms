@@ -30,6 +30,7 @@ import GradeOverrideInfo from '@canvas/grading/GradeEntry/GradeOverrideInfo'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {scoreToGrade} from '@instructure/grading-utils'
 import {View} from '@instructure/ui-view'
+import {finalGradeOverrideUtils} from '../utils'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -41,6 +42,7 @@ export type FinalGradeOverrideTextBoxProps = {
   gradingPeriodId?: string | null
   disabled?: boolean
   showPercentageLabel?: boolean
+  restrictToTwoDigitsAfterSeparator?: boolean
 }
 export function FinalGradeOverrideTextBox({
   finalGradeOverride,
@@ -49,6 +51,7 @@ export function FinalGradeOverrideTextBox({
   width = '14rem',
   gradingPeriodId,
   disabled = false,
+  restrictToTwoDigitsAfterSeparator = false,
   showPercentageLabel = false,
 }: FinalGradeOverrideTextBoxProps) {
   const [inputValue, setInputValue] = useState<string>('')
@@ -83,7 +86,11 @@ export function FinalGradeOverrideTextBox({
   }, [finalGradeOverride, gradingPeriodId, gradingScheme])
 
   const handleFinalGradeOverrideChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.target.value)
+    let {value} = event.target
+    if (restrictToTwoDigitsAfterSeparator) {
+      value = finalGradeOverrideUtils.restrictToTwoDigitsAfterSeparator(value)
+    }
+    setInputValue(value)
   }
 
   const handleFinalGradeOverrideBlur = async () => {

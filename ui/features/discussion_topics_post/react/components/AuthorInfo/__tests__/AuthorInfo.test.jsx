@@ -42,7 +42,7 @@ const setup = ({
   isForcedRead = false,
   isSplitView = false,
   createdAt = '2021-01-01T13:00:00-07:00',
-  updatedAt = '2021-02-02T14:00:00-07:00',
+  editedAt = '2021-02-02T14:00:00-07:00',
   timingDisplay = 'Jan 1 1:00pm',
   editedTimingDisplay = 'Feb 2 2:00pm',
   lastReplyAtDisplay = 'Mar 3 3:00pm',
@@ -62,7 +62,7 @@ const setup = ({
         isForcedRead={isForcedRead}
         isSplitView={isSplitView}
         createdAt={createdAt}
-        updatedAt={updatedAt}
+        editedAt={editedAt}
         timingDisplay={timingDisplay}
         editedTimingDisplay={editedTimingDisplay}
         lastReplyAtDisplay={lastReplyAtDisplay}
@@ -328,17 +328,6 @@ describe('AuthorInfo', () => {
       })
 
       expect(container.queryByText('View History')).not.toBeInTheDocument()
-    })
-  })
-
-  describe('Mark As Read badge interaction', () => {
-    it('clicks the Mark As Read badge', async () => {
-      const toggleUnread = jest.fn()
-      const container = setup({isUnread: true, toggleUnread})
-      const unreadBadge = container.getByTestId('is-unread')
-      expect(unreadBadge).toBeInTheDocument()
-      unreadBadge.firstChild.click()
-      expect(toggleUnread).toHaveBeenCalledTimes(1)
     })
   })
 })

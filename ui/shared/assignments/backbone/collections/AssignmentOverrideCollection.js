@@ -51,7 +51,7 @@ AssignmentOverrideCollection.prototype.courseIDs = function () {
 }
 
 AssignmentOverrideCollection.prototype.contextModuleIDs = function () {
-  return this.pluck('context_module_id').filter(id => id !== undefined)
+  return this.pluck('context_module_id').filter(id => id !== undefined && id !== null && id !== '')
 }
 
 AssignmentOverrideCollection.prototype.comparator = function (override) {

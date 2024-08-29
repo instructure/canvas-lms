@@ -3590,6 +3590,20 @@ describe DiscussionTopic do
       expect(@topic.user_can_summarize?(@observer)).to be false
       expect(@topic.user_can_summarize?(@student)).to be false
     end
+
+    it "does not crash if the topic is in the context of a group with account context" do
+      account = @course.root_account
+      account.enable_feature!(:discussion_summary)
+      group = account.groups.create!
+      topic = group.discussion_topics.create!(title: "topic")
+
+      expect(topic.user_can_summarize?(@teacher)).to be false
+      expect(topic.user_can_summarize?(@ta)).to be false
+      expect(topic.user_can_summarize?(@admin)).to be false
+      expect(topic.user_can_summarize?(@designer)).to be false
+      expect(topic.user_can_summarize?(@observer)).to be false
+      expect(topic.user_can_summarize?(@student)).to be false
+    end
   end
 
   describe "low_level_locked_for?" do
@@ -3731,6 +3745,32 @@ describe DiscussionTopic do
         expect(lock_info).to be_truthy
         expect(lock_info[:unlock_at]).to eq timestamp
       end
+    end
+  end
+
+  describe "edited_at" do
+    it "returns null if no change to the title or message occurred" do
+      topic = discussion_topic_model
+      expect(topic.edited_at).to be_nil
+      topic.context_code = "other context"
+      topic.save!
+      expect(topic.edited_at).to be_nil
+    end
+
+    it "returns not null if a change to the title occured" do
+      topic = discussion_topic_model
+      expect(topic.edited_at).to be_nil
+      topic.title = "Brand new shinny title"
+      topic.save!
+      expect(topic.edited_at).not_to be_nil
+    end
+
+    it "returns not null if a change to the message occured" do
+      topic = discussion_topic_model
+      expect(topic.edited_at).to be_nil
+      topic.message = "Brand new shinny message"
+      topic.save!
+      expect(topic.edited_at).not_to be_nil
     end
   end
 end

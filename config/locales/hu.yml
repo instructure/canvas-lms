@@ -5769,9 +5769,11 @@ hu:
           Ezen az oldalon könnyen nyomon követhetik (ahogy Ön is) az együttműködés alakulását, és még az e-mail címükre sincs szükség hozzá.
       how_to_start_a_new_collaboration: "Ha adott típusú együttműködésről szeretne bővebb információt, akkor az \"Új együttműködés kezdeményezése\" szakaszban válassza ki a kívánt típust a legördülő listából."
       links: 
+        collaboration: Együttműködés
         new: "Új együttműködés kezdeményezése"
       page_title: Együttműködés
       titles: 
+        collaborations: Együttműködés
         current: "Aktuális együttműködések"
     lti_collaborations: "Külső együttműködések"
     show: 
@@ -5810,6 +5812,7 @@ hu:
   color_option_colorlabel_hex_code_hexcode_ba314ad3: "Színválaszték %{colorLabel}, hex kód:%{hexcode}"
   color_overlay_fb5ecce7: "Színes réteg"
   columbia_college_chicago_custom_canvas_usage_repor_b6e2ee88: "Columbia College - Chicago Egyedi Canvas használati jelentés"
+  column_e1ae5c64: Oszlop
   columns_464bd055: Oszlopok
   come_back_later_5eab7dba: "Jöjjön vissza később!"
   coming_soon_79d46687: HAMAROSAN
@@ -18052,6 +18055,8 @@ hu:
   performed_by_70b3ce96: Előadta
   permanent_num_strands_setting_141e8a0c: "Állandó num_strands beállítás"
   permanent_page_links_c8b26ba8: "Állandó oldal linkek"
+  permission: 
+    read_sis: "SIS adat beolvasása"
   permission_must_be_enabled_for_someone_397e1ce3: "Az engedélyt valakinek meg kell adni"
   permission_not_found_620b80d1: "Engedély nem található"
   permission_role_filter_8a9a3e68: "Jogosultsági szerepkör szűrő"
@@ -18060,8 +18065,66 @@ hu:
   permission_to_change_this_mastery_scale_at_the_acc_ea75238f: "A Jártassági skála fiókszintű módosításának engedélyezése a következők számára engedélyezett:"
   permission_to_change_this_mastery_scale_at_the_cou_58677e7f: "A Jártassági skála kurzusszinten történő módosításának engedélyezése a következő esetekben engedélyezett:"
   permissions: 
+    change_course_state: "Kurzusstátusz módosítása"
+    create_collaborations: "Hallgatók közti együttműködés készítése"
+    create_conferences: "Webkonferencia létrehozása"
+    manage_account_banks: "Fiókszintű itembankok kezelése"
+    manage_account_memberships: "További adminisztrátorok hozzáadása/eltávolítása a fiókhoz/fiókból"
+    manage_account_settings: "Fiókszintű beállítások kezelése"
+    manage_admin_users: "A kurzushoz további oktatók, tervezők, segítők hozzáadása/eltávolítása"
+    manage_announcements: "Globális hirdetmények kezelése"
+    manage_assignments: "Feladatok és kvízek kezelése (hozzáadás / szerkesztés / törlés)"
+    manage_calendar: "Események hozzáadása, szerkesztése és törlése a kurzusnaptárban"
+    manage_catalog: "Katalógus kezelése"
+    manage_data_services: "Adat szolgáltatások kezelése"
+    manage_developer_keys: "Fejlesztői kulcsok kezelése"
+    manage_feature_flags: "Funkciók engedélyezése vagy tiltása fiók szinten"
+    manage_frozen_assignment: "A befagyasztott feladatok kezelése (szerkesztés/törlés)"
+    manage_grades: "Értékelések szerkesztése"
+    manage_interaction_alerts: "Figyelmeztetések kezelése"
+    manage_internal_settings: "Az egész környezetre kiterjedő belső beállítások kezelése"
+    manage_proficiency_calculations: "Eredmény jártassági számítások kezelése"
+    manage_proficiency_scales: "A tanulási eredmények elsajátítására vonatkozó skálák kezelése"
+    manage_role_overrides: "Engedélyek kezelése"
+    manage_rubrics: "Értékelőtáblák készítése és szerkesztése"
+    manage_sections_add: "Kurzusszekciók hozzáadása"
+    manage_sections_delete: "Kurzusszekciók törlése"
+    manage_sections_edit: "Kurzusszekciók szerkesztése"
+    manage_sis: "SIS adat kezelése"
+    manage_site_settings: "Az egész oldalra érvényes beállítások és pluginok kezelése"
+    manage_storage_quotas: "Tárhelykvóták kezelése"
+    manage_students: "Hallgatók hozzáadása/eltávolítása a kurzusba/kurzusból"
+    manage_user_logins: "Bejelentkezés részleteinek módosítása felhasználók számára"
+    manage_user_notes: "Intézményi hírlevél bejegyzések kezelése"
+    manage_user_observers: "Felhasználók megfigyelőinek kezelése"
     manage_webhooks: "Webhooks - kezelés"
+    managed_jobs: "Háttérben futó jobok kezelése"
+    moderate_form: "Fórumok moderálása (más közzétételek törlése / szerkesztése, témák lezárása)"
+    moderate_user_content: "Felhasználói tartalom moderálása"
+    post_to_forum: "Írás fórumba"
     provision_catalog: "Katalógus létesítése"
+    read_course_content: "Kurzus tartalmának megtekintése"
+    read_course_list: "Kurzuslista megtekintése"
+    read_forum: "Fórumok megtekintése"
+    read_messages: "Felhasználóknak küldött értesítések megtekintése "
+    read_question_banks: "Kérdések megtekintése és kérdéstárhoz adása "
+    read_reports: "Kurzus felhasználási jelentésének megtekintése"
+    read_roster: "Felhasználók listájának megtekintése"
+    send_messages: "Üzenetek küldése egyénileg a kurzusrésztvevőknek"
+    send_messages_all: "Üzenetek küldése az egész osztálynak"
+    share_banks_with_subaccounts: "Item bankok megosztása alfiókokkal"
+    temporary_enrollments_add: "Ideiglenes beiratkozások hozzáadása"
+    temporary_enrollments_delete: "Ideiglenes beiratkozások törlése"
+    temporary_enrollments_edit: "Ideiglenes beiratkozások szerkesztése"
+    undelete_courses: "Kurzusok törlésének visszavonása"
+    view_all_grades: "Összes értékelés megtekintése"
+    view_course_changes: "Kurzus módosítási előzményeinek megtekintése"
+    view_error_reports: "Hibajelentések megtekintése"
+    view_group_pages: "Az összes hallgatói csoporthoz tartozó csoportoldal megtekintése"
+    view_jobs: "Háttérben futó jobok mutatása"
+    view_notifications: "Értesítések megtekintése"
+    view_quiz_answer_audits: "Válaszmátrix megtekintése a kvízbeadás-naplóban"
+    view_statistics: "Statisztikák megtekintése"
   permissions_365c49e: Engedélyek
   permissions_manage_9eea4f8f: "Engedélyek - kezelés"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: " Engedélyezi az összes \"includes\" paraméter használatát ehhez a fejlesztői kulcshoz. Az „Includes” paraméterek hozzáférést biztosíthatnak további adatokhoz, amelyek nem tartoznak az alább kiválasztott hatókörbe."
@@ -21240,6 +21303,7 @@ hu:
     filter_multiple_users_found: "%{userCount} talált felhasználó."
     filter_no_users_found: "Egy egyező felhasználó sincs"
     filter_one_user_found: "1 talált felhasználó."
+  row_fc0944a7: Sor
   row_row_message_e369e49e: "Sor %{row}: %{message}"
   rsa_sha1_c457d751: RSA-SHA1
   rsa_sha256_3d41d605: RSA-SHA256

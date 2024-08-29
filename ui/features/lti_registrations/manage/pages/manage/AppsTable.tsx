@@ -22,14 +22,12 @@ import {Alert} from '@instructure/ui-alerts'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconMoreLine, IconSearchLine} from '@instructure/ui-icons'
-import {Link} from '@instructure/ui-link'
 import {Menu} from '@instructure/ui-menu'
 import {Responsive, type ResponsivePropsObject} from '@instructure/ui-responsive'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import React from 'react'
-import {Link as RouterLink} from 'react-router-dom'
 import type {PaginatedList} from '../../api/PaginatedList'
 import type {AppsSortDirection, AppsSortProperty} from '../../api/registrations'
 import type {LtiRegistration} from '../../model/LtiRegistration'
@@ -39,6 +37,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Pagination} from '@instructure/ui-pagination'
 import {MANAGE_APPS_PAGE_LIMIT} from './ManagePageLoadingState'
+import {openEditDynamicRegistrationWizard} from '../../registration_wizard/RegistrationWizardModalState'
 
 type CallbackWithRegistration = (registration: LtiRegistration) => void
 
@@ -96,10 +95,7 @@ const Columns: ReadonlyArray<Column> = [
           />
         )}
         <div style={ellispsisStyles} title={r.name}>
-          {/* TODO: comment these in when we have a manage app screen */}
-          {/* <Link to={`/manage/${r.id}`} as={RouterLink} isWithinText={false}> */}
           {r.name}
-          {/* </Link> */}
         </div>
       </Flex>
     ),
@@ -173,7 +169,8 @@ const Columns: ReadonlyArray<Column> = [
     id: 'actions',
     width: '80px',
     render: (r, {deleteApp}) => {
-      const developer_key_id = r.developer_key_id
+      const developerKeyId = r.developer_key_id
+      const imsRegistrationId = r.ims_registration_id
       return (
         <Menu
           trigger={
@@ -186,11 +183,11 @@ const Columns: ReadonlyArray<Column> = [
             </IconButton>
           }
         >
-          {developer_key_id ? (
+          {developerKeyId ? (
             <Menu.Item
               onClick={async () => {
                 try {
-                  await navigator.clipboard.writeText(developer_key_id)
+                  await navigator.clipboard.writeText(developerKeyId)
                   showFlashAlert({
                     type: 'info',
                     message: I18n.t('Client ID copied'),
@@ -204,6 +201,15 @@ const Columns: ReadonlyArray<Column> = [
               }}
             >
               {I18n.t('Copy Client ID')}
+            </Menu.Item>
+          ) : null}
+          {imsRegistrationId ? (
+            <Menu.Item
+              onClick={() => {
+                openEditDynamicRegistrationWizard(imsRegistrationId)
+              }}
+            >
+              {I18n.t('Edit App')}
             </Menu.Item>
           ) : null}
           <Menu.Item

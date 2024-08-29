@@ -190,6 +190,25 @@ describe "Importers::QuizImporter" do
     end
   end
 
+  context "when importing qti new quizzes with the setting 'import_quizzes_next' disabled" do
+    before do
+      allow(@migration).to receive_messages(quizzes_next_migration?: false, canvas_import?: true)
+    end
+
+    context "when the original quiz has points different than the quiz entries points" do
+      it "retains the points from the original quiz" do
+        context = course_model
+        question_data = import_example_questions
+        data = get_import_data ["vista", "quiz"], "new_quizzes_assignment"
+
+        Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
+        quiz = Quizzes::Quiz.where(migration_id: data[:migration_id]).first
+
+        expect(quiz.points_possible).to eq 10
+      end
+    end
+  end
+
   it "completes a quiz question reference" do
     context = course_model
     question_data = import_example_questions

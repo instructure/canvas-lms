@@ -492,6 +492,7 @@ class Lti::RegistrationsController < ApplicationController
     GuardRail.activate(:secondary) do
       eager_load_models = [
         { lti_registration_account_bindings: [:created_by, :updated_by] },
+        :ims_registration,
         :created_by, # registration's created_by
         :updated_by  # registration's updated_by
       ]
@@ -577,6 +578,13 @@ class Lti::RegistrationsController < ApplicationController
   rescue => e
     report_error(e)
     raise e
+  end
+
+  # @internal
+  def fetch_lti_configuration
+    result = CanvasHttp.get(params[:url])
+
+    render json: result.body
   end
 
   # @API Show an LTI Registration

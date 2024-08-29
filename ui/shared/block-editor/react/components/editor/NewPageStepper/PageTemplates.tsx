@@ -21,8 +21,11 @@ import {CondensedButton} from '@instructure/ui-buttons'
 import {View, type ViewProps} from '@instructure/ui-view'
 import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
-import {Grid} from '@instructure/ui-grid'
 import {Flex} from '@instructure/ui-flex'
+
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor')
 
 interface PageTemplatesProps {
   selectedTemplate: string
@@ -50,17 +53,18 @@ const PageTemplates = ({selectedTemplate = 'template-1', onSelectTemplate}: Page
   )
 
   return (
-    <Flex direction="column" gap="small">
+    <Flex direction="column" gap="small" data-testid="stepper-page-template">
       <Text size="large">Browse Templates</Text>
       <Text size="small">
-        Select from a variety of pre-designed page layouts that are ready to be filled with your
-        content.
+        {I18n.t(
+          'Select from a variety of pre-designed page layouts that are ready to be filled with your content.'
+        )}
       </Text>
       <Text size="large">Home Pages</Text>
       <Text size="small">
-        A home page is the main or introductory page of a course. The home page is typically the
+        {I18n.t(`A home page is the main or introductory page of a course. The home page is typically the
         first page you see. It serves as a central hub, guiding visitors to other parts of the
-        course.
+        course.`)}
       </Text>
       <View
         as="div"
@@ -86,7 +90,12 @@ const PageTemplates = ({selectedTemplate = 'template-1', onSelectTemplate}: Page
                 if (el) firstTemplateRef.current = el as HTMLButtonElement
               }}
             >
-              <Img src="/images/block_editor/template-1.png" alt="" width="230px" height="350px" />
+              <Img
+                src="/images/block_editor/template-1.png"
+                alt={I18n.t('template 1')}
+                width="230px"
+                height="350px"
+              />
             </CondensedButton>
           </View>
           <View
@@ -103,7 +112,12 @@ const PageTemplates = ({selectedTemplate = 'template-1', onSelectTemplate}: Page
                 if (el) secondTemplateRef.current = el as HTMLButtonElement
               }}
             >
-              <Img src="/images/block_editor/template-2.png" alt="" width="230px" height="350px" />
+              <Img
+                src="/images/block_editor/template-2.png"
+                alt={I18n.t('template 2')}
+                width="230px"
+                height="350px"
+              />
             </CondensedButton>
           </View>
         </Flex>

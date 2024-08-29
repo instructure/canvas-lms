@@ -30,6 +30,7 @@ import {
 import type {DynamicRegistrationWizardService} from './DynamicRegistrationWizardService'
 import {formatApiResultError, type ApiResult} from '../../common/lib/apiResult/ApiResult'
 import type {LtiRegistrationId} from '../model/LtiRegistrationId'
+import type {UnifiedToolId} from '../model/UnifiedToolId'
 
 /**
  * Steps are:
@@ -56,8 +57,10 @@ export interface DynamicRegistrationActions {
   loadRegistrationToken: (
     accountId: AccountId,
     dynamicRegistrationUrl: string,
-    unifiedToolId?: string
+    unifiedToolId?: UnifiedToolId
   ) => void
+
+  loadRegistration: (accountId: AccountId, imsRegistrationId: LtiImsRegistrationId) => void
   /**
    * Enables the developer key for the given registration
    * and closes the modal
@@ -72,6 +75,15 @@ export interface DynamicRegistrationActions {
     imsRegistrationId: LtiImsRegistrationId,
     registrationId: LtiRegistrationId,
     developerKeyId: DeveloperKeyId,
+    overlay: RegistrationOverlay,
+    adminNickname: string,
+    onSuccess: () => void
+  ) => Promise<unknown>
+
+  updateAndClose: (
+    accountId: AccountId,
+    imsRegistrationId: LtiImsRegistrationId,
+    registrationId: LtiRegistrationId,
     overlay: RegistrationOverlay,
     adminNickname: string,
     onSuccess: () => void
@@ -124,7 +136,7 @@ export type DynamicRegistrationWizardState =
     }
   | {
       _type: 'LoadingRegistration'
-      registrationToken: DynamicRegistrationToken
+      registrationToken?: DynamicRegistrationToken
     }
   | {
       _type: 'Error'
@@ -137,13 +149,14 @@ export type DynamicRegistrationWizardState =
   | ConfirmationState<'IconConfirmation'>
   | ConfirmationState<'Reviewing'>
   | ConfirmationState<'Enabling'>
+  | ConfirmationState<'Updating'>
   | ConfirmationState<'DeletingDevKey'>
 
 export type ConfirmationStateType = Exclude<
   DynamicRegistrationWizardState['_type'],
   'RequestingToken' | 'WaitingForTool' | 'LoadingRegistration' | 'Error'
 >
-type ReviewingStateType = Exclude<ConfirmationStateType, 'Enabling' | 'DeletingDevKey'>
+type ReviewingStateType = Exclude<ConfirmationStateType, 'Enabling' | 'DeletingDevKey' | 'Updating'>
 
 /**
  * Helper for constructing a 'confirmation' state (a substate of the confirmation screen)
@@ -200,6 +213,7 @@ const confirmationState =
   })
 
 const enabling = confirmationState('Enabling')
+const updating = confirmationState('Updating')
 const deleting = confirmationState('DeletingDevKey')
 
 /**
@@ -247,7 +261,7 @@ type StateUpdater = (
  */
 export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistrationWizardService) =>
   create<{state: DynamicRegistrationWizardState} & DynamicRegistrationActions>(
-    (set: StateUpdater, get) => ({
+    (set: StateUpdater) => ({
       state: {_type: 'RequestingToken'},
       /**
        * Fetches a registration token from the dynamic registration URL
@@ -261,7 +275,7 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
       loadRegistrationToken: (
         accountId: AccountId,
         dynamicRegistrationUrl: string,
-        unifiedToolId: string = ''
+        unifiedToolId?: UnifiedToolId
       ) => {
         set(stateFor({_type: 'RequestingToken'}))
         // eslint-disable-next-line promise/catch-or-return
@@ -303,6 +317,26 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
             }
           })
       },
+      /**
+       * Loads an already existing registration from the backend and sets the state to 'reviewing'.
+       *
+       * @param accountId ID of the account the Lti::IMS::Registration is associated with
+       * @param registrationId ID of the Lti::IMS::Registration to load
+       */
+      loadRegistration: async (accountId: AccountId, registrationId: LtiImsRegistrationId) => {
+        set(stateFor({_type: 'LoadingRegistration'}))
+        const reg = await service.getRegistrationById(accountId, registrationId)
+        if (reg._type === 'success') {
+          const store: RegistrationOverlayStore = createRegistrationOverlayStore(
+            reg.data.client_name,
+            reg.data
+          )
+
+          set(stateFor(confirmationState('Reviewing')(reg.data, store, true)))
+        } else {
+          set(stateFor(errorState(formatApiResultError(reg))))
+        }
+      },
       enableAndClose: async (
         accountId: AccountId,
         imsRegistrationId: LtiImsRegistrationId,
@@ -313,19 +347,36 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
         onSuccess: () => void
       ) => {
         set(stateFrom('Reviewing')(state => enabling(state.registration, state.overlayStore)))
-        const [a, b, c] = await Promise.all([
+        const results = await Promise.all([
           service.updateRegistrationOverlay(accountId, imsRegistrationId, overlay),
           service.updateDeveloperKeyWorkflowState(accountId, developerKeyId, 'on'),
           service.updateAdminNickname(accountId, registrationId, adminNickname),
         ])
-        if (a._type !== 'success') {
-          set(stateFor(errorState(formatApiResultError(a))))
-        } else if (b._type !== 'success') {
-          set(stateFor(errorState(formatApiResultError(b))))
-        } else if (c._type !== 'success') {
-          set(stateFor(errorState(formatApiResultError(c))))
-        } else {
+        if (results.every(r => r._type === 'success')) {
           onSuccess()
+        } else {
+          set(stateFor(errorState(formatApiResultError(results.find(r => r._type !== 'success')!))))
+        }
+      },
+      updateAndClose: async (
+        accountId: AccountId,
+        imsRegistrationId: LtiImsRegistrationId,
+        registrationId: LtiRegistrationId,
+        overlay: RegistrationOverlay,
+        adminNickname: string,
+        onSuccess: () => void
+      ) => {
+        set(stateFrom('Reviewing')(state => updating(state.registration, state.overlayStore)))
+
+        const results = await Promise.all([
+          service.updateRegistrationOverlay(accountId, imsRegistrationId, overlay),
+          service.updateAdminNickname(accountId, registrationId, adminNickname),
+        ])
+
+        if (results.every(b => b._type === 'success')) {
+          onSuccess()
+        } else {
+          set(stateFor(errorState(formatApiResultError(results.find(b => b._type !== 'success')!))))
         }
       },
       deleteKey: async (prevState: ReviewingStateType, developerKeyId: DeveloperKeyId) => {

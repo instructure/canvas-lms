@@ -36,6 +36,7 @@ const fauxNode = {
     parent: 'ROOT',
   },
 }
+let isDeletable = true
 
 jest.mock('@craftjs/core', () => {
   const module = jest.requireActual('@craftjs/core')
@@ -56,6 +57,9 @@ jest.mock('@craftjs/core', () => {
         },
         actions: {},
       }
+    }),
+    useNode: jest.fn(() => {
+      return {isDeletable}
     }),
   }
 })
@@ -144,8 +148,7 @@ describe('SectionMenu', () => {
 
   it('disables Move Up when at the top', async () => {
     getDescendants = () => ['1', '2']
-    const onMoveUp = jest.fn()
-    const {getByText} = renderComponent({onMoveUp})
+    const {getByText} = renderComponent()
 
     const menuitem = getByText('Move Up').closest('[role="menuitem"]')
     expect(menuitem).toHaveAttribute('aria-disabled', 'true')
@@ -153,10 +156,17 @@ describe('SectionMenu', () => {
 
   it('disables Move Down when at the bottom', async () => {
     getDescendants = () => ['2', '1']
-    const onMoveDown = jest.fn()
-    const {getByText} = renderComponent({onMoveDown})
+    const {getByText} = renderComponent()
 
     const menuitem = getByText('Move Down').closest('[role="menuitem"]')
+    expect(menuitem).toHaveAttribute('aria-disabled', 'true')
+  })
+
+  it('disables Remove when the section is not deletable', async () => {
+    isDeletable = false
+    const {getByText} = renderComponent()
+
+    const menuitem = getByText('Remove').closest('[role="menuitem"]')
     expect(menuitem).toHaveAttribute('aria-disabled', 'true')
   })
 })

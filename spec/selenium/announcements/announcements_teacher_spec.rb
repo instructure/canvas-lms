@@ -161,6 +161,43 @@ describe "announcements" do
         @announcement.reload
         expect(@announcement.lock_at).to be_nil
       end
+
+      context "selective release assignment embedded in discussions edit page" do
+        before :once do
+          Account.site_admin.enable_feature!(:selective_release_edit_page)
+        end
+
+        it "allows create", :ignore_js_errors do
+          title = "Announcement"
+          message = "this is an announcement"
+          get "/courses/#{@course.id}/discussion_topics/new?is_announcement=true"
+          AnnouncementNewEdit.title_field.send_keys title
+          type_in_tiny(AnnouncementNewEdit.message_body_selector, message)
+          AnnouncementNewEdit.submit
+          wait_for_ajaximations
+          expect(driver.current_url).not_to end_with("/courses/#{@course.id}/discussion_topics/new")
+        end
+
+        it "allows edit", :ignore_js_errors do
+          title = "Announcement"
+          message = "this is an announcement"
+          get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
+
+          AnnouncementNewEdit.title_field.clear
+          AnnouncementNewEdit.title_field.send_keys title
+          clear_tiny(AnnouncementNewEdit.message_body, "discussion-topic-message-body_ifr")
+          type_in_tiny(AnnouncementNewEdit.message_body_selector, message)
+          AnnouncementNewEdit.submit
+          wait_for_ajaximations
+
+          # Expect Modal to appear with proper header
+          expect(AnnouncementNewEdit.notification_modal).to be_displayed
+
+          # Choose sending Notification along with our change
+          AnnouncementNewEdit.notification_modal_send.click
+          expect(driver.current_url).not_to end_with("/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit")
+        end
+      end
     end
 
     it "allows saving of section announcement", :ignore_js_errors, priority: "1" do

@@ -61,32 +61,30 @@ export const ThreadActions = props => {
     }).map(config => renderMenuItem({...config}, props.id))
   }, [props])
 
+  if (props.isSearch) {
+    return null
+  }
+
   return (
-    <Flex justifyItems="end">
-      <Flex.Item>
-        {!props.isSearch && (
-          <Menu
-            placement="bottom"
-            key={`threadActionMenu-${props.id}`}
-            trigger={
-              <IconButton
-                size="medium"
-                screenReaderLabel={I18n.t('Manage Discussion by %{author}', {
-                  author: props.authorName,
-                })}
-                renderIcon={IconMoreLine}
-                withBackground={false}
-                withBorder={false}
-                data-testid="thread-actions-menu"
-              />
-            }
-            ref={props.moreOptionsButtonRef}
-          >
-            {menuItems}
-          </Menu>
-        )}
-      </Flex.Item>
-    </Flex>
+    <Menu
+      placement="bottom"
+      key={`threadActionMenu-${props.id}`}
+      trigger={
+        <IconButton
+          size="medium"
+          screenReaderLabel={I18n.t('Manage Discussion by %{author}', {
+            author: props.authorName,
+          })}
+          renderIcon={IconMoreLine}
+          withBackground={false}
+          withBorder={false}
+          data-testid="thread-actions-menu"
+        />
+      }
+      ref={props.moreOptionsButtonRef}
+    >
+      {menuItems}
+    </Menu>
   )
 }
 

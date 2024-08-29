@@ -21,7 +21,7 @@ import {ZPlacementConfig} from './LtiPlacementConfig'
 export interface PlatformSettings extends z.infer<typeof ZPlatformSettings> {}
 
 export const ZPlatformSettings = z.object({
-  text: z.string(),
+  text: z.string().optional().nullable(),
   icon_url: z.string().optional().nullable(),
   platform: z.string().optional().nullable(),
   placements: z.array(ZPlacementConfig),

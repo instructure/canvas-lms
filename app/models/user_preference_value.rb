@@ -108,7 +108,7 @@ class UserPreferenceValue < ActiveRecord::Base
         elsif preference_row_exists?(key, sub_key)
           update_user_preference_value(key, sub_key, value)
         else
-          create_user_preference_value(key, sub_key, value)
+          upsert_user_preference_value(key, sub_key, value)
         end
         preferences[key] = EXTERNAL
       else
@@ -137,14 +137,13 @@ class UserPreferenceValue < ActiveRecord::Base
       @existing_preference_rows << [key, sub_key]
     end
 
-    def create_user_preference_value(key, sub_key, value)
-      UserPreferenceValue.unique_constraint_retry do |retry_count|
-        if retry_count == 0
-          user_preference_values.create!(key:, sub_key:, value:)
-        else
-          update_user_preference_value(key, sub_key, value) # may already exist
-        end
-      end
+    def upsert_user_preference_value(key, sub_key, value)
+      user_preference_values.upsert(
+        { key:, sub_key:, value: },
+        unique_by: sub_key ? %i[user_id key sub_key] : %i[user_id key],
+        update_only: :value
+      )
+
       mark_preference_row(key, sub_key)
     end
 

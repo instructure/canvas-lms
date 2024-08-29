@@ -993,4 +993,15 @@ describe Types::AssignmentType do
       end
     end
   end
+
+  describe "supportsGradeByQuestion" do
+    it "returns false when the assignment does not support grade by question" do
+      expect(assignment_type.resolve("supportsGradeByQuestion")).to be false
+    end
+
+    it "returns true when the assignment supports grade by question" do
+      assignment.update!(submission_types: "online_quiz")
+      expect(assignment_type.resolve("supportsGradeByQuestion")).to be true
+    end
+  end
 end

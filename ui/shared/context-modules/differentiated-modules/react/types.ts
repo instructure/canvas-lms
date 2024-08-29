@@ -34,6 +34,8 @@ export interface Module {
 
 export interface ModuleItem extends Module {
   resource: ResourceType | undefined
+  graded?: boolean
+  pointsPossible?: null | string
 }
 
 export interface AssignmentOverride {
@@ -120,7 +122,10 @@ interface PageRequirement extends BaseRequirement {
 
 interface DiscussionRequirement extends BaseRequirement {
   resource: 'discussion'
-  type: Extract<RequirementType, 'view' | 'contribute'>
+  type: Extract<RequirementType, 'view' | 'contribute' | 'submit' | 'score'>
+  graded: boolean
+  minimumScore: string
+  pointsPossible: null | string
 }
 
 interface ExternalUrlRequirement extends BaseRequirement {

@@ -155,6 +155,7 @@ class FilesController < ApplicationController
     api_capture
     icon_metadata
     reset_verifier
+    rce_linked_file_urls
     show_relative
   ]
 
@@ -1555,6 +1556,66 @@ class FilesController < ApplicationController
         :manage_files_delete
       ) && @domain_root_account.grants_right?(@current_user, nil, :become_user)
     end
+  end
+
+  def rce_linked_file_urls
+    return not_found unless Account.site_admin.feature_enabled?(:rce_linked_file_urls)
+
+    user = InstAccessToken.find_user_by_uuid_prefer_local(params[:user_uuid])
+    return render_unauthorized_action unless user&.grants_right?(@current_user, session, :read_full_profile)
+    return render json: { errors: [{ "message" => "No valid file URLs given" }] }, status: :bad_request if params[:file_urls].blank?
+    return render json: { errors: [{ "message" => "Too many file links requested.  A maximum of 100 file links can be processed per request." }] }, status: :unprocessable_entity if params[:file_urls].size > 100
+
+    parsed_file_urls = params[:file_urls]&.filter_map do |url|
+      Rails.application.routes.recognize_path(url).merge(url:)
+    rescue ActionController::RoutingError
+      nil
+    end
+    att_ids = parsed_file_urls.pluck(:id, :attachment_id, :file_id).flatten.compact
+    att_list = Attachment.where(id: att_ids).merge(Attachment.active.or(Attachment.where.not(replacement_attachment_id: nil))).preload(:context, replacement_attachment: :context)
+    att_hash_list = att_list.index_by { |att| att.id.to_s }
+
+    file_context_keys = %i[account_id course_id group_id user_id].freeze
+
+    file_urls_by_context = parsed_file_urls.each_with_object({}) do |parsed_file_url, file_urls|
+      file_id = parsed_file_url[:id] || parsed_file_url[:attachment_id] || parsed_file_url[:file_id]
+      att = att_hash_list[file_id]
+      if att&.replacement_attachment_id
+        parsed_file_url[:old_att_id] = att.id
+        att = att.replacement_attachment
+      end
+      next unless att
+
+      context_type_id = (file_context_keys & parsed_file_url.keys).first
+      context_type = context_type_id&.to_s&.split("_", 2)&.first
+      context_id = parsed_file_url[context_type_id]
+      context = ((context_type.nil? && context_id.nil?) || (att.context_id.to_s == context_id && att.context_type == context_type.classify)) ? att.context : next
+      parsed_file_url[:attachment] = att
+      file_urls[context] ||= []
+      file_urls[context] << parsed_file_url
+    end
+
+    file_urls_with_uuids = file_urls_by_context.each_with_object({}) do |(context, file_list), file_metadata|
+      next unless context.grants_any_right?(@current_user, session, :manage_files_create, :manage_files_edit, :moderate_user_content, :become_user) &&
+                  context.grants_any_right?(user, session, :manage_files_create, :manage_files_edit)
+
+      file_list.each do |file|
+        att = file[:attachment]
+        if att.media_entry_id.present? || att.canvadocable?
+          file_metadata[:canvas_urls] ||= {}
+          url = file[:url]
+          old_att_id = file[:old_att_id]
+          file_metadata[:canvas_urls][file[:url]] = old_att_id.present? ? url.sub(%r{(files|iframe)/#{old_att_id}}, "\\1/#{att.id}") : url
+        else
+          file_metadata[:instfs_ids] ||= {}
+          file_metadata[:instfs_ids][file[:url]] = att.instfs_uuid
+        end
+      end
+    end
+
+    return render json: file_urls_with_uuids.to_json, status: :created if file_urls_with_uuids.present?
+
+    render json: { errors: [{ "message" => "No valid file URLs given" }] }, status: :unprocessable_entity
   end
 
   def image_thumbnail

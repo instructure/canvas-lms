@@ -290,6 +290,7 @@ const SubmissionManager = ({
         handleSubmitPeerReviewButton()
       } else {
         setOnFailure(I18n.t('Invalid Rubric Submission'))
+        useStore.setState({isSavingRubricAssessment: false})
       }
     }
   }, [isSavingRubricAssessment])

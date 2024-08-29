@@ -321,7 +321,6 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Pictogram Bewerken" },
   "edit_link_7f53bebb": { "message": "Link bewerken" },
-  "editor_statusbar_26ac81fc": { "message": "Statusbalk van editor" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Element dat begint met { start }"
   },
@@ -623,6 +622,7 @@ const locale = {
   "links_to_an_external_site_de74145d": {
     "message": "Koppelingen naar een externe site."
   },
+  "lists_cd1336fc": { "message": "Lijsten" },
   "lists_should_be_formatted_as_lists_f862de8d": {
     "message": "Lijsten moeten als lijst worden opgemaakt."
   },

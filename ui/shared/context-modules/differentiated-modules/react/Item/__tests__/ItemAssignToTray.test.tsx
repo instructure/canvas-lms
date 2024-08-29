@@ -96,6 +96,7 @@ describe('ItemAssignToTray', () => {
     ENV.SECTION_LIST = [{id: '4'}, {id: '5'}]
     ENV.POST_TO_SIS = false
     ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT = false
+    ENV.MASTER_COURSE_DATA = undefined
     originalLocation = window.location
     // @ts-expect-error
     delete window.location
@@ -283,94 +284,150 @@ describe('ItemAssignToTray', () => {
     expect(getAllByTestId('item-assign-to-card')).toHaveLength(2)
   })
 
-  it('renders blueprint locking info when there are locked dates', async () => {
-    fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
-      blueprint_date_locks: ['availability_dates'],
-    })
-    const {getAllByText, getByTestId} = renderComponent({itemContentId: '31'})
-    // wait for the cards to render
-    const loadingSpinner = getByTestId('cards-loading')
-    await waitFor(() => {
-      expect(loadingSpinner).not.toBeInTheDocument()
+  describe('in a blueprint course', () => {
+    it('renders blueprint locking info when there are locked dates', async () => {
+      fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
+        blueprint_date_locks: ['availability_dates'],
+      })
+      const {getAllByText, getByTestId} = renderComponent({itemContentId: '31'})
+      // wait for the cards to render
+      const loadingSpinner = getByTestId('cards-loading')
+      await waitFor(() => {
+        expect(loadingSpinner).not.toBeInTheDocument()
+      })
+
+      expect(
+        getAllByText((_, e) => e?.textContent === 'Locked: Availability Dates')[0]
+      ).toBeInTheDocument()
     })
 
-    expect(
-      getAllByText((_, e) => e?.textContent === 'Locked: Availability Dates')[0]
-    ).toBeInTheDocument()
-  })
-
-  it('renders blueprint locking info when there are locked dates and default cards', async () => {
-    fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
-      blueprint_date_locks: ['availability_dates'],
+    it('renders blueprint locking info when there are locked dates and default cards', async () => {
+      fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
+        blueprint_date_locks: ['availability_dates'],
+      })
+      const {getAllByText, findAllByTestId} = renderComponent({
+        itemContentId: '31',
+        defaultCards: [
+          {
+            defaultOptions: ['everyone'],
+            key: 'key-card-0',
+            isValid: true,
+            highlightCard: false,
+            hasAssignees: true,
+            due_at: '2023-10-05T12:00:00Z',
+            unlock_at: '2023-10-01T12:00:00Z',
+            lock_at: '2023-11-01T12:00:00Z',
+            selectedAssigneeIds: ['everyone'],
+          },
+        ],
+      })
+      await findAllByTestId('item-assign-to-card')
+      expect(
+        getAllByText((_, e) => e?.textContent === 'Locked: Availability Dates')[0]
+      ).toBeInTheDocument()
     })
-    const {getAllByText, findAllByTestId} = renderComponent({
-      itemContentId: '31',
-      defaultCards: [
-        {
-          defaultOptions: ['everyone'],
-          key: 'key-card-0',
-          isValid: true,
-          highlightCard: false,
-          hasAssignees: true,
-          due_at: '2023-10-05T12:00:00Z',
-          unlock_at: '2023-10-01T12:00:00Z',
-          lock_at: '2023-11-01T12:00:00Z',
-          selectedAssigneeIds: ['everyone'],
+
+    it('does not render blueprint locking info when locked with unlocked due dates', async () => {
+      fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
+        blueprint_date_locks: [],
+      })
+      const {getByTestId, queryByText} = renderComponent({itemContentId: '31'})
+
+      // wait for the cards to render
+      const loadingSpinner = getByTestId('cards-loading')
+      await waitFor(() => {
+        expect(loadingSpinner).not.toBeInTheDocument()
+      })
+
+      await expect(queryByText('Locked:')).not.toBeInTheDocument()
+    })
+
+    it('disables add button if there are blueprint-locked dates', async () => {
+      fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
+        blueprint_date_locks: ['availability_dates'],
+      })
+      const {getByTestId, findAllByText} = renderComponent({itemContentId: '31'})
+      await findAllByText('Locked:')
+      expect(getByTestId('add-card')).toBeDisabled()
+    })
+
+    it('disables add button if there are blueprint-locked dates and default cards', async () => {
+      fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
+        blueprint_date_locks: ['availability_dates'],
+      })
+      const {getByTestId, findAllByText} = renderComponent({
+        itemContentId: '31',
+        defaultCards: [
+          {
+            defaultOptions: ['everyone'],
+            key: 'key-card-0',
+            isValid: true,
+            highlightCard: false,
+            hasAssignees: true,
+            due_at: '2023-10-05T12:00:00Z',
+            unlock_at: '2023-10-01T12:00:00Z',
+            lock_at: '2023-11-01T12:00:00Z',
+            selectedAssigneeIds: ['everyone'],
+          },
+        ],
+      })
+      await findAllByText('Locked:')
+      expect(getByTestId('add-card')).toBeDisabled()
+    })
+
+    it('shows blueprint locking info when ENV contains master_course_restrictions', async () => {
+      ENV.MASTER_COURSE_DATA = {
+        is_master_course_child_content: true,
+        restricted_by_master_course: true,
+        master_course_restrictions: {
+          availability_dates: true,
+          content: true,
+          due_dates: false,
+          points: false,
         },
-      ],
-    })
-    await findAllByTestId('item-assign-to-card')
-    expect(
-      getAllByText((_, e) => e?.textContent === 'Locked: Availability Dates')[0]
-    ).toBeInTheDocument()
-  })
+      }
 
-  it('does not render blueprint locking info when locked with unlocked due dates', async () => {
-    fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
-      blueprint_date_locks: [],
-    })
-    const {getByTestId, queryByText} = renderComponent({itemContentId: '31'})
+      const {getAllByText, getByTestId} = renderComponent({
+        itemType: 'quiz',
+        iconType: 'quiz',
+        defaultCards: [],
+      })
+      // wait for the cards to render
+      const loadingSpinner = getByTestId('cards-loading')
+      await waitFor(() => {
+        expect(loadingSpinner).not.toBeInTheDocument()
+      })
 
-    // wait for the cards to render
-    const loadingSpinner = getByTestId('cards-loading')
-    await waitFor(() => {
-      expect(loadingSpinner).not.toBeInTheDocument()
+      expect(
+        getAllByText((_, e) => e?.textContent === 'Locked: Availability Dates')[0]
+      ).toBeInTheDocument()
     })
 
-    await expect(queryByText('Locked:')).not.toBeInTheDocument()
-  })
-
-  it('disables add button if there are blueprint-locked dates', async () => {
-    fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
-      blueprint_date_locks: ['availability_dates'],
-    })
-    const {getByTestId, findAllByText} = renderComponent({itemContentId: '31'})
-    await findAllByText('Locked:')
-    expect(getByTestId('add-card')).toBeDisabled()
-  })
-
-  it('disables add button if there are blueprint-locked dates and default cards', async () => {
-    fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
-      blueprint_date_locks: ['availability_dates'],
-    })
-    const {getByTestId, findAllByText} = renderComponent({
-      itemContentId: '31',
-      defaultCards: [
-        {
-          defaultOptions: ['everyone'],
-          key: 'key-card-0',
-          isValid: true,
-          highlightCard: false,
-          hasAssignees: true,
-          due_at: '2023-10-05T12:00:00Z',
-          unlock_at: '2023-10-01T12:00:00Z',
-          lock_at: '2023-11-01T12:00:00Z',
-          selectedAssigneeIds: ['everyone'],
+    it('does not show banner if in a blueprint source course', async () => {
+      ENV.MASTER_COURSE_DATA = {
+        is_master_course_master_content: true,
+        restricted_by_master_course: true,
+        master_course_restrictions: {
+          availability_dates: true,
+          content: true,
+          due_dates: false,
+          points: false,
         },
-      ],
+      }
+
+      const {queryByText, getByTestId} = renderComponent({
+        itemType: 'quiz',
+        iconType: 'quiz',
+        defaultCards: [],
+      })
+      // wait for the cards to render
+      const loadingSpinner = getByTestId('cards-loading')
+      await waitFor(() => {
+        expect(loadingSpinner).not.toBeInTheDocument()
+      })
+
+      expect(queryByText('Locked:')).not.toBeInTheDocument()
     })
-    await findAllByText('Locked:')
-    expect(getByTestId('add-card')).toBeDisabled()
   })
 
   it('calls onDismiss when the cancel button is clicked', () => {

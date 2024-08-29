@@ -33,6 +33,7 @@ module RuboCop
           shared_context
           shared_examples
           shared_examples_for
+          skip
           new
         ].freeze
 

@@ -101,10 +101,15 @@ export type ItemAssignToCardProps = {
   persistEveryoneOption?: boolean
 }
 
+export type ItemAssignToCardCustomValidationArgs = {dueDateRequired?: boolean}
+
 export type ItemAssignToCardRef = {
   showValidations: () => void
   focusDeleteButton: () => void
   focusInputs: () => void
+  runCustomValidations: (params?: ItemAssignToCardCustomValidationArgs) => {
+    [key: string]: string | boolean
+  }
 }
 
 export default forwardRef(function ItemAssignToCard(
@@ -160,14 +165,16 @@ export default forwardRef(function ItemAssignToCard(
   const assigneeSelectorRef = useRef<HTMLInputElement | null>(null)
   const dateInputRefs = useRef<Record<string, HTMLInputElement>>({})
   const timeInputRefs = useRef<Record<string, HTMLInputElement>>({})
-  const dateValidator = useRef<DateValidator>(
-    new DateValidator({
-      date_range: {...ENV.VALID_DATE_RANGE},
-      hasGradingPeriods: ENV.HAS_GRADING_PERIODS,
-      gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods),
-      userIsAdmin: ENV.current_user_is_admin,
-      postToSIS,
-    })
+  const dateValidator = useMemo(
+    () =>
+      new DateValidator({
+        date_range: {...ENV.VALID_DATE_RANGE},
+        hasGradingPeriods: ENV.HAS_GRADING_PERIODS,
+        gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods),
+        userIsAdmin: ENV.current_user_is_admin,
+        postToSIS,
+      }),
+    [postToSIS]
   )
 
   const cardActionLabels = useMemo(
@@ -180,7 +187,7 @@ export default forwardRef(function ItemAssignToCard(
     [customAllOptions, selectedAssigneeIds]
   )
 
-  const dueAtHasChanged = () => {
+  const dueAtHasChanged = useCallback(() => {
     const originalDueAt = new Date(original_due_at || 0)
     const newDueAt = new Date(dueDate || 0)
     // Since a user can't edit the seconds field in the UI and the form also
@@ -189,7 +196,29 @@ export default forwardRef(function ItemAssignToCard(
     originalDueAt.setSeconds(0)
     newDueAt.setSeconds(0)
     return originalDueAt.getTime() !== newDueAt.getTime()
-  }
+  }, [dueDate, original_due_at])
+
+  const dateValidatorInputArgs = useMemo(
+    () => ({
+      required_replies_due_at: requiredRepliesDueDate,
+      reply_to_topic_due_at: replyToTopicDueDate,
+      due_at: dueDate,
+      unlock_at: availableFromDate,
+      lock_at: availableToDate,
+      student_ids: [],
+      course_section_id: '2',
+      persisted: !dueAtHasChanged(),
+      skip_grading_periods: dueDate === null,
+    }),
+    [
+      dueDate,
+      availableFromDate,
+      availableToDate,
+      requiredRepliesDueDate,
+      replyToTopicDueDate,
+      dueAtHasChanged,
+    ]
+  )
 
   useEffect(() => {
     onValidityChange?.(
@@ -202,23 +231,19 @@ export default forwardRef(function ItemAssignToCard(
   }, [error.length, Object.keys(validationErrors).length, unparsedFieldKeys.size])
 
   useEffect(() => {
-    const data: DateValidatorInputArgs = {
-      required_replies_due_at: requiredRepliesDueDate,
-      reply_to_topic_due_at: replyToTopicDueDate,
-      due_at: dueDate,
-      unlock_at: availableFromDate,
-      lock_at: availableToDate,
-      student_ids: [],
-      course_section_id: '2',
-      persisted: !dueAtHasChanged(),
-      skip_grading_periods: dueDate === null,
-    }
-    const newErrors = dateValidator.current.validateDatetimes(data)
+    const newErrors = dateValidator.validateDatetimes(dateValidatorInputArgs)
     const newBadDates = Object.keys(newErrors)
     const oldBadDates = Object.keys(validationErrors)
     if (!arrayEquals(newBadDates, oldBadDates)) setValidationErrors(newErrors)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dueDate, availableFromDate, availableToDate, replyToTopicDueDate, requiredRepliesDueDate])
+  }, [
+    dueDate,
+    availableFromDate,
+    availableToDate,
+    replyToTopicDueDate,
+    requiredRepliesDueDate,
+    postToSIS,
+  ])
 
   useEffect(() => {
     const errorMessage: FormMessage = {
@@ -258,7 +283,31 @@ export default forwardRef(function ItemAssignToCard(
       } else if (unparsedFieldKeys.size > 0) {
         key = dateInputKeys.find(k => unparsedFieldKeys.has(k))
       }
-      if (key) dateInputRefs.current[key]?.focus()
+      if (key) {
+        dateInputRefs.current[key]?.focus()
+        return dateInputRefs.current[key]
+      }
+    },
+    runCustomValidations(params = {}) {
+      const {dueDateRequired} = params
+
+      // Stores original and sets custom date validator attributes
+      let originalDueDateRequired = false
+      if (dueDateRequired !== undefined) {
+        originalDueDateRequired = dateValidator.dueDateRequired
+        dateValidator.dueDateRequired = dueDateRequired
+      }
+      const assigneesErrors = error.length > 0 ? {assignees: true} : {}
+      const dateTimeErrors = dateValidator.validateDatetimes(dateValidatorInputArgs)
+      const parserErrors = Array.from(unparsedFieldKeys).reduce(
+        (result, key) => ({...result, [key]: true}),
+        {}
+      )
+      // Restores custom date validator attributes
+      if (dueDateRequired !== undefined) {
+        dateValidator.dueDateRequired = originalDueDateRequired
+      }
+      return {...assigneesErrors, ...dateTimeErrors, ...parserErrors}
     },
   }))
 
@@ -309,7 +358,7 @@ export default forwardRef(function ItemAssignToCard(
   const wrapperProps = useMemo(() => generateWrapperStyleProps(highlightCard), [highlightCard])
 
   const isInClosedGradingPeriod =
-    dateValidator.current.isDateInClosedGradingPeriod(dueDate) && !dueAtHasChanged()
+    dateValidator.isDateInClosedGradingPeriod(dueDate) && !dueAtHasChanged()
 
   const commonDateTimeInputProps = {
     breakpoints: {},

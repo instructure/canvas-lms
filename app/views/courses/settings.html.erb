@@ -715,7 +715,7 @@
         <footer class="sticky-footer">
           <div>
             <% if Setting.get('cross_root_account_course_moves', 'false') == 'true' &&
-              Account.site_admin.grants_any_right?(@current_user, :manage_courses, :manage_courses_admin) && Account.root_accounts.length > 1 %>
+              Account.site_admin.grants_any_right?(@current_user, :manage_courses, :manage_courses_admin) && Account.root_accounts.count > 1 %>
                 <a href="#" class="move_course_link btn"><i class="icon-arrow-right"></i> <%= t('links.move_course', %{Move To Another Account}) %></a>
             <% end %>
               <span class="course_form">
@@ -877,7 +877,17 @@
           <li aria-label="<%= tab[:label] %>" class="navitem <%= 'enabled' if @context.tab_enabled?(tab) %>"
               id="nav_edit_tab_id_<%= tab[:id] %>"
           >
-            <%= tab[:label] %>
+            <div class="draggable_handle">
+              <% if @context.tab_enabled?(tab) %>
+                  <i class="icon-drag-handle"></i>
+              <% else %>
+                &nbsp;
+              <% end %>
+            </div>
+            <div class="navitem_content">
+              <%= tab[:label] %>
+              <span class="disabled_message"><%= tab[:disabled_message] %></span>
+            </div>
             <% if @context.tab_enabled?(tab) %>
               <div class="admin-links">
                 <a class="al-trigger al-trigger-gray" role="button" href="#">
@@ -895,7 +905,6 @@
                   </li>
                 </ul>
               </div>
-              <span class="disabled_message"><%= tab[:disabled_message] %></span>
             <% end %>
           </li>
         <% end %>
@@ -916,7 +925,13 @@
               class="navitem enabled"
               id="nav_edit_tab_id_<%= tab[:id] %>"
           >
-            <%= tab[:label] %>
+            <div class="draggable_handle">
+              <i class="icon-drag-handle"></i>
+            </div>
+            <div class="navitem_content">
+              <%= tab[:label] %>
+              <span class="disabled_message"><%= tab[:disabled_message] %></span>
+            </div>
             <div class="admin-links">
                 <a class="al-trigger al-trigger-gray" role="button" href="#">
                   <i class="icon-more" aria-hidden="true"></i>
@@ -933,8 +948,6 @@
                   </li>
                 </ul>
               </div>
-              <span class="disabled_message"><%= tab[:disabled_message] %></span>
-
           </li>
         <% end %>
       </ul>

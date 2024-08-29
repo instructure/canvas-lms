@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {render, fireEvent, screen, waitFor, act, within} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import {IconMakerTray} from '../IconMakerTray'
 import {useStoreProps} from '../../../shared/StoreContext'
@@ -50,7 +49,7 @@ const setIconColor = hex => {
   fireEvent.input(input, {target: {value: hex}})
 }
 
-describe.skip('RCE "Icon Maker" Plugin > IconMakerTray', () => {
+describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
   const defaults = {
     onUnmount: jest.fn(),
     editing: false,
@@ -90,38 +89,7 @@ describe.skip('RCE "Icon Maker" Plugin > IconMakerTray', () => {
     })
   })
 
-  it('blocks first onclose event when element in rce clicked', async () => {
-    const ignoreSpy = jest.spyOn(shouldIgnoreCloseRef, 'shouldIgnoreClose')
-    const ed = new FakeEditor()
-    ed.id = 'editorId'
-    ed.on('click', () => document.body.click())
-    const {getByText, findByTestId} = render(
-      <>
-        <div data-id={ed.id}>
-          <button type="button">Outside button</button>
-        </div>
-        <IconMakerTray {...defaults} editor={ed} />
-      </>
-    )
-
-    const addImageButton = getByText('Add Image')
-    await userEvent.click(addImageButton)
-    const singleColorOption = getByText('Single Color Image')
-    await userEvent.click(singleColorOption)
-    const artIcon = await findByTestId('icon-maker-art')
-    await userEvent.click(artIcon)
-
-    await waitFor(() => expect(ignoreSpy).not.toHaveBeenCalled())
-    await waitFor(() => expect(window.confirm).not.toHaveBeenCalled())
-    await userEvent.click(getByText('Outside button'))
-    act(() => ed.fire('click'))
-    await waitFor(() => expect(ignoreSpy.mock.results.length).toBe(2))
-    await waitFor(() => expect(ignoreSpy.mock.results[0].value).toBe(true))
-    await waitFor(() => expect(ignoreSpy.mock.results[1].value).toBe(false))
-    await waitFor(() => expect(window.confirm).toHaveBeenCalledTimes(1))
-  })
-
-  it('closes when outside element clicked', async () => {
+  it('does not close when outside element clicked', async () => {
     const ignoreSpy = jest.spyOn(shouldIgnoreCloseRef, 'shouldIgnoreClose')
     const {getByText, findByTestId} = render(
       <>
@@ -131,18 +99,13 @@ describe.skip('RCE "Icon Maker" Plugin > IconMakerTray', () => {
     )
 
     const addImageButton = getByText('Add Image')
-    await userEvent.click(addImageButton)
-    const singleColorOption = getByText('Single Color Image')
-    await userEvent.click(singleColorOption)
-    const artIcon = await findByTestId('icon-maker-art')
-    await userEvent.click(artIcon)
+    await fireEvent.click(addImageButton)
 
     await waitFor(() => expect(ignoreSpy).not.toHaveBeenCalled())
     await waitFor(() => expect(window.confirm).not.toHaveBeenCalled())
-    await userEvent.click(getByText('Outside button'))
-    await waitFor(() => expect(ignoreSpy).toHaveBeenCalled())
-    await waitFor(() => expect(ignoreSpy.mock.results[0].value).toBe(false))
-    await waitFor(() => expect(window.confirm).toHaveBeenCalled())
+    await fireEvent.click(getByText('Outside button'))
+    await waitFor(() => expect(ignoreSpy).not.toHaveBeenCalled())
+    await waitFor(() => expect(window.confirm).not.toHaveBeenCalled())
   })
 
   it('renders the create view', () => {
@@ -153,13 +116,13 @@ describe.skip('RCE "Icon Maker" Plugin > IconMakerTray', () => {
   it('closes the tray', async () => {
     const onUnmount = jest.fn()
     renderComponent({onUnmount})
-    await userEvent.click(screen.getByText(/close/i))
+    await fireEvent.click(screen.getByText(/close/i))
     await waitFor(() => expect(onUnmount).toHaveBeenCalled())
   })
 
   it('does not call confirm when there are no changes', async () => {
     renderComponent()
-    await userEvent.click(screen.getByText(/close/i))
+    await fireEvent.click(screen.getByText(/close/i))
     expect(window.confirm).not.toHaveBeenCalled()
   })
 
@@ -167,21 +130,21 @@ describe.skip('RCE "Icon Maker" Plugin > IconMakerTray', () => {
     renderComponent()
     // edit the icon before clicking on close
     setIconColor('#000000')
-    await userEvent.click(screen.getByText(/close/i))
+    await fireEvent.click(screen.getByText(/close/i))
     expect(window.confirm).toHaveBeenCalled()
   })
 
   it('inserts a placeholder when an icon is inserted', async () => {
     const {getByTestId} = renderComponent()
     setIconColor('#000000')
-    await userEvent.click(getByTestId('create-icon-button'))
+    await fireEvent.click(getByTestId('create-icon-button'))
     await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
   })
 
   describe('when the user has not created a valid icon', () => {
     beforeEach(async () => {
       render(<IconMakerTray {...defaults} />)
-      await userEvent.click(screen.getByTestId('create-icon-button'))
+      await fireEvent.click(screen.getByTestId('create-icon-button'))
     })
 
     it('does not fire off the icon upload callback', () => {
@@ -241,7 +204,7 @@ describe.skip('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       render(<IconMakerTray {...defaults} />)
 
       setIconColor('#000000')
-      await userEvent.click(screen.getByTestId('create-icon-button'))
+      await fireEvent.click(screen.getByTestId('create-icon-button'))
       let firstCall
       await waitFor(() => {
         const result = startIconMakerUpload.mock.calls[0]
@@ -342,7 +305,7 @@ describe.skip('RCE "Icon Maker" Plugin > IconMakerTray', () => {
 
         fireEvent.change(document.querySelector('#icon-alt-text'), {target: {value: 'banana'}})
         setIconColor('#000000')
-        await userEvent.click(screen.getByTestId('create-icon-button'))
+        await fireEvent.click(screen.getByTestId('create-icon-button'))
         await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
         expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
           Object {
@@ -365,7 +328,7 @@ describe.skip('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         render(<IconMakerTray {...defaults} />)
 
         setIconColor('#000000')
-        await userEvent.click(screen.getByTestId('create-icon-button'))
+        await fireEvent.click(screen.getByTestId('create-icon-button'))
         await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
         expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
           Object {
@@ -387,8 +350,8 @@ describe.skip('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       it('with alt="" if is decorative', async () => {
         render(<IconMakerTray {...defaults} />)
         setIconColor('#000000')
-        await userEvent.click(screen.getByRole('checkbox', {name: /Decorative Icon/}))
-        await userEvent.click(screen.getByTestId('create-icon-button'))
+        await fireEvent.click(screen.getByLabelText('Decorative Icon'))
+        await fireEvent.click(screen.getByTestId('create-icon-button'))
         await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
         expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
           Object {
@@ -435,7 +398,7 @@ describe.skip('RCE "Icon Maker" Plugin > IconMakerTray', () => {
 
       setIconColor('#000000')
       const button = screen.getByTestId('create-icon-button')
-      await userEvent.click(button)
+      await fireEvent.click(button)
 
       await waitFor(() => expect(button).toBeDisabled())
       await waitFor(() => expect(defaults.onUnmount).toHaveBeenCalled(), {
@@ -448,7 +411,7 @@ describe.skip('RCE "Icon Maker" Plugin > IconMakerTray', () => {
 
       setIconColor('#000000')
       const button = getByTestId('create-icon-button')
-      await userEvent.click(button)
+      await fireEvent.click(button)
 
       const spinner = getByText('Loading...')
       await waitFor(() => expect(spinner).toBeInTheDocument())
@@ -537,14 +500,14 @@ describe.skip('RCE "Icon Maker" Plugin > IconMakerTray', () => {
 
     it('does not call confirm when there are no changes', async () => {
       subject()
-      await userEvent.click(await screen.findByText(/close/i))
+      await fireEvent.click(await screen.findByText(/close/i))
       expect(window.confirm).not.toHaveBeenCalled()
     })
 
     it('calls confirm when the user has unsaved changes', async () => {
       await subject().findByTestId('icon-maker-color-input-icon-color')
       setIconColor('#000000')
-      await userEvent.click(screen.getByText(/close/i))
+      await fireEvent.click(screen.getByText(/close/i))
       expect(window.confirm).toHaveBeenCalled()
     })
 
@@ -552,7 +515,7 @@ describe.skip('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       const {getByTestId} = subject()
       await waitFor(() => getByTestId('icon-maker-color-input-icon-color'))
       setIconColor('#000000')
-      await userEvent.click(getByTestId('icon-maker-save'))
+      await fireEvent.click(getByTestId('icon-maker-save'))
       await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
     })
 
@@ -595,7 +558,7 @@ describe.skip('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         await waitFor(() => getByTestId('icon-maker-color-input-icon-color'))
         setIconColor('#000000')
         expect(getByTestId('icon-maker-save')).toBeEnabled()
-        await userEvent.click(getByTestId('icon-maker-save'))
+        await fireEvent.click(getByTestId('icon-maker-save'))
         await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
         expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
           Object {
@@ -637,7 +600,7 @@ describe.skip('RCE "Icon Maker" Plugin > IconMakerTray', () => {
     const getNoneColorOptionFor = async popoverTestId => {
       const {getByTestId} = renderComponent()
       const dropdownArrow = getByTestId(`${popoverTestId}-trigger`)
-      await userEvent.click(dropdownArrow)
+      await fireEvent.click(dropdownArrow)
       const popover = getByTestId(popoverTestId)
       return within(popover).queryByText('None')
     }
@@ -656,11 +619,11 @@ describe.skip('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       it('they represent single color image', async () => {
         const {getByText, getByTestId} = renderComponent()
         const addImageButton = getByText('Add Image')
-        await userEvent.click(addImageButton)
+        await fireEvent.click(addImageButton)
         const singleColorOption = getByText('Single Color Image')
-        await userEvent.click(singleColorOption)
+        await fireEvent.click(singleColorOption)
         const artIcon = await waitFor(() => getByTestId('icon-maker-art'))
-        await userEvent.click(artIcon)
+        await fireEvent.click(artIcon)
         const noneColorOption = await getNoneColorOptionFor('single-color-image-fill-popover')
         expect(noneColorOption).not.toBeInTheDocument()
       })

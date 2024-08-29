@@ -51,6 +51,7 @@ class DiscussionEntry < ActiveRecord::Base
   belongs_to :root_account, class_name: "Account"
   has_one :external_feed_entry, as: :asset
 
+  before_save :set_edited_at
   before_create :infer_root_entry_id
   before_create :set_root_account_id
   after_save :update_discussion
@@ -714,5 +715,11 @@ class DiscussionEntry < ActiveRecord::Base
     final_counts["total"] = final_counts["inappropriate_count"] + final_counts["offensive_count"] + final_counts["other_count"]
 
     final_counts
+  end
+
+  def set_edited_at
+    if will_save_change_to_message? && !new_record?
+      self.edited_at = Time.now.utc
+    end
   end
 end

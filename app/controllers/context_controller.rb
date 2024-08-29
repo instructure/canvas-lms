@@ -29,6 +29,8 @@ class ContextController < ApplicationController
 
   include K5Mode
 
+  MAX_MESSAGES_ON_PROFILE = 10
+
   # safely render object and embed tags as part of user content, by using a
   # iframe pointing to the separate files domain that doesn't contain a user's
   # session. see lib/user_content.rb and the user_content calls throughout the
@@ -275,7 +277,31 @@ class ContextController < ApplicationController
       js_bundle :user_name, "context_roster_user"
       css_bundle :roster_user, :pairing_code
 
-      if @domain_root_account.enable_profiles?
+      enable_profiles = @domain_root_account.enable_profiles?
+      show_recent_messages_on_new_roster_user_page = Account.site_admin.feature_enabled?(:show_recent_messages_on_new_roster_user_page)
+      if (!enable_profiles || (enable_profiles && show_recent_messages_on_new_roster_user_page)) && @user.grants_right?(@current_user, session, :read_profile)
+        @topics = @context.discussion_topics.reject { |a| a.locked_for?(@current_user, check_policies: true) }
+        messages_temp = []
+        messages_count = MAX_MESSAGES_ON_PROFILE
+        while messages_temp.count <= messages_count
+          additional_messages = messages_count - messages_temp.count
+          messages = DiscussionEntry.active
+                                    .where(discussion_topic_id: @topics, user_id: @user)
+                                    .where.not(id: messages_temp.pluck(:id))
+                                    .limit(additional_messages)
+                                    .order(created_at: :desc)
+                                    .to_a
+
+          break if messages.empty?
+
+          messages = messages.select { |m| m.grants_right?(@current_user, session, :read) }
+
+          messages_temp += messages
+        end
+        @messages = messages_temp
+      end
+
+      if enable_profiles
         @user_data = profile_data(
           @user.profile,
           @current_user,
@@ -290,18 +316,6 @@ class ContextController < ApplicationController
 
         render :new_roster_user, stream: can_stream_template?
         return false
-      end
-
-      if @user.grants_right?(@current_user, session, :read_profile)
-        # self and instructors
-        @topics = @context.discussion_topics.active.reject { |a| a.locked_for?(@current_user, check_policies: true) }
-        @messages = []
-        @topics.each do |topic|
-          @messages << topic if topic.user_id == @user.id
-        end
-        @messages += DiscussionEntry.active.where(discussion_topic_id: @topics, user_id: @user).to_a
-
-        @messages = @messages.select { |m| m.grants_right?(@current_user, session, :read) }.sort_by(&:created_at).reverse
       end
 
       add_crumb(t("#crumbs.people", "People"), context_url(@context, :context_users_url))

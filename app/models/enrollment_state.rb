@@ -54,6 +54,10 @@ class EnrollmentState < ActiveRecord::Base
     !state_is_current? || (state_valid_until && state_valid_until < Time.now)
   end
 
+  def active?
+    state == "active"
+  end
+
   def ensure_current_state
     GuardRail.activate(:primary) do
       retry_count = 0

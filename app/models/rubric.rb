@@ -94,10 +94,10 @@ class Rubric < ActiveRecord::Base
     can :read
 
     # read_only means "associated with > 1 object for grading purposes"
-    given { |user, session| !read_only && rubric_associations.for_grading.length < 2 && context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit) }
+    given { |user, session| !read_only && rubric_associations.for_grading.count < 2 && context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit) }
     can :update and can :delete
 
-    given { |user, session| !read_only && rubric_associations.for_grading.length < 2 && context.grants_right?(user, session, :manage_rubrics) }
+    given { |user, session| !read_only && rubric_associations.for_grading.count < 2 && context.grants_right?(user, session, :manage_rubrics) }
     can :update and can :delete
 
     given { |user, session| context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit) }
@@ -571,17 +571,7 @@ class Rubric < ActiveRecord::Base
   end
 
   def enhanced_rubrics_enabled?
-    return context.feature_enabled?(:enhanced_rubrics) if context_type == "Account"
-
-    context.account.feature_enabled?(:enhanced_rubrics)
-  end
-
-  def self.enhanced_rubrics_enabled_for_context?(context)
-    return false unless context
-    return context.feature_enabled?(:enhanced_rubrics) if context.is_a?(Account)
-    return context.account.feature_enabled?(:enhanced_rubrics) if context.is_a?(Course)
-
-    false
+    context.feature_enabled?(:enhanced_rubrics)
   end
 
   def learning_outcome_ids_from_results

@@ -20,7 +20,7 @@
 require_relative "../../helpers/gradebook_common"
 require_relative "../pages/srgb_page"
 
-describe "Screenreader Gradebook" do
+describe.skip "Screenreader Gradebook EVAL-4360 remove test file with FF individual_gradebook_enhancements" do
   include_context "in-process server selenium tests"
   include_context "reusable_gradebook_course"
   include GradebookCommon
@@ -37,6 +37,7 @@ describe "Screenreader Gradebook" do
 
   before do
     course_setup
+    @course.root_account.disable_feature!(:individual_gradebook_enhancements)
     user_session(teacher)
     srgb_page.visit(test_course.id)
     srgb_page.select_student(student)

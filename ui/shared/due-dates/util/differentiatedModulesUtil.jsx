@@ -148,7 +148,7 @@ export const resetStagedCards = (cards, newCardsState, defaultState) => {
   return newState
 }
 
-export const getParsedOverrides = (stagedOverrides, cards, groupCategoryId) => {
+export const getParsedOverrides = (stagedOverrides, cards, groupCategoryId, defaultSectionId) => {
   let index = 0
   const validOverrides = stagedOverrides.filter(override =>
     [undefined, groupCategoryId].includes(override.group_category_id)
@@ -167,7 +167,9 @@ export const getParsedOverrides = (stagedOverrides, cards, groupCategoryId) => {
   const parsedOverrides = Object.entries(overridesByKey).reduce((acc, [key, overrides]) => {
     const datesForGroup = datesFromOverride(overrides[0])
     index++
-    index = cards?.[key]?.index ?? overrides[0].index ?? index
+    // ensure on initial load of the cards, the everyone option is first
+    const everyoneOption = ENV.FEATURES?.selective_release_edit_page && overrides[0].course_section_id === defaultSectionId ? 0 : undefined
+    index = cards?.[key]?.index ?? overrides[0].index ?? everyoneOption ?? index
     acc[key] = {overrides, dates: datesForGroup, index}
     return acc
   }, {})
@@ -269,7 +271,7 @@ export const processModuleOverridesV2 = (overrides, initialModuleOverrides) => {
       } = o
 
       const hasDates = currentAttributes.due_at || currentAttributes.lock_at || currentAttributes.unlock_at
-      const hasChanges = hasDates || currentAttributes.stagedOverrideId != previousAttributes.stagedOverrideId || JSON.stringify(currentAttributes.student_ids)!=JSON.stringify(previousAttributes.student_ids)
+      const hasChanges = !(!hasDates && currentAttributes.course_section_id == previousAttributes.course_section_id && JSON.stringify(currentAttributes.student_ids)== JSON.stringify(previousAttributes.student_ids))
 
       //   If there are changes, remove the context_module override information
       return hasChanges
@@ -293,25 +295,31 @@ export const processModuleOverridesV2 = (overrides, initialModuleOverrides) => {
   return withoutModuleOverrides
 }
 
-export const showPostToSisFlashAlert = assignToButtonId => () =>
-  showFlashAlert({
-    message: (
-      <>
-        {I18n.t('Please set a due date or change your selection for the “Sync to SIS” option.')}
-        <br />
-        <View display="flex">
-          <View as="div" margin="xx-small none none none" width="25px">
-            <IconEditLine size="x-small" color="primary" />
-          </View>
-          <Link
-            margin="xx-small none none none"
-            isWithinText={false}
-            onClick={() => document.getElementById(assignToButtonId)?.click()}
-          >
-            {I18n.t('Manage Due Dates and Assign To')}
-          </Link>
-        </View>
-      </>
-    ),
-    type: 'error',
-  })
+export const showPostToSisFlashAlert =
+  (assignToButtonId, isTray = false) =>
+  () =>
+    showFlashAlert({
+      message: (
+        <>
+          {I18n.t('Please set a due date or change your selection for the “Sync to SIS” option.')}
+          {isTray && (
+            <>
+              <br />
+              <View display="flex">
+                <View as="div" margin="xx-small none none none" width="25px">
+                  <IconEditLine size="x-small" color="primary" />
+                </View>
+                <Link
+                  margin="xx-small none none none"
+                  isWithinText={false}
+                  onClick={() => document.getElementById(assignToButtonId)?.click()}
+                >
+                  {I18n.t('Manage Due Dates and Assign To')}
+                </Link>
+              </View>
+            </>
+          )}
+        </>
+      ),
+      type: 'error',
+    })

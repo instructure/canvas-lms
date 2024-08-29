@@ -1057,5 +1057,15 @@ describe Lti::Messages::JwtMessage do
         expect(subject).to eq student_id
       end
     end
+
+    context "student_context claim" do
+      let(:claim) { "student_context" }
+      let(:student_lti_id) { "222" }
+      let(:opts) { { student_lti_id: } }
+
+      it "uses student_id from opts" do
+        expect(subject).to eq({ "id" => student_lti_id })
+      end
+    end
   end
 end

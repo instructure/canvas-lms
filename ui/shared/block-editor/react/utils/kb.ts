@@ -21,7 +21,7 @@ import React from 'react'
 const isAnyModifierKeyPressed = (event: React.KeyboardEvent) =>
   event.ctrlKey || event.metaKey || event.shiftKey || event.altKey
 
-const getCaretPosition = (editableElement: HTMLElement): number => {
+const getCaretPosition = (editableElement: Element): number => {
   let caretOffset = 0
   const doc = editableElement.ownerDocument
   const win = doc.defaultView
@@ -62,20 +62,21 @@ const setCaretToEnd = (editableElement: HTMLElement) => {
   }
 }
 
-// const setCaretToOffset = (editableElement: HTMLElement, offset: number) => {
-//   const range = document.createRange()
-//   const sel = window.getSelection()
-//   if (sel) {
-//     const textNode = editableElement.querySelector('p')?.firstChild
-//     if (textNode) {
-//       range.setStart(textNode, offset)
-//       range.collapse(true)
+const setCaretToOffset = (element: HTMLElement, offset: number) => {
+  const range = document.createRange()
+  const sel = window.getSelection()
+  if (sel) {
+    const textNode = element.firstChild
 
-//       sel.removeAllRanges()
-//       sel.addRange(range)
-//     }
-//   }
-// }
+    if (textNode) {
+      range.setStart(textNode, offset)
+      range.collapse(true)
+
+      sel.removeAllRanges()
+      sel.addRange(range)
+    }
+  }
+}
 
 const addNewNodeAsNextSibling = (
   newNode: React.ReactElement,
@@ -96,17 +97,21 @@ const shouldAddNewNode = (e: React.KeyboardEvent, lastChar: string) => {
   if (!e.currentTarget.textContent) return false
   return (
     e.key === 'Enter' &&
+    lastChar === 'Enter' &&
     !isAnyModifierKeyPressed(e) &&
-    isCaretAtEnd(e.currentTarget as HTMLElement) &&
-    lastChar === 'Enter'
+    isCaretAtEnd(e.currentTarget as HTMLElement)
   )
 }
 
-const removeLastParagraphTag = (elem: HTMLElement) => {
+const removeTrailingEmptyParagraphTags = (elem: HTMLElement) => {
   const paras = elem.querySelectorAll('p')
   if (paras.length > 0) {
-    const lastPara = paras[paras.length - 1]
-    lastPara.remove()
+    let lastPara = elem.lastElementChild
+    // contenteditable puts a <br> in empty paragraphs
+    while (lastPara && lastPara.tagName === 'P' && lastPara.textContent === '') {
+      lastPara.remove()
+      lastPara = elem.lastElementChild
+    }
   }
 }
 
@@ -129,9 +134,10 @@ export {
   getCaretPosition,
   isCaretAtEnd,
   setCaretToEnd,
+  setCaretToOffset,
   shouldAddNewNode,
   shouldDeleteNode,
   addNewNodeAsNextSibling,
   deleteNodeAndSelectPrevSibling,
-  removeLastParagraphTag,
+  removeTrailingEmptyParagraphTags,
 }

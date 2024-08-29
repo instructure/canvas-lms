@@ -3060,9 +3060,11 @@ ko:
     index: 
       how_to_start_a_new_collaboration: "특정 유형의 협업에 대한 자세한 정보를 찾으려면 \"새 협업 시작\"을 클릭하고 드롭다운 리스트에서 유형을 선택합니다."
       links: 
+        collaboration: 협업
         new: "새 협업 시작"
       page_title: 협업
       titles: 
+        collaborations: 협업
         current: "현재 협업"
     titles: 
       delete: "협업을 삭제하시겠습니까?"
@@ -10000,6 +10002,48 @@ ko:
   pending_f1ed53c7: "보류 중"
   people_b4ebb13c: 사용자
   percentused_of_bytesavailable_used_a859a40d: "%{bytesAvailable} 중 %{percentUsed} 사용 중"
+  permission: 
+    read_sis: "SIS 자료 읽기"
+  permissions: 
+    change_course_state: "과목 상태 바꾸기"
+    create_collaborations: "학생 협업 만들기"
+    create_conferences: "웹 회의 만들기"
+    manage_account_memberships: "계정에 대한 다른 관리자 추가/제거"
+    manage_account_settings: "계정 수준 설정 관리"
+    manage_admin_users: "다른 교사, 과목 디자이너, 조교를 과목에 추가/제거"
+    manage_announcements: "전체 공지 관리"
+    manage_assignments: "과제와 퀴즈 관리 (추가/편집/삭제)"
+    manage_calendar: "과목 달력에 행사 추가, 편집, 삭제"
+    manage_developer_keys: "개발자 키 관리"
+    manage_frozen_assignment: "동결된 과제 관리 (편집/삭제)"
+    manage_global_outcomes: "전체 학습 성과 관리"
+    manage_interaction_alerts: "알림 관리"
+    manage_outcomes: "학습 성과 관리"
+    manage_role_overrides: "권한 관리"
+    manage_rubrics: "루브릭 평가를 만들고 편집"
+    manage_site_settings: "사이트와 플러그인 설정 관리"
+    manage_storage_quotas: "저장소 할당량 관리"
+    manage_students: "과목 학생 추가/제거"
+    manage_user_logins: "사용자의 로그인 세부 정보 수정"
+    manage_user_notes: "교원 일지 항목 관리"
+    managed_jobs: "백그라운드 작업 관리"
+    moderate_form: "토론 관리 (게시물 삭제/편집, 주제 잠그기)"
+    post_to_forum: "토론에 게시"
+    read_course_content: "과목 내용 보기"
+    read_course_list: "과목 목록 보기"
+    read_forum: "토론 보기"
+    read_messages: "사용자에게 보낸 알림 보기"
+    read_question_banks: "문제 은행 보기 및 링크"
+    read_reports: "과목 사용 보고서 보기"
+    read_roster: "사용자 목록 보기"
+    send_messages_all: "전체 학급에 메시지 보내기"
+    undelete_courses: "과목 삭제 취소"
+    view_all_grades: "모든 평점 보기"
+    view_error_reports: "오류 보고서 보기"
+    view_group_pages: "모든 학생 그룹의 그룹 페이지 보기"
+    view_jobs: "백그라운드 작업 보기"
+    view_notifications: "알림 보기"
+    view_statistics: "통계 보기"
   permissions_365c49e: 권한
   pinned_discussions_a55c0cea: "고정된 토론"
   play_media_comment_8614d30f: "미디어 설명 재생"

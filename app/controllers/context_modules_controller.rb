@@ -408,7 +408,9 @@ class ContextModulesController < ApplicationController
       all_tags = GuardRail.activate(:secondary) { @context.module_items_visible_to(@current_user).to_a }
       user_is_admin = @context.grants_right?(@current_user, session, :read_as_admin)
 
-      ActiveRecord::Associations.preload(all_tags, content: [:context, :external_tool_tag])
+      all_tags.each_slice(1000) do |tags|
+        ActiveRecord::Associations.preload(tags, content: [:context, :external_tool_tag])
+      end
 
       preload_assignments_and_quizzes(all_tags, user_is_admin)
 

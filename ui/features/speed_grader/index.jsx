@@ -30,8 +30,12 @@ import {getSectionsByAssignment} from './queries/sectionsByAssignmentQuery'
 import {getSubmission} from './queries/submissionQuery'
 import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery'
 import {getSubmissionsByStudentIds} from './queries/submissionsByStudentsIdsQuery'
+import {getAssignmentsByCourseId} from './queries/assignmentsByCourseIdQuery'
 
-import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
+import {
+  updateSubmissionGrade,
+  updateCheckpointedSubmissionGrade,
+} from './mutations/updateSubmissionGradeMutation'
 import {createSubmissionComment} from './mutations/createSubmissionCommentMutation'
 import {hideAssignmentGradesForSections} from './mutations/hideAssignmentGradesForSectionsMutation'
 import {postDraftSubmissionComment} from './mutations/postDraftSubmissionCommentMutation'
@@ -68,6 +72,7 @@ ready(() => {
           theme,
           queryFns: {
             getAssignment,
+            getAssignmentsByCourseId,
             getCourse,
             getSectionsByAssignment,
             getSubmission,
@@ -122,6 +127,7 @@ ready(() => {
       })
   } else {
     // touch punch simulates mouse events for touch devices
+    // eslint-disable-next-line import/extensions
     require('./touch_punch.js')
 
     const mountPoint = document.getElementById('speed_grader_loading')

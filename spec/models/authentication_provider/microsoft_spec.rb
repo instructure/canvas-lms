@@ -146,6 +146,15 @@ describe AuthenticationProvider::Microsoft do
       expect(AuthenticationProvider::Microsoft.new(tenants: "common", login_attribute: "oid", account: Account.default)).not_to be_valid
       expect(AuthenticationProvider::Microsoft.new(tenants: "common", login_attribute: "sub", account: Account.default)).not_to be_valid
     end
+
+    it "allows deleting an auth provider with an otherwise invalid tenant" do
+      ap = AuthenticationProvider::Microsoft.new(tenants: "invalid", account: Account.default)
+      ap.save!(validate: false)
+      ap.destroy
+      expect(ap).not_to be_changed
+      expect(ap).to be_valid
+      expect(ap).to be_deleted
+    end
   end
 
   context "fetch unique_id" do

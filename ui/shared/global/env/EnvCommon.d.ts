@@ -269,6 +269,7 @@ export type RootAccountFeatureId =
   | 'instui_nav'
   | 'lti_deep_linking_module_index_menu_modal'
   | 'lti_dynamic_registration'
+  | 'lti_registrations_next'
   | 'lti_multiple_assignment_deep_linking'
   | 'lti_overwrite_user_url_input_select_content_dialog'
   | 'mobile_offline_mode'
@@ -290,7 +291,7 @@ export type BrandAccountFeatureId = 'embedded_release_notes'
  * Feature id exported in ApplicationController that aren't mentioned in
  * JS_ENV_SITE_ADMIN_FEATURES or JS_ENV_ROOT_ACCOUNT_FEATURES or JS_ENV_BRAND_ACCOUNT_FEATURES
  */
-export type OtherFeatureId = 'canvas_k6_theme' | 'new_math_equation_handling' | 'learner_passport'
+export type OtherFeatureId = 'canvas_k6_theme' | 'new_math_equation_handling'
 
 /**
  * From ApplicationHelper#set_tutorial_js_env

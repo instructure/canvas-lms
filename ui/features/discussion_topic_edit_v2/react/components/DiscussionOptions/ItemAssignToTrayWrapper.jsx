@@ -19,7 +19,9 @@
 import React, {useContext, useEffect, useState} from 'react'
 import {DiscussionDueDatesContext} from '../../util/constants'
 import DifferentiatedModulesSection from '@canvas/due-dates/react/DifferentiatedModulesSection'
+import AssignToContent from '@canvas/due-dates/react/AssignToContent'
 import LoadingIndicator from '@canvas/loading-indicator'
+import {View} from '@instructure/ui-view'
 
 const DEFAULT_SECTION_ID = '0'
 
@@ -48,7 +50,8 @@ export const ItemAssignToTrayWrapper = () => {
       setOverrides(newOverrides)
     }
     setLoading(false)
-  }, [assignedInfoList])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Convert the assignedInfoList to the expected shape for the DifferentiatedModulesSection
   function convertToOverrideObject(inputObj) {
@@ -84,7 +87,6 @@ export const ItemAssignToTrayWrapper = () => {
 
     let courseSectionId = null
     const studentIds = []
-    const groupIds = []
 
     inputObj.assignedList.forEach(item => {
       if (item === 'everyone') {
@@ -191,20 +193,37 @@ export const ItemAssignToTrayWrapper = () => {
   }
 
   return (
-    <DifferentiatedModulesSection
-      onSync={onSync}
-      overrides={overrides}
-      assignmentId={assignmentID}
-      getAssignmentName={() => title}
-      getPointsPossible={() => pointsPossible}
-      getGroupCategoryId={() => groupCategoryId}
-      type="discussion"
-      importantDates={importantDates}
-      defaultSectionId={DEFAULT_SECTION_ID}
-      supportDueDates={isGraded}
-      isCheckpointed={isCheckpoints}
-      postToSIS={postToSis}
-    />
+    <View as="div" maxWidth="478px">
+      {ENV.FEATURES?.selective_release_edit_page ? (
+        <AssignToContent
+          onSync={onSync}
+          overrides={overrides}
+          assignmentId={assignmentID}
+          defaultGroupCategoryId={groupCategoryId}
+          importantDates={importantDates}
+          defaultSectionId={DEFAULT_SECTION_ID}
+          supportDueDates={isGraded}
+          type="discussion"
+          isCheckpointed={isCheckpoints}
+          postToSIS={postToSis}
+        />
+      ) : (
+        <DifferentiatedModulesSection
+          onSync={onSync}
+          overrides={overrides}
+          assignmentId={assignmentID}
+          getAssignmentName={() => title}
+          getPointsPossible={() => pointsPossible}
+          getGroupCategoryId={() => groupCategoryId}
+          type="discussion"
+          importantDates={importantDates}
+          defaultSectionId={DEFAULT_SECTION_ID}
+          supportDueDates={isGraded}
+          isCheckpointed={isCheckpoints}
+          postToSIS={postToSis}
+        />
+      )}
+    </View>
   )
 }
 

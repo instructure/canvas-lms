@@ -54,7 +54,14 @@ KeyboardNavDialog.prototype.bindOpenKeys = function () {
     (function (_this) {
       return function (e) {
         const isQuestionMark = e.keyCode === 191 && e.shiftKey
-        if (isQuestionMark && !$(e.target).is(':input') && !ENV.disable_keyboard_shortcuts) {
+        if (
+          isQuestionMark &&
+          !(
+            $(e.target).is(':input') ||
+            (e.target.getAttribute && e.target.getAttribute('contenteditable') === 'true')
+          ) &&
+          !ENV.disable_keyboard_shortcuts
+        ) {
           e.preventDefault()
           if (_this.$el.is(':visible')) {
             _this.$el.dialog('close')

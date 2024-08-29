@@ -16,11 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {sendMessageStudentsWho} from './shared/grading/messageStudentsWhoHelper'
+import MessageStudentsWhoHelper from './shared/grading/messageStudentsWhoHelper'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {GlobalInst} from '@canvas/global/inst/GlobalInst'
 import {GlobalRemotes} from '@canvas/global/remotes/GlobalRemotes'
-import EditorJS from '@editorjs/editorjs'
 
 declare global {
   interface Global {
@@ -58,13 +57,14 @@ declare global {
     INST: GlobalInst
 
     webkitSpeechRecognition: any
-    messageStudents: (options: ReturnType<typeof sendMessageStudentsWho>) => void
+    messageStudents: (
+      options: ReturnType<typeof MessageStudentsWhoHelper.sendMessageStudentsWho>
+    ) => void
     updateGrades: () => void
 
     bundles: string[]
     deferredBundles: string[]
     canvasReadyState?: 'loading' | 'complete'
-    block_editor?: EditorJS
   }
 
   /**
@@ -93,9 +93,8 @@ declare global {
     (num?: number): JQuery<HTMLElement>
   }
 
-  declare interface JQuery {
+  interface JQuery {
     scrollTo: (y: number, x?: number) => void
-    change: any
     confirmDelete: any
     datetime_field: () => JQuery<HTMLInputElement>
     disableWhileLoading: any
@@ -132,7 +131,6 @@ declare global {
       required: string[]
       success: (data: any) => void
       beforeSubmit?: (data: any) => void
-      error: (response: JQuery.JQueryXHR) => void
     }) => void
     formErrors: (errors: Record<string, string>) => void
     getTemplateData: (options: {textValues: string[]}) => Record<string, unknown>
@@ -140,31 +138,14 @@ declare global {
     loadingImage: (str?: string) => void
   }
 
-  declare interface JQueryStatic {
+  interface JQueryStatic {
     subscribe: (topic: string, callback: (...args: any[]) => void) => void
-    ajaxJSON: (
-      url: string,
-      submit_type?: string,
-      data?: any,
-      success?: any,
-      error?: any,
-      options?: any
-    ) => JQuery.JQueryXHR
-    replaceTags: (string, string, string?) => string
+    replaceTags: (text: string, name: string, value?: string) => string
     raw: (str: string) => string
     getScrollbarWidth: any
     datetimeString: any
     ajaxJSONFiles: any
     isPreviewable: any
-  }
-
-  declare interface Array<T> {
-    flatMap: <Y>(callback: (value: T, index: number, array: T[]) => Y[]) => Y[]
-    flat: <Y>(depth?: number) => Y[]
-  }
-
-  declare interface Object {
-    fromEntries: any
   }
 
   // due to overrides in packages/date-js/core.js

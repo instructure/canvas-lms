@@ -32,19 +32,20 @@ type HorizontalButtonDisplayProps = {
   isPreviewMode: boolean
   ratings: RubricRating[]
   ratingOrder: string
-  selectedRatingIndex?: number
-  onSelectRating: (index: number) => void
+  selectedRatingId?: string
+  onSelectRating: (rating: RubricRating) => void
   criterionUseRange: boolean
 }
 export const HorizontalButtonDisplay = ({
   isPreviewMode,
   ratings,
   ratingOrder,
-  selectedRatingIndex = -1,
+  selectedRatingId,
   onSelectRating,
   criterionUseRange,
 }: HorizontalButtonDisplayProps) => {
-  const selectedRating = ratings[selectedRatingIndex]
+  const selectedRating = ratings.find(rating => rating.id && rating.id === selectedRatingId)
+  const selectedRatingIndex = selectedRating ? ratings.indexOf(selectedRating) : -1
   const min = criterionUseRange ? rangingFrom(ratings, selectedRatingIndex) : undefined
 
   const getPossibleText = (points?: number) => {
@@ -101,7 +102,7 @@ export const HorizontalButtonDisplay = ({
                 isSelected={selectedRatingIndex === index}
                 isPreviewMode={isPreviewMode}
                 selectedArrowDirection="up"
-                onClick={() => onSelectRating(index)}
+                onClick={() => onSelectRating(rating)}
               />
             </Flex.Item>
           )

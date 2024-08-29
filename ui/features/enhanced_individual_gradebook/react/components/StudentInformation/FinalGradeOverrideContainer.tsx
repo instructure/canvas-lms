@@ -81,6 +81,7 @@ function FinalGradeOverrideContainer({
         gradingPeriodId={gradingPeriodId}
         onGradeChange={handleFinalGradeOverrideChange}
         disabled={apiCallStatus === ApiCallStatus.PENDING}
+        restrictToTwoDigitsAfterSeparator={!!gradingScheme?.pointsBased}
         showPercentageLabel={true}
       />
     </>

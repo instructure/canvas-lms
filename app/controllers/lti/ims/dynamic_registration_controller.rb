@@ -82,6 +82,10 @@ module Lti
         render json: Lti::IMS::Registration.find_by(guid: params[:registration_uuid])
       end
 
+      def show
+        render json: Lti::IMS::Registration.find(params[:registration_id])
+      end
+
       def oidc_configuration_url(registration_token)
         issuer_url = Canvas::Security.config["lti_iss"]
         parsed_issuer = Addressable::URI.parse(issuer_url)

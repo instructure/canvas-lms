@@ -294,6 +294,7 @@ module SpeedGrader
             missing
             late_policy_status
             word_count
+            partially_submitted?
           ]
           json =
             sub

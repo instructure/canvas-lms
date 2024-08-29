@@ -20,6 +20,11 @@
 
 class BlockEditor < ActiveRecord::Base
   belongs_to :context, polymorphic: [:wiki_page]
+  before_create :set_root_account_id
 
   alias_attribute :version, :editor_version
+
+  def set_root_account_id
+    self.root_account_id = context&.root_account_id unless root_account_id
+  end
 end

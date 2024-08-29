@@ -101,7 +101,7 @@ describe "Rubric form page" do
     ]
     @outcome_rubric.save!
     RubricAssociation.create!(rubric: @outcome_rubric, context: @course, association_object: @course, purpose: "bookmark")
-    @course.account.enable_feature!(:enhanced_rubrics)
+    @course.enable_feature!(:enhanced_rubrics)
     get "/courses/#{@course.id}/rubrics"
   end
 

@@ -22,7 +22,7 @@ type LinkInfo = {
   [key: string]: string
 }
 
-type Links = {
+export type Links = {
   first?: LinkInfo
   prev?: LinkInfo
   current?: LinkInfo

@@ -25,6 +25,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 
 export const SUBMISSION_FRAGMENT = gql`
   fragment SubmissionInterfaceFragment on SubmissionInterface {
+    attempt
     cachedDueDate
     gradingStatus
     user {
@@ -46,6 +47,7 @@ export const SUBMISSION_FRAGMENT = gql`
     latePolicyStatus
     submissionStatus
     customGradeStatus
+    redoRequest
     submittedAt
     submissionType
     secondsLate
@@ -58,6 +60,7 @@ export const SUBMISSION_FRAGMENT = gql`
         createdAt
         draft
         author {
+          _id
           name
           updatedAt
           avatarUrl
@@ -147,6 +150,13 @@ const SUBMISSION_QUERY = gql`
 function transform(result: any) {
   const submission = result.assignment?.submissionsConnection?.nodes?.[0]
   if (submission) {
+    // TODO: should be updated with anonymous grading (see reassignAssignment method in speed_grader.tsx)
+    submission.reassignAssignment = () => {
+      return doFetchApi({
+        path: `/courses/${result.assignment?.courseId}/assignments/${result.assignment?._id}/submissions/${submission.user._id}/reassign`,
+        method: 'PUT',
+      })
+    }
     submission.attachments.forEach((attachment: any) => {
       attachment.delete = () =>
         doFetchApi({
@@ -178,6 +188,7 @@ function transform(result: any) {
       comments: submission?.commentsConnection?.nodes,
       rubricAssessments: submission.rubricAssessmentsConnection?.nodes,
       submissionHistory: submission.submissionHistoriesConnection?.nodes,
+      // @ts-expect-error
       submissionState: speedGraderHelpers.submissionState(submission, ENV.grading_role ?? ''),
     }
   }

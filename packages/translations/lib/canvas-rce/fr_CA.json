@@ -308,7 +308,6 @@
   },
   "edit_icon_2c6b0e91": { "message": "Modifier l’icône" },
   "edit_link_7f53bebb": { "message": "Modifier le lien" },
-  "editor_statusbar_26ac81fc": { "message": "Barre d''état de l''éditeur" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Élément commençant par { start }"
   },
@@ -616,6 +615,7 @@
   "links_to_an_external_site_de74145d": {
     "message": "Liens vers un site externe."
   },
+  "lists_cd1336fc": { "message": "Listes" },
   "lists_should_be_formatted_as_lists_f862de8d": {
     "message": "Les listes doivent être formatées comme une liste."
   },

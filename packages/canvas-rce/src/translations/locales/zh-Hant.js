@@ -287,7 +287,6 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "編輯圖示" },
   "edit_link_7f53bebb": { "message": "編輯連結" },
-  "editor_statusbar_26ac81fc": { "message": "編輯器狀態欄" },
   "element_starting_with_start_91bf4c3b": {
     "message": "以 { start } 開始的元素"
   },
@@ -549,6 +548,7 @@ const locale = {
   },
   "links_14b70841": { "message": "連結" },
   "links_to_an_external_site_de74145d": { "message": "連結到外部網站。" },
+  "lists_cd1336fc": { "message": "清單" },
   "lists_should_be_formatted_as_lists_f862de8d": {
     "message": "列表應使用清單格式。"
   },

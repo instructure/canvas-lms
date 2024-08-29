@@ -23,8 +23,33 @@ import ContentMigrationsForm from '../migrations_form'
 import fetchMock from 'fetch-mock'
 import {completeUpload} from '@canvas/upload-file'
 
+const attachment = {
+  id: '183',
+  uuid: 'B9NafLSg93EiR8CK3GMvVZClKQYl0u1wD9kMb0IJ',
+  folder_id: null,
+  display_name: 'my_file.zip',
+  filename: '1722434447_290__my_file.zip',
+  upload_status: 'success',
+  'content-type': 'application/zip',
+  url: 'http://canvas-web.inseng.test/files/183/download?download_frd=1',
+  size: 3804,
+  created_at: '2024-08-06T08:49:47Z',
+  updated_at: '2024-08-06T08:49:48Z',
+  unlock_at: null,
+  locked: false,
+  hidden: false,
+  lock_at: null,
+  hidden_for_user: false,
+  thumbnail_url: null,
+  modified_at: '2024-08-06T08:49:47Z',
+  mime_class: 'zip',
+  media_entry_id: null,
+  category: 'uncategorized',
+  locked_for_user: false,
+}
+
 jest.mock('@canvas/upload-file', () => ({
-  completeUpload: jest.fn(),
+  completeUpload: jest.fn(async () => attachment),
 }))
 
 const CommonCartridgeImporter = jest.fn()
@@ -189,6 +214,10 @@ describe('ContentMigrationForm', () => {
           onProgress: expect.any(Function),
         }
       )
+      const secondSetterFunction = setMigrationsMock.mock.calls[1][0]
+      const result = secondSetterFunction([])
+      expect(result?.[0].attachment.display_name).toBe(attachment.display_name)
+      expect(result?.[0].attachment.url).toBe(attachment.url)
     })
   })
 

@@ -143,6 +143,10 @@ if (!Array.prototype.flatMap) {
 require('@instructure/ui-themes')
 
 // set up mocks for native APIs
+if (!('alert' in window)) {
+  window.alert = () => {}
+}
+
 if (!('MutationObserver' in window)) {
   Object.defineProperty(window, 'MutationObserver', {
     value: require('@sheerun/mutationobserver-shim'),

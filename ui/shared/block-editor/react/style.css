@@ -69,25 +69,6 @@
 .font7 {font-family: 'trebuchet ms', geneva;}
 .font8 {font-family: verdana, geneva;}
 
-.block {
-  position: relative;
-  line-height: 1.2rem;
-  min-height: 1.2rem;
-  &.empty {
-    border: 1px dotted #ababab;
-  }
-  &.rce-text-block {
-    min-width: 50%;
-  }
-}
-
-.page-block {
-  background: transparent;
-  padding: 16px;
-  min-height: 10rem;
-  margin: 2px;
-}
-
 .colorPalette {
   box-sizing: border-box;
   height: 20px;
@@ -207,9 +188,24 @@
   min-width: 2.5rem;
 }
 
-.paragraph-block {
-  min-height: 1.5rem;
-  line-height: 1.5rem;
+.block {
+  position: relative;
+  min-height: 2rem;
+  min-width: 2rem;
+  &.page-block {
+    background: transparent;
+    padding: 16px;
+    min-height: 10rem;
+    margin: 2px;
+  }
+  &.paragraph-block {
+    min-height: 1.5rem;
+    line-height: 1.5rem;
+  }
+  &.image-block {
+    min-height: 24px;
+    min-width: 24px;
+  }
 }
 
 .resource-card {
@@ -347,8 +343,15 @@
 .text-block {
   max-width: 100%;
   text-wrap: balance;
+  margin: 12px 0; /* matches Canvas' global p margin */
   &.enabled {
     text-wrap: stable;
+  }
+  p:first-child {
+    margin-top: 0;
+  }
+  p:last-child {
+    margin-bottom: 0;
   }
 }
 

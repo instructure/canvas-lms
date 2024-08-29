@@ -42,4 +42,8 @@ class Checkpoints::AdhocOverrideCommonService < ApplicationService
   def existing_parent_override
     @checkpoint.parent_assignment.active_assignment_overrides.find_by(set_type: AssignmentOverride::SET_TYPE_ADHOC)
   end
+
+  def get_title(student_ids:)
+    I18n.t({ one: "1 student", other: "%{count} students" }, count: student_ids.size)
+  end
 end

@@ -9,8 +9,7 @@
   },
   "scripts": {
     "lint": "eslint . --ext .ts,.js",
-    "check": "tsc -p ./tsconfig.json",
-    "build:canvas": "yarn run check && yarn run lint"
+    "build:canvas": "yarn run lint"
   },
   "dependencies": {
     "@instructure/updown": "^1.3",

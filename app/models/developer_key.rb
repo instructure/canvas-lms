@@ -100,6 +100,8 @@ class DeveloperKey < ActiveRecord::Base
     state :deleted
   end
 
+  DEFAULT_KEY_NAME = "User-Generated"
+
   # https://stackoverflow.com/a/2500819
   alias_method :referenced_tool_configuration, :tool_configuration
 
@@ -175,11 +177,11 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   class << self
-    def default
-      get_special_key("User-Generated")
+    def default(create_if_missing: true)
+      get_special_key(DeveloperKey::DEFAULT_KEY_NAME, create_if_missing:)
     end
 
-    def get_special_key(default_key_name)
+    def get_special_key(default_key_name, create_if_missing: true)
       Shard.birth.activate do
         @special_keys ||= {}
 
@@ -190,6 +192,7 @@ class DeveloperKey < ActiveRecord::Base
           key = DeveloperKey.where(id: key_id).first
         end
         return @special_keys[default_key_name] = key if key
+        return nil unless create_if_missing
 
         key = DeveloperKey.create!(name: default_key_name)
         key.developer_key_account_bindings.update_all(workflow_state: "on")

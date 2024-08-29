@@ -16,18 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {Tray} from '@instructure/ui-tray'
 import {RubricAssessmentContainer, type ViewMode} from './RubricAssessmentContainer'
-import type {
-  Rubric,
-  RubricAssessmentData,
-  RubricAssessmentSelect,
-  UpdateAssessmentData,
-} from '../types/rubric'
-import {findCriterionMatchingRatingIndex} from './utils/rubricUtils'
+import type {Rubric, RubricAssessmentData} from '../types/rubric'
+import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 
@@ -39,10 +34,7 @@ export type RubricAssessmentTrayProps = {
   isPeerReview?: boolean
   rubric?: Pick<Rubric, 'title' | 'criteria' | 'ratingOrder' | 'freeFormCriterionComments'>
   rubricAssessmentData: RubricAssessmentData[]
-  rubricAssessmentId?: string
-  rubricAssessors?: RubricAssessmentSelect
   rubricSavedComments?: Record<string, string[]>
-  onAccessorChange?: (assessorId: string) => void
   onDismiss: () => void
   onSubmit?: (rubricAssessmentDraftData: RubricAssessmentData[]) => void
 }
@@ -54,73 +46,11 @@ export const RubricAssessmentTray = ({
   isPeerReview = false,
   rubric,
   rubricAssessmentData,
-  rubricAssessmentId = '',
-  rubricAssessors = [],
   rubricSavedComments = {},
-  onAccessorChange = () => {},
   onDismiss,
   onSubmit,
 }: RubricAssessmentTrayProps) => {
   const [viewMode, setViewMode] = useState<ViewMode>('traditional')
-  const [rubricAssessmentDraftData, setRubricAssessmentDraftData] = useState<
-    RubricAssessmentData[]
-  >([])
-
-  useEffect(() => {
-    if (isOpen) {
-      setRubricAssessmentDraftData(rubricAssessmentData)
-    }
-  }, [rubricAssessmentData, isOpen])
-
-  const onUpdateAssessmentData = (params: UpdateAssessmentData) => {
-    const {criterionId, points, description, comments = '', saveCommentsForLater} = params
-
-    const existingAssessmentIndex = rubricAssessmentDraftData.findIndex(
-      a => a.criterionId === criterionId
-    )
-
-    const ratingDescription = description ?? ''
-
-    const matchingCriteria = rubric?.criteria?.find(c => c.id === criterionId)
-    const matchingRatingIndex = findCriterionMatchingRatingIndex(
-      matchingCriteria?.ratings ?? [],
-      points,
-      matchingCriteria?.criterionUseRange
-    )
-    const matchingRating = matchingCriteria?.ratings?.[matchingRatingIndex]
-
-    const matchingRatingId = matchingRating?.id ?? ''
-
-    if (existingAssessmentIndex === -1) {
-      setRubricAssessmentDraftData([
-        ...rubricAssessmentDraftData,
-        {
-          criterionId,
-          points,
-          comments,
-          id: matchingRatingId,
-          commentsEnabled: true,
-          description: ratingDescription,
-          saveCommentsForLater,
-        },
-      ])
-    } else {
-      setRubricAssessmentDraftData(
-        rubricAssessmentDraftData.map(a =>
-          a.criterionId === criterionId
-            ? {
-                ...a,
-                comments,
-                id: matchingRatingId,
-                points,
-                description: ratingDescription,
-                saveCommentsForLater,
-              }
-            : a
-        )
-      )
-    }
-  }
 
   return (
     <Tray
@@ -136,25 +66,23 @@ export const RubricAssessmentTray = ({
       {isLoading || !rubric ? (
         <LoadingIndicator />
       ) : (
-        <RubricAssessmentContainer
-          criteria={rubric.criteria ?? []}
-          hidePoints={hidePoints}
-          isPreviewMode={isPreviewMode}
-          isPeerReview={isPeerReview}
-          isFreeFormCriterionComments={rubric.freeFormCriterionComments ?? false}
-          ratingOrder={rubric.ratingOrder ?? 'descending'}
-          rubricTitle={rubric.title}
-          rubricAssessmentData={rubricAssessmentDraftData}
-          rubricAssessmentId={rubricAssessmentId}
-          rubricAssessors={rubricAssessors}
-          rubricSavedComments={rubricSavedComments}
-          selectedViewMode={viewMode}
-          onAccessorChange={onAccessorChange}
-          onDismiss={onDismiss}
-          onSubmit={onSubmit ? () => onSubmit?.(rubricAssessmentDraftData) : undefined}
-          onViewModeChange={mode => setViewMode(mode)}
-          onUpdateAssessmentData={onUpdateAssessmentData}
-        />
+        <View as="div" padding="medium medium 0 medium" themeOverride={{paddingMedium: '1rem'}}>
+          <RubricAssessmentContainer
+            criteria={rubric.criteria ?? []}
+            hidePoints={hidePoints}
+            isPreviewMode={isPreviewMode}
+            isPeerReview={isPeerReview}
+            isFreeFormCriterionComments={rubric.freeFormCriterionComments ?? false}
+            ratingOrder={rubric.ratingOrder ?? 'descending'}
+            rubricTitle={rubric.title}
+            rubricAssessmentData={rubricAssessmentData}
+            rubricSavedComments={rubricSavedComments}
+            viewModeOverride={viewMode}
+            onDismiss={onDismiss}
+            onSubmit={onSubmit}
+            onViewModeChange={mode => setViewMode(mode)}
+          />
+        </View>
       )}
     </Tray>
   )

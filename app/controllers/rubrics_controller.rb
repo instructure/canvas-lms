@@ -41,8 +41,7 @@ class RubricsController < ApplicationController
     mastery_scales_js_env
     set_tutorial_js_env
 
-    is_enhanced_rubrics = Rubric.enhanced_rubrics_enabled_for_context?(@context)
-    if is_enhanced_rubrics
+    if @context.feature_enabled?(:enhanced_rubrics)
       js_env breadcrumbs: rubric_breadcrumbs
       js_env enhanced_rubrics_enabled: true
 
@@ -59,7 +58,7 @@ class RubricsController < ApplicationController
     permission = @context.is_a?(User) ? :manage : [:manage_rubrics, :read_rubrics]
     return unless authorized_action(@context, @current_user, permission)
 
-    is_enhanced_rubrics = Rubric.enhanced_rubrics_enabled_for_context?(@context)
+    is_enhanced_rubrics = @context.feature_enabled?(:enhanced_rubrics)
 
     if params[:id].match?(Api::ID_REGEX) || is_enhanced_rubrics
       js_env ROOT_OUTCOME_GROUP: get_root_outcome,

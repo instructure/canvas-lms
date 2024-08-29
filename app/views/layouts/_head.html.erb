@@ -55,5 +55,4 @@
   <% end -%>
   <% if @include_recaptcha %><script src="https://www.google.com/recaptcha/api.js?render=explicit&hl=<%= I18n.locale %>" async></script><% end %>
   <% if load_heap? %><%= render :partial => "shared/heap_js" %><% end %>
-  <% if load_hotjar? %><%= render :partial => "shared/hotjar_js" %><% end %>
 </head>

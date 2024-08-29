@@ -374,6 +374,24 @@ module CanvasRails
       end
     end
 
+    if $canvas_rails < "7.2"
+      # This should run after all initializers are complete, as yjit optimizing initialization code is unhelpful
+      # (modeled after version of yjit enabling in rails main)
+      initializer :enable_yjit do
+        config.after_initialize do
+          yjit_enabled = ActiveModel::Type::Boolean.new.cast(::DynamicSettings.find(tree: :private)["enable_yjit", failsafe: "false"])
+          if yjit_enabled && defined?(RubyVM::YJIT.enable)
+            RubyVM::YJIT.enable
+          end
+        end
+      end
+    else
+      # ensure configure after dynamic settings is configured before yjit is managed
+      initializer :enable_yjit_check, before: "enable_yjit" do
+        config.yjit = ActiveModel::Type::Boolean.new.cast(::DynamicSettings.find(tree: :private)["enable_yjit", failsafe: "false"])
+      end
+    end
+
     initializer "canvas.extend_shard", before: "active_record.initialize_database" do
       # have to do this before the default shard loads
       Switchman::Shard.serialize :settings, type: Hash

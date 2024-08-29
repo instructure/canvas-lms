@@ -36,7 +36,7 @@ const ImageBlock = ({src, width, height, constraint}: ImageBlockProps) => {
   const {
     connectors: {connect, drag},
   } = useNode()
-  const clazz = useClassNames(enabled, {empty: !src}, 'image-block')
+  const clazz = useClassNames(enabled, {empty: !src}, ['block', 'image-block'])
 
   if (!src) {
     return <div className={clazz} ref={el => el && connect(drag(el as HTMLDivElement))} />

@@ -33,6 +33,7 @@ import {PeerReviews} from '../../../../graphql/PeerReviews'
 import React from 'react'
 import useManagedCourseSearchApi from '../../../../../../shared/direct-sharing/react/effects/useManagedCourseSearchApi'
 import {waitFor} from '@testing-library/dom'
+import userEvent from '@testing-library/user-event'
 
 jest.mock('../../../../../../shared/direct-sharing/react/effects/useManagedCourseSearchApi')
 jest.mock('@canvas/rce/RichContentEditor')
@@ -221,6 +222,23 @@ describe('DiscussionTopicContainer', () => {
     )
     await waitFor(() => {
       expect(assignMock).toHaveBeenCalledWith('/courses/1/discussion_topics')
+    })
+  })
+
+  it('Should be able to delete announcement', async () => {
+    window.confirm = jest.fn(() => true)
+    const {getByTestId, getByText} = setup(
+      {discussionTopic: Discussion.mock({isAnnouncement: true})},
+      deleteDiscussionTopicMock()
+    )
+    await userEvent.click(getByTestId('discussion-post-menu-trigger'))
+    await userEvent.click(getByText('Delete'))
+
+    await waitFor(() =>
+      expect(setOnSuccess).toHaveBeenCalledWith('The discussion topic was successfully deleted.')
+    )
+    await waitFor(() => {
+      expect(assignMock).toHaveBeenCalledWith('/courses/1/announcements')
     })
   })
 

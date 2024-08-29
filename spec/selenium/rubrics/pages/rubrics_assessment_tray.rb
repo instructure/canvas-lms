@@ -27,6 +27,10 @@ class RubricAssessmentTray
       f("[data-testid='enhanced-rubric-assessment-tray']")
     end
 
+    def container
+      f("[data-testid='enhanced-rubric-assessment-container']")
+    end
+
     def traditional_grid_rubric_assessment_view
       f("[data-testid='rubric-assessment-traditional-view']")
     end
@@ -81,6 +85,10 @@ class RubricAssessmentTray
 
     def criterion_score_input(criterion_id)
       f("[data-testid='criterion-score-#{criterion_id}']")
+    end
+
+    def criterion_score_readonly(criterion_id)
+      f("[data-testid='criterion-score-#{criterion_id}-readonly']")
     end
 
     def modern_view_points_inputs(criterion_id)

@@ -21,27 +21,14 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import { IconArrowOpenEndLine, IconArrowOpenDownLine } from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
-import {Responsive} from '@instructure/ui-responsive'
-import {responsiveQuerySizes} from '../../utils'
+import { Flex } from '@instructure/ui-flex'
 
 const I18n = useI18nScope('discussion_posts')
 
 export function Expansion({...props}) {
   return (
-    <Responsive
-      match="media"
-      query={responsiveQuerySizes({mobile: true, desktop: true})}
-      props={{
-        mobile: {
-          textSize: 'small',
-        },
-        desktop: {
-          textSize: 'medium',
-          itemSpacing: 'none',
-        },
-      }}
-      render={responsiveProps => (
         <span className="discussion-expand-btn">
           <Link
             isWithinText={false}
@@ -65,17 +52,18 @@ export function Expansion({...props}) {
                     author: props.authorName,
                   })}
             </ScreenReaderContent>
-            <Text
-              weight="bold"
-              size={responsiveProps.textSize}
-              data-testid={`text-${responsiveProps.textSize}`}
-            >
-              {props.expandText}
-            </Text>
+            <Flex gap='x-small'>
+              { props.isExpanded ? <IconArrowOpenDownLine /> : <IconArrowOpenEndLine /> }
+              <Text
+                weight="bold"
+                size="medium"
+                data-testid={`text-medium`}
+                >
+                {props.expandText}
+              </Text>
+            </Flex>
           </Link>
         </span>
-      )}
-    />
   )
 }
 

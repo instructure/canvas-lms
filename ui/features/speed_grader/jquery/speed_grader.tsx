@@ -55,7 +55,7 @@ import AssessmentAuditButton from '../react/AssessmentAuditTray/components/Asses
 import AssessmentAuditTray from '../react/AssessmentAuditTray/index'
 import CommentArea from '../react/CommentArea'
 import GradeLoadingSpinner from '../react/GradeLoadingSpinner'
-import RubricAssessmentTrayWrapper from '../react/RubricAssessmentTrayWrapper'
+import RubricAssessmentContainerWrapper from '../react/RubricAssessmentContainerWrapper'
 import ScreenCaptureIcon from '../react/ScreenCaptureIcon'
 import {originalityReportSubmissionKey} from '@canvas/grading/originalityReportHelper'
 import PostPolicies from '../react/PostPolicies/index'
@@ -159,7 +159,8 @@ import type {
   RubricAssessmentUnderscore,
   RubricOutcomeUnderscore,
   RubricUnderscoreType,
-} from '../react/RubricAssessmentTrayWrapper/utils'
+} from '../react/RubricAssessmentContainerWrapper/utils'
+import {SpeedGraderCheckpointsWrapper} from '../react/SpeedGraderCheckpoints/SpeedGraderCheckpointsWrapper'
 
 declare global {
   interface Window {
@@ -181,6 +182,7 @@ const SPEED_GRADER_SUBMISSION_COMMENTS_DOWNLOAD_MOUNT_POINT =
   'speed_grader_submission_comments_download_mount_point'
 const SPEED_GRADER_HIDDEN_SUBMISSION_PILL_MOUNT_POINT =
   'speed_grader_hidden_submission_pill_mount_point'
+const SPEED_GRADER_CHECKPOINTS_MOUNT_POINT = 'speed_grader_checkpoints_mount_point'
 const SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT = 'speed_grader_edit_status_mount_point'
 const SPEED_GRADER_EDIT_STATUS_MENU_SECONDARY_MOUNT_POINT =
   'speed_grader_edit_status_secondary_mount_point'
@@ -840,6 +842,21 @@ function renderHiddenSubmissionPill(submission: Submission) {
   }
 }
 
+function renderCheckpoints(submission: Submission) {
+  const mountPoint = document.getElementById(SPEED_GRADER_CHECKPOINTS_MOUNT_POINT)
+
+  if (mountPoint) {
+    ReactDOM.render(
+      <SpeedGraderCheckpointsWrapper
+        courseId={ENV.course_id}
+        assignmentId={submission.assignment_id}
+        studentId={submission.user_id}
+      />,
+      mountPoint
+    )
+  }
+}
+
 function renderCommentTextArea() {
   // unmounting is a temporary workaround for INSTUI-870 to allow
   // for textarea minheight to be reset
@@ -1189,7 +1206,9 @@ function updateSubmissionAndPageEffects(data?: {
         if (availableMountPointForStatusMenu()) {
           const mountPoint = availableMountPointForStatusMenu()
           if (!mountPoint) throw new Error('SpeedGrader: mount point for status menu not found')
-          renderStatusMenu(statusMenuComponent(submission), mountPoint)
+          if (!window.jsonData.has_sub_assignments) {
+            renderStatusMenu(statusMenuComponent(submission), mountPoint)
+          }
         }
       })
     })
@@ -1528,7 +1547,13 @@ EG = {
     if (enhanced_rubrics_enabled) {
       const isOpen = isClosed ? false : !useStore.getState().rubricAssessmentTrayOpen
       useStore.setState({rubricAssessmentTrayOpen: isOpen})
+      toggleGradeVisibility(!isOpen)
       this.refreshFullRubric()
+
+      if (!isOpen) {
+        $('.toggle_full_rubric').focus()
+      }
+
       return
     }
 
@@ -1919,21 +1944,18 @@ EG = {
     ReactDOM.render(button, document.getElementById(ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT))
   },
 
-  setUpRubricAssessmentTrayWrapper() {
+  setUpRubricAssessmentContainerWrapper() {
     ReactDOM.render(
-      <RubricAssessmentTrayWrapper
+      <RubricAssessmentContainerWrapper
         rubric={ENV.rubric as RubricUnderscoreType}
         rubricOutcomeData={ENV.rubric_outcome_data as RubricOutcomeUnderscore[]}
-        onAccessorChange={accessorId => {
-          $('#rubric_assessments_select').val(accessorId)
-          handleSelectedRubricAssessmentChanged()
-        }}
+        onDismiss={() => EG.toggleFullRubric('close')}
         onSave={data => {
           useStore.setState({rubricAssessmentTrayOpen: false})
           this.saveRubricAssessment(data)
         }}
       />,
-      document.getElementById('speed_grader_rubric_assessment_tray_wrapper')
+      document.getElementById('enhanced-rubric-assessment-container')
     )
   },
 
@@ -2584,7 +2606,9 @@ EG = {
       const isInModeration = isModerated && !window.jsonData.grades_published_at
       const shouldRender = isMostRecent && !isClosedForSubmission && !isConcluded && !isInModeration
       const component = shouldRender ? statusMenuComponent(this.currentStudent.submission) : null
-      renderStatusMenu(component, mountPoint)
+      if (!window.jsonData.has_sub_assignments) {
+        renderStatusMenu(component, mountPoint)
+      }
     }
 
     EG.showDiscussion()
@@ -2798,6 +2822,12 @@ EG = {
     clearInterval(sessionTimer)
     $submissions_container.children().hide()
     $('.speedgrader_alert').hide()
+
+    if (this.currentStudent.submission && this.currentStudent.submission['partially_submitted?']) {
+      this.renderSubmissionPreview()
+      return
+    }
+
     if (
       !this.currentStudent.submission ||
       !this.currentStudent.submission.submission_type ||
@@ -3081,7 +3111,6 @@ EG = {
 
       const {hide_points} = (window?.jsonData?.rubric_association ?? {}) as {hide_points: boolean}
       useStore.setState({
-        rubricAssessors: showSelectMenu ? selectMenuOptions : [],
         rubricHidePoints: hide_points,
       })
       handleSelectedRubricAssessmentChanged({validateEnteredData})
@@ -3782,6 +3811,9 @@ EG = {
     if (ENV.MANAGE_GRADES || (window.jsonData.context.concluded && ENV.READ_AS_ADMIN)) {
       renderHiddenSubmissionPill(submission)
     }
+
+    renderCheckpoints(submission)
+
     EG.updateStatsInHeader()
   },
 
@@ -4249,7 +4281,7 @@ function setupSpeedGrader(
     useStore.setState({
       rubricSavedComments: rubricAssociation.summary_data?.saved_comments,
     })
-    EG.setUpRubricAssessmentTrayWrapper()
+    EG.setUpRubricAssessmentContainerWrapper()
   }
 }
 

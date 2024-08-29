@@ -73,6 +73,10 @@ module Canvas::Migration
       @package_root.item_path(file_name) if file_name.present?
     end
 
+    def package_root_path
+      @package_root.root_path.to_s
+    end
+
     def move_archive_to(full_path)
       if @archive_file.is_a?(Tempfile)
         FileUtils.move(@archive_file.path, full_path)
@@ -82,21 +86,22 @@ module Canvas::Migration
     end
 
     def package_course_files(base_dir = nil)
-      package_root = base_dir ? PackageRoot.new(base_dir) : @package_root
+      @package_root = base_dir ? PackageRoot.new(base_dir) : @package_root
       zip_file = File.join(@base_export_dir, MigratorHelper::ALL_FILES_ZIP)
       make_export_dir
 
-      return if @course[:file_map].empty?
+      path = get_full_path(CC::CCHelper::WEB_RESOURCES_FOLDER)
+      path = package_root_path if Dir.glob("#{path}/*", File::FNM_DOTMATCH).empty?
+
+      root_files = Dir.glob("#{path}/**/**", File::FNM_DOTMATCH)
+      return if root_files.empty?
 
       Zip::File.open(zip_file, Zip::File::CREATE) do |zipfile|
-        @course[:file_map].each_value do |val|
-          file_path = package_root.item_path(val[:real_path] || val[:path_name])
-          val.delete :real_path
-          if File.exist?(file_path)
-            zipfile.add(val[:path_name], file_path)
-          else
-            add_warning(I18n.t("canvas.migration.errors.file_does_not_exist", 'The file "%{file_path}" did not exist in the content package and could not be imported.', file_path: val[:path_name]))
-          end
+        root_files.each do |file|
+          next if File.directory?(file)
+
+          file_path = file.sub(path + "/", "")
+          zipfile.add(file_path, file)
         end
       end
 

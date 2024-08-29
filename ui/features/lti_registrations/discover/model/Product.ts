@@ -24,22 +24,32 @@ export type Product = {
   logo_url: string
   tagline: string
   description: string
-  updated_at: any
+  updated_at: string
   tool_integration_configurations: Lti
+  lti_configurations: LtiDetail
   badges: Badges[]
   screenshots: string[]
+  terms_of_service_url: string
+  privacy_policy_url: string
+  accessibility_url: string
+  support_link: string
   tags: Tag[]
 }
 
 export type Company = {
-  id: string
+  id: number
   name: string
-  company_url?: string
+  company_url: string
 }
 
 export type Lti = {
   lti_13?: {id: number; integration_type: string; url: string; unified_tool_id: string}[]
   lti_11?: {id: number; integration_type: string; url: string; unified_tool_id: string}[]
+}
+
+export type LtiDetail = {
+  lti_13?: {services: string[]; placements: string[]}
+  lti_11?: {services: string[]; placements: string[]}
 }
 
 export type Badges = {

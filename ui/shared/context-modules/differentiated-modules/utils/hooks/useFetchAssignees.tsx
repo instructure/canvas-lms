@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect, useState} from 'react'
+import {useEffect, useState, useRef} from 'react'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -94,7 +94,7 @@ const fetchNextPages = async (next: {url: string}, results: Record<string, any>[
 const useFetchAssignees = ({
   courseId,
   defaultValues,
-  groupCategoryId,
+  groupCategoryId = null,
   disableFetch = false,
   everyoneOption,
   checkMasteryPaths = false,
@@ -108,14 +108,14 @@ const useFetchAssignees = ({
   const [isLoading, setIsLoading] = useState(false)
   const [loaded, setLoaded] = useState(false)
   const [hasErrors, setHasErrors] = useState(false)
+  const groupCategoryRef = useRef(null)
 
   useEffect(() => {
     const params: Record<string, string | number> = {per_page: 100}
     const shouldSearchTerm = searchTerm.length > 2
     if (
       (shouldSearchTerm || searchTerm === '') &&
-      !disableFetch &&
-      !isLoading &&
+    (!disableFetch && !isLoading || groupCategoryRef.current !== groupCategoryId) &&
       !customAllOptions
     ) {
       setIsLoading(true)
@@ -231,6 +231,7 @@ const useFetchAssignees = ({
             ],
             'id'
           )
+          groupCategoryRef.current = groupCategoryId
           setAllOptions(newOptions)
           setIsLoading(false)
           setLoaded(true)

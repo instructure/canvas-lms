@@ -175,13 +175,13 @@ class WikiPagesController < ApplicationController
       wiki_index_menu_tools: external_tools_display_hashes(:wiki_index_menu),
       DISPLAY_SHOW_ALL_LINK: tab_enabled?(context.class::TAB_PAGES, no_render: true) && !@k5_details_view,
       CAN_SET_TODO_DATE: context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit),
-      BLOCK_EDITOR: context.account.feature_enabled?(:block_editor)
     }
     if Account.site_admin.feature_enabled?(:permanent_page_links)
       title_availability_path = context.is_a?(Course) ? api_v1_course_page_title_availability_path : api_v1_group_page_title_availability_path
       @wiki_pages_env[:TITLE_AVAILABILITY_PATH] = title_availability_path
     end
     js_env(@wiki_pages_env)
+    @js_env[:FEATURES][:BLOCK_EDITOR] = true if context.account.feature_enabled?(:block_editor)
     @wiki_pages_env
   end
 end

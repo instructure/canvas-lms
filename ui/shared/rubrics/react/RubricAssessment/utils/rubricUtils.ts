@@ -17,7 +17,7 @@
  */
 
 import htmlEscape from '@instructure/html-escape'
-import type {RubricCriterion, RubricRating} from '../../types/rubric'
+import type {RubricAssessmentData, RubricCriterion, RubricRating} from '../../types/rubric'
 
 export const htmlEscapeCriteriaLongDescription = (criteria: RubricCriterion) => {
   const {longDescription} = criteria
@@ -27,17 +27,39 @@ export const htmlEscapeCriteriaLongDescription = (criteria: RubricCriterion) => 
   }
 }
 
-export const escapeNewLineText = (text: string) => {
+export const escapeNewLineText = (text?: string) => {
   return {
     __html: htmlEscape(text ?? '').replace(/\n/g, '<br />'),
   }
 }
 
 export const rangingFrom = (ratings: RubricRating[], index: number, ratingOrder?: string) => {
+  const previousRatingPoints = ratings[index - 1]?.points
+  const previousPointModifier = getAdjustedDecimalRatingModifier(previousRatingPoints)
+  const nextRatingPoints = ratings[index + 1]?.points
+  const nextPointModifier = getAdjustedDecimalRatingModifier(nextRatingPoints)
+
   if (ratingOrder === 'ascending') {
-    return index > 0 ? ratings[index - 1].points + 0.1 : undefined
+    return index > 0
+      ? roundToTwoDecimalPlaces(previousRatingPoints + previousPointModifier)
+      : undefined
   }
-  return index < ratings.length - 1 ? ratings[index + 1].points + 0.1 : undefined
+
+  return index < ratings.length - 1
+    ? roundToTwoDecimalPlaces(nextRatingPoints + nextPointModifier)
+    : undefined
+}
+
+const getAdjustedDecimalRatingModifier = (points: number) => {
+  if (points == null) {
+    return 0
+  }
+  const twoDecimalRegex = /^\d+\.\d{2}$/
+  return twoDecimalRegex.test(points.toString()) ? 0.01 : 0.1
+}
+
+const roundToTwoDecimalPlaces = (num: number) => {
+  return Math.round(num * 100) / 100
 }
 
 export const findCriterionMatchingRatingIndex = (
@@ -51,4 +73,18 @@ export const findCriterionMatchingRatingIndex = (
   return criterionUseRange
     ? ratings.findLastIndex(rating => rating.points >= points)
     : ratings.findIndex(rating => rating.points === points)
+}
+
+export const findCriterionMatchingRatingId = (
+  ratings: RubricRating[],
+  criterionUseRange: boolean,
+  rubricAssessmentData?: RubricAssessmentData
+) => {
+  const {id, points} = rubricAssessmentData || {}
+  if (points == null) {
+    return undefined
+  }
+
+  return ratings.find(rating => rating.id === id && (criterionUseRange || rating.points === points))
+    ?.id
 }

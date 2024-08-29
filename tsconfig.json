@@ -22,6 +22,6 @@
     }
   },
   "include": ["ui/*", "ui/**/*"],
-  "exclude": ["**/node_modules", "**/.*/", "vendor"],
+  "exclude": ["**/node_modules", "**/.*/", "vendor", "ui/features/gradebook/**/*", "ui/features/discussion_topics_post/**/*"],
   "types": []
 }

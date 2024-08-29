@@ -93,8 +93,14 @@ type OptimizedItemAssignToCardProps = ItemAssignToCardProps & RefAttributes<Item
 const ItemAssignToCardMemo = memo(
   ItemAssignToCard,
   (prevProps: OptimizedItemAssignToCardProps, nextProps: OptimizedItemAssignToCardProps) => {
-    return (
+    // For improving performance, we should only validate Post to SIS if due_at is abscent
+    const shouldValidatePostToSIS =
+      prevProps.postToSIS !== nextProps.postToSIS &&
+      (nextProps.due_at === null || nextProps.due_at === '')
+
+    return !!(
       nextProps.persistEveryoneOption &&
+      JSON.stringify(prevProps.customAllOptions) === JSON.stringify(nextProps.customAllOptions) &&
       prevProps.selectedAssigneeIds?.length === nextProps.selectedAssigneeIds?.length &&
       prevProps.highlightCard === nextProps.highlightCard &&
       prevProps.due_at === nextProps.due_at &&
@@ -107,7 +113,8 @@ const ItemAssignToCardMemo = memo(
       prevProps.isCheckpointed === nextProps.isCheckpointed &&
       prevProps.courseId === nextProps.courseId &&
       prevProps.contextModuleId === nextProps.contextModuleId &&
-      prevProps.contextModuleName === nextProps.contextModuleName
+      prevProps.contextModuleName === nextProps.contextModuleName &&
+      !shouldValidatePostToSIS
     )
   }
 )
@@ -446,6 +453,7 @@ const ItemAssignToTrayContent = ({
   }, [courseId, itemContentId, itemType, JSON.stringify(defaultCards)])
 
   const handleAddCard = () => {
+    lastPerformedAction.current = {action: 'add'}
     if (onAddCard) {
       onAddCard()
       return
@@ -467,7 +475,6 @@ const ItemAssignToTrayContent = ({
         selectedAssigneeIds: [] as string[],
       } as ItemAssignToCardSpec,
     ]
-    lastPerformedAction.current = {action: 'add'}
     setAssignToCards(cards)
   }
 
@@ -572,6 +579,14 @@ const ItemAssignToTrayContent = ({
       const initialCard = initialCards.find(card => card.key === cardId)
       const areEquals =
         JSON.stringify(initialCard?.selectedAssigneeIds) === JSON.stringify(selectedAssigneeIds)
+
+      const studentAssignees = selectedAssigneeIds.filter(assignee => assignee.includes('student'))
+      const sectionAssignees = selectedAssigneeIds.filter(assignee => assignee.includes('section'))
+      // this is useful in the page edit page for checking if a module override has been changed
+      const hasInitialAssignees =
+        sectionAssignees?.includes(initialCard?.defaultOptions?.[0] ?? '') ||
+        JSON.stringify(studentAssignees) === JSON.stringify(initialCard?.defaultOptions)
+
       const cards = assignToCardsRef.current.map(card =>
         card.key === cardId
           ? {
@@ -580,6 +595,7 @@ const ItemAssignToTrayContent = ({
               highlightCard: !areEquals,
               isEdited: !areEquals,
               hasAssignees: assignees.length > 0,
+              hasInitialOverride: hasInitialAssignees,
             }
           : card
       )
@@ -675,6 +691,7 @@ const ItemAssignToTrayContent = ({
             blueprintDateLocks={blueprintDateLocks}
             postToSIS={postToSIS}
             disabledOptionIdsRef={disabledOptionIdsRef}
+            loadedAssignees={loadedAssignees}
           />
         </View>
       ))

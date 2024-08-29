@@ -54,6 +54,7 @@ export const FixedContentTray = ({
   renderFooter,
   bodyAs,
   shouldJoinBodyAndFooter,
+  shouldCloseOnDocumentClick,
 }) => {
   return (
     <Tray
@@ -64,7 +65,7 @@ export const FixedContentTray = ({
       onExited={onUnmount}
       open={isOpen}
       placement="end"
-      shouldCloseOnDocumentClick={true}
+      shouldCloseOnDocumentClick={shouldCloseOnDocumentClick}
       shouldContainFocus={true}
       shouldReturnFocus={true}
       size="regular"
@@ -105,6 +106,7 @@ FixedContentTray.propTypes = {
   mountNode: PropTypes.oneOfType([PropTypes.func, PropTypes.element]),
   bodyAs: PropTypes.string,
   shouldJoinBodyAndFooter: PropTypes.bool,
+  shouldCloseOnDocumentClick: PropTypes.bool,
 }
 
 FixedContentTray.defaultProps = {
@@ -114,4 +116,5 @@ FixedContentTray.defaultProps = {
   onUnmount: () => {},
   bodyAs: 'div',
   shouldJoinBodyAndFooter: false,
+  shouldCloseOnDocumentClick: true,
 }

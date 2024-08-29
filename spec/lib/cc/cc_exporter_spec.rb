@@ -227,7 +227,8 @@ describe "Common Cartridge exporting" do
     end
 
     it "creates a quizzes-only export" do
-      @q1 = @course.quizzes.create!(title: "quiz1")
+      att = attachment_model(uploaded_data: fixture_file_upload("test_image.jpg"))
+      @q1 = @course.quizzes.create!(title: "quiz1", description: %(<p><img src="/courses/#{@course.id}/files/#{att.id}/preview" width="150" height="150" /></p>"))
       @q2 = @course.quizzes.create!(title: "quiz2")
 
       @ce.export_type = ContentExport::QTI
@@ -242,7 +243,13 @@ describe "Common Cartridge exporting" do
       check_resource_node(@q2, CC::CCHelper::QTI_ASSESSMENT_TYPE)
 
       alt_mig_id1 = CC::CCHelper.create_key(@q1, "canvas_", global: true)
+      att_mig_id = CC::CCHelper.create_key(att, global: true)
+
       expect(@manifest_doc.at_css("resource[identifier=#{alt_mig_id1}][type=\"#{CC::CCHelper::LOR}\"]")).not_to be_nil
+      expect(@manifest_doc.at_css("resource[identifier=#{att_mig_id}][type=\"#{CC::CCHelper::WEBCONTENT}\"]")).not_to be_nil
+      doc = Nokogiri::XML.parse(@zip_file.read("#{CC::CCHelper.create_key(@q1, global: true)}/assessment_meta.xml"))
+      expect(@zip_file.read("web_resources/test_image.jpg")).not_to be_nil
+      expect(doc.at_css("description").text).to include("$IMS-CC-FILEBASE$/test_image.jpg")
 
       alt_mig_id2 = CC::CCHelper.create_key(@q2, "canvas_", global: true)
       expect(@manifest_doc.at_css("resource[identifier=#{alt_mig_id2}][type=\"#{CC::CCHelper::LOR}\"]")).not_to be_nil

@@ -16,6 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import create from 'zustand'
+import type {ApiResult} from '../../common/lib/apiResult/ApiResult'
+import type {LtiImsRegistrationId} from '../model/lti_ims_registration/LtiImsRegistrationId'
+import type {LtiConfiguration} from '../model/lti_tool_configuration/LtiConfiguration'
+import {ZUnifiedToolId, type UnifiedToolId} from '../model/UnifiedToolId'
+
+type JsonUrlFetchStatus =
+  | {
+      _tag: 'initial'
+    }
+  | {
+      _tag: 'loading'
+    }
+  | {
+      _tag: 'loaded'
+      result: ApiResult<LtiConfiguration>
+    }
 
 export type RegistrationWizardModalState = {
   open: boolean
@@ -31,9 +47,21 @@ export type RegistrationWizardModalState = {
    */
   registering: boolean
   lti_version: '1p3' | '1p1'
-  method: 'dynamic_registration' | 'manual' | 'json'
+  method: InstallMethod
   dynamicRegistrationUrl: string
-  unifiedToolId: string
+  jsonUrl: string
+  /**
+   * The ID of the LTI IMS Registration to edit. If this is set, the registration wizard will
+   * open to the Dynamic Registration review screen, once the registration has been loaded from the backend.
+   * If this is not set, the registration wizard will follow the typical flow.
+   */
+  ltiImsRegistrationId?: LtiImsRegistrationId
+  unifiedToolId?: UnifiedToolId
+  /**
+   * Contains the state of fetching the JSON for the
+   * JSON url method
+   */
+  jsonUrlFetch: JsonUrlFetchStatus
   /**
    * Controls whether the modal should close when the user
    * clicks "cancel" Should be true when the modal is
@@ -43,10 +71,14 @@ export type RegistrationWizardModalState = {
   onSuccessfulInstallation?: () => void
 }
 
+type InstallMethod = 'dynamic_registration' | 'manual' | 'json' | 'json_url'
+
 export type RegistrationWizardModalStateActions = {
   updateLtiVersion: (version: '1p3' | '1p1') => void
-  updateMethod: (method: 'dynamic_registration' | 'manual' | 'json') => void
+  updateMethod: (method: InstallMethod) => void
   updateDynamicRegistrationUrl: (url: string) => void
+  updateJsonUrl: (url: string) => void
+  updateJsonFetchStatus: (status: JsonUrlFetchStatus) => void
   register: () => void
   unregister: () => void
   close: () => void
@@ -61,12 +93,15 @@ export const useRegistrationModalWizardState = create<
   progressMax: 100,
   method: 'dynamic_registration',
   dynamicRegistrationUrl: '',
-  unifiedToolId: '',
+  jsonUrl: '',
+  unifiedToolId: undefined,
   registering: false,
   exitOnCancel: false,
+  jsonUrlFetch: {_tag: 'initial'},
   updateLtiVersion: version => set({lti_version: version}),
   updateMethod: method => set({method}),
   updateDynamicRegistrationUrl: url => set({dynamicRegistrationUrl: url}),
+  updateJsonUrl: url => set({jsonUrl: url}),
   register: () => set({registering: true}),
   unregister: () => {
     // todo: if we've already returned from the tool,
@@ -74,19 +109,36 @@ export const useRegistrationModalWizardState = create<
     set(prev => {
       return {
         open: !prev.exitOnCancel,
-        registering: prev.exitOnCancel,
+        ltiImsRegistrationId: undefined,
+        registering: false,
       }
     })
   },
-  close: () => set({open: false}),
+  updateJsonFetchStatus: status => {
+    if (status._tag === 'loaded') {
+      set({jsonUrlFetch: status, registering: status.result._type === 'success'})
+    } else {
+      set({jsonUrlFetch: status})
+    }
+  },
+  close: () => set({open: false, ltiImsRegistrationId: undefined, registering: false}),
 }))
 
 export const openRegistrationWizard = (
-  initialState: Omit<RegistrationWizardModalState, 'open'>
+  initialState: Partial<Omit<RegistrationWizardModalState, 'open'>>
 ) => {
-  useRegistrationModalWizardState.setState({
-    ...initialState,
-    open: true,
+  useRegistrationModalWizardState.setState(prev => {
+    return {
+      ...prev,
+      dynamicRegistrationUrl: '',
+      unifiedToolId: ZUnifiedToolId.parse(''),
+      jsonUrl: '',
+      jsonUrlFetch: {_tag: 'initial'},
+      lti_version: '1p3',
+      method: 'dynamic_registration',
+      ...initialState,
+      open: true,
+    }
   })
 }
 
@@ -98,16 +150,34 @@ export const openRegistrationWizard = (
  */
 export const openDynamicRegistrationWizard = (
   dynamicRegistrationUrl: string,
-  unifiedToolId: string = '',
+  unifiedToolId?: UnifiedToolId,
   onSuccessfulInstallation?: () => void
 ) => {
   openRegistrationWizard({
     dynamicRegistrationUrl,
-    lti_version: '1p3',
-    method: 'dynamic_registration',
     registering: true,
     exitOnCancel: true,
     onSuccessfulInstallation,
     unifiedToolId,
+  })
+}
+
+/**
+ * Allows users to edit the Dynamic Registration of an already existing LTI IMS Registration.
+ * This will open the registration wizard to the review screen, once the registration has been loaded
+ * from the backend.
+ *
+ * @param ltiImsRegistrationId The ID of the LTI IMS Registration to edit.
+ * @param onSuccessfulInstallation A callback to run after the update is finished successfully.
+ */
+export const openEditDynamicRegistrationWizard = (
+  ltiImsRegistrationId: LtiImsRegistrationId,
+  onSuccessfulInstallation?: () => void
+) => {
+  openRegistrationWizard({
+    ltiImsRegistrationId,
+    registering: true,
+    exitOnCancel: true,
+    onSuccessfulInstallation,
   })
 }

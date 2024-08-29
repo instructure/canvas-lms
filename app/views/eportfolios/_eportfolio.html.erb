@@ -26,7 +26,7 @@
   <% end %>
   <div style="padding-<%= direction('left') %>: 30px;">
     <%= t(:entry_count, { :one => "*1* page", :other => "*%{count}* pages" },
-          :count => (eportfolio.eportfolio_entries.length rescue 0),
+          :count => eportfolio.eportfolio_entries.size,
           :wrapper => '<span class="entry_count">\1</span>') %>
     &nbsp;&nbsp;&nbsp;&nbsp;
     <%= t(:updated_at, "last updated %{updated_at}", :updated_at => raw("<span class=\"updated_at\">#{datetime_string(eportfolio.updated_at) rescue nbsp}</span>")) %>

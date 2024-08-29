@@ -96,8 +96,8 @@ const updateRegistrationKey =
 
 const toggleString =
   <S extends string>(s: S) =>
-  (strings: Array<S> | undefined): Array<S> => {
-    if (typeof strings === 'undefined') {
+  (strings: Array<S> | null | undefined): Array<S> => {
+    if (typeof strings === 'undefined' || strings === null) {
       return [s]
     } else if (strings.includes(s)) {
       return strings.filter(x => x !== s)

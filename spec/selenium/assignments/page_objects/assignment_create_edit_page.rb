@@ -22,6 +22,9 @@ class AssignmentCreateEditPage
     include SeleniumDependencies
 
     # CSS Selectors
+    def assignment_inherited_from_selector
+      "#overrides-wrapper [data-testid='context-module-text']"
+    end
 
     def manage_assign_to_button_selector
       "[data-testid='manage-assign-to']"
@@ -62,6 +65,10 @@ class AssignmentCreateEditPage
 
     def assignment_name_textfield
       f("#assignment_name")
+    end
+
+    def assignment_inherited_from
+      ff(assignment_inherited_from_selector)
     end
 
     def assignment_save_button

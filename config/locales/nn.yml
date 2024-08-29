@@ -6260,9 +6260,11 @@ nn:
           utan å måtte utveksle e-postadresser.
       how_to_start_a_new_collaboration: "Dersom du vil vite meir om ein bestemt type samarbeid, kan du klikke på \"Start nytt samarbeid\" og deretter velje samarbeidstype i rullegardinmenyen."
       links: 
+        collaboration: Samarbeid
         new: "Start nytt samarbeid"
       page_title: Samarbeid
       titles: 
+        collaborations: Samarbeid
         current: "Gjeldande samarbeid"
     lti_collaborations: "Eksterne samarbeid"
     show: 
@@ -6302,6 +6304,7 @@ nn:
   color_a363e1b0: Farge
   color_color_for_mastery_level_position_35079de: "Farge %{color} for ekspertisenivå %{position}"
   color_overlay_fb5ecce7: Fargelag
+  column_e1ae5c64: kollonne
   columns_464bd055: Kolonnar
   come_back_later_5eab7dba: "Kom tilbake seinare"
   coming_soon_79d46687: "KJEM SNART"
@@ -19343,6 +19346,8 @@ nn:
   performed_by_70b3ce96: "Utført av"
   permanent_num_strands_setting_141e8a0c: "Permanen num_strands-innstilling"
   permanent_page_links_c8b26ba8: "Permanente sidelenker"
+  permission: 
+    read_sis: "Les SIS-data"
   permission_must_be_enabled_for_someone_397e1ce3: "Nokon må ha denne tilgangen"
   permission_not_found_620b80d1: "Finn ikkje løyve"
   permission_role_filter_8a9a3e68: "Rollefilter for løyve"
@@ -19351,8 +19356,68 @@ nn:
   permission_to_change_this_mastery_scale_at_the_acc_ea75238f: "Løyve til å endre denne meistringsskalaen på kontonivå er skrudd på for:"
   permission_to_change_this_mastery_scale_at_the_cou_58677e7f: "Tillatelse til å endre denne ekspertisenivå på emnenivå er skrudd på for:"
   permissions: 
+    change_course_state: "Endre emnesituasjon"
+    create_collaborations: "Opprett studentsamarbeid"
+    create_conferences: "Opprett webkonferansar"
+    manage_account_banks: "Administrer spørsmålsbankar på kontonivå"
+    manage_account_memberships: "Legg til/fjern andre administratorar for kontoen"
+    manage_account_settings: "Administrer innstillingar på kontonivå"
+    manage_admin_users: "Legg til/fjern andre faglærarar, designarar og undervisingsassistentar på emnet"
+    manage_announcements: "Administrer globale kunngjeringar"
+    manage_assignments: "Administrer (legg til / rediger / slett) oppgåver og quizar"
+    manage_calendar: "Legg til, rediger og slett hendingar i emnekalenderen"
+    manage_catalog: "Administrer katalog"
+    manage_data_services: "Administrer datatenester"
+    manage_developer_keys: "Administrer utviklarnøklar"
+    manage_feature_flags: "Aktiver eller deaktiver funksjonar på kontonivå"
+    manage_frozen_assignment: "Administrer (rediger/slett) frosne oppgåver"
+    manage_global_outcomes: "Administrer globale læringsmål"
+    manage_grades: "Rediger vurderingar"
+    manage_interaction_alerts: "Administrer varsel"
+    manage_internal_settings: "Administrer interne innstillingar for heile miljøet"
+    manage_outcomes: "Administrer læringsmål"
+    manage_proficiency_calculations: "Administrer dugleiksberekningar for læringsmål"
+    manage_proficiency_scales: "Administrer ekspertiseskalaer for læringsmål"
+    manage_role_overrides: "Administrer løyve"
+    manage_rubrics: "Opprett og rediger vurderingsskjema"
+    manage_sections_add: "Legg til emneseksjonar"
+    manage_sections_delete: "Slett seksjoner frå emnet"
+    manage_sections_edit: "Rediger emneseksjonar"
+    manage_sis: "Administrer SIS-data"
+    manage_site_settings: "Administrer innstillingar for nettstader og programtillegg"
+    manage_storage_quotas: "Administrer lagringskvotar"
+    manage_students: "Legg til/fjern studentar på emet"
+    manage_user_logins: "Endre påloggingsdetaljar for brukarar"
+    manage_user_notes: "Administrer oppføringar i faglærarprotokollane"
+    manage_user_observers: "Administrer observatørar for brukarar"
     manage_webhooks: "Webhooks - administrer"
+    managed_jobs: "Administrer bakgrunnsjobbar"
+    moderate_form: "Moderer diskusjonar ( slett / rediger andre sine postar og lås emne)"
+    moderate_user_content: "Moderer brukarinnhald"
+    post_to_forum: "Post til diskusjonar"
     provision_catalog: "Klargjer ein katalog"
+    read_course_content: "Sjå emneinnhald"
+    read_course_list: "Sjå emnelister"
+    read_forum: "Sjå diskusjonar"
+    read_messages: "Sjå varsel sende til brukarar"
+    read_question_banks: "Sjå og lenk til spørsmålsbankar"
+    read_reports: "Sjå rapportar om emnebruken"
+    read_roster: "Sjå brukarlister"
+    send_messages: "Send meldingar til individuelle emnedeltakarar"
+    send_messages_all: "Send meldingar til heile seksjonar"
+    temporary_enrollments_add: "Legg til midlertidige påmeldingar"
+    temporary_enrollments_delete: "Slett midlertidige påmeldingar"
+    temporary_enrollments_edit: "Endre midlertidige påmeldingar"
+    undelete_courses: "Gjer om sletting av emne"
+    view_all_grades: "Vis alle vurderingar"
+    view_course_changes: "Vis loggar for emneendringar"
+    view_error_reports: "Vis feilmeldingar"
+    view_grade_changes: "Vis loggar for vurderingsendringar"
+    view_group_pages: "Vis gruppesider for alle studentgruppene"
+    view_jobs: "Vis bakgrunnsjobbar"
+    view_notifications: "Vis varslar"
+    view_quiz_answer_audits: "Vis svarmatrisa i quizinnleveringsloggen"
+    view_statistics: "Vis statistikk"
   permissions_365c49e: Løyve
   permissions_manage_9eea4f8f: "Løyve - administrer"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Tillèt bruk av alle “inkluder” parameter for denne utviklarnøkkelen. “inkluderer” parameter kan gi tilgang til tilleggsdata som ikkje er inkludert i omfanget vald nedanfor."
@@ -22659,6 +22724,7 @@ nn:
     filter_multiple_users_found: "Funne %{userCount} brukarar."
     filter_no_users_found: "Finn ikkje samsvarande brukarar."
     filter_one_user_found: "Funne 1 brukar."
+  row_fc0944a7: Rad
   row_row_message_e369e49e: "Rad %{row}: %{message}"
   rsa_sha1_c457d751: RSA-SHA1
   rsa_sha256_3d41d605: RSA-SHA256

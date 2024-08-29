@@ -810,7 +810,8 @@ CanvasRails::Application.routes.draw do
     delete "grading_schemes/:id" => "grading_schemes_json#destroy"
     put "grading_schemes/:id" => "grading_schemes_json#update"
     get "grading_schemes/:id/used_locations" => "grading_schemes_json#used_locations", :as => :grading_schemes_used_locations
-    get "grading_schemes/default_used_locations" => "grading_schemes_json#default_used_locations", :as => :grading_schemes_default_used_locations
+    get "grading_schemes/:id/used_locations/:course_id" => "grading_schemes_json#used_locations_for_course", :as => :grading_schemes_used_locations_for_course
+    get "grading_schemes/:id/account_used_locations" => "grading_schemes_json#account_used_locations", :as => :grading_schemes_account_used_locations
     get "grading_schemes/default" => "grading_schemes_json#show_default_grading_scheme"
     get "grading_schemes/:id" => "grading_schemes_json#show"
 
@@ -938,45 +939,15 @@ CanvasRails::Application.routes.draw do
     end
   end
 
-  resources :users, only: [:passport] do
-    get "passport" => "learner_passport#index"
-
-    get "passport/data/achievements" => "learner_passport#achievements_index"
-
-    get "passport/data/portfolios" => "learner_passport#portfolios_index"
-    put "passport/data/portfolios/create" => "learner_passport#portfolio_create"
-    post "passport/data/portfolios/:portfolio_id" => "learner_passport#portfolio_update"
-    get "passport/data/portfolios/show/:portfolio_id" => "learner_passport#portfolio_show"
-    put "passport/data/portfolios/duplicate" => "learner_passport#portfolio_duplicate"
-    put "passport/data/portfolios/delete" => "learner_passport#portfolio_delete"
-
-    get "passport/data/projects" => "learner_passport#projects_index"
-    put "passport/data/projects/create" => "learner_passport#project_create"
-    post "passport/data/projects/:project_id" => "learner_passport#project_update"
-    get "passport/data/projects/show/:project_id" => "learner_passport#project_show"
-    put "passport/data/projects/duplicate" => "learner_passport#project_duplicate"
-    put "passport/data/projects/delete" => "learner_passport#project_delete"
-
-    get "passport/data/pathways" => "learner_passport#pathways_index"
-    get "passport/data/pathways/badges" => "learner_passport#pathway_badges_index"
-    get "passport/data/pathways/learner_groups" => "learner_passport#pathway_learner_groups_index"
-    get "passport/data/pathways/canvas_requirements" => "learner_passport#pathway_canvas_requirements_index"
-    put "passport/data/pathways/create" => "learner_passport#pathway_create"
-    post "passport/data/pathways/:pathway_id" => "learner_passport#pathway_update"
-    get "passport/data/pathways/show/:pathway_id" => "learner_passport#pathway_show"
-    get "passport/data/pathways/share_users" => "learner_passport#pathway_share_users"
-
-    get "passport/data/skills" => "learner_passport#skills_index"
-    get "passport/data/reset" => "learner_passport#reset"
-
-    get "passport/*path" => "learner_passport#index"
-  end
-
   get "show_message_template" => "messages#show_message_template"
   get "message_templates" => "messages#templates"
   resource :profile, controller: :profile, only: [:show, :update] do
     resources :pseudonyms, except: :index
-    resources :tokens, except: [:index, :destroy]
+    resources :tokens, only: [] do
+      member do
+        post :activate
+      end
+    end
     member do
       put :update_profile
       get :communication
@@ -1280,7 +1251,10 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :tokens) do
-      delete "users/:user_id/tokens/:id", action: :destroy, as: "token"
+      get "users/:user_id/tokens/:id", action: :show, as: "token"
+      post "users/:user_id/tokens", action: :create, as: "tokens"
+      put "users/:user_id/tokens/:id", action: :update
+      delete "users/:user_id/tokens/:id", action: :destroy
     end
 
     scope(controller: :authentication_audit_api) do
@@ -1936,6 +1910,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: "lti/registrations") do
       get "accounts/:account_id/lti_registrations", action: :list
+      get "accounts/:account_id/lti_registrations/fetch_lti_configuration", action: :fetch_lti_configuration
       delete "accounts/:account_id/lti_registrations/:id", action: :destroy
       get "accounts/:account_id/lti_registrations/:id", action: :show
       put "accounts/:account_id/lti_registrations/:id", action: :update
@@ -1973,6 +1948,7 @@ CanvasRails::Application.routes.draw do
       delete "files/:id", action: :destroy
       put "files/:id", action: :api_update
       post "files/:id/reset_verifier", action: :reset_verifier
+      post "rce_linked_file_urls", action: :rce_linked_file_urls
 
       # exists as an alias of GET for backwards compatibility
       #
@@ -2885,6 +2861,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: "lti/ims/dynamic_registration") do
       get "accounts/:account_id/registration_token", action: :registration_token
       get "accounts/:account_id/registrations/uuid/:registration_uuid", action: :registration_by_uuid
+      get "accounts/:account_id/registrations/:registration_id", action: :show
       put "accounts/:account_id/registrations/:registration_id/overlay", action: :update_registration_overlay
       get "accounts/:account_id/dr_iframe", action: :dr_iframe
       get "registrations/:registration_id/view", action: :registration_view, as: :lti_registration_config

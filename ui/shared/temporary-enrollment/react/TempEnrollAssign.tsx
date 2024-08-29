@@ -398,7 +398,7 @@ export function TempEnrollAssign(props: Props) {
 
   const handleValidationError = (message: string) => {
     setErrorMsg(message)
-    props.setEnrollmentStatus(false)
+    props.setEnrollmentStatus(false, false)
     setLoading(false)
   }
 
@@ -507,7 +507,9 @@ export function TempEnrollAssign(props: Props) {
       }
       success = false
     } finally {
-      props.setEnrollmentStatus(success)
+      // if there is no pairing, we are creating a new enrollment
+      const isUpdate = props.tempEnrollmentsPairing != null
+      props.setEnrollmentStatus(success, isUpdate)
       setLoading(false)
     }
   }

@@ -842,6 +842,45 @@ module Lti
       end
     end
 
+    describe "placement_warnings" do
+      subject { tool_configuration.placement_warnings }
+      context "when the tool does not have resource_selection placement" do
+        it "is empty" do
+          expect(subject).to eq []
+        end
+      end
+
+      context "when the tool has resource_selection placement" do
+        let(:settings) do
+          super().tap do |s|
+            s["extensions"].first["settings"]["placements"] << make_placement(
+              :resource_selection,
+              "LtiResourceLinkRequest"
+            )
+          end
+        end
+
+        it "contains a warning message about deprecation" do
+          expect(subject[0]).to include("Warning").and include("deprecated").and include("resource_selection")
+        end
+      end
+
+      context "when the tool has submission_type_selection placement" do
+        let(:settings) do
+          super().tap do |s|
+            s["extensions"].first["settings"]["placements"] << make_placement(
+              :submission_type_selection,
+              "LtiResourceLinkRequest"
+            )
+          end
+        end
+
+        it "contains a warning message about approved LTI tools" do
+          expect(subject[0]).to include("Warning").and include("submission_type_selection")
+        end
+      end
+    end
+
     describe "privacy_level" do
       subject do
         extensions["privacy_level"] = extension_privacy_level

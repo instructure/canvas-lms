@@ -265,6 +265,34 @@ describe DiscussionTopicsController do
           expect(assigns[:topics]).to include(@topic)
         end
       end
+
+      context "un-graded section specific discussions" do
+        before(:once) do
+          @shard1.activate do
+            @student = user_factory(active_all: true)
+          end
+          course_with_teacher(active_course: true)
+          @course.enroll_student(@student, enrollment_state: "active")
+          @section = @course.course_sections.create!(name: "test section")
+          student_in_section(@section, user: @student)
+          @topic = @course.discussion_topics.create!(user: @teacher, message: "hello my favorite section!")
+          @topic.is_section_specific = true
+          @topic.course_sections = [@section]
+          @topic.save!
+        end
+
+        it "is visible to student" do
+          user_session(@student)
+          @shard1.activate do
+            get "index", params: { course_id: @course }, format: :json
+            parsed_json = json_parse(response.body)
+            visible_ids_to_student = parsed_json.pluck("id")
+
+            expect(response).to have_http_status(:success)
+            expect(visible_ids_to_student).to include(@topic.id)
+          end
+        end
+      end
     end
 
     it "returns non-graded group discussions properly" do
@@ -441,7 +469,6 @@ describe DiscussionTopicsController do
           get "index", params: { course_id: @course.id }, format: :json
           parsed_json = json_parse(response.body)
           visible_ids_to_student_2 = parsed_json.pluck("id")
-
           expect(response).to have_http_status(:success)
           expect(visible_ids_to_student_2).to include(@topic_visible_to_everyone.id)
           expect(visible_ids_to_student_2).to include(@topic.id)

@@ -24,68 +24,67 @@ import {Reply} from './Reply'
 import {Like} from './Like'
 import {Expansion} from './Expansion'
 import {MarkAsRead} from './MarkAsRead'
+import {SpeedGraderNavigator} from './SpeedGraderNavigator'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../utils'
 import {View} from '@instructure/ui-view'
+import useSpeedGrader from '../../hooks/useSpeedGrader'
 
 const I18n = useI18nScope('discussion_posts')
 
 export function ThreadingToolbar({...props}) {
+  const { isInSpeedGrader } = useSpeedGrader()
+
   return (
     <Responsive
       match="media"
       query={responsiveQuerySizes({mobile: true, desktop: true})}
-      props={{
-        mobile: {
-          itemSpacing: '0 small 0 0',
-          textSize: 'small',
-        },
-        desktop: {
-          itemSpacing: 'none',
-          textSize: 'medium',
-        },
-      }}
-      render={(responsiveProps, matches) =>
-        (props.searchTerm || props.filter !== 'all') && !props.isSplitView ? (
-          <Link
-            as="button"
-            isWithinText={false}
-            data-testid="go-to-reply"
-            onClick={() => {
-              const parentId = props.discussionEntry.parentId
-                ? props.discussionEntry.parentId
-                : props.discussionEntry._id
-              const relativeId = props.discussionEntry.rootEntryId
-                ? props.discussionEntry._id
-                : null
+      render={(_responsiveProps, matches) => (
+        <View>
+          {(props.searchTerm || props.filter !== 'all') && !props.isSplitView ? (
+            <Link
+              as="button"
+              isWithinText={false}
+              data-testid="go-to-reply"
+              onClick={() => {
+                const parentId = props.discussionEntry.parentId
+                  ? props.discussionEntry.parentId
+                  : props.discussionEntry._id
+                const relativeId = props.discussionEntry.rootEntryId
+                  ? props.discussionEntry._id
+                  : null
 
-              props.onOpenSplitView(parentId, false, relativeId, props.discussionEntry._id)
-            }}
-          >
-            <Text weight="bold" size={responsiveProps.textSize}>
-              {I18n.t('Go to Reply')}
-            </Text>
-          </Link>
-        ) : (
-          <InlineList delimiter="pipe" display="inline-flex">
-            {React.Children.map(props.children, c => (
-              <InlineList.Item
-                delimiter="pipe"
-                key={c.props.delimiterKey}
-                margin={responsiveProps.itemSpacing}
-                size={responsiveProps.textSize}
-                data-testid={
-                  matches.includes('mobile') ? 'mobile-thread-tool' : 'desktop-thread-tool'
-                }
-              >
-                <View style={{display: 'inline-flex'}}>{c}</View>
-              </InlineList.Item>
-            ))}
-          </InlineList>
-        )
-      }
+                props.onOpenSplitView(parentId, false, relativeId, props.discussionEntry._id)
+              }}
+            >
+              <Text weight="bold">
+                {I18n.t('Go to Reply')}
+              </Text>
+            </Link>
+          ) : (
+            <InlineList delimiter="pipe" display="inline-flex">
+              {React.Children.map(props.children, (c, i) => (
+                <InlineList.Item
+                  delimiter="pipe"
+                  key={c.props.delimiterKey}
+                  data-testid={
+                    matches.includes('mobile') ? 'mobile-thread-tool' : 'desktop-thread-tool'
+                  }
+                >
+                  <View margin={i === 0 ? "0 x-small 0 0" : "0 x-small"} style={{display: 'inline-flex'}}>{c}</View>
+                </InlineList.Item>
+              ))}
+            </InlineList>
+          )}
+          {isInSpeedGrader && (
+            <View as="div" margin="small 0 0 0">
+              <SpeedGraderNavigator />
+            </View>
+          )}
+        </View>
+      )}
     />
   )
 }

@@ -17,22 +17,18 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import {useEditor, type Node} from '@craftjs/core'
+import {useEditor, useNode, type Node} from '@craftjs/core'
 import {Menu} from '@instructure/ui-menu'
 import {
   // getCloneTree,
-  scrollIntoViewWithCallback,
-  getScrollParent,
   getSectionLocation,
+  notDeletableIfLastChild,
   type SectionLocation,
 } from '../../utils'
 import {type AddSectionPlacement} from './types'
+import {useScope} from '@canvas/i18n'
 
-function triggerScrollEvent() {
-  const scrollingContainer = getScrollParent()
-  const scrollEvent = new Event('scroll')
-  scrollingContainer.dispatchEvent(scrollEvent)
-}
+const I18n = useScope('block-editor')
 
 export type SectionMenuProps = {
   onEditSection?: (node: Node) => void
@@ -56,6 +52,9 @@ const SectionMenu = ({
       selected: currentNodeId ? qry.node(currentNodeId) : null,
     }
   })
+  const {isDeletable} = useNode((n: Node) => ({
+    isDeletable: n.data.custom?.isSection && notDeletableIfLastChild(n.id, query),
+  }))
   const [sectionLocation, setSectionLocation] = useState<SectionLocation>(() => {
     if (selected?.get()) {
       return getSectionLocation(selected.get(), query)
@@ -115,7 +114,7 @@ const SectionMenu = ({
       actions.move(currentNode.id, parentId, myIndex - 1)
       actions.selectNode(currentNode.id)
       requestAnimationFrame(() => {
-        scrollIntoViewWithCallback(currentNode.dom, {block: 'nearest'}, triggerScrollEvent)
+        currentNode.dom?.scrollIntoView({block: 'nearest'})
       })
     }
   }, [actions, onMoveUp, query, selected])
@@ -137,7 +136,7 @@ const SectionMenu = ({
       actions.move(currentNode.id, parentId, myIndex + 2)
       actions.selectNode(currentNode.id)
       requestAnimationFrame(() => {
-        scrollIntoViewWithCallback(currentNode.dom, {block: 'nearest'}, triggerScrollEvent)
+        currentNode.dom?.scrollIntoView({block: 'nearest'})
       })
     }
   }, [actions, onMoveDown, query, selected])
@@ -161,24 +160,30 @@ const SectionMenu = ({
 
   return (
     <Menu show={true} onToggle={() => {}}>
-      {onEditSection ? <Menu.Item onSelect={handleEditSection}>EditSection</Menu.Item> : null}
+      {onEditSection ? (
+        <Menu.Item onSelect={handleEditSection}>{I18n.t('EditSection')}</Menu.Item>
+      ) : null}
       {/* <Menu.Item onSelect={handleDuplicateSection}>Duplicate</Menu.Item> */}
-      <Menu.Item onSelect={handleAddSection.bind(null, 'prepend')}>+ Section Above</Menu.Item>
-      <Menu.Item onSelect={handleAddSection.bind(null, 'append')}>+ Section Below</Menu.Item>
+      <Menu.Item onSelect={handleAddSection.bind(null, 'prepend')}>
+        {I18n.t('+ Section Above')}
+      </Menu.Item>
+      <Menu.Item onSelect={handleAddSection.bind(null, 'append')}>
+        {I18n.t('+ Section Below')}
+      </Menu.Item>
       <Menu.Item
         onSelect={handleMoveUp}
         disabled={sectionLocation === 'top' || sectionLocation === 'alone'}
       >
-        Move Up
+        {I18n.t('Move Up')}
       </Menu.Item>
       <Menu.Item
         onSelect={handleMoveDown}
         disabled={sectionLocation === 'bottom' || sectionLocation === 'alone'}
       >
-        Move Down
+        {I18n.t('Move Down')}
       </Menu.Item>
-      <Menu.Item onSelect={handleRemove} disabled={!selected?.isDeletable()}>
-        Remove
+      <Menu.Item onSelect={handleRemove} disabled={!isDeletable}>
+        {I18n.t('Remove')}
       </Menu.Item>
     </Menu>
   )

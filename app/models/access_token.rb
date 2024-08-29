@@ -23,6 +23,9 @@ class AccessToken < ActiveRecord::Base
   extend RootAccountResolver
 
   workflow do
+    state :pending do
+      event :activate, transitions_to: :active
+    end
     state :active
     state :deleted
   end
@@ -52,22 +55,35 @@ class AccessToken < ActiveRecord::Base
     p.dispatch :manually_created_access_token_created
     p.to(&:user)
     p.whenever do |access_token|
-      access_token.crypted_token_previously_changed? && access_token.manually_created?
+      access_token.crypted_token_previously_changed? && access_token.manually_created? &&
+        access_token.active?
+    end
+    p.dispatch :access_token_created_on_behalf_of_user
+    p.to(&:user)
+    p.whenever do |access_token|
+      access_token.crypted_token_previously_changed? && access_token.manually_created? &&
+        access_token.pending?
     end
   end
 
   set_policy do
     given do |user|
-      !user.account.feature_enabled?(:admin_manage_access_tokens) ||
-        !user.account.limit_personal_access_tokens? ||
-        self.user.check_accounts_right?(user, :manage_access_tokens)
+      user.id == user_id && (
+        !user.account.feature_enabled?(:admin_manage_access_tokens) ||
+        !user.account.limit_personal_access_tokens?
+      )
+    end
+    can :create and can :update
+
+    given do |user|
+      self.user.check_accounts_right?(user, :create_access_tokens)
     end
     can :create and can :update
 
     given { |user| user.id == user_id }
-    can :delete
+    can :read and can :delete
 
-    given { |user| self.user.check_accounts_right?(user, :manage_access_tokens) }
+    given { |user| self.user.check_accounts_right?(user, :delete_access_tokens) }
     can :delete
   end
 
@@ -77,7 +93,7 @@ class AccessToken < ActiveRecord::Base
   # yet been implemented)
 
   scope :active, -> { not_deleted.where("permanent_expires_at IS NULL OR permanent_expires_at>?", Time.now.utc) }
-  scope :not_deleted, -> { where(workflow_state: "active") }
+  scope :not_deleted, -> { where.not(workflow_state: "deleted") }
 
   TOKEN_SIZE = 64
   TOKEN_TYPES = [:crypted_token, :crypted_refresh_token].freeze
@@ -140,8 +156,20 @@ class AccessToken < ActiveRecord::Base
     !!authenticate(token_string)&.site_admin?
   end
 
+  def localized_workflow_state
+    if expired?
+      I18n.t("expired")
+    elsif pending?
+      I18n.t("pending")
+    elsif active?
+      I18n.t("active")
+    else
+      workflow_state
+    end
+  end
+
   def usable?(token_key = :crypted_token)
-    return false if expired?
+    return false if expired? || pending?
 
     if !developer_key_id || developer_key&.usable?
       return false if token_key != :crypted_refresh_token && needs_refresh?
@@ -243,12 +271,6 @@ class AccessToken < ActiveRecord::Base
 
   def clear_plaintext_refresh_token!
     @plaintext_refresh_token = nil
-  end
-
-  def regenerate=(val)
-    if val == "1" && manually_created?
-      generate_token(true)
-    end
   end
 
   def regenerate_access_token

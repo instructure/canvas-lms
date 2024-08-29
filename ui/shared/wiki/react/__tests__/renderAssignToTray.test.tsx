@@ -52,3 +52,22 @@ describe('renderAssignToTray', () => {
     waitFor(() => expect(selectedOptions[0]).toHaveTextContent('Everyone'))
   })
 })
+
+describe('renderAssignToTray embedded', () => {
+  beforeAll(() => {
+    ENV.FEATURES.selective_release_edit_page = true
+  })
+
+  const container = document.createElement('div')
+  container.id = 'assign-to-mount-point'
+
+  it('sets default state for new pages', async () => {
+    const assignToOption = renderAssignToTray(container, {...props, pageId: undefined})
+
+    const {findAllByTestId, getByTestId} = render(assignToOption)
+
+    const selectedOptions = await findAllByTestId('assignee_selector_selected_option')
+    expect(selectedOptions).toHaveLength(1)
+    waitFor(() => expect(selectedOptions[0]).toHaveTextContent('Everyone'))
+  })
+})

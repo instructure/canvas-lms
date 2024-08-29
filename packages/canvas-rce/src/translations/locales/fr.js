@@ -331,7 +331,6 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Icône d''édition" },
   "edit_link_7f53bebb": { "message": "Modifier lien" },
-  "editor_statusbar_26ac81fc": { "message": "Barre d''état de l''éditeur" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Élément commençant par { start }"
   },
@@ -635,6 +634,7 @@ const locale = {
   "links_to_an_external_site_de74145d": {
     "message": "Connexions vers un site externe."
   },
+  "lists_cd1336fc": { "message": "Listes" },
   "lists_should_be_formatted_as_lists_f862de8d": {
     "message": "Les listes doivent être présentées sous forme de listes."
   },

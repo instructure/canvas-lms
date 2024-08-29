@@ -78,7 +78,7 @@ export function PostToolbar({repliesCount, unreadCount, ...props}) {
         },
       }}
       render={responsiveProps => (
-        <Flex justifyItems={repliesCount > 0 ? responsiveProps.justifyItems : 'end'}>
+        <Flex justifyItems={repliesCount > 0 ? responsiveProps.justifyItems : 'end'} margin="0 0 0 x-small">
           {repliesCount > 0 && (
             <Flex.Item margin="0 x-small 0 0">
               <Text weight="normal" size={responsiveProps.textSize}>

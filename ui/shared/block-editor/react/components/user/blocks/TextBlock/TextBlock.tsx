@@ -19,14 +19,7 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import ContentEditable from 'react-contenteditable'
 import {useEditor, useNode} from '@craftjs/core'
-import {
-  useClassNames,
-  shouldAddNewNode,
-  shouldDeleteNode,
-  addNewNodeAsNextSibling,
-  deleteNodeAndSelectPrevSibling,
-  removeLastParagraphTag,
-} from '../../../../utils'
+import {useClassNames} from '../../../../utils'
 import {TextBlockToolbar} from './TextBlockToolbar'
 import {type TextBlockProps} from './types'
 
@@ -34,14 +27,15 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('block-editor/text-block')
 
+const isAParagraph = (text: string) => /<p>[\s\S]*?<\/p>/s.test(text)
+
 export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProps) => {
-  const {actions, enabled, query} = useEditor(state => ({
+  const {enabled} = useEditor(state => ({
     enabled: state.options.enabled,
   }))
   const {
     connectors: {connect, drag},
     actions: {setProp},
-    id,
     selected,
   } = useNode(state => ({
     id: state.id,
@@ -51,7 +45,6 @@ export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProp
   const focusableElem = useRef<HTMLDivElement | null>(null)
 
   const [editable, setEditable] = useState(true)
-  const lastChar = useRef<string>('')
 
   useEffect(() => {
     if (editable && selected) {
@@ -63,8 +56,8 @@ export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProp
   const handleChange = useCallback(
     e => {
       let html = e.target.value
-      if (html === '<p><br></p>' || html === '<div><br></div>') {
-        html = ''
+      if (!isAParagraph(html)) {
+        html = `<p>${html}</p>`
       }
 
       setProp((prps: TextBlockProps) => {
@@ -72,25 +65,6 @@ export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProp
       })
     },
     [setProp]
-  )
-
-  const handleKey = useCallback(
-    e => {
-      if (shouldAddNewNode(e, lastChar.current)) {
-        e.preventDefault()
-        removeLastParagraphTag(e.currentTarget)
-        setProp((prps: TextBlockProps) => {
-          prps.text = e.currentTarget.innerHTML
-        })
-        addNewNodeAsNextSibling(<TextBlock text="" />, id, actions, query)
-      } else if (shouldDeleteNode(e)) {
-        e.preventDefault()
-        deleteNodeAndSelectPrevSibling(id, actions, query)
-      }
-      lastChar.current = e.key
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [actions, id, lastChar.current, query]
   )
 
   if (enabled) {
@@ -112,7 +86,6 @@ export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProp
           disabled={!editable}
           html={text}
           onChange={handleChange}
-          onKeyUp={handleKey}
           tagName="div"
           style={{fontSize, textAlign, color}}
         />

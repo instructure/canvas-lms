@@ -19,6 +19,8 @@ import React, {useRef} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {GradingScheme} from '@canvas/grading_scheme/gradingSchemeApiModel'
 import {useGradingSchemeUsedLocations} from '../hooks/useGradingSchemeUsedLocations'
+import {useGradingSchemeAccountUsedLocations} from '../hooks/useGradingSchemeAccountUsedLocations'
+import {useGradingSchemeAssignmentUsedLocations} from '../hooks/useGradingSchemeAssignmentUsedLocations'
 import {ApiCallStatus} from '../hooks/ApiCallStatus'
 import {UsedLocationsModal} from './UsedLocationsModal'
 
@@ -39,6 +41,11 @@ const GradingSchemeUsedLocationsModal = ({
   const {getGradingSchemeUsedLocations, gradingSchemeUsedLocationsStatus} =
     useGradingSchemeUsedLocations()
 
+  const {getGradingSchemeAssignmentUsedLocations} = useGradingSchemeAssignmentUsedLocations()
+
+  const {getGradingSchemeAccountUsedLocations, gradingSchemeAccountUsedLocationsStatus} =
+    useGradingSchemeAccountUsedLocations()
+
   const onClose = () => {
     path.current = undefined
     handleClose()
@@ -46,7 +53,10 @@ const GradingSchemeUsedLocationsModal = ({
 
   return (
     <UsedLocationsModal
-      isLoading={gradingSchemeUsedLocationsStatus === ApiCallStatus.PENDING}
+      isLoading={
+        gradingSchemeUsedLocationsStatus === ApiCallStatus.PENDING ||
+        gradingSchemeAccountUsedLocationsStatus === ApiCallStatus.PENDING
+      }
       isOpen={open}
       itemId={gradingScheme?.id}
       fetchUsedLocations={async () => {
@@ -67,6 +77,36 @@ const GradingSchemeUsedLocationsModal = ({
 
         path.current = usedLocations.nextPage
         return usedLocations
+      }}
+      fetchAssignmentUsedLocations={async (courseId: string, currentPath?: string) => {
+        if (!gradingScheme) {
+          return {
+            assignmentUsedLocations: [],
+            isLastPage: true,
+            nextPage: '',
+          }
+        }
+
+        return getGradingSchemeAssignmentUsedLocations(
+          gradingScheme.context_type,
+          gradingScheme.context_id,
+          gradingScheme.id,
+          courseId,
+          currentPath
+        )
+      }}
+      fetchAccountUsedLocations={async () => {
+        if (!gradingScheme) {
+          return {
+            accountUsedLocations: [],
+          }
+        }
+
+        return getGradingSchemeAccountUsedLocations(
+          gradingScheme.context_type,
+          gradingScheme.context_id,
+          gradingScheme.id
+        )
       }}
       onClose={onClose}
     />
