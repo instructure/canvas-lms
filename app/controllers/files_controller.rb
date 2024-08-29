@@ -176,7 +176,6 @@ class FilesController < ApplicationController
   include Api::V1::Attachment
   include Api::V1::Avatar
   include AttachmentHelper
-  include FilesHelper
   include K5Mode
 
   before_action { |c| c.active_tab = "files" }
