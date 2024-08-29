@@ -64,6 +64,7 @@ const PasswordComplexityConfiguration = () => {
   const [allowLoginSuspensionEnabled, setAllowLoginSuspensionEnabled] = useState(false)
   const [maxLoginAttempts, setMaxLoginAttempts] = useState(DEFAULT_MAX_LOGIN_ATTEMPTS)
   const [newlyUploadedAttachmentId, setNewlyUploadedAttachmentId] = useState<number | null>(null)
+  const [customForbiddenWordsEnabled, setCustomForbiddenWordsEnabled] = useState(false)
 
   useEffect(() => {
     if (showTray) {
@@ -127,6 +128,10 @@ const PasswordComplexityConfiguration = () => {
     setShowTray(true)
   }
 
+  const handleCustomForbiddenWordsEnabledChange = (enabled: boolean) => {
+    setCustomForbiddenWordsEnabled(enabled)
+  }
+
   const handleMinimumCharacterLengthEnabledChange = () => {
     setMinimumCharacterLengthEnabled(!minimumCharacterLengthEnabled)
     if (minimumCharacterLengthEnabled) {
@@ -171,9 +176,8 @@ const PasswordComplexityConfiguration = () => {
   const saveChanges = async () => {
     setEnableApplyButton(false)
 
-    const currentSettingsUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`
     const {status, data: settingsResult} = await executeApiRequest<PasswordSettingsResponse>({
-      path: currentSettingsUrl,
+      path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`,
       method: 'GET',
     })
 
@@ -187,7 +191,13 @@ const PasswordComplexityConfiguration = () => {
       allow_login_suspension: allowLoginSuspensionEnabled,
     }
 
-    if (settingsResult.password_policy.common_passwords_attachment_id) {
+    if (!customForbiddenWordsEnabled) {
+      if (settingsResult.password_policy.common_passwords_attachment_id) {
+        await deleteForbiddenWordsFile(
+          settingsResult.password_policy.common_passwords_attachment_id
+        )
+      }
+    } else if (settingsResult.password_policy.common_passwords_attachment_id) {
       passwordPolicy.common_passwords_attachment_id =
         settingsResult.password_policy.common_passwords_attachment_id
     }
@@ -343,6 +353,7 @@ const PasswordComplexityConfiguration = () => {
             </View>
             <CustomForbiddenWordsSection
               setNewlyUploadedAttachmentId={setNewlyUploadedAttachmentId}
+              onCustomForbiddenWordsEnabledChange={handleCustomForbiddenWordsEnabledChange}
             />
 
             <View as="div" margin="medium medium small medium">

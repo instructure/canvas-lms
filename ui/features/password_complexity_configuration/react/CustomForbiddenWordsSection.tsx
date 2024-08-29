@@ -39,6 +39,7 @@ const I18n = useI18nScope('password_complexity_configuration')
 
 interface Props {
   setNewlyUploadedAttachmentId: (attachmentId: number | null) => void
+  onCustomForbiddenWordsEnabledChange: (enabled: boolean) => void
 }
 
 interface ForbiddenWordsResponse {
@@ -56,7 +57,10 @@ export const fetchLatestForbiddenWords = async (
   return status === 200 ? data ?? null : null
 }
 
-const CustomForbiddenWordsSection = ({setNewlyUploadedAttachmentId}: Props) => {
+const CustomForbiddenWordsSection = ({
+  setNewlyUploadedAttachmentId,
+  onCustomForbiddenWordsEnabledChange,
+}: Props) => {
   const linkRef = useRef<HTMLAnchorElement | null>(null)
   const [forbiddenWordsUrl, setForbiddenWordsUrl] = useState<string | null>(null)
   const [forbiddenWordsName, setForbiddenWordsName] = useState<string | null>(null)
@@ -65,6 +69,12 @@ const CustomForbiddenWordsSection = ({setNewlyUploadedAttachmentId}: Props) => {
   const [commonPasswordsAttachmentId, setCommonPasswordsAttachmentId] = useState<number | null>(
     null
   )
+
+  const handleForbiddenWordsToggle = () => {
+    const newEnabledState = !customForbiddenWordsEnabled
+    setCustomForbiddenWordsEnabled(newEnabledState)
+    onCustomForbiddenWordsEnabledChange(newEnabledState)
+  }
 
   const fetchAndSetForbiddenWords = useCallback(async () => {
     const {status, data: settingsResult} = await executeApiRequest<PasswordSettingsResponse>({
@@ -158,9 +168,7 @@ const CustomForbiddenWordsSection = ({setNewlyUploadedAttachmentId}: Props) => {
           <Flex.Item>
             <Checkbox
               checked={customForbiddenWordsEnabled}
-              onChange={() => {
-                setCustomForbiddenWordsEnabled(!customForbiddenWordsEnabled)
-              }}
+              onChange={handleForbiddenWordsToggle}
               label={I18n.t('Customize forbidden words/terms list')}
               data-testid="customForbiddenWordsCheckbox"
             />
