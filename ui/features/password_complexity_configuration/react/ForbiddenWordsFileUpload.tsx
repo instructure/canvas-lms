@@ -215,10 +215,6 @@ const ForbiddenWordsFileUpload = ({
 
   const handleDropAccepted = useCallback((acceptedFiles: ArrayLike<File | DataTransferItem>) => {
     const newFile = acceptedFiles[0] as File
-    if (newFile.type !== 'text/plain') {
-      setFileDropMessages([{text: I18n.t('Invalid file type'), type: 'error'}])
-      return
-    }
     const url = URL.createObjectURL(newFile)
     const filename = newFile.name
 
@@ -227,7 +223,9 @@ const ForbiddenWordsFileUpload = ({
   }, [])
 
   const handleDropRejected = useCallback(() => {
-    setFileDropMessages([{text: I18n.t('Invalid file type'), type: 'error'}])
+    setFileDropMessages([
+      {text: I18n.t('Invalid file type or file size exceeded limit of 1MB'), type: 'error'},
+    ])
   }, [])
 
   useEffect(() => {
@@ -304,6 +302,7 @@ const ForbiddenWordsFileUpload = ({
             shouldEnablePreview={false}
             height="400px"
             margin="0"
+            maxSize={1000000}
           />
         )}
       </Modal.Body>
