@@ -41,7 +41,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
 import {ExpandCollapseThreadsButton} from './ExpandCollapseThreadsButton'
-import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import {MoreMenuButton} from './MoreMenuButton'
 import {SummarizeButton} from './SummarizeButton'
 
@@ -325,7 +325,7 @@ export const DiscussionPostToolbar = props => {
             </Flex.Item>
           </Flex>
           {showAssignToTray && (
-            <ItemAssignToTray
+            <ItemAssignToManager
               open={showAssignToTray}
               onClose={handleClose}
               onDismiss={handleClose}

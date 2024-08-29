@@ -29,7 +29,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
-import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
@@ -325,7 +325,7 @@ export default class DiscussionsIndex extends Component {
         {ENV?.FEATURES?.selective_release_ui_api &&
           this.state.showAssignToTray &&
           this.props.contextType === 'course' && (
-            <ItemAssignToTray
+            <ItemAssignToManager
               open={this.state.showAssignToTray}
               onClose={this.closeAssignToTray}
               onDismiss={this.closeAssignToTray}
