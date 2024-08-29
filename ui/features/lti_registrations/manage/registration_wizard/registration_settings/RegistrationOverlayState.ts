@@ -31,7 +31,7 @@ export interface RegistrationOverlayActions {
   updateDevKeyName: (name: string) => void
   updateRegistrationTitle: (s: string) => void
   toggleDisabledScope: (scope: LtiScope) => void
-  toggleDisabledPlacement: (scope: LtiPlacement) => void
+  toggleDisabledPlacement: (placement: LtiPlacement) => void
   toggleDisabledSub: (sub: string) => void
   updateRegistrationIconUrl: (s: string) => void
   updateRegistrationLaunchHeight: (s: string) => void
