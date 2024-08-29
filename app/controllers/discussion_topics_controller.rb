@@ -880,7 +880,12 @@ class DiscussionTopicsController < ApplicationController
 
       js_bundle :discussion_topics_post
       css_bundle :discussions_index, :learning_outcomes
-      render html: "", layout: (params[:embed] == "true") ? "mobile_embed" : true
+
+      respond_to do |format|
+        format.html do
+          render html: "", layout: (params[:embed] == "true") ? "mobile_embed" : true
+        end
+      end
       return
     end
 
