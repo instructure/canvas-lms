@@ -164,6 +164,7 @@ const AssignmentPublishButton = ({
           themeOverride={buttonThemeOverride}
           data-testid="assignment-publish-menu"
           display={breakpoints.mobileOnly && 'block'}
+          margin={breakpoints.mobileOnly && 'none none small none'}
         >
           {getButtonLabel()}
         </Button>
