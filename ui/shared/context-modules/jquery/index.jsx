@@ -369,7 +369,14 @@ window.modules = (function () {
                   item.setAttribute('data-master_course_restrictions', JSON.stringify(restriction))
                 }
 
-                this.initMasterCourseLockButton(item, restriction)
+                if (
+                  !(
+                    ENV.MASTER_COURSE_SETTINGS.IS_CHILD_COURSE &&
+                    ENV.HIDE_BLUEPRINT_LOCK_ICON_FOR_CHILDREN
+                  )
+                ) {
+                  this.initMasterCourseLockButton(item, restriction)
+                }
               }
             })
           }

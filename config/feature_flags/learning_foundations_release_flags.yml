@@ -215,3 +215,12 @@ dashboard_graphql_integration:
     Integrate GraphQL queries and mutations for the Dashboard to improve loading speed
     and simplify data fetching logic.
   applies_to: SiteAdmin
+
+modules_page_hide_blueprint_lock_icon_for_children:
+  state: hidden
+  display_name: Hide Blueprint Lock Icon on child course Modules Page
+  description: |-
+    If enabled, the blueprint lock icon will be hidden on the modules page. This is a performance hack and should only
+    be used for customers with a large number of content items (2000+) in a course.
+  applies_to: Account
+
