@@ -28,22 +28,24 @@ services:
     init: true
 
   selenium-hub:
-    image: starlord.inscloudgate.net/jenkins/selenium-hub:${HUB_VERSION:-4.16}
+    image: 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/selenium/hub:${HUB_VERSION:-4.22.0}
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
     environment:
       GRID_BROWSER_TIMEOUT: 5000
 
   selenium-chrome: &NODE_CHROME
-    image: starlord.inscloudgate.net/jenkins/selenium-node-chrome:${CHROME_VERSION:-120.0}
+    image: 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/selenium/node-chromium:${CHROME_VERSION:-126.0-20240621}
+    shm_size: 2gb
     environment: &NODE_CHROME_ENV
       SE_EVENT_BUS_HOST: selenium-hub
       SE_EVENT_BUS_PUBLISH_PORT: 4442
       SE_EVENT_BUS_SUBSCRIBE_PORT: 4443
-      HUB_PORT_4444_TCP_ADDR: selenium-hub
-      HUB_PORT_4444_TCP_PORT: 4444
       SE_NODE_HOST: selenium-chrome
       JAVA_OPTS: '-Dwebdriver.chrome.whitelistedIps='
-    init: true
-    links:
+    depends_on:
       - selenium-hub
 
   selenium-chrome2:
