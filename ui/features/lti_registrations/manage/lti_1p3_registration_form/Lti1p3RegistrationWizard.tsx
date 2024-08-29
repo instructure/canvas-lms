@@ -24,6 +24,7 @@ import type {UnifiedToolId} from '../model/UnifiedToolId'
 import {LaunchSettings} from './components/LaunchSettings'
 import {createLti1p3RegistrationWizardState} from './Lti1p3RegistrationWizardState'
 import {PermissionConfirmationWrapper} from './components/PermissionConfirmationWrapper'
+import {PlacementsConfirmationWrapper} from './components/PlacementsConfirmationWrapper'
 import {Button} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
 import {Text} from '@instructure/ui-text'
@@ -69,7 +70,7 @@ export const Lti1p3RegistrationWizard = (props: Lti1p3RegistrationWizardProps) =
         <>
           <PermissionConfirmationWrapper
             overlayStore={store.state.overlayStore}
-            internalConfig={props.internalConfiguration!}
+            internalConfig={internalConfiguration!}
           />
           <Modal.Footer>
             <Button onClick={() => store.setStep('LaunchSettings')} margin="small">
@@ -99,6 +100,23 @@ export const Lti1p3RegistrationWizard = (props: Lti1p3RegistrationWizardProps) =
         </>
       )
     case 'Placements':
+      return (
+        // TODO: Handle the case where the internal config is undefined and allow for manual configuration
+        <>
+          <PlacementsConfirmationWrapper
+            internalConfig={internalConfiguration!}
+            overlayStore={store.state.overlayStore}
+          />
+          <Modal.Footer>
+            <Button onClick={() => store.setStep('DataSharing')} margin="small">
+              {I18n.t('Previous')}
+            </Button>
+            <Button onClick={() => store.setStep('OverrideURIs')} color="primary" margin="small">
+              {I18n.t('Next')}
+            </Button>
+          </Modal.Footer>
+        </>
+      )
     case 'OverrideURIs':
     case 'Naming':
     case 'Icons':
@@ -109,7 +127,7 @@ export const Lti1p3RegistrationWizard = (props: Lti1p3RegistrationWizardProps) =
             <Text>TODO: Implement the rest of the steps</Text>
           </RegistrationModalBody>
           <Modal.Footer>
-            <Button onClick={() => store.setStep('DataSharing')} margin="small">
+            <Button onClick={() => store.setStep('Placements')} margin="small">
               {I18n.t('Previous')}
             </Button>
           </Modal.Footer>

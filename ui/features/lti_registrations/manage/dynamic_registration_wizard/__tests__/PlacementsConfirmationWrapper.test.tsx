@@ -19,7 +19,8 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {mockConfigWithPlacements, mockRegistration} from './helpers'
-import {PlacementsConfirmation, UNDOCUMENTED_PLACEMENTS} from '../components/PlacementsConfirmation'
+import {PlacementsConfirmationWrapper} from '../components/PlacementsConfirmationWrapper'
+import {UNDOCUMENTED_PLACEMENTS} from '../../registration_wizard_forms/PlacementsConfirmation'
 import {createRegistrationOverlayStore} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
 import {LtiPlacements} from '../../model/LtiPlacement'
 import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
@@ -30,7 +31,7 @@ describe('PlacementsConfirmation', () => {
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
-    render(<PlacementsConfirmation registration={reg} overlayStore={overlayStore} />)
+    render(<PlacementsConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
 
     expect(screen.getByText(i18nLtiPlacement(LtiPlacements.AccountNavigation))).toBeInTheDocument()
   })
@@ -40,7 +41,7 @@ describe('PlacementsConfirmation', () => {
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
-    render(<PlacementsConfirmation registration={reg} overlayStore={overlayStore} />)
+    render(<PlacementsConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
 
     expect(
       screen.getByText(/This tool has not requested access to any placements/i)
@@ -56,7 +57,7 @@ describe('PlacementsConfirmation', () => {
     const reg = mockRegistration({}, placements)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
-    render(<PlacementsConfirmation registration={reg} overlayStore={overlayStore} />)
+    render(<PlacementsConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
 
     UNDOCUMENTED_PLACEMENTS.forEach(placement => {
       expect(screen.queryByTestId(`placement-img-${placement}`)).not.toBeInTheDocument()
@@ -74,7 +75,7 @@ describe('PlacementsConfirmation', () => {
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
-    render(<PlacementsConfirmation registration={reg} overlayStore={overlayStore} />)
+    render(<PlacementsConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
 
     placements.forEach(placement => {
       expect(screen.getByTestId(`placement-img-${placement}`)).toBeInTheDocument()
@@ -90,7 +91,7 @@ describe('PlacementsConfirmation', () => {
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
-    render(<PlacementsConfirmation registration={reg} overlayStore={overlayStore} />)
+    render(<PlacementsConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
 
     const checkbox = screen.getByLabelText(i18nLtiPlacement(LtiPlacements.CourseNavigation))
     await userEvent.click(checkbox)
@@ -110,7 +111,7 @@ describe('PlacementsConfirmation', () => {
     ])
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
-    render(<PlacementsConfirmation registration={reg} overlayStore={overlayStore} />)
+    render(<PlacementsConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
 
     const boxes = screen.getAllByText('Default to Hidden')
     expect(boxes.length).toBe(1)
@@ -123,7 +124,7 @@ describe('PlacementsConfirmation', () => {
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
-    render(<PlacementsConfirmation registration={reg} overlayStore={overlayStore} />)
+    render(<PlacementsConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
 
     const box = screen.getByLabelText('Default to Hidden')
 
@@ -139,7 +140,7 @@ describe('PlacementsConfirmation', () => {
       default: 'disabled',
     }))
 
-    render(<PlacementsConfirmation registration={reg} overlayStore={overlayStore} />)
+    render(<PlacementsConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
 
     const box = screen.getByLabelText('Default to Hidden')
 
@@ -157,7 +158,7 @@ describe('PlacementsConfirmation', () => {
       default: 'enabled',
     }))
 
-    render(<PlacementsConfirmation registration={reg} overlayStore={overlayStore} />)
+    render(<PlacementsConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
 
     const box = screen.getByLabelText('Default to Hidden')
 
@@ -169,7 +170,7 @@ describe('PlacementsConfirmation', () => {
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
     overlayStore.getState().toggleDisabledPlacement(LtiPlacements.CourseNavigation)
-    render(<PlacementsConfirmation registration={reg} overlayStore={overlayStore} />)
+    render(<PlacementsConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
 
     const boxes = screen.queryAllByText('Default to Hidden')
     expect(boxes.length).toBe(0)
@@ -184,7 +185,7 @@ describe('PlacementsConfirmation', () => {
     const config = mockConfigWithPlacements(placements)
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
-    render(<PlacementsConfirmation registration={reg} overlayStore={overlayStore} />)
+    render(<PlacementsConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
 
     // Assert that checkboxes for each placement are rendered
     for (const placement of placements) {

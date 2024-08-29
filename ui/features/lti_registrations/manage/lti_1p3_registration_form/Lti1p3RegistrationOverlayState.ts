@@ -43,6 +43,7 @@ export type Lti1p3RegistrationOverlayState = {
   }
   placements: {
     placements?: LtiPlacement[]
+    courseNavigationDefaultDisabled?: boolean
   }
   override_uris: {
     placements: Record<
@@ -87,6 +88,8 @@ export interface Lti1p3RegistrationOverlayActions {
   setCustomFields: (customFields: string) => void
   toggleScope: (scope: LtiScope) => void
   setPrivacyLevel: (privacyLevel: LtiPrivacyLevel) => void
+  togglePlacement: (placement: LtiPlacement) => void
+  toggleCourseNavigationDefaultDisabled: () => void
 }
 
 export type Lti1p3RegistrationOverlayStore = StoreApi<
@@ -140,6 +143,7 @@ export const createLti1p3RegistrationOverlayStore = (internalConfig: InternalLti
           return {
             ...state,
             permissions: {
+              ...state.permissions,
               scopes: updatedScopes,
             },
           }
@@ -151,10 +155,45 @@ export const createLti1p3RegistrationOverlayStore = (internalConfig: InternalLti
         updateState(state => ({
           ...state,
           data_sharing: {
+            ...state.data_sharing,
             privacy_level: privacyLevel,
           },
         }))
       ),
+    toggleCourseNavigationDefaultDisabled: () => {
+      set(
+        updateState(state => {
+          return {
+            ...state,
+            placements: {
+              ...state.placements,
+              courseNavigationDefaultDisabled: !state.placements.courseNavigationDefaultDisabled,
+            },
+          }
+        })
+      )
+    },
+    togglePlacement: placement => {
+      set(
+        updateState(state => {
+          let updatedPlacements = state.placements.placements
+
+          if (updatedPlacements?.includes(placement)) {
+            updatedPlacements = updatedPlacements.filter(p => p !== placement)
+          } else {
+            updatedPlacements = [...(updatedPlacements ?? []), placement]
+          }
+
+          return {
+            ...state,
+            placements: {
+              ...state.placements,
+              placements: updatedPlacements,
+            },
+          }
+        })
+      )
+    },
   }))
 
 const initialOverlayStateFromInternalConfig = (
@@ -183,6 +222,9 @@ const initialOverlayStateFromInternalConfig = (
     },
     placements: {
       placements: internalConfig.placements.map(p => p.placement) ?? [],
+      courseNavigationDefaultDisabled:
+        internalConfig.placements.find(p => p.placement === 'course_navigation')?.default ===
+        'disabled',
     },
     override_uris: {
       placements: internalConfig.placements.reduce<

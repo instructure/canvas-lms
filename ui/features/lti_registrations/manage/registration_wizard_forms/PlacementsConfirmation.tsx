@@ -17,14 +17,9 @@
  */
 
 import React from 'react'
-import {
-  canvasPlatformSettings,
-  type RegistrationOverlayStore,
-} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {LtiPlacements, type LtiPlacement} from '../../model/LtiPlacement'
-import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
-import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
+import {LtiPlacements, type LtiPlacement} from '../model/LtiPlacement'
+import {i18nLtiPlacement} from '../model/i18nLtiPlacement'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -37,12 +32,36 @@ import {IconInfoLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Img} from '@instructure/ui-img'
 import {Responsive} from '@instructure/ui-responsive'
-import {useOverlayStore} from '../hooks/useOverlayStore'
-import {usePlacements} from '../hooks/usePlacements'
 
 export type PlacementsConfirmationProps = {
-  registration: LtiImsRegistration
-  overlayStore: RegistrationOverlayStore
+  /**
+   * The name of the application that is being registered.
+   */
+  appName: string
+  /**
+   * The list of placements that are currently enabled.
+   */
+  enabledPlacements: LtiPlacement[]
+  /**
+   * The full list of placements that should be
+   * _possible_ to be toggled
+   * in the placements confirmation screen.
+   */
+  availablePlacements: LtiPlacement[]
+
+  /**
+   * A boolean that determines if the course navigation placement is hidden by default.
+   */
+  courseNavigationDefaultHidden: boolean
+
+  /**
+   * A callback for whenever a placement's checkbox is toggled.
+   */
+  onTogglePlacement: (placement: LtiPlacement) => void
+  /**
+   * A callback for whenever the default hidden checkbox is toggled. This is only applicable to the course navigation placement.
+   */
+  onToggleDefaultDisabled: () => void
 }
 
 const I18n = useI18nScope('lti_registration.wizard')
@@ -57,26 +76,83 @@ export const UNDOCUMENTED_PLACEMENTS = [
 ]
 
 export const PlacementsConfirmation = ({
-  registration,
-  overlayStore,
+  appName,
+  enabledPlacements,
+  courseNavigationDefaultHidden,
+  availablePlacements,
+  onTogglePlacement,
+  onToggleDefaultDisabled,
 }: PlacementsConfirmationProps) => {
-  const [overlayState, actions] = useOverlayStore(overlayStore)
-  const placements = usePlacements(registration)
+  return (
+    <>
+      <Heading level="h3" margin="0 0 x-small 0">
+        {I18n.t('Placements')}
+      </Heading>
+      <Text
+        dangerouslySetInnerHTML={{
+          __html: I18n.t(
+            'Choose where *%{appName}* may be accessed from. Find more details in the **placements documentation.**',
+            {
+              appName,
+              wrappers: [
+                '<strong>$1</strong>',
+                "<a href='https://canvas.instructure.com/doc/api/file.placements_overview.html' style='text-decoration: underline' target='_blank'>$1</a>",
+              ],
+            }
+          ),
+        }}
+      />
+      {availablePlacements.length === 0 ? (
+        <Text>
+          {I18n.t(
+            "This tool has not requested access to any placements. If installed, it will have access to the LTI APIs but won't be visible for users to launch. The app can be managed via the Manage Apps page."
+          )}
+        </Text>
+      ) : (
+        <Flex gap="medium" direction="column" margin="medium 0 medium 0">
+          {availablePlacements.map(p => {
+            return (
+              <PlacementCheckbox
+                key={p}
+                placement={p}
+                enabled={enabledPlacements.includes(p)}
+                onTogglePlacement={onTogglePlacement}
+                courseNavigationDefaultHidden={courseNavigationDefaultHidden}
+                onToggleDefaultDisabled={onToggleDefaultDisabled}
+              />
+            )
+          })}
+        </Flex>
+      )}
+    </>
+  )
+}
 
-  const renderPlacementCheckbox = (placement: LtiPlacement) => {
-    const registrationPlacement = canvasPlatformSettings(
-      registration.default_configuration
-    )?.settings.placements.find(p => p.placement === placement)
-    const overlayPlacement = overlayState.registration.placements?.find(p => p.type === placement)
+type PlacementCheckboxProps = {
+  placement: LtiPlacement
+  enabled: boolean
+  onTogglePlacement: (placement: LtiPlacement) => void
+  courseNavigationDefaultHidden: boolean
+  onToggleDefaultDisabled: () => void
+}
+
+const PlacementCheckbox = React.memo(
+  ({
+    placement,
+    enabled,
+    onTogglePlacement,
+    courseNavigationDefaultHidden,
+    onToggleDefaultDisabled,
+  }: PlacementCheckboxProps) => {
     const checkbox = (
       <Flex direction="row" gap="x-small" justifyItems="start" alignItems="center" key={placement}>
         <Flex.Item>
           <Checkbox
             labelPlacement="end"
             label={<Text>{i18nLtiPlacement(placement)}</Text>}
-            checked={!overlayState.registration.disabledPlacements?.includes(placement)}
+            checked={enabled}
             onChange={() => {
-              actions.toggleDisabledPlacement(placement)
+              onTogglePlacement(placement)
             }}
           />
         </Flex.Item>
@@ -131,9 +207,6 @@ export const PlacementsConfirmation = ({
       </Flex>
     )
     if (placement === LtiPlacements.CourseNavigation) {
-      // default: 'enabled' means visible, so not checked.
-      const checked =
-        (overlayPlacement?.default ?? registrationPlacement?.default ?? 'enabled') === 'disabled'
       return (
         <FormFieldGroup
           rowSpacing="medium"
@@ -148,16 +221,13 @@ export const PlacementsConfirmation = ({
           }
         >
           {checkbox}
-          {!overlayState.registration.disabledPlacements?.includes(placement) && (
+          {enabled && (
             <View padding="0 0 0 medium" display="block" as="div">
               <Checkbox
-                checked={checked}
+                checked={courseNavigationDefaultHidden}
                 label={I18n.t('Default to Hidden')}
                 onChange={() => {
-                  actions.updatePlacement(placement)(p => ({
-                    ...p,
-                    default: checked ? 'enabled' : 'disabled',
-                  }))
+                  onToggleDefaultDisabled()
                 }}
               />
             </View>
@@ -167,37 +237,4 @@ export const PlacementsConfirmation = ({
     }
     return checkbox
   }
-
-  return (
-    <>
-      <Heading level="h3" margin="0 0 x-small 0">
-        {I18n.t('Placements')}
-      </Heading>
-      <Text
-        dangerouslySetInnerHTML={{
-          __html: I18n.t(
-            'Choose where *%{toolName}* may be accessed from. Find more details in the **placements documentation.**',
-            {
-              toolName: registration.client_name,
-              wrappers: [
-                '<strong>$1</strong>',
-                "<a href='https://canvas.instructure.com/doc/api/file.placements_overview.html' style='text-decoration: underline' target='_blank'>$1</a>",
-              ],
-            }
-          ),
-        }}
-      />
-      {placements.length === 0 ? (
-        <Text>
-          {I18n.t(
-            "This tool has not requested access to any placements. If installed, it will have access to the LTI APIs but won't be visible for users to launch. The app can be managed via the Manage Apps page."
-          )}
-        </Text>
-      ) : (
-        <Flex gap="medium" direction="column" margin="medium 0 medium 0">
-          {placements.map(renderPlacementCheckbox)}
-        </Flex>
-      )}
-    </>
-  )
-}
+)
