@@ -145,13 +145,17 @@ class ContextModulesController < ApplicationController
       }
 
       is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
-      is_child_course = MasterCourses::ChildSubscription.is_child_course?(@context)
-      if is_master_course || is_child_course
+      @is_child_course = MasterCourses::ChildSubscription.is_child_course?(@context)
+      if is_master_course || @is_child_course
         hash[:MASTER_COURSE_SETTINGS] = {
           IS_MASTER_COURSE: is_master_course,
-          IS_CHILD_COURSE: is_child_course,
+          IS_CHILD_COURSE: @is_child_course,
           MASTER_COURSE_DATA_URL: context_url(@context, :context_context_modules_master_course_info_url)
         }
+      end
+      if !@is_student && @is_child_course &&
+         @context.account.feature_enabled?(:modules_page_hide_blueprint_lock_icon_for_children)
+        hash[:HIDE_BLUEPRINT_LOCK_ICON_FOR_CHILDREN] = true
       end
 
       append_default_due_time_js_env(@context, hash)
