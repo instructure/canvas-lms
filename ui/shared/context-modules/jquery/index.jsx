@@ -354,7 +354,7 @@ window.modules = (function () {
       )
     },
 
-    loadMasterCourseData(tag_id) {
+    async loadMasterCourseData(tag_id) {
       if (ENV.MASTER_COURSE_SETTINGS) {
         // Grab the stuff for master courses if needed
         $.ajaxJSON(ENV.MASTER_COURSE_SETTINGS.MASTER_COURSE_DATA_URL, 'GET', { tag_id }, data => {
@@ -987,7 +987,7 @@ const updatePublishMenuDisabledState = function (disabled) {
 
 modules.updatePublishMenuDisabledState = updatePublishMenuDisabledState
 
-modules.initModuleManagement = function (duplicate) {
+modules.initModuleManagement = async function (duplicate) {
   const moduleItems = {}
 
   // Create the context modules backbone view to manage the publish button.
