@@ -105,6 +105,19 @@ describe('ViewRubrics Tests', () => {
       expect(Router.useNavigate).toHaveReturnedWith(expect.any(Function))
     })
 
+    it('renders a popover menu without access to the share course tray', () => {
+      const mockNavigate = jest.fn()
+      jest.spyOn(Router, 'useNavigate').mockReturnValue(mockNavigate)
+
+      queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
+      const {getByTestId, queryByTestId} = renderComponent()
+      const popover = getByTestId('rubric-options-1-button')
+      popover.click()
+
+      expect(queryByTestId('copy-to-1-button')).not.toBeInTheDocument()
+      expect(queryByTestId('share-course-1-tray')).not.toBeInTheDocument()
+    })
+
     it('renders a popover menu with access to the rubric duplicate modal', () => {
       queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
       const {getByTestId} = renderComponent()
@@ -312,6 +325,20 @@ describe('ViewRubrics Tests', () => {
 
       expect(Router.useNavigate).toHaveBeenCalledWith()
       expect(Router.useNavigate).toHaveReturnedWith(expect.any(Function))
+    })
+
+    it('renders a popover menu with access to the share course tray', () => {
+      const mockNavigate = jest.fn()
+      jest.spyOn(Router, 'useNavigate').mockReturnValue(mockNavigate)
+
+      queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
+      const {getByTestId} = renderComponent()
+      const popover = getByTestId('rubric-options-1-button')
+      popover.click()
+      const copyToButton = getByTestId('copy-to-1-button')
+      copyToButton.click()
+
+      expect(getByTestId('share-course-1-tray')).toBeInTheDocument()
     })
 
     it('renders a popover menu with access to the rubric duplicate modal', () => {

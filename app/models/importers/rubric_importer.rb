@@ -98,16 +98,45 @@ module Importers
         item.save!
       end
 
-      if (association = context.rubric_associations.where(rubric_id: item).first)
+      process_rubric_association(context, migration, item)
+      track_metrics(migration)
+
+      item
+    end
+
+    def self.process_rubric_association(context, migration, item)
+      associate_with = context
+      opts = {}
+
+      if context.is_a?(Course) && migration.migration_settings[:associate_with_assignment_id].present?
+        assignment = context.assignments.where(id: migration.migration_settings[:associate_with_assignment_id]).first
+
+        if assignment && assignment.rubric_association.blank?
+          associate_with = assignment
+          opts[:purpose] = "grading"
+        end
+      end
+
+      association = if associate_with.is_a?(Assignment)
+                      associate_with.rubric_association
+                    else
+                      associate_with.rubric_associations.where(rubric_id: item).first
+                    end
+
+      if association
         unless association.bookmarked
           association.bookmarked = true
           association.save!
         end
       else
-        item.associate_with(context, context)
+        item.associate_with(associate_with, context, opts)
       end
+    end
 
-      item
+    def self.track_metrics(migration)
+      if migration.migration_settings[:associate_with_assignment_id].present?
+        InstStatsd::Statsd.increment("content_migration.rubrics.associate_with_assignment")
+      end
     end
   end
 end

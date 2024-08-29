@@ -23,7 +23,9 @@ import useModuleCourseSearchApi, {
   useCourseModuleItemApi,
 } from '../../effects/useModuleCourseSearchApi'
 import CourseAndModulePicker from '../CourseAndModulePicker'
+import {executeQuery} from '@canvas/query/graphql'
 
+jest.mock('@canvas/query/graphql')
 jest.mock('../../effects/useManagedCourseSearchApi')
 jest.mock('../../effects/useModuleCourseSearchApi')
 
@@ -134,5 +136,70 @@ describe('CourseAndModulePicker', () => {
     )
     const selector = queryByText(/select a module/i)
     expect(selector).not.toBeInTheDocument()
+  })
+
+  it('hides the assignments selector when a course is given but assignments are not shown', () => {
+    useManagedCourseSearchApi.mockImplementationOnce(({success}) => {
+      success([
+        {id: 'abc', name: 'abc'},
+        {id: 'cde', name: 'cde'},
+      ])
+    })
+    const setModule = jest.fn()
+    const {queryByText} = render(
+      <CourseAndModulePicker selectedCourseId="abc" setSelectedModule={setModule} />
+    )
+    const selector = queryByText(/select an assignment/i)
+    expect(selector).not.toBeInTheDocument()
+  })
+
+  it('show the assignments selector when a course is given and assignments are shown', () => {
+    useManagedCourseSearchApi.mockImplementationOnce(({success}) => {
+      success([
+        {id: 'abc', name: 'abc'},
+        {id: 'cde', name: 'cde'},
+      ])
+    })
+
+    executeQuery.mockImplementationOnce(() =>
+      Promise.resolve({
+        course: {
+          _id: '1',
+          id: '1',
+          name: 'Course 1',
+          assignmentsConnection: {
+            nodes: [
+              {
+                _id: 'assignment_1',
+                id: '1',
+                name: 'Assignment 1',
+                rubricAssociation: {
+                  _id: 'rubric_1',
+                },
+              },
+              {
+                _id: 'assignment_2',
+                id: '2',
+                name: 'Assignment 2',
+                rubricAssociation: {
+                  _id: null,
+                },
+              },
+            ],
+          },
+        },
+      })
+    )
+
+    const setModule = jest.fn()
+    const {queryByText} = render(
+      <CourseAndModulePicker
+        selectedCourseId="abc"
+        setSelectedModule={setModule}
+        showAssignments={true}
+      />
+    )
+    const selector = queryByText(/select an assignment/i)
+    expect(selector).toBeInTheDocument()
   })
 })

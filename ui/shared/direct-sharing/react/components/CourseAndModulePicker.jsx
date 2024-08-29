@@ -31,6 +31,7 @@ import useManagedCourseSearchApi, {
 } from '../effects/useManagedCourseSearchApi'
 import useModuleCourseSearchApi from '../effects/useModuleCourseSearchApi'
 import ModulePositionPicker from './ModulePositionPicker'
+import AssignmentPicker from './AssignmentPicker'
 
 const I18n = useI18nScope('course_and_module_picker')
 
@@ -39,13 +40,16 @@ CourseAndModulePicker.propTypes = {
   setSelectedCourse: func,
   selectedModuleId: string,
   setSelectedModule: func,
+  setSelectedAssignment: func,
   setModuleItemPosition: func,
   disableModuleInsertion: bool,
+  showAssignments: bool,
   moduleFilteringOpts: object,
   courseFilteringOpts: object,
 }
 
 CourseAndModulePicker.defaultProps = {
+  showAssignments: false,
   moduleFilteringOpts: {per_page: 50},
   courseFilteringOpts: {
     include: '',
@@ -58,8 +62,10 @@ export default function CourseAndModulePicker({
   setSelectedCourse,
   selectedModuleId,
   setSelectedModule,
+  setSelectedAssignment,
   setModuleItemPosition,
   disableModuleInsertion,
+  showAssignments,
   moduleFilteringOpts,
   courseFilteringOpts,
 }) {
@@ -131,6 +137,14 @@ export default function CourseAndModulePicker({
           setModuleItemPosition={setModuleItemPosition}
         />
       )}
+      <View as="div" padding="0 0 small 0">
+        {selectedCourseId && showAssignments && (
+          <AssignmentPicker
+            courseId={selectedCourseId}
+            onAssignmentSelected={setSelectedAssignment}
+          />
+        )}
+      </View>
     </div>
   )
 }
