@@ -253,6 +253,34 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def update_topic_submission
+    if discussion_topic&.assignment&.checkpoints_parent?
+      entry_checkpoint_type = parent_id ? CheckpointLabels::REPLY_TO_ENTRY : CheckpointLabels::REPLY_TO_TOPIC
+      submission = if entry_checkpoint_type == CheckpointLabels::REPLY_TO_TOPIC
+                     discussion_topic.reply_to_topic_checkpoint.submissions.find_by(user_id:)
+                   else
+                     discussion_topic.reply_to_entry_checkpoint.submissions.find_by(user_id:)
+                   end
+      return unless submission
+
+      entries = if entry_checkpoint_type == CheckpointLabels::REPLY_TO_TOPIC
+                  discussion_topic.discussion_entries.active.where(user_id:, parent_id: nil)
+                else
+                  discussion_topic.discussion_entries.active.where(user_id:).where.not(parent_id: nil)
+                end
+
+      should_unsubmit_reply_to_topic = entry_checkpoint_type == CheckpointLabels::REPLY_TO_TOPIC && entries.none?
+      should_unsubmit_reply_to_entry = entry_checkpoint_type == CheckpointLabels::REPLY_TO_ENTRY && (
+        entries.none? || (entries.any? && (entries.length < discussion_topic.reply_to_entry_required_count))
+      )
+      if should_unsubmit_reply_to_topic || should_unsubmit_reply_to_entry
+        submission.workflow_state = "unsubmitted"
+        submission.submission_type = nil
+        submission.submitted_at = nil
+        submission.save! # aggregate_checkpoint_submissions will be called in the after_save hook
+      end
+      return
+    end
+
     if discussion_topic.for_assignment?
       entries = discussion_topic.discussion_entries.where(user_id:, workflow_state: "active")
       submission = discussion_topic.assignment.submissions.find_by(user_id:)
