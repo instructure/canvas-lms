@@ -34,7 +34,7 @@ describe "as a teacher" do
       @teacher = teacher_in_course(name: "teacher", course: @course, enrollment_state: :active).user
     end
 
-    context "assignment details" do
+    context "assignment header" do
       before(:once) do
         @assignment = @course.assignments.create!(
           name: "assignment",
@@ -61,6 +61,42 @@ describe "as a teacher" do
 
       it "shows publish status" do
         expect(TeacherViewPageV2.publish_status(@assignment.workflow_state)).to_not be_nil
+      end
+
+      it "shows edit button" do
+        expect(TeacherViewPageV2.edit_button).to be_displayed
+      end
+
+      it "shows assign to button" do
+        expect(TeacherViewPageV2.assign_to_button).to be_displayed
+      end
+
+      it "shows speedgrader button" do
+        expect(TeacherViewPageV2.speedgrader_button).to be_displayed
+      end
+
+      it "redirects to edit assignment page when the edit button is clicked" do
+        TeacherViewPageV2.edit_button.click
+        expect(driver.current_url).to include(
+          "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+        )
+      end
+
+      it "redirects to speedgrader page when the speedgrader button is clicked" do
+        first_window = driver.window_handle
+        TeacherViewPageV2.speedgrader_button.click
+        new_window = (driver.window_handles - [first_window]).first
+        driver.switch_to.window(new_window)
+        expect(driver.current_url).to include(
+          "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+        )
+        driver.close
+        driver.switch_to.window(first_window)
+      end
+
+      it "shows assign to tray when assign to button is clicked" do
+        TeacherViewPageV2.assign_to_button.click
+        expect(TeacherViewPageV2.assign_to_tray).to be_displayed
       end
     end
 

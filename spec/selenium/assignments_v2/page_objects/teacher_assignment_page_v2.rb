@@ -56,5 +56,21 @@ class TeacherViewPageV2
     def status_pill
       f("span[data-testid='assignment-status-pill']")
     end
+
+    def edit_button
+      f("a[data-testid='edit-button']")
+    end
+
+    def assign_to_button
+      f("button[data-testid='assign-to-button']")
+    end
+
+    def speedgrader_button
+      f("a[data-testid='speedgrader-button']")
+    end
+
+    def assign_to_tray
+      f("div[data-testid='item-assign-to-card']")
+    end
   end
 end

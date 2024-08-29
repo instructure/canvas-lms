@@ -16,37 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-.desktop #assignments-2-teacher-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.desktop #header-buttons {
-  display: flex;
-}
-
-.desktop #header-buttons Button {
-  margin-left: 24px;
-  white-space: nowrap;
-}
-
-.mobile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.mobile #assignments-2-teacher-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
-.mobile #header-buttons{
-  display: block;
-  align-items: center;
-  margin-top: 30px;
-  width: 100%;
+#header-buttons a {
+  text-decoration: none;
 }
