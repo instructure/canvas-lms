@@ -38,6 +38,10 @@ module LtiOutbound
       [PRIVACY_LEVEL_PUBLIC].include? privacy_level
     end
 
+    def anonymous?
+      [PRIVACY_LEVEL_ANONYMOUS].include? privacy_level
+    end
+
     def settings
       @settings || {}
     end
