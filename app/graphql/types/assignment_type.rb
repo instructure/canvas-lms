@@ -236,6 +236,11 @@ module Types
           "If true, the assignment has been submitted to by at least one student",
           method: :has_submitted_submissions?,
           null: true
+    field :graded_submissions_exist,
+          Boolean,
+          "If true, the assignment has at least one graded submission",
+          method: :graded_submissions_exist?,
+          null: true
     field :can_duplicate, Boolean, method: :can_duplicate?, null: true
 
     field :grade_group_students_individually,
