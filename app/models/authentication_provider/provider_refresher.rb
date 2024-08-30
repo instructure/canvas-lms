@@ -33,7 +33,15 @@ class AuthenticationProvider::ProviderRefresher
       end
     end
 
-    protected
+    private
+
+    def uri_for(provider)
+      provider.metadata_uri
+    end
+
+    def assign_metadata(provider, metadata)
+      provider.metadata = metadata
+    end
 
     # returns the new data if it changed, or false if it has not
     def refresh_if_necessary(provider_key, endpoint, force_fetch: false)

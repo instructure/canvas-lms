@@ -27,7 +27,6 @@ describe ActiveSupport::Cache::SafeRedisRaceCondition do
 
   let(:store) do
     Class.new(ActiveSupport::Cache::RedisCacheStore) do
-      include ActiveSupport::Cache::SafeRedisRaceCondition
       def self.name
         "TestCache"
       end

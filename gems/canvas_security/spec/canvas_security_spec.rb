@@ -48,14 +48,14 @@ describe CanvasSecurity do
 
         it "encodes with configured encryption key" do
           jwt = double
-          expect(jwt).to receive(:sign).with(CanvasSecurity.encryption_key, :HS256).and_return("sometoken")
+          expect(jwt).to receive(:sign).with(CanvasSecurity.encryption_key, :autodetect).and_return("sometoken")
           allow(JSON::JWT).to receive_messages(new: jwt)
           CanvasSecurity.create_jwt({ a: 1 })
         end
 
         it "encodes with the supplied key" do
           jwt = double
-          expect(jwt).to receive(:sign).with("mykey", :HS256).and_return("sometoken")
+          expect(jwt).to receive(:sign).with("mykey", :autodetect).and_return("sometoken")
           allow(JSON::JWT).to receive_messages(new: jwt)
           CanvasSecurity.create_jwt({ a: 1 }, nil, "mykey")
         end

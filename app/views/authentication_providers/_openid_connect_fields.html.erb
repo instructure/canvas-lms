@@ -25,6 +25,10 @@ If the provider can configure valid callback or redirect URIs, use %{callback_ur
               %></p>
 <%= render partial: 'oauth2_fields', locals: { aac: aac, presenter: presenter, f: f } %>
 <div class="ic-Form-control">
+  <%= f.label :issuer, 'Issuer Identifier', class: 'ic-Label', for: "issuer_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :issuer, class: 'ic-Input', id: "issuer_#{presenter.id_suffix(aac)}" %>
+</div>
+<div class="ic-Form-control">
   <%= f.label :authorize_url, 'Authorize URL', class: 'ic-Label', for: "authorize_url_#{presenter.id_suffix(aac)}" %>
   <%= f.text_field :authorize_url, class: 'ic-Input', id: "authorize_url_#{presenter.id_suffix(aac)}" %>
 </div>
@@ -56,6 +60,15 @@ If the provider can configure valid callback or redirect URIs, use %{callback_ur
 <div class="ic-Form-control">
   <%= f.label :scope, 'Scope', class: 'ic-Label', for: "scope_#{presenter.id_suffix(aac)}" %>
   <%= f.text_field :scope, class: 'ic-Input', id: "scope_#{presenter.id_suffix(aac)}" %>
+</div>
+<div class="ic-Form-control">
+  <%= f.label :jwks_uri, 'JWKS URI', class: 'ic-Label', for: "jwks_uri_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :jwks_uri, class: 'ic-Input', id: "jwks_uri_#{presenter.id_suffix(aac)}" %>
+  <p><%= mt(<<~TEXT)
+    The JWKS URI provides the public keys used to verify the signature of ID tokens unless they are signed
+    with an HMAC algorithm using the `client_secret` as a key.
+    TEXT
+    %></p>
 </div>
 <div class="ic-Form-control">
   <%= f.label :login_attribute, 'Login Attribute', class: 'ic-Label', for: "login_attribute_#{presenter.id_suffix(aac)}" %>
