@@ -24,7 +24,6 @@ $bar-height: 64px;
   #{direction(right)}: 0;
   bottom: 0;
   height: $bar-height+1;
-  overflow: hidden;
 
   .hidden-aria-title {
     display: none;
@@ -37,6 +36,10 @@ $bar-height: 64px;
   border-top: 1px solid $ic-border-light;
   box-sizing: border-box;
   padding-top: $ic-sp;
+}
+
+.module-sequence-footer .module-sequence-footer-content a {
+  text-decoration: none;
 }
 
 @keyframes module-sequence-footer-animation {

@@ -36,7 +36,7 @@ describe Alert do
         original_criterion_id = alert.criteria.first.id
 
         alert.criteria = [{ criterion_type: "Interaction", threshold: 7, id: alert.criteria.first.id },
-                          { criterion_type: "UserNote", threshold: 6 }]
+                          { criterion_type: "Interaction", threshold: 6 }]
         expect(alert.criteria.length).to eq 2
         expect(alert.criteria.first.id).to eq original_criterion_id
         expect(alert.criteria.first.threshold).to eq 7

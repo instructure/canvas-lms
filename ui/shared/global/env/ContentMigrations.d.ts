@@ -35,4 +35,6 @@ export interface EnvContentMigrations {
   NEW_QUIZZES_MIGRATION_REQUIRED?: boolean
   EXPORT_WARNINGS?: string[]
   SHOW_BP_SETTINGS_IMPORT_OPTION?: boolean
+  OLD_START_DATE?: string
+  OLD_END_DATE?: string
 }

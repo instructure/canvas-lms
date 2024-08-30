@@ -39,10 +39,22 @@ import useDiscoverQueryParams from './useDiscoverQueryParams'
 import {uniqueId} from 'lodash'
 import {breakpoints} from './breakpoints'
 import {useMedia} from 'react-use'
+import {useAppendBreadcrumbsToDefaults} from '@canvas/breadcrumbs/useAppendBreadcrumbsToDefaults'
+import {ZAccountId} from '../../manage/model/AccountId'
 
 const I18n = useI18nScope('lti_registrations')
 
 export const Discover = () => {
+  const accountId = ZAccountId.parse(window.location.pathname.split('/')[2])
+  useAppendBreadcrumbsToDefaults(
+    [
+      {
+        name: I18n.t('Discover'),
+        url: `/accounts/${accountId}/apps`,
+      },
+    ],
+    !!window.ENV.FEATURES.lti_registrations_next
+  )
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const {queryParams, setQueryParams, updateQueryParams} = useDiscoverQueryParams()
   const {searchValue, handleSearchInputChange} = useDebouncedSearch({

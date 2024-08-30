@@ -22,6 +22,8 @@ module DataFixup::Lti::BackfillLtiRegistrationAccountBindings
     DeveloperKeyAccountBinding.joins(developer_key: :lti_registration)
                               .where.missing(:lti_registration_account_binding)
                               .find_each do |account_binding|
+      next unless account_binding.account.root_account?
+
       Lti::RegistrationAccountBinding.create!(
         account: account_binding.account,
         registration: account_binding.developer_key.lti_registration,

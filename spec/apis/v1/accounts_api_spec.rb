@@ -1051,6 +1051,8 @@ describe "Accounts API", type: :request do
           require_symbol_characters: true,
           minimum_character_length: 10,
           maximum_login_attempts: 5,
+          common_passwords_attachment_id: "1",
+          common_passwords_folder_id: "2",
           bogus_setting: "bogus"
         }
       end
@@ -1108,6 +1110,8 @@ describe "Accounts API", type: :request do
           expect(@a1.settings[:password_policy][:require_symbol_characters]).to be_truthy
           expect(@a1.settings[:password_policy][:minimum_character_length]).to eq("10")
           expect(@a1.settings[:password_policy][:maximum_login_attempts]).to eq("5")
+          expect(@a1.settings[:password_policy][:common_passwords_attachment_id]).to eq("1")
+          expect(@a1.settings[:password_policy][:common_passwords_folder_id]).to eq("2")
         end
       end
 
@@ -2191,6 +2195,8 @@ describe "Accounts API", type: :request do
           require_symbol_characters: "true",
           minimum_character_length: "10",
           maximum_login_attempts: "3",
+          common_passwords_attachment_id: "1",
+          common_passwords_folder_id: "2"
         }
       end
 

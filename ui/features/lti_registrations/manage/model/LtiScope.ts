@@ -16,9 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import * as z from 'zod'
-import {useScope as useI18nScope} from '@canvas/i18n'
-
-const I18n = useI18nScope('external_tools')
 
 /**
  * Scopes are permissions that an LTI tool can request from the platform.
@@ -80,49 +77,6 @@ const AllLtiScopes = [
 export const ZLtiScope = z.enum(AllLtiScopes)
 
 export type LtiScope = z.infer<typeof ZLtiScope>
-
-const LtiScopeTranslations: Record<LtiScope, string> = {
-  [LtiScopes.AccountExternalToolsCreate]: I18n.t('Can create external tools'),
-  [LtiScopes.AccountExternalToolsDestroy]: I18n.t('Can destroy external tools'),
-  [LtiScopes.AccountExternalToolsList]: I18n.t('Can list external tools'),
-  [LtiScopes.AccountExternalToolsShow]: I18n.t('Can show external tools'),
-  [LtiScopes.AccountExternalToolsUpdate]: I18n.t('Can update external tools'),
-  [LtiScopes.DataServicesCreate]: I18n.t('Can create subscription to data service data'),
-  [LtiScopes.DataServicesShow]: I18n.t('Can show subscription to data service data'),
-  [LtiScopes.DataServicesUpdate]: I18n.t('Can update subscription to data service data'),
-  [LtiScopes.DataServicesList]: I18n.t('Can list subscriptions to data service data'),
-  [LtiScopes.DataServicesDestroy]: I18n.t('Can destroy subscription to data service data'),
-  [LtiScopes.DataServicesListEventTypes]: I18n.t('Can list categorized event types'),
-  [LtiScopes.FeatureFlagsShow]: I18n.t('Can view feature flags'),
-  [LtiScopes.AgsLineItem]: I18n.t(
-    'Can create and view assignment data in the gradebook associated with the tool'
-  ),
-  [LtiScopes.AgsLineItemReadonly]: I18n.t(
-    'Can view assignment data in the gradebook associated with the tool'
-  ),
-  [LtiScopes.AgsResultReadonly]: I18n.t(
-    'Can view submission data for assignments associated with the tool'
-  ),
-  [LtiScopes.AgsScore]: I18n.t(
-    'Can create and update submission results for assignments associated with the tool'
-  ),
-  [LtiScopes.NrpsContextMembershipReadonly]: I18n.t(
-    'Can retrieve user data associated with the context the tool is installed in'
-  ),
-  [LtiScopes.PublicJwkUpdate]: I18n.t('Can update public jwk for LTI services'),
-  [LtiScopes.AccountLookupShow]: I18n.t('Can lookup Account information'),
-  [LtiScopes.AgsProgressShow]: I18n.t(
-    'Can view Progress records associated with the context the tool is installed in'
-  ),
-  [LtiScopes.AccessPageContent]: I18n.t('Can access page content'),
-}
-
-/**
- *
- * @param scope Returns the translation for the given LTI scope
- * @returns human readable translation of the LTI scope
- */
-export const i18nLtiScope = (scope: LtiScope) => LtiScopeTranslations[scope]
 
 /**
  * Narrows a string to LtiScope

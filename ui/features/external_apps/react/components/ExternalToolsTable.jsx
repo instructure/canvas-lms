@@ -29,10 +29,12 @@ import InfiniteScroll from '@canvas/infinite-scroll'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import splitAssetString from '@canvas/util/splitAssetString'
+import {Spinner} from '@instructure/ui-spinner'
+import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('external_tools')
 
-export default class ExternalToolsTable extends React.Component {
+export class ExternalToolsTable extends React.Component {
   static propTypes = {
     canAdd: PropTypes.bool,
     canEdit: PropTypes.bool,
@@ -68,7 +70,13 @@ export default class ExternalToolsTable extends React.Component {
     }
   }
 
-  loader = () => <div className="loadingIndicator" />
+  loader = () => (
+    <div className="loadingIndicator">
+      <View padding="x-small" textAlign="center" as="div" display="block">
+        <Spinner delay={300} size="x-small" renderTitle={() => I18n.t('Loading')} />
+      </View>
+    </div>
+  )
 
   setFocusAbove = tool => () => {
     const toolRow = tool && this[`externalTool${tool.app_id}`]
@@ -89,33 +97,28 @@ export default class ExternalToolsTable extends React.Component {
     }
     let t = null
     const externalTools = store.getState().externalTools
-    const rceFavCount = externalTools.reduce(
-      (accum, current) => accum + (current.is_rce_favorite ? 1 : 0),
-      0
-    )
+    const rceFavCount = countFavorites(externalTools)
     const topNavFavCount = externalTools.reduce(
       (accum, current) => accum + (current.is_top_nav_favorite ? 1 : 0),
       0
     )
-    return externalTools.map(tool => {
-      t = (
-        <ExternalToolsTableRow
-          key={tool.app_id}
-          ref={this.setToolRowRef(tool)}
-          tool={tool}
-          canAdd={this.props.canAdd}
-          canEdit={this.props.canEdit}
-          canDelete={this.props.canDelete}
-          canAddEdit={this.props.canAddEdit}
-          setFocusAbove={this.setFocusAbove(t)}
-          rceFavoriteCount={rceFavCount}
-          topNavFavoriteCount={topNavFavCount}
-          contextType={this.assetContextType}
-          showLTIFavoriteToggles={show_lti_favorite_toggles}
-        />
-      )
-      return t
-    })
+    return externalTools.map(tool =>
+    (
+      <ExternalToolsTableRow
+        key={tool.app_id}
+        ref={this.setToolRowRef(tool)}
+        tool={tool}
+        canAdd={this.props.canAdd}
+        canEdit={this.props.canEdit}
+        canDelete={this.props.canDelete}
+        canAddEdit={this.props.canAddEdit}
+        setFocusAbove={this.setFocusAbove(t)}
+        rceFavoriteCount={rceFavCount}
+        topNavFavoriteCount={topNavFavCount}
+        contextType={this.assetContextType}
+        showLTIFavoriteToggles={show_lti_favorite_toggles}
+      />
+    ))
   }
 
   render() {
@@ -171,7 +174,7 @@ export default class ExternalToolsTable extends React.Component {
                     {I18n.t('Add to RCE toolbar')}
                     <Tooltip
                       renderTip={I18n.t(
-                        'There is a 2 app limit for placement within the RCE toolbar.'
+                        'There is a 2 app limit on the RCE toolbar. Apps which Instructure defaults to on are not included in the limit.'
                       )}
                       placement="top"
                       on={['hover', 'focus']}
@@ -198,4 +201,12 @@ export default class ExternalToolsTable extends React.Component {
       </div>
     )
   }
+}
+
+export function countFavorites(tools) {
+  return tools.reduce(
+    // On_by_default apps don't count towards the limit
+    (accum, current) => accum + (current.is_rce_favorite && !INST.editorButtons?.find(b => b.id === current.app_id)?.on_by_default ? 1 : 0),
+    0
+  )
 }

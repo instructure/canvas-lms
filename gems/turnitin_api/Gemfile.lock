@@ -35,7 +35,7 @@ GEM
       activesupport (>= 5.2)
     base64 (0.2.0)
     bigdecimal (3.1.8)
-    concurrent-ruby (1.3.3)
+    concurrent-ruby (1.3.4)
     connection_pool (2.4.1)
     crack (1.0.0)
       bigdecimal
@@ -60,14 +60,14 @@ GEM
       dogstatsd-ruby (>= 4.2, < 6.0, != 5.0.0)
       statsd-ruby (~> 1.0)
     logger (1.6.0)
-    minitest (5.24.1)
+    minitest (5.25.1)
     multipart-post (2.4.1)
     mutex_m (0.2.0)
     net-http (0.4.1)
       uri
     public_suffix (6.0.1)
     rake (13.2.1)
-    rexml (3.3.4)
+    rexml (3.3.6)
       strscan
     rspec (3.13.0)
       rspec-core (~> 3.13.0)

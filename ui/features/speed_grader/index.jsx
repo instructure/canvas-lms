@@ -31,11 +31,10 @@ import {getSubmission} from './queries/submissionQuery'
 import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery'
 import {getSubmissionsByStudentIds} from './queries/submissionsByStudentsIdsQuery'
 import {getAssignmentsByCourseId} from './queries/assignmentsByCourseIdQuery'
+import {getEnrollmentsByCourse} from './queries/enrollmentsByCourseQuery'
+import {getCommentBankItems} from './queries/commentBankQuery'
 
-import {
-  updateSubmissionGrade,
-  updateCheckpointedSubmissionGrade,
-} from './mutations/updateSubmissionGradeMutation'
+import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
 import {createSubmissionComment} from './mutations/createSubmissionCommentMutation'
 import {hideAssignmentGradesForSections} from './mutations/hideAssignmentGradesForSectionsMutation'
 import {postDraftSubmissionComment} from './mutations/postDraftSubmissionCommentMutation'
@@ -45,6 +44,9 @@ import {
   postAssignmentGradesForSections,
   resolvePostAssignmentGradesStatus,
 } from './mutations/postAssignmentGradesForSectionsMutation'
+import {createCommentBankItem} from './mutations/comment_bank/createCommentBankItemMutation'
+import {deleteCommentBankItem} from './mutations/comment_bank/deleteCommentBankItemMutation'
+import {updateCommentBankItem} from './mutations/comment_bank/updateCommentBankItemMutation'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import GenericErrorPage from '@canvas/generic-error-page'
@@ -74,10 +76,12 @@ ready(() => {
             getAssignment,
             getAssignmentsByCourseId,
             getCourse,
+            getEnrollmentsByCourse,
             getSectionsByAssignment,
             getSubmission,
             getSubmissionsByAssignment,
             getSubmissionsByStudentIds,
+            getCommentBankItems,
             resolvePostAssignmentGradesStatus,
           },
           mutationFns: {
@@ -88,6 +92,9 @@ ready(() => {
             postAssignmentGradesForSections,
             postDraftSubmissionComment,
             updateSubmissionGradeStatus,
+            createCommentBankItem,
+            deleteCommentBankItem,
+            updateCommentBankItem,
           },
           postMessageAliases,
           context: {
@@ -98,7 +105,7 @@ ready(() => {
             hrefs: {
               heroIcon: `/courses/${window.ENV.course_id}/gradebook`,
             },
-            emojisDenyList: window.ENV.EMOJI_DENY_LIST?.split(','),
+            emojisDenyList: window.ENV.EMOJI_DENY_LIST ? window.ENV.EMOJI_DENY_LIST.split(',') : [],
             mediaSettings: window.INST.kalturaSettings,
             lang: window.navigator.language || ENV.LOCALE || ENV.BIGEASY_LOCALE,
           },
@@ -109,6 +116,7 @@ ready(() => {
               enabled: window.ENV.GRADE_BY_QUESTION,
             },
             emojisEnabled: !!window.ENV.EMOJIS_ENABLED,
+            commentLibraryEnabled: ENV.assignment_comment_library_feature_enabled,
           },
         })
       })

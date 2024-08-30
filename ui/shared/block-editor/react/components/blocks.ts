@@ -26,10 +26,11 @@ import {IconBlock} from './user/blocks/IconBlock'
 import {PageBlock} from './user/blocks/PageBlock'
 import {ImageBlock} from './user/blocks/ImageBlock'
 import {RCEBlock} from './user/blocks/RCEBlock'
+import {GroupBlock} from './user/blocks/GroupBlock'
 
 // sections
 import {ResourcesSection, ResourcesSectionInner} from './user/sections/ResourcesSection'
-import {ColumnsSection} from './user/sections/ColumnsSection'
+import {ColumnsSection, ColumnsSectionInner} from './user/sections/ColumnsSection'
 import {HeroSection, HeroTextHalf} from './user/sections/HeroSection'
 import {NavigationSection, NavigationSectionInner} from './user/sections/NavigationSection'
 import {AboutSection, AboutTextHalf} from './user/sections/AboutSection'
@@ -56,6 +57,8 @@ const blocks = {
   ResourcesSection,
   ResourcesSectionInner,
   ColumnsSection,
+  ColumnsSectionInner,
+  GroupBlock,
   NoSections,
   HeroSection,
   HeroTextHalf,

@@ -87,17 +87,6 @@ course_paces_redesign:
   description: Enable the redesigned course pacing user experience.
   applies_to: SiteAdmin
 
-deprecate_faculty_journal:
-  state: hidden
-  display_name: 'Faculty Journal Deprecation'
-  description: Enable the deprecation of the faculty journal functionality.
-  applies_to: SiteAdmin
-  environments:
-    ci:
-      state: allowed_on
-    development:
-      state: allowed_on
-
 blueprint_line_item_support:
   state: hidden
   display_name: 'Blueprint Resource ID Support'
@@ -159,6 +148,11 @@ selective_release_edit_page:
     and discussions will have the assign to functionality directly in the page instead
     of in a tray.
   applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on # enable for automated testings builds and local testing
+    development:
+      state: allowed_on # enable for local development
 
 selective_release_optimized_services:
   state: hidden
@@ -173,11 +167,6 @@ selective_release_optimized_services_v2:
   display_name: 'Selective Release - Optimized Visibility Services - Three Queries'
   description: |-
     Optimized the visibility services used by Selective Release.
-  environments:
-    ci:
-      state: allowed_on
-    development:
-      state: allowed_on
 
 selective_release_optimized_services_v3:
   state: hidden
@@ -185,6 +174,11 @@ selective_release_optimized_services_v3:
   display_name: 'Selective Release - Optimized Visibility Services - One Query'
   description: |-
     Optimized the visibility services used by Selective Release.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
 
 differentiated_files:
   state: hidden

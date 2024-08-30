@@ -32,6 +32,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Event, Which} from './types'
+import {subAssignmentOrOverride} from '@canvas/calendar/jquery/CommonEvent/SubAssignment'
 
 const I18n = useI18nScope('calendar_event')
 
@@ -161,6 +162,10 @@ const DeleteCalendarEventDialog = ({
         {eventType === 'assignment'
           ? I18n.t(
               'Are you sure you want to delete this event? Deleting this event will also delete the associated assignment.'
+            )
+          : subAssignmentOrOverride(eventType)
+          ? I18n.t(
+              'Are you sure you want to delete this event? Deleting this event will also delete the associated assignment and other checkpoints associated with the assignment.'
             )
           : I18n.t('Are you sure you want to delete this event?')}
       </Text>

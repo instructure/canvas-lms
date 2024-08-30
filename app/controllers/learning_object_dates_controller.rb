@@ -20,7 +20,8 @@
 
 # @API Learning Object Dates
 #
-# API for accessing date-related attributes on assignments, quizzes, modules, discussions, pages, and files.
+# API for accessing date-related attributes on assignments, quizzes, modules, discussions, pages, and files. Note that
+# support for files is not yet available.
 #
 # @model LearningObjectDates
 #     {
@@ -93,8 +94,6 @@ class LearningObjectDatesController < ApplicationController
   # Get a learning object's date-related information, including due date, availability dates,
   # override status, and a paginated list of all assignment overrides for the item.
   #
-  # Note: this API is still under development and will not function until the feature is enabled.
-  #
   # @returns LearningObjectDates
   def show
     route = polymorphic_url([:api_v1, @context, asset, :date_details])
@@ -123,8 +122,6 @@ class LearningObjectDatesController < ApplicationController
   # override status, and assignment overrides.
   #
   # Returns 204 No Content response code if successful.
-  #
-  # Note: this API is still under development and will not function until the feature is enabled.
   #
   # @argument due_at [DateTime]
   #   The learning object's due date. Not applicable for ungraded discussions, pages, and files.

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import {useQuery} from '@canvas/query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Spinner} from '@instructure/ui-spinner'
@@ -26,6 +26,7 @@ import type {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
 import AssessmentGradeInput from './AssessmentGradeInput'
 import {Flex} from '@instructure/ui-flex'
 import {useMutation, useQueryClient} from '@tanstack/react-query'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
 const I18n = useI18nScope('SpeedGraderCheckpoints')
 
@@ -58,6 +59,7 @@ export type SubAssignmentSubmission = {
   seconds_late: number
   custom_grade_status_id: null | string
   grade: string
+  entered_grade: string
   user_id: string
 }
 
@@ -72,7 +74,7 @@ const fetchAssignment = async (
 ): Promise<Assignment | null> => {
   const path = `/api/v1/courses/${courseId}/assignments/${assignmentId}?include=checkpoints`
 
-  const {json} = await doFetchApi<Assignment>({
+  const {json} = await doFetchApi({
     method: 'GET',
     path,
   })
@@ -87,7 +89,7 @@ const fetchSubmission = async (
 ): Promise<Submission | null> => {
   const path = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${studentId}?include=sub_assignment_submissions`
 
-  const {json} = await doFetchApi<Submission>({
+  const {json} = await doFetchApi({
     method: 'GET',
     path,
   })
@@ -183,6 +185,9 @@ const sortSubmissions = (a: SubAssignmentSubmission, b: SubAssignmentSubmission)
 export const SpeedGraderCheckpointsContainer = (props: Props) => {
   const queryClient = useQueryClient()
 
+  const [shouldAnnounceCurrentGradeChange, setShouldAnnounceCurrentGradeChange] = useState(false)
+  const {setOnSuccess} = useContext(AlertManagerContext)
+
   const {data: assignment, isLoading: isLoadingAssignment} = useQuery({
     queryKey: ['speedGraderCheckpointsAssignment', props.courseId, props.assignmentId],
     queryFn: () => fetchAssignment(props.courseId, props.assignmentId),
@@ -191,7 +196,11 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
     staleTime: 0,
   })
 
-  const {data: submission, isLoading: isLoadingSubmission} = useQuery({
+  const {
+    data: submission,
+    isLoading: isLoadingSubmission,
+    isRefetching: isRefetchingSubmission,
+  } = useQuery({
     queryKey: [
       'speedGraderCheckpointsSubmission',
       props.courseId,
@@ -203,6 +212,23 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
     cacheTime: 0,
     staleTime: 0,
   })
+
+  // make a screenreader announcement any time the current total grade
+  // automatically changes for checkpointed discussions
+  useEffect(() => {
+    if (
+      submission &&
+      !isRefetchingSubmission &&
+      submission.has_sub_assignment_submissions &&
+      shouldAnnounceCurrentGradeChange
+    ) {
+      const announcement = submission.grade
+        ? I18n.t('Current Total Updated: %{grade}', {grade: submission.grade})
+        : I18n.t('Current Total Updated')
+      setOnSuccess(announcement)
+      setShouldAnnounceCurrentGradeChange(false)
+    }
+  }, [submission, isRefetchingSubmission, shouldAnnounceCurrentGradeChange, setOnSuccess])
 
   const invalidateSubmission = () => {
     queryClient.invalidateQueries([
@@ -217,6 +243,7 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
     mutationFn: putSubmissionGrade,
     onSuccess: () => {
       invalidateSubmission()
+      setShouldAnnounceCurrentGradeChange(true)
     },
   })
 
@@ -224,6 +251,7 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
     mutationFn: putSubmissionStatus,
     onSuccess: () => {
       invalidateSubmission()
+      setShouldAnnounceCurrentGradeChange(true)
     },
   })
 

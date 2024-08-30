@@ -151,10 +151,14 @@ ul[data-cid='InlineList'] > li[data-cid='InlineListItem'] > span::after{
   animation-delay: 4s;
 }
 
+.highlight-discussion {
+  background-color: rgba(0, 142, 226, 0.1);
+}
+
 @keyframes fadeout {
-  to {
-    background-color: rgba(0, 0, 0 ,0);
-  }
+ to {
+   background-color: rgba(0, 0, 0 ,0);
+ }
 }
 
 .no-margin p {

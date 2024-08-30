@@ -318,6 +318,32 @@ describe "discussions index" do
         expect(displayed_overrides).to match_array(expected_overrides)
       end
 
+      it "displays checkpointed discussion assign to tray correctly" do
+        Account.site_admin.enable_feature! :discussion_checkpoints
+        checkpointed_discussion = create_graded_discussion(@course)
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: checkpointed_discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 2.days.from_now }],
+          points_possible: 6
+        )
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: checkpointed_discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 3.days.from_now }],
+          points_possible: 7,
+          replies_required: 2
+        )
+
+        login_and_visit_course(@teacher, @course)
+        DiscussionsIndex.click_assign_to_menu_option(checkpointed_discussion.title)
+
+        expect(module_item_assign_to_card.first).not_to contain_css(due_date_input_selector)
+        expect(module_item_assign_to_card.first).to contain_css(reply_to_topic_due_date_input_selector)
+        expect(module_item_assign_to_card.first).to contain_css(required_replies_due_date_input_selector)
+      end
+
       it "does not render assign to tray on group discussions index" do
         group = @course.groups.create!(name: "Group 1")
         discussion = group.discussion_topics.create!(title: "group topic")

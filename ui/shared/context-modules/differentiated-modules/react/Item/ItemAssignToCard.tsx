@@ -187,6 +187,16 @@ export default forwardRef(function ItemAssignToCard(
     [customAllOptions, selectedAssigneeIds]
   )
 
+  const commonDateTimeInputProps = useMemo(
+    () => ({
+      breakpoints: {},
+      showMessages: false,
+      locale: ENV.LOCALE || 'en',
+      timezone: ENV.TIMEZONE || 'UTC',
+    }),
+    []
+  )
+
   const dueAtHasChanged = useCallback(() => {
     const originalDueAt = new Date(original_due_at || 0)
     const newDueAt = new Date(dueDate || 0)
@@ -327,7 +337,7 @@ export default forwardRef(function ItemAssignToCard(
 
       const dateField = dateInputRefs.current[unparsedFieldKey]
       const isEmpty = dateField.value.trim() === ''
-      const isValid = moment(dateField.value, 'll').isValid()
+      const isValid = moment(dateField.value, 'll', commonDateTimeInputProps.locale).isValid()
       const unparsedFieldExists = unparsedFieldKeys.has(unparsedFieldKey)
       const newUnparsedFieldKeys = new Set(Array.from(unparsedFieldKeys))
 
@@ -350,7 +360,7 @@ export default forwardRef(function ItemAssignToCard(
       if (!setEquals(newUnparsedFieldKeys, unparsedFieldKeys))
         setUnparsedFieldKeys(newUnparsedFieldKeys)
     },
-    [unparsedFieldKeys]
+    [commonDateTimeInputProps.locale, unparsedFieldKeys]
   )
 
   const handleDelete = useCallback(() => onDelete?.(cardId), [cardId, onDelete])
@@ -359,13 +369,6 @@ export default forwardRef(function ItemAssignToCard(
 
   const isInClosedGradingPeriod =
     dateValidator.isDateInClosedGradingPeriod(dueDate) && !dueAtHasChanged()
-
-  const commonDateTimeInputProps = {
-    breakpoints: {},
-    showMessages: false,
-    locale: ENV.LOCALE || 'en',
-    timezone: ENV.TIMEZONE || 'UTC',
-  }
 
   return (
     <View as="div" {...wrapperProps}>

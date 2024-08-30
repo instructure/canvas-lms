@@ -1047,7 +1047,9 @@ class GradebooksController < ApplicationController
       remote_env(speedgrader: Services::PlatformServiceSpeedgrader.launch_url)
 
       env = {
-        GRADE_BY_QUESTION_SUPPORTED: nil
+        GRADE_BY_QUESTION_SUPPORTED: nil,
+        EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
+        EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
       }
       js_env(env)
 
@@ -1186,6 +1188,7 @@ class GradebooksController < ApplicationController
         end
 
         append_sis_data(env)
+        @entry_id = params[:entry_id]
 
         js_env(env)
         render :speed_grader, locals: {

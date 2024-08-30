@@ -324,6 +324,7 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Whakatika Ata" },
   "edit_link_7f53bebb": { "message": "Whakatika hononga" },
+  "editor_status_bar_653f44ee": { "message": "Pae Tūnga Kaiwhakatika" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Te tīmatanga o te kaupapa { start }"
   },

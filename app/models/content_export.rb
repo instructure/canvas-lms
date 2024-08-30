@@ -619,7 +619,8 @@ class ContentExport < ActiveRecord::Base
   def contains_new_quizzes?
     return false unless new_quizzes_common_cartridge_enabled?
 
-    context.assignments.active.type_quiz_lti.count.positive?
+    course.assignments.active.type_quiz_lti
+          .where.not(workflow_state: "failed_to_duplicate").count.positive?
   end
 
   def contains_new_quizzes_setting?

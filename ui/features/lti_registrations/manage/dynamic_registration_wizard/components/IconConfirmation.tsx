@@ -33,9 +33,9 @@ import {IconImageLine} from '@instructure/ui-icons'
 import {
   LtiPlacements,
   LtiPlacementsWithIcons,
-  i18nLtiPlacement,
   type LtiPlacementWithIcon,
 } from '../../model/LtiPlacement'
+import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
 import {useOverlayStore} from '../hooks/useOverlayStore'
 import {Button} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'

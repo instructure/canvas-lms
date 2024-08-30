@@ -58,7 +58,7 @@ const mockPromise = <T>(
     resolve: () => {
       resolve &&
         resolve({
-          _type: 'success',
+          _type: 'Success',
           data: apiResultData,
         })
     },
@@ -332,7 +332,7 @@ describe('deleteRegistration', () => {
 
     req2.resolve()
     expect(await deletionPromise).toEqual({
-      _type: 'success',
+      _type: 'Success',
     })
   })
 

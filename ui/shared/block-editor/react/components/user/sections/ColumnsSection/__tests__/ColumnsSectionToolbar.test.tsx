@@ -17,12 +17,13 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import {useNode} from '@craftjs/core'
+import {useEditor, useNode} from '@craftjs/core'
 import {ColumnsSection} from '../ColumnsSection'
 import {ColumnsSectionToolbar} from '../ColumnsSectionToolbar'
+import {get} from 'jquery'
 
 const user = userEvent.setup()
 
@@ -32,12 +33,48 @@ const mockSetProp = jest.fn((callback: (props: Record<string, any>) => void) => 
   callback(props)
 })
 
+const deleteMock = jest.fn()
+const addNodeTreeMock = jest.fn()
+
 jest.mock('@craftjs/core', () => {
   return {
     useNode: jest.fn(_node => {
       return {
         actions: {setProp: mockSetProp},
         props,
+        node: {
+          id: 'foo',
+        },
+      }
+    }),
+    useEditor: jest.fn(() => {
+      return {
+        actions: {
+          delete: deleteMock,
+          addNodeTree: addNodeTreeMock,
+        },
+        query: {
+          node: jest.fn((_nodeid: string) => {
+            return {
+              childNodes: jest.fn(() => []),
+              linkedNodes: jest.fn(() => ['bar']),
+              get: jest.fn(() => {
+                return {
+                  data: {
+                    nodes: [],
+                  },
+                }
+              }),
+            }
+          }),
+          parseReactElement: jest.fn((_rn: React.ReactNode) => {
+            return {
+              toNodeTree: jest.fn(() => {
+                return {rootNodeId: 'ROOT'}
+              }),
+            }
+          }),
+        },
       }
     }),
   }
@@ -52,44 +89,39 @@ describe('ColumnsSectionToolbar', () => {
     const {getByText} = render(<ColumnsSectionToolbar />)
 
     expect(getByText('Columns')).toBeInTheDocument()
-    expect(getByText('Column style')).toBeInTheDocument()
+    expect(getByText('Columns 1-4')).toBeInTheDocument()
   })
 
-  it('checks the right column variant', async () => {
-    const {getByText} = render(<ColumnsSectionToolbar />)
+  it('shows the column count input', () => {
+    const {getByLabelText} = render(<ColumnsSectionToolbar />)
 
-    const btn = getByText('Column style').closest('button') as HTMLButtonElement
-    await user.click(btn)
-
-    const fixed = screen.getByText('Fixed')
-    const fluid = screen.getByText('Fluid')
-
-    expect(fixed).toBeInTheDocument()
-    expect(fluid).toBeInTheDocument()
-
-    const li = fixed.closest('li') as HTMLLIElement
-    expect(li.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
+    const input = getByLabelText('Columns 1-4')
+    expect(input).toBeInTheDocument()
+    expect(input).toHaveValue(ColumnsSection.craft.defaultProps.columns.toString())
   })
 
-  it('changes the variant prop on changing the style', async () => {
-    const {getByText} = render(<ColumnsSectionToolbar />)
+  it('increments the column count', async () => {
+    const {container} = render(<ColumnsSectionToolbar />)
 
-    const btn = getByText('Column style').closest('button') as HTMLButtonElement
-    await user.click(btn)
-
-    const fluid = screen.getByText('Fluid')
-    await user.click(fluid)
+    const incBtn = container
+      .querySelector('svg[name="IconArrowOpenUp"]')
+      ?.closest('button') as HTMLButtonElement
+    await user.click(incBtn)
 
     expect(mockSetProp).toHaveBeenCalled()
-    expect(props.variant).toBe('fluid')
+    expect(props.columns).toBe(ColumnsSection.craft.defaultProps.columns + 1)
+    expect(addNodeTreeMock).toHaveBeenCalled()
   })
 
-  it('shows the column count button', () => {
-    const {getByText} = render(<ColumnsSectionToolbar />)
+  it('decrements the column count', async () => {
+    const {container} = render(<ColumnsSectionToolbar />)
 
-    const btn = getByText('Columns').closest('button') as HTMLButtonElement
-    expect(btn).toBeInTheDocument()
+    const decBtn = container
+      .querySelector('svg[name="IconArrowOpenDown"]')
+      ?.closest('button') as HTMLButtonElement
+    await user.click(decBtn)
+
+    expect(mockSetProp).toHaveBeenCalled()
+    expect(props.columns).toBe(ColumnsSection.craft.defaultProps.columns - 1)
   })
-
-  // the rest is tested in ColumnCountPopup.test.tsx
 })

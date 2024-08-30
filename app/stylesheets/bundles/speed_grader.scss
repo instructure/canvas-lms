@@ -384,7 +384,7 @@ $icon-size: 1.4rem;
       @include fontSize(12px);
       text-align: direction(right);
     }
-    .delete_comment_link, .submit_comment_button {
+    .delete_comment_link, .edit_comment_link, .submit_comment_button {
       flex: none;
       height: 24px;
       margin-#{direction(left)}: 0.5em;
@@ -984,6 +984,11 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 .emoji-picker-container {
   position: absolute;
   bottom: 0px;
+  #{direction(right)}: 10px;
+}
+
+.emoji-picker-container.with-rce-lite {
+  bottom: 55px;
   #{direction(right)}: 10px;
 }
 

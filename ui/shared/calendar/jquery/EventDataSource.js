@@ -534,6 +534,9 @@ export default class EventDataSource {
       context => !context.match(/^appointment_group_/)
     )
     eventDataSources.push(['/api/v1/calendar_events', this.assignmentParams(params)])
+    if (ENV.CALENDAR?.SHOW_CHECKPOINTS) {
+      eventDataSources.push(['/api/v1/calendar_events', this.assignmentParams(params, true)])
+    }
     if (ENV.STUDENT_PLANNER_ENABLED) {
       eventDataSources.push(['/api/v1/planner_notes', params])
     }
@@ -578,7 +581,7 @@ export default class EventDataSource {
     return p
   }
 
-  assignmentParams(params) {
+  assignmentParams(params, subAssignment = false) {
     // We only want to see assignments from courses that do not use Course Pacing, unless the
     // user is a student in the course. In that case, they should see their assignments on the calendar
     if (ENV.CALENDAR?.CONTEXTS) {
@@ -588,7 +591,8 @@ export default class EventDataSource {
           (!context.course_pacing_enabled || context.user_is_student)
       ).map(context => context.asset_string)
     }
-    return {type: 'assignment', ...params}
+    const type = subAssignment ? 'sub_assignment' : 'assignment'
+    return {...params, type}
   }
 
   getParticipants(appointmentGroup, registrationStatus, cb) {

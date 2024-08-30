@@ -34,6 +34,7 @@ const I18n = useI18nScope('enhanced_individual_gradebook_submit_score')
 
 type SubmitScoreRequestBody = {
   originator?: string
+  sub_assignment_tag?: string
   submission: {
     posted_grade?: string
     excuse?: boolean | string
@@ -117,37 +118,41 @@ export const useSubmitScore = () => {
     []
   )
 
-  const submitExcused = useCallback(async (excused: boolean, submitScoreUrl?: string | null) => {
-    if (!submitScoreUrl) {
-      setSubmitScoreError(I18n.t('Unable to submit score'))
-      setSubmitScoreStatus(ApiCallStatus.FAILED)
-      return
-    }
-
-    const requestBody: SubmitScoreRequestBody = {
-      submission: {
-        excuse: excused.toString(),
-      },
-    }
-
-    try {
-      setSubmitScoreStatus(ApiCallStatus.PENDING)
-      const {data, status} = await executeApiRequest<Submission>({
-        method: 'PUT',
-        path: submitScoreUrl,
-        body: requestBody,
-      })
-      if (status === 200) {
-        setSavedSubmission(mapUnderscoreSubmission(data))
-        setSubmitScoreStatus(ApiCallStatus.COMPLETED)
-      } else {
-        throw new Error()
+  const submitExcused = useCallback(
+    async (excused: boolean, submitScoreUrl?: string | null, subAssignmentTag?: string | null) => {
+      if (!submitScoreUrl) {
+        setSubmitScoreError(I18n.t('Unable to submit score'))
+        setSubmitScoreStatus(ApiCallStatus.FAILED)
+        return
       }
-    } catch (error) {
-      setSubmitScoreError(I18n.t('Something went wrong'))
-      setSubmitScoreStatus(ApiCallStatus.FAILED)
-    }
-  }, [])
+
+      const requestBody: SubmitScoreRequestBody = {
+        ...(subAssignmentTag ? {sub_assignment_tag: subAssignmentTag} : {}),
+        submission: {
+          excuse: excused.toString(),
+        },
+      }
+
+      try {
+        setSubmitScoreStatus(ApiCallStatus.PENDING)
+        const {data, status} = await executeApiRequest<Submission>({
+          method: 'PUT',
+          path: submitScoreUrl,
+          body: requestBody,
+        })
+        if (status === 200) {
+          setSavedSubmission(mapUnderscoreSubmission(data))
+          setSubmitScoreStatus(ApiCallStatus.COMPLETED)
+        } else {
+          throw new Error()
+        }
+      } catch (error) {
+        setSubmitScoreError(I18n.t('Something went wrong'))
+        setSubmitScoreStatus(ApiCallStatus.FAILED)
+      }
+    },
+    []
+  )
 
   return {
     submitScoreError,

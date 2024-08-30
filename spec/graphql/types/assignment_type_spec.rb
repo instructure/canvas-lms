@@ -940,7 +940,7 @@ describe Types::AssignmentType do
           query = GraphQLTypeTester.new(@topic.assignment, current_user: student)
 
           expect(query.resolve("checkpoints {pointsPossible}")).to eq [10]
-          expect(query.resolve("checkpoints {dueAt}")).to eq [@everyone_due_at.iso8601]
+          expect(query.resolve("checkpoints {dueAt}")).to eq [@section_due_at.iso8601]
           expect(query.resolve("checkpoints {assignmentOverrides {nodes {dueAt}}}")).to eq [[@section_due_at.iso8601]]
         end
       end
@@ -990,6 +990,32 @@ describe Types::AssignmentType do
         expect(query.resolve("mySubAssignmentSubmissionsConnection {nodes {userId}}")).to match_array [student.id.to_s, student.id.to_s]
         expect(query.resolve("mySubAssignmentSubmissionsConnection {nodes {subAssignmentTag}}")).to match_array [CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY]
         expect(query.resolve("mySubAssignmentSubmissionsConnection {nodes {submissionStatus}}")).to match_array ["unsubmitted", "unsubmitted"]
+      end
+    end
+  end
+
+  describe "sub_assignment_submissions" do
+    context "when feature flag is enabled" do
+      before do
+        course.root_account.enable_feature!(:discussion_checkpoints)
+        @topic = DiscussionTopic.create_graded_topic!(course:, title: "Checkpointed Discussion")
+        @topic.reply_to_entry_required_count = 2
+        @topic.save!
+        @assignment = @topic.assignment
+        @assignment.update!(has_sub_assignments: true)
+        @c1 = @assignment.sub_assignments.create!(context: course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+        @c2 = @assignment.sub_assignments.create!(context: course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+        @other_student = student_in_course(course:, active_all: true).user
+      end
+
+      it "sub_submissions return correct submissions corresponding to the sub assignments" do
+        root_entry = @topic.discussion_entries.create!(user: student, message: "my reply to topic")
+        2.times { |i| @topic.discussion_entries.create!(user: student, message: "my child reply #{i}", parent_entry: root_entry) }
+        @topic.discussion_entries.create!(user: @other_student, message: "other student reply to topic")
+
+        query = GraphQLTypeTester.new(@assignment, current_user: teacher)
+
+        expect(query.resolve("submissionsConnection {nodes {subAssignmentSubmissions {assignmentId}}}")).to match_array [[@c1.id.to_s, @c2.id.to_s]]
       end
     end
   end

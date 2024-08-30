@@ -16,13 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {Lti1p3RegistrationOverlayState} from './Lti1p3RegistrationOverlayState'
+import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
+import {
+  createLti1p3RegistrationOverlayStore,
+  type Lti1p3RegistrationOverlayStore,
+} from './Lti1p3RegistrationOverlayState'
+import create from 'zustand'
 
 export type Lti1p3RegistrationWizardState = {
-  overlay: Lti1p3RegistrationOverlayState
+  overlayStore: Lti1p3RegistrationOverlayStore
   _step: Lti1p3RegistrationWizardStep
   reviewing: boolean
   installing: boolean
+}
+
+export interface Lti1p3RegistrationWizardActions {
+  setStep: (step: Lti1p3RegistrationWizardStep) => void
+  setReviewing: (reviewing: boolean) => void
+  setInstalling: (installing: boolean) => void
 }
 
 type Lti1p3RegistrationWizardStep =
@@ -34,3 +45,31 @@ type Lti1p3RegistrationWizardStep =
   | 'Naming'
   | 'Icons'
   | 'Review'
+
+export type Lti1p3RegistrationWizardStore = {
+  state: Lti1p3RegistrationWizardState
+} & Lti1p3RegistrationWizardActions
+
+type CreateStoreProps = {
+  internalConfig: InternalLtiConfiguration
+  reviewing?: boolean
+  installing?: boolean
+}
+
+export const createLti1p3RegistrationWizardState = ({
+  internalConfig,
+  reviewing = false,
+  installing = true,
+}: CreateStoreProps) =>
+  create<Lti1p3RegistrationWizardStore>(set => ({
+    state: {
+      overlayStore: createLti1p3RegistrationOverlayStore(internalConfig),
+      _step: 'LaunchSettings',
+      reviewing,
+      installing,
+    },
+    setStep: step => set(state => ({state: {...state.state, _step: step}})),
+    setReviewing: isReviewing => set(state => ({state: {...state.state, reviewing: isReviewing}})),
+    setInstalling: isInstalling =>
+      set(state => ({state: {...state.state, installing: isInstalling}})),
+  }))

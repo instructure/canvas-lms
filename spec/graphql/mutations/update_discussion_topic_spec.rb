@@ -156,6 +156,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     args << peer_reviews_str(assignment[:peerReviews]) if assignment[:peerReviews]
     args << assignment_overrides_str(assignment[:assignmentOverrides]) if assignment[:assignmentOverrides]
     args << "forCheckpoints: #{assignment[:forCheckpoints]}" if assignment[:forCheckpoints]
+    args << "lockAt: \"#{assignment[:lockAt]}\"" if assignment[:lockAt]
 
     "assignment: { #{args.join(", ")} }"
   end
@@ -619,6 +620,14 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
 
       expect(result["errors"]).to be_nil
     end
+
+    it "syncs the discussion and assignment lock_at field when the assignment date changes" do
+      lock_at = 6.months.from_now.iso8601
+      expect(@topic.lock_at).to be_nil
+      result = run_mutation(id: @topic.id, assignment: { lockAt: lock_at.to_s })
+      expect(result["errors"]).to be_nil
+      expect(@topic.reload.lock_at).to eq lock_at.to_s
+    end
   end
 
   context "discussion checkpoints" do
@@ -925,6 +934,15 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(result["errors"]).to be_nil
       expect(Announcement.last.is_section_specific).to be_truthy
       expect(Announcement.last.course_sections.pluck(:id)).to eq([section1.id])
+    end
+
+    it "updates a section specific announcement to be unspecific" do
+      section1 = @course.course_sections.create!(name: "Section 1")
+      announcement1 = @course.announcements.create!(title: "Announcement Title", message: "Announcement Message", user: @teacher, course_sections: [section1], is_section_specific: true)
+      result = run_mutation(id: announcement1.id, specific_sections: "all")
+      expect(result["errors"]).to be_nil
+      expect(Announcement.last.is_section_specific).to be_falsy
+      expect(Announcement.last.course_sections.pluck(:id)).to eq([])
     end
 
     it "does not update ungraded assignment overrides if flag is off" do

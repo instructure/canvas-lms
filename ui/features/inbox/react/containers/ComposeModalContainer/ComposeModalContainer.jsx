@@ -55,7 +55,6 @@ const ComposeModalContainer = props => {
   const [bodyMessages, setBodyMessages] = useState([])
   const [addressBookMessages, setAddressBookMessages] = useState([])
   const [sendIndividualMessages, setSendIndividualMessages] = useState(false)
-  const [userNote, setUserNote] = useState(false)
   const [selectedContext, setSelectedContext] = useState()
   const [courseMessages, setCourseMessages] = useState([])
   const [mediaUploadOpen, setMediaUploadOpen] = useState(false)
@@ -263,10 +262,6 @@ const ComposeModalContainer = props => {
     }
   }
 
-  const onUserNoteChange = () => {
-    setUserNote(prev => !prev)
-  }
-
   const onSendIndividualMessagesChange = () => {
     setSendIndividualMessages(prev => !prev)
   }
@@ -368,7 +363,6 @@ const ComposeModalContainer = props => {
         variables: {
           attachmentIds: attachments.map(a => a.id),
           body,
-          userNote,
           includedMessages: props.pastConversation?.conversationMessagesConnection.nodes.map(
             c => c._id
           ),
@@ -396,7 +390,6 @@ const ComposeModalContainer = props => {
           attachmentIds: attachments.map(a => a.id),
           bulkMessage: sendIndividualMessages,
           body,
-          userNote,
           contextCode: selectedContext?.contextID || ENV?.CONVERSATIONS?.ACCOUNT_CONTEXT_CODE,
           recipients: props.selectedIds.map(rec => rec?._id || rec.id),
           subject,
@@ -495,7 +488,6 @@ const ComposeModalContainer = props => {
                 {isSubmissionCommentsType ? null : (
                   <HeaderInputs
                     activeCourseFilter={selectedContext}
-                    setUserNote={setUserNote}
                     contextName={props.pastConversation?.contextName}
                     courses={props.courses}
                     selectedRecipients={props.selectedIds}
@@ -504,11 +496,9 @@ const ComposeModalContainer = props => {
                     isForward={props.isForward}
                     onContextSelect={onContextSelect}
                     onSelectedIdsChange={onSelectedIdsChange}
-                    onUserNoteChange={onUserNoteChange}
                     onSendIndividualMessagesChange={onSendIndividualMessagesChange}
                     onSubjectChange={onSubjectChange}
                     onAddressBookInputValueChange={setAddressBookInputValue}
-                    userNote={userNote}
                     sendIndividualMessages={sendIndividualMessages}
                     subject={
                       props.isReply || props.isForward ? props.pastConversation?.subject : subject

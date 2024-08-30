@@ -450,7 +450,12 @@ class Lti::RegistrationsController < ApplicationController
 
   def index
     set_active_tab "apps"
-    add_crumb t("#crumbs.apps", "Apps")
+    breadcrumb_path = if @account.feature_enabled?(:lti_registrations_discover_page)
+                        account_lti_registrations_path(account_id: @account.id)
+                      else
+                        account_lti_manage_registrations_path(account_id: @account.id)
+                      end
+    add_crumb(t("#crumbs.apps", "Apps"), breadcrumb_path)
 
     # allows override of DR url hard-coded into Discover page
     # todo: remove once Discover page retrieves and uses correct DR url
@@ -534,7 +539,7 @@ class Lti::RegistrationsController < ApplicationController
 
       registration_ids = inherited_on_registration_bindings.map(&:registration_id)
       inherited_on_registrations = Shard.partition_by_shard(registration_ids) do |registration_ids_for_shard|
-        Lti::Registration.where(id: registration_ids_for_shard).eager_load(eager_load_models)
+        Lti::Registration.active.where(id: registration_ids_for_shard).eager_load(eager_load_models)
       end.flatten
 
       all_registrations = account_registrations + forced_on_in_site_admin + inherited_on_registrations + consortia_registrations
@@ -581,10 +586,65 @@ class Lti::RegistrationsController < ApplicationController
   end
 
   # @internal
-  def fetch_lti_configuration
-    result = CanvasHttp.get(params[:url])
+  # @API Validate LtiConfiguration
+  # Validates the provided LTI 1.3 JSON config against the LtiConfiguration schema,
+  # and returns any errors found. Also transforms the JSON from LtiConfiguration
+  # to InternalLtiConfiguration format before returning.
+  # JSON config can be provided via url that points to an endpoint hosted by a tool,
+  # or directly in the request body.
+  # This is a utility endpoint for the LTI registration UI. Fetching tool config server-side
+  # prevents CORS issues for the tool.
+  #
+  # @argument lti_configuration [Optional, JSON] The LTI 1.3 JSON config to validate.
+  # @argument url [Optional, String] The URL to fetch the LTI 1.3 JSON config from.
+  #
+  # @returns { configuration: Lti::ToolConfiguration } | { errors: [String] }
+  #
+  # @example_request
+  #
+  #   This would return the JSON in InternalLtiConfiguration format
+  #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/registrations/configuration/validate' \
+  #        -d '{"lti_configuration": <LTI JSON config>}' \
+  #        -H "Content-Type: application/json" \
+  #        -H "Authorization: Bearer <token>"
+  def validate_lti_configuration
+    unless params[:lti_configuration].present? || params[:url].present?
+      return render_configuration_errors(["one of lti_configuration or url is required"])
+    end
+    if params[:lti_configuration].present? && params[:url].present?
+      return render_configuration_errors(["only one of lti_configuration or url is allowed"])
+    end
 
-    render json: result.body
+    if params[:lti_configuration].present?
+      config = params.require(:lti_configuration).to_unsafe_h
+    else
+      begin
+        result = CanvasHttp.get(params.require(:url))
+
+        unless result.is_a?(Net::HTTPSuccess)
+          return render_configuration_errors(["invalid configuration url"])
+        end
+
+        config = JSON.parse(result.body)
+      rescue CanvasHttp::Error,
+             CanvasHttp::RelativeUriError,
+             CanvasHttp::InsecureUriError,
+             Timeout::Error,
+             SocketError,
+             SystemCallError,
+             OpenSSL::SSL::SSLError
+        return render_configuration_errors(["invalid configuration url"])
+      rescue JSON::ParserError
+        return render_configuration_errors(["url does not return JSON"])
+      end
+    end
+
+    errors = Schemas::LtiConfiguration.validation_errors(config)
+    if errors.present?
+      return render_configuration_errors(errors)
+    end
+
+    render json: { configuration: Schemas::InternalLtiConfiguration.from_lti_configuration(config) }
   end
 
   # @API Show an LTI Registration
@@ -692,6 +752,10 @@ class Lti::RegistrationsController < ApplicationController
   end
 
   private
+
+  def render_configuration_errors(errors)
+    render json: { errors: }, status: :unprocessable_entity
+  end
 
   def update_params
     params.permit(:admin_nickname).merge({ updated_by: @current_user })

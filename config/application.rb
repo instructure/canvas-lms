@@ -218,6 +218,32 @@ module CanvasRails
           # else try next host
         end
       end
+
+      def client_min_messages=(level)
+        return if level == "preset"
+
+        super
+      end
+
+      def set_standard_conforming_strings
+        # this has been the default since 9.1
+      end
+
+      def reconfigure_connection_timezone
+        return if @config[:timezone] == "preset"
+
+        super
+      end
+
+      def internal_execute(sql, name = "SCHEMA", *, **)
+        return super unless name == "SCHEMA"
+
+        if sql == "SET intervalstyle = iso_8601" && @config[:interval_style] == "preset"
+          return
+        end
+
+        super
+      end
     end
 
     module TypeMapInitializerExtensions

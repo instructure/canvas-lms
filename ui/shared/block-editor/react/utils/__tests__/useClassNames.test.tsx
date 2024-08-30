@@ -94,4 +94,46 @@ describe('useClassNames', () => {
     render(<TestComponent {...defaultTestProps({others: ['other-class', 'another-class']})} />)
     expect(document.getElementById('test')).toHaveAttribute('class', 'other-class another-class')
   })
+
+  describe('updating', () => {
+    it('should update enabled when it changes', () => {
+      const {rerender} = render(<TestComponent {...defaultTestProps()} />)
+      expect(document.getElementById('test')).not.toHaveClass('enabled')
+
+      rerender(<TestComponent {...defaultTestProps({enabled: true})} />)
+      expect(document.getElementById('test')).toHaveClass('enabled')
+    })
+
+    it('should update empty when it changes', () => {
+      const {rerender} = render(<TestComponent {...defaultTestProps({enabled: true})} />)
+      expect(document.getElementById('test')).not.toHaveClass('empty')
+
+      rerender(<TestComponent {...defaultTestProps({enabled: true, nodeState: {empty: true}})} />)
+      expect(document.getElementById('test')).toHaveClass('empty')
+    })
+
+    it('should update selected when it changes', () => {
+      const {rerender} = render(<TestComponent {...defaultTestProps()} />)
+      expect(document.getElementById('test')).not.toHaveClass('selected')
+
+      rerender(<TestComponent {...defaultTestProps({nodeState: {selected: true}})} />)
+      expect(document.getElementById('test')).toHaveClass('selected')
+    })
+
+    it('should update hovered when it changes', () => {
+      const {rerender} = render(<TestComponent {...defaultTestProps()} />)
+      expect(document.getElementById('test')).not.toHaveClass('hovered')
+
+      rerender(<TestComponent {...defaultTestProps({nodeState: {hovered: true}})} />)
+      expect(document.getElementById('test')).toHaveClass('hovered')
+    })
+
+    it('should update other classes when they change', () => {
+      const {rerender} = render(<TestComponent {...defaultTestProps()} />)
+      expect(document.getElementById('test')).not.toHaveAttribute('class', 'other-class')
+
+      rerender(<TestComponent {...defaultTestProps({others: 'other-class'})} />)
+      expect(document.getElementById('test')).toHaveAttribute('class', 'other-class')
+    })
+  })
 })

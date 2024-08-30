@@ -116,7 +116,7 @@ class RubricImport < ApplicationRecord
     error_data = []
 
     rubrics_by_name.each_with_index do |(rubric_name, rubric_data), rubric_index|
-      raise DataFormatError, I18n.t("Missing 'Rubric Name' for some rubrics.") if rubric_name.blank?
+      raise DataFormatError, I18n.t("Missing 'Rubric Name' in some rows.") if rubric_name.blank?
 
       rubric = context.rubrics.build(rubric_imports_id: id)
       criteria_hash = {}
@@ -170,6 +170,36 @@ class RubricImport < ApplicationRecord
       RubricImport.find_by(account: context, id:)
     else
       RubricImport.find_by(course: context, id:)
+    end
+  end
+
+  def self.template_file
+    column_headers = [
+      "Rubric Name",
+      "Criteria Name",
+      "Criteria Description",
+      "Criteria Enable Range",
+      "Rating Name",
+      "Rating Description",
+      "Rating Points",
+      "Rating Name",
+      "Rating Description",
+      "Rating Points",
+      "Rating Name",
+      "Rating Description",
+      "Rating Points"
+    ]
+
+    rubric_data = [
+      ["Rubric 1", "Criteria 1", "Criteria 1 Description", "false", "Rating 1", "Rating 1 Description", "2", "Rating 2", "Rating 2 Description", "1", "Rating 3", "Rating 3 Description", "0"],
+      ["Rubric 1", "Criteria 2", "Criteria 2 Description", "false", "Criteria 2 Rating 1", "Rating Description", "1", "Criteria 2 Rating 2", "Rating 2 Description", "1"],
+    ]
+
+    CSV.generate do |csv|
+      csv << column_headers
+      rubric_data.each do |rubric|
+        csv << rubric
+      end
     end
   end
 end

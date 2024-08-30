@@ -24,7 +24,8 @@
       :assessor_id => @current_user.id.to_s,
       :assessment_type => can_do(@assignment, @current_user, :grade) ? "grading" : "peer_review"
     },
-    studio_media_capture_enabled: Account.site_admin.feature_enabled?(:speedgrader_studio_media_capture)
+    studio_media_capture_enabled: Account.site_admin.feature_enabled?(:speedgrader_studio_media_capture),
+    ENTRY_ID: @entry_id
   })
   @show_left_side = false
   @show_embedded_chat = false
@@ -205,6 +206,9 @@
           </div>
 
           <div class="content_box">
+            <% if @domain_root_account.feature_enabled?(:discussion_checkpoints) %>
+              <div id="speed_grader_discussions_navigation_mount_point"></div>
+            <% end %>
             <% if @assignment.active_rubric_association? %>
             <div id="rubric_full" style="display: none;">
                 <h2><%= t("Grading") %></h2>
@@ -277,6 +281,9 @@
                     <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="avatar" alt="" style="display: none;"/>
                     <span class="draft-marker" aria-label="<%= t('Draft comment') %>"><%=t('DRAFT')%></span>
                     <span class="comment"></span>
+                    <a href="javascript:void 0;" class="edit_comment_link icon-edit">
+                      <span class="screenreader-only"><%= t('Edit Draft comment') %></span>
+                    </a>
                     <button class="submit_comment_button">
                       <span><%= t('Submit') %></span>
                     </button>

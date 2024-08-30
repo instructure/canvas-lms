@@ -322,6 +322,30 @@ describe('CourseAvailabilityOptions', () => {
       })
       expect(queryByText(warningText)).toBeInTheDocument()
     })
+
+    it('is not shown if conclude_at is blank', () => {
+      const {queryByText} = renderComponent(wrapper, {
+        course_start_at: moment('2020-10-16T12:00:00Z').toISOString(),
+        course_conclude_at: '',
+      })
+      expect(queryByText(warningText)).not.toBeInTheDocument()
+    })
+
+    it('is not shown if start_at is blank', () => {
+      const {queryByText} = renderComponent(wrapper, {
+        course_start_at: '',
+        course_conclude_at: moment('2020-10-15T12:00:00Z').toISOString()
+      })
+      expect(queryByText(warningText)).not.toBeInTheDocument()
+    })
+
+    it('is not shown if start_at and conclude_at are blank', () => {
+      const {queryByText} = renderComponent(wrapper, {
+        course_start_at: '',
+        course_conclude_at: ''
+      })
+      expect(queryByText(warningText)).not.toBeInTheDocument()
+    })
   })
 
   describe('shows local and course time', () => {

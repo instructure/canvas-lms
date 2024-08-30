@@ -24,11 +24,6 @@
       <%= t 'links.message_user', "Message %{user}", :user => context_user_name(@context, @user) %>
     </a>
     <div id="manage-temp-enrollments-mount-point"></div>
-    <% if @domain_root_account.try_rescue(:enable_user_notes) and can_do(@user, @current_user, :read_user_notes) %>
-      <a href="<%= user_user_notes_path(@user) %>" class="btn button-sidebar-wide">
-        <%= t('buttons.faculty_journal_for', 'Faculty Journal for %{user}', :user => context_user_name(@context, @user)) %>
-      </a>
-    <% end %>
     <% if @context_account.is_a?(Account) &&
           @user.grants_right?(@current_user, :generate_observer_pairing_code) &&
           @user.has_student_enrollment? &&
@@ -91,7 +86,7 @@
     <div id="temporary_enrollments_courses_list" style="<%= hidden if @enrollments.empty? %>">
       <h3><%= t('courses', 'Courses') %> <%= count_if_any(@enrollments.select(&:temporary_enrollment?).count) %></h3>
       <div class="courses" style="font-size: 1.2em">
-        <ul class="unstyled_list context_list" style="margin-<%= direction('left') %>: 5px; font-size: 0.9em; margin-bottom: 10px; max-height: 200px; overflow: auto;">
+        <ul class="unstyled_list context_list" style="margin-<%= direction('left') %>: 5px; font-size: 0.9em; margin-bottom: 10px; max-height: 200px; overflow: auto; position: relative;">
           <% @enrollments.each do |enrollment| %>
             <% num_enrollments += 1 %>
             <%= render :partial => "enrollment", :object => enrollment if enrollment.temporary_enrollment? %>
@@ -109,7 +104,7 @@
     <div id="courses_list" style="<%= hidden if @enrollments.empty? %>">
       <h3><%= t('courses', 'Courses') %> <%= count_if_any(@enrollments.reject(&:temporary_enrollment?).count) %></h3>
       <div class="courses" style="font-size: 1.2em">
-        <ul class="unstyled_list context_list" style="margin-<%= direction('left') %>: 5px; font-size: 0.9em; margin-bottom: 10px; max-height: 200px; overflow: auto;">
+        <ul class="unstyled_list context_list" style="margin-<%= direction('left') %>: 5px; font-size: 0.9em; margin-bottom: 10px; max-height: 200px; overflow: auto; position: relative;">
           <% @enrollments.each do |enrollment| %>
             <% num_enrollments += 1 %>
             <%= render :partial => "enrollment", :object => enrollment unless enrollment.temporary_enrollment? %>
@@ -120,7 +115,7 @@
     <% if @user.adminable_accounts && !@user.adminable_accounts.empty? %>
       <h3><%= t('accounts', 'Accounts') %> <%= count_if_any(@user.adminable_accounts.count) %></h3>
       <div class="accounts" style="font-size: 1.2em">
-        <ul class="unstyled_list context_list" style="margin-<%= direction('left') %>: 5px; font-size: 0.9em; margin-bottom: 10px; max-height: 200px; overflow: auto;">
+        <ul class="unstyled_list context_list" style="margin-<%= direction('left') %>: 5px; font-size: 0.9em; margin-bottom: 10px; max-height: 200px; overflow: auto; position: relative;">
           <% @user.adminable_accounts.each do |account| %>
             <% num_enrollments += 1 %>
             <li>
@@ -143,7 +138,7 @@
     <% if !@group_memberships.empty? %>
       <h3><%= t('groups', 'Groups') %> <%= count_if_any(@group_memberships.count) %></h3>
       <div class="groups" style="font-size: 1.2em">
-        <ul class="unstyled_list context_list" style="margin-<%= direction('left') %>: 5px; font-size: 0.9em; max-width: 800px; margin-bottom: 10px; max-height: 200px; overflow: auto;">
+        <ul class="unstyled_list context_list" style="margin-<%= direction('left') %>: 5px; font-size: 0.9em; max-width: 800px; margin-bottom: 10px; max-height: 200px; overflow: auto; position: relative;">
           <% @group_memberships.each do |membership| %>
             <% num_enrollments += 1 %>
             <li>

@@ -338,6 +338,7 @@ export const DiscussionPostToolbar = props => {
               locale={ENV.LOCALE || 'en'}
               timezone={ENV.TIMEZONE || 'UTC'}
               removeDueDateInput={!props.isGraded}
+              isCheckpointed={props.isCheckpointed}
             />
           )}
         </View>
@@ -373,6 +374,7 @@ DiscussionPostToolbar.propTypes = {
   contextType: PropTypes.oneOf(['Course', 'Group']),
   manageAssignTo: PropTypes.bool,
   isGroupDiscussion: PropTypes.bool,
+  isCheckpointed: PropTypes.bool,
 }
 
 DiscussionPostToolbar.defaultProps = {

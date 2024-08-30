@@ -21,20 +21,21 @@ class AuthenticationProvidersPresenter
   include ActionView::Helpers::FormTagHelper
   include ActionView::Helpers::FormOptionsHelper
 
-  attr_reader :account
+  attr_reader :account, :user
 
-  def initialize(acc)
-    @account = acc
+  def initialize(account = nil, user = nil)
+    @account = account
+    @user = user
   end
 
   def configs
-    @configs ||= account.authentication_providers.active.to_a
+    @configs ||= account.authentication_providers.active.select { |ap| ap.visible_to?(user) }
   end
 
   def new_auth_types
     AuthenticationProvider.valid_auth_types.filter_map do |auth_type|
       klass = AuthenticationProvider.find_sti_class(auth_type)
-      next unless klass.enabled?(account)
+      next unless klass.enabled?(account, user)
       next if klass.singleton? && configs.any?(klass)
 
       klass

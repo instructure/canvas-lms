@@ -190,12 +190,14 @@ const Columns: ReadonlyArray<Column> = [
                   await navigator.clipboard.writeText(developerKeyId)
                   showFlashAlert({
                     type: 'info',
-                    message: I18n.t('Client ID copied'),
+                    message: I18n.t('Client ID copied (%{id})', {id: developerKeyId}),
                   })
                 } catch (error) {
                   showFlashAlert({
                     type: 'error',
-                    message: I18n.t('There was an issue copying the client ID'),
+                    message: I18n.t('There was an issue copying the client ID (%{id})', {
+                      id: developerKeyId,
+                    }),
                   })
                 }
               }}

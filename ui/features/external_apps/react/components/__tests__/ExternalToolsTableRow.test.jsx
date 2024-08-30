@@ -201,6 +201,21 @@ describe('ExternalToolsTableRow', () => {
       expect(checkbox2.disabled).toBe(false)
     })
 
+    it('enables toggle if 2 tools are already favorites, this row is not, but it is an on_by_default tool', () => {
+      window.INST = {
+        editorButtons: [{id: 1, on_by_default: true}],
+      }
+      const {getByLabelText} = renderRow({
+        tool: tools[0],
+        rceFavoriteCount: 2,
+        topNavFavoriteCount: 2,
+        showLTIFavoriteToggles: true,
+      })
+
+      const checkbox = getByLabelText('RCE Favorite').closest('input[type="checkbox"]')
+      expect(checkbox.disabled).toBe(false)
+    })
+
     it('calls store.setAsFavorite when toggle is flipped', () => {
       const {getByLabelText} = renderRow({showLTIFavoriteToggles: true})
       expect(getByLabelText('RCE Favorite')).toBeInTheDocument()

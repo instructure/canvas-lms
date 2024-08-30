@@ -393,7 +393,15 @@ module Types
             observed_user_id = dashboard_filter[:observed_user_id].to_i
             opts[:observee_user] = User.find_by(id: observed_user_id) || current_user
           end
-          object.menu_courses(nil, opts)
+
+          menu_courses = object.menu_courses(nil, opts)
+          published, unpublished = menu_courses.partition(&:published?)
+
+          Rails.cache.write(["last_known_dashboard_cards_published_count", current_user.global_id].cache_key, published.count)
+          Rails.cache.write(["last_known_dashboard_cards_unpublished_count", current_user.global_id].cache_key, unpublished.count)
+          Rails.cache.write(["last_known_k5_cards_count", current_user.global_id].cache_key, menu_courses.count { |course| !course.homeroom_course? })
+
+          menu_courses
         end
       end
     end

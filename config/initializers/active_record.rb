@@ -785,27 +785,32 @@ class ActiveRecord::Base
   end
 
   def insert(on_conflict: -> { raise ActiveRecord::RecordNotUnique })
-    new_id = nil
-    timestamp = Time.now
+    validate!
 
     run_callbacks :save do
-      self.created_at ||= timestamp
-      self.updated_at ||= timestamp
+      run_callbacks :create do
+        timestamp = Time.now
 
-      content = attributes.compact
+        self.created_at ||= timestamp
+        self.updated_at ||= timestamp
 
-      result = self.class.insert(content)
-      new_id = result.first&.fetch("id")
+        content = attributes.compact
+
+        result = self.class.insert(content)
+        new_id = result.first&.fetch("id")
+
+        # if insert was not successful, return with callback
+        return on_conflict.call unless new_id
+
+        # otherwise update the state of the model
+        self.id = new_id
+        @new_record = false
+        @previously_new_record = true
+        changes_applied
+      end
     end
 
-    if new_id
-      self.id = new_id
-      changes_applied
-      @new_record = false
-      self
-    else
-      on_conflict.call
-    end
+    self
   end
 end
 

@@ -146,6 +146,8 @@ const DiscussionTopicManager = props => {
   }
 
   const isModuleItem = ENV.SEQUENCE != null
+  const urlParams = new URLSearchParams(window.location.search)
+  const isPersistEnabled = urlParams.get('persist') === '1'
 
   // Unread filter
   // This introduces a double query for DISCUSSION_QUERY when filter changes
@@ -169,7 +171,7 @@ const DiscussionTopicManager = props => {
   }, [pageNumber, searchPageNumber, searchTerm])
 
   useEffect(() => {
-    if (isTopicHighlighted) {
+    if (isTopicHighlighted && !isPersistEnabled) {
       setTimeout(() => {
         setIsTopicHighlighted(false)
       }, HIGHLIGHT_TIMEOUT)
@@ -177,7 +179,7 @@ const DiscussionTopicManager = props => {
   }, [isTopicHighlighted])
 
   useEffect(() => {
-    if (highlightEntryId) {
+    if (highlightEntryId && !isPersistEnabled) {
       setTimeout(() => {
         setHighlightEntryId(null)
       }, HIGHLIGHT_TIMEOUT)

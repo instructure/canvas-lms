@@ -21,7 +21,8 @@ import userEvent from '@testing-library/user-event'
 import {mockConfigWithPlacements, mockRegistration} from './helpers'
 import {PlacementsConfirmation, UNDOCUMENTED_PLACEMENTS} from '../components/PlacementsConfirmation'
 import {createRegistrationOverlayStore} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
-import {LtiPlacements, i18nLtiPlacement} from '../../model/LtiPlacement'
+import {LtiPlacements} from '../../model/LtiPlacement'
+import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
 
 describe('PlacementsConfirmation', () => {
   it('renders the PlacementsConfirmation', () => {
@@ -105,7 +106,7 @@ describe('PlacementsConfirmation', () => {
     const config = mockConfigWithPlacements([
       LtiPlacements.CourseNavigation,
       LtiPlacements.AccountNavigation,
-      LtiPlacements.RichTextEditor,
+      LtiPlacements.EditorButton,
     ])
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
@@ -178,7 +179,7 @@ describe('PlacementsConfirmation', () => {
     const placements = [
       LtiPlacements.CourseNavigation,
       LtiPlacements.AssignmentSelection,
-      LtiPlacements.ContentArea,
+      LtiPlacements.LinkSelection,
     ]
     const config = mockConfigWithPlacements(placements)
     const reg = mockRegistration({}, config)

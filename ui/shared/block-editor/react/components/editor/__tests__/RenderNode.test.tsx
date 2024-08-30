@@ -37,6 +37,7 @@ function renderEditor(props = {}) {
 
   return render(
     <BlockEditor
+      enableResizer={false} // jsdom doesn't render enough for BlockResizer to work
       container={container}
       version="1"
       content={blank_section_with_button_and_heading}

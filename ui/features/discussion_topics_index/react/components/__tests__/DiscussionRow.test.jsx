@@ -319,6 +319,66 @@ describe('DiscussionRow', () => {
     expect(screen.queryByText('To do', {exact: false})).not.toBeInTheDocument()
   })
 
+  it('renders checkpoint information', () => {
+    const props = makeProps({
+      discussion: {
+        reply_to_entry_required_count: 2,
+        assignment: {
+          checkpoints: [
+            {
+              tag: 'reply_to_topic',
+              points_possible: 20,
+              due_at: '2024-09-14T05:59:00Z',
+            },
+            {
+              tag: 'reply_to_entry',
+              points_possible: 10,
+              due_at: '2024-09-21T05:59:00Z',
+            },
+          ],
+        },
+      },
+    })
+    render(<DiscussionRow {...props} />) 
+    expect(screen.queryByText('Reply to topic:', {exact: false})).toBeInTheDocument()
+    expect(screen.queryByText('Required replies (2):', {exact: false})).toBeInTheDocument()
+    expect(
+      screen.queryByText(props.dateFormatter('2024-09-14T05:59:00Z'), {exact: false})
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText(props.dateFormatter('2024-09-21T05:59:00Z'), {exact: false})
+    ).toBeInTheDocument()
+    expect(screen.queryByText('No Due Date', {exact: false})).not.toBeInTheDocument()
+  })
+
+  it('renders checkpoint information without due dates', () => {
+    const props = makeProps({
+      discussion: {
+        reply_to_entry_required_count: 4,
+        assignment: {
+          checkpoints: [
+            {
+              tag: 'reply_to_topic',
+              points_possible: 10,
+              due_at: null,
+            },
+            {
+              tag: 'reply_to_entry',
+              points_possible: 20,
+              due_at: null,
+            },
+          ],
+        },
+      },
+    })
+    render(<DiscussionRow {...props} />)
+    expect(
+      screen.queryByText('Reply to topic: No Due Date Required replies (4): No Due Date', {
+        exact: false,
+      })
+    ).toBeInTheDocument()
+  })
+
   it('renders to do date if ungraded with a to do date', () => {
     const props = makeProps({
       discussion: {

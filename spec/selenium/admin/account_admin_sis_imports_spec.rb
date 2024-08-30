@@ -138,6 +138,7 @@ describe "sis imports ui" do
     f("#batch_mode").click
     f("input[type=file]").send_keys Rails.root.join("spec/fixtures/sis/utf8.csv")
     submit_form("#sis_importer")
+    f("#confirmation_modal_confirm").click
     expect(f(".progress_bar_holder .progress_message")).to be_displayed
     expect(SisBatch.last.batch_mode).to be true
     expect(SisBatch.last.options).to eq({

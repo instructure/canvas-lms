@@ -314,6 +314,7 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Edit Ikon" },
   "edit_link_7f53bebb": { "message": "Edit Pautan" },
+  "editor_status_bar_653f44ee": { "message": "Bar Status Editor" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Elemen bermula dengan { start }"
   },

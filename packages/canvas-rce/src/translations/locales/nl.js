@@ -321,6 +321,7 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Pictogram Bewerken" },
   "edit_link_7f53bebb": { "message": "Link bewerken" },
+  "editor_status_bar_653f44ee": { "message": "Statusbalk editor" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Element dat begint met { start }"
   },

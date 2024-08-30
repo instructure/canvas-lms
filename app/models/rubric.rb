@@ -453,6 +453,7 @@ class Rubric < ActiveRecord::Base
   Rating = Struct.new(:description, :long_description, :points, :id, :criterion_id, :migration_id, :percentage, keyword_init: true)
   def generate_criteria(params)
     @used_ids = {}
+    valid_bools = [true, "true", "1"]
     title = params[:title] || t("context_name_rubric", "%{course_name} Rubric", course_name: context.name)
     criteria = []
     (params[:criteria] || {}).each do |idx, criterion_data|
@@ -474,7 +475,7 @@ class Rubric < ActiveRecord::Base
         if outcome
           criterion[:learning_outcome_id] = outcome.id
           criterion[:mastery_points] = ((criterion_data[:mastery_points] || outcome.data[:rubric_criterion][:mastery_points]).to_f rescue nil)
-          criterion[:ignore_for_scoring] = criterion_data[:ignore_for_scoring] == "1"
+          criterion[:ignore_for_scoring] = valid_bools.include?(criterion_data[:ignore_for_scoring])
         end
       end
 

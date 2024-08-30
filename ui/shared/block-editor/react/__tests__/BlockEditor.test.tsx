@@ -39,6 +39,7 @@ function renderEditor(props = {}) {
     <BlockEditor
       container={container}
       version="1"
+      enableResizer={false} // jsdom doesn't render enough for BlockResizer to work
       content={blank_page}
       onCancel={() => {}}
       {...props}

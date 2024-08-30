@@ -26,6 +26,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SubmissionComment} from '@canvas/assignments/graphql/student/SubmissionComment'
 import {MediaPlayer} from '@instructure/ui-media-player'
 import {Link} from '@instructure/ui-link'
+import sanitizeHtml from 'sanitize-html-with-tinymce'
 
 const I18n = useI18nScope('assignments_2')
 
@@ -74,9 +75,11 @@ export default function CommentRow(props) {
             dateTime={props.comment.updatedAt}
           />
         </Text>
-        <Text color={props.comment._id === 'pending' ? 'secondary' : null} wrap="break-word">
-          {props.comment.comment}
-        </Text>
+        <Text
+          color={props.comment._id === 'pending' ? 'secondary' : null}
+          wrap="break-word"
+          dangerouslySetInnerHTML={{__html: sanitizeHtml(props.comment.comment)}}
+        />
         {props.comment.attachments.map(attachment => (
           <Link
             key={attachment._id}

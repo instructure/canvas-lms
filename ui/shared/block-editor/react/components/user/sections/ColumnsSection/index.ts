@@ -17,16 +17,16 @@
  */
 
 import {IconTableInsertColumnAfterLine} from '@instructure/ui-icons/es/svg'
-import {ColumnsSection} from './ColumnsSection'
-import {type ColumnsSectionVariant, type ColumnsSectionProps} from './types'
+import {ColumnsSection, ColumnsSectionInner} from './ColumnsSection'
+import {type ColumnsSectionProps} from './types'
 import {ColumnsSectionToolbar} from './ColumnsSectionToolbar'
 
 const ColumnsSectionIcon = IconTableInsertColumnAfterLine?.src
 
 export {
   ColumnsSection,
+  ColumnsSectionInner,
   ColumnsSectionToolbar,
   ColumnsSectionIcon,
-  type ColumnsSectionVariant,
   type ColumnsSectionProps,
 }

@@ -307,6 +307,7 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "تحرير الأيقونة" },
   "edit_link_7f53bebb": { "message": "تحرير الارتباط" },
+  "editor_status_bar_653f44ee": { "message": "شريط حالة المحرر" },
   "element_starting_with_start_91bf4c3b": {
     "message": "عنصر يبدأ بـ { start }"
   },

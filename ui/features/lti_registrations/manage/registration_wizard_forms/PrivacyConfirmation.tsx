@@ -25,11 +25,10 @@ import {Text} from '@instructure/ui-text'
 import {htmlEscape} from '@instructure/html-escape'
 import {
   AllLtiPrivacyLevels,
-  i18nLtiPrivacyLevel,
-  i18nLtiPrivacyLevelDescription,
   isLtiPrivacyLevel,
   type LtiPrivacyLevel,
 } from '../model/LtiPrivacyLevel'
+import {i18nLtiPrivacyLevel, i18nLtiPrivacyLevelDescription} from '../model/i18nLtiPrivacyLevel'
 
 const I18n = useI18nScope('lti_registration.wizard')
 

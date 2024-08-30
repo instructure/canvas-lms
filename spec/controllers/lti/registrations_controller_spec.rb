@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_relative "../../lti_1_3_tool_configuration_spec_helper"
+
 describe Lti::RegistrationsController do
   let(:response_json) do
     body = response.parsed_body
@@ -199,6 +201,27 @@ describe Lti::RegistrationsController do
             ims_registration
             subject
             expect(response_data.find { |r| r["id"] == ims_registration.lti_registration_id }["ims_registration_id"]).to eq(ims_registration.id)
+          end
+        end
+
+        context "when developer key is deleted" do
+          # introduces `tool_configuration`
+          include_context "lti_1_3_tool_configuration_spec_helper"
+
+          let(:developer_key) { developer_key_model(account:, lti_registration: registration, is_lti_key: true, public_jwk_url: "https://example.com") }
+          let(:registration) { lti_registration_model(account:) }
+
+          before do
+            tool_configuration
+            # enable key
+            developer_key.developer_key_account_bindings.first.update! workflow_state: :on
+            developer_key.destroy
+          end
+
+          it "should not include registration" do
+            expect(registration.reload).to be_deleted
+            subject
+            expect(response_data.pluck(:id)).not_to include(registration.id)
           end
         end
 
@@ -742,6 +765,168 @@ describe Lti::RegistrationsController do
 
       it "updates the existing binding" do
         expect { subject }.to change { account_binding.reload.workflow_state }.from(initial_workflow_state).to(workflow_state).and change { account_binding.updated_by }.from(initial_updated_by).to(admin)
+      end
+    end
+  end
+
+  describe "POST validate", type: :request do
+    subject { post "/api/v1/accounts/#{account.id}/lti_registrations/configuration/validate", params: { url:, lti_configuration: }.compact, as: :json }
+
+    let(:url) { nil }
+    let(:lti_configuration) { nil }
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      let(:student) { student_in_course(account:).user }
+
+      before { user_session(student) }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with flag disabled" do
+      before { account.disable_feature!(:lti_registrations_page) }
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    context "without any params" do
+      it "returns 422" do
+        subject
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response_json.dig("errors", 0)).to include("lti_configuration or url is required")
+      end
+    end
+
+    context "with both params" do
+      let(:url) { "http://example.com" }
+      let(:lti_configuration) { { title: "Title" } }
+
+      it "returns 422" do
+        subject
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response_json.dig("errors", 0)).to include("only one of lti_configuration or url")
+      end
+    end
+
+    context "with invalid lti_configuration" do
+      let(:lti_configuration) { { title: "Title" } }
+
+      it "returns 422" do
+        subject
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response_json.dig("errors", 0)).to include("required")
+      end
+    end
+
+    context "with valid lti_configuration" do
+      # introduces `settings` (hard-coded JSON LtiConfiguration)
+      include_context "lti_1_3_tool_configuration_spec_helper"
+
+      let(:lti_configuration) { settings }
+
+      it "is successful" do
+        subject
+        expect(response).to be_successful
+      end
+
+      it "transforms the configuration" do
+        subject
+        expect(response_json["configuration"]).to eq internal_configuration.with_indifferent_access.except(:redirect_uris)
+      end
+    end
+
+    context "with url" do
+      let(:url) { "http://example.com" }
+      let(:result) { nil }
+
+      before do
+        allow(CanvasHttp).to receive(:get).with(url).and_return(result)
+      end
+
+      context "when url errors" do
+        before do
+          allow(CanvasHttp).to receive(:get).with(url).and_raise(CanvasHttp::Error)
+        end
+
+        it "returns 422" do
+          subject
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+
+      context "when url can't connect" do
+        before do
+          allow(CanvasHttp).to receive(:get).with(url).and_raise(SocketError)
+        end
+
+        it "returns 422" do
+          subject
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+
+      context "when url responds with non-200" do
+        let(:result) { double(class: Net::HTTPBadRequest, code: 400) }
+
+        it "returns 422" do
+          subject
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+
+      context "when url responds with non-JSON" do
+        let(:result) { double(class: Net::HTTPSuccess, is_a?: true, body: "invalid json") }
+
+        it "returns 422" do
+          subject
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+
+      context "when url responds with JSON" do
+        let(:result) { double(class: Net::HTTPSuccess, is_a?: true, body: config.to_json) }
+
+        context "when configuration is invalid" do
+          let(:config) { { title: "Title" } }
+
+          it "returns 422" do
+            subject
+            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response_json.dig("errors", 0)).to include("required")
+          end
+        end
+
+        context "when configuration is valid" do
+          # introduces `settings` (hard-coded JSON LtiConfiguration)
+          include_context "lti_1_3_tool_configuration_spec_helper"
+
+          let(:config) { settings }
+
+          it "is successful" do
+            subject
+            expect(response).to be_successful
+          end
+
+          it "transforms the configuration" do
+            subject
+            expect(response_json["configuration"]).to eq internal_configuration.with_indifferent_access.except(:redirect_uris)
+          end
+        end
       end
     end
   end

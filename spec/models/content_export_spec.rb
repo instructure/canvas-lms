@@ -483,6 +483,17 @@ describe ContentExport do
         expect(@ce.settings[:contains_new_quizzes]).to be_nil
       end
 
+      it "contains lti assignments" do
+        expect(@ce.course.assignments.active.type_quiz_lti.where.not(workflow_state: "failed_to_duplicate").count).to eq(1)
+      end
+
+      it "does not contain failed_to_duplicate lti assignments" do
+        lti_assignment = @ce.course.assignments.first
+        lti_assignment.workflow_state = "failed_to_duplicate"
+        lti_assignment.save!
+        expect(@ce.course.assignments.active.type_quiz_lti.where.not(workflow_state: "failed_to_duplicate").count).to eq(0)
+      end
+
       describe "setting the contains_new_quizzes setting" do
         context "when the course has New Quizzes assignments" do
           it "the settings to contains_new_quizzes should be set to true" do

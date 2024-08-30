@@ -61,9 +61,9 @@ export const DateAdjustments = ({
 }) => {
   const [dateOperation, setDateOperation] = useState<'shift_dates' | 'remove_dates'>('shift_dates')
   const [start_from_date, setStartFromDate] = useState('')
-  const [start_to_date, setStartToDate] = useState('')
+  const [start_to_date, setStartToDate] = useState(ENV.OLD_START_DATE || '')
   const [end_from_date, setEndFromDate] = useState('')
-  const [end_to_date, setEndToDate] = useState('')
+  const [end_to_date, setEndToDate] = useState(ENV.OLD_END_DATE || '')
 
   const handleSetDate = (date: Date | null, setter: any, key: string) => {
     const tmp = JSON.parse(JSON.stringify(dateAdjustments))

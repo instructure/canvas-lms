@@ -247,6 +247,11 @@ describe CanvadocSessionsController do
       assert_status(401)
     end
 
+    it "needs an HMAC and blob" do
+      get :show
+      assert_status(400)
+    end
+
     it "sends o365 as a preferred plugin when the 'Prefer Office 365 file viewer' account setting is enabled" do
       Account.default.settings[:canvadocs_prefer_office_online] = true
       Account.default.save!

@@ -1387,7 +1387,7 @@ describe "RCE next tests", :ignore_js_errors do
         fj('button:contains("Save")').click
         wait_for_ajaximations
         expect(f(".show-content.user_content p span").attribute("style")).to eq(
-          'font-family: "Balsamiq Sans", lato, "Helvetica Neue", Helvetica, Arial, sans-serif;'
+          'font-family: "Balsamiq Sans", "Lato Extended", "Helvetica Neue", Helvetica, Arial, sans-serif;'
         )
       end
 
@@ -1400,7 +1400,7 @@ describe "RCE next tests", :ignore_js_errors do
         fj('button:contains("Save")').click
         wait_for_ajaximations
         expect(f(".show-content.user_content p span").attribute("style")).to eq(
-          'font-family: "Architects Daughter", lato, "Helvetica Neue", Helvetica, Arial, sans-serif;'
+          'font-family: "Architects Daughter", "Lato Extended", "Helvetica Neue", Helvetica, Arial, sans-serif;'
         )
       end
     end

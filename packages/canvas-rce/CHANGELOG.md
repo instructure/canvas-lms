@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 5.13.4 - 2024-08-12
 
+### Fixed
+
+- RCE "Lato Extended" now properly uses the "Lato Extended" font
+
+## 5.13.4 - 2024-08-12
+
 ### Changed
 
 - Icon Maker tray now stays open until the user closes it with the close button

@@ -47,7 +47,7 @@ import {
 } from '@canvas/calendar/react/RecurringEvents/FrequencyPicker/utils'
 import {renderUpdateCalendarEventDialog} from '@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog'
 import FrequencyPicker from '@canvas/calendar/react/RecurringEvents/FrequencyPicker/FrequencyPicker'
-import {encodeQueryString} from '@canvas/query-string-encoding'
+import {encodeQueryString} from '@instructure/query-string-encoding'
 
 const I18n = useI18nScope('calendar.edit_calendar_event')
 

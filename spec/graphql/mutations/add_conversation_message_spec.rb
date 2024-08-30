@@ -49,8 +49,7 @@ RSpec.describe Mutations::AddConversationMessage do
     included_messages: nil,
     attachment_ids: nil,
     media_comment_id: nil,
-    media_comment_type: nil,
-    user_note: nil
+    media_comment_type: nil
   )
     <<~GQL
       mutation {
@@ -62,7 +61,6 @@ RSpec.describe Mutations::AddConversationMessage do
           #{"attachmentIds: #{attachment_ids}" if attachment_ids}
           #{"mediaCommentId: \"#{media_comment_id}\"" if media_comment_id}
           #{"mediaCommentType: \"#{media_comment_type}\"" if media_comment_type}
-          #{"userNote: #{user_note}" unless user_note.nil?}
         }) {
           conversationMessage {
             _id
@@ -182,46 +180,6 @@ RSpec.describe Mutations::AddConversationMessage do
     expect(@conversation.reload.messages.count(:all)).to eq 1
     run_jobs
     expect(@conversation.reload.messages.count(:all)).to eq 2
-  end
-
-  context "when the deprecate_faculty_journal feature flag is disabled" do
-    before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
-
-    it "generates a user note when requested" do
-      Account.default.update_attribute(:enable_user_notes, true)
-      conversation(users: [@teacher])
-
-      result = run_mutation({ conversation_id: @conversation.conversation_id, body: "Have a note", recipients: [@student.id.to_s] }, @teacher)
-      expect(result["errors"]).to be_nil
-      cm = ConversationMessage.find(result.dig("data", "addConversationMessage", "conversationMessage", "_id"))
-      student = cm.recipients.first
-      expect(student.user_notes.size).to eq 0
-
-      result = run_mutation({ conversation_id: @conversation.conversation_id, body: "Have a note", recipients: [@student.id.to_s], user_note: true }, @teacher)
-      expect(result["errors"]).to be_nil
-      cm = ConversationMessage.find(result.dig("data", "addConversationMessage", "conversationMessage", "_id"))
-      student = cm.recipients.first
-      expect(student.user_notes.size).to eq 1
-    end
-  end
-
-  context "when the deprecated_faculty_journal feature flag is enabled" do
-    it "does not generate a user note when requested" do
-      Account.default.update_attribute(:enable_user_notes, true)
-      conversation(users: [@teacher])
-
-      result = run_mutation({ conversation_id: @conversation.conversation_id, body: "Have a note", recipients: [@student.id.to_s] }, @teacher)
-      expect(result["errors"]).to be_nil
-      cm = ConversationMessage.find(result.dig("data", "addConversationMessage", "conversationMessage", "_id"))
-      student = cm.recipients.first
-      expect(student.user_notes.size).to eq 0
-
-      result = run_mutation({ conversation_id: @conversation.conversation_id, body: "Have a note", recipients: [@student.id.to_s], user_note: true }, @teacher)
-      expect(result["errors"]).to be_nil
-      cm = ConversationMessage.find(result.dig("data", "addConversationMessage", "conversationMessage", "_id"))
-      student = cm.recipients.first
-      expect(student.user_notes.size).to eq 0
-    end
   end
 
   it "does not allow new messages in concluded courses for students" do

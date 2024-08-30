@@ -23,6 +23,7 @@ import type {
   DeleteRubricQueryResponse,
   DuplicateRubricQueryResponse,
   archiveRubricResponse,
+  RubricImport,
 } from '../types/Rubric'
 import getCookie from '@instructure/get-cookie'
 import qs from 'qs'
@@ -49,6 +50,7 @@ const COURSE_RUBRICS_QUERY = gql`
             points
             longDescription
             description
+            ignoreForScoring
           }
           hasRubricAssociations
           hidePoints
@@ -81,6 +83,7 @@ const ACCOUNT_RUBRICS_QUERY = gql`
             points
             longDescription
             description
+            ignoreForScoring
           }
           hasRubricAssociations
           hidePoints
@@ -111,6 +114,7 @@ const RUBRIC_PREVIEW_QUERY = gql`
         description
         criterionUseRange
         learningOutcomeId
+        ignoreForScoring
         masteryPoints
         outcome {
           displayName
@@ -376,4 +380,123 @@ export const unarchiveRubric = async (rubricId: string): Promise<archiveRubricRe
   })
 
   return rubric
+}
+
+export const importRubric = async (
+  file?: File,
+  accountId?: string,
+  courseId?: string
+): Promise<RubricImport> => {
+  if (!file) {
+    throw new Error('No file to import')
+  }
+
+  const urlPrefix = accountId ? `/accounts/${accountId}` : `/courses/${courseId}`
+  const url = `/api/v1/${urlPrefix}/rubrics/upload`
+
+  const formData = new FormData()
+  formData.append('attachment', file)
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'X-CSRF-Token': getCookie('_csrf_token'),
+    },
+    body: formData,
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to import rubric: ${response.statusText}`)
+  }
+
+  return mapImport(await response.json())
+}
+
+export const fetchRubricImport = async (
+  importId?: string,
+  accountId?: string,
+  courseId?: string
+): Promise<RubricImport> => {
+  const urlPrefix = accountId ? `/accounts/${accountId}` : `/courses/${courseId}`
+  const url = `/api/v1/${urlPrefix}/rubrics/upload/${importId ?? 'latest'}`
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'X-CSRF-Token': getCookie('_csrf_token'),
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to find the rubric import: ${response.statusText}`)
+  }
+
+  return mapImport(await response.json())
+}
+
+export const getImportedRubrics = async (
+  importId: string,
+  accountId?: string,
+  courseId?: string
+): Promise<Rubric[]> => {
+  const urlPrefix = accountId ? `/accounts/${accountId}` : `/courses/${courseId}`
+  const url = `/api/v1/${urlPrefix}/rubrics/upload/${importId}/rubrics`
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'X-CSRF-Token': getCookie('_csrf_token'),
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to get rubrics for import: ${response.statusText}`)
+  }
+
+  const jsonResponse = await response.json()
+  const rubrics: Rubric[] = jsonResponse.map((rubric: any) => {
+    return {
+      id: rubric.id.toString(),
+      title: rubric.title,
+      workflowState: 'draft',
+      pointsPossible: rubric.points_possible,
+      hasRubricAssociations: false,
+      criteriaCount: rubric.data.length,
+      criteria: rubric.data.map((criterion: any) => {
+        return {
+          id: criterion.id,
+          description: criterion.description,
+          longDescription: criterion.long_description,
+          points: criterion.points,
+          criterionUseRange: criterion.criterion_use_range,
+          ratings: criterion.ratings.map((rating: any) => {
+            return {
+              description: rating.description,
+              longDescription: rating.long_description,
+              points: rating.points,
+            }
+          }),
+        }
+      }),
+    }
+  })
+  return rubrics
+}
+
+// private functions
+
+const mapImport = (importData: any): RubricImport => {
+  return {
+    attachment: {
+      id: importData.attachment.id,
+      filename: importData.attachment.filename,
+      size: importData.attachment.size,
+    },
+    id: importData.id,
+    createdAt: importData.created_at,
+    errorCount: importData.error_count,
+    errorData: importData.error_data,
+    progress: importData.progress,
+    workflowState: importData.workflow_state,
+  }
 }

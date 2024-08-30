@@ -16,46 +16,37 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Tray} from '@instructure/ui-tray'
 import {Alert} from '@instructure/ui-alerts'
 import {List} from '@instructure/ui-list'
 import {Checkbox} from '@instructure/ui-checkbox'
 import NumberInputControlled from './NumberInputControlled'
-import {Link} from '@instructure/ui-link'
-import {IconTrashLine, IconUploadSolid} from '@instructure/ui-icons'
-import {Flex} from '@instructure/ui-flex'
-import {Modal} from '@instructure/ui-modal'
-import {FileDrop} from '@instructure/ui-file-drop'
-import {Billboard} from '@instructure/ui-billboard'
-import {Img} from '@instructure/ui-img'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+import {Flex} from '@instructure/ui-flex'
+import CustomForbiddenWordsSection from './CustomForbiddenWordsSection'
+import type {PasswordPolicy, PasswordSettings, PasswordSettingsResponse} from './types'
+import {deleteForbiddenWordsFile} from './apiClient'
 
 const I18n = useI18nScope('password_complexity_configuration')
 
 declare const ENV: GlobalEnv
 
-interface PasswordPolicy {
-  require_number_characters: boolean
-  require_symbol_characters: boolean
-  allow_login_suspension: boolean
-  maximum_login_attempts?: number
-  minimum_character_length?: number
-}
-
-interface Settings {
-  password_policy: PasswordPolicy
-}
+const MINIMUM_CHARACTER_LENGTH = 8
+const MAXIMUM_CHARACTER_LENGTH = 255
+const DEFAULT_MAX_LOGIN_ATTEMPTS = 10
+const MINIMUM_LOGIN_ATTEMPTS = 3
+const MAXIMUM_LOGIN_ATTEMPTS = 20
 
 interface Account {
-  settings: Settings
+  settings: PasswordSettings
 }
 
 interface QueryParams {
@@ -66,20 +57,98 @@ const PasswordComplexityConfiguration = () => {
   const [showTray, setShowTray] = useState(false)
   const [enableApplyButton, setEnableApplyButton] = useState(true)
   const [minimumCharacterLengthEnabled, setMinimumCharacterLengthEnabled] = useState(true)
-  const [minimumCharacterLength, setMinimumCharacterLength] = useState(8)
+  const [minimumCharacterLength, setMinimumCharacterLength] = useState(MINIMUM_CHARACTER_LENGTH)
   const [requireNumbersEnabled, setRequireNumbersEnabled] = useState(true)
-  const [requireSymbolsEnabled, setRequireSymbolsEnabled] = useState(true)
-  const [customForbiddenWordsEnabled, setCustomForbiddenWordsEnabled] = useState(false)
-  const [customListFile, setCustomListFile] = useState<File | null>(null)
-  const [customListUploaded, setCustomListUploaded] = useState(false)
-  const [fileModalOpen, setFileModalOpen] = useState(false)
+  const [requireSymbolsEnabled, setRequireSymbolsEnabled] = useState(false)
   const [customMaxLoginAttemptsEnabled, setCustomMaxLoginAttemptsEnabled] = useState(false)
   const [allowLoginSuspensionEnabled, setAllowLoginSuspensionEnabled] = useState(false)
-  const [maxLoginAttempts, setMaxLoginAttempts] = useState(10)
+  const [maxLoginAttempts, setMaxLoginAttempts] = useState(DEFAULT_MAX_LOGIN_ATTEMPTS)
+  const [newlyUploadedAttachmentId, setNewlyUploadedAttachmentId] = useState<number | null>(null)
+  const [customForbiddenWordsEnabled, setCustomForbiddenWordsEnabled] = useState(false)
+
+  useEffect(() => {
+    if (showTray) {
+      const fetchCurrentSettings = async () => {
+        try {
+          const {status, data} = await executeApiRequest<PasswordSettingsResponse>({
+            path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`,
+            method: 'GET',
+          })
+
+          if (status === 200) {
+            const passwordPolicy = data.password_policy
+
+            if (passwordPolicy.require_number_characters === 'true') {
+              setRequireNumbersEnabled(true)
+            } else {
+              setRequireNumbersEnabled(false)
+            }
+
+            if (passwordPolicy.require_symbol_characters === 'true') {
+              setRequireSymbolsEnabled(true)
+            } else {
+              setRequireSymbolsEnabled(false)
+            }
+
+            if (passwordPolicy.minimum_character_length) {
+              setMinimumCharacterLength(passwordPolicy.minimum_character_length)
+              setMinimumCharacterLengthEnabled(true)
+            } else {
+              setMinimumCharacterLengthEnabled(false)
+            }
+
+            if (passwordPolicy.maximum_login_attempts) {
+              setMaxLoginAttempts(passwordPolicy.maximum_login_attempts)
+              setCustomMaxLoginAttemptsEnabled(true)
+            } else {
+              setCustomMaxLoginAttemptsEnabled(false)
+            }
+
+            if (passwordPolicy.allow_login_suspension === 'true') {
+              setAllowLoginSuspensionEnabled(true)
+            } else {
+              setAllowLoginSuspensionEnabled(false)
+            }
+
+            // ensure customForbiddenWordsEnabled is correctly set when the tray opens to prevent
+            // mistakenly deleting an existing custom list if “Apply” is clicked without changes
+            setCustomForbiddenWordsEnabled(!!passwordPolicy.common_passwords_attachment_id)
+          }
+        } catch (err: any) {
+          // err type has to be any because the error object is not defined
+          showFlashAlert({
+            message: I18n.t('An error occurred fetching password policy settings.'),
+            err,
+            type: 'error',
+          })
+        }
+      }
+
+      fetchCurrentSettings()
+    }
+  }, [showTray])
+
+  const handleOpenTray = () => {
+    setShowTray(true)
+  }
+
+  const handleCustomForbiddenWordsEnabledChange = (enabled: boolean) => {
+    setCustomForbiddenWordsEnabled(enabled)
+  }
+
+  const handleMinimumCharacterLengthEnabledChange = () => {
+    setMinimumCharacterLengthEnabled(!minimumCharacterLengthEnabled)
+    if (minimumCharacterLengthEnabled) {
+      setMinimumCharacterLength(MINIMUM_CHARACTER_LENGTH)
+    }
+  }
 
   const handleCustomMaxLoginAttemptToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked
     setCustomMaxLoginAttemptsEnabled(checked)
+    if (allowLoginSuspensionEnabled && !checked) {
+      setAllowLoginSuspensionEnabled(false)
+    }
   }
 
   const handleAllowLoginSuspensionToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,33 +164,51 @@ const PasswordComplexityConfiguration = () => {
     setMaxLoginAttempts(value)
   }
 
-  const handleFileDrop = (file: File) => {
-    setCustomListFile(file)
-  }
-
-  const handleCancelModal = () => {
-    setFileModalOpen(false)
-    setCustomListFile(null)
-  }
-
-  const handleUploadModal = () => {
-    setCustomListUploaded(true)
-    setFileModalOpen(false)
-  }
-
-  const handleDeleteCustomList = () => {
-    setCustomListFile(null)
-    setCustomListUploaded(false)
+  const cancelChanges = async () => {
+    if (newlyUploadedAttachmentId) {
+      try {
+        await deleteForbiddenWordsFile(newlyUploadedAttachmentId)
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error deleting forbidden words file on cancel:', error)
+      }
+      setNewlyUploadedAttachmentId(null)
+    }
+    setShowTray(false)
   }
 
   const saveChanges = async () => {
     setEnableApplyButton(false)
 
-    const updateAccountUrl = `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/`
+    const {status, data: settingsResult} = await executeApiRequest<PasswordSettingsResponse>({
+      path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`,
+      method: 'GET',
+    })
+
+    if (status !== 200) {
+      throw new Error('Failed to fetch current settings.')
+    }
+
     const passwordPolicy: PasswordPolicy = {
       require_number_characters: requireNumbersEnabled,
       require_symbol_characters: requireSymbolsEnabled,
       allow_login_suspension: allowLoginSuspensionEnabled,
+    }
+
+    if (!customForbiddenWordsEnabled) {
+      if (settingsResult.password_policy.common_passwords_attachment_id) {
+        await deleteForbiddenWordsFile(
+          settingsResult.password_policy.common_passwords_attachment_id
+        )
+      }
+    } else if (settingsResult.password_policy.common_passwords_attachment_id) {
+      passwordPolicy.common_passwords_attachment_id =
+        settingsResult.password_policy.common_passwords_attachment_id
+    }
+
+    if (settingsResult.password_policy.common_passwords_folder_id) {
+      passwordPolicy.common_passwords_folder_id =
+        settingsResult.password_policy.common_passwords_folder_id
     }
 
     if (customMaxLoginAttemptsEnabled) {
@@ -141,17 +228,18 @@ const PasswordComplexityConfiguration = () => {
     }
 
     try {
-      const {status} = await executeApiRequest<QueryParams>({
-        path: updateAccountUrl,
+      const {status: accountStatus} = await executeApiRequest<QueryParams>({
+        path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/`,
         body: requestBody,
         method: 'PUT',
       })
-      if (status === 200) {
+      if (accountStatus === 200) {
         showFlashAlert({
           message: I18n.t('Password settings saved successfully.'),
           type: 'success',
         })
         setShowTray(false)
+        setNewlyUploadedAttachmentId(null)
       }
     } catch (err: any) {
       // err type has to be any because the error object is not defined
@@ -170,12 +258,7 @@ const PasswordComplexityConfiguration = () => {
       <Heading margin="small auto xx-small auto" level="h4">
         {I18n.t('Password Options')}
       </Heading>
-      <Button
-        onClick={() => {
-          setShowTray(true)
-        }}
-        color="primary"
-      >
+      <Button onClick={handleOpenTray} color="secondary">
         {I18n.t('View Options')}
       </Button>
       <Tray
@@ -198,7 +281,7 @@ const PasswordComplexityConfiguration = () => {
                   margin="xxx-small 0 0 0"
                   offset="small"
                   screenReaderLabel="Close"
-                  onClick={() => setShowTray(false)}
+                  onClick={cancelChanges}
                 />
               </Flex.Item>
             </Flex>
@@ -215,7 +298,19 @@ const PasswordComplexityConfiguration = () => {
             <Alert variant="info" margin="small medium medium medium">
               {I18n.t('Your password must meet the following requirements')}
               <List margin="xxx-small">
-                <List.Item>{I18n.t('Must be at least 8 Characters in length.')}</List.Item>
+                <List.Item>
+                  {I18n.t('Must be at least %{minimumCharacterLength} Characters in length.', {
+                    minimumCharacterLength,
+                  })}
+                </List.Item>
+                {requireNumbersEnabled && (
+                  <List.Item>{I18n.t('Must contain a number character (ie: 0...9).')}</List.Item>
+                )}
+                {requireSymbolsEnabled && (
+                  <List.Item>
+                    {I18n.t('Must contain a symbol character (ie: ! @ # $ %).')}
+                  </List.Item>
+                )}
                 <List.Item>
                   {I18n.t(
                     'Must not use words or sequences of characters common in passwords (ie: password, 12345, etc...)'
@@ -227,7 +322,7 @@ const PasswordComplexityConfiguration = () => {
               <Checkbox
                 label={I18n.t('Minimum character length (minimum: 8 | maximum: 255)')}
                 checked={minimumCharacterLengthEnabled}
-                onChange={() => setMinimumCharacterLengthEnabled(!minimumCharacterLengthEnabled)}
+                onChange={() => handleMinimumCharacterLengthEnabledChange()}
                 defaultChecked={true}
                 data-testid="minimumCharacterLengthCheckbox"
               />
@@ -235,8 +330,8 @@ const PasswordComplexityConfiguration = () => {
             <View as="div" maxWidth="9rem" margin="0 medium medium medium">
               <View as="div" margin="0 medium medium medium">
                 <NumberInputControlled
-                  minimum={8}
-                  maximum={255}
+                  minimum={MINIMUM_CHARACTER_LENGTH}
+                  maximum={MAXIMUM_CHARACTER_LENGTH}
                   currentValue={minimumCharacterLength}
                   updateCurrentValue={handleMinimumCharacterChange}
                   disabled={!minimumCharacterLengthEnabled}
@@ -249,7 +344,6 @@ const PasswordComplexityConfiguration = () => {
                 label={I18n.t('Require number characters (0...9)')}
                 checked={requireNumbersEnabled}
                 onChange={() => setRequireNumbersEnabled(!requireNumbersEnabled)}
-                defaultChecked={true}
                 data-testid="requireNumbersCheckbox"
               />
             </View>
@@ -258,68 +352,14 @@ const PasswordComplexityConfiguration = () => {
                 label={I18n.t('Require symbol characters (ie: ! @ # $ %)')}
                 checked={requireSymbolsEnabled}
                 onChange={() => setRequireSymbolsEnabled(!requireSymbolsEnabled)}
-                defaultChecked={true}
                 data-testid="requireSymbolsCheckbox"
               />
             </View>
-            <View as="div" margin="medium">
-              <Checkbox
-                checked={customForbiddenWordsEnabled}
-                onChange={() => {
-                  setCustomForbiddenWordsEnabled(!customForbiddenWordsEnabled)
-                }}
-                label={I18n.t('Customize forbidden words/termslist (see default list here)')}
-                data-testid="customForbiddenWordsCheckbox"
-              />
-              <View
-                as="div"
-                insetInlineStart="1.75em"
-                position="relative"
-                margin="xx-small small small 0"
-              >
-                <Text size="small">
-                  {I18n.t(
-                    'Upload a list of forbidden words/terms in addition to the default list. The file should be text file (.txt) with a single word or term per line.'
-                  )}
-                </Text>
-                {!customListUploaded && (
-                  <View as="div" margin="small 0">
-                    <Button
-                      disabled={!customForbiddenWordsEnabled}
-                      renderIcon={IconUploadSolid}
-                      onClick={() => setFileModalOpen(true)}
-                      data-testid="uploadButton"
-                    >
-                      {I18n.t('Upload')}
-                    </Button>
-                  </View>
-                )}
-              </View>
-            </View>
-            {customListUploaded && (
-              <View as="div" margin="0 medium medium medium">
-                <Heading level="h4">{I18n.t('Current Custom List')}</Heading>
-                <hr />
-                <Flex justifyItems="space-between">
-                  <Flex.Item>
-                    <Link href="#">{customListFile?.name}</Link>
-                  </Flex.Item>
-                  <Flex.Item>
-                    <IconButton
-                      withBackground={false}
-                      withBorder={false}
-                      screenReaderLabel="Delete tag"
-                      onClick={() => {
-                        handleDeleteCustomList()
-                      }}
-                    >
-                      <IconTrashLine color="warning" />
-                    </IconButton>
-                  </Flex.Item>
-                </Flex>
-                <hr />
-              </View>
-            )}
+            <CustomForbiddenWordsSection
+              setNewlyUploadedAttachmentId={setNewlyUploadedAttachmentId}
+              onCustomForbiddenWordsEnabledChange={handleCustomForbiddenWordsEnabledChange}
+            />
+
             <View as="div" margin="medium medium small medium">
               <Checkbox
                 onChange={handleCustomMaxLoginAttemptToggle}
@@ -335,40 +375,52 @@ const PasswordComplexityConfiguration = () => {
               >
                 <Text size="small">
                   {I18n.t(
-                    'This option controls the number of attempts a single user can make consecutively to login without success before their user’s login is suspended. Users can be unsuspended by institutional admins. Cannot be higher than 20 attempts.'
+                    'This option controls the number of attempts a single user can make consecutively to login without success before their user’s login is suspended temporarily (5 min). Cannot be higher than 20 attempts.'
                   )}
                 </Text>
               </View>
             </View>
-            <View as="div" maxWidth="9rem" margin="0 medium medium medium">
-              <View as="div" margin="0 medium medium medium">
+            <View as="div" margin="0 medium medium medium">
+              <View as="div" maxWidth="6rem" margin="0 medium medium medium">
                 <NumberInputControlled
-                  minimum={3}
-                  maximum={20}
+                  minimum={MINIMUM_LOGIN_ATTEMPTS}
+                  maximum={MAXIMUM_LOGIN_ATTEMPTS}
                   currentValue={maxLoginAttempts}
                   updateCurrentValue={handleMaxLoginAttemptsChange}
                   disabled={!customMaxLoginAttemptsEnabled}
                   data-testid="customMaxLoginAttemptsInput"
                 />
               </View>
-            </View>
-            <View as="div" margin="medium medium small medium">
-              <Checkbox
-                onChange={handleAllowLoginSuspensionToggle}
-                checked={allowLoginSuspensionEnabled}
-                label={I18n.t('Allow login suspension')}
-                data-testid="allowLoginSuspensionCheckbox"
-              />
+              <View as="div" margin="medium medium small medium">
+                <Checkbox
+                  onChange={handleAllowLoginSuspensionToggle}
+                  checked={allowLoginSuspensionEnabled}
+                  label={I18n.t('Make login suspension persistent')}
+                  data-testid="allowLoginSuspensionCheckbox"
+                  disabled={!customMaxLoginAttemptsEnabled}
+                />
+                <View
+                  as="div"
+                  insetInlineStart="1.75em"
+                  position="relative"
+                  margin="xx-small small xxx-small 0"
+                >
+                  <Text size="small">
+                    {I18n.t(
+                      'Users with a suspended login (because of maximum login attempt policy) must be unsuspended by institutional admins.'
+                    )}
+                  </Text>
+                </View>
+              </View>
             </View>
           </Flex.Item>
-
           <Flex.Item as="footer">
             <View as="div" background="secondary" width="100%" textAlign="end">
               <View as="div" display="inline-block">
                 <Button
                   margin="small 0"
                   color="secondary"
-                  onClick={() => setShowTray(false)}
+                  onClick={cancelChanges}
                   data-testid="cancelButton"
                 >
                   {I18n.t('Cancel')}
@@ -387,60 +439,6 @@ const PasswordComplexityConfiguration = () => {
           </Flex.Item>
         </Flex>
       </Tray>
-
-      <View as="div">
-        <Modal
-          open={fileModalOpen}
-          onDismiss={() => {
-            setFileModalOpen(false)
-          }}
-          size="medium"
-          label="Upload Forbidden Words/Terms List"
-          shouldCloseOnDocumentClick={true}
-          overflow="scroll"
-        >
-          <Modal.Header>
-            <Heading>{I18n.t('Upload Forbidden Words/Terms List')}</Heading>
-            <CloseButton
-              margin="small 0 0 0"
-              placement="end"
-              offset="small"
-              onClick={() => setFileModalOpen(false)}
-              screenReaderLabel="Close"
-            />
-          </Modal.Header>
-          <Modal.Body>
-            {!customListFile && (
-              <div style={{overflowY: 'clip'}}>
-                <FileDrop
-                  accept=".txt"
-                  onDrop={files => {
-                    const file = files[0] as File
-                    handleFileDrop(file)
-                  }}
-                  renderLabel={
-                    <Billboard
-                      heading={I18n.t('Upload File')}
-                      headingLevel="h2"
-                      message={I18n.t('Drag and drop, or click to browse your local filesystem')}
-                      hero={<Img src="/images/upload_rocket.svg" height="10rem" />}
-                    />
-                  }
-                />
-              </div>
-            )}
-            {customListFile && <Text>{customListFile.name}</Text>}
-          </Modal.Body>
-          <Modal.Footer>
-            <Button onClick={() => handleCancelModal()} margin="0 x-small 0 0">
-              {I18n.t('Close')}
-            </Button>
-            <Button color="primary" onClick={() => handleUploadModal()}>
-              {I18n.t('Upload')}
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </View>
     </>
   )
 }

@@ -41,6 +41,10 @@ const portalRouter = createBrowserRouter(
         path="/users/:userId/masquerade"
         lazy={() => import('../../features/act_as_modal/react/ActAsModalRoute')}
       />
+      <Route
+        path="/accounts"
+        lazy={() => import('../../features/account_manage/react/AccountListRoute')}
+      />
 
       {accountGradingSettingsRoutes}
 

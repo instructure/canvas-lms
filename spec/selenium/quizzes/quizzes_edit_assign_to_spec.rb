@@ -35,7 +35,7 @@ describe "quiz edit page assign to" do
   include SelectiveReleaseCommon
 
   before :once do
-    differentiated_modules_on
+    Account.site_admin.disable_feature!(:selective_release_edit_page)
 
     course_with_teacher(active_all: true)
     @quiz_assignment = @course.assignments.create

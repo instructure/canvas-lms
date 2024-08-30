@@ -73,6 +73,16 @@ describe('SectionBrowser', () => {
     const modal = getModal()
     const closeButton = getByText(modal, 'Close')
     expect(closeButton).toBeInTheDocument()
+    const sectionHeadings = modal.querySelectorAll('h3')
+    expect(sectionHeadings).toHaveLength(8)
+    expect(sectionHeadings[0]).toHaveTextContent('Hero')
+    expect(sectionHeadings[1]).toHaveTextContent('Navigation')
+    expect(sectionHeadings[2]).toHaveTextContent('About')
+    expect(sectionHeadings[3]).toHaveTextContent('Callout Cards')
+    expect(sectionHeadings[4]).toHaveTextContent('Quiz')
+    expect(sectionHeadings[5]).toHaveTextContent('Announcement')
+    expect(sectionHeadings[6]).toHaveTextContent('Footer')
+    expect(sectionHeadings[7]).toHaveTextContent('Blank')
   })
 
   it('calls onClose on Close button click', async () => {

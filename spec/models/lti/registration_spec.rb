@@ -80,8 +80,20 @@ RSpec.describe Lti::Registration do
       end
     end
 
-    context "when ims_registration is not present" do
-      # this will change when manual 1.3 and 1.1 registrations are supported
+    context "when tool_configuration is present" do
+      let!(:tool_configuration) do
+        dk = dev_key_model_1_3
+        dk.tool_configuration.update!(lti_registration: registration)
+        dk.tool_configuration
+      end
+
+      it "returns the manual_configuration" do
+        expect(subject).to eq(tool_configuration.settings)
+      end
+    end
+
+    context "when neither ims_registration nor manual_configuration is present" do
+      # this will change when and 1.1 registrations are supported
       it "is empty" do
         expect(subject).to eq({})
       end
@@ -94,18 +106,26 @@ RSpec.describe Lti::Registration do
     let(:registration) { lti_registration_model }
 
     context "when ims_registration is present" do
-      let(:ims_registration) { lti_ims_registration_model(lti_registration: registration) }
-
-      before do
-        ims_registration # instantiate before test runs
-      end
+      let!(:ims_registration) { lti_ims_registration_model(lti_registration: registration) }
 
       it "returns the logo_uri" do
         expect(subject).to eq(ims_registration.logo_uri)
       end
     end
 
-    context "when ims_registration is not present" do
+    context "when a tool configuration is present" do
+      let!(:tool_configuration) do
+        dk = dev_key_model_1_3
+        dk.tool_configuration.update!(lti_registration: registration)
+        dk.tool_configuration
+      end
+
+      it "returns the logo_uri" do
+        expect(subject).to eq(tool_configuration.settings["extensions"].first["settings"]["icon_url"])
+      end
+    end
+
+    context "when neither ims_registration nor manual_configuration is present" do
       it "is nil" do
         expect(subject).to be_nil
       end

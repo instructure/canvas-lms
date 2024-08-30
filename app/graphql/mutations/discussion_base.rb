@@ -162,6 +162,7 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
       end
     else
       discussion_topic.is_section_specific = false
+      discussion_topic.course_sections = []
     end
   end
 

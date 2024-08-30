@@ -41,15 +41,21 @@ module Canvas::Security
         end
         record.errors.add attr, "sequence" if candidates.any? { |candidate| SEQUENCES.grep(candidate).present? }
       end
-      if Canvas::Plugin.value_to_boolean(policy[:disallow_common_passwords])
-        record.errors.add attr, "common" if COMMON_PASSWORDS.include?(value.downcase)
-      end
+      # check for numbers
       if Canvas::Plugin.value_to_boolean(policy[:require_number_characters])
         record.errors.add attr, "no_digits" unless /\d/.match?(value)
       end
+      # check for symbols
       if Canvas::Plugin.value_to_boolean(policy[:require_symbol_characters])
         symbol_regex = %r{[\!\@\#\$\%\^\&\*\(\)\_\+\-\=\[\]\{\}\|\;\:\'\"\<\>\,\.\?/]}
         record.errors.add attr, "no_symbols" unless symbol_regex.match?(value)
+      end
+      # check for common passwords
+      cache_key = ["common_passwords_set", record.account.global_id, policy[:common_passwords_attachment_id]].cache_key
+      if policy.include?(:common_passwords_attachment_id) && check_password_membership(cache_key, value, policy)
+        record.errors.add attr, "common"
+      elsif Canvas::Plugin.value_to_boolean(policy[:disallow_common_passwords])
+        record.errors.add attr, "common" if DEFAULT_COMMON_PASSWORDS.include?(value.downcase)
       end
     end
 
@@ -61,9 +67,55 @@ module Canvas::Security
         # require_number_characters: false,
         # require_symbol_characters: false,
         # allow_login_suspension: false,
+        # common_passwords_attachment_id: nil,
+        # common_passwords_folder_id: nil,
         minimum_character_length: DEFAULT_CHARACTER_LENGTH,
         maximum_login_attempts: DEFAULT_LOGIN_ATTEMPTS
       }
+    end
+
+    def self.load_common_passwords_file_data(policy)
+      return false unless (attachment = Attachment.not_deleted.find_by(id: policy[:common_passwords_attachment_id]))
+      return false unless attachment.root_account.feature_enabled?(:password_complexity)
+      # avoid processing and loading large files into memory
+      # this will keep the line count to a reasonable size ~ 100k
+      return false if attachment.size > 1.megabyte
+
+      begin
+        stream = attachment.open(integrity_check: true)
+      rescue CorruptedDownload => e
+        Rails.logger.error("Corrupted download for common passwords attachment: #{e}")
+        return false
+      end
+
+      stream.read.force_encoding("utf-8").split("\n").map(&:strip)
+    end
+
+    def self.add_password_membership(key, passwords)
+      Canvas.redis.pipelined do
+        Array(passwords).each_slice(10_000) do |slice|
+          Canvas.redis.sadd(key, slice)
+        end
+      end
+    end
+
+    def self.check_password_membership(key, value, policy)
+      if Canvas.redis_enabled?
+        if Canvas.redis.srandmember(key).present?
+          # if an element exists, we can assume the set is populated
+          return Canvas.redis.sismember(key, value)
+        else
+          # if the set is empty, we need to populate it
+          file_data = load_common_passwords_file_data(policy)
+          if file_data
+            add_password_membership(key, file_data)
+          else
+            false
+          end
+        end
+
+        Canvas.redis.sismember(key, value)
+      end
     end
 
     SEQUENCES = begin
@@ -76,11 +128,12 @@ module Canvas::Security
       ]
       sequences + sequences.map(&:reverse)
     end
+    private_constant :SEQUENCES
 
     # per https://en.wikipedia.org/wiki/Wikipedia:10,000_most_common_passwords
     # Licensed under CC BY-SA 3.0: https://creativecommons.org/licenses/by-sa/3.0/legalcode
     # Top 100 common passwords as at May 2023, excluding profanity
-    COMMON_PASSWORDS = %w[
+    DEFAULT_COMMON_PASSWORDS = %w[
       123456
       password
       12345678
@@ -177,5 +230,6 @@ module Canvas::Security
       taylor
       matrix
     ].freeze
+    private_constant :DEFAULT_COMMON_PASSWORDS
   end
 end

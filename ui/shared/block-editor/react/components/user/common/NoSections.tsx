@@ -26,30 +26,33 @@ const I18n = useI18nScope('block-editor/no-sections')
 
 export type NoSectionsProps = {
   className?: string
+  placeholderText?: string
   children?: React.ReactNode
 }
 
-export const NoSections = ({className = '', children}: NoSectionsProps) => {
+export const NoSections = (props: NoSectionsProps) => {
+  const {className, placeholderText, children} = props
   const {enabled} = useEditor(state => ({
     enabled: state.options.enabled,
   }))
   const {
     connectors: {connect},
   } = useNode()
-  const clazz = useClassNames(enabled, {empty: !children}, [className, 'no-sections'])
+  const cn = className || NoSections.craft.defaultProps.className
+  const clazz = useClassNames(enabled, {empty: !children}, [cn, 'no-sections'])
 
   return (
-    <div
-      ref={el => el && connect(el)}
-      className={clazz}
-      data-placeholder={I18n.t('Drop a block to add it here')}
-    >
+    <div ref={el => el && connect(el)} className={clazz} data-placeholder={placeholderText}>
       {children}
     </div>
   )
 }
 
 NoSections.craft = {
+  defaultProps: {
+    className: '',
+    placeholderText: I18n.t('Drop a block to add it here'),
+  },
   rules: {
     canMoveIn: (nodes: Node[]) => !nodes.some(node => node.data.custom.isSection),
   },

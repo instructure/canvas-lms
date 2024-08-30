@@ -79,9 +79,43 @@ describe AuthenticationProvider::OpenIDConnect do
   end
 
   describe "#user_logout_url" do
-    it "returns the end_session_endpoint" do
+    let(:controller) { instance_double("ApplicationController", login_url: "http//www.example.com/login", session: {}) }
+
+    before do
+      subject.account = Account.default
       subject.end_session_endpoint = "http://somewhere/logout"
-      expect(subject.user_logout_redirect(nil, nil)).to eq "http://somewhere/logout"
+      subject.client_id = "abc"
+    end
+
+    context "with the feature flag on" do
+      before do
+        Account.default.enable_feature!(:oidc_rp_initiated_logout_params)
+      end
+
+      it "returns the end_session_endpoint" do
+        expect(subject.user_logout_redirect(controller, nil)).to eql "http://somewhere/logout?client_id=abc&post_logout_redirect_uri=http%2F%2Fwww.example.com%2Flogin"
+      end
+
+      it "preserves other query parameters" do
+        subject.end_session_endpoint = "http://somewhere/logout?foo=bar"
+        expect(subject.user_logout_redirect(controller, nil)).to eql "http://somewhere/logout?client_id=abc&post_logout_redirect_uri=http%2F%2Fwww.example.com%2Flogin&foo=bar"
+      end
+
+      it "does not overwrite conflicting parameters" do
+        subject.end_session_endpoint = "http://somewhere/logout?post_logout_redirect_uri=elsewhere"
+        expect(subject.user_logout_redirect(controller, nil)).to eql "http://somewhere/logout?client_id=abc&post_logout_redirect_uri=elsewhere"
+      end
+
+      it "includes the full id_token" do
+        id_token = Canvas::Security.create_jwt({ sub: "1" }, nil, :unsigned)
+        session = { oidc_id_token: id_token }
+        allow(controller).to receive(:session).and_return(session)
+        expect(subject.user_logout_redirect(controller, nil)).to eql "http://somewhere/logout?client_id=abc&post_logout_redirect_uri=http%2F%2Fwww.example.com%2Flogin&id_token_hint=#{id_token}"
+      end
+    end
+
+    it "doesn't add anything with the feature flag off" do
+      expect(subject.user_logout_redirect(controller, nil)).to eql "http://somewhere/logout"
     end
   end
 end

@@ -42,6 +42,32 @@ describe "calendar2" do
       course_with_teacher_logged_in
     end
 
+    def element_location
+      # rubocop:disable Specs/NoExecuteScript
+      driver.execute_script("return $('#calendar-app .fc-content-skeleton:first')
+      .find('tbody td.fc-event-container').index()")
+      # rubocop:enable Specs/NoExecuteScript
+    end
+
+    def create_checkpoint(
+      topic:,
+      type: "reply_to_topic",
+      due_at: nil,
+      points_possible: 5,
+      override: false,
+      override_due_at: nil,
+      student_ids: []
+    )
+      checkpoint_label = (type == "reply_to_topic") ? CheckpointLabels::REPLY_TO_TOPIC : CheckpointLabels::REPLY_TO_ENTRY
+      dates = override ? [{ type: "override", set_type: "ADHOC", student_ids:, due_at: }] : [{ type: "everyone", due_at: }]
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: topic,
+        checkpoint_label:,
+        dates:,
+        points_possible:
+      )
+    end
+
     it "navigates to month view when month button is clicked", :xbrowser do
       load_week_view
       f("#month").click
@@ -218,6 +244,54 @@ describe "calendar2" do
           extended_day_text = format_time_for_view(date_of_next_day.to_datetime + 1.day)
           expect(f(".event-details-timestring .date-range").text).to eq("#{original_day_text} - #{extended_day_text}")
         end
+
+        it "prevents drag and drop for discussion checkpoints", priority: "1" do
+          @course.root_account.enable_feature!(:discussion_checkpoints)
+          topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded discussion with checkpoints")
+          checkpoint = create_checkpoint(topic:, due_at: @initial_time)
+          get "/calendar2"
+          quick_jump_to_date(@initial_time_str)
+
+          # Move assignment from Thursday to Friday
+          drag_and_drop_element(find(".calendar .fc-event"),
+                                find(".calendar .fc-day.fc-widget-content.fc-fri.fc-past"))
+
+          # Expect errors message with drag and drop
+          expect_instui_flash_message("Discussion checkpoints are not draggable. You can update their due dates by editing the parent discussion topic.")
+          wait_for_ajaximations
+
+          # Checkpoint should not not be moved to Friday
+          expect(element_location).not_to eq @friday
+
+          # Checkpoint time should stay at 9:00am
+          checkpoint.reload
+          expect(checkpoint.start_at).to eql(@initial_time)
+        end
+
+        it "prevents drag and drop for discussion checkpoint overrides", priority: "2" do
+          @course.root_account.enable_feature!(:discussion_checkpoints)
+          student_in_course(active_all: true)
+          topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded discussion with checkpoints")
+          checkpoint = create_checkpoint(topic:, due_at: @initial_time, override: true, student_ids: [@student.id])
+
+          get "/calendar2"
+          quick_jump_to_date(@initial_time_str)
+
+          # Move assignment from Thursday to Friday
+          drag_and_drop_element(find(".calendar .fc-event"),
+                                find(".calendar .fc-day.fc-widget-content.fc-fri.fc-past"))
+
+          # Expect errors message with drag and drop
+          expect_instui_flash_message("Discussion checkpoints are not draggable. You can update their due dates by editing the parent discussion topic.")
+          wait_for_ajaximations
+
+          # Checkpoint should not not be moved to Friday
+          expect(element_location).not_to eq @friday
+
+          # Checkpoint time should stay at 9:00am
+          checkpoint.reload
+          expect(checkpoint.assignment_overrides.first.due_at).to eql(@initial_time)
+        end
       end
 
       it "more options link should go to calendar event edit page" do
@@ -257,6 +331,34 @@ describe "calendar2" do
         expect(find("#assignment-draft-state")).not_to include_text("Not Published")
       end
 
+      it "loads discussion edit page when click on edit button in discussion checkpoint info modal" do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        due_at = Time.zone.now.utc + 1.day
+        title = "graded discussion with checkpoints"
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title:)
+        create_checkpoint(topic:, due_at:)
+
+        get "/calendar2"
+        quick_jump_to_date(format_date_for_view(due_at))
+        f(".fc-event").click
+        click_edit_event_button
+        expect(find("h1")).to include_text(title)
+      end
+
+      it "loads discussion page when click on title in discussion checkpoint info modal" do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        due_at = Time.zone.now.utc + 1.day
+        title = "graded discussion with checkpoints"
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title:)
+        create_checkpoint(topic:, due_at:)
+
+        get "/calendar2"
+        quick_jump_to_date(format_date_for_view(due_at))
+        f(".fc-event").click
+        expect_new_page_load { hover_and_click ".view_event_link" }
+        expect(find("h1")).to include_text(title)
+      end
+
       it "deletes an event" do
         create_middle_day_event("doomed event")
         f(".fc-event").click
@@ -276,6 +378,32 @@ describe "calendar2" do
         wait_for_ajaximations
         expect(f("#content")).not_to contain_css(".fc-event")
         # make sure it was actually deleted and not just removed from the interface
+        get("/calendar2")
+        expect(f("#content")).not_to contain_css(".fc-event")
+      end
+
+      it "deletes a discussion checkpoint and all checkpoints and overrides for the same discussion topic" do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        student_in_course(active_all: true)
+        due_at_time1 = Time.zone.parse("2024-1-1")
+        due_at_time2 = Time.zone.parse("2024-1-3")
+        due_at_time3 = Time.zone.parse("2024-1-5")
+        due_at_time4 = Time.zone.parse("2024-1-6")
+        # Create a graded topic with 2 checkpoints and 2 checkpoint overrides
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded discussion with checkpoints")
+        create_checkpoint(topic:, due_at: due_at_time1)
+        create_checkpoint(topic:, due_at: due_at_time2, override: true, student_ids: [@student.id])
+        create_checkpoint(topic:, type: "reply_to_entry", due_at: due_at_time3)
+        create_checkpoint(topic:, due_at: due_at_time4, override: true, student_ids: [@student.id])
+
+        get "/calendar2"
+        quick_jump_to_date(format_date_for_view(due_at_time1))
+        f(".fc-event").click
+        hover_and_click ".delete_event_link"
+        click_delete_confirm_button
+        wait_for_ajaximations
+        expect(f("#content")).not_to contain_css(".fc-event")
+        # make sure all discussion related checkpoints and overrides were actually deleted and not just removed from the interface
         get("/calendar2")
         expect(f("#content")).not_to contain_css(".fc-event")
       end
@@ -451,6 +579,35 @@ describe "calendar2" do
         quick_jump_to_date(date_due.strftime("%Y-%m-%d"))
 
         # verify discussion has line-through
+        expect(find(".fc-title").css_value("text-decoration")).to include("line-through")
+      end
+
+      it "strikethroughs past due discussion checkpoint", priority: "1" do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        due_at = Time.zone.now.utc - 2.days
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded discussion with past due checkpoint")
+        create_checkpoint(topic:, due_at:)
+        get "/calendar2"
+
+        # go to the same month as the date_due
+        quick_jump_to_date(format_date_for_view(due_at))
+        # verify discussion checkpoint has line-through
+        expect(find(".fc-title").css_value("text-decoration")).to include("line-through")
+      end
+
+      it "strikethroughs past due discussion checkpoint override", priority: "1" do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        student_in_course(active_all: true)
+        due_at = Time.zone.now.utc + 1.day
+        due_at_override = due_at - 3.days
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded discussion with past due checkpoint override")
+        create_checkpoint(topic:, due_at:)
+        create_checkpoint(topic:, due_at: due_at_override, override: true, student_ids: [@student.id])
+        get "/calendar2"
+
+        # go to the same month as the date_due
+        quick_jump_to_date(format_date_for_view(due_at_override))
+        # verify discussion checkpoint override has line-through
         expect(find(".fc-title").css_value("text-decoration")).to include("line-through")
       end
 

@@ -27,6 +27,10 @@ module QuizzesIndexPage
     "#{quiz_settings_menu_selector(quiz_id)} .assign-to-link"
   end
 
+  def assign_to_card_selector
+    "[data-testid='item-assign-to-card']"
+  end
+
   def quiz_row_selector(quiz_id)
     "#summary_quiz_#{quiz_id}"
   end

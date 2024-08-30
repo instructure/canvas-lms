@@ -31,6 +31,7 @@ import {Badge} from '@instructure/ui-badge'
 import {Link} from '@instructure/ui-link'
 import {MediaPlayer} from '@instructure/ui-media-player'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
+import sanitizeHtml from 'sanitize-html-with-tinymce'
 
 const I18n = useI18nScope('grade_summary')
 
@@ -139,7 +140,12 @@ function SubmissionAttemptComments({comments}: SubmissionAttemptProps) {
               )}
             </div>
             <View as="div" margin="0 medium 0 small">
-              <Text size="small">{I18n.t('%{comment}', {comment: comment.comment})}</Text>
+              <Text
+                size="small"
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHtml(comment.comment),
+                }}
+              />
             </View>
             {comment.attachments?.map(attachment => (
               <View

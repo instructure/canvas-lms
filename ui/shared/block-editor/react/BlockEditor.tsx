@@ -49,6 +49,7 @@ const DEFAULT_CONTENT = JSON.stringify({
 
 type BlockEditorProps = {
   enabled?: boolean
+  enableResizer?: boolean
   container: HTMLElement // the element that will shrink when drawers open
   version: string
   content: string
@@ -57,6 +58,7 @@ type BlockEditorProps = {
 
 export default function BlockEditor({
   enabled = true,
+  enableResizer = true,
   container,
   version,
   content,
@@ -66,17 +68,18 @@ export default function BlockEditor({
   const [toolboxOpen, setToolboxOpen] = useState(false)
   const [stepperOpen, setStepperOpen] = useState(!content)
 
+  RenderNode.globals.enableResizer = !!enableResizer
+
   useEffect(() => {
     if (version !== '1') {
       // eslint-disable-next-line no-alert
-      alert('wrong version, mayhem may ensue')
+      alert(I18n.t('wrong version, mayhem may ensue'))
     }
   }, [json, version])
 
-  const handleNodesChange = useCallback(query => {
+  const handleNodesChange = useCallback((query: any) => {
     // @ts-expect-error
-    window.block_editor = query
-    // console.log(JSON.parse(query.serialize()))
+    window.block_editor = () => query
   }, [])
 
   const handleCloseToolbox = useCallback(() => {

@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import create from 'zustand'
-import type {ApiResult} from '../../common/lib/apiResult/ApiResult'
+import {isSuccessful, type ApiResult} from '../../common/lib/apiResult/ApiResult'
 import type {LtiImsRegistrationId} from '../model/lti_ims_registration/LtiImsRegistrationId'
-import type {LtiConfiguration} from '../model/lti_tool_configuration/LtiConfiguration'
 import {ZUnifiedToolId, type UnifiedToolId} from '../model/UnifiedToolId'
+import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 
-type JsonUrlFetchStatus =
+export type JsonUrlFetchStatus =
   | {
       _tag: 'initial'
     }
@@ -30,7 +30,7 @@ type JsonUrlFetchStatus =
     }
   | {
       _tag: 'loaded'
-      result: ApiResult<LtiConfiguration>
+      result: ApiResult<InternalLtiConfiguration>
     }
 
 export type RegistrationWizardModalState = {
@@ -116,7 +116,7 @@ export const useRegistrationModalWizardState = create<
   },
   updateJsonFetchStatus: status => {
     if (status._tag === 'loaded') {
-      set({jsonUrlFetch: status, registering: status.result._type === 'success'})
+      set({jsonUrlFetch: status, registering: isSuccessful(status.result)})
     } else {
       set({jsonUrlFetch: status})
     }

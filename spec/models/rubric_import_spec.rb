@@ -203,7 +203,7 @@ describe RubricImport do
         expect(import.workflow_state).to eq("succeeded_with_errors")
         expect(import.progress).to eq(100)
         expect(import.error_count).to eq(1)
-        expect(import.error_data).to eq([{ "message" => "Missing 'Rubric Name' for some rubrics." }])
+        expect(import.error_data).to eq([{ "message" => "Missing 'Rubric Name' in some rows." }])
         expect(Rubric.all.length).to eq(0)
       end
 
@@ -236,7 +236,7 @@ describe RubricImport do
         expect(import.workflow_state).to eq("succeeded_with_errors")
         expect(import.progress).to eq(100)
         expect(import.error_count).to eq(1)
-        expect(import.error_data).to eq([{ "message" => "Missing 'Rubric Name' for some rubrics." }])
+        expect(import.error_data).to eq([{ "message" => "Missing 'Rubric Name' in some rows." }])
         expect(Rubric.all.length).to eq(1)
         expect(Rubric.first.title).to eq("Rubric 1")
       end

@@ -38,6 +38,10 @@ export type EnrollmentConnection = {
   state: string
 }
 
+type AssignmentCheckpoint = {
+  tag: string
+}
+
 export type AssignmentConnection = {
   id: string
   assignmentGroupId: string
@@ -62,6 +66,7 @@ export type AssignmentConnection = {
   gradingPeriodId?: string | null
   hasSubmittedSubmissions: boolean
   inClosedGradingPeriod: boolean | null
+  checkpoints?: AssignmentCheckpoint[]
 }
 
 export type AssignmentGroupConnection = {

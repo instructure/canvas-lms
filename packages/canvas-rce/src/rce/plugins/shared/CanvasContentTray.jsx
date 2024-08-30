@@ -16,24 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Suspense, useCallback, useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {bool, element, func, instanceOf, oneOfType, shape, string} from 'prop-types'
 import {Tray} from '@instructure/ui-tray'
 import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
-import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
 import ErrorBoundary from './ErrorBoundary'
 import Bridge from '../../../bridge/Bridge'
 import formatMessage from '../../../format-message'
-import Filter, {useFilterSettings} from './Filter'
+import Filter from './Filter'
+import {useFilterSettings} from './useFilterSettings'
+
 import {getTrayHeight} from './trayUtils'
 import {ICON_MAKER_ICONS} from '../instructure_icon_maker/svg/constants'
 import {getLinkContentFromEditor} from './ContentSelection'
 import {LinkDisplay} from './LinkDisplay'
 import {showFlashAlert} from '../../../common/FlashAlert'
+import {FILTER_SETTINGS_BY_PLUGIN, DynamicPanel, isLoading} from './canvasContentUtils'
 
 /**
  * Returns the translated tray label
@@ -67,172 +69,6 @@ function getTrayLabel(contentType, contentSubtype, contextType) {
     default:
       return formatMessage('Tray') // Shouldn't ever get here
   }
-}
-
-const thePanels = {
-  icon_maker_icons: React.lazy(() =>
-    import('../instructure_icon_maker/components/SavedIconMakerList')
-  ),
-  links: React.lazy(() => import('../instructure_links/components/LinksPanel')),
-  images: React.lazy(() => import('../instructure_image/Images')),
-  documents: React.lazy(() => import('../instructure_documents/components/DocumentsPanel')),
-  media: React.lazy(() => import('../instructure_record/MediaPanel')),
-  all: React.lazy(() => import('./RceFileBrowser')),
-  unknown: React.lazy(() => import('./UnknownFileTypePanel')),
-}
-
-// Returns a Suspense wrapped lazy loaded component
-// pulled from useLazy's cache
-function DynamicPanel(props) {
-  let key = ''
-  if (props.contentType === 'links') {
-    key = 'links'
-  } else {
-    key = props.contentSubtype in thePanels ? props.contentSubtype : 'unknown'
-  }
-  const Component = thePanels[key]
-  return (
-    <Suspense fallback={<Spinner renderTitle={renderLoading} size="large" />}>
-      <Component {...props} />
-    </Suspense>
-  )
-}
-
-function renderLoading() {
-  return formatMessage('Loading')
-}
-
-const FILTER_SETTINGS_BY_PLUGIN = {
-  user_documents: {
-    contextType: 'user',
-    contentType: 'user_files',
-    contentSubtype: 'documents',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  course_documents: {
-    contextType: 'course',
-    contentType: 'course_files',
-    contentSubtype: 'documents',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  group_documents: {
-    contextType: 'group',
-    contentType: 'group_files',
-    contentSubtype: 'documents',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  user_images: {
-    contextType: 'user',
-    contentType: 'user_files',
-    contentSubtype: 'images',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  course_images: {
-    contextType: 'course',
-    contentType: 'course_files',
-    contentSubtype: 'images',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  group_images: {
-    contextType: 'group',
-    contentType: 'group_files',
-    contentSubtype: 'images',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  user_media: {
-    contextType: 'user',
-    contentType: 'user_files',
-    contentSubtype: 'media',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  course_media: {
-    contextType: 'course',
-    contentType: 'course_files',
-    contentSubtype: 'media',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  group_media: {
-    contextType: 'group',
-    contentType: 'group_files',
-    contentSubtype: 'media',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  course_links: {
-    contextType: 'course',
-    contentType: 'links',
-    contentSubtype: 'all',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  course_link_edit: {
-    contextType: 'course',
-    contentType: 'links',
-    contentSubtype: 'edit',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  group_links: {
-    contextType: 'group',
-    contentType: 'links',
-    contentSubtype: 'all',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  list_icon_maker_icons: {
-    contextType: 'course',
-    contentType: 'course_files',
-    contentSubtype: ICON_MAKER_ICONS,
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  all: {
-    contextType: 'course',
-    contentType: 'course_files',
-    contentSubtype: 'all',
-    sortValue: 'alphabetical',
-    sortDir: 'asc',
-    searchString: '',
-  },
-}
-
-function isLoading(sprops) {
-  return (
-    sprops.collections.announcements?.isLoading ||
-    sprops.collections.assignments?.isLoading ||
-    sprops.collections.discussions?.isLoading ||
-    sprops.collections.modules?.isLoading ||
-    sprops.collections.quizzes?.isLoading ||
-    sprops.collections.wikiPages?.isLoading ||
-    sprops.documents.course?.isLoading ||
-    sprops.documents.user?.isLoading ||
-    sprops.documents.group?.isLoading ||
-    sprops.media.course?.isLoading ||
-    sprops.media.user?.isLoading ||
-    sprops.media.group?.isLoading ||
-    sprops.all_files?.isLoading
-  )
 }
 
 /**
@@ -561,6 +397,7 @@ function requiredWithoutSource(props, propName, componentName) {
   }
 }
 
+// Changes made here may need to be reflected in the trayProps type in CanvasContentPanel
 const trayPropsMap = {
   canUploadFiles: bool.isRequired,
   contextId: string.isRequired, // initial value indicating the user's context (e.g. student v teacher), not the tray's

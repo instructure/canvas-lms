@@ -22,7 +22,8 @@ import {NamingConfirmation} from '../components/NamingConfirmation'
 import {mockConfigWithPlacements, mockRegistration} from './helpers'
 import {createRegistrationOverlayStore} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
 import userEvent from '@testing-library/user-event'
-import {LtiPlacements, i18nLtiPlacement} from '../../model/LtiPlacement'
+import {LtiPlacements} from '../../model/LtiPlacement'
+import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
 
 describe('NamingConfirmation', () => {
   it('renders the NamingConfirmation', () => {

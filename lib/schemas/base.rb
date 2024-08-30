@@ -41,6 +41,10 @@ module Schemas
       "The following fields are required: #{error.dig("schema", "required").join(", ")}"
     end
 
+    def self.validation_errors(json_hash)
+      new.validate(json_hash).pluck("error")
+    end
+
     private
 
     def schema_checker

@@ -16,16 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {useEditor, useNode} from '@craftjs/core'
+import {useEditor, useNode, type Node} from '@craftjs/core'
 import {useClassNames} from '../../../../utils'
 import {type ContainerProps} from './types'
 
 export const Container = ({
   id,
-  className = '',
-  background = 'transparent',
-  style = {},
-  layout = 'default',
+  className,
+  background,
+  style,
   children,
   ...rest
 }: ContainerProps) => {
@@ -34,21 +33,25 @@ export const Container = ({
   }))
   const {
     connectors: {connect, drag},
-  } = useNode()
+    node,
+  } = useNode((n: Node) => {
+    return {
+      node: n,
+    }
+  })
   const clazz = useClassNames(enabled, {empty: !children}, [
     'container-block',
-    `${layout}-layout`,
-    className,
+    className || Container.craft.defaultProps.className,
   ])
 
   return (
     <div
-      id={id}
+      id={id || `container-${node.id}`}
       className={clazz}
       data-placeholder={rest['data-placeholder'] || 'Drop blocks here'}
       ref={el => el && connect(drag(el))}
       style={{
-        background,
+        background: background || Container.craft.defaultProps.background,
         ...style,
       }}
     >
@@ -57,4 +60,11 @@ export const Container = ({
   )
 }
 
-Container.craft = {}
+Container.craft = {
+  displayName: 'Container',
+  defaultProps: {
+    className: '',
+    background: 'transparent',
+    style: {},
+  },
+}

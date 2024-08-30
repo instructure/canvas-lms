@@ -20,44 +20,50 @@
 module Permissions
   # canvas-lms proper, plugins, etc. call Permissions.register to add
   # permissions to the system. all registrations must happen during app init;
-  # once the app is running (particularly, after the first call to
-  # Permissions.retrieve) the registry will be frozen and further registrations
+  # once the app is running, particularly after the first call to
+  # Permissions.retrieve, the registry will be frozen and further registrations
   # will be ignored.
   #
-  # can take one permission or a hash of permissions. examples:
-  #
-  # Permissions.register :permission1,
-  #   :key => value,
-  #   ...
+  # can take a hash of permission(s). example:
   #
   # Permissions.register({
-  #   :permission2 => {
-  #     :key => value
+  #   permission1: {
+  #     key: value
   #     ...
   #   },
-  #   :permission3 => {
-  #     :key => value
+  #   permission2: {
+  #     key: value
   #     ...
   #   },
   #   ...
   #
-  def self.register(name_or_hash, data = {})
+  def self.register(permissions = {})
     @permissions ||= {}
-    if name_or_hash.is_a?(Hash)
-      raise ArgumentError unless data.empty?
 
-      @permissions.merge!(name_or_hash)
+    if @permissions.frozen?
+      raise "Cannot register permissions after the application has been fully initialized"
+    elsif permissions.is_a?(Hash)
+      permissions.each do |key, value|
+        if @permissions.key?(key)
+          Rails.logger.warn("Duplicate permission detected: #{key}")
+          next
+        else
+          @permissions[key] = value
+        end
+      end
     else
-      raise ArgumentError if data.empty?
-
-      @permissions.merge!(name_or_hash => data)
+      raise "Permissions.register must be called with a hash of permission(s)"
     end
   end
 
   # Return the list of registered permissions.
+  #
+  # Ensure that the permissions registry hash is frozen after the application
+  # has been fully initialized, so that no further registrations can happen.
+  # see: config/initializers/permissions_registry.rb
   def self.retrieve
     @permissions ||= {}
-    @permissions.freeze unless @permissions.frozen?
+
     @permissions
   end
 end

@@ -58,9 +58,8 @@ RSpec.shared_context "lti_1_3_tool_configuration_spec_helper", shared_context: :
           "platform" => "canvas.instructure.com",
           "privacy_level" => "public",
           "tool_id" => "LTI 1.3 Test Tool",
-          "domain" => "http://lti13testtool.docker",
+          "domain" => "lti13testtool.docker",
           "settings" => {
-            "domain" => "lti13testtool.docker",
             "icon_url" => "https://static.thenounproject.com/png/131630-200.png",
             "selection_height" => 500,
             "selection_width" => 500,
@@ -87,6 +86,50 @@ RSpec.shared_context "lti_1_3_tool_configuration_spec_helper", shared_context: :
               }
             ]
           }
+        }
+      ]
+    }
+  end
+
+  # functionally equivalent to `settings` above, but in the
+  # InternalLtiConfiguration format
+  let(:internal_configuration) do
+    {
+      title: "LTI 1.3 Tool",
+      description: "1.3 Tool",
+      target_link_uri:,
+      custom_fields: { has_expansion: "$Canvas.user.id", no_expansion: "foo" },
+      public_jwk: public_jwk.deep_symbolize_keys,
+      oidc_initiation_url:,
+      redirect_uris: [target_link_uri],
+      scopes:,
+      domain: "lti13testtool.docker",
+      tool_id: "LTI 1.3 Test Tool",
+      privacy_level: "public",
+      launch_settings: {
+        icon_url: "https://static.thenounproject.com/png/131630-200.png",
+        selection_height: 500,
+        selection_width: 500,
+        text: "LTI 1.3 Test Tool Extension text",
+      },
+      placements: [
+        {
+          placement: "course_navigation",
+          enabled: true,
+          message_type: "LtiResourceLinkRequest",
+          canvas_icon_class: "icon-pdf",
+          icon_url: "https://static.thenounproject.com/png/131630-211.png",
+          text: "LTI 1.3 Test Tool Course Navigation",
+          target_link_uri: "http://lti13testtool.docker/launch?placement=course_navigation",
+        },
+        {
+          placement: "account_navigation",
+          enabled: true,
+          message_type: "LtiResourceLinkRequest",
+          canvas_icon_class: "icon-lti",
+          icon_url: "https://static.thenounproject.com/png/131630-211.png",
+          text: "LTI 1.3 Test Tool Course Navigation",
+          target_link_uri: "http://lti13testtool.docker/launch?placement=account_navigation",
         }
       ]
     }

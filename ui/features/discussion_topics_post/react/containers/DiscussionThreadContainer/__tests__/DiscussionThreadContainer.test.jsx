@@ -39,12 +39,18 @@ jest.mock('../../../utils', () => ({
   responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 
+jest.mock('../../../utils/constants', () => ({
+  ...jest.requireActual('../../../utils/constants'),
+  HIGHLIGHT_TIMEOUT: 0,
+}))
+
 describe('DiscussionThreadContainer', () => {
   const onFailureStub = jest.fn()
   const onSuccessStub = jest.fn()
   const openMock = jest.fn()
   beforeAll(() => {
     delete window.location
+    window.location = {search: ''}
     window.open = openMock
     window.ENV = {
       course_id: '1',
@@ -189,7 +195,10 @@ describe('DiscussionThreadContainer', () => {
       window.location = {assign: jest.fn()}
       const setHighlightEntryId = jest.fn()
       const {getByTestId, getAllByText} = setup(
-        defaultProps({propOverrides: {setHighlightEntryId}, discussionOverrides: {discussionType: "threaded"},}),
+        defaultProps({
+          propOverrides: {setHighlightEntryId},
+          discussionOverrides: {discussionType: 'threaded'},
+        }),
         updateDiscussionThreadReadStateMock({
           discussionEntryId: 'DiscussionEntry-default-mock',
           read: false,
@@ -209,7 +218,7 @@ describe('DiscussionThreadContainer', () => {
     it('Should not render Mark Thread as Unread and Read', () => {
       const {getByTestId, queryByTestId} = setup(
         defaultProps({
-          discussionOverrides: {discussionType: "not_threaded"},
+          discussionOverrides: {discussionType: 'not_threaded'},
         })
       )
 
@@ -285,7 +294,10 @@ describe('DiscussionThreadContainer', () => {
       fireEvent.click(getByTestId('inSpeedGrader'))
 
       await waitFor(() => {
-        expect(openMock).toHaveBeenCalledWith(getSpeedGraderUrl('2'), `_blank`)
+        expect(openMock).toHaveBeenCalledWith(
+          getSpeedGraderUrl('2', 'DiscussionEntry-default-mock'),
+          `_blank`
+        )
       })
     })
 

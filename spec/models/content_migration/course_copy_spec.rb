@@ -1362,6 +1362,7 @@ describe ContentMigration do
         Timecop.travel(1.minute.from_now) do
           expect { run_course_copy }.not_to change(ContentExport, :count)
           expect { JSON.parse(@cm.reload.exported_attachment.open) }.not_to raise_error
+
           expect(@copy_to.wiki_pages.where(title: "one")).to exist
         end
       end

@@ -140,7 +140,7 @@
         <%= t('messages.no_comments', "No Comments") if visible_comments.empty? %>
         <% visible_comments.each do |comment| %>
           <div id="comment-<%= comment.id %>" class="comment">
-            <%= comment.comment %>
+            <div class="comment_content" data-content="<%= comment.comment %>"></div>
             <div class="comment_attachments">
               <% comment.attachments.each do |attachment| %>
                 <div class="comment_attachment">

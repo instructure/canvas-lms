@@ -1551,7 +1551,7 @@ class UsersController < ApplicationController
     @lti_launch.resource_url = @tool.login_or_launch_url(extension_type: placement)
     @lti_launch.link_text = @tool.label_for(placement, I18n.locale)
     @lti_launch.analytics_id = @tool.tool_id
-    Lti::LogService.new(tool: @tool, context: @domain_root_account, user: @current_user, session_id: session[:session_id], placement:, launch_type: :direct_link).call
+    Lti::LogService.new(tool: @tool, context: @domain_root_account, user: @current_user, session_id: session[:session_id], placement:, launch_type: :direct_link, launch_url: @lti_launch.resource_url).call
 
     set_active_tab @tool.asset_string
     add_crumb(@current_user.short_name, user_profile_path(@current_user))
@@ -2944,20 +2944,6 @@ class UsersController < ApplicationController
       next unless (student = data[submission.user_id])
 
       student[:ungraded] << submission
-    end
-
-    if course.root_account.enable_user_notes?
-      data.each_value { |v| v[:last_user_note] = nil }
-      # find all last user note times in one query
-      note_dates = UserNote.active
-                           .group(:user_id)
-                           .where("created_by_id = ? AND user_id IN (?)", teacher, ids)
-                           .maximum(:created_at)
-      note_dates.each do |user_id, date|
-        next unless (student = data[user_id])
-
-        student[:last_user_note] = date
-      end
     end
 
     Canvas::ICU.collate_by(data.values) { |e| e[:enrollment].user.sortable_name }

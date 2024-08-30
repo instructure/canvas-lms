@@ -16,79 +16,117 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState} from 'react'
+// @ts-expect-error
+import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {Spinner} from '@instructure/ui-spinner'
 import {AccountNavigation} from './AccountNavigation'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {View} from '@instructure/ui-view'
+import getAccounts from '@canvas/api/accounts/getAccounts'
+import {useQuery} from '@canvas/query'
+import {IconSettingsLine} from '@instructure/ui-icons'
+import GenericErrorPage from '@canvas/generic-error-page/react'
+import {Table} from '@instructure/ui-table'
+import {IconButton} from '@instructure/ui-buttons'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = useI18nScope('account_manage')
 
-const ACC_PER_PAGE = 50
-
-interface Props {
-  readonly pageIndex: number
-  readonly onPageClick: (page: number) => void
+const ErrorPage = ({error}: {error?: unknown}) => {
+  return (
+    <GenericErrorPage
+      imageUrl={errorShipUrl}
+      errorSubject={I18n.t('Accounts initial query error')}
+      errorCategory={I18n.t('Accounts Error Page')}
+      errorMessage={error instanceof Error ? error?.message : ''}
+    />
+  )
 }
 
-export function AccountList(props: Props) {
-  const [accounts, setAccounts] = useState([])
-  const [load, setLoad] = useState(false)
-  const [last, setLast] = useState(0)
-  const [error, setError] = useState(false)
+export function AccountList() {
+  const [pageIndex, setPageIndex] = useState(1)
 
-  useEffect(() => {
-    const loadAccounts = async () => {
-      setLoad(false)
-      try {
-        const {json, link} = await doFetchApi({
-          path: '/api/v1/accounts?per_page=' + ACC_PER_PAGE + '&page=' + props.pageIndex,
-          method: 'GET',
-        })
-        if (json !== undefined && link !== undefined) {
-          setLoad(true)
-          setError(false)
-          setAccounts(json)
-          const lastPage = parseInt(link?.last?.page, 10)
-          setLast(lastPage)
-        }
-      } catch (err) {
-        showFlashError(I18n.t('Accounts could not be loaded'))
-        setLoad(true)
-        setError(true)
-      }
-    }
-    loadAccounts()
-  }, [props.pageIndex])
+  const {data, error, isLoading, isError} = useQuery({
+    queryKey: ['accounts', {pageIndex}],
+    queryFn: getAccounts,
+    fetchAtLeastOnce: true,
+  })
 
-  if (!load) {
-    return (
-      <div>
-        <Spinner renderTitle={I18n.t('Loading')} margin="large auto 0 auto" />
-      </div>
-    )
+  const last = parseInt(String(data?.link?.last?.page || ''), 10)
+
+  if (isError) {
+    return <ErrorPage error={error} />
   }
-  if (error) {
-    return <div />
-  } else {
+
+  if (isLoading) {
     return (
-      <div>
-        <ul>
-          {accounts.length > 0
-            ? accounts.map((item: any) => (
-                <li key={item.id}>
-                  <a href={'/accounts/' + item.id}>{item.name}</a>
-                </li>
-              ))
-            : null}
-        </ul>
-        <AccountNavigation
-          currentPage={props.pageIndex}
-          onPageClick={props.onPageClick}
-          pageCount={last}
+      <View>
+        <Spinner
+          renderTitle={I18n.t('Loading')}
+          size="small"
+          delay={500}
+          margin="large auto 0 auto"
         />
-      </div>
+      </View>
     )
   }
+
+  const accounts = data?.json
+
+  return (
+    <View>
+      <Table caption={I18n.t('Accounts')}>
+        <Table.Head>
+          <Table.Row>
+            <Table.ColHeader id="name-header" width="65%">
+              {I18n.t('Name')}
+            </Table.ColHeader>
+            <Table.ColHeader id="sub_account_count-header" width="15%">
+              {I18n.t('Subaccounts')}
+            </Table.ColHeader>
+            <Table.ColHeader id="course_count-header" width="15%">
+              {I18n.t('Courses')}
+            </Table.ColHeader>
+            <Table.ColHeader id="settings-header" width="5%">
+              {I18n.t('Settings')}
+            </Table.ColHeader>
+          </Table.Row>
+        </Table.Head>
+        <Table.Body>
+          {accounts?.map(account => {
+            const settingsTip = I18n.t('Settings for %{name}', {name: account.name})
+
+            return (
+              <Table.Row key={account.id}>
+                <Table.Cell>
+                  <a href={`/accounts/${account.id}`}>{account.name}</a>
+                </Table.Cell>
+                <Table.Cell>
+                  <a href={`/accounts/${account.id}/sub_accounts`}>{account.sub_account_count}</a>
+                </Table.Cell>
+                <Table.Cell>{account.course_count}</Table.Cell>
+                <Table.Cell textAlign="end">
+                  <Tooltip placement="start center" offsetX={5} renderTip={settingsTip}>
+                    <IconButton
+                      withBorder={false}
+                      withBackground={false}
+                      size="small"
+                      href={`/accounts/${account.id}/settings#tab-settings`}
+                      screenReaderLabel={settingsTip}
+                    >
+                      <IconSettingsLine title={settingsTip} />
+                    </IconButton>
+                  </Tooltip>
+                </Table.Cell>
+              </Table.Row>
+            )
+          })}
+        </Table.Body>
+      </Table>
+      {last > 1 && (
+        <AccountNavigation currentPage={pageIndex} onPageClick={setPageIndex} pageCount={last} />
+      )}
+    </View>
+  )
 }

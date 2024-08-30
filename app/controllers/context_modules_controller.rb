@@ -704,6 +704,7 @@ class ContextModulesController < ApplicationController
         graded: @tag.graded?,
         content_details: content_details(@tag, @current_user),
         assignment_id: @tag.assignment.try(:id),
+        is_checkpointed: @tag.assignment.try(:has_sub_assignments),
         is_cyoe_able: cyoe_able?(@tag),
         is_duplicate_able: @tag.duplicate_able?,
         can_manage_assign_to: @tag.content&.grants_right?(@current_user, session, :manage_assign_to)
@@ -817,7 +818,8 @@ class ContextModulesController < ApplicationController
                                .select { |ct| ct.content_type != "Assignment" && ct.content.assignment_id }.map(&:content)
     ActiveRecord::Associations.preload(content_with_assignments, :assignment) if content_with_assignments.any?
     DatesOverridable.preload_override_data_for_objects(content_with_assignments.map(&:assignment))
-    DatesOverridable.preload_override_data_for_objects(tags.select { |ct| %w[Assignment Quizzes::Quiz WikiPage DiscussionTopic].include?(ct.content_type) }.map(&:content))
+    override_preload_types = %w[Assignment Quizzes::Quiz WikiPage DiscussionTopic].freeze
+    DatesOverridable.preload_override_data_for_objects(tags.select { |ct| override_preload_types.include?(ct.content_type) }.map(&:content))
 
     if user_is_admin && should_preload_override_data?
       assignments = assignment_tags.filter_map(&:assignment)

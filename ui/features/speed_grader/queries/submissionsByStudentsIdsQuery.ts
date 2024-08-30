@@ -20,17 +20,18 @@ import {z} from 'zod'
 import {executeQuery} from '@canvas/query/graphql'
 import gql from 'graphql-tag'
 
-const SUBMISSIONS_BY_STUDENT_IDS_QUERY = gql`
-  query SubmissionsByStudentsQuery {
+const QUERY = gql`
+  query SpeedGrader_SubmissionsByStudentsQuery($courseId: ID!, $studentIds: [ID!]!) {
     course(id: $courseId) {
-      id
       submissionsConnection(studentIds: $studentIds) {
         nodes {
+          assignmentId
           id
-          submittedAt
-          state
-          score
           late
+          score
+          state
+          submittedAt
+          userId
         }
       }
     }
@@ -45,6 +46,7 @@ function transform(result: any) {
 }
 
 export const ZGetSubmissionsByStudentIdsParams = z.object({
+  courseId: z.string().min(1),
   studentIds: z.array(z.string().min(1)),
 })
 
@@ -56,9 +58,10 @@ export async function getSubmissionsByStudentIds<T extends GetSubmissionsByStude
   queryKey: [string, T]
 }): Promise<any> {
   ZGetSubmissionsByStudentIdsParams.parse(queryKey[1])
-  const {studentIds} = queryKey[1]
+  const {courseId, studentIds} = queryKey[1]
 
-  const result = await executeQuery<any>(SUBMISSIONS_BY_STUDENT_IDS_QUERY, {
+  const result = await executeQuery<any>(QUERY, {
+    courseId,
     studentIds,
   })
 

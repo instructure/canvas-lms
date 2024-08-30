@@ -2,7 +2,7 @@
 # To update this file please edit the relevant template and run the generation
 # task `build/dockerfile_writer.rb --env development --compose-file docker-compose.yml,docker-compose.override.yml,docker-compose/puma.override.yml --in build/Dockerfile.puma.template --out Dockerfile.puma`
 
-ARG RUBY=3.1
+ARG RUBY=3.3
 
 FROM instructure/ruby:$RUBY
 LABEL maintainer="Instructure"

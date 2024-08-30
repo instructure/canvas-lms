@@ -323,8 +323,11 @@ function DiscussionTopicForm({
     setUsageRightsData(data)
   }
 
-  const hasGroupOverrides = () => assignedInfoList.some(info => info.assignedList.find(assetCode => assetCode.includes('group')) !== undefined)
- 
+  const hasGroupOverrides = () =>
+    assignedInfoList.some(
+      info => info.assignedList.find(assetCode => assetCode.includes('group')) !== undefined
+    )
+
   const assignmentDueDateContext = {
     assignedInfoList,
     setAssignedInfoList,
@@ -501,7 +504,13 @@ function DiscussionTopicForm({
       ...(shouldShowUsageRightsOption && {usageRightsData}),
     }
 
-    if (!isGraded && ENV.FEATURES?.selective_release_ui_api && !isAnnouncement) {
+    if (
+      !isGraded &&
+      ENV.FEATURES?.selective_release_ui_api &&
+      !isAnnouncement &&
+      ENV.context_type !== 'Group' &&
+      !isGroupDiscussion
+    ) {
       delete payload.specificSections
       Object.assign(
         payload,
@@ -588,7 +597,7 @@ function DiscussionTopicForm({
 
     if (
       // Not validate override dates for announcements or ungraded group discussions
-      !(isAnnouncement || (isGroupDiscussion && !isGraded)) &&
+      !(isAnnouncement || (isGroupDiscussion && !isGraded) || ENV?.context_type == 'Group') &&
       ENV.FEATURES.selective_release_ui_api &&
       ENV.FEATURES.selective_release_edit_page
     ) {
@@ -771,6 +780,7 @@ function DiscussionTopicForm({
         </View>
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     assignmentDueDateContext,
     assignmentGroup,
@@ -1074,23 +1084,30 @@ function DiscussionTopicForm({
               </>
             )}
             {shouldShowGroupOptions && (
-                <Checkbox
-                  id="has_group_category"
-                  data-testid="group-discussion-checkbox"
-                  label={I18n.t('This is a Group Discussion')}
-                  value="group-discussion"
-                  checked={isGroupDiscussion}
-                  messages={groupDiscussionErrors}
-                  onChange={() => {
-                    if (ENV.FEATURES.selective_release_edit_page && hasGroupOverrides()) {
-                      setGroupDiscussionErrors([{type: 'error', text: I18n.t('You must remove any groups from the Assign Access section to change this setting.')}])
-                      return;
-                    }
-                    setGroupCategoryId(!isGroupDiscussion ? '' : groupCategoryId)
-                    setIsGroupDiscussion(!isGroupDiscussion)
-                  }}
-                  disabled={!canGroupDiscussion}
-                />
+              <Checkbox
+                id="has_group_category"
+                data-testid="group-discussion-checkbox"
+                label={I18n.t('This is a Group Discussion')}
+                value="group-discussion"
+                checked={isGroupDiscussion}
+                messages={groupDiscussionErrors}
+                onChange={() => {
+                  if (ENV.FEATURES.selective_release_edit_page && hasGroupOverrides()) {
+                    setGroupDiscussionErrors([
+                      {
+                        type: 'error',
+                        text: I18n.t(
+                          'You must remove any groups from the Assign Access section to change this setting.'
+                        ),
+                      },
+                    ])
+                    return
+                  }
+                  setGroupCategoryId(!isGroupDiscussion ? '' : groupCategoryId)
+                  setIsGroupDiscussion(!isGroupDiscussion)
+                }}
+                disabled={!canGroupDiscussion}
+              />
             )}
             {shouldShowGroupOptions && isGroupDiscussion && (
               <View display="block" padding="none none none large">
@@ -1100,10 +1117,22 @@ function DiscussionTopicForm({
                   defaultValue=""
                   value={groupCategoryId}
                   onChange={(_event, newChoice) => {
-                    if(ENV.FEATURES.selective_release_edit_page && hasGroupOverrides()) {
-                      setGroupCategorySelectError([{type: 'error', text: I18n.t('You must remove any groups belonging to %{groupCategory} from the Assign Access section before you can change to another Group Set.', {groupCategory: groupCategories.find(groupCategory => groupCategory._id === groupCategoryId)?.name})}])
+                    if (ENV.FEATURES.selective_release_edit_page && hasGroupOverrides()) {
+                      setGroupCategorySelectError([
+                        {
+                          type: 'error',
+                          text: I18n.t(
+                            'You must remove any groups belonging to %{groupCategory} from the Assign Access section before you can change to another Group Set.',
+                            {
+                              groupCategory: groupCategories.find(
+                                groupCategory => groupCategory._id === groupCategoryId
+                              )?.name,
+                            }
+                          ),
+                        },
+                      ])
                       return
-                    };
+                    }
                     const value = newChoice.value
                     if (value === 'new-group-category') {
                       // new group category workflow here

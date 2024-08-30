@@ -145,13 +145,26 @@ export default function AssignToPanel({
       return
     }
 
-    setIsLoading(true)
-    doFetchApi({
-      path: `/api/v1/courses/${courseId}/modules/${moduleId}/assignment_overrides`,
-    })
-      .then((data: any) => {
-        if (data.json === undefined) return
-        const json = data.json as AssignmentOverride[]
+    const fetchAllOverrides = async () => {
+      setIsLoading(true)
+      const allResponses = []
+      let url:
+        | string
+        | null = `/api/v1/courses/${courseId}/modules/${moduleId}/assignment_overrides`
+
+      try {
+        while (url) {
+          // eslint-disable-next-line no-await-in-loop
+          const response: any = await doFetchApi({
+            path: url,
+            params: {per_page: 100},
+          })
+          if (response.json.length === 0) return
+          allResponses.push(response.json)
+          url = response.link?.next?.url || null
+        }
+        if (allResponses.length === 0) return
+        const json = allResponses.flat() as AssignmentOverride[]
         const parsedOptions = json.reduce((acc: AssigneeOption[], override: AssignmentOverride) => {
           const overrideOptions =
             override.students?.map(({id, name}: {id: string; name: string}) => ({
@@ -177,11 +190,13 @@ export default function AssignToPanel({
         if (!defaultOption && parsedOptions.length > 0) {
           setSelectedOption(CUSTOM_OPTION.value)
         }
-      })
-      .catch(showFlashError())
-      .finally(() => {
+      } catch {
+        showFlashError()
+      } finally {
         setIsLoading(false)
-      })
+      }
+    }
+    !isLoading && fetchAllOverrides()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

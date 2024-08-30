@@ -129,6 +129,93 @@ describe "SpeedGrader - discussion submissions" do
         end
       end
     end
+
+    it "displays the SpeedGraderNavigator" do
+      Speedgrader.visit(@course.id, @assignment.id)
+
+      in_frame("speedgrader_iframe") do
+        in_frame("discussion_preview_iframe") do
+          wait_for_ajaximations
+
+          # These should be uncommented out when the implementation is done in the closing
+          # Patchset for VICE-3920
+          # expect(f("[data-testid='previous-in-speedgrader']")).not_to be_displayed
+          # expect(f("[data-testid='next-in-speedgrader']")).not_to be_displayed
+          expect(f("[data-testid='jump-to-speedgrader-navigation']")).not_to be_displayed
+
+          # rubocop:disable Specs/NoExecuteScript
+          driver.execute_script("document.querySelector('[data-testid=\"jump-to-speedgrader-navigation\"]').focus()")
+          # rubocop:enable Specs/NoExecuteScript
+          wait_for_ajaximations
+
+          # These should be uncommented out when the implementation is done in the closing
+          # Patchset for VICE-3920
+          # expect(f("[data-testid='previous-in-speedgrader']")).to be_displayed
+          # expect(f("[data-testid='next-in-speedgrader']")).to be_displayed
+          expect(f("[data-testid='jump-to-speedgrader-navigation']")).to be_displayed
+        end
+      end
+    end
+
+    it "can focus on speedgrader previous student button" do
+      Speedgrader.visit(@course.id, @assignment.id)
+
+      in_frame("speedgrader_iframe") do
+        in_frame("discussion_preview_iframe") do
+          wait_for_ajaximations
+          # rubocop:disable Specs/NoExecuteScript
+          driver.execute_script("document.querySelector('[data-testid=\"jump-to-speedgrader-navigation\"]').focus()")
+          # rubocop:enable Specs/NoExecuteScript
+          wait_for_ajaximations
+
+          expect(f("[data-testid='jump-to-speedgrader-navigation']")).to be_displayed
+
+          f("[data-testid='jump-to-speedgrader-navigation']").click
+        end
+      end
+
+      check_element_has_focus f("#prev-student-button")
+    end
+
+    it "opens the student context card when clicking on the student name" do
+      Speedgrader.visit(@course.id, @assignment.id)
+
+      in_frame("speedgrader_iframe") do
+        in_frame("discussion_preview_iframe") do
+          wait_for_ajaximations
+          f("[data-testid='author_name']").click
+          expect(f(".StudentContextTray-Header")).to be_present
+        end
+      end
+    end
+
+    it "focuses on the entry_id defined in the speegrader url (splitscreen)" do
+      entry_3 = @discussion_topic.discussion_entries.create!(user: @student, message: "third student message", parent_id: @discussion_topic.discussion_entries.first.id)
+      @teacher.preferences[:discussions_splitscreen_view] = true
+      @teacher.save!
+      Speedgrader.visit(@course.id, @assignment.id, entry_id: entry_3.id)
+
+      in_frame("speedgrader_iframe") do
+        in_frame("discussion_preview_iframe") do
+          wait_for_ajaximations
+          expect(f("span.discussions-split-screen-view-content div.highlight-discussion").text).to include entry_3.message
+        end
+      end
+    end
+
+    it "focuses on the entry_id defined in the speegrader url (inline)" do
+      entry_3 = @discussion_topic.discussion_entries.create!(user: @student, message: "third student message", parent_id: @discussion_topic.discussion_entries.first.id)
+      @teacher.preferences[:discussions_splitscreen_view] = false
+      @teacher.save!
+      Speedgrader.visit(@course.id, @assignment.id, entry_id: entry_3.id)
+
+      in_frame("speedgrader_iframe") do
+        in_frame("discussion_preview_iframe") do
+          wait_for_ajaximations
+          expect(f("div[data-testid='discussion-root-entry-container'] div.highlight-discussion").text).to include entry_3.message
+        end
+      end
+    end
   end
 
   context "when student names hidden" do
@@ -237,62 +324,6 @@ describe "SpeedGrader - discussion submissions" do
         @custom_status = CustomGradeStatus.create!(name: "Custom Status", color: "#000000", root_account_id: @course.root_account_id, created_by: @teacher)
       end
 
-      it "displays the SpeedGraderNavigator" do
-        Speedgrader.visit(@course.id, @assignment.id)
-
-        in_frame("speedgrader_iframe") do
-          in_frame("discussion_preview_iframe") do
-            wait_for_ajaximations
-
-            # These should be uncommented out when the implementation is done in the closing
-            # Patchset for VICE-3920
-            # expect(f("[data-testid='previous-in-speedgrader']")).not_to be_displayed
-            # expect(f("[data-testid='next-in-speedgrader']")).not_to be_displayed
-            expect(f("[data-testid='jump-to-speedgrader-navigation']")).not_to be_displayed
-
-            driver.execute_script("document.querySelector('[data-testid=\"jump-to-speedgrader-navigation\"]').focus()")
-            wait_for_ajaximations
-
-            # These should be uncommented out when the implementation is done in the closing
-            # Patchset for VICE-3920
-            # expect(f("[data-testid='previous-in-speedgrader']")).to be_displayed
-            # expect(f("[data-testid='next-in-speedgrader']")).to be_displayed
-            expect(f("[data-testid='jump-to-speedgrader-navigation']")).to be_displayed
-          end
-        end
-      end
-
-      it "can focus on speedgrader previous student button" do
-        Speedgrader.visit(@course.id, @assignment.id)
-
-        in_frame("speedgrader_iframe") do
-          in_frame("discussion_preview_iframe") do
-            wait_for_ajaximations
-
-            driver.execute_script("document.querySelector('[data-testid=\"jump-to-speedgrader-navigation\"]').focus()")
-            wait_for_ajaximations
-
-            expect(f("[data-testid='jump-to-speedgrader-navigation']")).to be_displayed
-
-            f("[data-testid='jump-to-speedgrader-navigation']").click
-          end
-        end
-
-        check_element_has_focus f("#prev-student-button")
-      end
-
-      it "opens the student context card when clicking on the student name" do
-        Speedgrader.visit(@course.id, @assignment.id)
-
-        in_frame("speedgrader_iframe") do
-          in_frame("discussion_preview_iframe") do
-            wait_for_ajaximations
-            f("[data-testid='author_name']").click
-            expect(f(".StudentContextTray-Header")).to be_present
-          end
-        end
-      end
-
       it "displays whole discussion with hidden student names" do
         Speedgrader.visit(@course.id, @assignment.id)
 
@@ -314,6 +345,16 @@ describe "SpeedGrader - discussion submissions" do
       end
 
       it "changes grade and status and persist it correctly" do
+        @course.create_late_policy(
+          missing_submission_deduction_enabled: true,
+          missing_submission_deduction: 25.0,
+          late_submission_deduction_enabled: true,
+          late_submission_deduction: 10.0,
+          late_submission_interval: "day",
+          late_submission_minimum_percent_enabled: true,
+          late_submission_minimum_percent: 50.0
+        )
+
         # Loads Speedgrader for a student
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
         wait_for_ajaximations
@@ -324,6 +365,9 @@ describe "SpeedGrader - discussion submissions" do
         reply_to_topic_grade_input.send_keys("2")
         reply_to_topic_grade_input.send_keys(:tab)
         wait_for_ajaximations
+        # this is the screenreader alert that gets announced when the grade is saved
+        # using be_truthy since the alert is not visible
+        expect(fj("div:contains('Current Total Updated: 2')")).to be_truthy
 
         reply_to_topic_assignment = @checkpointed_discussion.assignment.sub_assignments.find_by(sub_assignment_tag: "reply_to_topic")
         reply_to_topic_submission = reply_to_topic_assignment.submissions.find_by(user: @student)
@@ -336,6 +380,7 @@ describe "SpeedGrader - discussion submissions" do
         reply_to_entry_grade_input.send_keys("5")
         reply_to_entry_grade_input.send_keys(:tab)
         wait_for_ajaximations
+        expect(fj("div:contains('Current Total Updated: 7')")).to be_truthy
 
         reply_to_entry_assignment = @checkpointed_discussion.assignment.sub_assignments.find_by(sub_assignment_tag: "reply_to_entry")
         reply_to_entry_submission = reply_to_entry_assignment.submissions.find_by(user: @student)
@@ -354,6 +399,7 @@ describe "SpeedGrader - discussion submissions" do
         time_late_input.send_keys("2")
         time_late_input.send_keys(:tab)
         wait_for_ajaximations
+        expect(fj("div:contains('Current Total Updated: 6.5')")).to be_truthy
 
         reply_to_topic_submission.reload
         expect(reply_to_topic_submission.late).to be true
@@ -393,7 +439,7 @@ describe "SpeedGrader - discussion submissions" do
         expect(reply_to_entry_select).to have_value "Custom Status"
       end
 
-      it "does not displays the no submission message if student has a partial submission" do
+      it "does not display the no submission message if student has a partial submission" do
         DiscussionEntry.create!(
           message: "1st level reply",
           discussion_topic_id: @checkpointed_discussion.discussion_topic_id,
@@ -411,6 +457,30 @@ describe "SpeedGrader - discussion submissions" do
         wait_for_ajaximations
 
         expect(f("#this_student_does_not_have_a_submission")).to be_displayed
+      end
+
+      context "discussions navigation" do
+        it "does not display if student has no submission" do
+          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
+          wait_for_ajaximations
+
+          expect(f("body")).to_not contain_jqcss("button[data-testid='discussions-previous-reply-button']")
+          expect(f("body")).to_not contain_jqcss("button[data-testid='discussions-next-reply-button']")
+        end
+
+        it "does display if student has submission" do
+          DiscussionEntry.create!(
+            message: "1st level reply",
+            discussion_topic_id: @checkpointed_discussion.discussion_topic_id,
+            user_id: @student.id
+          )
+
+          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
+          wait_for_ajaximations
+
+          expect(f("button[data-testid='discussions-previous-reply-button']")).to be_displayed
+          expect(f("button[data-testid='discussions-next-reply-button']")).to be_displayed
+        end
       end
 
       it "displays the root topic for group discussion if groups have no users" do

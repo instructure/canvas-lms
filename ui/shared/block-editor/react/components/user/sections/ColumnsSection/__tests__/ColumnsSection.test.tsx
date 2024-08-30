@@ -38,12 +38,16 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import {Editor, Frame} from '@craftjs/core'
 import {Container} from '../../../blocks/Container'
-import {ColumnsSection, type ColumnsSectionProps} from '..'
+import {ColumnsSection, ColumnsSectionInner, type ColumnsSectionProps} from '..'
+import {GroupBlock} from '../../../blocks/GroupBlock'
 import {NoSections} from '../../../common'
 
 const renderSection = (props: Partial<ColumnsSectionProps> = {}) => {
   return render(
-    <Editor enabled={true} resolver={{ColumnsSection, NoSections, Container}}>
+    <Editor
+      enabled={true}
+      resolver={{ColumnsSection, ColumnsSectionInner, GroupBlock, NoSections, Container}}
+    >
       <Frame>
         <ColumnsSection columns={2} {...props} />
       </Frame>
@@ -52,22 +56,10 @@ const renderSection = (props: Partial<ColumnsSectionProps> = {}) => {
 }
 
 describe('ColumnsSection', () => {
-  it('should render fixed variant by default', () => {
+  it('should render ', () => {
     const {container} = renderSection()
-    expect(container.querySelector('.section.columns-section.fixed.columns-2')).toBeInTheDocument()
-    expect(container.querySelectorAll('.columns-section__inner')).toHaveLength(2)
-  })
-
-  it('should render fluid variant', () => {
-    const {container} = render(
-      <Editor enabled={true} resolver={{ColumnsSection, NoSections, Container}}>
-        <Frame>
-          <ColumnsSection columns={3} variant="fluid" />
-        </Frame>
-      </Editor>
-    )
-    expect(container.querySelector('.section.columns-section.fluid.columns-3')).toBeInTheDocument()
-    expect(container.querySelectorAll('.columns-section__inner')).toHaveLength(1)
+    expect(container.querySelector('.section.columns-section.columns-2')).toBeInTheDocument()
+    expect(container.querySelectorAll('.group-block')).toHaveLength(2)
   })
 
   it('is tagged as a section', () => {

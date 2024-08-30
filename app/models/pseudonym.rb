@@ -85,16 +85,9 @@ class Pseudonym < ActiveRecord::Base
               if: ->(p) { (p.unique_id_changed? || p.workflow_state_changed?) && p.active? }
             }
 
-  validates :password,
-            confirmation: true,
-            if: :require_password?
-
-  validates_each :password,
-                 if: :require_password?,
-                 &Canvas::Security::PasswordPolicy.method(:validate)
-  validates :password_confirmation,
-            presence: true,
-            if: :require_password?
+  validates :password, confirmation: true, if: :require_password?
+  validates_each :password, if: :require_password?, &:validate_password
+  validates :password_confirmation, presence: true, if: :require_password?
 
   class << self
     # we know these fields, and don't want authlogic to connect to the db at boot
@@ -130,6 +123,10 @@ class Pseudonym < ActiveRecord::Base
     # is true. just check if the pw has changed or crypted_password_field is
     # blank.
     password_changed? || (send(crypted_password_field).blank? && sis_ssha.blank?) || @require_password
+  end
+
+  def validate_password(attr, val)
+    Canvas::Security::PasswordPolicy.validate(self, attr, val)
   end
 
   acts_as_list scope: :user
