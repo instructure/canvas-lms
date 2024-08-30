@@ -109,6 +109,10 @@ const PasswordComplexityConfiguration = () => {
             } else {
               setAllowLoginSuspensionEnabled(false)
             }
+
+            // ensure customForbiddenWordsEnabled is correctly set when the tray opens to prevent
+            // mistakenly deleting an existing custom list if “Apply” is clicked without changes
+            setCustomForbiddenWordsEnabled(!!passwordPolicy.common_passwords_attachment_id)
           }
         } catch (err: any) {
           // err type has to be any because the error object is not defined
