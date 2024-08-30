@@ -22,6 +22,7 @@ class CanvasSchema < GraphQL::Schema
   query Types::QueryType
   mutation Types::MutationType
   trace_with GraphQL::Tracing::CallLegacyTracers
+  trace_with GraphQL::Tracing::SentryTrace
 
   use GraphQL::Batch
 
