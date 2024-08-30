@@ -48,6 +48,12 @@ class Mention < ApplicationRecord
     end
   end
 
+  def reply_from(opts)
+    raise IncomingMail::Errors::UnknownAddress if discussion_entry.deleted?
+
+    discussion_entry.reply_from(opts)
+  end
+
   def log_created_mention_metrics
     InstStatsd::Statsd.increment("discussion_mention.created")
   end
