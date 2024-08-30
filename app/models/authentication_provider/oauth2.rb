@@ -38,7 +38,7 @@ class AuthenticationProvider::OAuth2 < AuthenticationProvider::Delegated
     @client ||= ::OAuth2::Client.new(client_id, client_secret, client_options)
   end
 
-  def generate_authorize_url(redirect_uri, state)
+  def generate_authorize_url(redirect_uri, state, nonce:)
     client.auth_code.authorize_url({ redirect_uri:, state: }.merge(authorize_options))
   end
 
