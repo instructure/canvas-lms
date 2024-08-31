@@ -19,7 +19,8 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import createReactClass from 'create-react-class'
-import InfiniteScroll from './mixins/InfiniteScroll'
+import InfiniteScroll from '@canvas/infinite-scroll'
+import {Spinner} from '@instructure/ui-spinner'
 import Group from './Group'
 
 const I18n = useI18nScope('student_groups')
@@ -27,7 +28,14 @@ const I18n = useI18nScope('student_groups')
 // eslint-disable-next-line react/prefer-es6-class
 const PaginatedGroupList = createReactClass({
   displayName: 'PaginatedGroupList',
-  mixins: [InfiniteScroll],
+
+  loader() {
+    return (
+      <div className="spinner-container">
+        <Spinner renderTitle="Loading" size="large" margin="0 0 0 medium" />
+      </div>
+    )
+  },
 
   loadMore() {
     this.props.loadMore()
@@ -44,9 +52,16 @@ const PaginatedGroupList = createReactClass({
       />
     ))
     return (
-      <div role="list" aria-label={I18n.t('Groups')}>
-        {groups}
-      </div>
+      <InfiniteScroll
+        pageStart={0}
+        loadMore={this.loadMore()}
+        hasMore={this.props.hasMore}
+        loader={this.loader()}
+      >
+        <div role="list" aria-label={I18n.t('Groups')}>
+          {groups}
+        </div>
+      </InfiniteScroll>
     )
   },
 })
