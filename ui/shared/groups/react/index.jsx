@@ -23,7 +23,6 @@ import createReactClass from 'create-react-class'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {Spinner} from '@instructure/ui-spinner'
 import {Button} from '@instructure/ui-buttons'
 import {IconAddLine} from '@instructure/ui-icons'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
@@ -216,7 +215,7 @@ const StudentView = createReactClass({
     this.openManageGroupDialog(group)
   },
 
-  renderGroupList(groups, loading) {
+  renderGroupList(groups) {
     const debouncedSetState = debounce((...args) => this.setState(...args), 500)
     return (
       <>
@@ -232,17 +231,15 @@ const StudentView = createReactClass({
         />
         <PaginatedGroupList
           loading={this.state.groupCollection.fetchingNextPage}
+          hasMore={
+            !this.state.groupCollection.loadedAll && !this.state.groupCollection.fetchingNextPage
+          }
           groups={groups}
           loadMore={() => this._loadMore(this.state.groupCollection)}
           onLeave={this.leave}
           onJoin={this.join}
           onManage={this.manage}
         />
-        {loading && (
-          <div className="spinner-container">
-            <Spinner renderTitle="Loading" size="large" margin="0 0 0 medium" />
-          </div>
-        )}
       </>
     )
   },
@@ -295,10 +292,10 @@ const StudentView = createReactClass({
                 this.panelRef = ref
               }}
             />
-            {this.renderGroupList(groups, loading)}
+            {this.renderGroupList(groups)}
           </div>
         ) : (
-          this.renderGroupList(groups, loading)
+          this.renderGroupList(groups)
         )}
       </div>
     )
