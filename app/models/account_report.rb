@@ -122,7 +122,9 @@ class AccountReport < ActiveRecord::Base
                         n_strand: proc { |ar| ["account_reports", ar.account.root_account.global_id] },
                         on_permanent_failure: :mark_as_errored
 
-  def mark_as_errored
+  def mark_as_errored(error = nil)
+    Rails.logger.error("AccountReport failed with error: #{error}") if error
+
     self.workflow_state = :error
     save!
   end
