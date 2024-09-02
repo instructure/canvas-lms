@@ -66,6 +66,12 @@ export const defaultRubricForm: RubricFormProps = {
   freeFormCriterionComments: false,
 }
 
+type RubricFormValidationProps = {
+  title?: {
+    message?: string
+  }
+}
+
 export type RubricFormComponentProp = {
   rubricId?: string
   accountId?: string
@@ -100,7 +106,7 @@ export const RubricForm = ({
     accountId,
     courseId,
   })
-
+  const [validationErrors, setValidationErrors] = useState<RubricFormValidationProps>({})
   const [selectedCriterion, setSelectedCriterion] = useState<RubricCriterion>()
   const [isCriterionModalOpen, setIsCriterionModalOpen] = useState(false)
   const [isOutcomeCriterionModalOpen, setIsOutcomeCriterionModalOpen] = useState(false)
@@ -138,12 +144,27 @@ export const RubricForm = ({
   const setRubricFormField = useCallback(
     <K extends keyof RubricFormProps>(key: K, value: RubricFormProps[K]) => {
       setRubricForm(prevState => ({...prevState, [key]: value}))
+
+      const validateField = (key: K, value: RubricFormProps[K]): void => {
+        if (key === 'title') {
+          const messageValidation =
+            typeof value === 'string' && value.trim().length > 0 && value.length <= 255
+          const message = messageValidation
+            ? undefined
+            : I18n.t('The Rubic Name must be between 1 and 255 characters.')
+          setValidationErrors(prevState => ({
+            ...prevState,
+            [key]: {message},
+          }))
+        }
+      }
+      validateField(key, value)
     },
     [setRubricForm]
   )
 
   const formValid = () => {
-    return rubricForm.title.trim().length > 0 && rubricForm.criteria.length > 0
+    return !validationErrors.title?.message && rubricForm.criteria.length > 0
   }
 
   const openCriterionModal = (criterion?: RubricCriterion) => {
@@ -361,6 +382,11 @@ export const RubricForm = ({
                 renderLabel={I18n.t('Rubric Name')}
                 onChange={e => setRubricFormField('title', e.target.value)}
                 value={rubricForm.title}
+                messages={[
+                  validationErrors.title?.message
+                    ? {text: validationErrors.title.message, type: 'error'}
+                    : {text: <></>, type: 'hint'},
+                ]}
               />
             </Flex.Item>
             {rubricForm.unassessed && (
