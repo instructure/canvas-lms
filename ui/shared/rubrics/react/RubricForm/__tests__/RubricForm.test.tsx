@@ -118,6 +118,47 @@ describe('RubricForm Tests', () => {
       expect(getByTestId('save-rubric-button')).toBeDisabled()
     })
 
+    it('save button is disabled when title is 255 whitespace even with criteria', async () => {
+      const {getByTestId} = renderComponent()
+      const titleInput = getByTestId('rubric-form-title')
+      fireEvent.change(titleInput, {
+        target: {
+          value:
+            '                                                                                                                                                                                                                                                               ',
+        },
+      })
+      fireEvent.click(getByTestId('add-criterion-button'))
+      await new Promise(resolve => setTimeout(resolve, 0))
+      expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
+
+      fireEvent.change(getByTestId('rubric-criterion-name-input'), {
+        target: {value: 'New Criterion Test'},
+      })
+      fireEvent.click(getByTestId('rubric-criterion-save'))
+      expect(getByTestId('save-rubric-button')).toBeDisabled()
+    })
+
+    it('save button is enabled when title is 254 whitespace and 1 letter', async () => {
+      const {getByTestId} = renderComponent()
+      const titleInput = getByTestId('rubric-form-title')
+      fireEvent.change(titleInput, {
+        target: {
+          value:
+            'e                                                                                                                                                                                                                                                              ',
+        },
+      })
+      fireEvent.click(getByTestId('add-criterion-button'))
+      await new Promise(resolve => setTimeout(resolve, 0))
+      expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
+
+      fireEvent.change(getByTestId('rubric-criterion-name-input'), {
+        target: {value: 'New Criterion Test'},
+      })
+      fireEvent.click(getByTestId('rubric-criterion-save'))
+
+      expect(getByTestId('save-rubric-button')).toBeEnabled()
+    })
+
     it('save button is disabled when there are no criteria', () => {
       const {getByTestId} = renderComponent()
       const titleInput = getByTestId('rubric-form-title')
