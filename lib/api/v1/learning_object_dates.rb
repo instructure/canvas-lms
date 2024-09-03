@@ -43,6 +43,7 @@ module Api::V1::LearningObjectDates
       group_category_id = group_category_id(learning_object)
       hash[:group_category_id] = group_category_id if group_category_id
     end
+    add_checkpoint_info(hash, learning_object, overridable)
     hash
   end
 
@@ -60,5 +61,13 @@ module Api::V1::LearningObjectDates
 
   def group_category_id(learning_object)
     learning_object.group_category_id if learning_object.is_a?(DiscussionTopic)
+  end
+
+  private
+
+  def add_checkpoint_info(hash, learning_object, overridable)
+    if learning_object.root_account.feature_enabled?(:discussion_checkpoints) && overridable.respond_to?(:has_sub_assignments?) && overridable.has_sub_assignments?
+      hash["checkpoints"] = overridable.sub_assignments.map { |sub_assignment| Checkpoint.new(sub_assignment, @current_user).as_json.except("name", "points_possible") }
+    end
   end
 end
