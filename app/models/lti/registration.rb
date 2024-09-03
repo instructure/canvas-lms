@@ -37,6 +37,7 @@ class Lti::Registration < ActiveRecord::Base
   has_one :manual_configuration, class_name: "Lti::ToolConfiguration", inverse_of: :lti_registration, foreign_key: :lti_registration_id
 
   has_many :lti_registration_account_bindings, class_name: "Lti::RegistrationAccountBinding", inverse_of: :registration
+  has_many :lti_overlays, class_name: "Lti::Overlay", inverse_of: :registration
 
   after_update :update_developer_key
 
