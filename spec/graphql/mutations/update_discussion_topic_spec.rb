@@ -156,6 +156,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     args << peer_reviews_str(assignment[:peerReviews]) if assignment[:peerReviews]
     args << assignment_overrides_str(assignment[:assignmentOverrides]) if assignment[:assignmentOverrides]
     args << "forCheckpoints: #{assignment[:forCheckpoints]}" if assignment[:forCheckpoints]
+    args << "lockAt: \"#{assignment[:lockAt]}\"" if assignment[:lockAt]
 
     "assignment: { #{args.join(", ")} }"
   end
@@ -618,6 +619,14 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       result = run_mutation(id: @topic.id, published: false, assignment: { pointsPossible: 10 }) # assignment is needed to trigger the if
 
       expect(result["errors"]).to be_nil
+    end
+
+    it "syncs the discussion and assignment lock_at field when the assignment date changes" do
+      lock_at = 6.months.from_now.iso8601
+      expect(@topic.lock_at).to be_nil
+      result = run_mutation(id: @topic.id, assignment: { lockAt: lock_at.to_s })
+      expect(result["errors"]).to be_nil
+      expect(@topic.reload.lock_at).to eq lock_at.to_s
     end
   end
 

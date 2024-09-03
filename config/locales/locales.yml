@@ -830,7 +830,7 @@ ga:
       tiny_on_the_hour: "%l%P"
   dow_offset: 1
   locales:
-    ga: Gaeilge (Irish)
+    ga: Gaeilge (Irish) - under development
   time:
     event: "%{date} ag %{time}"
     formats:
