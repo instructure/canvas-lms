@@ -100,6 +100,39 @@ describe('Assignment Information Tests', () => {
     expect(getByTestId('default-grade-button')).not.toBeDisabled()
   })
 
+  it('disables Curve Grades Button if Assignment has checkpoints', () => {
+    const props = {
+      ...assignmentInfoDefaultProps,
+      assignment: {
+        ...defaultAssignment,
+        checkpoints: [
+          {
+            dueAt: '2024-09-06T23:59:00-06:00',
+            lockAt: '2024-09-06T23:59:00-06:00',
+            name: 'Discussion 1',
+            pointsPossible: 15,
+            tag: 'reply_to_topic',
+            unlockAt: '2024-09-03T00:00:00-06:00',
+          },
+        ],
+      },
+    }
+    const {getByTestId} = renderAssignmentInformation(props)
+    expect(getByTestId('curve-grades-button')).toBeDisabled()
+  })
+
+  it('enables Curve Grades Button if Assignment checkpoints is empty', () => {
+    const props = {
+      ...assignmentInfoDefaultProps,
+      assignment: {
+        ...defaultAssignment,
+        checkpoints: [],
+      },
+    }
+    const {getByTestId} = renderAssignmentInformation(props)
+    expect(getByTestId('curve-grades-button')).toBeEnabled()
+  })
+
   describe('assignment in closed grading period', () => {
     let props: AssignmentInformationComponentProps
     beforeEach(() => {
