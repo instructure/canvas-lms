@@ -70,7 +70,9 @@ describe ContentMigration do
           @copy_from.wiki_pages.create!(title: "a page",
                                         workflow_state: "unpublished",
                                         todo_date: @old_start + 7.days,
-                                        publish_at: @old_start + 3.days)
+                                        publish_at: @old_start + 3.days,
+                                        unlock_at: @old_start + 1.day,
+                                        lock_at: @old_start + 5.days)
           cm = @copy_from.context_modules.build(name: "some module", unlock_at: @old_start + 1.day)
           cm.save!
 
@@ -128,6 +130,8 @@ describe ContentMigration do
           new_page = @copy_to.wiki_pages.first
           expect(new_page.todo_date.to_i).to eq (@new_start + 7.days).to_i
           expect(new_page.publish_at.to_i).to eq (@new_start + 3.days).to_i
+          expect(new_page.unlock_at.to_i).to eq (@new_start + 1.day).to_i
+          expect(new_page.lock_at.to_i).to eq (@new_start + 5.days).to_i
 
           new_mod = @copy_to.context_modules.first
           expect(new_mod.unlock_at.to_i).to eq (@new_start + 1.day).to_i
