@@ -28,16 +28,14 @@ import {IconTrashLine, IconUploadSolid} from '@instructure/ui-icons'
 import ForbiddenWordsFileUpload from './ForbiddenWordsFileUpload'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
-import type {PasswordSettingsResponse} from './types'
 import {deleteForbiddenWordsFile} from './apiClient'
 import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
-
-declare const ENV: GlobalEnv
 
 const I18n = useI18nScope('password_complexity_configuration')
 
 interface Props {
+  currentAttachmentId: number | null
+  passwordPolicyHashExists: boolean
   setNewlyUploadedAttachmentId: (attachmentId: number | null) => void
   onCustomForbiddenWordsEnabledChange: (enabled: boolean) => void
 }
@@ -60,6 +58,8 @@ export const fetchLatestForbiddenWords = async (
 const CustomForbiddenWordsSection = ({
   setNewlyUploadedAttachmentId,
   onCustomForbiddenWordsEnabledChange,
+  currentAttachmentId,
+  passwordPolicyHashExists,
 }: Props) => {
   const linkRef = useRef<HTMLAnchorElement | null>(null)
   const [forbiddenWordsUrl, setForbiddenWordsUrl] = useState<string | null>(null)
@@ -69,6 +69,7 @@ const CustomForbiddenWordsSection = ({
   const [commonPasswordsAttachmentId, setCommonPasswordsAttachmentId] = useState<number | null>(
     null
   )
+  const [forbiddenWordsFileEnabled, setForbiddenWordsEnabled] = useState(false)
 
   const handleForbiddenWordsToggle = () => {
     const newEnabledState = !customForbiddenWordsEnabled
@@ -77,22 +78,17 @@ const CustomForbiddenWordsSection = ({
   }
 
   const fetchAndSetForbiddenWords = useCallback(async () => {
-    const {status, data: settingsResult} = await executeApiRequest<PasswordSettingsResponse>({
-      path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`,
-      method: 'GET',
-    })
-    if (status !== 200) {
-      throw new Error('Failed to fetch current settings.')
+    if (passwordPolicyHashExists) {
+      setForbiddenWordsEnabled(true)
     }
 
-    const attachmentId = settingsResult.password_policy.common_passwords_attachment_id
-    if (!attachmentId) {
+    if (!currentAttachmentId) {
       return
     }
-    setCommonPasswordsAttachmentId(attachmentId)
+    setCommonPasswordsAttachmentId(currentAttachmentId)
 
     try {
-      const data = await fetchLatestForbiddenWords(attachmentId)
+      const data = await fetchLatestForbiddenWords(currentAttachmentId)
       if (data) {
         setForbiddenWordsUrl(data.url)
         setForbiddenWordsName(data.display_name)
@@ -109,7 +105,7 @@ const CustomForbiddenWordsSection = ({
         console.error('Failed to fetch forbidden words:', error)
       }
     }
-  }, [])
+  }, [currentAttachmentId, passwordPolicyHashExists])
 
   // pre-fetch forbidden words as early as possible when the component mounts
   useEffect(() => {
@@ -171,6 +167,7 @@ const CustomForbiddenWordsSection = ({
               onChange={handleForbiddenWordsToggle}
               label={I18n.t('Customize forbidden words/terms list')}
               data-testid="customForbiddenWordsCheckbox"
+              disabled={!forbiddenWordsFileEnabled}
             />
           </Flex.Item>
           <Flex.Item>
