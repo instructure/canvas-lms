@@ -362,7 +362,8 @@ export const DiscussionThreadContainer = props => {
   useEffect(() => {
     if (
       !ENV.manual_mark_as_read &&
-      !props.discussionEntry.entryParticipant?.read &&
+      !props.discussionEntry?.deleted &&
+      !props.discussionEntry?.entryParticipant?.read &&
       !props.discussionEntry?.entryParticipant?.forcedReadState
     ) {
       const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
