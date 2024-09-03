@@ -358,6 +358,131 @@ describe LearningObjectDatesController do
                                })
     end
 
+    it "returns correct date details for a checkpointed discussion" do
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic")
+
+      c1_due_at = "2022-05-05T12:00:00Z"
+      c1_unlock_at = "2022-05-04T12:00:00Z"
+      c1_lock_at = "2022-05-08T12:00:00Z"
+      c1_override_due_at = "2022-04-06T12:00:00Z"
+      c1_override_unlock_at = "2022-04-05T12:00:00Z"
+      c1_override_lock_at = "2022-04-07T12:00:00Z"
+
+      c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [
+          {
+            type: "everyone",
+            due_at: c1_due_at,
+            unlock_at: c1_unlock_at,
+            lock_at: c1_lock_at,
+          },
+          {
+            type: "override",
+            set_type: "CourseSection",
+            set_id: @course.default_section.id,
+            due_at: c1_override_due_at,
+            unlock_at: c1_override_unlock_at,
+            lock_at: c1_override_lock_at
+          },
+        ],
+        points_possible: 5
+      )
+
+      c2_due_at = "2022-05-06T12:00:00Z"
+      c2_unlock_at = "2022-05-05T12:00:00Z"
+      c2_lock_at = "2022-05-07T12:00:00Z"
+      c2_override_due_at = "2022-04-06T12:00:00Z"
+      c2_override_unlock_at = "2022-04-05T12:00:00Z"
+      c2_override_lock_at = "2022-04-07T12:00:00Z"
+
+      c2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [
+          {
+            type: "everyone",
+            due_at: c2_due_at,
+            unlock_at: c2_unlock_at,
+            lock_at: c2_lock_at,
+          },
+          {
+            type: "override",
+            set_type: "CourseSection",
+            set_id: @course.default_section.id,
+            due_at: c2_override_due_at,
+            unlock_at: c2_override_unlock_at,
+            lock_at: c2_override_lock_at
+          },
+        ],
+        points_possible: 10,
+        replies_required: 2
+      )
+
+      get :show, params: { course_id: @course.id, discussion_topic_id: discussion.id }
+      expect(response).to be_successful
+      json = json_parse
+
+      # Test base discussion attributes
+      expect(json).to include(
+        "id" => discussion.id,
+        "due_at" => nil,
+        "unlock_at" => nil,
+        "lock_at" => nil,
+        "only_visible_to_overrides" => false,
+        "visible_to_everyone" => true,
+        "group_category_id" => nil,
+        "graded" => true
+      )
+
+      # Test checkpoints
+      expect(json["checkpoints"].length).to eq(2)
+
+      # Test first checkpoint
+      first_checkpoint = json["checkpoints"][0]
+      expect(first_checkpoint).to include(
+        "tag" => CheckpointLabels::REPLY_TO_TOPIC,
+        "due_at" => c1_due_at,
+        "unlock_at" => c1_unlock_at,
+        "lock_at" => c1_lock_at,
+        "only_visible_to_overrides" => false
+      )
+
+      expect(first_checkpoint["overrides"][0]).to include(
+        "assignment_id" => c1.id,
+        "title" => "Unnamed Course",
+        "due_at" => c1_override_due_at,
+        "all_day" => false,
+        "all_day_date" => c1_override_due_at.to_date.to_s,
+        "unlock_at" => c1_override_unlock_at,
+        "lock_at" => c1_override_lock_at,
+        "course_section_id" => @course.default_section.id
+      )
+
+      # Test second checkpoint
+      second_checkpoint = json["checkpoints"][1]
+      expect(second_checkpoint).to include(
+        "tag" => CheckpointLabels::REPLY_TO_ENTRY,
+        "due_at" => c2_due_at,
+        "unlock_at" => c2_unlock_at,
+        "lock_at" => c2_lock_at,
+        "only_visible_to_overrides" => false
+      )
+
+      expect(second_checkpoint["overrides"][0]).to include(
+        "assignment_id" => c2.id,
+        "title" => "Unnamed Course",
+        "due_at" => c2_override_due_at,
+        "all_day" => false,
+        "all_day_date" => c2_override_due_at.to_date.to_s,
+        "unlock_at" => c2_override_unlock_at,
+        "lock_at" => c2_override_lock_at,
+        "course_section_id" => @course.default_section.id
+      )
+    end
+
     it "returns date details for a file" do
       attachment = @course.attachments.create!(filename: "coolpdf.pdf",
                                                uploaded_data: StringIO.new("test"),
