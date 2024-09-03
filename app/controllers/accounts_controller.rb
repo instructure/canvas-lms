@@ -493,9 +493,13 @@ class AccountsController < ApplicationController
                       microsoft_sync_remote_attribute
                       enable_as_k5_account
                       use_classic_font_in_k5]
-    public_attrs << :password_policy if @account.password_complexity_enabled? && !@account.site_admin?
+    settings_hash = public_attrs.index_with { |key| @account.settings[key] }.compact
 
-    render json: public_attrs.index_with { |key| @account.settings[key] }.compact
+    if @account.password_complexity_enabled? && !@account.site_admin?
+      settings_hash[:password_policy] = @account.password_policy
+    end
+
+    render json: settings_hash
   end
 
   # @API List environment settings
