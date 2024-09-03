@@ -230,6 +230,10 @@ export default forwardRef(function ItemAssignToCard(
     ]
   )
 
+  const validateTermForDueDate = (newErrors: any) => {
+    return validationErrors?.due_at !== undefined && validationErrors?.due_at !== newErrors?.due_at
+  }
+
   useEffect(() => {
     onValidityChange?.(
       cardId,
@@ -244,7 +248,9 @@ export default forwardRef(function ItemAssignToCard(
     const newErrors = dateValidator.validateDatetimes(dateValidatorInputArgs)
     const newBadDates = Object.keys(newErrors)
     const oldBadDates = Object.keys(validationErrors)
-    if (!arrayEquals(newBadDates, oldBadDates)) setValidationErrors(newErrors)
+    if (!arrayEquals(newBadDates, oldBadDates) || validateTermForDueDate(newErrors)) {
+      setValidationErrors(newErrors)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     dueDate,
