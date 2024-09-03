@@ -324,6 +324,7 @@ export default class GradeInput extends Component<Props, State> {
           </Text>
         )}
         <TextInput
+          autoComplete="off"
           display={this.props.inputDisplay}
           id="grade-detail-tray--grade-input"
           interaction={interaction}
