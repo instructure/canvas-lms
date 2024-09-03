@@ -235,6 +235,7 @@ const SplitScreenThreadContainer = props => {
   useEffect(() => {
     if (
       !ENV.manual_mark_as_read &&
+      !props.discussionEntry?.deleted &&
       !props.discussionEntry.entryParticipant?.read &&
       !props.discussionEntry?.entryParticipant?.forcedReadState
     ) {

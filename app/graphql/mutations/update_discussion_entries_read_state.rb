@@ -28,8 +28,7 @@ class Mutations::UpdateDiscussionEntriesReadState < Mutations::BaseMutation
   def resolve(input:)
     return validation_error(I18n.t("Discussion entry ids must have at least one id")) if input[:discussion_entry_ids].blank?
 
-    entries = DiscussionEntry.where(id: input[:discussion_entry_ids])
-    raise GraphQL::ExecutionError, "not found" if entries.count != input[:discussion_entry_ids].count
+    entries = DiscussionEntry.active.where(id: input[:discussion_entry_ids])
 
     # return error if provided any ids the user doesn't have permission to read
     entries.each do |entry|
