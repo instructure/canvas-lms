@@ -34,7 +34,7 @@ GEM
       retriable (>= 2.0, < 4.a)
     google-apis-drive_v3 (0.55.0)
       google-apis-core (>= 0.15.0, < 2.a)
-    google-cloud-env (2.1.1)
+    google-cloud-env (2.2.0)
       faraday (>= 1.0, < 3.a)
     googleauth (1.11.0)
       faraday (>= 1.0, < 3.a)
