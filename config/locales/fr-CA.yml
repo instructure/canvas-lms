@@ -403,7 +403,7 @@ fr-CA:
   access_tokens_create_update_bf2448af: "Jetons d’accès - création/mise à jour"
   access_tokens_delete_8ffe05d: "Jetons d’accès - supprimer"
   access_tokens_eea7e69f: "Jetons d’accès"
-  access_your_courses_and_groups_using_any_ios_or_an_cdb6ad63: "Accédez à vos cours et groupes à l’aide de n’importe quel dispositif mobile iOS ou Android et trouvez plus d’informations dans le menu Aide."
+  access_your_courses_and_groups_using_any_ios_or_an_cdb6ad63: "Accédez à vos cours et groupes à l’aide de n’importe quel appareil mobile iOS ou Android et trouvez plus d’informations dans le menu Aide."
   accessibility_a662153d: Accessibilité
   accessibility_checker_notifications_da5a49e6: "Notifications de vérificateur d’accessibilité"
   accessible_sidebar_menu_b30baf97: "Menu de la barre latérale accessible"
@@ -1293,7 +1293,7 @@ fr-CA:
       accounts_crumb: Comptes
       no_accounts_message: "Pas de compte"
       page_title: Comptes
-      title: "Comptes dont je gère"
+      title: "Comptes que je gère"
     instructure_bundled_reports: 
       last_user_activity: 
         parameters: 
@@ -1659,7 +1659,7 @@ fr-CA:
         show_scheduler: "Activer l’outil de planification"
         sis_source_id: "ID SIS"
         students_can_create_courses: Étudiants
-        sub_account_includes: "Autoriser les sous-comptes à définir des inclusions supplémentaires"
+        sub_account_includes: "Autoriser les sous-comtes utiliser l’éditeur de thème pour personnaliser leur image de marque"
         suppress_notifications: "Supprimer la création et l’envoi de notifications"
         teachers_can_create_courses: Enseignants
         trusted_referers: "Référants HTTP de confiance"
@@ -4485,7 +4485,7 @@ fr-CA:
     edit_view: 
       assignment_name: "Nom de la tâche"
       buttons: 
-        build: Version
+        build: Créer
         save: Enregistrer
         save_and_publish: "Sauvegarder et publier"
       description: Description
@@ -5523,7 +5523,7 @@ fr-CA:
   browse_your_computer_for_a_course_image_d7db2376: "Explorer votre ordinateur pour une image de cours"
   bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "le nom de récipient doit être l’un des suivants : %{bucket_names}"
   bucks_zero_activity_6f9b5ee3: "Aucune activité sur Bucks"
-  build_78955b82: Version
+  build_78955b82: Créer
   build_name_41ba9e7a: "Version %{name}"
   build_pages_containing_content_and_educational_res_4cdaec6: "Construire des pages qui contiennent un contenu et des ressources éducatives pour aider les étudiants à apprendre, mais qui ne sont pas des tâches. Inclure du texte, multimédia, et des liens vers des fichiers et des ressources externes."
   build_pages_containing_content_and_educational_res_6474319f: |-
@@ -6139,7 +6139,7 @@ fr-CA:
   can_create_and_view_assignment_data_in_the_gradebo_ab56f20: "Peut créer et voir des données des tâches dans le Carnet de notes associé à l'outil."
   can_create_external_tools_4c293044: "Peut créer des outils externes."
   can_create_external_tools_fcde47ea: "Peut créer des outils externes"
-  can_create_rename_and_edit_course_pages_by_default_f9ad4253: "peut créer, renommer et éditer les pages de cours par défaut"
+  can_create_rename_and_edit_course_pages_by_default_f9ad4253: "peuvent créer, renommer et éditer les pages de cours par défaut"
   can_create_subscription_to_data_service_data_53901a2e: "Peut créer un abonnement aux données du service de données"
   can_create_subscription_to_data_service_data_bb2874f2: "Peut créer un abonnement aux données du service de données."
   can_destroy_external_tools_693e2ae0: "Peut détruire les outils externes"
@@ -7825,7 +7825,7 @@ fr-CA:
       requirements: 
         must_contribute: "contribuer à la page"
         must_score_at_least: "obtenir au moins"
-        must_submit: "envoyer le tâche personnel"
+        must_submit: "soumettre le travail"
         must_view: "afficher l’élément"
       select_module: 
         instructions: "Sélectionner le module"
@@ -8123,7 +8123,7 @@ fr-CA:
   conversations_69a8dc26: Conversations
   conversations_send_messages_to_entire_class_3f414741: "Conversations - envoyer message à toute la classe"
   conversations_send_messages_to_individual_course_m_733620b: "Conversations- envoyer des messages aux membres individuels du cours"
-  copy_9748f9f: Copier
+  copy_9748f9f: Copie
   copy_announcement_title_9d23ddde: "Copier l’annonce %{title}"
   copy_assignment_name_to_another_course_b62d0a54: "Copier la tâche %{name} à un autre cours"
   copy_blueprint_course_settings_31a97e96: "Copier les paramètres du cours modèle"
@@ -9234,7 +9234,7 @@ fr-CA:
         blueprint_course: "Cours modèle"
         card_image: "Image de carte"
         conclude_at: "Se termine à"
-        conditional_release: "Parcours de maîtrise"
+        conditional_release: "Parcours conditionnel aux résultats"
         course_code: "Code du cours"
         course_color: Couleur
         course_description: Description
@@ -9351,7 +9351,7 @@ fr-CA:
         copy: "Copier ce cours"
         delete: "Supprimer ce cours"
         export_content: "Exporter le contenu du cours"
-        import: "Importer le contenu du cours"
+        import: "Importer le contenu d’un cours"
         reset: "Réinitialiser le contenu du cours"
         stats: "Statistiques du cours"
         student_view: "Affichage étudiant"
@@ -10509,7 +10509,7 @@ fr-CA:
   disabling_the_assignments_and_quizzes_delete_permi_ad890eb3: "La désactivation de l’autorisation « Tâches et questionnaires — supprimer » annulera (si activée) l’autorisation « Rubriques — ajouter/modifier/supprimer », empêchant l’utilisateur de supprimer les rubriques pour une tâche individuelle."
   disabling_the_assignments_and_quizzes_edit_permiss_529f9360: "La désactivation de l’autorisation « Tâches et questionnaires — modifier » annulera (si activée) l’autorisation « Rubriques — ajouter/modifier/supprimer », empêchant l’utilisateur de modifier les rubriques à partir d’une tâche individuelle."
   disabling_the_elementary_theme_will_change_the_fon_d7f31a3b: "La désactivation du thème élémentaire modifiera la police de l’interface Canvas pour tous les utilisateurs de votre cours."
-  disabling_the_mastery_paths_feature_will_release_c_4b96c86d: "La désactivation de la fonction « Parcours de maîtrise » libérera les tâches et le contenu configurés pour tous les étudiants. Si la fonction est réactivée, ces tâches devront être configurées à nouveau pour les Parcours de maîtrise."
+  disabling_the_mastery_paths_feature_will_release_c_4b96c86d: "La désactivation de la fonction « Parcours conditionnel aux résultats » libérera les tâches et le contenu configurés pour tous les étudiants. Si la fonction est réactivée, ces tâches devront être configurées à nouveau pour les Parcours conditionnel aux résultats."
   disabling_the_mastery_paths_feature_will_release_c_8a001169: "La désactivation de la fonction « Parcours de maîtrise » libérera les tâches et le contenu configurés pour tous les étudiants. %{br} Si la fonction est réactivée, ces tâches devront être configurées à nouveau pour les Parcours de maîtrise."
   disabling_this_permission_will_override_if_enabled_59c2b5c9: "La désactivation de cette autorisation annulera (si activée) l’autorisation « Rubriques — ajouter/modifier/supprimer », empêchant l’utilisateur de créer ou de modifier les rubriques à partir d’une tâche individuelle."
   disabling_this_permission_will_override_if_enabled_6481b015: "La désactivation de cette autorisation annulera (si activée) l’autorisation « Rubriques — ajouter/modifier/supprimer », empêchant l’utilisateur de créer ou de modifier les rubriques à partir d’une tâche individuelle. Toutefois, si « Acquis - ajouter/modifier/supprimer » est activé, l’utilisateur peut encore ajouter des rubriques par l’intermédiaire d’Acquis (Bouton « Gérer les rubriques »)."
@@ -10909,7 +10909,7 @@ fr-CA:
             votre plan de notation de cours, et filtrez et organisez les entrées de Carnet de notes
             selon vos préférences. Appliquez automatiquement une note pour les envois manquants ou
             en retard, et masquer facilement les notes jusqu’à ce que vous soyez prêt que les étudiants
-            puissent les visualisent. Pour une notation simplifiée, utilisez SpeedGrader pour voir et noter les envois.
+            puissent les visualiser. Pour une notation simplifiée, utilisez SpeedGrader pour voir et noter les envois.
   display_historical_view_of_achievements_of_users_53db5938: "Afficher la vue historique des réalisations des utilisateurs"
   display_lti_placement_before_assignment_descriptio_66c709e3: "Afficher le placement LTI avant la description de la tâche après l’envoi."
   display_name_36e114d3: "%{display_name}"
@@ -12346,7 +12346,7 @@ fr-CA:
   export_pairing_codes_5749f6f1: "Exporter les codes de jumelage"
   export_report_7c5899e: "Rapport d’exportation"
   export_to_quizzes_2_format_45b3ec25: "Exporter au format questionnaire 2"
-  exported_package_history_bfca44b9: "Historique de conteneur exporté"
+  exported_package_history_bfca44b9: "Historique de contenu exporté"
   exporting_b1eab154: Exportation
   exporting_filename_ea2441ad: "Exportation de %{filename} en cours"
   extend_assignment_due_dates_in_course_pacing_5ab23f52: "Prolonger les dates d’échéance des tâches dans le rythme des cours"
@@ -12625,10 +12625,10 @@ fr-CA:
   feature_flags_52141c74: "Drapeaux d’entités"
   feature_flags_enable_disable_32e8f1ab: "Drapeaux d'entités - activer/désactiver"
   feature_headline_3f0daf4: "Titre à la une"
-  feature_option_dbfa062f: "Options de la fonction"
-  feature_options_37a2c317: "Options de la fonction"
-  feature_options_account_settings_294a39f8: "Options de la fonction (paramètres du compte)"
-  feature_options_enable_disable_7e748054: "Options de la fonction - activer/désactiver"
+  feature_option_dbfa062f: Fonctionnalités
+  feature_options_37a2c317: Fonctionnalités
+  feature_options_account_settings_294a39f8: "Options des fonctionnalités (paramètres du compte)"
+  feature_options_enable_disable_7e748054: "Options des fonctionnalités - activer/désactiver"
   feature_options_view_a170e80c: "Options des fonctionnalités - voir"
   feature_preview_5e1216a0: "Aperçu des fonctionnalités"
   feature_preview_opting_in_includes_ongoing_updates_111627f2: "Fonctionnalités en Aperçu — l’adhésion inclut des mises à jour continues en dehors du calendrier de publication régulier"
@@ -17021,7 +17021,7 @@ fr-CA:
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "Maîtrise : %{n_mastery_points_precision_2_str} Points"
   mastery_path_processing_f4471152: "Traitement du parcours de maîtrise"
   mastery_paths_breakdown_6e0b5fce: "Répartition des parcours de maîtrise"
-  mastery_paths_cc4096c2: "Parcours de maîtrise"
+  mastery_paths_cc4096c2: "Parcours conditionnel aux résultats"
   mastery_paths_editing_has_been_temporarily_disable_4816f0f: "La modification des parcours de maîtrise a été temporairement désactivée pour entretien."
   mastery_paths_selection_has_been_temporarily_disab_c40623b9: "La sélection des parcours de maîtrise a été temporairement désactivée pour entretien."
   mastery_points_f1672cc: "points de maîtrise"
@@ -19610,9 +19610,9 @@ fr-CA:
   new_quizzes_included_on_outcome_alignment_summary__4547b0ad: "Nouveaux questionnaires inclus dans l’onglet Résumé de l’alignement des résultats"
   new_quizzes_is_the_new_assessment_engine_for_canva_4125a679: "Nouveaux Questionnaires est le nouveau moteur d’évaluation pour Canvas."
   new_quizzes_migrate_without_content_rewrite_1aec2ce8: "Les nouveaux questionnaires migrent sans réécriture de contenu"
-  new_quizzes_migration_during_course_import_copy_e9dd124e: "Migration des nouveaux questionnaires lors de l’importation/copie du cours"
-  new_quizzes_migration_enabled_by_default_5f9bcc81: "Migration des nouveaux questionnaires activée par défaut"
-  new_quizzes_migration_required_7854aa1a: "Migration des nouveaux questionnaires requise"
+  new_quizzes_migration_during_course_import_copy_e9dd124e: "Migration vers nouveaux questionnaires lors de l’importation/copie du cours"
+  new_quizzes_migration_enabled_by_default_5f9bcc81: "Migration vers nouveaux questionnaires activée par défaut"
+  new_quizzes_migration_required_7854aa1a: "Migration vers nouveaux questionnaires requise"
   new_quizzes_on_the_quizzes_page_b21f338d: "Nouveaux questionnaires sur la page des questionnaires"
   new_quizzes_outcome_alignments_are_included_on_the_83447268: "Les nouveaux alignements de résultats des questionnaires sont inclus dans l’onglet Résumé de l’alignement des résultats, qui fournit une liste des alignements pour chaque résultat d’un cours."
   new_quizzes_public_api_18d95321: "API publique des nouveaux questionnaires"
@@ -26384,7 +26384,7 @@ fr-CA:
   show_question_details_b059df00: "Afficher les informations de la questions"
   show_recent_activity_stream_2be4abc1: "Afficher le flux d'activité récente"
   show_recent_messages_on_new_roster_user_page_38451867: "Afficher les messages récents sur la page de l’utilisateur de la nouvelle liste"
-  show_report_to_students_a07888a6: "Afficher le rapport d’ aux étudiants"
+  show_report_to_students_a07888a6: "Afficher le rapport aux étudiants"
   show_rubric_dca783f2: "Afficher le barème"
   show_saved_what_if_scores_358bfe5f: "Afficher les notes hypothétiques sauvegardées"
   show_sections_in_course_tray_2fa08349: "Afficher les sections dans le plateau des cours."
@@ -27502,7 +27502,7 @@ fr-CA:
   switzerland_41_f861e414: "Suisse (+41)"
   syllabus: "Plan de cours"
   syllabus_course_summary_option_951a8144: "Option de sommaire du plan de cours"
-  syllabus_f191f65b: Programme
+  syllabus_f191f65b: "Plan de cours"
   syllabus_tab_enabled_62aebc2e: syllabus_tab_enabled
   syllabus_tutorial_tray_97e8ef82: "Tutoriel volant des plan de cours"
   syllabus_visibility_options_a81ef419: "Options de visibilité du plan de cours"
@@ -27649,7 +27649,7 @@ fr-CA:
   teachers_remove_5622b490: "Enseignants - Retirer"
   teaching_assistant_9635edaf: "Assistants d’enseignement"
   teal_f729a294: Sarcelle
-  tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Dîtes-nous quand et comment vous souhaitez être informé des événements dans Canvas."
+  tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Dites-nous quand et comment vous souhaitez être informé des événements dans Canvas."
   tempe_grade_export_c611da01: "Exportation de notation Tempe"
   template_1_f0d858b8: modèle 1
   template_2_69d10902: modèle 2
@@ -30137,7 +30137,7 @@ fr-CA:
   unpublish_9f2d730b: "Annuler la publication"
   unpublish_all_modules_and_items_ba0291f4: "Dépublier tous les modules et éléments"
   unpublish_module_and_all_items_e6dd35e5: "Dépublier le module et tous les éléments"
-  unpublish_module_only_1987d840: "Module non publié seulement"
+  unpublish_module_only_1987d840: "Dépublier uniquement le module"
   unpublish_modules_only_934a9ab: "Modules non publiés seulement"
   unpublish_progress_503dfcfa: "Progression de l’annulation de publication"
   unpublish_title_26ae9667: "Annuler la publication %{title}"
@@ -31799,8 +31799,8 @@ fr-CA:
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Vous pouvez mettre certaines des informations de cet utilisateur à jour, mais il pourra à nouveau les modifier à son gré."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Vous pouvez utiliser un seul fichier .ico de 16x16, 32x32 ou 48x48."
   you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
-      Vous pouvez afficher les annonces rejetées en accédant au Compte et en sélectionnant
-                  Annonces mondiales dans le menu.
+      Vous pouvez afficher les annonces fermées en accédant au Compte et en sélectionnant
+                  Annonces générales dans le menu.
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "Vous pouvez voir vos notes basées sur les scores « What If » de sorte que vous sachiez comment les notes seront affectées par les prochaines tâches ou les tâches resoumises. Vous pouvez tester des scores pour une tâche qui comprend déjà un score ou une tâche qui doit être notée."
   you_cannot_assign_sections_to_a_group_discussion_t_fec73e05: "Vous ne pouvez pas affecter de sections pour un sujet de discussion de groupe"
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Vous ne pouvez pas faire d'affectation à un groupe hors de l'ensemble de groupe de la tâche"
@@ -31912,10 +31912,10 @@ fr-CA:
   you_ll_need_to_accept_the_enrollment_invitation_be_f2ffe13: "Vous devrez accepter l’invitation d’inscription avant de pouvoir participer pleinement à ce cours, qui débute le %{date}."
   you_may_not_change_the_start_date_when_changing_al_d520e26c: "Vous ne pouvez pas modifier la date de début lorsque vous modifiez tous les événements de la série"
   you_may_not_reproduce_or_communicate_any_of_the_co_7636b552: |-
-      Vous ne pouvez pas reproduire ou communiquer tout contenu de ce cours, y compris les fichiers exportés
+      Vous ne pouvez pas reproduire ni communiquer tout contenu de ce cours, y compris les fichiers exportés
                   à partir de ce cours sans l'autorisation écrite préalable de votre institution.
-                  Vérifiez auprès de votre institution pour les lignes directrices spécifiques
-                  de l'accord en ligne de l'utilisateur.
+                  Vérifiez auprès de votre établissement les
+                  lignes directrices à respecter.
   you_may_not_see_all_comments_for_this_assignment_u_61817628: "Tous les commentaires pour cette tâche ne sont pas visibles tant que les notes ne sont pas affichées."
   you_may_not_see_all_comments_right_now_because_the_96cf2051: "Tous les commentaires ne sont pas visibles actuellement car le tâche est en cours de notation."
   you_may_not_update_a_locked_event_72708d23: "Vous ne pouvez pas mettre à jour un événement verrouillé"
