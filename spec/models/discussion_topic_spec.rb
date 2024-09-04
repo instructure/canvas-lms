@@ -282,6 +282,17 @@ describe DiscussionTopic do
     expect(topic.discussion_type).to eq "threaded"
   end
 
+  it "parent topic is threaded when children has threaded replies" do
+    group_discussion_assignment
+    @topic.refresh_subtopics
+    subtopic = @topic.child_topics.first
+    entry = subtopic.discussion_entries.create!(message: "test")
+    @course.groups.first.add_user(@student)
+
+    entry.reply_from(user: @student, html: "reply 1")
+    expect(@topic.threaded?).to be true
+  end
+
   it "requires a valid discussion_type" do
     @topic = @course.discussion_topics.build(message: "test", discussion_type: "gesundheit")
     expect(@topic.save).to be false

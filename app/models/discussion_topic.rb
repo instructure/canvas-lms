@@ -219,9 +219,18 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def threaded?
-    discussion_type == DiscussionTypes::THREADED || (root_account&.feature_enabled?(:discussion_checkpoints) && checkpoints?) || (DiscussionTypes::SIDE_COMMENT && discussion_entries.where.not(parent_id: nil).where.not(workflow_state: "deleted").exists?)
+    discussion_type == DiscussionTypes::THREADED ||
+      (root_account&.feature_enabled?(:discussion_checkpoints) && checkpoints?) ||
+      (DiscussionTypes::SIDE_COMMENT && has_threaded_replies?)
   end
   alias_method :threaded, :threaded?
+
+  def has_threaded_replies?
+    DiscussionEntry.where.not(parent_id: nil)
+                   .where.not(workflow_state: "deleted")
+                   .where(discussion_topic: [id] + child_topics.select(:id))
+                   .exists?
+  end
 
   def discussion_type
     read_attribute(:discussion_type) || DiscussionTypes::NOT_THREADED
