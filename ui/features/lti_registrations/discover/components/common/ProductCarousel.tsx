@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState, useMemo} from 'react'
-import GetWindowSize from './GetWindowSize'
+import useWindowWidth from './useWindowWidth'
 import Slider from 'react-slick'
 import 'slick-carousel/slick/slick.css'
 
@@ -39,7 +39,7 @@ type ProductCarouselProps = {
 
 function ProductCarousel(props: ProductCarouselProps) {
   const {products, companyName} = props
-  const windowSize = GetWindowSize()
+  const windowSize = useWindowWidth()
   const slider = React.useRef<Slider>(null)
 
   const [currentSlideNumber, setCurrentSlideNumber] = useState(0)
