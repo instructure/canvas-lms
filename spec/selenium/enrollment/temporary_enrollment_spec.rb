@@ -63,7 +63,7 @@ describe "temporary enrollment" do
 
     # search for user
     f("[for='peoplesearch_radio_unique_id']").click
-    f("input[data-analytics='TempEnrollTextInput']").send_keys("tempTeacher")
+    f("textarea").send_keys("tempTeacher")
     f("button[data-analytics='TempEnrollNext']").click
 
     # successfully got user
