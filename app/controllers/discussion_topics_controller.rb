@@ -560,7 +560,8 @@ class DiscussionTopicsController < ApplicationController
         override_dates: false,
         include_usage_rights:
       )
-      hash[:ATTRIBUTES][:has_threaded_replies] = @topic.discussion_entries.where.not(parent_id: nil).where.not(workflow_state: "deleted").exists?
+
+      hash[:ATTRIBUTES][:has_threaded_replies] = @topic.has_threaded_replies?
     end
     (hash[:ATTRIBUTES] ||= {})[:is_announcement] = @topic.is_announcement
     hash[:ATTRIBUTES][:can_group] = @topic.can_group?
