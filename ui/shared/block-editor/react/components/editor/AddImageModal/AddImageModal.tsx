@@ -68,10 +68,9 @@ const handleImageSubmit = async (
 
 interface AddImageModalProps {
   open: boolean
-  onSubmit: (url: string) => void
+  onSubmit: (url: string, alt: string) => void
   onDismiss: () => void
   accept?: string
-  requireA11yAttributes?: boolean
   panels?: UploadFilePanelId[]
   title?: string
 }
@@ -81,7 +80,6 @@ export const AddImageModal = ({
   onSubmit,
   onDismiss,
   accept = 'image/*',
-  requireA11yAttributes = false,
   panels,
   title,
 }: AddImageModalProps) => {
@@ -97,7 +95,10 @@ export const AddImageModal = ({
     storeProps: StoreProp
   ) => {
     const url = await handleImageSubmit(selectedPanel, uploadData, storeProps)
-    onSubmit(url)
+    const alt = uploadData?.imageOptions?.isDecorativeImage
+      ? ''
+      : uploadData?.imageOptions?.altText || ''
+    onSubmit(url, alt)
   }
 
   const defaultPanels: UploadFilePanelId[] = ['COMPUTER', 'URL', 'course_images', 'user_images']
@@ -113,7 +114,7 @@ export const AddImageModal = ({
       panels={modalPanels}
       onDismiss={onDismiss}
       onSubmit={handleSubmit}
-      requireA11yAttributes={requireA11yAttributes}
+      forBlockEditorUse={true}
       canvasOrigin={trayProps?.canvasOrigin}
     />
   ) : null

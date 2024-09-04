@@ -68,6 +68,7 @@ const UploadFileModal = React.forwardRef(
       modalBodyWidth,
       modalBodyHeight,
       requireA11yAttributes = true,
+      forBlockEditorUse = false,
     },
     ref
   ) => {
@@ -128,6 +129,10 @@ const UploadFileModal = React.forwardRef(
         host: trayProps.host,
         canvasOrigin,
       })
+
+    if (forBlockEditorUse && !['COMPUTER', 'URL'].includes(selectedPanel)) {
+      requireA11yAttributes = false
+    }
 
     return (
       <Modal
@@ -288,6 +293,7 @@ const UploadFileModal = React.forwardRef(
                         handleIsDecorativeChange={handleIsDecorativeChange}
                         handleDisplayAsChange={handleDisplayAsChange}
                         hideDimensions={true}
+                        forBlockEditorUse={forBlockEditorUse}
                       />
                     </ToggleDetails>
                   </View>
@@ -320,6 +326,7 @@ UploadFileModal.propTypes = {
   modalBodyWidth: number,
   modalBodyHeight: number,
   requireA11yAttributes: bool,
+  forBlockEditorUse: bool,
   preselectedFile: object, // JS File
 }
 
