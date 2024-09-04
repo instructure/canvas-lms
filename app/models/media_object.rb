@@ -55,7 +55,6 @@ class MediaObject < ActiveRecord::Base
   has_many :attachments_by_media_id, class_name: "Attachment", primary_key: :media_id, foreign_key: :media_entry_id, inverse_of: :media_object_by_media_id
   before_create :create_attachment
   after_create :retrieve_details_later
-  after_create :generate_captions
   after_save :update_title_on_kaltura_later
   serialize :data
 

@@ -33,7 +33,7 @@ class VideoCaptionService < ApplicationService
     return update_status(:failed_initial_validation) unless pass_initial_checks
 
     # send to Notorious so it can process the media; grab and use the media_id from the handoff response
-    @media_id = handoff
+    @media_id = handoff_video_for_processing
     return update_status(:failed_handoff) unless @media_id
 
     if @skip_polling
@@ -43,7 +43,7 @@ class VideoCaptionService < ApplicationService
 
       process_captions_ready
     else
-      delay.poll_caption_request
+      delay.poll_if_we_can_request_captions_yet
     end
   end
 
@@ -69,10 +69,11 @@ class VideoCaptionService < ApplicationService
     end
   end
 
-  def handoff
+  def handoff_video_for_processing
     response = request_handoff
     response&.dig("media", "id")
   end
+  alias_method :handoff, :handoff_video_for_processing
 
   def grab_captions(srclang)
     response = collect_captions(srclang)
@@ -147,47 +148,54 @@ class VideoCaptionService < ApplicationService
 
   def process_captions_ready
     response = media
-    if response.dig("media", "captions", 0, "language") && response.dig("media", "captions", 0, "status") == "succeeded"
-      srclang = response.dig("media", "captions", 0, "language")
-      srclang = nil unless srclang.start_with?("en")
-      return update_status(:non_english_captions) unless srclang
-
+    srclang = response.dig("media", "captions", 0, "language")
+    if srclang && response.dig("media", "captions", 0, "status") == "succeeded"
       save_media_track(grab_captions(srclang), srclang)
     else
       update_status(:failed_captions)
     end
   end
 
-  def poll_caption_request(attempts = 1)
-    response = request_caption
-    if (200..299).cover?(response.code)
-      delay.poll_captions_ready
+  def poll_if_we_can_request_captions_yet(attempts = 1)
+    response = media
+    response_succeeded = response.dig("media", "status") == "succeeded"
+
+    if response_succeeded
+      delay.request_to_start_caption_generation
     elsif attempts < 10
-      delay(run_at: reschedule_time(attempts)).poll_caption_request(attempts + 1)
+      delay(run_at: reschedule_time(attempts)).poll_if_we_can_request_captions_yet(attempts + 1)
     else
       update_status(:failed_request)
     end
   end
-  alias_method :generate_captions, :poll_caption_request
 
-  def poll_captions_ready(attempts = 1)
+  def request_to_start_caption_generation(attempts = 1)
+    # no need to actually poll here since we have a 'succeeded' video status, but it doesn't hurt
+    response = request_caption
+    if (200..299).cover?(response.code)
+      delay.check_if_captions_are_ready
+    elsif attempts < 10
+      delay(run_at: reschedule_time(attempts)).request_to_start_caption_generation(attempts + 1)
+    else
+      update_status(:failed_request)
+    end
+  end
+  alias_method :poll_caption_request, :request_to_start_caption_generation
+
+  def check_if_captions_are_ready(attempts = 1)
     response = media
     response_succeeded = response.dig("media", "captions", 0, "status") == "succeeded"
-    language_detected = response.dig("media", "captions", 0, "language")
+    srclang = response.dig("media", "captions", 0, "language")
 
-    if response_succeeded && language_detected
-      if language_detected.start_with?("en")
-        save_media_track(grab_captions(language_detected), language_detected)
-      else
-        update_status(:non_english_captions)
-      end
+    if response_succeeded && srclang
+      save_media_track(grab_captions(srclang), srclang)
     elsif attempts < 10
-      delay(run_at: reschedule_time(attempts)).poll_captions_ready(attempts + 1)
+      delay(run_at: reschedule_time(attempts)).check_if_captions_are_ready(attempts + 1)
     else
       update_status(:failed_captions)
     end
   end
-  alias_method :poll_for_captions_ready, :poll_captions_ready
+  alias_method :poll_captions_ready, :check_if_captions_are_ready
 
   def reschedule_time(attempt)
     # This mimics the exponential backoff algorithm used by inst jobs
