@@ -920,6 +920,21 @@ describe Attachment do
       expect(child_folder.workflow_state).to eq "visible"
       expect(parent_folder.workflow_state).to eq "visible"
     end
+
+    it "restores to unfiled folder when the parent folder has a unique conflict" do
+      course_factory
+      parent_folder = folder_model(unique_type: "media")
+      attachment = attachment_model(folder: parent_folder)
+      parent_folder.destroy
+
+      folder_model(unique_type: "media")
+
+      attachment.reload
+      attachment.restore
+
+      expect(attachment).to be_available
+      expect(attachment.folder).to eq Folder.unfiled_folder(@course)
+    end
   end
 
   context "destroy_permanently!" do

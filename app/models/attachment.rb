@@ -2070,7 +2070,12 @@ class Attachment < ActiveRecord::Base
     self.file_state = "available"
     if save
       handle_duplicates(:rename)
-      folder&.restore
+      begin
+        folder&.restore
+      rescue ActiveRecord::RecordNotUnique, PG::UniqueViolation
+        self.folder_id = Folder.unfiled_folder(context)&.id
+        save
+      end
     end
     true
   end
