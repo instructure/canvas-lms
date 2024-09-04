@@ -236,7 +236,7 @@ GEM
     sorbet-runtime (0.5.11519)
     statsd-ruby (1.5.0)
     stringio (3.1.1)
-    thor (1.3.1)
+    thor (1.3.2)
     timecop (0.9.10)
     timeout (0.4.1)
     twitter-text (3.1.0)
