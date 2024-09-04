@@ -41,7 +41,7 @@ module Quizzes::QuizQuestion::AnswerParsers
 
       @answers.set_correct_if_none
       fields = Quizzes::QuizQuestion::RawFields.new({ text_after_answers: question[:text_after_answers] })
-      question[:text_after_answers] = fields.sanitize(fields.fetch_with_enforced_length(:text_after_answers, max_size: 16.kilobyte))
+      question[:text_after_answers] = fields.sanitize(fields.fetch_with_enforced_length(:text_after_answers, max_size: 16.kilobytes))
 
       question.answers = @answers
       question

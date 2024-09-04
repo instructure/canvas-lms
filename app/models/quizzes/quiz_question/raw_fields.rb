@@ -38,7 +38,7 @@ class Quizzes::QuizQuestion::RawFields
 
   def fetch_with_enforced_length(key, opts = {})
     default = opts.fetch(:default, "")
-    max_size = opts.fetch(:max_size, 16.kilobyte)
+    max_size = opts.fetch(:max_size, 16.kilobytes)
 
     check_length(fetch_any(key, default), key_to_type(key), max_size)
   end

@@ -21,7 +21,7 @@ require "sanitize"
 
 module Quizzes::QuizQuestion::AnswerSerializers
   module Util
-    MaxTextualAnswerLength = 16.kilobyte
+    MaxTextualAnswerLength = 16.kilobytes
 
     class << self
       def blank_id(blank)
