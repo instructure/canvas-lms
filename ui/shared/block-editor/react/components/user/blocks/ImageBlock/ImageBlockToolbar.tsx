@@ -21,16 +21,18 @@ import {useNode, type Node} from '@craftjs/core'
 
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
+import {View, type ViewOwnProps} from '@instructure/ui-view'
 import {Menu, type MenuItemProps, type MenuItem} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
-import {IconArrowOpenDownLine, IconUploadLine} from '@instructure/ui-icons'
-import {type ViewOwnProps} from '@instructure/ui-view'
+import {IconArrowOpenDownLine, IconTextareaLine, IconUploadLine} from '@instructure/ui-icons'
 import {IconResize} from '../../../../assets/internal-icons'
 
 import {type ImageBlockProps, type ImageConstraint} from './types'
 import {type SizeVariant} from '../../../editor/types'
 import {AddImageModal} from '../../../editor/AddImageModal'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {Popover} from '@instructure/ui-popover'
+import {TextArea} from '@instructure/ui-text-area'
 
 const I18n = useI18nScope('block-editor/image-block')
 
@@ -89,14 +91,26 @@ const ImageBlockToolbar = () => {
   }, [])
 
   const handleSave = useCallback(
-    (imageURL: string | null) => {
+    (imageURL: string | null, alt: string) => {
       setProp((prps: ImageBlockProps) => {
         prps.src = imageURL || undefined
+        prps.alt = alt
       })
       setShowUploadModal(false)
     },
     [setProp]
   )
+
+  const handleAltChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setProp((prps: ImageBlockProps) => {
+        prps.alt = e.target.value
+      })
+    },
+    [setProp]
+  )
+
+  const [showingAltTextMenu, setShowingAltTextMenu] = useState(false)
 
   return (
     <Flex gap="small">
@@ -184,6 +198,37 @@ const ImageBlockToolbar = () => {
           <Text size="small">{I18n.t('Percent size')}</Text>
         </Menu.Item>
       </Menu>
+
+      <Popover
+        label={I18n.t('Alt Text')}
+        isShowingContent={showingAltTextMenu}
+        onShowContent={_e => {
+          setShowingAltTextMenu(true)
+        }}
+        onHideContent={_e => {
+          setShowingAltTextMenu(false)
+        }}
+        on="click"
+        renderTrigger={
+          <IconButton
+            size="small"
+            withBackground={false}
+            withBorder={false}
+            screenReaderLabel={I18n.t('Image Description')}
+          >
+            <IconTextareaLine size="x-small" />
+          </IconButton>
+        }
+      >
+        <View padding="small" as="div">
+          <TextArea
+            label={I18n.t('Alt Text')}
+            placeholder={I18n.t('Image Description')}
+            value={props.alt}
+            onChange={handleAltChange}
+          />
+        </View>
+      </Popover>
 
       <AddImageModal open={showUploadModal} onSubmit={handleSave} onDismiss={handleDismissModal} />
     </Flex>

@@ -54,6 +54,7 @@ const ImageOptionsForm = ({
   hideDimensions,
   id = 'image-options-form',
   isIconMaker = false,
+  forBlockEditorUse = false,
 }) => {
   const TYPE = isIconMaker ? formatMessage('icon') : formatMessage('image')
   const tooltipText = formatMessage('Used by screen readers to describe the content of an {TYPE}', {
@@ -112,23 +113,25 @@ const ImageOptionsForm = ({
       </Flex.Item>
       {!isIconMaker && (
         <>
-          <Flex.Item padding="small">
-            <RadioInputGroup
-              description={formatMessage('Display Options')}
-              disabled={isLinked}
-              name="display-image-as"
-              onChange={handleDisplayAsChange}
-              value={displayAs}
-            >
-              <RadioInput label={formatMessage('Embed Image')} value="embed" />
+          {!forBlockEditorUse && (
+            <Flex.Item padding="small">
+              <RadioInputGroup
+                description={formatMessage('Display Options')}
+                disabled={isLinked}
+                name="display-image-as"
+                onChange={handleDisplayAsChange}
+                value={displayAs}
+              >
+                <RadioInput label={formatMessage('Embed Image')} value="embed" />
 
-              <RadioInput
-                disabled={isDecorativeImage}
-                label={formatMessage('Display Text Link (Opens in a new tab)')}
-                value="link"
-              />
-            </RadioInputGroup>
-          </Flex.Item>
+                <RadioInput
+                  disabled={isDecorativeImage}
+                  label={formatMessage('Display Text Link (Opens in a new tab)')}
+                  value="link"
+                />
+              </RadioInputGroup>
+            </Flex.Item>
+          )}
 
           {!hideDimensions && (
             <Flex.Item>

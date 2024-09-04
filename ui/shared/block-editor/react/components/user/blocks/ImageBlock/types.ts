@@ -25,6 +25,7 @@ export const HeroImageHeight: string = '184px'
 export type ImageBlockProps = {
   src?: string
   constraint?: ImageConstraint
+  alt?: string
   sizeVariant?: SizeVariant
 } & ResizableProps
 

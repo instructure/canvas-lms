@@ -37,6 +37,7 @@ const ImageBlock = ({
   constraint,
   maintainAspectRatio,
   sizeVariant,
+  alt,
 }: ImageBlockProps) => {
   const {enabled} = useEditor(state => ({
     enabled: state.options.enabled,
@@ -155,6 +156,7 @@ const ImageBlock = ({
           display="inline-block"
           src={src || ImageBlock.craft.defaultProps.src}
           constrain={imgConstrain}
+          alt={alt || ''}
         />
       </div>
     )
@@ -169,6 +171,7 @@ ImageBlock.craft = {
     constraint: 'cover' as ImageConstraint,
     maintainAspectRatio: false,
     sizeVariant: 'auto',
+    alt: '',
   },
   related: {
     toolbar: ImageBlockToolbar,

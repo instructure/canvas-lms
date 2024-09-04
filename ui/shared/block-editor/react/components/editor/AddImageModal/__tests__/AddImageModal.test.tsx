@@ -123,6 +123,7 @@ describe('AddImageModal', () => {
         initializeDocuments() {},
         initializeMedia() {},
         fetchImages: jest.fn().mockResolvedValue({files}),
+        getSession: jest.fn().mockResolvedValue({usageRightsRequired: false}),
       },
       storeProps: {},
       images: {
@@ -168,9 +169,31 @@ describe('AddImageModal', () => {
       screen.getByRole('textbox', {name: /file url/i}),
       'http://example.com/image.jpg'
     )
-    await user.click(screen.getByRole('button', {name: /submit/i}))
+    await user.click(screen.getByText('Submit').closest('button'))
     await waitFor(() => {
-      expect(mockOnSubmit).toHaveBeenCalledWith('http://example.com/image.jpg')
+      expect(mockOnSubmit).toHaveBeenCalledWith('http://example.com/image.jpg', '')
+    })
+  })
+
+  it('can submit URL images with alt texts', async () => {
+    renderComponent()
+    await user.click(screen.getByText('URL'))
+    await waitFor(() => {
+      expect(screen.getByText('File URL')).toBeInTheDocument()
+    })
+    await user.type(
+      screen.getByRole('textbox', {name: /file url/i}),
+      'http://example.com/image.jpg'
+    )
+
+    fireEvent.change(
+      (await screen.getByPlaceholderText('(Describe the image)')) as unknown as HTMLInputElement,
+      {target: {value: 'Some alt text'}}
+    )
+
+    await user.click(screen.getByText('Submit').closest('button'))
+    await waitFor(() => {
+      expect(mockOnSubmit).toHaveBeenCalledWith('http://example.com/image.jpg', 'Some alt text')
     })
   })
 
@@ -183,7 +206,10 @@ describe('AddImageModal', () => {
     await user.click(screen.getByRole('img', {name: /image_one\.png/i}))
     await user.click(screen.getByRole('button', {name: /submit/i}))
     await waitFor(() => {
-      expect(mockOnSubmit).toHaveBeenCalledWith('http://canvas.docker/courses/21/files/722?wrap=1')
+      expect(mockOnSubmit).toHaveBeenCalledWith(
+        'http://canvas.docker/courses/21/files/722?wrap=1',
+        ''
+      )
     })
   })
 
@@ -197,7 +223,10 @@ describe('AddImageModal', () => {
     await user.click(screen.getByRole('img', {name: /image_one\.png/i}))
     await user.click(screen.getByRole('button', {name: /submit/i}))
     await waitFor(() => {
-      expect(mockOnSubmit).toHaveBeenCalledWith('http://canvas.docker/courses/21/files/722?wrap=1')
+      expect(mockOnSubmit).toHaveBeenCalledWith(
+        'http://canvas.docker/courses/21/files/722?wrap=1',
+        ''
+      )
     })
   })
 

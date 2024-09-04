@@ -108,6 +108,7 @@ const mockTrayProps = {
     initializeDocuments() {},
     initializeMedia() {},
     fetchImages: jest.fn().mockResolvedValue({files}),
+    getSession: jest.fn().mockResolvedValue({usageRightsRequired: false}),
   },
   storeProps: {},
   images: {
@@ -240,6 +241,43 @@ describe('ImageBlockToolbar', () => {
     await user.click(screen.getByText(/submit/i).closest('button') as HTMLButtonElement)
     await waitFor(() => {
       expect(props.src).toBe('http://canvas.docker/courses/21/files/722?wrap=1')
+    })
+  })
+
+  it('can add alt text to the image on image setting', async () => {
+    render(
+      <RCSPropsContext.Provider value={mockTrayProps}>
+        <ImageBlockToolbar />
+      </RCSPropsContext.Provider>
+    )
+    await user.click(screen.getByText(/upload image/i).closest('button') as HTMLButtonElement)
+    await user.click(screen.getByRole('tab', {name: /URL/i}))
+
+    const fileURLInput = screen.getByLabelText('File URL') as unknown as HTMLInputElement
+    const altInput = screen.getByPlaceholderText(
+      '(Describe the image)'
+    ) as unknown as HTMLInputElement
+
+    fireEvent.change(fileURLInput, {target: {value: 'https://whatever.net/whatevs.jpg'}})
+    fireEvent.change(altInput, {target: {value: 'Some alt text'}})
+
+    await user.click(screen.getByText(/submit/i).closest('button') as HTMLButtonElement)
+    await waitFor(() => {
+      expect(props.alt).toBe('Some alt text')
+    })
+  })
+
+  it('can add alt text to the image being interacted with', async () => {
+    props.alt = 'image description...'
+    render(<ImageBlockToolbar />)
+
+    const btn = screen.getByText('Image Description').closest('button') as HTMLButtonElement
+    await user.click(btn)
+
+    const altInput = screen.getByPlaceholderText('Image Description') as unknown as HTMLInputElement
+    fireEvent.change(altInput, {target: {value: 'new alt text'}})
+    await waitFor(() => {
+      expect(props.alt).toBe('new alt text')
     })
   })
 })
