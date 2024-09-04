@@ -206,6 +206,7 @@ class SectionsController < ApplicationController
                                      .select("course_section_id, count(*) as count")
                                      .not_fake.where.not(workflow_state: "rejected")
                                      .where(course_section_id: sections.select(:id))
+                                     .active
                                      .group(:course_section_id)
 
       response = sections.map do |section|
