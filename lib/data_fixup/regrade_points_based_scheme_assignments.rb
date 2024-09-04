@@ -45,7 +45,7 @@ class DataFixup::RegradePointsBasedSchemeAssignments
     submissions_with_grades = Submission.where.not(grade: nil).where(assignment_id: assignments.select(:id))
     submissions_with_grades.preload(assignment: [:grading_standard, { context: :grading_standard }]).find_in_batches(batch_size: 1000) do |submissions_batch|
       batched_updates = submissions_batch.each_with_object([]) do |submission, acc|
-        new_grade = submission.assignment.score_to_grade(submission.score)
+        new_grade = submission.assignment.score_to_grade(submission.score, submission.grade)
         grade_has_changed = new_grade != submission.grade || new_grade != submission.published_grade
         if grade_has_changed
           acc << submission.attributes.merge("grade" => new_grade, "published_grade" => new_grade, "updated_at" => current_time)

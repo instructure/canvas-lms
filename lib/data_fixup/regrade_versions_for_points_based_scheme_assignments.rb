@@ -70,7 +70,7 @@ class DataFixup::RegradeVersionsForPointsBasedSchemeAssignments
       model = version.model
       next unless model.grade.present?
 
-      new_grade = version.versionable.assignment.score_to_grade(model.score)
+      new_grade = version.versionable.assignment.score_to_grade(model.score, model.grade)
       grade_has_changed = new_grade != model.grade || new_grade != model.published_grade
       next unless grade_has_changed
 

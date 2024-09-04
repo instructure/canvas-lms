@@ -82,4 +82,13 @@ describe DataFixup::RegradeVersionsForPointsBasedSchemeAssignments do
     }
     expect(@submission3.reload.versions.first.model.published_grade).to eq("A")
   end
+
+  it "handles 0 point assignments using points-based grading standards" do
+    @submission1.assignment.update!(points_possible: 0)
+    @submission1.assignment.grade_student(@student, grade: "B", grader: @teacher)
+    expect { DataFixup::RegradeVersionsForPointsBasedSchemeAssignments.run }.not_to change {
+      @submission1.reload.versions.take.model.grade
+    }.from("B")
+    expect(@submission1.reload.versions.take.model.published_grade).to eq("B")
+  end
 end
