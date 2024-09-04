@@ -60,4 +60,13 @@ describe DataFixup::RegradePointsBasedSchemeAssignments do
     }
     expect(@submission3.reload.published_grade).to eq("A")
   end
+
+  it "handles 0 point assignments using points-based grading standards" do
+    @submission1.assignment.update!(points_possible: 0)
+    @submission1.assignment.grade_student(@student, grade: "B", grader: @teacher)
+    expect { DataFixup::RegradePointsBasedSchemeAssignments.run }.not_to change {
+      @submission1.reload.grade
+    }.from("B")
+    expect(@submission1.reload.published_grade).to eq("B")
+  end
 end
