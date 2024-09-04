@@ -1184,7 +1184,7 @@ Assignment.prototype.isImporting = function () {
 }
 
 Assignment.prototype.failedToImport = function () {
-  return this.get('workflow_state') === 'failed_to_import'
+  return this.get('workflow_state') === 'fail_to_import'
 }
 
 Assignment.prototype.submissionTypesFrozen = function () {

@@ -484,7 +484,7 @@ class AbstractAssignment < ActiveRecord::Base
   def self.clean_up_importing_assignments
     importing_for_too_long.in_batches(of: 10_000).update_all(
       importing_started_at: nil,
-      workflow_state: "failed_to_import",
+      workflow_state: "fail_to_import",
       updated_at: Time.zone.now
     )
   end

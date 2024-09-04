@@ -1844,15 +1844,39 @@ describe Assignment do
       allow(importing_for_too_long_result).to receive(:in_batches).and_return(@in_batches_result)
     end
 
-    it "marks all assignments that have been importing for too long as failed_to_import" do
+    it "marks all assignments that have been importing for too long as fail_to_import" do
       now = double("now")
       expect(Time.zone).to receive(:now).and_return(now)
       expect(@in_batches_result).to receive(:update_all).with(
         importing_started_at: nil,
-        workflow_state: "failed_to_import",
+        workflow_state: "fail_to_import",
         updated_at: now
       )
       described_class.clean_up_importing_assignments
+    end
+  end
+
+  describe "state: importing" do
+    subject { described_class }
+
+    let(:importing_assignment) do
+      @course.assignments.create!(workflow_state: "importing", **assignment_valid_attributes)
+    end
+
+    describe ".finish_importing" do
+      it "update to unpublished" do
+        expect(importing_assignment.workflow_state).to eq "importing"
+        importing_assignment.finish_importing
+        expect(importing_assignment.workflow_state).to eq "unpublished"
+      end
+    end
+
+    describe ".fail_to_import" do
+      it "update to fail_to_import" do
+        expect(importing_assignment.workflow_state).to eq "importing"
+        importing_assignment.fail_to_import
+        expect(importing_assignment.workflow_state).to eq "fail_to_import"
+      end
     end
   end
 
