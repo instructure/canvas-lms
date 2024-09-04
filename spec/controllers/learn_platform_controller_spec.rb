@@ -57,7 +57,7 @@ describe LearnPlatformController do
                      "Content-Length" => response_fixture.size
                    })
 
-      get :index, params: { account_id: @account.id }
+      get :index, params: { account_id: @account.id, q: { canvas_integrated_only: true } }
       expect(response).to have_http_status(:success)
       json = json_parse(response.body)
       expect(json["tools"]).to be_present
@@ -90,7 +90,40 @@ describe LearnPlatformController do
                      "Content-Length" => response_fixture.size
                    })
 
-      get :index, params: { account_id: @account.id, page: 1, per_page: 5, q: { search_terms_cont: "tool" } }
+      get :index, params: { account_id: @account.id, page: 1, per_page: 5, q: { search_terms_cont: "tool", canvas_integrated_only: true } }
+      expect(response).to have_http_status(:success)
+      json = json_parse(response.body)
+      expect(json["tools"]).to be_present
+
+      tool = json["tools"].first
+      expect(tool["name"]).to be_present
+    end
+
+    it "index calls are always coaxed into canvas_integrated_only === true" do
+      response_fixture = {
+        tools:
+          [
+            {
+              id: 1,
+              name: "First Tool"
+            }
+          ],
+        meta:
+          {
+            page: 1,
+            per_page: 5,
+            total_count: 1
+          }
+      }.to_json
+      stub_request(:get, %r{api/v2/lti/tools})
+        .to_return(body: response_fixture,
+                   status: 200,
+                   headers: {
+                     "Content-Type" => "application/json",
+                     "Content-Length" => response_fixture.size
+                   })
+
+      get :index, params: { account_id: @account.id, page: 1, per_page: 5, q: { canvas_integrated_only: false } }
       expect(response).to have_http_status(:success)
       json = json_parse(response.body)
       expect(json["tools"]).to be_present
@@ -113,7 +146,7 @@ describe LearnPlatformController do
                      "Content-Length" => response_fixture.size
                    })
 
-      get :index, params: { account_id: @account.id }
+      get :index, params: { account_id: @account.id, q: { canvas_integrated_only: true } }
       expect(response).to have_http_status(:internal_server_error)
       json = json_parse(response.body)
       expect(json["lp_server_error"]).to be true
