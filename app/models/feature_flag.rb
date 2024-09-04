@@ -65,19 +65,24 @@ class FeatureFlag < ActiveRecord::Base
   def clear_cache
     if context
       self.class.connection.after_transaction_commit do
-        context.feature_flag_cache.delete(context.feature_flag_cache_key(feature))
-        context.touch if Feature.definitions[feature].try(:touch_context) || context.try(:root_account?)
+        context.shard.activate do
+          # Shard scope is not as pertinent for Account or Course context as they
+          # reside on their home shard, but when deleting cache entries for cross-shard
+          # users that have keys prefixed by shard_id, we need to scope appropriately.
+          context.feature_flag_cache.delete(context.feature_flag_cache_key(feature))
+          context.touch if Feature.definitions[feature].try(:touch_context) || context.try(:root_account?)
 
-        if context.is_a?(Account)
-          if context.site_admin?
-            Switchman::DatabaseServer.send_in_each_region(context, :clear_cache_key, {}, :feature_flags)
-          else
-            context.clear_cache_key(:feature_flags)
+          if context.is_a?(Account)
+            if context.site_admin?
+              Switchman::DatabaseServer.send_in_each_region(context, :clear_cache_key, {}, :feature_flags)
+            else
+              context.clear_cache_key(:feature_flags)
+            end
           end
-        end
 
-        if !::Rails.env.production? && context.is_a?(Account) && Account.all_special_accounts.include?(context)
-          Account.clear_special_account_cache!(true)
+          if !::Rails.env.production? && context.is_a?(Account) && Account.all_special_accounts.include?(context)
+            Account.clear_special_account_cache!(true)
+          end
         end
       end
     end
