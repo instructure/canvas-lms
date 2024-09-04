@@ -37,7 +37,7 @@ import {
 } from '@instructure/ui-icons'
 import LtiDetailModal from './LtiDetailModal'
 import ProductCarousel from '../common/ProductCarousel'
-import ImageCarousel from '../common/ImageCarousel'
+import ImageCarousel from '../common/ImageCarousel/ImageCarousel'
 import BadgeCarousel from '../common/BadgeCarousel'
 import Disclaimer from '../common/Disclaimer'
 
