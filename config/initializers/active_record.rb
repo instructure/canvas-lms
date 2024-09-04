@@ -1372,7 +1372,7 @@ ActiveRecord::Relation.class_eval do
 
     relation = clone
     old_select = relation.select_values
-    relation.select_values = [+"DISTINCT ON (#{args.join(", ")}) "]
+    relation.select_values = ["DISTINCT ON (#{args.join(", ")}) "]
     relation.distinct_value = false
 
     relation.select_values.first << (old_select.empty? ? "*" : old_select.uniq.join(", "))
@@ -1398,7 +1398,7 @@ ActiveRecord::Relation.class_eval do
       end.join(" UNION ALL ")
       return unscoped.where("#{table}.#{connection.quote_column_name(primary_key)} IN (#{sub_query})") unless from
 
-      sub_query = +"(#{sub_query}) #{(from == true) ? table : from}"
+      sub_query = "(#{sub_query}) #{(from == true) ? table : from}"
       unscoped.from(sub_query)
     end
   end
@@ -1514,7 +1514,7 @@ module UpdateAndDeleteWithJoins
   def delete_all
     return super if joins_values.empty?
 
-    sql = +"DELETE FROM #{quoted_table_name} "
+    sql = "DELETE FROM #{quoted_table_name} "
 
     join_sql = arel.join_sources.map(&:to_sql).join(" ")
     tables, join_conditions = deconstruct_joins(join_sql)
@@ -1746,7 +1746,7 @@ module Migrator
 end
 ActiveRecord::Migrator.prepend(Migrator)
 
-ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join("gems/plugins/*/db/migrate")]
+ActiveRecord::Migrator.migrations_paths.concat Rails.root.glob("gems/plugins/*/db/migrate")
 
 ActiveRecord::Tasks::DatabaseTasks.migrations_paths = ActiveRecord::Migrator.migrations_paths
 

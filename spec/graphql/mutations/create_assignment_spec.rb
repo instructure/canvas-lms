@@ -119,7 +119,7 @@ describe Mutations::CreateAssignment do
   end
 
   it "creates an assignment with attributes" do
-    query = +"courseId: #{@course.to_param}\n"
+    query = "courseId: #{@course.to_param}\n"
     test_attrs.each do |graphql_name, _assignment_name, _initial_value, update_value, _graphql_result, _assignment_result|
       query << "#{graphql_name}: #{update_value}\n"
     end

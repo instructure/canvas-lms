@@ -439,7 +439,7 @@ module SchemaCreationExtensions
   end
 
   def visit_ForeignKeyDefinition(o, constraint_type: :table)
-    sql = +"CONSTRAINT #{quote_column_name(o.name)}"
+    sql = "CONSTRAINT #{quote_column_name(o.name)}"
     sql << " FOREIGN KEY (#{quote_column_name(o.column)})" if constraint_type == :table
     sql << " REFERENCES #{quote_table_name(o.to_table)} (#{quote_column_name(o.primary_key)})"
     sql << " #{action_sql("DELETE", o.on_delete)}" if o.on_delete

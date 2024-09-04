@@ -203,7 +203,7 @@ module CC
     end
 
     def create_export_dir
-      slug = +"common_cartridge_#{@course.id}"
+      slug = "common_cartridge_#{@course.id}"
       slug << "_user_#{@user.id}" if @user
       folder = @migration_config[:data_folder] || Dir.tmpdir
 

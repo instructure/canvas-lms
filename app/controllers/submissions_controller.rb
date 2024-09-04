@@ -439,7 +439,7 @@ class SubmissionsController < SubmissionsBaseController
                        (params[:submission][:attachment_ids] || "").split(",")
                      end
 
-    attachment_ids = attachment_ids.select(&:present?)
+    attachment_ids = attachment_ids.compact_blank
     params[:submission][:attachments] = []
 
     attachment_ids.each do |id|
