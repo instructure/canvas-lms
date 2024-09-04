@@ -39,7 +39,7 @@ describe('TempEnrollSearch', () => {
     account_id: '',
   }
   const mockSame = {users: [{userTemplate, user_id: '1', address: ''}]}
-  const mockNoUser = {users: [], duplicates: []}
+  const mockNoUser = {users: [], duplicates: [], missing: []}
   const mockUserList = {
     users: [
       {
@@ -48,6 +48,8 @@ describe('TempEnrollSearch', () => {
         address: 'user1',
       },
     ],
+    duplicates: [],
+    missing: [],
   }
   const mockFindUser = {
     id: '2',
@@ -56,6 +58,7 @@ describe('TempEnrollSearch', () => {
     primary_email: 'user@email.com',
     login_id: 'user_login',
   }
+
   const userDetailsUriMock = (userId: string, response: object) =>
     fetchMock.get(`/api/v1/users/${userId}/profile`, response)
 
@@ -92,9 +95,7 @@ describe('TempEnrollSearch', () => {
     const {queryAllByText} = render(<TempEnrollSearch page={1} {...props} />)
     await waitFor(() =>
       expect(
-        queryAllByText(
-          'The user found matches the source user. Please search for a different user.'
-        )
+        queryAllByText('The user found matches the provider. Please search for a different user.')
       ).toBeTruthy()
     )
   })
@@ -186,6 +187,7 @@ describe('TempEnrollSearch', () => {
           },
         ],
       ],
+      missing: [],
     }
 
     it('displays possible matches page when duplicates are present', async () => {
@@ -194,9 +196,7 @@ describe('TempEnrollSearch', () => {
         mockDuplicates
       )
       const {queryByText} = render(<TempEnrollSearch page={1} {...props} />)
-      await waitFor(() =>
-        expect(queryByText(/Please select desired user from the list below/)).toBeTruthy()
-      )
+      await waitFor(() => expect(queryByText(/No users are ready/)).toBeTruthy())
       await waitFor(() => expect(queryByText('user2')).toBeInTheDocument())
       await waitFor(() => expect(queryByText('user2_sis')).toBeInTheDocument())
       await waitFor(() => expect(queryByText('user3')).toBeInTheDocument())

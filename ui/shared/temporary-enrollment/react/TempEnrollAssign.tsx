@@ -510,7 +510,10 @@ export function TempEnrollAssign(props: Props) {
       // if there is no pairing, we are creating a new enrollment
       const isUpdate = props.tempEnrollmentsPairing != null
       props.setEnrollmentStatus(success, isUpdate)
-      setLoading(false)
+      // only set loading state if modal is still open
+      if (!success) {
+        setLoading(false)
+      }
     }
   }
 

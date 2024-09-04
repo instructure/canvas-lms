@@ -163,8 +163,10 @@ export function TempEnrollModal(props: Props) {
     }
   }
 
-  const handleSetEnrollmentFromSearch = (enrollmentUser: User) => {
-    setEnrollment(enrollmentUser)
+  const handleSetEnrollmentsFromSearch = (enrollmentUsers: User[]) => {
+    // TODO: Set enrollment to all users
+    // setEnrollment(enrollmentUsers)
+    setEnrollment(enrollmentUsers[0])
   }
 
   const handlePageChange = (change: number) => {
@@ -247,7 +249,7 @@ export function TempEnrollModal(props: Props) {
           user={props.user}
           page={page}
           searchFail={handleModalReset}
-          searchSuccess={handleSetEnrollmentFromSearch}
+          searchSuccess={handleSetEnrollmentsFromSearch}
           foundUser={enrollment}
           wasReset={wasReset}
         />
