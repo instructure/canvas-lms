@@ -2278,7 +2278,7 @@ describe DiscussionTopicsController do
         user_session @teacher
         post "create", params: group_topic_params(group, { anonymous_state: "full_anonymity" }), format: :json
         expect(response).to have_http_status :bad_request
-        expect(response.parsed_body["errors"]).to(include { "anonymous_state" => "Group discussions cannot be anonymous." })
+        expect(response.parsed_body["errors"]).to include({ "anonymous_state" => "Group discussions cannot be anonymous." })
       end
 
       it "returns an error for creating anonymous discussions assigned to a Group Category in a Course" do
@@ -2287,7 +2287,7 @@ describe DiscussionTopicsController do
         user_session @teacher
         post "create", params: topic_params(@course, { anonymous_state: "full_anonymity", group_category_id: group_category.id }), format: :json
         expect(response).to have_http_status :bad_request
-        expect(response.parsed_body["errors"]).to(include { "anonymous_state" => "Group discussions cannot be anonymous." })
+        expect(response.parsed_body["errors"]).to include({ "anonymous_state" => "Group discussions cannot be anonymous." })
       end
 
       it "returns an error for creating a graded anonymous discussion" do
@@ -2296,7 +2296,7 @@ describe DiscussionTopicsController do
         user_session(@teacher)
         post "create", params: obj_params, format: :json
         expect(response).to have_http_status :bad_request
-        expect(response.parsed_body["errors"]).to(include { "anonymous_state" => "Anonymous discussions cannot be graded" })
+        expect(response.parsed_body["errors"]).to include({ "anonymous_state" => "Anonymous discussions cannot be graded" })
       end
 
       it "allows partial_anonymity" do
@@ -2871,7 +2871,7 @@ describe DiscussionTopicsController do
         user_session(@teacher)
         put "update", params: { course_id: @course.id, topic_id: full_anon.id, group_category_id: group_category.id }, format: "json"
         expect(response).to have_http_status :bad_request
-        expect(response.parsed_body["errors"]).to(include { "anonymous_state" => "Group discussions cannot be anonymous." })
+        expect(response.parsed_body["errors"]).to include({ "anonymous_state" => "Group discussions cannot be anonymous." })
       end
 
       it "returns an error when turning a partially anonymous discussion into a group discussion" do
@@ -2881,7 +2881,7 @@ describe DiscussionTopicsController do
         user_session(@teacher)
         put "update", params: { course_id: @course.id, topic_id: partial_anon.id, group_category_id: group_category.id }, format: "json"
         expect(response).to have_http_status :bad_request
-        expect(response.parsed_body["errors"]).to(include { "anonymous_state" => "Group discussions cannot be anonymous." })
+        expect(response.parsed_body["errors"]).to include({ "anonymous_state" => "Group discussions cannot be anonymous." })
       end
 
       it "saves when turning a regular discussion into a group discussion" do
