@@ -496,7 +496,7 @@ end
 module SchemaStatementsExtensions
   # TODO: move this to activerecord-pg-extensions
   def valid_column_definition_options
-    super + [:delay_validation]
+    super + [:delay_validation, :foreign_key]
   end
 
   def add_column_for_alter(table_name, column_name, type, **options)
