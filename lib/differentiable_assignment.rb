@@ -53,12 +53,6 @@ module DifferentiableAssignment
     case differentiable.class_name
     when "Assignment"
       AssignmentStudentVisibility
-    when "ContextModule"
-      ModuleStudentVisibility
-    when "WikiPage"
-      WikiPageStudentVisibility
-    when "DiscussionTopic"
-      UngradedDiscussionStudentVisibility
     else
       Quizzes::QuizStudentVisibility
     end
