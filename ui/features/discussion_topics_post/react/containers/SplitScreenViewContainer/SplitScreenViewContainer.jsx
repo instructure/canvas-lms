@@ -98,7 +98,10 @@ export const SplitScreenViewContainer = props => {
     }
   }
 
-  const {createDiscussionEntry, isSubmitting} = useCreateDiscussionEntry(onEntryCreationCompletion, updateCache)
+  const {createDiscussionEntry, isSubmitting} = useCreateDiscussionEntry(
+    onEntryCreationCompletion,
+    updateCache
+  )
 
   const [deleteDiscussionEntry] = useMutation(DELETE_DISCUSSION_ENTRY, {
     onCompleted: data => {
