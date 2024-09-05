@@ -86,6 +86,8 @@ export interface Lti1p3RegistrationOverlayActions {
   setJwk: (jwk: string) => void
   setDomain: (domain: string) => void
   setCustomFields: (customFields: string) => void
+  setOverrideURI: (placement: LtiPlacement, uri: string) => void
+  setMessageType: (placement: LtiPlacement, messageType: LtiMessageType) => void
   toggleScope: (scope: LtiScope) => void
   setPrivacyLevel: (privacyLevel: LtiPrivacyLevel) => void
   togglePlacement: (placement: LtiPlacement) => void
@@ -117,6 +119,42 @@ const updateLaunchSetting = <K extends keyof Lti1p3RegistrationOverlayState['lau
     },
   }))
 
+const updateOverrideURI = (placement: LtiPlacement, uri: string) => {
+  return updateState(state => {
+    return {
+      ...state,
+      override_uris: {
+        ...state.override_uris,
+        placements: {
+          ...state.override_uris.placements,
+          [placement]: {
+            ...state.override_uris.placements[placement],
+            uri,
+          },
+        },
+      },
+    }
+  })
+}
+
+const updateMessageType = (placement: LtiPlacement, messageType: LtiMessageType) => {
+  return updateState(state => {
+    return {
+      ...state,
+      override_uris: {
+        ...state.override_uris,
+        placements: {
+          ...state.override_uris.placements,
+          [placement]: {
+            ...state.override_uris.placements[placement],
+            messageType,
+          },
+        },
+      },
+    }
+  })
+}
+
 export const createLti1p3RegistrationOverlayStore = (internalConfig: InternalLtiConfiguration) =>
   create<{state: Lti1p3RegistrationOverlayState} & Lti1p3RegistrationOverlayActions>(set => ({
     state: initialOverlayStateFromInternalConfig(internalConfig),
@@ -130,6 +168,8 @@ export const createLti1p3RegistrationOverlayStore = (internalConfig: InternalLti
     setJwkMethod: jwkMethod => set(updateLaunchSetting('JwkMethod', jwkMethod)),
     setDomain: domain => set(updateLaunchSetting('domain', domain)),
     setCustomFields: customFields => set(updateLaunchSetting('customFields', customFields)),
+    setOverrideURI: (placement, uri) => set(updateOverrideURI(placement, uri)),
+    setMessageType: (placement, messageType) => set(updateMessageType(placement, messageType)),
     toggleScope: scope => {
       set(
         updateState(state => {
@@ -232,7 +272,7 @@ const initialOverlayStateFromInternalConfig = (
       >((acc, p) => {
         acc[p.placement] = {
           message_type: p.message_type ?? 'LtiResourceLinkRequest',
-          uri: p.url ?? internalConfig.target_link_uri,
+          uri: p.target_link_uri ?? p.url ?? internalConfig.target_link_uri,
         }
         return acc
       }, {} as Record<LtiPlacement, {message_type: LtiMessageType; uri: string}>),
