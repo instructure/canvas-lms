@@ -22,7 +22,7 @@ describe Lti::Overlay do
     let(:account) { account_model }
     let(:updated_by) { user_model }
     let(:registration) { lti_registration_model(account:) }
-    let(:data) { { "hello" => "world" } }
+    let(:data) { { "title" => "Hello World!" } }
 
     context "without account" do
       it "fails" do
@@ -39,6 +39,25 @@ describe Lti::Overlay do
     context "without updated_by" do
       it "fails" do
         expect { Lti::Overlay.create!(registration:, account:, data:) }.to raise_error(ActiveRecord::RecordInvalid)
+      end
+    end
+
+    context "with invalid data" do
+      let(:data) do
+        {
+          disabled_placements: ["invalid_placement"]
+        }.deep_stringify_keys
+      end
+
+      it "fails" do
+        expect { Lti::Overlay.create!(registration:, account:, updated_by:, data:) }.to raise_error(ActiveRecord::RecordInvalid)
+      end
+
+      it "returns the schema errors" do
+        overlay = Lti::Overlay.build(registration:, account:, updated_by:, data:)
+        overlay.save
+
+        expect(JSON.parse(overlay.errors[:data].first).first).to include "is not one of"
       end
     end
 
