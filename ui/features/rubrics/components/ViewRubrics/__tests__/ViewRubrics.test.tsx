@@ -327,9 +327,10 @@ describe('ViewRubrics Tests', () => {
       expect(Router.useNavigate).toHaveReturnedWith(expect.any(Function))
     })
 
-    it('renders a popover menu with access to the share course tray', () => {
+    it('render an access to the share course tray when FF is enabled', () => {
       const mockNavigate = jest.fn()
       jest.spyOn(Router, 'useNavigate').mockReturnValue(mockNavigate)
+      window.ENV.enhanced_rubrics_copy_to = true
 
       queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
       const {getByTestId} = renderComponent()
@@ -339,6 +340,19 @@ describe('ViewRubrics Tests', () => {
       copyToButton.click()
 
       expect(getByTestId('share-course-1-tray')).toBeInTheDocument()
+    })
+
+    it('does not render an access to the share course tray when FF is disabled', () => {
+      const mockNavigate = jest.fn()
+      jest.spyOn(Router, 'useNavigate').mockReturnValue(mockNavigate)
+      window.ENV.enhanced_rubrics_copy_to = false
+
+      queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
+      const {getByTestId, queryByTestId} = renderComponent()
+      const popover = getByTestId('rubric-options-1-button')
+      popover.click()
+
+      expect(queryByTestId('copy-to-1-button')).not.toBeInTheDocument()
     })
 
     it('renders a popover menu with access to the rubric duplicate modal', () => {

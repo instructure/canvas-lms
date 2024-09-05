@@ -309,6 +309,17 @@ enhanced_rubrics:
       state: allowed
     development:
       state: allowed
+enhanced_rubrics_copy_to:
+  state: hidden
+  applies_to: Course
+  root_opt_in: true
+  display_name: Enhanced Rubrics Copy To
+  description: This functionality allows copying rubrics between courses from the enhanced rubrics UI and also assigning them directly to an assignment.
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed
 multiselect_gradebook_filters:
   state: hidden
   applies_to: SiteAdmin
