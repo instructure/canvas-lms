@@ -241,6 +241,7 @@ export default class TextGradeInput extends Component<Props, State> {
   render() {
     return (
       <TextInput
+        autoComplete="off"
         disabled={this.props.disabled}
         inputRef={this.bindTextInput}
         renderLabel={this.props.label}

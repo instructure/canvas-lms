@@ -76,6 +76,7 @@ const Points = props => {
           <Flex alignItems="end" wrap="wrap">
             <Flex.Item size="4rem" margin="none small none none">
               <TextInput
+                autoComplete="off"
                 display="inline-block"
                 renderLabel={<ScreenReaderContent>{I18n.t('Points')}</ScreenReaderContent>}
                 messages={[

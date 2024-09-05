@@ -172,6 +172,7 @@ export default class ProficiencyRating extends React.Component {
         </Table.Cell>
         <Table.Cell>
           <TextInput
+            autoComplete="off"
             ref={this.setPointsRef}
             renderLabel={<ScreenReaderContent>{I18n.t('Change points')}</ScreenReaderContent>}
             messages={this.errorMessage(pointsError)}
