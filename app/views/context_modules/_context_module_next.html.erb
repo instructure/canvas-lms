@@ -241,9 +241,10 @@
           <%
             item_data = module_data[:items_data][item.id]
             locals = {
-              :completion_criteria => context_module.completion_requirements,
-              :item_data => item_data,
-              :viewable => @can_view,
+              item_restrictions: module_data.dig(:items_restrictions, item.id),
+              completion_criteria: context_module.completion_requirements,
+              item_data: item_data,
+              viewable: @can_view,
             }
           %>
           <%= render :partial => 'context_modules/module_item_next', :object => item, :as => :module_item, :locals => locals %>
