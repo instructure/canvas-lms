@@ -236,13 +236,13 @@ describe "Discussion Topic Show" do
         @due_at = 2.days.from_now
         @replies_required = 2
         @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
-        Checkpoints::DiscussionCheckpointCreatorService.call(
+        @reply_to_topic_checkpoint = Checkpoints::DiscussionCheckpointCreatorService.call(
           discussion_topic: @checkpointed_discussion,
           checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
           dates: [{ type: "everyone", due_at: @due_at }],
           points_possible: 6
         )
-        Checkpoints::DiscussionCheckpointCreatorService.call(
+        @reply_to_entry_checkpint = Checkpoints::DiscussionCheckpointCreatorService.call(
           discussion_topic: @checkpointed_discussion,
           checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
           dates: [{ type: "everyone", due_at: @due_at }],
@@ -279,9 +279,31 @@ describe "Discussion Topic Show" do
         wait_for_ajaximations
         reply_to_topic_contents = f("span[data-testid='reply_to_topic_section']").text
         expect(reply_to_topic_contents).to include("Completed #{format_date_for_view(root_entry.created_at)}")
-        reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
-        expect(reply_to_entry_contents).to include("Completed")
+        f("span[data-testid='reply_to_entry_section']").text
         expect(reply_to_topic_contents).to include("Completed #{format_date_for_view(@checkpointed_discussion.discussion_entries.last.created_at)}")
+      end
+
+      it "lets students see the checkpoints tray with completed status for resubmitted" do
+        root_entry = @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to topic")
+        child_entries = Array.new(@replies_required) do |i|
+          @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to entry #{i}", parent_entry: root_entry)
+        end
+        @reply_to_topic_checkpoint.grade_student(@student, grade: 5, grader: @teacher)
+        @reply_to_entry_checkpint.grade_student(@student, grade: 5, grader: @teacher)
+        root_entry.destroy
+        child_entries.each(&:destroy)
+        resubmitted_rtt = @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to topic resubmitted")
+        @replies_required.times { |i| @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to entry #{i}", parent_entry: resubmitted_rtt) }
+
+        user_session(@student)
+        get "/courses/#{@course.id}/discussion_topics/#{@checkpointed_discussion.id}"
+
+        fj("button:contains('View Due Dates')").click
+        wait_for_ajaximations
+        reply_to_topic_contents = f("span[data-testid='reply_to_topic_section']").text
+        expect(reply_to_topic_contents).to include("Completed #{format_date_for_view(resubmitted_rtt.created_at)}")
+        reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
+        expect(reply_to_entry_contents).to include("Completed #{format_date_for_view(@checkpointed_discussion.discussion_entries.last.created_at)}")
       end
 
       it "lets students see completed status for reply to topic as soon as they successfully reply to topic" do
