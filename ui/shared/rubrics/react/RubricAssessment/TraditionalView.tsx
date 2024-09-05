@@ -476,6 +476,7 @@ const CriterionRow = ({
                   <Flex.Item margin="small 0 0 0">
                     {!isPreviewMode && !criterion.ignoreForScoring && (
                       <TextInput
+                        autoComplete="off"
                         renderLabel={
                           <ScreenReaderContent>{I18n.t('Criterion Score')}</ScreenReaderContent>
                         }
