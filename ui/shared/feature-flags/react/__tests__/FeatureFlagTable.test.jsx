@@ -64,7 +64,7 @@ describe('feature_flags::FeatureFlagTable', () => {
   it('updates status pills dynamically', async () => {
     window.ENV.CONTEXT_BASE_URL = '/accounts/1'
     const route = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/feature8`
-    fetchMock.putOnce(route, JSON.stringify(sampleData.siteAdminOnFeature.feature_flag))
+    fetchMock.putOnce(route, sampleData.siteAdminOnFeature.feature_flag)
 
     const {getByText, getAllByTestId} = render(
       <FeatureFlagTable rows={rows} title={title} />

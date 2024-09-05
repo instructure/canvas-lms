@@ -94,9 +94,9 @@ describe('GradesPage', () => {
 
   describe('without grading periods', () => {
     beforeEach(() => {
-      fetchMock.get(GRADING_PERIODS_URL, JSON.stringify(MOCK_GRADING_PERIODS_EMPTY))
-      fetchMock.get(ASSIGNMENT_GROUPS_URL, JSON.stringify(MOCK_ASSIGNMENT_GROUPS))
-      fetchMock.get(ENROLLMENTS_URL, JSON.stringify(MOCK_ENROLLMENTS))
+      fetchMock.get(GRADING_PERIODS_URL, MOCK_GRADING_PERIODS_EMPTY)
+      fetchMock.get(ASSIGNMENT_GROUPS_URL, MOCK_ASSIGNMENT_GROUPS)
+      fetchMock.get(ENROLLMENTS_URL, MOCK_ENROLLMENTS)
     })
 
     it('renders loading skeletons while fetching content', async () => {
@@ -277,14 +277,11 @@ describe('GradesPage', () => {
 
   describe('with grading periods', () => {
     beforeEach(() => {
-      fetchMock.get(GRADING_PERIODS_URL, JSON.stringify(MOCK_GRADING_PERIODS_NORMAL))
-      fetchMock.get(
-        `${ASSIGNMENT_GROUPS_URL}&grading_period_id=2`,
-        JSON.stringify(MOCK_ASSIGNMENT_GROUPS)
-      )
-      fetchMock.get(`${ENROLLMENTS_URL}&grading_period_id=2`, JSON.stringify(MOCK_ENROLLMENTS))
-      fetchMock.get(ENROLLMENTS_URL, JSON.stringify(MOCK_ENROLLMENTS))
-      fetchMock.get(ASSIGNMENT_GROUPS_URL, JSON.stringify(MOCK_ASSIGNMENT_GROUPS))
+      fetchMock.get(GRADING_PERIODS_URL, MOCK_GRADING_PERIODS_NORMAL)
+      fetchMock.get(`${ASSIGNMENT_GROUPS_URL}&grading_period_id=2`, MOCK_ASSIGNMENT_GROUPS)
+      fetchMock.get(`${ENROLLMENTS_URL}&grading_period_id=2`, MOCK_ENROLLMENTS)
+      fetchMock.get(ENROLLMENTS_URL, MOCK_ENROLLMENTS)
+      fetchMock.get(ASSIGNMENT_GROUPS_URL, MOCK_ASSIGNMENT_GROUPS)
     })
 
     it('shows a grading period select when grading periods are returned', async () => {
@@ -308,7 +305,7 @@ describe('GradesPage', () => {
       fetchMock.get(`${ASSIGNMENT_GROUPS_URL}&grading_period_id=1`, [], {
         overwriteRoutes: true,
       })
-      fetchMock.get(`${ENROLLMENTS_URL}&grading_period_id=1`, JSON.stringify(MOCK_ENROLLMENTS), {
+      fetchMock.get(`${ENROLLMENTS_URL}&grading_period_id=1`, MOCK_ENROLLMENTS, {
         overwriteRoutes: true,
       })
       const {getByText, findByText, queryByText} = render(<GradesPage {...getProps()} />)
@@ -323,9 +320,7 @@ describe('GradesPage', () => {
     it('hides totals on All Grading Periods if not allowed', async () => {
       const gradingPeriods = {...MOCK_GRADING_PERIODS_NORMAL}
       gradingPeriods.enrollments[0].totals_for_all_grading_periods_option = false
-      fetchMock.get(GRADING_PERIODS_URL, JSON.stringify(gradingPeriods), {
-        overwriteRoutes: true,
-      })
+      fetchMock.get(GRADING_PERIODS_URL, gradingPeriods, {overwriteRoutes: true})
       const {findByText, getByText, queryByText} = render(<GradesPage {...getProps()} />)
       const select = await findByText('Select Grading Period')
       act(() => select.click())
@@ -377,12 +372,9 @@ describe('GradesPage', () => {
 
   describe('observer support', () => {
     beforeEach(() => {
-      fetchMock.get(OBSERVER_GRADING_PERIODS_URL, JSON.stringify(MOCK_GRADING_PERIODS_EMPTY))
-      fetchMock.get(
-        OBSERVER_ASSIGNMENT_GROUPS_URL,
-        JSON.stringify(MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS)
-      )
-      fetchMock.get(OBSERVER_ENROLLMENTS_URL, JSON.stringify(MOCK_ENROLLMENTS_WITH_OBSERVED_USERS))
+      fetchMock.get(OBSERVER_GRADING_PERIODS_URL, MOCK_GRADING_PERIODS_EMPTY)
+      fetchMock.get(OBSERVER_ASSIGNMENT_GROUPS_URL, MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS)
+      fetchMock.get(OBSERVER_ENROLLMENTS_URL, MOCK_ENROLLMENTS_WITH_OBSERVED_USERS)
     })
 
     it('only shows assignment details for the observed user', async () => {
@@ -456,8 +448,8 @@ describe('GradesPage', () => {
   describe('with Restrict Quantitative Data enabled', () => {
     let mockAssignmentGroups = []
     beforeEach(() => {
-      fetchMock.get(GRADING_PERIODS_URL, JSON.stringify(MOCK_GRADING_PERIODS_EMPTY))
-      fetchMock.get(ENROLLMENTS_URL, JSON.stringify(MOCK_ENROLLMENTS))
+      fetchMock.get(GRADING_PERIODS_URL, MOCK_GRADING_PERIODS_EMPTY)
+      fetchMock.get(ENROLLMENTS_URL, MOCK_ENROLLMENTS)
       window.ENV = {
         RESTRICT_QUANTITATIVE_DATA: true,
         GRADING_SCHEME: DEFAULT_GRADING_SCHEME,
@@ -466,7 +458,7 @@ describe('GradesPage', () => {
     })
 
     it('renders the returned assignment details as a letter grade only', async () => {
-      fetchMock.get(ASSIGNMENT_GROUPS_URL, JSON.stringify(mockAssignmentGroups))
+      fetchMock.get(ASSIGNMENT_GROUPS_URL, mockAssignmentGroups)
 
       const {getByText, queryByText} = render(<GradesPage {...getProps()} />)
       await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())
@@ -487,7 +479,7 @@ describe('GradesPage', () => {
       mockAssignmentGroups[0].assignments[0].submission.score = 10
       mockAssignmentGroups[0].assignments[0].submission.grade = 'complete'
       mockAssignmentGroups[0].assignments[0].grading_type = 'pass_fail'
-      fetchMock.get(ASSIGNMENT_GROUPS_URL, JSON.stringify(mockAssignmentGroups))
+      fetchMock.get(ASSIGNMENT_GROUPS_URL, mockAssignmentGroups)
 
       const {getByText, queryByText} = render(<GradesPage {...getProps()} />)
       await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())
@@ -508,7 +500,7 @@ describe('GradesPage', () => {
       mockAssignmentGroups[0].assignments[0].submission.score = 10
       mockAssignmentGroups[0].assignments[0].submission.grade = '10'
       mockAssignmentGroups[0].assignments[0].points_possible = 0
-      fetchMock.get(ASSIGNMENT_GROUPS_URL, JSON.stringify(mockAssignmentGroups))
+      fetchMock.get(ASSIGNMENT_GROUPS_URL, mockAssignmentGroups)
 
       const {getByText, queryByText} = render(<GradesPage {...getProps()} />)
       await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())
@@ -530,7 +522,7 @@ describe('GradesPage', () => {
       mockAssignmentGroups[0].assignments[0].submission.grade = '0'
       mockAssignmentGroups[0].assignments[0].points_possible = 0
 
-      fetchMock.get(ASSIGNMENT_GROUPS_URL, JSON.stringify(mockAssignmentGroups))
+      fetchMock.get(ASSIGNMENT_GROUPS_URL, mockAssignmentGroups)
 
       const {getByText, queryByText} = render(<GradesPage {...getProps()} />)
       await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())

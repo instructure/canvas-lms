@@ -125,7 +125,8 @@ export default function useFetchApi(
               path,
               headers,
               params: paramsWithPage,
-              fetchOpts: {signal, ...fetchOpts},
+              fetchOpts,
+              signal,
             })
             const result = convert && json ? convert(json) : json
             accummulatedResults = accummulatedResults.concat(result)

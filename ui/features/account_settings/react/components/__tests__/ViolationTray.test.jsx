@@ -33,7 +33,7 @@ describe('Violation Tray', () => {
   })
 
   it('displays a spinner when loading data', async () => {
-    fetchMock.mock('*', JSON.stringify([])) // Mock fetch
+    fetchMock.mock('*', []) // Mock fetch
     const {findByText} = render(<ViolationTray {...getProps()} />)
     await findByText('Loading')
   })
@@ -45,27 +45,24 @@ describe('Violation Tray', () => {
   })
 
   it('displays an info alert when there are no violations', async () => {
-    fetchMock.mock('*', JSON.stringify([])) // Mock fetch
+    fetchMock.mock('*', []) // Mock fetch
     const {findByText} = render(<ViolationTray {...getProps()} />)
     expect(await findByText(/No violations/)).toBeInTheDocument()
   })
 
   it('displays the violation table when there are violations', async () => {
-    fetchMock.mock(
-      '*',
-      JSON.stringify([
-        {
-          uri: 'http://example.com',
-          latest_hit: '2019-11-11T00:00:00.000Z',
-          count: 7,
-        },
-        {
-          uri: 'http://clayd.dev',
-          latest_hit: '2019-11-11T00:00:00.000Z',
-          count: 2,
-        },
-      ])
-    ) // Mock fetch with data
+    fetchMock.mock('*', [
+      {
+        uri: 'http://example.com',
+        latest_hit: '2019-11-11T00:00:00.000Z',
+        count: 7,
+      },
+      {
+        uri: 'http://clayd.dev',
+        latest_hit: '2019-11-11T00:00:00.000Z',
+        count: 2,
+      },
+    ]) // Mock fetch with data
     const {findByText} = render(<ViolationTray {...getProps()} />)
     await findByText(/CSP Violations/)
   })

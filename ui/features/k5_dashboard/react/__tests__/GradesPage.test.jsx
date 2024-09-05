@@ -238,7 +238,7 @@ const OBSERVER_GRADING_PERIODS_URL = encodeURI(`${BASE_GRADES_URL}&include[]=obs
 describe('GradesPage', () => {
   beforeEach(() => {
     utils.transformGrades.mockImplementation(data => data)
-    fetchMock.get(GRADING_PERIODS_URL, JSON.stringify(defaultCourses))
+    fetchMock.get(GRADING_PERIODS_URL, defaultCourses)
   })
 
   afterEach(() => {
@@ -285,7 +285,7 @@ describe('GradesPage', () => {
   it('does not render a grading period drop-down if the user does not have student role', async () => {
     fetchMock.get(
       GRADING_PERIODS_URL,
-      JSON.stringify([
+      [
         {
           courseId: '99',
           courseName: 'For Teachers Only',
@@ -302,7 +302,7 @@ describe('GradesPage', () => {
             },
           ],
         },
-      ]),
+      ],
       {overwriteRoutes: true}
     )
     const {getByText, queryByText} = render(<GradesPage {...defaultProps} />)
@@ -355,7 +355,7 @@ describe('GradesPage', () => {
         },
       ],
     }
-    fetchMock.get(GRADING_PERIODS_URL, JSON.stringify([courseWithoutGrades]), {
+    fetchMock.get(GRADING_PERIODS_URL, [courseWithoutGrades], {
       overwriteRoutes: true,
     })
     const {getByText, queryByText} = render(<GradesPage {...defaultProps} />)
@@ -371,7 +371,7 @@ describe('GradesPage', () => {
 
   describe('Parent Support', () => {
     beforeEach(() => {
-      fetchMock.get(OBSERVER_GRADING_PERIODS_URL, JSON.stringify(defaultCourses))
+      fetchMock.get(OBSERVER_GRADING_PERIODS_URL, defaultCourses)
       utils.getCourseGrades.mockImplementation(c => c)
     })
 
