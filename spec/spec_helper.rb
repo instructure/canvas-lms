@@ -220,6 +220,8 @@ module RSpec::Rails
         node.attr("checked") == "checked"
       elsif node.respond_to?(:checked?)
         node.checked?
+      else
+        node.attribute("checked")
       end
     end
   end

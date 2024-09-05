@@ -50,6 +50,14 @@ class AssignmentCreateEditPage
       "#assignment_group_category_id option"
     end
 
+    def group_category_error_selector
+      "#has_group_category_blocked_error"
+    end
+
+    def group_error_selector
+      "#assignment_group_category_id_blocked_error"
+    end
+
     def error_box_selector
       ".error_text"
     end
@@ -137,6 +145,14 @@ class AssignmentCreateEditPage
 
     def group_categories
       ff(group_categories_selector)
+    end
+
+    def group_category_error
+      f(group_category_error_selector)
+    end
+
+    def group_error
+      f(group_error_selector)
     end
 
     def error_boxes

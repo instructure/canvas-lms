@@ -196,13 +196,12 @@ describe "selective_release module item assign to tray" do
     end
 
     it "changes pills when new card is added" do
-      skip("LX-1897 - re-enable once we fix this issue.")
       go_to_modules
 
       manage_module_item_button(@module_item1).click
       click_manage_module_item_assign_to(@module_item1)
 
-      expect(item_tray_exists?).to be true
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
 
       click_add_assign_to_card
       expect(element_exists?(assign_to_in_tray_selector("Remove Everyone"))).to be_falsey
@@ -210,11 +209,12 @@ describe "selective_release module item assign to tray" do
     end
 
     it "changes first card pill to Everyone when second card deleted" do
-      skip("LX-1897 - re-enable once we fix this issue.")
       go_to_modules
 
       manage_module_item_button(@module_item1).click
       click_manage_module_item_assign_to(@module_item1)
+
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
 
       click_add_assign_to_card
       expect(assign_to_in_tray("Remove Everyone else")[0]).to be_displayed
@@ -223,11 +223,12 @@ describe "selective_release module item assign to tray" do
     end
 
     it "first card pill changes to Everyone else when student added to first card" do
-      skip("LX-1897 - re-enable once we fix this issue.")
       go_to_modules
 
       manage_module_item_button(@module_item1).click
       click_manage_module_item_assign_to(@module_item1)
+
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
 
       select_module_item_assignee(0, @student1.name)
 
@@ -240,6 +241,9 @@ describe "selective_release module item assign to tray" do
 
       manage_module_item_button(@module_item1).click
       click_manage_module_item_assign_to(@module_item1)
+
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
       select_module_item_assignee(0, @student1.name)
 
       click_add_assign_to_card
@@ -258,6 +262,8 @@ describe "selective_release module item assign to tray" do
       manage_module_item_button(@module_item1).click
       click_manage_module_item_assign_to(@module_item1)
 
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
       expect(module_item_assign_to_card[0]).to be_displayed
       expect(module_item_assign_to_card[1]).to be_displayed
 
@@ -274,7 +280,8 @@ describe "selective_release module item assign to tray" do
       manage_module_item_button(latest_module_item).click
       click_manage_module_item_assign_to(latest_module_item)
 
-      expect(item_tray_exists?).to be true
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
       expect(module_item_assign_to_card[0]).to be_displayed
       expect(assign_to_in_tray("Remove Everyone")[0]).to be_displayed
 
@@ -288,7 +295,7 @@ describe "selective_release module item assign to tray" do
       manage_module_item_button(@module_item1).click
       click_manage_module_item_assign_to(@module_item1)
 
-      expect(item_tray_exists?).to be true
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
 
       update_due_date(0, "12/31/2022")
       update_due_time(0, "5:00 PM")
@@ -312,6 +319,9 @@ describe "selective_release module item assign to tray" do
 
       manage_module_item_button(@module_item1).click
       click_manage_module_item_assign_to(@module_item1)
+
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
       update_due_date(0, "15 April 2024")
       # Blurs the due date input
       assign_to_due_time(0).click
@@ -326,6 +336,9 @@ describe "selective_release module item assign to tray" do
 
       manage_module_item_button(@module_item1).click
       click_manage_module_item_assign_to(@module_item1)
+
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
       update_due_date(0, "15 de abr. de 2024")
       # Blurs the due date input
       assign_to_due_time(0).click
@@ -338,6 +351,9 @@ describe "selective_release module item assign to tray" do
 
       manage_module_item_button(@module_item1).click
       click_manage_module_item_assign_to(@module_item1)
+
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
       update_due_date(0, "wrongdate")
       # Blurs the due date input
       assign_to_due_time(0).click
@@ -350,6 +366,9 @@ describe "selective_release module item assign to tray" do
 
       manage_module_item_button(@module_item1).click
       click_manage_module_item_assign_to(@module_item1)
+
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
       update_due_date(0, "12/31/2022")
       update_available_date(0, "1/1/2023")
 
@@ -366,6 +385,8 @@ describe "selective_release module item assign to tray" do
       manage_module_item_button(@module_item1).click
       click_manage_module_item_assign_to(@module_item1)
 
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
       assign_to_in_tray("Remove #{@student2.name}")[0].click
       expect(element_exists?(assign_to_in_tray_selector("Remove #{@student2.name}"))).to be_falsey
       expect(assign_to_in_tray("Remove #{@student1.name}")[0]).to be_displayed
@@ -380,6 +401,9 @@ describe "selective_release module item assign to tray" do
 
       manage_module_item_button(@module_item1).click
       click_manage_module_item_assign_to(@module_item1)
+
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
       expect(module_item_assign_to_card.count).to be(3)
       click_delete_assign_to_card(2)
       expect(module_item_assign_to_card.count).to be(2)
