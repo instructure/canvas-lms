@@ -1751,12 +1751,17 @@ describe Assignment do
   end
 
   describe ".clean_up_duplicating_assignments" do
-    before { allow(described_class).to receive(:duplicating_for_too_long).and_return(double) }
+    before do
+      duplicating_for_too_long_result = double
+      @in_batches_result = double
+      allow(described_class).to receive(:duplicating_for_too_long).and_return(duplicating_for_too_long_result)
+      allow(duplicating_for_too_long_result).to receive(:in_batches).and_return(@in_batches_result)
+    end
 
     it "marks all assignments that have been duplicating for too long as failed_to_duplicate" do
       now = double("now")
       expect(Time.zone).to receive(:now).and_return(now)
-      expect(described_class.duplicating_for_too_long).to receive(:update_all).with(
+      expect(@in_batches_result).to receive(:update_all).with(
         duplication_started_at: nil,
         workflow_state: "failed_to_duplicate",
         updated_at: now
@@ -1822,12 +1827,17 @@ describe Assignment do
   end
 
   describe ".cleanup_importing_assignments" do
-    before { allow(described_class).to receive(:importing_for_too_long).and_return(double) }
+    before do
+      importing_for_too_long_result = double
+      @in_batches_result = double
+      allow(described_class).to receive(:importing_for_too_long).and_return(importing_for_too_long_result)
+      allow(importing_for_too_long_result).to receive(:in_batches).and_return(@in_batches_result)
+    end
 
     it "marks all assignments that have been importing for too long as failed_to_import" do
       now = double("now")
       expect(Time.zone).to receive(:now).and_return(now)
-      expect(described_class.importing_for_too_long).to receive(:update_all).with(
+      expect(@in_batches_result).to receive(:update_all).with(
         importing_started_at: nil,
         workflow_state: "failed_to_import",
         updated_at: now
@@ -1929,12 +1939,17 @@ describe Assignment do
   end
 
   describe ".clean_up_cloning_alignments" do
-    before { allow(described_class).to receive(:cloning_alignments_for_too_long).and_return(double) }
+    before do
+      cloning_alignments_for_too_long_result = double
+      @in_batches_result = double
+      allow(described_class).to receive(:cloning_alignments_for_too_long).and_return(cloning_alignments_for_too_long_result)
+      allow(cloning_alignments_for_too_long_result).to receive(:in_batches).and_return(@in_batches_result)
+    end
 
     it "marks all assignments that have been in the status cloning assignment for too long as failed_to_clone_outcome_alignment" do
       now = double("now")
       expect(Time.zone).to receive(:now).and_return(now)
-      expect(described_class.cloning_alignments_for_too_long).to receive(:update_all).with(
+      expect(@in_batches_result).to receive(:update_all).with(
         duplication_started_at: nil,
         workflow_state: "failed_to_clone_outcome_alignment",
         updated_at: now
