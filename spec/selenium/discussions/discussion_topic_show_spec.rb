@@ -536,6 +536,98 @@ describe "Discussion Topic Show" do
         expect(Discussion.discussion_page_body).to include_text("This topic is closed for comments")
         expect(Discussion.discussion_page_body).to include_text("a very cool discussion")
       end
+
+      context "discussion checkpoints" do
+        before do
+          Account.site_admin.enable_feature! :discussion_checkpoints
+          @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic")
+          @topic.update!(message: "a very cool discussion")
+        end
+
+        it "shows lock indication for discussions locked by discussion's unlock_at date" do
+          skip("EGG-73")
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+            dates: [{ type: "everyone", due_at: 1.week.from_now, unlock_at: 1.week.from_now }],
+            points_possible: 5
+          )
+
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+            dates: [{ type: "everyone", due_at: 2.weeks.from_now, unlock_at: 1.week.from_now }],
+            points_possible: 10,
+            replies_required: 2
+          )
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+          expect(Discussion.discussion_page_body).to include_text("This topic is locked until")
+          expect(Discussion.discussion_page_body).not_to include_text("a very cool discussion")
+        end
+
+        it "shows lock indication for discussions locked by discussion's lock_at date" do
+          skip("EGG-73")
+          @topic.update!(lock_at: 1.day.ago)
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+            dates: [{ type: "everyone", due_at: 1.day.ago, lock_at: 1.day.ago }],
+            points_possible: 5
+          )
+
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+            dates: [{ type: "everyone", due_at: 1.day.ago, lock_at: 1.day.ago }],
+            points_possible: 10,
+            replies_required: 2
+          )
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+          expect(Discussion.discussion_page_body).to include_text("This topic is closed for comments")
+          expect(Discussion.discussion_page_body).to include_text("a very cool discussion")
+        end
+
+        it "shows lock indication for discussions locked by student override unlock_at" do
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+            dates: [{ type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: 2.days.from_now, unlock_at: 1.day.from_now }],
+            points_possible: 5
+          )
+
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+            dates: [{ type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: 2.days.from_now, unlock_at: 1.day.from_now }],
+            points_possible: 10,
+            replies_required: 2
+          )
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+          expect(Discussion.discussion_page_body).to include_text("This topic is locked until")
+          expect(Discussion.discussion_page_body).not_to include_text("a very cool discussion")
+        end
+
+        it "shows lock indication for discussions locked by student override lock_at" do
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+            dates: [{ type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: 1.day.ago, lock_at: 1.day.ago }],
+            points_possible: 5
+          )
+
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+            dates: [{ type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: 1.day.ago, lock_at: 1.day.ago }],
+            points_possible: 10,
+            replies_required: 2
+          )
+
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+          expect(Discussion.discussion_page_body).to include_text("This topic is closed for comments")
+          expect(Discussion.discussion_page_body).not_to include_text("reply")
+        end
+      end
     end
 
     context "when Discussion Summary feature flag is ON" do
