@@ -28,4 +28,14 @@ class Lti::Overlay < ActiveRecord::Base
   belongs_to :updated_by, class_name: "User", inverse_of: :lti_overlays, optional: false
 
   resolves_root_account through: :account
+
+  validate :validate_data
+
+  def validate_data
+    schema_errors = Schemas::Lti::Overlay.validation_errors(data)
+    return if schema_errors.blank?
+
+    errors.add(:data, schema_errors.to_json)
+    false
+  end
 end
