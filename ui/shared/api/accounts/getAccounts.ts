@@ -24,7 +24,6 @@ import {z} from 'zod'
 const ZAccountWithCounts = ZAccount.extend({
   course_count: z.number(),
   sub_account_count: z.number(),
-  course_template_id: z.string().nullish(),
 }).strict()
 
 const ZAccounts = z.array(ZAccountWithCounts)
