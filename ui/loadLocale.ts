@@ -401,12 +401,10 @@ export default function loadLocale(locale: string) {
       return import(/* webpackChunkName: "moment/locale/fa" */ './ext/custom_moment_locales/fa')
 
     case 'moment/locale/fr':
-      return import(/* webpackChunkName: "moment/locale/fr" */ './ext/custom_moment_locales/fr')
+      return import(/* webpackChunkName: "moment/locale/fr" */ 'moment/locale/fr')
 
     case 'moment/locale/fr-ca':
-      return import(
-        /* webpackChunkName: "moment/locale/fr-ca" */ './ext/custom_moment_locales/fr_ca'
-      )
+      return import(/* webpackChunkName: "moment/locale/fr" */ 'moment/locale/fr-ca')
 
     case 'moment/locale/he':
       return import(/* webpackChunkName: "moment/locale/he" */ './ext/custom_moment_locales/he')
