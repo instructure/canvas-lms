@@ -466,7 +466,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def self.clean_up_duplicating_assignments
-    duplicating_for_too_long.update_all(
+    duplicating_for_too_long.in_batches(of: 10_000).update_all(
       duplication_started_at: nil,
       workflow_state: "failed_to_duplicate",
       updated_at: Time.zone.now
@@ -474,7 +474,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def self.clean_up_cloning_alignments
-    cloning_alignments_for_too_long.update_all(
+    cloning_alignments_for_too_long.in_batches(of: 10_000).update_all(
       duplication_started_at: nil,
       workflow_state: "failed_to_clone_outcome_alignment",
       updated_at: Time.zone.now
@@ -482,7 +482,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def self.clean_up_importing_assignments
-    importing_for_too_long.update_all(
+    importing_for_too_long.in_batches(of: 10_000).update_all(
       importing_started_at: nil,
       workflow_state: "failed_to_import",
       updated_at: Time.zone.now
@@ -490,7 +490,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def self.clean_up_migrating_assignments
-    migrating_for_too_long.update_all(
+    migrating_for_too_long.in_batches(of: 10_000).update_all(
       duplication_started_at: nil,
       workflow_state: "failed_to_migrate",
       updated_at: Time.zone.now
