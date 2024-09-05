@@ -39,8 +39,21 @@ class Checkpoints::AdhocOverrideCommonService < ApplicationService
     end
   end
 
-  def existing_parent_override
+  # Temporary, will be removed in EGG-72
+  def existing_parent_adhoc_override
     @checkpoint.parent_assignment.active_assignment_overrides.find_by(set_type: AssignmentOverride::SET_TYPE_ADHOC)
+  end
+
+  def existing_parent_override(student_ids:)
+    subquery = AssignmentOverrideStudent
+               .select(:assignment_override_id)
+               .where(user_id: student_ids, assignment_id: @checkpoint.parent_assignment.id)
+               .group(:assignment_override_id)
+               .having("COUNT(DISTINCT user_id) = ?", student_ids.size)
+
+    @checkpoint.parent_assignment.reload.active_assignment_overrides
+               .where(set_type: "ADHOC", id: subquery)
+               .first
   end
 
   def get_title(student_ids:)
