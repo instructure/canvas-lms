@@ -53,3 +53,59 @@ export const RUBRIC_ASSOCIATION: RubricAssociation = {
   id: '1',
   useForGrading: true,
 }
+
+export const RUBRIC_CONTEXTS = [
+  {
+    rubrics: 0,
+    context_code: 'account_2',
+    name: 'Account 1',
+  },
+  {
+    rubrics: 0,
+    context_code: 'course_1',
+    name: 'Course 1',
+  },
+  {
+    rubrics: 2,
+    context_code: 'course_2',
+    name: 'Course 2',
+  },
+]
+
+export const RUBRICS_FOR_CONTEXT = [
+  {
+    rubricAssociationId: '1',
+    rubric: RUBRIC,
+  },
+  {
+    rubricAssociationId: '2',
+    rubric: {
+      id: '2',
+      criteriaCount: 1,
+      pointsPossible: 20,
+      title: 'Rubric 2',
+      criteria: [
+        {
+          id: '10',
+          description: 'Criterion 1',
+          points: 20,
+          criterionUseRange: false,
+          ratings: [
+            {
+              description: 'Rating 1',
+              points: 20,
+              id: '10',
+              longDescription: 'Rating 1 Long Description',
+            },
+            {
+              description: 'Rating 2',
+              points: 10,
+              id: '20',
+              longDescription: 'Rating 2 Long Description',
+            },
+          ],
+        },
+      ],
+    },
+  },
+]

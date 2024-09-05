@@ -34,22 +34,30 @@ import {Text} from '@instructure/ui-text'
 import {RubricCreateModal} from './RubricCreateModal'
 import type {Rubric, RubricAssociation} from '../../types/rubric'
 import {RubricAssessmentTray} from '../../RubricAssessment'
-import {removeRubricFromAssignment} from '../queries'
+import {addRubricToAssignment, removeRubricFromAssignment} from '../queries'
+import {RubricSearchTray} from './RubricSearchTray'
+import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('enhanced-rubrics-assignment-container')
 
 export type RubricAssignmentContainerProps = {
+  assignmentId: string
   assignmentRubric?: Rubric
   assignmentRubricAssociation?: RubricAssociation
+  courseId: string
 }
 export const RubricAssignmentContainer = ({
+  assignmentId,
   assignmentRubric,
   assignmentRubricAssociation,
+  courseId,
 }: RubricAssignmentContainerProps) => {
   const [rubric, setRubric] = useState(assignmentRubric)
   const [rubricAssociation, setRubricAssociation] = useState(assignmentRubricAssociation)
   const [rubricCreateModalOpen, setRubricCreateModalOpen] = useState(false)
   const [isPreviewTrayOpen, setIsPreviewTrayOpen] = useState(false)
+  const [isSearchTrayOpen, setIsSearchTrayOpen] = useState(false)
+  const [searchPreviewRubric, setSearchPreviewRubric] = useState<Rubric>()
 
   const handleSaveRubric = (savedRubricResponse: SaveRubricResponse) => {
     setRubric(savedRubricResponse.rubric)
@@ -59,9 +67,25 @@ export const RubricAssignmentContainer = ({
 
   const handleRemoveRubric = async () => {
     if (rubricAssociation) {
-      await removeRubricFromAssignment(ENV.COURSE_ID, rubricAssociation?.id)
+      await removeRubricFromAssignment(courseId, rubricAssociation?.id)
       setRubric(undefined)
       setRubricAssociation(undefined)
+    }
+  }
+
+  const handleAddRubric = async (rubricId?: string) => {
+    if (!rubricId) {
+      return
+    }
+
+    try {
+      const response = await addRubricToAssignment(courseId, assignmentId, rubricId)
+      setRubric(response.rubric)
+      setRubricAssociation(response.rubricAssociation)
+      setIsSearchTrayOpen(false)
+      showFlashSuccess(I18n.t('Rubric added to assignment'))()
+    } catch (error) {
+      showFlashError(I18n.t('Failed to add rubric to assignment'))()
     }
   }
 
@@ -121,6 +145,7 @@ export const RubricAssignmentContainer = ({
               margin="0 0 0 small"
               data-testid="find-assignment-rubric-button"
               renderIcon={IconSearchLine}
+              onClick={() => setIsSearchTrayOpen(true)}
             >
               {I18n.t('Find Rubric')}
             </Button>
@@ -136,10 +161,24 @@ export const RubricAssignmentContainer = ({
       <RubricAssessmentTray
         isOpen={isPreviewTrayOpen}
         isPreviewMode={false}
-        rubric={rubric}
+        rubric={searchPreviewRubric ?? rubric}
         rubricAssessmentData={[]}
         shouldCloseOnDocumentClick={true}
         onDismiss={() => setIsPreviewTrayOpen(false)}
+      />
+      <RubricSearchTray
+        courseId={courseId}
+        isOpen={isSearchTrayOpen}
+        onPreview={previewRubric => {
+          setSearchPreviewRubric(previewRubric)
+          setIsPreviewTrayOpen(true)
+        }}
+        onDismiss={() => {
+          setIsSearchTrayOpen(false)
+          setIsPreviewTrayOpen(false)
+          setSearchPreviewRubric(undefined)
+        }}
+        onAddRubric={handleAddRubric}
       />
     </QueryProvider>
   )
