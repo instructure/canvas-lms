@@ -227,6 +227,7 @@ export const CriterionRow = ({
               <Text>--</Text>
             ) : (
               <TextInput
+                autoComplete="off"
                 renderLabel={<ScreenReaderContent>{instructorPointsText}</ScreenReaderContent>}
                 placeholder="--"
                 width="3.375rem"

@@ -22,6 +22,7 @@ exports[`The Points component renders the component when assessing with the expe
       size="4rem"
     >
       <TextInput
+        autoComplete="off"
         display="inline-block"
         isRequired={false}
         messages={[]}
