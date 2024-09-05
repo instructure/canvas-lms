@@ -23,7 +23,8 @@ import {
   type RubricAssignmentContainerProps,
 } from '../components/RubricAssignmentContainer'
 import * as RubricFormQueries from '@canvas/rubrics/react/RubricForm/queries/RubricFormQueries'
-import {RUBRIC, RUBRIC_ASSOCIATION} from './fixtures'
+import {RUBRIC, RUBRIC_ASSOCIATION, RUBRIC_CONTEXTS, RUBRICS_FOR_CONTEXT} from './fixtures'
+import {queryClient} from '@canvas/query'
 
 jest.mock('@canvas/rubrics/react/RubricForm/queries/RubricFormQueries', () => ({
   ...jest.requireActual('@canvas/rubrics/react/RubricForm/queries/RubricFormQueries'),
@@ -33,6 +34,9 @@ jest.mock('@canvas/rubrics/react/RubricForm/queries/RubricFormQueries', () => ({
 jest.mock('../queries', () => ({
   ...jest.requireActual('../queries'),
   removeRubricFromAssignment: jest.fn(),
+  addRubricToAssignment: jest.fn(),
+  getGradingRubricContexts: jest.fn(),
+  getGradingRubricsForContext: jest.fn(),
 }))
 
 describe('RubricAssignmentContainer Tests', () => {
@@ -43,33 +47,39 @@ describe('RubricAssignmentContainer Tests', () => {
         rubricAssociation: RUBRIC_ASSOCIATION,
       })
     )
+
+    queryClient.setQueryData(['fetch-grading-rubric-contexts-1'], RUBRIC_CONTEXTS)
+    queryClient.setQueryData(
+      ['fetch-grading-rubrics-for-context', '1', 'course_2'],
+      RUBRICS_FOR_CONTEXT
+    )
   })
 
   afterEach(() => {
     jest.clearAllMocks()
   })
 
-  const renderComponent = (props?: RubricAssignmentContainerProps) => {
-    return render(<RubricAssignmentContainer {...props} />)
+  const renderComponent = (props: Partial<RubricAssignmentContainerProps> = {}) => {
+    return render(<RubricAssignmentContainer assignmentId="1" courseId="1" {...props} />)
   }
 
   describe('non associated rubric', () => {
     it('should render the create and search buttons', () => {
-      const {getByText} = renderComponent()
-      expect(getByText('Create Rubric')).toBeInTheDocument()
-      expect(getByText('Find Rubric')).toBeInTheDocument()
+      const {getByTestId} = renderComponent()
+      expect(getByTestId('create-assignment-rubric-button')).toHaveTextContent('Create Rubric')
+      expect(getByTestId('find-assignment-rubric-button')).toHaveTextContent('Find Rubric')
     })
 
     it('should render the create modal when the create button is clicked', () => {
-      const {getByText, getByTestId} = renderComponent()
-      getByText('Create Rubric').click()
+      const {getByTestId} = renderComponent()
+      getByTestId('create-assignment-rubric-button').click()
       expect(getByTestId('rubric-assignment-create-modal')).toHaveTextContent('Create Rubric')
       expect(getByTestId('save-rubric-button')).toBeDisabled()
     })
 
     it('should save a new rubric and display the Rubric title, edit, preview, and remove buttons', async () => {
-      const {getByText, getByTestId} = renderComponent()
-      getByText('Create Rubric').click()
+      const {getByTestId} = renderComponent()
+      getByTestId('create-assignment-rubric-button').click()
       const titleInput = getByTestId('rubric-form-title')
       fireEvent.change(titleInput, {target: {value: 'Rubric 1'}})
       fireEvent.click(getByTestId('add-criterion-button'))
@@ -136,6 +146,70 @@ describe('RubricAssignmentContainer Tests', () => {
       expect(rubricTray).toBeInTheDocument()
       expect(getByTestId('traditional-criterion-1-ratings-0')).toBeInTheDocument()
       expect(getByTestId('traditional-criterion-1-ratings-1')).toBeInTheDocument()
+    })
+  })
+
+  describe('search tray', () => {
+    it('should open search tray when search button is clicked and load the correct rubric contexts', async () => {
+      const {getByTestId, getByText} = renderComponent()
+      fireEvent.click(getByTestId('find-assignment-rubric-button'))
+
+      expect(getByTestId('rubric-search-tray')).toBeInTheDocument()
+
+      const comboBox = getByTestId('rubric-context-select') as HTMLInputElement
+      expect(comboBox.value).toEqual('Account 1 (Account)')
+
+      fireEvent.click(comboBox)
+      expect(getByText('Course 1 (Course)')).toBeInTheDocument()
+      expect(getByText('Course 2 (Course)')).toBeInTheDocument()
+    })
+
+    it('should display the correct rubrics when clicking on a context', async () => {
+      const {getByTestId, getByText, queryAllByTestId} = renderComponent()
+      fireEvent.click(getByTestId('find-assignment-rubric-button'))
+
+      expect(getByTestId('rubric-search-tray')).toBeInTheDocument()
+
+      const comboBox = getByTestId('rubric-context-select') as HTMLInputElement
+      expect(comboBox.value).toEqual('Account 1 (Account)')
+
+      fireEvent.click(comboBox)
+
+      const comboBoxOption = getByText('Course 2 (Course)')
+      fireEvent.click(comboBoxOption)
+
+      const rubricRowTitles = queryAllByTestId('rubric-search-row-title')
+      expect(rubricRowTitles).toHaveLength(2)
+      expect(rubricRowTitles[0]).toHaveTextContent('Rubric 1')
+      expect(rubricRowTitles[1]).toHaveTextContent('Rubric 2')
+
+      const rubricRowData = queryAllByTestId('rubric-search-row-data')
+      expect(rubricRowData).toHaveLength(2)
+      expect(rubricRowData[0]).toHaveTextContent('10 pts | 1 criterion')
+      expect(rubricRowData[1]).toHaveTextContent('20 pts | 1 criterion')
+
+      const rubricPreviewButtons = queryAllByTestId('rubric-preview-btn')
+      expect(rubricPreviewButtons).toHaveLength(2)
+    })
+
+    it('should open rubric preview tray when preview button is clicked', async () => {
+      const {getByTestId, getByText, queryAllByTestId} = renderComponent()
+      fireEvent.click(getByTestId('find-assignment-rubric-button'))
+
+      expect(getByTestId('rubric-search-tray')).toBeInTheDocument()
+
+      const comboBox = getByTestId('rubric-context-select') as HTMLInputElement
+      expect(comboBox.value).toEqual('Account 1 (Account)')
+
+      fireEvent.click(comboBox)
+
+      const comboBoxOption = getByText('Course 2 (Course)')
+      fireEvent.click(comboBoxOption)
+
+      const rubricPreviewButtons = queryAllByTestId('rubric-preview-btn')
+
+      fireEvent.click(rubricPreviewButtons[0])
+      expect(getByTestId('traditional-criterion-1-ratings-0')).toBeInTheDocument()
     })
   })
 })

@@ -310,7 +310,12 @@ $(() => {
     const envRubricAssociation = ENV.rubric_association
     const assignmentRubric = envRubric ? mapRubricUnderscoredKeysToCamelCase(ENV.assigned_rubric) : undefined
     ReactDOM.render(
-      <RubricAssignmentContainer assignmentRubric={assignmentRubric} assignmentRubricAssociation={envRubricAssociation} />,
+      <RubricAssignmentContainer 
+        assignmentId={ENV.ASSIGNMENT_ID}
+        assignmentRubric={assignmentRubric} 
+        assignmentRubricAssociation={envRubricAssociation}
+        courseId={ENV.COURSE_ID}
+      />,
       $mountPoint
     )
   }

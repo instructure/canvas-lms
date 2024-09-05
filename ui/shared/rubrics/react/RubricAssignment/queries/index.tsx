@@ -18,6 +18,9 @@
 
 import getCookie from '@instructure/get-cookie'
 import qs from 'qs'
+import type {GradingRubricContext} from '../types/rubricAssignment'
+import type {Rubric} from '../../types/rubric'
+import {mapRubricUnderscoredKeysToCamelCase} from '../../utils'
 
 export const removeRubricFromAssignment = async (courseId: string, rubricAssociationId: string) => {
   return fetch(`/courses/${courseId}/rubric_associations/${rubricAssociationId}`, {
@@ -29,5 +32,87 @@ export const removeRubricFromAssignment = async (courseId: string, rubricAssocia
     body: qs.stringify({
       _method: 'DELETE',
     }),
+  })
+}
+
+export const addRubricToAssignment = async (
+  courseId: string,
+  assignmentId: string,
+  rubricId: string
+) => {
+  const response = await fetch(`/courses/${courseId}/rubric_associations`, {
+    headers: {
+      'X-CSRF-Token': getCookie('_csrf_token'),
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+    },
+    method: 'POST',
+    body: qs.stringify({
+      _method: 'POST',
+      rubric_association: {
+        association_type: 'Assignment',
+        association_id: assignmentId,
+        rubric_id: rubricId,
+        purpose: 'grading',
+      },
+    }),
+  })
+
+  if (!response.ok) {
+    throw new Error('Failed to add rubric to assignment')
+  }
+
+  const result = await response.json()
+
+  return {
+    rubricAssociation: result.rubric_association,
+    rubric: mapRubricUnderscoredKeysToCamelCase(result.rubric),
+  }
+}
+
+export const getGradingRubricContexts = async (
+  courseId: string
+): Promise<GradingRubricContext[]> => {
+  const contexts = await fetch(`/courses/${courseId}/grading_rubrics`, {
+    headers: {
+      'X-CSRF-Token': getCookie('_csrf_token'),
+    },
+  })
+
+  if (!contexts.ok) {
+    throw new Error('Failed to get grading rubric contexts')
+  }
+
+  return (await contexts.json()) as GradingRubricContext[]
+}
+
+type GradingRubricForContextResponse = {
+  rubricAssociationId: string
+  rubric: Rubric
+}
+export const getGradingRubricsForContext = async (
+  courseId: string,
+  contextCode?: string
+): Promise<GradingRubricForContextResponse[]> => {
+  if (!contextCode) {
+    throw Error('Context code is required')
+  }
+
+  const contexts = await fetch(`/courses/${courseId}/grading_rubrics?context_code=${contextCode}`, {
+    headers: {
+      'X-CSRF-Token': getCookie('_csrf_token'),
+    },
+  })
+
+  if (!contexts.ok) {
+    throw new Error('Failed to get grading rubric contexts')
+  }
+
+  const results = await contexts.json()
+
+  return results.map((result: {rubric_association: any}) => {
+    return {
+      rubricAssociationId: result.rubric_association?.id,
+      rubric: mapRubricUnderscoredKeysToCamelCase(result.rubric_association?.rubric),
+    }
   })
 }

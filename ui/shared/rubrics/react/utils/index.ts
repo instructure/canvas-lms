@@ -21,29 +21,32 @@ import type {Rubric, RubricAssessmentData} from '@canvas/rubrics/react/types/rub
 
 export type RubricUnderscoreType = {
   title: string
-  criteria: {
-    criterion_use_range: boolean
-    description: string
-    id: string
-    learning_outcome_id?: string
-    long_description: string
-    ignore_for_scoring?: boolean
-    mastery_points?: number
-    points: number
-    ratings: {
-      criterion_id: string
-      description: string
-      id: string
-      long_description: string
-      points: number
-    }[]
-  }[]
+  criteria: RubricUnderscoreCriteria[]
+  data?: RubricUnderscoreCriteria[]
   id: string
   rating_order: string
   free_form_criterion_comments: boolean
   points_possible: number
   unassessed?: boolean
   workflow_state: string
+}
+
+type RubricUnderscoreCriteria = {
+  criterion_use_range: boolean
+  description: string
+  id: string
+  learning_outcome_id?: string
+  long_description: string
+  ignore_for_scoring?: boolean
+  mastery_points?: number
+  points: number
+  ratings: {
+    criterion_id: string
+    description: string
+    id: string
+    long_description: string
+    points: number
+  }[]
 }
 
 export type RubricOutcomeUnderscore = {
@@ -73,9 +76,11 @@ export const mapRubricUnderscoredKeysToCamelCase = (
     return prev
   }, {} as Record<string, string>)
 
+  const criteria = rubric.criteria ?? rubric.data ?? []
+
   return {
     title: rubric.title,
-    criteria: rubric.criteria.map(criterion => {
+    criteria: criteria.map(criterion => {
       const {learning_outcome_id} = criterion
 
       return {
@@ -107,7 +112,7 @@ export const mapRubricUnderscoredKeysToCamelCase = (
     ratingOrder: rubric.rating_order,
     freeFormCriterionComments: rubric.free_form_criterion_comments,
     pointsPossible: rubric.points_possible,
-    criteriaCount: rubric.criteria.length,
+    criteriaCount: criteria.length,
     id: rubric.id,
     unassessed: rubric.unassessed,
     workflowState: rubric.workflow_state,
