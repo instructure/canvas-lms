@@ -49,6 +49,7 @@ interface FolderResponse {
 interface FileResponse {
   upload_url: string
   upload_params: Record<string, string>
+  id: string
 }
 
 interface Props {
@@ -57,6 +58,8 @@ interface Props {
   onSave: (attachmentId: number | null) => void
   setForbiddenWordsUrl: (url: string | null) => void
   setForbiddenWordsFilename: (filename: string | null) => void
+  setCurrentAttachmentId: (attachmentId: number | null) => void
+  setCommonPasswordsAttachmentId: (attachmentId: number | null) => void
 }
 
 const initialFileDetails: FileDetails = {url: null, filename: null}
@@ -67,6 +70,8 @@ const ForbiddenWordsFileUpload = ({
   onSave,
   setForbiddenWordsUrl,
   setForbiddenWordsFilename,
+  setCurrentAttachmentId,
+  setCommonPasswordsAttachmentId,
 }: Props) => {
   const [fileDropMessages, setFileDropMessages] = useState<FormMessage[]>([])
   const [fileDetails, setFileDetails] = useState<FileDetails>(initialFileDetails)
@@ -107,7 +112,7 @@ const ForbiddenWordsFileUpload = ({
   const handleUpload = useCallback(async () => {
     const {url, filename} = fileDetails
 
-    if (!url || !filename || isUploading || uploadAttempted) return
+    if (!filename || isUploading || uploadAttempted) return
 
     setIsUploading(true)
     setUploadAttempted(true)
@@ -130,41 +135,45 @@ const ForbiddenWordsFileUpload = ({
       }
       if (!folderId) throw new Error('Failed to create folder')
 
-      const fetchResponse = await fetch(url)
-      const fileBlob = await fetchResponse.blob()
-
-      const newFile = new File([fileBlob], filename, {type: fileBlob.type})
-
       const initialRequestFormData = new FormData()
       initialRequestFormData.append('name', filename)
 
-      const {data} = await executeApiRequest<FileResponse>({
+      const {status: fileStatus, data: fileData} = await executeApiRequest<FileResponse>({
         method: 'POST',
         path: `/api/v1/folders/${folderId}/files`,
         body: initialRequestFormData,
       })
-      const upload_url = data.upload_url
-      const upload_params = data.upload_params
+
+      if (fileStatus !== 200) {
+        throw new Error('Failed to initiate file upload')
+      }
+
+      const upload_url = fileData.upload_url
+      const upload_params = fileData.upload_params
 
       const uploadFileFormData = new FormData()
-
       for (const [key, value] of Object.entries(upload_params)) {
         uploadFileFormData.append(key, value)
       }
 
-      uploadFileFormData.append('file', newFile)
+      if (url && filename) {
+        uploadFileFormData.append('file', new File([url], filename))
+      } else {
+        throw new Error('URL or filename is missing')
+      }
 
-      const uploadResponse = await fetch(upload_url, {
-        method: 'POST',
-        body: uploadFileFormData,
-      })
+      const {data: uploadResponseData, status: uploadStatus} =
+        await executeApiRequest<FileResponse>({
+          path: upload_url,
+          method: 'POST',
+          body: uploadFileFormData,
+        })
 
-      if (!uploadResponse.ok) {
+      if (uploadStatus !== 200) {
         throw new Error('Failed to complete the file upload')
       }
 
-      const fileData = await uploadResponse.json()
-      const fileId = fileData.id
+      const fileId = Number(uploadResponseData.id)
 
       const updatedPasswordPolicy = {
         account: {
@@ -187,6 +196,8 @@ const ForbiddenWordsFileUpload = ({
       if (accountsSettingsStatus === 200) {
         setForbiddenWordsUrl(url)
         setForbiddenWordsFilename(filename)
+        setCurrentAttachmentId(fileId)
+        setCommonPasswordsAttachmentId(fileId)
         onSave(fileId)
         setModalClosing(true)
         onDismiss()
@@ -211,6 +222,8 @@ const ForbiddenWordsFileUpload = ({
     onDismiss,
     isUploading,
     uploadAttempted,
+    setCurrentAttachmentId,
+    setCommonPasswordsAttachmentId,
   ])
 
   const handleDropAccepted = useCallback((acceptedFiles: ArrayLike<File | DataTransferItem>) => {

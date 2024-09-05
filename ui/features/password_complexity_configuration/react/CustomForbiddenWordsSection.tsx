@@ -38,6 +38,7 @@ interface Props {
   passwordPolicyHashExists: boolean
   setNewlyUploadedAttachmentId: (attachmentId: number | null) => void
   onCustomForbiddenWordsEnabledChange: (enabled: boolean) => void
+  setCurrentAttachmentId: (attachmentId: number | null) => void
 }
 
 interface ForbiddenWordsResponse {
@@ -60,6 +61,7 @@ const CustomForbiddenWordsSection = ({
   onCustomForbiddenWordsEnabledChange,
   currentAttachmentId,
   passwordPolicyHashExists,
+  setCurrentAttachmentId,
 }: Props) => {
   const linkRef = useRef<HTMLAnchorElement | null>(null)
   const [forbiddenWordsUrl, setForbiddenWordsUrl] = useState<string | null>(null)
@@ -82,30 +84,30 @@ const CustomForbiddenWordsSection = ({
       setForbiddenWordsEnabled(true)
     }
 
-    if (!currentAttachmentId) {
-      return
-    }
-    setCommonPasswordsAttachmentId(currentAttachmentId)
-
-    try {
-      const data = await fetchLatestForbiddenWords(currentAttachmentId)
-      if (data) {
-        setForbiddenWordsUrl(data.url)
-        setForbiddenWordsName(data.display_name)
-      } else {
-        setForbiddenWordsUrl(null)
-        setForbiddenWordsName(null)
+    if (currentAttachmentId && currentAttachmentId !== commonPasswordsAttachmentId) {
+      setCommonPasswordsAttachmentId(currentAttachmentId)
+      try {
+        const data = await fetchLatestForbiddenWords(currentAttachmentId)
+        if (data) {
+          setForbiddenWordsUrl(data.url)
+          setForbiddenWordsName(data.display_name)
+        } else {
+          setForbiddenWordsUrl(null)
+          setForbiddenWordsName(null)
+        }
+      } catch (error: any) {
+        if (error.response?.status === 404) {
+          setForbiddenWordsUrl(null)
+          setForbiddenWordsName(null)
+        } else {
+          showFlashAlert({
+            message: I18n.t('Failed to fetch latest forbidden words.'),
+            type: 'error',
+          })
+        }
       }
-    } catch (error: any) {
-      if (error.response?.status === 404) {
-        setForbiddenWordsUrl(null)
-        setForbiddenWordsName(null)
-      } else {
-        // eslint-disable-next-line no-console
-        console.error('Failed to fetch forbidden words:', error)
-      }
     }
-  }, [currentAttachmentId, passwordPolicyHashExists])
+  }, [currentAttachmentId, passwordPolicyHashExists, commonPasswordsAttachmentId])
 
   // pre-fetch forbidden words as early as possible when the component mounts
   useEffect(() => {
@@ -131,6 +133,7 @@ const CustomForbiddenWordsSection = ({
       try {
         await deleteForbiddenWordsFile(commonPasswordsAttachmentId)
 
+        setCurrentAttachmentId(null)
         setForbiddenWordsUrl(null)
         setForbiddenWordsName(null)
         setCommonPasswordsAttachmentId(null)
@@ -151,7 +154,7 @@ const CustomForbiddenWordsSection = ({
         type: 'warning',
       })
     }
-  }, [commonPasswordsAttachmentId])
+  }, [commonPasswordsAttachmentId, setCurrentAttachmentId])
 
   const handleCancelUploadModal = useCallback(() => {
     setFileModalOpen(false)
@@ -250,6 +253,8 @@ const CustomForbiddenWordsSection = ({
         }}
         setForbiddenWordsUrl={setForbiddenWordsUrl}
         setForbiddenWordsFilename={setForbiddenWordsName}
+        setCurrentAttachmentId={setCurrentAttachmentId}
+        setCommonPasswordsAttachmentId={setCommonPasswordsAttachmentId}
       />
     </>
   )
