@@ -17,25 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class WikiPageStudentVisibility < ActiveRecord::Base
-  include VisibilityPluckingHelper
+class RemoveVisibilityTables < ActiveRecord::Migration[7.1]
+  tag :postdeploy
 
-  def readonly?
-    true
+  def up
+    connection.execute "DROP VIEW #{connection.quote_table_name("ungraded_discussion_student_visibilities")}"
+    connection.execute "DROP VIEW #{connection.quote_table_name("wiki_page_student_visibilities")}"
+    connection.execute "DROP VIEW #{connection.quote_table_name("module_student_visibilities")}"
+    connection.execute "DROP VIEW #{connection.quote_table_name("assignment_student_visibilities_v2")}"
+    connection.execute "DROP VIEW #{connection.quote_table_name("quiz_student_visibilities_v2")}"
   end
-
-  def self.where_with_guard(*args)
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      raise StandardError, "WikiPageStudentVisibility view should not be used when selective_release_backend site admin flag is on.  Use WikiPageVisibilityService instead"
-    end
-
-    where_without_guard(*args)
-  end
-
-  class << self
-    alias_method :where_without_guard, :where
-    alias_method :where, :where_with_guard
-  end
-
-  before_destroy { raise ActiveRecord::ReadOnlyRecord }
 end
