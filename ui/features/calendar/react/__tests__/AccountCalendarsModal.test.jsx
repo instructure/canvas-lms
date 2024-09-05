@@ -54,23 +54,17 @@ describe('Other Calendars modal ', () => {
 
   beforeEach(() => {
     fetchMock.get(SEARCH_ENDPOINT.concat('?per_page=2'), {
-      body: JSON.stringify(accountCalendarsAPIPage1Response),
+      body: accountCalendarsAPIPage1Response,
       headers: {
         Link: '</api/v1/account_calendars?&per_page=2&page=2>; rel="next"',
       },
     })
-    fetchMock.get(
-      SEARCH_ENDPOINT.concat('?per_page=5'),
-      JSON.stringify(allAccountCalendarsResponse)
-    )
-    fetchMock.get(
-      SEARCH_ENDPOINT.concat('?per_page=2&page=2'),
-      JSON.stringify(accountCalendarsAPIPage2Response)
-    )
-    fetchMock.get(getSearchUrl('Test'), JSON.stringify(accountCalendarsAPISearchResponse))
-    fetchMock.get(getSearchUrl('Test2'), JSON.stringify(emptyResponse))
-    fetchMock.get(getSearchUrl('T'), JSON.stringify(emptyResponse))
-    fetchMock.post(markAsSeenUrl, JSON.stringify({status: 'ok'}))
+    fetchMock.get(SEARCH_ENDPOINT.concat('?per_page=5'), allAccountCalendarsResponse)
+    fetchMock.get(SEARCH_ENDPOINT.concat('?per_page=2&page=2'), accountCalendarsAPIPage2Response)
+    fetchMock.get(getSearchUrl('Test'), accountCalendarsAPISearchResponse)
+    fetchMock.get(getSearchUrl('Test2'), emptyResponse)
+    fetchMock.get(getSearchUrl('T'), emptyResponse)
+    fetchMock.post(markAsSeenUrl, {body: {status: 'ok'}})
     jest.clearAllMocks()
   })
 
@@ -125,7 +119,7 @@ describe('Other Calendars modal ', () => {
         `?enabled_account_calendars[]=${page1Results[0].id}&enabled_account_calendars[]=${page1Results[1].id}`
       )
     )
-    fetchMock.post(onSaveUrl, JSON.stringify({status: 'ok'}))
+    fetchMock.post(onSaveUrl, {body: {status: 'ok'}})
     const {findByTestId, getByTestId} = render(<AccountCalendarsModal {...getProps()} />)
     const addCalendarButton = getByTestId('add-other-calendars-button')
     await openModal(addCalendarButton)

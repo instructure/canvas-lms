@@ -192,7 +192,7 @@ describe('K5Announcement', () => {
       fetchMock.get(
         /\/api\/v1\/announcements/,
         {
-          body: JSON.stringify([
+          body: [
             {
               id: '18',
               title: 'Announcement 2',
@@ -201,7 +201,7 @@ describe('K5Announcement', () => {
               posted_at: '2021-05-13T17:06:21-06:00',
               attachments: [],
             },
-          ]),
+          ],
           headers: {
             Link: '</api/v1/announcements>; rel="current",</api/v1/announcements>; rel="first",</api/v1/announcements>; rel="last"',
           },
@@ -220,7 +220,7 @@ describe('K5Announcement', () => {
       fetchMock.get(
         /\/api\/v1\/announcements/,
         {
-          body: JSON.stringify([
+          body: [
             {
               id: '18',
               title: 'Announcement 2',
@@ -229,7 +229,7 @@ describe('K5Announcement', () => {
               posted_at: '2021-05-13T17:06:21-06:00',
               attachments: [],
             },
-          ]),
+          ],
           headers: {
             Link: '</api/v1/announcements>; rel="current",</api/v1/announcements>; rel="first",</api/v1/announcements>; rel="last"',
           },
@@ -263,7 +263,7 @@ describe('K5Announcement', () => {
       fetchMock.get(
         /\/api\/v1\/announcements/,
         {
-          body: JSON.stringify([
+          body: [
             {...props.firstAnnouncement},
             {
               id: '18',
@@ -273,7 +273,7 @@ describe('K5Announcement', () => {
               posted_at: postedAt,
               attachments: [],
             },
-          ]),
+          ],
           headers: {
             Link: '</api/v1/announcements>; rel="current",</api/v1/announcements>; rel="first",</api/v1/announcements>; rel="last"',
           },
@@ -296,7 +296,7 @@ describe('K5Announcement', () => {
       fetchMock.getOnce(
         /\/api\/v1\/announcements/,
         {
-          body: JSON.stringify([
+          body: [
             {
               id: '17',
               title: '20 minutes of weekly reading',
@@ -311,7 +311,7 @@ describe('K5Announcement', () => {
               html_url: '/courses/1/discussion_topics/18',
               attachments: [],
             },
-          ]),
+          ],
           headers: {
             Link: '</api/v1/announcements?active_only=true&context_codes[]=course_123&per_page=2&page=2>; rel="next"',
           },
@@ -321,7 +321,7 @@ describe('K5Announcement', () => {
       fetchMock.getOnce(
         /\/api\/v1\/announcements.*page=2.*/,
         {
-          body: JSON.stringify([
+          body: [
             {
               id: '19',
               title: 'Announcement C',
@@ -336,7 +336,7 @@ describe('K5Announcement', () => {
               html_url: '/courses/1/discussion_topics/20',
               attachments: [],
             },
-          ]),
+          ],
           headers: {
             Link: '</api/v1/announcements?active_only=true&context_codes[]=course_123&per_page=2&page=3>; rel="next"',
           },
@@ -346,7 +346,7 @@ describe('K5Announcement', () => {
       fetchMock.getOnce(
         /\/api\/v1\/announcements.*page=3.*/,
         {
-          body: JSON.stringify([
+          body: [
             {
               id: '21',
               title: 'Announcement E',
@@ -354,7 +354,7 @@ describe('K5Announcement', () => {
               html_url: '/courses/1/discussion_topics/21',
               attachments: [],
             },
-          ]),
+          ],
           headers: {
             Link: '',
           },
@@ -441,7 +441,7 @@ describe('K5Announcement', () => {
           fetchMock.get(
             /\/api\/v1\/announcements/,
             {
-              body: JSON.stringify([
+              body: [
                 {
                   id: '18',
                   title: 'Announcement 2',
@@ -450,7 +450,7 @@ describe('K5Announcement', () => {
                   posted_at: '2021-05-13T17:06:21-06:00',
                   attachments: [],
                 },
-              ]),
+              ],
               headers: {
                 Link: '</api/v1/announcements>; rel="current",</api/v1/announcements>; rel="first",</api/v1/announcements>; rel="last"',
               },

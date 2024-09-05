@@ -18,7 +18,6 @@
 
 import $ from 'jquery'
 import '@canvas/backbone'
-import {defer} from 'lodash'
 import moment from 'moment-timezone'
 import {fireEvent, within, getByText, waitFor, screen} from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'

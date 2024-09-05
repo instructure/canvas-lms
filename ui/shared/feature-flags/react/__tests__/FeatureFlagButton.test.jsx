@@ -72,7 +72,7 @@ describe('feature_flags::FeatureFlagButton', () => {
   it('Calls the set flag api for enabling and uses the returned flag', async () => {
     window.ENV.CONTEXT_BASE_URL = '/accounts/1'
     const route = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/feature1`
-    fetchMock.putOnce(route, JSON.stringify(sampleData.onFeature.feature_flag))
+    fetchMock.putOnce(route, sampleData.onFeature.feature_flag)
     const onStateChange = jest.fn()
     const {container, getByText} = render(
       <FeatureFlagButton featureFlag={sampleData.allowedFeature.feature_flag} onStateChange={onStateChange} />
@@ -90,7 +90,7 @@ describe('feature_flags::FeatureFlagButton', () => {
   it('Calls the delete api when appropriate and uses the returned flag', async () => {
     ENV.CONTEXT_BASE_URL = '/accounts/1'
     const route = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/feature1`
-    fetchMock.deleteOnce(route, JSON.stringify(sampleData.allowedFeature.feature_flag))
+    fetchMock.deleteOnce(route, sampleData.allowedFeature.feature_flag)
     const {container, getByText} = render(
       <FeatureFlagButton featureFlag={sampleData.allowedFeature.feature_flag} />
     )
@@ -107,7 +107,7 @@ describe('feature_flags::FeatureFlagButton', () => {
   it.skip('Refocuses on the button after the FF icon changes', async () => {
     ENV.CONTEXT_BASE_URL = '/accounts/1'
     const route = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/feature4`
-    fetchMock.putOnce(route, JSON.stringify(sampleData.onFeature.feature_flag))
+    fetchMock.putOnce(route, sampleData.onFeature.feature_flag)
     const {container, getByText, getByRole} = render(
       <div id="ff-test-button-enclosing-div">
         <FeatureFlagButton featureFlag={sampleData.offFeature.feature_flag} />

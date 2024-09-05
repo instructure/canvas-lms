@@ -121,8 +121,8 @@ describe('useFetchApi', () => {
     fetchMock.mock(`path:${path}`, {key: 'value'})
     renderHook(() => useFetchApi({path, headers: {header: 'value'}, fetchOpts: {blah: 'frog'}}))
     const [, options] = fetchMock.lastCall()
-    expect(options.headers).toEqual(expect.objectContaining({header: 'value'}))
-    expect(options.headers.Accept).toMatch(/application\/json\+canvas-string-ids/)
+    expect(options.headers.get('header')).toBe('value')
+    expect(options.headers.get('accept')).toMatch(/application\/json\+canvas-string-ids/)
     expect(options.blah).toBe('frog')
   })
 
