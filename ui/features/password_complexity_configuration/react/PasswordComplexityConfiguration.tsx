@@ -39,11 +39,11 @@ const I18n = useI18nScope('password_complexity_configuration')
 
 declare const ENV: GlobalEnv
 
-const MINIMUM_CHARACTER_LENGTH = 8
-const MAXIMUM_CHARACTER_LENGTH = 255
-const DEFAULT_MAX_LOGIN_ATTEMPTS = 10
-const MINIMUM_LOGIN_ATTEMPTS = 3
-const MAXIMUM_LOGIN_ATTEMPTS = 20
+export const MINIMUM_CHARACTER_LENGTH = 8
+export const MAXIMUM_CHARACTER_LENGTH = 255
+export const DEFAULT_MAX_LOGIN_ATTEMPTS = 10
+export const MINIMUM_LOGIN_ATTEMPTS = 3
+export const MAXIMUM_LOGIN_ATTEMPTS = 20
 
 interface Account {
   settings: PasswordSettings
@@ -63,59 +63,41 @@ const PasswordComplexityConfiguration = () => {
   const [customMaxLoginAttemptsEnabled, setCustomMaxLoginAttemptsEnabled] = useState(false)
   const [allowLoginSuspensionEnabled, setAllowLoginSuspensionEnabled] = useState(false)
   const [maxLoginAttempts, setMaxLoginAttempts] = useState(DEFAULT_MAX_LOGIN_ATTEMPTS)
+  const [currentAttachmentId, setCurrentAttachmentId] = useState<number | null>(null)
   const [newlyUploadedAttachmentId, setNewlyUploadedAttachmentId] = useState<number | null>(null)
   const [customForbiddenWordsEnabled, setCustomForbiddenWordsEnabled] = useState(false)
+  const [passwordPolicyHashExists, setPasswordPolicyHashExists] = useState(false)
 
   useEffect(() => {
     if (showTray) {
       const fetchCurrentSettings = async () => {
         try {
-          const {status, data} = await executeApiRequest<PasswordSettingsResponse>({
+          const response = await executeApiRequest<PasswordSettingsResponse>({
             path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`,
             method: 'GET',
           })
 
-          if (status === 200) {
-            const passwordPolicy = data.password_policy
+          if (response?.status === 200 && response?.data) {
+            const passwordPolicy = response.data.password_policy || {}
 
-            if (passwordPolicy.require_number_characters === 'true') {
-              setRequireNumbersEnabled(true)
-            } else {
-              setRequireNumbersEnabled(false)
+            if (Object.keys(passwordPolicy).length > 0) {
+              setPasswordPolicyHashExists(true)
             }
-
-            if (passwordPolicy.require_symbol_characters === 'true') {
-              setRequireSymbolsEnabled(true)
-            } else {
-              setRequireSymbolsEnabled(false)
-            }
-
-            if (passwordPolicy.minimum_character_length) {
-              setMinimumCharacterLength(passwordPolicy.minimum_character_length)
-              setMinimumCharacterLengthEnabled(true)
-            } else {
-              setMinimumCharacterLengthEnabled(false)
-            }
-
-            if (passwordPolicy.maximum_login_attempts) {
-              setMaxLoginAttempts(passwordPolicy.maximum_login_attempts)
-              setCustomMaxLoginAttemptsEnabled(true)
-            } else {
-              setCustomMaxLoginAttemptsEnabled(false)
-            }
-
-            if (passwordPolicy.allow_login_suspension === 'true') {
-              setAllowLoginSuspensionEnabled(true)
-            } else {
-              setAllowLoginSuspensionEnabled(false)
-            }
-
-            // ensure customForbiddenWordsEnabled is correctly set when the tray opens to prevent
-            // mistakenly deleting an existing custom list if “Apply” is clicked without changes
+            setRequireNumbersEnabled(passwordPolicy.require_number_characters === 'true')
+            setRequireSymbolsEnabled(passwordPolicy.require_symbol_characters === 'true')
+            setMinimumCharacterLength(
+              passwordPolicy.minimum_character_length || MINIMUM_CHARACTER_LENGTH
+            )
+            setMinimumCharacterLengthEnabled(!!passwordPolicy.minimum_character_length)
+            setMaxLoginAttempts(passwordPolicy.maximum_login_attempts || DEFAULT_MAX_LOGIN_ATTEMPTS)
+            setCustomMaxLoginAttemptsEnabled(!!passwordPolicy.maximum_login_attempts)
+            setAllowLoginSuspensionEnabled(passwordPolicy.allow_login_suspension === 'true')
             setCustomForbiddenWordsEnabled(!!passwordPolicy.common_passwords_attachment_id)
+            setCurrentAttachmentId(passwordPolicy.common_passwords_attachment_id || null)
+          } else {
+            throw new Error('Failed to fetch current settings.')
           }
         } catch (err: any) {
-          // err type has to be any because the error object is not defined
           showFlashAlert({
             message: I18n.t('An error occurred fetching password policy settings.'),
             err,
@@ -195,20 +177,22 @@ const PasswordComplexityConfiguration = () => {
       allow_login_suspension: allowLoginSuspensionEnabled,
     }
 
-    if (!customForbiddenWordsEnabled) {
-      if (settingsResult.password_policy.common_passwords_attachment_id) {
-        await deleteForbiddenWordsFile(
+    if (settingsResult.password_policy) {
+      if (!customForbiddenWordsEnabled) {
+        if (settingsResult.password_policy.common_passwords_attachment_id) {
+          await deleteForbiddenWordsFile(
+            settingsResult.password_policy.common_passwords_attachment_id
+          )
+        }
+      } else if (settingsResult.password_policy.common_passwords_attachment_id) {
+        passwordPolicy.common_passwords_attachment_id =
           settingsResult.password_policy.common_passwords_attachment_id
-        )
       }
-    } else if (settingsResult.password_policy.common_passwords_attachment_id) {
-      passwordPolicy.common_passwords_attachment_id =
-        settingsResult.password_policy.common_passwords_attachment_id
-    }
 
-    if (settingsResult.password_policy.common_passwords_folder_id) {
-      passwordPolicy.common_passwords_folder_id =
-        settingsResult.password_policy.common_passwords_folder_id
+      if (settingsResult.password_policy.common_passwords_folder_id) {
+        passwordPolicy.common_passwords_folder_id =
+          settingsResult.password_policy.common_passwords_folder_id
+      }
     }
 
     if (customMaxLoginAttemptsEnabled) {
@@ -358,6 +342,8 @@ const PasswordComplexityConfiguration = () => {
             <CustomForbiddenWordsSection
               setNewlyUploadedAttachmentId={setNewlyUploadedAttachmentId}
               onCustomForbiddenWordsEnabledChange={handleCustomForbiddenWordsEnabledChange}
+              currentAttachmentId={currentAttachmentId}
+              passwordPolicyHashExists={passwordPolicyHashExists}
             />
 
             <View as="div" margin="medium medium small medium">
