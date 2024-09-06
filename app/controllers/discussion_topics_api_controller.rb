@@ -28,11 +28,12 @@ class DiscussionTopicsApiController < ApplicationController
   include LocaleSelection
 
   before_action :require_context_and_read_access
-  before_action :require_topic, except: %i[mark_all_topic_read]
+  before_action :require_topic, except: %i[mark_all_topic_read migrate_disallow]
   before_action :require_initial_post, except: %i[add_entry
                                                   mark_topic_read
                                                   mark_topic_unread
                                                   mark_all_topic_read
+                                                  migrate_disallow
                                                   show
                                                   unsubscribe_topic]
   before_action only: %i[replies
@@ -888,6 +889,26 @@ class DiscussionTopicsApiController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def unsubscribe_topic
     render_state_change_result @topic.unsubscribe(@current_user)
+  end
+
+  # This is a temp endpoint for disallow_threaded_replies_fix_alert
+  # TODO remove it after the alert is no longer needed
+  def migrate_disallow
+    raise ActiveRecord::RecordNotFound unless Account.site_admin.feature_enabled?(:disallow_threaded_replies_fix_alert)
+    return render_unauthorized_action unless @context.grants_right?(@current_user, session, :moderate_forum)
+
+    update_count = @context.active_discussion_topics
+                           .only_discussion_topics
+                           .where(discussion_type: DiscussionTopic::DiscussionTypes::SIDE_COMMENT)
+                           .in_batches
+                           .update_all(discussion_type: DiscussionTopic::DiscussionTypes::THREADED, updated_at: Time.now.utc)
+
+    tags = { institution: @domain_root_account&.name || "unknown" }
+
+    InstStatsd::Statsd.increment("discussion_topic.migrate_disallow.count", tags:)
+    InstStatsd::Statsd.gauge("discussion_topic.migrate_disallow.discussions_updated", update_count, tags:)
+
+    render json: { update_count: }
   end
 
   protected

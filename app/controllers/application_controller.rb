@@ -379,6 +379,7 @@ class ApplicationController < ActionController::Base
     dashboard_graphql_integration
     discussion_checkpoints
     speedgrader_studio_media_capture
+    disallow_threaded_replies_fix_alert
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
