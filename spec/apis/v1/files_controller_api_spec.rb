@@ -497,6 +497,16 @@ describe "Files API", type: :request do
       expect(existing.replacement_attachment).to eq attachment
     end
 
+    it "is permitted if attachment context is an account" do
+      account = Account.default
+      folder = Folder.root_folders(account).first
+      params = base_params.merge(context_type: "Account", context_id: account.global_id, folder: folder.id, size: 864.kilobytes)
+      raw_api_call(:post,
+                   "/api/v1/files/capture?#{params.to_query}",
+                   params.merge(controller: "files", action: "api_capture", format: "json"))
+      assert_status(201)
+    end
+
     describe "re-uploading a file" do
       before :once do
         @existing = Attachment.create!(
