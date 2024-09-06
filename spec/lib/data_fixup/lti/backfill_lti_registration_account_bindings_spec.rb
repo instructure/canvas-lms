@@ -19,7 +19,11 @@
 #
 
 RSpec.describe DataFixup::Lti::BackfillLtiRegistrationAccountBindings do
-  let(:dev_key) { dev_key_model_1_3(account:) }
+  let(:dev_key) do
+    dev_key = dev_key_model_1_3(account:)
+    dev_key.developer_key_account_bindings.first.lti_registration_account_binding.delete
+    dev_key
+  end
   let(:account) { account_model }
 
   it "backfills the lti_registration_account_bindings table" do
@@ -83,10 +87,8 @@ RSpec.describe DataFixup::Lti::BackfillLtiRegistrationAccountBindings do
 
   context "when there are some LTI keys that already have a registration account binding" do
     let(:other_key) { dev_key_model_1_3(account:) }
-    let(:binding) { Lti::RegistrationAccountBinding.create!(developer_key_account_binding: DeveloperKeyAccountBinding.find_in_account_priority(account.account_chain, other_key), account:, registration: other_key.lti_registration) }
 
     it "doesn't create any new bindings and runs successfully" do
-      binding
       expect { described_class.run }.not_to change { Lti::RegistrationAccountBinding.count }
     end
   end
@@ -109,6 +111,7 @@ RSpec.describe DataFixup::Lti::BackfillLtiRegistrationAccountBindings do
     let(:site_admin_key) do
       key = dev_key_model_1_3(account: Account.site_admin)
       key.update!(account: nil)
+      key.developer_key_account_bindings.first.lti_registration_account_binding.delete
       key
     end
 

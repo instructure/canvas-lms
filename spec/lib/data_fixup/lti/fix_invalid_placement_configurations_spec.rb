@@ -25,7 +25,7 @@ RSpec.describe DataFixup::Lti::FixInvalidPlacementConfigurations do
   include_context "lti_1_3_tool_configuration_spec_helper"
 
   let(:account) { Account.default }
-  let(:developer_key) { DeveloperKey.create!(account:, workflow_state: "active", is_lti_key: true, public_jwk:) }
+  let(:developer_key) { dev_key_model_1_3(account:) }
 
   before do
     tool_configuration.configuration["extensions"].first["settings"]["placements"] = []
