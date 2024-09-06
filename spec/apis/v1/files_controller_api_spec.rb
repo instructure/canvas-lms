@@ -1688,7 +1688,7 @@ describe "Files API", type: :request do
     end
   end
 
-  describe "#rce_linked_file_urls" do
+  describe "#rce_linked_file_instfs_ids" do
     before :once do
       course_with_teacher(active_all: true)
     end
@@ -1702,7 +1702,7 @@ describe "Files API", type: :request do
 
     it "returns 404 if feature not enabled" do
       Account.site_admin.disable_feature!(:rce_linked_file_urls)
-      api_call(:post, "/api/v1/rce_linked_file_urls", { controller: "files", action: "rce_linked_file_urls", format: "json" }, {}, {}, expected_status: 404)
+      api_call(:get, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, {}, {}, expected_status: 404)
     end
 
     it "allows access to course files the user has access to manage" do
@@ -1718,17 +1718,15 @@ describe "Files API", type: :request do
         "/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true",
         "/media_attachments_iframe/#{diff_course.id}?type=video&amp;embedded=true"
       ]
-      body = { user_uuid: @teacher.uuid, file_urls:, location: "quiz/123" }
-      stub_request(:post, %r{^http://instfs.test/files/doc/duplicate\?token=}).to_return(status: 201, body: { "id" => "new_doc_id" }.to_json)
-      stub_request(:post, %r{^http://instfs.test/files/media/duplicate\?token=}).to_return(status: 201, body: { "id" => "new_media_id" }.to_json)
+      body = { user_uuid: @teacher.uuid, file_urls: }
 
-      api_call(:post, "/api/v1/rce_linked_file_urls", { controller: "files", action: "rce_linked_file_urls", format: "json" }, body, {}, expected_status: 201)
+      api_call(:get, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 200)
       json = JSON.parse(response.body)
       expect(json).to eq({
                            "instfs_ids" => { "/courses/#{course.id}/files/#{image.id}/preview" => "image" },
-                           "canvas_urls" => {
-                             "/courses/#{course.id}/files/#{doc.id}?wrap=1" => "/courses/#{course.id}/files/#{doc.id}?instfs_id=new_doc_id&wrap=1",
-                             "/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true" => "/media_attachments_iframe/#{media.id}?embedded=true&instfs_id=new_media_id&type=video"
+                           "canvas_instfs_ids" => {
+                             "/courses/#{course.id}/files/#{doc.id}?wrap=1" => "doc",
+                             "/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true" => "media"
                            }
                          })
     end
@@ -1737,7 +1735,7 @@ describe "Files API", type: :request do
       doc = attachment_model(context: @teacher, display_name: "test.docx", uploaded_data: fixture_file_upload("test.docx"), instfs_uuid: "doc")
       image = attachment_model(context: @teacher, display_name: "cn_image.jpg", uploaded_data: fixture_file_upload("cn_image.jpg"), instfs_uuid: "image")
       media = attachment_model(context: @teacher, display_name: "292.mp3", uploaded_data: fixture_file_upload("292.mp3"), instfs_uuid: "media")
-      not_yours = attachment_model(context: @user, display_name: "292.mp3", uploaded_data: fixture_file_upload("292.mp3"), instfs_uuid: "media")
+      not_yours = attachment_model(context: @user, display_name: "292.mp3", uploaded_data: fixture_file_upload("292.mp3"), instfs_uuid: "media2")
 
       file_urls = [
         "/users/#{@teacher.id}/files/#{doc.id}?wrap=1",
@@ -1745,17 +1743,15 @@ describe "Files API", type: :request do
         "/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true",
         "/media_attachments_iframe/#{not_yours.id}?type=video&amp;embedded=true"
       ]
-      body = { user_uuid: @teacher.uuid, file_urls:, location: "quiz/123" }
-      stub_request(:post, %r{^http://instfs.test/files/doc/duplicate\?token=}).to_return(status: 201, body: { "id" => "new_doc_id" }.to_json)
-      stub_request(:post, %r{^http://instfs.test/files/media/duplicate\?token=}).to_return(status: 201, body: { "id" => "new_media_id" }.to_json)
+      body = { user_uuid: @teacher.uuid, file_urls: }
 
-      api_call(:post, "/api/v1/rce_linked_file_urls", { controller: "files", action: "rce_linked_file_urls", format: "json" }, body, {}, expected_status: 201)
+      api_call(:get, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 200)
       json = JSON.parse(response.body)
       expect(json).to eq({
                            "instfs_ids" => { "/users/#{@teacher.id}/files/#{image.id}/preview" => "image" },
-                           "canvas_urls" => {
-                             "/users/#{@teacher.id}/files/#{doc.id}?wrap=1" => "/users/#{@teacher.id}/files/#{doc.id}?instfs_id=new_doc_id&wrap=1",
-                             "/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true" => "/media_attachments_iframe/#{media.id}?embedded=true&instfs_id=new_media_id&type=video"
+                           "canvas_instfs_ids" => {
+                             "/users/#{@teacher.id}/files/#{doc.id}?wrap=1" => "doc",
+                             "/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true" => "media"
                            }
                          })
     end
@@ -1764,16 +1760,15 @@ describe "Files API", type: :request do
       doc = attachment_model(context: @course, display_name: "test.docx", uploaded_data: fixture_file_upload("test.docx"), instfs_uuid: "doc")
 
       file_urls = ["/files/#{doc.id}/download?download_frd=1", "/files/#{doc.id}", "http://example.canvas.edu/files/#{doc.id}/download"]
-      body = { user_uuid: @teacher.uuid, file_urls:, location: "quiz/123" }
-      stub_request(:post, %r{^http://instfs.test/files/doc/duplicate\?token=}).to_return(status: 201, body: { "id" => "new_doc_id" }.to_json)
+      body = { user_uuid: @teacher.uuid, file_urls: }
 
-      api_call(:post, "/api/v1/rce_linked_file_urls", { controller: "files", action: "rce_linked_file_urls", format: "json" }, body, {}, expected_status: 201)
+      api_call(:get, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 200)
       json = JSON.parse(response.body)
       expect(json).to eq({
-                           "canvas_urls" => {
-                             "/files/#{doc.id}/download?download_frd=1" => "/files/#{doc.id}/download?download_frd=1&instfs_id=new_doc_id",
-                             "/files/#{doc.id}" => "/files/#{doc.id}?instfs_id=new_doc_id",
-                             "http://example.canvas.edu/files/#{doc.id}/download" => "http://example.canvas.edu/files/#{doc.id}/download?instfs_id=new_doc_id"
+                           "canvas_instfs_ids" => {
+                             "/files/#{doc.id}/download?download_frd=1" => "doc",
+                             "/files/#{doc.id}" => "doc",
+                             "http://example.canvas.edu/files/#{doc.id}/download" => "doc"
                            }
                          })
     end
@@ -1789,9 +1784,9 @@ describe "Files API", type: :request do
         "/courses/#{@course.id}/files/#{image.id}/preview",
         "/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true",
       ]
-      body = { user_uuid: @teacher.uuid, file_urls:, location: "quiz/123" }
+      body = { user_uuid: @teacher.uuid, file_urls: }
 
-      api_call(:post, "/api/v1/rce_linked_file_urls", { controller: "files", action: "rce_linked_file_urls", format: "json" }, body, {}, expected_status: 422)
+      api_call(:get, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 422)
       json = JSON.parse(response.body)
       expect(json).to eq({ "errors" => [{ "message" => "No valid file URLs given" }] })
     end
@@ -1806,17 +1801,15 @@ describe "Files API", type: :request do
         "/courses/#{@course.id}/files/#{image.id}/preview",
         "/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true",
       ]
-      body = { user_uuid: @teacher.uuid, file_urls:, location: "quiz/123" }
-      stub_request(:post, %r{^http://instfs.test/files/doc/duplicate\?token=}).to_return(status: 201, body: { "id" => "new_doc_id" }.to_json)
-      stub_request(:post, %r{^http://instfs.test/files/media/duplicate\?token=}).to_return(status: 201, body: { "id" => "new_media_id" }.to_json)
+      body = { user_uuid: @teacher.uuid, file_urls:, }
 
-      api_call(:post, "/api/v1/rce_linked_file_urls", { controller: "files", action: "rce_linked_file_urls", format: "json" }, body, {}, expected_status: 201)
+      api_call(:get, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 200)
       json = JSON.parse(response.body)
       expect(json).to eq({
                            "instfs_ids" => { "/courses/#{@course.id}/files/#{image.id}/preview" => "image" },
-                           "canvas_urls" => {
-                             "/courses/#{@course.id}/files/#{doc.id}?wrap=1" => "/courses/#{@course.id}/files/#{doc.id}?instfs_id=new_doc_id&wrap=1",
-                             "/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true" => "/media_attachments_iframe/#{media.id}?embedded=true&instfs_id=new_media_id&type=video"
+                           "canvas_instfs_ids" => {
+                             "/courses/#{@course.id}/files/#{doc.id}?wrap=1" => "doc",
+                             "/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true" => "media"
                            }
                          })
     end
@@ -1836,17 +1829,15 @@ describe "Files API", type: :request do
         "/courses/#{@course.id}/files/#{image.id}/preview",
         "/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true",
       ]
-      body = { user_uuid: @teacher.uuid, file_urls:, location: "quiz/123" }
-      stub_request(:post, %r{^http://instfs.test/files/doc2/duplicate\?token=}).to_return(status: 201, body: { "id" => "new_doc2_id" }.to_json)
-      stub_request(:post, %r{^http://instfs.test/files/media2/duplicate\?token=}).to_return(status: 201, body: { "id" => "new_media2_id" }.to_json)
+      body = { user_uuid: @teacher.uuid, file_urls: }
 
-      api_call(:post, "/api/v1/rce_linked_file_urls", { controller: "files", action: "rce_linked_file_urls", format: "json" }, body, {}, expected_status: 201)
+      api_call(:get, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 200)
       json = JSON.parse(response.body)
       expect(json).to eq({
                            "instfs_ids" => { "/courses/#{@course.id}/files/#{image.id}/preview" => "image2" },
-                           "canvas_urls" => {
-                             "/courses/#{@course.id}/files/#{doc.id}?wrap=1" => "/courses/#{@course.id}/files/#{doc2.id}?instfs_id=new_doc2_id&wrap=1",
-                             "/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true" => "/media_attachments_iframe/#{media2.id}?embedded=true&instfs_id=new_media2_id&type=video"
+                           "canvas_instfs_ids" => {
+                             "/courses/#{@course.id}/files/#{doc.id}?wrap=1" => "doc2",
+                             "/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true" => "media2"
                            }
                          })
     end
@@ -1859,14 +1850,13 @@ describe "Files API", type: :request do
         "https://really-bad-url@",
         "/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true",
       ]
-      body = { user_uuid: @teacher.uuid, file_urls:, location: "quiz/123" }
-      stub_request(:post, %r{^http://instfs.test/files/media/duplicate\?token=}).to_return(status: 201, body: { "id" => "new_media_id" }.to_json)
+      body = { user_uuid: @teacher.uuid, file_urls: }
 
-      api_call(:post, "/api/v1/rce_linked_file_urls", { controller: "files", action: "rce_linked_file_urls", format: "json" }, body, {}, expected_status: 201)
+      api_call(:get, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 200)
       json = JSON.parse(response.body)
       expect(json).to eq({
-                           "canvas_urls" => {
-                             "/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true" => "/media_attachments_iframe/#{media.id}?embedded=true&instfs_id=new_media_id&type=video"
+                           "canvas_instfs_ids" => {
+                             "/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true" => "media"
                            }
                          })
     end
@@ -1875,7 +1865,7 @@ describe "Files API", type: :request do
       file_urls = []
       101.times { |i| file_urls << "/courses/#{@course.id}/files/#{i}?wrap=1" }
       body = { user_uuid: @teacher.uuid, file_urls:, location: "quiz/123" }
-      api_call(:post, "/api/v1/rce_linked_file_urls", { controller: "files", action: "rce_linked_file_urls", format: "json" }, body, {}, expected_status: 422)
+      api_call(:get, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 422)
 
       json = JSON.parse(response.body)
       expect(json).to eq({ "errors" => [{ "message" => "Too many file links requested.  A maximum of 100 file links can be processed per request." }] })
