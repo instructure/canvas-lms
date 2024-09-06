@@ -1038,10 +1038,11 @@ class FilesController < ApplicationController
 
   # intentionally narrower than the list on `Attachment.belongs_to :context`
   VALID_ATTACHMENT_CONTEXTS = [
-    "User",
+    "Account",
     "Course",
     "Group",
     "Assignment",
+    "User",
     "ContentMigration",
     "Quizzes::QuizSubmission",
     "ContentMigration",
