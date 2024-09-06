@@ -34,7 +34,9 @@ export const template = generateActionTemplates(
       description: I18n.t('Allows user to view the Discussions link in Course Navigation.'),
     },
     {
-      description: I18n.t('Allows user to view course discussions.'),
+      description: I18n.t(
+        'Allows user to view course discussions and all replies within the discussion topics.'
+      ),
     },
   ],
   [
@@ -70,7 +72,9 @@ export const template = generateActionTemplates(
       description: I18n.t('Allows user to view the Discussions link in Course Navigation.'),
     },
     {
-      description: I18n.t('Allows user to view course discussions.'),
+      description: I18n.t(
+        'Allows user to view course discussions and all replies within the discussion topics.'
+      ),
     },
   ],
   [
