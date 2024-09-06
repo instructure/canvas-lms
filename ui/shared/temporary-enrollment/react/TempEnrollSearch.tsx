@@ -46,20 +46,19 @@ interface Props {
   page: number
   searchFail: Function
   searchSuccess: Function
-  canReadSIS?: boolean
-  foundUser?: User | null
+  canReadSIS: boolean
+  foundUsers: User[]
   wasReset?: boolean
 }
 
 export function TempEnrollSearch(props: Props) {
   // 'cc_path' | 'unique_id' | 'sis_user_id'
-  const defaultFoundUsers = props.foundUser == null ? [] : [props.foundUser]
   const [searchType, setSearchType] = useState('cc_path')
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
   const [duplicateUsers, setDuplicateUsers] = useState<Record<string, DuplicateUser[]>>({})
-  const [foundUsers, setFoundUsers] = useState<User[]>(defaultFoundUsers)
+  const [foundUsers, setFoundUsers] = useState<User[]>(props.foundUsers)
 
   const handleSearchTypeChange = (_event: ChangeEvent<HTMLInputElement>, value: string) => {
     setSearchType(value)
@@ -85,7 +84,7 @@ export function TempEnrollSearch(props: Props) {
 
     // DUPLICATES
     const map: Record<string, DuplicateUser[]> = {}
-    response.duplicates.forEach(dupePair => {
+    response.duplicates.forEach((dupePair: DuplicateUser[]) => {
       const key = dupePair[0].address
       // get dupe sets without provider if included
       const withoutProvider = dupePair.filter(dupeUser => {
@@ -107,14 +106,15 @@ export function TempEnrollSearch(props: Props) {
       return
     }
     setFoundUsers(foundUserList)
+    setMessage('')
   }
 
-  const containsProvider = userList => {
+  const containsProvider = (userList: User[]) => {
     return userList.some(user => user.user_id === props.user.id)
   }
 
   useEffect(() => {
-    if (props.page === 1 && !props.foundUser) {
+    if (props.page === 1 && props.foundUsers.length === 0) {
       setLoading(true)
 
       const findUser = async () => {
@@ -126,7 +126,7 @@ export function TempEnrollSearch(props: Props) {
             setMessage(I18n.t('User could not be found.'))
             props.searchFail()
           } else {
-            const searchFirst = searchArray[0]
+            const searchFirst = [searchArray[0]]
             const {json} = await doFetchApi({
               path: `/accounts/${ENV.ACCOUNT_ID}/user_lists.json`,
               method: 'POST',
@@ -141,6 +141,8 @@ export function TempEnrollSearch(props: Props) {
         setLoading(false)
       }
       findUser()
+    } else if (props.page === 1 && props.foundUsers.length > 0) {
+      setFoundUsers(props.foundUsers)
     } else {
       setDuplicateUsers({})
     }
@@ -204,9 +206,8 @@ export function TempEnrollSearch(props: Props) {
           foundUsers={foundUsers}
           duplicateUsers={duplicateUsers}
           searchFailure={props.searchFail}
-          readySubmit={(enrollment: User) => props.searchSuccess(enrollment)}
+          readySubmit={(enrollments: User[]) => props.searchSuccess(enrollments)}
           canReadSIS={props.canReadSIS}
-          searchType={searchType}
         />
       </Flex>
     )
