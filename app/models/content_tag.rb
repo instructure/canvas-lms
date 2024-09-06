@@ -915,7 +915,12 @@ class ContentTag < ActiveRecord::Base
       SubmissionLifecycleManager.recompute(content, update_grades: true)
     elsif content.assignment
       content.assignment.clear_cache_key(:availability)
-      SubmissionLifecycleManager.recompute(content.assignment, update_grades: true)
+      create_sub_assignment_submissions = false
+      if content.assignment.checkpoints_parent?
+        create_sub_assignment_submissions = true
+      end
+
+      SubmissionLifecycleManager.recompute(content.assignment, update_grades: true, create_sub_assignment_submissions:)
     end
   end
 
