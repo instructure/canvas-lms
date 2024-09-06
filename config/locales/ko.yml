@@ -4642,6 +4642,7 @@ ko:
     ungrded_survey: "평가 안 된 설문"
     url: URL
   create_new_event_e9fb2fb6: "새 행사 만들기"
+  create_rubric_ec33ddf9: "루브릭 만들기"
   create_users_view: 
     required: "이메일 주소 입력"
   criteria_9fac648: 기준
@@ -6006,6 +6007,7 @@ ko:
       no_rubric_outcomes_found: "루브릭이 구성된 성과를 찾을 수 없음"
     titles: 
       find_outcome: "성과 검색"
+  find_rubric_98ba2ce: "루브릭 찾기"
   flickr_9bed633e: Flickr
   folder: 
     course_content_folder_name: "과목 내용"
@@ -10001,6 +10003,7 @@ ko:
   peer_reviews_e3a55964: "피어 리뷰"
   pending_f1ed53c7: "보류 중"
   people_b4ebb13c: 사용자
+  percent_8b3390db: 퍼센트
   percentused_of_bytesavailable_used_a859a40d: "%{bytesAvailable} 중 %{percentUsed} 사용 중"
   permission: 
     read_sis: "SIS 자료 읽기"
