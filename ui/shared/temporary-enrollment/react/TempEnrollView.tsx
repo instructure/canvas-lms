@@ -45,7 +45,7 @@ const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
 interface Props {
   user: User
-  onEdit?: (enrollment: User, tempEnrollments: Enrollment[]) => void
+  onEdit: (enrollmentUser: User, tempEnrollments: Enrollment[]) => void
   onAddNew?: () => void
   enrollmentType: EnrollmentType
   modifyPermissions: ModifyPermissions
@@ -143,7 +143,7 @@ export function TempEnrollView(props: Props) {
   })
 
   const {mutate} = useMutation({
-    mutationFn: async enrollments => handleConfirmAndDeleteEnrollment(enrollments),
+    mutationFn: async (enrollments: Enrollment[]) => handleConfirmAndDeleteEnrollment(enrollments),
     mutationKey: ['delete-enrollments'],
     onSuccess: () => queryClient.refetchQueries({queryKey: ['enrollments'], type: 'active'}),
   })
@@ -234,29 +234,35 @@ export function TempEnrollView(props: Props) {
   )
 
   const renderRows = (enrollments: Enrollment[]) => {
-    const rows = []
+    const rows: JSX.Element[] = []
     const enrollmentGroups = groupEnrollmentsByPairingId(enrollments)
+    const usedKeys: number[] = []
 
+    // iterate enrollments instead of enrollmentGroups to keep chronological order
     for (const enrollment of enrollments) {
-      // iterate enrollments instead of enrollmentGroups to keep chronological order
       const pairingId = enrollment.temporary_enrollment_pairing_id
-      const group = enrollmentGroups[pairingId]
-      const firstEnrollment = group[0]
-      rows.push(
-        <Table.Row key={pairingId}>
-          <Table.RowHeader>
-            <TempEnrollAvatar user={getRelevantUserFromEnrollment(firstEnrollment)} />
-          </Table.RowHeader>
-          <Table.Cell>
-            {`${formatDateTime(firstEnrollment.start_at)} - ${formatDateTime(
-              firstEnrollment.end_at
-            )}`}
-          </Table.Cell>
-          <Table.Cell>{firstEnrollment.type}</Table.Cell>
-          <Table.Cell>{renderEnrollmentPairingStatus(group)}</Table.Cell>
-          {canEditOrDelete && <Table.Cell>{renderActionIcons(group)}</Table.Cell>}
-        </Table.Row>
-      )
+      // avoid creating duplicate enrollment rows since we iterate by enrollment
+      // for sorting instead of by temp enroll grouping
+      if (!usedKeys.includes(pairingId)) {
+        const group = enrollmentGroups[pairingId]
+        const firstEnrollment = group[0]
+        rows.push(
+          <Table.Row key={pairingId}>
+            <Table.RowHeader>
+              <TempEnrollAvatar user={getRelevantUserFromEnrollment(firstEnrollment)} />
+            </Table.RowHeader>
+            <Table.Cell>
+              {`${formatDateTime(firstEnrollment.start_at)} - ${formatDateTime(
+                firstEnrollment.end_at
+              )}`}
+            </Table.Cell>
+            <Table.Cell>{firstEnrollment.type}</Table.Cell>
+            <Table.Cell>{renderEnrollmentPairingStatus(group)}</Table.Cell>
+            {canEditOrDelete && <Table.Cell>{renderActionIcons(group)}</Table.Cell>}
+          </Table.Row>
+        )
+        usedKeys.push(pairingId)
+      }
     }
     return rows
   }

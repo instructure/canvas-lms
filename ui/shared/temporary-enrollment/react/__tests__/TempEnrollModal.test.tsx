@@ -122,14 +122,17 @@ const ENROLLMENTS_URI = encodeURI(
   `/api/v1/users/${modalProps.user.id}/courses?enrollment_state=active&include[]=sections&include[]=term&per_page=${MAX_ALLOWED_COURSES_PER_PAGE}&account_id=${enrollmentsByCourse[0].account_id}`
 )
 
+// user_list did not match the encoded url (hence user_list[])
 const userListsData = {
-  user_list: '',
+  'user_list[]': '',
   v2: true,
   search_type: 'cc_path',
 }
 const userListsParams = Object.entries(userListsData)
   .map(([key, value]) => `${key}=${value}`)
   .join('&')
+
+const USER_LIST_URI = encodeURI(`/accounts/1/user_lists.json?${userListsParams}`)
 
 const userDetailsUriMock = (userId: string, response: object) =>
   fetchMock.get(`/api/v1/users/${userId}/profile`, response)
@@ -178,7 +181,7 @@ describe('TempEnrollModal', () => {
 
   describe('after opening modal', () => {
     beforeEach(async () => {
-      fetchMock.post(`/accounts/1/user_lists.json?${userListsParams}`, userData)
+      fetchMock.post(USER_LIST_URI, userData)
       userDetailsUriMock(recipientUser.user_id, recipientProfile)
       fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
       render(
@@ -233,7 +236,7 @@ describe('TempEnrollModal', () => {
       expect(submit).toBeInTheDocument()
       fireEvent.click(submit)
 
-      expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
+      expect(fetchMock.calls(USER_LIST_URI).length).toBe(1)
       expect(fetchMock.calls('/api/v1/users/2/profile').length).toBe(1)
       expect(fetchMock.calls(ENROLLMENTS_URI).length).toBe(1)
     })
@@ -257,7 +260,7 @@ describe('TempEnrollModal', () => {
         expect(screen.queryByText(/to be assigned temporary enrollments/)).toBeNull()
       })
 
-      expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
+      expect(fetchMock.calls(USER_LIST_URI).length).toBe(1)
       expect(fetchMock.calls('/api/v1/users/2/profile').length).toBe(1)
     })
 
@@ -289,7 +292,7 @@ describe('TempEnrollModal', () => {
         expect(screen.queryByText(/to be assigned temporary enrollments/)).toBeInTheDocument()
       })
 
-      expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
+      expect(fetchMock.calls(USER_LIST_URI).length).toBe(1)
       expect(fetchMock.calls('/api/v1/users/2/profile').length).toBe(1)
       expect(fetchMock.calls(ENROLLMENTS_URI).length).toBe(1)
     })

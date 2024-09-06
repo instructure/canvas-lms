@@ -48,7 +48,7 @@ interface Props {
   enrollmentType: EnrollmentType
   children: ReactElement
   user: User
-  canReadSIS?: boolean
+  canReadSIS: boolean
   rolePermissions: RolePermissions
   roles: Role[]
   isEditMode: boolean
@@ -85,7 +85,7 @@ export const generateModalTitle = (
 export function TempEnrollModal(props: Props) {
   const [open, setOpen] = useState(false)
   const [page, setPage] = useState(0)
-  const [enrollment, setEnrollment] = useState<User | null>(null)
+  const [enrollments, setEnrollments] = useState<User[]>([])
   const [isViewingAssignFromEdit, setIsViewingAssignFromEdit] = useState(false)
   const [buttonsDisabled, setButtonsDisabled] = useState(true)
   const [wasReset, setWasReset] = useState(false)
@@ -100,15 +100,16 @@ export function TempEnrollModal(props: Props) {
   }, [isModalOpenAnimationComplete])
 
   useEffect(() => {
+    const firstEnrollment = enrollments.length === 0 ? null : enrollments[0]
     const newTitle = generateModalTitle(
       props.user,
       props.enrollmentType,
       props.isEditMode,
       page,
-      enrollment
+      firstEnrollment
     )
     setTitle(newTitle)
-  }, [props.user, props.enrollmentType, props.isEditMode, page, enrollment])
+  }, [props.user, props.enrollmentType, props.isEditMode, page, enrollments])
 
   const resetCommonState = () => {
     if (props.isEditMode && props.onToggleEditMode) {
@@ -118,7 +119,7 @@ export function TempEnrollModal(props: Props) {
 
   const handleModalReset = () => {
     setPage(0)
-    setEnrollment(null)
+    setEnrollments([])
     setWasReset(true)
     setTempEnrollmentsPairing(null)
     setIsViewingAssignFromEdit(false)
@@ -126,11 +127,11 @@ export function TempEnrollModal(props: Props) {
     resetCommonState()
   }
 
-  const handleGoToAssignPageWithEnrollment = (
+  const handleGoToAssignPageWithEnrollments = (
     enrollmentUser: User,
     tempEnrollments: Enrollment[]
   ) => {
-    setEnrollment(enrollmentUser)
+    setEnrollments([enrollmentUser])
     setTempEnrollmentsPairing(tempEnrollments)
     setPage(2)
     setIsViewingAssignFromEdit(true)
@@ -165,8 +166,8 @@ export function TempEnrollModal(props: Props) {
 
   const handleSetEnrollmentsFromSearch = (enrollmentUsers: User[]) => {
     // TODO: Set enrollment to all users
-    // setEnrollment(enrollmentUsers)
-    setEnrollment(enrollmentUsers[0])
+    // setEnrollments(enrollmentUsers)
+    setEnrollments([enrollmentUsers[0]])
   }
 
   const handlePageChange = (change: number) => {
@@ -218,7 +219,7 @@ export function TempEnrollModal(props: Props) {
           <TempEnrollView
             user={props.user}
             onAddNew={handleModalReset}
-            onEdit={handleGoToAssignPageWithEnrollment}
+            onEdit={handleGoToAssignPageWithEnrollments}
             enrollmentType={props.enrollmentType}
             modifyPermissions={props.modifyPermissions}
             disableModal={(isDisabled: boolean) => setButtonsDisabled(isDisabled)}
@@ -229,8 +230,8 @@ export function TempEnrollModal(props: Props) {
       if (page >= 2) {
         return (
           <TempEnrollAssign
+            enrollments={enrollments}
             user={props.user}
-            enrollment={enrollment}
             roles={props.roles}
             goBack={() => handlePageChange(-1)}
             rolePermissions={props.rolePermissions}
@@ -250,7 +251,7 @@ export function TempEnrollModal(props: Props) {
           page={page}
           searchFail={handleModalReset}
           searchSuccess={handleSetEnrollmentsFromSearch}
-          foundUser={enrollment}
+          foundUsers={enrollments}
           wasReset={wasReset}
         />
       )
@@ -293,7 +294,7 @@ export function TempEnrollModal(props: Props) {
         !props.isEditMode && (
           <Flex.Item key="nextOrSubmit">
             <Button
-              disabled={buttonsDisabled || (enrollment === null && page === 1)}
+              disabled={buttonsDisabled || (enrollments.length === 0 && page === 1)}
               color="primary"
               onClick={() => handlePageChange(1)}
               {...analyticProps(page === 2 ? 'Submit' : 'Next')}
