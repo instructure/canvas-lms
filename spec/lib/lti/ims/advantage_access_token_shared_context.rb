@@ -22,7 +22,7 @@ shared_context "advantage access token context" do
     Account.default
   end
   let_once(:developer_key) do
-    dk = DeveloperKey.create!(account: root_account)
+    dk = dev_key_model_1_3(account: root_account)
     dk.developer_key_account_bindings.first.update! workflow_state: "on"
     dk
   end

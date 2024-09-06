@@ -43,7 +43,7 @@ module Lti
     }.freeze.with_indifferent_access
 
     def create
-      tool = target_developer_key.tool_configuration.new_external_tool(context)
+      tool = target_developer_key.lti_registration.new_external_tool(context)
       tool.check_for_duplication(params[:verify_uniqueness].present?)
 
       if tool.errors.blank? && tool.save

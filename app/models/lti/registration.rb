@@ -18,6 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Lti::Registration < ActiveRecord::Base
+  DEFAULT_PRIVACY_LEVEL = "anonymous"
+  CANVAS_EXTENSION_LABEL = "canvas.instructure.com"
+
   extend RootAccountResolver
   include Canvas::SoftDeletable
 
@@ -77,6 +80,24 @@ class Lti::Registration < ActiveRecord::Base
     Lti::RegistrationAccountBinding.find_by(registration: self, account:)
   end
 
+  def new_external_tool(context, existing_tool: nil)
+    # disabled tools should stay disabled while getting updated
+    # deleted tools are never updated during a dev key update so can be safely ignored
+    tool_is_disabled = existing_tool&.workflow_state == ContextExternalTool::DISABLED_STATE
+
+    tool = existing_tool || ContextExternalTool.new(context:)
+    Importers::ContextExternalToolImporter.import_from_migration(
+      importable_configuration,
+      context,
+      nil,
+      tool,
+      false
+    )
+    tool.developer_key = developer_key
+    tool.workflow_state = (tool_is_disabled && ContextExternalTool::DISABLED_STATE) || privacy_level
+    tool
+  end
+
   def self.preload_account_bindings(registrations, account)
     return nil unless account
 
@@ -121,7 +142,18 @@ class Lti::Registration < ActiveRecord::Base
 
   # TODO: this will eventually need to account for 1.1 registrations
   def configuration
-    ims_registration&.registration_configuration || manual_configuration&.settings || {}
+    # hack; remove the need to look for developer_key.tool_configuration and ensure that is
+    # always available as manual_configuration. This would need to happen in an after_save
+    # callback on the developer key.
+    ims_registration&.registration_configuration || manual_configuration&.settings || developer_key&.tool_configuration&.configuration || {}
+  end
+
+  def importable_configuration
+    ims_registration&.importable_configuration || manual_configuration&.importable_configuration || developer_key&.tool_configuration&.importable_configuration || {}
+  end
+
+  def privacy_level
+    ims_registration&.privacy_level || manual_configuration&.privacy_level || developer_key&.tool_configuration&.privacy_level || DEFAULT_PRIVACY_LEVEL
   end
 
   # TODO: this will eventually need to account for 1.1 registrations

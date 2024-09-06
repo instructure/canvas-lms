@@ -21,7 +21,7 @@ RSpec.shared_context "lti_1_3_tool_configuration_spec_helper", shared_context: :
   let(:target_link_uri) { "http://lti13testtool.docker/blti_launch" }
 
   let(:tool_configuration) do
-    Lti::ToolConfiguration.create!(
+    developer_key.tool_configuration || Lti::ToolConfiguration.create!(
       developer_key:,
       settings: settings.merge(public_jwk: tool_config_public_jwk),
       privacy_level: "public"
