@@ -5872,6 +5872,7 @@ uk:
   create_group_set_7fe1cd53: "Створити набір груп"
   create_new_e0946c49: "Створити новий"
   create_new_event_e9fb2fb6: "Створити нову подію"
+  create_rubric_ec33ddf9: "Створити рубрику"
   create_slots_71dbb2f8: "Створити слоти"
   create_theme_based_on_40651ed3: "Створити тему на основі"
   create_users_view: 
@@ -7753,6 +7754,7 @@ uk:
       find_outcome: "Знайти результат"
   find_outcome_746cc57e: "Знайти результат"
   find_questions_4930b38f: "Знайти питання"
+  find_rubric_98ba2ce: "Знайти рубрику"
   finished_19aaf6f5: Завершено
   finland_358_abeffc8a: "Фінляндія (+358)"
   first_last_name_9820d256: "Ім'я, Прізвище"
@@ -12606,6 +12608,7 @@ uk:
   people_tutorial_tray_a87a6c48: "Вказівки для людей"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "Люди будуть бачити це ім'я в дискусіях, повідомленнях і коментарях."
   percent_448ea947: відсоток
+  percent_8b3390db: Відсоток
   percent_complete_3a7edc20: "%{percent} завершено"
   percent_of_respondents_selecting_this_answer_4c2ce4ee: "Відсоток респондентів, які обирають цю відповідь"
   percent_of_students_scored_score_53d2c4d5: "%{percent} студентів оцінено %{score}"
