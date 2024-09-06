@@ -155,7 +155,7 @@ class FilesController < ApplicationController
     api_capture
     icon_metadata
     reset_verifier
-    rce_linked_file_urls
+    rce_linked_file_instfs_ids
     show_relative
   ]
 
@@ -1558,7 +1558,7 @@ class FilesController < ApplicationController
     end
   end
 
-  def rce_linked_file_urls
+  def rce_linked_file_instfs_ids
     return not_found unless Account.site_admin.feature_enabled?(:rce_linked_file_urls)
 
     user = InstAccessToken.find_user_by_uuid_prefer_local(params[:user_uuid])
@@ -1599,35 +1599,15 @@ class FilesController < ApplicationController
       next unless context.grants_any_right?(@current_user, session, :manage_files_create, :manage_files_edit, :moderate_user_content, :become_user) &&
                   context.grants_any_right?(user, session, :manage_files_create, :manage_files_edit)
 
-      canvas_display_files = []
       file_list.each do |file|
         att = file[:attachment]
-        if att.media_entry_id.present? || att.canvadocable?
-          canvas_display_files << file
-        else
-          file_metadata[:instfs_ids] ||= {}
-          file_metadata[:instfs_ids][file[:url]] = att.instfs_uuid
-        end
-      end
-
-      canvas_display_files.each do |file|
-        file_metadata[:canvas_urls] ||= {}
-        # TODO: Work with InstFS to make a bulk duplicate API for this
-        url = file[:url]
-        att = file[:attachment]
-        unless params[:location].present? && (new_instfs_ref = att.create_rce_reference(params[:location]))
-          file_metadata[:canvas_urls][url] = url
-          next
-        end
-        old_att_id = file[:id] if file[:id] != att.id.to_s
-        new_url = old_att_id.present? ? url.sub(%r{(files|iframe)/#{old_att_id}}, "\\1/#{att.id}") : url
-        parsed_url = Addressable::URI.parse(CGI.unescape_html(new_url))
-        parsed_url.query_values = (parsed_url.query_values || {}).merge({ instfs_id: new_instfs_ref })
-        file_metadata[:canvas_urls][url] = parsed_url.to_s
+        list = (att.media_entry_id.present? || att.canvadocable?) ? :canvas_instfs_ids : :instfs_ids
+        file_metadata[list] ||= {}
+        file_metadata[list][file[:url]] = att.instfs_uuid
       end
     end
 
-    return render json: file_urls_with_uuids.to_json, status: :created if file_urls_with_uuids.present?
+    return render json: file_urls_with_uuids.to_json, status: :ok if file_urls_with_uuids.present?
 
     render json: { errors: [{ "message" => "No valid file URLs given" }] }, status: :unprocessable_entity
   end
