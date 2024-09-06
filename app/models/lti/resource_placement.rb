@@ -55,6 +55,7 @@ module Lti
     PLACEMENTS_BY_MESSAGE_TYPE = {
       LtiAdvantage::Messages::ResourceLinkRequest::MESSAGE_TYPE => %i[
         account_navigation
+        analytics_hub
         assignment_edit
         assignment_group_menu
         assignment_index_menu
