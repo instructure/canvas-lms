@@ -977,6 +977,95 @@ describe ContentMigration do
     end
   end
 
+  describe "#import" do
+    subject { @cm.import!({}) }
+
+    context "when quizzes next import process returns true" do
+      before do
+        allow(@cm)
+          .to receive(:quizzes_next_import_process?)
+          .and_return(true)
+      end
+
+      let(:importer) { instance_double("QuizzesNext::Importers::CourseContentImporter") }
+
+      it "should call QuizzesNext::Importers" do
+        expect(Importers).not_to receive(:content_importer_for)
+        expect_any_instance_of(QuizzesNext::Importers::CourseContentImporter).to receive(:import_content)
+        subject
+      end
+    end
+
+    context "when quizzes next import process returns false" do
+      before do
+        allow(@cm)
+          .to receive(:quizzes_next_import_process?)
+          .and_return(false)
+      end
+
+      let(:importer) { class_double("Importers::CourseContentImporter") }
+
+      it "should not calls QuizzesNext::Importers" do
+        expect(QuizzesNext::Importers::CourseContentImporter)
+          .not_to receive(:new)
+        expect(Importers)
+          .to receive(:content_importer_for)
+          .and_return(importer)
+        expect(importer)
+          .to receive(:import_content)
+
+        subject
+      end
+    end
+  end
+
+  describe "#quizzes_next_import_process?" do
+    subject { @cm.quizzes_next_import_process? }
+
+    it "returns true if cc_qti_migration? is true" do
+      allow(@cm).to receive_messages(cc_qti_migration?: true, quizzes_next_migration?: false)
+      expect(subject).to be true
+    end
+
+    it "returns true if quizzes_next_migration? is true" do
+      allow(@cm).to receive_messages(cc_qti_migration?: false, quizzes_next_migration?: true)
+      expect(subject).to be true
+    end
+
+    it "returns false if cc_qti_migration? and quizzes_next_migration? is false" do
+      allow(@cm).to receive_messages(cc_qti_migration?: false, quizzes_next_migration?: false)
+      expect(subject).to be false
+    end
+  end
+
+  describe "#cc_qti_migration?" do
+    subject { @cm.cc_qti_migration? }
+
+    before do
+      allow(NewQuizzesFeaturesHelper).to receive(:common_cartridge_qti_new_quizzes_import_enabled?).and_return(true)
+      allow(@cm).to receive(:for_common_cartridge?).and_return(true)
+    end
+
+    it "returns true if context is a Course and common_cartridge_qti_new_quizzes_import_enabled? and for_common_cartridge? are true" do
+      expect(subject).to be true
+    end
+
+    it "returns false if context is not a Course" do
+      allow(@cm.context).to receive(:instance_of?).with(Course).and_return(false)
+      expect(subject).to be false
+    end
+
+    it "returns false if common_cartridge_qti_new_quizzes_import_enabled? is false" do
+      allow(NewQuizzesFeaturesHelper).to receive(:common_cartridge_qti_new_quizzes_import_enabled?).and_return(false)
+      expect(subject).to be false
+    end
+
+    it "returns false if for_common_cartridge? is false" do
+      allow(@cm).to receive(:for_common_cartridge?).and_return(false)
+      expect(subject).to be false
+    end
+  end
+
   describe "#import_quizzes_next?" do
     it "returns false when migration_settings[:import_quizzes_next] is false or nil" do
       settings = [false, "false", nil]
@@ -995,154 +1084,32 @@ describe ContentMigration do
     end
   end
 
-  context "Quizzes.Next CC import" do
-    before do
-      allow(@cm.context)
-        .to receive(:feature_enabled?)
-        .with(:quizzes_next)
-        .and_return(true)
-      allow(@cm.migration_settings)
-        .to receive(:[])
-        .with(:import_quizzes_next)
-        .and_return(true)
-    end
-
-    let(:importer) { instance_double("QuizzesNext::Importers::CourseContentImporter") }
-
-    it "calls QuizzesNext::Importers" do
-      expect(@cm.migration_settings)
-        .to receive(:[])
-        .with(:migration_ids_to_import)
-      expect(Importers).not_to receive(:content_importer_for)
-      expect(QuizzesNext::Importers::CourseContentImporter)
-        .to receive(:new).and_return(importer)
-      expect(importer).to receive(:import_content)
-      @cm.import!({})
-    end
-  end
-
-  context "common_cartridge_qti_new_quizzes_import" do
-    let(:importer) { double }
+  describe "#quizzes_next_migration?" do
+    subject { @cm.quizzes_next_migration? }
 
     before do
-      allow(importer)
-        .to receive(:import_content)
-        .with(any_args)
-        .and_return(true)
-      allow(@cm.migration_settings)
-        .to receive(:[])
-        .with("migration_type")
-        .and_return("common_cartridge_importer")
-      allow(QuizzesNext::Importers::CourseContentImporter)
-        .to receive(:new)
-        .with(any_args)
-        .and_return(importer)
+      allow(@cm.context).to receive(:feature_enabled?).with(:quizzes_next).and_return(true)
+      allow(@cm.context).to receive(:instance_of?).with(Course).and_return(true)
+      allow(@cm).to receive(:import_quizzes_next?).and_return(true)
     end
 
-    context "FF enabled" do
-      before do
-        allow(NewQuizzesFeaturesHelper)
-          .to receive(:common_cartridge_qti_new_quizzes_import_enabled?)
-          .with(instance_of(Course))
-          .and_return(true)
-      end
-
-      describe "not Quizzes.Next CC import" do
-        before do
-          allow(@cm.migration_settings)
-            .to receive(:[])
-            .with(:import_quizzes_next)
-            .and_return(false)
-        end
-
-        it "calls QuizzesNext::Importers" do
-          expect(@cm.migration_settings)
-            .to receive(:[])
-            .with(:migration_ids_to_import)
-          expect(Importers).not_to receive(:content_importer_for)
-          expect(QuizzesNext::Importers::CourseContentImporter)
-            .to receive(:new).and_return(importer)
-          expect(importer).to receive(:import_content)
-          @cm.import!({})
-        end
-      end
-
-      describe "Quizzes.Next CC import" do
-        before do
-          allow(@cm.migration_settings)
-            .to receive(:[])
-            .with(:import_quizzes_next)
-            .and_return(true)
-        end
-
-        it "calls QuizzesNext::Importers" do
-          expect(@cm.migration_settings)
-            .to receive(:[])
-            .with(:migration_ids_to_import)
-          expect(Importers).not_to receive(:content_importer_for)
-          expect(QuizzesNext::Importers::CourseContentImporter)
-            .to receive(:new).and_return(importer)
-          expect(importer).to receive(:import_content)
-          @cm.import!({})
-        end
-      end
+    it "returns true if context is a Course, feature_enabled?(:quizzes_next) is true, and import_quizzes_next? is true" do
+      expect(subject).to be true
     end
 
-    context "FF disabled" do
-      before do
-        allow(NewQuizzesFeaturesHelper)
-          .to receive(:common_cartridge_qti_new_quizzes_import_enabled?)
-          .with(instance_of(Course))
-          .and_return(false)
-        allow(Importers)
-          .to receive(:content_importer_for)
-          .with("Course")
-          .and_return(importer)
-      end
+    it "returns false if context is not a Course" do
+      allow(@cm.context).to receive(:instance_of?).with(Course).and_return(false)
+      expect(subject).to be false
+    end
 
-      describe "not Quizzes.Next CC import" do
-        before do
-          allow(@cm.migration_settings)
-            .to receive(:[])
-            .with(:import_quizzes_next)
-            .and_return(false)
-        end
+    it "returns false if feature_enabled?(:quizzes_next) is false" do
+      allow(@cm.context).to receive(:feature_enabled?).with(:quizzes_next).and_return(false)
+      expect(subject).to be false
+    end
 
-        it "does not call QuizzesNext::Importers" do
-          expect(@cm.migration_settings)
-            .to receive(:[])
-            .with(:migration_ids_to_import)
-          expect(Importers).to receive(:content_importer_for)
-          expect(QuizzesNext::Importers::CourseContentImporter)
-            .not_to receive(:new)
-          expect(importer).to receive(:import_content)
-          @cm.import!({})
-        end
-      end
-
-      describe "Quizzes.Next CC import" do
-        before do
-          allow(@cm.context)
-            .to receive(:feature_enabled?)
-            .with(:quizzes_next)
-            .and_return(true)
-          allow(@cm.migration_settings)
-            .to receive(:[])
-            .with(:import_quizzes_next)
-            .and_return(true)
-        end
-
-        it "calls QuizzesNext::Importers" do
-          expect(@cm.migration_settings)
-            .to receive(:[])
-            .with(:migration_ids_to_import)
-          expect(Importers).not_to receive(:content_importer_for)
-          expect(QuizzesNext::Importers::CourseContentImporter)
-            .to receive(:new).and_return(importer)
-          expect(importer).to receive(:import_content)
-          @cm.import!({})
-        end
-      end
+    it "returns false if import_quizzes_next? is false" do
+      allow(@cm).to receive(:import_quizzes_next?).and_return(false)
+      expect(subject).to be false
     end
   end
 
