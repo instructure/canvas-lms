@@ -6460,6 +6460,7 @@ he:
   create_group_set_7fe1cd53: "יצירת אוסף קבוצות"
   create_new_e0946c49: "צור/י חדש"
   create_new_event_e9fb2fb6: "יצירת אירוע חדש"
+  create_rubric_ec33ddf9: "יצירת רובריקה"
   create_slots_71dbb2f8: "יצירת חלונות"
   create_theme_based_on_40651ed3: "יצירת ערכת נושא המבוסס על"
   create_users_view: 
@@ -8560,6 +8561,7 @@ he:
       find_outcome: "חיפוש תוצאות למידה"
   find_outcome_746cc57e: "מציאת תוצאות למידה"
   find_questions_4930b38f: "חיפוש שאלות"
+  find_rubric_98ba2ce: "חיפוש רובריקה"
   finished_19aaf6f5: הסתיים
   finland_1f322b39: פינלנד
   finland_358_abeffc8a: "פינלנד (+358)"
@@ -14082,6 +14084,7 @@ he:
   people_tutorial_tray_a87a6c48: "מגירת מדריך אנשים"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "אנשים יראו שם זה בדיונים, הודעות והערות"
   percent_448ea947: אחוז
+  percent_8b3390db: אחוז
   percent_complete_3a7edc20: "%{percent} הושלם"
   percent_of_respondents_selecting_this_answer_4c2ce4ee: "שעור המגיבים שבחרו תשובה זו"
   percent_of_students_scored_score_53d2c4d5: "%{percent} מהתלמידים קיבלו ציון %{score}"

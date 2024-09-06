@@ -8085,6 +8085,7 @@ fa:
   create_outcome_4dac05a0: "ایجاد نتیجه"
   create_pages_581a4d59: "ایجاد صفحات"
   create_quiz_d08bb72a: "ایجاد آزمون"
+  create_rubric_ec33ddf9: "ایجاد دستورالعمل ارزیابی"
   create_slots_71dbb2f8: "ایجاد بازه ها"
   create_subject_86de5618: "ایجاد موضوع"
   create_theme_based_on_40651ed3: "ایجاد زمینه بر اساس"
@@ -10750,6 +10751,7 @@ fa:
       find_outcome: "یافتن نتیجه"
   find_outcome_746cc57e: "یافتن نتیجه"
   find_questions_4930b38f: "یافتن پرسش ها"
+  find_rubric_98ba2ce: "یافتن دستورالعمل ارزیابی"
   find_training_resources_and_more_help_f148612c: "منابع آموزشی و راهنمایی بیشتر را بیابید"
   find_your_canvas_institution_45af99af: "%{canvas} موسسه ی خود را پیدا کنید"
   find_your_classes_or_subjects_in_the_dashboard_72e1ed47: "کلاس ها یا موضوعات خود را در داشبورد پیدا کنید..."
@@ -17430,6 +17432,7 @@ fa:
   people_tutorial_tray_a87a6c48: "سینی خودآموز افراد"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "افراد این نام را در بحث ها، پیام ها و نظرها خواهند دید."
   percent_448ea947: درصد
+  percent_8b3390db: درصد
   percent_complete_3a7edc20: "%{percent} تکمیل شده"
   percent_complete_a7f6d403: "درصد تکمیل شد"
   percent_complete_e46b6148: "%{percent} درصد کامل"

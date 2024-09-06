@@ -8203,6 +8203,7 @@ hu:
   create_pace_4ff3e9c: "Ütemezés létrehozása"
   create_pages_581a4d59: "Oldalak létrehozása"
   create_quiz_d08bb72a: "Kvíz létrehozása"
+  create_rubric_ec33ddf9: "Értékelőtábla létrehozása"
   create_slots_71dbb2f8: "Időintervallumok létrehozása"
   create_subject_86de5618: "Tárgy létrehozása"
   create_temporary_enrollment_68eff9e8: "Ideiglenes beiratkozás létrehozása"
@@ -11049,6 +11050,7 @@ hu:
       find_outcome: "Tanulási eredmény keresése"
   find_outcome_746cc57e: "Tanulási eredmény keresése"
   find_questions_4930b38f: "Kérdések keresése"
+  find_rubric_98ba2ce: "Értékelőtábla keresése"
   find_training_resources_and_more_help_f148612c: "Keressen képzési forrásokat és további segítséget"
   find_your_canvas_institution_45af99af: "Keresse meg %{canvas} intézményét"
   find_your_classes_or_subjects_in_the_dashboard_72e1ed47: "Keresse meg osztályait vagy tantárgyait a vezérlőpulton..."
@@ -18035,6 +18037,7 @@ hu:
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "A felhasználók ezt a nevet látják a fórumokban, üzenetekben, kommentekben."
   per_student_course_paces_159026d2: "Hallgatónkénti kurzus ütemezés"
   percent_448ea947: százalék
+  percent_8b3390db: Százalék
   percent_af88d1b1: "%{percent}%"
   percent_complete_3a7edc20: "%{percent} kész"
   percent_complete_a7f6d403: "százalék teljesítve"

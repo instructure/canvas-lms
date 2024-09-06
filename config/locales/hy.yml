@@ -5428,6 +5428,7 @@ hy:
     url: "URL հասցե"
   create_new_event_e9fb2fb6: "Ստեղծել նոր միջոցառում"
   create_quiz_d08bb72a: "Ստեղծել ստուգողական աշխատանք"
+  create_rubric_ec33ddf9: "Ստեղծել ռուբրիկ"
   create_users_view: 
     required: "Մուտքագրեք որոշ էլ.փոստի հասցեներ"
   created_by_b39b9c8b: "Ստեղծվել է ___________կողմից"
@@ -7148,6 +7149,7 @@ hy:
       no_rubric_outcomes_found: "Ռուբրիկների կարգաբերմամբ արդյունքներ չեն գտնվել"
     titles: 
       find_outcome: "Արդյունքների որոնում"
+  find_rubric_98ba2ce: "Գտնել ռուբրիկը"
   first_reviewer_9ea05caa: "Առաջին կարծիք ներկայացնող"
   first_two_students_and_others_count_others_bb0a212a: "%{first_two_students} և %{others_count} մյուսները"
   flash_6afbf65a: Flash
@@ -11881,6 +11883,7 @@ hy:
   pending_f1ed53c7: "Սպասվում է"
   people_b4ebb13c: Մարդիկ
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "Այս անունն օգտագործվելու է քննարկումներում, հաղորդագրություններում եւ մեկնաբանություններում:"
+  percent_8b3390db: Տոկոս
   percent_complete_3a7edc20: "%{percent} ավարտված է"
   percent_of_students_scored_score_53d2c4d5: "ունկնդիրների %{percent} հավաքել է %{score}"
   percentage_34ab7c2c: Տոկոս

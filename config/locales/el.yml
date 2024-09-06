@@ -5039,6 +5039,7 @@ el:
   create_failed_15d07ad4: "Η δημιουργία απέτυχε"
   create_group_set_7fe1cd53: "Δημιουργία Σετ Ομάδων"
   create_new_event_e9fb2fb6: "Δημιουργία Νέου Γεγονότος"
+  create_rubric_ec33ddf9: "Δημιουργία Ρουμπρίκας"
   create_users_view: 
     required: "Παρακαλώ, καταχωρίστε μερικές διευθύνσεις ηλεκτρονικού ταχυδρομείου."
   created_by_b39b9c8b: "Δημιουργήθηκε απο τον/την"
@@ -6540,6 +6541,7 @@ el:
       no_rubric_outcomes_found: "Δεν βρέθηκαν Αποτελέσματα Ρυθμισμένα από Ρουμπρίκα"
     titles: 
       find_outcome: "Εύρεση Αποτελέσματος"
+  find_rubric_98ba2ce: "Βρείτε μια Ρουμπρίκα"
   finished_19aaf6f5: Ολοκληρώθηκε
   finland_358_abeffc8a: "Φινλανδία (+358)"
   flash_6afbf65a: Flash
@@ -10643,6 +10645,7 @@ el:
   people_options_cfb419a6: "Επιλογές Ατόμων"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "Το κοινό θα δει αυτό το όνομα σε συζητήσεις, μηνύματα και σχόλια"
   percent_448ea947: ποσοστό
+  percent_8b3390db: Ποσοστό
   percent_complete_3a7edc20: "%{percent} ολοκληρώθηκε"
   percent_of_respondents_selecting_this_answer_4c2ce4ee: "Ποσοστό απαντώντων που επέλεξαν αυτή την απάντηση"
   percent_of_students_scored_score_53d2c4d5: "%{Percent} των σπουδαστών πέτυχαν βαθμολογία %{score}"
