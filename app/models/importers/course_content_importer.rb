@@ -426,7 +426,7 @@ module Importers
     end
 
     def self.post_processing?(migration)
-      migration.quizzes_next_migration?
+      migration.quizzes_next_import_process?
     end
 
     def self.import_syllabus_from_migration(course, syllabus_body, migration)
