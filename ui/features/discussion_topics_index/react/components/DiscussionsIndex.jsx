@@ -45,6 +45,7 @@ import {
 } from './DiscussionBackgrounds'
 import {ConnectedIndexHeader} from './IndexHeader'
 import DiscussionsDeleteModal from './DiscussionsDeleteModal'
+import DisallowThreadedFixAlert from './DisallowThreadedFixAlert'
 
 import {renderTray} from '@canvas/move-item-tray'
 import select from '@canvas/obj-select'
@@ -351,6 +352,7 @@ export default class DiscussionsIndex extends Component {
           <Heading level="h1">{I18n.t('Discussions')}</Heading>
         </ScreenReaderContent>
         <ConnectedIndexHeader />
+        {ENV?.FEATURES?.disallow_threaded_replies_fix_alert && (<DisallowThreadedFixAlert/>)}
         {this.props.isLoadingDiscussions
           ? this.renderSpinner(I18n.t('Loading Discussions'))
           : this.props.permissions.moderate || this.props.DIRECT_SHARE_ENABLED
