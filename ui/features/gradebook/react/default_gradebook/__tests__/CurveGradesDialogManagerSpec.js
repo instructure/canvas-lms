@@ -29,13 +29,14 @@ const I18n = useI18nScope('gradebook')
 const {createCurveGradesAction} = CurveGradesDialogManager
 
 QUnit.module('CurveGradesDialogManager.createCurveGradesAction.isDisabled', {
-  props({points_possible, grades_published, grading_type, submissionsLoaded}) {
+  props({points_possible, grades_published, grading_type, submissionsLoaded, checkpoints}) {
     return [
       {
         // assignment
         points_possible,
         grading_type,
         grades_published,
+        checkpoints,
       },
       [], // students
       {
@@ -48,14 +49,15 @@ QUnit.module('CurveGradesDialogManager.createCurveGradesAction.isDisabled', {
 })
 
 test(
-  'is not disabled when submissions are loaded, grading type is not pass/fail and there are ' +
-    'points that are not 0',
+  'is not disabled when submissions are loaded, grading type is not pass/fail, there are ' +
+    'points that are not 0 and checkpoints is empty',
   function () {
     const props = this.props({
       points_possible: 10,
       grades_published: true,
       grading_type: 'points',
       submissionsLoaded: true,
+      checkpoints: [],
     })
     notOk(createCurveGradesAction(...props).isDisabled)
   }
@@ -87,6 +89,22 @@ test('is disabled when grading type is pass/fail', function () {
     grades_published: true,
     grading_type: 'pass_fail',
     submissionsLoaded: true,
+  })
+  ok(createCurveGradesAction(...props).isDisabled)
+})
+
+test('is disabled when assignment has checkpoints', function () {
+  const props = this.props({
+    checkpoints: [
+      {
+        dueAt: '2024-09-06T23:59:00-06:00',
+        lockAt: '2024-09-06T23:59:00-06:00',
+        name: 'Discussion 1',
+        pointsPossible: 15,
+        tag: 'reply_to_topic',
+        unlockAt: '2024-09-03T00:00:00-06:00',
+      },
+    ],
   })
   ok(createCurveGradesAction(...props).isDisabled)
 })
