@@ -530,4 +530,36 @@ describe DiscussionTopicsApiController do
       expect(topic.reload.read_state(@teacher)).to eq("unread")
     end
   end
+
+  context "migrate_disallow" do
+    before do
+      course_with_teacher(active_all: true)
+      @topic = @course.discussion_topics.create!(title: "discussion", discussion_type: "side_comment")
+      user_session(@teacher)
+    end
+
+    it "should return 404 if feature flag is not turned on" do
+      put "migrate_disallow", params: { course_id: @course.id }
+      expect(response).to be_not_found
+    end
+
+    it "should update the discussion type to 'threaded' if the feature flag is turned on" do
+      allow(Account.site_admin).to receive(:feature_enabled?).and_return(true)
+
+      put "migrate_disallow", params: { course_id: @course.id }
+
+      expect(response).to be_successful
+      expect(@topic.reload.discussion_type).to eq("threaded")
+    end
+
+    it "should not update the discussion type for announcements" do
+      allow(Account.site_admin).to receive(:feature_enabled?).and_return(true)
+      announcement = @course.announcements.create!(title: "announcement", message: "test", discussion_type: "side_comment")
+
+      put "migrate_disallow", params: { course_id: @course.id }
+
+      expect(response).to be_successful
+      expect(announcement.reload.discussion_type).to eq("side_comment")
+    end
+  end
 end
