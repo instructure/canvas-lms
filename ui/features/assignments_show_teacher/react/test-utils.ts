@@ -64,6 +64,9 @@ export function mockAssignment(overrides = {}): TeacherAssignmentType {
       {lid: '2', name: 'module 2'},
     ],
     assignmentGroup: {lid: '1', name: 'assignment group'},
+    peerReviews: {
+      enabled: true,
+    },
     lockInfo: {
       isLocked: false,
     },
@@ -77,6 +80,7 @@ export function mockAssignment(overrides = {}): TeacherAssignmentType {
       nodes: [],
     },
     hasSubmittedSubmissions: false,
+    submissionsDownloads: 0,
     submissions: {
       pageInfo: mockPageInfo(),
       nodes: [],

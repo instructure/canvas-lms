@@ -98,6 +98,10 @@ describe "as a teacher" do
         TeacherViewPageV2.assign_to_button.click
         expect(TeacherViewPageV2.assign_to_tray).to be_displayed
       end
+
+      it "shows options button" do
+        expect(TeacherViewPageV2.options_button).to be_displayed
+      end
     end
 
     context "submitted assignments" do

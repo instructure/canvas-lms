@@ -156,6 +156,7 @@ const AssignmentPublishButton = ({
           ? {minWidth: `${menuWidth}px`, maxWidth: BREAKPOINTS.mobileOnly.maxWidth}
           : undefined
       }
+      withArrow={false}
       trigger={
         <Button
           elementRef={buttonRefCallback}
