@@ -72,5 +72,9 @@ class TeacherViewPageV2
     def assign_to_tray
       f("div[data-testid='item-assign-to-card']")
     end
+
+    def options_button
+      f("button[data-testid='assignment-options-button']")
+    end
   end
 end

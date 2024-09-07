@@ -77,6 +77,9 @@ export const TEACHER_QUERY = gql`
       state
       needsGradingCount
       onlyVisibleToOverrides
+      peerReviews {
+        enabled
+      }
       lockInfo {
         isLocked
       }
@@ -115,6 +118,7 @@ export const TEACHER_QUERY = gql`
         ...AssignmentOverrides
       }
       hasSubmittedSubmissions
+      submissionsDownloads
       submissions: submissionsConnection(
         filter: {states: [submitted, unsubmitted, graded, ungraded, pending_review]}
       ) {

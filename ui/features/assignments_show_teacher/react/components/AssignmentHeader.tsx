@@ -34,6 +34,7 @@ import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/rea
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import OptionsMenu from './OptionsMenu'
 
 const I18n = useI18nScope('assignment_teacher_header')
 
@@ -58,31 +59,29 @@ const AssignmentHeader: React.FC<HeaderProps> = props => {
         justifyItems="space-between"
         id="assignments-2-teacher-header"
       >
-        <Flex
-          direction="column"
-          width={!isMobile ? '40%' : '100%'}
-          alignItems={isMobile ? 'center' : 'start'}
-        >
+        <Flex direction="column" width={!isMobile ? '40%' : '100%'} alignItems="start">
           <Heading data-testid="assignment-name" level="h1">
             {props.assignment.name}
           </Heading>
           <Flex id="submission-status">
             {props.assignment.hasSubmittedSubmissions && (
               <Pill
-                statusLabel={I18n.t('Status')}
                 renderIcon={<IconPublishSolid />}
                 color="success"
-                margin="x-small none"
+                margin={!isMobile ? 'x-small none' : 'medium none none none'}
                 data-testid="assignment-status-pill"
               >
-                <Text>{I18n.t('Published')}</Text>
+                <Text>
+                  <Text weight="bold">{I18n.t('Status')} </Text>
+                  {I18n.t('Published')}
+                </Text>
               </Pill>
             )}
           </Flex>
         </Flex>
         <View
           display={isMobile ? 'block' : 'flex'}
-          margin={isMobile ? 'large none' : 'none'}
+          margin={isMobile ? 'medium none none none' : 'none'}
           width={isMobile ? '100%' : 'auto'}
           id="header-buttons"
         >
@@ -125,6 +124,7 @@ const AssignmentHeader: React.FC<HeaderProps> = props => {
               )}
             </>
           )}
+          <OptionsMenu assignment={props.assignment} breakpoints={props.breakpoints} />
         </View>
       </Flex>
 
