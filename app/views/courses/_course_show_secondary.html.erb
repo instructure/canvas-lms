@@ -16,7 +16,7 @@
   <% end %>
 
   <% if can_do(@context, @current_user, :manage_content, :manage_course_content_add) %>
-  <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_content_migrations_url) %>">
+  <a id="import_existing_content_btn" class="btn button-sidebar-wide" href="<%= context_url(@context, :context_content_migrations_url) %>">
     <i class="icon-import"></i>
     <%= t('links.import', %{Import Existing Content}) %>
   </a>
@@ -31,7 +31,7 @@
     <% end %>
 
     <% if @course_home_view != 'feed' && !@context.elementary_homeroom_course? %>
-    <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_url, :view => 'feed') %>">
+    <a id="view_course_stream_btn" class="btn button-sidebar-wide" href="<%= context_url(@context, :context_url, :view => 'feed') %>">
       <i class="icon-stats"></i>
       <%= t('links.view_course_stream', %{View Course Stream}) %>
     </a>
@@ -75,7 +75,7 @@
 
       <% js_bundle :course_wizard %>
       <% css_bundle :course_wizard %>
-      <a href="#" class="btn button-sidebar-wide wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>">
+      <a id="course_setup_checklist_btn" href="#" class="btn button-sidebar-wide wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>">
         <i class="icon-question"></i> <%= t('links.course_setup', %{Course Setup Checklist}) %>
       </a>
       <% end %>
@@ -119,7 +119,7 @@
     <% end %>
 
     <% if @context_enrollment %>
-    <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_url, :view => 'notifications') %>">
+    <a id="view_course_notifications_btn" class="btn button-sidebar-wide" href="<%= context_url(@context, :context_url, :view => 'notifications') %>">
       <i class="icon-<%= @course_notifications_enabled ? "unmuted" : "muted" %>"></i>
       <%= t('links.view_course_notification_settings', %{View Course Notifications}) %>
     </a>
