@@ -169,7 +169,7 @@ const ForbiddenWordsFileUpload = ({
           body: uploadFileFormData,
         })
 
-      if (uploadStatus !== 200) {
+      if (uploadStatus !== 200 && uploadStatus !== 201) {
         throw new Error('Failed to complete the file upload')
       }
 
