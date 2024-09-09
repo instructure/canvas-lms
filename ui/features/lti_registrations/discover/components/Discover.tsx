@@ -41,6 +41,7 @@ import {breakpoints} from './breakpoints'
 import {useMedia} from 'react-use'
 import {useAppendBreadcrumbsToDefaults} from '@canvas/breadcrumbs/useAppendBreadcrumbsToDefaults'
 import {ZAccountId} from '../../manage/model/AccountId'
+import Disclaimer from './common/Disclaimer'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -234,6 +235,9 @@ export const Discover = () => {
         })
       )}
 
+      <div>
+        <Disclaimer />
+      </div>
       {filterData && (
         <LtiFilterTray
           isTrayOpen={isTrayOpen}

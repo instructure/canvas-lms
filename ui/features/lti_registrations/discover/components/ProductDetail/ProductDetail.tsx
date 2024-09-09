@@ -39,6 +39,7 @@ import LtiDetailModal from './LtiDetailModal'
 import ProductCarousel from '../common/ProductCarousel'
 import ImageCarousel from '../common/ImageCarousel'
 import BadgeCarousel from '../common/BadgeCarousel'
+import Disclaimer from '../common/Disclaimer'
 
 import {openDynamicRegistrationWizard} from '../../../manage/registration_wizard/RegistrationWizardModalState'
 
@@ -285,6 +286,9 @@ const ProductDetail = () => {
           {(excludeCurrentProduct?.length ?? 0) > 0 && (
             <ProductCarousel products={excludeCurrentProduct} companyName={product.company.name} />
           )}
+          <div style={{marginTop: '35px'}}>
+            <Disclaimer />
+          </div>
         </>
       )}
       <LtiDetailModal
