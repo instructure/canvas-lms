@@ -171,7 +171,14 @@ class FilesController < ApplicationController
     api_show api_create_success api_file_status api_update destroy icon_metadata reset_verifier
   ]
   before_action :check_limited_access_contexts, only: %i[index]
-  before_action :check_limited_access_for_students, only: %i[show api_index api_show]
+  before_action :check_limited_access_for_students, only: %i[show api_index]
+  before_action :forbid_api_calls_for_limited_access_students, only: :api_show
+
+  def forbid_api_calls_for_limited_access_students
+    if @current_user&.student_in_limited_access_account? && request.referer.nil?
+      render_unauthorized_action
+    end
+  end
 
   include Api::V1::Attachment
   include Api::V1::Avatar
