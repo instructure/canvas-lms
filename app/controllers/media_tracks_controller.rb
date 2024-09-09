@@ -51,6 +51,10 @@ class MediaTracksController < ApplicationController
 
   TRACK_SETTABLE_ATTRIBUTES = %i[kind locale content].freeze
 
+  def services_jwt_auth_allowed
+    params[:action] == "show" && Account.site_admin.feature_enabled?(:rce_linked_file_urls)
+  end
+
   # @API List media tracks for a Media Object or Attachment
   #
   # List the media tracks associated with a media object or attachment
