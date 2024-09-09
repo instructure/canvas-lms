@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useContext} from 'react'
+import React, {useContext, useState} from 'react'
 import {UploadFile, type UploadFilePanelId} from '@instructure/canvas-rce'
 import {prepEmbedSrc} from '@instructure/canvas-rce/es/common/fileUrl'
 import {RCSPropsContext} from '../../../Contexts'
@@ -85,6 +85,8 @@ export const AddImageModal = ({
 }: AddImageModalProps) => {
   const trayProps = useContext(RCSPropsContext)
 
+  const [uploading, setUploading] = useState(false)
+
   // UploadFile calls onSubmit with 5 separate args, not a destructed object
   // so even though we never use editor/accept, we must include them
   const handleSubmit = async (
@@ -94,7 +96,9 @@ export const AddImageModal = ({
     uploadData: UploadData,
     storeProps: StoreProp
   ) => {
+    setUploading(true)
     const url = await handleImageSubmit(selectedPanel, uploadData, storeProps)
+    setUploading(false)
     const alt = uploadData?.imageOptions?.isDecorativeImage
       ? ''
       : uploadData?.imageOptions?.altText || ''
@@ -116,6 +120,7 @@ export const AddImageModal = ({
       onSubmit={handleSubmit}
       forBlockEditorUse={true}
       canvasOrigin={trayProps?.canvasOrigin}
+      uploading={uploading}
     />
   ) : null
 }

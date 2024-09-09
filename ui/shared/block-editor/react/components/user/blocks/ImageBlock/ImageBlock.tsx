@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useRef, useState} from 'react'
+import React, {CSSProperties, useCallback, useEffect, useRef, useState} from 'react'
 import {useEditor, useNode, type Node} from '@craftjs/core'
 
 import {Img} from '@instructure/ui-img'
@@ -25,6 +25,7 @@ import {ImageBlockToolbar} from './ImageBlockToolbar'
 import {useClassNames} from '../../../../utils'
 import {type ImageBlockProps, type ImageVariant, type ImageConstraint} from './types'
 import {BlockResizer} from '../../../editor/BlockResizer'
+import {Spinner} from '@instructure/ui-spinner'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -59,6 +60,11 @@ const ImageBlock = ({
   // in preview mode, node.dom is null, so use a ref to the element
   const [blockRef, setBlockRef] = useState<HTMLDivElement | null>(null)
   const imgRef = useRef<HTMLImageElement | null>(null)
+  const loadingStyle = {
+    position: 'absolute',
+    left: 'calc(50% - 24px)',
+    top: 'calc(50% - 24px)',
+  } as CSSProperties
 
   const setSize = useCallback(() => {
     if (!blockRef) return
@@ -151,13 +157,22 @@ const ImageBlock = ({
           setBlockRef(el)
         }}
       >
-        <Img
-          elementRef={el => (imgRef.current = el as HTMLImageElement)}
-          display="inline-block"
-          src={src || ImageBlock.craft.defaultProps.src}
-          constrain={imgConstrain}
-          alt={alt || ''}
-        />
+        <div style={{position: 'relative'}}>
+          {!imgRef?.current?.complete ? (
+            <div style={loadingStyle}>
+              <Spinner renderTitle={I18n.t('Loading')} size="small" />
+            </div>
+          ) : null}
+          <div style={!imgRef?.current?.complete ? {opacity: '0.2'} : {}}>
+            <Img
+              elementRef={el => (imgRef.current = el as HTMLImageElement)}
+              display="inline-block"
+              src={src || ImageBlock.craft.defaultProps.src}
+              constrain={imgConstrain}
+              alt={alt || ''}
+            />
+          </div>
+        </div>
       </div>
     )
   }

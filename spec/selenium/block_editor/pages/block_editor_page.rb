@@ -130,7 +130,7 @@ module BlockEditorPage
   end
 
   def image_block_image
-    f(".block.image-block > img")
+    f(".block.image-block img")
   end
 
   def image_block_upload_button
