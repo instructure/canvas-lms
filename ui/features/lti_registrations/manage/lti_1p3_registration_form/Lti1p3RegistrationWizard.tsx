@@ -31,6 +31,7 @@ import {Text} from '@instructure/ui-text'
 import {PrivacyConfirmationWrapper} from './components/PrivacyConfirmationWrapper'
 import {RegistrationModalBody} from '../registration_wizard/RegistrationModalBody'
 import {OverrideURIsConfirmation} from './components/OverrideURIsConfirmation'
+import {NamingConfirmationWrapper} from './components/NamingConfirmationWrapper'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -128,6 +129,23 @@ export const Lti1p3RegistrationWizard = (props: Lti1p3RegistrationWizardProps) =
         />
       )
     case 'Naming':
+      return (
+        // TODO: Handle the case where the internal config is undefined and allow for manual configuration
+        <>
+          <NamingConfirmationWrapper
+            config={internalConfiguration!}
+            overlayStore={store.state.overlayStore}
+          />
+          <Modal.Footer>
+            <Button onClick={() => store.setStep('OverrideURIs')} margin="small">
+              {I18n.t('Previous')}
+            </Button>
+            <Button onClick={() => store.setStep('Icons')} color="primary" margin="small">
+              {I18n.t('Next')}
+            </Button>
+          </Modal.Footer>
+        </>
+      )
     case 'Icons':
     case 'Review':
       return (
@@ -136,7 +154,7 @@ export const Lti1p3RegistrationWizard = (props: Lti1p3RegistrationWizardProps) =
             <Text>TODO: Implement the rest of the steps</Text>
           </RegistrationModalBody>
           <Modal.Footer>
-            <Button onClick={() => store.setStep('OverrideURIs')} margin="small">
+            <Button onClick={() => store.setStep('Naming')} margin="small">
               {I18n.t('Previous')}
             </Button>
           </Modal.Footer>
