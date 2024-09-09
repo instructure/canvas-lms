@@ -270,6 +270,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     expect(@topic.is_section_specific).to be false
     expect(@topic.delayed_post_at).to eq delayed_post_at
     expect(@topic.lock_at).to eq lock_at
+    expect(@topic.editor).to eq @teacher
   end
 
   context "attachments" do
