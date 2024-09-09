@@ -1097,35 +1097,39 @@ describe "Files API", type: :request do
       @file_path_options = { controller: "files", action: "api_show", format: "json", id: @att.id.to_param }
     end
 
+    def attachment_json
+      {
+        "id" => @att.id,
+        "uuid" => @att.uuid,
+        "folder_id" => @att.folder_id,
+        "url" => file_download_url(@att, verifier: @att.uuid, download: "1", download_frd: "1"),
+        "content-type" => "image/png",
+        "display_name" => "test-frd.png",
+        "filename" => @att.filename,
+        "size" => @att.size,
+        "unlock_at" => nil,
+        "locked" => false,
+        "hidden" => false,
+        "lock_at" => nil,
+        "locked_for_user" => false,
+        "hidden_for_user" => false,
+        "created_at" => @att.created_at.as_json,
+        "updated_at" => @att.updated_at.as_json,
+        "upload_status" => "success",
+        "thumbnail_url" => thumbnail_image_url(@att, @att.uuid, host: "www.example.com"),
+        "modified_at" => @att.modified_at.as_json,
+        "mime_class" => @att.mime_class,
+        "media_entry_id" => @att.media_entry_id,
+        "canvadoc_session_url" => nil,
+        "crocodoc_session_url" => nil,
+        "category" => "uncategorized",
+        "visibility_level" => @att.visibility_level
+      }
+    end
+
     it "returns expected json" do
       json = api_call(:get, @file_path, @file_path_options, {})
-      expect(json).to eq({
-                           "id" => @att.id,
-                           "uuid" => @att.uuid,
-                           "folder_id" => @att.folder_id,
-                           "url" => file_download_url(@att, verifier: @att.uuid, download: "1", download_frd: "1"),
-                           "content-type" => "image/png",
-                           "display_name" => "test-frd.png",
-                           "filename" => @att.filename,
-                           "size" => @att.size,
-                           "unlock_at" => nil,
-                           "locked" => false,
-                           "hidden" => false,
-                           "lock_at" => nil,
-                           "locked_for_user" => false,
-                           "hidden_for_user" => false,
-                           "created_at" => @att.created_at.as_json,
-                           "updated_at" => @att.updated_at.as_json,
-                           "upload_status" => "success",
-                           "thumbnail_url" => thumbnail_image_url(@att, @att.uuid, host: "www.example.com"),
-                           "modified_at" => @att.modified_at.as_json,
-                           "mime_class" => @att.mime_class,
-                           "media_entry_id" => @att.media_entry_id,
-                           "canvadoc_session_url" => nil,
-                           "crocodoc_session_url" => nil,
-                           "category" => "uncategorized",
-                           "visibility_level" => @att.visibility_level
-                         })
+      expect(json).to eq(attachment_json)
     end
 
     it "works with a context path" do
@@ -1368,6 +1372,24 @@ describe "Files API", type: :request do
 
         it "sets a preview url" do
           expect(subject["preview_url"]).not_to be_nil
+        end
+      end
+
+      context "enrolled in limited access account" do
+        before do
+          @course.account.root_account.enable_feature!(:allow_limited_access_for_students)
+          @course.account.settings[:enable_limited_access_for_students] = true
+          @course.account.save!
+        end
+
+        it "renders unauthorized if called via API" do
+          api_call(:get, @file_path, @file_path_options, {})
+          expect(response).to have_http_status :unauthorized
+        end
+
+        it "returns expected json if called from UI" do
+          json = api_call(:get, @file_path, @file_path_options, {}, { "HTTP_REFERER" => "https://rspec.instructure.com" })
+          expect(json).to eq(attachment_json)
         end
       end
     end
