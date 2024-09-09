@@ -2909,6 +2909,7 @@ hu:
   already_belongs_to_an_assignment_override_99fc6f36: "már egy hozzárendelés felülbírálásához tartozik"
   already_have_a_canvas_account_c4368ac9: "Már van Canvas-fiókja?"
   also_note_that_microsoft_teams_is_unable_to_suppor_5b3c65e1: "Vegye figyelembe azt is, hogy a Microsoft Teams nem tudja támogatni azokat a kurzusokat, amelyeknél több mint %{max_enrollments} vagy több mint %{max_owners} tulajdonos. Ha a kurzus túllépi ezeket a határokat, a szinkronizálás valószínűleg megszakad."
+  alt_text_611fb322: "Alternatív szöveg"
   alumno_88c80e37: Alumnus
   always_3a59e701: Mindig
   always_include_dates_1ae2935e: "Mindig tartalmazza a dátumokat"
