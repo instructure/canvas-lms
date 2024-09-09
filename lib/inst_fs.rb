@@ -265,8 +265,8 @@ module InstFS
       json_response["success"][0]["id"]
     end
 
-    def duplicate_file(instfs_uuid, tenant_auth: nil)
-      token = duplicate_file_jwt(instfs_uuid, tenant_auth:)
+    def duplicate_file(instfs_uuid, new_tenant_auth: nil, tenant_auth: nil)
+      token = duplicate_file_jwt(instfs_uuid, new_tenant_auth:, tenant_auth:)
       url = "#{app_host}/files/#{instfs_uuid}/duplicate?token=#{token}"
 
       response = CanvasHttp.post(url)
@@ -473,11 +473,12 @@ module InstFS
                   SHORT_JWT_EXPIRATION)
     end
 
-    def duplicate_file_jwt(instfs_uuid, tenant_auth: nil)
+    def duplicate_file_jwt(instfs_uuid, new_tenant_auth: nil, tenant_auth: nil)
       jwt_contents = {
         iat: Time.now.utc.to_i,
         resource: "/files/#{instfs_uuid}/duplicate"
       }
+      jwt_contents[:new_tenant_auth] = new_tenant_auth if new_tenant_auth.present?
       jwt_contents[:tenant_auth] = tenant_auth if tenant_auth.present?
       service_jwt(jwt_contents, SHORT_JWT_EXPIRATION)
     end

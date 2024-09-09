@@ -70,10 +70,10 @@ module AttachmentHelper
     return false unless params[:instfs_id] && Account.site_admin.feature_enabled?(:rce_linked_file_urls)
 
     parsed_file_url = Rails.application.routes.recognize_path(resource)
-    file_id = parsed_file_url[:id] || parsed_file_url[:attachment_id] || parsed_file_url[:file_id]
-    return false unless file_id == params[:id]
+    file_id = parsed_file_url[:attachment_id] || parsed_file_url[:file_id] || parsed_file_url[:id]
+    return false unless file_id == (params[:attachment_id] || params[:file_id] || params[:id])
 
-    attachment.instfs_uuid = params[:instfs_id]
+    attachment.instfs_uuid = params[:instfs_id] if params[:instfs_id]
     attachment.instfs_tenant_auth = tenant_auth
     # TODO: One day it would be good if InstFS owned the Canvadoc/Studio file previews and we could use the
     # preview URL without having to ask InstFS if the file is linked to the tenant_auth location, but for now,
@@ -81,7 +81,7 @@ module AttachmentHelper
     metadata = InstFS.get_file_metadata(attachment)
     metadata.present?
   rescue ActionController::RoutingError, InstFS::MetadataError
-    nil
+    false
   end
 
   def attachment_locked?(attachment)
@@ -108,7 +108,7 @@ module AttachmentHelper
     if params[:attachment_id].present?
       @attachment = Attachment.find_by(id: params[:attachment_id])
       @attachment = @attachment.context.attachments.find(params[:attachment_id]) if @attachment&.deleted?
-      return render_unauthorized_action if @attachment&.deleted?
+      return render_unauthorized_action if @attachment&.deleted? && !(@instfs_verified_token ||= ensure_token_resource_link(@token, @attachment))
       return render_unauthorized_action unless @attachment&.media_entry_id
 
       # Look on active shard
@@ -137,6 +137,8 @@ module AttachmentHelper
   end
 
   def access_allowed(attachment, user, access_type)
+    return true if @instfs_verified_token ||= ensure_token_resource_link(@token, attachment)
+
     if params[:verifier]
       verifier_checker = Attachments::Verification.new(attachment)
       return true if verifier_checker.valid_verifier_for_permission?(params[:verifier], access_type, session)
