@@ -1769,6 +1769,14 @@ describe User do
       expect(@user.reload.avatar_image_url).to be_nil
     end
 
+    it "does not remove avatar when updating only the state" do
+      @user_w_avatar = User.create! avatar_image_url: "test_url"
+
+      @user_w_avatar.avatar_image = { "state" => "reported" }
+      @user_w_avatar.save!
+      expect(@user_w_avatar.reload.avatar_image_url).to eq "test_url"
+    end
+
     it "returns a useful avatar_fallback_url" do
       allow(HostUrl).to receive(:protocol).and_return("https")
 
