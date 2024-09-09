@@ -58,12 +58,7 @@ export type Lti1p3RegistrationOverlayState = {
     nickname?: string
     description?: string
     notes?: string
-    placements: Record<
-      LtiPlacement,
-      {
-        name?: string
-      }
-    >
+    placements: Record<LtiPlacement, string>
   }
   icons: {
     placements: Record<
@@ -88,6 +83,9 @@ export interface Lti1p3RegistrationOverlayActions {
   setCustomFields: (customFields: string) => void
   setOverrideURI: (placement: LtiPlacement, uri: string) => void
   setMessageType: (placement: LtiPlacement, messageType: LtiMessageType) => void
+  setAdminNickname: (nickname: string) => void
+  setDescription: (description: string) => void
+  setPlacementLabel: (placement: LtiPlacement, name: string) => void
   toggleScope: (scope: LtiScope) => void
   setPrivacyLevel: (privacyLevel: LtiPrivacyLevel) => void
   togglePlacement: (placement: LtiPlacement) => void
@@ -170,6 +168,23 @@ export const createLti1p3RegistrationOverlayStore = (internalConfig: InternalLti
     setCustomFields: customFields => set(updateLaunchSetting('customFields', customFields)),
     setOverrideURI: (placement, uri) => set(updateOverrideURI(placement, uri)),
     setMessageType: (placement, messageType) => set(updateMessageType(placement, messageType)),
+    setAdminNickname: nickname =>
+      set(updateState(state => ({...state, naming: {...state.naming, nickname}}))),
+    setDescription: description =>
+      set(updateState(state => ({...state, naming: {...state.naming, description}}))),
+    setPlacementLabel: (placement, name) =>
+      set(
+        updateState(state => ({
+          ...state,
+          naming: {
+            ...state.naming,
+            placements: {
+              ...state.naming.placements,
+              [placement]: name,
+            },
+          },
+        }))
+      ),
     toggleScope: scope => {
       set(
         updateState(state => {
@@ -282,10 +297,10 @@ const initialOverlayStateFromInternalConfig = (
       description: '',
       notes: '',
       placements:
-        internalConfig.placements.reduce<Record<LtiPlacement, {name: string}>>((acc, p) => {
-          acc[p.placement] = {name: p.text ?? internalConfig.title}
+        internalConfig.placements.reduce((acc, p) => {
+          acc[p.placement] = p.text ?? internalConfig.title
           return acc
-        }, {} as Record<LtiPlacement, {name: string}>) ?? [],
+        }, {} as Record<LtiPlacement, string>) ?? [],
     },
     icons: {
       placements: internalConfig.placements.reduce<Record<LtiPlacement, {icon_url?: string}>>(

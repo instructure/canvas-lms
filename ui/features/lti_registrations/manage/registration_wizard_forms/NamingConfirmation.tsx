@@ -24,24 +24,31 @@ import {TextArea} from '@instructure/ui-text-area'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import React from 'react'
+import type {LtiPlacement} from '../model/LtiPlacement'
+import {i18nLtiPlacement} from '../model/i18nLtiPlacement'
 import htmlEscape from '@instructure/html-escape'
-import type {RegistrationOverlayStore} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
-import {useOverlayStore} from '../hooks/useOverlayStore'
-import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
-import {usePlacements} from '../hooks/usePlacements'
-import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
 
 const I18n = useI18nScope('lti_registration.wizard')
 
 export type NamingConfirmationProps = {
-  registration: LtiImsRegistration
-  overlayStore: RegistrationOverlayStore
+  toolName: string
+  adminNickname?: string
+  onUpdateAdminNickname: (value: string) => void
+  description?: string
+  onUpdateDescription: (value: string) => void
+  placements: {placement: LtiPlacement; label: string}[]
+  onUpdatePlacementLabel: (placement: LtiPlacement, value: string) => void
 }
 
-export const NamingConfirmation = ({registration, overlayStore}: NamingConfirmationProps) => {
-  const [overlayState, actions] = useOverlayStore(overlayStore)
-  const placements = usePlacements(registration)
-
+export const NamingConfirmation = ({
+  toolName,
+  adminNickname,
+  onUpdateAdminNickname,
+  description,
+  onUpdateDescription,
+  placements,
+  onUpdatePlacementLabel,
+}: NamingConfirmationProps) => {
   return (
     <Flex direction="column">
       <>
@@ -51,7 +58,7 @@ export const NamingConfirmation = ({registration, overlayStore}: NamingConfirmat
         <Text
           dangerouslySetInnerHTML={{
             __html: I18n.t('Choose a nickname for *%{toolName}*.', {
-              toolName: htmlEscape(registration.client_name),
+              toolName: htmlEscape(toolName),
               wrapper: ['<strong>$1</strong>'],
             }),
           }}
@@ -59,8 +66,8 @@ export const NamingConfirmation = ({registration, overlayStore}: NamingConfirmat
         <View margin="medium 0 0 0" as="div">
           <TextInput
             renderLabel={I18n.t('Administration Nickname')}
-            value={overlayState.adminNickname ?? registration.client_name}
-            onChange={(_, value) => actions.updateAdminNickname(value)}
+            value={adminNickname}
+            onChange={(_, value) => onUpdateAdminNickname(value)}
           />
           <Text size="small">
             {I18n.t("The nickname will always appear next to the App's name")}
@@ -79,13 +86,9 @@ export const NamingConfirmation = ({registration, overlayStore}: NamingConfirmat
               )}
             </Text>
           }
-          value={
-            overlayState.registration.description ??
-            registration.default_configuration.description ??
-            ''
-          }
+          value={description}
           onChange={e => {
-            actions.updateDescription(e.target.value)
+            onUpdateDescription(e.target.value)
           }}
         />
       </View>
@@ -97,17 +100,12 @@ export const NamingConfirmation = ({registration, overlayStore}: NamingConfirmat
           <Text>{I18n.t('Choose a name override for each placement (optional).')}</Text>
           <Flex direction="column" gap="medium" margin="medium 0 medium 0">
             {placements.map(placement => {
-              const overlayPlacement = overlayState.registration.placements?.find(
-                p => p.type === placement
-              )
               return (
-                <TextInput
-                  key={placement}
-                  renderLabel={i18nLtiPlacement(placement)}
-                  value={overlayPlacement?.label ?? ''}
-                  onChange={(_, value) =>
-                    actions.updatePlacement(placement)(p => ({...p, label: value}))
-                  }
+                <MemoPlacementLabelInput
+                  key={placement.placement}
+                  placement={placement.placement}
+                  label={placement.label}
+                  onChange={onUpdatePlacementLabel}
                 />
               )
             })}
@@ -117,3 +115,23 @@ export const NamingConfirmation = ({registration, overlayStore}: NamingConfirmat
     </Flex>
   )
 }
+
+const MemoPlacementLabelInput = React.memo(
+  ({
+    placement,
+    label,
+    onChange,
+  }: {
+    placement: LtiPlacement
+    label: string
+    onChange: (placement: LtiPlacement, value: string) => void
+  }) => {
+    return (
+      <TextInput
+        renderLabel={i18nLtiPlacement(placement)}
+        value={label}
+        onChange={(_, value) => onChange(placement, value)}
+      />
+    )
+  }
+)
