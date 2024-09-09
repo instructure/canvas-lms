@@ -168,6 +168,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
       )
     end
 
+    discussion_topic.editor = current_user
     return errors_for(discussion_topic) unless discussion_topic.save!
 
     if input.key?(:ungraded_discussion_overrides)
