@@ -107,6 +107,7 @@ export interface UploadFileProps {
   panels?: UploadFilePanelId[]
   requireA11yAttributes?: boolean
   forBlockEditorUse?: boolean
+  uploading?: boolean
   trayProps?: object
   canvasOrigin?: string
   preselectedFile?: File // a JS File
@@ -120,6 +121,7 @@ export function UploadFile({
   onDismiss,
   requireA11yAttributes = true,
   forBlockEditorUse = false,
+  uploading = false,
   trayProps,
   canvasOrigin,
   onSubmit = handleSubmit,
@@ -167,6 +169,7 @@ export function UploadFile({
           modalBodyHeight={modalBodyHeight}
           requireA11yAttributes={requireA11yAttributes}
           forBlockEditorUse={forBlockEditorUse}
+          uploading={uploading}
         />
       )}
     </StoreProvider>
