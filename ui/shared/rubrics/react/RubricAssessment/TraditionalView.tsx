@@ -37,7 +37,7 @@ import {LongDescriptionModal} from './LongDescriptionModal'
 import {Link} from '@instructure/ui-link'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
-const {licorice, tiara} = colors
+const {shamrock, tiara} = colors
 
 type TraditionalViewProps = {
   criteria: RubricCriterion[]
@@ -375,7 +375,7 @@ const CriterionRow = ({
                       padding="0"
                       margin="0"
                       themeOverride={{
-                        borderColorBrand: licorice,
+                        borderColorBrand: shamrock,
                         borderColorPrimary: primaryBorderColor,
                       }}
                     >
@@ -396,7 +396,7 @@ const CriterionRow = ({
                         onClick={() => onClickRating(rating.id)}
                         themeOverride={{
                           borderWidthSmall: '0.125rem',
-                          borderColorBrand: licorice,
+                          borderColorBrand: shamrock,
                           borderColorPrimary: 'transparent',
                         }}
                         data-testid={`traditional-criterion-${criterion.id}-ratings-${index}`}
@@ -447,7 +447,7 @@ const CriterionRow = ({
                                     left: '50%',
                                     borderLeft: '12px solid transparent',
                                     borderRight: '12px solid transparent',
-                                    borderBottom: `12px solid ${licorice}`,
+                                    borderBottom: `12px solid ${shamrock}`,
                                     transform: 'translateX(-50%)',
                                   }}
                                 />
