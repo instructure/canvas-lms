@@ -3236,6 +3236,7 @@ nn:
   already_belongs_to_an_assignment_override_99fc6f36: "Tilhøyrer allereie til ei overstyring av oppgåve"
   already_have_a_canvas_account_c4368ac9: "Har du allereie ein Canvas brukar?"
   also_note_that_microsoft_teams_is_unable_to_suppor_5b3c65e1: "Merk at Microsoft Teams ikkje støttar emner med meir enn %{max_enrollments} påmeldingar, eller meir enn %{max_owners} eigarar. Dersom emnet overstig grensene vil synkroniseringa verte avbroten."
+  alt_text_611fb322: "Alternativ tekst"
   alumno_88c80e37: Alumn
   always_3a59e701: Alltid
   always_include_dates_1ae2935e: "Inkluder alltid datoar"
