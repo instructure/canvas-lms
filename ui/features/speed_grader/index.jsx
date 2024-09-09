@@ -22,7 +22,6 @@ import ReactDOM from 'react-dom'
 import {captureException} from '@sentry/browser'
 import {Spinner} from '@instructure/ui-spinner'
 import ready from '@instructure/ready'
-import {getCurrentTheme} from '@instructure/theme-registry'
 
 import {getAssignment} from './queries/assignmentQuery'
 import {getCourse} from './queries/courseQuery'
@@ -58,7 +57,6 @@ const I18n = useI18nScope('speed_grader')
 ready(() => {
   // The feature must be enabled AND we must be handed the speedgrader platform URL
   if (window.ENV.FEATURES.platform_service_speedgrader && window.REMOTES?.speedgrader) {
-    const theme = getCurrentTheme()
     const mountPoint = document.querySelector('#react-router-portals')
     const params = new URLSearchParams(window.location.search)
     const postMessageAliases = {
@@ -71,7 +69,6 @@ ready(() => {
     import('speedgrader/appInjector')
       .then(module => {
         module.render(mountPoint, {
-          theme,
           queryFns: {
             getAssignment,
             getAssignmentsByCourseId,
@@ -108,6 +105,8 @@ ready(() => {
             emojisDenyList: window.ENV.EMOJI_DENY_LIST ? window.ENV.EMOJI_DENY_LIST.split(',') : [],
             mediaSettings: window.INST.kalturaSettings,
             lang: window.navigator.language || ENV.LOCALE || ENV.BIGEASY_LOCALE,
+            themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES,
+            useHighContrast: window.ENV.use_high_contrast,
           },
           features: {
             extendedSubmissionState: window.ENV.FEATURES.extended_submission_state,
