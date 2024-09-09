@@ -189,17 +189,6 @@ new_quiz_deleted_workflow_restore_pending_review_state:
       state: allowed_on # enable for local development
     test:
       state: allowed_on # enable for the deployed 'test' environment
-individual_gradebook_enhancements:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Individual Gradebook Enhancements
-  description: This feature introduces performance and maintenance enhancements
-    to Individual Gradebook
-  environments:
-    ci:
-      state: allowed_on # enable for automated testings builds and local testing
-    development:
-      state: allowed_on # enable for local development
 hide_zero_point_quizzes_option:
   state: hidden
   applies_to: SiteAdmin
