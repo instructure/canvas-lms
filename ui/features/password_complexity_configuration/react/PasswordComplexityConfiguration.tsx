@@ -344,6 +344,7 @@ const PasswordComplexityConfiguration = () => {
               onCustomForbiddenWordsEnabledChange={handleCustomForbiddenWordsEnabledChange}
               currentAttachmentId={currentAttachmentId}
               passwordPolicyHashExists={passwordPolicyHashExists}
+              setCurrentAttachmentId={setCurrentAttachmentId}
             />
 
             <View as="div" margin="medium medium small medium">
