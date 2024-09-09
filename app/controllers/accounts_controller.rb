@@ -962,8 +962,8 @@ class AccountsController < ApplicationController
       unless account_settings.empty?
         if @account.grants_right?(@current_user, session, :manage_account_settings)
           if account_settings[:settings]
-            if @account.root_account? && @account.feature_enabled?(:password_complexity) && !@account.site_admin?
-              policy_settings = account_settings[:settings][:password_policy].slice(*permitted_password_policy_settings)
+            if @account.password_complexity_enabled? && (policy_settings = account_settings[:settings][:password_policy])
+              policy_settings = policy_settings.slice(*permitted_password_policy_settings)
 
               %w[minimum_character_length maximum_login_attempts].each do |setting|
                 next unless policy_settings.key?(setting)
