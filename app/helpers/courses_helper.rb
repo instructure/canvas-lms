@@ -124,8 +124,8 @@ module CoursesHelper
     end
   end
 
-  def skip_custom_role?(cr)
-    cr[:count] == 0 && cr[:workflow_state] == "inactive"
+  def skip_custom_role?(custom_role)
+    custom_role[:count] == 0 && custom_role[:workflow_state] == "inactive"
   end
 
   def user_type(course, user, enrollments = nil)
@@ -140,6 +140,7 @@ module CoursesHelper
 
     type
   end
+
   module_function :user_type
 
   def why_cant_i_enable_master_course(course)
@@ -197,10 +198,15 @@ module CoursesHelper
   end
 
   def get_courses_params(table, col, params)
-    params.permit(:cc_sort, :cc_order, :pc_sort, :pc_order, :fc_sort, :fc_order).merge({
-                                                                                         "#{table}_sort": col,
-                                                                                         "#{table}_order": get_sorting_order(col, params[:cc_sort], params[:cc_order]),
-                                                                                         focus: table
-                                                                                       })
+    sort = "#{table}_sort"
+    order = "#{table}_order"
+
+    params
+      .permit(:cc_sort, :cc_order, :pc_sort, :pc_order, :fc_sort, :fc_order)
+      .merge(
+        sort => col,
+        order => get_sorting_order(col, params[sort], params[order]),
+        :focus => table
+      )
   end
 end
