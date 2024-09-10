@@ -1031,7 +1031,8 @@ class GradebooksController < ApplicationController
 
     return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
 
-    if @context.feature_enabled?(:platform_service_speedgrader) && (params[:platform_sg].nil? || value_to_boolean(params[:platform_sg]))
+    platform_service_speedgrader_enabled = @context.feature_enabled?(:platform_service_speedgrader)
+    if platform_service_speedgrader_enabled && (params[:platform_sg].nil? || value_to_boolean(params[:platform_sg]))
       @page_title = t("SpeedGrader")
       @body_classes << "full-width padless-content"
 
@@ -1041,6 +1042,7 @@ class GradebooksController < ApplicationController
         GRADE_BY_QUESTION_SUPPORTED: nil,
         EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
         EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
+        PLATFORM_SERVICE_SPEEDGRADER_ENABLED: platform_service_speedgrader_enabled,
       }
       js_env(env)
 
@@ -1077,6 +1079,7 @@ class GradebooksController < ApplicationController
         @outer_frame = true
         log_asset_access(["speed_grader", @context], "grades", "other")
         env = {
+          PLATFORM_SERVICE_SPEEDGRADER_ENABLED: platform_service_speedgrader_enabled,
           SINGLE_NQ_SESSION_ENABLED: Account.site_admin.feature_enabled?(:single_new_quiz_session_in_speedgrader),
           NQ_GRADE_BY_QUESTION_ENABLED: Account.site_admin.feature_enabled?(:new_quizzes_grade_by_question_in_speedgrader),
           GRADE_BY_QUESTION: !!@current_user.preferences[:enable_speedgrader_grade_by_question],

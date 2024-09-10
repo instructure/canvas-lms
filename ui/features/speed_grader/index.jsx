@@ -56,7 +56,7 @@ const I18n = useI18nScope('speed_grader')
 
 ready(() => {
   // The feature must be enabled AND we must be handed the speedgrader platform URL
-  if (window.ENV.FEATURES.platform_service_speedgrader && window.REMOTES?.speedgrader) {
+  if (window.ENV.PLATFORM_SERVICE_SPEEDGRADER_ENABLED && window.REMOTES?.speedgrader) {
     const mountPoint = document.querySelector('#react-router-portals')
     const params = new URLSearchParams(window.location.search)
     const postMessageAliases = {
