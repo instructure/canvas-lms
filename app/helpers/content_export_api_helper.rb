@@ -69,7 +69,7 @@ module ContentExportApiHelper
     tz_identifier = ActiveSupport::TimeZone::MAPPING[Time.zone.name]
     export.settings[:user_time_zone] = tz_identifier if tz_identifier.present?
     if export.save
-      export.queue_api_job(opts) unless export.waiting_for_external_tool?
+      export.queue_api_job(opts)
     end
     export
   end
