@@ -34,6 +34,7 @@ module Types
       object.last?
     end
 
+    field :is_closed, Boolean, null: false
     field :start_date, DateTimeType, null: true
     field :end_date, DateTimeType, null: true
     field :close_date, DateTimeType, <<~MD, null: true

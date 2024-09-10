@@ -105,6 +105,7 @@ ready(() => {
             emojisDenyList: window.ENV.EMOJI_DENY_LIST ? window.ENV.EMOJI_DENY_LIST.split(',') : [],
             mediaSettings: window.INST.kalturaSettings,
             lang: window.navigator.language || ENV.LOCALE || ENV.BIGEASY_LOCALE,
+            currentUserIsAdmin: ENV.current_user_is_admin,
             themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES,
             useHighContrast: window.ENV.use_high_contrast,
           },

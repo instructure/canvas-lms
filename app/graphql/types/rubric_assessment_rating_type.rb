@@ -26,6 +26,7 @@ module Types
     field :_id, ID, "legacy canvas id", method: :id, null: true
 
     field :comments, String, null: true
+    field :comments_enabled, Boolean, null: false
     field :comments_html, String, null: true
     field :artifact_attempt, Integer, null: false
     def artifact_attempt

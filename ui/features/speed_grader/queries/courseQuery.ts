@@ -31,6 +31,12 @@ const QUERY = gql`
           name
         }
       }
+      gradingPeriodsConnection {
+        nodes {
+          id: _id
+          isClosed
+        }
+      }
     }
   }
 `
@@ -65,8 +71,17 @@ function transform(result: any) {
     }
   )
 
+  const gradingPeriods = result.course.gradingPeriodsConnection.nodes.reduce(
+    (acc: any, period: any) => {
+      acc[period.id] = period
+      return acc
+    },
+    {}
+  )
+
   return {
     gradeStatuses: [...Object.values(defaultStandardStatusesMap), ...customGradeStatuses],
+    gradingPeriods,
   }
 }
 

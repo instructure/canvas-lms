@@ -1031,6 +1031,7 @@ class GradebooksController < ApplicationController
 
     return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
 
+    @assignment = @context.assignments.active.find(params[:assignment_id])
     platform_service_speedgrader_enabled = @context.feature_enabled?(:platform_service_speedgrader)
     if platform_service_speedgrader_enabled && (params[:platform_sg].nil? || value_to_boolean(params[:platform_sg]))
       @page_title = t("SpeedGrader")
@@ -1043,7 +1044,18 @@ class GradebooksController < ApplicationController
         EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
         EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
         PLATFORM_SERVICE_SPEEDGRADER_ENABLED: platform_service_speedgrader_enabled,
+        RUBRIC_ASSESSMENT: {
+          assessor_id: @current_user.id.to_s,
+          assessment_type: can_do(@assignment, @current_user, :grade) ? "grading" : "peer_review"
+        },
       }
+      if @assignment.active_rubric_association?
+        env[:update_rubric_assessment_url] = context_url(
+          @context,
+          :context_rubric_association_rubric_assessments_url,
+          @assignment.rubric_association
+        )
+      end
       js_env(env)
 
       deferred_js_bundle :platform_speedgrader
@@ -1051,8 +1063,6 @@ class GradebooksController < ApplicationController
       render html: "".html_safe, layout: "bare"
       return
     end
-
-    @assignment = @context.assignments.active.find(params[:assignment_id])
 
     if @assignment.unpublished?
       flash[:notice] = t(:speedgrader_enabled_only_for_published_content,

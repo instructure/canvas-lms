@@ -32,6 +32,10 @@ export const SUBMISSION_FRAGMENT = gql`
       _id
       avatarUrl
       name
+      enrollments(courseId: $courseId) {
+        state
+        courseSectionId
+      }
     }
     gradeMatchesCurrentSubmission
     submissionCommentDownloadUrl
@@ -98,19 +102,6 @@ export const SUBMISSION_FRAGMENT = gql`
       submissionPreviewUrl
       url
     }
-    rubricAssessmentsConnection {
-      nodes {
-        _id
-        assessmentType
-        artifactAttempt
-        score
-        assessmentRatings {
-          ratingTag: _id
-          comments
-          points
-        }
-      }
-    }
     subAssignmentSubmissions {
       subAssignmentTag
       grade
@@ -122,7 +113,7 @@ export const SUBMISSION_FRAGMENT = gql`
 `
 
 const QUERY = gql`
-  query SpeedGrader_SubmissionQuery($assignmentId: ID!, $userId: ID!) {
+  query SpeedGrader_SubmissionQuery($assignmentId: ID!, $userId: ID!, $courseId: ID!) {
     assignment(id: $assignmentId) {
       id
       _id
@@ -141,7 +132,30 @@ const QUERY = gql`
         nodes {
           id
           _id
+          gradingPeriodId
           ...SubmissionInterfaceFragment
+          rubricAssessmentsConnection {
+            nodes {
+              id: _id
+              assessmentType
+              assessmentRatings {
+                id: _id
+                comments
+                commentsEnabled
+                points
+                description
+                criterion {
+                  _id
+                }
+                outcome {
+                  _id
+                }
+              }
+              assessor {
+                name
+              }
+            }
+          }
           submissionHistoriesConnection {
             nodes {
               ...SubmissionInterfaceFragment
@@ -171,6 +185,19 @@ function transform(result: any) {
           method: 'DELETE',
         })
     })
+    submission.rubricAssessments = submission?.rubricAssessmentsConnection?.nodes?.map(
+      (rubricAssessment: any) => {
+        rubricAssessment.assessmentRatings.forEach((rating: any) => {
+          rating.criterionId = rating.criterion?._id
+          rating.learningOutcomeId = rating.outcome?._id
+          delete rating.criterion
+          delete rating.outcome
+        })
+        rubricAssessment.assessorName = rubricAssessment.assessor?.name
+        delete rubricAssessment.assessor
+        return rubricAssessment
+      }
+    )
     submission.submissionHistoriesConnection?.nodes.forEach(
       (submissionHistory: any, index: number) => {
         submissionHistory.attachments.forEach((attachment: any) => {
@@ -181,9 +208,7 @@ function transform(result: any) {
             })
         })
         submissionHistory.comments = submissionHistory.commentsConnection?.nodes
-        submissionHistory.rubricAssessments = submissionHistory.rubricAssessmentsConnection?.nodes
         delete submissionHistory.commentsConnection
-        delete submissionHistory.rubricAssessmentsConnection
       }
     )
     return {
@@ -193,8 +218,9 @@ function transform(result: any) {
         'submissionHistoriesConnection',
       ]),
       comments: submission?.commentsConnection?.nodes,
-      rubricAssessments: submission.rubricAssessmentsConnection?.nodes,
+      rubricAssessments: submission.rubricAssessments,
       submissionHistory: submission.submissionHistoriesConnection?.nodes,
+      // @ts-expect-error
       submissionState: speedGraderHelpers.submissionState(submission, ENV.grading_role ?? ''),
     }
   }
@@ -204,6 +230,7 @@ function transform(result: any) {
 export const ZGetSubmissionParams = z.object({
   assignmentId: z.string().min(1),
   userId: z.string().min(1),
+  courseId: z.string().min(1),
 })
 
 type GetSubmissionParams = z.infer<typeof ZGetSubmissionParams>
@@ -214,11 +241,12 @@ export async function getSubmission<T extends GetSubmissionParams>({
   queryKey: [string, T]
 }): Promise<any> {
   ZGetSubmissionParams.parse(queryKey[1])
-  const {assignmentId, userId} = queryKey[1]
+  const {assignmentId, userId, courseId} = queryKey[1]
 
   const result = await executeQuery<any>(QUERY, {
     assignmentId,
     userId,
+    courseId,
   })
 
   return transform(result)
