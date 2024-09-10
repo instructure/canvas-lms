@@ -23,12 +23,12 @@ import {Flex} from '@instructure/ui-flex'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {func} from 'prop-types'
+import {func, string} from 'prop-types'
 import {GroupContext, SPLIT} from './context'
 
 const I18n = useI18nScope('groups')
 
-export const Leadership = ({onChange}) => {
+export const Leadership = ({onChange, direction}) => {
   const {enableAutoLeader, autoLeaderType, selfSignup, splitGroups} = useContext(GroupContext)
 
   function handleEnableChange(event) {
@@ -42,7 +42,7 @@ export const Leadership = ({onChange}) => {
   if (!selfSignup && splitGroups === SPLIT.off) return null
 
   return (
-    <Flex data-testid="group-leadership-controls">
+    <Flex data-testid="group-leadership-controls" direction={direction}>
       <Flex.Item padding="none medium none none">
         <Text>{I18n.t('Leadership')}</Text>
       </Flex.Item>
@@ -86,4 +86,5 @@ export const Leadership = ({onChange}) => {
 
 Leadership.propTypes = {
   onChange: func.isRequired,
+  direction: string,
 }

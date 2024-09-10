@@ -25,7 +25,7 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconQuestionLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {func} from 'prop-types'
+import {func, string} from 'prop-types'
 import {GroupContext} from './context'
 
 const I18n = useI18nScope('groups')
@@ -45,7 +45,7 @@ const HelpText = () => (
   </div>
 )
 
-export const SelfSignup = ({onChange}) => {
+export const SelfSignup = ({onChange, direction}) => {
   const {selfSignup, bySection} = useContext(GroupContext)
 
   function handleChange(key, val) {
@@ -55,7 +55,7 @@ export const SelfSignup = ({onChange}) => {
   }
 
   return (
-    <Flex>
+    <Flex direction={direction} data-testid="group-self-sign-up-controls">
       <Flex.Item padding="none medium none none">
         <Text>{I18n.t('Self Sign-Up')}</Text>
         <Tooltip renderTip={<HelpText />} placement="top" on={['click', 'hover', 'focus']}>
@@ -100,4 +100,5 @@ export const SelfSignup = ({onChange}) => {
 
 SelfSignup.propTypes = {
   onChange: func.isRequired,
+  direction: string,
 }
