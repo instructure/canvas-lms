@@ -414,6 +414,7 @@ describe ContentExportsApiController, type: :request do
             expect(export.settings["selected_new_quizzes"])
               .to match_array [t_course.assignments.first.id]
             expect(export.settings["contains_new_quizzes"]).to be true
+            expect(export.job_progress).to be_queued
           end
 
           it "contains new quizzes ids which is not in this course creates a common cartridge export without new quizzes" do
@@ -429,6 +430,7 @@ describe ContentExportsApiController, type: :request do
             expect(export.settings["selected_content"]["everything"]).to be_nil
             expect(export.settings["selected_new_quizzes"]).to be_nil
             expect(export.settings["contains_new_quizzes"]).to be_falsey
+            expect(export.job_progress).to be_queued
           end
         end
 
@@ -447,6 +449,7 @@ describe ContentExportsApiController, type: :request do
             expect(export.settings["selected_new_quizzes"])
               .to be_nil
             expect(export.settings["contains_new_quizzes"]).to be false
+            expect(export.job_progress).to be_queued
 
             run_jobs
 
@@ -471,6 +474,7 @@ describe ContentExportsApiController, type: :request do
           expect(export.settings["selected_content"]["everything"]).to be_truthy
           expect(export.settings["contains_new_quizzes"]).to be_falsey
           expect(export.settings["selected_new_quizzes"]).to be_nil
+          expect(export.job_progress).to be_queued
 
           run_jobs
 
