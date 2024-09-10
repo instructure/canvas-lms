@@ -19,7 +19,7 @@
 #
 
 # A refresher that refreshes JWKS when there is no discovery document
-class AuthenticationProvider::OpenIDConnect::JWKSRefresher < AuthenticationProvider::ProviderRefresher
+class AuthenticationProvider::OpenIDConnect::JwksRefresher < AuthenticationProvider::ProviderRefresher
   class << self
     def refresh_providers(shard_scope: Shard.current, providers: nil)
       providers ||= AuthenticationProvider.OpenIDConnect
