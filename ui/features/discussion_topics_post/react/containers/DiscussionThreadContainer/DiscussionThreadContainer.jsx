@@ -299,15 +299,18 @@ export const DiscussionThreadContainer = props => {
       )
     }
 
-    threadActions.push(
-      <ThreadingToolbar.MarkAsRead
-        key={`mark-as-read-${props.discussionEntry._id}`}
-        delimiterKey={`mark-as-read-delimiter-${props.discussionEntry._id}`}
-        isRead={props.discussionEntry.entryParticipant?.read}
-        authorName={getDisplayName(props.discussionEntry)}
-        onClick={toggleUnread}
-      />
-    )
+    if (!props.discussionEntry.deleted) {
+      threadActions.push(
+        <ThreadingToolbar.MarkAsRead
+          key={`mark-as-read-${props.discussionEntry._id}`}
+          delimiterKey={`mark-as-read-delimiter-${props.discussionEntry._id}`}
+          isRead={props.discussionEntry.entryParticipant?.read}
+          authorName={getDisplayName(props.discussionEntry)}
+          onClick={toggleUnread}
+        />
+      )
+    }
+
     return threadActions
   }
 
@@ -568,7 +571,9 @@ export const DiscussionThreadContainer = props => {
                       props.discussionEntry.createdAt
                     )}
                     editedTimingDisplay={DateHelper.formatDatetimeForDiscussions(
-                      props.discussionEntry.editedAt
+                      props.discussionEntry.deleted
+                        ? props.discussionEntry.updatedAt
+                        : props.discussionEntry.editedAt
                     )}
                     lastReplyAtDisplay={DateHelper.formatDatetimeForDiscussions(
                       props.discussionEntry.lastReply?.createdAt
