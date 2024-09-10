@@ -68,7 +68,7 @@ module Schemas::Lti::IMS
         Lti::IMS::Registration::PLACEMENT_VISIBILITY_EXTENSION =>
           { type: %w[string null].freeze, enum: [nil, *Lti::IMS::Registration::PLACEMENT_VISIBILITY_OPTIONS].freeze }.freeze,
         Lti::IMS::Registration::DISPLAY_TYPE_EXTENSION =>
-          { type: %w[string null].freeze }.freeze,
+          { type: %w[string null].freeze, enum: [nil, *Schemas::InternalLtiConfiguration::VALID_DISPLAY_TYPES] }.freeze,
         Lti::IMS::Registration::LAUNCH_WIDTH_EXTENSION =>
           { type: %w[integer string null] }.freeze,
         Lti::IMS::Registration::LAUNCH_HEIGHT_EXTENSION =>
