@@ -53,6 +53,7 @@ import '@canvas/context-cards/react/StudentContextCardTrigger'
 
 import assignmentRubricDialog from '@canvas/discussions/jquery/assignmentRubricDialog'
 import rubricEditing from '../../../../../shared/rubrics/jquery/edit_rubric'
+import TopNavPortalWithDefaults from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 
 const I18n = useI18nScope('discussion_posts')
 
@@ -209,6 +210,21 @@ export const DiscussionTopicContainer = ({
     document.querySelector(`link[title='${I18n.t('Discussion Podcast Feed')}' ]`) ||
     document.querySelector("link[type='application/rss+xml']")
 
+  const handleBreadCrumbSetter = ({getCrumbs, setCrumbs}) => {
+    const discussionOrAnnouncement = isAnnouncement
+      ? I18n.t('Announcements')
+      : I18n.t('Discussions')
+    const oldCrumbs = getCrumbs()
+    const newCrumbs = [
+      ...oldCrumbs,
+      ...[
+        {name: discussionOrAnnouncement, url: oldCrumbs[0].url + '/discussion_topics'},
+        {name: props.discussionTopic.title || '', url: ''},
+      ],
+    ]
+    setCrumbs(newCrumbs)
+  }
+
   return (
     <Responsive
       match="media"
@@ -269,8 +285,15 @@ export const DiscussionTopicContainer = ({
           },
         },
       }}
+
+
       render={(responsiveProps, matches) => (
         <>
+          <TopNavPortalWithDefaults
+            getBreadCrumbSetter={handleBreadCrumbSetter}
+            useStudentView={true}
+            useTutorial={true}
+          />
           <DiscussionTopicAlertManager discussionTopic={props.discussionTopic} />
           {!isSearch && (
             <Highlight isHighlighted={props.isHighlighted} data-testid="highlight-container">
