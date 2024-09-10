@@ -365,11 +365,13 @@ describe Schemas::Lti::IMS::OidcRegistration do
           expect_no_errors(message: { key => "public" })
         end
 
-        it "requires Canvas extension display_type (if present & non null) to be a string" do
+        it "requires Canvas extension display_type (if present & non null) to be a from an enum" do
           key = Lti::IMS::Registration::DISPLAY_TYPE_EXTENSION
           expect(errors(message: { key => 123 })).to include("display_type")
+          expect(errors(message: { key => "something-invalid" })).to include("display_type")
           expect_no_errors(message: { key => nil })
-          expect_no_errors(message: { key => "_blank" })
+          expect_no_errors(message: { key => "in_nav_context" })
+          expect_no_errors(message: { key => "default" })
         end
 
         it "requires Canvas extension launch_width (if present & non null) to be an integer or string" do
