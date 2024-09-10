@@ -4,74 +4,50 @@ Placements are the "entry points" into an External Tool. They determine where an
 
 ## List of Supported Placements
 
-- [Global Navigation](#global-navigation)
 - [Account Navigation](#account-navigation)
-- [User Navigation](#user-navigation)
-- [Course Navigation](#course-navigation)
-- [Editor Button](#editor-button)
 - [Analytics Hub](#analytics-hub)
 - [Assignment Edit](#assignment-edit)
+- [Assignment Group Menu](#assignment-group-menu)
+- [Assignment Index Menu](#assignment-index-menu)
+- [Assignment Menu](#assignment-menu)
 - [Assignment Selection](#assignment-selection)
 - [Assignment View](#assignment-view)
-- [Assignment Menu](#assignment-menu)
-- [Assignments Index Menu](#assignments-index-menu)
-- [Assignments Group Menu](#assignments-group-menu)
-- [Homework Submission](#homework-submission)
 - [Collaboration](#collaboration)
-- [Course Home Sub Navigation](#course-home-sub-navigation)
 - [Course Assignments Menu](#course-assignments-menu)
+- [Course Home Sub Navigation](#course-home-sub-navigation)
+- [Course Navigation](#course-navigation)
 - [Course Settings Sub Navigation](#course-settings-sub-navigation)
+- [Discussion Index Menu](#discussion-index-menu)
 - [Discussion Topic Menu](#discussion-topic-menu)
-- [Discussions Index Menu](#discussions-index-menu)
+- [Editor Button](#editor-button)
+- [File Index Menu](#file-index-menu)
 - [File Menu](#file-menu)
-- [Files Index Menu](#files-index-menu)
+- [Global Navigation](#global-navigation)
+- [Homework Submission](#homework-submission)
 - [Link Selection](#link-selection)
 - [Migration Selection](#migration-selection)
-- [Modules Index Menu (Tray)](#modules-index-menu-tray)
-- [Modules Index Menu (Modal)](#modules-index-menu-modal)
-- [Module Menu](#module-menu)
 - [Module Group Menu](#module-group-menu)
+- [Module Index Menu (Modal)](#module-index-menu-modal)
+- [Module Index Menu (Tray)](#module-index-menu-tray)
 - [Module Menu Modal](#module-menu-modal)
-- [Sync Grades](#sync-grades)
+- [Module Menu](#module-menu)
+- [Page Index Menu](#page-index-menu)
+- [Page Menu](#page-menu)
+- [Quiz Index Menu](#quiz-index-menu)
 - [Quiz Menu](#quiz-menu)
-- [Quizzes Index Menu](#quizzes-index-menu)
 - [Student Context Card](#student-context-card)
 - [Submission Type Selection](#submission-type-selection)
+- [Sync Grades](#sync-grades)
 - [Tool Configuration](#tool-configuration)
-- [Page Menu](#page-menu)
-- [Pages Index Menu](#pages-index-menu)
 - [Top Navigation](#top-navigation)
+- [User Navigation](#user-navigation)
 - [Resource Selection ⚠️](#resource-selection)
-
-# Global Navigation
-
-name: global_navigation
-
-<img class="lti-placement-image" src="./images/placements/global_navigation.png" alt="Global Navigation Screenshot">
 
 # Account Navigation
 
 name: account_navigation
 
 <img class="lti-placement-image" src="./images/placements/account_navigation.png" alt="Account Navigation Screenshot">
-
-# User Navigation
-
-name: user_navigation
-
-<img class="lti-placement-image" src="./images/placements/user_navigation.png" alt="User Navigation Screenshot">
-
-# Course Navigation
-
-name: course_navigation
-
-<img class="lti-placement-image" src="./images/placements/course_navigation.png" alt="Course Navigation Screenshot">
-
-# Editor Button
-
-name: editor_button
-
-<img class="lti-placement-image" src="./images/placements/editor_button.png" alt="Editor Button Screenshot">
 
 # Analytics Hub
 
@@ -87,6 +63,24 @@ name: assignment_edit
 
 <img class="lti-placement-image" src="./images/placements/assignment_edit.png" alt="Assignment Edit Screenshot">
 
+# Assignment Group Menu
+
+name: assignment_group_menu
+
+<img class="lti-placement-image" src="./images/placements/assignment_group_menu.png" alt="Assignments Group Menu Screenshot">
+
+# Assignment Index Menu
+
+name: assignment_index_menu
+
+<img class="lti-placement-image" src="./images/placements/assignment_index_menu.png" alt="Assignments Index Menu Screenshot">
+
+# Assignment Menu
+
+name: assignment_menu
+
+<img class="lti-placement-image" src="./images/placements/assignment_menu.png" alt="Assignment Menu Screenshot">
+
 # Assignment Selection
 
 name: assignment_selection
@@ -98,30 +92,6 @@ name: assignment_selection
 name: assignment_view
 
 <img class="lti-placement-image" src="./images/placements/assignment_view.png" alt="Assignment View Screenshot">
-
-# Homework Submission
-
-name: homework_submission
-
-<img class="lti-placement-image" src="./images/placements/homework_submission.png" alt="Homework Submission Screenshot">
-
-# Assignment Menu
-
-name: assignment_menu
-
-<img class="lti-placement-image" src="./images/placements/assignment_menu.png" alt="Assignment Menu Screenshot">
-
-# Assignments Index Menu
-
-name: assignment_index_menu
-
-<img class="lti-placement-image" src="./images/placements/assignment_index_menu.png" alt="Assignments Index Menu Screenshot">
-
-# Assignments Group Menu
-
-name: assignment_group_menu
-
-<img class="lti-placement-image" src="./images/placements/assignment_group_menu.png" alt="Assignments Group Menu Screenshot">
 
 # Collaboration
 
@@ -141,11 +111,23 @@ name: course_home_sub_navigation
 
 <img class="lti-placement-image" src="./images/placements/course_home_sub_navigation.png" alt="Course Home Sub Navigation Screenshot">
 
+# Course Navigation
+
+name: course_navigation
+
+<img class="lti-placement-image" src="./images/placements/course_navigation.png" alt="Course Navigation Screenshot">
+
 # Course Settings Sub Navigation
 
 name: course_settings_sub_navigation
 
 <img class="lti-placement-image" src="./images/placements/course_settings_sub_navigation.png" alt="Course Settings Sub Navigation Screenshot">
+
+# Discussion Index Menu
+
+name: discussion_topic_index_menu
+
+<img class="lti-placement-image" src="./images/placements/discussion_topic_index_menu.png" alt="Discussions Index Menu Screenshot">
 
 # Discussion Topic Menu
 
@@ -153,11 +135,17 @@ name: discussion_topic_menu
 
 <img class="lti-placement-image" src="./images/placements/discussion_topic_menu.png" alt="Discussion Topic Menu Screenshot">
 
-# Discussions Index Menu
+# Editor Button
 
-name: discussion_topic_index_menu
+name: editor_button
 
-<img class="lti-placement-image" src="./images/placements/discussion_topic_index_menu.png" alt="Discussions Index Menu Screenshot">
+<img class="lti-placement-image" src="./images/placements/editor_button.png" alt="Editor Button Screenshot">
+
+# File Index Menu
+
+name: file_index_menu
+
+<img class="lti-placement-image" src="./images/placements/file_index_menu.png" alt="Files Index Menu Screenshot">
 
 # File Menu
 
@@ -165,11 +153,17 @@ name: file_menu
 
 <img class="lti-placement-image" src="./images/placements/file_menu.png" alt="File Menu Screenshot">
 
-# Files Index Menu
+# Global Navigation
 
-name: file_index_menu
+name: global_navigation
 
-<img class="lti-placement-image" src="./images/placements/file_index_menu.png" alt="Files Index Menu Screenshot">
+<img class="lti-placement-image" src="./images/placements/global_navigation.png" alt="Global Navigation Screenshot">
+
+# Homework Submission
+
+name: homework_submission
+
+<img class="lti-placement-image" src="./images/placements/homework_submission.png" alt="Homework Submission Screenshot">
 
 # Link Selection
 
@@ -183,24 +177,6 @@ name: migration_selection
 
 <img class="lti-placement-image" src="./images/placements/migration_selection.png" alt="Migration Selection Screenshot">
 
-# Modules Index Menu (Tray)
-
-name: module_index_menu
-
-<img class="lti-placement-image" src="./images/placements/module_index_menu.png" alt="Modules Index Menu (Tray) Screenshot">
-
-# Modules Index Menu (Modal)
-
-name: module_index_menu_modal
-
-<img class="lti-placement-image" src="./images/placements/module_index_menu_modal.png" alt="Modules Index Menu (Modal) Screenshot">
-
-# Module Menu
-
-name: module_menu
-
-<img class="lti-placement-image" src="./images/placements/module_menu.png" alt="Module Menu Screenshot">
-
 # Module Group Menu
 
 name: module_group_menu
@@ -209,6 +185,18 @@ name: module_group_menu
 
 After clicking on the placement:
 <img class="lti-placement-image" src="./images/placements/module_group_menu_open.png" alt="A screenshot of the Module Group Menu placement being opened on the right side of the screen as a pop-out window.">
+
+# Module Index Menu (Modal)
+
+name: module_index_menu_modal
+
+<img class="lti-placement-image" src="./images/placements/module_index_menu_modal.png" alt="Modules Index Menu (Modal) Screenshot">
+
+# Module Index Menu (Tray)
+
+name: module_index_menu
+
+<img class="lti-placement-image" src="./images/placements/module_index_menu.png" alt="Modules Index Menu (Tray) Screenshot">
 
 # Module Menu Modal
 
@@ -219,23 +207,35 @@ name: module_menu_modal
 After clicking on the placement:
 <img class="lti-placement-image" src="./images/placements/module_menu_modal_open.png" alt="A screenshot of the Module Menu Modal placement being opened as a modal in the center of the screen.">
 
-# Sync Grades
+# Module Menu
 
-name: post_grades
+name: module_menu
 
-<img class="lti-placement-image" src="./images/placements/post_grades.png" alt="Sync Grades Screenshot">
+<img class="lti-placement-image" src="./images/placements/module_menu.png" alt="Module Menu Screenshot">
+
+# Page Index Menu
+
+name: wiki_index_menu
+
+<img class="lti-placement-image" src="./images/placements/wiki_index_menu.png" alt="Pages Index Menu Screenshot">
+
+# Page Menu
+
+name: wiki_page_menu
+
+<img class="lti-placement-image" src="./images/placements/wiki_page_menu.png" alt="Page Menu Screenshot">
+
+# Quiz Index Menu
+
+name: quiz_index_menu
+
+<img class="lti-placement-image" src="./images/placements/quiz_index_menu.png" alt="Quizzes Index Menu Screenshot">
 
 # Quiz Menu
 
 name: quiz_menu
 
 <img class="lti-placement-image" src="./images/placements/quiz_menu.png" alt="Quiz Menu Screenshot">
-
-# Quizzes Index Menu
-
-name: quiz_index_menu
-
-<img class="lti-placement-image" src="./images/placements/quiz_index_menu.png" alt="Quizzes Index Menu Screenshot">
 
 # Student Context Card
 
@@ -251,23 +251,17 @@ This is a restricted placement, contact your CSM (Customers) or [Developer Relat
 
 <img class="lti-placement-image" src="./images/placements/submission_type_selection.png" alt="Submission Type Selection Screenshot">
 
+# Sync Grades
+
+name: post_grades
+
+<img class="lti-placement-image" src="./images/placements/post_grades.png" alt="Sync Grades Screenshot">
+
 # Tool Configuration
 
 name: tool_configuration
 
 <img class="lti-placement-image" src="./images/placements/tool_configuration.png" alt="Tool Configuration Screenshot">
-
-# Page Menu
-
-name: wiki_page_menu
-
-<img class="lti-placement-image" src="./images/placements/wiki_page_menu.png" alt="Page Menu Screenshot">
-
-# Pages Index Menu
-
-name: wiki_index_menu
-
-<img class="lti-placement-image" src="./images/placements/wiki_index_menu.png" alt="Pages Index Menu Screenshot">
 
 # Top Navigation
 
@@ -276,6 +270,12 @@ name: top_navigation
 This is a restricted placement, contact your CSM (Customers) or [Developer Relations](mailto:dev-relations@instructure.com) (Partners) for more information.
 
 <img class="lti-placement-image" src="./images/placements/top_navigation.png" alt="Top Navigation Screenshot">
+
+# User Navigation
+
+name: user_navigation
+
+<img class="lti-placement-image" src="./images/placements/user_navigation.png" alt="User Navigation Screenshot">
 
 <div class="warning-message">
     Deprecated placements
