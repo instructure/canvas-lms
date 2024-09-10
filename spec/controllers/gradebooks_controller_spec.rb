@@ -3018,11 +3018,27 @@ describe GradebooksController do
       expect(response).not_to be_redirect
     end
 
-    it "loads the platform speedgreader when the feature flag is on and the platform_sg flag is passed" do
+    it "loads the platform speedgrader when the feature flag is on and the platform_sg flag is passed" do
       @assignment.publish
       Account.site_admin.enable_feature!(:platform_service_speedgrader)
       get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
       expect(response).to render_template(:bare, locals: { anonymous_grading: false })
+    end
+
+    it "loads the platform speedgrader when the account allows it and the course enables it" do
+      @assignment.publish
+      Account.site_admin.allow_feature!(:platform_service_speedgrader)
+      @course.enable_feature!(:platform_service_speedgrader)
+      get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+      expect(response).to render_template(:bare, locals: { anonymous_grading: false })
+    end
+
+    it "does not load the platform speedgrader when the account allows it and the course disables it" do
+      @assignment.publish
+      Account.site_admin.allow_feature!(:platform_service_speedgrader)
+      @course.disable_feature!(:platform_service_speedgrader)
+      get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+      expect(response).not_to render_template(:bare, locals: { anonymous_grading: false })
     end
 
     describe "js_env" do
