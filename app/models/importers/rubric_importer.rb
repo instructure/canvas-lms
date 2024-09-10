@@ -134,8 +134,12 @@ module Importers
     end
 
     def self.track_metrics(migration)
+      return unless migration.migration_settings[:is_copy_to]
+
       if migration.migration_settings[:associate_with_assignment_id].present?
         InstStatsd::Statsd.increment("content_migration.rubrics.associate_with_assignment")
+      else
+        InstStatsd::Statsd.increment("content_migration.rubrics.course_copy")
       end
     end
   end

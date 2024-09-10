@@ -1025,6 +1025,9 @@ describe RubricAssessment do
 
   describe "create" do
     it "sets the root_account_id using rubric" do
+      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      expect(InstStatsd::Statsd).to receive(:increment).with("grading.rubric.teacher_assessed_old").at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:increment).with("grading.rubric.teacher_leaves_feedback_old").at_least(:once)
       assessment = @association.assess({
                                          user: @student,
                                          assessor: @teacher,

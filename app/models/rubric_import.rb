@@ -91,19 +91,23 @@ class RubricImport < ApplicationRecord
       unless error_data.empty?
         update!(error_count: error_data.count, error_data:)
         job_completed_with_errors!
+        track_error
         return
       end
       job_completed!
     rescue DataFormatError => e
       ErrorReport.log_exception("rubrics_import_data_format", e)
       update!(error_count: 1, error_data: [{ message: e.message }])
+      track_error
       job_failed!
     rescue CSV::MalformedCSVError => e
       ErrorReport.log_exception("rubrics_import_csv", e)
       update!(error_count: 1, error_data: [{ message: I18n.t("The file is not a valid CSV file."), exception: e.message }])
+      track_error
     rescue => e
       ErrorReport.log_exception("rubrics_import", e)
       update!(error_count: 1, error_data: [{ message: I18n.t("An error occurred while importing rubrics."), exception: e.message }])
+      track_error
       job_failed!
     end
   end
@@ -201,5 +205,9 @@ class RubricImport < ApplicationRecord
         csv << rubric
       end
     end
+  end
+
+  def track_error
+    InstStatsd::Statsd.increment("#{context.class.to_s.downcase}.rubrics.csv_imported_with_error")
   end
 end
