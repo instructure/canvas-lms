@@ -113,6 +113,8 @@ describe RubricImport do
 
     describe "succeeded" do
       it "should run the import with single rubric and criteria" do
+        allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+        expect(InstStatsd::Statsd).to receive(:increment).with("account.rubrics.csv_imported").at_least(:once)
         import = create_import_manually(full_csv)
         import.run
 
@@ -120,7 +122,6 @@ describe RubricImport do
         expect(import.progress).to eq(100)
         expect(import.error_count).to eq(0)
         expect(import.error_data).to eq([])
-
         rubric = Rubric.find_by(rubric_imports_id: import.id)
         expect(rubric.title).to eq("Rubric 1")
         expect(rubric.context_id).to eq(@account.id)
