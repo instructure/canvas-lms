@@ -910,7 +910,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.destroy_files(ids)
-    Attachment.batch_destroy(Attachment.active.where(id: ids))
+    Attachment.batch_destroy(Attachment.not_deleted.where(id: ids))
   end
 
   before_save :assign_uuid

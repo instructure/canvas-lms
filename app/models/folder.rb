@@ -132,7 +132,7 @@ class Folder < ActiveRecord::Base
             )
             SELECT id FROM associated_folders WHERE associated_folders.workflow_state <> 'deleted' ORDER BY id LIMIT 1000 FOR UPDATE
           SQL
-          Attachment.batch_destroy(Attachment.active.where(folder_id: associated_folders).order(:id))
+          Attachment.batch_destroy(Attachment.not_deleted.where(folder_id: associated_folders).order(:id))
           delete_time = Time.now.utc
           Folder.where(id: associated_folders).update_all(workflow_state: "deleted", deleted_at: delete_time, updated_at: delete_time)
           folder_count = associated_folders.length
