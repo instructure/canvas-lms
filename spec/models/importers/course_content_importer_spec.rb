@@ -502,6 +502,65 @@ describe Course do
       expect(migration.warnings.length).to eq 1
       expect(migration.warnings[0]).to eq "Couldn't adjust dates on assignment lalala (ID #{assignment.id})"
     end
+
+    describe "pre_date_shift_for_assignment_importing FF" do
+      subject { Importers::CourseContentImporter.adjust_dates(course, migration) }
+
+      let(:course) { course_model }
+      let(:migration) do
+        course.content_migrations.create!(
+          migration_settings: {
+            date_shift_options: {
+              old_start_date: "2023-01-01",
+              old_end_date: "2023-12-31",
+              new_start_date: "2024-01-01",
+              new_end_date: "2024-12-31"
+            }
+          }
+        )
+      end
+
+      context "when the FF is enabled" do
+        before do
+          Account.site_admin.enable_feature!(:pre_date_shift_for_assignment_importing)
+        end
+
+        it "should not adjust Assignment dates" do
+          expect(migration).not_to receive(:imported_migration_items_by_class).with(Assignment)
+          subject
+        end
+
+        it "should not adjust Quiz::Quizzes dates" do
+          expect(migration).not_to receive(:imported_migration_items_by_class).with(Quizzes::Quiz)
+          subject
+        end
+      end
+
+      context "when the FF is disabled" do
+        before do
+          allow(migration).to receive(:imported_migration_items_by_class).with(CalendarEvent).and_call_original
+          allow(migration).to receive(:imported_migration_items_by_class).with(AssignmentOverride).and_call_original
+          allow(migration).to receive(:imported_migration_items_by_class).with(ContextModule).and_call_original
+          allow(migration).to receive(:imported_migration_items_by_class).with(WikiPage).and_call_original
+          allow(migration).to receive(:imported_migration_items_by_class).with(Attachment).and_call_original
+          allow(migration).to receive(:imported_migration_items_by_class).with(Folder).and_call_original
+          allow(migration).to receive(:imported_migration_items_by_class).with(Announcement).and_call_original
+          allow(migration).to receive(:imported_migration_items_by_class).with(DiscussionTopic).and_call_original
+          allow(migration).to receive(:imported_migration_items_by_class).with(Assignment).and_call_original
+          allow(migration).to receive(:imported_migration_items_by_class).with(Quizzes::Quiz).and_call_original
+        end
+
+        it "should adjust Assignment dates" do
+          expect(migration).to receive(:imported_migration_items_by_class).with(Assignment).and_call_original
+          subject
+        end
+
+        it "should adjust Quiz::Quizzes dates" do
+          expect(migration).to receive(:imported_migration_items_by_class).with(Quizzes::Quiz).and_call_original
+          subject
+        end
+      end
+    end
   end
 
   describe "import_media_objects" do
@@ -765,6 +824,49 @@ describe Course do
       allow(Auditors::Course).to receive(:record_copied).and_raise("Something went wrong at the last minute")
       expect { subject }.to raise_error("Something went wrong at the last minute")
       expect(InstStatsd::Statsd).to_not have_received(:timing).with("content_migrations.import_failure")
+    end
+  end
+
+  describe "#error_on_dates?" do
+    let(:item) { double("item") }
+    let(:attributes) { [:due_at] }
+
+    context "when there are errors on the given attributes" do
+      before do
+        allow(item).to receive(:errors).and_return({ due_at: ["validation error"] })
+      end
+
+      it "returns true" do
+        expect(Importers::CourseContentImporter.error_on_dates?(item, attributes)).to be true
+      end
+    end
+
+    context "when there are no errors on the given attributes" do
+      before do
+        allow(item).to receive(:errors).and_return({ due_at: [] })
+      end
+
+      it "returns false" do
+        expect(Importers::CourseContentImporter.error_on_dates?(item, attributes)).to be false
+      end
+    end
+
+    context "when attributes is empty" do
+      let(:attributes) { [] }
+
+      it "returns false" do
+        expect(Importers::CourseContentImporter.error_on_dates?(item, attributes)).to be false
+      end
+    end
+
+    context "when item errors is empty" do
+      before do
+        allow(item).to receive(:errors).and_return({})
+      end
+
+      it "returns false" do
+        expect(Importers::CourseContentImporter.error_on_dates?(item, attributes)).to be false
+      end
     end
   end
 end
