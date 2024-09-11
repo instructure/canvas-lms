@@ -26,6 +26,26 @@ class GraphQLTuning
     config["max_depth"] || 15
   end
 
+  def self.max_complexity
+    config["max_complexity"] || 375_000
+  end
+
+  def self.default_page_size
+    config["default_page_size"] || 20
+  end
+
+  def self.default_max_page_size
+    config["default_max_page_size"] || 100
+  end
+
+  def self.validate_max_errors
+    config["validate_max_errors"] || 100
+  end
+
+  def self.max_query_string_tokens
+    config["max_query_string_tokens"] || 5_000
+  end
+
   class << self
     private
 

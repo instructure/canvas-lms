@@ -128,4 +128,9 @@ class CanvasSchema < GraphQL::Schema
 
   # GraphQL tuning and defensive settings
   max_depth GraphQLTuning.max_depth
+  max_complexity GraphQLTuning.max_complexity
+  default_page_size GraphQLTuning.default_page_size
+  default_max_page_size GraphQLTuning.default_max_page_size
+  validate_max_errors GraphQLTuning.validate_max_errors
+  max_query_string_tokens GraphQLTuning.max_query_string_tokens
 end
