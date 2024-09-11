@@ -104,6 +104,10 @@ export function getToolbarForVariant(
         name: formatMessage('Lists'),
         items: ['bullist'],
       },
+      {
+        name: formatMessage('Miscellaneous'),
+        items: ['instructure_equation'],
+      },
     ]
   }
 
