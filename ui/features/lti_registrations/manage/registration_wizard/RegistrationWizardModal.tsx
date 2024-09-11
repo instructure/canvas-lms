@@ -154,6 +154,25 @@ const ModalBodyWrapper = ({
           }}
         />
       )
+    } else if (state.method === 'manual') {
+      return (
+        <Lti1p3RegistrationWizard
+          accountId={accountId}
+          internalConfiguration={{
+            title: state.manualAppName.trim(),
+            target_link_uri: '',
+            scopes: [],
+            oidc_initiation_url: '',
+            placements: [],
+          }}
+          unifiedToolId={state.unifiedToolId}
+          onSuccessfulRegistration={() => {
+            state.close()
+            state.onSuccessfulInstallation?.()
+          }}
+          unregister={state.unregister}
+        />
+      )
     } else {
       return (
         <InitializationModalBody
@@ -241,6 +260,8 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
                     props.state.updateMethod('json_url')
                   } else if (value === 'json') {
                     props.state.updateMethod('json')
+                  } else if (value === 'manual') {
+                    props.state.updateMethod('manual')
                   } else {
                     // todo: add other methods here
                   }
@@ -258,6 +279,12 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
                 {window.ENV.FEATURES.lti_registrations_next && (
                   <SimpleSelect.Option id="json" value="json">
                     {I18n.t('JSON')}
+                  </SimpleSelect.Option>
+                )}
+
+                {window.ENV.FEATURES.lti_registrations_next && (
+                  <SimpleSelect.Option id="manual" value="manual">
+                    {I18n.t('Manual')}
                   </SimpleSelect.Option>
                 )}
               </SimpleSelect>
@@ -296,6 +323,17 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
                     fontFamily: 'monospace',
                   }}
                   messages={jsonCodeInputMessages(props.state)}
+                />
+              </View>
+            )}
+
+            {props.state.method === 'manual' && (
+              <View display="block" margin="medium 0">
+                <TextInput
+                  data-testid="manual-name-input"
+                  renderLabel={I18n.t('App Name')}
+                  value={props.state.manualAppName}
+                  onChange={(_e, value) => props.state.updateManualAppName(value)}
                 />
               </View>
             )}
@@ -350,6 +388,8 @@ const validForm = (state: RegistrationWizardModalState) => {
       return isValidHttpUrl(state.jsonUrl)
     } else if (state.method === 'json') {
       return isValidJson(state.jsonCode)
+    } else if (state.method === 'manual') {
+      return state.manualAppName.trim() !== ''
     } else {
       return false
     }

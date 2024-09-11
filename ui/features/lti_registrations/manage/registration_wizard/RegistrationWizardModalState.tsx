@@ -58,6 +58,10 @@ export type RegistrationWizardModalState = {
    */
   jsonCode: string
   /**
+   * Contains the state of the Name input for the Manual method
+   */
+  manualAppName: string
+  /**
    * The ID of the LTI IMS Registration to edit. If this is set, the registration wizard will
    * open to the Dynamic Registration review screen, once the registration has been loaded from the backend.
    * If this is not set, the registration wizard will follow the typical flow.
@@ -85,6 +89,7 @@ export type RegistrationWizardModalStateActions = {
   updateMethod: (method: InstallMethod) => void
   updateDynamicRegistrationUrl: (url: string) => void
   updateJsonUrl: (url: string) => void
+  updateManualAppName: (appName: string) => void
   updateJsonCode: (url: string) => void
   updateJsonFetchStatus: (status: JsonFetchStatus) => void
   register: () => void
@@ -103,6 +108,7 @@ export const useRegistrationModalWizardState = create<
   dynamicRegistrationUrl: '',
   jsonUrl: '',
   jsonCode: '',
+  manualAppName: '',
   unifiedToolId: undefined,
   registering: false,
   exitOnCancel: false,
@@ -111,6 +117,7 @@ export const useRegistrationModalWizardState = create<
   updateMethod: method => set({method, jsonFetch: {_tag: 'initial'}}),
   updateDynamicRegistrationUrl: url => set({dynamicRegistrationUrl: url}),
   updateJsonUrl: url => set({jsonUrl: url, jsonFetch: {_tag: 'initial'}}),
+  updateManualAppName: name => set({manualAppName: name}),
   updateJsonCode: code => set({jsonCode: code, jsonFetch: {_tag: 'initial'}}),
   register: () => set({registering: true}),
   unregister: () => {
