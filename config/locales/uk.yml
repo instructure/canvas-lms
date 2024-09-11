@@ -8632,6 +8632,7 @@ uk:
   has_similarity_score_d5f332b4: "Має оцінку схожості"
   haven_t_been_graded_d7dee5bb: "Не було оцінено"
   haven_t_submitted_yet_e63834db: "Не було відправлено ще"
+  header_f28f73db: Заголовок
   helpDialog: 
     Back: Назад
     Help: Допомога
