@@ -140,7 +140,8 @@ export const useShouldShowContent = (
     !isAnnouncement &&
     !isGraded &&
     ENV.FEATURES?.selective_release_ui_api &&
-    ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_ASSIGN_TO_UNGRADED
+    (ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_ASSIGN_TO_UNGRADED ||
+      ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_UNGRADED_DISCUSSION)
 
   const shouldShowAllowParticipantsToCommentOption =
     !ENV?.ANNOUNCEMENTS_COMMENTS_DISABLED && shouldShowAnnouncementOnlyOptions
