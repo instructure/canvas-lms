@@ -23,13 +23,18 @@ class ToDoListPresenter
 
   attr_reader :needs_grading, :needs_moderation, :needs_submitting, :needs_reviewing
 
-  def initialize(view, user, contexts)
+  def initialize(view, user, contexts, root_account)
     @view = view
     @user = user
     @contexts = contexts
+    @root_account = root_account
 
     if user
       @needs_grading = assignments_needing(:grading)
+      if @root_account.feature_enabled?(:discussion_checkpoints)
+        @needs_grading += assignments_needing(:grading, is_sub_assignment: true)
+        @needs_grading.sort_by! { |a| a.due_at || a.updated_at }
+      end
       @needs_moderation = assignments_needing(:moderation)
       @needs_submitting = assignments_needing(:submitting, include_ungraded: true)
       @needs_submitting += ungraded_quizzes_needing_submitting
@@ -63,7 +68,7 @@ class ToDoListPresenter
 
   def assignments_needing(type, opts = {})
     if @user
-      @user.send(:"assignments_needing_#{type}", contexts: @contexts, limit: ASSIGNMENT_LIMIT, **opts).map do |assignment|
+      @user.send(:"assignments_needing_#{type}", contexts: @contexts, limit: ASSIGNMENT_LIMIT, discussion_checkpoints_enabled: @root_account.feature_enabled?(:discussion_checkpoints), **opts).map do |assignment|
         AssignmentPresenter.new(@view, assignment, @user, type)
       end
     else
@@ -112,7 +117,7 @@ class ToDoListPresenter
   class AssignmentPresenter
     attr_reader :assignment
     protected :assignment
-    delegate :title, :submission_action_string, :points_possible, :due_at, :updated_at, :peer_reviews_due_at, :context, to: :assignment
+    delegate :title, :submission_action_string, :points_possible, :due_at, :updated_at, :peer_reviews_due_at, :context, :sub_assignment_tag, to: :assignment
 
     def initialize(view, assignment, user, type)
       @view = view
@@ -159,7 +164,8 @@ class ToDoListPresenter
     end
 
     def gradebook_path
-      @view.speed_grader_course_gradebook_path(assignment.context_id, assignment_id: assignment.id)
+      assignment_id = sub_assignment? ? assignment.parent_assignment.id : assignment.id
+      @view.speed_grader_course_gradebook_path(assignment.context_id, assignment_id:)
     end
 
     def moderate_path
@@ -219,6 +225,14 @@ class ToDoListPresenter
       else
         I18n.t("No Due Date")
       end
+    end
+
+    def sub_assignment?
+      assignment.is_a?(SubAssignment)
+    end
+
+    def required_replies
+      assignment.parent_assignment.discussion_topic.reply_to_entry_required_count
     end
   end
 

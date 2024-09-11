@@ -729,6 +729,47 @@ describe UserLearningObjectScopes do
       expect(@teacher.assignments_needing_grading).to all(have_attribute(:only_visible_to_overrides))
     end
 
+    context "is_sub_assignment" do
+      before do
+        @course1.root_account.enable_feature!(:discussion_checkpoints)
+        @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course1)
+        @reply_to_topic.submit_homework @student_a, body: "checkpoint submission for #{@student_a.name}"
+      end
+
+      it "default false and does not return checkpointed sub-assignments" do
+        expect(@teacher.assignments_needing_grading).not_to include(@reply_to_topic)
+      end
+
+      it "returns only checkpointed sub-assignments when true" do
+        expect(@teacher.assignments_needing_grading(is_sub_assignment: true, discussion_checkpoints_enabled: true)).to eq([@reply_to_topic])
+      end
+
+      it "returns only checkpointed sub-assignments from the given course" do
+        @course2.root_account.enable_feature!(:discussion_checkpoints)
+        reply_to_topic2, _reply_to_entry2 = graded_discussion_topic_with_checkpoints(context: @course2)
+        reply_to_topic2.submit_homework @student_a, body: "checkpoint submission for #{@student_a.name}"
+
+        expect(@teacher.assignments_needing_grading(is_sub_assignment: true, discussion_checkpoints_enabled: true, course_ids: [@course1.id])).to eq([@reply_to_topic])
+      end
+
+      it "returns only active checkpointed sub-assignments" do
+        reply_to_topic2, _reply_to_entry2 = graded_discussion_topic_with_checkpoints(context: @course1)
+        reply_to_topic2.submit_homework @student_a, body: "checkpoint submission for #{@student_a.name}"
+
+        expect(@teacher.assignments_needing_grading(is_sub_assignment: true, discussion_checkpoints_enabled: true)).to eq([@reply_to_topic, reply_to_topic2])
+
+        reply_to_topic2.parent_assignment.workflow_state = "deleted"
+        reply_to_topic2.parent_assignment.save!
+
+        expect(@teacher.assignments_needing_grading(is_sub_assignment: true, discussion_checkpoints_enabled: true)).to eq([@reply_to_topic])
+      end
+
+      it "when false does not return parent assignments of sub-assignments" do
+        @reply_to_entry.submit_homework @student_a, body: "checkpoint submission for #{@student_a.name}"
+        expect(@teacher.assignments_needing_grading(discussion_checkpoints_enabled: true)).not_to include(@reply_to_topic.parent_assignment)
+      end
+    end
+
     context "sharding" do
       specs_require_sharding
 
