@@ -490,9 +490,22 @@ describe AssignmentOverride do
       let(:sub_assignment) { parent_assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC) }
       let(:parent_override) { parent_assignment.assignment_overrides.create! }
 
+      it "requires a parent_override for new overrides" do
+        override = AssignmentOverride.new(assignment: sub_assignment)
+        expect(override).not_to be_valid
+        expect(override.errors[:parent_override_id]).to include("must be present for sub-assignment overrides")
+      end
+
       it "is valid with a parent_override" do
         override = AssignmentOverride.new(assignment: sub_assignment, parent_override:)
         expect(override).to be_valid
+      end
+
+      it "does not allow removing parent_override from existing overrides" do
+        override = AssignmentOverride.create!(assignment: sub_assignment, parent_override:)
+        override.parent_override = nil
+        expect(override).not_to be_valid
+        expect(override.errors[:parent_override_id]).to include("must be present for sub-assignment overrides")
       end
 
       it "marks the child_override as deleted when the parent_override is destroyed" do
@@ -1272,7 +1285,7 @@ describe AssignmentOverride do
       topic.update!(group_category: category)
       topic.create_checkpoints(reply_to_topic_points: 4, reply_to_entry_points: 2)
       checkpoint = topic.reply_to_topic_checkpoint
-      override = assignment_override_model(assignment: checkpoint, course: @course, set: group)
+      override = create_group_override_for_assignment(checkpoint, { group: })
       expect(checkpoint.assignment_overrides).to include override
     end
   end

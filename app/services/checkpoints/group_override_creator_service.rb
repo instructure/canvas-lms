@@ -34,25 +34,21 @@ class Checkpoints::GroupOverrideCreatorService < ApplicationService
 
     group_id = @override.fetch(:set_id) { raise Checkpoints::SetIdRequiredError, "set_id is required, but was not provided" }
     group = @checkpoint.course.active_groups.where(group_category_id: @checkpoint.effective_group_category_id).find(group_id)
-    override = create_override(assignment: @checkpoint, group:)
 
-    unless parent_override_exists?(group)
-      create_override(assignment: @checkpoint.parent_assignment, group:, shell_override: true)
-    end
-
-    override
+    parent_override = parent_override(group)
+    create_override(assignment: @checkpoint, group:, parent_override:)
   end
 
   private
 
-  def create_override(assignment:, group:, shell_override: false)
-    override = assignment.assignment_overrides.build(set: group, dont_touch_assignment: true)
+  def create_override(assignment:, group:, shell_override: false, parent_override: nil)
+    override = assignment.assignment_overrides.build(set: group, dont_touch_assignment: true, parent_override:)
     apply_overridden_dates(override, @override, shell_override:)
     override.save!
     override
   end
 
-  def parent_override_exists?(group)
-    @checkpoint.parent_assignment.active_assignment_overrides.where(set: group).exists?
+  def parent_override(group)
+    @checkpoint.parent_assignment.active_assignment_overrides.find_by(set: group) || create_override(assignment: @checkpoint.parent_assignment, group:, shell_override: true)
   end
 end

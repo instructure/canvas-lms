@@ -66,6 +66,8 @@ class AssignmentOverride < ActiveRecord::Base
   validates :set_id, uniqueness: { scope: %i[attachment_id set_type workflow_state],
                                    if: ->(override) { override.attachment? && override.active? && concrete_set.call(override) } }
 
+  validate :validate_parent_override_for_sub_assignment
+
   before_create :set_root_account_id
 
   validate if: concrete_set do |record|
@@ -142,6 +144,16 @@ class AssignmentOverride < ActiveRecord::Base
   def set_not_empty?
     ["CourseSection", "Group", SET_TYPE_NOOP, "Course"].include?(set_type) ||
       (set.any? && overridable.context.current_enrollments.where(user_id: set).exists?)
+  end
+
+  def validate_parent_override_for_sub_assignment
+    if assignment.is_a?(SubAssignment)
+      if parent_override_id.blank?
+        errors.add(:parent_override_id, "must be present for sub-assignment overrides")
+      end
+    elsif parent_override_id.present?
+      errors.add(:parent_override_id, "can only be set for overrides belonging to a SubAssignment")
+    end
   end
 
   def update_grading_period_grades

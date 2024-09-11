@@ -23,6 +23,7 @@ describe Checkpoint do
       course_with_teacher(active_all: true)
 
       parent_assignment = @course.assignments.create!
+      parent_assignment.root_account.enable_feature!(:discussion_checkpoints)
 
       sub_assignment = SubAssignment.new(
         name: "Assignment Name",
@@ -39,9 +40,7 @@ describe Checkpoint do
       user = user_factory(active_all: true)
       @course.enroll_student(user).accept!
       students = [user]
-
       create_adhoc_override_for_assignment(sub_assignment, students, due_at: 2.days.from_now)
-
       checkpoint = Checkpoint.new(sub_assignment, @teacher)
       json = checkpoint.as_json
 
