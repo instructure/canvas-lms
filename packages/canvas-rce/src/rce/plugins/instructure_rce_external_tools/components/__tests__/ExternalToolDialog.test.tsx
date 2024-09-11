@@ -48,6 +48,8 @@ let submit: jest.Mock
 let originalSubmit: () => void
 let originalScroll: typeof window.scroll
 
+window.CSS.supports = () => false
+
 async function waitForAssertion(cb: () => void) {
   try {
     cb()
@@ -263,6 +265,21 @@ describe('ExternalToolDialog', () => {
       const instance = await getInstance(container)
       instance.open(toolHelper(2))
       expect(document.querySelector('iframe')?.getAttribute('data-lti-launch')).toBe('true')
+    })
+
+    it('sets height of iframe properly if dwh not supported', async () => {
+      const instance = await getInstance(container)
+      instance.open(toolHelper(2, {height: 500}))
+      const style = document.querySelector('iframe')?.style
+      expect(style?.height).toBe('500px')
+    })
+
+    it('sets height of iframe properly if dwh supported', async () => {
+      window.CSS.supports = () => true
+      const instance = await getInstance(container)
+      instance.open(toolHelper(2, {height: 500}))
+      const res = instance.calcIFrameHeight()
+      expect(res).toBe('min(500px, calc(95dvh - 5.5rem))')
     })
 
     describe('tray', () => {
