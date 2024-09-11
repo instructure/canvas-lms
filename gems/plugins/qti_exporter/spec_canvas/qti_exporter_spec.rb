@@ -266,10 +266,7 @@ if Qti.migration_executable
     end
 
     it "loads qti new quiz identifier when import file contains it" do
-      allow(Account.site_admin)
-        .to receive(:feature_enabled?)
-        .with(:common_cartridge_qti_new_quizzes_import)
-        .and_return(true)
+      Account.site_admin.enable_feature!(:common_cartridge_qti_new_quizzes_import)
       setup_migration(File.expand_path("fixtures/qti/lti_qti_new_quizzes.zip", __dir__))
       expect(Canvas::Migration::Worker).to receive(:upload_overview_file) do |arg1, _arg2|
         overview = JSON.parse(File.read(arg1.path))
