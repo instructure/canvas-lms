@@ -133,4 +133,6 @@ class CanvasSchema < GraphQL::Schema
   default_max_page_size GraphQLTuning.default_max_page_size
   validate_max_errors GraphQLTuning.validate_max_errors
   max_query_string_tokens GraphQLTuning.max_query_string_tokens
+
+  query_analyzer(LogQueryComplexity)
 end
