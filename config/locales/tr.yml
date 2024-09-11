@@ -10045,6 +10045,7 @@ tr:
       event: "%{date} %{time}"
   handler_7912052f: İşleyici
   has_turnitin_score_3e1cacf6: "Turnitin puanı"
+  header_f28f73db: Başlık
   height_69b03e15: Yükseklik
   helpDialog: 
     Back: Geri
