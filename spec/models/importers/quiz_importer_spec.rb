@@ -385,4 +385,338 @@ describe "Importers::QuizImporter" do
     expect(quiz.quiz_questions.first.root_account_id).to eq quiz.root_account_id
     expect(quiz.root_account_id).to eq @course.root_account_id
   end
+
+  describe "import_from_migration date shift saving method" do
+    subject { Importers::QuizImporter.import_from_migration(input_hash, course, migration, question_data) }
+
+    let(:course) { course_model }
+    let(:migration) { course.content_migrations.create! }
+    let(:input_hash) { get_import_data ["vista", "quiz"], "simple_quiz_data" }
+    let(:question_data) { import_example_questions }
+
+    context "when FF pre_date_shift_for_assignment_importing enabled" do
+      before do
+        Account.site_admin.enable_feature!(:pre_date_shift_for_assignment_importing)
+      end
+
+      it "should use the try_to_save_with_date_shift method" do
+        expect(Importers::QuizImporter)
+          .to receive(:try_to_save_with_date_shift).with(kind_of(Quizzes::Quiz), migration).and_call_original
+        subject
+      end
+    end
+
+    context "when FF pre_date_shift_for_assignment_importing disabled" do
+      it "should not use the try_to_save_with_date_shift method" do
+        expect(Importers::QuizImporter).to_not receive(:try_to_save_with_date_shift)
+        subject
+      end
+    end
+  end
+
+  describe "#try_to_save_with_date_shift" do
+    subject do
+      Importers::QuizImporter.try_to_save_with_date_shift(item, migration)
+    end
+
+    let(:course) { Course.create! }
+    let(:migration) do
+      course.content_migrations.create!(
+        migration_settings: {
+          date_shift_options: {
+            old_start_date: "2023-01-01",
+            old_end_date: "2023-12-31",
+            new_start_date: "2024-01-01",
+            new_end_date: "2024-12-31"
+          }
+        }
+      )
+    end
+    # This is not saved at this point, so there is no id
+    let(:item) { course.quizzes.temp_record }
+    let(:original_date) { Time.zone.parse("2023-06-01") }
+    let(:original_date_plus_one) { original_date + 1.day }
+    # With the given date shift options, this is the expected date
+    let(:expected_date) { Time.zone.parse("2024-05-30") }
+    let(:deletable_error_fields) { %i[due_at lock_at unlock_at show_correct_answers_at hide_correct_answers_at] }
+
+    context "when there is no date_shift_options on migration" do
+      let(:migration) { super().tap { |m| m.migration_settings.delete(:date_shift_options) } }
+
+      before do
+        item.update!(
+          due_at: original_date,
+          lock_at: original_date,
+          unlock_at: original_date,
+          show_correct_answers_at: original_date,
+          hide_correct_answers_at: original_date_plus_one
+        )
+      end
+
+      it "should not change the due_at field" do
+        expect(subject.due_at).to eq(original_date)
+      end
+
+      it "should not change the lock_at field" do
+        expect(subject.lock_at).to eq(original_date)
+      end
+
+      it "should not change the unlock_at field" do
+        expect(subject.unlock_at).to eq(original_date)
+      end
+
+      it "should not change the show_correct_answers_at field" do
+        expect(subject.show_correct_answers_at).to eq(original_date)
+      end
+
+      it "should not change the hide_correct_answers_at field" do
+        expect(subject.hide_correct_answers_at).to eq(original_date_plus_one)
+      end
+
+      it "should early return" do
+        expect(Importers::CourseContentImporter).not_to receive(:shift_date_options)
+        subject
+      end
+    end
+
+    context "when setting due_at field" do
+      context "when field is given" do
+        before do
+          item.update!(due_at: original_date)
+        end
+
+        it "should shift the date" do
+          expect(subject.due_at).to eq(expected_date)
+        end
+      end
+
+      context "when date is invalid after shifting" do
+        let(:title) { "test title" }
+
+        before do
+          item.update!(title:)
+          item.due_at = original_date
+          item.errors.add(:due_at, "a validation error message")
+
+          allow(item).to receive(:invalid?).and_return(true)
+          deletable_error_fields.each { |attr| allow(item.errors).to receive(:delete).with(attr) }
+        end
+
+        it "should keep the original incoming date" do
+          expect(subject.due_at).to eq(original_date)
+        end
+
+        it "should clear the date error field" do
+          expect(item.errors).to receive(:delete).with(:due_at)
+          subject
+        end
+
+        it "should add a warning to the migration on record with id" do
+          subject
+          expected_issue_message = "Couldn't adjust dates on quiz #{title} (ID #{item.id})"
+          issues = migration.migration_issues
+          expect(issues.count).to eq(1)
+          expect(migration.migration_issues.first.description).to eq(expected_issue_message)
+        end
+      end
+
+      context "when field is missing" do
+        it "should shift the date" do
+          expect(subject.due_at).to be_nil
+        end
+      end
+    end
+
+    context "when setting lock_at field" do
+      context "when field is given" do
+        before do
+          item.update!(lock_at: original_date)
+        end
+
+        it "should shift the date" do
+          expect(subject.lock_at).to eq(expected_date)
+        end
+      end
+
+      context "when date is invalid after shifting" do
+        let(:title) { "test title" }
+
+        before do
+          item.update!(title:)
+          item.lock_at = original_date
+          item.errors.add(:lock_at, "a validation error message")
+
+          allow(item).to receive(:invalid?).and_return(true)
+          deletable_error_fields.each { |attr| allow(item.errors).to receive(:delete).with(attr) }
+        end
+
+        it "should keep the original incoming date" do
+          expect(subject.lock_at).to eq(original_date)
+        end
+
+        it "should clear the date error field" do
+          expect(item.errors).to receive(:delete).with(:lock_at)
+          subject
+        end
+
+        it "should add a warning to the migration on record with id" do
+          subject
+          expected_issue_message = "Couldn't adjust dates on quiz #{title} (ID #{item.id})"
+          issues = migration.migration_issues
+          expect(issues.count).to eq(1)
+          expect(migration.migration_issues.first.description).to eq(expected_issue_message)
+        end
+      end
+
+      context "when field is missing" do
+        it "should shift the date" do
+          expect(subject.lock_at).to be_nil
+        end
+      end
+    end
+
+    context "when setting unlock_at field" do
+      context "when field is given" do
+        before do
+          item.update!(unlock_at: original_date)
+        end
+
+        it "should shift the date" do
+          expect(subject.unlock_at).to eq(expected_date)
+        end
+      end
+
+      context "when date is invalid after shifting" do
+        let(:title) { "test title" }
+
+        before do
+          item.update!(title:)
+          item.unlock_at = original_date
+          item.errors.add(:unlock_at, "a validation error message")
+
+          allow(item).to receive(:invalid?).and_return(true)
+          deletable_error_fields.each { |attr| allow(item.errors).to receive(:delete).with(attr) }
+        end
+
+        it "should keep the original incoming date" do
+          expect(subject.unlock_at).to eq(original_date)
+        end
+
+        it "should clear the date error field" do
+          expect(item.errors).to receive(:delete).with(:unlock_at)
+          subject
+        end
+
+        it "should add a warning to the migration on record with id" do
+          subject
+          expected_issue_message = "Couldn't adjust dates on quiz #{title} (ID #{item.id})"
+          issues = migration.migration_issues
+          expect(issues.count).to eq(1)
+          expect(migration.migration_issues.first.description).to eq(expected_issue_message)
+        end
+      end
+
+      context "when field is missing" do
+        it "should shift the date" do
+          expect(subject.unlock_at).to be_nil
+        end
+      end
+    end
+
+    context "when setting show_correct_answers_at field" do
+      context "when field is given" do
+        before do
+          item.update!(show_correct_answers_at: original_date)
+        end
+
+        it "should shift the date" do
+          expect(subject.show_correct_answers_at).to eq(expected_date)
+        end
+      end
+
+      context "when date is invalid after shifting" do
+        let(:title) { "test title" }
+
+        before do
+          item.update!(title:)
+          item.show_correct_answers_at = original_date
+          item.errors.add(:show_correct_answers_at, "a validation error message")
+
+          allow(item).to receive(:invalid?).and_return(true)
+          deletable_error_fields.each { |attr| allow(item.errors).to receive(:delete).with(attr) }
+        end
+
+        it "should keep the original incoming date" do
+          expect(subject.show_correct_answers_at).to eq(original_date)
+        end
+
+        it "should clear the date error field" do
+          expect(item.errors).to receive(:delete).with(:show_correct_answers_at)
+          subject
+        end
+
+        it "should add a warning to the migration on record with id" do
+          subject
+          expected_issue_message = "Couldn't adjust dates on quiz #{title} (ID #{item.id})"
+          issues = migration.migration_issues
+          expect(issues.count).to eq(1)
+          expect(migration.migration_issues.first.description).to eq(expected_issue_message)
+        end
+      end
+
+      context "when field is missing" do
+        it "should shift the date" do
+          expect(subject.show_correct_answers_at).to be_nil
+        end
+      end
+    end
+
+    context "when setting hide_correct_answers_at field" do
+      context "when field is given" do
+        before do
+          item.update!(hide_correct_answers_at: original_date)
+        end
+
+        it "should shift the date" do
+          expect(subject.hide_correct_answers_at).to eq(expected_date)
+        end
+      end
+
+      context "when date is invalid after shifting" do
+        let(:title) { "test title" }
+
+        before do
+          item.update!(title:)
+          item.hide_correct_answers_at = original_date
+          item.errors.add(:hide_correct_answers_at, "a validation error message")
+
+          allow(item).to receive(:invalid?).and_return(true)
+          deletable_error_fields.each { |attr| allow(item.errors).to receive(:delete).with(attr) }
+        end
+
+        it "should keep the original incoming date" do
+          expect(subject.hide_correct_answers_at).to eq(original_date)
+        end
+
+        it "should clear the date error field" do
+          expect(item.errors).to receive(:delete).with(:hide_correct_answers_at)
+          subject
+        end
+
+        it "should add a warning to the migration on record with id" do
+          subject
+          expected_issue_message = "Couldn't adjust dates on quiz #{title} (ID #{item.id})"
+          issues = migration.migration_issues
+          expect(issues.count).to eq(1)
+          expect(migration.migration_issues.first.description).to eq(expected_issue_message)
+        end
+      end
+
+      context "when field is missing" do
+        it "should shift the date" do
+          expect(subject.hide_correct_answers_at).to be_nil
+        end
+      end
+    end
+  end
 end

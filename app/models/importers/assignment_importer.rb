@@ -21,6 +21,7 @@ module Importers
   class AssignmentImporter < Importer
     # Used to avoid adding duplicate line items when doing a re-import
     LINE_ITEMS_EQUIVALENCY_FIELDS = %i[extensions label resource_id score_maximum tag].freeze
+    ATTRIBUTES_FOR_DATE_SHIFT = %i[due_at lock_at unlock_at peer_reviews_due_at needs_update_cached_due_dates].freeze
 
     self.item_class = Assignment
 
@@ -371,19 +372,23 @@ module Importers
 
       migration.add_imported_item(item)
 
-      if migration.date_shift_options
-        # Unfortunately, we save the assignment here, and then shift dates and
-        # save the assignment again later in the course migration. Saving here
-        # would normally schedule the auto peer reviews job with the
-        # pre-shifted due date, which is probably in the past. After shifting
-        # dates, it is saved again, but because the job is stranded, and
-        # because the new date is probably later than the old date, the new job
-        # is not scheduled, even though that's the date we want.
-        item.skip_schedule_peer_reviews = true
-      end
       item.needs_update_cached_due_dates = true if new_record || item.update_cached_due_dates?
-      item.save_without_broadcasting!
-      item.skip_schedule_peer_reviews = nil
+      if Account.site_admin.feature_enabled?(:pre_date_shift_for_assignment_importing)
+        try_to_save_with_date_shift(item, migration)
+      else
+        if migration.date_shift_options
+          # Unfortunately, we save the assignment here, and then shift dates and
+          # save the assignment again later in the course migration. Saving here
+          # would normally schedule the auto peer reviews job with the
+          # pre-shifted due date, which is probably in the past. After shifting
+          # dates, it is saved again, but because the job is stranded, and
+          # because the new date is probably later than the old date, the new job
+          # is not scheduled, even though that's the date we want.
+          item.skip_schedule_peer_reviews = true
+        end
+        item.save_without_broadcasting!
+        item.skip_schedule_peer_reviews = nil
+      end
       item.lti_resource_link_lookup_uuid = hash["resource_link_lookup_uuid"]
 
       create_lti_13_models(hash, context, migration, item)
@@ -579,6 +584,44 @@ module Importers
         end
       end
       params
+    end
+
+    def self.try_to_save_with_date_shift(item, migration)
+      unless migration.date_shift_options
+        item.save_without_broadcasting!
+        return item
+      end
+      shift_options = CourseContentImporter.shift_date_options(migration.course, migration.date_shift_options)
+
+      original_due_at = item.due_at
+      original_lock_at = item.lock_at
+      original_unlock_at = item.unlock_at
+      original_peer_reviews_due_at = item.peer_reviews_due_at
+      original_needs_update_cached_due_dates = item.needs_update_cached_due_dates
+
+      item.due_at = CourseContentImporter.shift_date(item.due_at, shift_options) if item.due_at
+      item.lock_at = CourseContentImporter.shift_date(item.lock_at, shift_options) if item.lock_at
+      item.unlock_at = CourseContentImporter.shift_date(item.unlock_at, shift_options) if item.unlock_at
+      item.peer_reviews_due_at = CourseContentImporter.shift_date(item.peer_reviews_due_at, shift_options) if item.peer_reviews_due_at
+      item.needs_update_cached_due_dates = item.update_cached_due_dates?
+
+      if item.invalid? && CourseContentImporter.error_on_dates?(item, ATTRIBUTES_FOR_DATE_SHIFT)
+        migration.add_warning(t("Couldn't adjust dates on assignment %{name} (ID %{id})", name: item.title, id: item.id&.to_s))
+
+        item.errors.delete(:due_at)
+        item.due_at = original_due_at
+        item.errors.delete(:lock_at)
+        item.lock_at = original_lock_at
+        item.errors.delete(:unlock_at)
+        item.unlock_at = original_unlock_at
+        item.errors.delete(:peer_reviews_due_at)
+        item.peer_reviews_due_at = original_peer_reviews_due_at
+        item.errors.delete(:needs_update_cached_due_dates)
+        item.needs_update_cached_due_dates = original_needs_update_cached_due_dates
+      end
+
+      item.save_without_broadcasting!
+      item
     end
   end
 end
