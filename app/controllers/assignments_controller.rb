@@ -786,6 +786,16 @@ class AssignmentsController < ApplicationController
     rce_js_env
     @assignment ||= @context.assignments.active.find(params[:id])
     add_crumb_on_new_quizzes(false)
+
+    if @context.root_account.feature_enabled?(:assignment_edit_enhancements_teacher_view) &&
+       authorized_action(@assignment, @current_user, @assignment.new_record? ? :create : :update)
+      js_env({ ASSIGNMENT_EDIT_ENHANCEMENTS_TEACHER_VIEW: true, ASSIGNMENT_ID: params[:id] })
+      css_bundle :assignment_enhancements_teacher_view
+      js_bundle :assignment_edit
+      render html: "", layout: true
+      return
+    end
+
     if authorized_action(@assignment, @current_user, @assignment.new_record? ? :create : :update)
       @assignment.title = params[:title] if params[:title]
       @assignment.due_at = params[:due_at] if params[:due_at]
