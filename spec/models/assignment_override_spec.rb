@@ -484,6 +484,25 @@ describe AssignmentOverride do
       expect(@override).not_to be_valid
       expect(@override.errors[:base].first).to eq "cannot set dates for context module overrides"
     end
+
+    context "sub-assignments" do
+      let(:parent_assignment) { @course.assignments.create! }
+      let(:sub_assignment) { parent_assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC) }
+      let(:parent_override) { parent_assignment.assignment_overrides.create! }
+
+      it "is valid with a parent_override" do
+        override = AssignmentOverride.new(assignment: sub_assignment, parent_override:)
+        expect(override).to be_valid
+      end
+
+      it "marks the child_override as deleted when the parent_override is destroyed" do
+        child_override = AssignmentOverride.create!(assignment: sub_assignment, parent_override:)
+        expect(child_override.workflow_state).not_to eq "deleted"
+        parent_override.destroy
+        expect(child_override.reload.workflow_state).to eq "deleted"
+        expect(parent_override.reload.workflow_state).to eq "deleted"
+      end
+    end
   end
 
   describe "title" do

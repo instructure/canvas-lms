@@ -43,6 +43,8 @@ class AssignmentOverride < ActiveRecord::Base
   belongs_to :discussion_topic, inverse_of: :assignment_overrides
   belongs_to :attachment, inverse_of: :assignment_overrides
   belongs_to :set, polymorphic: %i[group course_section course], exhaustive: false
+  belongs_to :parent_override, class_name: "AssignmentOverride", optional: true
+  has_many :child_overrides, class_name: "AssignmentOverride", foreign_key: "parent_override_id", inverse_of: :parent_override, dependent: :destroy
   has_many :assignment_override_students, -> { where(workflow_state: "active") }, inverse_of: :assignment_override, dependent: :destroy, validate: false
   validates :assignment_version, presence: { if: :assignment }
   validates :title, :workflow_state, presence: true
@@ -252,6 +254,7 @@ class AssignmentOverride < ActiveRecord::Base
   def destroy
     transaction do
       assignment_override_students.reload.destroy_all
+      child_overrides.reload.each(&:destroy)
       self.workflow_state = "deleted"
       default_values
       save!(validate: false)
