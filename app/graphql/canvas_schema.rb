@@ -18,11 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require "datadog/auto_instrument"
+
 class CanvasSchema < GraphQL::Schema
   query Types::QueryType
   mutation Types::MutationType
-  trace_with GraphQL::Tracing::CallLegacyTracers
-  trace_with GraphQL::Tracing::SentryTrace
+  trace_with GraphQL::Tracing::DataDogTrace if Rails.env.production?
+  trace_with GraphQL::Tracing::SentryTrace if Rails.env.production?
 
   use GraphQL::Batch
 
