@@ -22,6 +22,8 @@ module Importers
   class QuizImporter < Importer
     self.item_class = Quizzes::Quiz
 
+    ATTRIBUTES_FOR_DATE_SHIFT = %i[due_at lock_at unlock_at show_correct_answers_at hide_correct_answers_at].freeze
+
     # try to standardize the data to make life easier later on
     # in particular, strip out all of the embedded questions and add explicitly to assessment_questions
     def self.preprocess_migration_data(data)
@@ -230,7 +232,15 @@ module Importers
       end
 
       item.saved_by = :migration
-      item.save!
+
+      # Putting date shift here since this is the first place where we save after the dates are set
+      # This is important to avoid issues to try to put the shifted dates to the model and not update later
+      if Account.site_admin.feature_enabled?(:pre_date_shift_for_assignment_importing)
+        try_to_save_with_date_shift(item, migration)
+      else
+        item.save!
+      end
+
       recache_due_dates = item.assignment&.needs_update_cached_due_dates # quiz ends up getting reloaded by the end
       build_assignment = false
 
@@ -389,6 +399,44 @@ module Importers
         end
       end
       item.reload # reload to catch question additions
+    end
+
+    def self.try_to_save_with_date_shift(item, migration)
+      unless migration.date_shift_options
+        item.save!
+        return item
+      end
+      shift_options = CourseContentImporter.shift_date_options(migration.course, migration.date_shift_options)
+
+      original_due_at = item.due_at
+      original_lock_at = item.lock_at
+      original_unlock_at = item.unlock_at
+      original_show_correct_answers_at = item.show_correct_answers_at
+      original_hide_correct_answers_at = item.hide_correct_answers_at
+
+      item.due_at = CourseContentImporter.shift_date(item.due_at, shift_options) if item.due_at
+      item.lock_at = CourseContentImporter.shift_date(item.lock_at, shift_options) if item.lock_at
+      item.unlock_at = CourseContentImporter.shift_date(item.unlock_at, shift_options) if item.unlock_at
+      item.show_correct_answers_at = CourseContentImporter.shift_date(item.show_correct_answers_at, shift_options) if item.show_correct_answers_at
+      item.hide_correct_answers_at = CourseContentImporter.shift_date(item.hide_correct_answers_at, shift_options) if item.hide_correct_answers_at
+
+      if item.invalid? && CourseContentImporter.error_on_dates?(item, ATTRIBUTES_FOR_DATE_SHIFT)
+        migration.add_warning(t("Couldn't adjust dates on quiz %{name} (ID %{id})", name: item.title, id: item.id&.to_s))
+
+        item.errors.delete(:due_at)
+        item.due_at = original_due_at
+        item.errors.delete(:lock_at)
+        item.lock_at = original_lock_at
+        item.errors.delete(:unlock_at)
+        item.unlock_at = original_unlock_at
+        item.errors.delete(:show_correct_answers_at)
+        item.show_correct_answers_at = original_show_correct_answers_at
+        item.errors.delete(:hide_correct_answers_at)
+        item.hide_correct_answers_at = original_hide_correct_answers_at
+      end
+
+      item.save!
+      item
     end
   end
 end
