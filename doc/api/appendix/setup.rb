@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2024 - present Instructure, Inc.
+# Copyright (C) 2013 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,21 +18,23 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-def diskfile
-  content = "<div id='filecontents'>" +
-            case (File.extname(@file)[1..] || "").downcase
-            when "htm", "html"
-              @contents
-            when "txt"
-              "<pre>#{@contents}</pre>"
-            when "textile", "txtile"
-              htmlify(@contents, :textile)
-            when "markdown", "md", "mdown", "mkd"
-              htmlify(@contents, :markdown)
-            else
-              htmlify(@contents, diskfile_shebang_or_default)
-            end +
-            "</div>"
-  options.delete(:no_highlight)
-  content
+include T("default/appendix/html")
+include YARD::Templates::Helpers::HtmlHelper
+
+def appendix
+  controllers = options[:controllers]
+
+  if options[:all_resources]
+    controllers = options[:resources].flatten.select do |o|
+      o.is_a?(YARD::CodeObjects::NamespaceObject)
+    end
+  end
+
+  return unless controllers.is_a?(Array)
+
+  @appendixes = controllers.collect do |c|
+    c.children.select { |o| o.type == :appendix }
+  end.flatten
+
+  super
 end

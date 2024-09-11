@@ -1,0 +1,9 @@
+<% if object.has_tag?(:example_response) %>
+#### Example Response:
+    <% object.tags(:example_response).each do |tag| %>
+<% if tag.name && !tag.name.strip.empty? %>#### <%= htmlify tag.name %> <% end %>
+```js
+<%= tag.text.lstrip %>
+```
+    <% end %>
+<% end %>

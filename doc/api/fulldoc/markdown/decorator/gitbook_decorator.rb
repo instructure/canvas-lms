@@ -18,21 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-def diskfile
-  content = "<div id='filecontents'>" +
-            case (File.extname(@file)[1..] || "").downcase
-            when "htm", "html"
-              @contents
-            when "txt"
-              "<pre>#{@contents}</pre>"
-            when "textile", "txtile"
-              htmlify(@contents, :textile)
-            when "markdown", "md", "mdown", "mkd"
-              htmlify(@contents, :markdown)
-            else
-              htmlify(@contents, diskfile_shebang_or_default)
-            end +
-            "</div>"
-  options.delete(:no_highlight)
-  content
+module GitbookDecorator
+  # Gitbook specific implementation of the hint method
+  # see: https://docs.gitbook.com/content-editor/blocks/hint
+  #
+  # @param hint_style [String] the style of the hint
+  # @param text [String] the hint text
+  # @return [String] the hint in Gitbook format
+  def hint(hint_style, text)
+    "{% hint style=\"#{hint_style}\" %} #{text} {% endhint %}"
+  end
 end
