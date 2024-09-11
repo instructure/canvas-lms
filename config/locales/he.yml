@@ -9930,6 +9930,7 @@ he:
   has_turnitin_score_3e1cacf6: "קיבלו ציון  Turnitin "
   haven_t_been_graded_d7dee5bb: "לא התבצעה הערכה"
   haven_t_submitted_yet_e63834db: "טרם הוגש"
+  header_f28f73db: Header
   helpDialog: 
     Back: חזרה
     Help: "עזרה "
