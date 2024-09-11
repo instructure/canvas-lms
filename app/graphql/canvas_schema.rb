@@ -126,6 +126,6 @@ class CanvasSchema < GraphQL::Schema
     end
   end
 
-  # graphiql can't load the explorer if we go below 15, so we'll use that as long as our specs continue to pass
-  max_depth 15
+  # GraphQL tuning and defensive settings
+  max_depth GraphQLTuning.max_depth
 end
