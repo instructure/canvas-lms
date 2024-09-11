@@ -6891,6 +6891,7 @@ ko:
     unassigned_users: "할당 안 된 사용자 (%{count}명)"
   groups_6c90e26a: 그룹
   handler_7912052f: 처리기
+  header_f28f73db: 머리글
   helpDialog: 
     Back: 뒤로
     Help: 도움말
