@@ -4586,9 +4586,8 @@ describe CalendarEventsApiController, type: :request do
         expect(@checkpoint_1.all_day).to be_falsey
         expect(@checkpoint_1.all_day_date).to eq DateTime.parse("2024-08-03 05:15:00").to_date
 
-        assignment_override_model(assignment: @checkpoint_1,
-                                  set: @course.default_section,
-                                  due_at: DateTime.parse("2024-08-05 23:59:00"))
+        @override = create_section_override_for_assignment(@checkpoint_1, due_at: DateTime.parse("2024-08-05 23:59:00"))
+
         expect(@override.all_day).to be_truthy
         expect(@override.all_day_date).to eq DateTime.parse("2024-08-05 23:59:00").to_date
 
@@ -4614,10 +4613,8 @@ describe CalendarEventsApiController, type: :request do
         @checkpoint_1.save!
         expect(@checkpoint_1.all_day).to be_truthy
         expect(@checkpoint_1.all_day_date).to eq DateTime.parse("2024-08-03 23:59:00").to_date
+        @override = create_section_override_for_assignment(@checkpoint_1, due_at: DateTime.parse("2024-08-05 05:15:00"))
 
-        assignment_override_model(assignment: @checkpoint_1,
-                                  set: @course.default_section,
-                                  due_at: DateTime.parse("2024-08-05 05:15:00"))
         expect(@override.all_day).to be_falsey
         expect(@override.all_day_date).to eq DateTime.parse("2024-08-05 05:15:00").to_date
 
