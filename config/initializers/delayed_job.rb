@@ -147,8 +147,7 @@ Delayed::Worker.lifecycle.before(:error) do |worker, job, exception|
 end
 
 Delayed::Worker.lifecycle.before(:loop) do |worker|
-  unless Rails.cache.exist?("loop_stats_has_run_within_1m")
-    Rails.cache.write("loop_stats_has_run_within_1m", true, expires_in: 1.minute)
+  Rails.cache.fetch("loop_stats_has_run_within_1m", expires_in: 1.minute) do
     # log the age in seconds of the oldest job
     age = ((Delayed::Job.where(attempts: 0)
                         .where('run_at <= ?', DateTime.now.utc)
@@ -160,5 +159,6 @@ Delayed::Worker.lifecycle.before(:loop) do |worker|
     }
 
     Rails.logger.info(jobs.to_json)
+    true
   end
 end
