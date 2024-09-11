@@ -7268,6 +7268,7 @@ el:
   handler_7912052f: Χειριστής
   haven_t_been_graded_d7dee5bb: "Δεν έχει/έχουν βαθμολογηθεί"
   haven_t_submitted_yet_e63834db: "Δεν έχει γίνει ακόμη υποβολή"
+  header_f28f73db: Επικεφαλίδα
   helpDialog: 
     Back: Πίσω
     Help: Βοήθεια
