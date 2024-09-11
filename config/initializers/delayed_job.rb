@@ -147,15 +147,18 @@ Delayed::Worker.lifecycle.before(:error) do |worker, job, exception|
 end
 
 Delayed::Worker.lifecycle.before(:loop) do |worker|
-  # log the age in seconds of the oldest job
-  age = ((Delayed::Job.where(attempts: 0)
-                  .where('run_at <= ?', DateTime.now.utc)
-                  .minimum(:run_at)&.to_datetime || DateTime.now) - DateTime.now).to_i
+  unless Rails.cache.exist?("loop_stats_has_run_within_1m")
+    Rails.cache.write("loop_stats_has_run_within_1m", true, expires_in: 1.minute)
+    # log the age in seconds of the oldest job
+    age = ((Delayed::Job.where(attempts: 0)
+                        .where('run_at <= ?', DateTime.now.utc)
+                        .minimum(:run_at)&.to_datetime || DateTime.now) - DateTime.now).to_i
 
-  jobs = {
-    name: "inst_jobs loop stats",
-    oldest: age
-  }
+    jobs = {
+      name: "inst_jobs loop stats",
+      oldest: age
+    }
 
-  Rails.logger.info(jobs.to_json)
+    Rails.logger.info(jobs.to_json)
+  end
 end
