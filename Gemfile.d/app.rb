@@ -49,6 +49,7 @@ gem 'folio-pagination', '0.0.12', require: 'folio/rails'
 gem 'addressable', '2.5.1', require: false
 gem "after_transaction_commit", '2.0.0'
 gem 'aws-sdk-core', '3.38.0', require: false
+gem 'aws-sdk-cloudwatch', '1.12.0', require: false
 gem "aws-sdk-kinesis", require: false
 gem "aws-sdk-s3", require: false
 gem "aws-sdk-sns", require: false

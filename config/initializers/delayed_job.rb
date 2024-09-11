@@ -148,17 +148,30 @@ end
 
 Delayed::Worker.lifecycle.before(:loop) do |worker|
   Rails.cache.fetch("loop_stats_has_run_within_1m", expires_in: 1.minute) do
+
     # log the age in seconds of the oldest job
     age = ((Delayed::Job.where(attempts: 0)
                         .where('run_at <= ?', DateTime.now.utc)
                         .minimum(:run_at)&.to_datetime || DateTime.now) - DateTime.now).to_i
 
-    jobs = {
-      name: "inst_jobs loop stats",
-      oldest: age
-    }
-
-    Rails.logger.info(jobs.to_json)
+    client = Aws::CloudWatch::Client.new(region: 'us-west-2')
+    client.put_metric_data({
+                             namespace: "Canvas",
+                             metric_data: [
+                               {
+                                 metric_name: "JobStaleness",
+                                 dimensions: [
+                                   {
+                                     name: "domain",
+                                     value: ENV['CANVAS_DOMAIN']
+                                   },
+                                 ],
+                                 timestamp: Time.now,
+                                 value: age,
+                                 unit: "Seconds"
+                               },
+                             ]
+                           })
     true
   end
 end
