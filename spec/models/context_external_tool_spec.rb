@@ -2758,6 +2758,12 @@ describe ContextExternalTool do
         tool.save!
         expect(tool.display_type("global_navigation")).to eq "full_width"
       end
+
+      it "is full_width for global_navigation when tool does not define global_navigation" do
+        tool.global_navigation = nil
+        tool.save!
+        expect(tool.display_type("global_navigation")).to eq "full_width"
+      end
     end
 
     describe "validation" do
