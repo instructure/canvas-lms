@@ -69,6 +69,16 @@ describe AuthenticationProvider::OpenIDConnect do
     end
   end
 
+  describe "#download_discovery" do
+    it "works" do
+      subject.discovery_url = "https://somewhere/.well-known/openid-configuration"
+      response = instance_double("Net::HTTPOK", value: 200, body: { issuer: "me" }.to_json)
+      expect(CanvasHttp).to receive(:get).and_yield(response)
+      subject.valid?
+      expect(subject.issuer).to eq "me"
+    end
+  end
+
   describe "#scope_for_options" do
     it "automatically infers according to requested claims" do
       subject.federated_attributes = { "email" => { "attribute" => "email" } }

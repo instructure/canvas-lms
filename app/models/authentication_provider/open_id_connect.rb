@@ -306,7 +306,7 @@ class AuthenticationProvider
         CanvasHttp.get(url) do |response|
           # raise error unless it's a 2xx
           response.value
-          populate_from_discovery_json(JSON.parse(response.body))
+          populate_from_discovery_json(response.body)
         end
       end
     end
