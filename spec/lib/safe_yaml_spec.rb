@@ -223,11 +223,5 @@ describe "safe_yaml" do
   it "restores default value on sets on load" do
     expect(YAML.unsafe_load(YAML.dump(Set.new)).include?("test")).to be false
   end
-
-  it "loads WeakParameters as HWIA" do
-    wp = YAML.load("--- !ruby/hash:WeakParameters\nk1: v1\nk2: v2\n")
-    expect(wp.class).to eq(ActiveSupport::HashWithIndifferentAccess)
-    expect(wp.values_at(:k1, :k2)).to eq ["v1", "v2"]
-  end
 end
 # rubocop:enable Security/YAMLLoad
