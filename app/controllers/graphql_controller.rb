@@ -68,12 +68,6 @@ class GraphQLController < ApplicationController
       in_app: in_app?,
       deleted_models: {},
       request_id: (Thread.current[:context] || {})[:request_id],
-      tracers: [
-        Tracers::DatadogTracer.new(
-          request.headers["GraphQL-Metrics"] == "true",
-          request.host_with_port.sub(":", "_")
-        )
-      ]
     }
 
     Timeout.timeout(1.minute) do
