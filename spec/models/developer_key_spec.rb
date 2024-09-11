@@ -626,13 +626,6 @@ describe DeveloperKey do
       end.to raise_exception ActiveRecord::RecordInvalid
     end
 
-    it "renames scopes while validating" do
-      devkey = DeveloperKey.create!(scopes: [TokenScopes::LTI_PAGE_CONTENT_SHOW_SCOPE_DEPRECATED])
-      devkey.save!
-
-      expect(devkey.scopes).to eq [TokenScopes::LTI_PAGE_CONTENT_SHOW_SCOPE]
-    end
-
     it "rejects changes to routes.rb if it would break an existing scope" do
       stub_const("CanvasRails::Application", TokenScopesHelper::SpecHelper::MockCanvasRails::Application)
       all_routes = Set.new(TokenScopes.api_routes.pluck(:verb, :path))

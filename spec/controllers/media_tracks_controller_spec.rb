@@ -283,6 +283,14 @@ describe MediaTracksController do
         expect(response).to be_unauthorized
       end
 
+      it "checks the attachment for permissions over media object" do
+        other_course = course_model
+        other_course.media_objects.create!(media_id: "m-unicorns", title: "video1.mp3", media_type: "video/*")
+        @attachment.update! media_entry_id: "m-unicorns"
+        post "create", params: { attachment_id: @attachment.id, kind: "subtitles", locale: "en", content: "one track mind" }
+        expect(response).to be_successful
+      end
+
       it "creates a track" do
         content = "one track mind"
         post "create", params: { attachment_id: @attachment.id, kind: "subtitles", locale: "en", content: }

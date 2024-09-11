@@ -36,23 +36,6 @@ import {
   IconXLine,
 } from '@instructure/ui-icons'
 
-const DEFAULT_FILTER_SETTINGS = {
-  contentSubtype: 'all',
-  contentType: 'links',
-  sortValue: 'date_added',
-  searchString: '',
-}
-
-export function useFilterSettings(default_settings) {
-  const [filterSettings, setFilterSettings] = useState(default_settings || DEFAULT_FILTER_SETTINGS)
-
-  function updateFilterSettings(nextSettings) {
-    setFilterSettings({...filterSettings, ...nextSettings})
-  }
-
-  return [filterSettings, updateFilterSettings]
-}
-
 function fileLabelFromContext(contextType) {
   switch (contextType) {
     case 'user':

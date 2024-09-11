@@ -75,7 +75,7 @@ export const ltiToolsPropType = PropTypes.arrayOf(
 
     // is this a favorite tool?
     favorite: PropTypes.bool,
-    always_on: PropTypes.bool,
+    on_by_default: PropTypes.bool,
 
     name: PropTypes.string,
     description: PropTypes.string,

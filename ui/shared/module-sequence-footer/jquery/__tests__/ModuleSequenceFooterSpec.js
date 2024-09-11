@@ -29,6 +29,7 @@ const server_200_response = data => [
   JSON.stringify(data),
 ]
 
+const previousButton = el => el.find('.module-sequence-footer-button--previous').last()
 const nextButton = el => el.find('.module-sequence-footer-button--next').last()
 
 const moduleData = (args = {}) => ({
@@ -230,18 +231,17 @@ test('buttons show modules tooltip when current module id != next or prev module
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
   this.server.respond()
 
-  ok(
-    this.$testEl
-      .find('.module-sequence-footer-button--previous')
-      .first()
-      .data('html-tooltip-title')
-      .match('Module C'),
-    'displays previous module tooltip'
-  )
-  ok(
-    nextButton(this.$testEl).data('html-tooltip-title').match('Module B'),
-    'displays next module tooltip'
-  )
+  const prevBtn = previousButton(this.$testEl)
+  const nextBtn = nextButton(this.$testEl)
+
+  const prevTooltipId = prevBtn.find('[aria-describedby]').attr('aria-describedby')
+  const prevTooltip = $('#' + prevTooltipId)
+
+  const nextTooltipId = nextBtn.find('[aria-describedby]').attr('aria-describedby')
+  const nextTooltip = $('#' + nextTooltipId)
+
+  ok(prevTooltip.text().match('Module C'), 'displays previous module tooltip')
+  ok(nextTooltip.text().match('Module B'), 'displays next module tooltip')
 })
 
 const itemTooltipData = {
@@ -281,18 +281,17 @@ test('buttons show item tooltip when current module id == next or prev module id
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
   this.server.respond()
 
-  ok(
-    this.$testEl
-      .find('.module-sequence-footer-button--previous')
-      .first()
-      .data('html-tooltip-title')
-      .match('Project 1'),
-    'displays previous item tooltip'
-  )
-  ok(
-    nextButton(this.$testEl).data('html-tooltip-title').match('Project 33'),
-    'displays next item tooltip'
-  )
+  const prevBtn = previousButton(this.$testEl)
+  const nextBtn = nextButton(this.$testEl)
+
+  const prevTooltipId = prevBtn.find('[aria-describedby]').attr('aria-describedby')
+  const prevTooltip = $('#' + prevTooltipId)
+
+  const nextTooltipId = nextBtn.find('[aria-describedby]').attr('aria-describedby')
+  const nextTooltip = $('#' + nextTooltipId)
+
+  ok(prevTooltip.text().match('Project 1'), 'displays previous item tooltip')
+  ok(nextTooltip.text().match('Project 33'), 'displays next item tooltip')
 })
 
 test('if url has a module_item_id use that as the assetID and ModuleItem as the type instead', function () {
@@ -340,8 +339,11 @@ test('provides correct tooltip for mastery path when awaiting choice', function 
   this.server.respond()
   const btn = nextButton(this.$testEl)
 
+  const tooltipId = btn.find('[aria-describedby]').attr('aria-describedby')
+  const tooltip = $('#' + tooltipId)
+
   ok(
-    btn.data('html-tooltip-title').match('Choose the next mastery path'),
+    tooltip.text().match('Choose the next mastery path'),
     'indicates a user needs to choose the next mastery path'
   )
   ok(btn.find('a').attr('href').match('chew-z'), 'displays the correct link')
@@ -356,10 +358,10 @@ test('provides correct tooltip for mastery path when awaiting choice and not a s
   this.server.respond()
   const btn = nextButton(this.$testEl)
 
-  ok(
-    btn.data('html-tooltip-title').match('Project 33'),
-    'ignores awaiting_choice and displays next module item'
-  )
+  const tooltipId = btn.find('[aria-describedby]').attr('aria-describedby')
+  const tooltip = $('#' + tooltipId)
+
+  ok(tooltip.text().match('Project 33'), 'ignores awaiting_choice and displays next module item')
 })
 
 test('provides correct tooltip for mastery path when sequence is locked', function () {
@@ -369,8 +371,11 @@ test('provides correct tooltip for mastery path when sequence is locked', functi
   this.server.respond()
   const btn = nextButton(this.$testEl)
 
+  const tooltipId = btn.find('[aria-describedby]').attr('aria-describedby')
+  const tooltip = $('#' + tooltipId)
+
   ok(
-    btn.data('html-tooltip-title').match('Next mastery path is currently locked'),
+    tooltip.text().match('Next mastery path is currently locked'),
     'indicates there are locked mastery path items'
   )
   ok(btn.find('a').attr('href').match('mod.module.mod'), 'displays the correct link')
@@ -383,10 +388,10 @@ test('provides correct tooltip for mastery path when sequence is locked and not 
   this.server.respond()
   const btn = nextButton(this.$testEl)
 
-  ok(
-    btn.data('html-tooltip-title').match('Project 33'),
-    'ignores locked status and displays next module item'
-  )
+  const tooltipId = btn.find('[aria-describedby]').attr('aria-describedby')
+  const tooltip = $('#' + tooltipId)
+
+  ok(tooltip.text().match('Project 33'), 'ignores locked status and displays next module item')
 })
 
 test('provides correct tooltip for mastery path when processing', function () {
@@ -396,10 +401,10 @@ test('provides correct tooltip for mastery path when processing', function () {
   this.server.respond()
   const btn = nextButton(this.$testEl)
 
-  ok(
-    btn.data('html-tooltip-title').match('Next mastery path is still processing'),
-    'indicates path is processing'
-  )
+  const tooltipId = btn.find('[aria-describedby]').attr('aria-describedby')
+  const tooltip = $('#' + tooltipId)
+
+  ok(tooltip.text().match('Next mastery path is still processing'), 'indicates path is processing')
   ok(btn.find('a').attr('href').match('mod.module.mod'), 'displays the correct link')
 })
 
@@ -412,10 +417,10 @@ test('provides correct tooltip for mastery path when path is processing and not 
   this.server.respond()
   const btn = nextButton(this.$testEl)
 
-  ok(
-    btn.data('html-tooltip-title').match('Project 33'),
-    'ignores processing state and displays next module item'
-  )
+  const tooltipId = btn.find('[aria-describedby]').attr('aria-describedby')
+  const tooltip = $('#' + tooltipId)
+
+  ok(tooltip.text().match('Project 33'), 'ignores processing state and displays next module item')
 })
 
 test('properly disables the next button when path locked and modules tab disabled', function () {
@@ -508,8 +513,11 @@ test('properly shows next button when no next items yet exist and paths are lock
   this.server.respond()
   const btn = nextButton(this.$testEl)
 
+  const tooltipId = btn.find('a').attr('aria-describedby')
+  const tooltip = $('#' + tooltipId)
+
   ok(
-    btn.data('html-tooltip-title').match('Next mastery path is currently locked'),
+    tooltip.text().match('Next mastery path is currently locked'),
     'indicates there are locked mastery path items'
   )
   ok(btn.find('a').attr('href').match('mod.module.mod'), 'displays the correct link')
@@ -522,10 +530,10 @@ test('properly shows next button when no next items yet exist and paths are proc
   this.server.respond()
   const btn = nextButton(this.$testEl)
 
-  ok(
-    btn.data('html-tooltip-title').match('Next mastery path is still processing'),
-    'indicates path is processing'
-  )
+  const tooltipId = btn.find('a').attr('aria-describedby')
+  const tooltip = $('#' + tooltipId)
+
+  ok(tooltip.text().match('Next mastery path is still processing'), 'indicates path is processing')
   ok(btn.find('a').attr('href').match('mod.module.mod'), 'displays the correct link')
 })
 
@@ -578,7 +586,7 @@ test('SR reads new window when button linking to ExternalURL type is focused', f
 
   ok(
     this.$testEl
-      .find('.module-sequence-footer-button--previous a')
+      .find('.module-sequence-footer-button--previous [aria-label]')
       .first()
       .attr('aria-label')
       .match('Previous Module Item'),
@@ -586,7 +594,7 @@ test('SR reads new window when button linking to ExternalURL type is focused', f
   )
   ok(
     nextButton(this.$testEl)
-      .find('a')
+      .find('[aria-label]')
       .attr('aria-label')
       .match('Next Module Item - opens in new window'),
     'includes correct SR label for ExternalUrl types'

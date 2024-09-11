@@ -104,6 +104,12 @@ function ClearableDateTimeInput({
     // labels + labels margins + 0.5rem (padding when the date time input has errors)
     clearButtonContainer.current.style.paddingTop = hasErrorBorder ? '2.75rem' : '2.25rem'
   }, [hasErrorBorder])
+
+  const onChangeHandler = (event: React.SyntheticEvent, value: string | undefined) => {
+    if (value === undefined) return
+    return onChange(event, value)
+  }
+
   return (
     <Flex
       data-testid="clearable-date-time-input"
@@ -135,7 +141,7 @@ function ClearableDateTimeInput({
           showMessages={showMessages}
           locale={locale}
           timezone={timezone}
-          onChange={onChange}
+          onChange={onChangeHandler}
           onBlur={onBlur}
           dateInputRef={dateInputRef}
           timeInputRef={timeInputRef}

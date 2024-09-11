@@ -223,8 +223,11 @@ export const CriterionRow = ({
               <Text size="small" weight="bold" aria-label={instructorPointsText}>
                 {pointsInputValue}
               </Text>
+            ) : criterion.ignoreForScoring ? (
+              <Text>--</Text>
             ) : (
               <TextInput
+                autoComplete="off"
                 renderLabel={<ScreenReaderContent>{instructorPointsText}</ScreenReaderContent>}
                 placeholder="--"
                 width="3.375rem"

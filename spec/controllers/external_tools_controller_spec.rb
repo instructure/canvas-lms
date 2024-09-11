@@ -239,6 +239,29 @@ describe ExternalToolsController do
             end
           end
         end
+
+        context "logging" do
+          before do
+            allow(Lti::LogService).to receive(:new) do
+              double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+            end
+            user_session(@teacher)
+          end
+
+          it "logs launch with placement and indirect_link launch_type" do
+            expect(Lti::LogService).to receive(:new).with(
+              tool:,
+              context: @course,
+              user: @teacher,
+              session_id: nil,
+              placement: "course_navigation",
+              launch_type: :direct_link,
+              launch_url: "http://www.example.com/basic_lti"
+            )
+
+            subject
+          end
+        end
       end
 
       context "with a bad launch url" do
@@ -1256,7 +1279,8 @@ describe ExternalToolsController do
             user: @teacher,
             session_id: nil,
             placement:,
-            launch_type: :indirect_link
+            launch_type: :indirect_link,
+            launch_url: "http://www.example.com/basic_lti?first=john&last=smith"
           )
 
           get "retrieve", params: { course_id: @course.id, url: tool.url, placement: }
@@ -1271,7 +1295,8 @@ describe ExternalToolsController do
             user: @teacher,
             session_id: nil,
             placement: nil,
-            launch_type: :content_item
+            launch_type: :content_item,
+            launch_url: "http://www.example.com/basic_lti?first=john&last=smith"
           )
 
           get "retrieve", params: { course_id: @course.id, url: tool.url }
@@ -3244,7 +3269,8 @@ describe ExternalToolsController do
         user: @user,
         session_id: nil,
         placement: "course_navigation",
-        launch_type: :direct_link
+        launch_type: :direct_link,
+        launch_url: "http://www.example.com/basic_lti"
       )
     end
   end

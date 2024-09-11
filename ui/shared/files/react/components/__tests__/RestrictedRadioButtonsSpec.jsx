@@ -176,6 +176,26 @@ test('returns the correct object to restrict an item based on dates', function (
   )
 })
 
+test('returns the correct object to restrict an item based on dates in the absence of times', function () {
+  Simulate.change(this.restrictedRadioButtons.dateRange)
+  this.restrictedRadioButtons.dateRange.checked = true
+  const startDate = new Date(2016, 5, 1)
+  const endDate = new Date(2016, 5, 4)
+  $(this.restrictedRadioButtons.unlock_at).data('unfudged-date', startDate)
+  $(this.restrictedRadioButtons.lock_at).data('unfudged-date', endDate)
+  const expectedObject = {
+    hidden: false,
+    unlock_at:  $(this.restrictedRadioButtons.unlock_at).data('unfudged-date'),
+    lock_at: $(this.restrictedRadioButtons.lock_at).data('unfudged-date'),
+    locked: false,
+  }
+  deepEqual(
+    this.restrictedRadioButtons.extractFormValues(),
+    expectedObject,
+    'returns the correct object'
+  )
+})
+
 QUnit.module('RestrictedRadioButtons Multiple Items', {
   setup() {
     const props = {

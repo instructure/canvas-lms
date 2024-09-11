@@ -253,6 +253,51 @@ describe ContextModulesHelper do
 
       expect(module_data[:items]).to be_empty
     end
+
+    context "feature flag modules_page_hide_blueprint_lock_icon_for_children" do
+      context "is on" do
+        before(:once) do
+          t_course.account.feature_flags.create!(feature: "modules_page_hide_blueprint_lock_icon_for_children", state: "on")
+        end
+
+        it "returns blueprinit item restrictions for a teacher in a child course" do
+          @is_child_course = true
+          module_data = process_module_data(t_module, false, @teacher, @session)
+
+          expect(module_data[:items_restrictions]).not_to be_nil
+        end
+
+        it "does not return blueprinit item restrictions for a student in a child course" do
+          @is_child_course = true
+          module_data = process_module_data(t_module, true, @student, @session)
+
+          expect(module_data[:items_restrictions]).to be_nil
+        end
+
+        it "does not return blueprinit item restrictions for a teacher if not a blueprint child" do
+          @is_child_course = nil
+          module_data = process_module_data(t_module, false, @teacher, @session)
+
+          expect(module_data[:items_restrictions]).to be_nil
+        end
+      end
+
+      context "is off" do
+        it "does not return blueprinit item restrictions for a teacher in a child course" do
+          @is_child_course = true
+          module_data = process_module_data(t_module, false, @teacher, @session)
+
+          expect(module_data[:items_restrictions]).to be_nil
+        end
+
+        it "does not return blueprinit item restrictions for a student in a child course" do
+          @is_child_course = true
+          module_data = process_module_data(t_module, true, @student, @session)
+
+          expect(module_data[:items_restrictions]).to be_nil
+        end
+      end
+    end
   end
 
   describe "add_mastery_paths_to_cache_key" do

@@ -48,7 +48,8 @@ describe('AssignToPanel', () => {
     mountNodeRef: {current: null},
   }
 
-  const ASSIGNMENT_OVERRIDES_URL = `/api/v1/courses/${props.courseId}/modules/${props.moduleId}/assignment_overrides`
+  const ASSIGNMENT_OVERRIDES_URL = `/api/v1/courses/${props.courseId}/modules/${props.moduleId}/assignment_overrides?per_page=100`
+  const ASSIGNMENT_OVERRIDES_URL_PUT = `/api/v1/courses/${props.courseId}/modules/${props.moduleId}/assignment_overrides`
   const SECTIONS_URL = /\/api\/v1\/courses\/.+\/sections\?per_page=\d+/
   const STUDENTS_URL = /\/api\/v1\/courses\/.+\/users\?per_page=\d+&enrollment_type=student/
 
@@ -322,7 +323,7 @@ describe('AssignToPanel', () => {
 
   describe('on update', () => {
     it('creates new assignment overrides', async () => {
-      fetchMock.put(ASSIGNMENT_OVERRIDES_URL, {})
+      fetchMock.put(ASSIGNMENT_OVERRIDES_URL_PUT, {})
       const {findByTestId, findByText, getByRole, findAllByText} = renderComponent()
       const customOption = await findByTestId('custom-option')
       act(() => customOption.click())
@@ -333,7 +334,7 @@ describe('AssignToPanel', () => {
 
       getByRole('button', {name: 'Save'}).click()
       expect((await findAllByText('Module access updated successfully.'))[0]).toBeInTheDocument()
-      const requestBody = fetchMock.lastOptions(ASSIGNMENT_OVERRIDES_URL)?.body
+      const requestBody = fetchMock.lastOptions(ASSIGNMENT_OVERRIDES_URL_PUT)?.body
       const expectedPayload = JSON.stringify({
         overrides: [{course_section_id: SECTIONS_DATA[0].id}],
       })
@@ -367,7 +368,7 @@ describe('AssignToPanel', () => {
     })
 
     it('updates the modules UI', async () => {
-      fetchMock.put(ASSIGNMENT_OVERRIDES_URL, {})
+      fetchMock.put(ASSIGNMENT_OVERRIDES_URL_PUT, {})
       const {findByRole} = renderComponent()
       const updateButton = await findByRole('button', {name: 'Save'})
       updateButton.click()

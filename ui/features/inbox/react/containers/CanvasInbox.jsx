@@ -38,7 +38,7 @@ import {
   USER_INBOX_LABELS_QUERY,
   VIEWABLE_SUBMISSIONS_QUERY,
 } from '../../graphql/Queries'
-import {decodeQueryString} from '@canvas/query-string-encoding'
+import {decodeQueryString} from '@instructure/query-string-encoding'
 import {responsiveQuerySizes} from '../../util/utils'
 
 import {Flex} from '@instructure/ui-flex'

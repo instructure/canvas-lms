@@ -18,24 +18,33 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "pages/discussions_index_page"
+require_relative "../helpers/items_assign_to_tray"
+require_relative "pages/discussion_page"
+require_relative "../common"
 
 describe "discussions index" do
   include_context "in-process server selenium tests"
+
+  def setup_course_and_students
+    @teacher = user_with_pseudonym(active_user: true)
+    @student = user_with_pseudonym(active_user: true)
+    @account = Account.create(name: "New Account", default_time_zone: "UTC")
+    @course = course_factory(course_name: "Aaron 101",
+                             account: @account,
+                             active_course: true)
+    course_with_teacher(user: @teacher, active_course: true, active_enrollment: true)
+    course_with_student(course: @course, active_enrollment: true)
+    @student2 = user_factory(name: "second user", short_name: "second")
+    user_with_pseudonym(user: @student2, active_user: true)
+    @course.enroll_student(@student2, enrollment_state: "active")
+  end
 
   context "as a student" do
     discussion1_title = "Meaning of life"
     discussion2_title = "Meaning of the universe"
 
     before :once do
-      @teacher = user_with_pseudonym(active_user: true)
-      @student = user_with_pseudonym(active_user: true)
-      @account = Account.create(name: "New Account", default_time_zone: "UTC")
-      @course = course_factory(course_name: "Aaron 101",
-                               account: @account,
-                               active_course: true)
-      course_with_teacher(user: @teacher, active_course: true, active_enrollment: true)
-      course_with_student(course: @course, active_enrollment: true)
-
+      setup_course_and_students
       # Discussion attributes: title, message, delayed_post_at, user
       @discussion1 = @course.discussion_topics.create!(
         title: discussion1_title,
@@ -78,6 +87,63 @@ describe "discussions index" do
       @course.allow_student_discussion_topics = true
       login_and_visit_course(@student, @course)
       expect_new_page_load { DiscussionsIndex.click_add_discussion }
+    end
+  end
+
+  context "discussion checkpoints" do
+    include ItemsAssignToTray
+
+    before :once do
+      Account.default.enable_feature! :discussion_create
+      Account.default.enable_feature! :discussion_checkpoints
+      Account.default.enable_feature! :react_discussions_post
+      setup_course_and_students
+    end
+
+    it "show checkpoint info on the index page", :ignore_js_errors do
+      user_session(@teacher)
+      Discussion.start_new_discussion(@course.id)
+      wait_for_ajaximations
+      Discussion.topic_title_input.send_keys("Test Checkpoint")
+      Discussion.update_discussion_message
+      Discussion.click_graded_checkbox
+      Discussion.click_checkpoints_checkbox
+      Discussion.reply_to_topic_points_possible_input.send_keys("10")
+      Discussion.reply_to_entry_required_count_input.send_keys("1")
+      Discussion.points_possible_reply_to_entry_input.send_keys("10")
+      unless Account.site_admin.feature_enabled?(:selective_release_edit_page)
+        Discussion.click_assign_to_button
+      end
+      next_week = 1.week.from_now
+      half_month = 2.weeks.from_now
+      update_reply_to_topic_date(0, format_date_for_view(next_week))
+      update_reply_to_topic_time(0, "11:59 PM")
+      update_required_replies_date(0, format_date_for_view(next_week))
+      update_required_replies_time(0, "11:59 PM")
+      click_add_assign_to_card
+      select_module_item_assignee(1, @student.name)
+      update_reply_to_topic_date(1, format_date_for_view(half_month))
+      update_reply_to_topic_time(1, "11:59 PM")
+      update_required_replies_date(1, format_date_for_view(half_month))
+      update_required_replies_time(1, "11:59 PM")
+      unless Account.site_admin.feature_enabled?(:selective_release_edit_page)
+        click_save_button("Apply")
+      end
+      Discussion.save_and_publish_button.click
+      # student within everyone
+      user_session(@student2)
+      get "/courses/#{@course.id}/discussion_topics"
+      expect(fj("span:contains('Reply to topic: #{format_date_for_view(next_week)}')")).to be_present
+      expect(fj("span:contains('Required replies (1): #{format_date_for_view(next_week)}')")).to be_present
+      expect("body").not_to contain_jqcss("span:contains('Reply to topic: #{format_date_for_view(half_month)}')")
+      expect("body").not_to contain_jqcss("span:contains('Required replies (1): #{format_date_for_view(half_month)}')")
+      # student in the second assign card
+      user_session(@student)
+      get "/courses/#{@course.id}/discussion_topics"
+      expect(fj("span:contains('Reply to topic: #{format_date_for_view(half_month)}')")).to be_present
+      expect(fj("span:contains('Required replies (1): #{format_date_for_view(half_month)}')")).to be_present
+      expect("body").not_to contain_jqcss("span:contains('Reply to topic: #{format_date_for_view(next_week)}')")
+      expect("body").not_to contain_jqcss("span:contains('Required replies (1): #{format_date_for_view(next_week)}')")
     end
   end
 end

@@ -20,8 +20,8 @@ import {z} from 'zod'
 import {executeQuery} from '@canvas/query/graphql'
 import gql from 'graphql-tag'
 
-const ASSIGNMENTS_BY_COURSE_ID_QUERY = gql`
-  query AssignmentsByCourseIdQuery($courseId: ID!) {
+const QUERY = gql`
+  query SpeedGrader_AssignmentsByCourseIdQuery($courseId: ID!) {
     course(id: $courseId) {
       _id
       id
@@ -30,6 +30,7 @@ const ASSIGNMENTS_BY_COURSE_ID_QUERY = gql`
         nodes {
           _id
           id
+          name
           assignmentsConnection {
             nodes {
               _id
@@ -47,10 +48,12 @@ const ASSIGNMENTS_BY_COURSE_ID_QUERY = gql`
 function transform({course}: any) {
   return {
     id: course.id,
+    _id: course._id,
     name: course.name,
     assignmentGroups: course.assignmentGroupsConnection.nodes.map((group: any) => ({
       _id: group._id,
       id: group.id,
+      name: group.name,
       assignments: group.assignmentsConnection.nodes.map((assignment: any) => ({
         _id: assignment._id,
         id: assignment.id,
@@ -75,7 +78,7 @@ export async function getAssignmentsByCourseId<T extends GetSectionsParams>({
   ZParams.parse(queryKey[1])
   const {courseId} = queryKey[1]
 
-  const result = await executeQuery<any>(ASSIGNMENTS_BY_COURSE_ID_QUERY, {
+  const result = await executeQuery<any>(QUERY, {
     courseId,
   })
 

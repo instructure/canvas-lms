@@ -35,13 +35,7 @@ export const HeroSection = ({background}: HeroSectionProps) => {
     enabled: state.options.enabled,
   }))
   const [cid] = useState<string>('hero-section')
-  const clazz = useClassNames(enabled, {empty: false}, [
-    'section',
-    'columns-section',
-    'hero-section',
-    'fixed',
-    'columns-2',
-  ])
+  const clazz = useClassNames(enabled, {empty: false}, ['section', 'hero-section'])
 
   const backgroundColor = background || HeroSection.craft.defaultProps.background
   const textColor = getContrastingColor(backgroundColor)
@@ -61,6 +55,7 @@ export const HeroSection = ({background}: HeroSectionProps) => {
           id={`${cid}_image`}
           is={ImageBlock}
           constraint="contain"
+          maintainAspectRatio={false}
           src="/images/block_editor/default_hero_image.svg"
         />
       </Element>

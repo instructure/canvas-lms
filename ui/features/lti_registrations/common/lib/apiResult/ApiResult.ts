@@ -20,18 +20,27 @@ import type {ZodSchema, ZodTypeDef, ZodError} from 'zod'
 
 export type ApiResult<A> =
   | {
-      _type: 'success'
+      /** Indicates that the backend response was parsed successfully */
+      _type: 'Success'
       data: A
     }
   | {
+      /** Indicates that the backend responded with a JSON value that could not be parsed */
       _type: 'ApiParseError'
       url: string
       error: ZodError<any>
     }
   | {
+      /** Indicates that the backend responded with a non-JSON value */
       _type: 'InvalidJson'
       url: string
       error?: Error
+    }
+  | {
+      /** Indicates an error response from the backend */
+      _type: 'ApiError'
+      status: number
+      body?: unknown
     }
   | {
       _type: 'GenericError'
@@ -42,8 +51,11 @@ export type ApiResult<A> =
       error: Error
     }
 
+type UnsuccessfulApiResult = Exclude<ApiResult<unknown>, {_type: 'Success'}>
+type SuccessfulApiResult<A> = Extract<ApiResult<A>, {_type: 'Success'}>
+
 export const success = <A>(data: A): ApiResult<A> => ({
-  _type: 'success',
+  _type: 'Success',
   data,
 })
 
@@ -51,6 +63,12 @@ export const apiParseError = (error: ZodError, url: string): ApiResult<never> =>
   _type: 'ApiParseError',
   url,
   error,
+})
+
+export const apiError = (status: number, body: unknown): ApiResult<never> => ({
+  _type: 'ApiError',
+  status,
+  body,
 })
 
 export const genericError = (message: string): ApiResult<never> => ({
@@ -95,7 +113,10 @@ export const parseFetchResult =
               return invalidJson(response.url, err instanceof Error ? err : undefined)
             })
         } else {
-          return genericError('Response was not ok.')
+          return response
+            .json()
+            .then(body => apiError(response.status, body))
+            .catch(() => apiError(response.status, undefined))
         }
       })
       .catch(err => {
@@ -107,15 +128,15 @@ export const parseFetchResult =
       })
   }
 
-export const formatApiResultError = (
-  error: Exclude<ApiResult<unknown>, {_type: 'success'}>
-): string => {
+export const formatApiResultError = (error: UnsuccessfulApiResult): string => {
   if (error._type === 'Exception') {
     return `${error.error.message}${error.error.stack ? `\n${error.error.stack}` : ''}`
   } else if (error._type === 'GenericError') {
     return error.message
   } else if (error._type === 'InvalidJson') {
     return `Error parsing response from ${error.url}:\nResult was not valid JSON.`
+  } else if (error._type === 'ApiError') {
+    return `Error from server: ${error.status} ${JSON.stringify(error.body)}`
   } else {
     const messages = error.error.errors
       .map(issue => {
@@ -126,4 +147,38 @@ export const formatApiResultError = (
       .join('\n')
     return `Error parsing response from ${error.url}:\n${messages}`
   }
+}
+
+/**
+ * Applies a function to the data of an `ApiResult` if it is a success
+ * @param result
+ * @param f
+ * @returns
+ */
+export const mapApiResult = <A, B>(result: ApiResult<A>, f: (a: A) => B): ApiResult<B> => {
+  if (isSuccessful(result)) {
+    return success(f(result.data))
+  } else {
+    return result
+  }
+}
+
+/**
+ * Returns true if the `ApiResult` is not a success
+ * and narrows the type
+ * @param result
+ * @returns
+ */
+export const isUnsuccessful = (result: ApiResult<unknown>): result is UnsuccessfulApiResult => {
+  return result._type !== 'Success'
+}
+
+/**
+ * Returns true if the `ApiResult` is a success
+ * and narrows the type
+ * @param result
+ * @returns
+ */
+export const isSuccessful = <A>(result: ApiResult<A>): result is SuccessfulApiResult<A> => {
+  return result._type === 'Success'
 }

@@ -37,14 +37,24 @@ import type {LtiRegistration} from '../../model/LtiRegistration'
 import {AppsTable} from './AppsTable'
 import {mkUseManagePageState} from './ManagePageLoadingState'
 import {useManageSearchParams, type ManageSearchParams} from './ManageSearchParams'
+import {isSuccessful} from '../../../common/lib/apiResult/ApiResult'
+import {useAppendBreadcrumbsToDefaults} from '@canvas/breadcrumbs/useAppendBreadcrumbsToDefaults'
 
 const SEARCH_DEBOUNCE_MS = 250
 
 const I18n = useI18nScope('lti_registrations')
 
 export const ManagePage = () => {
-  const [searchParams] = useManageSearchParams()
   const accountId = ZAccountId.parse(window.location.pathname.split('/')[2])
+  useAppendBreadcrumbsToDefaults(
+    {
+      name: I18n.t('Manage'),
+      url: `/accounts/${accountId}/apps/manage`,
+    },
+    !!window.ENV.FEATURES.lti_registrations_next
+  )
+  const [searchParams] = useManageSearchParams()
+
   return searchParams.success ? (
     <ManagePageInner searchParams={searchParams.value} accountId={accountId} />
   ) : (
@@ -105,11 +115,11 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
     async (app: LtiRegistration) => {
       if (await confirmDeletion(app)) {
         const deleteResult = await deleteRegistration(app)
-        const type = deleteResult._type === 'success' ? 'success' : 'error'
+        const type = isSuccessful(deleteResult) ? 'success' : 'error'
         showFlashAlert({
           type,
           message:
-            deleteResult._type !== 'success'
+            deleteResult._type !== 'Success'
               ? I18n.t('There was an error deleting “%{appName}”', {appName: app.name})
               : I18n.t('App “%{appName}” successfully deleted', {appName: app.name}),
         })

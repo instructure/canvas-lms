@@ -111,11 +111,18 @@ export const SUBMISSION_FRAGMENT = gql`
         }
       }
     }
+    subAssignmentSubmissions {
+      subAssignmentTag
+      grade
+      score
+      publishedGrade
+      publishedScore
+    }
   }
 `
 
-const SUBMISSION_QUERY = gql`
-  query SubmissionQuery($assignmentId: ID!, $userId: ID!) {
+const QUERY = gql`
+  query SpeedGrader_SubmissionQuery($assignmentId: ID!, $userId: ID!) {
     assignment(id: $assignmentId) {
       id
       _id
@@ -188,7 +195,6 @@ function transform(result: any) {
       comments: submission?.commentsConnection?.nodes,
       rubricAssessments: submission.rubricAssessmentsConnection?.nodes,
       submissionHistory: submission.submissionHistoriesConnection?.nodes,
-      // @ts-expect-error
       submissionState: speedGraderHelpers.submissionState(submission, ENV.grading_role ?? ''),
     }
   }
@@ -210,7 +216,7 @@ export async function getSubmission<T extends GetSubmissionParams>({
   ZGetSubmissionParams.parse(queryKey[1])
   const {assignmentId, userId} = queryKey[1]
 
-  const result = await executeQuery<any>(SUBMISSION_QUERY, {
+  const result = await executeQuery<any>(QUERY, {
     assignmentId,
     userId,
   })

@@ -411,11 +411,13 @@ describe "submissions/show" do
 
         # Comments are structured as:
         # <div class="comment">
-        #   <div class="comment">the actual comment text</div>
+        #   <div class="comment" data-content="the actual comment text"></div>
         #   <div class="author">author name</div>
         #   ... and so on
         # </div>
-        comment_list.css(".comment .comment").map { |comment| comment.text.strip }
+        comment_list.css(".comment .comment_content").map do |comment|
+          comment["data-content"] || comment.text.strip
+        end
       end
 
       before do
@@ -787,17 +789,18 @@ describe "submissions/show" do
       render "submissions/show"
       html = Nokogiri::HTML5.fragment(response.body)
       comment_list = html.css(".submission-details-comments .comment_list")
-      comment_contents = comment_list.css(".comment .comment").map { |comment| comment.text.strip }
-      expect(comment_contents.find { |c| c.include?("good job!") }).not_to be_nil
+      comment_contents = comment_list.css(".comment .comment_content").first["data-content"]
+      expect(comment_contents.include?("good job!")).not_to be_nil
     end
 
     it "comment text includes boilerplate about being a media comment" do
       render "submissions/show"
       html = Nokogiri::HTML5.fragment(response.body)
       comment_list = html.css(".submission-details-comments .comment_list")
-      comment_contents = comment_list.css(".comment .comment").map { |comment| comment.text.strip }
-      comment = comment_contents.find { |c| c.include?("good job!") }
-      expect(comment.include?("This is a media comment")).to be true
+      comment_text = comment_list.css(".comment .comment_content").first["data-content"]
+      media_comment = comment_list.css(".comment .comment").map { |comment| comment.text.strip }.first
+      expect(comment_text.include?("good job!")).to be true
+      expect(media_comment.include?("This is a media comment")).to be true
     end
   end
 end

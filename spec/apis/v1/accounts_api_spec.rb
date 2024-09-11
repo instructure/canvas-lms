@@ -1051,6 +1051,8 @@ describe "Accounts API", type: :request do
           require_symbol_characters: true,
           minimum_character_length: 10,
           maximum_login_attempts: 5,
+          common_passwords_attachment_id: "1",
+          common_passwords_folder_id: "2",
           bogus_setting: "bogus"
         }
       end
@@ -1108,6 +1110,8 @@ describe "Accounts API", type: :request do
           expect(@a1.settings[:password_policy][:require_symbol_characters]).to be_truthy
           expect(@a1.settings[:password_policy][:minimum_character_length]).to eq("10")
           expect(@a1.settings[:password_policy][:maximum_login_attempts]).to eq("5")
+          expect(@a1.settings[:password_policy][:common_passwords_attachment_id]).to eq("1")
+          expect(@a1.settings[:password_policy][:common_passwords_folder_id]).to eq("2")
         end
       end
 
@@ -2189,18 +2193,22 @@ describe "Accounts API", type: :request do
           allow_login_suspension: "true",
           require_number_characters: "true",
           require_symbol_characters: "true",
-          minimum_character_length: "10",
-          maximum_login_attempts: "3",
+          common_passwords_attachment_id: "1",
+          common_passwords_folder_id: "2"
         }
       end
 
       it "exposes password policy settings when feature is enabled" do
         @a1.enable_feature!(:password_complexity)
+        json = api_call(:get, show_settings_path, show_settings_header, {}, { expected_status: 200 })
+        expect(json["password_policy"]).to be_present
+        expect(json["password_policy"]["minimum_character_length"]).to eq "8"
+        expect(json["password_policy"]["maximum_login_attempts"]).to eq "10"
+
         @a1.settings = { password_policy: policy_settings }
         @a1.save!
         json = api_call(:get, show_settings_path, show_settings_header, {}, { expected_status: 200 })
-        expect(json["password_policy"]).to be_present
-        expect(json["password_policy"]).to eq policy_settings.stringify_keys
+        expect(json["password_policy"]).to include policy_settings.stringify_keys
       end
 
       it "does not return password policy settings when feature is not enabled" do

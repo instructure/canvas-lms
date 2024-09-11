@@ -327,6 +327,7 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Editar Ícone" },
   "edit_link_7f53bebb": { "message": "Editar ligação" },
+  "editor_status_bar_653f44ee": { "message": "Barra de estado do editor" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Elemento a começar com { start }"
   },

@@ -331,7 +331,6 @@ class Conversation < ActiveRecord::Base
       # TODO: optimize me
       message.forwarded_message_ids = messages.map(&:id).join(",")
     end
-    message.generate_user_note = true if options[:generate_user_note]
 
     # Grab snapshot hash of user's inbox settings and save to message (If FF is enabled)
     if Account.site_admin.feature_enabled?(:inbox_settings)

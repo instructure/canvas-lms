@@ -1845,12 +1845,11 @@ class Submission < ActiveRecord::Base
   end
 
   def versioned_originality_reports
+    # Turns out the database stores timestamps with 9 decimal places, but Ruby/Rails only serves
+    # up 6 (plus three zeros). However, submission versions (when deserialized into a Submission
+    # model) like to show 9.
+    # This logic is duplicated in the bulk_load_versioned_originality_reports method
     @versioned_originality_reports ||=
-      # turns out the database stores timestamps with 9 decimal places, but Ruby/Rails only serves
-      # up 6.  however, submission versions (when deserialized into a Submission model) like to
-      # show 9. and apparently to_f rounds, but iso8601 doesn't
-      # it would be better if we saved the attempt number on the originality report and matched
-      # them up that way
       if submitted_at.nil?
         []
       else
@@ -1858,6 +1857,7 @@ class Submission < ActiveRecord::Base
           o.submission_time&.iso8601(6) == submitted_at&.iso8601(6) ||
             # ...and sometimes originality reports don't have submission times, so we're doing our
             # best to guess based on attachment_id (or the lack) and creation times
+            (o.attachment_id.present? && attachment_ids&.split(",")&.include?(o.attachment_id.to_s)) ||
             (o.submission_time.nil? && o.created_at > submitted_at &&
               (attachment_ids&.split(",").presence || [""]).include?(o.attachment_id.to_s))
         end
@@ -1925,25 +1925,33 @@ class Submission < ActiveRecord::Base
     reports = originality_reports_by_submission_id_submission_time_attachment_id(submissions)
     submissions.each do |s|
       s.versioned_originality_reports = [] && next unless s.submitted_at
-      reports_for_sub = reports.dig(s.id, s.submitted_at.iso8601(6)) || []
+      reports_for_sub = reports.dig(s.id, :by_time, s.submitted_at.iso8601(6)) || []
 
       # nil for originality reports with no submission time
-      reports.dig(s.id, nil)&.each do |attach_id, reports_for_attach_id|
-        # Without submission times on some originality reports, linking up via attachment id or
-        # lack of attachment id isn't particularly specific to the submission version.
-        # Students can submit the same attachment multiple times or submit only text (no attachment id)
-        # multiple times, and without a submission_time we don't have a good way of matching them
-        # (though at least in the case of using the same Canvas attachment id, it should be the same
-        # document, but no guarantees different originality reports for each version will have the
-        # same scores)
-        # In submission histories, we're just giving all of the originality reports we can't
-        # rule out, but we can at least rule out any report that was created before a new submission
-        # as belonging to that submission
-        if (s.attachment_ids&.split(",").presence || [""]).include?(attach_id.to_s)
-          reports_for_sub += reports_for_attach_id.select { |r| r.created_at > s.submitted_at }
+      reports.dig(s.id, :by_attachment)&.each do |attach_id, reports_for_attach_id|
+        # Handles the following cases:
+        # 1) student submits same attachment multiple times. There will only be
+        #    one originality report for each unique attachment. The originality
+        #    report has a submission_time but it will be submission time of the
+        #    first submission, so we need to match up by attachment ids.
+        # 2) The originality report does not have a submission time. We link up
+        #    via attachment id or lack of attachment id. That isn't particularly
+        #    specific to the submission version. We don't have a good way of
+        #    matching them (though at least in the case of using the same Canvas
+        #    attachment id, it should be the same document) In submission
+        #    histories, we're just giving all of the originality reports we can't
+        #    rule out, but we can at least rule out any report that was created
+        #    before a new submission as belonging to that submission
+
+        if attach_id.present? && s.attachment_ids&.split(",")&.include?(attach_id.to_s)
+          reports_for_sub += reports_for_attach_id
+        elsif attach_id.blank? && s.attachment_ids.blank?
+          # Sub and originality report both missing attachment ids -- add
+          # just originality reports with submission_time is nil
+          reports_for_sub += reports_for_attach_id.select { |r| r.submission_time.blank? && r.created_at > s.submitted_at }
         end
       end
-      s.versioned_originality_reports = reports_for_sub
+      s.versioned_originality_reports = reports_for_sub.uniq
     end
   end
 
@@ -1951,20 +1959,16 @@ class Submission < ActiveRecord::Base
     reports = OriginalityReport.where(submission_id: submissions)
     reports.each_with_object({}) do |report, hash|
       report_submission_time = report.submission_time&.iso8601(6)
-      hash[report.submission_id] ||= {}
+      hash[report.submission_id] ||= { by_time: {}, by_attachment: {} }
       if report_submission_time
-        hash[report.submission_id][report_submission_time] ||= []
-        hash[report.submission_id][report_submission_time] << report
-      else
-        hash[report.submission_id][nil] ||= {}
-        hash[report.submission_id][nil][report.attachment_id] ||= []
-        hash[report.submission_id][nil][report.attachment_id] << report
+        (hash[report.submission_id][:by_time][report_submission_time] ||= []) << report
       end
+      (hash[report.submission_id][:by_attachment][report.attachment_id] ||= []) << report
     end
   end
 
   # Avoids having O(N) attachment queries.  Returns a hash of
-  # submission to attachements.
+  # submission to attachments.
   def self.bulk_load_attachments_for_submissions(submissions, preloads: nil)
     submissions = Array(submissions)
     attachment_ids_by_submission =
@@ -3230,7 +3234,7 @@ class Submission < ActiveRecord::Base
     # of the assignment to make sure we pick up any changes to the muted status.
     if posted? && !previously_posted
       AbstractAssignment.find(assignment_id).post_submissions(submission_ids: [id], skip_updating_timestamp: true, skip_muted_changed: true)
-      # This rescure is because of an error in the production environment where
+      # This rescue is because of an error in the production environment where
       # the when a student that is also an admin creates a submission of an assignment
       # it throws a undefined method `owner' for nil:NilClass error when trying to
       # reload the assignment. This is fix to prevent the error from

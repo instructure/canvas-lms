@@ -20,10 +20,9 @@ import {ComposeInputWrapper} from '../../components/ComposeInputWrapper/ComposeI
 import CourseSelect from '../../components/CourseSelect/CourseSelect'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {IndividualMessageCheckbox} from '../../components/IndividualMessageCheckbox/IndividualMessageCheckbox'
-import {FacultyJournalCheckBox} from '../../components/FacultyJournalCheckbox/FacultyJournalCheckbox'
 import {Button} from '@instructure/ui-buttons'
 import PropTypes from 'prop-types'
-import React, {useMemo, useEffect} from 'react'
+import React, {useMemo} from 'react'
 import {reduceDuplicateCourses} from '../../../util/courses_helper'
 import {SubjectInput} from '../../components/SubjectInput/SubjectInput'
 
@@ -45,31 +44,6 @@ const HeaderInputs = props => {
     )
   }
 
-  const canAllRecipientsHaveNotes = (recipients, selectedCourseID) => {
-    if (!recipients.length) return false
-    for (const recipient of recipients) {
-      if (recipient.hasOwnProperty('commonCoursesInfo')) {
-        let recipientCourseRoles = []
-
-        if (recipient.commonCoursesInfo) {
-          recipientCourseRoles = ENV.CONVERSATIONS.CAN_ADD_NOTES_FOR_ACCOUNT
-            ? recipient.commonCoursesInfo.map(courseEnrollment => courseEnrollment.courseRole)
-            : recipient.commonCoursesInfo
-                .filter(courseEnrollment => courseEnrollment.courseID === selectedCourseID)
-                .map(courseEnrollment => courseEnrollment.courseRole)
-        }
-
-        if (!recipientCourseRoles.includes('StudentEnrollment')) {
-          return false
-        }
-        // TODO when VICE-2535 gets finished, add all all students option as a possible note recipient
-      } else if (!recipient.id.includes('group')) {
-        return false
-      }
-    }
-    return true
-  }
-
   const canIncludeObservers = useMemo(() => {
     if (ENV?.CONVERSATIONS?.CAN_MESSAGE_ACCOUNT_CONTEXT) {
       return true
@@ -86,31 +60,6 @@ const HeaderInputs = props => {
         enrollmentsThatCanIncludeObservers.includes(enrollment.type)
     )
   }, [props.activeCourseFilter, props.courses])
-
-  const canAddUserNote = useMemo(() => {
-    let canAddFacultyNote = false
-    const selectedCourseID = props.activeCourseFilter?.contextID
-      ? props.activeCourseFilter?.contextID.split('_')[1]
-      : ''
-
-    if (
-      ENV.CONVERSATIONS.NOTES_ENABLED &&
-      (ENV.CONVERSATIONS.CAN_ADD_NOTES_FOR_ACCOUNT ||
-        ENV.CONVERSATIONS.CAN_ADD_NOTES_FOR_COURSES[selectedCourseID])
-    ) {
-      canAddFacultyNote = canAllRecipientsHaveNotes(props.selectedRecipients, selectedCourseID)
-    }
-
-    return canAddFacultyNote
-  }, [props.activeCourseFilter, props.selectedRecipients])
-
-  // If a the Faculty Journal entry checkbox becomes disabled, set userNote state to false
-  useEffect(() => {
-    if (!canAddUserNote) {
-      props.setUserNote(false)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [canAddUserNote])
 
   const onContextSelect = context => {
     if (context.contextID === null && context.contextName === null) {
@@ -195,16 +144,6 @@ const HeaderInputs = props => {
           />
         </Flex.Item>
       )}
-      {canAddUserNote && (
-        <Flex.Item>
-          <ComposeInputWrapper
-            shouldGrow={true}
-            input={
-              <FacultyJournalCheckBox onChange={props.onUserNoteChange} checked={props.userNote} />
-            }
-          />
-        </Flex.Item>
-      )}
       {canIncludeObservers && props?.activeCourseFilter?.contextID && (
         <Flex.Item>
           <Button
@@ -268,17 +207,14 @@ HeaderInputs.propTypes = {
   isForward: PropTypes.bool,
   onContextSelect: PropTypes.func,
   onSelectedIdsChange: PropTypes.func,
-  onUserNoteChange: PropTypes.func,
   onSendIndividualMessagesChange: PropTypes.func,
   onSubjectChange: PropTypes.func,
   onAddressBookInputValueChange: PropTypes.func,
-  userNote: PropTypes.bool,
   sendIndividualMessages: PropTypes.bool,
   subject: PropTypes.string,
   activeCourseFilter: PropTypes.object,
   selectedRecipients: PropTypes.array,
   maxGroupRecipientsMet: PropTypes.bool,
-  setUserNote: PropTypes.func,
   /**
    * Bool to control open/closed state of the AddressBookContainer menu for testing
    */

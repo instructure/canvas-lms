@@ -183,7 +183,7 @@ class ExternalToolsController < ApplicationController
       end
 
       launch_type = placement.present? ? :indirect_link : :content_item
-      Lti::LogService.new(tool:, context: @context, user: @current_user, session_id: session[:session_id], placement:, launch_type:).call
+      Lti::LogService.new(tool:, context: @context, user: @current_user, session_id: session[:session_id], placement:, launch_type:, launch_url: url).call
 
       display_override = params["borderless"] ? "borderless" : params[:display]
       render Lti::AppUtil.display_template(@tool.display_type(placement), display_override:)
@@ -352,7 +352,7 @@ class ExternalToolsController < ApplicationController
       if tool
         placement = launch_settings.dig("metadata", "placement")
         launch_type = launch_settings.dig("metadata", "launch_type")&.to_sym
-        Lti::LogService.new(tool:, context: @context, user: @current_user, session_id: session[:session_id], placement:, launch_type:).call
+        Lti::LogService.new(tool:, context: @context, user: @current_user, session_id: session[:session_id], placement:, launch_type:, launch_url: launch_settings["launch_url"]).call
         log_asset_access(tool, "external_tools", "external_tools", overwrite: false)
       end
 
@@ -495,7 +495,7 @@ class ExternalToolsController < ApplicationController
         js_env(LTI_LAUNCH_RESOURCE_URL: @lti_launch.resource_url)
         set_tutorial_js_env
 
-        Lti::LogService.new(tool: @tool, context: @context, user: @current_user, session_id: session[:session_id], placement:, launch_type: :direct_link).call
+        Lti::LogService.new(tool: @tool, context: @context, user: @current_user, session_id: session[:session_id], placement:, launch_type: :direct_link, launch_url: @tool.url_with_environment_overrides(launch_url || @tool.url)).call
 
         render Lti::AppUtil.display_template(@tool.display_type(placement), display_override: params[:display])
         timing_meta.tags = { lti_version: @tool&.lti_version }.compact
@@ -1326,7 +1326,10 @@ class ExternalToolsController < ApplicationController
         valid_ids.map! { |id| Shard.global_id_for(id) }
         favorite_ids &= valid_ids # try to clear out any possibly deleted tool references first before causing a fuss
       end
-      if favorite_ids.length > 2
+      # On_by_default tools don't count towards the limit
+      client_ids = ContextExternalTool.find_external_tool_client_id(favorite_ids, @context)
+      on_by_default_ids = ContextExternalTool.on_by_default_ids
+      if (client_ids - on_by_default_ids).length > 2
         render json: { message: "Cannot have more than 2 favorited tools" }, status: :bad_request
       else
         @context.settings[:rce_favorite_tool_ids] = { value: favorite_ids }

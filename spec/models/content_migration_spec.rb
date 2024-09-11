@@ -2239,4 +2239,45 @@ describe ContentMigration do
       expect(@course.attachments.last.file_state).not_to eq("deleted")
     end
   end
+
+  context "imported_asset_id_map" do
+    before :once do
+      # not actually doing a course copy here, just simulating a finished one
+      @src = course_factory
+      @dst = course_factory
+      @old_assignment = @src.assignments.create! title: "foo"
+      @new_assignment = @dst.assignments.create! title: "foo", migration_id: CC::CCHelper.create_key(@old_assignment, global: true)
+
+      @old_wp = @src.wiki_pages.create! title: "bar"
+      @new_wp = @dst.wiki_pages.create!(
+        title: "bar",
+        migration_id: CC::CCHelper.create_key(@old_wp, global: true)
+      )
+
+      @cm = @dst.content_migrations.build(migration_type: "course_copy_importer", user: @teacher)
+      @cm.migration_settings[:imported_assets] = {
+        "Assignment" => @new_assignment.id.to_s,
+        "WikiPage" => @new_wp.id.to_s,
+      }
+      @cm.workflow_state = "imported"
+      @cm.source_course = @src
+      @cm.save!
+    end
+
+    it "returns a hash mapping the source asset IDs to the destination asset IDs" do
+      expect(@cm.imported_asset_id_map).to eq({
+                                                "Assignment" => { @old_assignment.id => @new_assignment.id },
+                                                "WikiPage" => { @old_wp.id => @new_wp.id }
+                                              })
+    end
+
+    it "ignores assets that can't be mapped" do
+      @cm.migration_settings[:imported_assets]["lti_assignment_quiz_set"] = []
+      @cm.save!
+      expect(@cm.imported_asset_id_map).to eq({
+                                                "Assignment" => { @old_assignment.id => @new_assignment.id },
+                                                "WikiPage" => { @old_wp.id => @new_wp.id }
+                                              })
+    end
+  end
 end

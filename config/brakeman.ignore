@@ -796,6 +796,29 @@
       "note": ""
     },
     {
+      "warning_type": "SSL Verification Bypass",
+      "warning_code": 71,
+      "fingerprint": "7c6a30da94876a5dcf712e8595642f6144bb9c4033ccdd6a09939c8808e57ce9",
+      "check_name": "SSLVerify",
+      "message": "SSL certificate verification was bypassed",
+      "file": "gems/canvas_kaltura/lib/canvas_kaltura/kaltura_client_v3.rb",
+      "line": 396,
+      "link": "https://brakemanscanner.org/docs/warning_types/ssl_verification_bypass/",
+      "code": "Net::HTTP.new(\"www.kaltura.com\", (Net::HTTP.https_default_port or Net::HTTP.http_default_port)).verify_mode = OpenSSL::SSL::VERIFY_NONE",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "CanvasKaltura::ClientV3",
+        "method": "sendRequest"
+      },
+      "user_input": null,
+      "confidence": "High",
+      "cwe_id": [
+        295
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "Command Injection",
       "warning_code": 14,
       "fingerprint": "816a81c5f19187c4a3855a2d49727ffd2f07c31284f44ba2621ae92b83576bdc",
@@ -1675,6 +1698,6 @@
       "note": ""
     }
   ],
-  "updated": "2024-06-13 16:55:44 +0000",
+  "updated": "2024-08-21 18:55:06 +0000",
   "brakeman_version": "6.1.2"
 }

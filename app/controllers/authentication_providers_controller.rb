@@ -242,9 +242,9 @@ class AuthenticationProvidersController < ApplicationController
   # @returns [AuthenticationProvider]
   def index
     if api_request?
-      render json: aacs_json(@account.authentication_providers.active)
+      render json: aacs_json(@account.authentication_providers.active.select { |ap| ap.visible_to?(@current_user) })
     else
-      @presenter = AuthenticationProvidersPresenter.new(@account)
+      @presenter = AuthenticationProvidersPresenter.new(@account, @current_user)
       @page_title = t("Authentication Settings")
       add_crumb @page_title
       page_has_instui_topnav

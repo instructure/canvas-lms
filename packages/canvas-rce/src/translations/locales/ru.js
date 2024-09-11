@@ -329,6 +329,7 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Редактировать значок" },
   "edit_link_7f53bebb": { "message": "Редактировать ссылку" },
+  "editor_status_bar_653f44ee": { "message": "Панель состояния редактора" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Элемент, начинающийся с { start }"
   },

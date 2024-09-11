@@ -668,6 +668,53 @@ describe OutcomeResultsController do
         expect(response_outcomes_ordering).to eq(outcome_ids)
       end
 
+      context "cross-shard access" do
+        specs_require_sharding
+
+        before do
+          @shard1.activate do
+            @shard1_account = Account.create!
+            @shard1_course = course_factory(account: @shard1_account)
+          end
+        end
+
+        it "ordering request is successful if site-admin user is from a different shard" do
+          admin_user = nil
+
+          @shard2.activate do
+            opts = { active_user: true, account: Account.site_admin, name: "site-admin", short_name: "site-admin" }
+            admin_user = Account.site_admin.account_users.create!(user: user_factory(opts)).user
+          end
+
+          @shard1.activate do
+            outcome_ids = create_outcomes(@shard1_course, 3)
+            position_map = create_outcome_position_map(outcome_ids)
+
+            user_session(admin_user)
+
+            post "outcome_order",
+                 params: { course_id: @shard1_course.id, },
+                 body: position_map.to_json,
+                 as: :json
+
+            expect(response.successful?).to be_truthy
+
+            get "rollups",
+                params: { context_id: @shard1_course.id,
+                          course_id: @shard1_course.id,
+                          context_type: "Course",
+                          user_outcome_ordering: "true",
+                          include: ["outcomes"] },
+                format: "json"
+
+            json = response.parsed_body
+            response_outcomes = json["linked"]["outcomes"]
+            response_outcomes_ordering = get_response_ordering(response_outcomes)
+            expect(response_outcomes_ordering).to eq(outcome_ids)
+          end
+        end
+      end
+
       context "with multiple outcome groups" do
         it "outcomes ordered correctly with large number of outcome groups" do
           user_session(@teacher)
@@ -1585,6 +1632,45 @@ describe OutcomeResultsController do
         StudentEnrollment.find_by(user_id: @student2.id).update(workflow_state: "deleted")
         json = parse_response(get_rollups({}))
         expect(json["rollups"].count { |r| r["links"]["user"] == @student2.id.to_s }).to eq(0)
+      end
+
+      context "with user enrollments from different shards (trust relationships)" do
+        specs_require_sharding
+
+        before do
+          @shard1.activate do
+            @student_from_another_shard = user_factory(name: "Distant Traveler", short_name: "Traveler")
+          end
+          student_in_course(active_all: true, course: outcome_course, user: @student_from_another_shard)
+        end
+
+        it "student is not canonical in the current shard" do
+          student = outcome_course.students.find_by(id: @student_from_another_shard.id)
+          expect(student.canonical?).to be_falsey
+        end
+
+        it "displays rollups for students from different shards" do
+          json = parse_response(get_rollups(exclude: ["inactive_enrollments", "concluded_enrollments"]))
+          expect(json["rollups"].count { |r| r["links"]["user"] == @student_from_another_shard.id.to_s }).to eq(1)
+        end
+
+        it "does not display rollups for students from different shards when they are inactive" do
+          outcome_course.enrollments.find_by(user_id: @student_from_another_shard.id).deactivate
+          json = parse_response(get_rollups(exclude: "inactive_enrollments"))
+          expect(json["rollups"].count { |r| r["links"]["user"] == @student_from_another_shard.id.to_s }).to eq(0)
+        end
+
+        it "does not display rollups for students from different shards when they are concluded" do
+          outcome_course.enrollments.find_by(user_id: @student_from_another_shard.id).conclude
+          json = parse_response(get_rollups(exclude: "concluded_enrollments"))
+          expect(json["rollups"].count { |r| r["links"]["user"] == @student_from_another_shard.id.to_s }).to eq(0)
+        end
+
+        it "does not display rollups for students from different shards when they are deleted" do
+          outcome_course.enrollments.find_by(user_id: @student_from_another_shard.id).update(workflow_state: "deleted")
+          json = parse_response(get_rollups({}))
+          expect(json["rollups"].count { |r| r["links"]["user"] == @student_from_another_shard.id.to_s }).to eq(0)
+        end
       end
 
       context "users with enrollments of different enrollment states" do

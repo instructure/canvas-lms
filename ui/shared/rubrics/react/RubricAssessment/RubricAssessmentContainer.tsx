@@ -78,13 +78,23 @@ export const RubricAssessmentContainer = ({
   const viewMode = viewModeOverride ?? viewModeSelect
   const isTraditionalView = viewMode === 'traditional'
   const instructorPoints = rubricAssessmentDraftData.reduce(
-    (prev, curr) => prev + (curr.points ?? 0),
+    (prev, curr) => prev + (!curr.ignoreForScoring && curr.points ? curr.points : 0),
     0
   )
 
   useEffect(() => {
-    setRubricAssessmentDraftData(rubricAssessmentData)
-  }, [rubricAssessmentData])
+    const updatedRubricAssessmentData = rubricAssessmentData.map(rubricAssessment => {
+      const matchingCriteria = criteria?.find(c => c.id === rubricAssessment.criterionId)
+      const ignoreForScoring = matchingCriteria?.ignoreForScoring || false
+
+      return {
+        ...rubricAssessment,
+        ignoreForScoring,
+      }
+    })
+
+    setRubricAssessmentDraftData(updatedRubricAssessmentData)
+  }, [rubricAssessmentData, criteria])
 
   const renderViewContainer = () => {
     if (isTraditionalView) {
@@ -133,6 +143,7 @@ export const RubricAssessmentContainer = ({
       a => a.criterionId === criterionId
     )
     const matchingCriteria = criteria?.find(c => c.id === criterionId)
+    const ignoreForScoring = matchingCriteria?.ignoreForScoring || false
     const criteriaRatings = matchingCriteria?.ratings ?? []
     const matchingRating: RubricRating | undefined = ratingId
       ? criteriaRatings.find(r => r.id === ratingId)
@@ -153,6 +164,7 @@ export const RubricAssessmentContainer = ({
           points,
           comments,
           id: matchingRatingId,
+          ignoreForScoring,
           commentsEnabled: true,
           description: ratingDescription,
           saveCommentsForLater,
@@ -167,6 +179,7 @@ export const RubricAssessmentContainer = ({
                 comments,
                 id: matchingRatingId,
                 points,
+                ignoreForScoring,
                 description: ratingDescription,
                 saveCommentsForLater,
               }

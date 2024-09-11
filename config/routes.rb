@@ -488,7 +488,6 @@ CanvasRails::Application.routes.draw do
     get :copy, as: :start_copy
     post "copy" => "courses#copy_course", :as => :copy_course
     concerns :media
-    get "user_notes" => "user_notes#user_notes"
     get "details/sis_publish" => "courses#sis_publish_status", :as => :sis_publish_status
     post "details/sis_publish" => "courses#publish_to_sis", :as => :publish_to_sis
 
@@ -773,7 +772,6 @@ CanvasRails::Application.routes.draw do
     resources :outcomes
     get :courses
     get "courses/:id" => "accounts#courses_redirect", :as => :courses_redirect
-    get "user_notes" => "user_notes#user_notes"
     resources :alerts
     resources :question_banks do
       post :bookmark
@@ -928,7 +926,6 @@ CanvasRails::Application.routes.draw do
     get :admin_split
     post :merge
     get :grades
-    resources :user_notes
     get :manageable_courses
     get "outcomes" => "outcomes#user_outcome_results"
     get "teacher_activity/course/:course_id" => "users#teacher_activity", :as => :course_teacher_activity
@@ -1910,7 +1907,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: "lti/registrations") do
       get "accounts/:account_id/lti_registrations", action: :list
-      get "accounts/:account_id/lti_registrations/fetch_lti_configuration", action: :fetch_lti_configuration
+      post "accounts/:account_id/lti_registrations/configuration/validate", action: :validate_lti_configuration
       delete "accounts/:account_id/lti_registrations/:id", action: :destroy
       get "accounts/:account_id/lti_registrations/:id", action: :show
       put "accounts/:account_id/lti_registrations/:id", action: :update
@@ -1981,6 +1978,7 @@ CanvasRails::Application.routes.draw do
       delete "folders/:id", action: :api_destroy
       put "folders/:id", action: :update
       post "folders/:folder_id/folders", action: :create, as: "create_folder"
+      post "accounts/:account_id/folders", action: :create
       post "folders/:folder_id/files", action: :create_file
       post "folders/:dest_folder_id/copy_file", action: :copy_file
       post "folders/:dest_folder_id/copy_folder", action: :copy_folder
@@ -2476,6 +2474,7 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :rubrics_api) do
+      get "rubrics/upload_template", action: "upload_template", as: "rubrics_account_upload_template"
       get "accounts/:account_id/rubrics", action: :index, as: :account_rubrics
       get "accounts/:account_id/rubrics/:id", action: :show
       get "courses/:course_id/rubrics", action: :index, as: :course_rubrics
@@ -2486,6 +2485,8 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/rubrics/upload", action: "upload", as: "rubrics_account_upload"
       get "courses/:course_id/rubrics/upload/:id", action: "upload_status", as: "rubrics_course_upload_status"
       get "accounts/:account_id/rubrics/upload/:id", action: "upload_status", as: "rubrics_account_upload_status"
+      get "courses/:course_id/rubrics/upload/:id/rubrics", action: "rubrics_by_import_id", as: "rubrics_course_upload_rubrics"
+      get "accounts/:account_id/rubrics/upload/:id/rubrics", action: "rubrics_by_import_id", as: "rubrics_account_upload_rubrics"
       post "courses/:course_id/rubrics", controller: :rubrics, action: :create
       put "courses/:course_id/rubrics/:id", controller: :rubrics, action: :update
       delete "courses/:course_id/rubrics/:id", controller: :rubrics, action: :destroy
@@ -2670,10 +2671,6 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/smartsearch/log", action: :log
       get "courses/:course_id/smartsearch/index_status", action: :index_status
       # TODO: add account level search
-    end
-
-    scope(controller: "user_notes") do
-      put "users/:user_id/user_notes/suppress_deprecation_notice", action: :suppress_deprecation_notice
     end
 
     scope(controller: :what_if_grades_api) do

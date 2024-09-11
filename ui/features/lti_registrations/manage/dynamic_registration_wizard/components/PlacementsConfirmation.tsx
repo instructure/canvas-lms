@@ -22,7 +22,8 @@ import {
   type RegistrationOverlayStore,
 } from '../../registration_wizard/registration_settings/RegistrationOverlayState'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {LtiPlacements, i18nLtiPlacement, type LtiPlacement} from '../../model/LtiPlacement'
+import {LtiPlacements, type LtiPlacement} from '../../model/LtiPlacement'
+import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
 import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'

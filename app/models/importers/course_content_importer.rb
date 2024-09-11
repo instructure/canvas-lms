@@ -189,16 +189,6 @@ module Importers
           Importers::BlueprintSettingsImporter.process_migration(data, migration)
         end
 
-        # be very explicit about draft state courses, but be liberal toward legacy courses
-        if course.wiki.has_no_front_page &&
-           migration.for_course_copy? &&
-           !migration.for_master_course_import? &&
-           (source = migration.source_course || Course.where(id: migration.migration_settings[:source_course_id]).first)
-          mig_id = migration.content_export.create_key(source.wiki.front_page)
-          if (new_front_page = course.wiki_pages.where(migration_id: mig_id).first)
-            course.wiki.set_front_page_url!(new_front_page.url)
-          end
-        end
         front_page = course.wiki.front_page
         course.wiki.unset_front_page! if front_page.nil? || front_page.new_record?
 

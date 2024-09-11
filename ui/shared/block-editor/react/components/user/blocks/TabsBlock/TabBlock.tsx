@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import {Element, useEditor, useNode, type Node} from '@craftjs/core'
 import {useClassNames} from '../../../../utils'
 import {type TabBlockProps} from './types'

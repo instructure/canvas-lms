@@ -28,7 +28,12 @@ import {
   type RegistrationOverlayStore,
 } from '../registration_wizard/registration_settings/RegistrationOverlayState'
 import type {DynamicRegistrationWizardService} from './DynamicRegistrationWizardService'
-import {formatApiResultError, type ApiResult} from '../../common/lib/apiResult/ApiResult'
+import {
+  formatApiResultError,
+  type ApiResult,
+  isUnsuccessful,
+  isSuccessful,
+} from '../../common/lib/apiResult/ApiResult'
 import type {LtiRegistrationId} from '../model/LtiRegistrationId'
 import type {UnifiedToolId} from '../model/UnifiedToolId'
 
@@ -282,7 +287,7 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
         service
           .fetchRegistrationToken(accountId, dynamicRegistrationUrl, unifiedToolId)
           .then(resp => {
-            if (resp._type === 'success') {
+            if (isSuccessful(resp)) {
               set(stateFor({_type: 'WaitingForTool', registrationToken: resp.data}))
               const onMessage = (message: MessageEvent) => {
                 if (
@@ -299,7 +304,7 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
                   )
                   // eslint-disable-next-line promise/catch-or-return
                   service.getRegistrationByUUID(accountId, resp.data.uuid).then(reg => {
-                    if (reg._type === 'success') {
+                    if (isSuccessful(reg)) {
                       const store: RegistrationOverlayStore = createRegistrationOverlayStore(
                         reg.data.client_name,
                         reg.data
@@ -326,7 +331,8 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
       loadRegistration: async (accountId: AccountId, registrationId: LtiImsRegistrationId) => {
         set(stateFor({_type: 'LoadingRegistration'}))
         const reg = await service.getRegistrationById(accountId, registrationId)
-        if (reg._type === 'success') {
+
+        if (isSuccessful(reg)) {
           const store: RegistrationOverlayStore = createRegistrationOverlayStore(
             reg.data.client_name,
             reg.data
@@ -352,10 +358,10 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
           service.updateDeveloperKeyWorkflowState(accountId, developerKeyId, 'on'),
           service.updateAdminNickname(accountId, registrationId, adminNickname),
         ])
-        if (results.every(r => r._type === 'success')) {
+        if (results.every(isSuccessful)) {
           onSuccess()
         } else {
-          set(stateFor(errorState(formatApiResultError(results.find(r => r._type !== 'success')!))))
+          set(stateFor(errorState(formatApiResultError(results.find(isUnsuccessful)!))))
         }
       },
       updateAndClose: async (
@@ -373,16 +379,16 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
           service.updateAdminNickname(accountId, registrationId, adminNickname),
         ])
 
-        if (results.every(b => b._type === 'success')) {
+        if (results.every(isSuccessful)) {
           onSuccess()
         } else {
-          set(stateFor(errorState(formatApiResultError(results.find(b => b._type !== 'success')!))))
+          set(stateFor(errorState(formatApiResultError(results.find(isUnsuccessful)!))))
         }
       },
       deleteKey: async (prevState: ReviewingStateType, developerKeyId: DeveloperKeyId) => {
         set(stateFrom(prevState)(state => deleting(state.registration, state.overlayStore)))
         const result = await service.deleteDeveloperKey(developerKeyId)
-        if (result._type !== 'success') {
+        if (isUnsuccessful(result)) {
           set(stateFor(errorState(formatApiResultError(result))))
         }
         return result

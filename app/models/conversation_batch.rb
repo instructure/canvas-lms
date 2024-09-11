@@ -21,6 +21,8 @@ class ConversationBatch < ActiveRecord::Base
   include SimpleTags
   include Workflow
 
+  self.ignored_columns += ["generate_user_note"]
+
   belongs_to :user
   belongs_to :root_conversation_message, class_name: "ConversationMessage"
   belongs_to :context, polymorphic: [:account, :course, { context_group: "Group" }]
@@ -62,7 +64,6 @@ class ConversationBatch < ActiveRecord::Base
                                                       context_id:)
             @conversations << conversation
             message = root_conversation_message.clone
-            message.generate_user_note = generate_user_note
             conversation.add_message(message, update_for_sender: false, tags:, cc_author: should_cc_author)
             conversation_message_ids << message.id
 
@@ -166,7 +167,6 @@ class ConversationBatch < ActiveRecord::Base
     user_map = recipients.index_by(&:id)
     user_map[batch.user_id] = batch.user
     batch.user_map = user_map
-    batch.generate_user_note = root_message.generate_user_note
     batch.save!
     batch
   end

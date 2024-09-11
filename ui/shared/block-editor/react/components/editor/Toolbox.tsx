@@ -35,6 +35,7 @@ import {ImageBlock, ImageBlockIcon} from '../user/blocks/ImageBlock'
 import {IconBlock, IconBlockIcon} from '../user/blocks/IconBlock'
 import {RCEBlock, RCEBlockIcon} from '../user/blocks/RCEBlock'
 import {TabsBlock, TabsBlockIcon} from '../user/blocks/TabsBlock'
+import {GroupBlock, GroupBlockIcon} from '../user/blocks/GroupBlock'
 
 export type ToolboxProps = {
   open: boolean
@@ -85,7 +86,7 @@ export const Toolbox = ({open, container, onClose}: ToolboxProps) => {
     return (
       <View
         shadow="resting"
-        className={`toolbox-item item-${label.toLowerCase().replaceAll(' ', '')}`}
+        className={`toolbox-item item-${label.toLowerCase().replaceAll(' ', '')}-block`}
         textAlign="center"
         elementRef={(ref: Element | null) => ref && connectors.create(ref as HTMLElement, element)}
       >
@@ -133,6 +134,7 @@ export const Toolbox = ({open, container, onClose}: ToolboxProps) => {
           {renderBox('Heading', HeadingBlockIcon, <HeadingBlock />)}
           {renderBox('Resource Card', ResourceCardIcon, <ResourceCard />)}
           {renderBox('Image', ImageBlockIcon, <ImageBlock />)}
+          {renderBox('Group', GroupBlockIcon, <GroupBlock />)}
           {renderBox('Tabs', TabsBlockIcon, <TabsBlock />)}
         </Flex>
       </View>

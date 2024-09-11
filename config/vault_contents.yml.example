@@ -10,6 +10,14 @@ development:
     access_key: 'fake-access-key'
     secret_key: 'fake-secret-key'
     security_token: 'fake-security-token'
+  # credentials used by smart search and discussion summaries
+  'sts/testaccount/sts/bedrock-dev':
+    access_key: aws-key-id-goes-here
+    secret_key: secret-goes-here
+  # credentials used by translations
+  'sts/testaccount/sts/sagemaker-dev':
+    access_key: aws-key-id-goes-here
+    secret_key: secret-goes-here
   'sts/testaccount/sts/canvas-release-notes':
     access_key: 'fake-access-key'
     secret_key: 'fake-secret-key'
@@ -19,6 +27,7 @@ development:
       canvas_security:
         encryption_secret: "astringthatisactually32byteslong"
         signing_secret: "astringthatisactually32byteslong"
+        attachments_secret: '6e4e7300bc30589203e95559e85bb823bfe71958edd7dc7dc28f0b78c0ce4eb4'
       lti_platform_storage:
         signing_secret: "astringthatisactually32byteslong"
 #     pandata_creds:

@@ -16,15 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {createRef, useCallback, useState} from 'react'
+import React, {useCallback, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
-import {Button} from '@instructure/ui-buttons'
-import {IconUploadLine} from '@instructure/ui-icons'
+import {IconUploadSolid} from '@instructure/ui-icons'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {humanReadableSize} from '../utils'
 import {ProgressBar} from '@instructure/ui-progress'
+import type {FormMessage} from '@instructure/ui-form-field'
+import {FileDrop} from '@instructure/ui-file-drop'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -41,32 +42,41 @@ const MigrationFileInput = ({
   fileUploadProgress,
   isSubmitting,
 }: MigrationFileInputProps) => {
-  const fileInput = createRef<HTMLInputElement>()
-  const [file, setFile] = useState<File | null>(null)
+  const [alert, setAlert] = useState<FormMessage>({
+    text: I18n.t('No file chosen'),
+    type: 'hint',
+  })
 
-  const handleSelectFile = useCallback(() => {
-    const files = fileInput.current?.files
-    if (!files) {
-      return
-    }
-    const selectedFile = files[0]
+  const handleDropAccepted = useCallback(
+    (files: ArrayLike<DataTransferItem | File>) => {
+      if (!Array.isArray(files) || !files.every(singleFile => singleFile instanceof File)) {
+        return onChange(null)
+      }
+      const selectedFile = files[0]
 
-    if (selectedFile && ENV.UPLOAD_LIMIT && selectedFile.size > ENV.UPLOAD_LIMIT) {
-      setFile(null)
-      onChange(null)
-      showFlashError(
-        I18n.t('Your migration can not exceed %{file_size}', {
-          file_size: humanReadableSize(ENV.UPLOAD_LIMIT),
-        })
-      )()
-    } else if (selectedFile) {
-      setFile(selectedFile)
+      if (!selectedFile) {
+        return onChange(null)
+      }
+      if (ENV.UPLOAD_LIMIT && selectedFile.size > ENV.UPLOAD_LIMIT) {
+        onChange(null)
+        return showFlashError(
+          I18n.t('Your migration can not exceed %{upload_limit}', {
+            upload_limit: humanReadableSize(ENV.UPLOAD_LIMIT),
+          })
+        )()
+      }
+      if (selectedFile.name) {
+        setAlert({text: selectedFile.name, type: 'hint'})
+      }
       onChange(selectedFile)
-    } else {
-      setFile(null)
-      onChange(null)
-    }
-  }, [onChange, fileInput])
+    },
+    [onChange, setAlert]
+  )
+
+  const handleDropRejected = useCallback(() => {
+    onChange(null)
+    setAlert({text: I18n.t('Invalid file type'), type: 'error'})
+  }, [onChange, setAlert])
 
   return (
     <>
@@ -75,23 +85,26 @@ const MigrationFileInput = ({
           <Text weight="bold">{I18n.t('Source')}</Text>
         </label>
       </View>
-      <input
-        id="migrationFileUpload"
-        data-testid="migrationFileUpload"
-        type="file"
-        ref={fileInput}
+      <FileDrop
         accept={accepts || '.zip,.imscc,.mbz,.xml'}
-        onChange={handleSelectFile}
-        style={{display: 'none'}}
+        onDropAccepted={handleDropAccepted}
+        interaction={isSubmitting ? 'disabled' : 'enabled'}
+        data-testid="migrationFileUpload"
+        onDropRejected={handleDropRejected}
+        messages={[alert]}
+        renderLabel={
+          <View as="div" textAlign="center" padding="x-large large">
+            <IconUploadSolid />
+            <Text as="div" weight="bold">
+              {I18n.t('Choose File')}
+            </Text>
+            <Text>
+              {I18n.t('Drag and drop or')} <Text color="brand">{I18n.t('browse your files')}</Text>
+            </Text>
+          </View>
+        }
+        maxWidth="22.5rem"
       />
-      <Button color="secondary" disabled={isSubmitting} onClick={() => fileInput.current?.click()}>
-        <IconUploadLine />
-        &nbsp;
-        {I18n.t('Choose File')}
-      </Button>
-      <View margin="none none none medium">
-        <Text>{file ? file.name : I18n.t('No file chosen')}</Text>
-      </View>
       {isSubmitting && (
         <View as="div" margin="small 0 0" style={{position: 'relative'}}>
           {I18n.t('Uploading File')}

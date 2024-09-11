@@ -51,7 +51,6 @@ class TokenScopes
   LTI_SHOW_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/show"
   LTI_UPDATE_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/update"
   LTI_PAGE_CONTENT_SHOW_SCOPE = "https://canvas.instructure.com/lti/page_content/show"
-  LTI_PAGE_CONTENT_SHOW_SCOPE_DEPRECATED = "http://canvas.instructure.com/lti/page_content/show" # This is deprecated and will be removed in a future release
   LTI_REPLACE_EDITOR_CONTENT_SCOPE = "https://canvas.instructure.com/lti/replace_editor_contents"
   LTI_SCOPES = {
     LTI_AGS_LINE_ITEM_SCOPE => I18n.t("Can create and view assignment data in the gradebook associated with the tool."),
@@ -67,8 +66,7 @@ class TokenScopes
   # These are scopes that are used to authorize postMessage calls
   # Any scopes here also need to be added to LTI_SCOPES or LTI_HIDDEN_SCOPES
   LTI_POSTMESSAGE_SCOPES = [
-    LTI_PAGE_CONTENT_SHOW_SCOPE,
-    LTI_PAGE_CONTENT_SHOW_SCOPE_DEPRECATED
+    LTI_PAGE_CONTENT_SHOW_SCOPE
   ].freeze
   LTI_AGS_SCOPES = [
     LTI_AGS_LINE_ITEM_SCOPE,
@@ -78,7 +76,6 @@ class TokenScopes
     LTI_AGS_SHOW_PROGRESS_SCOPE
   ].freeze
   LTI_HIDDEN_SCOPES = {
-    LTI_PAGE_CONTENT_SHOW_SCOPE_DEPRECATED => I18n.t("Can view the content of a page it's launched from."),
     LTI_CREATE_ACCOUNT_EXTERNAL_TOOLS_SCOPE => I18n.t("Can create external tools."),
     LTI_DESTROY_ACCOUNT_EXTERNAL_TOOLS_SCOPE => I18n.t("Can destroy external tools."),
     LTI_LIST_ACCOUNT_EXTERNAL_TOOLS_SCOPE => I18n.t("Can list external tools."),

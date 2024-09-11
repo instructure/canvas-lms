@@ -111,7 +111,8 @@ const dropTarget = {
     props.moveCard(dragIndex, hoverIndex)
   },
 }
-
+const REPLY_TO_TOPIC = 'reply_to_topic'
+const REPLY_TO_ENTRY = 'reply_to_entry'
 class DiscussionRow extends Component {
   static propTypes = {
     canPublish: bool.isRequired,
@@ -795,6 +796,39 @@ class DiscussionRow extends Component {
     )
   }
 
+  renderCheckpointInfo = (size, timestampStyleOverride) => {
+    const {assignment} = this.props.discussion
+    let dueDateString = null
+
+    if (assignment && assignment?.checkpoints?.length > 0) {
+      const replyToTopic = assignment.checkpoints.find(e => e.tag === REPLY_TO_TOPIC).due_at
+      const replyToEntry = assignment.checkpoints.find(e => e.tag === REPLY_TO_ENTRY).due_at
+      const noDate = I18n.t('No Due Date')
+
+      dueDateString = I18n.t(
+        ' Reply to topic: %{topicDate}  Required replies (%{count}): %{entryDate}',
+        {
+          topicDate: replyToTopic ? this.props.dateFormatter(replyToTopic) : noDate,
+          entryDate: replyToEntry ? this.props.dateFormatter(replyToEntry) : noDate,
+          count: this.props.discussion.reply_to_entry_required_count,
+        }
+      )
+    }
+    return (
+      dueDateString && (
+        <Grid.Row>
+          <Grid.Col textAlign="end">
+            <span aria-hidden="true" style={timestampStyleOverride}>
+              <span className="ic-discussion-row__content due-date">
+                <Text size={size}>{dueDateString}</Text>
+              </span>
+            </span>
+          </Grid.Col>
+        </Grid.Row>
+      )
+    )
+  }
+
   renderIcon = () => {
     const accessibleGradedIcon = (isSuccessColor = true) => (
       <Text
@@ -947,6 +981,7 @@ class DiscussionRow extends Component {
                     </span>
                   </Grid.Col>
                 </Grid.Row>
+                {this.renderCheckpointInfo(timestampTextSize, timestampStyleOverride)}
               </Grid>
             </span>
           </div>

@@ -36,6 +36,7 @@ module Api::V1::Rubric
       free_form_criterion_comments
       hide_score_total
       data
+      rating_order
     ]
   }.freeze
 

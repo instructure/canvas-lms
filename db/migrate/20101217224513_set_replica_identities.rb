@@ -28,6 +28,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :accounts
     set_replica_identity :asset_user_accesses
     set_replica_identity :blackout_dates
+    set_replica_identity :block_editors
     set_replica_identity :comment_bank_items
     set_replica_identity :content_tags
     set_replica_identity :context_external_tools
@@ -53,6 +54,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :group_categories
     set_replica_identity :group_memberships
     set_replica_identity :groups
+    set_replica_identity :inbox_settings
     set_replica_identity :lti_ims_registrations
     set_replica_identity :lti_line_items
     set_replica_identity :lti_resource_links

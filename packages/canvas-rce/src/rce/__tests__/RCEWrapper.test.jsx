@@ -1012,7 +1012,7 @@ describe('RCEWrapper', () => {
       ])
     })
 
-    it('extracts always_on tools', () => {
+    it('extracts on_by_default tools', () => {
       const element = createBasicElement({
         ltiTools: [
           {
@@ -1023,7 +1023,7 @@ describe('RCEWrapper', () => {
             width: 340,
             id: 1,
             name: 'An Always On Tool',
-            always_on: true,
+            on_by_default: true,
           },
           {
             canvas_icon_class: null,
@@ -1033,7 +1033,7 @@ describe('RCEWrapper', () => {
             id: 2,
             name: 'A Tool',
             width: 340,
-            always_on: false,
+            on_by_default: false,
           },
           {
             canvas_icon_class: null,
@@ -1042,14 +1042,13 @@ describe('RCEWrapper', () => {
             height: 160,
             id: 3,
             name: 'A Tool',
-            always_on: true,
+            on_by_default: true,
           },
         ],
       })
 
-      // The order here is important, as the always on tools should be at the beginning!
+      // The order here is important, as the on by default tools should be at the beginning!
       expect(element.ltiToolFavorites).toStrictEqual([
-        'instructure_external_button_1',
         'instructure_external_button_3',
         'instructure_external_button_2',
       ])

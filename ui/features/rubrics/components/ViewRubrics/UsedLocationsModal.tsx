@@ -38,7 +38,7 @@ const I18n = useI18nScope('UsedLocationsModal')
 export type FetchUsedLocationResponse = {
   usedLocations: UsedLocation[]
   isLastPage: boolean
-  nextPage: string
+  nextPage?: string
 }
 
 type UsedLocationsModalProps = {

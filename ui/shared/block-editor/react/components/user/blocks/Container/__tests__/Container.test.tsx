@@ -55,11 +55,6 @@ describe('Container', () => {
     expect(containerBlock).toHaveStyle({color: 'red'})
   })
 
-  it('sets a className matching the layout prop', () => {
-    const containerBlock = renderBlock({layout: 'row'})
-    expect(containerBlock).toHaveClass('row-layout')
-  })
-
   it('sets the data-placeholder attribute from props', () => {
     const containerBlock = renderBlock({'data-placeholder': 'My placeholder'})
     expect(containerBlock.getAttribute('data-placeholder')).toBe('My placeholder')

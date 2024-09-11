@@ -23,6 +23,9 @@ import theme from '@instructure/canvas-theme'
 
 export function Highlight({...props}) {
   const highlightRef = useRef()
+  const urlParams = new URLSearchParams(window.location.search)
+  const isPersistEnabled = urlParams.get('persist') === '1'
+  const className = isPersistEnabled ? 'highlight-discussion' : 'highlight-fadeout'
 
   useLayoutEffect(() => {
     if (props.isHighlighted && highlightRef.current) {
@@ -38,7 +41,7 @@ export function Highlight({...props}) {
       style={{
         borderRadius: theme.variables.borders.radiusLarge,
       }}
-      className={classNames({'highlight-fadeout': props.isHighlighted})}
+      className={classNames({[className]: props.isHighlighted})}
       data-testid={props.isHighlighted ? 'isHighlighted' : 'notHighlighted'}
       ref={highlightRef}
     >

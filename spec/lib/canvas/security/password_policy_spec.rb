@@ -17,11 +17,28 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+class CorruptedDownload < StandardError; end
 
 describe Canvas::Security::PasswordPolicy do
+  specs_require_cache(:redis_cache_store)
+
+  let(:account) { Account.default }
+  let(:policy) { { common_passwords_attachment_id: 1 } }
+  let(:attachment) do
+    double("Attachment",
+           size: 500.kilobytes,
+           open: StringIO.new("password1\npassword2\npassword3"),
+           root_account: account)
+  end
+  let(:cache_key) { "common_passwords_set_#{policy[:common_passwords_attachment_id]}" }
+
+  before do
+    account.enable_feature!(:password_complexity)
+    allow(Attachment).to receive(:not_deleted).and_return(double(find_by: attachment))
+  end
+
   describe "validations" do
     def pseudonym_with_policy(policy)
-      account = Account.default
       account.settings[:password_policy] = policy
       account.save
       @pseudonym = Pseudonym.new
@@ -36,9 +53,6 @@ describe Canvas::Security::PasswordPolicy do
       expect(@pseudonym).not_to be_valid
 
       @pseudonym.password = @pseudonym.password_confirmation = "aaaaaaaa"
-      expect(@pseudonym).to be_valid
-
-      @pseudonym.password = @pseudonym.password_confirmation = "football"
       expect(@pseudonym).to be_valid
 
       @pseudonym.password = @pseudonym.password_confirmation = "abcdefgh"
@@ -58,15 +72,6 @@ describe Canvas::Security::PasswordPolicy do
       expect(@pseudonym).not_to be_valid
 
       @pseudonym.password = @pseudonym.password_confirmation = "asdfghijklm"
-      expect(@pseudonym).to be_valid
-    end
-
-    it "rejects common passwords" do
-      pseudonym_with_policy(disallow_common_passwords: true)
-      @pseudonym.password = @pseudonym.password_confirmation = "football"
-      expect(@pseudonym).not_to be_valid
-
-      @pseudonym.password = @pseudonym.password_confirmation = "lacrosse"
       expect(@pseudonym).to be_valid
     end
 
@@ -97,30 +102,163 @@ describe Canvas::Security::PasswordPolicy do
     end
 
     context "when requiring at least one number" do
+      before { pseudonym_with_policy({ require_number_characters: "true" }) }
+
       it "is invalid without a number" do
-        pseudonym_with_policy({ require_number_characters: "true" })
         @pseudonym.password = @pseudonym.password_confirmation = "Password"
         expect(@pseudonym).not_to be_valid
       end
 
       it "is valid with at least one number" do
-        pseudonym_with_policy({ require_number_characters: "true" })
         @pseudonym.password = @pseudonym.password_confirmation = "Password1"
         expect(@pseudonym).to be_valid
       end
     end
 
     context "when requiring at least one symbol" do
+      before { pseudonym_with_policy({ require_symbol_characters: "true" }) }
+
       it "is invalid without a symbol" do
-        pseudonym_with_policy({ require_symbol_characters: "true" })
         @pseudonym.password = @pseudonym.password_confirmation = "Password"
         expect(@pseudonym).not_to be_valid
       end
 
       it "is valid with at least one symbol" do
-        pseudonym_with_policy({ require_symbol_characters: "true" })
         @pseudonym.password = @pseudonym.password_confirmation = "Password!"
         expect(@pseudonym).to be_valid
+      end
+    end
+
+    context "when validating against a common password dictionary" do
+      it "is valid with a password not listed in the provided dictionary" do
+        pseudonym_with_policy(policy)
+        @pseudonym.password = @pseudonym.password_confirmation = "Password!"
+        expect(@pseudonym).to be_valid
+      end
+
+      it "is invalid when the password is a member of the provided dictionary" do
+        pseudonym_with_policy(policy)
+        @pseudonym.password = @pseudonym.password_confirmation = "password1"
+        expect(@pseudonym).not_to be_valid
+      end
+
+      it "falls back to default common password dictionary when password complexity feature is disabled" do
+        account.disable_feature!(:password_complexity)
+        pseudonym_with_policy(disallow_common_passwords: true)
+        @pseudonym.password = @pseudonym.password_confirmation = "Password!"
+        expect(@pseudonym).to be_valid
+      end
+
+      it "falls back to default common password dictionary when common_passwords_attachment_id is not present" do
+        pseudonym_with_policy(disallow_common_passwords: true)
+        @pseudonym.password = @pseudonym.password_confirmation = "Password!"
+        expect(@pseudonym).to be_valid
+      end
+
+      it "falls back to default common password dictionary when attachment is not found" do
+        allow(Attachment).to receive(:not_deleted).and_return(double(find_by: nil))
+        pseudonym_with_policy(disallow_common_passwords: true)
+        @pseudonym.password = @pseudonym.password_confirmation = "Password!"
+        expect(@pseudonym).to be_valid
+      end
+
+      it "falls back to default common password dictionary when attachment is too large" do
+        allow(attachment).to receive(:size).and_return(2.megabytes)
+        pseudonym_with_policy(disallow_common_passwords: true)
+        @pseudonym.password = @pseudonym.password_confirmation = "Password!"
+        expect(@pseudonym).to be_valid
+      end
+
+      it "falls back to default common password dictionary when attachment is corrupted" do
+        allow(attachment).to receive(:open).and_raise(CorruptedDownload)
+        pseudonym_with_policy(disallow_common_passwords: true)
+        @pseudonym.password = @pseudonym.password_confirmation = "Password!"
+        expect(@pseudonym).to be_valid
+      end
+
+      it "falls back to default common password dictionary and still invalidates" do
+        pseudonym_with_policy(disallow_common_passwords: true)
+        @pseudonym.password = @pseudonym.password_confirmation = "football"
+        expect(@pseudonym).not_to be_valid
+      end
+    end
+  end
+
+  describe ".load_common_passwords_file_data" do
+    context "when attachment is found and valid" do
+      it "loads and returns the common passwords" do
+        passwords = described_class.load_common_passwords_file_data(policy)
+        expect(passwords).to eq(%w[password1 password2 password3])
+      end
+    end
+
+    context "when attachment is not found" do
+      before do
+        allow(Attachment).to receive(:not_deleted).and_return(double(find_by: nil))
+      end
+
+      it "returns false" do
+        expect(described_class.load_common_passwords_file_data(policy)).to be_falsey
+      end
+    end
+
+    context "when attachment size is too large" do
+      before do
+        allow(attachment).to receive(:size).and_return(2.megabytes)
+      end
+
+      it "returns false" do
+        expect(described_class.load_common_passwords_file_data(policy)).to be_falsey
+      end
+    end
+
+    context "when attachment is corrupted" do
+      before do
+        allow(attachment).to receive(:open).and_raise(CorruptedDownload)
+      end
+
+      it "logs an error and returns false" do
+        expect(Rails.logger).to receive(:error).with(/Corrupted download for common passwords attachment/)
+        expect(described_class.load_common_passwords_file_data(policy)).to be_falsey
+      end
+    end
+  end
+
+  describe ".add_password_membership" do
+    it "adds passwords to the Redis set" do
+      passwords = %w[password1 password2 password3]
+      described_class.add_password_membership(cache_key, passwords)
+      redis = Canvas.redis
+
+      passwords.each do |password|
+        expect(redis.sismember(cache_key, password)).to be_truthy
+      end
+    end
+  end
+
+  describe ".check_password_membership" do
+    before do
+      passwords = %w[password1 password2 password3]
+      described_class.add_password_membership(cache_key, passwords)
+    end
+
+    it "returns true if the password is in the Redis set" do
+      expect(described_class.check_password_membership(cache_key, "password1", policy)).to be_truthy
+    end
+
+    it "returns false if the password is not in the Redis set" do
+      expect(described_class.check_password_membership(cache_key, "password4", policy)).to be_falsey
+    end
+
+    it "recreates the Redis set if the key gets invalidated by a new attachment_id" do
+      new_cache_key = "common_passwords_set_2"
+      passwords = %w[password4 password5 password6]
+      described_class.add_password_membership(new_cache_key, passwords)
+      redis = Canvas.redis
+
+      passwords.each do |password|
+        expect(redis.sismember(cache_key, password)).to be_falsey
+        expect(redis.sismember(new_cache_key, password)).to be_truthy
       end
     end
   end

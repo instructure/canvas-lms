@@ -52,6 +52,7 @@ import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {usePostComment} from '../../hooks/useComments'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import DefaultGradeInput from './DefaultGradeInput'
+import sanitizeHtml from 'sanitize-html-with-tinymce'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -193,7 +194,7 @@ function SubmissionComment({comment, showDivider}: SubmissionCommentProps) {
               {author.name}
             </Link>
           </Heading>
-          <Text size="small">{comment.comment}</Text>
+          <Text size="small" dangerouslySetInnerHTML={{__html: sanitizeHtml(comment.comment)}} />
           {mediaObject && (
             <View as="div">
               <Link

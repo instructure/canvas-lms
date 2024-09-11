@@ -31,6 +31,7 @@ export const mockDynamicRegistrationWizardService = (
   fetchRegistrationToken: jest.fn(),
   deleteDeveloperKey: jest.fn(),
   getRegistrationByUUID: jest.fn(),
+  getRegistrationById: jest.fn(),
   updateDeveloperKeyWorkflowState: jest.fn(),
   updateRegistrationOverlay: jest.fn(),
   updateAdminNickname: jest.fn(),

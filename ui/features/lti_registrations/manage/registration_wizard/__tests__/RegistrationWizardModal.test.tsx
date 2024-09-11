@@ -20,16 +20,15 @@ import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {RegistrationWizardModal} from '../RegistrationWizardModal'
 import {ZAccountId} from '../../model/AccountId'
 import {
-  openDynamicRegistrationWizard,
   openRegistrationWizard,
   useRegistrationModalWizardState,
 } from '../RegistrationWizardModalState'
-import {apiParseError, genericError, success} from '../../../common/lib/apiResult/ApiResult'
-import {mockToolConfiguration, mockJsonUrlWizardService} from './helpers'
-import {ZLtiConfiguration} from '../../model/lti_tool_configuration/LtiConfiguration'
+import {apiError, genericError, success} from '../../../common/lib/apiResult/ApiResult'
+import {mockJsonUrlWizardService} from './helpers'
 import {mockDynamicRegistrationWizardService} from '../../dynamic_registration_wizard/__tests__/helpers'
 import userEvent from '@testing-library/user-event'
 import {ZUnifiedToolId} from '../../model/UnifiedToolId'
+import {mockInternalConfiguration} from '../../lti_1p3_registration_form/__tests__/helpers'
 
 describe('RegistrationWizardModal', () => {
   let error: (...data: any[]) => void
@@ -150,13 +149,9 @@ describe('RegistrationWizardModal', () => {
 
     it('should validate the json configuration from the URL', async () => {
       const accountId = ZAccountId.parse('123')
-      const fetchThirdPartyToolConfiguration = jest.fn().mockResolvedValue(
-        success(
-          mockToolConfiguration({
-            title: 'Test Tool',
-          })
-        )
-      )
+      const fetchThirdPartyToolConfiguration = jest
+        .fn()
+        .mockResolvedValue(success(mockInternalConfiguration()))
 
       const jsonUrlWizardService = mockJsonUrlWizardService({fetchThirdPartyToolConfiguration})
 
@@ -173,12 +168,8 @@ describe('RegistrationWizardModal', () => {
 
       await userEvent.click(screen.getByTestId('registration-wizard-next-button'))
 
-      await waitFor(() => {
-        expect(screen.getByText(/Test Tool/i, {ignore: 'title'})).toBeInTheDocument()
-      })
-
       expect(fetchThirdPartyToolConfiguration).toHaveBeenCalledWith(
-        'https://example.com/json',
+        {url: 'https://example.com/json'},
         accountId
       )
     })
@@ -213,32 +204,17 @@ describe('RegistrationWizardModal', () => {
       })
 
       expect(fetchThirdPartyToolConfiguration).toHaveBeenCalledWith(
-        'https://example.com/json',
+        {url: 'https://example.com/json'},
         accountId
       )
     })
 
     it('renders an error screen when the third party configuration is invalid', async () => {
       const accountId = ZAccountId.parse('123')
-      const result = ZLtiConfiguration.safeParse({
-        title: 'An invalid tool',
-        description: 'This tool is invalid',
-        target_link_uri: 'http://example.com',
-        oidc_initiation_url: 'http://example.com',
-        custom_fields: 'An invalid custom field',
-        oidc_initiation_urls: {},
-        public_jwk_url: 'http://example.com',
-        scopes: [],
-        extensions: [],
-      })
-
-      if (result.success) {
-        throw new Error('Expected an error')
-      }
 
       const fetchThirdPartyToolConfiguration = jest
         .fn()
-        .mockResolvedValue(apiParseError(result.error, 'http://example.com'))
+        .mockResolvedValue(apiError(422, {errors: ['Bad config']}))
 
       const jsonUrlWizardService = mockJsonUrlWizardService({fetchThirdPartyToolConfiguration})
 
@@ -265,7 +241,7 @@ describe('RegistrationWizardModal', () => {
       })
 
       expect(fetchThirdPartyToolConfiguration).toHaveBeenCalledWith(
-        'https://example.com/json',
+        {url: 'https://example.com/json'},
         accountId
       )
     })

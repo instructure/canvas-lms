@@ -1393,8 +1393,8 @@ class ContentMigration < ActiveRecord::Base
     global_ids = master_template.present? || use_global_identifiers?
 
     migration_settings[:imported_assets].each do |asset_type, dest_ids|
-      klass = asset_type.constantize
-      next unless klass.column_names.include? "migration_id"
+      klass = asset_type.safe_constantize
+      next unless klass&.column_names&.include? "migration_id"
 
       dest_ids = dest_ids.split(",").map(&:to_i)
       mig_id_to_dest_id = context.shard.activate do

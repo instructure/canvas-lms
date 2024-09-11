@@ -256,6 +256,17 @@ module Interfaces::SubmissionInterface
     end
   end
 
+  field :sub_assignment_submissions, [Types::SubAssignmentSubmissionType], null: true
+  def sub_assignment_submissions
+    Loaders::AssociationLoader.for(Submission, :assignment).then do
+      return nil unless object.assignment.checkpoints_parent?
+
+      Loaders::AssociationLoader.for(Assignment, :sub_assignment_submissions).then do
+        object.assignment.sub_assignment_submissions.where(user_id: object.user_id)
+      end
+    end
+  end
+
   field :grading_status, Types::SubmissionGradingStatusType, null: true
   field :late_policy_status, LatePolicyStatusType, null: true
   field :late, Boolean, method: :late?, null: true

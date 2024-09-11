@@ -317,6 +317,7 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Ikona edycji" },
   "edit_link_7f53bebb": { "message": "Edytuj łącze" },
+  "editor_status_bar_653f44ee": { "message": "Pasek stanu edytora" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Element rozpoczynający się od { start }"
   },

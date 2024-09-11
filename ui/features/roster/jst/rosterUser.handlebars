@@ -1,7 +1,7 @@
 <td class="center">
   <div id={{avatarId}}></div>
 </td>
-<td>
+<td class="roster_user_name-cell">
   <a href="{{html_url}}" data-student_id="{{id}}" data-course_id="{{course_id}}"
     class="roster_user_name student_context_card_trigger">{{name}}{{#if pronouns}} <i>({{pronouns}})</i>{{/if}}
   </a>
@@ -75,10 +75,6 @@
       {{/if}}
       {{#if canEditRoles}}
       <li><a href="#" data-event="editRoles"><i class="icon-edit" aria-hidden="true"></i> {{#t}}Edit Role{{/t}}</a></li>
-      {{/if}}
-      {{#if canManageUserNotes}}
-      <li><a href={{faculyJournalUrl}}><i class="icon-note-light" aria-hidden="true"></i> {{#t}}Faculty
-          Journal{{/t}}</a></li>
       {{/if}}
       {{/if}}
       <li><a href="{{url}}"><i class="icon-user" aria-hidden="true"></i> {{#t "links.user_details"}}User

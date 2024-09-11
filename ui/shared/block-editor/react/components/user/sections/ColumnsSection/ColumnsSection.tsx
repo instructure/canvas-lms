@@ -16,60 +16,87 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
-import {Element, useEditor} from '@craftjs/core'
+import React from 'react'
+import {Element, useEditor, useNode, type Node} from '@craftjs/core'
 
 import {Container} from '../../blocks/Container'
-import {NoSections} from '../../common'
 import {ColumnsSectionToolbar} from './ColumnsSectionToolbar'
 import {useClassNames} from '../../../../utils'
 import {SectionMenu} from '../../../editor/SectionMenu'
+import {GroupBlock} from '../../blocks/GroupBlock'
 import {type ColumnsSectionProps} from './types'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('block-editor/columns-section')
 
-export const ColumnsSection = ({columns, variant}: ColumnsSectionProps) => {
+export type ColumnsSectionInnerProps = {
+  children?: React.ReactNode
+}
+
+export const ColumnsSectionInner = ({children}: ColumnsSectionInnerProps) => {
   const {enabled} = useEditor(state => ({
     enabled: state.options.enabled,
   }))
-  const [cid] = useState<string>('columns-section') // uid('columns-section', 2)
+  const {
+    connectors: {connect},
+  } = useNode()
+  const clazz = useClassNames(enabled, {empty: !children}, ['columns-section__inner'])
+
+  return (
+    <div ref={el => el && connect(el)} className={clazz} data-placeholder="Drop Groups here">
+      {children}
+    </div>
+  )
+}
+
+ColumnsSectionInner.craft = {
+  displayName: 'Columns',
+  rules: {
+    canMoveIn: (incomingNodes: Node[]) =>
+      incomingNodes.every(incomingNode => incomingNode.data.type === GroupBlock),
+    canMoveOut: (outgoingNodes: Node[], currentNode: Node) => {
+      return currentNode.data.nodes.length > outgoingNodes.length
+    },
+  },
+  custom: {
+    noToolbar: true,
+  },
+}
+
+export const ColumnsSection = (props: ColumnsSectionProps) => {
+  const {enabled} = useEditor(state => ({
+    enabled: state.options.enabled,
+  }))
+  const {id, node} = useNode((n: Node) => {
+    return {
+      node: n,
+    }
+  })
   const clazz = useClassNames(enabled, {empty: false}, [
     'section',
     'columns-section',
-    variant || ColumnsSection.craft.defaultProps.variant,
-    `columns-${columns}`,
+    `columns-${node.data.props.columns}`,
   ])
 
-  const renderCols = () => {
-    if (variant === 'fixed') {
-      const cols: JSX.Element[] = []
-      for (let i = 0; i < columns; i++) {
-        cols.push(
-          <Element
-            key={`${cid}-${i}`}
-            id={`${cid}-${i}`}
-            is={NoSections}
-            canvas={true}
-            className="columns-section__inner"
-          />
-        )
-      }
-      return cols
-    } else {
-      return <Element id={cid} is={NoSections} canvas={true} className="columns-section__inner" />
-    }
-  }
-
-  return <Container className={clazz}>{renderCols()}</Container>
+  return (
+    <Container className={clazz}>
+      <Element id={`columns-${id}__inner`} is={ColumnsSectionInner} canvas={true}>
+        <Element id={`columns-${id}-1`} is={GroupBlock} canvas={true} resizable={false} />
+        <Element id={`columns-${id}-1`} is={GroupBlock} canvas={true} resizable={false} />
+      </Element>
+    </Container>
+  )
 }
 
 ColumnsSection.craft = {
-  displayName: I18n.t('Columns'),
+  displayName: I18n.t('Blank Section'),
   defaultProps: {
     columns: 2,
-    variant: 'fixed',
+  },
+  rules: {
+    // canMoveIn: (nodes: Node[]) => !nodes.some(node => node.data.custom.isSection || node.data.name !== 'GroupBlock'),
+    canMoveIn: () => false,
   },
   custom: {
     isSection: true,

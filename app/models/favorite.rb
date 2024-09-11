@@ -34,4 +34,8 @@ class Favorite < ActiveRecord::Base
   def populate_root_account_id
     self.root_account = context.root_account
   end
+
+  def self.create_or_find_by(user:, context:)
+    new(user:, context:).insert(on_conflict: -> { user.favorites.find_by(context:) })
+  end
 end

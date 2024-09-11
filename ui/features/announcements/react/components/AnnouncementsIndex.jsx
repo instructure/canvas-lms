@@ -108,10 +108,7 @@ export default class AnnouncementsIndex extends Component {
     if (condition) {
       return (
         <div style={{textAlign: 'center'}}>
-          <Spinner size="small" renderTitle={title} />
-          <Text size="small" as="p">
-            {title}
-          </Text>
+          <Spinner size="small" delay={500} renderTitle={title} />
         </div>
       )
     } else {

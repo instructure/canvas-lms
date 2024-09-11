@@ -329,6 +329,7 @@ const locale = {
   },
   "edit_icon_2c6b0e91": { "message": "Muokkaa kuvaketta" },
   "edit_link_7f53bebb": { "message": "Muokkaa linkkiä" },
+  "editor_status_bar_653f44ee": { "message": "Editorin tilapalkki" },
   "element_starting_with_start_91bf4c3b": {
     "message": "Elementti, joka alkaa { start }"
   },

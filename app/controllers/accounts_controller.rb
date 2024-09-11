@@ -493,9 +493,13 @@ class AccountsController < ApplicationController
                       microsoft_sync_remote_attribute
                       enable_as_k5_account
                       use_classic_font_in_k5]
-    public_attrs << :password_policy if @account.password_complexity_enabled? && !@account.site_admin?
+    settings_hash = public_attrs.index_with { |key| @account.settings[key] }.compact
 
-    render json: public_attrs.index_with { |key| @account.settings[key] }.compact
+    if @account.password_complexity_enabled? && !@account.site_admin?
+      settings_hash[:password_policy] = @account.password_policy
+    end
+
+    render json: settings_hash
   end
 
   # @API List environment settings
@@ -2017,7 +2021,9 @@ class AccountsController < ApplicationController
                                                          minimum_character_length
                                                          maximum_login_attempts
                                                          require_number_characters
-                                                         require_symbol_characters] }.freeze,
+                                                         require_symbol_characters
+                                                         common_passwords_attachment_id
+                                                         common_passwords_folder_id] }.freeze,
                                    :prevent_course_availability_editing_by_teachers,
                                    :prevent_course_renaming_by_teachers,
                                    :restrict_quiz_questions,
@@ -2104,7 +2110,9 @@ class AccountsController < ApplicationController
        minimum_character_length
        maximum_login_attempts
        require_number_characters
-       require_symbol_characters]
+       require_symbol_characters
+       common_passwords_attachment_id
+       common_passwords_folder_id]
   end
 
   def strong_account_params

@@ -21,8 +21,8 @@ import {executeQuery} from '@canvas/query/graphql'
 import gql from 'graphql-tag'
 import {omit} from 'lodash'
 
-const ASSIGNMENT_QUERY = gql`
-  query AssignmentQuery($assignmentId: ID!) {
+const QUERY = gql`
+  query SpeedGrader_AssignmentQuery($assignmentId: ID!) {
     assignment(id: $assignmentId) {
       allowedAttempts
       dueAt
@@ -125,7 +125,7 @@ export async function getAssignment<T extends GetAssignmentParams>({
   ZGetAssignmentParams.parse(queryKey[1])
   const {assignmentId} = queryKey[1]
 
-  const result = await executeQuery<any>(ASSIGNMENT_QUERY, {
+  const result = await executeQuery<any>(QUERY, {
     assignmentId,
   })
 

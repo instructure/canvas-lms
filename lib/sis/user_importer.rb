@@ -237,7 +237,7 @@ module SIS
           should_add_account_associations = false
           should_update_account_associations = false
 
-          if user_row.pronouns.present? && !user.stuck_sis_fields.include?(:pronouns)
+          if user_row.pronouns.present? && !user.stuck_sis_fields.include?(:pronouns) && @root_account.can_add_pronouns?
             user.pronouns = (user_row.pronouns == "<delete>") ? nil : user_row.pronouns
           end
 

@@ -2725,20 +2725,38 @@ describe ContextExternalTool do
         expect(tool.display_type(:course_navigation)).to eq "in_context"
         tool.course_navigation = { enabled: true }
         tool.save!
-        expect(tool.display_type(:course_navigation)).to eq "in_context"
+        expect(tool.display_type("course_navigation")).to eq "in_context"
       end
 
       it "is configurable by a property" do
         tool.course_navigation = { enabled: true }
         tool.settings[:display_type] = "custom_display_type"
         tool.save!
-        expect(tool.display_type(:course_navigation)).to eq "custom_display_type"
+        expect(tool.display_type("course_navigation")).to eq "custom_display_type"
       end
 
       it "is configurable in extension" do
         tool.course_navigation = { display_type: "other_display_type" }
         tool.save!
-        expect(tool.display_type(:course_navigation)).to eq "other_display_type"
+        expect(tool.display_type("course_navigation")).to eq "other_display_type"
+      end
+
+      it "is 'full_width' for global_navigation by default" do
+        tool.global_navigation = { enabled: true }
+        tool.save!
+        expect(tool.display_type("global_navigation")).to eq "full_width"
+      end
+
+      it "allows the 'full_width' default for global_navigation to be overridden with accepted type" do
+        tool.global_navigation = { display_type: "borderless" }
+        tool.save!
+        expect(tool.display_type("global_navigation")).to eq "borderless"
+      end
+
+      it "does not allow the 'full_width' default for global_navigation to be overridden with unaccepted type" do
+        tool.global_navigation = { display_type: "other_display_type" }
+        tool.save!
+        expect(tool.display_type("global_navigation")).to eq "full_width"
       end
     end
 
@@ -2979,6 +2997,12 @@ describe ContextExternalTool do
     end
 
     it "returns the tool name if nothing else is configured and no key is sent" do
+      @tool.save!
+      expect(@tool.label_for(nil)).to eq "tool"
+    end
+
+    it "returns the tool name if nothing else is set and text is an empty string" do
+      @tool.settings = { text: "" }
       @tool.save!
       expect(@tool.label_for(nil)).to eq "tool"
     end
@@ -3488,16 +3512,16 @@ describe ContextExternalTool do
       expect(json[0][:use_tray]).to be true
     end
 
-    it "includes a boolean false for always_on" do
+    it "includes a boolean false for on_by_default" do
       Setting.set("rce_always_on_developer_key_ids", "90000000000001,90000000000002")
       json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym, nil, "")
-      expect(json[0][:always_on]).to be false
+      expect(json[0][:on_by_default]).to be false
     end
 
-    it "includes a boolean true for always_on" do
+    it "includes a boolean true for on_by_default" do
       Setting.set("rce_always_on_developer_key_ids", "90000000000001,#{tool.developer_key.global_id}")
       json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym, nil, "")
-      expect(json[0][:always_on]).to be true
+      expect(json[0][:on_by_default]).to be true
     end
 
     describe "includes the description" do

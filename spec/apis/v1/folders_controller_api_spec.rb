@@ -618,6 +618,33 @@ describe "Folders API", type: :request do
                  expected_status: 401)
       end
     end
+
+    context "account context" do
+      it "creates by folder path with admin" do
+        api_call_as_user(account_admin_user,
+                         :post,
+                         "/api/v1/accounts/#{Account.default.id}/folders",
+                         @folders_path_options.merge(account_id: Account.default.id.to_param),
+                         { name: "new_folder", parent_folder_path: "files/" },
+                         {},
+                         expected_status: 200)
+
+        root = Folder.root_folders(Account.default).first
+        expect(root.sub_folders.count).to eq 1
+        subfolder = root.sub_folders.first
+        expect(subfolder.name).to eq "new_folder"
+        expect(subfolder.full_name).to eq "files/new_folder"
+      end
+
+      it "returns unauthorized when creating by folder path with non admin" do
+        api_call(:post,
+                 "/api/v1/accounts/#{Account.default.id}/folders",
+                 @folders_path_options.merge(account_id: Account.default.id.to_param),
+                 { name: "new_folder", parent_folder_path: "files/" },
+                 {},
+                 expected_status: 401)
+      end
+    end
   end
 
   describe "#update" do

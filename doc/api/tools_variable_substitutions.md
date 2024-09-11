@@ -1314,6 +1314,24 @@ Returns the points possible of the assignment that was launched.
 ```
 100
 ```
+## Canvas.assignment.hideInGradebook
+Returns true if the assignment is hidden in the gradebook.
+
+**Availability**: *when launched as an assignment*  
+
+
+```
+true
+```
+## Canvas.assignment.omitFromFinalGrade
+Returns true if the assignment is omitted from students' final grade.
+
+**Availability**: *when launched as an assignment*  
+
+
+```
+true
+```
 ## Canvas.assignment.unlockAt *[deprecated]*
 deprecated in favor of ISO8601.
 

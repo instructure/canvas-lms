@@ -37,10 +37,11 @@ import {
 } from './DynamicRegistrationWizardState'
 import {IconConfirmation} from './components/IconConfirmation'
 import {NamingConfirmation} from './components/NamingConfirmation'
-import {PermissionConfirmation} from './components/PermissionConfirmation'
+import {PermissionConfirmationWrapper} from './components/PermissionConfirmationWrapper'
 import {PlacementsConfirmation} from './components/PlacementsConfirmation'
-import {PrivacyConfirmation} from './components/PrivacyConfirmation'
+import {PrivacyConfirmationWrapper} from './components/PrivacyConfirmationWrapper'
 import {ReviewScreen} from './components/ReviewScreen'
+import {isUnsuccessful} from '../../common/lib/apiResult/ApiResult'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -162,7 +163,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
         <>
           {progressBar(state)}
           <RegistrationModalBody>
-            <PermissionConfirmation
+            <PermissionConfirmationWrapper
               registration={state.registration}
               overlayStore={state.overlayStore}
             />
@@ -180,7 +181,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
                     state._type,
                     state.registration.developer_key_id
                   )
-                  if (result._type !== 'success') {
+                  if (isUnsuccessful(result)) {
                     showFlashAlert({
                       message: I18n.t(
                         'Something went wrong deleting the registration. The registration can still be deleted manually on the Manage page.'
@@ -221,7 +222,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
         <>
           {progressBar(state)}
           <RegistrationModalBody>
-            <PrivacyConfirmation
+            <PrivacyConfirmationWrapper
               overlayStore={state.overlayStore}
               toolName={state.registration.client_name}
             />

@@ -22,7 +22,11 @@ import type {LtiRegistration} from '../../model/LtiRegistration'
 import type {ManageSearchParams} from './ManageSearchParams'
 import type {FetchRegistrations, DeleteRegistration} from '../../api/registrations'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {genericError, formatApiResultError} from '../../../common/lib/apiResult/ApiResult'
+import {
+  genericError,
+  formatApiResultError,
+  isSuccessful,
+} from '../../../common/lib/apiResult/ApiResult'
 import type {AccountId} from '../../model/AccountId'
 
 export const MANAGE_APPS_PAGE_LIMIT = 15
@@ -118,7 +122,7 @@ export const mkUseManagePageState =
           setState(prev => {
             // Only apply the result if the request is still relevant
             if (prev._type === 'reloading' && requested === prev.requested) {
-              return result._type === 'success'
+              return isSuccessful(result)
                 ? {
                     items: result.data,
                     _type: 'loaded',

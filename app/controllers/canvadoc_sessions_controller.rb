@@ -73,6 +73,10 @@ class CanvadocSessionsController < ApplicationController
   # This API can only be accessed when another endpoint provides a signed URL.
   # It will simply redirect you to the 3rd party document preview.
   def show
+    unless params[:hmac] && params[:blob]
+      return render plain: "Missing HMAC and blob", status: :bad_request
+    end
+
     blob = extract_blob(params[:hmac],
                         params[:blob],
                         "user_id" => @current_user.try(:global_id),

@@ -60,8 +60,15 @@ export const RubricCriteriaRow = ({
   onDuplicateCriterion,
   onEditCriterion,
 }: RubricCriteriaRowProps) => {
-  const {description, longDescription, outcome, learningOutcomeId, points, masteryPoints} =
-    criterion
+  const {
+    description,
+    longDescription,
+    outcome,
+    learningOutcomeId,
+    points,
+    masteryPoints,
+    ignoreForScoring,
+  } = criterion
 
   return (
     <Draggable draggableId={criterion.id || Date.now().toString()} index={rowIndex - 1}>
@@ -141,18 +148,20 @@ export const RubricCriteriaRow = ({
                 )}
               </Flex.Item>
               <Flex.Item align="start">
-                <Pill
-                  color="info"
-                  disabled={true}
-                  themeOverride={{
-                    background: 'rgb(3, 116, 181)',
-                    infoColor: 'white',
-                  }}
-                >
-                  <Text data-testid="rubric-criteria-row-points" size="x-small">
-                    {possibleString(points)}
-                  </Text>
-                </Pill>
+                {!ignoreForScoring && (
+                  <Pill
+                    color="info"
+                    disabled={true}
+                    themeOverride={{
+                      background: 'rgb(3, 116, 181)',
+                      infoColor: 'white',
+                    }}
+                  >
+                    <Text data-testid="rubric-criteria-row-points" size="x-small">
+                      {possibleString(points)}
+                    </Text>
+                  </Pill>
+                )}
                 <View as="span" margin="0 0 0 medium">
                   <IconButton
                     withBackground={false}

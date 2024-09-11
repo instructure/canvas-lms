@@ -16,30 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {Text} from '@instructure/ui-text'
-import {View} from '@instructure/ui-view'
-import {Heading} from '@instructure/ui-heading'
-import {Flex} from '@instructure/ui-flex'
+import {htmlEscape} from '@instructure/html-escape'
 import {IconButton} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
 import {IconEditLine} from '@instructure/ui-icons'
 import {List} from '@instructure/ui-list'
-import {i18nLtiScope} from '../../model/LtiScope'
-import {i18nLtiPrivacyLevelDescription} from '../../model/LtiPrivacyLevel'
-import {useOverlayStore} from '../hooks/useOverlayStore'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
+import React from 'react'
+import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
+import {i18nLtiPrivacyLevelDescription} from '../../model/i18nLtiPrivacyLevel'
+import {type LtiPrivacyLevel} from '../../model/LtiPrivacyLevel'
+import {i18nLtiScope} from '../../model/i18nLtiScope'
+import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
+import {
+  LtiPlacementsWithIcons,
+  type LtiPlacement,
+  type LtiPlacementWithIcon,
+} from '../../model/LtiPlacement'
 import {
   canvasPlatformSettings,
   type RegistrationOverlayStore,
 } from '../../registration_wizard/registration_settings/RegistrationOverlayState'
-import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
 import {type ConfirmationStateType} from '../DynamicRegistrationWizardState'
-import {
-  i18nLtiPlacement,
-  LtiPlacementsWithIcons,
-  type LtiPlacementWithIcon,
-} from '../../model/LtiPlacement'
-import {htmlEscape} from '@instructure/html-escape'
+import {useOverlayStore} from '../hooks/useOverlayStore'
 
 const I18n = useI18nScope('lti_registration.wizard')
 

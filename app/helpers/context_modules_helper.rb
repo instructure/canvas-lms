@@ -154,6 +154,13 @@ module ContextModulesHelper
     end
 
     module_data[:items_data] = items_data
+
+    if @is_child_course && !is_student &&
+       @context.account.feature_enabled?(:modules_page_hide_blueprint_lock_icon_for_children)
+      module_data[:items_restrictions] =
+        MasterCourses::MasterContentTag.fetch_module_item_restrictions_for_child(module_data[:items].map(&:id))
+      module_data[:items_restrictions].transform_values!(&:any?)
+    end
     module_data
   end
 

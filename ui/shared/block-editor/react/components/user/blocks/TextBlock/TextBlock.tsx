@@ -42,7 +42,7 @@ export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProp
     selected: state.events.selected,
   }))
   const clazz = useClassNames(enabled, {empty: !text}, ['block', 'text-block'])
-  const focusableElem = useRef<HTMLDivElement | null>(null)
+  const focusableElem = useRef<HTMLElement | null>(null)
 
   const [editable, setEditable] = useState(true)
 
@@ -69,27 +69,22 @@ export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProp
 
   if (enabled) {
     return (
-      // eslint-disable-next-line jsx-a11y/interactive-supports-focus, jsx-a11y/click-events-have-key-events
-      <div
-        ref={el => {
+      <ContentEditable
+        innerRef={(el: HTMLElement) => {
           if (el) {
             connect(drag(el))
           }
+          focusableElem.current = el
         }}
-        role="textbox"
+        data-placeholder={I18n.t('Type something')}
+        className={clazz}
+        disabled={!editable}
+        html={text}
+        onChange={handleChange}
+        tagName="div"
+        style={{fontSize, textAlign, color}}
         onClick={e => setEditable(true)}
-      >
-        <ContentEditable
-          innerRef={focusableElem}
-          data-placeholder={I18n.t('Type something')}
-          className={clazz}
-          disabled={!editable}
-          html={text}
-          onChange={handleChange}
-          tagName="div"
-          style={{fontSize, textAlign, color}}
-        />
-      </div>
+      />
     )
   } else {
     return (
@@ -111,5 +106,8 @@ TextBlock.craft = {
   },
   related: {
     toolbar: TextBlockToolbar,
+  },
+  custom: {
+    isResizable: true,
   },
 }

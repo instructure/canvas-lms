@@ -56,7 +56,17 @@ const renderComponent = (props: Partial<ToolboxProps> = {}) => {
   )
 }
 
-const blockList = ['Button', 'Text', 'Icon', 'Heading', 'Resource Card', 'Image', 'Tabs']
+const blockList = [
+  'Button',
+  'Text',
+  'RCE',
+  'Icon',
+  'Heading',
+  'Resource Card',
+  'Image',
+  'Group',
+  'Tabs',
+]
 
 describe('Toolbox', () => {
   beforeEach(() => {

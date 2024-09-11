@@ -27,11 +27,11 @@ import tourPubSub from '@canvas/tour-pubsub'
 import {getTrayLabel, getTrayPortal} from './utils'
 import useHoverIntent from './hooks/useHoverIntent'
 import coursesQuery from './queries/coursesQuery'
-import accountsQuery from './queries/accountsQuery'
 import groupsQuery from './queries/groupsQuery'
 import NavigationBadges from './NavigationBadges'
 import {prefetchQuery} from '@canvas/query'
 import profileQuery from './queries/profileQuery'
+import getAccounts from '@canvas/api/accounts/getAccounts'
 
 const I18n = useI18nScope('Navigation')
 
@@ -100,7 +100,7 @@ const Navigation = () => {
 
   useHoverIntent(accountsNavLink, () => {
     import('./trays/AccountsTray')
-    prefetchQuery(['accounts'], accountsQuery)
+    prefetchQuery(['accounts', {pageIndex: 1}], getAccounts)
   })
 
   useHoverIntent(groupsNavLink, () => {

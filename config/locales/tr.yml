@@ -2288,6 +2288,7 @@ tr:
   allows_users_to_edit_conferences_2d3c960c: "Canlı derslerin düzenlenmesine izin ver."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Uluslararası cep telefonu numarası olan kullanıcıların Canvas'tan metin mesajları almasına izin verir."
   alphabetically_60ab47e4: Alfabetik
+  alt_text_611fb322: "Etiket Metni"
   always_3a59e701: "Her zaman"
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "Her zaman canvas zengin içerik hizmetinden zengin metin editörünü ve kenar kubuğunu her yere yükle. "
   an_amazing_discussion_assignment_e5c8bd6b: "Harika bir tartışma ödevi"
@@ -6747,6 +6748,7 @@ tr:
   create_new_e0946c49: "Yeni oluştur"
   create_new_event_e9fb2fb6: "Yeni Bir Olay Oluştur"
   create_quiz_d08bb72a: "Kısa Sınav Oluştur"
+  create_rubric_ec33ddf9: "Değerlendirme Listesi Oluştur"
   create_slots_71dbb2f8: "Aralıklar Oluştur"
   create_theme_based_on_40651ed3: "Şunu baz alarak tema oluşturun"
   create_users_view: 
@@ -8812,6 +8814,7 @@ tr:
       find_outcome: "Öğrenme Çıktısı Bul"
   find_outcome_746cc57e: "Öğrenme Çıktısı Bul"
   find_questions_4930b38f: "Soru Ara"
+  find_rubric_98ba2ce: "Değerlendirme Listesi Ara"
   finish_bc343002: Tamamla
   finished_19aaf6f5: Tamamlandı
   finland_358_abeffc8a: "Finlandiya (+358)"
@@ -10042,6 +10045,7 @@ tr:
       event: "%{date} %{time}"
   handler_7912052f: İşleyici
   has_turnitin_score_3e1cacf6: "Turnitin puanı"
+  header_f28f73db: Başlık
   height_69b03e15: Yükseklik
   helpDialog: 
     Back: Geri
@@ -14156,6 +14160,7 @@ tr:
   people_tutorial_tray_a87a6c48: "Katılımcılar Yönerge Yan Menüsü"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "Bu isim tartışmalar, mesajlar ve yorumlarda görüntülenecek."
   percent_448ea947: yüzde
+  percent_8b3390db: Yüzde
   percent_complete_3a7edc20: "%{percent} tamamlandı"
   percent_of_respondents_selecting_this_answer_4c2ce4ee: "Bu cevabı seçenlerin yüzdesi"
   percent_of_students_scored_score_53d2c4d5: "%{score} puan alan öğrenciler %{percent} "

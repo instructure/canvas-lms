@@ -2909,6 +2909,7 @@ hu:
   already_belongs_to_an_assignment_override_99fc6f36: "már egy hozzárendelés felülbírálásához tartozik"
   already_have_a_canvas_account_c4368ac9: "Már van Canvas-fiókja?"
   also_note_that_microsoft_teams_is_unable_to_suppor_5b3c65e1: "Vegye figyelembe azt is, hogy a Microsoft Teams nem tudja támogatni azokat a kurzusokat, amelyeknél több mint %{max_enrollments} vagy több mint %{max_owners} tulajdonos. Ha a kurzus túllépi ezeket a határokat, a szinkronizálás valószínűleg megszakad."
+  alt_text_611fb322: "Alternatív szöveg"
   alumno_88c80e37: Alumnus
   always_3a59e701: Mindig
   always_include_dates_1ae2935e: "Mindig tartalmazza a dátumokat"
@@ -8203,6 +8204,7 @@ hu:
   create_pace_4ff3e9c: "Ütemezés létrehozása"
   create_pages_581a4d59: "Oldalak létrehozása"
   create_quiz_d08bb72a: "Kvíz létrehozása"
+  create_rubric_ec33ddf9: "Értékelőtábla létrehozása"
   create_slots_71dbb2f8: "Időintervallumok létrehozása"
   create_subject_86de5618: "Tárgy létrehozása"
   create_temporary_enrollment_68eff9e8: "Ideiglenes beiratkozás létrehozása"
@@ -11049,6 +11051,7 @@ hu:
       find_outcome: "Tanulási eredmény keresése"
   find_outcome_746cc57e: "Tanulási eredmény keresése"
   find_questions_4930b38f: "Kérdések keresése"
+  find_rubric_98ba2ce: "Értékelőtábla keresése"
   find_training_resources_and_more_help_f148612c: "Keressen képzési forrásokat és további segítséget"
   find_your_canvas_institution_45af99af: "Keresse meg %{canvas} intézményét"
   find_your_classes_or_subjects_in_the_dashboard_72e1ed47: "Keresse meg osztályait vagy tantárgyait a vezérlőpulton..."
@@ -12183,6 +12186,7 @@ hu:
   haven_t_been_graded_d7dee5bb: "Még nincs értékelve"
   haven_t_submitted_yet_e63834db: "Még nem adott be"
   he_him_99aea1a8: Ő
+  header_f28f73db: Fejléc
   heads_up_a_valid_salesforce_account_id_should_be_a_999cbf7d: "Fel a fejjel! Az érvényes Salesforce-fiókazonosítónak 15–18 alfanumerikus karakterből álló sorozatnak kell lennie."
   hebrew_88fbf778: Héber
   height_69b03e15: Magasság
@@ -18035,6 +18039,7 @@ hu:
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "A felhasználók ezt a nevet látják a fórumokban, üzenetekben, kommentekben."
   per_student_course_paces_159026d2: "Hallgatónkénti kurzus ütemezés"
   percent_448ea947: százalék
+  percent_8b3390db: Százalék
   percent_af88d1b1: "%{percent}%"
   percent_complete_3a7edc20: "%{percent} kész"
   percent_complete_a7f6d403: "százalék teljesítve"

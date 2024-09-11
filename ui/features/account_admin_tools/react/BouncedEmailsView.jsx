@@ -31,7 +31,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import * as tz from '@instructure/moment-utils'
-import {encodeQueryString} from '@canvas/query-string-encoding'
+import {encodeQueryString} from '@instructure/query-string-encoding'
 
 const I18n = useI18nScope('bounced_emails')
 

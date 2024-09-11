@@ -127,7 +127,8 @@ describe UsersController do
         user:,
         session_id: nil,
         placement: :user_navigation,
-        launch_type: :direct_link
+        launch_type: :direct_link,
+        launch_url: tool.url
       )
     end
 

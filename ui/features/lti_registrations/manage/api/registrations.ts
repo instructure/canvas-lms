@@ -17,16 +17,22 @@
  */
 
 import {ZLtiRegistration, type LtiRegistration} from '../model/LtiRegistration'
-import {type ApiResult, parseFetchResult} from '../../common/lib/apiResult/ApiResult'
+import {
+  type ApiResult,
+  parseFetchResult,
+  success,
+  apiError,
+  mapApiResult,
+} from '../../common/lib/apiResult/ApiResult'
 import {ZPaginatedList, type PaginatedList} from './PaginatedList'
 import {type LtiRegistrationId} from '../model/LtiRegistrationId'
 import type {AccountId} from '../model/AccountId'
 import {defaultFetchOptions} from '@canvas/util/xhr'
 import * as z from 'zod'
 import {
-  ZLtiConfiguration,
-  type LtiConfiguration,
-} from '../model/lti_tool_configuration/LtiConfiguration'
+  ZInternalLtiConfiguration,
+  type InternalLtiConfiguration,
+} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 
 export type AppsSortProperty =
   | 'name'
@@ -64,20 +70,40 @@ export const fetchRegistrations: FetchRegistrations = options =>
   )
 
 export type FetchThirdPartyToolConfiguration = (
-  url: string,
+  config:
+    | {
+        url: string
+      }
+    | {
+        lti_configuration: unknown
+      },
   accountId: AccountId
-) => Promise<ApiResult<LtiConfiguration>>
+) => Promise<ApiResult<InternalLtiConfiguration>>
+
+// POST
+// validate: ({url: string} | {lti_configuration: LtiConfiguration}) ->
+//   200 { configuration: InternalLtiConfiguration }
+//   422 { errors: string[] }
 
 export const fetchThirdPartyToolConfiguration: FetchThirdPartyToolConfiguration = (
-  url,
+  config,
   accountId
 ) =>
-  parseFetchResult(ZLtiConfiguration)(
-    fetch(
-      `/api/v1/accounts/${accountId}/lti_registrations/fetch_lti_configuration?` +
-        new URLSearchParams({url})
-    )
-  )
+  parseFetchResult(
+    z.object({
+      configuration: ZInternalLtiConfiguration,
+    })
+  )(
+    fetch(`/api/v1/accounts/${accountId}/lti_registrations/configuration/validate`, {
+      method: 'POST',
+      ...defaultFetchOptions({
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }),
+      body: JSON.stringify(config),
+    })
+  ).then(result => mapApiResult(result, r => r.configuration))
 
 export type DeleteRegistration = (
   accountId: AccountId,

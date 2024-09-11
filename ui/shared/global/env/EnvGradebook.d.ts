@@ -147,4 +147,5 @@ export interface EnvGradebookSpeedGrader {
     assessment_user_id?: string
     anonymous_id?: string
   }
+  ENTRY_ID: string
 }

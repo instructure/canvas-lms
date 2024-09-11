@@ -34,7 +34,6 @@ class Mutations::CreateConversation < Mutations::BaseMutation
   argument :media_comment_type, String, required: false
   argument :context_code, String, required: false
   argument :conversation_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Conversation")
-  argument :user_note, Boolean, required: false
   argument :tags, [String], required: false
 
   field :conversations, [Types::ConversationParticipantType], null: true
@@ -64,8 +63,7 @@ class Mutations::CreateConversation < Mutations::BaseMutation
       attachment_ids: input[:attachment_ids],
       domain_root_account_id: self.context[:domain_root_account].id,
       media_comment_id: input[:media_comment_id],
-      media_comment_type: input[:media_comment_type],
-      user_note: input[:user_note]
+      media_comment_type: input[:media_comment_type]
     ))
 
     if !batch_group_messages && recipients.size > Conversation.max_group_conversation_size
@@ -109,9 +107,6 @@ class Mutations::CreateConversation < Mutations::BaseMutation
         if message[:attachment_ids].present?
           InstStatsd::Statsd.increment("inbox.message.sent.attachment.react")
         end
-        if !Account.site_admin.feature_enabled?(:deprecate_faculty_journal) && input[:user_note]
-          InstStatsd::Statsd.increment("inbox.conversation.sent.faculty_journal.react")
-        end
         if input[:bulk_message]
           InstStatsd::Statsd.increment("inbox.conversation.sent.individual_message_option.react")
         end
@@ -142,9 +137,6 @@ class Mutations::CreateConversation < Mutations::BaseMutation
         end
         if context_type == "Account" || context_type.nil?
           InstStatsd::Statsd.increment("inbox.conversation.sent.account_context.react")
-        end
-        if !Account.site_admin.feature_enabled?(:deprecate_faculty_journal) && input[:user_note]
-          InstStatsd::Statsd.increment("inbox.conversation.sent.faculty_journal.react")
         end
         if input[:bulk_message]
           InstStatsd::Statsd.increment("inbox.conversation.sent.individual_message_option.react")

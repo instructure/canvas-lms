@@ -188,10 +188,12 @@ export const RubricForm = ({
     setIsCriterionModalOpen(true)
   }
 
+  const calcPointsPossible = (criteria: RubricCriterion[]): number =>
+    criteria.reduce((acc, c) => acc + (c.ignoreForScoring ? 0 : c.points), 0)
+
   const deleteCriterion = (criterion: RubricCriterion) => {
     const criteria = rubricForm.criteria.filter(c => c.id !== criterion.id)
-    const newPointsPossible = criteria.reduce((acc, c) => acc + c.points, 0)
-    setRubricFormField('pointsPossible', newPointsPossible)
+    setRubricFormField('pointsPossible', calcPointsPossible(criteria))
     setRubricFormField('criteria', criteria)
   }
 
@@ -206,8 +208,7 @@ export const RubricForm = ({
       criteria[criterionIndexToUpdate] = updatedCriteria
     }
 
-    const newPointsPossible = criteria.reduce((acc, c) => acc + c.points, 0)
-    setRubricFormField('pointsPossible', newPointsPossible)
+    setRubricFormField('pointsPossible', calcPointsPossible(criteria))
     setRubricFormField('criteria', criteria)
     setIsCriterionModalOpen(false)
     setIsOutcomeCriterionModalOpen(false)
@@ -269,7 +270,7 @@ export const RubricForm = ({
             displayName: outcomeData.attributes.display_name,
             title: outcomeData.outcomeLink.outcome.title,
           },
-          ignoreForScoring: false,
+          ignoreForScoring: !outcomeData.useForScoring,
           masteryPoints: outcomeData.attributes.mastery_points,
           criterionUseRange: false,
           ratings: outcomeData.attributes.ratings,
@@ -290,8 +291,7 @@ export const RubricForm = ({
         }
         criteria.push(newOutcomeCriteria)
 
-        const newPointsPossible = criteria.reduce((acc, c) => acc + c.points, 0)
-        setRubricFormField('pointsPossible', newPointsPossible)
+        setRubricFormField('pointsPossible', calcPointsPossible(criteria))
         setRubricFormField('criteria', criteria)
         dialog.cleanup()
       })
@@ -412,6 +412,7 @@ export const RubricForm = ({
                 <Heading
                   level="h2"
                   as="h2"
+                  data-testid={`rubric-points-possible-${rubricForm.id}`}
                   themeOverride={{h2FontWeight: 700, h2FontSize: '22px', lineHeight: '1.75rem'}}
                 >
                   {rubricForm.pointsPossible} {I18n.t('Points Possible')}

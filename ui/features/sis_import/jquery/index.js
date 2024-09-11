@@ -24,10 +24,15 @@ import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, formErrors */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf, disableIf */
 import 'jqueryui/progressbar'
 
+import ReactDOM from 'react-dom'
+import {openModal, renderBatchImportAlert} from '../react/ConfirmationModal'
+
 const I18n = useI18nScope('sis_import')
 
 $(document).ready(function (_event) {
   let state = 'nothing'
+
+  renderBatchImportAlert('small 0')
 
   $('#batch_mode')
     .change(function (__event) {
@@ -314,8 +319,29 @@ $(document).ready(function (_event) {
     setTimeout(tick, 1000)
   }
 
+  const submitModal = () => {
+    $('#safe_to_submit').val('true')
+    $('#sis_importer').submit()
+    ReactDOM.unmountComponentAtNode(document.getElementById('confirmation_modal_root'))
+  }
+  const closeModal = () => {
+    $('#safe_to_submit').val('false')
+    ReactDOM.unmountComponentAtNode(document.getElementById('confirmation_modal_root'))
+  }
+
   $('#sis_importer').formSubmit({
     fileUpload: true,
+    beforeSubmit(data) {
+      let shouldSubmit = true
+      if (data.batch_mode && data.safe_to_submit === 'false') {
+        // Prevent normal form submission. Instead, we will render a modal. Rending the modal happens asynchronously. In
+        // other words `openModal` is not blocking. The way we pass data back from the instUI modal is via a hidden
+        // form field.
+        shouldSubmit = false
+        openModal(submitModal, closeModal) // open the modal
+      }
+      return shouldSubmit
+    },
     success(data) {
       if (data && data.id) {
         startPoll()

@@ -3892,6 +3892,26 @@ QUnit.module('SpeedGrader', rootHooks => {
           0
         )
       })
+
+      test('RCE Lite is not used when rce_lite_enabled_speedgrader_comments FF is disabled', async () => {
+        ENV.FEATURES = { rce_lite_enabled_speedgrader_comments: false }
+        ENV.can_comment_on_submission = true
+        SpeedGrader.setup()
+        await awhile()
+
+        const rce = document.getElementById('comment_rce_textarea')
+        strictEqual(rce, null)
+      })
+
+      test('RCE Lite is used when rce_lite_enabled_speedgrader_comments FF is enabled', async () => {
+        ENV.FEATURES = { rce_lite_enabled_speedgrader_comments: true }
+        ENV.can_comment_on_submission = true
+        SpeedGrader.setup()
+        await awhile()
+
+        const rce = document.getElementById('comment_rce_textarea')
+        notStrictEqual(rce, null)
+      })
     })
 
     QUnit.module('#setup', hooks => {
@@ -4163,6 +4183,17 @@ QUnit.module('SpeedGrader', rootHooks => {
         )
         const button = renderedComment.find('.submit_comment_button')
         strictEqual(button.css('display'), 'none')
+      })
+
+      test('renderComment displays the edit button only for draft comments when rce_lite_enabled_speedgrader_comments FF is enabled', () => {
+        ENV.FEATURES = { rce_lite_enabled_speedgrader_comments: true }
+        commentToRender.publishable = true
+        const renderedComment = SpeedGrader.EG.renderComment(
+          commentToRender,
+          commentRenderingOptions
+        )
+        const button = renderedComment.find('.edit_comment_link')
+        notStrictEqual(button, undefined)
       })
     })
 

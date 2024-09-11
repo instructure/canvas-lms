@@ -30,6 +30,7 @@ export type RubricUnderscoreType = {
     id: string
     learning_outcome_id?: string
     long_description: string
+    ignore_for_scoring?: boolean
     mastery_points?: number
     points: number
     ratings: {
@@ -82,6 +83,7 @@ export const mapRubricUnderscoredKeysToCamelCase = (
         id: criterion.id,
         longDescription: criterion.long_description,
         learningOutcomeId: criterion.learning_outcome_id,
+        ignoreForScoring: criterion.ignore_for_scoring,
         points: criterion.points,
         masteryPoints: criterion.mastery_points,
         outcome: learning_outcome_id

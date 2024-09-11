@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import ExternalToolsTable from '../ExternalToolsTable'
+import {ExternalToolsTable, countFavorites} from '../ExternalToolsTable'
 
 function renderTable(canAdd = true, canEdit = true, canDelete = true, canAddEdit = true, FEATURES = {}) {
   window.ENV = {
@@ -73,6 +73,32 @@ describe('ExternalToolsTable', () => {
       const {queryByText} = renderTable(true, true, true, true, {top_navigation_placement: false})
       expect(queryByText('Name')).toBeInTheDocument()
       expect(queryByText('Pin to Top Navigation')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('calculateFavorites', () => {
+    window.INST = {
+      editorButtons: []
+    }
+    it('returns 0 if externalTools array is empty', () => {
+      const externalTools = []
+      const rceFavCount = countFavorites(externalTools)
+      expect(rceFavCount).toEqual(0)
+    })
+
+    it('returns 3 if externalTools contains 3 favorites and some not favorites', () => {
+      const externalTools = [{is_rce_favorite: true}, {is_rce_favorite: true}, {is_rce_favorite: true}, {is_rce_favorite: false}]
+      const rceFavCount = countFavorites(externalTools)
+      expect(rceFavCount).toEqual(3)
+    })
+
+    it('returns 2 if externalTools contains 3 favorites but one of them is on_by_default', () => {
+      window.INST = {
+        editorButtons: [{id: 2, on_by_default: true}, {id: 42, on_by_default: true}]
+      }
+      const externalTools = [{app_id: 1, is_rce_favorite: true}, {app_id: 2, is_rce_favorite: true}, {app_id: 3, is_rce_favorite: true}, {app_id: 4, is_rce_favorite: false}]
+      const rceFavCount = countFavorites(externalTools)
+      expect(rceFavCount).toEqual(2)
     })
   })
 })

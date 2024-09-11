@@ -23,7 +23,7 @@ import gql from 'graphql-tag'
 import {omit} from 'lodash'
 
 const QUERY = gql`
-  query CourseData($courseId: ID!) {
+  query SpeedGrader_CourseData($courseId: ID!) {
     course(id: $courseId) {
       customGradeStatusesConnection {
         nodes {

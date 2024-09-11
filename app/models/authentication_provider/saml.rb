@@ -25,7 +25,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     "saml"
   end
 
-  def self.enabled?(_account = nil)
+  def self.enabled?(_account = nil, _user = nil)
     true
   end
 

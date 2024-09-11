@@ -588,7 +588,7 @@ describe ApplicationHelper do
                                      width: 800,
                                      height: 400,
                                      use_tray: false,
-                                     always_on: false,
+                                     on_by_default: false,
                                      description: "<p>the description.</p>\n",
                                      favorite: false
                                    }])
@@ -611,7 +611,7 @@ describe ApplicationHelper do
                                      width: 800,
                                      height: 400,
                                      use_tray: false,
-                                     always_on: false,
+                                     on_by_default: false,
                                      description: "",
                                      favorite: false
                                    }])

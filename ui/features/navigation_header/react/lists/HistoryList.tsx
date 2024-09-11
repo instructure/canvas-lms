@@ -17,37 +17,74 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React from 'react'
+import React, {useEffect, useCallback} from 'react'
 import {Link} from '@instructure/ui-link'
 import {List} from '@instructure/ui-list'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
-import _ from 'lodash'
 import {formatTimeAgoDate, formatTimeAgoTitle} from '@canvas/enhanced-user-content'
-import {useQuery} from '@canvas/query'
-import historyQuery from '../queries/historyQuery'
+import {useInfiniteQuery} from '@tanstack/react-query'
 
 const I18n = useI18nScope('new_nav')
 
 export default function HistoryList() {
-  const {data, isLoading, isSuccess} = useQuery({
+  const fetchHistory = useCallback(
+    async ({pageParam = '/api/v1/users/self/history?per_page=100'}) => {
+      const res = await fetch(pageParam)
+      const data = await res.json()
+      const linkHeader = res.headers.get('link')
+      const nextPage = linkHeader
+        ? linkHeader
+            .split(',')
+            .find(s => s.includes('rel="next"'))
+            ?.match(/<([^>]+)>/)?.[1]
+        : undefined
+      return {data, nextPage}
+    },
+    []
+  )
+
+  const {data, fetchNextPage, isFetching, hasNextPage} = useInfiniteQuery({
     queryKey: ['history'],
-    queryFn: historyQuery,
-    fetchAtLeastOnce: true,
+    queryFn: fetchHistory,
+    getNextPageParam: lastPage => lastPage.nextPage,
   })
 
-  const uniqueHistoryEntries = _.uniqBy(data, entry => entry.asset_code)
+  const combinedHistoryEntries = data
+    ? data.pages.reduce(
+        (acc, page) => {
+          const seenAssetCodes = new Set(acc.data.map(entry => entry.asset_code))
+          const newEntries = page.data.filter(entry => {
+            if (!seenAssetCodes.has(entry.asset_code)) {
+              seenAssetCodes.add(entry.asset_code)
+              return true
+            }
+            return false
+          })
+          acc.data = [...acc.data, ...newEntries]
+          acc.nextPage = page.nextPage
+          return acc
+        },
+        {data: [], nextPage: null}
+      )
+    : {data: [], nextPage: null}
+
+  useEffect(() => {
+    if (hasNextPage && !isFetching) {
+      fetchNextPage()
+    }
+  }, [hasNextPage, isFetching, fetchNextPage])
 
   return (
-    <List isUnstyled={true} margin="small 0" itemSpacing="small">
-      {isLoading && (
-        <List.Item>
-          <Spinner size="small" renderTitle={I18n.t('Loading')} />
-        </List.Item>
-      )}
-      {isSuccess &&
-        uniqueHistoryEntries.map(entry => (
+    <>
+      <List isUnstyled={true} margin="small 0" itemSpacing="small">
+        {combinedHistoryEntries.data.length === 0 && isFetching && (
+          <List.Item>
+            <Spinner size="small" renderTitle={I18n.t('Loading')} />
+          </List.Item>
+        )}
+        {combinedHistoryEntries.data.map(entry => (
           <List.Item key={entry.asset_code}>
             <Flex>
               <Flex.Item align="start" padding="none x-small none none">
@@ -78,6 +115,7 @@ export default function HistoryList() {
             </Flex>
           </List.Item>
         ))}
-    </List>
+      </List>
+    </>
   )
 }

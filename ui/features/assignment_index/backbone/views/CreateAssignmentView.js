@@ -39,7 +39,7 @@ import {
   isMidnight,
 } from '@instructure/moment-utils'
 import * as tz from '@instructure/moment-utils'
-import {encodeQueryString} from '@canvas/query-string-encoding'
+import {encodeQueryString} from '@instructure/query-string-encoding'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 const I18n = useI18nScope('CreateAssignmentView')

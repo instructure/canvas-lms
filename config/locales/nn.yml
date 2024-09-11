@@ -3236,6 +3236,7 @@ nn:
   already_belongs_to_an_assignment_override_99fc6f36: "Tilhøyrer allereie til ei overstyring av oppgåve"
   already_have_a_canvas_account_c4368ac9: "Har du allereie ein Canvas brukar?"
   also_note_that_microsoft_teams_is_unable_to_suppor_5b3c65e1: "Merk at Microsoft Teams ikkje støttar emner med meir enn %{max_enrollments} påmeldingar, eller meir enn %{max_owners} eigarar. Dersom emnet overstig grensene vil synkroniseringa verte avbroten."
+  alt_text_611fb322: "Alternativ tekst"
   alumno_88c80e37: Alumn
   always_3a59e701: Alltid
   always_include_dates_1ae2935e: "Inkluder alltid datoar"
@@ -8891,6 +8892,7 @@ nn:
   create_pace_4ff3e9c: "Lag Framdriftsplan"
   create_pages_581a4d59: "Opprett sider"
   create_quiz_d08bb72a: "Opprett quiz"
+  create_rubric_ec33ddf9: "Opprett vurderingsskjema"
   create_slots_71dbb2f8: "Opprett tidslukar"
   create_subject_86de5618: "Opprett emne"
   create_temporary_enrollment_68eff9e8: "Opprett midlertidig påmelding"
@@ -11754,6 +11756,7 @@ nn:
       find_outcome: "Finn resultat"
   find_outcome_746cc57e: "Finn læringsmål"
   find_questions_4930b38f: "Finn spørsmål"
+  find_rubric_98ba2ce: "Finn vurderingsskjema"
   find_training_resources_and_more_help_f148612c: "Finn øvingsressursar og meir hjelp"
   find_your_canvas_institution_45af99af: "Finn din %{canvas} institusjon"
   find_your_classes_or_subjects_in_the_dashboard_72e1ed47: "Finn emna dine i dashbordet..."
@@ -13389,6 +13392,7 @@ nn:
   haven_t_been_graded_d7dee5bb: "Er ikkje vurdert"
   haven_t_submitted_yet_e63834db: "Ikkje har levert"
   he_him_99aea1a8: Han
+  header_f28f73db: Topptekst
   heads_up_a_valid_salesforce_account_id_should_be_a_999cbf7d: "Obs! Ein gyldig Salesforce konto-ID er mellom 15 og 18 alfanumeriske teikn lang."
   hebrew_88fbf778: Hebraisk
   height_69b03e15: Høgde
@@ -19328,6 +19332,7 @@ nn:
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "Namnet vil vere synleg for alle i diskusjonar, meldingar og kommentarar."
   per_student_course_paces_159026d2: "Studentvis emneframdrift"
   percent_448ea947: prosent
+  percent_8b3390db: Prosent
   percent_af88d1b1: "%{percent}%"
   percent_complete_3a7edc20: "%{percent} fullført"
   percent_complete_a7f6d403: "Prosent fullført"

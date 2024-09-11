@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import htmlEscape from '@instructure/html-escape'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
-import {Flex} from '@instructure/ui-flex'
-import {Checkbox} from '@instructure/ui-checkbox'
-import htmlEscape from '@instructure/html-escape'
-import {View} from '@instructure/ui-view'
-import {i18nLtiScope, type LtiScope} from '../model/LtiScope'
+import React from 'react'
+import {type LtiScope} from '../model/LtiScope'
+import {i18nLtiScope} from '../model/i18nLtiScope'
 
 const I18n = useI18nScope('lti_registration.wizard')
 

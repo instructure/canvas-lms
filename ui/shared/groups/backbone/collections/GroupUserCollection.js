@@ -24,7 +24,7 @@ import $ from 'jquery'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 import GroupUser from '../models/GroupUser'
 import h from '@instructure/html-escape'
-import {encodeQueryString} from '@canvas/query-string-encoding'
+import {encodeQueryString} from '@instructure/query-string-encoding'
 
 const I18n = useI18nScope('GroupUserCollection')
 

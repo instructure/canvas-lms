@@ -1,0 +1,89 @@
+/*
+ * Copyright (C) 2024 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import React from 'react'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import {PermissionConfirmationWrapper} from '../components/PermissionConfirmationWrapper'
+import {mockRegistration} from './helpers'
+import {LtiScopes} from '../../model/LtiScope'
+import {i18nLtiScope} from '../../model/i18nLtiScope'
+import {createRegistrationOverlayStore} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
+
+describe('PermissionConfirmationWrapper', () => {
+  const registration = mockRegistration({
+    client_name: 'Test App',
+    scopes: [LtiScopes.AgsLineItem, LtiScopes.AgsLineItemReadonly, LtiScopes.AgsResultReadonly],
+  })
+
+  const overlayStore = createRegistrationOverlayStore(registration.client_name, registration)
+
+  it('renders the PermissionConfirmation component with the correct props', () => {
+    render(
+      <PermissionConfirmationWrapper registration={registration} overlayStore={overlayStore} />
+    )
+
+    expect(screen.getByText('Permissions')).toBeInTheDocument()
+    expect(
+      screen.getByText(/is requesting permission to perform the following actions/i)
+    ).toBeInTheDocument()
+
+    registration.scopes.forEach(s => {
+      const scope = i18nLtiScope(s)
+      expect(screen.getByText(scope)).toBeInTheDocument()
+    })
+  })
+
+  it('toggles the scope when a checkbox is clicked', async () => {
+    render(
+      <PermissionConfirmationWrapper registration={registration} overlayStore={overlayStore} />
+    )
+
+    const lineItemCheckbox = screen.getByLabelText(i18nLtiScope(LtiScopes.AgsLineItem))
+    const lineItemReadonlyCheckbox = screen.getByLabelText(
+      i18nLtiScope(LtiScopes.AgsLineItemReadonly)
+    )
+    const resultReadonlyCheckbox = screen.getByLabelText(i18nLtiScope(LtiScopes.AgsResultReadonly))
+
+    expect(lineItemCheckbox).toBeChecked()
+    expect(lineItemReadonlyCheckbox).toBeChecked()
+    expect(resultReadonlyCheckbox).toBeChecked()
+
+    await userEvent.click(lineItemReadonlyCheckbox)
+    expect(lineItemReadonlyCheckbox).not.toBeChecked()
+
+    await userEvent.click(lineItemCheckbox)
+    expect(lineItemCheckbox).not.toBeChecked()
+
+    await userEvent.click(resultReadonlyCheckbox)
+    expect(resultReadonlyCheckbox).not.toBeChecked()
+  })
+
+  it('renders an appropriate message if no scopes are requested', async () => {
+    render(
+      <PermissionConfirmationWrapper
+        registration={mockRegistration({scopes: []})}
+        overlayStore={overlayStore}
+      />
+    )
+
+    expect(screen.getByText('Permissions')).toBeInTheDocument()
+
+    expect(screen.getByText(/hasn't requested any permissions/)).toBeInTheDocument()
+  })
+})

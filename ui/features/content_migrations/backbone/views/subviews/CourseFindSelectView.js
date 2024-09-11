@@ -28,7 +28,7 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import 'jqueryui/menu'
 import 'jqueryui/autocomplete'
-import {encodeQueryString} from '@canvas/query-string-encoding'
+import {encodeQueryString} from '@instructure/query-string-encoding'
 
 const I18n = useI18nScope('content_migrations')
 

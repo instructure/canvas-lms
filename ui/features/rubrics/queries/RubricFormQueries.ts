@@ -49,6 +49,7 @@ const RUBRIC_QUERY = gql`
           title
         }
         learningOutcomeId
+        ignoreForScoring
         masteryPoints
         points
         longDescription
@@ -115,6 +116,7 @@ export const saveRubric = async (rubric: RubricFormProps): Promise<RubricQueryRe
         title: criterion.outcome?.title,
       },
       learning_outcome_id: criterion.learningOutcomeId,
+      ignore_for_scoring: criterion.ignoreForScoring,
       criterion_use_range: criterion.criterionUseRange,
       ratings: criterion.ratings.map(rating => ({
         description: rating.description,

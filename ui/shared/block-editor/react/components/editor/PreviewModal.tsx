@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useCallback, useEffect, useMemo, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {useEditor} from '@craftjs/core'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -40,11 +40,11 @@ const PreviewModal = ({open, onDismiss}: PreviewModalProps) => {
 
   const handleKey = useCallback(
     (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (open && event.key === 'Escape') {
         onDismiss()
       }
     },
-    [onDismiss]
+    [onDismiss, open]
   )
 
   useEffect(() => {

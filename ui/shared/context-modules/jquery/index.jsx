@@ -354,7 +354,7 @@ window.modules = (function () {
       )
     },
 
-    loadMasterCourseData(tag_id) {
+    async loadMasterCourseData(tag_id) {
       if (ENV.MASTER_COURSE_SETTINGS) {
         // Grab the stuff for master courses if needed
         $.ajaxJSON(ENV.MASTER_COURSE_SETTINGS.MASTER_COURSE_DATA_URL, 'GET', { tag_id }, data => {
@@ -369,7 +369,14 @@ window.modules = (function () {
                   item.setAttribute('data-master_course_restrictions', JSON.stringify(restriction))
                 }
 
-                this.initMasterCourseLockButton(item, restriction)
+                if (
+                  !(
+                    ENV.MASTER_COURSE_SETTINGS.IS_CHILD_COURSE &&
+                    ENV.HIDE_BLUEPRINT_LOCK_ICON_FOR_CHILDREN
+                  )
+                ) {
+                  this.initMasterCourseLockButton(item, restriction)
+                }
               }
             })
           }
@@ -630,6 +637,7 @@ window.modules = (function () {
           $a.attr('data-item-context-type', data.context_type)
           $a.attr('data-item-content-id', data.content_id)
           $a.attr('data-item-has-assignment', data.assignment_id ? 'true' : 'false')
+          $a.attr('data-item-has-assignment-checkpoint', data.is_checkpointed ? 'true' : 'false')
         }
       }
 
@@ -986,7 +994,7 @@ const updatePublishMenuDisabledState = function (disabled) {
 
 modules.updatePublishMenuDisabledState = updatePublishMenuDisabledState
 
-modules.initModuleManagement = function (duplicate) {
+modules.initModuleManagement = async function (duplicate) {
   const moduleItems = {}
 
   // Create the context modules backbone view to manage the publish button.
@@ -2581,6 +2589,7 @@ $(document).ready(function () {
         locale={ENV.LOCALE || 'en'}
         timezone={ENV.TIMEZONE || 'UTC'}
         removeDueDateInput={handleRemoveDueDateInput(itemProps)}
+        isCheckpointed={itemProps.moduleItemHasCheckpoint === 'true'}
       />,
       document.getElementById('differentiated-modules-mount-point')
     )
@@ -2604,6 +2613,8 @@ $(document).ready(function () {
     const courseId = event.target.getAttribute('data-item-context-id')
     const moduleItemContentId = event.target.getAttribute('data-item-content-id')
     const moduleItemHasAssignment = event.target.getAttribute('data-item-has-assignment')
+    const moduleItemHasCheckpoint = event.target.getAttribute('data-item-has-assignment-checkpoint')
+
     const itemProps = parseModuleItemElement(
       document.getElementById(`context_module_item_${moduleItemId}`)
     )
@@ -2613,6 +2624,7 @@ $(document).ready(function () {
       moduleItemType,
       moduleItemContentId,
       moduleItemHasAssignment,
+      moduleItemHasCheckpoint,
       ...itemProps,
     })
   })

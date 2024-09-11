@@ -61,7 +61,7 @@ class Login::OAuthBaseController < ApplicationController
     false
   end
 
-  def find_pseudonym(unique_ids, provider_attributes = {})
+  def find_pseudonym(unique_ids, provider_attributes = {}, token = nil)
     unique_ids = unique_ids.first if unique_ids.is_a?(Array)
 
     unique_id = unique_ids.is_a?(Hash) ? unique_ids[@aac.login_attribute] : unique_ids
@@ -91,6 +91,7 @@ class Login::OAuthBaseController < ApplicationController
         PseudonymSession.create!(pseudonym, false)
       end
       session[:login_aac] = @aac.global_id
+      @aac.try(:persist_to_session, session, token) if token
 
       successful_login(user, pseudonym)
     else

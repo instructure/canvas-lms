@@ -17,103 +17,241 @@
  */
 
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
-import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
+import {render, screen, waitFor, cleanup} from '@testing-library/react'
+import '@testing-library/jest-dom'
 import PasswordComplexityConfiguration from '../PasswordComplexityConfiguration'
+import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
+import userEvent from '@testing-library/user-event'
 
 jest.mock('@canvas/do-fetch-api-effect/apiRequest')
+const mockedExecuteApiRequest = executeApiRequest as jest.MockedFunction<typeof executeApiRequest>
 
-describe('PasswordComplexityConfiguration', () => {
-  it('opens the Tray when "View Options" button is clicked', () => {
-    const {getByText} = render(<PasswordComplexityConfiguration />)
-    fireEvent.click(getByText('View Options'))
-    expect(getByText('Current Password Configuration')).toBeInTheDocument()
+const MOCK_MINIMUM_CHARACTER_LENGTH = '8'
+const MOCK_MAXIMUM_LOGIN_ATTEMPTS = '10'
+
+const getViewOptionsButton = async () => {
+  const viewOptions = await waitFor(() => {
+    const button = screen.getByText('View Options')
+    return button.closest('button')
+  })
+  if (!viewOptions) {
+    throw new Error('View Options button not found')
+  }
+  return viewOptions
+}
+
+describe('PasswordComplexityConfiguration Component', () => {
+  beforeAll(() => {
+    if (!window.ENV) {
+      window.ENV = {}
+    }
+    window.ENV.DOMAIN_ROOT_ACCOUNT_ID = '1'
   })
 
-  it('toggles all checkboxes with defaults set', async () => {
-    const {getByText, findByTestId} = render(<PasswordComplexityConfiguration />)
-    fireEvent.click(getByText('View Options'))
-
-    let checkbox = await findByTestId('minimumCharacterLengthCheckbox')
-    fireEvent.click(checkbox)
-    expect(checkbox).not.toBeChecked()
-
-    fireEvent.click(checkbox)
-    expect(checkbox).toBeChecked()
-
-    checkbox = await findByTestId('requireNumbersCheckbox')
-    fireEvent.click(checkbox)
-    expect(checkbox).not.toBeChecked()
-
-    fireEvent.click(checkbox)
-    expect(checkbox).toBeChecked()
-
-    checkbox = await findByTestId('requireSymbolsCheckbox')
-    fireEvent.click(checkbox)
-    expect(checkbox).not.toBeChecked()
-
-    fireEvent.click(checkbox)
-    expect(checkbox).toBeChecked()
-
-    checkbox = await findByTestId('customForbiddenWordsCheckbox')
-    fireEvent.click(checkbox)
-    expect(checkbox).toBeChecked()
-
-    fireEvent.click(checkbox)
-    expect(checkbox).not.toBeChecked()
+  afterAll(() => {
+    delete window.ENV.DOMAIN_ROOT_ACCOUNT_ID
   })
 
-  it('toggle input fields when checkbox is checked', async () => {
-    const {getByText, findByTestId} = render(<PasswordComplexityConfiguration />)
-    fireEvent.click(getByText('View Options'))
-
-    let checkbox = await findByTestId('minimumCharacterLengthCheckbox')
-    let input = await findByTestId('minimumCharacterLengthInput')
-    expect(input).toBeEnabled()
-
-    checkbox = await findByTestId('customMaxLoginAttemptsCheckbox')
-    fireEvent.click(checkbox)
-    input = await findByTestId('customMaxLoginAttemptsInput')
-    expect(input).toBeEnabled()
+  afterEach(() => {
+    jest.clearAllMocks()
+    cleanup()
   })
 
-  it('opens the file upload modal when "Upload" button is clicked', async () => {
-    const {getByText, findByTestId} = render(<PasswordComplexityConfiguration />)
-    fireEvent.click(getByText('View Options'))
-    const checkbox = await findByTestId('customForbiddenWordsCheckbox')
-    fireEvent.click(checkbox)
-    fireEvent.click(getByText('Upload'))
-    expect(getByText('Upload Forbidden Words/Terms List')).toBeInTheDocument()
-  })
-
-  it('closes the Tray when "Cancel" button is clicked', async () => {
-    const {getByText, queryByText, findByTestId} = render(<PasswordComplexityConfiguration />)
-    fireEvent.click(getByText('View Options'))
-    const cancelButton = await findByTestId('cancelButton')
-    fireEvent.click(cancelButton)
-    expect(queryByText('Password Options Tray')).not.toBeInTheDocument()
-  })
-
-  it('makes a PUT request with the correct method and path', async () => {
-    const {getByText, findByTestId} = render(<PasswordComplexityConfiguration />)
-    fireEvent.click(getByText('View Options'))
-    const saveButton = await findByTestId('saveButton')
-    fireEvent.click(saveButton)
-    expect(executeApiRequest).toHaveBeenCalledWith({
-      method: 'PUT',
-      body: {
-        account: {
-          settings: {
-            password_policy: {
-              allow_login_suspension: false,
-              minimum_character_length: 8,
-              require_number_characters: true,
-              require_symbol_characters: true,
-            },
-          },
+  beforeEach(() => {
+    mockedExecuteApiRequest.mockResolvedValue({
+      status: 200,
+      data: {
+        password_policy: {
+          minimum_character_length: MOCK_MINIMUM_CHARACTER_LENGTH,
+          maximum_login_attempts: MOCK_MAXIMUM_LOGIN_ATTEMPTS,
         },
       },
-      path: '/api/v1/accounts/undefined/',
+    })
+  })
+
+  describe('tray Interaction', () => {
+    it('opens the tray when "View Options" button is clicked', async () => {
+      render(<PasswordComplexityConfiguration />)
+      await userEvent.click(await getViewOptionsButton())
+      expect(screen.getByText('Current Password Configuration')).toBeInTheDocument()
+    })
+
+    it('closes the tray when "Cancel" button is clicked', async () => {
+      render(<PasswordComplexityConfiguration />)
+      await userEvent.click(await getViewOptionsButton())
+      expect(screen.getByText('Current Password Configuration')).toBeInTheDocument()
+      const cancelButton = await screen.findByTestId('cancelButton')
+      await userEvent.click(cancelButton)
+      expect(screen.queryByText('Password Options Tray')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('form control UI Interaction Tests', () => {
+    describe('input field states', () => {
+      beforeEach(async () => {
+        render(<PasswordComplexityConfiguration />)
+        await userEvent.click(await getViewOptionsButton())
+      })
+
+      it('enables minimum character length input by default', async () => {
+        const input = await screen.findByTestId('minimumCharacterLengthInput')
+        expect(input).toBeEnabled()
+      })
+
+      it('enables custom max login attempts input by default', async () => {
+        const input = await screen.findByTestId('customMaxLoginAttemptsInput')
+        expect(input).toBeEnabled()
+      })
+
+      it('enables allow login suspension checkbox when custom max login attempts is checked', async () => {
+        const checkbox = await screen.findByTestId('allowLoginSuspensionCheckbox')
+        expect(checkbox).toBeEnabled()
+      })
+
+      it('disables custom max login attempts input and allow suspension login checkbox when its checkbox is unchecked', async () => {
+        const checkbox = await screen.findByTestId('customMaxLoginAttemptsCheckbox')
+        await userEvent.click(checkbox)
+        const input = await screen.findByTestId('customMaxLoginAttemptsInput')
+        const allowLoginSuspensionCheckbox = await screen.findByTestId(
+          'allowLoginSuspensionCheckbox'
+        )
+        expect(input).toBeDisabled()
+        expect(allowLoginSuspensionCheckbox).toBeDisabled()
+      })
+
+      it('re-enables custom max login attempts input and allow login suspension checkbox when checkbox is checked again', async () => {
+        const checkbox = await screen.findByTestId('customMaxLoginAttemptsCheckbox')
+        await userEvent.click(checkbox)
+        await userEvent.click(checkbox)
+        const input = await screen.findByTestId('customMaxLoginAttemptsInput')
+        const allowLoginSuspensionCheckbox = await screen.findByTestId(
+          'allowLoginSuspensionCheckbox'
+        )
+        expect(input).toBeEnabled()
+        expect(allowLoginSuspensionCheckbox).toBeEnabled()
+      })
+    })
+  })
+
+  describe('API calls', () => {
+    it('should handle default password_policy settings gracefully', async () => {
+      render(<PasswordComplexityConfiguration />)
+      await userEvent.click(await getViewOptionsButton())
+      await waitFor(() => expect(screen.getByTestId('saveButton')).toBeEnabled())
+      expect(screen.getByTestId('minimumCharacterLengthInput')).toHaveValue(
+        MOCK_MINIMUM_CHARACTER_LENGTH
+      )
+      expect(screen.getByTestId('customMaxLoginAttemptsCheckbox')).toBeChecked()
+      expect(screen.getByTestId('requireNumbersCheckbox')).not.toBeChecked()
+      expect(screen.getByTestId('requireSymbolsCheckbox')).not.toBeChecked()
+    })
+
+    it('should handle missing password_policy key gracefully', async () => {
+      mockedExecuteApiRequest.mockResolvedValue({
+        status: 200,
+        data: {},
+      })
+      render(<PasswordComplexityConfiguration />)
+      await userEvent.click(await getViewOptionsButton())
+      await waitFor(() => expect(screen.getByTestId('saveButton')).toBeEnabled())
+      expect(
+        screen.queryByText('An error occurred fetching password policy settings.')
+      ).not.toBeInTheDocument()
+      expect(screen.getByTestId('minimumCharacterLengthInput')).toHaveValue(
+        MOCK_MINIMUM_CHARACTER_LENGTH
+      )
+      expect(screen.getByTestId('requireNumbersCheckbox')).not.toBeChecked()
+      expect(screen.getByTestId('requireSymbolsCheckbox')).not.toBeChecked()
+    })
+
+    it('should handle undefined password_policy key gracefully', async () => {
+      mockedExecuteApiRequest.mockResolvedValue({
+        status: 200,
+        data: {
+          password_policy: undefined,
+        },
+      })
+      render(<PasswordComplexityConfiguration />)
+      await userEvent.click(await getViewOptionsButton())
+      await waitFor(() => expect(screen.getByTestId('saveButton')).toBeEnabled())
+      expect(
+        screen.queryByText('An error occurred fetching password policy settings.')
+      ).not.toBeInTheDocument()
+      expect(screen.getByTestId('minimumCharacterLengthInput')).toHaveValue(
+        MOCK_MINIMUM_CHARACTER_LENGTH
+      )
+      expect(screen.getByTestId('requireNumbersCheckbox')).not.toBeChecked()
+      expect(screen.getByTestId('requireSymbolsCheckbox')).not.toBeChecked()
+    })
+
+    it('should handle completely empty password_policy', async () => {
+      mockedExecuteApiRequest.mockResolvedValue({
+        status: 200,
+        data: {
+          password_policy: {},
+        },
+      })
+      render(<PasswordComplexityConfiguration />)
+      await userEvent.click(await getViewOptionsButton())
+      await waitFor(() => expect(screen.getByTestId('saveButton')).toBeEnabled())
+      expect(
+        screen.queryByText('An error occurred fetching password policy settings.')
+      ).not.toBeInTheDocument()
+      expect(screen.getByTestId('minimumCharacterLengthInput')).toHaveValue(
+        MOCK_MINIMUM_CHARACTER_LENGTH
+      )
+      expect(screen.getByTestId('requireNumbersCheckbox')).not.toBeChecked()
+      expect(screen.getByTestId('requireSymbolsCheckbox')).not.toBeChecked()
+    })
+
+    it('should handle missing nested keys in password_policy', async () => {
+      const minimumCharacterLength = '12'
+      mockedExecuteApiRequest.mockResolvedValue({
+        status: 200,
+        data: {
+          password_policy: {
+            require_number_characters: 'true',
+            allow_login_suspension: 'false',
+            minimum_character_length: minimumCharacterLength,
+          },
+        },
+      })
+      render(<PasswordComplexityConfiguration />)
+      await userEvent.click(await getViewOptionsButton())
+      await waitFor(() => expect(screen.getByTestId('saveButton')).toBeEnabled())
+      expect(screen.getByTestId('requireSymbolsCheckbox')).not.toBeChecked()
+      expect(screen.getByTestId('customMaxLoginAttemptsCheckbox')).not.toBeChecked()
+      expect(screen.getByTestId('minimumCharacterLengthInput')).toHaveValue(minimumCharacterLength)
+      expect(screen.getByTestId('customForbiddenWordsCheckbox')).not.toBeChecked()
+    })
+  })
+
+  describe('Saving settings', () => {
+    it('makes a PUT request with the correct method and path when saving all settings, including defaults', async () => {
+      render(<PasswordComplexityConfiguration />)
+      await userEvent.click(await getViewOptionsButton())
+      const saveButton = await screen.findByTestId('saveButton')
+      await userEvent.click(saveButton)
+      const putCall = mockedExecuteApiRequest.mock.calls.find(call => call[0].method === 'PUT')
+      expect(putCall).toEqual([
+        {
+          method: 'PUT',
+          body: {
+            account: {
+              settings: {
+                password_policy: {
+                  require_number_characters: false,
+                  require_symbol_characters: false,
+                  allow_login_suspension: false,
+                  maximum_login_attempts: MOCK_MAXIMUM_LOGIN_ATTEMPTS,
+                  minimum_character_length: MOCK_MINIMUM_CHARACTER_LENGTH,
+                },
+              },
+            },
+          },
+          path: '/api/v1/accounts/1/',
+        },
+      ])
     })
   })
 })

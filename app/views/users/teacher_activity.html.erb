@@ -34,19 +34,15 @@
 <h1><%= t('headings.teacher_activity', "Teacher Activity Report for %{teacher}", :teacher => @teacher.name) %></h1>
 
 <% @courses.each do |course, students| %>
-  <% has_user_notes = students.first.try(:key?, :last_user_note) %>
   <h2><%= course.name %></h2>
   <% if students.blank? %>
     <%= t 'no_students', 'There are no students to report on.' %>
   <% else %>
-  <table class='report sortable <%= 'has_user_notes' if has_user_notes %>'>
+  <table class='report sortable'>
     <thead>
       <tr>
         <th><%= t 'headings.student_name', %{Student} %></th>
         <th><%= t 'headings.last_interaction', 'Last Student Interaction' %></th>
-        <% if has_user_notes %>
-          <th><%= t 'headings.last_journal_entry', %{Last Faculty Journal Entry} %></th>
-        <% end %>
         <th><%= t('headings.current_score', %{Current Score}) %></th>
         <th><%= t('headings.final_score', %{Final Score}) %></th>
         <th><%= t('headings.ungraded', %{Ungraded Assignments}) %></th>
@@ -68,16 +64,6 @@
               <%= t 'last_time_never', 'never' %>
             <% end %>
           </td>
-          <% if has_user_notes %>
-            <td>
-              <% if student[:last_user_note] %>
-                <% user_note_link = t 'last_time', { :zero => "less than 1 day ago", :one => "1 day ago", :other => "%{count} days ago" }, :count => (((Time.now - student[:last_user_note])/60)/1440).abs.to_i %>
-              <% else %>
-                <% user_note_link = t 'last_time_never', 'never' %>
-              <% end %>
-              <%= link_to(user_note_link, user_user_notes_url(student[:enrollment].user)) %>
-            </td>
-          <% end %>
           <td><%= n(student[:enrollment].computed_current_score, percentage: true, precision: 1) %></td>
           <td><%= n(student[:enrollment].computed_final_score, percentage: true, precision: 1) %></td>
           <td data-number="<%= (student[:ungraded].map(&:submitted_at).compact.min || 1.day.from_now).to_i / 3600 %>">

@@ -23,7 +23,7 @@ module DataFixup
       DeveloperKey.where(workflow_state: "active", is_lti_key: true, lti_registration: nil).preload(:tool_configuration, :ims_registration).find_each do |developer_key|
         registration_values = {
           admin_nickname: developer_key.name,
-          account: developer_key.account,
+          account_id: developer_key.account_id.presence || Account.site_admin.global_id,
           internal_service: developer_key.internal_service,
           name: developer_key.tool_configuration.configuration["title"],
           developer_key:,

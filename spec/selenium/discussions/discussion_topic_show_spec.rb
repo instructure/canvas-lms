@@ -254,7 +254,7 @@ describe "Discussion Topic Show" do
       it "lets students see the checkpoints tray" do
         user_session(@student)
         get "/courses/#{@course.id}/discussion_topics/#{@checkpointed_discussion.id}"
-
+        wait_for_ajaximations
         fj("button:contains('View Due Dates')").click
         wait_for_ajaximations
         expect(fj("span:contains('Due Dates')")).to be_present
@@ -303,22 +303,6 @@ describe "Discussion Topic Show" do
         reply_to_topic_contents = f("span[data-testid='reply_to_topic_section']").text
         expect(reply_to_topic_contents).to include("Completed #{format_date_for_view(@checkpointed_discussion.reload.discussion_entries.last.created_at)}")
       end
-
-      it "lets teachers see checkpoints tray" do
-        user_session(@teacher)
-        get "/courses/#{@course.id}/discussion_topics/#{@checkpointed_discussion.id}"
-
-        fj("button:contains('View Due Dates')").click
-        wait_for_ajaximations
-        expect(fj("span:contains('Due Dates')")).to be_present
-        reply_to_topic_contents = f("span[data-testid='reply_to_topic_section']").text
-        expect(reply_to_topic_contents).to include("Reply to Topic")
-        expect(reply_to_topic_contents).to include(format_date_for_view(@due_at))
-
-        reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
-        expect(reply_to_entry_contents).to include("Additional Replies Required: #{@replies_required}")
-        expect(reply_to_entry_contents).to include(format_date_for_view(@due_at))
-      end
     end
 
     context "Assign To option" do
@@ -335,9 +319,9 @@ describe "Discussion Topic Show" do
         )
       end
 
-      it "renders Assign To option" do
+      it "renders Assign To option but not due dates button" do
         get "/courses/#{@course.id}/discussion_topics/#{@discussion.id}"
-
+        expect(f("body")).not_to contain_jqcss("button:contains('Due Dates')")
         Discussion.click_assign_to_button
         expect(icon_type_exists?("Discussion")).to be true
         expect(tray_header.text).to eq("Discussion 1")
@@ -398,6 +382,43 @@ describe "Discussion Topic Show" do
         Discussion.click_assign_to_button
         wait_for_assign_to_tray_spinner
         expect(module_item_assign_to_card.last).to contain_css(due_date_input_selector)
+      end
+
+      it "shows correct date inputs for checkpointed discussion" do
+        Account.site_admin.enable_feature! :discussion_checkpoints
+        assignment = @course.assignments.create!(
+          name: "Assignment",
+          submission_types: ["online_text_entry"]
+        )
+        dt = @course.discussion_topics.create!(
+          title: "Graded Discussion",
+          discussion_type: "threaded",
+          posted_at: "2017-07-09 16:32:34",
+          user: @teacher,
+          assignment:
+        )
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: dt,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 2.days.from_now }],
+          points_possible: 6
+        )
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: dt,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 3.days.from_now }],
+          points_possible: 7,
+          replies_required: 2
+        )
+
+        get "/courses/#{@course.id}/discussion_topics/#{dt.id}"
+        Discussion.click_assign_to_button
+        wait_for_assign_to_tray_spinner
+
+        expect(module_item_assign_to_card.first).not_to contain_css(due_date_input_selector)
+        expect(module_item_assign_to_card.first).to contain_css(reply_to_topic_due_date_input_selector)
+        expect(module_item_assign_to_card.first).to contain_css(required_replies_due_date_input_selector)
       end
 
       it "does not show the button when the user does not have the moderate_forum permission" do
