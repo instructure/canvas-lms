@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2013 - present Instructure, Inc.
+# Copyright (C) 2024 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,22 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-include T("default/appendix/html")
+require_relative "gitbook_decorator"
 
-def appendix
-  controllers = options[:controllers]
-
-  if options[:all_resources]
-    controllers = options[:resources].flatten.select do |o|
-      o.is_a?(YARD::CodeObjects::NamespaceObject)
-    end
-  end
-
-  return unless controllers.is_a?(Array)
-
-  @appendixes = controllers.collect do |c|
-    c.children.select { |o| o.type == :appendix }
-  end.flatten
-
-  super
+# There are cases when Markdown doesn't provide enough flexibility to
+# create the desired output. In such instances, we can use the
+# Decorator module to add custom tags to the Markdown content, which
+# are understood and rendered by the Markdown engine.
+#
+# If someone wants to implement a new decorator, they can do so by
+# creating a new module and implementing the functions provided by the
+# Decorator module. Additionally, replace `include GitbookDecorator`
+# with your implementation below.
+module Decorator
+  include GitbookDecorator
 end

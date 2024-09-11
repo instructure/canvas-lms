@@ -1,0 +1,5 @@
+<% if @is_list %>
+Returns a list of
+<% else %>
+Returns <%= @object_name.start_with?(/[aeiou]/i) ? "an" : "a" %>
+<% end %> [<%= @object_name %>](<%= @resource_name %>.md#<%= @object_name.downcase %>) <%= @is_list ? "objects" : "object" %>.

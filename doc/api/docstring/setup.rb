@@ -18,21 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-def diskfile
-  content = "<div id='filecontents'>" +
-            case (File.extname(@file)[1..] || "").downcase
-            when "htm", "html"
-              @contents
-            when "txt"
-              "<pre>#{@contents}</pre>"
-            when "textile", "txtile"
-              htmlify(@contents, :textile)
-            when "markdown", "md", "mdown", "mkd"
-              htmlify(@contents, :markdown)
-            else
-              htmlify(@contents, diskfile_shebang_or_default)
-            end +
-            "</div>"
-  options.delete(:no_highlight)
-  content
+include YARD::Templates::Helpers::HtmlHelper
+
+def init
+  return if object.docstring.blank?
+
+  sections :text, T("tags")
 end

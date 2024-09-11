@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2024 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,8 +18,22 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-def init
-  return if object.docstring.blank?
+# Make the Decorator module available in the .erb files
+require "decorator"
+include Decorator
 
-  sections :text, T("tags")
+def diskfile
+  content = case (File.extname(@file)[1..] || "").downcase
+            when "htm", "html", "markdown", "md", "mdown", "mkd"
+              @contents
+            when "txt"
+              "```\n#{@contents}\n```"
+            when "textile", "txtile"
+              htmlify(@contents, :textile)
+            else
+              htmlify(@contents, diskfile_shebang_or_default)
+            end
+
+  options.delete(:no_highlight)
+  content
 end

@@ -1,0 +1,79 @@
+* [Canvas LMS](README.md)
+  * Basics
+    * [GraphQL](file.graphql.md)
+    * [API Change Log](file.changelog.md)
+    * [SIS IDs](file.object_ids.md)
+    * [Pagination](file.pagination.md)
+    * [Throttling](file.throttling.md)
+    * [Compound Documents](file.compound_documents.md)
+    * [File Uploads](file.file_uploads.md)
+    * [API Endpoint Attributes](file.endpoint_attributes.md)
+    * [Masquerading](file.masquerading.md)
+  * OAuth2
+    * [OAuth2 Overview](file.oauth.md)
+    * [OAuth2 Endpoints](file.oauth_endpoints.md)
+    * [Developer Keys](file.developer_keys.md)
+  * Resources
+    * [All Resources Reference](all_resources.md)
+    <% options[:resources].each do |(resource, controllers)|
+      next if resource.include?('Plagiarism')
+      link = url_for("#{topicize resource}.md") %>
+    * [<%= resource %>](<%= link %>)
+    <% end %>
+  * Outcomes
+    * [Outcomes CSV Format](file.outcomes_csv.md)
+  * Group Categories
+    * [Group Categories CSV Format](file.group_category_csv.md)
+  * SIS
+    * [SIS CSV Format](file.sis_csv.md)
+  * External Tools
+    * LTI
+      * [Introduction](file.tools_intro.md)
+      * [Registration](file.registration.md)
+      * [Configuring](file.lti_dev_key_config.md)
+      * [Variable Substitutions](file.tools_variable_substitutions.md)
+      * [Deep Linking](file.content_item.md)
+      * [Grading](file.assignment_tools.md)
+      * [Provisioning](file.provisioning.md)
+      * [PostMessage](file.lti_window_post_message.md)
+      * Placements
+        * [Placements Overview](file.placements_overview.md)
+        * [Navigation](file.navigation_tools.md)
+        * [Homework Submission](file.homework_submission_placement.md)
+        * [Editor Button](file.editor_button_placement.md)
+        * [Migration Selection](file.migration_selection_placement.md)
+        * [Link Selection (Modules)](file.link_selection_placement.md)
+        * [Assignment Selection](file.assignment_selection_placement.md)
+        * [Collaborations](file.collaborations_placement.md)
+    * [xAPI](file.xapi.md)
+    * [Canvas Roles](file.canvas_roles.md)
+    * Plagiarism Detection Platform
+      <% @plagiarism_file_list = [] %>
+      <% options[:resources].each do |(resource, controllers)| %>
+        <%
+          next if resource.exclude?('Plagiarism')
+          @plagiarism_file_list << resource
+        %>
+      <% end %>
+      * [Overview](file.plagiarism_platform.md)
+      <% @plagiarism_file_list.each do |resource| %>
+      <% link = url_for("#{topicize resource}.md") %>
+      * [<%= resource %>](<%= link %>)
+      <% end %>
+      * [JWT Access Tokens](file.jwt_access_tokens.md)
+  * Data Services
+    * Live Events
+      * Overview
+        * [Introduction](file.data_service_introduction.md)
+        * [Setup](file.data_service_setup.md)
+        * [Caliper](file.data_service_caliper_structure.md)
+        * [Metadata](file.data_service_canvas_event_metadata.md)
+      * Event Format
+        * Canvas
+          <% DataServicesCanvasLoader.data.each do |content| %>
+          * [<%= content[:page_title] %>](file.data_service_canvas_<%= content[:event_category] %>.md)
+          <% end %>
+        * Caliper IMS 1.1
+          <% DataServicesCaliperLoader.data.each do |content| %>
+          * [<%= content[:page_title] %>](file.data_service_caliper_<%= content[:event_category] %>.md)
+          <% end %>
