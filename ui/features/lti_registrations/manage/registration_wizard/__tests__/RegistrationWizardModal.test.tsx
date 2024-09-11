@@ -364,6 +364,65 @@ describe('RegistrationWizardModal', () => {
     })
   })
 
+  describe('When opened with Manual', () => {
+    beforeEach(() => {
+      openRegistrationWizard({
+        dynamicRegistrationUrl: '',
+        unifiedToolId: undefined,
+        lti_version: '1p3',
+        method: 'manual',
+        registering: false,
+        exitOnCancel: false,
+        jsonUrl: '',
+        jsonCode: '',
+        onSuccessfulInstallation: jest.fn(),
+        jsonFetch: {_tag: 'initial'},
+      })
+    })
+
+    it('should disable the Next button when the name is empty', async () => {
+      const accountId = ZAccountId.parse('123')
+
+      const screen = render(
+        <RegistrationWizardModal
+          accountId={accountId}
+          {...emptyServices}
+          jsonUrlWizardService={mockJsonUrlWizardService()}
+        />
+      )
+      screen.getByTestId('manual-name-input').focus()
+
+      await userEvent.paste('')
+
+      expect(screen.getByTestId('registration-wizard-next-button')).toBeDisabled()
+
+      await userEvent.paste('   ')
+
+      expect(screen.getByTestId('registration-wizard-next-button')).toBeDisabled()
+    })
+
+    it('should start the registration wizard when the user clicks Next', async () => {
+      const accountId = ZAccountId.parse('123')
+
+      const screen = render(
+        <RegistrationWizardModal
+          accountId={accountId}
+          {...emptyServices}
+          jsonUrlWizardService={mockJsonUrlWizardService()}
+        />
+      )
+      screen.getByTestId('manual-name-input').focus()
+
+      await userEvent.paste('My App')
+
+      await userEvent.click(screen.getByTestId('registration-wizard-next-button'))
+
+      await waitFor(() => {
+        expect(screen.getByText(/LTI 1.3 Registration/i)).toBeInTheDocument()
+      })
+    })
+  })
+
   describe('when pre-opened with dynamic registration', () => {
     it('should exit the modal when the cancel button is clicked & exitOnCancel is true', async () => {
       openRegistrationWizard({

@@ -37,7 +37,7 @@ const I18n = useI18nScope('lti_registrations')
 
 export type Lti1p3RegistrationWizardProps = {
   accountId: AccountId
-  internalConfiguration?: InternalLtiConfiguration
+  internalConfiguration: InternalLtiConfiguration
   unregister: () => void
   unifiedToolId?: UnifiedToolId
   onSuccessfulRegistration: () => void
@@ -46,13 +46,7 @@ export type Lti1p3RegistrationWizardProps = {
 export const Lti1p3RegistrationWizard = (props: Lti1p3RegistrationWizardProps) => {
   const {internalConfiguration} = props
   const useLti1p3RegistrationWizardStore = React.useMemo(() => {
-    if (internalConfiguration) {
-      return createLti1p3RegistrationWizardState({internalConfig: internalConfiguration})
-    } else {
-      // TODO: Account for the case where the internalConfiguration is not present
-      // to allow for manual configuration
-      throw new Error('Not yet implemented')
-    }
+    return createLti1p3RegistrationWizardState({internalConfig: internalConfiguration})
   }, [internalConfiguration])
 
   const store = useLti1p3RegistrationWizardStore()
