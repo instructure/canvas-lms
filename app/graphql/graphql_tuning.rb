@@ -46,6 +46,14 @@ class GraphQLTuning
     config["max_query_string_tokens"] || 5_000
   end
 
+  def self.max_query_aliases
+    config["max_query_aliases"] || 20
+  end
+
+  def self.max_query_directives
+    config["max_query_directives"] || 5
+  end
+
   class << self
     private
 
