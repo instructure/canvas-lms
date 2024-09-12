@@ -172,6 +172,14 @@ module BlockEditorPage
     f('[data-testid="upload-image-button"]')
   end
 
+  def image_block_alt_text_button
+    f('[data-testid="alt-text-button"]')
+  end
+
+  def image_block_alt_text_input
+    f("textarea[placeholder='Image Description']")
+  end
+
   def group_block_inner_selector
     ".group-block__inner"
   end
@@ -260,6 +268,14 @@ module BlockEditorPage
     ff(".icon-block > svg > title")
   end
 
+  def select_an_icon_popup
+    f("[role='dialog'][aria-label='Select an icon']")
+  end
+
+  def select_an_icon_popup_icon(name)
+    fxpath("//*[local-name()='svg']/*[local-name()='#{name}']", select_an_icon_popup)
+  end
+
   def image_block
     f(".image-block")
   end
@@ -270,5 +286,9 @@ module BlockEditorPage
 
   def section_menu_menu
     f(".section-menu ul[role='menu']")
+  end
+
+  def kb_focus_block_toolbar
+    driver.action.key_down(:control).send_keys(:f9).key_up(:control).perform
   end
 end

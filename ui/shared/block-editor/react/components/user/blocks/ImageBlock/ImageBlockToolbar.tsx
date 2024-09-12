@@ -200,7 +200,6 @@ const ImageBlockToolbar = () => {
       </Menu>
 
       <Popover
-        label={I18n.t('Alt Text')}
         isShowingContent={showingAltTextMenu}
         onShowContent={_e => {
           setShowingAltTextMenu(true)
@@ -211,6 +210,7 @@ const ImageBlockToolbar = () => {
         on="click"
         renderTrigger={
           <IconButton
+            data-testid="alt-text-button"
             size="small"
             withBackground={false}
             withBorder={false}

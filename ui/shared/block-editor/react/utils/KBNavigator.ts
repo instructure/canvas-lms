@@ -290,7 +290,8 @@ class KBNavigator {
         break
       case 'F9':
         if (e.ctrlKey) {
-          this.#getEditorControl('.block-toolbar')?.focus()
+          // return focus to the last toolbar button that had focus
+          this.#getEditorControl('.block-toolbar [tabIndex="0"]')?.focus()
         } else if (e.altKey) {
           this.#getEditorControl('.section-menu ul')?.focus()
         }

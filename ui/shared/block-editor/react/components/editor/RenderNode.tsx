@@ -43,38 +43,21 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import ReactDOM from 'react-dom'
 import {useNode, useEditor, type Node} from '@craftjs/core'
-import {ROOT_NODE} from '@craftjs/utils'
 
-import {IconArrowUpLine, IconTrashLine, IconDragHandleLine} from '@instructure/ui-icons'
-import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
-import {View, type ViewProps} from '@instructure/ui-view'
+import {View} from '@instructure/ui-view'
 
 import type {AddSectionPlacement, RenderNodeProps} from './types'
 import {SectionBrowser} from './SectionBrowser'
-import {notDeletableIfLastChild, mountNode} from '../../utils'
+import {mountNode} from '../../utils'
 import {BlockResizer} from './BlockResizer'
 import {
   getToolbarPos as getToolbarPosUtil,
   getMenuPos as getMenuPosUtil,
+  findUpNode,
+  findContainingSection,
 } from '../../utils/renderNodeHelpers'
-
-const findUpNode = (node: Node, query: any): Node | undefined => {
-  let upnode = node.data.parent ? query.node(node.data.parent).get() : undefined
-  while (upnode && upnode.data.parent && upnode.data.custom?.noToolbar) {
-    upnode = upnode.data.parent ? query.node(upnode.data.parent).get() : undefined
-  }
-  return upnode && upnode.id !== ROOT_NODE ? upnode : undefined
-}
-
-const findContainingSection = (node: Node, query: any): Node | undefined => {
-  if (node.data.custom?.isSection) return node
-  let upnode = findUpNode(node, query)
-  while (upnode && !upnode.data.custom?.isSection) {
-    upnode = findUpNode(upnode, query)
-  }
-  return upnode && upnode.data.custom?.isSection ? upnode : undefined
-}
+import {BlockToolbar} from './BlockToolbar'
 
 interface RenderNodeComponent extends React.FC<RenderNodeProps> {
   globals: {
@@ -89,36 +72,18 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
       RenderNode.globals.selectedSectionId = ''
     }
   })
-  const {
-    nodeActions,
-    hovered,
-    selected,
-    node,
-    name,
-    moveable,
-    deletable,
-    connectors: {drag},
-  } = useNode((n: Node) => {
-    const node_helpers = query.node(n.id)
+  const {hovered, selected, node, name} = useNode((n: Node) => {
     return {
-      nodeActions: actions,
       node: n,
       hovered: n.events.hovered,
       selected: n.events.selected,
       name: n.data.custom.displayName || n.data.displayName,
-      moveable: node_helpers.isDraggable(),
-      deletable: n.data.custom?.isSection
-        ? notDeletableIfLastChild(n.id, query)
-        : (typeof n.data.custom?.isDeletable === 'function'
-            ? n.data.custom.isDeletable?.(n.id, query)
-            : true) && node_helpers.isDeletable(),
       props: n.data.props,
     }
   })
 
   const [currentToolbarOrTagRef, setCurrentToolbarOrTagRef] = useState<HTMLDivElement | null>(null)
   const [currentMenuRef, setCurrentMenuRef] = useState<HTMLDivElement | null>(null)
-  const [upnodeId] = useState<string | undefined>(findUpNode(node, query)?.id)
   const [sectionBrowserOpen, setSectionBrowserOpen] = useState<AddSectionPlacement>(undefined)
   const [mountPoint, setMountPoint] = useState(mountNode())
 
@@ -207,95 +172,8 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
     return {top: `${top}px`, left: `${left}px`}
   }, [currentMenuRef, node.dom, mountPoint])
 
-  // TODO: maybe setState the upnode so we know whether to show the up button or not
-  const handleGoUp = useCallback(
-    (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps>) => {
-      e.stopPropagation()
-      actions.selectNode(upnodeId)
-      if (upnodeId) {
-        query.node(upnodeId).get()?.dom?.focus()
-      }
-    },
-    [actions, query, upnodeId]
-  )
-
-  const handleDeleteNode = useCallback(
-    (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps>) => {
-      e.stopPropagation()
-      actions.delete(node.id)
-    },
-    [actions, node.id]
-  )
-
-  // TODO: this should be role="toolbar" and nav with arrow keys
   const renderBlockToolbar = () => {
-    if (node.data?.custom?.noToolbar) return null
-    if (!mountPoint) return null
-
-    const {left, top} = getToolbarPos()
-
-    return ReactDOM.createPortal(
-      <div
-        ref={(el: HTMLDivElement) => setCurrentToolbarOrTagRef(el)}
-        className="block-toolbar"
-        style={{
-          left: `${left}px`,
-          top: `${top}px`,
-        }}
-        tabIndex={-1}
-      >
-        <View as="div" background="brand" padding="0 xx-small" borderRadius="small">
-          <Text size="small">{name}</Text>
-        </View>
-        {moveable ? (
-          <IconButton
-            cursor="move"
-            size="small"
-            elementRef={el => el && drag(el as HTMLElement)}
-            screenReaderLabel="Drag to move"
-            withBackground={false}
-            withBorder={false}
-          >
-            <IconDragHandleLine size="x-small" />
-          </IconButton>
-        ) : null}
-        {upnodeId && (
-          <IconButton
-            cursor="pointer"
-            size="small"
-            onClick={handleGoUp}
-            screenReaderLabel="Go to parent"
-            withBackground={false}
-            withBorder={false}
-          >
-            <IconArrowUpLine size="x-small" />
-          </IconButton>
-        )}
-        {node.related.toolbar && (
-          <>
-            <div className="toolbar-separator" />
-            {React.createElement(node.related.toolbar)}
-          </>
-        )}
-        {deletable ? (
-          <>
-            <div className="toolbar-separator" />
-            <IconButton
-              cursor="pointer"
-              size="small"
-              onClick={handleDeleteNode}
-              screenReaderLabel="Delete"
-              withBackground={false}
-              withBorder={false}
-              color="danger"
-            >
-              <IconTrashLine size="x-small" />
-            </IconButton>
-          </>
-        ) : null}
-      </div>,
-      mountPoint
-    )
+    return ReactDOM.createPortal(<BlockToolbar />, mountPoint)
   }
 
   const handleAddSection = useCallback((where: AddSectionPlacement) => {

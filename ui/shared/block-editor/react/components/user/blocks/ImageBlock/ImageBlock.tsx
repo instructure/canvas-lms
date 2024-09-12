@@ -180,6 +180,7 @@ const ImageBlock = ({
               src={src || ImageBlock.craft.defaultProps.src}
               constrain={imgConstrain}
               alt={alt || ''}
+              style={styl}
             />
           </div>
         </div>
