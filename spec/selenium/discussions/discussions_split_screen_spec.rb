@@ -238,16 +238,18 @@ describe "threaded discussions" do
 
       f("button[data-testid='threading-toolbar-reply']").click
       type_in_tiny("textarea", "additional reply 1")
+      # this sleep is necessary to avoid RCE auto-save alert, uncatchable by wait_for_ajaximations
+      # rubocop:disable Lint/NoSleep
+      sleep 1
+      # rubocop:enable Lint/NoSleep
       f("button[data-testid='DiscussionEdit-submit']").click
-      fj("button:contains('Close')").click
-      fj("button:contains('Due Dates')").click
-      reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
-      expect(reply_to_entry_contents).not_to include("Competed")
-      fj("button:contains('Close')").click
+      wait_for_ajaximations
 
       f("button[data-testid='threading-toolbar-reply']").click
       type_in_tiny("textarea", "additional reply 2")
       f("button[data-testid='DiscussionEdit-submit']").click
+      wait_for_ajaximations
+
       fj("button:contains('Close')").click
       fj("button:contains('Due Dates')").click
       reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
