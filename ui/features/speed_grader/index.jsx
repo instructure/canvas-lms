@@ -126,6 +126,7 @@ ready(() => {
         ReactDOM.render(
           <GenericErrorPage
             imageUrl={errorShipUrl}
+            errorMessage={error.message}
             errorSubject={I18n.t('SpeedGrader loading error')}
             errorCategory={I18n.t('SpeedGrader Error Page')}
           />,
