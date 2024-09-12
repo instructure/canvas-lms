@@ -76,5 +76,25 @@ class TeacherViewPageV2
     def options_button
       f("button[data-testid='assignment-options-button']")
     end
+
+    def peer_reviews_option
+      f("a[data-testid='peer-review-option']")
+    end
+
+    def send_to_option
+      f("button[data-testid='send-to-option']")
+    end
+
+    def send_to_modal
+      f("span[data-testid='send-to-modal']")
+    end
+
+    def copy_to_option
+      f("button[data-testid='copy-to-option']")
+    end
+
+    def copy_to_tray
+      f("span[data-testid='copy-to-tray']")
+    end
   end
 end
