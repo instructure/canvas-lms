@@ -203,7 +203,6 @@ describe "override assignees" do
     end
 
     it "creates group assignment overrides" do
-      skip("LX-1877 -- group assignment updats on edit/create page")
       AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @normal_assignment.id)
       AssignmentCreateEditPage.click_group_category_assignment_check
       AssignmentCreateEditPage.select_assignment_group_category(-3)
@@ -218,14 +217,18 @@ describe "override assignees" do
       expect(@normal_assignment.assignment_overrides.active.last.title).to eq(@testgroup[0].name)
     end
 
-    it "deletes existing group assignment overrides if the group set is changed" do
-      skip("LX-1877 -- group assignment updats on edit/create page")
+    it "shows error if the group set is changed and overrides exist" do
       AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @group_assignment.id)
-
       expect(@group_assignment.assignment_overrides.active.count).to eq(1)
       expect(@group_assignment.assignment_overrides.active.last.title).to eq(@testgroup[0].name)
 
       AssignmentCreateEditPage.select_assignment_group_category(-2)
+      expect(AssignmentCreateEditPage.group_error).to be_displayed
+
+      click_delete_assign_to_item("Remove #{@testgroup[0].name}", 0)
+
+      AssignmentCreateEditPage.select_assignment_group_category(-2)
+      expect(AssignmentCreateEditPage.group_error).not_to be_displayed
 
       click_add_assign_to_card
       select_module_item_assignee(1, @testgroup[1].name)
@@ -236,14 +239,20 @@ describe "override assignees" do
       expect(@group_assignment.assignment_overrides.active.last.title).to eq(@testgroup[1].name)
     end
 
-    it "shows error if there is no group category selected when opening the tray" do
-      skip("LX-1877 -- group assignment updats on edit/create page")
+    it "shows error if attempt to remove group assignment and groups are assigned" do
       AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @group_assignment.id)
+      wait_for_ajaximations
 
-      AssignmentCreateEditPage.select_assignment_group_category({})
-      error_boxes = AssignmentCreateEditPage.error_boxes
+      expect(AssignmentCreateEditPage.group_category_checkbox).to be_checked
+      AssignmentCreateEditPage.click_group_category_assignment_check
+      expect(AssignmentCreateEditPage.group_category_checkbox).to be_checked
+      expect(AssignmentCreateEditPage.group_category_error).to be_displayed
 
-      expect(error_boxes.any? { |errorbox| errorbox.text.include?("Please select a group set for this assignment") }).to be_truthy
+      click_delete_assign_to_item("Remove #{@testgroup[0].name}", 0)
+
+      AssignmentCreateEditPage.click_group_category_assignment_check
+      expect(AssignmentCreateEditPage.group_category_checkbox).not_to be_checked
+      expect(AssignmentCreateEditPage.group_category_error).not_to be_displayed
     end
   end
 

@@ -54,7 +54,9 @@ describe Checkpoints::SectionOverrideCreatorService do
     end
 
     it "creates a parent section override without dates set (but still overridden), if one doesn't already exist" do
-      override = { set_id: @section.id, due_at: 2.days.from_now, unlock_at: 2.days.ago, lock_at: 4.days.from_now }
+      unlock_at_time = 2.days.ago
+      lock_at_time = 4.days.from_now
+      override = { set_id: @section.id, due_at: 2.days.from_now, unlock_at: unlock_at_time, lock_at: lock_at_time }
       service.call(checkpoint: @checkpoint, override:)
       parent_override = @checkpoint.parent_assignment.assignment_overrides.first
 
@@ -62,9 +64,9 @@ describe Checkpoints::SectionOverrideCreatorService do
         expect(parent_override.set).to eq @section
         expect(parent_override.due_at).to be_nil
         expect(parent_override.due_at_overridden).to be true
-        expect(parent_override.unlock_at).to be_nil
+        expect(parent_override.unlock_at.to_i).to be unlock_at_time.to_i
         expect(parent_override.unlock_at_overridden).to be true
-        expect(parent_override.lock_at).to be_nil
+        expect(parent_override.lock_at.to_i).to be lock_at_time.to_i
         expect(parent_override.lock_at_overridden).to be true
       end
     end

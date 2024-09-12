@@ -28,6 +28,7 @@ import type {
 import {
   mapToSubmissionGradeChange,
   isInPastGradingPeriodAndNotAdmin,
+  assignmentHasCheckpoints,
 } from '../../../utils/gradebookUtils'
 import type {Submission} from '../../../../../api.d'
 
@@ -88,7 +89,9 @@ export function CurveGradesModal({assignment, contextUrl, submissions, handleGra
 
   return (
     <Button
-      disabled={isInPastGradingPeriodAndNotAdmin(assignment)}
+      disabled={
+        isInPastGradingPeriodAndNotAdmin(assignment) || assignmentHasCheckpoints(assignment)
+      }
       color="secondary"
       onClick={showDialog}
       data-testid="curve-grades-button"

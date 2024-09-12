@@ -392,6 +392,8 @@ module Importers
           event.reload
           event.todo_date = shift_date(event.todo_date, shift_options)
           event.publish_at = shift_date(event.publish_at, shift_options)
+          event.lock_at = shift_date(event.lock_at, shift_options)
+          event.unlock_at = shift_date(event.unlock_at, shift_options)
           event.save_without_broadcasting
         end
 

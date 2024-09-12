@@ -29,6 +29,8 @@ class AssignmentsController < ApplicationController
   include Api::V1::Outcome
   include Api::V1::ExternalTools
   include Api::V1::ContextModule
+  include Api::V1::Rubric
+  include Api::V1::RubricAssociation
 
   include KalturaHelper
   include ObserverEnrollmentsHelper
@@ -437,10 +439,20 @@ class AssignmentsController < ApplicationController
         permissions = {
           context: context_rights,
           assignment: @assignment.rights_status(@current_user, session, :update, :submit),
-          can_manage_groups: can_do(@context.groups.temp_record, @current_user, :create)
+          can_manage_groups: can_do(@context.groups.temp_record, @current_user, :create),
+          manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)
         }
 
         @similarity_pledge = pledge_text
+
+        rubric_association = nil
+        assigned_rubric = nil
+        if @assignment.active_rubric_association? && Rubric.enhanced_rubrics_assignments_enabled?(@context)
+          rubric_association = @assignment.rubric_association
+          assigned_rubric = rubric_json(rubric_association.rubric, @current_user, session, style: "full")
+          assigned_rubric[:unassessed] = Rubric.active.unassessed.where(id: rubric_association.rubric.id).exists?
+          rubric_association = rubric_association_json(rubric_association, @current_user, session)
+        end
 
         hash = {
           EULA_URL: tool_eula_url,
@@ -452,6 +464,8 @@ class AssignmentsController < ApplicationController
           EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
           USER_ASSET_STRING: @current_user&.asset_string,
           OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation),
+          assigned_rubric:,
+          rubric_association:
         }
 
         append_default_due_time_js_env(@context, hash)

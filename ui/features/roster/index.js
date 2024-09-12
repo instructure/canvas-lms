@@ -125,4 +125,11 @@ users.once('reset', () =>
 
 app.render()
 ready(() => app.$el.appendTo($('#content')))
-users.fetch()
+users.fetch({
+  success() {
+    if (users.length === 0) return
+    // PaginatedCollectionView first's attempt to get the container does not wait for the DOM to be ready
+    // so when we recieve the users data we need to reset the scroll container, to be sure
+    usersView.resetScrollContainer(document.getElementById('drawer-layout-content') || window)
+  },
+})

@@ -234,7 +234,7 @@ class AssetUserAccessLog
   end
 
   def self.reschedule!
-    AssetUserAccessLog.delay(strand: strand_name).compact
+    AssetUserAccessLog.delay(strand: strand_name, priority: 40).compact
   end
 
   def self.strand_name

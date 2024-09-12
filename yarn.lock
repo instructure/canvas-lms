@@ -12130,7 +12130,7 @@ elliptic@^6.5.3:
     minimalistic-assert "^1.0.1"
     minimalistic-crypto-utils "^1.0.1"
 
-ember-template-compiler@1.8.0, ember-template-compiler@^1.8.0:
+ember-template-compiler@1.8.0:
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/ember-template-compiler/-/ember-template-compiler-1.8.0.tgz#337a30fd5d9e491930ee5cfb2bd73043c16e2f36"
   integrity sha1-M3ow/V2eSRkw7lz7K9cwQ8FuLzY=

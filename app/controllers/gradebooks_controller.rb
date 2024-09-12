@@ -310,8 +310,7 @@ class GradebooksController < ApplicationController
       #     within the "gradebook" version there are two "views":
       #       "default"
       #       "learning_mastery"
-      #   "individual" (also "srgb")
-      #   "individual_enhanced"
+      #   "individual"
 
       if requested_gradebook_view.present?
         if requested_gradebook_view != preferred_gradebook_view
@@ -321,11 +320,8 @@ class GradebooksController < ApplicationController
         return
       end
 
-      individual_enhanced_enabled = @context.root_account.feature_enabled?(:individual_gradebook_enhancements)
-      if %w[srgb individual individual_enhanced].include?(gradebook_version) && individual_enhanced_enabled
+      if %w[srgb individual individual_enhanced].include?(gradebook_version)
         show_enhanced_individual_gradebook
-      elsif ["srgb", "individual"].include?(gradebook_version)
-        show_individual_gradebook
       elsif preferred_gradebook_view == "learning_mastery" && outcome_gradebook_enabled?
         show_learning_mastery
       else
@@ -547,7 +543,6 @@ class GradebooksController < ApplicationController
       grading_standard_scaling_factor: active_grading_standard_scaling_factor(grading_standard),
       group_weighting_scheme: @context.group_weighting_scheme,
       has_modules: @context.has_modules?,
-      individual_gradebook_enhancements: root_account.feature_enabled?(:individual_gradebook_enhancements),
       late_policy: @context.late_policy.as_json(include_root: false),
       login_handle_name: root_account.settings[:login_handle_name],
       message_attachment_upload_folder_id: @current_user.conversation_attachments_folder.id.to_s,
@@ -624,7 +619,6 @@ class GradebooksController < ApplicationController
       grading_standard_points_based: active_grading_standard_points_based(grading_standard),
       grading_standard_scaling_factor: active_grading_standard_scaling_factor(grading_standard),
       group_weighting_scheme: @context.group_weighting_scheme,
-      individual_gradebook_enhancements: true,
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
       outcome_rollups_url: api_v1_course_outcome_rollups_url(@context, per_page: 100),
       proxy_submissions_allowed: Account.site_admin.feature_enabled?(:proxy_file_uploads) && @context.grants_right?(@current_user, session, :proxy_assignment_submission),
@@ -723,7 +717,6 @@ class GradebooksController < ApplicationController
       late_policy: @context.late_policy.as_json(include_root: false),
       login_handle_name: root_account.settings[:login_handle_name],
       has_modules: @context.has_modules?,
-      individual_gradebook_enhancements: root_account.feature_enabled?(:individual_gradebook_enhancements),
       message_attachment_upload_folder_id: @current_user.conversation_attachments_folder.id.to_s,
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
       outcome_links_url: api_v1_course_outcome_group_links_url(@context, outcome_style: :full),
@@ -783,7 +776,6 @@ class GradebooksController < ApplicationController
                settings: gradebook_settings(@context.global_id),
                settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
                IMPROVED_LMGB: root_account.feature_enabled?(:improved_lmgb),
-               individual_gradebook_enhancements: root_account.feature_enabled?(:individual_gradebook_enhancements),
              },
              OUTCOME_AVERAGE_CALCULATION: root_account.feature_enabled?(:outcome_average_calculation),
              outcome_service_results_to_canvas: outcome_service_results_to_canvas_enabled?,
@@ -813,8 +805,7 @@ class GradebooksController < ApplicationController
         COURSE_URL: named_context_url(@context, :context_url),
         COURSE_IS_CONCLUDED: @context.is_a?(Course) && @context.completed?,
         OUTCOME_GRADEBOOK_ENABLED: outcome_gradebook_enabled?,
-        OVERRIDE_GRADES_ENABLED: @context.try(:allow_final_grade_override?),
-        individual_gradebook_enhancements: @context.root_account.feature_enabled?(:individual_gradebook_enhancements)
+        OVERRIDE_GRADES_ENABLED: @context.try(:allow_final_grade_override?)
       )
 
       render html: "", layout: true
@@ -1040,7 +1031,8 @@ class GradebooksController < ApplicationController
 
     return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
 
-    if @context.feature_enabled?(:platform_service_speedgrader) && (params[:platform_sg].nil? || value_to_boolean(params[:platform_sg]))
+    platform_service_speedgrader_enabled = @context.feature_enabled?(:platform_service_speedgrader)
+    if platform_service_speedgrader_enabled && (params[:platform_sg].nil? || value_to_boolean(params[:platform_sg]))
       @page_title = t("SpeedGrader")
       @body_classes << "full-width padless-content"
 
@@ -1050,6 +1042,7 @@ class GradebooksController < ApplicationController
         GRADE_BY_QUESTION_SUPPORTED: nil,
         EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
         EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
+        PLATFORM_SERVICE_SPEEDGRADER_ENABLED: platform_service_speedgrader_enabled,
       }
       js_env(env)
 
@@ -1086,6 +1079,7 @@ class GradebooksController < ApplicationController
         @outer_frame = true
         log_asset_access(["speed_grader", @context], "grades", "other")
         env = {
+          PLATFORM_SERVICE_SPEEDGRADER_ENABLED: platform_service_speedgrader_enabled,
           SINGLE_NQ_SESSION_ENABLED: Account.site_admin.feature_enabled?(:single_new_quiz_session_in_speedgrader),
           NQ_GRADE_BY_QUESTION_ENABLED: Account.site_admin.feature_enabled?(:new_quizzes_grade_by_question_in_speedgrader),
           GRADE_BY_QUESTION: !!@current_user.preferences[:enable_speedgrader_grade_by_question],

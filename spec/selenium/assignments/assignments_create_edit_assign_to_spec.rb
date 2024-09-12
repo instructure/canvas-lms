@@ -599,3 +599,247 @@ describe "assignments show page assign to", :ignore_js_errors do
     end
   end
 end
+
+describe "due date validations", :ignore_js_errors do
+  include_context "in-process server selenium tests"
+  include AssignmentsIndexPage
+  include ItemsAssignToTray
+  include ContextModulesCommon
+  include SelectiveReleaseCommon
+
+  before(:once) do
+    course_with_teacher(active_all: true)
+    @assignment1 = @course.assignments.create(name: "test assignment", submission_types: "online_url")
+    @section1 = @course.course_sections.create!(name: "section1")
+    @student1 = student_in_course(course: @course, active_all: true, name: "Student 1").user
+    @student2 = student_in_course(course: @course, active_all: true, name: "Student 2").user
+  end
+
+  before do
+    user_session(@teacher)
+  end
+
+  context "general due date validations" do
+    it "can fill out due dates and times on card" do
+      AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @assignment1.id)
+      update_due_date(0, "12/31/2022")
+      update_due_time(0, "5:00 PM")
+      update_available_date(0, "12/27/2022")
+      update_available_time(0, "8:00 AM")
+      update_until_date(0, "1/7/2023")
+      update_until_time(0, "9:00 PM")
+
+      expect(assign_to_due_date(0).attribute("value")).to eq("Dec 31, 2022")
+      expect(assign_to_due_time(0).attribute("value")).to eq("5:00 PM")
+      expect(assign_to_available_from_date(0).attribute("value")).to eq("Dec 27, 2022")
+      expect(assign_to_available_from_time(0).attribute("value")).to eq("8:00 AM")
+      expect(assign_to_until_date(0).attribute("value")).to eq("Jan 7, 2023")
+      expect(assign_to_until_time(0).attribute("value")).to eq("9:00 PM")
+    end
+
+    it "does not display an error when user uses other English locale" do
+      AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)
+      @user.update! locale: "en-GB"
+
+      update_due_date(0, "15 April 2024")
+      # Blurs the due date input
+      assign_to_due_time(0).click
+
+      expect(assign_to_date_and_time[0].text).not_to include("Invalid date")
+    end
+
+    it "does not display an error when user uses other language" do
+      AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)
+      @user.update! locale: "es"
+
+      update_due_date(0, "15 de abr. de 2024")
+      # Blurs the due date input
+      assign_to_due_time(0).click
+
+      expect(assign_to_date_and_time[0].text).not_to include("Fecha no válida")
+    end
+
+    it "displays an error when due date is invalid" do
+      AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)
+      update_due_date(0, "wrongdate")
+      # Blurs the due date input
+      assign_to_due_time(0).click
+
+      expect(assign_to_date_and_time[0].text).to include("Invalid date")
+    end
+
+    it "displays an error when the availability date is after the due date" do
+      AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)
+      update_due_date(0, "12/31/2022")
+      update_available_date(0, "1/1/2023")
+
+      expect(assign_to_date_and_time[1].text).to include("Unlock date cannot be after due date")
+    end
+  end
+
+  context "due date validations with term, course, section dates" do
+    it "displays due date errors before term start date" do
+      start_at = 2.months.from_now.to_date
+      @term = Account.default.enrollment_terms.create(name: "Fall", start_at:)
+      @course.update!(enrollment_term: @term, restrict_enrollments_to_course_dates: false)
+      AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)
+
+      long_due_date = 1.month.from_now.to_date
+
+      update_due_date(0, format_date_for_view(long_due_date, "%-m/%-d/%Y"))
+      AssignmentCreateEditPage.save_assignment
+      expect(assign_to_date_and_time[0].text).to include("Due date cannot be before term start")
+    end
+
+    it "displays due date errors past term end date" do
+      end_at = 1.month.from_now.to_date
+      @term = Account.default.enrollment_terms.create(name: "Fall", end_at:)
+      @course.update!(enrollment_term: @term, restrict_enrollments_to_course_dates: false)
+
+      AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)
+
+      long_due_date = 2.months.from_now.to_date
+
+      update_due_date(0, format_date_for_view(long_due_date, "%-m/%-d/%Y"))
+
+      expect(assign_to_date_and_time[0].text).to include("Due date cannot be after term end")
+    end
+
+    it "displays availability errors before term start date" do
+      start_at = 2.months.from_now.to_date
+      @term = Account.default.enrollment_terms.create(name: "Fall", start_at:)
+      @course.update!(enrollment_term: @term, restrict_enrollments_to_course_dates: false)
+
+      AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)
+
+      available_date = 1.month.from_now.to_date
+      update_available_date(0, format_date_for_view(available_date, "%-m/%-d/%Y"))
+      expect(assign_to_date_and_time[1].text).to include("Unlock date cannot be before term start")
+    end
+
+    it "displays lock date errors past term end date" do
+      end_at = 1.month.from_now.to_date
+      @term = Account.default.enrollment_terms.create(name: "Fall", end_at:)
+      @course.update!(enrollment_term: @term, restrict_enrollments_to_course_dates: false)
+
+      AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)
+
+      available_date = 2.months.from_now.to_date
+
+      update_until_date(0, format_date_for_view(available_date, "%-m/%-d/%Y"))
+      expect(assign_to_date_and_time[2].text).to include("Lock date cannot be after term end")
+    end
+
+    it "displays due date errors before course start date" do
+      @course.update!(start_at: 2.months.from_now.to_date, restrict_enrollments_to_course_dates: true)
+
+      AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)
+
+      long_due_date = 1.month.from_now.to_date
+
+      update_due_date(0, format_date_for_view(long_due_date, "%-m/%-d/%Y"))
+
+      expect(assign_to_date_and_time[0].text).to include("Due date cannot be before course start")
+    end
+
+    it "displays due date errors past course end date" do
+      @course.update!(conclude_at: 1.month.from_now.to_date, restrict_enrollments_to_course_dates: true)
+
+      AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)
+
+      long_due_date = 2.months.from_now.to_date
+
+      update_due_date(0, format_date_for_view(long_due_date, "%-m/%-d/%Y"))
+
+      expect(assign_to_date_and_time[0].text).to include("Due date cannot be after course end")
+    end
+
+    it "displays available from date errors before course start date" do
+      @course.update!(start_at: 2.months.from_now.to_date, restrict_enrollments_to_course_dates: true)
+
+      AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)
+
+      available_date = 1.month.from_now.to_date
+      update_available_date(0, format_date_for_view(available_date, "%-m/%-d/%Y"))
+      expect(assign_to_date_and_time[1].text).to include("Unlock date cannot be before course start")
+    end
+
+    it "displays lock date errors past course end date" do
+      @course.update!(conclude_at: 1.month.from_now.to_date, restrict_enrollments_to_course_dates: true)
+
+      AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)
+
+      available_date = 2.months.from_now.to_date
+
+      update_until_date(0, format_date_for_view(available_date, "%-m/%-d/%Y"))
+      expect(assign_to_date_and_time[2].text).to include("Lock date cannot be after course end")
+    end
+
+    it "displays due date errors before section start date" do
+      @section1.update!(start_at: 2.months.from_now.to_date, restrict_enrollments_to_section_dates: true)
+
+      AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)
+
+      select_module_item_assignee(0, @section1.name)
+
+      long_due_date = 1.month.from_now.to_date
+
+      update_due_date(0, format_date_for_view(long_due_date, "%-m/%-d/%Y"))
+
+      expect(assign_to_date_and_time[0].text).to include("Due date cannot be before section start")
+    end
+
+    it "displays due date errors past section end date" do
+      @section1.update!(end_at: 1.month.from_now.to_date, restrict_enrollments_to_section_dates: true)
+
+      AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)
+
+      select_module_item_assignee(0, @section1.name)
+
+      long_due_date = 2.months.from_now.to_date
+
+      update_due_date(0, format_date_for_view(long_due_date, "%-m/%-d/%Y"))
+
+      expect(assign_to_date_and_time[0].text).to include("Due date cannot be after section end")
+    end
+
+    it "displays available from errors before section start date" do
+      @section1.update!(start_at: 2.months.from_now.to_date, restrict_enrollments_to_section_dates: true)
+
+      AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)
+
+      select_module_item_assignee(0, @section1.name)
+
+      available_date = 1.month.from_now.to_date
+      update_available_date(0, format_date_for_view(available_date, "%-m/%-d/%Y"))
+      expect(assign_to_date_and_time[1].text).to include("Unlock date cannot be before section start")
+    end
+
+    it "displays lock date errors past section end date" do
+      @section1.update!(end_at: 1.month.from_now.to_date, restrict_enrollments_to_section_dates: true)
+
+      AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)
+
+      select_module_item_assignee(0, @section1.name)
+
+      available_date = 2.months.from_now.to_date
+
+      update_until_date(0, format_date_for_view(available_date, "%-m/%-d/%Y"))
+      expect(assign_to_date_and_time[2].text).to include("Lock date cannot be after section end")
+    end
+
+    it "allows section due date that is outside of course date range" do
+      @course.update!(start_at: 1.month.from_now.to_date, conclude_at: 2.months.from_now.to_date, restrict_enrollments_to_course_dates: true)
+      @section1.update!(start_at: 2.months.from_now.to_date, end_at: 4.months.from_now.to_date, restrict_enrollments_to_section_dates: true)
+
+      AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)
+
+      select_module_item_assignee(0, @section1.name)
+
+      section_due_date = 3.months.from_now.to_date
+      update_due_date(0, format_date_for_view(section_due_date, "%-m/%-d/%Y"))
+
+      expect(assign_to_date_and_time[0].text).not_to include("Due date cannot be before course start")
+    end
+  end
+end

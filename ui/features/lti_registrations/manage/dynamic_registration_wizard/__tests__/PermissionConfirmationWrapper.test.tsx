@@ -21,8 +21,8 @@ import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {PermissionConfirmationWrapper} from '../components/PermissionConfirmationWrapper'
 import {mockRegistration} from './helpers'
-import {LtiScopes} from '../../model/LtiScope'
-import {i18nLtiScope} from '../../model/i18nLtiScope'
+import {LtiScopes} from '@canvas/lti/model/LtiScope'
+import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
 import {createRegistrationOverlayStore} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
 
 describe('PermissionConfirmationWrapper', () => {

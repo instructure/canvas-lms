@@ -25,7 +25,7 @@ import {Text} from '@instructure/ui-text'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 
-const {licorice, tiara} = colors
+const {shamrock, tiara} = colors
 type RatingButtonProps = {
   buttonDisplay: string
   isPreviewMode: boolean
@@ -40,7 +40,7 @@ export const RatingButton = ({
   selectedArrowDirection,
   onClick,
 }: RatingButtonProps) => {
-  const unselectedColor = isPreviewMode ? tiara : licorice
+  const unselectedColor = isPreviewMode ? tiara : shamrock
   const selectedText = isSelected ? I18n.t('Selected') : ''
 
   return (
@@ -66,8 +66,8 @@ export const RatingButton = ({
           themeOverride={{
             largeFontSize: '1rem',
             borderWidth: isSelected ? '3px' : '1px',
-            primaryInverseBorderColor: isSelected ? licorice : 'rgb(219, 219, 219)',
-            primaryInverseColor: isSelected ? licorice : unselectedColor,
+            primaryInverseBorderColor: isSelected ? shamrock : 'rgb(219, 219, 219)',
+            primaryInverseColor: isSelected ? shamrock : unselectedColor,
           }}
         >
           <Text size="medium">{buttonDisplay}</Text>
@@ -99,7 +99,7 @@ const SelectedRatingArrow = ({direction}: SelectedRatingArrowProps) => {
     outerTriangleStyle.right = '0px'
     outerTriangleStyle.borderTop = '6px solid transparent'
     outerTriangleStyle.borderBottom = '6px solid transparent'
-    outerTriangleStyle.borderLeft = `6px solid ${licorice}`
+    outerTriangleStyle.borderLeft = `6px solid ${shamrock}`
     outerTriangleStyle.transform = 'translateY(-50%)'
     innerTriangleSmallStyle.top = '50%'
     innerTriangleSmallStyle.right = '4px'
@@ -112,7 +112,7 @@ const SelectedRatingArrow = ({direction}: SelectedRatingArrowProps) => {
     outerTriangleStyle.top = '-5px'
     outerTriangleStyle.borderLeft = '6px solid transparent'
     outerTriangleStyle.borderRight = '6px solid transparent'
-    outerTriangleStyle.borderBottom = `6px solid ${licorice}`
+    outerTriangleStyle.borderBottom = `6px solid ${shamrock}`
     outerTriangleStyle.transform = 'translateX(-50%)'
     innerTriangleSmallStyle.left = '46%'
     innerTriangleSmallStyle.top = '-1px'

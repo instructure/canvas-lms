@@ -93,7 +93,7 @@ pipeline {
               }
             }
 
-            extendedStage('Runner - Packages').hooks(stageHooks).nodeRequirements(label: nodeLabel(), podTemplate: jsStage.packagesNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {
+            extendedStage('Runner - Packages').hooks(stageHooks).nodeRequirements(label: nodeLabel(), podTemplate: jsStage.packagesNodeRequirementsTemplate()).obeysAllowStages(false).timeout(12).queue(runnerStages) {
               def tests = [:]
 
               callableWithDelegate(jsStage.queuePackagesDistribution())(tests)

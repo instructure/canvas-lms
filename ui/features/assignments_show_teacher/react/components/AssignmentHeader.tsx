@@ -16,22 +16,138 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState, useRef} from 'react'
 import {Heading} from '@instructure/ui-heading'
 import type {TeacherAssignmentType} from '../../graphql/AssignmentTeacherTypes'
+import AssignmentPublishButton from './AssignmentPublishButton'
+import {Pill} from '@instructure/ui-pill'
+import {useScope as useI18nScope} from '@canvas/i18n'
+import {
+  IconPublishSolid,
+  IconEditLine,
+  IconUserLine,
+  IconSpeedGraderLine,
+} from '@instructure/ui-icons'
+import WithBreakpoints, {type Breakpoints} from '@canvas/with-breakpoints'
+import {Button} from '@instructure/ui-buttons'
+import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
+
+const I18n = useI18nScope('assignment_teacher_header')
 
 interface HeaderProps {
   assignment: TeacherAssignmentType
+  breakpoints: Breakpoints
 }
 
 const AssignmentHeader: React.FC<HeaderProps> = props => {
+  const isMobile = props.breakpoints.mobileOnly
+  const [assignToTray, setAssignToTray] = useState(false)
+  const returnFocusTo = useRef(null)
+  const speedgraderLink = `/courses/${props.assignment.course.lid}/gradebook/speed_grader?assignment_id=${props.assignment.lid}`
+  const editLink = `/courses/${props.assignment.course.lid}/assignments/${props.assignment.lid}/edit`
+
   return (
-    <div id="assignments-2-teacher-header">
-      <Heading data-testid="assignment-name" level="h1">
-        {props.assignment?.name}
-      </Heading>
-    </div>
+    <Flex alignItems="start" direction="column" width="100%">
+      <Flex
+        direction={isMobile ? 'column' : 'row'}
+        alignItems={isMobile ? 'center' : 'start'}
+        width="100%"
+        justifyItems="space-between"
+        id="assignments-2-teacher-header"
+      >
+        <Flex
+          direction="column"
+          width={!isMobile ? '40%' : '100%'}
+          alignItems={isMobile ? 'center' : 'start'}
+        >
+          <Heading data-testid="assignment-name" level="h1">
+            {props.assignment.name}
+          </Heading>
+          <Flex id="submission-status">
+            {props.assignment.hasSubmittedSubmissions && (
+              <Pill
+                statusLabel={I18n.t('Status')}
+                renderIcon={<IconPublishSolid />}
+                color="success"
+                margin="x-small none"
+                data-testid="assignment-status-pill"
+              >
+                <Text>{I18n.t('Published')}</Text>
+              </Pill>
+            )}
+          </Flex>
+        </Flex>
+        <View
+          display={isMobile ? 'block' : 'flex'}
+          margin={isMobile ? 'large none' : 'none'}
+          width={isMobile ? '100%' : 'auto'}
+          id="header-buttons"
+        >
+          {!props.assignment.hasSubmittedSubmissions && (
+            <AssignmentPublishButton
+              isPublished={props.assignment.state === 'published'}
+              assignmentLid={props.assignment.lid}
+              breakpoints={props.breakpoints}
+            />
+          )}
+          {!isMobile && (
+            <>
+              <Button
+                data-testid="edit-button"
+                href={editLink}
+                renderIcon={<IconEditLine />}
+                margin="none none none medium"
+              >
+                <Text>{I18n.t('Edit')}</Text>
+              </Button>
+              <Button
+                data-testid="assign-to-button"
+                ref={returnFocusTo}
+                onClick={() => setAssignToTray(true)}
+                renderIcon={<IconUserLine />}
+                margin="none none none medium"
+              >
+                <Text>{I18n.t('Assign To')}</Text>
+              </Button>
+              {props.assignment.state === 'published' && (
+                <Button
+                  data-testid="speedgrader-button"
+                  href={speedgraderLink}
+                  target="_blank"
+                  renderIcon={<IconSpeedGraderLine />}
+                  margin="none none none medium"
+                >
+                  <Text>{I18n.t('SpeedGrader')}</Text>
+                </Button>
+              )}
+            </>
+          )}
+        </View>
+      </Flex>
+
+      <ItemAssignToTray
+        open={assignToTray}
+        onClose={() => setAssignToTray(false)}
+        onDismiss={() => {
+          setAssignToTray(false)
+          if (returnFocusTo.current) {
+            returnFocusTo.current.focus()
+          }
+        }}
+        itemType="assignment"
+        iconType="assignment"
+        locale={ENV.LOCALE || 'env'}
+        timezone={ENV.TIMEZONE || 'UTC'}
+        courseId={props.assignment.course.lid}
+        itemName={props.assignment.name}
+        itemContentId={props.assignment.lid}
+        pointsPossible={props.assignment.pointsPossible as number}
+      />
+    </Flex>
   )
 }
 
-export default AssignmentHeader
+export default WithBreakpoints(AssignmentHeader)

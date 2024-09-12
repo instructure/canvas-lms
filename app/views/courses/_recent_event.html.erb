@@ -21,26 +21,34 @@
 <%
   recent_event ||= nil
   show_context ||= false
-  is_assignment = recent_event.is_a?(Assignment)
+  is_sub_assignment = recent_event.is_a?(SubAssignment)
+  is_assignment_or_sub_assignment = recent_event.is_a?(Assignment) || is_sub_assignment
   is_calendar_event = recent_event.is_a?(CalendarEvent)
-  if is_assignment
+  if is_assignment_or_sub_assignment
     if @current_user_submissions
       submission = @current_user_submissions.detect { |s| s.assignment_id == recent_event.id }
       submission.assignment = recent_event if submission
     elsif @current_user
       submission = @current_user.submissions.select([:id, :assignment_id, :grading_period_id, :score, :grade, :workflow_state, :updated_at]).where(:assignment_id => recent_event).first
     end
-
-    if is_assignment
-      recent_event = recent_event.overridden_for(@current_user)
-    end
+    recent_event = recent_event.overridden_for(@current_user)
+  end
+  if is_sub_assignment
+    num_replies = recent_event&.parent_assignment&.discussion_topic&.reply_to_entry_required_count || 1
+    title = if recent_event.sub_assignment_tag == 'reply_to_topic'
+              t('%{title} Reply to Topic', {title: recent_event.title})
+            else
+              t('%{title} Required Replies (%{num_replies})', {title: recent_event.title, num_replies: num_replies})
+            end
+  else
+    title = recent_event.title
   end
 
   cache([ 'recent_event_render3',
           @current_user&.course_nickname_hash,
           submission || 'no_submission',
           recent_event || 'blank_event',
-          (recent_event.due_at if is_assignment),
+          (recent_event.due_at if is_assignment_or_sub_assignment),
           Time.zone.today,
           Time.zone.name,
           recent_event.context.grants_right?(@current_user, :manage_grades),
@@ -67,12 +75,12 @@
   >
     <i class="<%= icon_class %>" aria-label="<%= icon_aria_label %>"></i>
     <div class="event-details">
-      <b class="event-details__title"><%= recent_event.title %></b>
+      <b class="event-details__title"><%= title %></b>
       <% if show_context %>
         <p><%= context.nickname_for(@current_user, :short_name) %></p>
       <% end %>
       <p>
-        <% if is_assignment %>
+        <% if is_assignment_or_sub_assignment %>
           <% if submission && readable_grade(submission) && !recent_event.muted? %>
             <%= readable_grade(submission) %>
             &bullet;

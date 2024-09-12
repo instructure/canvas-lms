@@ -72,7 +72,7 @@
 #
 class MediaObjectsController < ApplicationController
   include Api::V1::MediaObject
-  include FilesHelper
+  include AttachmentHelper
 
   MISSED_MEDIA_ADDITIONAL_COST = 200
 

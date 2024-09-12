@@ -489,7 +489,6 @@ module Lti::IMS
         end
 
         it "rejects invalid placement names in the disabledPlacements array" do
-          pending("INTEROP-8538, create a schema that rejects invalid names for disabledPlacements")
           expect(registration.valid?).to be true # ensure that we aren't invalid for other reasons
           # disabledPlacements array should have non-prefixed placement names
           registration.registration_overlay["disabledPlacements"] = ["https://canvas.instructure.com/lti/course_navigation"]

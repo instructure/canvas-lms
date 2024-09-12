@@ -21,7 +21,7 @@ import {render, screen} from '@testing-library/react'
 import {mockRegistration} from './helpers'
 import {createRegistrationOverlayStore} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
 import {PrivacyConfirmationWrapper} from '../components/PrivacyConfirmationWrapper'
-import {LtiScopes} from '../../model/LtiScope'
+import {LtiScopes} from '@canvas/lti/model/LtiScope'
 import {i18nLtiPrivacyLevel, i18nLtiPrivacyLevelDescription} from '../../model/i18nLtiPrivacyLevel'
 import userEvent from '@testing-library/user-event'
 

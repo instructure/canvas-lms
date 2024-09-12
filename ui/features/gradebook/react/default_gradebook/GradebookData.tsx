@@ -172,9 +172,7 @@ export default function GradebookData(props: Props) {
     if (gradingPeriodSet) {
       // eslint-disable-next-line promise/catch-or-return
       fetchGradingPeriodAssignments().then(() => {
-        if (currentGradingPeriodId !== '0') {
-          loadAssignmentGroups(props.gradebookEnv.hide_zero_point_quizzes, currentGradingPeriodId)
-        }
+        loadAssignmentGroups(props.gradebookEnv.hide_zero_point_quizzes, currentGradingPeriodId)
       })
     } else {
       loadAssignmentGroups(props.gradebookEnv.hide_zero_point_quizzes)

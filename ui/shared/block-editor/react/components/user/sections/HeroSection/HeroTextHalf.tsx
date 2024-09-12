@@ -47,7 +47,12 @@ const HeroTextHalf = ({
   return (
     <Container className="hero-section__text" id={id}>
       <Element id={`${id}__no-section`} is={NoSections} canvas={true} className="text-half__inner">
-        <ImageBlock src="/images/block_editor/canvas_logo_black.svg" width={113} height={28} />
+        <ImageBlock
+          src="/images/block_editor/canvas_logo_black.svg"
+          width={113}
+          height={28}
+          sizeVariant="fixed"
+        />
         <Element
           id={`${id}__title`}
           is={HeadingBlock}

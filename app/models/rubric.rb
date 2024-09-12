@@ -588,4 +588,8 @@ class Rubric < ActiveRecord::Base
 
     Assignment.where(id: associations.pluck(:association_id))
   end
+
+  def self.enhanced_rubrics_assignments_enabled?(context_to_check)
+    context_to_check.feature_enabled?(:enhanced_rubrics_assignments) && context_to_check.feature_enabled?(:enhanced_rubrics)
+  end
 end

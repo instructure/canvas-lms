@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import type {LtiPlacement} from '../../model/LtiPlacements'
-import type {LtiMessage, LtiRegistration} from '../../model/LtiRegistration'
+import type {LtiRegistration} from '../../model/LtiRegistration'
 import createStore from 'zustand/vanilla'
-import type {LtiScope} from '../../model/LtiScopes'
+import type {LtiScope} from '@canvas/lti/model/LtiScope'
 import {subscribeWithSelector} from 'zustand/middleware'
 import type {LtiPrivacyLevel} from 'features/developer_keys_v2/model/LtiPrivacyLevel'
 import type {

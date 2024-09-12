@@ -97,7 +97,7 @@ class DiscussionTopic
         current_level = prefix.empty? ? level.to_s : "#{prefix}.#{level}"
 
         xml.entry(user: user_identifier, index: current_level) do
-          xml.text! entry.message || ""
+          xml.text! anonymize_mentions(entry.message || "", anonymized_user_ids)
         end
 
         xml << parts_for_summary(entry.id, entries_for_parent_id, anonymized_user_ids, current_level, 1)
@@ -106,6 +106,13 @@ class DiscussionTopic
       end
 
       xml.target!
+    end
+
+    def anonymize_mentions(content, anonymized_user_ids)
+      content.gsub(%r{<span class="mceNonEditable mention" data-mention="(\d+)".*?>.*?</span>}) do
+        user_id = $1.to_i
+        "@#{anonymized_user_ids[user_id] || "unknown"}"
+      end
     end
   end
 end

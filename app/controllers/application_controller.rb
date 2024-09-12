@@ -373,7 +373,6 @@ class ApplicationController < ActionController::Base
     instui_for_import_page
     multiselect_gradebook_filters
     assignment_edit_placement_not_on_announcements
-    platform_service_speedgrader
     instui_header
     rce_find_replace
     courses_popout_sisid

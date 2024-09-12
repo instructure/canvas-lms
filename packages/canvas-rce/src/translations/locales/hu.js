@@ -998,6 +998,7 @@ const locale = {
   },
   "styles_2aa721ef": { "message": "Stílusok" },
   "submit_a3cc6859": { "message": "Beküldés" },
+  "submitting_b90fac62": { "message": "Beküldés..." },
   "subscript_59744f96": { "message": "alsó index" },
   "subset_19c1a92f": { "message": "Részhalmaz" },
   "subset_strict_8d8948d6": { "message": "részhalmaz (szigorú)" },

@@ -24,7 +24,14 @@ import {IconDiscussionCheckLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Checkpoint} from '../../../graphql/Checkpoint'
 import {Submission} from '../../../graphql/Submission'
-import {REPLY_TO_TOPIC, REPLY_TO_ENTRY, SUBMITTED, MISSING, LATE} from '../../utils/constants'
+import {
+  REPLY_TO_TOPIC,
+  REPLY_TO_ENTRY,
+  SUBMITTED,
+  RESUMBITTED,
+  MISSING,
+  LATE,
+} from '../../utils/constants'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
@@ -46,7 +53,7 @@ export function CheckpointsTray({...props}) {
   )
 
   const renderSubmissionStatus = (submission = {}) => {
-    if (submission.submissionStatus === SUBMITTED) {
+    if (submission.submissionStatus === SUBMITTED || submission.submissionStatus === RESUMBITTED) {
       return (
         <Flex.Item align="start">
           <Text size="small" color="success" weight="bold">

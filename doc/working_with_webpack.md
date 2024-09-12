@@ -125,7 +125,7 @@ it can work against the es6 source and not the compiled output.
 
 [X] load up canvas w/ optimized js and RAILS_LOAD_ALL_LOCALES=1, switch your locale and ensure you see translations
 
-[ ] extract duplicated loader code from i18nLinerHandlebars and emberHandlebars
+[ ] extract duplicated loader code from i18nLinerHandlebars
 
 [ ] in a separate commit extract i18nLinerHandlebars loader function and what
 it duplicates from prepare_hbs to a function both can use.

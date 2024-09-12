@@ -18,7 +18,7 @@
 
 import type {LtiPlacement} from '../LtiPlacements'
 import type {LtiPrivacyLevel} from '../LtiPrivacyLevel'
-import type {LtiScope} from '../LtiScopes'
+import type {LtiScope} from '@canvas/lti/model/LtiScope'
 
 /// @see lib/schemas/lti/tool_configuration.rb
 export interface LtiToolConfiguration {

@@ -530,3 +530,7 @@ export function disableGrading(
     (assignment.moderatedGrading && !assignment.gradesPublished)
   )
 }
+
+export function assignmentHasCheckpoints(assignment: AssignmentConnection): boolean {
+  return assignment?.checkpoints?.length > 0
+}

@@ -118,6 +118,39 @@ describe FeatureFlag do
     end
   end
 
+  describe "#clear_cache" do
+    specs_require_cache(:redis_cache_store)
+
+    context "with sharding" do
+      specs_require_sharding
+
+      before do
+        allow(Feature).to receive(:definitions).and_return(
+          { "high_contrast" => Feature.new(feature: "high_contrast", applies_to: "User") }
+        )
+        @acting_user = user_model
+        @acting_user.associate_with_shard(@shard1)
+        @shard1.activate do
+          @flag = @acting_user.feature_flags.build(feature: "high_contrast", state: "off")
+          @flag.current_user = @acting_user
+          @flag.save!
+        end
+      end
+
+      it "deletes the feature flag cache using the context's shard prefix" do
+        context = @acting_user
+        redis = context.feature_flag_cache
+        cache_key = context.feature_flag_cache_key("high_contrast")
+        @shard1.activate do
+          allow(redis).to receive(:delete)
+          @flag.update!(state: "on")
+          expect(redis).to have_received(:delete).with(cache_key)
+          expect(context.prefers_high_contrast?).to be_truthy
+        end
+      end
+    end
+  end
+
   describe "audit log" do
     let_once(:acting_user) { user_model }
 

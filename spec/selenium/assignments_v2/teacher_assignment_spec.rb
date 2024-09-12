@@ -34,13 +34,14 @@ describe "as a teacher" do
       @teacher = teacher_in_course(name: "teacher", course: @course, enrollment_state: :active).user
     end
 
-    context "assignment details" do
+    context "assignment header" do
       before(:once) do
         @assignment = @course.assignments.create!(
           name: "assignment",
           due_at: 5.days.ago,
           points_possible: 10,
-          submission_types: "online_text_entry"
+          submission_types: "online_text_entry",
+          workflow_state: "published"
         )
       end
 
@@ -52,6 +53,73 @@ describe "as a teacher" do
 
       it "shows assignment title" do
         expect(TeacherViewPageV2.assignment_title(@assignment.title)).to_not be_nil
+      end
+
+      it "shows publish button" do
+        expect(TeacherViewPageV2.publish_button).to be_displayed
+      end
+
+      it "shows publish status" do
+        expect(TeacherViewPageV2.publish_status(@assignment.workflow_state)).to_not be_nil
+      end
+
+      it "shows edit button" do
+        expect(TeacherViewPageV2.edit_button).to be_displayed
+      end
+
+      it "shows assign to button" do
+        expect(TeacherViewPageV2.assign_to_button).to be_displayed
+      end
+
+      it "shows speedgrader button" do
+        expect(TeacherViewPageV2.speedgrader_button).to be_displayed
+      end
+
+      it "redirects to edit assignment page when the edit button is clicked" do
+        TeacherViewPageV2.edit_button.click
+        expect(driver.current_url).to include(
+          "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+        )
+      end
+
+      it "redirects to speedgrader page when the speedgrader button is clicked" do
+        first_window = driver.window_handle
+        TeacherViewPageV2.speedgrader_button.click
+        new_window = (driver.window_handles - [first_window]).first
+        driver.switch_to.window(new_window)
+        expect(driver.current_url).to include(
+          "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+        )
+        driver.close
+        driver.switch_to.window(first_window)
+      end
+
+      it "shows assign to tray when assign to button is clicked" do
+        TeacherViewPageV2.assign_to_button.click
+        expect(TeacherViewPageV2.assign_to_tray).to be_displayed
+      end
+    end
+
+    context "submitted assignments" do
+      before(:once) do
+        @assignment = @course.assignments.create!(
+          name: "assignment",
+          due_at: 5.days.ago,
+          points_possible: 10,
+          submission_types: "online_upload"
+        )
+        @file_attachment = attachment_model(content_type: "application/pdf", context: @student)
+        @assignment.submit_homework(@student, submission_type: "online_upload", attachments: [@file_attachment])
+      end
+
+      before do
+        user_session(@teacher)
+        TeacherViewPageV2.visit(@course, @assignment)
+        wait_for_ajaximations
+      end
+
+      it "shows status pill when an assignment has recieved submissions" do
+        expect(TeacherViewPageV2.status_pill).to be_displayed
       end
     end
   end

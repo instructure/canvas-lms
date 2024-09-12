@@ -258,6 +258,7 @@ class User < ActiveRecord::Base
            class_name: "Lti::RegistrationAccountBinding",
            foreign_key: :updated_by_id,
            inverse_of: :updated_by
+  has_many :lti_overlays, class_name: "Lti::Overlay", foreign_key: :updated_by_id, inverse_of: :updated_by
 
   has_many :comment_bank_items, -> { where("workflow_state<>'deleted'") }
   has_many :microsoft_sync_partial_sync_changes, class_name: "MicrosoftSync::PartialSyncChange", dependent: :destroy, inverse_of: :user
@@ -1586,20 +1587,23 @@ class User < ActiveRecord::Base
   def avatar_image=(val)
     return if avatar_state == :locked
 
-    # Clear out the old avatar first, in case of failure to get new avatar.
-    # The order of these attributes is standard throughout the method.
-    self.avatar_image_source = "no_pic"
-    self.avatar_image_url = nil
-    self.avatar_image_updated_at = Time.zone.now
-    self.avatar_state = "approved"
+    external_avatar_url_patterns = Setting.get("avatar_external_url_patterns", "^https://[a-zA-Z0-9.-]+\\.instructure\\.com/").split(",").map { |re| Regexp.new re }
+    blank_avatar = { avatar_image_source: "no_pic", avatar_image_url: nil, avatar_state: "approved" }
 
     # Return here if we're passed a nil val or any non-hash val (both of which
     # will just nil the user's avatar).
-    return unless val.is_a?(Hash)
+    unless val.is_a?(Hash)
+      assign_attributes(blank_avatar)
+      return
+    end
 
-    external_avatar_url_patterns = Setting.get("avatar_external_url_patterns", "^https://[a-zA-Z0-9.-]+\\.instructure\\.com/").split(",").map { |re| Regexp.new re }
+    only_includes_state = val["url"].blank? && val["type"].blank? && val["state"].present?
 
-    if val["url"]&.match?(GRAVATAR_PATTERN)
+    self.avatar_image_updated_at = Time.zone.now
+
+    if only_includes_state
+      self.avatar_state = val["state"]
+    elsif val["url"]&.match?(GRAVATAR_PATTERN)
       self.avatar_image_source = "gravatar"
       self.avatar_image_url = val["url"]
       self.avatar_state = "submitted"
@@ -1611,6 +1615,8 @@ class User < ActiveRecord::Base
       self.avatar_image_source = "external"
       self.avatar_image_url = val["url"]
       self.avatar_state = "submitted"
+    else
+      assign_attributes(blank_avatar)
     end
   end
 
@@ -2525,6 +2531,23 @@ class User < ActiveRecord::Base
       events += select_available_assignments(
         select_upcoming_assignments(assignments.map { |a| a.overridden_for(self) }, opts.merge(time: now))
       )
+    end
+
+    if opts[:include_sub_assignments]
+      sub_assignments = SubAssignment.published
+                                     .for_context_codes(context_codes)
+                                     .due_between_with_overrides(now, opts[:end_at])
+                                     .include_submitted_count.to_a
+
+      if sub_assignments.any?
+        if AssignmentOverrideApplicator.should_preload_override_students?(sub_assignments, self, "upcoming_events")
+          AssignmentOverrideApplicator.preload_assignment_override_students(sub_assignments, self)
+        end
+
+        events += select_available_assignments(
+          select_upcoming_assignments(sub_assignments.map { |a| a.overridden_for(self) }, opts.merge(time: now))
+        )
+      end
     end
 
     sorted_events = events.sort_by do |e|

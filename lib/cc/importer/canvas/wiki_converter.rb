@@ -52,6 +52,8 @@ module CC::Importer::Canvas
       wiki[:assignment] = nil
       wiki[:todo_date] = meta["todo_date"]
       wiki[:publish_at] = meta["publish_at"]
+      wiki[:unlock_at] = meta["unlock_at"]
+      wiki[:lock_at] = meta["lock_at"]
       if (asg_id = meta["assignment_identifier"])
         wiki[:assignment] = {
           migration_id: asg_id,

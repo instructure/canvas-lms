@@ -29,7 +29,7 @@ module CoursesHelper
     show_assignment_type_icon = opts[:show_assignment_type_icon]
 
     return [nil, "Quiz", "icon-quiz"] if recent_event.is_a?(Quizzes::Quiz)
-    return [nil, "Event", "icon-calendar-day"] unless recent_event.is_a?(Assignment)
+    return [nil, "Event", "icon-calendar-day"] unless recent_event.is_a?(Assignment) || recent_event.is_a?(SubAssignment)
 
     event_type = ["Assignment", "icon-assignment"]
     event_type = ["Quiz", "icon-quiz"] if recent_event.submission_types == "online_quiz"
@@ -78,6 +78,8 @@ module CoursesHelper
     context = recent_event.context
     if recent_event.is_a?(Assignment)
       context_url(context, :context_assignment_url, id: recent_event.id)
+    elsif recent_event.is_a?(SubAssignment)
+      context_url(context, :context_assignment_url, id: recent_event.parent_assignment_id)
     else
       calendar_url_for(nil, {
                          query: { month: recent_event.start_at.month, year: recent_event.start_at.year },

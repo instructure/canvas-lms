@@ -98,8 +98,6 @@ Rails:
   Exclude:
     - "bin/**/*"
     - "gems/google_drive/**/*"
-Rails/ActionControllerFlashBeforeRender:
-  AutoCorrect: false # auto-correct just changes it to `flash.now`, when that may not be appropriate
 Rails/ApplicationRecord:
   Enabled: false # we never bothered creating an ApplicationRecord
 Rails/Blank:
@@ -262,6 +260,9 @@ Naming/VariableName:
 Naming/VariableNumber:
   Enabled: false
 
+Rails/ActionControllerFlashBeforeRender:
+  Severity: convention
+  AutoCorrect: false
 Rails/ActionOrder:
   Severity: convention
   AutoCorrect: false

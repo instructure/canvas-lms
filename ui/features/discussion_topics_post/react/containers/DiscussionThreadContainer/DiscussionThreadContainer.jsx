@@ -362,12 +362,13 @@ export const DiscussionThreadContainer = props => {
       !props.discussionEntry.entryParticipant?.read &&
       !props.discussionEntry?.entryParticipant?.forcedReadState
     ) {
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
       const observer = new IntersectionObserver(
-        ([entry]) => entry.isIntersecting && updateReadState(props.discussionEntry),
+        ([entry]) => (entry.isIntersecting || entry.intersectionRatio > viewportHeight * 0.4) && updateReadState(props.discussionEntry),
         {
           root: null,
           rootMargin: '0px',
-          threshold: 0.4,
+          threshold: 0.0,
         }
       )
 

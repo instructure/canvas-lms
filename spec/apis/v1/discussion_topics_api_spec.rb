@@ -1115,6 +1115,37 @@ describe DiscussionTopicsController, type: :request do
           expect(json[0]["is_section_specific"]).to be(true)
         end
 
+        it "student in section should be able to get the announcement details" do
+          json = api_call_as_user(@student1,
+                                  :get,
+                                  "/api/v1/courses/#{@course.id}/discussion_topics/#{@announcement.id}",
+                                  {
+                                    controller: "discussion_topics_api",
+                                    action: "show",
+                                    format: "json",
+                                    course_id: @course.id,
+                                    topic_id: @announcement.id,
+                                  })
+
+          expect(json["id"]).to eq(@announcement.id)
+        end
+
+        it "student not in section should not be able to get the announcement details" do
+          api_call_as_user(@student2,
+                           :get,
+                           "/api/v1/courses/#{@course.id}/discussion_topics/#{@announcement.id}",
+                           {
+                             controller: "discussion_topics_api",
+                             action: "show",
+                             format: "json",
+                             course_id: @course.id,
+                             topic_id: @announcement.id,
+                           },
+                           {},
+                           {},
+                           { expected_status: 401 })
+        end
+
         it "student not in section should not be able to see section specific announcements" do
           json = api_call_as_user(@student2,
                                   :get,
@@ -3391,7 +3422,7 @@ describe DiscussionTopicsController, type: :request do
 
     def call_mark_all_as_read_state(new_state, opts = {})
       method = (new_state == "read") ? :put : :delete
-      url = +"/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read_all.json"
+      url = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read_all.json"
       expected_params = { controller: "discussion_topics_api",
                           action: "mark_all_#{new_state}",
                           format: "json",

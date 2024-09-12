@@ -698,7 +698,7 @@ object for placement-specific target_link_uri's.</p>
 
       <td class="param-desc">
 
-        <p>Allows role-based access control based on the built-in Canvas user roles AND the custom roles that you may have created in Canvas. This parameter can be a comma-separated string of one or more required permissions. As expected, if "required_permissions" is included in the configuration, the user will need to have a role with the permissions listed (or all the permissions listed, if multiple) to access the tool. To learn more about roles and permissions, and to see the permissions available for this parameter visit the <a href="roles.html" target="blank">Roles API docs</a>.
+        <p>Limits tool visibility to users with certain permissions, as defined on the user's built-in Canvas user roles AND the custom roles that you may have created in Canvas. This is a comma-separated string of one or more required permissions, such as <code>manage_groups_add,manage_groups_delete</code> or <code>read_outcomes</code>. The tool will be hidden for users without all specified permissons. If set in placement-specific settings, that placement will be hidden; if set at the tool-level (e.g. under <code>extensions[0]</code>), each of the tool's placements will be hidden. For true access control, please use (instead or in addition) the <a href="file.tools_variable_substitutions.html#Canvas-membership-permissions">Canvas.membership.permissions&lt;&gt;</a> custom variable expansion, and check its value in your tool. To learn more about roles and permissions, and to see the permissions available for this parameter, visit the <a href="roles.html" target="blank">Roles API docs</a>.
         </p>
 
 

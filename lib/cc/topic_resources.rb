@@ -136,10 +136,32 @@ module CC
         assignment_migration_id = create_key(topic.assignment)
         doc.assignment(identifier: assignment_migration_id) do |a|
           AssignmentResources.create_canvas_assignment(a, topic.assignment, @manifest)
+          create_sub_assignments(doc, topic) if discussion_checkpoints?(topic)
         end
       end
       doc.anonymous_state topic.anonymous_state unless topic.anonymous_state.nil?
       doc.is_anonymous_author "true" if topic.is_anonymous_author
+      if discussion_checkpoints?(topic) && topic.reply_to_entry_required_count
+        doc.reply_to_entry_required_count topic.reply_to_entry_required_count
+      end
+    end
+
+    def create_sub_assignments(doc, topic)
+      unless topic.sub_assignments.empty?
+        doc.sub_assignments do
+          topic.sub_assignments.each do |sub_assignment|
+            identifier = create_key(sub_assignment)
+            tag = sub_assignment.sub_assignment_tag
+            doc.sub_assignment(identifier:, tag:) do |sub_assignment_doc|
+              AssignmentResources.create_canvas_assignment(sub_assignment_doc, sub_assignment, @manifest)
+            end
+          end
+        end
+      end
+    end
+
+    def discussion_checkpoints?(topic)
+      @course.root_account.feature_enabled?(:discussion_checkpoints) && topic&.assignment&.has_sub_assignments
     end
   end
 end

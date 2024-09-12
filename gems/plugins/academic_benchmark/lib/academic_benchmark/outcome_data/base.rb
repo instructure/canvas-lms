@@ -19,8 +19,26 @@
 
 module AcademicBenchmark::OutcomeData
   class Base
+    Options = Struct.new(:authority,
+                         :publication,
+                         :partner_id,
+                         :partner_key,
+                         :converter_class,
+                         :document,
+                         :import_immediately,
+                         :migration_type,
+                         :archive_file,
+                         :no_archive_file,
+                         :skip_import_notification,
+                         :skip_job_progress,
+                         :content_migration,
+                         :content_migration_id,
+                         :user_id,
+                         :migration_options,
+                         keyword_init: true)
+
     def initialize(options = {})
-      @options = OpenStruct.new(options)
+      @options = Options.new(**options)
     end
   end
 end

@@ -114,6 +114,7 @@ export const TEACHER_QUERY = gql`
         }
         ...AssignmentOverrides
       }
+      hasSubmittedSubmissions
       submissions: submissionsConnection(
         filter: {states: [submitted, unsubmitted, graded, ungraded, pending_review]}
       ) {

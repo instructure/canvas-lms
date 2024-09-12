@@ -19,7 +19,7 @@
 
 import axios from '@canvas/axios'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {LtiScope} from 'features/developer_keys_v2/model/LtiScopes'
+import {LtiScope} from '@canvas/lti/model/LtiScope'
 import $ from 'jquery'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
 import {AnyAction, Dispatch} from 'redux'

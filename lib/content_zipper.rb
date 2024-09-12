@@ -168,8 +168,8 @@ class ContentZipper
       Zip::File.open(zip_name, Zip::File::CREATE) do |zipfile|
         update_progress(zip_attachment, index, count)
         portfolio_entries.each do |entry|
-          filename = "#{entry.full_slug}.html"
-          filename = Attachment.shorten_filename(filename) if filename.length > MAX_FILENAME_LENGTH
+          # if filename > 180 characters (allows 75 character buffer for the unique slug)
+          filename = Attachment.shorten_filename(entry.full_slug.concat(".html"))
           content = render_eportfolio_page_content(entry, portfolio, all_attachments, submissions_hash)
           zipfile.get_output_stream(filename) { |f| f.puts content }
         end
@@ -316,11 +316,12 @@ class ContentZipper
   def add_attachment_to_zip(attachment, zipfile, filename = nil)
     filename ||= attachment.filename
 
+    @files_in_zip ||= Set.new
+    # if filename > 180 characters (allows 75 character buffer for the unique filename)
+    filename = Attachment.shorten_filename(filename)
     # we allow duplicate filenames in the same folder. it's a bit silly, but we
     # have to handle it here or people might not get all their files zipped up.
-    @files_in_zip ||= Set.new
     filename = Attachment.make_unique_filename(filename, @files_in_zip)
-    filename = Attachment.shorten_filename(filename) if filename.length > MAX_FILENAME_LENGTH
     @files_in_zip << filename
 
     handle = nil

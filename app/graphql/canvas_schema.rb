@@ -22,6 +22,7 @@ class CanvasSchema < GraphQL::Schema
   query Types::QueryType
   mutation Types::MutationType
   trace_with GraphQL::Tracing::CallLegacyTracers
+  trace_with GraphQL::Tracing::SentryTrace
 
   use GraphQL::Batch
 
@@ -124,4 +125,7 @@ class CanvasSchema < GraphQL::Schema
       query Types::QueryType
     end
   end
+
+  # graphiql can't load the explorer if we go below 15, so we'll use that as long as our specs continue to pass
+  max_depth 15
 end

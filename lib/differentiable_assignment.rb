@@ -53,12 +53,6 @@ module DifferentiableAssignment
     case differentiable.class_name
     when "Assignment"
       AssignmentStudentVisibility
-    when "ContextModule"
-      ModuleStudentVisibility
-    when "WikiPage"
-      WikiPageStudentVisibility
-    when "DiscussionTopic"
-      UngradedDiscussionStudentVisibility
     else
       Quizzes::QuizStudentVisibility
     end
@@ -72,7 +66,7 @@ module DifferentiableAssignment
       ModuleVisibility::ModuleVisibilityService.module_visible_to_students(user_ids: conditions[:user_id], context_module_id: conditions[:context_module_id])
     when "WikiPage"
       WikiPageVisibility::WikiPageVisibilityService.wiki_page_visible_to_students(user_ids: conditions[:user_id], wiki_page_id: conditions[:wiki_page_id])
-    when "DiscussionTopic"
+    when "DiscussionTopic", "Announcement"
       UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topic_visible_to_students(user_ids: conditions[:user_id], discussion_topic_id: conditions[:discussion_topic_id])
     else
       QuizVisibility::QuizVisibilityService.quiz_visible_to_students(quiz_id: conditions[:quiz_id], user_ids: conditions[:user_id])
@@ -87,7 +81,7 @@ module DifferentiableAssignment
       :context_module_id
     when "WikiPage"
       :wiki_page_id
-    when "DiscussionTopic"
+    when "DiscussionTopic", "Announcement"
       :discussion_topic_id
     else
       :quiz_id

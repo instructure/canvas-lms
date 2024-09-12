@@ -30,7 +30,6 @@ describe('GradebookMenu', () => {
   const defaultProps = (props = {}) => ({
     courseUrl: '/courseUrl',
     learningMasteryEnabled: true,
-    enhancedIndividualGradebookEnabled: undefined,
     variant: 'DefaultGradebook' as GradiantVariantName,
     ...props,
   })

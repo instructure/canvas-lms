@@ -115,6 +115,7 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
     process_common_inputs(input, is_announcement, discussion_topic)
     process_future_date_inputs(input.slice(:delayed_post_at, :lock_at), discussion_topic)
     process_locked_parameter(input[:locked], discussion_topic)
+    save_lock_preferences(input[:locked], discussion_topic)
 
     if input.key?(:assignment) && input[:assignment].present?
       working_assignment = Mutations::CreateAssignment.new(object:, context:, field: nil)

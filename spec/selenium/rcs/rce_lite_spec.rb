@@ -167,7 +167,8 @@ describe "RCE next tests" do
         expect(toolbar_button("Lists", "Ordered and Unordered Lists")).to be_truthy
         expect(toolbar_button("Lists", "Increase Indent")).to be_falsey
 
-        expect(toolbar("Miscellaneous")).to be_falsey
+        expect(toolbar("Miscellaneous")).to be_truthy
+        expect(toolbar_button("Miscellaneous", "Insert Math Equation")).to be_truthy
 
         expect(element_exists?('[data-testid="RCEStatusBar"]')).to be true
         expect(status_bar_button("View keyboard shortcuts")).to be_truthy

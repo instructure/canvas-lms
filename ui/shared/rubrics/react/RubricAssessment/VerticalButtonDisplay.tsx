@@ -26,7 +26,7 @@ import {View} from '@instructure/ui-view'
 import {possibleString, possibleStringRange} from '../Points'
 import {escapeNewLineText, rangingFrom} from './utils/rubricUtils'
 
-const {licorice} = colors
+const {shamrock} = colors
 
 type VerticalButtonDisplayProps = {
   isPreviewMode: boolean
@@ -95,7 +95,7 @@ export const VerticalButtonDisplay = ({
                     padding="xx-small"
                     margin="0 0 x-small xx-small"
                     data-testid={`rating-details-${rating.id}`}
-                    themeOverride={{borderColorBrand: licorice, borderWidthMedium: '0.188rem'}}
+                    themeOverride={{borderColorBrand: shamrock, borderWidthMedium: '0.188rem'}}
                   >
                     <View as="div">
                       <Text size="x-small" weight="bold">

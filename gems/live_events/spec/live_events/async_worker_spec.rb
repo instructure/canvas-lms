@@ -64,7 +64,7 @@ describe LiveEvents::AsyncWorker do
   describe "push" do
     it "executes stuff pushed on the queue" do
       results_double = double
-      results = OpenStruct.new(records: results_double)
+      results = Aws::Kinesis::Types::PutRecordsOutput.new(records: results_double)
       expect(results_double).to receive(:each_with_index).and_return([])
       allow(stream_client).to receive(:put_records).and_return(results)
 
@@ -76,7 +76,7 @@ describe LiveEvents::AsyncWorker do
 
     it "batches write" do
       results_double = double
-      results = OpenStruct.new(records: results_double)
+      results = Aws::Kinesis::Types::PutRecordsOutput.new(records: results_double)
       expect(results_double).to receive(:each_with_index).and_return([])
       allow(stream_client).to receive(:put_records).once.and_return(results)
       @worker.start!
@@ -88,7 +88,7 @@ describe LiveEvents::AsyncWorker do
 
     it "times batch write" do
       results_double = double
-      results = OpenStruct.new(records: results_double)
+      results = Aws::Kinesis::Types::PutRecordsOutput.new(records: results_double)
       allow(results_double).to receive(:each_with_index).and_return([])
       allow(stream_client).to receive(:put_records).once.and_return(results)
 
@@ -141,9 +141,11 @@ describe LiveEvents::AsyncWorker do
       end
 
       it "writes errors to logger" do
-        results = OpenStruct.new(records: [
-                                   OpenStruct.new(error_code: "failure", error_message: "failure message")
-                                 ])
+        results = Aws::Kinesis::Types::PutRecordsOutput.new(
+          records: [
+            Aws::Kinesis::Types::PutRecordsResultEntry.new(error_code: "failure", error_message: "failure message")
+          ]
+        )
         allow(stream_client).to receive(:put_records).once.and_return(results)
         expect(statsd_double).to receive(:time).and_yield
         expect(statsd_double).to receive(:increment).with("live_events.events.send_errors", any_args)

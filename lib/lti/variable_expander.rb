@@ -1088,8 +1088,7 @@ module Lti
 
     # Returns a comma-separated list of permissions granted to the user in the current context,
     # given a comma-separated set to check using the format
-    # $Canvas.membership.permissions<example_permission,example_permission2,..>
-    # @internal
+    # `$Canvas.membership.permissions<example_permission,example_permission2,..>`
     # @example
     #   ```
     #   "example_permission_1,example_permission_2"

@@ -40,6 +40,8 @@ import {setupSubmitHandler} from '@canvas/assignments/jquery/reuploadSubmissions
 import ready from '@instructure/ready'
 import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 import {captureException} from '@sentry/browser'
+import {RubricAssignmentContainer} from '@canvas/rubrics/react/RubricAssignment'
+import {mapRubricUnderscoredKeysToCamelCase} from '@canvas/rubrics/react/utils'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 
 if (!('INST' in window)) window.INST = {}
@@ -297,6 +299,25 @@ $(() => {
     }
 
     renderSpeedGraderLink()
+  }
+})
+
+$(() => {
+  const $mountPoint = document.getElementById('enhanced-rubric-assignment-edit')
+
+  if ($mountPoint) {
+    const envRubric = ENV.assigned_rubric
+    const envRubricAssociation = ENV.rubric_association
+    const assignmentRubric = envRubric ? mapRubricUnderscoredKeysToCamelCase(ENV.assigned_rubric) : undefined
+    ReactDOM.render(
+      <RubricAssignmentContainer 
+        assignmentId={ENV.ASSIGNMENT_ID}
+        assignmentRubric={assignmentRubric} 
+        assignmentRubricAssociation={envRubricAssociation}
+        courseId={ENV.COURSE_ID}
+      />,
+      $mountPoint
+    )
   }
 })
 

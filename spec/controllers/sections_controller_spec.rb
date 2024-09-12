@@ -45,6 +45,23 @@ describe SectionsController do
       expect(sec2["user_count"]).to eq(1)
     end
 
+    it "should return the user count for each sections in a course not counting deleted users" do
+      @section1.enroll_user(@student1, "TeacherEnrollment")
+      @section1.enroll_user(@student2, "StudentEnrollment")
+      @section2.enroll_user(@student1, "StudentEnrollment")
+      @student2.destroy
+
+      get "user_count", params: { course_id: @course.id }
+
+      json_response = response.parsed_body
+
+      sec1 = json_response["sections"].find { |s| s["id"] == @section1.id }
+      sec2 = json_response["sections"].find { |s| s["id"] == @section2.id }
+
+      expect(sec1["user_count"]).to eq(1)
+      expect(sec2["user_count"]).to eq(1)
+    end
+
     it "should exclude sections if the section id is sent in the exclude param" do
       @section1.enroll_user(@teacher, "TeacherEnrollment")
       @section1.enroll_user(@student1, "StudentEnrollment")

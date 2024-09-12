@@ -18,8 +18,10 @@
 import * as z from 'zod'
 import {ZLtiPlacement} from './LtiPlacement'
 import {ZLtiPrivacyLevel} from './LtiPrivacyLevel'
-import {ZLtiScope} from './LtiScope'
+import {ZLtiScope} from '@canvas/lti/model/LtiScope'
 import {ZLtiPlacementOverlay} from './PlacementOverlay'
+
+// see also lib/schemas/lti/ims/registration_overlay.rb, used in backend
 
 export const ZRegistrationOverlay = z.object({
   title: z.string().optional().nullable(),

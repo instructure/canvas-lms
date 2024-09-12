@@ -44,7 +44,7 @@ GEM
       bindata
       faraday (~> 2.0)
       faraday-follow_redirects
-    logger (1.6.0)
+    logger (1.6.1)
     minitest (5.25.1)
     mutex_m (0.2.0)
     net-http (0.4.1)
@@ -55,9 +55,9 @@ GEM
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
       rspec-mocks (~> 3.13.0)
-    rspec-core (3.13.0)
+    rspec-core (3.13.1)
       rspec-support (~> 3.13.0)
-    rspec-expectations (3.13.1)
+    rspec-expectations (3.13.2)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-mocks (3.13.1)

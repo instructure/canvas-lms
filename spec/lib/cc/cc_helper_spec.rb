@@ -94,7 +94,7 @@ describe CC::CCHelper do
           <a id="media_comment_abcde" class="instructure_inline_media_comment video_comment" href="/media_objects/abcde" data-media_comment_type="video" data-alt=""></a>
         )
 
-        exported_html = @exporter.html_content(html).split("\n").map(&:strip).select(&:present?)
+        exported_html = @exporter.html_content(html).split("\n").map(&:strip).compact_blank
         expect(exported_html[0]).to eq(%(<video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allow="fullscreen" data-media-id="abcde"><source src="$IMS-CC-FILEBASE$/Uploaded%20Media/some_media.mp4?canvas_=1&amp;canvas_qs_type=video&amp;canvas_qs_embedded=true" data-media-id="abcde" data-media-type="video"></video>))
         expect(exported_html[1]).to eq(%(<video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allow="fullscreen" data-media-id="abcde"><source src="$IMS-CC-FILEBASE$/Uploaded Media/some_media.mp4" data-media-id="abcde" data-media-type="video"></video>))
         expect(exported_html[2]).to eq(%(<a id="media_comment_abcde" class="instructure_inline_media_comment video_comment" href="$IMS-CC-FILEBASE$/Uploaded Media/some_media.mp4" data-media_comment_type="video" data-alt=""></a>))
@@ -126,7 +126,7 @@ describe CC::CCHelper do
         @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
 
         html = %(<a id="media_comment_abcde" class="instructure_inline_media_comment video_comment" href="/media_objects/abcde" data-media_comment_type="video" data-alt=""></a>)
-        exported_html = @exporter.html_content(html).split("\n").map(&:strip).select(&:present?)
+        exported_html = @exporter.html_content(html).split("\n").map(&:strip).compact_blank
         expect(@exporter.media_object_infos[@obj.id]).not_to be_nil
         expect(exported_html[0]).to eq(%(<a id="media_comment_abcde" class="instructure_inline_media_comment video_comment" href="$IMS-CC-FILEBASE$/Uploaded Media/some_media" data-media_comment_type="video" data-alt=""></a>))
       end

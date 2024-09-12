@@ -26,6 +26,13 @@ describe TermsApiController do
       user_session(@user)
     end
 
+    def create_terms_with_same_start(count)
+      count.times do |i|
+        start_time = DateTime.new(2024, 9, 10, 14, 30, 45, "+00:00")
+        @account.enrollment_terms.create!(name: "term #{i}", start_at: start_time)
+      end
+    end
+
     it "gets the default term (non-paginated)" do
       get "index", params: { account_id: @account.id }
 
@@ -43,9 +50,7 @@ describe TermsApiController do
       expect(response).to be_successful
 
       # create new terms
-      new_terms_count.times do |i|
-        @account.enrollment_terms.create!(name: "term #{i}")
-      end
+      create_terms_with_same_start(new_terms_count)
 
       # get the first page of term results
       get "index", params: { account_id: @account.id }
@@ -57,6 +62,22 @@ describe TermsApiController do
                              page: 2 }
       expect(response).to be_successful
       expect(assigns[:terms].length).to eq (new_terms_count - terms_per_page_count) + default_term_count
+    end
+
+    it "gets terms sorted by id when start_at matches" do
+      new_terms_count = 10
+
+      # create new terms
+      create_terms_with_same_start(new_terms_count)
+
+      # get terms
+      get "index", params: { account_id: @account.id }
+      expect(response).to be_successful
+
+      # compare first and last id
+      first_term_id = assigns[:terms].first.id
+      last_term_id = assigns[:terms].last.id
+      expect(first_term_id).to be < last_term_id
     end
   end
 

@@ -35,6 +35,7 @@ export type RubricAssessmentTrayProps = {
   rubric?: Pick<Rubric, 'title' | 'criteria' | 'ratingOrder' | 'freeFormCriterionComments'>
   rubricAssessmentData: RubricAssessmentData[]
   rubricSavedComments?: Record<string, string[]>
+  shouldCloseOnDocumentClick?: boolean
   onDismiss: () => void
   onSubmit?: (rubricAssessmentDraftData: RubricAssessmentData[]) => void
 }
@@ -47,6 +48,7 @@ export const RubricAssessmentTray = ({
   rubric,
   rubricAssessmentData,
   rubricSavedComments = {},
+  shouldCloseOnDocumentClick,
   onDismiss,
   onSubmit,
 }: RubricAssessmentTrayProps) => {
@@ -58,7 +60,7 @@ export const RubricAssessmentTray = ({
       open={isOpen}
       onDismiss={onDismiss}
       placement="end"
-      shouldCloseOnDocumentClick={false}
+      shouldCloseOnDocumentClick={shouldCloseOnDocumentClick}
       size={viewMode === 'traditional' ? 'large' : 'small'}
       id="enhanced-rubric-assessment-tray"
       data-testid="enhanced-rubric-assessment-tray"

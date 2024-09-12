@@ -1544,7 +1544,6 @@ class Quizzes::Quiz < ActiveRecord::Base
         }
       end
     end
-
     filters
   end
 

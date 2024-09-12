@@ -43,7 +43,7 @@ const general = 'false'
 const keys = [
   {objectType: 'assignment'},
   {objectType: 'discussion_topic'},
-  {objectType: 'wiki_page', lockableAttributes: ['content']},
+  {objectType: 'wiki_page', lockableAttributes: ['content', 'availability_dates']},
   {objectType: 'attachment', lockableAttributes: ['content']},
   {objectType: 'quiz'},
   {objectType: 'course_pace', lockableAttributes: ['content']},

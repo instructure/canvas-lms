@@ -560,7 +560,8 @@ class DiscussionTopicsController < ApplicationController
         override_dates: false,
         include_usage_rights:
       )
-      hash[:ATTRIBUTES][:has_threaded_replies] = @topic.discussion_entries.where.not(parent_id: nil).where.not(workflow_state: "deleted").exists?
+
+      hash[:ATTRIBUTES][:has_threaded_replies] = @topic.has_threaded_replies?
     end
     (hash[:ATTRIBUTES] ||= {})[:is_announcement] = @topic.is_announcement
     hash[:ATTRIBUTES][:can_group] = @topic.can_group?
@@ -880,7 +881,12 @@ class DiscussionTopicsController < ApplicationController
 
       js_bundle :discussion_topics_post
       css_bundle :discussions_index, :learning_outcomes
-      render html: "", layout: (params[:embed] == "true") ? "mobile_embed" : true
+
+      respond_to do |format|
+        format.html do
+          render html: "", layout: (params[:embed] == "true") ? "mobile_embed" : true
+        end
+      end
       return
     end
 
@@ -1776,7 +1782,7 @@ class DiscussionTopicsController < ApplicationController
       attachment = params[:attachment].present? &&
                    params[:attachment]
 
-      return if attachment && attachment.size > 1.kilobytes &&
+      return if attachment && attachment.size > 1.kilobyte &&
                 quota_exceeded(@context, named_context_url(@context, :context_discussion_topics_url))
 
       if (params.key?(:remove_attachment) || attachment) && @topic.attachment

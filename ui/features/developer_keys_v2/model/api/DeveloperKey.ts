@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {LtiScope} from '../LtiScopes'
+import type {LtiScope} from '@canvas/lti/model/LtiScope'
 import type {LtiRegistration} from '../LtiRegistration'
 import type {Configuration} from './LtiToolConfiguration'
 

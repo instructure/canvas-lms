@@ -71,9 +71,9 @@ class Csp::Domain < ActiveRecord::Base
 
   def self.domains_for_tool(tool)
     # some tools stick a URL into the `domain` field, so deal with that first
-    base_domain = domain_from_url(tool.domain)
-    base_domain ||= tool.domain
-    base_domain ||= domain_from_url(tool.url)
+    base_domain = domain_from_url(tool.domain_with_environment_overrides)
+    base_domain ||= tool.domain_with_environment_overrides
+    base_domain ||= domain_from_url(tool.url_with_environment_overrides(tool.url, include_launch_url: true))
     return [] unless base_domain
 
     base_domain = base_domain.downcase
@@ -81,6 +81,8 @@ class Csp::Domain < ActiveRecord::Base
   end
 
   def self.domain_from_url(url)
-    Addressable::URI.parse(url).normalize.host rescue nil
+    Addressable::URI.parse(url).normalize.host
+  rescue
+    nil
   end
 end

@@ -40,14 +40,20 @@ const CurveGradesDialogManager = {
       submissionsLoaded?: boolean
     } = {}
   ) {
-    const {grading_type: gradingType, points_possible: pointsPossible} = assignment
+    const {
+      grading_type: gradingType,
+      points_possible: pointsPossible,
+      grades_published: gradesPublished,
+      checkpoints,
+    } = assignment
     return {
       isDisabled:
         !submissionsLoaded ||
         gradingType === 'pass_fail' ||
         pointsPossible == null ||
         pointsPossible === 0 ||
-        !assignment.grades_published,
+        !gradesPublished ||
+        checkpoints?.length > 0,
 
       async onSelect(onClose) {
         if (!isAdmin && assignment.inClosedGradingPeriod) {

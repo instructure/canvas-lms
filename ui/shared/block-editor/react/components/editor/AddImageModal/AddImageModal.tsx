@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useContext} from 'react'
+import React, {useContext, useState} from 'react'
 import {UploadFile, type UploadFilePanelId} from '@instructure/canvas-rce'
 import {prepEmbedSrc} from '@instructure/canvas-rce/es/common/fileUrl'
 import {RCSPropsContext} from '../../../Contexts'
@@ -68,10 +68,9 @@ const handleImageSubmit = async (
 
 interface AddImageModalProps {
   open: boolean
-  onSubmit: (url: string) => void
+  onSubmit: (url: string, alt: string) => void
   onDismiss: () => void
   accept?: string
-  requireA11yAttributes?: boolean
   panels?: UploadFilePanelId[]
   title?: string
 }
@@ -81,11 +80,12 @@ export const AddImageModal = ({
   onSubmit,
   onDismiss,
   accept = 'image/*',
-  requireA11yAttributes = false,
   panels,
   title,
 }: AddImageModalProps) => {
   const trayProps = useContext(RCSPropsContext)
+
+  const [uploading, setUploading] = useState(false)
 
   // UploadFile calls onSubmit with 5 separate args, not a destructed object
   // so even though we never use editor/accept, we must include them
@@ -96,8 +96,13 @@ export const AddImageModal = ({
     uploadData: UploadData,
     storeProps: StoreProp
   ) => {
+    setUploading(true)
     const url = await handleImageSubmit(selectedPanel, uploadData, storeProps)
-    onSubmit(url)
+    setUploading(false)
+    const alt = uploadData?.imageOptions?.isDecorativeImage
+      ? ''
+      : uploadData?.imageOptions?.altText || ''
+    onSubmit(url, alt)
   }
 
   const defaultPanels: UploadFilePanelId[] = ['COMPUTER', 'URL', 'course_images', 'user_images']
@@ -105,20 +110,19 @@ export const AddImageModal = ({
   const modalPanels = panels || defaultPanels
   const label = title || I18n.t('Upload Image')
 
-  return (
-    open && (
-      <UploadFile
-        accept={accept}
-        trayProps={trayProps}
-        label={label}
-        panels={modalPanels}
-        onDismiss={onDismiss}
-        onSubmit={handleSubmit}
-        requireA11yAttributes={requireA11yAttributes}
-        canvasOrigin={trayProps?.canvasOrigin}
-      />
-    )
-  )
+  return open ? (
+    <UploadFile
+      accept={accept}
+      trayProps={trayProps}
+      label={label}
+      panels={modalPanels}
+      onDismiss={onDismiss}
+      onSubmit={handleSubmit}
+      forBlockEditorUse={true}
+      canvasOrigin={trayProps?.canvasOrigin}
+      uploading={uploading}
+    />
+  ) : null
 }
 
 type UploadData = {

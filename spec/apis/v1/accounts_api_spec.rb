@@ -1072,6 +1072,17 @@ describe "Accounts API", type: :request do
           expect(json).not_to have_key("errors")
         end
 
+        it "guards from password_policy param not being present" do
+          api_call(:put,
+                   "/api/v1/accounts/#{@a1.id}",
+                   { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                   { account: { settings: { restrict_student_past_view: { value: true, locked: false } } } })
+
+          expect(response).to have_http_status(:ok)
+          @a1.reload
+          expect(@a1.settings).not_to have_key(:password_policy)
+        end
+
         it "rejects password policy settings outside allowed range" do
           json = api_call(:put,
                           "/api/v1/accounts/#{@a1.id}",

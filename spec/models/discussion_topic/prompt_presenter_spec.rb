@@ -35,8 +35,8 @@ describe DiscussionTopic::PromptPresenter do
     @topic.course.enroll_user(@student_2, "StudentEnrollment", enrollment_state: "active")
 
     @topic.discussion_entries.create!(user: @student_1, message: "I liked the course.")
-    entry_2 = @topic.discussion_entries.create!(user: @student_2, message: "I felt the course was too hard.")
-    @topic.discussion_entries.create!(user: @instructor_1, message: "I'm sorry to hear that. Could you please provide more details?", parent_entry: entry_2)
+    entry_2 = @topic.discussion_entries.create!(user: @student_2, message: "My apologies <span class=\"mceNonEditable mention\" data-mention=\"#{@instructor_1.id}\" data-reactroot=\"\">@Instructor 1</span>, but I felt the course was too hard, not sure how <span class=\"mceNonEditable mention\" data-mention=\"#{@student_1.id}\" data-reactroot=\"\">@Student 1</span> was able to keep up.")
+    @topic.discussion_entries.create!(user: @instructor_1, message: "I'm sorry to hear that. Could you please provide more details? Although <span class=\"mceNonEditable mention\" data-mention=\"9999999999\" data-reactroot=\"\">@Student 9999999999</span> has already left the course, he seemed to have encountered similar issues.", parent_entry: entry_2)
 
     @presenter = described_class.new(@topic)
   end
@@ -61,9 +61,9 @@ describe DiscussionTopic::PromptPresenter do
         <entry user="student_1" index="1">
         I liked the course.</entry>
         <entry user="student_2" index="2">
-        I felt the course was too hard.</entry>
+        My apologies @instructor_1, but I felt the course was too hard, not sure how @student_1 was able to keep up.</entry>
         <entry user="instructor_1" index="2.1">
-        I'm sorry to hear that. Could you please provide more details?</entry>
+        I'm sorry to hear that. Could you please provide more details? Although @unknown has already left the course, he seemed to have encountered similar issues.</entry>
           </entries>
         </discussion>
       TEXT

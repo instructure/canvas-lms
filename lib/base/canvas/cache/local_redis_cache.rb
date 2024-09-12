@@ -22,7 +22,6 @@ require "redis/scripting"
 module Canvas
   module Cache
     class LocalRedisCache < ActiveSupport::Cache::RedisCacheStore
-      include ActiveSupport::Cache::SafeRedisRaceCondition
       include FallbackExpirationCache
 
       def initialize(local_cache_conf)

@@ -134,5 +134,6 @@ export type TeacherAssignmentType = {
   allowedAttempts?: number
   anonymizeStudents?: boolean
   assignmentOverrides: AssignmentOverridesType
+  hasSubmittedSubmissions: boolean
   submissions: SubmissionsType
 }

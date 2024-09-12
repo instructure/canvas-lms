@@ -27,6 +27,7 @@ import {View} from '@instructure/ui-view'
 import {DuplicateRubricModal} from './DuplicateRubricModal'
 import {DeleteRubricModal} from './DeleteRubricModal'
 import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
+import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 
 const I18n = useI18nScope('rubrics-list-table')
 
@@ -64,6 +65,7 @@ export const RubricPopover = ({
   const navigate = useNavigate()
   const [isPopoverOpen, setPopoverIsOpen] = useState(false)
   const [isDuplicateRubricModalOpen, setIsDuplicateRubricModalOpen] = useState(false)
+  const [copyToOpen, setCopyToOpen] = useState(false)
   const [isDeleteRubricModalOpen, setIsDeleteRubricModalOpen] = useState(false)
 
   const handleArchiveRubric = () => {
@@ -97,6 +99,16 @@ export const RubricPopover = ({
         courseId={courseId}
         setPopoverIsOpen={setPopoverIsOpen}
       />
+      {courseId && (
+        <DirectShareCourseTray
+          sourceCourseId={courseId}
+          open={copyToOpen}
+          showAssignments={true}
+          data-testid={`share-course-${courseId}-tray`}
+          contentSelection={{rubrics: [id], modules: []}}
+          onDismiss={() => setCopyToOpen(false)}
+        />
+      )}
       <Popover
         renderTrigger={
           <IconButton
@@ -128,6 +140,14 @@ export const RubricPopover = ({
           >
             {I18n.t('Duplicate')}
           </Menu.Item>
+          {window.ENV.enhanced_rubrics_copy_to && courseId && (
+            <Menu.Item
+              data-testid={`copy-to-${courseId}-button`}
+              onClick={() => setCopyToOpen(true)}
+            >
+              {I18n.t('Copy To')}
+            </Menu.Item>
+          )}
           <Menu.Item data-testid="archive-rubric-button" onClick={handleArchiveRubric}>
             {active ? I18n.t('Archive') : I18n.t('Un-Archive')}
           </Menu.Item>

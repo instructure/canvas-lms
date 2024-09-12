@@ -221,8 +221,9 @@ function DiscussionTopicForm({
     currentDiscussionTopic?.groupSet?._id || null
   )
   const [groupCategorySelectError, setGroupCategorySelectError] = useState([])
-  const [locked, setLocked] = useState((currentDiscussionTopic.locked && isAnnouncement) || false)
-
+  const [locked, setLocked] = useState(
+    isAnnouncement ? currentDiscussionTopic.locked ?? !ENV.CREATE_ANNOUNCEMENTS_UNLOCKED : false
+  )
   const [availableFrom, setAvailableFrom] = useState(currentDiscussionTopic?.delayedPostAt || null)
   const [availableUntil, setAvailableUntil] = useState(currentDiscussionTopic?.lockAt || null)
   const [willAnnouncementPostRightAway, setWillAnnouncementPostRightAway] = useState(true)
@@ -322,12 +323,10 @@ function DiscussionTopicForm({
     setUsageRightsErrorState(false)
     setUsageRightsData(data)
   }
-
   const hasGroupOverrides = () =>
     assignedInfoList.some(
       info => info.assignedList.find(assetCode => assetCode.includes('group')) !== undefined
     )
-
   const assignmentDueDateContext = {
     assignedInfoList,
     setAssignedInfoList,
@@ -928,6 +927,7 @@ function DiscussionTopicForm({
               <Checkbox
                 label={I18n.t('Allow Participants to Comment')}
                 value="enable-participants-commenting"
+                inline={true}
                 checked={!locked}
                 onChange={() => {
                   setLocked(!locked)
@@ -941,6 +941,7 @@ function DiscussionTopicForm({
                 data-testid="disallow_threaded_replies"
                 label={I18n.t('Disallow threaded replies')}
                 value="disallow-threaded-replies"
+                inline={true}
                 checked={!isThreaded}
                 onChange={() => {
                   setIsThreaded(!isThreaded)
@@ -956,6 +957,7 @@ function DiscussionTopicForm({
                   'Participants must respond to the topic before viewing other replies'
                 )}
                 value="must-respond-before-viewing-replies"
+                inline={true}
                 checked={requireInitialPost}
                 onChange={() => setRequireInitialPost(!requireInitialPost)}
               />
@@ -965,6 +967,7 @@ function DiscussionTopicForm({
               <Checkbox
                 label={I18n.t('Enable podcast feed')}
                 value="enable-podcast-feed"
+                inline={true}
                 checked={enablePodcastFeed}
                 onChange={() => {
                   setIncludeRepliesInFeed(!enablePodcastFeed && includeRepliesInFeed)
@@ -977,6 +980,7 @@ function DiscussionTopicForm({
                 <Checkbox
                   label={I18n.t('Include student replies in podcast feed')}
                   value="include-student-replies-in-podcast-feed"
+                  inline={true}
                   checked={includeRepliesInFeed}
                   onChange={() => setIncludeRepliesInFeed(!includeRepliesInFeed)}
                 />
@@ -987,6 +991,7 @@ function DiscussionTopicForm({
                 data-testid="graded-checkbox"
                 label={I18n.t('Graded')}
                 value="graded"
+                inline={true}
                 checked={isGraded}
                 onChange={() => {
                   if (isGraded) {
@@ -1004,6 +1009,7 @@ function DiscussionTopicForm({
                     data-testid="checkpoints-checkbox"
                     label={I18n.t('Assign graded checkpoints')}
                     value="checkpoints"
+                    inline={true}
                     checked={isCheckpoints}
                     onChange={() => {
                       setIsCheckpoints(!isCheckpoints)
@@ -1028,6 +1034,7 @@ function DiscussionTopicForm({
                 <Checkbox
                   label={I18n.t('Allow liking')}
                   value="allow-liking"
+                  inline={true}
                   checked={allowLiking}
                   onChange={() => {
                     setOnlyGradersCanLike(!allowLiking && onlyGradersCanLike)
@@ -1040,6 +1047,7 @@ function DiscussionTopicForm({
                       <Checkbox
                         label={I18n.t('Only graders can like')}
                         value="only-graders-can-like"
+                        inline={true}
                         checked={onlyGradersCanLike}
                         onChange={() => setOnlyGradersCanLike(!onlyGradersCanLike)}
                       />
@@ -1053,6 +1061,7 @@ function DiscussionTopicForm({
                 <Checkbox
                   label={I18n.t('Add to student to-do')}
                   value="add-to-student-to-do"
+                  inline={true}
                   checked={addToTodo}
                   onChange={() => {
                     setTodoDate(!addToTodo ? todoDate : null)
@@ -1089,6 +1098,7 @@ function DiscussionTopicForm({
                 data-testid="group-discussion-checkbox"
                 label={I18n.t('This is a Group Discussion')}
                 value="group-discussion"
+                inline={true}
                 checked={isGroupDiscussion}
                 messages={groupDiscussionErrors}
                 onChange={() => {

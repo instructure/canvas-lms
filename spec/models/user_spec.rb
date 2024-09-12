@@ -1769,6 +1769,14 @@ describe User do
       expect(@user.reload.avatar_image_url).to be_nil
     end
 
+    it "does not remove avatar when updating only the state" do
+      @user_w_avatar = User.create! avatar_image_url: "test_url"
+
+      @user_w_avatar.avatar_image = { "state" => "reported" }
+      @user_w_avatar.save!
+      expect(@user_w_avatar.reload.avatar_image_url).to eq "test_url"
+    end
+
     it "returns a useful avatar_fallback_url" do
       allow(HostUrl).to receive(:protocol).and_return("https")
 
@@ -2426,6 +2434,14 @@ describe User do
         assignment2.publish
         events = @user.upcoming_events(end_at: 1.week.from_now)
         expect(events.first).to eq assignment2
+      end
+
+      it "includes sub assignments when include_sub_assignments is true" do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        reply_to_topic, reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+        context_codes = [@user.asset_string] + @user.cached_context_codes
+        events = @user.upcoming_events(context_codes:, include_sub_assignments: true)
+        expect(events).to match_array([reply_to_topic, reply_to_entry])
       end
 
       it "doesn't include events for enrollments that are inactive due to date" do
