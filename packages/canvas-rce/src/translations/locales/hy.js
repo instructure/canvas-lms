@@ -173,6 +173,7 @@ const locale = {
   "star_8d156e09": { "message": "Նշել աստղիկով" },
   "start_over_f7552aa9": { "message": "Սկսել նորից" },
   "submit_a3cc6859": { "message": "Ուղարկել" },
+  "submitting_b90fac62": { "message": "Ուղարկվում է..." },
   "syllabus_f191f65b": { "message": "Դասընթացի ծրագիր" },
   "teal_f729a294": { "message": "Փիրուզագույն" },
   "the_document_preview_is_currently_being_processed__7d9ea135": {

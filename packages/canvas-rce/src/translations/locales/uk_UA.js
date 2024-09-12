@@ -211,6 +211,7 @@ const locale = {
   "star_8d156e09": { "message": "Помітити зіркою" },
   "start_over_f7552aa9": { "message": "Почати з початку" },
   "submit_a3cc6859": { "message": "Підтвердити" },
+  "submitting_b90fac62": { "message": "Надсилання..." },
   "syllabus_f191f65b": { "message": "Навчальний план" },
   "teal_f729a294": { "message": "Бірюзовий" },
   "the_document_preview_is_currently_being_processed__7d9ea135": {
