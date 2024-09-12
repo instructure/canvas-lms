@@ -177,6 +177,7 @@ const locale = {
   "star_8d156e09": { "message": " " },
   "start_over_f7552aa9": { "message": "Ξεκινήστε Ξανά" },
   "submit_a3cc6859": { "message": "Υποβολή" },
+  "submitting_b90fac62": { "message": "Υποβολή σε εξέλιξη..." },
   "syllabus_f191f65b": { "message": "Αναλυτικό Πρόγραμμα" },
   "teal_f729a294": { "message": "Γαλαζοπράσινο" },
   "the_document_preview_is_currently_being_processed__7d9ea135": {
