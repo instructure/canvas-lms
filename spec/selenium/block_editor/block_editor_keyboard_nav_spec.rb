@@ -201,6 +201,77 @@ describe "Block Editor", :ignore_js_errors do
       expect(icon_block_titles[5].attribute("innerHTML")).to eq("alarm")
     end
 
+    describe "block toolbar navigation" do
+      it "should navigate the block toolbar with arrow keys" do
+        # first, select a block
+        icon_block.click
+        expect(block_toolbar).to be_displayed
+        expect(active_element).to eq(icon_block)
+
+        kb_focus_block_toolbar
+        expect(active_element.attribute("textContent")).to eq("Drag to move")
+
+        driver.action.send_keys(:arrow_down).perform
+        driver.action.send_keys(:arrow_right).perform
+        driver.action.send_keys(:arrow_right).perform
+        driver.action.send_keys(:arrow_right).perform
+        expect(active_element.attribute("textContent")).to eq("Delete")
+
+        # one more and it wraps around
+        driver.action.send_keys(:arrow_right).perform
+        expect(active_element.attribute("textContent")).to eq("Drag to move")
+
+        # back up
+        driver.action.send_keys(:arrow_up).perform
+        expect(active_element.attribute("textContent")).to eq("Delete")
+      end
+
+      it "should refocus block toolbar with escape" do
+        # first, select a block
+        icon_block.click
+        expect(block_toolbar).to be_displayed
+
+        kb_focus_block_toolbar
+        expect(active_element.attribute("textContent")).to eq("Drag to move")
+
+        driver.action.send_keys(:escape).perform
+        expect(active_element).to eq(icon_block)
+      end
+
+      describe("IconBlock's Select Icon button") do
+        it "should navigate the icons using the arrow keys" do
+          icon_block.click
+          expect(block_toolbar).to be_displayed
+          expect(active_element).to eq(icon_block)
+
+          kb_focus_block_toolbar
+          expect(active_element.attribute("textContent")).to eq("Drag to move")
+
+          driver.action.send_keys(:arrow_right).perform
+          driver.action.send_keys(:arrow_right).perform
+          driver.action.send_keys(:arrow_right).perform
+          expect(active_element.attribute("textContent")).to eq("Select Icon")
+
+          # open the icon picker
+          driver.action.send_keys(:enter).perform
+          expect(select_an_icon_popup).to be_displayed
+          expect(active_element.attribute("textContent").gsub(/\s+/, "")).to eq("alarm")
+
+          # navigate the icons
+          driver.action.send_keys(:arrow_down).perform
+          expect(active_element.attribute("textContent").gsub(/\s+/, "")).to eq("apple")
+
+          driver.action.send_keys(:arrow_right).perform
+          expect(active_element.attribute("textContent").gsub(/\s+/, "")).to eq("atom")
+
+          driver.action.send_keys(:enter).perform
+          expect(active_element.attribute("textContent")).to eq("Select Icon")
+
+          expect(icon_block_title.attribute("textContent")).to eq("atom")
+        end
+      end
+    end
+
     describe "keyboard shortcuts" do
       it "should focus the block toolbar on ctrl-F9" do
         # first, select a block
@@ -208,8 +279,8 @@ describe "Block Editor", :ignore_js_errors do
         expect(block_toolbar).to be_displayed
         expect(active_element).to eq(icon_block)
 
-        driver.action.key_down(:control).send_keys(:f9).key_up(:control).perform
-        expect(active_element).to eq(block_toolbar)
+        kb_focus_block_toolbar
+        expect(active_element).to eq(f("button", block_toolbar))
       end
 
       it "should focus the section menu on alt-F9" do

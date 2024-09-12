@@ -228,7 +228,7 @@ describe "Block Editor", :ignore_js_errors do
     end
   end
 
-  describe("resizing images") do
+  describe("manipulating images") do
     before do
       @root_folder = Folder.root_folders(@course).first
       @image = @root_folder.attachments.build(context: @course)
@@ -250,32 +250,50 @@ describe "Block Editor", :ignore_js_errors do
       )
     end
 
-    it("is not possible with SizeVariant 'auto'") do
-      get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
-      wait_for_block_editor
-
-      image_block.click  # select the section
-      image_block.click  # select the block
-      expect(block_resize_handle("se")).to be_displayed
-
-      click_block_toolbar_menu_item("Image Size", "Auto")
-      expect(block_editor_editor).not_to contain_css(block_resize_handle_selector("se"))
-    end
-
-    describe("that maintain aspect ratio") do
-      it "adjusts the width when the height is changed" do
+    describe("resizing") do
+      it("is not possible with SizeVariant 'auto'") do
         get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
         wait_for_block_editor
 
         image_block.click  # select the section
         image_block.click  # select the block
         expect(block_resize_handle("se")).to be_displayed
-        expect(image_block.size.width).to eq(200)
-        expect(image_block.size.height).to eq(100)
 
-        f("body").send_keys(:alt, :shift, :arrow_down)
-        expect(image_block.size.height).to eq(110)
-        expect(image_block.size.width).to eq(220)
+        click_block_toolbar_menu_item("Image Size", "Auto")
+        expect(block_editor_editor).not_to contain_css(block_resize_handle_selector("se"))
+      end
+
+      describe("that maintain aspect ratio") do
+        it "adjusts the width when the height is changed" do
+          get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+          wait_for_block_editor
+
+          image_block.click  # select the section
+          image_block.click  # select the block
+          expect(block_resize_handle("se")).to be_displayed
+          expect(image_block.size.width).to eq(200)
+          expect(image_block.size.height).to eq(100)
+
+          f("body").send_keys(:alt, :shift, :arrow_down)
+          expect(image_block.size.height).to eq(110)
+          expect(image_block.size.width).to eq(220)
+        end
+      end
+    end
+
+    describe("add alt text") do
+      it "can add alt text" do
+        get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+        wait_for_block_editor
+
+        image_block.click
+        image_block_alt_text_button.click
+        alt_input = image_block_alt_text_input
+        expect(alt_input).to be_displayed
+
+        alt_input.send_keys("I am alt text")
+        alt_input.send_keys(:escape)
+        expect(f("img", image_block).attribute("alt")).to eq("I am alt text")
       end
     end
   end
