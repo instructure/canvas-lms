@@ -629,7 +629,7 @@ class ContentExport < ActiveRecord::Base
       return
     end
 
-    nq_assignments = course.assignments.active.type_quiz_lti.where.not(workflow_state: "failed_to_duplicate")
+    nq_assignments = course.assignments.active.type_quiz_lti.where.not(workflow_state: ["failed_to_duplicate", "fail_to_import"])
 
     is_selective_export = !selected_assignments.nil?
     if is_selective_export
