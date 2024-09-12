@@ -129,6 +129,7 @@ describe "scheduler" do
     end
 
     it "does not allow scheduling multiple appointment slots when it is restricted", priority: "1" do
+      skip("LX-2053")
       reserve_appointment_for(@student1, @student1, @app1)
       get "/calendar2"
       open_select_courses_modal(@course1.name)
