@@ -3569,6 +3569,7 @@ describe CoursesController do
       init_course_name = @course.name
 
       put "update", params: { id: @course.id, course: { name: "123456" }, override_sis_stickiness: false, format: :json }
+      expect(response).to be_successful
 
       @course.reload
       expect(@course.name).to eq init_course_name
