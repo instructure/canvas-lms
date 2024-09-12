@@ -1294,16 +1294,6 @@ describe AccountsController do
       expect(response.body).to match(/"id":"instructor_question"/)
       expect(response.body).to match(/"id":"search_the_canvas_guides"/)
       expect(response.body).to match(/"type":"default"/)
-      expect(response.body).to_not match(/"id":"covid"/)
-    end
-
-    context "with featured_help_links enabled" do
-      it "returns the covid help link as a default" do
-        Account.site_admin.enable_feature!(:featured_help_links)
-        get "help_links", params: { account_id: @account.id }
-        expect(response).to be_successful
-        expect(response.body).to match(/"id":"covid"/)
-      end
     end
 
     it "returns custom help links" do
