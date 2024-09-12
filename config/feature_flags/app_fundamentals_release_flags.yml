@@ -71,4 +71,3 @@ password_complexity:
   applies_to: RootAccount
   display_name: Enhance password options
   description: More control over password settings at institution level
-  shadow: true
