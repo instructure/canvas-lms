@@ -34,8 +34,8 @@ class Types::MutationType < Types::ApplicationObjectType
   ##
   # wraps all mutation fields with necessary
   # extensions (e.g. pg timeout)
-  def self.field(*args, **kwargs)
-    super(*args, **kwargs, extensions: [PostgresTimeoutFieldExtension, AuditLogFieldExtension])
+  def self.field(*, **)
+    super(*, **, extensions: [PostgresTimeoutFieldExtension, AuditLogFieldExtension])
   end
 
   field :add_conversation_message, mutation: Mutations::AddConversationMessage

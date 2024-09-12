@@ -1031,8 +1031,8 @@ end
 module DeveloperKeyStubs
   @@original_get_special_key = DeveloperKey.method(:get_special_key)
 
-  def original_get_special_key(*args, **kwargs)
-    @@original_get_special_key.call(*args, **kwargs)
+  def original_get_special_key(*, **)
+    @@original_get_special_key.call(*, **)
   end
 
   def get_special_key(default_key_name, create_if_missing: true)

@@ -985,8 +985,8 @@ class ContentMigration < ActiveRecord::Base
     @html_converter ||= CanvasImportedHtmlConverter.new(self)
   end
 
-  def convert_html(*args, **keyword_args)
-    html_converter.convert(*args, **keyword_args)
+  def convert_html(*, **keyword_args)
+    html_converter.convert(*, **keyword_args)
   end
 
   def convert_text(text)

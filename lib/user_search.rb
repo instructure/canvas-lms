@@ -288,8 +288,8 @@ module UserSearch
                  .where(like_condition("communication_channels.path"), pattern: params[:pattern])
     end
 
-    def wildcard_pattern(value, **options)
-      ActiveRecord::Base.wildcard_pattern(value, **options)
+    def wildcard_pattern(value, **)
+      ActiveRecord::Base.wildcard_pattern(value, **)
     end
   end
 end

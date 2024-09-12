@@ -141,8 +141,8 @@ class BrandConfig < ActiveRecord::Base
     save! unless dup?
   end
 
-  def to_json(*args)
-    BrandableCSS.all_brand_variable_values(self).to_json(*args)
+  def to_json(*)
+    BrandableCSS.all_brand_variable_values(self).to_json(*)
   end
 
   def to_js

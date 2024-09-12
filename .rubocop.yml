@@ -16,7 +16,7 @@ inherit_gem:
   - rubocop-rspec.yml
 
 AllCops:
-  TargetRubyVersion: 3.1
+  TargetRubyVersion: 3.3
 
 Bundler:
   Severity: error

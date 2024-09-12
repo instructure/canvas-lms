@@ -81,8 +81,8 @@ class Enrollment::BatchStateUpdater
   end
 
   # bulk version of Enrollment.destroy
-  def self.mark_enrollments_as_deleted(batch, **kwargs)
-    data = mark_enrollments_as_state(batch, workflow_state: "deleted", **kwargs)
+  def self.mark_enrollments_as_deleted(batch, **)
+    data = mark_enrollments_as_state(batch, workflow_state: "deleted", **)
     EnrollmentState.where(enrollment_id: batch).update_all_locked_in_order(state: "deleted", state_valid_until: nil, updated_at: Time.now.utc)
     # we need the order to match the queries in GradeCalculator's save_course_and_grading_period_scores and save_assignment_group_scores,
     # _and_ the fact that the former runs first
@@ -263,17 +263,17 @@ class Enrollment::BatchStateUpdater
     sync_microsoft_group(courses, root_account)
   end
 
-  def self.update_batch_state(batch, root_account:, **kwargs)
-    data = mark_enrollments_as_state(batch, **kwargs)
+  def self.update_batch_state(batch, root_account:, **)
+    data = mark_enrollments_as_state(batch, **)
     run_call_backs_for(batch, root_account:, n_strand_root: "batch_mode_for")
     data
   end
 
-  def self.complete_batch(batch, **kwargs)
-    update_batch_state(batch, workflow_state: "completed", **kwargs)
+  def self.complete_batch(batch, **)
+    update_batch_state(batch, workflow_state: "completed", **)
   end
 
-  def self.inactivate_batch(batch, **kwargs)
-    update_batch_state(batch, workflow_state: "inactive", **kwargs)
+  def self.inactivate_batch(batch, **)
+    update_batch_state(batch, workflow_state: "inactive", **)
   end
 end

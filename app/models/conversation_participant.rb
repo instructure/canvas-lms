@@ -474,8 +474,8 @@ class ConversationParticipant < ActiveRecord::Base
     end
   end
 
-  def update_cached_data!(*args)
-    update_cached_data(*args)
+  def update_cached_data!(*)
+    update_cached_data(*)
     save!
   end
 

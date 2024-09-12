@@ -197,8 +197,8 @@ class ContentZipper
     )
   end
 
-  def self.zip_base_folder(*args)
-    ContentZipper.new.zip_base_folder(*args)
+  def self.zip_base_folder(*)
+    ContentZipper.new.zip_base_folder(*)
   end
 
   def zip_base_folder(zip_attachment, folder)
