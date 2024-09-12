@@ -3317,8 +3317,8 @@ class CoursesController < ApplicationController
         end
       end
 
-      if params[:override_sis_stickiness] && !value_to_boolean(params[:override_sis_stickiness])
-        params_for_update -= [*@course.stuck_sis_fields]
+      if params.key?(:override_sis_stickiness) && !value_to_boolean(params[:override_sis_stickiness])
+        params_for_update = params_for_update.except(*@course.stuck_sis_fields)
       end
 
       @course.attributes = params_for_update
