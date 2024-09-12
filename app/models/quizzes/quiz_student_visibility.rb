@@ -27,12 +27,12 @@ class Quizzes::QuizStudentVisibility < ActiveRecord::Base
     true
   end
 
-  def self.where_with_guard(*args)
+  def self.where_with_guard(*)
     if Account.site_admin.feature_enabled?(:selective_release_backend)
       raise StandardError, "QuizStudentVisibility view should not be used when selective_release_backend site admin flag is on.  Use QuizVisibilityService instead"
     end
 
-    where_without_guard(*args)
+    where_without_guard(*)
   end
 
   class << self

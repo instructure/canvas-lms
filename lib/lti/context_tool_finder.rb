@@ -38,15 +38,15 @@ module Lti
       @options = options
     end
 
-    def self.all_tools_scope_union(*args)
-      new(*args).send(:all_tools_scope_union)
+    def self.all_tools_scope_union(*)
+      new(*).send(:all_tools_scope_union)
     end
 
     # TEMPORARY shim function until we can switch away from it.
     # Returns a scope, only on the context's shard, so doesn't look at
     # the context's root account's federated parent account
-    def self.all_tools_for(*args)
-      new(*args).single_shard_scope
+    def self.all_tools_for(*)
+      new(*).single_shard_scope
     end
 
     # TEMPORARY shim function until we can switch away from all_tools_for

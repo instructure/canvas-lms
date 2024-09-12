@@ -333,14 +333,14 @@ class CourseSection < ActiveRecord::Base
     enrollments.where.not(course_id:).each { |e| e.update_attribute(:course_id, course_id) }
   end
 
-  def crosslist_to_course(course, **opts)
+  def crosslist_to_course(course, **)
     return self if course_id == course.id
 
     self.nonxlist_course_id ||= course_id
-    move_to_course(course, **opts)
+    move_to_course(course, **)
   end
 
-  def uncrosslist(**opts)
+  def uncrosslist(**)
     return unless self.nonxlist_course_id
 
     if nonxlist_course.workflow_state == "deleted"
@@ -349,7 +349,7 @@ class CourseSection < ActiveRecord::Base
     end
     nonxlist_course = self.nonxlist_course
     self.nonxlist_course = nil
-    move_to_course(nonxlist_course, **opts)
+    move_to_course(nonxlist_course, **)
   end
 
   def crosslisted?

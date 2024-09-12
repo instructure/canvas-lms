@@ -328,12 +328,12 @@ module UserLearningObjectScopes
   end
 
   # opts forwaded to course_ids_for_todo_lists
-  def submissions_needing_grading_count(**opts)
+  def submissions_needing_grading_count(**)
     if ::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries", failsafe: false]
       return 0
     end
 
-    course_ids = course_ids_for_todo_lists(:manage_grades, **opts)
+    course_ids = course_ids_for_todo_lists(:manage_grades, **)
     Submission.active
               .needs_grading
               .joins("INNER JOIN #{Enrollment.quoted_table_name} AS grader_enrollments ON assignments.context_id = grader_enrollments.course_id")

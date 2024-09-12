@@ -314,10 +314,10 @@ class ContextModuleProgression < ActiveRecord::Base
     end
   end
 
-  def update_requirement_met!(*args)
+  def update_requirement_met!(*)
     retry_count = 0
     begin
-      if update_requirement_met(*args)
+      if update_requirement_met(*)
         save!
         delay_if_production.evaluate!
       end

@@ -155,8 +155,8 @@ module CC
       @content_export&.id
     end
 
-    def create_key(*args)
-      @content_export ? @content_export.create_key(*args) : CCHelper.create_key(*args)
+    def create_key(*)
+      @content_export ? @content_export.create_key(*) : CCHelper.create_key(*)
     end
 
     def export_object?(obj, asset_type: nil, ignore_updated_at: false)

@@ -202,8 +202,6 @@ module CC
       linked_objects
     end
 
-    require "set"
-
     class HtmlContentExporter
       attr_reader :course, :user, :used_media_objects, :media_object_flavor, :media_object_infos
       attr_accessor :referenced_files, :referenced_assessment_question_files

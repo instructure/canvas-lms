@@ -27,8 +27,8 @@ class ActiveRecord::Base
   class << self
     delegate :distinct_on, :find_ids_in_batches, :explain, to: :all
 
-    def find_ids_in_ranges(loose: true, **kwargs, &block)
-      all.find_ids_in_ranges(loose:, **kwargs, &block)
+    def find_ids_in_ranges(loose: true, **, &)
+      all.find_ids_in_ranges(loose:, **, &)
     end
 
     attr_accessor :in_migration
@@ -337,8 +337,8 @@ class ActiveRecord::Base
     self.class.to_s
   end
 
-  def sanitize_sql(*args)
-    self.class.send :sanitize_sql_for_conditions, *args
+  def sanitize_sql(*)
+    self.class.send(:sanitize_sql_for_conditions, *)
   end
 
   def self.reflection_type_name
@@ -353,8 +353,8 @@ class ActiveRecord::Base
     base_class
   end
 
-  ruby2_keywords def wildcard(*args)
-    self.class.wildcard(*args)
+  ruby2_keywords def wildcard(*)
+    self.class.wildcard(*)
   end
 
   def self.wildcard(*args, type: :full, delimiter: nil, case_sensitive: false)
@@ -699,9 +699,9 @@ class ActiveRecord::Base
     end
   end
 
-  def self.create_and_ignore_on_duplicate(*args)
+  def self.create_and_ignore_on_duplicate(*)
     # FIXME: handle array fields and setting of nulls where those are not the default
-    model = new(*args)
+    model = new(*)
     attributes = []
     values = []
 
@@ -729,7 +729,7 @@ class ActiveRecord::Base
         )
         SELECT * FROM new_row
         UNION
-        #{except(:select).where(*args).to_sql}
+        #{except(:select).where(*).to_sql}
       SQL
 
       find_by_sql(insert_sql).first
@@ -1226,13 +1226,13 @@ module UsefulBatchEnumerator
     enum
   end
 
-  def pluck(*args)
-    return to_enum(:pluck, *args) unless block_given?
+  def pluck(*)
+    return to_enum(:pluck, *) unless block_given?
 
     @relation.except(:select)
-             .select(*args)
+             .select(*)
              .in_batches(strategy: @strategy, load: false, **@kwargs) do |relation|
-      yield relation.pluck(*args)
+      yield relation.pluck(*)
     end
   end
 

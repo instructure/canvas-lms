@@ -2404,14 +2404,14 @@ class User < ActiveRecord::Base
   def recent_feedback(
     course_ids: nil,
     contexts: nil,
-    **opts # forwarded to submissions_for_course_ids
+    ** # forwarded to submissions_for_course_ids
   )
     course_ids ||= if contexts
                      contexts.select { |c| c.is_a?(Course) }.map(&:id)
                    else
                      participating_student_course_ids
                    end
-    submissions_for_course_ids(course_ids, **opts)
+    submissions_for_course_ids(course_ids, **)
   end
 
   def visible_stream_item_instances(opts = {})

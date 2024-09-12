@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "set"
-
 module CanvasPandaPub
   # Internal: Helper for performing PandaPub HTTP requests in a separate
   # thread. The only type of pushes we currently support are ones where later

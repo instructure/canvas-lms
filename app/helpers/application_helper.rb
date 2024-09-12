@@ -642,8 +642,8 @@ module ApplicationHelper
   # <% }, :b => capture { %>
   # <select>...</select>
   # <% } %>
-  def ot(*args)
-    concat(t(*args))
+  def ot(*)
+    concat(t(*))
   end
 
   def join_title(*parts)

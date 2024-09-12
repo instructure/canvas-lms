@@ -71,28 +71,28 @@ class PeriodicJobs
   end
 end
 
-def with_each_job_cluster(klass, method, *args, jitter: nil, local_offset: false)
+def with_each_job_cluster(klass, method, *, jitter: nil, local_offset: false)
   DatabaseServer.send_in_each_region(
     PeriodicJobs,
     :with_each_shard_by_database_in_region,
     { singleton: "periodic:region: #{klass}.#{method}" },
     klass,
     method,
-    *args,
+    *,
     jitter:,
     local_offset:,
     connection_class: Delayed::Backend::ActiveRecord::AbstractJob
   )
 end
 
-def with_each_shard_by_database(klass, method, *args, jitter: nil, local_offset: false, error_callback: nil)
+def with_each_shard_by_database(klass, method, *, jitter: nil, local_offset: false, error_callback: nil)
   DatabaseServer.send_in_each_region(
     PeriodicJobs,
     :with_each_shard_by_database_in_region,
     { singleton: "periodic:region: #{klass}.#{method}" },
     klass,
     method,
-    *args,
+    *,
     jitter:,
     local_offset:,
     connection_class: ActiveRecord::Base,

@@ -218,8 +218,8 @@ module CanvasColor
     end
 
     # All-purpose setter - pass in another Color, '#000000', rgb vals... whatever
-    def set(*args)
-      val = Color.parse(*args)
+    def set(*)
+      val = Color.parse(*)
       unless val.nil?
         self.r = val.r
         self.g = val.g
@@ -429,7 +429,7 @@ module CanvasColor
   # "Global" method for creating Color objects, eg:
   #   new_color = rgb(params[:new_color])
   #   style="border: 1px solid <%= rgb(10,50,80).lighten %>"
-  def rgb(*args)
-    Color.parse(*args)
+  def rgb(*)
+    Color.parse(*)
   end
 end
