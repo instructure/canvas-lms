@@ -86,15 +86,16 @@ describe Account::HelpLinks do
     end
 
     it "removes default values from default links" do
-      links = account.help_links.first(3).deep_dup
+      links = account.help_links.sort_by { |a| a[:id] }.deep_dup
       updates = [
         { text: "this is new text", subtext: "this is new subtext" },
         { url: "this is a new url" },
-        { feature_headline: "this is a new headline", is_new: true }
+        { feature_headline: "this is a new headline", is_new: true },
+        { url: "yet another new url" }
       ]
       links.zip(updates).each { |link, update| link.merge!(update) }
 
-      processed = subject.process_links_before_save(links)
+      processed = subject.process_links_before_save(links).sort_by { |a| a[:id] }
       non_trivial_text = processed.map { |link| link.slice(:text, :subtext, :url, :feature_headline, :is_new).compact }
       expect(non_trivial_text).to eq updates
     end
@@ -126,13 +127,6 @@ describe Account::HelpLinks do
         expect(link).not_to have_key(:is_new)
         expect(link).not_to have_key(:feature_headline)
       end
-    end
-
-    it "does not return a link for covid resources" do
-      Account.site_admin.disable_feature! :featured_help_links
-      links = account.help_links
-      link_ids = links.pluck(:id)
-      expect(link_ids).not_to include(:covid)
     end
   end
 end
