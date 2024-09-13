@@ -2137,6 +2137,36 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
+  def ungraded_discussion_overrides(current_user = nil)
+    current_user ||= self.current_user
+    return unless current_user
+    return nil if assignment.present? || context_type == "Group" || is_announcement || !Account.site_admin.feature_enabled?(:selective_release_ui_api)
+
+    overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(self, current_user)
+
+    # this is a temporary check for any discussion_topic_section_visibilities until we eventually backfill that table
+    if is_section_specific
+      section_overrides = assignment_overrides.active.where(set_type: "CourseSection").select(:set_id)
+      section_visibilities = discussion_topic_section_visibilities.active.where.not(course_section_id: section_overrides)
+    end
+
+    if section_visibilities
+      section_overrides = section_visibilities.map do |section_visibility|
+        assignment_override = AssignmentOverride.new(
+          discussion_topic: section_visibility.discussion_topic,
+          course_section: section_visibility.course_section
+        )
+        assignment_override.unlock_at = unlock_at if unlock_at
+        assignment_override.lock_at = lock_at if lock_at
+        assignment_override
+      end
+    end
+
+    all_overrides = overrides.to_a
+    all_overrides += section_overrides if section_visibilities
+    all_overrides
+  end
+
   private
 
   def enough_replies_for_checkpoint?(reply_to_entries)

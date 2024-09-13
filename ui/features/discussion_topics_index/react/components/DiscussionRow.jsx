@@ -74,6 +74,7 @@ import select from '@canvas/obj-select'
 import UnreadBadge from '@canvas/unread-badge'
 import {isPassedDelayedPostAt} from '@canvas/datetime/react/date-utils'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import moment from 'moment'
 
 const I18n = useI18nScope('discussion_row')
 
@@ -302,9 +303,17 @@ class DiscussionRow extends Component {
     }
     const assignment = this.props.discussion.assignment
 
+    const ungradedLockAt = this.props.discussion.ungraded_discussion_overrides?.sort((a, b) =>
+      moment.utc(b.assignment_override?.lock_at).diff(moment.utc(a.assignment_override?.lock_at))
+    )
+
     const availabilityBegin =
       this.props.discussion.delayed_post_at || (assignment && assignment.unlock_at)
-    const availabilityEnd = this.props.discussion.lock_at || (assignment && assignment.lock_at)
+
+    const availabilityEnd =
+      this.props.discussion.lock_at ||
+      (assignment && assignment.lock_at) ||
+      ungradedLockAt?.[0]?.assignment_override.lock_at
 
     if (
       availabilityBegin &&
@@ -532,8 +541,7 @@ class DiscussionRow extends Component {
     const discussionTitle = this.props.discussion.title
     const menuList = []
 
-    if (this.props.discussion?.permissions?.update
-      && this.props.discussion?.html_url) {
+    if (this.props.discussion?.permissions?.update && this.props.discussion?.html_url) {
       menuList.push(
         this.createMenuItem(
           'edit',
