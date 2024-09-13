@@ -1192,14 +1192,6 @@ describe ApplicationHelper do
         allow(helper).to receive(:csp_context).and_return(account)
       end
 
-      it "doesn't set the CSP report only header if not configured" do
-        helper.add_csp_for_root
-        helper.include_custom_meta_tags
-        expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
-        expect(headers).to_not have_key("Content-Security-Policy")
-        expect(js_env).not_to have_key(:csp)
-      end
-
       it "doesn't set the CSP header for non-html requests" do
         response.content_type = "application/json"
         account.enable_csp!
@@ -1218,19 +1210,12 @@ describe ApplicationHelper do
         expect(js_env[:csp]).to eq "frame-src 'self' localhost root_account.test root_account2.test blob:; script-src 'self' 'unsafe-eval' 'unsafe-inline' localhost root_account.test root_account2.test; object-src 'self' localhost root_account.test root_account2.test; "
       end
 
-      it "includes the report URI" do
-        allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
-        helper.add_csp_for_root
-        helper.include_custom_meta_tags
-        expect(headers["Content-Security-Policy-Report-Only"]).to eq "frame-src 'self' blob: localhost root_account.test root_account2.test; report-uri https://somewhere/; "
-      end
-
-      it "includes the report URI when active" do
+      it "does not include the report URI when active" do
         allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
         account.enable_csp!
         helper.add_csp_for_root
         helper.include_custom_meta_tags
-        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: localhost root_account.test root_account2.test; report-uri https://somewhere/; "
+        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: localhost root_account.test root_account2.test; "
       end
 
       it "includes canvadocs domain if enabled" do

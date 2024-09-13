@@ -27,6 +27,7 @@ describe "site-wide" do
   let(:x_canvas_user_id) { "X-Canvas-User-Id" }
   let(:x_canvas_real_user_id) { "X-Canvas-Real-User-Id" }
   let(:content_security_policy) { "Content-Security-Policy" }
+  let(:content_security_policy_report_only) { "Content-Security-Policy-Report-Only" }
 
   it "renders 404 when user isn't logged in" do
     get "/dashbo"
@@ -57,6 +58,27 @@ describe "site-wide" do
     expect_any_instance_of(FilesController).to receive(:files_domain?).and_return(true)
     get "http://files-test.host/files/#{@attachment.id}/download"
     expect(response[content_security_policy]).to be_nil
+  end
+
+  context "CSP report only header" do
+    before :once do
+      Account.default.enable_feature! :default_source_csp_logging
+    end
+
+    it "is set if default_source_csp_logging feature is enabled" do
+      allow_any_instance_of(ApplicationHelper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
+      course_with_teacher_logged_in
+      get "/"
+      expect(response[content_security_policy_report_only])
+        .to eq "frame-ancestors 'self' ; default-src 'self'; report-uri https://somewhere/"
+    end
+
+    it "is not set if default_source_csp_logging feature is disabled" do
+      Account.default.disable_feature!(:default_source_csp_logging)
+      course_with_teacher_logged_in
+      get "/"
+      expect(response[content_security_policy_report_only]).to be_nil
+    end
   end
 
   describe "with javascript_csp flag enabled" do

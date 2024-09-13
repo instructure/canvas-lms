@@ -1045,18 +1045,11 @@ module ApplicationHelper
 
   def csp_report_uri
     @csp_report_uri ||=
-      if (host = csp_context.root_account.csp_logging_config["host"])
-        "; report-uri #{host}report/#{csp_context.root_account.global_id}"
+      if (host = DynamicSettings.find("csp-logging")[:host])
+        "; report-uri #{host}"
       else
         ""
       end
-  end
-
-  def csp_header
-    header = +"Content-Security-Policy"
-    header << "-Report-Only" unless csp_enforced?
-
-    header.freeze
   end
 
   def include_files_domain_in_csp
@@ -1067,7 +1060,6 @@ module ApplicationHelper
   def add_csp_for_root
     return unless response.media_type == "text/html"
     return unless csp_enabled?
-    return if csp_report_uri.empty? && !csp_enforced?
 
     # we iframe all files from the files domain into canvas, so we always have to include the files domain here
     domains =
@@ -1077,14 +1069,13 @@ module ApplicationHelper
 
     # Due to New Analytics generating CSV reports as blob on the client-side and then trying to download them,
     # as well as an interesting difference in browser interpretations of CSP, we have to allow blobs as a frame-src
-    headers[csp_header] = "frame-src 'self' blob: #{domains}#{csp_report_uri}; "
+    headers["Content-Security-Policy"] = "frame-src 'self' blob: #{domains}; "
   end
 
   def add_csp_for_file
     return unless csp_enabled?
-    return if csp_report_uri.empty? && !csp_enforced?
 
-    headers[csp_header] = csp_iframe_attribute + csp_report_uri
+    headers["Content-Security-Policy"] = csp_iframe_attribute
   end
 
   def csp_iframe_attribute
