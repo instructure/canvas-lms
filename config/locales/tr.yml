@@ -14473,6 +14473,11 @@ tr:
     inst_fs: 
       description: "S3 için proxy yapan dosya servisi."
       name: Inst-FS
+    instructure_identity_settings: 
+      labels: 
+        client_id: "Müşteri ID"
+        client_secret: "Müşteri Anahtarı"
+        discovery_url: "Keşif Bağlantısı:"
     kaltura: 
       description: "Kaltura video/ses kayıt ve oynatma"
       name: Kaltura
