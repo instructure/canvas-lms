@@ -77,3 +77,8 @@ default_source_csp_logging:
   display_name: Default Source Content Security Policy Logging
   description: Set the default-src directive for the Content-Security-Policy-Logging header to 'self' and log violations
   shadow: true
+course_archival:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Course Archival
+  description: Allows for the ability to archive courses
