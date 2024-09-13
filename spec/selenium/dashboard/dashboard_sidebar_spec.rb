@@ -136,5 +136,15 @@ describe "dashboard" do
       get "/dashboard-sidebar"
       expect(todo_list).to include_text @topic.title.to_s
     end
+
+    it "ignores a sub assignment successfully" do
+      @reply_to_topic.submit_homework @student, body: "checkpoint submission for #{@student.name}"
+      user_session(@teacher)
+
+      get "/dashboard"
+      expect(todo_list).to include_text @topic.title.to_s
+      todo_disable_item_link.click
+      expect(todo_list).not_to contain_jqcss(@topic.title.to_s)
+    end
   end
 end
