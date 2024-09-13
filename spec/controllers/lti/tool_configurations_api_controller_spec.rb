@@ -128,6 +128,16 @@ RSpec.describe Lti::ToolConfigurationsApiController do
         expect(config_from_response.settings["target_link_uri"]).to eq settings["target_link_uri"]
       end
 
+      context "when developer_key.redirect_uris is a blank string" do
+        let(:dev_key_params) { super().merge(redirect_uris: "") }
+
+        it "does not overwrite the URL's redirect uris with a blank string redirect uri" do
+          subject
+
+          expect(config_from_response.developer_key.redirect_uris).to eq [settings["target_link_uri"]]
+        end
+      end
+
       it 'sets the "disabled_placements"' do
         subject
         expect(config_from_response.disabled_placements).to match_array(
