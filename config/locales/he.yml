@@ -14407,6 +14407,11 @@ he:
       tag: תג
       version: גירסה
       website: אתר
+    instructure_identity_settings: 
+      labels: 
+        client_id: "מזהה קליינט"
+        client_secret: "מלה סודית של הקליינט"
+        discovery_url: "Discovery URL"
     kaltura: 
       description: "הקלטת והשמעת וידאו/אודיו של Kaltura "
       name: "Kaltura "
