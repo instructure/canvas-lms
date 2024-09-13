@@ -61,14 +61,25 @@ export const generateModalTitle = (
   enrollmentType: EnrollmentType,
   isEditMode: boolean,
   page: number,
-  enrollment: User | null
+  enrollments: User[]
 ): string => {
   const userName = user.name
-  const enrollmentName = enrollment?.name
+  const enrollmentName = enrollments[0]?.name
   if (page >= 2) {
+    // if user is RECIPIENT, recipient is the userName; otherwise, use first enrollment
     const recipient = enrollmentType === RECIPIENT && userName ? userName : enrollmentName
     if (recipient) {
-      return I18n.t(`Assign temporary enrollments to %{recipient}`, {recipient})
+      /** if an enrollment array has multiple users, we show the number of recipients (count).
+      enrollment.length can be 0 when clicking Edit in TempEnrollView and will still have a valid
+       recipient, so we should still show recipient. */
+      return I18n.t(
+        {
+          zero: `Assign temporary enrollments to %{recipient}`,
+          one: `Assign temporary enrollments to %{recipient}`,
+          other: `Assign temporary enrollments to %{count} users`,
+        },
+        {count: enrollments.length, recipient}
+      )
     } else {
       return I18n.t('Assign temporary enrollments')
     }
@@ -79,7 +90,7 @@ export const generateModalTitle = (
       userName,
     })
   }
-  return I18n.t('Find a recipient of Temporary Enrollments')
+  return I18n.t('Find recipients of Temporary Enrollments')
 }
 
 export function TempEnrollModal(props: Props) {
@@ -100,13 +111,12 @@ export function TempEnrollModal(props: Props) {
   }, [isModalOpenAnimationComplete])
 
   useEffect(() => {
-    const firstEnrollment = enrollments.length === 0 ? null : enrollments[0]
     const newTitle = generateModalTitle(
       props.user,
       props.enrollmentType,
       props.isEditMode,
       page,
-      firstEnrollment
+      enrollments
     )
     setTitle(newTitle)
   }, [props.user, props.enrollmentType, props.isEditMode, page, enrollments])
@@ -138,11 +148,17 @@ export function TempEnrollModal(props: Props) {
     resetCommonState()
   }
 
-  const handleEnrollmentSubmission = (isSuccess: boolean, isUpdate: boolean) => {
+  const handleEnrollmentSubmission = (
+    isSuccess: boolean,
+    isUpdate: boolean,
+    isMultiple: boolean
+  ) => {
     if (isSuccess) {
       setOpen(false)
       if (isUpdate) {
         showFlashSuccess(I18n.t('Temporary enrollment was successfully updated.'))()
+      } else if (isMultiple) {
+        showFlashSuccess(I18n.t('Temporary enrollments were successfully created.'))()
       } else {
         showFlashSuccess(I18n.t('Temporary enrollment was successfully created.'))()
       }
@@ -165,9 +181,7 @@ export function TempEnrollModal(props: Props) {
   }
 
   const handleSetEnrollmentsFromSearch = (enrollmentUsers: User[]) => {
-    // TODO: Set enrollment to all users
-    // setEnrollments(enrollmentUsers)
-    setEnrollments([enrollmentUsers[0]])
+    setEnrollments(enrollmentUsers)
   }
 
   const handlePageChange = (change: number) => {

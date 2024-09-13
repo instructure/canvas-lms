@@ -39,8 +39,7 @@ describe('TempEnrollSearch', () => {
     account_name: '',
     account_id: '',
   }
-  const mockSame = {users: [{userTemplate, user_id: '1', address: ''}]}
-  const mockNoUser = {users: [], duplicates: [], missing: []}
+
   const mockUserList = {
     users: [
       {
@@ -52,6 +51,7 @@ describe('TempEnrollSearch', () => {
     duplicates: [],
     missing: [],
   }
+
   const mockFindUser = {
     id: '2',
     name: 'user2',
@@ -86,32 +86,7 @@ describe('TempEnrollSearch', () => {
 
   it('shows search page', () => {
     const {getByText} = render(<TempEnrollSearch page={0} {...props} />)
-    expect(getByText('Find a recipient of temporary enrollments from user1')).toBeInTheDocument()
-  })
-
-  it('displays error message when API call fails', async () => {
-    userListUriMock(() => {
-      throw Object.assign(new Error('error'), {code: 402})
-    })
-    const {queryAllByText} = render(<TempEnrollSearch page={1} {...props} />)
-    await waitFor(() => expect(queryAllByText('error')).toBeTruthy())
-  })
-
-  it('displays error message when user is same as original user', async () => {
-    userListUriMock(mockSame)
-    userDetailsUriMock(mockSame.users[0].user_id, {})
-    const {queryAllByText} = render(<TempEnrollSearch page={1} {...props} />)
-    await waitFor(() =>
-      expect(
-        queryAllByText('The user found matches the provider. Please search for a different user.')
-      ).toBeTruthy()
-    )
-  })
-
-  it('displays error message when no user is returned', async () => {
-    userListUriMock(mockNoUser)
-    const {queryByText} = render(<TempEnrollSearch page={1} {...props} />)
-    await waitFor(() => expect(queryByText('User could not be found.')).toBeTruthy())
+    expect(getByText('Find recipient(s) of temporary enrollments from user1')).toBeInTheDocument()
   })
 
   it('displays new page when user is found', async () => {
@@ -119,26 +94,26 @@ describe('TempEnrollSearch', () => {
     userDetailsUriMock(mockFindUser.id, mockFindUser)
     const {queryByText} = render(<TempEnrollSearch page={1} {...props} />)
     await waitFor(() =>
-      expect(queryByText(/is ready to be assigned temporary enrollments/)).toBeTruthy()
+      expect(queryByText(/ready to be assigned temporary enrollments/)).toBeTruthy()
     )
   })
 
   it('changes label when different search type is chosen', () => {
     const {getAllByText, getByText} = render(<TempEnrollSearch page={0} {...props} />)
     expect(
-      getByText('Enter the email address of the user you would like to temporarily enroll')
+      getByText('Enter the email addresses of the users you would like to temporarily enroll')
     ).toBeInTheDocument()
 
     const sis = getAllByText('SIS ID')[0]
     sis.click()
     expect(
-      getByText('Enter the SIS ID of the user you would like to temporarily enroll')
+      getByText('Enter the SIS IDs of the users you would like to temporarily enroll')
     ).toBeInTheDocument()
 
     const login = getAllByText('Login ID')[0]
     login.click()
     expect(
-      getByText('Enter the login ID of the user you would like to temporarily enroll')
+      getByText('Enter the login IDs of the users you would like to temporarily enroll')
     ).toBeInTheDocument()
   })
 
@@ -147,13 +122,34 @@ describe('TempEnrollSearch', () => {
     expect(queryByText('SIS ID')).toBeFalsy()
   })
 
-  it('shows found user information on confirmation page', async () => {
-    userListUriMock(mockUserList)
+  it('shows found users information on confirmation page', async () => {
+    const mockOtherUser = {
+      userTemplate,
+      user_id: '4',
+      address: 'user4',
+    }
+    const mockMultiUserList = {
+      ...mockUserList,
+      users: [...mockUserList.users, mockOtherUser],
+    }
+    const mockOtherDetails = {
+      id: '4',
+      name: 'user4',
+      sis_user_id: 'addtl_user_sis',
+      primary_email: 'addtl_user@email.com',
+      login_id: 'addtl_user_login',
+    }
+    userListUriMock(mockMultiUserList)
     userDetailsUriMock(mockFindUser.id, mockFindUser)
-    const {queryByText} = render(<TempEnrollSearch page={1} {...props} />)
-    await waitFor(() => expect(queryByText('user@email.com')).toBeInTheDocument())
-    await waitFor(() => expect(queryByText('user_sis')).toBeInTheDocument())
-    await waitFor(() => expect(queryByText('user_login')).toBeInTheDocument())
+    userDetailsUriMock(mockOtherDetails.id, mockOtherDetails)
+    const {findByText} = render(<TempEnrollSearch page={1} {...props} />)
+    expect(await findByText('user@email.com')).toBeInTheDocument()
+    expect(await findByText('user_sis')).toBeInTheDocument()
+    expect(await findByText('user_login')).toBeInTheDocument()
+
+    expect(await findByText('addtl_user@email.com')).toBeInTheDocument()
+    expect(await findByText('addtl_user_sis')).toBeInTheDocument()
+    expect(await findByText('addtl_user_login')).toBeInTheDocument()
   })
 
   it('does not show sis id on confirmation page when permission is off', async () => {
@@ -161,6 +157,65 @@ describe('TempEnrollSearch', () => {
     userDetailsUriMock(mockFindUser.id, mockFindUser)
     const {queryByText} = render(<TempEnrollSearch page={1} {...props} canReadSIS={false} />)
     await waitFor(() => expect(queryByText('SIS ID')).toBeFalsy())
+  })
+
+  describe('errors', () => {
+    const mockSame = {
+      users: [
+        {userTemplate, user_id: '1', address: ''},
+        {userTemplate, user_id: '2', address: ''},
+      ],
+      duplicates: [],
+      missing: [],
+    }
+
+    const mockNoUser = {users: [], duplicates: [], missing: []}
+
+    const mockMissing = {
+      users: [{userTemplate, user_id: '2', address: ''}],
+      missing: [{userTemplate, user_id: '4', address: ''}],
+    }
+
+    it('displays error message when fetching user list fails', async () => {
+      userListUriMock(() => {
+        throw Object.assign(new Error('error'), {code: 402})
+      })
+      const {queryAllByText} = render(<TempEnrollSearch page={1} {...props} />)
+      await waitFor(() => expect(queryAllByText('error')).toBeTruthy())
+    })
+
+    it('displays error message when fetching user details fails', async () => {
+      userListUriMock(mockUserList)
+      userDetailsUriMock(mockFindUser.id, () => {
+        throw Object.assign(new Error('error'), {code: 402})
+      })
+      const {queryAllByText} = render(<TempEnrollSearch page={1} {...props} />)
+      await waitFor(() => expect(queryAllByText('error')).toBeTruthy())
+    })
+
+    it('displays error message when any user matches provider', async () => {
+      userListUriMock(mockSame)
+      const {queryAllByText} = render(<TempEnrollSearch page={1} {...props} />)
+      await waitFor(() =>
+        expect(
+          queryAllByText(
+            'One of the users found matches the provider. Please search for a different user.'
+          )
+        ).toBeTruthy()
+      )
+    })
+
+    it('displays error message when any missing users are received', async () => {
+      userListUriMock(mockMissing)
+      const {queryAllByText} = render(<TempEnrollSearch page={1} {...props} />)
+      await waitFor(() => expect(queryAllByText('A user could not be found.')).toBeTruthy())
+    })
+
+    it('displays error message when no users are returned', async () => {
+      userListUriMock(mockNoUser)
+      const {queryByText} = render(<TempEnrollSearch page={1} {...props} />)
+      await waitFor(() => expect(queryByText('A user could not be found.')).toBeTruthy())
+    })
   })
 
   describe('duplicates', () => {

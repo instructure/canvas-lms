@@ -400,7 +400,7 @@ export function TempEnrollAssign(props: Props) {
 
   const handleValidationError = (message: string) => {
     setErrorMsg(message)
-    props.setEnrollmentStatus(false, false)
+    props.setEnrollmentStatus(false, false, false)
     setLoading(false)
   }
 
@@ -518,7 +518,8 @@ export function TempEnrollAssign(props: Props) {
     } finally {
       // if there is no pairing, we are creating a new enrollment
       const isUpdate = props.tempEnrollmentsPairing != null
-      props.setEnrollmentStatus(success, isUpdate)
+      const isMultiple = props.enrollments.length > 1
+      props.setEnrollmentStatus(success, isUpdate, isMultiple)
       // only set loading state if modal is still open
       if (!success) {
         setLoading(false)

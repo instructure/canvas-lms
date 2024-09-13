@@ -87,6 +87,14 @@ const enrollmentsByCourse = [
   },
 ]
 
+const additionalRecipient = {
+  email: 'ross@email.com',
+  id: '6',
+  login_id: 'mel123',
+  name: 'Melvin',
+  sis_user_id: '11',
+}
+
 const props: Props = {
   enrollments: [
     {
@@ -167,6 +175,20 @@ describe('TempEnrollAssign', () => {
       )
 
       expect(defaultMessage).toBeInTheDocument()
+    })
+
+    it('changes text when multiple recipients are being assigned', async () => {
+      const modifiedProps = {
+        ...props,
+        enrollments: [...props.enrollments, additionalRecipient],
+      }
+      const {findByText} = render(<TempEnrollAssign {...modifiedProps} />)
+
+      const summaryMsg = await findByText(/Canvas will enroll 2 users/)
+      const readyMsg = await findByText(/2 users will receive/)
+
+      expect(summaryMsg).toBeInTheDocument()
+      expect(readyMsg).toBeInTheDocument()
     })
 
     it('triggers goBack when back is clicked', async () => {
