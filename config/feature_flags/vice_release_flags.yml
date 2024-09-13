@@ -149,3 +149,10 @@ inbox_settings:
   applies_to: SiteAdmin
   display_name: Inbox Settings - QW Updates
   description: Gives users access to new optional features like setting a default signature that will be added at the end of outgoing messages and setting an autoresponder.
+
+disallow_threaded_replies_fix_alert:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Disallow Threaded Replies Fix Alert
+  description: |-
+    This feature flag controls the visibility of the alert that allows teachers to fix threaded replies on the Discussions Index page.

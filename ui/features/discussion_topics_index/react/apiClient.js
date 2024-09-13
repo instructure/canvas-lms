@@ -72,3 +72,7 @@ export function reorderPinnedDiscussions({contextType, contextId}, order) {
   const url = `/api/v1/${contextType}s/${contextId}/discussion_topics/reorder`
   return axios.post(url, postData)
 }
+
+export function migrateDiscussionDisallowThreadedReplies({contextId}) {
+  return axios.put(`/api/v1/courses/${contextId}/discussion_topics/migrate_disallow`)
+}
