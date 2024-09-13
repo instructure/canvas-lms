@@ -158,11 +158,11 @@ module CanvasRails
                                 Rails.root.join("app/stylesheets"),
                                 Rails.root.join("ui")]
 
-    config.middleware.use Rack::Chunked
-    config.middleware.use Rack::Deflater, if: lambda { |*|
+    config.middleware.insert_before Rack::ETag, Rack::Chunked
+    config.middleware.insert_before Rack::ETag, Rack::Deflater, if: lambda { |*|
       ::DynamicSettings.find(tree: :private)["enable_rack_deflation", failsafe: true]
     }
-    config.middleware.use Rack::Brotli, if: lambda { |*|
+    config.middleware.insert_before Rack::ETag, Rack::Brotli, if: lambda { |*|
       ::DynamicSettings.find(tree: :private)["enable_rack_brotli", failsafe: true]
     }
 
