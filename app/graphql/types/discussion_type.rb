@@ -374,31 +374,7 @@ module Types
 
     field :ungraded_discussion_overrides, Types::AssignmentOverrideType.connection_type, null: true
     def ungraded_discussion_overrides
-      return nil if object.assignment.present? || object.context_type == "Group" || object.is_announcement || !Account.site_admin.feature_enabled?(:selective_release_ui_api)
-
-      overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(object, current_user)
-
-      # this is a temporary check for any discussion_topic_section_visibilities until we eventually backfill that table
-      if object.is_section_specific
-        section_overrides = object.assignment_overrides.active.where(set_type: "CourseSection").select(:set_id)
-        section_visibilities = object.discussion_topic_section_visibilities.active.where.not(course_section_id: section_overrides)
-      end
-
-      if section_visibilities
-        section_overrides = section_visibilities.map do |section_visibility|
-          assignment_override = AssignmentOverride.new(
-            discussion_topic: section_visibility.discussion_topic,
-            course_section: section_visibility.course_section
-          )
-          assignment_override.unlock_at = object.unlock_at if object.unlock_at
-          assignment_override.lock_at = object.lock_at if object.lock_at
-          assignment_override
-        end
-      end
-
-      all_overrides = overrides.to_a
-      all_overrides += section_overrides if section_visibilities
-      all_overrides
+      object.ungraded_discussion_overrides(current_user)
     end
 
     field :subscription_disabled_for_user, Boolean, null: true

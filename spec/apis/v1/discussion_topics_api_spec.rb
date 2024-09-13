@@ -723,6 +723,7 @@ describe DiscussionTopicsController, type: :request do
         "topic_children" => [],
         "group_topic_children" => [],
         "is_announcement" => false,
+        "ungraded_discussion_overrides" => [],
         "anonymous_state" => nil }
     end
 
@@ -2332,7 +2333,8 @@ describe DiscussionTopicsController, type: :request do
       "only_graders_can_rate" => false,
       "sort_by_rating" => false,
       "todo_date" => nil,
-      "anonymous_state" => nil
+      "anonymous_state" => nil,
+      "ungraded_discussion_overrides" => nil,
     }
     expect(json.sort.to_h).to eq expected.sort.to_h
   end
@@ -2415,7 +2417,8 @@ describe DiscussionTopicsController, type: :request do
       "unread_count" => 0,
       "url" => "http://www.example.com/groups/#{@group.id}/discussion_topics/#{announcement.id}",
       "user_can_see_posts" => true,
-      "user_name" => @user.name
+      "user_name" => @user.name,
+      "ungraded_discussion_overrides" => nil
     }
 
     expect(response).to have_http_status(:ok)
