@@ -1705,12 +1705,16 @@ describe DiscussionTopic do
 
           expect(DiscussionTopic.visible_to_students_in_course_with_da([@student1.id], [@course.id])).to include(@topic)
           expect(DiscussionTopic.visible_to_students_in_course_with_da([@student2.id], [@course.id])).not_to include(@topic)
+          expect(@topic.active_participants_with_visibility).to include(@student1)
+          expect(@topic.active_participants_with_visibility).not_to include(@student2)
         end
 
         it "is visible only to users who can access the assigned section" do
           @topic.assignment_overrides.create!(set: @course_section)
           expect(DiscussionTopic.visible_to_students_in_course_with_da([@student1.id], [@course.id])).not_to include(@topic)
           expect(DiscussionTopic.visible_to_students_in_course_with_da([@student2.id], [@course.id])).to include(@topic)
+          expect(@topic.active_participants_with_visibility).not_to include(@student1)
+          expect(@topic.active_participants_with_visibility).to include(@student2)
         end
 
         it "is visible only to students in module override section" do
