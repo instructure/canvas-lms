@@ -426,7 +426,7 @@ describe "Importing assignments" do
         peer_reviews_due_at: 2.days.from_now,
         migration_id:,
         submission_types: "external_tool",
-        external_tool_tag_attributes: { url: tool.url, content: tool },
+        external_tool_tag_attributes: { url: tool.url, content: tool, new_tab: tool_current_tab },
         points_possible: 10
       )
     end
@@ -445,9 +445,12 @@ describe "Importing assignments" do
         "lock_at" => nil,
         "unlock_at" => nil,
         "external_tool_url" => tool_url,
-        "external_tool_id" => tool_id
+        "external_tool_id" => tool_id,
+        "external_tool_new_tab" => tool_new_tab
       }
     end
+    let(:tool_current_tab) { false }
+    let(:tool_new_tab) { false }
 
     context "and a matching tool is installed in the destination" do
       let(:tool) { external_tool_model(context: course.root_account) }
@@ -467,6 +470,44 @@ describe "Importing assignments" do
 
         it "updates the URL" do
           expect { subject }.to change { assignment.external_tool_tag.url }.from(tool.url).to tool_url
+        end
+      end
+
+      context "and there is no new_tab setting" do
+        let(:tool_current_tab) { false }
+        let(:tool_new_tab) { nil }
+
+        it "does not change the setting" do
+          expect { subject }.not_to change { assignment.external_tool_tag.new_tab }.from(false)
+        end
+      end
+
+      context "and the new_tab setting is the same as the tool" do
+        let(:tool_current_tab) { false }
+        let(:tool_new_tab) { false }
+
+        it "does not change the setting" do
+          expect { subject }.not_to change { assignment.external_tool_tag.new_tab }.from(false)
+        end
+      end
+
+      context "but the matching tool has a different new_tab setting" do
+        context "when the old setting is false and the new is true" do
+          let(:tool_current_tab) { false }
+          let(:tool_new_tab) { true }
+
+          it "updates the setting to true" do
+            expect { subject }.to change { assignment.external_tool_tag.new_tab }.from(false).to true
+          end
+        end
+
+        context "when the old setting is true and the new is false" do
+          let(:tool_current_tab) { true }
+          let(:tool_new_tab) { false }
+
+          it "updates the setting to false" do
+            expect { subject }.to change { assignment.external_tool_tag.new_tab }.from(true).to false
+          end
         end
       end
     end

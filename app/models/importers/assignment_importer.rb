@@ -490,6 +490,13 @@ module Importers
             item.association(:external_tool_tag).target = nil # otherwise it will trigger destroy on the tag
           end
         end
+
+        if current_tag && !hash[:external_tool_new_tab].nil? && current_tag.new_tab != hash[:external_tool_new_tab]
+          current_tag.mark_as_importing! migration
+
+          current_tag.update(new_tab: hash[:external_tool_new_tab])
+        end
+
         # All external_tool assignments have at least one line item. Create the
         # default one here; we may modify it or add more below if line items
         # are explicitly provided in the imported data
