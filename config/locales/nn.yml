@@ -19779,6 +19779,11 @@ nn:
       labels: 
         migration_rate: "Mogelegheit for migrering av eldre filer til Inst-FS ved tilgang (0 til 100)"
         service_worker: "Bruk tenestearbeidar til å autentisere filtilgang i Safari 13+"
+    instructure_identity_settings: 
+      labels: 
+        client_id: Klient-ID
+        client_secret: Klienthemmelegheit
+        discovery_url: "URL-adresse for søk"
     kaltura: 
       description: "Kaltura video- og lydinnspeling med avspeling"
       name: Kaltura
