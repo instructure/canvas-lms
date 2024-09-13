@@ -12914,6 +12914,10 @@ uk:
     inst_fs: 
       description: "Файловий сервіс, що проксує для S3."
       name: Inst-FS
+    instructure_identity_settings: 
+      labels: 
+        client_id: "Ідентифікатор користувача"
+        discovery_url: "Пошук URL-адреси"
     kaltura: 
       description: "Запис та відтворення відео/аудіо в Kaltura"
       name: Kaltura
