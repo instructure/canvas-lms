@@ -21,10 +21,8 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {Heading} from '@instructure/ui-heading'
 import {Table} from '@instructure/ui-table'
-import {Tooltip} from '@instructure/ui-tooltip'
-import {Pill} from '@instructure/ui-pill'
+import StatusPill from './StatusPill'
 import FeatureFlagButton from './FeatureFlagButton'
-import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('feature_flags')
 
@@ -32,7 +30,6 @@ const {Head, Body, ColHeader, Row, Cell} = Table
 
 function FeatureFlagTable({title, rows, disableDefaults}) {
   rows.sort((a, b) => a.display_name.localeCompare(b.display_name))
-  const [visibleTooltip, setVisibleTooltip] = useState(null)
   return (
     <>
       <Heading as="h2" level="h3" data-testid="ff-table-heading">
@@ -59,56 +56,7 @@ function FeatureFlagTable({title, rows, disableDefaults}) {
                 </ToggleDetails>
               </Cell>
               <Cell>
-                <>
-                  {feature.feature_flag.hidden && !feature.shadow && (
-                    <Tooltip
-                      isShowingContent={feature.feature === visibleTooltip}
-                      onShowContent={() => setVisibleTooltip(feature.feature)}
-                      onHideContent={() => setVisibleTooltip(null)}
-                      renderTip={
-                        <View as="div" width="600px">
-                          {I18n.t(
-                            `This feature option is only visible to users with Site Admin access.
-                            End users will not see it until enabled by a Site Admin user.
-                            Before enabling for an institution, please be sure you fully understand
-                            the functionality and possible impacts to users.`
-                          )}
-                        </View>
-                      }
-                    >
-                      <Pill margin="0 x-small" themeOverride={{maxWidth: 'none'}}>
-                        {I18n.t('Hidden')}
-                      </Pill>
-                    </Tooltip>
-                  )}
-                  {feature.shadow && (
-                    <Tooltip
-                      renderTip={
-                        <View as="div" width="600px">
-                          {I18n.t(
-                            `This feature option is only visible to users with Site Admin access. It is similar to
-                          "Hidden", but end users will not see it even if enabled by a Site Admin user.`
-                          )}
-                        </View>
-                      }
-                    >
-                      <Pill color="alert" margin="0 x-small" themeOverride={{maxWidth: 'none'}}>
-                        {I18n.t('Shadow')}
-                      </Pill>
-                    </Tooltip>
-                  )}
-                  {feature.beta && (
-                    <Tooltip
-                      renderTip={I18n.t(
-                        'Feature preview — opting in includes ongoing updates outside the regular release schedule'
-                      )}
-                    >
-                      <Pill color="info" margin="0 0 0 x-small" themeOverride={{maxWidth: 'none'}}>
-                        {I18n.t('Feature Preview')}
-                      </Pill>
-                    </Tooltip>
-                  )}
-                </>
+                <StatusPill feature={feature} />
               </Cell>
               <Cell>
                 <FeatureFlagButton
