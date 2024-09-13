@@ -17798,6 +17798,11 @@ fa:
     inst_fs: 
       description: "خدمت فایل که نماینده S3  است."
       name: Inst-FS
+    instructure_identity_settings: 
+      labels: 
+        client_id: "شناسه سرویس گیرنده"
+        client_secret: "رمز سرویس گیرنده"
+        discovery_url: "نشانی اینترنتی کشف"
     kaltura: 
       description: "ضبط و پخش تصویر/صدای Kaltura"
       name: Kaltura
