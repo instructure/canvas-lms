@@ -10910,6 +10910,10 @@ el:
       tag: Ετικέτα
       version: Έκδοση
       website: Ιστοσελίδα
+    instructure_identity_settings: 
+      labels: 
+        client_id: "ID Πελάτη"
+        client_secret: "Μυστικό Πελάτη"
     kaltura: 
       description: "Ηχογράφηση και αναπαραγωγή αρχείων βίντεο/ήχου Kaltura"
       name: Kaltura
