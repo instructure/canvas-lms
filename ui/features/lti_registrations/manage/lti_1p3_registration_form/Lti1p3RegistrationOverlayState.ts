@@ -24,6 +24,8 @@ import type {LtiScope} from '@canvas/lti/model/LtiScope'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 import create from 'zustand'
 
+type PlacementLabelOverride = string
+
 export type Lti1p3RegistrationOverlayState = {
   launchSettings: Partial<{
     redirectURIs: string
@@ -46,26 +48,30 @@ export type Lti1p3RegistrationOverlayState = {
     courseNavigationDefaultDisabled?: boolean
   }
   override_uris: {
-    placements: Record<
-      LtiPlacement,
-      {
-        message_type?: LtiMessageType
-        uri?: string
-      }
+    placements: Partial<
+      Record<
+        LtiPlacement,
+        {
+          message_type?: LtiMessageType
+          uri?: string
+        }
+      >
     >
   }
   naming: {
     nickname?: string
     description?: string
     notes?: string
-    placements: Record<LtiPlacement, string>
+    placements: Partial<Record<LtiPlacement, PlacementLabelOverride>>
   }
   icons: {
-    placements: Record<
-      LtiPlacement,
-      {
-        icon_url?: string
-      }
+    placements: Partial<
+      Record<
+        LtiPlacement,
+        {
+          icon_url?: string
+        }
+      >
     >
   }
 }

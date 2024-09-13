@@ -92,12 +92,12 @@ describe('OverrideURIsConfirmation', () => {
     const placements = state.placements.placements || []
     const placement = placements[0]
 
-    const input = screen.getByPlaceholderText(state.override_uris.placements[placement].uri || '')
+    const input = screen.getByPlaceholderText(state.override_uris.placements[placement]!.uri!)
     await userEvent.click(input)
     await userEvent.clear(input)
     await userEvent.paste('https://new-uri.com')
 
-    expect(overlayStore.getState().state.override_uris.placements[placement].uri).toBe(
+    expect(overlayStore.getState().state.override_uris.placements[placement]!.uri).toBe(
       'https://new-uri.com'
     )
   })
@@ -177,7 +177,7 @@ describe('OverrideURIsConfirmation', () => {
     expect(screen.getByText('Next').closest('button')).not.toBeDisabled()
   })
 
-  it('allows users to change the message type placements that support it', async () => {
+  it('allows users to change the message type on placements that support it', async () => {
     const internalConfig = mockInternalConfiguration({
       placements: [{placement: LtiPlacements.ModuleMenuModal}],
     })
@@ -255,6 +255,31 @@ describe('OverrideURIsConfirmation', () => {
       expect(
         screen.queryByText(i18nLtiPlacement(LtiPlacements.CourseNavigation))
       ).not.toBeInTheDocument()
+    })
+  })
+
+  it("doesn't error when a new placement is added that doesn't have an override defined", async () => {
+    const internalConfig = mockInternalConfiguration({
+      placements: [{placement: LtiPlacements.CourseNavigation}],
+    })
+    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig)
+    const onNextClicked = jest.fn()
+    const onPreviousClicked = jest.fn()
+
+    render(
+      <OverrideURIsConfirmation
+        overlayStore={overlayStore}
+        registration={internalConfig}
+        onNextClicked={onNextClicked}
+        onPreviousClicked={onPreviousClicked}
+      />
+    )
+
+    const newPlacement = LtiPlacements.AccountNavigation
+    overlayStore.getState().togglePlacement(newPlacement)
+
+    await waitFor(() => {
+      expect(screen.getByText(i18nLtiPlacement(newPlacement))).toBeInTheDocument()
     })
   })
 })

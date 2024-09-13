@@ -82,7 +82,7 @@ export const OverrideURIsConfirmation = ({
           )}
         </Text>
         {placements.map(p => {
-          const overrideURI = overrides[p].uri || ''
+          const overrideURI = overrides[p]?.uri || ''
           return (
             <PlacementOverrideURIFormField
               key={p}
