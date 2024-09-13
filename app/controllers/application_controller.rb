@@ -978,7 +978,12 @@ class ApplicationController < ActionController::Base
     # are typically embedded in an iframe in canvas, but the hostname is
     # different
     if !files_domain? && !@embeddable
-      append_to_header("Content-Security-Policy", "frame-ancestors 'self' #{csp_frame_ancestors&.uniq&.join(" ")};")
+      directives = "frame-ancestors 'self' #{csp_frame_ancestors&.uniq&.join(" ")};"
+      append_to_header("Content-Security-Policy", directives)
+
+      if @domain_root_account&.feature_enabled?(:default_source_csp_logging) && csp_report_uri.present?
+        headers["Content-Security-Policy-Report-Only"] = directives + " default-src 'self'" + csp_report_uri
+      end
     end
     RequestContext::Generator.store_request_meta(request, @context, @sentry_trace)
     true
