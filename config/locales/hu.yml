@@ -18470,6 +18470,11 @@ hu:
       labels: 
         migration_rate: "A régebbi fájlok Inst-FS-be történő áttelepítésének esélye hozzáféréskor (0 és 100 között)"
         service_worker: "A Safari 13+ szolgáltatásmunkás használata a fájlhozzáférések hitelesítéséhez"
+    instructure_identity_settings: 
+      labels: 
+        client_id: Kliensazonosító
+        client_secret: "Kliens titkos kódja"
+        discovery_url: "Discovery URL"
     kaltura: 
       description: "Kaltura video-/audiofelvétel és visszajátszás "
       name: Kaltura
