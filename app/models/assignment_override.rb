@@ -316,6 +316,10 @@ class AssignmentOverride < ActiveRecord::Base
     set_type == "ADHOC"
   end
 
+  def course_section?
+    set_type == "CourseSection"
+  end
+
   def mastery_paths?
     set_type == SET_TYPE_NOOP && set_id == NOOP_MASTERY_PATHS
   end

@@ -1643,12 +1643,24 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def active_participants_with_visibility
-    return active_participants_include_tas_and_teachers unless for_assignment?
+    return active_participants_include_tas_and_teachers unless for_assignment? || assignment_overrides.active.any?
 
-    users_with_visibility = assignment.students_with_visibility.pluck(:id)
+    users_with_visibility = for_assignment? ? assignment.students_with_visibility.pluck(:id) : []
+
+    assignment_overrides.select(&:active?).each do |override|
+      # specific user
+      if override.adhoc?
+        adhoc_users = users_with_visibility.concat(override.assignment_override_students.pluck(:user_id))
+        users_with_visibility.concat(adhoc_users)
+      elsif override.course_section?
+        users_in_section = User.joins(:enrollments).where(enrollments: { course_section_id: override.set_id }).pluck(:id)
+        users_with_visibility.concat(users_in_section)
+      end
+    end
 
     admin_ids = course.participating_admins.pluck(:id)
     users_with_visibility.concat(admin_ids)
+    users_with_visibility.uniq!
 
     # observers will not be returned, which is okay for the functions current use cases (but potentially not others)
     active_participants_include_tas_and_teachers.select { |p| users_with_visibility.include?(p.id) }
