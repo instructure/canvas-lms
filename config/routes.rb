@@ -2483,6 +2483,8 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :rubrics_api) do
       get "rubrics/upload_template", action: "upload_template", as: "rubrics_account_upload_template"
+      post "courses/:course_id/rubrics/download_rubrics", action: "download_rubrics", as: "rubrics_account_download_rubrics"
+      post "accounts/:account_id/rubrics/download_rubrics", action: "download_rubrics", as: "rubrics_course_download_rubrics"
       get "accounts/:account_id/rubrics", action: :index, as: :account_rubrics
       get "accounts/:account_id/rubrics/:id", action: :show
       get "courses/:course_id/rubrics", action: :index, as: :course_rubrics
