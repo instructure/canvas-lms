@@ -382,7 +382,91 @@ class RubricsApiController < ApplicationController
     render json: rubrics_json(rubrics, @current_user, session)
   end
 
+  def download_rubrics
+    return unless authorized_action(@context, @current_user, :manage_rubrics)
+
+    rubric_ids = params[:rubric_ids]
+    if rubric_ids.blank?
+      render json: { error: I18.t("No rubric IDs provided") }, status: :bad_request
+      return
+    end
+
+    rubrics = Rubric.where(id: rubric_ids, context: @context)
+
+    if rubrics.empty?
+      render json: { error: I18.t("No rubrics found") }, status: :not_found
+      return
+    end
+
+    csv_content = generate_rubrics_csv(rubrics)
+
+    send_data(
+      csv_content,
+      type: "text/csv",
+      filename: "rubrics_export.csv",
+      disposition: "attachment"
+    )
+  end
+
   private
+
+  def generate_rubrics_csv(rubrics)
+    max_ratings = 0
+    rubrics.each do |rubric|
+      rubric.data.each do |criterion|
+        ratings_count = criterion[:ratings].length
+        max_ratings = ratings_count if ratings_count > max_ratings
+      end
+    end
+
+    column_headers = [
+      "Rubric Name",
+      "Criteria Name",
+      "Criteria Description",
+      "Criteria Enable Range"
+    ]
+
+    max_ratings.times do
+      column_headers += [
+        "Rating Name",
+        "Rating Description",
+        "Rating Points"
+      ]
+    end
+
+    CSV.generate(headers: true) do |csv|
+      csv << column_headers
+
+      rubrics.each do |rubric|
+        rubric_name = rubric.title
+        criteria = rubric.data
+
+        criteria.each do |criterion|
+          row = [
+            rubric_name,
+            criterion[:description],
+            criterion[:long_description],
+            criterion[:criterion_use_range]
+          ]
+
+          criterion[:ratings].each do |rating|
+            row += [
+              rating[:description],
+              rating[:long_description],
+              rating[:points]
+            ]
+          end
+
+          missing_ratings = max_ratings - criterion[:ratings].length
+          missing_ratings.times do
+            row += ["", "", ""]
+          end
+
+          csv << row
+        end
+      end
+    end
+  end
 
   def rubric_assessments(rubric)
     scope = if @context.is_a? Course

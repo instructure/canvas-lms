@@ -288,6 +288,8 @@
 - verb: GET
   path: "/api/v1/accounts/:account_id/rubrics/:id/used_locations"
 - verb: POST
+  path: "/api/v1/accounts/:account_id/rubrics/download_rubrics"
+- verb: POST
   path: "/api/v1/accounts/:account_id/rubrics/upload"
 - verb: GET
   path: "/api/v1/accounts/:account_id/rubrics/upload/:id"
@@ -1275,6 +1277,8 @@
   path: "/api/v1/courses/:course_id/rubrics/:id"
 - verb: GET
   path: "/api/v1/courses/:course_id/rubrics/:id/used_locations"
+- verb: POST
+  path: "/api/v1/courses/:course_id/rubrics/download_rubrics"
 - verb: POST
   path: "/api/v1/courses/:course_id/rubrics/upload"
 - verb: GET

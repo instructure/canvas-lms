@@ -435,6 +435,47 @@ export const fetchRubricImport = async (
   return mapImport(await response.json())
 }
 
+export const downloadRubrics = async (
+  courseId: string | undefined,
+  accountId: string | undefined,
+  selectedRubricIds: string[]
+) => {
+  let postUrl = ''
+
+  if (courseId) {
+    postUrl = `/api/v1/courses/${courseId}/rubrics/download_rubrics`
+  } else if (accountId) {
+    postUrl = `/api/v1/accounts/${accountId}/rubrics/download_rubrics`
+  } else {
+    return
+  }
+
+  const response = await fetch(postUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-Token': getCookie('_csrf_token'),
+    },
+    body: JSON.stringify({
+      rubric_ids: selectedRubricIds,
+    }),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to download rubrics: ${response.statusText}`)
+  }
+
+  const blob = await response.blob()
+  const url = window.URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.setAttribute('download', 'rubrics_export.csv')
+  document.body.appendChild(link)
+  link.click()
+  link?.parentNode?.removeChild(link)
+  window.URL.revokeObjectURL(url)
+}
+
 export const getImportedRubrics = async (
   importId: string,
   accountId?: string,
