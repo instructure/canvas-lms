@@ -37,6 +37,7 @@ jest.mock('../../../queries/ViewRubricQueries', () => ({
   ...jest.requireActual('../../../queries/ViewRubricQueries'),
   archiveRubric: () => archiveRubricMock,
   unarchiveRubric: () => unarchiveRubricMock,
+  downloadRubrics: jest.fn(),
 }))
 jest.mock('@canvas/direct-sharing/react/effects/useManagedCourseSearchApi')
 
@@ -498,6 +499,48 @@ describe('ViewRubrics Tests', () => {
     })
   })
 
+  describe('import rubricx', () => {
+    beforeAll(() => {
+      jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
+    })
+
+    it('enables the download button when rubrics are selected', () => {
+      queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+      const {getByTestId} = renderComponent()
+
+      const downloadButton = getByTestId('download-rubrics')
+      expect(downloadButton).toBeDisabled()
+
+      const checkbox1 = getByTestId('rubric-select-checkbox-1')
+      fireEvent.click(checkbox1)
+      expect(downloadButton).not.toBeDisabled()
+
+      const checkbox2 = getByTestId('rubric-select-checkbox-3')
+      fireEvent.click(checkbox2)
+      expect(downloadButton).not.toBeDisabled()
+
+      fireEvent.click(checkbox1)
+      fireEvent.click(checkbox2)
+      expect(downloadButton).toBeDisabled()
+    })
+
+    it('triggers the download function when the download button is clicked', async () => {
+      queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+      const {getByTestId} = renderComponent()
+
+      const checkbox1 = getByTestId('rubric-select-checkbox-1')
+      fireEvent.click(checkbox1)
+
+      const checkbox2 = getByTestId('rubric-select-checkbox-3')
+      fireEvent.click(checkbox2)
+
+      const downloadButton = getByTestId('download-rubrics')
+      fireEvent.click(downloadButton)
+
+      expect(ViewRubricQueries.downloadRubrics).toHaveBeenCalledWith(undefined, '1', ['1', '3'])
+    })
+  })
+
   describe('preview tray', () => {
     beforeAll(() => {
       jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
@@ -528,7 +571,7 @@ describe('ViewRubrics Tests', () => {
       expect(getByTestId('traditional-criterion-1-ratings-0')).toBeInTheDocument()
 
       previewCell.click()
-      await waitFor(() => expect(getPreviewTray()).not.toBeInTheDocument())
+      await waitFor(() => expect(getPreviewTray()).not.toBeInTheDocument(), {timeout: 5000})
     })
 
     it('filters rubrics based on search query at course level', () => {

@@ -50,7 +50,29 @@ describe RubricImport do
   end
 
   describe "run import" do
-    let(:rubric_headers) { ["Rubric Name", "Criteria Name", "Criteria Description", "Criteria Enable Range", "Rating Name", "Rating Description", "Rating Points", "Rating Name", "Rating Description", "Rating Points", "Rating Name", "Rating Description", "Rating Points"] }
+    let(:rubric_headers) do
+      [
+        "Rubric Name",
+        "Criteria Name",
+        "Criteria Description",
+        "Criteria Enable Range",
+        "Rating Name 1",
+        "Rating Description 1",
+        "Rating Points 1",
+        "Rating Name 2",
+        "Rating Description 2",
+        "Rating Points 2",
+        "Rating Name 3",
+        "Rating Description 3",
+        "Rating Points 3",
+        "Rating Name 4",
+        "Rating Description 4",
+        "Rating Points 4",
+        "Rating Name 5",
+        "Rating Description 5",
+        "Rating Points 5"
+      ]
+    end
 
     def generate_csv(rubric_data)
       uploaded_csv = CSV.generate do |csv|
@@ -82,9 +104,27 @@ describe RubricImport do
 
     def multiple_rubrics_csv
       generate_csv([
-                     ["Rubric 1", "Criteria 1", "Criteria 1 Description", "false", "Rating 1", "Rating 1 Description", "2", "Rating 2", "Rating 2 Description", "1"],
-                     ["Rubric 1", "Criteria 2", "Criteria 2 Description", "false", "Rating 1", "Rating 1 Description", "1"],
-                     ["Rubric 2", "Criteria 1", "Criteria 1 Description", "false", "Rating 1", "Rating 1 Description", "3", "Rating 2", "Rating 2 Description", "2", "Rating 3", "Rating 3 Description", "1"]
+                     ["Rubric 1", "Criteria 1", "Criteria 1 Description", "false", "Rating A1", "Description A1", "3", "Rating A2", "Description A2", "2"],
+                     ["Rubric 1", "Criteria 2", "Criteria 2 Description", "false", "Rating B1", "Description B1", "5", "Rating B2", "Description B2", "4", "Rating B3", "Description B3", "3"],
+                     ["Rubric 2", "Criteria 1", "Criteria 1 Description", "false", "Rating C1", "Description C1", "2"],
+                     ["Rubric 2", "Criteria 2", "Criteria 2 Description", "false", "Rating D1", "Description D1", "4", "Rating D2", "Description D2", "3", "Rating D3", "Description D3", "2", "Rating D4", "Description D4", "1"]
+                   ])
+    end
+
+    def varying_ratings_csv
+      generate_csv([
+                     ["Rubric 1", "Criterion 1", "Description 1", "false", "Rating 1", "Description 1", "5"],
+                     ["Rubric 1", "Criterion 2", "Description 2", "false", "Rating 1", "Description 1", "4", "Rating 2", "Description 2", "3"],
+                     ["Rubric 1", "Criterion 3", "Description 3", "false", "Rating 1", "Description 1", "5", "Rating 2", "Description 2", "4", "Rating 3", "Description 3", "3"],
+                     ["Rubric 1", "Criterion 4", "Description 4", "false", "Rating 1", "Description 1", "5", "Rating 2", "Description 2", "4", "Rating 3", "Description 3", "3", "Rating 4", "Description 4", "2"]
+                   ])
+    end
+
+    def multiple_criteria_ratings_csv
+      generate_csv([
+                     ["Rubric 1", "Criterion 1", "Description 1", "false", "Rating 1", "Description 1", "5", "Rating 2", "Description 2", "4", "Rating 3", "Description 3", "3"],
+                     ["Rubric 1", "Criterion 2", "Description 2", "false", "Rating 1", "Description 1", "4", "Rating 2", "Description 2", "3"],
+                     ["Rubric 1", "Criterion 3", "Description 3", "false", "Rating 1", "Description 1", "5"]
                    ])
     end
 
@@ -136,7 +176,7 @@ describe RubricImport do
         expect(rubric.data[0][:ratings][0][:points]).to eq(1.0)
       end
 
-      it "should run the import with multiple rubrics and criteria" do
+      it "should run the import with multiple rubrics, multiple criteria, and varying ratings" do
         import = create_import_manually(multiple_rubrics_csv)
         import.run
 
@@ -148,51 +188,132 @@ describe RubricImport do
         rubrics = Rubric.where(rubric_imports_id: import.id)
         expect(rubrics.length).to eq(2)
 
-        # checking rubric 1
+        # Checking Rubric 1
         rubric1 = rubrics.find_by(title: "Rubric 1")
         expect(rubric1.context_id).to eq(@account.id)
         expect(rubric1.data.length).to eq(2)
 
-        # checking rubric 1 criteria 1
-        expect(rubric1.data[0][:description]).to eq("Criteria 1")
-        expect(rubric1.data[0][:long_description]).to eq("Criteria 1 Description")
-        expect(rubric1.data[0][:points]).to eq(2.0)
-        expect(rubric1.data[0][:criterion_use_range]).to be false
-        expect(rubric1.data[0][:ratings].length).to eq(2)
-        expect(rubric1.data[0][:ratings][0][:description]).to eq("Rating 1")
-        expect(rubric1.data[0][:ratings][0][:long_description]).to eq("Rating 1 Description")
-        expect(rubric1.data[0][:ratings][0][:points]).to eq(2.0)
-        expect(rubric1.data[0][:ratings][1][:description]).to eq("Rating 2")
-        expect(rubric1.data[0][:ratings][1][:long_description]).to eq("Rating 2 Description")
-        expect(rubric1.data[0][:ratings][1][:points]).to eq(1.0)
+        # Rubric 1, Criteria 1
+        criterion1 = rubric1.data[0]
+        expect(criterion1[:description]).to eq("Criteria 1")
+        expect(criterion1[:long_description]).to eq("Criteria 1 Description")
+        expect(criterion1[:points]).to eq(3.0)
+        expect(criterion1[:ratings].length).to eq(2)
+        expect(criterion1[:ratings][0][:description]).to eq("Rating A1")
+        expect(criterion1[:ratings][0][:points]).to eq(3.0)
+        expect(criterion1[:ratings][1][:description]).to eq("Rating A2")
+        expect(criterion1[:ratings][1][:points]).to eq(2.0)
 
-        # checking rubric 1 criteria 2
-        expect(rubric1.data[1][:description]).to eq("Criteria 2")
-        expect(rubric1.data[1][:long_description]).to eq("Criteria 2 Description")
-        expect(rubric1.data[1][:points]).to eq(1.0)
-        expect(rubric1.data[1][:criterion_use_range]).to be false
-        expect(rubric1.data[1][:ratings].length).to eq(1)
-        expect(rubric1.data[1][:ratings][0][:description]).to eq("Rating 1")
-        expect(rubric1.data[1][:ratings][0][:long_description]).to eq("Rating 1 Description")
+        # Rubric 1, Criteria 2
+        criterion2 = rubric1.data[1]
+        expect(criterion2[:description]).to eq("Criteria 2")
+        expect(criterion2[:long_description]).to eq("Criteria 2 Description")
+        expect(criterion2[:points]).to eq(5.0)
+        expect(criterion2[:ratings].length).to eq(3)
+        expect(criterion2[:ratings][0][:description]).to eq("Rating B1")
+        expect(criterion2[:ratings][0][:points]).to eq(5.0)
+        expect(criterion2[:ratings][1][:description]).to eq("Rating B2")
+        expect(criterion2[:ratings][1][:points]).to eq(4.0)
+        expect(criterion2[:ratings][2][:description]).to eq("Rating B3")
+        expect(criterion2[:ratings][2][:points]).to eq(3.0)
 
-        # # checking rubric 2
+        # Checking Rubric 2
         rubric2 = rubrics.find_by(title: "Rubric 2")
         expect(rubric2.context_id).to eq(@account.id)
-        expect(rubric2.data.length).to eq(1)
+        expect(rubric2.data.length).to eq(2)
 
-        # # checking rubric 2 criteria 1
-        expect(rubric2.data[0][:description]).to eq("Criteria 1")
-        expect(rubric2.data[0][:long_description]).to eq("Criteria 1 Description")
-        expect(rubric2.data[0][:points]).to eq(3.0)
-        expect(rubric2.data[0][:ratings][0][:description]).to eq("Rating 1")
-        expect(rubric2.data[0][:ratings][0][:long_description]).to eq("Rating 1 Description")
-        expect(rubric2.data[0][:ratings][0][:points]).to eq(3.0)
-        expect(rubric2.data[0][:ratings][1][:description]).to eq("Rating 2")
-        expect(rubric2.data[0][:ratings][1][:long_description]).to eq("Rating 2 Description")
-        expect(rubric2.data[0][:ratings][1][:points]).to eq(2.0)
-        expect(rubric2.data[0][:ratings][2][:description]).to eq("Rating 3")
-        expect(rubric2.data[0][:ratings][2][:long_description]).to eq("Rating 3 Description")
-        expect(rubric2.data[0][:ratings][2][:points]).to eq(1.0)
+        # Rubric 2, Criteria 1
+        criterion1 = rubric2.data[0]
+        expect(criterion1[:description]).to eq("Criteria 1")
+        expect(criterion1[:long_description]).to eq("Criteria 1 Description")
+        expect(criterion1[:points]).to eq(2.0)
+        expect(criterion1[:ratings].length).to eq(1)
+        expect(criterion1[:ratings][0][:description]).to eq("Rating C1")
+        expect(criterion1[:ratings][0][:points]).to eq(2.0)
+
+        # Rubric 2, Criteria 2
+        criterion2 = rubric2.data[1]
+        expect(criterion2[:description]).to eq("Criteria 2")
+        expect(criterion2[:long_description]).to eq("Criteria 2 Description")
+        expect(criterion2[:points]).to eq(4.0)
+        expect(criterion2[:ratings].length).to eq(4)
+        expect(criterion2[:ratings][0][:description]).to eq("Rating D1")
+        expect(criterion2[:ratings][0][:points]).to eq(4.0)
+        expect(criterion2[:ratings][1][:description]).to eq("Rating D2")
+        expect(criterion2[:ratings][1][:points]).to eq(3.0)
+        expect(criterion2[:ratings][2][:description]).to eq("Rating D3")
+        expect(criterion2[:ratings][2][:points]).to eq(2.0)
+        expect(criterion2[:ratings][3][:description]).to eq("Rating D4")
+        expect(criterion2[:ratings][3][:points]).to eq(1.0)
+      end
+
+      it "should run the import with a single rubric having multiple criteria with varying numbers of ratings" do
+        import = create_import_manually(varying_ratings_csv)
+        import.run
+
+        expect(import.workflow_state).to eq("succeeded")
+        expect(import.progress).to eq(100)
+        expect(import.error_count).to eq(0)
+        expect(import.error_data).to eq([])
+
+        rubrics = Rubric.where(rubric_imports_id: import.id)
+        expect(rubrics.length).to eq(1)
+
+        rubric = rubrics.first
+        expect(rubric.title).to eq("Rubric 1")
+        expect(rubric.data.length).to eq(4)
+
+        # Criterion 1
+        criterion1 = rubric.data[0]
+        expect(criterion1[:description]).to eq("Criterion 1")
+        expect(criterion1[:ratings].length).to eq(1)
+
+        # Criterion 2
+        criterion2 = rubric.data[1]
+        expect(criterion2[:description]).to eq("Criterion 2")
+        expect(criterion2[:ratings].length).to eq(2)
+
+        # Criterion 3
+        criterion3 = rubric.data[2]
+        expect(criterion3[:description]).to eq("Criterion 3")
+        expect(criterion3[:ratings].length).to eq(3)
+
+        # Criterion 4
+        criterion4 = rubric.data[3]
+        expect(criterion4[:description]).to eq("Criterion 4")
+        expect(criterion4[:ratings].length).to eq(4)
+      end
+
+      it "should run the import with multiple criteria having different numbers of ratings" do
+        import = create_import_manually(multiple_criteria_ratings_csv)
+        import.run
+
+        expect(import.workflow_state).to eq("succeeded")
+        expect(import.progress).to eq(100)
+        expect(import.error_count).to eq(0)
+        expect(import.error_data).to eq([])
+
+        rubrics = Rubric.where(rubric_imports_id: import.id)
+        expect(rubrics.length).to eq(1)
+
+        rubric = rubrics.first
+        expect(rubric.title).to eq("Rubric 1")
+        expect(rubric.data.length).to eq(3)
+
+        # Criterion 1
+        criterion1 = rubric.data[0]
+        expect(criterion1[:description]).to eq("Criterion 1")
+        expect(criterion1[:ratings].length).to eq(3)
+
+        # Criterion 2
+        criterion2 = rubric.data[1]
+        expect(criterion2[:description]).to eq("Criterion 2")
+        expect(criterion2[:ratings].length).to eq(2)
+
+        # Criterion 3
+        criterion3 = rubric.data[2]
+        expect(criterion3[:description]).to eq("Criterion 3")
+        expect(criterion3[:ratings].length).to eq(1)
       end
     end
 

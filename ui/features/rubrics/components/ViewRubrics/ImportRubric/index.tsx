@@ -19,7 +19,7 @@
 import React, {useState} from 'react'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {useMutation, queryClient} from '@canvas/query'
+import {useMutation} from '@canvas/query'
 import {ImportRubricTray} from './ImportRubricTray'
 import {ImportFailuresModal} from './ImportFailuresModal'
 import type {RubricImport} from '../../../types/Rubric'
