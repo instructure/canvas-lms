@@ -532,7 +532,6 @@ class DiscussionTopicsController < ApplicationController
         CAN_MANAGE_CONTENT: @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_add),
         CAN_MANAGE_ASSIGN_TO_GRADED: @context.discussion_topics.temp_record(assignment_id: 0).grants_right?(@current_user, session, @topic.new_record? ? :create_assign_to : :manage_assign_to),
         CAN_MANAGE_ASSIGN_TO_UNGRADED: @context.discussion_topics.temp_record(assignment_id: nil).grants_right?(@current_user, session, @topic.new_record? ? :create_assign_to : :manage_assign_to),
-        CAN_MANAGE_UNGRADED_DISCUSSION: authorized_action(@topic, @current_user, (@topic.new_record? ? :create : :update)),
       }
     }
 
@@ -615,7 +614,6 @@ class DiscussionTopicsController < ApplicationController
               .map { |category| { id: category.id, name: category.name } },
       HAS_GRADING_PERIODS: @context.grading_periods?,
       SECTION_LIST: sections.map { |section| { id: section.id, name: section.name } },
-      SECTION_LIMITED_VISIBILITY: context.is_a?(Course) && context.visibility_limited_to_course_sections?(@current_user),
       ANNOUNCEMENTS_LOCKED: announcements_locked?,
       CREATE_ANNOUNCEMENTS_UNLOCKED: @current_user.create_announcements_unlocked?,
       USAGE_RIGHTS_REQUIRED: usage_rights_required,
