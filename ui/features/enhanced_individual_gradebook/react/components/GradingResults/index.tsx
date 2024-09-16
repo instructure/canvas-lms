@@ -39,9 +39,11 @@ import {
   submitterPreviewText,
   disableGrading,
   passFailStatusOptions,
+  assignmentHasCheckpoints,
 } from '../../../utils/gradebookUtils'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import DefaultGradeInput from './DefaultGradeInput'
+import {CheckpointGradeInputs} from './CheckpointGradeInputs'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -72,10 +74,14 @@ export default function GradingResults({
 }: GradingResultsComponentProps) {
   const submission = studentSubmissions?.find(s => s.assignmentId === assignment?.id)
   const [gradeInput, setGradeInput] = useState<string>('')
+  const [replyToTopicGradeInput, setReplyToTopicGradeInput] = useState<string>('')
+  const [replyToEntryGradeInput, setReplyToEntryGradeInput] = useState<string>('')
   const [excusedChecked, setExcusedChecked] = useState<boolean>(false)
   const [modalOpen, setModalOpen] = useState<boolean>(false)
   const [proxyUploadModalOpen, setProxyUploadModalOpen] = useState<boolean>(false)
   const [passFailStatusIndex, setPassFailStatusIndex] = useState<number>(0)
+  const [replyToTopicPassFailStatusIndex, setReplyToTopicPassFailStatusIndex] = useState<number>(0)
+  const [replyToEntryPassFailStatusIndex, setReplyToEntryPassFailStatusIndex] = useState<number>(0)
 
   const {submit, submitExcused, submitScoreError, submitScoreStatus, savedSubmission} =
     useSubmitScore()
@@ -251,18 +257,33 @@ export default function GradingResults({
                 {submitterPreviewText(submission)}
               </Text>
             </View>
-            <DefaultGradeInput
-              assignment={assignment}
-              submission={submission}
-              passFailStatusIndex={passFailStatusIndex}
-              gradeInput={gradeInput}
-              submitScoreStatus={submitScoreStatus}
-              context="student_and_assignment_grade"
-              handleSetGradeInput={handleSetGradeInput}
-              handleSubmitGrade={submitGrade}
-              handleChangePassFailStatus={handleChangePassFailStatus}
-              gradingStandardPointsBased={gradingStandardPointsBased}
-            />
+            {assignmentHasCheckpoints(assignment) ? (
+              <CheckpointGradeInputs
+                parentAssignment={assignment}
+                parentSubmission={submission}
+                parentPassFailStatusIndex={passFailStatusIndex}
+                replyToTopicPassFailStatusIndex={replyToTopicPassFailStatusIndex}
+                replyToEntryPassFailStatusIndex={replyToEntryPassFailStatusIndex}
+                parentGradeInput={gradeInput}
+                replyToTopicGradeInput={replyToTopicGradeInput}
+                replyToEntryGradeInput={replyToEntryGradeInput}
+                submitScoreStatus={submitScoreStatus}
+                gradingStandardPointsBased={gradingStandardPointsBased}
+              />
+            ) : (
+              <DefaultGradeInput
+                assignment={assignment}
+                submission={submission}
+                passFailStatusIndex={passFailStatusIndex}
+                gradeInput={gradeInput}
+                submitScoreStatus={submitScoreStatus}
+                context="student_and_assignment_grade"
+                handleSetGradeInput={handleSetGradeInput}
+                handleSubmitGrade={submitGrade}
+                handleChangePassFailStatus={handleChangePassFailStatus}
+                gradingStandardPointsBased={gradingStandardPointsBased}
+              />
+            )}
             <View as="div" margin="small 0 0 0">
               {submission.late && (
                 <>

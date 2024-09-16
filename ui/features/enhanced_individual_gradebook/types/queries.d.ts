@@ -40,6 +40,7 @@ export type EnrollmentConnection = {
 
 type AssignmentCheckpoint = {
   tag: string
+  pointsPossible: number
 }
 
 export type AssignmentConnection = {
