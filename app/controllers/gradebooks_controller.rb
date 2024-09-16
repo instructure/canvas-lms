@@ -1043,6 +1043,7 @@ class GradebooksController < ApplicationController
         GRADE_BY_QUESTION_SUPPORTED: nil,
         EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
         EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
+        ENHANCED_RUBRICS_ENABLED: @context.feature_enabled?(:enhanced_rubrics),
         PLATFORM_SERVICE_SPEEDGRADER_ENABLED: platform_service_speedgrader_enabled,
         RUBRIC_ASSESSMENT: {
           assessor_id: @current_user.id.to_s,
