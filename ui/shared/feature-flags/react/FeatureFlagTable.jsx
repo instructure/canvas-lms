@@ -29,6 +29,8 @@ const I18n = useI18nScope('feature_flags')
 const {Head, Body, ColHeader, Row, Cell} = Table
 
 function FeatureFlagTable({title, rows, disableDefaults}) {
+  const [stateChanges, setStateChanges] = useState({})
+
   rows.sort((a, b) => a.display_name.localeCompare(b.display_name))
   return (
     <>
@@ -56,7 +58,7 @@ function FeatureFlagTable({title, rows, disableDefaults}) {
                 </ToggleDetails>
               </Cell>
               <Cell>
-                <StatusPill feature={feature} />
+                <StatusPill feature={feature} updatedState={stateChanges[feature.feature]} />
               </Cell>
               <Cell>
                 <FeatureFlagButton
@@ -64,6 +66,7 @@ function FeatureFlagTable({title, rows, disableDefaults}) {
                   featureFlag={feature.feature_flag}
                   disableDefaults={disableDefaults}
                   appliesTo={feature.applies_to}
+                  onStateChange={newState => setStateChanges({...stateChanges, [feature.feature]: newState})}
                 />
               </Cell>
             </Row>

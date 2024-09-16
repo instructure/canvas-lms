@@ -73,8 +73,9 @@ describe('feature_flags::FeatureFlagButton', () => {
     window.ENV.CONTEXT_BASE_URL = '/accounts/1'
     const route = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/feature1`
     fetchMock.putOnce(route, JSON.stringify(sampleData.onFeature.feature_flag))
+    const onStateChange = jest.fn()
     const {container, getByText} = render(
-      <FeatureFlagButton featureFlag={sampleData.allowedFeature.feature_flag} />
+      <FeatureFlagButton featureFlag={sampleData.allowedFeature.feature_flag} onStateChange={onStateChange} />
     )
 
     expect(container.querySelector('svg[name="IconTrouble"]')).toBeInTheDocument()
@@ -82,6 +83,7 @@ describe('feature_flags::FeatureFlagButton', () => {
     await userEvent.click(getByText('Enabled'))
     await waitFor(() => expect(fetchMock.calls(route)).toHaveLength(1))
 
+    expect(onStateChange).toHaveBeenCalledWith('on')
     expect(container.querySelector('svg[name="IconPublish"]')).toBeInTheDocument()
   })
 
