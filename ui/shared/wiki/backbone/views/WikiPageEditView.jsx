@@ -258,8 +258,7 @@ export default class WikiPageEditView extends ValidatedFormView {
         <Suspense fallback={<div>{I18n.t('Loading...')}</div>}>
           <BlockEditor
             container={container}
-            version={blockEditorData.version}
-            content={blockEditorData.blocks[0].data}
+            content={blockEditorData}
             onCancel={this.cancel.bind(this)}
           />
         </Suspense>,
@@ -421,11 +420,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       }
     }
     if (window.block_editor) {
-      this.blockEditorData = {
-        time: Date.now(),
-        version: '1',
-        blocks: [{data: window.block_editor().getBlocks()}],
-      }
+      this.blockEditorData = window.block_editor().getBlocks()
     }
 
     if (this.reloadView != null) {

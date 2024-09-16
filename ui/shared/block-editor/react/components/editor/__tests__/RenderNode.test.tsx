@@ -22,6 +22,7 @@ import {getByText as domGetByText} from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import BlockEditor from '../../../BlockEditor'
 import {blank_section_with_button_and_heading} from '../../../__tests__/test-content'
+import {LATEST_BLOCK_DATA_VERSION} from '../../../utils/transformations'
 
 const user = userEvent.setup()
 
@@ -35,8 +36,7 @@ function renderEditor(props = {}) {
     <BlockEditor
       enableResizer={false} // jsdom doesn't render enough for BlockResizer to work
       container={container}
-      version="1"
-      content={blank_section_with_button_and_heading}
+      content={{version: LATEST_BLOCK_DATA_VERSION, blocks: blank_section_with_button_and_heading}}
       onCancel={() => {}}
       {...props}
     />,

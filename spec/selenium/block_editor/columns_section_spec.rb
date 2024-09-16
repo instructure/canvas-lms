@@ -47,11 +47,7 @@ describe "Block Editor", :ignore_js_errors do
       block_editor_attributes: {
         time: Time.now.to_i,
         version: "1",
-        blocks: [
-          {
-            data: block_page_content
-          }
-        ]
+        blocks: block_page_content
       }
     )
   end

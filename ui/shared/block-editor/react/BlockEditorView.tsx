@@ -16,20 +16,43 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import {Editor, Frame} from '@craftjs/core'
 import {blocks} from './components/blocks'
+import {
+  transform,
+  LATEST_BLOCK_DATA_VERSION,
+  type BlockEditorDataTypes,
+  type BlockEditorData,
+} from './utils/transformations'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import './style.css'
 
+const I18n = useI18nScope('block-editor')
+
 type BlockEditorViewProps = {
-  content: string
+  content: BlockEditorDataTypes
 }
 
 const BlockEditorView = ({content}: BlockEditorViewProps) => {
+  const [data] = useState<BlockEditorData>(() => {
+    if (content?.blocks) {
+      return transform(content)
+    }
+    return {version: '0.2', blocks: undefined} as BlockEditorData
+  })
+
+  useEffect(() => {
+    if (data.version !== LATEST_BLOCK_DATA_VERSION) {
+      // eslint-disable-next-line no-alert
+      alert(I18n.t('Unknown block data version "%{v}", mayhem may ensue', {v: data.version}))
+    }
+  }, [data.version])
+
   return (
     <Editor enabled={false} resolver={blocks}>
-      <Frame data={content} />
+      <Frame data={data.blocks} />
     </Editor>
   )
 }

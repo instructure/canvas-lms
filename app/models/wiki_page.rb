@@ -589,6 +589,7 @@ class WikiPage < ActiveRecord::Base
       copy_title: nil
     }
     opts_with_default = default_opts.merge(opts)
+
     result = WikiPage.new({
                             title: opts_with_default[:copy_title] || get_copy_title(self, t("Copy"), self.title),
                             wiki_id: self.wiki_id,
@@ -599,8 +600,14 @@ class WikiPage < ActiveRecord::Base
                             user_id:,
                             protected_editing:,
                             editing_roles:,
-                            todo_date:
+                            todo_date:,
                           })
+
+    if block_editor
+      block_editor_attributes = { version: block_editor.version, blocks: block_editor.blocks }
+      result.block_editor_attributes = block_editor_attributes
+    end
+
     if assignment && opts_with_default[:duplicate_assignment]
       result.assignment = assignment.duplicate({
                                                  duplicate_wiki_page: false,
