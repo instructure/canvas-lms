@@ -55,7 +55,7 @@ interface QueryParams {
 
 const PasswordComplexityConfiguration = () => {
   const [showTray, setShowTray] = useState(false)
-  const [enableApplyButton, setEnableApplyButton] = useState(true)
+  const [enableApplyButton, setEnableApplyButton] = useState(false)
   const [minimumCharacterLengthEnabled, setMinimumCharacterLengthEnabled] = useState(true)
   const [minimumCharacterLength, setMinimumCharacterLength] = useState(MINIMUM_CHARACTER_LENGTH)
   const [requireNumbersEnabled, setRequireNumbersEnabled] = useState(true)
@@ -114,7 +114,18 @@ const PasswordComplexityConfiguration = () => {
     setShowTray(true)
   }
 
+  const handleFormUpdatedByUser = () => {
+    if (!enableApplyButton) {
+      setEnableApplyButton(true)
+    }
+  }
+
   const handleCustomForbiddenWordsEnabledChange = (enabled: boolean) => {
+    // We do not want to enable the apply button if they check the box to upload
+    // a file but don't go through the upload process
+    if (customForbiddenWordsEnabled) {
+      handleFormUpdatedByUser()
+    }
     setCustomForbiddenWordsEnabled(enabled)
   }
 
@@ -123,6 +134,7 @@ const PasswordComplexityConfiguration = () => {
     if (minimumCharacterLengthEnabled) {
       setMinimumCharacterLength(MINIMUM_CHARACTER_LENGTH)
     }
+    handleFormUpdatedByUser()
   }
 
   const handleCustomMaxLoginAttemptToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,19 +143,33 @@ const PasswordComplexityConfiguration = () => {
     if (allowLoginSuspensionEnabled && !checked) {
       setAllowLoginSuspensionEnabled(false)
     }
+    handleFormUpdatedByUser()
   }
 
   const handleAllowLoginSuspensionToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked
     setAllowLoginSuspensionEnabled(checked)
+    handleFormUpdatedByUser()
   }
 
   const handleMinimumCharacterChange = (value: number) => {
     setMinimumCharacterLength(value)
+    handleFormUpdatedByUser()
   }
 
   const handleMaxLoginAttemptsChange = (value: number) => {
     setMaxLoginAttempts(value)
+    handleFormUpdatedByUser()
+  }
+
+  const handleRequireNumbersCheckboxChange = () => {
+    setRequireNumbersEnabled(!requireNumbersEnabled)
+    handleFormUpdatedByUser()
+  }
+
+  const handleRequireSymbolsCheckboxChange = () => {
+    setRequireSymbolsEnabled(!requireSymbolsEnabled)
+    handleFormUpdatedByUser()
   }
 
   const cancelChanges = async () => {
@@ -157,6 +183,7 @@ const PasswordComplexityConfiguration = () => {
       setNewlyUploadedAttachmentId(null)
     }
     setShowTray(false)
+    setEnableApplyButton(false)
   }
 
   const saveChanges = async () => {
@@ -232,8 +259,6 @@ const PasswordComplexityConfiguration = () => {
         err,
         type: 'error',
       })
-    } finally {
-      setEnableApplyButton(true)
     }
   }
 
@@ -327,7 +352,7 @@ const PasswordComplexityConfiguration = () => {
               <Checkbox
                 label={I18n.t('Require number characters (0...9)')}
                 checked={requireNumbersEnabled}
-                onChange={() => setRequireNumbersEnabled(!requireNumbersEnabled)}
+                onChange={() => handleRequireNumbersCheckboxChange()}
                 data-testid="requireNumbersCheckbox"
               />
             </View>
@@ -335,7 +360,7 @@ const PasswordComplexityConfiguration = () => {
               <Checkbox
                 label={I18n.t('Require symbol characters (ie: ! @ # $ %)')}
                 checked={requireSymbolsEnabled}
-                onChange={() => setRequireSymbolsEnabled(!requireSymbolsEnabled)}
+                onChange={() => handleRequireSymbolsCheckboxChange()}
                 data-testid="requireSymbolsCheckbox"
               />
             </View>
@@ -345,6 +370,7 @@ const PasswordComplexityConfiguration = () => {
               currentAttachmentId={currentAttachmentId}
               passwordPolicyHashExists={passwordPolicyHashExists}
               setCurrentAttachmentId={setCurrentAttachmentId}
+              setEnableApplyButton={setEnableApplyButton}
             />
 
             <View as="div" margin="medium medium small medium">
