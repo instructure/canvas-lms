@@ -106,10 +106,12 @@ class AuthenticationProvider
     alias_attribute :discovery_url, :metadata_uri
     alias_attribute :issuer, :idp_entity_id
 
-    def generate_authorize_url(redirect_uri, state, nonce:)
+    def generate_authorize_url(redirect_uri, state, nonce:, **authorize_options)
       return super unless self.class.always_validate? || account.feature_enabled?(:oidc_full_token_validation)
 
-      client.auth_code.authorize_url({ redirect_uri:, state:, nonce: }.merge(authorize_options))
+      client.auth_code.authorize_url({ redirect_uri:, state:, nonce: }
+                                     .merge(self.authorize_options)
+                                     .merge(authorize_options))
     end
 
     def raw_login_attribute
