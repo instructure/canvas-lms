@@ -633,7 +633,6 @@ describe "discussions" do
       end
 
       it "only shows the assign to UI when selective_release is enabled if the student has an unrestricted enrollment" do
-        skip("unskip or remove when product decsion is made about adding a discussion edit permission LX-2054")
         get "/courses/#{course.id}/discussion_topics/new"
         expect(element_exists?(Discussion.assign_to_card_selector)).to be_truthy
 
@@ -644,7 +643,6 @@ describe "discussions" do
       end
 
       it "only shows the assign to embedded UI when selective_release enabled if the student has an unrestricted enrollment" do
-        skip("unskip or remove when product decsion is made about adding a discussion edit permission LX-2054")
         Account.site_admin.enable_feature!(:selective_release_edit_page)
         get "/courses/#{course.id}/discussion_topics/new"
         expect(element_exists?(Discussion.assign_to_section_selector)).to be_truthy

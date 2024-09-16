@@ -51,7 +51,6 @@ import {AvailableFromDateTimeInput} from './AvailableFromDateTimeInput'
 import {AvailableToDateTimeInput} from './AvailableToDateTimeInput'
 import {Text} from '@instructure/ui-text'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
-import type {ItemType} from '../types'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -79,7 +78,6 @@ export type ItemAssignToCardProps = {
   original_due_at: string | null
   unlock_at: string | null
   lock_at: string | null
-  itemType: ItemType
   onDelete?: (cardId: string) => void
   onValidityChange?: (cardId: string, isValid: boolean) => void
   onCardAssignmentChange?: (
@@ -139,7 +137,6 @@ export default forwardRef(function ItemAssignToCard(
     postToSIS,
     disabledOptionIdsRef,
     isOpenRef,
-    itemType,
   } = props
   const [
     requiredRepliesDueDate,
@@ -426,7 +423,6 @@ export default forwardRef(function ItemAssignToCard(
           onBlur={() => setShowValidations(true)}
           disabledWithGradingPeriod={isInClosedGradingPeriod}
           disabledOptionIdsRef={disabledOptionIdsRef}
-          itemType={itemType}
         />
         {!removeDueDateInput && !isCheckpointed && (
           <DueDateTimeInput
