@@ -60,6 +60,7 @@ interface Props {
   setForbiddenWordsFilename: (filename: string | null) => void
   setCurrentAttachmentId: (attachmentId: number | null) => void
   setCommonPasswordsAttachmentId: (attachmentId: number | null) => void
+  setEnableApplyButton: (enabled: boolean) => void
 }
 
 const initialFileDetails: FileDetails = {url: null, filename: null}
@@ -72,6 +73,7 @@ const ForbiddenWordsFileUpload = ({
   setForbiddenWordsFilename,
   setCurrentAttachmentId,
   setCommonPasswordsAttachmentId,
+  setEnableApplyButton,
 }: Props) => {
   const [fileDropMessages, setFileDropMessages] = useState<FormMessage[]>([])
   const [fileDetails, setFileDetails] = useState<FileDetails>(initialFileDetails)
@@ -201,6 +203,7 @@ const ForbiddenWordsFileUpload = ({
         onSave(fileId)
         setModalClosing(true)
         onDismiss()
+        setEnableApplyButton(true)
       } else {
         throw new Error('Failed to save password policy settings')
       }
@@ -224,6 +227,7 @@ const ForbiddenWordsFileUpload = ({
     uploadAttempted,
     setCurrentAttachmentId,
     setCommonPasswordsAttachmentId,
+    setEnableApplyButton,
   ])
 
   const handleDropAccepted = useCallback((acceptedFiles: ArrayLike<File | DataTransferItem>) => {
