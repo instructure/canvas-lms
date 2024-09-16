@@ -31,11 +31,7 @@ describe "Pages API", type: :request do
     {
       time: Time.now.to_i,
       version: "1",
-      blocks: [
-        {
-          data: '{"ROOT":{"type": ...}'
-        }
-      ]
+      blocks: '{"ROOT":{"type": ...}'
     }
   end
 
@@ -46,11 +42,7 @@ describe "Pages API", type: :request do
       @block_page = @course.wiki_pages.create!(title: "Block editor page", block_editor_attributes: {
                                                  time: Time.now.to_i,
                                                  version: "1",
-                                                 blocks: [
-                                                   {
-                                                     data: '{"ROOT":{"type": ...}'
-                                                   }
-                                                 ]
+                                                 blocks: '{"ROOT":{"type": ...}'
                                                })
     end
 
@@ -77,12 +69,11 @@ describe "Pages API", type: :request do
                         format: "json",
                         course_id: @course.to_param,
                         include: ["body"])
-
         expect(json[0].keys).not_to include("body")
         expect(json[0].keys).to include("block_editor_attributes")
         returned_attributes = json[0]["block_editor_attributes"]
         expect(returned_attributes["version"]).to eq(block_page_data[:version])
-        expect(returned_attributes["blocks"][0]["data"]).to eq(block_page_data[:blocks][0][:data])
+        expect(returned_attributes["blocks"]).to eq(block_page_data[:blocks])
       end
     end
 
@@ -99,7 +90,7 @@ describe "Pages API", type: :request do
         expect(json["editor"]).to eq("block_editor")
         returned_attributes = json["block_editor_attributes"]
         expect(returned_attributes["version"]).to eq(block_page_data[:version])
-        expect(returned_attributes["blocks"][0]["data"]).to eq(block_page_data[:blocks][0][:data])
+        expect(returned_attributes["blocks"]).to eq(block_page_data[:blocks])
       end
 
       it "retrieves rce editor page content and attributes" do
@@ -127,7 +118,7 @@ describe "Pages API", type: :request do
         expect(page.title).to eq "New Block Page!"
         expect(page.url).to eq "new-block-page"
         expect(page.body).to be_nil
-        expect(page.block_editor["blocks"][0]["data"]).to eq block_page_data[:blocks][0][:data]
+        expect(page.block_editor["blocks"]).to eq block_page_data[:blocks]
         expect(page.block_editor["editor_version"]).to eq block_page_data[:version]
       end
 
@@ -143,7 +134,7 @@ describe "Pages API", type: :request do
         expect(page.is_front_page?).to be_truthy
         expect(page.title).to eq "New Block Front Page!"
         expect(page.body).to be_nil
-        expect(page.block_editor["blocks"][0]["data"]).to eq block_page_data[:blocks][0][:data]
+        expect(page.block_editor["blocks"]).to eq block_page_data[:blocks]
         expect(page.block_editor["editor_version"]).to eq block_page_data[:version]
       end
     end
@@ -153,11 +144,7 @@ describe "Pages API", type: :request do
         new_block_data = {
           time: Time.now.to_i,
           version: "1",
-          blocks: [
-            {
-              data: '{"ROOT":{"a_different_type": ...}'
-            }
-          ]
+          blocks: '{"ROOT":{"a_different_type": ...}'
         }
         api_call(:put,
                  "/api/v1/courses/#{@course.id}/pages/#{@block_page.url}",
@@ -168,7 +155,7 @@ describe "Pages API", type: :request do
                    url_or_id: @block_page.url },
                  { wiki_page: { block_editor_attributes: new_block_data } })
         @block_page.reload
-        expect(@block_page.block_editor["blocks"][0]["data"]).to eq new_block_data[:blocks][0][:data]
+        expect(@block_page.block_editor["blocks"]).to eq new_block_data[:blocks]
         expect(@block_page.body).to be_nil
       end
     end

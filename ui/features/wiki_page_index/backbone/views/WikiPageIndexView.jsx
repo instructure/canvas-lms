@@ -253,7 +253,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
         block_editor_attributes: this.createNewPageWithBlockEditor
           ? {
               version: '1',
-              blocks: [{data: undefined}],
+              blocks: undefined,
             }
           : null,
       },

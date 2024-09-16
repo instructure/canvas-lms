@@ -28,6 +28,12 @@ import {NewPageStepper} from './components/editor/NewPageStepper'
 import {RenderNode} from './components/editor/RenderNode'
 import {ErrorBoundary} from './components/editor/ErrorBoundary'
 import {closeExpandedBlocks} from './utils/cleanupBlocks'
+import {
+  transform,
+  LATEST_BLOCK_DATA_VERSION,
+  type BlockEditorDataTypes,
+  type BlockEditorData,
+} from './utils/transformations'
 
 import './style.css'
 
@@ -76,12 +82,11 @@ const DEFAULT_CONTENT = JSON.stringify({
   },
 })
 
-type BlockEditorProps = {
+export type BlockEditorProps = {
   enabled?: boolean
   enableResizer?: boolean
   container: HTMLElement // the element that will shrink when drawers open
-  version: string
-  content: string
+  content: BlockEditorDataTypes
   onCancel: () => void
 }
 
@@ -89,28 +94,35 @@ export default function BlockEditor({
   enabled = true,
   enableResizer = true,
   container,
-  version,
   content,
   onCancel,
 }: BlockEditorProps) {
-  const [json] = useState(content || DEFAULT_CONTENT)
+  const [data] = useState<BlockEditorData>(() => {
+    if (content?.blocks) {
+      return transform(content)
+    }
+    return {version: '0.2', blocks: DEFAULT_CONTENT} as BlockEditorData
+  })
   const [toolboxOpen, setToolboxOpen] = useState(false)
-  const [stepperOpen, setStepperOpen] = useState(!content)
+  const [stepperOpen, setStepperOpen] = useState(!content?.blocks)
 
   RenderNode.globals.enableResizer = !!enableResizer
 
   useEffect(() => {
-    if (version !== '1') {
+    if (data.version !== LATEST_BLOCK_DATA_VERSION) {
       // eslint-disable-next-line no-alert
-      alert(I18n.t('wrong version, mayhem may ensue'))
+      alert(I18n.t('Unknown block data version "%{v}", mayhem may ensue', {v: data.version}))
     }
-  }, [json, version])
+  }, [data.version])
 
   const handleNodesChange = useCallback((query: any) => {
     // @ts-expect-error
     window.block_editor = () => ({
       query,
-      getBlocks: (): string => closeExpandedBlocks(query),
+      getBlocks: (): BlockEditorData => ({
+        version: '0.2',
+        blocks: closeExpandedBlocks(query),
+      }),
     })
   }, [])
 
@@ -174,7 +186,7 @@ export default function BlockEditor({
               <Topbar onToolboxChange={handleOpenToolbox} toolboxOpen={toolboxOpen} />
             </div>
             <Flex.Item id="editor-area" shouldGrow={true} role="tree">
-              <Frame data={json} />
+              <Frame data={data.blocks} />
             </Flex.Item>
           </Flex>
 
