@@ -137,7 +137,11 @@ module Factories
 
   def graded_discussion_topic_with_checkpoints(opts = {})
     @context = opts[:context] || @context || course_factory(active_all: true)
-    @topic = discussion_topic_model(opts.merge!(title: opts[:title] || "graded discussion with checkpoints"))
+    topic_opts = {}
+    topic_opts.merge!(opts)
+    topic_opts[:title] = opts[:title] || "graded discussion with checkpoints"
+    topic_opts.reject! { |k| [:due_date_reply_to_topic, :due_date_reply_to_entry].include?(k) }
+    @topic = discussion_topic_model(topic_opts)
     @assignment = @topic.context.assignments.build(submission_types: "discussion_topic", title: @topic.title)
     @assignment.infer_times
     @assignment.saved_by = :discussion_topic

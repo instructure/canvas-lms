@@ -121,9 +121,35 @@ describe "ToDoListPresenter" do
         @reply_to_topic.submit_homework student, body: "checkpoint submission for #{student.name}"
       end
 
-      it "returns discussion checkpoint assignments" do
+      it "returns discussion checkpoint assignments that need grading" do
         presenter = ToDoListPresenter.new(nil, grader, nil, course1.root_account)
         expect(presenter.needs_grading.map(&:title)).to include(@reply_to_topic.title)
+      end
+    end
+  end
+
+  context "assignments that need submitting" do
+    context "discussion checkpoints" do
+      before do
+        course_with_student(active_all: true)
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+      end
+
+      it "returns discussion checkpoints that need submitting" do
+        presenter = ToDoListPresenter.new(self, @user, nil, @course.root_account)
+        expect(presenter.needs_submitting.map(&:title)).to include(@reply_to_topic.title)
+        expect(presenter.needs_submitting.map(&:sub_assignment_tag)).to match_array([
+                                                                                      @reply_to_topic.sub_assignment_tag,
+                                                                                      @reply_to_entry.sub_assignment_tag
+                                                                                    ])
+      end
+
+      it "returns the correct assignment_path for discussion checkpoints that need submitting" do
+        view_stub = double("view")
+        allow(view_stub).to receive(:course_assignment_path).and_return("path/to/assignment")
+        presenter = ToDoListPresenter.new(view_stub, @user, nil, @course.root_account)
+        expect(presenter.needs_submitting.last.assignment_path).to eq "path/to/assignment"
       end
     end
   end
