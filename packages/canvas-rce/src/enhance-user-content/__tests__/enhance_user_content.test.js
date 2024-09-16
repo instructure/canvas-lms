@@ -394,4 +394,86 @@ describe('enhanceUserContent()', () => {
       )
     })
   })
+
+  describe('replaceInstFSLinksWithOldLinks', () => {
+    describe('links using the href attribute', () => {
+      describe('and option is disabled', () => {
+        it('does not replace instfs links with old links', () => {
+          subject(
+            '<a href="http://instfs.fake.com/files/1" data-old-link="courses/1/files/1">file</a>'
+          )
+          enhanceUserContent(document, {replaceInstFSLinksWithOldLinks: false})
+          const aTag = document.querySelector('a')
+          expect(aTag.href).toEqual('http://instfs.fake.com/files/1')
+          expect(aTag.hasAttribute('src')).toBe(false)
+        })
+
+        it('does not replace links without old links', () => {
+          subject('<a href="/courses/1/files/1">file</a>')
+          enhanceUserContent(document, {replaceInstFSLinksWithOldLinks: false})
+          const aTag = document.querySelector('a')
+          expect(aTag.href).toEqual('http://localhost/courses/1/files/1')
+          expect(aTag.hasAttribute('src')).toBe(false)
+        })
+      })
+
+      describe('and option is enabled', () => {
+        it('replaces instfs links with old links', () => {
+          subject(
+            '<a href="http://instfs.fake.com/files/1" data-old-link="courses/1/files/1">file</a>'
+          )
+          enhanceUserContent(document, {replaceInstFSLinksWithOldLinks: true})
+          const aTag = document.querySelector('a')
+          expect(aTag.href).toEqual('http://localhost/courses/1/files/1')
+          expect(aTag.hasAttribute('src')).toBe(false)
+        })
+
+        it('does not replace links without old links', () => {
+          subject('<a href="/courses/1/files/1">file</a>')
+          enhanceUserContent(document, {replaceInstFSLinksWithOldLinks: true})
+          const aTag = document.querySelector('a')
+          expect(aTag.href).toEqual('http://localhost/courses/1/files/1')
+          expect(aTag.hasAttribute('src')).toBe(false)
+        })
+      })
+    })
+
+    describe('links using the src attribute', () => {
+      describe('and option is disabled', () => {
+        it('does not replace instfs links with old links', () => {
+          subject('<img src="http://instfs.fake.com/files/1" data-old-link="courses/1/files/1"/>')
+          enhanceUserContent(document, {replaceInstFSLinksWithOldLinks: false})
+          const imgTag = document.querySelector('img')
+          expect(imgTag.src).toEqual('http://instfs.fake.com/files/1')
+          expect(imgTag.hasAttribute('href')).toBe(false)
+        })
+
+        it('does not replace links without old links', () => {
+          subject('<img src="/courses/1/files/1"/>')
+          enhanceUserContent(document, {replaceInstFSLinksWithOldLinks: false})
+          const imgTag = document.querySelector('img')
+          expect(imgTag.src).toEqual('http://localhost/courses/1/files/1')
+          expect(imgTag.hasAttribute('href')).toBe(false)
+        })
+      })
+
+      describe('and option is enabled', () => {
+        it('replaces instfs links with old links', () => {
+          subject('<img src="http://instfs.fake.com/files/1" data-old-link="courses/1/files/1"/>')
+          enhanceUserContent(document, {replaceInstFSLinksWithOldLinks: true})
+          const imgTag = document.querySelector('img')
+          expect(imgTag.src).toEqual('http://localhost/courses/1/files/1')
+          expect(imgTag.hasAttribute('href')).toBe(false)
+        })
+
+        it('does not replace links without old links', () => {
+          subject('<img src="/courses/1/files/1"/>')
+          enhanceUserContent(document, {replaceInstFSLinksWithOldLinks: true})
+          const imgTag = document.querySelector('img')
+          expect(imgTag.src).toEqual('http://localhost/courses/1/files/1')
+          expect(imgTag.hasAttribute('href')).toBe(false)
+        })
+      })
+    })
+  })
 })
