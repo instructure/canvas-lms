@@ -61,5 +61,24 @@ describe Plannable do
       expect(override.workflow_state).to eq "deleted"
       expect(assignment.planner_override_for(@student)).to be_nil
     end
+
+    it "returns overrides for sub_assignments" do
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      reply_to_topic, reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+      reply_to_topic_override = PlannerOverride.create!(
+        plannable_id: reply_to_topic.id,
+        plannable_type: "SubAssignment",
+        marked_complete: true,
+        user: @student
+      )
+      expect(reply_to_topic.planner_override_for(@student)).to eq reply_to_topic_override
+      reply_to_entry_override = PlannerOverride.create!(
+        plannable_id: reply_to_entry.id,
+        plannable_type: "SubAssignment",
+        marked_complete: true,
+        user: @student
+      )
+      expect(reply_to_entry.planner_override_for(@student)).to eq reply_to_entry_override
+    end
   end
 end
