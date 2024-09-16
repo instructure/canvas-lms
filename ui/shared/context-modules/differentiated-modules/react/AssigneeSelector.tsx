@@ -17,7 +17,7 @@
  */
 
 import CanvasMultiSelect, {type Size} from '@canvas/multi-select/react'
-import React, {type ReactElement, useEffect, useRef, useState, useCallback} from 'react'
+import React, {type ReactElement, useEffect, useRef, useState, useCallback, useMemo} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
@@ -29,6 +29,7 @@ import useFetchAssignees from '../utils/hooks/useFetchAssignees'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import type {AssigneeOption} from './Item/types'
+import type {ItemType} from './types'
 
 const {Option: CanvasMultiSelectOption} = CanvasMultiSelect as any
 
@@ -54,6 +55,7 @@ interface Props {
   onBlur?: () => void
   disabledWithGradingPeriod?: boolean
   disabledOptionIdsRef?: React.MutableRefObject<string[]>
+  itemType: ItemType
 }
 
 const AssigneeSelector = ({
@@ -76,6 +78,7 @@ const AssigneeSelector = ({
   onBlur,
   disabledWithGradingPeriod,
   disabledOptionIdsRef,
+  itemType,
 }: Props) => {
   const listElementRef = useRef<HTMLElement | null>(null)
   const [options, setOptions] = useState<AssigneeOption[]>(defaultValues)
@@ -148,10 +151,15 @@ const AssigneeSelector = ({
     setOptions(newOptions)
   }, [allOptions, selectedOptionIds, disabledOptions])
 
+  const shouldDisableSelector = useMemo(() => {
+    if (!(itemType === 'discussion' || itemType === 'discussion_topic')) return false
+    return ENV?.current_user_roles && ENV?.current_user_roles?.includes('student')
+  }, [itemType])
+
   return (
     <>
       <CanvasMultiSelect
-        disabled={disabledWithGradingPeriod}
+        disabled={disabledWithGradingPeriod || shouldDisableSelector}
         data-testid="assignee_selector"
         messages={messages}
         label={showVisualLabel ? label : <ScreenReaderContent>{label}</ScreenReaderContent>}
