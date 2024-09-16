@@ -20,10 +20,8 @@
 
 class Login::OAuthController < Login::OAuthBaseController
   def new
-    super
-
     timeout_protection do
-      request_token = @aac.consumer.get_request_token(oauth_callback: callback_uri)
+      request_token = aac.consumer.get_request_token(oauth_callback: callback_uri)
       session[:oauth] = {
         callback_confirmed: request_token.callback_confirmed?,
         request_token: request_token.token,

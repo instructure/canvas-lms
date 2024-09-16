@@ -157,9 +157,10 @@ class Login::CanvasController < ApplicationController
 
   protected
 
-  def validate_auth_type
+  def aac
     @domain_root_account.authentication_providers.where(auth_type: params[:controller].sub(%r{^login/}, "")).active.take!
   end
+  alias_method :validate_auth_type, :aac
 
   def unsuccessful_login(message)
     if request.format.json?
