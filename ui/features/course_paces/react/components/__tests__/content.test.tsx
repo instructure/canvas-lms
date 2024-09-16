@@ -311,9 +311,9 @@ describe('PaceContextsContent', () => {
         )
       })
 
-      // passes, but with warning: "Unmatched GET to /api/v1/progress/2"
-      // FOO-3818
-      it.skip('shows a loading indicator for each pace publishing', async () => {
+      it('shows a loading indicator for each pace publishing', async () => {
+        fetchMock.get('/api/v1/progress/2', {progress: {id: 2}})
+
         const paceContextsState: PaceContextsState = {
           ...DEFAULT_STORE_STATE.paceContexts,
           contextsPublishing: [
@@ -340,6 +340,8 @@ describe('PaceContextsContent', () => {
       })
 
       it('starts polling for published status updates on mount', async () => {
+        fetchMock.get('/api/v1/progress/1', {progress: {id: 1}})
+
         const user = userEvent.setup({delay: null})
         const paceContextsState: PaceContextsState = {
           ...DEFAULT_STORE_STATE.paceContexts,
