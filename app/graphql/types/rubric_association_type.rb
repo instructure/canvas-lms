@@ -45,7 +45,7 @@ module Types
     end
     field :saved_comments, String, null: true
     def saved_comments
-      object.summary_data[:saved_comments].to_json
+      object.summary_data&.dig(:saved_comments)&.to_json
     end
   end
 end
