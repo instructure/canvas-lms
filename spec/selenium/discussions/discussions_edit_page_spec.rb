@@ -754,7 +754,6 @@ describe "discussions" do
           end
 
           it "does not show the assign to UI when the user does not have permission even if user can access edit page" do
-            skip("unskip or remove when product decsion is made about adding a discussion edit permission LX-2054")
             # i.e., they have moderate_forum permission but not admin or unrestricted student enrollment
             RoleOverride.create!(context: @course.account, permission: "moderate_forum", role: student_role, enabled: true)
             student_in_course(active_all: true)
@@ -994,7 +993,6 @@ describe "discussions" do
           end
 
           it "does not show the assign to UI when the user does not have permission even if user can access edit page" do
-            skip("unskip or remove when product decsion is made about adding a discussion edit permission LX-2054")
             # i.e., they have moderate_forum permission but not admin or unrestricted student enrollment
             RoleOverride.create!(context: @course.account, permission: "moderate_forum", role: student_role, enabled: true)
             student_in_course(active_all: true)
