@@ -38,6 +38,8 @@ const QUERY = gql`
       gradingPeriodId
       groupAssignment: hasGroupCategory
       htmlUrl
+      supportsGradeByQuestion
+      gradeByQuestionEnabled
       checkpoints {
         pointsPossible
         tag
