@@ -24,10 +24,10 @@ class Login::OAuthBaseController < ApplicationController
   before_action :forbid_on_files_domain
   before_action :run_login_hooks, :fix_ms_office_redirects, only: :new
 
-  def new
-    # a subclass might explicitly set the AAC, so that we don't need to infer
-    # it from the URL
-    return if @aac
+  protected
+
+  def aac
+    return @aac if @aac
 
     auth_type = params[:controller].sub(%r{^login/}, "")
     # ActionController::TestCase can't deal with aliased controllers, so we have to
@@ -40,8 +40,6 @@ class Login::OAuthBaseController < ApplicationController
              scope.first!
            end
   end
-
-  protected
 
   def timeout_protection
     timeout_options = { raise_on_timeout: true, fallback_timeout_length: 10.seconds }
