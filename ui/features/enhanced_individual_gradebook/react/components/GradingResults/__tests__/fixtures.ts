@@ -73,6 +73,22 @@ export const defaultAssignment: AssignmentConnection = {
   inClosedGradingPeriod: false,
 }
 
+export const checkpointedAssignment: AssignmentConnection = {
+  ...defaultAssignment,
+  pointsPossible: 20,
+  submissionTypes: ['discussion_topic'],
+  checkpoints: [
+    {
+      tag: 'reply_to_topic',
+      pointsPossible: 5,
+    },
+    {
+      tag: 'reply_to_entry',
+      pointsPossible: 15,
+    },
+  ],
+}
+
 export const defaultGradebookOptions: GradebookOptions = {
   contextUrl: '/courses/1',
   sortOrder: GradebookSortOrder.Alphabetical,
