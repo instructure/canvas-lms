@@ -97,5 +97,19 @@ describe "dashboard" do
 
       expect(f("#content")).not_to contain_css("#planner-todosidebar-item-list")
     end
+
+    it "displays discussion checkpoints in to do list for a student", priority: "1" do
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      reply_to_topic, reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+
+      get "/"
+      wait_for_ajaximations
+      f("#DashboardOptionsMenu_Container button").click
+      fj('span[role="menuitemradio"]:contains("Recent Activity")').click
+      # verify that both discussion checkpoints are in the to do list
+      list_items = ff("#planner-todosidebar-item-list>li")
+      expect(list_items.first).to include_text(reply_to_topic.title.to_s + " Reply to Topic")
+      expect(list_items.second).to include_text(reply_to_entry.title.to_s + " Required Replies (3)")
+    end
   end
 end

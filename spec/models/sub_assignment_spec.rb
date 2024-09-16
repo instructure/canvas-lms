@@ -120,4 +120,39 @@ describe SubAssignment do
       }
     end
   end
+
+  describe "scope: visible_to_students_in_course_with_da" do
+    before do
+      course_with_student(active_all: true)
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+    end
+
+    it "returns sub_assignments visible to student in course" do
+      result = SubAssignment.visible_to_students_in_course_with_da([@student.id], [@course.id])
+      expect(result.size).to eq 2
+      expect(result.pluck(:id)).to match_array([@reply_to_topic.id, @reply_to_entry.id])
+    end
+
+    it "does not return sub_assignments not visible to student in course" do
+      course2 = course_factory(course_name: "other course", active_course: true)
+      result = SubAssignment.visible_to_students_in_course_with_da([@student.id], [course2.id])
+      expect(result).to be_empty
+    end
+
+    it "works with selective release backend FF disabled" do
+      Account.site_admin.disable_feature!(:selective_release_backend)
+      result = SubAssignment.visible_to_students_in_course_with_da([@student.id], [@course.id])
+      expect(result.size).to eq 2
+      expect(result.pluck(:id)).to match_array([@reply_to_topic.id, @reply_to_entry.id])
+    end
+
+    it "works with selective release backend FF enabled" do
+      Account.site_admin.enable_feature!(:selective_release_backend)
+      result = SubAssignment.visible_to_students_in_course_with_da([@student.id], [@course.id])
+      expect(result).not_to be_empty
+      expect(result.size).to eq 2
+      expect(result.pluck(:id)).to match_array([@reply_to_topic.id, @reply_to_entry.id])
+    end
+  end
 end

@@ -245,6 +245,30 @@ describe Api::V1::PlannerItem do
       end
     end
 
+    context "dicussion checkpoints" do
+      before :once do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        course_with_student(active_all: true)
+        @checkpoint_topic, @checkpoint_entry = graded_discussion_topic_with_checkpoints(context: @course)
+      end
+
+      it "returns checkpoints" do
+        json = api.planner_item_json(@checkpoint_topic, @student, session)
+        expect(json[:plannable_type]).to eq "sub_assignment"
+        expect(json[:plannable][:title]).to eq @checkpoint_topic.title
+      end
+
+      it "includes number of required replies" do
+        json = api.planner_item_json(@checkpoint_topic, @student, session)
+        expect(json[:details][:reply_to_entry_required_count]).to eq 3
+      end
+
+      it "includes sub assignment tag" do
+        json = api.planner_item_json(@checkpoint_topic, @student, session)
+        expect(json[:plannable][:sub_assignment_tag]).to eq "reply_to_topic"
+      end
+    end
+
     describe "#submission_statuses_for" do
       it "returns the submission statuses for the learning object" do
         json = api.planner_item_json(@assignment, @student, session)
@@ -529,6 +553,14 @@ describe Api::V1::PlannerItem do
       expect(api.planner_item_json(@topic.assignment, @student, session)[:html_url]).to eq "named_context_url"
       graded_submission_model(assignment: @topic.assignment, user: @student).update(score: 5)
       expect(api.planner_item_json(@topic.assignment, @student, session)[:html_url]).to eq "course_assignment_submission_url"
+    end
+
+    it "links to a graded discussion with checkpoints submission if appropriate" do
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @checkpoint_topic, _checkpoint_entry = graded_discussion_topic_with_checkpoints(context: @course)
+      expect(api.planner_item_json(@checkpoint_topic, @student, session)[:html_url]).to eq "named_context_url"
+      graded_submission_model(assignment: @checkpoint_topic, user: @student).update(score: 5)
+      expect(api.planner_item_json(@checkpoint_topic, @student, session)[:html_url]).to eq "course_assignment_submission_url"
     end
   end
 

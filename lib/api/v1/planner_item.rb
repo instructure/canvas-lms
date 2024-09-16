@@ -51,6 +51,7 @@ module Api::V1::PlannerItem
   GRADABLE_FIELDS = %i[assignment_id points_possible due_at].freeze
   PLANNER_NOTE_FIELDS = [:user_id].freeze
   ASSESSMENT_REQUEST_FIELDS = [:workflow_state].freeze
+  SUB_ASSIGNMENT_FIELDS = [:sub_assignment_tag].freeze
 
   def planner_item_json(item, user, session, opts = {})
     planner_override = item.planner_override_for(user)
@@ -112,6 +113,14 @@ module Api::V1::PlannerItem
           current_user: user,
           assessment_request: item
         ).submission_data_url
+      elsif item.is_a?(SubAssignment)
+        hash[:details] = {
+          reply_to_entry_required_count: item.parent_assignment&.discussion_topic&.reply_to_entry_required_count || 1
+        }
+        hash[:plannable_type] = PlannerHelper::PLANNABLE_TYPES.key(item.class_name)
+        hash[:plannable_date] = item[:user_due_date] || item.due_at
+        hash[:plannable] = plannable_json(item.attributes, extra_fields: SUB_ASSIGNMENT_FIELDS + GRADABLE_FIELDS)
+        hash[:html_url] = assignment_html_url(item.parent_assignment, user, hash[:submissions])
       else
         hash[:plannable_date] = item[:user_due_date] || item.due_at
         hash[:plannable] = plannable_json(item.attributes, extra_fields: GRADABLE_FIELDS)
@@ -147,7 +156,7 @@ module Api::V1::PlannerItem
     notes, context_items = plannable_items.partition { |i| i.is_a?(::PlannerNote) }
     ActiveRecord::Associations.preload(notes, user: { pseudonym: :account }) if notes.any?
     ActiveRecord::Associations.preload(context_items, { context: :root_account }) if context_items.any?
-    ss = submission_statuses(context_items.select { |i| i.is_a?(::Assignment) }, user)
+    ss = submission_statuses(context_items.select { |i| i.is_a?(::Assignment) || i.is_a?(::SubAssignment) }, user)
     discussions = context_items.select { |i| i.is_a?(::DiscussionTopic) }
     topics_status = topics_status_for(user, discussions.map(&:id))
 
@@ -169,7 +178,7 @@ module Api::V1::PlannerItem
 
   def submission_statuses_for(user, item, opts = {})
     submission_status = { submissions: false }
-    return submission_status unless item.is_a?(Assignment)
+    return submission_status unless item.is_a?(Assignment) || item.is_a?(SubAssignment)
 
     ss = opts[:submission_statuses] || submission_statuses(item, user)
     submission_status[:submissions] = ss[item.id]&.except(:new_activity)

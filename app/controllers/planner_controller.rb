@@ -207,6 +207,8 @@ class PlannerController < ApplicationController
                    ungraded_discussion_collection,
                    calendar_events_collection,
                    peer_reviews_collection]
+    collections << sub_assignment_collection if @domain_root_account.feature_enabled?(:discussion_checkpoints)
+
     BookmarkedCollection.merge(*collections)
   end
 
@@ -260,6 +262,14 @@ class PlannerController < ApplicationController
                                      :id)
     end
     collections
+  end
+
+  def sub_assignment_collection
+    item_collection("sub_assignment_viewing",
+                    @user.assignments_for_student("viewing", is_sub_assignment: true, **default_opts).preload(:discussion_topic),
+                    SubAssignment,
+                    %i[user_due_date due_at created_at],
+                    :id)
   end
 
   def ungraded_quiz_collection

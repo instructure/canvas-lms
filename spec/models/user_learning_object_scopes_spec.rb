@@ -368,6 +368,20 @@ describe UserLearningObjectScopes do
       assignments = @student.assignments_for_student("submitting", contexts: [@course])
       expect(assignments[0]).to have_attribute :only_visible_to_overrides
     end
+
+    context "sub_assignments" do
+      before :once do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        course_with_student(active_all: true)
+        @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+      end
+
+      it "returns sub_assignments when discussion checkpoints FF enabled" do
+        list = @student.assignments_for_student("submitting", is_sub_assignment: true, contexts: [@course])
+        expect(list.size).to be 2
+        expect(list.pluck(:id)).to match_array([@reply_to_topic.id, @reply_to_entry.id])
+      end
+    end
   end
 
   describe "assignments_needing_submitting" do

@@ -317,6 +317,8 @@ export class PlannerItem_raw extends Component {
         return <IconDocumentLine />
       case 'Peer Review':
         return <IconPeerReviewLine />
+      case 'Discussion Checkpoint':
+        return <IconDiscussionLine />
       default:
         return (
           <Avatar
