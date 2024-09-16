@@ -99,6 +99,11 @@ describe Importers::ContextExternalToolImporter do
       expect(subject.lti_version).to eq "1.3"
     end
 
+    it "allows nil domain" do
+      tool_hash[:domain] = nil
+      expect(subject.domain).to be_nil
+    end
+
     context "when lti_version isn't present in hash" do
       before do
         tool_hash.delete :lti_version
