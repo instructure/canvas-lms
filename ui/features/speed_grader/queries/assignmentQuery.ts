@@ -116,7 +116,7 @@ function formattedRubric(assignment: any) {
     pointsPossible,
     useForGrading,
     title,
-    savedComments: JSON.parse(savedComments),
+    savedComments: JSON.parse(savedComments || null),
   }
 }
 

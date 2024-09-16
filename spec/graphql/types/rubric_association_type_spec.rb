@@ -75,5 +75,18 @@ describe Types::RubricAssociationType do
         submission_type.resolve("rubricAssessmentsConnection { nodes { rubricAssociation { useForGrading } } }")
       ).to eq [false]
     end
+
+    it "saved_comments (empty)" do
+      expect(
+        submission_type.resolve("rubricAssessmentsConnection { nodes { rubricAssociation { savedComments } } }")
+      ).to eq [nil]
+    end
+
+    it "saved_comments (with data)" do
+      rubric_association.update!(summary_data: { saved_comments: { "1" => ["comment"] } })
+      expect(
+        submission_type.resolve("rubricAssessmentsConnection { nodes { rubricAssociation { savedComments } } }")
+      ).to eq ["{\"1\":[\"comment\"]}"]
+    end
   end
 end
