@@ -47,8 +47,7 @@ class LoginController < ApplicationController
     session[:enrollment] = params[:enrollment] if params[:enrollment]
 
     if @current_pseudonym
-      params[:pseudonym_session] ||= {}
-      params[:pseudonym_session][:unique_id] ||= @current_pseudonym.unique_id
+      params[:login_hint] ||= @current_pseudonym.unique_id
     end
 
     # deprecated redirect; link directly to /login/canvas
@@ -78,9 +77,9 @@ class LoginController < ApplicationController
     end
 
     unless flash[:delegated_message]
+      params[:login_hint] ||= params.dig(:pseudonym_session, :unique_id)
       return redirect_to url_for({ controller: "login/#{auth_type}", action: :new }
-        .merge(params.permit(:id).to_unsafe_h)
-        .merge(params.permit(pseudonym_session: :unique_id).to_unsafe_h))
+        .merge(params.permit(:id, :login_hint).to_unsafe_h))
     end
 
     # we had an error from an SSO - we need to show it

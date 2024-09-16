@@ -63,6 +63,16 @@ describe Login::OpenidConnectController do
     expect(session[:oidc_id_token_sub]).to eql "uid"
   end
 
+  describe "#new" do
+    it "forwards token_hint param" do
+      get login_openid_connect_url, params: { login_hint: "cody" }
+      expect(response).to be_redirect
+      uri = URI.parse(response.location)
+      login_hint = Rack::Utils.parse_nested_query(uri.query)["login_hint"]
+      expect(login_hint).to eql "cody"
+    end
+  end
+
   describe "#create" do
     it "persists id token details in session" do
       do_login

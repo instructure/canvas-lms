@@ -89,4 +89,10 @@ class Login::OpenidConnectController < Login::OAuth2Controller
 
     ap
   end
+
+  private
+
+  def additional_authorize_params
+    params.permit(:login_hint)
+  end
 end
