@@ -1846,6 +1846,10 @@ class User < ActiveRecord::Base
     end
   end
 
+  def grade_by_question_in_speedgrader?
+    preferences.fetch(:enable_speedgrader_grade_by_question, false)
+  end
+
   def course_nickname(course)
     shard.activate do
       get_preference(:course_nicknames, course.id)

@@ -319,7 +319,19 @@ module Types
       load_association(:quiz)
     end
 
-    field :supports_grade_by_question, Boolean, method: :supports_grade_by_question?, null: false
+    field :supports_grade_by_question, Boolean, null: false
+    def supports_grade_by_question
+      Promise.all([load_association(:quiz), load_association(:external_tool_tag)]).then do
+        assignment.supports_grade_by_question?
+      end
+    end
+
+    field :grade_by_question_enabled, Boolean, null: false
+    def grade_by_question_enabled
+      supports_grade_by_question.then do |supported|
+        supported && current_user.present? && current_user.grade_by_question_in_speedgrader?
+      end
+    end
 
     field :discussion, Types::DiscussionType, null: true
     def discussion

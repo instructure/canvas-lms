@@ -2928,6 +2928,21 @@ describe User do
     end
   end
 
+  describe "grade_by_question_in_speedgrader?" do
+    let(:user) { user_factory(active_all: true) }
+
+    it "returns the saved preference" do
+      user.preferences[:enable_speedgrader_grade_by_question] = true
+      expect { user.preferences[:enable_speedgrader_grade_by_question] = false }.to change {
+        user.grade_by_question_in_speedgrader?
+      }.from(true).to(false)
+    end
+
+    it "defaults to false" do
+      expect(user.grade_by_question_in_speedgrader?).to be false
+    end
+  end
+
   describe "send_scores_in_emails" do
     before :once do
       course_with_student(active_all: true)
