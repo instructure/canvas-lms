@@ -38,6 +38,9 @@ class ToDoListPresenter
       @needs_moderation = assignments_needing(:moderation)
       @needs_submitting = assignments_needing(:submitting, include_ungraded: true)
       @needs_submitting += ungraded_quizzes_needing_submitting
+      if @root_account.feature_enabled?(:discussion_checkpoints)
+        @needs_submitting += assignments_needing(:submitting, include_ungraded: true, is_sub_assignment: true)
+      end
       @needs_submitting.sort_by! { |a| a.due_at || a.updated_at }
 
       assessment_requests = user.submissions_needing_peer_review(contexts:, limit: ASSIGNMENT_LIMIT)
@@ -175,6 +178,8 @@ class ToDoListPresenter
     def assignment_path
       if assignment.is_a?(Quizzes::Quiz)
         @view.course_quiz_path(assignment.context_id, assignment.id)
+      elsif assignment.is_a?(SubAssignment)
+        @view.course_assignment_path(assignment.context_id, assignment.parent_assignment_id)
       else
         @view.course_assignment_path(assignment.context_id, assignment.id)
       end

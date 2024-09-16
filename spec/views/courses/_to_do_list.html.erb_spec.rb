@@ -162,4 +162,29 @@ describe "courses/_to_do_list" do
       end
     end
   end
+
+  context "as a teacher with student enrollments" do
+    describe "assignments to submit" do
+      context "discussion checkpoints" do
+        before do
+          course_with_teacher(active_all: true)
+          course_with_student(active_all: true, user: @teacher)
+          @course.root_account.enable_feature!(:discussion_checkpoints)
+          @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course, title: "Discussion with Checkpoints")
+        end
+
+        it "displays proper title for reply to topic checkpoint" do
+          view_context
+          render partial: "courses/to_do_list", locals: { contexts: nil, show_legacy_todo_list: true, root_account: @course.root_account }
+          expect(response).to include "Turn in #{@reply_to_topic.title} Reply to Topic"
+        end
+
+        it "displays proper title for reply to entry checkpoint" do
+          view_context
+          render partial: "courses/to_do_list", locals: { contexts: nil, show_legacy_todo_list: true, root_account: @course.root_account }
+          expect(response).to include "Turn in #{@reply_to_entry.title} Required Replies (#{@topic.reply_to_entry_required_count})"
+        end
+      end
+    end
+  end
 end

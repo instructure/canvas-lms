@@ -244,6 +244,7 @@ module UserLearningObjectScopes
     due_before: 1.week.from_now,
     scope_only: false,
     include_concluded: false,
+    is_sub_assignment: false,
     **opts # forward args to assignments_for_student
   )
     opts[:cache_timeout] = 15.minutes
