@@ -33,7 +33,7 @@ it('includes tooltips for feature preview', () => {
 })
 
 it('includes tooltips for hidden pills', () => {
-  const {getByText} = render(<StatusPill feature={sampleData.siteAdminOnFeature} />)
+  const {getByText} = render(<StatusPill feature={sampleData.siteAdminOffFeature} />)
   expect(
     getByText(
       'This feature option is only visible to users with Site Admin access.' +

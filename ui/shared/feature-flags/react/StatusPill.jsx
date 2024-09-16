@@ -1,15 +1,16 @@
-import React, {useState} from "react"
+import React from "react"
 import {Tooltip} from "@instructure/ui-tooltip"
 import {View} from "@instructure/ui-view"
 import {Pill} from "@instructure/ui-pill";
-import {object} from "prop-types";
+import {object, string} from "prop-types";
 import {useScope as useI18nScope} from "@canvas/i18n";
 
 const I18n = useI18nScope('feature_flags')
 
-export default function StatusPill({feature}) {
+export default function StatusPill({feature, updatedState}) {
+  const state = updatedState || feature.feature_flag.state
   return <>
-    {feature.feature_flag.hidden && !feature.shadow && (
+    {state === "hidden" && !feature.shadow && (
       <Tooltip
         renderTip={
           <View as="div" width="600px">
@@ -58,5 +59,6 @@ export default function StatusPill({feature}) {
 }
 
 StatusPill.propTypes = {
-  feature: object.isRequired
+  feature: object.isRequired,
+  updatedState: string
 }

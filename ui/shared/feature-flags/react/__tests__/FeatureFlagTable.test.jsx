@@ -18,7 +18,9 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import fetchMock from 'fetch-mock'
 
 import FeatureFlagTable from '../FeatureFlagTable'
 import sampleData from './sampleData.json'
@@ -59,8 +61,21 @@ describe('feature_flags::FeatureFlagTable', () => {
     expect(queryByText('This does great feature4y things')).toBeInTheDocument()
   })
 
-  it('renders status tooltips', () => {
-    const {getAllByTestId} = render(<FeatureFlagTable rows={rows} title={title} />)
-    expect(getAllByTestId('ff-table-row')[7]).toHaveTextContent('Shadow')
+  it('updates status pills dynamically', async () => {
+    window.ENV.CONTEXT_BASE_URL = '/accounts/1'
+    const route = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/feature8`
+    fetchMock.putOnce(route, JSON.stringify(sampleData.siteAdminOnFeature.feature_flag))
+
+    const {getByText, getAllByTestId} = render(
+      <FeatureFlagTable rows={rows} title={title} />
+    )
+    const row = getAllByTestId('ff-table-row')[5] // siteAdminOffFeature
+    expect(row).toHaveTextContent('Hidden')
+
+    const button = row.querySelectorAll('button')[1]
+    await userEvent.click(button)
+    await userEvent.click(getByText('Enabled'))
+    await waitFor(() => expect(fetchMock.calls(route)).toHaveLength(1))
+    expect(row).not.toHaveTextContent('Hidden')
   })
 })
