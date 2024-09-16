@@ -2417,7 +2417,7 @@ describe "Default Account Reports" do
         parameters["xlist"] = true
         parameters["include_deleted"] = true
         report = run_report("sis_export_csv", { params: parameters, account: @sub_account })
-        expect(report.parameters["extra_text"]).to eq "Term: All Terms; Include Deleted Objects; Reports: xlist "
+        expect(report.parameters["extra_text"]).to eq "Term: All Terms; Include Deleted/Concluded Objects; Reports: xlist "
         parsed = parse_report(report)
         expect(parsed).to match_array [%w[SIS_COURSE_ID_1
                                           english_section_3
