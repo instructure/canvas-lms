@@ -19,6 +19,20 @@
 #
 
 class RedisClient
+  @allow_dangerous_redis_methods = false
+
+  def self.dangerous_redis_methods_allowed?
+    @allow_dangerous_redis_methods
+  end
+
+  def self.with_dangerous_redis_methods
+    old = @allow_dangerous_redis_methods
+    @allow_dangerous_redis_methods = true
+    yield
+  ensure
+    @allow_dangerous_redis_methods = old
+  end
+
   module Twemproxy
     UNSUPPORTED_METHODS = %w[
       migrate
@@ -89,9 +103,9 @@ class RedisClient
         raise CanvasCache::Redis::UnsupportedRedisMethod,
               "Redis method `#{command}` is not supported by Twemproxy, and so shouldn't be used in Canvas"
       end
-      if ALLOWED_UNSUPPORTED.include?(command) && GuardRail.environment != :deploy
+      if ALLOWED_UNSUPPORTED.include?(command) && !RedisClient.dangerous_redis_methods_allowed? && GuardRail.environment != :deploy
         raise CanvasCache::Redis::UnsupportedRedisMethod,
-              "Redis method `#{command}` is potentially dangerous, and should only be called from console, and only if you fully understand the consequences. If you're sure, retry after running GuardRail.activate!(:deploy)"
+              "Redis method `#{command}` is potentially dangerous, and should only be called from console, and only if you fully understand the consequences. If you're sure, retry after wrapping in `RedisClient.with_dangerous_redis_methods`"
       end
     end
   end
