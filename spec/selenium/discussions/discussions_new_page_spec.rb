@@ -633,6 +633,7 @@ describe "discussions" do
       end
 
       it "only shows the assign to UI when selective_release is enabled if the student has an unrestricted enrollment" do
+        skip("unskip or remove when product decsion is made about adding a discussion edit permission LX-2054")
         get "/courses/#{course.id}/discussion_topics/new"
         expect(element_exists?(Discussion.assign_to_card_selector)).to be_truthy
 
@@ -643,6 +644,7 @@ describe "discussions" do
       end
 
       it "only shows the assign to embedded UI when selective_release enabled if the student has an unrestricted enrollment" do
+        skip("unskip or remove when product decsion is made about adding a discussion edit permission LX-2054")
         Account.site_admin.enable_feature!(:selective_release_edit_page)
         get "/courses/#{course.id}/discussion_topics/new"
         expect(element_exists?(Discussion.assign_to_section_selector)).to be_truthy
@@ -2504,6 +2506,48 @@ describe "discussions" do
         expect(new_override.set_type).to eq("ADHOC")
         expect(new_override.set_id).to be_nil
         expect(new_override.set.map(&:id)).to match_array([student1.id])
+      end
+
+      context "user has both student and teacher roles in different courses" do
+        it "create discussion topic successfully" do
+          student_enrollment_course = Course.create!(name: "Student Course", root_account: Account.default)
+          teacher_enrollment_course = Course.create!(name: "Teacher Course", root_account: Account.default)
+          [student_enrollment_course, teacher_enrollment_course].each do |course|
+            course.update!(workflow_state: "available")
+          end
+
+          student1 = teacher_enrollment_course.enroll_student(User.create!, enrollment_state: "active").user
+          user = User.create!(name: "Multiple Role User")
+
+          student_enrollment_course.enroll_student(user).accept!
+          teacher_enrollment_course.enroll_teacher(user).accept!
+
+          user_session(user)
+          Discussion.start_new_discussion(teacher_enrollment_course.id)
+          Discussion.update_discussion_topic_title
+          Discussion.update_discussion_message
+
+          available_from = 5.days.ago
+          available_until = 5.days.from_now
+
+          click_add_assign_to_card
+          expect(element_exists?(due_date_input_selector)).to be_falsey
+          select_module_item_assignee(1, student1.name)
+          update_available_date(1, format_date_for_view(available_from, "%-m/%-d/%Y"), true)
+          update_available_time(1, "8:00 AM", true)
+          update_until_date(1, format_date_for_view(available_until, "%-m/%-d/%Y"), true)
+          update_until_time(1, "9:00 PM", true)
+
+          Discussion.save_button.click
+          wait_for_ajaximations
+
+          course.reload
+          discussion_topic = DiscussionTopic.last
+          new_override = discussion_topic.active_assignment_overrides.last
+          expect(new_override.set_type).to eq("ADHOC")
+          expect(new_override.set_id).to be_nil
+          expect(new_override.set.map(&:id)).to match_array([student1.id])
+        end
       end
     end
   end

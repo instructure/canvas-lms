@@ -25,6 +25,7 @@ import React, {
   type RefObject,
   type MutableRefObject,
   type RefAttributes,
+  useMemo,
 } from 'react'
 import {Mask} from '@instructure/ui-overlays'
 import {Spinner} from '@instructure/ui-spinner'
@@ -692,6 +693,7 @@ const ItemAssignToTrayContent = ({
             postToSIS={postToSIS}
             disabledOptionIdsRef={disabledOptionIdsRef}
             loadedAssignees={loadedAssignees}
+            itemType={itemType}
           />
         </View>
       ))
@@ -718,6 +720,11 @@ const ItemAssignToTrayContent = ({
     ]
   )
 
+  const shouldShowAddCard = useMemo(() => {
+    if (!(itemType === 'discussion' || itemType === 'discussion_topic')) return true
+    return !ENV?.current_user_is_student
+  }, [itemType])
+
   return (
     <Flex.Item padding="small medium" shouldGrow={true} shouldShrink={true}>
       {fetchInFlight || !loadedAssignees || isLoading ? (
@@ -733,17 +740,19 @@ const ItemAssignToTrayContent = ({
           {renderCards()}
         </ApplyLocale>
       )}
-      <Button
-        display={isTray ? undefined : 'block'}
-        onClick={handleAddCard}
-        data-testid="add-card"
-        margin="small 0 0 0"
-        renderIcon={IconAddLine}
-        interaction={!allCardsAssigned() || !!blueprintDateLocks?.length ? 'disabled' : 'enabled'}
-        elementRef={el => (addCardButtonRef.current = el)}
-      >
-        {isTray ? I18n.t('Add') : I18n.t('Assign To')}
-      </Button>
+      {shouldShowAddCard && (
+        <Button
+          display={isTray ? undefined : 'block'}
+          onClick={handleAddCard}
+          data-testid="add-card"
+          margin="small 0 0 0"
+          renderIcon={IconAddLine}
+          interaction={!allCardsAssigned() || !!blueprintDateLocks?.length ? 'disabled' : 'enabled'}
+          elementRef={el => (addCardButtonRef.current = el)}
+        >
+          {isTray ? I18n.t('Add') : I18n.t('Assign To')}
+        </Button>
+      )}
     </Flex.Item>
   )
 }
