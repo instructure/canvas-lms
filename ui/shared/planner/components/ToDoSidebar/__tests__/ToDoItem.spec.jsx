@@ -58,6 +58,11 @@ it('renders discussion icon for discussions', () => {
   expect(wrapper.find('IconDiscussionLine').exists()).toBe(true)
 })
 
+it('renders discussion icon for discussion checkpoints', () => {
+  const wrapper = shallow(<ToDoItem {...getDefaultProps({type: 'Discussion Checkpoint'})} />)
+  expect(wrapper.find('IconDiscussionLine').exists()).toBe(true)
+})
+
 it('renders announcement icon for announcements', () => {
   const wrapper = shallow(<ToDoItem {...getDefaultProps({type: 'Announcement'})} />)
   expect(wrapper.find('IconAnnouncementLine').exists()).toBe(true)

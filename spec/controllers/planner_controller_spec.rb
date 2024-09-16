@@ -1328,6 +1328,34 @@ describe PlannerController do
           expect(note["plannable"]["title"]).to eq pn.title
         end
       end
+
+      context "discussion checkpoints FF" do
+        before :once do
+          @course.root_account.enable_feature!(:discussion_checkpoints)
+          @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+        end
+
+        before do
+          user_session(@student)
+        end
+
+        it "includes discussion checkpoints when FF enabled" do
+          get :index
+          response_json = json_parse(response.body)
+          items = response_json.map { |i| [i["plannable_type"], i["plannable"]["id"]] }
+          expect(items).to include ["sub_assignment", @reply_to_topic.id]
+          expect(items).to include ["sub_assignment", @reply_to_entry.id]
+        end
+
+        it "does not include discussion checkpoints when FF disabled" do
+          @course.root_account.disable_feature!(:discussion_checkpoints)
+          get :index
+          response_json = json_parse(response.body)
+          items = response_json.map { |i| [i["plannable_type"], i["plannable"]["id"]] }
+          expect(items).not_to include ["sub_assignment", @reply_to_topic.id]
+          expect(items).not_to include ["sub_assignment", @reply_to_entry.id]
+        end
+      end
     end
   end
 

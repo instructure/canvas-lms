@@ -209,10 +209,12 @@ module UserLearningObjectScopes
     due_before: 2.weeks.from_now,
     cache_timeout: 120.minutes,
     include_locked: false,
+    is_sub_assignment: false,
     **opts # arguments that are just forwarded to objects_needing
   )
     params = _params_hash(binding)
-    objects_needing("Assignment",
+    object_type = is_sub_assignment ? "SubAssignment" : "Assignment"
+    objects_needing(object_type,
                     purpose,
                     :student,
                     params,
