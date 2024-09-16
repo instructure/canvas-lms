@@ -111,10 +111,6 @@ ready(() => {
           },
           features: {
             extendedSubmissionState: window.ENV.FEATURES.extended_submission_state,
-            gradeByQuestion: {
-              supported: window.ENV.GRADE_BY_QUESTION_SUPPORTED,
-              enabled: window.ENV.GRADE_BY_QUESTION,
-            },
             emojisEnabled: !!window.ENV.EMOJIS_ENABLED,
             enhancedRubricsEnabled: window.ENV.ENHANCED_RUBRICS_ENABLED,
             commentLibraryEnabled: ENV.assignment_comment_library_feature_enabled,
