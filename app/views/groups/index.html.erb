@@ -23,12 +23,12 @@
 <% end %>
 
 <% css_bundle :course_list %>
-
+<% js_bundle :current_groups %>
 <span class="screenreader-only">
   <h1><%= t(:no_groupsheading, "Groups") %></h1>
 </span>
-
   <% if @domain_root_account.feature_enabled?(:instui_nav) %>
+    <div id="react-instui-topnav"></div>
     <div class="page_header_container">
       <h1 class="page_header"><%= t :heading_current_groups, 'Current Groups' %></h1>
     </div>
