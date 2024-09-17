@@ -55,6 +55,8 @@ class ContentExport < ActiveRecord::Base
   QUIZZES2 = "quizzes2"
   CC_EXPORT_TYPES = [COMMON_CARTRIDGE, COURSE_COPY, MASTER_COURSE_COPY, QTI, QUIZZES2].freeze
 
+  class ExternalExportNotCompletedError < StandardError; end
+
   workflow do
     state :created
     state :waiting_for_external_tool
@@ -139,7 +141,15 @@ class ContentExport < ActiveRecord::Base
     quizzes_next? && root_account.feature_enabled?(:newquizzes_on_quiz_page)
   end
 
+  def waiting_for_external_tool?
+    workflow_state == "waiting_for_external_tool"
+  end
+
   def export(opts = {})
+    if waiting_for_external_tool? && !new_quizzes_export_state_completed?
+      raise ExternalExportNotCompletedError
+    end
+
     save if capture_job_id
 
     shard.activate do
@@ -374,7 +384,7 @@ class ContentExport < ActiveRecord::Base
     end
   end
 
-  def queue_api_job(opts)
+  def initialize_job_progress
     if job_progress
       p = job_progress
     else
@@ -385,8 +395,6 @@ class ContentExport < ActiveRecord::Base
     p.completion = 0
     p.user = user
     p.save!
-    quizzes2_build_assignment(opts) if new_quizzes_page_enabled?
-    export(opts)
   end
 
   def referenced_files

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2024 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -387,25 +387,36 @@ describe ContentExportsApiController, type: :request do
         end
 
         it "creates a common cartridge export with new quizzes" do
-          json = api_call_as_user(t_teacher,
-                                  :post,
-                                  "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
-                                  { controller: "content_exports_api", action: "create", format: "json", course_id: t_course.to_param, export_type: "common_cartridge" })
+          json = ""
+
+          track_jobs do
+            json = api_call_as_user(t_teacher,
+                                    :post,
+                                    "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                    { controller: "content_exports_api", action: "create", format: "json", course_id: t_course.to_param, export_type: "common_cartridge" })
+          end
+
           export = t_course.content_exports.where(id: json["id"]).first
 
           expect(export.workflow_state).to eql "waiting_for_external_tool"
           expect(export.export_type).to eql "common_cartridge"
           expect(export.settings["selected_content"]["everything"]).to be_truthy
           expect(export.settings["contains_new_quizzes"]).to be true
+
+          expect(created_jobs.find { |job| job.name == "ContentExport#export" }).to be_nil
         end
 
         context "but the export settings have 'selected content'" do
           it "contains new quizzes ids creates a common cartridge export with new quizzes" do
-            json = api_call_as_user(t_teacher,
-                                    :post,
-                                    "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
-                                    { controller: "content_exports_api", action: "create", format: "json", course_id: t_course.to_param, export_type: "common_cartridge" },
-                                    { select: { assignments: [t_course.assignments.first.id] } })
+            json = ""
+            track_jobs do
+              json = api_call_as_user(t_teacher,
+                                      :post,
+                                      "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                      { controller: "content_exports_api", action: "create", format: "json", course_id: t_course.to_param, export_type: "common_cartridge" },
+                                      { select: { assignments: [t_course.assignments.first.id] } })
+            end
+
             export = t_course.content_exports.where(id: json["id"]).first
 
             expect(export.workflow_state).to eql "waiting_for_external_tool"
@@ -415,6 +426,8 @@ describe ContentExportsApiController, type: :request do
               .to match_array [t_course.assignments.first.id]
             expect(export.settings["contains_new_quizzes"]).to be true
             expect(export.job_progress).to be_queued
+
+            expect(created_jobs.find { |job| job.name == "ContentExport#export" }).to be_nil
           end
 
           it "contains new quizzes ids which is not in this course creates a common cartridge export without new quizzes" do
