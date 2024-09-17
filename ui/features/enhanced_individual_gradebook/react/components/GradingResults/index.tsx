@@ -355,7 +355,7 @@ export default function GradingResults({
                 {I18n.t('Submission Details')}
               </Button>
             </View>
-            <View as="div" className="span4" margin="medium" width="14.6rem">
+            <View as="div" className="span4" margin="small 0 0 small" width="14.6rem">
               {gradebookOptions.proxySubmissionEnabled &&
                 assignment.submissionTypes.includes('online_upload') && (
                   <Button

@@ -243,8 +243,6 @@ describe "SpeedGrader submissions" do
       expect(ffj('td[data-testid="criterion-points"] input:visible').second).to have_attribute("value", "5")
     end
 
-    it "should highlight submitted assignments and not non-submitted assignments for students", priority: "1"
-
     it "displays image submission in browser", priority: "1" do
       filename, fullpath, _data = get_file("graded.png")
       create_and_enroll_students(1)
