@@ -39,6 +39,11 @@ export const LtiPlacements = {
    */
   AccountNavigation: 'account_navigation',
   /**
+   * Similar to account_navigation, but for allows for better analytics
+   * of what tools use this type of placement.
+   */
+  AnalyticsHub: 'analytics_hub',
+  /**
    * Renders a frame on the assignment edit page, under
    * the native assignment options
    */
@@ -130,6 +135,7 @@ export const LtiPlacements = {
 
 export const AllLtiPlacements = [
   LtiPlacements.AccountNavigation,
+  LtiPlacements.AnalyticsHub,
   LtiPlacements.AssignmentEdit,
   LtiPlacements.AssignmentSelection,
   LtiPlacements.AssignmentView,
@@ -191,6 +197,7 @@ export const LtiPlacementsWithIcons = [
 export const LtiPlacementsByMessageType = {
   [LtiResourceLinkRequest]: [
     LtiPlacements.AccountNavigation,
+    LtiPlacements.AnalyticsHub,
     LtiPlacements.AssignmentEdit,
     LtiPlacements.AssignmentGroupMenu,
     LtiPlacements.AssignmentIndexMenu,
