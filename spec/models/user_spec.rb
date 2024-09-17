@@ -819,6 +819,37 @@ describe User do
       submission.update!(last_comment_at: 1.day.ago, posted_at: nil)
       expect(student.recent_feedback(contexts: [post_policies_course])).not_to be_empty
     end
+
+    context "discussion checkpoints" do
+      before do
+        course_with_student(active_all: true)
+        course_with_teacher(course: @course, active_all: true)
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+      end
+
+      it "does not include checkpoint submissions without recent feedback" do
+        expect(@student.recent_feedback(exclude_parent_assignment_submissions: true)).to be_empty
+      end
+
+      it "includes checkpoint submissions with recent feedback" do
+        @reply_to_topic.grade_student(@student, grade: 5, grader: @teacher)
+        @reply_to_entry.grade_student(@student, grade: 8, grader: @teacher)
+
+        expect(@student.recent_feedback(exclude_parent_assignment_submissions: true)).to contain_exactly(
+          @reply_to_topic.submission_for_student(@student),
+          @reply_to_entry.submission_for_student(@student)
+        )
+      end
+
+      it "does not include parent assignment submission with recent feedback" do
+        parent_assignment_submission = @topic.assignment.grade_student(@student, grade: 10, sub_assignment_tag: "reply_to_topic", grader: @teacher)
+
+        expect(@student.recent_feedback(exclude_parent_assignment_submissions: true)).not_to include(
+          parent_assignment_submission
+        )
+      end
+    end
   end
 
   describe "#alternate_account_for_course_creation?" do

@@ -2361,7 +2361,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def submissions_for_course_ids(course_ids, start_at: nil, limit: 20)
+  def submissions_for_course_ids(course_ids, start_at: nil, limit: 20, exclude_parent_assignment_submissions: false)
     return [] unless course_ids.present?
 
     shard.activate do
@@ -2390,7 +2390,11 @@ class User < ActiveRecord::Base
           submissions.first(limit)
 
           ActiveRecord::Associations.preload(submissions, [{ assignment: :context }, :user, :submission_comments])
-          submissions
+          if exclude_parent_assignment_submissions
+            submissions.reject! { |s| s.assignment.has_sub_assignments? } || []
+          else
+            submissions
+          end
         end
       end
     end
