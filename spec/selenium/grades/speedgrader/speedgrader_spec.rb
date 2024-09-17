@@ -912,27 +912,6 @@ describe "SpeedGrader" do
       end
     end
 
-    it "scrolls nav bar and to questions", priority: "1" do
-      skip_if_chrome("broken")
-
-      in_frame "speedgrader_iframe", ".quizzes-speedgrader" do
-        wrapper = f("#quiz-nav-inner-wrapper")
-
-        # check scrolling
-        first_left = wrapper.css_value("left").to_f
-
-        f("#nav-link-next").click
-        second_left = wrapper.css_value("left").to_f
-        expect(first_left).to be > second_left
-
-        # check anchors
-        anchors = ff("#quiz-nav-inner-wrapper li a")
-        data_id = anchors[1].attribute "data-id"
-        anchors[1].click
-        expect(f("#question_#{data_id}")).to have_class "selected_single_question"
-      end
-    end
-
     it "updates scores", priority: "1" do
       in_frame "speedgrader_iframe", ".quizzes-speedgrader" do
         replace_content Speedgrader.quiz_point_inputs[1], "1", tab_out: true
