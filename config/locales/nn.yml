@@ -19128,6 +19128,7 @@ nn:
     everyone: Alle
     everyone_else: "Alle andre"
     invalid_group_override: "Du kan ikkje tilordne ei gruppe utanfor oppgåva sitt gruppesett"
+    mastery_paths: Meistringsstiar
     overrides: 
       everyone: Alle
   overview_of_student_status_a004bcf3: "Oversikt over studentstatus"
