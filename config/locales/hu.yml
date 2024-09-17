@@ -17833,6 +17833,7 @@ hu:
   overrides: 
     everyone: Mindenki
     everyone_else: "Mindenki más "
+    mastery_paths: "Jártassági útvonalak"
     overrides: 
       everyone: Mindenki
   overview_of_student_status_a004bcf3: "A hallgatói státusz áttekintése"
