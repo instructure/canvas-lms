@@ -177,11 +177,18 @@ function DiscussionTopicForm({
 
   const [rceContent, setRceContent] = useState(currentDiscussionTopic?.message || '')
 
-  const [sectionIdsToPostTo, setSectionIdsToPostTo] = useState(
-    currentDiscussionTopic?.courseSections && currentDiscussionTopic?.courseSections.length > 0
-      ? currentDiscussionTopic?.courseSections.map(section => section._id)
-      : ['all']
-  )
+  let sectionsDefault = []
+  if (
+    !currentDiscussionTopic?.isSectionSpecific ||
+    currentDiscussionTopic?.courseSections?.length > 0
+  ) {
+    sectionsDefault =
+      currentDiscussionTopic?.courseSections?.length > 0
+        ? currentDiscussionTopic.courseSections.map(section => section._id)
+        : ['all']
+  }
+
+  const [sectionIdsToPostTo, setSectionIdsToPostTo] = useState(sectionsDefault)
 
   const [discussionAnonymousState, setDiscussionAnonymousState] = useState(
     currentDiscussionTopic?.anonymousState || 'off'
@@ -559,13 +566,8 @@ function DiscussionTopicForm({
     }
   }
 
-  const continueSubmitForm = (shouldPublish, shouldNotifyUsers = false) => {
-    setTimeout(() => {
-      postToSisForCards.current = postToSis
-      setIsSubmitting(true)
-    }, 0)
-
-    let formIsValid = validateFormFields(
+  const validateForm = () =>
+    validateFormFields(
       title,
       availableFrom,
       availableUntil,
@@ -591,6 +593,14 @@ function DiscussionTopicForm({
       postToSis,
       showPostToSisFlashAlert('manage-assign-to', !ENV.FEATURES.selective_release_edit_page)
     )
+
+  const continueSubmitForm = (shouldPublish, shouldNotifyUsers = false) => {
+    setTimeout(() => {
+      postToSisForCards.current = postToSis
+      setIsSubmitting(true)
+    }, 0)
+
+    let formIsValid = validateForm()
     let hasAfterRenderIssue = false
     let sectionViewRef = null
 
@@ -1238,6 +1248,8 @@ function DiscussionTopicForm({
           shouldShowSaveAndPublishButton={shouldShowSaveAndPublishButton}
           submitForm={publish => {
             if (isAnnouncement && isEditing) {
+              handlePostToSelect(sectionIdsToPostTo)
+              if (!validateForm()) return
               // remember publish value for SendEditNotificationModal later
               setShowEditAnnouncementModal(true)
               setShouldPublish(publish)

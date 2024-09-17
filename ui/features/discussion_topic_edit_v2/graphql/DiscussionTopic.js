@@ -49,6 +49,7 @@ export const DiscussionTopic = {
       replyToEntryRequiredCount
       visibleToEveryone
       onlyVisibleToOverrides
+      isSectionSpecific
       courseSections {
         ...Section
       }
