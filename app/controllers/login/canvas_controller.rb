@@ -36,7 +36,11 @@ class Login::CanvasController < ApplicationController
     flash.now[:notice] = t("Your password has been changed.") if params[:password_changed] == "1"
     @include_recaptcha = recaptcha_enabled?(failsafe: false)
 
-    maybe_render_mobile_login
+    if @domain_root_account.feature_enabled? :login_registration_ui_identity
+      render_new_login
+    else
+      maybe_render_mobile_login
+    end
   end
 
   def create
@@ -174,17 +178,40 @@ class Login::CanvasController < ApplicationController
                     end
     @errored = true
     @headers = false
-    maybe_render_mobile_login :bad_request
+
+    if @domain_root_account.feature_enabled?(:login_registration_ui_identity)
+      render_new_login(:bad_request)
+    else
+      maybe_render_mobile_login(:bad_request)
+    end
   end
 
   def maybe_render_mobile_login(status = nil)
     if mobile_device?
-      @login_handle_name = @domain_root_account.login_handle_name_with_inference
-      @login_handle_is_email = @login_handle_name == AuthenticationProvider.default_login_handle_name
-      render :mobile_login, layout: "mobile_auth", status:
+      render_mobile_login
     else
-      @aacs_with_buttons = @domain_root_account.authentication_providers.active.select { |aac| aac.class.login_button? }
+      @aacs_with_buttons = auth_providers_with_buttons
       render :new, status:
     end
+  end
+
+  def render_new_login(status = nil)
+    @auth_providers = auth_providers_with_buttons.map do |provider|
+      {
+        id: provider.id,
+        auth_type: provider.auth_type
+      }
+    end
+    render "login/canvas/new_login", layout: "bare", status: status || :ok
+  end
+
+  def auth_providers_with_buttons
+    @domain_root_account.authentication_providers.active.select { |aac| aac.class.login_button? }
+  end
+
+  def render_mobile_login
+    @login_handle_name = @domain_root_account.login_handle_name_with_inference
+    @login_handle_is_email = @login_handle_name == AuthenticationProvider.default_login_handle_name
+    render :mobile_login, layout: "mobile_auth", status:
   end
 end
