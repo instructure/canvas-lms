@@ -10914,6 +10914,7 @@ el:
       labels: 
         client_id: "ID Πελάτη"
         client_secret: "Μυστικό Πελάτη"
+        discovery_url: "Διεύθυνση εντοπισμού URL"
     kaltura: 
       description: "Ηχογράφηση και αναπαραγωγή αρχείων βίντεο/ήχου Kaltura"
       name: Kaltura

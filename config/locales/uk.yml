@@ -12506,6 +12506,7 @@ uk:
   overrides: 
     everyone: Кожен
     everyone_else: "Всі інші"
+    mastery_paths: "Шляхи досягнення майстерності"
     overrides: 
       everyone: Кожен
   overwrite_already_entered_grades_64a98037: "Перезаписати вже введені оцінки"

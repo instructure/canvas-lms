@@ -14053,6 +14053,7 @@ tr:
     blank_override: "Bir öğrenci veya kısım seçmelisiniz"
     everyone: Herkes
     everyone_else: "Geri kalan herkes"
+    mastery_paths: "Yeterlilik Süreçleri"
     overrides: 
       everyone: Herkes
   overview_58268c72: "Genel Bakış"
