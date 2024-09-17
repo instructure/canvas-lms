@@ -13986,6 +13986,7 @@ he:
     everyone: "כל אחד"
     everyone_else: "כל אחד אחר"
     invalid_group_override: "אין אפשרות לשבץ בקבוצה אשר מחוץ למערך הקבוצות של משימה"
+    mastery_paths: "מסלולי התמחות"
     overrides: 
       everyone: "כל אחד"
   overwrite_already_entered_grades_64a98037: "דריסת הערכות שכבר התבצעו"
