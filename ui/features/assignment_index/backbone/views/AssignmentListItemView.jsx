@@ -602,11 +602,16 @@ export default AssignmentListItemView = (function () {
     }
 
     renderItemAssignToTray(open, returnFocusTo, itemProps) {
+      const mountPoint = document.getElementById('assign-to-mount-point')
+      if (mountPoint.hasChildNodes()) {
+        ReactDOM.unmountComponentAtNode(mountPoint)
+        mountPoint.innerHTML = ''
+      }
       ReactDOM.render(
         <ItemAssignToTray
           open={open}
           onClose={() => {
-            ReactDOM.unmountComponentAtNode(document.getElementById('assign-to-mount-point'))
+            ReactDOM.unmountComponentAtNode(mountPoint)
           }}
           onDismiss={() => {
             this.renderItemAssignToTray(false, returnFocusTo, itemProps)
@@ -618,7 +623,7 @@ export default AssignmentListItemView = (function () {
           isCheckpointed={itemProps.isCheckpoint}
           {...itemProps}
         />,
-        document.getElementById('assign-to-mount-point')
+        mountPoint
       )
     }
 
