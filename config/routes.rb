@@ -828,6 +828,7 @@ CanvasRails::Application.routes.draw do
   get "logout" => "login#logout_landing"
 
   get "login/canvas" => "login/canvas#new", :as => :canvas_login
+  get "login/canvas/forgot-password", to: "login/canvas#new"
   post "login/canvas" => "login/canvas#create"
 
   get "login/email_verify" => "login/email_verify#show", :as => :login_email_verify_show
