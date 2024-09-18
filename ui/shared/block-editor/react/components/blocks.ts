@@ -36,7 +36,7 @@ import {HeroSection, HeroTextHalf} from './user/sections/HeroSection'
 import {NavigationSection, NavigationSectionInner} from './user/sections/NavigationSection'
 import {AboutSection, AboutTextHalf} from './user/sections/AboutSection'
 import {FooterSection} from './user/sections/FooterSection'
-import {QuizSection} from './user/sections/QuizSection'
+import {KnowledgeCheckSection} from './user/sections/KnowledgeCheckSection'
 import {AnnouncementSection} from './user/sections/AnnouncementSection'
 import {BlankSection} from './user/sections/BlankSection'
 import {TabsBlock, TabBlock, TabContent} from './user/blocks/TabsBlock'
@@ -53,7 +53,7 @@ const blocks = {
   IconBlock,
   ImageBlock,
   RCEBlock,
-  QuizSection,
+  KnowledgeCheckSection,
   AnnouncementSection,
   ResourcesSection,
   ResourcesSectionInner,

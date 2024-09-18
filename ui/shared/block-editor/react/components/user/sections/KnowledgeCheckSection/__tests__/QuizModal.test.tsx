@@ -16,11 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {QuizSection} from './QuizSection'
-import {QuizModal} from './QuizModal'
-// @ts-expect-error
-import {IconQuizSolid} from '@instructure/ui-icons/es/svg'
+import React from 'react'
+import {render, screen} from '@testing-library/react'
+import {QuizModal} from '../QuizModal'
+import {Editor, Frame} from '@craftjs/core'
 
-const QuizSectionIcon = IconQuizSolid?.src
+describe('QuizModal', () => {
+  const defaultProps = {
+    open: true,
+    onClose: jest.fn(),
+    onSelect: jest.fn(),
+  }
 
-export {QuizSection, QuizModal, QuizSectionIcon}
+  const renderModal = (props = {}) => {
+    return render(
+      <Editor resolver={{QuizModal}}>
+        <Frame>
+          <QuizModal {...props} />
+        </Frame>
+      </Editor>
+    )
+  }
+
+  it('renders without crashing', () => {
+    renderModal(defaultProps)
+    expect(screen.getByText('Select a Quiz')).toBeInTheDocument()
+  })
+})

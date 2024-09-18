@@ -20,6 +20,9 @@ import React, {useCallback, useState} from 'react'
 
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor')
 
 type MatchingQuestionProps = {
   question: any
@@ -50,7 +53,7 @@ const MatchingQuestion = ({question, onAnswerChange}: MatchingQuestionProps) => 
 
   const handleAnswerChange = useCallback(
     (
-      event: React.SyntheticEvent,
+      _event: React.SyntheticEvent,
       data: {
         value?: string | number
         id?: string
@@ -76,8 +79,10 @@ const MatchingQuestion = ({question, onAnswerChange}: MatchingQuestionProps) => 
           <div className="matching-question__center" />
           <div className="matching-question__right">
             <SimpleSelect
-              renderLabel={<ScreenReaderContent>Pick a matching answer</ScreenReaderContent>}
-              assistiveText="Use arrow keys to navigate options"
+              renderLabel={
+                <ScreenReaderContent>{I18n.t('Pick a matching answer')}</ScreenReaderContent>
+              }
+              assistiveText={I18n.t('Use arrow keys to navigate options')}
               value={answers[q.id]}
               onChange={handleAnswerChange}
             >

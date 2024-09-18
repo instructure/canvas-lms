@@ -22,21 +22,21 @@ import {useEditor, useNode} from '@craftjs/core'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
+import {IconCanvasLogoLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
-
-import {MultipleChoiceQuestion} from './questions/MultipleChoiceQuestion'
-import {TrueFalseQuestion} from './questions/TrueFalseQuestion'
-import {MatchingQuestion} from './questions/MatchingQuestion'
-import {quizQuestions} from '../../../../assets/data/quizQuestions'
-import {IconQuizSolid} from '@instructure/ui-icons'
 import {useClassNames} from '../../../../utils'
+import {KnowledgeCheckSectionToolbar} from './KnowledgeCheckSectionToolbar'
 import {QuizModal} from './QuizModal'
-import {type QuizSectionProps} from './types'
+import {renderQuestion} from './utils/questionUtils'
+import {type QuestionProps, type KnowledgeCheckSectionProps} from './types'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor')
 
 const WIDTH = 'auto'
 const HEIGHT = 'auto'
 
-const QuizSection = ({questionId}: QuizSectionProps) => {
+const KnowledgeCheckSection = ({id, entry}: KnowledgeCheckSectionProps) => {
   const {enabled} = useEditor(state => {
     return {
       enabled: state.options.enabled,
@@ -46,22 +46,17 @@ const QuizSection = ({questionId}: QuizSectionProps) => {
     actions: {setProp},
     connectors: {connect, drag},
   } = useNode()
-  const [question, setQuestion] = useState(() => {
-    const q = quizQuestions.entries.find((entry: any) => entry.id === questionId)
-    return q?.entry
-  })
+  const [question, setQuestion] = useState(entry)
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [showResult, setShowResult] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const clazz = useClassNames(enabled, {empty: false}, ['section', 'quiz-section'])
 
   useEffect(() => {
-    const q = quizQuestions.entries.find((entry: any) => entry.id === questionId)
-    setQuestion(q?.entry)
-
+    setQuestion(entry)
     setIsCorrect(null)
     setShowResult(false)
-  }, [questionId])
+  }, [entry])
 
   const handleCheckAnswer = useCallback((result: boolean) => {
     setIsCorrect(result)
@@ -77,44 +72,61 @@ const QuizSection = ({questionId}: QuizSectionProps) => {
   }, [])
 
   const handleSelectQuestion = useCallback(
-    (newQuestionId: string) => {
-      setProp((prps: QuizSectionProps) => {
-        prps.questionId = newQuestionId
+    (newQuestion: QuestionProps) => {
+      setProp((prps: KnowledgeCheckSectionProps) => {
+        prps.id = newQuestion.id
+        prps.entry = newQuestion.entry
       })
+      setQuestion(newQuestion.entry)
       setModalOpen(false)
     },
     [setProp]
   )
 
-  const renderQuestion = () => {
-    if (question) {
-      switch (question.interaction_type.slug) {
-        case 'true-false':
-          return <TrueFalseQuestion question={question} onAnswerChange={handleCheckAnswer} />
-        case 'choice':
-          return <MultipleChoiceQuestion question={question} onAnswerChange={handleCheckAnswer} />
-        case 'matching':
-          return <MatchingQuestion question={question} onAnswerChange={handleCheckAnswer} />
-        default:
-          return <Alert variant="error">Unsupported question type</Alert>
+  const renderFeedback = () => {
+    if (isCorrect) {
+      if (question.feedback && question.feedback.correct) {
+        return question.feedback.correct
+      } else {
+        return I18n.t('Correct!')
       }
+    } else if (question.feedback && question.feedback.incorrect) {
+      return question.feedback.incorrect
     } else {
-      return (
-        <div className="quiz-section__empty">
-          {enabled ? (
-            <Button onClick={showModal} color="primary">
-              Select a question
-            </Button>
-          ) : (
-            <Text>No question has been selected</Text>
-          )}
-        </div>
-      )
+      return I18n.t('Bzzzzt, try again.')
     }
+  }
+
+  const renderNeutralFeedback = () => {
+    if (question.feedback && question.feedback.neutral) {
+      return question.feedback.neutral
+    }
+  }
+
+  const renderSelectQuestionButton = () => {
+    return (
+      <div className="quiz-section__empty">
+        {enabled ? (
+          <Button onClick={showModal} color="primary">
+            {I18n.t('Select Quiz')}
+          </Button>
+        ) : (
+          <Text>{I18n.t('No question has been selected')}</Text>
+        )}
+      </div>
+    )
+  }
+
+  const renderQuestionOrSelectButton = () => {
+    if (question) {
+      return renderQuestion(question, handleCheckAnswer)
+    }
+    return renderSelectQuestionButton()
   }
 
   return (
     <div
+      id={id}
       className={clazz}
       ref={ref => {
         ref && connect(drag(ref))
@@ -122,30 +134,30 @@ const QuizSection = ({questionId}: QuizSectionProps) => {
       style={{width: WIDTH, height: HEIGHT}}
     >
       <div className="block-header">
-        <IconQuizSolid size="x-small" inline={true} />
-        <span className="block-header-title">Quiz</span>
+        <IconCanvasLogoLine size="x-small" inline={true} style={{margin: 'auto 0'}} />
+        <span className="block-header-title">{I18n.t('Check Your Knowledge')}</span>
       </div>
-      {renderQuestion()}
+      {renderQuestionOrSelectButton()}
       <Flex justifyItems="space-between" padding="small">
         <Flex.Item shouldGrow={true}>
           {showResult && (
             <Alert variant={isCorrect ? 'success' : 'error'} margin="0 small 0 0">
-              {isCorrect ? 'Correct!' : 'Bzzzzt, try again.'}
+              <div dangerouslySetInnerHTML={{__html: renderFeedback()}} />
+              <div dangerouslySetInnerHTML={{__html: renderNeutralFeedback()}} />
             </Alert>
           )}
         </Flex.Item>
         <Button
           color="secondary"
           onClick={handleSubmit}
-          interaction={!enabled && questionId ? 'enabled' : 'disabled'}
+          interaction={!enabled && question ? 'enabled' : 'disabled'}
         >
-          Submit
+          {I18n.t('Check')}
         </Button>
       </Flex>
       {enabled && (
         <QuizModal
           open={modalOpen}
-          currentQuestionId={questionId}
           onClose={() => setModalOpen(false)}
           onSelect={handleSelectQuestion}
         />
@@ -154,14 +166,17 @@ const QuizSection = ({questionId}: QuizSectionProps) => {
   )
 }
 
-QuizSection.craft = {
-  displayName: 'Quiz Question',
+KnowledgeCheckSection.craft = {
+  displayName: I18n.t('Knowledge Check'),
   defaultProps: {
-    questionId: undefined,
+    entry: undefined,
   },
   custom: {
     isSection: true,
   },
+  related: {
+    toolbar: KnowledgeCheckSectionToolbar,
+  },
 }
 
-export {QuizSection}
+export {KnowledgeCheckSection}

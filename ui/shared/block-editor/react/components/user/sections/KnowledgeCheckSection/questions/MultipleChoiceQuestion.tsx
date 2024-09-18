@@ -20,14 +20,18 @@ import React, {useCallback, useState} from 'react'
 
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {type QuestionChoice} from '../../../../../assets/data/quizQuestions'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-type TrueFalseQuestionProps = {
+const I18n = useI18nScope('block-editor')
+
+type MultipleChoiceQuestionProps = {
   question: any
   onAnswerChange: (isCorrect: boolean) => void
 }
 
-const TrueFalseQuestion = ({question, onAnswerChange}: TrueFalseQuestionProps) => {
-  const [correctAnswer] = useState<string>(question.scoring_data.value.toString().toLowerCase())
+const MultipleChoiceQuestion = ({question, onAnswerChange}: MultipleChoiceQuestionProps) => {
+  const [correctAnswer] = useState<string>(question.scoring_data.value)
   const [answer, setAnswer] = useState<string | undefined>(undefined)
 
   const handleAnswerChange = useCallback(
@@ -42,16 +46,24 @@ const TrueFalseQuestion = ({question, onAnswerChange}: TrueFalseQuestionProps) =
     <div className="quiz-section__body">
       <div style={{margin: '0 0 .75rem'}} dangerouslySetInnerHTML={{__html: question.item_body}} />
       <RadioInputGroup
-        description={<ScreenReaderContent>Choose one</ScreenReaderContent>}
+        description={<ScreenReaderContent>{I18n.t('Choose one')}</ScreenReaderContent>}
         name={`question-${question.id}`}
         value={answer}
         onChange={handleAnswerChange}
+        key={`question-${question.id}`}
       >
-        <RadioInput value="true" label={question.interaction_data.true_choice} />
-        <RadioInput value="false" label={question.interaction_data.false_choice} />
+        {question.interaction_data.choices.map((choice: QuestionChoice) => {
+          return (
+            <RadioInput
+              key={choice.id}
+              value={choice.id}
+              label={<span dangerouslySetInnerHTML={{__html: choice.item_body}} />}
+            />
+          )
+        })}
       </RadioInputGroup>
     </div>
   )
 }
 
-export {TrueFalseQuestion}
+export {MultipleChoiceQuestion}
