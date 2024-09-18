@@ -36,7 +36,7 @@
 
 
 <% provide :page_title, t(:page_title, "%{assignment_name}, SpeedGrader, %{course_name}", :assignment_name => @assignment.title, :course_name => @context.name) %>
-<div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;display: flex;flex-direction: column;">
+<div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;display: flex;flex-direction: column;" id="classic_speedgrader_container">
   <figure id="speed_grader_timeout_alert"></figure>
   <figure id="speed_grader_loading"></figure>
   <h1 class="screenreader-only"><%= t('page_header_title', "SpeedGrader") %></h1>
