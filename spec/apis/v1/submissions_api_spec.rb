@@ -1271,6 +1271,26 @@ describe "Submissions API", type: :request do
     end
   end
 
+  it "apis translate online_text_entry submissions without verifiers" do
+    student1 = user_factory(active_all: true)
+    course_with_teacher(active_all: true)
+    @course.enroll_student(student1).accept!
+    a1 = @course.assignments.create!(title: "assignment1", grading_type: "letter_grade", points_possible: 15)
+    should_translate_user_content(@course, false) do |content|
+      submit_homework(a1, student1, body: content)
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}.json",
+                      { controller: "submissions_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        assignment_id: a1.id.to_s,
+                        user_id: student1.id.to_s,
+                        no_verifiers: true })
+      json["body"]
+    end
+  end
+
   it "allows retrieving attachments without a session" do
     local_storage!
 

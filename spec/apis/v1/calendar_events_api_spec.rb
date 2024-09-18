@@ -2249,6 +2249,20 @@ describe CalendarEventsApiController, type: :request do
       end
     end
 
+    it "apis translate event descriptions without verifiers" do
+      should_translate_user_content(@course, false) do |content|
+        event = @course.calendar_events.create!(title: "event", start_at: "2012-01-08 12:00:00", description: content)
+        json = api_call(:get,
+                        "/api/v1/calendar_events/#{event.id}",
+                        controller: "calendar_events_api",
+                        action: "show",
+                        format: "json",
+                        id: event.id.to_s,
+                        no_verifiers: true)
+        json["description"]
+      end
+    end
+
     it "apis translate event descriptions in ics" do
       allow(HostUrl).to receive(:default_host).and_return("www.example.com")
       should_translate_user_content(@course, false) do |content|
