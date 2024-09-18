@@ -703,7 +703,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def display_type(extension_type)
-    if extension_type.to_s == "global_navigation"
+    if ["global_navigation", "analytics_hub"].include?(extension_type.to_s)
       if Lti::AppUtil::TOOL_DISPLAY_TEMPLATES.key?(settings.dig(extension_type, :display_type))
         return extension_setting(extension_type, :display_type) || "full_width"
       else
