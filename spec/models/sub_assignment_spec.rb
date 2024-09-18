@@ -155,4 +155,184 @@ describe SubAssignment do
       expect(result.pluck(:id)).to match_array([@reply_to_topic.id, @reply_to_entry.id])
     end
   end
+
+  describe "synchronization with parent assignment" do
+    before do
+      @course = course_factory(active_course: true)
+      @parent_assignment = @course.assignments.create!(title: "Parent Assignment", has_sub_assignments: true)
+      @sub_assignment = @parent_assignment.sub_assignments.create!(
+        context: @course,
+        sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+        title: "Sub Assignment"
+      )
+    end
+
+    it "updates the parent assignment when unlock_at changes" do
+      new_unlock_at = 2.days.from_now
+      expect do
+        @sub_assignment.update!(unlock_at: new_unlock_at)
+      end.to change { @parent_assignment.reload.unlock_at }.to(new_unlock_at)
+    end
+
+    it "updates the parent assignment when lock_at changes" do
+      new_lock_at = 5.days.from_now
+      expect do
+        @sub_assignment.update!(lock_at: new_lock_at)
+      end.to change { @parent_assignment.reload.lock_at }.to(new_lock_at)
+    end
+
+    it "does not update the parent assignment when workflow_state changes" do
+      expect do
+        @sub_assignment.update!(workflow_state: "deleted")
+      end.not_to change { @parent_assignment.reload.workflow_state }
+    end
+
+    it "does not trigger a sync when updated by the parent assignment" do
+      new_unlock_at = 3.days.from_now
+      @parent_assignment.update!(unlock_at: new_unlock_at)
+
+      expect(@sub_assignment).not_to receive(:sync_with_parent)
+      @sub_assignment.reload.run_callbacks(:commit)
+    end
+  end
+
+  describe "synchronization from parent assignment" do
+    before do
+      @course = course_factory(active_course: true)
+      @parent_assignment = @course.assignments.create!(has_sub_assignments: true, title: "Parent Assignment")
+      @sub_assignment1 = @parent_assignment.sub_assignments.create!(
+        context: @course,
+        sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+        title: "Sub Assignment 1"
+      )
+      @sub_assignment2 = @parent_assignment.sub_assignments.create!(
+        context: @course,
+        sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY,
+        title: "Sub Assignment 2"
+      )
+    end
+
+    it "updates all active sub-assignments when parent's unlock_at changes" do
+      new_unlock_at = 4.days.from_now
+      @parent_assignment.update!(unlock_at: new_unlock_at)
+
+      expect(@sub_assignment1.reload.unlock_at).to eq(new_unlock_at)
+      expect(@sub_assignment2.reload.unlock_at).to eq(new_unlock_at)
+    end
+
+    it "updates all active sub-assignments when parent's lock_at changes" do
+      new_lock_at = 6.days.from_now
+      @parent_assignment.update!(lock_at: new_lock_at)
+
+      expect(@sub_assignment1.reload.lock_at).to eq(new_lock_at)
+      expect(@sub_assignment2.reload.lock_at).to eq(new_lock_at)
+    end
+
+    it "updates all active sub-assignments when parent's workflow_state changes" do
+      @parent_assignment.update!(workflow_state: "unpublished")
+
+      expect(@sub_assignment1.reload.workflow_state).to eq("unpublished")
+      expect(@sub_assignment2.reload.workflow_state).to eq("unpublished")
+    end
+
+    it "does not update inactive sub-assignments" do
+      @sub_assignment2.update!(workflow_state: "deleted")
+      new_unlock_at = 5.days.from_now
+      @parent_assignment.update!(unlock_at: new_unlock_at)
+
+      expect(@sub_assignment1.reload.unlock_at).to eq(new_unlock_at)
+      expect(@sub_assignment2.reload.unlock_at).not_to eq(new_unlock_at)
+    end
+  end
+
+  describe "synchronization between sibling sub-assignments" do
+    before do
+      @course = course_factory(active_course: true)
+      @parent_assignment = @course.assignments.create!(has_sub_assignments: true, title: "Parent Assignment")
+      @sub_assignment1 = @parent_assignment.sub_assignments.create!(
+        context: @course,
+        sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+        title: "Sub Assignment 1"
+      )
+      @sub_assignment2 = @parent_assignment.sub_assignments.create!(
+        context: @course,
+        sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY,
+        title: "Sub Assignment 2"
+      )
+      @sub_assignment3 = @parent_assignment.sub_assignments.create!(
+        context: @course,
+        sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+        title: "Sub Assignment 3"
+      )
+    end
+
+    it "updates all sibling sub-assignments when one sub-assignment's unlock_at changes" do
+      new_unlock_at = 3.days.from_now
+      expect do
+        @sub_assignment1.update!(unlock_at: new_unlock_at)
+      end.to change { [@sub_assignment2, @sub_assignment3].map { |sa| sa.reload.unlock_at } }
+        .to([new_unlock_at, new_unlock_at])
+    end
+
+    it "updates all sibling sub-assignments when one sub-assignment's lock_at changes" do
+      new_lock_at = 7.days.from_now
+      expect do
+        @sub_assignment2.update!(lock_at: new_lock_at)
+      end.to change { [@sub_assignment1, @sub_assignment3].map { |sa| sa.reload.lock_at } }
+        .to([new_lock_at, new_lock_at])
+    end
+
+    it "does not update sibling sub-assignments when one sub-assignment's workflow_state changes" do
+      expect do
+        @sub_assignment1.update!(workflow_state: "deleted")
+      end.not_to change { [@sub_assignment2, @sub_assignment3].map { |sa| sa.reload.workflow_state } }
+    end
+
+    it "updates active sibling sub-assignments but not inactive ones" do
+      @sub_assignment3.update!(workflow_state: "deleted")
+      new_unlock_at = 4.days.from_now
+
+      expect do
+        @sub_assignment1.update!(unlock_at: new_unlock_at)
+      end.to change { @sub_assignment2.reload.unlock_at }.to(new_unlock_at)
+
+      expect(@sub_assignment3.reload.unlock_at).not_to eq(new_unlock_at)
+    end
+
+    it "updates the parent assignment and all siblings in a single transaction" do
+      new_unlock_at = 5.days.from_now
+
+      expect do
+        @sub_assignment1.update!(unlock_at: new_unlock_at)
+      end.to change { @parent_assignment.reload.unlock_at }.to(new_unlock_at)
+                                                           .and change { @sub_assignment2.reload.unlock_at }.to(new_unlock_at)
+                                                                                                            .and change { @sub_assignment3.reload.unlock_at }.to(new_unlock_at)
+    end
+  end
+
+  describe "callback loop prevention" do
+    before do
+      @course = course_factory(active_course: true)
+      @parent_assignment = @course.assignments.create!(has_sub_assignments: true, title: "Parent Assignment")
+      @sub_assignment = @parent_assignment.sub_assignments.create!(
+        context: @course,
+        sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+        title: "Sub Assignment"
+      )
+    end
+
+    it "does not trigger infinite updates when sub-assignment is changed" do
+      expect(@sub_assignment).to receive(:sync_with_parent).once.and_call_original
+      expect(@parent_assignment).to receive(:update_from_sub_assignment).once.and_call_original
+      expect(@parent_assignment).to receive(:update_sub_assignments).once.and_call_original
+
+      @sub_assignment.update!(unlock_at: 1.day.from_now)
+    end
+
+    it "does not update parent when saved_by is set to :parent_assignment" do
+      @sub_assignment.saved_by = :parent_assignment
+      expect(@sub_assignment).not_to receive(:sync_with_parent)
+      @sub_assignment.update!(unlock_at: 1.day.from_now)
+    end
+  end
 end

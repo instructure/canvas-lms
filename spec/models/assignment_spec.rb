@@ -11470,6 +11470,67 @@ describe Assignment do
       expect(@first_checkpoint.reload.workflow_state).to eq "unpublished"
       expect(@second_checkpoint.reload.workflow_state).to eq "unpublished"
     end
+
+    it "will update the sub_assignment lock_at and unlock_at when parent updates" do
+      expect(@first_checkpoint.reload.unlock_at).to be_nil
+      expect(@second_checkpoint.reload.unlock_at).to be_nil
+      expect(@first_checkpoint.reload.lock_at).to be_nil
+      expect(@second_checkpoint.reload.lock_at).to be_nil
+      lock_at_time = 1.day.from_now
+      unlock_at_time = 2.days.from_now
+      @parent.update!(lock_at: lock_at_time, unlock_at: unlock_at_time)
+
+      expect(@first_checkpoint.reload.unlock_at).to eq unlock_at_time
+      expect(@second_checkpoint.reload.unlock_at).to eq unlock_at_time
+      expect(@first_checkpoint.reload.lock_at).to eq lock_at_time
+      expect(@second_checkpoint.reload.lock_at).to eq lock_at_time
+    end
+
+    describe "update propagation and loop prevention" do
+      before do
+        @course = course_factory(active_course: true)
+        @parent = @course.assignments.create!(title: "Parent Assignment", has_sub_assignments: true)
+        @first_checkpoint = @parent.sub_assignments.create!(
+          context: @course,
+          sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+          title: "First Checkpoint"
+        )
+        @second_checkpoint = @parent.sub_assignments.create!(
+          context: @course,
+          sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY,
+          title: "Second Checkpoint"
+        )
+      end
+
+      it "updates sub-assignments without triggering infinite updates" do
+        expect(@parent).to receive(:update_sub_assignments).once.and_call_original
+        expect(@first_checkpoint).not_to receive(:sync_with_parent)
+        expect(@second_checkpoint).not_to receive(:sync_with_parent)
+
+        lock_at_time = 1.day.from_now
+        unlock_at_time = 2.days.from_now
+
+        @parent.update!(lock_at: lock_at_time, unlock_at: unlock_at_time)
+
+        expect(@first_checkpoint.reload.unlock_at).to eq unlock_at_time
+        expect(@second_checkpoint.reload.unlock_at).to eq unlock_at_time
+        expect(@first_checkpoint.reload.lock_at).to eq lock_at_time
+        expect(@second_checkpoint.reload.lock_at).to eq lock_at_time
+      end
+
+      it "does not trigger infinite updates when updated by a sub-assignment" do
+        expect(@parent).to receive(:update_from_sub_assignment).once.and_call_original
+        expect(@parent).to receive(:update_sub_assignments).once.and_call_original
+        expect(@first_checkpoint).to receive(:sync_with_parent).once.and_call_original
+        expect(@second_checkpoint).not_to receive(:sync_with_parent)
+
+        new_unlock_at = 3.days.from_now
+        @first_checkpoint.update!(unlock_at: new_unlock_at)
+
+        expect(@parent.reload.unlock_at).to eq new_unlock_at
+        expect(@second_checkpoint.reload.unlock_at).to eq new_unlock_at
+      end
+    end
   end
 
   describe "Lti::Migratable" do
