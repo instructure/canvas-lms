@@ -312,17 +312,19 @@ module Importers
       if (shift_options = migration.date_shift_options)
         shift_options = shift_date_options(course, shift_options)
 
-        Assignment.suspend_due_date_caching do
-          migration.imported_migration_items_by_class(Assignment).each do |event|
-            event.reload # just in case
-            event.due_at = shift_date(event.due_at, shift_options)
-            event.lock_at = shift_date(event.lock_at, shift_options)
-            event.unlock_at = shift_date(event.unlock_at, shift_options)
-            event.peer_reviews_due_at = shift_date(event.peer_reviews_due_at, shift_options)
-            event.needs_update_cached_due_dates = true if event.update_cached_due_dates?
-            event.save_without_broadcasting
-            if event.errors.any?
-              migration.add_warning(t("Couldn't adjust dates on assignment %{name} (ID %{id})", name: event.name, id: event.id.to_s))
+        unless Account.site_admin.feature_enabled?(:pre_date_shift_for_assignment_importing)
+          Assignment.suspend_due_date_caching do
+            migration.imported_migration_items_by_class(Assignment).each do |event|
+              event.reload # just in case
+              event.due_at = shift_date(event.due_at, shift_options)
+              event.lock_at = shift_date(event.lock_at, shift_options)
+              event.unlock_at = shift_date(event.unlock_at, shift_options)
+              event.peer_reviews_due_at = shift_date(event.peer_reviews_due_at, shift_options)
+              event.needs_update_cached_due_dates = true if event.update_cached_due_dates?
+              event.save_without_broadcasting
+              if event.errors.any?
+                migration.add_warning(t("Couldn't adjust dates on assignment %{name} (ID %{id})", name: event.name, id: event.id.to_s))
+              end
             end
           end
         end
@@ -360,18 +362,22 @@ module Importers
           event.save_without_broadcasting
         end
 
-        Assignment.suspend_due_date_caching do
-          migration.imported_migration_items_by_class(Quizzes::Quiz).each do |event|
-            event.reload # have to reload the quiz_data to keep link resolution - the others are just in case
-            event.due_at = shift_date(event.due_at, shift_options)
-            event.lock_at = shift_date(event.lock_at, shift_options)
-            event.unlock_at = shift_date(event.unlock_at, shift_options)
-            event.show_correct_answers_at = shift_date(event.show_correct_answers_at, shift_options)
-            event.hide_correct_answers_at = shift_date(event.hide_correct_answers_at, shift_options)
-            event.saved_by = :migration
-            event.save
+        unless Account.site_admin.feature_enabled?(:pre_date_shift_for_assignment_importing)
+          Assignment.suspend_due_date_caching do
+            migration.imported_migration_items_by_class(Quizzes::Quiz).each do |event|
+              event.reload # have to reload the quiz_data to keep link resolution - the others are just in case
+              event.due_at = shift_date(event.due_at, shift_options)
+              event.lock_at = shift_date(event.lock_at, shift_options)
+              event.unlock_at = shift_date(event.unlock_at, shift_options)
+              event.show_correct_answers_at = shift_date(event.show_correct_answers_at, shift_options)
+              event.hide_correct_answers_at = shift_date(event.hide_correct_answers_at, shift_options)
+              event.saved_by = :migration
+              event.save
+            end
           end
+        end
 
+        Assignment.suspend_due_date_caching do
           migration.imported_migration_items_by_class(AssignmentOverride).each do |event|
             AssignmentOverride.overridden_dates.each do |field|
               date = event.send(field)
@@ -627,6 +633,10 @@ module Importers
         new_time -= new_time.utc_offset
         new_time
       end
+    end
+
+    def self.error_on_dates?(item, attributes)
+      attributes.any? { |attribute| item.errors[attribute].present? }
     end
   end
 end
