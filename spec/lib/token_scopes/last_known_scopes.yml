@@ -102,8 +102,6 @@
 - verb: POST
   path: "/api/v1/accounts/:account_id/create_tool_with_verification"
 - verb: GET
-  path: "/api/v1/accounts/:account_id/csp_log"
-- verb: GET
   path: "/api/v1/accounts/:account_id/csp_settings"
 - verb: PUT
   path: "/api/v1/accounts/:account_id/csp_settings"
