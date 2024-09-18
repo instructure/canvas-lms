@@ -42,8 +42,7 @@ module Services
       end
 
       def config
-        @config ||=
-          YAML.safe_load(DynamicSettings.find(tree: :private)["feature_analytics.yml", failsafe: nil] || "{}")
+        @config ||= DynamicSettings.find(tree: :private)["feature_analytics", failsafe: nil] || "{}"
       end
     end
   end
