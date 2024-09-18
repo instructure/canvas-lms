@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+require "aws-sdk-cloudwatch"
 
 Delayed::Job.include(JobLiveEventsContext)
 
@@ -143,5 +144,35 @@ Delayed::Worker.lifecycle.before(:error) do |worker, job, exception|
     end
   rescue
     Canvas::Errors.capture(exception, info.to_h)
+  end
+end
+
+Delayed::Worker.lifecycle.before(:loop) do |worker|
+  Rails.cache.fetch("loop_stats_has_run_within_1m", expires_in: 1.minute) do
+
+    # log the age in seconds of the oldest job
+    age = (DateTime.now.utc - (Delayed::Job.where(attempts: 0)
+                        .where('run_at <= ?', DateTime.now.utc)
+                        .minimum(:run_at)&.to_datetime || DateTime.now.utc)).to_i
+
+    client = Aws::CloudWatch::Client.new(region: 'us-west-2')
+    client.put_metric_data({
+                             namespace: "Canvas",
+                             metric_data: [
+                               {
+                                 metric_name: "JobStaleness",
+                                 dimensions: [
+                                   {
+                                     name: "domain",
+                                     value: ENV['CANVAS_DOMAIN']
+                                   },
+                                 ],
+                                 timestamp: Time.now,
+                                 value: age,
+                                 unit: "Seconds"
+                               },
+                             ]
+                           })
+    true
   end
 end
