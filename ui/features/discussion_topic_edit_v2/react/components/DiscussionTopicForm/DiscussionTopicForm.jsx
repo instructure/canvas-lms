@@ -596,7 +596,7 @@ function DiscussionTopicForm({
 
     if (
       // Not validate override dates for announcements or ungraded group discussions
-      !(isAnnouncement || (isGroupDiscussion && !isGraded) || ENV?.context_type == 'Group') &&
+      !(isAnnouncement || (isGroupDiscussion && !isGraded) || ENV?.context_type === 'Group') &&
       ENV.FEATURES.selective_release_ui_api &&
       ENV.FEATURES.selective_release_edit_page
     ) {
@@ -751,7 +751,7 @@ function DiscussionTopicForm({
           </DiscussionDueDatesContext.Provider>
         </View>
       )
-    } else if (shouldShowAssignToForUngradedDiscussions && !isGroupDiscussion) {
+    } else if (!isGroupDiscussion && !isAnnouncement && ENV.FEATURES?.selective_release_ui_api) {
       return (
         <View as="div" data-testid="assignment-settings-section">
           <Text weight="bold">{I18n.t('Assign Access')}</Text>
