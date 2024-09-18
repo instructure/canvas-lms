@@ -200,10 +200,6 @@ module Csp::AccountHelper
     csp_files_domains.compact
   end
 
-  def csp_logging_config
-    @config ||= Rails.application.credentials.csp_logging || {}
-  end
-
   private
 
   def csp_dynamic_registration_domain(request)
