@@ -142,6 +142,7 @@ const QUERY = gql`
                 id: _id
                 comments
                 commentsEnabled
+                commentsHtml
                 points
                 description
                 criterion {
@@ -151,6 +152,7 @@ const QUERY = gql`
                   _id
                 }
               }
+              score
               assessor {
                 name
               }

@@ -1044,6 +1044,7 @@ class GradebooksController < ApplicationController
         EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
         ENHANCED_RUBRICS_ENABLED: @context.feature_enabled?(:enhanced_rubrics),
         PLATFORM_SERVICE_SPEEDGRADER_ENABLED: platform_service_speedgrader_enabled,
+        RESTRICT_QUANTITATIVE_DATA: @context.restrict_quantitative_data?(@current_user),
         RUBRIC_ASSESSMENT: {
           assessor_id: @current_user.id.to_s,
           assessment_type: can_do(@assignment, @current_user, :grade) ? "grading" : "peer_review"

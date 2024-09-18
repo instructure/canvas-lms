@@ -163,6 +163,7 @@ ready(() => {
           emojisEnabled: !!window.ENV.EMOJIS_ENABLED,
           enhancedRubricsEnabled: window.ENV.ENHANCED_RUBRICS_ENABLED,
           commentLibraryEnabled: ENV.assignment_comment_library_feature_enabled,
+          restrictQuantitativeDataEnabled : window.ENV.RESTRICT_QUANTITATIVE_DATA_ENABLED,
         },
       })
     })
