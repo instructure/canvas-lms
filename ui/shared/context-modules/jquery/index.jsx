@@ -102,6 +102,18 @@ window.modules = (function () {
     },
 
     addModule(callback = () => {}) {
+      const $module = $('#context_module_blank').clone(true).attr('id', 'context_module_new')
+      $('#context_modules').append($module)
+
+      const opts = modules.sortable_module_options
+      opts.update = modules.updateModuleItemPositions
+      $module.find('.context_module_items').sortable(opts)
+      $('#context_modules.ui-sortable').sortable('refresh')
+      $('#context_modules .context_module .context_module_items.ui-sortable').each(function () {
+        $(this).sortable('refresh')
+        $(this).sortable('option', 'connectWith', '.context_module_items')
+      })
+
       if (ENV.FEATURES?.selective_release_ui_api) {
         const options = {initialTab: 'settings'}
         const settings = {
@@ -121,21 +133,8 @@ window.modules = (function () {
             $moduleElement.css('display', 'block')
           },
         }
-        const $module = $('#context_module_blank').clone(true).attr('id', 'context_module_new')
-        $('#context_modules').append($module)
-        // eslint-disable-next-line no-restricted-globals
         renderDifferentiatedModulesTray(event.target, $module, settings, options)
       } else {
-        const $module = $('#context_module_blank').clone(true).attr('id', 'context_module_new')
-        $('#context_modules').append($module)
-        const opts = modules.sortable_module_options
-        opts.update = modules.updateModuleItemPositions
-        $module.find('.context_module_items').sortable(opts)
-        $('#context_modules.ui-sortable').sortable('refresh')
-        $('#context_modules .context_module .context_module_items.ui-sortable').each(function () {
-          $(this).sortable('refresh')
-          $(this).sortable('option', 'connectWith', '.context_module_items')
-        })
         modules.editModule($module)
       }
     },
