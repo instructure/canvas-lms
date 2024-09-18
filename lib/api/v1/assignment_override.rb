@@ -23,7 +23,7 @@ module Api::V1::AssignmentOverride
 
   OVERRIDABLE_ID_FIELDS = %i[assignment_id quiz_id context_module_id discussion_topic_id wiki_page_id attachment_id].freeze
 
-  def assignment_override_json(override, visible_users = nil, student_names: nil, module_names: nil)
+  def assignment_override_json(override, visible_users = nil, student_names: nil, module_names: nil, include_child_override_due_dates: nil)
     fields = %i[id title unassign_item]
     OVERRIDABLE_ID_FIELDS.each { |f| fields << f if override.send(f).present? }
     fields.push(:due_at, :all_day, :all_day_date) if override.due_at_overridden
@@ -52,6 +52,9 @@ module Api::V1::AssignmentOverride
       when "Noop"
         json[:noop_id] = override.set_id
       end
+      if include_child_override_due_dates
+        json[:sub_assignment_due_dates] = override.sub_assignment_due_dates
+      end
     end
   end
 
@@ -70,7 +73,7 @@ module Api::V1::AssignmentOverride
     end
   end
 
-  def assignment_overrides_json(overrides, user = nil, include_names: false)
+  def assignment_overrides_json(overrides, user = nil, include_names: false, include_child_override_due_dates: false)
     visible_users_ids = ::AssignmentOverride.visible_enrollments_for(overrides.compact, user).select(:user_id)
     # we most likely already have the student_ids preloaded here because of overridden_for, but just in case
     if overrides.any? { |ov| ov.present? && ov.set_type == "ADHOC" && !ov.preloaded_student_ids }
@@ -82,7 +85,7 @@ module Api::V1::AssignmentOverride
       module_ids = overrides.select { |ov| ov.present? && ov.context_module_id.present? }.map(&:context_module_id).uniq
       module_names = ContextModule.where(id: module_ids).pluck(:id, :name).to_h
     end
-    overrides.map { |override| assignment_override_json(override, visible_users_ids, student_names:, module_names:) if override }
+    overrides.map { |override| assignment_override_json(override, visible_users_ids, student_names:, module_names:, include_child_override_due_dates:) if override }
   end
 
   def assignment_override_collection(learning_object, include_students: false)

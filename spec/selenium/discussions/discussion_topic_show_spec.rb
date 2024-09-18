@@ -420,16 +420,37 @@ describe "Discussion Topic Show" do
           assignment:
         )
 
+        group = dt.course.groups.create!
+        dt.update!(group_category: group.group_category)
+        student_in_group = student_in_course(course: dt.course, active_all: true).user
+        group.group_memberships.create!(user: student_in_group)
+
+        new_section = @topic.course.course_sections.create!
+
+        everyone_due_at = 3.days.from_now
+        student_due_at = 4.days.from_now
+        group_due_at = 5.days.from_now
+        section_due_at = 6.days.from_now
+
+        student_lock_at = 11.days.from_now
+        student_unlock_at = 1.day.from_now
+
         Checkpoints::DiscussionCheckpointCreatorService.call(
           discussion_topic: dt,
           checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
-          dates: [{ type: "everyone", due_at: 2.days.from_now }],
+          dates: [{ type: "everyone", due_at: everyone_due_at },
+                  { type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: student_due_at, lock_at: student_lock_at, unlock_at: student_unlock_at },
+                  { type: "override", set_type: "CourseSection", set_id: new_section.id, due_at: section_due_at },
+                  { type: "override", set_type: "Group", set_id: group.id, due_at: group_due_at }],
           points_possible: 6
         )
         Checkpoints::DiscussionCheckpointCreatorService.call(
           discussion_topic: dt,
           checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
-          dates: [{ type: "everyone", due_at: 3.days.from_now }],
+          dates: [{ type: "everyone", due_at: everyone_due_at },
+                  { type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: student_due_at, lock_at: student_lock_at, unlock_at: student_unlock_at },
+                  { type: "override", set_type: "CourseSection", set_id: new_section.id, due_at: section_due_at },
+                  { type: "override", set_type: "Group", set_id: group.id, due_at: group_due_at }],
           points_possible: 7,
           replies_required: 2
         )
@@ -441,6 +462,31 @@ describe "Discussion Topic Show" do
         expect(module_item_assign_to_card.first).not_to contain_css(due_date_input_selector)
         expect(module_item_assign_to_card.first).to contain_css(reply_to_topic_due_date_input_selector)
         expect(module_item_assign_to_card.first).to contain_css(required_replies_due_date_input_selector)
+        all_dates = get_all_dates_for_all_cards
+
+        # Everyone Card
+        expect(format_date_for_view(all_dates[0][:reply_to_topic], "%b %d, %Y %I:%M %p")).to eq(format_date_for_view(everyone_due_at.in_time_zone("UTC"), "%b %d, %Y %I:%M %p"))
+        expect(format_date_for_view(all_dates[0][:required_replies], "%b %d, %Y %I:%M %p")).to eq(format_date_for_view(everyone_due_at.in_time_zone("UTC"), "%b %d, %Y %I:%M %p"))
+        expect(all_dates[0][:available_from]).to eq("")
+        expect(all_dates[0][:until]).to eq("")
+
+        # Student Card
+        expect(format_date_for_view(all_dates[1][:reply_to_topic], "%b %d, %Y %I:%M %p")).to eq(format_date_for_view(student_due_at.in_time_zone("UTC"), "%b %d, %Y %I:%M %p"))
+        expect(format_date_for_view(all_dates[1][:required_replies], "%b %d, %Y %I:%M %p")).to eq(format_date_for_view(student_due_at.in_time_zone("UTC"), "%b %d, %Y %I:%M %p"))
+        expect(format_date_for_view(all_dates[1][:available_from], "%b %d, %Y %I:%M %p")).to eq(format_date_for_view(student_unlock_at.in_time_zone("UTC"), "%b %d, %Y %I:%M %p"))
+        expect(format_date_for_view(all_dates[1][:until], "%b %d, %Y %I:%M %p")).to eq(format_date_for_view(student_lock_at.in_time_zone("UTC"), "%b %d, %Y %I:%M %p"))
+
+        # Section Card
+        expect(format_date_for_view(all_dates[2][:reply_to_topic], "%b %d, %Y %I:%M %p")).to eq(format_date_for_view(section_due_at.in_time_zone("UTC"), "%b %d, %Y %I:%M %p"))
+        expect(format_date_for_view(all_dates[2][:required_replies], "%b %d, %Y %I:%M %p")).to eq(format_date_for_view(section_due_at.in_time_zone("UTC"), "%b %d, %Y %I:%M %p"))
+        expect(all_dates[2][:available_from]).to eq("")
+        expect(all_dates[2][:until]).to eq("")
+
+        # Group Card
+        expect(format_date_for_view(all_dates[3][:reply_to_topic], "%b %d, %Y %I:%M %p")).to eq(format_date_for_view(group_due_at.in_time_zone("UTC"), "%b %d, %Y %I:%M %p"))
+        expect(format_date_for_view(all_dates[3][:required_replies], "%b %d, %Y %I:%M %p")).to eq(format_date_for_view(group_due_at.in_time_zone("UTC"), "%b %d, %Y %I:%M %p"))
+        expect(all_dates[3][:available_from]).to eq("")
+        expect(all_dates[3][:until]).to eq("")
       end
 
       it "does not show the button when the user does not have the moderate_forum permission" do
