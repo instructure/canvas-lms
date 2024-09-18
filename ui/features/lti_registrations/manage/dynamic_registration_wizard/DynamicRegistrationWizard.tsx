@@ -35,7 +35,7 @@ import {
   mkUseDynamicRegistrationWizardState,
   type DynamicRegistrationWizardState,
 } from './DynamicRegistrationWizardState'
-import {IconConfirmation} from './components/IconConfirmation'
+import {IconConfirmationWrapper} from './components/IconConfirmationWrapper'
 import {NamingConfirmationWrapper} from './components/NamingConfirmationWrapper'
 import {PermissionConfirmationWrapper} from './components/PermissionConfirmationWrapper'
 import {PlacementsConfirmationWrapper} from './components/PlacementsConfirmationWrapper'
@@ -365,7 +365,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
       return (
         <>
           {progressBar(state)}
-          <IconConfirmation
+          <IconConfirmationWrapper
             overlayStore={state.overlayStore}
             registration={state.registration}
             reviewing={state.reviewing}

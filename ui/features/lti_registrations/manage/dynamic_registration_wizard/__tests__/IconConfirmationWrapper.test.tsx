@@ -19,7 +19,7 @@
 import React from 'react'
 import {mockConfigWithPlacements, mockRegistration} from './helpers'
 import {createRegistrationOverlayStore} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
-import {IconConfirmation} from '../components/IconConfirmation'
+import {IconConfirmationWrapper} from '../components/IconConfirmationWrapper'
 import {render, screen} from '@testing-library/react'
 import * as ue from '@testing-library/user-event'
 import {LtiPlacements, LtiPlacementsWithIcons} from '../../model/LtiPlacement'
@@ -46,7 +46,7 @@ describe('IconConfirmation', () => {
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
     render(
-      <IconConfirmation
+      <IconConfirmationWrapper
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
@@ -67,7 +67,7 @@ describe('IconConfirmation', () => {
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
     render(
-      <IconConfirmation
+      <IconConfirmationWrapper
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
@@ -94,7 +94,7 @@ describe('IconConfirmation', () => {
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
     render(
-      <IconConfirmation
+      <IconConfirmationWrapper
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
@@ -126,7 +126,7 @@ describe('IconConfirmation', () => {
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
     render(
-      <IconConfirmation
+      <IconConfirmationWrapper
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
@@ -157,7 +157,7 @@ describe('IconConfirmation', () => {
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
     render(
-      <IconConfirmation
+      <IconConfirmationWrapper
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
@@ -187,7 +187,7 @@ describe('IconConfirmation', () => {
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
     render(
-      <IconConfirmation
+      <IconConfirmationWrapper
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
@@ -218,7 +218,7 @@ describe('IconConfirmation', () => {
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
     render(
-      <IconConfirmation
+      <IconConfirmationWrapper
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
@@ -250,7 +250,7 @@ describe('IconConfirmation', () => {
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
     render(
-      <IconConfirmation
+      <IconConfirmationWrapper
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
@@ -286,7 +286,7 @@ describe('IconConfirmation', () => {
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
     render(
-      <IconConfirmation
+      <IconConfirmationWrapper
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
@@ -324,7 +324,7 @@ describe('IconConfirmation', () => {
     const mockTransition = jest.fn()
 
     render(
-      <IconConfirmation
+      <IconConfirmationWrapper
         overlayStore={overlayStore}
         registration={reg}
         reviewing={false}
@@ -350,7 +350,7 @@ describe('IconConfirmation', () => {
     const mockTransition = jest.fn()
 
     render(
-      <IconConfirmation
+      <IconConfirmationWrapper
         overlayStore={overlayStore}
         registration={reg}
         reviewing={true}

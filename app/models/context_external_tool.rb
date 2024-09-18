@@ -1658,7 +1658,6 @@ class ContextExternalTool < ActiveRecord::Base
   # id, and the tool name
   def default_icon_path
     Rails.application.routes.url_helpers.lti_tool_default_icon_path(
-      id: global_developer_key_id || global_id,
       name:
     )
   end
