@@ -632,27 +632,66 @@ describe "discussions" do
         expect(f("body")).not_to contain_jqcss "input[data-testid='group-discussion-checkbox']"
       end
 
-      it "only shows the assign to UI when selective_release is enabled if the student has an unrestricted enrollment" do
-        skip("unskip or remove when product decsion is made about adding a discussion edit permission LX-2054")
+      it "shows limited assign to UI when selective_release is enabled if the student has an unrestricted enrollment" do
         get "/courses/#{course.id}/discussion_topics/new"
-        expect(element_exists?(Discussion.assign_to_card_selector)).to be_truthy
+        wait_for_ajaximations
 
-        enrollment = course.enrollments.find_by(user: student)
-        enrollment.update!(limit_privileges_to_course_section: true)
-        get "/courses/#{course.id}/discussion_topics/new"
-        expect(element_exists?(Discussion.assign_to_card_selector)).to be_falsey
+        expect(element_exists?(Discussion.assign_to_card_selector)).to be_truthy
+        expect(Discussion.assignee_selector[0]).to be_disabled
+
+        title = "My Test Topic"
+        message = "replying to topic"
+        available_date = "12/27/2028"
+
+        # Set title
+        Discussion.update_discussion_topic_title(title)
+        # Set Message
+        Discussion.update_discussion_message(message)
+
+        update_available_date(0, available_date, true)
+        update_available_time(0, "8:00 AM", true)
+
+        # Save and publish
+        Discussion.save_button.click
+        wait_for_ajaximations
+
+        dt = DiscussionTopic.last
+
+        expect(dt.title).to eq title
+        expect(dt.message).to include message
+        expect(format_date_for_view(dt.unlock_at, "%m/%d/%Y")).to eq(available_date)
       end
 
-      it "only shows the assign to embedded UI when selective_release enabled if the student has an unrestricted enrollment" do
-        skip("unskip or remove when product decsion is made about adding a discussion edit permission LX-2054")
-        Account.site_admin.enable_feature!(:selective_release_edit_page)
-        get "/courses/#{course.id}/discussion_topics/new"
-        expect(element_exists?(Discussion.assign_to_section_selector)).to be_truthy
-
+      it "shows limited assign to UI when selective_release is enabled if the student has restricted enrollment" do
         enrollment = course.enrollments.find_by(user: student)
         enrollment.update!(limit_privileges_to_course_section: true)
+
         get "/courses/#{course.id}/discussion_topics/new"
-        expect(element_exists?(Discussion.assign_to_section_selector)).to be_falsey
+
+        expect(element_exists?(Discussion.assign_to_card_selector)).to be_truthy
+        expect(Discussion.assignee_selector[0]).to be_disabled
+
+        title = "My Test Topic"
+        message = "replying to topic"
+        available_date = "12/27/2028"
+
+        # Set title
+        Discussion.update_discussion_topic_title(title)
+        # Set Message
+        Discussion.update_discussion_message(message)
+
+        update_available_date(0, available_date, true)
+        update_available_time(0, "8:00 AM", true)
+
+        # Save and publish
+        Discussion.save_button.click
+        wait_for_ajaximations
+
+        dt = DiscussionTopic.last
+
+        expect(dt.title).to eq title
+        expect(dt.message).to include message
+        expect(format_date_for_view(dt.unlock_at, "%m/%d/%Y")).to eq(available_date)
       end
     end
 
