@@ -557,4 +557,13 @@ class AssignmentOverride < ActiveRecord::Base
   def set_root_account_id
     write_attribute(:root_account_id, root_account_id) unless read_attribute(:root_account_id)
   end
+
+  def sub_assignment_due_dates
+    child_overrides.active.preload(:assignment).map do |child|
+      {
+        sub_assignment_tag: child.assignment&.sub_assignment_tag,
+        due_at: child.due_at
+      }
+    end
+  end
 end

@@ -515,6 +515,30 @@ describe AssignmentOverride do
         expect(child_override.reload.workflow_state).to eq "deleted"
         expect(parent_override.reload.workflow_state).to eq "deleted"
       end
+
+      describe "#sub_assignment_due_dates" do
+        before :once do
+          @parent_assignment = @course.assignments.create!
+          @parent_override = AssignmentOverride.create!(title: "Parent Override", set_type: "ADHOC", assignment: @parent_assignment)
+          @child_assignment1 = parent_assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+          @child_assignment2 = parent_assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+          @child_override1 = AssignmentOverride.create!(title: "Child Override 1", set_type: "ADHOC", assignment: @child_assignment1, due_at: 1.day.from_now, parent_override: @parent_override)
+          @child_override2 = AssignmentOverride.create!(title: "Child Override 2", set_type: "ADHOC", assignment: @child_assignment2, due_at: 2.days.from_now, parent_override: @parent_override)
+        end
+
+        it "returns the correct sub_assignment_due_dates" do
+          expected_result = [
+            { sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, due_at: @child_override1.due_at },
+            { sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, due_at: @child_override2.due_at }
+          ]
+          expect(@parent_override.sub_assignment_due_dates).to eq(expected_result)
+        end
+
+        it "returns an empty array when there are no child overrides" do
+          @parent_override.child_overrides.destroy_all
+          expect(@parent_override.sub_assignment_due_dates).to eq([])
+        end
+      end
     end
   end
 
