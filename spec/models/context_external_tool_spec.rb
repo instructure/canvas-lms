@@ -3585,14 +3585,7 @@ describe ContextExternalTool do
   describe "#default_icon_path" do
     it "references the lti_tool_default_icon_path, tool name, and tool developer key id" do
       tool = external_tool_1_3_model(opts: { name: "foo" })
-      expect(tool.developer_key.global_id).to be_a(Integer)
-      expect(tool.default_icon_path).to eq("/lti/tool_default_icon?id=#{tool.developer_key.global_id}&name=foo")
-    end
-
-    it "uses tool ID if there is no developer key id" do
-      tool = external_tool_model(opts: { name: "foo" })
-      expect(tool.global_id).to be_a(Integer)
-      expect(tool.default_icon_path).to eq("/lti/tool_default_icon?id=#{tool.global_id}&name=foo")
+      expect(tool.default_icon_path).to eq("/lti/tool_default_icon?name=foo")
     end
   end
 

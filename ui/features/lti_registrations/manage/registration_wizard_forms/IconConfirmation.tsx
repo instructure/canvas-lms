@@ -16,77 +16,75 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useCallback} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {
-  canvasPlatformSettings,
-  type RegistrationOverlayStore,
-} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
-import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {usePlacements} from '../hooks/usePlacements'
 import {TextInput} from '@instructure/ui-text-input'
 import pageNotFoundPandaUrl from '@canvas/images/PageNotFoundPanda.svg'
 import {IconImageLine} from '@instructure/ui-icons'
-import {
-  LtiPlacements,
-  LtiPlacementsWithIcons,
-  type LtiPlacementWithIcon,
-} from '../../model/LtiPlacement'
-import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
-import {useOverlayStore} from '../hooks/useOverlayStore'
 import {Button} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
-import type {DynamicRegistrationActions} from '../DynamicRegistrationWizardState'
-import {isValidHttpUrl} from '../../../common/lib/validators/isValidHttpUrl'
+import {isValidHttpUrl} from '../../common/lib/validators/isValidHttpUrl'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {useDebouncedCallback} from 'use-debounce'
 import {Img} from '@instructure/ui-img'
-import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
+import {
+  LtiPlacements,
+  LtiPlacementsWithIcons,
+  type LtiPlacement,
+  type LtiPlacementWithIcon,
+} from '../model/LtiPlacement'
+import {RegistrationModalBody} from '../registration_wizard/RegistrationModalBody'
+import type {DeveloperKeyId} from '../model/developer_key/DeveloperKeyId'
+import {i18nLtiPlacement} from '../model/i18nLtiPlacement'
 
 const I18n = useI18nScope('lti_registration.wizard')
 export type IconConfirmationProps = {
-  overlayStore: RegistrationOverlayStore
-  registration: LtiImsRegistration
+  name: string
+  defaultIconUrl?: string
+  developerKeyId?: DeveloperKeyId
+  allPlacements: LtiPlacement[]
+  placementIconOverrides: Partial<Record<LtiPlacementWithIcon, string>>
+  setPlacementIconUrl: (placement: LtiPlacementWithIcon, iconUrl: string) => void
+  onNextButtonClicked: () => void
+  onPreviousButtonClicked: () => void
   reviewing: boolean
-  transitionToConfirmationState: DynamicRegistrationActions['transitionToConfirmationState']
-  transitionToReviewingState: DynamicRegistrationActions['transitionToReviewingState']
 }
 
 export const IconConfirmation = ({
-  overlayStore,
-  registration,
+  name,
+  defaultIconUrl,
+  developerKeyId,
+  allPlacements,
+  placementIconOverrides,
+  setPlacementIconUrl,
   reviewing,
-  transitionToConfirmationState,
-  transitionToReviewingState,
+  onNextButtonClicked,
+  onPreviousButtonClicked,
 }: IconConfirmationProps) => {
-  const [overlayState, actions] = useOverlayStore(overlayStore)
-  const placements = usePlacements(registration)
-  const iconPlacements = React.useMemo(
+  const placementsWithIcons = React.useMemo(
     () =>
-      placements.filter((p): p is LtiPlacementWithIcon =>
+      allPlacements.filter((p): p is LtiPlacementWithIcon =>
         LtiPlacementsWithIcons.includes(p as LtiPlacementWithIcon)
       ),
-    [placements]
+    [allPlacements]
   )
-  const [actualInputValues, setActualInputValues] = React.useState<
-    Partial<Record<LtiPlacementWithIcon, string>>
-  >(
-    iconPlacements.reduce((acc, placement) => {
-      const iconUrl = overlayState.registration.placements?.find(
-        p => p.type === placement
-      )?.icon_url
-      return {
-        ...acc,
-        [placement]: iconUrl ?? '',
-      }
-    }, {})
-  )
+
+  const [actualInputValues, setActualInputValues] =
+    React.useState<Partial<Record<LtiPlacementWithIcon, string>>>(placementIconOverrides)
   const [debouncedUpdate, _, callPending] = useDebouncedCallback(
-    (placement: LtiPlacementWithIcon, value: string) => actions.updateIconUrl(placement, value),
+    (placement: LtiPlacementWithIcon, value: string) => setPlacementIconUrl(placement, value),
     500
+  )
+
+  const updateIconUrl = React.useCallback(
+    (placement: LtiPlacementWithIcon, value: string) => {
+      setActualInputValues(prev => ({...prev, [placement]: value}))
+      debouncedUpdate(placement, value)
+    },
+    [setActualInputValues, debouncedUpdate]
   )
 
   React.useEffect(() => {
@@ -95,20 +93,85 @@ export const IconConfirmation = ({
     }
   }, [callPending])
 
-  const renderIconInput = (placement: LtiPlacementWithIcon) => {
-    const inputUrl = actualInputValues[placement]
+  return (
+    <>
+      <RegistrationModalBody>
+        <Heading level="h3" margin="0 0 x-small 0">
+          {I18n.t('Icon URLs')}
+        </Heading>
+        {placementsWithIcons.length > 0 ? (
+          <>
+            <Text>{I18n.t('Choose what icon displays in each placement (optional).')}</Text>
+            <Flex direction="column" gap="medium" margin="medium 0 medium 0">
+              {placementsWithIcons.map(placement => {
+                return (
+                  <IconOverrideInput
+                    key={placement}
+                    placement={placement}
+                    toolName={name}
+                    defaultIconUrl={defaultIconUrl}
+                    developerKeyId={developerKeyId}
+                    inputUrl={actualInputValues[placement]}
+                    imageUrl={placementIconOverrides[placement]}
+                    onInputUrlChange={updateIconUrl}
+                  />
+                )
+              })}
+            </Flex>
+          </>
+        ) : (
+          <Text>{I18n.t("This tool doesn't have any placements with configurable icons.")}</Text>
+        )}
+      </RegistrationModalBody>
+      <Modal.Footer>
+        <Button margin="small" color="secondary" type="submit" onClick={onPreviousButtonClicked}>
+          {I18n.t('Previous')}
+        </Button>
+        <Button
+          margin="small"
+          color="primary"
+          type="submit"
+          interaction={
+            Object.values(actualInputValues).every(v => !v || isValidHttpUrl(v))
+              ? 'enabled'
+              : 'disabled'
+          }
+          onClick={onNextButtonClicked}
+        >
+          {reviewing ? I18n.t('Back to Review') : I18n.t('Next')}
+        </Button>
+      </Modal.Footer>
+    </>
+  )
+}
+type IconOverrideInputProps = {
+  placement: LtiPlacementWithIcon
+  toolName: string
+  defaultIconUrl?: string
+  developerKeyId?: DeveloperKeyId
+  inputUrl?: string
+  imageUrl?: string
+  onInputUrlChange: (placement: LtiPlacementWithIcon, value: string) => void
+}
 
-    const defaultIconUrl = canvasPlatformSettings(registration.tool_configuration)?.settings
-      .icon_url
-
-    let src = overlayState.registration.placements?.find(p => p.type === placement)?.icon_url
+const IconOverrideInput = React.memo(
+  ({
+    placement,
+    toolName,
+    defaultIconUrl,
+    developerKeyId,
+    inputUrl,
+    imageUrl,
+    onInputUrlChange,
+  }: IconOverrideInputProps) => {
     let messages: FormMessage[] = []
     if (inputUrl && !isValidHttpUrl(inputUrl)) {
       messages = [{type: 'error', text: I18n.t('Invalid URL')}]
     } else if (placement === LtiPlacements.EditorButton && !inputUrl && !defaultIconUrl) {
-      src = `${window.location.origin}/lti/tool_default_icon?name=${
-        overlayState.adminNickname ?? registration.client_name
-      }&id=${registration.developer_key_id}`
+      imageUrl = `${window.location.origin}/lti/tool_default_icon?name=${toolName}`
+      if (developerKeyId) {
+        imageUrl += `&id=${developerKeyId}`
+      }
       messages = [
         {
           type: 'hint',
@@ -120,7 +183,7 @@ export const IconConfirmation = ({
     } else if (!inputUrl && !defaultIconUrl) {
       messages = [{type: 'hint', text: I18n.t('If left blank, no icon will display.')}]
     } else if (!inputUrl && defaultIconUrl) {
-      src = defaultIconUrl
+      imageUrl = defaultIconUrl
       messages = [
         {type: 'hint', text: I18n.t("If left blank, the tool's default icon will display.")},
       ]
@@ -136,7 +199,7 @@ export const IconConfirmation = ({
           renderLabel={<Heading level="h4">{i18nLtiPlacement(placement)}</Heading>}
           placeholder={defaultIconUrl ?? ''}
           renderAfterInput={
-            src && isValidHttpUrl(src) ? (
+            imageUrl && isValidHttpUrl(imageUrl) ? (
               <div
                 style={{
                   overflow: 'hidden',
@@ -145,7 +208,7 @@ export const IconConfirmation = ({
                 }}
               >
                 <Img
-                  src={src}
+                  src={imageUrl}
                   alt={imgTitle}
                   loading="lazy"
                   height="2rem"
@@ -176,61 +239,10 @@ export const IconConfirmation = ({
             )
           }
           value={inputUrl ?? ''}
-          onChange={e => {
-            setActualInputValues({
-              ...actualInputValues,
-              [placement]: e.target.value,
-            })
-            debouncedUpdate(placement, e.target.value)
-          }}
+          onChange={e => onInputUrlChange(placement, e.target.value)}
           messages={messages}
         />
       </div>
     )
   }
-
-  return (
-    <>
-      <RegistrationModalBody>
-        <Heading level="h3" margin="0 0 x-small 0">
-          {I18n.t('Icon URLs')}
-        </Heading>
-        {iconPlacements.length > 0 ? (
-          <>
-            <Text>{I18n.t('Choose what icon displays in each placement (optional).')}</Text>
-            <Flex direction="column" gap="medium" margin="medium 0 medium 0">
-              {iconPlacements.map(renderIconInput)}
-            </Flex>
-          </>
-        ) : (
-          <Text>{I18n.t("This tool doesn't have any placements with configurable icons.")}</Text>
-        )}
-      </RegistrationModalBody>
-      <Modal.Footer>
-        <Button
-          margin="small"
-          color="secondary"
-          type="submit"
-          onClick={() => {
-            transitionToConfirmationState('IconConfirmation', 'NamingConfirmation', false)
-          }}
-        >
-          {I18n.t('Previous')}
-        </Button>
-        <Button
-          margin="small"
-          color="primary"
-          type="submit"
-          interaction={
-            Object.values(actualInputValues).every(v => !v || isValidHttpUrl(v))
-              ? 'enabled'
-              : 'disabled'
-          }
-          onClick={() => transitionToReviewingState('IconConfirmation')}
-        >
-          {reviewing ? I18n.t('Back to Review') : I18n.t('Next')}
-        </Button>
-      </Modal.Footer>
-    </>
-  )
-}
+)
