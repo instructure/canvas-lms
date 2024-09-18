@@ -35,7 +35,6 @@ ADDITIONAL_ALLOWED_CLASSES = [
   Time,
   URI::HTTP,
   URI::HTTPS,
-  WeakParameters
 ].freeze
 
 # SafeYAML-like interface, but vanilla Psych
@@ -95,3 +94,14 @@ module YAMLSingletonFix
   end
 end
 Psych::Visitors::ToRuby.prepend(YAMLSingletonFix)
+
+module WeakParametersOverride
+  def resolve_class(klassname)
+    if klassname == "WeakParameters"
+      class_loader.load("ActiveSupport::HashWithIndifferentAccess")
+    else
+      super
+    end
+  end
+end
+Psych::Visitors::ToRuby.prepend(WeakParametersOverride)
