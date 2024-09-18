@@ -37,6 +37,17 @@ const QUERY = gql`
           isClosed
         }
       }
+      outcomeProficiency {
+        proficiencyRatingsConnection {
+          nodes {
+            points
+            mastery
+            description
+            color
+            id: _id
+          }
+        }
+      }
     }
   }
 `
@@ -79,9 +90,12 @@ function transform(result: any) {
     {}
   )
 
+  const proficiencyRatings = result.course.outcomeProficiency.proficiencyRatingsConnection.nodes
+
   return {
     gradeStatuses: [...Object.values(defaultStandardStatusesMap), ...customGradeStatuses],
     gradingPeriods,
+    proficiencyRatings,
   }
 }
 

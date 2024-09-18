@@ -90,6 +90,7 @@ const QUERY = gql`
         hideScoreTotal
         useForGrading
         savedComments
+        hidePoints
       }
     }
   }
