@@ -5956,6 +5956,15 @@ describe AssignmentsApiController, type: :request do
         end
       end
 
+      it "translates assignment descriptions without verifiers" do
+        course_with_teacher(active_all: true)
+        should_translate_user_content(@course, false) do |content|
+          assignment = @course.assignments.create!(description: content)
+          json = api_get_assignment_in_course(assignment, @course, no_verifiers: true)
+          json["description"]
+        end
+      end
+
       it "returns the discussion topic url" do
         @user = @teacher
         @context = @course
