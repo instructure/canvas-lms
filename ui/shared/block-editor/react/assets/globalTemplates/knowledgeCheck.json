@@ -8,7 +8,7 @@
     "nodes": {
       "uurLTPnBr1": {
         "type": {
-          "resolvedName": "QuizSection"
+          "resolvedName": "KnowledgeCheckSection"
         },
         "isCanvas": false,
         "props": {

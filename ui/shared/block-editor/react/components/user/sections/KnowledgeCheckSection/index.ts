@@ -16,6 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type QuizSectionProps = {
-  questionId?: string
-}
+import {KnowledgeCheckSection} from './KnowledgeCheckSection'
+import {QuizModal} from './QuizModal'
+// @ts-expect-error
+import {IconQuizSolid} from '@instructure/ui-icons/es/svg'
+
+const KnowledgeCheckSectionIcon = IconQuizSolid?.src
+
+export {KnowledgeCheckSection, QuizModal, KnowledgeCheckSectionIcon}

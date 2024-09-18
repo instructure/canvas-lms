@@ -29,7 +29,7 @@ import {ColumnsSection} from '../user/sections/ColumnsSection'
 import {HeroSection} from '../user/sections/HeroSection'
 import {NavigationSection} from '../user/sections/NavigationSection'
 import {AboutSection} from '../user/sections/AboutSection'
-import {QuizSection} from '../user/sections/QuizSection'
+import {KnowledgeCheckSection} from '../user/sections/KnowledgeCheckSection'
 import {AnnouncementSection} from '../user/sections/AnnouncementSection'
 import {FooterSection} from '../user/sections/FooterSection'
 import {getNodeIndex} from '../../utils'
@@ -51,8 +51,8 @@ const nameToSection = (name: string) => {
       return <NavigationSection />
     case 'About':
       return <AboutSection />
-    case 'Quiz':
-      return <QuizSection />
+    case 'Knowledge Check':
+      return <KnowledgeCheckSection />
     case 'Announcement':
       return <AnnouncementSection />
     case 'Footer':
