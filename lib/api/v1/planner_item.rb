@@ -190,8 +190,19 @@ module Api::V1::PlannerItem
                      .preload([:content_participations, visible_submission_comments: :author])
     subs_hash = subs.index_by(&:assignment_id)
     subs_data_hash = {}
+
+    parent_assignment_ids = Array(assignments)
+                            .filter { |a| a.is_a?(SubAssignment) }
+                            .map(&:parent_assignment_id)
+                            .uniq
+    parent_subs = Submission.where(assignment_id: parent_assignment_ids, user:)
+                            .preload([:content_participations, visible_submission_comments: :author]) # rubocop:disable Style/HashAsLastArrayItem
+    parent_subs_hash = parent_subs.index_by(&:assignment_id)
+
     Array(assignments).each do |assign|
       submission = subs_hash[assign.id]
+      parent_submission = parent_subs_hash[assign.parent_assignment_id]
+      sub_or_parent_sub = assign.is_a?(SubAssignment) ? parent_submission : submission
       submission.assignment = assign if submission # fixes loading for inverse associations that don't seem to be working
       sub_data_hash = {
         submitted: submission&.has_submission?,
@@ -201,11 +212,11 @@ module Api::V1::PlannerItem
         late: submission&.late?,
         missing: submission&.missing?,
         needs_grading: submission&.needs_grading?,
-        has_feedback: submission&.last_teacher_comment.present?,
-        new_activity: submission&.unread?(user),
+        has_feedback: sub_or_parent_sub&.last_teacher_comment.present?,
+        new_activity: sub_or_parent_sub&.unread?(user),
         redo_request: submission&.redo_request?
       }
-      sub_data_hash[:feedback] = feedback_data(submission, user) if sub_data_hash[:has_feedback]
+      sub_data_hash[:feedback] = feedback_data(sub_or_parent_sub, user) if sub_data_hash[:has_feedback]
       subs_data_hash[assign.id] = sub_data_hash
     end
     subs_data_hash
@@ -260,6 +271,10 @@ module Api::V1::PlannerItem
       unread_count, read_state = opts.dig(:topics_status, topic.id)
       return read_state == "unread" || unread_count > 0 if unread_count && read_state
       return topic.unread?(user) || topic.unread_count(user) > 0 if topic
+    end
+    if item.is_a?(SubAssignment)
+      ss = opts[:submission_statuses] || submission_statuses(item, user)
+      return true if ss.dig(item.id, :new_activity)
     end
     false
   end
