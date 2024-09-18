@@ -99,6 +99,58 @@ describe Checkpoints::DiscussionCheckpointUpdaterService do
       end
     end
 
+    it "propagates unlock_at and lock_at changes to all checkpoints and the parent assignment" do
+      now = Time.now.change(usec: 0)
+      initial_unlock_at = 1.day.from_now(now)
+      initial_lock_at = 5.days.from_now(now)
+
+      # Create the first checkpoint
+      first_checkpoint = creator_service.call(
+        discussion_topic: @topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: 2.days.from_now(now), unlock_at: initial_unlock_at, lock_at: initial_lock_at }],
+        points_possible: 5
+      )
+
+      # Create the second checkpoint
+      second_checkpoint = creator_service.call(
+        discussion_topic: @topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "everyone", due_at: 3.days.from_now(now), unlock_at: initial_unlock_at, lock_at: initial_lock_at }],
+        points_possible: 5
+      )
+
+      # Update the first checkpoint with new unlock_at and lock_at times
+      new_unlock_at = 2.days.from_now(now)
+      new_lock_at = 6.days.from_now(now)
+      updater_service.call(
+        discussion_topic: @topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: 2.days.from_now(now), unlock_at: new_unlock_at, lock_at: new_lock_at }],
+        points_possible: 5
+      )
+
+      # Reload all assignments
+      parent_assignment = first_checkpoint.parent_assignment.reload
+      first_checkpoint.reload
+      second_checkpoint.reload
+
+      aggregate_failures do
+        # Check that the parent assignment's unlock_at and lock_at are updated
+        expect(parent_assignment.unlock_at).to eq new_unlock_at
+        expect(parent_assignment.lock_at).to eq new_lock_at
+
+        # Check that both checkpoints have the updated unlock_at and lock_at
+        expect(first_checkpoint.unlock_at).to eq new_unlock_at
+        expect(first_checkpoint.lock_at).to eq new_lock_at
+        expect(second_checkpoint.unlock_at).to eq new_unlock_at
+        expect(second_checkpoint.lock_at).to eq new_lock_at
+
+        # Ensure that the due_at dates remain different
+        expect(first_checkpoint.due_at).to be < second_checkpoint.due_at
+      end
+    end
+
     describe "assignment overrides" do
       it "can create adhoc overrides and update them" do
         students = []

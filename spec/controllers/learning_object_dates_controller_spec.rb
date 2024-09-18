@@ -369,7 +369,7 @@ describe LearningObjectDatesController do
       c1_override_unlock_at = "2022-04-05T12:00:00Z"
       c1_override_lock_at = "2022-04-07T12:00:00Z"
 
-      c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+      Checkpoints::DiscussionCheckpointCreatorService.call(
         discussion_topic: discussion,
         checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
         dates: [
@@ -398,7 +398,7 @@ describe LearningObjectDatesController do
       c2_override_unlock_at = "2022-04-05T12:00:00Z"
       c2_override_lock_at = "2022-04-07T12:00:00Z"
 
-      c2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+      Checkpoints::DiscussionCheckpointCreatorService.call(
         discussion_topic: discussion,
         checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
         dates: [
@@ -421,6 +421,9 @@ describe LearningObjectDatesController do
         replies_required: 2
       )
 
+      # Refresh the discussion object to get the updated dates
+      discussion.reload
+
       get :show, params: { course_id: @course.id, discussion_topic_id: discussion.id }
       expect(response).to be_successful
       json = json_parse
@@ -429,8 +432,8 @@ describe LearningObjectDatesController do
       expect(json).to include(
         "id" => discussion.id,
         "due_at" => nil,
-        "unlock_at" => nil,
-        "lock_at" => nil,
+        "unlock_at" => c2_unlock_at,  # Should be synced to the latest unlock_at
+        "lock_at" => c2_lock_at,      # Should be synced to the latest lock_at
         "only_visible_to_overrides" => false,
         "visible_to_everyone" => true,
         "group_category_id" => nil,
@@ -440,18 +443,21 @@ describe LearningObjectDatesController do
       # Test checkpoints
       expect(json["checkpoints"].length).to eq(2)
 
-      # Test first checkpoint
-      first_checkpoint = json["checkpoints"][0]
-      expect(first_checkpoint).to include(
+      # Find checkpoints by tag
+      reply_to_topic = json["checkpoints"].find { |cp| cp["tag"] == CheckpointLabels::REPLY_TO_TOPIC }
+      reply_to_entry = json["checkpoints"].find { |cp| cp["tag"] == CheckpointLabels::REPLY_TO_ENTRY }
+
+      # Test reply_to_topic checkpoint
+      expect(reply_to_topic).to include(
         "tag" => CheckpointLabels::REPLY_TO_TOPIC,
         "due_at" => c1_due_at,
-        "unlock_at" => c1_unlock_at,
-        "lock_at" => c1_lock_at,
-        "only_visible_to_overrides" => false
+        "unlock_at" => c2_unlock_at,  # Should be synced to the latest unlock_at
+        "lock_at" => c2_lock_at,      # Should be synced to the latest lock_at
+        "only_visible_to_overrides" => false,
+        "points_possible" => 5.0
       )
 
-      expect(first_checkpoint["overrides"][0]).to include(
-        "assignment_id" => c1.id,
+      expect(reply_to_topic["overrides"][0]).to include(
         "title" => "Unnamed Course",
         "due_at" => c1_override_due_at,
         "all_day" => false,
@@ -461,18 +467,17 @@ describe LearningObjectDatesController do
         "course_section_id" => @course.default_section.id
       )
 
-      # Test second checkpoint
-      second_checkpoint = json["checkpoints"][1]
-      expect(second_checkpoint).to include(
+      # Test reply_to_entry checkpoint
+      expect(reply_to_entry).to include(
         "tag" => CheckpointLabels::REPLY_TO_ENTRY,
         "due_at" => c2_due_at,
         "unlock_at" => c2_unlock_at,
         "lock_at" => c2_lock_at,
-        "only_visible_to_overrides" => false
+        "only_visible_to_overrides" => false,
+        "points_possible" => 10.0
       )
 
-      expect(second_checkpoint["overrides"][0]).to include(
-        "assignment_id" => c2.id,
+      expect(reply_to_entry["overrides"][0]).to include(
         "title" => "Unnamed Course",
         "due_at" => c2_override_due_at,
         "all_day" => false,

@@ -23,6 +23,8 @@ class SubAssignment < AbstractAssignment
   validates :has_sub_assignments, inclusion: { in: [false], message: -> { I18n.t("cannot be true for sub assignments") } }
   validates :sub_assignment_tag, inclusion: { in: [CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY] }
 
+  SUB_ASSIGNMENT_SYNC_ATTRIBUTES = %w[unlock_at lock_at].freeze
+  after_save :sync_with_parent, if: :should_sync_with_parent?
   after_commit :aggregate_checkpoint_assignments, if: :checkpoint_changes?
 
   set_broadcast_policy do |p|
@@ -51,6 +53,25 @@ class SubAssignment < AbstractAssignment
   end
 
   private
+
+  def sync_with_parent
+    return if saved_by == :parent_assignment
+
+    changed_attributes = previous_changes.slice(*SUB_ASSIGNMENT_SYNC_ATTRIBUTES)
+    parent_assignment.update_from_sub_assignment(changed_attributes)
+  end
+
+  def should_sync_with_parent?
+    sync_attributes_changed? && saved_by != :parent_assignment
+  end
+
+  def sync_attributes_changed?
+    previous_changes.keys.intersect?(SUB_ASSIGNMENT_SYNC_ATTRIBUTES)
+  end
+
+  def sync_attributes_changes
+    previous_changes.slice(*SUB_ASSIGNMENT_SYNC_ATTRIBUTES)
+  end
 
   def aggregate_checkpoint_assignments
     Checkpoints::AssignmentAggregatorService.call(assignment: parent_assignment)
