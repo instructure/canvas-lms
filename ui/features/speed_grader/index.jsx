@@ -55,83 +55,9 @@ import speedGrader from './jquery/speed_grader'
 const I18n = useI18nScope('speed_grader')
 
 ready(() => {
-  // The feature must be enabled AND we must be handed the speedgrader platform URL
-  if (window.ENV.PLATFORM_SERVICE_SPEEDGRADER_ENABLED && window.REMOTES?.speedgrader) {
-    const mountPoint = document.querySelector('#react-router-portals')
-    const params = new URLSearchParams(window.location.search)
-    const postMessageAliases = {
-      'quizzesNext.register': 'tool.register',
-      'quizzesNext.nextStudent': 'tool.nextStudent',
-      'quizzesNext.previousStudent': 'tool.previousStudent',
-      'quizzesNext.submissionUpdate': 'tool.submissionUpdate',
-    }
+  const classicContainer = document.querySelector('#classic_speedgrader_container')
 
-    import('speedgrader/appInjector')
-      .then(module => {
-        module.render(mountPoint, {
-          queryFns: {
-            getAssignment,
-            getAssignmentsByCourseId,
-            getCourse,
-            getEnrollmentsByCourse,
-            getSectionsByAssignment,
-            getSubmission,
-            getSubmissionsByAssignment,
-            getSubmissionsByStudentIds,
-            getCommentBankItems,
-            resolvePostAssignmentGradesStatus,
-          },
-          mutationFns: {
-            updateSubmissionGrade,
-            createSubmissionComment,
-            deleteSubmissionComment,
-            hideAssignmentGradesForSections,
-            postAssignmentGradesForSections,
-            postDraftSubmissionComment,
-            updateSubmissionGradeStatus,
-            createCommentBankItem,
-            deleteCommentBankItem,
-            updateCommentBankItem,
-          },
-          postMessageAliases,
-          context: {
-            courseId: window.ENV.course_id,
-            userId: window.ENV.current_user_id,
-            assignmentId: params.get('assignment_id'),
-            studentId: params.get('student_id'),
-            hrefs: {
-              heroIcon: `/courses/${window.ENV.course_id}/gradebook`,
-            },
-            emojisDenyList: window.ENV.EMOJI_DENY_LIST ? window.ENV.EMOJI_DENY_LIST.split(',') : [],
-            mediaSettings: window.INST.kalturaSettings,
-            lang: window.navigator.language || ENV.LOCALE || ENV.BIGEASY_LOCALE,
-            currentUserIsAdmin: ENV.current_user_is_admin,
-            themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES,
-            useHighContrast: window.ENV.use_high_contrast,
-          },
-          features: {
-            extendedSubmissionState: window.ENV.FEATURES.extended_submission_state,
-            emojisEnabled: !!window.ENV.EMOJIS_ENABLED,
-            enhancedRubricsEnabled: window.ENV.ENHANCED_RUBRICS_ENABLED,
-            commentLibraryEnabled: ENV.assignment_comment_library_feature_enabled,
-          },
-        })
-      })
-      .catch(error => {
-        // eslint-disable-next-line no-console
-        console.error('Failed to load SpeedGrader', error)
-        captureException(error)
-        ReactDOM.render(
-          <GenericErrorPage
-            imageUrl={errorShipUrl}
-            errorMessage={error.message}
-            errorSubject={I18n.t('SpeedGrader loading error')}
-            errorCategory={I18n.t('SpeedGrader Error Page')}
-          />,
-          mountPoint
-        )
-      })
-  } else {
+  if (classicContainer instanceof HTMLElement) {
     // touch punch simulates mouse events for touch devices
     // eslint-disable-next-line import/extensions
     require('./touch_punch.js')
@@ -156,5 +82,102 @@ ready(() => {
       mountPoint
     )
     speedGrader.setup()
+    return
   }
+
+  const mountPoint = document.querySelector('#react-router-portals')
+
+  // The feature must be enabled AND we must be handed the speedgrader platform URL
+  if (!window.ENV.PLATFORM_SERVICE_SPEEDGRADER_ENABLED || !window.REMOTES?.speedgrader) {
+    ReactDOM.render(
+      <GenericErrorPage
+        imageUrl={errorShipUrl}
+        errorMessage={
+          <>
+            {window.ENV.PLATFORM_SERVICE_SPEEDGRADER_ENABLED ||
+              I18n.t('SpeedGrader Platform is not enabled')}
+            {window.REMOTES?.speedgrader || 'window.REMOTES?.speedgrader is missing'}
+          </>
+        }
+        errorSubject={I18n.t('SpeedGrader loading error')}
+        errorCategory={I18n.t('SpeedGrader Error Page')}
+      />,
+      mountPoint
+    )
+    return
+  }
+  
+  const params = new URLSearchParams(window.location.search)
+  const postMessageAliases = {
+    'quizzesNext.register': 'tool.register',
+    'quizzesNext.nextStudent': 'tool.nextStudent',
+    'quizzesNext.previousStudent': 'tool.previousStudent',
+    'quizzesNext.submissionUpdate': 'tool.submissionUpdate',
+  }
+
+  import('speedgrader/appInjector')
+    .then(module => {
+      module.render(mountPoint, {
+        queryFns: {
+          getAssignment,
+          getAssignmentsByCourseId,
+          getCourse,
+          getEnrollmentsByCourse,
+          getSectionsByAssignment,
+          getSubmission,
+          getSubmissionsByAssignment,
+          getSubmissionsByStudentIds,
+          getCommentBankItems,
+          resolvePostAssignmentGradesStatus,
+        },
+        mutationFns: {
+          updateSubmissionGrade,
+          createSubmissionComment,
+          deleteSubmissionComment,
+          hideAssignmentGradesForSections,
+          postAssignmentGradesForSections,
+          postDraftSubmissionComment,
+          updateSubmissionGradeStatus,
+          createCommentBankItem,
+          deleteCommentBankItem,
+          updateCommentBankItem,
+        },
+        postMessageAliases,
+        context: {
+          courseId: window.ENV.course_id,
+          userId: window.ENV.current_user_id,
+          assignmentId: params.get('assignment_id'),
+          studentId: params.get('student_id'),
+          hrefs: {
+            heroIcon: `/courses/${window.ENV.course_id}/gradebook`,
+          },
+          emojisDenyList: window.ENV.EMOJI_DENY_LIST ? window.ENV.EMOJI_DENY_LIST.split(',') : [],
+          mediaSettings: window.INST.kalturaSettings,
+          lang: window.navigator.language || ENV.LOCALE || ENV.BIGEASY_LOCALE,
+          currentUserIsAdmin: ENV.current_user_is_admin,
+          themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES,
+          useHighContrast: window.ENV.use_high_contrast,
+        },
+        features: {
+          extendedSubmissionState: window.ENV.FEATURES.extended_submission_state,
+          emojisEnabled: !!window.ENV.EMOJIS_ENABLED,
+          enhancedRubricsEnabled: window.ENV.ENHANCED_RUBRICS_ENABLED,
+          commentLibraryEnabled: ENV.assignment_comment_library_feature_enabled,
+        },
+      })
+    })
+    .catch(error => {
+      // eslint-disable-next-line no-console
+      console.error('Failed to load SpeedGrader', error)
+      captureException(error)
+      ReactDOM.render(
+        <GenericErrorPage
+          imageUrl={errorShipUrl}
+          errorMessage={error.message}
+          errorSubject={I18n.t('SpeedGrader loading error')}
+          errorCategory={I18n.t('SpeedGrader Error Page')}
+        />,
+        mountPoint
+      )
+    })
 })
