@@ -549,7 +549,7 @@ export function disableGrading(
 }
 
 export function assignmentHasCheckpoints(assignment: AssignmentConnection): boolean {
-  return assignment?.checkpoints?.length > 0
+  return (assignment.checkpoints?.length ?? 0) > 0
 }
 
 export const getCorrectSubmission = (

@@ -393,6 +393,20 @@ describe "Screenreader Gradebook grading" do
       expect(@checkpointed_assignment.submission_for_student(student).grade).to eq("complete")
     end
 
+    it "sets default grade on ungraded checkpoint submissions" do
+      login_to_srgb
+      EnhancedSRGB.select_assignment(@checkpointed_assignment)
+
+      EnhancedSRGB.default_grade.click
+      fj("span[aria-label='Set Default Grade Modal'] label:contains('Reply to Topic') input").send_keys "3"
+      fj("span[aria-label='Set Default Grade Modal'] label:contains('Required Replies') input").send_keys "2"
+      fj("span[aria-label='Set Default Grade Modal'] button:contains('Set Default Grade')").click
+
+      expect(@reply_to_topic_checkpoint.submission_for_student(student).grade).to eq("3")
+      expect(@reply_to_entry_checkpoint.submission_for_student(student).grade).to eq("2")
+      expect(@checkpointed_assignment.submission_for_student(student).grade).to eq("5")
+    end
+
     context "submission details modal" do
       it "grading points possible checkpoints persists correctly and aggregate to the parent submission" do
         login_to_srgb

@@ -23,6 +23,8 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
 import type {GradingType} from '../../../../../api'
 import {SimpleSelect} from '@instructure/ui-simple-select'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -36,8 +38,16 @@ type Props = {
   disabled: boolean
   gradingType: GradingType
   onGradeInputChange: (gradeInput: string) => void
+  header?: string
+  outOfTextValue?: string
 }
-export default function DefaultGradeInput({disabled, gradingType, onGradeInputChange}: Props) {
+export default function DefaultGradeInput({
+  disabled,
+  gradingType,
+  onGradeInputChange,
+  header,
+  outOfTextValue,
+}: Props) {
   const [textInput, setTextInput] = useState<string>('')
   const [selectInput, setSelectInput] = useState<string>('')
 
@@ -54,39 +64,83 @@ export default function DefaultGradeInput({disabled, gradingType, onGradeInputCh
     onGradeInputChange(showInputType() === 'text' ? textInput : selectInput)
   }, [textInput, selectInput, onGradeInputChange, showInputType])
 
+  const renderHeader = () => {
+    return (
+      header && (
+        <div>
+          <Text size="small" weight="bold">
+            {header}
+          </Text>
+        </div>
+      )
+    )
+  }
+
+  const renderSubHeader = () => {
+    return (
+      outOfTextValue && (
+        <Text size="x-small" weight="normal">
+          {I18n.t(`out of %{outOfTextValue}`, {outOfTextValue})}
+        </Text>
+      )
+    )
+  }
+
   return (
     <>
       {showInputType() === 'text' ? (
-        <TextInput
-          data-testid="default-grade-input"
-          renderLabel={<ScreenReaderContent>{I18n.t('Default Grade')}</ScreenReaderContent>}
-          display="inline-block"
-          width="4rem"
-          value={textInput}
-          disabled={disabled}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTextInput(e.target.value)}
-        />
-      ) : (
-        <SimpleSelect
-          value={selectInput}
-          defaultValue={selectInput}
-          renderLabel="Uncontrolled Select"
-          onChange={(e, {value}) => {
-            if (typeof value === 'string') {
-              setSelectInput(value)
+        <View as="div" margin="0 0 small 0">
+          {renderHeader()}
+          <TextInput
+            data-testid="default-grade-input"
+            renderLabel={
+              <>
+                <ScreenReaderContent>
+                  {`${header || I18n.t('Default Grade')}: ${outOfTextValue}`}
+                </ScreenReaderContent>
+                {renderSubHeader()}
+              </>
             }
-          }}
-        >
-          <SimpleSelectOption id="emptyOption" value="">
-            ---
-          </SimpleSelectOption>
-          <SimpleSelectOption id="completeOption" value="complete">
-            Complete
-          </SimpleSelectOption>
-          <SimpleSelectOption id="incompleteOption" value="incomplete">
-            Incomplete
-          </SimpleSelectOption>
-        </SimpleSelect>
+            display="inline-block"
+            width="4rem"
+            value={textInput}
+            disabled={disabled}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTextInput(e.target.value)}
+          />
+        </View>
+      ) : (
+        <View as="div" margin="0 0 small 0">
+          {renderHeader()}
+          <SimpleSelect
+            value={selectInput}
+            defaultValue={selectInput}
+            renderLabel={
+              <>
+                <ScreenReaderContent>
+                  {`${
+                    header || I18n.t('Student Grade Pass-Fail Grade Options')
+                  }: ${outOfTextValue}`}
+                </ScreenReaderContent>
+                {renderSubHeader()}
+              </>
+            }
+            onChange={(e, {value}) => {
+              if (typeof value === 'string') {
+                setSelectInput(value)
+              }
+            }}
+          >
+            <SimpleSelectOption id="emptyOption" value="">
+              ---
+            </SimpleSelectOption>
+            <SimpleSelectOption id="completeOption" value="complete">
+              Complete
+            </SimpleSelectOption>
+            <SimpleSelectOption id="incompleteOption" value="incomplete">
+              Incomplete
+            </SimpleSelectOption>
+          </SimpleSelect>
+        </View>
       )}
     </>
   )
