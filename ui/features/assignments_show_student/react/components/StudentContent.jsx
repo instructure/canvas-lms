@@ -280,34 +280,24 @@ function StudentContent(props) {
 
   // TODO: Move the button provider up one level
   return (
-    <div data-testid="assignments-2-student-view" style={{marginTop: '-36px'}}>
-      <View
-        as="div"
-        position="sticky"
-        stacking="above"
-        background="primary"
-        style={{top: 0}}
-        padding="large 0 0 0"
-        themeOverride={{paddingLarge: '36px'}}
-      >
-        <Header
-          assignment={props.assignment}
-          scrollThreshold={150}
-          submission={props.submission}
-          reviewerSubmission={props.reviewerSubmission}
-        />
-        <AttemptInformation
-          assignment={props.assignment}
-          submission={props.submission}
-          reviewerSubmission={props.reviewerSubmission}
-          onChangeSubmission={props.onChangeSubmission}
-          allSubmissions={props.allSubmissions}
-          openCommentTray={openCommentTray}
-          closeCommentTray={closeCommentTray}
-          commentTrayStatus={commentTrayStatus}
-          onSuccessfulPeerReview={onSuccessfulPeerReview}
-        />
-      </View>
+    <div data-testid="assignments-2-student-view">
+      <Header
+        assignment={props.assignment}
+        scrollThreshold={150}
+        submission={props.submission}
+        reviewerSubmission={props.reviewerSubmission}
+      />
+      <AttemptInformation
+        assignment={props.assignment}
+        submission={props.submission}
+        reviewerSubmission={props.reviewerSubmission}
+        onChangeSubmission={props.onChangeSubmission}
+        allSubmissions={props.allSubmissions}
+        openCommentTray={openCommentTray}
+        closeCommentTray={closeCommentTray}
+        commentTrayStatus={commentTrayStatus}
+        onSuccessfulPeerReview={onSuccessfulPeerReview}
+      />
       {renderContentBaseOnAvailability(props, alertContext, onSuccessfulPeerReview)}
     </div>
   )
