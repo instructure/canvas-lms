@@ -38,6 +38,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {colors} from '@instructure/canvas-theme'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Heading} from '@instructure/ui-heading'
+import {stripHtmlTags} from '@canvas/util/TextHelper'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -237,7 +238,7 @@ export const ConversationListItem = ({...props}) => {
                 </Grid.Col>
                 <Grid.Col>
                   <Text color="secondary" size={props.textSize} data-testid="last-message-content">
-                    {truncateText(props.conversation.lastMessageContent)}
+                    {truncateText(stripHtmlTags(props.conversation.lastMessageContent))}
                   </Text>
                 </Grid.Col>
                 <Grid.Col width="auto">

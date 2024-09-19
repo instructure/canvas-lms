@@ -97,7 +97,7 @@ describe('MessageDetailItem', () => {
     expect(getByText('Apr 20, 2021 at 2:31pm')).toBeInTheDocument()
   })
 
-  it('renders with an xss attempt', () => {
+  it('renders and xss attempt gets sanitized', () => {
     const props = {
       conversationMessage: {
         author: {name: 'Tom Thompson', shortName: 'Tom Thompson'},
@@ -106,16 +106,66 @@ describe('MessageDetailItem', () => {
           {name: 'Billy Harris', shortName: 'Billy Harris'},
         ],
         createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
-        body: "<script>alert('XSS')</script>",
+        body: "<p>Attempting to attack!<script>alert('XSS')</script></p>",
       },
       contextName: 'Fake Course 1',
     }
 
-    const {getByText} = render(<MessageDetailItem {...props} />)
+    const {container, getByText} = render(<MessageDetailItem {...props} />)
 
     expect(getByText('Tom Thompson')).toBeInTheDocument()
     expect(getByText(', Billy Harris')).toBeInTheDocument()
-    expect(getByText("<script>alert('XSS')</script>")).toBeInTheDocument()
+    expect(container.querySelector('script')).not.toBeInTheDocument()
+    expect(getByText('Attempting to attack!')).toBeInTheDocument()
+    expect(getByText('Fake Course 1')).toBeInTheDocument()
+    expect(getByText('Apr 20, 2021 at 2:31pm')).toBeInTheDocument()
+  })
+
+  it('renders and does not display html tags', () => {
+    const props = {
+      conversationMessage: {
+        author: {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+        recipients: [
+          {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+          {name: 'Billy Harris', shortName: 'Billy Harris'},
+        ],
+        createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
+        body: '<p>Formatted text</p>',
+      },
+      contextName: 'Fake Course 1',
+    }
+
+    const {queryByText, getByText} = render(<MessageDetailItem {...props} />)
+
+    expect(getByText('Tom Thompson')).toBeInTheDocument()
+    expect(getByText(', Billy Harris')).toBeInTheDocument()
+    expect(queryByText('<p>Formatted text</p>')).not.toBeInTheDocument()
+    expect(getByText('Formatted text')).toBeInTheDocument()
+    expect(getByText('Fake Course 1')).toBeInTheDocument()
+    expect(getByText('Apr 20, 2021 at 2:31pm')).toBeInTheDocument()
+  })
+
+  it('renders and preserves new lines', () => {
+    const props = {
+      conversationMessage: {
+        author: {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+        recipients: [
+          {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+          {name: 'Billy Harris', shortName: 'Billy Harris'},
+        ],
+        createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
+        body: 'Text\nOn a new line',
+      },
+      contextName: 'Fake Course 1',
+    }
+
+    const {container, getByText} = render(<MessageDetailItem {...props} />)
+
+    expect(getByText('Tom Thompson')).toBeInTheDocument()
+    expect(getByText(', Billy Harris')).toBeInTheDocument()
+    // replaces \n with <br>
+    expect(container.querySelector('br')).toBeInTheDocument()
+    expect(getByText(/Text\s*On a new line/)).toBeInTheDocument()
     expect(getByText('Fake Course 1')).toBeInTheDocument()
     expect(getByText('Apr 20, 2021 at 2:31pm')).toBeInTheDocument()
   })
