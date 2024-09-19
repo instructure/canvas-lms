@@ -95,6 +95,7 @@ class ApplicationController < ActionController::Base
   # on events that log someone in and log someone out.
   after_action :set_user_id_header
   after_action :set_response_headers
+  after_action :set_default_source_csp_directive_if_enabled
   after_action :update_enrollment_last_activity_at
   set_callback :html_render, :after, :add_csp_for_root
 
@@ -979,11 +980,8 @@ class ApplicationController < ActionController::Base
     # different
     if !files_domain? && !@embeddable
       directives = "frame-ancestors 'self' #{csp_frame_ancestors&.uniq&.join(" ")};"
-      append_to_header("Content-Security-Policy", directives)
 
-      if @domain_root_account&.feature_enabled?(:default_source_csp_logging) && csp_report_uri.present?
-        headers["Content-Security-Policy-Report-Only"] = directives + " default-src 'self'" + csp_report_uri
-      end
+      append_to_header("Content-Security-Policy", directives)
     end
     RequestContext::Generator.store_request_meta(request, @context, @sentry_trace)
     true
