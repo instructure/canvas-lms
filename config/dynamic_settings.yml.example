@@ -66,6 +66,8 @@ development:
         app-host: "http://rce.canvas.docker:3000"
       common_cartridge_viewer:
         base_url: "http://localhost:3300"
+      csp-logging:
+        # host: "https://<csp-violation-report-endpoint>/submit/csp"
     # another service
     pandata:
       ios-pandata-key: IOS_pandata_key
@@ -132,9 +134,6 @@ development:
       # clone_url_strand.yml: |
       #   lti1.instructure.com: lti1
       #   lti2.instructure.com: lti2
-      # csp_logging.yml: |
-      #   host: https://csplogging.inscloudgate.net/
-      #   shared_secret: s00p3r_s3cr3t
       # To work with the release notes UI, uncomment this and ensure you have vault_contents.yml
       # with the example contents.  Also see docker-compose/dynamodb.override.yml
       # release_notes.yml: |
