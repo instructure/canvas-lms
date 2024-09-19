@@ -62,8 +62,13 @@ const TabsBlockToolbar = () => {
     <>
       <Menu
         trigger={
-          <IconButton screenReaderLabel="Style" withBackground={false} withBorder={false}>
-            <IconFolderLine size="x-small" />
+          <IconButton
+            screenReaderLabel="Style"
+            size="small"
+            withBackground={false}
+            withBorder={false}
+          >
+            <IconFolderLine />
           </IconButton>
         }
       >
@@ -87,11 +92,12 @@ const TabsBlockToolbar = () => {
 
       <IconButton
         screenReaderLabel={I18n.t('Add Tab')}
+        size="small"
         withBackground={false}
         withBorder={false}
         onClick={handleAddTab}
       >
-        <IconAddLine size="x-small" />
+        <IconAddLine />
       </IconButton>
     </>
   )

@@ -169,7 +169,7 @@
   content: attr(data-placeholder);
   color: #ababab;
   pointer-events: none;
-  /*float: left;*/
+  margin: 0 auto;
 }
 
 [contenteditable="true"]:focus-visible {
@@ -328,6 +328,7 @@
     align-items: flex-start;
     gap: 8px;
     flex-direction: column;
+    height: 100%;
   }
   &.row-layout {
     &> .group-block__inner {
