@@ -104,7 +104,8 @@ export const STUDENT_DISCUSSION_QUERY = gql`
         }
         discussionEntriesConnection(sortOrder: $sort, userSearchId: $userSearchId) {
           nodes {
-            ...DiscussionEntry
+            _id
+            rootEntryId
             anonymousAuthor {
               ...AnonymousUser
             }
@@ -119,7 +120,6 @@ export const STUDENT_DISCUSSION_QUERY = gql`
   }
   ${AnonymousUser.fragment}
   ${Discussion.fragment}
-  ${DiscussionEntry.fragment}
   ${PageInfo.fragment}
 `
 

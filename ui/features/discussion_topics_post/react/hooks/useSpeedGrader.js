@@ -16,9 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect, useState} from 'react'
+import {useEffect, useState, useCallback} from 'react'
+import {STUDENT_DISCUSSION_QUERY} from '../../graphql/Queries'
+import {useQuery} from 'react-apollo'
 
-export default function useSpeedGrader() {
+export default function useSpeedGrader({
+  highlightEntryId = '',
+  setHighlightEntryId = () => {},
+  setPageNumber = () => {},
+  expandedThreads,
+  setExpandedThreads = () => {},
+  setFocusSelector = () => {},
+  sort = 'desc',
+  discussionID = '',
+  perPage = 20,
+} = {}) {
   const [isInSpeedGrader, setIsInSpeedGrader] = useState(false)
   const [currentStudentId, setCurrentStudentId] = useState(null)
 
@@ -37,7 +49,21 @@ export default function useSpeedGrader() {
     checkSpeedGrader()
   }, [])
 
-  const getStudentEntries = studentTopicQuery => {
+  // perPage and sort should match discussionTopicQuery
+  const studentTopicVariables = {
+    discussionID,
+    userSearchId: currentStudentId,
+    perPage,
+    sort,
+  }
+
+  const studentTopicQuery = useQuery(STUDENT_DISCUSSION_QUERY, {
+    variables: studentTopicVariables,
+    fetchPolicy: 'cache-and-network',
+    skip: !(isInSpeedGrader && currentStudentId && studentTopicVariables.discussionID),
+  })
+
+  const getStudentEntries = useCallback(() => {
     if (!currentStudentId) {
       return []
     }
@@ -50,31 +76,68 @@ export default function useSpeedGrader() {
       studentTopicQuery?.data?.legacyNode?.discussionEntriesConnection?.nodes || []
 
     return studentEntries
-  }
+  }, [studentTopicQuery, currentStudentId])
 
-  function getStudentPreviousEntry(currentEntryId, studentTopicQuery) {
+  const navigateToEntry = useCallback(
+    newEntry => {
+      setHighlightEntryId(newEntry?._id || highlightEntryId)
+      setPageNumber(newEntry?.rootEntryPageNumber)
+      if (newEntry?.rootEntryId) {
+        setExpandedThreads([...expandedThreads, newEntry.rootEntryId])
+      }
+    },
+    [expandedThreads, highlightEntryId, setExpandedThreads, setHighlightEntryId, setPageNumber]
+  )
+
+  const getStudentPreviousEntry = useCallback(() => {
     const studentEntries = getStudentEntries(studentTopicQuery)
     const studentEntriesIds = studentEntries.map(entry => entry._id)
-    const currentEntryIndex = studentEntriesIds.indexOf(currentEntryId)
+    const currentEntryIndex = studentEntriesIds.indexOf(highlightEntryId)
     let prevEntryIndex = currentEntryIndex - 1
     if (currentEntryIndex === 0) {
       prevEntryIndex = studentEntriesIds.length - 1
     }
     const previousEntry = studentEntries[prevEntryIndex]
-    return previousEntry || studentEntries[currentEntryId]
-  }
+    navigateToEntry(previousEntry)
+  }, [getStudentEntries, studentTopicQuery, highlightEntryId, navigateToEntry])
 
-  function getStudentNextEntry(currentEntryId, studentTopicQuery) {
+  const getStudentNextEntry = useCallback(() => {
     const studentEntries = getStudentEntries(studentTopicQuery)
     const studentEntriesIds = studentEntries.map(entry => entry._id)
-    const currentEntryIndex = studentEntriesIds.indexOf(currentEntryId)
+    const currentEntryIndex = studentEntriesIds.indexOf(highlightEntryId)
     let nextEntryIndex = currentEntryIndex + 1
     if (currentEntryIndex === studentEntriesIds.length - 1) {
       nextEntryIndex = 0
     }
     const nextEntry = studentEntries[nextEntryIndex]
-    return nextEntry || studentEntries[currentEntryId]
-  }
+    navigateToEntry(nextEntry)
+  }, [getStudentEntries, studentTopicQuery, highlightEntryId, navigateToEntry])
+
+  const onMessage = useCallback(
+    e => {
+      const message = e.data
+      if (highlightEntryId) {
+        switch (message.subject) {
+          case 'DT.previousStudentReply': {
+            getStudentPreviousEntry()
+            break
+          }
+          case 'DT.nextStudentReply': {
+            getStudentNextEntry()
+            break
+          }
+        }
+      }
+    },
+    [highlightEntryId, getStudentPreviousEntry, getStudentNextEntry]
+  )
+
+  useEffect(() => {
+    window.addEventListener('message', onMessage)
+    return () => {
+      window.removeEventListener('message', onMessage)
+    }
+  }, [highlightEntryId, onMessage])
 
   const handleJumpFocusToSpeedGrader = () => {
     window.top.postMessage(
@@ -85,14 +148,23 @@ export default function useSpeedGrader() {
     )
   }
 
-  // These will be implemented later
-  const handlePreviousStudentReply = null
-  const handleNextStudentReply = null
+  function sendPostMessage(message) {
+    window.postMessage(message, '*')
+  }
+
+  function handlePreviousStudentReply() {
+    const message = {subject: 'DT.previousStudentReply'}
+    sendPostMessage(message)
+    setFocusSelector('#previous-in-speedgrader')
+  }
+
+  const handleNextStudentReply = () => {
+    const message = {subject: 'DT.nextStudentReply'}
+    sendPostMessage(message)
+    setFocusSelector('#next-in-speedgrader')
+  }
 
   return {
-    currentStudentId,
-    getStudentPreviousEntry,
-    getStudentNextEntry,
     isInSpeedGrader,
     handlePreviousStudentReply,
     handleNextStudentReply,

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DISCUSSION_QUERY, STUDENT_DISCUSSION_QUERY} from '../graphql/Queries'
+import {DISCUSSION_QUERY} from '../graphql/Queries'
 import {DiscussionTopicToolbarContainer} from './containers/DiscussionTopicToolbarContainer/DiscussionTopicToolbarContainer'
 import {DiscussionTopicRepliesContainer} from './containers/DiscussionTopicRepliesContainer/DiscussionTopicRepliesContainer'
 import {DiscussionTopicHeaderContainer} from './containers/DiscussionTopicHeaderContainer/DiscussionTopicHeaderContainer'
@@ -66,6 +66,7 @@ const DiscussionTopicManager = props => {
   const [showTranslationControl, setShowTranslationControl] = useState(false)
   // Start as null, populate when ready.
   const [translateTargetLanguage, setTranslateTargetLanguage] = useState(null)
+  const [focusSelector, setFocusSelector] = useState('')
 
   const searchContext = {
     searchTerm,
@@ -82,6 +83,8 @@ const DiscussionTopicManager = props => {
     setAllThreadsStatus,
     expandedThreads,
     setExpandedThreads,
+    discussionID: props.discussionTopicId,
+    perPage: ENV.per_page,
   }
   const [userSplitScreenPreference, setUserSplitScreenPreference] = useState(
     ENV.DISCUSSION?.preferences?.discussions_splitscreen_view || false
@@ -133,6 +136,11 @@ const DiscussionTopicManager = props => {
     setUserSplitScreenPreference,
     highlightEntryId,
     setHighlightEntryId,
+    setPageNumber,
+    expandedThreads,
+    setExpandedThreads,
+    focusSelector,
+    setFocusSelector,
     setIsGradedDiscussion,
     isGradedDiscussion,
     usedThreadingToolbarChildRef,
@@ -231,72 +239,25 @@ const DiscussionTopicManager = props => {
     skip: waitForUnreadFilter,
   })
 
-  const speedGraderHook = useSpeedGrader()
-
-  const studenTopicVariables = {
-    discussionID: discussionTopicQuery?.data?.legacyNode?._id,
-    userSearchId: speedGraderHook.currentStudentId,
-    perPage: ENV.per_page,
-    sort,
-  }
-
-  const studentTopicQuery = useQuery(STUDENT_DISCUSSION_QUERY, {
-    variables: studenTopicVariables,
-    fetchPolicy: 'cache-and-network',
-    skip: !(
-      speedGraderHook.isInSpeedGrader &&
-      speedGraderHook.currentStudentId &&
-      studenTopicVariables.discussionID
-    ),
-  })
-
-  const onMessage = useCallback(
-    e => {
-      const message = e.data
-      if (highlightEntryId) {
-        switch (message.subject) {
-          case 'DT.previousStudentReply': {
-            const previousStudentEntry = speedGraderHook.getStudentPreviousEntry(
-              highlightEntryId,
-              studentTopicQuery
-            )
-            setHighlightEntryId(previousStudentEntry?._id)
-            setPageNumber(previousStudentEntry?.rootEntryPageNumber)
-            if (previousStudentEntry?.rootEntryId){
-              setExpandedThreads([...expandedThreads, previousStudentEntry.rootEntryId])
-            }
-            break
-          }
-          case 'DT.nextStudentReply': {
-            const nextStudentEntry = speedGraderHook.getStudentNextEntry(
-              highlightEntryId,
-              studentTopicQuery
-            )
-            setHighlightEntryId(nextStudentEntry?._id)
-            setPageNumber(nextStudentEntry?.rootEntryPageNumber)
-            if (nextStudentEntry?.rootEntryId){
-              setExpandedThreads([...expandedThreads, nextStudentEntry.rootEntryId])
-            }
-            break
-          }
-        }
-      }
-    },
-    [studentTopicQuery.loading, highlightEntryId]
-  )
-
   useEffect(() => {
     if (highlightEntryId && !isPersistEnabled) {
       setTimeout(() => {
         setHighlightEntryId(null)
       }, HIGHLIGHT_TIMEOUT)
     }
+  }, [highlightEntryId, discussionTopicQuery.loading])
 
-    window.addEventListener('message', onMessage)
-    return () => {
-      window.removeEventListener('message', onMessage)
-    }
-  }, [highlightEntryId, discussionTopicQuery.loading, onMessage])
+  useSpeedGrader({
+    highlightEntryId,
+    setHighlightEntryId,
+    setPageNumber,
+    expandedThreads,
+    setExpandedThreads,
+    setFocusSelector,
+    discussionID: props.discussionTopicId,
+    perPage: ENV.per_page,
+    sort,
+  })
 
   useEffect(() => {
     setIsGradedDiscussion(!!discussionTopicQuery?.data?.legacyNode?.assignment)

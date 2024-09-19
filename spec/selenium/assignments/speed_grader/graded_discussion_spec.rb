@@ -152,5 +152,66 @@ describe "Screenreader Gradebook grading" do
         wait_for_ajaximations
       end
     end
+
+    it "next tab keeps focus" do
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_assignment.id}&student_id=#{@student2.id}&entry_id=#{@entry.id}"
+
+      in_frame("speedgrader_iframe") do
+        in_frame("discussion_preview_iframe") do
+          # tab to prev button
+          driver.action.send_keys(:tab).perform
+          driver.action.send_keys(:tab).perform
+          driver.action.send_keys(:tab).perform
+          driver.action.send_keys(:tab).perform
+          driver.action.send_keys(:tab).perform
+          # tab to next button
+          driver.action.send_keys(:tab).perform
+
+          3.times do |i|
+            expect(f("div[data-testid='isHighlighted']").text).to include(@student2.name)
+            expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic j#{2 - i}")
+            # page 1
+            expect(f("body").text).to include("reply to topic j2")
+            expect(f("body").text).to_not include("reply to topic i0")
+            # notice enter key successfully navigates entries
+            driver.action.send_keys(:enter).perform
+          end
+          # page 2
+          expect(f("body").text).to include("reply to topic i0")
+          expect(f("body").text).to_not include("reply to topic j2")
+        end
+      end
+    end
+
+    it "prev tab keeps focus" do
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_assignment.id}&student_id=#{@student2.id}&entry_id=#{@entry.id}"
+
+      in_frame("speedgrader_iframe") do
+        in_frame("discussion_preview_iframe") do
+          # tab to prev button
+          driver.action.send_keys(:tab).perform
+          driver.action.send_keys(:tab).perform
+          driver.action.send_keys(:tab).perform
+          driver.action.send_keys(:tab).perform
+          driver.action.send_keys(:tab).perform
+
+          expect(f("div[data-testid='isHighlighted']").text).to include(@student2.name)
+          expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic j2")
+          # page 1 is selected
+          expect(f("body").text).to include("reply to topic j2")
+          expect(f("body").text).to_not include("reply to topic i0")
+
+          3.times do |i|
+            # notice enter key successfully navigates entries
+            driver.action.send_keys(:enter).perform
+            expect(f("div[data-testid='isHighlighted']").text).to include(@student2.name)
+            expect(f("div[data-testid='isHighlighted']").text).to include("reply to entry i#{i}")
+            # page 2 is selected
+            expect(f("body").text).to include("reply to topic i0")
+            expect(f("body").text).to_not include("reply to topic j2")
+          end
+        end
+      end
+    end
   end
 end
