@@ -209,7 +209,7 @@ describe "Block Editor", :ignore_js_errors do
         expect(active_element).to eq(icon_block)
 
         kb_focus_block_toolbar
-        expect(active_element.attribute("textContent")).to eq("Drag to move")
+        expect(active_element.attribute("textContent")).to eq("Go up")
 
         driver.action.send_keys(:arrow_down).perform
         driver.action.send_keys(:arrow_right).perform
@@ -219,7 +219,7 @@ describe "Block Editor", :ignore_js_errors do
 
         # one more and it wraps around
         driver.action.send_keys(:arrow_right).perform
-        expect(active_element.attribute("textContent")).to eq("Drag to move")
+        expect(active_element.attribute("textContent")).to eq("Go up")
 
         # back up
         driver.action.send_keys(:arrow_up).perform
@@ -232,7 +232,7 @@ describe "Block Editor", :ignore_js_errors do
         expect(block_toolbar).to be_displayed
 
         kb_focus_block_toolbar
-        expect(active_element.attribute("textContent")).to eq("Drag to move")
+        expect(active_element.attribute("textContent")).to eq("Go up")
 
         driver.action.send_keys(:escape).perform
         expect(active_element).to eq(icon_block)
@@ -245,9 +245,8 @@ describe "Block Editor", :ignore_js_errors do
           expect(active_element).to eq(icon_block)
 
           kb_focus_block_toolbar
-          expect(active_element.attribute("textContent")).to eq("Drag to move")
+          expect(active_element.attribute("textContent")).to eq("Go up")
 
-          driver.action.send_keys(:arrow_right).perform
           driver.action.send_keys(:arrow_right).perform
           driver.action.send_keys(:arrow_right).perform
           expect(active_element.attribute("textContent")).to eq("Select Icon")

@@ -100,7 +100,7 @@ describe('BlockEditor', () => {
     })
     const toolbar = getBlockToolbar()
     expect(domGetByText(toolbar, 'Drag to move')).toBeInTheDocument()
-    expect(domGetByText(toolbar, 'Go to parent')).toBeInTheDocument()
+    expect(domGetByText(toolbar, 'Go up')).toBeInTheDocument()
     expect(domGetByText(toolbar, 'Delete')).toBeInTheDocument()
     expect(domGetByText(toolbar, 'Link')).toBeInTheDocument()
     expect(domGetByText(toolbar, 'Size')).toBeInTheDocument()
@@ -150,9 +150,7 @@ describe('BlockEditor', () => {
     })
     expect(getSectionMenu()).not.toBeInTheDocument()
 
-    const upButton = domGetByText(getBlockToolbar(), 'Go to parent').closest(
-      'button'
-    ) as HTMLButtonElement
+    const upButton = domGetByText(getBlockToolbar(), 'Go up').closest('button') as HTMLButtonElement
     await user.click(upButton)
     await waitFor(() => {
       expect(domGetByText(getBlockToolbar(), 'Blank Section')).toBeInTheDocument()

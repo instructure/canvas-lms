@@ -28,7 +28,7 @@ import {type ColumnsSectionProps} from './types'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/columns-section')
+const I18n = useI18nScope('block-editor')
 
 export type ColumnsSectionInnerProps = {
   children?: React.ReactNode
@@ -82,15 +82,27 @@ export const ColumnsSection = (_props: ColumnsSectionProps) => {
   return (
     <Container className={clazz}>
       <Element id={`columns-${id}__inner`} is={ColumnsSectionInner} canvas={true}>
-        <Element id={`columns-${id}-1`} is={GroupBlock} canvas={true} resizable={false} />
-        <Element id={`columns-${id}-2`} is={GroupBlock} canvas={true} resizable={false} />
+        <Element
+          id={`columns-${id}-1`}
+          is={GroupBlock}
+          canvas={true}
+          resizable={false}
+          isColumn={true}
+        />
+        <Element
+          id={`columns-${id}-2`}
+          is={GroupBlock}
+          canvas={true}
+          resizable={false}
+          isColumn={true}
+        />
       </Element>
     </Container>
   )
 }
 
 ColumnsSection.craft = {
-  displayName: I18n.t('Blank Section'),
+  displayName: I18n.t('Columns'),
   defaultProps: {
     columns: 2,
   },

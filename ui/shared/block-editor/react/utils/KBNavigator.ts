@@ -20,6 +20,21 @@ import React from 'react'
 import {type Node} from '@craftjs/core'
 import {mountNode} from './dom'
 
+function findFirstChildBlock(node: Node, query: any): Node | null {
+  const nodehelpers = query.node(node.id)
+  let descendants = nodehelpers.childNodes()
+  if (descendants.length === 0) {
+    descendants = nodehelpers.descendants(true)
+  }
+  for (const descendant of descendants) {
+    const descendantNode = query.node(descendant).get()
+    if (KBNavigator.isBlock(descendantNode)) {
+      return descendantNode
+    }
+  }
+  return null
+}
+
 class KBNavigator {
   #actions: any
 
@@ -41,15 +56,15 @@ class KBNavigator {
     this.#domNode = null
   }
 
-  #isBlock(node: Node): boolean {
+  static isBlock(node: Node): boolean {
     return node && (node.data.custom?.isBlock || node.data.custom?.isSection)
   }
 
-  #isGroup(node: Node): boolean {
+  static isGroup(node: Node): boolean {
     return !!node.dom?.getAttribute('aria-expanded')
   }
 
-  #isExpandedGroup(node: Node): boolean {
+  static isExpandedGroup(node: Node): boolean {
     return node.dom?.getAttribute('aria-expanded') === 'true'
   }
 
@@ -66,18 +81,7 @@ class KBNavigator {
   }
 
   #findFirstChildBlock(node: Node): Node | null {
-    const nodehelpers = this.#query.node(node.id)
-    let descendants = nodehelpers.childNodes()
-    if (descendants.length === 0) {
-      descendants = nodehelpers.descendants(true)
-    }
-    for (const descendant of descendants) {
-      const descendantNode = this.#query.node(descendant).get()
-      if (this.#isBlock(descendantNode)) {
-        return descendantNode
-      }
-    }
-    return null
+    return findFirstChildBlock(node, this.#query)
   }
 
   #findNextSiblingBlock(node: Node): Node | null {
@@ -87,7 +91,7 @@ class KBNavigator {
     const myIndex = siblings.indexOf(node.id)
     if (siblings.length > myIndex + 1) {
       const nextSibling = this.#query.node(siblings[myIndex + 1]).get()
-      if (this.#isBlock(nextSibling)) {
+      if (KBNavigator.isBlock(nextSibling)) {
         return nextSibling
       }
     }
@@ -101,7 +105,7 @@ class KBNavigator {
     const myIndex = siblings.indexOf(this.#node.id)
     if (myIndex > 0) {
       const previousSibling = this.#query.node(siblings[myIndex - 1]).get()
-      if (this.#isBlock(previousSibling)) {
+      if (KBNavigator.isBlock(previousSibling)) {
         return previousSibling
       }
     }
@@ -112,7 +116,7 @@ class KBNavigator {
     if (!(this.#node && node.data.parent)) return null
 
     let parentNode = this.#query.node(node.data.parent).get()
-    while (parentNode && parentNode.id !== 'ROOT' && !this.#isBlock(parentNode)) {
+    while (parentNode && parentNode.id !== 'ROOT' && !KBNavigator.isBlock(parentNode)) {
       parentNode = this.#query.node(parentNode.data.parent).get()
     }
     return parentNode
@@ -148,7 +152,7 @@ class KBNavigator {
     const descendants = this.#query.node(nodeId).descendants(true)
     for (let i = descendants.length - 1; i >= 0; i--) {
       const descendantNode = this.#query.node(descendants[i]).get()
-      if (this.#isBlock(descendantNode)) {
+      if (KBNavigator.isBlock(descendantNode)) {
         return descendantNode
       }
     }
@@ -159,7 +163,7 @@ class KBNavigator {
     let descendants = this.#query.node(nodeId).descendants(false)
     // might be an _inner
     let lastDescendantId = descendants.length ? descendants[descendants.length - 1] : null
-    while (lastDescendantId && !this.#isBlock(this.#query.node(lastDescendantId).get())) {
+    while (lastDescendantId && !KBNavigator.isBlock(this.#query.node(lastDescendantId).get())) {
       descendants = this.#query.node(lastDescendantId).descendants(false)
       lastDescendantId = descendants.length ? descendants[descendants.length - 1] : null
     }
@@ -179,7 +183,7 @@ class KBNavigator {
   #findNextFocusableBlockWithoutOpeningOrClosing(node: Node): Node | null {
     if (!node) return null
 
-    if (this.#isExpandedGroup(node)) {
+    if (KBNavigator.isExpandedGroup(node)) {
       const childBlockNode = this.#findFirstChildBlock(node)
       if (childBlockNode) return childBlockNode
     }
@@ -207,7 +211,7 @@ class KBNavigator {
   #handleArrowRight() {
     if (!(this.#node && this.#domNode)) return
 
-    if (this.#isExpandedGroup(this.#node)) {
+    if (KBNavigator.isExpandedGroup(this.#node)) {
       const firstBlockNode = this.#findFirstChildBlock(this.#node)
       this.#focusBlock(firstBlockNode)
     } else {
@@ -224,9 +228,9 @@ class KBNavigator {
 
     const prevBlockNode = this.#findPreviousSiblingBlock()
     if (prevBlockNode) {
-      if (this.#isExpandedGroup(prevBlockNode)) {
+      if (KBNavigator.isExpandedGroup(prevBlockNode)) {
         let lastChild = this.#findLastDirectChildBlock(prevBlockNode.id)
-        while (lastChild && this.#isExpandedGroup(lastChild)) {
+        while (lastChild && KBNavigator.isExpandedGroup(lastChild)) {
           lastChild = this.#findLastDirectChildBlock(lastChild.id)
         }
         if (lastChild) {
@@ -249,7 +253,7 @@ class KBNavigator {
   #handleArrowLeft() {
     if (!(this.#node && this.#domNode)) return
 
-    if (this.#isExpandedGroup(this.#node)) {
+    if (KBNavigator.isExpandedGroup(this.#node)) {
       this.#actions.setCustom(this.#node.id, (cstm: Record<string, any>) => {
         cstm.isExpanded = false
       })
@@ -351,4 +355,4 @@ class KBNavigator {
   }
 }
 
-export {KBNavigator}
+export {KBNavigator, findFirstChildBlock}

@@ -160,35 +160,39 @@ const TextBlockToolbar = () => {
     <>
       <IconButton
         screenReaderLabel="Bold"
+        size="small"
         withBackground={false}
         withBorder={isBold}
         onClick={handleBold}
       >
-        <IconBoldLine size="x-small" />
+        <IconBoldLine />
       </IconButton>
       <IconButton
         screenReaderLabel={I18n.t('Italic')}
+        size="small"
         withBackground={false}
         withBorder={isItalic}
         onClick={handleItalic}
       >
-        <IconItalicLine size="x-small" />
+        <IconItalicLine />
       </IconButton>
       <IconButton
         screenReaderLabel={I18n.t('Underline')}
+        size="small"
         withBackground={false}
         withBorder={isUnderline}
         onClick={handleUnderline}
       >
-        <IconUnderlineLine size="x-small" />
+        <IconUnderlineLine />
       </IconButton>
       <IconButton
         screenReaderLabel={I18n.t('Strikethrough')}
+        size="small"
         withBackground={false}
         withBorder={isStrikeThrough}
         onClick={handleStrikeThrough}
       >
-        <IconStrikethroughLine size="x-small" />
+        <IconStrikethroughLine />
       </IconButton>
       <Menu
         label="Font size"
@@ -196,7 +200,7 @@ const TextBlockToolbar = () => {
           <Button size="small">
             <Flex gap="x-small">
               <Text size="small">{props.fontSize || I18n.t('Size')}</Text>
-              <IconMiniArrowDownLine size="x-small" />
+              <IconMiniArrowDownLine />
             </Flex>
           </Button>
         }
@@ -221,7 +225,7 @@ const TextBlockToolbar = () => {
         screenReaderLabel={I18n.t('Color')}
         onClick={handleColorButtonClick}
       >
-        <IconTextColorLine size="x-small" />
+        <IconTextColorLine />
       </IconButton>
 
       <ColorModal

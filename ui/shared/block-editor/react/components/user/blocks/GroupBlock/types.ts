@@ -22,6 +22,7 @@ export type GroupLayout = 'row' | 'column'
 export type GroupAlignment = 'start' | 'center' | 'end'
 
 export type GroupBlockProps = {
+  isColumn?: boolean
   layout?: GroupLayout
   alignment?: GroupAlignment
   verticalAlignment?: GroupAlignment

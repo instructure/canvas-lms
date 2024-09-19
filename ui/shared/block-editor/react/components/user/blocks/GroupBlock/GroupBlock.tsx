@@ -37,7 +37,7 @@ export const GroupBlock = (props: GroupBlockProps) => {
     layout = GroupBlock.craft.defaultProps.layout,
     resizable = GroupBlock.craft.defaultProps.resizable,
   } = props
-  const {actions, query, enabled} = useEditor(state => ({
+  const {enabled} = useEditor(state => ({
     enabled: state.options.enabled,
   }))
   const clazz = useClassNames(enabled, {empty: false}, [
@@ -47,20 +47,28 @@ export const GroupBlock = (props: GroupBlockProps) => {
     `${alignment}-align`,
     `${verticalAlignment}-valign`,
   ])
-  const {node} = useNode((n: Node) => {
+  const {actions, node} = useNode((n: Node) => {
     return {
       node: n,
     }
   })
 
   useEffect(() => {
+    if (props.isColumn) {
+      actions.setCustom((custom: any) => {
+        custom.displayName = I18n.t('Column')
+      })
+    }
+  }, [actions, props.isColumn])
+
+  useEffect(() => {
     if (resizable !== node.data.custom.isResizable) {
-      actions.setCustom(node.id, (custom: Object) => {
+      actions.setCustom((custom: Object) => {
         // @ts-expect-error
         custom.isResizable = resizable
       })
     }
-  }, [actions, node.data.custom.isResizable, node.data.parent, node.id, query, resizable])
+  }, [actions, node.data.custom.isResizable, resizable])
 
   const styl: React.CSSProperties = {}
   if (node.data.props.width) {
