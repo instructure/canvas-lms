@@ -23,9 +23,9 @@ function compile_assets {
 function build_images {
   start_spinner 'Building docker images...'
   if [[ -n "$JENKINS" ]]; then
-    _canvas_lms_track_with_log docker-compose build --build-arg USER_ID=$(id -u)
+    _canvas_lms_track_with_log docker compose build --build-arg USER_ID=$(id -u)
   elif [[ "${OS:-}" == 'Linux' && -z "${CANVAS_SKIP_DOCKER_USERMOD:-}" ]]; then
-    _canvas_lms_track_with_log docker-compose build --pull --build-arg USER_ID=$(id -u)
+    _canvas_lms_track_with_log docker compose build --pull --build-arg USER_ID=$(id -u)
   else
     _canvas_lms_track_with_log $DOCKER_COMMAND build --pull
   fi

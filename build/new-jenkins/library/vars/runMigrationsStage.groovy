@@ -46,6 +46,6 @@ def call() {
     }
 
     archiveArtifacts(artifacts: 'migrate-*.log', allowEmptyArchive: true)
-    sh 'docker-compose down --remove-orphans'
+    sh 'docker compose down --remove-orphans'
   }
 }
