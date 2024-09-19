@@ -174,7 +174,8 @@ module AccountReports
                                INNER JOIN #{Account.quoted_table_name} acct ON acct.id = c.account_id
                                INNER JOIN #{CourseSection.quoted_table_name} s ON s.id = e.course_section_id
                                INNER JOIN #{Assignment.quoted_table_name} a ON (a.context_id = c.id
-                                                            AND a.context_type = 'Course')
+                                                            AND a.context_type = 'Course'
+                                                            AND a.type = 'Assignment')
                                INNER JOIN #{ContentTag.quoted_table_name} ct ON (ct.content_id = a.id
                                                               AND ct.content_type = 'Assignment')
                                INNER JOIN #{LearningOutcome.quoted_table_name} lo ON lo.id = ct.learning_outcome_id
@@ -496,8 +497,8 @@ module AccountReports
                           LEFT OUTER JOIN #{LearningOutcomeQuestionResult.quoted_table_name} qr on qr.learning_outcome_result_id = r.id
                           LEFT OUTER JOIN #{Quizzes::Quiz.quoted_table_name} q ON q.id = r.association_id
                            AND r.association_type IN ('Quiz', 'Quizzes::Quiz')
-                          LEFT OUTER JOIN #{Assignment.quoted_table_name} a ON (a.id = ct.content_id
-                           AND ct.content_type = 'Assignment') OR a.id = q.assignment_id
+                          LEFT OUTER JOIN #{Assignment.quoted_table_name} a ON a.type = 'Assignment' AND ((a.id = ct.content_id
+                           AND ct.content_type = 'Assignment') OR a.id = q.assignment_id)
                           LEFT OUTER JOIN #{Submission.quoted_table_name} subs ON subs.assignment_id = a.id
                            AND subs.user_id = u.id AND subs.workflow_state <> 'deleted' AND subs.workflow_state <> 'unsubmitted'
                           LEFT OUTER JOIN #{Quizzes::QuizSubmission.quoted_table_name} qs ON r.artifact_id = qs.id

@@ -192,6 +192,8 @@ describe "Course Account Reports" do
 
       @assignment = @course1.assignments.create(title: "some assignment",
                                                 points_possible: "5")
+
+      @assignment.sub_assignments.create!(title: "sub assignment", context: @assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
       @discussion = @course2.discussion_topics.create!(message: "hi")
       @attachment = attachment_model(context: @course3)
       @module = @course4.context_modules.create!(name: "some module")

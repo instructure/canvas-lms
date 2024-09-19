@@ -48,8 +48,11 @@ describe "Student reports" do
     @course3.enroll_teacher(@teacher)
 
     @assignment1 = @course1.assignments.create!(title: "My Assignment")
+    @assignment1.sub_assignments.create!(title: "sub assignment", context: @assignment1.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
     @assignment2 = @course2.assignments.create!(title: "My Assignment")
+    @assignment2.sub_assignments.create!(title: "sub assignment", context: @assignment2.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
     @assignment3 = @course3.assignments.create!(title: "My Assignment")
+    @assignment3.sub_assignments.create!(title: "sub assignment", context: @assignment3.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
     @assignment4 = @course3.assignments.create!(title: "My Assignment")
     @user1 = user_with_managed_pseudonym(
       active_all: true,
