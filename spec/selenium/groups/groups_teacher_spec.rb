@@ -625,6 +625,22 @@ describe "new groups" do
       expect(fj(drop_target1)).to include_text("Test Student 3")
     end
 
+    it "shows the users within a group one per line in 320px" do
+      group_test_setup(3, 1, 1)
+      3.times do |n|
+        add_user_to_group(@students[n], @testgroup.first, false)
+      end
+      driver.manage.window.resize_to(320, 900)
+      get "/courses/#{@course.id}/groups"
+
+      f(".group[data-id=\"#{@testgroup.first.id}\"] .toggle-group").click
+      wait_for_ajaximations
+      f(".group[data-id=\"#{@testgroup.first.id}\"] .toggle-group").click
+      # We hide the users in the group to get the width in % instead of px
+
+      expect(f("li.group .group-user").css_value("width")).to eq "93%"
+    end
+
     it "moves leader via drag and drop", priority: "1" do
       group_test_setup(5, 1, 2)
       2.times do |n|
