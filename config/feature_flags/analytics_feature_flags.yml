@@ -123,12 +123,3 @@ analytics_hub:
       state: allowed_on
     development:
       state: allowed_on
-
-# Canvas Analytics
-remove_legacy_account_analytics:
-  state: hidden
-  applies_to: Account
-  display_name: "Remove legacy analytics"
-  description: "This feature removes the legacy analytics."
-  root_opt_in: true
-  shadow: true
