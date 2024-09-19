@@ -3,7 +3,7 @@
 set -e
 
 if [ -f "config/consul.yml" ]; then # canvas is running in docker
-  docker-compose run --rm \
+  docker compose run --rm \
     -e DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL=true \
     -e DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/canvas_test \
     -e PACT_API_CONSUMER="$1" \

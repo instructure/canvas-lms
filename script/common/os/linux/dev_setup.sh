@@ -3,7 +3,7 @@ source script/common/utils/common.sh
 source script/common/os/linux/impl.sh
 source script/common/utils/dory_setup.sh
 dependencies='docker,docker-compose 1.20.0'
-DOCKER_COMMAND="docker-compose"
+DOCKER_COMMAND="docker compose"
 
 message "It looks like you're using Linux. Let's set that up."
 

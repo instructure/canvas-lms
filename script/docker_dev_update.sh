@@ -11,7 +11,7 @@ LOG="$(pwd)/log/docker_dev_update.log"
 DOCKER='true'
 OS="$(uname)"
 SCRIPT_NAME=$0
-DOCKER_COMMAND="docker-compose"
+DOCKER_COMMAND="docker compose"
 CANVAS_SKIP_DOCKER_USERMOD='true'
 
 usage () {
@@ -86,11 +86,11 @@ else
   setup_docker_compose_override
 fi
 
-if [[ -n "$UPDATE_CODE" ]] || [[ -n "$REBUILD_DOCKER" ]] && [[ "$(docker-compose top | wc -l)" -gt 0 ]]; then
+if [[ -n "$UPDATE_CODE" ]] || [[ -n "$REBUILD_DOCKER" ]] && [[ "$(docker compose top | wc -l)" -gt 0 ]]; then
   echo "You should probably stop docker containers before rebasing code"
-  prompt "Would you like to attempt to stop containers with docker-compose stop? [y/n]" stop
+  prompt "Would you like to attempt to stop containers with docker compose stop? [y/n]" stop
   if [[ ${stop:-n} == 'y' ]]; then
-    docker-compose stop
+    docker compose stop
   else
     echo "Continuing with docker containers running, this may cause errors."
   fi
