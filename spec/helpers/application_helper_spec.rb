@@ -1192,6 +1192,14 @@ describe ApplicationHelper do
         allow(helper).to receive(:csp_context).and_return(account)
       end
 
+      it "doesn't set the CSP report only header if not configured" do
+        helper.add_csp_for_root
+        helper.include_custom_meta_tags
+        expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
+        expect(headers).to_not have_key("Content-Security-Policy")
+        expect(js_env).not_to have_key(:csp)
+      end
+
       it "doesn't set the CSP header for non-html requests" do
         response.content_type = "application/json"
         account.enable_csp!
@@ -1238,6 +1246,70 @@ describe ApplicationHelper do
         )
         helper.add_csp_for_root
         expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: *.inst_fs.instructure.com inst_fs.instructure.com localhost root_account.test root_account2.test; "
+      end
+
+      context "CSP report only header" do
+        before do
+          account.enable_feature!(:javascript_csp)
+          account.enable_feature!(:default_source_csp_logging)
+        end
+
+        it "is set for frames" do
+          allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
+          helper.add_csp_for_root
+          expect(headers["Content-Security-Policy-Report-Only"])
+            .to eq "frame-src 'self' blob: localhost root_account.test root_account2.test; default-src 'self'; report-uri https://somewhere/"
+        end
+
+        it "is set for files" do
+          allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
+          helper.add_csp_for_file
+          expect(headers["Content-Security-Policy-Report-Only"])
+            .to eq(helper.csp_iframe_attribute + "default-src 'self'; report-uri https://somewhere/")
+        end
+
+        it "is set to the default CSP Report-Only header when the content type is not text/html" do
+          allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
+          response.content_type = "application/json"
+          helper.add_csp_for_root
+          expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
+          helper.set_default_source_csp_directive_if_enabled
+          expect(headers["Content-Security-Policy-Report-Only"]).to eq "default-src 'self'; report-uri https://somewhere/"
+        end
+
+        it "is not set if default_source_csp_logging feature is disabled" do
+          account.disable_feature!(:default_source_csp_logging)
+          allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
+          helper.add_csp_for_root
+          expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
+        end
+
+        it "is not set if javascript_csp is disabled" do
+          account.disable_feature!(:javascript_csp)
+          allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
+          helper.add_csp_for_root
+          expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
+        end
+
+        it "is not set if CSP is enforced" do
+          account.enable_csp!
+          allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
+          helper.add_csp_for_root
+          expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
+          helper.set_default_source_csp_directive_if_enabled
+          expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
+          helper.add_csp_for_file
+          expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
+        end
+
+        it "won't override an existing CSP Report-Only header" do
+          directives = "frame-src 'self' blob: localhost root_account.test root_account2.test; default-src 'self'; report-uri https://somewhere/"
+          allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
+          helper.add_csp_for_root
+          expect(headers["Content-Security-Policy-Report-Only"]).to eq directives
+          helper.set_default_source_csp_directive_if_enabled
+          expect(headers["Content-Security-Policy-Report-Only"]).to eq directives
+        end
       end
     end
   end
