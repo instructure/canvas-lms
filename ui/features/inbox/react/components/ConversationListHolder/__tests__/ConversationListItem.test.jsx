@@ -27,17 +27,16 @@ jest.mock('../../../../util/utils', () => ({
   responsiveQuerySizes: jest.fn(),
 }))
 
-const submissionsCommentsMock = () => {
-  return {
-    _id: 1,
-    subject: 'XavierSchool - This is an Assignment',
-    lastMessageCreatedAt: '2022-02-15T06:50:54-07:00',
-    lastMessageContent: 'Hey!',
-    participantString: 'Hank Mccoy',
-    messages: [SubmissionComment.mock(), SubmissionComment.mock(), SubmissionComment.mock()],
-    count: 3,
-  }
-}
+const submissionsCommentsMock = (overrides = {}) => ({
+  _id: 1,
+  subject: 'XavierSchool - This is an Assignment',
+  lastMessageCreatedAt: '2022-02-15T06:50:54-07:00',
+  lastMessageContent: 'Hey!',
+  participantString: 'Hank Mccoy',
+  messages: [SubmissionComment.mock(), SubmissionComment.mock(), SubmissionComment.mock()],
+  count: 3,
+  ...overrides
+})
 
 describe('ConversationListItem', () => {
   const createProps = overrides => {
@@ -261,6 +260,15 @@ describe('ConversationListItem', () => {
       const unreadBadge = getByTestId('unread-badge')
       fireEvent.click(unreadBadge)
       expect(onMarkAsRead).toHaveBeenCalledWith(submissionsCommentsMock())
+    })
+
+    it('does not display html tags in last message', () => {
+      const props = createProps({
+        conversation: submissionsCommentsMock({lastMessageContent: '<p>Remove my tags</p>'}),
+      })
+      const {queryByText, getByText} = render(<ConversationListItem {...props} />)
+      expect(getByText('Remove my tags')).toBeInTheDocument()
+      expect(queryByText('<p>Remove my tags</p>')).not.toBeInTheDocument()
     })
   })
 })
