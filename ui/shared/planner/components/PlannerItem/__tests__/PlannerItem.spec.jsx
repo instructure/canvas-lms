@@ -656,6 +656,20 @@ it('renders feedback if available', () => {
   expect(wrapper).toMatchSnapshot()
 })
 
+it('does not render html tags in feedback', () => {
+  const props = defaultProps({
+    feedback: {
+      author_avatar_url: '/avatar/is/here/',
+      author_name: 'Boyd Crowder',
+      comment: '<p>Death will not be the end of your suffering.</p>',
+      is_media: false,
+    },
+    deregisterAnimatable: jest.fn()
+  })
+  const {getByTestId} = render(<PlannerItem {...props} />)
+  expect(getByTestId('feedback-comment').textContent).toBe('Death will not be the end of your suffering.')
+})
+
 it('renders the location if available', () => {
   const props = defaultProps({
     location: 'Columbus, OH',

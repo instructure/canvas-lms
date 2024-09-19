@@ -796,6 +796,7 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
         </span>
         <span
           className="PlannerItem-styles__feedbackComment"
+          data-testid="feedback-comment"
         >
           <Text
             as="span"
@@ -14520,6 +14521,7 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
         </span>
         <span
           className="PlannerItem-styles__feedbackComment"
+          data-testid="feedback-comment"
         >
           <Text
             as="span"
@@ -14929,6 +14931,7 @@ exports[`renders feedback if available 1`] = `
         </span>
         <span
           className="PlannerItem-styles__feedbackComment"
+          data-testid="feedback-comment"
         >
           <Text
             as="span"
@@ -15338,6 +15341,7 @@ exports[`renders media feedback if available 1`] = `
         </span>
         <span
           className="PlannerItem-styles__feedbackComment"
+          data-testid="feedback-comment"
         >
           <Text
             as="span"
