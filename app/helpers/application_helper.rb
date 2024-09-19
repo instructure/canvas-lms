@@ -1043,6 +1043,10 @@ module ApplicationHelper
     csp_enabled? && csp_context.csp_enabled?
   end
 
+  def default_source_csp_logging_enabled?
+    csp_context&.root_account&.feature_enabled?(:default_source_csp_logging)
+  end
+
   def csp_report_uri
     @csp_report_uri ||=
       if (host = DynamicSettings.find("csp-logging")[:host])
@@ -1052,14 +1056,38 @@ module ApplicationHelper
       end
   end
 
+  def csp_header
+    header = +"Content-Security-Policy"
+
+    if !csp_enforced? && default_source_csp_logging_enabled?
+      header << "-Report-Only"
+    end
+
+    header.freeze
+  end
+
+  def default_source_csp_logging_directive
+    default_source_csp_logging_enabled? ? ("default-src 'self'" + csp_report_uri) : ""
+  end
+
   def include_files_domain_in_csp
     # TODO: make this configurable per-course, and depending on csp_context_is_submission?
     true
   end
 
+  def set_default_source_csp_directive_if_enabled
+    return unless default_source_csp_logging_enabled? && csp_enabled? && csp_report_uri.present?
+    return if headers.key?(csp_header) || csp_enforced?
+
+    # this is the default source directive added for all
+    # content types not represented by frames, scripts, or files
+    headers[csp_header] = default_source_csp_logging_directive
+  end
+
   def add_csp_for_root
     return unless response.media_type == "text/html"
     return unless csp_enabled?
+    return if csp_report_uri.empty? && !csp_enforced?
 
     # we iframe all files from the files domain into canvas, so we always have to include the files domain here
     domains =
@@ -1069,13 +1097,19 @@ module ApplicationHelper
 
     # Due to New Analytics generating CSV reports as blob on the client-side and then trying to download them,
     # as well as an interesting difference in browser interpretations of CSP, we have to allow blobs as a frame-src
-    headers["Content-Security-Policy"] = "frame-src 'self' blob: #{domains}; "
+    directives = "frame-src 'self' blob: #{domains}; "
+    directives += default_source_csp_logging_directive
+
+    headers[csp_header] = directives
   end
 
   def add_csp_for_file
-    return unless csp_enabled?
+    return if csp_report_uri.empty? && !csp_enforced?
 
-    headers["Content-Security-Policy"] = csp_iframe_attribute
+    directives = csp_iframe_attribute
+    directives += default_source_csp_logging_directive
+
+    headers[csp_header] = directives
   end
 
   def csp_iframe_attribute
