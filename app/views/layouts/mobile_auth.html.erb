@@ -20,7 +20,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title><%= yield :page_title || t("log_in_to_canvas", "Canvas Login | Instructure") %></title>
+  <title><%= (yield :page_title).presence || t("log_in_to_canvas", "Canvas Login | Instructure") %></title>
   <%= render_datadog_rum_js %>
   <meta name="HandheldFriendly" content="True">
   <meta name="apple-mobile-web-app-capable" content="yes" />
