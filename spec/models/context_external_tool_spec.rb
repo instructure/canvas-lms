@@ -4406,5 +4406,23 @@ describe ContextExternalTool do
         expect(LearnPlatform::GlobalApi).not_to have_received(:get_unified_tool_id)
       end
     end
+
+    context "unified_tool_id backfill job" do
+      let(:tool) { external_tool_model }
+
+      it "can save last_udapted" do
+        now = Time.now
+        tool.unified_tool_id_last_updated_at = now
+        expect(tool.save).to be true
+        expect(tool.reload.unified_tool_id_last_updated_at).to eq(now)
+      end
+
+      it "can save needs_update" do
+        expect(tool.unified_tool_id_needs_update).to be false
+        tool.unified_tool_id_needs_update = true
+        expect(tool.save).to be true
+        expect(tool.reload.unified_tool_id_needs_update).to be true
+      end
+    end
   end
 end
