@@ -722,6 +722,51 @@ describe Mutations::CreateDiscussionTopic do
         expect_error(result, "You do not have permission to add this topic to the student to-do list.")
       end
     end
+
+    context "checkpoints" do
+      before(:once) do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+      end
+
+      context "Restrict Quantitative Data" do
+        it "returns an error if disccussion has checkpoints and RQD is enabled" do
+          @course.restrict_quantitative_data = true
+          @course.save!
+          context_type = "Course"
+          title = "Graded Discussion w/Checkpoints"
+          message = "Lorem ipsum..."
+          published = true
+
+          query = <<~GQL
+            contextId: "#{@course.id}"
+            contextType: #{context_type}
+            title: "#{title}"
+            message: "#{message}"
+            published: #{published}
+            assignment: {
+              courseId: "#{@course.id}",
+              name: "#{title}",
+              forCheckpoints: true,
+            }
+            checkpoints: [
+              {
+                checkpointLabel: reply_to_topic,
+                pointsPossible: 10,
+                dates: [{ type: everyone, dueAt: "#{5.days.from_now.iso8601}" }]
+              },
+              {
+                checkpointLabel: reply_to_entry,
+                pointsPossible: 15,
+                dates: [{ type: everyone, dueAt: "#{10.days.from_now.iso8601}" }],
+                repliesRequired: 3
+              }
+            ]
+          GQL
+          result = execute_with_input_with_assignment(query)
+          expect_error(result, "If RQD is enabled, checkpoints cannot be created")
+        end
+      end
+    end
   end
 
   context "sections" do

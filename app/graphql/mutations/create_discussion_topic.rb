@@ -130,6 +130,7 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
       # Assignment must be present to set checkpoints
       if input[:checkpoints]&.count == DiscussionTopic::REQUIRED_CHECKPOINT_COUNT
         return validation_error(I18n.t("If checkpoints are defined, forCheckpoints: true must be provided to the discussion topic assignment.")) unless input.dig(:assignment, :for_checkpoints)
+        return validation_error(I18n.t("If RQD is enabled, checkpoints cannot be created")) if discussion_topic_context.is_a?(Course) && discussion_topic_context.settings[:restrict_quantitative_data]
 
         input[:checkpoints].each do |checkpoint|
           dates = checkpoint[:dates]

@@ -1892,6 +1892,22 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:DISCUSSION_CHECKPOINTS_ENABLED]).to be_truthy
     end
 
+    it "js_env RESTRICT_QUANTITATIVE_DATA is set to true if enabled in course" do
+      user_session(@teacher)
+      @course.restrict_quantitative_data = true
+      @course.save!
+      get :edit, params: { course_id: @course.id, id: @topic.id }
+      expect(assigns[:js_env][:RESTRICT_QUANTITATIVE_DATA]).to be_truthy
+    end
+
+    it "js_env RESTRICT_QUANTITATIVE_DATA is set to false if disabled in course" do
+      user_session(@teacher)
+      @course.restrict_quantitative_data = false
+      @course.save!
+      get :edit, params: { course_id: @course.id, id: @topic.id }
+      expect(assigns[:js_env][:RESTRICT_QUANTITATIVE_DATA]).to be_falsy
+    end
+
     context "conditional-release" do
       before do
         user_session(@teacher)
