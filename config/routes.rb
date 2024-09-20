@@ -1949,7 +1949,7 @@ CanvasRails::Application.routes.draw do
       delete "files/:id", action: :destroy
       put "files/:id", action: :api_update
       post "files/:id/reset_verifier", action: :reset_verifier
-      get "rce_linked_file_instfs_ids", action: :rce_linked_file_instfs_ids
+      post "rce_linked_file_instfs_ids", action: :rce_linked_file_instfs_ids
 
       # exists as an alias of GET for backwards compatibility
       #
