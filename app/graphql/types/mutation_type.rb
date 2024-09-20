@@ -116,6 +116,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :create_user_inbox_label, mutation: Mutations::CreateUserInboxLabel
   field :delete_user_inbox_label, mutation: Mutations::DeleteUserInboxLabel
   field :update_my_inbox_settings, mutation: Mutations::UpdateMyInboxSettings
+  field :update_speed_grader_settings, mutation: Mutations::UpdateSpeedGraderSettings
 
   # TODO: Remove the in active development string from here once this is more
   #       finalized.

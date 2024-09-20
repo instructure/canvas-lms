@@ -33,6 +33,7 @@ import {getAssignmentsByCourseId} from './queries/assignmentsByCourseIdQuery'
 import {getEnrollmentsByCourse} from './queries/enrollmentsByCourseQuery'
 import {getCommentBankItems} from './queries/commentBankQuery'
 
+import {updateSpeedGraderSettings} from './mutations/updateSpeedGraderSettingsMutation'
 import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
 import {createSubmissionComment} from './mutations/createSubmissionCommentMutation'
 import {hideAssignmentGradesForSections} from './mutations/hideAssignmentGradesForSectionsMutation'
@@ -141,6 +142,7 @@ ready(() => {
           createCommentBankItem,
           deleteCommentBankItem,
           updateCommentBankItem,
+          updateSpeedGraderSettings,
         },
         postMessageAliases,
         context: {
