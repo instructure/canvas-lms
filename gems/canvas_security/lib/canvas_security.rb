@@ -345,6 +345,10 @@ module CanvasSecurity
       Rails.application&.credentials&.dig(:canvas_security, :signing_secret_deprecated)
     end
 
+    def services_issuer
+      "Canvas"
+    end
+
     private
 
     def verify_jwt(body, ignore_expiration: false)
