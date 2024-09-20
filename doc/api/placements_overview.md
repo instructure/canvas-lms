@@ -5,7 +5,6 @@ Placements are the "entry points" into an External Tool. They determine where an
 ## List of Supported Placements
 
 - [Account Navigation](#account-navigation)
-- [Analytics Hub](#analytics-hub)
 - [Assignment Edit](#assignment-edit)
 - [Assignment Group Menu](#assignment-group-menu)
 - [Assignment Index Menu](#assignment-index-menu)
@@ -48,14 +47,6 @@ Placements are the "entry points" into an External Tool. They determine where an
 name: account_navigation
 
 <img class="lti-placement-image" src="./images/placements/account_navigation.png" alt="Account Navigation Screenshot">
-
-# Analytics Hub
-
-name: analytics_hub
-
-This is a restricted placement, contact your CSM (Customers) or [Developer Relations](mailto:dev-relations@instructure.com) (Partners) for more information.
-
-<img class="lti-placement-image" src="./images/placements/analytics_hub.png" alt="Analytics Hub Screenshot">
 
 # Assignment Edit
 
