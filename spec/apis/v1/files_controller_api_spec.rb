@@ -1724,7 +1724,7 @@ describe "Files API", type: :request do
 
     it "returns 404 if feature not enabled" do
       Account.site_admin.disable_feature!(:rce_linked_file_urls)
-      api_call(:get, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, {}, {}, expected_status: 404)
+      api_call(:post, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, {}, {}, expected_status: 404)
     end
 
     it "allows access to course files the user has access to manage" do
@@ -1742,7 +1742,7 @@ describe "Files API", type: :request do
       ]
       body = { user_uuid: @teacher.uuid, file_urls: }
 
-      api_call(:get, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 200)
+      api_call(:post, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 200)
       json = JSON.parse(response.body)
       expect(json).to eq({
                            "instfs_ids" => { "/courses/#{course.id}/files/#{image.id}/preview" => "image" },
@@ -1767,7 +1767,7 @@ describe "Files API", type: :request do
       ]
       body = { user_uuid: @teacher.uuid, file_urls: }
 
-      api_call(:get, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 200)
+      api_call(:post, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 200)
       json = JSON.parse(response.body)
       expect(json).to eq({
                            "instfs_ids" => { "/users/#{@teacher.id}/files/#{image.id}/preview" => "image" },
@@ -1784,7 +1784,7 @@ describe "Files API", type: :request do
       file_urls = ["/files/#{doc.id}/download?download_frd=1", "/files/#{doc.id}", "http://example.canvas.edu/files/#{doc.id}/download"]
       body = { user_uuid: @teacher.uuid, file_urls: }
 
-      api_call(:get, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 200)
+      api_call(:post, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 200)
       json = JSON.parse(response.body)
       expect(json).to eq({
                            "canvas_instfs_ids" => {
@@ -1808,7 +1808,7 @@ describe "Files API", type: :request do
       ]
       body = { user_uuid: @teacher.uuid, file_urls: }
 
-      api_call(:get, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 422)
+      api_call(:post, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 422)
       json = JSON.parse(response.body)
       expect(json).to eq({ "errors" => [{ "message" => "No valid file URLs given" }] })
     end
@@ -1825,7 +1825,7 @@ describe "Files API", type: :request do
       ]
       body = { user_uuid: @teacher.uuid, file_urls:, }
 
-      api_call(:get, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 200)
+      api_call(:post, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 200)
       json = JSON.parse(response.body)
       expect(json).to eq({
                            "instfs_ids" => { "/courses/#{@course.id}/files/#{image.id}/preview" => "image" },
@@ -1853,7 +1853,7 @@ describe "Files API", type: :request do
       ]
       body = { user_uuid: @teacher.uuid, file_urls: }
 
-      api_call(:get, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 200)
+      api_call(:post, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 200)
       json = JSON.parse(response.body)
       expect(json).to eq({
                            "instfs_ids" => { "/courses/#{@course.id}/files/#{image.id}/preview" => "image2" },
@@ -1874,7 +1874,7 @@ describe "Files API", type: :request do
       ]
       body = { user_uuid: @teacher.uuid, file_urls: }
 
-      api_call(:get, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 200)
+      api_call(:post, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 200)
       json = JSON.parse(response.body)
       expect(json).to eq({
                            "canvas_instfs_ids" => {
@@ -1887,7 +1887,7 @@ describe "Files API", type: :request do
       file_urls = []
       101.times { |i| file_urls << "/courses/#{@course.id}/files/#{i}?wrap=1" }
       body = { user_uuid: @teacher.uuid, file_urls:, location: "quiz/123" }
-      api_call(:get, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 422)
+      api_call(:post, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 422)
 
       json = JSON.parse(response.body)
       expect(json).to eq({ "errors" => [{ "message" => "Too many file links requested.  A maximum of 100 file links can be processed per request." }] })

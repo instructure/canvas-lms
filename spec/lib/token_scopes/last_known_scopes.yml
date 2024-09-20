@@ -1849,7 +1849,7 @@
   path: "/api/v1/quiz_submissions/:quiz_submission_id/questions/:id/formatted_answer"
 - verb: PUT
   path: "/api/v1/quiz_submissions/:quiz_submission_id/questions/:id/unflag"
-- verb: GET
+- verb: POST
   path: "/api/v1/rce_linked_file_instfs_ids"
 - verb: GET
   path: "/api/v1/release_notes"
