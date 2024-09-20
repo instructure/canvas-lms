@@ -90,7 +90,7 @@ function transform(result: any) {
     {}
   )
 
-  const proficiencyRatings = result.course.outcomeProficiency.proficiencyRatingsConnection.nodes
+  const proficiencyRatings = result.course.outcomeProficiency?.proficiencyRatingsConnection.nodes
 
   return {
     gradeStatuses: [...Object.values(defaultStandardStatusesMap), ...customGradeStatuses],
