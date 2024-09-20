@@ -123,6 +123,10 @@ class ContentTag < ActiveRecord::Base
   scope :active, -> { where(workflow_state: "active") }
   scope :not_deleted, -> { where("content_tags.workflow_state<>'deleted'") }
   scope :nondeleted, -> { not_deleted }
+  scope :content_type, ->(type) { where(content_type: type) }
+  scope :not_deleted_assignments, -> { content_type("Assignment").not_deleted }
+  scope :assignments_for_modules, ->(modules) { not_deleted_assignments.where(context_module_id: modules) }
+  scope :assignments_for_module_items, ->(module_items) { not_deleted_assignments.where(id: module_items) }
 
   attr_accessor :skip_touch
   attr_accessor :reassociate_external_tool

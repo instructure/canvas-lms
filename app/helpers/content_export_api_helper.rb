@@ -19,6 +19,8 @@
 #
 
 module ContentExportApiHelper
+  include ContentExportAssignmentHelper
+
   def create_content_export_from_api(params, context, current_user)
     export = context.content_exports.build
     export.user = current_user
@@ -31,8 +33,6 @@ module ContentExportApiHelper
                                                               for_content_export: true,
                                                               return_asset_strings: params[:export_type] == ContentExport::ZIP,
                                                               global_identifiers: export.can_use_global_identifiers?)
-
-      selected_assignments = params&.dig(:select, :assignments)
     end
 
     case params[:export_type]
@@ -56,8 +56,8 @@ module ContentExportApiHelper
     else
       export.export_type = ContentExport::COMMON_CARTRIDGE
       export.selected_content = selected_content || { everything: true }
-
-      export.prepare_new_quizzes_export selected_assignments
+      selected_assignments = get_selected_assignments(export, params[:select]) if params[:select]
+      export.prepare_new_quizzes_export(selected_assignments)
     end
     # recheck, since the export type influences permissions (e.g., students can download zips of non-locked files, but not common cartridges)
     return unless authorized_action(export, current_user, :create)
