@@ -1374,6 +1374,7 @@ class User < ActiveRecord::Base
       read_email_addresses
       view_user_logins
       generate_observer_pairing_code
+      update_speed_grader_settings
     ]
 
     given { |user| user == self && user.user_can_edit_name? }
@@ -1764,6 +1765,12 @@ class User < ActiveRecord::Base
 
   def preferences
     read_or_initialize_attribute(:preferences, {})
+  end
+
+  def speed_grader_settings
+    {
+      grade_by_question: preferences.fetch(:enable_speedgrader_grade_by_question, false)
+    }
   end
 
   def new_user_tutorial_statuses

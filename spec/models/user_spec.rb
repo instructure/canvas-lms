@@ -75,6 +75,15 @@ describe User do
     end
   end
 
+  describe "#speed_grader_settings" do
+    it "stores the user's speed grader settings" do
+      user = user_model
+      expect { user.preferences[:enable_speedgrader_grade_by_question] = true }.to change {
+        user.speed_grader_settings
+      }.from({ grade_by_question: false }).to({ grade_by_question: true })
+    end
+  end
+
   it "adds an lti_id on creation" do
     user = User.new
     expect(user.lti_id).to be_blank
@@ -3035,6 +3044,17 @@ describe User do
   end
 
   describe "permissions" do
+    it "allows a user to update their own speed grader settings" do
+      user = user_model
+      expect(user.grants_right?(user, :update_speed_grader_settings)).to be true
+    end
+
+    it "does not allow a user to update someone else's speed grader settings" do
+      user1 = user_model
+      user2 = user_model
+      expect(user1.grants_right?(user2, :update_speed_grader_settings)).to be false
+    end
+
     it "does not allow account admin to modify admin privileges of other account admins" do
       expect(RoleOverride.readonly_for(Account.default, :manage_role_overrides, admin_role)).to be_truthy
       expect(RoleOverride.readonly_for(Account.default, :manage_account_memberships, admin_role)).to be_truthy
