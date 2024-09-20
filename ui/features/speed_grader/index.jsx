@@ -144,7 +144,6 @@ ready(() => {
         },
         postMessageAliases,
         context: {
-          courseId: window.ENV.course_id,
           userId: window.ENV.current_user_id,
           assignmentId: params.get('assignment_id'),
           studentId: params.get('student_id'),
@@ -162,8 +161,8 @@ ready(() => {
           extendedSubmissionState: window.ENV.FEATURES.extended_submission_state,
           emojisEnabled: !!window.ENV.EMOJIS_ENABLED,
           enhancedRubricsEnabled: window.ENV.ENHANCED_RUBRICS_ENABLED,
-          commentLibraryEnabled: ENV.assignment_comment_library_feature_enabled,
-          restrictQuantitativeDataEnabled : window.ENV.RESTRICT_QUANTITATIVE_DATA_ENABLED,
+          commentLibraryEnabled: window.ENV.COMMENT_LIBRARY_FEATURE_ENABLED,
+          restrictQuantitativeDataEnabled: window.ENV.RESTRICT_QUANTITATIVE_DATA_ENABLED,
         },
       })
     })
