@@ -289,7 +289,7 @@ class AssignmentGroup < ActiveRecord::Base
     )
   end
 
-  def self.visible_assignments(user, context, assignment_groups, includes: [], assignment_ids: [])
+  def self.visible_assignments(user, context, assignment_groups, includes: [], assignment_ids: [], include_discussion_checkpoints: false)
     scope = if context.grants_any_right?(user, :manage_grades, :read_as_admin, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
               context.active_assignments.where(assignment_group_id: assignment_groups)
             elsif user.nil?
@@ -298,6 +298,15 @@ class AssignmentGroup < ActiveRecord::Base
               user.assignments_visible_in_course(context)
                   .where(assignment_group_id: assignment_groups).published
             end
+    if include_discussion_checkpoints
+      # We need to update the scope to use AbstractAssignment instead of its subclass Assignment so that we can merge the
+      # scope query with the checkpoints_scope query
+      scope_assignment_ids = scope.pluck(:id)
+      scope = AbstractAssignment.where(id: scope_assignment_ids)
+      checkpoints_scope = SubAssignment.active.where(parent_assignment_id: scope_assignment_ids)
+      # merge the queries
+      scope = scope.or(checkpoints_scope)
+    end
 
     if assignment_ids&.any?
       scope = scope.where(id: assignment_ids)
