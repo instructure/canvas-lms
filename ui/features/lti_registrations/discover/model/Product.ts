@@ -34,6 +34,7 @@ export type Product = {
   accessibility_url: string
   support_link: string
   tags: Tag[]
+  integration_resources: IntegrationResources
 }
 
 export type Company = {
@@ -67,4 +68,15 @@ export type TagGroup = {
 export type Tag = {
   id: string
   name: string
+}
+
+export type IntegrationResources = {
+  comments: string | null
+  resources: IntegrationResource[] | []
+}
+
+export type IntegrationResource = {
+  name: string
+  description: string
+  content: string
 }
