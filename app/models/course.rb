@@ -3851,8 +3851,9 @@ class Course < ActiveRecord::Base
   def reset_content
     shard.activate do
       Course.transaction do
+        reset_uuid = root_account.feature_enabled?(:reset_uuid_on_course_reset)
         new_course = Course.new
-        keys_to_copy = Course.column_names - %i[
+        exempt_fields = %w[
           id
           created_at
           updated_at
@@ -3864,7 +3865,9 @@ class Course < ActiveRecord::Base
           workflow_state
           latest_outcome_import_id
           grading_standard_id
-        ].map(&:to_s)
+        ]
+        exempt_fields << "uuid" if reset_uuid
+        keys_to_copy = Course.column_names - exempt_fields
         attributes.each do |key, val|
           new_course[key] = val if keys_to_copy.include?(key)
         end
@@ -3877,7 +3880,8 @@ class Course < ActiveRecord::Base
         # get its id to move over sections and enrollments.  Setting this course to
         # deleted has to be last otherwise it would set all the enrollments to
         # deleted before they got moved
-        self.uuid = self.sis_source_id = self.sis_batch_id = self.integration_id = nil
+        self.sis_source_id = self.sis_batch_id = self.integration_id = nil
+        self.uuid = nil unless reset_uuid
         save!
         Course.process_as_sis { new_course.save! }
         course_sections.update_all(course_id: new_course.id)

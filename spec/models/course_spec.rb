@@ -1577,6 +1577,33 @@ describe Course do
         @new_course = @course.reset_content
         expect(fav.reload.context).to eq @new_course
       end
+
+      context "uuid" do
+        it "does not move the uuid to the new course during reset" do
+          orig_uuid = "original_uuid"
+          @course.uuid = orig_uuid
+          @course.save!
+          @course.reload
+
+          new_course = @course.reset_content
+
+          @course.reload
+          expect(@course.uuid).to eq orig_uuid
+          expect(new_course.uuid).to match(/[0-9a-zA-z]{40}/)
+        end
+
+        it "moves the uuid to the new course during reset if feature flag is disabled" do
+          @course.root_account.disable_feature!(:reset_uuid_on_course_reset)
+
+          orig_uuid = "original_uuid"
+          @course.uuid = orig_uuid
+          @course.save!
+          @course.reload
+
+          new_course = @course.reset_content
+          expect(new_course.uuid).to eq orig_uuid
+        end
+      end
     end
 
     context "group_categories" do
