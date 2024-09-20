@@ -643,6 +643,39 @@ describe SortsAssignments do
         create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
         expect(sorter.assignments(:upcoming)).to include @assignment
       end
+
+      context "with discussion checkpoints" do
+        before do
+          @course.root_account.enable_feature!(:discussion_checkpoints)
+          @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+        end
+
+        it "includes the checkpoint sub-assignments" do
+          sorter_with_checkpoints = SortsAssignments.new(
+            assignments_scope: AssignmentGroup.visible_assignments(@teacher, @course, @course.assignment_groups.active, include_discussion_checkpoints: true),
+            user: @teacher,
+            session: nil,
+            course: @course,
+            include_discussion_checkpoints: true
+          )
+          assignment_ids = sorter_with_checkpoints.assignments(:upcoming).pluck(:id)
+          expect(assignment_ids).to include(@reply_to_topic.id)
+          expect(assignment_ids).to include(@reply_to_entry.id)
+        end
+
+        it "does not include checkpoint sub-assignments if include_discussion_checkpoints is false" do
+          sorter_no_checkpoints = SortsAssignments.new(
+            assignments_scope: AssignmentGroup.visible_assignments(@teacher, @course, @course.assignment_groups.active, include_discussion_checkpoints: true),
+            user: @teacher,
+            session: nil,
+            course: @course,
+            include_discussion_checkpoints: false
+          )
+          assignment_ids = sorter_no_checkpoints.assignments(:upcoming).pluck(:id)
+          expect(assignment_ids).to_not include(@reply_to_topic.id)
+          expect(assignment_ids).to_not include(@reply_to_entry.id)
+        end
+      end
     end
 
     describe "future" do
