@@ -26,6 +26,7 @@ require "controller_list_view"
 require "api_scope_mapping_writer"
 require "decorator"
 require "fileutils"
+require "nokogiri"
 
 Rails.root.glob("doc/api/data_services/*.rb").sort.each { |file| require file }
 
@@ -210,9 +211,21 @@ def init
 
   generate_toc(output_path)
 
-  # this should be called after all the markdown files are generated
+  # Post-processing steps. These should be called after
+  # all the Markdown files are generated.
   Dir.glob("#{output_path}/**/*.md").each do |filename|
-    transform_html_links(filename)
+    content = File.read(filename)
+    transformations = [
+      method(:transform_html_links),
+      method(:transform_warning_divs),
+      method(:transform_dls)
+    ]
+
+    transformed_content = transformations.reduce(content) do |acc, transform|
+      transform.call(acc)
+    end
+
+    File.binwrite(filename, transformed_content)
   end
 end
 
@@ -282,9 +295,7 @@ end
 
 # Replace all the anchor tags that point to HTML files with links to
 # the corresponding markdown file. Also remove the target="_blank" attribute
-def transform_html_links(filename)
-  content = File.read(filename)
-
+def transform_html_links(content)
   # matches HTML-style anchors with URLs ending in .html or .html#fragment
   html_link_regex = /<a\s*href="([^"]+\.html(?:#[^"]*)?)"[^>]*>/
 
@@ -297,12 +308,39 @@ def transform_html_links(filename)
   # matches Markdown-style links with URLs ending in .html or .html#fragment
   markdown_link_regex = /\[([^\]]+)\]\(([^)]+\.html(?:#[^)]+)?)\)/
 
-  modified_content = modified_content.gsub(markdown_link_regex) do |_match|
+  modified_content.gsub(markdown_link_regex) do |_|
     text = $1
     url = $2
     url = url.gsub(".html", ".md") unless url.start_with?("http", "https")
     "[#{text}](#{url})"
   end
+end
 
-  File.binwrite(filename, modified_content)
+# Replace all the warning divs with hint tags so it can be rendered properly
+def transform_warning_divs(content)
+  warning_div_regex = %r{<div class="warning-message">(.*?)</div>}m
+  content.gsub(warning_div_regex) do |_|
+    inner_content = $1.strip
+    hint("warning", inner_content)
+  end
+end
+
+# Convert a <dl> lists to <ul> lists
+def transform_dls(content)
+  dl_regex = %r{<dl\b[^>]*>(.*?)</dl>}m
+  content.gsub(dl_regex) do |dl_match|
+    doc = Nokogiri::HTML.fragment(dl_match)
+    markdown = "<ul>"
+
+    doc.css("dl").each do |dl|
+      dl.css("dt").each do |dt|
+        dd = dt.at_xpath("following-sibling::dd")
+        if dd
+          markdown = "#{markdown}<li>#{dt.text.strip}<p>#{dd.text.strip}</p></li>"
+        end
+      end
+    end
+
+    markdown = "#{markdown}</ul>"
+  end
 end
