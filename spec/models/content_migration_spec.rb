@@ -178,6 +178,38 @@ describe ContentMigration do
     end
   end
 
+  context "send_item_notifications" do
+    it "interprets the migration setting" do
+      expect(@cm.send_item_notifications?).to be false
+
+      @cm.migration_settings[:send_item_notifications] = true
+      expect(@cm).to be_valid
+      expect(@cm.send_item_notifications?).to be true
+    end
+
+    it "disallows combining send_item_notifications with shift_dates" do
+      @cm.migration_settings[:date_shift_options] = {
+        shift_dates: true,
+        old_start_date: 1.year.ago,
+        new_start_date: Time.now.utc
+      }
+      expect(@cm).to be_valid
+
+      @cm.migration_settings[:send_item_notifications] = true
+      expect(@cm).not_to be_valid
+    end
+
+    it "disallows combining send_item_notifications with remove_dates" do
+      @cm.migration_settings[:date_shift_options] = {
+        remove_dates: true,
+      }
+      expect(@cm).to be_valid
+
+      @cm.migration_settings[:send_item_notifications] = true
+      expect(@cm).not_to be_valid
+    end
+  end
+
   it "excludes user-hidden migration plugins" do
     ab = Canvas::Plugin.find(:academic_benchmark_importer)
     expect(ContentMigration.migration_plugins(true)).not_to include(ab)
