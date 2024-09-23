@@ -1049,7 +1049,7 @@ describe "threaded discussions" do
       type_in_tiny("textarea", edit_text)
       fj("button:contains('Save')").click
       wait_for_ajax_requests
-      expect(fj("div:contains('Edited')")).to be_present
+      expect(fj("div:contains('Last edited')")).to be_present
       expect(f("body")).not_to contain_jqcss("span[data-testid='editedByText']")
     end
 

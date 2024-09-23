@@ -41,9 +41,10 @@ const setup = ({
   isUnread = false,
   isForcedRead = false,
   isSplitView = false,
-  createdAt = '2021-01-01T13:00:00-07:00',
+  createdAt = 'Jan 1 1:00pm',
   editedAt = '2021-02-02T14:00:00-07:00',
-  timingDisplay = 'Jan 1 1:00pm',
+  delayedPostAt = '',
+  isTopic = false,
   editedTimingDisplay = 'Feb 2 2:00pm',
   lastReplyAtDisplay = 'Mar 3 3:00pm',
   showCreatedAsTooltip = false,
@@ -51,6 +52,7 @@ const setup = ({
   isTopicAuthor = true,
   discussionEntryVersions = [],
   toggleUnread = () => {},
+  published = true,
 } = {}) =>
   render(
     <SearchContext.Provider value={{searchTerm}}>
@@ -63,13 +65,15 @@ const setup = ({
         isSplitView={isSplitView}
         createdAt={createdAt}
         editedAt={editedAt}
-        timingDisplay={timingDisplay}
+        delayedPostAt={delayedPostAt}
+        isTopic={isTopic}
         editedTimingDisplay={editedTimingDisplay}
         lastReplyAtDisplay={lastReplyAtDisplay}
         showCreatedAsTooltip={showCreatedAsTooltip}
         isTopicAuthor={isTopicAuthor}
         discussionEntryVersions={discussionEntryVersions}
         toggleUnread={toggleUnread}
+        published={published}
       />
     </SearchContext.Provider>
   )
@@ -227,16 +231,65 @@ describe('AuthorInfo', () => {
       expect(container.getByText('Last reply Mar 3 3:00pm')).toBeInTheDocument()
     })
 
-    it('renders the created tooltip if showCreatedAsTooltip is true', () => {
-      const container = setup({showCreatedAsTooltip: true})
-      expect(container.getByTestId('created-tooltip')).toBeInTheDocument()
-      expect(container.getByText('Created Jan 1 1:00pm')).toBeInTheDocument()
-      expect(container.queryByText('Jan 1 1:00pm')).toBeNull()
+    it('render the last edited date if it is in the past for teachers', () => {
+      window.ENV.current_user_roles = ['teacher']
+      const container = setup({
+        createdAt: 'Jan 1 1:00pm',
+        editedTimingDisplay: 'Jan 1 3:00pm',
+        delayedPostAt: 'Jan 1 5:00pm',
+      })
+      expect(container.queryByTestId('editedByText')).toBeInTheDocument()
     })
 
-    it('renders the created date if showCreatedAsTooltip is true but there is no edit info', () => {
-      const container = setup({editedTimingDisplay: null, editor: null})
-      expect(container.getByText('Jan 1 1:00pm')).toBeInTheDocument()
+    it('does not render the last edited date if it is in the past for students', () => {
+      window.ENV.current_user_roles = ['student']
+      const container = setup({
+        createdAt: 'Jan 1 1:00pm',
+        editedTimingDisplay: 'Jan 1 3:00pm',
+        delayedPostAt: 'Jan 1 5:00pm',
+      })
+      expect(container.queryByTestId('editedByText')).not.toBeInTheDocument()
+    })
+
+    it('render the last edited date if it is past the posted date', () => {
+      const container = setup({
+        createdAt: 'Jan 1 1:00pm',
+        editedTimingDisplay: 'Jan 1 6:00pm',
+        delayedPostAt: 'Jan 1 5:00pm',
+      })
+      expect(container.queryByTestId('editedByText')).toBeInTheDocument()
+    })
+
+    it('duplicates the created date for teacher if instant post', () => {
+      window.ENV.current_user_roles = ['teacher']
+      const container = setup({
+        createdAt: 'Jan 1 1:00pm',
+        isTopic: true,
+      })
+      expect(container.queryByText('Posted Jan 1 1:00pm')).toBeInTheDocument()
+      expect(container.queryByText('Created Jan 1 1:00pm')).toBeInTheDocument()
+    })
+
+    it('do not show duplication when not published', () => {
+      window.ENV.current_user_roles = ['teacher']
+      const container = setup({
+        createdAt: 'Jan 1 1:00pm',
+        isTopic: true,
+        published: false,
+      })
+      expect(container.queryByText('Posted Jan 1 1:00pm')).not.toBeInTheDocument()
+      expect(container.queryByText('Created Jan 1 1:00pm')).toBeInTheDocument()
+    })
+
+    it('student only sees "Posted" for instant post', () => {
+      window.ENV.current_user_roles = ['student']
+      const container = setup({
+        createdAt: 'Jan 1 1:00pm',
+        delayedPostAt: 'Jan 1 4:00pm',
+        isTopic: true,
+      })
+      expect(container.queryByText('Posted Jan 1 4:00pm')).toBeInTheDocument()
+      expect(container.queryByText('Created Jan 1 1:00pm')).not.toBeInTheDocument()
     })
   })
 

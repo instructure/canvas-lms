@@ -417,6 +417,9 @@ export const DiscussionTopicContainer = ({
                             timingDisplay={DateHelper.formatDatetimeForDiscussions(
                               props.discussionTopic.createdAt
                             )}
+                            delayedPostAt={DateHelper.formatDatetimeForDiscussions(
+                              props.discussionTopic?.delayedPostAt
+                            )}
                             editedTimingDisplay={DateHelper.formatDatetimeForDiscussions(
                               props.discussionTopic.editedAt
                             )}
