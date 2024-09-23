@@ -1171,7 +1171,7 @@ GEM
       unf_ext
     unf_ext (0.0.9.1)
     unicode-display_width (2.6.0)
-    unicode-emoji (3.4.0)
+    unicode-emoji (3.5.0)
       unicode-version (~> 1.0)
     unicode-version (1.4.0)
     uri (0.13.1)
