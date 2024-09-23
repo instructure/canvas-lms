@@ -3411,6 +3411,7 @@ hy:
   canvas_error_report_ff678539: "Canvas սխալի մասին հաշվետվություն"
   canvas_lms_6ce68514: "Canvas LMS"
   canvas_login_failure_message_4c922f2f: "Հաղորդագրություն Canvas մուտք գործելու ձախողման մասին "
+  canvas_login_instructure_271b8d00: "Մուտք գործել Canvas համակարգ"
   canvas_revision_unknown: "Անհայտ է"
   canvas_thinks_response_is_valid_8cc4a67d: "Canvas-ը կարծում է, որ պատասխանը ընդունելի է"
   canvas_ticketing_email_connector_27e253ae: "Canvas ձևերը գեներացնող էլ.փոստի կոնեկտոր "
