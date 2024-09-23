@@ -87,3 +87,8 @@ blueprint_item_notifications:
   applies_to: Account
   display_name: Blueprint Item Notifications
   description: Adds an option that allows teachers and students to receive new-item notifications for content synced from the blueprint course
+migrate_assignment_group_categories:
+  state: hidden
+  applies_to: Course
+  display_name: Migrate assignment group categories
+  description: Include group categories when copying group assignments in course copies or blueprint syncs

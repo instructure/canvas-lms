@@ -221,17 +221,40 @@ describe "Importing assignments" do
     expect(ra.hide_outcome_results).to be true
   end
 
-  it "imports group category into existing group with same name when marked as a group assignment" do
-    file_data = get_import_data("", "assignment")
-    context = get_import_context("")
-    assignment_hash = file_data.find { |h| h["migration_id"] == "4469882339232" }.with_indifferent_access
-    migration = context.content_migrations.create!
-    context.group_categories.create! name: assignment_hash[:group_category]
+  describe "migrate_assignment_group_categories" do
+    context "with feature off" do
+      it "imports group category into existing group with same name when marked as a group assignment" do
+        file_data = get_import_data("", "assignment")
+        context = get_import_context("")
+        assignment_hash = file_data.find { |h| h["migration_id"] == "4469882339232" }.with_indifferent_access
+        migration = context.content_migrations.create!
+        gc = context.group_categories.create! name: assignment_hash[:group_category]
 
-    Importers::AssignmentImporter.import_from_migration(assignment_hash, context, migration)
-    a = Assignment.where(migration_id: assignment_hash[:migration_id]).first
-    expect(a).to be_has_group_category
-    expect(a.group_category.name).to eq assignment_hash[:group_category]
+        Importers::AssignmentImporter.import_from_migration(assignment_hash, context, migration)
+        a = Assignment.where(migration_id: assignment_hash[:migration_id]).first
+        expect(a).to be_has_group_category
+        expect(a.group_category).to eq gc
+      end
+    end
+
+    context "with feature on" do
+      before do
+        Account.default.enable_feature!(:migrate_assignment_group_categories)
+      end
+
+      it "copies group category" do
+        file_data = get_import_data("", "assignment")
+        context = get_import_context("")
+        assignment_hash = file_data.find { |h| h["migration_id"] == "4469882339232" }.with_indifferent_access
+        migration = context.content_migrations.create!
+
+        Importers::AssignmentImporter.import_from_migration(assignment_hash, context, migration)
+        a = Assignment.where(migration_id: assignment_hash[:migration_id]).first
+        expect(a).to be_has_group_category
+        expect(a.group_category.name).to eq "A Team"
+        expect(context.group_categories.where(name: "Project Groups")).to be_empty
+      end
+    end
   end
 
   it "infers the default name when importing a nameless assignment" do
