@@ -164,6 +164,7 @@ class GradeSummaryAssignmentPresenter
     classes << special_class
     classes << "excused" if excused?
     classes << "extended" if extended?
+    classes << "has_sub_assignments" if has_sub_assignments?
     classes.join(" ")
   end
 
@@ -181,6 +182,12 @@ class GradeSummaryAssignmentPresenter
 
   def extended?
     submission.try(:extended?)
+  end
+
+  delegate :has_sub_assignments?, to: :assignment
+
+  def checkpoints_parent?
+    assignment.has_sub_assignments? && assignment.root_account.feature_enabled?(:discussion_checkpoints)
   end
 
   def deduction_present?
