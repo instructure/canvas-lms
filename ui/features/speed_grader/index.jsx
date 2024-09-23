@@ -27,7 +27,7 @@ import {getAssignment} from './queries/getAssignment'
 import {getCourse} from './queries/getCourse'
 import {getSectionsByAssignment} from './queries/sectionsByAssignmentQuery'
 import {getSubmission} from './queries/submissionQuery'
-import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery'
+import {getAssignmentSubmissions} from './queries/getAssignmentSubmissions'
 import {getSubmissionsByStudentIds} from './queries/submissionsByStudentsIdsQuery'
 import {getAssignmentsByCourseId} from './queries/assignmentsByCourseIdQuery'
 import {getEnrollmentsByCourse} from './queries/enrollmentsByCourseQuery'
@@ -122,11 +122,11 @@ ready(() => {
         queryFns: {
           getAssignment,
           getAssignmentsByCourseId,
+          getAssignmentSubmissions,
           getCourse,
           getEnrollmentsByCourse,
           getSectionsByAssignment,
           getSubmission,
-          getSubmissionsByAssignment,
           getSubmissionsByStudentIds,
           getCommentBankItems,
           resolvePostAssignmentGradesStatus,
@@ -147,6 +147,7 @@ ready(() => {
         postMessageAliases,
         context: {
           userId: window.ENV.current_user_id,
+          grading_role: window.ENV.grading_role,
           assignmentId: params.get('assignment_id'),
           studentId: params.get('student_id'),
           hrefs: {

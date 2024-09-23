@@ -19,10 +19,9 @@
 import {z} from 'zod'
 import {executeQuery} from '@canvas/query/graphql'
 import gql from 'graphql-tag'
-import speedGraderHelpers from '../jquery/speed_grader_helpers'
 
 const QUERY = gql`
-  query SpeedGrader_SubmissionsByAssignmentQuery($assignmentId: ID!) {
+  query SpeedGrader_AssignmentSubmissionsQuery($assignmentId: ID!) {
     assignment(id: $assignmentId) {
       submissionsConnection(
         filter: {
@@ -63,29 +62,13 @@ const QUERY = gql`
   }
 `
 
-function transform(result: any) {
-  if (result.assignment?.submissionsConnection?.nodes) {
-    const submissions = result.assignment.submissionsConnection.nodes
-    submissions.forEach((submission: any) => {
-      submission.submissionState = speedGraderHelpers.steelThreadSubmissionState(
-        submission.user,
-        // @ts-expect-error
-        ENV.grading_role ?? '',
-        submission
-      )
-    })
-    return submissions
-  }
-  return null
-}
-
 export const ZGetAssignmentParams = z.object({
   assignmentId: z.string().min(1),
 })
 
 type GetSubmissionsByAssignmentParams = z.infer<typeof ZGetAssignmentParams>
 
-export async function getSubmissionsByAssignment<T extends GetSubmissionsByAssignmentParams>({
+export async function getAssignmentSubmissions<T extends GetSubmissionsByAssignmentParams>({
   queryKey,
 }: {
   queryKey: [string, T]
@@ -93,9 +76,7 @@ export async function getSubmissionsByAssignment<T extends GetSubmissionsByAssig
   ZGetAssignmentParams.parse(queryKey[1])
   const {assignmentId} = queryKey[1]
 
-  const result = await executeQuery<any>(QUERY, {
+  return executeQuery<any>(QUERY, {
     assignmentId,
   })
-
-  return transform(result)
 }
