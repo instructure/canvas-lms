@@ -39,12 +39,12 @@ import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
-import {Tooltip} from '@instructure/ui-tooltip'
 import {DiscussionEntryVersion} from '../../../graphql/DiscussionEntryVersion'
 import {DiscussionEntryVersionHistory} from '../DiscussionEntryVersionHistory/DiscussionEntryVersionHistory'
 import {ReportsSummaryBadge} from '../ReportsSummaryBadge/ReportsSummaryBadge'
 import theme from '@instructure/canvas-theme'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {parse} from '@instructure/moment-utils'
 
 const I18n = useI18nScope('discussion_posts')
 
@@ -129,7 +129,7 @@ const AuthorInfoBase = ({breakpoints, ...props}) => {
       <Flex.Item shouldShrink={true}>
         <Flex direction="column" margin={authorInfoPadding}>
           {hasAuthor && (
-            <Flex.Item overflowY={"hidden"}>
+            <Flex.Item overflowY="hidden">
               <Flex wrap="wrap" gap="0 small">
                 <Text
                   weight="bold"
@@ -170,14 +170,16 @@ const AuthorInfoBase = ({breakpoints, ...props}) => {
             <Timestamps
               author={props.author}
               editor={props.editor}
+              delayedPostAt={props.delayedPostAt}
               createdAt={props.createdAt}
-              updatedAt={props.updatedAt}
-              timingDisplay={props.timingDisplay}
               editedTimingDisplay={props.editedTimingDisplay}
               lastReplyAtDisplay={props.lastReplyAtDisplay}
               showCreatedAsTooltip={props.showCreatedAsTooltip}
               timestampTextSize={timestampTextSize}
               mobileOnly={breakpoints.mobileOnly}
+              isTopic={props.isTopic}
+              published={props.published}
+              isAnnouncement={props.isAnnouncement}
             />
             {ENV.discussion_entry_version_history && props.discussionEntryVersions.length > 1 && (
               <DiscussionEntryVersionHistory
@@ -248,11 +250,23 @@ AuthorInfoBase.propTypes = {
   threadParent: PropTypes.bool,
   toggleUnread: PropTypes.func,
   breakpoints: breakpointsShape,
+  delayedPostAt: PropTypes.string,
+  isTopic: PropTypes.bool,
+  published: PropTypes.bool,
+  isAnnouncement: PropTypes.bool,
 }
 
 const Timestamps = props => {
+  const isTeacher = ENV?.current_user_roles && ENV?.current_user_roles.includes('teacher')
   const editText = useMemo(() => {
     if (!props.editedTimingDisplay) {
+      return null
+    }
+
+    const editedDate = parse(props.editedTimingDisplay)
+    const delayedDate = parse(props.delayedPostAt)
+    // do not show edited by info for students if the post is edited before the delayed post date
+    if (!isTeacher && delayedDate && editedDate.isBefore(delayedDate)) {
       return null
     }
 
@@ -280,38 +294,72 @@ const Timestamps = props => {
         </span>
       )
     } else {
-      return I18n.t('Edited %{editedTimingDisplay}', {
+      return I18n.t('Last edited %{editedTimingDisplay}', {
         editedTimingDisplay: props.editedTimingDisplay,
       })
     }
-  }, [props.editedTimingDisplay, props.editor, props.author])
+  }, [props.editedTimingDisplay, props.delayedPostAt, props.editor, props.author, isTeacher])
+
   const timestampsPadding = props.mobileOnly ? '0 xx-small 0 0' : 'xx-small xx-small xx-small 0'
+
+  const createdAtText = useMemo(() => {
+    // show basic date for replies
+    if (!props.isTopic) return props.createdAt
+    // show the original created date for teachers
+    if (isTeacher) {
+      return I18n.t('Created %{createdAt}', {createdAt: props.createdAt})
+    } else {
+      // don't show the created date for students if the post is delayed
+      return props.delayedPostAt
+        ? null
+        : I18n.t('Posted %{createdAt}', {createdAt: props.createdAt})
+    }
+  }, [isTeacher, props.createdAt, props.delayedPostAt, props.isTopic])
+
+  const delayedPostText = useMemo(() => {
+    if (!props.isTopic) return null
+    // duplicate createdAt for teachers if the post is instant
+    if (isTeacher && !props.delayedPostAt && props.createdAt && props.published) {
+      return I18n.t('Posted %{delayedPostAt}', {delayedPostAt: props.createdAt})
+    } else if (props.delayedPostAt) {
+      // announcements are "published" always, so we need to compare dates
+      if (parse(props.delayedPostAt).isAfter(parse(Date.now())) && props.isAnnouncement) {
+        return null
+      }
+
+      return I18n.t('Posted %{delayedPostAt}', {delayedPostAt: props.delayedPostAt})
+    }
+  }, [
+    isTeacher,
+    props.createdAt,
+    props.delayedPostAt,
+    props.isAnnouncement,
+    props.isTopic,
+    props.published,
+  ])
+
   return (
     <Flex wrap="wrap">
-      {(!props.showCreatedAsTooltip || !editText) && (
+      {createdAtText && (
         <Flex.Item overflowX="hidden" padding={timestampsPadding}>
-          <Text size={props.timestampTextSize}>{props.timingDisplay}</Text>
+          <Text size={props.timestampTextSize}>{createdAtText}</Text>
         </Flex.Item>
       )}
-      {editText && props.showCreatedAsTooltip && (
-        <Flex.Item data-testid="created-tooltip" padding={timestampsPadding}>
-          <Tooltip
-            renderTip={I18n.t('Created %{timingDisplay}', {timingDisplay: props.timingDisplay})}
-          >
-            {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-            <span tabIndex="0">
-              <Text size={props.timestampTextSize}>{editText}</Text>
-            </span>
-          </Tooltip>
+      {delayedPostText && (
+        <Flex.Item overflowX="hidden" padding={timestampsPadding}>
+          {createdAtText && ' | '}
+          <Text size={props.timestampTextSize}>{delayedPostText}</Text>
         </Flex.Item>
       )}
-      {editText && !props.showCreatedAsTooltip && (
+      {editText && (
         <Flex.Item overflowX="hidden" padding={timestampsPadding}>
+          {' | '}
           <Text size={props.timestampTextSize}>{editText}</Text>
         </Flex.Item>
       )}
       {props.lastReplyAtDisplay && (
         <Flex.Item overflowX="hidden" padding="0 xx-small 0 0">
+          {' | '}
           <Text size={props.timestampTextSize}>
             {I18n.t('Last reply %{lastReplyAtDisplay}', {
               lastReplyAtDisplay: props.lastReplyAtDisplay,
@@ -327,12 +375,14 @@ Timestamps.propTypes = {
   author: User.shape,
   editor: User.shape,
   createdAt: PropTypes.string,
-  timingDisplay: PropTypes.string,
+  delayedPostAt: PropTypes.string,
   editedTimingDisplay: PropTypes.string,
   lastReplyAtDisplay: PropTypes.string,
-  showCreatedAsTooltip: PropTypes.bool,
   timestampTextSize: PropTypes.string,
   mobileOnly: PropTypes.bool,
+  isTopic: PropTypes.bool,
+  published: PropTypes.bool,
+  isAnnouncement: PropTypes.bool,
 }
 
 const NameLink = props => {

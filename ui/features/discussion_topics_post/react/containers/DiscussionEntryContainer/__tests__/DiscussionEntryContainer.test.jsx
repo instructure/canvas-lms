@@ -131,7 +131,7 @@ describe('DiscussionEntryContainer', () => {
 
     it('should render the created timestamp', () => {
       const container = setup(defaultProps())
-      expect(container.getByText('Jan 1 1:00pm')).toBeInTheDocument()
+      expect(container.getByText('Posted Jan 1 1:00pm')).toBeInTheDocument()
     })
 
     it('should render the edited timestamp', () => {

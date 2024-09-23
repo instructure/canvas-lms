@@ -80,6 +80,7 @@ export function DiscussionAvailabilityContainer({...props}) {
                   availableDate={props.delayedPostAt}
                   untilDate={props.lockAt}
                   anonymousState={props.anonymousState}
+                  showDateWithTime={true}
                 />
               ) : (
                 <>
