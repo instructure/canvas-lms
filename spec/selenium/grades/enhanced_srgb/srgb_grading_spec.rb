@@ -294,20 +294,27 @@ describe "Screenreader Gradebook grading" do
       @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: test_course, title: "Checkpointed Discussion")
       @checkpointed_assignment = @checkpointed_discussion.assignment
 
-      Checkpoints::DiscussionCheckpointCreatorService.call(
+      @reply_to_topic_checkpoint = Checkpoints::DiscussionCheckpointCreatorService.call(
         discussion_topic: @checkpointed_discussion,
         checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
         dates: [{ type: "everyone", due_at: 2.days.from_now }],
         points_possible: 5
       )
 
-      Checkpoints::DiscussionCheckpointCreatorService.call(
+      @reply_to_entry_checkpoint = Checkpoints::DiscussionCheckpointCreatorService.call(
         discussion_topic: @checkpointed_discussion,
         checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
         dates: [{ type: "everyone", due_at: 5.days.from_now }],
         points_possible: 15,
         replies_required: 3
       )
+    end
+
+    def change_checkpoints_grading_type(grading_type)
+      [@checkpointed_assignment, @reply_to_topic_checkpoint, @reply_to_entry_checkpoint].each do |a|
+        a.grading_type = grading_type
+        a.save!
+      end
     end
 
     it "excusing assignment excuses reply to topic checkpoint and thus, the parent" do
@@ -317,10 +324,73 @@ describe "Screenreader Gradebook grading" do
       EnhancedSRGB.excuse_checkbox.click
       wait_for_ajaximations
 
-      reply_to_topic_checkpoint = @checkpointed_assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
-
-      expect(reply_to_topic_checkpoint.submission_for_student(student).excused?).to be_truthy
+      expect(@reply_to_topic_checkpoint.submission_for_student(student).excused?).to be_truthy
       expect(@checkpointed_assignment.submission_for_student(student).excused?).to be_truthy
+    end
+
+    it "grading points possible checkpoints works as expected" do
+      login_to_srgb
+      EnhancedSRGB.select_assignment(@checkpointed_assignment)
+
+      EnhancedSRGB.enter_reply_to_topic_grade(3)
+      EnhancedSRGB.enter_reply_to_entry_grade(10)
+
+      expect(@reply_to_topic_checkpoint.submission_for_student(student).grade).to eq("3")
+      expect(@reply_to_entry_checkpoint.submission_for_student(student).grade).to eq("10")
+      expect(@checkpointed_assignment.submission_for_student(student).grade).to eq("13")
+    end
+
+    it "grading letter grade checkpoints works as expected" do
+      change_checkpoints_grading_type("letter_grade")
+      login_to_srgb
+
+      EnhancedSRGB.select_assignment(@checkpointed_assignment)
+
+      EnhancedSRGB.enter_reply_to_topic_grade("B")
+      EnhancedSRGB.enter_reply_to_entry_grade("A")
+
+      expect(@reply_to_topic_checkpoint.submission_for_student(student).grade).to eq("B")
+      expect(@reply_to_entry_checkpoint.submission_for_student(student).grade).to eq("A")
+      expect(@checkpointed_assignment.submission_for_student(student).grade).to eq("A")
+    end
+
+    it "grading percent checkpoints works as expected" do
+      change_checkpoints_grading_type("percent")
+      login_to_srgb
+
+      EnhancedSRGB.select_assignment(@checkpointed_assignment)
+
+      EnhancedSRGB.enter_reply_to_topic_grade("81%")
+      EnhancedSRGB.enter_reply_to_entry_grade("93%")
+
+      expect(@reply_to_topic_checkpoint.submission_for_student(student).grade).to eq("81%")
+      expect(@reply_to_entry_checkpoint.submission_for_student(student).grade).to eq("93%")
+      expect(@checkpointed_assignment.submission_for_student(student).grade).to eq("90%")
+    end
+
+    it "grading complete/incomplete checkpoints works as expected" do
+      change_checkpoints_grading_type("pass_fail")
+      login_to_srgb
+
+      EnhancedSRGB.select_assignment(@checkpointed_assignment)
+      click_option(EnhancedSRGB.pass_fail_reply_to_topic_grade_select, "Complete")
+      EnhancedSRGB.tab_out_of_input(EnhancedSRGB.pass_fail_reply_to_topic_grade_select)
+
+      expect(EnhancedSRGB.out_of_text_reply_to_topic).to include_text("5 out of 5")
+      expect(EnhancedSRGB.out_of_text_reply_to_entry).to include_text(" - out of 15")
+      expect(EnhancedSRGB.out_of_text).to include_text("5 out of 20")
+
+      EnhancedSRGB.select_assignment(@checkpointed_assignment)
+      click_option(EnhancedSRGB.pass_fail_reply_to_entry_grade_select, "Complete")
+      EnhancedSRGB.tab_out_of_input(EnhancedSRGB.pass_fail_reply_to_entry_grade_select)
+
+      expect(EnhancedSRGB.out_of_text_reply_to_topic).to include_text("5 out of 5")
+      expect(EnhancedSRGB.out_of_text_reply_to_entry).to include_text("15 out of 15")
+      expect(EnhancedSRGB.out_of_text).to include_text("20 out of 20")
+
+      expect(@reply_to_topic_checkpoint.submission_for_student(student).grade).to eq("complete")
+      expect(@reply_to_entry_checkpoint.submission_for_student(student).grade).to eq("complete")
+      expect(@checkpointed_assignment.submission_for_student(student).grade).to eq("complete")
     end
   end
 end

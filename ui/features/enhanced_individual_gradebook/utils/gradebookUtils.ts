@@ -226,6 +226,8 @@ export function computeAssignmentDetailText(
 }
 
 export function mapUnderscoreSubmission(submission: Submission): GradebookUserSubmissionDetails {
+  const parentSubmission = submission
+
   return {
     assignmentId: submission.assignment_id,
     enteredScore: submission.entered_score,
@@ -244,6 +246,20 @@ export function mapUnderscoreSubmission(submission: Submission): GradebookUserSu
     deductedPoints: submission.points_deducted,
     enteredGrade: submission.entered_grade,
     gradeMatchesCurrentSubmission: submission.grade_matches_current_submission,
+    subAssignmentSubmissions: submission.sub_assignment_submissions
+      ? submission.sub_assignment_submissions.map(subAssignmentSubmission => ({
+          assignmentId: parentSubmission.assignment_id, // This is in purpose, we don't leak the sub assignment id.
+          grade: subAssignmentSubmission.grade,
+          gradeMatchesCurrentSubmission: subAssignmentSubmission.grade_matches_current_submission,
+          score: subAssignmentSubmission.score,
+          subAssignmentTag: subAssignmentSubmission.sub_assignment_tag,
+          publishedGrade: subAssignmentSubmission.published_grade,
+          publishedScore: subAssignmentSubmission.published_score,
+          enteredGrade: subAssignmentSubmission.entered_grade,
+          enteredScore: subAssignmentSubmission.entered_score,
+          excused: subAssignmentSubmission.excused,
+        }))
+      : undefined,
   }
 }
 

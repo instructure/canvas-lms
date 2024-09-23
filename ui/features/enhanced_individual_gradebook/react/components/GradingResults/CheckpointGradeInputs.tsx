@@ -25,6 +25,7 @@ import {
 import {Flex} from '@instructure/ui-flex'
 import DefaultGradeInput from './DefaultGradeInput'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {REPLY_TO_ENTRY, REPLY_TO_TOPIC} from './index'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -39,6 +40,17 @@ type Props = {
   replyToEntryGradeInput: string
   submitScoreStatus: ApiCallStatus
   gradingStandardPointsBased: boolean
+  handleSetReplyToTopicGradeInput: (grade: string) => void
+  handleSetReplyToEntryGradeInput: (grade: string) => void
+  handleSubmitGrade?: (subAssignmentTag: string) => void
+  handleChangeReplyToTopicPassFailStatus: (
+    e: React.SyntheticEvent<Element, Event>,
+    data: {value?: string | number}
+  ) => void
+  handleChangeReplyToEntryPassFailStatus: (
+    e: React.SyntheticEvent<Element, Event>,
+    data: {value?: string | number}
+  ) => void
 }
 
 const findCheckpoint = (assignment: AssignmentConnection, tag: string) => {
@@ -60,6 +72,25 @@ const buildCheckpointAssignment = (
   }
 }
 
+const findSubAssignmentSubmission = (submission: GradebookUserSubmissionDetails, tag: string) => {
+  return (
+    submission.subAssignmentSubmissions &&
+    submission.subAssignmentSubmissions.find(({subAssignmentTag}) => subAssignmentTag === tag)
+  )
+}
+
+const buildSubAssignmentSubmission = (
+  submission: GradebookUserSubmissionDetails,
+  tag: string
+): GradebookUserSubmissionDetails => {
+  const subAssignmentSubmission = findSubAssignmentSubmission(submission, tag)
+  return {
+    ...submission,
+    subAssignmentSubmissions: undefined,
+    enteredScore: subAssignmentSubmission?.enteredScore || null,
+  }
+}
+
 export const CheckpointGradeInputs = ({
   parentAssignment,
   parentSubmission,
@@ -71,9 +102,14 @@ export const CheckpointGradeInputs = ({
   replyToEntryGradeInput,
   submitScoreStatus,
   gradingStandardPointsBased,
+  handleSetReplyToTopicGradeInput,
+  handleSetReplyToEntryGradeInput,
+  handleSubmitGrade,
+  handleChangeReplyToTopicPassFailStatus,
+  handleChangeReplyToEntryPassFailStatus,
 }: Props) => {
-  const replyToTopicAssignment = buildCheckpointAssignment(parentAssignment, 'reply_to_topic')
-  const replyToEntryAssignment = buildCheckpointAssignment(parentAssignment, 'reply_to_entry')
+  const replyToTopicAssignment = buildCheckpointAssignment(parentAssignment, REPLY_TO_TOPIC)
+  const replyToEntryAssignment = buildCheckpointAssignment(parentAssignment, REPLY_TO_ENTRY)
 
   return (
     <>
@@ -81,14 +117,18 @@ export const CheckpointGradeInputs = ({
         <Flex.Item shouldGrow={true}>
           <DefaultGradeInput
             assignment={replyToTopicAssignment}
-            submission={parentSubmission}
+            submission={buildSubAssignmentSubmission(parentSubmission, REPLY_TO_TOPIC)}
             passFailStatusIndex={replyToTopicPassFailStatusIndex}
             gradeInput={replyToTopicGradeInput}
             submitScoreStatus={submitScoreStatus}
             context="student_and_reply_to_topic_assignment_grade"
-            handleSetGradeInput={() => {}}
-            handleSubmitGrade={() => {}}
-            handleChangePassFailStatus={() => {}}
+            handleSetGradeInput={handleSetReplyToTopicGradeInput}
+            handleSubmitGrade={() => {
+              if (handleSubmitGrade) {
+                handleSubmitGrade(REPLY_TO_TOPIC)
+              }
+            }}
+            handleChangePassFailStatus={handleChangeReplyToTopicPassFailStatus}
             gradingStandardPointsBased={gradingStandardPointsBased}
             header={I18n.t('Reply to Topic')}
             shouldShowOutOfText={false}
@@ -97,14 +137,18 @@ export const CheckpointGradeInputs = ({
         <Flex.Item shouldGrow={true}>
           <DefaultGradeInput
             assignment={replyToEntryAssignment}
-            submission={parentSubmission}
+            submission={buildSubAssignmentSubmission(parentSubmission, REPLY_TO_ENTRY)}
             passFailStatusIndex={replyToEntryPassFailStatusIndex}
             gradeInput={replyToEntryGradeInput}
             submitScoreStatus={submitScoreStatus}
             context="student_and_reply_to_entry_assignment_grade"
-            handleSetGradeInput={() => {}}
-            handleSubmitGrade={() => {}}
-            handleChangePassFailStatus={() => {}}
+            handleSetGradeInput={handleSetReplyToEntryGradeInput}
+            handleSubmitGrade={() => {
+              if (handleSubmitGrade) {
+                handleSubmitGrade(REPLY_TO_ENTRY)
+              }
+            }}
+            handleChangePassFailStatus={handleChangeReplyToEntryPassFailStatus}
             gradingStandardPointsBased={gradingStandardPointsBased}
             header={I18n.t('Required Replies')}
             shouldShowOutOfText={false}

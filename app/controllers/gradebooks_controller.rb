@@ -596,7 +596,7 @@ class GradebooksController < ApplicationController
     gradebook_options = {
       active_grading_periods: active_grading_periods_json,
       attachment_url: authenticated_download_url(last_exported_attachment),
-      change_grade_url: api_v1_course_assignment_submission_url(@context, ":assignment", ":submission", include: [:visibility]),
+      change_grade_url: api_v1_course_assignment_submission_url(@context, ":assignment", ":submission", include: [:visibility, :sub_assignment_submissions]),
       course_settings: {
         allow_final_grade_override: @context.allow_final_grade_override?,
         filter_speed_grader_by_student_group: @context.filter_speed_grader_by_student_group?

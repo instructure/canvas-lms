@@ -104,7 +104,7 @@ export default function DefaultGradeInput({
   const renderSubHeader = () => {
     return (
       header && (
-        <Text size="x-small" weight="normal">
+        <Text size="x-small" weight="normal" data-testid={`${context}_out_of_text`}>
           {outOfTextValue}
         </Text>
       )

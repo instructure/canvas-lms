@@ -87,6 +87,9 @@ export const GRADEBOOK_QUERY = gql`
             assignmentId
             gradeMatchesCurrentSubmission
             subAssignmentTag
+            enteredGrade
+            enteredScore
+            excused
           }
         }
       }
@@ -203,6 +206,9 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
             assignmentId
             gradeMatchesCurrentSubmission
             subAssignmentTag
+            enteredGrade
+            enteredScore
+            excused
           }
         }
       }
