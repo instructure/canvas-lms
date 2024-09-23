@@ -3787,6 +3787,7 @@ uk:
   canvas_introduction_video_2d81f3ad: "вступне відео до Canvas "
   canvas_lms_6ce68514: "Canvas LMS"
   canvas_login_failure_message_4c922f2f: "Повідомлення   про помилку входу Canvas"
+  canvas_login_instructure_271b8d00: "Увійти до Canvas"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "Запасні коди багатофакторної аутентифікації Canvas"
   canvas_observer_id_59db0918: canvas_observer_id
   canvas_parent_improved_description: "Це налаштування контролює чи можуть батьки, які створюють власні облікові записи Canvas Parent, зв'язуватися зі студентами з Вашої установи використовуючи мобільний застосунок Canvas Parent. Зауваження: Батьки, зареєстровані як Спостерігачі Canvas можуть використовувати мобільний застосунок Canvas Parent навіть, коли цю властивість не активовано."
@@ -9560,6 +9561,7 @@ uk:
   login_footer_link_hover_1b474e6c: "Посилання для входу у нижньому колонтитулі при наведенні курсору"
   login_id_12109693: "Ідентифікатор облікового запису"
   login_id_bc943b97: "Ідентифікатор входу:"
+  login_ids_b394c2a3: "Ідентифікатор входу"
   login_info_d1d9f11e: "Інформація для входу"
   login_instructure_logo_8f2332db: "Логотип входу"
   login_is_invalid_must_be_alphanumeric_or_an_email__ae4499b3: "Ім'я користувача недійсне: має бути послідовність з літер та цифр або адреса електронної пошти"
