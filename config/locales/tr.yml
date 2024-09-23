@@ -4340,6 +4340,7 @@ tr:
   canvas_introduction_video_2d81f3ad: "Canvas Tanıtım Videosu"
   canvas_lms_6ce68514: "Canvas LMS"
   canvas_login_failure_message_4c922f2f: "Canvas oturum açma hata mesajı"
+  canvas_login_instructure_271b8d00: "Canvas'ta Oturum Aç"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "Canvas Çoklu Kimlik Doğrulama Yedek Kodları"
   canvas_observer_id_59db0918: canvas_observer_id
   canvas_parent_improved_description: "Bu ayar, Canvas Veli hesaplarını oluşturmuş velilerin Canvas Veli mobil uygulamasını kullanarak kurumunuzdaki öğrencilere bağlanıp bağlanamayacağını kontrol eders. Not: Canvas Gözlemcisi olarak kaydolmuş Veliler bu özellik devre dışı olsa bile Canvas Veli mobil uygulamasını kullanabilir."
@@ -10950,6 +10951,7 @@ tr:
   login_button_text_c958250f: "Oturum Açma Buton Metni"
   login_footer_link_badb3898: "Oturum Açma Alt Bilgi Bağlantısı"
   login_footer_link_hover_1b474e6c: "Oturum Açma Bağlantı Üstüne Gelince"
+  login_ids_b394c2a3: "Oturum Açma IDleri"
   login_instructure_logo_8f2332db: "Oturum Açma Instructure Logosu"
   login_is_invalid_must_be_alphanumeric_or_an_email__ae4499b3: "Kullanıcı adı geçersiz: Alfa-sayısal karaktere ya da bir eposta adresi girmelisiniz."
   login_is_too_long_25373f95: "Kullanıcı adı çok uzun"
