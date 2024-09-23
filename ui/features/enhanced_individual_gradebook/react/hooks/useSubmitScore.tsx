@@ -55,7 +55,8 @@ export const useSubmitScore = () => {
       assignment: AssignmentConnection,
       submission: GradebookUserSubmissionDetails,
       gradeInput: string,
-      submitScoreUrl?: string | null
+      submitScoreUrl?: string | null,
+      subAssignmentTag?: string | null
     ) => {
       if (!submitScoreUrl) {
         setSubmitScoreError(I18n.t('Unable to submit score'))
@@ -96,6 +97,10 @@ export const useSubmitScore = () => {
         requestBody.submission.excuse = true
       } else {
         requestBody.submission.posted_grade = delocalizedGrade
+      }
+
+      if (subAssignmentTag) {
+        requestBody.sub_assignment_tag = subAssignmentTag
       }
 
       try {
