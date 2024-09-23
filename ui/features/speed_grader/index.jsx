@@ -23,7 +23,7 @@ import {captureException} from '@sentry/browser'
 import {Spinner} from '@instructure/ui-spinner'
 import ready from '@instructure/ready'
 
-import {getAssignment} from './queries/assignmentQuery'
+import {getAssignment} from './queries/getAssignment'
 import {getCourse} from './queries/getCourse'
 import {getSectionsByAssignment} from './queries/sectionsByAssignmentQuery'
 import {getSubmission} from './queries/submissionQuery'
