@@ -319,7 +319,9 @@ class DiscussionTopicsController < ApplicationController
     # Specify the shard context, because downstream we use `union` which isn't
     # cross-shard compatible.
     @context.shard.activate do
-      scope = DiscussionTopic::ScopedToUser.new(@context, @current_user, scope).scope
+      unless params[:only_announcements]
+        scope = DiscussionTopic::ScopedToUser.new(@context, @current_user, scope).scope
+      end
       # see context for this separation in ScopedToSections
       scope = DiscussionTopic::ScopedToSections.for(self, @context, @current_user, scope).scope
     end

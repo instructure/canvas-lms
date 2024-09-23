@@ -615,8 +615,7 @@ class ContentTag < ActiveRecord::Base
       for_non_differentiable_discussions(course_ids)
         .merge(DiscussionTopic.visible_to_ungraded_discussion_student_visibilities(user_ids)),
       for_differentiable_assignments(user_ids, course_ids),
-      for_differentiable_discussions(user_ids, course_ids)
-        .merge(DiscussionTopic.visible_to_ungraded_discussion_student_visibilities(user_ids)),
+      for_differentiable_discussions(user_ids, course_ids),
       for_differentiable_quizzes(user_ids, course_ids)
     )
   }
