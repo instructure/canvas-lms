@@ -948,4 +948,25 @@ describe "gradebooks/grade_summary" do
       end
     end
   end
+
+  context "discussion checkpoints" do
+    before do
+      course_with_student(active_all: true)
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+    end
+
+    it "sub assignments are shown" do
+      view_context(@course, @student)
+      assign(:presenter, GradeSummaryPresenter.new(@course, @student, nil))
+
+      render "gradebooks/grade_summary"
+
+      expect(response).to have_tag("tr.has_sub_assignments")
+      expect(response).to have_tag("button#parent_assignment_id_#{@reply_to_topic.parent_assignment.id}")
+      expect(response).to have_tag("tr.parent_assignment_id_#{@reply_to_topic.parent_assignment.id}")
+      expect(response).to have_tag("tr#sub_assignment_#{@reply_to_topic.id}")
+      expect(response).to have_tag("tr#sub_assignment_#{@reply_to_entry.id}")
+    end
+  end
 end
