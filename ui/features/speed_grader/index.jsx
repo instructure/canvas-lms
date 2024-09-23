@@ -24,7 +24,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import ready from '@instructure/ready'
 
 import {getAssignment} from './queries/assignmentQuery'
-import {getCourse} from './queries/courseQuery'
+import {getCourse} from './queries/getCourse'
 import {getSectionsByAssignment} from './queries/sectionsByAssignmentQuery'
 import {getSubmission} from './queries/submissionQuery'
 import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery'

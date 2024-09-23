@@ -18,9 +18,35 @@
 
 import {z} from 'zod'
 import {executeQuery} from '@canvas/query/graphql'
-import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 import gql from 'graphql-tag'
-import {omit} from 'lodash'
+
+type Result = {
+  course: {
+    customGradeStatusesConnection: {
+      nodes: {
+        id: string
+        name: string
+      }[]
+    }
+    gradingPeriodsConnection: {
+      nodes: {
+        id: string
+        isClosed: boolean
+      }[]
+    }
+    outcomeProficiency: {
+      proficiencyRatingsConnection: {
+        nodes: {
+          points: number
+          mastery: boolean
+          description: string
+          color: string
+          id: string
+        }[]
+      }
+    }
+  }
+}
 
 const QUERY = gql`
   query SpeedGrader_CourseData($courseId: ID!) {
@@ -52,70 +78,17 @@ const QUERY = gql`
   }
 `
 
-const defaultStandardStatusesMap: Record<string, Pick<GradeStatus, 'id' | 'name'>> = {
-  late: {
-    id: '-1',
-    name: 'Late',
-  },
-  missing: {
-    id: '-2',
-    name: 'Missing',
-  },
-  excused: {
-    id: '-5',
-    name: 'Excused',
-  },
-  extended: {
-    id: '-6',
-    name: 'Extended',
-  },
-  none: {
-    id: '-7',
-    name: 'None',
-  },
-}
-
-function transform(result: any) {
-  const customGradeStatuses = result.course.customGradeStatusesConnection.nodes.map(
-    (status: any) => {
-      return omit(status, ['__typename'])
-    }
-  )
-
-  const gradingPeriods = result.course.gradingPeriodsConnection.nodes.reduce(
-    (acc: any, period: any) => {
-      acc[period.id] = period
-      return acc
-    },
-    {}
-  )
-
-  const proficiencyRatings = result.course.outcomeProficiency?.proficiencyRatingsConnection.nodes
-
-  return {
-    gradeStatuses: [...Object.values(defaultStandardStatusesMap), ...customGradeStatuses],
-    gradingPeriods,
-    proficiencyRatings,
-  }
-}
-
 export const ZParams = z.object({
   courseId: z.string().min(1),
 })
 
 type Params = z.infer<typeof ZParams>
 
-export async function getCourse<T extends Params>({
-  queryKey,
-}: {
-  queryKey: [string, T]
-}): Promise<any> {
+export function getCourse<T extends Params>({queryKey}: {queryKey: [string, T]}) {
   ZParams.parse(queryKey[1])
   const {courseId} = queryKey[1]
 
-  const result = await executeQuery<any>(QUERY, {
+  return executeQuery<Result>(QUERY, {
     courseId,
   })
-
-  return transform(result)
 }
