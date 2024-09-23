@@ -3782,6 +3782,9 @@ nn:
   assign_module_to_individuals_or_sections_bd638c03: "Tildel modul til enkeltpersonar eller seksjonar."
   assign_reviews_on_date_7e48ec50: "Tilordne gjennomgangar etter dato"
   assign_temporary_enrollments_bdaaa58a: "Tildel midlertidige påmeldingar"
+  assign_temporary_enrollments_to_count_users_5da4f30d: 
+    one: "Tildel midlertidige påmeldingar til %{recipient}"
+    zero: "Tildel midlertidige påmeldingar til %{recipient}"
   assign_temporary_enrollments_to_recipient_b25cb6be: "Tildel midlertidige påmeldingar til %{recipient}"
   assign_this_assignment_ac3ca379: "Tildel denne oppgåva"
   assign_this_module_a4685e57: "Tildel denne modulen"
@@ -5873,6 +5876,7 @@ nn:
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas er ikkje sett opp til å ta imot innloggingar frå %{issuer}."
   canvas_lms_6ce68514: "Canvas læringsplattform (LMS)"
   canvas_login_failure_message_4c922f2f: "Feilmelding frå Canvas-pålogging"
+  canvas_login_instructure_271b8d00: "Logg på Canvas"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "Backup-kodar for fleirfaktorautentisering"
   canvas_needs_acccess_to_your_camera_16db6502: "Canvas treng tilgang til kameraet ditt. "
   canvas_needs_access_to_your_camera_b5418c0: "Canvas treng tilgang til kameraet ditt. "
@@ -15244,6 +15248,7 @@ nn:
   login_help_for_canvas_5571f9b1: "Innloggingshjelp for %{canvas}"
   login_id_12109693: Påloggings-ID
   login_id_bc943b97: "Påloggings-ID:"
+  login_ids_b394c2a3: Påloggings-ID-ar
   login_ids_required_ff2273ab: "Login-ID (obligatorisk)"
   login_info_d1d9f11e: Påloggingsinformasjon
   login_instructure_logo_8f2332db: "Pålogging Instructure-logo"
