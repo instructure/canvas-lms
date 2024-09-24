@@ -5883,7 +5883,7 @@ describe Assignment do
       expect(@a.quiz.reload).not_to be_published
     end
 
-    context "#quiz?" do
+    describe "#quiz?" do
       it "knows that it is a quiz" do
         @a.reload
         expect(@a.quiz?).to be true

@@ -837,7 +837,7 @@ describe Api do
     end
   end
 
-  context ".api_user_content" do
+  describe ".api_user_content" do
     let(:klass) do
       Class.new do
         include Api
@@ -941,7 +941,7 @@ describe Api do
     end
   end
 
-  context ".process_incoming_html_content" do
+  describe ".process_incoming_html_content" do
     let(:klass) do
       Class.new do
         extend Api
@@ -996,7 +996,7 @@ describe Api do
     end
   end
 
-  context ".paginate" do
+  describe ".paginate" do
     let(:request) { double("request", query_parameters: {}) }
     let(:response) { double("response", headers: {}) }
     let(:controller) { double("controller", request:, response:, params: {}) }
@@ -1075,7 +1075,7 @@ describe Api do
     end
   end
 
-  context ".jsonapi_paginate" do
+  describe ".jsonapi_paginate" do
     let(:request) { double("request", query_parameters: {}) }
     let(:response) { double("response", headers: {}) }
     let(:controller) { double("controller", request:, response:, params: {}) }
@@ -1101,7 +1101,7 @@ describe Api do
     end
   end
 
-  context ".build_links" do
+  describe ".build_links" do
     it "does not build links if not pagination is provided" do
       expect(Api.build_links("www.example.com")).to be_empty
     end

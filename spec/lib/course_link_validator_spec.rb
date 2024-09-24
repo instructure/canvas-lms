@@ -409,7 +409,7 @@ describe CourseLinkValidator do
     expect(issues).to be_empty
   end
 
-  context "#check_object_status" do
+  describe "#check_object_status" do
     before :once do
       course_model
       @course_link_validator = CourseLinkValidator.new(@course)

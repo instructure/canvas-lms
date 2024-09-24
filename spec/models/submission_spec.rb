@@ -1969,7 +1969,7 @@ describe Submission do
     end
   end
 
-  context "#graded_anonymously" do
+  describe "#graded_anonymously" do
     it "saves when grade changed and set explicitly" do
       submission_spec_model
       expect(@submission.graded_anonymously).to be_falsey

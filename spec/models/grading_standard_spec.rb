@@ -177,7 +177,7 @@ describe GradingStandard do
     end
   end
 
-  context "#for" do
+  describe "#for" do
     it "returns standards that match the context" do
       grading_standard_for @course
 

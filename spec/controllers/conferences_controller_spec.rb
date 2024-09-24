@@ -621,7 +621,7 @@ describe ConferencesController do
       end
     end
 
-    context "#index" do
+    describe "#index" do
       it "lists include LTI conference types" do
         user_session(@teacher)
         get "index", params: { course_id: @course.id }
@@ -631,7 +631,7 @@ describe ConferencesController do
       end
     end
 
-    context "#create" do
+    describe "#create" do
       it "can create LTI conferences" do
         user_session(@teacher)
         post "create",

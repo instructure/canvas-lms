@@ -2032,7 +2032,7 @@ describe Attachment do
     end
   end
 
-  context "#change_namespace and #make_childless" do
+  describe "#change_namespace and #make_childless" do
     before :once do
       @old_account = account_model
       @new_account = account_model
@@ -2532,7 +2532,7 @@ describe Attachment do
     end
   end
 
-  context "#open" do
+  describe "#open" do
     include WebMock::API
 
     context "instfs branch" do
@@ -2682,7 +2682,7 @@ describe Attachment do
     end
   end
 
-  context "#process_s3_details!" do
+  describe "#process_s3_details!" do
     before :once do
       attachment_model(filename: "new filename")
     end

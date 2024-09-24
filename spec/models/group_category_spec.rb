@@ -270,7 +270,7 @@ describe GroupCategory do
     end
   end
 
-  context "#distribute_members_among_groups" do
+  describe "#distribute_members_among_groups" do
     it "prefers groups with fewer users" do
       category = @course.group_categories.create(name: "Group Category")
       group1 = category.groups.create(name: "Group 1", context: @course)
@@ -320,7 +320,7 @@ describe GroupCategory do
     end
   end
 
-  context "#assign_unassigned_members_in_background" do
+  describe "#assign_unassigned_members_in_background" do
     it "uses the progress object" do
       category = @course.group_categories.create(name: "Group Category")
       category.groups.create(name: "Group 1", context: @course)
@@ -337,7 +337,7 @@ describe GroupCategory do
     end
   end
 
-  context "#assign_unassigned_members" do
+  describe "#assign_unassigned_members" do
     before(:once) do
       @category = @course.group_categories.create(name: "Group Category")
     end
@@ -460,7 +460,7 @@ describe GroupCategory do
     end
   end
 
-  context "#calculate_group_count_by_membership" do
+  describe "#calculate_group_count_by_membership" do
     before(:once) do
       @category = @course.group_categories.create(name: "Group Category")
     end
@@ -495,7 +495,7 @@ describe GroupCategory do
     end
   end
 
-  context "#current_progress" do
+  describe "#current_progress" do
     it "returns a new progress if the other progresses are completed" do
       category = @course.group_categories.create!(name: "Group Category")
       # given existing completed progress
@@ -511,7 +511,7 @@ describe GroupCategory do
     end
   end
 
-  context "#clone_groups_and_memberships" do
+  describe "#clone_groups_and_memberships" do
     it "does not duplicate wiki ids" do
       category = @course.group_categories.create!(name: "Group Category")
       group = category.groups.create!(name: "Group 1", context: @course)

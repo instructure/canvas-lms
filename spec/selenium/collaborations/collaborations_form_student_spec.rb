@@ -66,7 +66,7 @@ describe "collaborations" do
         deselect_collaborators(type)
       end
 
-      context "#add_collaboration fragment" do
+      describe "#add_collaboration fragment" do
         it "displays the new collaboration form if no collaborations exist", priority: "2" do
           display_new_form_if_none_exist(type)
         end

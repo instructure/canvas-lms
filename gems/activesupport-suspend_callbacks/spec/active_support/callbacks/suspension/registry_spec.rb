@@ -22,7 +22,7 @@ require "spec_helper"
 
 module ActiveSupport::Callbacks::Suspension
   describe Registry do
-    context "#any_registered?" do
+    describe "#any_registered?" do
       it "is false when nothing has been registered" do
         expect(Registry.new.any_registered?(:find)).to be false
       end

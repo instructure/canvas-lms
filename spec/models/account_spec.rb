@@ -2162,7 +2162,7 @@ describe Account do
     end
   end
 
-  context "#destroy on sub accounts" do
+  describe "#destroy on sub accounts" do
     before :once do
       @root_account = Account.create!
       @sub_account = @root_account.sub_accounts.create!
@@ -2282,7 +2282,7 @@ describe Account do
     end
   end
 
-  context "#roles_with_enabled_permission" do
+  describe "#roles_with_enabled_permission" do
     def create_role_override(permission, role, context, enabled = true)
       RoleOverride.create!(
         context:,

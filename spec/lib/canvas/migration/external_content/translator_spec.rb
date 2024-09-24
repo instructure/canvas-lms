@@ -20,7 +20,7 @@
 require_relative "../../../../spec_helper"
 
 describe Canvas::Migration::ExternalContent::Translator do
-  context "#translate_data" do
+  describe "#translate_data" do
     before :once do
       @copy_from = course_model
       @quiz = @copy_from.quizzes.create!
@@ -58,7 +58,7 @@ describe Canvas::Migration::ExternalContent::Translator do
     end
   end
 
-  context "#get_canvas_id_from_migration_id" do
+  describe "#get_canvas_id_from_migration_id" do
     before :once do
       course_model
       @cm = @course.content_migrations.create!
@@ -93,7 +93,7 @@ describe Canvas::Migration::ExternalContent::Translator do
     end
   end
 
-  context "#get_migration_id_from_canvas_id" do
+  describe "#get_migration_id_from_canvas_id" do
     before :once do
       course_model
       template = MasterCourses::MasterTemplate.create!(course: @course)

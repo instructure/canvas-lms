@@ -27,7 +27,7 @@ describe FileInContext do
     @course.reload
   end
 
-  context "#attach" do
+  describe "#attach" do
     it "creates files with the supplied filename escaped for s3" do
       s3_storage!
 

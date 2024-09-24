@@ -698,7 +698,7 @@ describe AssignmentGroupsApiController, type: :request do
     @course.assignment_groups.create!(name: "group", rules: rules_in_db)
   end
 
-  context "#show" do
+  describe "#show" do
     before :once do
       course_with_teacher(active_all: true)
       rules_in_db = "drop_lowest:1\ndrop_highest:1\nnever_drop:1\nnever_drop:2\n"
@@ -873,7 +873,7 @@ describe AssignmentGroupsApiController, type: :request do
     end
   end
 
-  context "#create" do
+  describe "#create" do
     before do
       course_with_teacher(active_all: true)
     end
@@ -927,7 +927,7 @@ describe AssignmentGroupsApiController, type: :request do
     end
   end
 
-  context "#update" do
+  describe "#update" do
     let(:assignment_group) do
       @course.assignment_groups.create!(params)
     end
@@ -1150,7 +1150,7 @@ describe AssignmentGroupsApiController, type: :request do
     end
   end
 
-  context "#destroy" do
+  describe "#destroy" do
     before :once do
       course_with_teacher(active_all: true)
       @assignment_group = @course.assignment_groups.create!(name: "Some group", position: 1)

@@ -222,7 +222,7 @@ describe AssignmentOverride do
     end
   end
 
-  context "#mastery_paths?" do
+  describe "#mastery_paths?" do
     let(:override) do
       described_class.new({
                             set_type: AssignmentOverride::SET_TYPE_NOOP,

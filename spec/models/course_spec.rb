@@ -6629,7 +6629,7 @@ describe Course do
     end
   end
 
-  context "#unpublishable?" do
+  describe "#unpublishable?" do
     it "is not unpublishable if there are active graded submissions" do
       course_with_teacher(active_all: true)
       @student = student_in_course(active_user: true).user

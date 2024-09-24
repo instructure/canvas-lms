@@ -309,9 +309,6 @@ RSpec/Be:
   Severity: convention
 RSpec/BeforeAfterAll:
   Severity: convention
-RSpec/ContextMethod:
-  Severity: convention
-  AutoCorrect: false
 RSpec/ContextWording:
   Enabled: false
 RSpec/DescribeClass:

@@ -26,7 +26,7 @@ end
 describe Api::V1::SisAssignment do
   subject(:generator) { SisAssignmentHarness.new }
 
-  context "#sis_assignments_json" do
+  describe "#sis_assignments_json" do
     let(:course_1) { course_factory }
     let(:assignment_1) { assignment_model(course: course_factory) }
 

@@ -124,7 +124,7 @@ describe AuditLogFieldExtension::Logger do
                                                          })
   end
 
-  context "#log_entry_ids" do
+  describe "#log_entry_ids" do
     before do
       unless AuditLogFieldExtension.enabled?
         skip("AuditLog needs to be enabled by configuring dynamodb.yml")

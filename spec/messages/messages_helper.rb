@@ -44,7 +44,7 @@ shared_examples_for "a message" do
     end
   end
 
-  context ".email" do
+  describe ".email" do
     let(:path_type) { :email }
 
     it "renders" do
@@ -52,7 +52,7 @@ shared_examples_for "a message" do
     end
   end
 
-  context ".sms" do
+  describe ".sms" do
     let(:path_type) { :sms }
 
     it "renders" do
@@ -60,7 +60,7 @@ shared_examples_for "a message" do
     end
   end
 
-  context ".summary" do
+  describe ".summary" do
     let(:path_type) { :summary }
 
     it "renders" do
@@ -68,7 +68,7 @@ shared_examples_for "a message" do
     end
   end
 
-  context ".twitter" do
+  describe ".twitter" do
     let(:path_type) { :twitter }
 
     it "renders" do
@@ -76,7 +76,7 @@ shared_examples_for "a message" do
     end
   end
 
-  context ".push" do
+  describe ".push" do
     let(:path_type) { :push }
 
     it "renders" do
