@@ -86,8 +86,12 @@ class Login::SamlController < ApplicationController
     end
 
     assertion = response.assertions.first
-    # yes, they could be _that_ busted that we put a dangling rescue here.
-    provider_attributes = assertion&.attribute_statements&.first.to_h rescue {}
+    begin
+      provider_attributes = assertion&.attribute_statements&.first.to_h
+    rescue
+      # yes, they could be _that_ busted that we put an unconditional rescue here.
+      {}
+    end
     subject_name_id = assertion&.subject&.name_id
     unique_id = if aac.login_attribute == "NameID"
                   subject_name_id&.id
@@ -153,26 +157,32 @@ class Login::SamlController < ApplicationController
       session[:session_index] = assertion.authn_statements.first&.session_index
       session[:login_aac] = aac.id
 
-      if relay_state.present? &&
-         (uri = URI.parse(relay_state) rescue nil) &&
-         uri.path &&
-         (!uri.scheme || request.scheme == uri.scheme || uri.scheme == "https")
-        if uri.host
-          # allow relay_state's to other (trusted) domains, by tacking on a session token
-          target_account = Account.find_by_domain(uri.host)
-          if target_account &&
-             target_account != @domain_root_account &&
-             pseudonym.works_for_account?(target_account, true)
-            token = SessionToken.new(pseudonym.global_id,
-                                     current_user_id: pseudonym.global_user_id).to_s
-            uri.query&.concat("&")
-            uri.query ||= ""
-            uri.query.concat("session_token=#{token}")
-            session[:return_to] = uri.to_s
+      if relay_state.present?
+        begin
+          uri = URI.parse(relay_state)
+        rescue URI::InvalidURIError
+          # ignore
+        end
+
+        if uri&.path &&
+           (!uri.scheme || request.scheme == uri.scheme || uri.scheme == "https")
+          if uri.host
+            # allow relay_state's to other (trusted) domains, by tacking on a session token
+            target_account = Account.find_by_domain(uri.host)
+            if target_account &&
+               target_account != @domain_root_account &&
+               pseudonym.works_for_account?(target_account, true)
+              token = SessionToken.new(pseudonym.global_id,
+                                       current_user_id: pseudonym.global_user_id).to_s
+              uri.query&.concat("&")
+              uri.query ||= ""
+              uri.query.concat("session_token=#{token}")
+              session[:return_to] = uri.to_s
+            end
+          elsif uri.path[0] == "/"
+            # otherwise, absolute paths on the same domain are okay
+            session[:return_to] = relay_state
           end
-        elsif uri.path[0] == "/"
-          # otherwise, absolute paths on the same domain are okay
-          session[:return_to] = relay_state
         end
       end
       pseudonym.infer_auth_provider(aac)

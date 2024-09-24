@@ -39,7 +39,7 @@ class DiscussionEntriesController < ApplicationController
 
   def create
     @topic = @context.discussion_topics.active.find(params[:discussion_entry].delete(:discussion_topic_id))
-    params[:discussion_entry].delete :remove_attachment rescue nil
+    params[:discussion_entry].delete(:remove_attachment)
     parent_id = params[:discussion_entry].delete(:parent_id)
 
     entry_params = params.require(:discussion_entry).permit(:message, :plaintext_message)

@@ -964,7 +964,7 @@ class CoursesController < ApplicationController
         if @course.save
           Auditors::Course.record_created(@course, @current_user, changes, source: (api_request? ? :api : :manual))
           @course.enroll_user(@current_user, "TeacherEnrollment", enrollment_state: "active") if params[:enroll_me].to_s == "true"
-          @course.require_assignment_group rescue nil
+          @course.require_assignment_group
           # offer updates the workflow state, saving the record without doing validation callbacks
           if api_request? && value_to_boolean(params[:offer])
             return unless verified_user_check
@@ -2785,8 +2785,13 @@ class CoursesController < ApplicationController
       args[:account] = account
       @course = @context.account.courses.new
       @course.attributes = args
-      @course.start_at = DateTime.parse(params[:course][:start_at]).utc rescue nil
-      @course.conclude_at = DateTime.parse(params[:course][:conclude_at]).utc rescue nil
+      %i[start_at conclude_at].each do |timestamp_field|
+        if (timestamp = params.dig(:course, timestamp_field))
+          @course[timestamp_field] = DateTime.parse(timestamp).utc
+        end
+      rescue Date::Error
+        # ignore
+      end
       @course.workflow_state = "claimed"
 
       Course.suspend_callbacks(:copy_from_course_template) do

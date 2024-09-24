@@ -160,9 +160,11 @@ class TermsController < ApplicationController
     hashes = [term_params]
     hashes += overrides.values if overrides
     invalid_dates = hashes.any? do |hash|
-      start_at = DateTime.parse(hash[:start_at]) rescue nil
-      end_at = DateTime.parse(hash[:end_at]) rescue nil
+      start_at = DateTime.parse(hash[:start_at]) if hash[:start_at]
+      end_at = DateTime.parse(hash[:end_at]) if hash[:end_at]
       start_at && end_at && end_at < start_at
+    rescue Date::Error
+      false
     end
     term.errors.add(:base, t("End dates cannot be before start dates")) if invalid_dates
     !invalid_dates

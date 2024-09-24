@@ -85,7 +85,7 @@ class RubricAssociationsController < ApplicationController
                            {}
                          end
 
-    @association = @context.rubric_associations.find(params[:id]) rescue nil
+    @association = @context.rubric_associations.find_by(id: params[:id])
     @association_object = RubricAssociation.get_association_object(params[:rubric_association])
     @association_object = nil unless @association_object && @association_object.try(:context) == @context
     rubric_id = association_params.delete(:rubric_id)
