@@ -49,10 +49,10 @@ class Course < ActiveRecord::Base
   belongs_to :abstract_course
   belongs_to :enrollment_term
   belongs_to :template_course, class_name: "Course"
-  has_many :templated_courses, class_name: "Course", foreign_key: "template_course_id"
-  has_many :templated_accounts, class_name: "Account", foreign_key: "course_template_id"
+  has_many :templated_courses, class_name: "Course", foreign_key: "template_course_id", inverse_of: :template_course
+  has_many :templated_accounts, class_name: "Account", foreign_key: "course_template_id", inverse_of: :course_template
 
-  belongs_to :linked_homeroom_course, class_name: "Course", foreign_key: "homeroom_course_id"
+  belongs_to :linked_homeroom_course, class_name: "Course", foreign_key: "homeroom_course_id", inverse_of: false
 
   has_many :course_sections, inverse_of: :course
   has_many :active_course_sections, -> { where(workflow_state: "active") }, class_name: "CourseSection", inverse_of: :course
@@ -78,7 +78,7 @@ class Course < ActiveRecord::Base
            source: :user
 
   has_many :student_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: "Enrollment"
-  has_many :student_enrollments_including_completed, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted', 'inactive') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: "Enrollment", inverse_of: :course
+  has_many :student_enrollments_including_completed, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted', 'inactive') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: "Enrollment"
   has_many :students, through: :student_enrollments, source: :user
   has_many :self_enrolled_students, -> { where("self_enrolled") }, through: :student_enrollments, source: :user
   has_many :admin_visible_student_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: "Enrollment"
@@ -220,7 +220,7 @@ class Course < ActiveRecord::Base
   has_many :alerts, -> { preload(:criteria) }, as: :context, inverse_of: :context
   has_many :appointment_group_contexts, as: :context, inverse_of: :context
   has_many :appointment_groups, through: :appointment_group_contexts
-  has_many :appointment_participants, -> { where("workflow_state = 'locked' AND parent_calendar_event_id IS NOT NULL") }, class_name: "CalendarEvent", foreign_key: :effective_context_code, primary_key: :asset_string
+  has_many :appointment_participants, -> { where("workflow_state = 'locked' AND parent_calendar_event_id IS NOT NULL") }, class_name: "CalendarEvent", foreign_key: :effective_context_code, primary_key: :asset_string, inverse_of: false
 
   has_many :content_participation_counts, as: :context, inverse_of: :context, dependent: :destroy
   has_many :poll_sessions, class_name: "Polling::PollSession", dependent: :destroy
@@ -238,7 +238,7 @@ class Course < ActiveRecord::Base
   # only valid if non-nil
   attr_accessor :is_master_course
 
-  has_many :master_course_subscriptions, class_name: "MasterCourses::ChildSubscription", foreign_key: "child_course_id"
+  has_many :master_course_subscriptions, class_name: "MasterCourses::ChildSubscription", foreign_key: "child_course_id", inverse_of: :child_course
   has_one :late_policy, dependent: :destroy, inverse_of: :course
   has_many :quiz_migration_alerts, dependent: :destroy
   has_many :notification_policy_overrides, as: :context, inverse_of: :context

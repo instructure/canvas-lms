@@ -91,7 +91,7 @@ class User < ActiveRecord::Base
   has_many :not_ended_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')") }, class_name: "Enrollment", multishard: true
   has_many :not_removed_enrollments, -> { where.not(workflow_state: %w[rejected deleted inactive]) }, class_name: "Enrollment", multishard: true
   has_many :observer_enrollments
-  has_many :observee_enrollments, foreign_key: :associated_user_id, class_name: "ObserverEnrollment"
+  has_many :observee_enrollments, foreign_key: :associated_user_id, class_name: "ObserverEnrollment", inverse_of: :associated_user
 
   has_many :observer_pairing_codes, -> { where("workflow_state<>'deleted' AND expires_at > ?", Time.zone.now) }, dependent: :destroy, inverse_of: :user
 
@@ -192,8 +192,8 @@ class User < ActiveRecord::Base
   has_many :learning_outcome_results
   has_many :collaborators
   has_many :collaborations, -> { preload(:user, :collaborators) }, through: :collaborators
-  has_many :assigned_submission_assessments, -> { preload(:user, submission: :assignment) }, class_name: "AssessmentRequest", foreign_key: "assessor_id"
-  has_many :assigned_assessments, class_name: "AssessmentRequest", foreign_key: "assessor_id"
+  has_many :assigned_submission_assessments, -> { preload(:user, submission: :assignment) }, class_name: "AssessmentRequest", foreign_key: "assessor_id", inverse_of: :assessor
+  has_many :assigned_assessments, class_name: "AssessmentRequest", foreign_key: "assessor_id", inverse_of: :assessor
   has_many :web_conference_participants
   has_many :web_conferences, through: :web_conference_participants
   has_many :account_users

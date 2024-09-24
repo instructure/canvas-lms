@@ -23,7 +23,7 @@ class LearningOutcomeResult < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :learning_outcome
-  belongs_to :alignment, class_name: "ContentTag", foreign_key: :content_tag_id
+  belongs_to :alignment, class_name: "ContentTag", foreign_key: :content_tag_id, inverse_of: :learning_outcome_results
   belongs_to :association_object,
              polymorphic:
                    [:rubric_association,

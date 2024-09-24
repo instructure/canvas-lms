@@ -4376,6 +4376,7 @@ describe Course do
           end
 
           def csv_output(include_final_grade_overrides: true)
+            @ase.each(&:reload)
             @course.generate_grade_publishing_csv_output(
               @ase,
               @user,
@@ -4468,6 +4469,7 @@ describe Course do
           end
 
           def csv_output
+            @ase.each(&:reload)
             @course.generate_grade_publishing_csv_output(@ase, @user, @pseudonym)
           end
 

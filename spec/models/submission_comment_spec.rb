@@ -273,7 +273,7 @@ RSpec.describe SubmissionComment do
       @assignment.ensure_post_policy(post_manually: true)
       @assignment.hide_submissions(submission_ids: [@submission.id])
 
-      @comment = @submission.add_comment(author: @teacher, comment: "some comment")
+      @comment = @submission.reload.add_comment(author: @teacher, comment: "some comment")
       expect(@comment.messages_sent.keys).not_to include("Submission Comment")
     end
 

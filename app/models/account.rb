@@ -39,7 +39,7 @@ class Account < ActiveRecord::Base
   has_many :custom_grade_statuses, inverse_of: :root_account, foreign_key: :root_account_id
   has_many :standard_grade_statuses, inverse_of: :root_account, foreign_key: :root_account_id
   has_many :favorites, inverse_of: :root_account
-  has_many :all_courses, class_name: "Course", foreign_key: "root_account_id"
+  has_many :all_courses, class_name: "Course", foreign_key: "root_account_id", inverse_of: :root_account
   has_one :terms_of_service, dependent: :destroy
   has_one :terms_of_service_content, dependent: :destroy
   has_many :group_categories, -> { where(deleted_at: nil) }, as: :context, inverse_of: :context
@@ -47,21 +47,21 @@ class Account < ActiveRecord::Base
   has_many :groups, as: :context, inverse_of: :context
   has_many :all_groups, class_name: "Group", foreign_key: "root_account_id", inverse_of: :root_account
   has_many :all_group_memberships, source: "group_memberships", through: :all_groups
-  has_many :enrollment_terms, foreign_key: "root_account_id"
-  has_many :active_enrollment_terms, -> { where("enrollment_terms.workflow_state<>'deleted'") }, class_name: "EnrollmentTerm", foreign_key: "root_account_id"
+  has_many :enrollment_terms, foreign_key: "root_account_id", inverse_of: :root_account
+  has_many :active_enrollment_terms, -> { where("enrollment_terms.workflow_state<>'deleted'") }, class_name: "EnrollmentTerm", foreign_key: "root_account_id", inverse_of: false
   has_many :grading_period_groups, inverse_of: :root_account, dependent: :destroy
   has_many :grading_periods, through: :grading_period_groups
-  has_many :enrollments, -> { where("enrollments.type<>'StudentViewEnrollment'") }, foreign_key: "root_account_id"
-  has_many :all_enrollments, class_name: "Enrollment", foreign_key: "root_account_id"
+  has_many :enrollments, -> { where("enrollments.type<>'StudentViewEnrollment'") }, foreign_key: "root_account_id", inverse_of: :root_account
+  has_many :all_enrollments, class_name: "Enrollment", foreign_key: "root_account_id", inverse_of: :root_account
   has_many :temporary_enrollment_pairings, inverse_of: :root_account, foreign_key: "root_account_id"
-  has_many :sub_accounts, -> { where("workflow_state<>'deleted'") }, class_name: "Account", foreign_key: "parent_account_id"
-  has_many :all_accounts, -> { order(:name) }, class_name: "Account", foreign_key: "root_account_id"
+  has_many :sub_accounts, -> { where("workflow_state<>'deleted'") }, class_name: "Account", foreign_key: "parent_account_id", inverse_of: :parent_account
+  has_many :all_accounts, -> { order(:name) }, class_name: "Account", foreign_key: "root_account_id", inverse_of: :root_account
   has_many :account_users, dependent: :destroy
   has_many :active_account_users, -> { active }, class_name: "AccountUser"
-  has_many :course_sections, foreign_key: "root_account_id"
+  has_many :course_sections, foreign_key: "root_account_id", inverse_of: :root_account
   has_many :sis_batches
   has_many :abstract_courses, class_name: "AbstractCourse"
-  has_many :root_abstract_courses, class_name: "AbstractCourse", foreign_key: "root_account_id"
+  has_many :root_abstract_courses, class_name: "AbstractCourse", foreign_key: "root_account_id", inverse_of: :root_account
   has_many :user_account_associations
   has_many :all_users, -> { distinct }, through: :user_account_associations, source: :user
   has_many :users, through: :active_account_users
@@ -90,7 +90,7 @@ class Account < ActiveRecord::Base
   has_many :assessment_question_banks, -> { preload(:assessment_questions, :assessment_question_bank_users) }, as: :context, inverse_of: :context
   has_many :assessment_questions, through: :assessment_question_banks
   has_many :roles
-  has_many :all_roles, class_name: "Role", foreign_key: "root_account_id"
+  has_many :all_roles, class_name: "Role", foreign_key: "root_account_id", inverse_of: :root_account
   has_many :progresses, as: :context, inverse_of: :context
   has_many :content_migrations, as: :context, inverse_of: :context
   has_many :sis_batch_errors, foreign_key: :root_account_id, inverse_of: :root_account
@@ -156,7 +156,7 @@ class Account < ActiveRecord::Base
   has_many :report_snapshots
   has_many :external_integration_keys, as: :context, inverse_of: :context, dependent: :destroy
   has_many :shared_brand_configs
-  belongs_to :brand_config, foreign_key: "brand_config_md5"
+  belongs_to :brand_config, foreign_key: "brand_config_md5", inverse_of: :accounts
   has_many :blackout_dates, as: :context, inverse_of: :context
 
   before_validation :verify_unique_sis_source_id

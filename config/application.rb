@@ -132,6 +132,8 @@ module CanvasRails
       config.logger.formatter = ContextFormatter.new(config.logger.formatter)
     end
 
+    config.active_record.automatic_scope_inversing = true
+
     # Activate observers that should always be running
     config.active_record.observers = %i[cacher stream_item_cache live_events_observer]
 

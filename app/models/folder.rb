@@ -38,8 +38,8 @@ class Folder < ActiveRecord::Base
   has_many :file_attachments, class_name: "Attachment"
   has_many :active_file_attachments, -> { where("attachments.file_state<>'deleted'") }, class_name: "Attachment"
   has_many :visible_file_attachments, -> { where(file_state: ["available", "public"]) }, class_name: "Attachment"
-  has_many :sub_folders, class_name: "Folder", foreign_key: "parent_folder_id", dependent: :destroy
-  has_many :active_sub_folders, -> { where("folders.workflow_state<>'deleted'") }, class_name: "Folder", foreign_key: "parent_folder_id", dependent: :destroy
+  has_many :sub_folders, class_name: "Folder", foreign_key: "parent_folder_id", dependent: :destroy, inverse_of: :parent_folder
+  has_many :active_sub_folders, -> { where("folders.workflow_state<>'deleted'") }, class_name: "Folder", foreign_key: "parent_folder_id", dependent: :destroy, inverse_of: :parent_folder
 
   acts_as_list scope: :parent_folder
 

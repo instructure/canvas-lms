@@ -85,7 +85,7 @@ class DiscussionTopic < ActiveRecord::Base
   belongs_to :root_topic, class_name: "DiscussionTopic"
   belongs_to :group_category
   has_many :sub_assignments, through: :assignment
-  has_many :child_topics, class_name: "DiscussionTopic", foreign_key: :root_topic_id, dependent: :destroy
+  has_many :child_topics, class_name: "DiscussionTopic", foreign_key: :root_topic_id, dependent: :destroy, inverse_of: :root_topic
   has_many :discussion_topic_participants, dependent: :destroy
   has_many :discussion_entry_participants, through: :discussion_entries
   has_many :discussion_topic_section_visibilities,

@@ -19,7 +19,7 @@
 #
 
 class StudentEnrollment < Enrollment
-  belongs_to :student, foreign_key: :user_id, class_name: "User"
+  belongs_to :student, foreign_key: :user_id, class_name: "User", inverse_of: false
 
   has_many :course_paces, through: :student
 

@@ -57,7 +57,7 @@ describe GroupMembership do
     group.group_memberships.create!(user: user_model, workflow_state: "accepted")
     group.group_memberships.create!(user: user_model, workflow_state: "accepted")
     # expect
-    membership = group.group_memberships.build(user: user_model, workflow_state: "accepted")
+    membership = group.reload.group_memberships.build(user: user_model, workflow_state: "accepted")
     expect(membership).not_to be_valid
     expect(membership.errors[:group_id]).to eq ["The group is full."]
   end

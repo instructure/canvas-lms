@@ -117,9 +117,9 @@ class Attachment < ActiveRecord::Base
   belongs_to :replacement_attachment, class_name: "Attachment", inverse_of: :replaced_attachments
   has_many :replaced_attachments, class_name: "Attachment", foreign_key: "replacement_attachment_id", inverse_of: :replacement_attachment
   has_one :sis_batch
-  has_one :thumbnail, -> { where(thumbnail: "thumb") }, foreign_key: "parent_id"
-  has_many :thumbnails, foreign_key: "parent_id"
-  has_many :children, foreign_key: :root_attachment_id, class_name: "Attachment"
+  has_one :thumbnail, -> { where(thumbnail: "thumb") }, foreign_key: "parent_id", inverse_of: :attachment
+  has_many :thumbnails, foreign_key: "parent_id", inverse_of: :attachment
+  has_many :children, foreign_key: :root_attachment_id, class_name: "Attachment", inverse_of: :root_attachment
   has_many :attachment_upload_statuses
   has_one :crocodoc_document
   has_one :canvadoc
