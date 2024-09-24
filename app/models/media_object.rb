@@ -162,9 +162,12 @@ class MediaObject < ActiveRecord::Base
     root_account = Account.where(id: root_account_id).first
     data[:entries].each do |entry|
       attachment_id = nil
-      if entry[:originalId].present? && (Integer(entry[:originalId]).is_a?(Integer) rescue false)
-        attachment_id = entry[:originalId]
-      elsif entry[:originalId].present? && entry[:originalId].length >= 2
+      begin
+        attachment_id = Integer(entry[:originalId]) if entry[:originalId].present?
+      rescue ArgumentError
+        # ignore
+      end
+      if !attachment_id && entry[:originalId].present? && entry[:originalId].length >= 2
         partner_data = Rack::Utils.parse_nested_query(entry[:originalId]).with_indifferent_access
         attachment_id = partner_data[:attachment_id] if partner_data[:attachment_id].present?
       end

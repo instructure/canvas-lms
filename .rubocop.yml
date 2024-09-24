@@ -204,6 +204,8 @@ Style/OpenStructUse:
   Severity: warning # unfortunately, legacy code uses it a lot;
 Style/ParallelAssignment:
   Enabled: false # most uses are legitimate deconstruction or value swapping
+Style/RescueModifier:
+  AutoCorrect: false # force the developer to think about how to handle it; don't just blindly ignore errors
 Style/ReturnNil:
   Enabled: false # explicit nil is okay when a method is expected to have a return value
 Style/SafeNavigationChainLength:
@@ -429,9 +431,6 @@ Style/OptionalArguments:
   Severity: convention
 Style/OptionalBooleanParameter:
   Severity: convention
-Style/RescueModifier:
-  Severity: warning
-  AutoCorrect: false
 Style/StringConcatenation:
   Enabled: false
   AutoCorrect: false

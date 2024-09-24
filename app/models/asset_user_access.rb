@@ -90,7 +90,7 @@ class AssetUserAccess < ActiveRecord::Base
   end
 
   def context_code
-    "#{context_type.underscore}_#{context_id}" rescue nil
+    "#{context_type.underscore}_#{context_id}" if context_type
   end
 
   def readable_name(include_group_name: true)

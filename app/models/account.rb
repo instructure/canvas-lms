@@ -624,12 +624,14 @@ class Account < ActiveRecord::Base
       ips = []
       vals = str.split(",")
       vals.each do |val|
-        ip = IPAddr.new(val) rescue nil
+        IPAddr.new(val)
         # right now the ip_filter column on quizzes is just a string,
         # so it has a max length.  I figure whatever we set it to this
         # setter should at the very least limit stored values to that
         # length.
-        ips << val if ip && val.length <= 255
+        ips << val if val.length <= 255
+      rescue IPAddr::InvalidAddressError
+        # ignore
       end
       filters[key] = ips.join(",") unless ips.empty?
     end

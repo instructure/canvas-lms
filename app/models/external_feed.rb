@@ -124,7 +124,7 @@ class ExternalFeed < ActiveRecord::Base
       end
       date = (item.respond_to?(:date) && item.date) || Time.zone.today
       return nil if header_match && !item.title.downcase.include?(header_match.downcase)
-      return nil if (date && created_at > date rescue false)
+      return nil if date && created_at > date
 
       description = "<a href='#{ERB::Util.h(item.link)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
       description += format_description(item.description || item.title)
@@ -157,7 +157,7 @@ class ExternalFeed < ActiveRecord::Base
         return entry
       end
       return nil if header_match && !item.title.downcase.include?(header_match.downcase)
-      return nil if (item.published && created_at > item.published rescue false)
+      return nil if item.published && created_at > item.published
 
       description = "<a href='#{ERB::Util.h(item.url)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
       description += format_description(item.content || item.title)

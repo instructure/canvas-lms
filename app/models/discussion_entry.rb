@@ -341,7 +341,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def user_name
-    user.name rescue t :default_user_name, "User Name"
+    user&.name || t(:default_user_name, "User Name")
   end
 
   def infer_root_entry_id

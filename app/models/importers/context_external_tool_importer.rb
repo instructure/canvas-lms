@@ -148,7 +148,11 @@ module Importers
             return tool
           end
         elsif tool.url.present?
-          match_domain = URI.parse(tool.url).host rescue nil
+          begin
+            match_domain = URI.parse(tool.url).host
+          rescue URI::InvalidURIError
+            # ignore
+          end
 
           if domain && match_domain == domain
             # turn the matched tool into a domain only tool
@@ -203,7 +207,11 @@ module Importers
       url = hash[:url].presence
 
       domain = hash[:domain]
-      domain ||= (URI.parse(url).host rescue nil) if url
+      begin
+        domain ||= URI.parse(url).host if url
+      rescue URI::InvalidURIError
+        # ignore
+      end
 
       settings = create_tool_settings(hash).with_indifferent_access.except(:custom_fields, :vendor_extensions)
 

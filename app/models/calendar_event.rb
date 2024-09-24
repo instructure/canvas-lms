@@ -253,7 +253,7 @@ class CalendarEvent < ActiveRecord::Base
 
   def default_values
     self.context_code = "#{context_type.underscore}_#{context_id}"
-    self.title ||= (context_type.to_s + " Event") rescue "Event"
+    self.title ||= (context_type.to_s + " Event")
 
     populate_missing_dates
     populate_all_day_flag unless imported
@@ -331,29 +331,31 @@ class CalendarEvent < ActiveRecord::Base
   def populate_all_day_flag
     # If the all day flag has been changed to all day, set the times to 00:00
     if all_day_changed? && all_day?
-      self.start_at = zoned_start_at.beginning_of_day rescue nil
-      self.end_at = zoned_end_at.beginning_of_day rescue nil
+      self.start_at = zoned_start_at&.beginning_of_day
+      self.end_at = zoned_end_at&.beginning_of_day
     elsif start_at_changed? || end_at_changed? || Canvas::Plugin.value_to_boolean(remove_child_events)
       self.all_day = self.start_at && self.start_at == self.end_at && zoned_start_at.strftime("%H:%M") == "00:00"
     end
 
     if all_day && (!all_day_date || start_at_changed? || all_day_date_changed?)
-      self.start_at = zoned_start_at.beginning_of_day rescue nil
-      self.end_at = zoned_end_at.beginning_of_day rescue nil
-      self.all_day_date = (zoned_start_at.to_date rescue nil)
+      self.start_at = zoned_start_at&.beginning_of_day
+      self.end_at = zoned_end_at&.beginning_of_day
+      self.all_day_date = zoned_start_at&.to_date
     end
   end
   protected :populate_all_day_flag
 
   # Localized start_at
   def zoned_start_at
-    self.start_at && ActiveSupport::TimeWithZone.new(self.start_at.utc,
-                                                     ((ActiveSupport::TimeZone.new(time_zone_edited) rescue nil) || Time.zone))
+    start_at&.in_time_zone(edited_in_zone)
   end
 
   def zoned_end_at
-    self.end_at && ActiveSupport::TimeWithZone.new(self.end_at.utc,
-                                                   ((ActiveSupport::TimeZone.new(time_zone_edited) rescue nil) || Time.zone))
+    end_at&.in_time_zone(edited_in_zone)
+  end
+
+  def edited_in_zone
+    (time_zone_edited && ActiveSupport::TimeZone[time_zone_edited]) || Time.zone
   end
 
   CASCADED_ATTRIBUTES = %i[
@@ -654,9 +656,9 @@ class CalendarEvent < ActiveRecord::Base
       author: context.name,
       updated: updated_at.utc,
       published: created_at.utc,
-      link: "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/calendar?month=#{self.start_at.strftime("%m") rescue ""}&year=#{self.start_at.strftime("%Y") rescue ""}#calendar_event_#{id}",
-      id: "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/calendar_events/#{feed_code}_#{self.start_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}_#{self.end_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}",
-      content: "#{datetime_string(self.start_at, self.end_at)}<br/>#{description}"
+      link: "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/calendar?month=#{start_at&.strftime("%m")}&year=#{start_at&.strftime("%Y")}#calendar_event_#{id}",
+      id: "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/calendar_events/#{feed_code}_#{start_at&.strftime("%Y-%m-%d-%H-%M") || "none"}_#{end_at&.strftime("%Y-%m-%d-%H-%M")}",
+      content: "#{datetime_string(start_at, end_at)}<br/>#{description}"
     }
   end
 

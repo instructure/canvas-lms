@@ -290,7 +290,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     params = sanitize_params(params)
 
     new_params = if !graded? && submission_data[:attempt] == attempt
-                   submission_data.deep_merge(params) rescue params
+                   submission_data.deep_merge(params)
                  else
                    params
                  end
@@ -472,12 +472,12 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def scores_for_versions(exclude_version_id)
-    versions = self.versions.reload.reject { |v| v.id == exclude_version_id } rescue []
+    versions = self.versions.where.not(id: exclude_version_id)
     scores = {}
     scores[attempt] = score if score
 
     # only most recent version for each attempt - some have regraded a version
-    versions.sort_by(&:number).reverse_each do |ver|
+    versions.order(number: :desc).each do |ver|
       scores[ver.model.attempt] ||= ver.model.score || 0.0
     end
 
@@ -734,7 +734,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
         self.workflow_state = "pending_review" if question && question["question_type"] != "text_only_question"
       end
       res << answer
-      tally += answer["points"].to_f rescue 0
+      tally += answer["points"].to_f
     end
 
     # Graded surveys always get the full points
@@ -786,7 +786,9 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def duration
-    (finished_at || started_at) - started_at rescue 0
+    return 0 unless finished_at && started_at
+
+    finished_at - started_at
   end
 
   def time_spent

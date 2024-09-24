@@ -643,7 +643,9 @@ class Course < ActiveRecord::Base
   end
 
   def valid_course_image_url?(image_url)
-    URI.parse(image_url) rescue false
+    URI.parse(image_url)
+  rescue URI::InvalidURIError
+    false
   end
 
   def validate_default_view
@@ -1288,7 +1290,7 @@ class Course < ActiveRecord::Base
       res = []
       split = self.name.split(/\s/)
       res << split[0]
-      res << split[1..].find { |txt| txt.match(/\d/) } rescue nil
+      res << split[1..].find { |txt| txt.match?(/\d/) }
       self.course_code = res.compact.join(" ")
     end
     @group_weighting_scheme_changed = group_weighting_scheme_changed?
@@ -1686,7 +1688,7 @@ class Course < ActiveRecord::Base
     end.index_by(&:context_id)
     courses.each do |course|
       unless groups[course.id]
-        course.require_assignment_group rescue nil
+        course.require_assignment_group
       end
     end
   end
@@ -1741,7 +1743,7 @@ class Course < ActiveRecord::Base
 
   def storage_quota
     super ||
-      (account.default_storage_quota rescue nil) ||
+      account.default_storage_quota ||
       Setting.get("course_default_quota", 500.decimal_megabytes.to_s).to_i
   end
 
@@ -1970,7 +1972,7 @@ class Course < ActiveRecord::Base
   end
 
   def self.find_all_by_context_code(codes)
-    ids = codes.filter_map { |c| c.match(/\Acourse_(\d+)\z/)[1] rescue nil }
+    ids = codes.filter_map { |c| c.match(/\Acourse_(\d+)\z/)&.[](1) }
     Course.where(id: ids).preload(:current_enrollments).to_a
   end
 
@@ -3144,7 +3146,7 @@ class Course < ActiveRecord::Base
       return canvas_k6_tab_configuration.map(&:with_indifferent_access)
     end
 
-    super.compact.map(&:with_indifferent_access) rescue []
+    super&.compact&.map(&:with_indifferent_access) || []
   end
 
   TAB_HOME = 0
@@ -3564,12 +3566,10 @@ class Course < ActiveRecord::Base
     self["allow_wiki_comments"]
   end
 
-  def account_name
-    account.name rescue nil
-  end
+  delegate :name, to: :account, prefix: true
 
   def term_name
-    self.enrollment_term.name rescue nil
+    enrollment_term.name
   end
 
   def equella_settings

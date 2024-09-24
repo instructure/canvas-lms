@@ -288,7 +288,7 @@ class Group < ActiveRecord::Base
   end
 
   def self.find_all_by_context_code(codes)
-    ids = codes.filter_map { |c| c.match(/\Agroup_(\d+)\z/)[1] rescue nil }
+    ids = codes.filter_map { |c| c.match(/\Agroup_(\d+)\z/)&.[](1) }
     Group.find(ids)
   end
 
@@ -344,7 +344,7 @@ class Group < ActiveRecord::Base
 
   def full_name
     res = before_label(name) + " "
-    res += (context.course_code rescue context.name) if context
+    res += context.try(:course_code) || context.name if context
     res
   end
 

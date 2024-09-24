@@ -250,11 +250,13 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def valid_ip?(ip)
+    return false unless ip
+
     require "ipaddr"
     ip_filter.split(",").any? do |filter|
-      addr_range = ::IPAddr.new(filter) rescue nil
-      addr = ::IPAddr.new(ip) rescue nil
-      addr && addr_range && addr_range.include?(addr)
+      IPAddr.new(filter).include?(IPAddr.new(ip))
+    rescue IPAddr::InvalidAddressError
+      false
     end
   end
 
@@ -749,7 +751,8 @@ class Quizzes::Quiz < ActiveRecord::Base
 
       submission = Quizzes::SubmissionManager.new(self).find_or_create_submission(user, preview)
       submission.retake
-      submission.attempt = (submission.attempt + 1) rescue 1
+      submission.attempt ||= 0
+      submission.attempt += 1
       submission.score = nil
       submission.fudge_points = nil
 

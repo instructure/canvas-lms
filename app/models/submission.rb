@@ -1427,7 +1427,7 @@ class Submission < ActiveRecord::Base
   def submitted_at
     if submission_type
       self.submitted_at = updated_at unless super
-      super.in_time_zone rescue nil
+      super&.in_time_zone
     else
       nil
     end
@@ -1577,7 +1577,7 @@ class Submission < ActiveRecord::Base
 
     if submission_type == "online_quiz"
       self.quiz_submission ||= Quizzes::QuizSubmission.where(submission_id: self).first
-      self.quiz_submission ||= Quizzes::QuizSubmission.where(user_id:, quiz_id: assignment.quiz).first rescue nil
+      self.quiz_submission ||= Quizzes::QuizSubmission.where(user_id:, quiz_id: assignment.quiz).first if assignment
     end
     @just_submitted = (submitted? || pending_review?) && submission_type && (new_record? || workflow_state_changed? || attempt_changed?)
     if score_changed? || grade_changed?
@@ -2481,7 +2481,7 @@ class Submission < ActiveRecord::Base
   def assign_assessor(obj)
     @assessment_request_count ||= 0
     @assessment_request_count += 1
-    user = obj.user rescue nil
+    user = obj.try(:user)
     association = assignment.active_rubric_association? ? assignment.rubric_association : nil
     res = assessment_requests.where(assessor_asset_id: obj.id, assessor_asset_type: obj.class.to_s, assessor_id: user.id, rubric_association_id: association.try(:id))
                              .first_or_initialize

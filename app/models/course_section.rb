@@ -240,7 +240,6 @@ class CourseSection < ActiveRecord::Base
   end
 
   def infer_defaults
-    self.root_account_id ||= (course.root_account_id rescue nil) || Account.default.id
     raise "Course required" unless course
 
     self.root_account_id = course.root_account_id || Account.default.id
@@ -277,7 +276,7 @@ class CourseSection < ActiveRecord::Base
 
     all_attrs = { course_id: course.id }
     if root_account_id_changed?
-      all_attrs[:root_account_id] = self.root_account_id
+      all_attrs[:root_account_id] = root_account_id
     end
 
     CourseSection.unique_constraint_retry do

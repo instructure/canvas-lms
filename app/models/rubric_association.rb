@@ -99,7 +99,7 @@ class RubricAssociation < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :rubric_association_created
-    p.to { context.students rescue [] }
+    p.to { context.students }
     p.whenever do |record|
       record.just_created && !record.context.is_a?(Course)
     end
@@ -179,15 +179,15 @@ class RubricAssociation < ActiveRecord::Base
   def context_name
     @cached_context_name ||= shard.activate do
       Rails.cache.fetch(["short_name_lookup", context_code].cache_key) do
-        context.short_name rescue ""
+        context.short_name
       end
     end
   end
 
   def update_values
     self.bookmarked = true if purpose == "bookmark" || bookmarked.nil?
-    self.context_code ||= "#{context_type.underscore}_#{context_id}" rescue nil
-    self.title ||= (association_object.title rescue association_object.name) rescue nil
+    self.context_code ||= context_type && "#{context_type.underscore}_#{context_id}"
+    self.title ||= association_object.try(:title) || association_object.try(:name)
     self.workflow_state ||= "active"
   end
   protected :update_values

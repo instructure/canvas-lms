@@ -154,7 +154,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.s3_storage?
-    (file_store_config["storage"] rescue nil) == "s3" && s3_config
+    file_store_config["storage"] == "s3" && s3_config
   end
 
   def self.local_storage?
@@ -534,7 +534,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def after_extension
-    res = extension[1..] rescue nil
+    res = extension[1..]
     res = nil if res == "" || res == "unknown"
     res
   end
@@ -638,8 +638,8 @@ class Attachment < ActiveRecord::Base
       # isn't any code still accessing the namespace for the account id directly.
       ns = root_attachment.try(:namespace) if root_attachment_id
       ns ||= Attachment.current_namespace
-      ns ||= context.root_account.file_namespace rescue nil
-      ns ||= context.account.file_namespace rescue nil
+      ns ||= context.try(:root_account)&.file_namespace
+      ns ||= context.try(:account)&.file_namespace
       if Rails.env.development? && Attachment.local_storage?
         ns ||= ""
         ns = "_localstorage_/#{ns}" unless ns.start_with?("_localstorage_/")
@@ -677,7 +677,11 @@ class Attachment < ActiveRecord::Base
           # deduplicate. the existing attachment's s3object should be the same as
           # that just uploaded ('cuz md5 match). delete the new copy and just
           # have this attachment inherit from the existing attachment.
-          s3object.delete rescue nil
+          begin
+            s3object.delete
+          rescue
+            # ignore
+          end
           self.root_attachment = existing_attachment
           self["filename"] = nil
         else
@@ -943,7 +947,9 @@ class Attachment < ActiveRecord::Base
   end
 
   def downloadable?
-    instfs_hosted? || !!(authenticated_s3_url rescue false)
+    instfs_hosted? || !!authenticated_s3_url
+  rescue
+    false
   end
 
   def public_url(**options)
@@ -1224,7 +1230,7 @@ class Attachment < ActiveRecord::Base
   protected :truncate_display_name
 
   def readable_size
-    ActiveSupport::NumberHelper.number_to_human_size(size) rescue "size unknown"
+    ActiveSupport::NumberHelper.number_to_human_size(size) || "size unknown"
   end
 
   def disposition_filename
@@ -2194,10 +2200,10 @@ class Attachment < ActiveRecord::Base
       list.unshift(Folder.root_folders(context).first.name)
     end
     filename = list.pop
-    folder = context.folder_name_lookups[list.join("/")] rescue nil
-    folder ||= context.folders.active.where(full_name: list.join("/")).first
+    full_name = list.join("/")
     context.folder_name_lookups ||= {}
-    context.folder_name_lookups[list.join("/")] = folder
+    folder = context.folder_name_lookups[full_name] ||=
+      context.folders.active.where(full_name:).first
     file = nil
     if folder
       file = folder.file_attachments.where(filename:).first
@@ -2310,7 +2316,11 @@ class Attachment < ActiveRecord::Base
     Canvas::Reloader.on_reload { Attachment.reset_clone_url_strand_overrides }
 
     def clone_url_strand(url)
-      _, uri = CanvasHttp.validate_url(url) rescue nil
+      begin
+        _, uri = CanvasHttp.validate_url(url)
+      rescue URI::InvalidURIError, ArgumentError, CanvasHttp::RelativeUriError, CanvasHttp::InsecureUriError
+        # ignore
+      end
       return "file_download" unless uri&.host
       return ["file_download", clone_url_strand_overrides[uri.host]] if clone_url_strand_overrides[uri.host]
 

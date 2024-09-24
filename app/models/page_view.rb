@@ -86,7 +86,7 @@ class PageView < ActiveRecord::Base
   end
 
   def ensure_account
-    self.account_id ||= ((context_type == "Account") ? context_id : context.account_id) rescue nil
+    self.account_id ||= (context_type == "Account") ? context_id : context&.account_id
     self.account_id ||= (context.is_a?(Account) ? context : context.account) if context
   end
 

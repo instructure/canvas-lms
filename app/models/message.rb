@@ -567,7 +567,7 @@ class Message < ActiveRecord::Base
   def get_template(filename)
     path = Canvas::MessageHelper.find_message_path(filename)
 
-    unless (File.exist?(path) rescue false)
+    unless File.exist?(path)
       return false if filename.include?("slack")
 
       filename = notification.name.downcase.gsub(/\s/, "_") + ".email.erb"
@@ -576,7 +576,7 @@ class Message < ActiveRecord::Base
 
     @i18n_scope = "messages." + filename.delete_suffix(".erb")
 
-    if (File.exist?(path) rescue false)
+    if File.exist?(path)
       File.read(path)
     else
       false
@@ -855,7 +855,7 @@ self.user,
   # Returns an array of dashboard messages.
   def self.dashboard_messages(messages)
     message_types = messages.inject({}) do |types, message|
-      type = message.notification.category rescue "Other"
+      type = message.notification&.category || "Other"
 
       if type.present?
         types[type] ||= []

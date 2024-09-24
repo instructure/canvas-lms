@@ -248,7 +248,7 @@ class ContentMigration < ActiveRecord::Base
   def root_account
     return super if root_account_id
 
-    context.root_account rescue nil
+    context.root_account
   end
 
   def migration_type

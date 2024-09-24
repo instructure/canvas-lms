@@ -287,7 +287,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def context_code
-    super || "#{context_type.underscore}_#{context_id}" rescue nil
+    super || (context_type && "#{context_type.underscore}_#{context_id}")
   end
 
   def infer_conference_settings; end
@@ -309,7 +309,7 @@ class WebConference < ActiveRecord::Base
   def infer_conference_details
     infer_conference_settings
     self.conference_type ||= config && config[:conference_type]
-    self.context_code = "#{context_type.underscore}_#{context_id}" rescue nil
+    self.context_code = context_type && "#{context_type.underscore}_#{context_id}"
     self.added_user_ids ||= ""
     if title.blank?
       self.title = context.is_a?(Course) ? t("#web_conference.default_name_for_courses", "Course Web Conference") : t("#web_conference.default_name_for_groups", "Group Web Conference")
@@ -600,9 +600,13 @@ class WebConference < ActiveRecord::Base
 
   def self.plugin_types
     plugins.filter_map do |plugin|
-      next unless plugin.enabled? &&
-                  (klass = (plugin.base || "#{plugin.id.classify}Conference").constantize rescue nil) &&
-                  klass < base_class
+      begin
+        next unless plugin.enabled? &&
+                    (klass = (plugin.base || "#{plugin.id.classify}Conference").constantize) &&
+                    klass < base_class
+      rescue NameError
+        next
+      end
 
       plugin.settings.merge(
         conference_type: plugin.id.classify,

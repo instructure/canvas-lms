@@ -504,6 +504,7 @@ class ContextModuleProgression < ActiveRecord::Base
       .readonly(false)
       .where(context_modules: { context_type: "Course", context_id: course_id })
   }
+  scope :compleleted, -> { where(workflow_state: "completed") }
 
   workflow do
     state :locked

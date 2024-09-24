@@ -98,10 +98,18 @@ module Courses
       timetable_hashes.each do |hash|
         hash.slice!(*ALLOWED_TIMETABLE_KEYS)
       end
-      unless timetable_hashes.all? { |hash| Time.zone.parse(hash[:start_time]) rescue nil }
+      unless timetable_hashes.all? do |hash|
+        hash[:start_time] && Time.zone.parse(hash[:start_time])
+      rescue ArgumentError
+        false
+      end
         add_error("invalid start time(s)") # i'm too lazy to be more specific
       end
-      unless timetable_hashes.all? { |hash| Time.zone.parse(hash[:end_time]) rescue nil }
+      unless timetable_hashes.all? do |hash|
+        hash[:end_time] && Time.zone.parse(hash[:end_time])
+      rescue ArgumentError
+        false
+      end
         add_error("invalid end time(s)")
       end
 

@@ -454,7 +454,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def effective_roles
-    context_roles = context.default_wiki_editing_roles rescue nil
+    context_roles = context.try(:default_wiki_editing_roles)
     roles = (editing_roles || context_roles || default_roles).split(",")
     (roles == %w[teachers]) ? [] : roles # "Only teachers" option doesn't grant rights excluded by RoleOverrides
   end
@@ -645,7 +645,7 @@ class WikiPage < ActiveRecord::Base
                             "active"
                           end
 
-    self.editing_roles = (context.default_wiki_editing_roles rescue nil) || default_roles
+    self.editing_roles = context.try(:default_wiki_editing_roles) || default_roles
 
     if is_front_page?
       self.body = t "#application.wiki_front_page_default_content_course", "Welcome to your new course wiki!" if context.is_a?(Course)
