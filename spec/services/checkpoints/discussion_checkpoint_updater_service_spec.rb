@@ -53,6 +53,25 @@ describe Checkpoints::DiscussionCheckpointUpdaterService do
       end.to raise_error(Checkpoints::DateTypeRequiredError)
     end
 
+    it "does not raise an error when points_possible is not provided for the updater service" do
+      creator_service.call(
+        discussion_topic: @topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "everyone", due_at: 2.days.from_now }],
+        points_possible: 6,
+        replies_required: 3
+      )
+
+      expect do
+        updater_service.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 2.days.from_now }],
+          replies_required: 6
+        )
+      end.not_to raise_error
+    end
+
     it "updates the reply_to_entry_required_count on the topic when creating a reply to entry checkpoint and then updates it" do
       expect do
         creator_service.call(
@@ -467,7 +486,6 @@ describe Checkpoints::DiscussionCheckpointUpdaterService do
         expect(updated_assignment_override3.due_at).to be_within(1.second).of(new_due_at)
       end
 
-      # Test provided by Jason G to prove this is fixing what we intended to.
       it "creates 2 checkpoints with 2 adhoc overrides each, and can update the correct sub_assignment assignment_overrides" do
         @students = create_users(2, return_type: :record)
         @students.each { |student| student_in_course(course: @topic.course, user: student, active_all: true) }
@@ -487,7 +505,7 @@ describe Checkpoints::DiscussionCheckpointUpdaterService do
             { type: "override", set_type: "ADHOC", student_ids: [@students[0].id], due_at: original_due_at_1, unlock_at: original_unlock_at_1, lock_at: original_lock_at_1 },
             { type: "override", set_type: "ADHOC", student_ids: [@students[1].id], due_at: original_due_at_2, unlock_at: original_unlock_at_2, lock_at: original_lock_at_2 }
           ],
-          points_possible: 5
+          points_possible: 4
         )
 
         # Create second checkpoint with two adhoc overrides
@@ -504,16 +522,13 @@ describe Checkpoints::DiscussionCheckpointUpdaterService do
         # Update due_at and unlock_at for first checkpoint's adhoc overrides
         new_due_at_1 = 5.days.from_now(now)
         new_due_at_2 = 6.days.from_now(now)
-        new_unlock_at_1 = 3.days.from_now(now)
-        new_unlock_at_2 = 4.days.from_now(now)
         updated_first_checkpoint = updater_service.call(
           discussion_topic: @topic,
           checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
           dates: [
-            { type: "override", id: first_checkpoint.assignment_overrides.first.id, set_type: "ADHOC", student_ids: [@students[0].id], due_at: new_due_at_1, unlock_at: new_unlock_at_1 },
-            { type: "override", id: first_checkpoint.assignment_overrides.second.id, set_type: "ADHOC", student_ids: [@students[1].id], due_at: new_due_at_2, unlock_at: new_unlock_at_2 }
-          ],
-          points_possible: 5
+            { type: "override", id: first_checkpoint.assignment_overrides.first.id, due_at: new_due_at_1 },
+            { type: "override", id: first_checkpoint.assignment_overrides.second.id, due_at: new_due_at_2 }
+          ]
         )
 
         # Update due_at and unlock_at for second checkpoint's adhoc overrides
@@ -521,39 +536,40 @@ describe Checkpoints::DiscussionCheckpointUpdaterService do
           discussion_topic: @topic,
           checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
           dates: [
-            { type: "override", id: second_checkpoint.assignment_overrides.first.id, set_type: "ADHOC", student_ids: [@students[0].id], due_at: new_due_at_1, unlock_at: new_unlock_at_1 },
-            { type: "override", id: second_checkpoint.assignment_overrides.second.id, set_type: "ADHOC", student_ids: [@students[1].id], due_at: new_due_at_2, unlock_at: new_unlock_at_2 }
-          ],
-          points_possible: 5
+            { type: "override", id: second_checkpoint.assignment_overrides.first.id, due_at: new_due_at_1 },
+            { type: "override", id: second_checkpoint.assignment_overrides.second.id, due_at: new_due_at_2 }
+          ]
         )
 
         # Verify updates for first checkpoint
         first_override_1 = updated_first_checkpoint.assignment_overrides.first
         first_override_2 = updated_first_checkpoint.assignment_overrides.second
+        expect(updated_first_checkpoint.points_possible).to eq 4
         expect(first_override_1.set_type).to eq "ADHOC"
         expect(first_override_1.due_at).to be_within(1.second).of(new_due_at_1)
-        expect(first_override_1.unlock_at).to be_within(1.second).of(new_unlock_at_1)
+        expect(first_override_1.unlock_at).to be_within(1.second).of(original_unlock_at_1)
         expect(first_override_1.lock_at).to be_within(1.second).of(original_lock_at_1)
         expect(first_override_1.assignment_override_students.pluck(:user_id)).to match_array([@students[0].id])
 
         expect(first_override_2.set_type).to eq "ADHOC"
         expect(first_override_2.due_at).to be_within(1.second).of(new_due_at_2)
-        expect(first_override_2.unlock_at).to be_within(1.second).of(new_unlock_at_2)
+        expect(first_override_2.unlock_at).to be_within(1.second).of(original_unlock_at_2)
         expect(first_override_2.lock_at).to be_within(1.second).of(original_lock_at_2)
         expect(first_override_2.assignment_override_students.pluck(:user_id)).to match_array([@students[1].id])
 
         # Verify updates for second checkpoint
         second_override_1 = updated_second_checkpoint.assignment_overrides.first
         second_override_2 = updated_second_checkpoint.assignment_overrides.second
+        expect(updated_second_checkpoint.points_possible).to eq 5
         expect(second_override_1.set_type).to eq "ADHOC"
         expect(second_override_1.due_at).to be_within(1.second).of(new_due_at_1)
-        expect(second_override_1.unlock_at).to be_within(1.second).of(new_unlock_at_1)
+        expect(second_override_1.unlock_at).to be_within(1.second).of(original_unlock_at_1)
         expect(second_override_1.lock_at).to be_within(1.second).of(original_lock_at_1)
         expect(second_override_1.assignment_override_students.pluck(:user_id)).to match_array([@students[0].id])
 
         expect(second_override_2.set_type).to eq "ADHOC"
         expect(second_override_2.due_at).to be_within(1.second).of(new_due_at_2)
-        expect(second_override_2.unlock_at).to be_within(1.second).of(new_unlock_at_2)
+        expect(second_override_2.unlock_at).to be_within(1.second).of(original_unlock_at_2)
         expect(second_override_2.lock_at).to be_within(1.second).of(original_lock_at_2)
         expect(second_override_2.assignment_override_students.pluck(:user_id)).to match_array([@students[1].id])
       end
