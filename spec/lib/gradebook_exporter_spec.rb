@@ -1117,4 +1117,28 @@ describe GradebookExporter do
       end
     end
   end
+
+  describe "discussion_checkpoints enabled" do
+    before(:once) do
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      student_in_course(course: @course, active_all: true)
+      @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+      @assignment.grade_student(@student, grade: 5, grader: @teacher, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+      @assignment.grade_student(@student, grade: 3, grader: @teacher, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+
+      csv = GradebookExporter.new(@course, @teacher).to_csv
+      @headers = CSV.parse(csv, headers: true).headers
+      @student_row = CSV.parse(csv, headers: true)[1]
+    end
+
+    it "includes sub-assignments of discussion checkpoint assignments" do
+      expect(@headers).to include(@reply_to_topic.title_with_id)
+      expect(@headers).to include(@reply_to_entry.title_with_id)
+    end
+
+    it "displays correct score for discussion checkpoints" do
+      expect(@student_row[@reply_to_topic.title_with_id]).to eq("5.00")
+      expect(@student_row[@reply_to_entry.title_with_id]).to eq("3.00")
+    end
+  end
 end

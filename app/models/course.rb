@@ -421,8 +421,7 @@ class Course < ActiveRecord::Base
 
   def assigned_assignment_ids_by_user
     @assigned_assignment_ids_by_user ||=
-      assignments
-      .active
+      assignments_scope
       .joins(:submissions)
       .except(:order)
       .pluck("assignments.id", "submissions.user_id")
@@ -430,6 +429,20 @@ class Course < ActiveRecord::Base
         hash[user_id] ||= Set.new
         hash[user_id] << assignment_id
       end
+  end
+
+  def assignments_scope
+    scope = assignments.active
+    if root_account.feature_enabled?(:discussion_checkpoints)
+      # We need to update the scope to use AbstractAssignment instead of its subclass Assignment so that we can merge the
+      # scope query with the checkpoints_scope query
+      scope_assignment_ids = scope.pluck(:id)
+      scope = AbstractAssignment.where(id: scope_assignment_ids)
+      checkpoints_scope = SubAssignment.active.where(parent_assignment_id: scope_assignment_ids)
+      # merge the queries
+      scope = scope.or(checkpoints_scope)
+    end
+    scope
   end
 
   def grading_standard_read_permission
