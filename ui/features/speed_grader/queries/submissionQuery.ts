@@ -19,9 +19,6 @@
 import {z} from 'zod'
 import {executeQuery} from '@canvas/query/graphql'
 import gql from 'graphql-tag'
-import {omit} from 'lodash'
-import speedGraderHelpers from '../jquery/speed_grader_helpers'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 
 export const SUBMISSION_FRAGMENT = gql`
   fragment SubmissionInterfaceFragment on SubmissionInterface {
@@ -115,12 +112,6 @@ export const SUBMISSION_FRAGMENT = gql`
 const QUERY = gql`
   query SpeedGrader_SubmissionQuery($assignmentId: ID!, $userId: ID!, $courseId: ID!) {
     assignment(id: $assignmentId) {
-      id
-      _id
-      name
-      gradingType
-      pointsPossible
-      courseId
       submissionsConnection(
         filter: {
           applyGradebookEnrollmentFilters: true
@@ -170,65 +161,6 @@ const QUERY = gql`
   ${SUBMISSION_FRAGMENT}
 `
 
-function transform(result: any) {
-  const submission = result.assignment?.submissionsConnection?.nodes?.[0]
-  if (submission) {
-    // TODO: should be updated with anonymous grading (see reassignAssignment method in speed_grader.tsx)
-    submission.reassignAssignment = () => {
-      return doFetchApi({
-        path: `/courses/${result.assignment?.courseId}/assignments/${result.assignment?._id}/submissions/${submission.user._id}/reassign`,
-        method: 'PUT',
-      })
-    }
-    submission.attachments.forEach((attachment: any) => {
-      attachment.delete = () =>
-        doFetchApi({
-          path: `/api/v1/files/${attachment._id}?replace=1`,
-          method: 'DELETE',
-        })
-    })
-    submission.rubricAssessments = submission?.rubricAssessmentsConnection?.nodes?.map(
-      (rubricAssessment: any) => {
-        rubricAssessment.assessmentRatings.forEach((rating: any) => {
-          rating.criterionId = rating.criterion?._id
-          rating.learningOutcomeId = rating.outcome?._id
-          delete rating.criterion
-          delete rating.outcome
-        })
-        rubricAssessment.assessorName = rubricAssessment.assessor?.name
-        delete rubricAssessment.assessor
-        return rubricAssessment
-      }
-    )
-    submission.submissionHistoriesConnection?.nodes.forEach(
-      (submissionHistory: any, index: number) => {
-        submissionHistory.attachments.forEach((attachment: any) => {
-          attachment.delete = () =>
-            doFetchApi({
-              path: `/api/v1/files/${attachment._id}?replace=1`,
-              method: 'DELETE',
-            })
-        })
-        submissionHistory.comments = submissionHistory.commentsConnection?.nodes
-        delete submissionHistory.commentsConnection
-      }
-    )
-    return {
-      ...omit(submission, [
-        'commentsConnection',
-        'rubricAssessmentsConnection',
-        'submissionHistoriesConnection',
-      ]),
-      comments: submission?.commentsConnection?.nodes,
-      rubricAssessments: submission.rubricAssessments,
-      submissionHistory: submission.submissionHistoriesConnection?.nodes,
-      // @ts-expect-error
-      submissionState: speedGraderHelpers.submissionState(submission, ENV.grading_role ?? ''),
-    }
-  }
-  return null
-}
-
 export const ZGetSubmissionParams = z.object({
   assignmentId: z.string().min(1),
   userId: z.string().min(1),
@@ -237,19 +169,13 @@ export const ZGetSubmissionParams = z.object({
 
 type GetSubmissionParams = z.infer<typeof ZGetSubmissionParams>
 
-export async function getSubmission<T extends GetSubmissionParams>({
-  queryKey,
-}: {
-  queryKey: [string, T]
-}): Promise<any> {
+export function getSubmission<T extends GetSubmissionParams>({queryKey}: {queryKey: [string, T]}) {
   ZGetSubmissionParams.parse(queryKey[1])
   const {assignmentId, userId, courseId} = queryKey[1]
 
-  const result = await executeQuery<any>(QUERY, {
+  return executeQuery<any>(QUERY, {
     assignmentId,
     userId,
     courseId,
   })
-
-  return transform(result)
 }
