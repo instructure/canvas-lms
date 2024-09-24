@@ -19,7 +19,6 @@
 import {z} from 'zod'
 import {executeQuery} from '@canvas/query/graphql'
 import gql from 'graphql-tag'
-import {SUBMISSION_FRAGMENT} from '../queries/submissionQuery'
 
 export const UPDATE_SUBMISSION_GRADE_STATUS = gql`
   mutation updateSubmissionGradeStatus(
@@ -35,13 +34,8 @@ export const UPDATE_SUBMISSION_GRADE_STATUS = gql`
         latePolicyStatus: $latePolicyStatus
         customGradeStatusId: $customGradeStatusId
       }
-    ) {
-      submission {
-        ...SubmissionInterfaceFragment
-      }
-    }
+    )
   }
-  ${SUBMISSION_FRAGMENT}
 `
 
 export const ZUpdateSubmissionGradeStatusParams = z.object({
