@@ -115,17 +115,6 @@ class CanvasSchema < GraphQL::Schema
                 Types::ModuleSubHeaderType,
                 Types::InternalSettingType]
 
-  def self.for_federation
-    @federatable_schema ||= Class.new(CanvasSchema) do
-      include ApolloFederation::Schema
-
-      # TODO: once https://github.com/Gusto/apollo-federation-ruby/pull/135 is
-      # merged and published, we can update the `apollo-federation` gem and
-      # remove this line
-      query Types::QueryType
-    end
-  end
-
   # GraphQL tuning and defensive settings
   max_depth GraphQLTuning.max_depth
   max_complexity GraphQLTuning.max_complexity

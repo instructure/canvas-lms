@@ -26,9 +26,6 @@ end
 
 CanvasRails::Application.routes.draw do
   post "/api/graphql", to: "graphql#execute"
-  post "/api/graphql/subgraph", to: "graphql#subgraph_execute"
-  # The subgraph endpoint is for use only with the federated API Gateway. See
-  # `app/graphql/README.md` for details.
   get "graphiql", to: "graphql#graphiql"
 
   resources :submissions, only: [] do

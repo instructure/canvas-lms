@@ -117,7 +117,6 @@ module Types
     implements Interfaces::LegacyIDInterface
 
     global_id_field :id
-    key_field_id
 
     field :course_code, String, "course short name", null: true
     field :name, String, null: false
