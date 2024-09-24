@@ -817,23 +817,23 @@ describe Api do
 
   context "ISO8601 regex" do
     it "does not allow invalid dates" do
-      expect("10/01/2014").to_not match Api::ISO8601_REGEX
+      expect(Api::ISO8601_REGEX).to_not match "10/01/2014"
     end
 
     it "does not allow non ISO8601 dates" do
-      expect("2014-10-01").to_not match Api::ISO8601_REGEX
+      expect(Api::ISO8601_REGEX).to_not match "2014-10-01"
     end
 
     it "does not allow garbage dates" do
-      expect("bad_data").to_not match Api::ISO8601_REGEX
+      expect(Api::ISO8601_REGEX).to_not match "bad_data"
     end
 
     it "allows valid dates" do
-      expect("2014-10-01T00:00:00-06:00").to match Api::ISO8601_REGEX
+      expect(Api::ISO8601_REGEX).to match "2014-10-01T00:00:00-06:00"
     end
 
     it "does not allow valid dates BC" do
-      expect("-2014-10-01T00:00:00-06:00").to_not match Api::ISO8601_REGEX
+      expect(Api::ISO8601_REGEX).to_not match "-2014-10-01T00:00:00-06:00"
     end
   end
 
