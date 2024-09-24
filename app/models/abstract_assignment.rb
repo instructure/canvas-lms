@@ -3557,6 +3557,16 @@ class AbstractAssignment < ActiveRecord::Base
     end
   end
 
+  def multiple_distinct_due_dates?
+    count = if association(:submissions).loaded?
+              submissions.pluck(:cached_due_date).uniq.count
+            else
+              submissions.distinct(:cached_due_date).count(:cached_due_date)
+            end
+
+    count > 1
+  end
+
   def apply_late_policy
     return if update_cached_due_dates? # SubmissionLifecycleManager already re-applies late policy so we shouldn't
     return unless saved_change_to_grading_type?

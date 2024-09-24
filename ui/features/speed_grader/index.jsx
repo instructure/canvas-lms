@@ -108,7 +108,7 @@ ready(() => {
     )
     return
   }
-  
+
   const params = new URLSearchParams(window.location.search)
   const postMessageAliases = {
     'quizzesNext.register': 'tool.register',

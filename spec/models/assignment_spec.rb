@@ -480,6 +480,16 @@ describe Assignment do
       end
     end
 
+    describe "multiple_distinct_due_dates?" do
+      it "returns true if the assignment has multiple unique due dates" do
+        course_with_teacher(active_all: true)
+        student_in_course(active_all: true, user_name: "some user")
+        student_in_course(active_all: true, user_name: "some user2")
+        assignment = @course.assignments.create!(due_at: 5.days.from_now)
+        expect { create_adhoc_override_for_assignment(assignment, @student, due_at: 2.days.from_now) }.to change { assignment.reload.multiple_distinct_due_dates? }.from(false).to(true)
+      end
+    end
+
     describe "#assigned_to_student" do
       it "returns assignments assigned to the given student" do
         assignment = @course.assignments.create!
