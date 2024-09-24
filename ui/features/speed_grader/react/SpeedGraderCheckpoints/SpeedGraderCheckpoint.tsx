@@ -34,6 +34,7 @@ import type {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import AssessmentGradeInput from './AssessmentGradeInput'
+import {UseSameGrade} from '../Shared/UseSameGrade'
 
 const I18n = useI18nScope('SpeedGraderCheckpoints')
 
@@ -189,6 +190,23 @@ export const SpeedGraderCheckpoint = (props: Props) => {
           updateTimeLate={updateTimeLate}
           subAssignmentTag={props.subAssignmentSubmission.sub_assignment_tag}
         />
+      )}
+      {!props.subAssignmentSubmission.grade_matches_current_submission && (
+        <Flex direction="column" margin="none none small">
+          <Flex.Item>
+            <UseSameGrade
+              onUseSameGrade={() => {
+                props.updateSubmissionGrade({
+                  subAssignmentTag: props.subAssignmentSubmission.sub_assignment_tag,
+                  courseId: props.assignment.course_id,
+                  assignmentId: props.assignment.id,
+                  studentId: props.subAssignmentSubmission.user_id,
+                  grade: props.subAssignmentSubmission.entered_grade,
+                })
+              }}
+            />
+          </Flex.Item>
+        </Flex>
       )}
     </>
   )

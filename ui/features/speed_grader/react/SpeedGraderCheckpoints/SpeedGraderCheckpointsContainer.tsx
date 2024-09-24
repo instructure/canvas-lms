@@ -63,6 +63,7 @@ export type SubAssignmentSubmission = {
   grade: string | number | null
   entered_grade: string
   user_id: string
+  grade_matches_current_submission: boolean
 }
 
 export type Submission = SubAssignmentSubmission & {
