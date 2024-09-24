@@ -1029,6 +1029,7 @@ const locale = {
   },
   "styles_2aa721ef": { "message": "Stile" },
   "submit_a3cc6859": { "message": "Aflever" },
+  "submitting_b90fac62": { "message": "Afleverer ..." },
   "subscript_59744f96": { "message": "Sænket skrift" },
   "subset_19c1a92f": { "message": "Delmængde" },
   "subset_strict_8d8948d6": { "message": "Delmængde (streng)" },

@@ -1033,6 +1033,7 @@ const locale = {
   },
   "styles_2aa721ef": { "message": "Stilar" },
   "submit_a3cc6859": { "message": "Spara" },
+  "submitting_b90fac62": { "message": "Skickar ..." },
   "subscript_59744f96": { "message": "Nedsänkt" },
   "subset_19c1a92f": { "message": "Delmängd" },
   "subset_strict_8d8948d6": { "message": "Delmängd (strikt)" },
