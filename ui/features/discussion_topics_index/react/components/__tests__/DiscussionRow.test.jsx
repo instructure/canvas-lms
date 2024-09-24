@@ -57,6 +57,7 @@ describe('DiscussionRow', () => {
             html_url: '',
             avatar_image_url: null,
           },
+          permissions: {},
           subscribed: false,
           read_state: 'unread',
           unread_count: 0,
@@ -339,7 +340,7 @@ describe('DiscussionRow', () => {
         },
       },
     })
-    render(<DiscussionRow {...props} />) 
+    render(<DiscussionRow {...props} />)
     expect(screen.queryByText('Reply to topic:', {exact: false})).toBeInTheDocument()
     expect(screen.queryByText('Required replies (2):', {exact: false})).toBeInTheDocument()
     expect(
@@ -735,6 +736,33 @@ describe('DiscussionRow', () => {
     const allKeys = list.querySelectorAll('li')
     expect(allKeys.length).toBe(1)
     expect(allKeys[0].textContent.includes('Close for comments')).toBe(true)
+  })
+
+  it('renders edit menu item if the user has update permission and discussion has html_url', async () => {
+    Object.defineProperty(window, 'location', {
+      value: {assign: jest.fn()},
+    })
+    render(
+      <DiscussionRow
+        {...makeProps({
+          displayManageMenu: true,
+          discussion: {
+            permissions: {update: true},
+            html_url: 'https://example.com',
+          },
+        })}
+      />
+    )
+
+    const list = await openManageMenu('Hello World')
+    const allKeys = list.querySelectorAll('li')
+    expect(allKeys.length).toBe(1)
+    expect(allKeys[0].textContent.includes('Edit')).toBe(true)
+
+    const edit = screen.getByText('Edit')
+    await user.click(edit)
+
+    expect(window.location.assign).toHaveBeenCalledWith('https://example.com/edit')
   })
 
   it('renders mastery paths menu item if permitted', async () => {
