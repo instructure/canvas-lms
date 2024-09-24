@@ -203,9 +203,9 @@ class ContentTag < ActiveRecord::Base
   end
 
   def default_values
-    self.title ||= content.title rescue nil
-    self.title ||= content.name rescue nil
-    self.title ||= content.display_name rescue nil
+    self.title ||= content.try(:title)
+    self.title ||= content.try(:name)
+    self.title ||= content.try(:display_name)
     self.title ||= t(:no_title, "No title")
     self.comments ||= ""
     self.comments = "" if self.comments == "Comments"
@@ -214,11 +214,11 @@ class ContentTag < ActiveRecord::Base
   protected :default_values
 
   def context_code
-    super || "#{context_type.to_s.underscore}_#{context_id}" rescue nil
+    super || (context_type && "#{context_type.to_s.underscore}_#{context_id}")
   end
 
   def context_name
-    context.name rescue ""
+    context.try(:name).to_s
   end
 
   def update_could_be_locked

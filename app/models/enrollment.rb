@@ -619,7 +619,7 @@ class Enrollment < ActiveRecord::Base
 
   def assert_section
     self.course_section = course.default_section if !course_section_id && course
-    self.root_account_id ||= course.root_account_id rescue nil
+    self.root_account_id ||= course&.root_account_id
   end
 
   def course_name(display_user = nil)
@@ -953,9 +953,7 @@ class Enrollment < ActiveRecord::Base
     invited? || creation_pending?
   end
 
-  def email
-    user.email rescue t("#enrollment.default_email", "No Email")
-  end
+  delegate :email, to: :user
 
   def user_name
     has_attribute?("user_name") ? self["user_name"] : user.name

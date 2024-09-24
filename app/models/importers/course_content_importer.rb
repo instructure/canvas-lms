@@ -572,10 +572,16 @@ module Importers
 
       result = {}
       remove_bad_end_dates!(options)
-      result[:old_start_date] = Date.parse(options[:old_start_date]) rescue course.real_start_date
-      result[:old_end_date] = Date.parse(options[:old_end_date]) rescue course.real_end_date
-      result[:new_start_date] = Date.parse(options[:new_start_date]) rescue course.real_start_date
-      result[:new_end_date] = Date.parse(options[:new_end_date]) rescue nil
+      {
+        old_start_date: course.real_start_date,
+        old_end_date: course.real_end_date,
+        new_start_date: course.real_start_date,
+        new_end_date: nil
+      }.each do |field, default|
+        result[field] = Date.parse(options[field])
+      rescue TypeError, Date::Error
+        result[field] = default
+      end
       # infer a new end date preserving course duration, instead of using the unshifted old end date
       if result[:new_end_date].nil? && result[:new_start_date].present? &&
          result[:old_end_date].present? && result[:old_start_date].present?
@@ -585,8 +591,8 @@ module Importers
       result[:time_zone] = Time.find_zone(options[:time_zone])
       result[:time_zone] ||= course.root_account.default_time_zone unless course.root_account.nil?
       time_zone = result[:time_zone] || Time.zone
-      result[:default_start_at] = time_zone.parse(options[:new_start_date]) rescue nil
-      result[:default_conclude_at] = time_zone.parse(options[:new_end_date]) rescue nil
+      result[:default_start_at] = time_zone.parse(options[:new_start_date].to_s)
+      result[:default_conclude_at] = time_zone.parse(options[:new_end_date].to_s)
       result
     end
 
@@ -599,12 +605,20 @@ module Importers
     end
 
     def self.remove_bad_end_dates!(options)
-      old_start = Time.zone.parse(options[:old_start_date]) rescue nil
-      old_end   = Time.zone.parse(options[:old_end_date]) rescue nil
-      options[:old_end_date] = nil if old_start && old_end && old_end < old_start
-      new_start = Time.zone.parse(options[:new_start_date]) rescue nil
-      new_end   = Time.zone.parse(options[:new_end_date]) rescue nil
-      options[:new_end_date] = nil if new_start && new_end && new_end < new_start
+      begin
+        old_start = Time.zone.parse(options[:old_start_date])
+        old_end   = Time.zone.parse(options[:old_end_date])
+        options[:old_end_date] = nil if old_end && old_end < old_start
+      rescue ArgumentError, TypeError
+        # ignore
+      end
+      begin
+        new_start = Time.zone.parse(options[:new_start_date])
+        new_end   = Time.zone.parse(options[:new_end_date])
+        options[:new_end_date] = nil if new_end && new_end < new_start
+      rescue ArgumentError, TypeError
+        # ignore
+      end
     end
 
     def self.shift_date(time, options = {})
@@ -636,7 +650,7 @@ module Importers
           new_date -= 7 unless new_date - 7 < new_start_date
         end
 
-        new_time = Time.utc(new_date.year, new_date.month, new_date.day, (time.hour rescue 0), (time.min rescue 0)).in_time_zone
+        new_time = Time.utc(new_date.year, new_date.month, new_date.day, time.try(:hour) || 0, time.try(:min) || 0).in_time_zone
         new_time -= new_time.utc_offset
         new_time
       end

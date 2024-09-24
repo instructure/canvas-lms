@@ -124,11 +124,11 @@ class DelayedMessage < ActiveRecord::Base
       m.communication_channel&.active? &&
         !m.communication_channel.bouncing?
     end
-    to = first.communication_channel rescue nil
+    to = first&.communication_channel
     return nil unless to
     return nil if delayed_messages.empty?
 
-    user = to.user rescue nil
+    user = to.user
     context = delayed_messages.select(&:context).compact.first.try(:context)
     return nil unless context # the context for this message has already been deleted
 

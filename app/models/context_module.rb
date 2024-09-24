@@ -780,7 +780,7 @@ class ContextModule < ActiveRecord::Base
     else
       return nil unless item
 
-      title = params[:title] || (item.title rescue item.name)
+      title = params[:title] || item.try(:title) || item.name
       added_item ||= content_tags.build(context:)
       added_item.attributes = {
         content: item,

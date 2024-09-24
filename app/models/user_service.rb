@@ -67,7 +67,7 @@ class UserService < ActiveRecord::Base
   scope :visible, -> { where("visible") }
 
   def service_name
-    service.titleize rescue ""
+    service.titleize
   end
 
   def password=(password)

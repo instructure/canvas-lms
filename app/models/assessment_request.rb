@@ -134,7 +134,7 @@ class AssessmentRequest < ActiveRecord::Base
   end
 
   def assessor_name
-    rubric_assessment.assessor_name rescue ((assessor.name rescue nil) || t("#unknown", "Unknown"))
+    rubric_assessment&.assessor_name || assessor.name || t("#unknown", "Unknown")
   end
 
   def incomplete?
@@ -163,7 +163,7 @@ class AssessmentRequest < ActiveRecord::Base
   end
 
   def asset_title
-    (asset.assignment.title rescue asset.title) rescue t("#unknown", "Unknown")
+    asset.assignment.title
   end
 
   def comment_added
@@ -171,7 +171,7 @@ class AssessmentRequest < ActiveRecord::Base
   end
 
   def asset_user_name
-    asset.user.name rescue t("#unknown", "Unknown")
+    asset.user.name
   end
 
   def self.serialization_excludes

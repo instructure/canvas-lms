@@ -1972,7 +1972,7 @@ class DiscussionTopic < ActiveRecord::Base
       next unless asset
 
       item = RSS::Rss::Channel::Item.new
-      item.title = before_label((asset.title rescue "")) + elem.name
+      item.title = before_label(asset.title) + elem.name
       link = nil
       case asset
       when DiscussionTopic

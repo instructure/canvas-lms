@@ -214,7 +214,7 @@ class Rubric < ActiveRecord::Base
         self.title = "#{original_title} (#{cnt})"
       end
     end
-    self.context_code = "#{context_type.underscore}_#{context_id}" rescue nil
+    self.context_code = context_type && "#{context_type.underscore}_#{context_id}"
   end
 
   alias_method :destroy_permanently!, :destroy
@@ -484,7 +484,7 @@ class Rubric < ActiveRecord::Base
         criterion[:long_description] = outcome&.description || ""
         if outcome
           criterion[:learning_outcome_id] = outcome.id
-          criterion[:mastery_points] = ((criterion_data[:mastery_points] || outcome.data[:rubric_criterion][:mastery_points]).to_f rescue nil)
+          criterion[:mastery_points] = (criterion_data[:mastery_points] || outcome.data&.dig(:rubric_criterion, :mastery_points))&.to_f
           criterion[:ignore_for_scoring] = valid_bools.include?(criterion_data[:ignore_for_scoring])
         end
       end
@@ -514,7 +514,7 @@ class Rubric < ActiveRecord::Base
   end
 
   def total_points_from_criteria(criteria)
-    criteria.reject { |c| c[:ignore_for_scoring] }.sum { |c| c[:points] }
+    criteria.reject { |c| c[:ignore_for_scoring] }.pluck(:points).compact.sum
   end
 
   def reconcile_criteria_models(current_user)
