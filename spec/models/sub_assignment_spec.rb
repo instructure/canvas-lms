@@ -335,4 +335,35 @@ describe SubAssignment do
       @sub_assignment.update!(unlock_at: 1.day.from_now)
     end
   end
+
+  describe "title_with_id" do
+    before(:once) do
+      @course = course_factory(active_course: true)
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+    end
+
+    it "formats the title and id of a reply_to_topic checkpoint assignment" do
+      expect(@reply_to_topic.title_with_id).to match("#{@reply_to_topic.title} Reply To Topic (#{@reply_to_topic.id})")
+    end
+
+    it "formats the title and id of a reply_to_entry checkpoint assignment" do
+      expect(@reply_to_entry.title_with_id).to match("#{@reply_to_entry.title} Required Replies (#{@reply_to_entry.id})")
+    end
+  end
+
+  describe "title_and_id" do
+    it "extracts the title and id of the reply_to_topic checkpoint assignment" do
+      expect(SubAssignment.title_and_id("Assignment 1 Reply To Topic (1)")).to eq(["Assignment 1", "1"])
+    end
+
+    it "extracts the title and id of the reply_to_entry checkpoint assignment" do
+      expect(SubAssignment.title_and_id("Assignment 1 Required Replies (1)")).to eq(["Assignment 1", "1"])
+    end
+
+    it "handles extracting the title and id of checkpoints properly" do
+      expect(SubAssignment.title_and_id("Reply To Topic Reply To Topic (1)")).to eq(["Reply To Topic", "1"])
+      expect(SubAssignment.title_and_id("Required Replies Required Replies (1)")).to eq(["Required Replies", "1"])
+    end
+  end
 end

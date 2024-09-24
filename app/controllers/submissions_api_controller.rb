@@ -1348,7 +1348,7 @@ class SubmissionsApiController < ApplicationController
     end
 
     assignment_ids = grade_data.keys
-    @assignments = api_find_all(@context.assignments.active, assignment_ids)
+    @assignments = api_find_all(@context.assignments_scope, assignment_ids)
 
     unless @assignments.all?(&:published?) &&
            @context.grants_right?(@current_user, session, :manage_grades)

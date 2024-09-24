@@ -2942,7 +2942,7 @@ class Submission < ActiveRecord::Base
     missing_ids = []
     unpublished_assignment_ids = []
     graded_user_ids = Set.new
-    preloaded_assignments = Assignment.find(grade_data.keys).index_by(&:id)
+    preloaded_assignments = AbstractAssignment.find(grade_data.keys).index_by(&:id)
 
     Submission.suspend_callbacks(:touch_graders) do
       grade_data.each do |assignment_id, user_grades|

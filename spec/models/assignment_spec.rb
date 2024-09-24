@@ -7553,6 +7553,23 @@ describe Assignment do
     end
   end
 
+  describe "title_with_id" do
+    before :once do
+      @assignment = assignment_model(course: @course)
+    end
+
+    it "formats the title and id of the assignment" do
+      @assignment.title = "Assignment Title"
+      expect(@assignment.title_with_id).to match("#{@assignment.title} (#{@assignment.id})")
+    end
+  end
+
+  describe "title_and_id" do
+    it "extracts the title and id of the assignment" do
+      expect(Assignment.title_and_id("Assignment 1 (1)")).to eq(["Assignment 1", "1"])
+    end
+  end
+
   describe "due_date" do
     let(:assignment) do
       @course.assignments.new(assignment_valid_attributes)
