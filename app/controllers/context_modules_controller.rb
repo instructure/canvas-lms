@@ -410,7 +410,7 @@ class ContextModulesController < ApplicationController
       # prerequisites to no longer be valid
       @modules = @context.context_modules.not_deleted.to_a
       @modules.each do |m|
-        m.updated_at = Time.now
+        m.updated_at = Time.zone.now
         m.save_without_touching_context
         Canvas::LiveEvents.module_updated(m) if m.position != order_before[m.id]
       end

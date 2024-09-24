@@ -97,7 +97,7 @@ class DelayedMessage < ActiveRecord::Base
   workflow do
     state :pending do
       event :begin_send, transitions_to: :sent do
-        self.batched_at = Time.now
+        self.batched_at = Time.zone.now
       end
       event :cancel, transitions_to: :cancelled
     end

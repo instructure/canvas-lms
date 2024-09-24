@@ -39,7 +39,7 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
   after_initialize do
     # We ALWAYS want this to be set, otherwise the event won't be stored in the
     # right partition.
-    self.created_at ||= Time.now
+    self.created_at ||= Time.zone.now
   end
 
   # After optimizing an event, it could become "empty" as in it does not

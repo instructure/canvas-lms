@@ -1554,11 +1554,11 @@ class Submission < ActiveRecord::Base
       end
     end
 
-    self.submitted_at ||= Time.now if has_submission?
+    self.submitted_at ||= Time.zone.now if has_submission?
     quiz_submission.reload if quiz_submission_id
     self.workflow_state = inferred_workflow_state
     if (workflow_state_changed? && graded?) || late_policy_status_changed?
-      self.graded_at = Time.now
+      self.graded_at = Time.zone.now
     end
     self.media_comment_id = nil if media_comment_id && media_comment_id.strip.empty?
     if media_comment_id && (media_comment_id_changed? || !media_object_id)

@@ -368,7 +368,7 @@ class MediaObject < ActiveRecord::Base
   def viewed!
     # in the delayed job, current_attachment gets reset
     # so we pass it in here and then set it again in the next method
-    delay.updated_viewed_at_and_retrieve_details(Time.now, current_attachment) if !self.data[:last_viewed_at] || self.data[:last_viewed_at] > 1.hour.ago
+    delay.updated_viewed_at_and_retrieve_details(Time.zone.now, current_attachment) if !self.data[:last_viewed_at] || self.data[:last_viewed_at] > 1.hour.ago
     true
   end
 

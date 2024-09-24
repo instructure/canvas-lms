@@ -435,7 +435,7 @@ class Group < ActiveRecord::Base
   end
 
   def bulk_insert_group_memberships(users, options = {})
-    current_time = Time.now
+    current_time = Time.zone.now
     options = {
       group_id: id,
       workflow_state: "accepted",

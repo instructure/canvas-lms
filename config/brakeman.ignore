@@ -459,29 +459,6 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "57bf50dbd2610462dcf2668cee33bc98fa95715b7017fa3ce22202b03a026ef4",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/models/discussion_entry_participant.rb",
-      "line": 164,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "connection.exec_insert(\"  INSERT INTO #{quoted_table_name}\\n              (#{\"discussion_entry_id,user_id,root_account_id,workflow_state,read_at,forced_read_state,rating,report_type\"})\\n       VALUES #{[entry_or_topic].map do\n row_values(batch_entry, user.id, entry_or_topic.root_account_id, (new_state or \"unread\"), [connection.quote(forced), connection.quote(rating), connection.quote(:BRAKEMAN_SAFE_LITERAL)])\n end.map do\n \"(#{row.join(\",\")})\"\n end.join(\",\")}\\n  ON CONFLICT (discussion_entry_id,user_id)\\nDO UPDATE SET #{[\"forced_read_state\", \"rating\", \"report_type\", \"workflow_state\", \"read_at\"].zip([connection.quote(forced), connection.quote(rating), connection.quote(:BRAKEMAN_SAFE_LITERAL), connection.quote(new_state), connection.quote((Time.now or nil))]).map do\n a.join(\"=\")\n end.join(\",\")}\\n        WHERE #{\"(#{quoted_table_name}.#{[\"forced_read_state\", \"rating\", \"report_type\", \"workflow_state\", \"read_at\"].join(\",#{quoted_table_name}.\")})\\n                     IS DISTINCT FROM (#{\"#{connection.quote(forced)},#{connection.quote(rating)},#{connection.quote(:BRAKEMAN_SAFE_LITERAL)},#{connection.quote(new_state)},#{connection.quote((Time.now or nil))}\"})\"}\\n\".squish)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "DiscussionEntryParticipant",
-        "method": "DiscussionEntryParticipant.upsert_for_entries"
-      },
-      "user_input": "[entry_or_topic].map do\n row_values(batch_entry, user.id, entry_or_topic.root_account_id, (new_state or \"unread\"), [connection.quote(forced), connection.quote(rating), connection.quote(:BRAKEMAN_SAFE_LITERAL)])\n end.map do\n \"(#{row.join(\",\")})\"\n end.join(\",\")",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
       "fingerprint": "60d79b3e448515aa6141cbfe88c51b91d1cdafc7a766af6c38780307b594f07a",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -880,6 +857,29 @@
       "confidence": "High",
       "cwe_id": [
         601
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "95cb09e9318723a29052bcdcf833ac2cf91cab22b8cd593987cc9d9e55223f11",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/discussion_entry_participant.rb",
+      "line": 164,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "connection.exec_insert(\"  INSERT INTO #{quoted_table_name}\\n              (#{\"discussion_entry_id,user_id,root_account_id,workflow_state,read_at,forced_read_state,rating,report_type\"})\\n       VALUES #{[entry_or_topic].map do\n row_values(batch_entry, user.id, entry_or_topic.root_account_id, (new_state or \"unread\"), [connection.quote(forced), connection.quote(rating), connection.quote(:BRAKEMAN_SAFE_LITERAL)])\n end.map do\n \"(#{row.join(\",\")})\"\n end.join(\",\")}\\n  ON CONFLICT (discussion_entry_id,user_id)\\nDO UPDATE SET #{[\"forced_read_state\", \"rating\", \"report_type\", \"workflow_state\", \"read_at\"].zip([connection.quote(forced), connection.quote(rating), connection.quote(:BRAKEMAN_SAFE_LITERAL), connection.quote(new_state), connection.quote((Time.zone.now or nil))]).map do\n a.join(\"=\")\n end.join(\",\")}\\n        WHERE #{\"(#{quoted_table_name}.#{[\"forced_read_state\", \"rating\", \"report_type\", \"workflow_state\", \"read_at\"].join(\",#{quoted_table_name}.\")})\\n                     IS DISTINCT FROM (#{\"#{connection.quote(forced)},#{connection.quote(rating)},#{connection.quote(:BRAKEMAN_SAFE_LITERAL)},#{connection.quote(new_state)},#{connection.quote((Time.zone.now or nil))}\"})\"}\\n\".squish)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DiscussionEntryParticipant",
+        "method": "DiscussionEntryParticipant.upsert_for_entries"
+      },
+      "user_input": "[entry_or_topic].map do\n row_values(batch_entry, user.id, entry_or_topic.root_account_id, (new_state or \"unread\"), [connection.quote(forced), connection.quote(rating), connection.quote(:BRAKEMAN_SAFE_LITERAL)])\n end.map do\n \"(#{row.join(\",\")})\"\n end.join(\",\")",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
       ],
       "note": ""
     },

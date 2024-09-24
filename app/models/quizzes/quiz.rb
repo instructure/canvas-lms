@@ -759,7 +759,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       end
 
       submission.quiz_version = version_number
-      submission.started_at = ::Time.now
+      submission.started_at = ::Time.zone.now
       submission.score_before_regrade = nil
       submission.end_at = build_submission_end_at(submission)
       submission.finished_at = nil
@@ -794,7 +794,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   # be held in Quizzes::Quiz.quiz_data
   def generate_quiz_data(opts = {})
     entries = root_entries(true)
-    t = Time.now
+    t = Time.zone.now
     entries.each do |e|
       e[:published_at] = t
     end
@@ -881,17 +881,17 @@ class Quizzes::Quiz < ActiveRecord::Base
     new_val = Canvas::Plugin.value_to_boolean(new_val)
     if new_val
       # lock the quiz either until unlock_at, or indefinitely if unlock_at.nil?
-      self.lock_at = Time.now
+      self.lock_at = Time.zone.now
       self.unlock_at = [lock_at, unlock_at].min if unlock_at
     else
       # unlock the quiz
-      self.unlock_at = Time.now
+      self.unlock_at = Time.zone.now
     end
   end
 
   def locked?
-    (unlock_at && unlock_at > Time.now) ||
-      (lock_at && lock_at <= Time.now)
+    (unlock_at && unlock_at > Time.zone.now) ||
+      (lock_at && lock_at <= Time.zone.now)
   end
 
   def hide_results=(val)

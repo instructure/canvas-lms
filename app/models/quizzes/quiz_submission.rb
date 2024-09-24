@@ -232,7 +232,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
          quiz_submissions.workflow_state = 'completed'
          AND quiz_submissions.submission_data IS NOT NULL
        )",
-                 { time: Time.now }).to_a
+                 { time: Time.zone.now }).to_a
     resp.select!(&:needs_grading?)
     resp
   end
@@ -269,7 +269,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   def finished_in_words
     extend ActionView::Helpers::DateHelper
-    started_at && finished_at && time_ago_in_words(Time.now - (finished_at - started_at))
+    started_at && finished_at && time_ago_in_words(Time.zone.now - (finished_at - started_at))
   end
 
   def finished_at_fallback
@@ -456,7 +456,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       @assignment_submission.quiz_submission_id = id
       @assignment_submission.graded_at = Time.zone.now
       @assignment_submission.grader_id = grader_id || "-#{quiz_id}".to_i
-      @assignment_submission.body = "user: #{user_id}, quiz: #{quiz_id}, score: #{score}, time: #{Time.now}"
+      @assignment_submission.body = "user: #{user_id}, quiz: #{quiz_id}, score: #{score}, time: #{Time.zone.now}"
       @assignment_submission.user_id = user_id
       @assignment_submission.submission_type = "online_quiz"
       @assignment_submission.saved_by = :quiz_submission
@@ -666,7 +666,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def update_submission_version(version, attrs)
     version_data = YAML.load(version.yaml)
     version_data["submission_data"] = submission_data if attrs.include?(:submission_data)
-    version_data["temporary_user_code"] = "was #{version_data["score"]} until #{Time.now}"
+    version_data["temporary_user_code"] = "was #{version_data["score"]} until #{Time.zone.now}"
     version_data["score"] = score if attrs.include?(:score)
     version_data["fudge_points"] = fudge_points if attrs.include?(:fudge_points)
     version_data["workflow_state"] = workflow_state if attrs.include?(:workflow_state)
@@ -767,7 +767,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
         s.score = kept_score
         s.grade_change_event_author_id = params[:grader_id]
         s.grade_matches_current_submission = workflow_state != "pending_review" || attempt == 1
-        s.body = "user: #{user_id}, quiz: #{quiz_id}, score: #{kept_score}, time: #{Time.now}"
+        s.body = "user: #{user_id}, quiz: #{quiz_id}, score: #{kept_score}, time: #{Time.zone.now}"
         s.saved_by = :quiz_submission
       end
     end

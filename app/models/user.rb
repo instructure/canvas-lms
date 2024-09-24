@@ -1662,7 +1662,7 @@ class User < ActiveRecord::Base
       if val == "none"
         self.avatar_image_url = nil
         self.avatar_image_source = "no_pic"
-        self.avatar_image_updated_at = Time.now
+        self.avatar_image_updated_at = Time.zone.now
       end
       super(val.to_s)
     end
@@ -1998,7 +1998,7 @@ class User < ActiveRecord::Base
   end
 
   def last_seen_release_note
-    preferences[:last_seen_release_note] || Time.at(0)
+    preferences[:last_seen_release_note] || Time.zone.at(0)
   end
 
   def release_notes_badge_disabled?
@@ -2996,7 +2996,7 @@ class User < ActiveRecord::Base
     can_favorite = proc { |c| !(c.elementary_subject_course? || c.elementary_homeroom_course?) || c.user_is_admin?(self) || roles(c.root_account).include?("teacher") }
     # this terribleness is so we try to make sure that the newest courses show up in the menu
     courses = courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid, opts)
-              .sort_by { |c| [c.primary_enrollment_rank, Time.now - (c.primary_enrollment_date || Time.now)] }
+              .sort_by { |c| [c.primary_enrollment_rank, Time.zone.now - (c.primary_enrollment_date || Time.zone.now)] }
               .first(Setting.get("menu_course_limit", "20").to_i)
               .sort_by { |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.name)] }
     favorites = courses_with_primary_enrollment(:favorite_courses, enrollment_uuid, opts)

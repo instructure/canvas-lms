@@ -113,7 +113,7 @@ class AssessmentRequest < ActiveRecord::Base
 
   def send_reminder!
     @send_reminder = true
-    self.updated_at = Time.now
+    self.updated_at = Time.zone.now
     save!
   ensure
     @send_reminder = nil

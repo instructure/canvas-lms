@@ -105,11 +105,11 @@ module CC
 
     REPLACEABLE_MEDIA_TYPES = ["audio", "video"].freeze
 
-    def ims_date(date = nil, default = Time.now)
+    def ims_date(date = nil, default = Time.zone.now)
       CCHelper.ims_date(date, default)
     end
 
-    def ims_datetime(date = nil, default = Time.now)
+    def ims_datetime(date = nil, default = Time.zone.now)
       CCHelper.ims_datetime(date, default)
     end
 
@@ -125,14 +125,14 @@ module CC
       (global ? "g" : "i") + Digest::MD5.hexdigest(prepend + key)
     end
 
-    def self.ims_date(date = nil, default = Time.now)
+    def self.ims_date(date = nil, default = Time.zone.now)
       date ||= default
       return nil unless date
 
       date.respond_to?(:utc) ? date.utc.strftime(IMS_DATE) : date.strftime(IMS_DATE)
     end
 
-    def self.ims_datetime(date = nil, default = Time.now)
+    def self.ims_datetime(date = nil, default = Time.zone.now)
       date ||= default
       return nil unless date
 

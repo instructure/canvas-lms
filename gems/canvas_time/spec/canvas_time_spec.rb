@@ -50,7 +50,7 @@ end
 
 describe "fancy_midnight" do
   it "doesn't stomp on your Jenkins specs at midnight UTC" do
-    time = Time.now.beginning_of_day + 4.seconds
+    time = Time.zone.now.beginning_of_day + 4.seconds
     expect(CanvasTime.fancy_midnight(time)).to eq(time)
     expect(CanvasTime.fancy_midnight(time.beginning_of_day)).to eq time.end_of_day
   end

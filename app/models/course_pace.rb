@@ -137,7 +137,7 @@ class CoursePace < ActiveRecord::Base
     progress
   end
 
-  def run_publish_progress(progress, run_at: Time.now, enrollment_ids: nil)
+  def run_publish_progress(progress, run_at: Time.zone.now, enrollment_ids: nil)
     progress.process_job(self,
                          :publish,
                          {

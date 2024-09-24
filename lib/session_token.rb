@@ -46,7 +46,7 @@ class SessionToken
     token = new(result["pseudonym_id"],
                 current_user_id: result["current_user_id"],
                 used_remember_me_token: result["used_remember_me_token"])
-    token.created_at = Time.at(result["created_at"])
+    token.created_at = Time.zone.at(result["created_at"])
     token.signature = result["signature"]
     token
   rescue JSON::ParserError

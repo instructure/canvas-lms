@@ -51,7 +51,7 @@ class EnrollmentState < ActiveRecord::Base
 
   # check if we've manually marked the enrollment state as potentially out of date (or if the stored date trigger has past)
   def state_needs_recalculation?
-    !state_is_current? || (state_valid_until && state_valid_until < Time.now)
+    !state_is_current? || (state_valid_until && state_valid_until < Time.zone.now)
   end
 
   def active?
@@ -154,7 +154,7 @@ class EnrollmentState < ActiveRecord::Base
   def calculate_state_based_on_dates
     wf_state = enrollment.workflow_state
     ranges = enrollment.enrollment_dates
-    now = Time.now
+    now = Time.zone.now
 
     # start_at <= now <= end_at, allowing for open ranges on either end
     if (range = ranges.detect { |start_at, end_at| (start_at || now) <= now && now <= (end_at || now) })

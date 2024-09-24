@@ -98,9 +98,9 @@ class CoursePacing::PaceService
       progress = Progress.order(created_at: :desc).find_by(context: pace, tag: "course_pace_publish")
 
       if (publish && !progress) || (progress.queued? && progress.delayed_job.blank?)
-        progress = pace.create_publish_progress(run_at: Time.now)
+        progress = pace.create_publish_progress(run_at: Time.zone.now)
       elsif progress.queued? && progress.delayed_job.present?
-        progress.delayed_job.update(run_at: Time.now)
+        progress.delayed_job.update(run_at: Time.zone.now)
       end
 
       progress
