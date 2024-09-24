@@ -23,6 +23,8 @@ module DataFixup
       help_link_id = help_link_id.to_sym
 
       Account.root_accounts.active.non_shadow.find_each do |account|
+        next unless account.primary_settings_root_account?
+
         links = account.settings[:custom_help_links]
         next unless links
 
