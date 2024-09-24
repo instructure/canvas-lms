@@ -242,6 +242,7 @@ module Types
           method: :graded_submissions_exist?,
           null: true
     field :can_duplicate, Boolean, method: :can_duplicate?, null: true
+    field :has_multiple_due_dates, Boolean, method: :multiple_distinct_due_dates?, null: true
 
     field :grade_group_students_individually,
           Boolean,
