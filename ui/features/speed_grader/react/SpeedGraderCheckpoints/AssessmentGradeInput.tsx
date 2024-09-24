@@ -110,6 +110,7 @@ export type AssessmentGradeInputProps = {
   hasHeader?: boolean
   header?: string
   isDisabled?: boolean
+  setLastSubmission: (params: SubAssignmentSubmission) => void
 }
 
 export const AssessmentGradeInput = ({
@@ -123,6 +124,7 @@ export const AssessmentGradeInput = ({
   hasHeader = false,
   header = '',
   isDisabled = false,
+  setLastSubmission,
 }: AssessmentGradeInputProps) => {
   const gradeToUse = useCallback(
     (gradeToUseSubmission: SubAssignmentSubmission) => {
@@ -185,6 +187,10 @@ export const AssessmentGradeInput = ({
     }
 
     if (updateSubmissionGrade) {
+      setLastSubmission({
+        sub_assignment_tag: submission.sub_assignment_tag,
+        grade: grade === '' || excuse ? null : grade,
+      } as SubAssignmentSubmission)
       updateSubmissionGrade({
         subAssignmentTag: submission.sub_assignment_tag,
         courseId,

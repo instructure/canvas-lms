@@ -83,6 +83,7 @@ const getDefaultProps = (
   lateSubmissionInterval: 'day',
   updateSubmissionGrade: jest.fn(),
   updateSubmissionStatus: jest.fn(),
+  setLastSubmission: jest.fn(),
 })
 
 const setup = (props: {
@@ -93,6 +94,7 @@ const setup = (props: {
   lateSubmissionInterval: string
   updateSubmissionGrade: (params: SubmissionGradeParams) => void
   updateSubmissionStatus: (params: SubmissionStatusParams) => void
+  setLastSubmission: (params: SubAssignmentSubmission) => void
 }) => {
   return render(<SpeedGraderCheckpoint {...props} />)
 }
@@ -200,6 +202,20 @@ describe('SpeedGraderCheckpoint', () => {
       courseId: '1',
       assignmentId: '1',
       studentId: '1',
+      grade: '3',
+    })
+  })
+
+  it('calls setLastSubmission when the grade input is changed', () => {
+    const props = getDefaultProps()
+    const {getByTestId} = setup(props)
+
+    const gradeInput = getByTestId('grade-input')
+    fireEvent.change(gradeInput, {target: {value: '3'}})
+    fireEvent.blur(gradeInput)
+
+    expect(props.setLastSubmission).toHaveBeenCalledWith({
+      sub_assignment_tag: 'reply_to_topic',
       grade: '3',
     })
   })
