@@ -1032,8 +1032,9 @@ class GradebooksController < ApplicationController
     return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
 
     @assignment = @context.assignments.active.find(params[:assignment_id])
-    platform_service_speedgrader_enabled = @context.feature_enabled?(:platform_service_speedgrader)
-    if platform_service_speedgrader_enabled && (params[:platform_sg].nil? || value_to_boolean(params[:platform_sg]))
+
+    platform_service_speedgrader_enabled = platform_service_speedgrader_enabled?(params)
+    if platform_service_speedgrader_enabled
       @page_title = t("SpeedGrader")
       @body_classes << "full-width padless-content"
 
@@ -1432,6 +1433,18 @@ class GradebooksController < ApplicationController
   end
 
   private
+
+  def platform_service_speedgrader_enabled?(params)
+    return false unless @context.feature_enabled?(:platform_service_speedgrader)
+
+    # SGP is currently disabled for moderated and anonymously graded assignments
+    if @assignment.present?
+      return false if @assignment.moderated_grading
+      return false if @assignment.anonymous_grading
+    end
+
+    params[:platform_sg].nil? || value_to_boolean(params[:platform_sg])
+  end
 
   def active_grading_standard_scaling_factor(grading_standard)
     grading_standard.scaling_factor
