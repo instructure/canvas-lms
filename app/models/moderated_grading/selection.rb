@@ -20,7 +20,8 @@
 class ModeratedGrading::Selection < ActiveRecord::Base
   belongs_to :provisional_grade,
              foreign_key: :selected_provisional_grade_id,
-             class_name: "ModeratedGrading::ProvisionalGrade"
+             class_name: "ModeratedGrading::ProvisionalGrade",
+             inverse_of: :selection
   belongs_to :assignment, inverse_of: :moderated_grading_selections, class_name: "AbstractAssignment"
   belongs_to :student, class_name: "User"
 

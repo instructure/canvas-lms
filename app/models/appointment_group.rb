@@ -22,17 +22,16 @@ class AppointmentGroup < ActiveRecord::Base
   include Workflow
   include TextHelper
 
-  # rubocop:disable Style/RedundantDoubleSplatHashBraces
-  # see https://github.com/rubocop/rubocop/issues/12263
+  # rubocop:disable Rails/InverseOf
   has_many :appointments,
            -> { order(:start_at).preload(:child_events).where("calendar_events.workflow_state <> 'deleted'") },
            **(opts = { class_name: "CalendarEvent", as: :context, inverse_of: :context })
-  # rubocop:enable Style/RedundantDoubleSplatHashBraces
 
   # has_many :through on the same table does not alias columns in condition
   # strings, just hashes. we create this helper association to ensure
   # appointments_participants conditions have the correct table alias
   has_many :_appointments, -> { order(:start_at).preload(:child_events).where("_appointments_appointments_participants.workflow_state <> 'deleted'") }, **opts
+  # rubocop:enable Rails/InverseOf
   has_many :appointments_participants, -> { where("calendar_events.workflow_state <> 'deleted'").order(:start_at) }, through: :_appointments, source: :child_events
   has_many :appointment_group_contexts
   has_many :appointment_group_sub_contexts, -> { preload(:sub_context) }

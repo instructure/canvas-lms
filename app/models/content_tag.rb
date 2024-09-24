@@ -59,7 +59,7 @@ class ContentTag < ActiveRecord::Base
   belongs_to :context_module
   belongs_to :learning_outcome
   # This allows doing a has_many_through relationship on ContentTags for linked LearningOutcomes. (see LearningOutcomeContext)
-  belongs_to :learning_outcome_content, class_name: "LearningOutcome", foreign_key: :content_id
+  belongs_to :learning_outcome_content, class_name: "LearningOutcome", foreign_key: :content_id, inverse_of: false
   has_many :learning_outcome_results
   belongs_to :root_account, class_name: "Account"
 

@@ -38,12 +38,12 @@ describe LiveAssessments::Submission do
       # we can probably create a meaningful result with no points
       # possible, but we don't now so that's what we test
       submission.possible = 0
-      submission.create_outcome_result(alignment)
+      submission.create_outcome_result(alignment.reload)
       expect(alignment.learning_outcome_results.count).to eq 0
     end
 
     it "creates an outcome result" do
-      submission.create_outcome_result(alignment)
+      submission.create_outcome_result(alignment.reload)
       result = alignment.learning_outcome_results.first
       expect(result).not_to be_nil
       expect(result.title).to eq "#{assessment_user.name}, #{assessment.title}"
@@ -57,7 +57,7 @@ describe LiveAssessments::Submission do
     end
 
     it "updates an existing outcome result" do
-      submission.create_outcome_result(alignment)
+      submission.create_outcome_result(alignment.reload)
       result = alignment.learning_outcome_results.first
       expect(result.percent).to eq 0.5
       submission.score = 80
@@ -68,7 +68,7 @@ describe LiveAssessments::Submission do
     end
 
     it "restores a deleted outcome result" do
-      submission.create_outcome_result(alignment)
+      submission.create_outcome_result(alignment.reload)
       result = alignment.learning_outcome_results.first
       result.destroy
       submission.score = 80
@@ -80,7 +80,7 @@ describe LiveAssessments::Submission do
     it "scales the score to the outcome rubric criterion if present" do
       outcome.data = { rubric_criterion: { mastery_points: 3, points_possible: 5 } }
       outcome.save!
-      submission.create_outcome_result(alignment)
+      submission.create_outcome_result(alignment.reload)
       result = alignment.learning_outcome_results.first
       expect(result.percent).to eq 0.5
       expect(result.score).to eq 2.5
@@ -90,7 +90,7 @@ describe LiveAssessments::Submission do
       it "sets mastery based on percent passed" do
         alignment.mastery_score = 0.6
         alignment.save!
-        submission.create_outcome_result(alignment)
+        submission.create_outcome_result(alignment.reload)
         result = alignment.learning_outcome_results.first
         expect(result.mastery).to be_falsey
         submission.score = 80

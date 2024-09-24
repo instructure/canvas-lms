@@ -127,6 +127,8 @@ Rails/I18nLocaleTexts:
   Exclude:
     - spec/**/*.rb
     - "**/spec_canvas/**/*.rb"
+Rails/InverseOf:
+  IgnoreScopes: true # config.active_record.automatic_scope_inversing is enabled
 Rails/NegateInclude:
   Enabled: false # exclude? isn't as intuitive as !include?
 Rails/Output:
@@ -284,8 +286,6 @@ Rails/EagerEvaluationLogMessage:
 Rails/FindEach:
   Severity: convention
   AutoCorrect: false
-Rails/InverseOf:
-  Severity: convention
 Rails/LexicallyScopedActionFilter:
   Severity: convention
 Rails/OutputSafety:

@@ -1786,6 +1786,9 @@ describe Account do
       end
       @sub2.save!
 
+      @account.reload
+      @sub1.reload
+      @sub2.reload
       @settings.each do |key|
         expect(@account.send(key)).to eq({ locked: false, value: false })
         expect(@sub1.send(key)).to eq({ locked: true, value: true })
@@ -1804,6 +1807,9 @@ describe Account do
       end
       @sub2.save!
 
+      @account.reload
+      @sub1.reload
+      @sub2.reload
       @settings.each do |key|
         expect(@account.send(key)).to eq({ locked: false, value: true })
         expect(@sub1.send(key)).to eq({ locked: false, value: true, inherited: true })
@@ -1831,22 +1837,22 @@ describe Account do
 
       it "elides an empty setting" do
         @sub1.update settings: { sis_assignment_name_length_input: { value: "" } }
-        expect(@sub1.sis_assignment_name_length_input).to eq({ value: "100", inherited: true })
+        expect(@sub1.reload.sis_assignment_name_length_input).to eq({ value: "100", inherited: true })
       end
 
       it "elides a nil setting" do
         @sub1.update settings: { sis_assignment_name_length_input: { value: nil } }
-        expect(@sub1.sis_assignment_name_length_input).to eq({ value: "100", inherited: true })
+        expect(@sub1.reload.sis_assignment_name_length_input).to eq({ value: "100", inherited: true })
       end
 
       it "elides an explicitly-unlocked setting" do
         @sub1.update settings: { sis_assignment_name_length_input: { value: nil, locked: false } }
-        expect(@sub1.sis_assignment_name_length_input).to eq({ value: "100", inherited: true })
+        expect(@sub1.reload.sis_assignment_name_length_input).to eq({ value: "100", inherited: true })
       end
 
       it "doesn't elide a locked setting" do
         @sub1.update settings: { sis_assignment_name_length_input: { value: nil, locked: true } }
-        expect(@sub2.sis_assignment_name_length_input).to eq({ value: nil, inherited: true, locked: true })
+        expect(@sub2.reload.sis_assignment_name_length_input).to eq({ value: nil, inherited: true, locked: true })
       end
     end
 
@@ -2805,10 +2811,10 @@ describe Account do
       end
 
       it "returns correct filters for each account level" do
-        expect(account4.available_ip_filters.size).to eq(3)
-        expect(account3.available_ip_filters.size).to eq(3)
-        expect(account2.available_ip_filters.size).to eq(2)
-        expect(account1.available_ip_filters.size).to eq(1)
+        expect(account4.reload.available_ip_filters.size).to eq(3)
+        expect(account3.reload.available_ip_filters.size).to eq(3)
+        expect(account2.reload.available_ip_filters.size).to eq(2)
+        expect(account1.reload.available_ip_filters.size).to eq(1)
       end
     end
   end

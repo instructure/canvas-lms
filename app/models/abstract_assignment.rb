@@ -113,7 +113,7 @@ class AbstractAssignment < ActiveRecord::Base
   has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, inverse_of: :content, class_name: "ContentTag"
   has_one :rubric_association, -> { where(purpose: "grading").order(:created_at).preload(:rubric) }, as: :association, inverse_of: :association_object
   has_one :rubric, -> { merge(RubricAssociation.active) }, through: :rubric_association
-  has_one :teacher_enrollment, -> { preload(:user).where(enrollments: { workflow_state: "active", type: "TeacherEnrollment" }) }, class_name: "TeacherEnrollment", foreign_key: "course_id", primary_key: "context_id"
+  has_one :teacher_enrollment, -> { preload(:user).where(enrollments: { workflow_state: "active", type: "TeacherEnrollment" }) }, class_name: "TeacherEnrollment", foreign_key: "course_id", primary_key: "context_id", inverse_of: false
   has_many :ignores, as: :asset
   has_many :moderated_grading_selections, class_name: "ModeratedGrading::Selection", inverse_of: :assignment, foreign_key: :assignment_id
   belongs_to :context, polymorphic: [:course]
