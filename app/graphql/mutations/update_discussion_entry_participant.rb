@@ -37,9 +37,9 @@ class Mutations::UpdateDiscussionEntryParticipant < Mutations::BaseMutation
   graphql_name "UpdateDiscussionEntryParticipant"
 
   argument :discussion_entry_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionEntry")
-  argument :read, Boolean, required: false
-  argument :rating, Types::RatingInputType, required: false
   argument :forced_read_state, Boolean, required: false
+  argument :rating, Types::RatingInputType, required: false
+  argument :read, Boolean, required: false
   argument :report_type, Types::ReportType, required: false
 
   field :discussion_entry, Types::DiscussionEntryType, null: false

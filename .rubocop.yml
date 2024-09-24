@@ -227,8 +227,6 @@ GraphQL/FieldName:
   AutoCorrect: false
 GraphQL/MultipleFieldDefinitions:
   AutoCorrect: false
-GraphQL/OrderedArguments:
-  AutoCorrect: false
 GraphQL/OrderedFields:
   AutoCorrect: false
 GraphQL/UnusedArgument:

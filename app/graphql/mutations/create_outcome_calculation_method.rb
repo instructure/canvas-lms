@@ -24,10 +24,10 @@ class Mutations::CreateOutcomeCalculationMethod < Mutations::OutcomeCalculationM
   graphql_name "CreateOutcomeCalculationMethod"
 
   # input arguments
-  argument :context_type, String, required: true
-  argument :context_id, ID, required: true
-  argument :calculation_method, String, required: true
   argument :calculation_int, Integer, required: false
+  argument :calculation_method, String, required: true
+  argument :context_id, ID, required: true
+  argument :context_type, String, required: true
 
   VALID_CONTEXTS = %w[Account Course].freeze
 

@@ -26,10 +26,10 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
 
   # rubocop:disable GraphQL/ExtractInputType
   argument :anonymous_state, Types::DiscussionTopicAnonymousStateType, required: false
-  argument :discussion_topic_id, GraphQL::Schema::Object::ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionTopic")
-  argument :remove_attachment, Boolean, required: false
   argument :assignment, Mutations::AssignmentBase::AssignmentUpdate, required: false
+  argument :discussion_topic_id, GraphQL::Schema::Object::ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionTopic")
   argument :discussion_type, Types::DiscussionTopicDiscussionType, required: false
+  argument :remove_attachment, Boolean, required: false
   # sets in-memory (not persisiting) flag to decide when to notify users about announcement changes
   argument :notify_users, Boolean, required: false
   argument :set_checkpoints, Boolean, required: false

@@ -87,9 +87,9 @@ module Types
     end
 
     field :author, Types::UserType, null: true do
+      argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
       argument :course_id, String, required: false
       argument :role_types, [String], "Return only requested base role types", required: false
-      argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
     end
     def author(course_id: nil, role_types: nil, built_in_only: false)
       load_association(:discussion_topic).then do |topic|
@@ -139,9 +139,9 @@ module Types
     end
 
     field :editor, Types::UserType, null: true do
+      argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
       argument :course_id, String, required: false
       argument :role_types, [String], "Return only requested base role types", required: false
-      argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
     end
     def editor(course_id: nil, role_types: nil, built_in_only: false)
       load_association(:discussion_topic).then do |topic|
@@ -179,10 +179,10 @@ module Types
     end
 
     field :discussion_subentries_connection, Types::DiscussionEntryType.connection_type, null: true do
-      argument :sort_order, DiscussionSortOrderType, required: false
-      argument :relative_entry_id, ID, required: false
       argument :before_relative_entry, Boolean, required: false
       argument :include_relative_entry, Boolean, required: false
+      argument :relative_entry_id, ID, required: false
+      argument :sort_order, DiscussionSortOrderType, required: false
     end
     def discussion_subentries_connection(sort_order: :asc, relative_entry_id: nil, before_relative_entry: true, include_relative_entry: true)
       Loaders::DiscussionEntryLoader.for(
