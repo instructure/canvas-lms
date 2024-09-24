@@ -859,7 +859,7 @@ describe UserLearningObjectScopes do
     end
   end
 
-  context "#submissions_needing_grading_count" do
+  describe "#submissions_needing_grading_count" do
     before :once do
       course_with_teacher(active_all: true)
       @sectionb = @course.course_sections.create!(name: "section B")
@@ -900,7 +900,7 @@ describe UserLearningObjectScopes do
     end
   end
 
-  context "#assignments_needing_moderation" do
+  describe "#assignments_needing_moderation" do
     before :once do
       # create courses and sections
       @course1 = course_with_teacher(active_all: true).course

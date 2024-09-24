@@ -30,7 +30,7 @@ describe "enrollment_notification" do
 
   include_examples "a message"
 
-  context ".email" do
+  describe ".email" do
     let(:path_type) { :email }
 
     context "creation_pending student" do

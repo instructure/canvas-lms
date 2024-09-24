@@ -20,7 +20,7 @@
 require "spec_helper"
 
 describe CanvasKaltura do
-  context ".timeout_protector" do
+  describe ".timeout_protector" do
     it "call block if not set" do
       CanvasKaltura.timeout_protector_proc = nil
       expect(CanvasKaltura.with_timeout_protector { 2 }).to be 2

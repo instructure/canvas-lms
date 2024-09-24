@@ -37,7 +37,7 @@ describe "appointment_reserved_by_user.twitter" do
     }
   end
 
-  context ".email" do
+  describe ".email" do
     let(:path_type) { :email }
 
     before :once do
@@ -67,7 +67,7 @@ describe "appointment_reserved_by_user.twitter" do
     end
   end
 
-  context ".sms" do
+  describe ".sms" do
     let(:path_type) { :sms }
 
     it "renders" do
@@ -77,7 +77,7 @@ describe "appointment_reserved_by_user.twitter" do
     end
   end
 
-  context ".twitter" do
+  describe ".twitter" do
     let(:path_type) { :twitter }
 
     it "renders" do

@@ -33,7 +33,7 @@ describe "announcement_reply" do
   let(:notification_name) { :announcement_reply }
   let(:asset) { @entry }
 
-  context ".email" do
+  describe ".email" do
     let(:path_type) { :email }
 
     it "renders" do
@@ -62,7 +62,7 @@ describe "announcement_reply" do
     end
   end
 
-  context ".sms" do
+  describe ".sms" do
     let(:path_type) { :sms }
 
     it "renders" do
@@ -70,7 +70,7 @@ describe "announcement_reply" do
     end
   end
 
-  context ".summary" do
+  describe ".summary" do
     let(:path_type) { :summary }
 
     it "renders" do
@@ -81,7 +81,7 @@ describe "announcement_reply" do
     end
   end
 
-  context ".twitter" do
+  describe ".twitter" do
     let(:path_type) { :twitter }
 
     it "renders" do

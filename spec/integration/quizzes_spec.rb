@@ -27,7 +27,7 @@ describe Quizzes::QuizzesController do
     override.save!
   end
 
-  context "#show" do
+  describe "#show" do
     before do
       course_with_teacher_logged_in(active_all: true)
       assignment_model(course: @course)
@@ -156,7 +156,7 @@ describe Quizzes::QuizzesController do
     end
   end
 
-  context "#history" do
+  describe "#history" do
     context "pending_review" do
       def mkquiz
         quiz_with_graded_submission([{ question_data: { :name => "question 1", :points_possible => 1, "question_type" => "essay_question" } },

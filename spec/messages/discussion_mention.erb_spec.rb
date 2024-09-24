@@ -32,7 +32,7 @@ describe "discussion_mention" do
 
   include_examples "a message"
 
-  context ".email" do
+  describe ".email" do
     let(:path_type) { :email }
     let(:long_comment_instruction_html) do
       "Comment by replying to this message, or join the conversation using the link below. When allowed, if you need to include an attachment, please log in to Canvas and reply to the discussion."

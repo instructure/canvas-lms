@@ -21,7 +21,7 @@
 require_relative "../../import_helper"
 
 describe Importers::ExternalFeedImporter do
-  context ".import_from_migration" do
+  describe ".import_from_migration" do
     it "creates a feed from the provided hash" do
       @course = course_factory
       migration = @course.content_migrations.create!
@@ -39,7 +39,7 @@ describe Importers::ExternalFeedImporter do
     end
   end
 
-  context ".find_or_initialize_from_migration" do
+  describe ".find_or_initialize_from_migration" do
     before(:once) do
       @course = course_factory
       @feed = external_feed_model(migration_id: "12345")

@@ -1110,7 +1110,7 @@ describe AssignmentOverrideApplicator do
       end
     end
 
-    context "#observer_overrides" do
+    describe "#observer_overrides" do
       it "returns all dates visible to observer" do
         @override = assignment_override_model(assignment: @assignment)
         @override_student = @override.assignment_override_students.build
@@ -1134,7 +1134,7 @@ describe AssignmentOverrideApplicator do
       end
     end
 
-    context "#has_invalid_args?" do
+    describe "#has_invalid_args?" do
       it "returns true with nil user" do
         result = AssignmentOverrideApplicator.has_invalid_args?(@assignment, nil)
         expect(result).to be_truthy

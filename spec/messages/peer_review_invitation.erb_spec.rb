@@ -32,7 +32,7 @@ describe "peer_review_invitation" do
   let(:anonymous_user) { "Anonymous User" }
 
   context "anonymous peer disabled" do
-    context ".email" do
+    describe ".email" do
       let(:path_type) { :email }
 
       it "renders" do
@@ -41,7 +41,7 @@ describe "peer_review_invitation" do
       end
     end
 
-    context ".sms" do
+    describe ".sms" do
       let(:path_type) { :sms }
 
       it "renders" do
@@ -50,7 +50,7 @@ describe "peer_review_invitation" do
       end
     end
 
-    context ".summary" do
+    describe ".summary" do
       let(:path_type) { :summary }
 
       it "renders" do
@@ -59,7 +59,7 @@ describe "peer_review_invitation" do
       end
     end
 
-    context ".twitter" do
+    describe ".twitter" do
       let(:path_type) { :twitter }
 
       it "renders" do
@@ -76,7 +76,7 @@ describe "peer_review_invitation" do
       @assessment_request.reload
     end
 
-    context ".email" do
+    describe ".email" do
       let(:path_type) { :email }
 
       it "shows anonymous when anonymous peer review enabled" do
@@ -85,7 +85,7 @@ describe "peer_review_invitation" do
       end
     end
 
-    context ".sms" do
+    describe ".sms" do
       let(:path_type) { :sms }
 
       it "shows anonymous when anonymous peer review enabled" do
@@ -94,7 +94,7 @@ describe "peer_review_invitation" do
       end
     end
 
-    context ".summary" do
+    describe ".summary" do
       let(:path_type) { :summary }
 
       it "shows anonymous when anonymous peer review enabled" do
@@ -103,7 +103,7 @@ describe "peer_review_invitation" do
       end
     end
 
-    context ".twitter" do
+    describe ".twitter" do
       let(:path_type) { :twitter }
 
       it "shows anonymous when anonymous peer review enabled" do

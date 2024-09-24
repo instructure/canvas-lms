@@ -21,7 +21,7 @@
 require "ostruct"
 
 describe Quizzes::QuizQuestion::AnswerParsers::AnswerParser do
-  context "#parse" do
+  describe "#parse" do
     let(:answer_parser) { Quizzes::QuizQuestion::AnswerParsers::AnswerParser.new([]) }
 
     it "returns the question with answers assigned" do

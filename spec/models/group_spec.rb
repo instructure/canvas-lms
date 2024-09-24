@@ -130,7 +130,7 @@ describe Group do
     end
   end
 
-  context "#peer_groups" do
+  describe "#peer_groups" do
     it "finds all peer groups" do
       context = course_model
       group_category = context.group_categories.create(name: "worldCup")
@@ -449,7 +449,7 @@ describe Group do
     end
   end
 
-  context "#full?" do
+  describe "#full?" do
     it "returns true when category group_limit has been met" do
       @group.group_category = @course.group_categories.build(name: "foo", group_limit: 1)
       @group.add_user user_model, "accepted"

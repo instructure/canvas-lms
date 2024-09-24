@@ -449,7 +449,7 @@ describe WebConference do
         end
       end
 
-      context ".active scope" do
+      describe ".active scope" do
         it "does not include LTI conferences" do
           conference = course.web_conferences.create! do |c|
             c.user = user

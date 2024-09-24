@@ -1256,7 +1256,7 @@ describe DiscussionTopic do
     end
   end
 
-  context "#discussion_subentry_count" do
+  describe "#discussion_subentry_count" do
     it "returns the count of all active discussion_entries" do
       @topic = @course.discussion_topics.create(title: "topic")
       @topic.reply_from(user: @teacher, text: "entry 1").destroy  # no count
