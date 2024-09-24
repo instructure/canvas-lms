@@ -26,11 +26,11 @@ module Types
     implements Interfaces::LegacyIDInterface
     global_id_field :id
 
-    field :discussion_topic_id, ID, null: false
     field :discussion_entry_id, ID, null: true
+    field :discussion_topic_id, ID, null: false
+    field :message, String, null: false
     field :parent_id, ID, null: true
     field :root_entry_id, ID, null: true
-    field :message, String, null: false
 
     field :attachment, Types::FileType, null: true
     def attachment

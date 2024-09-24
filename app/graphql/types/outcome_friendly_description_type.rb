@@ -27,9 +27,9 @@ module Types
     implements Interfaces::LegacyIDInterface
 
     global_id_field :id
-    field :description, String, null: false
     field :context_id, ID, null: false
     field :context_type, String, null: false
+    field :description, String, null: false
     field :learning_outcome_id, ID, null: false
     field :workflow_state, String, null: false
   end

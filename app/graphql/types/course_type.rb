@@ -119,10 +119,10 @@ module Types
     global_id_field :id
     key_field_id
 
-    field :name, String, null: false
     field :course_code, String, "course short name", null: true
-    field :syllabus_body, String, null: true
+    field :name, String, null: false
     field :state, CourseWorkflowState, method: :workflow_state, null: false
+    field :syllabus_body, String, null: true
 
     field :assignment_groups_connection,
           AssignmentGroupType.connection_type,
