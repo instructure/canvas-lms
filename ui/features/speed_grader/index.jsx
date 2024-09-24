@@ -31,7 +31,7 @@ import {getAssignmentSubmissions} from './queries/getAssignmentSubmissions'
 import {getSubmissionsByStudents} from './queries/getSubmissionsByStudents'
 import {getCourseAssignments} from './queries/getCourseAssignments'
 import {getCourseEnrollments} from './queries/getCourseEnrollments'
-import {getCommentBankItems} from './queries/commentBankQuery'
+import {getCommentBankItems} from './queries/getCommentBankItems'
 
 import {updateSpeedGraderSettings} from './mutations/updateSpeedGraderSettingsMutation'
 import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'

@@ -20,6 +20,18 @@ import {z} from 'zod'
 import {executeQuery} from '@canvas/query/graphql'
 import gql from 'graphql-tag'
 
+type Result = {
+  legacyNode: {
+    __typename: string
+    commentBankItemsConnection?: {
+      nodes: {
+        comment: string
+        _id: string
+      }[]
+    }
+  } | null
+}
+
 const QUERY = gql`
   query CommentBankItemQuery($userId: ID!, $query: String, $maxResults: Int) {
     legacyNode(_id: $userId, type: User) {
@@ -35,15 +47,6 @@ const QUERY = gql`
   }
 `
 
-function transform(result: any) {
-  return {
-    commentBankItems: result.legacyNode.commentBankItemsConnection.nodes.map((item: any) => ({
-      id: item._id,
-      comment: item.comment,
-    })),
-  }
-}
-
 export const ZParams = z.object({
   query: z.string().optional(),
   maxResults: z.number().optional(),
@@ -51,17 +54,12 @@ export const ZParams = z.object({
 
 type Params = z.infer<typeof ZParams>
 
-export async function getCommentBankItems<T extends Params>({
-  queryKey,
-}: {
-  queryKey: [string, T]
-}): Promise<any> {
+export function getCommentBankItems<T extends Params>({queryKey}: {queryKey: [string, T]}) {
   const params = ZParams.parse(queryKey[1])
 
-  const result = await executeQuery<any>(QUERY, {
+  return executeQuery<Result>(QUERY, {
     ...params,
-    userId: ENV.current_user_id,
+    // @ts-expect-error
+    userId: window.ENV.current_user_id,
   })
-
-  return transform(result)
 }

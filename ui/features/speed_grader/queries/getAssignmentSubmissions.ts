@@ -20,6 +20,40 @@ import {z} from 'zod'
 import {executeQuery} from '@canvas/query/graphql'
 import gql from 'graphql-tag'
 
+type Result = {
+  assignment: {
+    submissionsConnection: {
+      nodes: {
+        _id: string
+        id: string
+        cachedDueDate: string | null
+        customGradeStatus: string | null
+        excused: boolean
+        gradeMatchesCurrentSubmission: boolean
+        submissionCommentDownloadUrl: string | null
+        gradingPeriodId: string | null
+        gradingStatus: string
+        groupId: string | null
+        postedAt: string | null
+        grade: string | null
+        score: number | null
+        state: string
+        submissionStatus: string
+        submittedAt: string | null
+        attachments: {
+          submissionPreviewUrl: string | null
+        }[]
+        user: {
+          _id: string
+          id: string
+          name: string
+          avatarUrl: string | null
+        }
+      }[]
+    }
+  }
+}
+
 const QUERY = gql`
   query SpeedGrader_AssignmentSubmissionsQuery($assignmentId: ID!) {
     assignment(id: $assignmentId) {
@@ -72,11 +106,11 @@ export async function getAssignmentSubmissions<T extends GetSubmissionsByAssignm
   queryKey,
 }: {
   queryKey: [string, T]
-}): Promise<any> {
+}) {
   ZGetAssignmentParams.parse(queryKey[1])
   const {assignmentId} = queryKey[1]
 
-  return executeQuery<any>(QUERY, {
+  return executeQuery<Result>(QUERY, {
     assignmentId,
   })
 }
