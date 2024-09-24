@@ -25,7 +25,6 @@ export const UPDATE_SUBMISSION_GRADE_STATUS = gql`
     $submissionId: ID!
     $latePolicyStatus: String
     $customGradeStatusId: ID
-    $courseId: ID
   ) {
     __typename
     updateSubmissionGradeStatus(
@@ -34,7 +33,11 @@ export const UPDATE_SUBMISSION_GRADE_STATUS = gql`
         latePolicyStatus: $latePolicyStatus
         customGradeStatusId: $customGradeStatusId
       }
-    )
+    ) {
+      submission {
+        gradingStatus
+      }
+    }
   }
 `
 
