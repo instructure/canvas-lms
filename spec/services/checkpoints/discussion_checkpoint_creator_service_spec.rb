@@ -40,6 +40,16 @@ describe Checkpoints::DiscussionCheckpointCreatorService do
       end.to raise_error(Checkpoints::FlagDisabledError)
     end
 
+    it "raises an error when points_possible is not provided" do
+      expect do
+        service.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 2.days.from_now }]
+        )
+      end.to raise_error(ArgumentError, /missing keyword: :points_possible/)
+    end
+
     it "raises a DateTypeRequiredError when a type is not specified on a date" do
       expect do
         service.call(

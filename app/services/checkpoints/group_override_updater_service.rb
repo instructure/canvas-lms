@@ -32,10 +32,14 @@ class Checkpoints::GroupOverrideUpdaterService < ApplicationService
       raise Checkpoints::GroupAssignmentRequiredError, "must be a group assignment in order to create group overrides"
     end
 
-    group_id = @override.fetch(:set_id) { raise Checkpoints::SetIdRequiredError, "set_id is required, but was not provided" }
-    group = @checkpoint.course.active_groups.where(group_category_id: @checkpoint.effective_group_category_id).find(group_id)
     override = @checkpoint.assignment_overrides.find_by(id: @override[:id], set_type: AssignmentOverride::SET_TYPE_GROUP)
     raise Checkpoints::OverrideNotFoundError unless override
+
+    group_id = @override.fetch(:set_id, nil) || override.set_id
+
+    raise Checkpoints::SetIdRequiredError, "set_id is required, but was not provided" if group_id.blank?
+
+    group = @checkpoint.course.active_groups.where(group_category_id: @checkpoint.effective_group_category_id).find(group_id)
 
     current_group = override.set
 
