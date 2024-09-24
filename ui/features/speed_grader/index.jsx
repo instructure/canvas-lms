@@ -29,8 +29,8 @@ import {getAssignmentSections} from './queries/getAssignmentSections'
 import {getSubmission} from './queries/submissionQuery'
 import {getAssignmentSubmissions} from './queries/getAssignmentSubmissions'
 import {getSubmissionsByStudentIds} from './queries/submissionsByStudentsIdsQuery'
-import {getAssignmentsByCourseId} from './queries/assignmentsByCourseIdQuery'
-import {getEnrollmentsByCourse} from './queries/enrollmentsByCourseQuery'
+import {getCourseAssignments} from './queries/getCourseAssignments'
+import {getCourseEnrollments} from './queries/getCourseEnrollments'
 import {getCommentBankItems} from './queries/commentBankQuery'
 
 import {updateSpeedGraderSettings} from './mutations/updateSpeedGraderSettingsMutation'
@@ -122,10 +122,10 @@ ready(() => {
       module.render(mountPoint, {
         queryFns: {
           getAssignment,
-          getAssignmentsByCourseId,
+          getCourseAssignments,
           getAssignmentSubmissions,
           getCourse,
-          getEnrollmentsByCourse,
+          getCourseEnrollments,
           getAssignmentSections,
           getSubmission,
           getSubmissionsByStudentIds,
