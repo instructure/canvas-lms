@@ -4134,6 +4134,7 @@ he:
   canvas_introduction_video_2d81f3ad: "סרטון ההכירות של קנבס"
   canvas_lms_6ce68514: "קנבס LMS"
   canvas_login_failure_message_4c922f2f: " הודעת שגיאת התחברות למערכת קנבס"
+  canvas_login_instructure_271b8d00: "התחברות לקנבס"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "קודי גיבוי להזדהות מרובת מרכיבים של קנבס."
   canvas_observer_id_59db0918: canvas_observer_id
   canvas_parent_description: "סידור זה מבצע בקרה לגבי קישור הורים לתלמידים במוסד שלך בעזרת אפליקצית הסמארטפון Canvas Parent"
@@ -10930,6 +10931,7 @@ he:
   login_footer_link_hover_1b474e6c: "ריחוף מעל קישור התחברות בסרגל ניווט תחתון"
   login_id_12109693: "מזהה לוג-אין"
   login_id_bc943b97: "מזהה התחברות:"
+  login_ids_b394c2a3: "מזהי לוג-אין"
   login_info_d1d9f11e: "מידע התחברות"
   login_instructure_logo_8f2332db: "לוגו הלוג-אין  של Instructure "
   login_is_invalid_must_be_alphanumeric_or_an_email__ae4499b3: "ההתחברות אינה תקינה: נדרשת כתובת דוא\"ל או תווים אלפאנומריים"
