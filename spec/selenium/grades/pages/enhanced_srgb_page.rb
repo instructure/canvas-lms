@@ -112,6 +112,22 @@ class EnhancedSRGB
       f('[data-testid="submission_details_grade_input"]')
     end
 
+    def submission_details_reply_to_topic_assignment_grade_input
+      f('[data-testid="submission_details_reply_to_topic_assignment_grade_input"]')
+    end
+
+    def submission_details_reply_to_entry_assignment_grade_input
+      f('[data-testid="submission_details_reply_to_entry_assignment_grade_input"]')
+    end
+
+    def submission_details_reply_to_topic_assignment_grade_select
+      f('[data-testid="submission_details_reply_to_topic_assignment_grade_select"]')
+    end
+
+    def submission_details_reply_to_entry_assignment_grade_select
+      f('[data-testid="submission_details_reply_to_entry_assignment_grade_select"]')
+    end
+
     def submission_details_assignment_name
       f('[data-testid="submission-details-assignment-name"]')
     end

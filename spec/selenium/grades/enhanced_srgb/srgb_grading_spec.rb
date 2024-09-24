@@ -392,5 +392,104 @@ describe "Screenreader Gradebook grading" do
       expect(@reply_to_entry_checkpoint.submission_for_student(student).grade).to eq("complete")
       expect(@checkpointed_assignment.submission_for_student(student).grade).to eq("complete")
     end
+
+    context "submission details modal" do
+      it "grading points possible checkpoints persists correctly and aggregate to the parent submission" do
+        login_to_srgb
+        EnhancedSRGB.select_assignment(@checkpointed_assignment)
+
+        EnhancedSRGB.submission_details_button.click
+
+        EnhancedSRGB.submission_details_reply_to_topic_assignment_grade_input.clear
+        replace_content(EnhancedSRGB.submission_details_reply_to_topic_assignment_grade_input, 3)
+
+        EnhancedSRGB.submission_details_reply_to_entry_assignment_grade_input.clear
+        replace_content(EnhancedSRGB.submission_details_reply_to_entry_assignment_grade_input, 10)
+
+        EnhancedSRGB.submission_details_submit_button.click
+
+        expect(@reply_to_topic_checkpoint.submission_for_student(student).grade).to eq("3")
+        expect(@reply_to_entry_checkpoint.submission_for_student(student).grade).to eq("10")
+        expect(@checkpointed_assignment.submission_for_student(student).grade).to eq("13")
+      end
+
+      it "grading letter grade checkpoints persists correctly and aggregate to the parent submission" do
+        change_checkpoints_grading_type("letter_grade")
+        login_to_srgb
+
+        EnhancedSRGB.select_assignment(@checkpointed_assignment)
+
+        EnhancedSRGB.submission_details_button.click
+
+        EnhancedSRGB.submission_details_reply_to_topic_assignment_grade_input.clear
+        replace_content(EnhancedSRGB.submission_details_reply_to_topic_assignment_grade_input, "B")
+
+        EnhancedSRGB.submission_details_reply_to_entry_assignment_grade_input.clear
+        replace_content(EnhancedSRGB.submission_details_reply_to_entry_assignment_grade_input, "A")
+
+        EnhancedSRGB.submission_details_submit_button.click
+
+        expect(@reply_to_topic_checkpoint.submission_for_student(student).grade).to eq("B")
+        expect(@reply_to_entry_checkpoint.submission_for_student(student).grade).to eq("A")
+        expect(@checkpointed_assignment.submission_for_student(student).grade).to eq("A")
+      end
+
+      it "grading percent checkpoints persists correctly and aggregate to the parent submission" do
+        change_checkpoints_grading_type("percent")
+        login_to_srgb
+
+        EnhancedSRGB.select_assignment(@checkpointed_assignment)
+
+        EnhancedSRGB.submission_details_button.click
+
+        EnhancedSRGB.submission_details_reply_to_topic_assignment_grade_input.clear
+        replace_content(EnhancedSRGB.submission_details_reply_to_topic_assignment_grade_input, "81%")
+
+        EnhancedSRGB.submission_details_reply_to_entry_assignment_grade_input.clear
+        replace_content(EnhancedSRGB.submission_details_reply_to_entry_assignment_grade_input, "93%")
+
+        EnhancedSRGB.submission_details_submit_button.click
+
+        expect(@reply_to_topic_checkpoint.submission_for_student(student).grade).to eq("81%")
+        expect(@reply_to_entry_checkpoint.submission_for_student(student).grade).to eq("93%")
+        expect(@checkpointed_assignment.submission_for_student(student).grade).to eq("90%")
+      end
+
+      it "grading complete/incomplete checkpoints persists correctly and aggregate to the parent submission" do
+        change_checkpoints_grading_type("pass_fail")
+        login_to_srgb
+
+        EnhancedSRGB.select_assignment(@checkpointed_assignment)
+        EnhancedSRGB.submission_details_button.click
+
+        click_option(EnhancedSRGB.submission_details_reply_to_topic_assignment_grade_select, "Complete")
+        click_option(EnhancedSRGB.submission_details_reply_to_entry_assignment_grade_select, "Complete")
+
+        EnhancedSRGB.submission_details_submit_button.click
+
+        expect(@reply_to_topic_checkpoint.submission_for_student(student).grade).to eq("complete")
+        expect(@reply_to_entry_checkpoint.submission_for_student(student).grade).to eq("complete")
+        expect(@checkpointed_assignment.submission_for_student(student).grade).to eq("complete")
+      end
+
+      it "grading points possible checkpoints fails correctly when invalid input" do
+        login_to_srgb
+        EnhancedSRGB.select_assignment(@checkpointed_assignment)
+
+        EnhancedSRGB.submission_details_button.click
+
+        EnhancedSRGB.submission_details_reply_to_topic_assignment_grade_input.clear
+        replace_content(EnhancedSRGB.submission_details_reply_to_topic_assignment_grade_input, 3)
+
+        EnhancedSRGB.submission_details_reply_to_entry_assignment_grade_input.clear
+        replace_content(EnhancedSRGB.submission_details_reply_to_entry_assignment_grade_input, "asdf")
+
+        EnhancedSRGB.submission_details_submit_button.click
+
+        alerts = ff(".flashalert-message")
+
+        expect(alerts[1]).to include_text("Invalid Grade")
+      end
+    end
   end
 end
