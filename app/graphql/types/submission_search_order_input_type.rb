@@ -33,7 +33,7 @@ module Types
   class SubmissionSearchOrderInputType < Types::BaseInputObject
     graphql_name "SubmissionSearchOrder"
     description "Specify a sort for the results"
-    argument :field, SubmissionSearchOrderFieldInputType, required: true
     argument :direction, OrderDirectionType, required: false
+    argument :field, SubmissionSearchOrderFieldInputType, required: true
   end
 end

@@ -28,8 +28,8 @@ module Types
   class SubmissionOrderInputType < BaseInputObject
     graphql_name "SubmissionOrderCriteria"
 
-    argument :field, SubmissionOrderFieldType, required: true
     argument :direction, OrderDirectionType, required: false
+    argument :field, SubmissionOrderFieldType, required: true
   end
 
   class CourseType < ApplicationObjectType
@@ -292,13 +292,13 @@ module Types
     field :submissions_connection, SubmissionType.connection_type, null: true do
       description "all the submissions for assignments in this course"
 
+      argument :filter, SubmissionFilterInputType, required: false
+      argument :order_by, [SubmissionOrderInputType], required: false
       argument :student_ids,
                [ID],
                "Only return submissions for the given students.",
                prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
                required: false
-      argument :order_by, [SubmissionOrderInputType], required: false
-      argument :filter, SubmissionFilterInputType, required: false
     end
     def submissions_connection(student_ids: nil, order_by: [], filter: {})
       allowed_user_ids = if course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)

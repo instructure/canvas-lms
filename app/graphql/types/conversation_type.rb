@@ -42,8 +42,8 @@ module Types
     end
 
     field :conversation_messages_connection, Types::ConversationMessageType.connection_type, null: true do
-      argument :participants, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User")
       argument :created_before, DateTimeType, required: false
+      argument :participants, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User")
     end
     def conversation_messages_connection(participants: nil, created_before: nil)
       load_association(:conversation_messages).then do |messages|

@@ -23,6 +23,7 @@ class Mutations::CreateSubmissionComment < Mutations::BaseMutation
 
   argument :attempt, Integer, required: false
   argument :comment, String, required: true
+  argument :draft_comment, Boolean, required: false, default_value: false
   argument :file_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Attachment")
   argument :group_comment,
            Boolean,
@@ -33,7 +34,6 @@ class Mutations::CreateSubmissionComment < Mutations::BaseMutation
   argument :media_object_type, String, required: false
   argument :reviewer_submission_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Submission")
   argument :submission_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Submission")
-  argument :draft_comment, Boolean, required: false, default_value: false
 
   field :submission_comment, Types::SubmissionCommentType, null: true
 

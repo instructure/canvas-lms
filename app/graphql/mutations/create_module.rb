@@ -21,8 +21,8 @@
 class Mutations::CreateModule < Mutations::BaseMutation
   graphql_name "CreateModule"
 
-  argument :name, String, required: true
   argument :course_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+  argument :name, String, required: true
 
   field :module, Types::ModuleType, null: true, resolver_method: :will_not_be_called
   def will_not_be_called

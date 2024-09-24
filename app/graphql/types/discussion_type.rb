@@ -148,12 +148,12 @@ module Types
     end
 
     field :discussion_entries_connection, Types::DiscussionEntryType.connection_type, null: true do
-      argument :search_term, String, required: false
       argument :filter, Types::DiscussionFilterType, required: false
-      argument :sort_order, Types::DiscussionSortOrderType, required: false
       argument :root_entries, Boolean, required: false
-      argument :user_search_id, String, required: false
+      argument :search_term, String, required: false
+      argument :sort_order, Types::DiscussionSortOrderType, required: false
       argument :unread_before, String, required: false
+      argument :user_search_id, String, required: false
     end
     def discussion_entries_connection(**args)
       get_entries(**args)
@@ -199,9 +199,9 @@ module Types
     end
 
     field :author, Types::UserType, null: true do
+      argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
       argument :course_id, String, required: false
       argument :role_types, [String], "Return only requested base role types", required: false
-      argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
     end
     def author(course_id: nil, role_types: nil, built_in_only: false)
       # Conditionally set course_id based on whether it's provided or should be inferred from the object
@@ -246,9 +246,9 @@ module Types
     end
 
     field :editor, Types::UserType, null: true do
+      argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
       argument :course_id, String, required: false
       argument :role_types, [String], "Return only requested base role types", required: false
-      argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
     end
     def editor(course_id: nil, role_types: nil, built_in_only: false)
       # Conditionally set course_id based on whether it's provided or should be inferred from the object
@@ -323,11 +323,11 @@ module Types
     end
 
     field :entries_total_pages, Integer, null: true do
-      argument :per_page, Integer, required: true
-      argument :search_term, String, required: false
       argument :filter, Types::DiscussionFilterType, required: false
-      argument :sort_order, Types::DiscussionSortOrderType, required: false
+      argument :per_page, Integer, required: true
       argument :root_entries, Boolean, required: false
+      argument :search_term, String, required: false
+      argument :sort_order, Types::DiscussionSortOrderType, required: false
       argument :unread_before, String, required: false
     end
     def entries_total_pages(**args)
@@ -335,9 +335,9 @@ module Types
     end
 
     field :root_entries_total_pages, Integer, null: true do
+      argument :filter, Types::DiscussionFilterType, required: false
       argument :per_page, Integer, required: true
       argument :search_term, String, required: false
-      argument :filter, Types::DiscussionFilterType, required: false
       argument :sort_order, Types::DiscussionSortOrderType, required: false
     end
     def root_entries_total_pages(**args)
@@ -353,8 +353,8 @@ module Types
     end
 
     field :search_entry_count, Integer, null: true do
-      argument :search_term, String, required: false
       argument :filter, Types::DiscussionFilterType, required: false
+      argument :search_term, String, required: false
     end
     def search_entry_count(**args)
       get_entries(**args).then(&:count)
