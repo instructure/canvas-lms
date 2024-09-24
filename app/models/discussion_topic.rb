@@ -936,8 +936,15 @@ class DiscussionTopic < ActiveRecord::Base
     where("title ILIKE ?", "#{title}%")
   }
 
-  alias_attribute :available_from, :delayed_post_at
   alias_attribute :available_until, :lock_at
+
+  def available_from
+    self[:delayed_post_at]
+  end
+
+  def available_from=(value)
+    self[:delayed_post_at] = value
+  end
 
   def unlock_at
     self[:unlock_at].nil? ? self[:delayed_post_at] : self[:unlock_at]
