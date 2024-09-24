@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {FormFieldGroup, type FormMessageType} from '@instructure/ui-form-field'
@@ -32,6 +32,7 @@ type Props = {
   setAvailableFrom: (value: string | null) => void
   availableUntil: string
   setAvailableUntil: (value: string | null) => void
+  isAnnouncement: boolean
   isGraded: boolean
   availabilityValidationMessages: {text: string; type: FormMessageType}[]
   setAvailabilityValidationMessages: (value: {text: string; type: string}[]) => void
@@ -44,12 +45,27 @@ export const NonGradedDateOptions = ({
   setAvailableFrom,
   availableUntil,
   setAvailableUntil,
+  isAnnouncement,
   isGraded,
   setAvailabilityValidationMessages,
   availabilityValidationMessages,
   inputWidth,
   setDateInputRef,
 }: Props) => {
+  const [availableFromDateRef, setAvailableFromDateRef] = useState<HTMLInputElement | null>(null)
+  const [availableFromTimeRef, setAvailableFromTimeRef] = useState<HTMLInputElement | null>(null)
+  const [availableUntilDateRef, setAvailableUntilDateRef] = useState<HTMLInputElement | null>(null)
+  const [availableUntilTimeRef, setAvailableUntilTimeRef] = useState<HTMLInputElement | null>(null)
+
+  const testIdPrefix = isAnnouncement ? 'announcement' : 'group-discussion'
+
+  useEffect(() => {
+    availableFromDateRef?.setAttribute('data-testid', `${testIdPrefix}-available-from-date`)
+    availableFromTimeRef?.setAttribute('data-testid', `${testIdPrefix}-available-from-time`)
+    availableUntilDateRef?.setAttribute('data-testid', `${testIdPrefix}-available-until-date`)
+    availableUntilTimeRef?.setAttribute('data-testid', `${testIdPrefix}-available-until-time`)
+  })
+
   return (
     <FormFieldGroup description="" width={inputWidth}>
       <DateTimeInput
@@ -61,7 +77,7 @@ export const NonGradedDateOptions = ({
         nextMonthLabel={I18n.t('next')}
         value={availableFrom}
         onChange={(_event, newAvailableFrom = '') => {
-          if (newAvailableFrom === "") {
+          if (newAvailableFrom === '') {
             newAvailableFrom = null
           }
           validateAvailability(
@@ -76,6 +92,13 @@ export const NonGradedDateOptions = ({
         invalidDateTimeMessage={I18n.t('Invalid date and time')}
         layout="columns"
         allowNonStepInput={true}
+        dateInputRef={ref => {
+          setAvailableFromDateRef(ref)
+          setDateInputRef(ref)
+        }}
+        timeInputRef={ref => {
+          setAvailableFromTimeRef(ref)
+        }}
       />
       <Button
         type="button"
@@ -97,7 +120,7 @@ export const NonGradedDateOptions = ({
         nextMonthLabel={I18n.t('next')}
         value={availableUntil}
         onChange={(_event, newAvailableUntil = '') => {
-          if (newAvailableUntil === "") {
+          if (newAvailableUntil === '') {
             newAvailableUntil = null
           }
           validateAvailability(
@@ -112,8 +135,14 @@ export const NonGradedDateOptions = ({
         invalidDateTimeMessage={I18n.t('Invalid date and time')}
         messages={availabilityValidationMessages}
         layout="columns"
-        dateInputRef={setDateInputRef}
         allowNonStepInput={true}
+        dateInputRef={ref => {
+          setAvailableUntilDateRef(ref)
+          setDateInputRef(ref)
+        }}
+        timeInputRef={ref => {
+          setAvailableUntilTimeRef(ref)
+        }}
       />
       <Button
         type="button"

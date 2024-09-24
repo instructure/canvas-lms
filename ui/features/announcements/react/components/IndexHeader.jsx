@@ -284,6 +284,7 @@ export default class IndexHeader extends Component {
   renderSearchField() {
     return (
       <SearchField
+        id="announcements-search"
         name="announcements_search"
         searchInputRef={this.props.searchInputRef}
         onSearchEvent={this.onSearchChange}
