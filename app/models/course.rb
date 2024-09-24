@@ -1560,7 +1560,7 @@ class Course < ActiveRecord::Base
   end
 
   def do_complete
-    self.conclude_at ||= Time.now
+    self.conclude_at ||= Time.zone.now
   end
 
   def do_unconclude
@@ -1997,7 +1997,7 @@ class Course < ActiveRecord::Base
   #
   # Returns boolean
   def soft_concluded?(enrollment_type = nil)
-    now = Time.now
+    now = Time.zone.now
     return end_at < now if end_at && restrict_enrollments_to_course_dates
 
     if enrollment_type
@@ -2009,7 +2009,7 @@ class Course < ActiveRecord::Base
   end
 
   def soft_conclude!
-    self.conclude_at = Time.now
+    self.conclude_at = Time.zone.now
     self.restrict_enrollments_to_course_dates = true
   end
 
@@ -2019,7 +2019,7 @@ class Course < ActiveRecord::Base
 
   def set_concluded_assignments_grading_standard
     ActiveRecord::Base.transaction do
-      assignments.where(grading_type: ["letter_grade", "gpa_scale"], grading_standard_id: nil).in_batches(of: 10_000).update_all(grading_standard_id: 0, updated_at: Time.now)
+      assignments.where(grading_type: ["letter_grade", "gpa_scale"], grading_standard_id: nil).in_batches(of: 10_000).update_all(grading_standard_id: 0, updated_at: Time.zone.now)
     end
   end
 

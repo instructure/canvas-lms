@@ -43,11 +43,11 @@ class BookmarkService < UserService
   def find_bookmarks
     if service == "diigo"
       last_get = Rails.cache.fetch("last_diigo_lookup") { 1.minute.ago }
-      if Time.now - last_get < 8
-        Rails.cache.write("last_diigo_lookup", Time.now)
-        sleep Time.now - last_get
+      if Time.zone.now - last_get < 8
+        Rails.cache.write("last_diigo_lookup", Time.zone.now)
+        sleep Time.zone.now - last_get
       end
-      Rails.cache.write("last_diigo_lookup", Time.now)
+      Rails.cache.write("last_diigo_lookup", Time.zone.now)
     end
     bookmark_search(self)
   end

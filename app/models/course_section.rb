@@ -130,7 +130,7 @@ class CourseSection < ActiveRecord::Base
   delegate :available?, to: :course
 
   def concluded?
-    now = Time.now
+    now = Time.zone.now
     if end_at && restrict_enrollments_to_section_dates
       end_at < now
     else

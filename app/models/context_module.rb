@@ -140,7 +140,7 @@ class ContextModule < ActiveRecord::Base
   end
 
   def check_for_stale_cache_after_unlocking!
-    GuardRail.activate(:primary) { touch } if unlock_at && unlock_at < Time.now && updated_at < unlock_at
+    GuardRail.activate(:primary) { touch } if unlock_at && unlock_at < Time.zone.now && updated_at < unlock_at
   end
 
   def is_prerequisite_for?(mod)
@@ -941,7 +941,7 @@ class ContextModule < ActiveRecord::Base
   end
 
   def to_be_unlocked
-    unlock_at && unlock_at > Time.now
+    unlock_at && unlock_at > Time.zone.now
   end
 
   def migration_position

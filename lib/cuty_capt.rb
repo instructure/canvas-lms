@@ -125,7 +125,7 @@ class CutyCapt
     img_file = tmp_file.path
     success = true
 
-    start = Time.now
+    start = Time.zone.now
     logger.info("Starting web capture of #{url}")
 
     if screencap_service

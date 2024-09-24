@@ -392,7 +392,7 @@ class RequestThrottle
     # old values, and then pushing the new values. That would take at least 2
     # round trips, and possibly more when we get a transaction conflict.
     # amount and reserve_cost are passed separately for logging purposes.
-    def increment(amount, reserve_cost = 0, current_time = Time.now)
+    def increment(amount, reserve_cost = 0, current_time = Time.zone.now)
       if client_identifier.blank? || !Canvas.redis_enabled?
         return
       end

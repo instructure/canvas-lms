@@ -63,7 +63,7 @@ module Exporters
       time_zone = @export.settings[:user_time_zone]
       export_time =
         if time_zone.blank?
-          Time.now.strftime("%Y-%m-%dT%H:%M:%S")
+          Time.zone.now.strftime("%Y-%m-%dT%H:%M:%S")
         else
           TZInfo::Timezone.get(time_zone).now.strftime("%Y-%m-%dT%H:%M:%S")
         end
@@ -190,7 +190,7 @@ module Exporters
       # clamp at 100% to prevent weirdness if Attachment#size lies
       # make database updates at most once per second
       percent_complete = [(@total_copied * 100) / @total_size, 100].min
-      now = Time.now
+      now = Time.zone.now
       if (percent_complete - @last_percent >= 1) && (now - @last_update >= 1) # 1 second
         @export.fast_update_progress(percent_complete)
         @last_percent = percent_complete

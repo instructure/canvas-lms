@@ -26,9 +26,9 @@ class Quizzes::QuizRegradeRun < ActiveRecord::Base
   delegate :root_account, to: :quiz_regrade
 
   def self.perform(regrade)
-    run = create!(quiz_regrade_id: regrade.id, started_at: Time.now)
+    run = create!(quiz_regrade_id: regrade.id, started_at: Time.zone.now)
     yield
-    run.finished_at = Time.now
+    run.finished_at = Time.zone.now
     run.save!
   end
 

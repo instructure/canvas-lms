@@ -246,7 +246,7 @@ module Importers
       migration.trigger_live_events!
       Auditors::Course.record_copied(migration.source_course, course, migration.user, source: migration.initiated_source)
       InstStatsd::Statsd.increment("content_migrations.import_success")
-      duration = Time.now - migration.created_at
+      duration = Time.zone.now - migration.created_at
       InstStatsd::Statsd.timing("content_migrations.import_duration", duration, tags: { migration_type: migration.migration_type })
       migration.imported_migration_items
     rescue Exception # rubocop:disable Lint/RescueException

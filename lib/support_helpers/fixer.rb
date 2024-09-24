@@ -30,7 +30,7 @@ module SupportHelpers
     end
 
     def monitor_and_fix
-      @start_time = Time.now
+      @start_time = Time.zone.now
 
       fix # actually do it
 
@@ -53,7 +53,7 @@ module SupportHelpers
     def elapsed_time
       return 0 unless @start_time
 
-      (Time.now - @start_time).to_i
+      (Time.zone.now - @start_time).to_i
     end
 
     def success_message

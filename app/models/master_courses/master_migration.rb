@@ -144,7 +144,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
 
   def perform_exports(priority: Delayed::LOW_PRIORITY)
     self.workflow_state = "exporting"
-    self.exports_started_at = Time.now
+    self.exports_started_at = Time.zone.now
     save!
 
     subs = master_template.child_subscriptions.active.preload(:child_course).to_a
@@ -169,7 +169,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
 
     unless workflow_state == "exports_failed"
       self.workflow_state = "imports_queued"
-      self.imports_queued_at = Time.now
+      self.imports_queued_at = Time.zone.now
       save!
       queue_imports(cms, priority:)
     end
@@ -336,7 +336,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
             self.workflow_state = "imports_failed"
           else
             self.workflow_state = "completed"
-            self.imports_completed_at = Time.now
+            self.imports_completed_at = Time.zone.now
           end
           save!
         end

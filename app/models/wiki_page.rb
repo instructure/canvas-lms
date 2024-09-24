@@ -295,8 +295,8 @@ class WikiPage < ActiveRecord::Base
   alias_method :published?, :active?
 
   def set_revised_at
-    self.revised_at ||= Time.now
-    self.revised_at = Time.now if body_changed? || title_changed?
+    self.revised_at ||= Time.zone.now
+    self.revised_at = Time.zone.now if body_changed? || title_changed?
     @page_changed = body_changed? || title_changed?
     true
   end
@@ -531,7 +531,7 @@ class WikiPage < ActiveRecord::Base
 
   def last_revision_at
     res = self.revised_at || updated_at
-    res = Time.now if res.is_a?(String)
+    res = Time.zone.now if res.is_a?(String)
     res
   end
 

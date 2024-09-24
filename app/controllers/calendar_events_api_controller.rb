@@ -584,7 +584,7 @@ class CalendarEventsApiController < ApplicationController
       rrule = params_for_create[:rrule]
       # Create multiple events if necessary
       if rrule.present?
-        start_at = Time.parse(params_for_create[:start_at]) if params_for_create[:start_at]
+        start_at = Time.zone.parse(params_for_create[:start_at]) if params_for_create[:start_at]
         rr = validate_and_parse_rrule(
           rrule,
           dtstart: start_at,
@@ -1016,8 +1016,8 @@ class CalendarEventsApiController < ApplicationController
     else
       first_start_at = target_start
       first_end_at = target_end
-      date_time_changed = Time.parse(params_for_update[:start_at]) != target_event.start_at ||
-                          Time.parse(params_for_update[:end_at]) != target_event.end_at
+      date_time_changed = Time.zone.parse(params_for_update[:start_at]) != target_event.start_at ||
+                          Time.zone.parse(params_for_update[:end_at]) != target_event.end_at
     end
     duration = first_end_at - first_start_at
 
@@ -1974,8 +1974,8 @@ class CalendarEventsApiController < ApplicationController
     end
     event_attributes[:series_uuid] = SecureRandom.uuid
 
-    first_start_at = Time.parse(event_attributes[:start_at]) if event_attributes[:start_at]
-    first_end_at = Time.parse(event_attributes[:end_at]) if event_attributes[:end_at]
+    first_start_at = Time.zone.parse(event_attributes[:start_at]) if event_attributes[:start_at]
+    first_end_at = Time.zone.parse(event_attributes[:end_at]) if event_attributes[:end_at]
     duration = first_end_at - first_start_at if first_start_at && first_end_at
     dtstart_list = rrule.all(limit: RruleHelper::RECURRING_EVENT_LIMIT)
 

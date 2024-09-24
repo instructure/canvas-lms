@@ -139,7 +139,7 @@ class Message < ActiveRecord::Base
 
     state :sending do
       event :complete_dispatch, transitions_to: :sent do
-        self.sent_at ||= Time.now
+        self.sent_at ||= Time.zone.now
       end
       event :set_transmission_error, transitions_to: :transmission_error
       event :cancel, transitions_to: :cancelled
@@ -181,7 +181,7 @@ class Message < ActiveRecord::Base
     state :closed do
       event :set_transmission_error, transitions_to: :transmission_error
       event :send_message, transitions_to: :closed do
-        self.sent_at ||= Time.now
+        self.sent_at ||= Time.zone.now
       end
     end
   end
@@ -233,7 +233,7 @@ class Message < ActiveRecord::Base
 
   scope :in_state, ->(state) { where(workflow_state: Array(state).map(&:to_s)) }
 
-  scope :at_timestamp, ->(timestamp) { where(created_at: Time.at(timestamp.to_i)...Time.at(timestamp.to_i + 1)) }
+  scope :at_timestamp, ->(timestamp) { where(created_at: Time.zone.at(timestamp.to_i)...Time.zone.at(timestamp.to_i + 1)) }
 
   # an optimization for queries that would otherwise target the main table to
   # make them target the specific partition table. Naturally this only works if

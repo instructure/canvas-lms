@@ -21,7 +21,7 @@ module Alerts
   class UngradedTimespan
     def initialize(course, student_ids, _ = nil)
       @ungraded_timespan_for_student = {}
-      @today = Time.now.beginning_of_day
+      @today = Time.zone.now.beginning_of_day
       ungraded_timespans = course.submissions
                                  .group("submissions.user_id")
                                  .where(user_id: student_ids)

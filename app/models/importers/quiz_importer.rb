@@ -306,7 +306,7 @@ module Importers
 
       if hash[:available]
         item.workflow_state = "available"
-        item.published_at = Time.now
+        item.published_at = Time.zone.now
       elsif item.can_unpublish? && (new_record || master_migration)
         item.workflow_state = "unpublished"
         item.assignment.workflow_state = "unpublished" if item.assignment

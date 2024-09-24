@@ -764,7 +764,7 @@ class Attachment < ActiveRecord::Base
     return nil if OpenSSL::HMAC.digest(OpenSSL::Digest.new("sha1"), shared_secret, policy_str) != signature
 
     policy = JSON.parse(Base64.decode64(policy_str))
-    return nil unless Time.zone.parse(policy["expiration"]) >= Time.now
+    return nil unless Time.zone.parse(policy["expiration"]) >= Time.zone.now
 
     attachment = Attachment.find(policy["attachment_id"])
     return nil unless [:unattached, :unattached_temporary].include?(attachment.try(:state))
@@ -1556,7 +1556,7 @@ class Attachment < ActiveRecord::Base
       end
       if unlock_at && Time.zone.now < unlock_at
         locked = { asset_string:, unlock_at: }
-      elsif lock_at && Time.now > lock_at
+      elsif lock_at && Time.zone.now > lock_at
         locked = { asset_string:, lock_at: }
       elsif could_be_locked && (item = locked_by_module_item?(user, opts))
         locked = { asset_string:, context_module: item.context_module.attributes.slice(*LockedFor::MODULE_ATTRIBUTES) }

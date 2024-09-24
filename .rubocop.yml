@@ -140,6 +140,10 @@ Rails/RedundantPresenceValidationOnBelongsTo:
                  # config.load_defaults line
 Rails/SkipsModelValidations:
   Enabled: false # Canvas skips validations in many places for optimization reasons
+Rails/TimeZone:
+  Exclude:
+    - "gems/*/lib/**/*.rb"
+    - "gems/*/spec/**/*.rb"
 Rails/WhereExists:
   EnforcedStyle: where
 Rails/WhereNotWithMultipleConditions:
@@ -289,9 +293,6 @@ Rails/OutputSafety:
   Severity: convention
 Rails/RakeEnvironment:
   Severity: convention
-  AutoCorrect: false
-Rails/TimeZone:
-  Enabled: false
   AutoCorrect: false
 Rails/TimeZoneAssignment:
   Severity: convention

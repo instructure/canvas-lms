@@ -294,10 +294,10 @@ class DiscussionTopic < ActiveRecord::Base
     @delayed_post_at_changed = delayed_post_at_changed? || unlock_at_changed?
     if delayed_post_at? && @delayed_post_at_changed
       @should_schedule_delayed_post = true
-      self.workflow_state = "post_delayed" if [:migration, :after_migration].include?(saved_by) && delayed_post_at > Time.now
+      self.workflow_state = "post_delayed" if [:migration, :after_migration].include?(saved_by) && delayed_post_at > Time.zone.now
     end
     if lock_at && lock_at_changed?
-      self.locked = false if [:migration, :after_migration].include?(saved_by) && lock_at > Time.now
+      self.locked = false if [:migration, :after_migration].include?(saved_by) && lock_at > Time.zone.now
     end
 
     true
@@ -1015,8 +1015,8 @@ class DiscussionTopic < ActiveRecord::Base
     state :post_delayed do
       event :delayed_post, transitions_to: :active do
         self.notify_users = true
-        self.last_reply_at = Time.now
-        self.posted_at = Time.now
+        self.last_reply_at = Time.zone.now
+        self.posted_at = Time.zone.now
       end
       # with draft state, this means published. without, unpublished. so we really do support both events
     end
@@ -1030,9 +1030,9 @@ class DiscussionTopic < ActiveRecord::Base
 
   def publish
     # follows the logic of setting post_delayed in other places of this file
-    self.workflow_state = (delayed_post_at && delayed_post_at > Time.now) ? "post_delayed" : "active"
-    self.last_reply_at = Time.now
-    self.posted_at = Time.now
+    self.workflow_state = (delayed_post_at && delayed_post_at > Time.zone.now) ? "post_delayed" : "active"
+    self.last_reply_at = Time.zone.now
+    self.posted_at = Time.zone.now
   end
 
   def publish!
@@ -1050,7 +1050,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def can_lock?
-    !(assignment.try(:due_at) && assignment.due_at > Time.now)
+    !(assignment.try(:due_at) && assignment.due_at > Time.zone.now)
   end
 
   def comments_disabled?
@@ -1842,9 +1842,9 @@ class DiscussionTopic < ActiveRecord::Base
         overridden_unlock_at = topic_for_user.unlock_at
         overridden_unlock_at ||= topic_for_user.delayed_post_at if topic_for_user.respond_to?(:delayed_post_at)
         overridden_lock_at = topic_for_user.lock_at
-        if overridden_unlock_at && overridden_unlock_at > Time.now
+        if overridden_unlock_at && overridden_unlock_at > Time.zone.now
           locked = { object: self, unlock_at: overridden_unlock_at }
-        elsif overridden_lock_at && overridden_lock_at < Time.now
+        elsif overridden_lock_at && overridden_lock_at < Time.zone.now
           locked = { object: self, lock_at: overridden_lock_at, can_view: true }
         elsif could_be_locked && (item = locked_by_module_item?(user, opts))
           locked = { object: self, module: item.context_module }
@@ -1858,9 +1858,9 @@ class DiscussionTopic < ActiveRecord::Base
     else
       RequestCache.cache(locked_request_cache_key(user)) do
         locked = false
-        if delayed_post_at && delayed_post_at > Time.now
+        if delayed_post_at && delayed_post_at > Time.zone.now
           locked = { object: self, unlock_at: delayed_post_at }
-        elsif lock_at && lock_at < Time.now
+        elsif lock_at && lock_at < Time.zone.now
           locked = { object: self, lock_at:, can_view: true }
         elsif !opts[:skip_assignment] && (l = assignment&.low_level_locked_for?(user, opts))
           locked = l

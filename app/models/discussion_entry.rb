@@ -259,7 +259,7 @@ class DiscussionEntry < ActiveRecord::Base
 
       message_old, message_new = saved_changes["message"]
       updated_at_old = saved_changes.key?("updated_at") ? saved_changes["updated_at"][0] : 1.minute.ago
-      updated_at_new = saved_changes.key?("updated_at") ? saved_changes["updated_at"][1] : Time.now
+      updated_at_new = saved_changes.key?("updated_at") ? saved_changes["updated_at"][1] : Time.zone.now
 
       if discussion_entry_versions.count == 0 && !message_old.nil?
         discussion_entry_versions.create!(root_account:, user:, version: 1, message: message_old, created_at: updated_at_old, updated_at: updated_at_old)

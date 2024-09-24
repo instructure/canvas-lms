@@ -352,13 +352,13 @@ class ConversationParticipant < ActiveRecord::Base
         if operation == :delete
           scope.delete_all
         else
-          scope.update_all(workflow_state: "deleted", deleted_at: Time.now)
+          scope.update_all(workflow_state: "deleted", deleted_at: Time.zone.now)
         end
       else
         if operation == :delete
           scope.where(conversation_message_id: to_delete).delete_all
         else
-          scope.where(conversation_message_id: to_delete).update_all(workflow_state: "deleted", deleted_at: Time.now)
+          scope.where(conversation_message_id: to_delete).update_all(workflow_state: "deleted", deleted_at: Time.zone.now)
         end
         # if the only messages left are generated ones, e.g. "added
         # bob to the conversation", delete those too

@@ -42,7 +42,7 @@ class ContextModuleProgression < ActiveRecord::Base
 
   def set_completed_at
     if completed?
-      self.completed_at ||= Time.now
+      self.completed_at ||= Time.zone.now
     else
       self.completed_at = nil
     end

@@ -129,7 +129,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
         update_columns << "workflow_state"
         update_values << connection.quote(new_state)
 
-        read_at_datetime = (new_state&.to_s == "read") ? Time.now : nil
+        read_at_datetime = (new_state&.to_s == "read") ? Time.zone.now : nil
         update_columns << "read_at"
         update_values << connection.quote(read_at_datetime)
       end
@@ -166,7 +166,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   end
 
   def self.row_values(batch_entry, user_id, root_account_id, default_state, update_values)
-    read_at_datetime = (default_state&.to_s == "read") ? Time.now : nil
+    read_at_datetime = (default_state&.to_s == "read") ? Time.zone.now : nil
     [
       connection.quote(batch_entry.is_a?(ActiveRecord::Base) ? batch_entry.id_for_database : batch_entry),
       connection.quote(user_id),

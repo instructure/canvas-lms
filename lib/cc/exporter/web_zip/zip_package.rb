@@ -248,7 +248,7 @@ module CC::Exporter::WebZip
     def parse_module_data
       active_module_ids = Set.new(course.context_modules.active.map(&:id))
       course.context_modules.active.map do |mod|
-        unlock_date = force_timezone(mod.unlock_at) if mod.unlock_at&.> Time.now
+        unlock_date = force_timezone(mod.unlock_at) if mod.unlock_at&.> Time.zone.now
         {
           id: mod.id,
           name: mod.name,

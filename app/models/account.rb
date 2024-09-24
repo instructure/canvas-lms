@@ -707,7 +707,7 @@ class Account < ActiveRecord::Base
   def clear_downstream_caches(*keys_to_clear, xlog_location: nil, is_retry: false)
     shard.activate do
       if xlog_location && !self.class.wait_for_replication(start: xlog_location, timeout: 1.minute)
-        delay(run_at: Time.now + timeout, singleton: "Account#clear_downstream_caches/#{global_id}:#{keys_to_clear.join("/")}")
+        delay(run_at: Time.zone.now + timeout, singleton: "Account#clear_downstream_caches/#{global_id}:#{keys_to_clear.join("/")}")
           .clear_downstream_caches(*keys_to_clear, xlog_location:, is_retry: true)
         # we still clear, but only the first time; after that we just keep waiting
         return if is_retry
@@ -2572,7 +2572,7 @@ class Account < ActiveRecord::Base
         new_grade = grading_standard.score_to_grade((score * 100).to_f)
         grade_has_changed = new_grade != submission.grade || new_grade != submission.published_grade
         if grade_has_changed
-          acc << submission.attributes.merge("grade" => new_grade, "published_grade" => new_grade, "updated_at" => Time.now)
+          acc << submission.attributes.merge("grade" => new_grade, "published_grade" => new_grade, "updated_at" => Time.zone.now)
         end
       end
 

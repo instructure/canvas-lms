@@ -782,7 +782,7 @@ class ActiveRecord::Base
 
     run_callbacks :save do
       run_callbacks :create do
-        timestamp = Time.now
+        timestamp = Time.zone.now
 
         self.created_at ||= timestamp
         self.updated_at ||= timestamp

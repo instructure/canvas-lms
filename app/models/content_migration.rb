@@ -1190,7 +1190,7 @@ class ContentMigration < ActiveRecord::Base
        (next_cm = context.content_migrations.where(workflow_state: "queued").order(:id).first) &&
        (job_id = next_cm.job_progress.try(:delayed_job_id)) &&
        (job = Delayed::Job.where(id: job_id, locked_at: nil).first)
-      job.run_at = Time.now # it's okay to try it again now
+      job.run_at = Time.zone.now # it's okay to try it again now
       job.save
     end
   end

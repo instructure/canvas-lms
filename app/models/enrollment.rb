@@ -549,7 +549,7 @@ class Enrollment < ActiveRecord::Base
 
   def conclude
     self.workflow_state = "completed"
-    self.completed_at = Time.now
+    self.completed_at = Time.zone.now
     save
   end
 

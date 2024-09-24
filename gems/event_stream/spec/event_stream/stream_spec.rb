@@ -29,7 +29,7 @@ describe EventStream::Stream do
 
   let(:connection) { instance_double(ActiveRecord::ConnectionAdapters::AbstractAdapter, active?: true) }
   let(:record_type) { double("record_type", connection:, create_from_event_stream!: nil, update_from_event_stream!: nil) }
-  let(:created_at) { Time.now }
+  let(:created_at) { Time.zone.now }
   let(:record) { double("ActiveRecord::Base", id: "id", created_at:, attributes: {}) }
 
   context "setup block" do

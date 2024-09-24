@@ -524,7 +524,7 @@ class Quizzes::QuizzesController < ApplicationController
               if auto_publish
                 @quiz.generate_quiz_data
                 @quiz.workflow_state = "available"
-                @quiz.published_at = Time.now
+                @quiz.published_at = Time.zone.now
               end
               @quiz.save!
             end
@@ -779,7 +779,7 @@ class Quizzes::QuizzesController < ApplicationController
       @students = @students.distinct.order_by_sortable_name
       @students = @students.order(:uuid) if @quiz.survey? && @quiz.anonymous_submissions
       begin
-        last_updated_at = Time.parse(params[:last_updated_at]) if params[:last_updated_at]
+        last_updated_at = Time.zone.parse(params[:last_updated_at]) if params[:last_updated_at]
       rescue ArgumentError
         # ignore
       end

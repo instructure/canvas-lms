@@ -133,7 +133,7 @@ class ExternalFeed < ActiveRecord::Base
         message: description,
         source_name: feed.channel.title,
         source_url: feed.channel.link,
-        posted_at: Time.parse(date.to_s),
+        posted_at: Time.zone.parse(date.to_s),
         user:,
         url: item.link,
         uuid:

@@ -673,7 +673,7 @@ class CoursePacesController < ApplicationController
           @progress.fail!
           @progress = publish_course_pace
         in [true, true]
-          @progress.delayed_job.update(run_at: Time.now)
+          @progress.delayed_job.update(run_at: Time.zone.now)
         end
       end
       @progress_json = progress_json(@progress, @current_user, session)
@@ -793,7 +793,7 @@ class CoursePacesController < ApplicationController
   end
 
   def publish_course_pace
-    @progress = @course_pace.create_publish_progress(run_at: Time.now)
+    @progress = @course_pace.create_publish_progress(run_at: Time.zone.now)
   end
 
   def log_course_paces_publishing

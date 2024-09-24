@@ -641,7 +641,7 @@ module DatesOverridable
     tag_info[:points_possible] = points_possible unless try(:quiz_type) == "survey"
 
     if user && tag_info[:due_date]
-      if tag_info[:due_date] < Time.now &&
+      if tag_info[:due_date] < Time.zone.now &&
          (is_a?(Quizzes::Quiz) || (is_a?(AbstractAssignment) && expects_submission?)) &&
          !has_submission
         tag_info[:past_due] = true
