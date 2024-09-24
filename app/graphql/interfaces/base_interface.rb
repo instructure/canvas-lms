@@ -24,7 +24,6 @@
 # federated supergraph. See: https://github.com/Gusto/apollo-federation-ruby#usage
 module Interfaces::BaseInterface
   include GraphQL::Schema::Interface
-  include ApolloFederation::Interface
 
   field_class Types::BaseField
 end
