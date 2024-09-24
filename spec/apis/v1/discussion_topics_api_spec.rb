@@ -4353,7 +4353,7 @@ describe DiscussionTopicsController, type: :request do
     context "should not be shown" do
       def check_access(json)
         expect(json["new_entries"]).to be_nil
-        expect(%w[unauthorized unauthenticated]).to include(json["status"])
+        expect(json["status"]).to be_in %w[unauthorized unauthenticated]
       end
 
       before do

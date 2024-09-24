@@ -348,14 +348,9 @@ describe Quizzes::QuizSubmission do
       expect(q.workflow_state).to eql("complete")
       expect(q.state).to be(:complete)
       q.submission_data = []
-      res = false
-      begin
-        res = Quizzes::SubmissionGrader.new(q).grade_submission
-        expect(0).to be(1)
-      rescue => e
-        expect(e.to_s).to match(Regexp.new("Can't grade an already-submitted submission"))
-      end
-      expect(res).to be(false)
+      expect do
+        Quizzes::SubmissionGrader.new(q).grade_submission
+      end.to raise_error(/Can't grade an already-submitted submission/)
     end
 
     context "explicitly setting grade" do

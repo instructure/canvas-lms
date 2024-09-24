@@ -320,9 +320,6 @@ RSpec/DescribeClass:
   Enabled: false
 RSpec/DescribeMethod:
   Severity: convention
-RSpec/ExpectActual:
-  Severity: convention
-  AutoCorrect: false
 RSpec/ExpectChange:
   Enabled: false
   AutoCorrect: false

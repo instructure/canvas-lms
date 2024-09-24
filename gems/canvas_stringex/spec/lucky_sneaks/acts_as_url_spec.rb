@@ -74,20 +74,20 @@ end
 describe "ActsAsUrl" do
   it "should_create_url" do
     @doc = Document.create(title: "Let's Make a Test Title, <em>Okay</em>?")
-    expect("lets-make-a-test-title-okay").to eq @doc.url
+    expect(@doc.url).to eq("lets-make-a-test-title-okay")
   end
 
   it "should_create_unique_url" do
     @doc = Document.create!(title: "Unique")
     @other_doc = Document.create!(title: "Unique")
-    expect("unique-1").to eq @other_doc.url
+    expect(@other_doc.url).to eq("unique-1")
   end
 
   it "should_not_succ_on_repeated_saves" do
     @doc = Document.new(title: "Continuous or Constant")
     5.times do
       @doc.save!
-      expect("continuous-or-constant").to eq @doc.url
+      expect(@doc.url).to eq("continuous-or-constant")
     end
   end
 
@@ -105,7 +105,7 @@ describe "ActsAsUrl" do
 
   it "should_use_alternate_field_name" do
     @perm = Permument.create!(title: "Anything at This Point")
-    expect("anything-at-this-point").to eq @perm.permalink
+    expect(@perm.permalink).to eq("anything-at-this-point")
   end
 
   it "should_not_update_url_by_default" do
@@ -127,7 +127,7 @@ describe "ActsAsUrl" do
     @blank = Blankument.create!(title: "Stable as Stone", url: @original_url)
     expect(@original_url).to eq @blank.url
     @blank = Blankument.create!(title: "Stable as Stone")
-    expect("stable-as-stone").to eq @blank.url
+    expect(@blank.url).to eq("stable-as-stone")
   end
 
   it "overrides only_when_blank only for instance (not class level)" do
@@ -135,7 +135,7 @@ describe "ActsAsUrl" do
     @original_url = "the-url-of-concrete"
     @blank.only_when_blank = false
     @blank.save!
-    expect("something-something").to eq @blank.url
+    expect(@blank.url).to eq("something-something")
 
     @blank2 = Blankument.new
     expect(@blank2.only_when_blank).to be(true)
@@ -151,8 +151,8 @@ describe "ActsAsUrl" do
     Document.initialize_urls
     @doc_1.reload
     @doc_2.reload
-    expect("initial").to eq @doc_1.url
-    expect("subsequent").to eq @doc_2.url
+    expect(@doc_1.url).to eq("initial")
+    expect(@doc_2.url).to eq("subsequent")
   end
 
   it "should_mass_initialize_urls_with_custom_url_attribute" do
@@ -165,12 +165,12 @@ describe "ActsAsUrl" do
     Permument.initialize_urls
     @doc_1.reload
     @doc_2.reload
-    expect("initial").to eq @doc_1.permalink
-    expect("subsequent").to eq @doc_2.permalink
+    expect(@doc_1.permalink).to eq("initial")
+    expect(@doc_2.permalink).to eq("subsequent")
   end
 
   it "should_utilize_block_if_given" do
     @doc = Procument.create!(title: "Title String")
-    expect("title-string-got-massaged").to eq @doc.url
+    expect(@doc.url).to eq("title-string-got-massaged")
   end
 end
