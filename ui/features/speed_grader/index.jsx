@@ -47,6 +47,7 @@ import {
 import {createCommentBankItem} from './mutations/comment_bank/createCommentBankItemMutation'
 import {deleteCommentBankItem} from './mutations/comment_bank/deleteCommentBankItemMutation'
 import {updateCommentBankItem} from './mutations/comment_bank/updateCommentBankItemMutation'
+import {updateCommentSuggestionsEnabled} from './mutations/comment_bank/updateCommentSuggestionsEnabled'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import GenericErrorPage from '@canvas/generic-error-page'
@@ -142,6 +143,7 @@ ready(() => {
           createCommentBankItem,
           deleteCommentBankItem,
           updateCommentBankItem,
+          updateCommentSuggestionsEnabled,
           updateSpeedGraderSettings,
         },
         postMessageAliases,
@@ -159,6 +161,7 @@ ready(() => {
           currentUserIsAdmin: ENV.current_user_is_admin,
           themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES,
           useHighContrast: window.ENV.use_high_contrast,
+          commentLibrarySuggestionsEnabled: window.ENV.comment_library_suggestions_enabled,
         },
         features: {
           extendedSubmissionState: window.ENV.FEATURES.extended_submission_state,
