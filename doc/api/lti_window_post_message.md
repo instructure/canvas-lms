@@ -97,7 +97,7 @@ Returning postMessage includes the following properties:
 ## lti.getPageSettings
 
 Responds with an object containing page settings. This includes the current locale, time zome, contrast settings, url to the active branding configuration file, and the width of the parent (Canvas) window.
-This is the same json file url provided by the [Brand Configs API](https://canvas.instructure.com/doc/api/brand_configs.html).
+This is the same json file url provided by the [Brand Configs API](brand_configs.html).
 
 **Required properties:**
 

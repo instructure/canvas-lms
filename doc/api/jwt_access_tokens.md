@@ -37,13 +37,16 @@ Then, make a request to the authorization endpoint to retrieve your JWT access t
 The signed JWT should be used as the `assertion` parameter, the `grant_type` parameter should be set to `authorization_code`, and the `code` parameter should be set to the value of the `reg_key` received from the registration message sent by the tool consumer.
 
 **Example request:**
-```
+
+```bash
 curl https://<canvas>/api/lti/accounts/1/authorize \
        -F 'grant_type=authorization_code' \
        -F'assertion=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMDAwMDAwMDAwMDAwMyIsImF1ZCI6Imh0dHA6Ly9jYW52YXMuZG9ja2VyL2FwaS9sdGkvYXV0aG9yaXplIiwiZXhwIjoxNDg5Njc0NTAyLCJpYXQiOjE0ODk2NzQ0NDIsImp0aSI6ImQ4MjA0NDBjLTI3YzMtNDg2YS1hZjM5LWQzZDQxOGI4ZDNkYSJ9.S3SxxsSKAKhT8ViHuCDBxp9fbzdYGKJEBftftJMX4-E' \
        -F 'code=<reg_key>'
 ```
+
 **Example response:**
+
 ```json
 {
   "access_token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJDYW52YXMiLCJzdWIiOjEwMDAwMDAwMDAwMDAzLCJleHAiOjE0ODk2Nzc5NzcsImF1ZCI6ImNhbnZhcy5kb2NrZXIiLCJpYXQiOjE0ODk2NzQzNzcsIm5iZiI6MTQ4OTY3NDM0NywianRpIjoiMjI0OTQyNjAtMGE5Ni00NjhlLWFjZGYtMmIzOWYwNjI5NmE1IiwicmVnX2tleSI6IjkzNTllMGNkLTZhNjktNGNhOS05MWI2LTE2MmNmMDcxMWE1YiJ9.7nQ1g0-FpIMWn5kTWcf0M0D2zqENs_my-3iLuHUr5k0",
@@ -74,6 +77,7 @@ my_jwt = {
 ```
 
 Next, sign the JWT using the tool proxy shared secret and HS256:
+
 ```javascript
 signed_jwt = my_jwt.sign("tool-proxy-shared-secret").to_string
 > "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMxMjMtYWQxMy1hYzIzMyIsImF1ZCI6Imh0dHBzOi8vbXkuY2FudmFzLWRvbWFpbi5jb20vYXBpL2x0aS9hY2NvdW50cy8xL2F1dGhvcml6ZSIsImV4cCI6MTQ4NjM5Mzg2OCwiaWF0IjoxNDg2MzkzODAwLCJqdGkiOiI2ODg3MDBjMi00YmMxLTQwYjctODNlNS03Y2JmNTRmOTMzMDUifQ.IJ4ROoH8GxwWr_a-YNSvWGd3NeYLg0q9fOZCCLUaa4Q"
@@ -87,13 +91,15 @@ Next make a request to the authorization endpoint to retrieve your JWT access to
 This signed JWT should be used as the `assertion` parameter and the `grant_type` parameter  should be set to `urn:ietf:params:oauth:grant-type:jwt-bearer`
 
 **Example request:**
-```
+
+```bash
 curl https://<canvas>/api/lti/accounts/1/authorize \
        -F 'grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer' \
        -F 'assertion=<signed_jwt>'
 ```
 
-**Example response**
+**Example response:**
+
 ```json
 {
   "access_token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJDYW52YXMiLCJzdWIiOiIxMjMxMjMtYWQxMy1hYzIzMyIsImV4cCI6MTQ4NjM5ODQwMiwiYXVkIjoibXkuY2FudmFzLWRvbWFpbi5jb20iLCJpYXQiOjE0ODYzOTQ4MDIsIm5iZiI6MTQ4NjM5NDc3MiwianRpIjoiYTMwMGFmMWMtOTliOS00MDk4LThhZTQtNzE5MDlhNDVkZjYyIn0.qcpgVNVcThwwMMWVarflUPYbyIH70-yvClbPkjbAADs",
@@ -101,15 +107,18 @@ curl https://<canvas>/api/lti/accounts/1/authorize \
   "expires_in": "3600"
 }
 ```
+
 The access token in the response can then be used in an API request to Originality Report and Submission endpoints.
 
-**Example request**
-```
+**Example request:**
+
+```bash
 curl https://<canvas>/api/lti/assignments/25/submissions/6/originality_report/71 \
        -F 'Authorization=Bearer <access_token from the authorize endpoint response>'
 ```
 
-**Example response**
+**Example response:**
+
 ```json
 {
    "id": 4,
