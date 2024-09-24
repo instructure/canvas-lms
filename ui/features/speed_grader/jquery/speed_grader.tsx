@@ -3880,14 +3880,21 @@ EG = {
     }
 
     $('#submit_same_score').hide()
-    if (typeof submission !== 'undefined' && submission.entered_score !== null) {
-      // @ts-expect-error
-      $score.text(I18n.n(round(submission.entered_score, round.DEFAULT)))
-      if (!submission.grade_matches_current_submission) {
-        $('#submit_same_score').show()
+    // Discussion Checkpoints uses a shared React component to display the use same score link
+    // Do not show submit_same_score is checkpoints FF is enabled and the assignment has sub_assignments
+    if (
+      !document.getElementById(SPEED_GRADER_CHECKPOINTS_MOUNT_POINT) &&
+      !window.jsonData.has_sub_assignments
+    ) {
+      if (typeof submission !== 'undefined' && submission.entered_score !== null) {
+        // @ts-expect-error
+        $score.text(I18n.n(round(submission.entered_score, round.DEFAULT)))
+        if (!submission.grade_matches_current_submission) {
+          $('#submit_same_score').show()
+        }
+      } else {
+        $score.text('')
       }
-    } else {
-      $score.text('')
     }
 
     if (ENV.MANAGE_GRADES || (window.jsonData.context.concluded && ENV.READ_AS_ADMIN)) {
