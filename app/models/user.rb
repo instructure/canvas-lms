@@ -528,7 +528,6 @@ class User < ActiveRecord::Base
   end
 
   before_save :assign_uuid
-  before_save :update_avatar_image
   before_save :record_acceptance_of_terms
   after_save :update_account_associations_if_necessary
   after_save :self_enroll_if_necessary
@@ -1537,20 +1536,6 @@ class User < ActiveRecord::Base
   def management_contexts
     contexts = [self] + courses + groups.active + all_courses_for_active_enrollments
     contexts.uniq
-  end
-
-  def update_avatar_image(force_reload = false)
-    if (!avatar_image_url || force_reload) && avatar_image_source == "twitter"
-      twitter = user_services.for_service("twitter").first rescue nil
-      if twitter
-        url = URI.parse("http://twitter.com/users/show.json?user_id=#{twitter.service_user_id}")
-        data = JSON.parse(Net::HTTP.get(url)) rescue nil
-        if data
-          self.avatar_image_url = data["profile_image_url_https"] || avatar_image_url
-          self.avatar_image_updated_at = Time.now
-        end
-      end
-    end
   end
 
   def record_acceptance_of_terms
