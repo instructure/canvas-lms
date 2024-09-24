@@ -1018,6 +1018,7 @@ const locale = {
   },
   "styles_2aa721ef": { "message": "Gaya" },
   "submit_a3cc6859": { "message": "Serahkan" },
+  "submitting_b90fac62": { "message": "Menyerahkan..." },
   "subscript_59744f96": { "message": "Subskrip" },
   "subset_19c1a92f": { "message": "Subset" },
   "subset_strict_8d8948d6": { "message": "Subset (Wajar)" },

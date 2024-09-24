@@ -1031,6 +1031,7 @@ const locale = {
   },
   "styles_2aa721ef": { "message": "Kiểu" },
   "submit_a3cc6859": { "message": "Nộp" },
+  "submitting_b90fac62": { "message": "Đang nộp..." },
   "subscript_59744f96": { "message": "Thu Nhỏ Nằm Trên" },
   "subset_19c1a92f": { "message": "Tập Con" },
   "subset_strict_8d8948d6": { "message": "Tập Con (Thực Sự)" },

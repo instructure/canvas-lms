@@ -1038,6 +1038,7 @@ const locale = {
   },
   "styles_2aa721ef": { "message": "Ngā Kāhua" },
   "submit_a3cc6859": { "message": "Tuku" },
+  "submitting_b90fac62": { "message": "E tuku ana...." },
   "subscript_59744f96": { "message": "Tuhinga" },
   "subset_19c1a92f": { "message": "Roopuiti" },
   "subset_strict_8d8948d6": { "message": "Roopuiti (Paua)" },
