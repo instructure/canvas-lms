@@ -77,6 +77,7 @@ const QUERY = gql`
           groupId
           postedAt
           grade
+          externalToolUrl
           score
           state
           submissionStatus
