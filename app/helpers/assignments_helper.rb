@@ -112,18 +112,23 @@ module AssignmentsHelper
   end
 
   def i18n_grade(grade, grading_type = nil)
+    return unless grade
+
     if grading_type == "pass_fail" && %w[complete incomplete].include?(grade)
       return (grade == "complete") ? I18n.t("Complete") : I18n.t("Incomplete")
     end
 
-    number = Float(grade.sub(/%$/, "")) rescue nil
-    if number.present?
+    begin
+      number = Float(grade.sub(/%$/, ""))
+
       if grading_type.nil?
         grading_type = (/%$/ =~ grade) ? "percent" : "points"
       end
       if grading_type == "points" || grading_type == "percent"
         return I18n.n(round_if_whole(number), percentage: (grading_type == "percent"))
       end
+    rescue ArgumentError
+      # ignore
     end
 
     return replace_dash_with_minus(grade) if grading_type == "letter_grade"
