@@ -22,7 +22,7 @@ import ItemAssignToCard, {type ItemAssignToCardProps} from '../ItemAssignToCard'
 import {SECTIONS_DATA, STUDENTS_DATA} from '../../__tests__/mocks'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {QueryProvider, queryClient} from '@canvas/query'
 
 const props: ItemAssignToCardProps = {
   courseId: '1',
@@ -44,20 +44,9 @@ const props: ItemAssignToCardProps = {
 
 const renderComponent = (overrides: Partial<ItemAssignToCardProps> = {}) =>
   render(
-    <QueryClientProvider
-      client={
-        new QueryClient({
-          defaultOptions: {
-            queries: {
-              staleTime: 1000 * 60 * 60 * 24, // 1 day,
-              cacheTime: 1000 * 60 * 60 * 24 * 2, // 2 days,
-            },
-          },
-        })
-      }
-    >
+    <QueryProvider>
       <ItemAssignToCard {...props} {...overrides} />
-    </QueryClientProvider>
+    </QueryProvider>
   )
 
 const withWithGradingPeriodsMock = () => {
@@ -88,7 +77,6 @@ describe('ItemAssignToCard', () => {
   const ASSIGNMENT_OVERRIDES_URL = `/api/v1/courses/1/modules/2/assignment_overrides?per_page=100`
   const COURSE_SETTINGS_URL = `/api/v1/courses/1/settings`
   const SECTIONS_URL = /\/api\/v1\/courses\/.+\/sections\?per_page=\d+/
-  const STUDENTS_URL = /\/api\/v1\/courses\/.+\/users\?per_page=\d+&enrollment_type=student/
 
   beforeAll(() => {
     if (!document.getElementById('flash_screenreader_holder')) {
@@ -101,7 +89,7 @@ describe('ItemAssignToCard', () => {
 
   beforeEach(() => {
     fetchMock.get(SECTIONS_URL, SECTIONS_DATA)
-    fetchMock.get(STUDENTS_URL, STUDENTS_DATA)
+    queryClient.setQueryData(['students', props.courseId, {per_page: 100}], STUDENTS_DATA)
     fetchMock.get(ASSIGNMENT_OVERRIDES_URL, [])
     fetchMock.get(COURSE_SETTINGS_URL, {hide_final_grades: false})
   })

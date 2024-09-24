@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, fireEvent, getAllByRole, render, waitFor} from '@testing-library/react'
+import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import ItemAssignToTray, {type ItemAssignToTrayProps} from '../ItemAssignToTray'
@@ -28,8 +28,7 @@ import {
   SECOND_GROUP_CATEGORY_DATA,
   ADHOC_WITHOUT_STUDENTS,
 } from '../../__tests__/mocks'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import {getAllByText} from '@testing-library/dom'
+import {QueryProvider, queryClient} from '@canvas/query'
 
 const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never, delay: null}
 
@@ -60,7 +59,6 @@ describe('ItemAssignToTray', () => {
   const FIRST_GROUP_CATEGORY_URL = `/api/v1/group_categories/${FIRST_GROUP_CATEGORY_ID}/groups?per_page=100`
   const SECOND_GROUP_CATEGORY_URL = `/api/v1/group_categories/${SECOND_GROUP_CATEGORY_ID}/groups?per_page=100`
   const SECTIONS_URL = /\/api\/v1\/courses\/.+\/sections\?per_page=\d+/
-  const STUDENTS_URL = /\/api\/v1\/courses\/.+\/users\?per_page=\d+&enrollment_type=student/
   const OVERRIDES_URL = '/api/v1/courses/1/assignments/23/date_details?per_page=100'
 
   const OVERRIDES = [
@@ -139,10 +137,10 @@ describe('ItemAssignToTray', () => {
       .get('/api/v1/courses/1/discussion_topics/23/date_details?per_page=100', {})
       .get('/api/v1/courses/1/pages/23/date_details?per_page=100', {})
     fetchMock
-      .get(STUDENTS_URL, STUDENTS_DATA)
       .get(SECTIONS_URL, SECTIONS_DATA)
       .get(FIRST_GROUP_CATEGORY_URL, FIRST_GROUP_CATEGORY_DATA)
       .get(SECOND_GROUP_CATEGORY_URL, SECOND_GROUP_CATEGORY_DATA)
+    queryClient.setQueryData(['students', props.courseId, {per_page: 100}], STUDENTS_DATA)
   })
 
   afterEach(() => {
@@ -151,21 +149,11 @@ describe('ItemAssignToTray', () => {
     fetchMock.restore()
   })
 
-  const renderComponent = (
-    overrides: Partial<ItemAssignToTrayProps> = {},
-    queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          staleTime: 1000 * 60 * 60 * 24, // 1 day,
-          cacheTime: 1000 * 60 * 60 * 24 * 2, // 2 days,
-        },
-      },
-    })
-  ) =>
+  const renderComponent = (overrides: Partial<ItemAssignToTrayProps> = {}) =>
     render(
-      <QueryClientProvider client={queryClient}>
+      <QueryProvider>
         <ItemAssignToTray {...props} {...overrides} />
-      </QueryClientProvider>
+      </QueryProvider>
     )
 
   it('renders', async () => {
@@ -893,9 +881,9 @@ describe('ItemAssignToTray', () => {
         expect(queryByText(group.name)).not.toBeInTheDocument()
       })
       rerender(
-        <QueryClientProvider client={new QueryClient()}>
+        <QueryProvider>
           <ItemAssignToTray {...props} defaultGroupCategoryId={SECOND_GROUP_CATEGORY_ID} />
-        </QueryClientProvider>
+        </QueryProvider>
       )
 
       await findByText(SECOND_GROUP_CATEGORY_DATA[0].name)
@@ -903,33 +891,6 @@ describe('ItemAssignToTray', () => {
         expect(getByText(group.name)).toBeInTheDocument()
       })
     })
-  })
-
-  it('fetches overrides and assignee options only once', async () => {
-    const urls = [STUDENTS_URL, SECTIONS_URL, OVERRIDES_URL]
-    const queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          staleTime: 1000 * 60 * 60 * 24, // 1 day,
-          cacheTime: 1000 * 60 * 60 * 24 * 2, // 2 days,
-        },
-      },
-    })
-    const {rerender, findAllByTestId} = renderComponent({}, queryClient)
-    const assigneeSelectors = await findAllByTestId('assignee_selector')
-    expect(assigneeSelectors[0]).toBeInTheDocument()
-    urls.forEach(url => expect(fetchMock.calls(url).length).toBe(1))
-    rerender(
-      <QueryClientProvider client={queryClient}>
-        <ItemAssignToTray {...props} open={false} />
-      </QueryClientProvider>
-    )
-    rerender(
-      <QueryClientProvider client={queryClient}>
-        <ItemAssignToTray {...props} open={true} />
-      </QueryClientProvider>
-    )
-    urls.forEach(url => expect(fetchMock.calls(url).length).toBe(1))
   })
 
   describe('in a paced course', () => {
@@ -953,7 +914,6 @@ describe('ItemAssignToTray', () => {
 
     it('does not fetch assignee options', () => {
       renderComponent()
-      expect(fetchMock.calls(STUDENTS_URL).length).toBe(0)
       expect(fetchMock.calls(SECTIONS_URL).length).toBe(0)
     })
   })

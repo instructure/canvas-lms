@@ -86,10 +86,10 @@ export const useGetAssigneeOptions = ({
       [
         ...combinedOptions.map(option => {
           const existing = allOptions.find(o => o.id === option.id)
-          if (existing) {
-            option.overrideId = existing.overrideId
+          if (existing && existing.overrideId) {
+            return {...option, overrideId: existing.overrideId}
           }
-          return option
+          return {...option}
         }),
         ...defaultOptions,
       ],

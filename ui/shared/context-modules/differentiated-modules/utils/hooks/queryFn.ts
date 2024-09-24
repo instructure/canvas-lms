@@ -20,6 +20,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {type AssigneeOption} from '../../react/Item/types'
+import {getStudentsByCourse} from './getStudentsByCourse'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -90,32 +91,9 @@ export const fetchNextPages = async (
 }
 
 export const getStudents = async ({queryKey}: {queryKey: any}) => {
-  const [, currentCourseId, currentParams] = queryKey
-  const result = await doFetchApi({
-    path: `/api/v1/courses/${currentCourseId}/users`,
-    params: {...currentParams, enrollment_type: 'student'},
-  })
-  if (result && !result.response.ok) throw new Error(I18n.t('Failed to load students data)'))
-  let parsedResult: AssigneeOption[] = []
-  if (result && result.response.ok) {
-    let studentsJSON = result.json as JSONResult
-    if (result.link?.next) {
-      studentsJSON = await fetchNextPages({url: result.link.next.url}, studentsJSON)
-    }
-    parsedResult =
-      studentsJSON?.map(({id, name, sis_user_id}: any) => {
-        const parsedId = `student-${id}`
-        return {
-          id: parsedId,
-          value: name,
-          sisID: sis_user_id,
-          group: I18n.t('Students'),
-        }
-      }) ?? []
-  } else if (result) {
-    showFlashError(I18n.t('Failed to load students data'))
-  }
-  return parsedResult || []
+  const [, currentCourseId, _currentParams] = queryKey
+  const result = await getStudentsByCourse({courseId: currentCourseId})
+  return result || []
 }
 
 export const getSections = async ({queryKey}: {queryKey: any}) => {
