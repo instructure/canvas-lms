@@ -20,6 +20,20 @@ import {z} from 'zod'
 import {executeQuery} from '@canvas/query/graphql'
 import gql from 'graphql-tag'
 
+type Result = {
+  course: {
+    enrollmentsConnection: {
+      nodes: {
+        user: {
+          name: string
+          _id: string
+          sortableName: string
+        }
+      }[]
+    }
+  }
+}
+
 const QUERY = gql`
   query SpeedGrader_EnrollmentsByCourseQuery($courseId: ID!) {
     course(id: $courseId) {
@@ -36,27 +50,17 @@ const QUERY = gql`
   }
 `
 
-function transform(result: any) {
-  return result.course.enrollmentsConnection.nodes.map((node: any) => node.user)
-}
-
 export const ZParams = z.object({
   courseId: z.string().min(1),
 })
 
 type Params = z.infer<typeof ZParams>
 
-export async function getEnrollmentsByCourse<T extends Params>({
-  queryKey,
-}: {
-  queryKey: [string, T]
-}): Promise<any> {
+export function getCourseEnrollments<T extends Params>({queryKey}: {queryKey: [string, T]}) {
   ZParams.parse(queryKey[1])
   const {courseId} = queryKey[1]
 
-  const result = await executeQuery<any>(QUERY, {
+  return executeQuery<Result>(QUERY, {
     courseId,
   })
-
-  return transform(result)
 }
