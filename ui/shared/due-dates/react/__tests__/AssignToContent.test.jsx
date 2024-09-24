@@ -21,6 +21,7 @@ import {render, act, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AssignToContent from '../AssignToContent'
 import AssignmentOverrideCollection from '@canvas/assignments/backbone/collections/AssignmentOverrideCollection'
+import {QueryProvider, queryClient} from '@canvas/query'
 import fetchMock from 'fetch-mock'
 
 const SECTIONS_DATA = [
@@ -61,7 +62,6 @@ describe('AssignToContent', () => {
   }
 
   const SECTIONS_URL = `/api/v1/courses/${COURSE_ID}/sections?per_page=100`
-  const STUDENTS_URL = `api/v1/courses/${COURSE_ID}/users?per_page=100&enrollment_type=student`
   const DATE_DETAILS = `/api/v1/courses/${COURSE_ID}/assignments/${ASSIGNMENT_ID}/date_details?per_page=100`
   const SETTINGS_URL = `/api/v1/courses/${COURSE_ID}/settings`
 
@@ -77,11 +77,8 @@ describe('AssignToContent', () => {
   })
 
   beforeEach(() => {
-    fetchMock
-      .get(STUDENTS_URL, [])
-      .get(SECTIONS_URL, SECTIONS_DATA)
-      .get(DATE_DETAILS, {})
-      .get(SETTINGS_URL, {})
+    fetchMock.get(SECTIONS_URL, SECTIONS_DATA).get(DATE_DETAILS, {}).get(SETTINGS_URL, {})
+    queryClient.setQueryData(['students', COURSE_ID, {per_page: 100}], [])
   })
 
   afterEach(() => {
@@ -89,7 +86,12 @@ describe('AssignToContent', () => {
     fetchMock.restore()
   })
 
-  const setUp = (propOverrides = {}) => render(<AssignToContent {...props} {...propOverrides} />)
+  const setUp = (propOverrides = {}) =>
+    render(
+      <QueryProvider>
+        <AssignToContent {...props} {...propOverrides} />
+      </QueryProvider>
+    )
 
   it('renders', () => {
     const {getAllByText} = setUp()
@@ -144,7 +146,6 @@ describe('AssignToContent', () => {
 
     it('does not fetch assignee options', () => {
       setUp()
-      expect(fetchMock.calls(STUDENTS_URL).length).toBe(0)
       expect(fetchMock.calls(SECTIONS_URL).length).toBe(0)
     })
   })

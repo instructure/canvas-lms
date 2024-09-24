@@ -21,7 +21,7 @@ import {act, fireEvent, render} from '@testing-library/react'
 import ModuleAssignments, {type ModuleAssignmentsProps} from '../ModuleAssignments'
 import fetchMock from 'fetch-mock'
 import {FILTERED_SECTIONS_DATA, FILTERED_STUDENTS_DATA, SECTIONS_DATA, STUDENTS_DATA} from './mocks'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {QueryProvider, queryClient} from '@canvas/query'
 
 const props: ModuleAssignmentsProps = {
   courseId: '1',
@@ -30,7 +30,6 @@ const props: ModuleAssignmentsProps = {
 }
 
 const SECTIONS_URL = `/api/v1/courses/${props.courseId}/sections?per_page=100`
-const STUDENTS_URL = `api/v1/courses/${props.courseId}/users?per_page=100&enrollment_type=student`
 const FILTERED_SECTIONS_URL = /\/api\/v1\/courses\/.+\/sections\?per_page=100&search_term=.+/
 const FILTERED_STUDENTS_URL =
   /\/api\/v1\/courses\/.+\/users\?per_page=100&search_term=.+&enrollment_type=student/
@@ -48,10 +47,10 @@ describe('ModuleAssignments', () => {
 
   beforeEach(() => {
     fetchMock.get(SECTIONS_URL, SECTIONS_DATA)
-    fetchMock.get(STUDENTS_URL, STUDENTS_DATA)
     fetchMock.get(FILTERED_SECTIONS_URL, FILTERED_SECTIONS_DATA)
     fetchMock.get(FILTERED_STUDENTS_URL, FILTERED_STUDENTS_DATA)
     fetchMock.get(COURSE_SETTINGS_URL, {hide_final_grades: false})
+    queryClient.setQueryData(['students', props.courseId, {per_page: 100}], STUDENTS_DATA)
   })
 
   afterEach(() => {
@@ -60,9 +59,9 @@ describe('ModuleAssignments', () => {
 
   const renderComponent = (overrides?: Partial<typeof props>) =>
     render(
-      <QueryClientProvider client={new QueryClient()}>
+      <QueryProvider>
         <ModuleAssignments {...props} {...overrides} />
-      </QueryClientProvider>
+      </QueryProvider>
     )
 
   it('displays sections and students as options', async () => {
@@ -74,7 +73,7 @@ describe('ModuleAssignments', () => {
       expect(getByText(section.name)).toBeInTheDocument()
     })
     STUDENTS_DATA.forEach(student => {
-      expect(getByText(student.name)).toBeInTheDocument()
+      expect(getByText(student.value)).toBeInTheDocument()
     })
   })
 
@@ -82,9 +81,9 @@ describe('ModuleAssignments', () => {
     const {findByTestId, findByText, getByText} = renderComponent()
     const moduleAssignments = await findByTestId('assignee_selector')
     act(() => moduleAssignments.click())
-    await findByText(STUDENTS_DATA[0].name)
+    await findByText(STUDENTS_DATA[0].value)
     STUDENTS_DATA.forEach(student => {
-      expect(getByText(student.sis_user_id)).toBeInTheDocument()
+      expect(getByText(student.sisID)).toBeInTheDocument()
     })
   })
 
@@ -98,7 +97,7 @@ describe('ModuleAssignments', () => {
       expect(getByText(section.name)).toBeInTheDocument()
     })
     FILTERED_STUDENTS_DATA.forEach(student => {
-      expect(getByText(student.name)).toBeInTheDocument()
+      expect(getByText(student.value)).toBeInTheDocument()
     })
   })
 

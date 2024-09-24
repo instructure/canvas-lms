@@ -17,18 +17,18 @@
  */
 
 import React from 'react'
-import {render, act, getAllByTestId} from '@testing-library/react'
+import {render, act} from '@testing-library/react'
 import DifferentiatedModulesSection from '../DifferentiatedModulesSection'
 import AssignmentOverrideCollection from '@canvas/assignments/backbone/collections/AssignmentOverrideCollection'
 import fetchMock from 'fetch-mock'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {QueryProvider, queryClient} from '@canvas/query'
 
 const SECTIONS_DATA = [
   {id: '1', course_id: '1', name: 'Course 1', start_at: null, end_at: null},
   {id: '2', course_id: '1', name: 'Section A', start_at: null, end_at: null},
 ]
 
-const COURSE_ID = 1
+const COURSE_ID = '1'
 const ASSIGNMENT_ID = '1'
 
 describe('DifferentiatedModulesSection', () => {
@@ -61,7 +61,6 @@ describe('DifferentiatedModulesSection', () => {
   }
 
   const SECTIONS_URL = `/api/v1/courses/${COURSE_ID}/sections?per_page=100`
-  const STUDENTS_URL = `/api/v1/courses/${COURSE_ID}/users?per_page=100&enrollment_type=student`
   const DATE_DETAILS = `/api/v1/courses/${COURSE_ID}/assignments/${ASSIGNMENT_ID}/date_details?per_page=100`
   const SETTINGS_URL = `/api/v1/courses/${COURSE_ID}/settings`
 
@@ -77,7 +76,7 @@ describe('DifferentiatedModulesSection', () => {
   })
 
   beforeEach(() => {
-    fetchMock.get(STUDENTS_URL, [])
+    queryClient.setQueryData(['students', `${COURSE_ID}`, {per_page: 100}], [])
     fetchMock.get(SECTIONS_URL, SECTIONS_DATA)
     fetchMock.get(DATE_DETAILS, {})
     fetchMock.get(SETTINGS_URL, {})
@@ -90,20 +89,9 @@ describe('DifferentiatedModulesSection', () => {
 
   const setUp = params => {
     return render(
-      <QueryClientProvider
-        client={
-          new QueryClient({
-            defaultOptions: {
-              queries: {
-                staleTime: 1000 * 60 * 60 * 24, // 1 day,
-                cacheTime: 1000 * 60 * 60 * 24 * 2, // 2 days,
-              },
-            },
-          })
-        }
-      >
+      <QueryProvider>
         <DifferentiatedModulesSection {...params} />
-      </QueryClientProvider>
+      </QueryProvider>
     )
   }
 
@@ -165,7 +153,9 @@ describe('DifferentiatedModulesSection', () => {
     // skipping for now, since the pill is being validated in selenium specs
     it.skip('reverts highlighted style when changes are removed', async () => {
       const {getByTestId, findByTestId, findByText, getByText, queryByTestId} = render(
-        <DifferentiatedModulesSection {...props} />
+        <QueryProvider>
+          <DifferentiatedModulesSection {...props} />
+        </QueryProvider>
       )
       await addAssignee(getByTestId, findByTestId, findByText)
       expect(getByTestId('highlighted_card')).toBeInTheDocument()
@@ -177,7 +167,9 @@ describe('DifferentiatedModulesSection', () => {
     // skipping for now, since the pill is being validated in selenium specs
     it.skip('shows pending changes pill', async () => {
       const {getByTestId, findByTestId, findByText, getByRole} = render(
-        <DifferentiatedModulesSection {...props} />
+        <QueryProvider>
+          <DifferentiatedModulesSection {...props} />
+        </QueryProvider>
       )
       await addAssignee(getByTestId, findByTestId, findByText)
       expect(getByTestId('highlighted_card')).toBeInTheDocument()
@@ -267,10 +259,11 @@ describe('DifferentiatedModulesSection', () => {
     })
 
     it('validates if required due dates are set before applying changes', async () => {
-      const {getAllByTestId, getByTestId, queryByTestId, findAllByTestId, getByText, getAllByText} = setUp({
-        ...props,
-        postToSIS: true,
-      })
+      const {getAllByTestId, getByTestId, queryByTestId, findAllByTestId, getByText, getAllByText} =
+        setUp({
+          ...props,
+          postToSIS: true,
+        })
 
       act(() => getByTestId('manage-assign-to').click())
       // wait until the cards are loaded
