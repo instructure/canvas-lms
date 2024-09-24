@@ -40,6 +40,7 @@ import {
   disableGrading,
   passFailStatusOptions,
   assignmentHasCheckpoints,
+  getCorrectSubmission,
 } from '../../../utils/gradebookUtils'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import DefaultGradeInput from './DefaultGradeInput'
@@ -91,19 +92,6 @@ export default function GradingResults({
     submissionId: submission?.id,
   })
 
-  const getCorrectSubmission = useCallback(
-    (subAssignmentTag?: string | null) => {
-      if (subAssignmentTag === REPLY_TO_TOPIC || subAssignmentTag === REPLY_TO_ENTRY) {
-        return submission?.subAssignmentSubmissions?.find(
-          subSubmission => subSubmission.subAssignmentTag === subAssignmentTag
-        )
-      }
-
-      return submission
-    },
-    [submission]
-  )
-
   const getGradeInputSetter = (subAssignmentTag?: string) => {
     if (subAssignmentTag === REPLY_TO_TOPIC) {
       return setReplyToTopicGradeInput
@@ -128,7 +116,7 @@ export default function GradingResults({
     (subAssignmentTag?: string) => {
       if (!submission) return
 
-      const correctSubmission = getCorrectSubmission(subAssignmentTag)
+      const correctSubmission = getCorrectSubmission(submission, subAssignmentTag)
 
       if (!correctSubmission) return
 
@@ -164,7 +152,7 @@ export default function GradingResults({
         gradeInputSetter(correctSubmission.enteredGrade)
       }
     },
-    [assignment, getCorrectSubmission, submission]
+    [assignment, submission]
   )
 
   useEffect(() => {
@@ -178,18 +166,23 @@ export default function GradingResults({
 
   const handleGradeChange = useCallback(
     (updateEvent: GradeChangeApiUpdate) => {
-      const {status, newSubmission, error} = updateEvent
+      const {status, newSubmission, error, shouldCloseModal} = updateEvent
       switch (status) {
         case ApiCallStatus.FAILED:
-          showFlashError(error)(new Error('Failed to submit score'))
+          if (!shouldCloseModal) {
+            showFlashError(error)(new Error('Failed to submit score'))
+          }
           break
         case ApiCallStatus.COMPLETED:
           if (!newSubmission) {
             return
           }
           onSubmissionSaved(newSubmission)
-          setModalOpen(false)
-          showFlashSuccess(I18n.t('Grade saved'))()
+          if (shouldCloseModal) {
+            setModalOpen(false)
+          } else {
+            showFlashSuccess(I18n.t('Grade saved'))()
+          }
           break
       }
     },
@@ -278,7 +271,7 @@ export default function GradingResults({
 
   const submitGrade = async (subAssignmentTag?: string | null) => {
     const correctSubmission = subAssignmentTag
-      ? {...submission, ...getCorrectSubmission(subAssignmentTag)}
+      ? {...submission, ...getCorrectSubmission(submission, subAssignmentTag)}
       : submission
 
     await submit(

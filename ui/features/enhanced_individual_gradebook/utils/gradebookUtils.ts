@@ -51,6 +51,7 @@ import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import {scopeToUser, updateWithSubmissions} from '@canvas/grading/EffectiveDueDates'
 import {scoreToGrade, type GradingStandard} from '@instructure/grading-utils'
 import {divide, toNumber} from '@canvas/grading/GradeCalculationHelper'
+import {REPLY_TO_ENTRY, REPLY_TO_TOPIC} from '../react/components/GradingResults'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -549,4 +550,17 @@ export function disableGrading(
 
 export function assignmentHasCheckpoints(assignment: AssignmentConnection): boolean {
   return assignment?.checkpoints?.length > 0
+}
+
+export const getCorrectSubmission = (
+  submission?: GradebookUserSubmissionDetails,
+  subAssignmentTag?: string | null
+) => {
+  if (subAssignmentTag === REPLY_TO_TOPIC || subAssignmentTag === REPLY_TO_ENTRY) {
+    return submission?.subAssignmentSubmissions?.find(
+      subSubmission => subSubmission.subAssignmentTag === subAssignmentTag
+    )
+  }
+
+  return submission
 }

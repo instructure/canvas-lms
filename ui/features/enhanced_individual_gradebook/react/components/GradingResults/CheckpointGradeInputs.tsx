@@ -26,6 +26,7 @@ import {Flex} from '@instructure/ui-flex'
 import DefaultGradeInput from './DefaultGradeInput'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {REPLY_TO_ENTRY, REPLY_TO_TOPIC} from './index'
+import type {Spacing} from '@instructure/emotion'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -51,6 +52,9 @@ type Props = {
     e: React.SyntheticEvent<Element, Event>,
     data: {value?: string | number}
   ) => void
+  elementWrapper?: 'span' | 'div'
+  margin?: Spacing
+  contextPrefix?: string
 }
 
 const findCheckpoint = (assignment: AssignmentConnection, tag: string) => {
@@ -107,13 +111,16 @@ export const CheckpointGradeInputs = ({
   handleSubmitGrade,
   handleChangeReplyToTopicPassFailStatus,
   handleChangeReplyToEntryPassFailStatus,
+  elementWrapper,
+  margin,
+  contextPrefix = 'student_and_',
 }: Props) => {
   const replyToTopicAssignment = buildCheckpointAssignment(parentAssignment, REPLY_TO_TOPIC)
   const replyToEntryAssignment = buildCheckpointAssignment(parentAssignment, REPLY_TO_ENTRY)
 
   return (
     <>
-      <Flex>
+      <Flex width="29rem" as="span">
         <Flex.Item shouldGrow={true}>
           <DefaultGradeInput
             assignment={replyToTopicAssignment}
@@ -121,7 +128,7 @@ export const CheckpointGradeInputs = ({
             passFailStatusIndex={replyToTopicPassFailStatusIndex}
             gradeInput={replyToTopicGradeInput}
             submitScoreStatus={submitScoreStatus}
-            context="student_and_reply_to_topic_assignment_grade"
+            context={`${contextPrefix}reply_to_topic_assignment_grade`}
             handleSetGradeInput={handleSetReplyToTopicGradeInput}
             handleSubmitGrade={() => {
               if (handleSubmitGrade) {
@@ -132,6 +139,9 @@ export const CheckpointGradeInputs = ({
             gradingStandardPointsBased={gradingStandardPointsBased}
             header={I18n.t('Reply to Topic')}
             shouldShowOutOfText={false}
+            elementWrapper={elementWrapper}
+            margin={margin}
+            width="9rem"
           />
         </Flex.Item>
         <Flex.Item shouldGrow={true}>
@@ -141,7 +151,7 @@ export const CheckpointGradeInputs = ({
             passFailStatusIndex={replyToEntryPassFailStatusIndex}
             gradeInput={replyToEntryGradeInput}
             submitScoreStatus={submitScoreStatus}
-            context="student_and_reply_to_entry_assignment_grade"
+            context={`${contextPrefix}reply_to_entry_assignment_grade`}
             handleSetGradeInput={handleSetReplyToEntryGradeInput}
             handleSubmitGrade={() => {
               if (handleSubmitGrade) {
@@ -152,6 +162,9 @@ export const CheckpointGradeInputs = ({
             gradingStandardPointsBased={gradingStandardPointsBased}
             header={I18n.t('Required Replies')}
             shouldShowOutOfText={false}
+            elementWrapper={elementWrapper}
+            margin={margin}
+            width="9rem"
           />
         </Flex.Item>
         <Flex.Item shouldGrow={true}>
@@ -161,13 +174,16 @@ export const CheckpointGradeInputs = ({
             passFailStatusIndex={parentPassFailStatusIndex}
             gradeInput={parentGradeInput}
             submitScoreStatus={submitScoreStatus}
-            context="student_and_assignment_grade"
+            context={`${contextPrefix}assignment_grade`}
             handleSetGradeInput={() => {}}
             handleSubmitGrade={() => {}}
             handleChangePassFailStatus={() => {}}
             gradingStandardPointsBased={gradingStandardPointsBased}
             header={I18n.t('Total')}
             shouldShowOutOfText={false}
+            elementWrapper={elementWrapper}
+            margin={margin}
+            width="9rem"
           />
         </Flex.Item>
       </Flex>

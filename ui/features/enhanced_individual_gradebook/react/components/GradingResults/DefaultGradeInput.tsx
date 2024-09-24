@@ -58,6 +58,7 @@ type Props = {
   ) => void
   header?: string
   shouldShowOutOfText?: boolean
+  width?: string
 }
 
 export default function DefaultGradeInput({
@@ -75,6 +76,7 @@ export default function DefaultGradeInput({
   gradingStandardPointsBased,
   header,
   shouldShowOutOfText = true,
+  width = '14rem',
 }: Props) {
   const outOfTextValue = outOfText(assignment, submission, gradingStandardPointsBased)
 
@@ -128,6 +130,7 @@ export default function DefaultGradeInput({
               </>
             }
             size="medium"
+            width={width}
             isInline={true}
             onChange={handleChangePassFailStatus}
             value={passFailStatusOptions[passFailStatusIndex].value}
@@ -156,7 +159,7 @@ export default function DefaultGradeInput({
               </>
             }
             display="inline-block"
-            width="14rem"
+            width={width}
             value={gradeInput}
             disabled={disabledGrading}
             data-testid={`${context}_input`}
