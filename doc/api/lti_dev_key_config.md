@@ -8,28 +8,26 @@
 For a successful launch to occur, LTI Advantage Tools require configuration
 on both Canvas and inside the tool:
 
-- [Manually Configuring LTI Advantage Tools](#configuring-lti-advantage-tools)
-- [Overview of an LTI Launch](#overview-of-an-lti-launch)
-- [Configuring Canvas in the Tool](#configuring-canvas-in-the-tool)
-- [Configuring the Tool in Canvas](#configuring-the-tool-in-canvas)
+- [Manually Configuring LTI Advantage Tools](#manually-configuring-lti-advantage-tools)
+- [Overview of an LTI Launch](#launch-overview)
+- [Configuring Canvas in the Tool](#config-in-tool)
+- [Configuring the Tool in Canvas](#config-in-canvas)
   - [Anatomy of a JSON configuration](#anatomy-of-a-json-configuration)
 
 But first, the importance of each configuration setting can only be understood
 with a basic understanding of how an LTI launch occurs.
 
-<a name="launch-overview"></a>
-Overview of an LTI Launch
+Overview of an LTI Launch <a name="launch-overview"></a>
 =======================================
 The <a href="http://www.imsglobal.org/spec/security/v1p0/" target="_blank">IMS Security Framework</a> uses an
 <a href="http://www.imsglobal.org/spec/security/v1p0/#openid_connect_launch_flow" target="_blank">Open ID Connect (OIDC)</a> third-party flow. You'll want to read these specifications in detail, but the following is a Canvas-specific summary:
 
-<a name="step-1"></a>
-###Step 1: Login Initiation
+### Step 1: Login Initiation <a name="step-1"></a>
 Canvas <a href="http://www.imsglobal.org/spec/security/v1p0/#step-1-third-party-initiated-login" target="_blank">initiates a login request</a> to the `oidc_initiation_url` that is <a href="#config-in-canvas">configured on the LTI developer key</a>. This requests contains an issuer identifier (`iss`) to recognize Canvas is launching the tool. As the issuer, Instructure-hosted Canvas instances all use the following, regardless of the specific account domain(s) that the tool was launched from:
 
-- https://canvas.instructure.com (Production environment launches)
-- https://canvas.beta.instructure.com (Beta environment launches)
-- https://canvas.test.instructure.com (Test environment launches)
+- <https://canvas.instructure.com> (Production environment launches)
+- <https://canvas.beta.instructure.com> (Beta environment launches)
+- <https://canvas.test.instructure.com> (Test environment launches)
 
 The request also includes a `login_hint` that is passed in the next step. Last, the request include the `target_link_uri` that has been configured on the Developer key; this is later used by the tool as a recommended final redirect.
 
@@ -72,8 +70,7 @@ The request also includes a `login_hint` that is passed in the next step. Last, 
   </tbody>
 </table>
 
-<a name="login-redirect"></a>
-####Step 1.5: Optional Tool-to-tool Redirect
+#### Step 1.5: Optional Tool-to-tool Redirect <a name="login-redirect"></a>
 
 There are situations where a tool wants to use a region-specific or environment-specific instance of itself to respond to the LTI launch, like keeping traffic within the same region as the instance of Canvas, or using a different domain or even launch URL when launched from beta Canvas vs normal production.
 
@@ -96,15 +93,15 @@ Tools that utilize different instances for beta and test must also make sure tha
 
 Using the `oidc_initiation_urls` option described [in the JSON tool config](#request-params) can also produce a similar outcome while removing the need for the tool to perform an internal redirect.
 
-<a name="step-2"></a>
-###Step 2: Authentication Request
+### Step 2: Authentication Request <a name="step-2"></a>
+
 To complete authentication, tools are expected to send back an <a href="http://www.imsglobal.org/spec/security/v1p0/#step-2-authentication-request" target="_blank">authentication request</a> to an "OIDC Authorization end-point". This can be a GET or POST, however, this request needs to be a redirect in the user’s browser and not made server to server as we need to validate the current user's session data. For cloud-hosted Canvas, regardless of the domain used by the client, the endpoint is always:
 
-> - `https://sso.canvaslms.com/api/lti/authorize_redirect` (if launched from a **production** environment)
-> - `https://sso.beta.canvaslms.com/api/lti/authorize_redirect` (if launched from a **beta** environment)
-> - `https://sso.test.canvaslms.com/api/lti/authorize_redirect` (if launched from a **test** environment)
+- `https://sso.canvaslms.com/api/lti/authorize_redirect` (if launched from a **production** environment)
+- `https://sso.beta.canvaslms.com/api/lti/authorize_redirect` (if launched from a **beta** environment)
+- `https://sso.test.canvaslms.com/api/lti/authorize_redirect` (if launched from a **test** environment)
 
-> The domain for this endpoint used to be `https://canvas.instructure.com`. The impetus for this change and other exact details are described in <a href="https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677" target="_blank">this Canvas Community article</a>. Tools wishing to implement the Platform Storage spec are required to use the new domain for this endpoint, and all other tools should update this endpoint in their configuration store as soon as possible. This change will eventually be enforced, but for now is not a breaking change - the old domain will continue to work. Any questions or issues are either addressed in the linked article or can be filed as a standard support/partner support case, referencing the OIDC Auth endpoint change.
+  The domain for this endpoint used to be `https://canvas.instructure.com`. The impetus for this change and other exact details are described in <a href="https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677" target="_blank">this Canvas Community article</a>. Tools wishing to implement the Platform Storage spec are required to use the new domain for this endpoint, and all other tools should update this endpoint in their configuration store as soon as possible. This change will eventually be enforced, but for now is not a breaking change - the old domain will continue to work. Any questions or issues are either addressed in the linked article or can be filed as a standard support/partner support case, referencing the OIDC Auth endpoint change.
 
 Among the <a href="http://www.imsglobal.org/spec/security/v1p0/#step-2-authentication-request" target="_blank">required variables</a> the request should include:
 
@@ -113,16 +110,14 @@ Among the <a href="http://www.imsglobal.org/spec/security/v1p0/#step-2-authentic
 - the same `login_hint` that Canvas sent in Step 1.
 - a `state` parameter the tool will use to validate the request in Step 4.
 
-<a name="step-3"></a>
-###Step 3: Authentication Response (LTI Launch)
+### Step 3: Authentication Response (LTI Launch) <a name="step-3"></a>
+
 Canvas will use the `client_id` to lookup which developer key to use and then check the `redirect_uri` that was sent in the previous step and ensure that there is a exact-matching `redirect_uri` on the developer key. Canvas then sends its <a href="http://www.imsglobal.org/spec/security/v1p0/#step-3-authentication-response" target="_blank">authentication response</a> to the `redirect_uri` that the tool provided in Step 2. The request will include an `id_token` which is a signed JWT containing the LTI payload (user identifiers, course contextual data, custom data, etc.). Tools must <a href="http://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation" target="_blank">validate the request is actually coming from Canvas</a> using <a href="#config-in-tool" target="_blank">Canvas' public JWKs</a>.
 
-<a name="step-4"></a>
-###Step 4: Resource Display
+### Step 4: Resource Display <a name="step-4"></a>
 The tool then validates the `state` parameter matches the one sent in Step 2 and redirects the User Agent to the `target_link_uri` that was sent in Step 1 (or some other location of its choice) to <a href="http://www.imsglobal.org/spec/security/v1p0/#step-4-resource-is-displayed" target="_blank">display the final resource</a>. This redirect occurs in an iframe unless the tool is configured otherwise.
 
-<a name="cookie-less"></a>
-###Launching without Cookies
+### Launching without Cookies <a name="cookie-less"></a>
 
 Safari blocking cookies inside 3rd-party iframes made it necessary to create a workaround for storing the `state` property between the login and launch requests, to prevent MITM attacks. The newly finalized LTI Platform Storage spec provides a way for tools that are launching in Safari
 or another situation where cookies can't get set to still store data across requests in a secure fashion. Tools can send `window.postMessage`s to
@@ -154,18 +149,16 @@ The LTI Platform Storage spec docs:
 - [postMessage Platform Storage](https://www.imsglobal.org/spec/lti-pm-s/v0p1)
 - [Canvas postMessage documentation](file.lti_window_post_message.html)
 
-<a name="config-in-tool"></a>
-Configuring Canvas in the Tool
+Configuring Canvas in the Tool <a name="config-in-tool"></a>
 =======================================
 Tools will need to be aware of some Canvas-specific settings in order to accept a launch from Canvas and use the LTI Advantage Services:
 
 - **Canvas Public JWKs**: When the tool receives the authentication response ([Step 3](#step-3)), tools must <a href="http://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation" target="_blank">validate that the request is actually coming from Canvas</a>. Canvas' public keys are environment-specific, but not domain-specific (the same key set can be used across all client accounts):
+  - Production: `https://sso.canvaslms.com/api/lti/security/jwks`
+  - Beta: `https://sso.beta.canvaslms.com/api/lti/security/jwks`
+  - Test: `https://sso.test.canvaslms.com/api/lti/security/jwks`
 
-> - Production: `https://sso.canvaslms.com/api/lti/security/jwks`
-> - Beta: `https://sso.beta.canvaslms.com/api/lti/security/jwks`
-> - Test: `https://sso.test.canvaslms.com/api/lti/security/jwks`
-
-> **Note:** The domain for this endpoint used to be `https://canvas.instructure.com`. The impetus for this change and other exact details are described in <a href="https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677" target="_blank">this Canvas Community article</a>. Tools wishing to implement the Platform Storage spec are required to use the new domain for this endpoint, and all other tools should update this endpoint in their configuration store as soon as possible. This change will eventually be enforced, but for now is not a breaking change - the old domain will continue to work. Any questions or issues are either addressed in the linked article or can be filed as a standard support/partner support case, referencing the OIDC Auth endpoint change.
+    **Note:** The domain for this endpoint used to be `https://canvas.instructure.com`. The impetus for this change and other exact details are described in <a href="https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677" target="_blank">this Canvas Community article</a>. Tools wishing to implement the Platform Storage spec are required to use the new domain for this endpoint, and all other tools should update this endpoint in their configuration store as soon as possible. This change will eventually be enforced, but for now is not a breaking change - the old domain will continue to work. Any questions or issues are either addressed in the linked article or can be filed as a standard support/partner support case, referencing the OIDC Auth endpoint change.
 
 - **Authorization Redirect URL**: The values and use of this are described in [Step 2](#step-2). Since the URL is static, you will want to configure this in your tool. Tools that wish to utilize [Step 1.5](#login-redirect) need to include _all_ possible redirect URLs here.
 
@@ -173,8 +166,7 @@ Tools will need to be aware of some Canvas-specific settings in order to accept 
 
 - **Deployment ID**: The `deployment_id` can be optionally configured in the tool. A single developer key may have many deployments, so the deployment ID can be used to identify which deployment is being launched. For more, refer to the LTI 1.3 core specification, <a href="https://www.imsglobal.org/spec/lti/v1p3/#lti_deployment_id-login-parameter" target="_blank">section 4.1.2</a>. The `deployment_id` in Canvas is exposed after a tool has been <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-external-app-for-an-account-using-a-client/ta-p/202" target="_blank">deployed using the `client_id`</a>.
 
-<a name="config-in-canvas"></a>
-Configuring the Tool in Canvas
+Configuring the Tool in Canvas <a name="config-in-canvas"></a>
 =======================================
 With LTI Advantage, Canvas moved to using Developer Keys to store tool
 configuration information. After a developer key is
@@ -186,7 +178,7 @@ or <a href="https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-configu
 Developer Keys allow tools to set the required parameters to complete the
 <a href="https://www.imsglobal.org/spec/security/v1p0#openid_connect_launch_flow"
 target="_blank">OpenID Connect Launch Flow</a>, leverage
-<a href="https://canvas.instructure.com/doc/api/file.oauth.html#accessing-lti-advantage-services"
+<a href="file.oauth.html#accessing-lti-advantage-services"
  target="_blank">LTI Advantage Services</a>, and configure other important settings.
 
 With guidance from the tool developer, developer keys settings can be manually
@@ -300,131 +292,76 @@ also found in the placements sub-menu in the left-navigation of this documentati
       <th class="param-name">Parameter</th>
       <th class="param-req"></th>
       <th class="param-type">Type</th>
-
       <th class="param-desc">Description</th>
     </tr>
-
   </thead>
   <tbody>
-
 <!-- title -->
-
     <tr class="request-param ">
       <td>title</td>
       <td>
-
         Required
-
       </td>
       <td>string</td>
-
-
-
       <td class="param-desc">
-
 <p>The default name of the tool in the app index. This value is also displayed if no "text" field is provided within extension settings or placements.</p>
-
       </td>
     </tr>
-
 <!-- description -->
-
     <tr class="request-param ">
       <td>description</td>
       <td>
-
                 Required
-
       </td>
       <td>string</td>
-
-
-
       <td class="param-desc">
-
 <p>A description of the tool.</p>
-
       </td>
     </tr>
-
 <!-- oidc_initiation_url -->
-
     <tr class="request-param ">
       <td>oidc_initiation_url</td>
-
       <td>
-
         Required
-
       </td>
       <td>string</td>
-
-
-
       <td class="param-desc">
-
 <p>The <a href="https://www.imsglobal.org/spec/security/v1p0#step-1-third-party-initiated-login" target="_blank">login initiation url</a> that Canvas should redirect the User Agent to.
-
       </td>
     </tr>
-
 <!-- oidc_initiation_urls -->
-
     <tr class="request-param ">
       <td><a name="param-oidc-initial-urls"></a>oidc_initiation_urls</td>
       <td>
-
       </td>
       <td>JSON object</td>
-
-
-
       <td class="param-desc">
-
 <p>Optional region-specific <a href="https://www.imsglobal.org/spec/security/v1p0#step-1-third-party-initiated-login" target="_blank">login initiation urls</a> that Canvas should redirect the User Agent to. Each institution's Canvas install lives in a particular AWS region, typically one close to the institution's physical region. If ths AWS region is listed as a key in this object, the URL in the value will override the default `oidc_initiation_url`. As of 2023, the regions used by Canvas are: us-east-1, us-west-2, ca-central-1, eu-west-1, eu-central-1, ap-southeast-1, ap-southeast-2.
-
       </td>
     </tr>
-
 <!-- target_link_uri -->
-
     <tr class="request-param ">
       <td>target_link_uri</td>
       <td>
-
         Required
-
       </td>
       <td>string</td>
-
-
-
       <td class="param-desc">
-
 <p>The <a href="https://www.imsglobal.org/spec/security/v1p0#step-1-third-party-initiated-login" target="_blank">target_link_uri</a> that Canvas should pass in the to the login initiation endpoint. This allows tools to determine which redirect_uri to pass Canvas in the authorization redirect request and should be <a href="https://www.imsglobal.org/spec/lti/v1p3/impl#verify-the-target_link_uri" target="_blank">verified during the final
 launch</a>. This can be set at the tool-level, or within the "placements" JSON
 object for placement-specific target_link_uri's.</p>
-
       </td>
     </tr>
-
 <!-- scopes -->
-
     <tr class="request-param ">
       <td>scopes</td>
       <td>
-
       </td>
       <td>string array</td>
-
-
-
       <td class="param-desc">
-
 <p>The comma separated list of scopes to be allowed when using the
     <a href="file.oauth.html#accessing-lti-advantage-services">client_credentials
      grant to access LTI services</a>.
-
      <p class="param-values">
           <span class="allowed">Allowed values:</span>
           <code class="enum">"https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"</code>,
@@ -433,246 +370,140 @@ object for placement-specific target_link_uri's.</p>
           <code class="enum">"https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly"</code>,
           <code class="enum">"https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly"</code>,
           <code class="enum">"https://canvas.instructure.com/lti/public_jwk/scope/update"</code>
-
      </p>
-
 </p>
-
       </td>
     </tr>
-
 <!-- extensions -->
-
     <tr class="request-param ">
       <td>extensions</td>
       <td>
-
       </td>
       <td>array of JSON objects</td>
-
-
-
       <td class="param-desc">
-
 <p>The set of Canvas extensions, including placements, that the tool should use.</p>
-
       </td>
     </tr>
-
 <!-- domain -->
-
     <tr class="request-param ">
       <td>domain</td>
       <td>
-
       </td>
       <td>string</td>
-
-
-
       <td class="param-desc">
-
 <p>The domain Canvas should use to match clicked LTI links against. This is recommended if <a href="file.content_item.html">deep linking</a> is used.</p>
-
       </td>
     </tr>
-
 <!-- tool_id -->
-
     <tr class="request-param ">
       <td>tool_id</td>
       <td>
-
       </td>
       <td>string</td>
-
-
-
       <td class="param-desc">
-
 <p>Allows tools to set a unique identifier for the tool.</p>
-
       </td>
     </tr>
-
 <!-- platform -->
-
     <tr class="request-param ">
       <td>platform</td>
       <td>
-
       </td>
       <td>string</td>
-
-
-
       <td class="param-desc">
-
 <p>The LMS platform that the extensions belong to. This should always be set to "canvas.instructure.com" for cloud-hosted Canvas.</p>
-
       </td>
     </tr>
-
 <!-- privacy_level -->
-
     <tr class="request-param ">
       <td>privacy_level</td>
       <td>
-
         Required
-
       </td>
       <td>string</td>
-
-
-
       <td class="param-desc">
-
 <p>What level of user information to send to the external tool. Setting this to "name_only" will include fields that contain the user's name and sourcedid in the launch claims. "email_only" will include only the user's email. "public" includes all fields from "name_only", "email_only", and fields like the user's picture. "anonymous" will not include any of these fields. Note that the "sub" claim containing the user's ID is always included.</p>
-
         <p class="param-values">
           <span class="allowed">Allowed values:</span>
           <code class="enum">anonymous</code>, <code class="enum">public</code>
           <code class="enum">name_only</code>, <code class="enum">email_only</code>
         </p>
-
       </td>
     </tr>
-
 <!-- settings -->
-
     <tr class="request-param ">
       <td>settings</td>
       <td>
-
       </td>
       <td>JSON object</td>
-
-
-
       <td class="param-desc">
-
 <p>The set of platform-specific settings to be used.</p>
-
       </td>
     </tr>
-
 <!-- text -->
-
     <tr class="request-param ">
       <td>text</td>
       <td>
-
       </td>
       <td>string</td>
-
-
-
       <td class="param-desc">
-
 <p>The default text to show for this tool. Can be set within "settings" for the tool-level display text, or within "placements" object for placement-specific display text.</p>
-
       </td>
     </tr>
-
 <!-- labels -->
-
     <tr class="request-param ">
       <td>labels</td>
       <td>
-
       </td>
       <td>JSON object</td>
-
-
-
       <td class="param-desc">
-
 <p>An object for translations of the "text", used to support internationalization (i18n) / localization (l10n). If the user's Canvas interface is set to one of the languages listed, the tool will display the translated text in place of the value in the "text" field. More specific locales ("en-AU") are preferred over less specific ones ("en").  Can be set within "settings" or individual placements.
 </p>
-
       </td>
     </tr>
-
 <!-- icon_url -->
-
     <tr class="request-param ">
       <td>icon_url</td>
       <td>
-
       </td>
       <td>string</td>
-
-
-
       <td class="param-desc">
-
 <p>The url of the icon to show for this tool. Can be set within the "settings" object for tool-level icons, or in the "placement" object for placement-specific icons. NOTE: Not all placements display an icon.</p>
-
 <!-- selection_height -->
-
     <tr class="request-param ">
       <td>selection_height</td>
       <td>
-
       </td>
       <td>string</td>
-
-
-
       <td class="param-desc">
-
 <p>The display height of the iframe. This may be ignored or overridden for some LTI placements due to other UI requirements set by Canvas. Tools are advised to experiment with this setting to see what makes the most sense for their application.</p>
-
 <!-- selection_width -->
-
     <tr class="request-param ">
       <td>selection_width</td>
       <td>
-
       </td>
       <td>string</td>
-
-
-
       <td class="param-desc">
-
 <p>The display width of the iframe. This may be ignored or overridden for some LTI placements due to other UI requirements set by Canvas. Tools are advised to experiment with this setting to see what makes the most sense for their application.</p>
-
       </td>
     </tr>
-
 <!-- enabled -->
-
     <tr class="request-param ">
       <td>enabled</td>
       <td>
-
       </td>
       <td>boolean</td>
-
-
-
       <td class="param-desc">
-
 <p>Optional, defaults to `true`. Set within the "placements" object to to determine if the placement is enabled.</p>
-
       </td>
     </tr>
-
 <!-- message_type -->
-
     <tr class="request-param ">
       <td>message_type</td>
       <td>
-
       </td>
       <td>string</td>
-
-
-
       <td class="param-desc">
-
         <p>The IMS message type to be sent in the launch. This is set at the placement level. Not all placements support both message_types.
           <p class="param-values">
            <span class="allowed">Allowed values:</span>
@@ -680,40 +511,26 @@ object for placement-specific target_link_uri's.</p>
            <code class="enum">"LtiDeepLinkingRequest"</code>
           </p>
         </p>
-
-
       </td>
     </tr>
-
 <!-- required_permissions -->
-
     <tr class="request-param ">
       <td>required_permissions</td>
       <td>
-
       </td>
       <td>string</td>
-
-
-
       <td class="param-desc">
-
-        <p>Limits tool visibility to users with certain permissions, as defined on the user's built-in Canvas user roles AND the custom roles that you may have created in Canvas. This is a comma-separated string of one or more required permissions, such as <code>manage_groups_add,manage_groups_delete</code> or <code>read_outcomes</code>. The tool will be hidden for users without all specified permissons. If set in placement-specific settings, that placement will be hidden; if set at the tool-level (e.g. under <code>extensions[0]</code>), each of the tool's placements will be hidden. For true access control, please use (instead or in addition) the <a href="file.tools_variable_substitutions.html#Canvas-membership-permissions">Canvas.membership.permissions&lt;&gt;</a> custom variable expansion, and check its value in your tool. To learn more about roles and permissions, and to see the permissions available for this parameter, visit the <a href="roles.html" target="blank">Roles API docs</a>.
+        <p>Limits tool visibility to users with certain permissions, as defined on the user's built-in Canvas user roles AND the custom roles that you may have created in Canvas. This is a comma-separated string of one or more required permissions, such as <code>manage_groups_add,manage_groups_delete</code> or <code>read_outcomes</code>. The tool will be hidden for users without all specified permissons. If set in placement-specific settings, that placement will be hidden; if set at the tool-level (e.g. under <code>extensions[0]</code>), each of the tool's placements will be hidden. For true access control, please use (instead or in addition) the <a href="file.tools_variable_substitutions.html#Canvas-membership-permissions">Canvas.membership.permissions&lt;&gt;</a> custom variable expansion, and check its value in your tool. To learn more about roles and permissions, and to see the permissions available for this parameter, visit the <a href="roles.html" target="_blank">Roles API docs</a>.
         </p>
-
-
       </td>
     </tr>
-
 <!-- environments -->
-
     <tr class="request-param ">
       <td>environments</td>
       <td>
         <strong style="color: red;">Ignored<strong>
       </td>
       <td>JSON object</td>
-
       <td class="param-desc">
         <p>LTI 1.1 tools <a href="file.tools_xml.html">support environment-specific domains and launch urls</a>, used for launching
         from beta or test instances of Canvas. This config option is not supported for LTI 1.3. Tools instead should use the
@@ -723,60 +540,37 @@ object for placement-specific target_link_uri's.</p>
         </p>
       </td>
     </tr>
-
 <!-- public_jwk -->
-
     <tr class="request-param ">
       <td>public_jwk</td>
       <td>
           required, see notes
       </td>
       <td>JSON object</td>
-
-
-
       <td class="param-desc">
-
 <p>Required if public_jwk_url is omitted. The tools <a href="https://www.imsglobal.org/spec/lti/v1p3/impl/#tool-s-jwk-set" target="_blank">public key</a> to be used during the client_credentials grant for <a href="file.oauth.html#accessing-lti-advantage-services" target="_blank">accessing LTI Advantage services</a>.</p>
-
       </td>
     </tr>
-
 <!-- public_jwk_url -->
-
     <tr class="request-param ">
       <td>public_jwk_url</td>
       <td>
           required, see notes
       </td>
       <td>string</td>
-
-
-
       <td class="param-desc">
-
 <p>Required if public_jwk is omitted. The tools <a href="https://www.imsglobal.org/spec/lti/v1p3/impl/#tool-s-jwk-set" target="_blank">public key uri</a> to be used during the client_credentials grant for <a href="file.oauth.html#accessing-lti-advantage-services" target="_blank">accessing LTI Advantage services</a>.</p>
-
       </td>
     </tr>
-
 <!-- custom_fields -->
-
     <tr class="request-param ">
       <td>custom_fields</td>
       <td>
-
       </td>
       <td>JSON object</td>
-
-
-
       <td class="param-desc">
-
 <p>Custom fields that will be sent to the tool consumer; can be set at the tool-level or within the "placement" JSON object for placement-specific custom fields.</p>
-
       </td>
     </tr>
-
   </tbody>
 </table>

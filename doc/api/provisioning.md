@@ -9,8 +9,7 @@ Many external tools will need to know which users are enrolled in a course and t
 
 
 
-<a name="lti-advantage"></a>
-LTI Advantage: Names and Role Provisioning Service
+LTI Advantage: Names and Role Provisioning Service <a name="lti-advantage"></a>
 ==============
 
 The IMS <a href="https://www.imsglobal.org/spec/lti-nrps/v2p0" target="_blank"> Names and Role Provisioning Service (NRPS)</a> provides an efficient API for synchronizing course rosters. This capability is only available to LTI 1.3 tools. We will not discuss details of the specification here, but instead focus on configuring and using NRPS within the Canvas platform.
@@ -25,7 +24,7 @@ As with the other LTI Advantage service, tools must complete a specific <a href=
 
 ### Using NRPS
 
-Once an access token is obtained, tools may begin to <a href="names_and_role.html" target="_blank">synchronize data using NRPS</a>. Using endpoint require knowledge of the context_memberships_url, which can either be obtained during the LTI launch in the <a href=https://www.imsglobal.org/spec/lti-nrps/v2p0#lti-1-3-integration target="_blank">Names and Role Service claim</a>, or by substituting the desired course_id/group_id in the <a href="names_and_role.html" target="_blank">Names and Role API</a>.
+Once an access token is obtained, tools may begin to <a href="names_and_role.html" target="_blank">synchronize data using NRPS</a>. Using endpoint require knowledge of the context_memberships_url, which can either be obtained during the LTI launch in the <a href="https://www.imsglobal.org/spec/lti-nrps/v2p0#lti-1-3-integration" target="_blank">Names and Role Service claim</a>, or by substituting the desired course_id/group_id in the <a href="names_and_role.html" target="_blank">Names and Role API</a>.
 
 ### Advantages
 - Canvas REST API access is not required (i.e. no additional authorization UI)
@@ -40,14 +39,13 @@ Once an access token is obtained, tools may begin to <a href="names_and_role.htm
 ### Workflow
 - Step 1: Configure a tool that support NRPS in Canvas
 - Step 2: Launch the tool
-- Step 3: Tool consumes the Names and Role service claim as described in the<a href="https://www.imsglobal.org/spec/lti-nrps/v2p0#lti-1-3-integration" target="blank">NRPS specification</a>, or by substituting the desired course_id/group_id in the <a href="names_and_role.html" target="_blank">Names and Role API</a>.
+- Step 3: Tool consumes the Names and Role service claim as described in the<a href="https://www.imsglobal.org/spec/lti-nrps/v2p0#lti-1-3-integration" target="_blank">NRPS specification</a>, or by substituting the desired course_id/group_id in the <a href="names_and_role.html" target="_blank">Names and Role API</a>.
 - Step 4: Tool obtains <a href="file.oauth.html#accessing-lti-advantage-services" target="_blank">a client_credentials access token</a> (this can actually happen any time before the next step)
-- Step 5: Tool runs requests against the <a "names_and_role.html" target="_blank">Names and Role API</a>.
+- Step 5: Tool runs requests against the <a href="names_and_role.html" target="_blank">Names and Role API</a>.
 
 *Note:* Once a single launch has happened from a course, the tool has enough information to use NRPS at any time and get info about all the users.
 
-<a name="on-launch"></a>
-Provisioning during launch
+Provisioning during launch <a name="on-launch"></a>
 ==============
 
 ### Configuring
@@ -70,19 +68,18 @@ This approach requires an LTI integration (any version) to be configured and vis
 - Step 4: If a match is confirmed (and the signature matches), let the user access their information in your application
 - Step 5: If no match is found, either or send them through a user-creation flow within the iframe, or auto-create a user for them based on the information in Canvas (you may want to let them set a password at this point, or email them a registration URL).
 
-<a name="supplemental-provisioning"></a>
-Supplemental Provisioning via API
+Supplemental Provisioning via API <a name="supplemental-provisioning"></a>
 ==============
 
-In the event that the LTI standard alone is not enough to satisfy your tool's provisioning needs, Canvas has an open REST API and a data service (<a href="https://community.canvaslms.com/t5/Admin-Guide/What-is-Canvas-Data-Services/ta-p/142" target="blank"> Canvas Data</a>). Using the API or Canvas Data can help overcome some of the limitations of LTI-only integrations, but they have their own challenges. Where possible, tools should try to avoid using services that are not part of the LTI standards unless it is absolutely necessary.
+In the event that the LTI standard alone is not enough to satisfy your tool's provisioning needs, Canvas has an open REST API and a data service (<a href="https://community.canvaslms.com/t5/Admin-Guide/What-is-Canvas-Data-Services/ta-p/142" target="_blank"> Canvas Data</a>). Using the API or Canvas Data can help overcome some of the limitations of LTI-only integrations, but they have their own challenges. Where possible, tools should try to avoid using services that are not part of the LTI standards unless it is absolutely necessary.
 
 ### Configuring
 Accessing Canvas API's requires an institution to issue a <a href="file.developer_keys.html" target="_blank">Developer Key</a>. Once issued, tools can begin using <a href="file.oauth.html#accessing-canvas-api" target="_blank">OAuth2</a> to request access tokens from individual users. The access token issued to access LTI advantage services **will not work** to access REST APIs.
 
-Accessing Canvas Data also has its own authentication system that is <a href="https://community.canvaslms.com/t5/Admin-Guide/What-is-Canvas-Data-Services/ta-p/142" target="blank">discussed elsewhere</a>.
+Accessing Canvas Data also has its own authentication system that is <a href="https://community.canvaslms.com/t5/Admin-Guide/What-is-Canvas-Data-Services/ta-p/142" target="_blank">discussed elsewhere</a>.
 
 ### Advantages
-- bi-directional enrollment synchronization via the <a href="enrollments.html" target="blank">enrollments API</a>
+- bi-directional enrollment synchronization via the <a href="enrollments.html" target="_blank">enrollments API</a>
 - more efficiently pre-provision an entire account by <a href="account_reports.html" target="_blank"> exporting provisioning reports</a> or using Canvas Data.
 - Obtaining course_id's/group_id's required to sync courses via NRPS without a launch occurring from that course.
 

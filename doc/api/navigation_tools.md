@@ -7,8 +7,7 @@ Canvas allows External Tools to be surfaced in a variety of navigation menus. Th
 - [User Navigation Placement](#user_navigation)
 - [Top Navigation Placement](#top_navigation)
 
-<a name="course_navigation"></a>
-Course Navigation Placement
+Course Navigation Placement <a name="course_navigation"></a>
 =================
 External tools can be configured to appear as links in course-level navigation. If the tool is configured on an account, any course in that account or any of its sub-accounts will have the link added to the course navigation by default. If the tool is configured in a course, then the navigation will only appear in that course.
 
@@ -20,7 +19,7 @@ Configuration of the Course Navigation Placement depends on the LTI version.
 
 _Via JSON (LTI 1.3)_
 
-```
+```json
 {
    "title":"Cool Course Navigation Tool ",
    "scopes":[],
@@ -61,7 +60,7 @@ _Via JSON (LTI 1.3)_
 
 _Via XML (LTI 1.0-1.2)_
 
-```
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
     xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
@@ -168,8 +167,7 @@ All of these settings are contained under "course_navigation"
 
   When set to \_blank, the windowTarget property allows you to configure a launch to happen in a new tab instead of in an iframe. Omit this if you want to launch in frame.
 
-<a name="account_navigation"></a>
-Account navigation links
+Account navigation links <a name="account_navigation"></a>
 =================
 External tools can also be configured to appear as links in account-level navigation. If the tool is configured on an account, administrators in that account and any of its sub-accounts will see the link in their account navigation.
 
@@ -251,8 +249,7 @@ All of these settings are contained under "account_navigation"
 
   If set to true, the tool will not be shown in the account navigation for subaccounts. Defaults to false (show in root account and all subaccounts).
 
-<a name="user_navigation"></a>
-User navigation links
+User navigation links <a name="user_navigation"></a>
 =================
 External tools can also be configured to appear as links in user-level navigation. If the tool is configured on a root account, all users logged in to that account will see the link in their profile navigation by default.
 
@@ -310,8 +307,7 @@ All of these settings are contained under "user_navigation"
 
   This specifies what types of users will see the link in the user navigation. "public" and "members" means anyone will see it, and "admins" means only account admins will see the link.
 
-<a name="top_navigation"></a>
-Top Navigation Placement
+Top Navigation Placement <a name="top_navigation"></a>
 ==============
 
 External tools can be configured to appear in the Top Navigation menu and will launch in a drawer alongside the Canvas content. A preview of this can be seen in [Placements Overview](file.placements_overview.html).

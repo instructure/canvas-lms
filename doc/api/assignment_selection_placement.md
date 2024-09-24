@@ -4,11 +4,11 @@ Assignment Selection Placement
 External tools can be configured to be selectable as an assignment during
 assignment creation or editing. The **assignment_selection** placement
 alows course designers (Admins/Instructors) to use the <a
-href="content_item.html" target="_blank">LTI
+href="file.content_item.html" target="_blank">LTI
 Deep Linking</a> flow to select an LTI resource from an external tool and
 associate it with a Canvas assignment. Assigned students can then directly
 access the tools assessment activity from Canvas. Tools can then leverage <a
-href="assignment_tools.html" target="_blank">
+href="file.assignment_tools.html" target="_blank">
 LTI grading services</a> for a deeper assignment integration.
 
 Note: This placement is enabled by default in Canvas for LTI 1.1. It can be
@@ -109,7 +109,7 @@ All of these settings are contained for the **assignment_selection** placement:
     the tool use this to determine if a Deep Linking flow is being requested by
     Canvas and present an appropriate UI. A Deep Linking flow is highly recommended
     for this placement, but is not required. See the
-    <a href="file.content_item.html" target=_"blank">Deep Linking
+    <a href="file.content_item.html" target="_blank">Deep Linking
     documentation</a> for more information, including accepted values.
 
 -   selection_width: &lt;pixels&gt; (optional)

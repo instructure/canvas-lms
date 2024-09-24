@@ -9,7 +9,7 @@ password. Canvas uses OAuth2 (specifically <a href="http://tools.ietf.org/html/r
 for authentication and authorization of the Canvas API. Additionally, Canvas uses OAuth2 for <a href="https://www.imsglobal.org/activity/learning-tools-interoperability" target="_blank">LTI Advantage</a> service authentication (as described in the <a href="https://www.imsglobal.org/spec/security/v1p0/" target="_blank">IMS Security Framework</a>).
 <a name="top"></a>
 
-###[Accessing the Canvas API](#accessing-canvas-api)
+### [Accessing the Canvas API](#accessing-canvas-api)
 - [Storing Tokens](#storing-access-tokens)
 - [Manual Token Generation](#manual-token-generation)
 - [Oauth2 Flow](#oauth2-flow)
@@ -27,19 +27,16 @@ for authentication and authorization of the Canvas API. Additionally, Canvas use
   - [DELETE login/oauth2/token](file.oauth_endpoints.html#delete-login-oauth2-token)
   - [GET login/session_token](file.oauth_endpoints.html#get-login-session-token)
 
-###[Accessing LTI Advantage Services](#accessing-lti-advantage-services)
+### [Accessing LTI Advantage Services](#accessing-lti-advantage-services)
 - [Step 1: Developer Key Setup](#developer-key-setup)
 - [Step 2: Request an Access Token](#request-access-token)
 - [Step 3: Use the access token to access LTI services](#use-access-token)
 
 
-
-<a name="accessing-canvas-api"></a>
-# [Accessing the Canvas API](#accessing-canvas-api)
+# [Accessing the Canvas API](#accessing-canvas-api) <a name="accessing-canvas-api"></a>
 <small><a href="#top">Back to Top</a></small>
 
-<a name="storing-access-tokens"></a>
-## [Storing Tokens](#storing-access-tokens)
+## [Storing Tokens](#storing-access-tokens) <a name="storing-access-tokens"></a>
 <small><a href="#top">Back to Top</a></small>
 
 When appropriate, applications should store the token locally, rather
@@ -55,19 +52,18 @@ Storing a token is in many ways equivalent to storing the user's
 password, so tokens should be stored and used in a secure manner,
 including but not limited to:
 
-  * Don't embed tokens in web pages.
-  * Don't pass tokens or session IDs around in URLs.
-  * Properly secure the database or other data store containing the
-    tokens.
-  * For web applications, practice proper techniques to avoid session
-    attacks such as cross-site scripting, request forgery, replay
-    attacks, etc.
-  * For native applications, take advantage of user keychain stores and
-    other operating system functionality for securely storing passwords.
+- Don't embed tokens in web pages.
+- Don't pass tokens or session IDs around in URLs.
+- Properly secure the database or other data store containing the
+  tokens.
+- For web applications, practice proper techniques to avoid session
+  attacks such as cross-site scripting, request forgery, replay
+  attacks, etc.
+- For native applications, take advantage of user keychain stores and
+  other operating system functionality for securely storing passwords.
 
 
-<a name="manual-token-generation"></a>
-## [Manual Token Generation](#manual-token-generation)
+## [Manual Token Generation](#manual-token-generation)<a name="manual-token-generation"></a>
 <small><a href="#top">Back to Top</a></small>
 
 For testing your application before you've implemented OAuth, the
@@ -78,17 +74,16 @@ tokens.
 
 To manually generate a token for testing:
 
-  1. Click the "profile" link in the top right menu bar, or navigate to
-     `/profile`
-  2. Under the "Approved Integrations" section, click the button to
-     generate a new access token.
-  3. Once the token is generated, you cannot view it again, and you'll
-     have to generate a new token if you forget it. Remember that access
-     tokens are password equivalent, so keep it secret.
+1. Click the "profile" link in the top right menu bar, or navigate to
+   `/profile`
+2. Under the "Approved Integrations" section, click the button to
+   generate a new access token.
+3. Once the token is generated, you cannot view it again, and you'll
+   have to generate a new token if you forget it. Remember that access
+   tokens are password equivalent, so keep it secret.
 
 
-<a name="oauth2-flow"></a>
-## [Oauth2 Flow](#oauth2-flow)
+## [Oauth2 Flow](#oauth2-flow) <a name="oauth2-flow"></a>
 <small><a href="#top">Back to Top</a></small>
 
 Your application can rely on canvas for a user's identity.  During step 1 of
@@ -101,8 +96,7 @@ the authorization, Canvas will skip step 2 of the request flow for future reques
 Canvas will not give a token back as part of a userinfo request.  It will only
 provide the current user's name and id.
 
-<a name="oauth2-flow-0"></a>
-### [Getting OAuth2 Client ID/Secret](#oauth2-flow-0)
+### [Getting OAuth2 Client ID/Secret](#oauth2-flow-0) <a name="oauth2-flow-0"></a>
 
 If your application will be used by others, you will need to implement
 the full OAuth2 token request workflow, so that you can request an access
@@ -124,8 +118,7 @@ For <a href="https://github.com/instructure/canvas-lms/wiki" target="_blank">ope
 you can <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-manage-developer-keys-for-an-account/ta-p/249" target="_blank">generate a client ID</a>
 and secret in the Site Admin account of your Canvas install.
 
-<a name="oauth2-flow-1"></a>
-### [Step 1: Redirect users to request Canvas access](#oauth2-flow-1)
+### [Step 1: Redirect users to request Canvas access](#oauth2-flow-1) <a name="oauth2-flow-1"></a>
 <small><a href="#top">Back to Top</a></small>
 
 A basic request looks like:
@@ -136,8 +129,7 @@ A basic request looks like:
 
 See [GET login/oauth2/auth](file.oauth_endpoints.html#get-login-oauth2-auth) for details.
 
-<a name="oauth2-flow-2"></a>
-### [Step 2: Redirect back to the request\_uri, or out-of-band redirect](#oauth2-flow-2)
+### [Step 2: Redirect back to the request\_uri, or out-of-band redirect](#oauth2-flow-2) <a name="oauth2-flow-2"></a>
 <small><a href="#top">Back to Top</a></small>
 
 If the user accepts your request, Canvas redirects back to your
@@ -166,8 +158,7 @@ parameter, rather than a `code` parameter, in the query string.
 
 A list of possible error codes is found in the [RFC-7649 spec](https://datatracker.ietf.org/doc/html/rfc6749#section-4.2.2.1).
 
-<a name="oauth2-flow-2.1"></a>
-#### [Note for native apps](#oauth2-flow-2.1)
+### [Note for native apps](#oauth2-flow-2.1) <a name="oauth2-flow-2.1"></a>
 <small><a href="#top">Back to Top</a></small>
 
 Canvas redirects to a page on canvas with a specific query string, containing parameters from the OAuth2 response:
@@ -185,8 +176,7 @@ changed to contain <code>code=&lt;code&gt;</code> somewhere in the query
 string. The app can then extract the code, and use it along with the
 client_id and client_secret to obtain the final access_key.
 
-<a name="oauth2-flow-3"></a>
-### [Step 3: Exchange the code for the final access token](#oauth2-flow-3)
+### [Step 3: Exchange the code for the final access token](#oauth2-flow-3) <a name="oauth2-flow-3"></a>
 <small><a href="#top">Back to Top</a></small>
 
 To get a new access token and refresh token, send a
@@ -234,8 +224,7 @@ Note that the once the code issued in step 2 is used in a POST request
 to this endpoint, it is invalidated and further requests for tokens
 with the same code will fail.
 
-<a name="using-access-tokens"></a>
-## [Using an Access Token to authenticate requests](#using-access-tokens)
+## [Using an Access Token to authenticate requests](#using-access-tokens) <a name="using-access-tokens"></a>
 <small><a href="#top">Back to Top</a></small>
 
 Once you have an OAuth access token, you can use it to make API
@@ -258,8 +247,7 @@ OAuth2 Token sent in query string:
 curl "https://canvas.instructure.com/api/v1/courses?access_token=<ACCESS-TOKEN>"
 ```
 
-<a name="using-refresh-tokens"></a>
-## [Using a Refresh Token to get a new Access Token](#using-refresh-tokens)
+## [Using a Refresh Token to get a new Access Token](#using-refresh-tokens) <a name="using-refresh-tokens"></a>
 <small><a href="#top">Back to Top</a></small>
 
 Access tokens have a 1 hour lifespan. When the refresh flow is taken, Canvas
@@ -309,17 +297,15 @@ refresh token is to be reused.
 
 To logout, simply send a [DELETE request to login/oauth2/token](file.oauth_endpoints.html#delete-login-oauth2-token)
 
-<a name="accessing-lti-advantage-services"></a>
-# [Accessing LTI Advantage Services](#accessing-lti-advantage-services)
+# [Accessing LTI Advantage Services](#accessing-lti-advantage-services) <a name="accessing-lti-advantage-services"></a>
 <small><a href="#top">Back to Top</a></small>
 
 <p>LTI Advantage services, such as <a href="https://www.imsglobal.org/spec/lti-nrps/v2p0" target="_blank">Names and Role Provisioning Services</a> and <a href="https://www.imsglobal.org/spec/lti-ags/v2p0/" target="_blank">Assignment and Grade Services</a>, require use of a client credentials grant flow for request authentication. This workflow is best summarized on the IMS Security Framework (specifically <a href="https://www.imsglobal.org/spec/security/v1p0/#using-oauth-2-0-client-credentials-grant" target="_blank">Section 4</a>).</p> Our goal here is to highlight some nuances that might help you access these services in Canvas, rather than describing the specification in detail.</p>
 
-<a name="developer-key-setup"></a>
-## [Step 1: Developer Key Setup](#developer-key-setup)
+## [Step 1: Developer Key Setup](#developer-key-setup) <a name="developer-key-setup"></a>
 <small><a href="#top">Back to Top</a></small>
 
-<p>Before the client_credentials grant flow can be achieved, an <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-LTI-key-for-an-account/ta-p/140" target="_blank">LTI developer key must be created</a>. During developer key configuration, a public JWK can either be configured statically or can be dynamically rotated by providing JWKs by a URL that Canvas can reach. Tools may also use a previously issued client_credentials token to <a href="/doc/api/public_jwk.html" target="_blank">retroactively rotate the public JWK via an API request</a>. The JWK <b>must</b> include an alg and use.</p>
+<p>Before the client_credentials grant flow can be achieved, an <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-LTI-key-for-an-account/ta-p/140" target="_blank">LTI developer key must be created</a>. During developer key configuration, a public JWK can either be configured statically or can be dynamically rotated by providing JWKs by a URL that Canvas can reach. Tools may also use a previously issued client_credentials token to <a href="public_jwk.html" target="_blank">retroactively rotate the public JWK via an API request</a>. The JWK <b>must</b> include an alg and use.</p>
 
 <h4>Example JWK</h4>
 
@@ -334,14 +320,12 @@ To logout, simply send a [DELETE request to login/oauth2/token](file.oauth_endpo
    }
   </pre>
 
-<a name="request-access-token"></a>
-## [Step 2: Request an access token](#request-access-token)
+## [Step 2: Request an access token](#request-access-token) <a name="request-access-token"></a>
 <small><a href="#top">Back to Top</a></small>
 
-<p>Once the developer key is configured and turned on, your tool can  <a href="/doc/api/file.oauth_endpoints.html#post-login-oauth2-token" target="_blank">request an LTI access token using the client_credentials grant</a>. This request must be signed by an RSA256 private key with a public key that is configured on the developer key as described in <a href=#developer-key-setup>Step 1: Developer Key Setup</a>.</p>
+<p>Once the developer key is configured and turned on, your tool can  <a href="file.oauth_endpoints.html#post-login-oauth2-token" target="_blank">request an LTI access token using the client_credentials grant</a>. This request must be signed by an RSA256 private key with a public key that is configured on the developer key as described in <a href=#developer-key-setup>Step 1: Developer Key Setup</a>.</p>
 
-<a name="use-access-token"></a>
-## [Step 3: Use the access token to access LTI services](#use-access-token)
+## [Step 3: Use the access token to access LTI services](#use-access-token) <a name="use-access-token"></a>
 <small><a href="#top">Back to Top</a></small>
 
 Once you have an access token, you can use it to make LTI service requests. The access token must be included as a Bearer token in the Authorization header:
@@ -354,12 +338,12 @@ curl -H "Authorization: Bearer <ACCESS-TOKEN>" "https://<canvas_domain>/api/lti/
 
 The following endpoints are currently supported:
 
-###Names and Role Provisioning Services
-- <a href="/doc/api/names_and_role.html" target="_blank">Names and Role API</a>
+### Names and Role Provisioning Services
+- <a href="names_and_role.html" target="_blank">Names and Role API</a>
 
 
-###Assignment and Grade Services
+### Assignment and Grade Services
 
-- <a href="/doc/api/line_items.html" target="_blank">Line Items</a>
-- <a href="/doc/api/score.html" target="_blank">Score</a>
-- <a href="/doc/api/result.html" target="_blank">Result</a>
+- <a href="line_items.html" target="_blank">Line Items</a>
+- <a href="score.html" target="_blank">Score</a>
+- <a href="result.html" target="_blank">Result</a>

@@ -777,7 +777,7 @@ and 201 in responses will be treated as though there is nothing to be returned
 upon import.
 
 #### Example export start response
-```
+```json
 {
   "status_url": "https://lti.example.com/export/42/status",
   "fetch_url": "https://lti.example.com/export/42"
@@ -793,15 +793,15 @@ failure set the `status` field to `failed` and supply a `message` field for
 display to the user.
 
 #### Example in progress status response
-```
+```json
 {"status":"processing"}
 ```
 #### Example failed status response
-```
+```json
 {"status":"failed", "message":"The content is not able to be copied due to copyright restrictions."}
 ```
 #### Example complete success status response
-```
+```json
 {"status":"completed"}
 ```
 

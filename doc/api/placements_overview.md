@@ -175,6 +175,7 @@ name: module_group_menu
 <img class="lti-placement-image" src="./images/placements/module_group_menu.png" alt="A screenshot of the location of the Module Group Menu placement within Canvas, located underneath the three-dot menu in any module group.">
 
 After clicking on the placement:
+
 <img class="lti-placement-image" src="./images/placements/module_group_menu_open.png" alt="A screenshot of the Module Group Menu placement being opened on the right side of the screen as a pop-out window.">
 
 # Module Index Menu (Modal)
@@ -196,6 +197,7 @@ name: module_menu_modal
 <img class="lti-placement-image" src="./images/placements/module_menu_modal.png" alt="A screenshot of the Module Menu Modal placement within Canvas, located underneath the three-dot menu in any module group.">
 
 After clicking on the placement:
+
 <img class="lti-placement-image" src="./images/placements/module_menu_modal_open.png" alt="A screenshot of the Module Menu Modal placement being opened as a modal in the center of the screen.">
 
 # Module Menu
