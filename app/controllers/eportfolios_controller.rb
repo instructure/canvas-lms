@@ -218,7 +218,7 @@ class EportfoliosController < ApplicationController
       @entries = @portfolio.eportfolio_entries.order("eportfolio_entries.created_at DESC").to_a
 
       title = t(:title, "%{portfolio_name} Feed", portfolio_name: @portfolio.name)
-      updated = @entries.first.updated_at rescue Time.now
+      updated = @entries.first&.updated_at || Time.now
       link = eportfolio_url(@portfolio.id)
 
       private_value = params[:verifier] == @portfolio.uuid

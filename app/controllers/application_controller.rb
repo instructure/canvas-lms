@@ -788,9 +788,7 @@ class ApplicationController < ActionController::Base
     opts.push({}) unless opts[-1].is_a?(Hash)
     include_host = opts[-1].delete(:include_host)
     unless include_host
-      # rubocop:disable Style/RescueModifier
-      opts[-1][:host] = context.host_name rescue nil
-      # rubocop:enable Style/RescueModifier
+      opts[-1][:host] = context.try(:host_name)
       opts[-1][:only_path] = true unless name.end_with?("_path")
     end
     send name, *opts
@@ -942,8 +940,12 @@ class ApplicationController < ActionController::Base
     user = not_fake_student_user
     if user && user.time_zone.present?
       Time.zone = user.time_zone
-      if Time.zone && Time.zone.name == "UTC" && user.time_zone && user.time_zone.name.match(/\s/)
-        Time.zone = user.time_zone.name.split(/\s/)[1..].join(" ") rescue nil
+      if Time.zone&.name == "UTC" && user.time_zone&.name&.match?(/\s/)
+        begin
+          Time.zone = user.time_zone.name.split(/\s/)[1..].join(" ")
+        rescue ArgumentError
+          # ignore
+        end
       end
     else
       Time.zone = @domain_root_account && @domain_root_account.default_time_zone
@@ -1564,7 +1566,7 @@ class ApplicationController < ActionController::Base
       end
       if !@context
         @problem = t "#application.errors.invalid_verification_code", "The verification code is invalid."
-      elsif (!@context.is_public rescue false) && (!@context.respond_to?(:uuid) || pieces[1] != @context.uuid)
+      elsif (@context.respond_to?(:is_public) && !@context.is_public) && (!@context.respond_to?(:uuid) || pieces[1] != @context.uuid)
         @problem = case @context_type
                    when "course"
                      t "#application.errors.feed_private_course", "The matching course has gone private, so public feeds like this one will no longer be visible."
@@ -1682,7 +1684,7 @@ class ApplicationController < ActionController::Base
     # page_view.
     return unless @current_user && !request.xhr? && request.get? && page_views_enabled?
 
-    ENV["RAILS_HOST_WITH_PORT"] ||= request.host_with_port rescue nil
+    ENV["RAILS_HOST_WITH_PORT"] ||= request.host_with_port
     generate_page_view
   end
 
@@ -1841,7 +1843,7 @@ class ApplicationController < ActionController::Base
 
   def log_gets
     if @page_view && !request.xhr? && request.get? && ((response.media_type || "").to_s.include?("html") || api_request?)
-      @page_view.render_time ||= (Time.now.utc - @page_before_render) rescue nil
+      @page_view.render_time ||= (Time.now.utc - @page_before_render) if @page_before_render
       @page_view_update = true
     end
   end
@@ -1954,7 +1956,7 @@ class ApplicationController < ActionController::Base
   end
 
   def render_xhr_exception(error, message = nil, status = "500 Internal Server Error", status_code = 500)
-    message ||= "Unexpected error, ID: #{error.id rescue "unknown"}"
+    message ||= "Unexpected error, ID: #{error&.id || "unknown"}"
     render status: status_code, json: {
       errors: {
         base: message
@@ -1967,7 +1969,7 @@ class ApplicationController < ActionController::Base
     clear_crumbs
     @headers = nil
     load_account unless @domain_root_account
-    session[:last_error_id] = error.id rescue nil
+    session[:last_error_id] = error&.id
     if request.xhr? || request.format == :text
       message = exception.xhr_message if exception.respond_to?(:xhr_message)
       render_xhr_exception(error, message, status, status_code)
@@ -2643,13 +2645,13 @@ class ApplicationController < ActionController::Base
 
   def destroy_session
     logger.info "Destroying session: #{session[:session_id]}"
-    @pseudonym_session.destroy rescue true
+    @pseudonym_session.try(:destroy)
     reset_session
   end
 
   def logout_current_user
-    logged_in_user.try(:stamp_logout_time!)
-    InstFS.logout(logged_in_user) rescue nil
+    logged_in_user&.stamp_logout_time!
+    InstFS.logout(logged_in_user)
     destroy_session
   end
 

@@ -155,7 +155,7 @@ class ContextController < ApplicationController
     end
 
     @secondary_users ||= {}
-    @groups = @context.groups.active rescue []
+    @groups = @context.try(:groups)&.active || []
   end
 
   def prior_users
@@ -260,7 +260,7 @@ class ContextController < ApplicationController
         @enrollments = []
       end
 
-      @user = @membership.user rescue nil
+      @user = @membership&.user
       # rubocop:disable Rails/ActionControllerFlashBeforeRender
       unless @user
         case @context

@@ -174,7 +174,7 @@ class GroupsController < ApplicationController
     category = @context.group_categories.where(id: params[:category_id]).first
     return render json: {}, status: :not_found unless category
 
-    page = (params[:page] || 1).to_i rescue 1
+    page = (params[:page] || 1).to_i
     per_page = Api.per_page_for(self, default: 15, max: 100)
     groups = if category && !category.student_organized?
                category.groups.active
@@ -416,8 +416,8 @@ class GroupsController < ApplicationController
           redirect_to dashboard_url
           return
         end
-        @current_conferences = @group.web_conferences.active.select { |c| c.active? && c.users.include?(@current_user) } rescue []
-        @scheduled_conferences = @context.web_conferences.active.select { |c| c.scheduled? && c.users.include?(@current_user) } rescue []
+        @current_conferences = @group.web_conferences.active.select { |c| c.active? && c.users.include?(@current_user) }
+        @scheduled_conferences = @context.web_conferences.active.select { |c| c.scheduled? && c.users.include?(@current_user) }
         @stream_items = @current_user.try(:cached_recent_stream_items, { contexts: @context }) || []
         if params[:join] && @group.grants_right?(@current_user, :join)
           if @group.full?
