@@ -51,6 +51,7 @@ type Props = {
   lateSubmissionInterval: string
   updateSubmissionGrade: (params: SubmissionGradeParams) => void
   updateSubmissionStatus: (params: SubmissionStatusParams) => void
+  setLastSubmission: (params: SubAssignmentSubmission) => void
 }
 
 export const SpeedGraderCheckpoint = (props: Props) => {
@@ -167,6 +168,7 @@ export const SpeedGraderCheckpoint = (props: Props) => {
             isWidthDefault={false}
             hasHeader={true}
             header={getLabel()}
+            setLastSubmission={props.setLastSubmission}
           />
         </Flex.Item>
         <Flex.Item shouldShrink={true}>

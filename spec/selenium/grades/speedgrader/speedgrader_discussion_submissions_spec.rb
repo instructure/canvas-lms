@@ -336,6 +336,51 @@ describe "SpeedGrader - discussion submissions" do
         expect(reply_to_entry_select).to have_value "Custom Status"
       end
 
+      context "out of range values" do
+        it "displays This student was just awarded negative points with negative values" do
+          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
+          wait_for_ajaximations
+
+          # Sets the grade for the reply_to_topic checkpoint
+          reply_to_topic_grade_input = ff("[data-testid='grade-input']")[0]
+          reply_to_topic_grade_input.send_keys("-2")
+          reply_to_topic_grade_input.send_keys(:tab)
+          wait_for_ajaximations
+          expect(fj("span:contains('This student was just awarded negative points.')")).to be_present
+
+          # Sets the grade for the reply_to_entry checkpoint
+          reply_to_entry_grade_input = ff("[data-testid='grade-input']")[1]
+          reply_to_entry_grade_input.send_keys("-5")
+          reply_to_entry_grade_input.send_keys(:tab)
+          wait_for_ajaximations
+          expect(fj("span:contains('This student was just awarded negative points.')")).to be_present
+        end
+
+        it "displays This student was just awarded an unusually high grade with high values" do
+          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
+          wait_for_ajaximations
+
+          # 1.5 is used as a threshold to define when a score is unusually high
+          # See OutlierScoreHelper.ts
+
+          # Sets the grade for the reply_to_topic checkpoint
+          reply_to_topic_grade_input = ff("[data-testid='grade-input']")[0]
+          reply_to_topic_grade = @checkpointed_discussion.reply_to_topic_checkpoint.points_possible * 1.5
+          reply_to_topic_grade_input.send_keys(reply_to_topic_grade)
+          reply_to_topic_grade_input.send_keys(:tab)
+          wait_for_ajaximations
+          expect(fj("span:contains('This student was just awarded an unusually high grade.')")).to be_present
+
+          # Sets the grade for the reply_to_entry checkpoint
+          reply_to_entry_grade_input = ff("[data-testid='grade-input']")[1]
+          reply_to_entry_grade = @checkpointed_discussion.reply_to_entry_checkpoint.points_possible * 1.5
+          reply_to_entry_grade_input.send_keys(reply_to_entry_grade)
+          reply_to_entry_grade_input.send_keys(:tab)
+          wait_for_ajaximations
+          expect(fj("span:contains('This student was just awarded an unusually high grade.')")).to be_present
+        end
+      end
+
       it "displays the no submission message only if student has a partial submission (reply_to_topic)" do
         de = DiscussionEntry.create!(
           message: "1st level reply",
