@@ -25,7 +25,7 @@ import ready from '@instructure/ready'
 
 import {getAssignment} from './queries/getAssignment'
 import {getCourse} from './queries/getCourse'
-import {getSectionsByAssignment} from './queries/sectionsByAssignmentQuery'
+import {getAssignmentSections} from './queries/getAssignmentSections'
 import {getSubmission} from './queries/submissionQuery'
 import {getAssignmentSubmissions} from './queries/getAssignmentSubmissions'
 import {getSubmissionsByStudentIds} from './queries/submissionsByStudentsIdsQuery'
@@ -126,7 +126,7 @@ ready(() => {
           getAssignmentSubmissions,
           getCourse,
           getEnrollmentsByCourse,
-          getSectionsByAssignment,
+          getAssignmentSections,
           getSubmission,
           getSubmissionsByStudentIds,
           getCommentBankItems,
