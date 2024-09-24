@@ -26,18 +26,18 @@ module Types
 
     global_id_field :id
 
-    field :parent_outcome_group, Types::LearningOutcomeGroupType, null: true
     field :child_groups,
           Types::LearningOutcomeGroupType.connection_type,
           null: true
+    field :parent_outcome_group, Types::LearningOutcomeGroupType, null: true
     def child_groups
       active_child_groups
     end
 
     field :context_id, ID, null: true
     field :context_type, String, null: true
-    field :title, String, null: false
     field :description, String, null: true
+    field :title, String, null: false
     field :vendor_guid, String, null: true
 
     field :can_edit, Boolean, null: false

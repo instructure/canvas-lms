@@ -98,12 +98,12 @@ module Types
       end
     end
 
+    field :all_day, Boolean, null: true
+    field :context_module, ModuleType, null: true
     field :due_at, DateTimeType, null: true
     field :lock_at, DateTimeType, null: true
-    field :unlock_at, DateTimeType, null: true
-    field :all_day, Boolean, null: true
     field :unassign_item, Boolean, null: true
-    field :context_module, ModuleType, null: true
+    field :unlock_at, DateTimeType, null: true
     def context_module
       load_association(:context_module)
     end

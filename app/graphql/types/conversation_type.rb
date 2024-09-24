@@ -26,11 +26,11 @@ module Types
 
     global_id_field :id
     field :_id, ID, "legacy canvas id", method: :id, null: false
-    field :context_type, String, null: true
+    field :can_reply, Boolean, null: true
     field :context_id, ID, null: true
+    field :context_type, String, null: true
     field :subject, String, null: true
     field :updated_at, Types::DateTimeType, null: true
-    field :can_reply, Boolean, null: true
     def can_reply
       other_users = object.participants.reject { |u| u.id == current_user.id }
       audience = other_users.map(&:id)

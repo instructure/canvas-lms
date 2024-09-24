@@ -28,9 +28,9 @@ module Types
 
     global_id_field :id
 
+    field :end_at, DateTimeType, null: true
     field :name, String, null: true
     field :start_at, DateTimeType, null: true
-    field :end_at, DateTimeType, null: true
 
     field :sis_term_id, ID, method: :sis_source_id, null: true
 

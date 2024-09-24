@@ -22,8 +22,8 @@ module Types
   class EntryParticipantType < ApplicationObjectType
     graphql_name "EntryParticipant"
 
-    field :rating, Boolean, null: true
     field :forced_read_state, Boolean, null: true
+    field :rating, Boolean, null: true
     field :read, Boolean, null: false
     field :report_type, String, null: true
   end

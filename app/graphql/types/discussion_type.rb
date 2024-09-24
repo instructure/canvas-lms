@@ -57,31 +57,31 @@ module Types
     include Canvas::LockExplanation
 
     global_id_field :id
+    field :allow_rating, Boolean, null: true
     field :anonymous_state, DiscussionTopicAnonymousStateType, null: true
-    field :discussion_type, DiscussionTopicDiscussionType, null: true
-    field :title, String, null: true
+    field :can_group, Boolean, null: true, method: :can_group?
     field :context_id, ID, null: false
     field :context_type, String, null: false
     field :delayed_post_at, Types::DateTimeType, null: true
+    field :discussion_type, DiscussionTopicDiscussionType, null: true
     field :edited_at, Types::DateTimeType, null: true
+    field :is_announcement, Boolean, null: false
+    field :is_anonymous_author, Boolean, null: true
+    field :is_section_specific, Boolean, null: true
+    field :last_reply_at, Types::DateTimeType, null: true
     field :lock_at, Types::DateTimeType, null: true
     field :locked, Boolean, null: false
-    field :last_reply_at, Types::DateTimeType, null: true
-    field :posted_at, Types::DateTimeType, null: true
+    field :only_graders_can_rate, Boolean, null: true
+    field :only_visible_to_overrides, Boolean, null: true
     field :podcast_enabled, Boolean, null: true
     field :podcast_has_student_posts, Boolean, null: true
-    field :is_anonymous_author, Boolean, null: true
     field :position, Int, null: true
-    field :allow_rating, Boolean, null: true
-    field :only_graders_can_rate, Boolean, null: true
-    field :sort_by_rating, Boolean, null: true
-    field :todo_date, GraphQL::Types::ISO8601DateTime, null: true
-    field :is_announcement, Boolean, null: false
-    field :is_section_specific, Boolean, null: true
+    field :posted_at, Types::DateTimeType, null: true
     field :require_initial_post, Boolean, null: true
-    field :can_group, Boolean, null: true, method: :can_group?
+    field :sort_by_rating, Boolean, null: true
+    field :title, String, null: true
+    field :todo_date, GraphQL::Types::ISO8601DateTime, null: true
     field :visible_to_everyone, Boolean, null: true
-    field :only_visible_to_overrides, Boolean, null: true
 
     field :message, String, null: true
     def message
