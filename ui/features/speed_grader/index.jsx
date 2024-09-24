@@ -28,7 +28,7 @@ import {getCourse} from './queries/getCourse'
 import {getAssignmentSections} from './queries/getAssignmentSections'
 import {getSubmission} from './queries/submissionQuery'
 import {getAssignmentSubmissions} from './queries/getAssignmentSubmissions'
-import {getSubmissionsByStudentIds} from './queries/submissionsByStudentsIdsQuery'
+import {getSubmissionsByStudents} from './queries/getSubmissionsByStudents'
 import {getCourseAssignments} from './queries/getCourseAssignments'
 import {getCourseEnrollments} from './queries/getCourseEnrollments'
 import {getCommentBankItems} from './queries/commentBankQuery'
@@ -128,7 +128,7 @@ ready(() => {
           getCourseEnrollments,
           getAssignmentSections,
           getSubmission,
-          getSubmissionsByStudentIds,
+          getSubmissionsByStudents,
           getCommentBankItems,
           resolvePostAssignmentGradesStatus,
         },
