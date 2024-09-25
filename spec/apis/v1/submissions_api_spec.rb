@@ -40,7 +40,7 @@ describe "Submissions API", type: :request do
     sub.workflow_state = "submitted"
     yield(sub) if block_given?
     sub.with_versioning(explicit: true) do
-      update_with_protected_attributes!(sub, { submitted_at: @submit_homework_time, created_at: @submit_homework_time }.merge(opts))
+      sub.update!({ submitted_at: @submit_homework_time, created_at: @submit_homework_time }.merge(opts))
     end
     sub.versions.reload.each { |v| Version.where(id: v).update_all(created_at: v.model.created_at) }
     sub

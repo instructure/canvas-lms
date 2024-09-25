@@ -307,7 +307,11 @@ module RenderWithHelpers
   end
 
   def render(*args)
-    controller_class = ("#{@controller.controller_path.camelize}Controller".constantize rescue nil) || ApplicationController
+    controller_class = begin
+      "#{@controller.controller_path.camelize}Controller".constantize
+    rescue NameError
+      ApplicationController
+    end
 
     controller_class.instance_variable_set(:@js_env, nil)
     # this extends the controller's helper methods to the view

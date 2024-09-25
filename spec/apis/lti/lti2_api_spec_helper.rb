@@ -25,13 +25,11 @@ RSpec.shared_context "lti2_api_spec_helper", shared_context: :metadata do
   include_context "lti2_spec_helper"
   let(:developer_key) { DeveloperKey.create! }
   let(:dev_key_access_token) do
-    aud = host rescue (@request || request).host
-    Lti::OAuth2::AccessToken.create_jwt(aud:, sub: developer_key.global_id)
+    Lti::OAuth2::AccessToken.create_jwt(aud: host, sub: developer_key.global_id)
   end
   let(:access_token) do
-    aud = host rescue (@request || request).host
     file_host, _ = HostUrl.file_host_with_shard(account)
-    aud = [aud, file_host]
+    aud = [host, file_host]
     Lti::OAuth2::AccessToken.create_jwt(aud:, sub: tool_proxy.guid)
   end
   let(:request_headers) { { Authorization: "Bearer #{access_token}" } }

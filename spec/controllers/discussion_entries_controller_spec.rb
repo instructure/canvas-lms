@@ -241,7 +241,7 @@ describe DiscussionEntriesController do
       get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code }, format: "rss"
       expect(assigns[:entries]).not_to be_nil
       require "rss/2.0"
-      rss = RSS::Parser.parse(response.body, false) rescue nil
+      rss = RSS::Parser.parse(response.body, false)
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
       expect(rss.items.length).to be(0)
@@ -253,7 +253,7 @@ describe DiscussionEntriesController do
       @mo1.destroy
       get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code }, format: "rss"
       require "rss/2.0"
-      rss = RSS::Parser.parse(response.body, false) rescue nil
+      rss = RSS::Parser.parse(response.body, false)
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
       expect(rss.items.length).to be(0)
@@ -265,7 +265,7 @@ describe DiscussionEntriesController do
       @entry.update_attribute(:message, "<iframe data-media-id=\"#{@mo1.media_id}\"></iframe>")
       get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code }, format: "rss"
       require "rss/2.0"
-      rss = RSS::Parser.parse(response.body, false) rescue nil
+      rss = RSS::Parser.parse(response.body, false)
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
       expect(rss.items.length).to be(1)
@@ -284,7 +284,7 @@ describe DiscussionEntriesController do
 
       get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code }, format: "rss"
       require "rss/2.0"
-      rss = RSS::Parser.parse(response.body, false) rescue nil
+      rss = RSS::Parser.parse(response.body, false)
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
       expect(rss.items.length).to be(1)
@@ -299,7 +299,7 @@ describe DiscussionEntriesController do
       expect(assigns[:entries]).not_to be_nil
       expect(assigns[:entries]).not_to be_empty
       require "rss/2.0"
-      rss = RSS::Parser.parse(response.body, false) rescue nil
+      rss = RSS::Parser.parse(response.body, false)
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
       expect(rss.items.length).to be(1)
@@ -321,7 +321,7 @@ describe DiscussionEntriesController do
       expect(assigns[:entries]).not_to be_nil
       expect(assigns[:entries]).not_to be_empty
       require "rss/2.0"
-      rss = RSS::Parser.parse(response.body, false) rescue nil
+      rss = RSS::Parser.parse(response.body, false)
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
       expect(rss.items.length).to be(1)
@@ -344,7 +344,7 @@ describe DiscussionEntriesController do
       expect(assigns[:entries]).not_to be_nil
       expect(assigns[:entries]).not_to be_empty
       require "rss/2.0"
-      rss = RSS::Parser.parse(response.body, false) rescue nil
+      rss = RSS::Parser.parse(response.body, false)
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
       expect(rss.items.length).to be(0)
@@ -361,7 +361,7 @@ describe DiscussionEntriesController do
       expect(assigns[:entries]).not_to be_nil
       expect(assigns[:entries]).not_to be_empty
       require "rss/2.0"
-      rss = RSS::Parser.parse(response.body, false) rescue nil
+      rss = RSS::Parser.parse(response.body, false)
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
       expect(rss.items.length).to be(0)
@@ -380,7 +380,7 @@ describe DiscussionEntriesController do
       expect(assigns[:entries]).not_to be_nil
       expect(assigns[:entries]).not_to be_empty
       require "rss/2.0"
-      rss = RSS::Parser.parse(response.body, false) rescue nil
+      rss = RSS::Parser.parse(response.body, false)
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
       expect(rss.items.length).to be(0)
@@ -395,7 +395,7 @@ describe DiscussionEntriesController do
       expect(assigns[:entries]).not_to be_nil
       expect(assigns[:entries]).not_to be_empty
       require "rss/2.0"
-      rss = RSS::Parser.parse(response.body, false) rescue nil
+      rss = RSS::Parser.parse(response.body, false)
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
       expect(rss.items.length).to be(1)
@@ -408,7 +408,7 @@ describe DiscussionEntriesController do
       get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code }, format: "rss"
       expect(assigns[:entries]).not_to be_nil
       require "rss/2.0"
-      rss = RSS::Parser.parse(response.body, false) rescue nil
+      rss = RSS::Parser.parse(response.body, false)
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
       expect(rss.items.length).to be(0)
@@ -428,7 +428,7 @@ describe DiscussionEntriesController do
       get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code }, format: "rss"
       expect(assigns[:entries]).not_to be_nil
       require "rss/2.0"
-      rss = RSS::Parser.parse(response.body, false) rescue nil
+      rss = RSS::Parser.parse(response.body, false)
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
       expect(rss.items.length).to be(0)
