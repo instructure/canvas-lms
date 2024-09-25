@@ -1000,6 +1000,19 @@ describe "Users API", type: :request do
         expect(json.keys).not_to include("errors")
         expect(json["merged_into_user_id"]).to eq u3.id
       end
+
+      it "404s but still returns the user on a deleted user in circular merge for a site admin" do
+        u3 = User.create!
+        UserMerge.from(@other_user).into(u3)
+        UserMerge.from(u3).into(@other_user)
+        account_admin_user(account: Account.site_admin)
+        json = api_call(:get,
+                        "/api/v1/users/#{@other_user.id}",
+                        { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json" },
+                        {},
+                        expected_status: 404)
+        expect(json["id"]).to eq @other_user.id
+      end
     end
 
     context "avatars enabled" do
