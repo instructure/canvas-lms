@@ -218,6 +218,7 @@ class GroupsController < ApplicationController
   def index
     return context_index if @context
 
+    page_has_instui_topnav
     includes = { include: params[:include] }
     groups_scope = @current_user.current_groups
     page_has_instui_topnav
@@ -267,6 +268,7 @@ class GroupsController < ApplicationController
   def context_index
     return unless authorized_action(@context, @current_user, :read_roster)
 
+    page_has_instui_topnav
     @groups = all_groups = @context.groups.active
     unless params[:filter].nil?
       @groups = all_groups = @groups.left_outer_joins(:users).where("groups.name ILIKE :query OR users.name ILIKE :query", query: "%#{ActiveRecord::Base.sanitize_sql_like(params[:filter])}%")
