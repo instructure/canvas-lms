@@ -37,7 +37,7 @@ export const GroupBlock = (props: GroupBlockProps) => {
     layout = GroupBlock.craft.defaultProps.layout,
     resizable = GroupBlock.craft.defaultProps.resizable,
   } = props
-  const {actions, enabled} = useEditor(state => ({
+  const {actions, query, enabled} = useEditor(state => ({
     enabled: state.options.enabled,
   }))
   const clazz = useClassNames(enabled, {empty: false}, [
@@ -60,10 +60,18 @@ export const GroupBlock = (props: GroupBlockProps) => {
         custom.isResizable = resizable
       })
     }
-  }, [actions, node.data.custom.isResizable, node.id, resizable])
+  }, [actions, node.data.custom.isResizable, node.data.parent, node.id, query, resizable])
+
+  const styl: React.CSSProperties = {}
+  if (node.data.props.width) {
+    styl.width = `${node.data.props.width}px`
+  }
+  if (node.data.props.height) {
+    styl.height = `${node.data.props.height}px`
+  }
 
   return (
-    <Container className={clazz} id={`group-${node.id}`}>
+    <Container className={clazz} id={`group-${node.id}`} style={styl}>
       <Element
         id="group-block__inner"
         is={NoSections}

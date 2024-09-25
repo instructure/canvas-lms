@@ -108,6 +108,7 @@ const mockTrayProps = {
     initializeDocuments() {},
     initializeMedia() {},
     fetchImages: jest.fn().mockResolvedValue({files}),
+    getSession: jest.fn().mockResolvedValue({usageRightsRequired: false}),
   },
   storeProps: {},
   images: {
@@ -119,7 +120,7 @@ const mockTrayProps = {
 
 const user = userEvent.setup()
 
-let props = {...ImageBlock.craft.defaultProps} as Partial<ImageBlockProps>
+let props: Partial<ImageBlockProps>
 
 const mockSetProp = jest.fn((callback: (props: Record<string, any>) => void) => {
   callback(props)
@@ -144,7 +145,7 @@ jest.mock('@craftjs/core', () => {
 
 describe('ImageBlockToolbar', () => {
   beforeEach(() => {
-    props = {...ImageBlock.craft.defaultProps}
+    props = {...(ImageBlock.craft.defaultProps as Partial<ImageBlockProps>)}
   })
 
   it('should render', () => {
@@ -209,7 +210,7 @@ describe('ImageBlockToolbar', () => {
     expect(props.constraint).toBe('cover')
   })
 
-  it('shows the size popup', async () => {
+  it('changes the image size prop', async () => {
     props.width = 117
     props.height = 217
     const {getByText} = render(<ImageBlockToolbar />)
@@ -217,40 +218,15 @@ describe('ImageBlockToolbar', () => {
     const btn = getByText('Image Size').closest('button') as HTMLButtonElement
     await user.click(btn)
 
-    expect(screen.getByText('Image size')).toBeInTheDocument()
-    expect(screen.getByText('Width')).toBeInTheDocument()
-    expect(screen.getByText('Height')).toBeInTheDocument()
-    expect(screen.getByText('117')).toBeInTheDocument()
-    expect(screen.getByText('217')).toBeInTheDocument()
-  })
+    expect(screen.getByText('Auto')).toBeInTheDocument()
+    expect(screen.getByText('Fixed size')).toBeInTheDocument()
+    expect(screen.getByText('Percent size')).toBeInTheDocument()
+    expect(
+      screen.getByText('Auto').closest('li')?.querySelector('svg[name="IconCheck"')
+    ).toBeInTheDocument()
 
-  it('sets the width and height props', async () => {
-    props.width = 117
-    props.height = 217
-    props.maintainAspectRatio = true
-    const {getByText} = render(<ImageBlockToolbar />)
-
-    const btn = getByText('Image Size').closest('button') as HTMLButtonElement
-    await user.click(btn)
-    expect(screen.getByText('Image size')).toBeInTheDocument()
-    expect(screen.getByText('Width')).toBeInTheDocument()
-    expect(screen.getByText('Height')).toBeInTheDocument()
-    expect(screen.getByText('117')).toBeInTheDocument()
-    expect(screen.getByText('217')).toBeInTheDocument()
-
-    const widthInput = screen.getByLabelText('Width') as HTMLInputElement
-    fireEvent.change(widthInput, {target: {value: '119'}})
-
-    expect(screen.getByText('119')).toBeInTheDocument()
-    expect(screen.getByText('221')).toBeInTheDocument()
-
-    const setButton = screen.getByText('Set').closest('button') as HTMLButtonElement
-    expect(setButton).toBeInTheDocument()
-    await user.click(setButton)
-
-    expect(mockSetProp).toHaveBeenCalled()
-    expect(props.width).toBe(119)
-    expect(props.height).toBe(221)
+    await user.click(screen.getByText('Fixed size'))
+    expect(props.sizeVariant).toBe('pixel')
   })
 
   it('can add an image from the AddImageModal', async () => {
@@ -265,6 +241,43 @@ describe('ImageBlockToolbar', () => {
     await user.click(screen.getByText(/submit/i).closest('button') as HTMLButtonElement)
     await waitFor(() => {
       expect(props.src).toBe('http://canvas.docker/courses/21/files/722?wrap=1')
+    })
+  })
+
+  it('can add alt text to the image on image setting', async () => {
+    render(
+      <RCSPropsContext.Provider value={mockTrayProps}>
+        <ImageBlockToolbar />
+      </RCSPropsContext.Provider>
+    )
+    await user.click(screen.getByText(/upload image/i).closest('button') as HTMLButtonElement)
+    await user.click(screen.getByRole('tab', {name: /URL/i}))
+
+    const fileURLInput = screen.getByLabelText('File URL') as unknown as HTMLInputElement
+    const altInput = screen.getByPlaceholderText(
+      '(Describe the image)'
+    ) as unknown as HTMLInputElement
+
+    fireEvent.change(fileURLInput, {target: {value: 'https://whatever.net/whatevs.jpg'}})
+    fireEvent.change(altInput, {target: {value: 'Some alt text'}})
+
+    await user.click(screen.getByText(/submit/i).closest('button') as HTMLButtonElement)
+    await waitFor(() => {
+      expect(props.alt).toBe('Some alt text')
+    })
+  })
+
+  it('can add alt text to the image being interacted with', async () => {
+    props.alt = 'image description...'
+    render(<ImageBlockToolbar />)
+
+    const btn = screen.getByText('Image Description').closest('button') as HTMLButtonElement
+    await user.click(btn)
+
+    const altInput = screen.getByPlaceholderText('Image Description') as unknown as HTMLInputElement
+    fireEvent.change(altInput, {target: {value: 'new alt text'}})
+    await waitFor(() => {
+      expect(props.alt).toBe('new alt text')
     })
   })
 })

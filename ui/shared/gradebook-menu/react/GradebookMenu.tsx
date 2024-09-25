@@ -49,7 +49,6 @@ const activeLabels = {
 type Props = {
   courseUrl: string
   learningMasteryEnabled?: boolean
-  enhancedIndividualGradebookEnabled?: boolean
   variant: GradiantVariantName
   customTrigger?: any
 }
@@ -57,7 +56,6 @@ type Props = {
 export default function GradebookMenu({
   courseUrl,
   learningMasteryEnabled,
-  enhancedIndividualGradebookEnabled,
   variant,
   customTrigger,
 }: Props) {
@@ -137,25 +135,12 @@ export default function GradebookMenu({
               </Menu.Item>
             )}
 
-            {enhancedIndividualGradebookEnabled ? (
-              <Menu.Item
-                href={`${courseUrl}/gradebook/change_gradebook_version?version=individual_enhanced`}
-                value="EnhancedIndividualGradebook"
-              >
-                <span data-menu-item-id="individual-gradebook">
-                  {I18n.t('Individual Gradebook')}
-                </span>
-              </Menu.Item>
-            ) : (
-              <Menu.Item
-                href={`${courseUrl}/gradebook/change_gradebook_version?version=individual`}
-                value="IndividualGradebook"
-              >
-                <span data-menu-item-id="individual-gradebook">
-                  {I18n.t('Individual Gradebook')}
-                </span>
-              </Menu.Item>
-            )}
+            <Menu.Item
+              href={`${courseUrl}/gradebook/change_gradebook_version?version=individual`}
+              value="EnhancedIndividualGradebook"
+            >
+              <span data-menu-item-id="individual-gradebook">{I18n.t('Individual Gradebook')}</span>
+            </Menu.Item>
 
             <Menu.Separator key="separator" />
 

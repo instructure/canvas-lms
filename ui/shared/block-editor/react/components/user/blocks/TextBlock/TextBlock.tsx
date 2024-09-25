@@ -18,7 +18,7 @@
 
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import ContentEditable from 'react-contenteditable'
-import {useEditor, useNode} from '@craftjs/core'
+import {useEditor, useNode, type Node} from '@craftjs/core'
 import {useClassNames} from '../../../../utils'
 import {TextBlockToolbar} from './TextBlockToolbar'
 import {type TextBlockProps} from './types'
@@ -37,9 +37,11 @@ export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProp
     connectors: {connect, drag},
     actions: {setProp},
     selected,
-  } = useNode(state => ({
-    id: state.id,
-    selected: state.events.selected,
+    node,
+  } = useNode((n: Node) => ({
+    id: n.id,
+    selected: n.events.selected,
+    node: n,
   }))
   const clazz = useClassNames(enabled, {empty: !text}, ['block', 'text-block'])
   const focusableElem = useRef<HTMLElement | null>(null)
@@ -67,6 +69,14 @@ export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProp
     [setProp]
   )
 
+  const styl: React.CSSProperties = {fontSize, textAlign, color}
+  if (node.data.props.width) {
+    styl.width = `${node.data.props.width}px`
+  }
+  if (node.data.props.height) {
+    styl.height = `${node.data.props.height}px`
+  }
+
   if (enabled) {
     return (
       <ContentEditable
@@ -82,18 +92,12 @@ export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProp
         html={text}
         onChange={handleChange}
         tagName="div"
-        style={{fontSize, textAlign, color}}
+        style={styl}
         onClick={e => setEditable(true)}
       />
     )
   } else {
-    return (
-      <div
-        className={clazz}
-        style={{fontSize, textAlign, color}}
-        dangerouslySetInnerHTML={{__html: text}}
-      />
-    )
+    return <div className={clazz} style={styl} dangerouslySetInnerHTML={{__html: text}} />
   }
 }
 

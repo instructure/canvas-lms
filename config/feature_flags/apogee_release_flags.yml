@@ -189,17 +189,6 @@ new_quiz_deleted_workflow_restore_pending_review_state:
       state: allowed_on # enable for local development
     test:
       state: allowed_on # enable for the deployed 'test' environment
-individual_gradebook_enhancements:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Individual Gradebook Enhancements
-  description: This feature introduces performance and maintenance enhancements
-    to Individual Gradebook
-  environments:
-    ci:
-      state: allowed_on # enable for automated testings builds and local testing
-    development:
-      state: allowed_on # enable for local development
 hide_zero_point_quizzes_option:
   state: hidden
   applies_to: SiteAdmin
@@ -309,6 +298,17 @@ enhanced_rubrics:
       state: allowed
     development:
       state: allowed
+enhanced_rubrics_copy_to:
+  state: hidden
+  applies_to: Course
+  root_opt_in: true
+  display_name: Enhanced Rubrics Copy To
+  description: This functionality allows copying rubrics between courses from the enhanced rubrics UI and also assigning them directly to an assignment.
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed
 multiselect_gradebook_filters:
   state: hidden
   applies_to: SiteAdmin
@@ -364,7 +364,7 @@ rubric_imports_exports:
   applies_to: RootAccount
   root_opt_in: true
   display_name: Rubric Imports and Exports
-  description: This feature allows users to import and export rubrics from CSV and XML files.
+  description: This feature allows users to import and export rubrics from CSV and XML files from Enhanced Rubrics.
   environments:
     ci:
       state: allowed
@@ -375,3 +375,15 @@ rce_lite_enabled_speedgrader_comments:
   applies_to: RootAccount
   display_name: RCE lite in Speedgrader comments
   description: Allows Speedgrader comments to be formatted using RCE lite.
+enhanced_rubrics_assignments:
+  state: hidden
+  beta: true
+  applies_to: Course
+  root_opt_in: true
+  display_name: Enhanced Rubrics Assignments Page
+  description: This feature allows users to create and search for rubrics while using the Enhanced Rubrics design on the Assignments page.
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed

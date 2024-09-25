@@ -21,8 +21,6 @@
 Bundler.require "redis"
 
 class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisCacheStore
-  include ActiveSupport::Cache::SafeRedisRaceCondition
-
   def initialize(consul_datacenters: nil,
                  consul_event: nil,
                  lock_timeout: 5,

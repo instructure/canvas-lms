@@ -18,7 +18,7 @@
 import createStore, {type StoreApi} from 'zustand/vanilla'
 import {subscribeWithSelector} from 'zustand/middleware'
 import type {RegistrationOverlay} from '../../model/RegistrationOverlay'
-import type {LtiScope} from '../../model/LtiScope'
+import type {LtiScope} from '@canvas/lti/model/LtiScope'
 import type {LtiPlacement} from '../../model/LtiPlacement'
 import type {LtiPlacementOverlay} from '../../model/PlacementOverlay'
 import type {LtiConfiguration} from '../../model/lti_tool_configuration/LtiConfiguration'
@@ -31,7 +31,7 @@ export interface RegistrationOverlayActions {
   updateDevKeyName: (name: string) => void
   updateRegistrationTitle: (s: string) => void
   toggleDisabledScope: (scope: LtiScope) => void
-  toggleDisabledPlacement: (scope: LtiPlacement) => void
+  toggleDisabledPlacement: (placement: LtiPlacement) => void
   toggleDisabledSub: (sub: string) => void
   updateRegistrationIconUrl: (s: string) => void
   updateRegistrationLaunchHeight: (s: string) => void

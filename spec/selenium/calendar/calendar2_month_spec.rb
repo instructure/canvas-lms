@@ -59,7 +59,15 @@ describe "calendar2" do
       student_ids: []
     )
       checkpoint_label = (type == "reply_to_topic") ? CheckpointLabels::REPLY_TO_TOPIC : CheckpointLabels::REPLY_TO_ENTRY
-      dates = override ? [{ type: "override", set_type: "ADHOC", student_ids:, due_at: }] : [{ type: "everyone", due_at: }]
+
+      # Build the dates array dynamically based on whether an override is needed
+      dates = []
+      dates << { type: "everyone", due_at: } unless due_at.nil?
+      if override && !override_due_at.nil? && !student_ids.empty?
+        dates << { type: "override", set_type: "ADHOC", student_ids:, due_at: override_due_at }
+      end
+
+      # Call the service with the constructed parameters
       Checkpoints::DiscussionCheckpointCreatorService.call(
         discussion_topic: topic,
         checkpoint_label:,
@@ -272,7 +280,7 @@ describe "calendar2" do
           @course.root_account.enable_feature!(:discussion_checkpoints)
           student_in_course(active_all: true)
           topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded discussion with checkpoints")
-          checkpoint = create_checkpoint(topic:, due_at: @initial_time, override: true, student_ids: [@student.id])
+          checkpoint = create_checkpoint(topic:, override_due_at: @initial_time, override: true, student_ids: [@student.id])
 
           get "/calendar2"
           quick_jump_to_date(@initial_time_str)
@@ -294,7 +302,7 @@ describe "calendar2" do
         end
       end
 
-      it "more options link should go to calendar event edit page" do
+      it "more options link should go to calendar event edit page", :ignore_js_errors do
         create_middle_day_event
         f(".fc-event").click
         expect(fj(".popover-links-holder:visible")).not_to be_nil
@@ -345,7 +353,7 @@ describe "calendar2" do
         expect(find("h1")).to include_text(title)
       end
 
-      it "loads discussion page when click on title in discussion checkpoint info modal" do
+      it "loads discussion page when click on title in discussion checkpoint info modal", :ignore_js_errors do
         @course.root_account.enable_feature!(:discussion_checkpoints)
         due_at = Time.zone.now.utc + 1.day
         title = "graded discussion with checkpoints"
@@ -391,10 +399,8 @@ describe "calendar2" do
         due_at_time4 = Time.zone.parse("2024-1-6")
         # Create a graded topic with 2 checkpoints and 2 checkpoint overrides
         topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded discussion with checkpoints")
-        create_checkpoint(topic:, due_at: due_at_time1)
-        create_checkpoint(topic:, due_at: due_at_time2, override: true, student_ids: [@student.id])
-        create_checkpoint(topic:, type: "reply_to_entry", due_at: due_at_time3)
-        create_checkpoint(topic:, due_at: due_at_time4, override: true, student_ids: [@student.id])
+        create_checkpoint(topic:, due_at: due_at_time1, override_due_at: due_at_time2, override: true, student_ids: [@student.id])
+        create_checkpoint(topic:, type: "reply_to_entry", due_at: due_at_time3, override_due_at: due_at_time4, override: true, student_ids: [@student.id])
 
         get "/calendar2"
         quick_jump_to_date(format_date_for_view(due_at_time1))
@@ -601,8 +607,8 @@ describe "calendar2" do
         due_at = Time.zone.now.utc + 1.day
         due_at_override = due_at - 3.days
         topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded discussion with past due checkpoint override")
-        create_checkpoint(topic:, due_at:)
-        create_checkpoint(topic:, due_at: due_at_override, override: true, student_ids: [@student.id])
+        create_checkpoint(topic:, due_at:, override_due_at: due_at_override, override: true, student_ids: [@student.id])
+
         get "/calendar2"
 
         # go to the same month as the date_due

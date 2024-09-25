@@ -247,16 +247,20 @@
     <% end %>
 
     <% if can_do(@assignment, @current_user, :update) %>
-      <div class="content-box">
-        <a
-          href="<%= context_url(@context, :context_rubrics_url) %>"
-          class="add_rubric_link Button icon-plus"
-          style="<%= hidden if @assignment.active_rubric_association? %>"
-        >
-          <span aria-hidden="true"><%= t 'links.add_rubric', "Rubric" %></span>
-          <span class="screenreader-only"><%= t('Add Rubric') %></span>
-        </a>
-      </div>
+      <% if Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
+        <div id="enhanced-rubric-assignment-edit"></div>
+      <% else %>
+        <div class="content-box">
+          <a
+            href="<%= context_url(@context, :context_rubrics_url) %>"
+            class="add_rubric_link Button icon-plus"
+            style="<%= hidden if @assignment.active_rubric_association? %>"
+          >
+            <span aria-hidden="true"><%= t 'links.add_rubric', "Rubric" %></span>
+            <span class="screenreader-only"><%= t('Add Rubric') %></span>
+          </a>
+        </div>
+      <% end %>
     <% end %>
 
     <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>
@@ -276,4 +280,6 @@
   <%= render :partial => "submit_assignment", locals: { eula_url: eula_url }%>
 <% end %>
 
-<%= render partial: "shared/rubrics_component" %>
+<% if !Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
+  <%= render partial: "shared/rubrics_component" %>
+<% end %>

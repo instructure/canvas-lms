@@ -16,17 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {type SizeVariant, type ResizableProps} from '../../../editor/types'
+
 export type ImageConstraint = 'cover' | 'contain'
 export type ImageVariant = 'default' | 'hero'
 export const HeroImageHeight: string = '184px'
 
 export type ImageBlockProps = {
   src?: string
-  width?: number
-  height?: number | 'auto'
   constraint?: ImageConstraint
-  maintainAspectRatio?: boolean
-}
+  alt?: string
+  sizeVariant?: SizeVariant
+} & ResizableProps
 
 export const EMPTY_IMAGE_WIDTH = 100
 export const EMPTY_IMAGE_HEIGHT = 100

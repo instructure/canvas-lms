@@ -78,6 +78,7 @@ class Account < ActiveRecord::Base
   has_many :developer_keys
   has_many :developer_key_account_bindings, inverse_of: :account, dependent: :destroy
   has_many :lti_registration_account_bindings, class_name: "Lti::RegistrationAccountBinding", inverse_of: :account, dependent: :destroy
+  has_many :lti_overlays, class_name: "Lti::Overlay", inverse_of: :account, dependent: :destroy
   has_many :authentication_providers,
            -> { ordered },
            inverse_of: :account,
@@ -2525,5 +2526,25 @@ class Account < ActiveRecord::Base
 
   def banned_email_domains
     settings[:banned_email_domains] || []
+  end
+
+  def available_ip_filters(search_term = nil)
+    filters = []
+    accounts = account_chain.uniq
+    search_term = search_term.downcase if search_term.present?
+
+    accounts.each do |account|
+      account_filters = account.settings[:ip_filters] || {}
+      account_filters.each do |key, filter|
+        next unless search_term.blank? || key.downcase.include?(search_term)
+
+        filters << {
+          name: key,
+          account: account.name,
+          filter:
+        }
+      end
+    end
+    filters
   end
 end

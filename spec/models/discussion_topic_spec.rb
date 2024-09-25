@@ -282,6 +282,17 @@ describe DiscussionTopic do
     expect(topic.discussion_type).to eq "threaded"
   end
 
+  it "parent topic is threaded when children has threaded replies" do
+    group_discussion_assignment
+    @topic.refresh_subtopics
+    subtopic = @topic.child_topics.first
+    entry = subtopic.discussion_entries.create!(message: "test")
+    @course.groups.first.add_user(@student)
+
+    entry.reply_from(user: @student, html: "reply 1")
+    expect(@topic.threaded?).to be true
+  end
+
   it "requires a valid discussion_type" do
     @topic = @course.discussion_topics.build(message: "test", discussion_type: "gesundheit")
     expect(@topic.save).to be false
@@ -649,6 +660,17 @@ describe DiscussionTopic do
             expect(@topic.visible_for?(@student2)).to be_falsey
 
             expect(@topic.visible_for?(@teacher1)).to be_truthy
+            expect(@topic.visible_for?(@teacher2_limited_to_section)).to be_truthy
+          end
+
+          it "is visible to teachers with section limited access" do
+            account_admin = account_admin_user(account: @course.root_account)
+            @course.enroll_teacher(@teacher2_limited_to_section, section: @course_section, allow_multiple_enrollments: true).accept!
+            Enrollment.limit_privileges_to_course_section!(@course, @teacher2_limited_to_section, true)
+            @topic = discussion_topic_model(user: account_admin, context: @course)
+            @topic.update!(only_visible_to_overrides: true)
+            @topic.assignment_overrides.create!(set: @course_section)
+
             expect(@topic.visible_for?(@teacher2_limited_to_section)).to be_truthy
           end
         end

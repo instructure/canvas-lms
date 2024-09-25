@@ -314,6 +314,7 @@ class AccountsController < ApplicationController
   include Api::V1::Account
   include CustomSidebarLinksHelper
   include DefaultDueTimeHelper
+  include Api::V1::QuizIpFilter
 
   INTEGER_REGEX = /\A[+-]?\d+\z/
   SIS_ASSINGMENT_NAME_LENGTH_DEFAULT = 255
@@ -924,6 +925,16 @@ class AccountsController < ApplicationController
                  }
   end
 
+  def quiz_ip_filters
+    if authorized_action(@account, @current_user, :read)
+      available_filters = @account.available_ip_filters(params[:search_term]) || []
+
+      paginated_set = Api.paginate(available_filters, self, api_v1_quiz_ip_filters_url)
+      renderable = quiz_ip_filters_json(paginated_set, @context, @current_user, session)
+      render json: renderable
+    end
+  end
+
   # Delegated to by the update action (when the request is an api_request?)
   def update_api
     if authorized_action(@account, @current_user, [:manage_account_settings, :manage_storage_quotas])
@@ -962,8 +973,8 @@ class AccountsController < ApplicationController
       unless account_settings.empty?
         if @account.grants_right?(@current_user, session, :manage_account_settings)
           if account_settings[:settings]
-            if @account.root_account? && @account.feature_enabled?(:password_complexity) && !@account.site_admin?
-              policy_settings = account_settings[:settings][:password_policy].slice(*permitted_password_policy_settings)
+            if @account.password_complexity_enabled? && (policy_settings = account_settings[:settings][:password_policy])
+              policy_settings = policy_settings.slice(*permitted_password_policy_settings)
 
               %w[minimum_character_length maximum_login_attempts].each do |setting|
                 next unless policy_settings.key?(setting)

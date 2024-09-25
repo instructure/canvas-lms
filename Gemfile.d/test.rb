@@ -27,7 +27,7 @@ group :test do
   gem "db-query-matchers", "~> 0.12"
   gem "rspec", "~> 3.12"
   gem "rspec_around_all", "0.2.0"
-  gem "rspec-rails", "~> 6.0"
+  gem "rspec-rails", "~> 7.0"
   gem "rspec-collection_matchers", "~> 1.2"
   gem "shoulda-matchers", "~> 6.0"
 

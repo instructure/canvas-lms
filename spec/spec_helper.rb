@@ -98,7 +98,7 @@ module WebMock::API
 end
 
 require "delayed/testing"
-Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
+Rails.root.glob("spec/support/**/*.rb") { |f| require f }
 require "sharding_spec_helper"
 
 # nuke the db (say, if `rake db:migrate RAILS_ENV=test` created records),
@@ -220,6 +220,8 @@ module RSpec::Rails
         node.attr("checked") == "checked"
       elsif node.respond_to?(:checked?)
         node.checked?
+      else
+        node.attribute("checked")
       end
     end
   end
@@ -1012,7 +1014,7 @@ module I18nStubs
 end
 I18n.backend.class.prepend(I18nStubs)
 
-Dir[Rails.root.join("{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb")].each { |file| require file }
+Rails.root.glob("{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb") { |file| require file }
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|

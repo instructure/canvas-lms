@@ -95,6 +95,7 @@ class ApplicationController < ActionController::Base
   # on events that log someone in and log someone out.
   after_action :set_user_id_header
   after_action :set_response_headers
+  after_action :set_default_source_csp_directive_if_enabled
   after_action :update_enrollment_last_activity_at
   set_callback :html_render, :after, :add_csp_for_root
 
@@ -373,7 +374,6 @@ class ApplicationController < ActionController::Base
     instui_for_import_page
     multiselect_gradebook_filters
     assignment_edit_placement_not_on_announcements
-    platform_service_speedgrader
     instui_header
     rce_find_replace
     courses_popout_sisid
@@ -979,7 +979,9 @@ class ApplicationController < ActionController::Base
     # are typically embedded in an iframe in canvas, but the hostname is
     # different
     if !files_domain? && !@embeddable
-      append_to_header("Content-Security-Policy", "frame-ancestors 'self' #{csp_frame_ancestors&.uniq&.join(" ")};")
+      directives = "frame-ancestors 'self' #{csp_frame_ancestors&.uniq&.join(" ")};"
+
+      append_to_header("Content-Security-Policy", directives)
     end
     RequestContext::Generator.store_request_meta(request, @context, @sentry_trace)
     true

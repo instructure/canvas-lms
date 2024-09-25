@@ -236,13 +236,13 @@ describe "Discussion Topic Show" do
         @due_at = 2.days.from_now
         @replies_required = 2
         @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
-        Checkpoints::DiscussionCheckpointCreatorService.call(
+        @reply_to_topic_checkpoint = Checkpoints::DiscussionCheckpointCreatorService.call(
           discussion_topic: @checkpointed_discussion,
           checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
           dates: [{ type: "everyone", due_at: @due_at }],
           points_possible: 6
         )
-        Checkpoints::DiscussionCheckpointCreatorService.call(
+        @reply_to_entry_checkpint = Checkpoints::DiscussionCheckpointCreatorService.call(
           discussion_topic: @checkpointed_discussion,
           checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
           dates: [{ type: "everyone", due_at: @due_at }],
@@ -279,9 +279,31 @@ describe "Discussion Topic Show" do
         wait_for_ajaximations
         reply_to_topic_contents = f("span[data-testid='reply_to_topic_section']").text
         expect(reply_to_topic_contents).to include("Completed #{format_date_for_view(root_entry.created_at)}")
-        reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
-        expect(reply_to_entry_contents).to include("Completed")
+        f("span[data-testid='reply_to_entry_section']").text
         expect(reply_to_topic_contents).to include("Completed #{format_date_for_view(@checkpointed_discussion.discussion_entries.last.created_at)}")
+      end
+
+      it "lets students see the checkpoints tray with completed status for resubmitted" do
+        root_entry = @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to topic")
+        child_entries = Array.new(@replies_required) do |i|
+          @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to entry #{i}", parent_entry: root_entry)
+        end
+        @reply_to_topic_checkpoint.grade_student(@student, grade: 5, grader: @teacher)
+        @reply_to_entry_checkpint.grade_student(@student, grade: 5, grader: @teacher)
+        root_entry.destroy
+        child_entries.each(&:destroy)
+        resubmitted_rtt = @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to topic resubmitted")
+        @replies_required.times { |i| @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to entry #{i}", parent_entry: resubmitted_rtt) }
+
+        user_session(@student)
+        get "/courses/#{@course.id}/discussion_topics/#{@checkpointed_discussion.id}"
+
+        fj("button:contains('View Due Dates')").click
+        wait_for_ajaximations
+        reply_to_topic_contents = f("span[data-testid='reply_to_topic_section']").text
+        expect(reply_to_topic_contents).to include("Completed #{format_date_for_view(resubmitted_rtt.created_at)}")
+        reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
+        expect(reply_to_entry_contents).to include("Completed #{format_date_for_view(@checkpointed_discussion.discussion_entries.last.created_at)}")
       end
 
       it "lets students see completed status for reply to topic as soon as they successfully reply to topic" do
@@ -513,6 +535,98 @@ describe "Discussion Topic Show" do
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
         expect(Discussion.discussion_page_body).to include_text("This topic is closed for comments")
         expect(Discussion.discussion_page_body).to include_text("a very cool discussion")
+      end
+
+      context "discussion checkpoints" do
+        before do
+          Account.site_admin.enable_feature! :discussion_checkpoints
+          @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic")
+          @topic.update!(message: "a very cool discussion")
+        end
+
+        it "shows lock indication for discussions locked by discussion's unlock_at date" do
+          skip("EGG-73")
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+            dates: [{ type: "everyone", due_at: 1.week.from_now, unlock_at: 1.week.from_now }],
+            points_possible: 5
+          )
+
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+            dates: [{ type: "everyone", due_at: 2.weeks.from_now, unlock_at: 1.week.from_now }],
+            points_possible: 10,
+            replies_required: 2
+          )
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+          expect(Discussion.discussion_page_body).to include_text("This topic is locked until")
+          expect(Discussion.discussion_page_body).not_to include_text("a very cool discussion")
+        end
+
+        it "shows lock indication for discussions locked by discussion's lock_at date" do
+          skip("EGG-73")
+          @topic.update!(lock_at: 1.day.ago)
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+            dates: [{ type: "everyone", due_at: 1.day.ago, lock_at: 1.day.ago }],
+            points_possible: 5
+          )
+
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+            dates: [{ type: "everyone", due_at: 1.day.ago, lock_at: 1.day.ago }],
+            points_possible: 10,
+            replies_required: 2
+          )
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+          expect(Discussion.discussion_page_body).to include_text("This topic is closed for comments")
+          expect(Discussion.discussion_page_body).to include_text("a very cool discussion")
+        end
+
+        it "shows lock indication for discussions locked by student override unlock_at" do
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+            dates: [{ type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: 2.days.from_now, unlock_at: 1.day.from_now }],
+            points_possible: 5
+          )
+
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+            dates: [{ type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: 2.days.from_now, unlock_at: 1.day.from_now }],
+            points_possible: 10,
+            replies_required: 2
+          )
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+          expect(Discussion.discussion_page_body).to include_text("This topic is locked until")
+          expect(Discussion.discussion_page_body).not_to include_text("a very cool discussion")
+        end
+
+        it "shows lock indication for discussions locked by student override lock_at" do
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+            dates: [{ type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: 1.day.ago, lock_at: 1.day.ago }],
+            points_possible: 5
+          )
+
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+            dates: [{ type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: 1.day.ago, lock_at: 1.day.ago }],
+            points_possible: 10,
+            replies_required: 2
+          )
+
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+          expect(Discussion.discussion_page_body).to include_text("This topic is closed for comments")
+          expect(Discussion.discussion_page_body).not_to include_text("reply")
+        end
       end
     end
 

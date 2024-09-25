@@ -48,14 +48,14 @@ describe CanvasSecurity do
 
         it "encodes with configured encryption key" do
           jwt = double
-          expect(jwt).to receive(:sign).with(CanvasSecurity.encryption_key, :HS256).and_return("sometoken")
+          expect(jwt).to receive(:sign).with(CanvasSecurity.encryption_key, :autodetect).and_return("sometoken")
           allow(JSON::JWT).to receive_messages(new: jwt)
           CanvasSecurity.create_jwt({ a: 1 })
         end
 
         it "encodes with the supplied key" do
           jwt = double
-          expect(jwt).to receive(:sign).with("mykey", :HS256).and_return("sometoken")
+          expect(jwt).to receive(:sign).with("mykey", :autodetect).and_return("sometoken")
           allow(JSON::JWT).to receive_messages(new: jwt)
           CanvasSecurity.create_jwt({ a: 1 }, nil, "mykey")
         end
@@ -217,7 +217,8 @@ describe CanvasSecurity do
     it "falls back to Vault for the encryption key if not defined in the config file" do
       config = "test:\n  another_key: true"
       expect(File).to receive(:read).with(Rails.root.join("config/security.yml").to_s).and_return(config)
-      expect(Rails).to receive(:application).and_return(OpenStruct.new({ credentials: OpenStruct.new({ security_encryption_key: "secret" }) }))
+      credentials = double(security_encryption_key: "secret")
+      expect(Rails).to receive(:application).and_return(instance_double("Rails::Application", credentials:))
       expect(CanvasSecurity.config).to eq("encryption_key" => "secret", "another_key" => true)
     end
   end

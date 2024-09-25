@@ -96,5 +96,17 @@ describe "dashboard" do
       get "/"
       expect(f(".events_list .event-details")).to include_text "10 points"
     end
+
+    it "displays checkpoints in coming up list", priority: "1" do
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      reply_to_topic, reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+      get "/"
+      events = ff(".events_list .event a")
+      expect(events.first).to include_text(reply_to_topic.title + " Reply to Topic")
+      expect(events.second).to include_text(reply_to_entry.title + " Required Replies (3)")
+      # use jQuery to get the text since selenium can't figure it out when the elements aren't displayed
+      expect(events.first).to include_text(@course.short_name)
+      expect(events.last).to include_text(@course.short_name)
+    end
   end
 end

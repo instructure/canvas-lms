@@ -37,8 +37,6 @@ module AttachmentFu # :nodoc:
             binary_data = nil
           end
           yield binary_data if block_given? && binary_data
-        ensure
-          !binary_data.nil?
         end
       end
 

@@ -130,7 +130,7 @@ describe "Block Editor", :ignore_js_errors do
       expect(fj("#{group_block_inner_selector} a:contains('Click me')")).to be_displayed
     end
 
-    it "can resize blocks with the mouse" do
+    it "cannot resize an image with no src" do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
       block_toolbox_toggle.click
@@ -138,55 +138,60 @@ describe "Block Editor", :ignore_js_errors do
       image_block.click  # select the section
       image_block.click  # select the block
       expect(block_toolbar).to be_displayed
-      click_block_toolbar_menu_item("Constraint", "Cover")
+      expect(block_editor_editor).not_to contain_css(block_resize_handle_selector("se"))
+    end
 
-      expect(block_resize_handle_se).to be_displayed
-      expect(image_block.size.height).to eq(100)
-      expect(image_block.size.width).to eq(100)
+    it "can resize blocks with the mouse" do
+      get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+      wait_for_block_editor
+      block_toolbox_toggle.click
+      drag_and_drop_element(block_toolbox_text, group_block_dropzone)
+      expect(block_toolbar).to be_displayed
 
-      drag_and_drop_element_by(block_resize_handle_se, 100, 0)
-      drag_and_drop_element_by(block_resize_handle_se, 0, 50)
-      expect(image_block.size.width).to eq(200)
-      expect(image_block.size.height).to eq(150)
+      expect(block_resize_handle("se")).to be_displayed
+      expect(text_block.size.height).to eq(19) # 1.2rem
+      expect(text_block.size.width).to eq(160) # 10rem
+
+      drag_and_drop_element_by(block_resize_handle("se"), 100, 0)
+      drag_and_drop_element_by(block_resize_handle("se"), 0, 50)
+      expect(text_block.size.width).to eq(260)
+      expect(text_block.size.height).to eq(69)
     end
 
     it "can resize blocks with the keyboard" do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
       block_toolbox_toggle.click
-      drag_and_drop_element(block_toolbox_image, group_block_dropzone)
-      image_block.click  # select the section
-      image_block.click  # select the block
+      drag_and_drop_element(block_toolbox_text, group_block_dropzone)
       expect(block_toolbar).to be_displayed
-      click_block_toolbar_menu_item("Constraint", "Cover")
 
-      expect(block_resize_handle_se).to be_displayed
-      expect(image_block.size.height).to eq(100)
-      expect(image_block.size.width).to eq(100)
+      expect(block_resize_handle("se")).to be_displayed
+      expect(text_block.size.height).to eq(19)
+      expect(text_block.size.width).to eq(160)
 
       f("body").send_keys(:alt, :arrow_down)
-      expect(image_block.size.height).to eq(101)
-      expect(image_block.size.width).to eq(100)
+      expect(text_block.size.height).to eq(20)
+      expect(text_block.size.width).to eq(160)
 
       f("body").send_keys(:alt, :arrow_right)
-      expect(image_block.size.height).to eq(101)
-      expect(image_block.size.width).to eq(101)
+      expect(text_block.size.height).to eq(20)
+      expect(text_block.size.width).to eq(161)
 
       f("body").send_keys(:alt, :arrow_left)
-      expect(image_block.size.height).to eq(101)
-      expect(image_block.size.width).to eq(100)
+      expect(text_block.size.height).to eq(20)
+      expect(text_block.size.width).to eq(160)
 
       f("body").send_keys(:alt, :arrow_up)
-      expect(image_block.size.height).to eq(100)
-      expect(image_block.size.width).to eq(100)
+      expect(text_block.size.height).to eq(19)
+      expect(text_block.size.width).to eq(160)
 
       f("body").send_keys(:alt, :shift, :arrow_right)
-      expect(image_block.size.height).to eq(100)
-      expect(image_block.size.width).to eq(110)
+      expect(text_block.size.height).to eq(19)
+      expect(text_block.size.width).to eq(170)
 
       f("body").send_keys(:alt, :shift, :arrow_down)
-      expect(image_block.size.height).to eq(110)
-      expect(image_block.size.width).to eq(110)
+      expect(text_block.size.height).to eq(29)
+      expect(text_block.size.width).to eq(170)
     end
 
     context "image block" do
@@ -236,7 +241,7 @@ describe "Block Editor", :ignore_js_errors do
     end
   end
 
-  describe("resizing images that maintain aspect ratio") do
+  describe("resizing images") do
     before do
       @root_folder = Folder.root_folders(@course).first
       @image = @root_folder.attachments.build(context: @course)
@@ -251,26 +256,40 @@ describe "Block Editor", :ignore_js_errors do
           version: "1",
           blocks: [
             {
-              data: "{\"ROOT\":{\"type\":{\"resolvedName\":\"PageBlock\"},\"isCanvas\":true,\"props\":{},\"displayName\":\"Page\",\"custom\":{},\"hidden\":false,\"nodes\":[\"AcfL3KeXTT\"],\"linkedNodes\":{}},\"AcfL3KeXTT\":{\"type\":{\"resolvedName\":\"BlankSection\"},\"isCanvas\":false,\"props\":{},\"displayName\":\"Blank Section\",\"custom\":{\"isSection\":true},\"parent\":\"ROOT\",\"hidden\":false,\"nodes\":[],\"linkedNodes\":{\"blank-section_nosection1\":\"0ZWqBwA2Ou\"}},\"0ZWqBwA2Ou\":{\"type\":{\"resolvedName\":\"NoSections\"},\"isCanvas\":true,\"props\":{\"className\":\"blank-section__inner\"},\"displayName\":\"NoSections\",\"custom\":{\"noToolbar\":true},\"parent\":\"AcfL3KeXTT\",\"hidden\":false,\"nodes\":[\"lLVSJCBPWm\"],\"linkedNodes\":{}},\"lLVSJCBPWm\":{\"type\":{\"resolvedName\":\"ImageBlock\"},\"isCanvas\":false,\"props\":{\"src\":\"/courses/#{@course.id}/files/#{@image.id}/preview\",\"variant\":\"default\",\"constraint\":\"cover\",\"maintainAspectRatio\":true,\"width\":100,\"height\":50},\"displayName\":\"Image\",\"custom\":{\"isResizable\":true},\"parent\":\"0ZWqBwA2Ou\",\"hidden\":false,\"nodes\":[],\"linkedNodes\":{}}}"
+              data: "{\"ROOT\":{\"type\":{\"resolvedName\":\"PageBlock\"},\"isCanvas\":true,\"props\":{},\"displayName\":\"Page\",\"custom\":{},\"hidden\":false,\"nodes\":[\"AcfL3KeXTT\"],\"linkedNodes\":{}},\"AcfL3KeXTT\":{\"type\":{\"resolvedName\":\"BlankSection\"},\"isCanvas\":false,\"props\":{},\"displayName\":\"Blank Section\",\"custom\":{\"isSection\":true},\"parent\":\"ROOT\",\"hidden\":false,\"nodes\":[],\"linkedNodes\":{\"blank-section_nosection1\":\"0ZWqBwA2Ou\"}},\"0ZWqBwA2Ou\":{\"type\":{\"resolvedName\":\"NoSections\"},\"isCanvas\":true,\"props\":{\"className\":\"blank-section__inner\",\"placeholderText\":\"Drop a block to add it here\"},\"displayName\":\"NoSections\",\"custom\":{\"noToolbar\":true},\"parent\":\"AcfL3KeXTT\",\"hidden\":false,\"nodes\":[\"lLVSJCBPWm\"],\"linkedNodes\":{}},\"lLVSJCBPWm\":{\"type\":{\"resolvedName\":\"ImageBlock\"},\"isCanvas\":false,\"props\":{\"src\":\"/courses/#{@course.id}/files/#{@image.id}/preview\",\"variant\":\"default\",\"constraint\":\"cover\",\"maintainAspectRatio\":true,\"sizeVariant\":\"pixel\",\"width\":200,\"height\":100},\"displayName\":\"Image\",\"custom\":{\"isResizable\":true},\"parent\":\"0ZWqBwA2Ou\",\"hidden\":false,\"nodes\":[],\"linkedNodes\":{}}}"
             }
           ]
         }
       )
     end
 
-    it "adjusts the width when the height is changed" do
+    it("is not possible with SizeVariant 'auto'") do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
 
       image_block.click  # select the section
       image_block.click  # select the block
-      expect(block_resize_handle_se).to be_displayed
-      expect(image_block.size.width).to eq(100)
-      expect(image_block.size.height).to eq(50)
+      expect(block_resize_handle("se")).to be_displayed
 
-      f("body").send_keys(:alt, :shift, :arrow_right)
-      expect(image_block.size.width).to eq(110)
-      expect(image_block.size.height).to eq(55)
+      click_block_toolbar_menu_item("Image Size", "Auto")
+      expect(block_editor_editor).not_to contain_css(block_resize_handle_selector("se"))
+    end
+
+    describe("that maintain aspect ratio") do
+      it "adjusts the width when the height is changed" do
+        get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+        wait_for_block_editor
+
+        image_block.click  # select the section
+        image_block.click  # select the block
+        expect(block_resize_handle("se")).to be_displayed
+        expect(image_block.size.width).to eq(200)
+        expect(image_block.size.height).to eq(100)
+
+        f("body").send_keys(:alt, :shift, :arrow_down)
+        expect(image_block.size.height).to eq(110)
+        expect(image_block.size.width).to eq(220)
+      end
     end
   end
 end

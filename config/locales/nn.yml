@@ -788,7 +788,7 @@ nn:
         no_item_found: "Finn ingen element"
         time: Tidspunkt
       comm_message_item: 
-        created_at: "Oppretta den"
+        created_at: Oppretta
         from_name: Frå
         reply_to: "Svar til"
         sent_at: "Sendt den"
@@ -875,7 +875,7 @@ nn:
         Anonymous: Anonym
         Assignment: Oppgåve
         Course: Emne
-        Grader: Vurderar
+        Grader: Vurdering
         Student: Student
         To: Til
         date: Dato
@@ -3375,6 +3375,8 @@ nn:
       current: "Gjeldande emne"
     department: 
       analytics: Analyse
+    deprecated: 
+      analytics: Analyse
     filters: 
       completed: "Fullførte emne"
       current: "Gjeldande emne"
@@ -3782,6 +3784,9 @@ nn:
   assign_module_to_individuals_or_sections_bd638c03: "Tildel modul til enkeltpersonar eller seksjonar."
   assign_reviews_on_date_7e48ec50: "Tilordne gjennomgangar etter dato"
   assign_temporary_enrollments_bdaaa58a: "Tildel midlertidige påmeldingar"
+  assign_temporary_enrollments_to_count_users_5da4f30d: 
+    one: "Tildel midlertidige påmeldingar til %{recipient}"
+    zero: "Tildel midlertidige påmeldingar til %{recipient}"
   assign_temporary_enrollments_to_recipient_b25cb6be: "Tildel midlertidige påmeldingar til %{recipient}"
   assign_this_assignment_ac3ca379: "Tildel denne oppgåva"
   assign_this_module_a4685e57: "Tildel denne modulen"
@@ -5419,7 +5424,7 @@ nn:
       details: "Detaljar:"
       group_category: Gruppekategori
       group_signup: "La studentane melde seg på gruppevis."
-      location: Plassering
+      location: "Plassering:"
       name: Namn
       time_range: Tidsintervall
     edit_appt_calendar_event: 
@@ -5498,8 +5503,8 @@ nn:
         edit: Rediger
         reserve: Reserver
         unreserve: "Fjern reservasjon"
-      location: Plassering
-      location_address: Adresse
+      location: "Plassering:"
+      location_address: "Adresse:"
       message_students: "Send melding til studentane"
       slots_available: "Tilgjengelege avtaleluker"
     event_event_title: "Tittel på hending:"
@@ -5873,6 +5878,7 @@ nn:
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas er ikkje sett opp til å ta imot innloggingar frå %{issuer}."
   canvas_lms_6ce68514: "Canvas læringsplattform (LMS)"
   canvas_login_failure_message_4c922f2f: "Feilmelding frå Canvas-pålogging"
+  canvas_login_instructure_271b8d00: "Logg på Canvas"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "Backup-kodar for fleirfaktorautentisering"
   canvas_needs_acccess_to_your_camera_16db6502: "Canvas treng tilgang til kameraet ditt. "
   canvas_needs_access_to_your_camera_b5418c0: "Canvas treng tilgang til kameraet ditt. "
@@ -15244,6 +15250,7 @@ nn:
   login_help_for_canvas_5571f9b1: "Innloggingshjelp for %{canvas}"
   login_id_12109693: Påloggings-ID
   login_id_bc943b97: "Påloggings-ID:"
+  login_ids_b394c2a3: Påloggings-ID-ar
   login_ids_required_ff2273ab: "Login-ID (obligatorisk)"
   login_info_d1d9f11e: Påloggingsinformasjon
   login_instructure_logo_8f2332db: "Pålogging Instructure-logo"
@@ -18679,7 +18686,7 @@ nn:
   objects_589fdc11: Element
   observe_student_mastery_a1f01a: "Sjå meistring hos studentane"
   observees: 
-    being_observed: "Studentar er observerte"
+    being_observed: "Studentar blir observerte"
     new_observee_pairing_code: "Paringskode for student"
     new_observee_password: Passord
     new_observee_username: Brukarnamn
@@ -19128,6 +19135,7 @@ nn:
     everyone: Alle
     everyone_else: "Alle andre"
     invalid_group_override: "Du kan ikkje tilordne ei gruppe utanfor oppgåva sitt gruppesett"
+    mastery_paths: Meistringsstiar
     overrides: 
       everyone: Alle
   overview_of_student_status_a004bcf3: "Oversikt over studentstatus"
@@ -19779,6 +19787,11 @@ nn:
       labels: 
         migration_rate: "Mogelegheit for migrering av eldre filer til Inst-FS ved tilgang (0 til 100)"
         service_worker: "Bruk tenestearbeidar til å autentisere filtilgang i Safari 13+"
+    instructure_identity_settings: 
+      labels: 
+        client_id: Klient-ID
+        client_secret: Klienthemmelegheit
+        discovery_url: "URL-adresse for søk"
     kaltura: 
       description: "Kaltura video- og lydinnspeling med avspeling"
       name: Kaltura
@@ -23576,7 +23589,7 @@ nn:
     default_grades: "Gi alle studentane same karakter for *%{assignment.name}* ved å oppgi, og sende, ein karakterverdi nedanfor:"
     dialog_title: "Standard vurderingstype for %{assignment.name}"
     overwrite: "Overskriv vurderingane som allereie er lagt inn"
-    set_grades_button: "Bruk standardvurdering"
+    set_grades_button: "Bruk standardverdi for vurdering"
     set_grades_button_loading: "Fastset vurderingar..."
   set_email_address_as_default_954d284: "Sett e-postadressa som standard"
   set_email_as_default_5b4a28e: "Sett e-post som standard"

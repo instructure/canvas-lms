@@ -159,7 +159,7 @@ import type {
   RubricAssessmentUnderscore,
   RubricOutcomeUnderscore,
   RubricUnderscoreType,
-} from '../react/RubricAssessmentContainerWrapper/utils'
+} from '@canvas/rubrics/react/utils'
 import {SpeedGraderCheckpointsWrapper} from '../react/SpeedGraderCheckpoints/SpeedGraderCheckpointsWrapper'
 import {SpeedGraderDiscussionsNavigation} from '../react/SpeedGraderDiscussionsNavigation'
 import sanitizeHtml from 'sanitize-html-with-tinymce'

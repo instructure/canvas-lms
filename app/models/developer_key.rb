@@ -628,7 +628,7 @@ class DeveloperKey < ActiveRecord::Base
   def validate_public_jwk
     return true if public_jwk.blank?
 
-    jwk_errors = Schemas::Lti::PublicJwk.simple_validation_errors(public_jwk)
+    jwk_errors = Schemas::Lti::PublicJwk.simple_validation_first_error(public_jwk)
     return true if jwk_errors.blank?
 
     errors.add :public_jwk, jwk_errors

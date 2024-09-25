@@ -33,7 +33,7 @@ module Schemas::Lti
         }.freeze,
         "message_type" => {
           "type" => "string",
-          "enum" => %w[LtiDeepLinkingRequest LtiResourceLinkRequest].freeze
+          "enum" => Lti::ResourcePlacement::LTI_ADVANTAGE_MESSAGE_TYPES,
         }.freeze,
         "canvas_icon_class" => {
           "type" => "string"

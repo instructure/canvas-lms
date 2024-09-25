@@ -27,7 +27,7 @@ import {
   canvasPlatformSettings,
   createRegistrationOverlayStore,
 } from '../../registration_wizard/registration_settings/RegistrationOverlayState'
-import {i18nLtiScope} from '../../model/i18nLtiScope'
+import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
 import {i18nLtiPrivacyLevelDescription} from '../../model/i18nLtiPrivacyLevel'
 
 describe('ReviewScreen', () => {

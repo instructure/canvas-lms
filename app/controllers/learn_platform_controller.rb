@@ -28,6 +28,7 @@ class LearnPlatformController < ApplicationController
       page: params[:page] || 1,
       per_page: params[:per_page] || 20
     }
+    params[:q][:canvas_integrated_only] = true
     options[:q] = params[:q].to_unsafe_h if params[:q]
 
     response = learnplatform_api.products(options)

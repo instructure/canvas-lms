@@ -128,6 +128,7 @@ const locale = {
   "star_8d156e09": { "message": "별표 표시" },
   "start_over_f7552aa9": { "message": "새로 시작" },
   "submit_a3cc6859": { "message": "제출" },
+  "submitting_b90fac62": { "message": "제출 중..." },
   "syllabus_f191f65b": { "message": "요강" },
   "the_document_preview_is_currently_being_processed__7d9ea135": {
     "message": "문서 미리 보기를 처리 중입니다. 나중에 다시 시도하시기 바랍니다."

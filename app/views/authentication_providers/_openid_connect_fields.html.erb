@@ -25,12 +25,34 @@ If the provider can configure valid callback or redirect URIs, use %{callback_ur
               %></p>
 <%= render partial: 'oauth2_fields', locals: { aac: aac, presenter: presenter, f: f } %>
 <div class="ic-Form-control">
+  <%= f.label :discovery_url, 'Discovery URL', class: 'ic-Label', for: "discovery_url_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :discovery_url, class: 'ic-Input', id: "discovery_#{presenter.id_suffix(aac)}" %>
+  <p><%= mt(<<~TEXT)
+    The Discovery URL is a JSON document that contains the OpenID Connect provider's configuration.
+    If provided, Issuer Identity, Authorize URL, Token URL, Token Endpoint Authentication Method,
+    End Session Endpoint, UserInfo Endpoint, and JWKS URI will be auto-populated, and will be periodically
+    refreshed to ensure the configuration is up-to-date.
+    TEXT
+    %></p>
+</div>
+<div class="ic-Form-control">
+  <%= f.label :issuer, 'Issuer Identifier', class: 'ic-Label', for: "issuer_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :issuer, class: 'ic-Input', id: "issuer_#{presenter.id_suffix(aac)}" %>
+</div>
+<div class="ic-Form-control">
   <%= f.label :authorize_url, 'Authorize URL', class: 'ic-Label', for: "authorize_url_#{presenter.id_suffix(aac)}" %>
   <%= f.text_field :authorize_url, class: 'ic-Input', id: "authorize_url_#{presenter.id_suffix(aac)}" %>
 </div>
 <div class="ic-Form-control">
   <%= f.label :token_url, 'Token URL', class: 'ic-Label', for: "token_url_#{presenter.id_suffix(aac)}" %>
   <%= f.text_field :token_url, class: 'ic-Input', id: "token_url_#{presenter.id_suffix(aac)}" %>
+</div>
+<div class="ic-Form-control">
+  <%= f.label :token_endpoint_auth_method, 'Token Endpoint Authentication Method', class: 'ic-Label', for: "token_endpoint_auth_method_#{presenter.id_suffix(aac)}" %>
+  <%= f.select(:token_endpoint_auth_method,
+               AuthenticationProvider::OpenIDConnect::VALID_AUTH_METHODS,
+               {},
+               class: 'ic-Input', id: "token_endpoint_auth_method_#{presenter.id_suffix(aac)}") %>
 </div>
 <div class="ic-Form-control">
   <%= f.label :end_session_endpoint, 'End Session Endpoint', class: 'ic-Label', for: "end_session_endpoint_#{presenter.id_suffix(aac)}" %>
@@ -49,6 +71,15 @@ If the provider can configure valid callback or redirect URIs, use %{callback_ur
 <div class="ic-Form-control">
   <%= f.label :scope, 'Scope', class: 'ic-Label', for: "scope_#{presenter.id_suffix(aac)}" %>
   <%= f.text_field :scope, class: 'ic-Input', id: "scope_#{presenter.id_suffix(aac)}" %>
+</div>
+<div class="ic-Form-control">
+  <%= f.label :jwks_uri, 'JWKS URI', class: 'ic-Label', for: "jwks_uri_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :jwks_uri, class: 'ic-Input', id: "jwks_uri_#{presenter.id_suffix(aac)}" %>
+  <p><%= mt(<<~TEXT)
+    The JWKS URI provides the public keys used to verify the signature of ID tokens unless they are signed
+    with an HMAC algorithm using the `client_secret` as a key.
+    TEXT
+    %></p>
 </div>
 <div class="ic-Form-control">
   <%= f.label :login_attribute, 'Login Attribute', class: 'ic-Label', for: "login_attribute_#{presenter.id_suffix(aac)}" %>

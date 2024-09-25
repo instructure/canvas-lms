@@ -559,5 +559,15 @@ describe EportfoliosController do
       ContentZipper.new.zip_eportfolio(to_zip, @portfolio)
       expect(@portfolio.attachments.first.workflow_state).to eq "zipped"
     end
+
+    it "deals with long page names that are duplicates" do
+      @portfolio.update name: "blah"
+      long_category = @portfolio.eportfolio_categories.create! name: "Category" * 25
+      long_category.eportfolio_entries.create! name: "duplicate" * 25, eportfolio: @portfolio
+      long_category.eportfolio_entries.create! name: "duplicate" * 25, eportfolio: @portfolio
+      to_zip = @portfolio.attachments.first
+      ContentZipper.new.zip_eportfolio(to_zip, @portfolio)
+      expect(@portfolio.attachments.first.workflow_state).to eq "zipped"
+    end
   end
 end

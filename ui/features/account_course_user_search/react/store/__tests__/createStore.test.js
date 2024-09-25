@@ -60,4 +60,52 @@ describe('account course user search createStore', () => {
     store.load({})
     expect(store.getState()['{}'].error).toBe(true)
   })
+
+  test('load all finishes loading when all pages are loaded', async () => {
+    const linkHeader =
+      '<store-url?page=5>; rel="current",' +
+      '<store-url?page=4>; rel="prev",' +
+      '<store-url?page=1>; rel="first",' +
+      '<store-url?page=5>; rel="last"'
+
+    jest.spyOn($, 'ajax').mockImplementation(() => {
+      return {
+        then: (success, _failure) => {
+          success([], 'success', {getResponseHeader: () => linkHeader})
+          return Promise.resolve()
+        },
+      }
+    })
+    await store.loadAll({})
+    expect(store.getState()['{}'].loading).toBe(false)
+  })
+
+  test('load does not finish loading until all pages are loaded', async () => {
+    let page = 1
+    const linkHeader = () => {
+      let headers = `<store-url?page=${page}>; rel="current", `
+      if (page > 1) headers += `<store-url?page=${page - 1}>; rel="prev", `
+      if (page < 5) headers += `<store-url?page=${page + 1}>; rel="next", `
+      headers += `<store-url?page=1>; rel="first", <store-url?page=5>; rel="last"`
+      page++
+      expect(store.getState()['{}'].loading).toBe(true)
+      return headers
+    }
+
+    jest.spyOn($, 'ajax').mockImplementation(() => {
+      return {
+        abort: () => {},
+        then: (success, _failure) => {
+          success([], 'success', {getResponseHeader: linkHeader})
+          return Promise.resolve()
+        },
+      }
+    })
+
+    await store.loadAll({})
+    setTimeout(() => {
+      // Wait for event loop to tick so inner promises resolve
+      expect(store.getState()['{}'].loading).toBe(false)
+    }, 0)
+  })
 })

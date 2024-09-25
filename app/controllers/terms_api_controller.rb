@@ -163,7 +163,7 @@ class TermsApiController < ApplicationController
         @root_account = @context.root_account
 
         @terms = @terms.active.preload(:enrollment_dates_overrides)
-        @terms = @terms.order(Arel.sql("COALESCE(start_at, created_at) DESC"))
+        @terms = @terms.order(Arel.sql("COALESCE(start_at, created_at) DESC, id ASC"))
         @terms = @terms.paginate(per_page: PER_PAGE, page: params[:page])
 
         @course_counts_by_term = EnrollmentTerm.course_counts(@terms)

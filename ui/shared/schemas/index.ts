@@ -20,16 +20,20 @@ import {z} from 'zod'
 
 export const ZAccount = z
   .object({
+    course_template_id: z.string().nullish(),
+    default_group_storage_quota_mb: z.number(),
+    default_storage_quota_mb: z.number(),
+    default_time_zone: z.string(),
+    default_user_storage_quota_mb: z.number(),
     id: z.string(),
+    integration_id: z.string().nullish(),
     name: z.string(),
-    workflow_state: z.string(),
     parent_account_id: z.string().nullable(),
     root_account_id: z.string().nullable(),
+    sis_account_id: z.string().nullish(),
+    sis_import_id: z.string().nullish(),
     uuid: z.string(),
-    default_storage_quota_mb: z.number(),
-    default_user_storage_quota_mb: z.number(),
-    default_group_storage_quota_mb: z.number(),
-    default_time_zone: z.string(),
+    workflow_state: z.string(),
   })
   .strict()
 

@@ -263,6 +263,24 @@ RSpec.describe Lti::RegistrationAccountBinding do
       it "returns all bindings for all registrations" do
         expect(subject).to include(binding1, binding2)
       end
+
+      context "with caching" do
+        specs_require_cache(:redis_cache_store)
+
+        let(:list_cache_key) { Lti::RegistrationAccountBinding.site_admin_list_cache_key(registrations) }
+
+        it "caches the result" do
+          subject
+          expect(MultiCache.fetch(list_cache_key, nil)).to eq([binding1, binding2])
+        end
+
+        it "caches the pointer" do
+          subject
+          registrations.each do |registration|
+            expect(MultiCache.fetch(Lti::RegistrationAccountBinding.pointer_to_list_key(registration), nil)).to eq(list_cache_key)
+          end
+        end
+      end
     end
 
     context "with allow bindings" do
@@ -282,29 +300,55 @@ RSpec.describe Lti::RegistrationAccountBinding do
 
     let(:account_binding) { lti_registration_account_binding_model(account:) }
     let(:cache_key) { Lti::RegistrationAccountBinding.site_admin_cache_key(account_binding.registration) }
-    let(:all_cache_key) { Lti::RegistrationAccountBinding.site_admin_all_cache_key(account_binding.registration) }
+    let(:list_cache_key) { Lti::RegistrationAccountBinding.site_admin_list_cache_key([account_binding.registration]) }
 
-    before do
-      allow(MultiCache).to receive(:delete).and_return(true)
-    end
+    context "with mocks" do
+      before do
+        allow(MultiCache).to receive(:delete).and_return(true)
+        allow(MultiCache).to receive(:fetch).and_call_original
+        allow(MultiCache).to receive(:fetch).with(Lti::RegistrationAccountBinding.pointer_to_list_key(account_binding.registration), nil).and_return(list_cache_key)
+      end
 
-    context "when account is site admin" do
-      let(:account) { Account.site_admin }
+      context "when account is site admin" do
+        let(:account) { Account.site_admin }
 
-      it "clears the cache" do
-        subject
-        expect(MultiCache).to have_received(:delete).with(cache_key)
-        expect(MultiCache).to have_received(:delete).with(all_cache_key)
+        it "clears the cache" do
+          subject
+          expect(MultiCache).to have_received(:delete).with(cache_key)
+          expect(MultiCache).to have_received(:delete).with(list_cache_key)
+        end
+      end
+
+      context "when account is not site admin" do
+        let(:account) { account_model }
+
+        it "does not clear the cache" do
+          subject
+          expect(MultiCache).not_to have_received(:delete).with(cache_key)
+          expect(MultiCache).not_to have_received(:delete).with(list_cache_key)
+        end
       end
     end
 
-    context "when account is not site admin" do
-      let(:account) { account_model }
+    context "with caching" do
+      specs_require_cache(:redis_cache_store)
 
-      it "does not clear the cache" do
+      let(:account) { Account.site_admin }
+      let(:account_binding) { lti_registration_account_binding_model(account:) }
+
+      before do
+        Lti::RegistrationAccountBinding.find_in_site_admin(account_binding.registration)
+        Lti::RegistrationAccountBinding.find_all_in_site_admin([account_binding.registration])
+      end
+
+      it "clears the cache" do
+        expect(MultiCache.fetch(cache_key, nil)).to eq(account_binding)
+        expect(MultiCache.fetch(list_cache_key, nil)).to eq([account_binding])
+
         subject
-        expect(MultiCache).not_to have_received(:delete).with(cache_key)
-        expect(MultiCache).not_to have_received(:delete).with(all_cache_key)
+
+        expect(MultiCache.fetch(cache_key, nil)).to be_nil
+        expect(MultiCache.fetch(list_cache_key, nil)).to be_nil
       end
     end
   end

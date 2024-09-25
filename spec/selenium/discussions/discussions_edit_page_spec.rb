@@ -2461,7 +2461,6 @@ describe "discussions" do
           end
 
           it "sets the mark important dates checkbox for discussion edit" do
-            skip("Mark Important Dates not working on discussion edit yet")
             feature_setup
 
             graded_discussion = create_graded_discussion(course)

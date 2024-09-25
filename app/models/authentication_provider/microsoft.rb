@@ -79,6 +79,14 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
     false
   end
 
+  def self.always_validate?
+    true
+  end
+
+  def self.validate_issuer?
+    false
+  end
+
   def login_attribute
     raw_login_attribute || "tid+oid"
   end
@@ -125,6 +133,12 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
 
   def tenants
     [tenant.presence].compact + (settings["allowed_tenants"] || [])
+  end
+
+  def validate_signature(_token)
+    # The token is retrieved over TLS, so trust that, rather than the
+    # signature in the token, which might be signed by a various keys
+    # due to claims mapping
   end
 
   protected

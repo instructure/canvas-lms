@@ -35,6 +35,8 @@ module Lti
       anonymous: ANONYMOUS
     }.freeze
 
+    SUPPORTED_LEVELS = SUPPORTED_PARAMETERS_HASH.keys.map(&:to_s)
+
     def initialize(placement, variable_expander)
       @placement = placement
       @variable_expander = variable_expander

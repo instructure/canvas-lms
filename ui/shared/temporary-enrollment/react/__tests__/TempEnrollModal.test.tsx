@@ -39,14 +39,20 @@ const providerUser = {
   user_id: '1',
 } as User
 
-// Temporary Enrollment Recipient
+// Temporary Enrollment Recipient before GET profile
 const recipientUser = {
+  user_name: 'Recipient User',
+  user_id: '2',
+  address: 'recipient@instructure.com',
+} as User
+
+// Temporary Enrollment Recipient after GET profile
+const recipientProfile = {
   email: 'recipient@instructure.com',
-  id: '2',
   login_id: 'recipient',
+  id: '2',
   name: 'Recipient User',
   sis_user_id: 'recipient_sis',
-  user_id: '2',
 } as User
 
 const modalProps = {
@@ -87,6 +93,8 @@ const userData = {
       ...recipientUser,
     },
   ],
+  duplicates: [],
+  missing: [],
 }
 
 const enrollmentsByCourse = [
@@ -153,7 +161,6 @@ describe('TempEnrollModal', () => {
     fetchMock.restore()
   })
 
-  // TODO: delete the some of the below tests when finishing selenium tests
   it('displays the modal upon clicking the child element', async () => {
     render(
       <TempEnrollModal {...modalProps}>
@@ -172,7 +179,7 @@ describe('TempEnrollModal', () => {
   describe('after opening modal', () => {
     beforeEach(async () => {
       fetchMock.post(`/accounts/1/user_lists.json?${userListsParams}`, userData)
-      userDetailsUriMock(recipientUser.id, userData.users[0])
+      userDetailsUriMock(recipientUser.user_id, recipientProfile)
       fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
       render(
         <TempEnrollModal {...modalProps}>
@@ -210,15 +217,16 @@ describe('TempEnrollModal', () => {
 
       // click next to go to the search results screen (page 2)
       await userEvent.click(next)
-      expect(
-        await screen.findByText(/is ready to be assigned temporary enrollments/)
-      ).toBeInTheDocument()
+      expect(await screen.findByText(/to be assigned temporary enrollments/)).toBeInTheDocument()
+      await waitFor(() => {
+        expect(next).toBeEnabled()
+      })
 
       // click next to go to the assign screen (page 3)
       await userEvent.click(next)
       await waitFor(() => {
         expect(screen.queryByText('Back')).toBeInTheDocument()
-        expect(screen.queryByText(/is ready to be assigned temporary enrollments/)).toBeNull()
+        expect(screen.queryByText(/to be assigned temporary enrollments/)).toBeNull()
       })
 
       const submit = await screen.findByText('Submit')
@@ -238,9 +246,7 @@ describe('TempEnrollModal', () => {
 
       // click next to go to the search results screen (page 2)
       await userEvent.click(next)
-      expect(
-        await screen.findByText(/is ready to be assigned temporary enrollments/)
-      ).toBeInTheDocument()
+      expect(await screen.findByText(/to be assigned temporary enrollments/)).toBeInTheDocument()
 
       const reset = await screen.findByText('Start Over')
       expect(reset).toBeInTheDocument()
@@ -248,7 +254,7 @@ describe('TempEnrollModal', () => {
       // modal is back on the search screen (page 1)
       await waitFor(() => {
         expect(screen.queryByText('Start Over')).toBeNull()
-        expect(screen.queryByText(/is ready to be assigned temporary enrollments/)).toBeNull()
+        expect(screen.queryByText(/to be assigned temporary enrollments/)).toBeNull()
       })
 
       expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
@@ -264,13 +270,13 @@ describe('TempEnrollModal', () => {
       // click next to go to the search results screen (page 2)
       await userEvent.click(next)
       expect(
-        await screen.findByText(/is ready to be assigned temporary enrollments/)
+        await screen.findByText(/One user is ready to be assigned temporary enrollments/)
       ).toBeInTheDocument()
 
       // click next to go to the assign screen (page 3)
       await userEvent.click(next)
       await waitFor(() => {
-        expect(screen.queryByText(/is ready to be assigned temporary enrollments/)).toBeNull()
+        expect(screen.queryByText(/to be assigned temporary enrollments/)).toBeNull()
       })
 
       const back = await screen.findByText('Back')
@@ -280,9 +286,7 @@ describe('TempEnrollModal', () => {
       // modal is back on the search results screen (page 2)
       await waitFor(() => {
         expect(screen.queryByText('Back')).toBeNull()
-        expect(
-          screen.queryByText(/is ready to be assigned temporary enrollments/)
-        ).toBeInTheDocument()
+        expect(screen.queryByText(/to be assigned temporary enrollments/)).toBeInTheDocument()
       })
 
       expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
@@ -301,13 +305,13 @@ describe('TempEnrollModal', () => {
   describe('generateModalTitle', () => {
     describe('assign page titles (page >= 2)', () => {
       it('should return assign page title for recipient when page >= 2', () => {
-        const title = generateModalTitle(recipientUser, RECIPIENT, false, 2, null)
-        expect(title).toBe(`Assign temporary enrollments to ${recipientUser.name}`)
+        const title = generateModalTitle(recipientProfile, RECIPIENT, false, 2, null)
+        expect(title).toBe(`Assign temporary enrollments to ${recipientUser.user_name}`)
       })
 
       it('should return assign page title with enrollment name when page >= 2 and enrollment is provided', () => {
-        const title = generateModalTitle(providerUser, PROVIDER, false, 2, recipientUser)
-        expect(title).toBe(`Assign temporary enrollments to ${recipientUser.name}`)
+        const title = generateModalTitle(providerUser, PROVIDER, false, 2, recipientProfile)
+        expect(title).toBe(`Assign temporary enrollments to ${recipientUser.user_name}`)
       })
 
       it('should return a fallback title when page >= 2 and no valid recipient is provided', () => {
@@ -323,8 +327,8 @@ describe('TempEnrollModal', () => {
       })
 
       it('should return recipient’s providers title when in edit mode and type is recipient', () => {
-        const title = generateModalTitle(recipientUser, RECIPIENT, true, 1, null)
-        expect(title).toBe(`Temporary Enrollment Providers for ${recipientUser.name}`)
+        const title = generateModalTitle(recipientProfile, RECIPIENT, true, 1, null)
+        expect(title).toBe(`Temporary Enrollment Providers for ${recipientUser.user_name}`)
       })
     })
 

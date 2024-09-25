@@ -26,7 +26,7 @@ import {View} from '@instructure/ui-view'
 import {escapeNewLineText, rangingFrom} from './utils/rubricUtils'
 import {possibleString, possibleStringRange} from '../Points'
 
-const {licorice} = colors
+const {shamrock} = colors
 
 type HorizontalButtonDisplayProps = {
   isPreviewMode: boolean
@@ -63,7 +63,7 @@ export const HorizontalButtonDisplay = ({
           padding="xx-small"
           margin="0 xx-small small xx-small"
           data-testid={`rating-details-${selectedRating?.id}`}
-          themeOverride={{borderColorBrand: licorice, borderWidthMedium: '0.188rem'}}
+          themeOverride={{borderColorBrand: shamrock, borderWidthMedium: '0.188rem'}}
         >
           <View as="div">
             <Text size="x-small" weight="bold">

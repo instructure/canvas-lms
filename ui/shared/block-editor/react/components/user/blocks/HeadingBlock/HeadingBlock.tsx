@@ -18,7 +18,7 @@
 
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import ContentEditable from 'react-contenteditable'
-import {useEditor, useNode} from '@craftjs/core'
+import {useEditor, useNode, type Node} from '@craftjs/core'
 import {Heading} from '@instructure/ui-heading'
 import {TextBlock} from '../TextBlock/TextBlock'
 import {
@@ -43,10 +43,12 @@ export const HeadingBlock = ({text, level}: HeadingBlockProps) => {
     id,
     selected,
     themeOverride,
-  } = useNode(state => ({
-    id: state.id,
-    selected: state.events.selected,
-    themeOverride: state.data.custom.themeOverride,
+    node,
+  } = useNode((n: Node) => ({
+    id: n.id,
+    selected: n.events.selected,
+    themeOverride: n.data.custom.themeOverride,
+    node: n,
   }))
   const clazz = useClassNames(enabled, {empty: !text}, ['block', 'heading-block'])
   const focusableElem = useRef<HTMLElement | null>(null)
@@ -96,6 +98,14 @@ export const HeadingBlock = ({text, level}: HeadingBlockProps) => {
     //   }
   }, [])
 
+  const styl: React.CSSProperties = {}
+  if (node.data.props.width) {
+    styl.width = `${node.data.props.width}px`
+  }
+  if (node.data.props.height) {
+    styl.height = `${node.data.props.height}px`
+  }
+
   if (enabled) {
     return (
       // eslint-disable-next-line jsx-a11y/interactive-supports-focus, jsx-a11y/click-events-have-key-events
@@ -104,6 +114,7 @@ export const HeadingBlock = ({text, level}: HeadingBlockProps) => {
         role="textbox"
         onClick={handleClick}
         className={clazz}
+        style={styl}
       >
         <Heading level={level} color="primary" themeOverride={themeOverride}>
           <ContentEditable
@@ -122,9 +133,11 @@ export const HeadingBlock = ({text, level}: HeadingBlockProps) => {
     )
   } else {
     return (
-      <Heading level={level} color="primary" themeOverride={themeOverride}>
-        {text}
-      </Heading>
+      <div style={styl}>
+        <Heading level={level} color="primary" themeOverride={themeOverride}>
+          {text}
+        </Heading>
+      </div>
     )
   }
 }

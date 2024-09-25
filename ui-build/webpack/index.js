@@ -33,7 +33,6 @@ const isDev = process.env.NODE_ENV === 'development'
 const {
   swc,
   css,
-  emberHandlebars,
   fonts,
   handlebars,
   images,
@@ -190,7 +189,6 @@ module.exports = {
       fonts,
       ...swc,
       handlebars,
-      emberHandlebars,
     ].filter(Boolean),
   },
 

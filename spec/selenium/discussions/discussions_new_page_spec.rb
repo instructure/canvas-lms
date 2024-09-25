@@ -1080,7 +1080,6 @@ describe "discussions" do
       end
 
       it "shows only and creates only group context discussions options" do
-        skip("LX-2015 can't save a discussion started from group page")
         get "/groups/#{group.id}/discussion_topics/new"
         expect(f("body")).not_to contain_jqcss "input[value='enable-delay-posting']"
         expect(f("body")).not_to contain_jqcss "input[value='enable-participants-commenting']"
@@ -2015,64 +2014,6 @@ describe "discussions" do
               expect(assignment.assignment_overrides.active.last.set_type).to eq("CourseSection")
               expect(assignment.only_visible_to_overrides).to be false
             end
-
-            it "assigns overrides only correctly" do
-              skip("LX-1974: flakey test not going to be needed when edit page feature turned on")
-              Discussion.assign_to_button.click
-              wait_for_assign_to_tray_spinner
-
-              keep_trying_until { expect(item_tray_exists?).to be_truthy }
-
-              click_add_assign_to_card
-              select_module_item_assignee(1, @section_1.name)
-              select_module_item_assignee(1, @section_2.name)
-              select_module_item_assignee(1, @section_3.name)
-              select_module_item_assignee(1, @student_1.name)
-              select_module_item_assignee(1, @student_2.name)
-              select_module_item_assignee(1, @student_3.name)
-              select_module_item_assignee(1, "Mastery Paths")
-
-              # Set dates for these overrides
-              update_due_date(1, "12/31/2022")
-              update_due_time(1, "5:00 PM")
-              update_available_date(1, "12/27/2022")
-              update_available_time(1, "8:00 AM")
-              update_until_date(1, "1/7/2023")
-              update_until_time(1, "9:00 PM")
-
-              # Remove the Everyone Else option
-              click_delete_assign_to_card(0)
-
-              click_save_button("Apply")
-              keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
-
-              expect(AssignmentCreateEditPage.pending_changes_pill_exists?).to be_truthy
-
-              # Since not all sections were selected, a warning is displayed
-              Discussion.save_and_publish_button.click
-              Discussion.section_warning_continue_button.click
-              wait_for_ajaximations
-
-              assignment = Assignment.last
-
-              expect(assignment.assignment_overrides.active.count).to eq(5)
-              expected_overrides = [
-                { set_type: "CourseSection", title: "section 1" },
-                { set_type: "CourseSection", title: "section 2" },
-                { set_type: "CourseSection", title: "section 3" },
-                { set_type: "ADHOC", title: "3 students" },
-                { set_type: "Noop", title: "Mastery Paths" }
-              ]
-
-              expected_overrides.each_with_index do |expected_override, index|
-                actual_override = assignment.assignment_overrides[index]
-
-                expect(actual_override.set_type).to eq(expected_override[:set_type])
-                expect(actual_override.title).to eq(expected_override[:title])
-              end
-
-              expect(assignment.only_visible_to_overrides).to be true
-            end
           end
 
           it "sets the mark important dates checkbox for discussion create" do
@@ -2337,7 +2278,6 @@ describe "discussions" do
           end
 
           it "sets the mark important dates checkbox for discussion create" do
-            skip("skipping because this is not available yet")
             feature_setup
 
             get "/courses/#{course.id}/discussion_topics/new"

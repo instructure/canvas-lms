@@ -21,7 +21,7 @@ import type {Lti1p3RegistrationOverlayStore} from '../Lti1p3RegistrationOverlayS
 import {useOverlayStore} from '../hooks/useOverlayStore'
 import {PermissionConfirmation} from '../../registration_wizard_forms/PermissionConfirmation'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
-import {LtiScopes} from '../../model/LtiScope'
+import {LtiScopes} from '@canvas/lti/model/LtiScope'
 import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
 
 export type PermissionConfirmationWrapperProps = {

@@ -166,6 +166,23 @@ describe DataFixup::ReplaceBrokenMediaObjectLinks do
       expect(aq.question_data["question_text"]).to eq fixed_html
     end
 
+    it "fixes bad links in calendar event description" do
+      broken_html = <<-HTML.strip
+        <iframe style="width: 400px; height: 225px; display: inline-block;" title="title" data-media-type="video" src="/courses/1/file_contents/course%20files/unfiled/title" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-media"></iframe>
+      HTML
+
+      calendar_event_model(description: broken_html)
+
+      DataFixup::ReplaceBrokenMediaObjectLinks.run
+      @event.reload
+
+      fixed_html = <<-HTML.strip
+        <iframe style="width: 400px; height: 225px; display: inline-block;" title="title" data-media-type="video" src="/media_objects_iframe/m-media" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-media"></iframe>
+      HTML
+
+      expect(@event.description).to eq fixed_html
+    end
+
     it "fixes bad links in course syllabus" do
       broken_html = <<-HTML.strip
         <iframe style="width: 400px; height: 225px; display: inline-block;" title="title" data-media-type="video" src="/courses/1/file_contents/course%20files/unfiled/title" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-media"></iframe>
@@ -198,6 +215,40 @@ describe DataFixup::ReplaceBrokenMediaObjectLinks do
       HTML
 
       expect(@topic.message).to eq fixed_html
+    end
+
+    it "fixes bad links in learning outcome description" do
+      broken_html = <<-HTML.strip
+        <iframe style="width: 400px; height: 225px; display: inline-block;" title="title" data-media-type="video" src="/courses/1/file_contents/course%20files/unfiled/title" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-media"></iframe>
+      HTML
+
+      lo = LearningOutcome.create!(context: course, short_description: "lo", description: broken_html)
+
+      DataFixup::ReplaceBrokenMediaObjectLinks.run
+      lo.reload
+
+      fixed_html = <<-HTML.strip
+        <iframe style="width: 400px; height: 225px; display: inline-block;" title="title" data-media-type="video" src="/media_objects_iframe/m-media" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-media"></iframe>
+      HTML
+
+      expect(lo.description).to eq fixed_html
+    end
+
+    it "fixes bad links in learning outcome group description" do
+      broken_html = <<-HTML.strip
+        <iframe style="width: 400px; height: 225px; display: inline-block;" title="title" data-media-type="video" src="/courses/1/file_contents/course%20files/unfiled/title" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-media"></iframe>
+      HTML
+
+      log = LearningOutcomeGroup.create!(context: course, title: "log", description: broken_html)
+
+      DataFixup::ReplaceBrokenMediaObjectLinks.run
+      log.reload
+
+      fixed_html = <<-HTML.strip
+        <iframe style="width: 400px; height: 225px; display: inline-block;" title="title" data-media-type="video" src="/media_objects_iframe/m-media" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-media"></iframe>
+      HTML
+
+      expect(log.description).to eq fixed_html
     end
 
     it "fixes bad links in quiz description" do

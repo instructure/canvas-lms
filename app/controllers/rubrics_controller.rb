@@ -44,6 +44,7 @@ class RubricsController < ApplicationController
     if @context.feature_enabled?(:enhanced_rubrics)
       js_env breadcrumbs: rubric_breadcrumbs
       js_env enhanced_rubrics_enabled: true
+      js_env enhanced_rubrics_copy_to: @context.feature_enabled?(:enhanced_rubrics_copy_to)
 
       return show_rubrics_redesign
     end

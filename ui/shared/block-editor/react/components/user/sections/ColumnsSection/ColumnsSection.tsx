@@ -83,7 +83,7 @@ export const ColumnsSection = (props: ColumnsSectionProps) => {
     <Container className={clazz}>
       <Element id={`columns-${id}__inner`} is={ColumnsSectionInner} canvas={true}>
         <Element id={`columns-${id}-1`} is={GroupBlock} canvas={true} resizable={false} />
-        <Element id={`columns-${id}-1`} is={GroupBlock} canvas={true} resizable={false} />
+        <Element id={`columns-${id}-2`} is={GroupBlock} canvas={true} resizable={false} />
       </Element>
     </Container>
   )

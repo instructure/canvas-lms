@@ -64,6 +64,17 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("importantDates")).to eq assignment.important_dates
   end
 
+  describe "graded_submissions_exist" do
+    it "returns true when graded submissions exist" do
+      assignment.grade_student(student, grade: 5, grader: teacher)
+      expect(assignment_type.resolve("gradedSubmissionsExist")).to be true
+    end
+
+    it "returns false when no graded submissions exist" do
+      expect(assignment_type.resolve("gradedSubmissionsExist")).to be false
+    end
+  end
+
   it_behaves_like "types with enumerable workflow states" do
     let(:enum_class) { Types::AssignmentType::AssignmentStateType }
     let(:model_class) { Assignment }

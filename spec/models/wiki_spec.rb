@@ -185,13 +185,14 @@ describe Wiki do
   context "find_page by lookup" do
     before :once do
       Account.site_admin.enable_feature!(:permanent_page_links)
-      @page1 = @course.wiki_pages.create!(title: "Current Page")
+      @page0 = @course.wiki_pages.create!(title: "bideo") # ビデオ to_url
+      @page1 = @course.wiki_pages.create!(title: "ビデオ")
       @lookup1 = @page1.current_lookup
       @lookup2 = WikiPageLookup.create!(slug: "old-url", wiki_page: @page1, root_account_id: @page1.root_account_id, context_id: @page1.context_id, context_type: @page1.context_type)
     end
 
     it "finds page by title" do
-      expect(@wiki.find_page("Current Page")).to eq @page1
+      expect(@wiki.find_page("ビデオ")).to eq @page1
     end
 
     it "finds page by stale url" do
@@ -200,12 +201,20 @@ describe Wiki do
 
     it "doesn't include deleted page" do
       @page1.destroy
-      expect(@wiki.find_page("Current Page")).to be_nil
+      expect(@wiki.find_page("ビデオ")).to be_nil
     end
 
     it "can find deleted page if requested" do
       @page1.destroy
-      expect(@wiki.find_page("Current Page", include_deleted: true)).to eq @page1
+      expect(@wiki.find_page("ビデオ", include_deleted: true)).to eq @page1
+    end
+
+    it "looks for precise matches for title param before trying .to_url" do
+      page_1_lookup = @page1.current_lookup
+      expect(@wiki.find_page("ビデオ")).to eq @page1
+      @page1.update! current_lookup_id: nil
+      page_1_lookup.destroy
+      expect(@wiki.find_page("ビデオ")).to eq @page0
     end
   end
 

@@ -1943,6 +1943,29 @@ describe MasterCourses::MasterMigration do
       expect(assmt_to.unlock_at).to be_nil
     end
 
+    it "removes available dates from locked wiki pages in sync" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+      assmt = @copy_from.wiki_pages.create!(title: "page 1", unlock_at: 1.day.ago, lock_at: 1.day.from_now)
+      run_master_migration
+
+      page_to = @copy_to.wiki_pages.where(migration_id: mig_id(assmt)).first
+      expect(page_to.lock_at).not_to be_nil
+
+      Timecop.travel(5.minutes.from_now) do
+        @template.content_tag_for(assmt).update_attribute(:restrictions, { availability_dates: true })
+        assmt.update(unlock_at: nil, lock_at: nil)
+      end
+
+      Timecop.travel(10.minutes.from_now) do
+        run_master_migration
+      end
+
+      page_to.reload
+      expect(page_to.lock_at).to be_nil
+      expect(page_to.unlock_at).to be_nil
+    end
+
     it "counts downstream changes to quiz/assessment questions as changes in quiz/bank content" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)

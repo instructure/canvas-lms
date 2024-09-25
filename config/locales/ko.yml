@@ -429,7 +429,7 @@ ko:
         find: 찾기
       course_logging_details: 
         From: 시작
-        To: "받는 사람"
+        To: 수신
         Value: 값
         date: 날짜
         event_source_label: 원본
@@ -476,11 +476,14 @@ ko:
         message_date_to: "끝 날짜"
       grade_change_logging_content: 
         find: 찾기
+      grade_change_logging_item: 
+        no-abbreviation: "n"
       grade_change_logging_results: 
+        Anonymous: 익명
         Assignment: 과제
         Course: 과목
         Student: 학생
-        To: "받는 사람"
+        To: 수신
         date: 날짜
         from: 시작
         no_item_found: "항목을 찾을 수 없음"
@@ -1363,10 +1366,13 @@ ko:
   activity_13915493: 활동
   add_8523c19b: 추가
   add_a_comment_48994930: "의견 추가"
+  add_an_assignment_fb73942e: "과제 추가"
   add_an_attachment_b2e9092f: "첨부 추가"
+  add_another_assignment_fc5c908f: "다른 과제 추가"
   add_app_baf540f: "앱 추가"
   add_as_a_faculty_journal_entry_55a38a30: "교원 일지 항목으로 추가"
   add_assignment_da1c1529: "과제 추가"
+  add_assignment_to_name_caf173b0: "%{name}에 과제 추가"
   add_comment_3205529f: "의견 추가"
   add_contact_method_d2dfea03: "연락 방법 추가하기"
   add_content_58b4305a: "내용 추가"
@@ -1468,6 +1474,8 @@ ko:
       completed: "완료된 "
       current: "현재 "
     department: 
+      analytics: 분석
+    deprecated: 
       analytics: 분석
     filters: 
       completed: "완료된 "
@@ -2241,6 +2249,15 @@ ko:
         originality_report_visible_immediately: 즉시
     undated_assignments: "날짜 없는 과제"
     upcoming_assignments: "예정된 과제"
+    veri_cite_settings_dialog: 
+      buttons: 
+        update_settings: "설정 업데이트"
+      vericite_settings: 
+        originality_report_never: 전혀
+        originality_report_visibility: "학생이 독창성 보고서를 볼 수 있음"
+        originality_report_visible_after_due_date: "기한 이후"
+        originality_report_visible_after_grading: "과제 평가 이후"
+        originality_report_visible_immediately: 즉시
   assignmentsToggleShowByView: 
     overdue_assignments: "지연된 과제"
     past_assignments: "지난 과제"
@@ -2370,6 +2387,7 @@ ko:
   bb_display: "Blackboard 학습"
   bb_file_description: "Blackboard 6/7/8/9 내보내기 .zip 파일"
   bb_name: "Blackboard 변환기"
+  beginning_date_2d2a29ac: "시작 날짜"
   big_blue_button_conference: 
     recording_setting: 녹음/녹화
   blackboard: 
@@ -2638,7 +2656,7 @@ ko:
       details: "세부 정보:"
       group_category: "그룹 범주"
       group_signup: "학생이 그룹에 등록하도록 합니다."
-      location: 위치
+      location: "위치:"
       name: 이름
       time_range: "시간 범위"
     edit_appt_calendar_event: 
@@ -2650,13 +2668,13 @@ ko:
       due: "기한:"
       group: "그룹:"
       links: 
-        more_options: "추가 옵션"
-      title: "제목:"
+        more_options: "기타 옵션"
+      title: "직함:"
     edit_assignment_override: 
       calendar: "달력:"
       due: "기한:"
       links: 
-        more_options: "추가 옵션"
+        more_options: "기타 옵션"
     edit_calendar_event: 
       calendar: "달력:"
       date: "날짜:"
@@ -2674,7 +2692,7 @@ ko:
       delete: 삭제
       different_date_for_each_section: "각 섹션에 다른 날짜를 사용"
       edit_calendar_event_header: "달력 행사 편집"
-      end_time: "끝 시각"
+      end_time: "종료 시각"
       event_description: "행사 설명"
       event_title: "행사 제목"
       location_name: "위치:"
@@ -2686,12 +2704,13 @@ ko:
         event: 행사
     edit_planner_note: 
       calendar: "달력:"
+      date: "날짜:"
       title: "직함:"
     edit_to_do_item: 
       date: "날짜:"
       links: 
         more_options: "기타 옵션"
-      title: "제목:"
+      title: "직함:"
     end_before_start_error: "시작 시각은 끝 시각 이전이어야 함"
     ends_in_past_error: "지난 시간에 끝나는 약속 슬롯을 만들 수 없음"
     errors: 
@@ -2707,7 +2726,7 @@ ko:
         edit: 편집
         reserve: 예약
         unreserve: "예약 취소"
-      location: 위치
+      location: "위치:"
       message_students: "학생에게 메시지 보내기"
       slots_available: "사용 가능한 슬롯"
     event_event_title: "행사 제목:"
@@ -2890,6 +2909,7 @@ ko:
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas에 다음 사용자를 위한 계정이 없습니다: %{user}"
   canvas_lms_6ce68514: "Canvas LMS"
   canvas_login_failure_message_4c922f2f: "Canvas 로그인 실패 메시지"
+  canvas_login_instructure_271b8d00: "Canvas에 로그인"
   canvas_revision_unknown: "알 수 없음"
   canvas_thinks_response_is_valid_8cc4a67d: "Canvas가 응답이 유효하다고 간주"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "퀴즈를 저장한 후에 제출물을 다시 평가게 되며, 이 작업에는 수 분이 걸립니다."
@@ -2908,10 +2928,13 @@ ko:
   cc_attribution_non_commercial_no_derivatives_9fe74c00: "CC 유형 비영리 변경금지"
   cc_attribution_non_commercial_share_alike_c7edb1e5: "CC 유형 비영리 동일조건변경허락 "
   cell_number_69a7c309: "휴대 전화 번호"
+  change_beginning_date_to_39dbd06e: "시작 날짜를 다음으로 변경"
+  change_ending_date_to_d2cebd54: "끝 날짜를 다음으로 변경"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "이 과제는 %{assignmentPoints}점이 가능하지만 이 루브릭과 일치하도록 %{rubricPoints}점이 가능하도록 바꾸시겠습니까?"
   change_to_b757d327: "다음으로 변경"
+  child_s_username_dde3aa9: "자식의 사용자 이름"
   choose_a_course_home_page_8059c7b: "과목 홈 페이지 선택"
   choose_a_csv_file_to_upload_9644480c: "업로드할 CSV 파일 선택:"
   choose_assignment_group_9e7de13c: "과제 그룹 선택"
@@ -3012,7 +3035,7 @@ ko:
         collaboration_members: "협업 멤버"
         groups: 그룹
         loading: "로드 중"
-        people: 사용자
+        people: 참여자
         remove_all: "모두 제거"
       member_instructions: "협업을 추가하려면 왼쪽 열에 있는 사용자나 그룹을 클릭하거나 두드리십시오."
     edit: 
@@ -3168,6 +3191,9 @@ ko:
       description: 설명
       duration: "지속 시간"
       duration_in_minutes: 분
+      invite_all: 
+        course: "모든 과목 구성원 초대"
+        group: "모든 그룹 구성원 초대"
       long_running: "시간 제한 없음(장기 회의)"
       members: 구성원
       name: 이름
@@ -4084,6 +4110,7 @@ ko:
       wiki_page: "알 수 없는 위키 페이지"
   course_files_a31f97fc: "과목 파일"
   course_groups_e8239a1e: "과목 그룹"
+  course_id_8bd2a21c: "과목 ID"
   course_list: 
     wrapper: 
       close_course_menu_title: 닫기
@@ -4354,9 +4381,9 @@ ko:
       index: 
         cannot_add_users: "이 과목이 종료되어 새 사용자를 추가할 수 없음"
         group_set: "그룹 집합"
-        people: 사용자
+        people: 참여자
         role_to_search: "역할으로 검색을 제한"
-        search_people: "사람 검색"
+        search_people: "사용자 검색"
         title_add_people: "사람 추가"
       invitations_view: 
         accepted_invitation: "%{name}이(가) 이미 과목 참여 초대를 받고 수락했지만 필요하다면 초대를 다시 보낼 수 있습니다."
@@ -4645,6 +4672,7 @@ ko:
   create_rubric_ec33ddf9: "루브릭 만들기"
   create_users_view: 
     required: "이메일 주소 입력"
+  created_6ee36dff: "작성:"
   criteria_9fac648: 기준
   criterion_ratings_3eed22e2: "기준 등급"
   crowdsourced: true
@@ -5153,6 +5181,10 @@ ko:
     peer_reviews: 
       due_date: "기한 %{date}"
     points_possible_number: "가능한 점수는 숫자이어야 함"
+    published_button: 
+      buttons: 
+        not_published: "게시 안 됨"
+        published: 게시됨
     show: 
       add_rubric: "루브릭 추가"
       announcement_closed: "이 공지 사항은 의견을 받지 않음"
@@ -5210,6 +5242,8 @@ ko:
   discussion_topics_b35ac745: "토론 주제"
   discussions: 
     are_your_sure_delete: "이 항목을 삭제하시겠습니까?"
+    author_link: 
+      authors_name: "작성자 이름"
     cant_subscribe_not_in_group: "구독하려면 이 그룹에 속해야 함"
     cant_subscribe_not_in_group_set: "구독하려면 이 관련 그룹에 속해 있어야 함"
     closed_for_comments: "의견 닫힘"
@@ -5258,6 +5292,7 @@ ko:
       write_a_reply: "답변 작성..."
     results_entry: 
       authors_name: "작성자 이름"
+      edited_comment: "*%{editor.display_name}*이(가) %{edited_at}에 편집"
       unknown_author: "알 수 없는 작성자"
       view_in_discussion: "토론에서 보기"
     show_all_n_replies: 
@@ -5380,6 +5415,7 @@ ko:
   end_date_cannot_be_before_start_date_eb62ed6d: "종료일은 시작일보다 이전일 수 없습니다."
   end_date_e0093ed7: 종료일
   end_time_250391e8: "종료 시각"
+  ending_date_e1ea13a4: "끝 날짜"
   english_c60612e2: 영어
   enhanced_individual_gradebook: 
     avg_score: "평균 점수"
@@ -6033,6 +6069,7 @@ ko:
   full_article_9296bb6f: "전체 기사"
   gathering_files_933551d9: "파일 수집 중..."
   general_answer_comments_730136ba: "일반 답변 의견"
+  give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "아래에 평점 값을 입력해서 모든 학생에게 *%{assignment.name}*에 대한 동일한 평점을 주십시오:"
   global_announcements_a78912c8: "전체 공지"
   global_message_icons: 
     announcement: "공지 사항"
@@ -6091,6 +6128,8 @@ ko:
     not_submitted: "제출 안 됨"
     nth_student: "%{n}번째 학생"
     portion_graded: "%{x} / %{y} 평가됨"
+    section_to_show_menu: 
+      choose_a_section_to_show: "표시할 섹션 선택"
     show_all_details_button: "모든 세부 정보 보기"
     student: 학생
     student_mute_notification: "교사가 평가 작업 중"
@@ -6748,7 +6787,7 @@ ko:
       add_unassigned_menu: 
         add_unassigned_student: "할당 안 된 학생 추가"
         add_unassigned_user: "할당 안 된 사용자 추가"
-        search_people: "사람 검색"
+        search_people: "사용자 검색"
       add_unassigned_user: 
         add_to_group: "사용자를 그룹에 추가"
         add_user_to_group: "사용자 %{name}을(를) 그룹에 추가"
@@ -6783,6 +6822,8 @@ ko:
         randomly_assigning_students: "임의로 학생 할당 중"
         search_groups: "그룹 검색"
         search_users: "사용자 검색"
+      group_category_clone: 
+        cancel: 취소
       group_category_create: 
         allow_self_signup: "직접 등록 허용"
         cancel: 취소
@@ -7238,6 +7279,7 @@ ko:
   last_error_a3832668: "마지막 오류"
   last_modified_by_ca4bb5e1: "마지막 수정한 사람"
   late_assignment_user_name_assignment_name_2df32e01: "지연된 과제: %{user_name}, %{assignment_name}"
+  late_bd436902: 지연
   latest_f604a75: 최신
   latest_score_905aa87b: "최종 점수"
   layouts: 
@@ -9414,6 +9456,7 @@ ko:
   more_options_272b4953: "기타 옵션"
   more_options_e89670cf: "기타 옵션"
   move_abf00365: 이동
+  move_assignment_group_46e09fc3: "과제 그룹 이동"
   move_dialog: 
     cancel: 취소
     save: 저장
@@ -9426,6 +9469,7 @@ ko:
   multi_factor_authentication_1a6b3b3d: "다단계 인증"
   multi_factor_authentication_configured_865b1bde: "다단계 인증 구성"
   multiple_dates_e3a122f7: "여러 날짜"
+  multiple_modules_930713d4: "여러 모듈"
   must_be_255_characters_or_less_e8e7f25e: "255글자보다 적어야 함"
   mute_dialog: 
     curving_assignments: "과제 상대 평가"
@@ -9453,6 +9497,7 @@ ko:
   new_file_135ae520: "[ 새 파일 ]"
   new_group_8d6ad781: "새 그룹"
   new_outcome_7fba8c7d: "새 성과"
+  new_outcome_group_af59f145: "새 성과 그룹"
   new_quizzes_dbda7e0a: "새로운 퀴즈"
   next_40e12421: 다음
   next_assignment_c19812a5: "다음 과제"
@@ -9475,6 +9520,7 @@ ko:
   no_marks_5e7d2b59: "표시 없음"
   no_migration_file: "내용 마이그레이션을 위해 필요한 파일입니다."
   no_password_was_given_472222e5: "암호가 없음"
+  no_points_possible_368669d: "가능한 점수 없음"
   no_results_3cda4e72: "결과 없음"
   no_results_found_2ace1494: "찾은 결과 없음"
   no_results_found_58717065: "결과 없음"
@@ -9827,7 +9873,7 @@ ko:
       edit_criterion_rating_title: "\"%{description}\" 기준 등급 편집"
       insert_criterion_rating: "기준 등급 삽입"
       insert_rating: 삽입
-      points: 점수
+      points: 배점
       pts: 점
       rating_description: "기준 등급 설명"
     criterion_header: 
@@ -9861,6 +9907,9 @@ ko:
     missing_outcome: "해당 학습 성과를 찾을 수 없음"
     new_outcome_group: "새 성과 그룹"
     outcome: 
+      links: 
+        delete_outcome: 삭제
+        edit_outcome: 편집
       mastery_at_label: "다음 이상 점수에 대해 숙달 설정:"
       points: 
         rating: "%{points}점"
@@ -9877,6 +9926,10 @@ ko:
       points: "%{points_possible}점"
       title: "성과 이름"
       total_points: 총점
+    outcome_group: 
+      links: 
+        delete_outcome_group: 삭제
+        edit_outcome_group: 편집
     outcome_group_form: 
       group_description: "이 그룹의 설명"
       title: "이 그룹의 이름"
@@ -9995,7 +10048,7 @@ ko:
     no_results_found: "결과 없음"
     view_more_link: "더 보기"
   paginated_view: 
-    loading_more_results: "더 많은 결과 로드"
+    loading_more_results: "더 많은 결과 로드 중"
   password_8a271b1c: 암호
   paste_xml_cda3a64e: "XML 붙여넣기"
   paypal: 
@@ -11849,7 +11902,7 @@ ko:
       upload: "파일 업로드"
     reupload_submission_files: "제출물 파일 다시 업로드"
     upload_info: "이전에 다운로드한 학생의 제출물 파일을 바꿨다면 다시 압축해서 아래 양식에 압축 파일을 업로드하십시오. 학생이 제출물 파일에 대한 의견에서 변경된 파일을 볼 수 있습니다."
-    upload_warning: "파일의 이름을 인식할 수 있도록 제출물 파일의 이름을 변경하지 마십시오."
+    upload_warning: "인식할 수 있도록 파일 이름을 바꾸지 마십시오."
   react_files: 
     add_folder: "폴더 추가"
     cancel: 취소
@@ -11959,6 +12012,7 @@ ko:
   required_5f7ef8c0: 필수
   reset_this_contact_method_s_bounce_count_3845ecf4: "이 연락 방법의 응답 횟수 재설정하기"
   restore_6d523f1d: 복원
+  restore_courses_182e162e: "과목 복원"
   restrict_student_access: 
     button_text: 
       cancel: 취소
@@ -11972,6 +12026,7 @@ ko:
   resume_quiz_afeceb87: "퀴즈 다시 시작"
   resume_survey_58dce775: "설문 다시 시작"
   retrieve_timeout: "구성을 찾아올 수 없음 - 서버 응답 시간 만료"
+  role_7c0b7eaa: "역할:"
   role_override: 
     permission: 
       read_sis: "SIS 자료 읽기"
@@ -12307,6 +12362,7 @@ ko:
         current_enrollments: "현재 등록"
         decrosslist_section: "섹션 교차 나열 해제"
   sections_94731e51: "모든 섹션"
+  select_a_log_type_to_search_247fc6b4: "검색하려는 로그 유형을 선택하십시오."
   select_calendars_d5fa50b6: "달력 선택하기"
   select_content: "내용 선택"
   select_content_7faa4195: "내용 선택"
@@ -13098,6 +13154,7 @@ ko:
   smartbanner: 
     android_banner_view_button: 보기
   sms_f0ddceeb: SMS
+  some_settings_have_been_administratively_locked_9e3ee880: "일부 설정은 관리를 위해 잠겨있습니다."
   some_systems_recycle_their_ids_for_each_new_export_884b8e46: "어떤 시스템은 새로 내보내기를 할 때마다 ID를 재활용합니다. 그 결과, 내보낸 다른 문제 은행이 같은 ID를 갖게 됩니다. 평가 자료를 잃지 않으려면 ID를 무시하고 개체를 다른 것으로 처리해야 합니다. 이 옵션을 선택하면 이러한 안전 기능을 사용하지 않고 같은 ID를 가진 기존 평가 자료를 덮어쓰게 됩니다."
   someone_bbbc538b: 아무개
   sort_by_e75f9e3e: "정렬 조건"
@@ -13144,7 +13201,9 @@ ko:
   start_5a4cfcd6: 시작
   start_a_new_course_57ae2480: "새 과목 시작하기"
   start_date_e937be8a: "시작 날짜"
+  start_participating_f0c75256: "참여 시작"
   started_5e138638: 시작됨
+  starts_at_29843f98: "시작 날짜"
   state_66a67ba2: 상태
   state_standards_c9b1affd: "전국 표준"
   statistics: 
@@ -13372,6 +13431,7 @@ ko:
   submit_assignment_helper: 
     messages: 
       agree_to_pledge: "이 과제를 체출하기 전에 제출물 서약에 동의해야 합니다."
+  submit_media_file_f334c1ba: "미디어 파일 제출"
   submitted_318fad53: 제출됨
   submitted_d5ba370a: "제출:"
   subscribe_4b301fb7: 구독
@@ -13784,6 +13844,7 @@ ko:
   to_51406be9: "받는 사람"
   to_c4c44f4b: "다음 요일로"
   to_f0e90538: "수신:"
+  to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "Canvas 사용자에게 전송된 모든 알림을 보려면 검색을 위한 사용자와 날짜 범위를 선택하십시오."
   tomorrow_9a6c9a00: 내일
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "로그인을 너무 많이 실패했습니다. 다시 시도하시거나 시스템 관리자에게 문의하십시오."
   tooltips: 
@@ -13905,6 +13966,7 @@ ko:
     users_to_add: 
       one: "이대로 진행하면 사용자 %{count}명이 추가됩니다."
       other: "이대로 진행하면 사용자 %{count}명이 추가됩니다."
+  user_login_logout_activity_90fbbd9a: "사용자 로그인 / 로그아웃 활동"
   user_logins: 
     buttons: 
       add_login: "로그인 추가"
@@ -14264,6 +14326,7 @@ ko:
   view_edit_grading_scheme_238d3028: "평가 구성표 보기/편집"
   view_grades_8d3bae6c: "평점 보기"
   view_grades_for_name_45aeb2f2: "%{name} 평점 보기"
+  view_notifications_6aea09a2: "알림 보기"
   view_rubric_d71cce10: "루브릭 보기"
   viewsContextModules: 
     context_module: 
@@ -14295,6 +14358,7 @@ ko:
   website_adea4d05: 웹사이트
   website_url_177fc1dc: "웹 사이트 URL"
   week_1f945ddd: 주
+  weight_final_grade_based_on_assignment_groups_3124161: "과제 그룹을 바탕으로 최종 평가를 가중"
   welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: "나의 과목에 오신 것을 환영합니다! 과목들의 목록을 편집하려면 \"모든 과목\"을 클릭하고 표시할 과목들에 별표 표시를 하십시오."
   what_should_the_csv_file_look_like_985a59ac: "CSV 파일은 어떻게 보입니까?"
   what_would_you_like_to_do_next_2835397e: "다음에 어떤 작업을 하시겠습니까?"
@@ -14355,11 +14419,11 @@ ko:
         save: 저장
         save_and_publish: "저장 & 게시"
       course_editing_roles: 
-        anyone: 모두
+        anyone: 누구나
         only_teachers: 교사만
         teachers_and_students: "교사와 학생"
       editing_roles: 
-        anyone: 모두
+        anyone: 누구나
         can_edit_page: "은(는) 이 페이지를 편집할 수 있음"
         only_members: 멤버만
       notify_users_text: "이 내용이 바뀐 것을 사용자에게 알림"
@@ -14379,7 +14443,7 @@ ko:
       no_pages: "아직 페이지를 만들지 않았습니다."
       pages_title: 페이지
     wiki_page_index_edit_dialog: 
-      page_title: 제목
+      page_title: 직함
     wiki_page_index_item: 
       labels: 
         front_page: "첫 페이지"
@@ -14458,12 +14522,14 @@ ko:
   you_must_log_in_to_view_replies_9ccd4da0: "답변을 보기 위해서는 로그인해야 합니다."
   you_must_select_a_file_to_import_content_from_28a242ff: "내용을 가져올 파일을 선택해야 함"
   your_email_address_f881e583: "귀하의 이메일 주소"
+  your_email_b5364bee: 이메일
   your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
       교사가 %{title}에 대한 평점 변경 사항과 새 의견을 배포했습니다. 이제 변경 사항을 볼 수 있습니다.
       
       여기에서 볼 수 있습니다:
       %{url}
   your_message_was_sent_977f6583: "메세지가 전송되었습니다!"
+  your_name_7665e1d8: 이름
   your_password_has_been_changed_df0e72aa: "비밀번호가 변경되었습니다."
   yyyy_mm_dd_cbbd9959: YYYY-MM-DD
   yyyy_mm_dd_hh_mm_a01b6081: "YYYY-MM-DD hh:mm"

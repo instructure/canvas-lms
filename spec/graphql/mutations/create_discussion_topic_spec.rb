@@ -257,6 +257,43 @@ describe Mutations::CreateDiscussionTopic do
 
     expect(announcement.locked_announcement?).to be true
     expect(announcement.workflow_state).to eq "active"
+    @teacher.reload
+    expect(@teacher.create_announcements_unlocked?).to eq !locked
+  end
+
+  it "successfully creates an unlocked announcement" do
+    is_announcement = true
+    context_type = "Course"
+    title = "Test Title"
+    message = "A message"
+    published = true
+    require_initial_post = false
+    locked = false
+
+    query = <<~GQL
+      isAnnouncement: #{is_announcement}
+      contextId: "#{@course.id}"
+      contextType: #{context_type}
+      title: "#{title}"
+      message: "#{message}"
+      published: #{published}
+      requireInitialPost: #{require_initial_post}
+      anonymousState: off
+      locked: #{locked}
+    GQL
+
+    result = execute_with_input(query)
+    created_announcement = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+
+    announcement = Announcement.find(created_announcement["_id"])
+
+    expect(announcement.locked_announcement?).to be false
+    expect(announcement.workflow_state).to eq "active"
+    @teacher.reload
+    expect(@teacher.create_announcements_unlocked?).to eq !locked
   end
 
   it "successfully creates a section specific announcement" do

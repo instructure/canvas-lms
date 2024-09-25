@@ -136,6 +136,14 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
     end
   end
 
+  def save_lock_preferences(locked, discussion_topic)
+    return if @current_user.nil?
+    return unless discussion_topic.is_announcement
+
+    @current_user.create_announcements_unlocked(!locked)
+    @current_user.save!
+  end
+
   def process_locked_parameter(locked, discussion_topic)
     return unless locked != discussion_topic.locked? && !discussion_topic.lock_at_changed?
 

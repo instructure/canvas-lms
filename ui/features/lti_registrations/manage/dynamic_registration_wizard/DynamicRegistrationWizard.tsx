@@ -38,7 +38,7 @@ import {
 import {IconConfirmation} from './components/IconConfirmation'
 import {NamingConfirmation} from './components/NamingConfirmation'
 import {PermissionConfirmationWrapper} from './components/PermissionConfirmationWrapper'
-import {PlacementsConfirmation} from './components/PlacementsConfirmation'
+import {PlacementsConfirmationWrapper} from './components/PlacementsConfirmationWrapper'
 import {PrivacyConfirmationWrapper} from './components/PrivacyConfirmationWrapper'
 import {ReviewScreen} from './components/ReviewScreen'
 import {isUnsuccessful} from '../../common/lib/apiResult/ApiResult'
@@ -270,7 +270,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
         <>
           {progressBar(state)}
           <RegistrationModalBody>
-            <PlacementsConfirmation
+            <PlacementsConfirmationWrapper
               registration={state.registration}
               overlayStore={state.overlayStore}
             />

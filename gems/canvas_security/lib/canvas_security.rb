@@ -220,7 +220,7 @@ module CanvasSecurity
     raw_jwt = JSON::JWT.new(jwt_body)
     return raw_jwt.to_s if key == :unsigned
 
-    raw_jwt.sign(key || encryption_key, alg || :HS256).to_s
+    raw_jwt.sign(key || encryption_key, alg || :autodetect).to_s
   end
 
   # Creates an encrypted JWT token string
@@ -265,7 +265,7 @@ module CanvasSecurity
     keys.each do |key|
       body = JSON::JWT.decode(token, key)
       verify_jwt(body, ignore_expiration:)
-      return body.with_indifferent_access
+      return body
     rescue JSON::JWS::VerificationFailed
       # Keep looping, to try all the keys. If none succeed,
       # we raise below.

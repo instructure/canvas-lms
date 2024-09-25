@@ -29,7 +29,7 @@
 #       "description": "",
 #       "properties": {
 #         "id": {
-#           "description": "the ID of the learning object",
+#           "description": "the ID of the learning object (not present for checkpoints)",
 #           "example": 4,
 #           "type": "integer"
 #         },
@@ -73,6 +73,16 @@
 #           "description": "paginated list of AssignmentOverride objects",
 #           "type": "array",
 #           "items": { "$ref": "AssignmentOverride" }
+#         },
+#         "checkpoints": {
+#           "description": "list of Checkpoint objects, only present if a learning object has subAssignments",
+#           "type": "array",
+#           "items": { "$ref": "LearningObjectDates" }
+#         },
+#         "tag": {
+#           "description": "the tag identifying the type of checkpoint (only present for checkpoints)",
+#           "example": "reply_to_topic",
+#           "type": "string"
 #         }
 #       }
 #     }

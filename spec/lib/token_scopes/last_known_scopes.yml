@@ -258,6 +258,8 @@
 - verb: GET
   path: "/api/v1/accounts/:account_id/permissions/:permission"
 - verb: GET
+  path: "/api/v1/accounts/:account_id/quiz_ip_filters"
+- verb: GET
   path: "/api/v1/accounts/:account_id/reports"
 - verb: GET
   path: "/api/v1/accounts/:account_id/reports/:report"
@@ -1847,8 +1849,8 @@
   path: "/api/v1/quiz_submissions/:quiz_submission_id/questions/:id/formatted_answer"
 - verb: PUT
   path: "/api/v1/quiz_submissions/:quiz_submission_id/questions/:id/unflag"
-- verb: POST
-  path: "/api/v1/rce_linked_file_urls"
+- verb: GET
+  path: "/api/v1/rce_linked_file_instfs_ids"
 - verb: GET
   path: "/api/v1/release_notes"
 - verb: POST

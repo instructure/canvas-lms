@@ -25,6 +25,14 @@ module BlockEditorPage
     wait_for_block_editor
   end
 
+  def block_editor
+    f(".block-editor")
+  end
+
+  def block_editor_editor
+    f(".block-editor-editor")
+  end
+
   # Stepper
   def stepper_modal_selector
     '[role="dialog"][aria-label="Create a new page"]'
@@ -87,9 +95,21 @@ module BlockEditorPage
     f(".toolbox-item.item-button-block")
   end
 
+  def block_toolbox_text
+    f(".toolbox-item.item-text-block")
+  end
+
+  def block_toolbox_group
+    f(".toolbox-item.item-group-block")
+  end
+
   # Blocks
-  def block_resize_handle_se
-    f(".block-resizer .moveable-se")
+  def block_resize_handle_selector(direction)
+    ".block-resizer .moveable-#{direction}"
+  end
+
+  def block_resize_handle(direction = se)
+    f(block_resize_handle_selector(direction))
   end
 
   def block_toolbar
@@ -110,7 +130,7 @@ module BlockEditorPage
   end
 
   def image_block_image
-    f(".block.image-block > img")
+    f(".block.image-block img")
   end
 
   def image_block_upload_button
@@ -123,6 +143,10 @@ module BlockEditorPage
 
   def group_block_dropzone
     f(group_block_inner_selector)
+  end
+
+  def text_block
+    f(".text-block")
   end
 
   # Sections

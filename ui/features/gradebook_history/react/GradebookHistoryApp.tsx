@@ -31,14 +31,9 @@ const I18n = useI18nScope('gradebook_history')
 type Props = {
   courseUrl: string
   learningMasteryEnabled?: boolean
-  enhancedIndividualGradebookEnabled?: boolean
 }
 
-const GradebookHistoryApp = ({
-  courseUrl,
-  learningMasteryEnabled,
-  enhancedIndividualGradebookEnabled,
-}: Props) => (
+const GradebookHistoryApp = ({courseUrl, learningMasteryEnabled}: Props) => (
   <Provider store={GradebookHistoryStore}>
     <div>
       <h1 className="screenreader-only">{I18n.t('Gradebook History')}</h1>
@@ -51,7 +46,6 @@ const GradebookHistoryApp = ({
       >
         <GradebookMenu
           courseUrl={courseUrl}
-          enhancedIndividualGradebookEnabled={enhancedIndividualGradebookEnabled}
           learningMasteryEnabled={learningMasteryEnabled}
           variant="GradebookHistory"
         />

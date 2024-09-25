@@ -18,7 +18,7 @@
 import {ZDeveloperKeyAccountBinding} from './DeveloperKeyAccountBinding'
 import {ZDeveloperKeyId} from './DeveloperKeyId'
 import * as z from 'zod'
-import {ZLtiScope} from '../LtiScope'
+import {ZLtiScope} from '@canvas/lti/model/LtiScope'
 import {ZLtiConfiguration} from '../lti_tool_configuration/LtiConfiguration'
 import {ZLtiImsRegistration} from '../lti_ims_registration/LtiImsRegistration'
 

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import * as z from 'zod'
-import {ZLtiScope} from '../LtiScope'
+import {ZLtiScope} from '@canvas/lti/model/LtiScope'
 import {ZRegistrationOverlay} from '../RegistrationOverlay'
 import {ZLtiConfiguration} from '../lti_tool_configuration/LtiConfiguration'
 import {ZLtiImsToolConfiguration} from './LtiImsToolConfiguration'

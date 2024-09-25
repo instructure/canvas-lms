@@ -439,7 +439,7 @@ module SchemaCreationExtensions
   end
 
   def visit_ForeignKeyDefinition(o, constraint_type: :table)
-    sql = +"CONSTRAINT #{quote_column_name(o.name)}"
+    sql = "CONSTRAINT #{quote_column_name(o.name)}"
     sql << " FOREIGN KEY (#{quote_column_name(o.column)})" if constraint_type == :table
     sql << " REFERENCES #{quote_table_name(o.to_table)} (#{quote_column_name(o.primary_key)})"
     sql << " #{action_sql("DELETE", o.on_delete)}" if o.on_delete
@@ -496,7 +496,7 @@ end
 module SchemaStatementsExtensions
   # TODO: move this to activerecord-pg-extensions
   def valid_column_definition_options
-    super + [:delay_validation]
+    super + [:delay_validation, :foreign_key]
   end
 
   def add_column_for_alter(table_name, column_name, type, **options)

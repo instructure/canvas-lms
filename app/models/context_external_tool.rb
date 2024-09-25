@@ -1700,7 +1700,7 @@ class ContextExternalTool < ActiveRecord::Base
 
   def clear_tool_domain_cache
     if saved_change_to_domain? || saved_change_to_url? || saved_change_to_workflow_state?
-      context.clear_tool_domain_cache
+      context&.clear_tool_domain_cache
     end
   end
 

@@ -129,7 +129,7 @@ const AuthorInfoBase = ({breakpoints, ...props}) => {
       <Flex.Item shouldShrink={true}>
         <Flex direction="column" margin={authorInfoPadding}>
           {hasAuthor && (
-            <Flex.Item>
+            <Flex.Item overflowY={"hidden"}>
               <Flex wrap="wrap" gap="0 small">
                 <Text
                   weight="bold"

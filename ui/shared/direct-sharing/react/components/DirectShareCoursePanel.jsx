@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import React, {useState} from 'react'
-import {func, string} from 'prop-types'
+import {func, string, bool} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
@@ -37,12 +37,23 @@ DirectShareCoursePanel.propTypes = {
   sourceCourseId: string,
   contentSelection: contentSelectionShape,
   onCancel: func,
+  showAssignments: bool,
 }
 
-export default function DirectShareCoursePanel({sourceCourseId, contentSelection, onCancel}) {
+DirectShareCoursePanel.defaultProps = {
+  showAssignments: false,
+}
+
+export default function DirectShareCoursePanel({
+  sourceCourseId,
+  contentSelection,
+  onCancel,
+  showAssignments = false,
+}) {
   const [selectedCourse, setSelectedCourse] = useState(null)
   const [startCopyOperationPromise, setStartCopyOperationPromise] = useState(null)
   const [selectedModule, setSelectedModule] = useState(null)
+  const [selectedAssignment, setSelectedAssignment] = useState(null)
   const [selectedPosition, setSelectedPosition] = useState(null)
 
   function startCopyOperation() {
@@ -56,6 +67,7 @@ export default function DirectShareCoursePanel({sourceCourseId, contentSelection
           settings: {
             source_course_id: sourceCourseId,
             insert_into_module_id: selectedModule?.id || null,
+            associate_with_assignment_id: selectedAssignment?._id || null,
             insert_into_module_type: contentSelection ? Object.keys(contentSelection)[0] : null,
             insert_into_module_position: selectedPosition,
           },
@@ -66,6 +78,7 @@ export default function DirectShareCoursePanel({sourceCourseId, contentSelection
 
   function handleSelectedCourse(course) {
     setSelectedModule(null)
+    setSelectedAssignment(null)
     setSelectedCourse(course)
   }
 
@@ -82,6 +95,8 @@ export default function DirectShareCoursePanel({sourceCourseId, contentSelection
         setSelectedCourse={handleSelectedCourse}
         selectedModuleId={selectedModule?.id || null}
         setSelectedModule={setSelectedModule}
+        setSelectedAssignment={setSelectedAssignment}
+        showAssignments={showAssignments}
         setModuleItemPosition={setSelectedPosition}
         disableModuleInsertion={contentSelection && 'modules' in contentSelection}
         moduleFilteringOpts={{per_page: 50}}

@@ -22,6 +22,8 @@ module Schemas
   # Represents the "internal" JSON schema used to configure an LTI 1.3 tool,
   # as stored in Lti::ToolConfiguration and used in Lti::Registration.
   class InternalLtiConfiguration < Base
+    VALID_DISPLAY_TYPES = %w[default full_width full_width_in_context in_nav_context borderless].freeze
+
     # Transforms a hash conforming to the LtiConfiguration schema into
     # a hash conforming to the InternalLtiConfiguration schema.
     def self.from_lti_configuration(lti_config)
@@ -61,7 +63,7 @@ module Schemas
           redirect_uris: { type: "array", items: { type: "string" }, minItems: 1 },
           domain: { type: "string" },
           tool_id: { type: "string" },
-          privacy_level: { type: "string", enum: %w[public email_only name_only anonymous] },
+          privacy_level: { type: "string", enum: ::Lti::PrivacyLevelExpander::SUPPORTED_LEVELS },
           launch_settings: {
             type: "object",
             properties: self.class.base_settings_properties
@@ -88,7 +90,7 @@ module Schemas
 
     def self.base_settings_properties
       {
-        message_type: { type: "string", enum: %w[LtiDeepLinkingRequest LtiResourceLinkRequest] },
+        message_type: { type: "string", enum: ::Lti::ResourcePlacement::LTI_ADVANTAGE_MESSAGE_TYPES },
         text: { type: "string" },
         labels: { type: "object" },
         custom_fields: { type: "object" },
@@ -100,7 +102,7 @@ module Schemas
         canvas_icon_class: { type: "string" },
         required_permissions: { type: "string" },
         windowTarget: { type: "string", enum: %w[_blank] },
-        display_type: { type: "string", enum: %w[default full_width full_width_in_context in_nav_context borderless] },
+        display_type: { type: "string", enum: VALID_DISPLAY_TYPES },
         url: { type: "string", description: "Defers to target_link_uri for 1.3 tools" },
         target_link_uri: { type: "string" },
         visibility: { type: "string", enum: %w[admins members public] },

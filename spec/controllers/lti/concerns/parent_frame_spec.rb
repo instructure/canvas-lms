@@ -18,7 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_relative "../../../spec_helper"
+require_relative "../../../lti_spec_helper"
+
 describe Lti::Concerns::ParentFrame do
+  include LtiSpecHelper
+
   subject { controller.send(:parent_frame_origin) }
 
   let(:controller_class) do
@@ -64,6 +69,27 @@ describe Lti::Concerns::ParentFrame do
         end
 
         it { is_expected.to eq(expected_tool_origin) }
+
+        it "handles beta url overrides" do
+          allow_beta_overrides(tool)
+          tool.settings["environments"] = { "beta_launch_url" => "http://beta.example.com/launch" }
+          tool.save!
+          expect(subject).to eq("http://beta.example.com")
+        end
+
+        it "handles beta domain overrides" do
+          allow_beta_overrides(tool)
+          tool.settings["environments"] = { "beta_domain" => "beta.example.com" }
+          tool.save!
+          expect(subject).to eq("http://beta.example.com")
+        end
+
+        it "handles beta domain overrides with https prefix" do
+          allow_beta_overrides(tool)
+          tool.settings["environments"] = { "beta_domain" => "http://beta.example.com" }
+          tool.save!
+          expect(subject).to eq("http://beta.example.com")
+        end
       end
 
       context "when the user does not have the read or launch_external_tool permission" do

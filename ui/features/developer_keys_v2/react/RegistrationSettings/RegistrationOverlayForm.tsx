@@ -30,7 +30,7 @@ import * as React from 'react'
 import type {StoreApi} from 'zustand'
 import {type LtiPlacement, i18nLtiPlacement} from '../../model/LtiPlacements'
 import type {LtiRegistration} from '../../model/LtiRegistration'
-import {i18nLtiScope} from '../../model/LtiScopes'
+import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
 import {
   canvasPlatformSettings,
   type PlacementOverlay,

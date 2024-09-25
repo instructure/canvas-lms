@@ -39,7 +39,9 @@ describe Checkpoints::AdhocOverrideCreatorService do
     end
 
     it "creates a parent adhoc override without dates set (but still overridden), if one doesn't already exist" do
-      override = { due_at: 2.days.from_now, unlock_at: 2.days.ago, lock_at: 4.days.from_now, student_ids: [@student1.id, @student2.id] }
+      unlock_at_time = 2.days.ago
+      lock_at_time = 4.days.from_now
+      override = { due_at: 2.days.from_now, unlock_at: unlock_at_time, lock_at: lock_at_time, student_ids: [@student1.id, @student2.id] }
       service.call(checkpoint: @checkpoint, override:)
       parent_override = @checkpoint.parent_assignment.assignment_overrides.first
 
@@ -47,9 +49,9 @@ describe Checkpoints::AdhocOverrideCreatorService do
         expect(parent_override.set_type).to eq "ADHOC"
         expect(parent_override.due_at).to be_nil
         expect(parent_override.due_at_overridden).to be true
-        expect(parent_override.unlock_at).to be_nil
+        expect(parent_override.unlock_at.to_i).to be unlock_at_time.to_i
         expect(parent_override.unlock_at_overridden).to be true
-        expect(parent_override.lock_at).to be_nil
+        expect(parent_override.lock_at.to_i).to be lock_at_time.to_i
         expect(parent_override.lock_at_overridden).to be true
       end
     end
@@ -64,8 +66,9 @@ describe Checkpoints::AdhocOverrideCreatorService do
     end
 
     it "doesn't create a new parent adhoc override if one already exists" do
-      @checkpoint.parent_assignment.assignment_overrides.create!(set_type: "ADHOC")
-      override = { due_at: 2.days.from_now, student_ids: [@student1.id, @student2.id] }
+      parent_override = @checkpoint.parent_assignment.assignment_overrides.create!(set_type: "ADHOC")
+      parent_override.assignment_override_students.create!(user: @student1)
+      override = { due_at: 2.days.from_now, student_ids: [@student1.id] }
       expect do
         service.call(checkpoint: @checkpoint, override:)
       end.not_to change { @checkpoint.parent_assignment.assignment_overrides.count }.from(1)
@@ -74,10 +77,10 @@ describe Checkpoints::AdhocOverrideCreatorService do
     it "only creates new parent adhoc override students if they don't already exist" do
       parent_override = @checkpoint.parent_assignment.assignment_overrides.create!(set_type: "ADHOC")
       parent_override.assignment_override_students.create!(user: @student1)
-      override = { due_at: 2.days.from_now, student_ids: [@student1.id, @student2.id] }
+      override = { due_at: 2.days.from_now, student_ids: [@student2.id] }
       expect do
         service.call(checkpoint: @checkpoint, override:)
-      end.to change { parent_override.assignment_override_students.count }.from(1).to(2)
+      end.to change { @checkpoint.parent_assignment.assignment_overrides.count }.from(1).to(2)
     end
 
     describe "due_at" do

@@ -19,9 +19,10 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useNode, type Node} from '@craftjs/core'
 import {getAspectRatio} from '../../utils/size'
+import {type ResizableProps} from './types'
 import Moveable, {type OnResize} from 'react-moveable'
 
-type Sz = {
+export type Sz = {
   width: number
   height: number
 }
@@ -33,40 +34,62 @@ type BlockResizeProps = {
 const BlockResizer = ({mountPoint}: BlockResizeProps) => {
   const {
     actions: {setProp},
-    node,
     maintainAspectRatio,
+    node,
+    nodeProps,
   } = useNode((n: Node) => {
     return {
-      maintainAspectRatio: !!node?.data?.props?.maintainAspectRatio,
+      maintainAspectRatio: !!n.data.props.maintainAspectRatio,
       node: n,
+      nodeProps: n.data.props as ResizableProps,
     }
   })
-  const [currSz, setCurrSz] = useState<Sz>(() => {
-    const {width, height} = node.data.props
-    if (width) {
-      return {width, height}
-    } else if (node.dom) {
-      const rect = node.dom.getBoundingClientRect()
-      return {width: rect.width, height: rect.height}
-    } else {
-      return {width: 0, height: 0}
-    }
-  })
-
+  const [currSz, setCurrSz] = useState<Sz>({width: 0, height: 0})
   const isDragging = useRef(false)
+
+  useEffect(() => {
+    if (node.dom) {
+      const rect = node.dom.getBoundingClientRect()
+      setCurrSz({width: rect.width, height: rect.height})
+    }
+  }, [node.dom])
+
+  const setNewSize = useCallback(
+    (newWidth: number, newHeight: number) => {
+      if (maintainAspectRatio) {
+        const aspectRatio = getAspectRatio(currSz.width, currSz.height)
+        if (newHeight !== currSz.height) {
+          newWidth = newHeight * aspectRatio
+        } else {
+          newHeight = newWidth / aspectRatio
+        }
+      }
+
+      const myblock = node.dom as HTMLElement
+      myblock.style.width = `${newWidth}px`
+      myblock.style.height = `${newHeight}px`
+
+      setCurrSz({width: newWidth, height: newHeight})
+      setProp((props: any) => {
+        props.width = newWidth
+        props.height = newHeight
+      })
+    },
+    [currSz.height, currSz.width, maintainAspectRatio, node.dom, setProp]
+  )
 
   const handleResizeKeys = useCallback(
     event => {
       if (!node.dom) return
       if (!event.altKey) return
+
       let dir = 1
       const resizeKeys = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown']
       if (resizeKeys.includes(event.key)) {
         event.preventDefault()
-        dir = window.getComputedStyle(node.dom).direction === 'ltr' ? 1 : -1
+        dir = window.getComputedStyle(node.dom).direction === 'rtl' ? -1 : 1
       }
       const step = event.shiftKey ? 10 : 1
-
       let newWidth = currSz.width
       let newHeight = currSz.height
       switch (event.key) {
@@ -82,30 +105,16 @@ const BlockResizer = ({mountPoint}: BlockResizeProps) => {
         case 'ArrowDown':
           newHeight += step
           break
+        default:
+          return
       }
       if (newWidth > 0 && newHeight > 0) {
         newWidth = Math.max(newWidth, 24)
-        newHeight = Math.max(newHeight, 24)
-        if (maintainAspectRatio) {
-          const aspectRatio = getAspectRatio(currSz.width, currSz.height)
-          if (newHeight !== currSz.height) {
-            newWidth = newHeight * aspectRatio
-          } else {
-            newHeight = newWidth / aspectRatio
-          }
-        }
-        const myblock = node.dom as HTMLElement
-        myblock.style.width = `${newWidth}px`
-        myblock.style.height = `${newHeight}px`
-
-        setCurrSz({width: newWidth, height: newHeight})
-        setProp((props: any) => {
-          props.width = newWidth
-          props.height = newHeight
-        })
+        newHeight = Math.max(newHeight, 19) // min height of textblock is 1.2rem or 19.2px
+        setNewSize(newWidth, newHeight)
       }
     },
-    [currSz.height, currSz.width, maintainAspectRatio, node.dom, setProp]
+    [node.dom, currSz.width, currSz.height, setNewSize]
   )
 
   useEffect(() => {
@@ -118,15 +127,16 @@ const BlockResizer = ({mountPoint}: BlockResizeProps) => {
   useEffect(() => {
     if (
       !isDragging.current &&
-      'width' in node.data.props &&
-      (node.data.props.width !== currSz.width || node.data.props.height !== currSz.height)
+      Number.isFinite(nodeProps.width) &&
+      Number.isFinite(nodeProps.height) &&
+      (nodeProps.width !== currSz.width || nodeProps.height !== currSz.height)
     ) {
       setCurrSz({
-        width: node.data.props.width,
-        height: node.data.props.height,
+        width: nodeProps.width as number,
+        height: nodeProps.height as number,
       })
     }
-  }, [currSz.height, currSz.width, node.data.props.height, node.data.props.width, node.data.props])
+  }, [currSz.height, currSz.width, nodeProps.height, nodeProps.width, nodeProps])
 
   const handleResizeStart = useCallback(() => {
     isDragging.current = true
@@ -144,15 +154,12 @@ const BlockResizer = ({mountPoint}: BlockResizeProps) => {
 
   const handleResizeEnd = useCallback(() => {
     isDragging.current = false
-    setProp((props: any) => {
-      props.width = currSz.width
-      props.height = currSz.height
-    })
+    setNewSize(currSz.width, currSz.height)
     const myToolbar = mountPoint.querySelector('.block-editor-editor .block-toolbar') as HTMLElement
     if (myToolbar) {
       myToolbar.style.visibility = 'visible'
     }
-  }, [currSz.height, currSz.width, mountPoint, setProp])
+  }, [currSz.height, currSz.width, mountPoint, setNewSize])
 
   return (
     <Moveable

@@ -724,4 +724,28 @@ describe MediaObject do
       expect(media_object.attachments_by_media_id).to match_array([attachment, other_attachment])
     end
   end
+
+  context "validations" do
+    it "validates auto_caption_status" do
+      expect do
+        MediaObject.create!(
+          context: @course,
+          title: "uploaded_video.mp4",
+          media_id: "m-somejunkhere",
+          media_type: "video",
+          auto_caption_status: "non_existent_status"
+        )
+      end.to raise_error(ActiveRecord::RecordInvalid)
+
+      expect do
+        MediaObject.create!(
+          context: @course,
+          title: "uploaded_video.mp4",
+          media_id: "m-somejunkhere",
+          media_type: "video",
+          auto_caption_status: "failed_captions"
+        )
+      end.not_to raise_error
+    end
+  end
 end

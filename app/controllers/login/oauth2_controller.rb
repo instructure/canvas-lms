@@ -28,7 +28,7 @@ class Login::OAuth2Controller < Login::OAuthBaseController
     super
     nonce = session[:oauth2_nonce] = SecureRandom.hex(24)
     jwt = Canvas::Security.create_jwt({ aac_id: @aac.global_id, nonce:, host: request.host_with_port }, 10.minutes.from_now)
-    authorize_url = @aac.generate_authorize_url(oauth2_login_callback_url, jwt)
+    authorize_url = @aac.generate_authorize_url(oauth2_login_callback_url, jwt, nonce:)
 
     if @aac.debugging? && @aac.debug_set(:nonce, nonce, overwrite: false)
       @aac.debug_set(:debugging, t("Redirected to identity provider"))
@@ -56,6 +56,7 @@ class Login::OAuth2Controller < Login::OAuthBaseController
     return unless timeout_protection do
       begin
         token = @aac.get_token(params[:code], oauth2_login_callback_url, params)
+        token.options[:nonce] = jwt["nonce"]
       rescue => e
         @aac.debug_set(:get_token_response, e) if debugging
         raise

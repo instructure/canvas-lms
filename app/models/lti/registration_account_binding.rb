@@ -64,7 +64,11 @@ class Lti::RegistrationAccountBinding < ActiveRecord::Base
     return [] if registrations.empty?
 
     Shard.default.activate do
-      MultiCache.fetch(site_admin_all_cache_key(registrations.first)) do
+      list_cache_key = site_admin_list_cache_key(registrations)
+
+      MultiCache.fetch(list_cache_key) do
+        cache_pointers_for_clearing(registrations, list_cache_key)
+
         GuardRail.activate(:secondary) do
           where.not(workflow_state: :allow).where(account: Account.site_admin, registration: registrations)
         end
@@ -72,10 +76,17 @@ class Lti::RegistrationAccountBinding < ActiveRecord::Base
     end
   end
 
+  def self.cache_pointers_for_clearing(registrations, list_cache_key)
+    registrations.each { |r| MultiCache.fetch(pointer_to_list_key(r)) { list_cache_key } }
+  end
+
   def self.clear_site_admin_cache(registration)
     Shard.default.activate do
       MultiCache.delete(site_admin_cache_key(registration))
-      MultiCache.delete(site_admin_all_cache_key(registration))
+
+      list_key = MultiCache.fetch(pointer_to_list_key(registration), nil)
+      MultiCache.delete(list_key) if list_key
+      MultiCache.delete(pointer_to_list_key(registration))
     end
   end
 
@@ -83,8 +94,13 @@ class Lti::RegistrationAccountBinding < ActiveRecord::Base
     "accounts/site_admin/lti_registration_account_bindings/#{registration.global_id}"
   end
 
-  def self.site_admin_all_cache_key(registration)
-    "accounts/site_admin/lti_registration_account_bindings/all_registrations/#{registration.shard.id}"
+  def self.site_admin_list_cache_key(registrations)
+    ids_hash = Digest::SHA256.hexdigest(registrations.map(&:global_id).sort.join(","))
+    "accounts/site_admin/lti_registration_account_bindings/for_registrations:#{ids_hash}"
+  end
+
+  def self.pointer_to_list_key(registration)
+    "accounts/site_admin/lti_registration_account_bindings/for_registrations:#{registration.global_id}"
   end
 
   def clear_cache_if_site_admin

@@ -18,7 +18,7 @@
 
 import type {LtiPlacement} from '../../model/LtiPlacement'
 import {ZLtiRegistrationId} from '../../model/LtiRegistrationId'
-import {LtiScopes} from '../../model/LtiScope'
+import {LtiScopes} from '@canvas/lti/model/LtiScope'
 import {ZDeveloperKeyId} from '../../model/developer_key/DeveloperKeyId'
 import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
 import {ZLtiImsRegistrationId} from '../../model/lti_ims_registration/LtiImsRegistrationId'

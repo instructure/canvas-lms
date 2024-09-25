@@ -41,7 +41,7 @@
 class MediaTracksController < ApplicationController
   include Api::V1::MediaObject
   include Api::V1::MediaTrack
-  include FilesHelper
+  include AttachmentHelper
 
   before_action :load_media_object
   before_action :check_media_permissions, only: %i[index show]

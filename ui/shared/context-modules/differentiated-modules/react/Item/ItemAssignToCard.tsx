@@ -211,27 +211,33 @@ export default forwardRef(function ItemAssignToCard(
     return originalDueAt.getTime() !== newDueAt.getTime()
   }, [dueDate, original_due_at])
 
-  const dateValidatorInputArgs = useMemo(
-    () => ({
+  const dateValidatorInputArgs = useMemo(() => {
+    const section = selectedAssigneeIds.find(assignee => assignee.includes('section'))
+    const sectionId = section?.split('-')[1] ?? null
+    return {
       required_replies_due_at: requiredRepliesDueDate,
       reply_to_topic_due_at: replyToTopicDueDate,
       due_at: dueDate,
       unlock_at: availableFromDate,
       lock_at: availableToDate,
       student_ids: [],
-      course_section_id: '2',
+      course_section_id: sectionId,
       persisted: !dueAtHasChanged(),
       skip_grading_periods: dueDate === null,
-    }),
-    [
-      dueDate,
-      availableFromDate,
-      availableToDate,
-      requiredRepliesDueDate,
-      replyToTopicDueDate,
-      dueAtHasChanged,
-    ]
-  )
+    }
+  }, [
+    dueDate,
+    availableFromDate,
+    availableToDate,
+    requiredRepliesDueDate,
+    replyToTopicDueDate,
+    dueAtHasChanged,
+    selectedAssigneeIds,
+  ])
+
+  const validateTermForDueDate = (newErrors: any) => {
+    return validationErrors?.due_at !== undefined && validationErrors?.due_at !== newErrors?.due_at
+  }
 
   useEffect(() => {
     onValidityChange?.(
@@ -247,7 +253,9 @@ export default forwardRef(function ItemAssignToCard(
     const newErrors = dateValidator.validateDatetimes(dateValidatorInputArgs)
     const newBadDates = Object.keys(newErrors)
     const oldBadDates = Object.keys(validationErrors)
-    if (!arrayEquals(newBadDates, oldBadDates)) setValidationErrors(newErrors)
+    if (!arrayEquals(newBadDates, oldBadDates) || validateTermForDueDate(newErrors)) {
+      setValidationErrors(newErrors)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     dueDate,

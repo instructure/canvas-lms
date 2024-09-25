@@ -652,7 +652,7 @@ describe DeveloperKey do
       stub_const("CanvasRails::Application", TokenScopesHelper::SpecHelper::MockCanvasRails::Application)
 
       routes_from_plugins = Set.new
-      Dir[Rails.root.join("{gems,vendor}/plugins/*/config/*routes.rb")].each do |plugin_path|
+      Rails.root.glob("{gems,vendor}/plugins/*/config/*routes.rb") do |plugin_path|
         CanvasRails::Application.reset_routes
         load plugin_path
         plugin_route_set = Set.new(CanvasRails::Application.routes.routes.map do |route|

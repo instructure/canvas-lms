@@ -223,6 +223,7 @@ export interface EnvCommon {
   }>
   breadcrumbs?: {name: string; url: string | null}[]
   enhanced_rubrics_enabled?: boolean
+  enhanced_rubrics_copy_to?: boolean
 
   /**
    * Used by ui/features/top_navigation_tools/react/TopNavigationTools.tsx
@@ -250,7 +251,6 @@ export type SiteAdminFeatureId =
   | 'media_links_use_attachment_id'
   | 'multiselect_gradebook_filters'
   | 'permanent_page_links'
-  | 'platform_service_speedgrader'
   | 'render_both_to_do_lists'
   | 'instui_header'
   | 'lti_registrations_discover_page'

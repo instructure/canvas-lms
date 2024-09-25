@@ -26,8 +26,7 @@ class Checkpoints::AdhocOverrideCreatorService < Checkpoints::AdhocOverrideCommo
     override = build_override(assignment: @checkpoint, student_ids:)
     build_override_students(override:, student_ids:)
     override.save!
-
-    parent_override = existing_parent_override || build_override(assignment: @checkpoint.parent_assignment, student_ids:, shell_override: true)
+    parent_override = existing_parent_override(student_ids:) || build_override(assignment: @checkpoint.parent_assignment, student_ids:, shell_override: true)
     build_override_students(override: parent_override, student_ids:)
     parent_override.save! if parent_override.changed? || parent_override.changed_student_ids.any?
 

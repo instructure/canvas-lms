@@ -68,6 +68,8 @@ const UploadFileModal = React.forwardRef(
       modalBodyWidth,
       modalBodyHeight,
       requireA11yAttributes = true,
+      forBlockEditorUse = false,
+      uploading = false,
     },
     ref
   ) => {
@@ -129,6 +131,10 @@ const UploadFileModal = React.forwardRef(
         canvasOrigin,
       })
 
+    if (forBlockEditorUse && !['COMPUTER', 'URL'].includes(selectedPanel)) {
+      requireA11yAttributes = false
+    }
+
     return (
       <Modal
         data-mce-component={true}
@@ -140,7 +146,7 @@ const UploadFileModal = React.forwardRef(
         onDismiss={onDismiss}
         onSubmit={e => {
           e.preventDefault()
-          if (submitDisabled) {
+          if (submitDisabled || uploading) {
             return false
           }
           onSubmit(
@@ -288,6 +294,7 @@ const UploadFileModal = React.forwardRef(
                         handleIsDecorativeChange={handleIsDecorativeChange}
                         handleDisplayAsChange={handleDisplayAsChange}
                         hideDimensions={true}
+                        forBlockEditorUse={forBlockEditorUse}
                       />
                     </ToggleDetails>
                   </View>
@@ -298,8 +305,14 @@ const UploadFileModal = React.forwardRef(
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={onDismiss}>{formatMessage('Close')}</Button>&nbsp;
-          <Button color="primary" type="submit" disabled={submitDisabled}>
-            {formatMessage('Submit')}
+          <Button
+            color="primary"
+            type="submit"
+            disabled={submitDisabled || uploading}
+          >
+            {uploading
+              ? formatMessage('Submitting...')
+              : formatMessage('Submit')}
           </Button>
         </Modal.Footer>
       </Modal>
@@ -320,6 +333,8 @@ UploadFileModal.propTypes = {
   modalBodyWidth: number,
   modalBodyHeight: number,
   requireA11yAttributes: bool,
+  forBlockEditorUse: bool,
+  uploading: bool,
   preselectedFile: object, // JS File
 }
 

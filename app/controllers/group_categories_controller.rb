@@ -264,7 +264,10 @@ class GroupCategoriesController < ApplicationController
   # @returns Progress
   def import
     if authorized_action(@context, @current_user, [:manage_groups, :manage_groups_add])
-      return render(json: { "status" => "unauthorized" }, status: :unauthorized) if @group_category.protected?
+      # let teachers import into student created groups
+      if @group_category.protected? && !@group_category.student_organized?
+        return render(json: { "status" => "unauthorized" }, status: :unauthorized)
+      end
 
       file_obj = if params.key?(:attachment)
                    params[:attachment]

@@ -77,6 +77,9 @@ module CC::Importer::Canvas
           topic["assignment"] = parse_canvas_assignment_data(asmnt_node)
         end
         topic["anonymous_state"] = get_node_val(meta_doc, "anonymous_state")
+        if @is_discussion_checkpoints_enabled && (val = get_int_val(meta_doc, "reply_to_entry_required_count"))
+          topic["reply_to_entry_required_count"] = val
+        end
       end
 
       topic
