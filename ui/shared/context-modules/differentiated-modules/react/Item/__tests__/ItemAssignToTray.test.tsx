@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, fireEvent, render, waitFor} from '@testing-library/react'
+import {act, fireEvent, getAllByRole, render, waitFor} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import ItemAssignToTray, {type ItemAssignToTrayProps} from '../ItemAssignToTray'
@@ -29,6 +29,7 @@ import {
   ADHOC_WITHOUT_STUDENTS,
 } from '../../__tests__/mocks'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {getAllByText} from '@testing-library/dom'
 
 const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never, delay: null}
 
@@ -297,7 +298,7 @@ describe('ItemAssignToTray', () => {
     const {getByRole, findAllByTestId, getAllByTestId} = renderComponent()
     const cards = await findAllByTestId('item-assign-to-card')
     expect(cards).toHaveLength(1)
-    act(() => getByRole('button', {name: 'Add'}).click())
+    act(() => getAllByTestId('add-card')[1].click())
     expect(getAllByTestId('item-assign-to-card')).toHaveLength(2)
   })
 
@@ -363,16 +364,17 @@ describe('ItemAssignToTray', () => {
       fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
         blueprint_date_locks: ['availability_dates'],
       })
-      const {getByTestId, findAllByText} = renderComponent({itemContentId: '31'})
+      const {getAllByTestId, findAllByText} = renderComponent({itemContentId: '31'})
       await findAllByText('Locked:')
-      expect(getByTestId('add-card')).toBeDisabled()
+      expect(getAllByTestId('add-card')[0]).toBeDisabled()
+      expect(getAllByTestId('add-card')[1]).toBeDisabled()
     })
 
     it('disables add button if there are blueprint-locked dates and default cards', async () => {
       fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
         blueprint_date_locks: ['availability_dates'],
       })
-      const {getByTestId, findAllByText} = renderComponent({
+      const {getAllByTestId, findAllByText} = renderComponent({
         itemContentId: '31',
         defaultCards: [
           {
@@ -389,7 +391,9 @@ describe('ItemAssignToTray', () => {
         ],
       })
       await findAllByText('Locked:')
-      expect(getByTestId('add-card')).toBeDisabled()
+
+      expect(getAllByTestId('add-card')[0]).toBeDisabled()
+      expect(getAllByTestId('add-card')[1]).toBeDisabled()
     })
 
     it('shows blueprint locking info when ENV contains master_course_restrictions', async () => {
@@ -466,9 +470,9 @@ describe('ItemAssignToTray', () => {
 
   it('calls customAddCard if passed when a card is added', () => {
     const customAddCard = jest.fn()
-    const {getByRole} = renderComponent({onAddCard: customAddCard})
+    const {getAllByTestId} = renderComponent({onAddCard: customAddCard})
 
-    act(() => getByRole('button', {name: 'Add'}).click())
+    act(() => getAllByTestId('add-card')[1].click())
     expect(customAddCard).toHaveBeenCalled()
   })
 
@@ -787,18 +791,18 @@ describe('ItemAssignToTray', () => {
 
   it.skip('focuses on the add button when deleting a card', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
-    const {findAllByTestId, getByTestId} = renderComponent()
+    const {findAllByTestId, getAllByTestId} = renderComponent()
 
     const deleteButton = (await findAllByTestId('delete-card-button'))[0]
     await user.click(deleteButton)
 
-    const addButton = getByTestId('add-card')
+    const addButton = getAllByTestId('add-card')[1]
     await waitFor(() => expect(addButton).toHaveFocus())
   })
 
   it.skip("focuses on the newly-created card's delete button when adding a card", async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
-    const {findAllByTestId, getByTestId} = renderComponent()
+    const {findAllByTestId, getByTestId, getAllByTestId} = renderComponent()
 
     // wait for the cards to render
     const loadingSpinner = getByTestId('cards-loading')
@@ -806,7 +810,7 @@ describe('ItemAssignToTray', () => {
       expect(loadingSpinner).not.toBeInTheDocument()
     })
 
-    const addButton = getByTestId('add-card')
+    const addButton = getAllByTestId('add-card')[1]
     await user.click(addButton)
     const deleteButtons = await findAllByTestId('delete-card-button')
     await waitFor(() =>
@@ -925,14 +929,15 @@ describe('ItemAssignToTray', () => {
     })
 
     it('validates if required due dates are set before applying changes', async () => {
-      const {getByTestId, findAllByTestId, getByText, getAllByText} = renderComponent({
-        postToSIS: true,
-      })
+      const {getByTestId, getAllByTestId, findAllByTestId, getByText, getAllByText} =
+        renderComponent({
+          postToSIS: true,
+        })
       // wait until the cards are loaded
       const cards = await findAllByTestId('item-assign-to-card')
       expect(cards[0]).toBeInTheDocument()
 
-      const addCardBtn = getByTestId('add-card')
+      const addCardBtn = getAllByTestId('add-card')[1]
       act(() => addCardBtn.click())
 
       getByTestId('differentiated_modules_save_button').click()

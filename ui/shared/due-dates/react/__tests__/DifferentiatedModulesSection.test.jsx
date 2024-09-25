@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, act} from '@testing-library/react'
+import {render, act, getAllByTestId} from '@testing-library/react'
 import DifferentiatedModulesSection from '../DifferentiatedModulesSection'
 import AssignmentOverrideCollection from '@canvas/assignments/backbone/collections/AssignmentOverrideCollection'
 import fetchMock from 'fetch-mock'
@@ -267,7 +267,7 @@ describe('DifferentiatedModulesSection', () => {
     })
 
     it('validates if required due dates are set before applying changes', async () => {
-      const {getByTestId, queryByTestId, findAllByTestId, getByText, getAllByText} = setUp({
+      const {getAllByTestId, getByTestId, queryByTestId, findAllByTestId, getByText, getAllByText} = setUp({
         ...props,
         postToSIS: true,
       })
@@ -276,7 +276,7 @@ describe('DifferentiatedModulesSection', () => {
       // wait until the cards are loaded
       await findAllByTestId('item-assign-to-card')
 
-      const addCardBtn = getByTestId('add-card')
+      const addCardBtn = getAllByTestId('add-card')[1]
       act(() => addCardBtn.click())
 
       getByTestId('differentiated_modules_save_button').click()
