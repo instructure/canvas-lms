@@ -55,7 +55,7 @@ type Result = {
 }
 
 const QUERY = gql`
-  query SpeedGrader_AssignmentSubmissionsQuery($assignmentId: ID!) {
+  query SpeedGrader_AssignmentSubmissionsQuery($assignmentId: ID!, $cursor: String, $first: Int!) {
     assignment(id: $assignmentId) {
       submissionsConnection(
         filter: {
@@ -63,6 +63,8 @@ const QUERY = gql`
           applyGradebookEnrollmentFilters: true
           representativesOnly: true
         }
+        after: $cursor
+        first: $first
       ) {
         nodes {
           _id
@@ -92,6 +94,10 @@ const QUERY = gql`
             avatarUrl
           }
         }
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
       }
     }
   }
@@ -99,19 +105,24 @@ const QUERY = gql`
 
 export const ZGetAssignmentParams = z.object({
   assignmentId: z.string().min(1),
+  perPage: z.number().int().min(1),
 })
 
 type GetSubmissionsByAssignmentParams = z.infer<typeof ZGetAssignmentParams>
 
 export async function getAssignmentSubmissions<T extends GetSubmissionsByAssignmentParams>({
   queryKey,
+  pageParam,
 }: {
   queryKey: [string, T]
+  pageParam: string | null
 }) {
   ZGetAssignmentParams.parse(queryKey[1])
-  const {assignmentId} = queryKey[1]
+  const {assignmentId, perPage} = queryKey[1]
 
   return executeQuery<Result>(QUERY, {
+    cursor: pageParam,
+    first: perPage,
     assignmentId,
   })
 }
