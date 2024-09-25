@@ -111,10 +111,12 @@ module CanvasPartman
           if reflection.polymorphic?
             reflection.options[:polymorphic].map do |type|
               if type.is_a?(Hash)
-                type.values.map { |v| v.constantize rescue nil }
+                type.values.map(&:constantize)
               else
-                type.to_s.classify.constantize rescue nil
+                type.to_s.classify.constantize
               end
+            rescue NameError
+              nil
             end.flatten.compact
           else
             [reflection.klass]

@@ -43,7 +43,11 @@ require "twitter-text"
 module HtmlTextHelper
   def self.strip_tags(text)
     text ||= ""
-    text.gsub(%r{</?[^<>\n]*>?}, "").gsub(/&#\d+;/) { |m| m[2..].to_i.chr(text.encoding) rescue "" }.gsub(/&\w+;/, "")
+    text.gsub(%r{</?[^<>\n]*>?}, "").gsub(/&#\d+;/) do |m|
+      m[2..].to_i.chr(text.encoding)
+    rescue RangeError
+      ""
+    end.gsub(/&\w+;/, "")
   end
 
   def strip_tags(text)
