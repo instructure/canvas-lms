@@ -228,6 +228,8 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
   })
 
   const showWarningIfOutlier = useCallback(() => {
+    if (!lastSubmission) return
+
     const score = Number(lastSubmission.grade)
     const {points_possible: pointsPossible} = getAssignmentWithPropsFromCheckpoints(
       assignment,
