@@ -762,20 +762,20 @@ fa:
         no-abbreviation: "n"
         yes-abbreviation: "y"
       grade_change_logging_results: 
-        Anonymous: ناشناس
+        Anonymous: Anonymous
         Assignment: تکلیف
         Course: درس
         Grader: "نمره گذار"
         Student: دانشجو
         To: گیرنده
         date: تاریخ
-        from: فرستنده
+        from: از
         no_item_found: "موردی یافت نشد"
         time: زمان
       logging_content_pane: 
         authentication: "فعالیت ورود / خروج"
         course: "فعالیت درس"
-        grade_change: "فعالیت تغییر نمره "
+        grade_change: "فعالیت تغییر نمره"
         mutations: "جهش فعالیت GraphQL "
         select_default: "انتخاب نوع فایل ثبت"
         select_label: "نوع گزارش ثبت وقایع را برای جستجو انتخاب کنید."
@@ -3497,7 +3497,7 @@ fa:
       points_possible_screen_reader: "%{pointsPossible} امتیاز ممکن"
       settings: تنظیمات
     assignment_list_item_score: 
-      assignment_grading_type_is_not_graded: "به این تکلیف نمره ای تعلق نخواهد گرفت."
+      assignment_grading_type_is_not_graded: "به این تکلیف نمره ای تخصیص داده نخواهد شد."
       assignment_not_yet_graded_screenreader: "تکلیف هنوز نمره گذاری نشده است. %{pointsPossible} امتیاز ممکن."
       empty_points_possible: "-/%{pointsPossible} امتیاز"
       no_submission: "مورد ارسالی موجود نیست"
@@ -4782,7 +4782,7 @@ fa:
       my_appointment_groups: "گروه های قرار ملاقات من"
     calendar_navigator: 
       enter_navigation_date: "تاریخی که می خواهید به آن پیمایش کنید را وارد کنید."
-      next: بعدی
+      next: Next
       previous: قبلی
       today: امروز
     calendar_title: "تقویم:"
@@ -4851,8 +4851,8 @@ fa:
         create: "ایجاد رویداد"
         update: "بهنگام سازی رویداد"
       count: "تعداد:"
-      date: تاریخ
-      delete: حذف
+      date: Date
+      delete: Delete
       different_date_for_each_section: "استفاده از تاریخ های متفاوت برای هر بخش"
       edit_calendar_event_header: "ویرایش رویداد تقویم"
       end_time: "زمان پایان"
@@ -4888,7 +4888,7 @@ fa:
     event_details: 
       attendees: حاضرین
       calendar: تقویم
-      close: بستن
+      close: Close
       details: "اطلاعات بیشتر"
       links: 
         delete: حذف
@@ -4896,7 +4896,7 @@ fa:
         reserve: رزرو
         unreserve: "لغو رزرو"
       location: مکان
-      location_address: نشانی
+      location_address: "نشانی:"
       message_students: "ارسال پیام برای دانشجویان"
       slots_available: "بازه های زمانی موجود"
     event_event_title: "عنوان رویداد:"
@@ -5928,7 +5928,7 @@ fa:
       edit: ویرایش
       end_it_now: "پایان دادن"
       in_progress: "درحال انجام"
-      join: پیوستن
+      join: "ملحق شدن"
       recording: "1 مورد ضبط شده"
       recordings: "%{recordingCount} مورد ضبط شده"
       settings: تنظیمات
@@ -7657,7 +7657,7 @@ fa:
         edit_sections_desc: "بخش ها روش دیگری برای سازماندهی کاربران هستند. این روش شما امکان می دهد چند کلاس را از یک درس تدریس کنید، تا کل محتوای درس را یکجا داشته باشید. در قسمت زیر می توانید یک کاربر را به یک بخش دیگر منتقل کنید، یا ثبت نام های بخش را حذف یا اضافه کنید. کاربران همیشه باید حداقل در یک بخش باشند."
       index: 
         cannot_add_users: "کاربران جدید نمی توانند افزوده شوند، زیرا این درس خاتمه یافته است"
-        filter_field_description: "افراد را جستجو کنید. وقتی در این جای خالی تایپ می کنید، فهرست افراد به طور خودکار فقط برای شامل سازی افرادی که نام آنها با ورودی شما مطابقت دارند، فیلتر خواهد شد."
+        filter_field_description: "افراد را جستجو کنید. وقتی در این قسمت تایپ می کنید، فهرست افراد به طور خودکار فقط برای شامل سازی افرادی که نام آنها با ورودی شما مطابقت دارند، فیلتر خواهد شد."
         group_set: "مجموعه گروه"
         people: افراد
         role_to_search: "محدود کردن جستجو به نقش"
@@ -12092,9 +12092,9 @@ fa:
       group_category_detail: 
         add_group: "افزودن گروه"
         category_settings: تنظیمات
-        delete_category_option: حذف
+        delete_category_option: Delete
         edit_category_option: ویرایش
-        group: گروه
+        group: Group
         group_limit_blurb: "گروه ها به *%{group_limit}* عضو محدود شده اند."
         import: "وارد کردن"
         message_all_unassigned_option: "ارسال پیام برای همه دانشجویان تخصیص داده نشده"
@@ -12149,7 +12149,7 @@ fa:
       group_users: 
         add_student: "برای شروع به کار، یک دانشجو اضافه کنید."
         add_user: "برای شروع به کار، یک کاربر اضافه کنید."
-        greater_than_three: "لطفا یک عبارت جستجو با سه یا چند نویسه وارد کنید"
+        greater_than_three: "لطفا یک عبارت جستجو با سه نویسه یا بیشتر وارد نمایید"
         no_matching_students: "هیج دانشجویی مطابقت ندارد."
         no_matching_users: "هیج کاربری مطابقت ندارد."
         no_students: "در حال حاضر، هیچ دانشجویی در این گروه وجود ندارد."
@@ -15516,7 +15516,7 @@ fa:
         tweet: "هشدار کانواس - ارزیابی جدید: %{title}، %{context}."
     send_form: 
       labels: 
-        message_body: پیام
+        message_body: "ارسال پیام"
         send_button: ارسال
     submission_comment: 
       email: 
@@ -25536,7 +25536,7 @@ fa:
         assign_to: "اختصاص دادن به"
         edit: ویرایش
         view_all_pages: "مشاهده همه صفحه ها"
-      delete_wiki: حذف
+      delete_wiki: Delete
       labels: 
         front_page: "%{frontPageText}"
       menu: 
