@@ -117,6 +117,7 @@ export const LtiPlacements = {
   SubmissionTypeSelection: 'submission_type_selection',
   StudentContextCard: 'student_context_card',
   ToolConfiguration: 'tool_configuration',
+  TopNavigation: 'top_navigation',
   UserNavigation: 'user_navigation',
   WikiPageMenu: 'wiki_page_menu',
   WikiIndexMenu: 'wiki_index_menu',

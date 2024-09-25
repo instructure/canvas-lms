@@ -167,7 +167,11 @@ const IconOverrideInput = React.memo(
     let messages: FormMessage[] = []
     if (inputUrl && !isValidHttpUrl(inputUrl)) {
       messages = [{type: 'error', text: I18n.t('Invalid URL')}]
-    } else if (placement === LtiPlacements.EditorButton && !inputUrl && !defaultIconUrl) {
+    } else if (
+      [LtiPlacements.EditorButton, LtiPlacements.TopNavigation].includes(placement) &&
+      !inputUrl &&
+      !defaultIconUrl
+    ) {
       imageUrl = `${window.location.origin}/lti/tool_default_icon?name=${toolName}`
       if (developerKeyId) {
         imageUrl += `&id=${developerKeyId}`

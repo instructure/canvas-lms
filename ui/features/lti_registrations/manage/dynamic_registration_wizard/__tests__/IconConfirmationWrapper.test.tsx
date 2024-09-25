@@ -85,11 +85,9 @@ describe('IconConfirmation', () => {
     ).not.toBeInTheDocument()
   })
 
-  it("let's the user change the icon url", async () => {
-    const config = mockConfigWithPlacements([
-      LtiPlacements.GlobalNavigation,
-      LtiPlacements.FileIndexMenu,
-    ])
+  it('lets the user change the icon url', async () => {
+    const iconPlacement = LtiPlacementsWithIcons[0]
+    const config = mockConfigWithPlacements([iconPlacement])
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
@@ -105,7 +103,6 @@ describe('IconConfirmation', () => {
 
     const iconUrl = 'http://example.com/icon.png'
 
-    const iconPlacement = LtiPlacementsWithIcons[0]
     const input = screen.getByLabelText(new RegExp(i18nLtiPlacement(iconPlacement)), {
       selector: 'input',
     })
@@ -118,9 +115,10 @@ describe('IconConfirmation', () => {
     expect(input).toHaveValue(iconUrl)
   })
 
-  it('should render the default generated icon if no icon url is provided for the EditorButton placement', () => {
+  it('should render the default generated icon if no icon url is provided for the EditorButton, TopNavigation placements', () => {
+    const defaultIconPlacements = [LtiPlacements.EditorButton, LtiPlacements.TopNavigation]
     const config = mockConfigWithPlacements([
-      LtiPlacements.EditorButton,
+      ...defaultIconPlacements,
       LtiPlacements.GlobalNavigation,
     ])
     const reg = mockRegistration({}, config)
@@ -135,14 +133,19 @@ describe('IconConfirmation', () => {
       />
     )
 
-    const iconPlacement = LtiPlacements.EditorButton
-    const input = screen.getByLabelText(new RegExp(i18nLtiPlacement(iconPlacement)), {
-      selector: 'input',
-    })
+    for (const defaultIconPlacement of defaultIconPlacements) {
+      const input = screen.getByLabelText(new RegExp(i18nLtiPlacement(defaultIconPlacement)), {
+        selector: 'input',
+      })
 
-    expect(input).toHaveValue('')
-    expect(screen.getByAltText('Editor Button icon')).toBeInTheDocument()
-    expect(screen.getByText(/default icon resembling the one displayed/i)).toBeInTheDocument()
+      expect(input).toHaveValue('')
+      expect(
+        screen.getByAltText(`${i18nLtiPlacement(defaultIconPlacement)} icon`)
+      ).toBeInTheDocument()
+    }
+    expect(screen.getAllByText(/default icon resembling the one displayed/i)).toHaveLength(
+      defaultIconPlacements.length
+    )
   })
 
   it("should render the tool's provided default icon if no value is provided at the placement level", () => {
