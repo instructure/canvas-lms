@@ -761,7 +761,7 @@ hu:
         no_item_found: "Nincs találat"
         time: Idő
       comm_message_item: 
-        created_at: "Létrehozva ekkor: "
+        created_at: "Létrehozva ekkor"
         from_name: Feladó
         reply_to: Címzett
         sent_at: "Küldés időpontja: "
@@ -840,8 +840,8 @@ hu:
         time: Idő
       logging_content_pane: 
         authentication: "Be/kijelentkezési tevékenységek "
-        course: Kurzustevékenységek
-        grade_change: "Értékelésváltoztatási tevékenység"
+        course: Kurzustevékenység
+        grade_change: "Osztályzatváltoztatási tevékenység"
         mutations: "GraphQL mutciós tevékenység"
         select_default: "Naplótípus kiválasztása"
       page_title: "Admineszközök a következő fiókhoz: %{account}"
@@ -3045,6 +3045,8 @@ hu:
       current: "Aktuális kurzusok"
     department: 
       analytics: Analitika
+    deprecated: 
+      analytics: Analitika
     filters: 
       completed: "Befejezett kurzusok"
       current: "Aktuális kurzusok"
@@ -3692,7 +3694,7 @@ hu:
       assignment_not_yet_graded_rqd_screenreader: "Még nem osztályozott feladat."
       assignment_not_yet_graded_screenreader: "A feladat még nincs értékelve. %{pointsPossible} az elérhető pontszám."
       empty_points_possible: "-/%{pointsPossible} pont"
-      no_submission: "Nincs beadandó"
+      no_submission: "Nincs beadott munka"
       no_submission_for_assignment_rqd_screenreader: "Erre a feladatra nincs beadandó."
       no_submission_for_assignment_screenreader: "Ehhez a feladathoz nincs beadandó feladat. %{pointsPossible} az elérhető pontszám."
       not_yet_graded: "*Még nincs értékelve*"
@@ -3715,7 +3717,7 @@ hu:
     create_assignment: 
       assignment: Feladat
       assignment_due_at: "Határidő: "
-      assignment_name: "Név: "
+      assignment_name: "Név:"
       assignment_points: "Pontszám: "
       assignment_type: "Típus: "
       buttons: 
@@ -3780,7 +3782,7 @@ hu:
       description: Leírás
       freeze_properties: "Feladat tulajdonságainak zárolása másoláskor"
       notify_content_change: "Felhasználók értesítése arról, hogy a tartalom módosult"
-      points_possible: Pont
+      points_possible: Pontok
       submission_attempts: "Beküldési kísérletek"
     errors: 
       delete_reminder_failed: "A törlés sikertelen"
@@ -3790,12 +3792,12 @@ hu:
     external_content_homework_file_submission_view: 
       additional_comments: "További megjegyzések"
       buttons: 
-        submit_assignment: "Feladat beadása"
+        submit_assignment: "Feladat leadása"
       group_assignment_header: Megjegyzések...
     external_content_homework_url_submission_view: 
       additional_comments: "További megjegyzések"
       buttons: 
-        submit_assignment: "Feladat beadása"
+        submit_assignment: "Feladat leadása"
       group_assignment_header: Megjegyzések...
     file_retrieval_error: "A fájl lekérése sikertelen"
     getting_file: "Fájl lekérése..."
@@ -4051,7 +4053,7 @@ hu:
       submission_types: 
         external_tool: "Külső eszköz"
         no_submission: "Nincs beadott munka"
-        on_paper: "Papíron "
+        on_paper: Papíron
         online: Online
     submit_assignment: 
       additional_comments: "További megjegyzések"
@@ -4165,7 +4167,7 @@ hu:
         originality_report_never: Soha
         originality_report_visibility: "A hallgatók láthatják az eredetiségről szóló jelentést"
         originality_report_visible_after_due_date: "Határidő után"
-        originality_report_visible_after_grading: "A feladat értékelése után"
+        originality_report_visible_after_grading: "Miután a feladat értékelve lett"
         originality_report_visible_immediately: Azonnal
         settings_exclude_fewer_than_count: "Kevesebb mint %{wordsInput} szó"
         settings_exclude_less_than_percent: "Kevesebb mint a dokumentum %{percentInput} százaléka"
@@ -4903,7 +4905,7 @@ hu:
       titles: 
         warning: Figyelmeztetés
     edit_appointment_group: 
-      affect_reservations: "Hogy fogja ez befolyásolni a foglalásokat?"
+      affect_reservations: "Ez hogyan fogja befolyásolni a foglalásokat?"
       appt_group_options_help1: "Néhány meglévő foglalás már az Ön által megadott korláton felül van. Ez a változtatás csak új foglalások létrehozását fogja megakadályozni, a meglévő foglalásokra nem lesz hatással."
       appt_group_options_help2: "Ön viszont bármely meglévő foglalást el tud távolítani manuálisan."
       calendar: Naptár
@@ -4911,7 +4913,7 @@ hu:
       details: "Részletek:"
       group_category: Csoporthalmaz
       group_signup: "A hallgatók regisztrálása csoportokba."
-      location: Helyszín
+      location: "Helyszín:"
       name: Név
       time_range: Időtartomány
     edit_appt_calendar_event: 
@@ -4963,7 +4965,7 @@ hu:
         event: Esemény
         todo: "Saját teendőim"
     edit_planner_note: 
-      calendar: Naptár
+      calendar: "Naptár:"
       date: "Dátum:"
       time: "Idő:"
       title: "Cím:"
@@ -4980,15 +4982,15 @@ hu:
     event_details: 
       attendees: Résztvevők
       calendar: Naptár
-      close: Bezárás
+      close: Bezár
       details: Részletek
       links: 
         delete: Törlés
         edit: Szerkesztés
         reserve: Foglalás
         unreserve: "Foglalás törlése"
-      location: Helyszín
-      location_address: Cím
+      location: "Helyszín:"
+      location_address: "Cím:"
       message_students: "Üzenet a hallgatóknak"
       slots_available: "Szabad helyek"
     event_on_this_day: "Ma van egy esemény"
@@ -6404,7 +6406,7 @@ hu:
         move_to_select_title: "Mozgatás a hét napjára"
         remove_day_substitution_link: "Nap helyettesítés eltávolítása"
         remove_day_substitution_link_label: "Nap helyettesítés eltávolítása"
-        to_happen_on: "-"
+        to_happen_on: " - "
       external_tool_launch: 
         course: Kurzus
         find_a_course: "Kurzus keresése"
@@ -7829,7 +7831,7 @@ hu:
         accepted_invitation: "%{name} már megkapta és elfogadta a kurzusmeghívót, de ha szükséges, ismét kiküldheti a meghívót."
         admin_invitation_unaccepted: "%{name} még nem fogadta el a a kurzusmeghívót. A meghívó ekkor lett kiküldve: %{time}"
         invitations_pending_publish: "A meghívók nem lesznek addig kiküldve, amíg a kurzus nincs *publikálva*"
-        student_invitation_unaccepted_available: "%{name} még nem fogadta el a meghívót, hogy csatlakozzon a kurzushoz. A meghívó ekkor lett elküldve: %{time}"
+        student_invitation_unaccepted_available: "%{name} még nem fogadta el a a kurzusmeghívót. A meghívó ekkor lett kiküldve: %{time}"
         student_invitation_unaccepted_unavailable: "%{name} hozzá lett adva a kurzushoz ekkor: %{time}"
       link_to_students_view: 
         link_student_desc: "Amikor egy megfigyelő van társítva a hallgatóhoz, akkor hozzáfér a hallgató értékeléseihez és a kurzusinterakcióihoz."
@@ -7848,7 +7850,7 @@ hu:
         : "Ez a felhasználó még nem fogadta el a kurzusmeghívót"
         links: 
           edit_sections: "Szekciók szerkesztése"
-          link_to_students: "Hivatkozás a hallgatókra"
+          link_to_students: "Hivatkozás hallgatókra"
           remove_from_course: "Eltávolítás a kurzusból"
           resend_invitation: "Meghívó újraküldése"
           user_details: "Felhasználói adatok"
@@ -7860,11 +7862,11 @@ hu:
         last_activity: "Utolsó tevékenység"
         login_name: "Belépési azonosító"
         name: Név
-        no_people_found: "Nem található ilyen személy"
+        no_people_found: "Nem található ilyen résztvevő"
         role: Szerep
-        section: Szekció
+        section: "Szekció:"
         total_activity: "Összes tevékenység"
-        you_can_search_by: "Kereshet ezek alapján:"
+        you_can_search_by: "Ezek alapján kereshet:"
       section: 
         remove_user_from_course_section: "Felhasználó eltávolítása innen: %{name}"
     section: 
@@ -9284,7 +9286,7 @@ hu:
     entry_content: 
       delete: Törlés
       edit: Szerkesztés
-      edited_comment: "*%{editor.display_name}* szerkesztette ekkor: %{edited_at}"
+      edited_comment: "Szerkesztette: *%{editor.display_name}*, %{edited_at}"
       go_to_parent: "Ugrás a szülőre"
       go_to_topic: "Ugrás a témára"
       like_entry: "Bejegyzés lájkolása"
@@ -9305,7 +9307,7 @@ hu:
     mark_as_unread: "Megjelölés olvasatlanként"
     no_content: "Nincs tartalom"
     no_results: 
-      make_sure_all_search_terms_are_spelled_correctly: "Győződjön meg róla, hogy minden keresőszó helyesen van leírva"
+      make_sure_all_search_terms_are_spelled_correctly: "Győződjön meg róla, hogy minden keresőszó helyesen van leírva. "
       suggestions: "Javaslatok:"
       try_different_more_general_or_fewer_keywords: "Próbálja más, általánosabb vagy kevesebb kulcsszóval."
       try_disabling_the_unread_filter: "Próbálja meg kikapcsolni az \"Olvasatlan\" szűrőt."
@@ -12016,10 +12018,10 @@ hu:
         auto_random_group_leader: "Csoportvezető véletlenszerű kiválasztása"
         leadership: Vezetőség
       group_categories: 
-        account_group_explanation: "A fiókszintű hallgatói csoportok hasznosak a hallgatók csoportosítására, konkrét kurzushoz való társítás nélkül. Minden hallgatói csoporthoz saját naptár, fórum és együttműködési eszközök tartoznak, így hatékonyabban tudják megszervezni a közös munkát."
+        account_group_explanation: "A fiókszintű hallgatócsoportok hasznosak akkor, amikor a hallgatókat szeretnénk csoportosítani, konkrét kurzushoz való társítás nélkül. Minden hallgatócsoporthoz saját naptár, fórum és együttműködési eszközök tartoznak, így hatékonyabban tudják megszervezni a közös munkát."
         add_group_set: "Csoporthalmaz hozzáadása"
         course_group_explanation: "A hallgatói csoportok kialakítása hasznos módja annak, hogy projektekben működjenek együtt a hallgatók. Minden hallgatói csoport rendelkezik saját naptárral, fórummal és együttműködési eszközökkel, így hatékonyabban tudják megszervezni a közös munkát."
-        group_assignment_instructions: "A hallgatókat be tudja osztani véletlenszerűen csoportokba, vagy kézzel létrehozhatja és rendszerezheti a csoportokat. Amint létrejöttek a csoportok, beállíthatja a feladatokat úgy, hogy \"csoportos beadandó\" feladatok legyenek, ami azt jelenti, hogy minden egyes csoportnak egy beküldött megoldása lesz, mely a csoportbeli tagok közös megoldása."
+        group_assignment_instructions: "Be tudja osztani a hallgatókat véletlenszerűen csoportokba, vagy kézzel létrehozhatja és rendszerezheti a csoportokat. Amint létrejöttek a csoportok, beállíthatja a feladatokat úgy, hogy azok \"csoportos beküldésű\" feladatok legyenek, ami azt jelenti, hogy minden egyes csoportnak egy beküldött megoldása lesz, mely a csoporttagok közös megoldása."
         group_set: Csoporthalmaz
         headings: 
           account_groups: "Fiókszintű hallgatói csoportok"
@@ -12059,9 +12061,9 @@ hu:
         import: Importálás
         message_all_unassigned_option: "Üzenet küldése minden besorolatlan hallgatónak"
         randomly_assign_students_option: "Hallgatók véletlenszerű beosztása"
-        restricted_self_signup_blurb: "Egy csoportban minden hallgatónak ugyanabban a szekcióban kell lennie."
+        restricted_self_signup_blurb: "A csoport minden hallgatójának ugyanabban a szekcióban kell lennie."
         self_organized_warning: "Ezeket a csoportokat a hallgatók szervezik. Ellentétben a más típusú csoportokkal, a hallgatók egyszerre több ilyen csoport tagjai is lehetnek, ezért ezek a csoportok nem használhatóak feladatok értékeléséhez."
-        self_signup_blurb: "Önálló feliratkozás nem engedélyezett ezekhez a csoportokhoz."
+        self_signup_blurb: "Önálló feliratkozás engedélyezett ezekhez a csoportokhoz."
         settings: Beállítások
         uncategorized_groups: "Ezek a csoportok nincsenek társítva egy csoporthalmazhoz sem. Mivel a SIS-ből lettek importálva, csak a SIS-en keresztül frissíthetőek vagy törölhetőek"
       group_category_edit: 
@@ -12070,7 +12072,7 @@ hu:
         group_limit_override: "Ennek megváltoztatása felülbírál minden egyénileg beállított csoportkorlátot"
         group_set_name: "Csoporthalmaz neve"
         leave_group_limit_blank: "hagyja üresen, ha nincs korlátozás"
-        limit_group_size: "Csoporttagok számának korlátozása %{group_limit} főre"
+        limit_group_size: "Csoporttagok számának korlátozása %{group_limit} főre."
         require_same_section: "A csoporttagoknak azonos szekcióban kell lenniük"
         save: Mentés
         saving: Mentés...
@@ -16437,7 +16439,7 @@ hu:
   move_this_section_890bee38: "Szekció áthelyezése"
   move_to_1c208ae5: Mozgatás...
   move_to_25d7ef11: "Áthelyezés ide"
-  move_to_9b91c6e0: "Áthelyezés ide:"
+  move_to_9b91c6e0: Mozgatás...
   move_to_b7dddc4f: "Áthelyezés ide:"
   move_to_bottom_d0f71bf0: Legalulra
   move_to_dde1a5e1: "Áthelyezés ide..."
@@ -17697,7 +17699,7 @@ hu:
       edit_criterion_rating_title: "„%{description}” kritériumértékelés szerkesztése"
       insert_criterion_rating: "Kritériumértékelés beszúrása"
       insert_rating: Beszúrás
-      points: Pont
+      points: Pontok
       pts: pont
       rating_description: "Kritériumértékelés leírása"
     criterion_header: 
@@ -27056,7 +27058,7 @@ hu:
         front_page: Kezdőlap
       menu: 
         use_front_page: "Használja így: %{frontPageText}"
-      published_indicator: Publikálva
+      published_indicator: Publikált
       toolbar_menu: 
         settings: Beállítások
       unpublished_indicator: "Nem publikált"
@@ -27081,7 +27083,7 @@ hu:
       editing_roles: 
         anyone: Bárki
         only_members: "Csak tagoknak"
-      notify_users_text: "A felhasználók értesítése a tartalom módosulásáról"
+      notify_users_text: "Felhasználók értesítése arról, hogy a tartalom módosult"
       options_label: Beállítások
       title_label: "Oldal címe"
     wiki_page_index: 
