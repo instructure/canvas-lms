@@ -1355,6 +1355,18 @@ describe PlannerController do
           expect(items).not_to include ["sub_assignment", @reply_to_topic.id]
           expect(items).not_to include ["sub_assignment", @reply_to_entry.id]
         end
+
+        it "returns sub_assignments with the 'new_activity' param" do
+          @reply_to_topic.submit_homework @student, body: "Test reply to topic for student"
+
+          get :index, params: { filter: "new_activity" }
+          res = json_parse(response.body)[0]
+
+          expect(res["plannable_id"]).to eq @reply_to_topic.id
+          expect(res["plannable"]["read_state"]).to eq "unread"
+          expect(res["plannable_type"]).to eq "sub_assignment"
+          expect(res["new_activity"]).to be true
+        end
       end
     end
   end

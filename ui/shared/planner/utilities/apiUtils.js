@@ -46,7 +46,11 @@ const getItemDetailsFromPlannable = apiResponse => {
   details.originallyCompleted = details.completed
   details.feedback = apiResponse.submissions ? apiResponse.submissions.feedback : undefined
 
-  if (plannable_type === 'discussion_topic' || plannable_type === 'announcement') {
+  if (
+    plannable_type === 'discussion_topic' ||
+    plannable_type === 'announcement' ||
+    plannable_type === 'sub_assignment'
+  ) {
     details.unread_count = plannable.unread_count
   }
 
