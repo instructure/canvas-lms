@@ -89,7 +89,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def has_no_group_weight?
-    !(assignment.group_weight rescue false)
+    !assignment.try(:group_weight)
   end
 
   def has_no_score_display?
