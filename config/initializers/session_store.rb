@@ -25,9 +25,16 @@ require_dependency "setting"
 # If you change this key, all old sessions will become invalid!
 # Make sure the secret is at least 30 characters and all random,
 # no regular words or you'll be exposed to dictionary attacks.
+begin
+  secret = Setting.get("session_secret_key", SecureRandom.hex(64), set_if_nx: true)
+rescue
+  # The database may not exist yet
+  secret = SecureRandom.hex(64)
+end
+
 config = {
   key: "_normandy_session",
-  secret: (Setting.get("session_secret_key", SecureRandom.hex(64), set_if_nx: true) rescue SecureRandom.hex(64)),
+  secret:,
   legacy_key: "_legacy_normandy_session",
   same_site: :none
 }.merge((ConfigFile.load("session_store").dup || {}).symbolize_keys)

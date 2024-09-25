@@ -83,7 +83,7 @@ class ActiveRecord::Base
   end
 
   def feed_code
-    id = uuid rescue self.id
+    id = try(:uuid) || self.id
     "#{self.class.reflection_type_name}_#{id}"
   end
 
@@ -224,7 +224,7 @@ class ActiveRecord::Base
     if respond_to?(:context)
       code = respond_to?(:context_code) ? context_code : context.asset_string
       @cached_context_name ||= Rails.cache.fetch(["short_name_lookup", code].cache_key) do
-        context.short_name rescue ""
+        context.short_name
       end
     else
       raise "Can only call cached_context_short_name on items with a context"
