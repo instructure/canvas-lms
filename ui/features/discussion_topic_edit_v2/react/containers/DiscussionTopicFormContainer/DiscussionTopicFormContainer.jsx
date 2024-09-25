@@ -296,11 +296,7 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
 
   return (
     <>
-      <TopNavPortalWithDefaults
-        getBreadCrumbSetter={handleBreadCrumbSetter}
-        useStudentView={true}
-        useTutorial={true}
-      />
+      <TopNavPortalWithDefaults getBreadCrumbSetter={handleBreadCrumbSetter} useTutorial={true} />
       <Flex direction="column">
         <Flex.Item>{renderHeading()}</Flex.Item>
         {renderForm()}

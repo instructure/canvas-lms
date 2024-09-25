@@ -36,11 +36,18 @@ interface WithProps extends ITopNavProps {
   currentPageName?: string
   useTutorial?: boolean
   useStudentView?: boolean
+  courseId?: number
 }
+
+const isStudent = () => {
+  // @ts-ignore
+  return window.ENV.current_user_roles?.includes('student') && !window.ENV.PERMISSIONS?.manage
+}
+
 const handleStudentViewClick = (studentViewUrl: string) => {
   axios
     .post(studentViewUrl)
-    .then(response => {
+    .then(() => {
       window.location.reload()
     })
     .catch(error => {
@@ -58,13 +65,13 @@ const handleBreadCrumbSetter = (
   setCrumbs([...existingCrumbs, {name: pageName, url: ''}])
 }
 
-const addStudentViewActionItem = () => {
+const addStudentViewActionItem = (courseId?: number) => {
   // @ts-ignore
-  const curseId: string = window.ENV.COURSE_ID
-  if (!curseId) {
+  const cId: number = courseId || window.ENV?.course?.id || window.ENV?.COURSE_ID
+  if (!cId) {
     return null
   }
-  const studentViewUrl = STUDENT_VIEW_URL_TEMPLATE.replace('{courseId}', curseId)
+  const studentViewUrl = STUDENT_VIEW_URL_TEMPLATE.replace('{courseId}', String(cId))
   return (
     <TopNavBar.Item
       id="student-view"
@@ -93,9 +100,13 @@ const addTutorialActionItem = () => {
   )
 }
 
-const createDefaultActionItems = (useStudentView: boolean, useTutorial: boolean) => {
+const createDefaultActionItems = (
+  useStudentView: boolean,
+  useTutorial: boolean,
+  courseId?: number
+) => {
   return [
-    useStudentView ? addStudentViewActionItem() : null,
+    useStudentView && !isStudent() ? addStudentViewActionItem(courseId) : null,
     useTutorial ? addTutorialActionItem() : null,
   ].filter((item): item is ItemChild => item !== null)
 }
@@ -107,10 +118,11 @@ const withDefaults = (Component: React.FC<ITopNavProps>) => {
     getBreadCrumbSetter,
     useTutorial = false,
     useStudentView = false,
+    courseId = undefined,
     ...props
   }: WithProps) => {
     const combinedActionItems = [
-      ...createDefaultActionItems(useStudentView, useTutorial),
+      ...createDefaultActionItems(useStudentView, useTutorial, courseId),
       ...actionItems,
     ]
     return (
@@ -131,7 +143,7 @@ const TopNavPortalWithDefaults = withDefaults(TopNavPortal)
 export const initializeTopNavPortalWithDefaults = (props?: WithProps): void => {
   const mountPoint = getMountPoint()
   if (mountPoint) {
-    ReactDOM.createPortal(<TopNavPortalWithDefaults {...props} />, mountPoint)
+    ReactDOM.render(<TopNavPortalWithDefaults {...props} />, mountPoint)
   }
 }
 export default TopNavPortalWithDefaults

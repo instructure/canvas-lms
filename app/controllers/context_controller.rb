@@ -65,6 +65,7 @@ class ContextController < ApplicationController
   def roster
     return unless authorized_action(@context, @current_user, :read_roster)
 
+    page_has_instui_topnav
     log_asset_access(["roster", @context], "roster", "other")
 
     case @context
@@ -158,6 +159,7 @@ class ContextController < ApplicationController
   end
 
   def prior_users
+    page_has_instui_topnav
     manage_admins = if @context.root_account.feature_enabled?(:granular_permissions_manage_users)
                       :allow_course_admin_actions
                     else
@@ -180,6 +182,7 @@ class ContextController < ApplicationController
 
   def roster_user_services
     if authorized_action(@context, @current_user, :read_roster)
+      page_has_instui_topnav
       @users = @context.users.where(show_user_services: true).order_by_sortable_name
       @users_hash = {}
       @users_order_hash = {}

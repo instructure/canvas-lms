@@ -26,6 +26,7 @@ import ReactDOM from 'react-dom'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconSearchLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 
 const I18n = useI18nScope('RosterView')
 
@@ -55,6 +56,16 @@ export default class RosterView extends Backbone.View {
       '#addUsers': '$addUsersButton',
       '#createUsersModalHolder': '$createUsersModalHolder',
     }
+    const handleBreadCrumbSetter = ({getCrumbs, setCrumbs}) => {
+      const crumbs = getCrumbs()
+      crumbs.push({name: I18n.t('People'), url: ''})
+      setCrumbs(crumbs)
+    }
+    initializeTopNavPortalWithDefaults({
+      getBreadCrumbSetter: handleBreadCrumbSetter,
+      useTutorial: true,
+      useStudentView: true,
+    })
   }
 
   afterRender() {
