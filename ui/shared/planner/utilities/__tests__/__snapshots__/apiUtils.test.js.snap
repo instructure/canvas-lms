@@ -74,11 +74,14 @@ exports[`transformApiToInternalItem dicusssion checkpoint extracts and transform
   "overrideAssignId": undefined,
   "overrideId": null,
   "points": 10,
-  "status": false,
+  "status": {
+    "unread_count": 2,
+  },
   "title": "How to be a good friend Reply to Topic",
   "toggleAPIPending": false,
   "type": "Discussion Checkpoint",
   "uniqueId": "sub_assignment-15",
+  "unread_count": 2,
 }
 `;
 

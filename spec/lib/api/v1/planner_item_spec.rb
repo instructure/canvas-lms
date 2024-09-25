@@ -611,6 +611,13 @@ describe Api::V1::PlannerItem do
         json = api.planner_item_json(@reply_to_entry.reload, @student, session)
         expect(json[:new_activity]).to be true
       end
+
+      it "includes unread_count property from discussion topics" do
+        @reply_to_topic.submit_homework @student, body: "checkpoint submission for #{@student.name}"
+        json = api.planner_item_json(@reply_to_topic, @student, session)
+        expect(json[:plannable][:unread_count]).to eq 0
+        expect(json[:plannable][:read_state]).to eq "unread"
+      end
     end
   end
 

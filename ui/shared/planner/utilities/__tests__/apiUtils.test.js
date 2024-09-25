@@ -165,6 +165,7 @@ function makeDiscussionCheckpoint(overrides = {}) {
     created_at: '2024-09-08T14:36:03Z',
     updated_at: '2017-08-08T16:20:35Z',
     title: 'How to be a good friend',
+    unread_count: 2,
     ...overrides,
   }
 }
@@ -321,6 +322,12 @@ describe('transformApiToInternalItem', () => {
       })
       const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
       expect(result.title).toEqual('How to be a good friend Required Replies (3)')
+    })
+
+    it('moves unread_count property to status internal property', () => {
+      const apiResponse = makeDiscussionCheckpointApiResponse()
+      const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
+      expect(result.status).toHaveProperty('unread_count')
     })
   })
 

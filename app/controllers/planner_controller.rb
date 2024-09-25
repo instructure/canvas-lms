@@ -215,6 +215,7 @@ class PlannerController < ApplicationController
   def unread_items
     collections = [unread_discussion_topic_collection,
                    unread_assignment_collection]
+    collections << unread_sub_assignment_collection if @domain_root_account.feature_enabled?(:discussion_checkpoints)
 
     BookmarkedCollection.merge(*collections)
   end
@@ -300,9 +301,27 @@ class PlannerController < ApplicationController
                         .where(content_participations: { user_id: @user, workflow_state: "unread" }).union(
                           assign_scope.where(id: disc_assign_ids)
                         ).due_between_for_user(start_date, end_date, @user)
+
     item_collection("unread_assignment_submissions",
                     scope,
                     Assignment,
+                    %i[user_due_date due_at created_at],
+                    :id)
+  end
+
+  def unread_sub_assignment_collection
+    assign_scope = SubAssignment.active.where(context_type: "Course", context_id: @local_course_ids)
+    disc_sub_assign_ids = DiscussionTopic.active.published.where(context_type: "Course", context_id: @local_course_ids)
+                                         .where.not(assignment_id: nil).unread_for(@user).select(:assignment_id)
+    scope = assign_scope.where("assignments.muted IS NULL OR NOT assignments.muted")
+                        .joins(submissions: :content_participations)
+                        .where(content_participations: { user_id: @user, workflow_state: "unread" }).union(
+                          assign_scope.where(parent_assignment_id: disc_sub_assign_ids)
+                        ).due_between_for_user(start_date, end_date, @user)
+
+    item_collection("unread_sub_assignment_submissions",
+                    scope,
+                    SubAssignment,
                     %i[user_due_date due_at created_at],
                     :id)
   end

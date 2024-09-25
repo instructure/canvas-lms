@@ -114,12 +114,15 @@ module Api::V1::PlannerItem
           assessment_request: item
         ).submission_data_url
       elsif item.is_a?(SubAssignment)
+        topic = item.parent_assignment&.discussion_topic
+        unread_count, read_state = topics_status_for(user, topic.id, opts[:topics_status])[topic.id]
+        unread_attributes = { unread_count:, read_state: }
         hash[:details] = {
           reply_to_entry_required_count: item.parent_assignment&.discussion_topic&.reply_to_entry_required_count || 1
         }
         hash[:plannable_type] = PlannerHelper::PLANNABLE_TYPES.key(item.class_name)
         hash[:plannable_date] = item[:user_due_date] || item.due_at
-        hash[:plannable] = plannable_json(item.attributes, extra_fields: SUB_ASSIGNMENT_FIELDS + GRADABLE_FIELDS)
+        hash[:plannable] = plannable_json(item.attributes.merge(unread_attributes), extra_fields: SUB_ASSIGNMENT_FIELDS + GRADABLE_FIELDS)
         hash[:html_url] = assignment_html_url(item.parent_assignment, user, hash[:submissions])
       else
         hash[:plannable_date] = item[:user_due_date] || item.due_at
@@ -273,8 +276,10 @@ module Api::V1::PlannerItem
       return topic.unread?(user) || topic.unread_count(user) > 0 if topic
     end
     if item.is_a?(SubAssignment)
+      topic = item.parent_assignment&.discussion_topic
+      unread_count, read_state = opts.dig(:topics_status, topic.id)
       ss = opts[:submission_statuses] || submission_statuses(item, user)
-      return true if ss.dig(item.id, :new_activity)
+      return true if ss.dig(item.id, :new_activity) || (unread_count && read_state && (read_state == "unread" || unread_count > 0)) || (topic && (topic.unread?(user) || topic.unread_count(user) > 0))
     end
     false
   end
