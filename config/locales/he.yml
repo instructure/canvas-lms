@@ -608,7 +608,7 @@ he:
         time: זמן
       comm_message_item: 
         created_at: "נוצר במועד:"
-        from_name: מ-
+        from_name: מאת
         reply_to: "מענה ל-"
         sent_at: "נשלח אל"
         to: עבור
@@ -624,7 +624,7 @@ he:
         find: מצא
       course_logging_details: 
         Field: שדה
-        From: מ-
+        From: מאת
         To: עבור
         Value: ערך
         blank_placeholder: "-"
@@ -648,7 +648,7 @@ he:
         event_source: מקור
         event_type: סוג
         no_item_found: "לא נמצאו פריטים"
-        time: זמן
+        time: "זמן "
         user: משתמש
       course_search_form: 
         course_id: "מזהה קורס"
@@ -698,13 +698,13 @@ he:
         Student: תלמיד
         To: עבור
         date: תאריך
-        from: מ-
+        from: מאת
         no_item_found: "לא נמצאו פריטים"
-        time: זמן
+        time: "זמן "
       logging_content_pane: 
         authentication: "פעילות כניסת / יציאת משתמש"
         course: "פעילות הקורס"
-        grade_change: "מתן ציון לפעילות ששונתה"
+        grade_change: "פעילות שינוי הערכות"
         select_default: "בחירת סוג הלוג"
         select_label: "בחירת סוג הלוג לחיפוש"
       page_title: "כלי מנהל מערכת עבור %{account}"
@@ -2735,7 +2735,7 @@ he:
       external_tool_type: "כלי חיצוני"
       more: "אפשרויות נוספות"
       multiple_due_dates: "תאריכי יעד מרובים"
-      not_graded_type: "ללא ציון"
+      not_graded_type: "לא מוערך"
       quiz_type: בוחן
       save: שמירה
       saving: שומר...
@@ -2759,7 +2759,7 @@ he:
       multiple_dates: "תאריכים מרובים"
     delete_group: 
       cancel: ביטול
-      delete: "בטל קבוצה"
+      delete: "ביטול קבוצה"
       deleting: מבטל...
       labels: 
         delete_assignments_in_group: "ביטול המשימות"
@@ -2800,12 +2800,12 @@ he:
     edit_view: 
       assignment_name: "שם משימה"
       buttons: 
-        save: שמירה
+        save: "שמירה "
         save_and_publish: "שמירה ופרסום"
       description: תיאור
       freeze_properties: "נעילת מאפייני משימה בעת העתקה"
       notify_content_change: "הודיעה למשתמשים שתוכן זה השתנה"
-      points_possible: נקודות
+      points_possible: ניקוד
       post_to_sis: "הכללת ציוני המשימה הזו בעת הפרסום למערכת המידע של תלמידי ביה\"ס"
       warnings: 
         assignment_is_frozen: "חלק מההגדרות ננעלו ע\"י מנהל המערכת."
@@ -2891,7 +2891,7 @@ he:
     incomplete: "לא הושלם"
     index_view: 
       add_assignment: משימה
-      add_group: קבוצה
+      add_group: "קבוצה "
       add_quiz_lti: בוחן/בחינה
       assignments: משימות
       assignments_settings: "הגדרות משימות"
@@ -3010,7 +3010,7 @@ he:
         require_peer_reviews: "נדרשת ביקורות עמיתים"
       locked_until: "הקצאת סקירות עמיתים"
       peer_reviews_assign_at_explanation: "חייב להיות לאחר תאריך היעד. אם הושאר ריק, תאריך היעד יהיה התאריך."
-      peer_reviews_header: "הערכת עמיתים"
+      peer_reviews_header: "הערכות עמיתים"
       reviews_per_user: "סקירות עמיתים למשתמש"
     points_possible_number: "ערך נקודות אפשריות חייב להיות מספרי"
     positive_number: "חובה לספק מספר חיובי"
@@ -3215,7 +3215,7 @@ he:
           labels: 
             exclude_small_matches: "התאמות זעירות"
       buttons: 
-        update_settings: "עידכון הגדרות"
+        update_settings: "עדכון הגדרות"
       turnitin_settings: 
         labels: 
           compare_against: "השוואה מול"
@@ -3227,10 +3227,10 @@ he:
           student_paper_check: "עבודות אחרות של התלמיד"
           submit_papers_to: "להכללה במאגר הנתונים"
           turnitin_repository: "מאגר Turnitin"
-        originality_report_never: "לעולם לא"
+        originality_report_never: "אף פעם"
         originality_report_visibility: "לתלמידים האפשרות לעיין בדוח המקוריות "
         originality_report_visible_after_due_date: "לאחר תאריך היעד"
-        originality_report_visible_after_grading: "לאחר שהמשימה הוערכה"
+        originality_report_visible_after_grading: "אחרי שהמטלה מוערכת"
         originality_report_visible_immediately: מיד
         settings_exclude_fewer_than_count: "פחות מ%{wordsInput} מלים"
         settings_exclude_less_than_percent: "פחות מ%{percentInput} של המסמך"
@@ -3243,7 +3243,7 @@ he:
         originality_report_never: "אף פעם"
         originality_report_visibility: "תלמידים יכולים לעיין בדו\"ח המקוריות"
         originality_report_visible_after_due_date: "לאחר תאריך היעד"
-        originality_report_visible_after_grading: "לאחר שהמטלה הוערכה"
+        originality_report_visible_after_grading: "אחרי שהמטלה מוערכת"
         originality_report_visible_immediately: מיד
   assignmentsNeverDrop: 
     remove_never_drop_rule: "הסרת הכלל \"אין לדלג\""
@@ -3776,7 +3776,7 @@ he:
     calendar_navigator: 
       enter_navigation_date: "יש להקליד את התאריך אליו רוצים להתנתב."
       next: הבא
-      previous: הקודם
+      previous: קודם
       today: היום
     calendar_title: "יומן:"
     cancel_appointment: "בטוח/ה שרוצה לבטל את הפגישה עם %{name}?"
@@ -3877,7 +3877,7 @@ he:
       send_message_failed: "התרחשה שגיאה בשליחת ההודעה, בבקשה לנסות שנית."
     event_assignment_title: "כותרת משימה:"
     event_details: 
-      attendees: משתתפים
+      attendees: "משתתפים "
       calendar: יומן
       close: סגירה
       details: פרטים
@@ -3886,8 +3886,8 @@ he:
         edit: עריכה
         reserve: הקצאה
         unreserve: "ביטול הקצאה"
-      location: מיקום
-      location_address: כתובת
+      location: "מיקום:"
+      location_address: "כתובת:"
       message_students: "הודעות לתלמידים"
       slots_available: "יש חלון זמן זמין"
     event_event_title: "כותרת אירוע:"
@@ -3904,7 +3904,7 @@ he:
       all_users: "כל המשתמשים"
       message_groups: "הודעות לקבוצה"
       message_label: "הודעה:"
-      message_students: "הודעות לתלמידים"
+      message_students: "הודע/י לתלמידים "
       registered_groups: "קבוצות שכבר נרשמו"
       registered_users: "משתמשים שכבר נרשמו"
       send_message_to: "שלח הודעה ל..."
@@ -3946,8 +3946,8 @@ he:
     time_block_errors: "יש שגיאה בבחירת חלונות הזמן שלך."
     time_block_row: 
       date_label: תאריך
-      delete_link: "ביטול טווח זמנים"
-      end_time_label: "זמן סיום"
+      delete_link: "ביטול תחום זמנים"
+      end_time_label: "מועד סיום"
       start_time_label: "זמן התחלה"
     titles: 
       edit_appointment_group: "עריכת קבוצת משימה"
@@ -4326,7 +4326,7 @@ he:
         available_users: "משתמשים זמינים"
         collaborate_with: "שתף פעולה עם:"
         collaboration_members: "חברי שיתוף הפעולה"
-        groups: קבוצות
+        groups: "קבוצות "
         loading: טוען
         people: אנשים
         remove_all: "הסרת כולם"
@@ -4847,7 +4847,7 @@ he:
         assessment_help_label: "צלמית עזרה בדריסת הערכה"
         assessment_help_text: "מערכות מסוימות נוהגות למחזר את המזהה שלהן לכל ייצוא חדש. כתוצאה מכך, אם הייצוא של כולל שני בנקי שאלות נפרדים הם יקבלו את אותו המזהה. כדי למנוע איבוד נתוני הערכה אנו מטפלים בפריטים אלו כנפרדים למרות המזהים שלהם. בחירת אפשרות זו תנטרל את אמצעי זהירות זה ותאפשר לנתוני הערכה לדרוס נתונים קיימים עם אותו מזהה."
         assessment_help_title: "\"עזרה בדריסת הערכה\""
-        assessment_help_title_icon: "צלמית עזרה בדריסת הערכה  "
+        assessment_help_title_icon: "צלמית עזרה בדריסת הערכה"
         overwrite_assessment_content: "דריסת תוכן הערכות עם מזהה דומה"
       question_bank: 
         aria_new_label: "יצירת בנק שאלות חדש"
@@ -6111,15 +6111,15 @@ he:
         edit_sections_desc: "הקבצות הן דרך נוספת לארגן משתמשים. הדבר יאפשר ללמד כיתות מרובות מאותו הקורס, כך שניתן להשתמש באותו תוכן קורס בכל המקומות. ניתן להעביר תלמיד להקבצה אחרת, או להוסיף/ להסיר הרשמות לסעיף בדף מתחת. תלמידים חייבים להיות לפחות בהקבצה אחת בכל רגע נתון."
       index: 
         cannot_add_users: "אין אפשרות להוסיף משתמשים חדשים כיון שהקורס נסתיים ומסוכם"
-        filter_field_description: "חיפוש אנשים. בעת הקלדה בשדה זה, רשימת האנשים תסונן באופן אוטומטי ותכלול רק את אלו ששמותיהם תואמים את התווים שהוקלדו."
-        group_set: "מערכת קבוצה"
+        filter_field_description: "חיפוש אנשים. רשימת האנשים תסונן תוך כדי ההקלדה ותציג רק את אלו שעונים לטקסט ההקלדה"
+        group_set: "אוסף קבוצות"
         people: אנשים
         role_to_search: "הגבלת חיפוש לתפקיד"
         search_people: "חיפוש אנשים"
         title_add_people: "הוספת אנשים"
       invitations_view: 
         accepted_invitation: "%{name} כבר קיבל ואישר את ההזמנה להצטרף לקורס, אך תוכל עדיין לשלוח מחדש את ההזמנה אם הדבר נחוץ."
-        admin_invitation_unaccepted: "%{name} לא אישר את ההזמנה להצטרף לקורס. ההזמנה נשלחה ב %{time}"
+        admin_invitation_unaccepted: "%{name}  טרם אישר את ההזמנה להצטרף לקורס. ההזמנה נשלחה ב:%{time}"
         invitations_pending_publish: "הזמנות אינן נשלחות עד אשר הקורס *מפורסם*"
         student_invitation_unaccepted_available: "%{name}  טרם אישר את ההזמנה להצטרף לקורס. ההזמנה נשלחה ב:%{time}"
         student_invitation_unaccepted_unavailable: "%{name} נתווסף לקורס: %{time}"
@@ -6134,13 +6134,13 @@ he:
         all_roles: "כל התפקידים"
       roster_tabs: 
         everyone_tab: "כל אחד"
-        groups: קבוצות
+        groups: "קבוצות "
       roster_user: 
         ? " pending_acceptance_explanation"
         : "משתמש זה טרם אישר את ההזמנה לקורס"
         links: 
           edit_sections: "עריכת הקבצה"
-          link_to_students: "קישור לתלמידים"
+          link_to_students: "קישור אל התלמידים"
           remove_from_course: "הסרה מהקורס"
           resend_invitation: "שליחה מחדש של הזמנה"
           user_details: "פרטי משתמש"
@@ -6156,7 +6156,7 @@ he:
         role: תפקיד
         section: הקבצה
         total_activity: "סך פעילות"
-        you_can_search_by: "ניתן לחפש לפי:"
+        you_can_search_by: "אפשר לחפש לפי:"
       section: 
         remove_user_from_course_section: "הסרת משתמש מ %{name}"
     section: 
@@ -6659,7 +6659,7 @@ he:
       two: "הרחבת %{count} דיונים"
     show_more_link: 
       show_less: "הצג פחות"
-      show_more: "הצג יותר"
+      show_more: "הצג עוד"
   dashboard_7f1dbf71: "לוח המחוונים"
   dashboard_options_b240ed5a: "אפשרויות לוח המחוונים"
   dashboard_view_d7d85969: "תצוגת לוח המחוונים"
@@ -7153,7 +7153,7 @@ he:
       allow_liking: "הרשאת סימוני אהבתי"
       allow_threaded_replies: "הרשאת שירשור תגובות"
       attachment: תצריף
-      available_from: "זמין מתאריך"
+      available_from: "זמין מ"
       buttons: 
         not_published: "לא פורסם"
         published: פורסם
@@ -7167,12 +7167,12 @@ he:
       points_possible: "נקודות אפשריות"
       post_at: "פרסום ב"
       publish: פרסום
-      save: שמירה
+      save: "שמירה "
       saving: שומר...
       sort_by_likes: "מיון לפי סימוני אהבתי"
       topic_title: "כותרת נושא"
       until: "עד אשר"
-      use_for_grading: מוערך
+      use_for_grading: "ניתן ציון"
       users_must_post_before_seeing_replies: "התלמיד חייב לפרסם לפני שיעיין בתגובות"
     entry: 
       authors_name: "שם העורכ/ת"
@@ -8687,7 +8687,7 @@ he:
   grade_9c6f076d: ציון
   grade_a91e433e: "הערכה:"
   grade_assignment_7c1abc11: "הערכת %{assignment}"
-  grade_change_activity_75fb525: "מתן ציון לפעילות ששונתה"
+  grade_change_activity_75fb525: "פעילות שינוי הערכות"
   grade_change_notifications_98461261: "התראות שינוי הערכה"
   grade_changes_cb5a57a8: "שינויי הערכה"
   grade_display_warning_dialog: 
@@ -8777,7 +8777,7 @@ he:
     gradee_index_of_total: "%{gradee} %{x} מתוך %{y}"
     group: קבוצה
     header_filter: 
-      course_average: "ממוצע קורס"
+      course_average: "ממוצע קורס "
       course_median: "חציון של הקורס"
       course_mode: "שכיח הקורס"
     hide_all_details_button: "הסתרת כל הפרטים"
@@ -9773,7 +9773,7 @@ he:
         headings: 
           account_groups: "קבוצות תלמידים ברמת החשבון "
           course_groups: "קבוצות תלמידים "
-          groups: קבוצות
+          groups: "קבוצות "
         tabs: 
           everyone: "כל אחד"
       group_category: 
@@ -9801,24 +9801,24 @@ he:
         category_settings: הגדרות
         delete_category_option: ביטול
         edit_category_option: עריכה
-        group: קבוצה
+        group: "קבוצה "
         group_limit_blurb: "הקבוצות מוגבלות ל *%{group_limit}* חברים"
         import: ייבוא
         message_all_unassigned_option: "הודעה לכל התלמידים שטרם הוקצו"
         randomly_assign_students_option: "סיווג אקראי של תלמידים"
         restricted_self_signup_blurb: "כל תלמידי הקבוצה נדרשים להיות באותה ההקבצה "
-        self_organized_warning: "קבוצות אלו נוצרו בהתארגנות עצמית של התלמידים. שלא כמו בסוגי קבוצות אחרות, תלמידים יכולים להשתייך ליותר מקבוצה אחת כזו בעת ובעונה אחת, ולכן קבוצות אלו אינן יכולות לשמש במשימות מוערכות."
+        self_organized_warning: "קבוצות אלו נוצרו בהתארגנות עצמית של התלמידים. שלא כמו בסוגי קבוצות אחרות, תלמידים יכולים להשתייך ליותר מקבוצה אחת כזו בעת ובעונה אחת, ולכן קבוצות אלו אינן יכולות לשמש עבור משימות המחייבות הערכה."
         self_signup_blurb: "רישום עצמי אפשרי לקבוצות אלו "
         settings: הגדרות
         uncategorized_groups: "קבוצות אלו אינן משויכות לאוסף קבוצות כלשהו. כיון שיובאו דרך המערכת הבית ספרית, עדכונן או ביטולן אפשרי רק דרך מערכת זו."
       group_category_edit: 
-        allow_self_signup: "הרשאת רישום עצמי "
+        allow_self_signup: "הרשה/י רישום עצמי "
         cancel: ביטול
         group_limit_override: "שינוי זה ידרוס את כל המגבלות היחודיות של אוסף הקבוצות"
         group_set_name: "שם אוסף קבוצות "
         leave_group_limit_blank: "יש להשאיר ריק אם אין מגבלה "
         limit_group_size: "הגבלת קבוצות ל %{group_limit} חברים "
-        require_same_section: "מחייב חברי קבוצה להיות באותה ההקבצה "
+        require_same_section: "מחייב שחברי הקבוצה ישתייכו לאותה ההקבצה"
         save: "שמירה "
         saving: שומר...
       group_detail: 
@@ -9826,7 +9826,7 @@ he:
         group_delete: ביטול
         group_edit: עריכה
         group_full: מלא
-        group_leader: "מוביל קבוצה"
+        group_leader: "מוביל קבוצה "
         group_settings: הגדרות
         show_group_details: "הצגת פרטים לקבוצה %{name}"
         visit_group_homepage: "ביקור בדף הבית של הקבוצה"
@@ -9856,7 +9856,7 @@ he:
       group_users: 
         add_student: "יש להוסיף תלמיד כדי להתחיל בתהליך"
         add_user: "הוספת משתמש לצורך התחלת תהליך"
-        greater_than_three: "מונח החיפוש צריך להיות בעל שלשה תוים או יותר."
+        greater_than_three: "בבקשה להקליד מונח חיפוש עם 3 תווים ומעלה "
         no_matching_students: "לא נמצאו תלמידים העונים על הגדרת החיפוש."
         no_matching_users: "לא נמצאו משתמשים העונים על הגדרת החיפוש"
         no_students: "אין כרגע תלמידים בקבוצה זו"
@@ -10543,7 +10543,7 @@ he:
   late_2be42b88: איחור
   late_8bd684b6: מאוחר
   late_assignment_user_name_assignment_name_2df32e01: "משימה באיחור: %{user_name}, %{assignment_name}"
-  late_bd436902: מאוחר
+  late_bd436902: "מאוחר "
   late_penalty_78099d18: "קנס פיגור:"
   late_penalty_817fff4e: "קנס פיגור:"
   late_penalty_9c312b22: "קנס פיגור"
@@ -11004,7 +11004,7 @@ he:
   manage_all_other_course_content_d77de830: "ניהול כל התוכן האחר של הקורס "
   manage_announcement_with_title_title_f2ce92de: "ניהול הכרזות עם כותרת %{title}"
   manage_app_list_994cc26c: "ניהול רשימת האפליקציות"
-  manage_assignment_31a132fb: "ניהול משימות"
+  manage_assignment_31a132fb: "ניהול משימה"
   manage_avatars: 
     errors: 
       update_failed: "עדכון נכשל, יש לנסות שוב"
@@ -13854,7 +13854,7 @@ he:
       insert_criterion_rating: "הוספת קריטריון דרוג"
       insert_rating: הוספה
       points: נקודות
-      pts: נק'
+      pts: נקודות
       rating_description: "תיאור קריטריון דרוג"
     criterion_header: 
       insert_criterion_rating: "הוספת קריטריון דרוג"
@@ -16714,7 +16714,7 @@ he:
       set_up_account: "החשבון שלך כמעט הוגדר. כדי לסיים, בבקשה לבדוק דוא\"ל ב *%{email}* כדי להגדיר את סיסמתך"
       start_participating: "את/ה יכול/ה להתחיל להשתתף עכשיו, אבל עליך להגדיר סיסמה לפני שתוכל/י להתחבר שוב למערכת."
     login: 
-      password: סיסמה
+      password: "סיסמה "
       remember_me: "זכור אותי"
       sign_in: התחברות
     new_parent_dialog: 
@@ -16740,9 +16740,9 @@ he:
         email: דוא"ל
         join_code: "קוד הצטרפות"
         name: "שם מלא"
-        password: סיסמה
+        password: "סיסמה "
         password_confirmation: "אישור סיסמה"
-        username: "שם משתמש"
+        username: "שם משתמש "
     teacher_dialog: 
       agree_to_terms_and_pp: "את/ה מסכים/מסכימה ל*תנאי השמוש* וקראת את **מדיניות הפרטיות**."
       buttons: 
@@ -16843,6 +16843,7 @@ he:
         enabled: "הופעל (יש צורך להפעיל גם את ממיר QTI)"
   restart_link_validation_b61286fc: "התחל/י מחדש את בדיקת תקינות קישורים"
   restore_6d523f1d: שיחזור
+  restore_courses_182e162e: "שחזור קורסים"
   restrict_students_from_accessing_courses_after_end_7dd66bce: "הגבלת תלמידים מגישה לקורסים לאחר מועד סיום הקורס"
   restrict_students_from_accessing_courses_before_st_f7c22c00: "הגבלת תלמידים מגישה לקורסים קודם לתאריך התחילה"
   restrict_students_from_viewing_future_courses_in_e_67486caf: "הגבלת תלמידים מצפיה בקורסים עתידיים שברשימת ההרשמות"
@@ -17254,6 +17255,7 @@ he:
   search_entries_or_author_63fb0a86: "חיפוש מופעים או מחבר"
   search_flickr_6f28b02e: "חיפוש בפליקר"
   search_for_a_course_58fdc7a6: "חיפוש קורס"
+  search_for_a_deleted_course_by_id_f553398d: "חיפוש על פי מזהה של קורסים שבוטלו"
   search_for_assignment_8149cb1: "חיפוש משימה"
   search_for_files_7541fb28: "חיפוש קבצים"
   search_grading_periods_e947a3e9: "חיפוש תקופות הערכה..."
@@ -17379,6 +17381,7 @@ he:
   see_vericite_results_b44dd8c8: "ניתן לעיין בתוצאות  VeriCite "
   select_a_grading_period_5ea50f1: "בחירת תקופת הערכה..."
   select_a_grading_period_aab25483: "בחירת תקופת הערכה..."
+  select_a_log_type_to_search_247fc6b4: "בחירת סוג הלוג לחיפוש"
   select_a_predefined_color_c77ab2f5: "בחירת צבע מוגדר מראש"
   select_a_section_37ac1694: "בחירת הקבצה"
   select_a_student_adfcc348: "בחירת תלמיד "
@@ -17528,7 +17531,7 @@ he:
     default_grades: "מתן ציון אחיד לכל תלמידים עבור *%{assignment.name}* באמצעות כניסה ושליחה של ערך הציון הבא:"
     dialog_title: "הערכת ברירת מחדל של %{assignment.name}"
     overwrite: "דריסת הערכות שכבר התבצעו"
-    set_grades_button: "הכנת הערכת ברירת מחדל"
+    set_grades_button: "הגדרת הערכת ברירת מחדל"
     set_grades_button_loading: "מגדיר ציונים..."
   set_email_address_as_default_954d284: "הגדרת כתובת דוא\"ל כברירת מחדל"
   set_email_as_default_5b4a28e: "הגדרת כתובת דוא\"ל כברירת מחדל"
@@ -19607,6 +19610,7 @@ he:
   to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "להגבלת משתמשים מאיזור Clever מסוים, יש לספק את מזהה האיזור כאן. הדבר נחוץ עבור התחברות מיידית של Clever לצורך עבודה בסביבה מרובת פעילים."
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "כדי להגביל משתמשים מדומיין ספציפי של גוגל אפפס, יש להקליד את הדומיין כאן."
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: "להגבלת משמשי  Azure Active Directory שלך, יש להקליד את מזהה החברות שלך כאן."
+  to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "לעיון בכל ההודעות שנשלחו למשתמש קנבס, יש לבחור את המשתמש וטווח התאריכים לחיפוש."
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "כדי להציג משימות, יש לוודא שתצוגת ה*אג'נדה* פעילה."
   today_76e10f9c: היום
   toggle_editing_answer_text_as_html_9a93fe6: "שינוי מצב עריכת תוכן תשובה ל HTML"
@@ -19909,6 +19913,7 @@ he:
       one: "אם תמשיך/י כך, משתמש/ת אחד/ת ת/יתווסף."
       other: "אם תמשיך/י כך, %{count} משתמשים יתווספו."
       two: "אם תמשיך/י כך, %{count} משתמשים יתווספו."
+  user_login_logout_activity_90fbbd9a: "פעילות כניסת / יציאת משתמש מהמערכת"
   user_logins: 
     buttons: 
       add_login: "הוספת לוג-אין"
@@ -20484,7 +20489,7 @@ he:
     wiki_page_edit: 
       buttons: 
         cancel: ביטול
-        save: שמירה
+        save: "שמירה "
         save_and_publish: "שמירה ופרסום"
       course_editing_roles: 
         anyone: "כל אחד"
@@ -20494,7 +20499,7 @@ he:
         anyone: "כל אחד"
         can_edit_page: "יכול/ה לערוך דף זה"
         only_members: "רק חברים"
-      notify_users_text: "הודיעו למשתמשים שתוכן זה עודכן"
+      notify_users_text: "הודיעה למשתמשים שתוכן זה השתנה"
       options_label: אפשרויות
       title_label: "כותרת דף"
     wiki_page_index: 
