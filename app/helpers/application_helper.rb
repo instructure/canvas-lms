@@ -1049,7 +1049,7 @@ module ApplicationHelper
 
   def csp_report_uri
     @csp_report_uri ||=
-      if (host = DynamicSettings.find("csp-logging")[:host])
+      if default_source_csp_logging_enabled? && (host = DynamicSettings.find("csp-logging")[:host])
         "; report-uri #{host}"
       else
         ""
