@@ -24,7 +24,6 @@ type Result = {
   assignment: {
     allowedAttempts: number | null
     anonymizeStudents: boolean
-    dueAt: string | null
     gradingType: string
     id: string
     _id: string
@@ -96,7 +95,6 @@ const QUERY = gql`
     assignment(id: $assignmentId) {
       allowedAttempts
       anonymizeStudents
-      dueAt
       gradingType
       id
       _id
