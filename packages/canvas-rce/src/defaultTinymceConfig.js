@@ -57,7 +57,7 @@ const defaultTinymceConfig = {
   branding: false,
   browser_spellcheck: true,
 
-  content_style: undefined, // this will always be provided by the RCE
+  content_style: '',
 
   convert_urls: false,
 
