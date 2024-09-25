@@ -1035,6 +1035,7 @@ class GradebooksController < ApplicationController
 
     platform_service_speedgrader_enabled = platform_service_speedgrader_enabled?(params)
     if platform_service_speedgrader_enabled
+      InstStatsd::Statsd.increment("speedgrader.platform_service.load")
       @page_title = t("SpeedGrader")
       @body_classes << "full-width padless-content"
 
@@ -1068,6 +1069,8 @@ class GradebooksController < ApplicationController
       render html: "".html_safe, layout: "bare"
       return
     end
+
+    InstStatsd::Statsd.increment("speedgrader.classic.load")
 
     if @assignment.unpublished?
       flash[:notice] = t(:speedgrader_enabled_only_for_published_content,
