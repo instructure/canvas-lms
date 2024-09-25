@@ -788,7 +788,7 @@ nn:
         no_item_found: "Finn ingen element"
         time: Tidspunkt
       comm_message_item: 
-        created_at: "Oppretta den"
+        created_at: Oppretta
         from_name: Frå
         reply_to: "Svar til"
         sent_at: "Sendt den"
@@ -875,7 +875,7 @@ nn:
         Anonymous: Anonym
         Assignment: Oppgåve
         Course: Emne
-        Grader: Vurderar
+        Grader: Vurdering
         Student: Student
         To: Til
         date: Dato
@@ -3375,6 +3375,8 @@ nn:
       current: "Gjeldande emne"
     department: 
       analytics: Analyse
+    deprecated: 
+      analytics: Analyse
     filters: 
       completed: "Fullførte emne"
       current: "Gjeldande emne"
@@ -5422,7 +5424,7 @@ nn:
       details: "Detaljar:"
       group_category: Gruppekategori
       group_signup: "La studentane melde seg på gruppevis."
-      location: Plassering
+      location: "Plassering:"
       name: Namn
       time_range: Tidsintervall
     edit_appt_calendar_event: 
@@ -5501,8 +5503,8 @@ nn:
         edit: Rediger
         reserve: Reserver
         unreserve: "Fjern reservasjon"
-      location: Plassering
-      location_address: Adresse
+      location: "Plassering:"
+      location_address: "Adresse:"
       message_students: "Send melding til studentane"
       slots_available: "Tilgjengelege avtaleluker"
     event_event_title: "Tittel på hending:"
@@ -18684,7 +18686,7 @@ nn:
   objects_589fdc11: Element
   observe_student_mastery_a1f01a: "Sjå meistring hos studentane"
   observees: 
-    being_observed: "Studentar er observerte"
+    being_observed: "Studentar blir observerte"
     new_observee_pairing_code: "Paringskode for student"
     new_observee_password: Passord
     new_observee_username: Brukarnamn
@@ -23587,7 +23589,7 @@ nn:
     default_grades: "Gi alle studentane same karakter for *%{assignment.name}* ved å oppgi, og sende, ein karakterverdi nedanfor:"
     dialog_title: "Standard vurderingstype for %{assignment.name}"
     overwrite: "Overskriv vurderingane som allereie er lagt inn"
-    set_grades_button: "Bruk standardvurdering"
+    set_grades_button: "Bruk standardverdi for vurdering"
     set_grades_button_loading: "Fastset vurderingar..."
   set_email_address_as_default_954d284: "Sett e-postadressa som standard"
   set_email_as_default_5b4a28e: "Sett e-post som standard"
