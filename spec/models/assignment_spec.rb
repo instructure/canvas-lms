@@ -6665,7 +6665,7 @@ describe Assignment do
   context "adheres_to_policy" do
     it "serializes permissions" do
       @assignment = @course.assignments.create!(title: "some assignment")
-      data = @assignment.as_json(permissions: { user: @user, session: nil }) rescue nil
+      data = @assignment.as_json(permissions: { user: @user, session: nil })
       expect(data).not_to be_nil
       expect(data["assignment"]).not_to be_nil
       expect(data["assignment"]["permissions"]).not_to be_nil

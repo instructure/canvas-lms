@@ -154,11 +154,6 @@ describe UnzipAttachment do
         allow(Attachment).to receive(:get_quota).and_return({ quota: 5000, quota_used: 0 })
         expect { unzipper.process }.to raise_error(Attachment::OverQuotaError, "Zip file would exceed quota limit")
       end
-
-      it "is able to rescue the file quota error" do
-        allow(Attachment).to receive(:get_quota).and_return({ quota: 5000, quota_used: 0 })
-        unzipper.process rescue nil
-      end
     end
 
     describe "zip bomb mitigation" do

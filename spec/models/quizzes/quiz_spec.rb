@@ -622,7 +622,7 @@ describe Quizzes::Quiz do
     q.generate_quiz_data
     q.save
     expect(q.quiz_data).not_to be_nil
-    data = q.quiz_data rescue nil
+    data = q.quiz_data
     expect(data).not_to be_nil
   end
 
