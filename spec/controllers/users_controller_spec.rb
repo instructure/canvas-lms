@@ -2319,6 +2319,21 @@ describe UsersController do
       expect(response).to render_template("users/show")
     end
 
+    it "404s, but still shows, on a deleted user in circular merge for admins" do
+      @user1 = user_with_pseudonym(active_all: true, account: @account)
+      @user2 = user_factory(active_all: true, account: @account)
+
+      UserMerge.from(@user1).into(@user2)
+      UserMerge.from(@user2).into(@user1)
+
+      account_admin_user
+      user_session(@admin)
+
+      get "show", params: { id: @user1.id }
+      expect(response).to have_http_status :not_found
+      expect(response).to render_template("users/show")
+    end
+
     it "responds to JSON request" do
       account = Account.create!
       course_with_student(active_all: true, account:)

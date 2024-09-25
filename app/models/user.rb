@@ -1319,18 +1319,18 @@ class User < ActiveRecord::Base
     return account.grants_right?(user, sought_right) if fake_student? # doesn't have account association
 
     # Intentionally include deleted pseudonyms when checking deleted users (important for diagnosing deleted users)
-    accounts_to_search = if associated_accounts.empty?
-                           if merged_into_user
-                             # Early return from inside if to ensure we handle chains of merges correctly
-                             return merged_into_user.check_accounts_right?(user, sought_right)
-                           elsif Account.where(id: pseudonyms.pluck(:account_id)).any?
-                             Account.where(id: pseudonyms.pluck(:account_id))
-                           else
-                             associated_accounts
-                           end
-                         else
-                           associated_accounts
-                         end
+    accounts_to_search =
+      if associated_accounts.empty?
+        if merged_into_user && active_merged_into_user
+          return active_merged_into_user.check_accounts_right?(user, sought_right)
+        elsif Account.joins(:pseudonyms).where(pseudonyms: { user_id: id }).exists?
+          Account.joins(:pseudonyms).where(pseudonyms: { user_id: id })
+        else
+          associated_accounts
+        end
+      else
+        associated_accounts
+      end
 
     common_shards = associated_shards & user.associated_shards
     search_method = lambda do |shard|
@@ -1348,6 +1348,22 @@ class User < ActiveRecord::Base
     return true if (associated_shards - common_shards).any?(&search_method)
 
     false
+  end
+
+  def active_merged_into_user
+    merged_into_users.find { |u| u.associated_accounts.present? }
+  end
+
+  def merged_into_users
+    chain = []
+    next_in_chain = merged_into_user
+
+    while next_in_chain && chain.exclude?(next_in_chain) && chain.length < 20
+      chain << next_in_chain
+      next_in_chain = next_in_chain.merged_into_user
+    end
+
+    chain
   end
 
   set_policy do
