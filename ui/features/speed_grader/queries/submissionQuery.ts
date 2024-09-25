@@ -107,6 +107,7 @@ export const SUBMISSION_FRAGMENT = gql`
       publishedGrade
       publishedScore
     }
+    originalityData
   }
 `
 
