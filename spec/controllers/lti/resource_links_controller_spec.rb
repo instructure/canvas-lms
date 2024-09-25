@@ -113,6 +113,15 @@ describe Lti::ResourceLinksController, type: :request do
                                                                                 })
     end
 
+    it "includes launch_url for each resource link" do
+      subject
+      launch_urls = response_json.to_h { |rl| [rl["id"], rl["canvas_launch_url"]] }
+      expect(launch_urls[assignment_rl.id]).to eq("http://www.example.com/courses/#{course.id}/assignments/#{assignment.id}")
+      expect(launch_urls[module_item_rl.id]).to eq("http://www.example.com/courses/#{course.id}/external_tools/retrieve?resource_link_lookup_uuid=#{module_item_rl.lookup_uuid}")
+      expect(launch_urls[collaboration_rl.id]).to eq("http://www.example.com/courses/#{course.id}/external_tools/retrieve?resource_link_lookup_uuid=#{collaboration_rl.lookup_uuid}")
+      expect(launch_urls[rich_content_rl.id]).to eq("http://www.example.com/courses/#{course.id}/external_tools/retrieve?resource_link_lookup_uuid=#{rich_content_rl.lookup_uuid}")
+    end
+
     context "with deleted link and content" do
       before do
         collaboration_rl.destroy
@@ -192,6 +201,11 @@ describe Lti::ResourceLinksController, type: :request do
     it "returns the resource link" do
       subject
       expect(response_json).to include({ id: })
+    end
+
+    it "includes the canvas launch url" do
+      subject
+      expect(response_json["canvas_launch_url"]).to eq(retrieve_course_external_tools_url(course, resource_link_lookup_uuid: resource_link.lookup_uuid))
     end
 
     context "with lookup_uuid" do
