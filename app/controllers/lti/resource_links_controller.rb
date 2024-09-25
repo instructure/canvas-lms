@@ -72,6 +72,11 @@
 #             "rich_content"
 #           ]
 #         },
+#         "canvas_launch_url": {
+#           "type": "string",
+#           "description": "The Canvas URL that launches the LTI Resource Link. Suitable for use in Canvas rich content",
+#           "example": "https://example.instructure.com/courses/1/external_tools/retrieve?resource_link_lookup_uuid=ae43ba23-d238-49bc-ab55-ba7f79f77896"
+#         },
 #         "resource_link_uuid": {
 #           "type": "string",
 #           "description": "The LTI identifier for the LTI Resource Link, included as the resource_link_id when this link is launched",
@@ -146,10 +151,11 @@ class Lti::ResourceLinksController < ApplicationController
   # @returns [Lti::ResourceLink]
   def index
     course_assignment_ids = base_scope(@context.assignments).ids
-    assignment_links = base_scope.where(context_type: "Assignment", context_id: course_assignment_ids)
+    # preload Assignment -> Course, used for launch_url
+    assignment_links = base_scope.where(context_type: "Assignment", context_id: course_assignment_ids).preload(context: :context)
 
     # includes Module Items, Collaborations, and Rich Content
-    all_other_links = base_scope.where(context: @context)
+    all_other_links = base_scope.where(context: @context).preload(:context)
 
     bookmarker = BookmarkedCollection::SimpleBookmarker.new(Lti::ResourceLink, :created_at, :id)
     all_links = BookmarkedCollection.merge(
