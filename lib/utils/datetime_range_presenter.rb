@@ -21,9 +21,10 @@ module Utils
     attr_reader :start, :zone, :with_weekday
 
     def initialize(datetime, end_datetime = nil, datetime_type = :event, zone = nil, with_weekday: false)
-      zone ||= ::Time.zone
-      @start = datetime.in_time_zone(zone) rescue datetime
-      @_finish = end_datetime.in_time_zone(zone) rescue end_datetime
+      zone ||= Time.zone
+      zone = ActiveSupport::TimeZone[zone] if zone.is_a?(String)
+      @start = datetime&.in_time_zone(zone)
+      @_finish = end_datetime&.in_time_zone(zone)
       @_datetime_type = datetime_type
       @zone = zone
       @with_weekday = with_weekday

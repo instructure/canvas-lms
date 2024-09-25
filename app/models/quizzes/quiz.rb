@@ -125,7 +125,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   # override has_one relationship provided by simply_versioned
   def current_version_unidirectional
-    versions.limit(1)
+    versions.order(:number).last
   end
 
   def infer_times

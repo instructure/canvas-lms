@@ -31,7 +31,7 @@ class SessionToken
 
   def self.parse(serialized_token)
     # deserialize and validate structure
-    result = JSONToken.decode(serialized_token) rescue nil
+    result = JSONToken.decode(serialized_token)
     return nil unless
       result.is_a?(Hash) &&
       result.keys.sort == %w[created_at current_user_id pseudonym_id signature used_remember_me_token] &&
@@ -49,6 +49,8 @@ class SessionToken
     token.created_at = Time.at(result["created_at"])
     token.signature = result["signature"]
     token
+  rescue JSON::ParserError
+    nil
   end
 
   VALIDITY_PERIOD = 30
@@ -57,7 +59,7 @@ class SessionToken
     now = Time.now.utc
     created_at >= now - VALIDITY_PERIOD.seconds &&
       created_at <= now + VALIDITY_PERIOD.seconds &&
-      Canvas::Security.verify_hmac_sha1(signature, signature_string) rescue false
+      Canvas::Security.verify_hmac_sha1(signature, signature_string)
   end
 
   def as_json

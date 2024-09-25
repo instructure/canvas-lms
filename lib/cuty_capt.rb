@@ -103,7 +103,7 @@ class CutyCapt
     addresses = Resolv.getaddresses(uri.host)
     return false if addresses.blank?
 
-    if config[:ip_blacklist] && addresses.any? { |address| config[:ip_blacklist].any? { |cidr| cidr.include?(address) rescue false } }
+    if config[:ip_blacklist] && addresses.any? { |address| config[:ip_blacklist].any? { |cidr| cidr.include?(address) } }
       logger.warn("Skipping url because of blacklisted IP address: #{url}")
       return false
     end

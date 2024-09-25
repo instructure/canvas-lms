@@ -38,7 +38,11 @@ module CC::Importer::Canvas
     def convert_wiki(doc, path)
       wiki = {}
       wiki_name = File.basename(path).sub(".html", "")
-      title, body, meta = (get_html_title_and_body_and_meta_fields(doc) rescue get_html_title_and_body_and_meta_fields(open_file_xml(path)))
+      title, body, meta = begin
+        get_html_title_and_body_and_meta_fields(doc)
+      rescue EncodingError
+        get_html_title_and_body_and_meta_fields(open_file_xml(path))
+      end
       wiki[:title] = title
       wiki[:migration_id] = meta["identifier"]
       wiki[:editing_roles] = meta["editing_roles"]
