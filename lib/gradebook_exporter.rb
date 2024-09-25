@@ -93,7 +93,7 @@ class GradebookExporter
     student_section_names = {}
     student_enrollments.each do |enrollment|
       student_section_names[enrollment.user_id] ||= []
-      student_section_names[enrollment.user_id] << (enrollment.course_section.display_name rescue nil)
+      student_section_names[enrollment.user_id] << enrollment.course_section.display_name
     end
 
     # remove duplicate enrollments for students enrolled in multiple sections

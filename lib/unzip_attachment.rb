@@ -209,7 +209,9 @@ class UnzipAttachment
   end
 
   def path_elements_for(path)
-    list = File.split(path) rescue []
+    return [] unless path
+
+    list = File.split(path)
     list.shift if list[0] == "."
     list
   end

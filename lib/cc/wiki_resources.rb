@@ -73,8 +73,7 @@ module CC
             res.file(href: relative_path)
           end
         rescue
-          title = page.title rescue I18n.t("course_exports.unknown_titles.wiki_page", "Unknown wiki page")
-          add_error(I18n.t("course_exports.errors.wiki_page", "The wiki page \"%{title}\" failed to export", title:), $!)
+          add_error(I18n.t("course_exports.errors.wiki_page", "The wiki page \"%{title}\" failed to export", title: page.title), $!)
         end
       end
     end

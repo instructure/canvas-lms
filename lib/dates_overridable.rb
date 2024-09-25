@@ -70,11 +70,11 @@ module DatesOverridable
   end
 
   def has_overrides?
-    if current_version?
-      preloaded_all_overrides ? preloaded_all_overrides.any?(&:active?) : all_assignment_overrides.active.exists?
-    else
+    if is_a?(SimplyVersioned::InstanceMethods) && !current_version?
       # the old version's overrides might have be deleted too but it's probably more trouble than it's worth to check here
       preloaded_all_overrides ? preloaded_all_overrides.any? : all_assignment_overrides.exists?
+    else
+      preloaded_all_overrides ? preloaded_all_overrides.any?(&:active?) : all_assignment_overrides.active.exists?
     end
   end
 

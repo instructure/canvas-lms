@@ -32,13 +32,13 @@ module CopyAuthorizedLinks
 
   module CopyAuthorizedLinksInstanceMethods
     def repair_malformed_links(user)
-      block = self.class.copy_authorized_links_block rescue nil
+      block = self.class.copy_authorized_links_block
       columns = (self.class.copy_authorized_links_columns || []).compact
       @copy_authorized_links_override_user = user
       columns.each do |column|
         next if column == :custom
 
-        html = self[column] rescue nil
+        html = self[column]
         next if html.blank?
 
         context, inferred_user = instance_eval(&block) if block
@@ -59,13 +59,8 @@ module CopyAuthorizedLinks
     def copy_authorized_links_to_context
       columns = (self.class.copy_authorized_links_columns || []).compact
       columns.each do |column|
-        if column == :custom
-          if respond_to?(:copy_authorized_content_custom_column)
-            copy_authorized_content_custom_column(context, user)
-          end
-        else
-          html = self[column] rescue nil
-          self[column] = html if html.present?
+        if column == :custom && respond_to?(:copy_authorized_content_custom_column)
+          copy_authorized_content_custom_column(context, user)
         end
       end
       true

@@ -74,7 +74,7 @@ module CC
         end
         add_file_to_manifest(file, path, migration_id)
       rescue
-        title = file.unencoded_filename rescue I18n.t("course_exports.unknown_titles.file", "Unknown file")
+        title = file.try(:unencoded_filename) || I18n.t("course_exports.unknown_titles.file", "Unknown file")
         add_error(I18n.t("course_exports.errors.file", "The file \"%{file_name}\" failed to export", file_name: title), $!)
       end
 
