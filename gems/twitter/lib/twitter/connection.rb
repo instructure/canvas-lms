@@ -93,7 +93,11 @@ module Twitter
 
     def self.config_check(settings)
       consumer = twitter_consumer(settings[:api_key], settings[:secret_key])
-      token = consumer.get_request_token rescue nil
+      begin
+        token = consumer.get_request_token
+      rescue
+        # ignore
+      end
       token ? nil : "Configuration check failed, please check your settings"
     end
 

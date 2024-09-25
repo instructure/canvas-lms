@@ -55,9 +55,7 @@ module AccountReports::ReportHelper
   # This function will take a datetime string and parse into UTC from the
   # root_account's timezone
   def account_time_parse(datetime, account = root_account)
-    Time.use_zone(account.default_time_zone) do
-      Time.zone.parse datetime.to_s rescue nil
-    end
+    ActiveSupport::TimeZone[account.default_time_zone].parse(datetime.to_s)
   end
 
   def account
