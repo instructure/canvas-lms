@@ -1798,7 +1798,9 @@ class CoursesController < ApplicationController
       :course_color,
       :friendly_name,
       :enable_course_paces,
-      :conditional_release
+      :conditional_release,
+      :show_student_only_module_id,
+      :show_teacher_only_module_id
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
 

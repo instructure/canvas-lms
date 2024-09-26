@@ -3699,6 +3699,9 @@ class Course < ActiveRecord::Base
   add_setting :conditional_release, default: false, boolean: true, inherited: true
   add_setting :search_embedding_version, arbitrary: true
 
+  add_setting :show_student_only_module_id
+  add_setting :show_teacher_only_module_id
+
   def elementary_enabled?
     account.enable_as_k5_account?
   end

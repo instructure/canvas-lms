@@ -158,6 +158,22 @@ class ContextModulesController < ApplicationController
         hash[:HIDE_BLUEPRINT_LOCK_ICON_FOR_CHILDREN] = true
       end
 
+      @feature_student_module_selection = @context.account.feature_enabled?(:modules_student_module_selection)
+      @feature_teacher_module_selection = @context.account.feature_enabled?(:modules_teacher_module_selection)
+      if @feature_student_module_selection || @feature_teacher_module_selection
+        @module_show_setting = if @is_student && @feature_student_module_selection
+                                 @context.show_student_only_module_id
+                               elsif !@is_student && @feature_teacher_module_selection
+                                 @context.show_teacher_only_module_id
+                               end&.to_i
+        @module_show_setting = nil if @module_show_setting&.zero?
+        unless @is_student
+          hash[:MODULE_FEATURES] = {}
+          hash[:MODULE_FEATURES][:STUDENT_MODULE_SELECTION] = true if @feature_student_module_selection
+          hash[:MODULE_FEATURES][:TEACHER_MODULE_SELECTION] = true if @feature_teacher_module_selection
+        end
+      end
+
       append_default_due_time_js_env(@context, hash)
       js_env(hash)
       set_js_module_data

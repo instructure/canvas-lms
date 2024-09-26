@@ -76,6 +76,7 @@ import ItemAssignToManager from '../differentiated-modules/react/Item/ItemAssign
 import {parseModule, parseModuleList} from '../differentiated-modules/utils/moduleHelpers'
 import {addModuleElement} from '../utils/moduleHelpers'
 import ContextModulesHeader from '../react/ContextModulesHeader'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -356,7 +357,7 @@ window.modules = (function () {
     async loadMasterCourseData(tag_id) {
       if (ENV.MASTER_COURSE_SETTINGS) {
         // Grab the stuff for master courses if needed
-        $.ajaxJSON(ENV.MASTER_COURSE_SETTINGS.MASTER_COURSE_DATA_URL, 'GET', { tag_id }, data => {
+        $.ajaxJSON(ENV.MASTER_COURSE_SETTINGS.MASTER_COURSE_DATA_URL, 'GET', {tag_id}, data => {
           if (data.tag_restrictions) {
             Object.entries(data.tag_restrictions).forEach(([id, restriction]) => {
               const item = document.querySelector(
@@ -2550,6 +2551,34 @@ $(document).ready(function () {
       modules.editModule($(this).parents('.context_module'))
     }
   })
+
+  if (ENV.MODULE_FEATURES?.TEACHER_MODULE_SELECTION) {
+    $('#show_teacher_only_module_id').on('change', () => {
+      doFetchApi({
+        path: `/api/v1/courses/${ENV.COURSE_ID}/settings`,
+        method: 'PUT',
+        body: {show_teacher_only_module_id: $('#show_teacher_only_module_id').val()},
+      })
+        .then(_ => {
+          window.location.reload()
+        })
+        .catch(err => {
+          showFlashError(I18n.t('Cannot set the teacher view module'))(err)
+        })
+    })
+  }
+
+  if (ENV.MODULE_FEATURES?.STUDENT_MODULE_SELECTION) {
+    $('#show_student_only_module_id').on('change', () => {
+      doFetchApi({
+        path: `/api/v1/courses/${ENV.COURSE_ID}/settings`,
+        method: 'PUT',
+        body: {show_student_only_module_id: $('#show_student_only_module_id').val()},
+      }).catch(err => {
+        showFlashError(I18n.t('Cannot set the student view module'))(err)
+      })
+    })
+  }
 
   function handleRemoveDueDateInput(itemProps) {
     switch (itemProps.moduleItemType) {
