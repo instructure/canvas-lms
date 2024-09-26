@@ -52,6 +52,7 @@ export const SUBMISSION_FRAGMENT = gql`
     submittedAt
     submissionType
     secondsLate
+    state
     commentsConnection(includeDraftComments: true) {
       nodes {
         id
