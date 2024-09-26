@@ -600,6 +600,18 @@ describe "SpeedGrader - discussion submissions" do
           expect(f("body")).to_not contain_jqcss("button[data-testid='discussions-next-reply-button']")
         end
 
+        it "does not display if not discussion assignment" do
+          non_discussion_assignment = @course.assignments.create!(points_possible: 10, submission_types: "online_text_entry")
+          non_discussion_assignment.submit_homework(@student, body: "hi")
+
+          expect(non_discussion_assignment.submission_types).to_not eq("discussion_topic")
+          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{non_discussion_assignment.id}&student_id=#{@student.id}"
+          wait_for_ajaximations
+
+          expect(f("body")).to_not contain_jqcss("button[data-testid='discussions-previous-reply-button']")
+          expect(f("body")).to_not contain_jqcss("button[data-testid='discussions-next-reply-button']")
+        end
+
         it "does display if student has submission" do
           DiscussionEntry.create!(
             message: "1st level reply",
