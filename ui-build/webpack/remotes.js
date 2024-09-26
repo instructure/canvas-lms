@@ -16,10 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+const DEV_HOST = 'http://localhost:3002/remoteEntry.js'
+
 // based on https://module-federation.io/docs/en/mf-docs/0.2/dynamic-remotes/
 function fetchSpeedGraderLibrary(resolve, reject) {
   const script = document.createElement('script')
-  script.src = window.REMOTES?.speedgrader || 'http://localhost:3002/remoteEntry.js'
+
+  if (!window.REMOTES?.speedgrader) {
+    // eslint-disable-next-line no-console
+    console.debug(`SpeedGrader remote not configured; using ${DEV_HOST}`)
+  }
+  script.src = window.REMOTES?.speedgrader || DEV_HOST
   script.onload = () => {
     const module = {
       get: request => window.SpeedGraderLibrary.get(request),
@@ -51,7 +58,13 @@ exports.fetchSpeedGraderLibrary = fetchSpeedGraderLibrary
 
 function fetchAnalyticsHub(resolve, reject) {
   const script = document.createElement('script')
-  script.src = window.REMOTES?.analytics_hub?.launch_url || 'http://localhost:3002/remoteEntry.js'
+
+  if (!window.REMOTES?.analytics_hub?.launch_url) {
+    // eslint-disable-next-line no-console
+    console.debug(`Analytics Hub remote not configured; using ${DEV_HOST}`)
+  }
+
+  script.src = window.REMOTES?.analytics_hub?.launch_url || DEV_HOST
   script.onload = () => {
     const module = {
       get: request => window.AnalyticsHub.get(request),
