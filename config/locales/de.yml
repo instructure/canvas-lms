@@ -4811,7 +4811,7 @@ de:
         assign_peer_review: "%{student} weitere Abgaben zum Peer Review zuweisen."
         back_to_assignment: "Zurück zur Aufgabe"
       messages: 
-        cancel_peer_review: "Diese Peer-Korrektur abbrechen?"
+        cancel_peer_review: "Diesen Peer Review abbrechen?"
         no_students_found: "Keine Studierende gefunden"
       none_assigned: "Keine Zuweisungen"
       not_yet_submitted: "noch nicht abgegeben"
@@ -8830,8 +8830,8 @@ de:
   count_unsynced_changes_1fc147e5: "%{count} Nicht synchronisierte Änderungen"
   count_users_374d6e47: "(%{count} Benutzer\\*innen)"
   count_users_are_ready_to_be_assigned_temporary_enr_b2eccee: 
-    one: "Einer/einem Benutzer\\*in können temporäre Einschreibungen zugewiesen werden."
-    other: "%{count} Benutzer\\*innen können temporäre Einschreibungen zugewiesen werden."
+    one: "Einer/einem Benutzer*in können temporäre Einschreibungen zugewiesen werden."
+    other: "%{count} Benutzer*innen können temporäre Einschreibungen zugewiesen werden."
     zero: "Es sind keine Benutzer\\*innen bereit. Wählen Sie unten eine\\*n Benutzer\\*in aus den Duplikaten aus."
   count_weeks_11fbd2dc: 
     one: "1 Woche"
@@ -19654,16 +19654,16 @@ de:
     page_unpublished_module: "Diese Seite gehört zu einem nicht veröffentlichten Modul und ist noch nicht verfügbar."
     peer_review_invitation: 
       email: 
-        body: "Sie wurden eingeladen, eine Peer-Korrektur für %{reviewee} zu übernehmen. Klicken Sie hierzu unten auf den Link."
+        body: "Sie wurden eingeladen, einen Peer Review für %{reviewee} zu übernehmen. Klicken Sie hierzu unten auf den Link."
         html: 
           link_message: "Zum Abschließen der Korrektur hier klicken."
-        subject: "Peer-Korrektur für %{reviewee} zugewiesen"
+        subject: "Peer Review für %{reviewee} zugewiesen"
       sms: 
         more_info: "Weitere Informationen finden Sie unter %{url}"
       summary: 
         body: "Sie wurden eingeladen, eine Peer-Review für %{reviewee} durchzuführen. Klicken Sie hierzu auf den Link unten."
       twitter: 
-        body: "Sie wurden eingeladen, eine Peer-Korrektur für %{reviewee} zu übernehmen. Klicken Sie hierzu unten auf den Link."
+        body: "Sie wurden eingeladen, einen Peer Review für %{reviewee} zu übernehmen. Klicken Sie hierzu unten auf den Link."
     pseudonym_registration: 
       email: 
         body: "Sie wurden für ein Canvas-Konto unter %{account} registriert!  Bevor Sie sich anmelden und Canvas nutzen können, müssen Sie den Konfigurationsprozess abschließen."
@@ -21332,7 +21332,7 @@ de:
         * Webkonferenz
         * Gruppe
         * Zusammenarbeit
-        * Peer-Korrektur und Erinnerung
+        * Peer Review und Erinnerung
     invitation_display: Einladung
     late_grading_description: |-
         *Nur Lehrende und Administrator\*in:*
@@ -22335,8 +22335,8 @@ de:
   peer_review_completed_a74de33: "Peer Review abgeschlossen"
   peer_review_due_dueattext_20987412: "Peer-Review fällig am %{dueAtText}"
   peer_review_due_eb63af38: "Peer-Review fällig"
-  peer_review_for_assignment_ce72fc52: "Peer-Korrektur für %{assignment}"
-  peer_review_for_itemtitle_91198440: "Peer-Review für %{itemTitle}"
+  peer_review_for_assignment_ce72fc52: "Peer Review für %{assignment}"
+  peer_review_for_itemtitle_91198440: "Peer Review für %{itemTitle}"
   peer_review_for_name_bcffa32f: "Peer Review für %{name}"
   peer_review_for_name_due_dueattext_f5f6547d: "Peer Review für %{name} fällig: %{dueAtText}"
   peer_review_itemtitle_112ccc67: "Peer Review, %{itemTitle}"
@@ -28756,7 +28756,7 @@ de:
   strand_singleton_2d7d7be7: Strand/Singleton
   strands_b086013b: Strands
   stream_items_api: 
-    assessment_request_title: "Peer-Korrektur für %{title}"
+    assessment_request_title: "Peer Review für %{title}"
   strikethrough_6e45cdfe: Durchgestrichen
   strip_domain_from_login_attribute_value_bb6daa88: "Domäne aus dem Attributwert der Anmeldung entfernen"
   student_5da6bfd1: Studierende\*r
@@ -29147,7 +29147,7 @@ de:
       peer_review: "Peer Review"
       peer_review_not_done: "**Dieser Peer Review ist noch nicht abgeschlossen.** Um ihn abzuschließen, müssen Sie mindestens einen Kommentar erstellen."
       peer_review_not_done_rubric: "**Diese Peer-Korrektur ist noch nicht abgeschlossen.**  Damit die Peer-Korrektur als abgeschlossen gilt, muss mindestens ein Kommentar erstellt und das Bewertungsschemaformular rechts ausgefüllt werden."
-      peer_review_steps_complete: "Sie haben die erforderlichen Schritte für diese Peer-Korrektur abgeschlossen."
+      peer_review_steps_complete: "Sie haben die erforderlichen Schritte für diesen Peer Review abgeschlossen."
       see_vericite_results: "VeriCite-Ergebnisse ansehen"
       sent_to_whole_group: "Kommentar an die gesamte Gruppe senden"
       show_rubric: "Bewertungsschema anzeigen"
@@ -30071,7 +30071,7 @@ de:
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "Der URL der Seite, auf der der/die Benutzer\\*in war, als er/sie den Fehler meldete"
   the_user_below_is_ready_to_be_assigned_temporary_e_fd6bb909: "Der unten stehenden Person können temporäre Aufgaben zugewiesen werden."
   the_user_found_matches_the_provider_please_search__60e29949: "Der gefundene Benutzer\\*in stimmt mit dem Anbieter überein. Bitte suchen Sie nach einem/einer anderen Empfänger\\*in."
-  the_user_found_matches_the_provider_please_search__7a2c46b8: "Der gefundene Benutzer\\*in stimmt mit dem Anbieter überein. Bitte suchen Sie nach einer anderen Person."
+  the_user_found_matches_the_provider_please_search__7a2c46b8: "Der gefundene Benutzer*in stimmt mit dem Anbieter überein. Bitte suchen Sie nach einer anderen Person."
   the_user_found_matches_the_source_user_please_sear_a1d0004f: "Der gefundene Benutzer\\*in stimmt mit dem Quellbenutzer überein. Bitte suchen Sie nach einer anderen Person."
   the_user_id_s_of_the_admin_s_making_submissions_5432b2ce: "Die user_id(s) des/r Admin(s), der Abgaben macht"
   the_user_id_to_report_on_b1de2577: "Die Benutzer-ID, über die zu berichten ist"
@@ -30386,9 +30386,9 @@ de:
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Diese Funktion ermöglicht Lehrern, anonym Diskussionen einzurichten und eine Kurs-Level-Einstellung für Studenten zu aktivieren, damit sie anonym Diskussionen einrichten können"
   this_feature_allows_teachers_to_create_partially_a_46665db6: "Mit dieser Funktion können Lehrer teilweise anonyme Diskussionen erstellen. Teilweise anonyme Diskussionen ermöglichen es den Studierenden, zu entscheiden, ob sie anonym zu einem Diskussionsthema Stellung nehmen wollen."
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "Diese Funktion ermöglicht es Dozenten, einfach einzelne Objekte von einem Kurs zum anderen zu kopieren und ein einzelnes Content-Element mit anderen Benutzern zu teilen, damit sie diese Elemente ebenfalls in ihre Kurse importieren können."
-  this_feature_allows_users_to_create_and_search_for_15991ac8: "Mit dieser Funktion können Benutzer\\*innen Bewertungsschemata erstellen und nach ihnen suchen, während sie das Design „Verbesserte Bewertungsschemata“ auf der Seite „Aufgaben“ verwenden."
+  this_feature_allows_users_to_create_and_search_for_15991ac8: "Mit dieser Funktion können Benutzer*innen Bewertungsschemata erstellen und nach ihnen suchen, während sie das Design „Verbesserte Bewertungsschemata“ auf der Seite „Aufgaben“ verwenden."
   this_feature_allows_users_to_import_and_export_rub_340b5d30: "Diese Funktion ermöglicht es Benutzer\\*innen, Bewertungsschemata aus CSV- und XML-Dateien zu importieren und zu exportieren."
-  this_feature_allows_users_to_import_and_export_rub_b8cb0344: "Mit dieser Funktion können Benutzer\\*innen Bewertungsschemata aus CSV- und XML-Dateien aus „Verbesserte Bewertungsschemata“ importieren und exportieren."
+  this_feature_allows_users_to_import_and_export_rub_b8cb0344: "Mit dieser Funktion können Benutzer*innen Bewertungsschemata aus CSV- und XML-Dateien aus „Verbesserte Bewertungsschemata“ importieren und exportieren."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Diese Funktion kann nicht deaktiviert werden, da sie bei mindestens einem Unterkonto oder Kurs aktiviert ist."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "Diese Funktion kann nicht aktiviert werden, wenn die automatische Erkennung von Feldtrennzeichen aktiviert ist."
   this_feature_can_t_be_enabled_while_semicolons_are_2e0adb54: "Diese Funktion kann nicht aktiviert werden, wenn Semikolon erzwungene Feldtrennzeichen sind."
@@ -33839,7 +33839,7 @@ de:
   you_have_been_given_extra_time_on_this_attempt_9d8bff6c: "Ihr Zeitlimit für diesen Versuch wurde erweitert."
   you_have_changed_the_progression_requirements_for__6772bc89: "Sie haben die Fortschrittsanforderungen für einen aktiven Kurs geändert. Möglicherweise sind Studierende bereits bei diesem Modul angelangt, sowie bei anderen, die davon abhängen."
   you_have_completed_a_peer_review_for_name_4dd2264b: "Sie haben ein Peer Reviewed für %{name} abgeschlossen"
-  you_have_completed_a_peer_review_for_person_thank__1371f37e: "Sie haben eine Peer-Korrektur fertiggestellt für %{person}. Vielen Dank"
+  you_have_completed_a_peer_review_for_person_thank__1371f37e: "Sie haben einen Peer Review für %{person} fertiggestellt. Vielen Dank"
   you_have_completed_your_peer_reviews_543ad84: "Sie haben Ihre Peer Reviews abgeschlossen!"
   you_have_count_calendars_left_f0cbcac4: 
     one: "Sie haben noch 1 Kalender übrig"
@@ -33970,8 +33970,8 @@ de:
   you_ve_been_invited_to_participate_in_a_class_at_a_af5cae6d: "Sie wurden in eine Klasse in %{account} eingeladen.  Die Klasse heißt %{course}. Kursrolle: %{role_type}"
   you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Sie wurden in eine Klasse in %{website} eingeladen.  Die Klasse heißt %{course}. Kursrolle: %{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "Sie wurden zur Teilnahme am Kurs %{course} eingeladen. Kursrolle: %{role_type}"
-  you_ve_been_invited_to_peer_review_reviewee_82580fb: "Sie wurden eingeladen, eine Peer-Korrektur für %{reviewee} durchzuführen."
-  you_ve_been_invited_to_peer_review_reviewee_follow_2e71fce2: "Sie wurden eingeladen, eine Peer-Korrektur für %{reviewee} durchzuführen. Folgen Sie hierzu diesem Link: %{link}."
+  you_ve_been_invited_to_peer_review_reviewee_82580fb: "Sie wurden eingeladen, einen Peer Review für %{reviewee} durchzuführen."
+  you_ve_been_invited_to_peer_review_reviewee_follow_2e71fce2: "Sie wurden eingeladen, einen Peer Review für %{reviewee} durchzuführen. Folgen Sie hierzu diesem Link: %{link}."
   you_ve_been_invited_to_the_course_course_2aac8140: "Sie wurden zum Kurs %{course} eingeladen."
   you_ve_been_invited_to_the_course_course_course_ro_a74d748b: "Sie wurden zu dem Kurs %{course} eingeladen. Kursrolle: %{role_type}"
   you_ve_been_mentioned_discussion_topic_by_user_nam_60649d56: "Sie wurden erwähnt: %{discussion_topic} von %{user_name}"
