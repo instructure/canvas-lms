@@ -299,22 +299,22 @@ class ConferencesController < ApplicationController
     bbb_config = WebConference.config(class_name: BigBlueButtonConference.to_s)
 
     # exposing the initial data as json embedded on page.
-    js_env(
-      current_conferences: ui_conferences_json(@new_conferences, @context, @current_user, session),
-      concluded_conferences: ui_conferences_json(@concluded_conferences, @context, @current_user, session),
-      default_conference: default_conference_json(@context, @current_user, session),
-      conference_type_details: conference_types_json(WebConference.conference_types(@context)),
-      users: @users.map { |u| { id: u.id, name: u.last_name_first } },
-      groups: @groups&.map { |g| { id: g.id, name: g.full_name } },
-      sections: @sections&.map { |s| { id: s.id, name: s.display_name } },
-      group_user_ids_map: @group_user_ids_map,
-      section_user_ids_map: @section_user_ids_map,
-      can_create_conferences: @context.grants_right?(@current_user, session, :create_conferences),
-      can_manage_calendar: @context.grants_right?(@current_user, session, :manage_calendar),
-      render_alternatives: @render_alternatives,
-      bbb_recording_enabled: bbb_config ? bbb_config[:recording_enabled] : false,
-      context_name: @context&.name || nil
-    )
+    js_env({
+             current_conferences: ui_conferences_json(@new_conferences, @context, @current_user, session),
+             concluded_conferences: ui_conferences_json(@concluded_conferences, @context, @current_user, session),
+             default_conference: default_conference_json(@context, @current_user, session),
+             conference_type_details: conference_types_json(WebConference.conference_types(@context)),
+             users: @users.map { |u| { id: u.id, name: u.last_name_first } },
+             groups: @groups&.map { |g| { id: g.id, name: g.full_name } },
+             sections: @sections&.map { |s| { id: s.id, name: s.display_name } },
+             group_user_ids_map: @group_user_ids_map,
+             section_user_ids_map: @section_user_ids_map,
+             can_create_conferences: @context.grants_right?(@current_user, session, :create_conferences),
+             can_manage_calendar: @context.grants_right?(@current_user, session, :manage_calendar),
+             render_alternatives: @render_alternatives,
+             bbb_recording_enabled: bbb_config ? bbb_config[:recording_enabled] : false,
+             context_name: @context&.name || nil
+           })
     set_tutorial_js_env
     flash[:error] = t("Some conferences on this page are hidden because of errors while retrieving their status") if @errors
   end

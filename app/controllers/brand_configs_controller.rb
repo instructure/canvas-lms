@@ -43,13 +43,15 @@ class BrandConfigsController < ApplicationController
     base_brand_config ||= BrandConfig.k12_config if k12?
     base_brand_config ||= BrandConfig.new
 
-    js_env brandConfigStuff: {
-      baseBrandableVariables: BrandableCSS.all_brand_variable_values(base_brand_config),
-      brandableVariableDefaults: BrandableCSS.variables_map,
-      accountID: @account.id.to_s,
-      sharedBrandConfigs: visible_shared_brand_configs.as_json(include_root: false, include: "brand_config"),
-      activeBrandConfig: active_brand_config(ignore_parents: true).as_json(include_root: false)
-    }
+    js_env({
+             brandConfigStuff: {
+               baseBrandableVariables: BrandableCSS.all_brand_variable_values(base_brand_config),
+               brandableVariableDefaults: BrandableCSS.variables_map,
+               accountID: @account.id.to_s,
+               sharedBrandConfigs: visible_shared_brand_configs.as_json(include_root: false, include: "brand_config"),
+               activeBrandConfig: active_brand_config(ignore_parents: true).as_json(include_root: false)
+             }
+           })
     render html: "", layout: true
   end
 
@@ -63,12 +65,14 @@ class BrandConfigsController < ApplicationController
 
     variable_schema = Login::LoginBrandConfigFilter.filter(variable_schema, @domain_root_account)
 
-    js_env brandConfig: brand_config.as_json(include_root: false),
-           isDefaultConfig: session[:brand_config]&.[](:type) == :default,
-           hasUnsavedChanges: session.key?(:brand_config),
-           variableSchema: variable_schema,
-           allowGlobalIncludes: @account.allow_global_includes?,
-           account_id: @account.id
+    js_env({
+             brandConfig: brand_config.as_json(include_root: false),
+             isDefaultConfig: session[:brand_config]&.[](:type) == :default,
+             hasUnsavedChanges: session.key?(:brand_config),
+             variableSchema: variable_schema,
+             allowGlobalIncludes: @account.allow_global_includes?,
+             account_id: @account.id
+           })
     render html: "", layout: "layouts/bare"
   end
 

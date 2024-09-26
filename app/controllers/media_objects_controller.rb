@@ -239,8 +239,10 @@ class MediaObjectsController < ApplicationController
     @show_embedded_chat = false
     @show_left_side = false
     @show_right_side = false
-    js_env(MEDIA_OBJECT_ID: params[:id],
-           MEDIA_OBJECT_TYPE: @media_object ? @media_object.media_type.to_s : "video")
+    js_env({
+             MEDIA_OBJECT_ID: params[:id],
+             MEDIA_OBJECT_TYPE: @media_object ? @media_object.media_type.to_s : "video"
+           })
     render
   end
 
@@ -317,9 +319,9 @@ class MediaObjectsController < ApplicationController
                        media_object_api_json(@media_object, @current_user, session)
                      end
 
-    js_env media_object: media_api_json if media_api_json
-    js_env attachment: !!@attachment
-    js_env attachment_id: @attachment.id if @attachment
+    js_env({ media_object: media_api_json }) if media_api_json
+    js_env({ attachment: !!@attachment })
+    js_env({ attachment_id: @attachment.id }) if @attachment
     consolidated_media_player_enabled = Account.site_admin.feature_enabled?(:consolidated_media_player)
     # this flag is also injected through the normal js_env for the RCE
     # but it needs to be added separately here for the iframe because of subaccount weirdness
@@ -350,7 +352,7 @@ class MediaObjectsController < ApplicationController
                        media_object_api_json(@media_object, @current_user, session)
                      end
 
-    js_env media_object: media_api_json if media_api_json
+    js_env({ media_object: media_api_json }) if media_api_json
 
     # Add custom body class for responsive padding control
     @body_classes ||= []

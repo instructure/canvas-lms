@@ -29,7 +29,7 @@
   newquizzes_engine_selected = @context.horizon_course? ? 'true' : newquizzes_engine_selected
   module_links_default_new_tab = @current_user&.get_preference(:module_links_default_new_tab)
 %>
-<% js_env :NEW_QUIZZES_BY_DEFAULT => new_quizzes_by_default %>
+<% js_env({ NEW_QUIZZES_BY_DEFAULT: new_quizzes_by_default }) %>
 <% cache([@context, 'select_context_content_dialog_1', only].cache_key) do %>
   <div id="select_context_content_dialog" style="display: none;">
     <div style="margin-bottom: 5px; <%= hidden if only && only.size == 1 %>">

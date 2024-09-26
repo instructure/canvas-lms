@@ -1204,7 +1204,7 @@ describe ExternalToolsController do
       context "ENV.LTI_TOOL_FORM_ID" do
         it "sets a random id" do
           expect(controller).to receive(:random_lti_tool_form_id).and_return("1")
-          expect(controller).to receive(:js_env).with(LTI_TOOL_FORM_ID: "1")
+          expect(controller).to receive(:js_env).with({ LTI_TOOL_FORM_ID: "1" })
           get "retrieve", params: { course_id: @course.id, url: "http://www.example.com/launch" }
         end
       end

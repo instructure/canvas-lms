@@ -43,7 +43,7 @@ class ExternalContentController < ApplicationController
     normalize_deprecated_data!
     @retrieved_data = {}
     if params[:return_type] == "oembed"
-      js_env(oembed: { endpoint: params[:endpoint], url: params[:url] })
+      js_env({ oembed: { endpoint: params[:endpoint], url: params[:url] } })
       @oembed_token = params[:oembed_token]
     elsif params[:service] == "external_tool_dialog"
       get_context
@@ -84,7 +84,7 @@ class ExternalContentController < ApplicationController
              error_log: param_if_set(:lti_errorlog)
            })
     if parent_frame_origin
-      js_env({ DEEP_LINKING_POST_MESSAGE_ORIGIN: parent_frame_origin }, true)
+      js_env({ DEEP_LINKING_POST_MESSAGE_ORIGIN: parent_frame_origin }, overwrite: true)
       set_extra_csp_frame_ancestor!
     end
   end
@@ -130,7 +130,7 @@ class ExternalContentController < ApplicationController
 
   def cancel
     @headers = false
-    js_env(service: params[:service])
+    js_env({ service: params[:service] })
   end
 
   def content_items_for_canvas

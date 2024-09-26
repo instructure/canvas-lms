@@ -78,7 +78,7 @@ module Login::Shared
 
   def finalize_login(_user, _pseudonym); end
 
-  def successful_login(user, pseudonym, otp_passed = false)
+  def successful_login(user, pseudonym, otp_passed: false)
     reset_authenticity_token!
     Auditors::Authentication.record(pseudonym, "login")
 

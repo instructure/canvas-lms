@@ -927,9 +927,11 @@ class ExternalToolsController < ApplicationController
 
         success_url = tool_return_success_url(placement)
         cancel_url = tool_return_cancel_url(placement) || success_url
-        js_env(redirect_return_success_url: success_url,
-               redirect_return_cancel_url: cancel_url)
-        js_env(course_id: @context.id) if @context.is_a?(Course)
+        js_env({
+                 redirect_return_success_url: success_url,
+                 redirect_return_cancel_url: cancel_url
+               })
+        js_env({ course_id: @context.id }) if @context.is_a?(Course)
 
         set_active_tab @tool.asset_string
         @show_embedded_chat = false if @tool.tool_id == "chat"
@@ -942,7 +944,7 @@ class ExternalToolsController < ApplicationController
         end
 
         # Some LTI apps have tutorial trays. Provide some details to the client to know what tray, if any, to show
-        js_env(LTI_LAUNCH_RESOURCE_URL: @lti_launch.resource_url)
+        js_env({ LTI_LAUNCH_RESOURCE_URL: @lti_launch.resource_url })
         set_tutorial_js_env
 
         Lti::LogService.new(tool: @tool, context: @context, user: @current_user, session_id: session[:session_id], placement:, launch_type: :direct_link, launch_url: @tool.url_with_environment_overrides(launch_url || @tool.url)).call
@@ -1068,7 +1070,7 @@ class ExternalToolsController < ApplicationController
     log_asset_access(@tool, "external_tools", "external_tools") if post_live_event
 
     @tool_form_id = random_lti_tool_form_id
-    js_env(LTI_TOOL_FORM_ID: @tool_form_id)
+    js_env({ LTI_TOOL_FORM_ID: @tool_form_id })
 
     case message_type
     when "ContentItemSelectionResponse", "ContentItemSelection"

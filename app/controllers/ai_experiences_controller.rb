@@ -136,7 +136,7 @@ class AiExperiencesController < ApplicationController
       format.html do
         @page_title = @ai_experience.title
         js_bundle :ai_experiences_show
-        js_env(AI_EXPERIENCE: ai_experience_json(@ai_experience, @current_user, session, can_manage:))
+        js_env({ AI_EXPERIENCE: ai_experience_json(@ai_experience, @current_user, session, can_manage:) })
         render html: view_context.content_tag(:div, nil, id: "ai_experiences_show"),
                layout: true
       end

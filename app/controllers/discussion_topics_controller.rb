@@ -431,7 +431,11 @@ class DiscussionTopicsController < ApplicationController
             locked = topic.locked? || topic.locked_for?(@current_user)
             locked.is_a?(Hash) ? locked[:can_view] : locked
           end
-          js_env openTopics: open_topics, lockedTopics: locked_topics, newTopicURL: named_context_url(@context, :new_context_discussion_topic_url)
+          js_env({
+                   openTopics: open_topics,
+                   lockedTopics: locked_topics,
+                   newTopicURL: named_context_url(@context, :new_context_discussion_topic_url)
+                 })
         end
 
         fetch_params = {
@@ -502,7 +506,7 @@ class DiscussionTopicsController < ApplicationController
         set_tutorial_js_env
 
         if user_can_edit_course_settings?
-          js_env(SETTINGS_URL: named_context_url(@context, :api_v1_context_settings_url))
+          js_env({ SETTINGS_URL: named_context_url(@context, :api_v1_context_settings_url) })
         end
 
         @page_title = join_title(t("#titles.discussions", "Discussions"), @context.name)
@@ -1915,7 +1919,7 @@ class DiscussionTopicsController < ApplicationController
         @context.course_sections.select { |s| s.active? && section_visibilities.include?(s.id) }
       end
 
-    js_env SECTION_LIST: sections.map { |section|
+    js_env({ SECTION_LIST: sections.map do |section|
       {
         id: section.id,
         name: section.name,
@@ -1923,7 +1927,7 @@ class DiscussionTopicsController < ApplicationController
         end_at: section.end_at,
         override_course_and_term_dates: section.restrict_enrollments_to_section_dates
       }
-    }
+    end })
   end
 
   def mutate_js_hash_sections_for_show_method(js_hash, topic)
@@ -1984,6 +1988,6 @@ class DiscussionTopicsController < ApplicationController
 
     # For graded discussions, delegate to the assignment's asset processors
     urls = Lti::EulaUiService.eula_launch_urls(user: @current_user, assignment: @topic.assignment)
-    js_env ASSET_PROCESSOR_EULA_LAUNCH_URLS: urls
+    js_env({ ASSET_PROCESSOR_EULA_LAUNCH_URLS: urls })
   end
 end

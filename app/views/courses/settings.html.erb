@@ -886,7 +886,7 @@
     <%
       if @context.root_account.feature_enabled?(:course_settings_navigation_react)
     %>
-      <% js_env(COURSE_SETTINGS_NAVIGATION_TABS: sortable_tabs) %>
+      <% js_env({ COURSE_SETTINGS_NAVIGATION_TABS: sortable_tabs }) %>
       <%=
         form_tag(
           context_url(@context, :context_update_nav_url),

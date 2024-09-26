@@ -46,8 +46,8 @@ class Quizzes::QuizSubmissionsController < ApplicationController
       # If the submission is a preview, we don't add it to the user's submission history,
       # and it actually gets keyed by the temporary_user_code column instead of
       if @current_user.nil? || is_previewing?
-        @submission = @quiz.quiz_submissions.where(temporary_user_code: temporary_user_code(false), user_id: nil).first
-        @submission ||= @quiz.generate_submission(temporary_user_code(false) || @current_user, is_previewing?)
+        @submission = @quiz.quiz_submissions.where(temporary_user_code: temporary_user_code(generate: false), user_id: nil).first
+        @submission ||= @quiz.generate_submission(temporary_user_code(generate: false) || @current_user, is_previewing?)
       else
         @submission = @quiz.quiz_submissions.where(user_id: @current_user).first if @current_user.present?
         @submission ||= @quiz.generate_submission(@current_user, is_previewing?)
@@ -89,7 +89,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
     end
     if authorized_action(@quiz, @current_user, :submit)
       if @current_user.nil? || is_previewing?
-        @submission = @quiz.quiz_submissions.where(temporary_user_code: temporary_user_code(false), user_id: nil).first
+        @submission = @quiz.quiz_submissions.where(temporary_user_code: temporary_user_code(generate: false), user_id: nil).first
       else
         @submission = @quiz.quiz_submissions.where(user_id: @current_user).first
         if @submission.present? && !@submission.valid_token?(params[:validation_token])
@@ -104,7 +104,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
 
       if !@submission || (@quiz.ip_filter && !@quiz.valid_ip?(quiz_client_ip))
         # do nothing
-      elsif is_previewing? || (@submission.temporary_user_code == temporary_user_code(false)) ||
+      elsif is_previewing? || (@submission.temporary_user_code == temporary_user_code(generate: false)) ||
             @submission.grants_right?(@current_user, session, :update)
         if !@submission.completed? && (!@submission.overdue? || is_previewing?)
           if params[:action] == "record_answer"

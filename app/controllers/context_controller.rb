@@ -238,8 +238,10 @@ class ContextController < ApplicationController
             @accesses = @accesses.paginate(page: params[:page], per_page: 50)
             @last_activity_at = @context.enrollments.where(user_id: @user).maximum(:last_activity_at)
             @aua_expiration_date = AssetUserAccess.expiration_date
-            js_env(context_url: context_url(@context, :context_user_usage_url, @user, format: :json),
-                   accesses_total_pages: @accesses.total_pages)
+            js_env({
+                     context_url: context_url(@context, :context_user_usage_url, @user, format: :json),
+                     accesses_total_pages: @accesses.total_pages
+                   })
           end
           format.json do
             @accesses = Api.paginate(@accesses, self, polymorphic_url([@context, :user_usage], user_id: @user), default_per_page: 50)
@@ -314,7 +316,7 @@ class ContextController < ApplicationController
       end
       # rubocop:enable Rails/ActionControllerFlashBeforeRender
 
-      js_env(CONTEXT_USER_DISPLAY_NAME: @user.short_name)
+      js_env({ CONTEXT_USER_DISPLAY_NAME: @user.short_name })
 
       js_bundle :user_name, "context_roster_user"
       css_bundle :roster_user, :pairing_code

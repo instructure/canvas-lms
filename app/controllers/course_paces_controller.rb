@@ -339,7 +339,7 @@ class CoursePacesController < ApplicationController
              PACES_PUBLISHING: paces_publishing,
              CONTEXT_URL_ROOT: polymorphic_path([@context])
            },
-           true)
+           overwrite: true)
     js_bundle :course_paces
     css_bundle :course_paces
   end

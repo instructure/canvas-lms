@@ -23,7 +23,7 @@
     js_bundle(:navigation_header) unless @headers == false
 
     provide :head, include_common_stylesheets
-    js_env notices: flash_notices()
+    js_env({ notices: flash_notices() })
 
     body_classes << 'Underline-All-Links__enabled' if @current_user && @current_user.feature_enabled?(:underline_all_links)
 

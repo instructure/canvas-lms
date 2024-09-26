@@ -38,13 +38,13 @@ class RateLimitingSettingsController < ApplicationController
     respond_to do |format|
       format.html do
         set_navigation
-        js_env(
-          ACCOUNT: {
-            "id" => @context.id,
-            "site_admin" => @context.site_admin?,
-            "root_account" => @context.root_account?
-          }
-        )
+        js_env({
+                 ACCOUNT: {
+                   "id" => @context.id,
+                   "site_admin" => @context.site_admin?,
+                   "root_account" => @context.root_account?
+                 }
+               })
         render :index
       end
       format.json do

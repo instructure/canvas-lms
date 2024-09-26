@@ -29,7 +29,7 @@ class AccessibilityController < ApplicationController
     @show_left_side = true
     @collapse_course_menu = false
     js_bundle :accessibility_checker
-    js_env(SCAN_DISABLED: @context.exceeds_accessibility_scan_limit?)
+    js_env({ SCAN_DISABLED: @context.exceeds_accessibility_scan_limit? })
     render html: "".html_safe, layout: true
   end
 

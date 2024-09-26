@@ -868,12 +868,12 @@ class FilesController < ApplicationController
         redirect_to(named_context_url(@context, :context_file_url, attachment.id))
       end
     else
-      send_stored_file(attachment, false)
+      send_stored_file(attachment, inline: false)
     end
   end
   protected :send_attachment
 
-  def send_stored_file(attachment, inline = true)
+  def send_stored_file(attachment, inline: true)
     user = file_access_user
     attachment.context_module_action(user, :read) if user && !params[:preview]
 

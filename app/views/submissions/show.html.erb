@@ -197,7 +197,7 @@
             </a>
             <% if unread_comments %>
               <span class="rubric_comment unread_indicator" aria-hidden="true"></span>
-              <% js_env mark_rubric_comments_read_url: api_v1_course_submission_rubric_assessments_mark_read_url(@context.id, @assignment.id, @submission.user.id) %>
+              <% js_env({ mark_rubric_comments_read_url: api_v1_course_submission_rubric_assessments_mark_read_url(@context.id, @assignment.id, @submission.user.id) }) %>
             <% end %>
           </div>
         <% end %>
@@ -464,4 +464,4 @@
       </div>
     </div>
   </div>
-<% js_env :rubricAssessments => @visible_rubric_assessments.as_json(:include => :assessor, :permissions => {:user => @current_user, :session => session}) %>
+<% js_env({ rubricAssessments: @visible_rubric_assessments.as_json(:include => :assessor, :permissions => {:user => @current_user, :session => session}) }) %>

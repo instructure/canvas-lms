@@ -44,7 +44,7 @@ class QuestionBanksController < ApplicationController
   end
 
   def questions
-    find_bank(params[:question_bank_id], params[:inherited] == "1") do
+    find_bank(params[:question_bank_id], check_context_chain: params[:inherited] == "1") do
       @questions = @bank.assessment_questions.active
       url = polymorphic_url([@context, :question_bank_questions], question_bank_id: @bank)
       @questions = Api.paginate(@questions, self, url, default_per_page: 50)
@@ -62,11 +62,11 @@ class QuestionBanksController < ApplicationController
 
   def show
     @bank = @context.assessment_question_banks.find(params[:id])
-    js_env(
-      CONTEXT_URL_ROOT: polymorphic_path([@context]),
-      ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
-      OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
-    )
+    js_env({
+             CONTEXT_URL_ROOT: polymorphic_path([@context]),
+             ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
+             OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
+           })
     mastery_scales_js_env
     rce_js_env
 

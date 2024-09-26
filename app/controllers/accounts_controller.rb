@@ -1704,10 +1704,10 @@ class AccountsController < ApplicationController
                })
       end
 
-      js_env(edit_help_links_env, true)
+      js_env(edit_help_links_env, overwrite: true)
       if @account.root_account?
-        js_env(EARLY_ACCESS_PROGRAM: @account.early_access_program[:value] ||
-                                     @account.grants_right?(@current_user, :manage_site_settings))
+        js_env({ EARLY_ACCESS_PROGRAM: @account.early_access_program[:value] ||
+                                     @account.grants_right?(@current_user, :manage_site_settings) })
       end
     end
   end
@@ -1739,17 +1739,19 @@ class AccountsController < ApplicationController
     end
     logging ||= false
 
-    js_env PERMISSIONS: {
-      restore_course: @account.grants_right?(@current_user, session, :undelete_courses),
-      restore_user: @account.grants_right?(@current_user, session, :manage_user_logins),
-      # Permission caching issue makes explicitly checking the account setting
-      # an easier option.
-      view_messages: (@account.settings[:admins_can_view_notifications] &&
-                       @account.grants_right?(@current_user, session, :view_notifications)) ||
-                     Account.site_admin.grants_right?(@current_user, :read_messages),
-      logging:
-    }
-    js_env bounced_emails_admin_tool: @account.grants_right?(@current_user, session, :view_bounced_emails)
+    js_env({
+             PERMISSIONS: {
+               restore_course: @account.grants_right?(@current_user, session, :undelete_courses),
+               restore_user: @account.grants_right?(@current_user, session, :manage_user_logins),
+               # Permission caching issue makes explicitly checking the account setting
+               # an easier option.
+               view_messages: (@account.settings[:admins_can_view_notifications] &&
+                             @account.grants_right?(@current_user, session, :view_notifications)) ||
+                           Account.site_admin.grants_right?(@current_user, :read_messages),
+               logging:
+             },
+             BOUNCED_EMAILS_ADMIN_TOOL: @account.grants_right?(@current_user, session, :view_bounced_emails)
+           })
   end
 
   def confirm_delete_user
