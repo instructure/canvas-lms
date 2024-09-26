@@ -66,6 +66,7 @@ module SmartSearchable
 
   def should_generate_embeddings?
     return false if deleted? || skip_embeddings
+    return false unless context.is_a?(Course)
     return false unless SmartSearch.smart_search_available?(context)
 
     saved_changes.key?(self.class.search_title_column) || saved_changes.key?(self.class.search_body_column) ||
