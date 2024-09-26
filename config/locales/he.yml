@@ -605,7 +605,7 @@ he:
         activity: פעילות
         date: תאריך
         no_item_found: "לא נמצאו פריטים"
-        time: זמן
+        time: "זמן "
       comm_message_item: 
         created_at: "נוצר במועד:"
         from_name: מאת
@@ -715,7 +715,7 @@ he:
         message_date_from: מתאריך
         message_date_to: "עד תאריך"
         search: "חפש אנשים לפי מזהה או שם"
-        search_people: "חפש אנשים"
+        search_people: "חיפוש אנשים"
     adtalem: 
       attendance_extract: 
         parameters: 
@@ -2222,6 +2222,8 @@ he:
       current: "קורסים שרצים כעת"
     department: 
       analytics: "ניתוח פעילות"
+    deprecated: 
+      analytics: "ניתוח פעילות "
     filters: 
       completed: "קורסים שהסתיימו"
       current: "קורסים שרצים כעת "
@@ -2737,7 +2739,7 @@ he:
       multiple_due_dates: "תאריכי יעד מרובים"
       not_graded_type: "לא מוערך"
       quiz_type: בוחן
-      save: שמירה
+      save: "שמירה "
       saving: שומר...
     create_group: 
       cancel: ביטול
@@ -2747,7 +2749,7 @@ he:
       group_name: "שם קבוצה:"
       never_drop: "משימת חובה:"
       percent_of_total: "% של הציון הכולל"
-      save: שמירה
+      save: "שמירה "
       saving: שומר...
     create_new_crumb: "צור/י חדש"
     date_available_column_view: 
@@ -2818,8 +2820,8 @@ he:
     external_content_homework_file_submission_view: 
       additional_comments: "הערות נוספות"
       buttons: 
-        submit_assignment: "הגש משימה"
-      group_assignment_header: הערות...
+        submit_assignment: "הגשת משימה"
+      group_assignment_header: "הערות... "
     external_content_homework_url_submission_view: 
       additional_comments: "הערות נוספות"
       buttons: 
@@ -3228,7 +3230,7 @@ he:
           submit_papers_to: "להכללה במאגר הנתונים"
           turnitin_repository: "מאגר Turnitin"
         originality_report_never: "אף פעם"
-        originality_report_visibility: "לתלמידים האפשרות לעיין בדוח המקוריות "
+        originality_report_visibility: "תלמידים יכולים לעיין בדו\"ח המקוריות"
         originality_report_visible_after_due_date: "לאחר תאריך היעד"
         originality_report_visible_after_grading: "אחרי שהמטלה מוערכת"
         originality_report_visible_immediately: מיד
@@ -3811,7 +3813,7 @@ he:
       details: "פרטים:"
       group_category: "קטגורית קבוצות"
       group_signup: "אפשר/י לתלמידים להרשם בקבוצות"
-      location: מיקום
+      location: "מיקום:"
       name: שם
       time_range: "טווח זמן"
     edit_appt_calendar_event: 
@@ -3848,7 +3850,7 @@ he:
       delete: ביטול
       different_date_for_each_section: "השתמש/י בתאריך אחר לכל הקבצה"
       edit_calendar_event_header: "עריכת אירוע יומן"
-      end_time: "זמן סיום"
+      end_time: "מועד סיום"
       event_description: "תיאור אירוע"
       event_title: "שם האירוע"
       location_address: "כתובת:"
@@ -4328,7 +4330,7 @@ he:
         collaboration_members: "חברי שיתוף הפעולה"
         groups: "קבוצות "
         loading: טוען
-        people: אנשים
+        people: "אנשים "
         remove_all: "הסרת כולם"
       member_instructions: "יש להקליק על משתמש או קבוצה בעמודה הקיצונית כדי להוסיף שותפים לפעילות"
     delete_button: 
@@ -6113,7 +6115,7 @@ he:
         cannot_add_users: "אין אפשרות להוסיף משתמשים חדשים כיון שהקורס נסתיים ומסוכם"
         filter_field_description: "חיפוש אנשים. רשימת האנשים תסונן תוך כדי ההקלדה ותציג רק את אלו שעונים לטקסט ההקלדה"
         group_set: "אוסף קבוצות"
-        people: אנשים
+        people: "אנשים "
         role_to_search: "הגבלת חיפוש לתפקיד"
         search_people: "חיפוש אנשים"
         title_add_people: "הוספת אנשים"
@@ -6150,7 +6152,7 @@ he:
       roster_users: 
         canvas_user_id: "מזהה משתמש של קנבס"
         last_activity: "הפעילות האחרונה"
-        login_name: "מזהה התחברות"
+        login_name: "מזהה לוג-אין"
         name: שם
         no_people_found: "לא נמצאו אנשים"
         role: תפקיד
@@ -6588,7 +6590,7 @@ he:
   currently_assigned_to_tokenname_click_to_remove_5a853a84: "כרגע משויך ל %{tokenName}, הקש/י כדי להסיר"
   curve_grades_b7a75443: "עקומת ציונים"
   curve_grades_dialog: 
-    average_score: "ממוצע הציון"
+    average_score: "ציון ממוצע"
     buttons: 
       curve_grades: "עקומת ציונים"
       curving_grades: "מחשב עקומת ציונים..."
@@ -13704,7 +13706,7 @@ he:
     new_observee_password: סיסמה
     new_observee_username: "שם משתמש"
     observee_added: "כעת מתבוננים ב %{user}"
-    observing: מתבוננים
+    observing: השגחה
   observer_248a192e: משקיף
   observer_accounts_only_30c70a70: "חשבונות משקיף בלבד"
   observing_f3c5e759: השגחה
@@ -13853,7 +13855,7 @@ he:
       edit_criterion_rating_title: "עריכת \"%{description} של קריטריון דרוג"
       insert_criterion_rating: "הוספת קריטריון דרוג"
       insert_rating: הוספה
-      points: נקודות
+      points: ניקוד
       pts: נקודות
       rating_description: "תיאור קריטריון דרוג"
     criterion_header: 
@@ -15531,9 +15533,9 @@ he:
       possible_answer: "תשובה אפשרית"
     ldb_login_popup: 
       email: דוא"ל
-      log_in: התחברות
+      log_in: "התחברות "
       logged_out_of_canvas: "*התנתקת מקנבס.* כדי להמשיך יש להתחבר."
-      password: סיסמה
+      password: "סיסמה "
       titles: 
         log_in: "בבקשה להתחבר"
     loading_more_questions: "טעינת שאלות נוספות..."
@@ -16724,7 +16726,7 @@ he:
       labels: 
         email: "כתובת הדוא\"ל שלך"
         name: שמך
-        password: סיסמה
+        password: "סיסמה "
     parent_dialog: 
       buttons: 
         start_participating: "התחלת השתתפות"
@@ -18570,6 +18572,7 @@ he:
   start_time_2c3d11b5: "זמן התחלה"
   start_tls_26e4b0dc: "התחלת TLS"
   started_5e138638: התחיל
+  starts_at_29843f98: "מתחיל ב"
   starts_ce584f1c: "מתחיל:"
   state_standards_c9b1affd: "תקני מדינה"
   statistics: 
@@ -20338,6 +20341,7 @@ he:
   view_name_app_62a2ad8e: "הצגת האפליקציה  %{name}"
   view_next_file_a8a4a885: "הצגת הקובץ הבא"
   view_next_student_9fc72fef: "הצגת התלמיד הבא"
+  view_notifications_6aea09a2: "עיון בהודעות"
   view_previous_file_b846db4f: "הצגת הקובץ הקודם"
   view_previous_student_90000459: "הצגת התלמיד הקודם"
   view_prior_enrollments_9b519b25: "הצגת הרשמות קודמות"
