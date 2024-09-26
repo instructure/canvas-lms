@@ -276,7 +276,7 @@ describe('DifferentiatedModulesSection', () => {
       // wait until the cards are loaded
       await findAllByTestId('item-assign-to-card')
 
-      const addCardBtn = getAllByTestId('add-card')[1]
+      const addCardBtn = getAllByTestId('add-card')[0]
       act(() => addCardBtn.click())
 
       getByTestId('differentiated_modules_save_button').click()
