@@ -1920,6 +1920,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: "lti/resource_links") do
       get "courses/:course_id/lti_resource_links", action: :index
+      post "courses/:course_id/lti_resource_links", action: :create
       get "courses/:course_id/lti_resource_links/:id", action: :show
       put "courses/:course_id/lti_resource_links/:id", action: :update
     end

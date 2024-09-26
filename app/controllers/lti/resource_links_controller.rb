@@ -30,6 +30,14 @@
 #
 # Use of this API requires the `manage_lti_add` and `manage_assignments_add` permissions.
 #
+# <b>Caution!</b> Resource Links are usually managed by the tool that created them via LTI Deep Linking,
+# and using this API to create or modify links may result in errors when launching the link.
+#
+# Common patterns for using this API include:
+# * facilitating migration between two different versions of the same tool by updating the domain of the launch URL
+# * creating new links to embed in rich content in Canvas
+# * responding to a course copy or other Canvas content migration by updating the launch URL
+#
 # @model Lti::ResourceLink
 #     {
 #       "id": "Lti::ResourceLink",
@@ -128,7 +136,8 @@ class Lti::ResourceLinksController < ApplicationController
   before_action :require_context_instrumented
   before_action :require_feature_flag
   before_action :require_permissions
-  before_action :validate_update_params, only: :update
+  before_action :validate_custom, only: [:create, :update]
+  before_action :validate_url, only: [:create, :update]
 
   include Api::V1::Lti::ResourceLink
 
@@ -145,7 +154,7 @@ class Lti::ResourceLinksController < ApplicationController
   # @example_request
   #
   #   This would return the first 50 LTI resource links for the course, with a Link header pointing to the next page
-  #   curl -X GET 'https://<canvas>/api/v1/courses/<course_id>/lti_resource_links' \
+  #   curl -X GET 'https://<canvas>/api/v1/courses/1/lti_resource_links' \
   #       -H "Authorization: Bearer <token>" \
   #
   # @returns [Lti::ResourceLink]
@@ -184,7 +193,7 @@ class Lti::ResourceLinksController < ApplicationController
   # @example_request
   #
   #   This would return the specified LTI resource link
-  #   curl -X GET 'https://<canvas>/api/v1/courses/<course_id>/lti_resource_links/lookup_uuid:<resource_link_lookup_uuid>' \
+  #   curl -X GET 'https://<canvas>/api/v1/courses/1/lti_resource_links/lookup_uuid:c522554a-d4be-49ef-b163-9c87fdc6ad6f' \
   #       -H "Authorization: Bearer <token>"
   #
   # @returns Lti::ResourceLink
@@ -195,19 +204,65 @@ class Lti::ResourceLinksController < ApplicationController
     raise e
   end
 
+  # @API Create an LTI Resource Link
+  # Create a new LTI Resource Link in the specified course with the provided parameters.
+  #
+  # <b>Caution!</b> Resource Links are usually created by the tool via LTI Deep Linking. The tool has no
+  # knowledge of links created via this API, and may not be able to handle or launch them.
+  #
+  # Links created using this API cannot be associated with a specific piece of Canvas content,
+  # like an Assignment, Module Item, or Collaboration. Links created using this API are only suitable
+  # for embedding in rich content using the `canvas_launch_url` provided in the API response.
+  #
+  # This link will be associated with the ContextExternalTool available in this context that matches the provided url.
+  # If a matching tool is not found, the link will not be created and this will return an error.
+  #
+  # @argument url [Required, String] The launch URL for this resource link.
+  # @argument title [Optional, String] The title of the resource link.
+  # @argument custom [Optional, Hash] Custom parameters to be sent to the tool when launching this link.
+  #
+  # @example_request
+  #
+  #   This would create a new LTI resource link in the specified course
+  #   curl -X POST 'https://<canvas>/api/v1/courses/1/lti_resource_links' \
+  #       -H "Authorization: Bearer <token>" \
+  #       -d 'url=https://example.com/lti/launch/new_content_item/456' \
+  #       -d 'title=New Content Item' \
+  #       -d 'custom[hello]=world' \
+  #
+  # @returns Lti::ResourceLink
+  def create
+    tool = ContextExternalTool.find_external_tool(create_params[:url], @context, only_1_3: true)
+    return render_error(:invalid_url, "No tool found for the provided URL") unless tool
+
+    resource_link = Lti::ResourceLink.create_with(
+      @context,
+      tool,
+      create_params[:custom],
+      create_params[:url],
+      create_params[:title]
+    )
+    render json: lti_resource_link_json(resource_link, @current_user, session, :rich_content)
+  rescue => e
+    report_error(e)
+    raise e
+  end
+
   # @API Update an LTI Resource Link
-  # Update the specified resource link with the provided parameters
+  # Update the specified resource link with the provided parameters.
+  #
+  # <b>Caution!</b> Changing existing links may result in launch errors.
   #
   # @argument url [Optional, String] The launch URL for this resource link.
-  #   Caution! Updating this to a URL that doesn't match the tool could result in errors when launching this link!
+  #   <b>Caution!</b> Updating this to a URL that doesn't match the tool could result in errors when launching this link!
   # @argument custom [Optional, Hash] Custom parameters to be sent to the tool when launching this link.
-  #   Caution! Changing these from what the tool provided could result in errors if the tool doesn't see what it's expecting.
-  # @argument include_deleted [Optional, Boolean] Include deleted resource links in search. Default is false.
+  #   <b>Caution!</b> Changing these from what the tool provided could result in errors if the tool doesn't see what it's expecting.
+  # @argument include_deleted [Optional, Boolean] Update link even if it is deleted. Default is false.
   #
   # @example_request
   #
   #   This would update the specified LTI resource link
-  #   curl -X PUT 'https://<canvas>/api/v1/courses/<course_id>/lti_resource_links/<id>' \
+  #   curl -X PUT 'https://<canvas>/api/v1/courses/1/lti_resource_links/1' \
   #       -H "Authorization: Bearer <token>" \
   #       -d 'url=https://example.com/lti/launch/new_content_item/456'
   #       -d 'custom[hello]=world'
@@ -265,22 +320,29 @@ class Lti::ResourceLinksController < ApplicationController
     @module_item_resource_link_ids ||= base_scope(@context.context_module_tags).where(associated_asset_type: "Lti::ResourceLink").pluck(:associated_asset_id)
   end
 
-  def validate_update_params
-    if update_params[:custom].present? && !update_params[:custom].is_a?(Hash)
-      render_error(:invalid_custom, "'custom' param must contain key/value pairs")
-    end
+  def validate_custom
+    return true unless params[:custom].present?
+    return true if params[:custom].respond_to?(:to_unsafe_h)
 
-    if update_params[:url].present?
-      begin
-        URI.parse(update_params[:url])
-      rescue URI::InvalidURIError
-        render_error(:invalid_url, "'url' param must be a valid URL")
-      end
+    render_error(:invalid_custom, "'custom' param must contain key/value pairs")
+  end
+
+  def validate_url
+    return true unless params[:url].present?
+
+    begin
+      URI.parse(params[:url])
+    rescue URI::InvalidURIError
+      render_error(:invalid_url, "'url' param must be a valid URL")
     end
   end
 
   def update_params
     params.permit(:url, custom: ArbitraryStrongishParams::ANYTHING)
+  end
+
+  def create_params
+    params.permit(:url, :title, custom: ArbitraryStrongishParams::ANYTHING)
   end
 
   def require_context_instrumented

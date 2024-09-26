@@ -993,6 +993,8 @@
   path: "/api/v1/courses/:course_id/lti_apps/launch_definitions"
 - verb: GET
   path: "/api/v1/courses/:course_id/lti_resource_links"
+- verb: POST
+  path: "/api/v1/courses/:course_id/lti_resource_links"
 - verb: GET
   path: "/api/v1/courses/:course_id/lti_resource_links/:id"
 - verb: PUT
