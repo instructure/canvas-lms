@@ -4734,7 +4734,7 @@ fr:
       group_category_locked_explanation: "Les étudiants ont déjà envoyé leur travail personnel, aussi il est impossible de changer les paramètres de groupe."
       group_category_options: "Nouvelle catégorie de groupe"
       group_set: "Ensemble de groupes"
-      has_group_category_blocked_error: "Pour modifier ce paramètre, vous devez supprimer les groupes de la section « Attribuer l’accès »."
+      has_group_category_blocked_error: "Pour modifier ce paramètre, vous devez supprimer les groupes de la section « Attribuer l’accès »."
       is_group_assignment: "Ceci est une tâche pour un groupe"
     group_comment: 
       labels: 
