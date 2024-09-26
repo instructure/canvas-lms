@@ -151,6 +151,53 @@ context_modules_header_props = {
 <div id="direct-share-mount-point"></div>
 <div id="differentiated-modules-mount-point"></div>
 <div class="item-group-container" id="context_modules_sortable_container">
+  <div class="module-selector-container">
+    <% unless @is_student %>
+      <% if @feature_teacher_module_selection %>
+        <div class="module-selector" id="teacher_module_view_selection">
+          <% selected_module = @context.show_teacher_only_module_id&.to_i %>
+          <label for="show_teacher_only_module_id">
+            <%= t("Teachers View") %>
+          </label>
+          <select id="show_teacher_only_module_id" class="module-select">
+            <option value="0"
+              <%= "selected=selected" if !selected_module || selected_module&.zero? %> >
+              <%= t("All Modules") %>
+            </option>
+            <% @modules.each do |m| %>
+              <option value="<%= m.id %>"
+                <%= "selected=selected" if selected_module == m.id %> >
+                <%= m.name %>
+              </option>
+            <% end %>
+          </select>
+          <span class="description"><%= t("Selected module will be visible to teachers") %></span>
+        </div>
+      <% end %>
+      <% if @feature_student_module_selection && @modules.any?(&:published?) %>
+        <div class="module-selector" id="student_module_view_selection">
+          <% selected_module = @context.show_student_only_module_id&.to_i %>
+          <label for="show_student_only_module_id">
+            <%= t("Students View") %>
+          </label>
+          <select id="show_student_only_module_id" class="module-select">
+            <option value="0"
+              <%= "selected=selected" if !selected_module || selected_module&.zero? %> >
+              <%= t("All Modules") %>
+            </option>
+            <% @modules.select(&:published?).each do |m| %>
+              <option value="<%= m.id %>"
+                <%= "selected=selected" if selected_module == m.id %> >
+                <%= m.name %>
+              </option>
+            <% end %>
+          </select>
+          <span class="description"><%= t("Selected module will be visible to students") %></span>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+
   <div id="no_context_modules_message" style="display:none;">
     <% if can_do(@context.context_modules.temp_record, @current_user, :create) %>
       <div id="modules_homepage_user_create"></div>
@@ -164,8 +211,9 @@ context_modules_header_props = {
     class="ig-list <%= 'editable' if @can_add || @can_edit %>"
   >
     <% cache(@modules_cache_key) do %>
-      <% preload_modules_content(@modules) %>
-      <% @modules.each do |m| %>
+      <% modules_to_show = @module_show_setting ?  @modules.select { |m| m.id == @module_show_setting } : @modules %>
+      <% preload_modules_content(modules_to_show) %>
+      <% modules_to_show.each do |m| %>
         <%= render :partial => 'context_modules/context_module_next', :object => m, :as => :context_module %>
       <% end %>
     <% end %>

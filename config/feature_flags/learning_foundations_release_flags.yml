@@ -224,3 +224,16 @@ modules_page_hide_blueprint_lock_icon_for_children:
     be used for customers with a large number of content items (2000+) in a course.
   applies_to: Account
 
+modules_teacher_module_selection:
+  state: hidden
+  display_name: Allow teachers to select a single module to show on the modules page for teachers
+  description: |-
+    If enabled, teachers will be able to a single module to show on the modules page for teachers.
+  applies_to: Account
+
+modules_student_module_selection:
+  state: hidden
+  display_name: Allow teachers to select a single module to show on the modules page for students
+  description: |-
+    If enabled, teachers will be able to a single module to show on the modules page for students.
+  applies_to: Account
