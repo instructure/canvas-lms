@@ -8,4 +8,7 @@
     "editor.insertSpaces": true,
     "editor.semanticHighlighting.enabled": true
   },
+  "cSpell.words": [
+    "urlsafe"
+  ],
 }

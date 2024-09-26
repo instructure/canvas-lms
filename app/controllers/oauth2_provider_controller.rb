@@ -36,7 +36,16 @@ class OAuth2ProviderController < ApplicationController
 
     scopes = (params[:scope] || params[:scopes] || "").split
 
-    provider = Canvas::OAuth::Provider.new(params[:client_id], params[:redirect_uri], scopes, params[:purpose])
+    provider = Canvas::OAuth::Provider.new(
+      params[:client_id],
+      params[:redirect_uri],
+      scopes,
+      params[:purpose],
+      pkce: {
+        code_challenge: params[:code_challenge],
+        code_challenge_method: params[:code_challenge_method]
+      }
+    )
 
     raise Canvas::OAuth::RequestError, :invalid_client_id unless provider.has_valid_key?
     raise Canvas::OAuth::RequestError, :invalid_redirect unless provider.has_valid_redirect?
@@ -139,7 +148,11 @@ class OAuth2ProviderController < ApplicationController
 
     granter = case grant_type
               when "authorization_code"
-                Canvas::OAuth::GrantTypes::AuthorizationCode.new(client_id, secret, params)
+                if Canvas::OAuth::PKCE.use_pkce_in_token?(params)
+                  Canvas::OAuth::GrantTypes::AuthorizationCodeWithPKCE.new(client_id, secret, params)
+                else
+                  Canvas::OAuth::GrantTypes::AuthorizationCode.new(client_id, secret, params)
+                end
               when "refresh_token"
                 Canvas::OAuth::GrantTypes::RefreshToken.new(client_id, secret, params)
               when "client_credentials"

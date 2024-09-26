@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2024 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,18 +17,23 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# Be sure to restart your server when you modify this file.
+module Canvas::OAuth
+  module GrantTypes
+    class AuthorizationCodeWithPKCE < AuthorizationCode
+      # PKCE can be used by public or confidential clients as defined in RFC 6749.
+      def allow_public_client?
+        true
+      end
 
-ActiveSupport::Inflector.inflections do |inflect|
-  inflect.singular(/(criteri)a$/i, '\1on')
-  inflect.plural(/(criteri)on$/i, '\1a')
-  inflect.acronym "GraphQL"
-  inflect.acronym "IMS"
-  inflect.acronym "BLTI"
-  inflect.acronym "CSV"
-  inflect.acronym "OAuth"
-  inflect.acronym "OAuth2"
-  inflect.acronym "LLM"
-  inflect.acronym "PKCE"
-  inflect.irregular "feedback", "feedback"
+      private
+
+      def validate_type
+        unless Canvas::OAuth::PKCE.valid_code_verifier?(code: opts[:code], code_verifier: opts[:code_verifier])
+          raise Canvas::OAuth::RequestError, :invalid_grant
+        end
+
+        super
+      end
+    end
+  end
 end
