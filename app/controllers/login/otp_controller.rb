@@ -135,7 +135,7 @@ class Login::OtpController < ApplicationController
         }
       end
       if session.delete(:pending_otp)
-        successful_login(@current_user, @current_pseudonym, true)
+        successful_login(@current_user, @current_pseudonym, otp_passed: true)
       else
         respond_to do |format|
           format.html do

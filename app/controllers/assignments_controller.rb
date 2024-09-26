@@ -320,7 +320,7 @@ class AssignmentsController < ApplicationController
         flash.now[:notice] = t("assignment_submit_success", "Assignment successfully submitted.") if params[:submitted]
 
         # override media comment context: in the show action, these will be submissions
-        js_env media_comment_asset_string: @current_user.asset_string if @current_user
+        js_env({ media_comment_asset_string: @current_user.asset_string }) if @current_user
 
         @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
         @assignment.ensure_assignment_group
@@ -1331,15 +1331,17 @@ class AssignmentsController < ApplicationController
   end
 
   def set_section_list_js_env
-    js_env SECTION_LIST: @context.course_sections.active.map { |section|
-      {
-        id: section.id,
-        name: section.name,
-        start_at: section.start_at,
-        end_at: section.end_at,
-        override_course_and_term_dates: section.restrict_enrollments_to_section_dates
-      }
-    }
+    js_env({
+             SECTION_LIST: @context.course_sections.active.map do |section|
+               {
+                 id: section.id,
+                 name: section.name,
+                 start_at: section.start_at,
+                 end_at: section.end_at,
+                 override_course_and_term_dates: section.restrict_enrollments_to_section_dates
+               }
+             end
+           })
   end
 
   # LTI 1.3 Asset Processor Eula Service
@@ -1347,7 +1349,7 @@ class AssignmentsController < ApplicationController
     return unless @current_user
     return unless @context_enrollment&.student?
 
-    js_env ASSET_PROCESSOR_EULA_LAUNCH_URLS: Lti::EulaUiService.eula_launch_urls(user: @current_user, assignment: @assignment)
+    js_env({ ASSET_PROCESSOR_EULA_LAUNCH_URLS: Lti::EulaUiService.eula_launch_urls(user: @current_user, assignment: @assignment) })
   end
 
   def redirect_peer_review_sub_assignment

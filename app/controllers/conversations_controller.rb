@@ -965,7 +965,7 @@ class ConversationsController < ApplicationController
   #
 
   def add_message
-    get_conversation(true)
+    get_conversation(allow_deleted: true)
 
     message = process_response(
       conversation: @conversation,
@@ -1191,7 +1191,7 @@ class ConversationsController < ApplicationController
     end
   end
 
-  def get_conversation(allow_deleted = false)
+  def get_conversation(allow_deleted: false)
     scope = @current_user.all_conversations
     scope = scope.where("message_count>0") unless allow_deleted
     @conversation = scope.where(conversation_id: params[:id] || params[:conversation_id] || 0).first

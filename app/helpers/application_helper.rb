@@ -922,7 +922,7 @@ module ApplicationHelper
   end
 
   def include_custom_meta_tags
-    js_env(csp: csp_iframe_attribute) if csp_enforced?
+    js_env({ csp: csp_iframe_attribute }) if csp_enforced?
 
     output = []
     output = @meta_tags.map { |meta_attrs| tag.meta(**meta_attrs) } if @meta_tags.present?
@@ -1128,8 +1128,10 @@ module ApplicationHelper
       @context.grants_right?(@current_user, session, :manage)
 
     is_user_tutorial_enabled = @current_user&.show_new_user_tutorial?
-    js_env NEW_USER_TUTORIALS: { is_enabled: }
-    js_env NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT: { is_enabled: is_user_tutorial_enabled }
+    js_env({
+             NEW_USER_TUTORIALS: { is_enabled: },
+             NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT: { is_enabled: is_user_tutorial_enabled }
+           })
   end
 
   def planner_enabled?
@@ -1393,13 +1395,13 @@ module ApplicationHelper
 
   def mastery_scales_js_env
     if @domain_root_account.feature_enabled?(:account_level_mastery_scales)
-      js_env(
-        ACCOUNT_LEVEL_MASTERY_SCALES: true,
-        MASTERY_SCALE: {
-          outcome_proficiency: @context.resolved_outcome_proficiency&.as_json,
-          outcome_calculation_method: @context.resolved_outcome_calculation_method&.as_json
-        }
-      )
+      js_env({
+               ACCOUNT_LEVEL_MASTERY_SCALES: true,
+               MASTERY_SCALE: {
+                 outcome_proficiency: @context.resolved_outcome_proficiency&.as_json,
+                 outcome_calculation_method: @context.resolved_outcome_calculation_method&.as_json
+               }
+             })
     end
   end
 
@@ -1410,9 +1412,9 @@ module ApplicationHelper
   end
 
   def improved_outcomes_management_js_env
-    js_env(
-      IMPROVED_OUTCOMES_MANAGEMENT: @domain_root_account.feature_enabled?(:improved_outcomes_management)
-    )
+    js_env({
+             IMPROVED_OUTCOMES_MANAGEMENT: @domain_root_account.feature_enabled?(:improved_outcomes_management)
+           })
   end
 
   def append_default_due_time_js_env(context, hash)

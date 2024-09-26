@@ -648,7 +648,7 @@ class CalendarEventsApiController < ApplicationController
   # @returns CalendarEvent
 
   def show
-    get_event(true)
+    get_event(search_assignments: true)
     if authorized_action(@event, @current_user, :read)
       render json: event_json(@event, @current_user, session, include: includes + [:web_conference])
     end
@@ -777,7 +777,7 @@ class CalendarEventsApiController < ApplicationController
   #        -F 'calendar_event[title]=Epic Paintball Fight!' \
   #        -H "Authorization: Bearer <token>"
   def update
-    get_event(true)
+    get_event(search_assignments: true)
     if authorized_action(@event, @current_user, :update)
       params_for_update = nil
       if @event.is_a?(Assignment)
@@ -1586,7 +1586,7 @@ class CalendarEventsApiController < ApplicationController
     raise ActiveRecord::RecordNotFound unless @context
   end
 
-  def get_event(search_assignments = false)
+  def get_event(search_assignments: false)
     @event = if params[:id] =~ /\Aassignment_(.*)/
                raise ActiveRecord::RecordNotFound unless search_assignments
 

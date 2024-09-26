@@ -190,7 +190,7 @@ Simple/NewErbLinter:
         add_body_class 'whatever-classes you-want-to-add-to-body'
         js_bundle :your_js_bundle
         css_bundle :any_css_bundles_you_want
-        js_env({whatever: 'you need to put in window.ENV'})
+        js_env({ whatever: 'you need to put in window.ENV' })
         render :html => "".html_safe, :layout => true
 
 ByRoleLinter:

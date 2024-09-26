@@ -30,8 +30,10 @@ class CareerController < ApplicationController
     env = {
       FEATURES: features_env,
     }
-    js_env(CANVAS_CAREER: env)
-    js_env(MAX_GROUP_CONVERSATION_SIZE: Conversation.max_group_conversation_size)
+    js_env({
+             CANVAS_CAREER: env,
+             MAX_GROUP_CONVERSATION_SIZE: Conversation.max_group_conversation_size
+           })
 
     config = CanvasCareer::Config.new(@domain_root_account, session)
     if app == CanvasCareer::Constants::App::CAREER_LEARNING_PROVIDER

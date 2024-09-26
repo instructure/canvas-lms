@@ -40,7 +40,7 @@ class EportfoliosController < ApplicationController
     return unless tab_enabled?(UserProfile::TAB_EPORTFOLIOS)
 
     rce_js_env
-    js_env(show_eportfolio_deprecation_notice: @show_eportfolio_deprecation_notice)
+    js_env({ show_eportfolio_deprecation_notice: @show_eportfolio_deprecation_notice })
     set_active_tab "eportfolios"
     add_crumb(@current_user.short_name, user_profile_url(@current_user))
     add_crumb(t(:crumb, "ePortfolios"))

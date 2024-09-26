@@ -404,21 +404,25 @@ class GroupsController < ApplicationController
             can_delete_groups: @context.grants_right?(@current_user, session, :manage_groups_delete)
           }
 
-          js_env group_categories: categories_json,
-                 group_user_type: @group_user_type,
-                 allow_self_signup: @allow_self_signup,
-                 context_class_name: @context.class.name,
-                 permissions: js_permissions
+          js_env({
+                   group_categories: categories_json,
+                   group_user_type: @group_user_type,
+                   allow_self_signup: @allow_self_signup,
+                   context_class_name: @context.class.name,
+                   permissions: js_permissions
+                 })
 
           if @context.is_a?(Course)
             # get number of sections with students in them so we can enforce a min group size for random assignment on sections
-            js_env(student_section_count: @context.enrollments.active_or_pending.where(type: "StudentEnrollment").distinct.count(:course_section_id))
-            js_env(self_signup_deadline_enabled: @context.account.feature_enabled?(:self_signup_deadline))
+            js_env({
+                     student_section_count: @context.enrollments.active_or_pending.where(type: "StudentEnrollment").distinct.count(:course_section_id),
+                     self_signup_deadline_enabled: @context.account.feature_enabled?(:self_signup_deadline)
+                   })
           end
 
           # since there are generally lots of users in an account, always do large roster view
           if @context.is_a?(Account)
-            js_env({ IS_LARGE_ROSTER: true }, true)
+            js_env({ IS_LARGE_ROSTER: true }, overwrite: true)
           end
           render :context_manage_groups
         else

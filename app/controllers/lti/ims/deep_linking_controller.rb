@@ -48,7 +48,7 @@ module Lti
                  }.compact
                })
         if parent_frame_origin
-          js_env({ DEEP_LINKING_POST_MESSAGE_ORIGIN: parent_frame_origin }, true)
+          js_env({ DEEP_LINKING_POST_MESSAGE_ORIGIN: parent_frame_origin }, overwrite: true)
         end
 
         render :deep_linking_response, layout: "bare"
@@ -194,7 +194,7 @@ module Lti
                  }.compact
                })
         if parent_frame_origin
-          js_env({ DEEP_LINKING_POST_MESSAGE_ORIGIN: parent_frame_origin }, true)
+          js_env({ DEEP_LINKING_POST_MESSAGE_ORIGIN: parent_frame_origin }, overwrite: true)
         end
 
         render layout: "bare"

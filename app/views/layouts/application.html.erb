@@ -21,13 +21,13 @@
   js_bundle(:navigation_header) unless @headers == false
 
   if @domain_root_account&.feature_enabled?(:top_navigation_placement)
-    js_env INIT_DRAWER_LAYOUT_MUTEX: "init-drawer-layout"
+    js_env({ INIT_DRAWER_LAYOUT_MUTEX: "init-drawer-layout" })
     js_bundle(:top_navigation_tools)
   end
 
   if add_ignite_agent_bundle?
     js_bundle(:ignite_agent)
-    js_env(show_ignite_agent_button: show_ignite_agent_button?)
+    js_env({ show_ignite_agent_button: show_ignite_agent_button? })
     remote_env(ignite_agent: {
       launch_url: Services::IgniteAgent.launch_url,
       backend_url: Services::IgniteAgent.backend_url
@@ -38,7 +38,7 @@
   @has_content_notices = load_content_notices
   provide :head, include_common_stylesheets
   set_badge_counts_for(@context, @current_user) if @set_badge_counts
-  js_env notices: flash_notices()
+  js_env({ notices: flash_notices() })
   student_view_text = @context.is_a?(Course) && @context.horizon_course? ? t('View as Learner') : t('View as Student')
   enable_content_view_if_requested
   enable_hide_global_nav_if_requested

@@ -122,7 +122,7 @@ RSpec.describe ApplicationController do
 
       it "sets items" do
         expect(HostUrl).to receive(:file_host).with(Account.default, "test.host").and_return("files.example.com")
-        controller.js_env FOO: "bar"
+        controller.js_env({ FOO: "bar" })
         expect(controller.js_env[:FOO]).to eq "bar"
         expect(controller.js_env[:files_domain]).to eq "files.example.com"
       end
@@ -487,19 +487,19 @@ RSpec.describe ApplicationController do
       end
 
       it "allows multiple items" do
-        controller.js_env A: "a", B: "b"
+        controller.js_env({ A: "a", B: "b" })
         expect(controller.js_env[:A]).to eq "a"
         expect(controller.js_env[:B]).to eq "b"
       end
 
       it "does not allow overwriting a key" do
-        controller.js_env REAL_SLIM_SHADY: "please stand up"
-        expect { controller.js_env(REAL_SLIM_SHADY: "poser") }.to raise_error("js_env key REAL_SLIM_SHADY is already taken")
+        controller.js_env({ REAL_SLIM_SHADY: "please stand up" })
+        expect { controller.js_env({ REAL_SLIM_SHADY: "poser" }) }.to raise_error("js_env key REAL_SLIM_SHADY is already taken")
       end
 
       it "overwrites a key if told explicitly to do so" do
-        controller.js_env REAL_SLIM_SHADY: "please stand up"
-        controller.js_env({ REAL_SLIM_SHADY: "poser" }, true)
+        controller.js_env({ REAL_SLIM_SHADY: "please stand up" })
+        controller.js_env({ REAL_SLIM_SHADY: "poser" }, overwrite: true)
         expect(controller.js_env[:REAL_SLIM_SHADY]).to eq "poser"
       end
 
@@ -1395,7 +1395,7 @@ RSpec.describe ApplicationController do
             context "ENV.LTI_TOOL_FORM_ID" do
               it "sets a random id" do
                 expect(controller).to receive(:random_lti_tool_form_id).and_return("1")
-                expect(controller).to receive(:js_env).with(LTI_TOOL_FORM_ID: "1")
+                expect(controller).to receive(:js_env).with({ LTI_TOOL_FORM_ID: "1" })
                 controller.send(:content_tag_redirect, course, content_tag, nil)
               end
             end

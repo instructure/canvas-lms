@@ -101,7 +101,7 @@ class NewQuizzesController < ApplicationController
     add_new_quizzes_bundle
 
     signed_launch_data[:basename] = calculate_basename
-    js_env(NEW_QUIZZES: signed_launch_data)
+    js_env({ NEW_QUIZZES: signed_launch_data })
 
     add_body_class("native-new-quizzes full-width")
 
