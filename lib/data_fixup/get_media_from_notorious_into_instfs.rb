@@ -27,7 +27,15 @@ module DataFixup::GetMediaFromNotoriousIntoInstfs
     media_file_url = client.flavorAssetGetDownloadUrl(assets.last[:id])
     filename = "#{assets.last[:id]}.#{assets.last[:fileExt]}"
 
-    File.open(filename, "wb") { |file| file << CanvasHttp.get(media_file_url).body }
+    begin
+      body = CanvasHttp.get(media_file_url).body
+    rescue ArgumentError
+      Rails.logger.info "GetMediaFromNotoriousIntoInstfs : failed fetching media at: #{media_file_url}"
+    end
+
+    return nil unless body
+
+    File.open(filename, "wb") { |file| file << body }
 
     res = InstFS.direct_upload(
       file_name: filename,
@@ -54,7 +62,9 @@ module DataFixup::GetMediaFromNotoriousIntoInstfs
 
       begin
         instfs_uuid, media_entry_id, content_type = get_it_to_intfs(media_id)
-        att.update_columns(instfs_uuid:, media_entry_id:, content_type:)
+        next unless instfs_uuid
+
+        att.update_columns(instfs_uuid:, media_entry_id:, content_type:, updated_at: Time.now.utc)
       rescue NoMethodError
         Rails.logger.info "GetMediaFromNotoriousIntoInstfs : Failed for attachment #{att.id} (#{media_id})"
       end
