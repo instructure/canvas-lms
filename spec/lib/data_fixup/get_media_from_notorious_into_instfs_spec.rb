@@ -66,13 +66,15 @@ describe DataFixup::GetMediaFromNotoriousIntoInstfs do
   end
 
   describe ".get_it_to_instfs" do
-    it "downloads from kaltura and cleans up afterward" do
+    before do
       client = double(CanvasKaltura::ClientV3)
       expect(client).to receive(:startSession).and_return("sessioninfo")
       expect(client).to receive(:flavorAssetGetByEntryId).with("m-frommediaobject-3").and_return([{ id: 11, fileExt: "mp3" }])
       expect(client).to receive(:flavorAssetGetDownloadUrl).with(11).and_return("http://example.com/asset")
       expect(CanvasKaltura::ClientV3).to receive(:new).and_return(client)
+    end
 
+    it "downloads from kaltura and cleans up afterward" do
       http_return = double
       expect(http_return).to receive(:body).and_return("request_body")
       expect(CanvasHttp).to receive(:get).with("http://example.com/asset").and_return(http_return)
@@ -82,6 +84,13 @@ describe DataFixup::GetMediaFromNotoriousIntoInstfs do
       expect(File.exist?("./11.mp3")).to be(false)
       DataFixup::GetMediaFromNotoriousIntoInstfs.send(:get_it_to_intfs, "m-frommediaobject-3")
       expect(File.exist?("./11.mp3")).to be(false)
+    end
+
+    it "can handle failures when fetching media file" do
+      expect(CanvasHttp).to receive(:get).with("http://example.com/asset").and_raise ArgumentError
+      expect do
+        DataFixup::GetMediaFromNotoriousIntoInstfs.send(:get_it_to_intfs, "m-frommediaobject-3")
+      end.to_not raise_error
     end
   end
 end
