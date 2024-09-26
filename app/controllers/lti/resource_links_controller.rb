@@ -276,6 +276,37 @@ class Lti::ResourceLinksController < ApplicationController
     raise e
   end
 
+  # @API Delete an LTI Resource Link
+  # Delete the specified resource link. The ID can be in the standard
+  # Canvas format ("1"), or in these special formats:
+  #
+  # - resource_link_uuid:<uuid> - Find the resource link by its resource_link_uuid
+  # - lookup_uuid:<uuid> - Find the resource link by its lookup_uuid
+  #
+  # Only links that are not associated with Assignments, Module Items, or Collaborations can be deleted.
+  #
+  # @example_request
+  #
+  #   This would return the specified LTI resource link
+  #   curl -X DELETE 'https://<canvas>/api/v1/courses/1/lti_resource_links/lookup_uuid:c522554a-d4be-49ef-b163-9c87fdc6ad6f' \
+  #       -H "Authorization: Bearer <token>"
+  #
+  # @returns Lti::ResourceLink
+  def destroy
+    params.delete(:include_deleted)
+
+    link_type = resource_link_type(resource_link)
+    unless link_type == :rich_content
+      return render_error(:invalid_resource_link, "Cannot delete resource links associated with Assignments, Module Items, or Collaborations")
+    end
+
+    resource_link.destroy!
+    render json: resource_link_json(resource_link)
+  rescue => e
+    report_error(e)
+    raise e
+  end
+
   private
 
   def base_scope(scope = Lti::ResourceLink)
@@ -289,12 +320,12 @@ class Lti::ResourceLinksController < ApplicationController
 
     if id_parameter.include?("lookup_uuid:")
       lookup_uuid = id_parameter.sub("lookup_uuid:", "")
-      return @resource_link ||= base_scope.find_by(lookup_uuid:)
+      return @resource_link ||= base_scope.find_by!(lookup_uuid:)
     end
 
     if id_parameter.include?("resource_link_uuid:")
       resource_link_uuid = id_parameter.sub("resource_link_uuid:", "")
-      return @resource_link ||= base_scope.find_by(resource_link_uuid:)
+      return @resource_link ||= base_scope.find_by!(resource_link_uuid:)
     end
 
     @resource_link ||= base_scope.find(id_parameter)

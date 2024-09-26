@@ -1923,6 +1923,7 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/lti_resource_links", action: :create
       get "courses/:course_id/lti_resource_links/:id", action: :show
       put "courses/:course_id/lti_resource_links/:id", action: :update
+      delete "courses/:course_id/lti_resource_links/:id", action: :destroy
     end
 
     scope(controller: :immersive_reader) do
