@@ -355,4 +355,81 @@ describe Lti::ResourceLinksController, type: :request do
       end
     end
   end
+
+  describe "POST #create" do
+    subject { post "/api/v1/courses/#{course.id}/lti_resource_links", params: }
+
+    let(:custom) { { "hello" => "world" } }
+    let(:url) { "https://example.com/lti/launch" }
+    let(:title) { "My LTI Link" }
+    let(:params) { { url:, custom:, title: } }
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      before { user_session(student_in_course(account:).user) }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with flag disabled" do
+      before { account.disable_feature!(:lti_resource_links_api) }
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    it "is successful" do
+      subject
+      expect(response).to be_successful
+    end
+
+    it "creates a resource link" do
+      expect { subject }.to change { course.lti_resource_links.count }.by(1)
+    end
+
+    it "returns the resource link" do
+      subject
+      expect(response_json).to include({ url:, title:, custom: }.stringify_keys)
+    end
+
+    context "with no matching tool" do
+      let(:url) { "https://othertool.com/lti/launch" }
+
+      it "returns 422" do
+        subject
+        expect(response).to be_unprocessable
+      end
+    end
+
+    context "with invalid url param" do
+      let(:url) { "hello world!" }
+
+      it "returns 422" do
+        subject
+        expect(response).to be_unprocessable
+      end
+    end
+
+    context "with invalid custom param" do
+      let(:custom) { "hello" }
+
+      it "returns 422" do
+        subject
+        expect(response).to be_unprocessable
+      end
+    end
+  end
 end
