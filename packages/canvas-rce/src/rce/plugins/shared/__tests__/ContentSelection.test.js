@@ -124,6 +124,12 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
         expect(getContentFromElement($element, editor).isPreviewable).toEqual(true)
       })
 
+      it('does not indicate the link is previewable if the "data-canvas-previewable" attribute is false', () => {
+        expect(getContentFromElement($element, editor).isPreviewable).toEqual(false)
+        $element.setAttribute('data-canvas-previewable', false)
+        expect(getContentFromElement($element, editor).isPreviewable).toEqual(false)
+      })
+
       it('indicates the link is previewable if it contains the "instructure_scribd_file" class name', () => {
         expect(getContentFromElement($element, editor).isPreviewable).toEqual(false)
         $element.classList.add('instructure_scribd_file')

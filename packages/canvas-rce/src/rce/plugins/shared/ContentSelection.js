@@ -74,7 +74,7 @@ export function asLink($element, editor) {
   const fileName = $link.getAttribute('title')
   const published = $link.getAttribute('data-published') === 'true'
   const isPreviewable =
-    $link.hasAttribute('data-canvas-previewable') ||
+    $link.getAttribute('data-canvas-previewable') === 'true' ||
     $link.classList.contains('instructure_scribd_file') // needed to cover docs linked while there was a bug didn't add the data attr.
 
   return {

@@ -319,7 +319,7 @@ export function enhanceUserContent(container = document, opts = {}) {
       if (!href) return
 
       const matchesCanvasFile = href.pathname.match(
-        /(?:\/(courses|groups|users)\/(\d+))?\/files\/(\d+)/
+        /(?:\/(courses|groups|users)\/\d+)?\/files\/([\d~]+)(?=[!*'();:@&=+$,/?#\[\]]|$)/
       )
       if (!matchesCanvasFile) {
         // a bug in the new RCE added instructure_file_link class name to all links
