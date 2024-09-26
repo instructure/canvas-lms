@@ -21,6 +21,8 @@ import {type NodeId, DefaultEventHandlers, Editor, Frame} from '@craftjs/core'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
+import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Toolbox} from './components/editor/Toolbox'
 import {Topbar} from './components/editor/Topbar'
 import {blocks} from './components/blocks'
@@ -33,7 +35,17 @@ import {
   LATEST_BLOCK_DATA_VERSION,
   type BlockEditorDataTypes,
   type BlockEditorData,
-} from './utils/transformations'
+  mergeTemplates,
+} from './utils'
+import {saveGlobalTemplateToFile} from './utils/saveGlobalTemplate'
+import {getGlobalTemplates} from './assets/globalTemplates'
+import {
+  type CanEditTemplates,
+  type BlockTemplate,
+  TemplateEditor,
+  SaveTemplateEvent,
+  DeleteTemplateEvent,
+} from './types'
 
 import './style.css'
 
@@ -85,6 +97,7 @@ const DEFAULT_CONTENT = JSON.stringify({
 export type BlockEditorProps = {
   enabled?: boolean
   enableResizer?: boolean
+  course_id: string
   container: HTMLElement // the element that will shrink when drawers open
   content: BlockEditorDataTypes
   onCancel: () => void
@@ -93,6 +106,7 @@ export type BlockEditorProps = {
 export default function BlockEditor({
   enabled = true,
   enableResizer = true,
+  course_id,
   container,
   content,
   onCancel,
@@ -105,8 +119,165 @@ export default function BlockEditor({
   })
   const [toolboxOpen, setToolboxOpen] = useState(false)
   const [stepperOpen, setStepperOpen] = useState(!content?.blocks)
+  const [templateEditor, setTemplateEditor] = useState<TemplateEditor>(TemplateEditor.UNKNOWN)
+  const [blockTemplates, setBlockTemplates] = useState<BlockTemplate[]>([])
+  const [blockEditorEditorEl, setBlockEditorEditorEl] = useState<HTMLDivElement | null>(null)
 
   RenderNode.globals.enableResizer = !!enableResizer
+
+  // There are 2 sources of block templates, the database and global templates
+  // currently imported from the assets folder (though this will eventually be replaced with an API call)
+  const getBlockTemplates = useCallback(
+    editor => {
+      const promiseApi = doFetchApi<BlockTemplate[]>({
+        path: `/api/v1/courses/${course_id}/block_editor_templates?include[]=node_tree&drafts=${
+          editor > 0
+        }`,
+        method: 'GET',
+      })
+        .then((response: DoFetchApiResults<BlockTemplate[]>) => {
+          return response.json || []
+        })
+        .catch((err: Error) => {
+          showFlashError(I18n.t('Cannot get block custom templates'))(err)
+        })
+
+      const promiseGlobal = getGlobalTemplates()
+
+      // eslint-disable-next-line promise/catch-or-return
+      Promise.allSettled([promiseApi, promiseGlobal]).then(
+        ([apiTemplatesResult, globalTemplatesResult]) => {
+          const apiTemplates =
+            apiTemplatesResult.status === 'fulfilled' ? apiTemplatesResult.value : []
+          const globalTemplates =
+            globalTemplatesResult.status === 'fulfilled' ? globalTemplatesResult.value : []
+
+          const templates = mergeTemplates(apiTemplates || [], globalTemplates || [])
+          setBlockTemplates(templates)
+        }
+      )
+    },
+    [course_id]
+  )
+
+  const getTemplateEditor = useCallback(() => {
+    doFetchApi<CanEditTemplates>({
+      path: `/api/v1/courses/${course_id}/block_editor_templates/can_edit`,
+      method: 'GET',
+    })
+      .then((response: DoFetchApiResults<CanEditTemplates>) => {
+        let editor = response.json?.can_edit ? TemplateEditor.LOCAL : TemplateEditor.NONE
+        if (editor && response.json?.can_edit_global) {
+          editor = TemplateEditor.GLOBAL
+        }
+        setTemplateEditor(editor)
+        RenderNode.globals.templateEditor = editor
+        getBlockTemplates(editor)
+      })
+      .catch((err: Error) => {
+        showFlashError(I18n.t('Failed getting template editor status.'))(err)
+      })
+  }, [course_id, getBlockTemplates])
+
+  const saveGlobalTemplate = async (template: Partial<BlockTemplate>) => {
+    try {
+      await saveGlobalTemplateToFile(template)
+    } catch (err: any) {
+      showFlashError(I18n.t('Failed saving global template to a file'))(err)
+    }
+  }
+
+  const saveBlockTempate = useCallback(
+    (template: Partial<BlockTemplate>, globalTemplate: boolean) => {
+      const path = template.id
+        ? `/api/v1/courses/${course_id}/block_editor_templates/${template.id}`
+        : `/api/v1/courses/${course_id}/block_editor_templates`
+      const method = template.id ? 'PUT' : 'POST'
+      template.editor_version = LATEST_BLOCK_DATA_VERSION
+      doFetchApi<BlockTemplate>({
+        path,
+        method,
+        body: JSON.stringify(template),
+        headers: {'Content-Type': 'application/json'},
+      })
+        .then((response: DoFetchApiResults<BlockTemplate>) => {
+          const newTemplate = response.json
+          if (newTemplate) {
+            const index = blockTemplates.findIndex(t => t.global_id === newTemplate.global_id)
+            if (index >= 0) {
+              const newTemplates = [...blockTemplates]
+              newTemplates[index] = newTemplate
+              setBlockTemplates(newTemplates)
+            } else {
+              setBlockTemplates([...blockTemplates, newTemplate])
+            }
+            if (globalTemplate) {
+              saveGlobalTemplate(newTemplate)
+            }
+          }
+        })
+        .catch((err: Error) => {
+          showFlashError(I18n.t('Failed saving template'))(err)
+        })
+    },
+    [blockTemplates, course_id]
+  )
+
+  const deleteBlockTemplate = useCallback(
+    (templateId: number) => {
+      doFetchApi({
+        path: `/api/v1/courses/${course_id}/block_editor_templates/${templateId}`,
+        method: 'DELETE',
+      })
+        .then(() => {
+          setBlockTemplates(blockTemplates.filter(t => t.id !== templateId))
+        })
+        .catch((err: Error) => {
+          showFlashError(I18n.t('Failed deleting template'))(err)
+        })
+    },
+    [blockTemplates, course_id]
+  )
+
+  const handleSaveTemplate = useCallback(
+    (e: Event) => {
+      const saveTemplateEvent = e as CustomEvent
+      const template = saveTemplateEvent.detail.template
+      const globalTemplate = saveTemplateEvent.detail.globalTemplate
+      template.node_tree.nodes[template.node_tree.rootNodeId].custom.displayName = template.name
+      saveBlockTempate(template, globalTemplate)
+    },
+    [saveBlockTempate]
+  )
+
+  const handleDeleteTemplate = useCallback(
+    (e: Event) => {
+      const deleteTemplateEvent = e as CustomEvent
+      const templateId = deleteTemplateEvent.detail
+      deleteBlockTemplate(templateId)
+    },
+    [deleteBlockTemplate]
+  )
+
+  useEffect(() => {
+    if (blockEditorEditorEl) {
+      blockEditorEditorEl.addEventListener(SaveTemplateEvent, handleSaveTemplate)
+      blockEditorEditorEl.addEventListener(DeleteTemplateEvent, handleDeleteTemplate)
+    }
+
+    return () => {
+      if (blockEditorEditorEl) {
+        blockEditorEditorEl.removeEventListener(SaveTemplateEvent, handleSaveTemplate)
+        blockEditorEditorEl.removeEventListener(DeleteTemplateEvent, handleDeleteTemplate)
+      }
+    }
+  }, [blockEditorEditorEl, handleSaveTemplate, handleDeleteTemplate])
+
+  useEffect(() => {
+    if (templateEditor === TemplateEditor.UNKNOWN) {
+      getTemplateEditor()
+    }
+  }, [getTemplateEditor, templateEditor])
 
   useEffect(() => {
     if (data.version !== LATEST_BLOCK_DATA_VERSION) {
@@ -150,6 +321,7 @@ export default function BlockEditor({
 
   return (
     <View
+      elementRef={(el: Element | null) => setBlockEditorEditorEl(el as HTMLDivElement)}
       as="div"
       className="block-editor-editor"
       display="inline-block"
@@ -194,7 +366,13 @@ export default function BlockEditor({
             </Flex.Item>
           </Flex>
 
-          <Toolbox open={toolboxOpen} container={container} onClose={handleCloseToolbox} />
+          <Toolbox
+            open={toolboxOpen}
+            templateEditor={templateEditor}
+            container={container}
+            onClose={handleCloseToolbox}
+            templates={blockTemplates}
+          />
           <NewPageStepper
             open={stepperOpen}
             onFinish={handleCloseStepper}

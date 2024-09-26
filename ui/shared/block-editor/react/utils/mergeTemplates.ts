@@ -16,18 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './useClassNames'
-export * from './kb'
-export * from './dom'
-export * from './constants'
-export * from './getScrollParent'
-export * from './getCloneTree'
-export * from './colorUtils'
-export * from './getNodeIndex'
-export * from './deletable'
-export * from './size'
-export * from './renderNodeHelpers'
-export * from './transformations'
-export * from './cleanupBlocks'
-export * from './captureElement'
-export * from './mergeTemplates'
+import {type BlockTemplate} from '../types'
+
+export const mergeTemplates = (
+  apiTemplates: BlockTemplate[],
+  globalTemplates: BlockTemplate[]
+): BlockTemplate[] => {
+  const templates = apiTemplates.slice()
+  globalTemplates.forEach(gt => {
+    const index = templates.findIndex((t: BlockTemplate) => t.id === gt.id)
+    if (index >= 0) {
+      templates[index] = gt
+    } else {
+      templates.push(gt)
+    }
+  })
+  return templates
+}

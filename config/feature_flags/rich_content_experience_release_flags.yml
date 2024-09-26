@@ -30,6 +30,15 @@ block_editor:
     Enable the new block editor for the rich content editor.
   beta: true
 
+block_template_editor:
+  applies_to: Account
+  state: hidden
+  display_name: Block Template Editor
+  description: |-
+    Surfaces the "Block Editor Templates - edit" permission in the permissions UI.
+    Users with this permission can create and edit block templates.
+  beta: true
+
 buttons_and_icons_root_account:
   state: allowed
   applies_to: RootAccount

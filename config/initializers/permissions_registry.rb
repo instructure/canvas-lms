@@ -1804,6 +1804,18 @@ Rails.application.config.to_prepare do
         available_to: %w[AccountAdmin AccountMembership],
         true_for: %w[AccountAdmin],
         account_only: :root
+      },
+      block_editor_template_editor: {
+        label: -> { I18n.t("Block Editor Templates - edit") },
+        available_to: %w[TeacherEnrollment DesignerEnrollment AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin],
+        account_allows: ->(a) { a.feature_enabled?(:block_editor) && a.feature_enabled?(:block_template_editor) }
+      },
+      block_editor_global_template_editor: {
+        label: -> { I18n.t("Block Editor Global Templates - edit") },
+        available_to: %w[TeacherEnrollment DesignerEnrollment AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin],
+        account_allows: ->(a) { a.feature_enabled?(:block_editor) && a.feature_enabled?(:block_template_editor) }
       }
     }
   )

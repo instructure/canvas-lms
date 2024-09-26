@@ -47,7 +47,8 @@ import {useNode, useEditor, type Node} from '@craftjs/core'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-import type {AddSectionPlacement, RenderNodeProps} from './types'
+import {type AddSectionPlacement, type RenderNodeProps} from './types'
+import {TemplateEditor} from '../../types'
 import {SectionBrowser} from './SectionBrowser'
 import {mountNode} from '../../utils'
 import {BlockResizer} from './BlockResizer'
@@ -63,6 +64,7 @@ interface RenderNodeComponent extends React.FC<RenderNodeProps> {
   globals: {
     selectedSectionId: string
     enableResizer: boolean
+    templateEditor: TemplateEditor
   }
 }
 
@@ -173,7 +175,10 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
   }, [currentMenuRef, node.dom, mountPoint])
 
   const renderBlockToolbar = () => {
-    return ReactDOM.createPortal(<BlockToolbar />, mountPoint)
+    return ReactDOM.createPortal(
+      <BlockToolbar templateEditor={RenderNode.globals.templateEditor} />,
+      mountPoint
+    )
   }
 
   const handleAddSection = useCallback((where: AddSectionPlacement) => {
@@ -272,4 +277,5 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
 RenderNode.globals = {
   selectedSectionId: '',
   enableResizer: true,
+  templateEditor: TemplateEditor.NONE,
 }
