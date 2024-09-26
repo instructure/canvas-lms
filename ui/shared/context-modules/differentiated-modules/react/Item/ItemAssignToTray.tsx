@@ -407,7 +407,7 @@ export default function ItemAssignToTray({
           placement="end"
           offset="small"
         />
-        <Heading level="h2" margin="medium 0">
+        <Heading level="h2">
           {icon} {itemName}
         </Heading>
         <View data-testid="item-type-text" as="div" margin="medium 0 0 0">

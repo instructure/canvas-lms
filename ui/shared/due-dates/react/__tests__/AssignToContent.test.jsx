@@ -93,14 +93,14 @@ describe('AssignToContent', () => {
 
   it('renders', () => {
     const {getAllByText} = setUp()
-    expect(getAllByText('Assign To')[1]).toBeInTheDocument()
+    expect(getAllByText('Assign To')[0]).toBeInTheDocument()
   })
 
   it('adds a card when add button is clicked', async () => {
     const {getAllByRole, findAllByTestId, getAllByTestId} = setUp()
     const cards = await findAllByTestId('item-assign-to-card')
     expect(cards).toHaveLength(1)
-    act(() => getAllByRole('button', {name: 'Assign To'})[1].click())
+    act(() => getAllByRole('button', {name: 'Assign To'})[0].click())
     expect(getAllByTestId('item-assign-to-card')).toHaveLength(2)
   })
 
@@ -108,7 +108,7 @@ describe('AssignToContent', () => {
     setUp({overrides: []})
     const cards = await screen.queryAllByTestId('item-assign-to-card')
     expect(cards).toHaveLength(0)
-    await userEvent.click(screen.getAllByTestId('add-card')[1])
+    await userEvent.click(screen.getAllByTestId('add-card')[0])
     expect(screen.getAllByTestId('item-assign-to-card')).toHaveLength(1)
   })
 

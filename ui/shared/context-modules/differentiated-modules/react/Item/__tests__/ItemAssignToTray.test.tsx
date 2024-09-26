@@ -298,8 +298,48 @@ describe('ItemAssignToTray', () => {
     const {getByRole, findAllByTestId, getAllByTestId} = renderComponent()
     const cards = await findAllByTestId('item-assign-to-card')
     expect(cards).toHaveLength(1)
-    act(() => getAllByTestId('add-card')[1].click())
+    act(() => getAllByTestId('add-card')[0].click())
     expect(getAllByTestId('item-assign-to-card')).toHaveLength(2)
+  })
+
+  it('shows top add button if more than 3 cards exist', async () => {
+    fetchMock.get(
+      OVERRIDES_URL,
+      {
+        id: '23',
+        due_at: '2023-10-05T12:00:00Z',
+        unlock_at: '2023-10-01T12:00:00Z',
+        lock_at: '2023-11-01T12:00:00Z',
+        only_visible_to_overrides: false,
+        visible_to_everyone: true,
+        overrides: [
+          {
+            id: '2',
+            assignment_id: '23',
+            course_section_id: '4',
+          },
+          {
+            id: '3',
+            assignment_id: '23',
+            course_section_id: '5',
+          },
+          {
+            id: '4',
+            assignment_id: '23',
+            course_section_id: '6',
+          },
+        ],
+      },
+      {
+        overwriteRoutes: true,
+      }
+    )
+    const {getByRole, findAllByTestId, getAllByTestId} = renderComponent()
+    const cards = await findAllByTestId('item-assign-to-card')
+    expect(cards).toHaveLength(4)
+    expect(getAllByTestId('add-card')).toHaveLength(2)
+    act(() => getAllByTestId('add-card')[0].click())
+    expect(getAllByTestId('item-assign-to-card')).toHaveLength(5)
   })
 
   describe('in a blueprint course', () => {
@@ -367,7 +407,6 @@ describe('ItemAssignToTray', () => {
       const {getAllByTestId, findAllByText} = renderComponent({itemContentId: '31'})
       await findAllByText('Locked:')
       expect(getAllByTestId('add-card')[0]).toBeDisabled()
-      expect(getAllByTestId('add-card')[1]).toBeDisabled()
     })
 
     it('disables add button if there are blueprint-locked dates and default cards', async () => {
@@ -393,7 +432,6 @@ describe('ItemAssignToTray', () => {
       await findAllByText('Locked:')
 
       expect(getAllByTestId('add-card')[0]).toBeDisabled()
-      expect(getAllByTestId('add-card')[1]).toBeDisabled()
     })
 
     it('shows blueprint locking info when ENV contains master_course_restrictions', async () => {
@@ -472,7 +510,7 @@ describe('ItemAssignToTray', () => {
     const customAddCard = jest.fn()
     const {getAllByTestId} = renderComponent({onAddCard: customAddCard})
 
-    act(() => getAllByTestId('add-card')[1].click())
+    act(() => getAllByTestId('add-card')[0].click())
     expect(customAddCard).toHaveBeenCalled()
   })
 
@@ -796,7 +834,7 @@ describe('ItemAssignToTray', () => {
     const deleteButton = (await findAllByTestId('delete-card-button'))[0]
     await user.click(deleteButton)
 
-    const addButton = getAllByTestId('add-card')[1]
+    const addButton = getAllByTestId('add-card')[0]
     await waitFor(() => expect(addButton).toHaveFocus())
   })
 
@@ -810,7 +848,7 @@ describe('ItemAssignToTray', () => {
       expect(loadingSpinner).not.toBeInTheDocument()
     })
 
-    const addButton = getAllByTestId('add-card')[1]
+    const addButton = getAllByTestId('add-card')[0]
     await user.click(addButton)
     const deleteButtons = await findAllByTestId('delete-card-button')
     await waitFor(() =>
@@ -937,7 +975,7 @@ describe('ItemAssignToTray', () => {
       const cards = await findAllByTestId('item-assign-to-card')
       expect(cards[0]).toBeInTheDocument()
 
-      const addCardBtn = getAllByTestId('add-card')[1]
+      const addCardBtn = getAllByTestId('add-card')[0]
       act(() => addCardBtn.click())
 
       getByTestId('differentiated_modules_save_button').click()

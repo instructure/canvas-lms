@@ -672,7 +672,7 @@ const ItemAssignToTrayContent = ({
     return assignToCardsRef.current.every(card => card.hasAssignees)
   }
 
-  const addCardButton = () => {
+  const addCardButton = (firstButton: boolean) => {
     return (
       <Button
         display={isTray ? undefined : 'block'}
@@ -681,7 +681,7 @@ const ItemAssignToTrayContent = ({
         margin="small 0 0 0"
         renderIcon={IconAddLine}
         interaction={!allCardsAssigned() || !!blueprintDateLocks?.length ? 'disabled' : 'enabled'}
-        elementRef={el => (addCardButtonRef.current = el)}
+        elementRef={firstButton ? undefined : el => (addCardButtonRef.current = el)}
       >
         {isTray ? I18n.t('Add') : I18n.t('Assign To')}
       </Button>
@@ -762,7 +762,7 @@ const ItemAssignToTrayContent = ({
 
   return (
     <Flex.Item padding="small medium" shouldGrow={true} shouldShrink={true}>
-      {shouldShowAddCard && addCardButton()}
+      {shouldShowAddCard && assignToCardsRef.current.length > 3 && addCardButton(true)}
       {fetchInFlight || !loadedAssignees || isLoading ? (
         isTray ? (
           <Mask>
@@ -776,7 +776,7 @@ const ItemAssignToTrayContent = ({
           {renderCards()}
         </ApplyLocale>
       )}
-      {shouldShowAddCard && addCardButton()}
+      {shouldShowAddCard && addCardButton(false)}
     </Flex.Item>
   )
 }
