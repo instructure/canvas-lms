@@ -111,6 +111,7 @@ class AccountNotificationsController < ApplicationController
     @context = @current_user.profile
     set_active_tab("past_global_announcements")
     js_bundle :past_global_announcements
+    page_has_instui_topnav
     render html: "", layout: true
   end
 
