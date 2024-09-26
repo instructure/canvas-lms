@@ -48,6 +48,8 @@ describe Course do
         it { is_expected.to have_many(:assignment_post_policies).inverse_of(:course) }
         it { is_expected.to have_many(:feature_flags) }
         it { is_expected.to have_many(:lti_resource_links).class_name("Lti::ResourceLink") }
+
+        it { is_expected.to have_many(:block_editor_templates).class_name("BlockEditorTemplate").inverse_of(:context) }
       end
 
       describe "lti2 proxies" do

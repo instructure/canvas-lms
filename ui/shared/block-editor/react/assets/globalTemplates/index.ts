@@ -16,18 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './useClassNames'
-export * from './kb'
-export * from './dom'
-export * from './constants'
-export * from './getScrollParent'
-export * from './getCloneTree'
-export * from './colorUtils'
-export * from './getNodeIndex'
-export * from './deletable'
-export * from './size'
-export * from './renderNodeHelpers'
-export * from './transformations'
-export * from './cleanupBlocks'
-export * from './captureElement'
-export * from './mergeTemplates'
+//
+// This file is a temporary solution to prividing global templates to the block editor.
+//
+
+import {type BlockTemplate} from '../../types'
+
+import template41 from './template-10000000000041.json'
+import template42 from './template-10000000000042.json'
+import template44 from './template-10000000000044.json'
+
+// returning a promise will make this easier to replace with a real API call
+export const getGlobalTemplates = (): Promise<BlockTemplate[]> => {
+  // @ts-expect-error
+  return Promise.resolve([template41, template42, template44])
+}

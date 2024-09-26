@@ -2696,6 +2696,15 @@ CanvasRails::Application.routes.draw do
     scope(controller: :rich_content_api) do
       post "rich_content/generate", action: :generate
     end
+
+    scope(controller: :block_editor_templates_api) do
+      get "courses/:course_id/block_editor_templates", action: :index
+      post "courses/:course_id/block_editor_templates", action: :create
+      put "courses/:course_id/block_editor_templates/:id", action: :update
+      delete "courses/:course_id/block_editor_templates/:id", action: :destroy
+      post "courses/:course_id/block_editor_templates/:id/publish", action: :publish
+      get "courses/:course_id/block_editor_templates/can_edit", action: :can_edit
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented or

@@ -16,18 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './useClassNames'
-export * from './kb'
-export * from './dom'
-export * from './constants'
-export * from './getScrollParent'
-export * from './getCloneTree'
-export * from './colorUtils'
-export * from './getNodeIndex'
-export * from './deletable'
-export * from './size'
-export * from './renderNodeHelpers'
-export * from './transformations'
-export * from './cleanupBlocks'
-export * from './captureElement'
-export * from './mergeTemplates'
+import {useScope as useI18nScope} from '@canvas/i18n'
+import {generateActionTemplates} from '../generateActionTemplates'
+
+const I18n = useI18nScope('permissions_templates_32')
+
+export const template = generateActionTemplates(
+  [],
+  [],
+  [
+    {
+      title: I18n.t('Block Editor Templates - edit'),
+      description: I18n.t('Allows user to create and edit templates from within the Block Editor.'),
+    },
+  ]
+)

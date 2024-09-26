@@ -19,10 +19,10 @@
 import React from 'react'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {Editor, useEditor} from '@craftjs/core'
-
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {Toolbox, type ToolboxProps} from '../Toolbox'
+import {TemplateEditor} from '../../../types'
 
 const user = userEvent.setup()
 
@@ -45,6 +45,8 @@ jest.mock('@craftjs/core', () => {
 const defaultProps: ToolboxProps = {
   open: true,
   container: document.createElement('div'),
+  templates: [],
+  templateEditor: TemplateEditor.NONE,
   onClose: () => {},
 }
 
@@ -71,6 +73,13 @@ const blockList = [
 describe('Toolbox', () => {
   beforeEach(() => {
     mockCreate.mockClear()
+    const bee = document.createElement('div')
+    bee.classList.add('block-editor-editor')
+    document.body.appendChild(bee)
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
   })
 
   it('renders', () => {
@@ -89,6 +98,95 @@ describe('Toolbox', () => {
     await user.click(getByText('Close').closest('button') as HTMLButtonElement)
 
     expect(onClose).toHaveBeenCalled()
+  })
+
+  describe('with templates', () => {
+    it('renders template boxes', () => {
+      const templates = [
+        {
+          id: '1',
+          context_type: 'Course',
+          context_id: '1',
+          name: 'Template 1',
+          editor_version: '0.2',
+          template_type: 'block' as const,
+          workflow_state: 'active' as const,
+          node_tree: {rootNodeId: '0', nodes: {}},
+        },
+        {
+          id: '2',
+          context_type: 'Course',
+          context_id: '1',
+          name: 'Template 2',
+          editor_version: '0.2',
+          template_type: 'block' as const,
+          workflow_state: 'unpublished' as const,
+          node_tree: {rootNodeId: '0', nodes: {}},
+        },
+      ]
+      const {getByText} = renderComponent({templates})
+
+      expect(getByText('Template 1')).toBeInTheDocument()
+      expect(getByText('Template 1').closest('.toolbox-item')).toHaveStyle(
+        'border-color: transparent'
+      )
+      expect(getByText('Template 2')).toBeInTheDocument()
+      expect(getByText('Template 2').closest('.toolbox-item')).toHaveStyle('border-color: #FC5E13') // rgb(252, 94, 19)
+    })
+
+    it('dispatches DeleteTemplateEvent when delete button is clicked', async () => {
+      window.confirm = jest.fn(() => true)
+      const blockeditoreditor = document.querySelector('.block-editor-editor') as HTMLElement
+      const dispatchEvent = jest.spyOn(blockeditoreditor, 'dispatchEvent')
+
+      const templates = [
+        {
+          id: '1',
+          context_type: 'Course',
+          context_id: '1',
+          name: 'Template 1',
+          editor_version: '0.2',
+          template_type: 'block' as const,
+          workflow_state: 'active' as const,
+          node_tree: {rootNodeId: '0', nodes: {}},
+        },
+      ]
+      const {getByText} = renderComponent({templates, templateEditor: TemplateEditor.LOCAL})
+
+      await user.click(getByText('Delete Template').closest('button') as HTMLButtonElement)
+
+      expect(dispatchEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          detail: '1',
+        })
+      )
+    })
+
+    it('shows EditTemplateModal when edit template button is clicked', async () => {
+      const templates = [
+        {
+          id: '1',
+          context_type: 'Course',
+          context_id: '1',
+          name: 'Template 1',
+          editor_version: '0.2',
+          template_type: 'block' as const,
+          workflow_state: 'active' as const,
+          node_tree: {rootNodeId: '0', nodes: {}},
+        },
+      ]
+      const {getByLabelText, getByDisplayValue, getByText} = renderComponent({
+        templates,
+        templateEditor: TemplateEditor.LOCAL,
+      })
+
+      await user.click(getByText('Edit Template').closest('button') as HTMLButtonElement)
+
+      const dialog = getByLabelText('Edit Template')
+      expect(dialog).toBeInTheDocument()
+      expect(dialog).toHaveAttribute('role', 'dialog')
+      expect(getByDisplayValue('Template 1')).toBeInTheDocument()
+    })
   })
 
   // the rest is drag and drop and will be tested in the e2e tests

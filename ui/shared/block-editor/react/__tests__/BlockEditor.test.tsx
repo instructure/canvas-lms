@@ -24,6 +24,7 @@ import {
   getByLabelText as domGetByLabelText,
 } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
+import fetchMock from 'fetch-mock'
 import BlockEditor, {type BlockEditorProps} from '../BlockEditor'
 import {blank_page, blank_section_with_text} from './test-content'
 
@@ -37,6 +38,7 @@ function renderEditor(props: Partial<BlockEditorProps> = {}) {
 
   return render(
     <BlockEditor
+      course_id="1"
       container={container}
       enableResizer={false} // jsdom doesn't render enough for BlockResizer to work
       content={{version: '0.2', blocks: blank_page}}
@@ -48,8 +50,20 @@ function renderEditor(props: Partial<BlockEditorProps> = {}) {
 }
 
 describe('BlockEditor', () => {
+  let can_edit_mock: any
+  let templates_mock: any
   beforeAll(() => {
     window.alert = jest.fn()
+
+    can_edit_mock = fetchMock.mock('/api/v1/courses/1/block_editor_templates/can_edit', {
+      can_edit: false,
+      can_edit_global: false,
+    })
+
+    templates_mock = fetchMock.mock(
+      '/api/v1/courses/1/block_editor_templates?include[]=node_tree&drafts=false',
+      []
+    )
   })
 
   it('renders', () => {
@@ -58,10 +72,12 @@ describe('BlockEditor', () => {
     expect(getByText('Undo')).toBeInTheDocument()
     expect(getByText('Redo')).toBeInTheDocument()
     expect(getByLabelText('Block Toolbox')).not.toBeChecked()
+    expect(can_edit_mock.calls()).toHaveLength(1)
+    expect(templates_mock.calls()).toHaveLength(1)
   })
 
   it('warns on content version mismatch', () => {
-    // @ts-expect-error
+    // @ts-expect-error - passing invalid version on purpose
     renderEditor({content: {id: '1', version: '2', blocks: blank_page}})
     expect(window.alert).toHaveBeenCalledWith('Unknown block data version "2", mayhem may ensue')
   })

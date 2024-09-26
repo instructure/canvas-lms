@@ -51,6 +51,7 @@ class Course < ActiveRecord::Base
   belongs_to :template_course, class_name: "Course"
   has_many :templated_courses, class_name: "Course", foreign_key: "template_course_id", inverse_of: :template_course
   has_many :templated_accounts, class_name: "Account", foreign_key: "course_template_id", inverse_of: :course_template
+  has_many :block_editor_templates, class_name: "BlockEditorTemplate", as: :context, inverse_of: :context
 
   belongs_to :linked_homeroom_course, class_name: "Course", foreign_key: "homeroom_course_id", inverse_of: false
 

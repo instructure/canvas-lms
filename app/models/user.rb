@@ -218,6 +218,7 @@ class User < ActiveRecord::Base
            class_name: "UsageRights",
            dependent: :destroy
   has_many :gradebook_csvs, dependent: :destroy, class_name: "GradebookCSV"
+  has_many :block_editor_templates, class_name: "BlockEditorTemplate", as: :context, inverse_of: :context
 
   has_one :profile, class_name: "UserProfile"
 
