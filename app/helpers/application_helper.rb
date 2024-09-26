@@ -1066,8 +1066,21 @@ module ApplicationHelper
     header.freeze
   end
 
-  def default_source_csp_logging_directive
-    default_source_csp_logging_enabled? ? ("default-src 'self'" + csp_report_uri) : ""
+  def default_csp_logging_directives(include_script_src: true)
+    if default_source_csp_logging_enabled?
+      script_src_directive = include_script_src ? "script-src 'self' 'unsafe-eval' #{allow_list_domains};" : ""
+      directives = "default-src 'self'; \
+                    img-src 'self' data: #{allow_list_domains};\
+                    style-src 'self' 'unsafe-inline' #{allow_list_domains};\
+                    #{script_src_directive}\
+                    script-src-elem 'self' 'unsafe-inline' #{allow_list_domains};\
+                    font-src 'self' data: #{allow_list_domains};\
+                    connect-src 'self' #{allow_list_domains}"
+
+      (directives + csp_report_uri).squish
+    else
+      ""
+    end
   end
 
   def include_files_domain_in_csp
@@ -1079,9 +1092,9 @@ module ApplicationHelper
     return unless default_source_csp_logging_enabled? && csp_enabled? && csp_report_uri.present?
     return if headers.key?(csp_header) || csp_enforced?
 
-    # this is the default source directive added for all
+    # these are the default directives added for all
     # content types not represented by frames, scripts, or files
-    headers[csp_header] = default_source_csp_logging_directive
+    headers[csp_header] = default_csp_logging_directives
   end
 
   def add_csp_for_root
@@ -1090,15 +1103,11 @@ module ApplicationHelper
     return if csp_report_uri.empty? && !csp_enforced?
 
     # we iframe all files from the files domain into canvas, so we always have to include the files domain here
-    domains =
-      csp_context
-      .csp_whitelisted_domains(request, include_files: true, include_tools: true)
-      .join(" ")
-
+    #
     # Due to New Analytics generating CSV reports as blob on the client-side and then trying to download them,
     # as well as an interesting difference in browser interpretations of CSP, we have to allow blobs as a frame-src
-    directives = "frame-src 'self' blob: #{domains}; "
-    directives += default_source_csp_logging_directive
+    directives = "frame-src 'self' blob: #{allow_list_domains(include_tools: true)}; "
+    directives += default_csp_logging_directives
 
     headers[csp_header] = directives
   end
@@ -1107,30 +1116,22 @@ module ApplicationHelper
     return if csp_report_uri.empty? && !csp_enforced?
 
     directives = csp_iframe_attribute
-    directives += default_source_csp_logging_directive
+    directives += default_csp_logging_directives(include_script_src: false)
 
     headers[csp_header] = directives
   end
 
+  def allow_list_domains(include_tools: false)
+    csp_context.csp_whitelisted_domains(request, include_files: include_files_domain_in_csp, include_tools:).join(" ")
+  end
+
   def csp_iframe_attribute
-    frame_domains =
-      csp_context.csp_whitelisted_domains(
-        request,
-        include_files: include_files_domain_in_csp,
-        include_tools: true
-      )
-    script_domains =
-      csp_context.csp_whitelisted_domains(
-        request,
-        include_files: include_files_domain_in_csp,
-        include_tools: false
-      )
     if include_files_domain_in_csp
-      frame_domains = ["'self'"] + frame_domains
-      object_domains = ["'self'"] + script_domains
-      script_domains = ["'self'", "'unsafe-eval'", "'unsafe-inline'"] + script_domains
+      frame_domains = "'self' " + allow_list_domains(include_tools: true)
+      object_domains = "'self' " + allow_list_domains
+      script_domains = "'self' 'unsafe-eval' 'unsafe-inline' " + allow_list_domains
     end
-    "frame-src #{frame_domains.join(" ")} blob:; script-src #{script_domains.join(" ")}; object-src #{object_domains.join(" ")}; "
+    "frame-src #{frame_domains} blob:; script-src #{script_domains}; object-src #{object_domains}; "
   end
 
   # Returns true if the current_path starts with the given value
