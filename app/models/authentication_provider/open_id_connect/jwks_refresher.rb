@@ -22,11 +22,10 @@
 class AuthenticationProvider::OpenIDConnect::JwksRefresher < AuthenticationProvider::ProviderRefresher
   class << self
     def refresh_providers(shard_scope: Shard.current, providers: nil)
-      providers ||= AuthenticationProvider.OpenIDConnect
-                                          .active
-                                          .where(metadata_uri: [nil, ""])
-                                          .shard(shard_scope)
-                                          .select(&:jwks_uri)
+      providers ||= AuthenticationProvider::OpenIDConnect.active
+                                                         .where(metadata_uri: [nil, ""])
+                                                         .shard(shard_scope)
+                                                         .select(&:jwks_uri)
       super
     end
 
