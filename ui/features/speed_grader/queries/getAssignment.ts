@@ -36,6 +36,7 @@ type Result = {
     supportsGradeByQuestion: boolean
     gradeByQuestionEnabled: boolean
     hasMultipleDueDates: boolean
+    rubricUpdateUrl: string | null
     checkpoints: {
       pointsPossible: number
       tag: string
@@ -107,6 +108,7 @@ const QUERY = gql`
       supportsGradeByQuestion
       gradeByQuestionEnabled
       hasMultipleDueDates
+      rubricUpdateUrl
       checkpoints {
         pointsPossible
         tag

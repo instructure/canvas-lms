@@ -279,6 +279,13 @@ module Types
       assignment.active_rubric_association? ? load_association(:rubric_association) : nil
     end
 
+    field :rubric_update_url, String, null: true
+    def rubric_update_url
+      return nil unless assignment.active_rubric_association?
+
+      "/courses/#{assignment.context_id}/rubric_associations/#{assignment.rubric_association.id}/assessments" if assignment.rubric_association
+    end
+
     def lock_info
       load_locked_for { |lock_info| lock_info || {} }
     end
