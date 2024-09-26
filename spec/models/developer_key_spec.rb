@@ -44,6 +44,91 @@ describe DeveloperKey do
     )
   end
 
+  describe "#tokens_expire_in" do
+    let(:developer_key) { DeveloperKey.new }
+
+    context "when the client is public" do
+      before do
+        allow(developer_key).to receive(:public_client?).and_return(true)
+      end
+
+      it "returns the token TTL from settings" do
+        expect(developer_key.tokens_expire_in).to eq(120.minutes)
+      end
+    end
+
+    context "when the client is a mobile app" do
+      before do
+        allow(developer_key).to receive(:mobile_app?).and_return(true)
+        allow(Canvas::Plugin).to receive(:find).with("sessions").and_return(double(settings: { mobile_timeout: 240 }))
+      end
+
+      it "returns the mobile timeout from session settings" do
+        expect(developer_key.tokens_expire_in).to eq(240.minutes)
+      end
+    end
+
+    context "when the client is neither public nor a mobile app" do
+      before do
+        allow(developer_key).to receive_messages(public_client?: false, mobile_app?: false)
+      end
+
+      it "returns nil" do
+        expect(developer_key.tokens_expire_in).to be_nil
+      end
+    end
+  end
+
+  describe "#confidential_client?" do
+    let(:developer_key) { DeveloperKey.new }
+
+    context "when client_type is confidential" do
+      it "returns true" do
+        developer_key.client_type = DeveloperKey::CONFIDENTIAL_CLIENT_TYPE
+        expect(developer_key.confidential_client?).to be true
+      end
+    end
+
+    context "when client_type is public" do
+      it "returns false" do
+        developer_key.client_type = DeveloperKey::PUBLIC_CLIENT_TYPE
+        expect(developer_key.confidential_client?).to be false
+      end
+    end
+
+    context "when client_type is nil" do
+      it "returns false" do
+        developer_key.client_type = nil
+        expect(developer_key.confidential_client?).to be false
+      end
+    end
+  end
+
+  describe "#public_client?" do
+    let(:developer_key) { DeveloperKey.new }
+
+    context "when client_type is public" do
+      it "returns true" do
+        developer_key.client_type = DeveloperKey::PUBLIC_CLIENT_TYPE
+        expect(developer_key.public_client?).to be true
+      end
+    end
+
+    context "when client_type is confidential" do
+      it "returns false" do
+        developer_key.client_type = DeveloperKey::CONFIDENTIAL_CLIENT_TYPE
+        expect(developer_key.public_client?).to be false
+      end
+    end
+
+    context "when client_type is nil" do
+      it "returns false" do
+        developer_key.client_type = nil
+        expect(developer_key.public_client?).to be false
+      end
+    end
+  end
+
   describe "#site_admin_service_auth?" do
     subject do
       developer_key_not_saved.update!(key_attributes)
@@ -81,6 +166,28 @@ describe DeveloperKey do
           let(:key_attributes) { super().merge(account: root_account) }
 
           it { is_expected.to be false }
+        end
+      end
+    end
+  end
+
+  context "validations" do
+    describe "client_type" do
+      context "when client_type is Confidential" do
+        it "does not raise an exception" do
+          expect { DeveloperKey.create!(client_type: DeveloperKey::CONFIDENTIAL_CLIENT_TYPE) }.to_not raise_error
+        end
+      end
+
+      context "when client_type is Public" do
+        it "does not raise an exception" do
+          expect { DeveloperKey.create!(client_type: DeveloperKey::PUBLIC_CLIENT_TYPE) }.to_not raise_error
+        end
+      end
+
+      context "when client_type is not valid" do
+        it "raises an exception" do
+          expect { DeveloperKey.create!(client_type: "invalid") }.to raise_error ActiveRecord::RecordInvalid
         end
       end
     end
@@ -659,6 +766,20 @@ describe DeveloperKey do
         before { developer_key_saved.update public_jwk: { foo: "bar" } }
 
         it { is_expected.to be false }
+      end
+    end
+
+    context "when client_type is blank" do
+      it "sets the client type to 'Confidential'" do
+        key = DeveloperKey.create!
+        expect(key.client_type).to eq DeveloperKey::CONFIDENTIAL_CLIENT_TYPE
+      end
+    end
+
+    context "when the client_type is not blank" do
+      it "does not mutate the client type" do
+        key = DeveloperKey.create!(client_type: DeveloperKey::PUBLIC_CLIENT_TYPE)
+        expect(key.client_type).to eq DeveloperKey::PUBLIC_CLIENT_TYPE
       end
     end
 
