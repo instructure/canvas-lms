@@ -20,7 +20,7 @@
 
 module Factories
   def user_service_model(opts = {})
-    @user_service = factory_with_protected_attributes(UserService, valid_user_service_attributes.merge(opts))
+    @user_service = UserService.create!(valid_user_service_attributes.merge(opts))
   end
 
   def valid_user_service_attributes

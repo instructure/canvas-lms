@@ -171,10 +171,10 @@ describe ContentExportsController do
         course_factory active_all: true
         course_with_ta(course: @course, active_all: true)
         student_in_course(course: @course, active_all: true)
-        @acx = factory_with_protected_attributes(@course.content_exports, user: @ta, export_type: "common_cartridge")
-        @tcx = factory_with_protected_attributes(@course.content_exports, user: @teacher, export_type: "common_cartridge")
-        @tzx = factory_with_protected_attributes(@course.content_exports, user: @teacher, export_type: "zip")
-        @szx = factory_with_protected_attributes(@course.content_exports, user: @student, export_type: "zip")
+        @acx = @course.content_exports.create!(user: @ta, export_type: "common_cartridge")
+        @tcx = @course.content_exports.create!(user: @teacher, export_type: "common_cartridge")
+        @tzx = @course.content_exports.create!(user: @teacher, export_type: "zip")
+        @szx = @course.content_exports.create!(user: @student, export_type: "zip")
       end
 
       describe "index" do
@@ -211,9 +211,9 @@ describe ContentExportsController do
       before(:once) do
         course_factory active_all: true
         student_in_course(course: @course, active_all: true)
-        @tzx = factory_with_protected_attributes(@student.content_exports, user: @teacher, export_type: "zip")
-        @sdx = factory_with_protected_attributes(@student.content_exports, user: @student, export_type: "user_data")
-        @szx = factory_with_protected_attributes(@student.content_exports, user: @student, export_type: "zip")
+        @tzx = @student.content_exports.create!(user: @teacher, export_type: "zip")
+        @sdx = @student.content_exports.create!(user: @student, export_type: "user_data")
+        @szx = @student.content_exports.create!(user: @student, export_type: "zip")
       end
 
       describe "index" do

@@ -3374,14 +3374,14 @@ describe ContextExternalTool do
       let(:admin) { account_admin_user(account: c.root_account) }
       let(:c) { course_factory(active_course: true) }
       let(:student) do
-        student = factory_with_protected_attributes(User, valid_user_attributes)
+        student = User.create!(valid_user_attributes)
         e = c.enroll_student(student)
         e.invite
         e.accept
         student
       end
       let(:teacher) do
-        teacher = factory_with_protected_attributes(User, valid_user_attributes)
+        teacher = User.create!(valid_user_attributes)
         e = c.enroll_teacher(teacher)
         e.invite
         e.accept

@@ -27,7 +27,7 @@ module Factories
     attrs[:lock_at_overridden] = opts.key?(:lock_at)
     attrs[:unlock_at_overridden] = opts.key?(:unlock_at)
     attrs[:set] = override_for if override_for
-    @override = factory_with_protected_attributes(assignment.assignment_overrides, attrs)
+    @override = assignment.assignment_overrides.create!(attrs)
   end
 
   def assignment_override_valid_attributes

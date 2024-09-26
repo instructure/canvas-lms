@@ -291,8 +291,16 @@ describe CalendarEventsApiController do
     it "uses the relevant event for that section, in the course feed" do
       skip "requires changing the format of the course feed url to include user information"
       s2 = @course.course_sections.create!(name: "s2")
-      c1 = factory_with_protected_attributes(@event.child_events, description: @event.description, title: @event.title, context: @course.default_section, start_at: 2.hours.ago, end_at: 1.hour.ago)
-      factory_with_protected_attributes(@event.child_events, description: @event.description, title: @event.title, context: s2, start_at: 3.hours.ago, end_at: 2.hours.ago)
+      c1 = @event.child_events.create!(description: @event.description,
+                                       title: @event.title,
+                                       context: @course.default_section,
+                                       start_at: 2.hours.ago,
+                                       end_at: 1.hour.ago)
+      @event.child_events.create!(description: @event.description,
+                                  title: @event.title,
+                                  context: s2,
+                                  start_at: 3.hours.ago,
+                                  end_at: 2.hours.ago)
       get "public_feed", params: { feed_code: "course_#{@course.uuid}", format: "ics" }
       expect(response).to be_successful
       expect(assigns[:events]).to be_present
@@ -302,8 +310,16 @@ describe CalendarEventsApiController do
     context "for a user context" do
       it "uses the relevant event for that section" do
         s2 = @course.course_sections.create!(name: "s2")
-        c1 = factory_with_protected_attributes(@event.child_events, description: @event.description, title: @event.title, context: @course.default_section, start_at: 2.hours.ago, end_at: 1.hour.ago)
-        factory_with_protected_attributes(@event.child_events, description: @event.description, title: @event.title, context: s2, start_at: 3.hours.ago, end_at: 2.hours.ago)
+        c1 = @event.child_events.create!(description: @event.description,
+                                         title: @event.title,
+                                         context: @course.default_section,
+                                         start_at: 2.hours.ago,
+                                         end_at: 1.hour.ago)
+        @event.child_events.create!(description: @event.description,
+                                    title: @event.title,
+                                    context: s2,
+                                    start_at: 3.hours.ago,
+                                    end_at: 2.hours.ago)
         get "public_feed", params: { feed_code: "user_#{@user.uuid}" }, format: "ics"
         expect(response).to be_successful
         expect(assigns[:events]).to be_present

@@ -22,7 +22,7 @@ require_relative "../spec_helper"
 describe MediaTracksController do
   before :once do
     course_with_teacher(active_all: true)
-    @mo = factory_with_protected_attributes(MediaObject, media_id: "0_abcdefgh", old_media_id: "1_01234567", context: @course)
+    @mo = MediaObject.create!(media_id: "0_abcdefgh", old_media_id: "1_01234567", context: @course)
   end
 
   before do
@@ -368,7 +368,7 @@ describe MediaTracksController do
       end
 
       it "does not show tracks that belong to a different media object" do
-        mo2 = factory_with_protected_attributes(MediaObject, media_id: "0_abcdefghi", old_media_id: "1_012345678", context: @course)
+        mo2 = MediaObject.create!(media_id: "0_abcdefghi", old_media_id: "1_012345678", context: @course)
 
         track = mo2.media_tracks.create!(kind: "subtitles", locale: "en", content: "blah")
         get "show", params: { media_object_id: @mo.media_id, id: track.id }

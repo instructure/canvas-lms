@@ -44,7 +44,7 @@ describe GradebooksController do
       before do
         user_session(@student)
         @assignment = @course.assignments.create!(title: "Example Assignment")
-        @media_object = factory_with_protected_attributes(MediaObject, media_id: "m-someid", media_type: "video", title: "Example Media Object", context: @course)
+        @media_object = MediaObject.create!(media_id: "m-someid", media_type: "video", title: "Example Media Object", context: @course)
         @mock_kaltura = double("CanvasKaltura::ClientV3")
         allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@mock_kaltura)
         @media_sources = [{
@@ -93,7 +93,10 @@ describe GradebooksController do
         attachment = attachment_model(context: @assignment)
         attachment2 = attachment_model(context: @assignment)
         other_student = @course.enroll_user(User.create!(name: "some other user")).user
-        deleted_media_object = factory_with_protected_attributes(MediaObject, media_id: "m-someid2", media_type: "video", title: "Example Media Object 2", context: @course)
+        deleted_media_object = MediaObject.create!(media_id: "m-someid2",
+                                                   media_type: "video",
+                                                   title: "Example Media Object 2",
+                                                   context: @course)
         submission_to_comment = @assignment.grade_student(@student, grade: 10, grader: @teacher).first
         comment_1 = submission_to_comment.add_comment(comment: "a student comment", author: @teacher, attachments: [attachment])
         comment_2 = submission_to_comment.add_comment(comment: "another student comment", author: @teacher, attachments: [attachment, attachment2])

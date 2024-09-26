@@ -2380,8 +2380,7 @@ describe AssignmentsController do
         let(:domain) { "justanexamplenotarealwebsite.com" }
 
         let(:tool) do
-          factory_with_protected_attributes(
-            @course.context_external_tools,
+          @course.context_external_tools.create!(
             domain:,
             url: "http://www.justanexamplenotarealwebsite.com/tool1",
             shared_secret: "test123",

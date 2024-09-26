@@ -19,8 +19,8 @@
 #
 
 module Factories
-  def external_feed_model(opts = {}, do_save = true)
-    factory_with_protected_attributes(ExternalFeed, valid_external_feed_attributes.merge(opts), do_save)
+  def external_feed_model(opts = {})
+    ExternalFeed.create!(valid_external_feed_attributes.merge(opts))
   end
 
   def valid_external_feed_attributes

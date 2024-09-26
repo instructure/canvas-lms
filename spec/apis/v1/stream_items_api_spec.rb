@@ -32,7 +32,7 @@ describe UsersController, type: :request do
     get("/api/v1/users/self/activity_stream")
     assert_status(401)
 
-    @course = factory_with_protected_attributes(Course, course_valid_attributes)
+    @course = Course.create!(course_valid_attributes)
     raw_api_call(:get,
                  "/api/v1/courses/#{@course.id}/activity_stream",
                  controller: "courses",
