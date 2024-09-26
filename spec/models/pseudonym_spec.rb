@@ -21,7 +21,7 @@
 describe Pseudonym do
   it "creates a new instance given valid attributes" do
     user_model
-    expect { factory_with_protected_attributes(Pseudonym, valid_pseudonym_attributes) }.to change(Pseudonym, :count).by(1)
+    expect { Pseudonym.create!(valid_pseudonym_attributes) }.to change(Pseudonym, :count).by(1)
   end
 
   it "allows single character usernames" do

@@ -695,13 +695,10 @@ describe AssignmentsApiController, type: :request do
 
     it "excludes deleted assignments in the list return" do
       @context = @course
-      @assignment = factory_with_protected_attributes(
-        @course.assignments,
-        {
-          title: "assignment1",
-          submission_types: "discussion_topic",
-          discussion_topic: discussion_topic_model
-        }
+      @assignment = @course.assignments.create!(
+        title: "assignment1",
+        submission_types: "discussion_topic",
+        discussion_topic: discussion_topic_model
       )
       @assignment.reload
       @assignment.destroy
@@ -5208,12 +5205,7 @@ describe AssignmentsApiController, type: :request do
       it "prevents setting group category ID on assignments with discussions" do
         course_with_teacher(active_all: true)
         group_category = @course.group_categories.create!(name: "foo")
-        @assignment = factory_with_protected_attributes(
-          @course.assignments,
-          {
-            title: "assignment1",
-          }
-        )
+        @assignment = @course.assignments.create!(title: "assignment1")
         @topic = @course.discussion_topics.build(assignment: @assignment, title: "asdf")
         @topic.save
         raw_api_update_assignment(@course, @assignment, {

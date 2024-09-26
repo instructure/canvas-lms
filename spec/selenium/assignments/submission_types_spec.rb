@@ -91,7 +91,10 @@ describe "assignments" do
     it "validates an assignment created with the type of external tool", priority: "1" do
       allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { "encryption-secret-5T14NjaTbcYjc4" }
       allow(BasicLTI::Sourcedid).to receive(:signing_secret) { "signing-secret-vp04BNqApwdwUYPUI" }
-      t1 = factory_with_protected_attributes(@course.context_external_tools, url: "http://www.example.com/", shared_secret: "test123", consumer_key: "test123", name: "tool 1")
+      t1 = @course.context_external_tools.create!(url: "http://www.example.com/",
+                                                  shared_secret: "test123",
+                                                  consumer_key: "test123",
+                                                  name: "tool 1")
       external_tool_assignment = assignment_model(course: @course, title: "test2", submission_types: "external_tool")
       external_tool_assignment.create_external_tool_tag(url: t1.url)
       external_tool_assignment.external_tool_tag.update_attribute(:content_type, "ContextExternalTool")

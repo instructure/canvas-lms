@@ -21,7 +21,7 @@
 module Factories
   def course_pace_model(opts = {})
     course = opts.delete(:course) || opts[:context] || course_model(reusable: true)
-    @course_pace = factory_with_protected_attributes(course.course_paces, valid_course_pace_attributes.merge(opts))
+    @course_pace = course.course_paces.create!(valid_course_pace_attributes.merge(opts))
     course.context_module_tags.can_have_assignment.not_deleted.each do |module_item|
       @course_pace.course_pace_module_items.create(module_item:, duration: 0)
     end
@@ -30,7 +30,7 @@ module Factories
 
   def section_pace_model(opts = {})
     section = opts.delete(:section) || opts[:context] || add_section(course_model(reusable: true))
-    @section_pace = factory_with_protected_attributes(section.course.course_paces, valid_section_pace_attributes(section).merge(opts))
+    @section_pace = section.course.course_paces.create!(valid_section_pace_attributes(section).merge(opts))
     section.course.context_module_tags.can_have_assignment.not_deleted.each do |module_item|
       @section_pace.course_pace_module_items.create(module_item:, duration: 0)
     end
@@ -39,7 +39,7 @@ module Factories
 
   def student_enrollment_pace_model(opts = {})
     student_enrollment = opts.delete(:student_enrollment) || opts[:context] || add_section(course_model(reusable: true))
-    @student_enrollment_pace = factory_with_protected_attributes(student_enrollment.course.course_paces, valid_student_enrollment_pace_attributes(student_enrollment).merge(opts))
+    @student_enrollment_pace = student_enrollment.course.course_paces.create!(valid_student_enrollment_pace_attributes(student_enrollment).merge(opts))
     student_enrollment.course.context_module_tags.can_have_assignment.not_deleted.each do |module_item|
       @student_enrollment_pace.course_pace_module_items.create(module_item:, duration: 0)
     end

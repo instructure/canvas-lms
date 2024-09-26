@@ -30,7 +30,7 @@ describe CommunicationChannel do
   end
 
   it "creates a new instance given valid attributes" do
-    factory_with_protected_attributes(CommunicationChannel, communication_channel_valid_attributes)
+    CommunicationChannel.create!(communication_channel_valid_attributes)
   end
 
   describe "::trusted_confirmation_redirect?" do

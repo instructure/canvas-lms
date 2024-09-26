@@ -20,7 +20,7 @@
 
 module Factories
   def delayed_message_model(opts = {})
-    @delayed_message = factory_with_protected_attributes(DelayedMessage, delayed_message_valid_attributes(opts).merge(opts))
+    @delayed_message = DelayedMessage.create!(delayed_message_valid_attributes(opts).merge(opts))
   end
 
   def delayed_message_valid_attributes(opts = {})

@@ -27,12 +27,14 @@ describe CoursesHelper do
   context "a view with a 'Coming Up' sidebar" do
     before(:once) do
       course_with_teacher(active_all: true)
-      @assignment = factory_with_protected_attributes(@course.assignments,
-                                                      assignment_valid_attributes.merge({ points_possible: 10,
-                                                                                          submission_types: "online_text_entry" }))
-      @assignment2 = factory_with_protected_attributes(@course.assignments,
-                                                       assignment_valid_attributes.merge({ points_possible: 10,
-                                                                                           submission_types: "none" }))
+      @assignment = @course.assignments.create!(
+        assignment_valid_attributes.merge({ points_possible: 10,
+                                            submission_types: "online_text_entry" })
+      )
+      @assignment2 = @course.assignments.create!(
+        assignment_valid_attributes.merge({ points_possible: 10,
+                                            submission_types: "none" })
+      )
     end
 
     before do
@@ -41,8 +43,8 @@ describe CoursesHelper do
 
     describe "an assignment with no submissions" do
       before(:once) do
-        @student_one = factory_with_protected_attributes(User, valid_user_attributes)
-        @student_two = factory_with_protected_attributes(User, valid_user_attributes)
+        @student_one = User.create!(valid_user_attributes)
+        @student_two = User.create!(valid_user_attributes)
         [@student_one, @student_two].each do |student|
           e = @course.enroll_student(student)
           e.invite
@@ -69,8 +71,8 @@ describe CoursesHelper do
 
     describe "an assignment with submissions" do
       before(:once) do
-        @student_one = factory_with_protected_attributes(User, valid_user_attributes)
-        @student_two = factory_with_protected_attributes(User, valid_user_attributes)
+        @student_one = User.create!(valid_user_attributes)
+        @student_two = User.create!(valid_user_attributes)
         [@student_one, @student_two].each do |student|
           e = @course.enroll_student(student)
           e.invite
@@ -343,9 +345,8 @@ describe CoursesHelper do
     before(:once) do
       course_with_teacher(active_all: true)
       @course.root_account.enable_feature!(:discussion_checkpoints)
-      @assignment = factory_with_protected_attributes(@course.assignments,
-                                                      assignment_valid_attributes.merge({ points_possible: 10,
-                                                                                          submission_types: "online_text_entry" }))
+      @assignment = @course.assignments.create!(assignment_valid_attributes.merge({ points_possible: 10,
+                                                                                    submission_types: "online_text_entry" }))
       @checkpoint_topic, @checkpoint_entry = graded_discussion_topic_with_checkpoints(context: @course)
     end
 

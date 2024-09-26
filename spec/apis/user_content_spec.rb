@@ -306,7 +306,7 @@ describe UserContent, type: :request do
     let(:tester) { Class.new { include Api }.new }
 
     it "adds the expected href to instructure_inline_media_comment anchors" do
-      factory_with_protected_attributes(MediaObject, media_id: "test2", media_type: "audio")
+      MediaObject.create!(media_id: "test2", media_type: "audio")
       html = tester.process_incoming_html_content(<<~HTML)
         <a id='something-else' href='/blah'>no touchy</a>
         <a class='instructure_inline_media_comment audio_comment'>no id</a>

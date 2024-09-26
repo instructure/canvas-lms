@@ -20,7 +20,7 @@
 
 module Factories
   def rubric_model(opts = {})
-    @rubric = factory_with_protected_attributes(Rubric, valid_rubric_attributes.merge(opts))
+    @rubric = Rubric.create!(valid_rubric_attributes.merge(opts))
   end
 
   def valid_rubric_attributes

@@ -20,7 +20,7 @@
 
 module Factories
   def communication_channel_model(opts = {})
-    @cc = factory_with_protected_attributes(CommunicationChannel, communication_channel_valid_attributes.merge(opts))
+    @cc = CommunicationChannel.create!(communication_channel_valid_attributes.merge(opts))
     @communication_channel = @cc
   end
 

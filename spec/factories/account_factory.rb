@@ -19,7 +19,7 @@
 #
 module Factories
   def account_model(opts = {})
-    @account = factory_with_protected_attributes(Account, valid_account_attributes.merge(opts))
+    @account = Account.create!(valid_account_attributes.merge(opts))
   end
 
   def stub_rcs_config
@@ -42,7 +42,7 @@ module Factories
   end
 
   def account_rcs_model(opts = {})
-    @account = factory_with_protected_attributes(Account, valid_account_attributes.merge(opts))
+    @account = Account.create!(valid_account_attributes.merge(opts))
   end
 
   def provision_quizzes_next(account)

@@ -23,7 +23,7 @@ describe ContentShare do
     it "correctly sets the root_account_id from context" do
       course_factory active_all: true
       user_model
-      export = factory_with_protected_attributes(@course.content_exports, user: @user, export_type: "common_cartridge")
+      export = @course.content_exports.create!(user: @user, export_type: "common_cartridge")
       share = ContentShare.create!(content_export: export, name: "Share01", user: @user, read_state: "unread", type: "SentContentShare")
       expect(share.root_account_id).to eq(export.context.root_account_id)
     end
@@ -37,7 +37,7 @@ describe ContentShare do
           user_factory(account: acc)
         end
         course_factory active_all: true
-        export = factory_with_protected_attributes(@course.content_exports, user: @user, export_type: "common_cartridge")
+        export = @course.content_exports.create!(user: @user, export_type: "common_cartridge")
         share = @user.content_shares.create!(content_export: export, name: "Share01", read_state: "unread", type: "SentContentShare")
         expect(share.root_account_id).to eq(@course.root_account_id)
       end
@@ -46,7 +46,7 @@ describe ContentShare do
         user_model
         @sending_user = @user
         course_factory active_all: true
-        export = factory_with_protected_attributes(@course.content_exports, user: @sending_user, export_type: "common_cartridge")
+        export = @course.content_exports.create!(user: @sending_user, export_type: "common_cartridge")
         share = @sending_user.content_shares.create!(content_export: export, name: "Share01", read_state: "unread", type: "SentContentShare")
 
         @shard1.activate do

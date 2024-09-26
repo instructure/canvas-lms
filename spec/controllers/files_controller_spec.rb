@@ -51,19 +51,19 @@ describe FilesController do
   end
 
   def course_file
-    @file = factory_with_protected_attributes(@course.attachments, uploaded_data: io)
+    @file = @course.attachments.create!(uploaded_data: io)
   end
 
   def user_file
-    @file = factory_with_protected_attributes(@user.attachments, uploaded_data: io)
+    @file = @user.attachments.create!(uploaded_data: io)
   end
 
   def user_html_file
-    @file = factory_with_protected_attributes(@user.attachments, uploaded_data: fixture_file_upload("test.html", "text/html", false))
+    @file = @user.attachments.create!(uploaded_data: fixture_file_upload("test.html", "text/html", false))
   end
 
   def account_js_file
-    @file = factory_with_protected_attributes(@account.attachments, uploaded_data: fixture_file_upload("test.js", "text/javascript", false))
+    @file = @account.attachments.create!(uploaded_data: fixture_file_upload("test.js", "text/javascript", false))
   end
 
   def folder_file
@@ -887,7 +887,7 @@ describe FilesController do
       it "is included in newly uploaded files" do
         user_session(@teacher)
 
-        attachment = factory_with_protected_attributes(Attachment, context: @course, file_state: "deleted", filename: "doc.doc")
+        attachment = Attachment.create!(context: @course, file_state: "deleted", filename: "doc.doc")
         attachment.uploaded_data = io
         attachment.save!
 
@@ -1540,7 +1540,11 @@ describe FilesController do
       # this endpoint does not need a logged-in user or api token auth, it's
       # based completely on the policy signature
       pseudonym(@teacher)
-      @attachment = factory_with_protected_attributes(Attachment, context: @course, file_state: "deleted", workflow_state: "unattached", filename: "test.txt", content_type: "text")
+      @attachment = Attachment.create!(context: @course,
+                                       file_state: "deleted",
+                                       workflow_state: "unattached",
+                                       filename: "test.txt",
+                                       content_type: "text")
     end
 
     before do
@@ -1607,16 +1611,13 @@ describe FilesController do
     end
 
     it "adds 'include=avatar' to the api_create_success redirect for profile pictures" do
-      profile_pic = factory_with_protected_attributes(
-        Attachment,
-        user: @teacher,
-        context: @teacher,
-        folder: @teacher.profile_pics_folder,
-        file_state: "deleted",
-        workflow_state: "unattached",
-        filename: "profile.png",
-        content_type: "image/png"
-      )
+      profile_pic = Attachment.create!(user: @teacher,
+                                       context: @teacher,
+                                       folder: @teacher.profile_pics_folder,
+                                       file_state: "deleted",
+                                       workflow_state: "unattached",
+                                       filename: "profile.png",
+                                       content_type: "image/png")
 
       local_storage!
       params = profile_pic.ajax_upload_params("", "")
@@ -1969,7 +1970,7 @@ describe FilesController do
   end
 
   describe "GET 'image_thumbnail'" do
-    let(:image) { factory_with_protected_attributes(@teacher.attachments, uploaded_data: stub_png_data, instfs_uuid: "1234") }
+    let(:image) { @teacher.attachments.create!(uploaded_data: stub_png_data, instfs_uuid: "1234") }
 
     it "returns default 'no_pic' thumbnail if attachment not found" do
       user_session @teacher

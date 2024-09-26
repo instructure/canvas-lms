@@ -27,8 +27,7 @@ RSpec.describe Mutations::CreateSubmission do
       @course.assignments.create!(title: "Example Assignment", submission_types: "online_upload")
     @attachment1 = attachment_with_context(@student)
     @attachment2 = attachment_with_context(@student)
-    @media_object =
-      factory_with_protected_attributes(MediaObject, media_id: "m-123456", title: "neato-vid")
+    @media_object = MediaObject.create!(media_id: "m-123456", title: "neato-vid")
     @teacher = @course.enroll_teacher(User.create!, enrollment_state: "active").user
   end
 

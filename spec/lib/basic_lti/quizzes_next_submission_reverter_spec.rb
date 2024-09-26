@@ -26,7 +26,7 @@ describe BasicLTI::QuizzesNextSubmissionReverter do
     @root_account = @course.root_account
     @account = account_model(root_account: @root_account, parent_account: @root_account)
     @course.update_attribute(:account, @account)
-    @user = factory_with_protected_attributes(User, name: "some user", workflow_state: "registered")
+    @user = User.create!(name: "some user", workflow_state: "registered")
     @course.enroll_student(@user)
   end
 
