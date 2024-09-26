@@ -48,6 +48,8 @@ import {createCommentBankItem} from './mutations/comment_bank/createCommentBankI
 import {deleteCommentBankItem} from './mutations/comment_bank/deleteCommentBankItemMutation'
 import {updateCommentBankItem} from './mutations/comment_bank/updateCommentBankItemMutation'
 import {updateCommentSuggestionsEnabled} from './mutations/comment_bank/updateCommentSuggestionsEnabled'
+import {saveRubricAssessment} from './mutations/saveRubricAssessmentMutation'
+import {updateSubmissionSecondsLate} from './mutations/updateSubmissionSecondsLateMutation'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import GenericErrorPage from '@canvas/generic-error-page'
@@ -143,12 +145,14 @@ ready(() => {
           postAssignmentGradesForSections,
           postDraftSubmissionComment,
           updateSubmissionGradeStatus,
+          updateSubmissionSecondsLate,
           createCommentBankItem,
           deleteCommentBankItem,
           updateCommentBankItem,
           updateCommentSuggestionsEnabled,
           updateSpeedGraderSettings,
-          postSubmissionCommentMedia: sgUploader.doUploadByFile,
+          postSubmissionCommentMedia: sgUploader?.doUploadByFile,
+          saveRubricAssessment,
         },
         postMessageAliases,
         context: {
@@ -166,6 +170,7 @@ ready(() => {
           themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES,
           useHighContrast: window.ENV.use_high_contrast,
           commentLibrarySuggestionsEnabled: window.ENV.comment_library_suggestions_enabled,
+          lateSubmissionInterval: window.ENV.late_policy?.late_submission_interval || 'day',
         },
         features: {
           extendedSubmissionState: window.ENV.FEATURES.extended_submission_state,
