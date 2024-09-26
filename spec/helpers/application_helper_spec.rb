@@ -1192,14 +1192,6 @@ describe ApplicationHelper do
         allow(helper).to receive(:csp_context).and_return(account)
       end
 
-      it "doesn't set the CSP report only header if not configured" do
-        helper.add_csp_for_root
-        helper.include_custom_meta_tags
-        expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
-        expect(headers).to_not have_key("Content-Security-Policy")
-        expect(js_env).not_to have_key(:csp)
-      end
-
       it "doesn't set the CSP header for non-html requests" do
         response.content_type = "application/json"
         account.enable_csp!
@@ -1252,6 +1244,14 @@ describe ApplicationHelper do
         before do
           account.enable_feature!(:javascript_csp)
           account.enable_feature!(:default_source_csp_logging)
+        end
+
+        it "doesn't set the CSP header if :javascript_csp is enabled but not enforced" do
+          account.disable_feature!(:default_source_csp_logging)
+          allow_any_instance_of(DynamicSettings).to receive(:find).with("csp-logging").and_return({ host: "mocked_host_value" })
+          helper.add_csp_for_root
+          expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
+          expect(headers).to_not have_key("Content-Security-Policy")
         end
 
         it "is set for frames" do
