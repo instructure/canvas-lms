@@ -1373,7 +1373,7 @@ describe PlannerController do
         end
 
         it "returns sub_assignments with the 'new_activity' param" do
-          @reply_to_topic.submit_homework @student, body: "Test reply to topic for student"
+          @reply_to_topic.submit_homework @student, body: "Test initial post for student"
 
           get :index, params: { filter: "new_activity" }
           res = json_parse(response.body)[0]

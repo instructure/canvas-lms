@@ -157,7 +157,7 @@ export default function DefaultGradeModal({
     } else {
       if (isExcused(replyToTopicInput)) {
         showFlashError(
-          I18n.t('Default grade for Reply to Topic cannot be set to %{ex}', {
+          I18n.t('Default grade for Initial Post cannot be set to %{ex}', {
             ex: 'EX',
           })
         )(new Error())
@@ -252,7 +252,7 @@ export default function DefaultGradeModal({
                   disabled={defaultGradeStatus === ApiCallStatus.PENDING}
                   gradingType={assignment.gradingType}
                   onGradeInputChange={setReplyToTopicInput}
-                  header={I18n.t('Reply to Topic')}
+                  header={I18n.t('Initial Post')}
                   outOfTextValue={
                     assignment.checkpoints &&
                     assignment.checkpoints

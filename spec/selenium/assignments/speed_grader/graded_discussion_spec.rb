@@ -49,20 +49,20 @@ describe "Screenreader Gradebook grading" do
       )
 
       3.times do |i|
-        entry = @checkpointed_discussion.discussion_entries.create!(user: @student1, message: " reply to topic i#{i} ")
+        entry = @checkpointed_discussion.discussion_entries.create!(user: @student1, message: " initial post i#{i} ")
         @checkpointed_discussion.discussion_entries.create!(user: @student2, message: " reply to entry i#{i} ", root_entry_id: entry.id, parent_id: entry.id)
       end
 
       20.times do |k|
-        entry = @checkpointed_discussion.discussion_entries.create!(user: @teacher, message: " reply to topic k#{k} ")
+        entry = @checkpointed_discussion.discussion_entries.create!(user: @teacher, message: " initial post k#{k} ")
         @checkpointed_discussion.discussion_entries.create!(user: @student1, message: " reply to entry k#{k} ", root_entry_id: entry.id, parent_id: entry.id)
       end
 
       3.times do |j|
-        entry = @checkpointed_discussion.discussion_entries.create!(user: @student2, message: " reply to topic j#{j} ")
+        entry = @checkpointed_discussion.discussion_entries.create!(user: @student2, message: " initial post j#{j} ")
         @checkpointed_discussion.discussion_entries.create!(user: @student1, message: " reply to entry j#{j} ", root_entry_id: entry.id, parent_id: entry.id)
       end
-      @entry = DiscussionEntry.where(message: " reply to topic j2 ").first
+      @entry = DiscussionEntry.where(message: " initial post j2 ").first
     end
 
     it "can cycle next student entry" do
@@ -72,10 +72,10 @@ describe "Screenreader Gradebook grading" do
         in_frame("speedgrader_iframe") do
           in_frame("discussion_preview_iframe") do
             expect(f("div[data-testid='isHighlighted']").text).to include(@student2.name)
-            expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic j#{2 - i}")
+            expect(f("div[data-testid='isHighlighted']").text).to include("initial post j#{2 - i}")
             # page 1 is selected
-            expect(f("body").text).to include("reply to topic j2")
-            expect(f("body").text).to_not include("reply to topic i0")
+            expect(f("body").text).to include("initial post j2")
+            expect(f("body").text).to_not include("initial post i0")
           end
         end
         f("button[data-testid='discussions-next-reply-button']").click
@@ -88,8 +88,8 @@ describe "Screenreader Gradebook grading" do
             expect(f("div[data-testid='isHighlighted']").text).to include(@student2.name)
             expect(f("div[data-testid='isHighlighted']").text).to include("reply to entry i#{2 - i}")
             # page 2 is selected
-            expect(f("body").text).to include("reply to topic i0")
-            expect(f("body").text).to_not include("reply to topic j2")
+            expect(f("body").text).to include("initial post i0")
+            expect(f("body").text).to_not include("initial post j2")
           end
         end
         f("button[data-testid='discussions-next-reply-button']").click
@@ -100,10 +100,10 @@ describe "Screenreader Gradebook grading" do
       in_frame("speedgrader_iframe") do
         in_frame("discussion_preview_iframe") do
           expect(f("div[data-testid='isHighlighted']").text).to include(@student2.name)
-          expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic j2")
+          expect(f("div[data-testid='isHighlighted']").text).to include("initial post j2")
           # page 1 is selected
-          expect(f("body").text).to include("reply to topic j2")
-          expect(f("body").text).to_not include("reply to topic i0")
+          expect(f("body").text).to include("initial post j2")
+          expect(f("body").text).to_not include("initial post i0")
         end
       end
     end
@@ -114,10 +114,10 @@ describe "Screenreader Gradebook grading" do
       in_frame("speedgrader_iframe") do
         in_frame("discussion_preview_iframe") do
           expect(f("div[data-testid='isHighlighted']").text).to include(@student2.name)
-          expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic j2")
+          expect(f("div[data-testid='isHighlighted']").text).to include("initial post j2")
           # page 1 is selected
-          expect(f("body").text).to include("reply to topic j2")
-          expect(f("body").text).to_not include("reply to topic i0")
+          expect(f("body").text).to include("initial post j2")
+          expect(f("body").text).to_not include("initial post i0")
         end
       end
       f("button[data-testid='discussions-previous-reply-button']").click
@@ -129,8 +129,8 @@ describe "Screenreader Gradebook grading" do
             expect(f("div[data-testid='isHighlighted']").text).to include(@student2.name)
             expect(f("div[data-testid='isHighlighted']").text).to include("reply to entry i#{i}")
             # page 2 is selected
-            expect(f("body").text).to include("reply to topic i0")
-            expect(f("body").text).to_not include("reply to topic j2")
+            expect(f("body").text).to include("initial post i0")
+            expect(f("body").text).to_not include("initial post j2")
           end
         end
         f("button[data-testid='discussions-previous-reply-button']").click
@@ -142,10 +142,10 @@ describe "Screenreader Gradebook grading" do
         in_frame("speedgrader_iframe") do
           in_frame("discussion_preview_iframe") do
             expect(f("div[data-testid='isHighlighted']").text).to include(@student2.name)
-            expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic j#{i}")
+            expect(f("div[data-testid='isHighlighted']").text).to include("initial post j#{i}")
             # page 1 is selected
-            expect(f("body").text).to include("reply to topic j2")
-            expect(f("body").text).to_not include("reply to topic i0")
+            expect(f("body").text).to include("initial post j2")
+            expect(f("body").text).to_not include("initial post i0")
           end
         end
         f("button[data-testid='discussions-previous-reply-button']").click
@@ -169,16 +169,16 @@ describe "Screenreader Gradebook grading" do
 
           3.times do |i|
             expect(f("div[data-testid='isHighlighted']").text).to include(@student2.name)
-            expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic j#{2 - i}")
+            expect(f("div[data-testid='isHighlighted']").text).to include("initial post j#{2 - i}")
             # page 1
-            expect(f("body").text).to include("reply to topic j2")
-            expect(f("body").text).to_not include("reply to topic i0")
+            expect(f("body").text).to include("initial post j2")
+            expect(f("body").text).to_not include("initial post i0")
             # notice enter key successfully navigates entries
             driver.action.send_keys(:enter).perform
           end
           # page 2
-          expect(f("body").text).to include("reply to topic i0")
-          expect(f("body").text).to_not include("reply to topic j2")
+          expect(f("body").text).to include("initial post i0")
+          expect(f("body").text).to_not include("initial post j2")
         end
       end
     end
@@ -196,10 +196,10 @@ describe "Screenreader Gradebook grading" do
           driver.action.send_keys(:tab).perform
 
           expect(f("div[data-testid='isHighlighted']").text).to include(@student2.name)
-          expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic j2")
+          expect(f("div[data-testid='isHighlighted']").text).to include("initial post j2")
           # page 1 is selected
-          expect(f("body").text).to include("reply to topic j2")
-          expect(f("body").text).to_not include("reply to topic i0")
+          expect(f("body").text).to include("initial post j2")
+          expect(f("body").text).to_not include("initial post i0")
 
           3.times do |i|
             # notice enter key successfully navigates entries
@@ -207,8 +207,8 @@ describe "Screenreader Gradebook grading" do
             expect(f("div[data-testid='isHighlighted']").text).to include(@student2.name)
             expect(f("div[data-testid='isHighlighted']").text).to include("reply to entry i#{i}")
             # page 2 is selected
-            expect(f("body").text).to include("reply to topic i0")
-            expect(f("body").text).to_not include("reply to topic j2")
+            expect(f("body").text).to include("initial post i0")
+            expect(f("body").text).to_not include("initial post j2")
           end
         end
       end

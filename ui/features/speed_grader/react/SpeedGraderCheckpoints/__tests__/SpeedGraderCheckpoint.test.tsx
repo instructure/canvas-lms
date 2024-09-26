@@ -119,7 +119,7 @@ describe('SpeedGraderCheckpoint', () => {
     const props = getDefaultProps('reply_to_topic')
     const {getByText} = setup(props)
 
-    expect(getByText('Reply to Topic')).toBeDefined()
+    expect(getByText('Initial Post')).toBeDefined()
   })
 
   it('renders the correct label for reply_to_entry', () => {

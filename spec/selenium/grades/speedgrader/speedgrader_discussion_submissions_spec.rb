@@ -241,7 +241,7 @@ describe "SpeedGrader - discussion submissions" do
 
       describe "grading resubmissions" do
         before do
-          root_entry = @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to topic")
+          root_entry = @checkpointed_discussion.discussion_entries.create!(user: @student, message: "initial post")
           child_entries = Array.new(@replies_required) do |i|
             @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to entry #{i}", parent_entry: root_entry)
           end
@@ -249,7 +249,7 @@ describe "SpeedGrader - discussion submissions" do
           @reply_to_entry_checkpint.grade_student(@student, grade: 7, grader: @teacher)
           root_entry.destroy
           child_entries.each(&:destroy)
-          resubmitted_rtt = @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to topic resubmitted")
+          resubmitted_rtt = @checkpointed_discussion.discussion_entries.create!(user: @student, message: "initial post resubmitted")
           @replies_required.times { |i| @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to entry #{i}", parent_entry: resubmitted_rtt) }
         end
 

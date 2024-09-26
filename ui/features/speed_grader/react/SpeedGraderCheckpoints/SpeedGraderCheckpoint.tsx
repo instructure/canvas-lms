@@ -110,7 +110,7 @@ export const SpeedGraderCheckpoint = (props: Props) => {
     const tag = props.subAssignmentSubmission.sub_assignment_tag
 
     if (tag === REPLY_TO_TOPIC) {
-      return I18n.t('Reply to Topic')
+      return I18n.t('Initial Post')
     } else if (tag === REPLY_TO_ENTRY) {
       return I18n.t('Required Replies')
     } else {
@@ -223,7 +223,7 @@ type StatusSelectorProps = {
 const StatusSelector = (props: StatusSelectorProps) => {
   const statusAltText =
     props.subAssignmentTag === REPLY_TO_TOPIC
-      ? I18n.t('Status for the Reply to Topic Checkpoint.')
+      ? I18n.t('Status for the Initial Post Checkpoint.')
       : I18n.t('Status for the Required Replies Checkpoint.')
 
   return (

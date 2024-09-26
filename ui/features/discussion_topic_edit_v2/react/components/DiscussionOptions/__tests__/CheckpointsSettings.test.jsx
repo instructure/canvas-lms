@@ -51,7 +51,7 @@ describe('CheckpointsSettings', () => {
   it('renders', () => {
     const {getByText} = setup()
     expect(getByText('Checkpoint Settings')).toBeInTheDocument()
-    expect(getByText('Points Possible: Reply to Topic')).toBeInTheDocument()
+    expect(getByText('Points Possible: Initial Post')).toBeInTheDocument()
     expect(getByText('Points Possible: Additional Replies')).toBeInTheDocument()
   })
 
