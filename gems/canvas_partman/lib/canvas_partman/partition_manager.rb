@@ -120,9 +120,9 @@ module CanvasPartman
       drop_partition_table(partition_table)
     end
 
-    def with_statement_timeout(timeout_override: nil, &block)
+    def with_statement_timeout(timeout_override: nil, &)
       tv = timeout_override || ::CanvasPartman.timeout_value
-      base_class.connection.with_statement_timeout(tv.to_f, &block)
+      base_class.connection.with_statement_timeout(tv.to_f, &)
     end
 
     protected
@@ -165,8 +165,8 @@ module CanvasPartman
       base_class.infer_partition_table_name(attributes)
     end
 
-    def execute(*args)
-      base_class.connection.execute(*args)
+    def execute(*)
+      base_class.connection.execute(*)
     end
   end
 end

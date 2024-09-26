@@ -78,6 +78,7 @@ describe('DiscussionTopicForm', () => {
       DISCUSSION_CHECKPOINTS_ENABLED: true,
       ASSIGNMENT_EDIT_PLACEMENT_NOT_ON_ANNOUNCEMENTS: false,
       context_is_not_group: true,
+      RESTRICT_QUANTITATIVE_DATA: false,
     }
   })
 
@@ -478,6 +479,24 @@ describe('DiscussionTopicForm', () => {
 
     it('does not display the checkpoints checkbox when the discussion checkpoints flag is off', () => {
       window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = false
+
+      const {queryByTestId, getByLabelText} = setup()
+
+      getByLabelText('Graded').click()
+
+      expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
+    })
+
+    it('displays the checkpoints checkbox when RESTRICT_QUANTITATIVE_DATA is false', () => {
+      const {queryByTestId, getByLabelText} = setup()
+
+      getByLabelText('Graded').click()
+
+      expect(queryByTestId('checkpoints-checkbox')).toBeInTheDocument()
+    })
+
+    it('does not display the checkpoints checkbox when RESTRICT_QUANTITATIVE_DATA is true', () => {
+      window.ENV.RESTRICT_QUANTITATIVE_DATA = true
 
       const {queryByTestId, getByLabelText} = setup()
 

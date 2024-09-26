@@ -20,7 +20,7 @@
 class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
   require_relative "discussion_checkpoint_error"
 
-  def initialize(discussion_topic:, checkpoint_label:, dates:, points_possible:, replies_required: 1)
+  def initialize(discussion_topic:, checkpoint_label:, dates:, points_possible: nil, replies_required: 1)
     super()
     @discussion_topic = discussion_topic
     @assignment = discussion_topic.assignment
@@ -97,7 +97,9 @@ class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
   end
 
   def specified_attributes
-    { sub_assignment_tag: @checkpoint_label, points_possible: @points_possible }.merge(date_fields)
+    attrs = { sub_assignment_tag: @checkpoint_label }
+    attrs[:points_possible] = @points_possible if @points_possible
+    attrs.merge(date_fields)
   end
 
   def date_fields
@@ -127,6 +129,6 @@ class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
   def compute_due_dates_and_create_submissions(checkpoint)
     assignments = [checkpoint, checkpoint.parent_assignment]
     AbstractAssignment.clear_cache_keys(assignments, :availability)
-    SubmissionLifecycleManager.recompute_course(checkpoint.course, assignments:, update_grades: true)
+    SubmissionLifecycleManager.recompute_course(checkpoint.course, assignments:, update_grades: true, create_sub_assignment_submissions: false)
   end
 end

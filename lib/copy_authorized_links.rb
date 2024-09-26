@@ -38,7 +38,7 @@ module CopyAuthorizedLinks
       columns.each do |column|
         next if column == :custom
 
-        html = read_attribute(column) rescue nil
+        html = self[column] rescue nil
         next if html.blank?
 
         context, inferred_user = instance_eval(&block) if block
@@ -51,7 +51,7 @@ module CopyAuthorizedLinks
         Attachment.where(id: ids.uniq).each do |file|
           html = html.gsub(Regexp.new("/#{context.class.to_s.pluralize.underscore}/#{context.id}/files/#{file.id}"), "/#{file.context_type.pluralize.underscore}/#{file.context_id}/files/#{file.id}")
         end
-        write_attribute(column, html) if html.present?
+        self[column] = html if html.present?
       end
       save
     end
@@ -64,8 +64,8 @@ module CopyAuthorizedLinks
             copy_authorized_content_custom_column(context, user)
           end
         else
-          html = read_attribute(column) rescue nil
-          write_attribute(column, html) if html.present?
+          html = self[column] rescue nil
+          self[column] = html if html.present?
         end
       end
       true

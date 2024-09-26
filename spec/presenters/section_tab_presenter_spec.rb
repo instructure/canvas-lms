@@ -31,8 +31,8 @@ describe SectionTabPresenter do
   end
 
   describe "#initialize" do
-    it "sets tab as an ostruct" do
-      expect(presenter.tab).to be_a OpenStruct
+    it "sets tab as a struct" do
+      expect(presenter.tab).to be_a SectionTabPresenter::TabDefinition
     end
   end
 

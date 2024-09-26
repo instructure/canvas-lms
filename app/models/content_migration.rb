@@ -136,7 +136,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def migration_settings
-    read_or_initialize_attribute(:migration_settings, {}.with_indifferent_access)
+    self["migration_settings"] ||= {}.with_indifferent_access
   end
 
   # this is needed by Attachment#clone_for, which is used to allow a ContentExport to be directly imported
@@ -252,7 +252,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def migration_type
-    read_attribute(:migration_type) || migration_settings["migration_type"]
+    super || migration_settings["migration_type"]
   end
 
   def plugin_type
@@ -696,7 +696,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def import_quizzes_next?
-    !!migration_settings[:import_quizzes_next]
+    !!Canvas::Plugin.value_to_boolean(migration_settings[:import_quizzes_next])
   end
 
   def quizzes_next_migration?
@@ -949,7 +949,7 @@ class ContentMigration < ActiveRecord::Base
   def progress
     return nil if workflow_state == "created"
 
-    mig_prog = read_attribute(:progress) || 0
+    mig_prog = super || 0
     if for_course_copy?
       # this is for a course copy so it needs to combine the progress of the export and import
       # The export will count for 40% of progress
@@ -985,8 +985,8 @@ class ContentMigration < ActiveRecord::Base
     @html_converter ||= CanvasImportedHtmlConverter.new(self)
   end
 
-  def convert_html(*args, **keyword_args)
-    html_converter.convert(*args, **keyword_args)
+  def convert_html(*, **keyword_args)
+    html_converter.convert(*, **keyword_args)
   end
 
   def convert_text(text)

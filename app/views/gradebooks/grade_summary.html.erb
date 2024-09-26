@@ -171,8 +171,10 @@
               title="<%= excused_label %>"
             <% end %>
             >
-
             <th class="title" scope="row">
+              <% if assignment_presenter.checkpoints_parent? %>
+                <button id="parent_assignment_id_<%= assignment.id %>" class="Button Button--icon-action toggle_sub_assignments screenreader-toggle" aria-label="<%= t('Show discussion checkpoints information') %>" aria-expanded='false' aria-details="<%= t('show/hide the discussion checkpoints information reply to topic and required replies') %>"><i class="icon-arrow-open-end"></i><span class="screenreader-only"><%= t 'Expand or Collapse' %></span></button>
+              <% end %>
               <% if assignment_presenter.show_submission_details? %>
                 <% if assignment.a2_enabled? %>
                   <% if @presenter.student_is_user? || @presenter.user_an_observer_of_student? %>
@@ -463,7 +465,96 @@
               <span class="possible points_possible"></span>
             <%end%>
             </td>
+            <td></td>
           </tr>
+          <% if assignment.has_sub_assignments? %>
+            <% assignment.sub_assignments.map{ |sa| sa.overridden_for(@current_user) }.each do |sub_assignment| %>
+              <%
+                sa_submission = @presenter.submissions.detect{ |s| s.assignment_id == sub_assignment.id }
+                sub_assignment_presenter = GradeSummaryAssignmentPresenter.new(@presenter, @current_user, sub_assignment, sa_submission)
+              %>
+              <tr id="sub_assignment_<%= sub_assignment.id %>" class="sub_assignment_row parent_assignment_id_<%= assignment.id %>" style="display: none;" aria-label="<%= t("discussion checkpoint row") %>">
+                <% if sub_assignment.sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC %>
+                  <td class="title" scope="row"> <%= t "Reply To Topic" %> </td>
+                <% else%>
+                  <td> <%=t("Reply To Entry (%{required_count})", :required_count => assignment.discussion_topic.reply_to_entry_required_count) %> </td>
+                <% end%>
+                <td class="due">
+                  <% if sub_assignment_presenter.has_no_group_weight?  %>
+                    <%= datetime_string(sub_assignment.due_at, :due_date) rescue "" %>
+                  <% end %>
+                </td>
+                <td class="submitted">
+                  <% if sub_assignment_presenter.has_no_group_weight?  %>
+                    <%= datetime_string(sa_submission.submitted_at, :submitted_at) rescue "" %>
+                  <% end %>
+                </td>
+                <td class="status" scope="row">
+                  <% if sub_assignment_presenter.custom_grade_status?%>
+                    <span class="submission-custom-grade-status-pill-<%= sub_assignment_presenter.custom_grade_status_id %>">
+                  <% elsif sub_assignment_presenter.missing? %>
+                    <span class="submission-missing-pill"></span>
+                  <% elsif sub_assignment_presenter.late? %>
+                    <span class="submission-late-pill"></span>
+                  <% elsif sub_assignment_presenter.extended? %>
+                    <span class="submission-extended-pill"></span>
+                  <% end %>
+                </td>
+                <td class="assignment_score">
+                  <div style="position: relative; height: 100%;" class="score_holder">
+                    <% if !sub_assignment_presenter.upload_status.present?  %>
+                      <% js_bundle :progress_pill %>
+                      <span class="assignment_presenter_for_submission" style="display: none;"><%= sub_assignment_presenter.upload_status %></span>
+                      <span class="react_pill_container"></span>
+                    <% end %>
+                    <span>
+                      <span
+                        class="grade"
+                        <% unless sub_assignment_presenter.unchangeable? %>
+                          tabindex="0"
+                        <% end %>
+                      >
+                        <span class="tooltip_wrap right">
+                          <% if @presenter.editable? || assignment.special_class %>
+                            <span class="tooltip_text score_teaser">
+                              <% if sub_assignment_presenter.hide_grade_from_student? %>
+                                <%= hidden_text %>
+                              <% elsif sa_submission.try :pending_review? %>
+                                <%= hidden_text %>
+                              <% elsif assignment.special_class %>
+                                <%= t(:total, "Total") %>
+                              <% end %>
+                            </span>
+                          <% end %>
+                        </span>
+                        <% if sub_assignment_presenter.hide_grade_from_student? %>
+                          <i class="icon-off" title="<%= hidden_text %>"></i>
+                        <% else %>
+                          <% if sa_submission.try :pending_review? %>
+                            <span class="screenreader-only"><%= hidden_text %></span>
+                          <% end %>
+                          <%= student_score_display_for(sa_submission, !can_do(@context, @current_user, :manage_grades)) %>
+                        <% end %>
+                      </span>
+                      <% if sub_assignment_presenter.is_letter_graded_or_gpa_scaled? %>
+                        <span class="score_value">
+                          <%= sub_assignment_presenter.display_score %>
+                        </span>
+                      <% end %>
+                      <% if sub_assignment_presenter.points_graded? && sub_assignment.points_possible.present? %>
+                        <span>/ <%= n(round_if_whole(sub_assignment.points_possible)) %></span>
+                      <% end %>
+                      <% if sub_assignment_presenter.graded? && sub_assignment_presenter.item_unread?("grade") %>
+                        <span class="unread_dot grade_dot" id="submission_unread_dot_<%= sa_submission.id %>" aria-label="<%= t('This grade is unread') %>">&nbsp;</span>
+                      <% end %>
+                    </span>
+                  </div>
+                </td>
+                <td></td>
+                <td></td>
+              </tr>
+            <% end %>
+          <% end %>
           <%# always add row (even if empty) so javascript references work %>
           <tr id="final_grade_info_<%= assignment.id %>"
               class="comments <%= 'assignment_graded' if assignment_presenter.graded? %>"

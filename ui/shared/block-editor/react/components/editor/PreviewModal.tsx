@@ -23,6 +23,7 @@ import {Modal} from '@instructure/ui-modal'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {View} from '@instructure/ui-view'
 import BlockEditorView from '../../BlockEditorView'
+import {LATEST_BLOCK_DATA_VERSION} from '../../utils/transformations'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -100,7 +101,9 @@ const PreviewModal = ({open, onDismiss}: PreviewModalProps) => {
             padding="0"
             margin="0 auto"
           >
-            <BlockEditorView content={query.serialize()} />
+            <BlockEditorView
+              content={{version: LATEST_BLOCK_DATA_VERSION, blocks: query.serialize()}}
+            />
           </View>
         </View>
       </Modal.Body>

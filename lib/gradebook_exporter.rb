@@ -111,7 +111,8 @@ class GradebookExporter
       student_enrollments.map(&:user_id),
       @course,
       ignore_muted: false,
-      grading_period:
+      grading_period:,
+      include_discussion_checkpoints: @course.root_account.feature_enabled?(:discussion_checkpoints)
     )
 
     submissions = {}
@@ -127,6 +128,16 @@ class GradebookExporter
 
     ActiveRecord::Associations.preload(assignments, :assignment_group)
     assignments = sort_assignments(assignments)
+
+    # Insert the sub-assignments after the assignments are sorted
+    if @course.root_account.feature_enabled?(:discussion_checkpoints)
+      assignments_with_checkpoints = []
+      assignments.each do |a|
+        assignments_with_checkpoints << a
+        assignments_with_checkpoints += a.sub_assignments if a.has_sub_assignments?
+      end
+      assignments = assignments_with_checkpoints
+    end
 
     groups = calc.groups
 

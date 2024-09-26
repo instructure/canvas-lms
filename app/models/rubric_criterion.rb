@@ -19,6 +19,7 @@
 #
 class RubricCriterion < ApplicationRecord
   include Canvas::SoftDeletable
+  include Trackable
 
   belongs_to :rubric, inverse_of: :rubric_criteria
   belongs_to :learning_outcome, optional: true

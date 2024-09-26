@@ -45,8 +45,8 @@ class Enrollment < ActiveRecord::Base
   has_one :enrollment_state, dependent: :destroy, inverse_of: :enrollment
 
   has_many :role_overrides, as: :context, inverse_of: :context
-  has_many :pseudonyms, primary_key: :user_id, foreign_key: :user_id
-  has_many :course_account_associations, foreign_key: "course_id", primary_key: "course_id"
+  has_many :pseudonyms, primary_key: :user_id, foreign_key: :user_id, inverse_of: false
+  has_many :course_account_associations, foreign_key: "course_id", primary_key: "course_id", inverse_of: false
   has_many :scores, -> { active }
 
   validates :user_id, :course_id, :type, :root_account_id, :course_section_id, :workflow_state, :role_id, presence: true
@@ -860,7 +860,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def completed_at
-    if (date = read_attribute(:completed_at))
+    if (date = super)
       date
     elsif !new_record? && completed?
       enrollment_state.state_started_at
@@ -958,7 +958,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def user_name
-    read_attribute(:user_name) || user.name rescue t("#enrollment.default_user_name", "Unknown User")
+    has_attribute?("user_name") ? self["user_name"] : user.name
   end
 
   def context
@@ -1048,8 +1048,8 @@ class Enrollment < ActiveRecord::Base
   # stale! And once you've added the call, add the condition to the comment
   # here for future enlightenment.
 
-  def self.recompute_final_score(*args, **kwargs)
-    GradeCalculator.recompute_final_score(*args, **kwargs)
+  def self.recompute_final_score(*, **)
+    GradeCalculator.recompute_final_score(*, **)
   end
 
   # This method is intended to not duplicate work for a single user.
@@ -1409,15 +1409,15 @@ class Enrollment < ActiveRecord::Base
   def assign_uuid
     # DON'T use ||=, because that will cause an immediate save to the db if it
     # doesn't already exist
-    self.uuid = CanvasSlug.generate_securish_uuid unless read_attribute(:uuid)
+    self.uuid = CanvasSlug.generate_securish_uuid unless self["uuid"]
   end
   protected :assign_uuid
 
   def uuid
-    unless read_attribute(:uuid)
+    unless super
       update_attribute(:uuid, CanvasSlug.generate_securish_uuid)
     end
-    read_attribute(:uuid)
+    super
   end
 
   def self.limit_privileges_to_course_section!(course, user, limit)
@@ -1483,7 +1483,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def total_activity_time
-    read_attribute(:total_activity_time).to_i
+    super.to_i
   end
 
   def touch_graders_if_needed

@@ -27,14 +27,14 @@ import {GroupContext, formatMessages} from './context'
 
 const I18n = useI18nScope('groups')
 
-export const GroupSetName = ({onChange, errormsg, elementRef}) => {
+export const GroupSetName = ({onChange, errormsg, elementRef, direction}) => {
   const {name} = useContext(GroupContext)
   return (
-    <Flex elementRef={elementRef}>
+    <Flex elementRef={elementRef} direction={direction} data-testid="group-name-controls">
       <Flex.Item padding="none medium none none">
         <Text>{I18n.t('Group Set Name*')}</Text>
       </Flex.Item>
-      <Flex.Item shouldGrow={true}>
+      <Flex.Item shouldGrow={true} overflowY='hidden' overflowX='hidden'>
         <TextInput
           id="new-group-set-name"
           placeholder={I18n.t('Enter Group Set Name')}
@@ -56,4 +56,5 @@ GroupSetName.propTypes = {
   onChange: func.isRequired,
   errormsg: string,
   elementRef: func,
+  direction: string,
 }

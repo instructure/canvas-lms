@@ -99,6 +99,11 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
     "https://appleid.apple.com/auth/keys"
   end
 
+  def persist_to_session(_session, _token)
+    # Apple doesn't support single log out of any kind;
+    # don't waste space in the session supporting it
+  end
+
   private
 
   def authorize_url

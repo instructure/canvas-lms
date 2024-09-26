@@ -208,11 +208,10 @@ describe Lti::RegistrationsController do
           # introduces `tool_configuration`
           include_context "lti_1_3_tool_configuration_spec_helper"
 
-          let(:developer_key) { developer_key_model(account:, lti_registration: registration, is_lti_key: true, public_jwk_url: "https://example.com") }
-          let(:registration) { lti_registration_model(account:) }
+          let(:developer_key) { dev_key_model_1_3(account:) }
+          let(:registration) { developer_key.lti_registration }
 
           before do
-            tool_configuration
             # enable key
             developer_key.developer_key_account_bindings.first.update! workflow_state: :on
             developer_key.destroy

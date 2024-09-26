@@ -426,6 +426,160 @@ module DatesOverridable
     hash
   end
 
+  def get_id_from_override(override, key, overrides = [], user = nil)
+    return nil if override.nil? || override.is_a?(Hash)
+
+    case key
+    when :student_ids
+      (override.set_type == "ADHOC") ? get_student_ids(override, overrides, user) : nil
+    when :group_id
+      (override.set_type == "Group") ? override.set_id : nil
+    when :course_section_id
+      (override.set_type == "CourseSection") ? override.set_id : nil
+    when :course_id
+      (override.set_type == "Course") ? override.set_id : nil
+    when :noop_id
+      (override.set_type == "Noop") ? override.set_id : nil
+    when :context_module_id
+      override.context_module_id
+    else
+      nil
+    end
+  end
+
+  def get_overridden_assignees(overrides = [], user = nil)
+    module_overrides = overrides&.reject { |override| get_id_from_override(override, :context_module_id).nil? }
+
+    overridden_targets = module_overrides&.each_with_object({ sections: [], groups: [], students: [] }) do |current, acc|
+      section_override = overrides&.find do |tmp|
+        get_id_from_override(tmp, :course_section_id) &&
+          get_id_from_override(tmp, :course_section_id) == get_id_from_override(current, :course_section_id) &&
+          get_id_from_override(tmp, :context_module_id).nil?
+      end
+
+      if section_override && get_id_from_override(current, :course_section_id)
+        acc[:sections] << get_id_from_override(current, :course_section_id)
+        next acc
+      end
+
+      group_override = overrides&.find do |tmp|
+        get_id_from_override(tmp, :group_id) &&
+          get_id_from_override(tmp, :group_id) == get_id_from_override(current, :group_id) &&
+          get_id_from_override(tmp, :context_module_id).nil?
+      end
+
+      if group_override && get_id_from_override(current, :group_id)
+        acc[:groups] << get_id_from_override(current, :group_id)
+        next acc
+      end
+
+      students = get_id_from_override(current, :student_ids, overrides, user)
+
+      students_override = overrides&.reduce([]) do |student_ids, tmp|
+        next student_ids if get_id_from_override(tmp, :context_module_id)
+
+        overridden_ids = get_id_from_override(tmp, :student_ids, overrides, user)&.select { |id| students&.include?(id) } || []
+        student_ids.concat(overridden_ids)
+      end
+
+      acc[:students].concat(students_override)
+    end
+    overridden_targets || []
+  end
+
+  def get_student_ids(override, overrides, user)
+    visible_users_ids = AssignmentOverride.visible_enrollments_for(overrides.compact, user).select(:user_id)
+    if override.preloaded_student_ids
+      override.preloaded_student_ids
+    elsif visible_users_ids.present?
+      override.assignment_override_students.where(user_id: visible_users_ids).pluck(:user_id)
+    else
+      override.assignment_override_students.pluck(:user_id)
+    end
+  end
+
+  def merge_base_with_course(overrides)
+    base_override_index = overrides.find_index { |override| override.is_a?(Hash) && override[:base] }
+    course_override_index = overrides.find_index { |override| override.is_a?(AssignmentOverride) && override.set_type == "Course" }
+    if !base_override_index.nil? && !course_override_index.nil?
+      overrides.delete_at(base_override_index)
+      overrides[course_override_index][:title] = nil
+    end
+  end
+
+  def formatted_dates_hash_visible_to(user, context)
+    overrides = all_dates_visible_to(user).map { |o| o[:override] || o }
+    merge_base_with_course(overrides)
+    overridden_targets = get_overridden_assignees(overrides, user)
+    all_module_assignees = []
+    everyone_override_ids = []
+    section_override_ids = []
+    result = []
+
+    overrides.each do |override|
+      next if override[:unassign_item]
+
+      student_ids = get_id_from_override(override, :student_ids, overrides, user)
+      group_id = get_id_from_override(override, :group_id)
+      course_section_id = get_id_from_override(override, :course_section_id)
+      course_id = get_id_from_override(override, :course_id)
+      noop_id = get_id_from_override(override, :noop_id)
+      context_module_id = get_id_from_override(override, :context_module_id)
+
+      if context_module_id
+        all_module_assignees << "section-#{course_section_id}" if course_section_id
+
+        if student_ids
+          all_module_assignees.concat(student_ids.map { |id| "student-#{id}" })
+        end
+      end
+
+      remove_card = false
+      filtered_students = student_ids || []
+      if context_module_id && student_ids
+        filtered_students = filtered_students.reject { |id| overridden_targets[:students]&.include?(id) }
+        remove_card = student_ids.present? && filtered_students.blank?
+      end
+
+      student_overrides = filtered_students&.map { |student_id| "student-#{student_id}" }
+      default_options = student_overrides
+      default_options << "mastery_paths" if noop_id
+      default_options << "section-#{course_section_id}" if course_section_id
+      default_options << "group-#{group_id}" if group_id
+      default_options << "everyone" if course_id || default_options.empty?
+
+      remove_card ||= student_ids&.empty?
+
+      if remove_card ||
+         (context_module_id && course_section_id && overridden_targets[:sections]&.include?(course_section_id)) ||
+         (context_module_id && group_id && overridden_targets[:groups]&.include?(group_id))
+        next
+      end
+
+      override_hash = override.respond_to?(:to_h) ? override.to_h : override
+
+      everyone_override_ids << override_hash[:id] if default_options.include?("everyone")
+      section_options = default_options.filter { |o| /\Asection-\d+\z/.match?(o) }
+      section_override_ids.concat(section_options) unless section_options.empty?
+
+      result << {
+        id: override_hash[:id],
+        title: override_hash[:title],
+        due_at: override_hash[:due_at],
+        unlock_at: override_hash[:unlock_at],
+        lock_at: override_hash[:lock_at],
+        options: default_options
+      }
+    end
+
+    # If all sections has overrides, remove the 'everyone' option
+    if context.is_a?(Course) && section_override_ids.length == context.active_course_sections.count
+      result.reject! { |o| everyone_override_ids.include?(o[:id]) }
+    end
+
+    result
+  end
+
   def base_due_date_hash
     without_overrides.due_date_hash.merge(base: true)
   end

@@ -38,7 +38,7 @@ describe "appointment_group_deleted" do
     }
   end
 
-  context ".email" do
+  describe ".email" do
     let(:path_type) { :email }
 
     it "renders" do
@@ -55,7 +55,7 @@ describe "appointment_group_deleted" do
     end
   end
 
-  context ".sms" do
+  describe ".sms" do
     let(:path_type) { :sms }
 
     it "renders" do
@@ -64,7 +64,7 @@ describe "appointment_group_deleted" do
     end
   end
 
-  context ".summary" do
+  describe ".summary" do
     let(:path_type) { :summary }
 
     it "renders" do
@@ -74,7 +74,7 @@ describe "appointment_group_deleted" do
     end
   end
 
-  context ".twitter" do
+  describe ".twitter" do
     let(:path_type) { :twitter }
 
     it "renders" do

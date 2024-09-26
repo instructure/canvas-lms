@@ -27,7 +27,7 @@ GEM
     docile (1.4.1)
     drb (2.2.1)
     hashie (5.0.0)
-    i18n (1.14.5)
+    i18n (1.14.6)
       concurrent-ruby (~> 1.0)
     minitest (5.25.1)
     mutex_m (0.2.0)
@@ -44,7 +44,7 @@ GEM
       rspec-mocks (~> 3.13.0)
     rspec-core (3.13.1)
       rspec-support (~> 3.13.0)
-    rspec-expectations (3.13.2)
+    rspec-expectations (3.13.3)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-mocks (3.13.1)
@@ -55,7 +55,7 @@ GEM
       docile (~> 1.1)
       simplecov-html (~> 0.11)
       simplecov_json_formatter (~> 0.1)
-    simplecov-html (0.12.3)
+    simplecov-html (0.13.1)
     simplecov_json_formatter (0.1.4)
     snaky_hash (2.0.1)
       hashie
@@ -79,7 +79,7 @@ DEPENDENCIES
   simplecov (~> 0.22)
 
 RUBY VERSION
-   ruby 3.1.2p20
+   ruby 3.3.3p89
 
 BUNDLED WITH
    2.5.10

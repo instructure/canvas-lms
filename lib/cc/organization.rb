@@ -33,8 +33,8 @@ module CC
       r.create_organizations
     end
 
-    def create_key(*args)
-      @manifest.create_key(*args)
+    def create_key(*)
+      @manifest.create_key(*)
     end
 
     def create_organizations

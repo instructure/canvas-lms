@@ -1041,4 +1041,32 @@ describe Types::AssignmentType do
       expect(assignment_type.resolve("supportsGradeByQuestion")).to be true
     end
   end
+
+  describe "gradeByQuestionEnabled" do
+    context "when the assignment does not support grade by question" do
+      it "returns false, even if the user's preference is set to true" do
+        teacher.update!(preferences: { enable_speedgrader_grade_by_question: true })
+        expect(teacher_assignment_type.resolve("gradeByQuestionEnabled")).to be false
+      end
+
+      it "returns false when the user's preference is set to false" do
+        expect(teacher_assignment_type.resolve("gradeByQuestionEnabled")).to be false
+      end
+    end
+
+    context "when the assignment supports grade by question" do
+      before do
+        assignment.update!(submission_types: "online_quiz")
+      end
+
+      it "returns true when the user's preference is set to true" do
+        teacher.update!(preferences: { enable_speedgrader_grade_by_question: true })
+        expect(teacher_assignment_type.resolve("gradeByQuestionEnabled")).to be true
+      end
+
+      it "returns false when the user's preference is set to false" do
+        expect(teacher_assignment_type.resolve("gradeByQuestionEnabled")).to be false
+      end
+    end
+  end
 end

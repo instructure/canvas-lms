@@ -11029,7 +11029,7 @@ nl:
   disallow_comments_6d04b47a: "Geen opmerkingen toestaan"
   disallow_comments_for_title_21f9c653: "Geen opmerkingen toestaan voor %{title}"
   disallow_replies_for_title_ca3806b2: "Geen antwoorden toestaan voor %{title}"
-  disallow_threaded_replies_71c66c21: "Antwoorden op antwoorden toestaan"
+  disallow_threaded_replies_71c66c21: "Antwoorden op antwoorden niet toestaan"
   discard_changes_e04b15f9: "Wijzigingen verwijderen"
   discarded_20a4e7e8: Verwijderd
   disccussions_515a3a99: Disccussies

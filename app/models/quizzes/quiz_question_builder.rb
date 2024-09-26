@@ -24,8 +24,8 @@ class Quizzes::QuizQuestionBuilder
   }.freeze
 
   class << self
-    def t(*args)
-      ::ActiveRecord::Base.t(*args)
+    def t(*)
+      ::ActiveRecord::Base.t(*)
     end
   end
 

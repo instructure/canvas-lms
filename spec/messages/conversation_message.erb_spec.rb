@@ -39,7 +39,7 @@ message")
 
   include_examples "a message"
 
-  context ".email" do
+  describe ".email" do
     let(:path_type) { :email }
 
     it "doesnt have trailing erb closures" do

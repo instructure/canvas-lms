@@ -22,10 +22,10 @@ module Types
   class TurnitinDataType < ApplicationObjectType
     graphql_name "TurnitinData"
 
-    field :target, Types::TurnitinContextType, null: false
     field :reportUrl, String, null: true
-    field :status, String, null: true
     field :score, Float, null: true
     field :state, String, null: true
+    field :status, String, null: true
+    field :target, Types::TurnitinContextType, null: false
   end
 end

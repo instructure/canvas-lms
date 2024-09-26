@@ -121,9 +121,7 @@ class Score < ActiveRecord::Base
   end
 
   def set_course_score
-    gpid = read_attribute(:grading_period_id)
-    agid = read_attribute(:assignment_group_id)
-    write_attribute(:course_score, (gpid || agid).nil?)
+    self.course_score = (grading_period_id || assignment_group_id).nil?
     true
   end
 

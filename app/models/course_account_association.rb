@@ -22,7 +22,7 @@ class CourseAccountAssociation < ActiveRecord::Base
   belongs_to :course
   belongs_to :course_section
   belongs_to :account
-  has_many :account_users, foreign_key: "account_id", primary_key: "account_id"
+  has_many :account_users, foreign_key: "account_id", primary_key: "account_id", inverse_of: false
 
   validates :course_id, :account_id, :depth, presence: true
 

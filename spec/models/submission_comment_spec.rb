@@ -273,7 +273,7 @@ RSpec.describe SubmissionComment do
       @assignment.ensure_post_policy(post_manually: true)
       @assignment.hide_submissions(submission_ids: [@submission.id])
 
-      @comment = @submission.add_comment(author: @teacher, comment: "some comment")
+      @comment = @submission.reload.add_comment(author: @teacher, comment: "some comment")
       expect(@comment.messages_sent.keys).not_to include("Submission Comment")
     end
 
@@ -357,7 +357,7 @@ RSpec.describe SubmissionComment do
     @se = @course.enroll_student(user_factory)
     @assignment.reload
     @submission = @assignment.submit_homework(@se.user, body: "some message")
-    @submission.created_at = Time.now - 60
+    @submission.created_at = 1.minute.ago
     @submission.save
   end
 

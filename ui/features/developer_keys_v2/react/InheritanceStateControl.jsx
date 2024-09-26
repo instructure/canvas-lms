@@ -22,18 +22,45 @@ import React from 'react'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {confirm} from '@canvas/instui-bindings/react/Confirm'
 
 const I18n = useI18nScope('react_developer_keys')
 
 export default class DeveloperKeyStateControl extends React.Component {
-  setBindingState = newValue => {
-    // eslint-disable-next-line no-alert
-    const confirmation = window.confirm(
-      I18n.t('Are you sure you want to change the state of this developer key?')
-    )
+  confirmStateChange = (developerKey, newState) => {
+    const keyName = developerKey?.name || developerKey?.tool_configuration?.title
+
+    return confirm({
+      title:
+        newState === 'on'
+          ? I18n.t('Turn On Developer Key')
+          : newState === 'off'
+          ? I18n.t('Turn Off Developer Key')
+          : newState === 'allow'
+          ? I18n.t('Set Developer Key to "Allow"')
+          : undefined,
+      confirmButtonLabel:
+        newState === 'on'
+          ? I18n.t('Switch to On')
+          : newState === 'off'
+          ? I18n.t('Switch to Off')
+          : newState === 'allow'
+          ? I18n.t('Switch to Allow')
+          : I18n.t('Confirm'),
+      message: keyName
+        ? I18n.t('Are you sure you want to change the state of the developer key "%{keyName}"?', {
+            keyName,
+          })
+        : I18n.t('Are you sure you want to change the state of this developer key?'),
+    })
+  }
+
+  setBindingState = async newValue => {
+    const confirmation = await this.confirmStateChange(this.props.developerKey, newValue)
     if (!confirmation) {
       return
     }
+
     this.props.store.dispatch(
       this.props.actions.setBindingWorkflowState(
         this.props.developerKey,

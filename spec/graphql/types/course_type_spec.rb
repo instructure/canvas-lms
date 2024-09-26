@@ -864,6 +864,8 @@ describe Types::CourseType do
   describe "AssignmentGroupConnection" do
     it "returns assignment groups" do
       ag = course.assignment_groups.create!(name: "a group")
+      ag2 = course.assignment_groups.create!(name: "another group")
+      ag2.destroy
       expect(
         course_type.resolve("assignmentGroupsConnection { edges { node { _id } } }")
       ).to eq [ag.to_param]

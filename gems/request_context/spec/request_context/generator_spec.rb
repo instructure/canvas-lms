@@ -191,21 +191,5 @@ describe "RequestContext::Generator" do
       expect(Thread.current[:context][:request_id]).not_to eq(remote_request_context_id)
       expect(headers["X-Request-Context-Id"]).to eq(Thread.current[:context][:request_id])
     end
-
-    describe "when the request path allows setting a context ID without a signature" do
-      before { RequestContext::Generator.allow_unsigned_request_context_for(test_path) }
-
-      after { RequestContext::Generator.reset_unsigned_request_context_paths }
-
-      let(:test_path) { "/super/trustworthy/path" }
-
-      it "does not require a signature for override" do
-        env["HTTP_X_REQUEST_CONTEXT_SIGNATURE"] = nil
-        env["PATH_INFO"] = test_path
-        headers = run_middleware
-        expect(Thread.current[:context][:request_id]).to eq(remote_request_context_id)
-        expect(headers["X-Request-Context-Id"]).to eq(remote_request_context_id)
-      end
-    end
   end
 end

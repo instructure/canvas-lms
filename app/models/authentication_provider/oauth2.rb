@@ -38,8 +38,10 @@ class AuthenticationProvider::OAuth2 < AuthenticationProvider::Delegated
     @client ||= ::OAuth2::Client.new(client_id, client_secret, client_options)
   end
 
-  def generate_authorize_url(redirect_uri, state, nonce:)
-    client.auth_code.authorize_url({ redirect_uri:, state: }.merge(authorize_options))
+  def generate_authorize_url(redirect_uri, state, nonce:, **authorize_options)
+    client.auth_code.authorize_url({ redirect_uri:, state: }
+                                   .merge(self.authorize_options)
+                                   .merge(authorize_options))
   end
 
   def get_token(code, redirect_uri, _params)

@@ -80,7 +80,7 @@ describe Lti::Security do
       end
     end
 
-    context "#decoded_lti_assignment_id" do
+    describe "#decoded_lti_assignment_id" do
       it "returns nil if secure params are invalid" do
         expect(Lti::Security.decoded_lti_assignment_id("banana")).to be_nil
       end
@@ -93,7 +93,7 @@ describe Lti::Security do
       end
     end
 
-    context "#decoded_lti_assignment_description" do
+    describe "#decoded_lti_assignment_description" do
       it "returns nil if secure params are invalid" do
         expect(Lti::Security.decoded_lti_assignment_description("banana")).to be_nil
       end
@@ -106,7 +106,7 @@ describe Lti::Security do
       end
     end
 
-    context ".check_and_store_nonce" do
+    describe ".check_and_store_nonce" do
       it "rejects a used nonce" do
         enable_cache do
           cache_key = "abcdefghijklmnopqrstuvwxyz"

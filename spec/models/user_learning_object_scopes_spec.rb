@@ -368,6 +368,20 @@ describe UserLearningObjectScopes do
       assignments = @student.assignments_for_student("submitting", contexts: [@course])
       expect(assignments[0]).to have_attribute :only_visible_to_overrides
     end
+
+    context "sub_assignments" do
+      before :once do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        course_with_student(active_all: true)
+        @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+      end
+
+      it "returns sub_assignments when discussion checkpoints FF enabled" do
+        list = @student.assignments_for_student("submitting", is_sub_assignment: true, contexts: [@course])
+        expect(list.size).to be 2
+        expect(list.pluck(:id)).to match_array([@reply_to_topic.id, @reply_to_entry.id])
+      end
+    end
   end
 
   describe "assignments_needing_submitting" do
@@ -729,6 +743,47 @@ describe UserLearningObjectScopes do
       expect(@teacher.assignments_needing_grading).to all(have_attribute(:only_visible_to_overrides))
     end
 
+    context "is_sub_assignment" do
+      before do
+        @course1.root_account.enable_feature!(:discussion_checkpoints)
+        @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course1)
+        @reply_to_topic.submit_homework @student_a, body: "checkpoint submission for #{@student_a.name}"
+      end
+
+      it "default false and does not return checkpointed sub-assignments" do
+        expect(@teacher.assignments_needing_grading).not_to include(@reply_to_topic)
+      end
+
+      it "returns only checkpointed sub-assignments when true" do
+        expect(@teacher.assignments_needing_grading(is_sub_assignment: true, discussion_checkpoints_enabled: true)).to eq([@reply_to_topic])
+      end
+
+      it "returns only checkpointed sub-assignments from the given course" do
+        @course2.root_account.enable_feature!(:discussion_checkpoints)
+        reply_to_topic2, _reply_to_entry2 = graded_discussion_topic_with_checkpoints(context: @course2)
+        reply_to_topic2.submit_homework @student_a, body: "checkpoint submission for #{@student_a.name}"
+
+        expect(@teacher.assignments_needing_grading(is_sub_assignment: true, discussion_checkpoints_enabled: true, course_ids: [@course1.id])).to eq([@reply_to_topic])
+      end
+
+      it "returns only active checkpointed sub-assignments" do
+        reply_to_topic2, _reply_to_entry2 = graded_discussion_topic_with_checkpoints(context: @course1)
+        reply_to_topic2.submit_homework @student_a, body: "checkpoint submission for #{@student_a.name}"
+
+        expect(@teacher.assignments_needing_grading(is_sub_assignment: true, discussion_checkpoints_enabled: true)).to eq([@reply_to_topic, reply_to_topic2])
+
+        reply_to_topic2.parent_assignment.workflow_state = "deleted"
+        reply_to_topic2.parent_assignment.save!
+
+        expect(@teacher.assignments_needing_grading(is_sub_assignment: true, discussion_checkpoints_enabled: true)).to eq([@reply_to_topic])
+      end
+
+      it "when false does not return parent assignments of sub-assignments" do
+        @reply_to_entry.submit_homework @student_a, body: "checkpoint submission for #{@student_a.name}"
+        expect(@teacher.assignments_needing_grading(discussion_checkpoints_enabled: true)).not_to include(@reply_to_topic.parent_assignment)
+      end
+    end
+
     context "sharding" do
       specs_require_sharding
 
@@ -804,7 +859,7 @@ describe UserLearningObjectScopes do
     end
   end
 
-  context "#submissions_needing_grading_count" do
+  describe "#submissions_needing_grading_count" do
     before :once do
       course_with_teacher(active_all: true)
       @sectionb = @course.course_sections.create!(name: "section B")
@@ -845,7 +900,7 @@ describe UserLearningObjectScopes do
     end
   end
 
-  context "#assignments_needing_moderation" do
+  describe "#assignments_needing_moderation" do
     before :once do
       # create courses and sections
       @course1 = course_with_teacher(active_all: true).course

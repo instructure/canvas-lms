@@ -84,7 +84,7 @@ interface EnrollmentRole {
 }
 
 export interface Props {
-  enrollment: User | any
+  enrollments: User[]
   user: User
   rolePermissions: RolePermissions
   roles: Role[]
@@ -163,13 +163,13 @@ export function getStoredData(roles: Role[]): StoredData {
 }
 
 interface EnrollmentAndUserProps {
-  enrollmentProps: User
+  enrollmentProps: User[]
   userProps: User
 }
 
 interface EnrollmentAndUserContextProps {
   enrollmentType: EnrollmentType
-  enrollment: User
+  enrollments: User[]
   user: User
 }
 
@@ -186,9 +186,9 @@ interface EnrollmentAndUserContextProps {
 export function getEnrollmentAndUserProps(
   props: EnrollmentAndUserContextProps
 ): EnrollmentAndUserProps {
-  const {enrollmentType, enrollment, user} = props
-  const enrollmentProps = enrollmentType === RECIPIENT ? user : enrollment
-  const userProps = enrollmentType === RECIPIENT ? enrollment : user
+  const {enrollmentType, enrollments, user} = props
+  const enrollmentProps = enrollmentType === RECIPIENT ? [user] : enrollments
+  const userProps = enrollmentType === RECIPIENT ? enrollments[0] : user
 
   return {enrollmentProps, userProps}
 }
@@ -223,13 +223,15 @@ export function isMatchFound(
 export const deleteMultipleEnrollmentsByNoMatch = (
   tempEnrollments: Enrollment[],
   sectionIds: string[],
-  userId: string,
+  enrollmentUsers: User[],
   roleId: string
 ): Promise<void>[] => {
-  const deletionPromises = []
-  for (const tempEnrollment of tempEnrollments) {
-    if (!isMatchFound(sectionIds, tempEnrollment, userId, roleId)) {
-      deletionPromises.push(deleteEnrollment(tempEnrollment.course_id, tempEnrollment.id))
+  const deletionPromises: Promise<void>[] = []
+  for (const user of enrollmentUsers) {
+    for (const tempEnrollment of tempEnrollments) {
+      if (!isMatchFound(sectionIds, tempEnrollment, user.id, roleId)) {
+        deletionPromises.push(deleteEnrollment(tempEnrollment.course_id, tempEnrollment.id))
+      }
     }
   }
   return deletionPromises
@@ -252,7 +254,7 @@ export function TempEnrollAssign(props: Props) {
   // userProps = provider user object
   const {enrollmentProps, userProps} = getEnrollmentAndUserProps(props)
 
-  const roleOptions = []
+  const roleOptions: JSX.Element[] = []
 
   // using useMemo to compute and memoize roleLabel thus avoiding unnecessary re-renders
   const roleLabel = useMemo(() => {
@@ -398,7 +400,7 @@ export function TempEnrollAssign(props: Props) {
 
   const handleValidationError = (message: string) => {
     setErrorMsg(message)
-    props.setEnrollmentStatus(false, false)
+    props.setEnrollmentStatus(false, false, false)
     setLoading(false)
   }
 
@@ -463,8 +465,13 @@ export function TempEnrollAssign(props: Props) {
     let success: boolean = false
     try {
       setErrorMsg('')
-      const temporaryEnrollmentPairing: TemporaryEnrollmentPairing =
-        await createTemporaryEnrollmentPairing(ENV.ACCOUNT_ID, stateChoice)
+      const pairingPromises = []
+      enrollmentProps.forEach(() => {
+        pairingPromises.push(createTemporaryEnrollmentPairing(ENV.ACCOUNT_ID, stateChoice))
+      })
+      const temporaryEnrollmentPairings: TemporaryEnrollmentPairing[] = await Promise.all(
+        pairingPromises
+      )
 
       if (props.tempEnrollmentsPairing && props.tempEnrollmentsPairing.length >= 1) {
         // delete any enrollments that were not selected
@@ -475,28 +482,30 @@ export function TempEnrollAssign(props: Props) {
           deleteMultipleEnrollmentsByNoMatch(
             props.tempEnrollmentsPairing,
             sectionIds,
-            enrollmentProps.id,
+            enrollmentProps,
             roleChoice.id
           )
         )
       }
       // iterate through the form’s selected enrollments
       const createPromises: Promise<void>[] = []
-      submitEnrolls.forEach(enroll => {
-        // create all selected enrollments
-        createPromises.push(
-          createEnrollment(
-            enroll.section,
-            enrollmentProps.id,
-            userProps.id,
-            temporaryEnrollmentPairing.id,
-            enroll.limit_privileges_to_course_section,
-            startDate,
-            endDate,
-            roleChoice.id
+      for (const index in enrollmentProps) {
+        submitEnrolls.forEach(enroll => {
+          // create all selected enrollments
+          createPromises.push(
+            createEnrollment(
+              enroll.section,
+              enrollmentProps[index].id,
+              userProps.id,
+              temporaryEnrollmentPairings[index].id,
+              enroll.limit_privileges_to_course_section,
+              startDate,
+              endDate,
+              roleChoice.id
+            )
           )
-        )
-      })
+        })
+      }
       await Promise.all(createPromises)
       success = true
     } catch (error) {
@@ -509,7 +518,8 @@ export function TempEnrollAssign(props: Props) {
     } finally {
       // if there is no pairing, we are creating a new enrollment
       const isUpdate = props.tempEnrollmentsPairing != null
-      props.setEnrollmentStatus(success, isUpdate)
+      const isMultiple = props.enrollments.length > 1
+      props.setEnrollmentStatus(success, isUpdate, isMultiple)
       // only set loading state if modal is still open
       if (!success) {
         setLoading(false)
@@ -564,11 +574,18 @@ export function TempEnrollAssign(props: Props) {
           </Flex.Item>
         )}
         <Flex.Item>
-          <TempEnrollAvatar user={enrollmentProps}>
-            {I18n.t('%{enroll} will receive temporary enrollments from %{user}', {
-              enroll: enrollmentProps.name,
-              user: userProps.name,
-            })}
+          <TempEnrollAvatar user={userProps}>
+            {I18n.t(
+              {
+                one: '%{enroll} will receive temporary enrollments from %{user}',
+                other: '%{count} users will receive temporary enrollments from %{user}',
+              },
+              {
+                count: enrollmentProps.length,
+                enroll: enrollmentProps[0].name,
+                user: userProps.name,
+              }
+            )}
           </TempEnrollAvatar>
         </Flex.Item>
         {errorMsg && (
@@ -603,7 +620,10 @@ export function TempEnrollAssign(props: Props) {
                   isRequired={true}
                   description={
                     <ScreenReaderContent>
-                      {I18n.t('Start Date for %{enroll}', {enroll: enrollmentProps.name})}
+                      {I18n.t(
+                        {one: 'Start Date for %{enroll}', other: 'Start Date for %{count} users'},
+                        {count: enrollmentProps.length, enroll: enrollmentProps[0].name}
+                      )}
                     </ScreenReaderContent>
                   }
                   dateRenderLabel={I18n.t('Begins On')}
@@ -632,7 +652,10 @@ export function TempEnrollAssign(props: Props) {
                   isRequired={true}
                   description={
                     <ScreenReaderContent>
-                      {I18n.t('End Date for %{enroll}', {enroll: enrollmentProps.name})}
+                      {I18n.t(
+                        {one: 'End Date for %{enroll}', other: 'End Date for %{count} users'},
+                        {count: enrollmentProps.length, enroll: enrollmentProps[0].name}
+                      )}
                     </ScreenReaderContent>
                   }
                   dateRenderLabel={I18n.t('Until')}
@@ -663,9 +686,14 @@ export function TempEnrollAssign(props: Props) {
             <Flex.Item shouldGrow={true}>
               <Text as="p" data-testid="temp-enroll-summary">
                 {I18n.t(
-                  'Canvas will enroll %{recipient} as a %{role} in the selected courses of %{source} from %{start} - %{end} with an ending enrollment state of %{state}',
                   {
-                    recipient: enrollmentProps.name,
+                    one: 'Canvas will enroll %{recipient} as a %{role} in the selected courses of %{source} from %{start} - %{end} with an ending enrollment state of %{state}',
+                    other:
+                      'Canvas will enroll %{count} users as a %{role} in the selected courses of %{source} from %{start} - %{end} with an ending enrollment state of %{state}',
+                  },
+                  {
+                    count: enrollmentProps.length,
+                    recipient: enrollmentProps[0].name,
                     role: roleLabel,
                     source: userProps.name,
                     start: formatDateTime(startDate),

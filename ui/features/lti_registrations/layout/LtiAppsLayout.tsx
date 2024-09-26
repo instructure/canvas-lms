@@ -48,6 +48,7 @@ export const LtiAppsLayout = React.memo(() => {
   const open = React.useCallback(() => {
     openRegistrationWizard({
       jsonUrl: '',
+      jsonCode: '',
       unifiedToolId: undefined,
       dynamicRegistrationUrl: '',
       lti_version: '1p3',
@@ -57,7 +58,7 @@ export const LtiAppsLayout = React.memo(() => {
       onSuccessfulInstallation: () => {
         refreshRegistrations()
       },
-      jsonUrlFetch: {_tag: 'initial'},
+      jsonFetch: {_tag: 'initial'},
     })
   }, [])
 

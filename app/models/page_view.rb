@@ -81,7 +81,7 @@ class PageView < ActiveRecord::Base
   end
 
   def url
-    url = read_attribute(:url)
+    url = super
     url && LoggingFilter.filter_uri(url)
   end
 
@@ -236,7 +236,7 @@ class PageView < ActiveRecord::Base
   end
 
   def self.user_count_bucket_for_time(time)
-    utc = time.in_time_zone("UTC")
+    utc = time.utc
     # round down to the last 5 minute mark -- so 03:43:28 turns into 03:40:00
     utc = utc - ((utc.min % 5) * 60) - utc.sec
     "active_users:#{utc.as_json}"

@@ -19,31 +19,40 @@
 
 class Checkpoints::AdhocOverrideUpdaterService < Checkpoints::AdhocOverrideCommonService
   def call
-    desired_student_ids = @override.fetch(:student_ids) { raise Checkpoints::StudentIdsRequiredError, "student_ids is required, but was not provided" }
-    raise Checkpoints::StudentIdsRequiredError, "student_ids is required, but was not provided" if desired_student_ids.blank?
-
     override = @checkpoint.assignment_overrides.find_by(id: @override[:id], set_type: AssignmentOverride::SET_TYPE_ADHOC)
     raise Checkpoints::OverrideNotFoundError unless override
+
+    # Fetch the student_ids from @override or fall back to getting them from override.set
+    desired_student_ids = @override.fetch(:student_ids, nil)
+    # If desired_student_ids is not provided, use a map of ids from override.set
+    desired_student_ids ||= override.set.map(&:id)
+    raise Checkpoints::StudentIdsRequiredError, "student_ids is required, but was not provided" if desired_student_ids.blank?
 
     valid_student_ids = @checkpoint.course.all_students.where(id: desired_student_ids).pluck(:id)
     existing_student_ids = override.assignment_override_students.pluck(:user_id)
     student_ids_to_delete = existing_student_ids - valid_student_ids
 
-    apply_overridden_dates(override, @override, shell_override: false)
+    parent_override = override.parent_override
 
-    override.title = get_title(student_ids: valid_student_ids)
-    build_override_students(override:, student_ids: valid_student_ids)
-    override.save! if override.changed? || override.changed_student_ids.any?
+    destroy_students(override:, student_ids: student_ids_to_delete)
+    destroy_students(override: parent_override, student_ids: student_ids_to_delete)
 
-    override.assignment_override_students.where(user_id: student_ids_to_delete).destroy_all if student_ids_to_delete.any?
-
-    parent_override = existing_parent_adhoc_override
-    parent_override.title = get_title(student_ids: valid_student_ids)
-    build_override_students(override: parent_override, student_ids: valid_student_ids)
-    parent_override.save! if parent_override.changed? || parent_override.changed_student_ids.any?
-
-    parent_override.assignment_override_students.where(user_id: student_ids_to_delete).destroy_all if student_ids_to_delete.any?
+    update_override(override:, student_ids: valid_student_ids)
+    update_override(override: parent_override, student_ids: valid_student_ids, shell_override: true)
 
     override
+  end
+
+  def destroy_students(override:, student_ids:)
+    return if student_ids.blank?
+
+    override.assignment_override_students.where(user_id: student_ids).destroy_all
+  end
+
+  def update_override(override:, student_ids:, shell_override: false)
+    override.title = get_title(student_ids:)
+    build_override_students(override:, student_ids:)
+    apply_overridden_dates(override, @override, shell_override:)
+    override.save! if override.changed? || override.changed_student_ids.any?
   end
 end

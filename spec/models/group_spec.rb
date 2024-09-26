@@ -130,7 +130,7 @@ describe Group do
     end
   end
 
-  context "#peer_groups" do
+  describe "#peer_groups" do
     it "finds all peer groups" do
       context = course_model
       group_category = context.group_categories.create(name: "worldCup")
@@ -449,27 +449,27 @@ describe Group do
     end
   end
 
-  context "#full?" do
+  describe "#full?" do
     it "returns true when category group_limit has been met" do
-      @group.group_category = @course.group_categories.build(name: "foo")
-      @group.group_category.group_limit = 1
+      @group.group_category = @course.group_categories.build(name: "foo", group_limit: 1)
       @group.add_user user_model, "accepted"
+      @group.association(:participating_users).reset
       expect(@group).to be_full
     end
 
     it "returns true when max_membership has been met" do
-      @group.group_category = @course.group_categories.build(name: "foo")
-      @group.group_category.group_limit = 0
+      @group.group_category = @course.group_categories.build(name: "foo", group_limit: 0)
       @group.max_membership = 1
       @group.add_user user_model, "accepted"
+      @group.association(:participating_users).reset
       expect(@group).to be_full
     end
 
     it "returns false when max_membership has not been met" do
-      @group.group_category = @course.group_categories.build(name: "foo")
-      @group.group_category.group_limit = 0
+      @group.group_category = @course.group_categories.build(name: "foo", group_limit: 0)
       @group.max_membership = 2
       @group.add_user user_model, "accepted"
+      @group.association(:participating_users).reset
       expect(@group).not_to be_full
     end
 
@@ -477,9 +477,9 @@ describe Group do
       # no category
       expect(@group).not_to be_full
       # not full
-      @group.group_category = @course.group_categories.build(name: "foo")
-      @group.group_category.group_limit = 2
+      @group.group_category = @course.group_categories.build(name: "foo", group_limit: 2)
       @group.add_user user_model, "accepted"
+      @group.association(:participating_users).reset
       expect(@group).not_to be_full
     end
   end

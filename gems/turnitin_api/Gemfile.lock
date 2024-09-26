@@ -41,7 +41,7 @@ GEM
       bigdecimal
       rexml
     diff-lcs (1.5.1)
-    dogstatsd-ruby (5.6.1)
+    dogstatsd-ruby (5.6.2)
     drb (2.2.1)
     faraday (2.10.1)
       faraday-net_http (>= 2.0, < 3.2)
@@ -53,9 +53,9 @@ GEM
     faraday-net_http (3.1.1)
       net-http
     hashdiff (1.1.1)
-    i18n (1.14.5)
+    i18n (1.14.6)
       concurrent-ruby (~> 1.0)
-    inst_statsd (3.0.4)
+    inst_statsd (3.0.5)
       aroi (>= 0.0.7)
       dogstatsd-ruby (>= 4.2, < 6.0, != 5.0.0)
       statsd-ruby (~> 1.0)
@@ -74,7 +74,7 @@ GEM
       rspec-mocks (~> 3.13.0)
     rspec-core (3.13.1)
       rspec-support (~> 3.13.0)
-    rspec-expectations (3.13.2)
+    rspec-expectations (3.13.3)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-mocks (3.13.1)
@@ -107,7 +107,7 @@ DEPENDENCIES
   webmock (~> 3.0)
 
 RUBY VERSION
-   ruby 3.1.2p20
+   ruby 3.3.3p89
 
 BUNDLED WITH
    2.5.10

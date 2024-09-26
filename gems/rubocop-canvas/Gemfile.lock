@@ -57,7 +57,7 @@ GEM
     diff-lcs (1.5.1)
     drb (2.2.1)
     erubi (1.13.0)
-    i18n (1.14.5)
+    i18n (1.14.6)
       concurrent-ruby (~> 1.0)
     io-console (0.7.2)
     irb (1.14.0)
@@ -121,7 +121,7 @@ GEM
     rdoc (6.7.0)
       psych (>= 4.0.0)
     regexp_parser (2.9.2)
-    reline (0.5.9)
+    reline (0.5.10)
       io-console (~> 0.5)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
@@ -129,7 +129,7 @@ GEM
       rspec-mocks (~> 3.13.0)
     rspec-core (3.13.1)
       rspec-support (~> 3.13.0)
-    rspec-expectations (3.13.2)
+    rspec-expectations (3.13.3)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-mocks (3.13.1)
@@ -146,9 +146,9 @@ GEM
       rubocop-ast (>= 1.32.2, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 3.0)
-    rubocop-ast (1.32.2)
+    rubocop-ast (1.32.3)
       parser (>= 3.3.1.0)
-    rubocop-rails (2.26.0)
+    rubocop-rails (2.26.2)
       activesupport (>= 4.2.0)
       rack (>= 1.1)
       rubocop (>= 1.52.0, < 2.0)
@@ -159,7 +159,7 @@ GEM
     timeout (0.4.1)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    unicode-display_width (2.5.0)
+    unicode-display_width (2.6.0)
     webrick (1.8.1)
     zeitwerk (2.6.18)
 
@@ -178,7 +178,7 @@ DEPENDENCIES
   rubocop-canvas!
 
 RUBY VERSION
-   ruby 3.1.2p20
+   ruby 3.3.3p89
 
 BUNDLED WITH
    2.5.10

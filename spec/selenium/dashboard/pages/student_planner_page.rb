@@ -351,6 +351,10 @@ module PlannerPageObject
     expect(fxpath("//*[contains(@class, 'PlannerApp')]//*[contains(text(),'#{pill_type}')]")).to be_displayed
   end
 
+  def validate_feedback(feedback)
+    expect(fxpath("//*[contains(@class, 'PlannerApp')]//*[contains(text(),'#{feedback}')]")).to be_displayed
+  end
+
   def go_to_list_view
     @student1.dashboard_view = "planner"
     @student1.save!

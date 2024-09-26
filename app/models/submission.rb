@@ -754,11 +754,11 @@ class Submission < ActiveRecord::Base
   end
 
   def url
-    read_body = read_attribute(:body) && CGI.unescapeHTML(read_attribute(:body))
-    @full_url = if read_body && read_attribute(:url) && read_body[0..250] == read_attribute(:url)[0..250]
-                  read_attribute(:body)
+    read_body = body && CGI.unescapeHTML(body)
+    @full_url = if read_body && (url = super) && read_body[0..250] == url[0..250]
+                  body
                 else
-                  read_attribute(:url)
+                  super
                 end
   end
 
@@ -882,7 +882,7 @@ class Submission < ActiveRecord::Base
         similarity_score: originality_report.originality_score&.round(2),
         state: originality_report.state,
         attachment_id: originality_report.attachment_id,
-        report_url: originality_report.report_launch_path,
+        report_url: originality_report.report_launch_path(assignment),
         status: originality_report.workflow_state,
         error_message: originality_report.error_message,
         created_at: originality_report.created_at,
@@ -933,7 +933,7 @@ class Submission < ActiveRecord::Base
       WHEN workflow_state = 'pending' THEN 2
       END"),
                                                                  updated_at: :desc).first
-    report&.report_launch_path
+    report&.report_launch_path(assignment)
   end
 
   def has_originality_report?
@@ -1411,10 +1411,8 @@ class Submission < ActiveRecord::Base
   # submitted_at is needed by SpeedGrader, so it is set to the updated_at value
   def submitted_at
     if submission_type
-      unless read_attribute(:submitted_at)
-        write_attribute(:submitted_at, read_attribute(:updated_at))
-      end
-      read_attribute(:submitted_at).in_time_zone rescue nil
+      self.submitted_at = updated_at unless super
+      super.in_time_zone rescue nil
     else
       nil
     end
@@ -1644,12 +1642,12 @@ class Submission < ActiveRecord::Base
 
   def graded_anonymously=(value)
     @graded_anonymously_set = true
-    write_attribute :graded_anonymously, value
+    super
   end
 
   def check_reset_graded_anonymously
     if grade_changed? && !@graded_anonymously_set
-      write_attribute :graded_anonymously, false
+      self["graded_anonymously"] = false
     end
     true
   end
@@ -1834,14 +1832,6 @@ class Submission < ActiveRecord::Base
     if !attachment_id && @attempt_changed && url && submission_type == "online_url"
       delay(priority: Delayed::LOW_PRIORITY).get_web_snapshot
     end
-  end
-
-  def attachment_ids
-    read_attribute :attachment_ids
-  end
-
-  def attachment_ids=(ids)
-    write_attribute :attachment_ids, ids
   end
 
   def versioned_originality_reports
@@ -2089,16 +2079,17 @@ class Submission < ActiveRecord::Base
     # since they're all being held on the assignment for now.
     attachments ||= []
     old_ids = Array(attachment_ids || "").join(",").split(",").map(&:to_i)
-    write_attribute(:attachment_ids, attachments.select { |a| (a && a.id && old_ids.include?(a.id)) || (a.recently_created? && a.context == assignment) || a.context != assignment }.map(&:id).join(","))
+    self.attachment_ids = attachments.select { |a| (a && a.id && old_ids.include?(a.id)) || (a.recently_created? && a.context == assignment) || a.context != assignment }.map(&:id).join(",")
   end
 
   # someday code-archaeologists will wonder how this method came to be named
   # validate_single_submission.  their guess is as good as mine
   def validate_single_submission
     @full_url = nil
-    if read_attribute(:url) && read_attribute(:url).length > 250
-      self.body = read_attribute(:url)
-      self.url = read_attribute(:url)[0..250]
+
+    if (url = self["url"]) && url.length > 250
+      self.body = url
+      self.url = url[0..250]
     end
     unless submission_type
       self.submission_type ||= "online_url" if url
@@ -2951,7 +2942,7 @@ class Submission < ActiveRecord::Base
     missing_ids = []
     unpublished_assignment_ids = []
     graded_user_ids = Set.new
-    preloaded_assignments = Assignment.find(grade_data.keys).index_by(&:id)
+    preloaded_assignments = AbstractAssignment.find(grade_data.keys).index_by(&:id)
 
     Submission.suspend_callbacks(:touch_graders) do
       grade_data.each do |assignment_id, user_grades|

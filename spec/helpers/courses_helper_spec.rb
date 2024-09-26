@@ -328,6 +328,14 @@ describe CoursesHelper do
         new_params = ActionController::Parameters.new(cc_sort: column, cc_order: nil, focus: table)
         expect(get_courses_params(table, column, old_params)).to eq(new_params.permit(:cc_sort, :cc_order, :focus))
       end
+
+      it "works on pc table" do
+        table = "pc"
+        column = "favorite"
+        old_params = ActionController::Parameters.new(pc_sort: column, pc_order: nil, focus: table)
+        new_params = ActionController::Parameters.new(pc_sort: column, pc_order: "desc", focus: table)
+        expect(get_courses_params(table, column, old_params)).to eq(new_params.permit(:pc_sort, :pc_order, :focus))
+      end
     end
   end
 

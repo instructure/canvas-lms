@@ -48,13 +48,13 @@ module Types
     global_id_field :id
 
     field :name, String, null: true
-    field :sortable_name,
-          String,
-          "The name of the user that is should be used for sorting groups of users, such as in the gradebook.",
-          null: true
     field :short_name,
           String,
           "A short name the user has selected, for use in conversations or other less formal places through the site.",
+          null: true
+    field :sortable_name,
+          String,
+          "The name of the user that is should be used for sorting groups of users, such as in the gradebook.",
           null: true
 
     field :pronouns, String, null: true
@@ -152,13 +152,13 @@ module Types
                Boolean,
                "Whether or not to restrict results to `active` enrollments in `available` courses",
                required: false
-      argument :order_by,
-               [String],
-               "The fields to order the results by",
-               required: false
       argument :exclude_concluded,
                Boolean,
                "Whether or not to exclude `completed` enrollments",
+               required: false
+      argument :order_by,
+               [String],
+               "The fields to order the results by",
                required: false
     end
 
@@ -197,8 +197,8 @@ module Types
 
     field :notification_preferences_enabled, Boolean, null: false do
       argument :account_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Account")
-      argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
       argument :context_type, NotificationPreferencesContextType, required: true
+      argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
     end
     def notification_preferences_enabled(account_id: nil, course_id: nil, context_type: nil)
       enabled_for = lambda do |context|
@@ -228,8 +228,8 @@ module Types
     end
 
     field :conversations_connection, Types::ConversationParticipantType.connection_type, null: true do
-      argument :scope, String, required: false
       argument :filter, [String], required: false
+      argument :scope, String, required: false
     end
     def conversations_connection(scope: nil, filter: nil)
       if object == context[:current_user]
@@ -271,8 +271,8 @@ module Types
     end
 
     field :recipients, RecipientsType, null: true do
-      argument :search, String, required: false
       argument :context, String, required: false
+      argument :search, String, required: false
     end
     def recipients(search: nil, context: nil)
       return nil unless object == self.context[:current_user]
@@ -322,8 +322,8 @@ module Types
     end
 
     field :recipients_observers, MessageableUserType.connection_type, null: true do
-      argument :recipient_ids, [String], required: true
       argument :context_code, String, required: true
+      argument :recipient_ids, [String], required: true
     end
     def recipients_observers(recipient_ids: nil, context_code: nil)
       return nil unless object == context[:current_user]
@@ -493,9 +493,9 @@ module Types
     end
 
     field :course_roles, [String], null: true do
+      argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
       argument :course_id, String, required: false
       argument :role_types, [String], "Return only requested base role types", required: false
-      argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
     end
     def course_roles(course_id: nil, role_types: nil, built_in_only: true)
       # This graphql execution context can be used to set course_id if you are calling course_role from a nested query

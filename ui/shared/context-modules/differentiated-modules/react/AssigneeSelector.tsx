@@ -30,6 +30,7 @@ import type {FormMessage} from '@instructure/ui-form-field'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import type {AssigneeOption} from './Item/types'
 import type {ItemType} from './types'
+import {Spinner} from '@instructure/ui-spinner'
 
 const {Option: CanvasMultiSelectOption} = CanvasMultiSelect as any
 
@@ -166,7 +167,20 @@ const AssigneeSelector = ({
         size={size}
         selectedOptionIds={selectedOptionIds}
         onChange={handleChange}
-        renderAfterInput={<></>}
+        renderAfterInput={
+          isLoading ? (
+            <Spinner
+              renderTitle={
+                <ScreenReaderContent>
+                  {I18n.t('Loading student, section, and group data')}
+                </ScreenReaderContent>
+              }
+              size="x-small"
+            />
+          ) : (
+            <></>
+          )
+        }
         customOnInputChange={handleInputChange}
         visibleOptionsCount={10}
         isLoading={isLoading}

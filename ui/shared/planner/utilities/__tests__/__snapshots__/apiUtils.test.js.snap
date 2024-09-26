@@ -49,6 +49,42 @@ exports[`transformApiToInternalItem copes with a non-existent (e.g. concluded) c
 }
 `;
 
+exports[`transformApiToInternalItem dicusssion checkpoint extracts and transforms the proper data for a discussion checkpoint response 1`] = `
+{
+  "address": null,
+  "completed": false,
+  "context": {
+    "color": "#abffaa",
+    "id": "1",
+    "image_url": "blah_url",
+    "title": "blah",
+    "type": "Course",
+    "url": undefined,
+  },
+  "course_id": "1",
+  "date": "2024-09-08T18:58:51.000Z",
+  "dateBucketMoment": "2024-09-08T00:00:00.000Z",
+  "dateStyle": "due",
+  "feedback": undefined,
+  "html_url": "/courses/1/assignments/10",
+  "id": "15",
+  "location": null,
+  "newActivity": false,
+  "originallyCompleted": false,
+  "overrideAssignId": undefined,
+  "overrideId": null,
+  "points": 10,
+  "status": {
+    "unread_count": 2,
+  },
+  "title": "How to be a good friend Reply to Topic",
+  "toggleAPIPending": false,
+  "type": "Discussion Checkpoint",
+  "uniqueId": "sub_assignment-15",
+  "unread_count": 2,
+}
+`;
+
 exports[`transformApiToInternalItem extracts and transforms the proper data for a calendar event response 1`] = `
 {
   "address": "Here",

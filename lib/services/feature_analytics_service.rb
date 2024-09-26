@@ -42,7 +42,7 @@ module Services
       end
 
       def config
-        @config ||= DynamicSettings.find("feature_analytics", tree: :private) || {}
+        @config ||= DynamicSettings.find(tree: :private)["feature_analytics", failsafe: nil] || "{}"
       end
     end
   end

@@ -22,8 +22,8 @@ class Mutations::PostAssignmentGradesForSections < Mutations::BaseMutation
   graphql_name "PostAssignmentGradesForSections"
 
   argument :assignment_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Assignment")
-  argument :section_ids, [ID], required: true, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Section")
   argument :graded_only, Boolean, required: false
+  argument :section_ids, [ID], required: true, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Section")
 
   field :assignment, Types::AssignmentType, null: true
   field :progress, Types::ProgressType, null: true

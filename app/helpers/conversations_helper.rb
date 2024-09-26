@@ -86,7 +86,12 @@ module ConversationsHelper
       conversation.delay(strand: "add_message_#{conversation.global_conversation_id}").process_new_message(message_args, recipients, message_ids, tags)
       # The message is delayed and will be processed later so there is nothing to return
       # right now. If there is no error, success can be assumed.
-      { message: nil, recipients_count: recipients ? recipients.count : 0, status: :accepted }
+      # for displaying purposed, a preview of the processed message is created
+      message = Conversation.build_message(*message_args)
+      message.id = 0
+      message.conversation_id = conversation.conversation_id
+      message.created_at = Time.now.utc
+      { message:, recipients_count: recipients ? recipients.count : 0, status: :accepted }
     end
   rescue ConversationsHelper::InvalidMessageForConversationError
     raise ConversationsHelper::Error.new(message: I18n.t("not for this conversation"), status: :bad_request, attribute: "included_messages")

@@ -16,12 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<p><%= mt(<<~TEXT, callback_url: oauth2_login_callback_url)
+<p><%= mt(<<~TEXT, callback_url: oauth2_login_callback_url, backchannel_logout_uri: openid_connect_logout_url)
 To configure an OpenID Connect provider you need the authorize and token urls, and
 obtain a Client ID and Client Secret.
 
 If the provider can configure valid callback or redirect URIs, use %{callback_url}.
-                  TEXT
+To enable back channel logout, configure the provider's `backchannel_logout_uri`
+to use %{backchannel_logout_uri}, and preferably set
+`backchannel_logout_session_required` to `true` if the provider supports it.
+          TEXT
               %></p>
 <%= render partial: 'oauth2_fields', locals: { aac: aac, presenter: presenter, f: f } %>
 <div class="ic-Form-control">

@@ -643,7 +643,7 @@ class WikiPagesApiController < ApplicationController
   def get_update_params(allowed_fields = Set[])
     # normalize parameters
     wiki_page_params = %w[title body notify_of_update published front_page editing_roles publish_at]
-    wiki_page_params += [block_editor_attributes: [:time, :version, { blocks: [data: strong_anything] }]] if @context.account.feature_enabled?(:block_editor)
+    wiki_page_params += [block_editor_attributes: [:time, :version, { blocks: strong_anything }]] if @context.account.feature_enabled?(:block_editor)
     page_params = params[:wiki_page] ? params[:wiki_page].permit(*wiki_page_params) : {}
 
     if page_params.key?(:published)

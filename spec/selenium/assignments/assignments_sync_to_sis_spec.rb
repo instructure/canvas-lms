@@ -248,7 +248,7 @@ describe "assignments sync to sis" do
 
             AssignmentCreateEditPage.save_assignment
 
-            check_due_date_table(section_to_set, short_date)
+            check_due_date_table("1 Section", short_date)
           end
 
           it "checks due date when first add cards then fill fields", :ignore_js_errors do
@@ -276,7 +276,7 @@ describe "assignments sync to sis" do
 
             AssignmentCreateEditPage.save_assignment
 
-            check_due_date_table(section_to_set, short_date)
+            check_due_date_table("1 Section", short_date)
           end
 
           it "does not check when sis is off", :ignore_js_errors do
@@ -292,8 +292,7 @@ describe "assignments sync to sis" do
 
             AssignmentCreateEditPage.save_assignment
 
-            check_due_date_table(section_to_set)
-            check_due_date_table("Everyone else")
+            check_due_date_table("Everyone else, 1 Section")
           end
         end
       end
@@ -343,7 +342,7 @@ describe "assignments sync to sis" do
 
             AssignmentCreateEditPage.save_assignment
 
-            check_due_date_table(section_to_set, short_date)
+            check_due_date_table("1 Section", short_date)
           end
 
           it "checks due date when first add cards then fill fields", :ignore_js_errors do
@@ -363,7 +362,7 @@ describe "assignments sync to sis" do
             update_due_time(1, "11:59 PM")
             AssignmentCreateEditPage.save_assignment
 
-            check_due_date_table(section_to_set, short_date)
+            check_due_date_table("1 Section", short_date)
           end
 
           it "does not check when sis is off", :ignore_js_errors do
@@ -374,8 +373,7 @@ describe "assignments sync to sis" do
 
             AssignmentCreateEditPage.save_assignment
 
-            check_due_date_table(section_to_set)
-            check_due_date_table("Everyone else")
+            check_due_date_table("Everyone else, 1 Section")
           end
         end
       end

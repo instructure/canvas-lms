@@ -57,7 +57,6 @@ gem "datadog", "~> 2.1", require: false
 gem "docx", "~> 0.8"
 gem "encrypted_cookie_store-instructure", "~> 1.2", require: "encrypted_cookie_store"
 gem "gepub", "~> 1.0"
-gem "apollo-federation", "~> 3.8"
 gem "graphql", "~> 2.3.0"
 gem "graphql-batch", "~> 0.5"
 gem "highline", "~> 3.0", require: false
@@ -69,7 +68,7 @@ gem "ims-lti", "~> 2.3", require: "ims"
 gem "rrule", "~> 0.5", require: false
 gem "inst_llm", "~> 0.2.4"
 
-gem "inst_access", "0.4.3"
+gem "inst_access", "0.4.4"
 gem "inst_statsd", "~> 3.0"
 gem "inst-jobs", "~> 3.1"
 gem "inst-jobs-autoscaling", "2.1.1"
@@ -80,7 +79,7 @@ gem "link_header", "0.0.8"
 gem "marginalia", "1.11.1", require: false
 gem "method_source", "~> 1.1"
 gem "mime-types", "~> 3.5"
-gem "mini_magick", "~> 4.12"
+gem "mini_magick", "~> 5.0"
 gem "multi_json", "1.15.0"
 gem "net-http", "~> 0.1", require: false
 gem "net-ldap", "~> 0.18", require: false

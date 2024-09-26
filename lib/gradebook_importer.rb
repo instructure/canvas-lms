@@ -34,6 +34,9 @@ class GradebookImporter
     moderated_grading
     grades_published_at
     final_grader_id
+    workflow_state
+    has_sub_assignments
+    sub_assignment_tag
   ].freeze
 
   class NegativeId
@@ -133,6 +136,11 @@ class GradebookImporter
                                .select(ASSIGNMENT_PRELOADED_FIELDS)
                                .to_a
 
+    if @context.root_account.feature_enabled?(:discussion_checkpoints)
+      checkpoint_assignments = @all_assignments.select(&:has_sub_assignments).map(&:sub_assignments).flatten
+      @all_assignments += checkpoint_assignments
+    end
+
     Assignment.preload_unposted_anonymous_submissions(@all_assignments)
     @all_assignments = @all_assignments.index_by(&:id)
     @all_students = @context.all_students
@@ -199,7 +207,7 @@ class GradebookImporter
 
     @original_submissions = @context.submissions
                                     .preload(:grading_period, assignment: { context: :account })
-                                    .select(["submissions.id", :assignment_id, :user_id, :grading_period_id, :score, :excused, :cached_due_date, :course_id, "submissions.updated_at"])
+                                    .select(:id, :assignment_id, :user_id, :grading_period_id, :score, :excused, :cached_due_date, :course_id, :updated_at, :workflow_state)
                                     .where(assignment_id: assignment_ids, user_id: user_ids)
                                     .map do |submission|
       is_gradeable = gradeable?(submission:, is_admin:)
@@ -227,7 +235,15 @@ class GradebookImporter
                      .fetch(student.id, {})
                      .fetch(submission_assignment_id, {})
         submission["original_grade"] = assignment.fetch(:score, nil)
+        # Ignore updates to parent assignments - Only allow grading at the checkpoint-level
+        no_change = no_change_to_submission?(submission)
+        if submission["has_sub_assignments"] && !no_change
+          @warning_messages[:prevented_grading_ungradeable_submission] = true
+          submission["grade"] = submission["original_grade"]
+        end
         submission["gradeable"] = assignment.fetch(:gradable, nil)
+        # Clean up submission hash
+        submission.delete("has_sub_assignments")
 
         next unless submission.fetch("gradeable").nil?
 
@@ -601,6 +617,7 @@ class GradebookImporter
       new_submission = {
         "grade" => grade,
         "assignment_id" => assignment_id,
+        "has_sub_assignments" => assignment.has_sub_assignments?
       }
       importer_submissions << new_submission
     end
@@ -797,10 +814,17 @@ class GradebookImporter
   end
 
   def assignment_to_hash(assignment)
+    assignment_title = if assignment&.sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC
+                         "#{assignment.title} Reply To Topic"
+                       elsif assignment&.sub_assignment_tag == CheckpointLabels::REPLY_TO_ENTRY
+                         "#{assignment.title} Required Replies"
+                       else
+                         assignment.title
+                       end
     {
       id: assignment.id,
       previous_id: assignment.previous_id,
-      title: assignment.title,
+      title: assignment_title,
       points_possible: assignment.points_possible,
       grading_type: assignment.grading_type
     }

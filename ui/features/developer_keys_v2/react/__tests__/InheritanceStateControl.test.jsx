@@ -18,10 +18,13 @@
 
 import React from 'react'
 import moxios from 'moxios'
-import {screen, render, fireEvent} from '@testing-library/react'
+import {screen, render, fireEvent, waitFor} from '@testing-library/react'
 import storeCreator from '../store/store'
 import actions from '../actions/developerKeysActions'
 import InheritanceStateControl from '../InheritanceStateControl'
+import {confirm} from '@canvas/instui-bindings/react/Confirm'
+
+jest.mock('@canvas/instui-bindings/react/Confirm')
 
 const sampleDeveloperKey = (defaults = {}) => {
   return {
@@ -55,12 +58,9 @@ const renderInheritanceStateControl = (developerKey, store = false, contextId = 
   render(<InheritanceStateControl {...defaultProps(developerKey, store, contextId)} />)
 
 describe('InheritanceStateControl', () => {
-  let oldConfirmation = window.confirm
   let oldFeatures = {}
 
   beforeEach(() => {
-    oldConfirmation = window.confirm
-    window.confirm = jest.fn(() => true)
     window.ENV.FEATURES ||= {}
     oldFeatures = window.ENV.FEATURES
 
@@ -68,7 +68,6 @@ describe('InheritanceStateControl', () => {
   })
 
   afterEach(() => {
-    window.confirm = oldConfirmation
     window.ENV.FEATURES = oldFeatures
 
     moxios.uninstall()
@@ -158,12 +157,14 @@ describe('InheritanceStateControl', () => {
 
     fireEvent.click(item)
 
-    const updatedDevKey = store.getState().listDeveloperKeys.list[0]
+    waitFor(() => {
+      const updatedDevKey = store.getState().listDeveloperKeys.list[0]
 
-    expect(updatedDevKey.developer_key_account_binding.workflow_state).toBe('off')
+      expect(updatedDevKey.developer_key_account_binding.workflow_state).toBe('off')
+    })
   })
 
-  it('updates the state when the Checkbox is clicked', () => {
+  function createStoreAndDevKey() {
     const key = sampleDeveloperKey({
       developer_key_account_binding: {
         developer_key_id: '1',
@@ -176,6 +177,12 @@ describe('InheritanceStateControl', () => {
         list: [key],
       },
     })
+    return {store, key}
+  }
+
+  it('updates the state when the Checkbox is clicked', async () => {
+    confirm.mockImplementation(() => Promise.resolve(true))
+    const {key, store} = createStoreAndDevKey()
 
     renderInheritanceStateControl(key, store)
 
@@ -183,33 +190,29 @@ describe('InheritanceStateControl', () => {
 
     fireEvent.click(item)
 
-    const updatedDevKey = store.getState().listDeveloperKeys.list[0]
-
-    expect(updatedDevKey.developer_key_account_binding.workflow_state).toBe('off')
+    await waitFor(() => {
+      const updatedDevKey = store.getState().listDeveloperKeys.list[0]
+      expect(updatedDevKey.developer_key_account_binding.workflow_state).toBe('off')
+    })
   })
 
-  it('does nothing if cancel is clicked in the confirmation modal', () => {
-    const key = sampleDeveloperKey({
-      developer_key_account_binding: {
-        developer_key_id: '1',
-        workflow_state: 'on',
-        account_owns_binding: true,
-      },
-    })
-    const store = storeCreator({
-      listDeveloperKeys: {
-        list: [key],
-      },
-    })
+  it('does nothing if cancel is clicked in the confirmation modal', async () => {
+    confirm.mockImplementation(() => Promise.resolve(false))
+    const {key, store} = createStoreAndDevKey()
 
-    const {getByRole} = renderInheritanceStateControl(key, store)
-    const item = getByRole('checkbox')
+    renderInheritanceStateControl(key, store)
 
-    fireEvent.change(item, {target: {checked: true}})
+    const item = document.querySelector('input[type="checkbox"]:checked')
 
-    const devKeyFromStore = store.getState().listDeveloperKeys.list[0]
+    fireEvent.click(item)
 
-    expect(devKeyFromStore.developer_key_account_binding.workflow_state).toBe('on')
+    // It's hard to test "wait for nothing to happen", so just
+    // wait a bit and make sure nothing's changed. This seems to be
+    // enough time such that if the confirm() Promise resolves to true,
+    // this test fails.
+    await new Promise(resolve => setTimeout(resolve, 1))
+    const updatedDevKey = store.getState().listDeveloperKeys.list[0]
+    expect(updatedDevKey.developer_key_account_binding.workflow_state).toBe('on')
   })
 
   const rootAccountCTX = {

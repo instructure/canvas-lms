@@ -43,7 +43,7 @@ const nameToSection = (name: string) => {
   switch (name) {
     case 'Callout Cards':
       return <ResourcesSection />
-    case 'Columns':
+    case 'Blank':
       return <ColumnsSection columns={2} />
     case 'Hero':
       return <HeroSection />

@@ -39,6 +39,7 @@ interface Props {
   setNewlyUploadedAttachmentId: (attachmentId: number | null) => void
   onCustomForbiddenWordsEnabledChange: (enabled: boolean) => void
   setCurrentAttachmentId: (attachmentId: number | null) => void
+  setEnableApplyButton: (enabled: boolean) => void
 }
 
 interface ForbiddenWordsResponse {
@@ -62,6 +63,7 @@ const CustomForbiddenWordsSection = ({
   currentAttachmentId,
   passwordPolicyHashExists,
   setCurrentAttachmentId,
+  setEnableApplyButton,
 }: Props) => {
   const linkRef = useRef<HTMLAnchorElement | null>(null)
   const [forbiddenWordsUrl, setForbiddenWordsUrl] = useState<string | null>(null)
@@ -137,6 +139,7 @@ const CustomForbiddenWordsSection = ({
         setForbiddenWordsUrl(null)
         setForbiddenWordsName(null)
         setCommonPasswordsAttachmentId(null)
+        setEnableApplyButton(true)
 
         showFlashAlert({
           message: I18n.t('Forbidden words list deleted successfully.'),
@@ -154,7 +157,7 @@ const CustomForbiddenWordsSection = ({
         type: 'warning',
       })
     }
-  }, [commonPasswordsAttachmentId, setCurrentAttachmentId])
+  }, [commonPasswordsAttachmentId, setCurrentAttachmentId, setEnableApplyButton])
 
   const handleCancelUploadModal = useCallback(() => {
     setFileModalOpen(false)
@@ -255,6 +258,7 @@ const CustomForbiddenWordsSection = ({
         setForbiddenWordsFilename={setForbiddenWordsName}
         setCurrentAttachmentId={setCurrentAttachmentId}
         setCommonPasswordsAttachmentId={setCommonPasswordsAttachmentId}
+        setEnableApplyButton={setEnableApplyButton}
       />
     </>
   )

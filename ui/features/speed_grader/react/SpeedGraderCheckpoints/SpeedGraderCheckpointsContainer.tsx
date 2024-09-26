@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useContext, useEffect, useState} from 'react'
+import React, {useContext, useEffect, useState, useCallback} from 'react'
 import {useQuery} from '@canvas/query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Spinner} from '@instructure/ui-spinner'
@@ -27,6 +27,8 @@ import AssessmentGradeInput from './AssessmentGradeInput'
 import {Flex} from '@instructure/ui-flex'
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
+import {showFlashWarning} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('SpeedGraderCheckpoints')
 
@@ -58,9 +60,10 @@ export type SubAssignmentSubmission = {
   late_policy_status: string
   seconds_late: number
   custom_grade_status_id: null | string
-  grade: string
+  grade: string | number | null
   entered_grade: string
   user_id: string
+  grade_matches_current_submission: boolean
 }
 
 export type Submission = SubAssignmentSubmission & {
@@ -182,15 +185,26 @@ const sortSubmissions = (a: SubAssignmentSubmission, b: SubAssignmentSubmission)
   return getOrder(a.sub_assignment_tag) - getOrder(b.sub_assignment_tag)
 }
 
+const fetchAssignmentFunction = (context: {queryKey: [string, string, string]}) => {
+  const [, courseId, assignmentId] = context.queryKey
+  return fetchAssignment(courseId, assignmentId)
+}
+
+const fetchSubmissionFunction = (context: {queryKey: [string, string, string, string]}) => {
+  const [, courseId, assignmentId, studentId] = context.queryKey
+  return fetchSubmission(courseId, assignmentId, studentId)
+}
+
 export const SpeedGraderCheckpointsContainer = (props: Props) => {
   const queryClient = useQueryClient()
 
   const [shouldAnnounceCurrentGradeChange, setShouldAnnounceCurrentGradeChange] = useState(false)
   const {setOnSuccess} = useContext(AlertManagerContext)
+  const [lastSubmission, setLastSubmission] = useState<SubAssignmentSubmission>(null)
 
   const {data: assignment, isLoading: isLoadingAssignment} = useQuery({
     queryKey: ['speedGraderCheckpointsAssignment', props.courseId, props.assignmentId],
-    queryFn: () => fetchAssignment(props.courseId, props.assignmentId),
+    queryFn: fetchAssignmentFunction,
     enabled: true,
     cacheTime: 0,
     staleTime: 0,
@@ -207,11 +221,27 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
       props.assignmentId,
       props.studentId,
     ],
-    queryFn: () => fetchSubmission(props.courseId, props.assignmentId, props.studentId),
+    queryFn: fetchSubmissionFunction,
     enabled: true,
     cacheTime: 0,
     staleTime: 0,
   })
+
+  const showWarningIfOutlier = useCallback(() => {
+    if (!lastSubmission) return
+
+    const score = Number(lastSubmission.grade)
+    const {points_possible: pointsPossible} = getAssignmentWithPropsFromCheckpoints(
+      assignment,
+      lastSubmission
+    )
+    const outlierScoreHelper = new OutlierScoreHelper(score, pointsPossible)
+
+    if (outlierScoreHelper.hasWarning()) {
+      // $.flashWarning(outlierScoreHelper.warningMessage())
+      showFlashWarning(outlierScoreHelper.warningMessage())()
+    }
+  }, [assignment, lastSubmission])
 
   // make a screenreader announcement any time the current total grade
   // automatically changes for checkpointed discussions
@@ -227,8 +257,15 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
         : I18n.t('Current Total Updated')
       setOnSuccess(announcement)
       setShouldAnnounceCurrentGradeChange(false)
+      showWarningIfOutlier()
     }
-  }, [submission, isRefetchingSubmission, shouldAnnounceCurrentGradeChange, setOnSuccess])
+  }, [
+    submission,
+    isRefetchingSubmission,
+    shouldAnnounceCurrentGradeChange,
+    setOnSuccess,
+    showWarningIfOutlier,
+  ])
 
   const invalidateSubmission = () => {
     queryClient.invalidateQueries([
@@ -294,6 +331,7 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
             lateSubmissionInterval={props.lateSubmissionInterval}
             updateSubmissionGrade={updateSubmissionGrade}
             updateSubmissionStatus={updateSubmissionStatus}
+            setLastSubmission={setLastSubmission}
           />
         )
       })}

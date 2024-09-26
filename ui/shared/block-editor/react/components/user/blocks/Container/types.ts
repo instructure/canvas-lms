@@ -24,5 +24,6 @@ export type ContainerProps = {
   'data-placeholder'?: string
   background?: string
   style?: React.CSSProperties
+  onKeyDown?: (e: React.KeyboardEvent) => void
   children?: React.ReactNode
 }

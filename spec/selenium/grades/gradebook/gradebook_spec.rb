@@ -325,7 +325,7 @@ describe "Gradebook" do
     Gradebook.visit(@course)
     expect(f("body")).not_to contain_css(".late")
 
-    @student_3_submission.write_attribute(:cached_due_date, 1.week.ago)
+    @student_3_submission.cached_due_date = 1.week.ago
     @student_3_submission.save!
     Gradebook.visit(@course)
 

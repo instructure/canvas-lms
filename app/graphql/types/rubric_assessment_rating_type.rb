@@ -25,9 +25,10 @@ module Types
     # This can actually have a nil id (:sigh:), so we cannot use the LegacyIDInterface here
     field :_id, ID, "legacy canvas id", method: :id, null: true
 
-    field :comments, String, null: true
-    field :comments_html, String, null: true
     field :artifact_attempt, Integer, null: false
+    field :comments, String, null: true
+    field :comments_enabled, Boolean, null: false
+    field :comments_html, String, null: true
     def artifact_attempt
       object[:artifact_attempt] || 0
     end

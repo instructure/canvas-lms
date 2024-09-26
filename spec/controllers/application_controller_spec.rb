@@ -765,6 +765,17 @@ RSpec.describe ApplicationController do
         expect { locale = I18n.localizer.call }.to_not raise_error
         expect(locale).to eq("en") # default locale
       end
+
+      it "finds a deleted course if an access token is used" do
+        course_model
+        @course.delete
+
+        controller.instance_variable_set(:@domain_root_account, Account.default)
+        controller.instance_variable_set(:@token, "just some random thing here")
+        allow(controller).to receive_messages(params: { course_id: @course.id })
+        controller.send(:get_context)
+        expect(controller.instance_variable_get(:@context)).to eq @course
+      end
     end
 
     context "require_context" do

@@ -1892,6 +1892,22 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:DISCUSSION_CHECKPOINTS_ENABLED]).to be_truthy
     end
 
+    it "js_env RESTRICT_QUANTITATIVE_DATA is set to true if enabled in course" do
+      user_session(@teacher)
+      @course.restrict_quantitative_data = true
+      @course.save!
+      get :edit, params: { course_id: @course.id, id: @topic.id }
+      expect(assigns[:js_env][:RESTRICT_QUANTITATIVE_DATA]).to be_truthy
+    end
+
+    it "js_env RESTRICT_QUANTITATIVE_DATA is set to false if disabled in course" do
+      user_session(@teacher)
+      @course.restrict_quantitative_data = false
+      @course.save!
+      get :edit, params: { course_id: @course.id, id: @topic.id }
+      expect(assigns[:js_env][:RESTRICT_QUANTITATIVE_DATA]).to be_falsy
+    end
+
     context "conditional-release" do
       before do
         user_session(@teacher)
@@ -1977,7 +1993,7 @@ describe DiscussionTopicsController do
       user_session(@teacher)
       todo_date = 1.day.from_now.in_time_zone("America/New_York")
       post "create", params: { course_id: @course.id, todo_date:, title: "Discussion 1" }, format: "json"
-      expect(response.parsed_body["todo_date"]).to eq todo_date.in_time_zone("UTC").iso8601
+      expect(response.parsed_body["todo_date"]).to eq todo_date.utc.iso8601
     end
 
     it "updates a topic with a todo date" do
@@ -2784,8 +2800,8 @@ describe DiscussionTopicsController do
 
     it "deletes attachments" do
       attachment = @topic.attachment = attachment_model(context: @course)
-      @topic.lock_at = Time.now + 1.week
-      @topic.delayed_post_at = Time.now - 1.week
+      @topic.lock_at = 1.week.from_now
+      @topic.delayed_post_at = 1.week.ago
       @topic.save!
       @topic.unlock!
       put("update", params: { course_id: @course.id, topic_id: @topic.id, remove_attachment: "1" }, format: "json")

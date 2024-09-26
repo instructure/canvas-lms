@@ -42,10 +42,10 @@ module Types
     graphql_name "TardinessBreakdown"
     description "statistics based on timeliness of student submissions"
 
-    field :total, Integer, null: true
     field :late, Float, null: true
     field :missing, Float, null: true
     field :on_time, Float, null: true
+    field :total, Integer, null: true
   end
 
   class StudentSummaryAnalyticsType < ApplicationObjectType

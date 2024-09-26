@@ -438,6 +438,8 @@ module Interfaces::SubmissionInterface
 
   field :assignment_id, ID, null: false
 
+  field :external_tool_url, String, null: true
+
   field :group_id, ID, null: true
   def group_id
     # Unfortunately, we can't use submissions.group_id, since that value is

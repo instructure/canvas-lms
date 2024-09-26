@@ -84,13 +84,13 @@ GEM
     crass (1.0.6)
     diff-lcs (1.5.1)
     docile (1.4.1)
-    dogstatsd-ruby (5.6.1)
+    dogstatsd-ruby (5.6.2)
     drb (2.2.1)
     erubi (1.13.0)
     folio-pagination (0.0.12)
-    i18n (1.14.5)
+    i18n (1.14.6)
       concurrent-ruby (~> 1.0)
-    inst_statsd (3.0.4)
+    inst_statsd (3.0.5)
       aroi (>= 0.0.7)
       dogstatsd-ruby (>= 4.2, < 6.0, != 5.0.0)
       statsd-ruby (~> 1.0)
@@ -145,7 +145,7 @@ GEM
     rake (13.2.1)
     rdoc (6.7.0)
       psych (>= 4.0.0)
-    reline (0.5.9)
+    reline (0.5.10)
       io-console (~> 0.5)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
@@ -153,7 +153,7 @@ GEM
       rspec-mocks (~> 3.13.0)
     rspec-core (3.13.1)
       rspec-support (~> 3.13.0)
-    rspec-expectations (3.13.2)
+    rspec-expectations (3.13.3)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-mocks (3.13.1)
@@ -164,7 +164,7 @@ GEM
       docile (~> 1.1)
       simplecov-html (~> 0.11)
       simplecov_json_formatter (~> 0.1)
-    simplecov-html (0.12.3)
+    simplecov-html (0.13.1)
     simplecov_json_formatter (0.1.4)
     sqlite3 (1.7.3)
       mini_portile2 (~> 2.8.0)
@@ -201,7 +201,7 @@ DEPENDENCIES
   sqlite3
 
 RUBY VERSION
-   ruby 3.1.2p20
+   ruby 3.3.3p89
 
 BUNDLED WITH
    2.5.10

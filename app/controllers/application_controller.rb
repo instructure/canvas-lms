@@ -1129,7 +1129,7 @@ class ApplicationController < ActionController::Base
           end
         end
 
-        render "shared/unauthorized", status: :unauthorized, content_type: Mime::Type.lookup("text/html"), formats: :html
+        return render "shared/unauthorized", status: :unauthorized, content_type: Mime::Type.lookup("text/html"), formats: :html
       end
       format.zip { redirect_to(url_for(path_params)) }
       format.json { render_json_unauthorized }
@@ -1228,8 +1228,8 @@ class ApplicationController < ActionController::Base
     GuardRail.activate(:secondary) do
       unless @context
         if params[:course_id] || (request.url.include?("/graphql") && GET_CONTEXT_GRAPHQL_OPERATION_NAMES.include?(params[:operationName]))
-
-          @context = params[:course_id] ? api_find(Course.active, params[:course_id]) : pull_context_course
+          course_scope = @token ? Course : Course.active
+          @context = params[:course_id] ? api_find(course_scope, params[:course_id]) : pull_context_course
           return if @context.nil? # When doing pull_context_course it's possible to get a nil context, if that happen, we don't want to continue.
 
           @context.root_account = @domain_root_account if @context.root_account_id == @domain_root_account.id # no sense in refetching it
@@ -1448,10 +1448,12 @@ class ApplicationController < ActionController::Base
   end
 
   def get_upcoming_assignments(course)
+    include_discussion_checkpoints = course.root_account.feature_enabled?(:discussion_checkpoints)
     visible_assignments = AssignmentGroup.visible_assignments(
       @current_user,
       course,
-      course.assignment_groups.active
+      course.assignment_groups.active,
+      include_discussion_checkpoints:
     )
 
     log_course(course)
@@ -1459,7 +1461,8 @@ class ApplicationController < ActionController::Base
       assignments_scope: visible_assignments,
       user: @current_user,
       session:,
-      course:
+      course:,
+      include_discussion_checkpoints:
     )
     sorter.assignments(:upcoming) do |assignments|
       assignments.group("assignments.id").order("MIN(submissions.cached_due_date) ASC").to_a
@@ -3192,8 +3195,8 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def recaptcha_enabled?(**kwargs)
-    DynamicSettings.find(tree: :private)["recaptcha_server_key", **kwargs].present? && @domain_root_account.self_registration_captcha?
+  def recaptcha_enabled?(**)
+    DynamicSettings.find(tree: :private)["recaptcha_server_key", **].present? && @domain_root_account.self_registration_captcha?
   end
 
   def peer_reviews_for_a2_enabled?

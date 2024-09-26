@@ -22,6 +22,7 @@ import {generateModalTitle, TempEnrollModal} from '../TempEnrollModal'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
 import {
+  type DuplicateUser,
   type EnrollmentType,
   MAX_ALLOWED_COURSES_PER_PAGE,
   PROVIDER,
@@ -44,7 +45,7 @@ const recipientUser = {
   user_name: 'Recipient User',
   user_id: '2',
   address: 'recipient@instructure.com',
-} as User
+} as DuplicateUser
 
 // Temporary Enrollment Recipient after GET profile
 const recipientProfile = {
@@ -122,14 +123,17 @@ const ENROLLMENTS_URI = encodeURI(
   `/api/v1/users/${modalProps.user.id}/courses?enrollment_state=active&include[]=sections&include[]=term&per_page=${MAX_ALLOWED_COURSES_PER_PAGE}&account_id=${enrollmentsByCourse[0].account_id}`
 )
 
+// user_list did not match the encoded url (hence user_list[])
 const userListsData = {
-  user_list: '',
+  'user_list[]': '',
   v2: true,
   search_type: 'cc_path',
 }
 const userListsParams = Object.entries(userListsData)
   .map(([key, value]) => `${key}=${value}`)
   .join('&')
+
+const USER_LIST_URI = encodeURI(`/accounts/1/user_lists.json?${userListsParams}`)
 
 const userDetailsUriMock = (userId: string, response: object) =>
   fetchMock.get(`/api/v1/users/${userId}/profile`, response)
@@ -168,17 +172,17 @@ describe('TempEnrollModal', () => {
       </TempEnrollModal>
     )
 
-    expect(screen.queryByText('Find a recipient of Temporary Enrollments')).toBeNull()
+    expect(screen.queryByText('Find recipients of Temporary Enrollments')).toBeNull()
 
     // trigger the modal to open and display the search screen (page 1)
     await userEvent.click(screen.getByText('child_element'))
 
-    expect(screen.getByText('Find a recipient of Temporary Enrollments')).toBeInTheDocument()
+    expect(screen.getByText('Find recipients of Temporary Enrollments')).toBeInTheDocument()
   })
 
   describe('after opening modal', () => {
     beforeEach(async () => {
-      fetchMock.post(`/accounts/1/user_lists.json?${userListsParams}`, userData)
+      fetchMock.post(USER_LIST_URI, userData)
       userDetailsUriMock(recipientUser.user_id, recipientProfile)
       fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
       render(
@@ -192,7 +196,7 @@ describe('TempEnrollModal', () => {
     })
 
     it('hides the modal upon clicking the cancel button', async () => {
-      expect(screen.queryByText('Find a recipient of Temporary Enrollments')).toBeInTheDocument()
+      expect(screen.queryByText('Find recipients of Temporary Enrollments')).toBeInTheDocument()
 
       const cancel = await screen.findByRole('button', {name: 'Cancel'})
       await waitFor(() => {
@@ -204,7 +208,7 @@ describe('TempEnrollModal', () => {
       // wait for the modal to close (including animation)
       await waitFor(() => {
         expect(
-          screen.queryByText('Find a recipient of Temporary Enrollments')
+          screen.queryByText('Find recipients of Temporary Enrollments')
         ).not.toBeInTheDocument()
       })
     })
@@ -233,7 +237,7 @@ describe('TempEnrollModal', () => {
       expect(submit).toBeInTheDocument()
       fireEvent.click(submit)
 
-      expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
+      expect(fetchMock.calls(USER_LIST_URI).length).toBe(1)
       expect(fetchMock.calls('/api/v1/users/2/profile').length).toBe(1)
       expect(fetchMock.calls(ENROLLMENTS_URI).length).toBe(1)
     })
@@ -257,7 +261,7 @@ describe('TempEnrollModal', () => {
         expect(screen.queryByText(/to be assigned temporary enrollments/)).toBeNull()
       })
 
-      expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
+      expect(fetchMock.calls(USER_LIST_URI).length).toBe(1)
       expect(fetchMock.calls('/api/v1/users/2/profile').length).toBe(1)
     })
 
@@ -289,7 +293,7 @@ describe('TempEnrollModal', () => {
         expect(screen.queryByText(/to be assigned temporary enrollments/)).toBeInTheDocument()
       })
 
-      expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
+      expect(fetchMock.calls(USER_LIST_URI).length).toBe(1)
       expect(fetchMock.calls('/api/v1/users/2/profile').length).toBe(1)
       expect(fetchMock.calls(ENROLLMENTS_URI).length).toBe(1)
     })
@@ -305,37 +309,37 @@ describe('TempEnrollModal', () => {
   describe('generateModalTitle', () => {
     describe('assign page titles (page >= 2)', () => {
       it('should return assign page title for recipient when page >= 2', () => {
-        const title = generateModalTitle(recipientProfile, RECIPIENT, false, 2, null)
+        const title = generateModalTitle(recipientProfile, RECIPIENT, false, 2, [])
         expect(title).toBe(`Assign temporary enrollments to ${recipientUser.user_name}`)
       })
 
       it('should return assign page title with enrollment name when page >= 2 and enrollment is provided', () => {
-        const title = generateModalTitle(providerUser, PROVIDER, false, 2, recipientProfile)
+        const title = generateModalTitle(providerUser, PROVIDER, false, 2, [recipientProfile])
         expect(title).toBe(`Assign temporary enrollments to ${recipientUser.user_name}`)
       })
 
       it('should return a fallback title when page >= 2 and no valid recipient is provided', () => {
-        const title = generateModalTitle(providerUser, PROVIDER, false, 2, null)
+        const title = generateModalTitle(providerUser, PROVIDER, false, 2, [])
         expect(title).toBe('Assign temporary enrollments')
       })
     })
 
     describe('edit mode titles', () => {
       it('should return provider’s recipients title when in edit mode and type is provider', () => {
-        const title = generateModalTitle(providerUser, PROVIDER, true, 1, null)
+        const title = generateModalTitle(providerUser, PROVIDER, true, 1, [])
         expect(title).toBe(`Temporary Enrollment Recipients for ${providerUser.name}`)
       })
 
       it('should return recipient’s providers title when in edit mode and type is recipient', () => {
-        const title = generateModalTitle(recipientProfile, RECIPIENT, true, 1, null)
+        const title = generateModalTitle(recipientProfile, RECIPIENT, true, 1, [])
         expect(title).toBe(`Temporary Enrollment Providers for ${recipientUser.user_name}`)
       })
     })
 
     describe('default title', () => {
       it('should return default title when not in edit mode and page < 2', () => {
-        const title = generateModalTitle(providerUser, RECIPIENT, false, 1, null)
-        expect(title).toBe('Find a recipient of Temporary Enrollments')
+        const title = generateModalTitle(providerUser, RECIPIENT, false, 1, [])
+        expect(title).toBe('Find recipients of Temporary Enrollments')
       })
     })
   })

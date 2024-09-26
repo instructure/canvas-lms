@@ -106,7 +106,7 @@ describe ContextModuleProgression do
     end
   end
 
-  context "#evaluate" do
+  describe "#evaluate" do
     let(:module_progression) do
       p = @module.context_module_progressions.create!(
         context_module: @module,

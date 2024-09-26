@@ -59,7 +59,7 @@ class ContentTag < ActiveRecord::Base
   belongs_to :context_module
   belongs_to :learning_outcome
   # This allows doing a has_many_through relationship on ContentTags for linked LearningOutcomes. (see LearningOutcomeContext)
-  belongs_to :learning_outcome_content, class_name: "LearningOutcome", foreign_key: :content_id
+  belongs_to :learning_outcome_content, class_name: "LearningOutcome", foreign_key: :content_id, inverse_of: false
   has_many :learning_outcome_results
   belongs_to :root_account, class_name: "Account"
 
@@ -210,7 +210,7 @@ class ContentTag < ActiveRecord::Base
   protected :default_values
 
   def context_code
-    read_attribute(:context_code) || "#{context_type.to_s.underscore}_#{context_id}" rescue nil
+    super || "#{context_type.to_s.underscore}_#{context_id}" rescue nil
   end
 
   def context_name
@@ -915,7 +915,12 @@ class ContentTag < ActiveRecord::Base
       SubmissionLifecycleManager.recompute(content, update_grades: true)
     elsif content.assignment
       content.assignment.clear_cache_key(:availability)
-      SubmissionLifecycleManager.recompute(content.assignment, update_grades: true)
+      create_sub_assignment_submissions = false
+      if content.assignment.checkpoints_parent?
+        create_sub_assignment_submissions = true
+      end
+
+      SubmissionLifecycleManager.recompute(content.assignment, update_grades: true, create_sub_assignment_submissions:)
     end
   end
 

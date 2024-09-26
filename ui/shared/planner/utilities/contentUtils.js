@@ -40,6 +40,8 @@ export function assignmentType(itemType) {
       return I18n.t('Quiz')
     case 'Discussion':
       return I18n.t('Discussion')
+    case 'Discussion Checkpoint':
+      return I18n.t('Discussion')
     case 'Assignment':
       return I18n.t('Assignment')
     case 'Page':

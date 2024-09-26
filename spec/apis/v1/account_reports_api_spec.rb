@@ -103,6 +103,19 @@ describe "Account Reports API", type: :request do
       assert_status(400)
     end
 
+    it "accepts comma-separated enrollment_term_id param" do
+      Account.default.enrollment_terms.create!
+      report = api_call(:post,
+                        "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}",
+                        { report: @report.report_type,
+                          controller: "account_reports",
+                          action: "create",
+                          format: "json",
+                          account_id: @admin.account.id.to_s,
+                          parameters: { "enrollment_term_id" => Account.default.enrollment_terms.pluck(:id).join(",") } })
+      expect(report).to have_key("id")
+    end
+
     it "ignores empty enrollment_term_id param" do
       report = api_call(:post,
                         "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}",

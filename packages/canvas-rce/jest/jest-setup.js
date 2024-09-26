@@ -44,6 +44,7 @@ const ignoredErrors = [
   /failed updating video captions/,
   /You seem to have overlapping act\(\) calls/,
   /A theme registry has already been initialized/,
+  /Warning: Failed prop type: Invalid prop `color` of value `secondary` supplied to `CondensedButton`, expected one of \["primary","primary-inverse"\]./,
 ]
 const globalWarn = global.console.warn
 const ignoredWarnings = [

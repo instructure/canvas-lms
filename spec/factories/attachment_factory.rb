@@ -81,6 +81,7 @@ module Factories
   end
 
   def stub_png_data(filename = "test my file? hai!&.png", data = nil)
+    data ||= file_fixture("instructure.png").read
     stub_file_data(filename, data, "image/png")
   end
 

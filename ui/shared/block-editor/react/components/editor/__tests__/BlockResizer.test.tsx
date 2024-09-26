@@ -22,7 +22,6 @@ import userEvent from '@testing-library/user-event'
 import {useNode} from '@craftjs/core'
 import {render} from '@testing-library/react'
 import {BlockResizer, type Sz} from '../BlockResizer'
-import {eq} from 'lodash'
 
 const user = userEvent.setup()
 
@@ -30,6 +29,7 @@ let props: Sz = {width: 100, height: 125}
 let maintainAspectRatio = false
 
 const nodeDomNode = document.createElement('div')
+// @ts-expect-error
 nodeDomNode.getBoundingClientRect = jest.fn(() => {
   return {top: 0, left: 0, ...props}
 })
@@ -79,11 +79,6 @@ describe('BlockResizer', () => {
     expect(document.querySelector('.block-resizer .moveable-ne')).toBeInTheDocument()
     expect(document.querySelector('.block-resizer .moveable-sw')).toBeInTheDocument()
     expect(document.querySelector('.block-resizer .moveable-se')).toBeInTheDocument()
-
-    expect(document.querySelector('.block-resizer .moveable-n')).toBeInTheDocument()
-    expect(document.querySelector('.block-resizer .moveable-s')).toBeInTheDocument()
-    expect(document.querySelector('.block-resizer .moveable-e')).toBeInTheDocument()
-    expect(document.querySelector('.block-resizer .moveable-w')).toBeInTheDocument()
 
     const edges = document.querySelectorAll('.block-resizer .moveable-line')
     expect(edges).toHaveLength(4)

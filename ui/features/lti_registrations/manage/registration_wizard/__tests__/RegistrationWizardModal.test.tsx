@@ -76,7 +76,7 @@ describe('RegistrationWizardModal', () => {
         exitOnCancel: false,
         jsonUrl: '',
         onSuccessfulInstallation: jest.fn(),
-        jsonUrlFetch: {_tag: 'initial'},
+        jsonFetch: {_tag: 'initial'},
       })
     })
 
@@ -138,8 +138,9 @@ describe('RegistrationWizardModal', () => {
         registering: false,
         exitOnCancel: false,
         jsonUrl: '',
+        jsonCode: '',
         onSuccessfulInstallation: jest.fn(),
-        jsonUrlFetch: {_tag: 'initial'},
+        jsonFetch: {_tag: 'initial'},
       })
     })
 
@@ -247,6 +248,181 @@ describe('RegistrationWizardModal', () => {
     })
   })
 
+  describe('When opened with JSON Code', () => {
+    beforeEach(() => {
+      openRegistrationWizard({
+        dynamicRegistrationUrl: '',
+        unifiedToolId: undefined,
+        lti_version: '1p3',
+        method: 'json',
+        registering: false,
+        exitOnCancel: false,
+        jsonUrl: '',
+        jsonCode: '',
+        onSuccessfulInstallation: jest.fn(),
+        jsonFetch: {_tag: 'initial'},
+      })
+    })
+
+    it('should validate the json configuration', async () => {
+      const accountId = ZAccountId.parse('123')
+      const fetchThirdPartyToolConfiguration = jest
+        .fn()
+        .mockResolvedValue(success(mockInternalConfiguration()))
+
+      const jsonUrlWizardService = mockJsonUrlWizardService({fetchThirdPartyToolConfiguration})
+
+      const screen = render(
+        <RegistrationWizardModal
+          accountId={accountId}
+          {...emptyServices}
+          jsonUrlWizardService={jsonUrlWizardService}
+        />
+      )
+      screen.getByTestId('json-code-input').focus()
+
+      await userEvent.paste('{}')
+
+      await userEvent.click(screen.getByTestId('registration-wizard-next-button'))
+
+      expect(fetchThirdPartyToolConfiguration).toHaveBeenCalledWith(
+        {lti_configuration: {}},
+        accountId
+      )
+    })
+
+    it('renders an error screen when the third party configuration fetch fails', async () => {
+      const accountId = ZAccountId.parse('123')
+      const fetchThirdPartyToolConfiguration = jest
+        .fn()
+        .mockResolvedValue(
+          genericError('An error occurred while fetching the third party tool configuration.')
+        )
+
+      const jsonUrlWizardService = mockJsonUrlWizardService({fetchThirdPartyToolConfiguration})
+
+      const screen = render(
+        <RegistrationWizardModal
+          accountId={accountId}
+          {...emptyServices}
+          jsonUrlWizardService={jsonUrlWizardService}
+        />
+      )
+      screen.getByTestId('json-code-input').focus()
+
+      await userEvent.paste('{}')
+
+      await userEvent.click(screen.getByTestId('registration-wizard-next-button'))
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(/An error occurred. Please try again./i, {ignore: 'title'})
+        ).toBeInTheDocument()
+      })
+
+      expect(fetchThirdPartyToolConfiguration).toHaveBeenCalledWith(
+        {lti_configuration: {}},
+        accountId
+      )
+    })
+
+    it('renders an error screen when the third party configuration is invalid', async () => {
+      const accountId = ZAccountId.parse('123')
+
+      const fetchThirdPartyToolConfiguration = jest
+        .fn()
+        .mockResolvedValue(apiError(422, {errors: ['Bad config']}))
+
+      const jsonUrlWizardService = mockJsonUrlWizardService({fetchThirdPartyToolConfiguration})
+
+      const screen = render(
+        <RegistrationWizardModal
+          accountId={accountId}
+          {...emptyServices}
+          jsonUrlWizardService={jsonUrlWizardService}
+        />
+      )
+      screen.getByTestId('json-code-input').focus()
+
+      await userEvent.paste('{}')
+
+      await userEvent.click(screen.getByTestId('registration-wizard-next-button'))
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            /The configuration is invalid. Please reach out to the app provider for assistance./i,
+            {ignore: 'title'}
+          )
+        ).toBeInTheDocument()
+      })
+
+      expect(fetchThirdPartyToolConfiguration).toHaveBeenCalledWith(
+        {lti_configuration: {}},
+        accountId
+      )
+    })
+  })
+
+  describe('When opened with Manual', () => {
+    beforeEach(() => {
+      openRegistrationWizard({
+        dynamicRegistrationUrl: '',
+        unifiedToolId: undefined,
+        lti_version: '1p3',
+        method: 'manual',
+        registering: false,
+        exitOnCancel: false,
+        jsonUrl: '',
+        jsonCode: '',
+        onSuccessfulInstallation: jest.fn(),
+        jsonFetch: {_tag: 'initial'},
+      })
+    })
+
+    it('should disable the Next button when the name is empty', async () => {
+      const accountId = ZAccountId.parse('123')
+
+      const screen = render(
+        <RegistrationWizardModal
+          accountId={accountId}
+          {...emptyServices}
+          jsonUrlWizardService={mockJsonUrlWizardService()}
+        />
+      )
+      screen.getByTestId('manual-name-input').focus()
+
+      await userEvent.paste('')
+
+      expect(screen.getByTestId('registration-wizard-next-button')).toBeDisabled()
+
+      await userEvent.paste('   ')
+
+      expect(screen.getByTestId('registration-wizard-next-button')).toBeDisabled()
+    })
+
+    it('should start the registration wizard when the user clicks Next', async () => {
+      const accountId = ZAccountId.parse('123')
+
+      const screen = render(
+        <RegistrationWizardModal
+          accountId={accountId}
+          {...emptyServices}
+          jsonUrlWizardService={mockJsonUrlWizardService()}
+        />
+      )
+      screen.getByTestId('manual-name-input').focus()
+
+      await userEvent.paste('My App')
+
+      await userEvent.click(screen.getByTestId('registration-wizard-next-button'))
+
+      await waitFor(() => {
+        expect(screen.getByText(/LTI 1.3 Registration/i)).toBeInTheDocument()
+      })
+    })
+  })
+
   describe('when pre-opened with dynamic registration', () => {
     it('should exit the modal when the cancel button is clicked & exitOnCancel is true', async () => {
       openRegistrationWizard({
@@ -258,7 +434,7 @@ describe('RegistrationWizardModal', () => {
         exitOnCancel: true,
         jsonUrl: '',
         onSuccessfulInstallation: jest.fn(),
-        jsonUrlFetch: {_tag: 'initial'},
+        jsonFetch: {_tag: 'initial'},
       })
       const accountId = ZAccountId.parse('123')
       const screen = render(<RegistrationWizardModal accountId={accountId} {...emptyServices} />)

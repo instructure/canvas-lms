@@ -30,7 +30,6 @@ import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegi
 
 describe('ExternalToolSelectionDialog', () => {
   const fakeEnv = createDeepMockProxy<ExternalToolsEnv>()
-
   function buildProps(
     override: Partial<ExternalToolSelectionDialogProps> = {}
   ): ExternalToolSelectionDialogProps {
@@ -129,6 +128,7 @@ describe('ExternalToolSelectionDialog', () => {
   })
 
   it('calls onAction when clicking a tool', () => {
+    window.CSS.supports = () => false
     const helpers = RceToolWrapper.forEditorEnv(
       createDeepMockProxy<ExternalToolsEnv>({
         ltiIframeAllowPolicy: 'allow',

@@ -49,8 +49,9 @@ const IconPopup = ({iconName}: IconPopupProps) => {
     (newIconName: string) => {
       setSelectedIcon(newIconName)
       setProp((prps: {iconName: string}) => (prps.iconName = newIconName))
+      handleHideContent()
     },
-    [setProp]
+    [handleHideContent, setProp]
   )
 
   return (
@@ -72,7 +73,7 @@ const IconPopup = ({iconName}: IconPopupProps) => {
       shouldReturnFocus={true}
       shouldCloseOnDocumentClick={true}
     >
-      <IconPicker iconName={selectedIcon} onSelect={handleSelectIcon} />
+      <IconPicker iconName={selectedIcon} onSelect={handleSelectIcon} onClose={handleHideContent} />
     </Popover>
   )
 }

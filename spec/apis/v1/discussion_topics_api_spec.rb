@@ -2768,8 +2768,8 @@ describe DiscussionTopicsController, type: :request do
     end
 
     it "sorts top-level entries by descending created_at" do
-      @older_entry = create_entry(@topic, message: "older top-level entry", created_at: Time.now - 1.minute)
-      @newer_entry = create_entry(@topic, message: "newer top-level entry", created_at: Time.now + 1.minute)
+      @older_entry = create_entry(@topic, message: "older top-level entry", created_at: 1.minute.ago)
+      @newer_entry = create_entry(@topic, message: "newer top-level entry", created_at: 1.minute.from_now)
       json = api_call(
         :get,
         "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
@@ -2785,8 +2785,8 @@ describe DiscussionTopicsController, type: :request do
     end
 
     it "sorts replies included on top-level entries by descending created_at" do
-      @older_reply = create_reply(@entry, message: "older reply", created_at: Time.now - 1.minute)
-      @newer_reply = create_reply(@entry, message: "newer reply", created_at: Time.now + 1.minute)
+      @older_reply = create_reply(@entry, message: "older reply", created_at: 1.minute.ago)
+      @newer_reply = create_reply(@entry, message: "newer reply", created_at: 1.minute.from_now)
       json = api_call(
         :get,
         "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
@@ -2912,8 +2912,8 @@ describe DiscussionTopicsController, type: :request do
     end
 
     it "sorts replies by descending created_at" do
-      @older_reply = create_reply(@entry, message: "older reply", created_at: Time.now - 1.minute)
-      @newer_reply = create_reply(@entry, message: "newer reply", created_at: Time.now + 1.minute)
+      @older_reply = create_reply(@entry, message: "older reply", created_at: 1.minute.ago)
+      @newer_reply = create_reply(@entry, message: "newer reply", created_at: 1.minute.from_now)
       json = api_call(
         :get,
         "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies.json",
@@ -3864,7 +3864,7 @@ describe DiscussionTopicsController, type: :request do
         @reply1 = @root1.reply_from(user: @teacher, html: "reply1")
 
         # materialized view jobs are now delayed
-        Timecop.travel(Time.now + 20.seconds) do
+        Timecop.travel(20.seconds.from_now) do
           run_jobs
 
           # make everything slightly in the past to test updating
@@ -3913,7 +3913,7 @@ describe DiscussionTopicsController, type: :request do
       @root1 = @topic.reply_from(user: @student, html: "root1")
 
       # materialized view jobs are now delayed
-      Timecop.travel(Time.now + 20.seconds) do
+      Timecop.travel(20.seconds.from_now) do
         run_jobs
 
         # make everything slightly in the past to test updating
@@ -3975,7 +3975,7 @@ describe DiscussionTopicsController, type: :request do
 
       link = "/courses/#{@course.id}/discussion_topics"
       # materialized view jobs are now delayed
-      Timecop.travel(Time.now + 20.seconds) do
+      Timecop.travel(20.seconds.from_now) do
         run_jobs
 
         # make everything slightly in the past to test updating
@@ -4353,7 +4353,7 @@ describe DiscussionTopicsController, type: :request do
     context "should not be shown" do
       def check_access(json)
         expect(json["new_entries"]).to be_nil
-        expect(%w[unauthorized unauthenticated]).to include(json["status"])
+        expect(json["status"]).to be_in %w[unauthorized unauthenticated]
       end
 
       before do

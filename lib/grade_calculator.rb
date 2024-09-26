@@ -30,7 +30,8 @@ class GradeCalculator
       update_course_score: true,
       only_update_course_gp_metadata: false,
       only_update_points: false,
-      use_what_if_scores: false
+      use_what_if_scores: false,
+      include_discussion_checkpoints: false
     )
 
     @course = course.is_a?(Course) ? course : Course.find(course)
@@ -78,6 +79,7 @@ class GradeCalculator
     @only_update_course_gp_metadata = opts[:only_update_course_gp_metadata]
     @only_update_points = opts[:only_update_points]
     @use_what_if_scores = opts[:use_what_if_scores]
+    @include_discussion_checkpoints = opts[:include_discussion_checkpoints]
   end
 
   # recomputes the scores and saves them to each user's Enrollment
@@ -105,11 +107,17 @@ class GradeCalculator
   end
 
   def submissions
+    assignments = if @include_discussion_checkpoints
+                    checkpoint_assignments = @assignments.select(&:has_sub_assignments?).map(&:sub_assignments).flatten
+                    @assignments += checkpoint_assignments
+                  else
+                    @assignments
+                  end
     @submissions ||= begin
       submissions = @course.submissions
                            .except(:order, :select)
                            .for_user(@user_ids)
-                           .where(assignment_id: @assignments)
+                           .where(assignment_id: assignments)
                            .select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state, submissions.posted_at, student_entered_score")
                            .preload(:assignment)
 

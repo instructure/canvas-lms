@@ -65,8 +65,8 @@ module Auditors::ActiveRecord
       Setting.get("auditor_partitions_keep_months", 14).to_i
     end
 
-    def self.log(*args)
-      logger&.info(*args)
+    def self.log(*)
+      logger&.info(*)
     end
 
     def self.processed?

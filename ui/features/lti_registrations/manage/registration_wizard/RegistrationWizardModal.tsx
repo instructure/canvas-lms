@@ -23,7 +23,7 @@ import {
   useRegistrationModalWizardState,
   type RegistrationWizardModalState,
   type RegistrationWizardModalStateActions,
-  type JsonUrlFetchStatus,
+  type JsonFetchStatus,
 } from './RegistrationWizardModalState'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextInput} from '@instructure/ui-text-input'
@@ -41,6 +41,9 @@ import {Lti1p3RegistrationWizard} from '../lti_1p3_registration_form/Lti1p3Regis
 import type {JsonUrlWizardService} from './JsonUrlWizardService'
 import * as z from 'zod'
 import {isSuccessful, isUnsuccessful} from '../../common/lib/apiResult/ApiResult'
+import {TextArea} from '@instructure/ui-text-area'
+import {isValidJson} from '../../common/lib/validators/isValidJson'
+import type {FormMessage} from '@instructure/ui-form-field'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -115,14 +118,14 @@ const ModalBodyWrapper = ({
 }) => {
   if (state.registering) {
     if (
-      state.method === 'json_url' &&
-      state.jsonUrlFetch._tag === 'loaded' &&
-      isSuccessful(state.jsonUrlFetch.result)
+      (state.method === 'json_url' || state.method === 'json') &&
+      state.jsonFetch._tag === 'loaded' &&
+      isSuccessful(state.jsonFetch.result)
     ) {
       return (
         <Lti1p3RegistrationWizard
           accountId={accountId}
-          internalConfiguration={state.jsonUrlFetch.result.data}
+          internalConfiguration={state.jsonFetch.result.data}
           unifiedToolId={state.unifiedToolId}
           onSuccessfulRegistration={() => {
             state.close()
@@ -151,6 +154,25 @@ const ModalBodyWrapper = ({
           }}
         />
       )
+    } else if (state.method === 'manual') {
+      return (
+        <Lti1p3RegistrationWizard
+          accountId={accountId}
+          internalConfiguration={{
+            title: state.manualAppName.trim(),
+            target_link_uri: '',
+            scopes: [],
+            oidc_initiation_url: '',
+            placements: [],
+          }}
+          unifiedToolId={state.unifiedToolId}
+          onSuccessfulRegistration={() => {
+            state.close()
+            state.onSuccessfulInstallation?.()
+          }}
+          unregister={state.unregister}
+        />
+      )
     } else {
       return (
         <InitializationModalBody
@@ -177,7 +199,7 @@ export type InitializationModalBodyProps = {
   accountId: AccountId
 }
 
-const renderDebugMessage = (jsonUrlFetch: JsonUrlFetchStatus) => {
+const renderDebugMessage = (jsonUrlFetch: JsonFetchStatus) => {
   if (jsonUrlFetch._tag === 'loaded' && jsonUrlFetch.result._type === 'ApiError') {
     const result = z.object({errors: z.array(z.string())}).safeParse(jsonUrlFetch.result.body)
     if (result.success) {
@@ -236,6 +258,10 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
                     props.state.updateMethod('dynamic_registration')
                   } else if (value === 'json_url') {
                     props.state.updateMethod('json_url')
+                  } else if (value === 'json') {
+                    props.state.updateMethod('json')
+                  } else if (value === 'manual') {
+                    props.state.updateMethod('manual')
                   } else {
                     // todo: add other methods here
                   }
@@ -249,6 +275,18 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
                     {I18n.t('Enter URL')}
                   </SimpleSelect.Option>
                 )}
+
+                {window.ENV.FEATURES.lti_registrations_next && (
+                  <SimpleSelect.Option id="json" value="json">
+                    {I18n.t('JSON')}
+                  </SimpleSelect.Option>
+                )}
+
+                {window.ENV.FEATURES.lti_registrations_next && (
+                  <SimpleSelect.Option id="manual" value="manual">
+                    {I18n.t('Manual')}
+                  </SimpleSelect.Option>
+                )}
               </SimpleSelect>
             </View>
             {props.state.method === 'dynamic_registration' && (
@@ -257,14 +295,7 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
                   renderLabel={I18n.t('Dynamic Registration URL')}
                   value={props.state.dynamicRegistrationUrl}
                   onChange={(_e, value) => props.state.updateDynamicRegistrationUrl(value)}
-                  messages={[
-                    {
-                      text: I18n.t(
-                        'You can locate this URL on the integration page of the tool if it supports this method'
-                      ),
-                      type: 'hint',
-                    },
-                  ]}
+                  messages={dynamicRegistrationUrlInputMessages(props.state)}
                 />
               </View>
             )}
@@ -275,11 +306,38 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
                   renderLabel={I18n.t('JSON URL')}
                   value={props.state.jsonUrl}
                   onChange={(_e, value) => props.state.updateJsonUrl(value)}
-                  messages={jsonUrlFetchMessages(props.state)}
+                  messages={jsonUrlInputMessages(props.state)}
                 />
               </View>
             )}
-            {debugging && renderDebugMessage(props.state.jsonUrlFetch)}
+            {props.state.method === 'json' && (
+              <View display="block" margin="medium 0">
+                <TextArea
+                  data-testid="json-code-input"
+                  label={I18n.t('JSON Code')}
+                  value={props.state.jsonCode}
+                  onChange={event => props.state.updateJsonCode(event.currentTarget.value)}
+                  height="10em"
+                  maxHeight="10em"
+                  themeOverride={{
+                    fontFamily: 'monospace',
+                  }}
+                  messages={jsonCodeInputMessages(props.state)}
+                />
+              </View>
+            )}
+
+            {props.state.method === 'manual' && (
+              <View display="block" margin="medium 0">
+                <TextInput
+                  data-testid="manual-name-input"
+                  renderLabel={I18n.t('App Name')}
+                  value={props.state.manualAppName}
+                  onChange={(_e, value) => props.state.updateManualAppName(value)}
+                />
+              </View>
+            )}
+            {debugging && renderDebugMessage(props.state.jsonFetch)}
           </>
         )}
       </RegistrationModalBody>
@@ -290,14 +348,20 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
           color="primary"
           type="submit"
           margin="small"
-          disabled={validForm(props.state) === false || props.state.jsonUrlFetch._tag === 'loading'}
+          disabled={validForm(props.state) === false || props.state.jsonFetch._tag === 'loading'}
           onClick={() => {
             // if it's json_url, we need to fetch the configuration first
-            if (props.state.method === 'json_url') {
+            if (props.state.method === 'json_url' || props.state.method === 'json') {
               props.state.updateJsonFetchStatus({_tag: 'loading'})
+              const body =
+                props.state.method === 'json'
+                  ? {
+                      lti_configuration: JSON.parse(props.state.jsonCode),
+                    }
+                  : {url: props.state.jsonUrl}
               // eslint-disable-next-line promise/catch-or-return
               props.jsonUrlWizardService
-                .fetchThirdPartyToolConfiguration({url: props.state.jsonUrl}, props.accountId)
+                .fetchThirdPartyToolConfiguration(body, props.accountId)
                 .then(result => {
                   props.state.updateJsonFetchStatus({
                     _tag: 'loaded',
@@ -309,7 +373,7 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
             }
           }}
         >
-          {props.state.jsonUrlFetch._tag === 'loading' ? I18n.t('Loading') : I18n.t('Next')}
+          {props.state.jsonFetch._tag === 'loading' ? I18n.t('Loading') : I18n.t('Next')}
         </Button>
       </Modal.Footer>
     </>
@@ -322,6 +386,10 @@ const validForm = (state: RegistrationWizardModalState) => {
       return isValidHttpUrl(state.dynamicRegistrationUrl)
     } else if (state.method === 'json_url') {
       return isValidHttpUrl(state.jsonUrl)
+    } else if (state.method === 'json') {
+      return isValidJson(state.jsonCode)
+    } else if (state.method === 'manual') {
+      return state.manualAppName.trim() !== ''
     } else {
       return false
     }
@@ -330,18 +398,83 @@ const validForm = (state: RegistrationWizardModalState) => {
   }
 }
 
-const jsonUrlFetchMessages = (state: RegistrationWizardModalState) => {
-  const jsonUrlFetch = state.jsonUrlFetch
-  if (jsonUrlFetch._tag === 'loaded' && isUnsuccessful(jsonUrlFetch.result)) {
-    const errorType = jsonUrlFetch.result._type
+const dynamicRegistrationUrlInputMessages = (
+  state: RegistrationWizardModalState
+): Array<FormMessage> => {
+  const defaultMessage: FormMessage = {
+    text: I18n.t(
+      'You can locate this URL on the integration page of the tool if it supports this method'
+    ),
+    type: 'hint',
+  }
+  if (!isValidHttpUrl(state.dynamicRegistrationUrl) && state.dynamicRegistrationUrl.trim() !== '') {
+    return [{text: I18n.t('Please enter a valid URL'), type: 'error'}, defaultMessage]
+  } else {
+    return [defaultMessage]
+  }
+}
+
+/**
+ * Constructs error & info messages for the JSON URL input field
+ * @param state
+ * @returns
+ */
+const jsonUrlInputMessages = (state: RegistrationWizardModalState): Array<FormMessage> => {
+  const fetchMessages = jsonFetchMessages(state)
+  // if the URL is invalid, we need to show that message
+
+  const withInfoMessage =
+    fetchMessages.length === 0
+      ? [
+          {
+            text: I18n.t(
+              'You can locate this URL on the integration page of the tool if it supports this method'
+            ),
+            type: 'hint',
+          } as const,
+        ]
+      : fetchMessages
+
+  if (!isValidHttpUrl(state.jsonUrl) && state.jsonUrl.trim() !== '') {
+    return [{text: I18n.t('Please enter a valid URL'), type: 'error'}, ...withInfoMessage]
+  } else {
+    return withInfoMessage
+  }
+}
+
+/**
+ * Constructs error & info messages for the JSON code input field
+ * @param state
+ * @returns
+ */
+const jsonCodeInputMessages = (state: RegistrationWizardModalState): Array<FormMessage> => {
+  const fetchMessages = jsonFetchMessages(state)
+
+  if (!isValidJson(state.jsonCode) && state.jsonCode.trim() !== '') {
+    return [{text: I18n.t('Please enter valid JSON'), type: 'error'}, ...fetchMessages]
+  } else {
+    return fetchMessages
+  }
+}
+
+/**
+ * Constructs FormMessages based on the state of the JSON fetch,
+ * used both with code & URL input fields
+ * @param state
+ * @param method
+ * @returns
+ */
+const jsonFetchMessages = (state: RegistrationWizardModalState): Array<FormMessage> => {
+  const jsonFetch = state.jsonFetch
+  if (jsonFetch._tag === 'loaded' && isUnsuccessful(jsonFetch.result)) {
+    const errorType = jsonFetch.result._type
 
     /**
      * True if the configuration is invalid or the JSON is invalid,
      * the implication being that the tool provider needs to fix the configuration
      */
     const configurationError =
-      errorType === 'InvalidJson' ||
-      (errorType === 'ApiError' && jsonUrlFetch.result.status === 422)
+      errorType === 'InvalidJson' || (errorType === 'ApiError' && jsonFetch.result.status === 422)
     return [
       {
         text: configurationError
@@ -353,13 +486,6 @@ const jsonUrlFetchMessages = (state: RegistrationWizardModalState) => {
       } as const,
     ]
   } else {
-    return [
-      {
-        text: I18n.t(
-          'You can locate this URL on the integration page of the tool if it supports this method'
-        ),
-        type: 'hint',
-      } as const,
-    ]
+    return []
   }
 }

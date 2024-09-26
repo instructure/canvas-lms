@@ -28,4 +28,4 @@ if $ruby_version_warning.nil? && !ENV["SUPPRESS_RUBY_WARNING"]
   end
 end
 # rubocop:enable Style/GlobalVars
-ruby ">= 3.1.0"
+ruby ">= 3.3.1"

@@ -42,12 +42,12 @@ module AuthenticationMethods
   end
 
   def load_pseudonym_from_inst_access_token(token_string)
-    token = ::AuthenticationMethods::InstAccessToken.parse(token_string)
-    return false unless token
+    @token = ::AuthenticationMethods::InstAccessToken.parse(token_string)
+    return false unless @token
 
-    auth_context = ::AuthenticationMethods::InstAccessToken.load_user_and_pseudonym_context(token, @domain_root_account)
+    auth_context = ::AuthenticationMethods::InstAccessToken.load_user_and_pseudonym_context(@token, @domain_root_account)
 
-    raise AccessTokenError unless ::AuthenticationMethods::InstAccessToken.usable_developer_key?(token, @domain_root_account)
+    raise AccessTokenError unless ::AuthenticationMethods::InstAccessToken.usable_developer_key?(@token, @domain_root_account)
 
     @current_user = auth_context[:current_user]
     @current_pseudonym = auth_context[:current_pseudonym]
@@ -58,11 +58,15 @@ module AuthenticationMethods
       @real_current_pseudonym = auth_context[:real_current_pseudonym]
       logger.warn "[AUTH] #{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
     end
-    @authenticated_with_jwt = @authenticated_with_inst_access_token = true
+    @authenticated_with_jwt = true
+  end
+
+  def services_jwt_auth_allowed
+    false
   end
 
   def load_pseudonym_from_jwt
-    return unless api_request?
+    return unless api_request? || services_jwt_auth_allowed
 
     token_string = AuthenticationMethods.access_token(request)
     return unless token_string.present?
@@ -208,6 +212,15 @@ module AuthenticationMethods
              @current_pseudonym.cas_ticket_expired?(session[:cas_session])
 
             logger.info "[AUTH] Invalidating session: CAS ticket expired - #{session[:cas_session]}."
+            invalidate_session
+            return
+          end
+
+          if @current_pseudonym &&
+             session[:oidc_id_token_iss] &&
+             Pseudonym.oidc_session_expired?(session)
+
+            logger.info "[AUTH] Invalidating session: OIDC token expired."
             invalidate_session
             return
           end

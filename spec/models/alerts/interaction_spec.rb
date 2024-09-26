@@ -36,7 +36,7 @@ module Alerts
           end
 
           it "returns false for old courses" do
-            @course.start_at = Time.now - 30.days
+            @course.start_at = 30.days.ago
 
             interaction_alert = Alerts::Interaction.new(@course, [@student.id], [@teacher.id])
             expect(interaction_alert.should_not_receive_message?(@student.id, 7)).to be false
@@ -54,7 +54,7 @@ module Alerts
           end
 
           it "returns false for old courses" do
-            @course.created_at = Time.now - 30.days
+            @course.created_at = 30.days.ago
             @course.start_at = nil
             @course.save!
 
@@ -71,9 +71,9 @@ module Alerts
         @submission = @assignment.submit_homework(@student)
         SubmissionComment.create!(submission: @submission, comment: "new comment", author: @teacher)
         SubmissionComment.create!(submission: @submission, comment: "old comment", author: @teacher) do |submission_comment|
-          submission_comment.created_at = Time.now - 30.days
+          submission_comment.created_at = 30.days.ago
         end
-        @course.start_at = Time.now - 30.days
+        @course.start_at = 30.days.ago
 
         interaction_alert = Alerts::Interaction.new(@course, [@student.id], [@teacher.id])
         expect(interaction_alert.should_not_receive_message?(@student.id, 7)).to be true
@@ -85,9 +85,9 @@ module Alerts
         @assignment.save
         @submission = @assignment.submit_homework(@student)
         SubmissionComment.create!(submission: @submission, comment: "some comment", author: @teacher) do |sc|
-          sc.created_at = Time.now - 30.days
+          sc.created_at = 30.days.ago
         end
-        @course.start_at = Time.now - 30.days
+        @course.start_at = 30.days.ago
 
         interaction_alert = Alerts::Interaction.new(@course, [@student.id], [@teacher.id])
         expect(interaction_alert.should_not_receive_message?(@student.id, 7)).to be false
@@ -96,7 +96,7 @@ module Alerts
       it "returns true for conversation messages" do
         @conversation = @teacher.initiate_conversation([@student])
         @conversation.add_message("hello")
-        @course.start_at = Time.now - 30.days
+        @course.start_at = 30.days.ago
 
         interaction_alert = Alerts::Interaction.new(@course, [@student.id], [@teacher.id])
         expect(interaction_alert.should_not_receive_message?(@student.id, 7)).to be true
@@ -105,9 +105,9 @@ module Alerts
       it "returns false for old conversation messages" do
         @conversation = @teacher.initiate_conversation([@student, user_factory])
         message = @conversation.add_message("hello")
-        message.created_at = Time.now - 30.days
+        message.created_at = 30.days.ago
         message.save!
-        @course.start_at = Time.now - 30.days
+        @course.start_at = 30.days.ago
         @conversation.add_participants([user_factory])
         expect(@conversation.messages.length).to eq 2
 

@@ -32,10 +32,8 @@ describe "Block Editor", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include BlockEditorPage
 
-  # a default page that's had an apple icon block added
-  let(:block_page_content) do
-    file = File.open(File.expand_path(File.dirname(__FILE__) + "/../../fixtures/block-editor/page-with-apple-icon.json"))
-    file.read
+  def drop_new_block(block_name, where)
+    drag_and_drop_element(block_toolbox_box_by_block_name(block_name), where)
   end
 
   before do
@@ -43,19 +41,8 @@ describe "Block Editor", :ignore_js_errors do
     @course.account.enable_feature!(:block_editor)
     @context = @course
     @rce_page = @course.wiki_pages.create!(title: "RCE Page", body: "RCE Page Body")
-    @block_page = @course.wiki_pages.create!(title: "Block Page")
 
-    @block_page.update!(
-      block_editor_attributes: {
-        time: Time.now.to_i,
-        version: "1",
-        blocks: [
-          {
-            data: block_page_content
-          }
-        ]
-      }
-    )
+    @block_page = build_wiki_page("page-with-apple-icon.json")
   end
 
   context "Create new page" do
@@ -126,7 +113,7 @@ describe "Block Editor", :ignore_js_errors do
       wait_for_block_editor
       block_toolbox_toggle.click
       expect(block_toolbox).to be_displayed
-      drag_and_drop_element(block_toolbox_button, group_block_dropzone)
+      drop_new_block("button", group_block_dropzone)
       expect(fj("#{group_block_inner_selector} a:contains('Click me')")).to be_displayed
     end
 
@@ -134,7 +121,7 @@ describe "Block Editor", :ignore_js_errors do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
       block_toolbox_toggle.click
-      drag_and_drop_element(block_toolbox_image, group_block_dropzone)
+      drop_new_block("image", group_block_dropzone)
       image_block.click  # select the section
       image_block.click  # select the block
       expect(block_toolbar).to be_displayed
@@ -145,7 +132,7 @@ describe "Block Editor", :ignore_js_errors do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
       block_toolbox_toggle.click
-      drag_and_drop_element(block_toolbox_text, group_block_dropzone)
+      drop_new_block("text", group_block_dropzone)
       expect(block_toolbar).to be_displayed
 
       expect(block_resize_handle("se")).to be_displayed
@@ -162,7 +149,7 @@ describe "Block Editor", :ignore_js_errors do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
       block_toolbox_toggle.click
-      drag_and_drop_element(block_toolbox_text, group_block_dropzone)
+      drop_new_block("text", group_block_dropzone)
       expect(block_toolbar).to be_displayed
 
       expect(block_resize_handle("se")).to be_displayed
@@ -210,7 +197,7 @@ describe "Block Editor", :ignore_js_errors do
         wait_for_block_editor
         block_toolbox_toggle.click
 
-        drag_and_drop_element(block_toolbox_image, group_block_dropzone)
+        drop_new_block("image", group_block_dropzone)
         image_block_upload_button.click
         course_images_tab.click
         image_thumbnails[0].click
@@ -230,7 +217,7 @@ describe "Block Editor", :ignore_js_errors do
         wait_for_block_editor
         block_toolbox_toggle.click
 
-        drag_and_drop_element(block_toolbox_image, group_block_dropzone)
+        drop_new_block("image", group_block_dropzone)
         image_block_upload_button.click
         user_images_tab.click
         image_thumbnails[0].click
@@ -241,7 +228,7 @@ describe "Block Editor", :ignore_js_errors do
     end
   end
 
-  describe("resizing images") do
+  describe("manipulating images") do
     before do
       @root_folder = Folder.root_folders(@course).first
       @image = @root_folder.attachments.build(context: @course)
@@ -254,41 +241,55 @@ describe "Block Editor", :ignore_js_errors do
         block_editor_attributes: {
           time: Time.now.to_i,
           version: "1",
-          blocks: [
-            {
-              data: "{\"ROOT\":{\"type\":{\"resolvedName\":\"PageBlock\"},\"isCanvas\":true,\"props\":{},\"displayName\":\"Page\",\"custom\":{},\"hidden\":false,\"nodes\":[\"AcfL3KeXTT\"],\"linkedNodes\":{}},\"AcfL3KeXTT\":{\"type\":{\"resolvedName\":\"BlankSection\"},\"isCanvas\":false,\"props\":{},\"displayName\":\"Blank Section\",\"custom\":{\"isSection\":true},\"parent\":\"ROOT\",\"hidden\":false,\"nodes\":[],\"linkedNodes\":{\"blank-section_nosection1\":\"0ZWqBwA2Ou\"}},\"0ZWqBwA2Ou\":{\"type\":{\"resolvedName\":\"NoSections\"},\"isCanvas\":true,\"props\":{\"className\":\"blank-section__inner\",\"placeholderText\":\"Drop a block to add it here\"},\"displayName\":\"NoSections\",\"custom\":{\"noToolbar\":true},\"parent\":\"AcfL3KeXTT\",\"hidden\":false,\"nodes\":[\"lLVSJCBPWm\"],\"linkedNodes\":{}},\"lLVSJCBPWm\":{\"type\":{\"resolvedName\":\"ImageBlock\"},\"isCanvas\":false,\"props\":{\"src\":\"/courses/#{@course.id}/files/#{@image.id}/preview\",\"variant\":\"default\",\"constraint\":\"cover\",\"maintainAspectRatio\":true,\"sizeVariant\":\"pixel\",\"width\":200,\"height\":100},\"displayName\":\"Image\",\"custom\":{\"isResizable\":true},\"parent\":\"0ZWqBwA2Ou\",\"hidden\":false,\"nodes\":[],\"linkedNodes\":{}}}"
-            }
-          ]
+          blocks: "{\"ROOT\":{\"type\":{\"resolvedName\":\"PageBlock\"},\"isCanvas\":true,\"props\":{},\"displayName\":\"Page\",\"custom\":{},\"hidden\":false,\"nodes\":[\"AcfL3KeXTT\"],\"linkedNodes\":{}},\"AcfL3KeXTT\":{\"type\":{\"resolvedName\":\"BlankSection\"},\"isCanvas\":false,\"props\":{},\"displayName\":\"Blank Section\",\"custom\":{\"isSection\":true},\"parent\":\"ROOT\",\"hidden\":false,\"nodes\":[],\"linkedNodes\":{\"blank-section_nosection1\":\"0ZWqBwA2Ou\"}},\"0ZWqBwA2Ou\":{\"type\":{\"resolvedName\":\"NoSections\"},\"isCanvas\":true,\"props\":{\"className\":\"blank-section__inner\",\"placeholderText\":\"Drop a block to add it here\"},\"displayName\":\"NoSections\",\"custom\":{\"noToolbar\":true},\"parent\":\"AcfL3KeXTT\",\"hidden\":false,\"nodes\":[\"lLVSJCBPWm\"],\"linkedNodes\":{}},\"lLVSJCBPWm\":{\"type\":{\"resolvedName\":\"ImageBlock\"},\"isCanvas\":false,\"props\":{\"src\":\"/courses/#{@course.id}/files/#{@image.id}/preview\",\"variant\":\"default\",\"constraint\":\"cover\",\"maintainAspectRatio\":true,\"sizeVariant\":\"pixel\",\"width\":200,\"height\":100},\"displayName\":\"Image\",\"custom\":{\"isResizable\":true},\"parent\":\"0ZWqBwA2Ou\",\"hidden\":false,\"nodes\":[],\"linkedNodes\":{}}}"
         }
       )
     end
 
-    it("is not possible with SizeVariant 'auto'") do
-      get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
-      wait_for_block_editor
-
-      image_block.click  # select the section
-      image_block.click  # select the block
-      expect(block_resize_handle("se")).to be_displayed
-
-      click_block_toolbar_menu_item("Image Size", "Auto")
-      expect(block_editor_editor).not_to contain_css(block_resize_handle_selector("se"))
-    end
-
-    describe("that maintain aspect ratio") do
-      it "adjusts the width when the height is changed" do
+    describe("resizing") do
+      it("is not possible with SizeVariant 'auto'") do
         get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
         wait_for_block_editor
 
         image_block.click  # select the section
         image_block.click  # select the block
         expect(block_resize_handle("se")).to be_displayed
-        expect(image_block.size.width).to eq(200)
-        expect(image_block.size.height).to eq(100)
 
-        f("body").send_keys(:alt, :shift, :arrow_down)
-        expect(image_block.size.height).to eq(110)
-        expect(image_block.size.width).to eq(220)
+        click_block_toolbar_menu_item("Image Size", "Auto")
+        expect(block_editor_editor).not_to contain_css(block_resize_handle_selector("se"))
+      end
+
+      describe("that maintain aspect ratio") do
+        it "adjusts the width when the height is changed" do
+          get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+          wait_for_block_editor
+
+          image_block.click  # select the section
+          image_block.click  # select the block
+          expect(block_resize_handle("se")).to be_displayed
+          expect(image_block.size.width).to eq(200)
+          expect(image_block.size.height).to eq(100)
+
+          f("body").send_keys(:alt, :shift, :arrow_down)
+          expect(image_block.size.height).to eq(110)
+          expect(image_block.size.width).to eq(220)
+        end
+      end
+    end
+
+    describe("add alt text") do
+      it "can add alt text" do
+        get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+        wait_for_block_editor
+
+        image_block.click
+        image_block_alt_text_button.click
+        alt_input = image_block_alt_text_input
+        expect(alt_input).to be_displayed
+
+        alt_input.send_keys("I am alt text")
+        alt_input.send_keys(:escape)
+        expect(f("img", image_block).attribute("alt")).to eq("I am alt text")
       end
     end
   end

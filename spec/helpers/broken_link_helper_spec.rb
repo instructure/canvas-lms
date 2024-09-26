@@ -95,7 +95,7 @@ describe BrokenLinkHelper, type: :controller do
     expect(send_broken_content!).to be true
   end
 
-  context "#error_type" do
+  describe "#error_type" do
     it "returns :missing_item if the link doesn't point to course content" do
       expect(error_type(@course, "/test_error")).to eq :missing_item
     end

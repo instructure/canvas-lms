@@ -46,20 +46,19 @@ interface Props {
   page: number
   searchFail: Function
   searchSuccess: Function
-  canReadSIS?: boolean
-  foundUser?: User | null
+  canReadSIS: boolean
+  foundUsers: User[]
   wasReset?: boolean
 }
 
 export function TempEnrollSearch(props: Props) {
   // 'cc_path' | 'unique_id' | 'sis_user_id'
-  const defaultFoundUsers = props.foundUser == null ? [] : [props.foundUser]
   const [searchType, setSearchType] = useState('cc_path')
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
   const [duplicateUsers, setDuplicateUsers] = useState<Record<string, DuplicateUser[]>>({})
-  const [foundUsers, setFoundUsers] = useState<User[]>(defaultFoundUsers)
+  const [foundUsers, setFoundUsers] = useState<User[]>(props.foundUsers)
 
   const handleSearchTypeChange = (_event: ChangeEvent<HTMLInputElement>, value: string) => {
     setSearchType(value)
@@ -78,14 +77,14 @@ export function TempEnrollSearch(props: Props) {
     const isUndefined = typeof response.users[0] === 'undefined' && response.duplicates.length === 0
     if (response.missing.length > 0 || hasNoUsers || isUndefined) {
       // failed search; users were not found
-      setMessage(I18n.t('User could not be found.'))
+      setMessage(I18n.t('A user could not be found.'))
       props.searchFail()
       return
     }
 
     // DUPLICATES
     const map: Record<string, DuplicateUser[]> = {}
-    response.duplicates.forEach(dupePair => {
+    response.duplicates.forEach((dupePair: DuplicateUser[]) => {
       const key = dupePair[0].address
       // get dupe sets without provider if included
       const withoutProvider = dupePair.filter(dupeUser => {
@@ -102,38 +101,34 @@ export function TempEnrollSearch(props: Props) {
 
     // FOUND USERS
     if (containsProvider(foundUserList)) {
-      setMessage(I18n.t('The user found matches the provider. Please search for a different user.'))
+      setMessage(
+        I18n.t('One of the users found matches the provider. Please search for a different user.')
+      )
       props.searchFail()
       return
     }
     setFoundUsers(foundUserList)
+    setMessage('')
   }
 
-  const containsProvider = userList => {
+  const containsProvider = (userList: User[]) => {
     return userList.some(user => user.user_id === props.user.id)
   }
 
   useEffect(() => {
-    if (props.page === 1 && !props.foundUser) {
+    if (props.page === 1 && props.foundUsers.length === 0) {
       setLoading(true)
 
       const findUser = async () => {
         try {
           const searchArray = search.split(',')
-          // TODO: Search all values and remove check for length
-          // const searchFirst = searchArray
-          if (searchArray.length > 1) {
-            setMessage(I18n.t('User could not be found.'))
-            props.searchFail()
-          } else {
-            const searchFirst = searchArray[0]
-            const {json} = await doFetchApi({
-              path: `/accounts/${ENV.ACCOUNT_ID}/user_lists.json`,
-              method: 'POST',
-              params: {user_list: searchFirst, v2: true, search_type: searchType},
-            })
-            processSearchApiResponse(json)
-          }
+          const searchFirst = searchArray
+          const {json} = await doFetchApi({
+            path: `/accounts/${ENV.ACCOUNT_ID}/user_lists.json`,
+            method: 'POST',
+            params: {user_list: searchFirst, v2: true, search_type: searchType},
+          })
+          processSearchApiResponse(json)
         } catch (error: any) {
           setMessage(error.message)
           props.searchFail()
@@ -141,6 +136,8 @@ export function TempEnrollSearch(props: Props) {
         setLoading(false)
       }
       findUser()
+    } else if (props.page === 1 && props.foundUsers.length > 0) {
+      setFoundUsers(props.foundUsers)
     } else {
       setDuplicateUsers({})
     }
@@ -154,19 +151,21 @@ export function TempEnrollSearch(props: Props) {
 
   switch (searchType) {
     case 'cc_path':
-      exampleText = 'lsmith@myschool.edu'
-      descText = I18n.t('Enter the email address of the user you would like to temporarily enroll')
-      labelText = I18n.t('Email Address')
+      exampleText = 'lsmith@myschool.edu, mfoster@myschool.edu'
+      descText = I18n.t(
+        'Enter the email addresses of the users you would like to temporarily enroll'
+      )
+      labelText = I18n.t('Email Addresses')
       break
     case 'unique_id':
-      exampleText = 'lsmith'
-      descText = I18n.t('Enter the login ID of the user you would like to temporarily enroll')
-      labelText = I18n.t('Login ID')
+      exampleText = 'lsmith, mfoster'
+      descText = I18n.t('Enter the login IDs of the users you would like to temporarily enroll')
+      labelText = I18n.t('Login IDs')
       break
     case 'sis_user_id':
-      exampleText = 'student_2708'
-      descText = I18n.t('Enter the SIS ID of the user you would like to temporarily enroll')
-      labelText = I18n.t('SIS ID')
+      exampleText = 'student_2708, student_3693'
+      descText = I18n.t('Enter the SIS IDs of the users you would like to temporarily enroll')
+      labelText = I18n.t('SIS IDs')
       break
   }
 
@@ -179,7 +178,7 @@ export function TempEnrollSearch(props: Props) {
           </Flex.Item>
           <Flex.Item shouldGrow={true}>
             <Text weight="bold">
-              {I18n.t('Find a recipient of temporary enrollments from %{name}', {
+              {I18n.t('Find recipient(s) of temporary enrollments from %{name}', {
                 name: props.user.name,
               })}
             </Text>
@@ -204,9 +203,8 @@ export function TempEnrollSearch(props: Props) {
           foundUsers={foundUsers}
           duplicateUsers={duplicateUsers}
           searchFailure={props.searchFail}
-          readySubmit={(enrollment: User) => props.searchSuccess(enrollment)}
+          readySubmit={(enrollments: User[]) => props.searchSuccess(enrollments)}
           canReadSIS={props.canReadSIS}
-          searchType={searchType}
         />
       </Flex>
     )
@@ -225,7 +223,7 @@ export function TempEnrollSearch(props: Props) {
           <RadioInputGroup
             name="search_type"
             defaultValue={searchType}
-            description={I18n.t('Add recipient by')}
+            description={I18n.t('Add recipient(s) by')}
             onChange={handleSearchTypeChange}
             layout="columns"
           >

@@ -67,9 +67,9 @@ class DelayedMessage < ActiveRecord::Base
 
   def summary=(val)
     if !val || val.length < self.class.maximum_text_length
-      write_attribute(:summary, val)
+      super
     else
-      write_attribute(:summary, val[0, self.class.maximum_text_length])
+      super(val[0, self.class.maximum_text_length])
     end
   end
 

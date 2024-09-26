@@ -1,0 +1,8 @@
+#### <%= @label ? @label : YARD::Tags::Library.labels[@name] %>:
+
+<% object.tags(@name).each do |tag| %>
+- <% unless @no_types %><%= format_types(tag.types) %><% end %>
+<% name, text = (tag.text || "").split(/\s/, 2) %>
+<% unless @no_names %><%= name %><% end %>
+<% if text && !text.empty? %><%= htmlify text %><% end %>
+<% end %>

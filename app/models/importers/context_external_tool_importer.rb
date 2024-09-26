@@ -60,7 +60,7 @@ module Importers
         url = migration.process_domain_substitutions(url) if migration
         item.url = url
       end
-      item.domain = hash[:domain] unless hash[:domain].blank?
+      item.domain = hash[:domain]
       item.privacy_level = hash[:privacy_level] || "name_only"
       item.not_selectable = hash[:not_selectable] if hash[:not_selectable]
       item.consumer_key ||= hash[:consumer_key] || "fake"

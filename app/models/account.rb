@@ -39,7 +39,7 @@ class Account < ActiveRecord::Base
   has_many :custom_grade_statuses, inverse_of: :root_account, foreign_key: :root_account_id
   has_many :standard_grade_statuses, inverse_of: :root_account, foreign_key: :root_account_id
   has_many :favorites, inverse_of: :root_account
-  has_many :all_courses, class_name: "Course", foreign_key: "root_account_id"
+  has_many :all_courses, class_name: "Course", foreign_key: "root_account_id", inverse_of: :root_account
   has_one :terms_of_service, dependent: :destroy
   has_one :terms_of_service_content, dependent: :destroy
   has_many :group_categories, -> { where(deleted_at: nil) }, as: :context, inverse_of: :context
@@ -47,21 +47,21 @@ class Account < ActiveRecord::Base
   has_many :groups, as: :context, inverse_of: :context
   has_many :all_groups, class_name: "Group", foreign_key: "root_account_id", inverse_of: :root_account
   has_many :all_group_memberships, source: "group_memberships", through: :all_groups
-  has_many :enrollment_terms, foreign_key: "root_account_id"
-  has_many :active_enrollment_terms, -> { where("enrollment_terms.workflow_state<>'deleted'") }, class_name: "EnrollmentTerm", foreign_key: "root_account_id"
+  has_many :enrollment_terms, foreign_key: "root_account_id", inverse_of: :root_account
+  has_many :active_enrollment_terms, -> { where("enrollment_terms.workflow_state<>'deleted'") }, class_name: "EnrollmentTerm", foreign_key: "root_account_id", inverse_of: false
   has_many :grading_period_groups, inverse_of: :root_account, dependent: :destroy
   has_many :grading_periods, through: :grading_period_groups
-  has_many :enrollments, -> { where("enrollments.type<>'StudentViewEnrollment'") }, foreign_key: "root_account_id"
-  has_many :all_enrollments, class_name: "Enrollment", foreign_key: "root_account_id"
+  has_many :enrollments, -> { where("enrollments.type<>'StudentViewEnrollment'") }, foreign_key: "root_account_id", inverse_of: :root_account
+  has_many :all_enrollments, class_name: "Enrollment", foreign_key: "root_account_id", inverse_of: :root_account
   has_many :temporary_enrollment_pairings, inverse_of: :root_account, foreign_key: "root_account_id"
-  has_many :sub_accounts, -> { where("workflow_state<>'deleted'") }, class_name: "Account", foreign_key: "parent_account_id"
-  has_many :all_accounts, -> { order(:name) }, class_name: "Account", foreign_key: "root_account_id"
+  has_many :sub_accounts, -> { where("workflow_state<>'deleted'") }, class_name: "Account", foreign_key: "parent_account_id", inverse_of: :parent_account
+  has_many :all_accounts, -> { order(:name) }, class_name: "Account", foreign_key: "root_account_id", inverse_of: :root_account
   has_many :account_users, dependent: :destroy
   has_many :active_account_users, -> { active }, class_name: "AccountUser"
-  has_many :course_sections, foreign_key: "root_account_id"
+  has_many :course_sections, foreign_key: "root_account_id", inverse_of: :root_account
   has_many :sis_batches
   has_many :abstract_courses, class_name: "AbstractCourse"
-  has_many :root_abstract_courses, class_name: "AbstractCourse", foreign_key: "root_account_id"
+  has_many :root_abstract_courses, class_name: "AbstractCourse", foreign_key: "root_account_id", inverse_of: :root_account
   has_many :user_account_associations
   has_many :all_users, -> { distinct }, through: :user_account_associations, source: :user
   has_many :users, through: :active_account_users
@@ -90,7 +90,7 @@ class Account < ActiveRecord::Base
   has_many :assessment_question_banks, -> { preload(:assessment_questions, :assessment_question_bank_users) }, as: :context, inverse_of: :context
   has_many :assessment_questions, through: :assessment_question_banks
   has_many :roles
-  has_many :all_roles, class_name: "Role", foreign_key: "root_account_id"
+  has_many :all_roles, class_name: "Role", foreign_key: "root_account_id", inverse_of: :root_account
   has_many :progresses, as: :context, inverse_of: :context
   has_many :content_migrations, as: :context, inverse_of: :context
   has_many :sis_batch_errors, foreign_key: :root_account_id, inverse_of: :root_account
@@ -156,7 +156,7 @@ class Account < ActiveRecord::Base
   has_many :report_snapshots
   has_many :external_integration_keys, as: :context, inverse_of: :context, dependent: :destroy
   has_many :shared_brand_configs
-  belongs_to :brand_config, foreign_key: "brand_config_md5"
+  belongs_to :brand_config, foreign_key: "brand_config_md5", inverse_of: :accounts
   has_many :blackout_dates, as: :context, inverse_of: :context
 
   before_validation :verify_unique_sis_source_id
@@ -181,7 +181,7 @@ class Account < ActiveRecord::Base
 
   time_zone_attribute :default_time_zone, default: "America/Denver"
   def default_time_zone
-    if read_attribute(:default_time_zone) || root_account?
+    if self["default_time_zone"] || root_account?
       super
     else
       root_account.default_time_zone
@@ -221,7 +221,7 @@ class Account < ActiveRecord::Base
   end
 
   def default_locale
-    result = read_attribute(:default_locale)
+    result = super
     result = nil unless I18n.locale_available?(result)
     result
   end
@@ -924,7 +924,7 @@ class Account < ActiveRecord::Base
   DEFAULT_STORAGE_QUOTA = 500.decimal_megabytes
 
   def quota
-    return storage_quota if read_attribute(:storage_quote)
+    return storage_quota if storage_quota
     return DEFAULT_STORAGE_QUOTA if root_account?
 
     shard.activate do
@@ -935,7 +935,7 @@ class Account < ActiveRecord::Base
   end
 
   def default_storage_quota
-    return super if read_attribute(:default_storage_quota)
+    return super if super
     return DEFAULT_STORAGE_QUOTA if root_account?
 
     shard.activate do
@@ -961,18 +961,17 @@ class Account < ActiveRecord::Base
     if parent_account && parent_account.default_storage_quota == val
       val = nil
     end
-    write_attribute(:default_storage_quota, val)
+    super
   end
 
   def default_user_storage_quota
-    read_attribute(:default_user_storage_quota) ||
-      User.default_storage_quota
+    super || User.default_storage_quota
   end
 
   def default_user_storage_quota=(val)
     val = val.to_i
     val = nil if val == User.default_storage_quota || val <= 0
-    write_attribute(:default_user_storage_quota, val)
+    super
   end
 
   def default_user_storage_quota_mb
@@ -984,7 +983,7 @@ class Account < ActiveRecord::Base
   end
 
   def default_group_storage_quota
-    return super if read_attribute(:default_group_storage_quota)
+    return super if super
     return Group.default_storage_quota if root_account?
 
     shard.activate do
@@ -1000,7 +999,7 @@ class Account < ActiveRecord::Base
        (parent_account && parent_account.default_group_storage_quota == val)
       val = nil
     end
-    write_attribute(:default_group_storage_quota, val)
+    super
   end
 
   def default_group_storage_quota_mb
@@ -1874,7 +1873,7 @@ class Account < ActiveRecord::Base
   end
 
   def current_sis_batch
-    if (current_sis_batch_id = read_attribute(:current_sis_batch_id)) && current_sis_batch_id.present?
+    if current_sis_batch_id.present?
       sis_batches.where(id: current_sis_batch_id).first
     end
   end

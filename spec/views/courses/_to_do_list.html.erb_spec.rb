@@ -27,7 +27,7 @@ describe "courses/_to_do_list" do
       it "shows the new planner to do list anyway" do
         course_with_student(active_all: true)
         view_context
-        render partial: "courses/to_do_list", locals: { contexts: nil }
+        render partial: "courses/to_do_list", locals: { contexts: nil, root_account: @course.root_account }
         expect(response).to include '<div class="todo-list Sidebar__TodoListContainer">'
       end
     end
@@ -53,7 +53,7 @@ describe "courses/_to_do_list" do
         @user.set_preference(:course_nicknames, @course.id, "My Awesome Course")
         view_context
         # title, course nickname, points, due date, number of submissions to grade
-        render partial: "courses/to_do_list", locals: { contexts: nil, show_legacy_todo_list: true }
+        render partial: "courses/to_do_list", locals: { contexts: nil, show_legacy_todo_list: true, root_account: @course.root_account }
         expect(response).to include "Grade GradeMe"
         expect(response).to include "15 points"
         expect(response).to include "My Awesome Course"
@@ -77,13 +77,44 @@ describe "courses/_to_do_list" do
         @user.set_preference(:course_nicknames, @course.id, "My Awesome Course")
         view_context
         # title, course nickname, points, due date, number of submissions to grade
-        render partial: "courses/to_do_list", locals: { contexts: nil, show_legacy_todo_list: true }
+        render partial: "courses/to_do_list", locals: { contexts: nil, show_legacy_todo_list: true, root_account: @course.root_account }
         expect(response).to include "Grade GradeMe"
         expect(response).to include "15 points"
         expect(response).to include "My Awesome Course"
         expect(response).to include due_at(@assignment, @user)
         expect(response).to include "999+"
         expect(response).to include "More than 999 submissions need grading"
+      end
+
+      context "discussion checkpoints" do
+        before do
+          course_with_student(active_all: true)
+          @course.root_account.enable_feature!(:discussion_checkpoints)
+          @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+        end
+
+        it "text for reply to topic" do
+          @reply_to_topic.submit_homework @student, body: "checkpoint submission for #{@student.name}"
+          @user = @teacher
+          view_context
+          render partial: "courses/to_do_list", locals: { contexts: nil, show_legacy_todo_list: true, root_account: @course.root_account }
+          expect(response).to include "Reply to Topic"
+        end
+
+        it "text for required replies" do
+          @reply_to_entry.submit_homework @student, body: "checkpoint submission for #{@student.name}"
+          @user = @teacher
+          view_context
+          render partial: "courses/to_do_list", locals: { contexts: nil, show_legacy_todo_list: true, root_account: @course.root_account }
+          expect(response).to include "Required Replies (#{@topic.reply_to_entry_required_count})"
+        end
+
+        it "does not include overall discussion assignment" do
+          @user = @teacher
+          view_context
+          render partial: "courses/to_do_list", locals: { contexts: nil, show_legacy_todo_list: true, root_account: @course.root_account }
+          expect(response).not_to include @topic.title.to_s
+        end
       end
     end
 
@@ -107,7 +138,7 @@ describe "courses/_to_do_list" do
         @user = @teacher
         @user.set_preference(:course_nicknames, @course.id, "My Awesome Course")
         view_context
-        render partial: "courses/to_do_list", locals: { contexts: nil, show_legacy_todo_list: true }
+        render partial: "courses/to_do_list", locals: { contexts: nil, show_legacy_todo_list: true, root_account: @course.root_account }
         expect(response).to include "Moderate ModerateMe"
         expect(response).to include "Ignore ModerateMe until new mark"
       end
@@ -126,8 +157,33 @@ describe "courses/_to_do_list" do
         submission = submission_model(assignment: @assignment, body: "my submission")
         submission.find_or_create_provisional_grade!(@teacher, grade: 5)
         view_context
-        render partial: "courses/to_do_list", locals: { contexts: nil, show_legacy_todo_list: true }
+        render partial: "courses/to_do_list", locals: { contexts: nil, show_legacy_todo_list: true, root_account: @course.root_account }
         expect(response).not_to include "Moderate ModerateMe"
+      end
+    end
+  end
+
+  context "as a teacher with student enrollments" do
+    describe "assignments to submit" do
+      context "discussion checkpoints" do
+        before do
+          course_with_teacher(active_all: true)
+          course_with_student(active_all: true, user: @teacher)
+          @course.root_account.enable_feature!(:discussion_checkpoints)
+          @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course, title: "Discussion with Checkpoints")
+        end
+
+        it "displays proper title for reply to topic checkpoint" do
+          view_context
+          render partial: "courses/to_do_list", locals: { contexts: nil, show_legacy_todo_list: true, root_account: @course.root_account }
+          expect(response).to include "Turn in #{@reply_to_topic.title} Reply to Topic"
+        end
+
+        it "displays proper title for reply to entry checkpoint" do
+          view_context
+          render partial: "courses/to_do_list", locals: { contexts: nil, show_legacy_todo_list: true, root_account: @course.root_account }
+          expect(response).to include "Turn in #{@reply_to_entry.title} Required Replies (#{@topic.reply_to_entry_required_count})"
+        end
       end
     end
   end

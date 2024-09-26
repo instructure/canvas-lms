@@ -84,7 +84,7 @@ describe "Exportable" do
                end)
   end
 
-  context "#convert_to_web_zip" do
+  describe "#convert_to_web_zip" do
     before do
       @create_date = 1.minute.ago
       course_with_teacher(active_all: true)

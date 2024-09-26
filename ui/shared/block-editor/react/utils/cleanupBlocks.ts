@@ -16,6 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// We don't want the expanded state to be saved with the block data
+export const closeExpandedBlocks = (query: any) => {
+  const nodes = JSON.parse(query.serialize())
+  Object.keys(nodes).forEach(k => {
+    const node = nodes[k]
+    delete node.custom?.isExpanded
+  })
+  return JSON.stringify(nodes)
+}
+
 // NOTE: this is not being used, but it is a good example
 // of how to iterate over the json. Might be a good foundation
 // for copying a block and changing its IDs (since the current

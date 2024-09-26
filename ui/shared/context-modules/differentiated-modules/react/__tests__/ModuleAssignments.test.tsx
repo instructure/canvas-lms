@@ -21,6 +21,7 @@ import {act, fireEvent, render} from '@testing-library/react'
 import ModuleAssignments, {type ModuleAssignmentsProps} from '../ModuleAssignments'
 import fetchMock from 'fetch-mock'
 import {FILTERED_SECTIONS_DATA, FILTERED_STUDENTS_DATA, SECTIONS_DATA, STUDENTS_DATA} from './mocks'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 const props: ModuleAssignmentsProps = {
   courseId: '1',
@@ -33,6 +34,7 @@ const STUDENTS_URL = `api/v1/courses/${props.courseId}/users?per_page=100&enroll
 const FILTERED_SECTIONS_URL = /\/api\/v1\/courses\/.+\/sections\?per_page=100&search_term=.+/
 const FILTERED_STUDENTS_URL =
   /\/api\/v1\/courses\/.+\/users\?per_page=100&search_term=.+&enrollment_type=student/
+const COURSE_SETTINGS_URL = `/api/v1/courses/${props.courseId}/settings`
 
 describe('ModuleAssignments', () => {
   beforeAll(() => {
@@ -45,10 +47,11 @@ describe('ModuleAssignments', () => {
   })
 
   beforeEach(() => {
-    fetchMock.getOnce(SECTIONS_URL, SECTIONS_DATA)
-    fetchMock.getOnce(STUDENTS_URL, STUDENTS_DATA)
-    fetchMock.getOnce(FILTERED_SECTIONS_URL, FILTERED_SECTIONS_DATA)
-    fetchMock.getOnce(FILTERED_STUDENTS_URL, FILTERED_STUDENTS_DATA)
+    fetchMock.get(SECTIONS_URL, SECTIONS_DATA)
+    fetchMock.get(STUDENTS_URL, STUDENTS_DATA)
+    fetchMock.get(FILTERED_SECTIONS_URL, FILTERED_SECTIONS_DATA)
+    fetchMock.get(FILTERED_STUDENTS_URL, FILTERED_STUDENTS_DATA)
+    fetchMock.get(COURSE_SETTINGS_URL, {hide_final_grades: false})
   })
 
   afterEach(() => {
@@ -56,7 +59,11 @@ describe('ModuleAssignments', () => {
   })
 
   const renderComponent = (overrides?: Partial<typeof props>) =>
-    render(<ModuleAssignments {...props} {...overrides} />)
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <ModuleAssignments {...props} {...overrides} />
+      </QueryClientProvider>
+    )
 
   it('displays sections and students as options', async () => {
     const {findByTestId, findByText, getByText} = renderComponent()

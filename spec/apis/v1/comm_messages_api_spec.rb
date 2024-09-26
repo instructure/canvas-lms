@@ -61,7 +61,7 @@ describe CommMessagesApiController, type: :request do
 
         it "uses start_time and end_time parameters to limit results" do
           m = Message.new(user: @test_user, body: "account message", root_account_id: Account.default.id)
-          m.write_attribute(:created_at, 1.day.from_now)
+          m.created_at = 1.day.from_now
           m.save!
           m2 = Message.create!(user: @test_user, body: "account message", root_account_id: Account.default.id)
 

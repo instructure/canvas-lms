@@ -26,7 +26,7 @@ module SelfEnrollmentsHelper
   def registration_summary
     # allow plugins to display additional content
     if @registration_summary
-      markdown(@registration_summary, :never) rescue nil
+      markdown(@registration_summary, :never)
     end
   end
 end

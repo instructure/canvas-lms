@@ -24,12 +24,12 @@ import {
   getByLabelText as domGetByLabelText,
 } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
-import BlockEditor from '../BlockEditor'
+import BlockEditor, {type BlockEditorProps} from '../BlockEditor'
 import {blank_page, blank_section_with_text} from './test-content'
 
 const user = userEvent.setup()
 
-function renderEditor(props = {}) {
+function renderEditor(props: Partial<BlockEditorProps> = {}) {
   const container = document.createElement('div')
   container.id = 'drawer-layout-content'
   container.scrollTo = () => {}
@@ -38,9 +38,8 @@ function renderEditor(props = {}) {
   return render(
     <BlockEditor
       container={container}
-      version="1"
       enableResizer={false} // jsdom doesn't render enough for BlockResizer to work
-      content={blank_page}
+      content={{version: '0.2', blocks: blank_page}}
       onCancel={() => {}}
       {...props}
     />,
@@ -62,8 +61,8 @@ describe('BlockEditor', () => {
   })
 
   it('warns on content version mismatch', () => {
-    renderEditor({version: '2'})
-    expect(window.alert).toHaveBeenCalledWith('wrong version, mayhem may ensue')
+    renderEditor({content: {version: '2', blocks: blank_page}})
+    expect(window.alert).toHaveBeenCalledWith('Unknown block data version "2", mayhem may ensue')
   })
 
   describe('New page stepper', () => {
@@ -111,11 +110,23 @@ describe('BlockEditor', () => {
     })
   })
 
+  describe('data transformations', () => {
+    it('can edit version 0.1 data', () => {
+      renderEditor({
+        content: {
+          version: '0.1',
+          blocks: [{data: blank_section_with_text}],
+        },
+      })
+      expect(screen.getByText('this is text.')).toBeInTheDocument()
+    })
+  })
+
   describe('Preview', () => {
     it('toggles the preview', async () => {
       // rebnder a page with a blank section containing a text block
       const {getByText} = renderEditor({
-        content: blank_section_with_text,
+        content: {version: '0.2', blocks: blank_section_with_text},
       })
       await user.click(getByText('Preview').closest('button') as HTMLButtonElement)
 
@@ -138,7 +149,7 @@ describe('BlockEditor', () => {
     it('adjusts the view size', async () => {
       // rebnder a page with a blank section containing a text block
       const {getByText} = renderEditor({
-        content: blank_section_with_text,
+        content: {version: '0.2', blocks: blank_section_with_text},
       })
       await user.click(getByText('Preview').closest('button') as HTMLButtonElement)
 

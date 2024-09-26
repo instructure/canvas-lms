@@ -28,6 +28,8 @@ import {enableFetchMocks} from 'jest-fetch-mock'
 
 enableFetchMocks()
 
+const responseOpts = {headers: {'Content-Type': 'application/json'}}
+
 // grab this before fake timers replace it
 const realSetTimeout = setTimeout
 async function flushPromises() {
@@ -94,7 +96,7 @@ function tooManyDatesResponse() {
 }
 
 function mockAssignmentsResponse(assignments) {
-  fetch.mockResponse(JSON.stringify(assignments))
+  fetch.mockResponse(JSON.stringify(assignments), responseOpts)
   return assignments
 }
 
@@ -114,7 +116,7 @@ function renderBulkEdit(overrides = {}) {
 }
 
 async function renderBulkEditAndWait(overrides = {}, assignments = standardAssignmentResponse()) {
-  fetch.mockResponseOnce(JSON.stringify(assignments))
+  fetch.mockResponseOnce(JSON.stringify(assignments), responseOpts)
   const result = renderBulkEdit(overrides)
   await flushPromises()
   result.assignments = assignments
@@ -753,8 +755,11 @@ describe('Assignment Bulk Edit Dates', () => {
       const fns = await renderBulkEditAndWait()
       changeAndBlurInput(fns.getAllByLabelText('Due At')[0], '2020-04-01')
       fetch.mockResponses(
-        [JSON.stringify({url: 'progress url'})],
-        [JSON.stringify({url: 'progress url', workflow_state: 'queued', completion: 0})]
+        [JSON.stringify({url: 'progress url'}), responseOpts],
+        [
+          JSON.stringify({url: 'progress url', workflow_state: 'queued', completion: 0}),
+          responseOpts,
+        ]
       )
       fireEvent.click(fns.getByText('Save'))
       await flushPromises()
@@ -767,8 +772,14 @@ describe('Assignment Bulk Edit Dates', () => {
       expect(getByText('0%')).toBeInTheDocument()
 
       fetch.mockResponses(
-        [JSON.stringify({url: 'progress url', workflow_state: 'running', completion: 42})],
-        [JSON.stringify({url: 'progress url', workflow_state: 'complete', completion: 100})]
+        [
+          JSON.stringify({url: 'progress url', workflow_state: 'running', completion: 42}),
+          responseOpts,
+        ],
+        [
+          JSON.stringify({url: 'progress url', workflow_state: 'complete', completion: 100}),
+          responseOpts,
+        ]
       )
 
       act(jest.runOnlyPendingTimers)
@@ -807,7 +818,8 @@ describe('Assignment Bulk Edit Dates', () => {
           results: [
             {assignment_id: 'assignment_1', errors: {due_at: [{message: 'some bad dates'}]}},
           ],
-        })
+        }),
+        responseOpts
       )
       act(jest.runAllTimers)
       await flushPromises()
@@ -822,7 +834,8 @@ describe('Assignment Bulk Edit Dates', () => {
     it('can start a second save operation', async () => {
       const {getByText, queryByText, getAllByLabelText} = await renderBulkEditAndSave()
       fetch.mockResponseOnce(
-        JSON.stringify({url: 'progress url', workflow_state: 'complete', completion: 100})
+        JSON.stringify({url: 'progress url', workflow_state: 'complete', completion: 100}),
+        responseOpts
       )
       act(jest.runAllTimers)
       await flushPromises()
@@ -833,8 +846,11 @@ describe('Assignment Bulk Edit Dates', () => {
       expect(queryByText(/saved successfully/)).toBe(null)
 
       fetch.mockResponses(
-        [JSON.stringify({url: 'progress url'})],
-        [JSON.stringify({url: 'progress url', workflow_state: 'complete', completion: 100})]
+        [JSON.stringify({url: 'progress url'}), responseOpts],
+        [
+          JSON.stringify({url: 'progress url', workflow_state: 'complete', completion: 100}),
+          responseOpts,
+        ]
       )
       fireEvent.click(getByText('Save'))
       await flushPromises()

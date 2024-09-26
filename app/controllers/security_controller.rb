@@ -108,7 +108,7 @@ class SecurityController < ApplicationController
       token_endpoint: oauth2_token_url(host: Lti::Oidc.auth_domain(account_domain)),
       token_endpoint_auth_methods_supported: ["private_key_jwt"],
       token_endpoint_auth_signing_alg_values_supported: ["RS256"],
-      scopes_supported: TokenScopes::LTI_SCOPES.keys,
+      scopes_supported: ["openid"].union(TokenScopes::LTI_SCOPES.keys),
       response_types_supported: ["id_token"],
       id_token_signing_alg_values_supported: ["RS256"],
       # TODO: this list can probably be dynamic, with admins choosing the scopes they want to admit to this tool

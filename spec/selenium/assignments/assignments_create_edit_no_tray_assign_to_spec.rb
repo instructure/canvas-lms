@@ -49,7 +49,7 @@ shared_examples_for "item assign to on page during assignment creation/update" d
     assignment = Assignment.last
     expect(assignment.assignment_overrides.last.assignment_override_students.count).to eq(1)
 
-    due_at_row = AssignmentPage.retrieve_due_date_table_row("1 student")
+    due_at_row = AssignmentPage.retrieve_due_date_table_row("1 Student")
     expect(due_at_row).not_to be_nil
     expect(due_at_row.text.split("\n").first).to include("Dec 31, 2022")
     expect(due_at_row.text.split("\n").third).to include("Dec 27, 2022")
@@ -80,7 +80,7 @@ shared_examples_for "item assign to on page during assignment creation/update" d
     expect(assignment.assignment_overrides.count).to eq(1)
     expect(assignment.assignment_overrides.last.set_type).to eq("CourseSection")
 
-    due_at_row = AssignmentPage.retrieve_due_date_table_row(@section1.name)
+    due_at_row = AssignmentPage.retrieve_due_date_table_row("1 Section")
     expect(due_at_row).not_to be_nil
     expect(due_at_row.text.split("\n").first).to include("Dec 31, 2022")
     expect(due_at_row.text.split("\n").third).to include("Dec 27, 2022")

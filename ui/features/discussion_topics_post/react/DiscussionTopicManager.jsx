@@ -35,7 +35,7 @@ import {
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
 import PropTypes from 'prop-types'
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useRef, useState, useCallback} from 'react'
 import {useQuery} from 'react-apollo'
 import {SplitScreenViewContainer} from './containers/SplitScreenViewContainer/SplitScreenViewContainer'
 import {DrawerLayout} from '@instructure/ui-drawer-layout'
@@ -46,6 +46,7 @@ import useCreateDiscussionEntry from './hooks/useCreateDiscussionEntry'
 import {flushSync} from 'react-dom'
 import {captureException} from '@sentry/react'
 import {LoadingSpinner} from './components/LoadingSpinner/LoadingSpinner'
+import useSpeedGrader from './hooks/useSpeedGrader'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -65,6 +66,7 @@ const DiscussionTopicManager = props => {
   const [showTranslationControl, setShowTranslationControl] = useState(false)
   // Start as null, populate when ready.
   const [translateTargetLanguage, setTranslateTargetLanguage] = useState(null)
+  const [focusSelector, setFocusSelector] = useState('')
 
   const searchContext = {
     searchTerm,
@@ -81,6 +83,8 @@ const DiscussionTopicManager = props => {
     setAllThreadsStatus,
     expandedThreads,
     setExpandedThreads,
+    discussionID: props.discussionTopicId,
+    perPage: ENV.per_page,
   }
   const [userSplitScreenPreference, setUserSplitScreenPreference] = useState(
     ENV.DISCUSSION?.preferences?.discussions_splitscreen_view || false
@@ -132,6 +136,11 @@ const DiscussionTopicManager = props => {
     setUserSplitScreenPreference,
     highlightEntryId,
     setHighlightEntryId,
+    setPageNumber,
+    expandedThreads,
+    setExpandedThreads,
+    focusSelector,
+    setFocusSelector,
     setIsGradedDiscussion,
     isGradedDiscussion,
     usedThreadingToolbarChildRef,
@@ -177,14 +186,6 @@ const DiscussionTopicManager = props => {
       }, HIGHLIGHT_TIMEOUT)
     }
   }, [isTopicHighlighted])
-
-  useEffect(() => {
-    if (highlightEntryId && !isPersistEnabled) {
-      setTimeout(() => {
-        setHighlightEntryId(null)
-      }, HIGHLIGHT_TIMEOUT)
-    }
-  }, [highlightEntryId])
 
   /**
    * Opens a split-screen view for a discussion entry.
@@ -236,6 +237,26 @@ const DiscussionTopicManager = props => {
     variables,
     fetchPolicy: searchTerm ? 'network-only' : 'cache-and-network',
     skip: waitForUnreadFilter,
+  })
+
+  useEffect(() => {
+    if (highlightEntryId && !isPersistEnabled) {
+      setTimeout(() => {
+        setHighlightEntryId(null)
+      }, HIGHLIGHT_TIMEOUT)
+    }
+  }, [highlightEntryId, discussionTopicQuery.loading])
+
+  useSpeedGrader({
+    highlightEntryId,
+    setHighlightEntryId,
+    setPageNumber,
+    expandedThreads,
+    setExpandedThreads,
+    setFocusSelector,
+    discussionID: props.discussionTopicId,
+    perPage: ENV.per_page,
+    sort,
   })
 
   useEffect(() => {

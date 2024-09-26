@@ -39,21 +39,12 @@ export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProp
     selected,
     node,
   } = useNode((n: Node) => ({
-    id: n.id,
     selected: n.events.selected,
     node: n,
   }))
   const clazz = useClassNames(enabled, {empty: !text}, ['block', 'text-block'])
   const focusableElem = useRef<HTMLElement | null>(null)
-
   const [editable, setEditable] = useState(true)
-
-  useEffect(() => {
-    if (editable && selected) {
-      focusableElem.current?.focus()
-    }
-    setEditable(selected)
-  }, [editable, focusableElem, selected])
 
   const handleChange = useCallback(
     e => {
@@ -69,6 +60,24 @@ export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProp
     [setProp]
   )
 
+  const handleKey = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (editable) {
+        if (e.key === 'Escape') {
+          e.preventDefault()
+          e.stopPropagation()
+          setEditable(false)
+        } else if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+          e.stopPropagation()
+        }
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        setEditable(true)
+      }
+    },
+    [editable]
+  )
+
   const styl: React.CSSProperties = {fontSize, textAlign, color}
   if (node.data.props.width) {
     styl.width = `${node.data.props.width}px`
@@ -80,6 +89,10 @@ export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProp
   if (enabled) {
     return (
       <ContentEditable
+        role="treeitem"
+        aria-label={TextBlock.craft.displayName}
+        aria-selected={selected}
+        tabIndex={-1}
         innerRef={(el: HTMLElement) => {
           if (el) {
             connect(drag(el))
@@ -90,14 +103,28 @@ export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProp
         className={clazz}
         disabled={!editable}
         html={text}
-        onChange={handleChange}
         tagName="div"
         style={styl}
+        onChange={handleChange}
         onClick={e => setEditable(true)}
+        onKeyDown={selected ? handleKey : undefined}
+        onBlur={() => {
+          setEditable(false)
+        }}
       />
     )
   } else {
-    return <div className={clazz} style={styl} dangerouslySetInnerHTML={{__html: text}} />
+    return (
+      <div
+        role="treeitem"
+        aria-label={TextBlock.craft.displayName}
+        aria-selected={selected}
+        tabIndex={-1}
+        className={clazz}
+        style={styl}
+        dangerouslySetInnerHTML={{__html: text}}
+      />
+    )
   }
 }
 
@@ -113,5 +140,6 @@ TextBlock.craft = {
   },
   custom: {
     isResizable: true,
+    isBlock: true,
   },
 }

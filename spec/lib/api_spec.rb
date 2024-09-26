@@ -817,27 +817,27 @@ describe Api do
 
   context "ISO8601 regex" do
     it "does not allow invalid dates" do
-      expect("10/01/2014").to_not match Api::ISO8601_REGEX
+      expect(Api::ISO8601_REGEX).to_not match "10/01/2014"
     end
 
     it "does not allow non ISO8601 dates" do
-      expect("2014-10-01").to_not match Api::ISO8601_REGEX
+      expect(Api::ISO8601_REGEX).to_not match "2014-10-01"
     end
 
     it "does not allow garbage dates" do
-      expect("bad_data").to_not match Api::ISO8601_REGEX
+      expect(Api::ISO8601_REGEX).to_not match "bad_data"
     end
 
     it "allows valid dates" do
-      expect("2014-10-01T00:00:00-06:00").to match Api::ISO8601_REGEX
+      expect(Api::ISO8601_REGEX).to match "2014-10-01T00:00:00-06:00"
     end
 
     it "does not allow valid dates BC" do
-      expect("-2014-10-01T00:00:00-06:00").to_not match Api::ISO8601_REGEX
+      expect(Api::ISO8601_REGEX).to_not match "-2014-10-01T00:00:00-06:00"
     end
   end
 
-  context ".api_user_content" do
+  describe ".api_user_content" do
     let(:klass) do
       Class.new do
         include Api
@@ -941,13 +941,13 @@ describe Api do
     end
   end
 
-  context ".process_incoming_html_content" do
+  describe ".process_incoming_html_content" do
     let(:klass) do
       Class.new do
         extend Api
 
         def self.request
-          OpenStruct.new({ host: "some-host.com", port: 80 })
+          @request ||= ActionDispatch::Request.new("HTTP_HOST" => "some-host.com")
         end
       end
     end
@@ -996,7 +996,7 @@ describe Api do
     end
   end
 
-  context ".paginate" do
+  describe ".paginate" do
     let(:request) { double("request", query_parameters: {}) }
     let(:response) { double("response", headers: {}) }
     let(:controller) { double("controller", request:, response:, params: {}) }
@@ -1075,7 +1075,7 @@ describe Api do
     end
   end
 
-  context ".jsonapi_paginate" do
+  describe ".jsonapi_paginate" do
     let(:request) { double("request", query_parameters: {}) }
     let(:response) { double("response", headers: {}) }
     let(:controller) { double("controller", request:, response:, params: {}) }
@@ -1101,7 +1101,7 @@ describe Api do
     end
   end
 
-  context ".build_links" do
+  describe ".build_links" do
     it "does not build links if not pagination is provided" do
       expect(Api.build_links("www.example.com")).to be_empty
     end

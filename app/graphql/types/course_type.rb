@@ -28,8 +28,8 @@ module Types
   class SubmissionOrderInputType < BaseInputObject
     graphql_name "SubmissionOrderCriteria"
 
-    argument :field, SubmissionOrderFieldType, required: true
     argument :direction, OrderDirectionType, required: false
+    argument :field, SubmissionOrderFieldType, required: true
   end
 
   class CourseType < ApplicationObjectType
@@ -117,17 +117,21 @@ module Types
     implements Interfaces::LegacyIDInterface
 
     global_id_field :id
-    key_field_id
 
-    field :name, String, null: false
     field :course_code, String, "course short name", null: true
-    field :syllabus_body, String, null: true
+    field :name, String, null: false
     field :state, CourseWorkflowState, method: :workflow_state, null: false
+    field :syllabus_body, String, null: true
 
     field :assignment_groups_connection,
           AssignmentGroupType.connection_type,
           method: :assignment_groups,
           null: true
+
+    def assignment_groups_connection
+      assignment_groups = object.assignment_groups
+      assignment_groups.where(workflow_state: "available")
+    end
 
     field :apply_group_weights, Boolean, null: true
     def apply_group_weights
@@ -287,13 +291,13 @@ module Types
     field :submissions_connection, SubmissionType.connection_type, null: true do
       description "all the submissions for assignments in this course"
 
+      argument :filter, SubmissionFilterInputType, required: false
+      argument :order_by, [SubmissionOrderInputType], required: false
       argument :student_ids,
                [ID],
                "Only return submissions for the given students.",
                prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
                required: false
-      argument :order_by, [SubmissionOrderInputType], required: false
-      argument :filter, SubmissionFilterInputType, required: false
     end
     def submissions_connection(student_ids: nil, order_by: [], filter: {})
       allowed_user_ids = if course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)

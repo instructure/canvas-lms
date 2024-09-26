@@ -704,7 +704,7 @@ describe ContentMigration do
 
       quiz = @copy_from.quizzes.create!(title: "survey pub", quiz_type: "survey")
       qq_from = quiz.quiz_questions.new(assessment_question: aq_from)
-      qq_from.write_attribute(:question_data, data)
+      qq_from["question_data"] = data
       qq_from.save!
       quiz.generate_quiz_data
       quiz.save!

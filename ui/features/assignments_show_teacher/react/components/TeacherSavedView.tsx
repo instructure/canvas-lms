@@ -19,13 +19,18 @@
 import React from 'react'
 import type {TeacherAssignmentType} from '../../graphql/AssignmentTeacherTypes'
 import AssignmentHeader from './AssignmentHeader'
+import {QueryProvider} from '@canvas/query'
 
 interface TeacherViewProps {
   assignment: TeacherAssignmentType
 }
 
 const TeacherSavedView: React.FC<TeacherViewProps> = props => {
-  return <AssignmentHeader assignment={props.assignment} />
+  return (
+    <QueryProvider>
+      <AssignmentHeader assignment={props.assignment} breakpoints={{}} />
+    </QueryProvider>
+  )
 }
 
 export default TeacherSavedView

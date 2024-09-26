@@ -129,6 +129,18 @@ const shouldDeleteNode = (e: React.KeyboardEvent) => {
   return e.key === 'Backspace' && e.currentTarget.textContent === ''
 }
 
+const getArrowNext = () => {
+  return document.documentElement.dir === 'rtl'
+    ? ['ArrowDown', 'ArrowLeft']
+    : ['ArrowDown', 'ArrowRight']
+}
+
+const getArrowPrev = () => {
+  return document.documentElement.dir === 'rtl'
+    ? ['ArrowUp', 'ArrowRight']
+    : ['ArrowUp', 'ArrowLeft']
+}
+
 export {
   isAnyModifierKeyPressed,
   getCaretPosition,
@@ -140,4 +152,6 @@ export {
   addNewNodeAsNextSibling,
   deleteNodeAndSelectPrevSibling,
   removeTrailingEmptyParagraphTags,
+  getArrowNext,
+  getArrowPrev,
 }

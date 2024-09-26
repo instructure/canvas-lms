@@ -40,6 +40,7 @@ export type EnrollmentConnection = {
 
 type AssignmentCheckpoint = {
   tag: string
+  pointsPossible: number
 }
 
 export type AssignmentConnection = {
@@ -182,6 +183,19 @@ export type GradebookStudentDetails = {
   sortableName: string
 }
 
+export type GradebookUserSubSubmissionDetails = {
+  grade: string | null
+  score: number | null
+  publishedGrade: string | null
+  publishedScore: string | null
+  assignmentId: string
+  gradeMatchesCurrentSubmission: boolean
+  subAssignmentTag: string
+  enteredGrade: string | null
+  enteredScore?: number | null
+  excused: boolean
+}
+
 export type GradebookUserSubmissionDetails = {
   assignmentId: string
   cachedDueDate: string | null
@@ -204,6 +218,7 @@ export type GradebookUserSubmissionDetails = {
   submissionType?: string | null
   submittedAt: Date | null
   userId: string
+  subAssignmentSubmissions?: GradebookUserSubSubmissionDetails[]
 }
 
 export type GradebookStudentQueryResponse = {

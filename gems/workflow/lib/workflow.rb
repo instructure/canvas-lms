@@ -176,10 +176,10 @@ module Workflow
     end
 
     # INSTRUCTURE:
-    def process_event(name, *args)
+    def process_event(name, *)
       success = true
       begin
-        process_event!(name, *args)
+        process_event!(name, *)
       rescue NoTransitionAllowed
         @halted = true
         @halted_because = $!
@@ -188,14 +188,14 @@ module Workflow
       success
     end
 
-    def process_event!(name, *args)
+    def process_event!(name, *)
       event = current_state.events[name.to_sym]
       raise NoTransitionAllowed, "There is no event #{name.to_sym} defined for the #{current_state} state" if event.nil?
 
       @halted_because = nil
       @halted = false
       @raise_exception_on_halt = false
-      return_value = run_action(event.action, *args) || run_action_callback("do_#{event.name}", *args)
+      return_value = run_action(event.action, *) || run_action_callback("do_#{event.name}", *)
       if @halted
         if @raise_exception_on_halt
           raise TransitionHalted, @halted_because
@@ -203,8 +203,8 @@ module Workflow
           false
         end
       else
-        run_on_transition(current_state, spec.states[event.transitions_to], name, *args)
-        transition(current_state, spec.states[event.transitions_to], name, *args)
+        run_on_transition(current_state, spec.states[event.transitions_to], name, *)
+        transition(current_state, spec.states[event.transitions_to], name, *)
         return_value
       end
     end
@@ -227,30 +227,30 @@ module Workflow
       @raise_exception_on_halt = true
     end
 
-    def transition(from, to, name, *args)
-      run_on_exit(from, to, name, *args)
+    def transition(from, to, name, *)
+      run_on_exit(from, to, name, *)
       persist_workflow_state to.to_s
-      run_on_entry(to, from, name, *args)
+      run_on_entry(to, from, name, *)
     end
 
-    def run_on_transition(from, to, event, *args)
-      instance_exec(from.name, to.name, event, *args, &spec.on_transition_proc) if spec.on_transition_proc
+    def run_on_transition(from, to, event, *)
+      instance_exec(from.name, to.name, event, *, &spec.on_transition_proc) if spec.on_transition_proc
     end
 
-    def run_action(action, *args)
-      instance_exec(*args, &action) if action
+    def run_action(action, *)
+      instance_exec(*, &action) if action
     end
 
-    def run_action_callback(action_name, *args)
-      send action_name.to_sym, *args if respond_to?(action_name.to_sym)
+    def run_action_callback(action_name, *)
+      send(action_name.to_sym, *) if respond_to?(action_name.to_sym)
     end
 
-    def run_on_entry(state, prior_state, triggering_event, *args)
-      instance_exec(prior_state.name, triggering_event, *args, &state.on_entry) if state.on_entry
+    def run_on_entry(state, prior_state, triggering_event, *)
+      instance_exec(prior_state.name, triggering_event, *, &state.on_entry) if state.on_entry
     end
 
-    def run_on_exit(state, new_state, triggering_event, *args)
-      instance_exec(new_state.name, triggering_event, *args, &state.on_exit) if state&.on_exit
+    def run_on_exit(state, new_state, triggering_event, *)
+      instance_exec(new_state.name, triggering_event, *, &state.on_exit) if state&.on_exit
     end
 
     # load_workflow_state and persist_workflow_state
@@ -271,7 +271,7 @@ module Workflow
 
   module ActiveRecordInstanceMethods
     def load_workflow_state
-      read_attribute(:workflow_state)
+      self["workflow_state"]
     end
 
     # On transition the new workflow state is immediately saved in the
@@ -288,7 +288,7 @@ module Workflow
     # state. That's why it is important to save the string with the name of the
     # initial state in all the new records.
     def write_initial_state
-      write_attribute :workflow_state, current_state.to_s unless frozen?
+      self.workflow_state = current_state.to_s unless frozen?
     end
   end
 

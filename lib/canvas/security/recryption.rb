@@ -59,8 +59,8 @@ module Canvas::Security
         model.where("#{definition[:encrypted_column]} IS NOT NULL")
              .select([:id, definition[:encrypted_column], definition[:salt_column]])
              .find_each do |instance|
-          cleartext = Canvas::Security.decrypt_password(instance.read_attribute(definition[:encrypted_column]),
-                                                        instance.read_attribute(definition[:salt_column]),
+          cleartext = Canvas::Security.decrypt_password(instance[definition[:encrypted_column]],
+                                                        instance[definition[:salt_column]],
                                                         definition[:key],
                                                         encryption_key)
           new_crypted_data, new_salt = Canvas::Security.encrypt_password(cleartext, definition[:key])

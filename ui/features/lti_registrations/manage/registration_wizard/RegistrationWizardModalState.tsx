@@ -21,7 +21,7 @@ import type {LtiImsRegistrationId} from '../model/lti_ims_registration/LtiImsReg
 import {ZUnifiedToolId, type UnifiedToolId} from '../model/UnifiedToolId'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 
-export type JsonUrlFetchStatus =
+export type JsonFetchStatus =
   | {
       _tag: 'initial'
     }
@@ -49,7 +49,18 @@ export type RegistrationWizardModalState = {
   lti_version: '1p3' | '1p1'
   method: InstallMethod
   dynamicRegistrationUrl: string
+  /**
+   * Contains the state of the URL input for the JSON Url method
+   */
   jsonUrl: string
+  /**
+   * Contains the state of the JSON Code input for the JSON method
+   */
+  jsonCode: string
+  /**
+   * Contains the state of the Name input for the Manual method
+   */
+  manualAppName: string
   /**
    * The ID of the LTI IMS Registration to edit. If this is set, the registration wizard will
    * open to the Dynamic Registration review screen, once the registration has been loaded from the backend.
@@ -59,9 +70,9 @@ export type RegistrationWizardModalState = {
   unifiedToolId?: UnifiedToolId
   /**
    * Contains the state of fetching the JSON for the
-   * JSON url method
+   * JSON methods
    */
-  jsonUrlFetch: JsonUrlFetchStatus
+  jsonFetch: JsonFetchStatus
   /**
    * Controls whether the modal should close when the user
    * clicks "cancel" Should be true when the modal is
@@ -78,7 +89,9 @@ export type RegistrationWizardModalStateActions = {
   updateMethod: (method: InstallMethod) => void
   updateDynamicRegistrationUrl: (url: string) => void
   updateJsonUrl: (url: string) => void
-  updateJsonFetchStatus: (status: JsonUrlFetchStatus) => void
+  updateManualAppName: (appName: string) => void
+  updateJsonCode: (url: string) => void
+  updateJsonFetchStatus: (status: JsonFetchStatus) => void
   register: () => void
   unregister: () => void
   close: () => void
@@ -94,14 +107,18 @@ export const useRegistrationModalWizardState = create<
   method: 'dynamic_registration',
   dynamicRegistrationUrl: '',
   jsonUrl: '',
+  jsonCode: '',
+  manualAppName: '',
   unifiedToolId: undefined,
   registering: false,
   exitOnCancel: false,
-  jsonUrlFetch: {_tag: 'initial'},
+  jsonFetch: {_tag: 'initial'},
   updateLtiVersion: version => set({lti_version: version}),
-  updateMethod: method => set({method}),
+  updateMethod: method => set({method, jsonFetch: {_tag: 'initial'}}),
   updateDynamicRegistrationUrl: url => set({dynamicRegistrationUrl: url}),
-  updateJsonUrl: url => set({jsonUrl: url}),
+  updateJsonUrl: url => set({jsonUrl: url, jsonFetch: {_tag: 'initial'}}),
+  updateManualAppName: name => set({manualAppName: name}),
+  updateJsonCode: code => set({jsonCode: code, jsonFetch: {_tag: 'initial'}}),
   register: () => set({registering: true}),
   unregister: () => {
     // todo: if we've already returned from the tool,
@@ -116,9 +133,9 @@ export const useRegistrationModalWizardState = create<
   },
   updateJsonFetchStatus: status => {
     if (status._tag === 'loaded') {
-      set({jsonUrlFetch: status, registering: isSuccessful(status.result)})
+      set({jsonFetch: status, registering: isSuccessful(status.result)})
     } else {
-      set({jsonUrlFetch: status})
+      set({jsonFetch: status})
     }
   },
   close: () => set({open: false, ltiImsRegistrationId: undefined, registering: false}),

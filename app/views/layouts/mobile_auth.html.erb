@@ -20,12 +20,13 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title><%= yield :page_title || t("log_in_to_canvas", "Log In To Canvas") %></title>
+  <title><%= (yield :page_title).presence || t("log_in_to_canvas", "Canvas Login | Instructure") %></title>
   <%= render_datadog_rum_js %>
   <meta name="HandheldFriendly" content="True">
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+  <meta name="description" content="Official Login page for Canvas student login, School Search Canvas, Canvas Network, Canvas Community, and Canvas Free For Teacher accounts." />
 
   <%= stylesheet_link_tag(active_brand_config_url('css'), media: "all") %>
   <%= include_common_stylesheets %>

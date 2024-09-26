@@ -284,6 +284,66 @@ describe GradebookImporter do
         expect(importer.context).to eq(gradebook_course)
       end
     end
+
+    context "when assignment checkpoints are present" do
+      before(:once) do
+        @course = course_factory(active_course: true)
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+      end
+
+      it "handles checkpoint assignments" do
+        importer_with_rows(
+          "Student,ID,Section,#{@reply_to_topic.title} Reply To Topic (#{@reply_to_topic.id}),#{@reply_to_entry.title} Required Replies (#{@reply_to_entry.id}),Final Score",
+          "Points Possible,,5,5,",
+          '"Blend, Bill",6,My Course,5,3,'
+        )
+
+        expect(@gi.assignments.length).to eq 2
+        expect(@gi.assignments.first.id).to eq @reply_to_topic.id
+        expect(@gi.assignments.last.id).to eq @reply_to_entry.id
+      end
+
+      it "handles checkpoint assignments grade changes" do
+        importer_with_rows(
+          "Student,ID,Section,#{@reply_to_topic.title} Reply To Topic (#{@reply_to_topic.id}),#{@reply_to_entry.title} Required Replies (#{@reply_to_entry.id}),Final Score",
+          "Points Possible,,5,5,",
+          '"Blend, Bill",6,My Course,5,3,'
+        )
+        submission = @gi.upload.gradebook.fetch("students").first.fetch("submissions").first
+        expect(submission["original_grade"]).to be_nil
+        expect(submission["grade"]).to eq "5"
+        expect(submission["assignment_id"]).to eq @reply_to_topic.id
+      end
+
+      it "properly formats title for checkpoint assignments" do
+        importer_with_rows(
+          "Student,ID,Section,#{@reply_to_topic.title} Reply To Topic (#{@reply_to_topic.id}),#{@reply_to_entry.title} Required Replies (#{@reply_to_entry.id}),Final Score",
+          "Points Possible,,5,5,",
+          '"Blend, Bill",6,My Course,5,3,'
+        )
+        gradebook = @gi.upload.gradebook
+        reply_to_topic_title = gradebook.fetch("assignments").first.fetch("title")
+        reply_to_entry_title = gradebook.fetch("assignments").last.fetch("title")
+        expect(reply_to_topic_title).to eq "#{@reply_to_topic.title} Reply To Topic"
+        expect(reply_to_entry_title).to eq "#{@reply_to_entry.title} Required Replies"
+      end
+
+      it "ignores grade changes to parent assignments" do
+        importer_with_rows(
+          "Student,ID,Section,#{@assignment.title} (#{@assignment.id}),Final Score",
+          "Points Possible,,5,",
+          '"Blend, Bill",6,My Course,5,'
+        )
+        gradebook = @gi.upload.gradebook
+        submission = gradebook.fetch("students").first.fetch("submissions").first
+        prevented_grading_ungradeable_submission = gradebook.fetch("warning_messages").fetch("prevented_grading_ungradeable_submission")
+        expect(submission["original_grade"]).to be_nil
+        expect(submission["grade"]).to be_nil
+        expect(submission["assignment_id"]).to eq @assignment.id
+        expect(prevented_grading_ungradeable_submission).to be true
+      end
+    end
   end
 
   context "User lookup" do

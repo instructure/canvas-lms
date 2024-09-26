@@ -18,9 +18,15 @@
 import moment from 'moment-timezone'
 import _ from 'lodash'
 import parseLinkHeader from '@canvas/parse-link-header'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('planner')
+
+export const REPLY_TO_TOPIC = 'reply_to_topic'
+export const REPLY_TO_ENTRY = 'reply_to_entry'
 
 const getItemDetailsFromPlannable = apiResponse => {
-  const {plannable, plannable_type, planner_override} = apiResponse
+  const {plannable, plannable_type, planner_override, details: item_details} = apiResponse
   const plannableId = plannable.id || plannable.page_id
 
   const details = {
@@ -40,7 +46,11 @@ const getItemDetailsFromPlannable = apiResponse => {
   details.originallyCompleted = details.completed
   details.feedback = apiResponse.submissions ? apiResponse.submissions.feedback : undefined
 
-  if (plannable_type === 'discussion_topic' || plannable_type === 'announcement') {
+  if (
+    plannable_type === 'discussion_topic' ||
+    plannable_type === 'announcement' ||
+    plannable_type === 'sub_assignment'
+  ) {
     details.unread_count = plannable.unread_count
   }
 
@@ -57,6 +67,22 @@ const getItemDetailsFromPlannable = apiResponse => {
     details.onlineMeetingURL = plannable.online_meeting_url
   }
 
+  if (plannable_type === 'sub_assignment') {
+    switch (plannable.sub_assignment_tag) {
+      case REPLY_TO_TOPIC:
+        details.title = I18n.t('%{itemTitle} Reply to Topic', {itemTitle: details.title})
+        break
+      case REPLY_TO_ENTRY:
+        details.title = I18n.t('%{itemTitle} Required Replies (%{num})', {
+          itemTitle: details.title,
+          num: item_details.reply_to_entry_required_count,
+        })
+        break
+      default:
+        details.title = I18n.t('Checkpoint')
+    }
+  }
+
   if (plannable.restrict_quantitative_data) {
     details.restrict_quantitative_data = plannable.restrict_quantitative_data
   }
@@ -68,6 +94,7 @@ const TYPE_MAPPING = {
   quiz: 'Quiz',
   discussion_topic: 'Discussion',
   assignment: 'Assignment',
+  sub_assignment: 'Discussion Checkpoint',
   wiki_page: 'Page',
   announcement: 'Announcement',
   planner_note: 'To Do',

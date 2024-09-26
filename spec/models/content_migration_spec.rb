@@ -977,6 +977,24 @@ describe ContentMigration do
     end
   end
 
+  describe "#import_quizzes_next?" do
+    it "returns false when migration_settings[:import_quizzes_next] is false or nil" do
+      settings = [false, "false", nil]
+      settings.each do |setting|
+        @cm.migration_settings["import_quizzes_next"] = setting
+        expect(@cm.import_quizzes_next?).to be false
+      end
+    end
+
+    it "returns true when migration_settings[:import_quizzes_next] is true" do
+      settings = [true, "true"]
+      settings.each do |setting|
+        @cm.migration_settings["import_quizzes_next"] = setting
+        expect(@cm.import_quizzes_next?).to be true
+      end
+    end
+  end
+
   context "Quizzes.Next CC import" do
     before do
       allow(@cm.context)

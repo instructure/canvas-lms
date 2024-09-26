@@ -28,7 +28,7 @@ GEM
     concurrent-ruby (1.3.4)
     connection_pool (2.4.1)
     drb (2.2.1)
-    i18n (1.14.5)
+    i18n (1.14.6)
       concurrent-ruby (~> 1.0)
     minitest (5.25.1)
     mutex_m (0.2.0)
@@ -51,7 +51,7 @@ DEPENDENCIES
   workflow!
 
 RUBY VERSION
-   ruby 3.1.2p20
+   ruby 3.3.3p89
 
 BUNDLED WITH
    2.5.10

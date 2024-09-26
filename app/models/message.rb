@@ -440,7 +440,7 @@ class Message < ActiveRecord::Base
   #
   # Returns nothing.
   def transmission_errors=(val)
-    write_attribute(:transmission_errors, val[0, self.class.maximum_text_length])
+    super(val[0, self.class.maximum_text_length])
   end
 
   # Public: Custom getter that delegates and caches notification category to
@@ -1006,7 +1006,7 @@ self.user,
   #
   # Returns nothing.
   def data=(values_hash)
-    @data = OpenStruct.new(values_hash)
+    @data = OpenStruct.new(values_hash) # rubocop:disable Style/OpenStructUse
   end
 
   # Public: Before save, close this message if it has no user or a deleted

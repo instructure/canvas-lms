@@ -81,13 +81,10 @@ describe('PaceContextsContent', () => {
   })
 
   beforeEach(() => {
-    fetchMock.get(SECTION_CONTEXTS_API, JSON.stringify(PACE_CONTEXTS_SECTIONS_RESPONSE))
-    fetchMock.get(STUDENT_CONTEXTS_API, JSON.stringify(PACE_CONTEXTS_STUDENTS_RESPONSE))
-    fetchMock.get(
-      SEARCH_SECTION_CONTEXTS_API,
-      JSON.stringify(PACE_CONTEXTS_SECTIONS_SEARCH_RESPONSE)
-    )
-    fetchMock.get(SECTION_PACE_CREATION_API, JSON.stringify({course_pace: {}, progress: null}))
+    fetchMock.get(SECTION_CONTEXTS_API, PACE_CONTEXTS_SECTIONS_RESPONSE)
+    fetchMock.get(STUDENT_CONTEXTS_API, PACE_CONTEXTS_STUDENTS_RESPONSE)
+    fetchMock.get(SEARCH_SECTION_CONTEXTS_API, PACE_CONTEXTS_SECTIONS_SEARCH_RESPONSE)
+    fetchMock.get(SECTION_PACE_CREATION_API, {course_pace: {}, progress: null})
     jest.clearAllMocks()
   })
 
@@ -177,7 +174,7 @@ describe('PaceContextsContent', () => {
     it("shows no results if there's no contexts for the search", async () => {
       fetchMock.get(
         SEARCH_SECTION_CONTEXTS_API,
-        JSON.stringify({pace_contexts: [], total_entries: 0}),
+        {pace_contexts: [], total_entries: 0},
         {overwriteRoutes: true}
       )
       const {findAllByText, getByText, getByPlaceholderText} = renderConnected(<PaceContent />)
@@ -200,9 +197,11 @@ describe('PaceContextsContent', () => {
     describe('Last Modified column', () => {
       it('displays just now if the last modification was 5 minutes ago or less', async () => {
         const justModifiedPace = generateModifiedPace(MINUTE)
-        fetchMock.get(SECTION_CONTEXTS_API, JSON.stringify({pace_contexts: [justModifiedPace]}), {
-          overwriteRoutes: true,
-        })
+        fetchMock.get(
+          SECTION_CONTEXTS_API,
+          {pace_contexts: [justModifiedPace]},
+          {overwriteRoutes: true}
+        )
 
         const {findByText} = renderConnected(<PaceContent />)
         expect(await findByText('Just Now')).toBeInTheDocument()
@@ -210,9 +209,11 @@ describe('PaceContextsContent', () => {
 
       it('displays the number of minutes if the last modification was between 5 and 59 mins ago', async () => {
         const modifiedPace = generateModifiedPace(7 * MINUTE)
-        fetchMock.get(SECTION_CONTEXTS_API, JSON.stringify({pace_contexts: [modifiedPace]}), {
-          overwriteRoutes: true,
-        })
+        fetchMock.get(
+          SECTION_CONTEXTS_API,
+          {pace_contexts: [modifiedPace]},
+          {overwriteRoutes: true}
+        )
 
         const {findByText} = renderConnected(<PaceContent />)
         expect(await findByText('7 minutes ago')).toBeInTheDocument()
@@ -220,9 +221,11 @@ describe('PaceContextsContent', () => {
 
       it('displays the number of hours if the last modification was between 1 and 24 hours ago', async () => {
         const modifiedPace = generateModifiedPace(3 * HOUR)
-        fetchMock.get(SECTION_CONTEXTS_API, JSON.stringify({pace_contexts: [modifiedPace]}), {
-          overwriteRoutes: true,
-        })
+        fetchMock.get(
+          SECTION_CONTEXTS_API,
+          {pace_contexts: [modifiedPace]},
+          {overwriteRoutes: true}
+        )
 
         const {findByText} = renderConnected(<PaceContent />)
         expect(await findByText('3 hours ago')).toBeInTheDocument()
@@ -230,9 +233,11 @@ describe('PaceContextsContent', () => {
 
       it('displays the number of days if the last modification was between 1 and 7 days ago', async () => {
         const modifiedPace = generateModifiedPace(4 * DAY)
-        fetchMock.get(SECTION_CONTEXTS_API, JSON.stringify({pace_contexts: [modifiedPace]}), {
-          overwriteRoutes: true,
-        })
+        fetchMock.get(
+          SECTION_CONTEXTS_API,
+          {pace_contexts: [modifiedPace]},
+          {overwriteRoutes: true}
+        )
 
         const {findByText} = renderConnected(<PaceContent />)
         expect(await findByText('4 days ago')).toBeInTheDocument()
@@ -240,9 +245,11 @@ describe('PaceContextsContent', () => {
 
       it('displays the number of weeks if the last modification was between 1 and 4 weeks ago', async () => {
         const modifiedPace = generateModifiedPace(WEEK)
-        fetchMock.get(SECTION_CONTEXTS_API, JSON.stringify({pace_contexts: [modifiedPace]}), {
-          overwriteRoutes: true,
-        })
+        fetchMock.get(
+          SECTION_CONTEXTS_API,
+          {pace_contexts: [modifiedPace]},
+          {overwriteRoutes: true}
+        )
 
         const {findByText} = renderConnected(<PaceContent />)
         expect(await findByText('1 week ago')).toBeInTheDocument()
@@ -253,9 +260,11 @@ describe('PaceContextsContent', () => {
         const modifiedPace = generateModifiedPace(timeAgo)
         const lastModified = new Date(Date.now() - timeAgo)
         const formattedDate = tz.format(lastModified, 'date.formats.long')
-        fetchMock.get(SECTION_CONTEXTS_API, JSON.stringify({pace_contexts: [modifiedPace]}), {
-          overwriteRoutes: true,
-        })
+        fetchMock.get(
+          SECTION_CONTEXTS_API,
+          {pace_contexts: [modifiedPace]},
+          {overwriteRoutes: true}
+        )
 
         const {findByText} = renderConnected(<PaceContent />)
         expect(await findByText(formattedDate)).toBeInTheDocument()
@@ -264,10 +273,7 @@ describe('PaceContextsContent', () => {
 
     describe('Sortable Column', () => {
       beforeEach(() => {
-        fetchMock.get(
-          STUDENT_CONTEXTS_API_WITH_DESC_SORTING,
-          JSON.stringify(PACE_CONTEXTS_STUDENTS_RESPONSE)
-        )
+        fetchMock.get(STUDENT_CONTEXTS_API_WITH_DESC_SORTING, PACE_CONTEXTS_STUDENTS_RESPONSE)
       })
 
       it('sorts the table in ascending order by default', async () => {
@@ -301,19 +307,13 @@ describe('PaceContextsContent', () => {
 
     describe('Paces publishing', () => {
       beforeEach(() => {
-        fetchMock.get(
-          INIT_PACE_PROGRESS_STATUS_POLL,
-          JSON.stringify({course_pace: {}, progress: {id: 1}})
-        )
-        fetchMock.get(
-          INIT_SECTION_PACE_PROGRESS_STATUS_POLL,
-          JSON.stringify({course_pace: {}, progress: {id: 2}})
-        )
+        fetchMock.get(INIT_PACE_PROGRESS_STATUS_POLL, {course_pace: {}, progress: {id: 1}})
+        fetchMock.get(INIT_SECTION_PACE_PROGRESS_STATUS_POLL, {course_pace: {}, progress: {id: 2}})
       })
 
-      // passes, but with warning: "Unmatched GET to /api/v1/progress/2"
-      // FOO-3818
-      it.skip('shows a loading indicator for each pace publishing', async () => {
+      it('shows a loading indicator for each pace publishing', async () => {
+        fetchMock.get('/api/v1/progress/2', {progress: {id: 2}})
+
         const paceContextsState: PaceContextsState = {
           ...DEFAULT_STORE_STATE.paceContexts,
           contextsPublishing: [
@@ -340,6 +340,8 @@ describe('PaceContextsContent', () => {
       })
 
       it('starts polling for published status updates on mount', async () => {
+        fetchMock.get('/api/v1/progress/1', {progress: {id: 1}})
+
         const user = userEvent.setup({delay: null})
         const paceContextsState: PaceContextsState = {
           ...DEFAULT_STORE_STATE.paceContexts,

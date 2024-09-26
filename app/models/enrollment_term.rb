@@ -101,22 +101,22 @@ class EnrollmentTerm < ActiveRecord::Base
   end
 
   def default_term?
-    read_attribute(:name) == EnrollmentTerm::DEFAULT_TERM_NAME
+    self["name"] == EnrollmentTerm::DEFAULT_TERM_NAME
   end
 
   def name
     if default_term?
       EnrollmentTerm.i18n_default_term_name
     else
-      read_attribute(:name)
+      super
     end
   end
 
   def name=(new_name)
     if new_name == EnrollmentTerm.i18n_default_term_name
-      write_attribute(:name, DEFAULT_TERM_NAME)
+      super(DEFAULT_TERM_NAME)
     else
-      write_attribute(:name, new_name)
+      super
     end
   end
 
@@ -196,7 +196,7 @@ class EnrollmentTerm < ActiveRecord::Base
   end
 
   def consistent_account_associations
-    if read_attribute(:grading_period_group_id).present? && (root_account_id != grading_period_group.account_id)
+    if grading_period_group_id && (root_account_id != grading_period_group.account_id)
       errors.add(:grading_period_group, t("cannot be associated with a different account"))
     end
   end

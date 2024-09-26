@@ -150,4 +150,28 @@ describe "courses/_recent_feedback" do
     url = context_url(@assignment.context, :context_assignment_submission_url, assignment_id: @assignment.id, id: student.id)
     expect(response.body).to include("\"#{url}\"")
   end
+
+  context "discussion checkpoints" do
+    before do
+      course_with_student(active_all: true)
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course, title: "Discussion with Checkpoints")
+    end
+
+    it "displays proper title for reply to topic checkpoint" do
+      @reply_to_topic.submit_homework @student, body: "checkpoint submission for #{@student.name}"
+      submission_model(user: @student, assignment: @reply_to_topic)
+
+      render partial: "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
+      expect(response).to include "#{@reply_to_topic.title} Reply to Topic"
+    end
+
+    it "displays proper title for reply to entry checkpoint" do
+      @reply_to_topic.submit_homework @student, body: "checkpoint submission for #{@student.name}"
+      submission_model(user: @student, assignment: @reply_to_entry)
+
+      render partial: "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
+      expect(response).to include "#{@reply_to_entry.title} Required Replies (#{@topic.reply_to_entry_required_count})"
+    end
+  end
 end

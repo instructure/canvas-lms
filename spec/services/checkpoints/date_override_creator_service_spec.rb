@@ -79,25 +79,12 @@ describe Checkpoints::DateOverrideCreatorService do
       end
 
       it "creates a shell override for the parent assignment with nil due_at" do
-        expect(Checkpoints::SectionOverrideCreatorService).to receive(:call) do |params|
-          expect(params[:checkpoint]).to eq(@checkpoint)
-          expect(params[:override]).to eq(override_params)
+        Checkpoints::SectionOverrideCreatorService.call(checkpoint: @checkpoint, override: override_params)
 
-          # Simulate the behavior of SectionOverrideCreatorService
-          checkpoint_override = @checkpoint.assignment_overrides.create!(set: section)
-          checkpoint_override.override_due_at(override_params[:due_at])
-          checkpoint_override.override_unlock_at(override_params[:unlock_at])
-          checkpoint_override.override_lock_at(override_params[:lock_at])
-
-          parent_override = @checkpoint.parent_assignment.assignment_overrides.create!(set: section)
-          parent_override.override_due_at(nil)
-          parent_override.override_unlock_at(override_params[:unlock_at])
-          parent_override.override_lock_at(override_params[:lock_at])
-        end
-
-        service.call(checkpoint: @checkpoint, overrides: [override_params])
-
+        # Fetch the last created override for the parent assignment
         parent_override = @checkpoint.parent_assignment.assignment_overrides.last
+
+        # Assert that the parent override's due_at is nil and other dates are set correctly
         expect(parent_override.due_at).to be_nil
         expect(parent_override.unlock_at.to_s).to eq(override_params[:unlock_at].to_s)
         expect(parent_override.lock_at.to_s).to eq(override_params[:lock_at].to_s)

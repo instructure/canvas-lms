@@ -17,9 +17,15 @@
  */
 import * as z from 'zod'
 
-export const ZLtiMessageType = z.union([
-  z.literal('LtiResourceLinkRequest'),
-  z.literal('LtiDeepLinkingRequest'),
-])
+export const LtiResourceLinkRequest = 'LtiResourceLinkRequest' as const
+export const LtiDeepLinkingRequest = 'LtiDeepLinkingRequest' as const
+export const ZResourceLinkRequest = z.literal(LtiResourceLinkRequest)
+export const ZDeepLinkingRequest = z.literal(LtiDeepLinkingRequest)
+
+export const ZLtiMessageType = z.union([ZDeepLinkingRequest, ZResourceLinkRequest])
 
 export type LtiMessageType = z.infer<typeof ZLtiMessageType>
+
+export const isLtiMessageType = (s: string): s is LtiMessageType => {
+  return ZLtiMessageType.safeParse(s).success
+}

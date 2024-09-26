@@ -331,12 +331,12 @@ describe WebConference do
     end
 
     it "has a schduled date in the past" do
-      allow(@conference).to receive(:scheduled_date).and_return(Time.now - 10.days)
+      allow(@conference).to receive(:scheduled_date).and_return(10.days.ago)
       expect(@conference.scheduled?).to be_falsey
     end
 
     it "has a schduled date in the future" do
-      allow(@conference).to receive(:scheduled_date).and_return(Time.now + 10.days)
+      allow(@conference).to receive(:scheduled_date).and_return(10.days.from_now)
       expect(@conference.scheduled?).to be_truthy
     end
   end
@@ -449,7 +449,7 @@ describe WebConference do
         end
       end
 
-      context ".active scope" do
+      describe ".active scope" do
         it "does not include LTI conferences" do
           conference = course.web_conferences.create! do |c|
             c.user = user

@@ -242,7 +242,7 @@ const GroupStructureNoSelfSignup = ({onChange, errormsg}) => {
   )
 }
 
-export const GroupStructure = ({onChange, errormsg}) => {
+export const GroupStructure = ({onChange, errormsg, direction}) => {
   const {selfSignup, createGroupCount, createGroupMemberCount, bySection, splitGroups, groupLimit} =
     useContext(GroupContext)
 
@@ -259,11 +259,11 @@ export const GroupStructure = ({onChange, errormsg}) => {
   }
 
   return (
-    <Flex>
+    <Flex direction={direction} data-testid="group-structure-controls">
       <Flex.Item padding="none medium none none">
         <Text>{I18n.t('Group Structure')}</Text>
       </Flex.Item>
-      <Flex.Item shouldGrow={true}>
+      <Flex.Item shouldGrow={true} overflowY='hidden'>
         {selfSignup ? (
           <GroupStructureSelfSignup onChange={handleChange} errormsg={errormsg} />
         ) : (
@@ -277,4 +277,5 @@ export const GroupStructure = ({onChange, errormsg}) => {
 GroupStructure.propTypes = {
   onChange: func.isRequired,
   errormsg: string,
+  direction: string,
 }

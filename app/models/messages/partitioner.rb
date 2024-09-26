@@ -36,8 +36,8 @@ module Messages
       process(prune: true)
     end
 
-    def self.log(*args)
-      logger&.info(*args)
+    def self.log(*)
+      logger&.info(*)
     end
 
     def self.processed?

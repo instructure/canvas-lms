@@ -71,28 +71,28 @@ class PeriodicJobs
   end
 end
 
-def with_each_job_cluster(klass, method, *args, jitter: nil, local_offset: false)
+def with_each_job_cluster(klass, method, *, jitter: nil, local_offset: false)
   DatabaseServer.send_in_each_region(
     PeriodicJobs,
     :with_each_shard_by_database_in_region,
     { singleton: "periodic:region: #{klass}.#{method}" },
     klass,
     method,
-    *args,
+    *,
     jitter:,
     local_offset:,
     connection_class: Delayed::Backend::ActiveRecord::AbstractJob
   )
 end
 
-def with_each_shard_by_database(klass, method, *args, jitter: nil, local_offset: false, error_callback: nil)
+def with_each_shard_by_database(klass, method, *, jitter: nil, local_offset: false, error_callback: nil)
   DatabaseServer.send_in_each_region(
     PeriodicJobs,
     :with_each_shard_by_database_in_region,
     { singleton: "periodic:region: #{klass}.#{method}" },
     klass,
     method,
-    *args,
+    *,
     jitter:,
     local_offset:,
     connection_class: ActiveRecord::Base,
@@ -158,7 +158,7 @@ Rails.configuration.after_initialize do
     IncomingMailProcessor::Instrumentation.process
   end
 
-  Delayed::Periodic.cron "ErrorReport.destroy_error_reports", "2-59/5 * * * *" do
+  Delayed::Periodic.cron "ErrorReport.destroy_error_reports", "2-59/15 * * * *" do
     cutoff = 3.months
     if cutoff > 0
       with_each_shard_by_database(ErrorReport, :destroy_error_reports, cutoff.seconds.ago)
@@ -309,19 +309,19 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(MissingPolicyApplicator, :apply_missing_deductions)
   end
 
-  Delayed::Periodic.cron "Assignment.clean_up_duplicating_assignments", "*/5 * * * *", priority: Delayed::LOW_PRIORITY do
+  Delayed::Periodic.cron "Assignment.clean_up_duplicating_assignments", "*/15 * * * *", priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(Assignment, :clean_up_duplicating_assignments)
   end
 
-  Delayed::Periodic.cron "Assignment.clean_up_cloning_alignments", "*/5 * * * *", priority: Delayed::LOW_PRIORITY do
+  Delayed::Periodic.cron "Assignment.clean_up_cloning_alignments", "*/15 * * * *", priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(Assignment, :clean_up_cloning_alignments)
   end
 
-  Delayed::Periodic.cron "Assignment.clean_up_importing_assignments", "*/5 * * * *", priority: Delayed::LOW_PRIORITY do
+  Delayed::Periodic.cron "Assignment.clean_up_importing_assignments", "*/15 * * * *", priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(Assignment, :clean_up_importing_assignments)
   end
 
-  Delayed::Periodic.cron "Assignment.clean_up_migrating_assignments", "*/5 * * * *", priority: Delayed::LOW_PRIORITY do
+  Delayed::Periodic.cron "Assignment.clean_up_migrating_assignments", "*/15 * * * *", priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(Assignment, :clean_up_migrating_assignments)
   end
 

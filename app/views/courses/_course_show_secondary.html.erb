@@ -16,7 +16,7 @@
   <% end %>
 
   <% if can_do(@context, @current_user, :manage_content, :manage_course_content_add) %>
-  <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_content_migrations_url) %>">
+  <a id="import_existing_content_btn" class="btn button-sidebar-wide" href="<%= context_url(@context, :context_content_migrations_url) %>">
     <i class="icon-import"></i>
     <%= t('links.import', %{Import Existing Content}) %>
   </a>
@@ -24,14 +24,14 @@
 
   <% if @can_manage || @can_create_announcements || @course_home_view != 'feed' || @course_home_sub_navigation_tools.present? %>
   <div class="course-options">
-    <%= external_tools_menu_items(@course_home_sub_navigation_tools, {link_class: "btn button-sidebar-wide course-home-sub-navigation-lti", settings_key: :course_home_sub_navigation}) %>
+    <%= external_tools_menu_items(@course_home_sub_navigation_tools, {link_id: "import_from_commons_btn", link_class: "btn button-sidebar-wide course-home-sub-navigation-lti", settings_key: :course_home_sub_navigation}) %>
     <% if can_do(@context, @current_user, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) && !@context.elementary_homeroom_course? %>
     <div id="choose_home_page"></div>
     <div id="choose_home_page_not_modules"></div>
     <% end %>
 
     <% if @course_home_view != 'feed' && !@context.elementary_homeroom_course? %>
-    <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_url, :view => 'feed') %>">
+    <a id="view_course_stream_btn" class="btn button-sidebar-wide" href="<%= context_url(@context, :context_url, :view => 'feed') %>">
       <i class="icon-stats"></i>
       <%= t('links.view_course_stream', %{View Course Stream}) %>
     </a>
@@ -75,7 +75,7 @@
 
       <% js_bundle :course_wizard %>
       <% css_bundle :course_wizard %>
-      <a href="#" class="btn button-sidebar-wide wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>">
+      <a id="course_setup_checklist_btn" href="#" class="btn button-sidebar-wide wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>">
         <i class="icon-question"></i> <%= t('links.course_setup', %{Course Setup Checklist}) %>
       </a>
       <% end %>
@@ -119,13 +119,13 @@
     <% end %>
 
     <% if @context_enrollment %>
-    <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_url, :view => 'notifications') %>">
+    <a id="view_course_notifications_btn" class="btn button-sidebar-wide" href="<%= context_url(@context, :context_url, :view => 'notifications') %>">
       <i class="icon-<%= @course_notifications_enabled ? "unmuted" : "muted" %>"></i>
       <%= t('links.view_course_notification_settings', %{View Course Notifications}) %>
     </a>
     <% end %>
 
-    <%= render :partial => '/courses/to_do_list', :locals => {:contexts => [@context], :show_legacy_todo_list => !@context_enrollment&.student?} %>
+    <%= render :partial => '/courses/to_do_list', :locals => {:contexts => [@context], :show_legacy_todo_list => !@context_enrollment&.student?, root_account: @context.root_account} %>
     <%= render :partial => "/courses/group_list", :locals => {:group_list => @user_groups} %>
     <%= nbsp unless @current_user %>
   </div>

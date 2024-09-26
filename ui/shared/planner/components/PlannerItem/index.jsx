@@ -57,6 +57,7 @@ import {assignmentType as getAssignmentType} from '../../utilities/contentUtils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {animatable} from '../../dynamic-ui'
 import buildStyle from './style'
+import {stripHtmlTags} from '@canvas/util/TextHelper'
 
 const I18n = useI18nScope('planner')
 
@@ -317,6 +318,8 @@ export class PlannerItem_raw extends Component {
         return <IconDocumentLine />
       case 'Peer Review':
         return <IconPeerReviewLine />
+      case 'Discussion Checkpoint':
+        return <IconDiscussionLine />
       default:
         return (
           <Avatar
@@ -589,7 +592,7 @@ export class PlannerItem_raw extends Component {
   renderExtraInfo() {
     const feedback = this.props.feedback
     if (feedback) {
-      const comment = feedback.is_media ? I18n.t('You have media feedback.') : feedback.comment
+      const comment = feedback.is_media ? I18n.t('You have media feedback.') : stripHtmlTags(feedback.comment)
       return (
         <div className={this.style.classNames.feedback}>
           <span className={this.style.classNames.feedbackAvatar}>
@@ -600,7 +603,7 @@ export class PlannerItem_raw extends Component {
               data-fs-exclude={true}
             />
           </span>
-          <span className={this.style.classNames.feedbackComment}>
+          <span className={this.style.classNames.feedbackComment} data-testid='feedback-comment'>
             <Text fontStyle="italic">{comment}</Text>
           </span>
         </div>

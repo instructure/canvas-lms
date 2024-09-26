@@ -45,14 +45,19 @@ class Checkpoints::DiscussionCheckpointUpdaterService < Checkpoints::DiscussionC
 
       override_ids_to_delete = existing_overrides.pluck(:id) - update_overrides.pluck(:id)
 
-      # 1. Update existing overrides.
+      # 1. Remove overrides that are no longer present
+      if override_ids_to_delete.any?
+        parent_override_ids = checkpoint.assignment_overrides.where(id: override_ids_to_delete).pluck(:parent_override_id)
+        checkpoint.assignment_overrides.where(id: override_ids_to_delete).destroy_all
+
+        AssignmentOverride.where(id: parent_override_ids).destroy_all
+      end
+
+      # 2. Update existing overrides.
       Checkpoints::DateOverrideUpdaterService.call(checkpoint:, overrides: update_overrides) if update_overrides.any?
 
-      # 2. Add new overrides
+      # 3. Add new overrides
       Checkpoints::DateOverrideCreatorService.call(checkpoint:, overrides: new_overrides) if new_overrides.any?
-
-      # 3. Remove overrides that are no longer present
-      checkpoint.assignment_overrides.where(id: override_ids_to_delete).destroy_all if override_ids_to_delete.any?
 
       update_assignment
       checkpoint

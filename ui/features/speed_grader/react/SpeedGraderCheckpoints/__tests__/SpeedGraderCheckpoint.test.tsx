@@ -50,7 +50,8 @@ const generateAssignment = (
 
 const generateSubAssignmentSubmission = (
   sub_assignment_tag: 'reply_to_topic' | 'reply_to_entry' | null,
-  user_id: string
+  user_id: string,
+  grade_matches_current_submission: boolean = true
 ): SubAssignmentSubmission => ({
   sub_assignment_tag,
   score: 0,
@@ -60,6 +61,8 @@ const generateSubAssignmentSubmission = (
   custom_grade_status_id: null,
   grade: '0',
   user_id,
+  grade_matches_current_submission,
+  entered_grade: '1',
 })
 
 const getCustomGradeStatus = (id: string, name: string) => ({
@@ -71,10 +74,15 @@ const getCustomGradeStatus = (id: string, name: string) => ({
 const getDefaultProps = (
   subAssignmentTag: 'reply_to_topic' | 'reply_to_entry' = 'reply_to_topic',
   pointsPossible: number = 3,
-  gradingType: string = 'points'
+  gradingType: string = 'points',
+  grade_matches_current_submission: boolean = true
 ) => ({
   assignment: generateAssignment('1', pointsPossible, gradingType),
-  subAssignmentSubmission: generateSubAssignmentSubmission(subAssignmentTag, '1'),
+  subAssignmentSubmission: generateSubAssignmentSubmission(
+    subAssignmentTag,
+    '1',
+    grade_matches_current_submission
+  ),
   customGradeStatusesEnabled: true,
   customGradeStatuses: [
     getCustomGradeStatus('1', 'Custom Grade Status 1'),
@@ -83,6 +91,7 @@ const getDefaultProps = (
   lateSubmissionInterval: 'day',
   updateSubmissionGrade: jest.fn(),
   updateSubmissionStatus: jest.fn(),
+  setLastSubmission: jest.fn(),
 })
 
 const setup = (props: {
@@ -93,6 +102,7 @@ const setup = (props: {
   lateSubmissionInterval: string
   updateSubmissionGrade: (params: SubmissionGradeParams) => void
   updateSubmissionStatus: (params: SubmissionStatusParams) => void
+  setLastSubmission: (params: SubAssignmentSubmission) => void
 }) => {
   return render(<SpeedGraderCheckpoint {...props} />)
 }
@@ -204,6 +214,20 @@ describe('SpeedGraderCheckpoint', () => {
     })
   })
 
+  it('calls setLastSubmission when the grade input is changed', () => {
+    const props = getDefaultProps()
+    const {getByTestId} = setup(props)
+
+    const gradeInput = getByTestId('grade-input')
+    fireEvent.change(gradeInput, {target: {value: '3'}})
+    fireEvent.blur(gradeInput)
+
+    expect(props.setLastSubmission).toHaveBeenCalledWith({
+      sub_assignment_tag: 'reply_to_topic',
+      grade: '3',
+    })
+  })
+
   it('calls updateSubmissionStatus when the status is changed or days late changed', () => {
     const props = getDefaultProps()
     const {getByTestId, getByText} = setup(props)
@@ -260,6 +284,37 @@ describe('SpeedGraderCheckpoint', () => {
       assignmentId: '1',
       studentId: '1',
       grade: 'complete',
+    })
+  })
+
+  describe('UseSameGrade', () => {
+    it('renders', () => {
+      const props = getDefaultProps('reply_to_topic', 3, 'pass_fail', false)
+      const {queryByTestId} = setup(props)
+
+      expect(queryByTestId('use-same-grade-link')).toBeDefined()
+    })
+
+    it('does not render', () => {
+      const props = getDefaultProps('reply_to_topic', 3, 'pass_fail', true)
+      const {queryByTestId} = setup(props)
+
+      expect(queryByTestId('use-same-grade-link')).toBeNull()
+    })
+
+    it('calls updateSubmissionGrade when clicking on the link', () => {
+      const props = getDefaultProps('reply_to_topic', 3, 'pass_fail', false)
+      const {getByTestId} = setup(props)
+
+      fireEvent.click(getByTestId('use-same-grade-link'))
+
+      expect(props.updateSubmissionGrade).toHaveBeenCalledWith({
+        subAssignmentTag: 'reply_to_topic',
+        courseId: '1',
+        assignmentId: '1',
+        studentId: '1',
+        grade: '1',
+      })
     })
   })
 })

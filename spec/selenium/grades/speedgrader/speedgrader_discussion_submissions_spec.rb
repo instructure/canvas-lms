@@ -223,22 +223,170 @@ describe "SpeedGrader - discussion submissions" do
         @course.root_account.enable_feature!(:discussion_checkpoints)
 
         @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        @replies_required = 3
 
-        Checkpoints::DiscussionCheckpointCreatorService.call(
+        @reply_to_topic_checkpoint = Checkpoints::DiscussionCheckpointCreatorService.call(
           discussion_topic: @checkpointed_discussion,
           checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
           dates: [{ type: "everyone", due_at: 2.days.from_now }],
           points_possible: 3
         )
-        Checkpoints::DiscussionCheckpointCreatorService.call(
+        @reply_to_entry_checkpint = Checkpoints::DiscussionCheckpointCreatorService.call(
           discussion_topic: @checkpointed_discussion,
           checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
           dates: [{ type: "everyone", due_at: 3.days.from_now }],
           points_possible: 9,
-          replies_required: 3
+          replies_required: @replies_required
         )
 
         @custom_status = CustomGradeStatus.create!(name: "Custom Status", color: "#000000", root_account_id: @course.root_account_id, created_by: @teacher)
+      end
+
+      describe "grading resubmissions" do
+        before do
+          root_entry = @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to topic")
+          child_entries = Array.new(@replies_required) do |i|
+            @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to entry #{i}", parent_entry: root_entry)
+          end
+          @reply_to_topic_checkpoint.grade_student(@student, grade: 5, grader: @teacher)
+          @reply_to_entry_checkpint.grade_student(@student, grade: 7, grader: @teacher)
+          root_entry.destroy
+          child_entries.each(&:destroy)
+          resubmitted_rtt = @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to topic resubmitted")
+          @replies_required.times { |i| @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to entry #{i}", parent_entry: resubmitted_rtt) }
+        end
+
+        it "displays the use same grade link for the previous submission" do
+          # Loads Speedgrader for a student
+          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
+          wait_for_ajaximations
+
+          use_same_grade_links = ff("[data-testid='use-same-grade-link']")
+          expect(use_same_grade_links.count).to eq(2)
+        end
+
+        it "links are removed when the grade is set" do
+          # Loads Speedgrader for a student
+          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
+          wait_for_ajaximations
+
+          use_same_grade_links = ff("[data-testid='use-same-grade-link']")
+          expect(use_same_grade_links.count).to eq(2)
+
+          # Sets the grade as the previous submission grade from the reply_to_topic checkpoint
+          reply_to_topic_use_same_grade_link = use_same_grade_links[0]
+          reply_to_entry_use_same_grade_link = use_same_grade_links[1]
+
+          reply_to_topic_use_same_grade_link.click
+          wait_for_ajaximations
+
+          # The use same grade link disappears after the grade is set
+          expect(ff("[data-testid='use-same-grade-link']").count).to eq(1)
+
+          # Sets the grade as the previous submission grade from the reply_to_entry checkpoint
+          reply_to_entry_use_same_grade_link.click
+          wait_for_ajaximations
+
+          # The use same grade link disappears after the grade is set
+          expect(f("body")).to_not contain_jqcss("[data-testid='use-same-grade-link']")
+        end
+
+        it "changes grade and status and persist it correctly" do
+          # Loads Speedgrader for a student
+          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
+          wait_for_ajaximations
+
+          use_same_grade_links = ff("[data-testid='use-same-grade-link']")
+          expect(use_same_grade_links.count).to eq(2)
+
+          # Sets the grade as the previous submission grade from the reply_to_topic checkpoint
+          reply_to_topic_use_same_grade_link = use_same_grade_links[0]
+          reply_to_entry_use_same_grade_link = use_same_grade_links[1]
+
+          reply_to_topic_use_same_grade_link.click
+          wait_for_ajaximations
+
+          reply_to_topic_assignment = @checkpointed_discussion.assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+          reply_to_topic_submission = reply_to_topic_assignment.submissions.find_by(user: @student)
+
+          expect(reply_to_topic_submission.grade).to eq("5")
+          expect(reply_to_topic_submission.grade_matches_current_submission).to be true
+
+          # Sets the grade as the previous submission grade from the reply_to_entry checkpoint
+          reply_to_entry_use_same_grade_link.click
+          wait_for_ajaximations
+
+          reply_to_entry_assignment = @checkpointed_discussion.assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+          reply_to_entry_submission = reply_to_entry_assignment.submissions.find_by(user: @student)
+
+          expect(reply_to_entry_submission.grade).to eq("7")
+          expect(reply_to_entry_submission.grade_matches_current_submission).to be true
+
+          # reload speedgrader to check that grades persist and are correct
+          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
+          wait_for_ajaximations
+
+          # should not contain use same grade links
+          expect(f("body")).to_not contain_jqcss("[data-testid='use-same-grade-link']")
+
+          reply_to_topic_grade_input = ff("[data-testid='grade-input']")[0]
+          expect(reply_to_topic_grade_input).to have_value "5"
+
+          reply_to_entry_grade_input = ff("[data-testid='grade-input']")[1]
+          expect(reply_to_entry_grade_input).to have_value "7"
+        end
+
+        it "changes grade using grade input and persists correctly" do
+          # Loads Speedgrader for a student
+          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
+          wait_for_ajaximations
+
+          use_same_grade_links = ff("[data-testid='use-same-grade-link']")
+          expect(use_same_grade_links.count).to eq(2)
+
+          # Sets the grade using the grade input instead of use same grade link
+          reply_to_topic_grade_input = ff("[data-testid='grade-input']")[0]
+          reply_to_topic_grade_input.send_keys(:backspace)
+          reply_to_topic_grade_input.send_keys("2")
+          reply_to_topic_grade_input.send_keys(:tab)
+          wait_for_ajaximations
+
+          reply_to_topic_assignment = @checkpointed_discussion.assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+          reply_to_topic_submission = reply_to_topic_assignment.submissions.find_by(user: @student)
+
+          # Sets resubmission grade to 2 and replay to topic use same grade link is no longer present
+          expect(reply_to_topic_submission.grade).to eq("2")
+          expect(reply_to_topic_submission.grade_matches_current_submission).to be true
+          expect(ff("[data-testid='use-same-grade-link']").count).to eq(1)
+
+          # Sets the grade as the previous submission grade from the reply_to_entry checkpoint
+          reply_to_entry_grade_input = ff("[data-testid='grade-input']")[1]
+          reply_to_entry_grade_input.send_keys(:backspace)
+          reply_to_entry_grade_input.send_keys("5")
+          reply_to_entry_grade_input.send_keys(:tab)
+          wait_for_ajaximations
+
+          reply_to_entry_assignment = @checkpointed_discussion.assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+          reply_to_entry_submission = reply_to_entry_assignment.submissions.find_by(user: @student)
+
+          # Sets resubmission grade to 5 and replay to topic use same grade link is no longer present
+          expect(reply_to_entry_submission.grade).to eq("5")
+          expect(reply_to_entry_submission.grade_matches_current_submission).to be true
+          expect(f("body")).to_not contain_jqcss("[data-testid='use-same-grade-link']")
+
+          # reload speedgrader to check that grades persist and are correct
+          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
+          wait_for_ajaximations
+
+          # should not contain use same grade links
+          expect(f("body")).to_not contain_jqcss("[data-testid='use-same-grade-link']")
+
+          reply_to_topic_grade_input = ff("[data-testid='grade-input']")[0]
+          expect(reply_to_topic_grade_input).to have_value "2"
+
+          reply_to_entry_grade_input = ff("[data-testid='grade-input']")[1]
+          expect(reply_to_entry_grade_input).to have_value "5"
+        end
       end
 
       it "changes grade and status and persist it correctly" do
@@ -269,7 +417,7 @@ describe "SpeedGrader - discussion submissions" do
         reply_to_topic_assignment = @checkpointed_discussion.assignment.sub_assignments.find_by(sub_assignment_tag: "reply_to_topic")
         reply_to_topic_submission = reply_to_topic_assignment.submissions.find_by(user: @student)
 
-        expect(reply_to_topic_submission.score).to eq 2
+        expect(reply_to_topic_submission.score).to eq(2.0)
 
         # Sets the grade for the reply_to_entry checkpoint
 
@@ -282,7 +430,7 @@ describe "SpeedGrader - discussion submissions" do
         reply_to_entry_assignment = @checkpointed_discussion.assignment.sub_assignments.find_by(sub_assignment_tag: "reply_to_entry")
         reply_to_entry_submission = reply_to_entry_assignment.submissions.find_by(user: @student)
 
-        expect(reply_to_entry_submission.score).to eq 5
+        expect(reply_to_entry_submission.score).to eq(5)
 
         # Change the status of the reply_to_topic checkpoint to late and set the time late to 2 days
 
@@ -300,8 +448,8 @@ describe "SpeedGrader - discussion submissions" do
 
         reply_to_topic_submission.reload
         expect(reply_to_topic_submission.late).to be true
-        expect(reply_to_topic_submission.late_policy_status).to eq "late"
-        expect(reply_to_topic_submission.seconds_late_override).to eq 2 * 24 * 3600
+        expect(reply_to_topic_submission.late_policy_status).to eq("late")
+        expect(reply_to_topic_submission.seconds_late_override).to eq(2 * 24 * 3600)
 
         # Change the status of the reply_to_entry checkpoint to "Custom Status"
 
@@ -313,7 +461,7 @@ describe "SpeedGrader - discussion submissions" do
 
         reply_to_entry_submission.reload
 
-        expect(reply_to_entry_submission.custom_grade_status_id).to eq @custom_status.id
+        expect(reply_to_entry_submission.custom_grade_status_id).to be @custom_status.id
 
         # Reload the page to make sure the grades, statuses and time late are persisted
 
@@ -334,6 +482,51 @@ describe "SpeedGrader - discussion submissions" do
 
         reply_to_entry_select = f("[data-testid='reply_to_entry-checkpoint-status-select']")
         expect(reply_to_entry_select).to have_value "Custom Status"
+      end
+
+      context "out of range values" do
+        it "displays This student was just awarded negative points with negative values" do
+          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
+          wait_for_ajaximations
+
+          # Sets the grade for the reply_to_topic checkpoint
+          reply_to_topic_grade_input = ff("[data-testid='grade-input']")[0]
+          reply_to_topic_grade_input.send_keys("-2")
+          reply_to_topic_grade_input.send_keys(:tab)
+          wait_for_ajaximations
+          expect(fj("span:contains('This student was just awarded negative points.')")).to be_present
+
+          # Sets the grade for the reply_to_entry checkpoint
+          reply_to_entry_grade_input = ff("[data-testid='grade-input']")[1]
+          reply_to_entry_grade_input.send_keys("-5")
+          reply_to_entry_grade_input.send_keys(:tab)
+          wait_for_ajaximations
+          expect(fj("span:contains('This student was just awarded negative points.')")).to be_present
+        end
+
+        it "displays This student was just awarded an unusually high grade with high values" do
+          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
+          wait_for_ajaximations
+
+          # 1.5 is used as a threshold to define when a score is unusually high
+          # See OutlierScoreHelper.ts
+
+          # Sets the grade for the reply_to_topic checkpoint
+          reply_to_topic_grade_input = ff("[data-testid='grade-input']")[0]
+          reply_to_topic_grade = @checkpointed_discussion.reply_to_topic_checkpoint.points_possible * 1.5
+          reply_to_topic_grade_input.send_keys(reply_to_topic_grade)
+          reply_to_topic_grade_input.send_keys(:tab)
+          wait_for_ajaximations
+          expect(fj("span:contains('This student was just awarded an unusually high grade.')")).to be_present
+
+          # Sets the grade for the reply_to_entry checkpoint
+          reply_to_entry_grade_input = ff("[data-testid='grade-input']")[1]
+          reply_to_entry_grade = @checkpointed_discussion.reply_to_entry_checkpoint.points_possible * 1.5
+          reply_to_entry_grade_input.send_keys(reply_to_entry_grade)
+          reply_to_entry_grade_input.send_keys(:tab)
+          wait_for_ajaximations
+          expect(fj("span:contains('This student was just awarded an unusually high grade.')")).to be_present
+        end
       end
 
       it "displays the no submission message only if student has a partial submission (reply_to_topic)" do
@@ -401,6 +594,18 @@ describe "SpeedGrader - discussion submissions" do
       context "discussions navigation" do
         it "does not display if student has no submission" do
           get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
+          wait_for_ajaximations
+
+          expect(f("body")).to_not contain_jqcss("button[data-testid='discussions-previous-reply-button']")
+          expect(f("body")).to_not contain_jqcss("button[data-testid='discussions-next-reply-button']")
+        end
+
+        it "does not display if not discussion assignment" do
+          non_discussion_assignment = @course.assignments.create!(points_possible: 10, submission_types: "online_text_entry")
+          non_discussion_assignment.submit_homework(@student, body: "hi")
+
+          expect(non_discussion_assignment.submission_types).to_not eq("discussion_topic")
+          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{non_discussion_assignment.id}&student_id=#{@student.id}"
           wait_for_ajaximations
 
           expect(f("body")).to_not contain_jqcss("button[data-testid='discussions-previous-reply-button']")

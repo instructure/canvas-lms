@@ -16,21 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {useEditor, useNode, type Node} from '@craftjs/core'
-import {useClassNames} from '../../../../utils'
+import {useNode, type Node} from '@craftjs/core'
 import {type ContainerProps} from './types'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor')
 
 export const Container = ({
   id,
   className,
   background,
   style,
+  onKeyDown,
   children,
   ...rest
 }: ContainerProps) => {
-  const {enabled} = useEditor(state => ({
-    enabled: state.options.enabled,
-  }))
   const {
     connectors: {connect, drag},
     node,
@@ -39,21 +39,22 @@ export const Container = ({
       node: n,
     }
   })
-  const clazz = useClassNames(enabled, {empty: !children}, [
-    'container-block',
-    className || Container.craft.defaultProps.className,
-  ])
-
   return (
     <div
+      role="treeitem"
+      aria-label={node.data.displayName}
+      aria-selected={node.events.selected}
+      aria-expanded={!!node.data.custom?.isExpanded}
       id={id || `container-${node.id}`}
-      className={clazz}
+      className={`container-block ${className}`}
       data-placeholder={rest['data-placeholder'] || 'Drop blocks here'}
       ref={el => el && connect(drag(el))}
       style={{
         background: background || Container.craft.defaultProps.background,
         ...style,
       }}
+      tabIndex={-1}
+      onKeyDown={onKeyDown}
     >
       {children}
     </div>
@@ -61,7 +62,7 @@ export const Container = ({
 }
 
 Container.craft = {
-  displayName: 'Container',
+  displayName: I18n.t('Container'),
   defaultProps: {
     className: '',
     background: 'transparent',

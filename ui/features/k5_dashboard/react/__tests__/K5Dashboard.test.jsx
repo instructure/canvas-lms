@@ -143,18 +143,18 @@ beforeEach(() => {
   moxios.install()
   createPlannerMocks()
   fetchMock.get(/\/api\/v1\/announcements.*/, announcements)
-  fetchMock.get(/\/api\/v1\/users\/self\/courses.*/, JSON.stringify(gradeCourses))
-  fetchMock.get(encodeURI('api/v1/courses/2?include[]=syllabus_body'), JSON.stringify(syllabus))
-  fetchMock.get(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/, JSON.stringify(apps))
-  fetchMock.get(/\/api\/v1\/courses\/2\/users.*/, JSON.stringify(staff))
+  fetchMock.get(/\/api\/v1\/users\/self\/courses.*/, gradeCourses)
+  fetchMock.get(encodeURI('api/v1/courses/2?include[]=syllabus_body'), syllabus)
+  fetchMock.get(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/, apps)
+  fetchMock.get(/\/api\/v1\/courses\/2\/users.*/, staff)
   fetchMock.get(/\/api\/v1\/users\/self\/todo.*/, MOCK_TODOS)
-  fetchMock.put('/api/v1/users/self/settings', JSON.stringify({}))
+  fetchMock.put('/api/v1/users/self/settings', {})
   fetchMock.get(ASSIGNMENTS_URL, MOCK_ASSIGNMENTS)
   fetchMock.get(EVENTS_URL, MOCK_EVENTS)
-  fetchMock.post(
-    /\/api\/v1\/calendar_events\/save_selected_contexts.*/,
-    JSON.stringify({status: 'ok'})
-  )
+  fetchMock.post(/\/api\/v1\/calendar_events\/save_selected_contexts.*/, {
+    status: 200,
+    body: {status: 'ok'},
+  })
   fetchMock.put(/\/api\/v1\/users\/\d+\/colors\.*/, {status: 200, body: []})
   global.ENV = defaultEnv
 })

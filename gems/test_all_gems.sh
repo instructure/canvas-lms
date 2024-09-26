@@ -8,7 +8,7 @@ pushd "$(dirname $0)"
 
 for test_script in $(find . -name test.sh); do
   pushd `dirname $test_script` > /dev/null
-  echo -e "--format doc" >> ./.rspec
+  grep -e "--format doc" ./.rspec > /dev/null || echo -e "--format doc" >> ./.rspec
 
   echo "################ $(basename `dirname $test_script`) ################"
   ./test.sh

@@ -360,7 +360,7 @@ describe "Common Cartridge exporting" do
                     migration_id: "QUE_1017_A2", text: "False", weight: 0, id: 2279
                   }]
       }.with_indifferent_access
-      qq.write_attribute(:question_data, data)
+      qq["question_data"] = data
       qq.save!
 
       @ce.export_type = ContentExport::QTI
@@ -400,7 +400,7 @@ describe "Common Cartridge exporting" do
                question_text: %(Image yo: <img src="/courses/#{@course.id}/files/#{att1.id}/preview">),
                answers: [{ migration_id: "QUE_1016_A1", text: "True", weight: 100, id: 8080 },
                          { migration_id: "QUE_1017_A2", text: "False", weight: 0, id: 2279 }] }.with_indifferent_access
-      qq.write_attribute(:question_data, data)
+      qq["question_data"] = data
       qq.save!
 
       attachment_model(uploaded_data: stub_png_data)
@@ -517,7 +517,7 @@ describe "Common Cartridge exporting" do
                     migration_id: "QUE_1017_A2", text: "False", weight: 0, id: 2279
                   }]
       }.with_indifferent_access
-      qq.write_attribute(:question_data, data)
+      qq["question_data"] = data
       qq.save!
 
       @ce.export_type = ContentExport::QTI
@@ -719,7 +719,7 @@ describe "Common Cartridge exporting" do
                question_text: "Image yo: <img src=\"/courses/#{@course.id}/files/#{@att.id}/preview\">",
                answers: [{ migration_id: "QUE_1016_A1", text: "True", weight: 100, id: 8080 },
                          { migration_id: "QUE_1017_A2", text: "False", weight: 0, id: 2279 }] }.with_indifferent_access
-      qq.write_attribute(:question_data, data)
+      qq["question_data"] = data
       qq.save!
 
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
@@ -769,7 +769,7 @@ describe "Common Cartridge exporting" do
                "assessment_question_id" => nil,
                "question_name" => "personality",
                "points_possible" => 1 }.with_indifferent_access
-      qq.write_attribute(:question_data, data)
+      qq["question_data"] = data
       qq.save!
 
       @ce.export_type = ContentExport::QTI

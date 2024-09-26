@@ -33,7 +33,7 @@ additional_title_context ||= false
     cache_opts = (contexts.present? ? {} : { :expires_in => 3.minutes })
     cache(safe_cache_key([@current_user, @current_user&.cache_key(:todo_list), contexts, show_legacy_todo_list, 'to_do_list_view']), cache_opts) do
       hidden_todos = 0
-      presenter = ToDoListPresenter.new(self, @current_user, contexts)
+      presenter = ToDoListPresenter.new(self, @current_user, contexts, root_account)
   %>
     <% if presenter.any_assignments? %>
       <h2 class="todo-list-header" tabindex="-1">
@@ -60,7 +60,15 @@ additional_title_context ||= false
                 </div>
               </div>
               <div class="todo-details">
-                <b class="todo-details__title"><%= t('Grade %{assignment}', assignment: assignment.title) %></b>
+                <% if root_account.feature_enabled?(:discussion_checkpoints) && assignment.sub_assignment? %>
+                  <% if assignment.sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC %>
+                    <b class="todo-details__title"><%= t('Grade %{assignment} Reply to Topic', assignment: assignment.title) %></b>
+                  <% elsif assignment.sub_assignment_tag == CheckpointLabels::REPLY_TO_ENTRY %>
+                    <b class="todo-details__title"><%= t('Grade %{assignment} Required Replies (%{num})', assignment: assignment.title, num: assignment.required_replies) %></b>
+                  <% end %>
+                <% else %>
+                  <b class="todo-details__title"><%= t('Grade %{assignment}', assignment: assignment.title) %></b>
+                <% end %>
                 <% if presenter.show_context? %>
                   <p class="todo-details__context">
                     <%= assignment.short_context_name %>
@@ -118,7 +126,15 @@ additional_title_context ||= false
             >
               <i class="<%= icon_class %>" aria-label="<%= icon_aria_label %>"></i>
               <div class="todo-details">
-                <b  class="todo-details__title"><%= assignment.submission_action_string %></b>
+                <% if root_account.feature_enabled?(:discussion_checkpoints) && assignment.sub_assignment? %>
+                  <% if assignment.sub_assignment_tag == 'reply_to_topic' %>
+                    <b  class="todo-details__title"><%= t('%{assignment} Reply to Topic', assignment: assignment.submission_action_string) %></b>
+                  <% elsif assignment.sub_assignment_tag == 'reply_to_entry' %>
+                    <b  class="todo-details__title"><%= t('%{assignment} Required Replies (%{num})', assignment: assignment.submission_action_string, num: assignment.required_replies) %></b>
+                  <% end %>
+                <% else %>
+                  <b  class="todo-details__title"><%= assignment.submission_action_string %></b>
+                <% end %>
                 <% if presenter.show_context? %>
                   <p class="todo-details__context">
                     <%= assignment.short_context_name %>

@@ -24,6 +24,8 @@ import type {LtiScope} from '@canvas/lti/model/LtiScope'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 import create from 'zustand'
 
+type PlacementLabelOverride = string
+
 export type Lti1p3RegistrationOverlayState = {
   launchSettings: Partial<{
     redirectURIs: string
@@ -46,31 +48,30 @@ export type Lti1p3RegistrationOverlayState = {
     courseNavigationDefaultDisabled?: boolean
   }
   override_uris: {
-    placements: Record<
-      LtiPlacement,
-      {
-        message_type?: LtiMessageType
-        uri?: string
-      }
+    placements: Partial<
+      Record<
+        LtiPlacement,
+        {
+          message_type?: LtiMessageType
+          uri?: string
+        }
+      >
     >
   }
   naming: {
     nickname?: string
     description?: string
     notes?: string
-    placements: Record<
-      LtiPlacement,
-      {
-        name?: string
-      }
-    >
+    placements: Partial<Record<LtiPlacement, PlacementLabelOverride>>
   }
   icons: {
-    placements: Record<
-      LtiPlacement,
-      {
-        icon_url?: string
-      }
+    placements: Partial<
+      Record<
+        LtiPlacement,
+        {
+          icon_url?: string
+        }
+      >
     >
   }
 }
@@ -86,6 +87,11 @@ export interface Lti1p3RegistrationOverlayActions {
   setJwk: (jwk: string) => void
   setDomain: (domain: string) => void
   setCustomFields: (customFields: string) => void
+  setOverrideURI: (placement: LtiPlacement, uri: string) => void
+  setMessageType: (placement: LtiPlacement, messageType: LtiMessageType) => void
+  setAdminNickname: (nickname: string) => void
+  setDescription: (description: string) => void
+  setPlacementLabel: (placement: LtiPlacement, name: string) => void
   toggleScope: (scope: LtiScope) => void
   setPrivacyLevel: (privacyLevel: LtiPrivacyLevel) => void
   togglePlacement: (placement: LtiPlacement) => void
@@ -117,6 +123,42 @@ const updateLaunchSetting = <K extends keyof Lti1p3RegistrationOverlayState['lau
     },
   }))
 
+const updateOverrideURI = (placement: LtiPlacement, uri: string) => {
+  return updateState(state => {
+    return {
+      ...state,
+      override_uris: {
+        ...state.override_uris,
+        placements: {
+          ...state.override_uris.placements,
+          [placement]: {
+            ...state.override_uris.placements[placement],
+            uri,
+          },
+        },
+      },
+    }
+  })
+}
+
+const updateMessageType = (placement: LtiPlacement, messageType: LtiMessageType) => {
+  return updateState(state => {
+    return {
+      ...state,
+      override_uris: {
+        ...state.override_uris,
+        placements: {
+          ...state.override_uris.placements,
+          [placement]: {
+            ...state.override_uris.placements[placement],
+            messageType,
+          },
+        },
+      },
+    }
+  })
+}
+
 export const createLti1p3RegistrationOverlayStore = (internalConfig: InternalLtiConfiguration) =>
   create<{state: Lti1p3RegistrationOverlayState} & Lti1p3RegistrationOverlayActions>(set => ({
     state: initialOverlayStateFromInternalConfig(internalConfig),
@@ -130,6 +172,25 @@ export const createLti1p3RegistrationOverlayStore = (internalConfig: InternalLti
     setJwkMethod: jwkMethod => set(updateLaunchSetting('JwkMethod', jwkMethod)),
     setDomain: domain => set(updateLaunchSetting('domain', domain)),
     setCustomFields: customFields => set(updateLaunchSetting('customFields', customFields)),
+    setOverrideURI: (placement, uri) => set(updateOverrideURI(placement, uri)),
+    setMessageType: (placement, messageType) => set(updateMessageType(placement, messageType)),
+    setAdminNickname: nickname =>
+      set(updateState(state => ({...state, naming: {...state.naming, nickname}}))),
+    setDescription: description =>
+      set(updateState(state => ({...state, naming: {...state.naming, description}}))),
+    setPlacementLabel: (placement, name) =>
+      set(
+        updateState(state => ({
+          ...state,
+          naming: {
+            ...state.naming,
+            placements: {
+              ...state.naming.placements,
+              [placement]: name,
+            },
+          },
+        }))
+      ),
     toggleScope: scope => {
       set(
         updateState(state => {
@@ -232,7 +293,7 @@ const initialOverlayStateFromInternalConfig = (
       >((acc, p) => {
         acc[p.placement] = {
           message_type: p.message_type ?? 'LtiResourceLinkRequest',
-          uri: p.url ?? internalConfig.target_link_uri,
+          uri: p.target_link_uri ?? p.url ?? internalConfig.target_link_uri,
         }
         return acc
       }, {} as Record<LtiPlacement, {message_type: LtiMessageType; uri: string}>),
@@ -242,10 +303,10 @@ const initialOverlayStateFromInternalConfig = (
       description: '',
       notes: '',
       placements:
-        internalConfig.placements.reduce<Record<LtiPlacement, {name: string}>>((acc, p) => {
-          acc[p.placement] = {name: p.text ?? internalConfig.title}
+        internalConfig.placements.reduce((acc, p) => {
+          acc[p.placement] = p.text ?? internalConfig.title
           return acc
-        }, {} as Record<LtiPlacement, {name: string}>) ?? [],
+        }, {} as Record<LtiPlacement, string>) ?? [],
     },
     icons: {
       placements: internalConfig.placements.reduce<Record<LtiPlacement, {icon_url?: string}>>(

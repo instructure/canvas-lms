@@ -241,6 +241,25 @@ describe UsersController, type: :request do
     expect(strip_secure_params(json.first)).to eq strip_secure_params(@a2_json)
   end
 
+  it "supports ignore for sub assignments" do
+    @teacher_course.root_account.enable_feature!(:discussion_checkpoints)
+    rtt, _ = graded_discussion_topic_with_checkpoints(context: @teacher_course)
+    student = @teacher_course.students.first
+    rtt.submit_homework(student, body: "checkpoint submission for #{student.name}")
+    api_call(:delete,
+             "/api/v1/users/self/todo/sub_assignment_#{rtt.id}/grading",
+             controller: "users",
+             action: "ignore_item",
+             format: "json",
+             purpose: "grading",
+             asset_string: "sub_assignment_#{rtt.id}",
+             permanent: "0")
+
+    expect(response).to be_successful
+    ignored_asset = Ignore.last.asset
+    expect(ignored_asset).to eq rtt
+  end
+
   it "ignores excused assignments for students" do
     @student_course.enroll_teacher(@teacher)
     @a1.grade_student(@me, excuse: true, grader: @teacher)

@@ -43,7 +43,7 @@ describe Csp do
     it "inherits settings" do
       @root.enable_csp!
       @accounts.each do |a|
-        expect(a.csp_enabled?).to be true
+        expect(a.reload.csp_enabled?).to be true
         expect(a.csp_account_id).to eq @root.global_id
       end
     end
@@ -51,7 +51,7 @@ describe Csp do
     it "overrides inherited settings if explicitly set down the chain" do
       @root.enable_csp!
       @sub1.disable_csp!
-      expect(@sub2.csp_enabled?).to be false
+      expect(@sub2.reload.csp_enabled?).to be false
     end
 
     it "does not override inherited settings if explicitly set down the chain but locked" do
@@ -59,7 +59,7 @@ describe Csp do
       @sub1.disable_csp!
       @root.lock_csp!
       @accounts.each do |a|
-        expect(a.csp_enabled?).to be true
+        expect(a.reload.csp_enabled?).to be true
         expect(a.csp_account_id).to eq @root.global_id
       end
     end

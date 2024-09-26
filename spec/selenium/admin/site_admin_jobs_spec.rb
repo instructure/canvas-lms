@@ -75,7 +75,7 @@ describe "site admin jobs ui" do
     site_admin_logged_in
     track_jobs do
       2.times { "present".delay.reverse }
-      "future".delay(run_at: Time.now + 30.days).capitalize
+      "future".delay(run_at: 30.days.from_now).capitalize
       job = "failure".delay(ignore_transaction: true).downcase
       @failed_job = job.fail!
     end

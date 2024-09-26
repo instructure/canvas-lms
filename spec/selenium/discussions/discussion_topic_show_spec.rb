@@ -171,7 +171,7 @@ describe "Discussion Topic Show" do
       student_in_course(active_all: true)
       user_session(@student)
       module1 = @course.context_modules.create!(name: "module1")
-      module1.unlock_at = Time.now + 1.day
+      module1.unlock_at = 1.day.from_now
 
       topic = @course.discussion_topics.create!(
         title: "Ya Ya Ding Dong",
@@ -406,41 +406,208 @@ describe "Discussion Topic Show" do
         expect(module_item_assign_to_card.last).to contain_css(due_date_input_selector)
       end
 
-      it "shows correct date inputs for checkpointed discussion" do
-        Account.site_admin.enable_feature! :discussion_checkpoints
-        assignment = @course.assignments.create!(
-          name: "Assignment",
-          submission_types: ["online_text_entry"]
-        )
-        dt = @course.discussion_topics.create!(
-          title: "Graded Discussion",
-          discussion_type: "threaded",
-          posted_at: "2017-07-09 16:32:34",
-          user: @teacher,
-          assignment:
-        )
+      context "checkpointed discussions" do
+        before :once do
+          Account.site_admin.enable_feature! :discussion_checkpoints
 
-        Checkpoints::DiscussionCheckpointCreatorService.call(
-          discussion_topic: dt,
-          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
-          dates: [{ type: "everyone", due_at: 2.days.from_now }],
-          points_possible: 6
-        )
-        Checkpoints::DiscussionCheckpointCreatorService.call(
-          discussion_topic: dt,
-          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
-          dates: [{ type: "everyone", due_at: 3.days.from_now }],
-          points_possible: 7,
-          replies_required: 2
-        )
+          @assignment = @course.assignments.create!(
+            name: "Assignment",
+            submission_types: ["online_text_entry"]
+          )
 
-        get "/courses/#{@course.id}/discussion_topics/#{dt.id}"
-        Discussion.click_assign_to_button
-        wait_for_assign_to_tray_spinner
+          @dt = @course.discussion_topics.create!(
+            title: "Graded Discussion",
+            discussion_type: "threaded",
+            posted_at: "2017-07-09 16:32:34",
+            user: @teacher,
+            assignment: @assignment
+          )
 
-        expect(module_item_assign_to_card.first).not_to contain_css(due_date_input_selector)
-        expect(module_item_assign_to_card.first).to contain_css(reply_to_topic_due_date_input_selector)
-        expect(module_item_assign_to_card.first).to contain_css(required_replies_due_date_input_selector)
+          @group = @dt.course.groups.create!
+          @dt.update!(group_category: @group.group_category)
+          @student_in_group = student_in_course(course: @dt.course, active_all: true).user
+          @group.group_memberships.create!(user: @student_in_group)
+
+          @new_section = @dt.course.course_sections.create!
+
+          @everyone_due_at = 3.days.from_now
+          @student_due_at = 4.days.from_now
+          @group_due_at = 5.days.from_now
+          @section_due_at = 6.days.from_now
+          @student_lock_at = 11.days.from_now
+          @student_unlock_at = 1.day.from_now
+
+          [CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY].each do |label|
+            Checkpoints::DiscussionCheckpointCreatorService.call(
+              discussion_topic: @dt,
+              checkpoint_label: label,
+              dates: [
+                { type: "everyone", due_at: @everyone_due_at },
+                { type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: @student_due_at, lock_at: @student_lock_at, unlock_at: @student_unlock_at },
+                { type: "override", set_type: "CourseSection", set_id: @new_section.id, due_at: @section_due_at },
+                { type: "override", set_type: "Group", set_id: @group.id, due_at: @group_due_at }
+              ],
+              points_possible: (label == CheckpointLabels::REPLY_TO_TOPIC) ? 6 : 7,
+              replies_required: (label == CheckpointLabels::REPLY_TO_ENTRY) ? 2 : nil
+            )
+          end
+        end
+
+        it "shows correct date inputs for checkpointed discussion" do
+          get "/courses/#{@course.id}/discussion_topics/#{@dt.id}"
+          Discussion.click_assign_to_button
+          wait_for_assign_to_tray_spinner
+
+          expect(module_item_assign_to_card.first).not_to contain_css(due_date_input_selector)
+          expect(module_item_assign_to_card.first).to contain_css(reply_to_topic_due_date_input_selector)
+          expect(module_item_assign_to_card.first).to contain_css(required_replies_due_date_input_selector)
+          all_dates = get_all_dates_for_all_cards
+
+          # Everyone Card
+          expect(format_date_for_view(all_dates[0][:reply_to_topic], "%b %d, %Y %I:%M %p")).to eq(format_date_for_view(@everyone_due_at.in_time_zone("UTC"), "%b %d, %Y %I:%M %p"))
+          expect(format_date_for_view(all_dates[0][:required_replies], "%b %d, %Y %I:%M %p")).to eq(format_date_for_view(@everyone_due_at.in_time_zone("UTC"), "%b %d, %Y %I:%M %p"))
+          expect(all_dates[0][:available_from]).to eq("")
+          expect(all_dates[0][:until]).to eq("")
+
+          # Student Card
+          expect(format_date_for_view(all_dates[1][:reply_to_topic], "%b %d, %Y %I:%M %p")).to eq(format_date_for_view(@student_due_at.in_time_zone("UTC"), "%b %d, %Y %I:%M %p"))
+          expect(format_date_for_view(all_dates[1][:required_replies], "%b %d, %Y %I:%M %p")).to eq(format_date_for_view(@student_due_at.in_time_zone("UTC"), "%b %d, %Y %I:%M %p"))
+          expect(format_date_for_view(all_dates[1][:available_from], "%b %d, %Y %I:%M %p")).to eq(format_date_for_view(@student_unlock_at.in_time_zone("UTC"), "%b %d, %Y %I:%M %p"))
+          expect(format_date_for_view(all_dates[1][:until], "%b %d, %Y %I:%M %p")).to eq(format_date_for_view(@student_lock_at.in_time_zone("UTC"), "%b %d, %Y %I:%M %p"))
+
+          # Section Card
+          expect(format_date_for_view(all_dates[2][:reply_to_topic], "%b %d, %Y %I:%M %p")).to eq(format_date_for_view(@section_due_at.in_time_zone("UTC"), "%b %d, %Y %I:%M %p"))
+          expect(format_date_for_view(all_dates[2][:required_replies], "%b %d, %Y %I:%M %p")).to eq(format_date_for_view(@section_due_at.in_time_zone("UTC"), "%b %d, %Y %I:%M %p"))
+          expect(all_dates[2][:available_from]).to eq("")
+          expect(all_dates[2][:until]).to eq("")
+
+          # Group Card
+          expect(format_date_for_view(all_dates[3][:reply_to_topic], "%b %d, %Y %I:%M %p")).to eq(format_date_for_view(@group_due_at.in_time_zone("UTC"), "%b %d, %Y %I:%M %p"))
+          expect(format_date_for_view(all_dates[3][:required_replies], "%b %d, %Y %I:%M %p")).to eq(format_date_for_view(@group_due_at.in_time_zone("UTC"), "%b %d, %Y %I:%M %p"))
+          expect(all_dates[3][:available_from]).to eq("")
+          expect(all_dates[3][:until]).to eq("")
+        end
+
+        it "updates dates correctly for checkpointed discussion", :ignore_js_errors do
+          # Navigate to the discussion topic
+          get "/courses/#{@course.id}/discussion_topics/#{@dt.id}"
+          Discussion.click_assign_to_button
+          wait_for_assign_to_tray_spinner
+
+          # New dates to set
+          new_dates = {
+            everyone: {
+              reply_to_topic: 7.days.from_now,
+              required_replies: 8.days.from_now
+            },
+            student: {
+              reply_to_topic: 9.days.from_now,
+              required_replies: 10.days.from_now,
+              available_from: 2.days.from_now,
+              until: 15.days.from_now
+            },
+            section: {
+              reply_to_topic: 11.days.from_now,
+              required_replies: 12.days.from_now
+            },
+            group: {
+              reply_to_topic: 13.days.from_now,
+              required_replies: 14.days.from_now
+            }
+          }
+
+          # Update dates in the UI
+          update_required_replies_date(0, format_date_for_view(new_dates[:everyone][:required_replies], "%b %-d, %Y"))
+          update_required_replies_time(0, format_date_for_view(new_dates[:everyone][:required_replies], "%l:%M %p"))
+
+          update_reply_to_topic_date(1, format_date_for_view(new_dates[:student][:reply_to_topic], "%b %-d, %Y"))
+          update_reply_to_topic_time(1, format_date_for_view(new_dates[:student][:reply_to_topic], "%l:%M %p"))
+          update_required_replies_date(1, format_date_for_view(new_dates[:student][:required_replies], "%b %-d, %Y"))
+          update_required_replies_time(1, format_date_for_view(new_dates[:student][:required_replies], "%l:%M %p"))
+          update_available_date(1, format_date_for_view(new_dates[:student][:available_from], "%b %-d, %Y"), false, false)
+          update_available_time(1, format_date_for_view(new_dates[:student][:available_from], "%l:%M %p"), false, false)
+          update_until_date(1, format_date_for_view(new_dates[:student][:until], "%b %-d, %Y"), false, false)
+          update_until_time(1, format_date_for_view(new_dates[:student][:until], "%l:%M %p"), false, false)
+
+          update_reply_to_topic_date(2, format_date_for_view(new_dates[:section][:reply_to_topic], "%b %-d, %Y"))
+          update_reply_to_topic_time(2, format_date_for_view(new_dates[:section][:reply_to_topic], "%l:%M %p"))
+          update_required_replies_date(2, format_date_for_view(new_dates[:section][:required_replies], "%b %-d, %Y"))
+          update_required_replies_time(2, format_date_for_view(new_dates[:section][:required_replies], "%l:%M %p"))
+
+          update_reply_to_topic_date(3, format_date_for_view(new_dates[:group][:reply_to_topic], "%b %-d, %Y"))
+          update_reply_to_topic_time(3, format_date_for_view(new_dates[:group][:reply_to_topic], "%l:%M %p"))
+          update_required_replies_date(3, format_date_for_view(new_dates[:group][:required_replies], "%b %-d, %Y"))
+          update_required_replies_time(3, format_date_for_view(new_dates[:group][:required_replies], "%l:%M %p"))
+
+          # Save changes
+          click_save_button
+          expect(element_exists?(module_item_edit_tray_selector)).to be_falsey
+
+          # Reload the discussion topic
+          @dt.reload
+
+          # Find sub-assignments
+          reply_to_topic = @dt.assignment.sub_assignments.find { |sa| sa.sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC }
+          reply_to_entry = @dt.assignment.sub_assignments.find { |sa| sa.sub_assignment_tag == CheckpointLabels::REPLY_TO_ENTRY }
+
+          # Check the number of active overrides
+          expect(@dt.assignment.assignment_overrides.active.count).to eq 3
+          expect(reply_to_topic.assignment_overrides.active.count).to eq 3
+          expect(reply_to_entry.assignment_overrides.active.count).to eq 3
+
+          # Student Override checks
+          student_parent_override = @dt.assignment.assignment_overrides.active.find { |ao| ao.set_type == "ADHOC" }
+          student_reply_to_topic_override = reply_to_topic.assignment_overrides.active.find { |ao| ao.set_type == "ADHOC" }
+          student_reply_to_entry_override = reply_to_entry.assignment_overrides.active.find { |ao| ao.set_type == "ADHOC" }
+
+          expect(student_parent_override.set).to eq [@student]
+          expect(student_parent_override.unlock_at.to_date).to eq new_dates[:student][:available_from].to_date
+          expect(student_parent_override.due_at).to be_nil
+          expect(student_parent_override.lock_at.to_date).to eq new_dates[:student][:until].to_date
+
+          expect(student_reply_to_topic_override.set).to eq [@student]
+          expect(student_reply_to_topic_override.unlock_at.to_date).to eq new_dates[:student][:available_from].to_date
+          expect(student_reply_to_topic_override.due_at.to_date).to eq new_dates[:student][:reply_to_topic].to_date
+          expect(student_reply_to_topic_override.lock_at.to_date).to eq new_dates[:student][:until].to_date
+
+          expect(student_reply_to_entry_override.set).to eq [@student]
+          expect(student_reply_to_entry_override.unlock_at.to_date).to eq new_dates[:student][:available_from].to_date
+          expect(student_reply_to_entry_override.due_at.to_date).to eq new_dates[:student][:required_replies].to_date
+          expect(student_reply_to_entry_override.lock_at.to_date).to eq new_dates[:student][:until].to_date
+
+          # Course Section Override checks
+          section_parent_override = @dt.assignment.assignment_overrides.active.find { |ao| ao.set_type == "CourseSection" }
+          section_reply_to_topic_override = reply_to_topic.assignment_overrides.active.find { |ao| ao.set_type == "CourseSection" }
+          section_reply_to_entry_override = reply_to_entry.assignment_overrides.active.find { |ao| ao.set_type == "CourseSection" }
+
+          expect(section_parent_override.set).to eq @new_section
+          expect(section_parent_override.due_at).to be_nil
+
+          expect(section_reply_to_topic_override.set).to eq @new_section
+          expect(section_reply_to_topic_override.due_at.to_date).to eq new_dates[:section][:reply_to_topic].to_date
+
+          expect(section_reply_to_entry_override.set).to eq @new_section
+          expect(section_reply_to_entry_override.due_at.to_date).to eq new_dates[:section][:required_replies].to_date
+
+          # Group Override checks
+          group_parent_override = @dt.assignment.assignment_overrides.active.find { |ao| ao.set_type == "Group" }
+          group_reply_to_topic_override = reply_to_topic.assignment_overrides.active.find { |ao| ao.set_type == "Group" }
+          group_reply_to_entry_override = reply_to_entry.assignment_overrides.active.find { |ao| ao.set_type == "Group" }
+
+          expect(group_parent_override.set).to eq @group
+          expect(group_parent_override.due_at).to be_nil
+
+          expect(group_reply_to_topic_override.set).to eq @group
+          expect(group_reply_to_topic_override.due_at.to_date).to eq new_dates[:group][:reply_to_topic].to_date
+
+          expect(group_reply_to_entry_override.set).to eq @group
+          expect(group_reply_to_entry_override.due_at.to_date).to eq new_dates[:group][:required_replies].to_date
+
+          # Everyone (base) due dates
+          expect(@dt.assignment.due_at).to be_nil # due dates not stored on parent assignments
+          expect(reply_to_topic.due_at.to_date).to eq @everyone_due_at.to_date
+          expect(reply_to_entry.due_at.to_date).to eq new_dates[:everyone][:required_replies].to_date
+        end
       end
 
       it "does not show the button when the user does not have the moderate_forum permission" do

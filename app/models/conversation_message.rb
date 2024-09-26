@@ -136,12 +136,12 @@ class ConversationMessage < ActiveRecord::Base
 
   # override AR association magic
   def attachment_ids
-    (read_attribute(:attachment_ids) || "").split(",").map(&:to_i)
+    (super || "").split(",").map(&:to_i)
   end
 
   def attachment_ids=(ids)
     ids = author.conversation_attachments_folder.attachments.where(id: ids.map(&:to_i)).pluck(:id) unless ids.empty?
-    write_attribute(:attachment_ids, ids.join(","))
+    super(ids.join(","))
   end
 
   def relativize_attachment_ids(from_shard:, to_shard:)
@@ -208,17 +208,13 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def body
-    if generated?
-      format_event_message
-    else
-      read_attribute(:body)
-    end
+    generated? ? format_event_message : super
   end
 
   def event_data
     return {} unless generated?
 
-    @event_data ||= YAML.safe_load(read_attribute(:body))
+    @event_data ||= YAML.safe_load(self["body"])
   end
 
   def format_event_message

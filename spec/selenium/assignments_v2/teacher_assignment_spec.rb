@@ -41,7 +41,8 @@ describe "as a teacher" do
           due_at: 5.days.ago,
           points_possible: 10,
           submission_types: "online_text_entry",
-          workflow_state: "published"
+          workflow_state: "published",
+          peer_reviews: true
         )
       end
 
@@ -97,6 +98,30 @@ describe "as a teacher" do
       it "shows assign to tray when assign to button is clicked" do
         TeacherViewPageV2.assign_to_button.click
         expect(TeacherViewPageV2.assign_to_tray).to be_displayed
+      end
+
+      it "shows options button" do
+        expect(TeacherViewPageV2.options_button).to be_displayed
+      end
+
+      it "redirects to Peer Reviews page when the Peer Review option is clicked" do
+        TeacherViewPageV2.options_button.click
+        TeacherViewPageV2.peer_reviews_option.click
+        expect(driver.current_url).to include(
+          "/courses/#{@course.id}/assignments/#{@assignment.id}/peer_reviews"
+        )
+      end
+
+      it "shows send to modal when Send To option is clicked" do
+        TeacherViewPageV2.options_button.click
+        TeacherViewPageV2.send_to_option.click
+        expect(TeacherViewPageV2.send_to_modal).to be_displayed
+      end
+
+      it "shows copy to tray when Copy To option is clicked" do
+        TeacherViewPageV2.options_button.click
+        TeacherViewPageV2.copy_to_option.click
+        expect(TeacherViewPageV2.copy_to_tray).to be_displayed
       end
     end
 

@@ -89,6 +89,39 @@ export const DISCUSSION_QUERY = gql`
   ${GroupSet.fragment}
   ${Group.fragment}
 `
+export const STUDENT_DISCUSSION_QUERY = gql`
+  query GetDiscussionQuery(
+    $discussionID: ID!
+    $perPage: Int!
+    $userSearchId: String
+    $sort: DiscussionSortOrderType
+  ) {
+    legacyNode(_id: $discussionID, type: Discussion) {
+      ... on Discussion {
+        ...Discussion
+        anonymousAuthor {
+          ...AnonymousUser
+        }
+        discussionEntriesConnection(sortOrder: $sort, userSearchId: $userSearchId) {
+          nodes {
+            _id
+            rootEntryId
+            anonymousAuthor {
+              ...AnonymousUser
+            }
+            rootEntryPageNumber(sortOrder: $sort, perPage: $perPage)
+          }
+          pageInfo {
+            ...PageInfo
+          }
+        }
+      }
+    }
+  }
+  ${AnonymousUser.fragment}
+  ${Discussion.fragment}
+  ${PageInfo.fragment}
+`
 
 export const DISCUSSION_ENTRIES_BY_STUDENT_QUERY = gql`
   query GetDiscussionEntriesByStudentQuery($discussionID: ID!, $userSearchId: String!) {

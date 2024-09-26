@@ -37,7 +37,7 @@ describe "new_announcement" do
   let(:notification_name) { :new_announcement }
   let(:asset) { @a }
 
-  context ".email" do
+  describe ".email" do
     let(:path_type) { :email }
 
     it "renders for course" do
@@ -87,7 +87,7 @@ describe "new_announcement" do
     end
   end
 
-  context ".sms" do
+  describe ".sms" do
     let(:path_type) { :sms }
 
     it "renders" do
@@ -95,7 +95,7 @@ describe "new_announcement" do
     end
   end
 
-  context ".summary" do
+  describe ".summary" do
     let(:path_type) { :summary }
 
     it "renders" do
@@ -106,7 +106,7 @@ describe "new_announcement" do
     end
   end
 
-  context ".twitter" do
+  describe ".twitter" do
     let(:path_type) { :twitter }
 
     it "renders" do

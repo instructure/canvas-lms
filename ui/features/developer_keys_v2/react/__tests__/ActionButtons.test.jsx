@@ -19,6 +19,9 @@
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import ActionButtons from '../ActionButtons'
+import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
+
+jest.mock('@canvas/instui-bindings/react/Confirm')
 
 const defaultProps = ({
   showVisibilityToggle = true,
@@ -97,8 +100,7 @@ describe('ActionButtons', () => {
   })
 
   it('warns the user when deleting a LTI key', () => {
-    const oldConfirm = window.confirm
-    window.confirm = jest.fn()
+    confirmDanger.mockImplementation(() => Promise.resolve())
 
     const {getByText} = renderActionButtons({
       developerKey: {
@@ -111,10 +113,12 @@ describe('ActionButtons', () => {
 
     fireEvent.click(getByText('Delete key Unnamed Tool'))
 
-    expect(window.confirm).toHaveBeenCalledWith(
-      'Are you sure you want to delete this developer key? This action will also delete all tools associated with the developer key in this context.'
-    )
-
-    window.confirm = oldConfirm
+    expect(confirmDanger).toHaveBeenCalledWith({
+      confirmButtonLabel: 'Delete',
+      heading: undefined,
+      title: 'Delete LTI Developer Key',
+      message:
+        'Are you sure you want to delete this developer key? This action will also delete all tools associated with the developer key in this context.',
+    })
   })
 })

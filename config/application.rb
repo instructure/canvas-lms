@@ -132,6 +132,8 @@ module CanvasRails
       config.logger.formatter = ContextFormatter.new(config.logger.formatter)
     end
 
+    config.active_record.automatic_scope_inversing = true
+
     # Activate observers that should always be running
     config.active_record.observers = %i[cacher stream_item_cache live_events_observer]
 
@@ -158,11 +160,11 @@ module CanvasRails
                                 Rails.root.join("app/stylesheets"),
                                 Rails.root.join("ui")]
 
-    config.middleware.use Rack::Chunked
-    config.middleware.use Rack::Deflater, if: lambda { |*|
+    config.middleware.insert_before Rack::ETag, Rack::Chunked
+    config.middleware.insert_before Rack::ETag, Rack::Deflater, if: lambda { |*|
       ::DynamicSettings.find(tree: :private)["enable_rack_deflation", failsafe: true]
     }
-    config.middleware.use Rack::Brotli, if: lambda { |*|
+    config.middleware.insert_before Rack::ETag, Rack::Brotli, if: lambda { |*|
       ::DynamicSettings.find(tree: :private)["enable_rack_brotli", failsafe: true]
     }
 
@@ -442,15 +444,6 @@ module CanvasRails
       app.config.middleware.insert_before(Rack::Head, RequestThrottle)
       app.config.middleware.insert_before(Rack::MethodOverride, PreventNonMultipartParse)
       app.config.middleware.insert_before(Sentry::Rails::CaptureExceptions, SentryTraceScrubber)
-    end
-
-    initializer("set_allowed_request_id_setters", after: :finisher_hook) do |app|
-      # apparently there is no initialization hook that comes late enough for
-      # routes to already be loaded, so we have to load them explicitly
-      app.reload_routes!
-      RequestContext::Generator.allow_unsigned_request_context_for(
-        app.routes.url_helpers.api_graphql_subgraph_path
-      )
     end
   end
 end

@@ -129,7 +129,7 @@ export const useShouldShowContent = (
   const shouldShowPodcastFeedOption =
     ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !ENV.K5_HOMEROOM_COURSE
 
-  const shouldShowCheckpointsOptions = isGraded && ENV.DISCUSSION_CHECKPOINTS_ENABLED
+  const shouldShowCheckpointsOptions = isGraded && ENV.DISCUSSION_CHECKPOINTS_ENABLED && !ENV.RESTRICT_QUANTITATIVE_DATA
 
   const canCreateGradedDiscussion =
     !isEditing && ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_CREATE_ASSIGNMENT

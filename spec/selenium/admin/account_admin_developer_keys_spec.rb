@@ -117,7 +117,7 @@ describe "Developer Keys" do
       root_developer_key
       get "/accounts/#{Account.default.id}/developer_keys"
       fj("table[data-automation='devKeyAdminTable'] tbody tr button:has(svg[name='IconTrash'])").click
-      accept_alert
+      fj("span[role='dialog'] button:contains('Delete')").click
       wait_for_ajaximations
       expect(element_exists?("table[data-automation='devKeyAdminTable'] tbody tr")).to be(false)
       expect(Account.default.developer_keys.nondeleted.count).to eq 0
@@ -179,7 +179,7 @@ describe "Developer Keys" do
         site_admin_developer_key.update(visible: true)
         get "/accounts/site_admin/developer_keys"
         fj("div:contains('On'):last").click
-        accept_alert
+        find_button("Switch to On").click
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
         expect(f("input[type='checkbox']:disabled")).to be_truthy
@@ -205,13 +205,13 @@ describe "Developer Keys" do
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
         fj("div:has(input[type='checkbox']:not(:checked):last) > label").click
-        accept_alert
+        find_button("Switch to On").click
         get "/accounts/site_admin/developer_keys"
         fj("div:contains('Off'):last").click
-        accept_alert
+        find_button("Switch to Off").click
         expect(DeveloperKeyAccountBinding.where(account_id: Account.site_admin.id).first.workflow_state).to eq "off"
         fj("div:contains('Allow'):last").click
-        accept_alert
+        find_button("Switch to Allow").click
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
         expect(DeveloperKeyAccountBinding.where(account_id: Account.default.id).first.workflow_state).to eq "on"
@@ -223,7 +223,7 @@ describe "Developer Keys" do
         root_developer_key
         get "/accounts/#{Account.default.id}/developer_keys"
         fj("div:has(input[type='checkbox']:not(:checked):last) > label").click
-        accept_alert
+        find_button("Switch to On").click
         keep_trying_until { expect(current_active_element.attribute("checked")).to eq "true" }
         expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq "on"
       end
@@ -233,7 +233,7 @@ describe "Developer Keys" do
         DeveloperKeyAccountBinding.last.update(workflow_state: "on")
         get "/accounts/#{Account.default.id}/developer_keys"
         fj("div:has(input[type='checkbox']:checked:last) > label").click
-        accept_alert
+        find_button("Switch to Off").click
         expect(f("input[type='checkbox']:not(:checked)")).to be_truthy
         expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq "off"
       end
@@ -242,7 +242,7 @@ describe "Developer Keys" do
         root_developer_key
         get "/accounts/#{Account.default.id}/developer_keys"
         fj("div:has(input[type='checkbox']:not(:checked):last) > label").click
-        accept_alert
+        find_button("Switch to On").click
         click_inherited_tab
         click_account_tab
         expect(f("input[type='checkbox']:checked")).to be_truthy

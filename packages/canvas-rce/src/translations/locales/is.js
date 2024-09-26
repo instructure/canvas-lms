@@ -1012,6 +1012,7 @@ const locale = {
   },
   "styles_2aa721ef": { "message": "Stílar" },
   "submit_a3cc6859": { "message": "Leggja fram" },
+  "submitting_b90fac62": { "message": "Skila..." },
   "subscript_59744f96": { "message": "Undirskrift" },
   "subset_19c1a92f": { "message": "Hlutmengi" },
   "subset_strict_8d8948d6": { "message": "Hlutmengi (strangt)" },

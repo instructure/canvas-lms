@@ -72,7 +72,6 @@ const speedGraderHelpers = {
     parts.push(` src="${src}"`)
     Object.keys(options).forEach(option => {
       let key = option
-      // @ts-expect-error
       const value = options[key]
       if (key === 'className') {
         key = 'class'
@@ -106,6 +105,7 @@ const speedGraderHelpers = {
     }
     const select = '&version='
     // check if the version is valid, or matches the index
+    // @ts-expect-error
     const version = submission.submission_history[currentSelectedIndex].submission.version
     if (version == null || Number.isNaN(Number(version))) {
       return select + currentSelectedIndex
@@ -218,54 +218,6 @@ const speedGraderHelpers = {
       return 'not_submitted'
     }
   },
-  // variant of submissionState helper above that has been adapted for
-  // use in SG2 where properties are camel cased
-  // TODO: update for moderated grading
-  steelThreadSubmissionState(
-    student: StudentWithSubmission,
-    grading_role: string,
-    submission: Submission
-  ) {
-    if (
-      submission &&
-      submission.state !== 'unsubmitted' &&
-      (submission.submittedAt || !(typeof submission.grade === 'undefined'))
-    ) {
-      if (
-        // TODO: add these properties to the student object for provisional grading
-        (grading_role === 'provisional_grader' || grading_role === 'moderator') &&
-        !student.needs_provisional_grade &&
-        submission.provisional_grade_id === null
-      ) {
-        // if we are a provisional grader and it doesn't need a grade (and we haven't given one already) then we shouldn't be able to grade it
-        return 'not_gradeable'
-      } else if (
-        submission.submittedAt === null &&
-        submission.grade === null &&
-        submission.state === 'graded' &&
-        !submission.excused
-      ) {
-        // if a teacher entered a grade on accident and clears it out
-        // for a student that doesn't have a submission, ensure that it
-        // does not show as not_graded
-        return 'not_submitted'
-      } else if (
-        !(submission.final_provisional_grade && submission.final_provisional_grade.grade) &&
-        !submission.excused &&
-        (typeof submission.grade === 'undefined' ||
-          submission.grade === null ||
-          submission.state === 'pending_review')
-      ) {
-        return 'not_graded'
-      } else if (submission.gradeMatchesCurrentSubmission) {
-        return 'graded'
-      } else {
-        return 'resubmitted'
-      }
-    } else {
-      return 'not_submitted'
-    }
-  },
 
   submissionStateSortingValue(student: StudentWithSubmission, grading_role: string) {
     const states = {
@@ -295,6 +247,7 @@ const speedGraderHelpers = {
     event.preventDefault()
 
     $(event.target).prop('disabled', true).text(I18n.t('turnitin.resubmitting', 'Resubmitting...'))
+    // @ts-expect-error
     $.ajaxJSON(resubmitUrl, 'POST', {}, () => {
       speedGraderHelpers.reloadPage()
     })

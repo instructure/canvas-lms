@@ -26,7 +26,7 @@ end
 describe Api::V1::SisAssignment do
   subject(:generator) { SisAssignmentHarness.new }
 
-  context "#sis_assignments_json" do
+  describe "#sis_assignments_json" do
     let(:course_1) { course_factory }
     let(:assignment_1) { assignment_model(course: course_factory) }
 
@@ -82,7 +82,7 @@ describe Api::V1::SisAssignment do
       allow(course_sections).to receive_messages(
         loaded?: true,
         active_course_sections: course_sections,
-        association: OpenStruct.new(loaded?: true)
+        association: instance_double("ActiveRecord::Association", loaded?: true)
       )
     end
 

@@ -69,7 +69,7 @@ describe "announcements" do
 
     it "validates that a student can not see an announcement with a delayed posting date", priority: "1" do
       announcement_title = "Hi there!"
-      announcement = @course.announcements.create!(title: announcement_title, message: "Announcement time!", delayed_post_at: Time.now + 1.day)
+      announcement = @course.announcements.create!(title: announcement_title, message: "Announcement time!", delayed_post_at: 1.day.from_now)
       get "/courses/#{@course.id}/announcements"
 
       expect(f("#content")).not_to contain_css(".ic-announcement-row")
