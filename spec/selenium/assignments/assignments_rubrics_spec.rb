@@ -36,7 +36,7 @@ describe "assignment rubrics" do
       sleep 1 if %r{\A/courses/\d+/assignments/\d+\z}.match?(url)
     end
 
-    def mark_rubric_for_grading(rubric, expect_confirmation, expect_dialog = true)
+    def mark_rubric_for_grading(rubric, expect_confirmation: true, expect_dialog: true)
       f("#rubric_#{rubric.id} .edit_rubric_link").click
       driver.switch_to.alert.accept if expect_confirmation
       fj(".grading_rubric_checkbox:visible").click
@@ -138,10 +138,10 @@ describe "assignment rubrics" do
       association2 = course_rubric.associate_with(assignment2, @course, purpose: "grading")
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      mark_rubric_for_grading(course_rubric, true)
+      mark_rubric_for_grading(course_rubric)
 
       get "/courses/#{@course.id}/assignments/#{assignment2.id}"
-      mark_rubric_for_grading(course_rubric, true)
+      mark_rubric_for_grading(course_rubric)
 
       expect(association[0].reload.use_for_grading).to be_truthy
       expect(association[0].rubric.id).to eq course_rubric.id
@@ -346,10 +346,10 @@ describe "assignment rubrics" do
       @association2 = @rubric.associate_with(@assignment2, @course, purpose: "grading")
 
       get "/courses/#{@course.id}/assignments/#{@assignment1.id}"
-      mark_rubric_for_grading(@rubric, true, false)
+      mark_rubric_for_grading(@rubric, expect_dialog: false)
 
       get "/courses/#{@course.id}/assignments/#{@assignment2.id}"
-      mark_rubric_for_grading(@rubric, true, false)
+      mark_rubric_for_grading(@rubric, expect_dialog: false)
 
       expect(@association1.reload.use_for_grading).to be_truthy
       expect(@association1.rubric.id).to eq @rubric.id
@@ -370,7 +370,7 @@ describe "assignment rubrics" do
       )
 
       get "/courses/#{@course.id}/assignments/#{@assignment1.id}"
-      mark_rubric_for_grading(@rubric, false, false)
+      mark_rubric_for_grading(@rubric, expect_confirmation: false, expect_dialog: false)
 
       f("#rubric_#{@rubric.id} .edit_rubric_link").click
       expect(is_checked(".grading_rubric_checkbox:visible")).to be_truthy

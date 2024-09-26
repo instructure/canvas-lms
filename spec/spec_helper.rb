@@ -701,12 +701,12 @@ RSpec.configure do |config|
     end
   end
 
-  def fixture_file_upload(path, mime_type = nil, binary = false)
+  def fixture_file_upload(path, mime_type = nil, binary: false)
     Rack::Test::UploadedFile.new(file_fixture(path), mime_type, binary)
   end
 
   def default_uploaded_data
-    fixture_file_upload("docs/doc.doc", "application/msword", true)
+    fixture_file_upload("docs/doc.doc", "application/msword", binary: true)
   end
 
   def create_temp_dir!
@@ -794,10 +794,10 @@ RSpec.configure do |config|
   end
 
   # enforce forgery protection, so we can verify usage of the authenticity token
-  def enable_forgery_protection(enable = true)
+  def enable_forgery_protection
     old_value = ActionController::Base.allow_forgery_protection
-    allow(ActionController::Base).to receive(:allow_forgery_protection).and_return(enable)
-    allow_any_instance_of(ActionController::Base).to receive(:allow_forgery_protection).and_return(enable)
+    allow(ActionController::Base).to receive(:allow_forgery_protection).and_return(true)
+    allow_any_instance_of(ActionController::Base).to receive(:allow_forgery_protection).and_return(true)
 
     yield if block_given?
   ensure
@@ -1026,7 +1026,7 @@ RSpec.configure do |config|
   end
 
   def dummy_io
-    fixture_file_upload("docs/doc.doc", "application/msword", true)
+    fixture_file_upload("docs/doc.doc", "application/msword", binary: true)
   end
 
   def consider_all_requests_local(value)

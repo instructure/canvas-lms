@@ -3882,7 +3882,7 @@ describe CoursesController do
     it "does not attempt to sync k5 homeroom to course if sync_enrollments_from_homeroom is falsey" do
       teacher = @teacher
       subject = @course
-      toggle_k5_setting(subject.account, true)
+      toggle_k5_setting(subject.account)
       homeroom = course_factory(active_all: true, account: subject.account)
       homeroom.enroll_teacher(teacher, enrollment_state: :active)
       homeroom.homeroom_course = true
@@ -3940,7 +3940,7 @@ describe CoursesController do
     end
 
     it "does not allow homeroom course to enable course pacing" do
-      toggle_k5_setting(@course.account, true)
+      toggle_k5_setting(@course.account)
       homeroom = course_factory(active_all: true, account: @course.account)
       homeroom.homeroom_course = true
       homeroom.save!

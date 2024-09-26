@@ -298,8 +298,8 @@ describe "discussions" do
           # Set Message
           Discussion.update_discussion_message(message)
 
-          update_available_date(0, available_date, true)
-          update_available_time(0, "8:00 AM", true)
+          update_available_date(0, available_date, exclude_due_date: true)
+          update_available_time(0, "8:00 AM", exclude_due_date: true)
 
           # Save and publish
           Discussion.save_button.click
@@ -345,10 +345,10 @@ describe "discussions" do
           click_add_assign_to_card
           expect(element_exists?(due_date_input_selector)).to be_falsey
           select_module_item_assignee(1, student1.name)
-          update_available_date(1, format_date_for_view(available_from, "%-m/%-d/%Y"), true)
-          update_available_time(1, "8:00 AM", true)
-          update_until_date(1, format_date_for_view(available_until, "%-m/%-d/%Y"), true)
-          update_until_time(1, "9:00 PM", true)
+          update_available_date(1, format_date_for_view(available_from, "%-m/%-d/%Y"), exclude_due_date: true)
+          update_available_time(1, "8:00 AM", exclude_due_date: true)
+          update_until_date(1, format_date_for_view(available_until, "%-m/%-d/%Y"), exclude_due_date: true)
+          update_until_time(1, "9:00 PM", exclude_due_date: true)
 
           Discussion.save_button.click
           wait_for_ajaximations
@@ -427,10 +427,10 @@ describe "discussions" do
           get "/courses/#{course.id}/discussion_topics/#{discussion_topic.id}/edit"
 
           expect(assign_to_date_and_time[1].text).not_to include("Due Date")
-          expect(assign_to_available_from_date(1, true).attribute("value")).to eq(format_date_for_view(available_from, "%b %-e, %Y"))
-          expect(assign_to_available_from_time(1, true).attribute("value")).to eq(available_from.strftime("%-l:%M %p"))
-          expect(assign_to_until_date(1, true).attribute("value")).to eq(format_date_for_view(available_until, "%b %-e, %Y"))
-          expect(assign_to_until_time(1, true).attribute("value")).to eq(available_until.strftime("%-l:%M %p"))
+          expect(assign_to_available_from_date(1, exclude_due_date: true).attribute("value")).to eq(format_date_for_view(available_from, "%b %-e, %Y"))
+          expect(assign_to_available_from_time(1, exclude_due_date: true).attribute("value")).to eq(available_from.strftime("%-l:%M %p"))
+          expect(assign_to_until_date(1, exclude_due_date: true).attribute("value")).to eq(format_date_for_view(available_until, "%b %-e, %Y"))
+          expect(assign_to_until_time(1, exclude_due_date: true).attribute("value")).to eq(available_until.strftime("%-l:%M %p"))
         end
 
         it "does not recover a deleted card when adding an assignee", :ignore_js_errors do
@@ -1257,14 +1257,14 @@ describe "discussions" do
             # available from
             available_from_date = 2.days.from_now(Time.zone.now).to_date + 17.hours
             available_from_date_formatted = format_date_for_view(available_from_date, "%m/%d/%Y")
-            update_available_date(0, available_from_date_formatted, true, false)
-            update_available_time(0, "5:00 PM", true, false)
+            update_available_date(0, available_from_date_formatted, exclude_due_date: true, exclude_checkpoints: false)
+            update_available_time(0, "5:00 PM", exclude_due_date: true, exclude_checkpoints: false)
 
             # available until
             until_date = 5.days.from_now(Time.zone.now).to_date + 17.hours
             until_date_formatted = format_date_for_view(until_date, "%m/%d/%Y")
-            update_until_date(0, until_date_formatted, true, false)
-            update_until_time(0, "5:00 PM", true, false)
+            update_until_date(0, until_date_formatted, exclude_due_date: true, exclude_checkpoints: false)
+            update_until_time(0, "5:00 PM", exclude_due_date: true, exclude_checkpoints: false)
 
             fj("button:contains('Save')").click
             Discussion.section_warning_continue_button.click
@@ -1304,14 +1304,14 @@ describe "discussions" do
             # available from
             available_from_date = 3.days.from_now(Time.zone.now).to_date + 17.hours
             available_from_date_formatted = format_date_for_view(available_from_date, "%m/%d/%Y")
-            update_available_date(0, available_from_date_formatted, true, false)
-            update_available_time(0, "5:00 PM", true, false)
+            update_available_date(0, available_from_date_formatted, exclude_due_date: true, exclude_checkpoints: false)
+            update_available_time(0, "5:00 PM", exclude_due_date: true, exclude_checkpoints: false)
 
             # available until
             until_date = 6.days.from_now(Time.zone.now).to_date + 17.hours
             until_date_formatted = format_date_for_view(until_date, "%m/%d/%Y")
-            update_until_date(0, until_date_formatted, true, false)
-            update_until_time(0, "5:00 PM", true, false)
+            update_until_date(0, until_date_formatted, exclude_due_date: true, exclude_checkpoints: false)
+            update_until_time(0, "5:00 PM", exclude_due_date: true, exclude_checkpoints: false)
 
             fj("button:contains('Save')").click
             Discussion.section_warning_continue_button.click
@@ -1356,8 +1356,8 @@ describe "discussions" do
 
             # available from
             available_from_date_formatted = format_date_for_view(2.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
-            update_available_date(0, available_from_date_formatted, true, false)
-            update_available_time(0, "5:00 PM", true, false)
+            update_available_date(0, available_from_date_formatted, exclude_due_date: true, exclude_checkpoints: false)
+            update_available_time(0, "5:00 PM", exclude_due_date: true, exclude_checkpoints: false)
             expect(assign_to_date_and_time[2].text).to include("Unlock date cannot be after reply to topic due date")
 
             # correct reply to topic
@@ -1374,8 +1374,8 @@ describe "discussions" do
             # available until
             until_date = 5.days.from_now(Time.zone.now).to_date + 17.hours
             until_date_formatted = format_date_for_view(until_date, "%m/%d/%Y")
-            update_until_date(0, until_date_formatted, true, false)
-            update_until_time(0, "5:00 PM", true, false)
+            update_until_date(0, until_date_formatted, exclude_due_date: true, exclude_checkpoints: false)
+            update_until_time(0, "5:00 PM", exclude_due_date: true, exclude_checkpoints: false)
 
             reply_to_topic_date_formatted = format_date_for_view(6.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
             update_reply_to_topic_date(0, reply_to_topic_date_formatted)

@@ -34,7 +34,7 @@ describe "quiz restrictions as a student" do
     before do
       course_with_student_logged_in
       @password = "threepwood"
-      @quiz = course_quiz(true)
+      @quiz = course_quiz(active: true)
       @quiz.publish!
       @quiz.access_code = @password
       @quiz.save!
@@ -60,7 +60,7 @@ describe "quiz restrictions as a student" do
     before do
       course_with_student_logged_in
       @ip = "64.233.160.0"
-      @quiz = course_quiz(true)
+      @quiz = course_quiz(active: true)
       @quiz.publish!
       @quiz.ip_filter = "64.233.160.0"
       @quiz.save!

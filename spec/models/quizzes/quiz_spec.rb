@@ -2038,7 +2038,7 @@ describe Quizzes::Quiz do
     before :once do
       @course.workflow_state = "available"
       @course.save!
-      course_quiz(course: @course)
+      course_quiz(active: true)
       student_in_course(course: @course, active_all: true)
       teacher_in_course(course: @course, active_all: true)
     end

@@ -4457,7 +4457,7 @@ describe CoursesController, type: :request do
     end
 
     it "returns the course syllabus without verifiers" do
-      should_translate_user_content(@course1, false) do |content|
+      should_translate_user_content(@course1, include_verifiers: false) do |content|
         @course1.syllabus_body = content
         @course1.saving_user = @me
         @course1.save!

@@ -20,7 +20,7 @@
 
 describe FoldersController do
   def io
-    fixture_file_upload("docs/doc.doc", "application/msword", true)
+    fixture_file_upload("docs/doc.doc", "application/msword", binary: true)
   end
 
   def root_folder

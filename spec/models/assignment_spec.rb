@@ -2663,10 +2663,10 @@ describe Assignment do
         group_two = @course.groups.create!(name: "Group A", group_category:)
         group_three = @course.groups.create!(name: "Group C", group_category:)
 
-        add_user_to_group(student_one, group_one, true)
-        add_user_to_group(student_two, group_two, true)
-        add_user_to_group(student_three, group_three, true)
-        add_user_to_group(@initial_student, group_three, true)
+        add_user_to_group(student_one, group_one, is_leader: true)
+        add_user_to_group(student_two, group_two, is_leader: true)
+        add_user_to_group(student_three, group_three, is_leader: true)
+        add_user_to_group(@initial_student, group_three, is_leader: true)
 
         assignment = @course.assignments.create!(
           assignment_valid_attributes.merge(
@@ -2735,8 +2735,8 @@ describe Assignment do
         group_one = @course.groups.create!(name: "Group B", group_category:)
         group_two = @course.groups.create!(name: "Group A", group_category:)
 
-        add_user_to_group(student_one, group_one, true)
-        add_user_to_group(student_two, group_two, true)
+        add_user_to_group(student_one, group_one, is_leader: true)
+        add_user_to_group(student_two, group_two, is_leader: true)
 
         assignment = @course.assignments.create!(
           assignment_valid_attributes.merge(
@@ -2859,10 +2859,10 @@ describe Assignment do
       group_two = @course.groups.create!(name: "Group A", group_category:)
       group_three = @course.groups.create!(name: "Group C", group_category:)
 
-      add_user_to_group(student_one, group_one, true)
-      add_user_to_group(student_two, group_two, true)
-      add_user_to_group(student_three, group_three, true)
-      add_user_to_group(@initial_student, group_three, true)
+      add_user_to_group(student_one, group_one, is_leader: true)
+      add_user_to_group(student_two, group_two, is_leader: true)
+      add_user_to_group(student_three, group_three, is_leader: true)
+      add_user_to_group(@initial_student, group_three, is_leader: true)
 
       assignment = @course.assignments.create!(
         assignment_valid_attributes.merge(

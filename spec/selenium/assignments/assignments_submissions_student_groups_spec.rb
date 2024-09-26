@@ -55,7 +55,7 @@ describe "submissions" do
         f('li[aria-label="My files"] button').click
         f('li[aria-label="example.pdf"] button').click
 
-        wait_for_new_page_load(f('button[type="submit"]').click)
+        wait_for_new_page_load { f('button[type="submit"]').click }
 
         expect(f("#sidebar_content .header")).to include_text "Submitted!"
       end

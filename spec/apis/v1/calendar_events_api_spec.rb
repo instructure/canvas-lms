@@ -1350,7 +1350,7 @@ describe CalendarEventsApiController, type: :request do
       end
 
       context "reservations" do
-        def prepare(as_student = false)
+        def prepare(as_student: false)
           Notification.create! name: "Appointment Canceled By User", category: "TestImmediately"
 
           if as_student
@@ -1384,7 +1384,7 @@ describe CalendarEventsApiController, type: :request do
         end
 
         context "as a student" do
-          before(:once) { prepare(true) }
+          before(:once) { prepare(as_student: true) }
 
           it "reserves the appointment for @current_user" do
             json = api_call(:post, "/api/v1/calendar_events/#{@event1.id}/reservations", {
@@ -2740,7 +2740,7 @@ describe CalendarEventsApiController, type: :request do
     end
 
     it "apis translate event descriptions without verifiers" do
-      should_translate_user_content(@course, false) do |content|
+      should_translate_user_content(@course, include_verifiers: false) do |content|
         event = @course.calendar_events.create!(title: "event", start_at: "2012-01-08 12:00:00", description: content, saving_user: @teacher)
         json = api_call(:get,
                         "/api/v1/calendar_events/#{event.id}",
@@ -2755,7 +2755,7 @@ describe CalendarEventsApiController, type: :request do
 
     it "apis translate event descriptions in ics" do
       allow(HostUrl).to receive(:default_host).and_return("www.example.com")
-      should_translate_user_content(@course, false) do |content|
+      should_translate_user_content(@course, include_verifiers: false) do |content|
         @course.calendar_events.create!(description: content, start_at: 1.hour.from_now, end_at: 2.hours.from_now, saving_user: @teacher)
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}",

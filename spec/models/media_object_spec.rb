@@ -91,7 +91,7 @@ describe MediaObject do
 
   describe ".ensure_attachment_media_info" do
     it "fixes associated attachments in a weird state" do
-      file_data = fixture_file_upload("292.mp3", "audio/mpeg", true)
+      file_data = fixture_file_upload("292.mp3", "audio/mpeg", binary: true)
       a1 = attachment_model(context: @course, uploaded_data: file_data, media_entry_id: "m-unicorns")
       client = instance_double(CanvasKaltura::ClientV3)
       expect(CanvasKaltura::ClientV3).to receive_messages(new: client)

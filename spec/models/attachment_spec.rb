@@ -1394,7 +1394,7 @@ describe Attachment do
 
     context "attachments with quiz context" do
       before :once do
-        quiz_with_submission(true)
+        quiz_with_submission
         @course.enroll_teacher(user_model).accept
         @teacher = @user
       end

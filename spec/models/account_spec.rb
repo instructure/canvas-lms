@@ -2465,7 +2465,7 @@ describe Account do
   end
 
   describe "#roles_with_enabled_permission" do
-    def create_role_override(permission, role, context, enabled = true)
+    def create_role_override(permission, role, context, enabled: true)
       RoleOverride.create!(
         context:,
         permission:,

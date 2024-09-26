@@ -80,7 +80,7 @@ describe "submissions" do
     end
 
     it "Submitting Group Assignments - Grade Students Individually", priority: "1" do
-      create_assignment_for_group("online_text_entry", true)
+      create_assignment_for_group("online_text_entry", grade_group_students_individually: true)
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       f(".ui-selectmenu-icon").click
       expect(f(".ui-selectmenu-item-header")).not_to include_text(@testgroup[0].name)

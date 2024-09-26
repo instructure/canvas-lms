@@ -372,7 +372,7 @@ describe "API Authentication", type: :request do
       end
 
       context "untrusted developer key" do
-        def login_and_confirm(create_token = false)
+        def login_and_confirm(create_token: false)
           enable_forgery_protection do
             enable_cache do
               user_with_pseudonym(active_user: true, username: "test1@example.com", password: "test1234")
@@ -433,7 +433,7 @@ describe "API Authentication", type: :request do
         end
 
         it "enables the web app flow if token already exists" do
-          login_and_confirm(true)
+          login_and_confirm(create_token: true)
         end
 
         it "does not allow an account level dev key to auth with other account's user" do
@@ -461,7 +461,7 @@ describe "API Authentication", type: :request do
       end
 
       context "trusted developer key" do
-        def trusted_exchange(create_token = false, userinfo: false)
+        def trusted_exchange(create_token: false, userinfo: false)
           @key.trusted = true
           @key.save!
 
@@ -500,7 +500,7 @@ describe "API Authentication", type: :request do
         end
 
         it "gives second token if not force_token_reuse" do
-          json = trusted_exchange(true)
+          json = trusted_exchange(create_token: true)
           expect(json["access_token"]).to_not be_nil
           expect(@user.access_tokens.count).to eq 2
         end
@@ -510,7 +510,7 @@ describe "API Authentication", type: :request do
           @key.auto_expire_tokens = false
           @key.save!
 
-          json = trusted_exchange(true) do |token|
+          json = trusted_exchange(create_token: true) do |token|
             expect_any_instantiation_of(token).to receive(:save).at_least(:once).and_call_original
           end
           expect(json["access_token"]).not_to be_nil
@@ -522,7 +522,7 @@ describe "API Authentication", type: :request do
           @key.auto_expire_tokens = false
           @key.save!
 
-          json = trusted_exchange(true, userinfo: true) do |token|
+          json = trusted_exchange(create_token: true, userinfo: true) do |token|
             expect_any_instantiation_of(token).not_to receive(:save)
           end
           expect(json["user"]).not_to be_nil

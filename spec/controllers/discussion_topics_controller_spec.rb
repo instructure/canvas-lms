@@ -2903,7 +2903,7 @@ describe DiscussionTopicsController do
     end
 
     context "usage rights - student" do
-      let(:data) { fixture_file_upload("docs/txt.txt", "text/plain", true) }
+      let(:data) { fixture_file_upload("docs/txt.txt", "text/plain", binary: true) }
 
       before { user_session(@student) }
 
@@ -3203,7 +3203,7 @@ describe DiscussionTopicsController do
     end
 
     it "attaches a file and handles duplicates" do
-      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", binary: true)
       attachment_model context: @course, uploaded_data: data, folder: Folder.unfiled_folder(@course)
       put "update", params: { course_id: @course.id, topic_id: @topic.id, attachment: data }, format: "json"
       expect(response).to be_successful
@@ -3231,7 +3231,7 @@ describe DiscussionTopicsController do
       @course.save!
       old_count = DiscussionTopic.count
       # the doc.doc is a 63 kb file
-      data = fixture_file_upload("docs/doc.doc", "application/msword", true)
+      data = fixture_file_upload("docs/doc.doc", "application/msword", binary: true)
       post "create", params: topic_params(@course, { attachment: data }), format: :json
       expect(response).to have_http_status :bad_request
       expect(response.body).to include("Course storage quota exceeded")
@@ -3242,7 +3242,7 @@ describe DiscussionTopicsController do
       uuid = "1234-abcd"
       allow(InstFS).to receive_messages(enabled?: true, direct_upload: uuid)
 
-      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", binary: true)
       attachment_model context: @course, uploaded_data: data, folder: Folder.unfiled_folder(@course)
       put "update", params: { course_id: @course.id, topic_id: @topic.id, attachment: data }, format: "json"
 
@@ -3446,7 +3446,7 @@ describe DiscussionTopicsController do
 
     it "increment discussion_topic.created.attachment" do
       user_session @teacher
-      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", binary: true)
       attachment_model context: @course, uploaded_data: data, folder: Folder.unfiled_folder(@course)
       post "create", params: topic_params(@course, { attachment: data }), format: :json
       expect(response).to be_successful

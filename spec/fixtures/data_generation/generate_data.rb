@@ -42,14 +42,14 @@ include Factories
 # rubocop:enable Specs/ScopeIncludes
 
 # rubocop:disable Specs/ScopeHelperModules
-def toggle_k5_setting(account, enable = true)
+def toggle_k5_setting(account, enable: true)
   account.settings[:enable_as_k5_account] = { value: enable, locked: enable }
   account.root_account.settings[:k5_accounts] = enable ? [account.id] : []
   account.root_account.save!
   account.save!
 end
 
-def toggle_horizon_setting(account, enable = true)
+def toggle_horizon_setting(account, enable: true)
   account.horizon_account = enable
   account.save!
 end
@@ -239,7 +239,7 @@ end
 
 def generate_k5_dashboard
   puts "Generate K5 Dashboard Homeroom and Subjects"
-  toggle_k5_setting(@root_account, true)
+  toggle_k5_setting(@root_account)
   course_with_teacher_enrolled
   homeroom = @course
   homeroom.homeroom_course = true
@@ -529,7 +529,7 @@ end
 
 def enable_horizon_for_account(account = @root_account)
   Account.site_admin.enable_feature!(:horizon_course_setting) unless Account.site_admin.feature_enabled?(:horizon_course_setting)
-  toggle_horizon_setting(account, true)
+  toggle_horizon_setting(account, enable: true)
 end
 
 def generate_horizon_hierarchy_with_users(root_is_horizon: false)

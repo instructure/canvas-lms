@@ -271,7 +271,7 @@ describe "User Profile API", type: :request do
 
   context "canvas for elementary" do
     it "returns k5_user false if not a k5 user" do
-      toggle_k5_setting(@course.account, false)
+      toggle_k5_setting(@course.account, enable: false)
 
       @user = @student
       json = api_call(:get,
@@ -286,7 +286,7 @@ describe "User Profile API", type: :request do
 
     context "k5 mode on" do
       before(:once) do
-        toggle_k5_setting(@course.account, true)
+        toggle_k5_setting(@course.account)
       end
 
       it "returns k5_user true for current_user" do

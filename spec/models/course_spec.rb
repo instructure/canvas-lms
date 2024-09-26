@@ -5044,7 +5044,7 @@ describe Course do
     end
 
     context "integration suite" do
-      def quick_sanity_check(user, expect_success = true)
+      def quick_sanity_check(user, expect_success: true)
         Course.valid_grade_export_types["test_export"] = {
           name: "test export",
           callback: lambda do |course, _enrollments, publishing_user, publishing_pseudonym|
@@ -5085,7 +5085,7 @@ describe Course do
 
       it "does not allow grade publishing for a user that is disallowed" do
         @user = User.new
-        expect { quick_sanity_check(@user, false) }.to raise_error("publishing disallowed for this publishing user")
+        expect { quick_sanity_check(@user, expect_success: false) }.to raise_error("publishing disallowed for this publishing user")
       end
 
       it "does not allow grade publishing for a user with a pseudonym in the wrong account" do
@@ -5093,7 +5093,7 @@ describe Course do
         @pseudonym.account = account_model
         @pseudonym.sis_user_id = "U1"
         @pseudonym.save!
-        expect { quick_sanity_check(@user, false) }.to raise_error("publishing disallowed for this publishing user")
+        expect { quick_sanity_check(@user, expect_success: false) }.to raise_error("publishing disallowed for this publishing user")
       end
 
       it "does not allow grade publishing for a user with a pseudonym without a sis id" do
@@ -5101,7 +5101,7 @@ describe Course do
         @pseudonym.account_id = @course.root_account_id
         @pseudonym.sis_user_id = nil
         @pseudonym.save!
-        expect { quick_sanity_check(@user, false) }.to raise_error("publishing disallowed for this publishing user")
+        expect { quick_sanity_check(@user, expect_success: false) }.to raise_error("publishing disallowed for this publishing user")
       end
 
       it "does not publish empty csv" do
@@ -6122,7 +6122,7 @@ describe Course do
   describe "#sync_homeroom_enrollments" do
     before :once do
       @homeroom_course = course_factory(active_course: true)
-      toggle_k5_setting(@homeroom_course.account, true)
+      toggle_k5_setting(@homeroom_course.account)
       @homeroom_course.homeroom_course = true
       @homeroom_course.save!
 
@@ -6232,7 +6232,7 @@ describe Course do
       before :once do
         @shard1.activate do
           account = Account.create!
-          toggle_k5_setting(account, true)
+          toggle_k5_setting(account, enable: true)
           @cross_shard_course = course_factory(account:, active_course: true)
           @cross_shard_course.sync_enrollments_from_homeroom = true
           @cross_shard_course.homeroom_course_id = @homeroom_course.id
@@ -6257,7 +6257,7 @@ describe Course do
   describe "#sync_homeroom_participation" do
     before :once do
       @homeroom_course = course_factory(active_course: true)
-      toggle_k5_setting(@homeroom_course.account, true)
+      toggle_k5_setting(@homeroom_course.account)
       @homeroom_course.homeroom_course = true
       @homeroom_course.save!
 
@@ -6324,7 +6324,7 @@ describe Course do
   describe "#sync_with_homeroom" do
     before :once do
       @account = Account.default
-      toggle_k5_setting(@account, true)
+      toggle_k5_setting(@account)
 
       @homeroom_course1 = course_factory(active_course: true, account: @account)
       @homeroom_course1.homeroom_course = true
@@ -6376,7 +6376,7 @@ describe Course do
   describe ".syncing_subjects" do
     before :once do
       @account = Account.default
-      toggle_k5_setting(@account, true)
+      toggle_k5_setting(@account)
 
       @homeroom_course1 = course_factory(active_course: true, account: @account)
       @homeroom_course1.homeroom_course = true

@@ -721,7 +721,7 @@ shared_examples "context modules for students" do
       sub_account = Account.create!(name: "sub account", parent_account: Account.default)
       @course.update!(account: sub_account)
       @course.account.enable_feature!(:discussion_checkpoints)
-      @modules = create_modules(1, true)
+      @modules = create_modules(1, published: true)
 
       @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed topic")
       @c1 = Checkpoints::DiscussionCheckpointCreatorService.call(

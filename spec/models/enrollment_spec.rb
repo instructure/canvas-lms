@@ -1712,7 +1712,7 @@ describe Enrollment do
         end
       end
 
-      def course_section_availability_test(should_be_invited = false)
+      def course_section_availability_test(should_be_invited: false)
         @section = @course.course_sections.first
         expect(@section).not_to be_nil
         @enrollment.course_section = @section
@@ -1947,7 +1947,7 @@ describe Enrollment do
         end
 
         it "accepts into the right state based on availability dates on course_section" do
-          course_section_availability_test(true)
+          course_section_availability_test(should_be_invited: true)
         end
 
         it "accepts into the right state based on availability dates on course" do

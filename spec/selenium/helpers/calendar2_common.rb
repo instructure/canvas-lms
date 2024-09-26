@@ -321,16 +321,12 @@ module Calendar2Common
   end
 
   # Creates event from the 'edit event' modal
-  def event_from_modal(event_title, should_add_date = false, should_add_location = false)
+  def event_from_modal(event_title)
     edit_event_dialog = f("#edit_event_tabs")
     expect(edit_event_dialog).to be_displayed
     title = edit_calendar_event_form_title
     keep_trying_until { title.displayed? }
     replace_content(title, event_title)
-    add_date(middle_number) if should_add_date
-    if should_add_location
-      replace_content(f("input[placeHolder='Input Event Location...'"), "location title")
-    end
     edit_calendar_event_form_submit_button.click
     wait_for_ajax_requests
   end

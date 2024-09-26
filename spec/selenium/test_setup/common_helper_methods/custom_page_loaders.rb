@@ -39,7 +39,7 @@ module CustomPageLoaders
       wait_for_initializers
       wait_for_ajaximations
     else
-      wait_for_new_page_load(true) do
+      wait_for_new_page_load(accept_alert: true) do
         driver.get(app_url + link)
       end
     end
