@@ -543,7 +543,7 @@ el:
         event_id: "Id Συμβάντος"
         event_sis_batch: "SIS Batch"
         event_source_label: Source
-        event_type_label: Είδος
+        event_type_label: Τύπος
         reset_from_label: "Επαναφορά Απο"
         reset_to_label: "Επαναφορά Μέχρι"
         time: Χρόνος
@@ -555,7 +555,7 @@ el:
         date: Ημερομηνία
         event_details: "Λεπτομέρειες συμβάντος"
         event_source: Source
-        event_type: Είδος
+        event_type: Τύπος
         no_item_found: "Δεν βρέθηκαν στοιχεία"
         time: Χρόνος
         user: Χρήστης
@@ -593,7 +593,7 @@ el:
         Assignment: Εργασία
         Course: Μάθημα
         Grader: Βαθμολογητής
-        Student: Μαθητής
+        Student: "Μαθητής "
         To: Πρός
         date: Ημερομηνία
         from: Από
@@ -1780,6 +1780,8 @@ el:
       current: "Τρέχοντα Μαθήματα"
     department: 
       analytics: "Αναλυτικά στοιχεία"
+    deprecated: 
+      analytics: "Αναλυτικά στοιχεία"
     filters: 
       completed: "Ολοκληρωμένα Μαθήματα"
       current: "Τρέχοντα Μαθήματα"
@@ -2079,6 +2081,7 @@ el:
     errors: 
       frozen_assignments_error: "Δεν μπορείτε να διαγράψετε ομάδα με κλειδωμένη εργασία."
   assignment_id_96baa1b7: "id αξιολόγισης"
+  assignment_id_b040cee0: "Id Εργασίας"
   assignment_information_e871d0e0: "Πληροφορίες Εργασίας"
   assignment_menu_91fe3716: "Μενού Εργασίας"
   assignment_muted_4cb590a4: "Η εργασία μπήκε σε κατάσταση «σίγασης»"
@@ -2109,7 +2112,7 @@ el:
     assignment_group_list: 
       no_assignment_groups: "Δεν βρέθηκαν Ομάδες Υποβολής"
     assignment_group_selector: 
-      assignment_group: "Ομάδα Υποβολής"
+      assignment_group: "Ομάδα Εργασίας"
       assignment_group_options: 
         create_group: "Δημιουργία Ομάδας"
         new_group: "Νέα Ομάδα"
@@ -2155,7 +2158,7 @@ el:
       not_graded_type: "Δεν έχει βαθμολογηθεί"
       quiz_type: Κουίζ
       save: Αποθήκευση
-      saving: Αποθήκευση...
+      saving: "Αποθήκευση σε εξέλιξη..."
     create_group: 
       cancel: Ακύρωση
       drop_highest: "Υψηλότερες βαθμολογίες:"
@@ -2165,7 +2168,7 @@ el:
       never_drop: "Να υπολογίζεται πάντα"
       percent_of_total: "% o της συνολικής βαθμολογίας"
       save: Αποθήκευση
-      saving: Αποθήκευση...
+      saving: "Αποθήκευση σε εξέλιξη..."
     date_available_column_view: 
       available: Διαθέσιμο
       multiple_dates: "Πολλαπλές Ημερομηνίες"
@@ -2175,7 +2178,7 @@ el:
       multiple_dates: "Πολλαπλές Ημερομηνίες"
     delete_group: 
       cancel: Ακύρωση
-      delete: "Διαγραφή Ομάδας"
+      delete: "Αφαίρεση Ομάδας"
       deleting: Διαγραφή...
       labels: 
         delete_assignments_in_group: "Διαγραφή των εργασιών του"
@@ -2210,12 +2213,12 @@ el:
     external_content_homework_file_submission_view: 
       additional_comments: "Πρόσθετα σχόλια"
       buttons: 
-        submit_assignment: "Υποβολή Εργασίας"
+        submit_assignment: "Υποβάλετε την εργασία"
       group_assignment_header: Σχόλια...
     external_content_homework_url_submission_view: 
       additional_comments: "Πρόσθετα σχόλια"
       buttons: 
-        submit_assignment: "Υποβολή Εργασίας"
+        submit_assignment: "Υποβάλετε την εργασία"
       group_assignment_header: Σχόλια...
     file_retrieval_error: "Η Ανάκτηση του Αρχείου Απέτυχε"
     getting_file: "Γίνεται Ανάκτηση του Αρχείου..."
@@ -2267,7 +2270,7 @@ el:
     incomplete: "Μη ολοκληρωμένο"
     index_view: 
       add_assignment: Εργασία
-      add_group: Ομάδα
+      add_group: Όμαδα
       add_quiz_lti: Κουίζ/Τέστ
       assignments: Εργασίες
       search_for_assignment: "Αναζήτηση Εργασίας"
@@ -2570,7 +2573,7 @@ el:
           turnitin_repository: "Αποθετήριο Turnitin"
         originality_report_never: Ποτέ
         originality_report_visibility: "Οι Φοιτητές/τριες Μπορούν να Δουν την Αναφορά Πρωτοτυπίας"
-        originality_report_visible_after_due_date: "Μετά την Καταληκτική Ημερομηνία"
+        originality_report_visible_after_due_date: "Έπειτα απο την Καταληκτική Ημερομηνία"
         originality_report_visible_after_grading: "Μετά τη βαθμολόγηση της εργασίας"
         originality_report_visible_immediately: Αμέσως
         settings_exclude_fewer_than_count: "Λιγότερες από %{wordsInput} λέξεις"
@@ -2582,6 +2585,7 @@ el:
         update_settings: "Ενημέρωση Ρυθμίσεων"
       vericite_settings: 
         originality_report_never: Ποτέ
+        originality_report_visibility: "Οι Φοιτητές/τριες Μπορούν να Δουν την Αναφορά Πρωτοτυπίας"
         originality_report_visible_after_due_date: "Έπειτα απο την Καταληκτική Ημερομηνία"
         originality_report_visible_after_grading: "Μετά τη βαθμολόγηση της εργασίας"
         originality_report_visible_immediately: Αμέσως
@@ -3044,13 +3048,13 @@ el:
       details: "Λεπτομέρειες:"
       group_category: "Κατηγορία Ομάδας"
       group_signup: "Βάλτε τους σπουδαστές να εγγραφούν σε ομάδες."
-      location: Τοποθεσία
+      location: "Τοποθεσία:"
       name: Όνομα
       time_range: "Χρονική Περίοδος"
     edit_appt_calendar_event: 
       description: "Περιγραφή:"
     edit_assignment: 
-      calendar: "Ημερολόγιαο:"
+      calendar: "Ημερολόγιο:"
       due: "Καταληκτική Ημερ/νία:"
       group: "Ομάδα:"
       links: 
@@ -3091,6 +3095,10 @@ el:
       tabs: 
         assignment: Εργασία
         event: Γεγονός
+    edit_planner_note: 
+      calendar: "Ημερολόγιο:"
+      date: "Ημερομηνία:"
+      title: "Τίτλος:"
     edit_to_do_item: 
       date: "Ημερομηνία:"
       links: 
@@ -3110,8 +3118,8 @@ el:
         edit: Διαμόρφωση
         reserve: Κράτηση
         unreserve: "Ακύρωση κράτησης"
-      location: Τοποθεσία
-      location_address: Διεύθυνση
+      location: "Τοποθεσία:"
+      location_address: "Διεύθυνση:"
       message_students: "Αποστολή μηνύματος στους μαθητές"
       slots_available: "Διαθέσιμες θέσεις"
     event_on_this_day: "Υπάρχει κάποιο γεγονός αυτή την ημέρα"
@@ -3381,7 +3389,7 @@ el:
         collaboration_members: "Μέλη συνεργασίας"
         groups: Ομάδες
         loading: Φόρτωση
-        people: Άνθρωποι
+        people: Κοινό
         remove_all: "Αφαίρεση Όλων"
       member_instructions: "Κάντε κλικ ή αγγίξτε κάποιον χρήστη ή κάποια ομάδα στην αριστερή στήλη για να προσθέσετε Συνεργάτες."
     delete_button: 
@@ -3569,7 +3577,7 @@ el:
     disabled_error: "Η συνεδρία μέσω Διαδικτύου δεν έχει ενεργοποιηθεί για αυτή την ιστοσελίδα Canvas"
     edit_conference_form: 
       advanced_settings: "Διαχείριση Προηγμένων Ρυθμίσεων..."
-      conference_type: Είδος
+      conference_type: Τύπος
       description: Περιγραφή
       duration: Διάρκεια
       duration_in_minutes: λεπτά
@@ -3816,7 +3824,7 @@ el:
         to_happen_on: σε
       external_tool_launch: 
         course: Μάθημα
-        find_a_course: "Βρήτε ένα Μάθημα"
+        find_a_course: "Βρείτε ένα Μάθημα"
       folder_picker: 
         default_select_folder: "Επιλογή Φακέλου"
         upload_to: "Μεταφόρτωση σε"
@@ -4419,6 +4427,7 @@ el:
       teachers_students: "Δάσκαλοι και Μαθητές"
   course_8a63b4a3: Μάθημα
   course_activities_21c83bd3: "Δραστηριότητες του Μαθήματος"
+  course_activity_bfe11267: "Δραστηριότητα Μαθήματος"
   course_announcements_76b07340: "Ανακοινώσεις Μαθήματος"
   course_assignments_833b8cf1: "Εργασίες Μαθήματος"
   course_atom_feed_9d95214e: "Τροφοδοσία Atom Μαθήματος"
@@ -4483,6 +4492,7 @@ el:
   course_groups_e8239a1e: "Ομάδες Μαθήματος"
   course_home_4c4c0107: "Αρχική Σελίδα Μαθήματος"
   course_home_sub_navigation_b1ee6b03: "Υπο-πλοήγηση στην Αρχική Σελίδα του Μαθήματος"
+  course_id_8bd2a21c: "ID Μαθήματος"
   course_id_f8640bb8: course_id
   course_implemented_apps_fa658f5a: "Εφαρμογές που Εφαρμόστηκαν στο Μάθημα"
   course_list: 
@@ -4762,13 +4772,13 @@ el:
         cannot_add_users: "Δεν είναι δυνατή η προσθήκη νέων χρηστών επειδή αυτό το μάθημα έχει ολοκληρωθεί"
         filter_field_description: "Αναζήτηση ατόμων. Καθώς πληκτρολογείτε σε αυτό το πεδίο, η λίστα των ατόμων θα φιλτράρεται αυτόματα για να περιλαμβάνει μόνο εκείνα τα ονόματα που ταιριάζουν στην αναζήτησή σας."
         group_set: "Σετ Ομάδων"
-        people: Άνθρωποι
+        people: Κοινό
         role_to_search: "Περιορισμός αναζήτησης στον ρόλο"
         search_people: "Search people"
         title_add_people: "Προσθήκη Ατόμων"
       invitations_view: 
         accepted_invitation: "Ο/Η %{name} ήδη έλαβε και αποδέχτηκε την πρόσκληση να συμμετάσχει στο μάθημα, αλλά και πάλι μπορείτε, αν χρειαστεί, να ξαναστείλετε την πρόσκληση."
-        admin_invitation_unaccepted: "<mrk mid=\"6646\" mtype=\"seg\">Ο/Η %{name} δεν έχει ακόμη αποδεχτεί την πρόσκληση να συμμετάσχει στο μάθημα.</mrk> <mrk mid=\"6647\" mtype=\"seg\">Η πρόσκληση εστάλη:</mrk> <mrk mid=\"6648\" mtype=\"seg\">%{time}</mrk>"
+        admin_invitation_unaccepted: "<mrk mid=\"6650\" mtype=\"seg\">Ο/Η %{name} δεν έχει ακόμη αποδεχτεί την πρόσκληση να συμμετάσχει στο μάθημα.</mrk> <mrk mid=\"6651\" mtype=\"seg\">Η πρόσκληση εστάλη:</mrk> <mrk mid=\"6652\" mtype=\"seg\">%{time}</mrk>"
         invitations_pending_publish: "Οι προσκλήσεις δεν αποστέλλονται μέχρι να *δημοσιευθεί* το μάθημα"
         student_invitation_unaccepted_available: "<mrk mid=\"6650\" mtype=\"seg\">Ο/Η %{name} δεν έχει ακόμη αποδεχτεί την πρόσκληση να συμμετάσχει στο μάθημα.</mrk> <mrk mid=\"6651\" mtype=\"seg\">Η πρόσκληση εστάλη:</mrk> <mrk mid=\"6652\" mtype=\"seg\">%{time}</mrk>"
         student_invitation_unaccepted_unavailable: "<mrk mid=\"6653\" mtype=\"seg\">Ο/Η %{name} προστέθηκε στο μάθημα:</mrk> <mrk mid=\"6654\" mtype=\"seg\">%{time}</mrk>"
@@ -4793,7 +4803,7 @@ el:
           remove_from_course: "Αφαίρεση από το Μάθημα"
           resend_invitation: "Επαναποστολή Πρόσκλησης"
           user_details: "Λεπτομέρειες Χρήστη"
-        manage_user: "Διαχείριση %{name}"
+        manage_user: "Διαχείριση του %{name}"
         pending_acceptance_explanation: "Ο χρήστης δεν έχει ακόμη αποδεχθεί την πρόσκληση για το μάθημα"
         pending_acceptance_of_invitation: εκκρεμεί
       roster_users: 
@@ -4803,7 +4813,7 @@ el:
         name: Όνομα
         no_people_found: "Δεν βρέθηκαν άτομα"
         role: Ρόλος
-        section: Τομέας
+        section: Τμήμα
         total_activity: "Συνολική Δραστηριότητα"
         you_can_search_by: "Μπορείτε να εκτελέσετε ευρετηρίαση με:"
       section: 
@@ -5043,6 +5053,7 @@ el:
   create_rubric_ec33ddf9: "Δημιουργία Ρουμπρίκας"
   create_users_view: 
     required: "Παρακαλώ, καταχωρίστε μερικές διευθύνσεις ηλεκτρονικού ταχυδρομείου."
+  created_6ee36dff: "Δημιουργήθηκε:"
   created_by_b39b9c8b: "Δημιουργήθηκε απο τον/την"
   created_by_sis_b590894c: "Δημιουργήθηκε από το SIS _Student Information System_"
   created_group_group_name_2097306b: "Δημιουργήθηκε η ομάδα %{group_name}"
@@ -5147,7 +5158,7 @@ el:
   curve_grades_dialog: 
     average_score: "Μέσος όρος"
     buttons: 
-      curve_grades: "Βαθμολόγιση σύμφωνα με στατιστικό μοντελο Bell Curve"
+      curve_grades: "Βαθμολόγηση σύμφωνα με στατιστικό μοντέλο Bell Curve"
       curving_grades: "Αναπροσαρμογή Βαθμών..."
     curve_average: "<mrk mid=\"822\" mtype=\"seg\">Εισαγωγή βαθμού κατά μέσο όρο ως αναπροσαρμογή για την εργασία *%{assignment.name}*.</mrk> <mrk mid=\"823\" mtype=\"seg\">Το διάγραμμα δείχνει μια πολύ καλή προσπάθεια αναπαραγωγής των βαθμών με βάση τη βαθμολογία των υπαρχόντων σπουδαστών.</mrk>"
     curve_grade_for_assignment: "Αναπροσαρμογή Βαθμού για %{assignment.name}"
@@ -5479,7 +5490,7 @@ el:
   dialog_form_wrapper: 
     cancel: Ακύρωση
     save_settings: "Αποθήκευση Ρυθμίσεων"
-    saving: Αποθήκευση...
+    saving: "Αποθήκευση σε εξέλιξη..."
   different_course_b875770e: "διαφορετικό μάθημα"
   diigo_993c4646: Diigo
   disableWhileLoading: 
@@ -5760,6 +5771,7 @@ el:
       post_reply: "Δημοσίευση Απάντησης"
       write_a_reply: Απάντηση
     results_entry: 
+      edited_comment: "Τροποποιήθηκε από τον/την *%{editor.display_name}* στις %{edited_at}"
       view_in_discussion: "Προβολή σε συζήτηση"
     show_all_n_replies: 
       one: "Εμφάνιση μίας απάντησης"
@@ -6590,6 +6602,7 @@ el:
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "Λάβετε τα ακόλουθα από τη Συνδεδεμένη σας Εφαρμογή Salesforce"
   get_your_users_error_reports_posted_to_salesforce__76f57839: "Λάβετε τις αναφορές σφαλμάτων χρηστών που έχουν δημοσιευθεί στο Service Cloud της Salesforce"
   get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: "Λάβετε τις αναφορές σφαλμάτων χρηστών που έχουν δημοσιευθεί στη Salesforce"
+  give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Δώστε σε όλους τους σπουδαστές τον ίδιο βαθμό για το μάθημα *%{assignment.name}* εισαγάγοντας και υποβάλλοντας μια βαθμολογία παρακάτω:"
   global_announcements_a78912c8: "Καθολικές Ανακοινώσεις"
   global_branding_df1cae12: "Καθολική Σήμανση"
   global_message_icons: 
@@ -6614,6 +6627,7 @@ el:
   gpa_scale_a6d1cdea: "Κλίμακα GPA"
   grade_9c6f076d: Βαθμός
   grade_assignment_7c1abc11: "Βαθμός %{assignment}"
+  grade_change_activity_75fb525: "Ιστορικό/Δραστηριότητα Αλλαγής Βαθμού"
   grade_change_notifications_98461261: "Ειδοποιήσεις αλλαγής βαθμών"
   grade_display_warning_dialog: 
     grade_display_warning: 
@@ -7135,7 +7149,7 @@ el:
       group_categories: 
         account_group_explanation: "<mrk mid=\"6515\" mtype=\"seg\">Οι ομάδες σπουδαστών σε επίπεδο λογαριασμού είναι ένας καλός τρόπος για να οργανώσετε τους σπουδαστές σε ομάδες χωρίς να δεσμεύεστε για συγκεκριμένο μάθημα.</mrk> <mrk mid=\"6516\" mtype=\"seg\">Σε κάθε ομάδα σπουδαστών παρέχεται ένα ημερολόγιο, πίνακας συζήτησης και εργαλεία συνεργασίας ώστε οι σπουδαστές να μπορούν να οργανώνονται και να εργάζονται από κοινού πιο αποτελεσματικά.</mrk>"
         add_group_set: "Προσθήκη Σετ Ομάδων"
-        course_group_explanation: "<mrk mid=\"6518\" mtype=\"seg\">Οι ομάδες σπουδαστών είναι ένας χρήσιμος τρόπος οργάνωσης των σπουδαστών για περιπτώσεις όπως τα ομαδικά πρότζεκτς ή οι εργασίες.</mrk> <mrk mid=\"6519\" mtype=\"seg\">Σε κάθε ομάδα σπουδαστών παρέχεται ένα ημερολόγιο, πίνακας συζήτησης και εργαλεία συνεργασίας ώστε οι σπουδαστές να μπορούν να οργανώνονται και να εργάζονται από κοινού πιο αποτελεσματικά.</mrk>"
+        course_group_explanation: "<mrk mid=\"1329\" mtype=\"seg\">Οι ομάδες σπουδαστών είναι ένας χρήσιμος τρόπος οργάνωσης των σπουδαστών για περιπτώσεις όπως τα ομαδικά πρότζεκτς ή οι εργασίες.</mrk> <mrk mid=\"1330\" mtype=\"seg\">Σε κάθε ομάδα σπουδαστών παρέχεται ένα ημερολόγιο, πίνακας συζήτησης και εργαλεία συνεργασίας ώστε οι σπουδαστές να μπορούν να οργανώνονται και να εργάζονται από κοινού πιο αποτελεσματικά.</mrk>"
         group_assignment_instructions: "<mrk mid=\"6520\" mtype=\"seg\">Μπορείτε να ορίσετε τυχαία σπουδαστές σε ομάδες συγκεκριμένου μεγέθους ή να δημιουργήσετε και να οργανώσετε χειροκίνητα τις ομάδες.</mrk> <mrk mid=\"6521\" mtype=\"seg\">Μόλις δημιουργηθούν οι ομάδες, μπορείτε να ορίσετε εργασίες ως εργασίες «ομαδικής υποβολής», που σημαίνει ότι κάθε ομάδα θα διαθέτει μία υποβολή για όλους τους χρήστες της.</mrk>"
         group_set: "Σετ Ομάδων"
         headings: 
@@ -7168,7 +7182,7 @@ el:
         category_settings: Ρυθμίσεις
         delete_category_option: Διαγραφή
         edit_category_option: Διαμόρφωση
-        group: Ομάδα
+        group: Όμαδα
         group_limit_blurb: "Ο αριθμός των μελών των ομάδων περιορίζεται σε *%{group_limit}* μέλη"
         import: Εισαγωγή
         message_all_unassigned_option: "Στείλτε Μήνυμα σε Όλους τους Μη Εγγεγραμμένους Σπουδαστές"
@@ -7187,7 +7201,7 @@ el:
         limit_group_size: "Περιορίστε τις ομάδες σε %{group_limit} μέλη"
         require_same_section: "Απαιτήστε τα μέλη της ομάδας να βρίσκονται στον ίδιο τομέα"
         save: Αποθήκευση
-        saving: Αποθήκευση...
+        saving: "Αποθήκευση σε εξέλιξη..."
       group_detail: 
         add_user_to_group: "Ορισμός χρήστη στην ομάδα"
         group_delete: Διαγραφή
@@ -7727,6 +7741,7 @@ el:
   last_user_access_title: "Τελευταία Πρόσβαση Χρήστη"
   late_2be42b88: Πρόσφατο/α
   late_assignment_user_name_assignment_name_2df32e01: "<mrk mid=\"5564\" mtype=\"seg\">Εκπρόθεσμη Υποβολή:</mrk> <mrk mid=\"5565\" mtype=\"seg\">%{user_name}, %{assignment_name}</mrk>"
+  late_bd436902: ΕΚΠΡΟΘΕΣΜΟ/Α
   late_percent_b91d01b3: "<mrk mid=\"4316\" mtype=\"seg\">Πρόσφατο/α:</mrk> <mrk mid=\"4317\" mtype=\"seg\">%{percent}</mrk>"
   latest_assessment_a85280ef: "Πιο Πρόσφατη Αξιολόγηση"
   latest_f604a75: "Το/τα πιο πρόσφατο/α"
@@ -8036,6 +8051,7 @@ el:
   malformed_csv_aaa4b7f2: "Παραμορφωμένο CSV"
   manage_access_bd923d8d: "Διαχείριση Πρόσβασης"
   manage_all_other_course_content_d77de830: "Διαχείριση όλου του υπόλοιπου περιεχομένου του μαθήματος"
+  manage_assignment_31a132fb: "Διαχείριση Εργασίας"
   manage_avatars: 
     errors: 
       update_failed: "Η ενημέρωση απέτυχε, παρακαλώ δοκιμάστε ξανά"
@@ -9902,11 +9918,13 @@ el:
   move_outcome_ce497e6c: "Μετακίνηση Αποτελέσματος"
   move_outcome_group_cfa1a505: "Μετακίνηση Ομάδας Αποτελεσμάτων"
   move_to_1c208ae5: "Μεταφορά Προς..."
+  move_to_9b91c6e0: "Μετακίνηση στο..."
   move_to_dde1a5e1: "Μεταφορά Προς..."
   moving_a4d552df: Μετακίνηση...
   multi_factor_authentication_1a6b3b3d: "Έλεγχος Ταυτότητας Πολλών Παραγόντων"
   multi_factor_authentication_configured_865b1bde: "Ρυθμίστηκε ο έλεγχος ταυτότητας πολλών παραγόντων "
   multiple_dates_e3a122f7: "Πολλαπλές Ημερομηνίες"
+  multiple_modules_930713d4: "Πολλαπλά ένθετα"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
     one: "<mrk mid=\"8203\" mtype=\"seg\">Πρέπει να επιτύχετε μαεστρία τουλάχιστον μία φορά.</mrk> <mrk mid=\"8204\" mtype=\"seg\">Για τις βαθμολογίες πάνω από το επίπεδο μαεστρίας, θα χρησιμοποιηθεί ο μέσος όρος τους για τον υπολογισμό της τελικής βαθμολογίας.</mrk>"
     other: "Πρέπει να επιτύχετε επιδεξιότητα τουλάχιστον %{count} φορές. Για τις βαθμολογίες πάνω από το επίπεδο επιδεξιότητας, θα χρησιμοποιηθεί ο μέσος όρος τους για τον υπολογισμό της τελικής βαθμολογίας."
@@ -9979,6 +9997,7 @@ el:
   new_group_set_7241a581: "Νέο Σετ Ομάδων"
   new_module_4e9287e4: "Νέα Ενότητα"
   new_outcome_7fba8c7d: "Νέο Αποτέλεσμα"
+  new_outcome_group_af59f145: "Νέα Ομάδα Αποτελεσμάτων"
   new_question_9107c469: "Νέα Ερώτηση"
   new_quiz_34aacba6: "Νέο Κουίζ"
   next_40e12421: Επόμενη
@@ -10473,8 +10492,8 @@ el:
     missing_outcome: "Αδύνατη η εύρεση αυτού του αποτελέσματος εκμάθησης"
     outcome: 
       links: 
-        delete_outcome: "Διαγραφή Αποτελέσματος"
-        edit_outcome: "Επεξεργασία Αποτελέσματος"
+        delete_outcome: Διαγραφή
+        edit_outcome: Διαμόρφωση
       mastery_at_label: "Καθορισμός επιπέδου επιδεξιότητας για βαθμολογία ίση με ή πάνω από:"
       total_points: "Συνολικοί Πόντοι"
       use_for_scoring: "Χρήση αυτού του κριτηρίου για βαθμολόγηση"
@@ -10491,8 +10510,8 @@ el:
       total_points: "Συνολικοί Πόντοι"
     outcome_group: 
       links: 
-        delete_outcome_group: "Διαγραφή Ομάδας Αποτελεσμάτων"
-        edit_outcome_group: "Επεξεργασία Ομάδας Αποτελεσμάτων"
+        delete_outcome_group: Διαγραφή
+        edit_outcome_group: Διαμόρφωση
     outcome_group_form: 
       group_description: "Περιγράψτε αυτή την ομάδα"
       title: "Όνομα Ομάδας"
@@ -12864,7 +12883,7 @@ el:
         join_code: "Κωδικός Συμμετοχής"
         name: "Πλήρες Όνομα"
         password: "Κωδικός πρόσβασης"
-        password_confirmation: "Επικυρώστε Κωδικό Πρόσβασης"
+        password_confirmation: "Επικύρωση Συνθηματικού"
         username: "Όνομα Χρήστη"
     teacher_dialog: 
       agree_to_terms_and_pp: "Συμφωνείτε με τους *όρους χρήσης* και αναγνωρίζετε την **πολιτική απορρήτου**."
@@ -12941,6 +12960,7 @@ el:
         enabled: "Ενεργοποιημένο (απαιτείται και η ενεργοποίηση του Μετατροπέα QTI)"
   restart_link_validation_b61286fc: "Επανέναρξη Επικύρωσης Συνδέσμου"
   restore_6d523f1d: Eπαναφορά
+  restore_courses_182e162e: "Επαναφορά Μαθημάτων"
   restrict_students_from_viewing_future_courses_in_e_67486caf: "Περιορισμός των μαθητών από το να βλέπουν τα μελλοντικά μαθήματα στην λίστα εγγραφών"
   restricted_access_d3e99a39: "Περιορισμένη Πρόσβαση"
   result_8f971a09: Αποτέλεσμα
@@ -13280,6 +13300,7 @@ el:
   search_courses_591bc900: "Αναζήτηση μαθημάτων..."
   search_entries_or_author_63fb0a86: "Αναζήτηση καταχωρίσεων ή συγγραφέα"
   search_for_a_course_58fdc7a6: "Αναζήτησης Μαθήματος"
+  search_for_a_deleted_course_by_id_f553398d: "Εύρευση για ένα μάθημα που έχει αφαιρεθεί με αριθμό ταυτοποίησης/ID"
   search_for_assignment_8149cb1: "Αναζήτηση Εργασίας"
   search_for_files_7541fb28: "Αναζήτηση αρχείων"
   search_groups_or_people_6c15d6ad: "Αναζήτηση Ομάδων ή Ατόμων"
@@ -13384,6 +13405,7 @@ el:
   see_vericite_results_b44dd8c8: "Προβολή των αποτελεσμάτων του VeriCite"
   select_a_grading_period_5ea50f1: "Επιλογή Περιόδου Βαθμολόγησης..."
   select_a_grading_period_aab25483: "Επιλογή Περιόδου Βαθμολόγησης"
+  select_a_log_type_to_search_247fc6b4: "Επιλέξτε έναν τύπο καταγραφής για αναζήτηση."
   select_a_predefined_color_c77ab2f5: "Επιλογή προκαθορισμένου χρώματος."
   select_a_section_37ac1694: "Επιλέξτε τομέα"
   select_a_student_adfcc348: "Επιλέξτε σπουδαστή"
@@ -14117,6 +14139,7 @@ el:
   skype_18850ba7: Skype
   sms_f0ddceeb: sms
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Μερικές συνεδρίες σε αυτή τη σελίδα είναι κρυφές λόγω σφαλμάτων κατά την ανάκτηση της κατάστασής τους"
+  some_settings_have_been_administratively_locked_9e3ee880: "Κάποιες ρυθμίσεις έχουν κλειδωθεί απο τον διαχειριστή"
   some_systems_recycle_their_ids_for_each_new_export_884b8e46: "<mrk mid=\"3317\" mtype=\"seg\">Μερικοί σπουδαστές ανακυκλώνουν τα ID τους για κάθε νέα εξαγωγή.</mrk> <mrk mid=\"3318\" mtype=\"seg\">Κατά συνέπεια, αν εξάγετε δύο ξεχωριστές τράπεζες ερωτήσεων, θα έχουν το ίδιο ID.</mrk> <mrk mid=\"3319\" mtype=\"seg\">Για να μην χαθούν δεδομένα αξιολόγησης, διαχειριζόμαστε αυτά τα αντικείμενα ως διαφορετικά παρά τα ID τους.</mrk> <mrk mid=\"3320\" mtype=\"seg\">Αυτή η επιλογή θα απενεργοποιήσει αυτή τη λειτουργία ασφαλείας και θα επιτρέψει στα δεδομένα αξιολόγησης να αντικαταστήσουν τα υπάρχοντα δεδομένα με το ίδιο ID.</mrk>"
   someone: Κάποιος
   someone_bbbc538b: Κάποιος
@@ -14219,6 +14242,7 @@ el:
   start_participating_f0c75256: "Έναρξη συμμετοχής"
   start_tls_26e4b0dc: "Έναρξη TLS"
   started_5e138638: Εκκίνηση
+  starts_at_29843f98: "Ξεκινάει σε"
   state_standards_c9b1affd: "Πρότυπα της Πολιτείας"
   statistics: 
     csv_columns: 
@@ -15005,6 +15029,7 @@ el:
   to_minscore_43e5452e: "σε %{minScore}%"
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Για να καρφιτσώσετε μια συζήτηση στο επάνω μέρος της σελίδας, σύρετε τη συζήτηση εδώ ή επιλέξτε Καρφίτσωμα από το μενού ρυθμίσεων της συζήτησης."
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "Για να περιορίσετε χρήστες από το συγκεκριμένο domain Google Apps, εισαγάγετε το domain εδώ."
+  to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "Για να δείτε όλες τις ειδοποιήσεις που έχουν σταλεί σε ένα χρήστη του Canvas, επιλέξτε τον χρήστη και το εύρος ημερομηνιών για την αναζήτησή σας."
   toggle_editing_answer_text_as_html_9a93fe6: "Εναλλαγή της επεξεργασίας του κειμένου απάντησης σε HTML"
   tolerance_value_9e96573c: "Τιμή ανοχής"
   tomorrow_9a6c9a00: Αύριο
@@ -15205,6 +15230,7 @@ el:
     users_to_add: 
       one: "Αν προχωρήσετε ως έχει, θα προστεθεί 1 χρήστης."
       other: "Αν προχωρήσετε ως έχει, θα προστεθούν %{count} χρήστες."
+  user_login_logout_activity_90fbbd9a: "Δραστηριότητα Σύνδεσης/Αποσύνδεσης Χρήστη"
   user_logins: 
     buttons: 
       add_login: "Προσθήκη Σύνδεσης"
@@ -15548,6 +15574,7 @@ el:
   view_grading_scheme_ac66bcdd: "Προβολή Συστήματος Βαθμολόγησης"
   view_name_app_62a2ad8e: "Προβολή της εφαρμογής %{name}"
   view_next_file_a8a4a885: "Προβολή επόμενου αρχείου"
+  view_notifications_6aea09a2: "Προβολή Ειδοποιήσεων"
   view_previous_file_b846db4f: "Προβολή προηγούμενου αρχείου"
   view_question_banks_188a9e0f: "Προβολή Τραπεζών Ερωτήσεων"
   view_rubric_d71cce10: "Εμφάνιση Ρουμπρίκας Αξιολόγισης"
@@ -15603,6 +15630,7 @@ el:
   website_url_177fc1dc: "URL ιστοσελίδας"
   week_1f945ddd: Εβδομάδα
   week_s_cb1492ee: Εβδομάδα/ες
+  weight_final_grade_based_on_assignment_groups_3124161: "Καθορισμός βαρύτητας τελικού βαθμού με βάση τις ομάδες υποβολής"
   welcome_to_the_canvas_theme_editor_73091d1: "Καλώς ορίσατε στον Επεξεργαστή Θέματος (Theme Editor) του Canvas"
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "<mrk mid=\"6789\" mtype=\"seg\">Καλώς ορίσατε στα μαθήματά σας!</mrk> <mrk mid=\"6790\" mtype=\"seg\">Για παραμετροποίηση της λίστας των μαθημάτων σας, κάντε κλικ στον σύνδεσμο «Όλα τα Μαθήματα» και βάλτε αστερίσκο στα μαθήματα που θέλετε να προβάλετε.</mrk>"
   well_below_mastery_37664bdc: "Αρκετά Κάτω από το Επίπεδο Επιδεξιότητας"
