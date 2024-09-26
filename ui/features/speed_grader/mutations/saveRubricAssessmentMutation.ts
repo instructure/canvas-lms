@@ -17,16 +17,14 @@
  */
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {RubricAssessmentData} from '@canvas/rubrics/react/types/rubric'
+import type {RubricAssessmentData} from '@canvas/rubrics/react/types/rubric'
 
-export default function saveRubricAssessementMutation(
-  assessments: RubricAssessmentData[],
+type Props = {
+  assessments: RubricAssessmentData[]
   userId: string
-) {
-  // @ts-expect-error
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const {assessment_user_id, anonymous_id, assessment_type} = ENV.RUBRIC_ASSESSMENT ?? {}
-
+  url: string
+}
+export const saveRubricAssessment = ({assessments, userId, url}: Props) => {
   // TODO: anonymous grading stuff here, see convertSubmittedAssessmentin RubricAssessmentContainerWrapper
   // if (assessment_user_id) {
   //   data['rubric_assessment[user_id]'] = assessment_user_id
@@ -35,7 +33,7 @@ export default function saveRubricAssessementMutation(
   // }
   const rubric_assessment: Record<string, any> = {}
   rubric_assessment.user_id = userId
-  rubric_assessment.assessment_type = assessment_type
+  rubric_assessment.assessment_type = 'grading'
 
   assessments.forEach(assessment => {
     const pre = `criterion_${assessment.criterionId}`
@@ -53,8 +51,6 @@ export default function saveRubricAssessementMutation(
   // TODO: anonymous grading support, see saveRubricAssessment in speed_grader.tsx
 
   data.graded_anonymously = false
-  // @ts-expect-error
-  const url = window.ENV.update_rubric_assessment_url!
   const method = 'POST'
   return doFetchApi({
     path: url,
