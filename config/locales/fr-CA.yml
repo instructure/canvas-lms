@@ -4572,7 +4572,7 @@ fr-CA:
       group_assignment_header: "Tâche de groupe"
       group_category_locked_explanation: "Les étudiants ont déjà envoyé leur tâche personnel, aussi il est impossible de changer les paramètres de groupe."
       group_set: "Ensemble de groupes"
-      has_group_category_blocked_error: "Vous devez supprimer tous les groupes de la section « Attribuer un accès » pour modifier ce paramètre."
+      has_group_category_blocked_error: "Vous devez supprimer tous les groupes de la section « Attribuer un accès » pour modifier ce paramètre."
       is_group_assignment: "Ceci est une tâche pour un groupe"
     group_comment: 
       labels: 
