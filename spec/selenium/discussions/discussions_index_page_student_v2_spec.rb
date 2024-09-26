@@ -133,17 +133,17 @@ describe "discussions index" do
       # student within everyone
       user_session(@student2)
       get "/courses/#{@course.id}/discussion_topics"
-      expect(fj("span:contains('Reply to topic: #{format_date_for_view(next_week)}')")).to be_present
-      expect(fj("span:contains('Required replies (1): #{format_date_for_view(next_week)}')")).to be_present
-      expect(f("body")).not_to contain_jqcss("span:contains('Reply to topic: #{format_date_for_view(half_month)}')")
-      expect(f("body")).not_to contain_jqcss("span:contains('Required replies (1): #{format_date_for_view(half_month)}')")
+      expect(fj("span:contains('Initial Post: #{format_date_for_view(next_week)}')")).to be_present
+      expect(fj("span:contains('Required Replies (1): #{format_date_for_view(next_week)}')")).to be_present
+      expect(f("body")).not_to contain_jqcss("span:contains('Initial Post: #{format_date_for_view(half_month)}')")
+      expect(f("body")).not_to contain_jqcss("span:contains('Required Replies (1): #{format_date_for_view(half_month)}')")
       # student in the second assign card
       user_session(@student)
       get "/courses/#{@course.id}/discussion_topics"
-      expect(fj("span:contains('Reply to topic: #{format_date_for_view(half_month)}')")).to be_present
-      expect(fj("span:contains('Required replies (1): #{format_date_for_view(half_month)}')")).to be_present
-      expect(f("body")).not_to contain_jqcss("span:contains('Reply to topic: #{format_date_for_view(next_week)}')")
-      expect(f("body")).not_to contain_jqcss("span:contains('Required replies (1): #{format_date_for_view(next_week)}')")
+      expect(fj("span:contains('Initial Post: #{format_date_for_view(half_month)}')")).to be_present
+      expect(fj("span:contains('Required Replies (1): #{format_date_for_view(half_month)}')")).to be_present
+      expect(f("body")).not_to contain_jqcss("span:contains('Initial Post: #{format_date_for_view(next_week)}')")
+      expect(f("body")).not_to contain_jqcss("span:contains('Required Replies (1): #{format_date_for_view(next_week)}')")
     end
   end
 end

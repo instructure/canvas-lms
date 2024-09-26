@@ -439,7 +439,7 @@
             <div class="module-item-title" style="display: block; margin-left: 10px;">
               <span class="item_name">
                 <span class="ig-title">
-                  <%= checkpoint.sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC ? t("Reply to Topic") : t("Required Replies (%{number})", number: module_item.content.reply_to_entry_required_count) %>
+                  <%= checkpoint.sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC ? t("Initial Post") : t("Required Replies (%{number})", number: module_item.content.reply_to_entry_required_count) %>
                 </span>
               </span>
             </div>

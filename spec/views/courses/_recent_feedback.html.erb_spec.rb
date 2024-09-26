@@ -158,12 +158,12 @@ describe "courses/_recent_feedback" do
       @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course, title: "Discussion with Checkpoints")
     end
 
-    it "displays proper title for reply to topic checkpoint" do
+    it "displays proper title for initial post checkpoint" do
       @reply_to_topic.submit_homework @student, body: "checkpoint submission for #{@student.name}"
       submission_model(user: @student, assignment: @reply_to_topic)
 
       render partial: "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
-      expect(response).to include "#{@reply_to_topic.title} Reply to Topic"
+      expect(response).to include "#{@reply_to_topic.title} Initial Post"
     end
 
     it "displays proper title for reply to entry checkpoint" do

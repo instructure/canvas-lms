@@ -2061,7 +2061,7 @@ class AbstractAssignment < ActiveRecord::Base
 
   def title_with_id
     if sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC
-      "#{title} Reply To Topic (#{id})"
+      "#{title} Initial Post (#{id})"
     elsif sub_assignment_tag == CheckpointLabels::REPLY_TO_ENTRY
       "#{title} Required Replies (#{id})"
     else
@@ -2075,7 +2075,7 @@ class AbstractAssignment < ActiveRecord::Base
 
   def self.title_and_id(str)
     # Define patterns to ignore, but only at the end before the ID
-    ignore_patterns = /\s+(Reply To Topic|Required Replies)\s*$/
+    ignore_patterns = /\s+(Initial Post|Required Replies)\s*$/
 
     # Check if the string matches the pattern and extract title and id
     if str =~ /\A(.*)\s\((\d+)\)\z/

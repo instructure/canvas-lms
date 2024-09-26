@@ -340,9 +340,9 @@ describe('DiscussionRow', () => {
         },
       },
     })
-    render(<DiscussionRow {...props} />)
-    expect(screen.queryByText('Reply to topic:', {exact: false})).toBeInTheDocument()
-    expect(screen.queryByText('Required replies (2):', {exact: false})).toBeInTheDocument()
+    render(<DiscussionRow {...props} />) 
+    expect(screen.queryByText('Initial Post:', {exact: false})).toBeInTheDocument()
+    expect(screen.queryByText('Required Replies (2):', {exact: false})).toBeInTheDocument()
     expect(
       screen.queryByText(props.dateFormatter('2024-09-14T05:59:00Z'), {exact: false})
     ).toBeInTheDocument()
@@ -374,7 +374,7 @@ describe('DiscussionRow', () => {
     })
     render(<DiscussionRow {...props} />)
     expect(
-      screen.queryByText('Reply to topic: No Due Date Required replies (4): No Due Date', {
+      screen.queryByText('Initial Post: No Due Date Required Replies (4): No Due Date', {
         exact: false,
       })
     ).toBeInTheDocument()

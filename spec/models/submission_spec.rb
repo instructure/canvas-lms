@@ -1145,7 +1145,7 @@ describe Submission do
         cd_submission = cd.assignment.submissions.find_by!(user: @student)
 
         Timecop.freeze(@date) do
-          cd.discussion_entries.create!(user: @student, message: "reply to topic")
+          cd.discussion_entries.create!(user: @student, message: "initial post")
           cd.discussion_entries.create!(user: @student, message: "reply to entry", parent_id: cd.discussion_entries.first.id)
           cd_submission.score = 10
           cd_submission.save!

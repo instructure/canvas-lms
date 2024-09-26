@@ -71,7 +71,7 @@ export const CheckpointsSettings = () => {
         <PointsPossible
           pointsPossible={pointsPossibleReplyToTopic}
           setPointsPossible={setPointsPossibleReplyToTopic}
-          pointsPossibleLabel={I18n.t('Points Possible: Reply to Topic')}
+          pointsPossibleLabel={I18n.t('Points Possible: Initial Post')}
           pointsPossibleDataTestId="points-possible-input-reply-to-topic"
         />
       </View>

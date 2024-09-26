@@ -63,7 +63,7 @@ describe "checkpoints_created" do
 
       expect(msg.body).to include "A new assignment has been created for your course, #{asset.context.name}"
       expect(msg.body).to include asset.parent_assignment.discussion_topic.title
-      expect(msg.body).to include "due: reply to topic: #{datetime_string(@reply_to_topic_due_date)}"
+      expect(msg.body).to include "due: initial post: #{datetime_string(@reply_to_topic_due_date)}"
       expect(msg.body).to include "additional replies (#{@replies_required}): #{datetime_string(@reply_to_entry_due_date)}"
     end
 
@@ -78,7 +78,7 @@ describe "checkpoints_created" do
 
       msg = generate_message(notification_name, path_type, asset)
 
-      expect(msg.body).to include "due: reply to topic: No Due Date"
+      expect(msg.body).to include "due: initial post: No Due Date"
       expect(msg.body).to include "additional replies (#{@replies_required}): No Due Date"
     end
   end

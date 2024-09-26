@@ -102,7 +102,7 @@ describe "dashboard" do
       reply_to_topic, reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
       get "/"
       events = ff(".events_list .event a")
-      expect(events.first).to include_text(reply_to_topic.title + " Reply to Topic")
+      expect(events.first).to include_text(reply_to_topic.title + " Initial Post")
       expect(events.second).to include_text(reply_to_entry.title + " Required Replies (3)")
       # use jQuery to get the text since selenium can't figure it out when the elements aren't displayed
       expect(events.first).to include_text(@course.short_name)

@@ -824,7 +824,7 @@ class DiscussionRow extends Component {
       const noDate = I18n.t('No Due Date')
 
       dueDateString = I18n.t(
-        ' Reply to topic: %{topicDate}  Required replies (%{count}): %{entryDate}',
+        ' Initial Post: %{topicDate}  Required Replies (%{count}): %{entryDate}',
         {
           topicDate: replyToTopic ? this.props.dateFormatter(replyToTopic) : noDate,
           entryDate: replyToEntry ? this.props.dateFormatter(replyToEntry) : noDate,

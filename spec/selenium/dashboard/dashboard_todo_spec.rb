@@ -108,7 +108,7 @@ describe "dashboard" do
       fj('span[role="menuitemradio"]:contains("Recent Activity")').click
       # verify that both discussion checkpoints are in the to do list
       list_items = ff("#planner-todosidebar-item-list>li")
-      expect(list_items.first).to include_text(reply_to_topic.title.to_s + " Reply to Topic")
+      expect(list_items.first).to include_text(reply_to_topic.title.to_s + " Initial Post")
       expect(list_items.second).to include_text(reply_to_entry.title.to_s + " Required Replies (3)")
     end
   end

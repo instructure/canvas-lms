@@ -334,7 +334,7 @@ export const generateCardActionLabels = (selected: string[]) => {
       return {
         removeCard: I18n.t('Remove card'),
         clearDueAt: I18n.t('Clear due date/time'),
-        clearReplyToTopicDueAt: I18n.t('Clear reply to topic due date/time'),
+        clearReplyToTopicDueAt: I18n.t('Clear initial post due date/time'),
         clearRequiredRepliesDueAt: I18n.t('Clear required replies due date/time'),
         clearAvailableFrom: I18n.t('Clear available from date/time'),
         clearAvailableTo: I18n.t('Clear until date/time'),
@@ -344,7 +344,7 @@ export const generateCardActionLabels = (selected: string[]) => {
       return {
         removeCard: I18n.t('Remove card for %{pillA}', {pillA: selected[0]}),
         clearDueAt: I18n.t('Clear due date/time for %{pillA}', {pillA: selected[0]}),
-        clearReplyToTopicDueAt: I18n.t('Clear reply to topic due date/time for %{pillA}', {
+        clearReplyToTopicDueAt: I18n.t('Clear initial post due date/time for %{pillA}', {
           pillA: selected[0],
         }),
         clearRequiredRepliesDueAt: I18n.t('Clear required replies due date/time for %{pillA}', {
@@ -366,7 +366,7 @@ export const generateCardActionLabels = (selected: string[]) => {
           pillB: selected[1],
         }),
         clearReplyToTopicDueAt: I18n.t(
-          'Clear reply to topic due date/time for %{pillA} and %{pillB}',
+          'Clear initial post due date/time for %{pillA} and %{pillB}',
           {
             pillA: selected[0],
             pillB: selected[1],
@@ -401,7 +401,7 @@ export const generateCardActionLabels = (selected: string[]) => {
           pillC: selected[2],
         }),
         clearReplyToTopicDueAt: I18n.t(
-          'Clear reply to topic due date/time for %{pillA}, %{pillB}, and %{pillC}',
+          'Clear initial post due date/time for %{pillA}, %{pillB}, and %{pillC}',
           {
             pillA: selected[0],
             pillB: selected[1],
@@ -439,7 +439,7 @@ export const generateCardActionLabels = (selected: string[]) => {
           n: selected.length - 2,
         }),
         clearReplyToTopicDueAt: I18n.t(
-          'Clear reply to topic due date/time for %{pillA}, %{pillB}, and %{n} others',
+          'Clear initial post due date/time for %{pillA}, %{pillB}, and %{n} others',
           {
             pillA: selected[0],
             pillB: selected[1],

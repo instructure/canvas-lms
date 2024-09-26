@@ -23,7 +23,7 @@
   reply_to_entry_required_count = discussion_topic.reply_to_entry_required_count
 %>
 
-<%= I18n.t("due: reply to topic: %{assignment_due_date_time}", :assignment_due_date_time => reply_to_topic_due_date) %>
+<%= I18n.t("due: initial post: %{assignment_due_date_time}", :assignment_due_date_time => reply_to_topic_due_date) %>
     <%= I18n.t("additional replies (%{reply_to_entry_required_count}): %{assignment_due_date_time}", :reply_to_entry_required_count => reply_to_entry_required_count, :assignment_due_date_time => reply_to_entry_due_date) %>
 
 <%= before_label('click_to_see_assignment', 'Click here to view the assignment') %>

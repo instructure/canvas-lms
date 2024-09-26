@@ -3242,8 +3242,8 @@ describe DiscussionTopic do
         expect(@topic.reply_to_entry_checkpoint.sub_assignment_tag).to eq CheckpointLabels::REPLY_TO_ENTRY
       end
 
-      it "correctly marks the reply to topic checkpoint submission as submitted when the student replies to topic" do
-        @topic.discussion_entries.create!(user: @student, message: "reply to topic")
+      it "correctly marks the initial post checkpoint submission as submitted when the student replies to topic" do
+        @topic.discussion_entries.create!(user: @student, message: "initial post")
 
         expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
         expect(@topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
@@ -3251,7 +3251,7 @@ describe DiscussionTopic do
       end
 
       it "correctly marks the reply to entry checkpoint submission as submitted when the student replies to an entry 5 times" do
-        entry = @topic.discussion_entries.create!(user: @teacher, message: "reply to topic")
+        entry = @topic.discussion_entries.create!(user: @teacher, message: "initial post")
         5.times do
           @topic.discussion_entries.create!(user: @student, message: "reply to entry", root_entry_id: entry.id, parent_id: entry.id)
         end
@@ -3262,8 +3262,8 @@ describe DiscussionTopic do
       end
 
       it "correctly leaves the reply to entry checkpoint submission as unsubmitted when the student has not replied to an entry 5 times" do
-        entry = @topic.discussion_entries.create!(user: @teacher, message: "reply to topic")
-        @topic.discussion_entries.create!(user: @student, message: "reply to topic by student")
+        entry = @topic.discussion_entries.create!(user: @teacher, message: "initial post")
+        @topic.discussion_entries.create!(user: @student, message: "initial post by student")
         @topic.discussion_entries.create!(user: @student, message: "reply to entry", root_entry_id: entry.id, parent_id: entry.id)
 
         expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
@@ -3272,8 +3272,8 @@ describe DiscussionTopic do
       end
 
       it "correctly marks both checkpoint submissions when the user replies to both topic and entry 5 times" do
-        entry_by_teacher = @topic.discussion_entries.create!(user: @teacher, message: "reply to topic by teacher")
-        @topic.discussion_entries.create!(user: @student, message: "reply to topic by student")
+        entry_by_teacher = @topic.discussion_entries.create!(user: @teacher, message: "initial post by teacher")
+        @topic.discussion_entries.create!(user: @student, message: "initial post by student")
         5.times do
           @topic.discussion_entries.create!(user: @student, message: "reply to entry by student", root_entry_id: entry_by_teacher.id, parent_id: entry_by_teacher.id)
         end

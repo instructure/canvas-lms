@@ -93,12 +93,12 @@ describe "courses/_to_do_list" do
           @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
         end
 
-        it "text for reply to topic" do
+        it "text for initial post" do
           @reply_to_topic.submit_homework @student, body: "checkpoint submission for #{@student.name}"
           @user = @teacher
           view_context
           render partial: "courses/to_do_list", locals: { contexts: nil, show_legacy_todo_list: true, root_account: @course.root_account }
-          expect(response).to include "Reply to Topic"
+          expect(response).to include "Initial Post"
         end
 
         it "text for required replies" do
@@ -173,10 +173,10 @@ describe "courses/_to_do_list" do
           @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course, title: "Discussion with Checkpoints")
         end
 
-        it "displays proper title for reply to topic checkpoint" do
+        it "displays proper title for initial post checkpoint" do
           view_context
           render partial: "courses/to_do_list", locals: { contexts: nil, show_legacy_todo_list: true, root_account: @course.root_account }
-          expect(response).to include "Turn in #{@reply_to_topic.title} Reply to Topic"
+          expect(response).to include "Turn in #{@reply_to_topic.title} Initial Post"
         end
 
         it "displays proper title for reply to entry checkpoint" do

@@ -294,7 +294,7 @@ describe GradebookImporter do
 
       it "handles checkpoint assignments" do
         importer_with_rows(
-          "Student,ID,Section,#{@reply_to_topic.title} Reply To Topic (#{@reply_to_topic.id}),#{@reply_to_entry.title} Required Replies (#{@reply_to_entry.id}),Final Score",
+          "Student,ID,Section,#{@reply_to_topic.title} Initial Post (#{@reply_to_topic.id}),#{@reply_to_entry.title} Required Replies (#{@reply_to_entry.id}),Final Score",
           "Points Possible,,5,5,",
           '"Blend, Bill",6,My Course,5,3,'
         )
@@ -306,7 +306,7 @@ describe GradebookImporter do
 
       it "handles checkpoint assignments grade changes" do
         importer_with_rows(
-          "Student,ID,Section,#{@reply_to_topic.title} Reply To Topic (#{@reply_to_topic.id}),#{@reply_to_entry.title} Required Replies (#{@reply_to_entry.id}),Final Score",
+          "Student,ID,Section,#{@reply_to_topic.title} Initial Post (#{@reply_to_topic.id}),#{@reply_to_entry.title} Required Replies (#{@reply_to_entry.id}),Final Score",
           "Points Possible,,5,5,",
           '"Blend, Bill",6,My Course,5,3,'
         )
@@ -318,14 +318,14 @@ describe GradebookImporter do
 
       it "properly formats title for checkpoint assignments" do
         importer_with_rows(
-          "Student,ID,Section,#{@reply_to_topic.title} Reply To Topic (#{@reply_to_topic.id}),#{@reply_to_entry.title} Required Replies (#{@reply_to_entry.id}),Final Score",
+          "Student,ID,Section,#{@reply_to_topic.title} Initial Post (#{@reply_to_topic.id}),#{@reply_to_entry.title} Required Replies (#{@reply_to_entry.id}),Final Score",
           "Points Possible,,5,5,",
           '"Blend, Bill",6,My Course,5,3,'
         )
         gradebook = @gi.upload.gradebook
         reply_to_topic_title = gradebook.fetch("assignments").first.fetch("title")
         reply_to_entry_title = gradebook.fetch("assignments").last.fetch("title")
-        expect(reply_to_topic_title).to eq "#{@reply_to_topic.title} Reply To Topic"
+        expect(reply_to_topic_title).to eq "#{@reply_to_topic.title} Initial Post"
         expect(reply_to_entry_title).to eq "#{@reply_to_entry.title} Required Replies"
       end
 
