@@ -1431,8 +1431,6 @@ describe AssignmentsApiController, type: :request do
 
           @observer_enrollment.update_attribute(:associated_user_id, @students[5].id)
 
-          Course.enroll_user_call_count -= 2 # Total hack but can't eleminate any of the enroll_user calls -- we need them to test multiple enrollments
-
           observer_enrollment2 = @course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active", allow_multiple_enrollments: true)
           observer_enrollment2.update_attribute(:associated_user_id, @students[3].id)
           observer_enrollment3 = @course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active", allow_multiple_enrollments: true)
