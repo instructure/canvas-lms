@@ -2318,7 +2318,7 @@ describe DiscussionTopicsController, type: :request do
   end
 
   it "translates user content in topics without verifiers" do
-    should_translate_user_content(@course, false) do |user_content|
+    should_translate_user_content(@course, include_verifiers: false) do |user_content|
       @topic ||= create_topic(@course, title: "Topic 1", message: user_content)
       json = api_call(
         :get,
@@ -2770,7 +2770,7 @@ describe DiscussionTopicsController, type: :request do
     end
 
     it "allows including attachments on top-level entries" do
-      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", binary: true)
       json = api_call(
         :post,
         "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
@@ -2788,7 +2788,7 @@ describe DiscussionTopicsController, type: :request do
 
     it "includes attachments on replies to top-level entries" do
       top_entry = create_entry(@topic, message: "top-level message")
-      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", binary: true)
       json = api_call(
         :post,
         "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{top_entry.id}/replies.json",
@@ -3100,7 +3100,7 @@ describe DiscussionTopicsController, type: :request do
     end
 
     it "translates user content in replies without verifiers" do
-      should_translate_user_content(@course, false) do |user_content|
+      should_translate_user_content(@course, include_verifiers: false) do |user_content|
         @reply.saving_user = @user
         @reply.update_attribute("message", user_content)
         json = api_call(

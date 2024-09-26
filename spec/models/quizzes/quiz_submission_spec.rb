@@ -984,7 +984,7 @@ describe Quizzes::QuizSubmission do
           enabled: false
         )
         course_with_teacher(active_all: true)
-        course_quiz(course: @course)
+        course_quiz(active: true)
         student_in_course(course: @course)
         qs = @quiz.generate_submission(@student)
         expect(qs.grants_right?(@teacher, :update_scores)).to be true

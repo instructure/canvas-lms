@@ -147,7 +147,7 @@ module QuizzesCommon
     click_settings_tab
   end
 
-  def quiz_with_multiple_type_questions(goto_edit = true)
+  def quiz_with_multiple_type_questions
     @context = @course
     bank = @context.assessment_question_banks.create!(title: "Test Bank")
     @quiz = quiz_model
@@ -191,11 +191,10 @@ module QuizzesCommon
 
     @quiz.generate_quiz_data
     @quiz.save!
-    open_quiz_edit_form if goto_edit
     @quiz
   end
 
-  def quiz_with_essay_questions(goto_edit = true)
+  def quiz_with_essay_questions
     # TODO: DRY this up
     @context = @course
     bank = @context.assessment_question_banks.create!(title: "Test Bank")
@@ -238,7 +237,6 @@ module QuizzesCommon
 
     @quiz.generate_quiz_data
     @quiz.save!
-    open_quiz_edit_form if goto_edit
     @quiz
   end
 
@@ -393,7 +391,7 @@ module QuizzesCommon
     access_code = opts.fetch(:access_code, nil)
 
     begin_quiz(access_code, opts)
-    complete_and_submit_quiz(submit)
+    complete_and_submit_quiz(submit:)
   end
 
   def begin_quiz(access_code = nil, opts = {})
@@ -421,12 +419,12 @@ module QuizzesCommon
     expect(f(".quiz-submission .quiz_score .score_value")).to be_truthy
   end
 
-  def preview_quiz(submit = true)
+  def preview_quiz
     open_quiz_show_page
 
     expect_new_page_load { f("#preview_quiz_button").click }
 
-    complete_and_submit_quiz(submit)
+    complete_and_submit_quiz(submit: true)
   end
 
   def wait_for_quiz_publish_button_to_populate
@@ -438,7 +436,7 @@ module QuizzesCommon
   #   You can pass a block to specify which answer to choose, the block will
   #   receive the set of possible answers. If you don't, the first (and correct)
   #   answer will be chosen.
-  def complete_and_submit_quiz(submit = true)
+  def complete_and_submit_quiz(submit: true)
     answer =
       if block_given?
         yield(@quiz.stored_questions[0][:answers])
@@ -451,7 +449,7 @@ module QuizzesCommon
     submit_quiz if submit
   end
 
-  def answer_questions_and_submit(quiz, num_questions, submit = true)
+  def answer_questions_and_submit(quiz, num_questions)
     num_questions.times do |o|
       question = quiz.stored_questions[o][:id]
       case quiz.stored_questions[o][:question_type]
@@ -464,7 +462,7 @@ module QuizzesCommon
       end
     end
 
-    submit_quiz if submit
+    submit_quiz
   end
 
   def set_answer_comment(answer_num, text)
@@ -842,7 +840,7 @@ module QuizzesCommon
     get quiz_submission_speedgrader_url
   end
 
-  def open_quiz_edit_form(should_wait_for_rce = true)
+  def open_quiz_edit_form(should_wait_for_rce: true)
     get quiz_edit_form_url
     wait_for_rce if should_wait_for_rce
   end

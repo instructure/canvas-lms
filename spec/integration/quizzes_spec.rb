@@ -131,7 +131,7 @@ describe Quizzes::QuizzesController do
   context "show_student" do
     before do
       course_with_student_logged_in(active_all: true)
-      course_quiz true
+      course_quiz(active: true)
       post "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@student.id}"
 
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take"
@@ -222,7 +222,7 @@ describe Quizzes::QuizzesController do
     end
   end
 
-  def course_quiz(active = false)
+  def course_quiz(active: false)
     @quiz = @course.quizzes.create
     @quiz.workflow_state = "available" if active
     @quiz.save!

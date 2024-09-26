@@ -30,7 +30,7 @@ module CollaborationsSpecsCommon
 
   def be_editable(type, title)
     create_collaboration!(type, title)
-    validate_collaborations(%W[/courses/#{@course.id}/collaborations], false)
+    validate_collaborations(%W[/courses/#{@course.id}/collaborations], form_visible: false)
 
     new_title = "Edited collaboration"
     move_to_click(".edit_collaboration_link")
@@ -46,7 +46,7 @@ module CollaborationsSpecsCommon
 
   def no_edit_if_no_access(type, title)
     create_collaboration!(type, title)
-    validate_collaborations(%W[/courses/#{@course.id}/collaborations], false)
+    validate_collaborations(%W[/courses/#{@course.id}/collaborations], form_visible: false)
 
     # Negative check
     expect(f("#content")).not_to contain_css(".edit_collaboration_link")
@@ -54,7 +54,7 @@ module CollaborationsSpecsCommon
 
   def be_deletable(type, title)
     create_collaboration!(type, title)
-    validate_collaborations(%W[/courses/#{@course.id}/collaborations], false)
+    validate_collaborations(%W[/courses/#{@course.id}/collaborations], form_visible: false)
 
     move_to_click(".delete_collaboration_link")
 
@@ -98,7 +98,7 @@ module CollaborationsSpecsCommon
     group_model(context: @course, name: "grup grup")
 
     create_collaboration!(type, title)
-    validate_collaborations(%W[/courses/#{@course.id}/collaborations], false)
+    validate_collaborations(%W[/courses/#{@course.id}/collaborations], form_visible: false)
 
     f(".edit_collaboration_link").click
     wait_for_ajaximations
@@ -146,7 +146,7 @@ module CollaborationsSpecsCommon
 
   def no_edit_with_no_access
     create_collaboration!("google_docs", "Google Docs")
-    validate_collaborations(%W[/courses/#{@course.id}/collaborations], false)
+    validate_collaborations(%W[/courses/#{@course.id}/collaborations], form_visible: false)
 
     # Negative check
     expect(f("#content")).not_to contain_css(".edit_collaboration_link")
@@ -154,7 +154,7 @@ module CollaborationsSpecsCommon
 
   def no_delete_with_no_access
     create_collaboration!("google_docs", "Google Docs")
-    validate_collaborations(%W[/courses/#{@course.id}/collaborations], false)
+    validate_collaborations(%W[/courses/#{@course.id}/collaborations], form_visible: false)
 
     # Negative check
     expect(f("#content")).not_to contain_css(".delete_collaboration_link")
@@ -162,26 +162,25 @@ module CollaborationsSpecsCommon
 
   def not_display_new_form_if_none_exist(type, title)
     create_collaboration!(type, title)
-    validate_collaborations(%W[/courses/#{@course.id}/collaborations], false)
+    validate_collaborations(%W[/courses/#{@course.id}/collaborations], form_visible: false)
   end
 
   def display_new_form_if_none_exist(type)
     ensure_plugin(type)
     validate_collaborations(%W[/courses/#{@course.id}/collaborations
-                               /courses/#{@course.id}/collaborations#add_collaboration],
-                            true)
+                               /courses/#{@course.id}/collaborations#add_collaboration])
   end
 
   def hide_new_form_if_exists(type, title)
     create_collaboration!(type, title)
     validate_collaborations(%W[/courses/#{@course.id}/collaborations
                                /courses/#{@course.id}/collaborations#add_collaboration],
-                            false)
+                            form_visible: false)
   end
 
   def open_form_if_last_was_deleted(type, title)
     create_collaboration!(type, title)
-    validate_collaborations("/courses/#{@course.id}/collaborations/", false, true)
+    validate_collaborations("/courses/#{@course.id}/collaborations/", form_visible: false, execute_script: true)
     delete_collaboration(@collaboration, type)
     expect_form_to_be_visible
   end
@@ -200,7 +199,7 @@ module CollaborationsSpecsCommon
     @collaboration2.user = @user
     @collaboration2.save!
 
-    validate_collaborations("/courses/#{@course.id}/collaborations/", false, true)
+    validate_collaborations("/courses/#{@course.id}/collaborations/", form_visible: false, execute_script: true)
     delete_collaboration(@collaboration1, type)
     expect_form_not_to_be_visible
     delete_collaboration(@collaboration2, type)
@@ -211,8 +210,8 @@ module CollaborationsSpecsCommon
     create_collaboration!(type, title)
     validate_collaborations(%W[/courses/#{@course.id}/collaborations
                                /courses/#{@course.id}/collaborations#add_collaboration],
-                            false,
-                            true)
+                            form_visible: false,
+                            execute_script: true)
     f(".add_collaboration_link").click
     delete_collaboration(@collaboration, type)
     expect_form_to_be_visible

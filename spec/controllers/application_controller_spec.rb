@@ -2100,7 +2100,7 @@ RSpec.describe ApplicationController do
     end
 
     describe "external_tool_display_hash" do
-      def tool_settings(setting, include_class = false)
+      def tool_settings(setting, include_class: false)
         settings_hash = {
           url: "http://example.com/?#{setting}",
           icon_url: "http://example.com/icon.png?#{setting}",
@@ -2176,7 +2176,7 @@ RSpec.describe ApplicationController do
 
       it "all settings return canvas_icon_class if set" do
         @tool_settings.each do |setting|
-          @tool.send(:"#{setting}=", tool_settings(setting, true))
+          @tool.send(:"#{setting}=", tool_settings(setting, include_class: true))
           @tool.save!
 
           hash = controller.external_tool_display_hash(@tool, setting)
@@ -2281,7 +2281,7 @@ RSpec.describe ApplicationController do
 
       it "includes launch_method if set" do
         @tool_settings.each do |setting|
-          setting_hash = tool_settings(setting, true).merge(launch_method: "tray")
+          setting_hash = tool_settings(setting, include_class: true).merge(launch_method: "tray")
           @tool.send(:"#{setting}=", setting_hash)
           @tool.save!
 

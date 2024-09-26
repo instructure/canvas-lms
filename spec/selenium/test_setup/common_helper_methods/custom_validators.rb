@@ -128,7 +128,7 @@ module CustomValidators
     expect(box[0]).to be_displayed
   end
 
-  def wait_for_new_page_load(accept_alert = false)
+  def wait_for_new_page_load(accept_alert: false)
     driver.execute_script("window.INST = window.INST || {}; INST.still_on_old_page = true;")
     yield if block_given?
     wait_for(method: :wait_for_new_page_load) do
@@ -147,8 +147,8 @@ module CustomValidators
     true
   end
 
-  def expect_new_page_load(accept_alert = false, &)
-    success = wait_for_new_page_load(accept_alert, &)
+  def expect_new_page_load(accept_alert: false, &)
+    success = wait_for_new_page_load(accept_alert:, &)
     expect(success).to be, "expected new page load, none happened"
   end
 end

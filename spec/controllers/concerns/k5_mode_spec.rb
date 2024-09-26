@@ -43,7 +43,7 @@ describe K5Mode do
   describe "set_k5_mode" do
     shared_examples_for ":show_left_side" do
       it "does not set :show_left_side in non-k5 contexts" do
-        toggle_k5_setting(@course.account, false)
+        toggle_k5_setting(@course.account, enable: false)
         get :index, params: { course_id: @course.id }
         expect(assigns(:show_left_side)).to be_nil
       end

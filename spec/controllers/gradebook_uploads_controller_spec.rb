@@ -30,7 +30,7 @@ describe GradebookUploadsController do
     @course.reload
   end
 
-  def generate_file(include_sis_id = false)
+  def generate_file(include_sis_id: false)
     file = Tempfile.new("csv.csv")
     file.puts(GradebookExporter.new(@course, @teacher, include_sis_id:).to_csv)
     file.close
@@ -42,8 +42,8 @@ describe GradebookUploadsController do
     post "create", params: { course_id: course.id, gradebook_upload: { uploaded_data: data } }
   end
 
-  def check_create_response(include_sis_id = false)
-    file = generate_file(include_sis_id)
+  def check_create_response(include_sis_id: false)
+    file = generate_file(include_sis_id:)
     upload_gradebook_import(@course, file)
     expect(response).to be_successful
   end
@@ -104,7 +104,7 @@ describe GradebookUploadsController do
         end
 
         it "accepts a valid csv upload with sis id columns" do
-          check_create_response(true)
+          check_create_response(include_sis_id: true)
         end
       end
     end

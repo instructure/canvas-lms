@@ -1529,7 +1529,7 @@ describe "Submissions API", type: :request do
     course_with_teacher(active_all: true)
     @course.enroll_student(student1).accept!
     a1 = @course.assignments.create!(title: "assignment1", grading_type: "letter_grade", points_possible: 15)
-    should_translate_user_content(@course, false) do |content|
+    should_translate_user_content(@course, include_verifiers: false) do |content|
       submit_homework(a1, student1, body: content)
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}.json",

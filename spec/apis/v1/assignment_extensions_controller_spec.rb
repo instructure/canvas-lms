@@ -30,7 +30,7 @@ describe AssignmentExtensionsController, type: :request do
   end
 
   describe "POST /api/v1/courses/:course_id/assignments/:assignment_id/extensions (create)" do
-    def api_create_assignment_extensions(assignment_extension_params, opts = {}, raw = false)
+    def api_create_assignment_extensions(assignment_extension_params, opts = {}, raw: false)
       api_method = raw ? :raw_api_call : :api_call
 
       send(api_method,
@@ -58,7 +58,7 @@ describe AssignmentExtensionsController, type: :request do
         assignment_extension_params = [
           { user_id: @student.id, extra_attempts: 3 },
         ]
-        api_create_assignment_extensions(assignment_extension_params, {}, true)
+        api_create_assignment_extensions(assignment_extension_params, {}, raw: true)
         assert_forbidden
       end
     end

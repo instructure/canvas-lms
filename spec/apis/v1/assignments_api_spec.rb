@@ -9192,7 +9192,7 @@ describe AssignmentsApiController, type: :request do
 
       it "translates assignment descriptions without verifiers" do
         course_with_teacher(active_all: true)
-        should_translate_user_content(@course, false) do |content|
+        should_translate_user_content(@course, include_verifiers: false) do |content|
           assignment = @course.assignments.create!(description: content, saving_user: @teacher)
           json = api_get_assignment_in_course(assignment, @course, no_verifiers: true)
           json["description"]

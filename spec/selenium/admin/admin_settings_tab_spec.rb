@@ -47,7 +47,7 @@ describe "admin settings tab" do
     end
   end
 
-  def check_box_verifier(css_selectors, features, checker = true)
+  def check_box_verifier(css_selectors, features, checker: true)
     is_symbol = false
 
     css_selectors = [css_selectors] unless css_selectors.is_a? Array
@@ -163,7 +163,7 @@ describe "admin settings tab" do
     end
 
     it "unchecks 'students can opt-in to receiving scores in email notifications'" do
-      check_box_verifier("#account_settings_allow_sending_scores_in_emails", :allow_sending_scores_in_emails, false)
+      check_box_verifier("#account_settings_allow_sending_scores_in_emails", :allow_sending_scores_in_emails, checker: false)
     end
 
     it "sets trusted referers for account" do
@@ -250,17 +250,17 @@ describe "admin settings tab" do
     end
 
     it "unchecks users can edit display name' and check it again" do
-      check_box_verifier("#account_settings_users_can_edit_name", :users_can_edit_name, false)
+      check_box_verifier("#account_settings_users_can_edit_name", :users_can_edit_name, checker: false)
       check_box_verifier("#account_settings_users_can_edit_name", :users_can_edit_name)
     end
 
     it "unchecks users_can_edit_profile and check it again" do
-      check_box_verifier("#account_settings_users_can_edit_profile", :users_can_edit_profile, false)
+      check_box_verifier("#account_settings_users_can_edit_profile", :users_can_edit_profile, checker: false)
       check_box_verifier("#account_settings_users_can_edit_profile", :users_can_edit_profile)
     end
 
     it "unchecks users_can_edit_comm_channels and check it again" do
-      check_box_verifier("#account_settings_users_can_edit_comm_channels", :users_can_edit_comm_channels, false)
+      check_box_verifier("#account_settings_users_can_edit_comm_channels", :users_can_edit_comm_channels, checker: false)
       check_box_verifier("#account_settings_users_can_edit_comm_channels", :users_can_edit_comm_channels)
     end
   end
@@ -278,17 +278,17 @@ describe "admin settings tab" do
     end
 
     it "unclicks and click on google docs previews" do
-      check_box_verifier("#account_services_google_docs_previews", { allowed_services: :google_docs_previews }, false)
+      check_box_verifier("#account_services_google_docs_previews", { allowed_services: :google_docs_previews }, checker: false)
       check_box_verifier("#account_services_google_docs_previews", { allowed_services: :google_docs_previews })
     end
 
     it "clicks on user avatars" do
       check_box_verifier("#account_services_avatars", { allowed_services: :avatars })
-      check_box_verifier("#account_services_avatars", { allowed_services: :avatars }, false)
+      check_box_verifier("#account_services_avatars", { allowed_services: :avatars }, checker: false)
     end
 
     it "disables all web services" do
-      check_box_verifier(nil, :all_selectors, false)
+      check_box_verifier(nil, :all_selectors, checker: false)
     end
 
     it "enables all web services" do
@@ -299,14 +299,14 @@ describe "admin settings tab" do
       AccountServices.register_service(:myplugin, { name: "My Plugin", description: "", expose_to_ui: :setting, default: false })
       get "/accounts/#{Account.default.id}/settings"
       check_box_verifier("#account_services_myplugin", { allowed_services: :myplugin })
-      check_box_verifier("#account_services_myplugin", { allowed_services: :myplugin }, false)
+      check_box_verifier("#account_services_myplugin", { allowed_services: :myplugin }, checker: false)
     end
 
     it "enables and disable a plugin service (service)" do
       AccountServices.register_service(:myplugin, { name: "My Plugin", description: "", expose_to_ui: :service, default: false })
       get "/accounts/#{Account.default.id}/settings"
       check_box_verifier("#account_services_myplugin", { allowed_services: :myplugin })
-      check_box_verifier("#account_services_myplugin", { allowed_services: :myplugin }, false)
+      check_box_verifier("#account_services_myplugin", { allowed_services: :myplugin }, checker: false)
     end
   end
 

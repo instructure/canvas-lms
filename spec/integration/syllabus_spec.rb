@@ -21,9 +21,9 @@
 require "nokogiri"
 
 describe "syllabus" do
-  def anonymous_syllabus_access_allowed(property, value = true)
+  def anonymous_syllabus_access_allowed(property)
     course_with_teacher(course: @course, active_all: true)
-    @course.send(:"#{property}=", value)
+    @course.send(:"#{property}=", true)
     @course.save!
 
     get "/courses/#{@course.id}/assignments/syllabus"

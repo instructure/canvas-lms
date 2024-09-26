@@ -90,7 +90,7 @@ describe K5::UserService do
     end
 
     it "returns false if not associated with a k5 account" do
-      toggle_k5_setting(@k5_account, false)
+      toggle_k5_setting(@k5_account, enable: false)
       service = K5::UserService.new(@student1, @root_account, nil)
       expect(service.send(:k5_user?)).to be_falsey
     end
@@ -228,7 +228,7 @@ describe K5::UserService do
       end
 
       it "returns true for a user with k5 enrollments on a subaccount of another shard" do
-        toggle_k5_setting(@k5_account, false)
+        toggle_k5_setting(@k5_account, enable: false)
         @shard2.activate do
           subaccount = Account.default.sub_accounts.create!
           toggle_k5_setting(subaccount)
@@ -249,7 +249,7 @@ describe K5::UserService do
       end
 
       it "returns false for users on multiple shards with no k5 enrollments" do
-        toggle_k5_setting(@k5_account, false)
+        toggle_k5_setting(@k5_account, enable: false)
         @shard2.activate do
           service = K5::UserService.new(@student2, @root_account, nil)
           expect(service.send(:k5_user?)).to be_falsey

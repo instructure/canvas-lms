@@ -213,7 +213,7 @@ module Lti
       end
 
       it "returns resource_selection tools" do
-        tool = new_valid_external_tool(account, true)
+        tool = new_valid_external_tool(account, resource_selection: true)
         placements = %w[assignment_selection link_selection resource_selection]
         tools_collection = described_class.bookmarked_collection(account, placements).paginate(per_page: 100).to_a
 

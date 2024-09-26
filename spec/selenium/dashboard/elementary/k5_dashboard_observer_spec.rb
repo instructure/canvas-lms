@@ -196,7 +196,7 @@ describe "observer k5 dashboard" do
 
       get "/"
       expect(homeroom_tab).to be_displayed # k5 dashboard only
-      toggle_k5_setting(@account, false)
+      toggle_k5_setting(@account, enable: false)
       click_observed_student_option("Classic Student")
       expect(todo_list_header).to be_displayed # classic dashboard only
     end

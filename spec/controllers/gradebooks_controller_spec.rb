@@ -2329,7 +2329,7 @@ describe GradebooksController do
       {
         assignment_id: @assignment.id,
         course_id: @course.id,
-        submissions_zip: fixture_file_upload("docs/txt.txt", "text/plain", true)
+        submissions_zip: fixture_file_upload("docs/txt.txt", "text/plain", binary: true)
       }
     end
 
@@ -2640,7 +2640,7 @@ describe GradebooksController do
       end
 
       it "allows attaching files to comments for submission" do
-        data = fixture_file_upload("docs/doc.doc", "application/msword", true)
+        data = fixture_file_upload("docs/doc.doc", "application/msword", binary: true)
         post "update_submission",
              params: { course_id: @course.id,
                        attachments: { "0" => { uploaded_data: data } },
@@ -2730,7 +2730,7 @@ describe GradebooksController do
       user_session(@teacher)
       @assignment = @course.assignments.create!(title: "some assignment")
       @student = @course.enroll_user(User.create!(name: "some user"))
-      data = fixture_file_upload("docs/doc.doc", "application/msword", true)
+      data = fixture_file_upload("docs/doc.doc", "application/msword", binary: true)
       post "update_submission",
            params: { course_id: @course.id,
                      attachments: { "0" => { uploaded_data: data } },

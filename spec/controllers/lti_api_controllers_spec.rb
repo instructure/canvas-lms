@@ -39,7 +39,7 @@ describe LtiApiController, type: :request do
     allow(BasicLTI::Sourcedid).to receive(:signing_secret) { "signing-secret-vp04BNqApwdwUYPUI" }
   end
 
-  def check_error_response(message, check_generated_sig = true, with_report: true)
+  def check_error_response(message, check_generated_sig: true, with_report: true)
     expect(response.body.strip).to_not be_empty, "Should not have an empty response body"
 
     json = response.parsed_body
@@ -124,7 +124,7 @@ describe LtiApiController, type: :request do
   context "OAuth Requests" do
     it "fails on invalid signature method" do
       make_call("override_signature_method" => "BawkBawk256")
-      check_error_response("Invalid authorization header", false, with_report: false)
+      check_error_response("Invalid authorization header", check_generated_sig: false, with_report: false)
       assert_status(401)
     end
 

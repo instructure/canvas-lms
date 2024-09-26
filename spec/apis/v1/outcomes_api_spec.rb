@@ -85,7 +85,7 @@ describe "Outcomes API", type: :request do
     retval
   end
 
-  def assess_outcome(outcome = @outcome, assess = true)
+  def assess_outcome(outcome = @outcome, assess: true)
     @rubric = Rubric.create!(context: @course)
     @rubric.data = [
       {
@@ -967,7 +967,7 @@ describe "Outcomes API", type: :request do
         end
 
         it "reports with updateable rubrics" do
-          assess_outcome(@outcome, false)
+          assess_outcome(@outcome, assess: false)
           json = api_call(:get,
                           "/api/v1/outcomes/#{@outcome.id}",
                           controller: "outcomes_api",
@@ -989,7 +989,7 @@ describe "Outcomes API", type: :request do
         @assignment.unpublish
         outcome_with_rubric
         @rubric.associate_with(@assignment, @course, purpose: "grading")
-        quiz_with_submission(true, true)
+        quiz_with_submission(skip_submission: true)
         @quiz.unpublish!
         bank = @quiz.quiz_questions[0].assessment_question.assessment_question_bank
         @outcome.align(bank, @course, mastery_score: 6.0)

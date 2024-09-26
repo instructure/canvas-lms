@@ -306,8 +306,8 @@ describe SubmissionsController do
       course_with_student_logged_in(active_all: true)
       @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload")
-      att1 = attachment_model(context: @user, uploaded_data: fixture_file_upload("docs/doc.doc", "application/msword", true))
-      att2 = attachment_model(context: @user, uploaded_data: fixture_file_upload("docs/txt.txt", "application/vnd.ms-excel", true))
+      att1 = attachment_model(context: @user, uploaded_data: fixture_file_upload("docs/doc.doc", "application/msword", binary: true))
+      att2 = attachment_model(context: @user, uploaded_data: fixture_file_upload("docs/txt.txt", "application/vnd.ms-excel", binary: true))
       post "create", params: { course_id: @course.id,
                                assignment_id: @assignment.id,
                                submission: { submission_type: "online_upload", attachment_ids: [att1.id, att2.id].join(",") },

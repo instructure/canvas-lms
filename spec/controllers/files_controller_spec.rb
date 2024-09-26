@@ -47,7 +47,7 @@ describe FilesController do
   end
 
   def io
-    fixture_file_upload("docs/doc.doc", "application/msword", true)
+    fixture_file_upload("docs/doc.doc", "application/msword", binary: true)
   end
 
   def course_file
@@ -59,11 +59,11 @@ describe FilesController do
   end
 
   def user_html_file
-    @file = @user.attachments.create!(uploaded_data: fixture_file_upload("test.html", "text/html", false))
+    @file = @user.attachments.create!(uploaded_data: fixture_file_upload("test.html", "text/html"))
   end
 
   def account_js_file
-    @file = @account.attachments.create!(uploaded_data: fixture_file_upload("test.js", "text/javascript", false))
+    @file = @account.attachments.create!(uploaded_data: fixture_file_upload("test.js", "text/javascript"))
   end
 
   def folder_file

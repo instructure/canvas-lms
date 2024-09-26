@@ -1118,7 +1118,7 @@ module Modules2IndexPage
   end
 
   def module_item_action_menu_link_exists?(tool_text)
-    element_exists?(module_item_action_menu_link_selector(tool_text), true)
+    element_exists?(module_item_action_menu_link_selector(tool_text), xpath: true)
   end
 
   def input_text_in_text_header_input(text)

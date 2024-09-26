@@ -192,7 +192,7 @@ end
 
 # passes the cb a piece of user content html text. the block should return the
 # response from the api for that field, which will be verified for correctness.
-def should_translate_user_content(course, include_verifiers = true)
+def should_translate_user_content(course, include_verifiers: true)
   attachment = attachment_model(context: course)
   attachment.root_account.set_feature_flag!(:disable_adding_uuid_verifier_in_api, include_verifiers ? Feature::STATE_OFF : Feature::STATE_ON)
   content = <<~HTML

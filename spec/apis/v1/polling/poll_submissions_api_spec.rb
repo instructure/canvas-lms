@@ -50,7 +50,7 @@ describe Polling::PollSubmissionsController, type: :request do
       )
     end
 
-    def get_show(raw = false, data = {})
+    def get_show(data = {}, raw: false)
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
                   "/api/v1/polls/#{@poll.id}/poll_sessions/#{@session.id}/poll_submissions/#{@submission.id}",
@@ -76,7 +76,7 @@ describe Polling::PollSubmissionsController, type: :request do
       @selected = @poll.poll_choices.where(text: "Green").first
     end
 
-    def post_create(params, raw = false)
+    def post_create(params, raw: false)
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:post,
                   "/api/v1/polls/#{@poll.id}/poll_sessions/#{@session.id}/poll_submissions",
@@ -93,7 +93,7 @@ describe Polling::PollSubmissionsController, type: :request do
     context "as a student" do
       it "creates a poll submission successfully" do
         student_in_course(active_all: true, course: @course)
-        post_create(poll_choice_id: @selected.id)
+        post_create({ poll_choice_id: @selected.id })
 
         @session.reload
         expect(@session.poll_submissions.size).to eq 1
@@ -104,7 +104,7 @@ describe Polling::PollSubmissionsController, type: :request do
 
       it "is invalid if the poll choice does not exist" do
         student_in_course(active_all: true, course: @course)
-        post_create({ filler: true }, true)
+        post_create({ filler: true }, raw: true)
 
         expect(response).to have_http_status :not_found
         expect(response.body).to match(/The specified resource does not exist/)
@@ -117,7 +117,7 @@ describe Polling::PollSubmissionsController, type: :request do
 
         student_in_course(active_all: true, course: @course)
 
-        post_create({ poll_choice_id: @selected.id }, true)
+        post_create({ poll_choice_id: @selected.id }, raw: true)
 
         expect(response).to have_http_status :forbidden
         @session.reload
@@ -129,7 +129,7 @@ describe Polling::PollSubmissionsController, type: :request do
         @session.course_section = @section
         @session.save
 
-        post_create(poll_choice_id: @selected.id)
+        post_create({ poll_choice_id: @selected.id })
 
         @session.reload
         expect(@session.poll_submissions.size).to eq 1

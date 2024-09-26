@@ -344,7 +344,7 @@ module ModulesSettingsTray
   end
 
   def add_prerequisites_button_exists?
-    element_exists?(add_prerequisites_button_selector, true)
+    element_exists?(add_prerequisites_button_selector, xpath: true)
   end
 
   def click_add_prerequisites_button

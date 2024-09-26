@@ -130,7 +130,7 @@ describe "blueprint courses assignments" do
       expect(assign_to_until_date(0).enabled?).to be_falsey
       expect(assign_to_until_time(0).enabled?).to be_falsey
 
-      expect(element_exists?(bp_locked_alert_text_selector("Due Dates & Availability Dates"), true)).to be_truthy
+      expect(element_exists?(bp_locked_alert_text_selector("Due Dates & Availability Dates"), xpath: true)).to be_truthy
     end
 
     it "does not allow editing of restricted due dates in SR tray" do
@@ -152,7 +152,7 @@ describe "blueprint courses assignments" do
       expect(assign_to_until_date(0).enabled?).to be_truthy
       expect(assign_to_until_time(0).enabled?).to be_truthy
 
-      expect(element_exists?(bp_locked_alert_text_selector("Due Dates"), true)).to be_truthy
+      expect(element_exists?(bp_locked_alert_text_selector("Due Dates"), xpath: true)).to be_truthy
     end
 
     it "does not allow editing of restricted availability dates in SR tray" do
@@ -174,7 +174,7 @@ describe "blueprint courses assignments" do
       expect(assign_to_until_date(0).enabled?).to be_falsey
       expect(assign_to_until_time(0).enabled?).to be_falsey
 
-      expect(element_exists?(bp_locked_alert_text_selector("Availability Dates"), true)).to be_truthy
+      expect(element_exists?(bp_locked_alert_text_selector("Availability Dates"), xpath: true)).to be_truthy
     end
 
     it "does not allow making a non-graded assignment graded when points are locked" do

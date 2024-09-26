@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module GoogleDriveCommon
-  def setup_google_drive(add_user_service = true, authorized = true)
+  def setup_google_drive(add_user_service: true, authorized: true)
     if add_user_service
       UserService.register(
         service: "google_drive",
