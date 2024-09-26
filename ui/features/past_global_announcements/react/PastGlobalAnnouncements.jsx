@@ -27,6 +27,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import AnnouncementFactory from './AnnouncementFactory'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import WithBreakpoints from '@canvas/with-breakpoints'
+import TopNavPortalWithDefaults from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 
 const I18n = useI18nScope('past_global_announcements')
 const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
@@ -117,6 +118,7 @@ const PastGlobalAnnouncements = ({breakpoints}) => {
       )}
       {instUINavEnabled() && (
         <>
+          <TopNavPortalWithDefaults />
           <Heading margin={headerMargin} as="h1" level={breakpoints.desktop ? 'h1' : 'h2'}>
             {I18n.t('Global Announcements')}
           </Heading>
