@@ -15174,6 +15174,7 @@ el:
   use_new_folder_tree_in_files_bc0ea09f: "Χρήση Νέας Δομής Φακέλων στα Αρχεία"
   use_remote_service_for_notifications_9fe667c6: "Χρήση της απομακρυσμένης υπηρεσίας για τις ειδοποιήσεις"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Χρησιμοποιήστε εργαλείο LTI του νέου κουίζ αντί για τα συνηθισμένα κουίζ του Canvas"
+  use_this_same_grade_for_the_resubmission_eaa6bf55: "Χρήση του ίδιου βαθμού για την επανυποβολή"
   used_by_permission_314a78dd: "Χρησιμοποιήθηκε κατόπιν Άδειας"
   user: 
     default_user_name: Χρήστης
