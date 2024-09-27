@@ -1001,6 +1001,8 @@
   path: "/api/v1/courses/:course_id/lti_resource_links/:id"
 - verb: PUT
   path: "/api/v1/courses/:course_id/lti_resource_links/:id"
+- verb: POST
+  path: "/api/v1/courses/:course_id/lti_resource_links/bulk"
 - verb: GET
   path: "/api/v1/courses/:course_id/mastery_paths/rules"
 - verb: POST

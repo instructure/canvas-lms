@@ -1921,6 +1921,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: "lti/resource_links") do
       get "courses/:course_id/lti_resource_links", action: :index
       post "courses/:course_id/lti_resource_links", action: :create
+      post "courses/:course_id/lti_resource_links/bulk", action: :bulk_create
       get "courses/:course_id/lti_resource_links/:id", action: :show
       put "courses/:course_id/lti_resource_links/:id", action: :update
       delete "courses/:course_id/lti_resource_links/:id", action: :destroy
