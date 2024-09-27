@@ -458,24 +458,14 @@ export const showErrorWhenMessageTooLong = message => {
   return false
 }
 
-export const getTranslation = async (
-  text,
-  translateTargetLanguage,
-  setter,
-  setIsTranslating = () => {}
-) => {
+export const getTranslation = async (text, translateTargetLanguage, setter) => {
   if (text === undefined || text == null) {
     return // Do nothing, there is no text to translate
   }
 
   const apiPath = `/courses/${ENV.course_id}/translate`
 
-  // Remove any tags from the string to be translated
-  const parsedDocument = new DOMParser().parseFromString(text, 'text/html')
-  const toTranslate = parsedDocument.documentElement.textContent
-
   try {
-    setIsTranslating(true)
     const {json} = await doFetchApi({
       method: 'POST',
       path: apiPath,
@@ -483,7 +473,7 @@ export const getTranslation = async (
         inputs: {
           src_lang: 'en', // TODO: detect source language.
           tgt_lang: translateTargetLanguage,
-          text: toTranslate,
+          text,
         },
       },
     })
@@ -492,8 +482,6 @@ export const getTranslation = async (
   } catch (e) {
     // TODO: Do something with the error message.
   }
-
-  setIsTranslating(false)
 }
 
 export const translationSeparator = '\n\n----------\n\n\n'

@@ -67,13 +67,20 @@ export function PostMessage({...props}) {
       return
     }
 
-    getTranslation(translatedTitle, translateTargetLanguage, setTranslatedTitle, setIsTranslating)
-    getTranslation(
-      translatedMessage,
-      translateTargetLanguage,
-      setTranslatedMessage,
-      setIsTranslating
-    )
+    const translations = [
+      getTranslation(translatedTitle, translateTargetLanguage, setTranslatedTitle),
+      getTranslation(
+        translatedMessage,
+        translateTargetLanguage,
+        setTranslatedMessage
+      )
+    ]
+
+    // Begin translating, clear spinner when done.
+    setIsTranslating(true);
+    Promise.all(translations)
+           .then(() => setIsTranslating(false));
+
   }, [translateTargetLanguage, props.message])
 
   return (
