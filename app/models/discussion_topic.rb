@@ -291,7 +291,6 @@ class DiscussionTopic < ActiveRecord::Base
       self.workflow_state = "post_delayed" if [:migration, :after_migration].include?(saved_by) && delayed_post_at > Time.now
     end
     if lock_at && lock_at_changed?
-      @should_schedule_lock_at = true
       self.locked = false if [:migration, :after_migration].include?(saved_by) && lock_at > Time.now
     end
 
@@ -323,12 +322,10 @@ class DiscussionTopic < ActiveRecord::Base
 
     bp = true if @importing_migration&.migration_type == "master_course_import"
     delay(run_at: delayed_post_at).update_based_on_date(for_blueprint: bp) if @should_schedule_delayed_post
-    delay(run_at: lock_at).update_based_on_date(for_blueprint: bp) if @should_schedule_lock_at
     # need to clear these in case we do a save whilst saving (e.g.
     # Announcement#respect_context_lock_rules), so as to avoid the dreaded
     # double delayed job ಠ_ಠ
     @should_schedule_delayed_post = nil
-    @should_schedule_lock_at = nil
   end
 
   def sync_attachment_with_publish_state
@@ -976,11 +973,7 @@ class DiscussionTopic < ActiveRecord::Base
   # Also: if this method is scheduled by a blueprint sync, ensure it isn't counted as a manual downstream change
   def update_based_on_date(for_blueprint: false)
     skip_downstream_changes! if for_blueprint
-    transaction do
-      reload lock: true # would call lock!, except, oops, workflow overwrote it :P
-      lock if should_lock_yet
-      delayed_post unless should_not_post_yet
-    end
+    delayed_post unless should_not_post_yet
   end
   alias_method :try_posting_delayed, :update_based_on_date
   alias_method :auto_update_workflow, :update_based_on_date
