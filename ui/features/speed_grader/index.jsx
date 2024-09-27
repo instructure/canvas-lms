@@ -118,7 +118,9 @@ ready(() => {
     'quizzesNext.submissionUpdate': 'tool.submissionUpdate',
   }
 
-  const sgUploader = new SGUploader('any', {defaultTItle: 'Upload Media'})
+  const sgUploader = window.INST.kalturaSettings
+    ? new SGUploader('any', {defaultTitle: 'Upload Media'})
+    : null
 
   import('speedgrader/appInjector')
     .then(module => {
@@ -148,7 +150,7 @@ ready(() => {
           updateCommentBankItem,
           updateCommentSuggestionsEnabled,
           updateSpeedGraderSettings,
-          postSubmissionCommentMedia: sgUploader.doUploadByFile,
+          postSubmissionCommentMedia: sgUploader?.doUploadByFile,
         },
         postMessageAliases,
         context: {
