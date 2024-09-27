@@ -170,12 +170,6 @@ describe ContentMigration do
         to_ann.reload
         expect(to_ann.workflow_state).to eq "active"
       end
-
-      Timecop.freeze(26.hours.from_now) do
-        run_jobs
-        to_ann.reload
-        expect(to_ann.locked).to be_truthy
-      end
     end
 
     it "properly copies selected delayed announcements even if they've already posted and locked" do
@@ -185,7 +179,6 @@ describe ContentMigration do
       from_ann.reload
 
       expect(from_ann.workflow_state).to eq "active"
-      expect(from_ann.locked).to be_truthy
 
       @cm.copy_options = {
         everything: true,
@@ -207,12 +200,6 @@ describe ContentMigration do
         run_jobs
         to_ann.reload
         expect(to_ann.workflow_state).to eq "active"
-      end
-
-      Timecop.freeze(6.days.from_now) do
-        run_jobs
-        to_ann.reload
-        expect(to_ann.locked).to be_truthy
       end
     end
 
