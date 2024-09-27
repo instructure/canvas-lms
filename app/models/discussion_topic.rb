@@ -1799,9 +1799,8 @@ class DiscussionTopic < ActiveRecord::Base
     if Account.site_admin.feature_enabled?(:selective_release_backend)
       RequestCache.cache(locked_request_cache_key(user)) do
         locked = false
-        # if graded, we only care to check the topic's base dates, then defer to checking if the assignment is locked
-        # if ungraded, there's no assignment, and thus we want the topic's overridden availability dates for the user
-        topic_for_user = assignment.present? ? self : overridden_for(user)
+        # get the topic's overridden availability dates for the user. If graded, the dates will be on the assignment.
+        topic_for_user = assignment.present? ? assignment.overridden_for(user) : overridden_for(user)
         # prefer unlock_at, but fall back to delayed_post_at for DiscussionTopics until the latter is removed
         overridden_unlock_at = topic_for_user.unlock_at
         overridden_unlock_at ||= topic_for_user.delayed_post_at if topic_for_user.respond_to?(:delayed_post_at)
@@ -1810,8 +1809,6 @@ class DiscussionTopic < ActiveRecord::Base
           locked = { object: self, unlock_at: overridden_unlock_at }
         elsif overridden_lock_at && overridden_lock_at < Time.now
           locked = { object: self, lock_at: overridden_lock_at, can_view: true }
-        elsif !opts[:skip_assignment] && (l = assignment&.low_level_locked_for?(user, opts))
-          locked = l
         elsif could_be_locked && (item = locked_by_module_item?(user, opts))
           locked = { object: self, module: item.context_module }
         elsif locked? # nothing more specific, it's just locked
