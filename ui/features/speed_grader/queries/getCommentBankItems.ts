@@ -33,7 +33,7 @@ type Result = {
 }
 
 const QUERY = gql`
-  query CommentBankItemQuery($userId: ID!, $query: String, $maxResults: Int) {
+  query SpeedGrader_CommentBankItemQuery($userId: ID!, $query: String, $maxResults: Int) {
     legacyNode(_id: $userId, type: User) {
       ... on User {
         commentBankItemsConnection(query: $query, limit: $maxResults) {
