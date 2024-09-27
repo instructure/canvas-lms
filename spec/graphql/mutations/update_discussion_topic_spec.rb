@@ -157,6 +157,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     args << assignment_overrides_str(assignment[:assignmentOverrides]) if assignment[:assignmentOverrides]
     args << "forCheckpoints: #{assignment[:forCheckpoints]}" if assignment[:forCheckpoints]
     args << "lockAt: \"#{assignment[:lockAt]}\"" if assignment[:lockAt]
+    args << "unlockAt: \"#{assignment[:unlockAt]}\"" if assignment[:unlockAt]
 
     "assignment: { #{args.join(", ")} }"
   end
@@ -529,8 +530,10 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       new_points_possible = 100
       new_post_to_sis = true
       new_grading_type = "pass_fail"
+      lock_at = 20.days.from_now.iso8601
+      unlock_at = 10.days.from_now.iso8601
 
-      result = run_mutation(id: topic.id, assignment: { pointsPossible: new_points_possible, postToSis: new_post_to_sis, gradingType: new_grading_type })
+      result = run_mutation(id: topic.id, assignment: { pointsPossible: new_points_possible, postToSis: new_post_to_sis, gradingType: new_grading_type, lockAt: lock_at, unlockAt: unlock_at })
       expect(result["errors"]).to be_nil
 
       # Verify that the response from graphql is correct
@@ -542,11 +545,15 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       # Verify that the saved object is correct
       topic.reload
       expect(topic.assignment).to be_present
+      expect(topic.lock_at).to eq(lock_at)
+      expect(topic.unlock_at).to eq(unlock_at)
       updated_assignment = Assignment.find(topic.assignment.id)
 
       expect(updated_assignment.points_possible).to eq(new_points_possible)
       expect(updated_assignment.post_to_sis).to eq(new_post_to_sis)
       expect(updated_assignment.grading_type.to_s).to eq(new_grading_type)
+      expect(updated_assignment.lock_at).to eq(lock_at)
+      expect(updated_assignment.unlock_at).to eq(unlock_at)
 
       # Verify that a new DiscussionTopic wasn't created
       expect(DiscussionTopic.last.id).to eq(topic.id)
@@ -622,12 +629,14 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(result["errors"]).to be_nil
     end
 
-    it "syncs the discussion and assignment lock_at field when the assignment date changes" do
+    it "syncs the discussion and assignment lock_at and unlock_at fields when the assignment date changes" do
       lock_at = 6.months.from_now.iso8601
+      unlock_at = 3.months.from_now.iso8601
       expect(@topic.lock_at).to be_nil
-      result = run_mutation(id: @topic.id, assignment: { lockAt: lock_at.to_s })
+      result = run_mutation(id: @topic.id, assignment: { lockAt: lock_at.to_s, unlockAt: unlock_at.to_s })
       expect(result["errors"]).to be_nil
       expect(@topic.reload.lock_at).to eq lock_at.to_s
+      expect(@topic.reload.unlock_at).to eq unlock_at.to_s
     end
   end
 

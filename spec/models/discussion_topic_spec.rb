@@ -3713,9 +3713,9 @@ describe DiscussionTopic do
         expect(@topic.locked_for?(@student)).to be_falsey
       end
 
-      it "still enforces the topic's dates" do
+      it "prefers the assignment's dates" do
         @topic.update(unlock_at: 1.week.from_now)
-        expect(@topic.locked_for?(@student)).to be_truthy
+        expect(@topic.locked_for?(@student)).to be_falsey
       end
 
       it "does not enforce the topic's overrides" do
@@ -3747,6 +3747,15 @@ describe DiscussionTopic do
         lock_info = @topic.locked_for?(@student)
         expect(lock_info).to be_truthy
         expect(lock_info[:unlock_at]).to eq timestamp
+      end
+
+      it "respects assignment's overrides when discussion is locked for everyone else" do
+        timestamp = 1.week.from_now
+        @topic.update!(lock_at: 1.week.ago)
+        ao = @assignment.assignment_overrides.create!(lock_at: timestamp, lock_at_overridden: true)
+        ao.assignment_override_students.create!(user: @student)
+        lock_info = @topic.locked_for?(@student)
+        expect(lock_info).to be_falsey
       end
     end
   end
