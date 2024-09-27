@@ -154,4 +154,20 @@ describe "Translation" do
       expect(Translation.language_matches_user_locale?(@user, "¿Dónde está el baño?")).to be_falsey
     end
   end
+
+  describe ":translate_html" do
+    it "translates HTML" do
+      allow(Translation).to receive(:create).and_return("fake")
+      text = "<p>Hello mom!</p><p>I am a person</p>"
+      expected = "<p>fake</p><p>fake</p>"
+      expect(Translation.translate_html(html_string: text)).to eq(expected)
+    end
+
+    it "translates HTML but leaves whitespace-only strings" do
+      allow(Translation).to receive(:create).and_return("fake")
+      text = "<p>Hello mom!</p><p>&nbsp;</p>"
+      not_expected = "<p>fake</p><p>fake</p>"
+      expect(Translation.translate_html(html_string: text)).to_not eq(not_expected)
+    end
+  end
 end
