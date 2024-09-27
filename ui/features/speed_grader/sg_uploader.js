@@ -68,7 +68,7 @@ export default class SGUploader {
     } = e
     alert(
       I18n.t(
-        'File type %{fileType} not compatable with selected media type: %{allowedMediaTypes}.',
+        'File type %{fileType} not compatible with selected media type: %{allowedMediaTypes}.',
         {fileType, allowedMediaTypes}
       )
     )
