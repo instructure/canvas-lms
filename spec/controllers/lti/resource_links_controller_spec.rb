@@ -433,6 +433,117 @@ describe Lti::ResourceLinksController, type: :request do
     end
   end
 
+  describe "POST #bulk_create" do
+    subject { post "/api/v1/courses/#{course.id}/lti_resource_links/bulk", params:, as: :json }
+
+    let(:params) do
+      [
+        { url: "https://example.com/lti/launch", title: "My LTI Link 1" },
+        { url: "https://example.com/lti/launch", title: "My LTI Link 2", custom: { "hello" => "world" } }
+      ]
+    end
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      before { user_session(student_in_course(account:).user) }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with flag disabled" do
+      before { account.disable_feature!(:lti_resource_links_api) }
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    it "is successful" do
+      subject
+      expect(response).to be_successful
+    end
+
+    it "creates resource links" do
+      expect { subject }.to change { course.lti_resource_links.count }.by(2)
+      first = course.lti_resource_links.find_by(title: "My LTI Link 1")
+      expect(first.custom).to be_nil
+      expect(first.url).to eq("https://example.com/lti/launch")
+      second = course.lti_resource_links.find_by(title: "My LTI Link 2")
+      expect(second.custom).to eq({ "hello" => "world" })
+      expect(second.url).to eq("https://example.com/lti/launch")
+    end
+
+    it "returns the resource links" do
+      subject
+      expect(response_json.size).to eq(2)
+    end
+
+    context "with one invalid link" do
+      let(:params) do
+        [
+          { url: "hello world!", title: "My LTI Link 1" },
+        ]
+      end
+
+      it "returns 422" do
+        subject
+        expect(response).to be_unprocessable
+      end
+
+      it "does not create any links" do
+        expect { subject }.not_to change { course.lti_resource_links.count }
+      end
+    end
+
+    context "with some invalid links" do
+      let(:params) do
+        [
+          { url: "hello world!", title: "My LTI Link 1" },
+          { url: "https://example.com/lti/launch", title: "My LTI Link 2", custom: { "hello" => "world" } }
+        ]
+      end
+
+      it "returns 422" do
+        subject
+        expect(response).to be_unprocessable
+      end
+
+      it "does not create any links" do
+        expect { subject }.not_to change { course.lti_resource_links.count }
+      end
+    end
+
+    context "with more links than are allowed" do
+      let(:max_size) { 10 }
+      let(:params) { Array.new(12) { { url: "https://example.com/lti/launch", title: "My LTI Link" } } }
+
+      before do
+        stub_const("Lti::ResourceLinksController::MAX_BULK_CREATE", max_size)
+      end
+
+      it "returns 422" do
+        subject
+        expect(response).to be_unprocessable
+      end
+
+      it "creates no links" do
+        expect { subject }.not_to change { course.lti_resource_links.count }
+      end
+    end
+  end
+
   describe "DELETE #destroy" do
     subject { delete "/api/v1/courses/#{course.id}/lti_resource_links/#{id}" }
 
