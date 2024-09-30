@@ -72,6 +72,9 @@ const itemTypeLabels = {
   get settings() {
     return I18n.t('Settings')
   },
+  get sub_assignment() {
+    return I18n.t('Checkpoint')
+  },
   get syllabus() {
     return I18n.t('Syllabus')
   },
@@ -95,6 +98,9 @@ const itemTypeLabelPlurals = {
   },
   get discussion_topic() {
     return I18n.t('Discussions')
+  },
+  get sub_assignment() {
+    return I18n.t('Checkpoints')
   },
   get wiki_page() {
     return I18n.t('Pages')
