@@ -54,6 +54,7 @@ import {updateSubmissionSecondsLate} from './mutations/updateSubmissionSecondsLa
 import {useScope as useI18nScope} from '@canvas/i18n'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import {executeQuery} from '@canvas/query/graphql'
 import speedGrader from './jquery/speed_grader'
 import SGUploader from './sg_uploader'
 
@@ -127,6 +128,7 @@ ready(() => {
   import('speedgrader/appInjector')
     .then(module => {
       module.render(mountPoint, {
+        executeQuery,
         queryFns: {
           getAssignment,
           getCourseAssignments,
@@ -156,6 +158,7 @@ ready(() => {
           postSubmissionCommentMedia: sgUploader?.doUploadByFile,
           saveRubricAssessment,
         },
+        platform: 'canvas',
         postMessageAliases,
         context: {
           userId: window.ENV.current_user_id,
