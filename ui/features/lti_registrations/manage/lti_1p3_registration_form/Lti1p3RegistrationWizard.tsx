@@ -22,43 +22,82 @@ import type {AccountId} from '../model/AccountId'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 import type {UnifiedToolId} from '../model/UnifiedToolId'
 import {LaunchSettings} from './components/LaunchSettings'
-import {createLti1p3RegistrationWizardState} from './Lti1p3RegistrationWizardState'
+import {
+  createLti1p3RegistrationWizardState,
+  type Lti1p3RegistrationWizardStep,
+} from './Lti1p3RegistrationWizardState'
+import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {PermissionConfirmationWrapper} from './components/PermissionConfirmationWrapper'
 import {PlacementsConfirmationWrapper} from './components/PlacementsConfirmationWrapper'
 import {Button} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
 import {Text} from '@instructure/ui-text'
 import {PrivacyConfirmationWrapper} from './components/PrivacyConfirmationWrapper'
-import {RegistrationModalBody} from '../registration_wizard/RegistrationModalBody'
 import {OverrideURIsConfirmation} from './components/OverrideURIsConfirmation'
 import {NamingConfirmationWrapper} from './components/NamingConfirmationWrapper'
 import {IconConfirmationWrapper} from './components/IconConfirmationWrapper'
+import {ReviewScreenWrapper} from './components/ReviewScreenWrapper'
+import {RegistrationModalBody} from '../registration_wizard/RegistrationModalBody'
+import GenericErrorPage from '@canvas/generic-error-page/react'
+import {Spinner} from '@instructure/ui-spinner'
+import {Flex} from '@instructure/ui-flex'
+import type {Lti1p3RegistrationWizardService} from './Lti1p3RegistrationWizardService'
+import type {LtiRegistrationId} from '../model/LtiRegistrationId'
+import {Heading} from '@instructure/ui-heading'
 
 const I18n = useI18nScope('lti_registrations')
 
 export type Lti1p3RegistrationWizardProps = {
+  registrationId?: LtiRegistrationId
   accountId: AccountId
   internalConfiguration: InternalLtiConfiguration
+  service: Lti1p3RegistrationWizardService
   unregister: () => void
   unifiedToolId?: UnifiedToolId
   onSuccessfulRegistration: () => void
 }
 
-export const Lti1p3RegistrationWizard = (props: Lti1p3RegistrationWizardProps) => {
-  const {internalConfiguration} = props
+export const Lti1p3RegistrationWizard = ({
+  registrationId,
+  accountId,
+  internalConfiguration,
+  service,
+  unregister,
+  unifiedToolId,
+  onSuccessfulRegistration,
+}: Lti1p3RegistrationWizardProps) => {
   const useLti1p3RegistrationWizardStore = React.useMemo(() => {
-    return createLti1p3RegistrationWizardState({internalConfig: internalConfiguration})
-  }, [internalConfiguration])
+    return createLti1p3RegistrationWizardState({internalConfig: internalConfiguration, service})
+  }, [internalConfiguration, service])
 
   const store = useLti1p3RegistrationWizardStore()
+
+  const handlePreviousClicked = (prevStep: Lti1p3RegistrationWizardStep) => () => {
+    store.setReviewing(false)
+    store.setStep(prevStep)
+  }
+
+  const handleNextClicked = (nextStep: Lti1p3RegistrationWizardStep) => () => {
+    if (store.state.reviewing) {
+      store.setStep('Review')
+    } else {
+      if (nextStep === 'Review') {
+        store.setReviewing(true)
+      }
+      store.setStep(nextStep)
+    }
+  }
+
+  const nextButtonLabel = store.state.reviewing ? I18n.t('Back to Review') : I18n.t('Next')
 
   switch (store.state._step) {
     case 'LaunchSettings':
       return (
         <LaunchSettings
           overlayStore={store.state.overlayStore}
-          unregister={props.unregister}
-          onNextClicked={() => store.setStep('Permissions')}
+          unregister={unregister}
+          reviewing={store.state.reviewing}
+          onNextClicked={handleNextClicked('Permissions')}
         />
       )
     case 'Permissions':
@@ -67,14 +106,14 @@ export const Lti1p3RegistrationWizard = (props: Lti1p3RegistrationWizardProps) =
         <>
           <PermissionConfirmationWrapper
             overlayStore={store.state.overlayStore}
-            internalConfig={internalConfiguration!}
+            internalConfig={internalConfiguration}
           />
           <Modal.Footer>
-            <Button onClick={() => store.setStep('LaunchSettings')} margin="small">
+            <Button onClick={handlePreviousClicked('LaunchSettings')} margin="small">
               {I18n.t('Previous')}
             </Button>
-            <Button onClick={() => store.setStep('DataSharing')} color="primary" margin="small">
-              {I18n.t('Next')}
+            <Button onClick={handleNextClicked('DataSharing')} color="primary" margin="small">
+              {nextButtonLabel}
             </Button>
           </Modal.Footer>
         </>
@@ -83,33 +122,32 @@ export const Lti1p3RegistrationWizard = (props: Lti1p3RegistrationWizardProps) =
       return (
         <>
           <PrivacyConfirmationWrapper
-            appName={internalConfiguration!.title}
+            appName={internalConfiguration.title}
             overlayStore={store.state.overlayStore}
           />
           <Modal.Footer>
-            <Button onClick={() => store.setStep('Permissions')} margin="small">
+            <Button onClick={handlePreviousClicked('Permissions')} margin="small">
               {I18n.t('Previous')}
             </Button>
-            <Button onClick={() => store.setStep('Placements')} color="primary" margin="small">
-              {I18n.t('Next')}
+            <Button onClick={handleNextClicked('Placements')} color="primary" margin="small">
+              {nextButtonLabel}
             </Button>
           </Modal.Footer>
         </>
       )
     case 'Placements':
       return (
-        // TODO: Handle the case where the internal config is undefined and allow for manual configuration
         <>
           <PlacementsConfirmationWrapper
-            internalConfig={internalConfiguration!}
+            internalConfig={internalConfiguration}
             overlayStore={store.state.overlayStore}
           />
           <Modal.Footer>
-            <Button onClick={() => store.setStep('DataSharing')} margin="small">
+            <Button onClick={handlePreviousClicked('DataSharing')} margin="small">
               {I18n.t('Previous')}
             </Button>
-            <Button onClick={() => store.setStep('OverrideURIs')} color="primary" margin="small">
-              {I18n.t('Next')}
+            <Button onClick={handleNextClicked('OverrideURIs')} color="primary" margin="small">
+              {nextButtonLabel}
             </Button>
           </Modal.Footer>
         </>
@@ -118,25 +156,25 @@ export const Lti1p3RegistrationWizard = (props: Lti1p3RegistrationWizardProps) =
       return (
         <OverrideURIsConfirmation
           overlayStore={store.state.overlayStore}
-          registration={internalConfiguration!}
-          onNextClicked={() => store.setStep('Naming')}
-          onPreviousClicked={() => store.setStep('Placements')}
+          registration={internalConfiguration}
+          reviewing={store.state.reviewing}
+          onPreviousClicked={handlePreviousClicked('Placements')}
+          onNextClicked={handleNextClicked('Naming')}
         />
       )
     case 'Naming':
       return (
-        // TODO: Handle the case where the internal config is undefined and allow for manual configuration
         <>
           <NamingConfirmationWrapper
             config={internalConfiguration}
             overlayStore={store.state.overlayStore}
           />
           <Modal.Footer>
-            <Button onClick={() => store.setStep('OverrideURIs')} margin="small">
+            <Button onClick={handlePreviousClicked('OverrideURIs')} margin="small">
               {I18n.t('Previous')}
             </Button>
-            <Button onClick={() => store.setStep('Icons')} color="primary" margin="small">
-              {I18n.t('Next')}
+            <Button onClick={handleNextClicked('Icons')} color="primary" margin="small">
+              {nextButtonLabel}
             </Button>
           </Modal.Footer>
         </>
@@ -147,22 +185,81 @@ export const Lti1p3RegistrationWizard = (props: Lti1p3RegistrationWizardProps) =
           config={internalConfiguration}
           reviewing={store.state.reviewing}
           overlayStore={store.state.overlayStore}
-          onPreviousButtonClicked={() => store.setStep('Naming')}
-          onNextButtonClicked={() => store.setStep('Review')}
+          onPreviousButtonClicked={handlePreviousClicked('Naming')}
+          onNextButtonClicked={handleNextClicked('Review')}
         />
       )
     case 'Review':
       return (
-        <div>
-          <RegistrationModalBody>
-            <Text>TODO: Implement the rest of the steps</Text>
-          </RegistrationModalBody>
+        <>
+          <ReviewScreenWrapper
+            overlayStore={store.state.overlayStore}
+            internalConfig={internalConfiguration}
+            transitionTo={store.setStep}
+          />
           <Modal.Footer>
-            <Button onClick={() => store.setStep('Icons')} margin="small">
+            <Button onClick={handlePreviousClicked('Icons')} margin="small">
               {I18n.t('Previous')}
             </Button>
+            <Button
+              onClick={() => {
+                if (registrationId) {
+                  store.update(onSuccessfulRegistration, accountId, registrationId, unifiedToolId)
+                } else {
+                  store.install(onSuccessfulRegistration, accountId, unifiedToolId)
+                }
+              }}
+              color="primary"
+              margin="small"
+            >
+              {I18n.t('Install App')}
+            </Button>
           </Modal.Footer>
-        </div>
+        </>
+      )
+    case 'Installing':
+      return (
+        <RegistrationModalBody>
+          <Flex justifyItems="center" alignItems="center" height="100%">
+            <Flex.Item>
+              <Spinner renderTitle={I18n.t('Installing App')} />
+            </Flex.Item>
+            <Flex.Item>{I18n.t('Installing App')}</Flex.Item>
+          </Flex>
+        </RegistrationModalBody>
+      )
+    case 'Updating':
+      return (
+        <RegistrationModalBody>
+          <Flex justifyItems="center" alignItems="center" height="100%">
+            <Flex.Item>
+              <Spinner renderTitle={I18n.t('Updating App')} />
+            </Flex.Item>
+            <Flex.Item>{I18n.t('Updating App')}</Flex.Item>
+          </Flex>
+        </RegistrationModalBody>
+      )
+    case 'Error':
+      return (
+        <RegistrationModalBody>
+          <GenericErrorPage
+            imageUrl={errorShipUrl}
+            errorSubject={I18n.t('Dynamic Registration error')}
+            errorCategory="Dynamic Registration"
+            errorMessage={store.state.errorMessage}
+          />
+        </RegistrationModalBody>
+      )
+    case 'Success':
+      return (
+        <RegistrationModalBody>
+          <Heading>{I18n.t('App Installed Successfully')}</Heading>
+          <Text>
+            {I18n.t(
+              'Your app has been successfully installed. This modal should close in a moment.'
+            )}
+          </Text>
+        </RegistrationModalBody>
       )
   }
 }

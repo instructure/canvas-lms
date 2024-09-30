@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {createBrowserRouter, RouterProvider} from 'react-router-dom'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {LtiAppsLayout} from './layout/LtiAppsLayout'
@@ -38,8 +38,13 @@ import {
   updateAdminNickname,
   updateDeveloperKeyWorkflowState,
 } from './manage/api/developerKey'
-import {fetchThirdPartyToolConfiguration} from './manage/api/registrations'
+import {
+  fetchThirdPartyToolConfiguration,
+  createRegistration,
+  updateRegistration,
+} from './manage/api/registrations'
 import type {JsonUrlWizardService} from './manage/registration_wizard/JsonUrlWizardService'
+import type {Lti1p3RegistrationWizardService} from './manage/lti_1p3_registration_form/Lti1p3RegistrationWizardService'
 
 const getBasename = () => {
   const path = window.location.pathname
@@ -87,14 +92,21 @@ const jsonUrlWizardService: JsonUrlWizardService = {
   fetchThirdPartyToolConfiguration,
 }
 
-ReactDOM.render(
+const lti1p3RegistrationWizardService: Lti1p3RegistrationWizardService = {
+  createLtiRegistration: createRegistration,
+  updateLtiRegistration: updateRegistration,
+}
+
+const root = createRoot(document.getElementById('reactContent')!)
+
+root.render(
   <QueryClientProvider client={queryClient}>
     <RegistrationWizardModal
       accountId={accountId}
       dynamicRegistrationWizardService={dynamicRegistrationWizardService}
+      lti1p3RegistrationWizardService={lti1p3RegistrationWizardService}
       jsonUrlWizardService={jsonUrlWizardService}
     />
     <RouterProvider router={router} />
-  </QueryClientProvider>,
-  document.getElementById('reactContent')
+  </QueryClientProvider>
 )
