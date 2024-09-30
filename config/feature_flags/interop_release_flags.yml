@@ -351,13 +351,13 @@ microsoft_group_enrollments_syncing:
     If enabled, syncing course enrollments to Microsoft Groups will be
     available. Account admins may enable this in account settings.
   applies_to: RootAccount
-platform_notification_services:
+platform_notification_service:
   state: hidden
   shadow: true
   applies_to: RootAccount
-  display_name: Enable Platform Notification Services
+  display_name: Enable Platform Notification Service
   description: |-
-    When on, 1Edtech Platform Notfication services (used to subscribe tools for notice, list existing notice handlers, notify subscribed tools, etc.) will be enabled.
+    When on, 1Edtech Platform Notfication service (used to subscribe tools for notices, list existing notice handlers, notify subscribed tools, etc.) will be enabled.
   environments:
     development:
       state: allowed_on
