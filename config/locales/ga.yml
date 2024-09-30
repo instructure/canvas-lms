@@ -6803,7 +6803,7 @@ ga:
     blank_placeholder: "-"
     event_source: 
       api: Api
-      manual: Láimhe
+      manual: "De láimh"
       sis: SIS
     event_type: 
       concluded: Críochnaithe
@@ -12842,7 +12842,7 @@ ga:
   manage_usage_rights_da351cd8: "Bainistigh cearta úsáide"
   manage_user_name_a97d3438: "Bainistigh %{user_name}"
   manage_user_settings_827ab12d: "Bainistigh Socruithe Úsáideora"
-  manual_8c2665de: Láimhe
+  manual_8c2665de: "de láimh"
   manual_configuration_b586fe54: "Cumraíocht Láimhe"
   manual_entry_e4a4f99a: "Iontráil Láimhe"
   manual_posting_scores_hidden_from_instructors_9ccb197c: "%{manual_posting} (scóir i bhfolach ó theagascóirí)"
