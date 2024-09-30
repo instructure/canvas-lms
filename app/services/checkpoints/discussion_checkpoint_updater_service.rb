@@ -24,7 +24,7 @@ class Checkpoints::DiscussionCheckpointUpdaterService < Checkpoints::DiscussionC
 
     checkpoint = find_checkpoint
     compute_due_dates_and_create_submissions(checkpoint)
-    checkpoint.save
+    checkpoint.save!
     checkpoint
   end
 

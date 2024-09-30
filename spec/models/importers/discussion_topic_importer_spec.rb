@@ -97,7 +97,7 @@ describe Importers::DiscussionTopicImporter do
     expect(topic.attachment).to be_nil
   end
 
-  describe "checkpoints" do
+  describe "assignments" do
     subject do
       Importers::DiscussionTopicImporter.import_from_migration(data, context, migration)
       DiscussionTopic.where(migration_id: data[:migration_id]).first
@@ -109,6 +109,39 @@ describe Importers::DiscussionTopicImporter do
 
     it "saves reply_to_entry_required_count" do
       expect(subject.reply_to_entry_required_count).to eq(2)
+    end
+
+    it "saves assignment description" do
+      expect(subject.assignment.description).to eq(data[:description])
+    end
+
+    context "when discussion_checkpoints feature is enabled" do
+      before do
+        context.root_account.enable_feature!(:discussion_checkpoints)
+      end
+
+      it "saves the sub assignments" do
+        expect(subject.sub_assignments.count).to eq(2)
+      end
+
+      it "saves topic message to the sub assignments" do
+        topic = subject
+        topic.sub_assignments.each do |sub_assignment|
+          expect(sub_assignment.description).to eq(topic.message)
+        end
+      end
+
+      context "when sub_assignments are not present" do
+        before { data[:assignment].delete(:sub_assignments) }
+
+        it "imports assignment" do
+          expect(subject.assignment).to be_present
+        end
+
+        it "does not create sub assignments" do
+          expect(subject.sub_assignments).to be_empty
+        end
+      end
     end
 
     context "when reply_to_entry_required_count is not present" do
