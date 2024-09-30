@@ -1043,41 +1043,32 @@ module ApplicationHelper
     csp_enabled? && csp_context.csp_enabled?
   end
 
-  def default_source_csp_logging_enabled?
+  def include_default_source_csp_directives?
     csp_context&.root_account&.feature_enabled?(:default_source_csp_logging)
   end
 
   def csp_report_uri
     @csp_report_uri ||=
-      if default_source_csp_logging_enabled? && (host = DynamicSettings.find("csp-logging")[:host])
-        "; report-uri #{host}"
+      if include_default_source_csp_directives? && (host = DynamicSettings.find("csp-logging")[:host])
+        " report-uri #{host}; "
       else
         ""
       end
   end
 
-  def csp_header
-    header = +"Content-Security-Policy"
-
-    if !csp_enforced? && default_source_csp_logging_enabled?
-      header << "-Report-Only"
-    end
-
-    header.freeze
-  end
-
   def default_csp_logging_directives(include_script_src: true)
-    if default_source_csp_logging_enabled?
+    if include_default_source_csp_directives?
       script_src_directive = include_script_src ? "script-src 'self' 'unsafe-eval' #{allow_list_domains};" : ""
+
       directives = "default-src 'self'; \
                     img-src 'self' data: #{allow_list_domains};\
                     style-src 'self' 'unsafe-inline' #{allow_list_domains};\
                     #{script_src_directive}\
                     script-src-elem 'self' 'unsafe-inline' #{allow_list_domains};\
                     font-src 'self' data: #{allow_list_domains};\
-                    connect-src 'self' #{allow_list_domains}"
+                    connect-src 'self' #{allow_list_domains};"
 
-      (directives + csp_report_uri).squish
+      directives.squish + csp_report_uri
     else
       ""
     end
@@ -1088,13 +1079,19 @@ module ApplicationHelper
     true
   end
 
+  def apply_csp_header(directives)
+    return unless csp_enforced? && !headers.key?("Content-Security-Policy")
+
+    directives = directives.presence || ""
+    headers["Content-Security-Policy"] = directives
+  end
+
   def set_default_source_csp_directive_if_enabled
-    return unless default_source_csp_logging_enabled? && csp_enabled? && csp_report_uri.present?
-    return if headers.key?(csp_header) || csp_enforced?
+    return unless include_default_source_csp_directives? && csp_enabled? && csp_report_uri.present?
 
     # these are the default directives added for all
     # content types not represented by frames, scripts, or files
-    headers[csp_header] = default_csp_logging_directives
+    apply_csp_header(default_csp_logging_directives)
   end
 
   def add_csp_for_root
@@ -1109,7 +1106,7 @@ module ApplicationHelper
     directives = "frame-src 'self' blob: #{allow_list_domains(include_tools: true)}; "
     directives += default_csp_logging_directives
 
-    headers[csp_header] = directives
+    apply_csp_header(directives)
   end
 
   def add_csp_for_file
@@ -1118,7 +1115,7 @@ module ApplicationHelper
     directives = csp_iframe_attribute
     directives += default_csp_logging_directives(include_script_src: false)
 
-    headers[csp_header] = directives
+    apply_csp_header(directives)
   end
 
   def allow_list_domains(include_tools: false)
