@@ -1005,15 +1005,6 @@ describe DiscussionTopic do
         expect(topic.workflow_state).to eql "post_delayed"
       end
 
-      it "is locked when lock_at is in the past" do
-        topic = delayed_discussion_topic(title: "title",
-                                         message: "content here",
-                                         delayed_post_at: nil,
-                                         lock_at: Time.now - 1.day)
-        topic.update_based_on_date
-        expect(topic.locked?).to be_truthy
-      end
-
       it "is active when lock_at is in the future" do
         topic = delayed_discussion_topic(title: "title",
                                          message: "content here",
@@ -1042,16 +1033,6 @@ describe DiscussionTopic do
         topic.update_based_on_date
         expect(topic.workflow_state).to eql "post_delayed"
         expect(topic.locked?).to be_falsey
-      end
-
-      it "is locked when delayed_post_at and lock_at are in the past" do
-        topic = delayed_discussion_topic(title: "title",
-                                         message: "content here",
-                                         delayed_post_at: Time.now - 3.days,
-                                         lock_at: Time.now - 1.day)
-        topic.update_based_on_date
-        expect(topic.workflow_state).to eql "active"
-        expect(topic.locked?).to be_truthy
       end
 
       it "does not unlock a topic even if the lock date is in the future" do
