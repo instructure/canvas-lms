@@ -33,6 +33,7 @@ class SectionTabPresenter
                              :account_id,
                              :visibility,
                              :external,
+                             :position,
                              keyword_init: true)
   def initialize(tab, context)
     @tab = TabDefinition.new(**tab)
