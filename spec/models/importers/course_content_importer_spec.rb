@@ -331,6 +331,7 @@ describe Course do
       migration = build_migration(@course, params)
       setup_import(@course, "discussion_assignments.json", migration)
       dt = @course.discussion_topics.find_by(migration_id: "g8bacee869e70bf19cd6784db3efade7e")
+      expect(dt.reply_to_entry_required_count).to eq 2
       expect(dt.assignment.assignment_group).to eq a1.assignment_group
       expect(dt.assignment.assignment_group).to_not be_deleted
       expect(a1.reload).to be_deleted # didn't restore the previously deleted assignment too
