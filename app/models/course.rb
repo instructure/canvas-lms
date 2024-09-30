@@ -393,6 +393,10 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def dummy?
+    local_id == 0
+  end
+
   def self.ensure_dummy_course
     EnrollmentTerm.ensure_dummy_enrollment_term
     # pre-loading dummy account here to avoid error when finding

@@ -68,6 +68,8 @@ class LiveEventsObserver < ActiveRecord::Observer
   end
 
   def after_create(obj)
+    return if obj.try(:dummy?)
+
     obj.class.connection.after_transaction_commit do
       Canvas::LiveEventsCallbacks.after_create(obj)
     end
