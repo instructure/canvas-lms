@@ -186,6 +186,10 @@ module Importers
       return nil unless context.respond_to?(:assignments)
 
       if options[:assignment]
+        assignment_hash = options[:assignment]
+        assignment_hash[:sub_assignments]&.each do |sub_assignment|
+          sub_assignment[:description] = item.message
+        end
         Importers::AssignmentImporter.import_from_migration(options[:assignment], context, migration)
       elsif options[:grading]
         Importers::AssignmentImporter.import_from_migration({
