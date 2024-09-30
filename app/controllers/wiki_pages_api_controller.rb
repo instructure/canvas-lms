@@ -100,7 +100,23 @@
 #           "description": "(Optional) An explanation of why this is locked for the user. Present when locked_for_user is true.",
 #           "example": "This page is locked until September 1 at 12:00am",
 #           "type": "string"
-#         }
+#         },
+#         "editor": {
+#           "description": "The editor used to create and edit this page. May be one of 'rce' or 'block_editor'.",
+#           "example": "rce",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "rce",
+#               "block_editor"
+#             ]
+#           }
+#         },
+#         "block_editor_attributes": {
+#           "description": "The block editor attributes for this page. (optionally included, and only if this is a block editor created page)",
+#           "example": { "id": 278, "version": "0.2", "blocks": "{...block json here...}"},
+#           "type": "object"
+#          }
 #       }
 #     }
 #
@@ -256,6 +272,7 @@ class WikiPagesApiController < ApplicationController
   #
   # @argument include[] [String, "body"]
   #   - "enrollments": Optionally include the page body with each Page.
+  #   If this is a block_editor page, returns the block_editor_attributes.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
