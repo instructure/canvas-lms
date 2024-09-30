@@ -90,7 +90,32 @@ describe "Account Reports" do
     expect(ar.job_ids).to eq([123, 456])
   end
 
-  it "does not retry PG::ConnectionBad forever" do
+  it "retries ActiveRecord::ConnectionFailed" do
+    retried = false
+    AccountReports.configure_account_report "Default", {
+      "fake_report" => {
+        title: -> { "Fake Report" },
+        proc: lambda do |report|
+                unless retried
+                  retried = true
+                  raise ActiveRecord::ConnectionFailed
+                end
+                report.update workflow_state: "complete"
+              end
+      }
+    }
+    expect(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123),
+                                                                double("Delayed::Job", id: 456))
+
+    ar = AccountReport.create!(account: Account.default, user: account_admin_user, report_type: "fake_report")
+    ar.run_report
+    run_jobs
+    ar.reload
+    expect(ar).to be_complete
+    expect(ar.job_ids).to eq([123, 456])
+  end
+
+  it "does not retry exceptions forever" do
     count = 0
     AccountReports.configure_account_report "Default", {
       "sad_report" => {
