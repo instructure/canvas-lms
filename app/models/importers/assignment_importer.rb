@@ -215,6 +215,8 @@ module Importers
       # workflow_state) that it did
       item.reload
 
+      handle_sub_assignments(hash, item, migration)
+
       unless master_migration && migration.master_course_subscription.content_tag_for(item)&.downstream_changes&.include?("rubric")
         rubric = nil
         rubric = context.rubrics.where(migration_id: hash[:rubric_migration_id]).first if hash[:rubric_migration_id]
@@ -402,6 +404,30 @@ module Importers
       item.post_policy.update!(post_manually: !!post_manually)
 
       item
+    end
+
+    def self.handle_sub_assignments(assignment_hash, parent_item, migration)
+      return unless assignment_hash[:sub_assignments].present?
+      return unless parent_item.context.root_account.feature_enabled?(:discussion_checkpoints)
+
+      parent_item.has_sub_assignments = true
+
+      assignment_hash[:sub_assignments].each do |sub_assignment_hash|
+        sub_assignment = find_or_create_sub_assignment(sub_assignment_hash, parent_item)
+        sub_assignment.context = parent_item.context
+        sub_assignment.sub_assignment_tag = sub_assignment_hash[:tag]
+
+        sub_assignment = import_from_migration(sub_assignment_hash, parent_item.context, migration, sub_assignment)
+
+        parent_item.sub_assignments << sub_assignment
+      end
+    end
+
+    def self.find_or_create_sub_assignment(sub_assignment_hash, parent_item)
+      sub_item ||= SubAssignment.where(context_type: parent_item.context.class.to_s, context_id: parent_item.context, id: sub_assignment_hash[:id]).first
+      sub_item ||= SubAssignment.where(context_type: parent_item.context.class.to_s, context_id: parent_item.context, migration_id: sub_assignment_hash[:migration_id]).first if sub_assignment_hash[:migration_id]
+
+      sub_item || parent_item.sub_assignments.temp_record
     end
 
     def self.import_similarity_detection_tool(hash, context, migration, item)

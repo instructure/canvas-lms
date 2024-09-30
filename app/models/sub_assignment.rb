@@ -57,7 +57,7 @@ class SubAssignment < AbstractAssignment
   private
 
   def sync_with_parent
-    return if saved_by == :parent_assignment
+    return if saved_by == :parent_assignment || saved_by == :discussion_topic # saved by discussion_topic happens during assignment importer, where update from sub assignment breaks the import of the asset
 
     changed_attributes = previous_changes.slice(*SUB_ASSIGNMENT_SYNC_ATTRIBUTES)
     parent_assignment.update_from_sub_assignment(changed_attributes)

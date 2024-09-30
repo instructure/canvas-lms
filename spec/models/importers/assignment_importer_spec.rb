@@ -1494,4 +1494,134 @@ describe "Importing assignments" do
       end
     end
   end
+
+  describe "import sub assignments" do
+    subject do
+      Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+      course.assignments.find_by(migration_id:)
+    end
+
+    let(:course) { Course.create! }
+    let(:account) { course.root_account }
+    let(:migration) { course.content_migrations.create! }
+    let(:assignment_hash) do
+      {
+        migration_id:,
+        title: "with_subassignment",
+        post_to_sis: false,
+        date_shift_options: {
+          remove_dates: true
+        },
+        sub_assignments: [
+          {
+            id: 1337,
+            migration_id: "test_migration_id_1337",
+            title: "sub_assignment1",
+            tag: CheckpointLabels::REPLY_TO_TOPIC,
+          },
+          {
+            title: "sub_assignment2",
+            tag: CheckpointLabels::REPLY_TO_ENTRY,
+          }
+        ],
+      }
+    end
+
+    context "when the discussion_checkpoints feature flag is on" do
+      before do
+        account.enable_feature!(:discussion_checkpoints)
+      end
+
+      it "imports the two sub assignments from the hash" do
+        expect(subject.sub_assignments.length).to eq(2)
+      end
+
+      it "sets the has_sub_assignments" do
+        expect(subject.has_sub_assignments).to be_truthy
+      end
+
+      it "sets the proper tags for the sub assignments" do
+        expect(subject.sub_assignments.pluck(:sub_assignment_tag)).to match_array([CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY])
+      end
+
+      it "sets the same context for sub assignments" do
+        expect(subject.sub_assignments.all? { |sub_assignment| sub_assignment.context == subject.context }).to be_truthy
+      end
+
+      it "handles nil sub assignments" do
+        assignment_hash[:sub_assignments] = nil
+
+        expect(subject.sub_assignments.length).to eq(0)
+      end
+
+      it "handles empty sub assignments" do
+        assignment_hash[:sub_assignments] = []
+
+        expect(subject.sub_assignments.length).to eq(0)
+      end
+
+      it "raises error if any sub assignment is invalid" do
+        assignment_hash[:sub_assignments] = assignment_hash[:sub_assignments] + [{ title: "sub_assignment1" }]
+
+        expect do
+          subject
+        end.to raise_error(ActiveRecord::RecordInvalid)
+      end
+    end
+
+    context "when the discussion_checkpoints feature flag is off" do
+      it "does not import sub assignments" do
+        expect(subject.sub_assignments.length).to eq(0)
+      end
+    end
+
+    describe ".find_or_create_sub_assignment" do
+      subject do
+        Importers::AssignmentImporter.find_or_create_sub_assignment(sub_assignment_hash, parent_item)
+      end
+
+      let(:parent_item) { course.assignments.create!(title: "parent_assignment") }
+      let(:sub_assignment_hash) { assignment_hash[:sub_assignments].first }
+
+      context "when a sub assignment already exists with the same id" do
+        before do
+          @existing_sub_assignment = parent_item.sub_assignments.create!(
+            id: sub_assignment_hash[:id],
+            title: "sub_assignment1",
+            sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+            context: parent_item.context
+          )
+        end
+
+        it "does not create a new sub assignment" do
+          expect(subject).to eq(@existing_sub_assignment)
+        end
+      end
+
+      context "when a sub assignment already exists with the same migration id" do
+        before do
+          @existing_sub_assignment = parent_item.sub_assignments.create!(
+            migration_id: sub_assignment_hash[:migration_id],
+            title: "sub_assignment1",
+            sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+            context: parent_item.context
+          )
+        end
+
+        it "returns that sub assignment" do
+          expect(subject).to eq(@existing_sub_assignment)
+        end
+      end
+
+      context "when a sub assignment does not exist" do
+        it "creates a new sub assignment model instance" do
+          expect(subject.id).to be_nil
+        end
+
+        it "properly sets parent_assignment_id" do
+          expect(subject.parent_assignment_id).to eq(parent_item.id)
+        end
+      end
+    end
+  end
 end
