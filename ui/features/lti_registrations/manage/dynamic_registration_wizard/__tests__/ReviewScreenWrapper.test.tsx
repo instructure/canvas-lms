@@ -19,7 +19,7 @@
 import {screen, render} from '@testing-library/react'
 
 import React from 'react'
-import {ReviewScreen} from '../components/ReviewScreen'
+import {ReviewScreenWrapper} from '../components/ReviewScreenWrapper'
 import {mockConfigWithPlacements, mockRegistration} from './helpers'
 import {LtiPlacements, type LtiPlacementWithIcon} from '../../model/LtiPlacement'
 import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
@@ -40,7 +40,7 @@ describe('ReviewScreen', () => {
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
     render(
-      <ReviewScreen
+      <ReviewScreenWrapper
         registration={reg}
         overlayStore={overlayStore}
         transitionToConfirmationState={jest.fn()}
@@ -59,7 +59,7 @@ describe('ReviewScreen', () => {
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
     render(
-      <ReviewScreen
+      <ReviewScreenWrapper
         registration={reg}
         overlayStore={overlayStore}
         transitionToConfirmationState={jest.fn()}
@@ -83,7 +83,7 @@ describe('ReviewScreen', () => {
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
     render(
-      <ReviewScreen
+      <ReviewScreenWrapper
         registration={reg}
         overlayStore={overlayStore}
         transitionToConfirmationState={jest.fn()}
@@ -113,7 +113,7 @@ describe('ReviewScreen', () => {
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
     render(
-      <ReviewScreen
+      <ReviewScreenWrapper
         registration={reg}
         overlayStore={overlayStore}
         transitionToConfirmationState={jest.fn()}
@@ -158,7 +158,7 @@ describe('ReviewScreen', () => {
       }
     })
     render(
-      <ReviewScreen
+      <ReviewScreenWrapper
         registration={reg}
         overlayStore={overlayStore}
         transitionToConfirmationState={jest.fn()}
@@ -189,7 +189,7 @@ describe('ReviewScreen', () => {
       const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
       render(
-        <ReviewScreen
+        <ReviewScreenWrapper
           registration={reg}
           overlayStore={overlayStore}
           transitionToConfirmationState={jest.fn()}
@@ -219,7 +219,7 @@ describe('ReviewScreen', () => {
       const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
       render(
-        <ReviewScreen
+        <ReviewScreenWrapper
           registration={reg}
           overlayStore={overlayStore}
           transitionToConfirmationState={jest.fn()}
@@ -263,7 +263,7 @@ describe('ReviewScreen', () => {
       })
 
       render(
-        <ReviewScreen
+        <ReviewScreenWrapper
           registration={reg}
           overlayStore={overlayStore}
           transitionToConfirmationState={jest.fn()}
@@ -291,7 +291,7 @@ describe('ReviewScreen', () => {
       const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
       render(
-        <ReviewScreen
+        <ReviewScreenWrapper
           registration={reg}
           overlayStore={overlayStore}
           transitionToConfirmationState={jest.fn()}
@@ -318,7 +318,7 @@ describe('ReviewScreen', () => {
       const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
       render(
-        <ReviewScreen
+        <ReviewScreenWrapper
           registration={reg}
           overlayStore={overlayStore}
           transitionToConfirmationState={jest.fn()}
