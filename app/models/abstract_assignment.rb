@@ -2735,7 +2735,7 @@ class AbstractAssignment < ActiveRecord::Base
 
   def groups_and_ungrouped(user, includes: [])
     groups_and_users = group_category
-                       .groups.active.preload(group_memberships: :user)
+                       .groups.active.preload(:users)
                        .map { |g| [g.name, { sortable_name: g.name, users: g.users }] }
     users_in_group = groups_and_users.flat_map { |_, group_info| group_info[:users] }
     groupless_users = visible_students_for_speed_grader(user:, includes:) - users_in_group
