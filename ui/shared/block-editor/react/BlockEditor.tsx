@@ -115,16 +115,20 @@ export default function BlockEditor({
     }
   }, [data.version])
 
-  const handleNodesChange = useCallback((query: any) => {
-    // @ts-expect-error
-    window.block_editor = () => ({
-      query,
-      getBlocks: (): BlockEditorData => ({
-        version: '0.2',
-        blocks: closeExpandedBlocks(query),
-      }),
-    })
-  }, [])
+  const handleNodesChange = useCallback(
+    (query: any) => {
+      // @ts-expect-error
+      window.block_editor = () => ({
+        query,
+        getBlocks: (): BlockEditorData => ({
+          id: data.id || '',
+          version: '0.2',
+          blocks: closeExpandedBlocks(query),
+        }),
+      })
+    },
+    [data.id]
+  )
 
   const handleCloseToolbox = useCallback(() => {
     setToolboxOpen(false)

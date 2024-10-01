@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -18,14 +18,22 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import BlockEditor from './BlockEditor'
 
-import BlockEditorView from './BlockEditorView'
-import {type BlockEditorDataTypes} from './utils/transformations'
+import {type GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+import ready from '@instructure/ready'
+import {BlockEditorView, type BlockEditorDataTypes} from '@canvas/block-editor'
 
-function renderBlockEditorView(content: BlockEditorDataTypes, container: HTMLElement) {
-  ReactDOM.render(<BlockEditorView content={content} />, container)
+declare const ENV: GlobalEnv & {
+  block_editor_attributes: string
 }
 
-export {BlockEditor, BlockEditorView, renderBlockEditorView, type BlockEditorDataTypes}
-export default BlockEditor
+ready(() => {
+  document.documentElement.setAttribute('style', 'overflow: auto;width:100%;height:100%;')
+
+  const block_editor_attributes: BlockEditorDataTypes = JSON.parse(ENV.block_editor_attributes)
+
+  ReactDOM.render(
+    <BlockEditorView content={block_editor_attributes} />,
+    document.getElementById('block_editor_viewer_container') as HTMLElement
+  )
+})
