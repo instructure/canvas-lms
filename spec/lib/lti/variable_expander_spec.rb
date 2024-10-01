@@ -29,7 +29,7 @@ module Lti
     let(:group_category) { course.group_categories.new(name: "Category") }
     let(:group) { course.groups.new(name: "Group", group_category:) }
     let(:user) { User.new }
-    let(:assignment) { Assignment.new }
+    let(:assignment) { Assignment.new(context: course) }
     let(:collaboration) do
       ExternalToolCollaboration.new(
         title: "my collab",
@@ -38,7 +38,7 @@ module Lti
       )
     end
     let(:substitution_helper) { double.as_null_object }
-    let(:right_now) { DateTime.now }
+    let(:right_now) { Time.current }
     let(:tool) do
       shard_mock = double("shard")
       allow(shard_mock).to receive(:settings).and_return({ encription_key: "abc" })
@@ -1967,9 +1967,49 @@ module Lti
             expect(expand!("$Canvas.assignment.lockAt.iso8601")).to eq right_now.utc.iso8601
           end
 
-          it "has substitution for $Canvas.assignment.dueAt.iso8601" do
-            allow(assignment).to receive(:due_at).and_return(right_now)
-            expect(expand!("$Canvas.assignment.dueAt.iso8601")).to eq right_now.utc.iso8601
+          describe "$Canvas.assignment.dueAt.iso8601" do
+            before do
+              course.save!
+              user.save!
+              assignment.update!(course:)
+            end
+
+            context "for student" do
+              before do
+                course.enroll_user(user, "StudentEnrollment")
+              end
+
+              it "is expanded" do
+                assignment.update!(due_at: right_now)
+                expect(expand!("$Canvas.assignment.dueAt.iso8601")).to eq right_now.utc.iso8601
+              end
+
+              it "handles a nil due_at" do
+                assignment.update!(due_at: nil)
+                expect_unexpanded! "$Canvas.assignment.dueAt.iso8601"
+              end
+            end
+
+            context "for teacher" do
+              before do
+                course.enroll_user(user, "TeacherEnrollment")
+                course.enroll_user(User.create!, "StudentEnrollment")
+                course.enroll_user(User.create!, "StudentEnrollment")
+              end
+
+              it "is expanded" do
+                subm1, subm2 = assignment.submissions.to_a
+                subm1.update! cached_due_date: right_now
+                subm2.update! cached_due_date: right_now - 1.day
+                expect(assignment.due_at).to be_nil
+                expect(expand!("$Canvas.assignment.dueAt.iso8601")).to eq right_now.utc.iso8601
+              end
+
+              it "handles a nil due_at" do
+                assignment.update!(due_at: nil)
+                expect_unexpanded! "$Canvas.assignment.dueAt.iso8601"
+              end
+            end
           end
 
           it "has substitution for $Canvas.assignment.allDueAts.iso8601" do
@@ -1985,11 +2025,6 @@ module Lti
           it "handles a nil lock_at" do
             allow(assignment).to receive(:lock_at).and_return(nil)
             expect_unexpanded! "$Canvas.assignment.lockAt.iso8601"
-          end
-
-          it "handles a nil due_at" do
-            allow(assignment).to receive(:lock_at).and_return(nil)
-            expect_unexpanded! "$Canvas.assignment.dueAt.iso8601"
           end
         end
 
