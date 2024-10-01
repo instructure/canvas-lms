@@ -25,6 +25,7 @@ import AudioOptionsTrayDriver from './AudioOptionsTrayDriver'
 import * as contentSelection from '../../../shared/ContentSelection'
 import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
 import bridge from '../../../../../bridge'
+import RCEGlobals from '../../../../RCEGlobals'
 
 const MOCK_AUDIO_PLAYERS = [
   {
@@ -49,6 +50,7 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
   let trayController
 
   beforeEach(() => {
+    RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: true})
     createLiveRegion()
 
     const trayProps = {
@@ -132,6 +134,13 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
   })
 
   describe('#_applyAudioOptions', () => {
+    beforeEach(() => {
+      // container?.contentWindow.location.reload() is not defined in jsdom
+      const iframe = contentSelection.findMediaPlayerIframe(editors[0].selection.getNode())
+      delete iframe.contentWindow.location
+      iframe.contentWindow.location = {reload: jest.fn()}
+    })
+
     it('updates the audio', () => {
       const updateMediaObject = jest.fn().mockResolvedValue()
       trayController.showTrayForEditor(editors[0])
@@ -140,6 +149,27 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
         updateMediaObject,
       })
       expect(updateMediaObject).toHaveBeenCalled()
+    })
+
+    it('does not update the audio w/o a media_object_id', async () => {
+      const updateMediaObject = jest.fn().mockResolvedValue()
+      trayController.showTrayForEditor(editors[0])
+      trayController._applyAudioOptions({
+        media_object_id: undefined,
+        updateMediaObject,
+      })
+      expect(updateMediaObject).not.toHaveBeenCalled()
+    })
+
+    it('does update audio w/o media_object_id if attachment_id present', async () => {
+      const updateMediaObject = jest.fn().mockResolvedValue()
+      trayController.showTrayForEditor(editors[0])
+      trayController._applyAudioOptions({
+        media_object_id: undefined,
+        attachment_id: '123',
+        updateMediaObject,
+      })
+      expect(updateMediaObject).toHaveBeenCalledWith({attachment_id: '123', media_object_id: undefined})
     })
   })
 
@@ -151,7 +181,7 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
     })
   })
 
-  describe.only('#requestSubtitlesFromIframe', () => {
+  describe('#requestSubtitlesFromIframe', () => {
     let previousOrigin = ''
 
     beforeAll(() => {

@@ -52,6 +52,7 @@ export default function AudioOptionsTray({
     onSave({
       media_object_id: audioOptions.id,
       subtitles,
+      attachment_id: audioOptions.attachmentId,
       updateMediaObject: contentProps.updateMediaObject,
     })
   }
