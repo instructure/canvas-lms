@@ -76,7 +76,10 @@ ready(() => {
   window.addEventListener(
     'message',
     event => {
-      if (event?.data?.subject === 'reload_media' && media_id === event?.data?.media_object_id) {
+      if (
+        event?.data?.subject === 'reload_media' &&
+        (media_id === event?.data?.media_object_id || attachment_id === event?.data?.attachment_id)
+      ) {
         document.getElementsByTagName('video')[0].load()
       } else if (event?.data?.subject === 'media_tracks_request') {
         const tracks = mediaTracks?.map(t => ({

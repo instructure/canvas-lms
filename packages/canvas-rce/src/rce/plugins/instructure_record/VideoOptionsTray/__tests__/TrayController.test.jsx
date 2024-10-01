@@ -279,6 +279,27 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       expect(updateMediaObject).not.toHaveBeenCalled()
     })
 
+    it('does update video w/o media_object_id if attachment_id present', async () => {
+      RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: true})
+      const updateMediaObject = jest.fn().mockResolvedValue()
+      trayController.showTrayForEditor(editors[0])
+      trayController._applyVideoOptions({
+        displayAs: 'embed',
+        appliedHeight: '101',
+        appliedWidth: '321',
+        titleText: 'new title',
+        media_object_id: undefined,
+        attachment_id: '123',
+        updateMediaObject,
+      })
+      expect(updateMediaObject).toHaveBeenCalledWith({
+        attachment_id: '123',
+        media_object_id: undefined,
+        subtitles: undefined,
+        title: 'new title',
+      })
+    })
+
     it('does not try to save data to the db on a locked media attachment', () => {
       const updateMediaObject = jest.fn().mockResolvedValue()
       trayController.showTrayForEditor(editors[0])
@@ -326,7 +347,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
     it('posts message to iframe onload', () => {
       const postMessageMock = jest.fn()
       const iframe = contentSelection.findMediaPlayerIframe(editors[0].selection.getNode())
-      iframe.contentWindow.postMessage = postMessageMock;
+      iframe.contentWindow.postMessage = postMessageMock
       trayController.showTrayForEditor(editors[0])
       expect(postMessageMock).toHaveBeenCalledTimes(1)
     })
@@ -334,7 +355,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
     it('cleans up event listener on tray close', () => {
       const postMessageMock = jest.fn()
       const iframe = contentSelection.findMediaPlayerIframe(editors[0].selection.getNode())
-      iframe.contentWindow.postMessage = postMessageMock;
+      iframe.contentWindow.postMessage = postMessageMock
       trayController.showTrayForEditor(editors[0])
       trayController.hideTrayForEditor(editors[0])
       trayController.showTrayForEditor(editors[0])
