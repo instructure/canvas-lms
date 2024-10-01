@@ -184,6 +184,11 @@ module SpeedGrader
           %i[name id sortable_name]
         end
 
+      # yes, this will arbitrarily pick the first enrollment in the course for the user,
+      # but it mirrors what CoursesHelper#user_type does, which we're now passing this value to
+      # in order to avoid an N+1 query problem
+      current_user_enrollments = { current_user.id => course.enrollments.find_by(user: current_user) }
+
       res[:context][:students] =
         students.map do |student|
           json =
@@ -351,7 +356,7 @@ module SpeedGrader
 
           if url_opts[:enable_annotations]
             url_opts[:disable_annotation_notifications] = assignment.post_manually? && !sub.posted?
-            url_opts[:enrollment_type] = canvadocs_user_role(course, current_user)
+            url_opts[:enrollment_type] = canvadocs_user_role(course, current_user, current_user_enrollments)
           end
 
           if quizzes_next_submission?
