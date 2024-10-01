@@ -18,10 +18,9 @@
 
 import React from 'react'
 import $ from 'jquery'
-import {MockedProvider} from '@apollo/react-testing'
 import {render} from '@testing-library/react'
 import {QueryProvider} from '@canvas/query'
-import {setGradebookOptions, setupGraphqlMocks} from './fixtures'
+import {setGradebookOptions, setupCanvasQueries} from './fixtures'
 import EnhancedIndividualGradebookWrapper from '../EnhancedIndividualGradebookWrapper'
 import axios from 'axios'
 import {BrowserRouter, Route, Routes} from 'react-router-dom'
@@ -42,6 +41,8 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
       data: [],
     })
     $.subscribe = jest.fn()
+
+    setupCanvasQueries()
   })
   afterEach(() => {
     jest.spyOn(ReactRouterDom, 'useSearchParams').mockClear()
@@ -50,20 +51,18 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
 
   const renderEnhancedIndividualGradebookWrapper = (mockOverrides = []) => {
     return render(
-      <QueryProvider>
-        <BrowserRouter basename="">
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <MockedProvider mocks={setupGraphqlMocks(mockOverrides)} addTypename={false}>
-                  <EnhancedIndividualGradebookWrapper />
-                </MockedProvider>
-              }
-            />
-          </Routes>
-        </BrowserRouter>
-      </QueryProvider>
+      <BrowserRouter basename="">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <QueryProvider>
+                <EnhancedIndividualGradebookWrapper />
+              </QueryProvider>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
     )
   }
 
