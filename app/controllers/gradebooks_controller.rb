@@ -1031,8 +1031,11 @@ class GradebooksController < ApplicationController
 
     return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
 
-    @assignment = @context.assignments.active.find(params[:assignment_id])
-
+    @assignment = if params[:assignment_id].blank?
+                    nil
+                  else
+                    @context.assignments.active.find(params[:assignment_id])
+                  end
     platform_service_speedgrader_enabled = platform_service_speedgrader_enabled?(params)
     if platform_service_speedgrader_enabled
       @page_title = t("SpeedGrader")
@@ -1048,19 +1051,9 @@ class GradebooksController < ApplicationController
         ENHANCED_RUBRICS_ENABLED: @context.feature_enabled?(:enhanced_rubrics),
         PLATFORM_SERVICE_SPEEDGRADER_ENABLED: platform_service_speedgrader_enabled,
         RESTRICT_QUANTITATIVE_DATA_ENABLED: @context.restrict_quantitative_data?(@current_user),
-        RUBRIC_ASSESSMENT: {
-          assessor_id: @current_user.id.to_s,
-          assessment_type: can_do(@assignment, @current_user, :grade) ? "grading" : "peer_review"
-        },
         course_id: @context.id,
+        late_policy: @context.late_policy&.as_json(include_root: false),
       }
-      if @assignment.active_rubric_association?
-        env[:update_rubric_assessment_url] = context_url(
-          @context,
-          :context_rubric_association_rubric_assessments_url,
-          @assignment.rubric_association
-        )
-      end
       js_env(env)
 
       deferred_js_bundle :platform_speedgrader
