@@ -35,6 +35,7 @@ import type {FormMessage} from '@instructure/ui-form-field'
 import {TextArea} from '@instructure/ui-text-area'
 import {DragDropContext as DragAndDrop, Droppable, Draggable} from 'react-beautiful-dnd'
 import type {DropResult} from 'react-beautiful-dnd'
+import {WarningModal} from './WarningModal'
 
 const I18n = useI18nScope('rubrics-criterion-modal')
 
@@ -116,6 +117,7 @@ export const CriterionModal = ({
   const [savingCriterion, setSavingCriterion] = useState(false)
   const [dragging, setDragging] = useState(false)
   const [checkValidation, setCheckValidation] = useState(false)
+  const [showWarningModal, setShowWarningModal] = useState(false)
 
   const addRating = (index: number) => {
     const isFirstIndex = index === 0
@@ -200,6 +202,20 @@ export const CriterionModal = ({
     setRatings(finalRatings)
   }
 
+  const handleDismiss = () => {
+    const hasRatingsChanged = JSON.stringify(existingRatings) !== JSON.stringify(ratings)
+    const hasDescriptionChanged = existingDescription !== criterionDescription
+    const hasLongDescriptionChanged = existingLongDescription !== criterionLongDescription
+    const hasCriterionUseRangeChanged = existingCriterionUseRange !== criterionUseRange
+    const hasDataChanged =
+      hasRatingsChanged ||
+      hasDescriptionChanged ||
+      hasLongDescriptionChanged ||
+      hasCriterionUseRangeChanged
+
+    hasDataChanged ? setShowWarningModal(true) : onDismiss()
+  }
+
   const handleDragStart = () => {
     setDragging(true)
   }
@@ -256,178 +272,191 @@ export const CriterionModal = ({
   const maxRatingPoints = ratings.length ? Math.max(...ratings.map(r => r.points), 0) : '--'
 
   return (
-    <Modal
-      open={isOpen}
-      onDismiss={onDismiss}
-      width="66.5rem"
-      height="45.125rem"
-      label={I18n.t('Rubric Criterion Modal')}
-      shouldCloseOnDocumentClick={false}
-      data-testid="rubric-criterion-modal"
-    >
-      <Modal.Header>
-        <CloseButton placement="end" offset="small" onClick={onDismiss} screenReaderLabel="Close" />
-        <Heading>{modalTitle}</Heading>
-      </Modal.Header>
-      <Modal.Body>
-        <View as="div" margin="0">
-          <Flex alignItems="start">
-            <View as="span" margin="0 small 0 0" themeOverride={{marginSmall: '1rem'}}>
-              <TextInput
-                renderLabel={I18n.t('Criterion Name')}
-                placeholder={I18n.t('Enter the name')}
-                display="inline-block"
-                width="20.75rem"
-                value={criterionDescription ?? ''}
-                messages={criterionDescriptionErrorMessage}
-                onChange={(e, value) => setCriterionDescription(value)}
-                data-testid="rubric-criterion-name-input"
-              />
-            </View>
-            <View as="span">
-              <TextInput
-                renderLabel={I18n.t('Criterion Description')}
-                placeholder={I18n.t('Enter the description')}
-                display="inline-block"
-                width="41.75rem"
-                value={criterionLongDescription ?? ''}
-                onChange={(e, value) => setCriterionLongDescription(value)}
-                data-testid="rubric-criterion-description-input"
-              />
-            </View>
-          </Flex>
-        </View>
+    <>
+      <WarningModal
+        isOpen={showWarningModal}
+        onDismiss={() => setShowWarningModal(false)}
+        onCancel={onDismiss}
+      />
 
-        <View as="div" margin="medium 0 0 0" themeOverride={{marginMedium: '1.25rem'}}>
-          <Flex>
-            <Flex.Item shouldGrow={true}>
-              {unassessed && criterionUseRangeEnabled && !hidePoints && (
-                <Checkbox
-                  label="Enable Range"
-                  checked={criterionUseRange}
-                  onChange={e => setCriterionUseRange(e.target.checked)}
-                  data-testid="enable-range-checkbox"
+      <Modal
+        open={isOpen}
+        onDismiss={handleDismiss}
+        width="66.5rem"
+        height="45.125rem"
+        label={I18n.t('Rubric Criterion Modal')}
+        shouldCloseOnDocumentClick={false}
+        data-testid="rubric-criterion-modal"
+      >
+        <Modal.Header>
+          <CloseButton
+            placement="end"
+            offset="small"
+            onClick={handleDismiss}
+            screenReaderLabel="Close"
+          />
+          <Heading>{modalTitle}</Heading>
+        </Modal.Header>
+        <Modal.Body>
+          <View as="div" margin="0">
+            <Flex alignItems="start">
+              <View as="span" margin="0 small 0 0" themeOverride={{marginSmall: '1rem'}}>
+                <TextInput
+                  renderLabel={I18n.t('Criterion Name')}
+                  placeholder={I18n.t('Enter the name')}
+                  display="inline-block"
+                  width="20.75rem"
+                  value={criterionDescription ?? ''}
+                  messages={criterionDescriptionErrorMessage}
+                  onChange={(e, value) => setCriterionDescription(value)}
+                  data-testid="rubric-criterion-name-input"
                 />
-              )}
-            </Flex.Item>
-            <Flex.Item>
-              {!hidePoints && (
-                <Heading
-                  level="h2"
-                  as="h2"
-                  themeOverride={{h2FontWeight: 700, h2FontSize: '22px', lineHeight: '1.75rem'}}
-                >
-                  {maxRatingPoints} {I18n.t('Points Possible')}
-                </Heading>
-              )}
-            </Flex.Item>
-          </Flex>
-        </View>
-
-        <View as="div" margin="medium 0 0 0" themeOverride={{marginMedium: '1.25rem'}}>
-          <Flex>
-            <Flex.Item>
-              <View as="div" width="4.125rem">
-                {I18n.t('Display')}
               </View>
-            </Flex.Item>
-            {!hidePoints && (
+              <View as="span">
+                <TextInput
+                  renderLabel={I18n.t('Criterion Description')}
+                  placeholder={I18n.t('Enter the description')}
+                  display="inline-block"
+                  width="41.75rem"
+                  value={criterionLongDescription ?? ''}
+                  onChange={(e, value) => setCriterionLongDescription(value)}
+                  data-testid="rubric-criterion-description-input"
+                />
+              </View>
+            </Flex>
+          </View>
+
+          <View as="div" margin="medium 0 0 0" themeOverride={{marginMedium: '1.25rem'}}>
+            <Flex>
+              <Flex.Item shouldGrow={true}>
+                {unassessed && criterionUseRangeEnabled && !hidePoints && (
+                  <Checkbox
+                    label="Enable Range"
+                    checked={criterionUseRange}
+                    onChange={e => setCriterionUseRange(e.target.checked)}
+                    data-testid="enable-range-checkbox"
+                  />
+                )}
+              </Flex.Item>
               <Flex.Item>
-                <View as="div" width={criterionUseRange ? '12.375rem' : '8.875rem'}>
-                  {criterionUseRange ? I18n.t('Point Range') : I18n.t('Points')}
+                {!hidePoints && (
+                  <Heading
+                    level="h2"
+                    as="h2"
+                    themeOverride={{h2FontWeight: 700, h2FontSize: '22px', lineHeight: '1.75rem'}}
+                  >
+                    {maxRatingPoints} {I18n.t('Points Possible')}
+                  </Heading>
+                )}
+              </Flex.Item>
+            </Flex>
+          </View>
+
+          <View as="div" margin="medium 0 0 0" themeOverride={{marginMedium: '1.25rem'}}>
+            <Flex>
+              <Flex.Item>
+                <View as="div" width="4.125rem">
+                  {I18n.t('Display')}
                 </View>
               </Flex.Item>
-            )}
-            <Flex.Item>
-              <View as="div" width="8.875rem" margin={hidePoints ? '0 0 0 x-large' : '0'}>
-                {I18n.t('Rating Name')}
-              </View>
+              {!hidePoints && (
+                <Flex.Item>
+                  <View as="div" width={criterionUseRange ? '12.375rem' : '8.875rem'}>
+                    {criterionUseRange ? I18n.t('Point Range') : I18n.t('Points')}
+                  </View>
+                </Flex.Item>
+              )}
+              <Flex.Item>
+                <View as="div" width="8.875rem" margin={hidePoints ? '0 0 0 x-large' : '0'}>
+                  {I18n.t('Rating Name')}
+                </View>
+              </Flex.Item>
+              <Flex.Item>
+                <View as="div" margin="0 0 0 small" themeOverride={{marginSmall: '1rem'}}>
+                  {I18n.t('Rating Description')}
+                </View>
+              </Flex.Item>
+            </Flex>
+          </View>
+
+          <View as="div" position="relative">
+            {!hidePoints && <DragVerticalLineBreak criterionUseRange={criterionUseRange} />}
+            <DragAndDrop onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+              <Droppable droppableId="droppable-id">
+                {provided => {
+                  return (
+                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                      {ratings.map((rating, index) => {
+                        const scale = ratings.length - (index + 1)
+                        const rangeStart = rangingFrom(ratings, index)
+
+                        return (
+                          // eslint-disable-next-line react/no-array-index-key
+                          <View as="div" key={`rating-row-${rating.id}-${index}`}>
+                            <AddRatingRow
+                              onClick={() => addRating(index)}
+                              unassessed={unassessed}
+                              isDragging={dragging}
+                            />
+                            <RatingRow
+                              index={index}
+                              checkValidation={checkValidation}
+                              hidePoints={hidePoints}
+                              rating={rating}
+                              scale={scale}
+                              showRemoveButton={ratings.length > 1}
+                              criterionUseRange={criterionUseRange}
+                              rangeStart={rangeStart}
+                              unassessed={unassessed}
+                              onRemove={() => removeRating(index)}
+                              onChange={updatedRating => updateRating(index, updatedRating)}
+                              onPointsBlur={reorderRatings}
+                            />
+                          </View>
+                        )
+                      })}
+                      <AddRatingRow
+                        onClick={() => addRating(ratings.length)}
+                        unassessed={unassessed}
+                        isDragging={dragging}
+                      />
+                      {provided.placeholder}
+                    </div>
+                  )
+                }}
+              </Droppable>
+            </DragAndDrop>
+          </View>
+        </Modal.Body>
+        <Modal.Footer>
+          <Flex width="100%">
+            <Flex.Item shouldShrink={true} shouldGrow={true}>
+              {/* <Checkbox label={I18n.t('Save this rating scale as default')} value="medium" /> */}
             </Flex.Item>
             <Flex.Item>
-              <View as="div" margin="0 0 0 small" themeOverride={{marginSmall: '1rem'}}>
-                {I18n.t('Rating Description')}
-              </View>
+              <Button
+                margin="0 x-small 0 0"
+                onClick={handleDismiss}
+                data-testid="rubric-criterion-cancel"
+              >
+                {I18n.t('Cancel')}
+              </Button>
+            </Flex.Item>
+            <Flex.Item>
+              <Button
+                color="primary"
+                type="submit"
+                disabled={savingCriterion}
+                onClick={() => saveChanges()}
+                data-testid="rubric-criterion-save"
+              >
+                {I18n.t('Save Criterion')}
+              </Button>
             </Flex.Item>
           </Flex>
-        </View>
-
-        <View as="div" position="relative">
-          {!hidePoints && <DragVerticalLineBreak criterionUseRange={criterionUseRange} />}
-          <DragAndDrop onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-            <Droppable droppableId="droppable-id">
-              {provided => {
-                return (
-                  <div ref={provided.innerRef} {...provided.droppableProps}>
-                    {ratings.map((rating, index) => {
-                      const scale = ratings.length - (index + 1)
-                      const rangeStart = rangingFrom(ratings, index)
-
-                      return (
-                        // eslint-disable-next-line react/no-array-index-key
-                        <View as="div" key={`rating-row-${rating.id}-${index}`}>
-                          <AddRatingRow
-                            onClick={() => addRating(index)}
-                            unassessed={unassessed}
-                            isDragging={dragging}
-                          />
-                          <RatingRow
-                            index={index}
-                            checkValidation={checkValidation}
-                            hidePoints={hidePoints}
-                            rating={rating}
-                            scale={scale}
-                            showRemoveButton={ratings.length > 1}
-                            criterionUseRange={criterionUseRange}
-                            rangeStart={rangeStart}
-                            unassessed={unassessed}
-                            onRemove={() => removeRating(index)}
-                            onChange={updatedRating => updateRating(index, updatedRating)}
-                            onPointsBlur={reorderRatings}
-                          />
-                        </View>
-                      )
-                    })}
-                    <AddRatingRow
-                      onClick={() => addRating(ratings.length)}
-                      unassessed={unassessed}
-                      isDragging={dragging}
-                    />
-                    {provided.placeholder}
-                  </div>
-                )
-              }}
-            </Droppable>
-          </DragAndDrop>
-        </View>
-      </Modal.Body>
-      <Modal.Footer>
-        <Flex width="100%">
-          <Flex.Item shouldShrink={true} shouldGrow={true}>
-            {/* <Checkbox label={I18n.t('Save this rating scale as default')} value="medium" /> */}
-          </Flex.Item>
-          <Flex.Item>
-            <Button
-              margin="0 x-small 0 0"
-              onClick={onDismiss}
-              data-testid="rubric-criterion-cancel"
-            >
-              {I18n.t('Cancel')}
-            </Button>
-          </Flex.Item>
-          <Flex.Item>
-            <Button
-              color="primary"
-              type="submit"
-              disabled={savingCriterion}
-              onClick={() => saveChanges()}
-              data-testid="rubric-criterion-save"
-            >
-              {I18n.t('Save Criterion')}
-            </Button>
-          </Flex.Item>
-        </Flex>
-      </Modal.Footer>
-    </Modal>
+        </Modal.Footer>
+      </Modal>
+    </>
   )
 }
 
