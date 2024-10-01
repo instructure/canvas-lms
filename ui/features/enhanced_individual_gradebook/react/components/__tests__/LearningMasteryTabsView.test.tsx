@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {MockedProvider} from '@apollo/react-testing'
 import {QueryProvider, queryClient} from '@canvas/query'
 import userSettings from '@canvas/user-settings'
 import {fireEvent, render, within} from '@testing-library/react'
@@ -27,7 +26,7 @@ import * as ReactRouterDom from 'react-router-dom'
 import {BrowserRouter, Route, Routes} from 'react-router-dom'
 import {GradebookSortOrder} from '../../../types/gradebook.d'
 import LearningMasteryTabsView from '../LearningMasteryTabsView'
-import {OUTCOME_ROLLUP_QUERY_RESPONSE, setGradebookOptions, setupGraphqlMocks} from './fixtures'
+import {OUTCOME_ROLLUP_QUERY_RESPONSE, setGradebookOptions, setupCanvasQueries} from './fixtures'
 
 jest.mock('axios') // mock axios for final grade override helper API call
 jest.mock('@canvas/do-fetch-api-effect', () => jest.fn()) // mock doFetchApi for final grade override helper API call
@@ -70,6 +69,8 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
       data: [],
     })
     $.subscribe = jest.fn()
+
+    setupCanvasQueries()
   })
   afterEach(() => {
     jest.spyOn(ReactRouterDom, 'useSearchParams').mockClear()
@@ -78,20 +79,18 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
 
   const renderLearningMasteryGradebookWrapper = (mockOverrides = []) => {
     return render(
-      <QueryProvider>
-        <BrowserRouter basename="">
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <MockedProvider mocks={setupGraphqlMocks(mockOverrides)} addTypename={false}>
-                  <LearningMasteryTabsView />
-                </MockedProvider>
-              }
-            />
-          </Routes>
-        </BrowserRouter>
-      </QueryProvider>
+      <BrowserRouter basename="">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <QueryProvider>
+                <LearningMasteryTabsView />
+              </QueryProvider>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
     )
   }
 

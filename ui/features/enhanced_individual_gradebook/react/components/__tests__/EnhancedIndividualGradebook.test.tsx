@@ -19,9 +19,9 @@
 import React from 'react'
 import $ from 'jquery'
 import axios from 'axios'
-import {MockedProvider} from '@apollo/react-testing'
+import {QueryProvider} from '@canvas/query'
 import {render, within, fireEvent} from '@testing-library/react'
-import {setGradebookOptions, setupGraphqlMocks} from './fixtures'
+import {setGradebookOptions, setupCanvasQueries} from './fixtures'
 import {BrowserRouter, Route, Routes} from 'react-router-dom'
 import EnhancedIndividualGradebook from '../EnhancedIndividualGradebook'
 import userSettings from '@canvas/user-settings'
@@ -71,6 +71,8 @@ describe('Enhanced Individual Gradebook', () => {
       data: [],
     })
     $.subscribe = jest.fn()
+
+    setupCanvasQueries()
   })
   afterEach(() => {
     jest.spyOn(ReactRouterDom, 'useSearchParams').mockClear()
@@ -84,9 +86,9 @@ describe('Enhanced Individual Gradebook', () => {
           <Route
             path="/"
             element={
-              <MockedProvider mocks={setupGraphqlMocks(mockOverrides)} addTypename={false}>
+              <QueryProvider>
                 <EnhancedIndividualGradebook />
-              </MockedProvider>
+              </QueryProvider>
             }
           />
         </Routes>

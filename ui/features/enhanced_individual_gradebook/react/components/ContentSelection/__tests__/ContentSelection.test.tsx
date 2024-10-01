@@ -16,25 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {MockedProvider} from '@apollo/react-testing'
 import {render} from '@testing-library/react'
-import ContentSelection from '..'
+import ContentSelection, {type ContentSelectionComponentProps} from '..'
 import {
   defaultSortableAssignments,
   defaultSortableStudents,
   makeContentSelectionProps,
 } from './fixtures'
 import userEvent from '@testing-library/user-event'
+import {QueryProvider} from '@canvas/query'
+import {setupCanvasQueries} from '../../__tests__/fixtures'
 
 describe('Content Selection', () => {
+  beforeEach(() => {
+    setupCanvasQueries()
+  })
+
+  const renderComponent = (props: ContentSelectionComponentProps) => {
+    return render(
+      <QueryProvider>
+        <ContentSelection {...props} />
+      </QueryProvider>
+    )
+  }
+
   describe('student dropdown', () => {
     it('displays the sortableName in the student dropdown', () => {
       const props = makeContentSelectionProps({students: defaultSortableStudents})
-      const {getByTestId} = render(
-        <MockedProvider>
-          <ContentSelection {...props} />
-        </MockedProvider>
-      )
+      const {getByTestId} = renderComponent(props)
       const studentDropdown = getByTestId('content-selection-student-select')
       expect(studentDropdown).toHaveTextContent('Last, First')
       expect(studentDropdown).toHaveTextContent('Last2, First2')
@@ -45,11 +54,7 @@ describe('Content Selection', () => {
         students: defaultSortableStudents,
         assignments: defaultSortableAssignments,
       })
-      const {getByTestId} = render(
-        <MockedProvider>
-          <ContentSelection {...props} />
-        </MockedProvider>
-      )
+      const {getByTestId} = renderComponent(props)
       await userEvent.click(getByTestId('next-student-button'))
       await userEvent.click(getByTestId('next-student-button'))
       await userEvent.click(getByTestId('next-student-button'))
@@ -62,11 +67,7 @@ describe('Content Selection', () => {
         students: defaultSortableStudents,
         assignments: defaultSortableAssignments,
       })
-      const {getByTestId} = render(
-        <MockedProvider>
-          <ContentSelection {...props} />
-        </MockedProvider>
-      )
+      const {getByTestId} = renderComponent(props)
       await userEvent.click(getByTestId('next-student-button'))
       await userEvent.click(getByTestId('previous-student-button'))
       expect(getByTestId('previous-student-button')).toBeDisabled()
@@ -78,11 +79,7 @@ describe('Content Selection', () => {
         students: defaultSortableStudents,
         assignments: defaultSortableAssignments,
       })
-      const {getByTestId} = render(
-        <MockedProvider>
-          <ContentSelection {...props} />
-        </MockedProvider>
-      )
+      const {getByTestId} = renderComponent(props)
       await userEvent.click(getByTestId('next-assignment-button'))
       await userEvent.click(getByTestId('next-assignment-button'))
       await userEvent.click(getByTestId('next-assignment-button'))
@@ -95,11 +92,7 @@ describe('Content Selection', () => {
         students: defaultSortableStudents,
         assignments: defaultSortableAssignments,
       })
-      const {getByTestId} = render(
-        <MockedProvider>
-          <ContentSelection {...props} />
-        </MockedProvider>
-      )
+      const {getByTestId} = renderComponent(props)
       await userEvent.click(getByTestId('next-assignment-button'))
       await userEvent.click(getByTestId('previous-assignment-button'))
       expect(getByTestId('previous-assignment-button')).toBeDisabled()
@@ -114,11 +107,7 @@ describe('Content Selection', () => {
         selectedStudentId: null,
         assignments: defaultSortableAssignments,
       })
-      const {getByTestId} = render(
-        <MockedProvider>
-          <ContentSelection {...props} />
-        </MockedProvider>
-      )
+      const {getByTestId} = renderComponent(props)
       const assignmentDropdown = getByTestId('content-selection-assignment-select')
       expect(assignmentDropdown).toHaveTextContent('Assignment 1')
     })
@@ -129,11 +118,7 @@ describe('Content Selection', () => {
         selectedStudentId: '1',
         assignments: defaultSortableAssignments,
       })
-      const {getByTestId} = render(
-        <MockedProvider>
-          <ContentSelection {...props} />
-        </MockedProvider>
-      )
+      const {getByTestId} = renderComponent(props)
       const assignmentDropdown = getByTestId('content-selection-assignment-select')
       expect(assignmentDropdown).not.toHaveTextContent('Assignment 1')
     })
