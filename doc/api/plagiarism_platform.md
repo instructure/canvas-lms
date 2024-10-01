@@ -180,7 +180,7 @@ HTTPS Webhooks will be transmitted over HTTPS via a POST request with a content 
 
 SQS Webhooks will contain the same JSON body as the body of the SQS Message.
 
-For additional field definitions and example JSON payloads, see the documentation for assignment_updated, submission_created, and submission_updated event types in the Canvas Data Services LTI Tool, or on S3 here: <a href="https://d1raj86qipxohr.cloudfront.net/production/canvas/event-types/assignment_updated.json">assignment_updated</a>, <a href="https://d1raj86qipxohr.cloudfront.net/production/canvas/event-types/submission_created.json">submission_created</a>, <a href="https://d1raj86qipxohr.cloudfront.net/production/canvas/event-types/submission_updated.json">submission_updated</a>
+For additional field definitions and example JSON payloads, refer to the documentation for the `assignment_updated`, `submission_created`, and `submission_updated` event types in Canvas Data Services, specifically under <a href="file.data_service_canvas_assignment.html" target="_blank">Assignment</a> and <a href="file.data_service_canvas_submission.html" target="_blank">Submission</a> Event Format.
 
 ### 3. Originality Reports
 Once the TP has been notified of a new submission (see section 2.2), it may access the submission through the <a href="plagiarism_detection_submissions.html">Canvas LTI Submissions API</a> for processing. The payload from this request will contain URLs for retrieving the submission’s attachment.
