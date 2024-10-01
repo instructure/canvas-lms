@@ -28,6 +28,7 @@ class CC::Importer::CCWorker < Canvas::Migration::Worker::Base
       settings[:content_migration_id] = migration_id
       settings[:user_id] = cm.user_id
       settings[:content_migration] = cm
+      settings[:is_discussion_checkpoints_enabled] = discussion_checkpoints_enabled?(cm)
 
       if cm.attachment
         settings[:attachment_id] = cm.attachment.id
@@ -86,6 +87,10 @@ class CC::Importer::CCWorker < Canvas::Migration::Worker::Base
     rescue => e
       cm&.fail_with_error!(e)
     end
+  end
+
+  def discussion_checkpoints_enabled?(content_migration)
+    content_migration&.context&.root_account&.feature_enabled?(:discussion_checkpoints) || false
   end
 
   def self.enqueue(content_migration)

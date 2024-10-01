@@ -73,6 +73,11 @@ describe "Common Cartridge exporting" do
       @manifest_doc = Nokogiri::XML.parse(@manifest_body)
     end
 
+    def run_export_without_file_parse(opts = {})
+      @ce.export(opts, synchronous: true)
+      expect(@ce.error_messages).to eq []
+    end
+
     def mig_id(obj)
       CC::CCHelper.create_key(obj, global: true)
     end
@@ -1483,6 +1488,36 @@ describe "Common Cartridge exporting" do
             doc = Nokogiri::XML.parse(@zip_file.read("#{assignment_id}/assignment_settings.xml"))
             expect(doc).to_not be_nil
           end
+        end
+      end
+    end
+
+    describe "setting is_discussion_checkpoints_enabled ff on BP export" do
+      subject { run_export_without_file_parse }
+
+      before do
+        @ce.update!(export_type: ContentExport::COURSE_TEMPLATE_COPY)
+      end
+
+      context "when is_discussion_checkpoints_enabled is disabled" do
+        let(:expected_settings) { { is_discussion_checkpoints_enabled: false } }
+
+        before { @course.root_account.disable_feature!(:discussion_checkpoints) }
+
+        it "calls converter_class with proper settings" do
+          expect(CC::Importer::Canvas::Converter).to receive(:new).with(hash_including(expected_settings)).and_call_original
+          subject
+        end
+      end
+
+      context "when is_discussion_checkpoints_enabled is enabled" do
+        let(:expected_settings) { { is_discussion_checkpoints_enabled: true } }
+
+        before { @course.root_account.enable_feature!(:discussion_checkpoints) }
+
+        it "calls converter_class with proper settings" do
+          expect(CC::Importer::Canvas::Converter).to receive(:new).with(hash_including(expected_settings)).and_call_original
+          subject
         end
       end
     end
