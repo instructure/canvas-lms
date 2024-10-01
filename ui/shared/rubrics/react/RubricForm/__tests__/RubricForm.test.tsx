@@ -25,6 +25,7 @@ import {RUBRIC_CRITERIA_IGNORED_FOR_SCORING, RUBRICS_QUERY_RESPONSE} from './fix
 import * as RubricFormQueries from '../queries/RubricFormQueries'
 import FindDialog from '@canvas/outcomes/backbone/views/FindDialog'
 import {reorder} from '../CriterionModal'
+import {WarningModal} from '../WarningModal'
 
 const saveRubricMock = jest.fn()
 jest.mock('../queries/RubricFormQueries', () => ({
@@ -677,6 +678,65 @@ describe('RubricForm Tests', () => {
       expect(queryByTestId('hide-outcome-results-checkbox')).not.toBeInTheDocument()
       expect(queryByTestId('use-for-grading-checkbox')).not.toBeInTheDocument()
       expect(queryByTestId('hide-score-total-checkbox')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('WarningModal', () => {
+    const onDismissMock = jest.fn()
+    const onCancelMock = jest.fn()
+
+    beforeEach(() => {
+      jest.clearAllMocks()
+    })
+
+    it('renders correctly when open', () => {
+      const {getByTestId, getByText} = render(
+        <WarningModal isOpen={true} onDismiss={onDismissMock} onCancel={onCancelMock} />
+      )
+
+      expect(getByTestId('rubric-assignment-exit-warning-modal')).toBeInTheDocument()
+      expect(getByText('Warning')).toBeInTheDocument()
+      expect(
+        getByText('You are about to exit the rubric editor. Any unsaved changes will be lost.')
+      ).toBeInTheDocument()
+      expect(getByText('Exit')).toBeInTheDocument()
+      expect(getByText('Cancel')).toBeInTheDocument()
+    })
+
+    it('does not render when isOpen is false', () => {
+      const {queryByTestId} = render(
+        <WarningModal isOpen={false} onDismiss={onDismissMock} onCancel={onCancelMock} />
+      )
+
+      expect(queryByTestId('rubric-assignment-exit-warning-modal')).toBeNull()
+    })
+
+    it('calls onDismiss when the close button is clicked', () => {
+      const {getByText} = render(
+        <WarningModal isOpen={true} onDismiss={onDismissMock} onCancel={onCancelMock} />
+      )
+
+      fireEvent.click(getByText('Cancel'))
+      expect(onDismissMock).toHaveBeenCalled()
+    })
+
+    it('calls onCancel when the Cancel button is clicked', () => {
+      const {getByTestId} = render(
+        <WarningModal isOpen={true} onDismiss={onDismissMock} onCancel={onCancelMock} />
+      )
+
+      fireEvent.click(getByTestId('exit-rubric-warning-button'))
+      expect(onCancelMock).toHaveBeenCalled()
+    })
+
+    it('calls onCancel and onDismiss when the Exit button is clicked', () => {
+      const {getByText} = render(
+        <WarningModal isOpen={true} onDismiss={onDismissMock} onCancel={onCancelMock} />
+      )
+
+      fireEvent.click(getByText('Exit'))
+      expect(onDismissMock).toHaveBeenCalled()
+      expect(onCancelMock).toHaveBeenCalled()
     })
   })
 })

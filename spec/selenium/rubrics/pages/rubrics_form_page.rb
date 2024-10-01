@@ -55,6 +55,10 @@ class RubricsForm
       f("[data-testid='cancel-rubric-save-button']")
     end
 
+    def warning_exit_rubric_button
+      f("[data-testid='exit-rubric-warning-button']")
+    end
+
     def save_as_draft_button
       f("[data-testid='save-as-draft-button']")
     end
