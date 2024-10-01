@@ -17,59 +17,36 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {useState, useMemo} from 'react'
-import useWindowWidth from './useWindowWidth'
+import React, {useState} from 'react'
+import useWindowWidth from '../useWindowWidth'
+import {PreviousArrow, NextArrow} from './Arrows'
+import {settings, calculateArrowDisableIndex} from './utils'
 import Slider from 'react-slick'
 import 'slick-carousel/slick/slick.css'
 
-import {IconButton} from '@instructure/ui-buttons'
-import {IconArrowOpenStartLine, IconArrowOpenEndLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Img} from '@instructure/ui-img'
 import {Link} from '@instructure/ui-link'
 
-import type {Badges} from '../../model/Product'
+import type {Badges} from '../../../model/Product'
+import type {Settings} from 'react-slick'
 
 const I18n = useI18nScope('lti_registrations')
 
 type BadgeCarouselProps = {
   badges: Badges[]
+  customSettings?: Partial<Settings>
 }
 
 function BadgeCarousel(props: BadgeCarouselProps) {
   const {badges} = props
-  const windowSize = useWindowWidth()
   const slider = React.useRef<Slider>(null)
+  const windowSize = useWindowWidth()
+  const updatedSettings = settings(badges)
+  const updatedArrowDisableIndex = calculateArrowDisableIndex(badges, windowSize)
 
   const [currentSlideNumber, setCurrentSlideNumber] = useState(0)
-
-  const settings = useMemo(() => {
-    return {
-      dots: false,
-      infinite: false,
-      slidesToShow: (badges || []).length >= 3 ? 3 : (badges || []).length,
-      slidesToScroll: 1,
-      arrows: false,
-      responsive: [
-        {
-          breakpoint: 760,
-          settings: {
-            slidesToShow: 2,
-            slidesToScroll: 1,
-            initialSlide: 1,
-          },
-        },
-        {
-          breakpoint: 360,
-          settings: {
-            slidesToShow: 1,
-            slidesToScroll: 1,
-          },
-        },
-      ],
-    }
-  }, [badges])
 
   const renderBadges = () => {
     return badges.map((badge, i) => (
@@ -97,21 +74,6 @@ function BadgeCarousel(props: BadgeCarouselProps) {
     ))
   }
 
-  const arrowDisablePerBreakpoint = useMemo(() => {
-    const l = badges.length
-    if (windowSize <= 360 && l === 2) {
-      return l - 1
-    } else if (windowSize <= 360) {
-      return l - 1
-    } else if (windowSize <= 760 && windowSize > 360) {
-      return l - 2
-    } else if (windowSize >= 760 && l === 2) {
-      return l - 2
-    } else {
-      return l - 3
-    }
-  }, [badges, windowSize])
-
   return (
     <div>
       <Flex margin="medium 0 small 0">
@@ -121,37 +83,22 @@ function BadgeCarousel(props: BadgeCarouselProps) {
           </Text>
         </Flex.Item>
         {badges.length > 1 && (
-          <Flex.Item align="start">
-            <IconButton
-              screenReaderLabel={I18n.t('Carousel Previous Badge Button')}
-              withBackground={false}
-              withBorder={false}
-              color="secondary"
-              onClick={() => slider?.current?.slickPrev()}
-              interaction={currentSlideNumber === 0 ? 'disabled' : 'enabled'}
-            >
-              <IconArrowOpenStartLine />
-            </IconButton>
-            <IconButton
-              screenReaderLabel={I18n.t('Carousel Next Badge Button')}
-              withBackground={false}
-              withBorder={false}
-              color="secondary"
-              onClick={() => slider?.current?.slickNext()}
-              interaction={
-                currentSlideNumber === arrowDisablePerBreakpoint ? 'disabled' : 'enabled'
-              }
-            >
-              <IconArrowOpenEndLine />
-            </IconButton>
-          </Flex.Item>
+          <Flex direction="row">
+            <PreviousArrow currentSlideNumber={currentSlideNumber} slider={slider} />
+            <NextArrow
+              currentSlideNumber={currentSlideNumber}
+              slider={slider}
+              updatedArrowDisableIndex={updatedArrowDisableIndex.type}
+            />
+          </Flex>
         )}
       </Flex>
       <Flex>
         <Flex.Item>
           <Slider
             ref={slider}
-            {...settings}
+            {...updatedSettings}
+            {...props.customSettings}
             beforeChange={(currentSlide: number, nextSlide: number) =>
               setCurrentSlideNumber(nextSlide)
             }

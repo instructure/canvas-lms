@@ -46,7 +46,7 @@ export const NextArrow = (props: NextArrowProps) => {
     <Flex.Item>
       <div>
         <IconButton
-          screenReaderLabel={I18n.t('Carousel Next Screenshot Button')}
+          screenReaderLabel={I18n.t('Carousel Next Item Button')}
           withBackground={false}
           withBorder={false}
           color="secondary"
@@ -67,7 +67,7 @@ export const PreviousArrow = (props: PreviousArrowProps) => {
     <Flex.Item>
       <div style={{marginRight: '0.8rem'}}>
         <IconButton
-          screenReaderLabel={I18n.t('Carousel Previous Screenshot Button')}
+          screenReaderLabel={I18n.t('Carousel Previous Item Button')}
           withBackground={false}
           withBorder={false}
           color="secondary"

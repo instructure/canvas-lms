@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {calculateArrowDisableIndex} from '../ImageCarousel/utils'
+import {calculateArrowDisableIndex} from '../Carousels/utils'
 
 describe('calculateArrowDisableIndex', () => {
   it('should return the correct index for a window size of 360 and 2 screenshots', () => {

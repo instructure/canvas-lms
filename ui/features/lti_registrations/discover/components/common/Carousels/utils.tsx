@@ -15,15 +15,18 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+import type {Badges, Product} from '../../../model/Product'
+
 interface Settings {
   [key: string]: number | boolean | Array<number> | Object
 }
 
-export const settings = (screenshots: string[]): Settings => {
+export const settings = (items: string[] | Badges[] | Product[]): Settings => {
   return {
     dots: false,
     infinite: false,
-    slidesToShow: screenshots.length > 3 ? 3 : screenshots?.length,
+    slidesToShow: items.length > 3 ? 3 : items?.length,
     slidesToScroll: 1,
     arrows: false,
     responsive: [
@@ -47,10 +50,10 @@ export const settings = (screenshots: string[]): Settings => {
 }
 
 export const calculateArrowDisableIndex = (
-  screenshots: string[],
+  items: string[] | Badges[] | Product[],
   windowSize: number
 ): {type: number} => {
-  const total = screenshots.length
+  const total = items.length
   if (windowSize <= 360 && total === 2) {
     return {type: total - 1}
   } else if (windowSize <= 360) {
