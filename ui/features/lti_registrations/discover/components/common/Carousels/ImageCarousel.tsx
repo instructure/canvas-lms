@@ -17,8 +17,8 @@
  */
 
 import React, {useState} from 'react'
-import type {Settings} from 'react-slick'
 import Slider from 'react-slick'
+import type {Settings} from 'react-slick'
 import 'slick-carousel/slick/slick.css'
 
 import {Flex} from '@instructure/ui-flex'

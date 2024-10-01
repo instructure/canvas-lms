@@ -39,10 +39,9 @@ import {
   IconQuizTitleLine,
 } from '@instructure/ui-icons'
 import LtiDetailModal from './LtiDetailModal'
-import ProductCarousel from '../common/ProductCarousel'
-import ImageCarousel from '../common/ImageCarousel/ImageCarousel'
-import BadgeCarousel from '../common/BadgeCarousel'
-import Disclaimer from '../common/Disclaimer'
+import ProductCarousel from '../common/Carousels/ProductCarousel'
+import ImageCarousel from '../common/Carousels/ImageCarousel'
+import BadgeCarousel from '../common/Carousels/BadgeCarousel'
 
 import {openDynamicRegistrationWizard} from '../../../manage/registration_wizard/RegistrationWizardModalState'
 
@@ -298,7 +297,7 @@ const ProductDetail = () => {
             {product.badges.length > 0 && <BadgeCarousel badges={product?.badges} />}
             {(excludeCurrentProduct?.length ?? 0) > 0 && (
               <ProductCarousel
-                products={excludeCurrentProduct}
+                products={excludeCurrentProduct ?? []}
                 companyName={product.company.name}
               />
             )}
