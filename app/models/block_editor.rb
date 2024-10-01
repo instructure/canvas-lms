@@ -27,4 +27,8 @@ class BlockEditor < ActiveRecord::Base
   def set_root_account_id
     self.root_account_id = context&.root_account_id unless root_account_id
   end
+
+  def viewer_iframe_html
+    "<iframe class='block_editor_view' src='#{Rails.application.routes.url_helpers.block_editor_path(id)}' />".html_safe # rubocop:disable Rails/OutputSafety
+  end
 end
