@@ -1407,19 +1407,12 @@ EditView.prototype.saveFormData = function () {
 }
 
 EditView.prototype.submit = function (event) {
-  let missingDateDialog, sections
+  let missingDateDialog
   event.preventDefault()
   event.stopPropagation()
   this.cacheAssignmentSettings()
   if (this.dueDateOverrideView.containsSectionsWithoutOverrides()) {
-    sections = this.dueDateOverrideView.sectionsWithoutOverrides()
     missingDateDialog = new MissingDateDialog({
-      validationFn() {
-        return sections
-      },
-      labelFn(section) {
-        return section.get('name')
-      },
       success: (function (_this) {
         return function (dateDialog) {
           dateDialog.dialog('close').remove()

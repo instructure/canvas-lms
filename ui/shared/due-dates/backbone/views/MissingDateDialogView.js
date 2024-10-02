@@ -42,7 +42,7 @@ MissingDateDialogView.prototype.dialogTitle =
 
 MissingDateDialogView.prototype.initialize = function (options) {
   MissingDateDialogView.__super__.initialize.apply(this, arguments)
-  this.validationFn = options.validationFn
+  this.validationFn = options.validationFn || function () {}
   this.labelFn = options.labelFn || this.defaultLabelFn
   return (this.success = options.success)
 }
@@ -56,46 +56,13 @@ MissingDateDialogView.prototype.render = function () {
   if (this.invalidFields === true) {
     return false
   } else {
-    const mappedSectionNames = this.invalidFields.map((index, input) => this.labelFn(index, input))
-
-    // Convert to array if jquery object
-    if (this.invalidFields.jquery) {
-      this.invalidSectionNames = mappedSectionNames.get()
-    } else {
-      this.invalidSectionNames = mappedSectionNames
-    }
     this.showDialog()
     return this
   }
 }
 
-MissingDateDialogView.prototype.getInvalidFields = function () {
-  const invalidDates = this.$dateFields.filter(date => $(date).val() === '')
-  const sectionNames = invalidDates.map(this.labelFn)
-  if (sectionNames.length > 0) {
-    return [invalidDates, sectionNames]
-  } else {
-    return false
-  }
-}
-
 MissingDateDialogView.prototype.showDialog = function () {
-  const description = I18n.t(
-    'missingDueDate',
-    {
-      one: '%{sections} does not have a due date assigned.',
-      other: '%{sections} do not have a due date assigned.',
-    },
-    {
-      sections: '',
-      count: this.invalidSectionNames.length,
-    }
-  )
-  const tpl = template({
-    description,
-    sections: this.invalidSectionNames,
-  })
-  this.$dialog = $(tpl)
+  this.$dialog = $(template())
     .dialog({
       dialogClass: 'dialog-warning',
       draggable: false,

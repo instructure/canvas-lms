@@ -1219,10 +1219,7 @@ describe "discussions" do
         it "shows warning when not all sections are assigned" do
           f("button[data-testid='save-and-publish-button']").click
 
-          expect(fj("span:contains('Not all sections will be assigned this item.')")).to be_present
-          course.course_sections.each do |section|
-            expect(fj("span:contains('#{section.name}')")).to be_present
-          end
+          expect(fj("span:contains('Not everyone will be assigned this item!')")).to be_present
         end
 
         it "shows warning when not all sections are assigned but then, continues to create the discussion topic" do
@@ -1232,7 +1229,7 @@ describe "discussions" do
 
           f("button[data-testid='save-and-publish-button']").click
 
-          expect(fj("span:contains('Not all sections will be assigned this item.')")).to be_present
+          expect(fj("span:contains('Not everyone will be assigned this item!')")).to be_present
 
           f("button[data-testid='continue-button']").click
           wait_for_ajaximations
