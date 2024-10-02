@@ -120,7 +120,7 @@ describe "discussions overrides" do
       f(".form-actions button[type=submit]").click
       wait_for_ajaximations
       expect(fj('.ui-dialog:contains("Warning")')).to be_present
-      expect(fj('.ui-dialog:contains("Warning")').text).to include("Not all sections will be assigned this item")
+      expect(fj('.ui-dialog:contains("Warning")').text).to include("Not everyone will be assigned this item")
       wait_for_new_page_load { f(".ui-dialog .ui-dialog-buttonset .btn-primary").click }
       f(".toggle_due_dates").click
       wait_for_ajaximations

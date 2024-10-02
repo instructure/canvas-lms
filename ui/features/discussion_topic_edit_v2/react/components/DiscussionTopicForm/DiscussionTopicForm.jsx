@@ -318,7 +318,6 @@ function DiscussionTopicForm({
   )
 
   const [lastShouldPublish, setLastShouldPublish] = useState(false)
-  const [missingSections, setMissingSections] = useState([])
   const [shouldShowMissingSectionsWarning, setShouldShowMissingSectionsWarning] = useState(false)
 
   const [showEditAnnouncementModal, setShowEditAnnouncementModal] = useState(false)
@@ -650,7 +649,8 @@ function DiscussionTopicForm({
       const isEveryoneOrEveryoneElseSelected = selectedAssignedTo.some(
         assignedTo =>
           assignedTo === defaultEveryoneOption.assetCode ||
-          assignedTo === defaultEveryoneElseOption.assetCode
+          assignedTo === defaultEveryoneElseOption.assetCode ||
+          assignedTo == `course_${ENV.context_id}`
       )
 
       if (!isEveryoneOrEveryoneElseSelected) {
@@ -664,7 +664,6 @@ function DiscussionTopicForm({
 
         if (missingSectionObjs.length > 0 && isGraded) {
           setLastShouldPublish(shouldPublish)
-          setMissingSections(missingSectionObjs)
           setShouldShowMissingSectionsWarning(true)
 
           return false
@@ -726,7 +725,6 @@ function DiscussionTopicForm({
     // If we don't do this, the focus will not go to the correct field if there is a validation error.
     flushSync(() => {
       setShouldShowMissingSectionsWarning(false)
-      setMissingSections([])
     })
   }
 
@@ -1263,7 +1261,6 @@ function DiscussionTopicForm({
       </FormFieldGroup>
       {shouldShowMissingSectionsWarning && (
         <MissingSectionsWarningModal
-          sections={missingSections}
           onClose={closeMissingSectionsWarningModal}
           onContinue={() => {
             closeMissingSectionsWarningModal()
