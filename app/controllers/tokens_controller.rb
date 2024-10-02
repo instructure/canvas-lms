@@ -142,7 +142,7 @@ class TokensController < ApplicationController
   def access_token_params
     result = params.require(:token).permit(:purpose, :expires_at, :regenerate, scopes: [])
     # rename for API
-    result[:permanent_expires_at] = result.delete(:expires_at)
+    result[:permanent_expires_at] = result.delete(:expires_at) if result.key?(:expires_at)
     result
   end
 end
