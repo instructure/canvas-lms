@@ -17,14 +17,13 @@
  */
 
 import getCookie from '@instructure/get-cookie'
-import type {Product, TagGroup} from '../model/Product'
+import type {Product, ToolsByDisplayGroup} from '../model/Product'
 import {stringify} from 'qs'
 import type {DiscoverParams} from '../components/useDiscoverQueryParams'
 import type {LtiFilters} from '../model/Filter'
 
 const accountId = window.location.pathname.split('/')[2]
 
-// TODO: add actual type
 type Meta = {
   count: number
   total_count: number
@@ -36,11 +35,6 @@ type ProductResponse = {
   tools: Array<Product>
   meta: Meta
 }
-type ToolsByDisplayGroupResponse = Array<{
-  meta: Meta
-  tag_group: TagGroup
-  tools: Array<Product>
-}>
 
 export const fetchProducts = async (params: DiscoverParams): Promise<ProductResponse> => {
   const apiParams = {
@@ -109,7 +103,7 @@ export const fetchProductDetails = async (global_product_id: String): Promise<Pr
   return getProduct()
 }
 
-export const fetchToolsByDisplayGroups = async (): Promise<ToolsByDisplayGroupResponse> => {
+export const fetchToolsByDisplayGroups = async (): Promise<ToolsByDisplayGroup> => {
   const url = `/api/v1/accounts/${accountId}/learn_platform/products_categories`
 
   const response = await fetch(url, {
