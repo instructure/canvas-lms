@@ -281,6 +281,14 @@ lti_registrations_discover_page:
     development:
       state: hidden
   custom_transition_proc: lti_registrations_discover_page_hook
+lti_apps_page_instructors:
+  state: hidden
+  applies_to: RootAccount
+  display_name: LTI Apps Page for Instructors
+  description: When enabled, the LTI Apps page will be available in the Course navigation sidebar.
+  environments:
+    development:
+      state: hidden
 lti_registrations_next:
   state: hidden
   applies_to: RootAccount

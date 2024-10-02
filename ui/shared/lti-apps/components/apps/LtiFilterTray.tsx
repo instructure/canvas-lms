@@ -22,10 +22,10 @@ import {Tray} from '@instructure/ui-tray'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import type {FilterItem, LtiFilters} from '../model/Filter'
+import type {FilterItem, LtiFilters} from '../../models/Filter'
 import FilterOptions from './FilterOptions'
 import {View} from '@instructure/ui-view'
-import type {DiscoverParams} from './useDiscoverQueryParams'
+import type {DiscoverParams} from '../../hooks/useDiscoverQueryParams'
 
 const I18n = useI18nScope('lti_registrations')
 

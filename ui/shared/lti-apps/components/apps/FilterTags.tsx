@@ -17,11 +17,11 @@
  */
 
 import React from 'react'
-import type {FilterItem} from '../model/Filter'
+import type {FilterItem} from '../../models/Filter'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
-import type {DiscoverParams} from './useDiscoverQueryParams'
+import type {DiscoverParams} from '../../hooks/useDiscoverQueryParams'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -34,7 +34,7 @@ export default function FilterTags(props: {
     const newFilters = Object.fromEntries(
       Object.entries(props.queryParams.filters).map(([key, value]) => [
         key,
-        value.filter(f => f.id !== filter.id),
+        (value as FilterItem[]).filter(f => f.id !== filter.id),
       ])
     )
     props.updateQueryParams({
@@ -49,9 +49,9 @@ export default function FilterTags(props: {
         <p>
           {props.numberOfResults} {I18n.t('results filtered by')}
         </p>
-        {Object.values(props.queryParams.filters)
+        {(Object.values(props.queryParams.filters) as FilterItem[][])
           .flat()
-          .map(filter => {
+          .map((filter: FilterItem) => {
             return (
               <Flex.Item padding="0 small 0 0" key={filter.id}>
                 <Tag text={filter.name} dismissible={true} onClick={() => removeFilter(filter)} />

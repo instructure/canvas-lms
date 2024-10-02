@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import {useLocation, useNavigate} from 'react-router-dom'
-import {fetchProducts} from '../../queries/productsQuery'
+import {fetchProducts} from '../../../../../shared/lti-apps/queries/productsQuery'
 import {useQuery} from '@tanstack/react-query'
 import useProduct from './useProduct'
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
@@ -32,7 +32,7 @@ import {View} from '@instructure/ui-view'
 import {IconExternalLinkLine} from '@instructure/ui-icons/es/IconExternalLinkLine'
 import {Button} from '@instructure/ui-buttons'
 import GenericErrorPage from '@canvas/generic-error-page/react'
-import TruncateWithTooltip from '../common/TruncateWithTooltip'
+import TruncateWithTooltip from '../../../../../shared/lti-apps/components/common/TruncateWithTooltip'
 import {
   IconA11yLine,
   IconExpandStartLine,
@@ -45,11 +45,11 @@ import IntegrationDetailModal from './IntegrationDetailModal'
 import ProductCarousel from '../common/Carousels/ProductCarousel'
 import ImageCarousel from '../common/Carousels/ImageCarousel'
 import BadgeCarousel from '../common/Carousels/BadgeCarousel'
-import Disclaimer from '../common/Disclaimer'
+import Disclaimer from '../../../../../shared/lti-apps/components/common/Disclaimer'
 
 import {openDynamicRegistrationWizard} from '../../../manage/registration_wizard/RegistrationWizardModalState'
 
-import type {DiscoverParams} from '../useDiscoverQueryParams'
+import type {DiscoverParams} from '../../../../../shared/lti-apps/hooks/useDiscoverQueryParams'
 
 const I18n = useI18nScope('lti_registrations')
 

@@ -17,10 +17,27 @@
  */
 
 import React from 'react'
-import type {RouteObject} from 'react-router-dom'
-import {Discover} from '../../../../shared/lti-apps/components/Discover'
+import {createBrowserRouter, RouterProvider} from 'react-router-dom'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {InstructorApps} from '../../../../shared/lti-apps/components/InstructorApps'
 
-export const DiscoverRoute: RouteObject = {
-  path: '/',
-  element: <Discover />,
+export const CourseApps = () => {
+  const router = createBrowserRouter(
+    [
+      {
+        path: '/',
+        element: <InstructorApps />,
+      },
+    ],
+    {
+      basename: window.location.pathname,
+    }
+  )
+  const queryClient = new QueryClient()
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  )
 }

@@ -62,6 +62,10 @@
       <% if can_do(@context, @current_user, :read_as_admin) %>
         <li id="external_tools_tab"><a href="#tab-tools" id="tab-tools-link"><%= t('tabs.tools', %{Apps}) %></a></li>
       <% end %>
+      <% if can_do(@context, @current_user, :read_as_admin) && @context.root_account.feature_enabled?(:lti_apps_page_instructors) %>
+        <%# TODO: change name and deal with old apps? %>
+        <li id="apps_tab"><a href="#tab-apps" id="tab-apps-link">Apps (Discover)</a></li>
+      <% end %>
       <% if @publishing_enabled %>
         <li id="grade_publishing_tab"><a href="#tab-grade-publishing" id="tab-grade-publishing-link"><%= t('Grade Syncing') %></a></li>
       <% end %>
@@ -964,6 +968,10 @@
     <div id="tab-tools">
       <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>
     </div>
+  <% end %>
+
+  <% if @context.root_account.feature_enabled?(:lti_apps_page_instructors) && can_do(@context, @current_user, :read_as_admin) && !@context.elementary_homeroom_course? %>
+    <div id="tab-apps"></div>
   <% end %>
 
   <% if @publishing_enabled && !@context.elementary_homeroom_course? %>

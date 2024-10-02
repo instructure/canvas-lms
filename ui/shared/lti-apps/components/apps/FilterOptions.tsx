@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import type {FilterItem} from '../model/Filter'
+import type {FilterItem} from '../../models/Filter'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'

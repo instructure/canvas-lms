@@ -80,3 +80,8 @@ export type IntegrationResource = {
   description: string
   content: string
 }
+
+export type ToolsByDisplayGroup = Array<{
+  tag_group: TagGroup
+  tools: Array<Product>
+}>
