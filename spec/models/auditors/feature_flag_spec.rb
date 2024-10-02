@@ -20,12 +20,12 @@
 
 describe Auditors::FeatureFlag do
   let(:request_id) { 42 }
-  let(:feature_name) { "root_account_feature" }
+  let(:feature_name) { "password_complexity" }
 
   before do
-    allow(Feature).to receive(:definitions).and_return({
-                                                         feature_name => Feature.new(feature: feature_name, applies_to: "RootAccount")
-                                                       })
+    allow(Feature).to receive(:definitions).and_return(
+      { feature_name => Feature.new(feature: feature_name, applies_to: "RootAccount") }
+    )
     @flag = Account.site_admin.feature_flags.build
     @flag.feature = feature_name
     @flag.state = "on"
