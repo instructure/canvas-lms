@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {useNode} from '@craftjs/core'
 import {ImageBlock, type ImageBlockProps} from '..'
@@ -118,8 +117,6 @@ const mockTrayProps = {
   },
 }
 
-const user = userEvent.setup()
-
 let props: Partial<ImageBlockProps>
 
 const mockSetProp = jest.fn((callback: (props: Record<string, any>) => void) => {
@@ -149,18 +146,18 @@ describe('ImageBlockToolbar', () => {
   })
 
   it('should render', () => {
-    const {getByText} = render(<ImageBlockToolbar />)
+    render(<ImageBlockToolbar />)
 
-    expect(getByText('Upload Image')).toBeInTheDocument()
-    expect(getByText('Constraint')).toBeInTheDocument()
-    expect(getByText('Image Size')).toBeInTheDocument()
+    expect(screen.getByText('Upload Image')).toBeInTheDocument()
+    expect(screen.getByText('Constraint')).toBeInTheDocument()
+    expect(screen.getByText('Image Size')).toBeInTheDocument()
   })
 
   it('checks the right constraint', async () => {
-    const {getByText} = render(<ImageBlockToolbar />)
+    render(<ImageBlockToolbar />)
 
-    const btn = getByText('Constraint').closest('button') as HTMLButtonElement
-    await user.click(btn)
+    const btn = screen.getByText('Constraint').closest('button') as HTMLButtonElement
+    fireEvent.click(btn)
 
     const coverMenuItem = screen.getByText('Cover')
     const containMenuItem = screen.getByText('Contain')
@@ -175,13 +172,13 @@ describe('ImageBlockToolbar', () => {
   })
 
   it('changes the constraint prop', async () => {
-    const {getByText} = render(<ImageBlockToolbar />)
+    render(<ImageBlockToolbar />)
 
-    const btn = getByText('Constraint').closest('button') as HTMLButtonElement
-    await user.click(btn)
+    const btn = screen.getByText('Constraint').closest('button') as HTMLButtonElement
+    fireEvent.click(btn)
 
     const containMenuItem = screen.getByText('Contain')
-    await user.click(containMenuItem)
+    fireEvent.click(containMenuItem)
 
     expect(mockSetProp).toHaveBeenCalled()
     expect(props.constraint).toBe('contain')
@@ -190,10 +187,10 @@ describe('ImageBlockToolbar', () => {
 
   it('changes the maintainAspectRatio prop', async () => {
     props.maintainAspectRatio = false
-    const {getByText} = render(<ImageBlockToolbar />)
+    render(<ImageBlockToolbar />)
 
-    const btn = getByText('Constraint').closest('button') as HTMLButtonElement
-    await user.click(btn)
+    const btn = screen.getByText('Constraint').closest('button') as HTMLButtonElement
+    fireEvent.click(btn)
 
     const coverMenuItem = screen.getByText('Cover')
     let li = coverMenuItem.closest('li') as HTMLLIElement
@@ -203,7 +200,7 @@ describe('ImageBlockToolbar', () => {
     li = aspectRatioMenuItem.closest('li') as HTMLLIElement
     expect(li.querySelector('svg[name="IconCheck"]')).not.toBeInTheDocument()
 
-    await user.click(aspectRatioMenuItem)
+    fireEvent.click(aspectRatioMenuItem)
 
     expect(mockSetProp).toHaveBeenCalled()
     expect(props.maintainAspectRatio).toBe(true)
@@ -213,10 +210,10 @@ describe('ImageBlockToolbar', () => {
   it('changes the image size prop', async () => {
     props.width = 117
     props.height = 217
-    const {getByText} = render(<ImageBlockToolbar />)
+    render(<ImageBlockToolbar />)
 
-    const btn = getByText('Image Size').closest('button') as HTMLButtonElement
-    await user.click(btn)
+    const btn = screen.getByText('Image Size').closest('button') as HTMLButtonElement
+    fireEvent.click(btn)
 
     expect(screen.getByText('Auto')).toBeInTheDocument()
     expect(screen.getByText('Fixed size')).toBeInTheDocument()
@@ -225,20 +222,23 @@ describe('ImageBlockToolbar', () => {
       screen.getByText('Auto').closest('li')?.querySelector('svg[name="IconCheck"')
     ).toBeInTheDocument()
 
-    await user.click(screen.getByText('Fixed size'))
+    fireEvent.click(screen.getByText('Fixed size'))
     expect(props.sizeVariant).toBe('pixel')
   })
 
   it('can add an image from the AddImageModal', async () => {
-    const {getByText, getByRole} = render(
+    render(
       <RCSPropsContext.Provider value={mockTrayProps}>
         <ImageBlockToolbar />
       </RCSPropsContext.Provider>
     )
-    await user.click(getByText(/upload image/i).closest('button') as HTMLButtonElement)
-    await user.click(getByRole('tab', {name: /course images/i}))
-    await user.click(screen.getByRole('img', {name: /image_one\.png/i}))
-    await user.click(screen.getByText(/submit/i).closest('button') as HTMLButtonElement)
+    fireEvent.click(screen.getByText(/upload image/i).closest('button') as HTMLButtonElement)
+    const courseImagesTab = await screen.findByText(/course images/i)
+    fireEvent.click(courseImagesTab)
+
+    const img = await screen.findByAltText(/image_one\.png/i)
+    fireEvent.click(img)
+    fireEvent.click(screen.getByText(/submit/i).closest('button') as HTMLButtonElement)
     await waitFor(() => {
       expect(props.src).toBe('http://canvas.docker/courses/21/files/722?wrap=1')
     })
@@ -250,10 +250,10 @@ describe('ImageBlockToolbar', () => {
         <ImageBlockToolbar />
       </RCSPropsContext.Provider>
     )
-    await user.click(screen.getByText(/upload image/i).closest('button') as HTMLButtonElement)
-    await user.click(screen.getByRole('tab', {name: /URL/i}))
+    fireEvent.click(screen.getByText(/upload image/i).closest('button') as HTMLButtonElement)
+    fireEvent.click(await screen.findByText(/URL/i))
 
-    const fileURLInput = screen.getByLabelText('File URL') as unknown as HTMLInputElement
+    const fileURLInput = (await screen.findByLabelText('File URL')) as unknown as HTMLInputElement
     const altInput = screen.getByPlaceholderText(
       '(Describe the image)'
     ) as unknown as HTMLInputElement
@@ -261,7 +261,7 @@ describe('ImageBlockToolbar', () => {
     fireEvent.change(fileURLInput, {target: {value: 'https://whatever.net/whatevs.jpg'}})
     fireEvent.change(altInput, {target: {value: 'Some alt text'}})
 
-    await user.click(screen.getByText(/submit/i).closest('button') as HTMLButtonElement)
+    fireEvent.click(screen.getByText(/submit/i).closest('button') as HTMLButtonElement)
     await waitFor(() => {
       expect(props.alt).toBe('Some alt text')
     })
@@ -272,7 +272,7 @@ describe('ImageBlockToolbar', () => {
     render(<ImageBlockToolbar />)
 
     const btn = screen.getByText('Image Description').closest('button') as HTMLButtonElement
-    await user.click(btn)
+    fireEvent.click(btn)
 
     const altInput = screen.getByPlaceholderText('Image Description') as unknown as HTMLInputElement
     fireEvent.change(altInput, {target: {value: 'new alt text'}})
