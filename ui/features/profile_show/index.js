@@ -18,7 +18,9 @@
 
 import ProfileShow from './backbone/views/ProfileShow'
 import ready from '@instructure/ready'
+import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 
 ready(() => {
+  initializeTopNavPortal()
   new ProfileShow(ENV.PROFILE)
 })
