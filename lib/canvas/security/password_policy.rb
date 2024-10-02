@@ -41,21 +41,25 @@ module Canvas::Security
         end
         record.errors.add attr, "sequence" if candidates.any? { |candidate| SEQUENCES.grep(candidate).present? }
       end
-      # check for numbers
-      if Canvas::Plugin.value_to_boolean(policy[:require_number_characters])
-        record.errors.add attr, "no_digits" unless /\d/.match?(value)
-      end
-      # check for symbols
-      if Canvas::Plugin.value_to_boolean(policy[:require_symbol_characters])
-        symbol_regex = %r{[\!\@\#\$\%\^\&\*\(\)\_\+\-\=\[\]\{\}\|\;\:\'\"\<\>\,\.\?/]}
-        record.errors.add attr, "no_symbols" unless symbol_regex.match?(value)
-      end
       # check for common passwords
-      cache_key = ["common_passwords_set", record.account.global_id, policy[:common_passwords_attachment_id]].cache_key
-      if policy.include?(:common_passwords_attachment_id) && check_password_membership(cache_key, value, policy)
-        record.errors.add attr, "common"
-      elsif Canvas::Plugin.value_to_boolean(policy[:disallow_common_passwords])
+      if Canvas::Plugin.value_to_boolean(policy[:disallow_common_passwords]) && policy[:common_passwords_attachment_id].blank?
         record.errors.add attr, "common" if DEFAULT_COMMON_PASSWORDS.include?(value.downcase)
+      end
+      # only enforce these policies if password complexity feature is enabled
+      if record.account.password_complexity_enabled?
+        if Canvas::Plugin.value_to_boolean(policy[:require_number_characters])
+          record.errors.add attr, "no_digits" unless /\d/.match?(value)
+        end
+
+        if Canvas::Plugin.value_to_boolean(policy[:require_symbol_characters])
+          symbol_regex = %r{[\!\@\#\$\%\^\&\*\(\)\_\+\-\=\[\]\{\}\|\;\:\'\"\<\>\,\.\?/]}
+          record.errors.add attr, "no_symbols" unless symbol_regex.match?(value)
+        end
+
+        if policy[:common_passwords_attachment_id].present?
+          cache_key = ["common_passwords_set", record.account.global_id, policy[:common_passwords_attachment_id]].cache_key
+          record.errors.add attr, "common" if check_password_membership(cache_key, value, policy)
+        end
       end
     end
 

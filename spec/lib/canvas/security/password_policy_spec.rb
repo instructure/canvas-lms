@@ -59,6 +59,23 @@ describe Canvas::Security::PasswordPolicy do
       expect(@pseudonym).to be_valid
     end
 
+    it "does not validate against new policies if :password_complexity is disabled" do
+      account.disable_feature!(:password_complexity)
+      pseudonym_with_policy({ require_number_characters: "true", require_symbol_characters: "true" })
+
+      @pseudonym.password = @pseudonym.password_confirmation = "2short"
+      expect(@pseudonym).not_to be_valid
+
+      @pseudonym.password = @pseudonym.password_confirmation = "herearesomenumbers1234"
+      expect(@pseudonym).to be_valid
+
+      @pseudonym.password = @pseudonym.password_confirmation = "idontneednumbers"
+      expect(@pseudonym).to be_valid
+
+      @pseudonym.password = @pseudonym.password_confirmation = "idontneedsymbols"
+      expect(@pseudonym).to be_valid
+    end
+
     it "validates confirmation matches" do
       pseudonym_with_policy({})
 
