@@ -80,7 +80,7 @@ describe('CanvasInbox App Container', () => {
     return render(
       <ApolloProvider client={mswClient}>
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
-          <CanvasInbox />
+          <CanvasInbox breakpoints={{desktopOnly: true}}/>
         </AlertManagerContext.Provider>
       </ApolloProvider>
     )
