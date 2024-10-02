@@ -148,6 +148,13 @@ describe TokensController do
         expect(assigns[:token]).to be_active
       end
 
+      it "does not overwrite the token's permanent_expires_at on update if expires_at not provided" do
+        token = @user.access_tokens.create!(permanent_expires_at: 1.day.from_now)
+        put "update", params: { user_id: "self", id: token.id, token: { purpose: "test" } }
+        expect(assigns[:token].purpose).to eq "test"
+        expect(assigns[:token].permanent_expires_at).to eq token.permanent_expires_at
+      end
+
       it "allows regenerating a manually generated token" do
         token = @user.access_tokens.new
         token.developer_key = DeveloperKey.default
