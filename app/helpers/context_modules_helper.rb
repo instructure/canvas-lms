@@ -113,7 +113,7 @@ module ContextModulesHelper
 
   def preload_modules_content(modules)
     modules.each_slice(1000) do |slice|
-      ActiveRecord::Associations.preload(slice, content_tags: { content: [:context, :external_tool_tag] })
+      ActiveRecord::Associations.preload(slice, content_tags: { content: %i[context external_tool_tag current_lookup] })
     end
     preload_can_unpublish(@context, modules) if @can_view
   end
