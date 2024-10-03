@@ -304,7 +304,7 @@ module RCENextPage
   def change_content_tray_content_type(which)
     content_type = content_tray_content_type
     content_type.click
-    options_id = content_type.attribute("aria-owns")
+    options_id = content_type.attribute("aria-controls")
     options = f("##{options_id}")
     option = fj(":contains(#{which})", options)
     option.click
@@ -313,7 +313,7 @@ module RCENextPage
   def change_content_tray_content_subtype(subtype)
     content_subtype = content_tray_content_subtype
     content_subtype.click
-    options_id = content_subtype.attribute("aria-owns")
+    options_id = content_subtype.attribute("aria-controls")
     options = f("##{options_id}")
     option = fj(":contains(#{subtype})", options)
     option.click
