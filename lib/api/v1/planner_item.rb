@@ -66,6 +66,17 @@ module Api::V1::PlannerItem
         hash[:plannable_date] = item.start_at || item.created_at
         hash[:plannable] = plannable_json(item.attributes, extra_fields: CALENDAR_PLANNABLE_FIELDS)
         hash[:html_url] = calendar_url_for(item.effective_context, event: item)
+      elsif item.is_a?(SubAssignment)
+        topic = item.parent_assignment&.discussion_topic
+        unread_count, read_state = topics_status_for(user, topic.id, opts[:topics_status])[topic.id]
+        unread_attributes = { unread_count:, read_state: }
+        hash[:details] = {
+          reply_to_entry_required_count: item.parent_assignment&.discussion_topic&.reply_to_entry_required_count || 1
+        }
+        hash[:plannable_type] = PlannerHelper::PLANNABLE_TYPES.key(item.class_name)
+        hash[:plannable_date] = item[:user_due_date] || item.due_at
+        hash[:plannable] = plannable_json(item.attributes.merge(unread_attributes), extra_fields: SUB_ASSIGNMENT_FIELDS + GRADABLE_FIELDS)
+        hash[:html_url] = assignment_html_url(item.parent_assignment, user, hash[:submissions])
       elsif item.is_a?(::PlannerNote)
         hash[:plannable_date] = item.todo_date || item.created_at
         hash[:plannable] = plannable_json(item.attributes, extra_fields: PLANNER_NOTE_FIELDS)
@@ -113,17 +124,6 @@ module Api::V1::PlannerItem
           current_user: user,
           assessment_request: item
         ).submission_data_url
-      elsif item.is_a?(SubAssignment)
-        topic = item.parent_assignment&.discussion_topic
-        unread_count, read_state = topics_status_for(user, topic.id, opts[:topics_status])[topic.id]
-        unread_attributes = { unread_count:, read_state: }
-        hash[:details] = {
-          reply_to_entry_required_count: item.parent_assignment&.discussion_topic&.reply_to_entry_required_count || 1
-        }
-        hash[:plannable_type] = PlannerHelper::PLANNABLE_TYPES.key(item.class_name)
-        hash[:plannable_date] = item[:user_due_date] || item.due_at
-        hash[:plannable] = plannable_json(item.attributes.merge(unread_attributes), extra_fields: SUB_ASSIGNMENT_FIELDS + GRADABLE_FIELDS)
-        hash[:html_url] = assignment_html_url(item.parent_assignment, user, hash[:submissions])
       else
         hash[:plannable_date] = item[:user_due_date] || item.due_at
         hash[:plannable] = plannable_json(item.attributes, extra_fields: GRADABLE_FIELDS)
@@ -145,7 +145,7 @@ module Api::V1::PlannerItem
   def planner_items_json(items, user, session, opts = {})
     preload_items = items.each_with_object([]) do |item, memo|
       memo << item
-      if item.try(:submittable_object)
+      if item.try(:submittable_object) && item.is_a?(Assignment)
         item.submittable_object.assignment = item # fixes loading for inverse associations that don't seem to be working
         memo << item.submittable_object
       end
