@@ -88,6 +88,7 @@ const Settings = props => (
 const ActionButton = props => (
   <Tooltip renderTip={props.tip} placement="top">
     <Button
+      id={props.id}
       renderIcon={props.icon}
       onClick={props.onClick}
       margin="0 x-small 0 0"
@@ -119,6 +120,7 @@ export const MessageActionButtons = props => {
         <View padding="0 medium 0 0">
           {props.showComposeButton && (
             <ActionButton
+              id="compose-new-message"
               tip={I18n.t('Compose a new message')}
               icon={IconComposeLine}
               onClick={props.compose}
@@ -140,6 +142,7 @@ export const MessageActionButtons = props => {
       </Flex.Item>
       <Flex.Item>
         <ActionButton
+          id="reply-to-message"
           tip={I18n.t('Reply')}
           icon={IconReplyLine}
           onClick={props.reply}
@@ -148,6 +151,7 @@ export const MessageActionButtons = props => {
           ariaLabel={I18n.t('Reply')}
         />
         <ActionButton
+          id="reply-to-all"
           tip={I18n.t('Reply all')}
           icon={IconReplyAll2Line}
           onClick={props.replyAll}
@@ -156,6 +160,7 @@ export const MessageActionButtons = props => {
           ariaLabel={I18n.t('Reply all')}
         />
         <ActionButton
+          id="archive-conversation"
           tip={props.unarchive ? I18n.t('Unarchive') : I18n.t('Archive')}
           icon={props.unarchive ? IconRemoveFromCollectionLine : IconCollectionSaveLine}
           onClick={props.unarchive ? props.unarchive : props.archive}
@@ -164,6 +169,7 @@ export const MessageActionButtons = props => {
           ariaLabel={props.unarchive ? I18n.t('Unarchive') : I18n.t('Archive')}
         />
         <ActionButton
+          id="delete-conversation"
           tip={I18n.t('Delete')}
           icon={IconTrashLine}
           onClick={props.delete}

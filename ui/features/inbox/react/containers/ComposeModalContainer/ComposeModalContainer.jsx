@@ -475,6 +475,7 @@ const ComposeModalContainer = props => {
               shouldCloseOnDocumentClick={false}
               onExited={resetState}
               data-testid={responsiveProps.dataTestId}
+              id="compose-message-modal"
             >
               <ModalHeader onDismiss={dismiss} headerTitle={props?.submissionCommentsHeader} />
               <ModalBody
