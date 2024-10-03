@@ -2679,6 +2679,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :what_if_grades_api) do
       put "submissions/:id/what_if_grades", action: :update
+      put "courses/:course_id/what_if_grades/reset", action: :reset_for_student_course
     end
 
     scope(controller: :plugins) do
