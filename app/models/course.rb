@@ -1770,7 +1770,7 @@ class Course < ActiveRecord::Base
     given do |user|
       available? && user && fetch_on_enrollments("has_active_student_enrollment", user) { enrollments.for_user(user).active_by_date.of_student_type.exists? }
     end
-    can :read, :participate_as_student, :read_grades, :read_outcomes, :read_as_member
+    can :read, :participate_as_student, :read_grades, :read_outcomes, :read_as_member, :reset_what_if_grades
 
     given do |user|
       (available? || completed?) && user &&
