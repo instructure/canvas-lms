@@ -6,7 +6,7 @@
   "main": "./react/index.tsx",
   "dependencies": {
     "@craftjs/core": "^0.2.10",
-    "@instructure/ui-color-picker": "^8",
+    "@instructure/ui-color-picker": "8.56.4",
     "react-moveable": "0.56.0",
     "styled-components": ">= 4",
     "react-contenteditable": "^3.3.7",

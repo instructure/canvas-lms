@@ -63,7 +63,7 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
                         class="css-btw693-closeButton"
                       >
                         <button
-                          class="css-14jn3fd-view--inlineBlock-baseButton"
+                          class="css-1hj8nz2-view--inlineBlock-baseButton"
                           cursor="pointer"
                           dir="ltr"
                           tabindex="0"
@@ -237,7 +237,7 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
                       class="css-btw693-closeButton"
                     >
                       <button
-                        class="css-14jn3fd-view--inlineBlock-baseButton"
+                        class="css-1hj8nz2-view--inlineBlock-baseButton"
                         cursor="pointer"
                         dir="ltr"
                         tabindex="0"
