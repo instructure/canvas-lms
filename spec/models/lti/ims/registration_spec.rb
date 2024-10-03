@@ -861,27 +861,25 @@ module Lti::IMS
       end
     end
 
-    describe "registration_configuration" do
-      subject { registration.registration_configuration }
+    describe "internal_lti_configuration" do
+      subject { registration.internal_lti_configuration }
 
       context "when no explicit tool_id is set" do
         it "formats the configuration correctly with tool_id being nil" do
           config = registration.lti_tool_configuration.with_indifferent_access
           expect(subject).to eq(
             {
-              name: registration.client_name,
-              description: config[:description],
+              title: registration.client_name,
               domain: config[:domain],
-              custom_fields: config[:custom_parameters],
-              target_link_uri: config[:target_link_uri],
               privacy_level: registration.privacy_level,
-              icon_url: registration.logo_uri,
               oidc_initiation_url: registration.initiate_login_uri,
               redirect_uris: registration.redirect_uris,
               public_jwk_url: registration.jwks_uri,
               scopes: registration.overlaid_scopes,
               placements: registration.placements,
-              tool_id: nil
+              launch_settings: {
+                icon_url: "http://example.com/logo.png"
+              }
             }.with_indifferent_access
           )
         end
@@ -901,18 +899,17 @@ module Lti::IMS
           config = registration.lti_tool_configuration.with_indifferent_access
           expect(subject).to eq(
             {
-              name: registration.client_name,
-              description: config[:description],
+              title: registration.client_name,
               domain: config[:domain],
-              custom_fields: config[:custom_parameters],
-              target_link_uri: config[:target_link_uri],
               privacy_level: registration.privacy_level,
-              icon_url: registration.logo_uri,
               oidc_initiation_url: registration.initiate_login_uri,
               redirect_uris: registration.redirect_uris,
               public_jwk_url: registration.jwks_uri,
               scopes: registration.overlaid_scopes,
               placements: registration.placements,
+              launch_settings: {
+                icon_url: "http://example.com/logo.png"
+              },
               tool_id: "ToolV2"
             }.with_indifferent_access
           )

@@ -109,27 +109,33 @@ class Lti::IMS::Registration < ApplicationRecord
     }.with_indifferent_access
   end
 
-  # This method converts an IMS Registration into a "Tool Configuration V2",
-  # the flattened and standardized version of the Canvas proprietary configuration
-  # format meant for internal use with LTI Registrations.
-  def registration_configuration
-    config = lti_tool_configuration
+  def self.to_internal_lti_configuration(registration)
+    config = registration.lti_tool_configuration
 
     {
-      name: client_name,
+      title: registration.client_name,
       description: config["description"],
-      domain: config["domain"],
       custom_fields: config["custom_parameters"],
       target_link_uri: config["target_link_uri"],
-      privacy_level:,
-      icon_url: logo_uri,
-      oidc_initiation_url: initiate_login_uri,
-      redirect_uris:,
-      public_jwk_url: jwks_uri,
-      scopes: overlaid_scopes,
-      placements:,
-      tool_id:
-    }.with_indifferent_access
+      oidc_initiation_url: registration.initiate_login_uri,
+      public_jwk_url: registration.jwks_uri,
+      scopes: registration.overlaid_scopes,
+      redirect_uris: registration.redirect_uris,
+      domain: config["domain"],
+      tool_id: registration.tool_id,
+      privacy_level: registration.privacy_level,
+      placements: registration.placements,
+      launch_settings: {
+        icon_url: registration.logo_uri,
+      }
+    }.compact.with_indifferent_access
+  end
+
+  # This method converts an IMS Registration into an "InternalLtiConfiguration",
+  # the flattened and standardized version of the Canvas proprietary configuration
+  # format meant for internal use with LTI Registrations.
+  def internal_lti_configuration
+    Lti::IMS::Registration.to_internal_lti_configuration(self)
   end
 
   def importable_configuration
@@ -208,14 +214,22 @@ class Lti::IMS::Registration < ApplicationRecord
         placement: placement_name,
         enabled:,
         message_type: message["type"],
-        target_link_uri: message["target_link_uri"],
         text:,
-        icon_url:,
+        # TODO: add support for i18n titles
+        # labels: ,
         custom_fields: message["custom_parameters"],
+        # TODO: add support for height/width in dyn reg
+        # selection_height:,
+        # selection_width:,
+        # launch_height:,
+        # launch_width:,
+
+        icon_url:,
+        target_link_uri: message["target_link_uri"],
         display_type:,
         windowTarget: window_target,
-        default:,
         visibility: placement_visibility(message),
+        default:,
       }.merge(width_and_height_settings(message, placement_name)).compact
     ]
   end
@@ -285,6 +299,10 @@ class Lti::IMS::Registration < ApplicationRecord
       tool_configuration: canvas_configuration,
       default_configuration: canvas_configuration(apply_overlay: false)
     }.as_json(options)
+  end
+
+  def tool_id
+    lti_tool_configuration[TOOL_ID_EXTENSION]
   end
 
   private
@@ -367,9 +385,5 @@ class Lti::IMS::Registration < ApplicationRecord
     else
       "anonymous"
     end
-  end
-
-  def tool_id
-    lti_tool_configuration[TOOL_ID_EXTENSION]
   end
 end
