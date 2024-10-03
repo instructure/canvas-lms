@@ -48,8 +48,7 @@ export type DoFetchApiOpts = {
   method?: string
   headers?: {[k: string]: string} | Headers
   params?: QueryParameterRecord
-  // eslint-disable-next-line no-undef
-  body?: BodyInit
+  body?: string | FormData | object
   fetchOpts?: RequestInit
   signal?: AbortSignal
 }
