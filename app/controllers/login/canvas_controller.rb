@@ -178,13 +178,7 @@ class Login::CanvasController < ApplicationController
   end
 
   def maybe_render_mobile_login(status = nil)
-    if mobile_device?
-      @login_handle_name = @domain_root_account.login_handle_name_with_inference
-      @login_handle_is_email = @login_handle_name == AuthenticationProvider.default_login_handle_name
-      render :mobile_login, layout: "mobile_auth", status:
-    else
-      @aacs_with_buttons = @domain_root_account.authentication_providers.active.select { |aac| aac.class.login_button? }
-      render :new, status:
-    end
+    @aacs_with_buttons = @domain_root_account.authentication_providers.active.select { |aac| aac.class.login_button? }
+    render :new, status:
   end
 end
