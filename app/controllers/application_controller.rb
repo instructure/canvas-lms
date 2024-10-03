@@ -994,8 +994,16 @@ class ApplicationController < ActionController::Base
 
   def check_pending_otp
     if session[:pending_otp] && params[:controller] != "login/otp"
-      return render plain: "Please finish logging in", status: :forbidden if request.xhr?
+      # handle api json requests for feature flag
+      if request.format.json? && @domain_root_account.feature_enabled?(:login_registration_ui_identity)
+        render json: { message: I18n.t("Verification required. Please complete multi-factor authentication by entering the code sent to your device.") }, status: :forbidden
+        return
+      end
 
+      # handle non-api xhr (ajax) requests
+      return render plain: I18n.t("Please finish logging in"), status: :forbidden if request.xhr?
+
+      # handle all other requests
       destroy_session
       redirect_to login_url
     end

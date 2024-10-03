@@ -17,14 +17,15 @@
  */
 
 import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
-import type {LoginResponse} from './types'
+import type {ApiResponse, LoginResponse} from '../types'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
-export const login = async (
+export const performSignIn = async (
   username: string,
   password: string,
   rememberMe: boolean
-): Promise<LoginResponse> => {
-  const {status, data} = await executeApiRequest<LoginResponse>({
+): Promise<ApiResponse<LoginResponse>> => {
+  const {json, response} = await doFetchApi<LoginResponse>({
     path: '/login/canvas',
     method: 'POST',
     body: {
@@ -34,16 +35,9 @@ export const login = async (
         remember_me: rememberMe ? '1' : '0',
       },
     },
-    headers: {
-      'Content-Type': 'application/json',
-    },
   })
 
-  if (status === 200) {
-    return data
-  } else {
-    throw new Error('Login failed')
-  }
+  return {status: response.status, data: json ?? ({} as LoginResponse)}
 }
 
 export const forgotPassword = async (email: string): Promise<{requested: boolean}> => {
@@ -54,9 +48,6 @@ export const forgotPassword = async (email: string): Promise<{requested: boolean
       pseudonym_session: {
         unique_id_forgot: email,
       },
-    },
-    headers: {
-      'Content-Type': 'application/json',
     },
   })
 

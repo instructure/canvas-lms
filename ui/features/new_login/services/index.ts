@@ -16,17 +16,5 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {render} from '@testing-library/react'
-import LoginLinks from '../LoginLinks'
-import {MemoryRouter} from 'react-router-dom'
-
-describe('LoginLinks', () => {
-  it('mounts without crashing', () => {
-    render(
-      <MemoryRouter initialEntries={['/']}>
-        <LoginLinks />
-      </MemoryRouter>
-    )
-  })
-})
+export * from './auth'
+export * from './otp'

@@ -20,12 +20,15 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import {MemoryRouter} from 'react-router-dom'
 import ForgotPassword from '../ForgotPassword'
+import {NewLoginProvider} from '../../context/NewLoginContext'
 
 describe('ForgotPassword', () => {
   it('mounts without crashing', () => {
     render(
       <MemoryRouter>
-        <ForgotPassword />
+        <NewLoginProvider>
+          <ForgotPassword />
+        </NewLoginProvider>
       </MemoryRouter>
     )
   })

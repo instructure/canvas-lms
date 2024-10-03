@@ -16,21 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {render} from '@testing-library/react'
-import '@testing-library/jest-dom'
-import SignIn from '../SignIn'
-import {MemoryRouter} from 'react-router-dom'
-import {NewLoginProvider} from '../../context/NewLoginContext'
-
-describe('SignIn', () => {
-  it('mounts without crashing', () => {
-    render(
-      <MemoryRouter>
-        <NewLoginProvider>
-          <SignIn />
-        </NewLoginProvider>
-      </MemoryRouter>
-    )
-  })
-})
+export interface ApiResponse<T> {
+  status: number
+  data: T
+}

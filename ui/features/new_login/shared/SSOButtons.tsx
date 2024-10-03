@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import type {AuthProvider} from '../utils/types'
 import {Button} from '@instructure/ui-buttons'
 // @ts-expect-error
 import GoogleIcon from '../assets/images/google.svg'
@@ -28,6 +27,8 @@ import PlaceholderIcon from '../assets/images/placeholder.svg'
 import {Img} from '@instructure/ui-img'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {useNewLogin} from '../context/NewLoginContext'
+import type {AuthProvider} from '../types'
 
 const I18n = useI18nScope('new_login')
 
@@ -36,6 +37,8 @@ interface SSOButtonsProps {
 }
 
 const SSOButtons = ({providers}: SSOButtonsProps) => {
+  const {isLoading} = useNewLogin()
+
   const getProviderIcon = (authType: string) => {
     switch (authType) {
       case 'google':
@@ -60,6 +63,7 @@ const SSOButtons = ({providers}: SSOButtonsProps) => {
             <Button
               href={link}
               display="block"
+              disabled={isLoading}
               renderIcon={() => (
                 <Img
                   src={getProviderIcon(provider.auth_type)}

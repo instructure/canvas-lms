@@ -18,17 +18,16 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import '@testing-library/jest-dom'
-import SignIn from '../SignIn'
+import OtpForm from '../OtpForm'
 import {MemoryRouter} from 'react-router-dom'
 import {NewLoginProvider} from '../../context/NewLoginContext'
 
-describe('SignIn', () => {
+describe('OtpForm', () => {
   it('mounts without crashing', () => {
     render(
       <MemoryRouter>
         <NewLoginProvider>
-          <SignIn />
+          <OtpForm />
         </NewLoginProvider>
       </MemoryRouter>
     )

@@ -16,22 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {render} from '@testing-library/react'
-import SSOButtons from '../SSOButtons'
-import {MemoryRouter} from 'react-router-dom'
-import type {AuthProvider} from '../../utils/types'
-
-describe('SSOButtons', () => {
-  it('mounts without crashing', () => {
-    const mockProviders: AuthProvider[] = [
-      {id: 1, auth_type: 'google'},
-      {id: 2, auth_type: 'microsoft'},
-    ]
-    render(
-      <MemoryRouter>
-        <SSOButtons providers={mockProviders} />
-      </MemoryRouter>
-    )
-  })
-})
+export {default as OtpForm} from './OtpForm'
+export {default as SSOButtons} from './SSOButtons'
+export {default as SignInLinks} from './SignInLinks'

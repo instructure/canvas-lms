@@ -22,5 +22,17 @@ export interface AuthProvider {
 }
 
 export interface LoginResponse {
-  location: string
+  location?: string
+  otp_required?: boolean
+  pseudonym?: object
+}
+
+export interface OtpInitiationResponse {
+  otp_sent?: boolean
+  otp_configuring?: boolean
+  otp_communication_channel_id?: string
+}
+
+export interface OtpVerifyResponse {
+  location?: string
 }
