@@ -367,6 +367,8 @@ module Api::V1::Submission
       end
     end
 
+    hash["student_entered_score"] = attempt.student_entered_score if includes.include?("student_entered_score")
+
     hash
   end
 

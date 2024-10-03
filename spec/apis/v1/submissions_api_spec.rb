@@ -7065,6 +7065,22 @@ describe "Submissions API", type: :request do
           expect(json).to all include field
         end
       end
+
+      describe "student_entered_score" do
+        let(:field) { "student_entered_score" }
+
+        it "is not included by default" do
+          json = api_call_as_user(teacher, :get, path, params)
+          json.each do |entry| # can't use `.not_to all`
+            expect(entry).not_to include field
+          end
+        end
+
+        it "included when passed to the include param" do
+          json = api_call_as_user(teacher, :get, path, params.merge(include: field))
+          expect(json).to all include field
+        end
+      end
     end
   end
 
