@@ -21,14 +21,6 @@ import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {TeacherCheckpointsInfo} from '../TeacherCheckpointsInfo'
 
-// Mock the I18n function
-jest.mock('@canvas/i18n', () => ({
-  useScope: () => ({
-    t: (str: string) => str,
-    n: (num: number) => num.toString(),
-  }),
-}))
-
 // Mock assignments
 const assignmentNoDueDates = {
   id: '1',
@@ -44,8 +36,8 @@ const assignmentNoDueDates = {
 const assignmentWithDueDates = {
   id: '2',
   checkpoints: [
-    {tag: 'reply_to_topic', due_at: '2024-06-02T00:00:00Z', overrides: []},
-    {tag: 'reply_to_entry', due_at: '2024-06-04T00:00:00Z', overrides: []},
+    {tag: 'reply_to_topic', due_at: '2024-06-02T12:00:00Z', overrides: []},
+    {tag: 'reply_to_entry', due_at: '2024-06-04T12:00:00Z', overrides: []},
   ],
   discussion_topic: {
     reply_to_entry_required_count: 4,
@@ -57,18 +49,18 @@ const assignmentWithOverrides = {
   checkpoints: [
     {
       tag: 'reply_to_topic',
-      due_at: '2024-06-02T00:00:00Z',
+      due_at: '2024-06-02T12:00:00Z',
       overrides: [
-        {title: 'Section 1', due_at: '2024-06-03T00:00:00Z'},
-        {title: 'Section 2', due_at: '2024-06-04T00:00:00Z'},
+        {title: 'Section 1', due_at: '2024-06-03T12:00:00Z'},
+        {title: 'Section 2', due_at: '2024-06-04T12:00:00Z'},
       ],
     },
     {
       tag: 'reply_to_entry',
-      due_at: '2024-06-04T00:00:00Z',
+      due_at: '2024-06-07T12:00:00Z',
       overrides: [
-        {title: 'Section 1', due_at: '2024-06-05T00:00:00Z'},
-        {title: 'Section 2', due_at: '2024-06-06T00:00:00Z'},
+        {title: 'Section 1', due_at: '2024-06-05T12:00:00Z'},
+        {title: 'Section 2', due_at: '2024-06-06T12:00:00Z'},
       ],
     },
   ],
@@ -113,12 +105,19 @@ describe('TeacherCheckpointsInfo', () => {
       const multipleDatesLinks = screen.getAllByText('Multiple Dates')
       await userEvent.hover(multipleDatesLinks[0])
 
-      expect(screen.getByText('Section 1')).toBeInTheDocument()
-      expect(screen.getByText('Jun 3')).toBeInTheDocument()
-      expect(screen.getByText('Section 2')).toBeInTheDocument()
-      expect(screen.getByText('Jun 4')).toBeInTheDocument()
-      expect(screen.getByText('Everyone else')).toBeInTheDocument()
-      expect(screen.getByText('Jun 2')).toBeInTheDocument()
+      expect(screen.getAllByText('Section 1')).toHaveLength(2)
+      expect(screen.getAllByText('Section 2')).toHaveLength(2)
+      expect(screen.getAllByText('Everyone else')).toHaveLength(2)
+
+      // reply_to_topic due dates
+      expect(screen.getByText('Jun 3')).toBeInTheDocument() // Section 1
+      expect(screen.getByText('Jun 4')).toBeInTheDocument() // Section 2
+      expect(screen.getByText('Jun 2')).toBeInTheDocument() // Everyone else
+
+      // reply_to_entry due dates
+      expect(screen.getByText('Jun 5')).toBeInTheDocument() // Section 1
+      expect(screen.getByText('Jun 6')).toBeInTheDocument() // Section 2
+      expect(screen.getByText('Jun 7')).toBeInTheDocument() // Everyone else
     })
   })
 })
