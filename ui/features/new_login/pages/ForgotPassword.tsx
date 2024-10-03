@@ -21,10 +21,10 @@ import {Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import LoginLinks from '../partials/LoginLinks'
-import {forgotPassword} from '../utils/api'
+import {forgotPassword} from '../services'
 import {Heading} from '@instructure/ui-heading'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {SignInLinks} from '../shared'
 
 const I18n = useI18nScope('new_login')
 
@@ -121,7 +121,7 @@ const ForgotPassword = () => {
       </Flex.Item>
 
       <Flex.Item overflowY="visible">
-        <LoginLinks />
+        <SignInLinks />
       </Flex.Item>
     </Flex>
   )

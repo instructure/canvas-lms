@@ -36,9 +36,11 @@ class Login::CanvasController < ApplicationController
     flash.now[:notice] = t("Your password has been changed.") if params[:password_changed] == "1"
     @include_recaptcha = recaptcha_enabled?(failsafe: false)
 
+    # TODO: remove feature flag check and fallback when `login_registration_ui_identity` is no longer needed
     if @domain_root_account.feature_enabled? :login_registration_ui_identity
       render_new_login
     else
+      # fallback to maintain original behavior
       maybe_render_mobile_login
     end
   end

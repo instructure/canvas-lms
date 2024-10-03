@@ -23,18 +23,17 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('new_login')
 
-const LoginLinks = () => {
+const SignInLinks = () => {
   const isSignIn = useMatch('/login/canvas')
   const isForgotPassword = useMatch('/login/canvas/forgot-password')
+
+  const getActiveClassName = ({isActive}: {isActive: boolean}) => (isActive ? 'active' : '')
 
   return (
     <Flex direction="column" gap="small">
       {isSignIn && (
         <Flex.Item>
-          <NavLink
-            to="/login/canvas/forgot-password"
-            className={({isActive}) => (isActive ? 'active' : '')}
-          >
+          <NavLink to="/login/canvas/forgot-password" className={getActiveClassName}>
             {I18n.t('Forgot password?')}
           </NavLink>
         </Flex.Item>
@@ -42,7 +41,7 @@ const LoginLinks = () => {
 
       {isForgotPassword && (
         <Flex.Item>
-          <NavLink to="/login/canvas" className={({isActive}) => (isActive ? 'active' : '')}>
+          <NavLink to="/login/canvas" className={getActiveClassName}>
             {I18n.t('Sign in')}
           </NavLink>
         </Flex.Item>
@@ -51,4 +50,4 @@ const LoginLinks = () => {
   )
 }
 
-export default LoginLinks
+export default SignInLinks

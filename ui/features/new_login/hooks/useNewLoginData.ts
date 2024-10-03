@@ -17,8 +17,8 @@
  */
 
 import {useEffect, useState} from 'react'
-import type {AuthProvider} from '../utils/types'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import type {AuthProvider} from '../types'
 
 const I18n = useI18nScope('new_login')
 
@@ -48,6 +48,7 @@ export const useNewLoginData = (): NewLoginData => {
 
   useEffect(() => {
     const container = getLoginDataContainer()
+
     if (container) {
       const authProviders = getAuthProviders(container)
       const loginHandleName = getLoginHandleName(container)

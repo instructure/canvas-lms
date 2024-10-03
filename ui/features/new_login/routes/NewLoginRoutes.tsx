@@ -21,6 +21,7 @@ import {Route} from 'react-router-dom'
 import {LoginLayout} from '../layouts/LoginLayout'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {NewLoginProvider} from '../context/NewLoginContext'
 
 const I18n = useI18nScope('new_login')
 
@@ -30,7 +31,14 @@ const ForgotPassword = lazy(() => import('../pages/ForgotPassword'))
 const Fallback = () => <Spinner renderTitle={I18n.t('Loading page')} />
 
 export const NewLoginRoutes = (
-  <Route path="/login/canvas" element={<LoginLayout />}>
+  <Route
+    path="/login/canvas"
+    element={
+      <NewLoginProvider>
+        <LoginLayout />
+      </NewLoginProvider>
+    }
+  >
     <Route
       index={true}
       element={

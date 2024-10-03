@@ -47,10 +47,13 @@ module Login::Shared
     otp_passed ||= user.validate_otp_secret_key_remember_me_cookie(cookies["canvas_otp_remember_me"], request.remote_ip)
     unless otp_passed || pseudonym.authentication_provider.skip_internal_mfa
       mfa_settings = user.mfa_settings(pseudonym_hint: @current_pseudonym)
-      if (user.otp_secret_key && mfa_settings == :optional) ||
-         mfa_settings == :required
+      if (user.otp_secret_key && mfa_settings == :optional) || mfa_settings == :required
         session[:pending_otp] = true
-        return redirect_to otp_login_url
+        respond_to do |format|
+          format.html { redirect_to otp_login_url }
+          format.json { render json: { otp_required: true }, status: :ok }
+        end
+        return
       end
     end
 
@@ -86,19 +89,24 @@ module Login::Shared
 
     respond_to do |format|
       if (oauth = session[:oauth2])
+        # redirect to external OAuth provider
         provider = Canvas::OAuth::Provider.new(oauth[:client_id], oauth[:redirect_uri], oauth[:scopes], oauth[:purpose])
         return redirect_to Canvas::OAuth::Provider.confirmation_redirect(self, provider, user)
-      elsif session[:course_uuid] && user &&
-            (course = Course.where(uuid: session[:course_uuid], workflow_state: "created").first)
+
+      elsif session[:course_uuid] && user && (course = Course.where(uuid: session[:course_uuid], workflow_state: "created").first)
+        # redirect to course if session includes valid course UUID
         claim_session_course(course, user)
         redirect_target = course_url(course, login_success: "1")
         format.html { redirect_to redirect_target }
+
       elsif session[:confirm]
+        # redirect to registration confirmation
         redirect_target = registration_confirmation_path(session.delete(:confirm),
                                                          enrollment: session.delete(:enrollment),
                                                          login_success: 1,
                                                          confirm: ((user.id == session.delete(:expected_user_id)) ? 1 : nil))
         format.html { redirect_to redirect_target }
+
       else
         # the URL to redirect back to is stored in the session, so it's
         # assumed that if that URL is found rather than using the default,

@@ -18,18 +18,14 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import '@testing-library/jest-dom'
-import SignIn from '../SignIn'
+import SignInLinks from '../SignInLinks'
 import {MemoryRouter} from 'react-router-dom'
-import {NewLoginProvider} from '../../context/NewLoginContext'
 
-describe('SignIn', () => {
+describe('SignInLinks', () => {
   it('mounts without crashing', () => {
     render(
       <MemoryRouter>
-        <NewLoginProvider>
-          <SignIn />
-        </NewLoginProvider>
+        <SignInLinks />
       </MemoryRouter>
     )
   })
