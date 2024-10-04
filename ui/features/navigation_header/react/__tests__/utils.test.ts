@@ -42,46 +42,49 @@ describe('utils.ts', () => {
     })
 
     it('processes valid tools correctly', async () => {
-      mockedAxios.get
-        .mockResolvedValueOnce({
-          data: [
-            {context: 'account', context_id: '4045', app_id: '8300'},
-            {context: 'account', context_id: '4045', app_id: '8066'},
-          ],
-        })
-        .mockResolvedValueOnce({
-          data: {
-            global_navigation: {
-              url: 'https://example.com',
-              enabled: true,
-              label: 'Local Studio',
-              icon_svg_path_64: '',
-              icon_url: 'https://example.com/icon.png',
+      mockedAxios.get.mockResolvedValueOnce({
+        data: [
+          {
+            definition_id: 8300,
+            definition_type: 'ContextExternalTool',
+            placements: {
+              global_navigation: {
+                message_type: 'basic_lti_request',
+                url: 'https://example.com',
+                title: 'Local Studio',
+                icon_svg_path_64: '',
+                icon_url: 'https://example.com/icon.png',
+                html_url: '/accounts/1/external_tools/8300?launch_type=global_navigation',
+              },
             },
           },
-        })
-        .mockResolvedValueOnce({
-          data: {
-            global_navigation: {
-              url: 'https://example2.com',
-              enabled: true,
-              label: 'Lucid Integration',
-              icon_svg_path_64: 'path/to/svg',
-              icon_url: '',
+          {
+            definition_id: 8066,
+            definition_type: 'ContextExternalTool',
+            placements: {
+              global_navigation: {
+                message_type: 'basic_lti_request',
+                url: 'https://example2.com',
+                title: 'Lucid Integration',
+                icon_svg_path_64: 'path/to/svg',
+                icon_url: '',
+                html_url: '/accounts/1/external_tools/8066?launch_type=global_navigation',
+              },
             },
           },
-        })
+        ],
+      })
 
       const result = await getExternalApps()
       expect(result).toEqual([
         {
-          href: 'https://example.com',
+          href: '/accounts/1/external_tools/8300?launch_type=global_navigation',
           label: 'Local Studio',
           svgPath: null,
           imgSrc: 'https://example.com/icon.png',
         },
         {
-          href: 'https://example2.com',
+          href: '/accounts/1/external_tools/8066?launch_type=global_navigation',
           label: 'Lucid Integration',
           svgPath: 'path/to/svg',
           imgSrc: null,
@@ -91,7 +94,7 @@ describe('utils.ts', () => {
 
     it('ignores tools without required global_navigation data', async () => {
       mockedAxios.get.mockResolvedValueOnce({
-        data: [{context: 'account', context_id: '4045', app_id: '8300'}],
+        data: [{definition_id: '8300', definition_type: 'ContextExternalTool', placements: {}}],
       })
       const simulate_missing_global_navigation_data = {}
       mockedAxios.get.mockResolvedValueOnce({data: simulate_missing_global_navigation_data})
@@ -104,94 +107,6 @@ describe('utils.ts', () => {
       mockedAxios.get.mockResolvedValue({data: not_an_array})
       const result = await getExternalApps()
       expect(result).toEqual([])
-    })
-
-    it('uses customFields.url when present', async () => {
-      mockedAxios.get
-        .mockResolvedValueOnce({
-          data: [{context: 'account', context_id: '4045', app_id: '8300'}],
-        })
-        .mockResolvedValueOnce({
-          data: {
-            global_navigation: {
-              url: 'https://example.com',
-              enabled: true,
-              label: 'Local Studio',
-              icon_svg_path_64: '',
-              icon_url: 'https://example.com/icon.png',
-            },
-            custom_fields: {
-              url: 'https://custom.example.com',
-            },
-          },
-        })
-
-      const result = await getExternalApps()
-      expect(result).toEqual([
-        {
-          href: 'https://custom.example.com',
-          label: 'Local Studio',
-          svgPath: null,
-          imgSrc: 'https://example.com/icon.png',
-        },
-      ])
-    })
-
-    it('uses globalNavigation.url when customFields.url is not present', async () => {
-      mockedAxios.get
-        .mockResolvedValueOnce({
-          data: [{context: 'account', context_id: '4045', app_id: '8300'}],
-        })
-        .mockResolvedValueOnce({
-          data: {
-            global_navigation: {
-              url: 'https://example.com',
-              enabled: true,
-              label: 'Local Studio',
-              icon_svg_path_64: '',
-              icon_url: 'https://example.com/icon.png',
-            },
-            custom_fields: {},
-          },
-        })
-
-      const result = await getExternalApps()
-      expect(result).toEqual([
-        {
-          href: 'https://example.com',
-          label: 'Local Studio',
-          svgPath: null,
-          imgSrc: 'https://example.com/icon.png',
-        },
-      ])
-    })
-
-    it('sets href to null if both customFields.url and globalNavigation.url are not present', async () => {
-      mockedAxios.get
-        .mockResolvedValueOnce({
-          data: [{context: 'account', context_id: '4045', app_id: '8300'}],
-        })
-        .mockResolvedValueOnce({
-          data: {
-            global_navigation: {
-              enabled: true,
-              label: 'Local Studio',
-              icon_svg_path_64: '',
-              icon_url: 'https://example.com/icon.png',
-            },
-            custom_fields: {},
-          },
-        })
-
-      const result = await getExternalApps()
-      expect(result).toEqual([
-        {
-          href: null,
-          label: 'Local Studio',
-          svgPath: null,
-          imgSrc: 'https://example.com/icon.png',
-        },
-      ])
     })
   })
 
