@@ -14070,6 +14070,7 @@ el:
   show_totals_as_points_on_student_grade_page_d9cb4207: "Εμφάνιση Συνόλων ως Μορίων στη Σελίδα Βαθμών Σπουδαστή"
   showing_count_results_below_61ddca33: 
     zero: "Δεν βρέθηκαν αποτελέσματα"
+  sign_in_c6858e26: Σύνδεση
   sign_up_dafdee18: Εγγραφή
   simple_tls_45df2648: "Απλό TLS"
   sis_agent_token_authentication_2a0b29e3: "Έλεγχος Ταυτότητας Διακριτικού SIS Agent"
@@ -14264,6 +14265,7 @@ el:
   stats_9272cef3: Στατιστικές
   status_e051bb30: κατάσταση
   status_e7fdbe06: Κατάσταση
+  stay_signed_in_1853e9b6: "Παραμείνετε συνδεδεμένος/η"
   step: Βήμα
   strand_955969b1: Σκέλος
   stream_items_api: 
