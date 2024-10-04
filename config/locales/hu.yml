@@ -2936,6 +2936,7 @@ hu:
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Hiba történt*, kérjük, próbálja meg újból a válasz küldését"
   an_error_occurred_please_try_again_95361e05: "Hiba lépett fel. Kérlek próbálja újra."
   an_error_occurred_please_try_again_error_error_8800b506: "Hiba lépett fel. Kérlek próbálja újra. Hiba: %{error}"
+  an_error_occurred_please_try_again_later_16a11884: "Hiba történt. Próbálja újra később."
   an_error_occurred_please_try_again_later_84223241: "Hiba történt. Kérem, próbálja újra később."
   an_error_occurred_publishing_grades_cfdf7631: "Hiba történt az értékelések közzététele közben. "
   an_error_occurred_selecting_provisional_grades_9d7bcda: "Hiba történt az átmeneti értékelések kiválasztása közben"
@@ -11114,6 +11115,7 @@ hu:
   for_students_who_d0fd45d0: "Azon hallgatóknak akik..."
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: "Egyelőre ez a jobb választás, ha harmadik féltől származó eszközökre, Gyorsértékelőre vagy CSV-fájlokra van szüksége a tanulói válaszelemzéshez."
   for_title_69d92b3a: "%{title} számára"
+  forgot_password_9098c30d: "Elfelejtett jelszó"
   forgot_password_f0c3fbac: "Elfelejtette a jelszavát?"
   forgot_password_url_3f9c04b: "Elfelejtett jelszó link"
   form_background_fb654518: "Űrlap háttere"
@@ -22917,6 +22919,7 @@ hu:
   showing_search_results_below_4c9a63d9: "Az alábbi keresési eredmények megjelenítése"
   shrink_permission_74b01aed: "Csökkentés %{permission}"
   shuffle_answers_edb602b7: "Válaszok összekeverése"
+  sign_in_c6858e26: Bejelentkezés
   sign_up_dafdee18: Feliratkozás
   signature_8d0141c8: Aláírás
   signature_af6ce34e: Aláírás*
@@ -23346,6 +23349,7 @@ hu:
   statuses_497dfa15: Státuszok...
   statuses_f41543d8: Státuszok
   statusname_status_successfully_saved_5f8ab9f: "%{statusName} állapot sikeresen mentve"
+  stay_signed_in_1853e9b6: "Maradjon bejelentkezve"
   steel_4baa48ca: Steel
   stemscopes_namespace_custom_data_87bcd65a: "STEMScopes - Névtér Egyedi adatok"
   step: Lépés
