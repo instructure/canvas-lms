@@ -28,6 +28,7 @@ end
 class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
   include Api
   include Api::V1::AssignmentOverride
+  include DiscussionTopicsHelper
 
   graphql_name "CreateDiscussionTopic"
 
@@ -83,6 +84,12 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
     # TODO: return an error when user tries to add a todo_date to a graded discussion
 
     is_announcement = input[:is_announcement] || false
+
+    # If discussion topic has checkpoints, the sum of possible points cannot exceed the max for the assignment
+    if input[:checkpoints].present?
+      err_message = validate_possible_points_with_checkpoints(input)
+      return validation_error(err_message) unless err_message.nil?
+    end
 
     # TODO: On update, we load here instead of creating a new one.
     discussion_topic = is_announcement ? Announcement.new : DiscussionTopic.new
