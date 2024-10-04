@@ -28,7 +28,7 @@ import {
   SECOND_GROUP_CATEGORY_DATA,
   ADHOC_WITHOUT_STUDENTS,
 } from '../../__tests__/mocks'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {QueryProvider, queryClient} from '@canvas/query'
 
 const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never, delay: null}
 
@@ -59,7 +59,6 @@ describe('ItemAssignToTray', () => {
   const FIRST_GROUP_CATEGORY_URL = `/api/v1/group_categories/${FIRST_GROUP_CATEGORY_ID}/groups?per_page=100`
   const SECOND_GROUP_CATEGORY_URL = `/api/v1/group_categories/${SECOND_GROUP_CATEGORY_ID}/groups?per_page=100`
   const SECTIONS_URL = /\/api\/v1\/courses\/.+\/sections\?per_page=\d+/
-  const STUDENTS_URL = /\/api\/v1\/courses\/.+\/users\?per_page=\d+&enrollment_type=student/
   const OVERRIDES_URL = '/api/v1/courses/1/assignments/23/date_details?per_page=100'
 
   const OVERRIDES = [
@@ -138,10 +137,10 @@ describe('ItemAssignToTray', () => {
       .get('/api/v1/courses/1/discussion_topics/23/date_details?per_page=100', {})
       .get('/api/v1/courses/1/pages/23/date_details?per_page=100', {})
     fetchMock
-      .get(STUDENTS_URL, STUDENTS_DATA)
       .get(SECTIONS_URL, SECTIONS_DATA)
       .get(FIRST_GROUP_CATEGORY_URL, FIRST_GROUP_CATEGORY_DATA)
       .get(SECOND_GROUP_CATEGORY_URL, SECOND_GROUP_CATEGORY_DATA)
+    queryClient.setQueryData(['students', props.courseId, {per_page: 100}], STUDENTS_DATA)
   })
 
   afterEach(() => {
@@ -150,21 +149,11 @@ describe('ItemAssignToTray', () => {
     fetchMock.restore()
   })
 
-  const renderComponent = (
-    overrides: Partial<ItemAssignToTrayProps> = {},
-    queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          staleTime: 1000 * 60 * 60 * 24, // 1 day,
-          cacheTime: 1000 * 60 * 60 * 24 * 2, // 2 days,
-        },
-      },
-    })
-  ) =>
+  const renderComponent = (overrides: Partial<ItemAssignToTrayProps> = {}) =>
     render(
-      <QueryClientProvider client={queryClient}>
+      <QueryProvider>
         <ItemAssignToTray {...props} {...overrides} />
-      </QueryClientProvider>
+      </QueryProvider>
     )
 
   it('renders', async () => {
@@ -297,8 +286,48 @@ describe('ItemAssignToTray', () => {
     const {getByRole, findAllByTestId, getAllByTestId} = renderComponent()
     const cards = await findAllByTestId('item-assign-to-card')
     expect(cards).toHaveLength(1)
-    act(() => getByRole('button', {name: 'Add'}).click())
+    act(() => getAllByTestId('add-card')[0].click())
     expect(getAllByTestId('item-assign-to-card')).toHaveLength(2)
+  })
+
+  it('shows top add button if more than 3 cards exist', async () => {
+    fetchMock.get(
+      OVERRIDES_URL,
+      {
+        id: '23',
+        due_at: '2023-10-05T12:00:00Z',
+        unlock_at: '2023-10-01T12:00:00Z',
+        lock_at: '2023-11-01T12:00:00Z',
+        only_visible_to_overrides: false,
+        visible_to_everyone: true,
+        overrides: [
+          {
+            id: '2',
+            assignment_id: '23',
+            course_section_id: '4',
+          },
+          {
+            id: '3',
+            assignment_id: '23',
+            course_section_id: '5',
+          },
+          {
+            id: '4',
+            assignment_id: '23',
+            course_section_id: '6',
+          },
+        ],
+      },
+      {
+        overwriteRoutes: true,
+      }
+    )
+    const {getByRole, findAllByTestId, getAllByTestId} = renderComponent()
+    const cards = await findAllByTestId('item-assign-to-card')
+    expect(cards).toHaveLength(4)
+    expect(getAllByTestId('add-card')).toHaveLength(2)
+    act(() => getAllByTestId('add-card')[0].click())
+    expect(getAllByTestId('item-assign-to-card')).toHaveLength(5)
   })
 
   describe('in a blueprint course', () => {
@@ -363,16 +392,16 @@ describe('ItemAssignToTray', () => {
       fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
         blueprint_date_locks: ['availability_dates'],
       })
-      const {getByTestId, findAllByText} = renderComponent({itemContentId: '31'})
+      const {getAllByTestId, findAllByText} = renderComponent({itemContentId: '31'})
       await findAllByText('Locked:')
-      expect(getByTestId('add-card')).toBeDisabled()
+      expect(getAllByTestId('add-card')[0]).toBeDisabled()
     })
 
     it('disables add button if there are blueprint-locked dates and default cards', async () => {
       fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
         blueprint_date_locks: ['availability_dates'],
       })
-      const {getByTestId, findAllByText} = renderComponent({
+      const {getAllByTestId, findAllByText} = renderComponent({
         itemContentId: '31',
         defaultCards: [
           {
@@ -389,7 +418,8 @@ describe('ItemAssignToTray', () => {
         ],
       })
       await findAllByText('Locked:')
-      expect(getByTestId('add-card')).toBeDisabled()
+
+      expect(getAllByTestId('add-card')[0]).toBeDisabled()
     })
 
     it('shows blueprint locking info when ENV contains master_course_restrictions', async () => {
@@ -466,9 +496,9 @@ describe('ItemAssignToTray', () => {
 
   it('calls customAddCard if passed when a card is added', () => {
     const customAddCard = jest.fn()
-    const {getByRole} = renderComponent({onAddCard: customAddCard})
+    const {getAllByTestId} = renderComponent({onAddCard: customAddCard})
 
-    act(() => getByRole('button', {name: 'Add'}).click())
+    act(() => getAllByTestId('add-card')[0].click())
     expect(customAddCard).toHaveBeenCalled()
   })
 
@@ -787,18 +817,18 @@ describe('ItemAssignToTray', () => {
 
   it.skip('focuses on the add button when deleting a card', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
-    const {findAllByTestId, getByTestId} = renderComponent()
+    const {findAllByTestId, getAllByTestId} = renderComponent()
 
     const deleteButton = (await findAllByTestId('delete-card-button'))[0]
     await user.click(deleteButton)
 
-    const addButton = getByTestId('add-card')
+    const addButton = getAllByTestId('add-card')[0]
     await waitFor(() => expect(addButton).toHaveFocus())
   })
 
   it.skip("focuses on the newly-created card's delete button when adding a card", async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
-    const {findAllByTestId, getByTestId} = renderComponent()
+    const {findAllByTestId, getByTestId, getAllByTestId} = renderComponent()
 
     // wait for the cards to render
     const loadingSpinner = getByTestId('cards-loading')
@@ -806,7 +836,7 @@ describe('ItemAssignToTray', () => {
       expect(loadingSpinner).not.toBeInTheDocument()
     })
 
-    const addButton = getByTestId('add-card')
+    const addButton = getAllByTestId('add-card')[0]
     await user.click(addButton)
     const deleteButtons = await findAllByTestId('delete-card-button')
     await waitFor(() =>
@@ -851,9 +881,9 @@ describe('ItemAssignToTray', () => {
         expect(queryByText(group.name)).not.toBeInTheDocument()
       })
       rerender(
-        <QueryClientProvider client={new QueryClient()}>
+        <QueryProvider>
           <ItemAssignToTray {...props} defaultGroupCategoryId={SECOND_GROUP_CATEGORY_ID} />
-        </QueryClientProvider>
+        </QueryProvider>
       )
 
       await findByText(SECOND_GROUP_CATEGORY_DATA[0].name)
@@ -861,33 +891,6 @@ describe('ItemAssignToTray', () => {
         expect(getByText(group.name)).toBeInTheDocument()
       })
     })
-  })
-
-  it('fetches overrides and assignee options only once', async () => {
-    const urls = [STUDENTS_URL, SECTIONS_URL, OVERRIDES_URL]
-    const queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          staleTime: 1000 * 60 * 60 * 24, // 1 day,
-          cacheTime: 1000 * 60 * 60 * 24 * 2, // 2 days,
-        },
-      },
-    })
-    const {rerender, findAllByTestId} = renderComponent({}, queryClient)
-    const assigneeSelectors = await findAllByTestId('assignee_selector')
-    expect(assigneeSelectors[0]).toBeInTheDocument()
-    urls.forEach(url => expect(fetchMock.calls(url).length).toBe(1))
-    rerender(
-      <QueryClientProvider client={queryClient}>
-        <ItemAssignToTray {...props} open={false} />
-      </QueryClientProvider>
-    )
-    rerender(
-      <QueryClientProvider client={queryClient}>
-        <ItemAssignToTray {...props} open={true} />
-      </QueryClientProvider>
-    )
-    urls.forEach(url => expect(fetchMock.calls(url).length).toBe(1))
   })
 
   describe('in a paced course', () => {
@@ -911,7 +914,6 @@ describe('ItemAssignToTray', () => {
 
     it('does not fetch assignee options', () => {
       renderComponent()
-      expect(fetchMock.calls(STUDENTS_URL).length).toBe(0)
       expect(fetchMock.calls(SECTIONS_URL).length).toBe(0)
     })
   })
@@ -925,14 +927,15 @@ describe('ItemAssignToTray', () => {
     })
 
     it('validates if required due dates are set before applying changes', async () => {
-      const {getByTestId, findAllByTestId, getByText, getAllByText} = renderComponent({
-        postToSIS: true,
-      })
+      const {getByTestId, getAllByTestId, findAllByTestId, getByText, getAllByText} =
+        renderComponent({
+          postToSIS: true,
+        })
       // wait until the cards are loaded
       const cards = await findAllByTestId('item-assign-to-card')
       expect(cards[0]).toBeInTheDocument()
 
-      const addCardBtn = getByTestId('add-card')
+      const addCardBtn = getAllByTestId('add-card')[0]
       act(() => addCardBtn.click())
 
       getByTestId('differentiated_modules_save_button').click()

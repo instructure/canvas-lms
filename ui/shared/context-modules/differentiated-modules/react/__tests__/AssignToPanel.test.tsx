@@ -23,7 +23,7 @@ import {ASSIGNMENT_OVERRIDES_DATA, SECTIONS_DATA, STUDENTS_DATA} from './mocks'
 import * as utils from '../../utils/assignToHelper'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {QueryProvider, queryClient} from '@canvas/query'
 
 jest.mock('../../utils/assignToHelper', () => {
   const originalModule = jest.requireActual('../../utils/assignToHelper')
@@ -53,7 +53,6 @@ describe('AssignToPanel', () => {
   const ASSIGNMENT_OVERRIDES_URL_PUT = `/api/v1/courses/${props.courseId}/modules/${props.moduleId}/assignment_overrides`
   const COURSE_SETTINGS_URL = `/api/v1/courses/${props.courseId}/settings`
   const SECTIONS_URL = /\/api\/v1\/courses\/.+\/sections\?per_page=\d+/
-  const STUDENTS_URL = /\/api\/v1\/courses\/.+\/users\?per_page=\d+&enrollment_type=student/
 
   beforeAll(() => {
     if (!document.getElementById('flash_screenreader_holder')) {
@@ -66,31 +65,22 @@ describe('AssignToPanel', () => {
 
   beforeEach(() => {
     fetchMock.get(SECTIONS_URL, SECTIONS_DATA)
-    fetchMock.get(STUDENTS_URL, STUDENTS_DATA)
+    queryClient.setQueryData(['students', props.courseId, {per_page: 100}], STUDENTS_DATA)
     fetchMock.get(ASSIGNMENT_OVERRIDES_URL, [])
     fetchMock.get(COURSE_SETTINGS_URL, {hide_final_grades: false})
+    fetchMock.put(ASSIGNMENT_OVERRIDES_URL_PUT, {})
   })
 
   afterEach(() => {
     fetchMock.restore()
+    queryClient.removeQueries()
   })
 
   const renderComponent = (overrides = {}) =>
     render(
-      <QueryClientProvider
-        client={
-          new QueryClient({
-            defaultOptions: {
-              queries: {
-                staleTime: 1000 * 60 * 60 * 24, // 1 day,
-                cacheTime: 1000 * 60 * 60 * 24 * 2, // 2 days,
-              },
-            },
-          })
-        }
-      >
+      <QueryProvider>
         <AssignToPanel {...props} {...overrides} />
-      </QueryClientProvider>
+      </QueryProvider>
     )
 
   it('renders', async () => {
@@ -182,7 +172,7 @@ describe('AssignToPanel', () => {
       act(() => customOption.click())
       const assigneeSelector = await findByTestId('assignee_selector')
       act(() => assigneeSelector.click())
-      const option = await findByText(STUDENTS_DATA[0].name)
+      const option = await findByText(STUDENTS_DATA[0].value)
       act(() => option.click())
       expect(queryAllByTestId('assignee_selector_selected_option').length).toBe(1)
       act(() => getByTestId('clear_selection_button').click())
@@ -251,7 +241,7 @@ describe('AssignToPanel', () => {
       expect(await screen.findByText(errorText)).toBeInTheDocument()
 
       await userEvent.click(assigneeSelector)
-      const option = await screen.findByText(STUDENTS_DATA[0].name)
+      const option = await screen.findByText(STUDENTS_DATA[0].value)
       await userEvent.click(option)
       await waitFor(() => expect(screen.queryByText(errorText)).toBeNull())
     })
@@ -342,7 +332,6 @@ describe('AssignToPanel', () => {
 
   describe('on update', () => {
     it('creates new assignment overrides', async () => {
-      fetchMock.put(ASSIGNMENT_OVERRIDES_URL_PUT, {})
       const {findByTestId, findByText, getByRole, findAllByText} = renderComponent()
       const customOption = await findByTestId('custom-option')
       act(() => customOption.click())
@@ -362,7 +351,6 @@ describe('AssignToPanel', () => {
 
     it.skip('updates existing assignment overrides', async () => {
       fetchMock.get(ASSIGNMENT_OVERRIDES_URL, ASSIGNMENT_OVERRIDES_DATA, {overwriteRoutes: true})
-      fetchMock.put(ASSIGNMENT_OVERRIDES_URL, {})
       const studentsOverride = ASSIGNMENT_OVERRIDES_DATA[0]
       const existingOverride = ASSIGNMENT_OVERRIDES_DATA[1]
       const {findByTestId, findByText, getByRole, findAllByText} = renderComponent()
@@ -387,7 +375,6 @@ describe('AssignToPanel', () => {
     })
 
     it('updates the modules UI', async () => {
-      fetchMock.put(ASSIGNMENT_OVERRIDES_URL_PUT, {})
       const {findByRole} = renderComponent()
       const updateButton = await findByRole('button', {name: 'Save'})
       updateButton.click()

@@ -733,7 +733,7 @@ describe "selective_release module item assign to tray" do
       click_add_assign_to_card
 
       click_delete_assign_to_card(1)
-      check_element_has_focus add_assign_to_card
+      check_element_has_focus add_assign_to_card[0]
       # expect(assign_to_in_tray("Remove Everyone")[0]).to be_displayed
       expect(element_exists?(delete_card_button_selector)).to be_falsey
     end
@@ -749,7 +749,7 @@ describe "selective_release module item assign to tray" do
       expect(assign_to_in_tray("Remove #{@student1.name}")[0]).to be_displayed
 
       click_delete_assign_to_card(0)
-      check_element_has_focus add_assign_to_card
+      check_element_has_focus add_assign_to_card[0]
       expect(assign_to_in_tray("Remove #{@student1.name}")[0]).to be_displayed
       expect(element_exists?(delete_card_button_selector)).to be_falsey
     end

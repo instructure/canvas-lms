@@ -155,7 +155,7 @@ module ItemsAssignToTray
 
   #------------------------------ Elements ------------------------------
   def add_assign_to_card
-    f(add_assign_to_card_selector)
+    ff(add_assign_to_card_selector)
   end
 
   def assign_to_card_delete_button
@@ -336,8 +336,8 @@ module ItemsAssignToTray
 
   #------------------------------ Actions ------------------------------
 
-  def click_add_assign_to_card
-    add_assign_to_card.click
+  def click_add_assign_to_card(button_number = 0)
+    add_assign_to_card[button_number].click
   end
 
   def click_duedate_clear_button(card_number = 0)
