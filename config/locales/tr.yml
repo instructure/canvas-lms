@@ -8848,6 +8848,7 @@ tr:
   for_974cbb84: "Kim için"
   for_all_devices_1f603968: "Tüm Aygıtlar İçin"
   for_title_69d92b3a: "%{title} olarak"
+  forgot_password_9098c30d: "Şifremi Unuttum"
   forgot_password_f0c3fbac: "Şifrenizi mi Unuttunuz?"
   forgot_password_url_3f9c04b: "Parola Hatırlatma URL'si"
   form_background_fb654518: "Form Arkaplanı"
@@ -18257,6 +18258,7 @@ tr:
   showing_count_results_below_61ddca33: 
     zero: "Sonuç bulunamadı"
   shuffle_answers_edb602b7: "Cevapları Karıştır"
+  sign_in_c6858e26: "Oturum Aç"
   sign_up_dafdee18: "Kayıt ol"
   similarity_detection_platform_9e424d70: "Benzerlik Tespit Platformu"
   simple_tls_45df2648: "Basit TLS"
@@ -18501,6 +18503,7 @@ tr:
   status_e7fdbe06: Durum
   statuses_497dfa15: Durumlar
   statuses_f41543d8: Durumlar
+  stay_signed_in_1853e9b6: "Oturumunuz açık kalsın"
   step: Adım
   storage_quotas_manage_6ca14bbb: "Dosya Depolama Kotası - yönet"
   storage_used_in_mb_c75fbd9c: "MB olarak kullanılan depolama"
