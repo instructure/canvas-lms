@@ -174,6 +174,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
           subject
 
           expect(config_from_response.developer_key.redirect_uris).to eq redirect_uris
+          expect(config_from_response.redirect_uris).to eq redirect_uris
         end
       end
     end
@@ -276,6 +277,11 @@ RSpec.describe Lti::ToolConfigurationsApiController do
 
     it "sets the developer key redirect_uris" do
       expect(subject.redirect_uris).to eq dev_key_params[:redirect_uris].split
+    end
+
+    it "sets the tool config redirect_uris" do
+      subject
+      expect(config_from_response.redirect_uris).to eq dev_key_params[:redirect_uris].split
     end
 
     it "sets the developer key oidc_initiation_url" do

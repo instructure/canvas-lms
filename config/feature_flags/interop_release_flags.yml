@@ -275,6 +275,8 @@ lti_registrations_next:
   environments:
     development:
       state: allowed_on
+    ci:
+      state: allowed_on
 lti_registrations_page:
   state: hidden
   applies_to: RootAccount

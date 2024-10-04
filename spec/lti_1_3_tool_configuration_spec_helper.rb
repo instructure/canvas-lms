@@ -25,7 +25,7 @@ RSpec.shared_context "lti_1_3_tool_configuration_spec_helper", shared_context: :
       developer_key:,
       settings: settings.merge(public_jwk: tool_config_public_jwk),
       privacy_level: "public"
-    )
+    ).tap(&:transform!)
   end
 
   let(:tool_config_public_jwk) { public_jwk }
