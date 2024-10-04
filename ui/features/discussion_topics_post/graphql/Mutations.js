@@ -261,3 +261,20 @@ export const UPDATE_USER_DISCUSSION_SPLITSCREEN_PREFERENCE = gql`
     }
   }
 `
+
+export const UPDATE_DISCUSSION_SORT_ORDER = gql`
+  mutation UpdateDiscussionSortOrder(
+    $discussionTopicId: ID!
+    $sortOrder: DiscussionSortOrderType!
+  ) {
+    updateDiscussionSortOrder(
+      input: {discussionTopicId: $discussionTopicId, sortOrder: $sortOrder}
+    ) {
+      discussionTopic {
+        _id
+        id
+        sortOrder
+      }
+    }
+  }
+`

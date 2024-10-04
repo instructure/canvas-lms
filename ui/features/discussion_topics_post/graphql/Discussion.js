@@ -149,6 +149,7 @@ export const Discussion = {
     rootEntriesTotalPages: number,
     entriesTotalPages: number,
     subscriptionDisabledForUser: bool,
+    sortOrder: string,
   }),
 
   mock: ({
@@ -196,6 +197,7 @@ export const Discussion = {
     groupSet = GroupSet.mock(),
     rootTopic = RootTopic.mock(),
     entriesTotalPages = 2,
+    sortOrder = 'desc',
     discussionEntriesConnection = {
       nodes: [DiscussionEntry.mock()],
       pageInfo: PageInfo.mock(),
@@ -245,6 +247,7 @@ export const Discussion = {
     entriesTotalPages,
     discussionEntriesConnection,
     subscriptionDisabledForUser,
+    sortOrder,
     __typename: 'Discussion',
   }),
 }

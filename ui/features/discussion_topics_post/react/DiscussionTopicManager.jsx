@@ -56,7 +56,7 @@ const DiscussionTopicManager = props => {
   const [searchTerm, setSearchTerm] = useState('')
   const [filter, setFilter] = useState('all')
   const [unreadBefore, setUnreadBefore] = useState('')
-  const [sort, setSort] = useState('desc')
+  const [sort, setSort] = useState(null)
   const [pageNumber, setPageNumber] = useState(ENV.current_page)
   const [searchPageNumber, setSearchPageNumber] = useState(0)
   const [allThreadsStatus, setAllThreadsStatus] = useState(AllThreadsState.None)
