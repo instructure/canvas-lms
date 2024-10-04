@@ -399,8 +399,8 @@ const NameLink = props => {
         props.userType === 'author'
           ? {
               marginBottom: props.mobileOnly ? '0' : '0.3rem',
-              marginTop: props.mobileOnly ? '0' : theme.variables.spacing.xxSmall,
-              marginLeft: theme.variables.spacing.xxSmall,
+              marginTop: props.mobileOnly ? '0' : theme.spacing.xxSmall,
+              marginLeft: theme.spacing.xxSmall,
               display: 'inline-block',
             }
           : {display: 'inline'}

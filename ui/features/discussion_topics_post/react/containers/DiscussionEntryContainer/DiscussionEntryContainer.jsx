@@ -172,9 +172,9 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
             <hr
               data-testid="post-separator"
               style={{
-                height: theme.variables.borders.widthSmall,
+                height: theme.borders.widthSmall,
                 borderColor: '#E8EAEC',
-                margin: `${theme.variables.spacing.medium} 0`,
+                margin: `${theme.spacing.medium} 0`,
                 ...additionalSeparatorStyles,
               }}
             />

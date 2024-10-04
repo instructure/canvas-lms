@@ -36,8 +36,8 @@ const I18n = useI18nScope('assignments_2_file_upload')
 
 function buildFooterStyle() {
   const footerStyle = {
-    backgroundColor: theme.variables.colors.white,
-    borderColor: theme.variables.colors.borderMedium,
+    backgroundColor: theme.colors.white,
+    borderColor: theme.colors.borderMedium,
   }
 
   if (document.querySelector('.with-embedded-chat')) {

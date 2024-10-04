@@ -103,7 +103,7 @@ export function PostMessage({...props}) {
           titleTextWeight: props.threadMode ? 'bold' : 'normal',
           messageLeftPadding:
             props.discussionEntry && props.discussionEntry.depth === 1 && !props.threadMode
-              ? theme.variables.spacing.xxSmall
+              ? theme.spacing.xxSmall
               : undefined,
           isMobile: false,
         },
