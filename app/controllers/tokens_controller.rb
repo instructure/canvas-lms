@@ -46,12 +46,15 @@ class TokensController < ApplicationController
   # If the user is not the current user, the token will be created as "pending",
   # and must be activated by the user before it can be used.
   #
-  # @argument token[purpose] [String] The purpose of the token.
+  # @argument token[purpose] [Required, String] The purpose of the token.
   # @argument token[expires_at] [DateTime] The time at which the token will expire.
   # @argument token[scopes][] [Array] The scopes to associate with the token.
   #
   def create
     token_params = access_token_params
+
+    return render(json: { errors: [{ message: "token[purpose] is missing" }] }, status: :bad_request) unless token_params.key?(:purpose)
+
     token_params[:developer_key] = DeveloperKey.default
     @token = @context.access_tokens.build(token_params)
 

@@ -77,6 +77,12 @@ describe TokensController do
         expect(assigns[:token].permanent_expires_at.to_date).to eq Time.zone.parse("jun 1 2011").to_date
       end
 
+      it "does not allow creating a token without a purpose param" do
+        post "create", params: { user_id: "self", token: { expires_at: "jun 1 2011" } }
+        assert_status(400)
+        expect(response.body).to match(/purpose/)
+      end
+
       it "allows deleting an access token" do
         token = @user.access_tokens.create!
         expect(token.user_id).to eq @user.id
