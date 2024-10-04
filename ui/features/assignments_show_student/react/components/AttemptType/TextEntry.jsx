@@ -200,7 +200,7 @@ export default class TextEntry extends React.Component {
     return (
       <div
         data-testid="text-editor"
-        style={{padding: `${theme.variables.spacing.small} ${theme.variables.spacing.xLarge}`}}
+        style={{padding: `${theme.spacing.small} ${theme.spacing.xLarge}`}}
       >
         <CanvasRce
           ref={this._rceRef}

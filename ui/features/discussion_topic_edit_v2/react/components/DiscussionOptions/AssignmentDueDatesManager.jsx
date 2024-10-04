@@ -152,9 +152,9 @@ export const AssignmentDueDatesManager = () => {
             <View key={info.dueDateId}>
               <div
                 style={{
-                  paddingTop: assignedInfoList.length === 1 ? theme.variables.spacing.medium : '0',
+                  paddingTop: assignedInfoList.length === 1 ? theme.spacing.medium : '0',
                   borderBottom: index < assignedInfoList.length - 1 ? '1px solid #C7CDD1' : 'none',
-                  paddingBottom: theme.variables.spacing.medium,
+                  paddingBottom: theme.spacing.medium,
                 }}
               >
                 {assignedInfoList.length > 1 && (

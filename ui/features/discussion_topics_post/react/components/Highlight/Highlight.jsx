@@ -65,7 +65,7 @@ export function Highlight({...props}) {
   return (
     <div
       style={{
-        borderRadius: theme.variables.borders.radiusLarge,
+        borderRadius: theme.borders.radiusLarge,
       }}
       className={classNames({[className]: props.isHighlighted})}
       data-testid={props.isHighlighted ? 'isHighlighted' : 'notHighlighted'}

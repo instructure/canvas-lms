@@ -32,7 +32,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 const I18n = useI18nScope('course_paces_flaggable_number_input')
 
 const baseTheme = ENV.use_high_contrast ? canvasHighContrast : canvas
-const borderRadiusMedium = baseTheme.variables.borders.radiusMedium
+const borderRadiusMedium = baseTheme.borders.radiusMedium
 
 interface ComponentProps {
   readonly label: React.ReactNode | string
