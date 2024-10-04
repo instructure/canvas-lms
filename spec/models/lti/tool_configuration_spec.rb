@@ -34,7 +34,19 @@ module Lti
         "use" => "sig"
       }
     end
-    let(:tool_configuration) { described_class.new(settings:).tap { |tc| tc.developer_key = developer_key } }
+    let(:tool_configuration) do
+      described_class.new(settings:).tap do |tc|
+        tc.developer_key = developer_key
+        tc.redirect_uris = ["https://example.com"]
+        tc.send :normalize_configuration
+        tc.transform_settings
+      end
+    end
+    let(:untransformed_tool_configuration) do
+      described_class.new(settings:).tap do |tc|
+        tc.developer_key = developer_key
+      end
+    end
     let(:developer_key) { DeveloperKey.create!(is_lti_key: true, public_jwk_url: "https://example.com", redirect_uris: ["https://example.com"]) }
 
     def make_placement(type, message_type, extra = {})
@@ -141,7 +153,7 @@ module Lti
       end
 
       context 'when "developer_key_id" is blank' do
-        before { tool_configuration.settings = { foo: "bar" } }
+        before { tool_configuration.developer_key_id = nil }
 
         it { is_expected.to be false }
       end
@@ -173,7 +185,7 @@ module Lti
 
       context "when one of the configured placements has an unsupported message_type" do
         before do
-          tool_configuration.settings["extensions"].first["settings"]["placements"] = [
+          tool_configuration.placements = [
             {
               "placement" => "account_navigation",
               "message_type" => "LtiDeepLinkingRequest",
@@ -265,6 +277,9 @@ module Lti
 
     describe "before_update" do
       subject { tool_configuration.update!(changes) }
+
+      let(:tool_configuration) { untransformed_tool_configuration }
+
       before { tool_configuration.update!(developer_key:) }
 
       context "when root privacy_level is updated to nil but settings not changed" do
@@ -345,7 +360,7 @@ module Lti
           context "when the configuration's settings changed" do
             it "calls the LearnPlatform::GlobalApi service" do
               allow(LearnPlatform::GlobalApi).to receive(:get_unified_tool_id)
-              subject.settings["title"] = "new title"
+              subject.title = "new title"
               subject.save
               run_jobs
               expect(LearnPlatform::GlobalApi).to have_received(:get_unified_tool_id)
@@ -574,7 +589,7 @@ module Lti
           end
 
           before do
-            tool_configuration.settings["oidc_initiation_urls"] = oidc_initiation_urls
+            tool_configuration.oidc_initiation_urls = oidc_initiation_urls
             tool_configuration.save!
           end
 
@@ -828,8 +843,7 @@ module Lti
           context "when the configuration has a #{placement} placement" do
             let(:tool_configuration) do
               super().tap do |tc|
-                tc.settings["extensions"].first["settings"]["placements"] <<
-                  make_placement(placement, "LtiResourceLinkRequest")
+                tc.placements << make_placement(placement, "LtiResourceLinkRequest")
               end
             end
 
@@ -905,12 +919,14 @@ module Lti
     end
 
     describe "privacy_level" do
-      subject do
+      def set_privacy_level
         extensions["privacy_level"] = extension_privacy_level
         tool_configuration.privacy_level = privacy_level
+        tool_configuration.settings = settings
         tool_configuration.save!
-        tool_configuration[:privacy_level] # bypass getter and read from column
       end
+
+      subject { tool_configuration[:privacy_level] }
 
       let(:extension_privacy_level) { "name_only" }
       let(:privacy_level) { raise "set in examples" }
@@ -920,6 +936,7 @@ module Lti
         let(:privacy_level) { nil }
 
         it "is set to the value from canvas_extensions" do
+          set_privacy_level
           expect(subject).to eq extension_privacy_level
         end
       end
@@ -931,6 +948,7 @@ module Lti
           let(:privacy_level) { extension_privacy_level }
 
           it "is not reset" do
+            set_privacy_level
             expect { subject }.not_to change { tool_configuration[:privacy_level] }
           end
         end
@@ -939,21 +957,8 @@ module Lti
           let(:privacy_level) { "anonymous" }
 
           it "is updated to match" do
+            set_privacy_level
             expect(subject).to eq extension_privacy_level
-          end
-        end
-
-        context "when the canvas_extensions value is nil" do
-          let(:privacy_level) { "anonymous" }
-
-          before do
-            # setting the value directly to nil violates the
-            # extension schema, so nuke the whole thing
-            tool_configuration.settings.delete("extensions")
-          end
-
-          it "ignores the override" do
-            expect(subject).to eq privacy_level
           end
         end
       end
@@ -987,6 +992,8 @@ module Lti
       subject { tool_configuration.importable_configuration }
 
       context "with settings hash" do
+        let(:tool_configuration) { untransformed_tool_configuration }
+
         it "includes fields from root settings" do
           expect(subject["title"]).to eq settings["title"]
         end
@@ -1015,11 +1022,6 @@ module Lti
       end
 
       context "with columns filled" do
-        before do
-          tool_configuration.developer_key.root_account.enable_feature!(:lti_registrations_next)
-          tool_configuration.transform!
-        end
-
         it "does not include redirect_uris" do
           expect(subject.keys).not_to include("redirect_uris")
         end
@@ -1041,6 +1043,7 @@ module Lti
     describe "#transform_settings" do
       subject { tool_configuration.transform_settings }
 
+      let(:tool_configuration) { untransformed_tool_configuration }
       let(:scopes) { ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"] }
 
       it "clears out settings field" do
@@ -1144,6 +1147,8 @@ module Lti
     describe "#transform!" do
       subject { tool_configuration.transform! }
 
+      let(:tool_configuration) { untransformed_tool_configuration }
+
       before do
         allow(tool_configuration).to receive(:transform_settings).and_return(true)
       end
@@ -1173,6 +1178,8 @@ module Lti
     describe "#untransform!" do
       subject { tool_configuration.untransform! }
 
+      let(:tool_configuration) { untransformed_tool_configuration }
+
       context "with untransformed model" do
         it "does not change the model" do
           expect { subject }.not_to change { tool_configuration }
@@ -1199,6 +1206,8 @@ module Lti
     end
 
     describe "transforming" do
+      let(:tool_configuration) { untransformed_tool_configuration }
+
       it "remains equivalent after multiple transforms" do
         settings = tool_configuration.settings.merge("oidc_initiation_urls" => {}, "public_jwk_url" => nil)
         tool_configuration.transform!
@@ -1215,6 +1224,8 @@ module Lti
 
     describe "#transform_updated_settings" do
       subject { tool_configuration.transform_updated_settings }
+
+      let(:tool_configuration) { untransformed_tool_configuration }
 
       before do
         tool_configuration.transform_settings
@@ -1251,6 +1262,8 @@ module Lti
     describe "#transformed?" do
       subject { tool_configuration.transformed? }
 
+      let(:tool_configuration) { untransformed_tool_configuration }
+
       it { is_expected.to be false }
 
       context "when a required column is present" do
@@ -1264,6 +1277,8 @@ module Lti
 
     describe "#settings" do
       subject { tool_configuration.settings }
+
+      let(:tool_configuration) { untransformed_tool_configuration }
 
       context "when not transformed" do
         it "returns the settings field" do
@@ -1289,6 +1304,8 @@ module Lti
 
     describe "#set_redirect_uris" do
       subject { tool_configuration.send :set_redirect_uris }
+
+      let(:tool_configuration) { untransformed_tool_configuration }
 
       context "when not transformed" do
         it "does not set redirect_uris" do
