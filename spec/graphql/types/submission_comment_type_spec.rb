@@ -49,6 +49,39 @@ describe Types::SubmissionCommentType do
     ).to eq [false]
   end
 
+  describe "comment" do
+    before(:once) do
+      @submission2 = @assignment.grade_student(@student2, score: 8, grader: @teacher)[0]
+      @html_comment = @submission2.add_comment(author: @student2, comment: "<div>html comment</div>", attempt: nil)
+      @html_submission_comments = @submission2.submission_comments
+    end
+
+    let(:submission_type2) { GraphQLTypeTester.new(@submission2, current_user: @teacher) }
+
+    it "comment does not include html tags" do
+      expect(
+        submission_type2.resolve("commentsConnection(filter: {allComments: true}) { nodes { comment }}").first
+      ).to eq("html comment")
+    end
+
+    it "html_comment includes html tags" do
+      expect(
+        submission_type2.resolve("commentsConnection(filter: {allComments: true}) { nodes { htmlComment }}").first
+      ).to eq(@html_comment.comment)
+    end
+
+    it "does not throw an error for poorly formatted html" do
+      @submission2.add_comment(
+        author: @student2,
+        comment: "<div>test invalid html comment</div></div>",
+        attempt: nil
+      )
+      expect(
+        submission_type2.resolve("commentsConnection(filter: {allComments: true}) { nodes { comment }}").last
+      ).to eq("test invalid html comment")
+    end
+  end
+
   describe "Submission Comment Read" do
     it "returns the correct read state" do
       @assignment.post_submissions

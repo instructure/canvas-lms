@@ -1138,6 +1138,22 @@ describe PlannerController do
           expect(response_json.first["plannable"]["id"]).to eq @assignment2.id
         end
 
+        it "returns items with new submission comments with html tags if use_html_comments is true" do
+          @sub = @assignment2.submit_homework(@student)
+          @sub.add_comment(comment: "<div>hello</div>", author: @teacher)
+          get :index, params: { filter: "new_activity", use_html_comment: true }
+          response_json = json_parse(response.body)
+          expect(response_json.first["submissions"]["feedback"]["comment"]).to eq("<div>hello</div>")
+        end
+
+        it "returns items with new submission comments without html tags if use_html_comments is false" do
+          @sub = @assignment2.submit_homework(@student)
+          @sub.add_comment(comment: "<div>hello</div>", author: @teacher)
+          get :index, params: { filter: "new_activity" }
+          response_json = json_parse(response.body)
+          expect(response_json.first["submissions"]["feedback"]["comment"]).to eq("hello")
+        end
+
         it "marks submitted stuff within start and end dates" do
           @assignment4 = @course.assignments.create!(submission_types: "online_text_entry", due_at: 4.weeks.from_now)
           @assignment5 = @course.assignments.create!(submission_types: "online_text_entry", due_at: 4.weeks.ago)

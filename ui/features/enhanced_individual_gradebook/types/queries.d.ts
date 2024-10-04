@@ -131,7 +131,7 @@ export type Attachment = {
 
 export type CommentConnection = {
   id: string
-  comment: string
+  htmlComment: string
   mediaObject?: {
     id: string
     mediaDownloadUrl: string

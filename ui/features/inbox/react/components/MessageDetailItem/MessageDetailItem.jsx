@@ -31,7 +31,7 @@ import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
 import {ConversationContext} from '../../../util/constants'
 import {MediaAttachment} from '@canvas/message-attachments'
-import {formatMessage, containsHtmlTags, stripHtmlTags} from '@canvas/util/TextHelper'
+import {formatMessage, containsHtmlTags} from '@canvas/util/TextHelper'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import { Spinner } from '@instructure/ui-spinner'
 import { translationSeparator } from '../../utils/constants'
@@ -48,7 +48,7 @@ export const MessageDetailItem = ({...props}) => {
   const [translatedMessage, setTranslatedMessage] = useState('')
   const [isTranslating, setIsTranslating] = useState(false)
   const translateInboundMessage = ENV?.inbox_translation_enabled
-  const isMessageHtml = containsHtmlTags(props.conversationMessage?.body)
+  const isMessageHtml = containsHtmlTags(props.conversationMessage?.htmlBody)
 
   useEffect(() => {
     if (translateInboundMessage == null || !translateInboundMessage) {
@@ -65,11 +65,10 @@ export const MessageDetailItem = ({...props}) => {
     if (props.conversationMessage?.body.includes(translationSeparator)) {
       return
     }
-    
+
     setIsTranslating(true)
-    // Send the translation call to the backend. 
-    const messageBody = isMessageHtml ? stripHtmlTags(props.conversationMessage?.body) : props.conversationMessage?.body
-    translateInboxMessage(messageBody, (result) => {
+    // Send the translation call to the backend.
+    translateInboxMessage(props.conversationMessage?.body, (result) => {
       if (result.translated_text) {
         setTranslatedMessage(translationSeparator.concat(result.translated_text))
       }
@@ -77,7 +76,7 @@ export const MessageDetailItem = ({...props}) => {
     })
   }, [translatedMessage])
 
-  const messageBody = (isMessageHtml ? sanitizeHtml(props.conversationMessage?.body) : formatMessage(props.conversationMessage?.body)).concat(translatedMessage)
+  const messageBody = (isMessageHtml ? sanitizeHtml(props.conversationMessage?.htmlBody) : formatMessage(props.conversationMessage?.body)).concat(translatedMessage)
   return (
     <Responsive
       match="media"
