@@ -261,14 +261,5 @@ describe('ConversationListItem', () => {
       fireEvent.click(unreadBadge)
       expect(onMarkAsRead).toHaveBeenCalledWith(submissionsCommentsMock())
     })
-
-    it('does not display html tags in last message', () => {
-      const props = createProps({
-        conversation: submissionsCommentsMock({lastMessageContent: '<p>Remove my tags</p>'}),
-      })
-      const {queryByText, getByText} = render(<ConversationListItem {...props} />)
-      expect(getByText('Remove my tags')).toBeInTheDocument()
-      expect(queryByText('<p>Remove my tags</p>')).not.toBeInTheDocument()
-    })
   })
 })

@@ -661,4 +661,21 @@ describe Api::V1::PlannerItem do
       end
     end
   end
+
+  describe "submission comments" do
+    before do
+      @submission = @assignment.submit_homework(@student, body: "my submission")
+      @html_comment = @submission.add_comment(author: @teacher, comment: "<div>html comment</div>", attempt: nil)
+    end
+
+    it "if use_html_comment true returns submission comments with html tags" do
+      json = api.planner_items_json([@assignment], @student, session, { use_html_comment: true })
+      expect(json.first[:submissions][:feedback][:comment]).to eq("<div>html comment</div>")
+    end
+
+    it "if use_html_comment false returns submission comments without htl tags" do
+      json = api.planner_items_json([@assignment], @student, session)
+      expect(json.first[:submissions][:feedback][:comment]).to eq("html comment")
+    end
+  end
 end

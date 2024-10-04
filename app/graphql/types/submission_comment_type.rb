@@ -44,13 +44,27 @@ module Types
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
 
-    field :comment, String, null: true
     field :created_at, Types::DateTimeType, null: false
     field :draft, Boolean, null: false
     field :submission_id, ID, null: false
 
     field :author, Types::UserType, null: true
     field :media_comment_id, String, null: true
+
+    field :comment, String, null: true
+    def comment
+      Nokogiri::HTML(object.comment).text
+    end
+
+    # rubocop:disable GraphQL/FieldMethod
+    # To keep the GraphQL endpoint consistent, we need to keep the comment field as plain text
+    # and return the html comment separately
+    field :html_comment, String, null: true
+    def html_comment
+      object.comment
+    end
+    # rubocop:enable GraphQL/FieldMethod
+
     def author
       # We are preloading submission and assignment here for the permission check.
       # Not ideal as that could be cached in redis, but in most cases the assignment
