@@ -10809,6 +10809,7 @@ fa:
   for_name_d5684bfd: "برای %{name}"
   for_students_who_d0fd45d0: "برای دانشجویانی که..."
   for_title_69d92b3a: "برای %{title}"
+  forgot_password_9098c30d: "فراموشی رمز عبور"
   forgot_password_f0c3fbac: "رمز عبور را فراموش کردید؟"
   forgot_password_url_3f9c04b: "نشانی اینترنتی فراموشی رمز عبور"
   form_background_fb654518: "پس زمینه فرم"
@@ -22256,6 +22257,7 @@ fa:
     zero: "نتیجه ای یافت نشد"
   shrink_permission_74b01aed: "کوچک شدن %{permission}"
   shuffle_answers_edb602b7: "بر زدن پاسخ ها"
+  sign_in_c6858e26: "ثبت نام"
   sign_up_dafdee18: "ثبت نام"
   signup_type_8b4506f3: "نوع ثبت نام"
   similarity_detection_dcada48: "تشخیص تشابه"
@@ -22643,6 +22645,7 @@ fa:
   status_e7fdbe06: وضعیت
   statuses_497dfa15: وضعیت‌ها...
   statuses_f41543d8: وضعیت‌ها
+  stay_signed_in_1853e9b6: "ماندن در حالت ورود"
   step: مرحله
   still_having_difficulty_get_more_help_here_3cdc8de1: "هنوز مشکل دارید؟ از اینجا کمک بیشتری دریافت کنید:"
   stop_acting_as_user_8809a97f: "متوقف کردن فعالیت به عنوان کاربر"
