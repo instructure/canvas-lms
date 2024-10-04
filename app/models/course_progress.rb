@@ -39,18 +39,23 @@ class CourseProgress
     end
   end
 
+  def modules_by_id
+    @_modules_by_id = modules.index_by(&:id)
+  end
+
   def current_module
-    @_current_module ||= if read_only
-                           begin
-                             progressions_by_mod_id = module_progressions.index_by(&:context_module_id)
-                             modules.detect do |m|
-                               prog = progressions_by_mod_id[m.id]
-                               prog.nil? || prog.completed? == false
+    incomplete_modules.first
+  end
+
+  def incomplete_modules
+    @_incomplete_modules ||= if read_only
+                               modules.select do |m|
+                                 prog = module_ids_to_progressions[m.id]
+                                 prog.nil? || prog.completed? == false
+                               end
+                             else
+                               modules.select { |m| m.evaluate_for(user).completed? == false }
                              end
-                           end
-                         else
-                           modules.detect { |m| m.evaluate_for(user).completed? == false }
-                         end
   end
 
   def module_progressions
@@ -62,6 +67,10 @@ class CourseProgress
                                 course.context_module_progressions
                                       .where(user_id: user, context_module_id: modules)
                               end
+  end
+
+  def module_ids_to_progressions
+    @_module_ids_to_progressions ||= module_progressions.index_by(&:context_module_id)
   end
 
   def current_position
@@ -91,9 +100,29 @@ class CourseProgress
     end
   end
 
+  def visible_tags_for_module(mod)
+    tags = mod.content_tags # preloaded
+    if tags.any?
+      opts = mod.visibility_for_user(user)
+      tags.filter { |tag| tag.visible_to_user?(user, opts) }
+    else
+      []
+    end
+  end
+
   def requirements
     # e.g. [{id: 1, type: 'must_view'}, {id: 2, type: 'must_view'}]
     @_requirements ||= modules.flat_map { |m| module_requirements(m) }.uniq
+  end
+
+  def incomplete_items_for_modules
+    @_incomplete_items_for_modules ||= incomplete_modules.map do |mod|
+      progression = module_ids_to_progressions[mod.id]
+      {
+        module: mod,
+        items: incomplete_module_items(mod, progression)
+      }
+    end
   end
 
   def requirement_count
@@ -102,6 +131,29 @@ class CourseProgress
 
   def has_requirements?
     requirement_count > 0
+  end
+
+  # if a module requires only one item to complete, it increases this requirement count by only 1,
+  # unlike the regular #requirement_count
+  def normalized_requirement_count
+    @_normalized_requirement_count ||= modules.sum { |mod| module_reqs_to_complete_count(mod) }
+  end
+
+  # if a module requires only one item to complete, completion in that module can only increase this count by 1,
+  # unlike the regular #requirement_completed_count
+  def normalized_requirement_completed_count
+    module_ids_to_progressions.sum do |mod_id, progression|
+      mod = modules_by_id[mod_id]
+      requirement_count = module_reqs_to_complete_count(mod)
+      completed_requirements_count = module_requirements_completed(progression).count
+      [requirement_count, completed_requirements_count].min
+    end
+  end
+
+  def progress_percent
+    return 0 unless has_requirements? && normalized_requirement_count > 0
+
+    (normalized_requirement_completed_count.to_f / normalized_requirement_count) * 100
   end
 
   def requirements_completed
@@ -147,7 +199,7 @@ class CourseProgress
   end
 
   def to_json(*)
-    if course.module_based? && course.user_is_student?(user, include_all: true)
+    if can_evaluate_progression?
       {
         requirement_count:,
         requirement_completed_count:,
@@ -168,7 +220,28 @@ class CourseProgress
     end
   end
 
+  def can_evaluate_progression?
+    course.module_based? && course.user_is_student?(user, include_all: true)
+  end
+
   private
+
+  def incomplete_module_items(mod, progression)
+    @_incomplete_module_items ||= {}
+    @_incomplete_module_items[mod.id] ||= begin
+      requirements_ids = module_requirements(mod).pluck(:id).to_set
+      items = visible_tags_for_module(mod)
+
+      if progression
+        completed_requirement_ids = module_requirements_completed(progression).pluck(:id).to_set
+        incomplete_requirement_ids = requirements_ids - completed_requirement_ids
+
+        items.select { |tag| incomplete_requirement_ids.include?(tag.id) }
+      else
+        items.select { |tag| requirements_ids.include?(tag.id) }
+      end
+    end
+  end
 
   def module_requirements(mod)
     @_module_requirements ||= {}
