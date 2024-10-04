@@ -1205,6 +1205,53 @@ describe Types::UserType do
     end
   end
 
+  describe "course_progression" do
+    let(:progress_helper) do
+      progress_helper = double(CourseProgress.name)
+      allow(progress_helper).to receive_messages(can_evaluate_progression?: true, normalized_requirement_count: 1)
+      progress_helper
+    end
+
+    before do
+      allow(CourseProgress).to receive(:new).and_return(progress_helper)
+    end
+
+    it "returns nil in a non-course context" do
+      type = GraphQLTypeTester.new(@student, current_user: @student)
+
+      expect(type.resolve("courseProgression { requirements { total } }")).to be_nil
+    end
+
+    it "returns nil when progress cannot be evaluated" do
+      type = GraphQLTypeTester.new(@student, current_user: @teacher, course: @course)
+
+      expect(progress_helper).to receive(:can_evaluate_progression?).and_return(false)
+      expect(type.resolve("courseProgression { requirements { total } }")).to be_nil
+    end
+
+    context "for a user with view_all_grades permission in the course" do
+      it "returns progression for another user" do
+        type = GraphQLTypeTester.new(@student, current_user: @teacher, course: @course)
+
+        expect(type.resolve("courseProgression { requirements { total } }")).to be_truthy
+      end
+    end
+
+    context "for a user without view_all_grades permission in the course" do
+      it "does not return progression for another user" do
+        type = GraphQLTypeTester.new(@student, current_user: @other_student, course: @course)
+
+        expect(type.resolve("courseProgression { requirements { total } }")).to be_nil
+      end
+
+      it "returns progression for self" do
+        type = GraphQLTypeTester.new(@student, current_user: @student, course: @course)
+
+        expect(type.resolve("courseProgression { requirements { total } }")).to be_truthy
+      end
+    end
+  end
+
   describe "submission comments" do
     before(:once) do
       course = Course.create! name: "TEST"
