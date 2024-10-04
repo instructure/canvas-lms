@@ -384,18 +384,31 @@ module Types
       object.subscription_hold(current_user, session)
     end
 
-    def get_entries(search_term: nil, filter: nil, sort_order: :asc, root_entries: false, user_search_id: nil, unread_before: nil)
+    def get_entries(search_term: nil, filter: nil, sort_order: nil, root_entries: false, user_search_id: nil, unread_before: nil)
       return [] if object.initial_post_required?(current_user, session) || !available_for_user
 
-      Loaders::DiscussionEntryLoader.for(
-        current_user:,
-        search_term:,
-        filter:,
-        sort_order:,
-        root_entries:,
-        user_search_id:,
-        unread_before:
-      ).load(object)
+      sort_order(sort: sort_order).then do |resolved_sort_order|
+        Loaders::DiscussionEntryLoader.for(
+          current_user:,
+          search_term:,
+          filter:,
+          sort_order: resolved_sort_order,
+          root_entries:,
+          user_search_id:,
+          unread_before:
+        ).load(object)
+      end
+    end
+
+    field :sort_order, Types::DiscussionSortOrderType, null: true do
+      argument :sort, Types::DiscussionSortOrderType, required: false
+    end
+
+    def sort_order(sort: nil)
+      return sort.to_sym unless sort.nil?
+
+      participant = object.participant(current_user:)
+      participant&.sort_order&.to_sym || DiscussionTopicParticipant::SortOrder::DESC.to_sym
     end
   end
 end

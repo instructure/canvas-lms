@@ -741,6 +741,13 @@ class DiscussionTopic < ActiveRecord::Base
   end
   protected :change_child_topic_subscribed_state
 
+  def participant(opts = {})
+    current_user = opts[:current_user] || self.current_user
+    return nil unless current_user
+
+    discussion_topic_participants.find_by(user_id: current_user)
+  end
+
   def update_or_create_participant(opts = {})
     current_user = opts[:current_user] || self.current_user
     return nil unless current_user
@@ -758,6 +765,7 @@ class DiscussionTopic < ActiveRecord::Base
           topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
           topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
           topic_participant.subscribed = opts[:subscribed] if opts.key?(:subscribed)
+          topic_participant.sort_order = opts[:sort_order] if opts.key?(:sort_order)
           topic_participant.save
         end
       end

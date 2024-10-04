@@ -48,7 +48,7 @@ export const getDiscussionQueryMock = ({
   perPage = 20,
   rootEntries = true,
   searchTerm = '',
-  sort = 'desc',
+  sort = null,
   shouldError = false,
   isGroup = true,
   unreadBefore = '',
@@ -87,6 +87,7 @@ export const getDiscussionQueryMock = ({
           }
           if (sort === 'asc') {
             return Discussion.mock({
+              sortOrder: 'asc',
               discussionEntriesConnection: {
                 nodes: [
                   DiscussionEntry.mock({
@@ -139,7 +140,7 @@ export const getAnonymousDiscussionQueryMock = ({
   perPage = 20,
   rootEntries = true,
   searchTerm = '',
-  sort = 'desc',
+  sort = null,
   shouldError = false,
   unreadBefore = '',
 } = {}) => [

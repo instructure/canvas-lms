@@ -21,6 +21,12 @@
 class DiscussionTopicParticipant < ActiveRecord::Base
   include Workflow
 
+  module SortOrder
+    DESC = "desc"
+    ASC = "asc"
+    TYPES = SortOrder.constants.map { |c| SortOrder.const_get(c) }
+  end
+
   belongs_to :discussion_topic
   belongs_to :user
 
@@ -29,6 +35,7 @@ class DiscussionTopicParticipant < ActiveRecord::Base
   after_save :check_planner_cache
 
   validates :discussion_topic_id, :user_id, :workflow_state, :unread_entry_count, presence: true
+  validates :sort_order, inclusion: { in: SortOrder::TYPES }
 
   # keeps track of the read state for the initial discussion topic text
   workflow do
