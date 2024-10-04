@@ -26049,7 +26049,7 @@ sv:
   required_values_1eb5841f: "Obligatoriska värden"
   requirement_f5b75da1: Krav
   requirement_subject_7cfac6c8: Ämneskrav
-  requirements_c64bcef3: Förutsättningar
+  requirements_c64bcef3: Krav
   requires_recaptcha_for_self_registration_by_defaul_c1a9db63: "Kräver Recaptcha vid självregistrering som standard"
   reregister_9ab95a57: Omregistrera
   reregister_toolname_3dde0bfc: "Omregistrera %{toolName}"
