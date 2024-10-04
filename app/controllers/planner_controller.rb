@@ -144,8 +144,9 @@ class PlannerController < ApplicationController
         items_response = Rails.cache.fetch(composite_cache_key, expires_in: 1.week) do
           items = collection_for_filter(params[:filter])
           items = Api.paginate(items, self, params.key?(:user_id) ? api_v1_user_planner_items_url : api_v1_planner_items_url)
+          use_html_comment = params[:use_html_comment] || false
           {
-            json: planner_items_json(items, @user, session, { due_after: start_date, due_before: end_date }),
+            json: planner_items_json(items, @user, session, { due_after: start_date, due_before: end_date, use_html_comment: }),
             link: response.headers["Link"].to_s,
           }
         end

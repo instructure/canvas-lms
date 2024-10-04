@@ -50,6 +50,16 @@ QUnit.module('submissions', {
         </div>
         <div class='comments'>
           <div class='comment_list'>
+            <div class='comment ' id='submission_comment_1'>
+              <div class='comment'>
+                <span class='comment_content' data-content='<div>My html comment</div>'></span>
+              </div>
+            </div>
+            <div class='comment ' id='submission_comment_2'>
+              <div class='comment'>
+                <span class='comment_content' data-content='My\nformatted\ncomment'></span>
+              </div>
+            </div>
             <div class='comment_media'>
               <span class='media_comment_id'>my_comment_id</span>
               <div class='media_comment_content'></div>
@@ -159,4 +169,15 @@ test('clicking a media comment passes the opening element to the window', () => 
   strictEqual(openingElement, commentLink.get(0))
 
   $.fn.mediaComment.restore()
+})
+
+test('html comment does not render with html tags', () => {
+  const htmlComment = document.getElementById('submission_comment_1')
+  equal(htmlComment.textContent.trim(), 'My html comment')
+})
+
+test('comment with \n is formatted properly', () => {
+  const formattedComment = document.getElementById('submission_comment_2')
+  const commentContent = formattedComment.querySelector('span')
+  equal(commentContent.innerHTML, 'My<br>\nformatted<br>\ncomment')
 })

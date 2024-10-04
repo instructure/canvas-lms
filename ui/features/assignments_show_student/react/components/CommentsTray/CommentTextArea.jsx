@@ -77,6 +77,7 @@ export default class CommentTextArea extends Component {
           _id: 'pending',
           attachments: [],
           comment: this.state.commentText,
+          htmlComment: this.state.commentText,
           read: true,
           updatedAt: new Date().toISOString(),
           author: {

@@ -43,6 +43,7 @@ import {captureException} from '@sentry/browser'
 import {RubricAssignmentContainer} from '@canvas/rubrics/react/RubricAssignment'
 import {mapRubricUnderscoredKeysToCamelCase} from '@canvas/rubrics/react/utils'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
+import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -52,7 +53,8 @@ ready(() => {
   const comments = document.getElementsByClassName("comment_content")
   Array.from(comments).forEach((comment) => {
     const content = comment.dataset.content
-    comment.innerHTML = sanitizeHtml(content)
+    const formattedComment = containsHtmlTags(content) ? sanitizeHtml(content) : formatMessage(content)
+    comment.innerHTML = formattedComment
   })
 
   const lockManager = new LockManager()

@@ -238,7 +238,7 @@ export const ConversationListItem = ({...props}) => {
                 </Grid.Col>
                 <Grid.Col>
                   <Text color="secondary" size={props.textSize} data-testid="last-message-content">
-                    {truncateText(stripHtmlTags(props.conversation.lastMessageContent))}
+                    {truncateText(props.conversation.lastMessageContent)}
                   </Text>
                 </Grid.Col>
                 <Grid.Col width="auto">

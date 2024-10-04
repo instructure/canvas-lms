@@ -159,7 +159,7 @@ module Api::V1::PlannerItem
     notes, context_items = plannable_items.partition { |i| i.is_a?(::PlannerNote) }
     ActiveRecord::Associations.preload(notes, user: { pseudonym: :account }) if notes.any?
     ActiveRecord::Associations.preload(context_items, { context: :root_account }) if context_items.any?
-    ss = submission_statuses(context_items.select { |i| i.is_a?(::Assignment) || i.is_a?(::SubAssignment) }, user)
+    ss = submission_statuses(context_items.select { |i| i.is_a?(::Assignment) || i.is_a?(::SubAssignment) }, user, opts:)
     discussions = context_items.select { |i| i.is_a?(::DiscussionTopic) }
     topics_status = topics_status_for(user, discussions.map(&:id))
 
@@ -188,7 +188,7 @@ module Api::V1::PlannerItem
     submission_status
   end
 
-  def submission_statuses(assignments, user)
+  def submission_statuses(assignments, user, opts: {})
     subs = Submission.where(assignment: assignments, user:)
                      .preload([:content_participations, visible_submission_comments: :author])
     subs_hash = subs.index_by(&:assignment_id)
@@ -219,17 +219,17 @@ module Api::V1::PlannerItem
         new_activity: sub_or_parent_sub&.unread?(user),
         redo_request: submission&.redo_request?
       }
-      sub_data_hash[:feedback] = feedback_data(sub_or_parent_sub, user) if sub_data_hash[:has_feedback]
+      sub_data_hash[:feedback] = feedback_data(sub_or_parent_sub, user, opts[:use_html_comment]) if sub_data_hash[:has_feedback]
       subs_data_hash[assign.id] = sub_data_hash
     end
     subs_data_hash
   end
 
-  def feedback_data(submission, user)
+  def feedback_data(submission, user, use_html_comment)
     feedback_hash = {}
     last_teacher_comment = submission.last_teacher_comment
     last_teacher_comment.submission = submission # otherwise you get a couple more queries, because the association is lost somehow
-    feedback_hash[:comment] = last_teacher_comment.comment
+    feedback_hash[:comment] = use_html_comment ? last_teacher_comment.comment : Nokogiri::HTML(last_teacher_comment.comment).text
     feedback_hash[:is_media] = last_teacher_comment.media_comment_id?
     if last_teacher_comment.can_read_author?(user, nil)
       feedback_hash[:author_name] = last_teacher_comment.author_name

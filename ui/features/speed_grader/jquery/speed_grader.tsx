@@ -163,6 +163,7 @@ import type {
 import {SpeedGraderCheckpointsWrapper} from '../react/SpeedGraderCheckpoints/SpeedGraderCheckpointsWrapper'
 import {SpeedGraderDiscussionsNavigation} from '../react/SpeedGraderDiscussionsNavigation'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
+import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
 
 declare global {
   interface Window {
@@ -3378,7 +3379,10 @@ EG = {
       commentElement.find('.edit_comment_link').remove()
     }
 
-    commentElement.find('span.comment').html(sanitizeHtml(comment.comment))
+    const formattedComment = containsHtmlTags(comment.comment)
+      ? sanitizeHtml(comment.comment)
+      : formatMessage(comment.comment)
+    commentElement.find('span.comment').html(formattedComment)
 
     deleteCommentLinkText = I18n.t('Delete comment: %{commentText}', {commentText: spokenComment})
     commentElement.find('.delete_comment_link .screenreader-only').text(deleteCommentLinkText)

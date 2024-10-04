@@ -653,6 +653,36 @@ describe Api::V1::Submission do
       submission_json = fake_controller.submission_json(submission, assignment, user, session, context)
       expect(submission_json.fetch("media_comment")["media_type"]).to eq "video"
     end
+
+    describe "include submission_comments" do
+      before do
+        @submission_comment = submission.submission_comments.create!
+        @submission_comment.comment = "<div>My html comment</div>"
+        @submission_comment.save!
+      end
+
+      it "returns submission comments without html tags" do
+        submission = assignment.submission_for_student(user)
+        fake_controller.current_user = user
+        submission_json = fake_controller.submission_json(submission, assignment, user, session, context, ["submission_comments"])
+        expect(submission_json.fetch("submission_comments").first["comment"]).to eq "My html comment"
+      end
+    end
+
+    describe "include submission_html_comments" do
+      before do
+        @submission_comment = submission.submission_comments.create!
+        @submission_comment.comment = "<div>My html comment</div>"
+        @submission_comment.save!
+      end
+
+      it "returns submission comments with html tags" do
+        submission = assignment.submission_for_student(user)
+        fake_controller.current_user = user
+        submission_json = fake_controller.submission_json(submission, assignment, user, session, context, ["submission_html_comments"])
+        expect(submission_json.fetch("submission_html_comments").first["comment"]).to eq "<div>My html comment</div>"
+      end
+    end
   end
 
   describe "#submission_zip" do

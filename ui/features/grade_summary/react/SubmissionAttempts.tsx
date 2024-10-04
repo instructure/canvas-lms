@@ -32,6 +32,7 @@ import {Link} from '@instructure/ui-link'
 import {MediaPlayer} from '@instructure/ui-media-player'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
+import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
 
 const I18n = useI18nScope('grade_summary')
 
@@ -114,6 +115,9 @@ function SubmissionAttemptComments({comments}: SubmissionAttemptProps) {
             }
           })
         }
+        const formattedComment = containsHtmlTags(comment.comment)
+          ? sanitizeHtml(comment.comment)
+          : formatMessage(comment.comment)
         return (
           <Flex as="div" direction="column" key={comment.id} data-testid="submission-comment">
             <div
@@ -142,8 +146,9 @@ function SubmissionAttemptComments({comments}: SubmissionAttemptProps) {
             <View as="div" margin="0 medium 0 small">
               <Text
                 size="small"
+                data-testid="submission-comment-content"
                 dangerouslySetInnerHTML={{
-                  __html: sanitizeHtml(comment.comment),
+                  __html: formattedComment,
                 }}
               />
             </View>
