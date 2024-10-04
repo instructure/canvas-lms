@@ -3300,6 +3300,7 @@ nn:
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Det oppstod ein feil*, legg inn svaret ditt på nytt seinare"
   an_error_occurred_please_try_again_95361e05: "Det oppstod ein feil. Prøv på nytt seinare."
   an_error_occurred_please_try_again_error_error_8800b506: "Ein feil oppstod. Vennligst prøv igjen. Feil: %{error}"
+  an_error_occurred_please_try_again_later_16a11884: "Det oppstod ein feil, prøv på nytt seinare."
   an_error_occurred_please_try_again_later_84223241: "Det oppstod ein feil. Prøv på nytt seinare."
   an_error_occurred_publishing_grades_cfdf7631: "Det oppstod ein feil under publisering av karakterar."
   an_error_occurred_selecting_provisional_grades_9d7bcda: "Det oppstod ein feil under val av mellombelse karakterar"
@@ -11862,6 +11863,7 @@ nn:
       3. partsverktøy, Speedgrader, eller CSV for analyse av
       studentrespons, er dette eit betre val.
   for_title_69d92b3a: "for %{title}"
+  forgot_password_9098c30d: "Gløymt passord"
   forgot_password_f0c3fbac: "Gløymt passord?"
   forgot_password_url_3f9c04b: "Gløymt URL-adresse for passord"
   form_background_fb654518: Skjemabakgrunn
@@ -24558,6 +24560,7 @@ nn:
   showing_search_results_below_4c9a63d9: "Viser søkeresultat under"
   shrink_permission_74b01aed: "Krymp %{permission}"
   shuffle_answers_edb602b7: "Stokk svar"
+  sign_in_c6858e26: "Logg på"
   sign_up_dafdee18: "Meld deg på"
   signature_8d0141c8: Signatur
   signature_af6ce34e: Signatur*
@@ -25010,6 +25013,7 @@ nn:
   statuses_497dfa15: Statusar...
   statuses_f41543d8: Statusar
   statusname_status_successfully_saved_5f8ab9f: "%{statusName} status lagra"
+  stay_signed_in_1853e9b6: "Ikkje logg av"
   steel_4baa48ca: Stål
   stemscopes_namespace_custom_data_87bcd65a: "STEMScopes - namneområde eigendefinerte data"
   step: Trinn
