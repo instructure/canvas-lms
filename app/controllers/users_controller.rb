@@ -440,6 +440,8 @@ class UsersController < ApplicationController
 
     includes = (params[:include] || []) & %w[avatar_url email last_login time_zone uuid ui_invoked]
     includes << "last_login" if params[:sort] == "last_login" && !includes.include?("last_login")
+    include_deleted_users = value_to_boolean(params[:include_deleted_users])
+    includes << "deleted_pseudonyms" if include_deleted_users
 
     search_term = params[:search_term].presence
     if search_term
@@ -452,7 +454,7 @@ class UsersController < ApplicationController
                                                sort: params[:sort],
                                                enrollment_role_id: params[:role_filter_id],
                                                enrollment_type: params[:enrollment_type],
-                                               include_deleted_users: value_to_boolean(params[:include_deleted_users])
+                                               include_deleted_users:
                                              })
     else
       users = UserSearch.scope_for(@context,
@@ -465,7 +467,7 @@ class UsersController < ApplicationController
                                      ui_invoked: includes.include?("ui_invoked"),
                                      temporary_enrollment_recipients: value_to_boolean(params[:temporary_enrollment_recipients]),
                                      temporary_enrollment_providers: value_to_boolean(params[:temporary_enrollment_providers]),
-                                     include_deleted_users: value_to_boolean(params[:include_deleted_users])
+                                     include_deleted_users:
                                    })
       users = users.with_last_login if params[:sort] == "last_login"
     end
@@ -477,6 +479,7 @@ class UsersController < ApplicationController
     end
 
     GuardRail.activate(:secondary) do
+      users.preload(:pseudonyms) if includes.include? "deleted_pseudonyms"
       users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
 
       user_json_preloads(users, includes.include?("email"))
@@ -1364,13 +1367,9 @@ class UsersController < ApplicationController
       get_context(user_scope: User) if params[:account_id] || params[:course_id] || params[:group_id]
 
       @context_account = @context.is_a?(Account) ? @context : @domain_root_account
-      @user = api_find_all(@context&.all_users || User, [params[:id]]).first
-      if !@user && @context.is_a?(Account)
-        @user = api_find_all(@context&.deleted_users, [params[:id]]).first
-      end
-      allowed = @user&.grants_right?(@current_user, session, :read_full_profile)
-
-      return render_unauthorized_action unless allowed
+      scope = (value_to_boolean(params[:include_deleted_users]) && @context.is_a?(Account)) ? @context.pseudonym_users : (@context&.all_users || User)
+      @user = api_find_all(scope, [params[:id]]).first
+      return render_unauthorized_action unless @user&.grants_right?(@current_user, session, :read_full_profile)
 
       @context ||= @user
 
@@ -1447,7 +1446,7 @@ class UsersController < ApplicationController
         end
         format.json do
           includes = %w[locale avatar_url]
-          includes << "deleted_pseudonyms" if @context.is_a?(Account)
+          includes << "deleted_pseudonyms" if value_to_boolean(params[:include_deleted_users])
           render json: user_json(@user,
                                  @current_user,
                                  session,

@@ -83,6 +83,11 @@ module Api::V1::User
           if pseudonym && context.grants_right?(current_user, session, :view_user_logins)
             json[:login_id] = pseudonym.unique_id
           end
+
+          if includes.include?("deleted_pseudonyms")
+            json[:login_ids] = user.pseudonyms.pluck(:unique_id).join(",")
+            json[:sis_user_ids] = user.pseudonyms.pluck(:sis_user_id).join(",")
+          end
         end
       end
 
