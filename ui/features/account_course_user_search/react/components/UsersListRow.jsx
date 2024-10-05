@@ -37,12 +37,15 @@ export default function UsersListRow({
   permissions,
   handleSubmitEditUserForm,
   roles,
+  includeDeletedUsers
 }) {
+  let userLink = `/accounts/${accountId}/users/${user.id}`
+  if (includeDeletedUsers && !user.login_id) userLink += `?include_deleted_users=${includeDeletedUsers}`
   return (
     <Table.Row>
       <Table.RowHeader>
         <UserLink
-          href={`/accounts/${accountId}/users/${user.id}`}
+          href={userLink}
           avatarName={user.short_name}
           name={user.sortable_name}
           avatar_url={user.avatar_url}
@@ -157,6 +160,7 @@ UsersListRow.propTypes = {
       label: string.isRequired,
     })
   ).isRequired,
+  includeDeletedUsers: string,
 }
 
 UsersListRow.displayName = 'Row'

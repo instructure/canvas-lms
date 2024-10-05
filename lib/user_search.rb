@@ -30,9 +30,10 @@ module UserSearch
       @include_email       = context.grants_right?(searcher, session, :read_email_addresses)
       @include_sis         = context.grants_any_right?(searcher, session, :read_sis, :manage_sis)
       @include_integration = @include_sis
+      @include_deleted_users = options[:include_deleted_users]
 
       context.shard.activate do
-        users_scope = context_scope(context, searcher, options.slice(:enrollment_state, :include_inactive_enrollments, :include_deleted_users))
+        users_scope = context_scope(context, searcher, options.slice(:enrollment_state, :include_inactive_enrollments))
         users_scope = users_scope.from("(#{conditions_statement(search_term, context.root_account, users_scope)}) AS users")
         users_scope = order_scope(users_scope, context, options.slice(:order, :sort))
         roles_scope(users_scope, context, options.slice(:enrollment_type,
@@ -57,11 +58,11 @@ module UserSearch
     end
 
     def scope_for(context, searcher, options = {})
+      @include_deleted_users = options[:include_deleted_users]
       users_scope = context_scope(context, searcher, options.slice(:enrollment_state,
                                                                    :include_inactive_enrollments,
                                                                    :enrollment_role_id,
-                                                                   :ui_invoked,
-                                                                   :include_deleted_users))
+                                                                   :ui_invoked))
       users_scope = roles_scope(users_scope, context, options.slice(:enrollment_role,
                                                                     :enrollment_role_id,
                                                                     :enrollment_type,
@@ -79,7 +80,7 @@ module UserSearch
       case context
       when Account
         users = User.of_account(context).active
-        users = users.union(context.deleted_users) if options[:include_deleted_users]
+        users = users.union(context.pseudonym_users) if @include_deleted_users
         users
       when Course
         context.users_visible_to(searcher,
@@ -117,7 +118,7 @@ module UserSearch
                                                     (SELECT #{column}
                                                       FROM #{Pseudonym.quoted_table_name}
                                                       WHERE pseudonyms.user_id = users.id
-                                                        AND pseudonyms.workflow_state <> 'deleted'
+                                                        #{"AND pseudonyms.workflow_state <> 'deleted'" if @include_deleted_users}
                                                         AND pseudonyms.account_id = ?
                                                       ORDER BY workflow_state,
                                                               CASE WHEN pseudonyms.sis_user_id IS NOT NULL THEN 0 ELSE 1 END,
@@ -228,7 +229,7 @@ module UserSearch
       users_scope.select("users.*, MAX(pseudonyms.current_login_at) as last_login")
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id
           AND pseudonyms.account_id = #{User.connection.quote(params[:account].id_for_database)}
-          AND pseudonyms.workflow_state = 'active'")
+          #{"AND pseudonyms.workflow_state = 'active'" unless @include_deleted_users}")
                  .where(id: params[:db_id])
                  .shard(Shard.current)
                  .group(:id)
@@ -241,7 +242,7 @@ module UserSearch
       users_scope.select("users.*, MAX(pseudonyms.current_login_at) as last_login")
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id
           AND pseudonyms.account_id = #{User.connection.quote(params[:account].id_for_database)}
-          AND pseudonyms.workflow_state = 'active'")
+          #{"AND pseudonyms.workflow_state = 'active'" unless @include_deleted_users}")
                  .where(id: ids)
     end
 
@@ -254,38 +255,42 @@ module UserSearch
       users_scope.select("users.*, MAX(pseudonyms.current_login_at) as last_login")
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id
           AND pseudonyms.account_id = #{User.connection.quote(params[:account].id_for_database)}
-          AND pseudonyms.workflow_state = 'active'")
+          #{"AND pseudonyms.workflow_state = 'active'" unless @include_deleted_users}")
                  .where(like_condition("users.name"), pattern: params[:pattern])
     end
 
     def login_sql(users_scope, params)
-      users_scope.select("users.*, MAX(logins.current_login_at) as last_login")
-                 .joins(:pseudonyms)
-                 .joins("LEFT JOIN #{Pseudonym.quoted_table_name} AS logins ON logins.user_id = users.id
-          AND logins.account_id = #{User.connection.quote(params[:account].id_for_database)}
-          AND logins.workflow_state = 'active'")
-                 .where(pseudonyms: { account_id: params[:account], workflow_state: "active" })
-                 .where(like_condition("pseudonyms.unique_id"), pattern: params[:pattern])
+      scope = users_scope.select("users.*, MAX(logins.current_login_at) as last_login")
+                         .joins(:pseudonyms)
+                         .joins("LEFT JOIN #{Pseudonym.quoted_table_name} AS logins ON logins.user_id = users.id
+                  AND logins.account_id = #{User.connection.quote(params[:account].id_for_database)}
+                  #{"AND logins.workflow_state = 'active'" unless @include_deleted_users}")
+                         .where(pseudonyms: { account_id: params[:account] })
+                         .where(like_condition("pseudonyms.unique_id"), pattern: params[:pattern])
+      scope = scope.where(pseudonyms: { workflow_state: "active" }) unless @include_deleted_users
+      scope
     end
 
     def sis_sql(users_scope, params)
-      users_scope.select("users.*, MAX(logins.current_login_at) as last_login")
-                 .joins(:pseudonyms)
-                 .joins("LEFT JOIN #{Pseudonym.quoted_table_name} AS logins ON logins.user_id = users.id
-          AND logins.account_id = #{User.connection.quote(params[:account].id_for_database)}
-          AND logins.workflow_state = 'active'")
-                 .where(pseudonyms: { account_id: params[:account], workflow_state: ["active", "suspended"] })
-                 .where(like_condition("pseudonyms.sis_user_id"), pattern: params[:pattern])
+      scope = users_scope.select("users.*, MAX(logins.current_login_at) as last_login")
+                         .joins(:pseudonyms)
+                         .joins("LEFT JOIN #{Pseudonym.quoted_table_name} AS logins ON logins.user_id = users.id
+                  AND logins.account_id = #{User.connection.quote(params[:account].id_for_database)}
+                  #{"AND logins.workflow_state = 'active'" unless @include_deleted_users}")
+                         .where(like_condition("pseudonyms.sis_user_id"), pattern: params[:pattern])
+      scope = scope.where(pseudonyms: { account_id: params[:account], workflow_state: ["active", "suspended"] }) unless @include_deleted_users
+      scope
     end
 
     def integration_sql(users_scope, params)
-      users_scope.select("users.*, MAX(logins.current_login_at) as last_login")
-                 .joins(:pseudonyms)
-                 .joins("LEFT JOIN #{Pseudonym.quoted_table_name} AS logins ON logins.user_id = users.id
-          AND logins.account_id = #{User.connection.quote(params[:account].id_for_database)}
-          AND logins.workflow_state = 'active'")
-                 .where(pseudonyms: { account_id: params[:account], workflow_state: ["active", "suspended"] })
-                 .where(like_condition("pseudonyms.integration_id"), pattern: params[:pattern])
+      scope = users_scope.select("users.*, MAX(logins.current_login_at) as last_login")
+                         .joins(:pseudonyms)
+                         .joins("LEFT JOIN #{Pseudonym.quoted_table_name} AS logins ON logins.user_id = users.id
+                  AND logins.account_id = #{User.connection.quote(params[:account].id_for_database)}
+                  #{"AND logins.workflow_state = 'active'" unless @include_deleted_users}")
+                         .where(like_condition("pseudonyms.integration_id"), pattern: params[:pattern])
+      scope = scope.where(pseudonyms: { account_id: params[:account], workflow_state: ["active", "suspended"] }) unless @include_deleted_users
+      scope
     end
 
     def email_sql(users_scope, params)
@@ -293,7 +298,7 @@ module UserSearch
                  .joins(:communication_channels)
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id
           AND pseudonyms.account_id = #{User.connection.quote(params[:account].id_for_database)}
-          AND pseudonyms.workflow_state = 'active'")
+          #{"AND pseudonyms.workflow_state = 'active'" unless @include_deleted_users}")
                  .where(communication_channels: { workflow_state: ["active", "unconfirmed"], path_type: params[:path_type] })
                  .where(like_condition("communication_channels.path"), pattern: params[:pattern])
     end

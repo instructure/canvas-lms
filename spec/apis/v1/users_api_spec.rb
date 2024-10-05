@@ -1106,6 +1106,36 @@ describe "Users API", type: :request do
       expect(response).to have_http_status :forbidden
     end
 
+    it "does not show deleted users" do
+      @account = Account.default
+      course_with_teacher(active_all: 1, user: user_with_pseudonym(user: user_factory(name: "deleted teacher")))
+      account_admin_user(active_all: true)
+      user_session(@admin)
+      @teacher.remove_from_root_account(Account.default)
+
+      raw_api_call(:get, "/api/v1/accounts/#{@account.id}/users", controller: "users", action: "api_index", account_id: @account.id.to_param, format: "json")
+      expect(JSON.parse(response.body).pluck("name")).not_to include "deleted teacher"
+
+      raw_api_call(:get, "/api/v1/accounts/#{@account.id}/users", controller: "users", action: "api_index", account_id: @account.id.to_param, format: "json", search_term: "deleted")
+      expect(JSON.parse(response.body).pluck("name")).not_to include "deleted teacher"
+      expect(JSON.parse(response.body).length).to be 0
+    end
+
+    it "shows deleted users if the include_deleted_users flag is set" do
+      @account = Account.default
+      course_with_teacher(active_all: 1, user: user_with_pseudonym(user: user_factory(name: "deleted teacher")))
+      account_admin_user(active_all: true)
+      user_session(@admin)
+      @teacher.remove_from_root_account(Account.default)
+
+      raw_api_call(:get, "/api/v1/accounts/#{@account.id}/users", controller: "users", action: "api_index", account_id: @account.id.to_param, format: "json", include_deleted_users: true)
+      expect(JSON.parse(response.body).pluck("name")).to include "deleted teacher"
+
+      raw_api_call(:get, "/api/v1/accounts/#{@account.id}/users", controller: "users", action: "api_index", account_id: @account.id.to_param, format: "json", include_deleted_users: true, search_term: "deleted")
+      expect(JSON.parse(response.body).pluck("name")).to include "deleted teacher"
+      expect(JSON.parse(response.body).length).to be 1
+    end
+
     it "returns an error when search_term is fewer than 2 characters" do
       @account = Account.default
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param }, { search_term: "a" }, {}, expected_status: 400)
