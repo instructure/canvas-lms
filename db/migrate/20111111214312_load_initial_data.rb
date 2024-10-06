@@ -125,6 +125,7 @@ class LoadInitialData < ActiveRecord::Migration[7.0]
                              "Forgot Password",
                              "Manually Created Access Token Created",
                              "Access Token Created On Behalf Of User",
+                             "Access Token Deleted",
                              "Merge Email Communication Channel",
                              "Pseudonym Registration",
                              "Pseudonym Registration Done",
