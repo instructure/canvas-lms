@@ -370,6 +370,7 @@ class Notification < Switchman::UnshardedRecord
   def names
     t "names.manually_created_access_token_created", "Manually Created Access Token Created"
     t "names.access_token_created_on_behalf_of_user", "Access Token Created On Behalf Of User"
+    t "names.access_token_deleted", "Access Token Deleted"
     t "names.account_user_notification", "Account User Notification"
     t "names.account_user_registration", "Account User Registration"
     t "Annotation Notification"

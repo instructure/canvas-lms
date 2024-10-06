@@ -64,6 +64,11 @@ class AccessToken < ActiveRecord::Base
       access_token.crypted_token_previously_changed? && access_token.manually_created? &&
         access_token.pending?
     end
+    p.dispatch :access_token_deleted
+    p.to(&:user)
+    p.whenever do |access_token|
+      access_token.manually_created? && access_token.deleted?
+    end
   end
 
   set_policy do

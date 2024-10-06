@@ -597,6 +597,7 @@ describe AccessToken do
     before(:once) do
       Notification.create!(name: "Manually Created Access Token Created")
       Notification.create!(name: "Access Token Created On Behalf Of User")
+      Notification.create!(name: "Access Token Deleted")
       user_model
     end
 
@@ -630,6 +631,12 @@ describe AccessToken do
       access_token = AccessToken.create!(user: @user, workflow_state: "pending")
       expect(access_token.messages_sent).not_to include("Manually Created Access Token Created")
       expect(access_token.messages_sent).to include("Access Token Created On Behalf Of User")
+    end
+
+    it "sends a notification when a token is deleted" do
+      access_token = AccessToken.create!(user: @user)
+      access_token.destroy
+      expect(access_token.messages_sent).to include("Access Token Deleted")
     end
   end
 
