@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import type {ApiResponse, LoginResponse} from '../types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
@@ -40,9 +39,9 @@ export const performSignIn = async (
   return {status: response.status, data: json ?? ({} as LoginResponse)}
 }
 
-export const forgotPassword = async (email: string): Promise<{requested: boolean}> => {
-  const {status, data} = await executeApiRequest<{requested: boolean}>({
-    path: '/pseudonyms/forgot_password',
+export const forgotPassword = async (email: string): Promise<ApiResponse<{requested: boolean}>> => {
+  const {json, response} = await doFetchApi<{requested: boolean}>({
+    path: '/forgot_password',
     method: 'POST',
     body: {
       pseudonym_session: {
@@ -51,9 +50,5 @@ export const forgotPassword = async (email: string): Promise<{requested: boolean
     },
   })
 
-  if (status === 200) {
-    return data
-  } else {
-    throw new Error('Password reset failed')
-  }
+  return {status: response.status, data: json ?? {requested: false}}
 }
