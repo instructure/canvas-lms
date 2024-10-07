@@ -65,6 +65,8 @@ RSpec.describe Lti::ToolConfigurationsApiController do
   before do
     user_session(admin)
     settings["extensions"][0]["privacy_level"] = privacy_level || extension_privacy_level
+    request.accept = "application/json"
+    request.content_type = "application/json"
   end
 
   shared_examples_for "an action that requires manage developer keys" do |skip_404|

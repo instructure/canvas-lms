@@ -40,7 +40,7 @@ describe DataFixup::RenameLtiScope do
   let(:devkey13) do
     key = dev_key_model_1_3
     key.scopes.append(old_scope)
-    key.tool_configuration.settings["scopes"] = [old_scope]
+    key.tool_configuration.scopes = [old_scope]
     key.tool_configuration.save!
     key.save!
     key

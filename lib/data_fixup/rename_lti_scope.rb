@@ -21,7 +21,12 @@ module DataFixup::RenameLtiScope
     return unless old_scope && new_scope
 
     DeveloperKey.where("scopes like ?", "%#{old_scope}%").in_batches do |batch|
-      Lti::ToolConfiguration.where(developer_key: batch.pluck(:id)).update_all(["settings['scopes'] = replace(settings->>'scopes', ?, ?)::json", old_scope, new_scope])
+      tc_scope = Lti::ToolConfiguration.where(developer_key: batch.pluck(:id))
+      tc_scope.where.not(settings: {}).update_all(["settings['scopes'] = replace(settings->>'scopes', ?, ?)::json", old_scope, new_scope])
+      tc_scope.where(settings: {}).find_each do |tc|
+        tc.scopes = tc.scopes.map { |scope| (scope == old_scope) ? new_scope : scope }
+        tc.save!
+      end
       batch.update_all(["scopes = replace(scopes, ?, ?)", old_scope, new_scope])
     end
   end

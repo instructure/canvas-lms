@@ -22,9 +22,7 @@ module DataFixup::Lti::FixInvalidPlacementConfigurations
       # Skip keys associated with Dynamic Registration. They don't have a tool config and are already good to go.
       next unless dk.referenced_tool_configuration.present?
 
-      actual_placements = dk.referenced_tool_configuration.configuration["extensions"]
-                            &.find { |e| e["platform"] == Lti::ToolConfiguration::CANVAS_EXTENSION_LABEL }
-                            &.dig("settings", "placements")
+      actual_placements = dk.referenced_tool_configuration.placements
       actual_placements&.each do |placement|
         next unless placement_needs_fixing?(placement)
 

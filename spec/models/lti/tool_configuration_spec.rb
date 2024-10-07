@@ -35,7 +35,7 @@ module Lti
       }
     end
     let(:tool_configuration) { described_class.new(settings:).tap { |tc| tc.developer_key = developer_key } }
-    let(:developer_key) { DeveloperKey.create!(is_lti_key: true, public_jwk_url: "https://example.com") }
+    let(:developer_key) { DeveloperKey.create!(is_lti_key: true, public_jwk_url: "https://example.com", redirect_uris: ["https://example.com"]) }
 
     def make_placement(type, message_type, extra = {})
       {
@@ -135,14 +135,6 @@ module Lti
       context "when developer_key already has a tool_config" do
         before do
           described_class.create! settings:, developer_key:
-        end
-
-        it { is_expected.to be false }
-      end
-
-      context 'when "settings" is blank' do
-        before do
-          tool_configuration.settings = nil
         end
 
         it { is_expected.to be false }
@@ -256,6 +248,18 @@ module Lti
         let(:settings) { super().tap { |s| s["oidc_initiation_urls"] = { "us-east-1" => "http://example.com" } } }
 
         it { is_expected.to be true }
+      end
+
+      context "when settings is a JSON string" do
+        let(:settings) { super().to_json }
+
+        it { is_expected.to be true }
+      end
+
+      context "when settings is an invalid JSON string" do
+        let(:settings) { "hello world!" }
+
+        it { is_expected.to be false }
       end
     end
 
@@ -619,12 +623,55 @@ module Lti
         expect(tool_configuration.developer_key.redirect_uris.first).to eq settings["target_link_uri"]
       end
 
+      context "with extra custom fields provided" do
+        let(:params) { super().merge(custom_fields: "foo=bar") }
+
+        it "merges all custom fields" do
+          expect(tool_configuration.settings["custom_fields"]).to eq settings["custom_fields"].merge({ "foo" => "bar" })
+        end
+      end
+
+      context "with provided redirect_uris" do
+        let(:redirect_uris) { [settings["target_link_uri"], "http://example.com"] }
+        let(:tool_configuration) { described_class.create_tool_config_and_key!(account, params, redirect_uris) }
+
+        it "sets the redirect_uris on the DeveloperKey" do
+          expect(tool_configuration.developer_key.redirect_uris).to eq redirect_uris
+        end
+
+        it "sets the redirect_uris" do
+          expect(tool_configuration[:redirect_uris]).to eq redirect_uris
+        end
+      end
+
       it "correctly sets custom_fields" do
-        expect(tool_configuration.settings["custom_fields"]).to eq settings["custom_fields"]
+        expect(tool_configuration.custom_fields).to eq settings["custom_fields"]
       end
 
       it "correctly sets privacy_level" do
         expect(tool_configuration[:privacy_level]).to eq params[:privacy_level]
+      end
+
+      it "sets redirect_uris column" do
+        expect(tool_configuration[:redirect_uris]).to eq [settings["target_link_uri"]]
+      end
+
+      %i[title
+         description
+         target_link_uri
+         oidc_initiation_url
+         public_jwk
+         public_jwk_url
+         scopes].each do |field|
+        it "sets #{field} column" do
+          expect(tool_configuration[field]).to eq settings[field.to_s]
+        end
+      end
+
+      %i[domain tool_id].each do |field|
+        it "sets #{field} column from extensions" do
+          expect(tool_configuration[field]).to eq settings.dig("extensions", 0, field.to_s)
+        end
       end
 
       context "when the account is site admin" do
@@ -907,6 +954,368 @@ module Lti
 
           it "ignores the override" do
             expect(subject).to eq privacy_level
+          end
+        end
+      end
+    end
+
+    describe "#configuration_changed?" do
+      subject { tool_configuration.send :configuration_changed? }
+
+      it { is_expected.to be false }
+
+      context "when settings have changed" do
+        before do
+          tool_configuration.settings["title"] = "new title"
+          tool_configuration.save!
+        end
+
+        it { is_expected.to be true }
+      end
+
+      context "when any config fields have changed" do
+        before do
+          tool_configuration.title = "new title"
+          tool_configuration.save!
+        end
+
+        it { is_expected.to be true }
+      end
+    end
+
+    describe "#importable_configuration" do
+      subject { tool_configuration.importable_configuration }
+
+      context "with settings hash" do
+        it "includes fields from root settings" do
+          expect(subject["title"]).to eq settings["title"]
+        end
+
+        it "includes canvas extension" do
+          expect(subject["domain"]).to eq settings.dig("extensions", 0, "domain")
+        end
+
+        it "includes default tool settings" do
+          expect(subject[:lti_version]).to eq "1.3"
+        end
+
+        context "when model is transformed" do
+          let(:old_configuration) { tool_configuration.importable_configuration }
+
+          before do
+            tool_configuration.settings["oidc_initiation_urls"] = { "us-east-1" => "http://example.com" }
+            old_configuration
+            tool_configuration.transform!
+          end
+
+          it "is functionally equivalent to new version" do
+            expect(subject).to eq old_configuration.except("extensions", "platform").deep_stringify_keys.compact
+          end
+        end
+      end
+
+      context "with columns filled" do
+        before do
+          tool_configuration.developer_key.root_account.enable_feature!(:lti_registrations_next)
+          tool_configuration.transform!
+        end
+
+        it "does not include redirect_uris" do
+          expect(subject.keys).not_to include("redirect_uris")
+        end
+
+        it "includes fields from columns" do
+          expect(subject["title"]).to eq tool_configuration.title
+        end
+
+        it "includes fields from launch_settings" do
+          expect(subject.dig("settings", "text")).to eq tool_configuration.launch_settings["text"]
+        end
+
+        it "includes default tool settings" do
+          expect(subject[:lti_version]).to eq "1.3"
+        end
+      end
+    end
+
+    describe "#transform_settings" do
+      subject { tool_configuration.transform_settings }
+
+      let(:scopes) { ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"] }
+
+      it "clears out settings field" do
+        subject
+        expect(tool_configuration[:settings]).to be_blank
+      end
+
+      it "sets target_link_uri" do
+        subject
+        expect(tool_configuration.target_link_uri).not_to be_blank
+        expect(tool_configuration.target_link_uri).to eq settings["target_link_uri"]
+      end
+
+      it "sets domain" do
+        subject
+        expect(tool_configuration.domain).not_to be_blank
+        expect(tool_configuration.domain).to eq settings.dig("extensions", 0, "domain")
+      end
+
+      it "sets title" do
+        subject
+        expect(tool_configuration.title).not_to be_blank
+        expect(tool_configuration.title).to eq settings["title"]
+      end
+
+      it "sets privacy_level" do
+        subject
+        expect(tool_configuration.privacy_level).not_to be_blank
+        expect(tool_configuration.privacy_level).to eq settings.dig("extensions", 0, "privacy_level")
+      end
+
+      it "sets tool_id" do
+        subject
+        expect(tool_configuration.tool_id).not_to be_blank
+        expect(tool_configuration.tool_id).to eq settings.dig("extensions", 0, "tool_id")
+      end
+
+      it "sets description" do
+        subject
+        expect(tool_configuration.description).not_to be_blank
+        expect(tool_configuration.description).to eq settings["description"]
+      end
+
+      it "set oidc_initiation_url" do
+        subject
+        expect(tool_configuration.oidc_initiation_url).not_to be_blank
+        expect(tool_configuration.oidc_initiation_url).to eq settings["oidc_initiation_url"]
+      end
+
+      it "sets oidc_initiation_urls" do
+        oidc_initiation_urls = { "us-east-1" => "http://example.com" }
+        tool_configuration.settings[:oidc_initiation_urls] = oidc_initiation_urls
+
+        subject
+        expect(tool_configuration.oidc_initiation_urls).not_to be_blank
+        expect(tool_configuration.oidc_initiation_urls).to eq oidc_initiation_urls
+      end
+
+      it "sets custom_fields" do
+        subject
+        expect(tool_configuration.custom_fields).not_to be_blank
+        expect(tool_configuration.custom_fields).to eq settings["custom_fields"]
+      end
+
+      it "sets scopes" do
+        subject
+        expect(tool_configuration.scopes).not_to be_blank
+        expect(tool_configuration.scopes).to eq scopes
+      end
+
+      it "sets public_jwk" do
+        subject
+        expect(tool_configuration.public_jwk).not_to be_blank
+        expect(tool_configuration.public_jwk).to eq settings["public_jwk"]
+      end
+
+      it "sets public_jwk_url" do
+        public_jwk_url = "https://example.com"
+        tool_configuration.settings[:public_jwk_url] = public_jwk_url
+
+        subject
+        expect(tool_configuration.public_jwk_url).not_to be_blank
+        expect(tool_configuration.public_jwk_url).to eq public_jwk_url
+      end
+
+      it "sets launch_settings" do
+        launch_settings = settings.dig("extensions", 0, "settings").except("placements")
+
+        subject
+        expect(tool_configuration.launch_settings).not_to be_blank
+        expect(tool_configuration.launch_settings).to eq launch_settings
+      end
+
+      it "sets placements" do
+        subject
+        expect(tool_configuration.placements).not_to be_blank
+        expect(tool_configuration.placements).to eq settings.dig("extensions", 0, "settings", "placements")
+      end
+    end
+
+    describe "#transform!" do
+      subject { tool_configuration.transform! }
+
+      before do
+        allow(tool_configuration).to receive(:transform_settings).and_return(true)
+      end
+
+      it "transforms the model" do
+        subject
+        expect(tool_configuration).to have_received(:transform_settings)
+      end
+
+      it "sets redirect_uris" do
+        subject
+        expect(tool_configuration.redirect_uris).to eq developer_key.redirect_uris
+      end
+
+      context "with already transformed model" do
+        before do
+          allow(tool_configuration).to receive(:transformed?).and_return(true)
+        end
+
+        it "does not transform the model" do
+          subject
+          expect(tool_configuration).not_to have_received(:transform_settings)
+        end
+      end
+    end
+
+    describe "#untransform!" do
+      subject { tool_configuration.untransform! }
+
+      context "with untransformed model" do
+        it "does not change the model" do
+          expect { subject }.not_to change { tool_configuration }
+        end
+      end
+
+      it "puts data back into settings hash" do
+        settings = tool_configuration.settings
+        subject
+        expect(tool_configuration[:settings]).to eq settings
+      end
+
+      it "clears out new columns" do
+        columns = tool_configuration.internal_configuration.except(:privacy_level).keys
+        subject
+        columns.each do |column|
+          expect(tool_configuration[column]).to be_blank
+        end
+      end
+
+      it "leaves existing columns" do
+        expect { subject }.not_to change { tool_configuration[:privacy_level] }
+      end
+    end
+
+    describe "transforming" do
+      it "remains equivalent after multiple transforms" do
+        settings = tool_configuration.settings.merge("oidc_initiation_urls" => {}, "public_jwk_url" => nil)
+        tool_configuration.transform!
+        new_settings = tool_configuration.settings
+        expect(new_settings).to eq settings
+        tool_configuration.untransform!
+        expect(tool_configuration.settings).to eq new_settings
+        expect(tool_configuration.settings).to eq settings
+        tool_configuration.transform!
+        expect(tool_configuration.settings).to eq new_settings
+        expect(tool_configuration.settings).to eq settings
+      end
+    end
+
+    describe "#transform_updated_settings" do
+      subject { tool_configuration.transform_updated_settings }
+
+      before do
+        tool_configuration.transform_settings
+      end
+
+      context "when transformed model has settings changes" do
+        before do
+          tool_configuration.settings = { title: "new title" }
+        end
+
+        it "updates columns" do
+          expect { subject }.to change { tool_configuration.title }.to("new title")
+        end
+      end
+
+      context "when transformed model has no settings changes" do
+        it "does not update columns" do
+          expect { subject }.not_to change { tool_configuration.title }
+        end
+      end
+
+      context "when model is not transformed" do
+        before do
+          tool_configuration.settings = { title: "new title" }
+          allow(tool_configuration).to receive(:transformed?).and_return(false)
+        end
+
+        it "does not update columns" do
+          expect { subject }.not_to change { tool_configuration.title }
+        end
+      end
+    end
+
+    describe "#transformed?" do
+      subject { tool_configuration.transformed? }
+
+      it { is_expected.to be false }
+
+      context "when a required column is present" do
+        before do
+          tool_configuration.target_link_uri = "http://example.com"
+        end
+
+        it { is_expected.to be true }
+      end
+    end
+
+    describe "#settings" do
+      subject { tool_configuration.settings }
+
+      context "when not transformed" do
+        it "returns the settings field" do
+          expect(subject).to eq tool_configuration[:settings]
+        end
+      end
+
+      context "when transformed" do
+        let(:old_settings) { tool_configuration[:settings] }
+
+        before do
+          tool_configuration.settings["oidc_initiation_urls"] = { "us-east-1" => "http://example.com" }
+          tool_configuration.settings["public_jwk_url"] = "https://example.com"
+          old_settings
+          tool_configuration.transform_settings
+        end
+
+        it "transforms columns to LtiConfiguration" do
+          expect(subject).to eq old_settings
+        end
+      end
+    end
+
+    describe "#set_redirect_uris" do
+      subject { tool_configuration.send :set_redirect_uris }
+
+      context "when not transformed" do
+        it "does not set redirect_uris" do
+          subject
+          expect(tool_configuration.redirect_uris).to be_blank
+        end
+      end
+
+      context "when transformed" do
+        before do
+          tool_configuration.transform_settings
+        end
+
+        context "with redirect_uris" do
+          before do
+            tool_configuration.redirect_uris = ["http://example.com"]
+          end
+
+          it "does not set redirect_uris" do
+            expect { subject }.not_to change { tool_configuration.redirect_uris }
+          end
+        end
+
+        context "without redirect_uris" do
+          it "sets redirect_uris to default" do
+            subject
+            expect(tool_configuration.redirect_uris).to eq [tool_configuration.target_link_uri]
           end
         end
       end

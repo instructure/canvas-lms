@@ -25,38 +25,89 @@ module Lti
     belongs_to :developer_key
     belongs_to :lti_registration, class_name: "Lti::Registration", inverse_of: :manual_configuration, optional: true
 
-    before_save :normalize_configuration
+    before_validation :normalize_configuration
     before_save :update_privacy_level_from_extensions
     before_save :update_lti_registration
+    before_save :transform_updated_settings
+    before_save :set_redirect_uris
 
-    after_update :update_external_tools!, if: :update_external_tools?
+    after_update :update_external_tools!, if: :configuration_changed?
 
     after_commit :update_unified_tool_id, if: :update_unified_tool_id?
 
-    validates :developer_key_id, :settings, presence: true
-    validates :developer_key_id, uniqueness: true
-    validate :validate_configuration, unless: proc { |c| c.developer_key_id.blank? || c.settings.blank? }
+    validates :developer_key_id, uniqueness: true, presence: true
+    validate :validate_configuration
     validate :validate_placements
     validate :validate_oidc_initiation_urls
 
-    attr_accessor :settings_url
+    def settings
+      return self[:settings] unless transformed?
 
-    # settings* was an unfortunate naming choice as there is a settings hash per placement that
-    # made it confusing, as well as this being a configuration, not a settings, hash
-    alias_attribute :configuration, :settings
-    alias_method :configuration_url, :settings_url
-    alias_method :configuration_url=, :settings_url=
+      Schemas::LtiConfiguration.from_internal_lti_configuration(internal_configuration).with_indifferent_access
+    end
 
-    def self.create_tool_config_and_key!(account, tool_configuration_params)
+    def configuration
+      settings
+    end
+
+    def transform!
+      return if transformed?
+
+      transform_settings
+      self.redirect_uris = developer_key.redirect_uris.presence || [target_link_uri]
+      save!
+    end
+
+    def untransform!
+      return unless transformed?
+
+      self[:settings] = settings
+      internal_configuration.except(:privacy_level).each_key do |key|
+        self[key] = if %i[oidc_initiation_urls custom_fields launch_settings].include?(key)
+                      {}
+                    elsif %i[placements scopes redirect_uris].include?(key)
+                      []
+                    else
+                      nil
+                    end
+      end
+
+      @transformed = false
+      save!
+    end
+
+    def transformed?
+      @transformed ||= self[:target_link_uri].present?
+    end
+
+    def transform_settings
+      internal_config = Schemas::InternalLtiConfiguration.from_lti_configuration(self[:settings]).except(:vendor_extensions)
+
+      allowed_keys = internal_config.keys & internal_configuration.keys
+      allowed_keys.each do |key|
+        self[key] = internal_config[key]
+      end
+
+      self[:settings] = {}
+      @transformed = true
+    end
+
+    def transform_updated_settings
+      return unless transformed?
+      return if self[:settings].blank?
+
+      transform_settings
+    end
+
+    def self.create_tool_config_and_key!(account, tool_configuration_params, redirect_uris = nil)
       settings = if tool_configuration_params[:settings_url].present? && tool_configuration_params[:settings].blank?
                    retrieve_and_extract_configuration(tool_configuration_params[:settings_url])
                  elsif tool_configuration_params[:settings].present?
                    tool_configuration_params[:settings]&.try(:to_unsafe_hash) || tool_configuration_params[:settings]
                  end
 
-      # try to recover the target_link_url from the tool configuration and use
-      # it into developer_key.redirect_uris
-      redirect_uris = settings[:target_link_uri]
+      default_redirect_uris = [settings[:target_link_uri]]
+      redirect_uris = redirect_uris.presence || default_redirect_uris
 
       raise_error(:configuration, "Configuration must be present") if settings.blank?
       transaction do
@@ -65,17 +116,31 @@ module Lti
           is_lti_key: true,
           public_jwk_url: settings[:public_jwk_url],
           public_jwk: settings[:public_jwk],
-          redirect_uris: redirect_uris || [],
+          redirect_uris:,
           scopes: settings[:scopes] || []
         )
+
+        manual_custom_fields = ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
+        internal_config = Schemas::InternalLtiConfiguration.from_lti_configuration(settings)
         create!(
           developer_key: dk,
-          configuration: settings.deep_merge(
-            "custom_fields" => ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
-          ),
-          configuration_url: tool_configuration_params[:settings_url],
           disabled_placements: tool_configuration_params[:disabled_placements],
-          privacy_level: tool_configuration_params[:privacy_level]
+          privacy_level: tool_configuration_params[:privacy_level] || internal_config[:privacy_level],
+          title: internal_config[:title],
+          description: internal_config[:description],
+          domain: internal_config[:domain],
+          tool_id: internal_config[:tool_id],
+          target_link_uri: internal_config[:target_link_uri],
+          oidc_initiation_url: internal_config[:oidc_initiation_url],
+          oidc_initiation_urls: internal_config[:oidc_initiation_urls] || {},
+          public_jwk_url: internal_config[:public_jwk_url],
+          public_jwk: internal_config[:public_jwk],
+          custom_fields: internal_config[:custom_fields]&.merge(manual_custom_fields) || {},
+          scopes: internal_config[:scopes],
+          redirect_uris:,
+          launch_settings: internal_config[:launch_settings] || {},
+          placements: internal_config[:placements] || {},
+          settings: {}
         )
       end
     end
@@ -91,6 +156,8 @@ module Lti
     end
 
     def update_privacy_level_from_extensions
+      return if transformed?
+
       ext_privacy_level = extension_privacy_level
       if (self[:privacy_level].nil? || settings_changed?) && self[:privacy_level] != ext_privacy_level && ext_privacy_level.present?
         self[:privacy_level] = ext_privacy_level
@@ -98,13 +165,15 @@ module Lti
     end
 
     def placements
+      return self[:placements] if transformed?
       return [] if configuration.blank?
 
       configuration["extensions"]&.find { |e| e["platform"] == CANVAS_EXTENSION_LABEL }&.dig("settings", "placements")&.deep_dup || []
     end
 
     def domain
-      return [] if configuration.blank?
+      return self[:domain] if transformed?
+      return "" if configuration.blank?
 
       configuration["extensions"]&.find { |e| e["platform"] == CANVAS_EXTENSION_LABEL }&.dig("domain") || ""
     end
@@ -145,7 +214,45 @@ module Lti
     end
 
     def importable_configuration
-      configuration&.merge(canvas_extensions)&.merge(configuration_to_cet_settings_map)
+      if transformed?
+        placements = internal_configuration[:placements].reject { |p| disabled_placements&.include?(p["placement"]) }
+        settings = {
+          **internal_configuration[:launch_settings],
+          placements:
+        }
+        # legacy: add placements in both array and hash form
+        placements.each do |p|
+          settings[p["placement"]] = p
+        end
+
+        internal_configuration
+          .except(:redirect_uris, :launch_settings, :placements)
+          .merge({ settings: }, default_tool_settings)
+          .with_indifferent_access.compact
+      else
+        configuration&.merge(canvas_extensions)&.merge(default_tool_settings)
+      end
+    end
+
+    # @returns InternalLtiConfiguration
+    def internal_configuration
+      {
+        title:,
+        description:,
+        domain: self[:domain],
+        tool_id:,
+        privacy_level: self[:privacy_level],
+        target_link_uri:,
+        oidc_initiation_url:,
+        oidc_initiation_urls:,
+        public_jwk_url:,
+        public_jwk:,
+        custom_fields:,
+        scopes:,
+        redirect_uris:,
+        launch_settings:,
+        placements: self[:placements],
+      }
     end
 
     private
@@ -169,10 +276,6 @@ module Lti
     end
     private_class_method :raise_error
 
-    def update_external_tools?
-      saved_change_to_settings?
-    end
-
     def update_external_tools!
       developer_key.update_external_tools!
     end
@@ -182,7 +285,16 @@ module Lti
       true
     end
 
+    def set_redirect_uris
+      return unless transformed?
+      return if redirect_uris.present?
+
+      self.redirect_uris = [target_link_uri]
+    end
+
     def validate_configuration
+      return if configuration.blank?
+
       if configuration["public_jwk"].blank? && configuration["public_jwk_url"].blank?
         errors.add(:lti_key, "tool configuration must have public jwk or public jwk url")
       end
@@ -190,7 +302,13 @@ module Lti
         jwk_schema_errors = Schemas::Lti::PublicJwk.simple_validation_first_error(configuration["public_jwk"])
         errors.add(:configuration, jwk_schema_errors) if jwk_schema_errors.present?
       end
-      schema_errors = Schemas::Lti::ToolConfiguration.simple_validation_first_error(configuration.compact)
+
+      schema_errors = if transformed?
+                        Schemas::InternalLtiConfiguration.simple_validation_errors(internal_configuration.compact)
+                      else
+                        Schemas::LtiConfiguration.simple_validation_errors(configuration.compact)
+                      end
+
       errors.add(:configuration, schema_errors) if schema_errors.present?
       false if errors[:configuration].present?
     end
@@ -223,8 +341,8 @@ module Lti
       errors.add(:configuration, "oidc_initiation_urls must be valid urls")
     end
 
-    def configuration_to_cet_settings_map
-      { url: configuration["target_link_uri"], lti_version: "1.3" }
+    def default_tool_settings
+      { url: configuration["target_link_uri"], lti_version: "1.3", unified_tool_id: }
     end
 
     def canvas_extensions
@@ -243,7 +361,12 @@ module Lti
     end
 
     def normalize_configuration
-      self.configuration = JSON.parse(configuration) if configuration.is_a? String
+      self.settings = JSON.parse(configuration) if configuration.is_a? String
+      self.settings ||= {}
+    rescue JSON::ParserError
+      errors.add(:configuration, "Invalid JSON")
+      self.settings = {}
+      false
     end
 
     def update_unified_tool_id
@@ -265,7 +388,11 @@ module Lti
     end
 
     def update_unified_tool_id?
-      saved_change_to_settings?
+      saved_changes.keys.intersect?(%w[title tool_id domain target_link_uri]) || saved_change_to_settings?
+    end
+
+    def configuration_changed?
+      saved_changes.keys.intersect?(internal_configuration.keys.map(&:to_s)) || saved_change_to_settings?
     end
   end
 end

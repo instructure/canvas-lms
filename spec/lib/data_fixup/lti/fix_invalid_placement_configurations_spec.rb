@@ -28,19 +28,18 @@ RSpec.describe DataFixup::Lti::FixInvalidPlacementConfigurations do
   let(:developer_key) { dev_key_model_1_3(account:) }
 
   before do
-    tool_configuration.configuration["extensions"].first["settings"]["placements"] = []
+    tool_configuration.placements = []
     tool_configuration.save!
   end
 
   def placement_config(tool_config, placement_name)
     tool_config
-      .configuration["extensions"]
-      .find { |e| e["platform"] == Lti::ToolConfiguration::CANVAS_EXTENSION_LABEL }["settings"]["placements"]
+      .placements
       .find { |p| p["placement"] == placement_name }
   end
 
   def add_placement(tool_config, placement)
-    tool_config.configuration["extensions"].first["settings"]["placements"] << placement
+    tool_config.placements << placement
   end
 
   it "doesn't change the config of a properly configured tool" do

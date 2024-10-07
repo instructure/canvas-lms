@@ -88,7 +88,7 @@ RSpec.describe Lti::Registration do
       end
 
       it "returns the manual_configuration" do
-        expect(subject).to eq(tool_configuration.settings)
+        expect(subject).to eq(tool_configuration.internal_configuration)
       end
     end
 

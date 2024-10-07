@@ -89,7 +89,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   # @returns ToolConfiguration
   def create
     developer_key_redirect_uris
-    tool_config = Lti::ToolConfiguration.create_tool_config_and_key!(account, tool_configuration_params)
+    tool_config = Lti::ToolConfiguration.create_tool_config_and_key!(account, tool_configuration_params, tool_configuration_redirect_uris)
     update_developer_key!(tool_config, developer_key_redirect_uris)
     render json: Lti::ToolConfigurationSerializer.new(tool_config, include_warnings: true)
   end
@@ -130,7 +130,8 @@ class Lti::ToolConfigurationsApiController < ApplicationController
     tool_config = developer_key.tool_configuration
     update_params = {
       settings: tool_configuration_params[:settings]&.to_unsafe_hash&.deep_merge(manual_custom_fields),
-      disabled_placements: tool_configuration_params[:disabled_placements]
+      disabled_placements: tool_configuration_params[:disabled_placements],
+      redirect_uris: tool_configuration_redirect_uris,
     }
     update_params[:privacy_level] = tool_configuration_params[:privacy_level] unless tool_configuration_params[:privacy_level].nil?
     tool_config.update!(update_params)
@@ -229,5 +230,15 @@ class Lti::ToolConfigurationsApiController < ApplicationController
     else
       params.require(:developer_key).require(:redirect_uris)
     end
+  end
+
+  def tool_configuration_redirect_uris
+    redirect_uris = params.dig(:developer_key, :redirect_uris)
+
+    if redirect_uris.is_a?(String)
+      return redirect_uris.split
+    end
+
+    redirect_uris
   end
 end
