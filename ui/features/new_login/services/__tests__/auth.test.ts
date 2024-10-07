@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {performSignIn} from '../auth'
+import {forgotPassword, performSignIn} from '../auth'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 jest.mock('@canvas/do-fetch-api-effect', () => ({
@@ -62,6 +62,37 @@ describe('Auth Service', () => {
       ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
       const result = await performSignIn('testUser', 'testPassword', true)
       expect(result).toEqual({status: 200, data: {}})
+    })
+  })
+
+  describe('forgotPassword', () => {
+    it('should call doFetchApi with correct parameters and handle success', async () => {
+      const mockResponse = {
+        json: {requested: true},
+        response: {status: 200},
+      }
+      ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+      const result = await forgotPassword('test@example.com')
+      expect(doFetchApi).toHaveBeenCalledWith({
+        path: '/forgot_password',
+        method: 'POST',
+        body: {
+          pseudonym_session: {
+            unique_id_forgot: 'test@example.com',
+          },
+        },
+      })
+      expect(result).toEqual({
+        status: 200,
+        data: {requested: true},
+      })
+    })
+
+    it('should return {requested: false} when response has no json', async () => {
+      const mockResponse = {json: null, response: {status: 200}}
+      ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+      const result = await forgotPassword('test@example.com')
+      expect(result).toEqual({status: 200, data: {requested: false}})
     })
   })
 })
