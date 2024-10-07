@@ -59,7 +59,21 @@ export const persister = createSyncStoragePersister({
 
 export function QueryProvider({children}: {children: React.ReactNode}) {
   return (
-    <PersistQueryClientProvider client={queryClient} persistOptions={{persister}}>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{
+        persister,
+        dehydrateOptions: {
+          shouldDehydrateQuery: query => {
+            // don't persist cache on infinite queries
+            if (query.options?.getNextPageParam) {
+              return false
+            }
+            return query.state.status === 'success'
+          },
+        },
+      }}
+    >
       {children}
     </PersistQueryClientProvider>
   )
@@ -153,27 +167,11 @@ export function useInfiniteQuery<
   const refetchOnMount =
     ensureFetch && !wasAlreadyFetched ? 'always' : options.refetchOnMount ?? false
 
-  // Handle incoming broadcasts
-  useReception({
-    hashedKey,
-    queryKey: options.queryKey,
-    queryClient,
-    channel: broadcastChannel,
-    enabled: options.broadcast,
-  })
-
   const mergedOptions: CustomUseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey> = {
     ...options,
     refetchOnMount,
   }
   const queryResult = baseUseInfiniteQuery<TQueryFnData, TError, TData, TQueryKey>(mergedOptions)
-
-  useBroadcastWhenFetched({
-    hashedKey,
-    queryResult,
-    channel: broadcastChannel,
-    enabled: options.broadcast,
-  })
 
   return queryResult
 }
