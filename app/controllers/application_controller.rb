@@ -553,6 +553,8 @@ class ApplicationController < ActionController::Base
   #   render
   # end
   def authorized_action(object, actor, rights)
+    render_unauthorized_action if object.nil?
+
     can_do = object.grants_any_right?(actor, session, *Array(rights))
     render_unauthorized_action unless can_do
     can_do
