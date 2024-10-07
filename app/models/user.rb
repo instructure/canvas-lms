@@ -3469,6 +3469,10 @@ class User < ActiveRecord::Base
   end
 
   def pronouns
+    # For jobs/rails consoles/specs where domain root account is not set
+    acc = Account.current_domain_root_account || account
+    return nil unless acc.can_add_pronouns?
+
     translate_pronouns(super)
   end
 
