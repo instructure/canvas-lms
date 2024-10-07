@@ -228,6 +228,55 @@ export default {
     },
   ],
 
+  sub_assignments: [
+    {
+      id: 'sub_assignment_1',
+      title: 'Graded Discussion with Checkpoints 1',
+      workflow_state: 'published',
+      start_at: '2012-01-31T20:00:00-07:00',
+      end_at: '2012-01-31T20:00:00-07:00',
+      submission_types: 'discussion_topic',
+      type: 'sub_assignment',
+      url: 'http://localhost/api/v1/calendar_events/assignment_1',
+      html_url: 'http://localhost/courses/1/assignments/1',
+      sub_assignment: {
+        id: '1',
+        name: 'Graded Discussion with Checkpoints 1',
+        sub_assignment_tag: 'reply_to_topic',
+        workflow_state: 'published',
+        discussion_topic: {
+          id: '1',
+          title: 'Graded Discussion with Checkpoints 1',
+          assignment_id: '1',
+          reply_to_entry_required_count: 3,
+        },
+      },
+    },
+    {
+      id: 'sub_assignment_2',
+      title: 'Graded Discussion with Checkpoints 1',
+      workflow_state: 'published',
+      start_at: '2012-01-31T20:00:00-07:00',
+      end_at: '2012-01-31T20:00:00-07:00',
+      submission_types: 'discussion_topic',
+      type: 'sub_assignment',
+      url: 'http://localhost/api/v1/calendar_events/assignment_1',
+      html_url: 'http://localhost/courses/1/assignments/1',
+      sub_assignment: {
+        id: '2',
+        name: 'Graded Discussion with Checkpoints 1',
+        sub_assignment_tag: 'reply_to_entry',
+        workflow_state: 'published',
+        discussion_topic: {
+          id: '1',
+          title: 'Graded Discussion with Checkpoints 1',
+          assignment_id: '1',
+          reply_to_entry_required_count: 3,
+        },
+      },
+    },
+  ],
+
   appointment_groups: [
     {
       id: '3',

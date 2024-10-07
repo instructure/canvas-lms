@@ -1680,11 +1680,9 @@ class CalendarEventsApiController < ApplicationController
       # as a more sane default then natural DB order. No, it isn't perfect but much better.
       scope = assignment_context_scope(user, sub_assignment:)
 
-      # exclude undated assignments with sub assignments because the
-      # parent assignment does not have due date, only the sub assignments do
-      if @undated && !sub_assignment && discussion_checkpoints_enabled?
-        scope = scope.where(has_sub_assignments: false)
-      end
+      # exclude parent assignment when the discussion checkpoints FF is enabled
+      # because due dates and other relevant info is stored in the sub_assignments/checkpoints
+      scope = scope.where(has_sub_assignments: false) if discussion_checkpoints_enabled?
 
       next unless scope
 
