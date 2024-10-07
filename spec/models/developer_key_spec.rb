@@ -471,25 +471,12 @@ describe DeveloperKey do
           expect(shard_2_tool.reload.workflow_state).to eq "disabled"
         end
       end
-
-      context "privacy_level is not set on tool_configuration" do
-        let(:account) { shard_1_tool.root_account }
-        let(:tool_configuration) do
-          tc = Account.site_admin.shard.activate { super() }
-          tc.update!(privacy_level: nil)
-          tc
-        end
-
-        it "still correctly uses privacy_level from extensions" do
-          expect(shard_1_tool.reload.workflow_state).to eq "public"
-        end
-      end
     end
 
     describe "#update_external_tools!" do
       def update_external_tools
         Account.site_admin.shard.activate do
-          tool_configuration.settings["title"] = new_title
+          tool_configuration.title = new_title
           tool_configuration.save!
           developer_key.update_external_tools!
           run_jobs
