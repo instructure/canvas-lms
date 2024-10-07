@@ -106,7 +106,8 @@ describe('MessageDetailItem', () => {
           {name: 'Billy Harris', shortName: 'Billy Harris'},
         ],
         createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
-        body: "<p>Attempting to attack!<script>alert('XSS')</script></p>",
+        body: "Attempting to attack!<script>alert('XSS')</script>",
+        htmlBody: "<p>Attempting to attack!<script>alert('XSS')</script></p>",
       },
       contextName: 'Fake Course 1',
     }
@@ -130,7 +131,8 @@ describe('MessageDetailItem', () => {
           {name: 'Billy Harris', shortName: 'Billy Harris'},
         ],
         createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
-        body: '<p>Formatted text</p>',
+        body: 'Formatted text',
+        htmlBody: '<p>Formatted text</p>',
       },
       contextName: 'Fake Course 1',
     }
@@ -155,6 +157,7 @@ describe('MessageDetailItem', () => {
         ],
         createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
         body: 'Text\nOn a new line',
+        htmlBody: 'Text\nOn a new line'
       },
       contextName: 'Fake Course 1',
     }
@@ -180,6 +183,7 @@ describe('MessageDetailItem', () => {
         ],
         createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
         body: 'This is the body text for the message.',
+        htmlBody: 'This is the body text for the message.',
         attachmentsConnection: {
           nodes: [{id: '1', displayName: 'attachment1.jpeg', url: 'testingurl'}],
         },
@@ -201,6 +205,7 @@ describe('MessageDetailItem', () => {
         ],
         createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
         body: 'This is the body text for the message.',
+        htmlBody: 'This is the body text for the message.',
         mediaComment: {
           _id: '123',
           title: 'Course Video',
@@ -231,6 +236,7 @@ describe('MessageDetailItem', () => {
         ],
         createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
         body: 'This is the body text for the message.',
+        htmlBody: 'This is the body text for the message.',
       },
       contextName: 'Fake Course 1',
       onReply: null,
@@ -259,6 +265,7 @@ describe('MessageDetailItem', () => {
         ],
         createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
         body: 'This is the body text for the message.',
+        htmlBody: 'This is the body text for the message.',
       },
       contextName: 'Fake Course 1',
       onReply: jest.fn(),
@@ -319,6 +326,7 @@ describe('MessageDetailItem', () => {
             ],
             createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
             body: 'This is the body text for the message.',
+            htmlBody: 'This is the body text for the message.',
           },
           contextName: 'Fake Course 1',
         }

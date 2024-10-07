@@ -222,7 +222,7 @@ export const GRADEBOOK_SUBMISSION_COMMENTS = gql`
       commentsConnection {
         nodes {
           id: _id
-          comment
+          htmlComment
           mediaObject {
             id: _id
             mediaDownloadUrl

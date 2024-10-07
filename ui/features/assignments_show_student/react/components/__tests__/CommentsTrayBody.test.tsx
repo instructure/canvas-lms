@@ -67,7 +67,7 @@ async function mockCreateSubmissionComment() {
   const overrides = {
     DateTime: '2010-11-16T23:59:59-06:00',
     User: {shortName: 'sent user'},
-    SubmissionComment: {comment: 'test reply comment'},
+    SubmissionComment: {htmlComment: 'test reply comment'},
   }
 
   const result = await mockQuery(CREATE_SUBMISSION_COMMENT, [overrides], variables)
@@ -687,6 +687,42 @@ describe('CommentsTrayBody', () => {
     expect(rows).toHaveLength(comments.length)
   })
 
+  it('renders comments without html tags', async () => {
+    const overrides = {
+      SubmissionCommentConnection: {
+        nodes: [
+          {_id: '3', updatedAt: '2019-03-01T14:32:37-07:00', htmlComment: '<p>html comment</p>'},
+        ],
+      },
+    }
+    const comments = await mockComments(overrides)
+    const props = await getDefaultPropsWithReviewerSubmission('completed')
+    props.submission.gradeHidden = true
+    props.isPeerReviewEnabled = false
+    const commentProps = {...props, comments}
+    const {getByTestId} = render(mockContext(<CommentContent {...commentProps} />))
+
+    expect(getByTestId('commentContent').textContent).toBe('html comment')
+  })
+
+  it('preserves \n formatting in comments', async () => {
+    const overrides = {
+      SubmissionCommentConnection: {
+        nodes: [
+          {_id: '3', updatedAt: '2019-03-01T14:32:37-07:00', htmlComment: 'formatted\ncomment'},
+        ],
+      },
+    }
+    const comments = await mockComments(overrides)
+    const props = await getDefaultPropsWithReviewerSubmission('completed')
+    props.submission.gradeHidden = true
+    props.isPeerReviewEnabled = false
+    const commentProps = {...props, comments}
+    const {getByTestId} = render(mockContext(<CommentContent {...commentProps} />))
+
+    expect(getByTestId('commentContent').innerHTML).toBe('formatted<br>\ncomment')
+  })
+
   it('renders shortname when shortname is provided', async () => {
     const overrides = {
       SubmissionCommentConnection: {nodes: [{}]},
@@ -771,9 +807,9 @@ describe('CommentsTrayBody', () => {
     const overrides = {
       SubmissionCommentConnection: {
         nodes: [
-          {_id: '3', updatedAt: '2019-03-01T14:32:37-07:00', comment: 'first comment'},
-          {_id: '1', updatedAt: '2019-03-03T14:32:37-07:00', comment: 'last comment'},
-          {_id: '2', updatedAt: '2019-03-02T14:32:37-07:00', comment: 'middle comment'},
+          {_id: '3', updatedAt: '2019-03-01T14:32:37-07:00', htmlComment: 'first comment'},
+          {_id: '1', updatedAt: '2019-03-03T14:32:37-07:00', htmlComment: 'last comment'},
+          {_id: '2', updatedAt: '2019-03-02T14:32:37-07:00', htmlComment: 'middle comment'},
         ],
       },
     }
@@ -816,9 +852,9 @@ describe('CommentsTrayBody', () => {
       const overrides = {
         SubmissionCommentConnection: {
           nodes: [
-            {_id: '3', updatedAt: '2019-03-01T14:32:37-07:00', comment: 'first comment'},
-            {_id: '1', updatedAt: '2019-03-03T14:32:37-07:00', comment: 'last comment'},
-            {_id: '2', updatedAt: '2019-03-02T14:32:37-07:00', comment: 'middle comment'},
+            {_id: '3', updatedAt: '2019-03-01T14:32:37-07:00', htmlComment: 'first comment'},
+            {_id: '1', updatedAt: '2019-03-03T14:32:37-07:00', htmlComment: 'last comment'},
+            {_id: '2', updatedAt: '2019-03-02T14:32:37-07:00', htmlComment: 'middle comment'},
           ],
         },
       }
@@ -836,9 +872,9 @@ describe('CommentsTrayBody', () => {
       const overrides = {
         SubmissionCommentConnection: {
           nodes: [
-            {_id: '3', updatedAt: '2019-03-01T14:32:37-07:00', comment: 'first comment'},
-            {_id: '1', updatedAt: '2019-03-03T14:32:37-07:00', comment: 'last comment'},
-            {_id: '2', updatedAt: '2019-03-02T14:32:37-07:00', comment: 'middle comment'},
+            {_id: '3', updatedAt: '2019-03-01T14:32:37-07:00', htmlComment: 'first comment'},
+            {_id: '1', updatedAt: '2019-03-03T14:32:37-07:00', htmlComment: 'last comment'},
+            {_id: '2', updatedAt: '2019-03-02T14:32:37-07:00', htmlComment: 'middle comment'},
           ],
         },
       }

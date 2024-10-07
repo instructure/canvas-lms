@@ -4195,6 +4195,22 @@ QUnit.module('SpeedGrader', rootHooks => {
         const button = renderedComment.find('.edit_comment_link')
         notStrictEqual(button, undefined)
       })
+
+      test('renderComment formats comments that use \n properly', () => {
+        const comment = {
+          created_at: new Date().toISOString(),
+          publishable: true,
+          comment: 'a comment\nwith\nparagraphs',
+          author_id: 1,
+          author_name: 'an author',
+        }
+        const renderedComment = SpeedGrader.EG.renderComment(
+          comment,
+          commentRenderingOptions
+        )
+        const commentText = renderedComment.find('span.comment').html()
+        equal(commentText, 'a comment<br>\nwith<br>\nparagraphs')
+      })
     })
 
     QUnit.module('#addCommentSubmissionHandler', () => {

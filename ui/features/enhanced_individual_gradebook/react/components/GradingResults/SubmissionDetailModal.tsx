@@ -55,6 +55,7 @@ import {usePostComment} from '../../hooks/useComments'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import DefaultGradeInput from './DefaultGradeInput'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
+import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
 import {CheckpointGradeInputs} from './CheckpointGradeInputs'
 import {REPLY_TO_ENTRY, REPLY_TO_TOPIC} from './index'
 
@@ -179,6 +180,9 @@ type SubmissionCommentProps = {
 }
 function SubmissionComment({comment, showDivider}: SubmissionCommentProps) {
   const {attachments, author, mediaObject} = comment
+  const formattedComment = containsHtmlTags(comment.htmlComment)
+    ? sanitizeHtml(comment.htmlComment)
+    : formatMessage(comment.htmlComment)
   return (
     <View
       as="div"
@@ -200,7 +204,7 @@ function SubmissionComment({comment, showDivider}: SubmissionCommentProps) {
               {author.name}
             </Link>
           </Heading>
-          <Text size="small" dangerouslySetInnerHTML={{__html: sanitizeHtml(comment.comment)}} />
+          <Text size="small" dangerouslySetInnerHTML={{__html: formattedComment}} />
           {mediaObject && (
             <View as="div">
               <Link
