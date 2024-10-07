@@ -360,6 +360,16 @@ module Types
       end
     end
 
+    # TODO: this is only temporary until the group_sets_connection gets paginated
+    field :group_sets, [GroupSetType], <<~MD, null: true
+      Project group sets for this course.
+    MD
+    def group_sets
+      if course.grants_any_right?(current_user, :manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
+        course.group_categories.where(role: nil)
+      end
+    end
+
     field :external_tools_connection, ExternalToolType.connection_type, null: true do
       argument :filter, ExternalToolFilterInputType, required: false, default_value: {}
     end
