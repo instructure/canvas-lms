@@ -133,6 +133,15 @@ module Types
       assignment_groups.where(workflow_state: "available")
     end
 
+    field :assignment_groups,
+          [AssignmentGroupType],
+          null: true
+
+    def assignment_groups
+      assignment_groups = object.assignment_groups
+      assignment_groups.where(workflow_state: "available")
+    end
+
     field :apply_group_weights, Boolean, null: true
     def apply_group_weights
       object.apply_group_weights?
