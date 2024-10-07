@@ -36,6 +36,9 @@ export const Course = {
           ...AssignmentGroup
         }
       }
+      assignmentGroups {
+        ...AssignmentGroup
+      }
       usersConnection(filter: {enrollmentTypes: StudentEnrollment, enrollmentStates: active}) {
         nodes {
           _id
@@ -62,6 +65,7 @@ export const Course = {
     id: string,
     name: string,
     groupSets: arrayOf(GroupSet.shape),
+    assignmentGroups: arrayOf(AssignmentGroup.shape),
     assignmentGroupsConnection: shape({
       nodes: arrayOf(AssignmentGroup.shape),
     }),
@@ -84,6 +88,7 @@ export const Course = {
     id: 'K3n9F08vw4',
     name: 'X-Men School',
     groupSets: [GroupSet.mock()],
+    assignmentGroups: shape([AssignmentGroup.mock()]),
     assignmentGroupsConnection: shape({
       nodes: [AssignmentGroup.mock()],
     }),
