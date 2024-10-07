@@ -268,7 +268,7 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
         isStudent={ENV.current_user_is_student}
         assignmentGroups={currentContext?.assignmentGroupsConnection?.nodes}
         sections={ENV.SECTION_LIST}
-        groupCategories={currentContext?.groupSetsConnection?.nodes}
+        groupCategories={currentContext?.groupSets || []}
         studentEnrollments={currentContext?.usersConnection?.nodes}
         apolloClient={apolloClient}
         onSubmit={handleFormSubmit}

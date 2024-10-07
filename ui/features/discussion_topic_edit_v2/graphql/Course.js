@@ -28,6 +28,9 @@ export const Course = {
       _id
       id
       name
+      groupSets {
+        ...GroupSet
+      }
       assignmentGroupsConnection {
         nodes {
           ...AssignmentGroup
@@ -58,6 +61,7 @@ export const Course = {
     _id: string,
     id: string,
     name: string,
+    groupSets: arrayOf(GroupSet.shape),
     assignmentGroupsConnection: shape({
       nodes: arrayOf(AssignmentGroup.shape),
     }),
@@ -79,6 +83,7 @@ export const Course = {
     _id: '1',
     id: 'K3n9F08vw4',
     name: 'X-Men School',
+    groupSets: [GroupSet.mock()],
     assignmentGroupsConnection: shape({
       nodes: [AssignmentGroup.mock()],
     }),
