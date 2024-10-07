@@ -121,6 +121,8 @@ describe Api::V1::DiscussionTopics do
 
   it "includes the user's pronouns when enabled" do
     @me.update! pronouns: "she/her"
+    @me.account.settings[:can_add_pronouns] = true
+    @me.account.save!
 
     expect(
       @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)
