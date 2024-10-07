@@ -67,8 +67,12 @@ import {useUpdateDiscussionThread} from '../../hooks/useUpdateDiscussionThread'
 const I18n = useI18nScope('discussion_topics_post')
 
 const defaultExpandedReplies = id => {
-  if (ENV.DISCUSSION?.preferences?.discussions_splitscreen_view) return false
-  if (id === ENV.discussions_deep_link?.entry_id) return false
+  if (
+    (ENV.DISCUSSION?.preferences?.discussions_splitscreen_view &&
+      !window.top.location.href.includes('speed_grader')) ||
+    id === ENV.discussions_deep_link?.entry_id
+  )
+    return false
   if (id === ENV.discussions_deep_link?.root_entry_id) return true
 
   return false
@@ -361,9 +365,11 @@ export const DiscussionThreadContainer = props => {
       !props.discussionEntry?.entryParticipant?.read &&
       !props.discussionEntry?.entryParticipant?.forcedReadState
     ) {
-      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight
       const observer = new IntersectionObserver(
-        ([entry]) => (entry.isIntersecting || entry.intersectionRatio > viewportHeight * 0.4) && updateReadState(props.discussionEntry),
+        ([entry]) =>
+          (entry.isIntersecting || entry.intersectionRatio > viewportHeight * 0.4) &&
+          updateReadState(props.discussionEntry),
         {
           root: null,
           rootMargin: '0px',
@@ -380,10 +386,10 @@ export const DiscussionThreadContainer = props => {
   }, [threadRefCurrent, props.discussionEntry.entryParticipant.read, props, updateReadState])
 
   useEffect(() => {
-    if (expandedThreads.includes(props.discussionEntry._id)){
+    if (expandedThreads.includes(props.discussionEntry._id)) {
       setExpandReplies(true)
     }
-  }, [expandedThreads])
+  }, [expandedThreads, props.discussionEntry._id])
 
   useEffect(() => {
     if (allThreadsStatus === AllThreadsState.Expanded && !expandReplies) {
