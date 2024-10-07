@@ -19,6 +19,7 @@
 import {useEffect, useState, useCallback} from 'react'
 import {STUDENT_DISCUSSION_QUERY} from '../../graphql/Queries'
 import {useQuery} from 'react-apollo'
+import {isSpeedGraderInTopUrl} from '../utils/constants'
 
 export default function useSpeedGrader({
   highlightEntryId = '',
@@ -40,7 +41,7 @@ export default function useSpeedGrader({
         const currentUrl = new URL(window.location.href)
         const params = new URLSearchParams(currentUrl.search)
 
-        setIsInSpeedGrader(params.get('speed_grader') === '1')
+        setIsInSpeedGrader(isSpeedGraderInTopUrl)
         setCurrentStudentId(params.get('student_id'))
       } catch (error) {
         setIsInSpeedGrader(false)
