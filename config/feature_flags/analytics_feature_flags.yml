@@ -12,6 +12,15 @@ analytics_2:
       Community.
   after_state_change_proc: analytics_2_after_state_change_hook
   beta: false
+attendance_on_dap_model:
+  state: hidden
+  applies_to: Account
+  display_name: Attendance on DAP
+  description:
+    attendance_on_dap_model_description: Enable attendance on looker_canvas_attendance on DAP data
+  root_opt_in: true
+  beta: true
+  shadow: true
 
 # Admin Analytics - Provided through K20 LTI App
 admin_analytics_view_permission:
