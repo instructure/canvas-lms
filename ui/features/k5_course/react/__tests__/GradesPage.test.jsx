@@ -27,6 +27,7 @@ import {
   MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS,
   MOCK_ENROLLMENTS,
   MOCK_ENROLLMENTS_WITH_OBSERVED_USERS,
+  MOCK_GRADEBOOK_HIDDEN_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS,
 } from './mocks'
 
 const GRADING_PERIODS_URL = encodeURI(
@@ -401,6 +402,24 @@ describe('GradesPage', () => {
         'Out of 10 pts',
       ].forEach(label => {
         expect(getByText(label)).toBeInTheDocument()
+      })
+    })
+
+    it('does not show assignment details for the observed user when it is hidden for student page', async () => {
+      fetchMock.get(
+        OBSERVER_ASSIGNMENT_GROUPS_URL,
+        MOCK_GRADEBOOK_HIDDEN_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS,
+        {overwriteRoutes: true}
+      )
+
+      const {getByText, queryByText, getByTestId} = render(
+        <GradesPage {...getProps({observedUserId: '5'})} />
+      )
+      await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())
+      expect(getByText("You don't have any grades yet.")).toBeInTheDocument()
+      expect(getByTestId('empty-grades-panda')).toBeInTheDocument()
+      ;['Assignment', 'Due Date', 'Assignment Group', 'Score'].forEach(header => {
+        expect(queryByText(header)).not.toBeInTheDocument()
       })
     })
 

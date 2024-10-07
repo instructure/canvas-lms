@@ -205,6 +205,52 @@ export const MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS = [
   },
 ]
 
+export const MOCK_GRADEBOOK_HIDDEN_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS = [
+  {
+    id: '52',
+    name: 'Assignments',
+    rules: {},
+    group_weight: 0.0,
+    assignments: [
+      {
+        id: '9',
+        description: '',
+        html_url: 'http://localhost:3000/courses/30/assignments/9',
+        due_at: '2021-10-25T05:59:59Z',
+        points_possible: 10,
+        grading_type: 'points',
+        position: 5,
+        name: 'Assignment 3',
+        hide_in_gradebook: true,
+        submission: [
+          {
+            id: '51',
+            assignment_id: '9',
+            grade: '6',
+            score: 6,
+            submitted_at: '2021-09-20T23:55:08Z',
+            user_id: '5',
+            workflow_state: 'submitted',
+            grader_id: '1',
+            excused: false,
+            points_deducted: null,
+            grading_period_id: '2',
+            late: false,
+            missing: false,
+            seconds_late: 0,
+            submission_comments: [
+              {
+                id: '1',
+              },
+            ],
+            read_state: 'read',
+          },
+        ],
+      },
+    ],
+  },
+]
+
 export const MOCK_ENROLLMENTS = [
   {
     user_id: 'fake',
