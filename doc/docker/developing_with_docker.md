@@ -306,13 +306,11 @@ colorized rails log and a browser screenshot taken at the time of the failure.
 ## Extra Services
 
 ### Mail Catcher
+Mail Catcher is used to both send and view email in a development environment.
 
-To enable Mail Catcher: Add `docker-compose/mailcatcher.override.yml` to your `COMPOSE_FILE` var in `.env`.
+To enable Mail Catcher: Add `docker-compose/mailcatcher.override.yml` to your `COMPOSE_FILE` var in `.env`. Then you can `docker compose up mailcatcher`.
 
-Email is often sent through background jobs if you spin up the `jobs` container.
-If you would like to test or preview any notifications, simply trigger the email
-through its normal actions, and it should immediately show up in the emulated
-webmail inbox available here: http://mail.canvas.docker/
+Email is often sent through background jobs in the jobs container. If you would like to test or preview any notifications, simply trigger the email through its normal actions, and it should immediately show up in the emulated webmail inbox available here: <http://mail.canvas.docker>
 
 ### Canvas RCE API
 
