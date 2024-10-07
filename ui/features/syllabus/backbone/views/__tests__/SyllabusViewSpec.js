@@ -40,14 +40,17 @@ function setupServerResponses() {
   const server = sinon.fakeServer.create()
 
   // Fake calendar_events endpoint
-  let {assignments} = SyllabusViewPrerendered
-  let {events} = SyllabusViewPrerendered
+  let {assignments, sub_assignments, events} = SyllabusViewPrerendered
   function calendar_events_endpoint(request) {
     let more, response
     if (request.url.match(/.*\?.*\btype=assignment\b/)) {
       response = assignments.slice(0, 2)
       assignments = assignments.slice(2)
       more = assignments.length > 0
+    } else if (request.url.match(/.*\?.*\btype=sub_assignment\b/)) {
+      response = sub_assignments.slice(0, 2)
+      sub_assignments = sub_assignments.slice(2)
+      more = sub_assignments.length > 0
     } else if (request.url.match(/.*\?.*\btype=event\b/)) {
       response = events.slice(0, 2)
       events = events.slice(2)
@@ -151,6 +154,7 @@ QUnit.module('Syllabus', {
     const collections = [
       new SyllabusCalendarEventsCollection([ENV.context_asset_string], 'event'),
       new SyllabusCalendarEventsCollection([ENV.context_asset_string], 'assignment'),
+      new SyllabusCalendarEventsCollection([ENV.context_asset_string], 'sub_assignment'),
       new SyllabusAppointmentGroupsCollection([ENV.context_asset_string], 'reservable'),
       new SyllabusAppointmentGroupsCollection([ENV.context_asset_string], 'manageable'),
       new SyllabusPlannerCollection([ENV.context_asset_string]),
@@ -213,14 +217,14 @@ QUnit.module('Syllabus', {
   },
 
   renderAssertions() {
-    expect(26)
+    expect(30)
     // rendering
     const syllabus = $('#syllabusTableBody')
     ok(syllabus.length, 'syllabus - syllabus added to the dom')
     ok(syllabus.is(':visible'), 'syllabus - syllabus visible')
 
     const dates = $('tr.date', syllabus)
-    equal(dates.length, 22, 'dates - dates render')
+    equal(dates.length, 24, 'dates - dates render')
     equal($('td.day_date', dates).length, 6, 'dates - coalesce')
 
     const assignments = $('tr.syllabus_assignment', syllabus)
@@ -229,6 +233,33 @@ QUnit.module('Syllabus', {
       equal($('td.name a', assignments).length, 10, 'events - link rendered for each assignment')
     } else {
       equal($('td.name a', assignments).length, 0, 'events - link not rendered for each assignment')
+    }
+
+    const {sub_assignments: sub_assignments_data} = SyllabusViewPrerendered
+    const sub_assignments = $('tr.syllabus_sub_assignment', syllabus)
+    const sub_assignment_reply_to_topic_title = `${sub_assignments_data[0].title} Reply to Topic`
+    const sub_assignment_required_replies_title = `${sub_assignments_data[1].title} Required Replies (${sub_assignments_data[1].sub_assignment.discussion_topic.reply_to_entry_required_count})`
+    const sub_assignment_titles = $('td.name', sub_assignments)
+    equal(sub_assignments.length, 2, 'events - all sub_assignments rendered')
+    equal(
+      sub_assignment_titles.first().text().includes(sub_assignment_reply_to_topic_title),
+      true,
+      'events - sub_assignments rendered with proper title for Reply to Topic checkpoint'
+    )
+    equal(
+      sub_assignment_titles.last().text().includes(sub_assignment_required_replies_title),
+      true,
+      'events - sub_assignments rendered with proper title for Required Replies checkpoint'
+    )
+    if (this.view.can_read) {
+      const sub_assignment_links = $('td.name a', sub_assignments)
+      equal(sub_assignment_links.length, 2, 'events - link rendered for each sub_assignment')
+    } else {
+      equal(
+        $('td.name a', sub_assignments).length,
+        0,
+        'events - link not rendered for each sub_assignment'
+      )
     }
 
     const graded_discussions = $(

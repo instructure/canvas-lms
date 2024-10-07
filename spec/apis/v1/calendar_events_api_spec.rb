@@ -3355,6 +3355,21 @@ describe CalendarEventsApiController, type: :request do
                         })
         expect(json.size).to be 2
       end
+
+      it "does not return assignments associated with discussions with checkpoints when the checkpoints FF is enabled" do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        graded_discussion_topic_with_checkpoints(context: @course, title: "Discussion with Checkpoints")
+
+        json = api_call(:get, "/api/v1/calendar_events", {
+                          controller: "calendar_events_api",
+                          action: "index",
+                          format: "json",
+                          type: "assignment",
+                          context_codes: ["course_#{@course.id}"],
+                          all_events: "1"
+                        })
+        expect(json.size).to be 2
+      end
     end
 
     it "gets a single assignment" do

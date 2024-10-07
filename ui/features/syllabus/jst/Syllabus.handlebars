@@ -13,7 +13,10 @@
   </td>
   {{/if}}
   <td class="name{{#unless last}} not_last{{/unless}}">
-    {{#ifEqual subtype 'discussion_topic' }}
+    {{#ifEqual type 'sub_assignment' }}
+    <span class="screenreader-only">{{#t}}Discussion Checkpoint{{/t}}</span>
+    {{addIcon 'discussion'}}
+    {{else}}{{#ifEqual subtype 'discussion_topic' }}
     <span class="screenreader-only">{{#t}}Discussion Topic{{/t}}</span>
     {{addIcon 'discussion'}}
     {{else}}{{#ifEqual subtype 'quiz' }}
@@ -31,7 +34,7 @@
     {{else}}
     <span class="screenreader-only">{{#t}}Calendar Event{{/t}}</span>
     {{addIcon 'calendar-month'}}
-    {{/ifEqual}}{{/ifEqual}}{{/ifEqual}}{{/ifEqual}}{{/ifEqual}}
+    {{/ifEqual}}{{/ifEqual}}{{/ifEqual}}{{/ifEqual}}{{/ifEqual}}{{/ifEqual}}
     {{#if html_url}}
     <a href="{{html_url}}">{{title}}</a>
     {{else}}

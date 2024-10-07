@@ -41,6 +41,7 @@ const showCourseSummary = !!document.getElementById('syllabusContainer')
 
 let collections = []
 let deferreds
+
 // If we're in a paced course, we're not showing the assignments
 // so skip retrieving them.
 // Also, ensure 'Show Course Summary' is checked otherwise don't bother.
@@ -49,6 +50,7 @@ if (!(ENV.IN_PACED_COURSE && !ENV.current_user_is_student) && showCourseSummary)
   collections = [
     new SyllabusCalendarEventsCollection([ENV.context_asset_string], 'event'),
     new SyllabusCalendarEventsCollection([ENV.context_asset_string], 'assignment'),
+    new SyllabusCalendarEventsCollection([ENV.context_asset_string], 'sub_assignment'),
   ]
 
   // Don't show appointment groups for non-logged in users
