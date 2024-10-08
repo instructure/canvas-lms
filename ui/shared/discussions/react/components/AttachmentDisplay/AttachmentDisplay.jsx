@@ -94,7 +94,6 @@ export function AttachmentDisplay(props) {
         // This is useful for making it work with usage rights and the Discussion Topic Create/Edit process.
         const context = !assetString ? discussionContext : userContext || discussionContext
 
-
         attachmentInformation['attachment[filename]'] = fileToUpload.name
         attachmentInformation['attachment[content_type]'] = fileToUpload.type
         attachmentInformation['attachment[size]'] = fileToUpload.size
@@ -103,6 +102,9 @@ export function AttachmentDisplay(props) {
         attachmentInformation['attachment[context_code]'] = `${context}` // used to find the correct course folder
         attachmentInformation['attachment[asset_string]'] = `${assetString}` // required for downloads to go to submission folder; Doesn't Apply to Topic attachments, but Legacy Topic Attachments don't apply to user quota.
       }
+
+      // Prevents overwriting attachments in separate discussions
+      attachmentInformation['attachment[on_duplicate]'] = 'rename'
 
       // Changed from uploadFiles to uploadFile because we need to control the pre-flight data ( attachmentInformation)
       const newFile = await uploadFile(fileUploadURL, attachmentInformation, fileToUpload)
