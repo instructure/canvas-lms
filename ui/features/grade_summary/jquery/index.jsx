@@ -675,6 +675,13 @@ function bindShowAllDetailsButton($ariaAnnouncer) {
   })
 }
 
+$(window).on('beforeprint', function () {
+  $('tr.sub_assignment_row').show()
+  $(`.toggle_sub_assignments i`)
+        .removeClass('icon-arrow-open-end')
+        .addClass('icon-arrow-open-down')
+})
+
 function displayPageContent() {
   document.getElementById('grade-summary-content').style.display = ''
   document.getElementById('student-grades-right-content').style.display = ''
