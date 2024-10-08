@@ -23,8 +23,6 @@ import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import SubmissionWorkflowTracker from '../SubmissionWorkflowTracker'
 import * as tz from '@instructure/moment-utils'
 
-const {colors} = canvas.variables
-
 describe('when a submission is graded', () => {
   describe('when the grade is visible', () => {
     it('renders as "Review Feedback"', async () => {
@@ -50,7 +48,7 @@ describe('when a submission is graded', () => {
 
       const {getByTestId} = render(<SubmissionWorkflowTracker submission={submission} />)
       expect(getByTestId('submission-workflow-tracker-subtitle')).toHaveStyle(
-        `color: ${colors.textSuccess}`
+        `color: ${canvas.colors.textSuccess}`
       )
     })
 
