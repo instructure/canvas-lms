@@ -45,6 +45,7 @@ shared_context "advantage access token context" do
       https://canvas.instructure.com/lti/account_external_tools/scope/list
       https://canvas.instructure.com/lti/account_external_tools/scope/show
       https://canvas.instructure.com/lti/account_external_tools/scope/destroy
+      https://purl.imsglobal.org/spec/lti/scope/noticehandlers
     ].join(" ")
   end
   let(:access_token_signing_key) { Canvas::Security.encryption_key }

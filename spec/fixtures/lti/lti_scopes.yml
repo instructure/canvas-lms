@@ -83,4 +83,3 @@
 - scope: https://canvas.instructure.com/lti/replace_editor_contents
   description: Can replace the entire contents of the RCE
   undocumented: true
-
