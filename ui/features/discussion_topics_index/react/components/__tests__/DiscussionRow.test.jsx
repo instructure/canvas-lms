@@ -237,7 +237,7 @@ describe('DiscussionRow', () => {
   it('renders the publish ToggleIcon', () => {
     const discussion = {published: false}
     render(<DiscussionRow {...makeProps({canPublish: true, discussion})} />)
-    expect(screen.getByText('Publish Hello World')).toBeInTheDocument()
+    expect(screen.getAllByText('Publish Hello World', {exact: false}).length).toBe(2)
   })
 
   it('when feature flag is off, renders anonymous discussion lock explanation for read_as_admin', () => {

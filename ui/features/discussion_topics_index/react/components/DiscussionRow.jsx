@@ -54,6 +54,7 @@ import {
   IconPermissionsLine,
   IconEditLine,
 } from '@instructure/ui-icons'
+import {ToggleButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Menu} from '@instructure/ui-menu'
@@ -70,7 +71,6 @@ import masterCourseDataShape from '@canvas/courses/react/proptypes/masterCourseD
 import propTypes from '../propTypes'
 import SectionsTooltip from '@canvas/sections-tooltip'
 import select from '@canvas/obj-select'
-import ToggleIcon from './ToggleIcon'
 import UnreadBadge from '@canvas/unread-badge'
 import {isPassedDelayedPostAt} from '@canvas/datetime/react/date-utils'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
@@ -393,56 +393,78 @@ class DiscussionRow extends Component {
 
   subscribeButton = () =>
     !this.isInaccessibleDueToAnonymity() && (
-      <ToggleIcon
-        key={`Subscribe_${this.props.discussion.id}`}
-        toggled={this.props.discussion.subscribed}
-        OnIcon={
-          <Text color="success">
-            <IconBookmarkSolid
-              title={I18n.t('Unsubscribe from %{title}', {title: this.props.discussion.title})}
-            />
-          </Text>
-        }
-        OffIcon={
-          <Text color="brand">
-            <IconBookmarkLine
-              title={I18n.t('Subscribe to %{title}', {title: this.props.discussion.title})}
-            />
-          </Text>
-        }
-        onToggleOn={() => this.props.toggleSubscriptionState(this.props.discussion)}
-        onToggleOff={() => this.props.toggleSubscriptionState(this.props.discussion)}
-        disabled={this.props.discussion.subscription_hold !== undefined}
-        className="subscribe-button"
-      />
+      <span className="subscribe-button" key={`Subscribe_${this.props.discussion.id}`}>
+        <ToggleButton
+          size="small"
+          status={this.props.discussion.subscribed ? 'pressed' : 'unpressed'}
+          color={this.props.discussion.subscribed ? 'success' : 'secondary'}
+          renderIcon={
+            this.props.discussion.subscribed ? <IconBookmarkSolid /> : <IconBookmarkLine />
+          }
+          renderTooltipContent={
+            this.props.discussion.subscribed
+              ? I18n.t('Unsubscribe from %{title}', {
+                  title: this.props.discussion.title,
+                })
+              : this.props.discussion.subscription_hold !== undefined
+              ? I18n.t('Reply to subscribe')
+              : I18n.t('Subscribe to %{title}', {title: this.props.discussion.title})
+          }
+          screenReaderLabel={
+            this.props.discussion.subscribed
+              ? I18n.t('Subscribed')
+              : this.props.discussion.subscription_hold !== undefined
+              ? I18n.t('Reply to subscribe')
+              : I18n.t('Unsubscribed')
+          }
+          interaction={
+            this.props.discussion.subscription_hold !== undefined ? 'disabled' : 'enabled'
+          }
+          onClick={() => this.props.toggleSubscriptionState(this.props.discussion)}
+        />
+      </span>
     )
 
   publishButton = () =>
     this.props.canPublish && !this.isInaccessibleDueToAnonymity() ? (
-      <ToggleIcon
-        key={`Publish_${this.props.discussion.id}`}
-        toggled={this.props.discussion.published}
-        disabled={!this.props.discussion.can_unpublish && this.props.discussion.published}
-        OnIcon={
-          <Text color="success">
-            <IconPublishSolid
-              title={I18n.t('Unpublish %{title}', {title: this.props.discussion.title})}
-            />
-          </Text>
-        }
-        OffIcon={
-          <Text color="secondary">
-            <IconUnpublishedLine
-              title={I18n.t('Publish %{title}', {title: this.props.discussion.title})}
-            />
-          </Text>
-        }
-        onToggleOn={() => this.props.updateDiscussion(this.props.discussion, {published: true}, {})}
-        onToggleOff={() =>
-          this.props.updateDiscussion(this.props.discussion, {published: false}, {})
-        }
-        className="publish-button"
-      />
+      <span className="publish-button" key={`Publish_${this.props.discussion.id}`}>
+        <ToggleButton
+          size="small"
+          status={this.props.discussion.published ? 'pressed' : 'unpressed'}
+          color={this.props.discussion.published ? 'success' : 'secondary'}
+          renderIcon={
+            this.props.discussion.published ? <IconPublishSolid /> : <IconUnpublishedLine />
+          }
+          renderTooltipContent={
+            this.props.discussion.published
+              ? I18n.t('Unpublish %{title}', {title: this.props.discussion.title})
+              : I18n.t('Publish %{title}', {title: this.props.discussion.title})
+          }
+          screenReaderLabel={
+            this.props.discussion.published
+              ? I18n.t('Unpublish %{title}', {
+                  title: this.props.discussion.title,
+                })
+              : I18n.t('Publish %{title}', {
+                  title: this.props.discussion.title,
+                })
+          }
+          interaction={
+            !this.props.discussion.can_unpublish && this.props.discussion.published
+              ? 'disabled'
+              : 'enabled'
+          }
+          onClick={() =>
+            this.props.updateDiscussion(
+              this.props.discussion,
+              {
+                published: !this.props.discussion.published,
+              },
+              {}
+            )
+          }
+        />
+      </span>
     ) : null
 
   pinMenuItemDisplay = () => {
