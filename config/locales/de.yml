@@ -31299,6 +31299,14 @@ de:
       müssen eine Client-ID und einen Client-Secret erhalten.
       
       Wenn der Provider gültige Rückruf- oder Weiterleitungs-URIs konfigurieren kann, verwenden Sie bitte %{callback_url}.
+  to_configure_an_openid_connect_provider_you_need_t_90b11989: |-
+      Um einen OpenID-Connect-Anbieter zu konfigurieren, benötigen Sie die Autorisierungs- und Token-URLs und
+      erhalten eine Client-ID und einen geheimen Client-Schlüssel.
+      
+      Wenn der Anbieter gültige Rückruf- oder Umleitungs-URIs konfigurieren kann, verwenden Sie %{callback_url}.
+      Um die Abmeldung über den Rückkanal zu aktivieren, konfigurieren Sie die `backchannel_logout_uri` des Anbieters
+      für die Verwendung von %{backchannel_logout_uri} und setzen Sie vorzugsweise
+      `backchannel_logout_session_required` auf `true`, wenn der Anbieter dies unterstützt.
   to_create_a_link_you_can_use_in_canvas_you_ll_need_5c6d93e4: "um einen Link zu erstellen, den Sie in Canvas verwenden können. Sie müssen sich für ein Zoom-Konto anmelden, falls Sie noch keins haben."
   to_create_a_link_you_can_use_in_canvas_you_ll_need_7dd85497: "um einen Link zu erstellen, den Sie in Canvas verwenden können. Sie benötigen ein Google-Konto, um Google Meet zu verwenden."
   to_create_a_new_course_to_use_as_a_course_template_9e7e2c6c: "Um einen neuen Kurses zur Verwendung als Kursvorlage zu erstellen, muss auch „Kurse verwalten – hinzufügen“ aktiviert werden."
