@@ -24,6 +24,8 @@ class GroupCategory < ActiveRecord::Base
   attr_accessor :group_by_section
   attr_writer :assign_unassigned_members
 
+  attr_readonly :non_collaborative
+
   belongs_to :context, polymorphic: [:course, :account]
   belongs_to :sis_batch
   belongs_to :root_account, class_name: "Account", inverse_of: :all_group_categories

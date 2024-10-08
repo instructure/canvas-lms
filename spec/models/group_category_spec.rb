@@ -705,6 +705,32 @@ describe GroupCategory do
     gc = GroupCategory.create!(name: "Test3", account: new_account, sis_source_id: 1)
     expect(gc.sis_source_id).to eq("1")
   end
+
+  context "non_collaborative group_category" do
+    it "attribute can be set on creation but cannot be changed afterwards" do
+      # Set non_collaborative on creation
+      category = GroupCategory.create(name: "Test Category", context: @course, non_collaborative: true)
+      expect(category.non_collaborative).to be true
+
+      # Attempt to change non_collaborative
+      category.non_collaborative = false
+      category.save
+      expect(category.reload.non_collaborative).to be true
+
+      # Attempt to change non_collaborative using update
+      category.update(non_collaborative: false)
+      expect(category.reload.non_collaborative).to be true
+
+      # Create a category without setting non_collaborative
+      another_category = GroupCategory.create(name: "Another Test Category", context: @course)
+      expect(another_category.non_collaborative).to be false
+
+      # Attempt to set non_collaborative after creation
+      another_category.non_collaborative = true
+      another_category.save
+      expect(another_category.reload.non_collaborative).to be false
+    end
+  end
 end
 
 def assert_random_group_assignment(category, course, initial_spread, result_spread, opts = {})
