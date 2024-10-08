@@ -31,8 +31,7 @@ import {Day, Grouping, PlannerItem} from '@canvas/planner'
 
 export function getBaseThemeVars() {
   const baseTheme = window.ENV.use_high_contrast ? canvasHighContrastTheme : canvasBaseTheme
-  const {variables} = baseTheme
-  const {borders, colors, typography} = variables
+  const {borders, colors, typography} = baseTheme
 
   /**
    * These are the base defaults used to generate component-specific theme
@@ -58,7 +57,7 @@ export function getBaseThemeVars() {
     },
   }
 
-  return {typography, colors, borders, base, baseTheme, baseFont, variables}
+  return {typography, colors, borders, base, baseTheme, baseFont}
 }
 
 /**
@@ -124,13 +123,17 @@ export const getPlannerTheme = () => {
   }
 }
 
-export const useK5Theme = (options = {}) => {
+export const useK5Theme = (
+  options: {
+    fontOnly?: boolean
+  } = {}
+) => {
   const {baseTheme, base, baseFont} = getBaseThemeVars()
   const fontOnly = options?.fontOnly || false
   baseTheme.use({overrides: fontOnly ? baseFont : base})
 }
 
 export const getK5ThemeVars = () => {
-  const {base, variables} = getBaseThemeVars()
-  return mergeDeep(variables, base)
+  const {base, baseTheme} = getBaseThemeVars()
+  return mergeDeep(baseTheme, base)
 }

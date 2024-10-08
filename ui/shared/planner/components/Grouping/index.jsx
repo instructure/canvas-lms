@@ -37,6 +37,8 @@ import buildStyle from './style'
 const I18n = useI18nScope('planner')
 
 export class Grouping extends Component {
+  static componentId = 'Grouping'
+
   static propTypes = {
     items: arrayOf(shape(itemShape)).isRequired,
     animatableIndex: number,

@@ -36,6 +36,8 @@ import {animatable} from '../../dynamic-ui'
 const I18n = useI18nScope('planner')
 
 export class Day extends Component {
+  static componentId = 'Day'
+
   static propTypes = {
     day: string.isRequired,
     itemsForDay: arrayOf(shape(itemShape)),

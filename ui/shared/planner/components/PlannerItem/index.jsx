@@ -62,6 +62,8 @@ import {stripHtmlTags} from '@canvas/util/TextHelper'
 const I18n = useI18nScope('planner')
 
 export class PlannerItem_raw extends Component {
+  static componentId = 'PlannerItem'
+
   static propTypes = {
     color: string,
     uniqueId: string.isRequired,
