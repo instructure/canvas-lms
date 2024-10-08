@@ -13437,6 +13437,7 @@ nb-x-k12:
   group_conferences_12866179: Gruppevideomøter
   group_count: 
     one: "%{count} gruppe"
+    other: "%{count} grupper"
   group_count_is_invalid_f04dec9d: "Gruppetall er ugyldig"
   group_created_successfully_cae99f8c: "Gruppen ble opprettet"
   group_description_f142b1e5: Gruppebeskrivelse
