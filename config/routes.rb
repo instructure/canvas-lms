@@ -2910,6 +2910,12 @@ CanvasRails::Application.routes.draw do
       get "groups/:group_id/names_and_roles", controller: "lti/ims/names_and_roles", action: :group_index, as: :group_names_and_roles
     end
 
+    # Platform Notification service
+    scope(controller: "lti/notice_handler") do
+      get "notice-handlers/:context_external_tool_id", action: :index
+      put "notice-handlers/:context_external_tool_id", action: :update
+    end
+
     # Security
     scope(controller: "security") do
       get "security/jwks", action: :jwks, as: :lti_jwks
