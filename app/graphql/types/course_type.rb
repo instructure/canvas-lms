@@ -133,6 +133,15 @@ module Types
       assignment_groups.where(workflow_state: "available")
     end
 
+    field :assignment_groups,
+          [AssignmentGroupType],
+          null: true
+
+    def assignment_groups
+      assignment_groups = object.assignment_groups
+      assignment_groups.where(workflow_state: "available")
+    end
+
     field :apply_group_weights, Boolean, null: true
     def apply_group_weights
       object.apply_group_weights?
@@ -355,6 +364,16 @@ module Types
       Project group sets for this course.
     MD
     def group_sets_connection
+      if course.grants_any_right?(current_user, :manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
+        course.group_categories.where(role: nil)
+      end
+    end
+
+    # TODO: this is only temporary until the group_sets_connection gets paginated
+    field :group_sets, [GroupSetType], <<~MD, null: true
+      Project group sets for this course.
+    MD
+    def group_sets
       if course.grants_any_right?(current_user, :manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
         course.group_categories.where(role: nil)
       end

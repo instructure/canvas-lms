@@ -53,7 +53,7 @@ export const addNewGroupCategoryToCache = (cache, newCategory) => {
   }
 
   if (data) {
-    data.legacyNode.groupSetsConnection.nodes.push(relevantGroupCategoryData)
+    data.legacyNode.groupSets.push(relevantGroupCategoryData)
     cache.writeQuery({
       query: contextQueryToUse,
       variables: contextQueryVariables,
