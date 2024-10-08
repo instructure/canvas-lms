@@ -936,4 +936,30 @@ describe Group do
       end
     end
   end
+
+  describe "non_collaborative groups" do
+    it "non_collaborative can be set on creation but cannot be changed afterwards" do
+      # Set non_collaborative on creation
+      group = Group.create(context: @course, name: "Test Group", non_collaborative: true)
+      expect(group.non_collaborative).to be true
+
+      # Attempt to change non_collaborative
+      group.non_collaborative = false
+      group.save
+      expect(group.reload.non_collaborative).to be true
+
+      # Attempt to change non_collaborative using update
+      group.update(non_collaborative: false)
+      expect(group.reload.non_collaborative).to be true
+
+      # Create a group without setting non_collaborative
+      another_group = Group.create(context: @course, name: "Another Test Group")
+      expect(another_group.non_collaborative).to be false
+
+      # Attempt to set non_collaborative after creation
+      another_group.non_collaborative = true
+      another_group.save
+      expect(another_group.reload.non_collaborative).to be false
+    end
+  end
 end

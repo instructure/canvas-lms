@@ -30,6 +30,8 @@ class Group < ActiveRecord::Base
 
   validates :sis_source_id, uniqueness: { scope: :root_account }, allow_nil: true
 
+  attr_readonly :non_collaborative
+
   # use to skip queries in can_participate?, called by policy block
   attr_accessor :can_participate
 
