@@ -573,6 +573,74 @@ describe Checkpoints::DiscussionCheckpointUpdaterService do
         expect(second_override_2.lock_at).to be_within(1.second).of(original_lock_at_2)
         expect(second_override_2.assignment_override_students.pluck(:user_id)).to match_array([@students[1].id])
       end
+
+      it "can create discussion with checkpoints with Everyone and then update them with student overrides and remove Everyone" do
+        reply_to_topic_due_at = 7.days.from_now
+        reply_to_entry_due_at = 14.days.from_now
+
+        # Create checkpoints with Everyone due dates
+        reply_to_topic_checkpoint = creator_service.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: reply_to_topic_due_at }],
+          points_possible: 5
+        )
+
+        reply_to_entry_checkpoint = creator_service.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: reply_to_entry_due_at }],
+          points_possible: 15
+        )
+
+        expect(reply_to_topic_checkpoint.due_at).to be_within(1.second).of(reply_to_topic_due_at)
+        expect(reply_to_entry_checkpoint.due_at).to be_within(1.second).of(reply_to_entry_due_at)
+        expect(reply_to_topic_checkpoint.only_visible_to_overrides).to be_falsey
+        expect(reply_to_entry_checkpoint.only_visible_to_overrides).to be_falsey
+
+        # Update checkpoints with student overrides and not define Everyone dates
+        students = create_users(2, return_type: :record)
+        students.each { |student| student_in_course(course: @topic.course, user: student, active_all: true) }
+        student_ids = students.map(&:id)
+
+        reply_to_topic_due_at_2 = 14.days.from_now
+        reply_to_entry_due_at_2 = 21.days.from_now
+
+        updated_reply_to_topic_checkpoint = updater_service.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "override", set_type: "ADHOC", student_ids:, due_at: reply_to_topic_due_at_2 }],
+          points_possible: 5
+        )
+
+        updated_reply_to_entry_checkpoint = updater_service.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "override", set_type: "ADHOC", student_ids:, due_at: reply_to_entry_due_at_2 }],
+          points_possible: 15
+        )
+
+        expect(updated_reply_to_topic_checkpoint.due_at).to be_nil
+        expect(updated_reply_to_entry_checkpoint.due_at).to be_nil
+
+        expect(updated_reply_to_topic_checkpoint.only_visible_to_overrides).to be_truthy
+        expect(updated_reply_to_entry_checkpoint.only_visible_to_overrides).to be_truthy
+
+        expect(updated_reply_to_topic_checkpoint.assignment_overrides.count).to eq 1
+        expect(updated_reply_to_entry_checkpoint.assignment_overrides.count).to eq 1
+
+        updated_reply_to_topic_checkpoint.assignment_overrides.each do |assignment_override|
+          expect(assignment_override.set_type).to eq "ADHOC"
+          expect(assignment_override.due_at).to be_within(1.second).of(reply_to_topic_due_at_2)
+          expect(assignment_override.assignment_override_students.pluck(:user_id)).to match_array(student_ids)
+        end
+
+        updated_reply_to_entry_checkpoint.assignment_overrides.each do |assignment_override|
+          expect(assignment_override.set_type).to eq "ADHOC"
+          expect(assignment_override.due_at).to be_within(1.second).of(reply_to_entry_due_at_2)
+          expect(assignment_override.assignment_override_students.pluck(:user_id)).to match_array(student_ids)
+        end
+      end
     end
   end
 end

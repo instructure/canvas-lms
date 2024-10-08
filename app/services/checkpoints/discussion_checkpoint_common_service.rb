@@ -108,11 +108,17 @@ class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
   end
 
   def only_visible_to_overrides?
-    everyone_date.empty? && override_dates.any?
+    everyone_not_in_dates? && override_dates.any?
+  end
+
+  def everyone_not_in_dates?
+    dates_by_type("everyone").empty?
   end
 
   def everyone_date
-    dates_by_type("everyone").first || {}
+    # If there are no dates for everyone, return a hash with nil values.
+    # This is important because the due_at, unlock_at, and lock_at fields, if not present, will not be updated accordingly.
+    dates_by_type("everyone").first || { due_at: nil, unlock_at: nil, lock_at: nil }
   end
 
   def override_dates
