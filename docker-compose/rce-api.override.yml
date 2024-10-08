@@ -1,7 +1,6 @@
 # to use this add docker-compose/rce-api.override.yml
 # to your COMPOSE_FILE var in .env
 
-version: '2.3'
 services:
   web:
     links:
