@@ -923,6 +923,47 @@ describe "discussions" do
         expect(f("input[placeholder='Select a group category']")["value"]).to eq(new_group_category.name)
       end
 
+      it "creates two different discussions with attachments not overwriting each other" do
+        title = "new topic with file"
+        title2 = "another topic with file"
+        graded_png = File.expand_path(File.dirname(__FILE__) + "/../../../public/images/graded.png")
+
+        get "/courses/#{course.id}/discussion_topics/new"
+        wait_for_ajaximations
+
+        set_react_topic_title_and_message(title, "replying to topic")
+        _filename, fullpath, file = get_permanent_file(graded_png)
+        f("[data-testid='attachment-input']").send_keys(fullpath)
+
+        Discussion.save_button.click
+        wait_for_ajaximations
+
+        attachment_id = DiscussionTopic.where(title:).first.attachment_id
+        attachment_name = Attachment.find(attachment_id).display_name
+        expect(attachment_id).to be_present
+
+        # create the second discussion with the same attachment
+        get "/courses/#{course.id}/discussion_topics/new"
+        wait_for_ajaximations
+
+        set_react_topic_title_and_message(title2, "replying to topic")
+        _filename2, fullpath2, file2 = get_permanent_file(graded_png)
+        f("[data-testid='attachment-input']").send_keys(fullpath2)
+
+        Discussion.save_button.click
+        wait_for_ajaximations
+
+        attachment_id2 = DiscussionTopic.where(title: title2).first.attachment_id
+        attachment_name2 = Attachment.find(attachment_id2).display_name
+        expect(attachment_id2).to be_present
+
+        expect(attachment_name).to eq("graded.png")
+        expect(attachment_name2).to eq("graded-1.png")
+      ensure
+        file.close
+        file2.close
+      end
+
       context "usage rights" do
         before do
           course.root_account.enable_feature!(:usage_rights_discussion_topics)
