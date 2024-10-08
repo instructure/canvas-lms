@@ -125,4 +125,26 @@ describe "Account Reports" do
     expect(count).to eq 1
     expect(ar.reload).to be_error
   end
+
+  describe "sharding" do
+    specs_require_sharding
+
+    it "activates the report's shard before calling the proc" do
+      active_shard_id = nil
+      AccountReports.configure_account_report "Default", {
+        "test_report" => {
+          title: -> { "Test Report" },
+          proc: lambda do |_report|
+            active_shard_id = Shard.current.id
+          end
+        }
+      }
+      ar = AccountReport.create!(account: Account.default, user: account_admin_user, report_type: "test_report")
+
+      @shard1.activate { ar.run_report }
+      run_jobs
+
+      expect(active_shard_id).to eq ar.shard.id
+    end
+  end
 end
