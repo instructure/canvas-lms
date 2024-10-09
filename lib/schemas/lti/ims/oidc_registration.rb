@@ -134,6 +134,7 @@ module Schemas::Lti::IMS
             *Lti::IMS::Registration::IMPLIED_SPEC_ATTRIBUTES
           )
           reg_attrs["scopes"] = reg_attrs.delete("scope")&.split || []
+          reg_attrs["scopes"].delete("openid")
           reg_attrs["lti_tool_configuration"] =
             reg_attrs.delete("https://purl.imsglobal.org/spec/lti-tool-configuration")
           reg_attrs
