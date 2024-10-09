@@ -37,6 +37,7 @@ class GroupCategory < ActiveRecord::Base
 
   before_validation :set_root_account_id
   validates :sis_source_id, uniqueness: { scope: :root_account }, allow_nil: true
+  validate :validate_non_collaborative_constraints, if: :non_collaborative?
 
   after_save :auto_create_groups
   after_update :update_groups_max_membership
@@ -563,6 +564,11 @@ class GroupCategory < ActiveRecord::Base
   end
 
   protected
+
+  def validate_non_collaborative_constraints
+    errors.add(:base, "Non-collaborative group categories can only be created for courses") unless context_type == "Course"
+    errors.add(:base, "Non-collaborative group categories cannot be student organized or communities") if ["student_organized", "communities"].include?(role)
+  end
 
   def start_progress
     self.current_progress ||= progresses.build(tag: "assign_unassigned_members", completion: 0)
