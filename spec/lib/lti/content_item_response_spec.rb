@@ -196,11 +196,11 @@ describe Lti::ContentItemResponse do
         .and_call_original
     end
 
-    context "when commons_new_quizzes feature flag is enabled" do
+    context "when new_quizzes_media_type feature flag is enabled" do
       before do
         allow(Account.site_admin)
           .to receive(:feature_enabled?)
-          .with(:commons_new_quizzes)
+          .with(:new_quizzes_media_type)
           .and_return(true)
       end
 
@@ -227,11 +227,11 @@ describe Lti::ContentItemResponse do
       end
     end
 
-    context "when commons_new_quizzes feature flag is disabled" do
+    context "when new_quizzes_media_type feature flag is disabled" do
       before do
         allow(Account.site_admin)
           .to receive(:feature_enabled?)
-          .with(:commons_new_quizzes)
+          .with(:new_quizzes_media_type)
           .and_return(false)
       end
 

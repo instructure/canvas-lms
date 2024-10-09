@@ -113,7 +113,7 @@ module Lti
     end
 
     def media_type_for_content_type
-      return media_type unless Account.site_admin.feature_enabled?(:commons_new_quizzes)
+      return media_type unless Account.site_admin.feature_enabled?(:new_quizzes_media_type)
       return media_type unless assignment?
 
       assignment = module_item? ? tag.content : assignment_from_context
