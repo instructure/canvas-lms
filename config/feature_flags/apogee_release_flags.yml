@@ -388,3 +388,9 @@ enhanced_rubrics_assignments:
       state: allowed
     development:
       state: allowed
+speedgrader_grade_by_student:
+  state: hidden
+  beta: true
+  applies_to: RootAccount
+  display_name: SpeedGrader Grade by Student
+  description: Allow instructors to view and traverse between students and assignments from within SpeedGrader
