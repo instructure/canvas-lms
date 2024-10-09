@@ -176,7 +176,8 @@ class DeveloperKeyAccountBinding < ApplicationRecord
         created_by: current_user,
         updated_by: current_user,
         developer_key_account_binding: self,
-        skip_lime_sync: true
+        skip_lime_sync: true,
+        workflow_state:
       )
     end
   end
