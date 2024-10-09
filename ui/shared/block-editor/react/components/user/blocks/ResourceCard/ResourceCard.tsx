@@ -26,7 +26,7 @@ import {TextBlock} from '../TextBlock'
 import {ButtonBlock} from '../ButtonBlock'
 import {IconBlock} from '../IconBlock'
 import {type ResourceCardProps} from './types'
-import {notDeletableIfLastChild} from '../../../../utils'
+import {isLastChild} from '../../../../utils'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -97,7 +97,7 @@ ResourceCard.craft = {
     isDeletable: (nodeId: string, query: any) => {
       const parentId = query.node(nodeId).get().data.parent
       const parent = query.node(parentId).get()
-      return parent?.data.name !== 'ResourcesSectionInner' || notDeletableIfLastChild(nodeId, query)
+      return parent?.data.name === 'ResourcesSectionInner' && !isLastChild(nodeId, query)
     },
   },
 }

@@ -181,7 +181,6 @@ describe "Block Editor", :ignore_js_errors do
       driver.action.send_keys(:arrow_down).perform
       driver.action.send_keys(:arrow_right).perform
       driver.action.send_keys(:arrow_down).perform
-      driver.action.send_keys(:arrow_right).perform
       driver.action.send_keys(:arrow_down).perform
       driver.action.send_keys(:arrow_right).perform
       # empty group is nowopen

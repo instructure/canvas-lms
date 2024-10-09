@@ -16,17 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-//
-// This file is a temporary solution to prividing global templates to the block editor.
-//
+import React from 'react'
+import {type ViewProps} from '@instructure/ui-view'
+import {type BlockTemplate, TemplateEditor} from '../../../types'
 
-import {type BlockTemplate} from '../../types'
-
-import blank from './blank.json'
-import knowledgeCheck from './knowledgeCheck.json'
-
-// returning a promise will make this easier to replace with a real API call
-export const getGlobalTemplates = (): Promise<BlockTemplate[]> => {
-  // @ts-expect-error
-  return Promise.resolve([blank, knowledgeCheck])
+export interface TemplatePanelProps {
+  templateEditor: TemplateEditor
+  templates: BlockTemplate[]
 }
+
+export interface ToolboxProps extends TemplatePanelProps {
+  open: boolean
+  container: HTMLElement
+  onClose: () => void
+}
+
+export type KeyboardOrMouseEvent = React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps>

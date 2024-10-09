@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import {type ViewOwnProps} from '@instructure/ui-view'
 
 export interface RenderNodeProps {
   render: React.ReactElement
@@ -30,3 +31,8 @@ export type ResizableProps = {
   height?: number
   maintainAspectRatio?: boolean
 }
+
+export type OnRequestTabChangeHandler = (
+  event: React.MouseEvent<ViewOwnProps, MouseEvent> | React.KeyboardEvent<ViewOwnProps>,
+  tabData: {index: number; id?: string | undefined}
+) => void

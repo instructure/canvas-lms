@@ -22,7 +22,7 @@ import {Menu} from '@instructure/ui-menu'
 import {
   // getCloneTree,
   getSectionLocation,
-  notDeletableIfLastChild,
+  isLastChild,
   type SectionLocation,
 } from '../../utils'
 import {type AddSectionPlacement} from './types'
@@ -53,7 +53,7 @@ const SectionMenu = ({
     }
   })
   const {isDeletable} = useNode((n: Node) => ({
-    isDeletable: n.data.custom?.isSection && notDeletableIfLastChild(n.id, query),
+    isDeletable: n.data.custom?.isSection && !isLastChild(n.id, query),
   }))
   const [sectionLocation, setSectionLocation] = useState<SectionLocation>(() => {
     if (selected?.get()) {

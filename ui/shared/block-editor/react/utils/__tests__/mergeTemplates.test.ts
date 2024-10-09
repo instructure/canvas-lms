@@ -21,21 +21,26 @@ import {mergeTemplates} from '../mergeTemplates'
 describe('mergeTemplates', () => {
   it('should merge global templates into api templates', () => {
     const apiTemplates = [
-      {id: '1', global_id: 'a', title: 'Api 1'},
-      {id: '2', global_id: 'b', title: 'Api 2'},
-      {id: '3', global_id: 'c', title: 'Api 3'},
+      {id: '1', global_id: 'a', name: 'AA Api 1'},
+      {id: '2', global_id: 'b', name: 'CC Api 2'},
+      {id: '3', global_id: 'c', name: 'DD Api 3'},
     ]
     const globalTemplates = [
-      {id: '1', global_id: 'a', title: 'global 1'},
-      {id: '4', global_id: 'z', title: 'global 4'},
+      {id: '2', global_id: 'a', name: 'AA global 1'},
+      {id: '4', global_id: 'z', name: 'BB global 4'},
+      {id: '5', global_id: 'x', name: 'Blank'},
     ]
     // @ts-expect-error
     const mergedTemplates = mergeTemplates(apiTemplates, globalTemplates)
+    // blank is sorted to the top
+    expect(mergedTemplates[0].name).toEqual('Blank')
+
     expect(mergedTemplates).toEqual([
-      {id: '1', global_id: 'a', title: 'global 1'},
-      {id: '2', global_id: 'b', title: 'Api 2'},
-      {id: '3', global_id: 'c', title: 'Api 3'},
-      {id: '4', global_id: 'z', title: 'global 4'},
+      {id: '5', global_id: 'x', name: 'Blank'},
+      {id: '1', global_id: 'a', name: 'AA Api 1'},
+      {id: '2', global_id: 'a', name: 'AA global 1'},
+      {id: '4', global_id: 'z', name: 'BB global 4'},
+      {id: '3', global_id: 'c', name: 'DD Api 3'},
     ])
   })
 })

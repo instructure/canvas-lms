@@ -31,13 +31,19 @@ const I18n = useI18nScope('block-editor')
 
 type SaveMode = 'save' | 'edit'
 
+export type OnSaveTemplateCallback = (
+  template: Partial<BlockTemplate>,
+  published: boolean,
+  globalTemplate: boolean
+) => void
+
 type EditTemplateModalProps = {
   mode: SaveMode
   template?: Partial<BlockTemplate>
   templateType: TemplateType
   isGlobalEditor: boolean
   onDismiss: () => void
-  onSave: (template: Partial<BlockTemplate>, globalTemplate: boolean) => void
+  onSave: OnSaveTemplateCallback
 }
 const EditTemplateModal = ({
   mode,
@@ -54,7 +60,7 @@ const EditTemplateModal = ({
   const [nameErrorMsg, setNameErrorMsg] = useState<FormMessage[] | undefined>(undefined)
   const nameInputRef = useRef<HTMLInputElement | null>(null)
 
-  const handleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>, value: string) => {
+  const handleNameChange = useCallback((_e: React.ChangeEvent<HTMLInputElement>, value: string) => {
     setName(value)
     if (value) {
       setNameErrorMsg(undefined)

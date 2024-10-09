@@ -17,62 +17,34 @@
  */
 
 import React from 'react'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import {Editor, useEditor} from '@craftjs/core'
+import {Editor} from '@craftjs/core'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {Toolbox, type ToolboxProps} from '../Toolbox'
-import {TemplateEditor} from '../../../types'
+import {Toolbox} from '../Toolbox'
+import {type ToolboxProps} from '../types'
+import {TemplateEditor} from '../../../../types'
+import {testTemplates} from './testTemplates'
 
 const user = userEvent.setup()
-
-const mockCreate = jest.fn()
-
-jest.mock('@craftjs/core', () => {
-  const module = jest.requireActual('@craftjs/core')
-  return {
-    ...module,
-    useEditor: jest.fn(() => {
-      return {
-        connectors: {
-          create: mockCreate,
-        },
-      }
-    }),
-  }
-})
 
 const defaultProps: ToolboxProps = {
   open: true,
   container: document.createElement('div'),
-  templates: [],
   templateEditor: TemplateEditor.NONE,
+  templates: testTemplates,
   onClose: () => {},
 }
 
 const renderComponent = (props: Partial<ToolboxProps> = {}) => {
   return render(
-    <Editor enabled={true}>
+    <Editor>
       <Toolbox {...defaultProps} {...props} />
     </Editor>
   )
 }
 
-const blockList = [
-  'Button',
-  'Text',
-  'RCE',
-  'Icon',
-  'Heading',
-  'Resource Card',
-  'Image',
-  'Group',
-  'Tabs',
-]
-
 describe('Toolbox', () => {
   beforeEach(() => {
-    mockCreate.mockClear()
     const bee = document.createElement('div')
     bee.classList.add('block-editor-editor')
     document.body.appendChild(bee)
@@ -85,10 +57,35 @@ describe('Toolbox', () => {
   it('renders', () => {
     const {getByText} = renderComponent()
 
+    expect(getByText('Add Content')).toBeInTheDocument()
+    expect(getByText('Close')).toBeInTheDocument()
+    expect(getByText('Sections')).toBeInTheDocument()
     expect(getByText('Blocks')).toBeInTheDocument()
-    for (const block of blockList) {
-      expect(getByText(block)).toBeInTheDocument()
-    }
+  })
+
+  it('renders the Sections tab by default', () => {
+    const {getByText} = renderComponent()
+
+    expect(getByText('Sections')).toHaveAttribute('aria-selected', 'true')
+  })
+
+  it('renders the sections', () => {
+    const {getByText} = renderComponent()
+
+    expect(getByText('Blank')).toBeInTheDocument()
+    expect(getByText('A blank template')).toBeInTheDocument()
+    expect(getByText('Another Section')).toBeInTheDocument()
+    expect(getByText('Another section template')).toBeInTheDocument()
+  })
+
+  it('renders the blocks when the Blocks tab is clicked', async () => {
+    const {getByText} = renderComponent({templates: testTemplates})
+
+    await user.click(getByText('Blocks'))
+
+    expect(getByText('Blocks')).toHaveAttribute('aria-selected', 'true')
+    expect(getByText('A block template')).toBeInTheDocument()
+    expect(getByText('block template 2')).toBeInTheDocument()
   })
 
   it('calls onClose when close button is clicked', async () => {
@@ -100,83 +97,26 @@ describe('Toolbox', () => {
     expect(onClose).toHaveBeenCalled()
   })
 
-  describe('with templates', () => {
-    it('renders template boxes', () => {
-      const templates = [
-        {
-          id: '1',
-          context_type: 'Course',
-          context_id: '1',
-          name: 'Template 1',
-          editor_version: '0.2',
-          template_type: 'block' as const,
-          workflow_state: 'active' as const,
-          node_tree: {rootNodeId: '0', nodes: {}},
-        },
-        {
-          id: '2',
-          context_type: 'Course',
-          context_id: '1',
-          name: 'Template 2',
-          editor_version: '0.2',
-          template_type: 'block' as const,
-          workflow_state: 'unpublished' as const,
-          node_tree: {rootNodeId: '0', nodes: {}},
-        },
-      ]
-      const {getByText} = renderComponent({templates})
-
-      expect(getByText('Template 1')).toBeInTheDocument()
-      expect(getByText('Template 1').closest('.toolbox-item')).toHaveStyle(
-        'border-color: transparent'
-      )
-      expect(getByText('Template 2')).toBeInTheDocument()
-      expect(getByText('Template 2').closest('.toolbox-item')).toHaveStyle('border-color: #FC5E13') // rgb(252, 94, 19)
-    })
-
+  describe('when editing templates', () => {
     it('dispatches DeleteTemplateEvent when delete button is clicked', async () => {
       window.confirm = jest.fn(() => true)
       const blockeditoreditor = document.querySelector('.block-editor-editor') as HTMLElement
       const dispatchEvent = jest.spyOn(blockeditoreditor, 'dispatchEvent')
 
-      const templates = [
-        {
-          id: '1',
-          context_type: 'Course',
-          context_id: '1',
-          name: 'Template 1',
-          editor_version: '0.2',
-          template_type: 'block' as const,
-          workflow_state: 'active' as const,
-          node_tree: {rootNodeId: '0', nodes: {}},
-        },
-      ]
-      const {getByText} = renderComponent({templates, templateEditor: TemplateEditor.LOCAL})
+      const {getByText} = renderComponent({templateEditor: TemplateEditor.LOCAL})
 
       await user.click(getByText('Delete Template').closest('button') as HTMLButtonElement)
 
       expect(dispatchEvent).toHaveBeenCalledWith(
         expect.objectContaining({
-          detail: '1',
+          detail: '2',
         })
       )
     })
 
     it('shows EditTemplateModal when edit template button is clicked', async () => {
-      const templates = [
-        {
-          id: '1',
-          context_type: 'Course',
-          context_id: '1',
-          name: 'Template 1',
-          editor_version: '0.2',
-          template_type: 'block' as const,
-          workflow_state: 'active' as const,
-          node_tree: {rootNodeId: '0', nodes: {}},
-        },
-      ]
       const {getByLabelText, getByDisplayValue, getByText} = renderComponent({
-        templates,
+        templates: testTemplates,
         templateEditor: TemplateEditor.LOCAL,
       })
 
@@ -185,7 +125,7 @@ describe('Toolbox', () => {
       const dialog = getByLabelText('Edit Template')
       expect(dialog).toBeInTheDocument()
       expect(dialog).toHaveAttribute('role', 'dialog')
-      expect(getByDisplayValue('Template 1')).toBeInTheDocument()
+      expect(getByDisplayValue('Another Section')).toBeInTheDocument()
     })
   })
 

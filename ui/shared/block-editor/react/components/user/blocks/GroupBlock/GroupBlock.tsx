@@ -21,7 +21,7 @@ import {Element, useEditor, useNode, type Node} from '@craftjs/core'
 
 import {NoSections} from '../../common'
 import {Container} from '../Container/Container'
-import {useClassNames, notDeletableIfLastChild} from '../../../../utils'
+import {useClassNames, isNthChild} from '../../../../utils'
 import {type GroupBlockProps} from './types'
 import {GroupBlockToolbar} from './GroupBlockToolbar'
 import {BlockResizer} from '../../../editor/BlockResizer'
@@ -80,12 +80,7 @@ export const GroupBlock = (props: GroupBlockProps) => {
 
   return (
     <Container className={clazz} id={`group-${node.id}`} style={styl}>
-      <Element
-        id="group-block__inner"
-        is={NoSections}
-        canvas={true}
-        className="group-block__inner"
-      />
+      <Element id="group__inner" is={NoSections} canvas={true} className="group-block__inner" />
     </Container>
   )
 }
@@ -114,7 +109,19 @@ GroupBlock.craft = {
     isDeletable: (nodeId: string, query: any) => {
       const parentId = query.node(nodeId).get().data.parent
       const parent = query.node(parentId).get()
-      return parent?.data.name !== 'ColumnsSectionInner' || notDeletableIfLastChild(nodeId, query)
+      let columnCount = 0
+      if (parent) {
+        if (parent.data.name === 'ColumnsSectionInner') {
+          const colSect = query.node(parent.data.parent).get()
+          columnCount = colSect.data.props.columns
+          return (
+            parent?.data.name !== 'ColumnsSectionInner' || !isNthChild(nodeId, query, columnCount)
+          )
+        } else {
+          return !isNthChild(nodeId, query, 1)
+        }
+      }
+      return false
     },
     isResizable: true,
     isBlock: true,

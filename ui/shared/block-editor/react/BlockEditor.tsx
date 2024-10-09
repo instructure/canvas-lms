@@ -24,7 +24,7 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {Toolbox} from './components/editor/Toolbox'
+import {Toolbox} from './components/editor/Toolbox/Toolbox'
 import {Topbar} from './components/editor/Topbar'
 import {blocks} from './components/blocks'
 import {NewPageStepper} from './components/editor/NewPageStepper'
@@ -129,9 +129,9 @@ export default function BlockEditor({
   // There are 2 sources of block templates, the database and global templates
   // currently imported from the assets folder (though this will eventually be replaced with an API call)
   const getBlockTemplates = useCallback(
-    editor => {
+    (editor: TemplateEditor) => {
       const promiseApi = doFetchApi<BlockTemplate[]>({
-        path: `/api/v1/courses/${course_id}/block_editor_templates?include[]=node_tree&drafts=${
+        path: `/api/v1/courses/${course_id}/block_editor_templates?include[]=node_tree&include[]=thumbnail&sort=name&drafts=${
           editor > 0
         }`,
         method: 'GET',
@@ -150,8 +150,12 @@ export default function BlockEditor({
         ([apiTemplatesResult, globalTemplatesResult]) => {
           const apiTemplates =
             apiTemplatesResult.status === 'fulfilled' ? apiTemplatesResult.value : []
-          const globalTemplates =
+          const globalTemplates = (
             globalTemplatesResult.status === 'fulfilled' ? globalTemplatesResult.value : []
+          ).map(t => {
+            t.template_category = 'global'
+            return t
+          })
 
           const templates = mergeTemplates(apiTemplates || [], globalTemplates || [])
           setBlockTemplates(templates)

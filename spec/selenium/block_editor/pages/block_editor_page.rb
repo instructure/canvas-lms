@@ -107,7 +107,20 @@ module BlockEditorPage
   end
 
   def block_toolbox
-    f('[role="dialog"][aria-label="Toolbox"]')
+    f('[role="dialog"][aria-label="Add content tray"]')
+  end
+
+  def block_toolbox_sections_tab
+    f("#tab-sections")
+  end
+
+  def block_toolbox_blocks_tab
+    f("#tab-blocks")
+  end
+
+  def open_block_toolbox_to_tab(tab_name)
+    block_toolbox_toggle.click
+    f("#tab-#{tab_name}").click
   end
 
   def block_toolbox_box_by_block_name(block_name)
@@ -202,8 +215,12 @@ module BlockEditorPage
   end
 
   # Add Image Modal
+  def image_modal
+    f('[role="dialog"][aria-label="Upload Image"]')
+  end
+
   def image_modal_tabs
-    ff('[role="tab"]')
+    ff('[role="tab"]', image_modal)
   end
 
   def course_images_tab
@@ -215,7 +232,7 @@ module BlockEditorPage
   end
 
   def image_thumbnails
-    ff('[class*="view--block-img"]')
+    ff('[class*="view--block-link"]')
   end
 
   def submit_button

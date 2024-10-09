@@ -614,6 +614,12 @@
   }
 }
 
+.preview-section {
+  .section-thumbnail {
+    width: 100%
+  }
+}
+
 @container block-editor-view (width <= 320px) {
   .page-block {
     padding: 0;

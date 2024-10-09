@@ -23,5 +23,11 @@ export type PageStandardSection =
   | 'resources'
   | 'footer'
   | 'tabs'
-export type PageCanvasSection = 'question' | 'announcement' | 'discussion' | 'assignment' | 'module'
+export type PageCanvasSection =
+  | 'question'
+  | 'announcement'
+  | 'discussion'
+  | 'assignment'
+  | 'module'
+  | 'blank'
 export type PageSection = PageStandardSection | PageCanvasSection

@@ -31,5 +31,12 @@ export const mergeTemplates = (
       templates.push(gt)
     }
   })
-  return templates
+  return templates.sort((a, b) => {
+    if (a.name === 'Blank') {
+      return b.name === 'Blank' ? 0 : -1
+    } else if (b.name === 'Blank') {
+      return a.name === 'Blank' ? 0 : 1
+    }
+    return a.name.localeCompare(b.name)
+  })
 }

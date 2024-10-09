@@ -19,9 +19,9 @@
 import uuid from 'uuid'
 import {type BlockTemplate} from '../types'
 
-type Template = Partial<BlockTemplate>
+type GlobalTemplate = Partial<BlockTemplate>
 
-const saveGlobalTemplateToFile = (template: Template) => {
+const saveGlobalTemplateToFile = (template: GlobalTemplate) => {
   const blob = new Blob([JSON.stringify(template, null, 2)], {type: 'application/json'})
 
   const link = document.createElement('a')

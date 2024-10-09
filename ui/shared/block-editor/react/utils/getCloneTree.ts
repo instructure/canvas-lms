@@ -15,11 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {type NodeTree, type Node, type SerializedNode, type FreshNode} from '@craftjs/core'
+import {type NodeTree, type Node, type SerializedNode} from '@craftjs/core'
 import {getRandomId} from '@craftjs/utils'
+import {type TemplateNodeTree} from '../types'
+
+export type NodePair = [string, Node]
+export type SerializedNodePair = [string, SerializedNode]
 
 export const getCloneTree = (tree: NodeTree, query: any): NodeTree => {
-  const newNodes: Record<string, FreshNode> = {}
+  const newNodes: Record<string, Node> = {}
   const changeNodeId = (node: Node, newParentId?: string) => {
     const newNodeId = getRandomId()
     const childNodes = node.data.nodes.map(childId => changeNodeId(tree.nodes[childId], newNodeId))
@@ -44,34 +48,23 @@ export const getCloneTree = (tree: NodeTree, query: any): NodeTree => {
     newNodes[newNodeId] = freshNode
     return newNodeId
   }
+
   const rootNodeId = changeNodeId(tree.nodes[tree.rootNodeId])
   return {
     rootNodeId,
     nodes: newNodes,
-  } as NodeTree
-}
-export type NodePair = [string, SerializedNode]
-const fromEntries = (pairs: NodePair[]) => {
-  if (Object.fromEntries) {
-    return Object.fromEntries(pairs)
   }
-  return pairs.reduce(
-    (accum, [id, value]) => ({
-      ...accum,
-      [id]: value,
-    }),
-    {}
-  )
 }
-export const getNodeTemplate = (id: string, name: string, query: any) => {
+
+export const getNodeTemplate = (id: string, name: string, query: any): TemplateNodeTree => {
   const tree = query.node(id).toNodeTree()
-  const nodePairs: NodePair[] = Object.keys(tree.nodes).map(id => [
-    id,
-    query.node(id).toSerializedNode(),
+  const nodePairs: SerializedNodePair[] = Object.keys(tree.nodes).map(nid => [
+    nid,
+    query.node(nid).toSerializedNode(),
   ])
-  const saveData = {
+  const saveData: TemplateNodeTree = {
     rootNodeId: tree.rootNodeId,
-    nodes: fromEntries(nodePairs),
+    nodes: Object.fromEntries(nodePairs),
   }
   const rootNode = saveData.nodes[saveData.rootNodeId]
   if (rootNode.custom) {
@@ -86,7 +79,8 @@ export const getNodeTemplate = (id: string, name: string, query: any) => {
 
   return saveData
 }
-export const createFromTemplate = (template: any, query: any): NodeTree => {
+
+export const createFromTemplate = (template: TemplateNodeTree, query: any): NodeTree => {
   const newNodes = template.nodes
   const nodePairs: NodePair[] = Object.keys(newNodes).map(id => {
     const nodeId = id
@@ -95,9 +89,9 @@ export const createFromTemplate = (template: any, query: any): NodeTree => {
       query.parseSerializedNode(newNodes[id]).toNode((node: Node) => (node.id = nodeId)),
     ]
   })
-  const tree = {
+  const tree: NodeTree = {
     rootNodeId: template.rootNodeId,
-    nodes: fromEntries(nodePairs),
+    nodes: Object.fromEntries(nodePairs),
   }
   const newTree = getCloneTree(tree, query)
   return newTree

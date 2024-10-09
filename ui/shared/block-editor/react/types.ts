@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {type NodeTree} from '@craftjs/core'
+import {type SerializedNode} from '@craftjs/core'
 
 export type CanEditTemplates = {
   can_edit: boolean
@@ -33,6 +33,13 @@ export enum TemplateEditor {
   GLOBAL = 2,
 }
 
+export type TemplateNodeTree = {
+  rootNodeId: string
+  nodes: Record<string, SerializedNode>
+}
+
+export type TemplateCategory = 'global' | 'local'
+
 export type BlockTemplate = {
   id: string
   global_id?: string
@@ -41,9 +48,10 @@ export type BlockTemplate = {
   name: string
   description?: string | null
   tags?: string[]
-  node_tree?: NodeTree
+  node_tree?: TemplateNodeTree
   editor_version: string
   template_type: TemplateType
+  template_category?: TemplateCategory
   thumbnail?: string
   workflow_state: WorkflowState
 }
