@@ -25,6 +25,7 @@ import Confetti from '@canvas/confetti/react/Confetti'
 import React, {useState} from 'react'
 import StickerModal from './StickerModal'
 import type {StickerProps} from '../types/stickers.d'
+import Sparkles from '@canvas/sparkles/react/components/Sparkles'
 
 export default function Sticker({
   confetti,
@@ -36,6 +37,7 @@ export default function Sticker({
 }: StickerProps) {
   const [confettiShowing, setConfettiShowing] = useState(false)
   const [modalShowing, setModalShowing] = useState(false)
+  const [hovering, setHovering] = useState(false)
 
   const triggerConfetti = () => {
     if (!confettiShowing) {
@@ -102,12 +104,18 @@ export default function Sticker({
   }
 
   return (
-    <div className={stickerContainerClass(size)}>
-      <Img
-        data-testid="sticker-image"
-        src={assetFactory(submission.sticker)}
-        alt={stickerDescription(submission.sticker)}
-      />
-    </div>
+    <Sparkles key={submission.sticker} enabled={typeof submission.sticker === 'string' && hovering}>
+      <div
+        className={stickerContainerClass(size)}
+        onMouseEnter={() => setHovering(true)}
+        onMouseLeave={() => setHovering(false)}
+      >
+        <Img
+          data-testid="sticker-image"
+          src={assetFactory(submission.sticker)}
+          alt={stickerDescription(submission.sticker)}
+        />
+      </div>
+    </Sparkles>
   )
 }
