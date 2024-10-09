@@ -31,7 +31,7 @@ import {Text} from '@instructure/ui-text'
 import {type ViewProps} from '@instructure/ui-view'
 import {findFocusable} from '@instructure/ui-dom-utils'
 import {
-  captureElement,
+  captureElementThumbnail,
   notDeletableIfLastChild,
   mountNode,
   findUpNode,
@@ -40,6 +40,8 @@ import {
   getArrowNext,
   getArrowPrev,
   getNodeTemplate,
+  saveTemplateImages,
+  type ImagesMapping,
 } from '../../utils'
 import {EditTemplateModal} from './EditTemplateModal'
 import {
@@ -75,6 +77,8 @@ function isBlockSaveable(templateEditor: TemplateEditor, node: Node) {
   }
   return false
 }
+
+type ActualNodeTreeNode = Node & {props: any; type: {resolvedName: string}}
 
 type BlockToolbarProps = {
   templateEditor: TemplateEditor
@@ -214,14 +218,33 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
   const handleSaveTemplate = useCallback(
     async (template: Partial<BlockTemplate>, globalTemplate: boolean) => {
       setShowEditTemplateModal(false)
+
       template.node_tree = getNodeTemplate(node.id, template.name as string, query)
       template.template_type = templateType
 
       let thumbnail: string | undefined
       if (['page', 'section'].includes(templateType) && node.dom) {
-        thumbnail = await captureElement(node.dom)
+        thumbnail = await captureElementThumbnail(node.dom)
       }
       template.thumbnail = thumbnail
+
+      if (globalTemplate) {
+        // for now, we have to extract images from the template and save as files
+        const imgmap: ImagesMapping = await saveTemplateImages(
+          query.node(node.id)?.get().dom as HTMLElement
+        )
+
+        // update ImageBlocks to point to the saved images
+        Object.values(template.node_tree.nodes).forEach(n => {
+          const n2 = n as ActualNodeTreeNode
+          if (n2.type.resolvedName === 'ImageBlock') {
+            const src: string = n2.props.src
+            if (src && imgmap[src]) {
+              n2.props.src = imgmap[src]
+            }
+          }
+        })
+      }
 
       const saveTemplateEvent = new CustomEvent(SaveTemplateEvent, {
         detail: {

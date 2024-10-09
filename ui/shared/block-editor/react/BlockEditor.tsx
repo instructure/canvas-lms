@@ -18,6 +18,7 @@
 
 import React, {useCallback, useEffect, useState} from 'react'
 import {type NodeId, DefaultEventHandlers, Editor, Frame} from '@craftjs/core'
+import uuid from 'uuid'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
@@ -188,7 +189,7 @@ export default function BlockEditor({
   }
 
   const saveBlockTempate = useCallback(
-    (template: Partial<BlockTemplate>, globalTemplate: boolean) => {
+    (template: Partial<BlockTemplate>) => {
       const path = template.id
         ? `/api/v1/courses/${course_id}/block_editor_templates/${template.id}`
         : `/api/v1/courses/${course_id}/block_editor_templates`
@@ -211,9 +212,6 @@ export default function BlockEditor({
             } else {
               setBlockTemplates([...blockTemplates, newTemplate])
             }
-            if (globalTemplate) {
-              saveGlobalTemplate(newTemplate)
-            }
           }
         })
         .catch((err: Error) => {
@@ -224,7 +222,7 @@ export default function BlockEditor({
   )
 
   const deleteBlockTemplate = useCallback(
-    (templateId: number) => {
+    (templateId: string) => {
       doFetchApi({
         path: `/api/v1/courses/${course_id}/block_editor_templates/${templateId}`,
         method: 'DELETE',
@@ -245,7 +243,13 @@ export default function BlockEditor({
       const template = saveTemplateEvent.detail.template
       const globalTemplate = saveTemplateEvent.detail.globalTemplate
       template.node_tree.nodes[template.node_tree.rootNodeId].custom.displayName = template.name
-      saveBlockTempate(template, globalTemplate)
+
+      if (globalTemplate) {
+        template.global_id = template.id = uuid.v4()
+        saveGlobalTemplate(template)
+      } else {
+        saveBlockTempate(template)
+      }
     },
     [saveBlockTempate]
   )

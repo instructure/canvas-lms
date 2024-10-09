@@ -99,7 +99,7 @@ export const Toolbox = ({open, container, templateEditor, templates, onClose}: T
     onClose()
   }, [onClose])
 
-  const handleDeleteTemplate = useCallback((templateId: number) => {
+  const handleDeleteTemplate = useCallback((templateId: string) => {
     // eslint-disable-next-line no-alert
     if (window.confirm(I18n.t('Are you sure you want to delete this template?'))) {
       const event = new CustomEvent(DeleteTemplateEvent, {

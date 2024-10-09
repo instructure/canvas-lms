@@ -25,9 +25,10 @@ import {type BlockTemplate} from '../../types'
 import template41 from './template-10000000000041.json'
 import template42 from './template-10000000000042.json'
 import template44 from './template-10000000000044.json'
+import template80 from './template-10000000000080.json'
 
 // returning a promise will make this easier to replace with a real API call
 export const getGlobalTemplates = (): Promise<BlockTemplate[]> => {
   // @ts-expect-error
-  return Promise.resolve([template41, template42, template44])
+  return Promise.resolve([template41, template42, template44, template80])
 }
