@@ -2411,6 +2411,24 @@ describe "discussions" do
             expect(inherited_from.last.text).to eq("Inherited from #{module1.name}")
           end
 
+          it "saves group overrides correctly" do
+            graded_discussion = create_graded_discussion(course)
+            group_category.create_groups(1)
+            get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+
+            # select group category
+            force_click_native("input[data-testid='group-discussion-checkbox']")
+            force_click_native("input[placeholder='Select a group category']")
+            fj("li:contains('#{group_category.name}')").click
+
+            # set group category override
+            force_click_native('input[data-testid="assignee_selector"]')
+            fj("li:contains('#{group_category.groups.first.name}')").click
+            Discussion.save_button.click
+            wait_for_ajaximations
+            expect(driver.current_url).not_to include("edit")
+          end
+
           it "creates a course override if everyone is added with a module override" do
             graded_discussion = create_graded_discussion(course)
             module1 = course.context_modules.create!(name: "Module 1")

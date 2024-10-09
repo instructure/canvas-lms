@@ -92,6 +92,10 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
       return validation_error(err_message) unless err_message.nil?
     end
 
+    # Save the discussion topic before updating the assignment if the group category is being updated,
+    # because creating group assignment overrides are dependent on the group category being set
+    discussion_topic.save! if input.key?(:group_category_id)
+
     # Take care of Assignment update information
     if input[:assignment]
       assignment_id = discussion_topic&.assignment&.id || discussion_topic.old_assignment_id
@@ -129,7 +133,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
 
         # Instantiate and execute CreateAssignment mutation
         assignment_create_mutation = Mutations::CreateAssignment.new(object:, context:, field: nil)
-        assignment_create_result = assignment_create_mutation.resolve(input: assignment_input)
+        assignment_create_result = assignment_create_mutation.resolve(input: assignment_input, submittable: discussion_topic)
 
         if assignment_create_result[:errors]
           return { errors: assignment_create_result[:errors] }
