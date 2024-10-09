@@ -8,11 +8,6 @@ outcome_alignment_non_scoring_content:
   environments:
     production:
       state: disabled
-selectable_outcomes_in_course_copy:
-  state: hidden
-  applies_to: RootAccount
-  display_name: "Selectable outcomes during course content migration"
-  description: "Allows learning outcomes to be selectable when migrating course content"
 limit_section_visibility_in_lmgb:
   state: hidden
   applies_to: RootAccount

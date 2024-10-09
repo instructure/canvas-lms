@@ -145,23 +145,17 @@ describe "content migrations", :non_parallel do
       @filename = "cc_outcomes.imscc"
     end
 
-    context "with selectable_outcomes_in_course_copy enabled" do
-      before do
-        @course.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
-      end
+    it "selectively copies outcomes" do
+      visit_page
 
-      it "selectively copies outcomes" do
-        visit_page
+      fill_migration_form
+      wait_for_ajaximations
 
-        fill_migration_form
-        wait_for_ajaximations
+      ContentMigrationPage.selective_imports(1).click
+      submit
+      run_migration
 
-        ContentMigrationPage.selective_imports(1).click
-        submit
-        run_migration
-
-        test_selective_outcome
-      end
+      test_selective_outcome
     end
   end
 
@@ -475,7 +469,6 @@ describe "content migrations", :non_parallel do
 
     context "with selectable_outcomes_in_course_copy enabled" do
       before do
-        @course.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
         root = @copy_from.root_outcome_group(true)
         outcome_model(context: @copy_from, title: "root1")
 
@@ -485,10 +478,6 @@ describe "content migrations", :non_parallel do
         subgroup = group.child_outcome_groups.create!(context: @copy_from, title: "subgroup1")
         outcome_model(context: @copy_from, outcome_group: subgroup, title: "non-root2")
         outcome_model(context: @copy_from, outcome_group: subgroup, title: "non-root3")
-      end
-
-      after do
-        @course.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
       end
 
       it "selectively copies outcomes" do

@@ -97,36 +97,16 @@ describe Canvas::Migration::MigratorHelper do
       end
       let(:content_migration) { ContentMigration.create!(context: course_model) }
 
-      context "selectable_outcomes_in_course_copy disabled" do
-        before do
-          content_migration.context.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
-        end
-
-        it "does not generate learning_outcome_groups overview section" do
-          helper = subject.new
-          helper.course = course
-          helper.settings = { content_migration: }
-          overview = helper.overview
-          expect(overview).not_to have_key(:learning_outcome_groups)
-        end
-      end
-
-      context "selectable_outcomes_in_course_copy enabled" do
-        before do
-          content_migration.context.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
-        end
-
-        it "generates learning_outcome_groups overview section" do
-          helper = subject.new
-          helper.course = course
-          helper.settings = { content_migration: }
-          overview = helper.overview
-          groups = overview[:learning_outcome_groups]
-          outcomes = overview[:learning_outcomes]
-          expect(groups.length).to eq 1
-          expect(outcomes.length).to eq 1
-          expect(groups.first[:migration_id]).to eq outcomes.first[:parent_migration_id]
-        end
+      it "generates learning_outcome_groups overview section" do
+        helper = subject.new
+        helper.course = course
+        helper.settings = { content_migration: }
+        overview = helper.overview
+        groups = overview[:learning_outcome_groups]
+        outcomes = overview[:learning_outcomes]
+        expect(groups.length).to eq 1
+        expect(outcomes.length).to eq 1
+        expect(groups.first[:migration_id]).to eq outcomes.first[:parent_migration_id]
       end
     end
   end
