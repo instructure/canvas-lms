@@ -886,7 +886,12 @@ class Attachment < ActiveRecord::Base
             ContextModule.where(id: ContentTag.where(content_id: id, content_type: "Attachment").select(:context_module_id)).touch_all
           end
           # update replacement pointers pointing at the overwritten file
-          context.attachments.where(replacement_attachment_id: a).in_batches(of: 10_000).update_all(replacement_attachment_id: id)
+          # (to a point. files that get overwritten thousands of times cause serious database pain,
+          # so don't update beyond the first 50 overwrites)
+          context.attachments.where(replacement_attachment_id: a)
+                 .order(:id)
+                 .limit(50)
+                 .update_all(replacement_attachment_id: id)
           # delete the overwritten file (unless the caller is queueing them up)
           a.destroy unless opts[:caller_will_destroy]
           deleted_attachments << a
