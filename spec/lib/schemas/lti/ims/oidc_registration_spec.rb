@@ -42,7 +42,7 @@ describe Schemas::Lti::IMS::OidcRegistration do
       # "tos_uri#ja" => "https://client.example.org/tos?lang=ja", # not supported
       "token_endpoint_auth_method" => "private_key_jwt",
       "contacts" => ["ve7jtb@example.org", "mary@example.org"],
-      "scope" => "https://purl.imsglobal.org/spec/lti-ags/scope/score",
+      "scope" => "https://purl.imsglobal.org/spec/lti-ags/scope/score openid https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
       "https://purl.imsglobal.org/spec/lti-tool-configuration" => {
         "domain" => "client.example.org",
         "deployment_id" => "foo",
@@ -107,6 +107,30 @@ describe Schemas::Lti::IMS::OidcRegistration do
       expect(reg).to be_persisted
       expect(reg.contacts).to eq(["ve7jtb@example.org", "mary@example.org"])
       expect(reg.lti_tool_configuration["messages"][0]["type"]).to eq("LtiDeepLinkingRequest")
+    end
+
+    it "returns attributes that can be used to construct a DeveloperKey" do
+      described_class.to_model_attrs(valid) => {errors:, registration_attrs:}
+      developer_key = DeveloperKey.create!(
+        current_user: user_model,
+        name: registration_attrs["client_name"],
+        account: nil,
+        redirect_uris: registration_attrs["redirect_uris"],
+        public_jwk_url: registration_attrs["jwks_uri"],
+        oidc_initiation_url: registration_attrs["initiate_login_uri"],
+        is_lti_key: true,
+        scopes: registration_attrs["scopes"],
+        icon_url: registration_attrs["logo_uri"]
+      )
+      expect(developer_key).to be_persisted
+    end
+
+    it "splits up scopes and removes the openid scope" do
+      described_class.to_model_attrs(valid) => {errors:, registration_attrs:}
+      expect(registration_attrs["scopes"]).to eq([
+                                                   "https://purl.imsglobal.org/spec/lti-ags/scope/score",
+                                                   "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"
+                                                 ])
     end
   end
 
