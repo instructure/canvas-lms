@@ -9,11 +9,11 @@
     "custom": {},
     "hidden": false,
     "nodes": [
-      "pEdeFvz6_0"
+      "erBCjb4f1F"
     ],
     "linkedNodes": {}
   },
-  "pEdeFvz6_0": {
+  "erBCjb4f1F": {
     "type": {
       "resolvedName": "ColumnsSection"
     },
@@ -21,7 +21,7 @@
     "props": {
       "columns": 1
     },
-    "displayName": "Blank Section",
+    "displayName": "Columns",
     "custom": {
       "isSection": true
     },
@@ -29,86 +29,52 @@
     "hidden": false,
     "nodes": [],
     "linkedNodes": {
-      "columns-pEdeFvz6_0__inner": "ax57suVCfC"
+      "columns__inner": "0PR_eDXcC5"
     }
   },
-  "ax57suVCfC": {
+  "0PR_eDXcC5": {
     "type": {
       "resolvedName": "ColumnsSectionInner"
     },
     "isCanvas": true,
     "props": {},
-    "displayName": "Columns",
+    "displayName": "Columns Inner",
     "custom": {
       "noToolbar": true
     },
-    "parent": "pEdeFvz6_0",
+    "parent": "erBCjb4f1F",
     "hidden": false,
     "nodes": [
-      "wasLLTTys-"
+      "q0-rtsEu6T"
     ],
     "linkedNodes": {}
   },
-  "wasLLTTys-": {
+  "q0-rtsEu6T": {
     "type": {
       "resolvedName": "GroupBlock"
     },
-    "isCanvas": true,
+    "isCanvas": false,
     "props": {
       "alignment": "start",
+      "verticalAlignment": "start",
       "layout": "column",
       "resizable": false,
-      "id": "columns-pEdeFvz6_0-1"
+      "isColumn": true
     },
     "displayName": "Group",
     "custom": {
-      "isResizable": false
+      "isResizable": false,
+      "isBlock": true,
+      "displayName": "Column"
     },
-    "parent": "ax57suVCfC",
+    "parent": "0PR_eDXcC5",
     "hidden": false,
     "nodes": [],
     "linkedNodes": {
-      "group-wasLLTTys-_inner": "le254LKmwg",
-      "group-block__inner": "WEpFwohMKm"
+      "group__inner": "Arka26rHUm"
     }
   },
-  "le254LKmwg": {
-    "type": {
-      "resolvedName": "NoSections"
-    },
-    "isCanvas": true,
-    "props": {
-      "className": "",
-      "placeholderText": "Drop a block to add it here"
-    },
-    "displayName": "NoSections",
-    "custom": {
-      "noToolbar": true
-    },
-    "parent": "wasLLTTys-",
-    "hidden": false,
-    "nodes": [
-      "-Nhp3GFEoz"
-    ],
-    "linkedNodes": {}
-  },
-  "-Nhp3GFEoz": {
-    "type": {
-      "resolvedName": "IconBlock"
-    },
-    "isCanvas": false,
-    "props": {
-      "iconName": "apple",
-      "size": "small"
-    },
-    "displayName": "Icon",
-    "custom": {},
-    "parent": "le254LKmwg",
-    "hidden": false,
-    "nodes": [],
-    "linkedNodes": {}
-  },
-  "WEpFwohMKm": {
+  "Arka26rHUm": {
     "type": {
       "resolvedName": "NoSections"
     },
@@ -121,14 +87,14 @@
     "custom": {
       "noToolbar": true
     },
-    "parent": "wasLLTTys-",
+    "parent": "q0-rtsEu6T",
     "hidden": false,
     "nodes": [
-      "xDIqC1zgLV"
+      "rLP27io1vi"
     ],
     "linkedNodes": {}
   },
-  "xDIqC1zgLV": {
+  "rLP27io1vi": {
     "type": {
       "resolvedName": "IconBlock"
     },
@@ -138,8 +104,10 @@
       "size": "small"
     },
     "displayName": "Icon",
-    "custom": {},
-    "parent": "WEpFwohMKm",
+    "custom": {
+      "isBlock": true
+    },
+    "parent": "Arka26rHUm",
     "hidden": false,
     "nodes": [],
     "linkedNodes": {}

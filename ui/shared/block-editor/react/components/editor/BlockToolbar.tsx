@@ -32,7 +32,7 @@ import {type ViewProps} from '@instructure/ui-view'
 import {findFocusable} from '@instructure/ui-dom-utils'
 import {
   captureElementThumbnail,
-  notDeletableIfLastChild,
+  isLastChild,
   mountNode,
   findUpNode,
   findDownNode,
@@ -100,7 +100,7 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
       name: n.data.custom.displayName || n.data.displayName,
       moveable: node_helpers.isDraggable(),
       deletable: n.data.custom?.isSection
-        ? notDeletableIfLastChild(n.id, query)
+        ? !isLastChild(n.id, query)
         : (typeof n.data.custom?.isDeletable === 'function'
             ? n.data.custom.isDeletable?.(n.id, query)
             : true) && node_helpers.isDeletable(),

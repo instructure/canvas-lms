@@ -36,8 +36,8 @@ const ColumnsSectionToolbar = () => {
   const {actions, query} = useEditor()
   const {
     actions: {setProp},
-    props,
     node,
+    props,
   } = useNode((n: Node) => ({
     props: n.data.props,
     node: n,

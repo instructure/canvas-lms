@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const THUMBNAIL_WIDTH = 300
+const THUMBNAIL_WIDTH = 272
 
 const captureElementThumbnail = async (element: HTMLElement) => {
   if (!element) return ''

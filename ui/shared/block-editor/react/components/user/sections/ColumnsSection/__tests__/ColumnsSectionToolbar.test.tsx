@@ -114,6 +114,7 @@ describe('ColumnsSectionToolbar', () => {
   })
 
   it('decrements the column count', async () => {
+    props.columns = 2
     const {container} = render(<ColumnsSectionToolbar />)
 
     const decBtn = container
@@ -122,6 +123,6 @@ describe('ColumnsSectionToolbar', () => {
     await user.click(decBtn)
 
     expect(mockSetProp).toHaveBeenCalled()
-    expect(props.columns).toBe(ColumnsSection.craft.defaultProps.columns - 1)
+    expect(props.columns).toBe(1)
   })
 })

@@ -111,7 +111,7 @@ describe "Block Editor", :ignore_js_errors do
     it "can drag and drop blocks from the toolbox" do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
-      block_toolbox_toggle.click
+      open_block_toolbox_to_tab("blocks")
       expect(block_toolbox).to be_displayed
       drop_new_block("button", group_block_dropzone)
       expect(fj("#{group_block_inner_selector} a:contains('Click me')")).to be_displayed
@@ -120,7 +120,7 @@ describe "Block Editor", :ignore_js_errors do
     it "cannot resize an image with no src" do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
-      block_toolbox_toggle.click
+      open_block_toolbox_to_tab("blocks")
       drop_new_block("image", group_block_dropzone)
       image_block.click  # select the section
       image_block.click  # select the block
@@ -131,7 +131,7 @@ describe "Block Editor", :ignore_js_errors do
     it "can resize blocks with the mouse" do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
-      block_toolbox_toggle.click
+      open_block_toolbox_to_tab("blocks")
       drop_new_block("text", group_block_dropzone)
       expect(block_toolbar).to be_displayed
 
@@ -148,7 +148,7 @@ describe "Block Editor", :ignore_js_errors do
     it "can resize blocks with the keyboard" do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
-      block_toolbox_toggle.click
+      open_block_toolbox_to_tab("blocks")
       drop_new_block("text", group_block_dropzone)
       expect(block_toolbar).to be_displayed
 
@@ -195,7 +195,7 @@ describe "Block Editor", :ignore_js_errors do
 
         get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
         wait_for_block_editor
-        block_toolbox_toggle.click
+        open_block_toolbox_to_tab("blocks")
 
         drop_new_block("image", group_block_dropzone)
         image_block_upload_button.click
@@ -215,7 +215,7 @@ describe "Block Editor", :ignore_js_errors do
 
         get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
         wait_for_block_editor
-        block_toolbox_toggle.click
+        open_block_toolbox_to_tab("blocks")
 
         drop_new_block("image", group_block_dropzone)
         image_block_upload_button.click
