@@ -31,6 +31,7 @@ class Group < ActiveRecord::Base
   validates :sis_source_id, uniqueness: { scope: :root_account }, allow_nil: true
 
   attr_readonly :non_collaborative
+  validate :validate_non_collaborative_constraints
 
   # use to skip queries in can_participate?, called by policy block
   attr_accessor :can_participate
@@ -917,6 +918,20 @@ class Group < ActiveRecord::Base
       context.grading_standard_or_default
     else
       GradingStandard.default_instance
+    end
+  end
+
+  private
+
+  def validate_non_collaborative_constraints
+    if non_collaborative?
+      errors.add(:base, "Non-collaborative groups must belong to a course") unless context_type == "Course"
+      errors.add(:base, "Non-collaborative groups cannot have a leader") if leader_id.present?
+      errors.add(:base, "Non-collaborative groups must be private") if is_public
+    end
+
+    if group_category && non_collaborative != group_category.non_collaborative
+      errors.add(:base, "Group non_collaborative status must match its category")
     end
   end
 end
