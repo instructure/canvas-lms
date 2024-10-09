@@ -585,7 +585,7 @@ class CalendarEventsApiController < ApplicationController
         rr = validate_and_parse_rrule(
           rrule,
           dtstart: start_at,
-          tzid: @current_user.time_zone&.tzinfo&.name || "UTC"
+          tzid: params_for_create[:time_zone_edited] || @current_user.time_zone&.tzinfo&.name || "UTC"
         )
         return false if rr.nil?
 
