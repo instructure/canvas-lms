@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Rubric, type RubricCriterion} from '@canvas/rubrics/react/types/rubric'
-import {RubricQueryResponse} from '../queries/RubricFormQueries'
-import {RubricFormProps} from '../types/RubricForm'
+import type {Rubric, RubricAssociation, RubricCriterion} from '@canvas/rubrics/react/types/rubric'
+import type {RubricQueryResponse} from '../queries/RubricFormQueries'
+import type {RubricFormProps} from '../types/RubricForm'
 
 export const translateRubricQueryResponse = (fields: RubricQueryResponse): RubricFormProps => {
   return {
     id: fields.id,
     title: fields.title ?? '',
     hasRubricAssociations: fields.hasRubricAssociations ?? false,
-    hidePoints: fields.hidePoints ?? false,
+    hidePoints: fields.rubricAssociationForContext?.hidePoints ?? false,
     criteria: fields.criteria ?? [],
     pointsPossible: fields.pointsPossible ?? 0,
     buttonDisplay: fields.buttonDisplay ?? 'numeric',
@@ -33,15 +33,21 @@ export const translateRubricQueryResponse = (fields: RubricQueryResponse): Rubri
     unassessed: fields.unassessed ?? true,
     workflowState: fields.workflowState ?? 'active',
     freeFormCriterionComments: fields.freeFormCriterionComments ?? false,
+    hideOutcomeResults: fields.rubricAssociationForContext?.hideOutcomeResults ?? false,
+    hideScoreTotal: fields.rubricAssociationForContext?.hideScoreTotal ?? false,
+    useForGrading: fields.rubricAssociationForContext?.useForGrading ?? false,
   }
 }
 
-export const translateRubricData = (rubric: Rubric): RubricFormProps => {
+export const translateRubricData = (
+  rubric: Rubric,
+  rubricAssociation: RubricAssociation
+): RubricFormProps => {
   return {
     id: rubric.id,
     title: rubric.title ?? '',
     hasRubricAssociations: rubric.hasRubricAssociations ?? false,
-    hidePoints: rubric.hidePoints ?? false,
+    hidePoints: rubricAssociation.hidePoints ?? false,
     criteria: rubric.criteria ?? [],
     pointsPossible: rubric.pointsPossible ?? 0,
     buttonDisplay: rubric.buttonDisplay ?? 'numeric',
@@ -49,6 +55,10 @@ export const translateRubricData = (rubric: Rubric): RubricFormProps => {
     unassessed: rubric.unassessed ?? true,
     workflowState: rubric.workflowState ?? 'active',
     freeFormCriterionComments: rubric.freeFormCriterionComments ?? false,
+    hideOutcomeResults: rubricAssociation.hideOutcomeResults ?? false,
+    hideScoreTotal: rubricAssociation.hideScoreTotal ?? false,
+    useForGrading: rubricAssociation.useForGrading ?? false,
+    rubricAssociationId: rubricAssociation.id,
   }
 }
 
