@@ -67,7 +67,7 @@ const ICONS: {[key: string]: any} = {
   calendar_events: IconCalendarDaysLine,
   rubrics: IconRubricLine,
   groups: IconGroupLine,
-  learning_outcomes: ENV.SHOW_SELECTABLE_OUTCOMES_IN_IMPORT ? IconOutcomesLine : IconStandardsLine,
+  learning_outcomes: IconOutcomesLine,
   learning_outcome_groups: IconFolderLine,
   attachments: IconDocumentLine,
   assignment_groups: IconFolderLine,

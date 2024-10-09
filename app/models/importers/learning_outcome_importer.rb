@@ -26,8 +26,7 @@ module Importers
     self.item_class = LearningOutcome
 
     def self.process_migration(data, migration)
-      selectable_outcomes = migration.context.respond_to?(:root_account) &&
-                            migration.context.root_account.feature_enabled?(:selectable_outcomes_in_course_copy)
+      selectable_outcomes = migration.context.respond_to?(:root_account)
       outcomes = data["learning_outcomes"] || []
       migration.outcome_to_id_map = {}
       migration.copied_external_outcome_map = {}

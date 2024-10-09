@@ -113,7 +113,7 @@ ContentCheckboxView.prototype.iconClasses = {
   calendar_events: 'icon-calendar-days',
   rubrics: 'icon-rubric',
   groups: 'icon-group',
-  learning_outcomes: ENV.SHOW_SELECTABLE_OUTCOMES_IN_IMPORT ? 'icon-outcomes' : 'icon-standards',
+  learning_outcomes: 'icon-outcomes',
   learning_outcome_groups: 'icon-folder',
   attachments: 'icon-document',
   assignment_groups: 'icon-folder',
