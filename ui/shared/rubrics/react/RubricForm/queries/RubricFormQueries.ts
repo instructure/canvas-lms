@@ -21,16 +21,25 @@ import qs from 'qs'
 import {executeQuery} from '@canvas/query/graphql'
 import type {RubricFormProps} from '../types/RubricForm'
 import type {Rubric, RubricAssociation} from '@canvas/rubrics/react/types/rubric'
-import {mapRubricUnderscoredKeysToCamelCase} from '@canvas/rubrics/react/utils'
+import {
+  mapRubricAssociationUnderscoredKeysToCamelCase,
+  mapRubricUnderscoredKeysToCamelCase,
+} from '@canvas/rubrics/react/utils'
 import getCookie from '@instructure/get-cookie'
 
 const RUBRIC_QUERY = gql`
-  query RubricQuery($id: ID!) {
-    rubric(id: $id) {
+  query RubricQuery($rubricId: ID!) {
+    rubric(id: $rubricId) {
       id: _id
       title
       hasRubricAssociations
-      hidePoints
+      rubricAssociationForContext {
+        hidePoints
+        hideScoreTotal
+        hideOutcomeResults
+        id: _id
+        useForGrading
+      }
       buttonDisplay
       ratingOrder
       freeFormCriterionComments
@@ -61,6 +70,13 @@ const RUBRIC_QUERY = gql`
   }
 `
 
+export type RubricAssociationQueryResponse = {
+  hidePoints: boolean
+  hideScoreTotal: boolean
+  hideOutcomeResults: boolean
+  id: string
+  useForGrading: boolean
+}
 export type RubricQueryResponse = Pick<
   Rubric,
   | 'id'
@@ -75,18 +91,25 @@ export type RubricQueryResponse = Pick<
 > & {
   unassessed: boolean
   hasRubricAssociations: boolean
+  rubricAssociationForContext?: RubricAssociationQueryResponse
 }
 
 type FetchRubricResponse = {
   rubric: RubricQueryResponse
 }
-
-export const fetchRubric = async (id?: string): Promise<RubricQueryResponse | null> => {
-  if (!id) return null
+type FetchRubricParams = {
+  queryKey: string[]
+}
+export const fetchRubric = async ({
+  queryKey,
+}: FetchRubricParams): Promise<RubricQueryResponse | null> => {
+  const [_, rubricId] = queryKey
+  if (!rubricId) return null
 
   const {rubric} = await executeQuery<FetchRubricResponse>(RUBRIC_QUERY, {
-    id,
+    rubricId,
   })
+
   return rubric
 }
 
@@ -108,9 +131,20 @@ export const saveRubric = async (
     ratingOrder,
     buttonDisplay,
     workflowState,
+    hideOutcomeResults,
+    hideScoreTotal,
+    useForGrading,
+    rubricAssociationId,
   } = rubric
+
+  const associationType = assignmentId ? 'Assignment' : accountId ? 'Account' : 'Course'
+
   const urlPrefix = accountId ? `/accounts/${accountId}` : `/courses/${courseId}`
-  const url = `${urlPrefix}/rubrics/${id ?? ''}`
+  let url = `${urlPrefix}/rubrics/${id ?? ''}`
+
+  if (associationType === 'Assignment') {
+    url = `${url}?rubric_association_id=${rubricAssociationId}`
+  }
   const method = id ? 'PATCH' : 'POST'
 
   const criteria = rubric.criteria.map(criterion => {
@@ -146,16 +180,22 @@ export const saveRubric = async (
       rubric: {
         title,
         hide_points: hidePoints,
-        free_form_comments: freeFormCriterionComments,
+        free_form_criterion_comments: freeFormCriterionComments ? 1 : 0,
         criteria,
         button_display: buttonDisplay,
         rating_order: ratingOrder,
         workflow_state: workflowState,
       },
+      rubric_association_id: rubricAssociationId,
       rubric_association: {
+        id: rubricAssociationId,
         association_id: assignmentId ?? accountId ?? courseId,
-        association_type: assignmentId ? 'Assignment' : accountId ? 'Account' : 'Course',
+        association_type: associationType,
         purpose: assignmentId ? 'grading' : undefined,
+        hide_points: hidePoints ? 1 : 0,
+        hide_outcome_results: hideOutcomeResults ? 1 : 0,
+        hide_score_total: hideScoreTotal ? 1 : 0,
+        use_for_grading: useForGrading ? 1 : 0,
       },
     }),
   })
@@ -172,6 +212,6 @@ export const saveRubric = async (
 
   return {
     rubric: mapRubricUnderscoredKeysToCamelCase(savedRubric),
-    rubricAssociation: rubric_association,
+    rubricAssociation: mapRubricAssociationUnderscoredKeysToCamelCase(rubric_association),
   }
 }

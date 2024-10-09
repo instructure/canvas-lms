@@ -52,6 +52,7 @@ export const RUBRIC_ASSOCIATION: RubricAssociation = {
   hideScoreTotal: false,
   id: '1',
   useForGrading: true,
+  hideOutcomeResults: false,
 }
 
 export const RUBRIC_CONTEXTS = [
@@ -74,11 +75,13 @@ export const RUBRIC_CONTEXTS = [
 
 export const RUBRICS_FOR_CONTEXT = [
   {
-    rubricAssociationId: '1',
+    rubricAssociation: RUBRIC_ASSOCIATION,
     rubric: RUBRIC,
   },
   {
-    rubricAssociationId: '2',
+    rubricAssociation: {
+      id: '2',
+    },
     rubric: {
       id: '2',
       criteriaCount: 1,

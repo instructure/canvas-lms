@@ -44,12 +44,14 @@ export type RubricAssignmentContainerProps = {
   assignmentId: string
   assignmentRubric?: Rubric
   assignmentRubricAssociation?: RubricAssociation
+  canManageRubrics: boolean
   courseId: string
 }
 export const RubricAssignmentContainer = ({
   assignmentId,
   assignmentRubric,
   assignmentRubricAssociation,
+  canManageRubrics,
   courseId,
 }: RubricAssignmentContainerProps) => {
   const [rubric, setRubric] = useState(assignmentRubric)
@@ -73,13 +75,14 @@ export const RubricAssignmentContainer = ({
     }
   }
 
-  const handleAddRubric = async (rubricId?: string) => {
-    if (!rubricId) {
-      return
-    }
-
+  const handleAddRubric = async (rubricId: string, updatedAssociation: RubricAssociation) => {
     try {
-      const response = await addRubricToAssignment(courseId, assignmentId, rubricId)
+      const response = await addRubricToAssignment(
+        courseId,
+        assignmentId,
+        rubricId,
+        updatedAssociation
+      )
       setRubric(response.rubric)
       setRubricAssociation(response.rubricAssociation)
       setIsSearchTrayOpen(false)
@@ -114,14 +117,16 @@ export const RubricAssignmentContainer = ({
             >
               {I18n.t('Preview Rubric')}
             </Button>
-            <IconButton
-              margin="0 0 0 small"
-              screenReaderLabel={I18n.t('Edit Rubric')}
-              data-testid="edit-assignment-rubric-button"
-              onClick={() => setRubricCreateModalOpen(true)}
-            >
-              <IconEditLine />
-            </IconButton>
+            {canManageRubrics && (
+              <IconButton
+                margin="0 0 0 small"
+                screenReaderLabel={I18n.t('Edit Rubric')}
+                data-testid="edit-assignment-rubric-button"
+                onClick={() => setRubricCreateModalOpen(true)}
+              >
+                <IconEditLine />
+              </IconButton>
+            )}
             <IconButton
               margin="0 0 0 small"
               data-testid="remove-assignment-rubric-button"
@@ -133,14 +138,16 @@ export const RubricAssignmentContainer = ({
           </View>
         ) : (
           <View>
-            <Button
-              margin="0"
-              renderIcon={IconAddLine}
-              data-testid="create-assignment-rubric-button"
-              onClick={() => setRubricCreateModalOpen(true)}
-            >
-              {I18n.t('Create Rubric')}
-            </Button>
+            {canManageRubrics && (
+              <Button
+                margin="0"
+                renderIcon={IconAddLine}
+                data-testid="create-assignment-rubric-button"
+                onClick={() => setRubricCreateModalOpen(true)}
+              >
+                {I18n.t('Create Rubric')}
+              </Button>
+            )}
             <Button
               margin="0 0 0 small"
               data-testid="find-assignment-rubric-button"
@@ -155,10 +162,12 @@ export const RubricAssignmentContainer = ({
       <RubricCreateModal
         isOpen={rubricCreateModalOpen}
         rubric={rubric}
+        rubricAssociation={rubricAssociation}
         onDismiss={() => setRubricCreateModalOpen(false)}
         onSaveRubric={handleSaveRubric}
       />
       <RubricAssessmentTray
+        hidePoints={rubricAssociation?.hidePoints}
         isOpen={isPreviewTrayOpen}
         isPreviewMode={false}
         rubric={searchPreviewRubric ?? rubric}

@@ -48,9 +48,9 @@ describe('RubricAssignmentContainer Tests', () => {
       })
     )
 
-    queryClient.setQueryData(['fetch-grading-rubric-contexts-1'], RUBRIC_CONTEXTS)
+    queryClient.setQueryData(['fetchGradingRubricContexts', '1'], RUBRIC_CONTEXTS)
     queryClient.setQueryData(
-      ['fetch-grading-rubrics-for-context', '1', 'course_2'],
+      ['fetchGradingRubricsForContext', '1', 'course_2'],
       RUBRICS_FOR_CONTEXT
     )
   })
@@ -60,13 +60,21 @@ describe('RubricAssignmentContainer Tests', () => {
   })
 
   const renderComponent = (props: Partial<RubricAssignmentContainerProps> = {}) => {
-    return render(<RubricAssignmentContainer assignmentId="1" courseId="1" {...props} />)
+    return render(
+      <RubricAssignmentContainer assignmentId="1" courseId="1" canManageRubrics={true} {...props} />
+    )
   }
 
   describe('non associated rubric', () => {
     it('should render the create and search buttons', () => {
       const {getByTestId} = renderComponent()
       expect(getByTestId('create-assignment-rubric-button')).toHaveTextContent('Create Rubric')
+      expect(getByTestId('find-assignment-rubric-button')).toHaveTextContent('Find Rubric')
+    })
+
+    it('should not render the create when manage_rubrics permissions is false', () => {
+      const {getByTestId, queryByTestId} = renderComponent({canManageRubrics: false})
+      expect(queryByTestId('create-assignment-rubric-button')).toBeNull()
       expect(getByTestId('find-assignment-rubric-button')).toHaveTextContent('Find Rubric')
     })
 
@@ -110,6 +118,17 @@ describe('RubricAssignmentContainer Tests', () => {
       })
       expect(getByTestId('preview-assignment-rubric-button')).toBeInTheDocument()
       expect(getByTestId('edit-assignment-rubric-button')).toBeInTheDocument()
+      expect(getByTestId('remove-assignment-rubric-button')).toBeInTheDocument()
+    })
+
+    it('will not render the edit button when can_manage_rubrics is false', () => {
+      const {getByTestId, queryByTestId} = renderComponent({
+        assignmentRubric: RUBRIC,
+        assignmentRubricAssociation: RUBRIC_ASSOCIATION,
+        canManageRubrics: false,
+      })
+      expect(getByTestId('preview-assignment-rubric-button')).toBeInTheDocument()
+      expect(queryByTestId('edit-assignment-rubric-button')).toBeNull()
       expect(getByTestId('remove-assignment-rubric-button')).toBeInTheDocument()
     })
 

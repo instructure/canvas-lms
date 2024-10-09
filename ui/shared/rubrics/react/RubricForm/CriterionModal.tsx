@@ -94,6 +94,7 @@ export const reorder = ({list, startIndex, endIndex}: ReorderProps) => {
 export type CriterionModalProps = {
   criterion?: RubricCriterion
   criterionUseRangeEnabled: boolean
+  hidePoints: boolean
   isOpen: boolean
   unassessed: boolean
   onSave: (criterion: RubricCriterion) => void
@@ -102,6 +103,7 @@ export type CriterionModalProps = {
 export const CriterionModal = ({
   criterion,
   criterionUseRangeEnabled,
+  hidePoints,
   isOpen,
   unassessed,
   onDismiss,
@@ -299,7 +301,7 @@ export const CriterionModal = ({
         <View as="div" margin="medium 0 0 0" themeOverride={{marginMedium: '1.25rem'}}>
           <Flex>
             <Flex.Item shouldGrow={true}>
-              {unassessed && criterionUseRangeEnabled && (
+              {unassessed && criterionUseRangeEnabled && !hidePoints && (
                 <Checkbox
                   label="Enable Range"
                   checked={criterionUseRange}
@@ -309,13 +311,15 @@ export const CriterionModal = ({
               )}
             </Flex.Item>
             <Flex.Item>
-              <Heading
-                level="h2"
-                as="h2"
-                themeOverride={{h2FontWeight: 700, h2FontSize: '22px', lineHeight: '1.75rem'}}
-              >
-                {maxRatingPoints} {I18n.t('Points Possible')}
-              </Heading>
+              {!hidePoints && (
+                <Heading
+                  level="h2"
+                  as="h2"
+                  themeOverride={{h2FontWeight: 700, h2FontSize: '22px', lineHeight: '1.75rem'}}
+                >
+                  {maxRatingPoints} {I18n.t('Points Possible')}
+                </Heading>
+              )}
             </Flex.Item>
           </Flex>
         </View>
@@ -327,13 +331,15 @@ export const CriterionModal = ({
                 {I18n.t('Display')}
               </View>
             </Flex.Item>
+            {!hidePoints && (
+              <Flex.Item>
+                <View as="div" width={criterionUseRange ? '12.375rem' : '8.875rem'}>
+                  {criterionUseRange ? I18n.t('Point Range') : I18n.t('Points')}
+                </View>
+              </Flex.Item>
+            )}
             <Flex.Item>
-              <View as="div" width={criterionUseRange ? '12.375rem' : '8.875rem'}>
-                {criterionUseRange ? I18n.t('Point Range') : I18n.t('Points')}
-              </View>
-            </Flex.Item>
-            <Flex.Item>
-              <View as="div" width="8.875rem">
+              <View as="div" width="8.875rem" margin={hidePoints ? '0 0 0 x-large' : '0'}>
                 {I18n.t('Rating Name')}
               </View>
             </Flex.Item>
@@ -346,7 +352,7 @@ export const CriterionModal = ({
         </View>
 
         <View as="div" position="relative">
-          <DragVerticalLineBreak criterionUseRange={criterionUseRange} />
+          {!hidePoints && <DragVerticalLineBreak criterionUseRange={criterionUseRange} />}
           <DragAndDrop onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <Droppable droppableId="droppable-id">
               {provided => {
@@ -367,6 +373,7 @@ export const CriterionModal = ({
                           <RatingRow
                             index={index}
                             checkValidation={checkValidation}
+                            hidePoints={hidePoints}
                             rating={rating}
                             scale={scale}
                             showRemoveButton={ratings.length > 1}
@@ -427,6 +434,7 @@ export const CriterionModal = ({
 type RatingRowProps = {
   checkValidation: boolean
   criterionUseRange: boolean
+  hidePoints: boolean
   index: number
   rangeStart?: number
   rating: RubricRating
@@ -441,6 +449,7 @@ const RatingRow = ({
   checkValidation,
   criterionUseRange,
   rangeStart,
+  hidePoints,
   index,
   rating,
   scale,
@@ -480,59 +489,61 @@ const RatingRow = ({
               </View>
             </View>
           </Flex.Item>
-          <Flex.Item align="start">
-            <View as="div" width={criterionUseRange ? '9.375rem' : '5.938rem'}>
-              <Flex alignItems="end" height="2.375rem">
-                {criterionUseRange && (
-                  <Flex.Item width="3.438rem" textAlign="end" margin="0 0 x-small 0">
-                    <View as="span" margin="0 small 0 0">
-                      {rangeStart ? `${rangeStart} to ` : `--`}
-                    </View>
-                  </Flex.Item>
-                )}
-                {unassessed ? (
-                  <Flex.Item>
-                    <NumberInput
-                      renderLabel={
-                        <ScreenReaderContent>{I18n.t('Rating Points')}</ScreenReaderContent>
-                      }
-                      value={pointsInputText}
-                      onIncrement={() => {
-                        const newNumber = setNumber(Math.floor(rating.points) + 1)
+          {!hidePoints && (
+            <Flex.Item align="start">
+              <View as="div" width={criterionUseRange ? '9.375rem' : '5.938rem'}>
+                <Flex alignItems="end" height="2.375rem">
+                  {criterionUseRange && (
+                    <Flex.Item width="3.438rem" textAlign="end" margin="0 0 x-small 0">
+                      <View as="span" margin="0 small 0 0">
+                        {rangeStart ? `${rangeStart} to ` : `--`}
+                      </View>
+                    </Flex.Item>
+                  )}
+                  {unassessed ? (
+                    <Flex.Item>
+                      <NumberInput
+                        renderLabel={
+                          <ScreenReaderContent>{I18n.t('Rating Points')}</ScreenReaderContent>
+                        }
+                        value={pointsInputText}
+                        onIncrement={() => {
+                          const newNumber = setNumber(Math.floor(rating.points) + 1)
 
-                        setPointsInputText(newNumber)
-                        setRatingForm('points', newNumber)
-                      }}
-                      onDecrement={() => {
-                        const newNumber = setNumber(Math.floor(rating.points) - 1)
+                          setPointsInputText(newNumber)
+                          setRatingForm('points', newNumber)
+                        }}
+                        onDecrement={() => {
+                          const newNumber = setNumber(Math.floor(rating.points) - 1)
 
-                        setPointsInputText(newNumber)
-                        setRatingForm('points', newNumber)
-                      }}
-                      onChange={(e, value) => {
-                        if (!/^\d*[.,]?\d{0,2}$/.test(value)) return
+                          setPointsInputText(newNumber)
+                          setRatingForm('points', newNumber)
+                        }}
+                        onChange={(e, value) => {
+                          if (!/^\d*[.,]?\d{0,2}$/.test(value)) return
 
-                        const newNumber = setNumber(Number(value.replace(',', '.')))
-                        setRatingForm('points', newNumber)
-                        setPointsInputText(value.toString())
-                      }}
-                      data-testid="rating-points"
-                      width="4.938rem"
-                      onBlur={() => {
-                        onPointsBlur()
-                      }}
-                    />
-                  </Flex.Item>
-                ) : (
-                  <Flex.Item margin="0 0 x-small 0">
-                    <View as="span" data-testid="rating-points-assessed">
-                      {rating.points}
-                    </View>
-                  </Flex.Item>
-                )}
-              </Flex>
-            </View>
-          </Flex.Item>
+                          const newNumber = setNumber(Number(value.replace(',', '.')))
+                          setRatingForm('points', newNumber)
+                          setPointsInputText(value.toString())
+                        }}
+                        data-testid="rating-points"
+                        width="4.938rem"
+                        onBlur={() => {
+                          onPointsBlur()
+                        }}
+                      />
+                    </Flex.Item>
+                  ) : (
+                    <Flex.Item margin="0 0 x-small 0">
+                      <View as="span" data-testid="rating-points-assessed">
+                        {rating.points}
+                      </View>
+                    </Flex.Item>
+                  )}
+                </Flex>
+              </View>
+            </Flex.Item>
+          )}
         </Flex>
       </Flex.Item>
 

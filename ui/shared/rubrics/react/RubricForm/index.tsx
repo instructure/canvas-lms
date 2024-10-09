@@ -22,7 +22,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import LoadingIndicator from '@canvas/loading-indicator/react'
 import {useQuery, useMutation, queryClient} from '@canvas/query'
-import type {Rubric, RubricCriterion} from '@canvas/rubrics/react/types/rubric'
+import type {Rubric, RubricAssociation, RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 import {colors} from '@instructure/canvas-theme'
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
@@ -48,6 +48,7 @@ import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup'
 import type {GroupOutcome} from '@canvas/global/env/EnvCommon'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 import {reorder, stripPTags, translateRubricData, translateRubricQueryResponse} from './utils'
+import {Checkbox} from '@instructure/ui-checkbox'
 
 const I18n = useI18nScope('rubrics-form')
 
@@ -64,6 +65,9 @@ export const defaultRubricForm: RubricFormProps = {
   unassessed: true,
   workflowState: 'active',
   freeFormCriterionComments: false,
+  hideOutcomeResults: false,
+  hideScoreTotal: false,
+  useForGrading: false,
 }
 
 type RubricFormValidationProps = {
@@ -82,6 +86,7 @@ export type RubricFormComponentProp = {
   criterionUseRangeEnabled: boolean
   hideHeader?: boolean
   rubric?: Rubric
+  rubricAssociation?: RubricAssociation
   onLoadRubric?: (rubricTitle: string) => void
   onSaveRubric: (savedRubricResponse: SaveRubricResponse) => void
   onCancel: () => void
@@ -97,6 +102,7 @@ export const RubricForm = ({
   rootOutcomeGroup,
   hideHeader = false,
   rubric,
+  rubricAssociation,
   onLoadRubric,
   onSaveRubric,
   onCancel,
@@ -116,10 +122,11 @@ export const RubricForm = ({
   const criteriaRef = useRef(rubricForm.criteria)
 
   const header = rubricId ? I18n.t('Edit Rubric') : I18n.t('Create New Rubric')
+  const queryKey = ['fetch-rubric', rubricId ?? '']
 
   const {data, isLoading} = useQuery({
-    queryKey: [`fetch-rubric-${rubricId}`],
-    queryFn: async () => fetchRubric(rubricId),
+    queryKey,
+    queryFn: fetchRubric,
     enabled: !!rubricId && canManageRubrics && !rubric,
   })
 
@@ -134,9 +141,13 @@ export const RubricForm = ({
     onSuccess: async successResponse => {
       showFlashSuccess(I18n.t('Rubric saved successfully'))()
       setSavedRubricResponse(successResponse as SaveRubricResponse)
-      const queryKey = accountId ? `accountRubrics-${accountId}` : `courseRubrics-${courseId}`
-      await queryClient.invalidateQueries([`fetch-rubric-${rubricId}`], {}, {cancelRefetch: true})
-      await queryClient.invalidateQueries([queryKey], undefined, {cancelRefetch: true})
+      const rubricsForContextQueryKey = accountId
+        ? `accountRubrics-${accountId}`
+        : `courseRubrics-${courseId}`
+      await queryClient.invalidateQueries(queryKey, {}, {cancelRefetch: true})
+      await queryClient.invalidateQueries([rubricsForContextQueryKey], undefined, {
+        cancelRefetch: true,
+      })
       await queryClient.invalidateQueries([`rubric-preview-${rubricId}`], {}, {cancelRefetch: true})
     },
   })
@@ -319,11 +330,11 @@ export const RubricForm = ({
   }, [accountId, courseId, data, rubricId, onLoadRubric])
 
   useEffect(() => {
-    if (rubric) {
-      const rubricFormData = translateRubricData(rubric)
+    if (rubric && rubricAssociation) {
+      const rubricFormData = translateRubricData(rubric, rubricAssociation)
       setRubricForm({...rubricFormData, accountId, courseId})
     }
-  }, [accountId, courseId, rubric])
+  }, [accountId, courseId, rubric, rubricAssociation])
 
   useEffect(() => {
     if (saveSuccess && savedRubricResponse) {
@@ -336,7 +347,7 @@ export const RubricForm = ({
   }
 
   return (
-    <View as="div" margin="0 0 medium 0" overflowY="hidden" overflowX="hidden">
+    <View as="div" margin="0 0 medium 0" overflowY="hidden" overflowX="hidden" padding="large">
       <Flex as="div" direction="column" style={{minHeight: '100%'}}>
         <Flex.Item>
           {saveError && (
@@ -374,8 +385,8 @@ export const RubricForm = ({
           </Flex.Item>
         )}
 
-        <Flex.Item overflowX="hidden" overflowY="hidden">
-          <Flex margin="large 0 0 0">
+        <Flex.Item overflowX="hidden" overflowY="hidden" padding="0 xx-small">
+          <Flex margin="large 0 0 0" alignItems="start">
             <Flex.Item shouldGrow={true} shouldShrink={true}>
               <TextInput
                 data-testid="rubric-form-title"
@@ -389,6 +400,14 @@ export const RubricForm = ({
                 ]}
               />
             </Flex.Item>
+            <Flex.Item margin="0 0 0 small">
+              <GradingTypeSelect
+                onChange={isFreeFormComments => {
+                  setRubricFormField('freeFormCriterionComments', isFreeFormComments)
+                }}
+                freeFormCriterionComments={rubricForm.freeFormCriterionComments}
+              />
+            </Flex.Item>
             {rubricForm.unassessed && (
               <Flex.Item margin="0 0 0 small">
                 <RubricRatingOrderSelect
@@ -396,6 +415,53 @@ export const RubricForm = ({
                   onChangeOrder={ratingOrder => setRubricFormField('ratingOrder', ratingOrder)}
                 />
               </Flex.Item>
+            )}
+            <Flex.Item margin="0 0 0 small">
+              <ScoringTypeSelect
+                hidePoints={rubricForm.hidePoints}
+                onChange={() => {
+                  setRubricFormField('hidePoints', !rubricForm.hidePoints)
+                  setRubricFormField('hideScoreTotal', false)
+                  setRubricFormField('useForGrading', false)
+                }}
+              />
+            </Flex.Item>
+          </Flex>
+
+          <Flex margin="medium 0 0" gap="medium">
+            <Flex.Item>
+              <Checkbox
+                label={"Don't post to Learning Mastery Gradebook"}
+                checked={rubricForm.hideOutcomeResults}
+                onChange={e => setRubricFormField('hideOutcomeResults', e.target.checked)}
+                data-testid="hide-outcome-results-checkbox"
+              />
+            </Flex.Item>
+            {!rubricForm.hidePoints && (
+              <>
+                <Flex.Item>
+                  <Checkbox
+                    label="Use this rubric for assignment grading"
+                    checked={rubricForm.useForGrading}
+                    onChange={e => {
+                      setRubricFormField('useForGrading', e.target.checked)
+                      setRubricFormField('hideScoreTotal', false)
+                    }}
+                    data-testid="use-for-grading-checkbox"
+                  />
+                </Flex.Item>
+
+                {!rubricForm.useForGrading && (
+                  <Flex.Item>
+                    <Checkbox
+                      label="Hide rubric score total from students"
+                      checked={rubricForm.hideScoreTotal}
+                      onChange={e => setRubricFormField('hideScoreTotal', e.target.checked)}
+                      data-testid="hide-score-total-checkbox"
+                    />
+                  </Flex.Item>
+                )}
+              </>
             )}
           </Flex>
 
@@ -410,16 +476,18 @@ export const RubricForm = ({
                   {I18n.t('Criteria Builder')}
                 </Heading>
               </Flex.Item>
-              <Flex.Item>
-                <Heading
-                  level="h2"
-                  as="h2"
-                  data-testid={`rubric-points-possible-${rubricForm.id}`}
-                  themeOverride={{h2FontWeight: 700, h2FontSize: '22px', lineHeight: '1.75rem'}}
-                >
-                  {rubricForm.pointsPossible} {I18n.t('Points Possible')}
-                </Heading>
-              </Flex.Item>
+              {!rubricForm.hidePoints && !rubricForm.hideScoreTotal && (
+                <Flex.Item>
+                  <Heading
+                    level="h2"
+                    as="h2"
+                    data-testid={`rubric-points-possible-${rubricForm.id}`}
+                    themeOverride={{h2FontWeight: 700, h2FontSize: '22px', lineHeight: '1.75rem'}}
+                  >
+                    {rubricForm.pointsPossible} {I18n.t('Points Possible')}
+                  </Heading>
+                </Flex.Item>
+              )}
             </Flex>
           </View>
         </Flex.Item>
@@ -436,6 +504,8 @@ export const RubricForm = ({
                           <RubricCriteriaRow
                             key={criterion.id}
                             criterion={criterion}
+                            freeFormCriterionComments={rubricForm.freeFormCriterionComments}
+                            hidePoints={rubricForm.hidePoints}
                             rowIndex={index + 1}
                             unassessed={rubricForm.unassessed}
                             onDeleteCriterion={() => deleteCriterion(criterion)}
@@ -519,6 +589,7 @@ export const RubricForm = ({
       <CriterionModal
         criterion={selectedCriterion}
         criterionUseRangeEnabled={criterionUseRangeEnabled}
+        hidePoints={rubricForm.hidePoints || rubricForm.freeFormCriterionComments}
         isOpen={isCriterionModalOpen}
         unassessed={rubricForm.unassessed}
         onDismiss={() => setIsCriterionModalOpen(false)}
@@ -530,6 +601,7 @@ export const RubricForm = ({
         onDismiss={() => setIsOutcomeCriterionModalOpen(false)}
       />
       <RubricAssessmentTray
+        hidePoints={rubricForm.hidePoints}
         isOpen={isPreviewTrayOpen}
         isPreviewMode={false}
         rubric={rubricForm}
@@ -571,6 +643,66 @@ const RubricRatingOrderSelect = ({ratingOrder, onChangeOrder}: RubricRatingOrder
         data-testid="low_high_rating_order"
       >
         {I18n.t('Low < High')}
+      </SimpleSelectOption>
+    </SimpleSelect>
+  )
+}
+
+type GradingTypeSelectProps = {
+  freeFormCriterionComments: boolean
+  onChange: (isFreeFormComments: boolean) => void
+}
+
+const GradingTypeSelect = ({freeFormCriterionComments, onChange}: GradingTypeSelectProps) => {
+  const handleChange = (value: string) => {
+    onChange(value === 'freeForm')
+  }
+
+  const gradingType = freeFormCriterionComments ? 'freeForm' : 'scale'
+
+  return (
+    <SimpleSelect
+      renderLabel={I18n.t('Type')}
+      width="10.563rem"
+      value={gradingType}
+      onChange={(e, {value}) => handleChange(value !== undefined ? value.toString() : '')}
+      data-testid="rubric-rating-type-select"
+    >
+      <SimpleSelectOption id="scaleOption" value="scale" data-testid="rating_type_scale">
+        {I18n.t('Scale')}
+      </SimpleSelectOption>
+      <SimpleSelectOption id="freeFormOption" value="freeForm" data-testid="rating_type_free_form">
+        {I18n.t('Written Feedback')}
+      </SimpleSelectOption>
+    </SimpleSelect>
+  )
+}
+
+type ScoreTypeSelectProps = {
+  hidePoints: boolean
+  onChange: (shouldHidePoints: boolean) => void
+}
+
+const ScoringTypeSelect = ({hidePoints, onChange}: ScoreTypeSelectProps) => {
+  const handleChange = (value: string) => {
+    onChange(value === 'unscored')
+  }
+
+  const scoreType = hidePoints ? 'unscored' : 'scored'
+
+  return (
+    <SimpleSelect
+      renderLabel={I18n.t('Scoring')}
+      width="10.563rem"
+      value={scoreType}
+      onChange={(e, {value}) => handleChange(value !== undefined ? value.toString() : '')}
+      data-testid="rubric-rating-scoring-type-select"
+    >
+      <SimpleSelectOption id="scoredOption" value="scored" data-testid="scoring_type_scored">
+        {I18n.t('Scored')}
+      </SimpleSelectOption>
+      <SimpleSelectOption id="unscoredOption" value="unscored" data-testid="scoring_type_unscored">
+        {I18n.t('Unscored')}
       </SimpleSelectOption>
     </SimpleSelect>
   )

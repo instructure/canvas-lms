@@ -22,8 +22,6 @@ export type RubricFormProps = {
   id?: string
   title: string
   hasRubricAssociations: boolean
-  hidePoints: boolean
-  freeFormCriterionComments: boolean
   accountId?: string
   courseId?: string
   criteria: RubricCriterion[]
@@ -32,4 +30,10 @@ export type RubricFormProps = {
   ratingOrder: string
   unassessed: boolean
   workflowState: string
+  freeFormCriterionComments: boolean
+  hideOutcomeResults: boolean
+  hidePoints: boolean
+  hideScoreTotal: boolean
+  useForGrading: boolean
+  rubricAssociationId?: string
 }

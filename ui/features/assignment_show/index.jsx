@@ -41,7 +41,7 @@ import ready from '@instructure/ready'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import {captureException} from '@sentry/browser'
 import {RubricAssignmentContainer} from '@canvas/rubrics/react/RubricAssignment'
-import {mapRubricUnderscoredKeysToCamelCase} from '@canvas/rubrics/react/utils'
+import {mapRubricUnderscoredKeysToCamelCase, mapRubricAssociationUnderscoredKeysToCamelCase} from '@canvas/rubrics/react/utils'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
 
@@ -311,11 +311,13 @@ $(() => {
     const envRubric = ENV.assigned_rubric
     const envRubricAssociation = ENV.rubric_association
     const assignmentRubric = envRubric ? mapRubricUnderscoredKeysToCamelCase(ENV.assigned_rubric) : undefined
+    const assignmentRubricAssociation = envRubricAssociation ? mapRubricAssociationUnderscoredKeysToCamelCase(ENV.rubric_association) : undefined
     ReactDOM.render(
-      <RubricAssignmentContainer 
+      <RubricAssignmentContainer
         assignmentId={ENV.ASSIGNMENT_ID}
-        assignmentRubric={assignmentRubric} 
-        assignmentRubricAssociation={envRubricAssociation}
+        assignmentRubric={assignmentRubric}
+        assignmentRubricAssociation={assignmentRubricAssociation}
+        canManageRubrics={ENV.PERMISSIONS.manage_rubrics}
         courseId={ENV.COURSE_ID}
       />,
       $mountPoint
