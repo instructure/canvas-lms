@@ -380,6 +380,10 @@ $icon-size: 1.4rem;
     span.comment {
       flex: auto;
     }
+    span.comment h2 {
+      font-weight: normal;
+      font-size: 1.8em;
+    }
     .comment_citation {
       @include fontSize(12px);
       text-align: direction(right);
