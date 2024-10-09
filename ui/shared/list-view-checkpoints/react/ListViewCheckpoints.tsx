@@ -93,7 +93,7 @@ const CheckpointItem = React.memo(({checkpoint, assignment}: CheckpointProps) =>
 
   const renderCheckpointTitle = () => {
     if (checkpoint.tag === REPLY_TO_TOPIC) {
-      return I18n.t('Initial Post')
+      return I18n.t('Reply To Topic')
     } else {
       // if it's not reply to topic, it must be reply to entry
       const translatedReplyToEntryRequiredCount = I18n.n(

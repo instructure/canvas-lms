@@ -73,7 +73,7 @@ describe('TeacherCheckpointsInfo', () => {
   it('renders the component with correct checkpoint titles', () => {
     render(<TeacherCheckpointsInfo assignment={assignmentNoDueDates} />)
 
-    expect(screen.getByText('Initial Post:')).toBeInTheDocument()
+    expect(screen.getByText('Reply to Topic:')).toBeInTheDocument()
     expect(screen.getByText('Required Replies (4):')).toBeInTheDocument()
   })
 

@@ -1916,7 +1916,7 @@ describe "discussions" do
           end
 
           context "checkpoints" do
-            it "shows initial post input on graded discussion with sub assignments" do
+            it "shows reply to topic input on graded discussion with sub assignments" do
               Account.site_admin.enable_feature!(:discussion_checkpoints)
               @course.root_account.enable_feature!(:discussion_checkpoints)
               assignment = @course.assignments.create!(
@@ -2091,9 +2091,9 @@ describe "discussions" do
               available_from_date_formatted = format_date_for_view(2.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
               update_available_date(0, available_from_date_formatted, true, false)
               update_available_time(0, "5:00 PM", true, false)
-              expect(assign_to_date_and_time[2].text).to include("Unlock date cannot be after initial post due date")
+              expect(assign_to_date_and_time[2].text).to include("Unlock date cannot be after reply to topic due date")
 
-              # correct initial post
+              # correct reply to topic
               reply_to_topic_date_formatted = format_date_for_view(3.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
               update_reply_to_topic_date(0, reply_to_topic_date_formatted)
               update_reply_to_topic_time(0, "5:00 PM")
@@ -2113,9 +2113,9 @@ describe "discussions" do
               reply_to_topic_date_formatted = format_date_for_view(6.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
               update_reply_to_topic_date(0, reply_to_topic_date_formatted)
               update_reply_to_topic_time(0, "5:00 PM")
-              expect(assign_to_date_and_time[3].text).to include("Lock date cannot be before initial post due date")
+              expect(assign_to_date_and_time[3].text).to include("Lock date cannot be before reply to topic due date")
 
-              # correct initial post
+              # correct reply to topic
               reply_to_topic_date_formatted = format_date_for_view(3.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
               update_reply_to_topic_date(0, reply_to_topic_date_formatted)
               update_reply_to_topic_time(0, "5:00 PM")
@@ -2529,7 +2529,7 @@ describe "discussions" do
           end
 
           context "checkpoints" do
-            it "shows initial post input on graded discussion with sub assignments" do
+            it "shows reply to topic input on graded discussion with sub assignments" do
               Account.site_admin.enable_feature!(:discussion_checkpoints)
               @course.root_account.enable_feature!(:discussion_checkpoints)
               assignment = @course.assignments.create!(
@@ -2694,9 +2694,9 @@ describe "discussions" do
               available_from_date_formatted = format_date_for_view(2.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
               update_available_date(0, available_from_date_formatted, true, false)
               update_available_time(0, "5:00 PM", true, false)
-              expect(assign_to_date_and_time[2].text).to include("Unlock date cannot be after initial post due date")
+              expect(assign_to_date_and_time[2].text).to include("Unlock date cannot be after reply to topic due date")
 
-              # correct initial post
+              # correct reply to topic
               reply_to_topic_date_formatted = format_date_for_view(3.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
               update_reply_to_topic_date(0, reply_to_topic_date_formatted)
               update_reply_to_topic_time(0, "5:00 PM")
@@ -2716,9 +2716,9 @@ describe "discussions" do
               reply_to_topic_date_formatted = format_date_for_view(6.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
               update_reply_to_topic_date(0, reply_to_topic_date_formatted)
               update_reply_to_topic_time(0, "5:00 PM")
-              expect(assign_to_date_and_time[3].text).to include("Lock date cannot be before initial post due date")
+              expect(assign_to_date_and_time[3].text).to include("Lock date cannot be before reply to topic due date")
 
-              # correct initial post
+              # correct reply to topic
               reply_to_topic_date_formatted = format_date_for_view(3.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
               update_reply_to_topic_date(0, reply_to_topic_date_formatted)
               update_reply_to_topic_time(0, "5:00 PM")

@@ -62,7 +62,7 @@ additional_title_context ||= false
               <div class="todo-details">
                 <% if root_account.feature_enabled?(:discussion_checkpoints) && assignment.sub_assignment? %>
                   <% if assignment.sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC %>
-                    <b class="todo-details__title"><%= t('Grade %{assignment} Initial Post', assignment: assignment.title) %></b>
+                    <b class="todo-details__title"><%= t('Grade %{assignment} Reply to Topic', assignment: assignment.title) %></b>
                   <% elsif assignment.sub_assignment_tag == CheckpointLabels::REPLY_TO_ENTRY %>
                     <b class="todo-details__title"><%= t('Grade %{assignment} Required Replies (%{num})', assignment: assignment.title, num: assignment.required_replies) %></b>
                   <% end %>
@@ -127,9 +127,9 @@ additional_title_context ||= false
               <i class="<%= icon_class %>" aria-label="<%= icon_aria_label %>"></i>
               <div class="todo-details">
                 <% if root_account.feature_enabled?(:discussion_checkpoints) && assignment.sub_assignment? %>
-                  <% if assignment.sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC %>
-                    <b  class="todo-details__title"><%= t('%{assignment} Initial Post', assignment: assignment.submission_action_string) %></b>
-                  <% elsif assignment.sub_assignment_tag == CheckpointLabels::REPLY_TO_ENTRY %>
+                  <% if assignment.sub_assignment_tag == 'reply_to_topic' %>
+                    <b  class="todo-details__title"><%= t('%{assignment} Reply to Topic', assignment: assignment.submission_action_string) %></b>
+                  <% elsif assignment.sub_assignment_tag == 'reply_to_entry' %>
                     <b  class="todo-details__title"><%= t('%{assignment} Required Replies (%{num})', assignment: assignment.submission_action_string, num: assignment.required_replies) %></b>
                   <% end %>
                 <% else %>

@@ -70,7 +70,7 @@ const getItemDetailsFromPlannable = apiResponse => {
   if (plannable_type === 'sub_assignment') {
     switch (plannable.sub_assignment_tag) {
       case REPLY_TO_TOPIC:
-        details.title = I18n.t('%{itemTitle} Initial Post', {itemTitle: details.title})
+        details.title = I18n.t('%{itemTitle} Reply to Topic', {itemTitle: details.title})
         break
       case REPLY_TO_ENTRY:
         details.title = I18n.t('%{itemTitle} Required Replies (%{num})', {

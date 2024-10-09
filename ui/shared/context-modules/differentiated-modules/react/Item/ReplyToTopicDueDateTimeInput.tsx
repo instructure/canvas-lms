@@ -74,8 +74,8 @@ export function ReplyToTopicDueDateTimeInput({
     id: key,
     disabled:
       Boolean(blueprintDateLocks?.includes('availability_dates')) || disabledWithGradingPeriod,
-    description: I18n.t('Choose an initial post due date and time'),
-    dateRenderLabel: I18n.t('Initial Post Due Date'),
+    description: I18n.t('Choose a reply to topic due date and time'),
+    dateRenderLabel: I18n.t('Reply to Topic Due Date'),
     value: replyToTopicDueDate,
     onChange: handleReplyToTopicDueDateChange,
     onClear: handleClear,

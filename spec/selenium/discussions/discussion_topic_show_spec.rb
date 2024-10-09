@@ -259,7 +259,7 @@ describe "Discussion Topic Show" do
         wait_for_ajaximations
         expect(fj("span:contains('Due Dates')")).to be_present
         reply_to_topic_contents = f("span[data-testid='reply_to_topic_section']").text
-        expect(reply_to_topic_contents).to include("Initial Post")
+        expect(reply_to_topic_contents).to include("Reply to Topic")
         expect(reply_to_topic_contents).to include(format_date_for_view(@due_at))
 
         reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
@@ -268,7 +268,7 @@ describe "Discussion Topic Show" do
       end
 
       it "lets students see the checkpoints tray with completed status on initial page load" do
-        root_entry = @checkpointed_discussion.discussion_entries.create!(user: @student, message: "initial post")
+        root_entry = @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to topic")
 
         @replies_required.times { |i| @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to entry #{i}", parent_entry: root_entry) }
 

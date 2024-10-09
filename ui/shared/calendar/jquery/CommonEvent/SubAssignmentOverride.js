@@ -49,7 +49,7 @@ Object.assign(SubAssignmentOverride.prototype, {
     const numReplies = data?.sub_assignment?.discussion_topic?.reply_to_entry_required_count || 1
     this.title =
       data?.sub_assignment?.sub_assignment_tag === 'reply_to_topic'
-        ? I18n.t('%{title} Initial Post (%{overrideTitle})', {
+        ? I18n.t('%{title} Reply to Topic (%{overrideTitle})', {
             title: this.assignment.name,
             overrideTitle: this.override.title,
           })

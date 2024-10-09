@@ -310,10 +310,10 @@ describe('transformApiToInternalItem', () => {
       expect(result).toMatchSnapshot()
     })
 
-    it('modifies properly title for initial post checkpoint', () => {
+    it('modifies properly title for reply to topic checkpoint', () => {
       const apiResponse = makeDiscussionCheckpointApiResponse()
       const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
-      expect(result.title).toEqual('How to be a good friend Initial Post')
+      expect(result.title).toEqual('How to be a good friend Reply to Topic')
     })
 
     it('modifies properly title for reply to entry checkpoint', () => {

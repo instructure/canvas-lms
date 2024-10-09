@@ -32,7 +32,7 @@ describe('ListViewCheckpoints', () => {
     )
     expect(container.querySelectorAll('li')).toHaveLength(2)
 
-    expect(getByTestId('1_reply_to_topic_title').textContent).toEqual('Initial Post')
+    expect(getByTestId('1_reply_to_topic_title').textContent).toEqual('Reply To Topic')
     expect(getByTestId('1_reply_to_entry_title').textContent).toEqual('Required Replies (4)')
   })
 

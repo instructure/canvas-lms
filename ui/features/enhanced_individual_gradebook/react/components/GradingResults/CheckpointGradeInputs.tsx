@@ -137,7 +137,7 @@ export const CheckpointGradeInputs = ({
             }}
             handleChangePassFailStatus={handleChangeReplyToTopicPassFailStatus}
             gradingStandardPointsBased={gradingStandardPointsBased}
-            header={I18n.t('Initial Post')}
+            header={I18n.t('Reply to Topic')}
             shouldShowOutOfText={false}
             elementWrapper={elementWrapper}
             margin={margin}

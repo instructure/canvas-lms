@@ -66,7 +66,7 @@ const DATE_RANGE_ERRORS = {
         return I18n.t('Unlock date cannot be after due date')
       },
       get replyToTopicDue() {
-        return I18n.t('Unlock date cannot be after initial post due date')
+        return I18n.t('Unlock date cannot be after reply to topic due date')
       },
       get replyToEntryDue() {
         return I18n.t('Unlock date cannot be after required replies due date')
@@ -82,7 +82,7 @@ const DATE_RANGE_ERRORS = {
         return I18n.t('Lock date cannot be before due date')
       },
       get replyToTopicDue() {
-        return I18n.t('Lock date cannot be before initial post due date')
+        return I18n.t('Lock date cannot be before reply to topic due date')
       },
       get replyToEntryDue() {
         return I18n.t('Lock date cannot be before required replies due date')

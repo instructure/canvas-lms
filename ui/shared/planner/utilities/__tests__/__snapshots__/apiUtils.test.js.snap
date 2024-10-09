@@ -77,7 +77,7 @@ exports[`transformApiToInternalItem dicusssion checkpoint extracts and transform
   "status": {
     "unread_count": 2,
   },
-  "title": "How to be a good friend Initial Post",
+  "title": "How to be a good friend Reply to Topic",
   "toggleAPIPending": false,
   "type": "Discussion Checkpoint",
   "uniqueId": "sub_assignment-15",

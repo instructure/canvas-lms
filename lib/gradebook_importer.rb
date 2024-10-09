@@ -815,7 +815,7 @@ class GradebookImporter
 
   def assignment_to_hash(assignment)
     assignment_title = if assignment&.sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC
-                         "#{assignment.title} Initial Post"
+                         "#{assignment.title} Reply To Topic"
                        elsif assignment&.sub_assignment_tag == CheckpointLabels::REPLY_TO_ENTRY
                          "#{assignment.title} Required Replies"
                        else

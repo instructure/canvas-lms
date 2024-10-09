@@ -668,7 +668,7 @@ export default class SubmissionTray extends React.Component<
                   this.props,
                   REPLY_TO_TOPIC,
                   replyToTopicSubmission,
-                  I18n.t('Initial Post')
+                  I18n.t('Reply to Topic')
                 )}
                 {renderInputsForCheckpoints(
                   hasCheckpoints,

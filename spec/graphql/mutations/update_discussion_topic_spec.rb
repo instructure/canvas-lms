@@ -719,7 +719,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       end
     end
 
-    it "updates the initial post checkpoint due at date" do
+    it "updates the reply to topic checkpoint due at date" do
       new_due_at = 3.days.from_now
       result = run_mutation(id: @graded_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
                               { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC, dates: [{ type: "everyone", dueAt: new_due_at.iso8601 }], pointsPossible: 5 },
@@ -823,7 +823,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(result["errors"]).to be_nil
     end
 
-    it "updates the initial post overrides to add a section override and then, remove it" do
+    it "updates the reply to topic overrides to add a section override and then, remove it" do
       section = add_section("M03")
 
       result1 = run_mutation(id: @graded_topic.id, assignment: { forCheckpoints: true }, checkpoints: [

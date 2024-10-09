@@ -109,7 +109,7 @@ export const InputsForCheckpoints = (props: Props) => {
 
   const statusAltText =
     props.subAssignmentTag === REPLY_TO_TOPIC
-      ? I18n.t('Status for the Initial Post Checkpoint.')
+      ? I18n.t('Status for the Reply to Topic Checkpoint.')
       : I18n.t('Status for the Required Replies Checkpoint.')
 
   return props.hasCheckpoints ? (
