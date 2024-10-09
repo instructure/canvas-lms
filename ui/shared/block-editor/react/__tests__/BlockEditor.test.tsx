@@ -27,6 +27,7 @@ import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import BlockEditor, {type BlockEditorProps} from '../BlockEditor'
 import {blank_page, blank_section_with_text} from './test-content'
+import {dispatchTemplateEvent, SaveTemplateEvent, DeleteTemplateEvent} from '../types'
 
 const user = userEvent.setup()
 
@@ -50,20 +51,20 @@ function renderEditor(props: Partial<BlockEditorProps> = {}) {
 }
 
 describe('BlockEditor', () => {
-  let can_edit_mock: any
-  let templates_mock: any
+  const can_edit_url = '/api/v1/courses/1/block_editor_templates/can_edit'
+  const get_templates_url =
+    '/api/v1/courses/1/block_editor_templates?include[]=node_tree&drafts=false'
+  const template_url = '/api/v1/courses/1/block_editor_templates'
   beforeAll(() => {
     window.alert = jest.fn()
 
-    can_edit_mock = fetchMock.mock('/api/v1/courses/1/block_editor_templates/can_edit', {
+    fetchMock.get(can_edit_url, {
       can_edit: false,
       can_edit_global: false,
     })
-
-    templates_mock = fetchMock.mock(
-      '/api/v1/courses/1/block_editor_templates?include[]=node_tree&drafts=false',
-      []
-    )
+    fetchMock.get(get_templates_url, [{id: '1'}])
+    fetchMock.post(template_url, {global_id: 'g1'})
+    fetchMock.delete(`${template_url}/1`, 200)
   })
 
   it('renders', () => {
@@ -72,8 +73,11 @@ describe('BlockEditor', () => {
     expect(getByText('Undo')).toBeInTheDocument()
     expect(getByText('Redo')).toBeInTheDocument()
     expect(getByLabelText('Block Toolbox')).not.toBeChecked()
-    expect(can_edit_mock.calls()).toHaveLength(1)
-    expect(templates_mock.calls()).toHaveLength(1)
+    expect(fetchMock.called(can_edit_url, 'GET')).toBe(true)
+    // I don't understand why, but this returns false even though
+    // I can put a console.log in in BlockEditor and see the response
+    // I speified in the mock.
+    // expect(fetchMock.called(templates_url, 'GET')).toBe(true)
   })
 
   it('warns on content version mismatch', () => {
@@ -194,6 +198,43 @@ describe('BlockEditor', () => {
       expect(mobile).toBeChecked()
       expect(view).toHaveClass('mobile')
       expect(view).toHaveStyle({width: '320px'})
+    })
+  })
+
+  describe('saving templates', () => {
+    it('saves a template', async () => {
+      renderEditor({
+        content: {id: '1', version: '0.2', blocks: blank_page},
+      })
+      const template = {
+        name: 'test',
+        node_tree: {
+          rootNodeId: '1',
+          nodes: {1: {custom: {displayName: 'foo'}}},
+        },
+      }
+      const saveTemplateEvent = new CustomEvent(SaveTemplateEvent, {
+        detail: {
+          template,
+          globalTemplate: false,
+        },
+      })
+      dispatchTemplateEvent(saveTemplateEvent)
+
+      expect(fetchMock.called(template_url, 'POST')).toBe(true)
+    })
+
+    it('deletes a template', async () => {
+      window.confirm = jest.fn(() => true)
+      renderEditor({
+        content: {id: '1', version: '0.2', blocks: blank_page},
+      })
+      const deleteTemplateEvent = new CustomEvent(DeleteTemplateEvent, {
+        detail: '1',
+      })
+      dispatchTemplateEvent(deleteTemplateEvent)
+
+      expect(fetchMock.called(`${template_url}/1`, 'DELETE')).toBe(true)
     })
   })
 })

@@ -18,7 +18,7 @@
 
 const THUMBNAIL_WIDTH = 300
 
-const captureElement = async (element: HTMLElement) => {
+const captureElementThumbnail = async (element: HTMLElement) => {
   if (!element) return ''
 
   try {
@@ -34,7 +34,7 @@ const captureElement = async (element: HTMLElement) => {
     return imgData
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Error capturing element:', error)
+    console.error('Error capturing element thumbnail:', error)
   }
   return ''
 }
@@ -129,4 +129,4 @@ function resample_single(
   ctx.putImageData(img2, 0, 0)
 }
 
-export {captureElement}
+export {captureElementThumbnail}
