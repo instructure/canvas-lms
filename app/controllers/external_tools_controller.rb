@@ -1168,7 +1168,7 @@ class ExternalToolsController < ApplicationController
     if params.key?(:client_id)
       raise ActiveRecord::RecordInvalid unless developer_key.usable_in_context?(@context)
 
-      @tool = developer_key.tool_configuration.new_external_tool(@context)
+      @tool = developer_key.lti_registration.new_external_tool(@context)
     else
       external_tool_params = (params[:external_tool] || params).to_unsafe_h
       @tool = @context.context_external_tools.new

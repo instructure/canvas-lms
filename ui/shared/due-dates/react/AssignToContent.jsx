@@ -19,9 +19,8 @@
 import React, {useState, useRef, useEffect, useMemo, useCallback} from 'react'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import ItemAssignToTray, {
-  getEveryoneOption,
-} from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
+import {getEveryoneOption} from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 import _ from 'underscore'
 import {forEach, map} from 'lodash'
 import CardActions from '../util/differentiatedModulesCardActions'
@@ -327,7 +326,7 @@ const AssignToContent = ({
 
   const handleChange = (cardId, newAssignee, deletedAssignees) => {
     // Cards without assignees are empty objects
-    // ui/shared/context-modules/differentiated-modules/react/Item/ItemAssignToTray.tsx
+    // ui/shared/context-modules/differentiated-modules/react/Item/ItemAssignToManager.tsx
     if (Object.keys(newAssignee).length > 0) {
       handleAssigneeAddition(cardId, newAssignee)
     }
@@ -486,7 +485,7 @@ const AssignToContent = ({
   return (
     <View as="div" padding="x-small 0 0 0">
       {shouldRenderImportantDates && importantDatesCheckbox()}
-      <ItemAssignToTray
+      <ItemAssignToManager
         courseId={ENV.COURSE_ID}
         itemType={type}
         itemContentId={assignmentId}

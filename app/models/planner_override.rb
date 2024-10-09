@@ -28,6 +28,7 @@ class PlannerOverride < ActiveRecord::Base
   belongs_to :plannable, polymorphic:
     [:announcement,
      :assignment,
+     :sub_assignment,
      :discussion_topic,
      :planner_note,
      :wiki_page,

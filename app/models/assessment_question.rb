@@ -225,13 +225,12 @@ class AssessmentQuestion < ActiveRecord::Base
              # we may be modifying this data (translate_links), and only want to work on a copy
              data.try(:dup)
            end
-    write_attribute(:question_data, data.to_hash.with_indifferent_access)
+    super(data.to_hash.with_indifferent_access)
   end
 
   def question_data
-    if (data = read_attribute(:question_data)) && data.instance_of?(Hash)
-      write_attribute(:question_data, data.with_indifferent_access)
-      data = read_attribute(:question_data)
+    if (data = super) && data.instance_of?(Hash)
+      data = self["question_data"] = data.with_indifferent_access
     end
 
     data
@@ -300,7 +299,7 @@ class AssessmentQuestion < ActiveRecord::Base
 
   def create_quiz_question(quiz_id, quiz_group_id = nil, duplicate_index = nil)
     quiz_questions.new.tap do |qq|
-      qq.write_attribute(:question_data, question_data)
+      qq["question_data"] = question_data
       qq.quiz_id = quiz_id
       qq.quiz_group_id = quiz_group_id
       qq.assessment_question = self
@@ -385,7 +384,7 @@ class AssessmentQuestion < ActiveRecord::Base
       dup.send(:"#{key}=", val)
     end
     dup.assessment_question_bank_id = question_bank
-    dup.write_attribute(:question_data, self.question_data)
+    dup["question_data"] = question_data
     dup
   end
 

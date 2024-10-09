@@ -64,7 +64,7 @@ class User < ActiveRecord::Base
   before_save :infer_defaults
   before_validation :ensure_lti_id, on: :update
   after_create :set_default_feature_flags
-  after_update :clear_cached_short_name, if: ->(user) { user.saved_change_to_short_name? || (user.read_attribute(:short_name).nil? && user.saved_change_to_name?) }
+  after_update :clear_cached_short_name, if: ->(user) { user.saved_change_to_short_name? || (user["short_name"].nil? && user.saved_change_to_name?) }
   validate :preserve_lti_id, on: :update
 
   serialize :preferences
@@ -91,7 +91,7 @@ class User < ActiveRecord::Base
   has_many :not_ended_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')") }, class_name: "Enrollment", multishard: true
   has_many :not_removed_enrollments, -> { where.not(workflow_state: %w[rejected deleted inactive]) }, class_name: "Enrollment", multishard: true
   has_many :observer_enrollments
-  has_many :observee_enrollments, foreign_key: :associated_user_id, class_name: "ObserverEnrollment"
+  has_many :observee_enrollments, foreign_key: :associated_user_id, class_name: "ObserverEnrollment", inverse_of: :associated_user
 
   has_many :observer_pairing_codes, -> { where("workflow_state<>'deleted' AND expires_at > ?", Time.zone.now) }, dependent: :destroy, inverse_of: :user
 
@@ -192,8 +192,8 @@ class User < ActiveRecord::Base
   has_many :learning_outcome_results
   has_many :collaborators
   has_many :collaborations, -> { preload(:user, :collaborators) }, through: :collaborators
-  has_many :assigned_submission_assessments, -> { preload(:user, submission: :assignment) }, class_name: "AssessmentRequest", foreign_key: "assessor_id"
-  has_many :assigned_assessments, class_name: "AssessmentRequest", foreign_key: "assessor_id"
+  has_many :assigned_submission_assessments, -> { preload(:user, submission: :assignment) }, class_name: "AssessmentRequest", foreign_key: "assessor_id", inverse_of: :assessor
+  has_many :assigned_assessments, class_name: "AssessmentRequest", foreign_key: "assessor_id", inverse_of: :assessor
   has_many :web_conference_participants
   has_many :web_conferences, through: :web_conference_participants
   has_many :account_users
@@ -528,7 +528,6 @@ class User < ActiveRecord::Base
   end
 
   before_save :assign_uuid
-  before_save :update_avatar_image
   before_save :record_acceptance_of_terms
   after_save :update_account_associations_if_necessary
   after_save :self_enroll_if_necessary
@@ -856,7 +855,7 @@ class User < ActiveRecord::Base
   def assign_uuid
     # DON'T use ||=, because that will cause an immediate save to the db if it
     # doesn't already exist
-    self.uuid = CanvasSlug.generate_securish_uuid unless read_attribute(:uuid)
+    self.uuid = CanvasSlug.generate_securish_uuid unless self["uuid"]
   end
   protected :assign_uuid
 
@@ -979,7 +978,7 @@ class User < ActiveRecord::Base
                                 !sortable_name_explicitly_set &&
                                 name_changed? &&
                                 User.name_parts(sortable_name, likely_already_surname_first: true).compact.join(" ") == name_was
-    unless read_attribute(:sortable_name)
+    unless self["sortable_name"]
       self.sortable_name = User.last_name_first(self.name, sortable_name_was, likely_already_surname_first: true)
     end
     self.reminder_time_for_due_dates ||= 48.hours.to_i
@@ -1011,7 +1010,7 @@ class User < ActiveRecord::Base
   end
 
   def sortable_name
-    self.sortable_name = read_attribute(:sortable_name) ||
+    self.sortable_name = super ||
                          User.last_name_first(self.name, likely_already_surname_first: false)
   end
 
@@ -1124,7 +1123,7 @@ class User < ActiveRecord::Base
   end
 
   def short_name
-    read_attribute(:short_name) || name
+    super || name
   end
 
   workflow do
@@ -1374,6 +1373,7 @@ class User < ActiveRecord::Base
       read_email_addresses
       view_user_logins
       generate_observer_pairing_code
+      update_speed_grader_settings
     ]
 
     given { |user| user == self && user.user_can_edit_name? }
@@ -1538,20 +1538,6 @@ class User < ActiveRecord::Base
     contexts.uniq
   end
 
-  def update_avatar_image(force_reload = false)
-    if (!avatar_image_url || force_reload) && avatar_image_source == "twitter"
-      twitter = user_services.for_service("twitter").first rescue nil
-      if twitter
-        url = URI.parse("http://twitter.com/users/show.json?user_id=#{twitter.service_user_id}")
-        data = JSON.parse(Net::HTTP.get(url)) rescue nil
-        if data
-          self.avatar_image_url = data["profile_image_url_https"] || avatar_image_url
-          self.avatar_image_updated_at = Time.now
-        end
-      end
-    end
-  end
-
   def record_acceptance_of_terms
     accept_terms if @require_acceptance_of_terms && @terms_of_use
   end
@@ -1630,8 +1616,8 @@ class User < ActiveRecord::Base
   end
 
   def avatar_state
-    if %w[none submitted approved locked reported re_reported].include?(read_attribute(:avatar_state))
-      read_attribute(:avatar_state).to_sym
+    if %w[none submitted approved locked reported re_reported].include?(super)
+      super.to_sym
     else
       :none
     end
@@ -1644,7 +1630,7 @@ class User < ActiveRecord::Base
         self.avatar_image_source = "no_pic"
         self.avatar_image_updated_at = Time.now
       end
-      write_attribute(:avatar_state, val.to_s)
+      super(val.to_s)
     end
   end
 
@@ -1763,7 +1749,13 @@ class User < ActiveRecord::Base
   end
 
   def preferences
-    read_or_initialize_attribute(:preferences, {})
+    self["preferences"] ||= {}
+  end
+
+  def speed_grader_settings
+    {
+      grade_by_question: preferences.fetch(:enable_speedgrader_grade_by_question, false)
+    }
   end
 
   def new_user_tutorial_statuses
@@ -1844,6 +1836,10 @@ class User < ActiveRecord::Base
     else
       "default"
     end
+  end
+
+  def grade_by_question_in_speedgrader?
+    preferences.fetch(:enable_speedgrader_grade_by_question, false)
   end
 
   def course_nickname(course)
@@ -1987,16 +1983,16 @@ class User < ActiveRecord::Base
   # it will store the data in a separate table on the db and lighten the load on poor `users`
 
   def uuid
-    unless read_attribute(:uuid)
+    unless super
       update_attribute(:uuid, CanvasSlug.generate_securish_uuid)
     end
-    read_attribute(:uuid)
+    super
   end
 
   def heap_id(root_account: nil)
     # this is called in read-only contexts where we can't create a missing uuid
     # (uuid-less users should be rare in real life but they exist in specs and maybe unauthenticated requests)
-    return nil unless read_attribute(:uuid)
+    return nil unless self["uuid"]
 
     # for an explanation of these, see
     # https://instructure.atlassian.net/wiki/spaces/HEAP/pages/85854749165/RFC+Advanced+HEAP+installation
@@ -2365,7 +2361,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def submissions_for_course_ids(course_ids, start_at: nil, limit: 20)
+  def submissions_for_course_ids(course_ids, start_at: nil, limit: 20, exclude_parent_assignment_submissions: false)
     return [] unless course_ids.present?
 
     shard.activate do
@@ -2394,7 +2390,11 @@ class User < ActiveRecord::Base
           submissions.first(limit)
 
           ActiveRecord::Associations.preload(submissions, [{ assignment: :context }, :user, :submission_comments])
-          submissions
+          if exclude_parent_assignment_submissions
+            submissions.reject! { |s| s.assignment.has_sub_assignments? } || []
+          else
+            submissions
+          end
         end
       end
     end
@@ -2404,14 +2404,14 @@ class User < ActiveRecord::Base
   def recent_feedback(
     course_ids: nil,
     contexts: nil,
-    **opts # forwarded to submissions_for_course_ids
+    ** # forwarded to submissions_for_course_ids
   )
     course_ids ||= if contexts
                      contexts.select { |c| c.is_a?(Course) }.map(&:id)
                    else
                      participating_student_course_ids
                    end
-    submissions_for_course_ids(course_ids, **opts)
+    submissions_for_course_ids(course_ids, **)
   end
 
   def visible_stream_item_instances(opts = {})
@@ -2825,7 +2825,7 @@ class User < ActiveRecord::Base
   end
 
   def quota
-    return read_attribute(:storage_quota) if read_attribute(:storage_quota)
+    return storage_quota if storage_quota
 
     accounts = associated_root_accounts.reject(&:site_admin?)
     if accounts.empty?
@@ -3123,7 +3123,7 @@ class User < ActiveRecord::Base
   end
 
   def crocodoc_id!
-    cid = read_attribute(:crocodoc_id)
+    cid = crocodoc_id
     return cid if cid
 
     Setting.transaction do
@@ -3469,11 +3469,11 @@ class User < ActiveRecord::Base
   end
 
   def pronouns
-    translate_pronouns(read_attribute(:pronouns))
+    translate_pronouns(super)
   end
 
   def pronouns=(pronouns)
-    write_attribute(:pronouns, untranslate_pronouns(pronouns))
+    super(untranslate_pronouns(pronouns))
   end
 
   def create_courses_right(account)

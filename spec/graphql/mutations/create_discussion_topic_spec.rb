@@ -722,6 +722,51 @@ describe Mutations::CreateDiscussionTopic do
         expect_error(result, "You do not have permission to add this topic to the student to-do list.")
       end
     end
+
+    context "checkpoints" do
+      before(:once) do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+      end
+
+      context "Restrict Quantitative Data" do
+        it "returns an error if disccussion has checkpoints and RQD is enabled" do
+          @course.restrict_quantitative_data = true
+          @course.save!
+          context_type = "Course"
+          title = "Graded Discussion w/Checkpoints"
+          message = "Lorem ipsum..."
+          published = true
+
+          query = <<~GQL
+            contextId: "#{@course.id}"
+            contextType: #{context_type}
+            title: "#{title}"
+            message: "#{message}"
+            published: #{published}
+            assignment: {
+              courseId: "#{@course.id}",
+              name: "#{title}",
+              forCheckpoints: true,
+            }
+            checkpoints: [
+              {
+                checkpointLabel: reply_to_topic,
+                pointsPossible: 10,
+                dates: [{ type: everyone, dueAt: "#{5.days.from_now.iso8601}" }]
+              },
+              {
+                checkpointLabel: reply_to_entry,
+                pointsPossible: 15,
+                dates: [{ type: everyone, dueAt: "#{10.days.from_now.iso8601}" }],
+                repliesRequired: 3
+              }
+            ]
+          GQL
+          result = execute_with_input_with_assignment(query)
+          expect_error(result, "If RQD is enabled, checkpoints cannot be created")
+        end
+      end
+    end
   end
 
   context "sections" do
@@ -1233,7 +1278,7 @@ describe Mutations::CreateDiscussionTopic do
       message = "Lorem ipsum..."
       published = true
       due_at = 5.days.from_now
-      lock_at = 5.days.from_now
+      lock_at = 12.days.from_now
       unlock_at = 2.days.from_now
 
       query = <<~GQL
@@ -1256,7 +1301,7 @@ describe Mutations::CreateDiscussionTopic do
           {
             checkpointLabel: reply_to_entry,
             pointsPossible: 15,
-            dates: [{ type: everyone, dueAt: "#{10.days.from_now.iso8601}" }],
+            dates: [{ type: everyone, dueAt: "#{10.days.from_now.iso8601}", lockAt: "#{lock_at.iso8601}", unlockAt: "#{unlock_at.iso8601}" }],
             repliesRequired: 3
           }
         ]
@@ -1265,10 +1310,18 @@ describe Mutations::CreateDiscussionTopic do
       result = execute_with_input_with_assignment(query)
       expect(result["errors"]).to be_nil
 
-      checkpoint = SubAssignment.find_by(sub_assignment_tag: "reply_to_topic")
+      checkpoint = SubAssignment.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+      checkpoint2 = SubAssignment.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+
       expect(checkpoint.due_at).to be_within(1.second).of due_at
       expect(checkpoint.lock_at).to be_within(1.second).of lock_at
       expect(checkpoint.unlock_at).to be_within(1.second).of unlock_at
+      expect(checkpoint2.lock_at).to be_within(1.second).of lock_at
+      expect(checkpoint2.unlock_at).to be_within(1.second).of unlock_at
+
+      parent_assignment = Assignment.last
+      expect(parent_assignment.lock_at).to be_within(1.second).of lock_at
+      expect(parent_assignment.unlock_at).to be_within(1.second).of unlock_at
     end
 
     it "successfully creates a discussion topic with checkpoints and CourseSection overrides" do

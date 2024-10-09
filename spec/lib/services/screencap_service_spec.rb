@@ -41,7 +41,7 @@ module Services
       }
     end
 
-    context ".snapshot_url_to_file" do
+    describe ".snapshot_url_to_file" do
       it "calls the provided url" do
         @stub = stub_request(:get, config[:url])
                 .with(query: { url: "https://www.example.com" })

@@ -64,7 +64,7 @@ describe CanvasPandaPub::Client do
 
   describe "generate_token" do
     it "generates a token" do
-      expires = Time.now + 60
+      expires = 1.minute.from_now
       token = @client.generate_token "/foo", true, true, expires
       payload, _ = JSON::JWT.decode(token, "secret")
       expect(payload["keyId"]).to eq("key")

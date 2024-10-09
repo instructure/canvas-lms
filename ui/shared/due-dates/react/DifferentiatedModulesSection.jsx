@@ -21,9 +21,8 @@ import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import ItemAssignToTray, {
-  getEveryoneOption,
-} from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
+import {getEveryoneOption} from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 import {IconEditLine} from '@instructure/ui-icons'
 import _ from 'underscore'
 import {forEach, map} from 'lodash'
@@ -96,14 +95,14 @@ const DifferentiatedModulesSection = ({
 
   const stagedCardsRef = useRef(stagedCards)
 
-  const setStagedCards = (cards) => {
+  const setStagedCards = cards => {
     stagedCardsRef.current = cards
     setStagedCardsInner(cards)
   }
 
   const stagedOverridesRef = useRef(stagedOverrides)
 
-  const setStagedOverrides = (overrides) => {
+  const setStagedOverrides = overrides => {
     stagedOverridesRef.current = overrides
     setStagedOverridesInner(overrides)
   }
@@ -270,7 +269,12 @@ const DifferentiatedModulesSection = ({
     let preSaved = stagedOverridesRef.current.filter(o =>
       preSavedOverrides.find(override => o.stagedOverrideId === override.stagedOverrideId)
     )
-    const deletedOverrides = preSavedOverrides.filter(o => stagedOverridesRef.current.find(override => o.stagedOverrideId === override.stagedOverrideId) === undefined)
+    const deletedOverrides = preSavedOverrides.filter(
+      o =>
+        stagedOverridesRef.current.find(
+          override => o.stagedOverrideId === override.stagedOverrideId
+        ) === undefined
+    )
     preSaved = [...preSaved, ...deletedOverrides]
     const defaultState = getParsedOverrides(preSaved, checkPoint)
     const checkPointOverrides = getAllOverridesFromCards(defaultState)
@@ -284,7 +288,7 @@ const DifferentiatedModulesSection = ({
     const newCard = CardActions.handleAssigneeAdd({}, [], cardId, {})[0]
     delete newCard.student_ids
     newCard.draft = true
-    newCard.index = cards[cards.length -1].index + 1
+    newCard.index = cards[cards.length - 1].index + 1
     const oldOverrides = getAllOverridesFromCards(stagedCardsRef.current).filter(
       card =>
         card.course_section_id ||
@@ -302,7 +306,9 @@ const DifferentiatedModulesSection = ({
     delete newStagedCards[cardId]
     setStagedCards(newStagedCards)
 
-    const newStagedOverrides = stagedOverridesRef.current.filter(override => override.rowKey.toString() !== cardId)
+    const newStagedOverrides = stagedOverridesRef.current.filter(
+      override => override.rowKey.toString() !== cardId
+    )
     setStagedOverrides(newStagedOverrides)
   }
 
@@ -317,13 +323,13 @@ const DifferentiatedModulesSection = ({
   }
 
   const addOverride = () => {
-    const cardsCount = cards[cards.length -1].index + 1
+    const cardsCount = cards[cards.length - 1].index + 1
     generateCard(cardsCount)
   }
 
   const handleChange = (cardId, newAssignee, deletedAssignees) => {
     // Cards without assignees are emty objects
-    // ui/shared/context-modules/differentiated-modules/react/Item/ItemAssignToTray.tsx
+    // ui/shared/context-modules/differentiated-modules/react/Item/ItemAssignToManager.tsx
     if (Object.keys(newAssignee).length > 0) {
       handleAssigneeAddition(cardId, newAssignee)
     }
@@ -541,7 +547,7 @@ const DifferentiatedModulesSection = ({
         </Link>
       </View>
       {shouldRenderImportantDates && importantDatesCheckbox()}
-      <ItemAssignToTray
+      <ItemAssignToManager
         open={open}
         onClose={handleClose}
         onDismiss={handleDismiss}

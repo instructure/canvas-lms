@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback} from 'react'
+import React, {useCallback, useState} from 'react'
 import classNames from 'classnames'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {getArrowNext, getArrowPrev} from '../../../../utils'
 
 import {iconMap} from '../../../../assets/user-icons'
 
@@ -32,8 +33,11 @@ const I18n = useI18nScope('block-editor/icon-block')
 type IconPickerProps = {
   iconName?: string
   onSelect: (iconName: string) => void
+  onClose: () => void
 }
-const IconPicker = ({iconName, onSelect}: IconPickerProps) => {
+const IconPicker = ({iconName, onSelect, onClose}: IconPickerProps) => {
+  const [arrowNext] = useState(getArrowNext())
+  const [arrowPrev] = useState(getArrowPrev())
   const handleSelectIcon = useCallback(
     (newIconName: string) => {
       onSelect(newIconName)
@@ -43,11 +47,23 @@ const IconPicker = ({iconName, onSelect}: IconPickerProps) => {
 
   const handleKey = useCallback(
     (event: React.KeyboardEvent, newIconName: string) => {
+      if (
+        ['Enter', 'Escape', 'ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'].includes(event.key)
+      ) {
+        event.stopPropagation()
+        event.preventDefault()
+      }
       if (event.key === 'Enter') {
         handleSelectIcon(newIconName)
+      } else if (event.key === 'Escape') {
+        onClose()
+      } else if (arrowNext.includes(event.key)) {
+        ;(event.currentTarget.nextElementSibling as HTMLElement)?.focus()
+      } else if (arrowPrev.includes(event.key)) {
+        ;(event.currentTarget.previousElementSibling as HTMLElement)?.focus()
       }
     },
-    [handleSelectIcon]
+    [arrowNext, arrowPrev, handleSelectIcon, onClose]
   )
 
   const renderNoIcon = () => {

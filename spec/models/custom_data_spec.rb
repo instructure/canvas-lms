@@ -23,7 +23,7 @@ describe CustomData do
     custom_data_model
   end
 
-  context "#get_data" do
+  describe "#get_data" do
     it "returns the same data that was set" do
       str = "lol hi"
       @custom_data.set_data(nil, str)
@@ -53,19 +53,14 @@ describe CustomData do
     end
   end
 
-  context "#set_data" do
+  describe "#set_data" do
     it "raises a WriteConflict when the requested scope is invalid" do
       @custom_data.set_data("kewl/skope", "ohai")
       expect { @custom_data.set_data("kewl/skope/plus/more", "bad idea dood") }.to raise_error(CustomData::WriteConflict)
     end
-
-    it "is able to write legacy WeakParameters data" do
-      @custom_data.set_data("scope", WeakParameters.new({}))
-      @custom_data.save!
-    end
   end
 
-  context "#delete_data" do
+  describe "#delete_data" do
     it "deletes values" do
       @custom_data.set_data(nil, { "a" => 1, "b" => 2, "c" => 3 })
       expect(@custom_data.delete_data("a")).to be 1

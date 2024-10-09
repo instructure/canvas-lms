@@ -19,7 +19,7 @@
 
 module SIS
   describe CourseImporter do
-    context "#add_course" do
+    describe "#add_course" do
       it "republishes course paces if appropriate" do
         @account = Account.default
         @account.enable_feature!(:course_paces)

@@ -23,6 +23,7 @@ import {responsiveQuerySizes} from '../../../utils'
 import {ThreadingToolbar} from '../ThreadingToolbar'
 
 jest.mock('../../../utils')
+jest.mock('../../../hooks/useSpeedGrader', () => jest.fn(() => false))
 
 beforeAll(() => {
   window.matchMedia = jest.fn().mockImplementation(() => {
@@ -42,7 +43,7 @@ beforeEach(() => {
   }))
 })
 
-describe('PostToolbar', () => {
+describe('ThreadingToolbar', () => {
   it('renders "Go to Reply" button when filter is set to unread', () => {
     const {getByText} = render(
       <ThreadingToolbar searchTerm="" filter="unread">

@@ -55,6 +55,16 @@ module Importers
       else
         item ||= Rubric.where(context_id: context, context_type: context.class.to_s, id: hash[:id]).first
         item ||= Rubric.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
+
+        # avoid override a rubric used for grading
+        if item&.rubric_assessments&.any?
+          return migration.add_import_warning(
+            t("#migration.rubric_type", "Rubric"),
+            hash[:title],
+            I18n.t("A rubric that has been used for grading cannot be overwritten.")
+          )
+        end
+
         item ||= Rubric.new(context:)
         item.migration_id = hash[:migration_id]
         item.workflow_state = "active" if item.deleted?
@@ -134,8 +144,12 @@ module Importers
     end
 
     def self.track_metrics(migration)
+      return unless migration.migration_settings[:is_copy_to]
+
       if migration.migration_settings[:associate_with_assignment_id].present?
         InstStatsd::Statsd.increment("content_migration.rubrics.associate_with_assignment")
+      else
+        InstStatsd::Statsd.increment("content_migration.rubrics.course_copy")
       end
     end
   end

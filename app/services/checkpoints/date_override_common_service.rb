@@ -26,7 +26,13 @@ class Checkpoints::DateOverrideCommonService < ApplicationService
 
   def call
     @overrides.each do |override|
-      set_type = override.fetch(:set_type) { raise Checkpoints::SetTypeRequiredError, "set_type is required, but was not provided" }
+      set_type = override.fetch(:set_type, nil)
+
+      # If set_type is nil and override has an id, fetch the set_type from the checkpoint
+      set_type = @checkpoint.assignment_overrides.find(override[:id]).set_type if set_type.nil? && override[:id]
+
+      raise Checkpoints::SetTypeRequiredError, "set_type is required, but was not provided" if set_type.nil?
+
       service = services.fetch(set_type) { |key| raise Checkpoints::SetTypeNotSupportedError, "set_type of '#{key}' not supported. Supported types: #{services.keys}" }
       service.call(checkpoint: @checkpoint, override:)
     end

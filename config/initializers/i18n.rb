@@ -141,10 +141,10 @@ if ENV["LOLCALIZE"]
 end
 
 module I18nUtilities
-  def before_label(text_or_key, default_value = nil, *args)
+  def before_label(text_or_key, default_value = nil, *)
     if default_value
       text_or_key = "labels.#{text_or_key}" unless text_or_key.to_s.start_with?("#")
-      text_or_key = respond_to?(:t) ? t(text_or_key, default_value, *args) : I18n.t(text_or_key, default_value, *args)
+      text_or_key = respond_to?(:t) ? t(text_or_key, default_value, *) : I18n.t(text_or_key, default_value, *)
     end
     I18n.t("#before_label_wrapper", "%{text}:", text: text_or_key)
   end
@@ -359,7 +359,7 @@ ActiveRecord::Base.class_eval do
       if options[:allow_nil] && !options[:allow_empty]
         before_validation do |record|
           args.each do |field|
-            record.write_attribute(field, nil) if record.read_attribute(field) == ""
+            record[field] = nil if record[field] == ""
           end
         end
       end

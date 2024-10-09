@@ -28,17 +28,18 @@ module Types
 
     global_id_field :id
 
-    field :title, String, null: true
     field :is_last, Boolean, null: false
+    field :title, String, null: true
     def is_last
       object.last?
     end
 
-    field :start_date, DateTimeType, null: true
-    field :end_date, DateTimeType, null: true
     field :close_date, DateTimeType, <<~MD, null: true
       assignments can only be graded before the grading period closes
     MD
+    field :end_date, DateTimeType, null: true
+    field :is_closed, Boolean, null: false
+    field :start_date, DateTimeType, null: true
 
     field :weight, Float, <<~MD, null: true
       used to calculate how much the assignments in this grading period

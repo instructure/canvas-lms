@@ -25,17 +25,41 @@ describe('doFetchApi', () => {
     fetchMock.restore()
   })
 
-  it('fetches and resolves with json results', () => {
+  it('fetches and resolves with json results', async () => {
     const path = '/api/v1/blah'
-    const response = {key: 'value'}
+    const response = {
+      status: 200,
+      body: '{"key":"value","locale":"en-US"}',
+      headers: {'Content-Type': 'application/json; charset=utf-8'},
+    }
     fetchMock.mock(`path:${path}`, response)
-    return expect(doFetchApi({path})).resolves.toMatchObject({json: {key: 'value'}})
+    const result = await doFetchApi({path})
+    expect(result).toMatchObject({json: {key: 'value', locale: 'en-US'}})
   })
 
-  it('resolves json to undefined when response is empty', () => {
+  it('fetches and resolves with plain text results', async () => {
     const path = '/api/v1/blah'
-    fetchMock.mock(`path:${path}`, 200)
-    return expect(doFetchApi({path})).resolves.toMatchObject({json: undefined})
+    const response = {
+      status: 200,
+      body: 'just returns a string',
+      headers: {'Content-Type': 'text/plain'},
+    }
+    fetchMock.mock(`path:${path}`, response)
+    const result = await doFetchApi({path})
+    expect(result.json).toBeUndefined()
+    expect(result.text).toBe('just returns a string')
+  })
+
+  it('resolves json to undefined when response body is empty', async () => {
+    const path = '/api/v1/blah'
+    const response = {
+      status: 200,
+      body: '', // empty JSON
+      headers: {'Content-Type': 'application/json; charset=utf-8'},
+    }
+    fetchMock.mock(`path:${path}`, response)
+    const result = await doFetchApi({path})
+    expect(result.json).toBeUndefined()
   })
 
   it('resolve includes response', () => {
@@ -62,10 +86,11 @@ describe('doFetchApi', () => {
     })
   })
 
-  it('link is undefined when there is no link header', () => {
+  it('returns undefined link when there is no link header', async () => {
     const path = '/api/v1/blah'
     fetchMock.mock(`path:${path}`, 200)
-    return expect(doFetchApi({path})).resolves.toMatchObject({link: undefined})
+    const result = await doFetchApi({path})
+    expect(result.link).toBeUndefined()
   })
 
   it('rejects on network error', () => {
@@ -98,32 +123,44 @@ describe('doFetchApi', () => {
   it('passes default headers, headers, body, and fetch options', () => {
     const path = '/api/v1/blah'
     fetchMock.mock(`path:${path}`, 200)
-    const headers = {foo: 'bar', baz: 'bing'}
+    const headers = new Headers({foo: 'bar', baz: 'bing'})
     document.cookie = '_csrf_token=the_token'
     doFetchApi({path, headers, method: 'POST', body: 'the body', fetchOpts: {additional: 'option'}})
     const [, fetchOptions] = fetchMock.lastCall()
-    expect(fetchOptions).toEqual({
+    expect(fetchOptions).toMatchObject({
       method: 'POST',
       body: 'the body',
       credentials: 'same-origin',
-      headers: {
-        'X-CSRF-Token': 'the_token',
-        Accept: expect.stringMatching(/application\/json\+canvas-string-ids/),
-        'X-Requested-With': 'XMLHttpRequest',
-        foo: 'bar',
-        baz: 'bing',
-      },
       additional: 'option',
+    })
+    expect(Object.fromEntries(fetchOptions.headers.entries())).toEqual({
+      'x-csrf-token': 'the_token',
+      accept: expect.stringMatching(/application\/json\+canvas-string-ids/),
+      'x-requested-with': 'XMLHttpRequest',
+      foo: 'bar',
+      baz: 'bing',
     })
   })
 
-  it('converts body object to string body and sets content-type', () => {
+  it('does not allow sneaking in headers via fetchOpts', async () => {
+    const path = '/api/v1/blah'
+    const response = {key: 'value'}
+    fetchMock.mock(`path:${path}`, response)
+    const headers = new Headers({foo: 'bar'})
+    const fetchOpts = {headers: {baz: 'bing'}}
+    doFetchApi({path, headers, fetchOpts})
+    const [, fetchOptions] = fetchMock.lastCall()
+    expect(fetchOptions.headers.has('baz')).toBe(false)
+    expect(fetchOptions.headers.get('foo')).toBe('bar')
+  })
+
+  it('converts body object to string body and overrides content-type to JSON', () => {
     const path = '/api/v1/blah'
     fetchMock.mock(`path:${path}`, 200)
-    doFetchApi({path, body: {the: 'body'}})
+    doFetchApi({path, body: {the: 'body'}, headers: {'Content-Type': 'application/octet-stream'}})
     const [, fetchOptions] = fetchMock.lastCall()
     expect(JSON.parse(fetchOptions.body)).toEqual({the: 'body'})
-    expect(fetchOptions.headers['Content-Type']).toBe('application/json')
+    expect(fetchOptions.headers.get('content-type')).toBe('application/json')
   })
 
   it('handles string body correctly without altering it or setting Content-Type', () => {
@@ -133,11 +170,22 @@ describe('doFetchApi', () => {
     doFetchApi({path, body})
     const [, fetchOptions] = fetchMock.lastCall()
     expect(fetchOptions.body).toBe(body)
-    expect(fetchOptions.headers['Content-Type']).toBeUndefined()
+    expect(fetchOptions.headers.has('content-type')).toBe(false)
+  })
+
+  it('respects manually-set Content-Type for a text body', () => {
+    const path = '/api/v1/string-body-test'
+    const body = '<p>this is an html string</p>'
+    const headers = {'Content-Type': 'text/html'}
+    fetchMock.mock(`path:${path}`, 200)
+    doFetchApi({path, body, headers})
+    const [, fetchOptions] = fetchMock.lastCall()
+    expect(fetchOptions.body).toBe(body)
+    expect(fetchOptions.headers.get('content-type')).toBe('text/html')
   })
 
   describe('handles FormData correctly', () => {
-    it('does not stringify FormData and does not set Content-Type to application/json', () => {
+    it('does not stringify FormData and does not set a Content-Type', () => {
       const path = '/api/v1/formdata-test'
       fetchMock.mock(`path:${path}`, 200)
       const formData = new FormData()
@@ -145,7 +193,7 @@ describe('doFetchApi', () => {
       doFetchApi({path, body: formData})
       const [, fetchOptions] = fetchMock.lastCall()
       expect(fetchOptions.body).toBeInstanceOf(FormData)
-      expect(fetchOptions.headers['Content-Type']).toBeUndefined()
+      expect(fetchOptions.headers.has('content-type')).toBe(false)
     })
 
     it('sends FormData along with other headers correctly', () => {
@@ -157,8 +205,8 @@ describe('doFetchApi', () => {
       doFetchApi({path, body: formData, headers})
       const [, fetchOptions] = fetchMock.lastCall()
       expect(fetchOptions.body).toBeInstanceOf(FormData)
-      expect(fetchOptions.headers.foo).toBe('bar')
-      expect(fetchOptions.headers['Content-Type']).toBeUndefined()
+      expect(fetchOptions.headers.get('foo')).toBe('bar')
+      expect(fetchOptions.headers.has('content-type')).toBe(false)
     })
 
     it('handles FormData with no additional headers', () => {
@@ -181,10 +229,10 @@ describe('doFetchApi', () => {
       doFetchApi({path, body: formData})
       const [, fetchOptions] = fetchMock.lastCall()
       expect(fetchOptions.body).toBeInstanceOf(FormData)
-      expect(fetchOptions.headers['Content-Type']).toBeUndefined()
+      expect(fetchOptions.headers.has('content-type')).toBe(false)
     })
 
-    it('respects manually set Content-Type header when using FormData', () => {
+    it('removes manually set Content-Type header when using FormData', () => {
       const path = '/api/v1/formdata-custom-content-type'
       fetchMock.mock(`path:${path}`, 200)
       const formData = new FormData()
@@ -193,7 +241,7 @@ describe('doFetchApi', () => {
       doFetchApi({path, body: formData, headers})
       const [, fetchOptions] = fetchMock.lastCall()
       expect(fetchOptions.body).toBeInstanceOf(FormData)
-      expect(fetchOptions.headers['Content-Type']).toBe('multipart/form-data')
+      expect(fetchOptions.headers.has('content-type')).toBe(false)
     })
 
     it('handles FormData with empty entries correctly', () => {
@@ -205,7 +253,7 @@ describe('doFetchApi', () => {
       doFetchApi({path, body: formData})
       const [, fetchOptions] = fetchMock.lastCall()
       expect(fetchOptions.body).toBeInstanceOf(FormData)
-      expect(fetchOptions.headers['Content-Type']).toBeUndefined()
+      expect(fetchOptions.headers.has('content-type')).toBe(false)
     })
   })
 })

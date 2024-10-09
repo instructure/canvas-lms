@@ -171,7 +171,7 @@ class CoursePace < ActiveRecord::Base
               assignment = content_tag.assignment
               next unless assignment
 
-              due_at = CanvasTime.fancy_midnight(dates[course_pace_module_item.id].in_time_zone).in_time_zone("UTC")
+              due_at = CanvasTime.fancy_midnight(dates[course_pace_module_item.id].in_time_zone).utc
               user_id = enrollment.user_id
 
               # Check for an old override

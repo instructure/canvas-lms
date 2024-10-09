@@ -1261,6 +1261,7 @@ describe "RCE next tests", :ignore_js_errors do
       end
 
       it "displays lti icon with a tool enabled for the course", :ignore_js_errors do
+        skip("INTEROP-8846")
         page_title = "Page1"
         create_wiki_page_with_embedded_image(page_title)
 
@@ -1272,6 +1273,7 @@ describe "RCE next tests", :ignore_js_errors do
       # we are now only using the menu button regardless of presence/absence
       # of mru data in local storage
       it "displays the lti tool modal", :ignore_js_errors do
+        skip("INTEROP-8846")
         page_title = "Page1"
         create_wiki_page_with_embedded_image(page_title)
 
@@ -1290,6 +1292,7 @@ describe "RCE next tests", :ignore_js_errors do
       end
 
       it "displays the lti tool modal, reprise", :ignore_js_errors do
+        skip("INTEROP-8846")
         page_title = "Page1"
         create_wiki_page_with_embedded_image(page_title)
 

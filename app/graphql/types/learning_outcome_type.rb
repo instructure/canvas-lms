@@ -58,9 +58,9 @@ module Types
 
     field :context_id, ID, null: true
     field :context_type, String, null: true
-    field :title, String, null: false
     field :description, String, null: true
     field :display_name, String, null: true
+    field :title, String, null: false
     field :vendor_guid, String, null: true
 
     field :calculation_method, String, null: true

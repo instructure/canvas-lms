@@ -23,6 +23,10 @@ class CanvadocSessionsController < ApplicationController
   include CoursesHelper
   include HmacHelper
 
+  def services_jwt_auth_allowed
+    params[:action] == "show" && Account.site_admin.feature_enabled?(:rce_linked_file_urls)
+  end
+
   def create
     submission_attempt, submission_id = params.require([:submission_attempt, :submission_id])
 
@@ -145,7 +149,7 @@ class CanvadocSessionsController < ApplicationController
       if blob["annotation_context"]
         annotation_context_id = if ApplicationController.test_cluster?
                                   # since Canvas test environments are often configured to point at production
-                                  # DocViewer environments, this prevents making an annotation on Canavs beta and
+                                  # DocViewer environments, this prevents making an annotation on Canvas beta and
                                   # having it show up on Canvas prod.  See CAS-1551
                                   # TODO: a proper Canvas/DocViewer environment pairing and beta refresh from prod on DocViewer
                                   blob["annotation_context"] + "-#{ApplicationController.test_cluster_name}"

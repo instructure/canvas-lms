@@ -1085,6 +1085,7 @@ const locale = {
   },
   "styles_2aa721ef": { "message": "Styles" },
   "submit_a3cc6859": { "message": "Envoyer" },
+  "submitting_b90fac62": { "message": "Envoi en cours..." },
   "subscript_59744f96": { "message": "Description" },
   "subset_19c1a92f": { "message": "Sous-ensemble" },
   "subset_strict_8d8948d6": { "message": "Sous-ensemble (Strict)" },

@@ -23,6 +23,7 @@ import CommonMigratorControls from '../common_migrator_controls'
 
 const onSubmit = jest.fn()
 const onCancel = jest.fn()
+const setIsQuestionBankDisabled = jest.fn()
 
 const renderComponent = (overrideProps?: any) =>
   render(<CommonMigratorControls onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
@@ -210,5 +211,18 @@ describe('CommonMigratorControls', () => {
     expect(
       getByRole('checkbox', {name: /Overwrite assessment content with matching IDs/})
     ).toBeDisabled()
+  })
+
+  it('call setIsQuestionBankDisabled after "Import existing quizzes as New Quizzes" checked', async () => {
+    renderComponent({canImportAsNewQuizzes: true, setIsQuestionBankDisabled})
+
+    await userEvent.click(
+      screen.getByRole('checkbox', {name: /Import existing quizzes as New Quizzes/})
+    )
+    expect(setIsQuestionBankDisabled).toHaveBeenCalledWith(true)
+    await userEvent.click(
+      screen.getByRole('checkbox', {name: /Import existing quizzes as New Quizzes/})
+    )
+    expect(setIsQuestionBankDisabled).toHaveBeenCalledWith(false)
   })
 })

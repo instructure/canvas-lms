@@ -128,6 +128,19 @@ iframe.tool_launch {
   max-width: 100%;
 }
 
+@media screen and (min-height: 451px) and (max-height: 600px) {
+  iframe.tool_launch#external_tool_button_frame {
+    min-height: 300px !important;
+  }
+}
+
+@media screen and (max-height: 450px) {
+  iframe.tool_launch#external_tool_button_frame {
+    min-height: 200px !important;
+  }
+}
+
+
 .lti_tool_icon {
   margin-right: 0.25rem;
   max-width: 1.2rem;

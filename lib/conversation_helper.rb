@@ -20,13 +20,13 @@
 
 module ConversationHelper
   def set_root_account_ids
-    write_attribute(:root_account_ids, conversation&.root_account_ids&.sort&.join(","))
+    self["root_account_ids"] = conversation&.root_account_ids&.sort&.join(",")
   end
 
   # NOTE: all ids are relative to the birth shard, if you are going to consume these you should do
   # `Shard.birth.activate do`
   def root_account_ids
-    (read_attribute(:root_account_ids) || "").split(",").map(&:to_i).sort
+    (self["root_account_ids"] || "").split(",").map(&:to_i).sort
   end
 
   def root_account_ids=(ids)
@@ -35,7 +35,7 @@ module ConversationHelper
       ids = ids.split(",").map(&:to_i)
     end
     # ids must be sorted for the scope to work
-    write_attribute(:root_account_ids, ids&.sort&.join(","))
+    super(ids&.sort&.join(","))
   end
 
   def global_root_account_ids

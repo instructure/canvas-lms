@@ -413,14 +413,14 @@ class DeveloperKey < ActiveRecord::Base
   def create_lti_registration
     return unless is_lti_key?
     return if skip_lti_sync
-    return if tool_configuration.blank?
+    return if lti_registration.present?
 
     lti_registration = Lti::Registration.new(developer_key: self,
                                              account: account || Account.site_admin,
                                              created_by: current_user,
                                              updated_by: current_user,
                                              admin_nickname: name,
-                                             name: tool_configuration.settings["title"],
+                                             name: tool_configuration&.settings&.dig("title") || "Unnamed tool",
                                              workflow_state:,
                                              ims_registration:,
                                              skip_lti_sync: true)
@@ -436,7 +436,7 @@ class DeveloperKey < ActiveRecord::Base
       return
     end
 
-    lti_registration.update!(name: tool_configuration.settings["title"],
+    lti_registration.update!(name: tool_configuration&.settings&.dig("title") || "Unnamed tool",
                              admin_nickname: name,
                              updated_by: current_user,
                              workflow_state:,
@@ -576,7 +576,7 @@ class DeveloperKey < ActiveRecord::Base
       ContextExternalTool.where(id: tool_ids).preload(:context).each do |tool|
         next unless tool.context
 
-        tool_configuration.new_external_tool(
+        lti_registration.new_external_tool(
           tool.context,
           existing_tool: tool
         ).save

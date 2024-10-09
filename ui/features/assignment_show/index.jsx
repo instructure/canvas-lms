@@ -38,11 +38,12 @@ import DirectShareUserModal from '@canvas/direct-sharing/react/components/Direct
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import {setupSubmitHandler} from '@canvas/assignments/jquery/reuploadSubmissionsHelper'
 import ready from '@instructure/ready'
-import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import {captureException} from '@sentry/browser'
 import {RubricAssignmentContainer} from '@canvas/rubrics/react/RubricAssignment'
 import {mapRubricUnderscoredKeysToCamelCase} from '@canvas/rubrics/react/utils'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
+import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -52,7 +53,8 @@ ready(() => {
   const comments = document.getElementsByClassName("comment_content")
   Array.from(comments).forEach((comment) => {
     const content = comment.dataset.content
-    comment.innerHTML = sanitizeHtml(content)
+    const formattedComment = containsHtmlTags(content) ? sanitizeHtml(content) : formatMessage(content)
+    comment.innerHTML = formattedComment
   })
 
   const lockManager = new LockManager()
@@ -212,7 +214,7 @@ $(() => {
 
 function renderItemAssignToTray(open, returnFocusTo, itemProps) {
   ReactDOM.render(
-    <ItemAssignToTray
+    <ItemAssignToManager
       open={open}
       onClose={() => {
         ReactDOM.unmountComponentAtNode(document.getElementById('assign-to-mount-point'))

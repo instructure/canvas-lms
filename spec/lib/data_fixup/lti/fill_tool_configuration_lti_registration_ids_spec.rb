@@ -26,13 +26,14 @@ describe DataFixup::Lti::FillToolConfigurationLtiRegistrationIds do
   let(:account) { account_model }
 
   context "when there are developer keys with tool configurations" do
+    let(:registration) { Lti::Registration.last }
+
     before do
-      dev_key_model_1_3
-      tool_configuration
+      dev_key_model_1_3(account:)
+      registration.manual_configuration.lti_registration = nil
     end
 
     it "puts the tool_configuration_id as the registration's manual_configuration_id" do
-      registration = Lti::Registration.last
       expect(registration.manual_configuration).to be_nil
       described_class.run
       expect(registration.reload.manual_configuration)
@@ -43,8 +44,8 @@ describe DataFixup::Lti::FillToolConfigurationLtiRegistrationIds do
   context "when there are developer keys without tool configurations" do
     let!(:developer_key) do
       dk = dev_key_model_1_3
-      dk.tool_configuration.destroy!
-      dk
+      dk.tool_configuration.delete
+      dk.reload
     end
 
     it "skips developer keys that don't have a tool configuration" do
@@ -57,7 +58,7 @@ describe DataFixup::Lti::FillToolConfigurationLtiRegistrationIds do
     let(:developer_key) do
       dk = dev_key_model_1_3
       dk.lti_registration.destroy!
-      dk
+      dk.reload
     end
 
     it "skips developer keys that don't have lti_registrations" do

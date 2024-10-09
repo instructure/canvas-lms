@@ -21,11 +21,11 @@
 class Mutations::UpdateLearningOutcomeGroup < Mutations::BaseMutation
   graphql_name "UpdateLearningOutcomeGroup"
 
-  argument :id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("LearningOutcomeGroup")
-  argument :title, String, required: false
   argument :description, String, required: false
-  argument :vendor_guid, String, required: false
+  argument :id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("LearningOutcomeGroup")
   argument :parent_outcome_group_id, ID, required: false
+  argument :title, String, required: false
+  argument :vendor_guid, String, required: false
 
   field :learning_outcome_group, Types::LearningOutcomeGroupType, null: true
 

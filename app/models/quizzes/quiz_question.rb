@@ -121,13 +121,12 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     data = AssessmentQuestion.parse_question(data, assessment_question)
     data[:name] = data[:question_name]
 
-    write_attribute(:question_data, data.to_hash)
+    super(data.to_hash)
   end
 
   def question_data
-    if (data = read_attribute(:question_data)) && data.instance_of?(Hash)
-      write_attribute(:question_data, data.with_indifferent_access)
-      data = read_attribute(:question_data)
+    if (data = super) && data.instance_of?(Hash)
+      data = self["question_data"] = data.with_indifferent_access
     end
 
     unless data.is_a?(Quizzes::QuizQuestion::QuestionData)
@@ -171,7 +170,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   def update_assessment_question!(aq, quiz_group_id, duplicate_index)
     if assessment_question_version.blank? || assessment_question_version < aq.version_number
       self.assessment_question = aq
-      write_attribute(:question_data, aq.question_data)
+      self["question_data"] = aq.question_data
     end
     self.quiz_group_id = quiz_group_id
     self.duplicate_index = duplicate_index
@@ -200,7 +199,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     # if options[:old_context] && options[:new_context]
     #   data = Quizzes::QuizQuestion.migrate_question_hash(data, options)
     # end
-    dup.write_attribute(:question_data, data)
+    dup["question_data"] = data
     dup.quiz_id = quiz.id
     dup
   end

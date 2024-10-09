@@ -62,7 +62,7 @@ class MediaObject < ActiveRecord::Base
 
   def user_entered_title=(val)
     @push_user_title = true
-    write_attribute(:user_entered_title, val)
+    super
   end
 
   def update_title_on_kaltura_later
@@ -362,7 +362,7 @@ class MediaObject < ActiveRecord::Base
   end
 
   def data
-    read_or_initialize_attribute(:data, {})
+    self["data"] ||= {}
   end
 
   def viewed!

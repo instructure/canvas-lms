@@ -245,10 +245,10 @@ module PostgreSQLAdapterExtensions
     super
   end
 
-  def add_column(table_name, column_name, type, if_not_exists: false, **options)
+  def add_column(table_name, column_name, type, if_not_exists: false, **)
     return if if_not_exists && column_exists?(table_name, column_name)
 
-    super(table_name, column_name, type, **options)
+    super(table_name, column_name, type, **)
   end
 
   def remove_column(table_name, column_name, type = nil, if_exists: false, **options)
@@ -499,9 +499,9 @@ module SchemaStatementsExtensions
     super + [:delay_validation, :foreign_key]
   end
 
-  def add_column_for_alter(table_name, column_name, type, **options)
+  def add_column_for_alter(table_name, column_name, type, **)
     td = create_table_definition(table_name)
-    cd = td.new_column_definition(column_name, type, **options)
+    cd = td.new_column_definition(column_name, type, **)
     schema = schema_creation
     schema.set_table_context(table_name)
     schema.accept(ActiveRecord::ConnectionAdapters::AddColumnDefinition.new(cd))
@@ -515,10 +515,10 @@ module IndexDefinitionExtensions
     klass.attr_reader :replica_identity
   end
 
-  def initialize(*args, replica_identity: false, **kwargs)
+  def initialize(*, replica_identity: false, **)
     @replica_identity = replica_identity
 
-    super(*args, **kwargs)
+    super(*, **)
   end
 
   def defined_for?(*, replica_identity: nil, **)

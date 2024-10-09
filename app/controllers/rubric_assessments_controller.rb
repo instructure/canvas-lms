@@ -227,7 +227,7 @@ class RubricAssessmentsController < ApplicationController
     value_to_boolean(params[:final]) && @association_object.permits_moderation?(@current_user)
   end
 
-  def ensure_adjudication_possible(provisional:, &block)
+  def ensure_adjudication_possible(provisional:, &)
     # Non-assignment association objects crash if they're passed into this
     # controller, since find_asset_for_assessment only exists on assignments.
     # The check here thus serves only to make sure the crash doesn't happen on
@@ -238,7 +238,7 @@ class RubricAssessmentsController < ApplicationController
       grader: @current_user,
       provisional:,
       occupy_slot: true,
-&block
+      &
     )
   end
 end

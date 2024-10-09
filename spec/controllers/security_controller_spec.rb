@@ -152,6 +152,7 @@ RSpec.describe SecurityController, type: :request do
         expect(parsed_body["issuer"]).to eq "https://canvas.instructure.com"
         expect(parsed_body["authorization_endpoint"]).to eq "http://canvas.instructure.com/api/lti/authorize_redirect"
         expect(parsed_body["registration_endpoint"]).to eq "http://localhost/api/lti/registrations"
+        expect(parsed_body["scopes_supported"]).to include(*["openid"].union(TokenScopes::LTI_SCOPES.keys))
         lti_platform_configuration = parsed_body["https://purl.imsglobal.org/spec/lti-platform-configuration"]
         expect(lti_platform_configuration["product_family_code"]).to eq "canvas"
         expect(lti_platform_configuration["https://canvas.instructure.com/lti/account_name"]).to eq "Shard 2 Account"

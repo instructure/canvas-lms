@@ -82,6 +82,7 @@ export const Footer = ({
               </ConditionalTooltip>
             ) : (
               <Button
+                id="create-icon-button"
                 disabled={disabled}
                 margin="0 0 0 x-small"
                 color="primary"

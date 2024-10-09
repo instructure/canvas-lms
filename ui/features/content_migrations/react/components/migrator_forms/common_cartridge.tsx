@@ -42,6 +42,7 @@ const CommonCartridgeImporter = ({
   const [file, setFile] = useState<File | null>(null)
   const [fileError, setFileError] = useState<boolean>(false)
   const [questionBankError, setQuestionBankError] = useState<boolean>(false)
+  const [isQuestionBankDisabled, setIsQuestionBankDisabled] = useState(false)
   const [questionBankSettings, setQuestionBankSettings] = useState<QuestionBankSettings | null>()
 
   const handleSubmit = useCallback(
@@ -84,7 +85,9 @@ const CommonCartridgeImporter = ({
       <QuestionBankSelector
         onChange={setQuestionBankSettings}
         questionBankError={questionBankError}
-        disable={isSubmitting}
+        disable={isSubmitting || isQuestionBankDisabled}
+        notCompatible={isQuestionBankDisabled}
+        questionBankSettings={questionBankSettings}
       />
       <CommonMigratorControls
         canSelectContent={true}
@@ -95,6 +98,7 @@ const CommonCartridgeImporter = ({
         onSubmit={handleSubmit}
         onCancel={onCancel}
         fileUploadProgress={fileUploadProgress}
+        setIsQuestionBankDisabled={setIsQuestionBankDisabled}
       />
     </>
   )

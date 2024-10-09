@@ -150,9 +150,9 @@ class WikiPage < ActiveRecord::Base
   end
 
   def url
-    return read_attribute(:url) unless Account.site_admin.feature_enabled?(:permanent_page_links)
+    return super unless Account.site_admin.feature_enabled?(:permanent_page_links)
 
-    current_lookup&.slug || read_attribute(:url)
+    current_lookup&.slug || super
   end
 
   def should_create_lookup?
@@ -163,8 +163,8 @@ class WikiPage < ActiveRecord::Base
   def create_lookup
     new_record = id_changed?
     WikiPageLookup.unique_constraint_retry do
-      lookup = wiki_page_lookups.find_by(slug: read_attribute(:url)) unless new_record
-      lookup ||= wiki_page_lookups.build(slug: read_attribute(:url))
+      lookup = wiki_page_lookups.find_by(slug: self["url"]) unless new_record
+      lookup ||= wiki_page_lookups.build(slug: self["url"])
       lookup.save
       # this is kind of circular so we want to avoid triggering callbacks again
       update_column(:current_lookup_id, lookup.id)
@@ -180,7 +180,7 @@ class WikiPage < ActiveRecord::Base
     return if deleted? || Account.site_admin.feature_enabled?(:permanent_page_links)
 
     to_cased_title = ->(string) { string.gsub(/[^\w]+/, " ").gsub(/\b('?[a-z])/) { $1.capitalize }.strip }
-    self.title ||= to_cased_title.call(read_attribute(:url) || "page")
+    self.title ||= to_cased_title.call(self["url"] || "page")
     # TODO: i18n (see wiki.rb)
 
     if self.title == "Front Page" && new_record?
@@ -246,9 +246,9 @@ class WikiPage < ActiveRecord::Base
       while urls.detect { |u| u == "#{base_url}-#{n}" }
         n = n.succ
       end
-      write_attribute url_attribute, "#{base_url}-#{n}"
+      self[url_attribute] = "#{base_url}-#{n}"
     else
-      write_attribute url_attribute, base_url
+      self[url_attribute] = base_url
     end
   end
 
@@ -589,6 +589,7 @@ class WikiPage < ActiveRecord::Base
       copy_title: nil
     }
     opts_with_default = default_opts.merge(opts)
+
     result = WikiPage.new({
                             title: opts_with_default[:copy_title] || get_copy_title(self, t("Copy"), self.title),
                             wiki_id: self.wiki_id,
@@ -599,8 +600,14 @@ class WikiPage < ActiveRecord::Base
                             user_id:,
                             protected_editing:,
                             editing_roles:,
-                            todo_date:
+                            todo_date:,
                           })
+
+    if block_editor
+      block_editor_attributes = { version: block_editor.version, blocks: block_editor.blocks }
+      result.block_editor_attributes = block_editor_attributes
+    end
+
     if assignment && opts_with_default[:duplicate_assignment]
       result.assignment = assignment.duplicate({
                                                  duplicate_wiki_page: false,

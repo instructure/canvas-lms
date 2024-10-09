@@ -1969,7 +1969,7 @@ describe Submission do
     end
   end
 
-  context "#graded_anonymously" do
+  describe "#graded_anonymously" do
     it "saves when grade changed and set explicitly" do
       submission_spec_model
       expect(@submission.graded_anonymously).to be_falsey
@@ -2050,7 +2050,7 @@ describe Submission do
 
       it "sends the correct message when an assignment is turned in on-time" do
         @assignment.workflow_state = "published"
-        @assignment.update(due_at: Time.now + 1000)
+        @assignment.update(due_at: 15.minutes.from_now)
 
         submission_spec_model(user: @student, submit_homework: true)
         expect(@submission.messages_sent.keys).to eq ["Assignment Submitted"]
@@ -2070,7 +2070,7 @@ describe Submission do
         Notification.where(name: "Assignment Submitted").first
 
         @assignment.workflow_state = "published"
-        @assignment.update(due_at: Time.now + 1000)
+        @assignment.update(due_at: 15.minutes.from_now)
 
         submission_spec_model(user: @student, submit_homework: true)
 
@@ -3603,14 +3603,14 @@ describe Submission do
 
       it "lets students view the turnitin report after the due date if the visibility setting allows it" do
         @assignment.turnitin_settings[:originality_report_visibility] = "after_due_date"
-        @assignment.due_at = Time.now + 1.day
+        @assignment.due_at = 1.day.from_now
         @assignment.save
         @submission.reload
 
         expect(@submission).not_to be_grants_right(@user, nil, :view_turnitin_report)
         expect(@submission.turnitin_report_url("submission_#{@submission.id}", @user)).to be_nil
 
-        @assignment.due_at = Time.now - 1.day
+        @assignment.due_at = 1.day.ago
         @assignment.save
         @submission.reload
         AdheresToPolicy::Cache.clear
@@ -4293,10 +4293,10 @@ describe Submission do
       @assignment.save!
 
       submission = @quiz_submission.submission.reload
-      submission.write_attribute(:submitted_at, @assignment.due_at + 3.days)
+      submission.submitted_at = @assignment.due_at + 3.days
       expect(submission).to be_past_due
 
-      submission.write_attribute(:submitted_at, @assignment.due_at + 30.seconds)
+      submission.submitted_at = @assignment.due_at + 30.seconds
       expect(submission).not_to be_past_due
     end
   end
@@ -5365,7 +5365,7 @@ describe Submission do
   describe "#assign_assessor" do
     def peer_review_assignment
       assignment = @course.assignments.build(title: "Peer review",
-                                             due_at: Time.now - 1.day,
+                                             due_at: 1.day.ago,
                                              points_possible: 5,
                                              submission_types: "online_text_entry")
       assignment.peer_reviews_assigned = true
@@ -7319,23 +7319,23 @@ describe Submission do
     end
 
     it "shows teacher all comments" do
-      comments = @submission.visible_submission_comments_for(@teacher)
+      comments = @submission.reload.visible_submission_comments_for(@teacher)
       expect(comments).to match_array([@student_comment, @teacher_comment, @first_ta_comment])
     end
 
     it "shows ta all comments" do
-      comments = @submission.visible_submission_comments_for(@first_ta)
+      comments = @submission.reload.visible_submission_comments_for(@first_ta)
       expect(comments).to match_array([@student_comment, @teacher_comment, @first_ta_comment])
     end
 
     it "shows student all comments, when submission is posted" do
       @submission.update!(posted_at: Time.zone.now)
-      comments = @submission.visible_submission_comments_for(@student)
+      comments = @submission.reload.visible_submission_comments_for(@student)
       expect(comments).to match_array([@student_comment, @teacher_comment, @first_ta_comment])
     end
 
     it "shows student only their own comment, when submission is unposted" do
-      comments = @submission.visible_submission_comments_for(@student)
+      comments = @submission.reload.visible_submission_comments_for(@student)
       expect(comments).to match_array([@student_comment])
     end
 
@@ -7368,12 +7368,12 @@ describe Submission do
         end
 
         it "shows the submitting student their own comments and any peer review comments" do
-          comments = @submission.visible_submission_comments_for(@student)
+          comments = @submission.reload.visible_submission_comments_for(@student)
           expect(comments).to match_array([@peer_review_comment, @student_comment, @alternate_assessment_comment])
         end
 
         it "shows a peer-reviewing student only their own comments" do
-          comments = @submission.visible_submission_comments_for(@student2)
+          comments = @submission.reload.visible_submission_comments_for(@student2)
           expect(comments).to match_array([@peer_review_comment])
         end
       end
@@ -7384,12 +7384,12 @@ describe Submission do
         end
 
         it "shows the submitting student comments from all users" do
-          comments = @submission.visible_submission_comments_for(@student)
+          comments = @submission.reload.visible_submission_comments_for(@student)
           expect(comments).to match_array([@peer_review_comment, @student_comment, @teacher_comment])
         end
 
         it "shows a peer-reviewing student only their own comments" do
-          comments = @submission.visible_submission_comments_for(@student2)
+          comments = @submission.reload.visible_submission_comments_for(@student2)
           expect(comments).to match_array([@peer_review_comment])
         end
       end
@@ -7414,7 +7414,7 @@ describe Submission do
       end
 
       it "returns comments scoped to that group" do
-        comments = @submission.visible_submission_comments_for(@teacher)
+        comments = @submission.reload.visible_submission_comments_for(@teacher)
         expect(comments).to match_array([@student_comment, @student2_comment])
       end
 
@@ -7444,17 +7444,17 @@ describe Submission do
         end
 
         it "shows a peer reviewer only their own comments" do
-          comments = @submission.visible_submission_comments_for(@student2)
+          comments = @submission.reload.visible_submission_comments_for(@student2)
           expect(comments).to match_array([@peer_review_comment])
         end
 
         it "shows all comments to the submitting student" do
-          comments = @submission.visible_submission_comments_for(@student)
+          comments = @submission.reload.visible_submission_comments_for(@student)
           expect(comments).to match_array([@peer_review_comment, @student_comment, @teacher_comment])
         end
 
         it "shows all comments to a teacher" do
-          comments = @submission.visible_submission_comments_for(@teacher)
+          comments = @submission.reload.visible_submission_comments_for(@teacher)
           expect(comments).to match_array([@peer_review_comment, @student_comment, @teacher_comment])
         end
       end
@@ -7556,7 +7556,7 @@ describe Submission do
       context "when graders can view other graders' comments" do
         context "when grades are unpublished" do
           it "shows final grader all submission comments" do
-            comments = @submission.visible_submission_comments_for(@teacher)
+            comments = @submission.reload.visible_submission_comments_for(@teacher)
             expect(comments).to match_array([
                                               @student_comment,
                                               @first_ta_comment,
@@ -7567,7 +7567,7 @@ describe Submission do
           end
 
           it "shows provisional grader all submission comments" do
-            comments = @submission.visible_submission_comments_for(@first_ta)
+            comments = @submission.reload.visible_submission_comments_for(@first_ta)
             expect(comments).to match_array([
                                               @student_comment,
                                               @first_ta_comment,
@@ -7578,12 +7578,12 @@ describe Submission do
           end
 
           it "shows student only their own comments" do
-            comments = @submission.visible_submission_comments_for(@student)
+            comments = @submission.reload.visible_submission_comments_for(@student)
             expect(comments).to match_array([@student_comment])
           end
 
           it "shows admins all submission comments" do
-            comments = @submission.visible_submission_comments_for(@admin)
+            comments = @submission.reload.visible_submission_comments_for(@admin)
             expect(comments).to match_array([
                                               @student_comment,
                                               @first_ta_comment,
@@ -7602,7 +7602,7 @@ describe Submission do
           end
 
           it "shows final grader all submission comments" do
-            comments = @submission.visible_submission_comments_for(@teacher)
+            comments = @submission.reload.visible_submission_comments_for(@teacher)
             expect(comments.pluck(:comment)).to match_array([
                                                               "Student comment",
                                                               "First Ta comment",
@@ -7613,7 +7613,7 @@ describe Submission do
           end
 
           it "shows provisional grader all submission comments" do
-            comments = @submission.visible_submission_comments_for(@first_ta)
+            comments = @submission.reload.visible_submission_comments_for(@first_ta)
             expect(comments.pluck(:comment)).to match_array([
                                                               "Student comment",
                                                               "First Ta comment",
@@ -7624,13 +7624,13 @@ describe Submission do
           end
 
           it "shows student only their own comments" do
-            comments = @submission.visible_submission_comments_for(@student)
+            comments = @submission.reload.visible_submission_comments_for(@student)
             expect(comments).to match_array([@student_comment])
           end
 
           it "when grades are posted, shows student their own, chosen grader's, and final grader's comments" do
             @assignment.post_submissions
-            comments = @submission.visible_submission_comments_for(@student)
+            comments = @submission.reload.visible_submission_comments_for(@student)
             expect(comments.pluck(:comment)).to match_array([
                                                               "Student comment",
                                                               "First Ta comment",
@@ -7639,7 +7639,7 @@ describe Submission do
           end
 
           it "shows admins all submission comments" do
-            comments = @submission.visible_submission_comments_for(@admin)
+            comments = @submission.reload.visible_submission_comments_for(@admin)
             expect(comments.pluck(:comment)).to match_array([
                                                               "Student comment",
                                                               "First Ta comment",
@@ -7658,7 +7658,7 @@ describe Submission do
 
         context "when grades are unpublished" do
           it "shows final grader all submission comments" do
-            comments = @submission.visible_submission_comments_for(@teacher)
+            comments = @submission.reload.visible_submission_comments_for(@teacher)
             expect(comments).to match_array([
                                               @student_comment,
                                               @first_ta_comment,
@@ -7669,17 +7669,17 @@ describe Submission do
           end
 
           it "shows provisional grader their own and student's" do
-            comments = @submission.visible_submission_comments_for(@second_ta)
+            comments = @submission.reload.visible_submission_comments_for(@second_ta)
             expect(comments.pluck(:comment)).to match_array(["Student comment", "Second Ta comment"])
           end
 
           it "shows student only their own comments" do
-            comments = @submission.visible_submission_comments_for(@student)
+            comments = @submission.reload.visible_submission_comments_for(@student)
             expect(comments).to match_array([@student_comment])
           end
 
           it "shows admins all submission comments" do
-            comments = @submission.visible_submission_comments_for(@admin)
+            comments = @submission.reload.visible_submission_comments_for(@admin)
             expect(comments).to match_array([
                                               @student_comment,
                                               @first_ta_comment,
@@ -7698,7 +7698,7 @@ describe Submission do
           end
 
           it "shows final grader all submission comments" do
-            comments = @submission.visible_submission_comments_for(@teacher)
+            comments = @submission.reload.visible_submission_comments_for(@teacher)
             expect(comments.pluck(:comment)).to match_array([
                                                               "Student comment",
                                                               "First Ta comment",
@@ -7709,7 +7709,7 @@ describe Submission do
           end
 
           it "shows provisional grader their own, student's, chosen grader's, and final grader's comments" do
-            comments = @submission.visible_submission_comments_for(@second_ta)
+            comments = @submission.reload.visible_submission_comments_for(@second_ta)
             expect(comments.pluck(:comment)).to match_array([
                                                               "Student comment",
                                                               "First Ta comment",
@@ -7719,13 +7719,13 @@ describe Submission do
           end
 
           it "shows student only their own comments" do
-            comments = @submission.visible_submission_comments_for(@student)
+            comments = @submission.reload.visible_submission_comments_for(@student)
             expect(comments).to match_array([@student_comment])
           end
 
           it "when grades are posted, shows student own, chosen grader's, and final grader's comments" do
             @assignment.post_submissions
-            comments = @submission.visible_submission_comments_for(@student)
+            comments = @submission.reload.visible_submission_comments_for(@student)
             expect(comments.pluck(:comment)).to match_array([
                                                               "Student comment",
                                                               "First Ta comment",
@@ -7734,7 +7734,7 @@ describe Submission do
           end
 
           it "shows admins all submission comments" do
-            comments = @submission.visible_submission_comments_for(@admin)
+            comments = @submission.reload.visible_submission_comments_for(@admin)
             expect(comments.pluck(:comment)).to match_array([
                                                               "Student comment",
                                                               "First Ta comment",

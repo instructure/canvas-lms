@@ -19,7 +19,7 @@
 #
 
 describe SubmissionCommentInteraction do
-  context ".in_course_between" do
+  describe ".in_course_between" do
     it "finds the date of the latest submission comment" do
       course_with_student_submissions
       sub = @course.assignments.first.submissions

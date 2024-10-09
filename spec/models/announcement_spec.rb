@@ -56,7 +56,7 @@ describe Announcement do
       course = Course.new
       course.lock_all_announcements = true
       course.save!
-      announcement = course.announcements.build(valid_announcement_attributes.merge(delayed_post_at: Time.now + 1.week))
+      announcement = course.announcements.build(valid_announcement_attributes.merge(delayed_post_at: 1.week.from_now))
       announcement.workflow_state = "post_delayed"
       announcement.save!
 
@@ -76,7 +76,7 @@ describe Announcement do
       course_factory(active_all: true)
       att = attachment_model(context: @course)
       announcement = @course.announcements.create!(valid_announcement_attributes
-        .merge(delayed_post_at: Time.now + 1.week, workflow_state: "post_delayed", attachment: att))
+        .merge(delayed_post_at: 1.week.from_now, workflow_state: "post_delayed", attachment: att))
       att.reload
       expect(att).to be_locked
 

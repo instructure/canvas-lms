@@ -91,4 +91,29 @@ describe('past_global_announcements::pastGlobalAnnouncements', () => {
       expect(await findByText('This is past page two')).toBeVisible()
     })
   })
+
+  describe('with instui_nav feature flag on', () => {
+    beforeEach(() => {
+      window.ENV.FEATURES.instui_nav = true
+    })
+    afterEach(() => {
+      window.ENV.FEATURES.instui_nav = false
+    })
+
+    it('checks that SimpleSelect is displayed for lower resolution', () => {
+      const {getByTestId} = render(<PastGlobalAnnouncements breakpoints={{mobileOnly: true}} />)
+      expect(getByTestId('GlobalAnnouncementSelect')).toBeVisible()
+    })
+
+    it('checks that Tabs are displayed for higher resolutions', () => {
+      const {getByTestId} = render(<PastGlobalAnnouncements breakpoints={{desktop: true}} />)
+      expect(getByTestId('GlobalAnnouncementCurrentTab')).toBeVisible()
+      expect(getByTestId('GlobalAnnouncementPastTab')).toBeVisible()
+    })
+
+    it('checks that the "Global Announcements" header is visible', () => {
+      const {getByText} = render(<PastGlobalAnnouncements breakpoints={{desktop: true}} />)
+      expect(getByText('Global Announcements')).toBeVisible()
+    })
+  })
 })

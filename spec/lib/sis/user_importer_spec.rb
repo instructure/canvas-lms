@@ -173,7 +173,7 @@ describe SIS::UserImporter do
       importer.add_user(unchanged_user)
     end
 
-    expect(Pseudonym.last.read_attribute("stuck_sis_fields")).to eq ""
+    expect(Pseudonym.last["stuck_sis_fields"]).to eq ""
   end
 
   it "does not update deleted_at property when user gets deleted but workflow_state is stuck" do

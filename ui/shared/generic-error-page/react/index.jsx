@@ -28,6 +28,7 @@ import {string} from 'prop-types'
 
 import ErrorTextInputForm from './ErrorTextInputForm'
 import ErrorPageHeader from './ErrorPageHeader'
+import {Flex, FlexItem} from '@instructure/ui-flex'
 
 const I18n = useI18nScope('generic_error_page')
 
@@ -119,10 +120,14 @@ export default class GenericErrorPage extends React.Component {
         display="block"
       >
         <ErrorPageHeader imageUrl={this.props.imageUrl} />
-        {process.env.NODE_ENV === 'development' && (
-          <pre style={{textAlign: 'left'}}>{this.props.errorMessage}</pre>
-        )}
         <View margin="small" display="block">
+          <Flex justifyItems="center">
+            <FlexItem>
+              {process.env.NODE_ENV === 'development' && (
+                <pre style={{textAlign: 'left'}}>{this.props.errorMessage}</pre>
+              )}
+            </FlexItem>
+          </Flex>
           {!this.state.commentPosted && (
             <>
               <View margin="small" display="block">

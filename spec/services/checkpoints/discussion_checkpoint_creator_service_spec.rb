@@ -40,6 +40,16 @@ describe Checkpoints::DiscussionCheckpointCreatorService do
       end.to raise_error(Checkpoints::FlagDisabledError)
     end
 
+    it "raises an error when points_possible is not provided" do
+      expect do
+        service.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 2.days.from_now }]
+        )
+      end.to raise_error(ArgumentError, /missing keyword: :points_possible/)
+    end
+
     it "raises a DateTypeRequiredError when a type is not specified on a date" do
       expect do
         service.call(
@@ -111,6 +121,50 @@ describe Checkpoints::DiscussionCheckpointCreatorService do
         points_possible: 6
       )
       expect(checkpoint.parent_assignment.only_visible_to_overrides).to be false
+    end
+
+    it "syncs unlock_at and lock_at fields to the latest created checkpoint" do
+      now = Time.now.change(usec: 0)
+      first_unlock_at = 1.day.from_now(now)
+      first_lock_at = 3.days.from_now(now)
+      second_unlock_at = 2.days.from_now(now)
+      second_lock_at = 4.days.from_now(now)
+
+      # Create the first checkpoint
+      first_checkpoint = service.call(
+        discussion_topic: @topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: 2.days.from_now(now), unlock_at: first_unlock_at, lock_at: first_lock_at }],
+        points_possible: 5
+      )
+
+      # Create the second checkpoint
+      second_checkpoint = service.call(
+        discussion_topic: @topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "everyone", due_at: 3.days.from_now(now), unlock_at: second_unlock_at, lock_at: second_lock_at }],
+        points_possible: 5
+      )
+
+      # Reload the parent assignment and checkpoints
+      parent_assignment = first_checkpoint.parent_assignment.reload
+      first_checkpoint.reload
+      second_checkpoint.reload
+
+      aggregate_failures do
+        # Check that the parent assignment's unlock_at and lock_at are synced to the latest checkpoint
+        expect(parent_assignment.unlock_at).to eq second_unlock_at
+        expect(parent_assignment.lock_at).to eq second_lock_at
+
+        # Check that both checkpoints have the same unlock_at and lock_at as the parent
+        expect(first_checkpoint.unlock_at).to eq second_unlock_at
+        expect(first_checkpoint.lock_at).to eq second_lock_at
+        expect(second_checkpoint.unlock_at).to eq second_unlock_at
+        expect(second_checkpoint.lock_at).to eq second_lock_at
+
+        # Ensure that the due_at dates remain different
+        expect(first_checkpoint.due_at).to be < second_checkpoint.due_at
+      end
     end
 
     it "creates submission objects for the parent assignment and for the checkpoints" do

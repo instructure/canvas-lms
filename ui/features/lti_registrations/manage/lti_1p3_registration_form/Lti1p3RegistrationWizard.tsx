@@ -30,12 +30,14 @@ import {Modal} from '@instructure/ui-modal'
 import {Text} from '@instructure/ui-text'
 import {PrivacyConfirmationWrapper} from './components/PrivacyConfirmationWrapper'
 import {RegistrationModalBody} from '../registration_wizard/RegistrationModalBody'
+import {OverrideURIsConfirmation} from './components/OverrideURIsConfirmation'
+import {NamingConfirmationWrapper} from './components/NamingConfirmationWrapper'
 
 const I18n = useI18nScope('lti_registrations')
 
 export type Lti1p3RegistrationWizardProps = {
   accountId: AccountId
-  internalConfiguration?: InternalLtiConfiguration
+  internalConfiguration: InternalLtiConfiguration
   unregister: () => void
   unifiedToolId?: UnifiedToolId
   onSuccessfulRegistration: () => void
@@ -44,13 +46,7 @@ export type Lti1p3RegistrationWizardProps = {
 export const Lti1p3RegistrationWizard = (props: Lti1p3RegistrationWizardProps) => {
   const {internalConfiguration} = props
   const useLti1p3RegistrationWizardStore = React.useMemo(() => {
-    if (internalConfiguration) {
-      return createLti1p3RegistrationWizardState({internalConfig: internalConfiguration})
-    } else {
-      // TODO: Account for the case where the internalConfiguration is not present
-      // to allow for manual configuration
-      throw new Error('Not yet implemented')
-    }
+    return createLti1p3RegistrationWizardState({internalConfig: internalConfiguration})
   }, [internalConfiguration])
 
   const store = useLti1p3RegistrationWizardStore()
@@ -118,7 +114,32 @@ export const Lti1p3RegistrationWizard = (props: Lti1p3RegistrationWizardProps) =
         </>
       )
     case 'OverrideURIs':
+      return (
+        <OverrideURIsConfirmation
+          overlayStore={store.state.overlayStore}
+          registration={internalConfiguration!}
+          onNextClicked={() => store.setStep('Naming')}
+          onPreviousClicked={() => store.setStep('Placements')}
+        />
+      )
     case 'Naming':
+      return (
+        // TODO: Handle the case where the internal config is undefined and allow for manual configuration
+        <>
+          <NamingConfirmationWrapper
+            config={internalConfiguration!}
+            overlayStore={store.state.overlayStore}
+          />
+          <Modal.Footer>
+            <Button onClick={() => store.setStep('OverrideURIs')} margin="small">
+              {I18n.t('Previous')}
+            </Button>
+            <Button onClick={() => store.setStep('Icons')} color="primary" margin="small">
+              {I18n.t('Next')}
+            </Button>
+          </Modal.Footer>
+        </>
+      )
     case 'Icons':
     case 'Review':
       return (
@@ -127,7 +148,7 @@ export const Lti1p3RegistrationWizard = (props: Lti1p3RegistrationWizardProps) =
             <Text>TODO: Implement the rest of the steps</Text>
           </RegistrationModalBody>
           <Modal.Footer>
-            <Button onClick={() => store.setStep('Placements')} margin="small">
+            <Button onClick={() => store.setStep('Naming')} margin="small">
               {I18n.t('Previous')}
             </Button>
           </Modal.Footer>

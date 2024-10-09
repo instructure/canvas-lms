@@ -43,5 +43,9 @@ module Types
     def use_for_grading
       !!object.use_for_grading
     end
+    field :saved_comments, String, null: true
+    def saved_comments
+      object.summary_data&.dig(:saved_comments)&.to_json
+    end
   end
 end

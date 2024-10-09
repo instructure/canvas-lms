@@ -30,7 +30,7 @@ describe "submission_grade_changed" do
 
   include_examples "a message"
 
-  context ".email" do
+  describe ".email" do
     let(:path_type) { :email }
 
     it "only includes the score if opted in (and still enabled on root account)" do

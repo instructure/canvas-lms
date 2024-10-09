@@ -134,3 +134,33 @@ describe('truncateText', () => {
     expect(TextHelper.truncateText('zomgzomg', {max: 7})).toBe('zomg...')
   })
 })
+
+describe('containsHtmlTags', () => {
+  test('should return true if html tags present', () => {
+    expect(TextHelper.containsHtmlTags('<p>Html detected</p>')).toBeTruthy()
+  })
+
+  test('should return false if not present', () => {
+    expect(TextHelper.containsHtmlTags('No html present')).toBeFalsy()
+  })
+})
+
+describe('stripHtmlTags', () => {
+  const htmlText = '<p>Test <strong>Content</strong></p>'
+  const strippedText = 'Test Content'
+
+  it('returns stripped text if arg is HTML text', () => {
+    const result = TextHelper.stripHtmlTags(htmlText)
+    expect(result).toEqual(strippedText)
+  })
+
+  it('returns empty string if arg is empty', () => {
+    const result = TextHelper.stripHtmlTags('')
+    expect(result).toEqual('')
+  })
+
+  it('returns empty string if undefined provided', () => {
+    const result = TextHelper.stripHtmlTags()
+    expect(result).toEqual('')
+  })
+})

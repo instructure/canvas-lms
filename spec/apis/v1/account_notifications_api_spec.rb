@@ -147,7 +147,7 @@ describe "Account Notification API", type: :request do
                       format: "json",
                       account_id: @admin.account.id.to_s }
       @start_at = DateTime.now.utc
-      @end_at = (DateTime.now + 1.day).utc
+      @end_at = 1.day.from_now.utc
     end
 
     it "creates an account notification" do

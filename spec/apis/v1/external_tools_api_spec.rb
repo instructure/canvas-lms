@@ -934,6 +934,7 @@ describe ExternalToolsController, type: :request do
     et.custom_fields = { key1: "val1", key2: "val2" }
     et.course_navigation = { :url => "http://www.example.com/ims/lti/course", :visibility => "admins", :text => "Course nav", "default" => "disabled" }
     et.account_navigation = { url: "http://www.example.com/ims/lti/account", text: "Account nav", custom_fields: { "key" => "value" } }
+    et.analytics_hub = { url: "http://www.example.com/ims/lti/resource", text: "analytics hub", display_type: "full_width", visibility: "admins" }
     et.user_navigation = { url: "http://www.example.com/ims/lti/user", text: "User nav" }
     et.editor_button = { url: "http://www.example.com/ims/lti/editor", icon_url: "/images/delete.png", selection_width: 50, selection_height: 50, text: "editor button" }
     et.homework_submission = { url: "http://www.example.com/ims/lti/editor", selection_width: 50, selection_height: 50, text: "homework submission" }
@@ -1092,6 +1093,16 @@ describe ExternalToolsController, type: :request do
         "url" => "http://www.example.com/ims/lti/account",
         "custom_fields" => { "key" => "value" },
         "label" => "Account nav",
+        "selection_height" => 400,
+        "selection_width" => 800
+      },
+      "analytics_hub" => {
+        "enabled" => true,
+        "text" => "analytics hub",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "visibility" => "admins",
+        "label" => "analytics hub",
+        "display_type" => "full_width",
         "selection_height" => 400,
         "selection_width" => 800
       },

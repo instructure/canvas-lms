@@ -22,13 +22,11 @@ require "active_support/callbacks/suspension"
 class ActiveRecord::Base
   self.cache_timestamp_format = :usec
 
-  public :write_attribute
-
   class << self
     delegate :distinct_on, :find_ids_in_batches, :explain, to: :all
 
-    def find_ids_in_ranges(loose: true, **kwargs, &block)
-      all.find_ids_in_ranges(loose:, **kwargs, &block)
+    def find_ids_in_ranges(loose: true, **, &)
+      all.find_ids_in_ranges(loose:, **, &)
     end
 
     attr_accessor :in_migration
@@ -75,11 +73,6 @@ class ActiveRecord::Base
     end
   end
 
-  def read_or_initialize_attribute(attr_name, default_value)
-    # have to read the attribute again because serialized attributes in Rails 4.2 get duped
-    read_attribute(attr_name) || (write_attribute(attr_name, default_value) && read_attribute(attr_name))
-  end
-
   alias_method :clone, :dup
 
   # See ActiveModel#serializable_add_includes
@@ -90,7 +83,7 @@ class ActiveRecord::Base
   end
 
   def feed_code
-    id = uuid rescue self.id
+    id = try(:uuid) || self.id
     "#{self.class.reflection_type_name}_#{id}"
   end
 
@@ -206,8 +199,8 @@ class ActiveRecord::Base
         res = super
         if !res && #{string_version_name}.present?
           type, id = ActiveRecord::Base.parse_asset_string(#{string_version_name})
-          write_attribute(:#{association_version_name}_type, type)
-          write_attribute(:#{association_version_name}_id, id)
+          self["#{association_version_name}_type"] = type
+          self["#{association_version_name}_id"] = id
           res = super
         end
         res
@@ -231,7 +224,7 @@ class ActiveRecord::Base
     if respond_to?(:context)
       code = respond_to?(:context_code) ? context_code : context.asset_string
       @cached_context_name ||= Rails.cache.fetch(["short_name_lookup", code].cache_key) do
-        context.short_name rescue ""
+        context.short_name
       end
     else
       raise "Can only call cached_context_short_name on items with a context"
@@ -337,8 +330,8 @@ class ActiveRecord::Base
     self.class.to_s
   end
 
-  def sanitize_sql(*args)
-    self.class.send :sanitize_sql_for_conditions, *args
+  def sanitize_sql(*)
+    self.class.send(:sanitize_sql_for_conditions, *)
   end
 
   def self.reflection_type_name
@@ -353,8 +346,8 @@ class ActiveRecord::Base
     base_class
   end
 
-  ruby2_keywords def wildcard(*args)
-    self.class.wildcard(*args)
+  ruby2_keywords def wildcard(*)
+    self.class.wildcard(*)
   end
 
   def self.wildcard(*args, type: :full, delimiter: nil, case_sensitive: false)
@@ -699,9 +692,9 @@ class ActiveRecord::Base
     end
   end
 
-  def self.create_and_ignore_on_duplicate(*args)
+  def self.create_and_ignore_on_duplicate(*)
     # FIXME: handle array fields and setting of nulls where those are not the default
-    model = new(*args)
+    model = new(*)
     attributes = []
     values = []
 
@@ -729,7 +722,7 @@ class ActiveRecord::Base
         )
         SELECT * FROM new_row
         UNION
-        #{except(:select).where(*args).to_sql}
+        #{except(:select).where(*).to_sql}
       SQL
 
       find_by_sql(insert_sql).first
@@ -1226,13 +1219,13 @@ module UsefulBatchEnumerator
     enum
   end
 
-  def pluck(*args)
-    return to_enum(:pluck, *args) unless block_given?
+  def pluck(*)
+    return to_enum(:pluck, *) unless block_given?
 
     @relation.except(:select)
-             .select(*args)
+             .select(*)
              .in_batches(strategy: @strategy, load: false, **@kwargs) do |relation|
-      yield relation.pluck(*args)
+      yield relation.pluck(*)
     end
   end
 

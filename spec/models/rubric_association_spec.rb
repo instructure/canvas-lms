@@ -139,7 +139,7 @@ describe RubricAssociation do
       end
     end
 
-    context "#update_alignments" do
+    describe "#update_alignments" do
       it "does nothing if it is not associated to an assignment" do
         rubric = @course.rubrics.create!
         ra = RubricAssociation.create!(

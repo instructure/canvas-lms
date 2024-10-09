@@ -32,6 +32,14 @@ class EnhancedSRGB
       f('[data-testid="student_and_assignment_grade_input"]')
     end
 
+    def reply_to_topic_grade_input
+      f('[data-testid="student_and_reply_to_topic_assignment_grade_input"]')
+    end
+
+    def reply_to_entry_grade_input
+      f('[data-testid="student_and_reply_to_entry_assignment_grade_input"]')
+    end
+
     def submission_late_penalty_label
       f('[data-testid="submission_late_penalty_label"]')
     end
@@ -44,8 +52,24 @@ class EnhancedSRGB
       f('[data-testid="student_and_assignment_grade_select"]')
     end
 
+    def pass_fail_reply_to_topic_grade_select
+      f('[data-testid="student_and_reply_to_topic_assignment_grade_select"]')
+    end
+
+    def pass_fail_reply_to_entry_grade_select
+      f('[data-testid="student_and_reply_to_entry_assignment_grade_select"]')
+    end
+
     def out_of_text
       f('[data-testid="student_and_assignment_grade_out_of_text"]')
+    end
+
+    def out_of_text_reply_to_topic
+      f('[data-testid="student_and_reply_to_topic_assignment_grade_out_of_text"]')
+    end
+
+    def out_of_text_reply_to_entry
+      f('[data-testid="student_and_reply_to_entry_assignment_grade_out_of_text"]')
     end
 
     def excuse_checkbox
@@ -86,6 +110,22 @@ class EnhancedSRGB
 
     def submission_details_grade_input
       f('[data-testid="submission_details_grade_input"]')
+    end
+
+    def submission_details_reply_to_topic_assignment_grade_input
+      f('[data-testid="submission_details_reply_to_topic_assignment_grade_input"]')
+    end
+
+    def submission_details_reply_to_entry_assignment_grade_input
+      f('[data-testid="submission_details_reply_to_entry_assignment_grade_input"]')
+    end
+
+    def submission_details_reply_to_topic_assignment_grade_select
+      f('[data-testid="submission_details_reply_to_topic_assignment_grade_select"]')
+    end
+
+    def submission_details_reply_to_entry_assignment_grade_select
+      f('[data-testid="submission_details_reply_to_entry_assignment_grade_select"]')
     end
 
     def submission_details_assignment_name
@@ -335,6 +375,16 @@ class EnhancedSRGB
     def enter_grade(grade)
       replace_content(main_grade_input, grade)
       tab_out_of_input(main_grade_input)
+    end
+
+    def enter_reply_to_topic_grade(grade)
+      replace_content(reply_to_topic_grade_input, grade)
+      tab_out_of_input(reply_to_topic_grade_input)
+    end
+
+    def enter_reply_to_entry_grade(grade)
+      replace_content(reply_to_entry_grade_input, grade)
+      tab_out_of_input(reply_to_entry_grade_input)
     end
 
     def enter_override_grade(grade)

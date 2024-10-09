@@ -85,7 +85,7 @@ class DiscussionTopic < ActiveRecord::Base
   belongs_to :root_topic, class_name: "DiscussionTopic"
   belongs_to :group_category
   has_many :sub_assignments, through: :assignment
-  has_many :child_topics, class_name: "DiscussionTopic", foreign_key: :root_topic_id, dependent: :destroy
+  has_many :child_topics, class_name: "DiscussionTopic", foreign_key: :root_topic_id, dependent: :destroy, inverse_of: :root_topic
   has_many :discussion_topic_participants, dependent: :destroy
   has_many :discussion_entry_participants, through: :discussion_entries
   has_many :discussion_topic_section_visibilities,
@@ -233,7 +233,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def discussion_type
-    read_attribute(:discussion_type) || DiscussionTypes::NOT_THREADED
+    super || DiscussionTypes::NOT_THREADED
   end
 
   def validate_draft_state_change
@@ -253,7 +253,7 @@ class DiscussionTopic < ActiveRecord::Base
       self.title = t("#discussion_topic.default_title", "No Title")
     end
 
-    d_type = read_attribute(:discussion_type)
+    d_type = self["discussion_type"]
     d_type ||= context.feature_enabled?("react_discussions_post") ? DiscussionTypes::THREADED : DiscussionTypes::NOT_THREADED
     self.discussion_type = d_type
 
@@ -933,8 +933,15 @@ class DiscussionTopic < ActiveRecord::Base
     where("title ILIKE ?", "#{title}%")
   }
 
-  alias_attribute :available_from, :delayed_post_at
   alias_attribute :available_until, :lock_at
+
+  def available_from
+    self[:delayed_post_at]
+  end
+
+  def available_from=(value)
+    self[:delayed_post_at] = value
+  end
 
   def unlock_at
     self[:unlock_at].nil? ? self[:delayed_post_at] : self[:unlock_at]

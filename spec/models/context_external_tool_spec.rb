@@ -2741,22 +2741,28 @@ describe ContextExternalTool do
         expect(tool.display_type("course_navigation")).to eq "other_display_type"
       end
 
-      it "is 'full_width' for global_navigation by default" do
+      it "is 'full_width' for global_navigation and analytics_hub by default" do
         tool.global_navigation = { enabled: true }
+        tool.analytics_hub = { enabled: true }
         tool.save!
         expect(tool.display_type("global_navigation")).to eq "full_width"
+        expect(tool.display_type("analytics_hub")).to eq "full_width"
       end
 
-      it "allows the 'full_width' default for global_navigation to be overridden with accepted type" do
+      it "allows the 'full_width' default for global_navigation and analytics_hub to be overridden with accepted type" do
         tool.global_navigation = { display_type: "borderless" }
+        tool.analytics_hub = { display_type: "borderless" }
         tool.save!
         expect(tool.display_type("global_navigation")).to eq "borderless"
+        expect(tool.display_type("analytics_hub")).to eq "borderless"
       end
 
-      it "does not allow the 'full_width' default for global_navigation to be overridden with unaccepted type" do
+      it "does not allow the 'full_width' default for global_navigation and analytics_hub to be overridden with unaccepted type" do
         tool.global_navigation = { display_type: "other_display_type" }
+        tool.analytics_hub = { display_type: "other_display_type" }
         tool.save!
         expect(tool.display_type("global_navigation")).to eq "full_width"
+        expect(tool.display_type("analytics_hub")).to eq "full_width"
       end
 
       it "is full_width for global_navigation when tool does not define global_navigation" do

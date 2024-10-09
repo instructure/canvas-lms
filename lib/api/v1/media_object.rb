@@ -41,7 +41,7 @@ module Api::V1::MediaObject
     end
   end
 
-  def media_attachment_api_json(attachment, media_object, current_user, session, exclude = [], verifier: nil)
+  def media_attachment_api_json(attachment, media_object, current_user, session, exclude = [], verifier: nil, access_token: nil, instfs_id: nil)
     api_json(media_object, current_user, session, API_MEDIA_OBJECT_JSON_OPTS).tap do |json|
       json["title"] = media_object.guaranteed_title
       json["can_add_captions"] = attachment.grants_right?(current_user, session, :update)
@@ -52,7 +52,7 @@ module Api::V1::MediaObject
       unless exclude.include?("tracks")
         json["media_tracks"] = attachment.media_tracks_include_originals.map do |track|
           api_json(track, current_user, session, only: %w[kind created_at updated_at id locale inherited]).tap do |json2|
-            json2[:url] = show_media_attachment_tracks_url(attachment.id, track.id)
+            json2[:url] = show_media_attachment_tracks_url(attachment.id, track.id, access_token:, instfs_id:)
           end
         end
       end

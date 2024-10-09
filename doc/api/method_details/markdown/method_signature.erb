@@ -1,0 +1,6 @@
+<% @routes.each do |route| %>
+  <% route_path = route.path.spec.to_s.sub("(.:format)", "")
+    next if route_path =~ /\.json$/ %>
+#### `<%= route.verb %> <%= route_path %>`
+**Scope:** `<%= TokenScopesHelper.scope_from_route(route) %>`
+<% end %>

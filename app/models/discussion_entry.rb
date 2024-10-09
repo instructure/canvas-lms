@@ -31,17 +31,17 @@ class DiscussionEntry < ActiveRecord::Base
   attr_readonly :discussion_topic_id, :user_id, :parent_id, :is_anonymous_author
   has_many :discussion_entry_drafts, inverse_of: :discussion_entry
   has_many :discussion_entry_versions, -> { order(version: :desc) }, inverse_of: :discussion_entry, dependent: :destroy
-  has_many :legacy_subentries, class_name: "DiscussionEntry", foreign_key: "parent_id"
-  has_many :root_discussion_replies, -> { where("parent_id=root_entry_id") }, class_name: "DiscussionEntry", foreign_key: "root_entry_id"
-  has_many :discussion_subentries, -> { order(:created_at) }, class_name: "DiscussionEntry", foreign_key: "parent_id"
-  has_many :unordered_discussion_subentries, class_name: "DiscussionEntry", foreign_key: "parent_id"
-  has_many :flattened_discussion_subentries, class_name: "DiscussionEntry", foreign_key: "root_entry_id"
+  has_many :legacy_subentries, class_name: "DiscussionEntry", foreign_key: "parent_id", inverse_of: :parent_entry
+  has_many :root_discussion_replies, -> { where("parent_id=root_entry_id") }, class_name: "DiscussionEntry", foreign_key: "root_entry_id", inverse_of: :root_entry
+  has_many :discussion_subentries, -> { order(:created_at) }, class_name: "DiscussionEntry", foreign_key: "parent_id", inverse_of: :parent_entry
+  has_many :unordered_discussion_subentries, class_name: "DiscussionEntry", foreign_key: "parent_id", inverse_of: :parent_entry
+  has_many :flattened_discussion_subentries, class_name: "DiscussionEntry", foreign_key: "root_entry_id", inverse_of: :root_entry
   has_many :discussion_entry_participants
-  has_one :last_discussion_subentry, -> { order(created_at: :desc) }, class_name: "DiscussionEntry", foreign_key: "root_entry_id"
+  has_one :last_discussion_subentry, -> { order(created_at: :desc) }, class_name: "DiscussionEntry", foreign_key: "root_entry_id", inverse_of: :root_entry
   belongs_to :discussion_topic, inverse_of: :discussion_entries
   belongs_to :quoted_entry, class_name: "DiscussionEntry"
   # null if a root entry
-  belongs_to :parent_entry, class_name: "DiscussionEntry", foreign_key: :parent_id
+  belongs_to :parent_entry, class_name: "DiscussionEntry", foreign_key: :parent_id, inverse_of: :discussion_subentries
   # also null if a root entry
   belongs_to :root_entry, class_name: "DiscussionEntry"
   belongs_to :user

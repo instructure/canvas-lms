@@ -46,7 +46,7 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
     end
 
     it "works for inputs of type Integer" do
-      expect(question.i18n_decimal(1234)).to eq BigDecimal("1234")
+      expect(question.i18n_decimal(1234)).to eq BigDecimal(1234)
     end
 
     it "works for inputs of type Float" do

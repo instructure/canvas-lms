@@ -141,7 +141,7 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
       item = item_key[:item]
       item_updates = {}
       field_links.each do |field, links|
-        html = item.read_attribute(field)
+        html = item[field]
         if LinkReplacer.sub_placeholders!(html, links)
           item_updates[field] = html
         end

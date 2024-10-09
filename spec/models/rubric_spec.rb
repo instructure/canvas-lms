@@ -358,6 +358,8 @@ describe Rubric do
   end
 
   it "changes workflow state properly when archiving when enhanced_rubrics FF enabled" do
+    allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+    expect(InstStatsd::Statsd).to receive(:increment).with("course.rubrics.archived").at_least(:once)
     course_with_teacher
     @course.enable_feature!(:enhanced_rubrics)
     rubric = rubric_model({ context: @course })

@@ -30,7 +30,7 @@ describe "assignment_changed" do
   let(:notification_name) { :assignment_changed }
   let(:asset) { @assignment }
 
-  context ".email" do
+  describe ".email" do
     let(:path_type) { :email }
 
     it "renders" do
@@ -43,7 +43,7 @@ describe "assignment_changed" do
     end
   end
 
-  context ".sms" do
+  describe ".sms" do
     let(:path_type) { :sms }
 
     it "renders" do
@@ -53,7 +53,7 @@ describe "assignment_changed" do
     end
   end
 
-  context ".summary" do
+  describe ".summary" do
     let(:path_type) { :summary }
 
     it "renders" do

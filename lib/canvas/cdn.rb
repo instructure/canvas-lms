@@ -72,10 +72,10 @@ module Canvas
         end
       end
 
-      def push_to_s3!(*args, **kwargs, &)
+      def push_to_s3!(*, **, &)
         return unless config.bucket
 
-        uploader = Canvas::Cdn::S3Uploader.new(*args, **kwargs)
+        uploader = Canvas::Cdn::S3Uploader.new(*, **)
         uploader.upload!(&)
       end
 

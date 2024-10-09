@@ -168,6 +168,11 @@ export function enhanceUserContent(container = document, opts = {}) {
      * When used inside of an LTI tool, this contains the canvas global id of the tool.
      */
     containingCanvasLtiToolId,
+
+    /**
+     * Contingency plan in case new instfs media links cause problems in rich content.
+     */
+    replaceInstFSLinksWithOldLinks,
   } = opts
 
   getTranslations(locale)
@@ -212,6 +217,30 @@ export function enhanceUserContent(container = document, opts = {}) {
       }
     })
     setData(unenhanced_elem, 'unenhanced_content_html', unenhanced_elem.innerHTML)
+
+    // If instfs links are causing content problems,
+    // use this to show users old links instead
+    if (replaceInstFSLinksWithOldLinks) {
+      const attributes = ['href', 'src']
+      const selector = '[href], [src]'
+      const oldLinkAttribute = 'data-old-link'
+
+      unenhanced_elem.querySelectorAll(selector).forEach(element => {
+        const oldLink = element.getAttribute(oldLinkAttribute)
+
+        if (!oldLink) {
+          return
+        }
+
+        for (const a of attributes) {
+          const newLink = element.getAttribute(a)
+
+          if (newLink && newLink != oldLink) {
+            element.setAttribute(a, oldLink)
+          }
+        }
+      })
+    }
 
     // guarantee relative links point to canvas
     if (canvasOrigin) {

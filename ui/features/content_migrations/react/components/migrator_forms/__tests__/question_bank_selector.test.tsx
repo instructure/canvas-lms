@@ -46,7 +46,7 @@ describe('QuestionBankSelector', () => {
     await userEvent.click(screen.getByRole('combobox', {name: 'Default Question bank'}))
     await userEvent.click(screen.getByRole('option', {name: 'Create new question bank...'}))
 
-    expect(onChange).toHaveBeenCalledWith({question_bank_name: ''})
+    expect(onChange).toHaveBeenCalledWith({question_bank_id: 'new_question_bank'})
   })
 
   it('calls onChange with new question bank name when input changes', async () => {

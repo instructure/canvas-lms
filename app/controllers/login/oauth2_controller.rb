@@ -25,14 +25,13 @@ class Login::OAuth2Controller < Login::OAuthBaseController
   rescue_from Canvas::TimeoutCutoff, with: :handle_external_timeout
 
   def new
-    super
     nonce = session[:oauth2_nonce] = SecureRandom.hex(24)
-    jwt = Canvas::Security.create_jwt({ aac_id: @aac.global_id, nonce:, host: request.host_with_port }, 10.minutes.from_now)
-    authorize_url = @aac.generate_authorize_url(oauth2_login_callback_url, jwt, nonce:)
+    jwt = Canvas::Security.create_jwt({ aac_id: aac.global_id, nonce:, host: request.host_with_port }, 10.minutes.from_now)
+    authorize_url = aac.generate_authorize_url(oauth2_login_callback_url, jwt, nonce:, **additional_authorize_params)
 
-    if @aac.debugging? && @aac.debug_set(:nonce, nonce, overwrite: false)
-      @aac.debug_set(:debugging, t("Redirected to identity provider"))
-      @aac.debug_set(:authorize_url, authorize_url)
+    if aac.debugging? && aac.debug_set(:nonce, nonce, overwrite: false)
+      aac.debug_set(:debugging, t("Redirected to identity provider"))
+      aac.debug_set(:authorize_url, authorize_url)
     end
 
     redirect_to authorize_url
@@ -78,6 +77,10 @@ class Login::OAuth2Controller < Login::OAuthBaseController
   end
 
   protected
+
+  def additional_authorize_params
+    {}
+  end
 
   def handle_expired_token
     flash[:delegated_message] = t("It took too long to login. Please try again")

@@ -270,6 +270,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     expect(@topic.is_section_specific).to be false
     expect(@topic.delayed_post_at).to eq delayed_post_at
     expect(@topic.lock_at).to eq lock_at
+    expect(@topic.editor).to eq @teacher
   end
 
   context "attachments" do
@@ -656,8 +657,9 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       )
     end
 
-    it "successfully updates a discussion topic with checkpoints" do
-      result = run_mutation(id: @graded_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
+    it "converts an ungraded discussion into a graded discussion with checkpoints" do
+      ungraded_discussion = discussion_topic_model({ context: @course })
+      result = run_mutation(id: ungraded_discussion.id, assignment: { forCheckpoints: true }, checkpoints: [
                               { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC, dates: [{ type: "everyone", dueAt: @due_at1.iso8601 }], pointsPossible: 6 },
                               { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY, dates: [{ type: "everyone", dueAt: @due_at2.iso8601 }], pointsPossible: 8, repliesRequired: 5 }
                             ])
@@ -666,6 +668,37 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
 
       reply_to_topic_checkpoint = discussion_topic["assignment"]["checkpoints"].find { |checkpoint| checkpoint["tag"] == CheckpointLabels::REPLY_TO_TOPIC }
       reply_to_entry_checkpoint = discussion_topic["assignment"]["checkpoints"].find { |checkpoint| checkpoint["tag"] == CheckpointLabels::REPLY_TO_ENTRY }
+
+      aggregate_failures do
+        expect(result["errors"]).to be_nil
+        expect(reply_to_topic_checkpoint).to be_truthy
+        expect(reply_to_entry_checkpoint).to be_truthy
+        expect(reply_to_topic_checkpoint["pointsPossible"]).to eq 6
+        expect(reply_to_entry_checkpoint["pointsPossible"]).to eq 8
+        expect(discussion_topic["replyToEntryRequiredCount"]).to eq 5
+      end
+    end
+
+    it "successfully updates a discussion topic with checkpoints" do
+      new_lock_at = 12.days.from_now
+      new_unlock_at = 1.day.from_now
+
+      result = run_mutation(id: @graded_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC, dates: [{ type: "everyone", dueAt: @due_at1.iso8601, lockAt: new_lock_at.iso8601, unlockAt: new_unlock_at.iso8601 }], pointsPossible: 6 },
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY, dates: [{ type: "everyone", dueAt: @due_at2.iso8601, lockAt: new_lock_at.iso8601, unlockAt: new_unlock_at.iso8601 }], pointsPossible: 8, repliesRequired: 5 }
+                            ])
+
+      discussion_topic = result.dig("data", "updateDiscussionTopic", "discussionTopic")
+
+      reply_to_topic_checkpoint = discussion_topic["assignment"]["checkpoints"].find { |checkpoint| checkpoint["tag"] == CheckpointLabels::REPLY_TO_TOPIC }
+      reply_to_entry_checkpoint = discussion_topic["assignment"]["checkpoints"].find { |checkpoint| checkpoint["tag"] == CheckpointLabels::REPLY_TO_ENTRY }
+
+      expect(Assignment.last.unlock_at).to be_within(1.second).of(new_unlock_at)
+      expect(Assignment.last.lock_at).to be_within(1.second).of(new_lock_at)
+      expect(Assignment.last.sub_assignments.first.unlock_at).to be_within(1.second).of(new_unlock_at)
+      expect(Assignment.last.sub_assignments.first.lock_at).to be_within(1.second).of(new_lock_at)
+      expect(Assignment.last.sub_assignments.last.unlock_at).to be_within(1.second).of(new_unlock_at)
+      expect(Assignment.last.sub_assignments.last.lock_at).to be_within(1.second).of(new_lock_at)
 
       aggregate_failures do
         expect(result["errors"]).to be_nil
@@ -750,8 +783,8 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
 
       expect(@graded_topic.published?).to be false
       expect(@graded_topic.assignment.published?).to be false
-      expect(@checkpoint1.published?).to be false
-      expect(@checkpoint2.published?).to be false
+      expect(@checkpoint1.reload.published?).to be false
+      expect(@checkpoint2.reload.published?).to be false
 
       # check publish topic,
       result = run_mutation({ id: @graded_topic.id, published: true })

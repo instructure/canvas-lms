@@ -23,15 +23,6 @@ describe GraphQLController do
     student_in_course(user: user_with_pseudonym)
   end
 
-  let(:federation_query_params) do
-    {
-      query: "query ($representations: [_Any!]!) { _entities(representations: $representations) { ...on Course { name } } }",
-      variables: {
-        representations: [{ __typename: "Course", id: "Q291cnNlLTE=" }]
-      }
-    }
-  end
-
   context "graphiql" do
     it "requires a user" do
       get :graphiql
@@ -74,12 +65,6 @@ describe GraphQLController do
       post :execute, params: { query: '{ course(id: "1") { id } }' }, format: :json
       expect(response.parsed_body["errors"]).to be_blank
       expect(response.parsed_body["data"]).not_to be_blank
-    end
-
-    it "does not handle Apollo Federation queries" do
-      post :execute, params: federation_query_params, format: :json
-      expect(response.parsed_body["errors"]).not_to be_blank
-      expect(response.parsed_body["data"]).to be_blank
     end
 
     it "logs a page view for CreateSubmission" do
@@ -269,44 +254,6 @@ describe GraphQLController do
           expect_increment("graphql.operation.count", operation_name: "3rdparty")
           expect_increment("graphql.query.count", operation_name: "3rdparty", field: "course")
         end
-      end
-    end
-  end
-
-  describe "subgraph_execute" do
-    context "with authentication" do
-      around do |example|
-        InstAccess.with_config(signing_key: signing_priv_key, &example)
-      end
-
-      let(:token_signing_keypair) { OpenSSL::PKey::RSA.new(2048) }
-      let(:signing_priv_key) { token_signing_keypair.to_s }
-      let(:token) { InstAccess::Token.for_user(user_uuid: @student.uuid, account_uuid: @student.account.uuid) }
-
-      it "handles standard queries" do
-        request.headers["Authorization"] = "Bearer #{token.to_unencrypted_token_string}"
-        post :subgraph_execute, params: { query: '{ course(id: "1") { id } }' }, format: :json
-        expect(response.parsed_body["errors"]).to be_blank
-        expect(response.parsed_body["data"]).not_to be_blank
-      end
-
-      it "handles Apollo Federation queries" do
-        request.headers["Authorization"] = "Bearer #{token.to_unencrypted_token_string}"
-        post :subgraph_execute, params: federation_query_params, format: :json
-        expect(response.parsed_body["errors"]).to be_blank
-      end
-    end
-
-    describe "without authentication" do
-      it "services subgraph introspection queries" do
-        post :subgraph_execute, params: { query: "query FederationSubgraphIntrospection { _service { sdl } }" }, format: :json
-        expect(response.parsed_body["errors"]).to be_blank
-        expect(response.parsed_body["data"]).not_to be_blank
-      end
-
-      it "rejects other queries" do
-        post :subgraph_execute, params: federation_query_params, format: :json
-        expect(response).to be_unauthorized
       end
     end
   end

@@ -138,9 +138,9 @@ class Progress < ActiveRecord::Base
 
   # (private)
   class Work < Delayed::PerformableMethod
-    def initialize(progress, *args, **kwargs)
+    def initialize(progress, *, **)
       @progress = progress
-      super(*args, **kwargs)
+      super(*, **)
     end
 
     def perform

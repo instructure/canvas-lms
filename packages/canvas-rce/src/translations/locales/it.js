@@ -1071,6 +1071,7 @@ const locale = {
   },
   "styles_2aa721ef": { "message": "Stili" },
   "submit_a3cc6859": { "message": "Invia" },
+  "submitting_b90fac62": { "message": "Invio in corso..." },
   "subscript_59744f96": { "message": "Pedice" },
   "subset_19c1a92f": { "message": "Sottoinsieme" },
   "subset_strict_8d8948d6": { "message": "Sottoinsieme (rigido)" },

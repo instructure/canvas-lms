@@ -28,7 +28,10 @@ module Services
       private
 
       def config
-        @config ||= DynamicSettings.find("platform_service_speedgrader", tree: :private) || {}
+        @config ||=
+          YAML.safe_load(
+            DynamicSettings.find(tree: :private)["platform_service_speedgrader.yml", failsafe: nil] || "{}"
+          )
       end
     end
   end

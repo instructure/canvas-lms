@@ -39,7 +39,7 @@ message")
 
   include_examples "a message"
 
-  context ".email" do
+  describe ".email" do
     it "doesnt have trailing erb closures" do
       allow(@message).to receive(:attachments).and_return([
                                                             double("attachment",

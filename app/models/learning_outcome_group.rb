@@ -29,7 +29,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   belongs_to :source_outcome_group, class_name: "LearningOutcomeGroup", inverse_of: :destination_outcome_groups
   has_many :destination_outcome_groups, class_name: "LearningOutcomeGroup", inverse_of: :source_outcome_group, dependent: :nullify
   has_many :child_outcome_groups, class_name: "LearningOutcomeGroup"
-  has_many :child_outcome_links, -> { where(tag_type: "learning_outcome_association", content_type: "LearningOutcome") }, class_name: "ContentTag", as: :associated_asset
+  has_many :child_outcome_links, -> { where(tag_type: "learning_outcome_association", content_type: "LearningOutcome") }, class_name: "ContentTag", as: :associated_asset, inverse_of: :associated_asset
   belongs_to :context, polymorphic: [:account, :course]
 
   before_save :infer_defaults

@@ -24,7 +24,7 @@ export const CREATE_COMMENT_MUTATION = gql`
   mutation CreateCommentBankItem($courseId: ID!, $comment: String!) {
     createCommentBankItem(input: {courseId: $courseId, comment: $comment}) {
       commentBankItem {
-        _id
+        id: _id
         comment
       }
       errors {

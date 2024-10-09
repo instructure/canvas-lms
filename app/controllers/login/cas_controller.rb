@@ -53,7 +53,7 @@ class Login::CasController < ApplicationController
       logger.warn "Failed to validate CAS ticket: #{e.inspect}"
 
       if e.is_a?(Timeout::Error)
-        tags = { auth_type: aac.auth_type, auth_provider_id: aac.global_id }
+        tags = { auth_type: aac.auth_type, auth_provider_id: aac.global_id, domain: request.host }
         if e.respond_to?(:error_count)
           tags[:error_count] = e.error_count
           InstStatsd::Statsd.increment(statsd_timeout_cutoff, tags:)

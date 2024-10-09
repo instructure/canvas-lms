@@ -127,6 +127,6 @@ class CustomData < ActiveRecord::Base
   end
 
   def data_frd
-    read_or_initialize_attribute(:data, {})
+    self["data"] ||= {}
   end
 end

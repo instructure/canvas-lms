@@ -21,8 +21,8 @@
 class Mutations::UpdateSubmissionsReadState < Mutations::BaseMutation
   graphql_name "UpdateSubmissionsReadState"
 
-  argument :submission_ids, [ID], required: true, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Submission")
   argument :read, Boolean, required: true
+  argument :submission_ids, [ID], required: true, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Submission")
 
   field :submissions, [Types::SubmissionType], null: true
   def resolve(input:)

@@ -26,18 +26,18 @@ module Types
 
     global_id_field :id
 
-    field :parent_outcome_group, Types::LearningOutcomeGroupType, null: true
     field :child_groups,
           Types::LearningOutcomeGroupType.connection_type,
           null: true
+    field :parent_outcome_group, Types::LearningOutcomeGroupType, null: true
     def child_groups
       active_child_groups
     end
 
     field :context_id, ID, null: true
     field :context_type, String, null: true
-    field :title, String, null: false
     field :description, String, null: true
+    field :title, String, null: false
     field :vendor_guid, String, null: true
 
     field :can_edit, Boolean, null: false
@@ -69,8 +69,8 @@ module Types
     end
 
     field :outcomes, Types::ContentTagConnection, null: false do
-      argument :search_query, String, required: false
       argument :filter, String, required: false
+      argument :search_query, String, required: false
     end
     def outcomes(**args)
       learning_outcome_group_children_service.suboutcomes_by_group_id(object.id, args)

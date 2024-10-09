@@ -194,8 +194,8 @@ export default forwardRef(function ItemAssignToCard(
     () => ({
       breakpoints: {},
       showMessages: false,
-      locale: ENV.LOCALE || 'en',
-      timezone: ENV.TIMEZONE || 'UTC',
+      locale: ENV?.LOCALE || 'en',
+      timezone: ENV?.TIMEZONE || 'UTC',
     }),
     []
   )
@@ -425,7 +425,7 @@ export default forwardRef(function ItemAssignToCard(
           clearAllDisabled={true}
           size="medium"
           messages={showValidations ? error : []}
-          disabledOptionIds={disabledOptionIdsRef.current}
+          disabledOptionIds={disabledOptionIdsRef?.current}
           disableFetch={!isOpenRef?.current ?? false}
           customAllOptions={customAllOptions}
           customIsLoading={customIsLoading}

@@ -60,7 +60,7 @@ describe('initExternalToolsLocalPlugin', () => {
     initExternalToolsLocalPlugin(editor)
 
     expect(editor.ui.registry.addMenuButton).toHaveBeenCalledWith('lti_mru_button', {
-      tooltip: 'Apps',
+      tooltip: 'apps-temp',
       icon: 'lti',
       fetch: expect.any(Function),
       onSetup: expect.any(Function),

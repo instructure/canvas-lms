@@ -32,7 +32,9 @@ export type PlacementsConfirmationProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
 }
 
-const allPlacements = [...AllLtiPlacements].filter(p => !UNDOCUMENTED_PLACEMENTS.includes(p))
+const allPlacements = [...AllLtiPlacements]
+  .filter(p => !UNDOCUMENTED_PLACEMENTS.includes(p as any))
+  .sort()
 
 export const PlacementsConfirmationWrapper = ({
   internalConfig,

@@ -22,8 +22,8 @@ module Types
   class AnonymousUserType < ApplicationObjectType
     graphql_name "AnonymousUser"
 
-    field :id, ID, null: false
     field :avatar_url, String, null: true
+    field :id, ID, null: false
     field :short_name, String, null: false
   end
 end

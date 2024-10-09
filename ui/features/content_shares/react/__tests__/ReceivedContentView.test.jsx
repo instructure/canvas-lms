@@ -120,7 +120,7 @@ describe('view of received content', () => {
     const shares = [assignmentShare]
     fetchMock.put(`/api/v1/users/self/content_shares/${assignmentShare.id}`, {
       status: 200,
-      body: JSON.stringify({read_state: 'read', id: unreadDiscussionShare.id}),
+      body: {read_state: 'read', id: unreadDiscussionShare.id},
     })
     useFetchApi.mockImplementationOnce(({loading, success}) => {
       loading(false)
@@ -165,7 +165,7 @@ describe('view of received content', () => {
       })
       fetchMock.put(`/api/v1/users/self/content_shares/${unreadDiscussionShare.id}`, {
         status: 200,
-        body: JSON.stringify({read_state: 'read', id: unreadDiscussionShare.id}),
+        body: {read_state: 'read', id: unreadDiscussionShare.id},
       })
     })
 

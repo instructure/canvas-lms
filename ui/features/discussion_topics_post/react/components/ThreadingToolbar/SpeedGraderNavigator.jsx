@@ -17,10 +17,11 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {useState, useRef} from 'react'
+import React, {useState, useRef, useContext} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 import useSpeedGrader from '../../hooks/useSpeedGrader'
+import {DiscussionManagerUtilityContext, SearchContext} from '../../utils/constants'
 
 const I18n = useI18nScope('speed_grader')
 
@@ -40,16 +41,34 @@ export const SpeedGraderNavigator = () => {
   const containerRef = useRef(null)
 
   const {
-    handlePreviousStudentReply,
-    handleNextStudentReply,
-    handleJumpFocusToSpeedGrader
-  } = useSpeedGrader()
+    highlightEntryId,
+    setHighlightEntryId,
+    setPageNumber,
+    expandedThreads,
+    setExpandedThreads,
+    setFocusSelector,
+  } = useContext(DiscussionManagerUtilityContext)
+
+  const {sort, perPage, discussionID} = useContext(SearchContext)
+
+  const {handlePreviousStudentReply, handleNextStudentReply, handleJumpFocusToSpeedGrader} =
+    useSpeedGrader({
+      highlightEntryId,
+      setHighlightEntryId,
+      setPageNumber,
+      expandedThreads,
+      setExpandedThreads,
+      setFocusSelector,
+      discussionID,
+      perPage,
+      sort,
+    })
 
   const handleFocus = () => {
     setIsVisible(true)
   }
 
-  const handleBlur = (event) => {
+  const handleBlur = event => {
     if (!containerRef.current?.contains(event.relatedTarget)) {
       setIsVisible(false)
     }
@@ -59,7 +78,7 @@ export const SpeedGraderNavigator = () => {
     if (!handler) return null
     return (
       <Flex.Item padding="0 x-small">
-        <Button data-testid={testId} onClick={handler}>
+        <Button data-testid={testId} id={testId} onClick={handler}>
           {text}
         </Button>
       </Flex.Item>
@@ -69,6 +88,7 @@ export const SpeedGraderNavigator = () => {
   return (
     <div
       ref={containerRef}
+      id={'speedgrader-navigator'}
       style={isVisible ? {} : visuallyHiddenStyles}
       aria-hidden={!isVisible}
       onFocus={handleFocus}

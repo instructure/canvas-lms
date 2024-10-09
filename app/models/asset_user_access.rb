@@ -66,13 +66,13 @@ class AssetUserAccess < ActiveRecord::Base
 
   def display_name
     # repair existing AssetUserAccesses that have bad display_names
-    if read_attribute(:display_name) == asset_code
+    if super == asset_code
       better_display_name = asset_display_name
       if better_display_name != asset_code
         update_attribute(:display_name, better_display_name)
       end
     end
-    read_attribute(:display_name)
+    super
   end
 
   def asset_display_name

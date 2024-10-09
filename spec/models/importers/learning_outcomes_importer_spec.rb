@@ -75,7 +75,7 @@ describe "Importing Learning Outcomes" do
     existing_outcome = LearningOutcome.where(migration_id: "bdf6dc13-5d8f-43a8-b426-03380c9b6781").first
     identifier = existing_outcome.migration_id
     lo_data = @data["learning_outcomes"].find { |lo| lo["migration_id"] == identifier }
-    existing_outcome.write_attribute("migration_id", "7321d12e-3705-430d-9dfd-2511b0c73c14")
+    existing_outcome.migration_id = "7321d12e-3705-430d-9dfd-2511b0c73c14"
     existing_outcome.save!
     lo_data[:migration_id] = "7321d12e-3705-430d-9dfd-2511b0c73c14"
     Importers::LearningOutcomeImporter.import_from_migration(lo_data, @migration)
@@ -102,7 +102,7 @@ describe "Importing Learning Outcomes" do
                                          context: context2,
                                          description: friendly_description
                                        })
-    outcome.write_attribute("migration_id", "bdf6dc13-5d8f-43a8-b426-03380c9b6781")
+    outcome.migration_id = "bdf6dc13-5d8f-43a8-b426-03380c9b6781"
     identifier = outcome.migration_id
     lo_data = @data["learning_outcomes"].find { |lo| lo["migration_id"] == identifier }
     Account.site_admin.enable_feature! :outcomes_friendly_description

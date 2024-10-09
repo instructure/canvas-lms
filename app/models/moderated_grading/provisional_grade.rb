@@ -32,7 +32,8 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   has_many :rubric_assessments, as: :artifact
   has_one :selection,
           class_name: "ModeratedGrading::Selection",
-          foreign_key: :selected_provisional_grade_id
+          foreign_key: :selected_provisional_grade_id,
+          inverse_of: :provisional_grade
 
   belongs_to :source_provisional_grade, class_name: "ModeratedGrading::ProvisionalGrade"
 

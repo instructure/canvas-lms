@@ -41,7 +41,7 @@ describe Lti::ContentItemSelectionRequest do
   let(:tool) { new_valid_tool(course) }
   let(:launch_url) { "http://www.test.com/launch" }
 
-  context "#generate_lti_launch" do
+  describe "#generate_lti_launch" do
     it "generates an Lti::Launch" do
       expect(lti_request.generate_lti_launch(placement:)).to be_a Lti::Launch
     end
@@ -343,7 +343,7 @@ describe Lti::ContentItemSelectionRequest do
     end
   end
 
-  context ".default_lti_params" do
+  describe ".default_lti_params" do
     before do
       allow(Lti::Asset).to receive(:opaque_identifier_for).with(course).and_return("course_opaque_id")
     end

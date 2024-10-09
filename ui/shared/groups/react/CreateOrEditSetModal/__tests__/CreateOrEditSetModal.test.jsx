@@ -48,4 +48,64 @@ describe('CreateOrEditSetModal', () => {
     await fetchMock.flush(true)
     expect(getAllByText(/error/i)[0].innerHTML).toContain(errorMessage)
   })
+
+  describe('small screen', () => {
+    beforeEach(() => {
+      window.matchMedia = jest.fn().mockImplementation(query => {
+        return {
+          matches: query.includes('(max-width: 600px)'),
+          media: query,
+          onchange: null,
+          addListener: jest.fn(),
+          removeListener: jest.fn()
+        }
+      })
+    })
+
+    it('renders components with column direction', () => {
+      const {getByTestId} = render(<CreateOrEditSetModal allowSelfSignup={true} contextId="1" />)
+
+      const groupSetName = getByTestId('group-name-controls')
+      const groupSetNameStyle = getComputedStyle(groupSetName)
+      expect(groupSetNameStyle.flexDirection).toBe('column')
+
+      const groupStructure = getByTestId('group-structure-controls')
+      const groupStructuretyle = getComputedStyle(groupStructure)
+      expect(groupStructuretyle.flexDirection).toBe('column')
+
+      const groupSelfSignUp = getByTestId('group-self-sign-up-controls')
+      const groupSelfSignUpStyle = getComputedStyle(groupSelfSignUp)
+      expect(groupSelfSignUpStyle.flexDirection).toBe('column')
+    })
+  })
+
+  describe('not small screen', () => {
+    beforeEach(() => {
+      window.matchMedia = jest.fn().mockImplementation(query => {
+        return {
+          matches: !query.includes('(max-width: 600px)'),
+          media: query,
+          onchange: null,
+          addListener: jest.fn(),
+          removeListener: jest.fn()
+        }
+      })
+    })
+
+    it('renders components with row direction', () => {
+      const {getByTestId} = render(<CreateOrEditSetModal allowSelfSignup={true} contextId="1" />)
+
+      const groupSetName = getByTestId('group-name-controls')
+      const groupSetNameStyle = getComputedStyle(groupSetName)
+      expect(groupSetNameStyle.flexDirection).toBe('row')
+
+      const groupStructure = getByTestId('group-structure-controls')
+      const groupStructuretyle = getComputedStyle(groupStructure)
+      expect(groupStructuretyle.flexDirection).toBe('row')
+
+      const groupSelfSignUp = getByTestId('group-self-sign-up-controls')
+      const groupSelfSignUpStyle = getComputedStyle(groupSelfSignUp)
+      expect(groupSelfSignUpStyle.flexDirection).toBe('row')
+    })
+  })
 })

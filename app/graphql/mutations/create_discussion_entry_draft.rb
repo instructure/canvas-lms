@@ -21,23 +21,23 @@
 class Mutations::CreateDiscussionEntryDraft < Mutations::BaseMutation
   graphql_name "CreateDiscussionEntryDraft"
 
-  argument :discussion_topic_id,
-           ID,
-           required: true,
-           prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionTopic")
   argument :discussion_entry_id,
            ID,
            required: false,
            prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionEntry")
-  argument :parent_id,
+  argument :discussion_topic_id,
            ID,
-           required: false,
-           prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionEntry")
+           required: true,
+           prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionTopic")
   argument :file_id,
            ID,
            required: false,
            prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Attachment")
   argument :message, String, required: true
+  argument :parent_id,
+           ID,
+           required: false,
+           prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionEntry")
 
   field :discussion_entry_draft, Types::DiscussionEntryDraftType, null: true
 

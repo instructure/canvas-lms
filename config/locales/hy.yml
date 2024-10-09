@@ -7205,6 +7205,7 @@ hy:
   for_974cbb84: Համար
   for_all_devices_1f603968: "Բոլոր սարքերի համար"
   for_title_69d92b3a: "%{title} համար"
+  forgot_password_9098c30d: "Գաղտնաբառը մոռացել եք"
   forgot_password_f0c3fbac: "Մոռացել եք գաղտնաբա՞ռը"
   forgot_password_url_3f9c04b: "Մոռացել եմ URL գաղտնաբառը"
   form_background_fb654518: "Ձեւավորել ֆոն"
@@ -15803,6 +15804,7 @@ hy:
   show_totals_as_points_on_student_grade_page_d9cb4207: "Ունկնդրի գնահատականների էջում ցույց տալ ընդհանուր արդյունքը՝ միավորների տեսքով  "
   showing_count_results_below_61ddca33: 
     zero: "Արդյունքներ չեն ստացվել"
+  sign_in_c6858e26: "Մուտք գործել համակարգ"
   sign_up_dafdee18: Գրանցվել
   simple_tls_45df2648: "Պարզ  TLS"
   sis_agent_token_authentication_2a0b29e3: "SIS գործակալի token-ի վավերացում"
@@ -16029,6 +16031,7 @@ hy:
   statistics_for_course_f74c2a78: "%{course} դասընթացի վիճակագրություն"
   stats_9272cef3: Վիճակագրություն
   status_e7fdbe06: Կարգավիճակ
+  stay_signed_in_1853e9b6: "Պահպանել գաղտնաբառը"
   step: Քայլ
   strand_955969b1: կոնֆլիկտ
   stream_items_api: 
@@ -16966,6 +16969,7 @@ hy:
   use_new_folder_tree_in_files_eb5a451b: "Ֆայլերում օգտագործել նոր թղթապանակի ծառը "
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Օգտագործել նոր թեստերի LTI գործիքը Canvas սովորական թեստերի փոխարեն:"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Օգտագործել այս կոնֆիգուրացիան ծնողի/դիտորդի գրանցման համար"
+  use_this_same_grade_for_the_resubmission_eaa6bf55: "Օգտագործել գնահատման նույն սխեման հանձնարարության կրկնակի ուղարկման համար"
   used_by_permission_314a78dd: "Օգտագործվում է թույլտվության հիման վրա"
   user: 
     default_user_name: Օգտատեր

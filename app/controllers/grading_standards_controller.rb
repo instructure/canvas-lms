@@ -63,7 +63,7 @@ class GradingStandardsController < ApplicationController
   def create
     if authorized_action(@context, @current_user, :manage_grades)
       @standard = @context.grading_standards.build(grading_standard_params)
-      if @standard.read_attribute(:data).blank?
+      if @standard["data"].blank?
         @standard.data = GradingStandard.default_grading_standard
       end
       @standard.user = @current_user

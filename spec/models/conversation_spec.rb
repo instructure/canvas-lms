@@ -600,11 +600,11 @@ describe Conversation do
         u1 = student_in_course.user
         u2 = student_in_course(course: @course).user
         conversation = Conversation.initiate([u1, u2], true)
-        expect(conversation.read_attribute(:tags)).not_to be_nil
+        expect(conversation["tags"]).not_to be_nil
         expect(conversation.tags).to eql []
-        expect(u1.all_conversations.first.read_attribute(:tags)).not_to be_nil
+        expect(u1.all_conversations.first["tags"]).not_to be_nil
         expect(u1.all_conversations.first.tags).to eql []
-        expect(u2.all_conversations.first.read_attribute(:tags)).not_to be_nil
+        expect(u2.all_conversations.first["tags"]).not_to be_nil
         expect(u2.all_conversations.first.tags).to eql []
       end
 

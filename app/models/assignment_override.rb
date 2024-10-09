@@ -43,6 +43,8 @@ class AssignmentOverride < ActiveRecord::Base
   belongs_to :discussion_topic, inverse_of: :assignment_overrides
   belongs_to :attachment, inverse_of: :assignment_overrides
   belongs_to :set, polymorphic: %i[group course_section course], exhaustive: false
+  belongs_to :parent_override, class_name: "AssignmentOverride", optional: true
+  has_many :child_overrides, class_name: "AssignmentOverride", foreign_key: "parent_override_id", inverse_of: :parent_override, dependent: :destroy
   has_many :assignment_override_students, -> { where(workflow_state: "active") }, inverse_of: :assignment_override, dependent: :destroy, validate: false
   validates :assignment_version, presence: { if: :assignment }
   validates :title, :workflow_state, presence: true
@@ -63,6 +65,8 @@ class AssignmentOverride < ActiveRecord::Base
                                    if: ->(override) { override.discussion_topic? && override.active? && concrete_set.call(override) } }
   validates :set_id, uniqueness: { scope: %i[attachment_id set_type workflow_state],
                                    if: ->(override) { override.attachment? && override.active? && concrete_set.call(override) } }
+
+  validate :validate_parent_override_for_sub_assignment
 
   before_create :set_root_account_id
 
@@ -140,6 +144,16 @@ class AssignmentOverride < ActiveRecord::Base
   def set_not_empty?
     ["CourseSection", "Group", SET_TYPE_NOOP, "Course"].include?(set_type) ||
       (set.any? && overridable.context.current_enrollments.where(user_id: set).exists?)
+  end
+
+  def validate_parent_override_for_sub_assignment
+    if assignment.is_a?(SubAssignment)
+      if parent_override_id.blank?
+        errors.add(:parent_override_id, "must be present for sub-assignment overrides")
+      end
+    elsif parent_override_id.present?
+      errors.add(:parent_override_id, "can only be set for overrides belonging to a SubAssignment")
+    end
   end
 
   def update_grading_period_grades
@@ -252,6 +266,7 @@ class AssignmentOverride < ActiveRecord::Base
   def destroy
     transaction do
       assignment_override_students.reload.destroy_all
+      child_overrides.reload.each(&:destroy)
       self.workflow_state = "deleted"
       default_values
       save!(validate: false)
@@ -306,12 +321,7 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   # override set read accessor and set_id read/write accessors so that reading
-  # set/set_id or setting set_id while set_type=ADHOC doesn't try and find the
-  # ADHOC model
-  def set_id
-    read_attribute(:set_id)
-  end
-
+  # set while set_type=ADHOC doesn't try and find the # ADHOC model
   def set
     case self.set_type
     when "ADHOC"
@@ -320,14 +330,6 @@ class AssignmentOverride < ActiveRecord::Base
       super
     else
       nil
-    end
-  end
-
-  def set_id=(id)
-    if ["ADHOC", SET_TYPE_NOOP].include? self.set_type
-      write_attribute(:set_id, id)
-    else
-      super
     end
   end
 
@@ -414,19 +416,19 @@ class AssignmentOverride < ActiveRecord::Base
     new_due_at = CanvasTime.fancy_midnight(new_due_at)
     new_all_day, new_all_day_date = Assignment.all_day_interpretation(
       due_at: new_due_at,
-      due_at_was: read_attribute(:due_at),
-      all_day_was: read_attribute(:all_day),
-      all_day_date_was: read_attribute(:all_day_date)
+      due_at_was: due_at,
+      all_day_was: all_day,
+      all_day_date_was: all_day_date
     )
 
-    write_attribute(:due_at, new_due_at)
-    write_attribute(:all_day, new_all_day)
-    write_attribute(:all_day_date, new_all_day_date)
+    super
+    self.all_day = new_all_day
+    self.all_day_date = new_all_day_date
   end
 
   def lock_at=(new_lock_at)
     new_lock_at = self.class.type_for_attribute(:lock_at).cast(new_lock_at) if new_lock_at.is_a?(String)
-    write_attribute(:lock_at, CanvasTime.fancy_midnight(new_lock_at))
+    super(CanvasTime.fancy_midnight(new_lock_at))
   end
 
   def availability_expired?
@@ -540,6 +542,15 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def set_root_account_id
-    write_attribute(:root_account_id, root_account_id) unless read_attribute(:root_account_id)
+    self.root_account_id = root_account_id unless self[:root_account_id]
+  end
+
+  def sub_assignment_due_dates
+    child_overrides.active.preload(:assignment).map do |child|
+      {
+        sub_assignment_tag: child.assignment&.sub_assignment_tag,
+        due_at: child.due_at
+      }
+    end
   end
 end

@@ -106,14 +106,16 @@ class AuthenticationProvider
     alias_attribute :discovery_url, :metadata_uri
     alias_attribute :issuer, :idp_entity_id
 
-    def generate_authorize_url(redirect_uri, state, nonce:)
+    def generate_authorize_url(redirect_uri, state, nonce:, **authorize_options)
       return super unless self.class.always_validate? || account.feature_enabled?(:oidc_full_token_validation)
 
-      client.auth_code.authorize_url({ redirect_uri:, state:, nonce: }.merge(authorize_options))
+      client.auth_code.authorize_url({ redirect_uri:, state:, nonce: }
+                                     .merge(self.authorize_options)
+                                     .merge(authorize_options))
     end
 
     def raw_login_attribute
-      read_attribute(:login_attribute).presence
+      self["login_attribute"].presence
     end
 
     def login_attribute
@@ -129,6 +131,13 @@ class AuthenticationProvider
 
       # the raw JWT for RP Initiated Logout
       session[:oidc_id_token] = token.options[:jwt_string]
+
+      return unless (id_token = claims(token))
+
+      # useful claims for back channel logout
+      session[:oidc_id_token_iss] = id_token["iss"]
+      session[:oidc_id_token_sub] = id_token["sub"]
+      session[:oidc_id_token_sid] = id_token["sid"] if id_token["sid"]
     end
 
     def user_logout_redirect(controller, _current_user)
@@ -234,6 +243,22 @@ class AuthenticationProvider
       self.jwks_uri = json["jwks_uri"]
     end
 
+    def validate_signature(token)
+      if token.alg&.to_sym == :none
+        return "Token is not signed"
+      elsif token.send(:hmac?)
+        token.verify!(client_secret)
+      elsif (jwks = self.jwks).nil?
+        return "No JWKS available to validate signature"
+      else
+        token.verify!(jwks)
+      end
+
+      nil
+    rescue JSON::JWT::VerificationFailed => e
+      e.message
+    end
+
     protected
 
     def authorize_options
@@ -249,22 +274,6 @@ class AuthenticationProvider
           options[:auth_scheme] = :request_body
         end
       end
-    end
-
-    def validate_signature(token)
-      if token.alg&.to_sym == :none
-        return "Token is not signed"
-      elsif token.send(:hmac?)
-        token.verify!(client_secret)
-      elsif (jwks = self.jwks).nil?
-        return "No JWKS available to validate signature"
-      else
-        token.verify!(jwks)
-      end
-
-      nil
-    rescue JSON::JWT::VerificationFailed => e
-      e.message
     end
 
     private

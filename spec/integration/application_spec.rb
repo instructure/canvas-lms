@@ -45,6 +45,14 @@ describe "site-wide" do
     expect(response["Cache-Control"]).not_to match(/no-store/)
   end
 
+  it "does set ETag header for API/xhr requests" do
+    allow_any_instance_of(EnableRackChunking).to receive(:chunkable_version?).and_return(true)
+    course_with_teacher_logged_in
+    get "/api/v1/courses"
+    assert_status(200)
+    expect(response["ETag"]).not_to be_nil
+  end
+
   it "sets the content-security-policy http header" do
     get "/login"
     expect(assigns[:files_domain]).to be_falsey

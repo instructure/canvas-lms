@@ -316,6 +316,12 @@ describe AuthenticationProvider do
       expect(@pseudonym.integration_id).to eq "testfrd"
     end
 
+    it "supports multiple emails" do
+      aac.apply_federated_attributes(@pseudonym, { "email" => %w[cody@school.edu student@school.edu] })
+      @user.reload
+      expect(@user.communication_channels.email.pluck(:path)).to eq(%w[nobody@example.com cody@school.edu student@school.edu])
+    end
+
     it "can autoconfirm emails" do
       aac.federated_attributes["email"]["autoconfirm"] = true
       aac.apply_federated_attributes(@pseudonym,
@@ -404,6 +410,13 @@ describe AuthenticationProvider do
         aac.apply_federated_attributes(@pseudonym, { "locale" => "en-gb" })
         @user.reload
         expect(@user.locale).to eq "en-GB"
+      end
+
+      it "supports multiple incoming values, selecting the first available match" do
+        allow(I18n).to receive(:available_locales).and_return(%w[fr en])
+        aac.apply_federated_attributes(@pseudonym, { "locale" => %w[ab-CD fr-FR] })
+        @user.reload
+        expect(@user.locale).to eq "fr"
       end
     end
   end

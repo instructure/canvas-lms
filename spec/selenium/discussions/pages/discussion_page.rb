@@ -27,6 +27,10 @@ class Discussion
       "[data-testid='CoursePacingNotice']"
     end
 
+    def assignee_selector_selector
+      "[data-testid='assignee_selector']"
+    end
+
     def assign_to_button_selector
       "button[data-testid='manage-assign-to']"
     end
@@ -140,6 +144,10 @@ class Discussion
     end
 
     # ---------------------- Elements ----------------------
+    def assignee_selector
+      ff(assignee_selector_selector)
+    end
+
     def assign_to_card
       f(assign_to_card_selector)
     end
@@ -353,6 +361,7 @@ class Discussion
     end
 
     def update_discussion_topic_title(title = "Default Discussion Title")
+      topic_title_input.send_keys([:control, "a"], :backspace)
       topic_title_input.send_keys title
     end
 

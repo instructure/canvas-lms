@@ -24,7 +24,7 @@ import {toQueryString} from '@instructure/query-string-encoding'
 import type {QueryParameterRecord} from '@instructure/query-string-encoding/index.d'
 import z from 'zod'
 
-type RequestCredentials = 'include' | 'omit' | 'same-origin'
+const jsonRegEx = new RegExp('^application/json', 'i')
 
 function constructRelativeUrl({
   path,
@@ -46,7 +46,7 @@ interface RequestInit {
 export type DoFetchApiOpts = {
   path: string
   method?: string
-  headers?: {[k: string]: string}
+  headers?: {[k: string]: string} | Headers
   params?: QueryParameterRecord
   // eslint-disable-next-line no-undef
   body?: BodyInit
@@ -55,6 +55,7 @@ export type DoFetchApiOpts = {
 }
 
 export type DoFetchApiResults<T> = {
+  text: string
   json?: T
   response: Response
   link?: Links
@@ -63,29 +64,37 @@ export type DoFetchApiResults<T> = {
 export default async function doFetchApi<T = unknown>({
   path,
   method = 'GET',
-  headers = {},
+  headers = {}, // can be object or Headers
   params = {},
   body,
   signal,
-  fetchOpts = {}, // we do not deep-merge fetchOptions.headers
+  fetchOpts = {}, // do not specify headers in fetchOpts.headers ... use headers instead
 }: DoFetchApiOpts): Promise<DoFetchApiResults<T>> {
-  const finalFetchOptions = {...defaultFetchOptions()}
-  finalFetchOptions.headers['X-CSRF-Token'] = getCookie('_csrf_token')
+  const {credentials, headers: defaultHeaders} = defaultFetchOptions()
+  const suppliedHeaders = new Headers(headers)
+  const fetchHeaders = new Headers(defaultHeaders)
 
-  if (body && !(body instanceof FormData) && !(typeof body === 'string')) {
-    body = JSON.stringify(body)
-    finalFetchOptions.headers['Content-Type'] = 'application/json'
+  suppliedHeaders.forEach((v, k) => fetchHeaders.set(k, v))
+  fetchHeaders.set('X-CSRF-Token', getCookie('_csrf_token'))
+
+  // properly encode and set the content type if a body was given
+  if (body) {
+    if (body instanceof FormData) {
+      fetchHeaders.delete('Content-Type') // must let the browser handle it
+    } else if (typeof body !== 'string') {
+      body = JSON.stringify(body)
+      fetchHeaders.set('Content-Type', 'application/json')
+    }
   }
-  Object.assign(finalFetchOptions.headers, headers)
-  Object.assign(finalFetchOptions, fetchOpts)
 
   const url = constructRelativeUrl({path, params})
   const response = await fetch(url, {
     body,
     method,
-    ...finalFetchOptions,
+    ...fetchOpts,
+    headers: fetchHeaders,
     signal,
-    credentials: finalFetchOptions.credentials as RequestCredentials,
+    credentials,
   })
   if (!response.ok) {
     const err = new Error(
@@ -95,10 +104,14 @@ export default async function doFetchApi<T = unknown>({
     throw err
   }
   const linkHeader = response.headers.get('Link')
+  const contentType = response.headers.get('Content-Type') ?? ''
   const link = (linkHeader && parseLinkHeader(linkHeader)) || undefined
   const text = await response.text()
-  const json = text.length > 0 ? (JSON.parse(text) as T) : undefined
-  return {json, response, link}
+  if (text.length > 0 && jsonRegEx.test(contentType)) {
+    const json = JSON.parse(text) as T
+    return {json, response, link, text}
+  }
+  return {response, link, text}
 }
 
 export type SafelyFetchResults<T> = {

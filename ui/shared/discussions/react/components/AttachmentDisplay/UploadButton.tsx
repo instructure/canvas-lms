@@ -51,7 +51,7 @@ export const UploadButton = ({...props}: Props) => {
   ) : (
     <>
       <CondensedButton
-        color="primary"
+        color="secondary"
         renderIcon={<IconPaperclipLine size="small" />}
         onClick={handleAttachmentClick}
         data-testid="attach-btn"

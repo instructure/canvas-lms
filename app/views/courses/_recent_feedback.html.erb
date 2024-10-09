@@ -29,17 +29,32 @@
     assignment = recent_feedback.assignment
     preserve_grade = ["letter_grade", "pass_fail"].include?(recent_feedback.assignment.grading_type)
     context = recent_feedback.assignment.context
+    title = assignment.title
+    if assignment.is_a?(SubAssignment)
+      parent_assignment = assignment.parent_assignment
+      assignment_id = parent_assignment.id
+      parent_assignment_submission_for_user = parent_assignment.submission_for_student(recent_feedback.user) if parent_assignment
+      comment = parent_assignment_submission_for_user.last_teacher_comment if parent_assignment_submission_for_user
+      num_replies = parent_assignment.discussion_topic.reply_to_entry_required_count || 1
+      title = if assignment.sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC
+                t('%{title} Reply to Topic', {title:})
+              elsif assignment.sub_assignment_tag == CheckpointLabels::REPLY_TO_ENTRY
+                t('%{title} Required Replies (%{num_replies})', {title:, num_replies:})
+              end
+    else
+      assignment_id = recent_feedback.assignment_id
+      comment = recent_feedback.last_teacher_comment
+    end
     if recent_feedback.assignment.a2_enabled?
       context_symbol = :context_assignment_url
-      context_params = {:id => recent_feedback.assignment_id}
+      context_params = {:id => assignment_id}
     else
       context_symbol = :context_assignment_submission_url
-      context_params = {:assignment_id => recent_feedback.assignment_id, :id => @user&.id || @current_user.id}
+      context_params = {:assignment_id => assignment_id, :id => @user&.id || @current_user.id}
     end
     url = context_url(context, context_symbol, context_params)
     grade = readable_grade(recent_feedback)
     score = recent_feedback.score
-    comment = recent_feedback.last_teacher_comment
     comment_text = HtmlTextHelper.strip_and_truncate(comment.comment, :max_length => 120) if comment
     icon_explanation, _, icon_class = icon_data(:context => context,
                                              :current_user => @current_user,
@@ -60,7 +75,7 @@
         <img src="<%= kaltura_thumbnail_url %>" style="max-width: 50px; max-height: 35px; float: <%= direction('right') %>; padding-<%= direction('left') %>: 3px;" alt=""/>
       <% end %>
       <b class="event-details__title recent_feedback_title">
-        <%= recent_feedback.assignment.title %>
+        <%= title %>
       </b>
       <% if show_context %>
         <p class="event-details__context">

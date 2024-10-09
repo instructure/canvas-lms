@@ -111,7 +111,8 @@ module UserLearningObjectScopes
     contexts: nil,
     include_concluded: false,
     include_ignored: false,
-    include_ungraded: false
+    include_ungraded: false,
+    discussion_checkpoints_enabled: false
   )
     original_shard = Shard.current
     shard.activate do
@@ -142,6 +143,7 @@ module UserLearningObjectScopes
               shard_course_ids,
               shard_group_ids,
               participation_type,
+              discussion_checkpoints_enabled:,
               include_ignored:,
               include_ungraded:
             ))
@@ -163,6 +165,7 @@ module UserLearningObjectScopes
                   shard_hash[:course_ids],
                   shard_hash[:group_ids],
                   participation_type,
+                  discussion_checkpoints_enabled:,
                   include_ignored:,
                   include_ungraded:
                 ))
@@ -182,15 +185,19 @@ module UserLearningObjectScopes
     shard_course_ids,
     shard_group_ids,
     participation_type,
+    discussion_checkpoints_enabled: false,
     include_ignored: false,
     include_ungraded: false
   )
     scope = object_type.constantize
     scope = scope.not_ignored_by(self, purpose) unless include_ignored
-    scope = scope.for_course(shard_course_ids) if ["Assignment", "Quizzes::Quiz"].include?(object_type)
-    if object_type == "Assignment"
+    scope = scope.for_course(shard_course_ids) if ["Assignment", "SubAssignment", "Quizzes::Quiz"].include?(object_type)
+    if ["Assignment", "SubAssignment"].include?(object_type)
       scope = (participation_type == :student) ? scope.published : scope.active
       scope = scope.expecting_submission unless include_ungraded
+      if object_type == "Assignment" && discussion_checkpoints_enabled
+        scope = scope.where(has_sub_assignments: false)
+      end
     end
     [scope, shard_course_ids, shard_group_ids]
   end
@@ -202,10 +209,12 @@ module UserLearningObjectScopes
     due_before: 2.weeks.from_now,
     cache_timeout: 120.minutes,
     include_locked: false,
+    is_sub_assignment: false,
     **opts # arguments that are just forwarded to objects_needing
   )
     params = _params_hash(binding)
-    objects_needing("Assignment",
+    object_type = is_sub_assignment ? "SubAssignment" : "Assignment"
+    objects_needing(object_type,
                     purpose,
                     :student,
                     params,
@@ -235,6 +244,7 @@ module UserLearningObjectScopes
     due_before: 1.week.from_now,
     scope_only: false,
     include_concluded: false,
+    is_sub_assignment: false,
     **opts # forward args to assignments_for_student
   )
     opts[:cache_timeout] = 15.minutes
@@ -328,12 +338,12 @@ module UserLearningObjectScopes
   end
 
   # opts forwaded to course_ids_for_todo_lists
-  def submissions_needing_grading_count(**opts)
+  def submissions_needing_grading_count(**)
     if ::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries", failsafe: false]
       return 0
     end
 
-    course_ids = course_ids_for_todo_lists(:manage_grades, **opts)
+    course_ids = course_ids_for_todo_lists(:manage_grades, **)
     Submission.active
               .needs_grading
               .joins("INNER JOIN #{Enrollment.quoted_table_name} AS grader_enrollments ON assignments.context_id = grader_enrollments.course_id")
@@ -351,14 +361,17 @@ module UserLearningObjectScopes
               ).count
   end
 
-  def assignments_needing_grading(limit: ULOS_DEFAULT_LIMIT, scope_only: false, **opts)
+  def assignments_needing_grading(limit: ULOS_DEFAULT_LIMIT, scope_only: false, is_sub_assignment: false, discussion_checkpoints_enabled: false, **opts)
     if ::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries", failsafe: false]
-      return scope_only ? Assignment.none : []
+      scope = is_sub_assignment ? SubAssignment.none : Assignment.none
+      return scope_only ? scope : []
     end
 
     params = _params_hash(binding)
+    params.delete(:is_sub_assignment)
     # not really any harm in extending the expires_in since we touch the user anyway when grades change
-    objects_needing("Assignment", "grading", :manage_grades, params, 120.minutes, **params) do |assignment_scope|
+    object_type = is_sub_assignment ? "SubAssignment" : "Assignment"
+    objects_needing(object_type, "grading", :manage_grades, params, 120.minutes, **params) do |assignment_scope|
       if Setting.get("assignments_needing_grading_new_style", "true") == "true"
         submissions_needing_grading = Submission.select(:assignment_id, :user_id)
                                                 .joins("INNER JOIN (#{assignment_scope.to_sql}) assignments ON assignment_id=assignments.id")

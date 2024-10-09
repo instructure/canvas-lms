@@ -496,7 +496,7 @@ class Group < ActiveRecord::Base
   end
 
   def account_id=(new_account_id)
-    write_attribute(:account_id, new_account_id)
+    super
     if account_id_changed?
       self.root_account = reload_account&.root_account
     end

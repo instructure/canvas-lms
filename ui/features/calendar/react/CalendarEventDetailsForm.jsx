@@ -617,6 +617,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
           <Flex.Item padding="none xxx-small" shouldShrink={true}>
             <Tooltip renderTip={I18n.t('A save is in progress')} on={isWorking ? undefined : []}>
               <Button
+                id="edit-calendar-event-submit-button"
                 data-testid="edit-calendar-event-submit-button"
                 color="primary"
                 onClick={e => {

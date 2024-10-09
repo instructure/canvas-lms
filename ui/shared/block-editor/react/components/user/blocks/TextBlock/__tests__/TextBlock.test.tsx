@@ -17,18 +17,21 @@
  */
 
 import React from 'react'
-import {render, getNodeText} from '@testing-library/react'
+import {render, getNodeText, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {Editor, Frame} from '@craftjs/core'
 import {TextBlock, type TextBlockProps} from '..'
 
 const renderBlock = (enabled: boolean, props: Partial<TextBlockProps> = {}) => {
   return render(
-    <Editor enabled={enabled} resolver={{TextBlock}}>
-      <Frame>
-        <TextBlock text="A Heading" {...props} />
-      </Frame>
-    </Editor>
+    <>
+      <div id="another-element" tabIndex={-1} />
+      <Editor enabled={enabled} resolver={{TextBlock}}>
+        <Frame>
+          <TextBlock {...props} />
+        </Frame>
+      </Editor>
+    </>
   )
 }
 
@@ -41,7 +44,7 @@ describe('TextBlock', () => {
       const contentEditable = container.querySelector('[contenteditable]') as HTMLElement
       expect(contentEditable).toBeInTheDocument()
       expect(contentEditable.getAttribute('data-placeholder')).toBe('Type something')
-      expect(contentEditable.getAttribute('disabled')).not.toBeNull()
+      expect(contentEditable.getAttribute('contenteditable')).toBe('true')
 
       const block = container.querySelector('.text-block')
       expect(block).toHaveStyle({
@@ -51,13 +54,25 @@ describe('TextBlock', () => {
       })
     })
 
+    it('should stop being editaaable on blur', async () => {
+      const {container} = renderBlock(true, {text: 'some text'})
+      const contentEditable = container.querySelector('[contenteditable]') as HTMLElement
+      ;(document.querySelector('.text-block') as HTMLElement).focus()
+      expect(contentEditable.getAttribute('contenteditable')).toBe('true')
+
+      document.getElementById('another-element')?.focus()
+      expect(contentEditable.getAttribute('contenteditable')).toBe('false')
+    })
+
     it('should render active editable version on click', async () => {
       const {container} = renderBlock(true, {text: 'some text'})
       const contentEditable = container.querySelector('[contenteditable]') as HTMLElement
-      await userEvent.click(contentEditable)
+      ;(document.querySelector('.text-block') as HTMLElement).focus()
+      document.getElementById('another-element')?.focus()
+      expect(contentEditable.getAttribute('contenteditable')).toBe('false')
 
+      await userEvent.click(contentEditable)
       expect(contentEditable.getAttribute('contenteditable')).toBe('true')
-      expect(contentEditable.getAttribute('disabled')).toBeNull()
     })
 
     it('respects the fontSize prop', () => {

@@ -30,7 +30,7 @@ module QuizMathDataFixup
     questions.find_each do |quiz_question|
       old_data = quiz_question.question_data.to_hash
       new_data = fixup_question_data(quiz_question.question_data.to_hash.symbolize_keys)
-      quiz_question.write_attribute(:question_data, new_data) if new_data != old_data
+      quiz_question["question_data"] = new_data if new_data != old_data
       if quiz_question.changed?
         stat = question_bank ? "updated_math_qb_question" : "updated_math_question"
         InstStatsd::Statsd.increment(stat)

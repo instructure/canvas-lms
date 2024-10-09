@@ -59,7 +59,7 @@ class ReportSnapshot < ActiveRecord::Base
 
   def data
     unless @data
-      @data = JSON.parse(read_attribute(:data) || "{}")
+      @data = JSON.parse(super || "{}")
       @data["generated_at"] = Time.at(@data["generated_at"].to_i / 1000) if @data["generated_at"]
     end
     @data
@@ -74,7 +74,7 @@ class ReportSnapshot < ActiveRecord::Base
 
     data = @data.dup
     data["generated_at"] = data["generated_at"].to_i * 1000 if data["generated_at"]
-    write_attribute(:data, data.to_json)
+    self["data"] = data.to_json
   end
 
   scope :detailed, -> { where(report_type: "counts_detailed") }
@@ -91,7 +91,7 @@ class ReportSnapshot < ActiveRecord::Base
       "collection_type" => collection_type,
       "installation_uuid" => Canvas.installation_uuid,
       "report_type" => report_type,
-      "data" => read_attribute(:data),
+      "data" => self["data"],
       "rails_env" => Rails.env
     }
 

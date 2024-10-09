@@ -32,7 +32,7 @@ GEM
       mutex_m
       representable (~> 3.0)
       retriable (>= 2.0, < 4.a)
-    google-apis-drive_v3 (0.55.0)
+    google-apis-drive_v3 (0.57.0)
       google-apis-core (>= 0.15.0, < 2.a)
     google-cloud-env (2.2.0)
       faraday (>= 1.0, < 3.a)
@@ -49,7 +49,7 @@ GEM
     irb (1.14.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
-    jwt (2.8.2)
+    jwt (2.9.0)
       base64
     logger (1.6.1)
     mini_mime (1.1.5)
@@ -64,7 +64,7 @@ GEM
     rake (13.2.1)
     rdoc (6.7.0)
       psych (>= 4.0.0)
-    reline (0.5.9)
+    reline (0.5.10)
       io-console (~> 0.5)
     representable (3.2.0)
       declarative (< 0.1.0)
@@ -78,7 +78,7 @@ GEM
       rspec-mocks (~> 3.13.0)
     rspec-core (3.13.1)
       rspec-support (~> 3.13.0)
-    rspec-expectations (3.13.2)
+    rspec-expectations (3.13.3)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-mocks (3.13.1)
@@ -117,7 +117,7 @@ DEPENDENCIES
   webmock
 
 RUBY VERSION
-   ruby 3.1.2p20
+   ruby 3.3.3p89
 
 BUNDLED WITH
    2.5.10

@@ -1059,6 +1059,7 @@ const locale = {
   },
   "styles_2aa721ef": { "message": "Estilos" },
   "submit_a3cc6859": { "message": "Submeter" },
+  "submitting_b90fac62": { "message": "A enviar..." },
   "subscript_59744f96": { "message": "Assinatura" },
   "subset_19c1a92f": { "message": "Subconjunto" },
   "subset_strict_8d8948d6": { "message": "Subconjunto (Estrito)" },

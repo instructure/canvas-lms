@@ -48,6 +48,9 @@ const searchFilter = {
   setAllThreadsStatus: () => {},
   expandedThreads: [],
   setExpandedThreads: () => {},
+  sort: 'desc',
+  perPage: '',
+  discussionID: '',
 }
 export const SearchContext = React.createContext(searchFilter)
 
@@ -58,6 +61,11 @@ const discussionManagerUtilityContext = {
   setUserSplitScreenPreference: () => {},
   highlightEntryId: '',
   setHighlightEntryId: () => {},
+  expandedThreads: '',
+  setExpandedThreads: () => {},
+  focusSelector: '',
+  setFocusSelector: () => {},
+  setPageNumber: () => {},
   isGradedDiscussion: false,
   setIsGradedDiscussion: () => {},
   usedThreadingToolbarChildRef: null,

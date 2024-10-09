@@ -20,6 +20,7 @@ require_relative "../common"
 require_relative "../helpers/context_modules_common"
 require_relative "../helpers/items_assign_to_tray"
 require_relative "page_objects/wiki_page"
+require_relative "page_objects/wiki_index_page"
 require_relative "../conditional_release/page_objects/conditional_release_objects"
 require_relative "../../helpers/selective_release_common"
 
@@ -29,6 +30,7 @@ describe "wiki pages edit page assign to" do
   include ContextModulesCommon
   include ItemsAssignToTray
   include CourseWikiPage
+  include CourseWikiIndexPage
   include SelectiveReleaseCommon
 
   before :once do
@@ -267,6 +269,28 @@ describe "wiki pages edit page assign to" do
       RoleOverride.create!(context: @course.account, permission: "manage_wiki_update", role: teacher_role, enabled: false)
       visit_wiki_edit_page(@course.id, @page.title)
       expect(element_exists?(assign_to_card_selector)).to be_falsey
+    end
+
+    context "with course pacing" do
+      before do
+        Account.site_admin.enable_feature! :course_paces
+        @course.enable_course_paces = true
+        @course.save!
+      end
+
+      it "mark only_visible_to_overrides to false" do
+        visit_course_wiki_index_page(@course.id)
+        page_index_new_page_btn.click
+        wait_for_ajaximations
+        wait_for_rce
+        replace_wiki_page_name("Course pacing page")
+
+        expect_new_page_load { save_wiki_page }
+
+        page = @course.wiki_pages.last
+
+        expect(page.only_visible_to_overrides).to be_falsey
+      end
     end
   end
 end

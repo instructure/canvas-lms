@@ -1,0 +1,356 @@
+{
+  "ROOT": {
+    "type": {
+      "resolvedName": "PageBlock"
+    },
+    "isCanvas": true,
+    "props": {},
+    "displayName": "Page",
+    "custom": {},
+    "hidden": false,
+    "nodes": [
+      "pEdeFvz6_0"
+    ],
+    "linkedNodes": {}
+  },
+  "le254LKmwg": {
+    "type": {
+      "resolvedName": "NoSections"
+    },
+    "isCanvas": true,
+    "props": {
+      "className": "",
+      "placeholderText": "Drop a block to add it here"
+    },
+    "displayName": "NoSections",
+    "custom": {
+      "noToolbar": true
+    },
+    "parent": "wasLLTTys-",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  },
+  "19FZlPv0ip": {
+    "type": {
+      "resolvedName": "IconBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "iconName": "apple",
+      "size": "small"
+    },
+    "displayName": "Icon",
+    "custom": {
+      "isBlock": true
+    },
+    "parent": "x2R701ix0i",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  },
+  "82_pwtLkUy": {
+    "type": {
+      "resolvedName": "IconBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "iconName": "apple",
+      "size": "small"
+    },
+    "displayName": "Icon",
+    "custom": {
+      "isBlock": true
+    },
+    "parent": "BnT5eI1NTo",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  },
+  "h8Z0p_5kko": {
+    "type": {
+      "resolvedName": "IconBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "iconName": "apple",
+      "size": "small"
+    },
+    "displayName": "Icon",
+    "custom": {
+      "isBlock": true
+    },
+    "parent": "BnT5eI1NTo",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  },
+  "BnT5eI1NTo": {
+    "type": {
+      "resolvedName": "NoSections"
+    },
+    "isCanvas": true,
+    "props": {
+      "className": "group-block__inner",
+      "placeholderText": "Drop a block to add it here"
+    },
+    "displayName": "NoSections",
+    "custom": {
+      "noToolbar": true
+    },
+    "parent": "pj2-2ElnvO",
+    "hidden": false,
+    "nodes": [
+      "82_pwtLkUy",
+      "h8Z0p_5kko"
+    ],
+    "linkedNodes": {}
+  },
+  "pj2-2ElnvO": {
+    "type": {
+      "resolvedName": "GroupBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "alignment": "start",
+      "verticalAlignment": "start",
+      "layout": "column",
+      "resizable": true
+    },
+    "displayName": "Group",
+    "custom": {
+      "isResizable": true,
+      "isBlock": true
+    },
+    "parent": "x2R701ix0i",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {
+      "group-block__inner": "BnT5eI1NTo"
+    }
+  },
+  "bbacglgLMO": {
+    "type": {
+      "resolvedName": "IconBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "iconName": "apple",
+      "size": "small"
+    },
+    "displayName": "Icon",
+    "custom": {
+      "isBlock": true
+    },
+    "parent": "x2R701ix0i",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  },
+  "x2R701ix0i": {
+    "type": {
+      "resolvedName": "NoSections"
+    },
+    "isCanvas": true,
+    "props": {
+      "className": "group-block__inner",
+      "placeholderText": "Drop a block to add it here"
+    },
+    "displayName": "NoSections",
+    "custom": {
+      "noToolbar": true
+    },
+    "parent": "wasLLTTys-",
+    "hidden": false,
+    "nodes": [
+      "19FZlPv0ip",
+      "pj2-2ElnvO",
+      "bbacglgLMO"
+    ],
+    "linkedNodes": {}
+  },
+  "wasLLTTys-": {
+    "type": {
+      "resolvedName": "GroupBlock"
+    },
+    "isCanvas": true,
+    "props": {
+      "alignment": "start",
+      "verticalAlignment": "start",
+      "layout": "row",
+      "resizable": false,
+      "id": "columns-pEdeFvz6_0-1"
+    },
+    "displayName": "Group",
+    "custom": {
+      "isResizable": false,
+      "isBlock": true
+    },
+    "parent": "ax57suVCfC",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {
+      "group-wasLLTTys-_inner": "le254LKmwg",
+      "group-block__inner": "x2R701ix0i"
+    }
+  },
+  "Gf-VVaO6hW": {
+    "type": {
+      "resolvedName": "IconBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "iconName": "idea",
+      "size": "small"
+    },
+    "displayName": "Icon",
+    "custom": {
+      "isBlock": true
+    },
+    "parent": "j4zjeVNAzu",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  },
+  "VnkkqQNVS4": {
+    "type": {
+      "resolvedName": "IconBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "iconName": "alarm",
+      "size": "small"
+    },
+    "displayName": "Icon",
+    "custom": {
+      "isBlock": true
+    },
+    "parent": "j4zjeVNAzu",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  },
+  "j4zjeVNAzu": {
+    "type": {
+      "resolvedName": "NoSections"
+    },
+    "isCanvas": true,
+    "props": {
+      "className": "group-block__inner",
+      "placeholderText": "Drop a block to add it here"
+    },
+    "displayName": "NoSections",
+    "custom": {
+      "noToolbar": true
+    },
+    "parent": "M398oEn_uF",
+    "hidden": false,
+    "nodes": [
+      "Gf-VVaO6hW",
+      "r5D-8fvHmd",
+      "VnkkqQNVS4"
+    ],
+    "linkedNodes": {}
+  },
+  "M398oEn_uF": {
+    "type": {
+      "resolvedName": "GroupBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "alignment": "start",
+      "verticalAlignment": "start",
+      "layout": "row",
+      "resizable": false
+    },
+    "displayName": "Group",
+    "custom": {
+      "isResizable": false,
+      "isBlock": true
+    },
+    "parent": "ax57suVCfC",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {
+      "group-block__inner": "j4zjeVNAzu"
+    }
+  },
+  "ax57suVCfC": {
+    "type": {
+      "resolvedName": "ColumnsSectionInner"
+    },
+    "isCanvas": true,
+    "props": {},
+    "displayName": "Columns",
+    "custom": {
+      "noToolbar": true
+    },
+    "parent": "pEdeFvz6_0",
+    "hidden": false,
+    "nodes": [
+      "wasLLTTys-",
+      "M398oEn_uF"
+    ],
+    "linkedNodes": {}
+  },
+  "pEdeFvz6_0": {
+    "type": {
+      "resolvedName": "ColumnsSection"
+    },
+    "isCanvas": false,
+    "props": {
+      "columns": 2
+    },
+    "displayName": "Blank Section",
+    "custom": {
+      "isSection": true
+    },
+    "parent": "ROOT",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {
+      "columns-pEdeFvz6_0__inner": "ax57suVCfC"
+    }
+  },
+  "r5D-8fvHmd": {
+    "type": {
+      "resolvedName": "GroupBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "alignment": "start",
+      "verticalAlignment": "start",
+      "layout": "column",
+      "resizable": true
+    },
+    "displayName": "Group",
+    "custom": {
+      "isResizable": true,
+      "isBlock": true
+    },
+    "parent": "j4zjeVNAzu",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {
+      "group-block__inner": "4lJ2nYk0sO"
+    }
+  },
+  "4lJ2nYk0sO": {
+    "type": {
+      "resolvedName": "NoSections"
+    },
+    "isCanvas": true,
+    "props": {
+      "className": "group-block__inner",
+      "placeholderText": "Drop a block to add it here"
+    },
+    "displayName": "NoSections",
+    "custom": {
+      "noToolbar": true
+    },
+    "parent": "r5D-8fvHmd",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  }
+}

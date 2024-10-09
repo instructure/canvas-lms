@@ -34,6 +34,7 @@ import {GroupStructure} from './GroupStructure'
 import {Leadership} from './Leadership'
 import {AssignmentProgress} from './AssignmentProgress'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {Responsive} from '@instructure/ui-responsive'
 
 const I18n = useI18nScope('groups')
 
@@ -291,28 +292,46 @@ export const CreateOrEditSetModal = ({
   }
 
   const renderDialogBody = () => (
-    <GroupContext.Provider value={stateToContext(st)}>
-      <GroupSetName
-        errormsg={st.errors.name}
-        onChange={newName => dispatch({ev: 'name-change', to: newName})}
-        elementRef={el => {
-          topElement.current = el
+    
+      <Responsive
+        match="media"
+        query={{
+          small: { maxWidth: 600 },
+        }}
+        props={{
+          small: {
+            direction: 'column'
+          },
+        }}
+        render={(props, matches) => {
+              return(
+                <GroupContext.Provider value={stateToContext(st)}>
+                  <GroupSetName
+                    errormsg={st.errors.name}
+                    onChange={newName => dispatch({ev: 'name-change', to: newName})}
+                    elementRef={el => {
+                      topElement.current = el
+                    }}
+                  {...props}
+                  />
+                  {allowSelfSignup && (
+                    <>
+                      <Divider />
+                      <SelfSignup onChange={to => dispatch({ev: 'selfsignup-change', to})} {...props} />
+                      <Divider />
+                      <GroupStructure
+                        errormsg={st.errors.structure}
+                        onChange={to => dispatch({ev: 'structure-change', to})}
+                        {...props}
+                      />
+                      <Divider />
+                      <Leadership onChange={to => dispatch({ev: 'leadership-change', to})} {...props} />
+                    </>
+                  )}
+                  </GroupContext.Provider>
+              )
         }}
       />
-      {allowSelfSignup && (
-        <>
-          <Divider />
-          <SelfSignup onChange={to => dispatch({ev: 'selfsignup-change', to})} />
-          <Divider />
-          <GroupStructure
-            errormsg={st.errors.structure}
-            onChange={to => dispatch({ev: 'structure-change', to})}
-          />
-          <Divider />
-          <Leadership onChange={to => dispatch({ev: 'leadership-change', to})} />
-        </>
-      )}
-    </GroupContext.Provider>
   )
 
   return (

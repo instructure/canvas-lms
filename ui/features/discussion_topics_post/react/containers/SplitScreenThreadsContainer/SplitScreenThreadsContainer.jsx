@@ -235,6 +235,7 @@ const SplitScreenThreadContainer = props => {
   useEffect(() => {
     if (
       !ENV.manual_mark_as_read &&
+      !props.discussionEntry?.deleted &&
       !props.discussionEntry.entryParticipant?.read &&
       !props.discussionEntry?.entryParticipant?.forcedReadState
     ) {
@@ -328,16 +329,18 @@ const SplitScreenThreadContainer = props => {
     )
   }
 
-  threadActions.push(
-    <ThreadingToolbar.MarkAsRead
-      key={`mark-as-read-${props.discussionEntry.id}`}
-      delimiterKey={`mark-as-read-delimiter-${props.discussionEntry.id}`}
-      isRead={props.discussionEntry.entryParticipant?.read}
-      authorName={getDisplayName(props.discussionEntry)}
-      onClick={toggleUnread}
-      isSplitScreenView={true}
-    />
-  )
+  if (!props.discussionEntry.deleted) {
+    threadActions.push(
+      <ThreadingToolbar.MarkAsRead
+        key={`mark-as-read-${props.discussionEntry.id}`}
+        delimiterKey={`mark-as-read-delimiter-${props.discussionEntry.id}`}
+        isRead={props.discussionEntry.entryParticipant?.read}
+        authorName={getDisplayName(props.discussionEntry)}
+        onClick={toggleUnread}
+        isSplitScreenView={true}
+      />
+    )
+  }
 
   if (props.discussionEntry.subentriesCount) {
     threadActions.push(

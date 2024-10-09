@@ -178,7 +178,7 @@ module AttachmentFu # :nodoc:
       # Overwrites the base filename writer in order to store the old filename
       def filename=(value)
         @old_filename = filename unless filename.nil? || @old_filename
-        write_attribute :filename, sanitize_filename(value)
+        self["filename"] = sanitize_filename(value)
       end
 
       def sanitize_filename(filename)
@@ -199,7 +199,7 @@ module AttachmentFu # :nodoc:
       # INSTRUCTURE: fallback to old path style if there is no cluster attribute
       def namespaced_path
         obj = (respond_to?(:root_attachment) && root_attachment) || self
-        if (namespace = obj.read_attribute(:namespace))
+        if (namespace = obj["namespace"])
           File.join(namespace, obj.attachment_options[:path_prefix])
         else
           obj.attachment_options[:path_prefix]

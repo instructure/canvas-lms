@@ -25,8 +25,8 @@ module Types
     field :mutation_logs, MutationLogType.connection_type, null: true do
       description "A list of all recent graphql mutations run on the specified object"
       argument :asset_string, String, required: true
-      argument :start_time, DateTimeType, required: false
       argument :end_time, DateTimeType, required: false
+      argument :start_time, DateTimeType, required: false
     end
 
     def mutation_logs(asset_string:, start_time: nil, end_time: nil)

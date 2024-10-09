@@ -1798,7 +1798,9 @@ class CoursesController < ApplicationController
       :course_color,
       :friendly_name,
       :enable_course_paces,
-      :conditional_release
+      :conditional_release,
+      :show_student_only_module_id,
+      :show_teacher_only_module_id
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
 
@@ -2388,7 +2390,7 @@ class CoursesController < ApplicationController
         end
 
         if @current_user && (@show_recent_feedback = @context.user_is_student?(@current_user))
-          @recent_feedback = @current_user.recent_feedback(contexts: @contexts) || []
+          @recent_feedback = @current_user.recent_feedback(contexts: @contexts, exclude_parent_assignment_submissions: @domain_root_account.feature_enabled?(:discussion_checkpoints)) || []
         end
 
         flash.now[:notice] = t("notices.updated", "Course was successfully updated.") if params[:for_reload]
@@ -3317,8 +3319,8 @@ class CoursesController < ApplicationController
         end
       end
 
-      if params[:override_sis_stickiness] && !value_to_boolean(params[:override_sis_stickiness])
-        params_for_update -= [*@course.stuck_sis_fields]
+      if params.key?(:override_sis_stickiness) && !value_to_boolean(params[:override_sis_stickiness])
+        params_for_update = params_for_update.except(*@course.stuck_sis_fields)
       end
 
       @course.attributes = params_for_update

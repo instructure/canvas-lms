@@ -185,22 +185,22 @@ class ErrorReport < ActiveRecord::Base
 
   def backtrace=(val)
     if !val || val.length < self.class.maximum_text_length
-      write_attribute(:backtrace, val)
+      super
     else
-      write_attribute(:backtrace, val[0, self.class.maximum_text_length])
+      super(val[0, self.class.maximum_text_length])
     end
   end
 
   def comments=(val)
     if !val || val.length < self.class.maximum_text_length
-      write_attribute(:comments, val)
+      super
     else
-      write_attribute(:comments, val[0, self.class.maximum_text_length])
+      super(val[0, self.class.maximum_text_length])
     end
   end
 
   def url=(val)
-    write_attribute(:url, LoggingFilter.filter_uri(val))
+    super(LoggingFilter.filter_uri(val))
   end
 
   def safe_url?

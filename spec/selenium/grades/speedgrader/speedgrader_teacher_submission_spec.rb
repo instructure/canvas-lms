@@ -113,9 +113,9 @@ describe "SpeedGrader submissions" do
     end
 
     it "does not display a late message if an assignment has been overridden", priority: "1" do
-      @assignment.update_attribute(:due_at, Time.now - 2.days)
+      @assignment.update_attribute(:due_at, 2.days.ago)
       override = @assignment.assignment_overrides.build
-      override.due_at = Time.now + 2.days
+      override.due_at = 2.days.from_now
       override.due_at_overridden = true
       override.set = @course.course_sections.first
       override.save!
@@ -242,8 +242,6 @@ describe "SpeedGrader submissions" do
       expect(ffj('td[data-testid="criterion-points"] input:visible').first).to have_attribute("value", "3")
       expect(ffj('td[data-testid="criterion-points"] input:visible').second).to have_attribute("value", "5")
     end
-
-    it "should highlight submitted assignments and not non-submitted assignments for students", priority: "1"
 
     it "displays image submission in browser", priority: "1" do
       filename, fullpath, _data = get_file("graded.png")

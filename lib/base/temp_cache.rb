@@ -52,9 +52,9 @@ class TempCache
     end.join("/")
   end
 
-  def self.cache(*args)
+  def self.cache(*)
     if @enabled
-      key = create_key(*args)
+      key = create_key(*)
       if @cache.key?(key)
         @cache[key]
       else

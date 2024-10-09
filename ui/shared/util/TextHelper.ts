@@ -161,3 +161,12 @@ export function plainText(message: string) {
   // remove all html tags from the message returning only the text
   return message.replace(/(<([^>]+)>)/gi, '')
 }
+
+export const containsHtmlTags = (message: string): boolean => {
+  const regex = /(<([^>]+)>)/gi
+  return regex.test(message)
+}
+
+export const stripHtmlTags = (htmlText?: string): string | null => {
+  return htmlText ? new DOMParser().parseFromString(htmlText, 'text/html').body.textContent : ''
+}

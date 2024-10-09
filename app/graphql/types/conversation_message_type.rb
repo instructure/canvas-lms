@@ -24,8 +24,8 @@ module Types
 
     global_id_field :id
     field :_id, ID, "legacy canvas id", method: :id, null: false
-    field :conversation_id, ID, null: false
     field :body, String, null: false
+    field :conversation_id, ID, null: false
     field :created_at, Types::DateTimeType, null: true
 
     field :author, UserType, null: true

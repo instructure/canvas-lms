@@ -78,4 +78,11 @@ RSpec.describe Mutations::UpdateDiscussionEntriesReadState do
       expect(entry.reload.read?(@student)).to be false
     end
   end
+
+  it "does not mark deleted entry" do
+    @entries.first.destroy
+    run_mutation({ ids: [@entries.first.id], read: false })
+
+    expect(@entries.first.reload.read?(@student)).to be(true)
+  end
 end

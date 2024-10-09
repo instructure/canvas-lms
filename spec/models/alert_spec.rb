@@ -67,7 +67,7 @@ describe Alert do
     end
   end
 
-  context "#resolve_recipients" do
+  describe "#resolve_recipients" do
     it "resolves to a student based on recipients list" do
       alert = Alert.new(context: Account.default, recipients: [:student])
       recipients = alert.resolve_recipients(1, [2, 3])

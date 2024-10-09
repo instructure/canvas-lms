@@ -36,7 +36,6 @@ class Lti::RegistrationAccountBinding < ActiveRecord::Base
   belongs_to :created_by, class_name: "User", inverse_of: :created_lti_registration_account_bindings
   belongs_to :updated_by, class_name: "User", inverse_of: :updated_lti_registration_account_bindings
   belongs_to :developer_key_account_binding, inverse_of: :lti_registration_account_binding
-
   resolves_root_account through: :account
 
   validates :workflow_state, inclusion: { in: %w[off on allow deleted], message: -> { I18n.t("%{value} is not a valid workflow_state") } }

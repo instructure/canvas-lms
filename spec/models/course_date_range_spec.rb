@@ -29,7 +29,7 @@ describe CourseDateRange do
   end
 
   it "gets term dates if restrict enrollments to course dates is false" do
-    @course.enrollment_term.update(start_at: Time.now - 10.days, end_at: Time.now + 10.days)
+    @course.enrollment_term.update(start_at: 10.days.ago, end_at: 10.days.from_now)
     range = CourseDateRange.new(@course)
     expect(range.start_at[:date_context]).to eq("term")
     expect(range.end_at[:date_context]).to eq("term")
@@ -39,7 +39,7 @@ describe CourseDateRange do
 
   describe "with restrict enrollments to course dates active" do
     it "sets the range based on the course" do
-      @course.update(start_at: Time.now - 5.days, conclude_at: Time.now + 5.days, restrict_enrollments_to_course_dates: true)
+      @course.update(start_at: 5.days.ago, conclude_at: 5.days.from_now, restrict_enrollments_to_course_dates: true)
       range = CourseDateRange.new(@course)
       expect(range.start_at[:date_context]).to eq("course")
       expect(range.end_at[:date_context]).to eq("course")

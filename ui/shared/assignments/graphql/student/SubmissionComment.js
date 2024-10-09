@@ -54,6 +54,39 @@ export const SubmissionComment = {
   }),
 }
 
+export const SubmissionHtmlComment = {
+  fragment: gql`
+    fragment SubmissionHtmlComment on SubmissionComment {
+      _id
+      attachments {
+        ...SubmissionCommentFile
+      }
+      author {
+        ...SubmissionCommentAuthor
+      }
+      htmlComment
+      mediaObject {
+        ...MediaObject
+      }
+      read
+      updatedAt
+    }
+    ${MediaObject.fragment}
+    ${SubmissionCommentAuthor.fragment}
+    ${SubmissionCommentFile.fragment}
+  `,
+
+  shape: shape({
+    _id: string,
+    attachments: arrayOf(SubmissionCommentFile.shape),
+    author: SubmissionCommentAuthor.shape,
+    htmlComment: string,
+    mediaObject: MediaObject.shape,
+    read: bool,
+    updatedAt: string,
+  }),
+}
+
 export const DefaultMocks = {
   SubmissionComment: () => {
     return {

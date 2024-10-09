@@ -982,6 +982,7 @@ const locale = {
   },
   "styles_2aa721ef": { "message": "Stil" },
   "submit_a3cc6859": { "message": "Soumèt" },
+  "submitting_b90fac62": { "message": "Soumisyon..." },
   "subscript_59744f96": { "message": "Endis" },
   "subset_19c1a92f": { "message": "Sou Ansanm" },
   "subset_strict_8d8948d6": { "message": "Sou ansanm (Estrik)" },

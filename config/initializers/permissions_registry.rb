@@ -1789,6 +1789,15 @@ Rails.application.config.to_prepare do
         account_only: true,
         account_allows: ->(a) { a.feature_enabled?(:k20_lti_usage) }
       },
+      view_lti_insights: {
+        label: -> { I18n.t("LTI Insights") },
+        group: "view_advanced_analytics",
+        group_label: -> { I18n.t("Intelligent Insights") },
+        available_to: %w[AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin],
+        account_only: true,
+        account_allows: ->(a) { a.feature_enabled?(:k20_lti_insights) }
+      },
       manage_impact: {
         label: -> { I18n.t("Manage Impact") },
         label_v2: -> { I18n.t("Impact - Manage") },

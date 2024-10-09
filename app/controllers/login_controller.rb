@@ -47,22 +47,25 @@ class LoginController < ApplicationController
     session[:enrollment] = params[:enrollment] if params[:enrollment]
 
     if @current_pseudonym
-      params[:pseudonym_session] ||= {}
-      params[:pseudonym_session][:unique_id] ||= @current_pseudonym.unique_id
+      params[:login_hint] ||= @current_pseudonym.unique_id
     end
+    params[:login_hint] ||= params.dig(:pseudonym_session, :unique_id)
 
     # deprecated redirect; link directly to /login/canvas
     params[:authentication_provider] = "canvas" if params["canvas_login"]
     # deprecated redirect; they should already know the correct type
     params[:authentication_provider] ||= params[:id]
 
-    if @domain_root_account.auth_discovery_url(request) && !params[:authentication_provider]
-      auth_discovery_url = @domain_root_account.auth_discovery_url(request)
-      if flash[:delegated_message]
-        auth_discovery_url << (URI.parse(auth_discovery_url).query ? "&" : "?")
-        auth_discovery_url << "message=#{URI::DEFAULT_PARSER.escape(flash[:delegated_message])}"
-      end
-      return redirect_to auth_discovery_url, @domain_root_account.auth_discovery_url_options(request)
+    redirect_to_discovery_url
+    return if performed?
+
+    if flash[:delegated_message]
+      # we had an error from an SSO - we need to show it
+      @headers = false
+      @show_left_side = false
+      @show_embedded_chat = false
+
+      return render
     end
 
     if params[:authentication_provider]
@@ -72,21 +75,9 @@ class LoginController < ApplicationController
                   .find(params[:authentication_provider])
                   .auth_type
       params[:id] = params[:authentication_provider] if params[:authentication_provider] != auth_type
-    else
-      auth_type = @domain_root_account.authentication_providers.active.first.try(:auth_type)
-      auth_type ||= "canvas"
     end
 
-    unless flash[:delegated_message]
-      return redirect_to url_for({ controller: "login/#{auth_type}", action: :new }
-        .merge(params.permit(:id).to_unsafe_h)
-        .merge(params.permit(pseudonym_session: :unique_id).to_unsafe_h))
-    end
-
-    # we had an error from an SSO - we need to show it
-    @headers = false
-    @show_left_side = false
-    @show_embedded_chat = false
+    redirect_to_specific_provider(auth_type)
   end
 
   # DELETE /logout
@@ -160,5 +151,26 @@ class LoginController < ApplicationController
     session[:permissions_key] = SecureRandom.uuid
 
     render plain: "ok"
+  end
+
+  private
+
+  def redirect_to_discovery_url
+    if @domain_root_account.auth_discovery_url(request) && !params[:authentication_provider]
+      auth_discovery_url = @domain_root_account.auth_discovery_url(request)
+      if flash[:delegated_message]
+        auth_discovery_url << (URI.parse(auth_discovery_url).query ? "&" : "?")
+        auth_discovery_url << "message=#{URI::DEFAULT_PARSER.escape(flash[:delegated_message])}"
+      end
+      redirect_to auth_discovery_url, @domain_root_account.auth_discovery_url_options(request)
+    end
+  end
+
+  def redirect_to_specific_provider(auth_type)
+    auth_type ||= @domain_root_account.authentication_providers.active.first&.auth_type
+    auth_type ||= "canvas"
+
+    redirect_to url_for({ controller: "login/#{auth_type}", action: :new }
+      .merge(params.permit(:id, :login_hint).to_unsafe_h))
   end
 end

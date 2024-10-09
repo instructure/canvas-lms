@@ -62,8 +62,8 @@ RSpec.describe Lti::Result do
       )
     end
 
-    describe "#scaled_result_score" do
-      subject { result.scaled_result_score }
+    describe "#result_score" do
+      subject { result.result_score }
 
       let(:tool_id) { 1 }
       let(:manual_grader_id) { 2 }
@@ -79,19 +79,19 @@ RSpec.describe Lti::Result do
       before { result.submission.update!(grader_id: tool_id * -1) }
 
       context "when the score_given has not been manually changed" do
-        it { is_expected.to eq result.read_attribute(:result_score) }
+        it { is_expected.to eq result["result_score"] }
       end
 
       context "when result_score is blank" do
         before { result.update!(result_score: 0) }
 
-        it { is_expected.to eq result.read_attribute(:result_score) }
+        it { is_expected.to eq result["result_score"] }
       end
 
       context "when the submission is blank" do
         before { result.update!(submission: nil) }
 
-        it { is_expected.to eq result.read_attribute(:result_score) }
+        it { is_expected.to eq result["result_score"] }
       end
 
       context "when the score_given was manually updated by a user" do
@@ -105,7 +105,7 @@ RSpec.describe Lti::Result do
         context "when the assignment has 0 points_possible" do
           before { assignment.update!(points_possible: 0) }
 
-          it { is_expected.to eq result.read_attribute(:result_score) }
+          it { is_expected.to eq result["result_score"] }
         end
       end
 
@@ -148,7 +148,7 @@ RSpec.describe Lti::Result do
           result.reload
         end
 
-        it { is_expected.to eq result.read_attribute(:result_score) }
+        it { is_expected.to eq result["result_score"] }
       end
 
       context "when result_maximum is 0" do
@@ -158,7 +158,7 @@ RSpec.describe Lti::Result do
           result.reload
         end
 
-        it { is_expected.to eq result.read_attribute(:result_score) }
+        it { is_expected.to eq result["result_score"] }
       end
     end
 
@@ -213,7 +213,7 @@ RSpec.describe Lti::Result do
       end
     end
 
-    describe "#result_score" do
+    describe "#scaled_result_score" do
       let(:result) { lti_result_model assignment:, result_score:, result_maximum: }
       let(:result_score) { 10 }
       let(:result_maximum) { 10 }

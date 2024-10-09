@@ -52,6 +52,7 @@ import ItemAssignToCard, {
 } from './ItemAssignToCard'
 import {getOverriddenAssignees, itemTypeToApiURL} from '../../utils/assignToHelper'
 import {getEveryoneOption, type ItemAssignToTrayProps} from './ItemAssignToTray'
+import {getDueAtForCheckpointTag} from './utils'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -84,6 +85,8 @@ export interface ItemAssignToTrayContentProps
 }
 
 const MAX_PAGES = 10
+const REPLY_TO_TOPIC = 'reply_to_topic'
+const REPLY_TO_ENTRY = 'reply_to_entry'
 
 function makeCardId(): string {
   return uid('assign-to-card', 12)
@@ -338,6 +341,19 @@ const ItemAssignToTrayContent = ({
         const overriddenTargets = getOverriddenAssignees(overrides)
         delete dateDetailsApiResponse.overrides
         const baseDates: BaseDateDetails = dateDetailsApiResponse
+        if (
+          dateDetailsApiResponse.checkpoints &&
+          Array.isArray(dateDetailsApiResponse.checkpoints)
+        ) {
+          dateDetailsApiResponse.checkpoints.forEach((checkpoint: any) => {
+            if (checkpoint.tag === REPLY_TO_ENTRY) {
+              baseDates.required_replies_due_at = checkpoint.due_at
+            } else if (checkpoint.tag === REPLY_TO_TOPIC) {
+              baseDates.reply_to_topic_due_at = checkpoint.due_at
+            }
+          })
+        }
+
         const onlyOverrides = !dateDetailsApiResponse.visible_to_everyone
         const allModuleAssignees: string[] = []
         const hasModuleOverride = overrides?.some(override => override.context_module_id)
@@ -354,8 +370,8 @@ const ItemAssignToTrayContent = ({
             isValid: true,
             hasAssignees: true,
             due_at: baseDates.due_at,
-            reply_to_topic_due_at: null,
-            required_replies_due_at: null,
+            reply_to_topic_due_at: baseDates.reply_to_topic_due_at,
+            required_replies_due_at: baseDates.required_replies_due_at,
             original_due_at: baseDates.due_at,
             unlock_at: baseDates.unlock_at,
             lock_at: baseDates.lock_at,
@@ -412,13 +428,16 @@ const ItemAssignToTrayContent = ({
               return
             }
             const cardId = makeCardId()
+            const reply_to_topic_due_at = getDueAtForCheckpointTag(override, REPLY_TO_TOPIC)
+            const required_replies_due_at = getDueAtForCheckpointTag(override, REPLY_TO_ENTRY)
+
             cards.push({
               key: cardId,
               isValid: true,
               hasAssignees: true,
               due_at: override.due_at,
-              reply_to_topic_due_at: null,
-              required_replies_due_at: null,
+              reply_to_topic_due_at,
+              required_replies_due_at,
               original_due_at: override.due_at,
               unlock_at: override.unlock_at,
               lock_at: override.lock_at,
@@ -653,6 +672,22 @@ const ItemAssignToTrayContent = ({
     return assignToCardsRef.current.every(card => card.hasAssignees)
   }
 
+  const addCardButton = (firstButton: boolean) => {
+    return (
+      <Button
+        display={isTray ? undefined : 'block'}
+        onClick={handleAddCard}
+        data-testid="add-card"
+        margin="small 0 0 0"
+        renderIcon={IconAddLine}
+        interaction={!allCardsAssigned() || !!blueprintDateLocks?.length ? 'disabled' : 'enabled'}
+        elementRef={firstButton ? undefined : el => (addCardButtonRef.current = el)}
+      >
+        {isTray ? I18n.t('Add') : I18n.t('Assign To')}
+      </Button>
+    )
+  }
+
   const renderCards = useCallback(
     () => {
       const cardCount = assignToCardsRef.current.length
@@ -727,6 +762,7 @@ const ItemAssignToTrayContent = ({
 
   return (
     <Flex.Item padding="small medium" shouldGrow={true} shouldShrink={true}>
+      {shouldShowAddCard && assignToCardsRef.current.length > 3 && addCardButton(true)}
       {fetchInFlight || !loadedAssignees || isLoading ? (
         isTray ? (
           <Mask>
@@ -740,19 +776,7 @@ const ItemAssignToTrayContent = ({
           {renderCards()}
         </ApplyLocale>
       )}
-      {shouldShowAddCard && (
-        <Button
-          display={isTray ? undefined : 'block'}
-          onClick={handleAddCard}
-          data-testid="add-card"
-          margin="small 0 0 0"
-          renderIcon={IconAddLine}
-          interaction={!allCardsAssigned() || !!blueprintDateLocks?.length ? 'disabled' : 'enabled'}
-          elementRef={el => (addCardButtonRef.current = el)}
-        >
-          {isTray ? I18n.t('Add') : I18n.t('Assign To')}
-        </Button>
-      )}
+      {shouldShowAddCard && addCardButton(false)}
     </Flex.Item>
   )
 }

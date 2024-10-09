@@ -753,21 +753,6 @@ describe "discussions" do
             Account.site_admin.disable_feature!(:selective_release_edit_page)
           end
 
-          it "does not show the assign to UI when the user does not have permission even if user can access edit page" do
-            skip("unskip or remove when product decsion is made about adding a discussion edit permission LX-2054")
-            # i.e., they have moderate_forum permission but not admin or unrestricted student enrollment
-            RoleOverride.create!(context: @course.account, permission: "moderate_forum", role: student_role, enabled: true)
-            student_in_course(active_all: true)
-            user_session(@student)
-            get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
-            expect(element_exists?(Discussion.assign_to_button_selector)).to be_truthy
-
-            enrollment = @course.enrollments.find_by(user: @student)
-            enrollment.update!(limit_privileges_to_course_section: true)
-            get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
-            expect(element_exists?(Discussion.assign_to_button_selector)).to be_falsey
-          end
-
           it "does not display 'Assign To' section for an ungraded group discussion" do
             group = course.groups.create!(name: "group")
             group_ungraded = course.discussion_topics.create!(title: "no options enabled - topic", group_category: group.group_category)
@@ -993,8 +978,7 @@ describe "discussions" do
             expect(driver.current_url).not_to end_with("/courses/#{course.id}/discussion_topics/#{teacher_topic.id}/edit")
           end
 
-          it "does not show the assign to UI when the user does not have permission even if user can access edit page" do
-            skip("unskip or remove when product decsion is made about adding a discussion edit permission LX-2054")
+          it "shows the assign to UI regardless of limit privilege settings with moderate forum set" do
             # i.e., they have moderate_forum permission but not admin or unrestricted student enrollment
             RoleOverride.create!(context: @course.account, permission: "moderate_forum", role: student_role, enabled: true)
             student_in_course(active_all: true)
@@ -1007,7 +991,45 @@ describe "discussions" do
             enrollment.update!(limit_privileges_to_course_section: true)
             get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
 
-            expect(element_exists?(Discussion.assign_to_section_selector)).to be_falsey
+            expect(element_exists?(Discussion.assign_to_section_selector)).to be_truthy
+          end
+
+          it "allows student to save edit of created discussion" do
+            student_in_course(active_all: true)
+            user_session(@student)
+
+            get "/courses/#{course.id}/discussion_topics/new"
+
+            title = "My Test Topic"
+            message = "replying to topic"
+            available_date = "12/27/2023"
+
+            # Set title
+            Discussion.update_discussion_topic_title(title)
+            # Set Message
+            Discussion.update_discussion_message(message)
+
+            update_available_date(0, available_date, true)
+            update_available_time(0, "8:00 AM", true)
+
+            # Save and publish
+            Discussion.save_button.click
+            wait_for_ajaximations
+
+            dt = DiscussionTopic.last
+
+            get "/courses/#{course.id}/discussion_topics/#{dt.id}/edit"
+
+            new_title = "My New Test Topic"
+            Discussion.update_discussion_topic_title(new_title)
+
+            Discussion.save_button.click
+            wait_for_ajaximations
+
+            dt.reload
+            expect(dt.title).to eq(new_title)
+            expect(dt.message).to include message
+            expect(format_date_for_view(dt.unlock_at, "%m/%d/%Y")).to eq(available_date)
           end
 
           it "does not display 'Assign To' section for an ungraded group discussion" do

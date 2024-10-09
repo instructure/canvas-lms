@@ -409,8 +409,8 @@ class BigBlueButtonConference < WebConference
                            end
   end
 
-  def generate_request(*args)
-    self.class.generate_request(*args)
+  def generate_request(*)
+    self.class.generate_request(*)
   end
 
   def send_request(action, options)

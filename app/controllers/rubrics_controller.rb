@@ -219,6 +219,7 @@ class RubricsController < ApplicationController
         @rubric = @association.rubric if @association
       end
       @rubric.reconcile_criteria_models(@current_user)
+      track_metrics
       json_res = {}
       json_res[:rubric] = @rubric.as_json(methods: :criteria, include_root: false, permissions: { user: @current_user, session: }) if @rubric
       json_res[:rubric_association] = @association.as_json(include_root: false, include: [:assessment_requests], permissions: { user: @current_user, session: }) if @association
@@ -276,5 +277,11 @@ class RubricsController < ApplicationController
 
   def can_manage_rubrics_context?
     @context.grants_right?(@current_user, session, :manage_rubrics)
+  end
+
+  def track_metrics
+    if @association_object.is_a?(Assignment)
+      InstStatsd::Statsd.increment("#{@context.class.to_s.downcase}.rubrics.created_from_assignment")
+    end
   end
 end

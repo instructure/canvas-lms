@@ -337,6 +337,14 @@ describe('SplitScreenThreadsContainer', () => {
       expect(window.IntersectionObserver).toHaveBeenCalledTimes(0)
     })
 
+    it('observer is not created when entry is deleted', () => {
+      const props = defaultProps()
+      props.discussionEntry.discussionSubentriesConnection.nodes[0].deleted = true
+      const container = setup(props)
+      expect(container).toBeTruthy()
+      expect(window.IntersectionObserver).toHaveBeenCalledTimes(0)
+    })
+
     it('observer is created for unread entries', () => {
       const props = defaultProps()
       props.discussionEntry.discussionSubentriesConnection.nodes[0].entryParticipant.read = false

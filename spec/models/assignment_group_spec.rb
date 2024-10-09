@@ -102,6 +102,37 @@ describe AssignmentGroup do
         ).pluck(:id)
         expect(assignment_ids).to match_array [@assignment.id, @overridden_assignment.id]
       end
+
+      context "with discussion checkpoints" do
+        before do
+          @course.root_account.enable_feature!(:discussion_checkpoints)
+          @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+        end
+
+        it "includes the checkpoint sub-assignments" do
+          assignment_ids = AssignmentGroup.visible_assignments(
+            @student,
+            @course,
+            [@ag],
+            assignment_ids: nil,
+            include_discussion_checkpoints: true
+          ).pluck(:id)
+          expect(assignment_ids).to include(@reply_to_topic.id)
+          expect(assignment_ids).to include(@reply_to_entry.id)
+        end
+
+        it "does not include checkpoint sub-assignments if include_discussion_checkpoints is false" do
+          assignment_ids = AssignmentGroup.visible_assignments(
+            @student,
+            @course,
+            [@ag],
+            assignment_ids: nil,
+            include_discussion_checkpoints: false
+          ).pluck(:id)
+          expect(assignment_ids).to_not include(@reply_to_topic.id)
+          expect(assignment_ids).to_not include(@reply_to_entry.id)
+        end
+      end
     end
 
     describe "instance method" do

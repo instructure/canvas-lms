@@ -289,5 +289,64 @@ describe ModuleAssignmentOverridesController do
       put :bulk_update, params: { course_id: @course.id, context_module_id: @module1.id, overrides: [] }
       expect(response).to be_unauthorized
     end
+
+    context "discussion checkpoints" do
+      before do
+        Account.site_admin.enable_feature! :discussion_checkpoints
+      end
+
+      it "can add a checkpointed discussion with its own overrides to a module with ad-hoc overrides and add even more students" do
+        original_override_student = student_in_course(active_all: true, name: "OOS").user
+        extra_override_student = student_in_course(active_all: true, name: "EOS").user
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [
+            {
+              type: "override",
+              set_type: "ADHOC",
+              student_ids: [original_override_student],
+              due_at: 3.days.from_now
+            }
+          ],
+          points_possible: 5
+        )
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [
+            {
+              type: "override",
+              set_type: "ADHOC",
+              student_ids: [original_override_student],
+              due_at: 3.days.from_now
+            }
+          ],
+          points_possible: 5,
+          replies_required: 2
+        )
+        topic.assignment.only_visible_to_overrides = true
+        topic.assignment.save!
+
+        # sanity check, make sure only original_override_student has checkpoint submissions pre-created
+        sub_assignment_submission_ids = topic.assignment.sub_assignment_submissions.pluck("user_id")
+        expect(sub_assignment_submission_ids).to include original_override_student.id
+        expect(sub_assignment_submission_ids).not_to include @student1.id
+
+        @module1.add_item(type: "discussion_topic", id: topic.id)
+        put :bulk_update, params: { course_id: @course.id,
+                                    context_module_id: @module1.id,
+                                    overrides: [{ "id" => @adhoc_override1.id, "student_ids" => [@student1.id, @student2.id, @student3.id, extra_override_student.id], "title" => "Accelerated" }] }
+
+        expect(response).to have_http_status :no_content
+        sub_assignment_submission_ids = topic.assignment.sub_assignment_submissions.pluck("user_id")
+        expect(sub_assignment_submission_ids).to include original_override_student.id
+        expect(sub_assignment_submission_ids).to include @student1.id
+        expect(sub_assignment_submission_ids).to include @student2.id
+        expect(sub_assignment_submission_ids).to include @student3.id
+        expect(sub_assignment_submission_ids).to include extra_override_student.id
+      end
+    end
   end
 end

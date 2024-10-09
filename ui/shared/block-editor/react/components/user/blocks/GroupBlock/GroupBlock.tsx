@@ -109,5 +109,7 @@ GroupBlock.craft = {
       return parent?.data.name !== 'ColumnsSectionInner' || notDeletableIfLastChild(nodeId, query)
     },
     isResizable: true,
+    isBlock: true,
+    isExpanded: false,
   },
 }

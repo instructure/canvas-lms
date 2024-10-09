@@ -56,6 +56,8 @@ module AttachmentFu # :nodoc:
             @resized = true
           end
         end
+      rescue MiniMagick::Error => e
+        logger.warn("MiniMagick processing failed: #{e}")
       end
 
       # Performs the actual resizing operation for a thumbnail

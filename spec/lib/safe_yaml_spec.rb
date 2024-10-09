@@ -90,7 +90,7 @@ describe "safe_yaml" do
   it "supports a unique case of key / value pairs" do
     skip("newer ruby versions only") unless RUBY_VERSION >= "3.0.0"
 
-    os = OpenStruct.new
+    os = OpenStruct.new # rubocop:disable Style/OpenStructUse
     os.table = { a: "b" }
     os.modifiable = true
 
@@ -130,10 +130,10 @@ describe "safe_yaml" do
     float_inf = verify(result, "float_inf", Float)
     expect(float_inf).to eq(Float::INFINITY)
 
-    os = verify(result, "os", OpenStruct)
+    os = verify(result, "os", OpenStruct) # rubocop:disable Style/OpenStructUse
     expect(os.a).to eq 1
     expect(os.b).to eq 2
-    expect(os.sub.class).to eq OpenStruct
+    expect(os.sub.class).to eq OpenStruct # rubocop:disable Style/OpenStructUse
     expect(os.sub.c).to eq 3
 
     str = verify(result, "str", String)
@@ -222,6 +222,12 @@ describe "safe_yaml" do
 
   it "restores default value on sets on load" do
     expect(YAML.unsafe_load(YAML.dump(Set.new)).include?("test")).to be false
+  end
+
+  it "loads WeakParameters as HWIA" do
+    wp = YAML.load("--- !ruby/hash:WeakParameters\nk1: v1\nk2: v2\n")
+    expect(wp.class).to eq(ActiveSupport::HashWithIndifferentAccess)
+    expect(wp.values_at(:k1, :k2)).to eq ["v1", "v2"]
   end
 end
 # rubocop:enable Security/YAMLLoad

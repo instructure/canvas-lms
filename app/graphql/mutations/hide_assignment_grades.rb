@@ -22,8 +22,8 @@ class Mutations::HideAssignmentGrades < Mutations::BaseMutation
   graphql_name "HideAssignmentGrades"
 
   argument :assignment_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Assignment")
-  argument :section_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Section")
   argument :only_student_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User")
+  argument :section_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Section")
   argument :skip_student_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User")
 
   field :assignment, Types::AssignmentType, null: true

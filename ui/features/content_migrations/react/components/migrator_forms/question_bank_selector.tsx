@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
@@ -42,31 +42,38 @@ type QuestionBankSelectorProps = {
   onChange: (settings: QuestionBankSettings | null) => void
   questionBankError: boolean
   disable?: boolean
+  notCompatible?: boolean
+  questionBankSettings?: QuestionBankSettings | null
 }
 
 const QuestionBankSelector = ({
   onChange,
   questionBankError,
   disable = false,
+  notCompatible = false,
+  questionBankSettings,
 }: QuestionBankSelectorProps) => {
   const [showQuestionInput, setShowQuestionInput] = useState<boolean>(false)
   const questionBanks = ENV.QUESTION_BANKS || []
 
   const handleChange = useCallback(
     (_, {value}) => {
+      setShowQuestionInput(value === 'new_question_bank')
       if (!value) {
-        setShowQuestionInput(false)
         onChange(null)
-      } else if (value === 'new_question_bank') {
-        setShowQuestionInput(true)
-        onChange({question_bank_name: ''})
       } else {
-        setShowQuestionInput(false)
-        onChange({question_bank_id: value})
+        onChange({...questionBankSettings, question_bank_id: value})
       }
     },
-    [onChange]
+    [onChange, questionBankSettings]
   )
+
+  useEffect(() => {
+    if (notCompatible) {
+      setShowQuestionInput(false)
+      onChange(null)
+    }
+  }, [notCompatible, onChange])
 
   return (
     <>
@@ -77,6 +84,7 @@ const QuestionBankSelector = ({
           assistiveText={I18n.t('Select a question bank')}
           onChange={handleChange}
           disabled={disable}
+          value={questionBankSettings?.question_bank_id || ''}
         >
           <SimpleSelect.Option id="selectQuestion" value="">
             {I18n.t('Select question bank')}
@@ -90,6 +98,11 @@ const QuestionBankSelector = ({
             </SimpleSelect.Option>
           ))}
         </SimpleSelect>
+        {!!notCompatible && (
+          <Text lineHeight="double">
+            {I18n.t('This option is not compatible with New Quizzes')}
+          </Text>
+        )}
       </View>
       {showQuestionInput && (
         <View as="div" maxWidth="22.5rem">
@@ -111,7 +124,7 @@ const QuestionBankSelector = ({
             }
             renderLabel={<></>}
             placeholder={I18n.t('New question bank')}
-            onChange={(_, value) => onChange({question_bank_name: value})}
+            onChange={(_, value) => onChange({...questionBankSettings, question_bank_name: value})}
           />
         </View>
       )}

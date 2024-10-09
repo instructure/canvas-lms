@@ -7788,6 +7788,7 @@ uk:
   for_best_results_crop_image_to_262px_wide_by_146px_af81a540: "Для кращих результатів обріжте зображення до 262px шириною 146px висотою. Доступні типи файлів - JPG, PNG або GIF"
   for_each_late_62aecf41: "Для кожного спізнення"
   for_title_69d92b3a: "для %{title}"
+  forgot_password_9098c30d: "Забули пароль"
   forgot_password_f0c3fbac: "Забули пароль?"
   forgot_password_url_3f9c04b: "URL-адреса забутого пароля  "
   form_background_fb654518: "Фон форми"
@@ -16451,6 +16452,7 @@ uk:
   showing_count_results_below_61ddca33: 
     zero: "Результатів не знайдено"
   shuffle_answers_edb602b7: "Випадкові відповіді"
+  sign_in_c6858e26: Увійти
   sign_up_dafdee18: Зареєструватися
   signup_type_8b4506f3: "Тип реєстрації "
   similarity_detection_dcada48: "Виявлення схожості"
@@ -16708,6 +16710,7 @@ uk:
   status_e7fdbe06: Статус
   statuses_497dfa15: Статуси...
   statuses_f41543d8: Статуси
+  stay_signed_in_1853e9b6: "Залишатися в системі"
   step: Крок
   stop_acting_as_user_8809a97f: "Припинити діяти як користувач"
   storage_used_in_mb_c75fbd9c: "використаний простір у МБ"
@@ -17998,6 +18001,7 @@ uk:
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "Використовуйте цей список для видалення призначених студентів. Додайте нових студентів з вікна під списком."
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Використовуйте цю панель для вирішення проблеми дублювання результатів або людей, не знайдені у вашому пошуку."
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Використовуйте цю панель, щоб шукати людей, яких ви хочете додати до цього курсу."
+  use_this_same_grade_for_the_resubmission_eaa6bf55: "Використати саме цю оцінку для цього  повторного завдання"
   used_by_permission_314a78dd: "Використовується дозволом"
   user: 
     default_user_name: Користувач

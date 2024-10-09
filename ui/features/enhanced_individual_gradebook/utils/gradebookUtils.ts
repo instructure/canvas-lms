@@ -51,6 +51,7 @@ import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import {scopeToUser, updateWithSubmissions} from '@canvas/grading/EffectiveDueDates'
 import {scoreToGrade, type GradingStandard} from '@instructure/grading-utils'
 import {divide, toNumber} from '@canvas/grading/GradeCalculationHelper'
+import {REPLY_TO_ENTRY, REPLY_TO_TOPIC} from '../react/components/GradingResults'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -226,6 +227,8 @@ export function computeAssignmentDetailText(
 }
 
 export function mapUnderscoreSubmission(submission: Submission): GradebookUserSubmissionDetails {
+  const parentSubmission = submission
+
   return {
     assignmentId: submission.assignment_id,
     enteredScore: submission.entered_score,
@@ -244,6 +247,20 @@ export function mapUnderscoreSubmission(submission: Submission): GradebookUserSu
     deductedPoints: submission.points_deducted,
     enteredGrade: submission.entered_grade,
     gradeMatchesCurrentSubmission: submission.grade_matches_current_submission,
+    subAssignmentSubmissions: submission.sub_assignment_submissions
+      ? submission.sub_assignment_submissions.map(subAssignmentSubmission => ({
+          assignmentId: parentSubmission.assignment_id, // This is in purpose, we don't leak the sub assignment id.
+          grade: subAssignmentSubmission.grade,
+          gradeMatchesCurrentSubmission: subAssignmentSubmission.grade_matches_current_submission,
+          score: subAssignmentSubmission.score,
+          subAssignmentTag: subAssignmentSubmission.sub_assignment_tag,
+          publishedGrade: subAssignmentSubmission.published_grade,
+          publishedScore: subAssignmentSubmission.published_score,
+          enteredGrade: subAssignmentSubmission.entered_grade,
+          enteredScore: subAssignmentSubmission.entered_score,
+          excused: subAssignmentSubmission.excused,
+        }))
+      : undefined,
   }
 }
 
@@ -532,5 +549,18 @@ export function disableGrading(
 }
 
 export function assignmentHasCheckpoints(assignment: AssignmentConnection): boolean {
-  return assignment?.checkpoints?.length > 0
+  return (assignment.checkpoints?.length ?? 0) > 0
+}
+
+export const getCorrectSubmission = (
+  submission?: GradebookUserSubmissionDetails,
+  subAssignmentTag?: string | null
+) => {
+  if (subAssignmentTag === REPLY_TO_TOPIC || subAssignmentTag === REPLY_TO_ENTRY) {
+    return submission?.subAssignmentSubmissions?.find(
+      subSubmission => subSubmission.subAssignmentTag === subAssignmentTag
+    )
+  }
+
+  return submission
 }

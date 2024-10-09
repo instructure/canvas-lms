@@ -19,7 +19,7 @@
 #
 
 describe ExternalFeedAggregator do
-  context "#process_feed" do
+  describe "#process_feed" do
     before(:once) do
       course_factory(active_all: true)
       @feed = external_feed_model

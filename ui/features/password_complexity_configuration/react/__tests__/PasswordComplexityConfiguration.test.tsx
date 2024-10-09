@@ -137,7 +137,7 @@ describe('PasswordComplexityConfiguration Component', () => {
     it('should handle default password_policy settings gracefully', async () => {
       render(<PasswordComplexityConfiguration />)
       await userEvent.click(await getViewOptionsButton())
-      await waitFor(() => expect(screen.getByTestId('saveButton')).toBeEnabled())
+      await waitFor(() => expect(screen.getByTestId('cancelButton')).toBeEnabled())
       expect(screen.getByTestId('minimumCharacterLengthInput')).toHaveValue(
         MOCK_MINIMUM_CHARACTER_LENGTH
       )
@@ -153,7 +153,7 @@ describe('PasswordComplexityConfiguration Component', () => {
       })
       render(<PasswordComplexityConfiguration />)
       await userEvent.click(await getViewOptionsButton())
-      await waitFor(() => expect(screen.getByTestId('saveButton')).toBeEnabled())
+      await waitFor(() => expect(screen.getByTestId('cancelButton')).toBeEnabled())
       expect(
         screen.queryByText('An error occurred fetching password policy settings.')
       ).not.toBeInTheDocument()
@@ -173,7 +173,7 @@ describe('PasswordComplexityConfiguration Component', () => {
       })
       render(<PasswordComplexityConfiguration />)
       await userEvent.click(await getViewOptionsButton())
-      await waitFor(() => expect(screen.getByTestId('saveButton')).toBeEnabled())
+      await waitFor(() => expect(screen.getByTestId('cancelButton')).toBeEnabled())
       expect(
         screen.queryByText('An error occurred fetching password policy settings.')
       ).not.toBeInTheDocument()
@@ -193,7 +193,7 @@ describe('PasswordComplexityConfiguration Component', () => {
       })
       render(<PasswordComplexityConfiguration />)
       await userEvent.click(await getViewOptionsButton())
-      await waitFor(() => expect(screen.getByTestId('saveButton')).toBeEnabled())
+      await waitFor(() => expect(screen.getByTestId('cancelButton')).toBeEnabled())
       expect(
         screen.queryByText('An error occurred fetching password policy settings.')
       ).not.toBeInTheDocument()
@@ -218,7 +218,7 @@ describe('PasswordComplexityConfiguration Component', () => {
       })
       render(<PasswordComplexityConfiguration />)
       await userEvent.click(await getViewOptionsButton())
-      await waitFor(() => expect(screen.getByTestId('saveButton')).toBeEnabled())
+      await waitFor(() => expect(screen.getByTestId('cancelButton')).toBeEnabled())
       expect(screen.getByTestId('requireSymbolsCheckbox')).not.toBeChecked()
       expect(screen.getByTestId('customMaxLoginAttemptsCheckbox')).not.toBeChecked()
       expect(screen.getByTestId('minimumCharacterLengthInput')).toHaveValue(minimumCharacterLength)
@@ -230,6 +230,8 @@ describe('PasswordComplexityConfiguration Component', () => {
     it('makes a PUT request with the correct method and path when saving all settings, including defaults', async () => {
       render(<PasswordComplexityConfiguration />)
       await userEvent.click(await getViewOptionsButton())
+      const checkbox = await screen.findByTestId('requireNumbersCheckbox')
+      await userEvent.click(checkbox)
       const saveButton = await screen.findByTestId('saveButton')
       await userEvent.click(saveButton)
       const putCall = mockedExecuteApiRequest.mock.calls.find(call => call[0].method === 'PUT')
@@ -240,7 +242,7 @@ describe('PasswordComplexityConfiguration Component', () => {
             account: {
               settings: {
                 password_policy: {
-                  require_number_characters: false,
+                  require_number_characters: true,
                   require_symbol_characters: false,
                   allow_login_suspension: false,
                   maximum_login_attempts: MOCK_MAXIMUM_LOGIN_ATTEMPTS,

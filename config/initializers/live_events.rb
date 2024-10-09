@@ -21,8 +21,8 @@ class StubbedClient
   def self.put_records(records:, stream_name:)
     events = records.map { |e| JSON.parse(e[:data]).dig("attributes", "event_name") }.join(" | ")
     puts "Events #{events} put to stream #{stream_name}: #{records}" # rubocop:disable Rails/Output
-    OpenStruct.new(
-      records: records.map { OpenStruct.new(error_code: nil) }
+    Aws::Kinesis::Types::PutRecordsOutput.new(
+      records: records.map { Aws::Kinesis::Types::PutRecordsResultEntry.new }
     )
   end
 

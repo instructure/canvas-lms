@@ -164,10 +164,11 @@ const ComposeModalManager = props => {
       }
       const data = JSON.parse(JSON.stringify(cache.readQuery(queryToUpdate)))
 
-      data.legacyNode.conversationMessagesConnection.nodes = [
-        result.data.addConversationMessage.conversationMessage,
-        ...data.legacyNode.conversationMessagesConnection.nodes,
-      ]
+      if (!!result.data?.addConversationMessage.conversationMessage)
+        data.legacyNode.conversationMessagesConnection.nodes = [
+          result.data.addConversationMessage.conversationMessage,
+          ...data.legacyNode.conversationMessagesConnection.nodes,
+        ]
 
       cache.writeQuery({...queryToUpdate, data})
     }
@@ -209,6 +210,10 @@ const ComposeModalManager = props => {
   }
 
   const updateCache = (cache, result) => {
+    if (result?.data?.addConversationMessage?.conversationMessage._id === '0') {
+      //if the user sends another delayed message right now, we will have 2 0 id message in our stack, which will cause duplication
+      result.data.addConversationMessage.conversationMessage.id = Date.now().toString()
+    }
     const submissionFail = result?.data?.createSubmissionComment?.errors
     const addConversationFail = result?.data?.addConversationMessage?.errors
     const createConversationFail = result?.data?.createConversation?.errors
@@ -231,7 +236,6 @@ const ComposeModalManager = props => {
     // success is true if there is no error message or if data === true
     const errorMessage = data?.errors
     const success = errorMessage ? false : !!data
-
     if (success) {
       props.onDismiss()
       setOnSuccess(I18n.t('Message sent!'), false)

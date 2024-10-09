@@ -195,7 +195,7 @@ export default function StatusBar(props) {
     const button = (
       <IconButton
         data-btn-id={a11yButtonId}
-        color="primary"
+        color="secondary"
         title={a11y}
         tabIndex={tabIndexForBtn(a11yButtonId)}
         onClick={event => {
@@ -277,7 +277,7 @@ export default function StatusBar(props) {
         {ai_tools && props.onAI && (
           <IconButton
             data-btn-id="rce-ai-btn"
-            color="primary"
+            color="secondary"
             aria-haspopup="dialog"
             title={formatMessage('AI Tools')}
             tabIndex={tabIndexForBtn('rce-ai-btn')}
@@ -298,7 +298,7 @@ export default function StatusBar(props) {
         {kb_shortcuts && (
           <IconButton
             data-btn-id="rce-kbshortcut-btn"
-            color="primary"
+            color="secondary"
             aria-haspopup="dialog"
             title={kbshortcut}
             tabIndex={tabIndexForBtn('rce-kbshortcut-btn')}
@@ -335,7 +335,7 @@ export default function StatusBar(props) {
         <View display="inline-block" padding="0 small" data-testid="status-bar-word-count">
           <CondensedButton
             data-btn-id="rce-wordcount-btn"
-            color="primary"
+            color="secondary"
             onClick={props.onWordcountModalOpen}
             tabIndex={tabIndexForBtn('rce-wordcount-btn')}
             title={formatMessage('View word and character counts')}
@@ -378,7 +378,7 @@ export default function StatusBar(props) {
         {!props.readOnly && (
           <IconButton
             data-btn-id="rce-edit-btn"
-            color="primary"
+            color="secondary"
             onClick={event => {
               props.onChangeView(isHtmlView() ? WYSIWYG_VIEW : getHtmlEditorView(event))
             }}
@@ -424,7 +424,7 @@ export default function StatusBar(props) {
     return (
       <IconButton
         data-btn-id="rce-fullscreen-btn"
-        color="primary"
+        color="secondary"
         title={fullscreen}
         tabIndex={tabIndexForBtn('rce-fullscreen-btn')}
         onClick={event => {
@@ -461,26 +461,36 @@ export default function StatusBar(props) {
   const resize_handle = isFeature('resize_handle')
 
   return (
-    <Flex
-      id={props.id}
-      padding="x-small 0 x-small x-small"
-      data-testid="RCEStatusBar"
-      justifyItems={flexJustify}
-      ref={statusBarRef}
-      onKeyDown={handleKey}
+    <InstUISettingsProvider
+      theme={{
+        componentOverrides: {
+          IconButton: {
+            secondaryGhostColor: 'rgb(34, 47, 62)', // to match tinymce's button color
+          },
+        },
+      }}
     >
-      <Flex.Item shouldGrow={true}>
-        {isHtmlView() ? renderHtmlEditorMessage() : renderPath()}
-      </Flex.Item>
+      <Flex
+        id={props.id}
+        padding="x-small 0 x-small x-small"
+        data-testid="RCEStatusBar"
+        justifyItems={flexJustify}
+        ref={statusBarRef}
+        onKeyDown={handleKey}
+      >
+        <Flex.Item shouldGrow={true}>
+          {isHtmlView() ? renderHtmlEditorMessage() : renderPath()}
+        </Flex.Item>
 
-      <Flex.Item role="toolbar" title={formatMessage('Editor Status Bar')}>
-        {renderIconButtons()}
+        <Flex.Item role="toolbar" title={formatMessage('Editor Status Bar')}>
+          {renderIconButtons()}
 
-        {isFeature('word_count') && isAvailable('instructure_wordcount') && renderWordCount()}
-        {(html_view || fullscreen || resize_handle) &&
-          renderSection3(html_view, fullscreen, resize_handle)}
-      </Flex.Item>
-    </Flex>
+          {isFeature('word_count') && isAvailable('instructure_wordcount') && renderWordCount()}
+          {(html_view || fullscreen || resize_handle) &&
+            renderSection3(html_view, fullscreen, resize_handle)}
+        </Flex.Item>
+      </Flex>
+    </InstUISettingsProvider>
   )
 }
 

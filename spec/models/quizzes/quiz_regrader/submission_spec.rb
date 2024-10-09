@@ -51,7 +51,7 @@ describe Quizzes::QuizRegrader::Submission do
            :score= => nil,
            :score_before_regrade= => nil,
            :submission_data => submission_data,
-           :write_attribute => {})
+           :[]= => {})
   end
 
   let(:wrapper) do
@@ -79,7 +79,7 @@ describe Quizzes::QuizRegrader::Submission do
       :score= => nil,
       :score_before_regrade= => nil,
       :submission_data => multiple_attempts_submission_data,
-      :write_attribute => {}
+      :[]= => {}
     )
   end
 

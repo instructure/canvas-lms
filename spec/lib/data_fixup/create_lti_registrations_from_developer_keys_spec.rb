@@ -27,7 +27,8 @@ describe DataFixup::CreateLtiRegistrationsFromDeveloperKeys do
       key = dev_key_model_1_3(account: second_account)
       reg = key.lti_registration
       key.update(lti_registration: nil, skip_lti_sync: true)
-      reg.destroy_permanently!
+      key.tool_configuration.update(lti_registration: nil)
+      reg.delete
       key
     end
 
@@ -37,7 +38,8 @@ describe DataFixup::CreateLtiRegistrationsFromDeveloperKeys do
         # dev_key_model factory creates reg automatically and ignores the skip_lti_sync param
         reg = key.lti_registration
         key.update(lti_registration: nil, skip_lti_sync: true)
-        reg.destroy_permanently!
+        key.tool_configuration.update(lti_registration: nil)
+        reg.delete
       end
     end
 
@@ -82,7 +84,8 @@ describe DataFixup::CreateLtiRegistrationsFromDeveloperKeys do
         # dev_key_model factory creates reg automatically and ignores the skip_lti_sync param
         reg = key.lti_registration
         key.update(lti_registration: nil, skip_lti_sync: true)
-        reg.destroy_permanently!
+        key.tool_configuration.update(lti_registration: nil)
+        reg.delete
       end
 
       it "creates a site admin registration" do

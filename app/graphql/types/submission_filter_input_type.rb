@@ -32,8 +32,8 @@ module Types
              required: false,
              prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Section")
 
-    argument :submitted_since, DateTimeType, required: false
     argument :graded_since, DateTimeType, required: false
+    argument :submitted_since, DateTimeType, required: false
     argument :updated_since, DateTimeType, required: false
   end
 end

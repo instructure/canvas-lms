@@ -30,3 +30,15 @@ oidc_full_token_validation:
   applies_to: RootAccount
   display_name: Perform Full Validation of OpenID Connect ID Tokens
   description: Performs full validation of OpenID Connect ID Tokens, including requiring issuer, nonce, and expiration claims.
+login_registration_ui_identity:
+  state: hidden
+  applies_to: RootAccount
+  display_name: New Login/Registration UI for Identity
+  description: Rework the Login/Registration UI to support Identity changes, ensuring a uniform login experience and transparent auth migration.
+  environments:
+    development:
+      state: allowed
+    beta:
+      state: hidden
+    production:
+      state: hidden

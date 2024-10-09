@@ -169,7 +169,7 @@ describe "communication_channels/confirm" do
       expect(transfer_button["href"]).to eq registration_confirmation_path(@communication_channel.confirmation_code, enrollment: @enrollment.uuid, transfer_enrollment: 1)
       login_button = page.css("#login.btn").first
       expect(login_button).not_to be_nil
-      expect(login_button["href"]).to eq login_url(enrollment: @enrollment.uuid, pseudonym_session: { unique_id: "jt@instructure.com" }, expected_user_id: @pseudonym1.user_id, host: "test.host")
+      expect(login_button["href"]).to eq login_url(enrollment: @enrollment.uuid, expected_user_id: @pseudonym1.user_id, login_hint: "jt@instructure.com")
     end
 
     context "open registration" do

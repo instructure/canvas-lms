@@ -198,13 +198,13 @@ let fakeXhrServer
 beforeEach(() => {
   fakeXhrServer = sinon.fakeServer.create({autoRespond: true})
   moxios.install()
-  fetchMock.get(FETCH_IMPORTANT_INFO_URL, JSON.stringify(MOCK_COURSE_SYLLABUS))
-  fetchMock.get(FETCH_APPS_URL, JSON.stringify(MOCK_COURSE_APPS))
-  fetchMock.get(FETCH_TABS_URL, JSON.stringify(MOCK_COURSE_TABS))
-  fetchMock.get(GRADING_PERIODS_URL, JSON.stringify(MOCK_GRADING_PERIODS_EMPTY))
-  fetchMock.get(ASSIGNMENT_GROUPS_URL, JSON.stringify(MOCK_ASSIGNMENT_GROUPS))
-  fetchMock.get(ENROLLMENTS_URL, JSON.stringify(MOCK_ENROLLMENTS))
-  fetchMock.get(ANNOUNEMENTS_URL_REGEX, JSON.stringify([]))
+  fetchMock.get(FETCH_IMPORTANT_INFO_URL, MOCK_COURSE_SYLLABUS)
+  fetchMock.get(FETCH_APPS_URL, MOCK_COURSE_APPS)
+  fetchMock.get(FETCH_TABS_URL, MOCK_COURSE_TABS)
+  fetchMock.get(GRADING_PERIODS_URL, MOCK_GRADING_PERIODS_EMPTY)
+  fetchMock.get(ASSIGNMENT_GROUPS_URL, MOCK_ASSIGNMENT_GROUPS)
+  fetchMock.get(ENROLLMENTS_URL, MOCK_ENROLLMENTS)
+  fetchMock.get(ANNOUNEMENTS_URL_REGEX, [])
   fakeXhrServer.respondWith('GET', GROUPS_URL, [
     200,
     {'Content-Type': 'application/json'},
@@ -815,12 +815,9 @@ describe('K-5 Subject Course', () => {
 
   describe('Observer Support', () => {
     beforeEach(() => {
-      fetchMock.get(OBSERVER_GRADING_PERIODS_URL, JSON.stringify(MOCK_GRADING_PERIODS_EMPTY))
-      fetchMock.get(
-        OBSERVER_ASSIGNMENT_GROUPS_URL,
-        JSON.stringify(MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS)
-      )
-      fetchMock.get(OBSERVER_ENROLLMENTS_URL, JSON.stringify(MOCK_ENROLLMENTS_WITH_OBSERVED_USERS))
+      fetchMock.get(OBSERVER_GRADING_PERIODS_URL, MOCK_GRADING_PERIODS_EMPTY)
+      fetchMock.get(OBSERVER_ASSIGNMENT_GROUPS_URL, MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS)
+      fetchMock.get(OBSERVER_ENROLLMENTS_URL, MOCK_ENROLLMENTS_WITH_OBSERVED_USERS)
     })
 
     afterEach(() => {

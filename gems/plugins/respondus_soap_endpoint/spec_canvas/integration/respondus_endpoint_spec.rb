@@ -27,9 +27,9 @@ class SpecStreamHandler < SOAP::StreamHandler
     conn_data
   end
 
-  def capture(obj, method, *args, &block)
+  def capture(obj, method, *, &block)
     @capture_block = block
-    obj.send(method, *args)
+    obj.send(method, *)
   end
 
   def self.create(*)

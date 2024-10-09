@@ -104,7 +104,7 @@ describe "reply attachment" do
         tinymce = f(".tox-tinymce")
         expect(tinymce.enabled?).to be true
       rescue Selenium::WebDriver::Error::NoSuchElementError
-        expect("tinymce not loaded").to eq "loaded"
+        raise "tinymce not loaded"
       end
     end
 

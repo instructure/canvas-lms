@@ -353,7 +353,7 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def context
-    read_attribute(:context) || submission.assignment.context rescue nil
+    super || submission&.assignment&.context
   end
 
   def parse_attachment_ids
@@ -371,18 +371,18 @@ class SubmissionComment < ActiveRecord::Base
     # on the assignment for now.
     attachments ||= []
     old_ids = parse_attachment_ids
-    write_attribute(:attachment_ids, attachments.select do |a|
+    self["attachment_ids"] = attachments.select do |a|
       old_ids.include?(a.id) ||
-      a.recently_created ||
-      a.ok_for_submission_comment
-    end.map(&:id).join(","))
+        a.recently_created ||
+        a.ok_for_submission_comment
+    end.map(&:id).join(",")
   end
 
   def infer_details
     self.anonymous = submission.assignment.anonymous_peer_reviews
     self.author_name ||= author.short_name rescue t(:unknown_author, "Someone")
     self.cached_attachments = attachments.map(&:attributes)
-    self.context = read_attribute(:context) || submission.assignment.context rescue nil
+    self.context = context unless context_id
 
     self.workflow_state ||= "active"
   end
@@ -450,9 +450,7 @@ class SubmissionComment < ActiveRecord::Base
 
   def formatted_body(truncate = nil)
     # stream items pre-serialize the return value of this method
-    if (formatted_body = read_attribute(:formatted_body))
-      return formatted_body
-    end
+    return self["formatted_body"] if has_attribute?("formatted_body")
 
     res = format_message(comment).first
     res = truncate_html(res, max_length: truncate, words: true) if truncate

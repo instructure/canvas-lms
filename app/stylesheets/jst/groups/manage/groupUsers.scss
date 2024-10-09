@@ -96,6 +96,9 @@
 .group .group-user {
   float: direction(left);
   width: 31%;
+  @media screen and (max-width: 500px) {
+    width: 93%;
+  }
   margin: direction-sides(0 2% 3px 0);
   box-sizing: border-box;
 

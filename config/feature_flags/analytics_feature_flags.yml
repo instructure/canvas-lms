@@ -83,6 +83,20 @@ k20_lti_usage:
   root_opt_in: true
   beta: true
   shadow: true
+k20_lti_insights:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - LTI Insights
+  description:
+    k20_lti_insights: Enables the Intelligent Insights - LTI Insights feature and accompanying permission.
+  root_opt_in: true
+  beta: true
+  shadow: true
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
 
 # Intelligent Insights - Provided through Ask Your Data LTI App
 advanced_analytics_ask_questions:

@@ -113,7 +113,9 @@ module ContextModulesHelper
 
   def preload_modules_content(modules)
     modules.each_slice(1000) do |slice|
-      ActiveRecord::Associations.preload(slice, content_tags: { content: %i[context external_tool_tag current_lookup] })
+      ActiveRecord::Associations.preload(slice, content_tags: { content: %i[context external_tool_tag current_lookup wiki] })
+      assignmentable_content = slice.map(&:content_tags).flatten.select(&:can_have_assignment?)
+      ActiveRecord::Associations.preload(assignmentable_content, content: { assignment: :context }) unless assignmentable_content.empty?
     end
     preload_can_unpublish(@context, modules) if @can_view
   end

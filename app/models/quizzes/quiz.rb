@@ -340,7 +340,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def assignment_id=(val)
     @assignment_id_set = true
-    write_attribute(:assignment_id, val)
+    super
   end
 
   def lock_at=(val)
@@ -624,7 +624,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   # Returns the number of questions a student will see on the
   # SAVED version of the quiz
   def question_count(force_check = false)
-    return read_attribute(:question_count) if !force_check && read_attribute(:question_count)
+    return super() if !force_check && super()
 
     question_count = 0
     stored_questions.each do |q|
@@ -816,7 +816,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     questions = assessment_questions.map do |assessment_question|
       question = quiz_questions.build
       question.quiz_group_id = group.id if group && group.quiz_id == id
-      question.write_attribute(:question_data, assessment_question.question_data)
+      question["question_data"] = assessment_question.question_data
       question.assessment_question = assessment_question
       question.assessment_question_version = assessment_question.version_number
       question.save
@@ -907,7 +907,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     when ""
       val = nil
     end
-    write_attribute(:hide_results, val)
+    super
   end
 
   def check_if_submissions_need_review

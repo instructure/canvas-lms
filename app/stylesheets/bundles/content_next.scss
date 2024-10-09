@@ -346,3 +346,56 @@ input.move-module-label-spacer {
   #context-modules-header-export-course-button {
     text-decoration: none;
   }
+
+  #context_modules_sortable_container {
+    .module-selector-container {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+
+      .module-selector {
+        display: flex;
+        flex-direction: column;
+
+        padding: 0 4px;
+
+        label {
+          font-size: 16px;
+          font-weight: 700;
+          line-height: 24px;
+          text-align: left;
+          padding-bottom: 8px;
+        }
+
+        .module-select {
+          /* Ensure it looks the same across browsers */
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          appearance: none;
+
+          /* Base styling */
+          background-color: white;
+          border: 1px solid lightgray;
+          border-radius: 5px;
+          width: 100%;
+          max-width: 300px;
+          color: black;
+          font-size: 16px;
+          padding: 0 32px 0 12px;
+
+          /* Chevron */
+          background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns%3D"http%3A//www.w3.org/2000/svg" viewBox%3D"0 0 4 5"%3E%3Cpath fill%3D"%23999" d%3D"M2 5L0 2h4z"/%3E%3C/svg%3E');
+          background-repeat: no-repeat;
+          background-position: right 12px center;
+          background-size: 12px;
+        }
+
+        .description {
+          font-size: 14px;
+          font-weight: 400;
+          line-height: 20px;
+          text-align: left;
+        }
+      }
+    }
+  }

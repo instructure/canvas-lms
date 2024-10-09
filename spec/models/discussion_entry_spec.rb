@@ -625,7 +625,7 @@ describe DiscussionEntry do
       topic_with_nested_replies
     end
 
-    context ".read_entry_ids" do
+    describe ".read_entry_ids" do
       it "returns the ids of the read entries" do
         @root2.change_read_state("read", @teacher)
         @reply_reply1.change_read_state("read", @teacher)
@@ -638,7 +638,7 @@ describe DiscussionEntry do
       end
     end
 
-    context ".forced_read_state_entry_ids" do
+    describe ".forced_read_state_entry_ids" do
       it "returns the ids of entries that have been marked as force_read_state" do
         marked_entries = [@root2, @reply_reply1, @reply_reply2, @reply3]
         marked_entries.each do |e|
@@ -655,7 +655,7 @@ describe DiscussionEntry do
       end
     end
 
-    context ".find_existing_participant" do
+    describe ".find_existing_participant" do
       it "returns existing data" do
         @root2.change_read_state("read", @teacher, forced: true)
         participant = @root2.find_existing_participant(@teacher)

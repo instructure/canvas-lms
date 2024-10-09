@@ -208,6 +208,63 @@ it('renders Assignment correctly with just date', () => {
   expect(wrapper).toMatchSnapshot()
 })
 
+it('renders Discussion Checkpoint correctly with everything', () => {
+  const wrapper = shallow(
+    <PlannerItem
+      {...defaultProps({
+        associated_item: 'Discussion Checkpoint',
+        completed: true,
+        title: 'I am a Discussion Checkpoint',
+        points: 4,
+        html_url: 'http://www.non_default_url.com',
+        date: DEFAULT_DATE,
+      })}
+    />
+  )
+  expect(wrapper).toMatchSnapshot()
+})
+
+it('renders Discussion Checkpoint correctly with just points', () => {
+  const wrapper = shallow(
+    <PlannerItem
+      {...defaultProps({
+        associated_item: 'Discussion Checkpoint',
+        completed: false,
+        title: 'I am a Discussion Checkpoint',
+        points: 2,
+      })}
+    />
+  )
+  expect(wrapper).toMatchSnapshot()
+})
+
+it('renders Discussion Checkpoint correctly without right side content', () => {
+  const wrapper = shallow(
+    <PlannerItem
+      {...defaultProps({
+        associated_item: 'Discussion Checkpoint',
+        completed: false,
+        title: 'I am a Discussion Checkpoint',
+      })}
+    />
+  )
+  expect(wrapper).toMatchSnapshot()
+})
+
+it('renders Discussion Checkpoint correctly with just date', () => {
+  const wrapper = shallow(
+    <PlannerItem
+      {...defaultProps({
+        associated_item: 'Discussion Checkpoint',
+        completed: false,
+        title: 'I am a Discussion Checkpoint',
+        date: DEFAULT_DATE,
+      })}
+    />
+  )
+  expect(wrapper).toMatchSnapshot()
+})
+
 it('renders assignment peer reviews correctly', () => {
   const wrapper = shallow(
     <PlannerItem
@@ -597,6 +654,20 @@ it('renders feedback if available', () => {
   })
   const wrapper = shallow(<PlannerItem {...props} />)
   expect(wrapper).toMatchSnapshot()
+})
+
+it('does not render html tags in feedback', () => {
+  const props = defaultProps({
+    feedback: {
+      author_avatar_url: '/avatar/is/here/',
+      author_name: 'Boyd Crowder',
+      comment: '<p>Death will not be the end of your suffering.</p>',
+      is_media: false,
+    },
+    deregisterAnimatable: jest.fn()
+  })
+  const {getByTestId} = render(<PlannerItem {...props} />)
+  expect(getByTestId('feedback-comment').textContent).toBe('Death will not be the end of your suffering.')
 })
 
 it('renders the location if available', () => {

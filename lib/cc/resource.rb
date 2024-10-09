@@ -86,10 +86,10 @@ module CC
       end
     end
 
-    def run_and_set_progress(method, progress, fail_message, *args)
+    def run_and_set_progress(method, progress, fail_message, *)
       res = nil
       begin
-        res = send(method, *args)
+        res = send(method, *)
       rescue
         add_error(fail_message, $!)
       end

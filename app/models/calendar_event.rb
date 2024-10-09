@@ -449,7 +449,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def time_zone_edited
-    CGI.unescapeHTML(read_attribute(:time_zone_edited) || "")
+    CGI.unescapeHTML(super || "")
   end
 
   has_a_broadcast_policy
@@ -551,9 +551,7 @@ class CalendarEvent < ActiveRecord::Base
     content_being_saved_by(user)
   end
 
-  def user
-    read_attribute(:user) || ((context_type == "User") ? context : nil)
-  end
+  alias_method :user, :context_user
 
   def appointment_group?
     context_type == "AppointmentGroup" || parent_event.try(:context_type) == "AppointmentGroup"
@@ -619,7 +617,7 @@ class CalendarEvent < ActiveRecord::Base
 
   def participants_per_appointment
     if override_participants_per_appointment?
-      read_attribute(:participants_per_appointment)
+      super
     else
       context.is_a?(AppointmentGroup) ? context.participants_per_appointment : nil
     end
@@ -629,9 +627,9 @@ class CalendarEvent < ActiveRecord::Base
     # if the given limit is the same as the context's limit, we should not override
     if limit == context.participants_per_appointment && override_participants_per_appointment?
       self.override_participants_per_appointment = false
-      write_attribute(:participants_per_appointment, nil)
+      super(nil)
     else
-      write_attribute(:participants_per_appointment, limit)
+      super
       self.override_participants_per_appointment = true
     end
   end
@@ -641,7 +639,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def all_day
-    read_attribute(:all_day) || (new_record? && self.start_at && self.start_at == self.end_at && self.start_at.strftime("%H:%M") == "00:00")
+    super || (new_record? && self.start_at && self.start_at == self.end_at && self.start_at.strftime("%H:%M") == "00:00")
   end
 
   def to_atom(opts = {})

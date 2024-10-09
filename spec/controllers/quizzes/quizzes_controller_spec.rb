@@ -1146,7 +1146,7 @@ describe Quizzes::QuizzesController do
       override = AssignmentOverride.new
       override.title = "ADHOC quiz override"
       override.quiz = @quiz
-      override.lock_at = Time.now + 1.day
+      override.lock_at = 1.day.from_now
       override.lock_at_overridden = true
       override.save!
       override_student = override.assignment_override_students.build

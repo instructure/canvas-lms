@@ -30,12 +30,11 @@ ADDITIONAL_ALLOWED_CLASSES = [
   Mime::Type,
   Mime::NullType,
   OpenObject,
-  OpenStruct,
+  OpenStruct, # rubocop:disable Style/OpenStructUse
   Symbol,
   Time,
   URI::HTTP,
   URI::HTTPS,
-  WeakParameters
 ].freeze
 
 # SafeYAML-like interface, but vanilla Psych
@@ -53,14 +52,14 @@ module SafeYAML
 
   module Psych
     # load defaults to safe
-    def load(*args, safe: true, **kwargs)
-      return unsafe_load(*args, **kwargs) unless safe
+    def load(*, safe: true, **)
+      return unsafe_load(*, **) unless safe
 
-      super(*args, aliases: true, **kwargs)
+      super(*, aliases: true, **)
     end
 
-    def safe_load(yaml, permitted_classes: [], **kwargs)
-      super(yaml, permitted_classes: permitted_classes + SafeYAML.permitted_classes, aliases: true, **kwargs)
+    def safe_load(yaml, permitted_classes: [], **)
+      super(yaml, permitted_classes: permitted_classes + SafeYAML.permitted_classes, aliases: true, **)
     end
   end
 end
@@ -95,3 +94,14 @@ module YAMLSingletonFix
   end
 end
 Psych::Visitors::ToRuby.prepend(YAMLSingletonFix)
+
+module WeakParametersOverride
+  def resolve_class(klassname)
+    if klassname == "WeakParameters"
+      class_loader.load("ActiveSupport::HashWithIndifferentAccess")
+    else
+      super
+    end
+  end
+end
+Psych::Visitors::ToRuby.prepend(WeakParametersOverride)

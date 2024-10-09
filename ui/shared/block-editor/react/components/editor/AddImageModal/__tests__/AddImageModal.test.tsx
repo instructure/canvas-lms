@@ -197,7 +197,8 @@ describe('AddImageModal', () => {
     })
   }, 10000)
 
-  it('can submit course images', async () => {
+  it.skip('can submit course images', async () => {
+    // RCX-2420 to fix it
     renderComponent()
     await user.click(screen.getByText('Course Images'))
     await waitFor(() => {
@@ -213,7 +214,8 @@ describe('AddImageModal', () => {
     })
   })
 
-  it('can submit user images', async () => {
+  it.skip('can submit user images', async () => {
+    // RCX-2340 to fix it
     mockTrayProps.containingContext.contextType = 'user'
     renderComponent()
     await user.click(screen.getByText('User Images'))

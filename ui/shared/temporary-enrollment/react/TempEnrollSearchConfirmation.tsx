@@ -33,7 +33,7 @@ const I18n = useI18nScope('temporary_enrollment')
 
 interface Props {
   foundUsers: User[]
-  duplicateUsers: Record<string, User>
+  duplicateUsers: Record<string, DuplicateUser[]>
   searchFailure: Function
   readySubmit: Function
   canReadSIS: boolean
@@ -42,15 +42,19 @@ interface Props {
 export function TempEnrollSearchConfirmation(props: Props) {
   const [userDetails, setUserDetails] = useState<User[]>([])
   const [loading, setLoading] = useState<boolean>(false)
-  const [selectedDupes, setSelectedDupes] = useState<Record<string, DuplicateUser>>([])
+  const [selectedDupes, setSelectedDupes] = useState<Record<string, DuplicateUser | null>>([])
 
   useEffect(() => {
-    const processFoundUsers = async () => {
-      if (props.foundUsers[0].id == null) {
+    const processFoundUsers = async (users: User[]) => {
+      if (users[0].id == null) {
         setLoading(true)
-        const promises = []
-        props.foundUsers.forEach(user => {
-          promises.push(fetchUserDetails(user))
+        const promises: Promise<User>[] = []
+        users.forEach(user => {
+          if (user.id == null) {
+            promises.push(fetchUserDetails(user))
+          } else {
+            promises.push(user)
+          }
         })
         Promise.all(promises)
           .then(value => {
@@ -66,13 +70,13 @@ export function TempEnrollSearchConfirmation(props: Props) {
             setLoading(false)
           })
       } else {
-        setUserDetails(props.foundUsers)
+        setUserDetails(users)
       }
     }
     const duplicateCount = Object.keys(props.duplicateUsers).length
 
     const templateSelectedUsers = () => {
-      const emptyMap: Record<string, DuplicateUser> = {}
+      const emptyMap: Record<string, DuplicateUser | null> = {}
 
       for (const duplicatePair in props.duplicateUsers) {
         emptyMap[duplicatePair] = null
@@ -81,7 +85,7 @@ export function TempEnrollSearchConfirmation(props: Props) {
     }
 
     if (props.foundUsers.length > 0) {
-      processFoundUsers()
+      processFoundUsers(props.foundUsers)
     }
 
     if (duplicateCount > 0) {
@@ -111,15 +115,15 @@ export function TempEnrollSearchConfirmation(props: Props) {
     })
     const values = Object.values(copyDupes)
     if (values.every(dupe => dupe !== null)) {
-      const dupes = values.map(dupe => {
+      const dupes: User[] = values.map(dupe => {
         return {id: dupe.user_id, name: dupe.user_name, ...dupe}
       })
-      const allEnrollments = dupes.concat(props.foundUsers)
+      const allEnrollments = dupes.concat(userDetails)
       props.readySubmit(allEnrollments)
     }
   }
 
-  const renderDupeRow = (key, dupeUser) => {
+  const renderDupeRow = (key: string, dupeUser: DuplicateUser) => {
     const k = `dupeuser_${dupeUser.user_id}`
     let checked = false
     if (selectedDupes[key] != null) {
@@ -149,7 +153,7 @@ export function TempEnrollSearchConfirmation(props: Props) {
     )
   }
 
-  const renderDupeTables = (key, dupePair) => {
+  const renderDupeTables = (key: string, dupePair: DuplicateUser[]) => {
     return (
       <Flex.Item key={`dupepair_${key}`}>
         <Text>{I18n.t('Possible matches for "%{key}". Select the desired one below.', {key})}</Text>
@@ -176,7 +180,7 @@ export function TempEnrollSearchConfirmation(props: Props) {
             </Table.Row>
           </Table.Head>
           <Table.Body>
-            {dupePair.map(dupeUser => {
+            {dupePair.map((dupeUser: DuplicateUser) => {
               return renderDupeRow(key, dupeUser)
             })}
           </Table.Body>
@@ -202,7 +206,7 @@ export function TempEnrollSearchConfirmation(props: Props) {
   }
 
   const renderDupes = () => {
-    const tables = []
+    const tables: JSX.Element[] = []
     for (const key in props.duplicateUsers) {
       tables.push(renderDupeTables(key, props.duplicateUsers[key]))
     }

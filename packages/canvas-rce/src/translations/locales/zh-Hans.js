@@ -907,6 +907,7 @@ const locale = {
   "studio_media_options_tray_cfb94654": { "message": "Studio 媒体选项任务栏" },
   "styles_2aa721ef": { "message": "样式" },
   "submit_a3cc6859": { "message": "提交" },
+  "submitting_b90fac62": { "message": "正在提交..." },
   "subscript_59744f96": { "message": "下标" },
   "subset_19c1a92f": { "message": "子集" },
   "subset_strict_8d8948d6": { "message": "子集（严格）" },

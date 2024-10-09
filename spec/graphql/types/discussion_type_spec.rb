@@ -826,7 +826,7 @@ describe Types::DiscussionType do
         workflow_state: "published"
       )
       @context_module = @course.context_modules.create!(name: "some module")
-      @context_module.unlock_at = Time.now + 1.day
+      @context_module.unlock_at = 1.day.from_now
       @context_module.add_item(type: "discussion_topic", id: @topic.id)
       @context_module.save!
     end

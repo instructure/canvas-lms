@@ -26,10 +26,10 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
 
   # rubocop:disable GraphQL/ExtractInputType
   argument :anonymous_state, Types::DiscussionTopicAnonymousStateType, required: false
-  argument :discussion_topic_id, GraphQL::Schema::Object::ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionTopic")
-  argument :remove_attachment, Boolean, required: false
   argument :assignment, Mutations::AssignmentBase::AssignmentUpdate, required: false
+  argument :discussion_topic_id, GraphQL::Schema::Object::ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionTopic")
   argument :discussion_type, Types::DiscussionTopicDiscussionType, required: false
+  argument :remove_attachment, Boolean, required: false
   # sets in-memory (not persisiting) flag to decide when to notify users about announcement changes
   argument :notify_users, Boolean, required: false
   argument :set_checkpoints, Boolean, required: false
@@ -134,7 +134,9 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
       if discussion_topic.assignment && input[:checkpoints]&.count == DiscussionTopic::REQUIRED_CHECKPOINT_COUNT
         return validation_error(I18n.t("If checkpoints are defined, forCheckpoints: true must be provided to the discussion topic assignment.")) unless input.dig(:assignment, :for_checkpoints)
 
-        checkpoint_service = if discussion_topic.assignment.has_sub_assignments
+        # on the case of changing an ungraded discussion to a graded, checkpointed discussion, at this stage
+        # has_sub_assignments? returns true, but sub_assignments is empty. We will want the creator service when this happens
+        checkpoint_service = if discussion_topic.assignment.has_sub_assignments? && discussion_topic.assignment.sub_assignments.any?
                                Checkpoints::DiscussionCheckpointUpdaterService
                              else
                                Checkpoints::DiscussionCheckpointCreatorService
@@ -166,6 +168,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
       )
     end
 
+    discussion_topic.editor = current_user
     return errors_for(discussion_topic) unless discussion_topic.save!
 
     if input.key?(:ungraded_discussion_overrides)

@@ -27,7 +27,8 @@ module PlannerHelper
     "wiki_page" => "WikiPage",
     "planner_note" => "PlannerNote",
     "calendar_event" => "CalendarEvent",
-    "assessment_request" => "AssessmentRequest"
+    "assessment_request" => "AssessmentRequest",
+    "sub_assignment" => "SubAssignment"
   }.freeze
 
   class << self

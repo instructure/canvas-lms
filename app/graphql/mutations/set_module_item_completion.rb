@@ -23,9 +23,9 @@ class Mutations::SetModuleItemCompletion < Mutations::BaseMutation
 
   graphql_name "SetModuleItemCompletion"
 
-  argument :module_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("ContextModule")
-  argument :item_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("ContextModuleItem")
   argument :done, Boolean, required: true
+  argument :item_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("ContextModuleItem")
+  argument :module_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("ContextModule")
 
   field :module_item, Types::ModuleItemType, null: false
 

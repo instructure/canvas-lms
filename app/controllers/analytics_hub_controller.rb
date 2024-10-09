@@ -42,12 +42,13 @@ class AnalyticsHubController < ApplicationController
     env = {
       ANALYTICS_HUB: {
         ACCOUNT_ID: @account.id.to_s,
-        PERMISSIONS: @context.granted_rights(@current_user, :view_ask_questions_analytics, :view_students_in_need, :view_course_readiness, :view_lti_usage),
+        PERMISSIONS: @context.granted_rights(@current_user, :view_ask_questions_analytics, :view_students_in_need, :view_course_readiness, :view_lti_usage, :view_lti_insights),
         FEATURE_FLAGS: {
           ADVANCED_ANALYTICS_ASK_QUESTIONS_ENABLED: @account.feature_enabled?(:advanced_analytics_ask_questions),
           K20_STUDENTS_IN_NEED_OF_ATTENTION_ENABLED: @account.feature_enabled?(:k20_students_in_need_of_attention),
           K20_COURSE_READINESS_ENABLED: @account.feature_enabled?(:k20_course_readiness),
-          K20_LTI_USAGE_ENABLED: @account.feature_enabled?(:k20_lti_usage)
+          K20_LTI_USAGE_ENABLED: @account.feature_enabled?(:k20_lti_usage),
+          K20_LTI_INSIGHTS_ENABLED: @account.feature_enabled?(:k20_lti_insights)
         }
       }
     }

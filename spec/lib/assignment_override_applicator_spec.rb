@@ -407,7 +407,7 @@ describe AssignmentOverrideApplicator do
       end
 
       it "distinguishes cache by assignment version" do
-        Timecop.travel Time.now + 1.hour do
+        Timecop.travel 1.hour.from_now do
           @assignment.due_at = 7.days.from_now
           @assignment.save!
           expect(@assignment.versions.count).to eq 2
@@ -1110,7 +1110,7 @@ describe AssignmentOverrideApplicator do
       end
     end
 
-    context "#observer_overrides" do
+    describe "#observer_overrides" do
       it "returns all dates visible to observer" do
         @override = assignment_override_model(assignment: @assignment)
         @override_student = @override.assignment_override_students.build
@@ -1134,7 +1134,7 @@ describe AssignmentOverrideApplicator do
       end
     end
 
-    context "#has_invalid_args?" do
+    describe "#has_invalid_args?" do
       it "returns true with nil user" do
         result = AssignmentOverrideApplicator.has_invalid_args?(@assignment, nil)
         expect(result).to be_truthy
@@ -1457,7 +1457,7 @@ describe AssignmentOverrideApplicator do
 
     it "distinguishes cache by assignment updated_at" do
       @assignment = create_assignment
-      Timecop.travel Time.now + 1.hour do
+      Timecop.travel 1.hour.from_now do
         @assignment.due_at = 5.days.from_now
         @assignment.save!
         expect(@assignment.versions.count).to eq 2

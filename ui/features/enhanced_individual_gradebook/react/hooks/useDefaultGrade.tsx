@@ -31,9 +31,11 @@ export type DefaultGradeSubmissionParams = {
       set_by_default_grade: boolean
       late_policy_status?: string
       grade?: string
+      sub_assignment_tag?: string
     }
   }
   dont_overwrite_grades: boolean
+  sub_assignment_tag?: string
 }
 
 export type ApiResultType = {

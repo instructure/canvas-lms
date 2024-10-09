@@ -1240,75 +1240,69 @@ describe ApplicationHelper do
         expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: *.inst_fs.instructure.com inst_fs.instructure.com localhost root_account.test root_account2.test; "
       end
 
-      context "CSP report only header" do
+      context "with default source CSP directives" do
         before do
           account.enable_feature!(:javascript_csp)
           account.enable_feature!(:default_source_csp_logging)
+          account.enable_csp!
         end
 
-        it "doesn't set the CSP header if :javascript_csp is enabled but not enforced" do
+        it "sets header for frames" do
+          allow(helper).to receive(:csp_report_uri).and_return("report-uri https://somewhere/; ")
+          helper.add_csp_for_root
+          expect(headers["Content-Security-Policy"])
+            .to eq "frame-src 'self' blob: #{helper.allow_list_domains}; " + helper.default_csp_logging_directives
+        end
+
+        it "sets header for files" do
+          allow(helper).to receive(:csp_report_uri).and_return("report-uri https://somewhere/; ")
+          helper.add_csp_for_file
+          expect(headers["Content-Security-Policy"])
+            .to eq(helper.csp_iframe_attribute + helper.default_csp_logging_directives(include_script_src: false))
+        end
+
+        it "sets header when the content type is not text/html" do
+          allow(helper).to receive(:csp_report_uri).and_return("report-uri https://somewhere/; ")
+          response.content_type = "application/json"
+          helper.set_default_source_csp_directive_if_enabled
+          expect(headers["Content-Security-Policy"]).to eq helper.default_csp_logging_directives
+        end
+
+        it "sets header without default source CSP directives if :default_source_csp_logging feature is disabled" do
           account.disable_feature!(:default_source_csp_logging)
+          helper.add_csp_for_root
+          expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: #{helper.allow_list_domains}; "
+          headers.clear
+          helper.add_csp_for_file
+          expect(headers["Content-Security-Policy"]).to eq helper.csp_iframe_attribute
+          headers.clear
+          helper.set_default_source_csp_directive_if_enabled
+          expect(headers["Content-Security-Policy"]).not_to eq helper.default_csp_logging_directives
+        end
+
+        it "doesn't set the header if :javascript_csp feature is enabled but not enforced" do
+          account.disable_feature!(:default_source_csp_logging)
+          account.disable_csp!
           allow_any_instance_of(DynamicSettings).to receive(:find).with("csp-logging").and_return({ host: "mocked_host_value" })
           helper.add_csp_for_root
-          expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
           expect(headers).to_not have_key("Content-Security-Policy")
         end
 
-        it "is set for frames" do
-          allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
-          helper.add_csp_for_root
-          expect(headers["Content-Security-Policy-Report-Only"])
-            .to eq "frame-src 'self' blob: localhost root_account.test root_account2.test; default-src 'self'; report-uri https://somewhere/"
-        end
-
-        it "is set for files" do
-          allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
-          helper.add_csp_for_file
-          expect(headers["Content-Security-Policy-Report-Only"])
-            .to eq(helper.csp_iframe_attribute + "default-src 'self'; report-uri https://somewhere/")
-        end
-
-        it "is set to the default CSP Report-Only header when the content type is not text/html" do
-          allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
-          response.content_type = "application/json"
-          helper.add_csp_for_root
-          expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
-          helper.set_default_source_csp_directive_if_enabled
-          expect(headers["Content-Security-Policy-Report-Only"]).to eq "default-src 'self'; report-uri https://somewhere/"
-        end
-
-        it "is not set if default_source_csp_logging feature is disabled" do
-          account.disable_feature!(:default_source_csp_logging)
-          allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
-          helper.add_csp_for_root
-          expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
-        end
-
-        it "is not set if javascript_csp is disabled" do
+        it "doesn't set the header if javascript_csp feature is disabled" do
           account.disable_feature!(:javascript_csp)
-          allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
+          allow(helper).to receive(:csp_report_uri).and_return("report-uri https://somewhere/; ")
           helper.add_csp_for_root
-          expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
+          expect(headers).to_not have_key("Content-Security-Policy")
         end
 
-        it "is not set if CSP is enforced" do
-          account.enable_csp!
-          allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
+        it "won't override existing header" do
+          allow(helper).to receive(:csp_report_uri).and_return("report-uri https://somewhere/; ")
+          directives =
+            "frame-src 'self' blob: #{helper.allow_list_domains}; " + helper.default_csp_logging_directives
           helper.add_csp_for_root
-          expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
+          expect(headers["Content-Security-Policy"]).to eq directives
           helper.set_default_source_csp_directive_if_enabled
-          expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
-          helper.add_csp_for_file
-          expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
-        end
-
-        it "won't override an existing CSP Report-Only header" do
-          directives = "frame-src 'self' blob: localhost root_account.test root_account2.test; default-src 'self'; report-uri https://somewhere/"
-          allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
-          helper.add_csp_for_root
-          expect(headers["Content-Security-Policy-Report-Only"]).to eq directives
-          helper.set_default_source_csp_directive_if_enabled
-          expect(headers["Content-Security-Policy-Report-Only"]).to eq directives
+          expect(headers["Content-Security-Policy"]).to eq directives
         end
       end
     end

@@ -53,7 +53,7 @@ export default function UsersListRow({
       <Table.Cell data-heap-redact-text="">{user.email}</Table.Cell>
       <Table.Cell data-heap-redact-text="">{user.sis_user_id}</Table.Cell>
       <Table.Cell>{user.last_login && <FriendlyDatetime dateTime={user.last_login} />}</Table.Cell>
-      <Table.Cell>
+      <Table.Cell textAlign="end">
         {permissions.can_view_temporary_enrollments &&
           TempEnrollUsersListRow({
             user,

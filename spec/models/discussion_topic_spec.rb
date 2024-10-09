@@ -523,7 +523,7 @@ describe DiscussionTopic do
     end
 
     it "is visible to teachers not locked to a section in the course" do
-      @topic.update_attribute(:delayed_post_at, Time.now + 1.day)
+      @topic.update_attribute(:delayed_post_at, 1.day.from_now)
       new_teacher = user_factory
       @course.enroll_teacher(new_teacher).accept!
       expect(@topic.visible_for?(new_teacher)).to be_truthy
@@ -986,7 +986,7 @@ describe DiscussionTopic do
       it "is active when delayed_post_at is in the past" do
         topic = delayed_discussion_topic(title: "title",
                                          message: "content here",
-                                         delayed_post_at: Time.now - 1.day,
+                                         delayed_post_at: 1.day.ago,
                                          lock_at: nil)
         topic.update_based_on_date
         expect(topic.workflow_state).to eql "active"
@@ -996,7 +996,7 @@ describe DiscussionTopic do
       it "is post_delayed and remains like than even after publishing when delayed_post_at is in the future" do
         topic = delayed_discussion_topic(title: "title",
                                          message: "content here",
-                                         delayed_post_at: Time.now + 1.day,
+                                         delayed_post_at: 1.day.from_now,
                                          lock_at: nil)
         topic.update_based_on_date
         expect(topic.workflow_state).to eql "post_delayed"
@@ -1009,7 +1009,7 @@ describe DiscussionTopic do
         topic = delayed_discussion_topic(title: "title",
                                          message: "content here",
                                          delayed_post_at: nil,
-                                         lock_at: Time.now + 1.day)
+                                         lock_at: 1.day.from_now)
         topic.update_based_on_date
         expect(topic.workflow_state).to eql "active"
         expect(topic.locked?).to be_falsey
@@ -1018,8 +1018,8 @@ describe DiscussionTopic do
       it "is active when now is between delayed_post_at and lock_at" do
         topic = delayed_discussion_topic(title: "title",
                                          message: "content here",
-                                         delayed_post_at: Time.now - 1.day,
-                                         lock_at: Time.now + 1.day)
+                                         delayed_post_at: 1.day.ago,
+                                         lock_at: 1.day.from_now)
         topic.update_based_on_date
         expect(topic.workflow_state).to eql "active"
         expect(topic.locked?).to be_falsey
@@ -1028,8 +1028,8 @@ describe DiscussionTopic do
       it "is post_delayed when delayed_post_at and lock_at are in the future" do
         topic = delayed_discussion_topic(title: "title",
                                          message: "content here",
-                                         delayed_post_at: Time.now + 1.day,
-                                         lock_at: Time.now + 3.days)
+                                         delayed_post_at: 1.day.from_now,
+                                         lock_at: 3.days.from_now)
         topic.update_based_on_date
         expect(topic.workflow_state).to eql "post_delayed"
         expect(topic.locked?).to be_falsey
@@ -1041,7 +1041,7 @@ describe DiscussionTopic do
                                  workflow_state: "locked",
                                  locked: true,
                                  delayed_post_at: nil,
-                                 lock_at: Time.now + 1.day)
+                                 lock_at: 1.day.from_now)
         topic.update_based_on_date
         expect(topic.locked?).to be_truthy
       end
@@ -1050,7 +1050,7 @@ describe DiscussionTopic do
         topic = discussion_topic(title: "title",
                                  message: "content here",
                                  workflow_state: "active",
-                                 delayed_post_at: Time.now + 1.day,
+                                 delayed_post_at: 1.day.from_now,
                                  lock_at: nil)
         topic.update_based_on_date
         expect(topic.workflow_state).to eql "active"
@@ -1237,7 +1237,7 @@ describe DiscussionTopic do
     end
   end
 
-  context "#discussion_subentry_count" do
+  describe "#discussion_subentry_count" do
     it "returns the count of all active discussion_entries" do
       @topic = @course.discussion_topics.create(title: "topic")
       @topic.reply_from(user: @teacher, text: "entry 1").destroy  # no count
@@ -1321,7 +1321,7 @@ describe DiscussionTopic do
       )
 
       context_module = @course.context_modules.create!(name: "some module")
-      context_module.unlock_at = Time.now + 1.day
+      context_module.unlock_at = 1.day.from_now
       context_module.add_item(type: "discussion_topic", id: topic.id)
       context_module.save!
       topic.publish!
@@ -1384,7 +1384,7 @@ describe DiscussionTopic do
       expect(@student.stream_item_instances.count).to eq 1
 
       context_module = @course.context_modules.create!(name: "some module")
-      context_module.unlock_at = Time.now + 1.day
+      context_module.unlock_at = 1.day.from_now
       context_module.add_item(type: "discussion_topic", id: topic.id)
       context_module.save!
       topic.save!
@@ -2508,13 +2508,13 @@ describe DiscussionTopic do
 
     it "does not allow replies from students to discussion topic before unlock date" do
       @topic = @course.discussion_topics.create!(user: @teacher)
-      @topic.update_attribute(:delayed_post_at, Time.now + 1.day)
+      @topic.update_attribute(:delayed_post_at, 1.day.from_now)
       expect { @topic.reply_from(user: @student, text: "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
     end
 
     it "does not allow replies from students to discussion topic after lock date" do
       @topic = @course.discussion_topics.create!(user: @teacher)
-      @topic.update_attribute(:lock_at, Time.now - 1.day)
+      @topic.update_attribute(:lock_at, 1.day.ago)
       expect { @topic.reply_from(user: @student, text: "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
     end
 
@@ -3296,14 +3296,14 @@ describe DiscussionTopic do
     end
 
     it "prefers unlock_at to delayed_post_at" do
-      @topic[:delayed_post_at] = Time.now + 5.days
+      @topic[:delayed_post_at] = 5.days.from_now
       @topic[:unlock_at] = Time.now
       expect(@topic.delayed_post_at).to equal @topic[:unlock_at]
       expect(@topic.unlock_at).to equal @topic[:unlock_at]
     end
 
     it "defaults to delayed_post_at if unlock_at is nil" do
-      @topic[:delayed_post_at] = Time.now + 5.days
+      @topic[:delayed_post_at] = 5.days.from_now
       @topic[:unlock_at] = nil
       expect(@topic.delayed_post_at).to equal @topic[:delayed_post_at]
       expect(@topic.unlock_at).to equal @topic[:delayed_post_at]
@@ -3315,9 +3315,9 @@ describe DiscussionTopic do
       expect(@topic[:unlock_at]).to eq @topic.delayed_post_at
       expect(@topic.delayed_post_at).to eq @topic.unlock_at
 
-      @topic[:delayed_post_at] = Time.now + 5.days
+      @topic[:delayed_post_at] = 5.days.from_now
       @topic[:unlock_at] = nil
-      @topic.unlock_at = Time.now + 1.day
+      @topic.unlock_at = 1.day.from_now
       expect(@topic[:delayed_post_at]).to eq @topic[:unlock_at]
       expect(@topic[:unlock_at]).to eq @topic.delayed_post_at
       expect(@topic.delayed_post_at).to eq @topic.unlock_at

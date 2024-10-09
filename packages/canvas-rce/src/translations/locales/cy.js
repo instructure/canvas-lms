@@ -1045,6 +1045,7 @@ const locale = {
   },
   "styles_2aa721ef": { "message": "Arddulliau" },
   "submit_a3cc6859": { "message": "Cyflwyno" },
+  "submitting_b90fac62": { "message": "Wrthi’n cyflwyno..." },
   "subscript_59744f96": { "message": "Isysgrif" },
   "subset_19c1a92f": { "message": "Is-set" },
   "subset_strict_8d8948d6": { "message": "Is-set (Strict)" },

@@ -26,8 +26,8 @@ module Types
 
     global_id_field :id
 
-    field :context_type, String, null: false
     field :context_id, ID, null: false
+    field :context_type, String, null: false
 
     field :proficiency_ratings_connection, ProficiencyRatingType.connection_type, null: true
     def proficiency_ratings_connection

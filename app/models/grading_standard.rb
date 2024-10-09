@@ -129,7 +129,7 @@ class GradingStandard < ActiveRecord::Base
   end
 
   def version
-    read_attribute(:version).presence || 1
+    super || 1
   end
 
   def ordered_scheme
@@ -204,17 +204,17 @@ class GradingStandard < ActiveRecord::Base
     if new_val.respond_to?(:map)
       new_val = new_val.map { |grade_name, lower_bound| [grade_name, lower_bound.round(4)] }
     end
-    write_attribute(:data, new_val)
+    super
     @ordered_scheme = nil
   end
 
   def data
     unless version == VERSION
-      data = read_attribute(:data)
+      data = super
       data = GradingStandard.upgrade_data(data, version) unless data.nil?
       self.data = data
     end
-    read_attribute(:data)
+    super
   end
 
   def self.upgrade_data(data, version)

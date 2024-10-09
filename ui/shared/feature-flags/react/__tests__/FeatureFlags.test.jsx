@@ -40,7 +40,7 @@ describe('feature_flags::FeatureFlags', () => {
   beforeEach(() => {
     ENV.CONTEXT_BASE_URL = '/accounts/1'
     const route = `/api/v1${ENV.CONTEXT_BASE_URL}/features?hide_inherited_enabled=true&per_page=50`
-    fetchMock.getOnce(route, JSON.stringify(rows))
+    fetchMock.getOnce(route, rows)
   })
 
   it('Renders all the appropriate sections', async () => {

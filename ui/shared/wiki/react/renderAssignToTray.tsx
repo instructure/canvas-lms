@@ -22,7 +22,7 @@ import {Pill} from '@instructure/ui-pill'
 import {View} from '@instructure/ui-view'
 import {IconEditLine} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import ReactDOM from 'react-dom'
 import {
   DateDetailsPayload,
@@ -167,7 +167,7 @@ const AssignToOption = (props: Props) => {
           </View>
         </Link>
       </View>
-      <ItemAssignToTray
+      <ItemAssignToManager
         open={open}
         onClose={handleClose}
         onDismiss={handleDismiss}
@@ -190,7 +190,7 @@ const AssignToOption = (props: Props) => {
 
   const embeddedView = (
     <>
-      <ItemAssignToTray
+      <ItemAssignToManager
         data-testid="manage-assign-to"
         courseId={ENV.COURSE_ID}
         itemName={itemName}

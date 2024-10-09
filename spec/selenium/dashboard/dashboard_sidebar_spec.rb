@@ -121,4 +121,30 @@ describe "dashboard" do
       expect(recent_feedback).to include_text "Comment 2"
     end
   end
+
+  context "discussion checkpoints" do
+    before do
+      course_with_student(active_all: true)
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @reply_to_topic, _reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+    end
+
+    it "are shown in to do for teachers when ready for grading" do
+      @reply_to_topic.submit_homework @student, body: "checkpoint submission for #{@student.name}"
+      user_session(@teacher)
+
+      get "/dashboard-sidebar"
+      expect(todo_list).to include_text @topic.title.to_s
+    end
+
+    it "ignores a sub assignment successfully" do
+      @reply_to_topic.submit_homework @student, body: "checkpoint submission for #{@student.name}"
+      user_session(@teacher)
+
+      get "/dashboard"
+      expect(todo_list).to include_text @topic.title.to_s
+      todo_disable_item_link.click
+      expect(todo_list).not_to contain_jqcss(@topic.title.to_s)
+    end
+  end
 end

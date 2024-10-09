@@ -83,6 +83,10 @@ class MediaObjectsController < ApplicationController
   before_action :require_user, only: %i[index update_media_object]
   protect_from_forgery only: %i[create_media_object media_object_redirect media_object_inline media_object_thumbnail], with: :exception
 
+  def services_jwt_auth_allowed
+    params[:action] == "iframe_media_player" && Account.site_admin.feature_enabled?(:rce_linked_file_urls)
+  end
+
   # @{not an}API Show Media Object Details
   # This isn't an API because it needs to work for non-logged in users (video in public course)
   #
@@ -308,7 +312,7 @@ class MediaObjectsController < ApplicationController
     @embeddable = true
 
     media_api_json = if @attachment && @media_object
-                       media_attachment_api_json(@attachment, @media_object, @current_user, session, verifier: params[:verifier])
+                       media_attachment_api_json(@attachment, @media_object, @current_user, session, verifier: params[:verifier], access_token: params[:access_token], instfs_id: params[:instfs_id])
                      elsif @media_object
                        media_object_api_json(@media_object, @current_user, session)
                      end

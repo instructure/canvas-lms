@@ -222,9 +222,9 @@ module DataFixup::PopulateRootAccountIdOnModels
   # tables that have been filled for a while already
   DONE_TABLES = [Account, Assignment, Course, CourseSection, Enrollment, EnrollmentTerm, Group].freeze
 
-  def self.send_later_backfill_strand(job, *args)
+  def self.send_later_backfill_strand(job, *)
     delay_if_production(priority: Delayed::MAX_PRIORITY,
-                        n_strand: ["root_account_id_backfill", Shard.current.database_server.id]).__send__(job, *args)
+                        n_strand: ["root_account_id_backfill", Shard.current.database_server.id]).__send__(job, *)
   end
 
   def self.run

@@ -26,7 +26,7 @@ describe AdheresToPolicy::Cache do
     AdheresToPolicy::Cache.instance_variable_get(:@cache)
   end
 
-  context "#fetch" do
+  describe "#fetch" do
     it "tries to read the key value" do
       AdheresToPolicy::Cache.write(:key, "value")
       expect(AdheresToPolicy::Cache).to_not receive(:write)
@@ -63,7 +63,7 @@ describe AdheresToPolicy::Cache do
     end
   end
 
-  context "#write" do
+  describe "#write" do
     it "writes a value to the key provided" do
       expect(Rails.cache).to receive(:write).with(:key, "value", anything).and_return("value")
       AdheresToPolicy::Cache.write(:key, "value")
@@ -76,7 +76,7 @@ describe AdheresToPolicy::Cache do
     end
   end
 
-  context "#read" do
+  describe "#read" do
     before do
       AdheresToPolicy::Cache.write(:key, "value")
     end
@@ -96,7 +96,7 @@ describe AdheresToPolicy::Cache do
     end
   end
 
-  context "#clear" do
+  describe "#clear" do
     before do
       AdheresToPolicy::Cache.write(:key1, "value1")
       AdheresToPolicy::Cache.write(:key2, "value2")

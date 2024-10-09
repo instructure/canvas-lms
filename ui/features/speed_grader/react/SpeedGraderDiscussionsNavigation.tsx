@@ -24,13 +24,37 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 const I18n = useI18nScope('SpeedGraderDiscussionsNavigation')
 
 export const SpeedGraderDiscussionsNavigation = () => {
+  function sendPostMessage(message) {
+    const iframe = document.getElementById('speedgrader_iframe')
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document
+    const discussion_iframe = iframeDoc?.getElementById('discussion_preview_iframe')
+    const contentWindow = discussion_iframe?.contentWindow
+    if (contentWindow) {
+      contentWindow.postMessage(message, '*')
+    }
+  }
+
+  function previousStudentReply() {
+    const message = {subject: 'DT.previousStudentReply'}
+    sendPostMessage(message)
+  }
+
+  function nextStudentReply() {
+    const message = {subject: 'DT.nextStudentReply'}
+    sendPostMessage(message)
+  }
+
   return (
     <Flex justifyItems="space-between" margin="small none small none">
       <Flex.Item>
-        <Button data-testid="discussions-previous-reply-button">{I18n.t('Previous Reply')}</Button>
+        <Button data-testid="discussions-previous-reply-button" onClick={previousStudentReply}>
+          {I18n.t('Previous Reply')}
+        </Button>
       </Flex.Item>
       <Flex.Item>
-        <Button data-testid="discussions-next-reply-button">{I18n.t('Next Reply')}</Button>
+        <Button data-testid="discussions-next-reply-button" onClick={nextStudentReply}>
+          {I18n.t('Next Reply')}
+        </Button>
       </Flex.Item>
     </Flex>
   )

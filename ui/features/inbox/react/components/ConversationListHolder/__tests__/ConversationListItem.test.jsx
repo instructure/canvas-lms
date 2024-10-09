@@ -27,17 +27,16 @@ jest.mock('../../../../util/utils', () => ({
   responsiveQuerySizes: jest.fn(),
 }))
 
-const submissionsCommentsMock = () => {
-  return {
-    _id: 1,
-    subject: 'XavierSchool - This is an Assignment',
-    lastMessageCreatedAt: '2022-02-15T06:50:54-07:00',
-    lastMessageContent: 'Hey!',
-    participantString: 'Hank Mccoy',
-    messages: [SubmissionComment.mock(), SubmissionComment.mock(), SubmissionComment.mock()],
-    count: 3,
-  }
-}
+const submissionsCommentsMock = (overrides = {}) => ({
+  _id: 1,
+  subject: 'XavierSchool - This is an Assignment',
+  lastMessageCreatedAt: '2022-02-15T06:50:54-07:00',
+  lastMessageContent: 'Hey!',
+  participantString: 'Hank Mccoy',
+  messages: [SubmissionComment.mock(), SubmissionComment.mock(), SubmissionComment.mock()],
+  count: 3,
+  ...overrides
+})
 
 describe('ConversationListItem', () => {
   const createProps = overrides => {

@@ -53,7 +53,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
   let(:params) do
     {
       developer_key: dev_key_params,
-      account_id: sub_account.id,
+      account_id: account.id,
       developer_key_id: dev_key_id,
       tool_configuration: {
         privacy_level:,
@@ -106,7 +106,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
     let(:params) do
       {
         developer_key: dev_key_params,
-        account_id: sub_account.id,
+        account_id: account.id,
         developer_key_id: developer_key.id,
         tool_configuration: {
           settings_url: url,
@@ -126,6 +126,16 @@ RSpec.describe Lti::ToolConfigurationsApiController do
       it "uses the tool configuration JSON from the settings_url" do
         subject
         expect(config_from_response.settings["target_link_uri"]).to eq settings["target_link_uri"]
+      end
+
+      context "when developer_key.redirect_uris is a blank string" do
+        let(:dev_key_params) { super().merge(redirect_uris: "") }
+
+        it "does not overwrite the URL's redirect uris with a blank string redirect uri" do
+          subject
+
+          expect(config_from_response.developer_key.redirect_uris).to eq [settings["target_link_uri"]]
+        end
       end
 
       it 'sets the "disabled_placements"' do
@@ -390,7 +400,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
       it "creates a developer key on the correct account" do
         subject
         key = DeveloperKey.find(json_parse.dig("tool_configuration", "developer_key_id"))
-        expect(key.account).to eq sub_account
+        expect(key.account).to eq account
       end
     end
 
@@ -403,7 +413,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
     end
 
     it_behaves_like "an endpoint that accepts developer key parameters" do
-      let(:bad_scope_params) { { account_id: sub_account.id, developer_key: dev_key_params.merge(scopes: ["invalid scope"]) } }
+      let(:bad_scope_params) { { account_id: account.id, developer_key: dev_key_params.merge(scopes: ["invalid scope"]) } }
       let(:make_request) { post :create, params: params.merge({ developer_key: dev_key_params }) }
       let(:bad_scope_request) { post :create, params: params.merge(bad_scope_params) }
     end
@@ -446,7 +456,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
         subject { installed_tool.reload.workflow_state }
 
         let(:installed_tool) do
-          t = tool_configuration.new_external_tool(context)
+          t = tool_configuration.lti_registration.new_external_tool(context)
           t.save!
           t
         end
@@ -492,14 +502,14 @@ RSpec.describe Lti::ToolConfigurationsApiController do
     subject { get :show, params: params.except(:tool_configuration) }
 
     before do
-      tool_configuration
+      developer_key
       account.developer_key_account_bindings
              .find_by(developer_key:)
              .update!(workflow_state: "on")
     end
 
     context "when tool configuration does not exist" do
-      let(:tool_configuration) { nil }
+      before { tool_configuration.destroy! }
 
       it_behaves_like "an endpoint that requires an existing tool configuration"
     end
@@ -537,21 +547,22 @@ RSpec.describe Lti::ToolConfigurationsApiController do
     subject { delete :destroy, params: params.except(:tool_configuration) }
 
     before do
-      tool_configuration
+      developer_key
     end
 
     it_behaves_like "an action that requires manage developer keys"
 
     context do
-      let(:tool_configuration) { nil }
+      before { tool_configuration.destroy! }
 
       it_behaves_like "an endpoint that requires an existing tool configuration"
     end
 
     context "when the tool configuration exists" do
       it "destroys the tool configuration" do
+        id = tool_configuration.id
         subject
-        expect(Lti::ToolConfiguration.find_by(id: tool_configuration.id)).to be_nil
+        expect(Lti::ToolConfiguration.find_by(id:)).to be_nil
       end
 
       it { is_expected.to be_no_content }

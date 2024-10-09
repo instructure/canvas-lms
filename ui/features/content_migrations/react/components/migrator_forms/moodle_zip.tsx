@@ -85,6 +85,7 @@ const MoodleZipImporter = ({
         onChange={setQuestionBankSettings}
         questionBankError={questionBankError}
         disable={isSubmitting}
+        questionBankSettings={questionBankSettings}
       />
       <CommonMigratorControls
         fileUploadProgress={fileUploadProgress}

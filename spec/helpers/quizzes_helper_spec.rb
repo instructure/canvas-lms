@@ -497,7 +497,7 @@ describe QuizzesHelper do
     end
   end
 
-  context "#point_value_for_input" do
+  describe "#point_value_for_input" do
     let(:user_answer) { @user_answer }
     let(:question) { { points_possible: 5 } }
     let(:quiz) { @quiz }
@@ -531,7 +531,7 @@ describe QuizzesHelper do
     end
   end
 
-  context "#comment_get" do
+  describe "#comment_get" do
     it "returns _html field if present" do
       comment = comment_get({ foo_html: "<div>Foo</div>", foo: "Bar" }, "foo")
       expect(comment).to eq "<div>Foo</div>"

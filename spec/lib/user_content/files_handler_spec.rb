@@ -31,14 +31,12 @@ describe UserContent::FilesHandler do
   let(:match_part) { "download?wrap=1" }
   let(:uri_match) do
     UserContent::FilesHandler::UriMatch.new(
-      OpenStruct.new(
-        {
-          url: match_url,
-          type: "files",
-          obj_class: Attachment,
-          obj_id: attachment.id,
-          rest: "/#{match_part}"
-        }
+      UserContent::HtmlRewriter::UriMatch.new(
+        match_url,
+        "files",
+        Attachment,
+        attachment.id,
+        "/#{match_part}"
       )
     )
   end

@@ -114,6 +114,11 @@ module Api::V1::Submission
       hash["submission_comments"] = submission_comments_json(published_comments, current_user)
     end
 
+    if includes.include?("submission_html_comments")
+      published_comments = submission.comments_excluding_drafts_for(@current_user)
+      hash["submission_html_comments"] = submission_comments_json(published_comments, current_user, use_html_comment: true)
+    end
+
     if includes.include?("rubric_assessment") && submission.rubric_assessment &&
        submission.user_can_read_grade?(current_user)
       hash["rubric_assessment"] = indexed_rubric_assessment_json(submission.rubric_assessment)
@@ -426,9 +431,12 @@ module Api::V1::Submission
       "entered_score",
       "grade",
       "score",
-      "user_id"
+      "user_id",
+      "grade_matches_current_submission"
     )
     sub_assignment_json["sub_assignment_tag"] = assignment.sub_assignment_tag
+    sub_assignment_json["published_grade"] = submission.published_grade
+    sub_assignment_json["published_score"] = submission.published_score
     sub_assignment_json
   end
 

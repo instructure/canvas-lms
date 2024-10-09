@@ -190,4 +190,340 @@ describe "assignments show page assign to" do
     # there were 2 existing users in the course, plus the Everyone Else card, so we expect 23 cards
     expect(module_item_assign_to_card.length).to eq(23)
   end
+
+  context "overrides table" do
+    let(:due_at) { Time.parse("2024-04-15") }
+    let(:unlock_at) { Time.parse("2024-04-10") }
+    let(:lock_at) { Time.parse("2024-04-20") }
+
+    before do
+      @assignment = @course.assignments.create(name: "test assignment", points_possible: 25)
+
+      @student1 = student_in_course(course: @course, active_all: true, name: "Student 1").user
+      @student2 = student_in_course(course: @course, active_all: true, name: "Student 2").user
+      @course_section1 = @course.course_sections.create!(name: "Section Alpha")
+      @course_section2 = @course.course_sections.create!(name: "Section Beta")
+
+      @category = @course.group_categories.create!(name: "Course Group")
+
+      @group1 = @category.groups.create!(name: "Course Group A", context: @course)
+      @group2 = @category.groups.create!(name: "Course Group B", context: @course)
+    end
+
+    def create_test_overrides(object, types: %w[student section group], params: {})
+      if types.include? "student"
+        student_overrides = object.assignment_overrides.create!(
+          set_type: "ADHOC",
+          title: "2 students",
+          **params
+        )
+        student_overrides.assignment_override_students.create!(user: @student1)
+        student_overrides.assignment_override_students.create!(user: @student2)
+      end
+
+      if types.include? "section"
+        object.assignment_overrides.create!(set_type: "CourseSection", set_id: @course_section1.id, **params)
+        object.assignment_overrides.create!(set_type: "CourseSection", set_id: @course_section2.id, **params)
+      end
+
+      if types.include? "group"
+        object.assignment_overrides.create!(set_type: "Group", set_id: @group1.id, **params)
+        object.assignment_overrides.create!(set_type: "Group", set_id: @group2.id, **params)
+      end
+    end
+
+    def validate_all_overrides(expected)
+      expect(AssignmentPage.retrieve_overrides_count).to eq(expected.count)
+      AssignmentPage.retrieve_all_overrides_formatted.each_with_index do |override, index|
+        expect(override[:due_at]).to eq(expected[index][:due_at])
+        expect(override[:due_for]).to eq(expected[index][:due_for])
+        expect(override[:unlock_at]).to eq(expected[index][:unlock_at])
+        expect(override[:lock_at]).to eq(expected[index][:lock_at])
+      end
+    end
+
+    it "shows dates for Everyone when visible_to_everyone is true" do
+      @assignment.update!(
+        due_at:,
+        unlock_at:,
+        lock_at:,
+        only_visible_to_overrides: false
+      )
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      expect(@assignment.visible_to_everyone).to be_truthy
+      validate_all_overrides([
+                               { due_at: "Apr 15 at 12am", due_for: "Everyone", unlock_at: "Apr 10 at 12am", lock_at: "Apr 20 at 12am" }
+                             ])
+    end
+
+    it "shows dates for Everyone else when visible_to_everyone is true" do
+      @assignment.update!(
+        group_category: @category,
+        due_at:,
+        unlock_at:,
+        lock_at:,
+        only_visible_to_overrides: false
+      )
+
+      params = {
+        due_at:,
+        due_at_overridden: true,
+        unlock_at:,
+        unlock_at_overridden: true,
+        lock_at:,
+        lock_at_overridden: true,
+      }
+
+      create_test_overrides(@assignment, types: ["student"], params: params.merge!({ due_at: due_at + 1.day }))
+      create_test_overrides(@assignment, types: ["section"], params: params.merge!({ due_at: due_at + 2.days }))
+      create_test_overrides(@assignment, types: ["group"], params: params.merge!({ due_at: due_at + 3.days }))
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      expect(@assignment.visible_to_everyone).to be_truthy
+
+      validate_all_overrides([
+                               { due_at: "Apr 15 at 12am", due_for: "Everyone else", unlock_at: "Apr 10 at 12am", lock_at: "Apr 20 at 12am" },
+                               { due_at: "Apr 16", due_for: "2 Students", unlock_at: "Apr 10 at 12am", lock_at: "Apr 20 at 11:59pm" },
+                               { due_at: "Apr 17", due_for: "2 Sections", unlock_at: "Apr 10 at 12am", lock_at: "Apr 20 at 11:59pm" },
+                               { due_at: "Apr 18", due_for: "2 Groups", unlock_at: "Apr 10 at 12am", lock_at: "Apr 20 at 11:59pm" }
+                             ])
+    end
+
+    it "does not any dates when without visible_to_everyone is false" do
+      @assignment.update!(
+        due_at:,
+        unlock_at:,
+        lock_at:,
+        only_visible_to_overrides: true
+      )
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      expect(@assignment.visible_to_everyone).to be_falsey
+      validate_all_overrides([])
+    end
+
+    it "does not show dates for Everyone else when visible_to_everyone is false" do
+      @assignment.update!(
+        group_category: @category,
+        due_at:,
+        unlock_at:,
+        lock_at:,
+        only_visible_to_overrides: true
+      )
+
+      params = {
+        due_at:,
+        due_at_overridden: true,
+        unlock_at:,
+        unlock_at_overridden: true,
+        lock_at:,
+        lock_at_overridden: true,
+      }
+
+      create_test_overrides(@assignment, types: ["student"], params:)
+      create_test_overrides(@assignment, types: ["section"], params: params.merge!({ due_at: due_at + 1.day }))
+      create_test_overrides(@assignment, types: ["group"], params: params.merge!({ due_at: due_at + 2.days }))
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      expect(@assignment.visible_to_everyone).to be_falsey
+      validate_all_overrides([
+                               { due_at: "Apr 15", due_for: "2 Students", unlock_at: "Apr 10 at 12am", lock_at: "Apr 20 at 11:59pm" },
+                               { due_at: "Apr 16", due_for: "2 Sections", unlock_at: "Apr 10 at 12am", lock_at: "Apr 20 at 11:59pm" },
+                               { due_at: "Apr 17", due_for: "2 Groups", unlock_at: "Apr 10 at 12am", lock_at: "Apr 20 at 11:59pm" }
+                             ])
+    end
+
+    it "shows dates for Everyone when there is course override" do
+      @assignment.assignment_overrides.create!(set_type: "Course", set_id: @course.id, due_at:, unlock_at:, lock_at:)
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      expect(@assignment.visible_to_everyone).to be_truthy
+      validate_all_overrides([
+                               { due_at: "Apr 15", due_for: "Everyone", unlock_at: "Apr 10 at 12am", lock_at: "Apr 20 at 11:59pm" }
+                             ])
+    end
+
+    it "shows dates for default section" do
+      @assignment.update!(
+        due_at:,
+        unlock_at:,
+        lock_at:,
+        only_visible_to_overrides: true
+      )
+
+      @assignment.assignment_overrides.create!(
+        set_type: "CourseSection",
+        set_id: @course.default_section.id,
+        due_at:,
+        due_at_overridden: true,
+        unlock_at:,
+        unlock_at_overridden: true,
+        lock_at:,
+        lock_at_overridden: true
+      )
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      expect(@assignment.visible_to_everyone).to be_falsey
+      validate_all_overrides([
+                               { due_at: "Apr 15", due_for: "1 Section", unlock_at: "Apr 10 at 12am", lock_at: "Apr 20 at 11:59pm" }
+                             ])
+    end
+
+    it "does not show dates for overrides when unassign_item is true" do
+      @assignment.update!(
+        group_category: @category,
+        due_at:,
+        unlock_at:,
+        lock_at:,
+        only_visible_to_overrides: false
+      )
+
+      create_test_overrides(@assignment, params: {
+                              due_at:,
+                              due_at_overridden: true,
+                              unlock_at:,
+                              unlock_at_overridden: true,
+                              lock_at:,
+                              lock_at_overridden: true,
+                              unassign_item: true
+                            })
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      expect(@assignment.visible_to_everyone).to be_truthy
+      validate_all_overrides([
+                               { due_at: "Apr 15 at 12am", due_for: "Everyone", unlock_at: "Apr 10 at 12am", lock_at: "Apr 20 at 12am" }
+                             ])
+    end
+
+    it "does not show dates for overrides when workflow_state is deleted" do
+      @assignment.update!(
+        group_category: @category,
+        due_at:,
+        unlock_at:,
+        lock_at:,
+        only_visible_to_overrides: false
+      )
+
+      create_test_overrides(@assignment, params: {
+                              due_at:,
+                              due_at_overridden: true,
+                              unlock_at:,
+                              unlock_at_overridden: true,
+                              lock_at:,
+                              lock_at_overridden: true,
+                              workflow_state: "deleted"
+                            })
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      expect(@assignment.visible_to_everyone).to be_truthy
+      validate_all_overrides([
+                               { due_at: "Apr 15 at 12am", due_for: "Everyone", unlock_at: "Apr 10 at 12am", lock_at: "Apr 20 at 12am" }
+                             ])
+    end
+
+    context "with module overrides" do
+      before do
+        @module = @course.context_modules.create!(name: "Module 1")
+        @module.add_item(type: "assignment", id: @assignment.id)
+      end
+
+      it "shows only dates for inherited overrides" do
+        @assignment.update!(
+          group_category: @category,
+          due_at:,
+          unlock_at:,
+          lock_at:,
+          only_visible_to_overrides: true
+        )
+
+        create_test_overrides(@module)
+
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+        validate_all_overrides([
+                                 { due_at: "-", due_for: "2 Sections, 2 Groups, 2 Students", unlock_at: "-", lock_at: "-" }
+                               ])
+      end
+
+      it "shows only dates for assignment overrides due precedence" do
+        @assignment.update!(
+          group_category: @category,
+          due_at:,
+          unlock_at:,
+          lock_at:,
+          only_visible_to_overrides: false
+        )
+
+        create_test_overrides(@module)
+        create_test_overrides(@assignment, params: {
+                                due_at:,
+                                due_at_overridden: true,
+                                unlock_at:,
+                                unlock_at_overridden: true,
+                                lock_at:,
+                                lock_at_overridden: true
+                              })
+
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+        # Doesn't show 'Everyone' when there are module overrides even if only_visible_to_overrides is false
+        validate_all_overrides([
+                                 { due_at: "Apr 15", due_for: "2 Sections, 2 Groups, 2 Students", unlock_at: "Apr 10 at 12am", lock_at: "Apr 20 at 11:59pm" }
+                               ])
+      end
+
+      it "shows dates for inherited overrides and assignment overrides" do
+        @assignment.update!(
+          group_category: @category,
+          due_at:,
+          unlock_at:,
+          lock_at:,
+          only_visible_to_overrides: false
+        )
+
+        student_overrides = @module.assignment_overrides.create!(
+          set_type: "ADHOC",
+          title: "2 students"
+        )
+        student_overrides.assignment_override_students.create!(user: @student1)
+        student_overrides.assignment_override_students.create!(user: @student2)
+        @module.assignment_overrides.create!(set_type: "CourseSection", set_id: @course_section1.id)
+        @module.assignment_overrides.create!(set_type: "CourseSection", set_id: @course_section2.id)
+        override_params = {
+          due_at:,
+          due_at_overridden: true,
+          unlock_at:,
+          unlock_at_overridden: true,
+          lock_at:,
+          lock_at_overridden: true
+        }
+        student_overrides = @assignment.assignment_overrides.create!(
+          set_type: "ADHOC",
+          title: "2 students",
+          **override_params
+        )
+        student_overrides.assignment_override_students.create!(user: @student1)
+        student_overrides.assignment_override_students.create!(user: @student2)
+        @assignment.assignment_overrides.create!(set_type: "Group", set_id: @group1.id, **override_params)
+        @assignment.assignment_overrides.create!(set_type: "Group", set_id: @group2.id, **override_params)
+
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+        # Doesn't show 'Everyone' when there are module overrides even if only_visible_to_overrides is false
+        validate_all_overrides([
+                                 { due_at: "Apr 15", due_for: "2 Groups, 2 Students", unlock_at: "Apr 10 at 12am", lock_at: "Apr 20 at 11:59pm" },
+                                 { due_at: "-", due_for: "2 Sections", unlock_at: "-", lock_at: "-" }
+                               ])
+      end
+    end
+  end
 end

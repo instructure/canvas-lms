@@ -33,7 +33,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
-import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 
 const I18n = useI18nScope('quizzes.index')
 
@@ -176,7 +176,7 @@ export default class ItemView extends Backbone.View {
   renderItemAssignToTray(open, returnFocusTo, itemProps) {
     const quizItemType = this.model.get('quiz_type') !== 'quizzes.next' ? 'quiz' : 'assignment'
     ReactDOM.render(
-      <ItemAssignToTray
+      <ItemAssignToManager
         open={open}
         onClose={() => {
           ReactDOM.unmountComponentAtNode(document.getElementById('assign-to-mount-point'))

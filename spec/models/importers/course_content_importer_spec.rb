@@ -483,9 +483,9 @@ describe Course do
       @course.account.settings[:sis_require_assignment_due_date] = true
       @course.account.save!
 
-      assignment = @course.assignments.create!(due_at: Time.now + 1.day)
+      assignment = @course.assignments.create!(due_at: 1.day.from_now)
       assignment.post_to_sis = true
-      assignment.due_at = Time.now + 1.day
+      assignment.due_at = 1.day.from_now
       assignment.name = "lalala"
       assignment.save!
 

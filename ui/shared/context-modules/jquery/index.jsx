@@ -72,10 +72,11 @@ import {renderContextModulesPublishIcon} from '../utils/publishOneModuleHelper'
 import {underscoreString} from '@canvas/convert-case'
 import {selectContentDialog} from '@canvas/select-content-dialog'
 import DifferentiatedModulesTray from '../differentiated-modules'
-import ItemAssignToTray from '../differentiated-modules/react/Item/ItemAssignToTray'
+import ItemAssignToManager from '../differentiated-modules/react/Item/ItemAssignToManager'
 import {parseModule, parseModuleList} from '../differentiated-modules/utils/moduleHelpers'
 import {addModuleElement} from '../utils/moduleHelpers'
 import ContextModulesHeader from '../react/ContextModulesHeader'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -102,6 +103,18 @@ window.modules = (function () {
     },
 
     addModule(callback = () => {}) {
+      const $module = $('#context_module_blank').clone(true).attr('id', 'context_module_new')
+      $('#context_modules').append($module)
+
+      const opts = modules.sortable_module_options
+      opts.update = modules.updateModuleItemPositions
+      $module.find('.context_module_items').sortable(opts)
+      $('#context_modules.ui-sortable').sortable('refresh')
+      $('#context_modules .context_module .context_module_items.ui-sortable').each(function () {
+        $(this).sortable('refresh')
+        $(this).sortable('option', 'connectWith', '.context_module_items')
+      })
+
       if (ENV.FEATURES?.selective_release_ui_api) {
         const options = {initialTab: 'settings'}
         const settings = {
@@ -121,21 +134,8 @@ window.modules = (function () {
             $moduleElement.css('display', 'block')
           },
         }
-        const $module = $('#context_module_blank').clone(true).attr('id', 'context_module_new')
-        $('#context_modules').append($module)
-        // eslint-disable-next-line no-restricted-globals
         renderDifferentiatedModulesTray(event.target, $module, settings, options)
       } else {
-        const $module = $('#context_module_blank').clone(true).attr('id', 'context_module_new')
-        $('#context_modules').append($module)
-        const opts = modules.sortable_module_options
-        opts.update = modules.updateModuleItemPositions
-        $module.find('.context_module_items').sortable(opts)
-        $('#context_modules.ui-sortable').sortable('refresh')
-        $('#context_modules .context_module .context_module_items.ui-sortable').each(function () {
-          $(this).sortable('refresh')
-          $(this).sortable('option', 'connectWith', '.context_module_items')
-        })
         modules.editModule($module)
       }
     },
@@ -357,7 +357,7 @@ window.modules = (function () {
     async loadMasterCourseData(tag_id) {
       if (ENV.MASTER_COURSE_SETTINGS) {
         // Grab the stuff for master courses if needed
-        $.ajaxJSON(ENV.MASTER_COURSE_SETTINGS.MASTER_COURSE_DATA_URL, 'GET', { tag_id }, data => {
+        $.ajaxJSON(ENV.MASTER_COURSE_SETTINGS.MASTER_COURSE_DATA_URL, 'GET', {tag_id}, data => {
           if (data.tag_restrictions) {
             Object.entries(data.tag_restrictions).forEach(([id, restriction]) => {
               const item = document.querySelector(
@@ -2552,6 +2552,34 @@ $(document).ready(function () {
     }
   })
 
+  if (ENV.MODULE_FEATURES?.TEACHER_MODULE_SELECTION) {
+    $('#show_teacher_only_module_id').on('change', () => {
+      doFetchApi({
+        path: `/api/v1/courses/${ENV.COURSE_ID}/settings`,
+        method: 'PUT',
+        body: {show_teacher_only_module_id: $('#show_teacher_only_module_id').val()},
+      })
+        .then(_ => {
+          window.location.reload()
+        })
+        .catch(err => {
+          showFlashError(I18n.t('Cannot set the teacher view module'))(err)
+        })
+    })
+  }
+
+  if (ENV.MODULE_FEATURES?.STUDENT_MODULE_SELECTION) {
+    $('#show_student_only_module_id').on('change', () => {
+      doFetchApi({
+        path: `/api/v1/courses/${ENV.COURSE_ID}/settings`,
+        method: 'PUT',
+        body: {show_student_only_module_id: $('#show_student_only_module_id').val()},
+      }).catch(err => {
+        showFlashError(I18n.t('Cannot set the student view module'))(err)
+      })
+    })
+  }
+
   function handleRemoveDueDateInput(itemProps) {
     switch (itemProps.moduleItemType) {
       case 'discussion':
@@ -2569,7 +2597,7 @@ $(document).ready(function () {
 
   function renderItemAssignToTray(open, returnFocusTo, itemProps) {
     ReactDOM.render(
-      <ItemAssignToTray
+      <ItemAssignToManager
         open={open}
         onClose={() => {
           ReactDOM.unmountComponentAtNode(

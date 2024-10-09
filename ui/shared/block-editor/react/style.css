@@ -99,6 +99,9 @@
 }
 
 .block-editor-editor .block-toolbar {
+  &:focus-visible {
+    outline: 2px solid var(--ic-brand-primary);
+  }
   .toolbar-separator {
     display: inline-block;
     box-sizing: border-box;
@@ -188,7 +191,16 @@
 
 .selected {
   outline-color: var(--active-border-color);
-  outline-style: solid;
+}
+
+.block, .section {
+  &:focus-visible {
+    outline: 2px solid var(--ic-brand-primary);
+    &[aria-expanded="true"] {
+      outline-color: green;
+      outline-style: dashed;
+    }
+  }
 }
 
 .empty-section__content {
@@ -235,7 +247,7 @@
     background: transparent;
     padding: 8px;
     min-height: 10rem;
-    margin: 2px;
+    margin: 3px;
   }
 
   &.image-block {
@@ -286,6 +298,7 @@
 }
 
 .columns-section {
+  margin: 8px 0;
   &.columns-1 {
     &>.columns-section__inner {
       grid-template-columns: 1fr;
@@ -309,7 +322,7 @@
 }
 
 .group-block {
-  overflow: auto;
+  overflow: visible; /* with auto I get 4px of overflow that shows a scrollbar */
   .no-sections {
     display: flex;
     align-items: flex-start;
@@ -352,6 +365,16 @@
     outline-width: 1px;
     outline-offset: -1px;
     border-radius: 4px;
+    &:focus-visible {
+      outline: 2px solid var(--ic-brand-primary);
+      &[aria-expanded="true"] {
+        outline-color: green;
+        outline-style: dashed;
+      }
+    }
+  }
+  &.selected {
+    outline-color: var(--active-border-color);
   }
   .no-sections:hover {
     outline-style: none;
@@ -416,12 +439,13 @@
 .text-block {
   min-width: 10rem;
   min-height: 1.2rem;
-  line-height: 1.2rem;
+  line-height: 1.2em;
   max-width: 100%;
   text-wrap: balance;
   margin: 12px 0; /* matches Canvas' global p margin */
   overflow: auto;
   &.enabled {
+    /* stable supported only in ff and safari so far */
     text-wrap: stable;
   }
   p:first-child {
@@ -430,6 +454,10 @@
   p:last-child {
     margin-bottom: 0;
   }
+}
+
+.heading-block {
+  overflow: auto;
 }
 
 .quiz-section {

@@ -89,6 +89,21 @@ export default class WikiPageEditView extends ValidatedFormView {
     return (this.studentTodoAtDateValue = todoDate ? new Date(todoDate) : '')
   }
 
+  setOnlyVisibleToOverrides() {
+    if (ENV.FEATURES?.selective_release_ui_api) {
+      const hasDefaultEveryone = this.overrides.assignment_overrides.length === 0
+      const contextModuleOverrides = this.overrides.assignment_overrides.filter(
+        info => info.context_module_id != null
+      )
+      return !(
+        hasDefaultEveryone ||
+        contextModuleOverrides.length === this.overrides.assignment_overrides.length
+      )
+    } else {
+      return this.overrides.only_visible_to_overrides
+    }
+  }
+
   handleOverridesSave(page, redirect) {
     if (!page.page_id) return
     const url = itemTypeToApiURL(ENV.COURSE_ID, 'page', page.page_id)
@@ -96,7 +111,11 @@ export default class WikiPageEditView extends ValidatedFormView {
       this.disablingDfd.reject()
       $.flashError(I18n.t("Oops! We weren't able to save your page. Please try again"))
     }
-    $.ajaxJSON(url, 'PUT', JSON.stringify(this.overrides), redirect, errorCallBack, {
+
+    const data = this.overrides
+    data.only_visible_to_overrides = this.setOnlyVisibleToOverrides()
+
+    $.ajaxJSON(url, 'PUT', JSON.stringify(data), redirect, errorCallBack, {
       contentType: 'application/json',
     })
   }
@@ -239,8 +258,7 @@ export default class WikiPageEditView extends ValidatedFormView {
         <Suspense fallback={<div>{I18n.t('Loading...')}</div>}>
           <BlockEditor
             container={container}
-            version={blockEditorData.version}
-            content={blockEditorData.blocks[0].data}
+            content={blockEditorData}
             onCancel={this.cancel.bind(this)}
           />
         </Suspense>,
@@ -402,11 +420,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       }
     }
     if (window.block_editor) {
-      this.blockEditorData = {
-        time: Date.now(),
-        version: '1',
-        blocks: [{data: window.block_editor().serialize()}],
-      }
+      this.blockEditorData = window.block_editor().getBlocks()
     }
 
     if (this.reloadView != null) {

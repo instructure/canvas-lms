@@ -140,13 +140,13 @@ describe WikiPagesApiController, type: :request do
               it "succeeds" do
                 block_editor_attributes = {
                   time: Time.now.to_i,
-                  blocks: [{ "data" => { "text" => "test" }, "id" => "R0iGYLKhw2", "type" => "paragraph" }],
-                  version: "1.0"
+                  blocks: { "text" => "test", "id" => "R0iGYLKhw2", "type" => "paragraph" },
+                  version: "0.2"
                 }
                 create_wiki_page(@teacher, { title: "New Page", block_editor_attributes: })
                 expect(WikiPage.last.title).to eq "New Page"
                 expect(WikiPage.last.block_editor).to be_present
-                expect(WikiPage.last.block_editor.blocks).to eq([{ "data" => { "text" => "test" }, "id" => "R0iGYLKhw2", "type" => "paragraph" }])
+                expect(WikiPage.last.block_editor.blocks).to eq({ "text" => "test", "id" => "R0iGYLKhw2", "type" => "paragraph" })
               end
             end
 
@@ -158,7 +158,7 @@ describe WikiPagesApiController, type: :request do
               it "ignores the block_editor_attributes" do
                 block_editor_attributes = {
                   time: Time.now.to_i,
-                  blocks: [{ "data" => { "text" => "test" }, "id" => "R0iGYLKhw2", "type" => "paragraph" }],
+                  blocks: { "text" => "test", "id" => "R0iGYLKhw2", "type" => "paragraph" },
                   version: "1.0"
                 }
                 create_wiki_page(@teacher, { title: "New Page", block_editor_attributes: })

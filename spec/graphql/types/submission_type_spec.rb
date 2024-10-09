@@ -78,6 +78,19 @@ describe Types::SubmissionType do
     end
   end
 
+  describe "external_tool_url" do
+    it "returns the URL for an LTI submission" do
+      @assignment.update!(submission_types: "external_tool")
+      @submission.update!(url: "https://example.com", submission_type: "basic_lti_launch")
+      expect(submission_type.resolve("externalToolUrl")).to eq "https://example.com"
+    end
+
+    it "returns nil if the submission has a URL but is not an LTI submission" do
+      @submission.update!(url: "https://example.com")
+      expect(submission_type.resolve("externalToolUrl")).to be_nil
+    end
+  end
+
   describe "sticker" do
     let(:sticker) { type.resolve("sticker") }
 

@@ -260,7 +260,7 @@ module AccountReports::ReportHelper
       @include_deleted = value_to_boolean(@account_report.parameters["include_deleted"])
 
       if @include_deleted
-        add_extra_text(I18n.t("Include Deleted Objects;"))
+        add_extra_text(I18n.t("Include Deleted/Concluded Objects;"))
       end
     end
   end

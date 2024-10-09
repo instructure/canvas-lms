@@ -42,10 +42,12 @@ class Rubric < ActiveRecord::Base
 
   include Workflow
   include HtmlTextHelper
+  include Trackable
 
   POINTS_POSSIBLE_PRECISION = 4
 
   attr_writer :skip_updating_points_possible
+  attr_accessor :is_duplicate, :is_manually_update
 
   belongs_to :user
   belongs_to :rubric # based on another rubric
@@ -130,7 +132,10 @@ class Rubric < ActiveRecord::Base
   def archive
     # overrides 'archive' event in workflow to make sure the feature flag is enabled
     # remove this and 'unarchive' method when feature flag is removed
-    super if enhanced_rubrics_enabled?
+    return unless enhanced_rubrics_enabled?
+
+    InstStatsd::Statsd.increment("#{context.class.to_s.downcase}.rubrics.archived")
+    super
   end
 
   def unarchive
@@ -327,6 +332,7 @@ class Rubric < ActiveRecord::Base
   def update_with_association(current_user, rubric_params, context, association_params)
     self.free_form_criterion_comments = rubric_params[:free_form_criterion_comments] == "1" if rubric_params[:free_form_criterion_comments]
     self.user ||= current_user
+    self.is_manually_update = association_params[:update_if_existing]
     rubric_params[:hide_score_total] ||= association_params[:hide_score_total]
     @skip_updating_points_possible = association_params[:skip_updating_points_possible]
     update_criteria(rubric_params)
@@ -346,7 +352,10 @@ class Rubric < ActiveRecord::Base
   end
 
   def update_criteria(params)
-    without_versioning(&:save) if new_record?
+    if new_record?
+      self.is_duplicate = ActiveModel::Type::Boolean.new.cast(params[:is_duplicate]) if params[:is_duplicate]
+      without_versioning(&:save)
+    end
     data = generate_criteria(params)
     self.hide_score_total = params[:hide_score_total] if hide_score_total.nil? || (association_count || 0) < 2
     self.data = data.criteria
@@ -356,6 +365,7 @@ class Rubric < ActiveRecord::Base
     self.hide_points = params[:hide_points]
     self.rating_order = params[:rating_order] if params.key?(:rating_order)
     self.workflow_state = params[:workflow_state] if params[:workflow_state]
+    self.is_duplicate = params[:is_duplicate] if params[:is_duplicate]
     save
     self
   end

@@ -27,10 +27,10 @@ module Types
 
     global_id_field :id
 
-    field :calculation_method, String, null: false
     field :calculation_int, Integer, null: true
-    field :context_type, String, null: false
+    field :calculation_method, String, null: false
     field :context_id, ID, null: false
+    field :context_type, String, null: false
 
     field :locked, Boolean, null: false
     def locked

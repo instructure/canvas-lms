@@ -33,7 +33,7 @@ describe "new_files_added" do
 
   include_examples "a message"
 
-  context ".email" do
+  describe ".email" do
     let(:path_type) { :email }
 
     it "only displays max_displayed" do

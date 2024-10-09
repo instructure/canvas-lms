@@ -498,7 +498,7 @@ class ContextModule < ActiveRecord::Base
   end
 
   def gather_prerequisites(module_names)
-    all_prereqs = read_attribute(:prerequisites)
+    all_prereqs = self["prerequisites"]
     return [] unless all_prereqs&.any?
 
     all_prereqs.select { |pre| module_names.key?(pre[:id]) }.map { |pre| pre.merge(name: module_names[pre[:id]]) }
@@ -531,7 +531,7 @@ class ContextModule < ActiveRecord::Base
     end
     @prerequisites = nil
     @active_prerequisites = nil
-    write_attribute(:prerequisites, prereqs)
+    super
   end
 
   def completion_requirements=(val)
@@ -553,7 +553,7 @@ class ContextModule < ActiveRecord::Base
     else
       val = nil
     end
-    write_attribute(:completion_requirements, val)
+    super
   end
 
   def validate_completion_requirements(requirements)
@@ -953,16 +953,16 @@ class ContextModule < ActiveRecord::Base
   VALID_COMPLETION_EVENTS = [:publish_final_grade].freeze
 
   def completion_events
-    (read_attribute(:completion_events) || "").split(",").map(&:to_sym)
+    (super || "").split(",").map(&:to_sym)
   end
 
   def completion_events=(value)
     unless value.present?
-      write_attribute(:completion_events, nil)
+      super(nil)
       return
     end
 
-    write_attribute(:completion_events, (value.map(&:to_sym) & VALID_COMPLETION_EVENTS).join(","))
+    super((value.map(&:to_sym) & VALID_COMPLETION_EVENTS).join(","))
   end
 
   VALID_COMPLETION_EVENTS.each do |event|
@@ -999,8 +999,13 @@ class ContextModule < ActiveRecord::Base
 
   def update_assignment_submissions(module_assignments = current_items_with_assignment)
     if Account.site_admin.feature_enabled?(:selective_release_backend)
+      create_sub_assignment_submissions = false
+      if context.root_account.feature_enabled?(:discussion_checkpoints) && module_assignments.has_sub_assignments.any?
+        create_sub_assignment_submissions = true
+      end
+
       module_assignments.clear_cache_keys(:availability)
-      SubmissionLifecycleManager.recompute_course(context, assignments: module_assignments, update_grades: true)
+      SubmissionLifecycleManager.recompute_course(context, assignments: module_assignments, update_grades: true, create_sub_assignment_submissions:)
     end
   end
 

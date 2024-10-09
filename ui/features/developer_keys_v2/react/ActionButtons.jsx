@@ -24,6 +24,7 @@ import page from 'page'
 import {IconButton} from '@instructure/ui-buttons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconEditLine, IconEyeLine, IconOffLine, IconTrashLine} from '@instructure/ui-icons'
+import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
 
 const I18n = useI18nScope('react_developer_keys')
 
@@ -40,11 +41,27 @@ class DeveloperKeyActionButtons extends React.Component {
     dispatch(makeInvisibleDeveloperKey(developerKey))
   }
 
-  deleteLinkHandler = event => {
+  confirmDeletion = developerKey => {
+    const isLtiKey = developerKey?.is_lti_key
+    const keyName = developerKey?.name || developerKey?.tool_configuration?.title
+
+    return confirmDanger({
+      title: isLtiKey ? I18n.t('Delete LTI Developer Key') : I18n.t('Delete Developer Key'),
+      heading: keyName ? I18n.t('You are about to delete “%{keyName}”.', {keyName}) : undefined,
+      message: isLtiKey
+        ? I18n.t(
+            'Are you sure you want to delete this developer key? This action will also delete all tools associated with the developer key in this context.'
+          )
+        : I18n.t('Are you sure you want to delete this developer key?'),
+      confirmButtonLabel: I18n.t('Delete'),
+    })
+  }
+
+  deleteLinkHandler = async event => {
     const {dispatch, deleteDeveloperKey, developerKey, onDelete} = this.props
     event.preventDefault()
-    const confirmResult = window.confirm(this.confirmationMessage(developerKey))
-    if (confirmResult) {
+
+    if (await this.confirmDeletion(developerKey)) {
       onDelete(developerKey.id)
       dispatch(deleteDeveloperKey(developerKey))
     }
@@ -74,15 +91,6 @@ class DeveloperKeyActionButtons extends React.Component {
 
   refDeleteLink = link => {
     this.deleteLink = link
-  }
-
-  confirmationMessage(developerKey) {
-    if (developerKey.is_lti_key) {
-      return I18n.t(
-        'Are you sure you want to delete this developer key? This action will also delete all tools associated with the developer key in this context.'
-      )
-    }
-    return I18n.t('Are you sure you want to delete this developer key?')
   }
 
   renderVisibilityIcon() {

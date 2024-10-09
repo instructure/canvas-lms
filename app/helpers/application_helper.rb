@@ -642,8 +642,8 @@ module ApplicationHelper
   # <% }, :b => capture { %>
   # <select>...</select>
   # <% } %>
-  def ot(*args)
-    concat(t(*args))
+  def ot(*)
+    concat(t(*))
   end
 
   def join_title(*parts)
@@ -1043,31 +1043,35 @@ module ApplicationHelper
     csp_enabled? && csp_context.csp_enabled?
   end
 
-  def default_source_csp_logging_enabled?
+  def include_default_source_csp_directives?
     csp_context&.root_account&.feature_enabled?(:default_source_csp_logging)
   end
 
   def csp_report_uri
     @csp_report_uri ||=
-      if default_source_csp_logging_enabled? && (host = DynamicSettings.find("csp-logging")[:host])
-        "; report-uri #{host}"
+      if include_default_source_csp_directives? && (host = DynamicSettings.find("csp-logging")[:host])
+        " report-uri #{host}; "
       else
         ""
       end
   end
 
-  def csp_header
-    header = +"Content-Security-Policy"
+  def default_csp_logging_directives(include_script_src: true)
+    if include_default_source_csp_directives?
+      script_src_directive = include_script_src ? "script-src 'self' 'unsafe-eval' #{allow_list_domains};" : ""
 
-    if !csp_enforced? && default_source_csp_logging_enabled?
-      header << "-Report-Only"
+      directives = "default-src 'self'; \
+                    img-src 'self' data: #{allow_list_domains};\
+                    style-src 'self' 'unsafe-inline' #{allow_list_domains};\
+                    #{script_src_directive}\
+                    script-src-elem 'self' 'unsafe-inline' #{allow_list_domains};\
+                    font-src 'self' data: #{allow_list_domains};\
+                    connect-src 'self' #{allow_list_domains};"
+
+      directives.squish + csp_report_uri
+    else
+      ""
     end
-
-    header.freeze
-  end
-
-  def default_source_csp_logging_directive
-    default_source_csp_logging_enabled? ? ("default-src 'self'" + csp_report_uri) : ""
   end
 
   def include_files_domain_in_csp
@@ -1075,13 +1079,19 @@ module ApplicationHelper
     true
   end
 
-  def set_default_source_csp_directive_if_enabled
-    return unless default_source_csp_logging_enabled? && csp_enabled? && csp_report_uri.present?
-    return if headers.key?(csp_header) || csp_enforced?
+  def apply_csp_header(directives)
+    return unless csp_enforced? && !headers.key?("Content-Security-Policy")
 
-    # this is the default source directive added for all
+    directives = directives.presence || ""
+    headers["Content-Security-Policy"] = directives
+  end
+
+  def set_default_source_csp_directive_if_enabled
+    return unless include_default_source_csp_directives? && csp_enabled? && csp_report_uri.present?
+
+    # these are the default directives added for all
     # content types not represented by frames, scripts, or files
-    headers[csp_header] = default_source_csp_logging_directive
+    apply_csp_header(default_csp_logging_directives)
   end
 
   def add_csp_for_root
@@ -1090,47 +1100,35 @@ module ApplicationHelper
     return if csp_report_uri.empty? && !csp_enforced?
 
     # we iframe all files from the files domain into canvas, so we always have to include the files domain here
-    domains =
-      csp_context
-      .csp_whitelisted_domains(request, include_files: true, include_tools: true)
-      .join(" ")
-
+    #
     # Due to New Analytics generating CSV reports as blob on the client-side and then trying to download them,
     # as well as an interesting difference in browser interpretations of CSP, we have to allow blobs as a frame-src
-    directives = "frame-src 'self' blob: #{domains}; "
-    directives += default_source_csp_logging_directive
+    directives = "frame-src 'self' blob: #{allow_list_domains(include_tools: true)}; "
+    directives += default_csp_logging_directives
 
-    headers[csp_header] = directives
+    apply_csp_header(directives)
   end
 
   def add_csp_for_file
     return if csp_report_uri.empty? && !csp_enforced?
 
     directives = csp_iframe_attribute
-    directives += default_source_csp_logging_directive
+    directives += default_csp_logging_directives(include_script_src: false)
 
-    headers[csp_header] = directives
+    apply_csp_header(directives)
+  end
+
+  def allow_list_domains(include_tools: false)
+    csp_context.csp_whitelisted_domains(request, include_files: include_files_domain_in_csp, include_tools:).join(" ")
   end
 
   def csp_iframe_attribute
-    frame_domains =
-      csp_context.csp_whitelisted_domains(
-        request,
-        include_files: include_files_domain_in_csp,
-        include_tools: true
-      )
-    script_domains =
-      csp_context.csp_whitelisted_domains(
-        request,
-        include_files: include_files_domain_in_csp,
-        include_tools: false
-      )
     if include_files_domain_in_csp
-      frame_domains = ["'self'"] + frame_domains
-      object_domains = ["'self'"] + script_domains
-      script_domains = ["'self'", "'unsafe-eval'", "'unsafe-inline'"] + script_domains
+      frame_domains = "'self' " + allow_list_domains(include_tools: true)
+      object_domains = "'self' " + allow_list_domains
+      script_domains = "'self' 'unsafe-eval' 'unsafe-inline' " + allow_list_domains
     end
-    "frame-src #{frame_domains.join(" ")} blob:; script-src #{script_domains.join(" ")}; object-src #{object_domains.join(" ")}; "
+    "frame-src #{frame_domains} blob:; script-src #{script_domains}; object-src #{object_domains}; "
   end
 
   # Returns true if the current_path starts with the given value
@@ -1373,12 +1371,18 @@ module ApplicationHelper
     render json: { location:, token: file_authenticator.instfs_bearer_token }
   end
 
+  def authenticated_url_options(attachment)
+    options = { original_url: request.original_url }
+    options[:tenant_auth] = attachment.instfs_tenant_auth if attachment&.instfs_tenant_auth.present?
+    options
+  end
+
   def authenticated_download_url(attachment)
-    file_authenticator.download_url(attachment, options: { original_url: request.original_url })
+    file_authenticator.download_url(attachment, options: authenticated_url_options(attachment))
   end
 
   def authenticated_inline_url(attachment)
-    file_authenticator.inline_url(attachment, options: { original_url: request.original_url })
+    file_authenticator.inline_url(attachment, options: authenticated_url_options(attachment))
   end
 
   def authenticated_thumbnail_url(attachment, options = {})

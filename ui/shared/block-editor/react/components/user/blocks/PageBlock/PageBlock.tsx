@@ -15,10 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useCallback, useEffect} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useEditor, useNode, type Node} from '@craftjs/core'
 import {useClassNames, getScrollParent} from '../../../../utils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {KBNavigator} from '../../../../utils/KBNavigator'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -29,17 +30,23 @@ export type PageBlockProps = {
 }
 
 export const PageBlock = ({children}: PageBlockProps) => {
-  const {enabled, actions} = useEditor(state => {
-    // console.log('>>>pageblock')
-    // console.log(JSON.parse(query.serialize()))
+  const {enabled, actions, query, selectedNodeId} = useEditor(state => {
     return {
       enabled: state.options.enabled,
+      selectedNodeId: state.events.selected.values().next().value,
     }
   })
   const {
     connectors: {connect},
-  } = useNode()
+    selected,
+  } = useNode((n: Node) => {
+    return {
+      selected: n.events.selected,
+    }
+  })
+  const [kbnav] = useState(enabled ? new KBNavigator() : null)
   const clazz = useClassNames(enabled, {empty: !children}, ['block', 'page-block'])
+  const pageRef = useRef<HTMLDivElement | null>(null)
 
   // So that a section newly dropped in the editor gets selected,
   // RenderNode selects them on initial render. As a side-effect this also
@@ -54,21 +61,41 @@ export const PageBlock = ({children}: PageBlockProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const handlePagekey = useCallback(
-    (e: KeyboardEvent) => {
+  const handlePagekey: React.KeyboardEventHandler<HTMLDivElement> = useCallback(
+    e => {
       if (e.key === 'Escape') {
-        actions.selectNode()
+        actions.selectNode('ROOT')
+        ;(document.querySelector('.page-block') as HTMLElement)?.focus()
+      } else if (e.key === 'z') {
+        if (e.ctrlKey || e.metaKey) {
+          if (e.shiftKey) {
+            actions.history.redo()
+          } else {
+            actions.history.undo()
+          }
+        }
+      } else if (kbnav) {
+        kbnav.key(e, actions, query, selectedNodeId)
+      }
+    },
+    [actions, kbnav, query, selectedNodeId]
+  )
+
+  // Per the w3c:
+  // When a single-select tree receives focus:
+  // If none of the nodes are selected before the tree receives focus, focus is set on the first node.
+  // If a node is selected before the tree receives focus, focus is set on the selected node.
+  const handleFocus: React.FocusEventHandler<HTMLDivElement> = useCallback(
+    (e: React.FocusEvent) => {
+      if (e.target === pageRef.current) {
+        e.preventDefault()
+        actions.selectNode('ROOT')
+        const scrollingContainer = getScrollParent()
+        scrollingContainer.scrollTo({top: 0, behavior: 'instant'})
       }
     },
     [actions]
   )
-
-  useEffect(() => {
-    document.addEventListener('keydown', handlePagekey)
-    return () => {
-      document.removeEventListener('keydown', handlePagekey)
-    }
-  }, [handlePagekey])
 
   const handlePaste = useCallback((_e: React.ClipboardEvent<HTMLDivElement>) => {
     // Some day we should take what's on the clipboard and convert it into
@@ -78,10 +105,21 @@ export const PageBlock = ({children}: PageBlockProps) => {
 
   return (
     <div
+      role="treeitem"
+      aria-expanded="true"
+      aria-selected={selected}
+      tabIndex={0}
       className={clazz}
       data-placeholder={I18n.t('Add a section to start your page')}
-      ref={el => el && connect(el)}
+      ref={el => {
+        if (el) {
+          connect(el)
+        }
+        pageRef.current = el
+      }}
       onPaste={handlePaste}
+      onKeyDown={handlePagekey}
+      onFocus={handleFocus}
     >
       <a id="page-top" href="#page-top">
         <ScreenReaderContent>page top</ScreenReaderContent>

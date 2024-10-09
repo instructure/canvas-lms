@@ -299,15 +299,18 @@ export const DiscussionThreadContainer = props => {
       )
     }
 
-    threadActions.push(
-      <ThreadingToolbar.MarkAsRead
-        key={`mark-as-read-${props.discussionEntry._id}`}
-        delimiterKey={`mark-as-read-delimiter-${props.discussionEntry._id}`}
-        isRead={props.discussionEntry.entryParticipant?.read}
-        authorName={getDisplayName(props.discussionEntry)}
-        onClick={toggleUnread}
-      />
-    )
+    if (!props.discussionEntry.deleted) {
+      threadActions.push(
+        <ThreadingToolbar.MarkAsRead
+          key={`mark-as-read-${props.discussionEntry._id}`}
+          delimiterKey={`mark-as-read-delimiter-${props.discussionEntry._id}`}
+          isRead={props.discussionEntry.entryParticipant?.read}
+          authorName={getDisplayName(props.discussionEntry)}
+          onClick={toggleUnread}
+        />
+      )
+    }
+
     return threadActions
   }
 
@@ -359,7 +362,8 @@ export const DiscussionThreadContainer = props => {
   useEffect(() => {
     if (
       !ENV.manual_mark_as_read &&
-      !props.discussionEntry.entryParticipant?.read &&
+      !props.discussionEntry?.deleted &&
+      !props.discussionEntry?.entryParticipant?.read &&
       !props.discussionEntry?.entryParticipant?.forcedReadState
     ) {
       const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
@@ -379,6 +383,12 @@ export const DiscussionThreadContainer = props => {
       }
     }
   }, [threadRefCurrent, props.discussionEntry.entryParticipant.read, props, updateReadState])
+
+  useEffect(() => {
+    if (expandedThreads.includes(props.discussionEntry._id)){
+      setExpandReplies(true)
+    }
+  }, [expandedThreads])
 
   useEffect(() => {
     if (allThreadsStatus === AllThreadsState.Expanded && !expandReplies) {
@@ -562,7 +572,9 @@ export const DiscussionThreadContainer = props => {
                       props.discussionEntry.createdAt
                     )}
                     editedTimingDisplay={DateHelper.formatDatetimeForDiscussions(
-                      props.discussionEntry.editedAt
+                      props.discussionEntry.deleted
+                        ? props.discussionEntry.updatedAt
+                        : props.discussionEntry.editedAt
                     )}
                     lastReplyAtDisplay={DateHelper.formatDatetimeForDiscussions(
                       props.discussionEntry.lastReply?.createdAt

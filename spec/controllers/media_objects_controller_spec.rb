@@ -1121,6 +1121,60 @@ describe MediaObjectsController do
         expect(response.location).to eq "http://test.host/media_objects_iframe/0_deadbeef?embed=true&foo=bar"
       end
     end
+
+    describe "with JWT access token" do
+      include_context "InstAccess setup"
+
+      before do
+        @media_object.attachment.update!(file_state: "hidden")
+        user_with_pseudonym
+        jwt_payload = {
+          resource: "/media_attachments_iframe/#{@media_object.attachment_id}?instfs_id=stuff",
+          aud: [@course.root_account.uuid],
+          sub: @user.uuid,
+          tenant_auth: { location: "location" },
+          iss: "instructure:inst_access",
+          exp: 1.hour.from_now.to_i,
+          iat: Time.now.to_i
+        }
+        @token_string = InstAccess::Token.send(:new, jwt_payload).to_unencrypted_token_string
+        allow(InstFS).to receive_messages(enabled?: true, app_host: "http://instfs.test")
+        stub_request(:get, "http://instfs.test/files/stuff/metadata").to_return(status: 200, body: { url: "http://instfs.test/stuff" }.to_json)
+      end
+
+      it "allows access" do
+        get "iframe_media_player", params: { attachment_id: @media_object.attachment_id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
+        expect(response).to be_successful
+      end
+
+      it "allows access to files in deleted contexts" do
+        @media_object.attachment.context.delete
+
+        get "iframe_media_player", params: { attachment_id: @media_object.attachment_id, access_token: @token_string, instfs_id: "stuff" }
+        expect(response).to be_successful
+      end
+
+      it "allows access to deleted files" do
+        @media_object.attachment.destroy
+
+        get "iframe_media_player", params: { attachment_id: @media_object.attachment_id, access_token: @token_string, instfs_id: "stuff" }
+        expect(response).to be_successful
+      end
+
+      it "does not allow access if the resource in the token does not match the resource being accessed" do
+        media_object2 = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
+
+        get "iframe_media_player", params: { attachment_id: media_object2.attachment_id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
+        expect(response).to be_unauthorized
+      end
+
+      it "does not allow access if InstFS doesn't return metadata for the tenant auth" do
+        stub_request(:get, "http://instfs.test/files/stuff/metadata").to_return(status: 404, body: { error: "weird" }.to_json)
+
+        get "iframe_media_player", params: { attachment_id: @media_object.attachment_id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
+        expect(response).to be_unauthorized
+      end
+    end
   end
 
   describe "#media_attachment_api_json" do

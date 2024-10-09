@@ -283,3 +283,7 @@ export function showFlashError(message = I18n.t('An error occurred making a netw
 export function showFlashSuccess(message: string) {
   return () => showFlashAlert({message, type: 'success'})
 }
+
+export function showFlashWarning(message: string) {
+  return () => showFlashAlert({message, type: 'warning'})
+}

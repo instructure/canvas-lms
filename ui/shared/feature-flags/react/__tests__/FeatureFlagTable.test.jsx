@@ -18,7 +18,9 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import fetchMock from 'fetch-mock'
 
 import FeatureFlagTable from '../FeatureFlagTable'
 import sampleData from './sampleData.json'
@@ -59,34 +61,21 @@ describe('feature_flags::FeatureFlagTable', () => {
     expect(queryByText('This does great feature4y things')).toBeInTheDocument()
   })
 
-  it('includes tooltips for feature preview', () => {
-    const {getByText} = render(<FeatureFlagTable rows={rows} title={title} />)
-    expect(
-      getByText(
-        'Feature preview — opting in includes ongoing updates outside the regular release schedule'
-      )
-    ).toBeInTheDocument()
-  })
+  it('updates status pills dynamically', async () => {
+    window.ENV.CONTEXT_BASE_URL = '/accounts/1'
+    const route = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/feature8`
+    fetchMock.putOnce(route, sampleData.siteAdminOnFeature.feature_flag)
 
-  it('includes tooltips for hidden pills', () => {
-    const {getAllByText} = render(<FeatureFlagTable rows={rows} title={title} />)
-    expect(
-      getAllByText(
-        'This feature option is only visible to users with Site Admin access.' +
-          ' End users will not see it until enabled by a Site Admin user. Before enabling for an institution,' +
-          ' please be sure you fully understand the functionality and possible impacts to users.'
-      ).length
-    ).toBe(2)
-  })
+    const {getByText, getAllByTestId} = render(
+      <FeatureFlagTable rows={rows} title={title} />
+    )
+    const row = getAllByTestId('ff-table-row')[5] // siteAdminOffFeature
+    expect(row).toHaveTextContent('Hidden')
 
-  it('Includes tooltips for shadow features', () => {
-    const {getAllByTestId, getByText} = render(<FeatureFlagTable rows={rows} title={title} />)
-    expect(getAllByTestId('ff-table-row')[7]).toHaveTextContent('Shadow')
-    expect(
-      getByText(
-        'This feature option is only visible to users with Site Admin access. It is similar to "Hidden",' +
-          ' but end users will not see it even if enabled by a Site Admin user.'
-      )
-    ).toBeInTheDocument()
+    const button = row.querySelectorAll('button')[1]
+    await userEvent.click(button)
+    await userEvent.click(getByText('Enabled'))
+    await waitFor(() => expect(fetchMock.calls(route)).toHaveLength(1))
+    expect(row).not.toHaveTextContent('Hidden')
   })
 })

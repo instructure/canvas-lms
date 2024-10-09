@@ -24,13 +24,13 @@ class DeveloperKeyAccountBinding < ApplicationRecord
     state :off
     state :on
     state :allow
+    state :deleted
   end
 
   belongs_to :account
   belongs_to :developer_key
   belongs_to :root_account, class_name: "Account"
   has_one :lti_registration_account_binding, class_name: "Lti::RegistrationAccountBinding", inverse_of: :developer_key_account_binding
-
   validates :account, :developer_key, presence: true
 
   before_save :set_root_account
@@ -53,6 +53,25 @@ class DeveloperKeyAccountBinding < ApplicationRecord
   # set this current_user attribute when creating or updating a developer_key_account_binding.
   # (This is done in the dkab controller, in the create_or_update method.)
   attr_accessor :current_user
+
+  # -- BEGIN SoftDeleteable --
+  # adapting SoftDeleteable, but with no "active" state
+  scope :active, -> { where.not(workflow_state: :deleted) }
+
+  alias_method :destroy_permanently!, :destroy
+  def destroy
+    return true if deleted?
+
+    self.workflow_state = :deleted
+    run_callbacks(:destroy) { save! }
+  end
+
+  def undestroy(active_state: "off")
+    self.workflow_state = active_state
+    save!
+    true
+  end
+  # -- END SoftDeleteable --
 
   # Find a DeveloperKeyAccountBinding in order of accounts. The search for a binding will
   # be prioritized by the order of accounts. If a binding is found for the first account

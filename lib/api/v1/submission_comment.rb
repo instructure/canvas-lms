@@ -35,11 +35,16 @@ module Api::V1::SubmissionComment
     media_comment_type
   ].freeze
 
-  def submission_comment_json(submission_comment, user)
+  def submission_comment_json(submission_comment, user, use_html_comment: false)
     sc_hash = submission_comment.as_json(
       include_root: false,
       only: %w[id author_id author_name created_at edited_at comment attempt]
     )
+
+    unless use_html_comment
+      comment = sc_hash.delete("comment")
+      sc_hash["comment"] = Nokogiri::HTML(comment).text
+    end
 
     if submission_comment.media_comment?
       sc_hash["media_comment"] = media_comment_json(
@@ -68,8 +73,8 @@ module Api::V1::SubmissionComment
     sc_hash
   end
 
-  def submission_comments_json(submission_comments, user)
-    submission_comments.map { |submission_comment| submission_comment_json(submission_comment, user) }
+  def submission_comments_json(submission_comments, user, use_html_comment: false)
+    submission_comments.map { |submission_comment| submission_comment_json(submission_comment, user, use_html_comment:) }
   end
 
   def anonymous_moderated_submission_comments_json(assignment:, submissions:, submission_comments:, current_user:, course:, avatars:)

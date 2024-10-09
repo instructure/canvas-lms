@@ -29,7 +29,7 @@
   <div class="Sidebar__TodoListContainer"></div>
 <% end %>
 <% if render_teacher_to_do %>
-  <%= render :partial => 'courses/to_do_list', :locals => {:contexts => nil, :show_legacy_todo_list => true, :additional_title_context => @user.has_student_enrollment?} %>
+  <%= render :partial => 'courses/to_do_list', :locals => {:contexts => nil, :show_legacy_todo_list => true, :additional_title_context => @user.has_student_enrollment?, :root_account => @domain_root_account } %>
   <% locals = {
       :title => t('coming_up', "Coming Up"),
       :period => :one_week,

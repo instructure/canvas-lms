@@ -3033,6 +3033,28 @@ describe GradebooksController do
       expect(response).to render_template(:bare, locals: { anonymous_grading: false })
     end
 
+    it "does not load the platform speedgrader when the assignment is moderated" do
+      @assignment.publish
+      @assignment.moderated_grading = true
+      @assignment.final_grader_id = @teacher
+      @assignment.grader_count = 1
+      @assignment.save!
+      Account.site_admin.allow_feature!(:platform_service_speedgrader)
+      @course.enable_feature!(:platform_service_speedgrader)
+      get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+      expect(response).to render_template(:speed_grader)
+    end
+
+    it "does not load the platform speedgrader when the assignment is anonymously graded" do
+      @assignment.publish
+      @assignment.anonymous_grading = true
+      @assignment.save!
+      Account.site_admin.allow_feature!(:platform_service_speedgrader)
+      @course.enable_feature!(:platform_service_speedgrader)
+      get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+      expect(response).to render_template(:speed_grader)
+    end
+
     it "does not load the platform speedgrader when the account allows it and the course disables it" do
       @assignment.publish
       Account.site_admin.allow_feature!(:platform_service_speedgrader)
@@ -3043,14 +3065,6 @@ describe GradebooksController do
 
     describe "js_env" do
       let(:js_env) { assigns[:js_env] }
-
-      context "when platform_service_speedgrader is enabled" do
-        it "includes info indicating whether grade by question is supported" do
-          Account.site_admin.enable_feature!(:platform_service_speedgrader)
-          get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
-          expect(js_env).to have_key :GRADE_BY_QUESTION_SUPPORTED
-        end
-      end
 
       it "includes lti_retrieve_url" do
         get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id }

@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import * as z from 'zod'
+import {LtiDeepLinkingRequest, LtiResourceLinkRequest} from './LtiMessageType'
 
 // TODO: this list is duplicated in ui/features/external_apps/react/components/ExternalToolPlacementList.jsx
 // We should consolidate some of the lti "models" into a shared package that both features depend on
@@ -37,6 +38,11 @@ export const LtiPlacements = {
    * Account-level navigation
    */
   AccountNavigation: 'account_navigation',
+  /**
+   * Similar to account_navigation, but for allows for better analytics
+   * of what tools use this type of placement.
+   */
+  AnalyticsHub: 'analytics_hub',
   /**
    * Renders a frame on the assignment edit page, under
    * the native assignment options
@@ -129,6 +135,7 @@ export const LtiPlacements = {
 
 export const AllLtiPlacements = [
   LtiPlacements.AccountNavigation,
+  LtiPlacements.AnalyticsHub,
   LtiPlacements.AssignmentEdit,
   LtiPlacements.AssignmentSelection,
   LtiPlacements.AssignmentView,
@@ -181,6 +188,89 @@ export const LtiPlacementsWithIcons = [
   LtiPlacements.EditorButton,
   LtiPlacements.FileIndexMenu,
 ] as const
+
+/**
+ * A record where the keys are message type identifiers
+ * and the values are the placements that support that message type.
+ * Note that this list is duplicated in the Lti::ResourcePlacement model on the Rails side.
+ */
+export const LtiPlacementsByMessageType = {
+  [LtiResourceLinkRequest]: [
+    LtiPlacements.AccountNavigation,
+    LtiPlacements.AnalyticsHub,
+    LtiPlacements.AssignmentEdit,
+    LtiPlacements.AssignmentGroupMenu,
+    LtiPlacements.AssignmentIndexMenu,
+    LtiPlacements.AssignmentMenu,
+    LtiPlacements.AssignmentSelection,
+    LtiPlacements.AssignmentView,
+    LtiPlacements.Collaboration,
+    LtiPlacements.ConferenceSelection,
+    LtiPlacements.CourseAssignmentsMenu,
+    LtiPlacements.CourseHomeSubNavigation,
+    LtiPlacements.CourseNavigation,
+    LtiPlacements.CourseSettingsSubNavigation,
+    LtiPlacements.DiscussionTopicIndexMenu,
+    LtiPlacements.DiscussionTopicMenu,
+    LtiPlacements.FileIndexMenu,
+    LtiPlacements.FileMenu,
+    LtiPlacements.GlobalNavigation,
+    LtiPlacements.HomeworkSubmission,
+    LtiPlacements.LinkSelection,
+    LtiPlacements.MigrationSelection,
+    LtiPlacements.ModuleGroupMenu,
+    LtiPlacements.ModuleIndexMenu,
+    LtiPlacements.ModuleIndexMenuModal,
+    LtiPlacements.ModuleMenuModal,
+    LtiPlacements.ModuleMenu,
+    LtiPlacements.PostGrades,
+    LtiPlacements.QuizIndexMenu,
+    LtiPlacements.QuizMenu,
+    LtiPlacements.SimilarityDetection,
+    LtiPlacements.StudentContextCard,
+    LtiPlacements.SubmissionTypeSelection,
+    LtiPlacements.ToolConfiguration,
+    LtiPlacements.TopNavigation,
+    LtiPlacements.UserNavigation,
+    LtiPlacements.WikiIndexMenu,
+    LtiPlacements.WikiPageMenu,
+  ],
+  [LtiDeepLinkingRequest]: [
+    LtiPlacements.AssignmentSelection,
+    LtiPlacements.Collaboration,
+    LtiPlacements.ConferenceSelection,
+    LtiPlacements.CourseAssignmentsMenu,
+    LtiPlacements.EditorButton,
+    LtiPlacements.HomeworkSubmission,
+    LtiPlacements.LinkSelection,
+    LtiPlacements.MigrationSelection,
+    LtiPlacements.ModuleIndexMenuModal,
+    LtiPlacements.ModuleMenuModal,
+    LtiPlacements.SubmissionTypeSelection,
+  ],
+} as const
+
+/**
+ * All placements that support the LtiDeepLinkingRequest message type. Note that this list is
+ * duplicated in the Lti::ResourcePlacement model on the Rails side.
+ */
+export const DeepLinkingRequestPlacements = LtiPlacementsByMessageType.LtiDeepLinkingRequest
+
+export const supportsDeepLinkingRequest = (
+  placement: LtiPlacement
+): placement is (typeof DeepLinkingRequestPlacements)[number] => {
+  return DeepLinkingRequestPlacements.includes(placement as any)
+}
+/**
+ * All placements that support the "LtiResourceLinkRequest" message type. Note that this list is
+ * duplicated in the Lti::ResourcePlacement model on the Rails side.
+ */
+export const ResourceLinkRequestPlacements = LtiPlacementsByMessageType.LtiResourceLinkRequest
+export const supportsResourceLinkRequest = (
+  placement: LtiPlacement
+): placement is (typeof ResourceLinkRequestPlacements)[number] => {
+  return ResourceLinkRequestPlacements.includes(placement as any)
+}
 
 export type LtiPlacementWithIcon = (typeof LtiPlacementsWithIcons)[number]
 

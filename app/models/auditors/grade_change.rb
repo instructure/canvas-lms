@@ -27,7 +27,13 @@ class Auditors::GradeChange
   # Cassandra, since it stores them with the placeholder assignment ID above.
   # If we're querying ActiveRecord, we swap this out for an actual IS NULL
   # query instead.
-  COURSE_OVERRIDE_ASSIGNMENT = OpenStruct.new(id: NULL_PLACEHOLDER, global_id: NULL_PLACEHOLDER).freeze
+  class DummyAssignment
+    def id
+      NULL_PLACEHOLDER
+    end
+    alias_method :global_id, :id
+  end
+  COURSE_OVERRIDE_ASSIGNMENT = DummyAssignment.new.freeze
 
   OverrideGradeChange = Struct.new(:grader, :old_grade, :old_score, :score, keyword_init: true)
 

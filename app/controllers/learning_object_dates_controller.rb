@@ -43,6 +43,16 @@
 #           "example": "2012-07-01T23:59:00-06:00",
 #           "type": "datetime"
 #         },
+#         "reply_to_topic_due_at": {
+#           "description": "the reply_to_topic sub_assignment due_date. returns null if not present",
+#           "example": "2012-07-01T23:59:00-06:00",
+#           "type": "datetime"
+#         },
+#         "required_replies_due_at": {
+#           "description": "the reply_to_entry sub_assignment due_date. returns null if not present",
+#           "example": "2012-07-01T23:59:00-06:00",
+#           "type": "datetime"
+#         },
 #         "unlock_at": {
 #           "description": "the unlock date (learning object is unlocked after this date). returns null if not present",
 #           "example": "2012-07-01T23:59:00-06:00",
@@ -116,7 +126,8 @@ class LearningObjectDatesController < ApplicationController
                                  Api.paginate(section_visibilities, self, route)
                                end
 
-    all_overrides = assignment_overrides_json(overrides, @current_user, include_names: true)
+    include_child_override_due_dates = Account.site_admin.feature_enabled?(:discussion_checkpoints)
+    all_overrides = assignment_overrides_json(overrides, @current_user, include_names: true, include_child_override_due_dates:)
     all_overrides += section_visibility_to_override_json(section_visibilities, overridable) if visibilities_to_override
 
     render json: {
@@ -179,12 +190,16 @@ class LearningObjectDatesController < ApplicationController
     when "Assignment"
       update_assignment(asset, object_update_params)
     when "Quizzes::Quiz"
-      update_quiz(asset, object_update_params)
+      update_quiz(asset, object_update_params.except(:reply_to_topic_due_at, :required_replies_due_at))
     when "DiscussionTopic"
       if asset == overridable
         update_ungraded_object(asset, object_update_params)
       else
-        update_assignment(overridable, object_update_params)
+        if asset.checkpoints?
+          update_checkpointed_assignment(asset, object_update_params)
+        else
+          update_assignment(overridable, object_update_params)
+        end
         prefer_assignment_availability_dates(asset, overridable)
       end
     when "WikiPage"
@@ -242,6 +257,88 @@ class LearningObjectDatesController < ApplicationController
     return head :no_content if [:created, :ok].include?(result)
 
     render json: assignment.errors, status: (result == :forbidden) ? :forbidden : :bad_request
+  end
+
+  def update_checkpointed_assignment(discussion, params)
+    checkpoint_service = Checkpoints::DiscussionCheckpointUpdaterService
+    checkpoint_dates = prepare_checkpoints_dates(params)
+    checkpoint_service.call(
+      discussion_topic: discussion,
+      checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+      dates: checkpoint_dates[:reply_to_topic][:dates]
+    )
+    checkpoint_service.call(
+      discussion_topic: discussion,
+      checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+      dates: checkpoint_dates[:reply_to_entry][:dates]
+    )
+  end
+
+  def prepare_checkpoints_dates(params)
+    reply_to_topic_dates = []
+    reply_to_entry_dates = []
+
+    params[:assignment_overrides]&.each do |override|
+      base_override = { type: "override" }
+
+      [:unlock_at, :lock_at].each do |date_field|
+        base_override[date_field] = override[date_field] if override[date_field]
+      end
+
+      # If student_ids, course_section_id, or group_id is provided, then we want to provide the correct set_type and set ids
+      if override[:student_ids]
+        base_override[:set_type] = "ADHOC"
+        base_override[:student_ids] = override[:student_ids]
+      elsif override[:course_section_id]
+        base_override[:set_type] = "CourseSection"
+        base_override[:set_id] = override[:course_section_id]
+      elsif override[:group_id]
+        base_override[:set_type] = "Group"
+        base_override[:set_id] = override[:group_id]
+      end
+
+      # each checkpoint has the same base_override attributes
+      reply_to_topic_date = base_override.dup
+      reply_to_entry_date = base_override.dup
+      reply_to_topic_date[:due_at] = override[:reply_to_topic_due_at] if override[:reply_to_topic_due_at]
+      reply_to_entry_date[:due_at] = override[:required_replies_due_at] if override[:required_replies_due_at]
+
+      # If the override is provided, we assume it is the parent override, and we need to find the correct child_override
+      # That should get updated in the discussionCheckpointUpdaterService
+      if override[:id]
+        parent_override = AssignmentOverride.find(override[:id])
+        reply_to_topic_override = parent_override.child_overrides.find { |o| o.assignment.sub_assignment_tag == "reply_to_topic" }
+        reply_to_entry_override = parent_override.child_overrides.find { |o| o.assignment.sub_assignment_tag == "reply_to_entry" }
+
+        reply_to_topic_date[:id] = reply_to_topic_override&.id
+        reply_to_entry_date[:id] = reply_to_entry_override&.id
+      end
+
+      reply_to_topic_dates << reply_to_topic_date
+      reply_to_entry_dates << reply_to_entry_date
+    end
+
+    # Add base dates for everyone only if not only_visible_to_overrides
+    unless params[:only_visible_to_overrides]
+      base_everyone_date = { type: "everyone" }
+
+      [:unlock_at, :lock_at].each do |date_field|
+        base_everyone_date[date_field] = params[date_field] if params[date_field]
+      end
+
+      reply_to_topic_date = base_everyone_date.dup
+      reply_to_topic_date[:due_at] = params[:reply_to_topic_due_at] if params[:reply_to_topic_due_at]
+      reply_to_topic_dates << reply_to_topic_date
+
+      reply_to_entry_date = base_everyone_date.dup
+      reply_to_entry_date[:due_at] = params[:required_replies_due_at] if params[:required_replies_due_at]
+      reply_to_entry_dates << reply_to_entry_date
+    end
+
+    {
+      reply_to_topic: { dates: reply_to_topic_dates },
+      reply_to_entry: { dates: reply_to_entry_dates }
+    }
   end
 
   def update_quiz(quiz, params)
@@ -316,6 +413,8 @@ class LearningObjectDatesController < ApplicationController
                       :only_visible_to_overrides,
                       { assignment_overrides: strong_anything }]
     allowed_params.unshift(:due_at) if allow_due_at?
+    allowed_params.unshift(:reply_to_topic_due_at) if allow_due_at?
+    allowed_params.unshift(:required_replies_due_at) if allow_due_at?
     params.permit(*allowed_params)
   end
 end

@@ -21,16 +21,28 @@
 module Types
   class SubAssignmentSubmissionType < ApplicationObjectType
     field :grade, String, null: true
+    def grade
+      protect_submission_grades(:grade)
+    end
 
     field :score, Float, null: true
+    def score
+      protect_submission_grades(:score)
+    end
 
     field :assignment_id, ID, null: false
 
     field :grade_matches_current_submission, Boolean, null: true
 
     field :published_score, Float, null: true
+    def published_score
+      protect_submission_grades(:published_score)
+    end
 
     field :published_grade, String, null: true
+    def published_grade
+      protect_submission_grades(:published_grade)
+    end
 
     field :sub_assignment_tag, String, null: true
     def sub_assignment_tag
@@ -38,5 +50,34 @@ module Types
 
       nil
     end
+
+    field :excused,
+          Boolean,
+          "excused assignments are ignored when calculating grades",
+          method: :excused?,
+          null: true
+
+    field :entered_grade,
+          String,
+          "the submission grade *before* late policy deductions were applied",
+          null: true
+    def entered_grade
+      protect_submission_grades(:entered_grade)
+    end
+
+    field :entered_score,
+          Float,
+          "the submission score *before* late policy deductions were applied",
+          null: true
+    def entered_score
+      protect_submission_grades(:entered_score)
+    end
+
+    def protect_submission_grades(attr)
+      load_association(:assignment).then do
+        object.send(attr) if object.user_can_read_grade?(current_user, session)
+      end
+    end
+    private :protect_submission_grades
   end
 end

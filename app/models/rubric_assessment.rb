@@ -24,6 +24,7 @@
 class RubricAssessment < ActiveRecord::Base
   include TextHelper
   include HtmlTextHelper
+  include Trackable
 
   belongs_to :rubric
   belongs_to :rubric_association

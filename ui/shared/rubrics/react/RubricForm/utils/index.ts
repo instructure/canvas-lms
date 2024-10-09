@@ -67,5 +67,5 @@ export const reorder = ({list, startIndex, endIndex}: ReorderProps) => {
 }
 
 export const stripPTags = (htmlString: string) => {
-  return htmlString.replace(/^<p>(.*)<\/p>$/, '$1')
+  return htmlString?.replace(/^<p>(.*)<\/p>$/, '$1')
 }

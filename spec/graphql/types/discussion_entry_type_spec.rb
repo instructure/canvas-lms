@@ -579,6 +579,41 @@ describe Types::DiscussionEntryType do
     expect(discussion_entry_versions).to eq(["Hello! 3", "Hello! 2", "Hello!"])
   end
 
+  it "returns the correct page number for it's associated root entry" do
+    # 3 cases: page 1, page 2, subreply
+    topic = DiscussionTopic.create!(title: "some title", context: @course, user: @teacher)
+
+    # 10 root entries
+    10.times do |i|
+      entry = topic.discussion_entries.create!(user: @teacher, message: "reply to topic #{i}")
+      topic.discussion_entries.create!(user: @teacher, message: "reply to entry #{i}", root_entry_id: entry.id, parent_id: entry.id)
+    end
+
+    entry = topic.discussion_entries.where(message: "reply to topic 6").first
+    entry.destroy
+    topic.reload
+
+    entry = topic.discussion_entries.where(message: "reply to topic 5").first
+    sub_entry = topic.discussion_entries.where(message: "reply to entry 5").first
+    entry_type = GraphQLTypeTester.new(entry, current_user: @teacher)
+    sub_entry_type = GraphQLTypeTester.new(sub_entry, current_user: @teacher)
+
+    result = entry_type.resolve("rootEntryPageNumber(perPage: 5,sortOrder: desc)")
+    expect(result).to eq 0
+    result = sub_entry_type.resolve("rootEntryPageNumber(perPage: 5,sortOrder: desc)")
+    expect(result).to eq 0
+
+    entry = topic.discussion_entries.where(message: "reply to topic 4").first
+    sub_entry = topic.discussion_entries.where(message: "reply to entry 4").first
+    entry_type = GraphQLTypeTester.new(entry, current_user: @teacher)
+    sub_entry_type = GraphQLTypeTester.new(sub_entry, current_user: @teacher)
+
+    result = entry_type.resolve("rootEntryPageNumber(perPage: 5,sortOrder: desc)")
+    expect(result).to eq 1
+    result = sub_entry_type.resolve("rootEntryPageNumber(perPage: 5,sortOrder: desc)")
+    expect(result).to eq 1
+  end
+
   context "all root entries" do
     before do
       @sub_entry2 = discussion_entry.discussion_topic.discussion_entries.create!(message: "sub_entry 2", user: @teacher, parent_id: sub_entry.id)

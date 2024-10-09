@@ -54,9 +54,9 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
            prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Attachment")
   argument :media_id, ID, required: false
   argument :resource_link_lookup_uuid, String, required: false
+  argument :student_id, ID, required: false
   argument :submission_type, Types::OnlineSubmissionType, required: true
   argument :url, String, required: false
-  argument :student_id, ID, required: false
 
   field :submission, Types::SubmissionType, null: true
 

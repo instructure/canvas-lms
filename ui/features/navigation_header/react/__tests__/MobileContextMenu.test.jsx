@@ -68,7 +68,7 @@ const props = {
 describe('MobileContextMenu', () => {
   beforeEach(() => {
     window.ENV = {context_asset_string: 'courses_1'}
-    fetchMock.mock('*', JSON.stringify(tabsFromApi))
+    fetchMock.mock('*', tabsFromApi)
   })
 
   afterEach(() => {

@@ -176,7 +176,7 @@ describe Api::V1::AssignmentOverride do
         enrollment.save!
       end
 
-      context "#invisble_users_and_overrides_for_user" do
+      describe "#invisble_users_and_overrides_for_user" do
         before do
           @override.set_type = "ADHOC"
           @override_student = @override.assignment_override_students.build
@@ -220,7 +220,7 @@ describe Api::V1::AssignmentOverride do
         @student_visible = student_in_section(@section_visible, user: user_factory)
       end
 
-      context "#invisble_users_and_overrides_for_user" do
+      describe "#invisble_users_and_overrides_for_user" do
         before do
           @override.set_type = "ADHOC"
           @override_student = @override.assignment_override_students.build

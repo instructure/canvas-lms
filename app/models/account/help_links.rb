@@ -58,17 +58,6 @@ class Account::HelpLinks
         is_featured: false,
         is_new: false,
         feature_headline: -> { "" }
-      }.freeze,
-      {
-        available_to: %w[user student teacher admin observer unenrolled],
-        text: -> { I18n.t("#help_dialog.covid", "COVID-19 Canvas Resources") },
-        subtext: -> { I18n.t("#help_dialog.covid_sub", "Tips for teaching and learning online") },
-        url: I18n.t(:"community.contingency_covid"),
-        type: "default",
-        id: :covid,
-        is_new: false,
-        is_featured: false,
-        feature_headline: -> { "" }
       }.freeze
     ]
     filter ? filtered_links(defaults) : defaults
@@ -78,12 +67,9 @@ class Account::HelpLinks
     @default_links_hash ||= default_links.index_by { |link| link[:id] }
   end
 
-  # do not return the covid help link unless the featured_help_links FF is enabled
   def filtered_links(links)
     show_feedback_link = Setting.get("show_feedback_link", "false") == "true"
     links.select do |link|
-      (link[:id].to_s == "covid") ? Account.site_admin.feature_enabled?(:featured_help_links) : true
-    end.select do |link|
       (link[:id].to_s == "report_a_problem" || link[:id].to_s == "instructor_question") ? show_feedback_link : true
     end
   end
@@ -133,11 +119,13 @@ class Account::HelpLinks
     links.map do |link|
       default_link = link[:type] == "default" && default_links_hash[link[:id]&.to_sym]
       if default_link
+        default_is_new = Canvas::Plugin.value_to_boolean(default_link[:is_new])
+        default_is_featured = Canvas::Plugin.value_to_boolean(default_link[:is_featured])
         link.delete(:text) if link[:text] == default_link[:text].call
         link.delete(:subtext) if link[:subtext] == default_link[:subtext].call
         link.delete(:url) if link[:url] == default_link[:url]
-        link.delete(:is_featured) if link[:is_featured] == default_link[:is_featured]
-        link.delete(:is_new) if link[:is_new] == default_link[:is_new]
+        link.delete(:is_featured) if link[:is_featured] == default_is_featured
+        link.delete(:is_new) if link[:is_new] == default_is_new
         link.delete(:feature_headline) if link[:feature_headline] == default_link[:feature_headline].try(:call)
       end
       link

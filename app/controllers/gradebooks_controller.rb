@@ -596,7 +596,7 @@ class GradebooksController < ApplicationController
     gradebook_options = {
       active_grading_periods: active_grading_periods_json,
       attachment_url: authenticated_download_url(last_exported_attachment),
-      change_grade_url: api_v1_course_assignment_submission_url(@context, ":assignment", ":submission", include: [:visibility]),
+      change_grade_url: api_v1_course_assignment_submission_url(@context, ":assignment", ":submission", include: [:visibility, :sub_assignment_submissions]),
       course_settings: {
         allow_final_grade_override: @context.allow_final_grade_override?,
         filter_speed_grader_by_student_group: @context.filter_speed_grader_by_student_group?
@@ -888,7 +888,7 @@ class GradebooksController < ApplicationController
             submission[:dont_overwrite_grade] = dont_overwrite_grade
             submission.delete(:final) if submission[:final] && !@assignment.permits_moderation?(@current_user)
             if params.key?(:sub_assignment_tag) && @domain_root_account&.feature_enabled?(:discussion_checkpoints)
-              submission[:sub_assignment_tag] = params.delete(:sub_assignment_tag)
+              submission[:sub_assignment_tag] = params[:sub_assignment_tag]
             end
             subs = @assignment.grade_student(@user, submission.merge(skip_grader_check: is_default_grade_for_missing))
             apply_provisional_grade_filters!(submissions: subs, final: submission[:final]) if submission[:provisional]
@@ -1031,18 +1031,28 @@ class GradebooksController < ApplicationController
 
     return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
 
-    platform_service_speedgrader_enabled = @context.feature_enabled?(:platform_service_speedgrader)
-    if platform_service_speedgrader_enabled && (params[:platform_sg].nil? || value_to_boolean(params[:platform_sg]))
+    @assignment = if params[:assignment_id].blank?
+                    nil
+                  else
+                    @context.assignments.active.find(params[:assignment_id])
+                  end
+    platform_service_speedgrader_enabled = platform_service_speedgrader_enabled?(params)
+    if platform_service_speedgrader_enabled
       @page_title = t("SpeedGrader")
       @body_classes << "full-width padless-content"
 
       remote_env(speedgrader: Services::PlatformServiceSpeedgrader.launch_url)
 
       env = {
-        GRADE_BY_QUESTION_SUPPORTED: nil,
+        COMMENT_LIBRARY_FEATURE_ENABLED:
+          @context.root_account.feature_enabled?(:assignment_comment_library),
         EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
         EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
+        ENHANCED_RUBRICS_ENABLED: @context.feature_enabled?(:enhanced_rubrics),
         PLATFORM_SERVICE_SPEEDGRADER_ENABLED: platform_service_speedgrader_enabled,
+        RESTRICT_QUANTITATIVE_DATA_ENABLED: @context.restrict_quantitative_data?(@current_user),
+        course_id: @context.id,
+        late_policy: @context.late_policy&.as_json(include_root: false),
       }
       js_env(env)
 
@@ -1051,8 +1061,6 @@ class GradebooksController < ApplicationController
       render html: "".html_safe, layout: "bare"
       return
     end
-
-    @assignment = @context.assignments.active.find(params[:assignment_id])
 
     if @assignment.unpublished?
       flash[:notice] = t(:speedgrader_enabled_only_for_published_content,
@@ -1156,8 +1164,8 @@ class GradebooksController < ApplicationController
           group_selection = SpeedGrader::StudentGroupSelection.new(current_user: @current_user, course: @context)
           updated_group_info = group_selection.select_group(student_id: requested_student_id)
 
-          if updated_group_info.group != group_selection.initial_group
-            new_group_id = updated_group_info.group.present? ? updated_group_info.group.id.to_s : nil
+          if updated_group_info[:group] != group_selection.initial_group
+            new_group_id = updated_group_info[:group].present? ? updated_group_info[:group].id.to_s : nil
             context_settings = gradebook_settings(context.global_id)
             context_settings.deep_merge!({
                                            "filter_rows_by" => {
@@ -1167,10 +1175,10 @@ class GradebooksController < ApplicationController
             @current_user.set_preference(:gradebook_settings, context.global_id, context_settings)
           end
 
-          if updated_group_info.group.present?
-            env[:selected_student_group] = group_json(updated_group_info.group, @current_user, session)
+          if updated_group_info[:group].present?
+            env[:selected_student_group] = group_json(updated_group_info[:group], @current_user, session)
           end
-          env[:student_group_reason_for_change] = updated_group_info.reason_for_change if updated_group_info.reason_for_change.present?
+          env[:student_group_reason_for_change] = updated_group_info[:reason_for_change] if updated_group_info[:reason_for_change].present?
         end
 
         if @assignment.active_rubric_association?
@@ -1418,6 +1426,18 @@ class GradebooksController < ApplicationController
   end
 
   private
+
+  def platform_service_speedgrader_enabled?(params)
+    return false unless @context.feature_enabled?(:platform_service_speedgrader)
+
+    # SGP is currently disabled for moderated and anonymously graded assignments
+    if @assignment.present?
+      return false if @assignment.moderated_grading
+      return false if @assignment.anonymous_grading
+    end
+
+    params[:platform_sg].nil? || value_to_boolean(params[:platform_sg])
+  end
 
   def active_grading_standard_scaling_factor(grading_standard)
     grading_standard.scaling_factor

@@ -45,10 +45,10 @@ module Types
     end
 
     global_id_field :id
-    field :name, String, null: true
-    field :rules, AssignmentGroupRulesType, method: :rules_hash, null: true
     field :group_weight, Float, null: true
+    field :name, String, null: true
     field :position, Int, null: true
+    field :rules, AssignmentGroupRulesType, method: :rules_hash, null: true
     field :state, AssignmentGroupState, method: :workflow_state, null: false
 
     implements Interfaces::AssignmentsConnectionInterface

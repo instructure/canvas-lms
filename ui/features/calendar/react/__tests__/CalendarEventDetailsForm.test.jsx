@@ -19,7 +19,7 @@
 import React from 'react'
 import $ from 'jquery'
 import moment from 'moment-timezone'
-import {act, fireEvent, getByTestId, render, waitFor} from '@testing-library/react'
+import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import {screen} from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import {eventFormProps, conference, userContext, courseContext, accountContext} from './mocks'

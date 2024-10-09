@@ -315,12 +315,12 @@ describe Message do
     end
 
     it "has a list of messages to dispatch" do
-      message_model(dispatch_at: Time.now - 1, workflow_state: "staged", to: "somebody", user: user_factory)
+      message_model(dispatch_at: 1.second.ago, workflow_state: "staged", to: "somebody", user: user_factory)
       expect(Message.to_dispatch).to eq [@message]
     end
 
     it "does not have a message to dispatch if the message's delay moves it to the future" do
-      message_model(dispatch_at: Time.now - 1, to: "somebody")
+      message_model(dispatch_at: 1.second.ago, to: "somebody")
       @message.stage
       expect(Message.to_dispatch).to eq []
     end
@@ -351,10 +351,10 @@ describe Message do
   end
 
   it "goes back to the staged state if sending fails" do
-    message_model(dispatch_at: Time.now - 1, workflow_state: "sending", to: "somebody", updated_at: Time.now.utc - 11.minutes, user: user_factory)
+    message_model(dispatch_at: 1.second.ago, workflow_state: "sending", to: "somebody", updated_at: Time.now.utc - 11.minutes, user: user_factory)
     @message.errored_dispatch
     expect(@message.workflow_state).to eq "staged"
-    expect(@message.dispatch_at).to be > Time.now + 4.minutes
+    expect(@message.dispatch_at).to be > 4.minutes.from_now
   end
 
   describe "#deliver" do
@@ -428,7 +428,7 @@ describe Message do
     it "logs stats on deliver" do
       allow(InstStatsd::Statsd).to receive(:increment)
       account = account_model
-      @message = message_model(dispatch_at: Time.now - 1,
+      @message = message_model(dispatch_at: 1.second.ago,
                                notification_name: "my_name",
                                workflow_state: "staged",
                                to: "somebody",

@@ -31,25 +31,21 @@ class Checkpoints::SectionOverrideCreatorService < ApplicationService
     raise Checkpoints::SetIdRequiredError, "set_id is required, but was not provided" if section_id.blank?
 
     section = @checkpoint.course.active_course_sections.find(section_id)
-    override = create_override(assignment: @checkpoint, section:)
 
-    unless parent_override_exists?(section)
-      create_override(assignment: @checkpoint.parent_assignment, section:, shell_override: true)
-    end
-
-    override
+    parent_override = parent_override(section)
+    create_override(assignment: @checkpoint, section:, parent_override:)
   end
 
   private
 
-  def create_override(assignment:, section:, shell_override: false)
-    override = assignment.assignment_overrides.build(set: section, dont_touch_assignment: true)
+  def create_override(assignment:, section:, shell_override: false, parent_override: nil)
+    override = assignment.assignment_overrides.build(set: section, dont_touch_assignment: true, parent_override:)
     apply_overridden_dates(override, @override, shell_override:)
     override.save!
     override
   end
 
-  def parent_override_exists?(section)
-    @checkpoint.parent_assignment.active_assignment_overrides.where(set: section).exists?
+  def parent_override(section)
+    @checkpoint.parent_assignment.active_assignment_overrides.find_by(set: section) || create_override(assignment: @checkpoint.parent_assignment, section:, shell_override: true)
   end
 end

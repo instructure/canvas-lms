@@ -33,8 +33,8 @@ module CC
         @html_exporter = html_exporter
       end
 
-      def self.generate_qti(*args)
-        qti = Qti::QtiGenerator.new(*args)
+      def self.generate_qti(*)
+        qti = Qti::QtiGenerator.new(*)
         qti.generate
       end
 

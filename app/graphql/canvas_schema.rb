@@ -115,17 +115,10 @@ class CanvasSchema < GraphQL::Schema
                 Types::ModuleSubHeaderType,
                 Types::InternalSettingType]
 
-  def self.for_federation
-    @federatable_schema ||= Class.new(CanvasSchema) do
-      include ApolloFederation::Schema
+  # GraphQL tuning and defensive settings
+  max_depth GraphQLTuning.max_depth
+  validate_max_errors GraphQLTuning.validate_max_errors
+  max_query_string_tokens GraphQLTuning.max_query_string_tokens
 
-      # TODO: once https://github.com/Gusto/apollo-federation-ruby/pull/135 is
-      # merged and published, we can update the `apollo-federation` gem and
-      # remove this line
-      query Types::QueryType
-    end
-  end
-
-  # graphiql can't load the explorer if we go below 15, so we'll use that as long as our specs continue to pass
-  max_depth 15
+  query_analyzer(CanvasAntiabuseAnalyzer)
 end

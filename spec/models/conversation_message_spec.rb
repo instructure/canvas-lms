@@ -270,7 +270,7 @@ describe ConversationMessage do
     it "sets has_attachments if there are attachments" do
       a = attachment_model(context: @teacher, folder: @teacher.conversation_attachments_folder)
       m = @teacher.initiate_conversation([@student]).add_message("ohai", attachment_ids: [a.id])
-      expect(m.read_attribute(:has_attachments)).to be_truthy
+      expect(m.has_attachments).to be_truthy
       expect(m.conversation.reload.has_attachments).to be_truthy
       expect(m.conversation.conversation_participants.all?(&:has_attachments?)).to be_truthy
     end
@@ -279,7 +279,7 @@ describe ConversationMessage do
       a = attachment_model(context: @teacher, folder: @teacher.conversation_attachments_folder)
       m1 = @teacher.initiate_conversation([user_factory]).add_message("ohai", attachment_ids: [a.id])
       m2 = @teacher.initiate_conversation([@student]).add_message("lulz", forwarded_message_ids: [m1.id])
-      expect(m2.read_attribute(:has_attachments)).to be_truthy
+      expect(m2.has_attachments).to be_truthy
       expect(m2.conversation.reload.has_attachments).to be_truthy
       expect(m2.conversation.conversation_participants.all?(&:has_attachments?)).to be_truthy
     end
@@ -291,7 +291,7 @@ describe ConversationMessage do
       mc.context = mc.user = @teacher
       mc.save
       m = @teacher.initiate_conversation([@student]).add_message("ohai", media_comment: mc)
-      expect(m.read_attribute(:has_media_objects)).to be_truthy
+      expect(m.has_media_objects).to be_truthy
       expect(m.conversation.reload.has_media_objects).to be_truthy
       expect(m.conversation.conversation_participants.all?(&:has_media_objects?)).to be_truthy
     end
@@ -304,7 +304,7 @@ describe ConversationMessage do
       mc.save
       m1 = @teacher.initiate_conversation([user_factory]).add_message("ohai", media_comment: mc)
       m2 = @teacher.initiate_conversation([@student]).add_message("lulz", forwarded_message_ids: [m1.id])
-      expect(m2.read_attribute(:has_media_objects)).to be_truthy
+      expect(m2.has_media_objects).to be_truthy
       expect(m2.conversation.reload.has_media_objects).to be_truthy
       expect(m2.conversation.conversation_participants.all?(&:has_media_objects?)).to be_truthy
     end

@@ -133,7 +133,7 @@ describe AuthenticationProvider::LDAP do
     end
   end
 
-  context "#ldap_bind_result" do
+  describe "#ldap_bind_result" do
     before(:once) do
       @account = Account.new
       @account.save!

@@ -60,8 +60,8 @@ class ActiveSupport::Cache::ZonalRedisCacheStore < ActiveSupport::Cache::Store
 
   protected
 
-  def read_entry(key, **options)
-    zonal_store.send(:read_entry, key, **options)
+  def read_entry(key, **)
+    zonal_store.send(:read_entry, key, **)
   end
 
   def zonal_store

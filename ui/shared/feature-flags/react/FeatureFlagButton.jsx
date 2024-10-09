@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useRef, useEffect} from 'react'
-import {bool, object, string} from 'prop-types'
+import {bool, object, string, func} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
@@ -53,7 +53,7 @@ function removeFlag(flagName) {
   })
 }
 
-function FeatureFlagButton({featureFlag, disableDefaults, displayName, appliesTo}) {
+function FeatureFlagButton({featureFlag, disableDefaults, displayName, appliesTo, onStateChange = () => {}}) {
   const [updatedFlag, setUpdatedFlag] = useState(undefined)
   const [apiBusy, setApiBusy] = useState(false)
   const enclosingDivEl = useRef(null)
@@ -79,9 +79,11 @@ function FeatureFlagButton({featureFlag, disableDefaults, displayName, appliesTo
         // Update to match the new state since this returns the old version not the new one
         json.state = json.parent_state
         setUpdatedFlag(json)
+        onStateChange(json.state)
       } else {
         const {json} = await setFlag(effectiveFlag.feature, state)
         setUpdatedFlag(json)
+        onStateChange(json.state)
       }
     } catch (e) {
       showFlashAlert({
@@ -200,6 +202,7 @@ FeatureFlagButton.propTypes = {
   displayName: string,
   disableDefaults: bool,
   appliesTo: string,
+  onStateChange: func
 }
 
 export default React.memo(FeatureFlagButton)

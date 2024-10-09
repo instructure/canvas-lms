@@ -234,6 +234,11 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
       actions,
     } = this.props
     const developer_key = {...this.developerKey}
+
+    if (!developer_key.redirect_uris?.trim()) {
+      delete developer_key.redirect_uris
+    }
+
     if (!this.hasRedirectUris && !this.isUrlConfig) {
       $.flashError(I18n.t('A redirect_uri is required, please supply one.'))
       this.setState({submitted: true})

@@ -34,8 +34,8 @@ module Lti
         "use" => "sig"
       }
     end
-    let(:tool_configuration) { described_class.new(settings:) }
-    let(:developer_key) { DeveloperKey.create }
+    let(:tool_configuration) { described_class.new(settings:).tap { |tc| tc.developer_key = developer_key } }
+    let(:developer_key) { DeveloperKey.create!(is_lti_key: true, public_jwk_url: "https://example.com") }
 
     def make_placement(type, message_type, extra = {})
       {
@@ -53,7 +53,6 @@ module Lti
 
       context "when valid" do
         before do
-          tool_configuration.developer_key = developer_key
           tool_configuration.disabled_placements = ["account_navigation"]
         end
 
@@ -89,10 +88,6 @@ module Lti
       end
 
       context "with non-matching schema" do
-        before do
-          tool_configuration.developer_key = developer_key
-        end
-
         context "a missing target_link_uri" do
           let(:settings) do
             s = super()
@@ -147,7 +142,6 @@ module Lti
 
       context 'when "settings" is blank' do
         before do
-          tool_configuration.developer_key = developer_key
           tool_configuration.settings = nil
         end
 
@@ -161,8 +155,6 @@ module Lti
       end
 
       context "when the settings are invalid" do
-        before { tool_configuration.developer_key = developer_key }
-
         context "when no URL or domain is set" do
           before do
             settings.delete("target_link_uri")
@@ -189,7 +181,6 @@ module Lti
 
       context "when one of the configured placements has an unsupported message_type" do
         before do
-          tool_configuration.developer_key = developer_key
           tool_configuration.settings["extensions"].first["settings"]["placements"] = [
             {
               "placement" => "account_navigation",
@@ -213,10 +204,6 @@ module Lti
           sets
         end
 
-        before do
-          tool_configuration.developer_key = developer_key
-        end
-
         it { is_expected.to be true }
       end
 
@@ -226,10 +213,6 @@ module Lti
           s.delete("public_jwk")
           s["public_jwk_url"] = "https://test.com"
           s
-        end
-
-        before do
-          tool_configuration.developer_key = developer_key
         end
 
         it { is_expected.to be true }
@@ -243,10 +226,6 @@ module Lti
           s
         end
 
-        before do
-          tool_configuration.developer_key = developer_key
-        end
-
         it { is_expected.to be true }
       end
 
@@ -258,17 +237,11 @@ module Lti
           s
         end
 
-        before do
-          tool_configuration.developer_key = developer_key
-        end
-
         it { is_expected.to be false }
       end
 
       context "when oidc_initiation_urls is not an hash" do
         let(:settings) { super().tap { |s| s["oidc_initiation_urls"] = ["https://test.com"] } }
-
-        before { tool_configuration.developer_key = developer_key }
 
         it { is_expected.to be false }
       end
@@ -276,15 +249,11 @@ module Lti
       context "when oidc_initiation_urls values are not urls" do
         let(:settings) { super().tap { |s| s["oidc_initiation_urls"] = { "us-east-1" => "@?!" } } }
 
-        before { tool_configuration.developer_key = developer_key }
-
         it { is_expected.to be false }
       end
 
       context "when oidc_initiation_urls values are urls" do
         let(:settings) { super().tap { |s| s["oidc_initiation_urls"] = { "us-east-1" => "http://example.com" } } }
-
-        before { tool_configuration.developer_key = developer_key }
 
         it { is_expected.to be true }
       end
@@ -323,10 +292,6 @@ module Lti
       let(:unified_tool_id) { "unified_tool_id_12345" }
 
       subject { tool_configuration }
-
-      before do
-        tool_configuration.developer_key = developer_key
-      end
 
       context "update_unified_tool_id FF is on" do
         before do
@@ -397,12 +362,11 @@ module Lti
     end
 
     describe "#new_external_tool" do
-      subject { tool_configuration.new_external_tool(context) }
+      subject { tool_configuration.developer_key.lti_registration.new_external_tool(context) }
 
       let(:extensions) { settings["extensions"].first }
 
       before do
-        tool_configuration.developer_key = developer_key
         extensions["privacy_level"] = "public"
       end
 
@@ -448,9 +412,9 @@ module Lti
         end
 
         context "when existing_tool is provided" do
-          subject { tool_configuration.new_external_tool(context, existing_tool:) }
+          subject { tool_configuration.developer_key.lti_registration.new_external_tool(context, existing_tool:) }
 
-          let(:existing_tool) { tool_configuration.new_external_tool(context) }
+          let(:existing_tool) { tool_configuration.developer_key.lti_registration.new_external_tool(context) }
 
           context "and existing tool is disabled" do
             let(:state) { "disabled" }
@@ -535,7 +499,7 @@ module Lti
         end
 
         context "placements" do
-          subject { tool_configuration.new_external_tool(context).settings["course_navigation"] }
+          subject { tool_configuration.developer_key.lti_registration.new_external_tool(context).settings["course_navigation"] }
 
           let(:placement_settings) { extensions["settings"]["placements"].first }
 
@@ -569,7 +533,7 @@ module Lti
         end
 
         context "with non-canvas extensions in settings" do
-          subject { tool_configuration.new_external_tool(context) }
+          subject { tool_configuration.developer_key.lti_registration.new_external_tool(context) }
 
           let(:settings) do
             sets = super()
@@ -597,7 +561,7 @@ module Lti
             tool_configuration.save!
           end
 
-          subject { tool_configuration.new_external_tool(context) }
+          subject { tool_configuration.developer_key.lti_registration.new_external_tool(context) }
 
           it "includes the oidc_initiation_urls in the new tool settings" do
             expect(subject.settings["oidc_initiation_urls"]).to eq oidc_initiation_urls
@@ -780,7 +744,6 @@ module Lti
       subject { tool_configuration.verify_placements }
 
       before do
-        tool_configuration.developer_key = developer_key
         tool_configuration.save!
       end
 
@@ -892,8 +855,6 @@ module Lti
       let(:extension_privacy_level) { "name_only" }
       let(:privacy_level) { raise "set in examples" }
       let(:extensions) { settings["extensions"].first }
-
-      before { tool_configuration.developer_key = developer_key }
 
       context "when nil" do
         let(:privacy_level) { nil }

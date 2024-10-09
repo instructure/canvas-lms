@@ -16,7 +16,7 @@ inherit_gem:
   - rubocop-rspec.yml
 
 AllCops:
-  TargetRubyVersion: 3.1
+  TargetRubyVersion: 3.3
 
 Bundler:
   Severity: error
@@ -98,6 +98,8 @@ Rails:
   Exclude:
     - "bin/**/*"
     - "gems/google_drive/**/*"
+Rails/ActionControllerFlashBeforeRender:
+  AutoCorrect: false # auto-correct just changes it to `flash.now`, when that may not be appropriate
 Rails/ApplicationRecord:
   Enabled: false # we never bothered creating an ApplicationRecord
 Rails/Blank:
@@ -125,6 +127,8 @@ Rails/I18nLocaleTexts:
   Exclude:
     - spec/**/*.rb
     - "**/spec_canvas/**/*.rb"
+Rails/InverseOf:
+  IgnoreScopes: true # config.active_record.automatic_scope_inversing is enabled
 Rails/NegateInclude:
   Enabled: false # exclude? isn't as intuitive as !include?
 Rails/Output:
@@ -223,10 +227,6 @@ GraphQL/FieldName:
   AutoCorrect: false
 GraphQL/MultipleFieldDefinitions:
   AutoCorrect: false
-GraphQL/OrderedArguments:
-  AutoCorrect: false
-GraphQL/OrderedFields:
-  AutoCorrect: false
 GraphQL/UnusedArgument:
   AutoCorrect: false
 
@@ -260,9 +260,6 @@ Naming/VariableName:
 Naming/VariableNumber:
   Enabled: false
 
-Rails/ActionControllerFlashBeforeRender:
-  Severity: convention
-  AutoCorrect: false
 Rails/ActionOrder:
   Severity: convention
   AutoCorrect: false
@@ -285,17 +282,12 @@ Rails/EagerEvaluationLogMessage:
 Rails/FindEach:
   Severity: convention
   AutoCorrect: false
-Rails/InverseOf:
-  Severity: convention
 Rails/LexicallyScopedActionFilter:
   Severity: convention
 Rails/OutputSafety:
   Severity: convention
 Rails/RakeEnvironment:
   Severity: convention
-  AutoCorrect: false
-Rails/ReadWriteAttribute:
-  Enabled: false # accessors are often defined in terms of read_attribute
   AutoCorrect: false
 Rails/TimeZone:
   Enabled: false
@@ -315,18 +307,12 @@ RSpec/Be:
   Severity: convention
 RSpec/BeforeAfterAll:
   Severity: convention
-RSpec/ContextMethod:
-  Severity: convention
-  AutoCorrect: false
 RSpec/ContextWording:
   Enabled: false
 RSpec/DescribeClass:
   Enabled: false
 RSpec/DescribeMethod:
   Severity: convention
-RSpec/ExpectActual:
-  Severity: convention
-  AutoCorrect: false
 RSpec/ExpectChange:
   Enabled: false
   AutoCorrect: false

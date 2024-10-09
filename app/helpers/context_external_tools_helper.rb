@@ -55,6 +55,7 @@ module ContextExternalToolsHelper
       "data-tool-launch-method" => tool.fetch(:launch_method, ""),
     }
 
+    link_attrs[:id] = options[:link_id] if options[:link_id]
     link_attrs[:class] = options[:link_class] if options[:link_class]
     if options[:show_icon]
       rendered_icon = render(partial: "external_tools/helpers/icon", locals: { tool: })

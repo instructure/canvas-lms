@@ -24,11 +24,11 @@ module Types
 
     implements GraphQL::Types::Relay::Node
 
-    field :id, ID, null: false
-    field :name, String, null: false
     field :avatar_url, String, null: false
-    field :user_count, Int, null: true
+    field :id, ID, null: false
     field :item_count, Int, null: true
+    field :name, String, null: false
     field :permissions, MessagePermissionsType, null: true
+    field :user_count, Int, null: true
   end
 end

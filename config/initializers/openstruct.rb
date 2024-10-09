@@ -57,5 +57,5 @@ if RUBY_VERSION >= "3.0.0"
     end
   end
 
-  OpenStruct.prepend(OpenStructOverrides)
+  OpenStruct.prepend(OpenStructOverrides) # rubocop:disable Style/OpenStructUse
 end

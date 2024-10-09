@@ -26,9 +26,6 @@ end
 
 CanvasRails::Application.routes.draw do
   post "/api/graphql", to: "graphql#execute"
-  post "/api/graphql/subgraph", to: "graphql#subgraph_execute"
-  # The subgraph endpoint is for use only with the federated API Gateway. See
-  # `app/graphql/README.md` for details.
   get "graphiql", to: "graphql#graphiql"
 
   resources :submissions, only: [] do
@@ -883,6 +880,7 @@ CanvasRails::Application.routes.draw do
   get "login/microsoft/:id" => "login/microsoft#new", :as => :microsoft_login
   get "login/openid_connect" => "login/openid_connect#new"
   get "login/openid_connect/:id" => "login/openid_connect#new", :as => :openid_connect_login
+  post "login/openid_connect/logout" => "login/openid_connect#destroy", :as => :openid_connect_logout
   get "login/twitter" => "login/twitter#new", :as => :twitter_login
 
   get "login/otp" => "login/otp#new", :as => :otp_login
@@ -1948,7 +1946,7 @@ CanvasRails::Application.routes.draw do
       delete "files/:id", action: :destroy
       put "files/:id", action: :api_update
       post "files/:id/reset_verifier", action: :reset_verifier
-      get "rce_linked_file_instfs_ids", action: :rce_linked_file_instfs_ids
+      post "rce_linked_file_instfs_ids", action: :rce_linked_file_instfs_ids
 
       # exists as an alias of GET for backwards compatibility
       #

@@ -104,5 +104,43 @@ class AssignmentPage
       row_elements = f(".assignment_dates").find_elements(:tag_name, "tr")
       row_elements.detect { |i| i.text.include?(row_item) }
     end
+
+    def row_elements
+      f(".assignment_dates tbody").find_elements(:tag_name, "tr")
+    rescue Selenium::WebDriver::Error::NoSuchElementError # rubocop:disable Specs/NoNoSuchElementError
+      []
+    end
+
+    def retrieve_overrides_count
+      row_elements.count
+    end
+
+    def retrieve_all_overrides
+      overrides = []
+      row_elements.map do |row|
+        data_cells = row.find_elements(:tag_name, "td")
+
+        values = data_cells.map do |cell|
+          inner_span = cell.find_element(:css, 'span[aria-hidden="true"]')
+          inner_span.text
+        rescue Selenium::WebDriver::Error::NoSuchElementError # rubocop:disable Specs/NoNoSuchElementError
+          cell.text
+        end
+        overrides.push(values)
+      end
+      overrides
+    end
+
+    def retrieve_all_overrides_formatted
+      overrides = retrieve_all_overrides
+      overrides.map do |override|
+        {
+          due_at: override[0],
+          due_for: override[1],
+          unlock_at: override[2],
+          lock_at: override[3]
+        }
+      end
+    end
   end
 end

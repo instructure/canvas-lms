@@ -409,7 +409,7 @@ class RubricAssociation < ActiveRecord::Base
   def hide_points(user = nil)
     return true if restrict_quantitative_data?(user)
 
-    read_attribute(:hide_points)
+    super()
   end
 
   private

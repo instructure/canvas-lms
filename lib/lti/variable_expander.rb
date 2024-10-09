@@ -41,14 +41,14 @@ module Lti
                   :variable_whitelist,
                   :variable_blacklist
 
-    def self.register_expansion(name, permission_groups, expansion_proc, *guards, **kwargs)
+    def self.register_expansion(name, permission_groups, expansion_proc, *guards, **)
       @expansions ||= {}
       @expansions[:"$#{name}"] = VariableExpansion.new(
         name,
         permission_groups,
         expansion_proc,
         *([-> { Lti::AppUtil.allowed?(name, @variable_whitelist, @variable_blacklist) }] + guards),
-        **kwargs
+        **
       )
     end
 

@@ -33,7 +33,7 @@ import DirectShareCourseTray from '@canvas/direct-sharing/react/components/Direc
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import {ltiState} from '@canvas/lti/jquery/messages'
-import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 
@@ -253,7 +253,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
         block_editor_attributes: this.createNewPageWithBlockEditor
           ? {
               version: '1',
-              blocks: [{data: undefined}],
+              blocks: undefined,
             }
           : null,
       },
@@ -372,7 +372,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     const handleTrayExited = () => ReactDOM.unmountComponentAtNode(this.$assignToMountPoint[0])
 
     ReactDOM.render(
-      <ItemAssignToTray
+      <ItemAssignToManager
         open={open}
         onClose={handleTrayClose}
         onDismiss={handleTrayClose}

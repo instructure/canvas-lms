@@ -27,6 +27,7 @@ module Lti
 
     before_save :normalize_configuration
     before_save :update_privacy_level_from_extensions
+    before_save :update_lti_registration
 
     after_update :update_external_tools!, if: :update_external_tools?
 
@@ -45,24 +46,6 @@ module Lti
     alias_attribute :configuration, :settings
     alias_method :configuration_url, :settings_url
     alias_method :configuration_url=, :settings_url=
-
-    def new_external_tool(context, existing_tool: nil)
-      # disabled tools should stay disabled while getting updated
-      # deleted tools are never updated during a dev key update so can be safely ignored
-      tool_is_disabled = existing_tool&.workflow_state == ContextExternalTool::DISABLED_STATE
-
-      tool = existing_tool || ContextExternalTool.new(context:)
-      Importers::ContextExternalToolImporter.import_from_migration(
-        importable_configuration,
-        context,
-        nil,
-        tool,
-        false
-      )
-      tool.developer_key = developer_key
-      tool.workflow_state = (tool_is_disabled && ContextExternalTool::DISABLED_STATE) || privacy_level || DEFAULT_PRIVACY_LEVEL
-      tool
-    end
 
     def self.create_tool_config_and_key!(account, tool_configuration_params)
       settings = if tool_configuration_params[:settings_url].present? && tool_configuration_params[:settings].blank?
@@ -157,6 +140,10 @@ module Lti
       warnings
     end
 
+    def importable_configuration
+      configuration&.merge(canvas_extensions)&.merge(configuration_to_cet_settings_map)
+    end
+
     private
 
     def self.retrieve_and_extract_configuration(url)
@@ -186,6 +173,11 @@ module Lti
       developer_key.update_external_tools!
     end
 
+    def update_lti_registration
+      self.lti_registration_id = developer_key&.lti_registration_id if developer_key
+      true
+    end
+
     def validate_configuration
       if configuration["public_jwk"].blank? && configuration["public_jwk_url"].blank?
         errors.add(:lti_key, "tool configuration must have public jwk or public jwk url")
@@ -196,12 +188,7 @@ module Lti
       end
       schema_errors = Schemas::Lti::ToolConfiguration.simple_validation_first_error(configuration.compact)
       errors.add(:configuration, schema_errors) if schema_errors.present?
-      return false if errors[:configuration].present?
-
-      tool = new_external_tool(developer_key.owner_account)
-      unless tool.valid?
-        errors.add(:configuration, tool.errors.to_h.map { |k, v| "Tool #{k} #{v}" })
-      end
+      false if errors[:configuration].present?
     end
 
     def validate_placements
@@ -230,10 +217,6 @@ module Lti
       end
     rescue CanvasHttp::Error, URI::Error, ArgumentError
       errors.add(:configuration, "oidc_initiation_urls must be valid urls")
-    end
-
-    def importable_configuration
-      configuration&.merge(canvas_extensions)&.merge(configuration_to_cet_settings_map)
     end
 
     def configuration_to_cet_settings_map

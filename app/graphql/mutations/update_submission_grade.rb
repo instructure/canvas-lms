@@ -21,8 +21,8 @@
 class Mutations::UpdateSubmissionGrade < Mutations::BaseMutation
   graphql_name "UpdateSubmissionsGrade"
 
-  argument :submission_id, ID, required: true
   argument :score, Int, required: true
+  argument :submission_id, ID, required: true
 
   field :submission, Types::SubmissionType, null: true
   def resolve(input:)

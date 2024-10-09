@@ -54,10 +54,15 @@ module Types
       graphql_name "PeerReviews"
       description "Settings for Peer Reviews on an Assignment"
 
-      field :enabled,
+      field :anonymous_reviews,
             Boolean,
-            "Boolean indicating if peer reviews are required for this assignment",
-            method: :peer_reviews,
+            "Boolean representing whether or not peer reviews are anonymous",
+            method: :anonymous_peer_reviews,
+            null: true
+      field :automatic_reviews,
+            Boolean,
+            "Boolean indicating peer reviews are assigned automatically. If false, the teacher is expected to manually assign peer reviews.",
+            method: :automatic_peer_reviews,
             null: true
       field :count,
             Int,
@@ -69,20 +74,15 @@ module Types
             "Date and Time representing when the peer reviews are due",
             method: :peer_reviews_due_at,
             null: true
+      field :enabled,
+            Boolean,
+            "Boolean indicating if peer reviews are required for this assignment",
+            method: :peer_reviews,
+            null: true
       field :intra_reviews,
             Boolean,
             "Boolean representing whether or not members from within the same group on a group assignment can be assigned to peer review their own group's work",
             method: :intra_group_peer_reviews,
-            null: true
-      field :anonymous_reviews,
-            Boolean,
-            "Boolean representing whether or not peer reviews are anonymous",
-            method: :anonymous_peer_reviews,
-            null: true
-      field :automatic_reviews,
-            Boolean,
-            "Boolean indicating peer reviews are assigned automatically. If false, the teacher is expected to manually assign peer reviews.",
-            method: :automatic_peer_reviews,
             null: true
     end
 
@@ -95,13 +95,13 @@ module Types
             "Boolean indicating if the assignment is moderated.",
             method: :moderated_grading,
             null: true
-      field :grader_count,
-            Int,
-            "The maximum number of provisional graders who may issue grades for this assignment.",
-            null: true
       field :grader_comments_visible_to_graders,
             Boolean,
             "Boolean indicating if provisional graders' comments are visible to other provisional graders.",
+            null: true
+      field :grader_count,
+            Int,
+            "The maximum number of provisional graders who may issue grades for this assignment.",
             null: true
       field :grader_names_visible_to_final_grader,
             Boolean,
@@ -125,9 +125,13 @@ module Types
       graphql_name "AssignmentScoreStatistic"
       description "Statistics for an Assignment"
 
-      field :minimum,
+      field :count,
+            Int,
+            "The number of scores for the assignment",
+            null: true
+      field :lower_q,
             Float,
-            "The minimum score for the assignment",
+            "The lower quartile score for the assignment",
             null: true
       field :maximum,
             Float,
@@ -137,17 +141,13 @@ module Types
             Float,
             "The mean score for the assignment",
             null: true
-      field :count,
-            Int,
-            "The number of scores for the assignment",
-            null: true
-      field :lower_q,
-            Float,
-            "The lower quartile score for the assignment",
-            null: true
       field :median,
             Float,
             "The median score for the assignment",
+            null: true
+      field :minimum,
+            Float,
+            "The minimum score for the assignment",
             null: true
       field :upper_q,
             Float,
@@ -156,17 +156,16 @@ module Types
     end
 
     global_id_field :id
-    key_field_id
 
     field :name, String, null: true
 
-    field :position,
-          Int,
-          "determines the order this assignment is displayed in in its assignment group",
-          null: true
     field :points_possible,
           Float,
           "the assignment is out of this many points",
+          null: true
+    field :position,
+          Int,
+          "determines the order this assignment is displayed in in its assignment group",
           null: true
 
     field :restrict_quantitative_data, Boolean, "Is the current user restricted from viewing quantitative data", null: true do
@@ -226,22 +225,23 @@ module Types
     field :anonymous_grading,
           Boolean,
           null: true
-    field :omit_from_final_grade,
-          Boolean,
-          "If true, the assignment will be omitted from the student's final grade",
-          null: true
     field :anonymous_instructor_annotations, Boolean, null: true
-    field :has_submitted_submissions,
-          Boolean,
-          "If true, the assignment has been submitted to by at least one student",
-          method: :has_submitted_submissions?,
-          null: true
+    field :can_duplicate, Boolean, method: :can_duplicate?, null: true
     field :graded_submissions_exist,
           Boolean,
           "If true, the assignment has at least one graded submission",
           method: :graded_submissions_exist?,
           null: true
-    field :can_duplicate, Boolean, method: :can_duplicate?, null: true
+    field :has_multiple_due_dates, Boolean, method: :multiple_distinct_due_dates?, null: true
+    field :has_submitted_submissions,
+          Boolean,
+          "If true, the assignment has been submitted to by at least one student",
+          method: :has_submitted_submissions?,
+          null: true
+    field :omit_from_final_grade,
+          Boolean,
+          "If true, the assignment will be omitted from the student's final grade",
+          null: true
 
     field :grade_group_students_individually,
           Boolean,
@@ -249,18 +249,18 @@ module Types
           null: true
     field :group_category_id, Int, null: true
 
-    field :time_zone_edited, String, null: true
-    field :in_closed_grading_period, Boolean, method: :in_closed_grading_period?, null: true
-    field :anonymize_students, Boolean, method: :anonymize_students?, null: true
-    field :submissions_downloads, Int, null: true
-    field :expects_submission, Boolean, method: :expects_submission?, null: true
-    field :expects_external_submission, Boolean, method: :expects_external_submission?, null: true
-    field :non_digital_submission, Boolean, method: :non_digital_submission?, null: true
     field :allow_google_docs_submission, Boolean, method: :allow_google_docs_submission?, null: true
+    field :anonymize_students, Boolean, method: :anonymize_students?, null: true
+    field :expects_external_submission, Boolean, method: :expects_external_submission?, null: true
+    field :expects_submission, Boolean, method: :expects_submission?, null: true
     field :important_dates, Boolean, null: true
+    field :in_closed_grading_period, Boolean, method: :in_closed_grading_period?, null: true
+    field :non_digital_submission, Boolean, method: :non_digital_submission?, null: true
+    field :submissions_downloads, Int, null: true
+    field :time_zone_edited, String, null: true
 
-    field :due_date_required, Boolean, method: :due_date_required?, null: true
     field :can_unpublish, Boolean, method: :can_unpublish?, null: true
+    field :due_date_required, Boolean, method: :due_date_required?, null: true
 
     field :originality_report_visibility, String, null: true
     def originality_report_visibility
@@ -277,6 +277,13 @@ module Types
     field :rubric_association, RubricAssociationType, null: true
     def rubric_association
       assignment.active_rubric_association? ? load_association(:rubric_association) : nil
+    end
+
+    field :rubric_update_url, String, null: true
+    def rubric_update_url
+      return nil unless assignment.active_rubric_association?
+
+      "/courses/#{assignment.context_id}/rubric_associations/#{assignment.rubric_association.id}/assessments" if assignment.rubric_association
     end
 
     def lock_info
@@ -319,7 +326,19 @@ module Types
       load_association(:quiz)
     end
 
-    field :supports_grade_by_question, Boolean, method: :supports_grade_by_question?, null: false
+    field :supports_grade_by_question, Boolean, null: false
+    def supports_grade_by_question
+      Promise.all([load_association(:quiz), load_association(:external_tool_tag)]).then do
+        assignment.supports_grade_by_question?
+      end
+    end
+
+    field :grade_by_question_enabled, Boolean, null: false
+    def grade_by_question_enabled
+      supports_grade_by_question.then do |supported|
+        supported && current_user.present? && current_user.grade_by_question_in_speedgrader?
+      end
+    end
 
     field :discussion, Types::DiscussionType, null: true
     def discussion

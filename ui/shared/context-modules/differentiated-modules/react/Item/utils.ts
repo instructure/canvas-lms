@@ -36,6 +36,30 @@ type UseDatesHookArgs = {
   cardId: string
   onCardDatesChange?: (cardId: string, dateAttribute: string, dateValue: string | null) => void
 }
+type Override = {
+  id: string
+  assignment_id: string
+  title: string
+  due_at: string | null
+  all_day: boolean
+  all_day_date: string | null
+  unlock_at: string
+  lock_at: string
+  unassign_item: boolean
+  student_ids: string[]
+  students: Student[]
+  sub_assignment_due_dates: SubAssignmentDueDate[]
+}
+
+type SubAssignmentDueDate = {
+  sub_assignment_tag: string
+  due_at: string | null
+}
+
+type Student = {
+  id: string
+  name: string
+}
 
 type UseDatesHookResult = [
   // requiredRepliesDueDate
@@ -441,4 +465,11 @@ export const generateCardActionLabels = (selected: string[]) => {
         }),
       }
   }
+}
+
+export const getDueAtForCheckpointTag = (override: Override, checkpointTag: String) => {
+  return override.sub_assignment_due_dates
+    ? override.sub_assignment_due_dates.find(item => item.sub_assignment_tag === checkpointTag)
+        ?.due_at || null
+    : null
 }

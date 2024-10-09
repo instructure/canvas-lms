@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {type Node} from '@craftjs/core'
+import {ROOT_NODE} from '@craftjs/utils'
+
 const getToolbarPos = (
   domNode: HTMLElement | null,
   mountPoint: HTMLElement,
@@ -63,4 +66,21 @@ const getMenuPos = (
   return {top, left}
 }
 
-export {getToolbarPos, getMenuPos}
+const findUpNode = (node: Node, query: any): Node | undefined => {
+  let upnode = node.data.parent ? query.node(node.data.parent).get() : undefined
+  while (upnode && upnode.data.parent && upnode.data.custom?.noToolbar) {
+    upnode = upnode.data.parent ? query.node(upnode.data.parent).get() : undefined
+  }
+  return upnode && upnode.id !== ROOT_NODE ? upnode : undefined
+}
+
+const findContainingSection = (node: Node, query: any): Node | undefined => {
+  if (node.data.custom?.isSection) return node
+  let upnode = findUpNode(node, query)
+  while (upnode && !upnode.data.custom?.isSection) {
+    upnode = findUpNode(upnode, query)
+  }
+  return upnode && upnode.data.custom?.isSection ? upnode : undefined
+}
+
+export {getToolbarPos, getMenuPos, findUpNode, findContainingSection}

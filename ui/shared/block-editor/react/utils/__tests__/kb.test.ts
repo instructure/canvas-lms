@@ -26,6 +26,8 @@ import {
   shouldAddNewNode,
   removeTrailingEmptyParagraphTags,
   shouldDeleteNode,
+  getArrowNext,
+  getArrowPrev,
 } from '../kb'
 
 const makeKeyboardEvent = (opts = {}) => {
@@ -269,5 +271,29 @@ describe('keyboard utilities', () => {
 
   describe('deleteNodeAndSelecctPrevSibling', () => {
     // requires mocking to much of craft.js
+  })
+
+  describe('getArrowNext', () => {
+    it('should return ArrowDown and ArrowRight if the document is LTR', () => {
+      document.documentElement.dir = 'ltr'
+      expect(getArrowNext()).toEqual(['ArrowDown', 'ArrowRight'])
+    })
+
+    it('should return ArrowDown and ArrowLeft if the document is RTL', () => {
+      document.documentElement.dir = 'rtl'
+      expect(getArrowNext()).toEqual(['ArrowDown', 'ArrowLeft'])
+    })
+  })
+
+  describe('getArrowPrev', () => {
+    it('should return ArrowUp and ArrowLeft if the document is LTR', () => {
+      document.documentElement.dir = 'ltr'
+      expect(getArrowPrev()).toEqual(['ArrowUp', 'ArrowLeft'])
+    })
+
+    it('should return ArrowUp and ArrowRight if the document is RTL', () => {
+      document.documentElement.dir = 'rtl'
+      expect(getArrowPrev()).toEqual(['ArrowUp', 'ArrowRight'])
+    })
   })
 })

@@ -21,8 +21,8 @@
 class Mutations::CreateGroupInSet < Mutations::BaseMutation
   graphql_name "CreateGroupInSet"
 
-  argument :name, String, required: true
   argument :group_set_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("GroupSet")
+  argument :name, String, required: true
 
   field :group, Types::GroupType, null: true
 

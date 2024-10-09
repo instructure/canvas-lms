@@ -33,7 +33,7 @@
     <p><%= mt 'details.wrong_account', "The invitation for %{course} was sent to **%{invited_user}**, but you are currently logged in as **%{current_user}**", :course => @course.name, :invited_user => @user.name, :current_user => @current_user.name %></p>
     <div class="button_box ic-Login-confirmation__actions">
       <a href="<%= registration_confirmation_path(@nonce, :enrollment => @enrollment.uuid, :transfer_enrollment => 1) %>" class="btn" id='transfer'><%=  t 'buttons.transfer_enrollment', "Transfer Enrollment" %></a>
-      <a href="<%= login_url(:enrollment => @enrollment.uuid, :pseudonym_session => { :unique_id => @user.pseudonym.try(:unique_id) }, :expected_user_id => @user.id) %>" class="btn" id="login"><%=  t 'buttons.login_as', "Log in as %{invited_user}", :invited_user => @user.name %></a>
+      <a href="<%= login_url(:enrollment => @enrollment.uuid, :login_hint => @user.pseudonym.try(:unique_id), :expected_user_id => @user.id) %>" class="btn" id="login"><%=  t 'buttons.login_as', "Log in as %{invited_user}", :invited_user => @user.name %></a>
     </div>
   <% elsif !@merge_opportunities.empty? %>
     <div class="disambiguation_box" <%= hidden(true) if params[:register] %>>

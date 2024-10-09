@@ -393,6 +393,18 @@ export type TurnitinAsset = {
   public_error_message?: string
 }
 
+export type SubAssignmentSubmission = {
+  grade: string | null
+  score: number | null
+  published_grade: string | null
+  published_score: string | null
+  grade_matches_current_submission: boolean
+  sub_assignment_tag: string
+  entered_grade: string | null
+  entered_score: number | null
+  excused: boolean
+}
+
 export type Submission = Readonly<{
   anonymous_id?: string
   assignment_id: string
@@ -425,6 +437,7 @@ export type Submission = Readonly<{
   versioned_attachments?: any
   word_count: null | number
   workflow_state: WorkflowState
+  sub_assignment_submissions?: SubAssignmentSubmission[]
 }> & {
   assignedAssessments?: AssignedAssessments[]
   attempt?: number

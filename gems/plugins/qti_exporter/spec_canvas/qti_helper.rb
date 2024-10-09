@@ -31,8 +31,8 @@ unless defined? BASE_FIXTURE_DIR
   HTML_SANITIZATION_FIXTURE_DIR = BASE_FIXTURE_DIR + "html_sanitization/"
 end
 
-def get_question_hash(dir, name, delete_answer_ids: true, **opts)
-  hash = get_quiz_data(dir, name, **opts).first.first
+def get_question_hash(dir, name, delete_answer_ids: true, **)
+  hash = get_quiz_data(dir, name, **).first.first
   hash[:answers].each { |a| a.delete(:id) } if delete_answer_ids
   hash
 end

@@ -60,7 +60,7 @@ module Factories
       name: "value for name",
       group_weighting_scheme: "value for group_weighting_scheme",
       start_at: Time.now,
-      conclude_at: Time.now + 100,
+      conclude_at: 100.seconds.from_now,
       is_public: true,
       allow_student_wiki_edits: true,
     }

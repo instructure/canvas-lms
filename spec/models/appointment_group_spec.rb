@@ -677,7 +677,7 @@ describe AppointmentGroup do
     expect(@ag.instructors).to match_array([unrestricted_teacher, limited_teacher2])
   end
 
-  context "#requiring_action?" do
+  describe "#requiring_action?" do
     before :once do
       course_with_teacher(active_all: true)
       @teacher = @user

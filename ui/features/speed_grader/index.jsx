@@ -23,16 +23,17 @@ import {captureException} from '@sentry/browser'
 import {Spinner} from '@instructure/ui-spinner'
 import ready from '@instructure/ready'
 
-import {getAssignment} from './queries/assignmentQuery'
-import {getCourse} from './queries/courseQuery'
-import {getSectionsByAssignment} from './queries/sectionsByAssignmentQuery'
+import {getAssignment} from './queries/getAssignment'
+import {getCourse} from './queries/getCourse'
+import {getAssignmentSections} from './queries/getAssignmentSections'
 import {getSubmission} from './queries/submissionQuery'
-import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery'
-import {getSubmissionsByStudentIds} from './queries/submissionsByStudentsIdsQuery'
-import {getAssignmentsByCourseId} from './queries/assignmentsByCourseIdQuery'
-import {getEnrollmentsByCourse} from './queries/enrollmentsByCourseQuery'
-import {getCommentBankItems} from './queries/commentBankQuery'
+import {getAssignmentSubmissions} from './queries/getAssignmentSubmissions'
+import {getSubmissionsByStudents} from './queries/getSubmissionsByStudents'
+import {getCourseAssignments} from './queries/getCourseAssignments'
+import {getCourseEnrollments} from './queries/getCourseEnrollments'
+import {getCommentBankItems} from './queries/getCommentBankItems'
 
+import {updateSpeedGraderSettings} from './mutations/updateSpeedGraderSettingsMutation'
 import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
 import {createSubmissionComment} from './mutations/createSubmissionCommentMutation'
 import {hideAssignmentGradesForSections} from './mutations/hideAssignmentGradesForSectionsMutation'
@@ -46,93 +47,23 @@ import {
 import {createCommentBankItem} from './mutations/comment_bank/createCommentBankItemMutation'
 import {deleteCommentBankItem} from './mutations/comment_bank/deleteCommentBankItemMutation'
 import {updateCommentBankItem} from './mutations/comment_bank/updateCommentBankItemMutation'
+import {updateCommentSuggestionsEnabled} from './mutations/comment_bank/updateCommentSuggestionsEnabled'
+import {saveRubricAssessment} from './mutations/saveRubricAssessmentMutation'
+import {updateSubmissionSecondsLate} from './mutations/updateSubmissionSecondsLateMutation'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import {executeQuery} from '@canvas/query/graphql'
 import speedGrader from './jquery/speed_grader'
+import SGUploader from './sg_uploader'
 
 const I18n = useI18nScope('speed_grader')
 
 ready(() => {
-  // The feature must be enabled AND we must be handed the speedgrader platform URL
-  if (window.ENV.PLATFORM_SERVICE_SPEEDGRADER_ENABLED && window.REMOTES?.speedgrader) {
-    const mountPoint = document.querySelector('#react-router-portals')
-    const params = new URLSearchParams(window.location.search)
-    const postMessageAliases = {
-      'quizzesNext.register': 'tool.register',
-      'quizzesNext.nextStudent': 'tool.nextStudent',
-      'quizzesNext.previousStudent': 'tool.previousStudent',
-      'quizzesNext.submissionUpdate': 'tool.submissionUpdate',
-    }
+  const classicContainer = document.querySelector('#classic_speedgrader_container')
 
-    import('speedgrader/appInjector')
-      .then(module => {
-        module.render(mountPoint, {
-          queryFns: {
-            getAssignment,
-            getAssignmentsByCourseId,
-            getCourse,
-            getEnrollmentsByCourse,
-            getSectionsByAssignment,
-            getSubmission,
-            getSubmissionsByAssignment,
-            getSubmissionsByStudentIds,
-            getCommentBankItems,
-            resolvePostAssignmentGradesStatus,
-          },
-          mutationFns: {
-            updateSubmissionGrade,
-            createSubmissionComment,
-            deleteSubmissionComment,
-            hideAssignmentGradesForSections,
-            postAssignmentGradesForSections,
-            postDraftSubmissionComment,
-            updateSubmissionGradeStatus,
-            createCommentBankItem,
-            deleteCommentBankItem,
-            updateCommentBankItem,
-          },
-          postMessageAliases,
-          context: {
-            courseId: window.ENV.course_id,
-            userId: window.ENV.current_user_id,
-            assignmentId: params.get('assignment_id'),
-            studentId: params.get('student_id'),
-            hrefs: {
-              heroIcon: `/courses/${window.ENV.course_id}/gradebook`,
-            },
-            emojisDenyList: window.ENV.EMOJI_DENY_LIST ? window.ENV.EMOJI_DENY_LIST.split(',') : [],
-            mediaSettings: window.INST.kalturaSettings,
-            lang: window.navigator.language || ENV.LOCALE || ENV.BIGEASY_LOCALE,
-            themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES,
-            useHighContrast: window.ENV.use_high_contrast,
-          },
-          features: {
-            extendedSubmissionState: window.ENV.FEATURES.extended_submission_state,
-            gradeByQuestion: {
-              supported: window.ENV.GRADE_BY_QUESTION_SUPPORTED,
-              enabled: window.ENV.GRADE_BY_QUESTION,
-            },
-            emojisEnabled: !!window.ENV.EMOJIS_ENABLED,
-            commentLibraryEnabled: ENV.assignment_comment_library_feature_enabled,
-          },
-        })
-      })
-      .catch(error => {
-        // eslint-disable-next-line no-console
-        console.error('Failed to load SpeedGrader', error)
-        captureException(error)
-        ReactDOM.render(
-          <GenericErrorPage
-            imageUrl={errorShipUrl}
-            errorSubject={I18n.t('SpeedGrader loading error')}
-            errorCategory={I18n.t('SpeedGrader Error Page')}
-          />,
-          mountPoint
-        )
-      })
-  } else {
+  if (classicContainer instanceof HTMLElement) {
     // touch punch simulates mouse events for touch devices
     // eslint-disable-next-line import/extensions
     require('./touch_punch.js')
@@ -157,5 +88,114 @@ ready(() => {
       mountPoint
     )
     speedGrader.setup()
+    return
   }
+
+  const mountPoint = document.querySelector('#react-router-portals')
+
+  // The feature must be enabled AND we must be handed the speedgrader platform URL
+  if (!window.ENV.PLATFORM_SERVICE_SPEEDGRADER_ENABLED || !window.REMOTES?.speedgrader) {
+    ReactDOM.render(
+      <GenericErrorPage
+        imageUrl={errorShipUrl}
+        errorMessage={
+          <>
+            {window.ENV.PLATFORM_SERVICE_SPEEDGRADER_ENABLED ||
+              I18n.t('SpeedGrader Platform is not enabled')}
+            {window.REMOTES?.speedgrader || 'window.REMOTES?.speedgrader is missing'}
+          </>
+        }
+        errorSubject={I18n.t('SpeedGrader loading error')}
+        errorCategory={I18n.t('SpeedGrader Error Page')}
+      />,
+      mountPoint
+    )
+    return
+  }
+
+  const params = new URLSearchParams(window.location.search)
+  const postMessageAliases = {
+    'quizzesNext.register': 'tool.register',
+    'quizzesNext.nextStudent': 'tool.nextStudent',
+    'quizzesNext.previousStudent': 'tool.previousStudent',
+    'quizzesNext.submissionUpdate': 'tool.submissionUpdate',
+  }
+
+  const sgUploader = new SGUploader('any', {defaultTItle: 'Upload Media'})
+
+  import('speedgrader/appInjector')
+    .then(module => {
+      module.render(mountPoint, {
+        executeQuery,
+        queryFns: {
+          getAssignment,
+          getCourseAssignments,
+          getAssignmentSubmissions,
+          getCourse,
+          getCourseEnrollments,
+          getAssignmentSections,
+          getSubmission,
+          getSubmissionsByStudents,
+          getCommentBankItems,
+          resolvePostAssignmentGradesStatus,
+        },
+        mutationFns: {
+          updateSubmissionGrade,
+          createSubmissionComment,
+          deleteSubmissionComment,
+          hideAssignmentGradesForSections,
+          postAssignmentGradesForSections,
+          postDraftSubmissionComment,
+          updateSubmissionGradeStatus,
+          updateSubmissionSecondsLate,
+          createCommentBankItem,
+          deleteCommentBankItem,
+          updateCommentBankItem,
+          updateCommentSuggestionsEnabled,
+          updateSpeedGraderSettings,
+          postSubmissionCommentMedia: sgUploader?.doUploadByFile,
+          saveRubricAssessment,
+        },
+        platform: 'canvas',
+        postMessageAliases,
+        context: {
+          userId: window.ENV.current_user_id,
+          grading_role: window.ENV.grading_role,
+          assignmentId: params.get('assignment_id'),
+          studentId: params.get('student_id'),
+          hrefs: {
+            heroIcon: `/courses/${window.ENV.course_id}/gradebook`,
+          },
+          emojisDenyList: window.ENV.EMOJI_DENY_LIST ? window.ENV.EMOJI_DENY_LIST.split(',') : [],
+          mediaSettings: window.INST.kalturaSettings,
+          lang: window.navigator.language || ENV.LOCALE || ENV.BIGEASY_LOCALE,
+          currentUserIsAdmin: ENV.current_user_is_admin,
+          themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES,
+          useHighContrast: window.ENV.use_high_contrast,
+          commentLibrarySuggestionsEnabled: window.ENV.comment_library_suggestions_enabled,
+          lateSubmissionInterval: window.ENV.late_policy?.late_submission_interval || 'day',
+        },
+        features: {
+          extendedSubmissionState: window.ENV.FEATURES.extended_submission_state,
+          emojisEnabled: !!window.ENV.EMOJIS_ENABLED,
+          enhancedRubricsEnabled: window.ENV.ENHANCED_RUBRICS_ENABLED,
+          commentLibraryEnabled: window.ENV.COMMENT_LIBRARY_FEATURE_ENABLED,
+          restrictQuantitativeDataEnabled: window.ENV.RESTRICT_QUANTITATIVE_DATA_ENABLED,
+        },
+      })
+    })
+    .catch(error => {
+      // eslint-disable-next-line no-console
+      console.error('Failed to load SpeedGrader', error)
+      captureException(error)
+      ReactDOM.render(
+        <GenericErrorPage
+          imageUrl={errorShipUrl}
+          errorMessage={error.message}
+          errorSubject={I18n.t('SpeedGrader loading error')}
+          errorCategory={I18n.t('SpeedGrader Error Page')}
+        />,
+        mountPoint
+      )
+    })
 })

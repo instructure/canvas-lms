@@ -19,7 +19,6 @@
 import {z} from 'zod'
 import {executeQuery} from '@canvas/query/graphql'
 import gql from 'graphql-tag'
-import {SUBMISSION_FRAGMENT} from '../queries/submissionQuery'
 
 export const UPDATE_SUBMISSION_GRADE_STATUS = gql`
   mutation updateSubmissionGradeStatus(
@@ -36,17 +35,17 @@ export const UPDATE_SUBMISSION_GRADE_STATUS = gql`
       }
     ) {
       submission {
-        ...SubmissionInterfaceFragment
+        gradingStatus
       }
     }
   }
-  ${SUBMISSION_FRAGMENT}
 `
 
 export const ZUpdateSubmissionGradeStatusParams = z.object({
   submissionId: z.string(),
   latePolicyStatus: z.string().nullable(),
   customGradeStatusId: z.string().nullable(),
+  courseId: z.string().nullable(),
 })
 
 type UpdateSubmissionGradeStatusParams = z.infer<typeof ZUpdateSubmissionGradeStatusParams>
@@ -55,11 +54,13 @@ export async function updateSubmissionGradeStatus({
   submissionId,
   latePolicyStatus,
   customGradeStatusId,
+  courseId,
 }: UpdateSubmissionGradeStatusParams): Promise<any> {
   const result: any = await executeQuery(UPDATE_SUBMISSION_GRADE_STATUS, {
     submissionId,
     latePolicyStatus,
     customGradeStatusId,
+    courseId,
   })
 
   return result.createSubmissionComment.submission

@@ -34,6 +34,10 @@ export type LockInfoType = {
   isLocked: boolean
 }
 
+export type peerReviewsType = {
+  enabled: boolean
+}
+
 type SetType = {
   lid?: string
   name?: string
@@ -129,11 +133,13 @@ export type TeacherAssignmentType = {
   modules: ModuleType[]
   course: CourseType
   lockInfo: LockInfoType
+  peerReviews: peerReviewsType
   submissionTypes: string[]
   allowedExtensions: string[]
   allowedAttempts?: number
   anonymizeStudents?: boolean
   assignmentOverrides: AssignmentOverridesType
   hasSubmittedSubmissions: boolean
+  submissionsDownloads: number
   submissions: SubmissionsType
 }

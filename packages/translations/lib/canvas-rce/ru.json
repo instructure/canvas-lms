@@ -1048,6 +1048,7 @@
   },
   "styles_2aa721ef": { "message": "Стили" },
   "submit_a3cc6859": { "message": "Отправить" },
+  "submitting_b90fac62": { "message": "Выполняется отправка..." },
   "subscript_59744f96": { "message": "Надпись снизу" },
   "subset_19c1a92f": { "message": "Подмножество" },
   "subset_strict_8d8948d6": { "message": "Подмножество (жесткое)" },

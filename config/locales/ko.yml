@@ -6061,6 +6061,7 @@ ko:
     only_one_folder: "폴더 경로와 폴더 ID를 설정할 수 없음"
   for_all_devices_1f603968: "모든 기기"
   for_title_69d92b3a: "%{title}"
+  forgot_password_9098c30d: "암호 잊음"
   forward_d143f64: 전달
   from_fdd4956d: 시작
   from_from_to_to_e31f6422: "%{from}부터 %{to}까지"
@@ -13077,6 +13078,7 @@ ko:
   show_more_fae1328: "자세히 표시"
   showing_count_results_below_61ddca33: 
     zero: "결과가 없음"
+  sign_in_c6858e26: 로그인
   sign_up_dafdee18: 등록
   sis_batch: 
     errors: 
@@ -13226,6 +13228,7 @@ ko:
   statistics_for_course_f74c2a78: "%{course} 통계"
   status_e051bb30: 상태
   status_e7fdbe06: 상태
+  stay_signed_in_1853e9b6: "로그인 상태 유지"
   step: 단계
   strand_955969b1: 고립
   student_5da6bfd1: 학생
@@ -13918,6 +13921,7 @@ ko:
   upper_limit_of_range_c454a8f2: "범위의 상한"
   url_22a5f3b8: URL
   url_preview_5d1f4a4e: "URL 미리 보기"
+  use_this_same_grade_for_the_resubmission_eaa6bf55: "다시 제출한 것에 대해 같은 평점 사용"
   user: 
     default_user_name: 사용자
     errors: 

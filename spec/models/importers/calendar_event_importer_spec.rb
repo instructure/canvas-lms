@@ -97,7 +97,7 @@ describe Importers::CalendarEventImporter do
         title: "event title",
         description: "the event description",
         start_at: Time.now,
-        end_at: Time.now + 2.hours,
+        end_at: 2.hours.from_now,
         attachment_type: "external_url",
         attachment_value: "http://example.com"
       }

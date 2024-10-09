@@ -163,7 +163,8 @@ const thunkActions = {
                 updatedProgress.workflow_state !== 'completed' ? updatedProgress : undefined
               )
             )
-            dispatch(uiActions.clearCategoryError('checkPublishStatus'))
+            if (uiActions.clearCategoryError instanceof Function)
+              dispatch(uiActions.clearCategoryError('checkPublishStatus'))
             if (updatedProgress.workflow_state === 'completed') {
               showFlashAlert({
                 message: isUnpublishedNewPace

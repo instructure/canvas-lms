@@ -175,7 +175,7 @@ describe Quizzes::QuizSubmissionsController do
     it "returns the time left to finish a quiz" do
       user_session(@student)
       submission = @qs
-      submission.update_attribute(:end_at, Time.now + 1.hour)
+      submission.update_attribute(:end_at, 1.hour.from_now)
       Quizzes::QuizSubmission.where(id: submission).update_all(updated_at: 1.hour.ago)
 
       put "backup", params: { quiz_id: @quiz.id, course_id: @course.id, a: "test", validation_token: submission.validation_token }

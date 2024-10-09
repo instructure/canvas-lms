@@ -111,11 +111,11 @@ class ConversationBatch < ActiveRecord::Base
   end
 
   def recipient_ids
-    @recipient_ids ||= read_attribute(:recipient_ids).split(",").map(&:to_i)
+    @recipient_ids ||= super.split(",").map(&:to_i)
   end
 
   def recipient_ids=(ids)
-    write_attribute(:recipient_ids, ids.join(","))
+    super(ids.join(","))
   end
 
   def recipient_count
@@ -123,11 +123,11 @@ class ConversationBatch < ActiveRecord::Base
   end
 
   def conversation_message_ids
-    @conversation_message_ids ||= (read_attribute(:conversation_message_ids) || "").split(",").map(&:to_i)
+    @conversation_message_ids ||= (super || "").split(",").map(&:to_i)
   end
 
   def serialize_conversation_message_ids
-    write_attribute :conversation_message_ids, conversation_message_ids.join(",")
+    self["conversation_message_ids"] = conversation_message_ids.join(",")
   end
 
   def queue_delivery

@@ -24,6 +24,7 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
 import DefaultGradeInput from './DefaultGradeInput'
 import {
   ApiCallStatus,
@@ -34,6 +35,8 @@ import {
 } from '../../../types'
 import {isExcused} from '@canvas/grading/GradeInputHelper'
 import {useDefaultGrade, type DefaultGradeSubmissionParams} from '../../hooks/useDefaultGrade'
+import {assignmentHasCheckpoints} from '../../../utils/gradebookUtils'
+import {REPLY_TO_ENTRY, REPLY_TO_TOPIC} from '../GradingResults'
 
 const {Header: ModalHeader, Body: ModalBody} = Modal as any
 const I18n = useI18nScope('enhanced_individual_gradebook')
@@ -58,12 +61,20 @@ export default function DefaultGradeModal({
   const {contextUrl} = gradebookOptions
 
   const [gradeInput, setGradeInput] = useState<string>('')
+  const [replyToTopicInput, setReplyToTopicInput] = useState<string>('')
+  const [replyToEntryInput, setReplyToEntryInput] = useState<string>('')
   const [gradeOverwrite, setGradeOverwrite] = useState<boolean>(false)
   const {defaultGradeStatus, savedGrade, setGrades, updatedSubmissions, resetDefaultGradeStatus} =
     useDefaultGrade()
 
   const gradeIsMissing = (grade: string) => {
     return grade !== null && grade.toUpperCase() === 'MI'
+  }
+
+  const isCheckpointed = assignmentHasCheckpoints(assignment)
+
+  const getCheckpointSubmissions = submissions => {
+    return submissions.flatMap(submission => submission.subAssignmentSubmissions)
   }
 
   const setGradeSuccessText = useCallback(
@@ -116,32 +127,76 @@ export default function DefaultGradeModal({
       return
     }
 
-    if (isExcused(gradeInput)) {
-      showFlashError(
-        I18n.t('Default grade cannot be set to %{ex}', {
-          ex: 'EX',
-        })
-      )(new Error())
-      return
-    }
-
-    const gradeOrMissingParam = gradeIsMissing(gradeInput)
-      ? {late_policy_status: 'missing'}
-      : {grade: gradeInput}
-    const submissionsParams: DefaultGradeSubmissionParams = {
-      submissions: {},
-      dont_overwrite_grades: !gradeOverwrite,
-    }
-    submissions.forEach(submission => {
-      submissionsParams.submissions[`submission_${submission.userId}`] = {
-        assignment_id: submission.assignmentId,
-        user_id: submission.userId,
-        set_by_default_grade: true,
-        ...gradeOrMissingParam,
+    if (!isCheckpointed) {
+      if (isExcused(gradeInput)) {
+        showFlashError(
+          I18n.t('Default grade cannot be set to %{ex}', {
+            ex: 'EX',
+          })
+        )(new Error())
+        return
       }
-    })
 
-    await setGrades(contextUrl, gradeInput, submissionsParams)
+      const gradeOrMissingParam = gradeIsMissing(gradeInput)
+        ? {late_policy_status: 'missing'}
+        : {grade: gradeInput}
+      const submissionsParams: DefaultGradeSubmissionParams = {
+        submissions: {},
+        dont_overwrite_grades: !gradeOverwrite,
+      }
+      submissions.forEach(submission => {
+        submissionsParams.submissions[`submission_${submission.userId}`] = {
+          assignment_id: submission.assignmentId,
+          user_id: submission.userId,
+          set_by_default_grade: true,
+          ...gradeOrMissingParam,
+        }
+      })
+
+      await setGrades(contextUrl, gradeInput, submissionsParams)
+    } else {
+      if (isExcused(replyToTopicInput)) {
+        showFlashError(
+          I18n.t('Default grade for Reply to Topic cannot be set to %{ex}', {
+            ex: 'EX',
+          })
+        )(new Error())
+        return
+      }
+
+      if (isExcused(replyToEntryInput)) {
+        showFlashError(
+          I18n.t('Default grade for Required Replies cannot be set to %{ex}', {
+            ex: 'EX',
+          })
+        )(new Error())
+        return
+      }
+
+      const setDefaultForCheckpoint = async (tag: string, input: string) => {
+        const gradeOrMissingParam = () =>
+          gradeIsMissing(input) ? {late_policy_status: 'missing'} : {grade: input}
+
+        const submissionsParams: DefaultGradeSubmissionParams = {
+          submissions: {},
+          sub_assignment_tag: tag,
+          dont_overwrite_grades: !gradeOverwrite,
+        }
+        submissions.forEach(submission => {
+          submissionsParams.submissions[`submission_${submission.userId}`] = {
+            assignment_id: submission.assignmentId,
+            user_id: submission.userId,
+            set_by_default_grade: true,
+            ...gradeOrMissingParam(),
+          }
+        })
+
+        await setGrades(contextUrl, input, submissionsParams)
+      }
+
+      await setDefaultForCheckpoint(REPLY_TO_TOPIC, replyToTopicInput)
+      await setDefaultForCheckpoint(REPLY_TO_ENTRY, replyToEntryInput)
+    }
   }
 
   return (
@@ -180,13 +235,51 @@ export default function DefaultGradeModal({
             </Text>
           )}
         </View>
-        <View as="div" margin="small medium">
-          <DefaultGradeInput
-            disabled={defaultGradeStatus === ApiCallStatus.PENDING}
-            gradingType={assignment.gradingType}
-            onGradeInputChange={setGradeInput}
-          />
-        </View>
+        {!isCheckpointed && (
+          <View as="div" margin="small medium">
+            <DefaultGradeInput
+              disabled={defaultGradeStatus === ApiCallStatus.PENDING}
+              gradingType={assignment.gradingType}
+              onGradeInputChange={setGradeInput}
+            />
+          </View>
+        )}
+        {isCheckpointed && (
+          <Flex>
+            <Flex.Item shouldShrink={true}>
+              <View as="div" margin="small medium">
+                <DefaultGradeInput
+                  disabled={defaultGradeStatus === ApiCallStatus.PENDING}
+                  gradingType={assignment.gradingType}
+                  onGradeInputChange={setReplyToTopicInput}
+                  header={I18n.t('Reply to Topic')}
+                  outOfTextValue={
+                    assignment.checkpoints &&
+                    assignment.checkpoints
+                      .find(cp => cp.tag === REPLY_TO_TOPIC)
+                      ?.pointsPossible.toString()
+                  }
+                />
+              </View>
+            </Flex.Item>
+            <Flex.Item shouldShrink={true}>
+              <View as="div" margin="small medium">
+                <DefaultGradeInput
+                  disabled={defaultGradeStatus === ApiCallStatus.PENDING}
+                  gradingType={assignment.gradingType}
+                  onGradeInputChange={setReplyToEntryInput}
+                  header={I18n.t('Required Replies')}
+                  outOfTextValue={
+                    assignment.checkpoints &&
+                    assignment.checkpoints
+                      .find(cp => cp.tag === REPLY_TO_ENTRY)
+                      ?.pointsPossible.toString()
+                  }
+                />
+              </View>
+            </Flex.Item>
+          </Flex>
+        )}
         <View as="div" margin="small medium">
           <Checkbox
             label={I18n.t('Overwrite already-entered grades')}
@@ -203,7 +296,10 @@ export default function DefaultGradeModal({
           data-testid="default-grade-submit-button"
           onClick={setDefaultGrade}
           type="submit"
-          disabled={defaultGradeStatus === ApiCallStatus.PENDING || !gradeInput}
+          disabled={
+            defaultGradeStatus === ApiCallStatus.PENDING ||
+            (!gradeInput && (!replyToEntryInput || !replyToTopicInput))
+          }
         >
           {I18n.t('Set Default Grade')}
         </Button>

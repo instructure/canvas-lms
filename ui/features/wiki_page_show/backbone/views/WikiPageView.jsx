@@ -36,7 +36,7 @@ import '../../jquery/content_locks'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import {renderFrontPagePill} from '@canvas/wiki/react/renderFrontPagePill'
-import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 
 const I18n = useI18nScope('pages')
 
@@ -195,13 +195,13 @@ export default class WikiPageView extends Backbone.View {
   maybeRenderBlockEditorContent() {
     if (
       this.model.get('editor') === 'block_editor' &&
-      this.model.get('block_editor_attributes')?.blocks?.[0]?.data
+      this.model.get('block_editor_attributes')?.blocks
     ) {
       import('@canvas/block-editor')
         .then(({renderBlockEditorView}) => {
           const container = document.getElementById('block-editor-content')
           container.classList.add('block-editor-view')
-          const content = JSON.parse(this.model.get('block_editor_attributes').blocks[0].data)
+          const content = this.model.get('block_editor_attributes')
           renderBlockEditorView(content, container)
         })
         .catch(e => {
@@ -321,7 +321,7 @@ export default class WikiPageView extends Backbone.View {
     const onTrayExited = () => ReactDOM.unmountComponentAtNode(mountPoint)
 
     ReactDOM.render(
-      <ItemAssignToTray
+      <ItemAssignToManager
         open={open}
         onClose={onTrayClose}
         onDismiss={onTrayClose}

@@ -38,7 +38,7 @@ module Lti::IMS
     let(:scopes) { [] }
 
     let(:registration) do
-      r = Registration.new({
+      Registration.new({
         redirect_uris:,
         initiate_login_uri:,
         client_name:,
@@ -48,12 +48,12 @@ module Lti::IMS
         tos_uri:,
         policy_uri:,
         lti_tool_configuration:,
-        scopes:
+        scopes:,
+        developer_key:,
+        lti_registration: developer_key.lti_registration
       }.compact)
-      r.developer_key = developer_key
-      r
     end
-    let(:developer_key) { DeveloperKey.create }
+    let(:developer_key) { dev_key_model_1_3 }
 
     it "is soft_deleted when destroy is called" do
       registration.destroy
@@ -684,7 +684,7 @@ module Lti::IMS
     end
 
     describe "#new_external_tool" do
-      subject { registration.new_external_tool(context) }
+      subject { registration.developer_key.lti_registration.new_external_tool(context) }
 
       let(:lti_tool_configuration) do
         {
@@ -737,9 +737,14 @@ module Lti::IMS
       end
 
       context "when existing_tool is provided" do
-        subject { registration.new_external_tool(context, existing_tool:) }
+        subject { lti_registration.new_external_tool(context, existing_tool:) }
 
-        let(:existing_tool) { registration.new_external_tool(context) }
+        let(:lti_registration) { registration.developer_key.lti_registration }
+        let(:existing_tool) { lti_registration.new_external_tool(context) }
+
+        before do
+          lti_registration.ims_registration = registration
+        end
 
         context "and existing tool is disabled" do
           let(:state) { "disabled" }
@@ -828,7 +833,7 @@ module Lti::IMS
       end
 
       context "placements" do
-        subject { registration.new_external_tool(context).settings["course_navigation"] }
+        subject { registration.developer_key.lti_registration.new_external_tool(context).settings["course_navigation"] }
 
         it "uses the correct icon url" do
           expect(subject["icon_url"]).to eq icon_uri

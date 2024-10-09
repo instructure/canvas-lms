@@ -36,7 +36,7 @@
 
 
 <% provide :page_title, t(:page_title, "%{assignment_name}, SpeedGrader, %{course_name}", :assignment_name => @assignment.title, :course_name => @context.name) %>
-<div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;display: flex;flex-direction: column;">
+<div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;display: flex;flex-direction: column;" id="classic_speedgrader_container">
   <figure id="speed_grader_timeout_alert"></figure>
   <figure id="speed_grader_loading"></figure>
   <h1 class="screenreader-only"><%= t('page_header_title', "SpeedGrader") %></h1>
@@ -206,7 +206,7 @@
           </div>
 
           <div class="content_box">
-            <% if @domain_root_account.feature_enabled?(:discussion_checkpoints) %>
+            <% if @domain_root_account.feature_enabled?(:discussion_checkpoints) && @assignment.submission_types == 'discussion_topic' %>
               <div id="speed_grader_discussions_navigation_mount_point"></div>
             <% end %>
             <% if @assignment.active_rubric_association? %>
@@ -476,20 +476,20 @@
       </p>
     <% end %>
 
-    <% if @context.feature_enabled?(:platform_service_speedgrader) %>
-      <p>
-        <button class="btn btn-primary submit_button" id="show_new_sg_ui" name="show_new_sg_ui">
-          <%= t('buttons.show_new_sg_ui', "Use new speedgrader UI") %>
-        </button>
-      </p>
-    <% end %>
-
     <p <% unless @assignment.supports_grade_by_question? %>class=hidden<% end %>>
       <%= check_box_tag :enable_speedgrader_grade_by_question, "1",
         @current_user.preferences[:enable_speedgrader_grade_by_question] %>
       <%= label_tag :enable_speedgrader_grade_by_question,
         t("Grade by question") %>
     </p>
+
+    <% if @context.feature_enabled?(:platform_service_speedgrader) %>
+      <p>
+        <button class="btn btn-primary submit_button" id="show_new_sg_ui" name="show_new_sg_ui">
+          <%= t('buttons.show_new_sg_ui', "Use new SpeedGrader UI") %>
+        </button>
+      </p>
+    <% end %>
 
     <div class="button-container">
       <button class="btn dialog_closer"><%= t('#buttons.cancel', "Cancel") %></button>

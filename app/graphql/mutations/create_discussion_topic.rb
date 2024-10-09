@@ -31,13 +31,13 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
 
   graphql_name "CreateDiscussionTopic"
 
+  argument :anonymous_state, Types::DiscussionTopicAnonymousStateType, required: false
+  argument :assignment, Mutations::AssignmentBase::AssignmentCreate, required: false
+  argument :context_id, GraphQL::Schema::Object::ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Context")
+  argument :context_type, Types::DiscussionTopicContextType, required: true
   argument :discussion_type, Types::DiscussionTopicDiscussionType, required: false
   argument :is_announcement, Boolean, required: false
   argument :is_anonymous_author, Boolean, required: false
-  argument :anonymous_state, Types::DiscussionTopicAnonymousStateType, required: false
-  argument :context_id, GraphQL::Schema::Object::ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Context")
-  argument :context_type, Types::DiscussionTopicContextType, required: true
-  argument :assignment, Mutations::AssignmentBase::AssignmentCreate, required: false
   argument :ungraded_discussion_overrides, [Mutations::AssignmentBase::AssignmentOverrideCreateOrUpdate], required: false
 
   # most arguments inherited from DiscussionBase
@@ -130,6 +130,7 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
       # Assignment must be present to set checkpoints
       if input[:checkpoints]&.count == DiscussionTopic::REQUIRED_CHECKPOINT_COUNT
         return validation_error(I18n.t("If checkpoints are defined, forCheckpoints: true must be provided to the discussion topic assignment.")) unless input.dig(:assignment, :for_checkpoints)
+        return validation_error(I18n.t("If RQD is enabled, checkpoints cannot be created")) if discussion_topic_context.is_a?(Course) && discussion_topic_context.settings[:restrict_quantitative_data]
 
         input[:checkpoints].each do |checkpoint|
           dates = checkpoint[:dates]

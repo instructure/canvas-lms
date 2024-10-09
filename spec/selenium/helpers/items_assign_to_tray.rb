@@ -137,9 +137,25 @@ module ItemsAssignToTray
     "[data-testid = 'lock_at_input']"
   end
 
+  def reply_to_topic_datetime_selector
+    "[data-testid='reply_to_topic_due_at_input'] input[type='text']"
+  end
+
+  def required_replies_datetime_selector
+    "[data-testid='required_replies_due_at_input'] input[type='text']"
+  end
+
+  def available_from_datetime_selector
+    "[data-testid='unlock_at_input'] input[type='text']"
+  end
+
+  def until_datetime_selector
+    "[data-testid='lock_at_input'] input[type='text']"
+  end
+
   #------------------------------ Elements ------------------------------
   def add_assign_to_card
-    f(add_assign_to_card_selector)
+    ff(add_assign_to_card_selector)
   end
 
   def assign_to_card_delete_button
@@ -302,10 +318,26 @@ module ItemsAssignToTray
     f(tray_header_selector)
   end
 
+  def reply_to_topic_datetime_inputs
+    ff(reply_to_topic_datetime_selector)
+  end
+
+  def required_replies_datetime_inputs
+    ff(required_replies_datetime_selector)
+  end
+
+  def available_from_datetime_inputs
+    ff(available_from_datetime_selector)
+  end
+
+  def until_datetime_inputs
+    ff(until_datetime_selector)
+  end
+
   #------------------------------ Actions ------------------------------
 
-  def click_add_assign_to_card
-    add_assign_to_card.click
+  def click_add_assign_to_card(button_number = 0)
+    add_assign_to_card[button_number].click
   end
 
   def click_duedate_clear_button(card_number = 0)
@@ -388,5 +420,51 @@ module ItemsAssignToTray
       # ignore - sometimes spinner doesn't appear in Chrome
     end
     wait_for_ajaximations
+  end
+
+  def combine_date_and_time(date_input, time_input)
+    date = date_input.attribute("value")
+    time = time_input.attribute("value")
+    return "" if date.empty? && time.empty?
+
+    "#{date} #{time}".strip
+  end
+
+  def get_reply_to_topic_datetime(card_index)
+    combine_date_and_time(reply_to_topic_datetime_inputs[card_index * 2], reply_to_topic_datetime_inputs[(card_index * 2) + 1])
+  end
+
+  def get_required_replies_datetime(card_index)
+    combine_date_and_time(required_replies_datetime_inputs[card_index * 2], required_replies_datetime_inputs[(card_index * 2) + 1])
+  end
+
+  def get_available_from_datetime(card_index)
+    combine_date_and_time(available_from_datetime_inputs[card_index * 2], available_from_datetime_inputs[(card_index * 2) + 1])
+  end
+
+  def get_until_datetime(card_index)
+    combine_date_and_time(until_datetime_inputs[card_index * 2], until_datetime_inputs[(card_index * 2) + 1])
+  end
+
+  def get_all_dates_for_card(card_index)
+    {
+      reply_to_topic: get_reply_to_topic_datetime(card_index),
+      required_replies: get_required_replies_datetime(card_index),
+      available_from: get_available_from_datetime(card_index),
+      until: get_until_datetime(card_index)
+    }
+  end
+
+  def get_all_dates_for_all_cards
+    card_count = [
+      reply_to_topic_datetime_inputs.length,
+      required_replies_datetime_inputs.length,
+      available_from_datetime_inputs.length,
+      until_datetime_inputs.length
+    ].max / 2 # Divide by 2 because we have separate inputs for date and time
+
+    (0...card_count).map do |card_index|
+      get_all_dates_for_card(card_index)
+    end
   end
 end

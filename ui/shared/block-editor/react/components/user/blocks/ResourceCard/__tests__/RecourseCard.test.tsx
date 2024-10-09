@@ -41,32 +41,12 @@ const renderBlock = (enabled: boolean, props: Partial<ResourceCardProps> = {}) =
 
 describe('ResourceCard', () => {
   it('should render default props', () => {
-    const {container, getByText, getByTitle} = renderBlock(true)
+    const {getByText, getByTitle} = renderBlock(true)
     expect(getByTitle('apple')).toBeInTheDocument()
     expect(getByText('Title')).toBeInTheDocument()
     expect(getByText('Description')).toBeInTheDocument()
     expect(getByText('Link')).toBeInTheDocument()
-
-    const heading = container.querySelector('.heading-block')
-    expect(heading).toBeInTheDocument()
-    expect(heading?.querySelector('[contenteditable]')?.getAttribute('contenteditable')).toBe(
-      'false'
-    )
-
-    const desc = container.querySelector('.text-block')
-    expect(desc).toBeInTheDocument()
-    expect(desc?.getAttribute('contenteditable')).toBe('false')
   })
-
-  it('should render editable title on click', async () => {
-    const {container} = renderBlock(true)
-    const heading = container.querySelector('.heading-block') as HTMLElement
-    await userEvent.click(heading)
-
-    expect(heading.querySelector('[contenteditable]')?.getAttribute('contenteditable')).toBe('true')
-    expect(heading.getAttribute('disabled')).toBeNull()
-  })
-  // let's assumd if the heading is editable w/in the ResourceCard, the description is editable too
 
   it('should render given props', () => {
     const {getByText, getByTitle} = renderBlock(true, {

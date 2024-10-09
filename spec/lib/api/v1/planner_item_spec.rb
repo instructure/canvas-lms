@@ -245,6 +245,30 @@ describe Api::V1::PlannerItem do
       end
     end
 
+    context "dicussion checkpoints" do
+      before :once do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        course_with_student(active_all: true)
+        @checkpoint_topic, @checkpoint_entry = graded_discussion_topic_with_checkpoints(context: @course)
+      end
+
+      it "returns checkpoints" do
+        json = api.planner_item_json(@checkpoint_topic, @student, session)
+        expect(json[:plannable_type]).to eq "sub_assignment"
+        expect(json[:plannable][:title]).to eq @checkpoint_topic.title
+      end
+
+      it "includes number of required replies" do
+        json = api.planner_item_json(@checkpoint_topic, @student, session)
+        expect(json[:details][:reply_to_entry_required_count]).to eq 3
+      end
+
+      it "includes sub assignment tag" do
+        json = api.planner_item_json(@checkpoint_topic, @student, session)
+        expect(json[:plannable][:sub_assignment_tag]).to eq "reply_to_topic"
+      end
+    end
+
     describe "#submission_statuses_for" do
       it "returns the submission statuses for the learning object" do
         json = api.planner_item_json(@assignment, @student, session)
@@ -448,6 +472,48 @@ describe Api::V1::PlannerItem do
         expect(json[:submissions][:has_feedback]).to be true
         expect(json[:submissions][:feedback].keys).not_to include(:author_name, :author_avatar_url)
       end
+
+      context "discussion checkpoints/sub_assignments" do
+        before do
+          course_with_student(active_all: true)
+          course_with_teacher(course: @course, active_all: true)
+          @course.root_account.enable_feature!(:discussion_checkpoints)
+          @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course, title: "Discussion with Checkpoints")
+        end
+
+        it "indicates that a graded sub_assignment with parent assignment comment has feedback and is graded" do
+          @reply_to_topic.submit_homework @student, body: "checkpoint submission for #{@student.name}"
+          @reply_to_topic.grade_student(@student, grade: 5, grader: @teacher)
+          @topic.assignment.submission_for_student(@student).add_comment(user: @teacher, comment: "nice work")
+
+          json = api.planner_item_json(@reply_to_topic, @student, session)
+          expect(json[:submissions][:has_feedback]).to be true
+          expect(json[:submissions][:graded]).to be true
+        end
+
+        it "indicates that a not-yet-graded sub_assignment with parent assignment comment has feedback" do
+          @reply_to_topic.submit_homework @student, body: "checkpoint submission for #{@student.name}"
+          @topic.assignment.submission_for_student(@student).add_comment(user: @teacher, comment: "nice work")
+
+          json = api.planner_item_json(@assignment, @student, session)
+          expect(json[:submissions][:has_feedback]).to be true
+          expect(json[:submissions][:graded]).to be false
+        end
+
+        it "includes comment data from the parent assignment for sub_assignment with feedback" do
+          @reply_to_topic.submit_homework @student, body: "checkpoint submission for #{@student.name}"
+          @topic.assignment.submission_for_student(@student).add_comment(user: @teacher, comment: "nice work")
+
+          json = api.planner_item_json(@reply_to_topic, @student, session)
+          expect(json[:submissions][:has_feedback]).to be true
+          expect(json[:submissions][:feedback]).to eq({
+                                                        comment: "nice work",
+                                                        author_name: @teacher.name,
+                                                        author_avatar_url: @teacher.avatar_url,
+                                                        is_media: false
+                                                      })
+        end
+      end
     end
   end
 
@@ -514,6 +580,45 @@ describe Api::V1::PlannerItem do
       planner_note_model(user: @student)
       expect(api.planner_item_json(@planner_note, @student, session)[:new_activity]).to be false
     end
+
+    context "discussion checkpoints/sub_assignments" do
+      before do
+        course_with_student(active_all: true)
+        course_with_teacher(course: @course, active_all: true)
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course, title: "Discussion with Checkpoints")
+      end
+
+      it "returns true for sub_assignments with new grades" do
+        @reply_to_topic.submit_homework @student, body: "checkpoint submission for #{@student.name}"
+        @reply_to_topic.grade_student(@student, grade: 5, grader: @teacher)
+        @reply_to_entry.submit_homework @student, body: "checkpoint submission for #{@student.name}"
+        @reply_to_entry.grade_student(@student, grade: 5, grader: @teacher)
+
+        json = api.planner_item_json(@reply_to_topic.reload, @student, session)
+        expect(json[:new_activity]).to be true
+        json = api.planner_item_json(@reply_to_entry.reload, @student, session)
+        expect(json[:new_activity]).to be true
+      end
+
+      it "returns true for sub_assignments with new feedback" do
+        @reply_to_topic.submit_homework @student, body: "checkpoint submission for #{@student.name}"
+        @reply_to_entry.submit_homework @student, body: "checkpoint submission for #{@student.name}"
+        @topic.assignment.submission_for_student(@student).add_comment(user: @teacher, comment: "nice work")
+
+        json = api.planner_item_json(@reply_to_topic.reload, @student, session)
+        expect(json[:new_activity]).to be true
+        json = api.planner_item_json(@reply_to_entry.reload, @student, session)
+        expect(json[:new_activity]).to be true
+      end
+
+      it "includes unread_count property from discussion topics" do
+        @reply_to_topic.submit_homework @student, body: "checkpoint submission for #{@student.name}"
+        json = api.planner_item_json(@reply_to_topic, @student, session)
+        expect(json[:plannable][:unread_count]).to eq 0
+        expect(json[:plannable][:read_state]).to eq "unread"
+      end
+    end
   end
 
   describe "#html_url" do
@@ -529,6 +634,14 @@ describe Api::V1::PlannerItem do
       expect(api.planner_item_json(@topic.assignment, @student, session)[:html_url]).to eq "named_context_url"
       graded_submission_model(assignment: @topic.assignment, user: @student).update(score: 5)
       expect(api.planner_item_json(@topic.assignment, @student, session)[:html_url]).to eq "course_assignment_submission_url"
+    end
+
+    it "links to a graded discussion with checkpoints submission if appropriate" do
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @checkpoint_topic, _checkpoint_entry = graded_discussion_topic_with_checkpoints(context: @course)
+      expect(api.planner_item_json(@checkpoint_topic, @student, session)[:html_url]).to eq "named_context_url"
+      graded_submission_model(assignment: @checkpoint_topic, user: @student).update(score: 5)
+      expect(api.planner_item_json(@checkpoint_topic, @student, session)[:html_url]).to eq "course_assignment_submission_url"
     end
   end
 
@@ -546,6 +659,23 @@ describe Api::V1::PlannerItem do
         json = api.planner_items_json([topic1, topic2], @student, session)
         expect(json.pluck(:plannable_id)).to match_array([topic1.id, topic2.id])
       end
+    end
+  end
+
+  describe "submission comments" do
+    before do
+      @submission = @assignment.submit_homework(@student, body: "my submission")
+      @html_comment = @submission.add_comment(author: @teacher, comment: "<div>html comment</div>", attempt: nil)
+    end
+
+    it "if use_html_comment true returns submission comments with html tags" do
+      json = api.planner_items_json([@assignment], @student, session, { use_html_comment: true })
+      expect(json.first[:submissions][:feedback][:comment]).to eq("<div>html comment</div>")
+    end
+
+    it "if use_html_comment false returns submission comments without htl tags" do
+      json = api.planner_items_json([@assignment], @student, session)
+      expect(json.first[:submissions][:feedback][:comment]).to eq("html comment")
     end
   end
 end

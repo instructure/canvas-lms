@@ -50,8 +50,8 @@ describe('ImportantDates', () => {
   })
 
   beforeEach(() => {
-    fetchMock.get(ASSIGNMENTS_URL, JSON.stringify(MOCK_ASSIGNMENTS))
-    fetchMock.get(EVENTS_URL, JSON.stringify(MOCK_EVENTS))
+    fetchMock.get(ASSIGNMENTS_URL, MOCK_ASSIGNMENTS)
+    fetchMock.get(EVENTS_URL, MOCK_EVENTS)
   })
 
   afterEach(() => {
@@ -231,8 +231,8 @@ describe('ImportantDates', () => {
       global.ENV = {
         current_user_id: currentUserId,
       }
-      fetchMock.get(OBSERVER_ASSIGNMENTS_URL, JSON.stringify(MOCK_OBSERVEE_ASSIGNMENTS))
-      fetchMock.get(OBSERVER_EVENTS_URL, JSON.stringify(MOCK_OBSERVEE_EVENTS))
+      fetchMock.get(OBSERVER_ASSIGNMENTS_URL, MOCK_OBSERVEE_ASSIGNMENTS)
+      fetchMock.get(OBSERVER_EVENTS_URL, MOCK_OBSERVEE_EVENTS)
     })
 
     afterEach(() => {

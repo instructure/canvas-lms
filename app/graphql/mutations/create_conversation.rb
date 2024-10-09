@@ -23,17 +23,17 @@ class Mutations::CreateConversation < Mutations::BaseMutation
 
   include ConversationsHelper
 
-  argument :recipients, [String], required: true
-  argument :subject, String, required: false
+  argument :attachment_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Attachment")
   argument :body, String, required: true
   argument :bulk_message, Boolean, required: false
-  argument :force_new, Boolean, required: false
-  argument :group_conversation, Boolean, required: false
-  argument :attachment_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Attachment")
-  argument :media_comment_id, ID, required: false
-  argument :media_comment_type, String, required: false
   argument :context_code, String, required: false
   argument :conversation_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Conversation")
+  argument :force_new, Boolean, required: false
+  argument :group_conversation, Boolean, required: false
+  argument :media_comment_id, ID, required: false
+  argument :media_comment_type, String, required: false
+  argument :recipients, [String], required: true
+  argument :subject, String, required: false
   argument :tags, [String], required: false
 
   field :conversations, [Types::ConversationParticipantType], null: true

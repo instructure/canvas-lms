@@ -194,11 +194,11 @@ describe CalendarEvent do
         res = @event.to_ics(in_own_calendar: false)
         expect(res).not_to be_nil
         expect(res.dtstart.tz_utc).to be true
-        expect(res.dtstart.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
+        expect(res.dtstart.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 11:55am").utc.strftime("%Y-%m-%dT%H:%M:00")
         expect(res.dtend.tz_utc).to be true
-        expect(res.dtend.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:00pm").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
+        expect(res.dtend.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:00pm").utc.strftime("%Y-%m-%dT%H:%M:00")
         expect(res.dtstamp.tz_utc).to be true
-        expect(res.dtstamp.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
+        expect(res.dtstamp.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:05pm").utc.strftime("%Y-%m-%dT%H:%M:00")
       end
 
       it "returns data for events with times in correct tz" do
@@ -209,11 +209,11 @@ describe CalendarEvent do
         res = @event.to_ics(in_own_calendar: false)
         expect(res).not_to be_nil
         expect(res.dtstart.tz_utc).to be true
-        expect(res.dtstart.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
+        expect(res.dtstart.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 11:55am").utc.strftime("%Y-%m-%dT%H:%M:00")
         expect(res.dtend.tz_utc).to be true
-        expect(res.dtend.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:00pm").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
+        expect(res.dtend.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:00pm").utc.strftime("%Y-%m-%dT%H:%M:00")
         expect(res.dtend.tz_utc).to be true
-        expect(res.dtstamp.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
+        expect(res.dtstamp.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:05pm").utc.strftime("%Y-%m-%dT%H:%M:00")
       end
 
       it "does not fail with no date for all_day event" do
@@ -696,7 +696,6 @@ describe CalendarEvent do
 
       appointment.participants_per_appointment = 2
       appointment.save!
-      expect(appointment.read_attribute(:participants_per_limit)).to be_nil
       expect(appointment.override_participants_per_appointment?).to be_falsey
       expect(appointment.participants_per_appointment).to be 2
     end

@@ -43,8 +43,8 @@ module TextHelper
     end
   end
 
-  def date_string(*args)
-    TextHelper.date_string(*args)
+  def date_string(*)
+    TextHelper.date_string(*)
   end
 
   def time_string(start_time, end_time = nil, zone = nil)

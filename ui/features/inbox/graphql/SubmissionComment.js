@@ -38,6 +38,7 @@ export const SubmissionComment = {
         ...Assignment
       }
       comment
+      htmlComment
       course {
         ...Course
       }
@@ -57,6 +58,7 @@ export const SubmissionComment = {
     canReply: bool,
     author: User.shape,
     assignment: Assignment.shape,
+    htmlComment: string,
     comment: string,
     course: Course.shape,
     read: bool,
@@ -71,6 +73,7 @@ export const SubmissionComment = {
     canReply = true,
     author = User.mock(),
     assignment = Assignment.mock(),
+    htmlComment = '<p>Hey!</p>',
     comment = 'Hey!',
     course = Course.mock(),
     read = true,
@@ -84,6 +87,7 @@ export const SubmissionComment = {
     author,
     assignment,
     comment,
+    htmlComment,
     course,
     read,
     __typename: 'SubmissionComment',

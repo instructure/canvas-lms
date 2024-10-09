@@ -603,7 +603,7 @@ describe "Outcome Results API", type: :request do
             rollup["scores"].each do |score|
               expect(score.keys.sort).to eq %w[count hide_points links score submitted_at title]
               expect(score["count"]).to eq 1
-              expect([0, 1]).to include(score["score"])
+              expect(score["score"]).to be_in [0, 1]
               expect(score["links"].keys.sort).to eq %w[outcome]
               expect(score["links"]["outcome"]).to eq outcome_object.id.to_s
             end
@@ -680,7 +680,7 @@ describe "Outcome Results API", type: :request do
             rollup["scores"].each do |score|
               expect(score.keys.sort).to eq %w[count hide_points links score submitted_at title]
               expect(score["count"]).to eq 1
-              expect([0, 2]).to include(score["score"])
+              expect(score["score"]).to be_in [0, 2]
               expect(score["links"].keys.sort).to eq %w[outcome]
               expect(score["links"]["outcome"]).to eq outcome_object.id.to_s
             end

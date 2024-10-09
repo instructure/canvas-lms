@@ -6578,6 +6578,7 @@ el:
   for_974cbb84: Για
   for_all_devices_1f603968: "Για όλες τις Συσκευές"
   for_title_69d92b3a: "για %{title}"
+  forgot_password_9098c30d: "Ξέχασα τον Κωδικό μου"
   forgot_password_f0c3fbac: "Δεν γνωρίζω τον κωδικό πρόσβασής μου"
   forgot_password_url_3f9c04b: "URL του \"Ξέχασα το Συνθηματικό μου\""
   form_background_fb654518: "Δημιουργία Φόντου"
@@ -14070,6 +14071,7 @@ el:
   show_totals_as_points_on_student_grade_page_d9cb4207: "Εμφάνιση Συνόλων ως Μορίων στη Σελίδα Βαθμών Σπουδαστή"
   showing_count_results_below_61ddca33: 
     zero: "Δεν βρέθηκαν αποτελέσματα"
+  sign_in_c6858e26: Σύνδεση
   sign_up_dafdee18: Εγγραφή
   simple_tls_45df2648: "Απλό TLS"
   sis_agent_token_authentication_2a0b29e3: "Έλεγχος Ταυτότητας Διακριτικού SIS Agent"
@@ -14264,6 +14266,7 @@ el:
   stats_9272cef3: Στατιστικές
   status_e051bb30: κατάσταση
   status_e7fdbe06: Κατάσταση
+  stay_signed_in_1853e9b6: "Παραμείνετε συνδεδεμένος/η"
   step: Βήμα
   strand_955969b1: Σκέλος
   stream_items_api: 
@@ -15174,6 +15177,7 @@ el:
   use_new_folder_tree_in_files_bc0ea09f: "Χρήση Νέας Δομής Φακέλων στα Αρχεία"
   use_remote_service_for_notifications_9fe667c6: "Χρήση της απομακρυσμένης υπηρεσίας για τις ειδοποιήσεις"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Χρησιμοποιήστε εργαλείο LTI του νέου κουίζ αντί για τα συνηθισμένα κουίζ του Canvas"
+  use_this_same_grade_for_the_resubmission_eaa6bf55: "Χρήση του ίδιου βαθμού για την επανυποβολή"
   used_by_permission_314a78dd: "Χρησιμοποιήθηκε κατόπιν Άδειας"
   user: 
     default_user_name: Χρήστης

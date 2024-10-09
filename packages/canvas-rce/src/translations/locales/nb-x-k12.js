@@ -1019,6 +1019,7 @@ const locale = {
   },
   "styles_2aa721ef": { "message": "Stiler" },
   "submit_a3cc6859": { "message": "Send inn" },
+  "submitting_b90fac62": { "message": "Sender inn…" },
   "subscript_59744f96": { "message": "Senket skrift" },
   "subset_19c1a92f": { "message": "Delsett" },
   "subset_strict_8d8948d6": { "message": "Delsett (streng)" },

@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {useNode} from '@craftjs/core'
+import {useNode, type Node} from '@craftjs/core'
 import {getIcon, IconAlarm} from '../../../../assets/user-icons'
 import {IconBlockToolbar} from './IconBlockToolbar'
 import {type IconBlockProps, type IconSize} from './types'
@@ -29,7 +29,12 @@ const I18n = useI18nScope('block-editor/icon-block')
 const IconBlock = ({iconName, size}: IconBlockProps) => {
   const {
     connectors: {connect, drag},
-  } = useNode()
+    node,
+  } = useNode((n: Node) => {
+    return {
+      node: n,
+    }
+  })
   const [Icon, setIcon] = useState(() => {
     return getIcon(iconName) || IconAlarm
   })
@@ -39,7 +44,14 @@ const IconBlock = ({iconName, size}: IconBlockProps) => {
   }, [iconName])
 
   return (
-    <div className="block icon-block" ref={el => el && connect(drag(el as HTMLElement))}>
+    <div
+      role="treeitem"
+      aria-label={node.data.displayName}
+      aria-selected={node.events.selected}
+      className="block icon-block"
+      ref={el => el && connect(drag(el as HTMLElement))}
+      tabIndex={-1}
+    >
       <Icon size={size} />
     </div>
   )
@@ -53,6 +65,9 @@ IconBlock.craft = {
   },
   related: {
     toolbar: IconBlockToolbar,
+  },
+  custom: {
+    isBlock: true,
   },
 }
 

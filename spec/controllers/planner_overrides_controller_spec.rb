@@ -114,6 +114,17 @@ describe PlannerOverridesController do
         expect(response).to have_http_status(:bad_request)
         expect(PlannerOverride.where(user_id: @student.id).count).to be 1
       end
+
+      it "saves sub_assignment overrides with plannable type sub_assignment" do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+        post :create, params: { plannable_type: "sub_assignment", plannable_id: @reply_to_topic.id, user_id: @student.id, marked_complete: true }
+        json = json_parse(response.body)
+        expect(json["plannable_type"]).to eq "sub_assignment"
+        post :create, params: { plannable_type: "sub_assignment", plannable_id: @reply_to_entry.id, user_id: @student.id, marked_complete: true }
+        json = json_parse(response.body)
+        expect(json["plannable_type"]).to eq "sub_assignment"
+      end
     end
 
     describe "DELETE #destroy" do

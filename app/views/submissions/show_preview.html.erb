@@ -57,6 +57,7 @@
         hidden_user_id:,
         speed_grader: 1,
         persist: 1,
+        student_id: @user.id,
       }
 
       if params[:entry_id] || @entries&.first

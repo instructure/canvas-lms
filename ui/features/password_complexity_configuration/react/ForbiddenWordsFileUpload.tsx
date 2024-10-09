@@ -32,6 +32,7 @@ import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import './ForbiddenWordsFileUpload.module.css'
 import type {PasswordSettingsResponse} from './types'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const I18n = useI18nScope('password_complexity_configuration')
 
@@ -60,6 +61,7 @@ interface Props {
   setForbiddenWordsFilename: (filename: string | null) => void
   setCurrentAttachmentId: (attachmentId: number | null) => void
   setCommonPasswordsAttachmentId: (attachmentId: number | null) => void
+  setEnableApplyButton: (enabled: boolean) => void
 }
 
 const initialFileDetails: FileDetails = {url: null, filename: null}
@@ -72,6 +74,7 @@ const ForbiddenWordsFileUpload = ({
   setForbiddenWordsFilename,
   setCurrentAttachmentId,
   setCommonPasswordsAttachmentId,
+  setEnableApplyButton,
 }: Props) => {
   const [fileDropMessages, setFileDropMessages] = useState<FormMessage[]>([])
   const [fileDetails, setFileDetails] = useState<FileDetails>(initialFileDetails)
@@ -138,22 +141,26 @@ const ForbiddenWordsFileUpload = ({
       const initialRequestFormData = new FormData()
       initialRequestFormData.append('name', filename)
 
-      const {status: fileStatus, data: fileData} = await executeApiRequest<FileResponse>({
+      // Temporarily using doFetchApi until the endpoint correctly return JSON
+      // TODO: Remove doFetchApi and use executeApiRequest once the endpoint returns JSON
+      const response = await doFetchApi<FileResponse>({
         method: 'POST',
         path: `/api/v1/folders/${folderId}/files`,
         body: initialRequestFormData,
       })
 
-      if (fileStatus !== 200) {
+      if (response.response.status !== 200) {
         throw new Error('Failed to initiate file upload')
       }
 
-      const upload_url = fileData.upload_url
-      const upload_params = fileData.upload_params
+      const responseBodyParsed = JSON.parse(response.text)
+
+      const upload_url = responseBodyParsed.upload_url
+      const upload_params = responseBodyParsed.upload_params
 
       const uploadFileFormData = new FormData()
       for (const [key, value] of Object.entries(upload_params)) {
-        uploadFileFormData.append(key, value)
+        uploadFileFormData.append(key, value as string)
       }
 
       if (url && filename) {
@@ -201,6 +208,7 @@ const ForbiddenWordsFileUpload = ({
         onSave(fileId)
         setModalClosing(true)
         onDismiss()
+        setEnableApplyButton(true)
       } else {
         throw new Error('Failed to save password policy settings')
       }
@@ -224,6 +232,7 @@ const ForbiddenWordsFileUpload = ({
     uploadAttempted,
     setCurrentAttachmentId,
     setCommonPasswordsAttachmentId,
+    setEnableApplyButton,
   ])
 
   const handleDropAccepted = useCallback((acceptedFiles: ArrayLike<File | DataTransferItem>) => {

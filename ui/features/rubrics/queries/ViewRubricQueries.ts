@@ -343,6 +343,7 @@ export const duplicateRubric = async ({
         criteria: duplicateCriteria,
         button_display: buttonDisplay,
         rating_order: ratingOrder,
+        is_duplicate: true,
       },
       rubric_association: {
         association_id: accountId ?? courseId,
