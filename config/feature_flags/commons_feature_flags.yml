@@ -4,3 +4,8 @@ commons_new_quizzes:
   display_name: Commons New Quizzes Support
   description: If enabled, Canvas will be able to share New Quizzes to Commons.
   applies_to: SiteAdmin
+new_quizzes_media_type:
+  state: hidden
+  display_name: Change Content Items LTI Launch param to send quizzesnext when an Assignment is New Quizzes
+  description: If enabled, Canvas will set quizzesnext media type instead of assignments
+  applies_to: SiteAdmin
