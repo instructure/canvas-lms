@@ -87,6 +87,35 @@ describe "external tool assignments" do
     expect(a.external_tool_tag.new_tab).to be_falsey
   end
 
+  it "Renders iframe in assignment details page if external tool is not set to open in new window", priority: "2" do
+    a = assignment_model(course: @course, title: "test1", submission_types: "external_tool")
+    a.create_external_tool_tag(url: @t1.url)
+    a.external_tool_tag.update_attribute(:content_type, "ContextExternalTool")
+
+    student_in_course(course: @course, active_all: true)
+    user_session(@student)
+
+    get "/courses/#{a.context.id}/assignments/#{a.id}"
+
+    # expect that the iframe is present
+    expect(f("iframe[class='tool_launch']")).to be_displayed
+  end
+
+  it "does not render iframe in assignment details page if external tool is set to open in new window", priority: "2" do
+    a = assignment_model(course: @course, title: "test1", submission_types: "external_tool")
+    a.create_external_tool_tag(url: @t1.url)
+    a.external_tool_tag.update_attribute(:content_type, "ContextExternalTool")
+    a.external_tool_tag.update_attribute(:new_tab, true)
+
+    student_in_course(course: @course, active_all: true)
+    user_session(@student)
+
+    get "/courses/#{a.context.id}/assignments/#{a.id}"
+
+    # expect that the iframe is not present
+    expect(have_no_selector("iframe[class='tool_launch']")).to be_truthy
+  end
+
   it "allows editing", priority: "2" do
     a = assignment_model(course: @course, title: "test2", submission_types: "external_tool")
     a.create_external_tool_tag(url: @t1.url)
