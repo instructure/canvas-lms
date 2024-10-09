@@ -221,7 +221,7 @@ describe "threaded discussions" do
     end
 
     it "displays updated reply to entry checkpoint status on entry creation within splitscreen" do
-      @checkpointed_discussion.discussion_entries.create!(user: @teacher, message: "initial post")
+      @checkpointed_discussion.discussion_entries.create!(user: @teacher, message: "reply to topic")
 
       @student.preferences[:discussions_splitscreen_view] = true
       @student.save!

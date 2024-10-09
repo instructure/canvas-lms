@@ -37,7 +37,7 @@
       comment = parent_assignment_submission_for_user.last_teacher_comment if parent_assignment_submission_for_user
       num_replies = parent_assignment.discussion_topic.reply_to_entry_required_count || 1
       title = if assignment.sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC
-                t('%{title} Initial Post', {title:})
+                t('%{title} Reply to Topic', {title:})
               elsif assignment.sub_assignment_tag == CheckpointLabels::REPLY_TO_ENTRY
                 t('%{title} Required Replies (%{num_replies})', {title:, num_replies:})
               end

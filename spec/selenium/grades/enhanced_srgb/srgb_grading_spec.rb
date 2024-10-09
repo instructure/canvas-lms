@@ -398,7 +398,7 @@ describe "Screenreader Gradebook grading" do
       EnhancedSRGB.select_assignment(@checkpointed_assignment)
 
       EnhancedSRGB.default_grade.click
-      fj("span[aria-label='Set Default Grade Modal'] label:contains('Initial Post') input").send_keys "3"
+      fj("span[aria-label='Set Default Grade Modal'] label:contains('Reply to Topic') input").send_keys "3"
       fj("span[aria-label='Set Default Grade Modal'] label:contains('Required Replies') input").send_keys "2"
       fj("span[aria-label='Set Default Grade Modal'] button:contains('Set Default Grade')").click
 

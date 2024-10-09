@@ -817,7 +817,7 @@ describe "context modules" do
         get "/courses/#{@course.id}/modules"
         expect(f("span.item_name").text).to include @topic.title
         details = f("div.ig-details").text
-        expect(details).to eq "Initial Post: #{date_string(c1.due_at)}\nRequired Replies (#{@topic.reply_to_entry_required_count}): #{date_string(c2.due_at)}\n#{@topic.assignment.points_possible.to_i} pts"
+        expect(details).to eq "Reply to Topic: #{date_string(c1.due_at)}\nRequired Replies (#{@topic.reply_to_entry_required_count}): #{date_string(c2.due_at)}\n#{@topic.assignment.points_possible.to_i} pts"
       end
 
       it "does not show due dates when the enable_course_paces is set to true" do
@@ -842,7 +842,7 @@ describe "context modules" do
         get "/courses/#{@course.id}/modules"
         expect(f("span.item_name").text).to include @topic.title
         details = f("div.ig-details").text
-        expect(details).to eq "Initial Post\nRequired Replies (2)\n10 pts"
+        expect(details).to eq "Reply to Topic\nRequired Replies (2)\n10 pts"
       end
 
       it "shows multiple due dates as a hoverable link within each checkpoint" do
@@ -910,7 +910,7 @@ describe "context modules" do
         get "/courses/#{@course.id}/modules"
 
         expect(f("body")).not_to contain_jqcss(".reply_to_topic_display a")
-        expect(f(".ig-details").text).to eq "Initial Post: Multiple Due Dates\nRequired Replies (2): Multiple Due Dates\n10 pts"
+        expect(f(".ig-details").text).to eq "Reply to Topic: Multiple Due Dates\nRequired Replies (2): Multiple Due Dates\n10 pts"
       end
 
       it "shows due dates when newly added" do
@@ -931,7 +931,7 @@ describe "context modules" do
         get "/courses/#{@course.id}/modules"
         add_new_module_item_and_yield("#discussion_topics_select", "Discussion", @topic.title)
         details = f("div.ig-details").text
-        expect(details).to eq "Initial Post: #{date_string(c1.due_at)}\nRequired Replies (#{@topic.reply_to_entry_required_count}): #{date_string(c2.due_at)}"
+        expect(details).to eq "Reply to Topic: #{date_string(c1.due_at)}\nRequired Replies (#{@topic.reply_to_entry_required_count}): #{date_string(c2.due_at)}"
       end
 
       it "can duplicate modules with checkpointed discussions" do
@@ -964,7 +964,7 @@ describe "context modules" do
 
         # check that due dates are still equal to the original checkpoints' due dates
         details = f("div.ig-details").text
-        expect(details).to eq "Initial Post: #{date_string(c1.due_at)}\nRequired Replies (#{@topic.reply_to_entry_required_count}): #{date_string(c2.due_at)}\n10 pts"
+        expect(details).to eq "Reply to Topic: #{date_string(c1.due_at)}\nRequired Replies (#{@topic.reply_to_entry_required_count}): #{date_string(c2.due_at)}\n10 pts"
       end
 
       it "Shows the correct dates inputs in the assign to tray", :ignore_js_errors do

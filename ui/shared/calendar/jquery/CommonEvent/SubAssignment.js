@@ -49,7 +49,7 @@ Object.assign(SubAssignment.prototype, {
     const title = data.title || data.name || I18n.t('Untitled')
     this.title =
       data?.sub_assignment_tag === 'reply_to_topic'
-        ? I18n.t('%{title} Initial Post', {title})
+        ? I18n.t('%{title} Reply to Topic', {title})
         : I18n.t('%{title} Required Replies (%{numReplies})', {title, numReplies})
     this.lock_explanation = null // not set at sub assignment level
     this.description = data.description

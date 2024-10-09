@@ -348,7 +348,7 @@ describe SubAssignment do
     end
 
     it "formats the title and id of a reply_to_topic checkpoint assignment" do
-      expect(@reply_to_topic.title_with_id).to match("#{@reply_to_topic.title} Initial Post (#{@reply_to_topic.id})")
+      expect(@reply_to_topic.title_with_id).to match("#{@reply_to_topic.title} Reply To Topic (#{@reply_to_topic.id})")
     end
 
     it "formats the title and id of a reply_to_entry checkpoint assignment" do
@@ -358,7 +358,7 @@ describe SubAssignment do
 
   describe "title_and_id" do
     it "extracts the title and id of the reply_to_topic checkpoint assignment" do
-      expect(SubAssignment.title_and_id("Assignment 1 Initial Post (1)")).to eq(["Assignment 1", "1"])
+      expect(SubAssignment.title_and_id("Assignment 1 Reply To Topic (1)")).to eq(["Assignment 1", "1"])
     end
 
     it "extracts the title and id of the reply_to_entry checkpoint assignment" do
@@ -366,7 +366,7 @@ describe SubAssignment do
     end
 
     it "handles extracting the title and id of checkpoints properly" do
-      expect(SubAssignment.title_and_id("Initial Post Initial Post (1)")).to eq(["Initial Post", "1"])
+      expect(SubAssignment.title_and_id("Reply To Topic Reply To Topic (1)")).to eq(["Reply To Topic", "1"])
       expect(SubAssignment.title_and_id("Required Replies Required Replies (1)")).to eq(["Required Replies", "1"])
     end
   end

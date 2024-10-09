@@ -2167,7 +2167,7 @@ function updateSubAssignmentData(contextModuleItem, subAssignments) {
     }
     const title =
       subAssignment.sub_assignment_tag === 'reply_to_topic'
-        ? I18n.t('Initial Post')
+        ? I18n.t('Reply to Topic')
         : I18n.t('Required Replies (%{required_replies})', {
             required_replies: subAssignment.replies_required,
           })

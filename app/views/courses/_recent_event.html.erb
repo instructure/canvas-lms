@@ -35,8 +35,8 @@
   end
   if is_sub_assignment
     num_replies = recent_event&.parent_assignment&.discussion_topic&.reply_to_entry_required_count || 1
-    title = if recent_event.sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC
-              t('%{title} Initial Post', {title: recent_event.title})
+    title = if recent_event.sub_assignment_tag == 'reply_to_topic'
+              t('%{title} Reply to Topic', {title: recent_event.title})
             else
               t('%{title} Required Replies (%{num_replies})', {title: recent_event.title, num_replies: num_replies})
             end

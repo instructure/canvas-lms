@@ -767,7 +767,7 @@ describe "context modules" do
       user_session(@student)
       go_to_modules
       checkpoints = ff("div[data-testid='checkpoint']")
-      expect(checkpoints[0].text).to include("Initial Post\n#{datetime_string(@c1.overridden_for(@student).due_at)}")
+      expect(checkpoints[0].text).to include("Reply to Topic\n#{datetime_string(@c1.overridden_for(@student).due_at)}")
       expect(checkpoints[1].text).to include("Required Replies (#{@topic.reply_to_entry_required_count})\n#{datetime_string(@c2.overridden_for(@student).due_at)}")
     end
 
@@ -790,7 +790,7 @@ describe "context modules" do
       go_to_modules
 
       checkpoints = ff("div[data-testid='checkpoint']")
-      expect(checkpoints[0].text).to include("Initial Post\n#{datetime_string(@c1.reload.due_at)}")
+      expect(checkpoints[0].text).to include("Reply to Topic\n#{datetime_string(@c1.reload.due_at)}")
       expect(checkpoints[1].text).to include("Required Replies (#{@topic.reply_to_entry_required_count})\n#{datetime_string(@c2.reload.due_at)}")
     end
 
@@ -820,7 +820,7 @@ describe "context modules" do
       go_to_modules
 
       checkpoints = ff("div[data-testid='checkpoint']")
-      expect(checkpoints[0].text).to include("Initial Post\n#{datetime_string(@c1.overridden_for(@student).due_at)}")
+      expect(checkpoints[0].text).to include("Reply to Topic\n#{datetime_string(@c1.overridden_for(@student).due_at)}")
       expect(checkpoints[1].text).to include("Required Replies (#{@topic.reply_to_entry_required_count})\n#{datetime_string(@c2.overridden_for(@student).due_at)}")
     end
   end

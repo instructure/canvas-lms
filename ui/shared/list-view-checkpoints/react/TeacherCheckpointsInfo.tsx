@@ -140,7 +140,7 @@ export const TeacherCheckpointsInfo: React.FC<TeacherCheckpointsInfoProps> = ({a
       }}
     >
       <CheckpointInfo
-        title={I18n.t('Initial Post')}
+        title={I18n.t('Reply to Topic')}
         dueDate={getCheckpointDueDates(replyToTopicCheckpoint)}
         testId={`${assignment.id}_${REPLY_TO_TOPIC}`}
       />

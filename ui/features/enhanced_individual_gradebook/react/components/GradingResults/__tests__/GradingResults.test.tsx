@@ -658,7 +658,7 @@ describe('Grading Results Tests', () => {
       expect(getByTestId('student_and_reply_to_entry_assignment_grade_input')).toBeInTheDocument()
       expect(getByTestId('student_and_assignment_grade_input')).toBeInTheDocument()
 
-      expect(getByText('Initial Post: (out of 5)', {selector: 'span'})).toBeInTheDocument()
+      expect(getByText('Reply to Topic: (out of 5)', {selector: 'span'})).toBeInTheDocument()
       expect(getByText('Required Replies: (out of 15)', {selector: 'span'})).toBeInTheDocument()
       expect(getByText('Total: (out of 20)', {selector: 'span'})).toBeInTheDocument()
     })
@@ -685,7 +685,7 @@ describe('Grading Results Tests', () => {
       expect(getByTestId('student_and_reply_to_entry_assignment_grade_select')).toBeInTheDocument()
       expect(getByTestId('student_and_assignment_grade_select')).toBeInTheDocument()
 
-      expect(getByText('Initial Post: ( - out of 5)', {selector: 'span'})).toBeInTheDocument()
+      expect(getByText('Reply to Topic: ( - out of 5)', {selector: 'span'})).toBeInTheDocument()
       expect(getByText('Required Replies: ( - out of 15)', {selector: 'span'})).toBeInTheDocument()
       expect(getByText('Total: ( - out of 20)', {selector: 'span'})).toBeInTheDocument()
     })

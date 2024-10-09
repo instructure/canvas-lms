@@ -100,7 +100,7 @@ export function CheckpointsTray({...props}) {
           >
             <Flex direction="column">
               <Flex.Item align="start">
-                <Text size="small">{I18n.t('Initial Post')} </Text>
+                <Text size="small">{I18n.t('Reply to Topic')} </Text>
               </Flex.Item>
               <Flex.Item align="start">
                 <Text size="small">{getCheckpointDueString(replyToTopicCheckpoint)}</Text>
