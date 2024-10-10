@@ -19,6 +19,7 @@
 #
 
 require_relative "content_migration/course_copy_helper"
+require "webmock/rspec"
 
 describe ContentMigration do
   before :once do
@@ -2104,7 +2105,7 @@ describe ContentMigration do
     end
   end
 
-  context "media catridge migration" do
+  context "media cartridge migration" do
     include_context "course copy"
 
     let(:success_response) { Net::HTTPSuccess.new(Net::HTTPOK, "200", "OK") }
@@ -2172,6 +2173,16 @@ describe ContentMigration do
       expect(@copy_to.wiki_pages.last.body).to eq("<iframe data-media-type=\"video\" data-media-id=\"#{destination_att2.media_entry_id}\" src=\"/media_attachments_iframe/#{destination_att2.id}?embedded=true&amp;type=video\"></iframe>")
       expect(@zip_file.find_entry("web_resources/Uploaded Media/first.webm")).not_to be_nil
       expect(@zip_file.find_entry("web_resources/Uploaded Media/second.webm")).not_to be_nil
+    end
+
+    it "properly migrates media files without extensions" do
+      @att1.update(filename: "first", display_name: "first", uploaded_data: fixture_file_upload("292"))
+
+      run_export_and_import
+
+      destination_att1 = @copy_to.attachments.find_by(migration_id: mig_id(@att1))
+      expect(destination_att1.media_entry_id).not_to be_nil
+      expect(destination_att1.content_type).to eq "audio/mpeg"
     end
   end
 
