@@ -240,7 +240,8 @@ submission_stickers:
   state: hidden
   applies_to: Course
   display_name: Submission Stickers
-  description: Allows teachers to attach stickers to student submissions.
+  description: Allows teachers to attach stickers to student submissions. Requires the "Assignment Enhancements - Student" feature flag to be enabled.
+  custom_transition_proc: assignment_enhancements_prereq_for_stickers_hook
   environments:
     ci:
       state: allowed_on # enable for automated testing builds and local testing
