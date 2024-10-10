@@ -137,12 +137,13 @@ module Lti::IMS::Providers
 
     def assignment
       return nil unless rlid?
+      return @assignment if defined?(@assignment)
 
-      @assignment ||= Assignment.active.for_course(course.id)
-                                .joins(line_items: :resource_link)
-                                .where(lti_resource_links: { id: resource_link&.id })
-                                .distinct
-                                .take
+      @assignment = Assignment.active.for_course(course.id)
+                              .joins(line_items: :resource_link)
+                              .where(lti_resource_links: { id: resource_link&.id })
+                              .distinct
+                              .take
     end
 
     def assignment?
@@ -172,7 +173,8 @@ module Lti::IMS::Providers
           api_message: "Requested ResourceLink has an unexpected content type"
         )
       end
-      if tool_tag.content_id != tool.id
+
+      unless tool.can_access_content_tag?(tool_tag)
         raise Lti::IMS::AdvantageErrors::InvalidResourceLinkIdFilter.new(
           "ResourceLink (rlid: #{rlid}) needs binding to external tool #{tool.id} but found #{tool_tag.content_id}",
           api_message: "Requested ResourceLink bound to unexpected external tool"
