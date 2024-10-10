@@ -480,6 +480,7 @@ class Group < ActiveRecord::Base
     self.join_level ||= "invitation_only"
     self.is_public ||= false
     self.is_public = false unless self.group_category.try(:communities?)
+    self.non_collaborative = group_category.non_collaborative if group_category && !non_collaborative_changed?
     set_default_account
   end
   private :ensure_defaults

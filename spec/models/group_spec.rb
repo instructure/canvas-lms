@@ -946,7 +946,7 @@ describe Group do
 
     it "non_collaborative can be set on creation but cannot be changed afterwards" do
       # Set non_collaborative on creation
-      group = Group.create(context: course, group_category: non_collaborative_category, name: "Test Group", non_collaborative: true)
+      group = Group.create(context: course, group_category: non_collaborative_category, name: "Test Group")
       expect(group).to be_valid
       expect(group.non_collaborative).to be true
 
@@ -971,30 +971,40 @@ describe Group do
     end
 
     it "must belong to a course" do
-      course_group = Group.new(context: course, group_category: non_collaborative_category, name: "Course Group", non_collaborative: true)
+      course_group = Group.new(context: course, group_category: non_collaborative_category, name: "Course Group")
       expect(course_group).to be_valid
 
-      account_group = Group.new(context: account, group_category: non_collaborative_category, name: "Account Group", non_collaborative: true)
+      account_group = Group.new(context: account, group_category: non_collaborative_category, name: "Account Group")
       expect(account_group).not_to be_valid
       expect(account_group.errors[:base]).to include("Non-collaborative groups must belong to a course")
     end
 
     it "cannot have a leader" do
-      group_with_leader = Group.new(context: course, group_category: non_collaborative_category, name: "Group with Leader", non_collaborative: true, leader: user)
+      group_with_leader = Group.new(context: course, group_category: non_collaborative_category, name: "Group with Leader", leader: user)
       expect(group_with_leader).not_to be_valid
       expect(group_with_leader.errors[:base]).to include("Non-collaborative groups cannot have a leader")
 
-      group_without_leader = Group.new(context: course, group_category: non_collaborative_category, name: "Group without Leader", non_collaborative: true)
+      group_without_leader = Group.new(context: course, group_category: non_collaborative_category, name: "Group without Leader")
       expect(group_without_leader).to be_valid
     end
 
     it "must match the non_collaborative status of its category" do
-      mismatched_group = Group.new(context: course, name: "Mismatched Group", non_collaborative: true, group_category: collaborative_category)
+      mismatched_group = Group.new(context: course, name: "Mismatched Group", group_category: collaborative_category, non_collaborative: true)
       expect(mismatched_group).not_to be_valid
       expect(mismatched_group.errors[:base]).to include("Group non_collaborative status must match its category")
 
-      matched_group = Group.new(context: course, name: "Matched Group", non_collaborative: true, group_category: non_collaborative_category)
+      matched_group = Group.new(context: course, name: "Matched Group", group_category: non_collaborative_category, non_collaborative: true)
       expect(matched_group).to be_valid
+    end
+
+    it "sets non_collaborative to true if the group_category is non_collaborative" do
+      group = Group.create!(name: "Non-Collaborative Group", group_category: non_collaborative_category, context: course)
+      expect(group.non_collaborative).to be_truthy
+    end
+
+    it "sets non_collaborative to false if the group_category is collaborative" do
+      group = Group.create!(name: "Collaborative Group", group_category: collaborative_category, context: course)
+      expect(group.non_collaborative).to be_falsey
     end
   end
 end
