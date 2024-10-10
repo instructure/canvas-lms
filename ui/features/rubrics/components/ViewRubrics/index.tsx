@@ -57,10 +57,15 @@ export const TABS = {
 
 export type ViewRubricsProps = {
   canManageRubrics?: boolean
+  canImportExportRubrics?: boolean
   showHeader?: boolean
 }
 
-export const ViewRubrics = ({canManageRubrics = false, showHeader = true}: ViewRubricsProps) => {
+export const ViewRubrics = ({
+  canManageRubrics = false,
+  canImportExportRubrics = false,
+  showHeader = true,
+}: ViewRubricsProps) => {
   const navigate = useNavigate()
   const {accountId, courseId} = useParams()
   const isAccount = !!accountId
@@ -255,12 +260,11 @@ export const ViewRubrics = ({canManageRubrics = false, showHeader = true}: ViewR
             data-testid="rubric-search-bar"
           />
         </FlexItem>
-        <FlexItem>
-          {canManageRubrics && (
+        <FlexItem margin="small">
+          {canManageRubrics && canImportExportRubrics && (
             <Button
               renderIcon={IconImportLine}
               color="secondary"
-              margin="small"
               data-testid="import-rubric-button"
               onClick={() => setImportTrayIsOpen(true)}
             >
@@ -345,13 +349,15 @@ export const ViewRubrics = ({canManageRubrics = false, showHeader = true}: ViewR
         onClose={handleLocationsUsedModalClose}
       />
 
-      <ImportRubric
-        accountId={accountId}
-        courseId={courseId}
-        isTrayOpen={importTrayIsOpen}
-        handleImportSuccess={handleImportSuccess}
-        handleTrayClose={() => setImportTrayIsOpen(false)}
-      />
+      {canImportExportRubrics && (
+        <ImportRubric
+          accountId={accountId}
+          courseId={courseId}
+          isTrayOpen={importTrayIsOpen}
+          handleImportSuccess={handleImportSuccess}
+          handleTrayClose={() => setImportTrayIsOpen(false)}
+        />
+      )}
     </View>
   )
 }
