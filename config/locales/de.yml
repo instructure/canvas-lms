@@ -9395,7 +9395,7 @@ de:
         confirm_unenroll: "Widerruf der Einschreibung bestätigen"
       links: 
         course_setup: "Checkliste für Kurseinstellungen"
-        drop_course: "Diesen Kurs verwerfen"
+        drop_course: "Vom Kurs abmelden"
         import: "Vorhandenen Inhalt importieren"
         join_course: "An diesem Kurs teilnehmen"
         new_announcement: "Neue Ankündigung"
@@ -9836,7 +9836,7 @@ de:
       send_failed: "Die Anforderung ist fehlgeschlagen. Versuchen Sie es erneut."
       teachers_only: "Bis zur *Veröffentlichung* ist der Kurs nur für Dozenten sichtbar"
       titles: 
-        drop_course: "Diesen Kurs verwerfen"
+        drop_course: "Vom Kurs abmelden"
         recent_feedback: "Aktuelles Feedback"
     sidebar_weighting: 
       default_name: Gruppe
