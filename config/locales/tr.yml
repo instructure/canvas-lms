@@ -2,6 +2,9 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 tr: 
+  1_hour_and_count_minutes_27533c1b: 
+    one: "1 saat ve dakika"
+    other: "1 saat ve %{count} dakika"
   1_item_scores_5512cd03: "1- Öğe puanları"
   1_item_scores_examplescores_9736236: "1- Öğe  Puanları: %{exampleScores}"
   1_pt_cd3551c8: "1 puan"
@@ -166,6 +169,7 @@ tr:
     uploading: Yükleniyor...
   _2d4c0d31: …
   _5a374287: "..."
+  __376f89ea: "--"
   _at_the_bottom__4360f2b4: "-- Alt kısımda --"
   _b4455c8b: "%"
   _count_points_23dc93e0: 
@@ -175,6 +179,8 @@ tr:
   _section_not_synced_yet_cd07d0dd: "-- Bölüm henüz senkronize edilmedi"
   a_and_b_cannot_be_used_together_77ee6a2a: "{a} ve {b} birlikte kullanılamaz"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Bu hesaplama yöntemiyle bir hesaplama değeri kullanılmıyor "
+  a_canvas_security_token_was_just_generated_for_you_b03be18b: "Canvas güvenlik anahtarı, başka biri tarafından hesabınız için yeni oluşturuldu. Kullanılmadan önce, anahtarın burada sizin tarafınızdan etkinleştirilmesi gerekir:"
+  a_canvas_security_token_was_just_generated_for_you_ef4021aa: "Hesabınız için başka biri tarafından bir Canvas güvenlik anahtarı oluşturuldu. Bir kullanıcı anahtarı talep ettiyseniz, başka bir işlem yapmanız gerekmez. Kullanılabilmesi için anahtarın sizin tarafınızdan burada etkinleştirilmesi gerekir:"
   a_canvas_security_token_was_just_generated_for_you_efeeac68: "Hesabınız için az önce bir Canvas güvenlik anahtarı oluşturuldu. Bir kullanıcı anahtarı istediyseniz, başka bir işlem yapmanız gerekmez. Anahtar talep etmediyseniz veya Canvas erişim anahtarlarınızı yönetmek istiyorsanız, bunu buradan yapabilirsiniz:"
   a_comma_delimited_list_of_external_tools_urls_to_i_ffe707f2: "Drop Box Gönderi Sayısı sütununda yer alan virgülle ayrılmış harici araç URL listesi"
   a_comma_delimited_list_of_user_ids_to_report_on_49e05a7: "Raporu oluşturulucak virgülle ayrılmış kullanıcı id listeleri"
@@ -670,11 +676,11 @@ tr:
         To: Kime
         Value: Değer
         blank_placeholder: "-"
-        copied_from_label: "Şuradan Kopyala"
-        copied_to_label: "Şuraya Kopyala"
+        copied_from_label: "Şuradan Kopyalandı"
+        copied_to_label: "Şuraya Kopyalandı"
         date: Tarih
         event_id: "Olay Id"
-        event_sis_batch: "SIS Toplu İş"
+        event_sis_batch: "ÖBS Toplu İş"
         event_source_label: Kaynak
         event_type_label: Tür
         reset_from_label: "Şuradan Ayarla"
@@ -18512,6 +18518,7 @@ tr:
     assessment_request_title: "%{title} için Akran İncelemesi"
   student_5da6bfd1: Öğrenci
   student_921b864d: öğrenci
+  student_annotation: "öğrenci açıklaması"
   student_assignment_outcome_map_title: "Öğrenci Yeterliliği"
   student_collaborations_create_b9e312c1: "Öğrencilerin İşbirliğine Yönelik Çalışması - oluştur"
   student_context_card_ad59967e: "Öğrenci Durum Kartı"
