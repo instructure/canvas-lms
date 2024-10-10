@@ -300,7 +300,7 @@ enhanced_rubrics:
       state: allowed
 enhanced_rubrics_copy_to:
   state: hidden
-  applies_to: Course
+  applies_to: SiteAdmin
   root_opt_in: true
   display_name: Enhanced Rubrics Copy To
   description: This functionality allows copying rubrics between courses from the enhanced rubrics UI and also assigning them directly to an assignment.
@@ -361,7 +361,7 @@ speedgrader_studio_media_capture:
       state: allowed
 rubric_imports_exports:
   state: hidden
-  applies_to: RootAccount
+  applies_to: SiteAdmin
   root_opt_in: true
   display_name: Rubric Imports and Exports
   description: This feature allows users to import and export rubrics from CSV and XML files from Enhanced Rubrics.
