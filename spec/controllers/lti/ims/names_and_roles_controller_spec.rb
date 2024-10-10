@@ -319,6 +319,12 @@ describe Lti::IMS::NamesAndRolesController do
           send_request
           expect_single_member(enrollment)
         end
+
+        it "does not match against content tags with the wrong associated_asset_type" do
+          course_module.content_tags.where(associated_asset: resource_link).update_all(associated_asset_type: "LearningOutcome")
+          send_request
+          expect(json).to be_lti_advantage_error_response_body("bad_request", "Requested ResourceLink was not found")
+        end
       end
     end
 
