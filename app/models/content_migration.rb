@@ -208,11 +208,11 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def zip_path
-    (migration_settings || {})[:export_archive_path]
+    migration_settings[:export_archive_path]
   end
 
   def question_bank_name=(name)
-    if (name = name&.strip) != ""
+    if name.present?
       migration_settings[:question_bank_name] = name
     end
   end
