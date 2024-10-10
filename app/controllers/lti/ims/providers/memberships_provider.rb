@@ -97,28 +97,24 @@ module Lti::IMS::Providers
 
     def resource_link
       return nil unless rlid?
+      return @resource_link if defined?(@resource_link)
 
-      @resource_link ||= begin
-        rl = Lti::ResourceLink.find_by(resource_link_uuid: rlid)
-        # context here is a decorated context, we want the original
-        if rl.present? && rl.current_external_tool(Lti::IMS::Providers::MembershipsProvider.unwrap(context))&.id != tool.id
-          raise Lti::IMS::AdvantageErrors::InvalidResourceLinkIdFilter.new(
-            "Tool does not have access to rlid #{rlid}",
-            api_message: "Tool does not have access to rlid or rlid does not exist"
-          )
-        end
-        rl
+      rl = Lti::ResourceLink.find_by(resource_link_uuid: rlid)
+      # context here is a decorated context, we want the original
+      if rl.present? && rl.current_external_tool(Lti::IMS::Providers::MembershipsProvider.unwrap(context))&.id != tool.id
+        raise Lti::IMS::AdvantageErrors::InvalidResourceLinkIdFilter.new(
+          "Tool does not have access to rlid #{rlid}",
+          api_message: "Tool does not have access to rlid or rlid does not exist"
+        )
       end
-    end
 
-    def resource_link?
-      resource_link&.present?
+      @resource_link = rl
     end
 
     def content_tag
-      return nil unless resource_link?
+      return nil unless resource_link
 
-      ContentTag.find_by(associated_asset_id: resource_link&.id)
+      ContentTag.find_by(associated_asset: resource_link)
     end
 
     def role
@@ -154,7 +150,7 @@ module Lti::IMS::Providers
     end
 
     def validate_tool!
-      raise Lti::IMS::AdvantageErrors::InvalidResourceLinkIdFilter unless resource_link?
+      raise Lti::IMS::AdvantageErrors::InvalidResourceLinkIdFilter unless resource_link
 
       if assignment? && !assignment.external_tool?
         raise Lti::IMS::AdvantageErrors::InvalidResourceLinkIdFilter.new(
