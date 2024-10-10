@@ -117,12 +117,12 @@ export const buildAssignmentOverrides = discussion => {
   )
 
   let checkpointOverrides = []
+  const everyoneDates = {}
   const hasCheckpoints = discussion?.assignment?.hasSubAssignments
   if (hasCheckpoints) {
     // we need an override for each 'assignee type: everyone, section, students,...'
     // to determine, count union of reply_to_topic and required_reply + 1 for everyone if checkpoint.due_at
     const allAssignees = getCheckpointAssignees(discussion.assignment.checkpoints)
-    const everyoneDates = {}
     checkpointOverrides = allAssignees.map(assignee => {
       const returnHash = {}
       returnHash.assignedList = assignee
@@ -172,24 +172,21 @@ export const buildAssignmentOverrides = discussion => {
   }
 
   // When this is true, then we do not have a everyone/everyone else option
-  if (
-    target.onlyVisibleToOverrides ||
-    !target.visibleToEveryone ||
-    hasCourseOverride ||
-    hasCheckpoints
-  )
+  if (target.onlyVisibleToOverrides || !target.visibleToEveryone || hasCourseOverride)
     return overrides
 
-  overrides.push({
-    dueDateId: nanoid(),
-    assignedList:
-      overrides.length > 0
-        ? [defaultEveryoneElseOption.assetCode]
-        : [defaultEveryoneOption.assetCode],
-    dueDate: target.dueAt,
-    availableFrom: target.unlockAt || target.delayedPostAt,
-    availableUntil: target.lockAt,
-  })
+  if (Object.keys(everyoneDates).length === 0) {
+    overrides.push({
+      dueDateId: nanoid(),
+      assignedList:
+        overrides.length > 0
+          ? [defaultEveryoneElseOption.assetCode]
+          : [defaultEveryoneOption.assetCode],
+      dueDate: target.dueAt,
+      availableFrom: target.unlockAt || target.delayedPostAt,
+      availableUntil: target.lockAt,
+    })
+  }
   return overrides.length > 0 ? overrides : buildDefaultAssignmentOverride()
 }
 

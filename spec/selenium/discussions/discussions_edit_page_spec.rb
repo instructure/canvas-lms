@@ -2902,6 +2902,64 @@ describe "discussions" do
             expect(Assignment.last.has_sub_assignments).to be(false)
             expect(DiscussionTopic.last.assignment).to be_nil
           end
+
+          it "checkpointed discussion assigned to Everyone with no dates appears correctly with assign to tray" do
+            Account.site_admin.disable_feature!(:selective_release_edit_page)
+
+            get "/courses/#{course.id}/discussion_topics/new"
+            title = "checkpointed discussion assigned to Everyone with no dates"
+
+            f("input[placeholder='Topic Title']").send_keys title
+
+            force_click_native('input[type=checkbox][value="graded"]')
+            force_click_native('input[type=checkbox][value="checkpoints"]')
+
+            Discussion.assign_to_button.click
+
+            click_save_button("Apply")
+
+            wait_for_assign_to_tray_spinner
+            fj("button:contains('Save')").click
+            wait_for_ajaximations
+
+            graded_discussion = DiscussionTopic.last
+            get "/courses/#{@course.id}/discussion_topics/#{graded_discussion.id}/edit"
+            Discussion.assign_to_button.click
+
+            expect(get_all_dates_for_all_cards).to eq [
+              {
+                reply_to_topic: "",
+                required_replies: "",
+                available_from: "",
+                until: "",
+              }
+            ]
+          end
+
+          it "checkpointed discussion assigned to Everyone with no dates appears correctly with embedded assign to cards" do
+            get "/courses/#{course.id}/discussion_topics/new"
+            title = "checkpointed discussion assigned to Everyone with no dates"
+
+            f("input[placeholder='Topic Title']").send_keys title
+
+            force_click_native('input[type=checkbox][value="graded"]')
+            force_click_native('input[type=checkbox][value="checkpoints"]')
+
+            fj("button:contains('Save')").click
+            wait_for_ajaximations
+
+            graded_discussion = DiscussionTopic.last
+            get "/courses/#{@course.id}/discussion_topics/#{graded_discussion.id}/edit"
+
+            expect(get_all_dates_for_all_cards).to eq [
+              {
+                reply_to_topic: "",
+                required_replies: "",
+                available_from: "",
+                until: "",
+              }
+            ]
+          end
         end
 
         context "mastery paths aka cyoe ake conditional release" do
