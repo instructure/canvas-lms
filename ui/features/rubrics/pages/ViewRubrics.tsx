@@ -70,7 +70,10 @@ export const Component = () => {
               <TabbedView accountId={accountId} />
             </>
           ) : (
-            <ViewRubrics canManageRubrics={ENV.PERMISSIONS?.manage_rubrics} />
+            <ViewRubrics
+              canManageRubrics={ENV.PERMISSIONS?.manage_rubrics}
+              canImportExportRubrics={ENV.rubric_imports_exports}
+            />
           )}
         </ApolloProvider>
       </Portal>
