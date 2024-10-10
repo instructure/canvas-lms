@@ -48,6 +48,7 @@ import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
 import QuizzesNextSpeedGrading from '../QuizzesNextSpeedGrading'
 import StatusPill from '@canvas/grading-status-pill'
+import SubmissionSticker from '@canvas/submission-sticker'
 import JQuerySelectorCache from '../JQuerySelectorCache'
 import numberHelper from '@canvas/i18n/numberHelper'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
@@ -202,6 +203,7 @@ let anonymizableUserId: 'anonymous_id' | 'user_id'
 let anonymizableStudentId: 'anonymous_id' | 'student_id'
 let anonymizableAuthorId: 'anonymous_id' | 'author_id'
 let isModerated: boolean
+let isMostRecentAttempt: boolean
 
 let commentSubmissionInProgress: boolean
 let reassignAssignmentInProgress: boolean
@@ -1366,6 +1368,7 @@ EG = {
   jsonReady() {
     isAnonymous = setupIsAnonymous(window.jsonData)
     isModerated = setupIsModerated(window.jsonData)
+    isMostRecentAttempt = true
     anonymousGraders = setupAnonymousGraders(window.jsonData)
     anonymizableId = setupAnonymizableId(isAnonymous)
     anonymizableUserId = setupAnonymizableUserId(isAnonymous)
@@ -1608,12 +1611,14 @@ EG = {
     const rubricFull = selectors.get('#rubric_full')
 
     if (rubricFull.filter(':visible').length || isClosed) {
+      $('#submission_sticker_mount_point').show()
       toggleGradeVisibility(true)
       rubricFull.fadeOut()
       $('.toggle_full_rubric').focus()
     } else {
       rubricFull.fadeIn()
       toggleGradeVisibility(false)
+      $('#submission_sticker_mount_point').hide()
       this.refreshFullRubric()
       originalRubric = EG.getOriginalRubricInfo()
       rubricFull.find('.rubric_title .title').focus()
@@ -1650,12 +1655,12 @@ EG = {
     return null
   },
 
-  hasUnsubmittedRubric(originalRubric_) {
+  hasUnsubmittedRubric(rubric) {
     const $rubricFull = $('#rubric_full')
     if ($rubricFull.filter(':visible').length) {
       const $unSavedRubric = $('.save_rubric_button').parents('#rubric_holder').find('.rubric')
       const unSavedData = rubricAssessment.assessmentData($unSavedRubric)
-      return !isEqual(unSavedData, originalRubric_)
+      return !isEqual(unSavedData, rubric)
     }
     return false
   },
@@ -1918,6 +1923,8 @@ EG = {
       $not_gradeable_message.hide()
       $rightside_inner.show()
     }
+
+    this.renderSticker()
     if (ENV.grading_role === 'moderator') {
       this.renderProvisionalGradeSelector({showingNewStudent: true})
       this.setCurrentStudentRubricAssessments()
@@ -2607,10 +2614,9 @@ EG = {
     renderSubmissionCommentsDownloadLink(submission)
     EG.updateWordCount(preview_attachment ? preview_attachment.word_count : submission.word_count)
 
+    isMostRecentAttempt = !$submission_to_view.filter(':visible').find(':selected').nextAll().length
     // if there is any submissions after this one, show a notice that they are not looking at the newest
-    $submission_not_newest_notice.showIf(
-      $submission_to_view.filter(':visible').find(':selected').nextAll().length
-    )
+    $submission_not_newest_notice.showIf(!isMostRecentAttempt)
 
     $submission_late_notice.showIf(submission.late)
     $full_width_container.removeClass('with_enrollment_notice')
@@ -2664,6 +2670,7 @@ EG = {
         renderStatusMenu(component, mountPoint)
       }
     }
+    this.renderSticker()
 
     EG.showDiscussion()
   },
@@ -3414,13 +3421,19 @@ EG = {
     return commentElement
   },
 
-  currentDisplayedSubmission(): HistoricalSubmission {
-    const displayedHistory =
-      typeof this.currentStudent.submission?.currentSelectedIndex === 'number'
-        ? this.currentStudent.submission?.submission_history?.[
-            this.currentStudent.submission.currentSelectedIndex
-          ]
-        : undefined
+  currentDisplayedSubmission(inferIdx = false): HistoricalSubmission {
+    const history = this.currentStudent.submission?.submission_history
+    let requestedIdx = this.currentStudent.submission?.currentSelectedIndex
+
+    if (inferIdx && requestedIdx == null && history?.length) {
+      requestedIdx = history.length - 1
+    }
+
+    if (history == null || requestedIdx == null) {
+      return this.currentStudent.submission
+    }
+
+    const displayedHistory = history[requestedIdx]
     return displayedHistory?.submission || this.currentStudent.submission
   },
 
@@ -4289,6 +4302,51 @@ EG = {
       })
       this.renderProvisionalGradeSelector()
     }
+  },
+
+  renderSticker() {
+    const mountPoint = document.getElementById('submission_sticker_mount_point')
+    if (!mountPoint) {
+      return
+    }
+
+    if (ENV.grading_role === 'moderator' || ENV.grading_role === 'provisional_grader') {
+      return
+    }
+
+    const {
+      id,
+      anonymous_id: anonymousId,
+      assignment_id: assignmentId,
+      user_id: userId,
+      sticker,
+    } = EG.currentDisplayedSubmission()
+
+    const submission = {courseId: ENV.course_id, id, anonymousId, assignmentId, userId, sticker}
+    const changeSticker = newSticker => {
+      const currentSubmission = EG.currentDisplayedSubmission(true)
+      currentSubmission.sticker = newSticker
+
+      if (
+        currentSubmission !== this.currentStudent.submission &&
+        currentSubmission.attempt === this.currentStudent.submission?.attempt
+      ) {
+        this.currentStudent.submission.sticker = newSticker
+        renderHiddenSubmissionPill(this.currentStudent.submission)
+      }
+      this.renderSticker()
+    }
+
+    ReactDOM.render(
+      <SubmissionSticker
+        confetti={false}
+        editable={isMostRecentAttempt}
+        onStickerChange={changeSticker}
+        size="medium"
+        submission={submission}
+      />,
+      mountPoint
+    )
   },
 
   renderProvisionalGradeSelector({showingNewStudent = false} = {}) {

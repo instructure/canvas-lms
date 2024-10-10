@@ -29,7 +29,11 @@ import {
   IconPermissionsLine,
 } from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
-import {CURRENT_USER, DiscussionManagerUtilityContext} from '../../utils/constants'
+import {
+  CURRENT_USER,
+  DiscussionManagerUtilityContext,
+  isSpeedGraderInTopUrl,
+} from '../../utils/constants'
 import React, {useContext, useState} from 'react'
 import {Responsive} from '@instructure/ui-responsive'
 import {hideStudentNames, responsiveQuerySizes} from '../../utils'
@@ -265,21 +269,21 @@ export const DiscussionPostToolbar = props => {
                     </span>
                   </Tooltip>
                 </Flex.Item>
-
-                <Flex.Item
-                  margin={responsiveProps?.viewSplitScreen?.margin}
-                  padding={responsiveProps.padding}
-                  shouldGrow={responsiveProps?.viewSplitScreen?.shouldGrow}
-                >
-                  <SplitScreenButton
-                    setUserSplitScreenPreference={props.setUserSplitScreenPreference}
-                    userSplitScreenPreference={props.userSplitScreenPreference}
-                    closeView={props.closeView}
-                    display={matches.includes('mobile') ? 'block' : 'inline-block'}
-                  />
-                </Flex.Item>
-
-                {!props.userSplitScreenPreference && (
+                {!isSpeedGraderInTopUrl && (
+                  <Flex.Item
+                    margin={responsiveProps?.viewSplitScreen?.margin}
+                    padding={responsiveProps.padding}
+                    shouldGrow={responsiveProps?.viewSplitScreen?.shouldGrow}
+                  >
+                    <SplitScreenButton
+                      setUserSplitScreenPreference={props.setUserSplitScreenPreference}
+                      userSplitScreenPreference={props.userSplitScreenPreference}
+                      closeView={props.closeView}
+                      display={matches.includes('mobile') ? 'block' : 'inline-block'}
+                    />
+                  </Flex.Item>
+                )}
+                {(!props.userSplitScreenPreference || isSpeedGraderInTopUrl) && (
                   <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
                     <ExpandCollapseThreadsButton showText={!matches.includes('mobile')} />
                   </Flex.Item>

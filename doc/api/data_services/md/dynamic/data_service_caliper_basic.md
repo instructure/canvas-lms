@@ -380,7 +380,7 @@ Basic
 | **data[0].group.extensions["com.instructure.canvas"].entity_id** | Canvas context ID |
 | **data[0].object.extensions["com.instructure.canvas"].entity_id** | Canvas global ID of the object affected by the event |
 | **data[0].object.extensions["com.instructure.canvas"].lock_at** | The lock date (assignment is locked after this date) |
-| **data[0].object.extensions["com.instructure.canvas"].workflow_state** | 1. Workflow state of the assignment when used in the assignment context (deleted, duplicating, failed_to_import, failed_to_duplicate, failed_to_migrate, importing, published, unpublished) - 2. Workflow state of the enrollment when used in the enrollment context (active, completed, creation_pending, deleted, inactive, invited) |
+| **data[0].object.extensions["com.instructure.canvas"].workflow_state** | 1. Workflow state of the assignment when used in the assignment context (deleted, duplicating, fail_to_import, failed_to_duplicate, failed_to_migrate, importing, published, unpublished) - 2. Workflow state of the enrollment when used in the enrollment context (active, completed, creation_pending, deleted, inactive, invited) |
 | **data[0].object.type** | AssignableDigitalResource |
 
 
@@ -1018,7 +1018,7 @@ Basic
 | **data[0].object.extensions["com.instructure.canvas"].type** | The type of enrollment; e.g. StudentEnrollment, TeacherEnrollment, ObserverEnrollment, etc. |
 | **data[0].object.extensions["com.instructure.canvas"].user_id** | The Canvas id of the currently logged in user |
 | **data[0].object.extensions["com.instructure.canvas"].user_name** | The user first and last name |
-| **data[0].object.extensions["com.instructure.canvas"].workflow_state** | 1. Workflow state of the assignment when used in the assignment context (deleted, duplicating, failed_to_import, failed_to_duplicate, failed_to_migrate, importing, published, unpublished) - 2. Workflow state of the enrollment when used in the enrollment context (active, completed, creation_pending, deleted, inactive, invited) |
+| **data[0].object.extensions["com.instructure.canvas"].workflow_state** | 1. Workflow state of the assignment when used in the assignment context (deleted, duplicating, fail_to_import, failed_to_duplicate, failed_to_migrate, importing, published, unpublished) - 2. Workflow state of the enrollment when used in the enrollment context (active, completed, creation_pending, deleted, inactive, invited) |
 | **data[0].object.type** | Entity |
 
 
@@ -1369,7 +1369,7 @@ Basic
 | **data[0].object.extensions["com.instructure.canvas"].type** | The type of enrollment; e.g. StudentEnrollment, TeacherEnrollment, ObserverEnrollment, etc. |
 | **data[0].object.extensions["com.instructure.canvas"].user_id** | The Canvas id of the currently logged in user |
 | **data[0].object.extensions["com.instructure.canvas"].user_name** | The user first and last name |
-| **data[0].object.extensions["com.instructure.canvas"].workflow_state** | 1. Workflow state of the assignment when used in the assignment context (deleted, duplicating, failed_to_import, failed_to_duplicate, failed_to_migrate, importing, published, unpublished) - 2. Workflow state of the enrollment when used in the enrollment context (active, completed, creation_pending, deleted, inactive, invited) |
+| **data[0].object.extensions["com.instructure.canvas"].workflow_state** | 1. Workflow state of the assignment when used in the assignment context (deleted, duplicating, fail_to_import, failed_to_duplicate, failed_to_migrate, importing, published, unpublished) - 2. Workflow state of the enrollment when used in the enrollment context (active, completed, creation_pending, deleted, inactive, invited) |
 | **data[0].object.type** | Entity |
 
 

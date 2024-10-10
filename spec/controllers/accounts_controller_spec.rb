@@ -1498,6 +1498,11 @@ describe AccountsController do
         expect(response).to be_successful
         expect(response.body).to match(/"name":"apple".+"name":"bar".+"name":"foo"/)
       end
+
+      it "works in conjunction with the blueprint option" do
+        get "courses_api", params: { account_id: @account.id, sort: "course_status", order: "desc", blueprint: false }
+        expect(response).to be_successful
+      end
     end
 
     it "is able to sort courses by name ascending" do

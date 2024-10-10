@@ -270,6 +270,8 @@
       delay_for: 0
     - name: Access Token Created On Behalf Of User
       delay_for: 0
+    - name: Access Token Deleted
+      delay_for: 0
 
 - category: Student Appointment Signups
   notifications:

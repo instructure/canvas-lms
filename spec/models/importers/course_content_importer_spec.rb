@@ -21,9 +21,12 @@
 require_relative "../../import_helper"
 
 describe Course do
-  describe "import_content" do
+  describe "#import_content" do
     before(:once) do
       @course = course_factory
+      @course.root_account.settings[:provision] = { "lti" => "lti url" }
+      @course.root_account.save!
+      @course
     end
 
     it "imports a whole json file" do
@@ -328,24 +331,102 @@ describe Course do
       migration = build_migration(@course, params)
       setup_import(@course, "discussion_assignments.json", migration)
       dt = @course.discussion_topics.find_by(migration_id: "g8bacee869e70bf19cd6784db3efade7e")
+      expect(dt.reply_to_entry_required_count).to eq 2
       expect(dt.assignment.assignment_group).to eq a1.assignment_group
       expect(dt.assignment.assignment_group).to_not be_deleted
       expect(a1.reload).to be_deleted # didn't restore the previously deleted assignment too
     end
 
-    context "when it is a Quizzes.Next migration" do
+    context "when it is a Quizzes.Next import process" do
       let(:migration) do
         params = { copy: { "everything" => true } }
         build_migration(@course, params)
       end
 
       before do
-        allow(migration).to receive(:quizzes_next_migration?).and_return(true)
+        allow(migration).to receive(:quizzes_next_import_process?).and_return(true)
       end
 
       it "does not set workflow_state to imported" do
         setup_import(@course, "assessments.json", migration)
         expect(migration.workflow_state).not_to eq("imported")
+      end
+    end
+
+    describe "content migration workflow_state" do
+      subject { setup_import(@course, "assessments.json", migration) }
+
+      let(:migration) { build_migration(@course, copy: { "everything" => true }) }
+
+      it "set workflow_state to imported" do
+        subject
+        expect(migration.workflow_state).to eq("imported")
+      end
+
+      context "when the migration_type is common_cartridge_importer" do
+        before do
+          migration.migration_type = "common_cartridge_importer"
+        end
+
+        it "set workflow_state to imported" do
+          subject
+          expect(migration.workflow_state).to eq("imported")
+        end
+
+        context "when common_cartridge_qti_new_quizzes_import_enabled? is true" do
+          before do
+            Account.site_admin.enable_feature!(:common_cartridge_qti_new_quizzes_import)
+            migration.context.root_account.enable_feature!(:new_quizzes_migration)
+          end
+
+          it "does not set workflow_state to imported" do
+            subject
+            expect(migration.workflow_state).not_to eq("imported")
+          end
+        end
+      end
+
+      context "when the migration_type is canvas_cartridge_importer" do
+        before do
+          migration.migration_type = "canvas_cartridge_importer"
+        end
+
+        it "set workflow_state to imported" do
+          subject
+          expect(migration.workflow_state).to eq("imported")
+        end
+
+        context "when common_cartridge_qti_new_quizzes_import_enabled? is true" do
+          before do
+            Account.site_admin.enable_feature!(:common_cartridge_qti_new_quizzes_import)
+            migration.context.root_account.enable_feature!(:new_quizzes_migration)
+          end
+
+          it "does not set workflow_state to imported" do
+            subject
+            expect(migration.workflow_state).not_to eq("imported")
+          end
+        end
+      end
+
+      context "when quizzes_next is enabled" do
+        before { migration.context.enable_feature!(:quizzes_next) }
+
+        it "set workflow_state to imported" do
+          subject
+          expect(migration.workflow_state).to eq("imported")
+        end
+
+        context "when import_quizzes_next is true in migration settings" do
+          before do
+            migration.migration_settings[:import_quizzes_next] = true
+          end
+
+          it "set workflow_state to imported" do
+            subject
+            expect(migration.workflow_state).not_to eq("imported")
+          end
+        end
       end
     end
 

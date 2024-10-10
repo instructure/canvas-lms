@@ -747,8 +747,8 @@ class AccountsController < ApplicationController
     order = case params[:sort]
             when "course_status"
               "(CASE
-                WHEN workflow_state = 'available' THEN 1
-                WHEN workflow_state = 'completed' THEN 2
+                WHEN courses.workflow_state = 'available' THEN 1
+                WHEN courses.workflow_state = 'completed' THEN 2
                 ELSE 0
               END)"
             when "course_name"

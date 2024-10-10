@@ -139,7 +139,7 @@ module Qti
         match_mig_id = nil
         if (match = r_if.at_css("match"))
           answer_mig_id = get_node_att(match, "variable", "identifier")
-          match_mig_id = match.at_css("baseValue[baseType=identifier]").text rescue nil
+          match_mig_id = match.at_css("baseValue[baseType=identifier]")&.text
         end
         next unless (answer = answer_map[answer_mig_id])
 

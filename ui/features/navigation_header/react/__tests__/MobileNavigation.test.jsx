@@ -32,14 +32,9 @@ describe('MobileNavigation', () => {
       ACCOUNT_ID: 'test-account-id',
     }
     axios.get.mockImplementation(url => {
-      if (url === '/api/v1/accounts/test-account-id/lti_apps?per_page=50') {
+      if (url === '/api/v1/accounts/test-account-id/lti_apps/launch_definitions?per_page=50&placements[]=global_navigation') {
         return Promise.resolve({
           data: [],
-        })
-      }
-      if (url === '/api/v1/courses/1/external_tools/1') {
-        return Promise.resolve({
-          data: {},
         })
       }
     })

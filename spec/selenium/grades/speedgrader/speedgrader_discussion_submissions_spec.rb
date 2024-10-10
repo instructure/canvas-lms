@@ -137,21 +137,18 @@ describe "SpeedGrader - discussion submissions" do
         in_frame("discussion_preview_iframe") do
           wait_for_ajaximations
 
-          # These should be uncommented out when the implementation is done in the closing
-          # Patchset for VICE-3920
-          # expect(f("[data-testid='previous-in-speedgrader']")).not_to be_displayed
-          # expect(f("[data-testid='next-in-speedgrader']")).not_to be_displayed
+          expect(f("[data-testid='previous-in-speedgrader']")).not_to be_displayed
+          expect(f("[data-testid='next-in-speedgrader']")).not_to be_displayed
           expect(f("[data-testid='jump-to-speedgrader-navigation']")).not_to be_displayed
+          expect(f("body")).to contain_jqcss("[data-testid='jump-to-speedgrader-navigation']")
 
           # rubocop:disable Specs/NoExecuteScript
           driver.execute_script("document.querySelector('[data-testid=\"jump-to-speedgrader-navigation\"]').focus()")
           # rubocop:enable Specs/NoExecuteScript
           wait_for_ajaximations
 
-          # These should be uncommented out when the implementation is done in the closing
-          # Patchset for VICE-3920
-          # expect(f("[data-testid='previous-in-speedgrader']")).to be_displayed
-          # expect(f("[data-testid='next-in-speedgrader']")).to be_displayed
+          expect(f("[data-testid='previous-in-speedgrader']")).to be_displayed
+          expect(f("[data-testid='next-in-speedgrader']")).to be_displayed
           expect(f("[data-testid='jump-to-speedgrader-navigation']")).to be_displayed
         end
       end
@@ -189,7 +186,7 @@ describe "SpeedGrader - discussion submissions" do
       end
     end
 
-    it "focuses on the entry_id defined in the speegrader url (splitscreen)" do
+    it "focuses on the entry_id defined in the speegrader url in inline even if user has splitscreen preference" do
       entry_3 = @discussion_topic.discussion_entries.create!(user: @student, message: "third student message", parent_id: @discussion_topic.discussion_entries.first.id)
       @teacher.preferences[:discussions_splitscreen_view] = true
       @teacher.save!
@@ -198,7 +195,7 @@ describe "SpeedGrader - discussion submissions" do
       in_frame("speedgrader_iframe") do
         in_frame("discussion_preview_iframe") do
           wait_for_ajaximations
-          expect(f("span.discussions-split-screen-view-content div.highlight-discussion").text).to include entry_3.message
+          expect(f("div[data-testid='discussion-root-entry-container'] div.highlight-discussion").text).to include entry_3.message
         end
       end
     end

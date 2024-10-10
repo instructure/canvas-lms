@@ -77,7 +77,11 @@ module IncomingMailProcessor
         encoding = "UTF-8" if encoding == "UTF8"
 
         # change encoding; if it throws an exception (i.e. unrecognized encoding), just strip invalid UTF-8
-        new_string = string.encode("UTF-8", encoding) rescue nil
+        begin
+          new_string = string.encode("UTF-8", encoding)
+        rescue EncodingError
+          # ignore
+        end
         new_string&.valid_encoding? ? new_string : Utf8Cleaner.strip_invalid_utf8(string)
       end
 

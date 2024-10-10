@@ -20,7 +20,7 @@
 
 module Factories
   def page_view_model(opts = {})
-    factory_with_protected_attributes(PageView, valid_page_view_attributes.merge(opts))
+    PageView.create!(valid_page_view_attributes.merge(opts))
   end
 
   def valid_page_view_attributes

@@ -251,7 +251,7 @@ export default function CanvasDateInput({
 
   function renderDays() {
     // This is expensive, so only do it if the calendar is open
-    if (!isShowingCalendar) return undefined
+    if (!isShowingCalendar) return []
 
     const locale = specifiedLocale || ENV?.LOCALE || navigator.language
 
@@ -417,7 +417,7 @@ export default function CanvasDateInput({
 
   function renderWeekdayLabels() {
     // This is expensive, so only do it if the calendar is open
-    if (!isShowingCalendar) return []
+    if (!isShowingCalendar) return undefined
 
     const firstOfWeek = renderedMoment.clone().startOf('week')
     return [...Array(7).keys()].map(index => {

@@ -64,7 +64,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
 
   before do
     user_session(admin)
-    settings["extensions"][0]["privacy_level"] = privacy_level
+    settings["extensions"][0]["privacy_level"] = privacy_level || extension_privacy_level
   end
 
   shared_examples_for "an action that requires manage developer keys" do |skip_404|
@@ -448,6 +448,16 @@ RSpec.describe Lti::ToolConfigurationsApiController do
       it "sets the privacy level" do
         subject
         expect(config_from_response.privacy_level).to eq "public"
+      end
+    end
+
+    context "when privacy_level is nil" do
+      let(:extension_privacy_level) { "email_only" }
+      let(:privacy_level) { nil }
+
+      it "updates the tool configuration without setting privacy level" do
+        subject
+        expect(config_from_response.privacy_level).to eq "email_only"
       end
     end
 

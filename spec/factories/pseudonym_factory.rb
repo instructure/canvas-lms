@@ -21,7 +21,7 @@
 module Factories
   def pseudonym_model(opts = {})
     user_model unless @user
-    @pseudonym = factory_with_protected_attributes(Pseudonym, valid_pseudonym_attributes.merge(opts))
+    @pseudonym = Pseudonym.create!(valid_pseudonym_attributes.merge(opts))
   end
 
   # Re-generate these because I need a Unique ID

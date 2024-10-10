@@ -119,6 +119,10 @@ describe SubAssignment do
         @topic.assignment.reload.points_possible
       }
     end
+
+    it "can access topic through associations" do
+      expect(@checkpoint.discussion_topic).to eq @topic
+    end
   end
 
   describe "scope: visible_to_students_in_course_with_da" do

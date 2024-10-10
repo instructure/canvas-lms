@@ -23,6 +23,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import ready from '@instructure/ready'
 import GroupModal from '@canvas/group-modal'
 import Group from '@canvas/groups/backbone/models/Group'
+import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 
 const I18n = useI18nScope('StudentGroupDialog')
 
@@ -56,6 +57,8 @@ function editGroup(group, open = true) {
 
 ready(() => {
   const group = new Group(ENV.group)
+
+  initializeTopNavPortal()
 
   $('#edit_group').click(event => {
     event.preventDefault()

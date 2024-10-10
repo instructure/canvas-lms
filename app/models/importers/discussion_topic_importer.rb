@@ -113,6 +113,8 @@ module Importers
         item.send(:"#{attr}=", options[attr])
       end
 
+      item.reply_to_entry_required_count = options[:reply_to_entry_required_count] || 0
+
       type = item.is_a?(Announcement) ? :announcement : :discussion_topic
       item.locked = options[:locked] if !options[:locked].nil? && type == :announcement
       item.message = if options.message

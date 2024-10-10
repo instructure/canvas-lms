@@ -144,7 +144,11 @@ module BlockEditorPage
   end
 
   def block_toolbar_up_button
-    driver.execute_script("return document.querySelector('svg[name=\"IconArrowUp\"]').closest('button')") # rubocop:disable Specs/NoExecuteScript
+    driver.execute_script("return document.querySelector('svg[name=\"IconArrowOpenStart\"]').closest('button')") # rubocop:disable Specs/NoExecuteScript
+  end
+
+  def block_editor_down_button
+    driver.execute_script("return document.querySelector('svg[name=\"IconArrowOpenEnd\"]').closest('button')") # rubocop:disable Specs/NoExecuteScript
   end
 
   def block_toolbar_delete_button_selector

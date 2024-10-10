@@ -113,12 +113,12 @@ end
   </div>
 
   <div id="wrapper" class="ic-Layout-wrapper">
-    <% if crumbs.length > 1 %>
-      <% if @instui_topnav %>
-        <div class="instui-topnav-container">
-          <div id="react-instui-topnav"></div>
-        </div>
-      <% else %>
+    <% if @instui_topnav %>
+      <div class="instui-topnav-container">
+        <div id="react-instui-topnav"></div>
+      </div>
+    <% else %>
+      <% if crumbs.length > 1 %>
         <div class="ic-app-nav-toggle-and-crumbs no-print">
           <% if @show_left_side %>
             <button type="button" id="courseMenuToggle" class="Button Button--link ic-app-course-nav-toggle" aria-live="polite" aria-label="<%= subnav_menu_text %>">

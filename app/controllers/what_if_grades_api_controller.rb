@@ -225,11 +225,27 @@ class WhatIfGradesApiController < ApplicationController
 
         what_if_grade = sanitize_student_entered_score(student_entered_score)
         begin
-          grades = Submissions::WhatIfGradesService.new(@current_user, submission, what_if_grade).call
+          grades = Submissions::WhatIfGradesService.new(@current_user).update(submission, what_if_grade)
           render json: { grades:, submission: { id: submission.id, student_entered_score: submission.student_entered_score } }
         rescue
           render json: submission.errors, status: :bad_request
         end
+      end
+    end
+  end
+
+  # @API Reset the what-if scores for the current user for an entire course and recalculate grades
+  #
+  # @returns {"grades": [Grades]}
+  def reset_for_student_course
+    course = @domain_root_account.all_courses.active.find(params[:course_id])
+    return render_unauthorized_action unless course.grants_right?(@current_user, :reset_what_if_grades)
+
+    grades = Submissions::WhatIfGradesService.new(@current_user).reset_for_course(course)
+
+    respond_to do |format|
+      format.json do
+        render json: { grades: }
       end
     end
   end

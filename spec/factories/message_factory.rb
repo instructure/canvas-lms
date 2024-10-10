@@ -20,7 +20,7 @@
 
 module Factories
   def message_model(opts = {})
-    @message = factory_with_protected_attributes(Message, message_valid_attributes.merge(opts))
+    @message = Message.create!(message_valid_attributes.merge(opts))
   end
 
   def message_valid_attributes

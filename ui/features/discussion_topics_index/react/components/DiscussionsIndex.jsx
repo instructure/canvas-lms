@@ -56,6 +56,8 @@ import actions from '../actions'
 import {reorderDiscussionsURL} from '../utils'
 import {CONTENT_SHARE_TYPES} from '@canvas/content-sharing/react/proptypes/contentShare'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import TopNavPortalWithDefaults from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
+
 const I18n = useI18nScope('discussions_v2')
 
 export default class DiscussionsIndex extends Component {
@@ -347,18 +349,25 @@ export default class DiscussionsIndex extends Component {
 
   render() {
     return (
-      <div className="discussions-v2__wrapper">
-        <ScreenReaderContent>
-          <Heading level="h1">{I18n.t('Discussions')}</Heading>
-        </ScreenReaderContent>
-        <ConnectedIndexHeader />
-        {ENV?.FEATURES?.disallow_threaded_replies_fix_alert && (<DisallowThreadedFixAlert/>)}
-        {this.props.isLoadingDiscussions
-          ? this.renderSpinner(I18n.t('Loading Discussions'))
-          : this.props.permissions.moderate || this.props.DIRECT_SHARE_ENABLED
-          ? this.renderTeacherView()
-          : this.renderStudentView()}
-      </div>
+      <>
+        <TopNavPortalWithDefaults
+          currentPageName={I18n.t('Discussions')}
+          useTutorial={true}
+          useStudentView={true}
+        />
+        <div className="discussions-v2__wrapper">
+          <ScreenReaderContent>
+            <Heading level="h1">{I18n.t('Discussions')}</Heading>
+          </ScreenReaderContent>
+          <ConnectedIndexHeader breakpoints={this.props.breakpoints} />
+          {ENV?.FEATURES?.disallow_threaded_replies_fix_alert && <DisallowThreadedFixAlert />}
+          {this.props.isLoadingDiscussions
+            ? this.renderSpinner(I18n.t('Loading Discussions'))
+            : this.props.permissions.moderate || this.props.DIRECT_SHARE_ENABLED
+            ? this.renderTeacherView()
+            : this.renderStudentView()}
+        </div>
+      </>
     )
   }
 }

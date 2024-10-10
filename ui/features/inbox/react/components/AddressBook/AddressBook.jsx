@@ -580,6 +580,7 @@ export const AddressBook = ({
               }}
               renderTrigger={
                 <TextInput
+                  id="search-address-input"
                   placeholder={selectedMenuItems.length === 0 ? searchPlaceholder : null}
                   renderLabel={
                     <ScreenReaderContent>

@@ -69,11 +69,13 @@ describe "Pages API", type: :request do
                         format: "json",
                         course_id: @course.to_param,
                         include: ["body"])
-        expect(json[0].keys).not_to include("body")
+        expect(json[0].keys).to include("body")
         expect(json[0].keys).to include("block_editor_attributes")
         returned_attributes = json[0]["block_editor_attributes"]
         expect(returned_attributes["version"]).to eq(block_page_data[:version])
         expect(returned_attributes["blocks"]).to eq(block_page_data[:blocks])
+        returned_body = json[0]["body"]
+        expect(returned_body).to eq("<iframe class='block_editor_view' src='/block_editors/#{returned_attributes["id"]}' />")
       end
     end
 
@@ -86,9 +88,11 @@ describe "Pages API", type: :request do
                         format: "json",
                         course_id: @course.id.to_s,
                         url_or_id: @block_page.url)
-        expect(json["body"]).to be_nil
-        expect(json["editor"]).to eq("block_editor")
+
         returned_attributes = json["block_editor_attributes"]
+        expect(json["body"]).to eq("<iframe class='block_editor_view' src='/block_editors/#{returned_attributes["id"]}' />")
+        expect(json["editor"]).to eq("block_editor")
+
         expect(returned_attributes["version"]).to eq(block_page_data[:version])
         expect(returned_attributes["blocks"]).to eq(block_page_data[:blocks])
       end

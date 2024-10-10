@@ -623,6 +623,7 @@ module Api
       protocol = HostUrl.protocol
     end
 
+    no_verifiers = params[:no_verifiers] if defined?(params)
     html = context.shard.activate do
       rewriter = UserContent::HtmlRewriter.new(context, user)
       rewriter.set_handler("files") do |match|
@@ -632,7 +633,8 @@ module Api
           user:,
           preloaded_attachments:,
           is_public:,
-          in_app: respond_to?(:in_app?, true) && in_app?
+          in_app: respond_to?(:in_app?, true) && in_app?,
+          no_verifiers:
         ).processed_url
       end
       rewriter.translate_content(html)

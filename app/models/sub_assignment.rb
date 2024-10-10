@@ -23,6 +23,8 @@ class SubAssignment < AbstractAssignment
   validates :has_sub_assignments, inclusion: { in: [false], message: -> { I18n.t("cannot be true for sub assignments") } }
   validates :sub_assignment_tag, inclusion: { in: [CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY] }
 
+  has_one :discussion_topic, through: :parent_assignment
+
   SUB_ASSIGNMENT_SYNC_ATTRIBUTES = %w[unlock_at lock_at].freeze
   after_save :sync_with_parent, if: :should_sync_with_parent?
   after_commit :aggregate_checkpoint_assignments, if: :checkpoint_changes?
@@ -55,7 +57,7 @@ class SubAssignment < AbstractAssignment
   private
 
   def sync_with_parent
-    return if saved_by == :parent_assignment
+    return if saved_by == :parent_assignment || saved_by == :discussion_topic # saved by discussion_topic happens during assignment importer, where update from sub assignment breaks the import of the asset
 
     changed_attributes = previous_changes.slice(*SUB_ASSIGNMENT_SYNC_ATTRIBUTES)
     parent_assignment.update_from_sub_assignment(changed_attributes)

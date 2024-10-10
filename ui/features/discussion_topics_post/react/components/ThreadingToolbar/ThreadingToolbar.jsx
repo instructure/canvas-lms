@@ -29,14 +29,12 @@ import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../utils'
+import {isSpeedGraderInTopUrl} from '../../utils/constants'
 import {View} from '@instructure/ui-view'
-import useSpeedGrader from '../../hooks/useSpeedGrader'
 
 const I18n = useI18nScope('discussion_posts')
 
 export function ThreadingToolbar({...props}) {
-  const { isInSpeedGrader } = useSpeedGrader()
-
   return (
     <Responsive
       match="media"
@@ -59,9 +57,7 @@ export function ThreadingToolbar({...props}) {
                 props.onOpenSplitView(parentId, false, relativeId, props.discussionEntry._id)
               }}
             >
-              <Text weight="bold">
-                {I18n.t('Go to Reply')}
-              </Text>
+              <Text weight="bold">{I18n.t('Go to Reply')}</Text>
             </Link>
           ) : (
             <InlineList delimiter="pipe" display="inline-flex">
@@ -73,12 +69,17 @@ export function ThreadingToolbar({...props}) {
                     matches.includes('mobile') ? 'mobile-thread-tool' : 'desktop-thread-tool'
                   }
                 >
-                  <View margin={i === 0 ? "0 x-small 0 0" : "0 x-small"} style={{display: 'inline-flex'}}>{c}</View>
+                  <View
+                    margin={i === 0 ? '0 x-small 0 0' : '0 x-small'}
+                    style={{display: 'inline-flex'}}
+                  >
+                    {c}
+                  </View>
                 </InlineList.Item>
               ))}
             </InlineList>
           )}
-          {isInSpeedGrader && (
+          {isSpeedGraderInTopUrl && (
             <View as="div" margin="small 0 0 0">
               <SpeedGraderNavigator />
             </View>

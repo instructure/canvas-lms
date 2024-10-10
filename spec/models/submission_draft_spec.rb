@@ -27,7 +27,7 @@ RSpec.describe SubmissionDraft do
       submission: @submission,
       submission_attempt: @submission.attempt
     )
-    @media_object = factory_with_protected_attributes(MediaObject, media_id: "m-123456", title: "CreedThoughts")
+    @media_object = MediaObject.create!(media_id: "m-123456", title: "CreedThoughts")
   end
 
   describe "cross-shard attachments" do
@@ -123,7 +123,7 @@ RSpec.describe SubmissionDraft do
     end
 
     it "can be changed by updating the media_object_id" do
-      media_object = factory_with_protected_attributes(MediaObject, media_id: "m-654321", title: "BeetsBearsBattleStarGalactica")
+      media_object = MediaObject.create!(media_id: "m-654321", title: "BeetsBearsBattleStarGalactica")
       @submission_draft.media_object_id = media_object.media_id
       expect(@submission_draft.media_object.media_id).to eq(media_object.media_id)
       expect(@submission_draft.media_object.title).to eq(media_object.title)

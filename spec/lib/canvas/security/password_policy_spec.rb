@@ -43,7 +43,7 @@ describe Canvas::Security::PasswordPolicy do
       account.save
       @pseudonym = Pseudonym.new
       @pseudonym.user = user_factory
-      @pseudonym.account = Account.default
+      @pseudonym.account = account
       @pseudonym.unique_id = "foo"
     end
 
@@ -60,8 +60,8 @@ describe Canvas::Security::PasswordPolicy do
     end
 
     it "does not validate against new policies if :password_complexity is disabled" do
-      account.disable_feature!(:password_complexity)
       pseudonym_with_policy({ require_number_characters: "true", require_symbol_characters: "true" })
+      @pseudonym.account.disable_feature!(:password_complexity)
 
       @pseudonym.password = @pseudonym.password_confirmation = "2short"
       expect(@pseudonym).not_to be_valid
@@ -89,6 +89,10 @@ describe Canvas::Security::PasswordPolicy do
       expect(@pseudonym).not_to be_valid
 
       @pseudonym.password = @pseudonym.password_confirmation = "asdfghijklm"
+      expect(@pseudonym).to be_valid
+
+      @pseudonym.account.disable_feature!(:password_complexity)
+      @pseudonym.password = @pseudonym.password_confirmation = "asdfghijk"
       expect(@pseudonym).to be_valid
     end
 

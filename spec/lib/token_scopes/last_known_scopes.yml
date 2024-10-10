@@ -102,8 +102,6 @@
 - verb: POST
   path: "/api/v1/accounts/:account_id/create_tool_with_verification"
 - verb: GET
-  path: "/api/v1/accounts/:account_id/csp_log"
-- verb: GET
   path: "/api/v1/accounts/:account_id/csp_settings"
 - verb: PUT
   path: "/api/v1/accounts/:account_id/csp_settings"
@@ -637,6 +635,8 @@
   path: "/api/v1/courses/:course_id/assignments/:assignment_id/submissions/:user_id/rubric_comments/read"
 - verb: POST
   path: "/api/v1/courses/:course_id/assignments/:assignment_id/submissions/update_grades"
+- verb: GET
+  path: "/api/v1/courses/:course_id/assignments/:assignment_id/users/:user_id/group_members"
 - verb: DELETE
   path: "/api/v1/courses/:course_id/assignments/:id"
 - verb: GET
@@ -995,10 +995,16 @@
   path: "/api/v1/courses/:course_id/lti_apps/launch_definitions"
 - verb: GET
   path: "/api/v1/courses/:course_id/lti_resource_links"
+- verb: POST
+  path: "/api/v1/courses/:course_id/lti_resource_links"
+- verb: DELETE
+  path: "/api/v1/courses/:course_id/lti_resource_links/:id"
 - verb: GET
   path: "/api/v1/courses/:course_id/lti_resource_links/:id"
 - verb: PUT
   path: "/api/v1/courses/:course_id/lti_resource_links/:id"
+- verb: POST
+  path: "/api/v1/courses/:course_id/lti_resource_links/bulk"
 - verb: GET
   path: "/api/v1/courses/:course_id/mastery_paths/rules"
 - verb: POST
@@ -1353,6 +1359,8 @@
   path: "/api/v1/courses/:course_id/web_zip_exports"
 - verb: GET
   path: "/api/v1/courses/:course_id/web_zip_exports/:id"
+- verb: PUT
+  path: "/api/v1/courses/:course_id/what_if_grades/reset"
 - verb: DELETE
   path: "/api/v1/courses/:id"
 - verb: GET

@@ -32,6 +32,7 @@ import {PrivacyConfirmationWrapper} from './components/PrivacyConfirmationWrappe
 import {RegistrationModalBody} from '../registration_wizard/RegistrationModalBody'
 import {OverrideURIsConfirmation} from './components/OverrideURIsConfirmation'
 import {NamingConfirmationWrapper} from './components/NamingConfirmationWrapper'
+import {IconConfirmationWrapper} from './components/IconConfirmationWrapper'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -127,7 +128,7 @@ export const Lti1p3RegistrationWizard = (props: Lti1p3RegistrationWizardProps) =
         // TODO: Handle the case where the internal config is undefined and allow for manual configuration
         <>
           <NamingConfirmationWrapper
-            config={internalConfiguration!}
+            config={internalConfiguration}
             overlayStore={store.state.overlayStore}
           />
           <Modal.Footer>
@@ -141,6 +142,15 @@ export const Lti1p3RegistrationWizard = (props: Lti1p3RegistrationWizardProps) =
         </>
       )
     case 'Icons':
+      return (
+        <IconConfirmationWrapper
+          config={internalConfiguration}
+          reviewing={store.state.reviewing}
+          overlayStore={store.state.overlayStore}
+          onPreviousButtonClicked={() => store.setStep('Naming')}
+          onNextButtonClicked={() => store.setStep('Review')}
+        />
+      )
     case 'Review':
       return (
         <div>
@@ -148,7 +158,7 @@ export const Lti1p3RegistrationWizard = (props: Lti1p3RegistrationWizardProps) =
             <Text>TODO: Implement the rest of the steps</Text>
           </RegistrationModalBody>
           <Modal.Footer>
-            <Button onClick={() => store.setStep('Naming')} margin="small">
+            <Button onClick={() => store.setStep('Icons')} margin="small">
               {I18n.t('Previous')}
             </Button>
           </Modal.Footer>

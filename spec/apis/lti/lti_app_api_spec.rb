@@ -202,6 +202,52 @@ module Lti
         expect(json.first["definition_id"]).to eq tool.id
       end
 
+      it "includes additional information for global navigation placements" do
+        course_with_student(active_all: true, user: user_with_pseudonym, account:)
+
+        tool1 = new_valid_external_tool(account)
+        tool1.description = "foo foo"
+        tool1.domain = "foo.org"
+        tool1.global_navigation = {
+          text: "Foo",
+          visibility: "members",
+          icon_url: "http://example.com/foo.png"
+        }
+        tool1.save!
+
+        tool2 = new_valid_external_tool(account)
+        tool2.description = "baz baz"
+        tool2.domain = "baz.egg"
+        tool2.global_navigation = {
+          text: "Baz",
+          visibility: "members",
+          icon_svg_path_64: "baz svg...",
+          windowTarget: "_blank"
+        }
+        tool2.save!
+
+        json = api_call(:get,
+                        "/api/v1/accounts/#{account.id}/lti_apps/launch_definitions",
+                        { controller: "lti/lti_apps", action: "launch_definitions", account_id: account.to_param, format: "json" },
+                        placements: ["global_navigation"])
+
+        tool1_index = json.find_index { |j| j["definition_id"] == tool1.id }
+        tool1_info = json[tool1_index]["placements"]["global_navigation"]
+        expect(tool1_info["title"]).to eq "Foo"
+        expect(tool1_info["icon_url"]).to eq "http://example.com/foo.png"
+        expect(tool1_info["icon_svg_path_64"]).to be_nil
+        expect(tool1_info["html_url"]).to eq "/accounts/#{account.id}/external_tools/#{tool1.id}?launch_type=global_navigation"
+
+        tool2_index = json.find_index { |j| j["definition_id"] == tool2.id }
+        tool2_info = json[tool2_index]["placements"]["global_navigation"]
+        expect(tool2_info["title"]).to eq "Baz"
+        expect(tool2_info["icon_url"]).to be_nil
+        expect(tool2_info["icon_svg_path_64"]).to eq "baz svg..."
+        uri = URI.parse(tool2_info["html_url"])
+        expect(uri.path).to eq "/accounts/#{account.id}/external_tools/#{tool2.id}"
+        expect(Rack::Utils.parse_nested_query(uri.query)).to eq({ "display" => "borderless", "launch_type" => "global_navigation" })
+      end
+
       it "paginates the launch definitions" do
         5.times { |_| new_valid_external_tool(account) }
         course_with_teacher(active_all: true, user: user_with_pseudonym, account:)

@@ -23,16 +23,6 @@ import {captureException} from '@sentry/browser'
 import {Spinner} from '@instructure/ui-spinner'
 import ready from '@instructure/ready'
 
-import {getAssignment} from './queries/getAssignment'
-import {getCourse} from './queries/getCourse'
-import {getAssignmentSections} from './queries/getAssignmentSections'
-import {getSubmission} from './queries/submissionQuery'
-import {getAssignmentSubmissions} from './queries/getAssignmentSubmissions'
-import {getSubmissionsByStudents} from './queries/getSubmissionsByStudents'
-import {getCourseAssignments} from './queries/getCourseAssignments'
-import {getCourseEnrollments} from './queries/getCourseEnrollments'
-import {getCommentBankItems} from './queries/getCommentBankItems'
-
 import {updateSpeedGraderSettings} from './mutations/updateSpeedGraderSettingsMutation'
 import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
 import {createSubmissionComment} from './mutations/createSubmissionCommentMutation'
@@ -40,10 +30,7 @@ import {hideAssignmentGradesForSections} from './mutations/hideAssignmentGradesF
 import {postDraftSubmissionComment} from './mutations/postDraftSubmissionCommentMutation'
 import {updateSubmissionGradeStatus} from './mutations/updateSubmissionGradeStatusMutation'
 import {deleteSubmissionComment} from './mutations/deleteSubmissionCommentMutation'
-import {
-  postAssignmentGradesForSections,
-  resolvePostAssignmentGradesStatus,
-} from './mutations/postAssignmentGradesForSectionsMutation'
+import {postAssignmentGradesForSections} from './mutations/postAssignmentGradesForSectionsMutation'
 import {createCommentBankItem} from './mutations/comment_bank/createCommentBankItemMutation'
 import {deleteCommentBankItem} from './mutations/comment_bank/deleteCommentBankItemMutation'
 import {updateCommentBankItem} from './mutations/comment_bank/updateCommentBankItemMutation'
@@ -121,24 +108,14 @@ ready(() => {
     'quizzesNext.submissionUpdate': 'tool.submissionUpdate',
   }
 
-  const sgUploader = new SGUploader('any', {defaultTItle: 'Upload Media'})
+  const sgUploader = window.INST.kalturaSettings
+    ? new SGUploader('any', {defaultTitle: 'Upload Media'})
+    : null
 
   import('speedgrader/appInjector')
     .then(module => {
       module.render(mountPoint, {
         executeQuery,
-        queryFns: {
-          getAssignment,
-          getCourseAssignments,
-          getAssignmentSubmissions,
-          getCourse,
-          getCourseEnrollments,
-          getAssignmentSections,
-          getSubmission,
-          getSubmissionsByStudents,
-          getCommentBankItems,
-          resolvePostAssignmentGradesStatus,
-        },
         mutationFns: {
           updateSubmissionGrade,
           createSubmissionComment,

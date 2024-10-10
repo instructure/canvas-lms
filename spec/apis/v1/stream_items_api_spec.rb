@@ -32,7 +32,7 @@ describe UsersController, type: :request do
     get("/api/v1/users/self/activity_stream")
     assert_status(401)
 
-    @course = factory_with_protected_attributes(Course, course_valid_attributes)
+    @course = Course.create!(course_valid_attributes)
     raw_api_call(:get,
                  "/api/v1/courses/#{@course.id}/activity_stream",
                  controller: "courses",
@@ -274,6 +274,17 @@ describe UsersController, type: :request do
     end
   end
 
+  it "translates user content in discussion topic without verifiers" do
+    should_translate_user_content(@course, false) do |user_content|
+      @context = @course
+      discussion_topic_model(message: user_content)
+      json = api_call(:get,
+                      "/api/v1/users/activity_stream.json",
+                      { controller: "users", action: "activity_stream", format: "json", no_verifiers: true })
+      json.first["message"]
+    end
+  end
+
   it "translates user content in discussion entry" do
     should_translate_user_content(@course) do |user_content|
       @context = @course
@@ -282,6 +293,18 @@ describe UsersController, type: :request do
       json = api_call(:get,
                       "/api/v1/users/activity_stream.json",
                       { controller: "users", action: "activity_stream", format: "json" })
+      json.first["root_discussion_entries"].first["message"]
+    end
+  end
+
+  it "translates user content in discussion entry without verifiers" do
+    should_translate_user_content(@course, false) do |user_content|
+      @context = @course
+      discussion_topic_model
+      @topic.reply_from(user: @user, html: user_content)
+      json = api_call(:get,
+                      "/api/v1/users/activity_stream.json",
+                      { controller: "users", action: "activity_stream", format: "json", no_verifiers: true })
       json.first["root_discussion_entries"].first["message"]
     end
   end
@@ -329,6 +352,17 @@ describe UsersController, type: :request do
     end
   end
 
+  it "translates user content in announcement messages without verifiers" do
+    should_translate_user_content(@course, false) do |user_content|
+      @context = @course
+      announcement_model(message: user_content)
+      json = api_call(:get,
+                      "/api/v1/users/activity_stream.json",
+                      { controller: "users", action: "activity_stream", format: "json", no_verifiers: true })
+      json.first["message"]
+    end
+  end
+
   it "translates user content in announcement discussion entries" do
     should_translate_user_content(@course) do |user_content|
       @context = @course
@@ -337,6 +371,18 @@ describe UsersController, type: :request do
       json = api_call(:get,
                       "/api/v1/users/activity_stream.json",
                       { controller: "users", action: "activity_stream", format: "json" })
+      json.first["root_discussion_entries"].first["message"]
+    end
+  end
+
+  it "translates user content in announcement discussion entries without verifiers" do
+    should_translate_user_content(@course, false) do |user_content|
+      @context = @course
+      announcement_model
+      @a.reply_from(user: @user, html: user_content)
+      json = api_call(:get,
+                      "/api/v1/users/activity_stream.json",
+                      { controller: "users", action: "activity_stream", format: "json", no_verifiers: true })
       json.first["root_discussion_entries"].first["message"]
     end
   end

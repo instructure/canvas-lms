@@ -21,6 +21,7 @@ const LATEST_BLOCK_DATA_VERSION = '0.2' as const
 type jsonString = string
 
 type BlockEditorData_0_2 = {
+  id?: string
   version: '0.2'
   blocks?: jsonString
 }
@@ -29,6 +30,7 @@ type BlockType_0_1 = {
   data?: jsonString
 }
 type BlockEditorData_0_1 = {
+  id?: string
   version: '0.1'
   blocks: BlockType_0_1[]
 }
@@ -53,6 +55,7 @@ function transform_0_1_to_0_2(data: BlockEditorData_0_1): BlockEditorData_0_2 {
   const blocks = data.blocks[0].data
 
   return {
+    id: data.id,
     version: '0.2',
     blocks,
   }

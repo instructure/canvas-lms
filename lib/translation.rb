@@ -19,6 +19,7 @@
 require "aws-sdk-sagemakerruntime"
 require "cld"
 require "pragmatic_segmenter"
+require "nokogiri"
 
 module Translation
   class << self
@@ -84,6 +85,37 @@ module Translation
       )
 
       JSON.parse(response.body.read)
+    end
+
+    def translate_html(html_string:, user: nil, src_lang: nil, tgt_lang: nil)
+      # Parse the document into a nokogiri fragment, needed to maintain the structure of the message
+      # Gather up all the translations that need to happen.
+      # With those translations, piece the document back together and return the to_html version of that
+      # back to the client.
+
+      fragment = Nokogiri::HTML.fragment(html_string)
+      translations = []
+
+      # Initialize our search
+      to_visit = fragment.children
+
+      # Walk the tree.
+      current = nil
+      until to_visit.empty?
+        current = to_visit.shift
+        if current.text? && !current.content.gsub(/[[:space:]]+/, "").empty? # Remove whitespace strings, including NBSP
+          translations << current
+        else
+          current.children.each { |child| to_visit << child }
+        end
+      end
+
+      # Do the translations
+      translations.each do |translation|
+        translation.content = Translation.create(text: translation.content, user:, src_lang:, tgt_lang:)
+      end
+
+      fragment.to_html
     end
 
     def languages
@@ -188,7 +220,7 @@ module Translation
         { id: "yo", name: "Yoruba" },
         { id: "zh", name: "Chinese" },
         { id: "zu", name: "Zulu" }
-      ]
+      ].sort_by { |a| a[:name] }
     end
 
     # For translating the translation controls into the users locale. Don't translate if it's english

@@ -705,6 +705,54 @@ describe GroupCategory do
     gc = GroupCategory.create!(name: "Test3", account: new_account, sis_source_id: 1)
     expect(gc.sis_source_id).to eq("1")
   end
+
+  context "non_collaborative group_category" do
+    it "attribute can be set on creation but cannot be changed afterwards" do
+      # Set non_collaborative on creation
+      category = GroupCategory.create(name: "Test Category", context: @course, non_collaborative: true)
+      expect(category.non_collaborative).to be true
+
+      # Attempt to change non_collaborative
+      category.non_collaborative = false
+      category.save
+      expect(category.reload.non_collaborative).to be true
+
+      # Attempt to change non_collaborative using update
+      category.update(non_collaborative: false)
+      expect(category.reload.non_collaborative).to be true
+
+      # Create a category without setting non_collaborative
+      another_category = GroupCategory.create(name: "Another Test Category", context: @course)
+      expect(another_category.non_collaborative).to be false
+
+      # Attempt to set non_collaborative after creation
+      another_category.non_collaborative = true
+      another_category.save
+      expect(another_category.reload.non_collaborative).to be false
+    end
+
+    it "can only be created for courses" do
+      course_category = GroupCategory.new(name: "Course Category", context: @course, non_collaborative: true)
+      expect(course_category).to be_valid
+
+      account_category = GroupCategory.new(name: "Account Category", context: account, non_collaborative: true)
+      expect(account_category).not_to be_valid
+      expect(account_category.errors[:base]).to include("Non-collaborative group categories can only be created for courses")
+    end
+
+    it "cannot be student organized or communities" do
+      student_organized = GroupCategory.new(name: "Student Organized", context: @course, non_collaborative: true, role: "student_organized")
+      expect(student_organized).not_to be_valid
+      expect(student_organized.errors[:base]).to include("Non-collaborative group categories cannot be student organized or communities")
+
+      communities = GroupCategory.new(name: "Communities", context: @course, non_collaborative: true, role: "communities")
+      expect(communities).not_to be_valid
+      expect(communities.errors[:base]).to include("Non-collaborative group categories cannot be student organized or communities")
+
+      normal = GroupCategory.new(name: "Normal", context: @course, non_collaborative: true)
+      expect(normal).to be_valid
+    end
+  end
 end
 
 def assert_random_group_assignment(category, course, initial_spread, result_spread, opts = {})

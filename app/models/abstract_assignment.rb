@@ -484,7 +484,7 @@ class AbstractAssignment < ActiveRecord::Base
   def self.clean_up_importing_assignments
     importing_for_too_long.in_batches(of: 10_000).update_all(
       importing_started_at: nil,
-      workflow_state: "failed_to_import",
+      workflow_state: "fail_to_import",
       updated_at: Time.zone.now
     )
   end
@@ -1483,7 +1483,9 @@ class AbstractAssignment < ActiveRecord::Base
     rubric_association.destroy if active_rubric_association?
     save!
 
-    each_submission_type { |submission| submission.destroy if submission && !submission.deleted? }
+    unless is_a?(SubAssignment)
+      each_submission_type { |submission| submission.destroy if submission && !submission.deleted? }
+    end
     conditional_release_rules.destroy_all
     conditional_release_associations.destroy_all
     refresh_course_content_participation_counts
@@ -1905,6 +1907,7 @@ class AbstractAssignment < ActiveRecord::Base
     if block_given?
       submittable_types = %i[discussion_topic quiz]
       submittable_types << :wiki_page if context.try(:conditional_release?)
+      # one of these is the submittable_object
       submittable_types.each do |asg_type|
         submittable = send(asg_type)
         yield submittable, Assignment.get_submission_type(asg_type), asg_type

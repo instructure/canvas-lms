@@ -58,6 +58,7 @@ module Api::V1::WikiPage
           version: wiki_page.block_editor.editor_version,
           blocks: wiki_page.block_editor.blocks
         }
+        hash["body"] = wiki_page.block_editor.viewer_iframe_html
       else
         hash["body"] = api_user_content(wiki_page.body, wiki_page.context)
       end

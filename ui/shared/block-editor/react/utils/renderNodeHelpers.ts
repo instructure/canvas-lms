@@ -18,6 +18,7 @@
 
 import {type Node} from '@craftjs/core'
 import {ROOT_NODE} from '@craftjs/utils'
+import {findFirstChildBlock} from './KBNavigator'
 
 const getToolbarPos = (
   domNode: HTMLElement | null,
@@ -74,6 +75,11 @@ const findUpNode = (node: Node, query: any): Node | undefined => {
   return upnode && upnode.id !== ROOT_NODE ? upnode : undefined
 }
 
+const findDownNode = (node: Node, query: any): Node | undefined => {
+  if (!node.data.custom?.isSection) return undefined
+  return findFirstChildBlock(node, query) || undefined
+}
+
 const findContainingSection = (node: Node, query: any): Node | undefined => {
   if (node.data.custom?.isSection) return node
   let upnode = findUpNode(node, query)
@@ -83,4 +89,4 @@ const findContainingSection = (node: Node, query: any): Node | undefined => {
   return upnode && upnode.data.custom?.isSection ? upnode : undefined
 }
 
-export {getToolbarPos, getMenuPos, findUpNode, findContainingSection}
+export {getToolbarPos, getMenuPos, findUpNode, findDownNode, findContainingSection}

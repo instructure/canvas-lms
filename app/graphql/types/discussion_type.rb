@@ -401,6 +401,13 @@ module Types
       all_overrides
     end
 
+    field :subscription_disabled_for_user, Boolean, null: true
+    def subscription_disabled_for_user
+      return false if object.is_announcement
+
+      object.subscription_hold(current_user, session)
+    end
+
     def get_entries(search_term: nil, filter: nil, sort_order: :asc, root_entries: false, user_search_id: nil, unread_before: nil)
       return [] if object.initial_post_required?(current_user, session) || !available_for_user
 

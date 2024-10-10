@@ -18,13 +18,18 @@
 
 import type {StoreApi} from 'zustand'
 import type {LtiMessageType} from '../model/LtiMessageType'
-import type {LtiPlacement} from '../model/LtiPlacement'
+import {
+  isLtiPlacementWithIcon,
+  type LtiPlacement,
+  type LtiPlacementWithIcon,
+} from '../model/LtiPlacement'
 import type {LtiPrivacyLevel} from '../model/LtiPrivacyLevel'
 import type {LtiScope} from '@canvas/lti/model/LtiScope'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 import create from 'zustand'
 
 type PlacementLabelOverride = string
+type IconUrlOverride = string
 
 export type Lti1p3RegistrationOverlayState = {
   launchSettings: Partial<{
@@ -65,14 +70,7 @@ export type Lti1p3RegistrationOverlayState = {
     placements: Partial<Record<LtiPlacement, PlacementLabelOverride>>
   }
   icons: {
-    placements: Partial<
-      Record<
-        LtiPlacement,
-        {
-          icon_url?: string
-        }
-      >
-    >
+    placements: Partial<Record<LtiPlacementWithIcon, IconUrlOverride>>
   }
 }
 
@@ -88,6 +86,7 @@ export interface Lti1p3RegistrationOverlayActions {
   setDomain: (domain: string) => void
   setCustomFields: (customFields: string) => void
   setOverrideURI: (placement: LtiPlacement, uri: string) => void
+  setPlacementIconUrl: (placement: LtiPlacementWithIcon, iconUrl: string) => void
   setMessageType: (placement: LtiPlacement, messageType: LtiMessageType) => void
   setAdminNickname: (nickname: string) => void
   setDescription: (description: string) => void
@@ -255,6 +254,22 @@ export const createLti1p3RegistrationOverlayStore = (internalConfig: InternalLti
         })
       )
     },
+    setPlacementIconUrl: (placement, iconUrl) => {
+      set(
+        updateState(state => {
+          return {
+            ...state,
+            icons: {
+              ...state.icons,
+              placements: {
+                ...state.icons.placements,
+                [placement]: iconUrl,
+              },
+            },
+          }
+        })
+      )
+    },
   }))
 
 const initialOverlayStateFromInternalConfig = (
@@ -309,13 +324,13 @@ const initialOverlayStateFromInternalConfig = (
         }, {} as Record<LtiPlacement, string>) ?? [],
     },
     icons: {
-      placements: internalConfig.placements.reduce<Record<LtiPlacement, {icon_url?: string}>>(
-        (acc, p) => {
-          acc[p.placement] = {icon_url: p.icon_url}
+      placements: internalConfig.placements.reduce((acc, p) => {
+        if (isLtiPlacementWithIcon(p.placement)) {
+          acc[p.placement] = p.icon_url
           return acc
-        },
-        {} as Record<LtiPlacement, {icon_url?: string}>
-      ),
+        }
+        return acc
+      }, {} as Partial<Record<LtiPlacementWithIcon, string>>),
     },
   }
 }

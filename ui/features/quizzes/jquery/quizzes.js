@@ -2281,14 +2281,7 @@ ready(function () {
       let overrides = overrideView.getOverrides()
       data['quiz[only_visible_to_overrides]'] = overrideView.setOnlyVisibleToOverrides()
       if (overrideView.containsSectionsWithoutOverrides() && !hasCheckedOverrides) {
-        const sections = overrideView.sectionsWithoutOverrides()
         var missingDateView = new MissingDateDialog({
-          validationFn() {
-            return sections
-          },
-          labelFn(section) {
-            return section.get('name')
-          },
           success() {
             missingDateView.$dialog.dialog('close').remove()
             missingDateView.remove()

@@ -21,7 +21,7 @@ import {RadioInput} from '@instructure/ui-radio-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Checkbox} from '@instructure/ui-checkbox'
 
-import React, {useContext, useState, useRef, useEffect} from 'react'
+import React, {useContext, useState, useRef, useEffect, useMemo} from 'react'
 import {ModalBodyContext, signatureSeparator, translationSeparator} from '../../utils/constants'
 import {stripSignature} from '../../utils/inbox_translator'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -37,30 +37,53 @@ const TranslationControls = (props: TranslationControlsProps) => {
   const languages = useRef(ENV?.inbox_translation_languages ?? [])
   const [language, setLanguage] = useState('English')
   const [includeTranslation, setIncludeTranslation] = useState(false)
-  const [primary, setIsPrimary] = useState(null)
-  const [translated, setTranslated] = useState(false)
   const {
     setMessagePosition,
     messagePosition,
+    translationTargetLanguage,
     setTranslationTargetLanguage,
     translateBody,
+    translateBodyWith,
+    body,
     setBody,
   } = useContext(ModalBodyContext)
+
+  // If we have a message position, the message has been translated.
+  const primary = useMemo(() => {
+    if (messagePosition === null) {
+      return null
+    }
+
+    return messagePosition === 'primary'
+  }, [messagePosition])
+
+  const translated = useMemo(() => {
+    return messagePosition !== null && body.includes(translationSeparator)
+  }, [messagePosition, body])
 
   const handleSelect = (e, {id, value}) => {
     setLanguage(value)
     setTranslationTargetLanguage(id)
+
+    // If this has already been translated, we need to change the language.
+    if (translated) {
+      let newBody = body
+      if (props.inboxSettingsFeature && props.signature !== '') {
+        newBody = stripSignature(newBody)
+      }
+      newBody = newBody.split(translationSeparator)[primary ? 1 : 0]
+      translateBodyWith(primary, newBody, {tgtLang: id})
+    }
   }
 
   /**
    * Handle placing translated message in primary or secondary position
    * */
   const handleChange = isPrimary => {
-    setIsPrimary(isPrimary)
+    // If not already translated, translate the body.
     setMessagePosition(isPrimary ? 'primary' : 'secondary')
     if (!translated) {
       translateBody(isPrimary)
-      setTranslated(true)
       return
     }
 
@@ -86,12 +109,11 @@ const TranslationControls = (props: TranslationControlsProps) => {
     })
   }
 
-  const handleIncludeTranslation = shouldInclude => {
-    setIncludeTranslation(shouldInclude)
-  }
+  const handleIncludeTranslation = shouldInclude => setIncludeTranslation(shouldInclude)
 
   useEffect(() => {
     if (!includeTranslation && translated) {
+      setMessagePosition(null)
       setBody(prevBody => {
         if (props.inboxSettingsFeature && props.signature !== '') {
           prevBody = stripSignature(prevBody)
@@ -106,11 +128,10 @@ const TranslationControls = (props: TranslationControlsProps) => {
 
         return newBody
       })
-      setTranslated(false)
-      setIsPrimary(null)
     }
   }, [
     includeTranslation,
+    setMessagePosition,
     messagePosition,
     props.inboxSettingsFeature,
     props.signature,

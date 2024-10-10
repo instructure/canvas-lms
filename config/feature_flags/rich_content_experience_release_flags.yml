@@ -128,3 +128,10 @@ rce_transform_loaded_content:
       state: allowed_on
     ci:
       state: allowed_on
+
+reset_uuid_on_course_reset:
+  state: allowed_on
+  display_name: Reset UUID on Course Reset
+  description: |-
+    Reset the UUID of a course when it is reset.  This allows course restore to work better for New Quizzes.
+  applies_to: RootAccount

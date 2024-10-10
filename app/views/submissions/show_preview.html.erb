@@ -55,7 +55,6 @@
       url_opts = {
         embed: true,
         hidden_user_id:,
-        speed_grader: 1,
         persist: 1,
         student_id: @user.id,
       }
@@ -76,13 +75,13 @@
             <%= t('group_discussion_submission_description',
                     "The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for %{user}, or you can *view the full group discussion*.",
                     :user => user_name,
-                    :wrapper => "<a id='discussion_view_link' href=\"#{context_url(group, :context_discussion_topics_url, :root_discussion_topic_id => @assignment.discussion_topic.id, :hide_student_names => params[:hide_student_name], :student_id => @submission.user.id, :headless => 1, :embed => true, :speed_grader => 1)}\"><b>\\1</b></a>") %>
+                    :wrapper => "<a id='discussion_view_link' href=\"#{context_url(group, :context_discussion_topics_url, :root_discussion_topic_id => @assignment.discussion_topic.id, :hide_student_names => params[:hide_student_name], :student_id => @submission.user.id, :headless => 1, :embed => true)}\"><b>\\1</b></a>") %>
           <% else %>
             <%= t('discussion_submission_description',
                     "The submissions for this assignment are posts in the assignment's discussion. Below are the discussion posts for %{user}, or you can *view the full discussion*.",
                     :user => user_name,
                     # legacy discussions uses headless, hide student name, and student id, while discussions redesign uses embed
-                    :wrapper => "<a id='discussion_view_link' href=\"#{context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :hide_student_names => params[:hide_student_name], :student_id => @submission.user.id, :headless => 1, :embed => true, :speed_grader => 1)}\"><b>\\1</b></a>") %>
+                    :wrapper => "<a id='discussion_view_link' href=\"#{context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :hide_student_names => params[:hide_student_name], :student_id => @submission.user.id, :headless => 1, :embed => true)}\"><b>\\1</b></a>") %>
           <% end %>
         <% else %>
           <% if @assignment.discussion_topic.for_group_discussion? && (group = @assignment.discussion_topic.group_category.group_for(@user)) %>
@@ -100,7 +99,7 @@
           <%= render :partial => 'discussion_topics/entry', :object => entry, :locals => {:out_of_context => true, :skip_sub_entries => true, :link_to_headless => true, :hide_student_names => params[:hide_student_name], :assignment_visible_to_user => assignment_visible_to_user} %>
         <% end %>
         <div style="text-align: center; font-size: 1.2em; margin-top: 10px; display: none;">
-          <a href="<%= context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :headless => 1, :combined => 1, :embed => true, :speed_grader => 1) %>" class="forward"><%= t('show_entire_discussion', 'Show the Entire Discussion') %></a>
+          <a href="<%= context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :headless => 1, :combined => 1, :embed => true) %>" class="forward"><%= t('show_entire_discussion', 'Show the Entire Discussion') %></a>
         </div>
     </div>
   <% else %>

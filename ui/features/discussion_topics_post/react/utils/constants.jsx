@@ -72,4 +72,8 @@ const discussionManagerUtilityContext = {
   isSummaryEnabled: false,
 }
 
+// use for logic that does not need or expect changes in the same page load
+export const isSpeedGraderInTopUrl =
+  window.top.location.href?.includes('gradebook/speed_grader') || false
+
 export const DiscussionManagerUtilityContext = React.createContext(discussionManagerUtilityContext)

@@ -52,6 +52,7 @@ import {
   IconUpdownLine,
   IconUserLine,
   IconPermissionsLine,
+  IconEditLine,
 } from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -73,7 +74,6 @@ import ToggleIcon from './ToggleIcon'
 import UnreadBadge from '@canvas/unread-badge'
 import {isPassedDelayedPostAt} from '@canvas/datetime/react/date-utils'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
-import DiscussionsIndex from './DiscussionsIndex'
 
 const I18n = useI18nScope('discussion_row')
 
@@ -250,6 +250,9 @@ class DiscussionRow extends Component {
         break
       case 'assignTo':
         this.props.onOpenAssignToTray(this.props.discussion)
+        break
+      case 'edit':
+        window.location.assign(`${this.props.discussion.html_url}/edit`)
         break
       default:
         throw new Error('Unknown manage discussion action encountered')
@@ -506,6 +509,21 @@ class DiscussionRow extends Component {
   renderMenuList = () => {
     const discussionTitle = this.props.discussion.title
     const menuList = []
+
+    if (this.props.discussion?.permissions?.update
+      && this.props.discussion?.html_url) {
+      menuList.push(
+        this.createMenuItem(
+          'edit',
+          <span aria-hidden="true">
+            <IconEditLine />
+            &nbsp;&nbsp;{I18n.t('Edit')}
+          </span>,
+          I18n.t('Edit discussion %{title}', {title: discussionTitle})
+        )
+      )
+    }
+
     if (this.props.displayLockMenuItem) {
       const menuLabel = this.props.discussion.locked
         ? I18n.t('Open for comments')
@@ -959,7 +977,7 @@ class DiscussionRow extends Component {
                   <Grid.Col textAlign="start">
                     <span
                       aria-hidden="true"
-                      style={!!this.renderLastReplyAt() ? timestampStyleOverride : {}}
+                      style={this.renderLastReplyAt() ? timestampStyleOverride : {}}
                     >
                       {this.renderLastReplyAt(timestampTextSize)}
                     </span>
@@ -967,7 +985,7 @@ class DiscussionRow extends Component {
                   <Grid.Col textAlign="center">
                     <span
                       aria-hidden="true"
-                      style={!!this.renderAvailabilityDate() ? timestampStyleOverride : {}}
+                      style={this.renderAvailabilityDate() ? timestampStyleOverride : {}}
                     >
                       {this.renderAvailabilityDate(timestampTextSize)}
                     </span>
@@ -975,7 +993,7 @@ class DiscussionRow extends Component {
                   <Grid.Col textAlign="end">
                     <span
                       aria-hidden="true"
-                      style={!!this.renderDueDate() ? timestampStyleOverride : {}}
+                      style={this.renderDueDate() ? timestampStyleOverride : {}}
                     >
                       {this.renderDueDate(timestampTextSize)}
                     </span>

@@ -30,7 +30,7 @@ module Canvas::Security
     def self.validate(record, attr, value)
       policy = record.account.password_policy
       value = value.to_s
-      record.errors.add attr, "too_short" if value.length < policy[:minimum_character_length].to_i
+      # too long
       record.errors.add attr, "too_long" if value.length > MAX_CHARACTER_LENGTH.to_i
       # same char repeated
       record.errors.add attr, "repeated" if policy[:max_repeats] && value =~ /(.)\1{#{policy[:max_repeats]},}/
@@ -47,19 +47,25 @@ module Canvas::Security
       end
       # only enforce these policies if password complexity feature is enabled
       if record.account.password_complexity_enabled?
+        # too short
+        record.errors.add attr, "too_short" if value.length < policy[:minimum_character_length].to_i
+        # not enough numbers
         if Canvas::Plugin.value_to_boolean(policy[:require_number_characters])
           record.errors.add attr, "no_digits" unless /\d/.match?(value)
         end
-
+        # not enough symbols
         if Canvas::Plugin.value_to_boolean(policy[:require_symbol_characters])
           symbol_regex = %r{[\!\@\#\$\%\^\&\*\(\)\_\+\-\=\[\]\{\}\|\;\:\'\"\<\>\,\.\?/]}
           record.errors.add attr, "no_symbols" unless symbol_regex.match?(value)
         end
-
+        # check for common passwords using provided password dictionary
         if policy[:common_passwords_attachment_id].present?
           cache_key = ["common_passwords_set", record.account.global_id, policy[:common_passwords_attachment_id]].cache_key
           record.errors.add attr, "common" if check_password_membership(cache_key, value, policy)
         end
+      elsif value.length < MIN_CHARACTER_LENGTH.to_i
+        # fallback to minimum character length
+        record.errors.add attr, "too_short"
       end
     end
 
@@ -68,11 +74,6 @@ module Canvas::Security
         # max_repeats: nil,
         # max_sequence: nil,
         # disallow_common_passwords: false,
-        # require_number_characters: false,
-        # require_symbol_characters: false,
-        # allow_login_suspension: false,
-        # common_passwords_attachment_id: nil,
-        # common_passwords_folder_id: nil,
         minimum_character_length: DEFAULT_CHARACTER_LENGTH,
         maximum_login_attempts: DEFAULT_LOGIN_ATTEMPTS
       }

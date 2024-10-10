@@ -220,7 +220,7 @@ module UserSearch
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id
           AND pseudonyms.account_id = #{User.connection.quote(params[:account].id_for_database)}
           AND pseudonyms.workflow_state = 'active'")
-                 .where(id: params[:db_id])
+                 .where("users.id=?", params[:db_id]) # intentionally circumventing Switchman magic here
                  .group(:id)
     end
 

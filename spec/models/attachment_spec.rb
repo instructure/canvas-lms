@@ -787,8 +787,8 @@ describe Attachment do
         allow(InstFS).to receive(:duplicate_file)
         allow(Attachment).to receive(:file_removed_base_instfs_uuid).and_return(base_uuid)
         old_filename = a.filename
-        allow(a).to receive(:destroy_content).and_raise
-        a.destroy_content_and_replace rescue nil
+        allow(a).to receive(:destroy_content).and_raise("spec error")
+        expect { a.destroy_content_and_replace }.to raise_error("spec error")
         purgatory = Purgatory.find_by(attachment_id: a)
         expect(purgatory).not_to be_nil
         expect(a.reload.filename).to eq old_filename

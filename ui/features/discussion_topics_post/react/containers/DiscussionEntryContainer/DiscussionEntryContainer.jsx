@@ -112,12 +112,11 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
                 isUnread={props.isUnread}
                 isForcedRead={props.isForcedRead}
                 isSplitView={props.isSplitView}
-                timingDisplay={props.timingDisplay}
-                createdAt={props.createdAt}
-                updatedAt={props.updatedAt}
+                createdAt={props.timingDisplay}
+                delayedPostAt={props.delayedPostAt}
                 editedTimingDisplay={props.editedTimingDisplay}
                 lastReplyAtDisplay={props.lastReplyAtDisplay}
-                showCreatedAsTooltip={!props.isTopic}
+                isTopic={props.isTopic}
                 isTopicAuthor={props.isTopicAuthor}
                 discussionEntryVersions={
                   props.discussionEntry?.discussionEntryVersionsConnection?.nodes || []
@@ -126,6 +125,8 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
                 threadMode={threadMode}
                 toggleUnread={props.toggleUnread}
                 breakpoints={breakpoints}
+                published={props.discussionTopic?.published}
+                isAnnouncement={props.discussionTopic?.isAnnouncement}
               />
             </Flex.Item>
           )}
@@ -171,9 +172,9 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
             <hr
               data-testid="post-separator"
               style={{
-                height: theme.variables.borders.widthSmall,
+                height: theme.borders.widthSmall,
                 borderColor: '#E8EAEC',
-                margin: `${theme.variables.spacing.medium} 0`,
+                margin: `${theme.spacing.medium} 0`,
                 ...additionalSeparatorStyles,
               }}
             />
@@ -212,6 +213,7 @@ DiscussionEntryContainerBase.propTypes = {
   attachment: Attachment.shape,
   toggleUnread: PropTypes.func,
   breakpoints: breakpointsShape,
+  delayedPostAt: PropTypes.string,
 }
 
 DiscussionEntryContainerBase.defaultProps = {

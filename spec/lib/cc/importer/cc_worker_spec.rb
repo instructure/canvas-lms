@@ -40,4 +40,42 @@ describe CC::Importer::CCWorker do
     expect(worker.perform).to be true
     expect(cm.skip_job_progress).to be_truthy
   end
+
+  describe "setting is_discussion_checkpoints_enabled ff" do
+    subject { described_class.new(content_migration.id).perform }
+
+    let(:course) { course_factory }
+    let(:migration_settings) { { converter_class: CC::Importer::Canvas::Converter, no_archive_file: true, skip_job_progress: true } }
+    let(:content_migration) { ContentMigration.create!(migration_settings:, context: course) }
+
+    before do
+      allow_any_instance_of(CC::Importer::Canvas::Converter).to receive(:export).and_return({})
+    end
+
+    context "when is_discussion_checkpoints_enabled is disabled" do
+      let(:expected_settings) { { is_discussion_checkpoints_enabled: false } }
+
+      before do
+        course.root_account.disable_feature!(:discussion_checkpoints)
+      end
+
+      it "calls converter_class with proper settings" do
+        expect(CC::Importer::Canvas::Converter).to receive(:new).with(hash_including(expected_settings))
+        subject
+      end
+    end
+
+    context "when is_discussion_checkpoints_enabled is enabled" do
+      let(:expected_settings) { { is_discussion_checkpoints_enabled: true } }
+
+      before do
+        course.root_account.enable_feature!(:discussion_checkpoints)
+      end
+
+      it "calls converter_class with proper settings" do
+        expect(CC::Importer::Canvas::Converter).to receive(:new).with(hash_including(expected_settings))
+        subject
+      end
+    end
+  end
 end

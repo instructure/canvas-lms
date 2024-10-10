@@ -1385,11 +1385,10 @@ describe ContextModulesController do
       }
 
       course_with_teacher_logged_in(active_all: true)
-      @tool = factory_with_protected_attributes(@course.context_external_tools,
-                                                url: "http://www.justanexamplenotarealwebsite.com/tool1",
-                                                shared_secret: "test123",
-                                                consumer_key: "test123",
-                                                name: "mytool")
+      @tool = @course.context_external_tools.create!(url: "http://www.justanexamplenotarealwebsite.com/tool1",
+                                                     shared_secret: "test123",
+                                                     consumer_key: "test123",
+                                                     name: "mytool")
       @mod = @course.context_modules.create!
       @assign = @course.assignments.create! title: "WHAT",
                                             submission_types: "external_tool",

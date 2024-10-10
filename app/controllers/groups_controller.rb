@@ -218,8 +218,11 @@ class GroupsController < ApplicationController
   def index
     return context_index if @context
 
+    page_has_instui_topnav
     includes = { include: params[:include] }
     groups_scope = @current_user.current_groups
+    page_has_instui_topnav
+
     respond_to do |format|
       format.html do
         groups_scope = groups_scope.where(context_type: params[:context_type]) if params[:context_type]
@@ -265,6 +268,7 @@ class GroupsController < ApplicationController
   def context_index
     return unless authorized_action(@context, @current_user, :read_roster)
 
+    page_has_instui_topnav
     @groups = all_groups = @context.groups.active
     unless params[:filter].nil?
       @groups = all_groups = @groups.left_outer_joins(:users).where("groups.name ILIKE :query OR users.name ILIKE :query", query: "%#{ActiveRecord::Base.sanitize_sql_like(params[:filter])}%")
@@ -401,6 +405,7 @@ class GroupsController < ApplicationController
           add_crumb @group.short_name, named_context_url(@group, :context_url)
         end
         @context = @group
+        page_has_instui_topnav
         assign_localizer
         if @group.deleted? && @group.context
           flash[:notice] = t("notices.already_deleted", "That group has been deleted")

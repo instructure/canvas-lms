@@ -314,7 +314,11 @@ module CanvasSecurity
   end
 
   def self.validate_encryption_key(overwrite = false)
-    db_hash = settings_store.get("encryption_key_hash", nil) rescue return # in places like rake db:test:reset, we don't care that the db/table doesn't exist
+    begin
+      db_hash = settings_store.get("encryption_key_hash", nil)
+    rescue
+      return # in places like rake db:test:reset, we don't care that the db/table doesn't exist
+    end
     return if encryption_keys.any? { |key| Digest::SHA1.hexdigest(key) == db_hash }
 
     if db_hash.nil? || overwrite
@@ -339,6 +343,10 @@ module CanvasSecurity
 
     def services_previous_signing_secret
       Rails.application&.credentials&.dig(:canvas_security, :signing_secret_deprecated)
+    end
+
+    def services_issuer
+      "Canvas"
     end
 
     private

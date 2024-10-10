@@ -59,6 +59,8 @@ class AnnouncementsController < ApplicationController
 
     redirect_to named_context_url(@context, :context_url) if @context.is_a?(Course) && @context.elementary_homeroom_course?
 
+    page_has_instui_topnav
+
     log_asset_access(["announcements", @context], "announcements", "other")
     respond_to do |format|
       format.html do

@@ -33,7 +33,7 @@ module Services
             symmetric: true
           )
         rescue Canvas::Security::InvalidJwtKey => e
-          Canvas::Errors.capture_exception(:jwt, e)
+          Canvas::Errors.capture_exception(:jwt, e) unless Rails.env.test?
           env_hash[:JWT] = "InvalidJwtKey"
         end
       end

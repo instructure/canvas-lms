@@ -153,6 +153,60 @@ describe AccessToken do
     end
   end
 
+  describe "#generate_refresh_token" do
+    let(:developer_key) { DeveloperKey.create! }
+    let(:access_token) { AccessToken.create!(user: user_model, developer_key:) }
+
+    context "when no refresh token exists" do
+      before { access_token.update!(crypted_refresh_token: nil) }
+
+      it "generates a new refresh token" do
+        expect(access_token.crypted_refresh_token).to be_nil
+        access_token.generate_refresh_token
+        expect(access_token.crypted_refresh_token).to be_present
+      end
+    end
+
+    context "when a refresh token exists" do
+      it "does not overwrite the existing refresh token by default" do
+        access_token.generate_refresh_token
+        initial_refresh_token = access_token.crypted_refresh_token
+        access_token.generate_refresh_token
+
+        expect(access_token.crypted_refresh_token).to eq(initial_refresh_token)
+      end
+
+      it "overwrites the existing refresh token if overwrite is true" do
+        access_token.generate_refresh_token
+        initial_refresh_token = access_token.crypted_refresh_token
+        access_token.generate_refresh_token(overwrite: true)
+
+        expect(access_token.crypted_refresh_token).not_to eq(initial_refresh_token)
+      end
+    end
+  end
+
+  describe "#set_permanent_expiration" do
+    let(:developer_key) { DeveloperKey.create!(client_type: DeveloperKey::PUBLIC_CLIENT_TYPE) }
+    let(:access_token) { AccessToken.create!(user: user_model, developer_key:) }
+
+    context "when the developer key has a token expiration" do
+      it "sets the permanent_expires_at to the correct time" do
+        access_token.set_permanent_expiration
+        expect(access_token.permanent_expires_at).to be_within(1.second).of(2.hours.from_now)
+      end
+    end
+
+    context "when the developer key does not have a token expiration" do
+      let(:developer_key) { DeveloperKey.create! }
+
+      it "does not set the permanent_expires_at" do
+        access_token.set_permanent_expiration
+        expect(access_token.permanent_expires_at).to be_nil
+      end
+    end
+  end
+
   describe "usable?" do
     before :once do
       @at = AccessToken.create!(user: user_model, developer_key: DeveloperKey.default)
@@ -543,6 +597,7 @@ describe AccessToken do
     before(:once) do
       Notification.create!(name: "Manually Created Access Token Created")
       Notification.create!(name: "Access Token Created On Behalf Of User")
+      Notification.create!(name: "Access Token Deleted")
       user_model
     end
 
@@ -576,6 +631,12 @@ describe AccessToken do
       access_token = AccessToken.create!(user: @user, workflow_state: "pending")
       expect(access_token.messages_sent).not_to include("Manually Created Access Token Created")
       expect(access_token.messages_sent).to include("Access Token Created On Behalf Of User")
+    end
+
+    it "sends a notification when a token is deleted" do
+      access_token = AccessToken.create!(user: @user)
+      access_token.destroy
+      expect(access_token.messages_sent).to include("Access Token Deleted")
     end
   end
 

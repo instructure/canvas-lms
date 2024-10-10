@@ -143,7 +143,7 @@ describe Api::V1::Lti::Registration do
       end
 
       it "includes the tool configuration" do
-        expect(subject["configuration"]).to eq(ims_registration.registration_configuration)
+        expect(subject["configuration"]).to eq(ims_registration.internal_lti_configuration)
       end
 
       it "includes dynamic_registration as true" do

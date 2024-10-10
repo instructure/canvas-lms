@@ -19,6 +19,7 @@
 import {enhanceUserContent} from '../enhance_user_content'
 import {Mathml} from '../mathml'
 import formatMessage from '../../format-message'
+import * as instructureHelper from '../instructure_helper'
 
 jest.useFakeTimers()
 
@@ -98,60 +99,83 @@ describe('enhanceUserContent()', () => {
     })
   })
 
-  describe('when given a containingCanvasLtiToolId', () => {
-    const opts = {
-      canvasOrigin: 'https://canvas.is.here:2000/',
-      containingCanvasLtiToolId: 'toolid',
-    }
-
-    it('adds parent_frame_context to relative canvas urls', () => {
-      subject('<iframe id="iframe" src="/media_object_iframe" />')
-
-      enhanceUserContent(document, opts)
-
-      expect(document.getElementById('iframe').src).toEqual(
-        'https://canvas.is.here:2000/media_object_iframe?parent_frame_context=toolid'
-      )
+  describe('file path matching', () => {
+    beforeEach(() => {
+      jest.clearAllMocks()
     })
 
-    it('adds parent_frame_context to absolute canvas urls', () => {
-      subject('<iframe id="iframe" src="https://canvas.is.here:2000/files/1?download_frd=1" />')
+    describe('does enhance', () => {
+      describe('Canvas file links', () => {
+        it('with query params', () => {
+          const showFilePreviewSpy = jest
+            .spyOn(instructureHelper, 'showFilePreview')
+            .mockImplementation(() => {})
+          const url = '/courses/1/files/1?download_frd=1'
+          subject(`<a class="instructure_file_link inline_disabled" href="${url}">file</a>`)
+          enhanceUserContent()
+          expect(document.querySelector('.instructure_file_holder')).toBeInTheDocument()
+          document.querySelector('.instructure_file_holder > a').click()
+          expect(showFilePreviewSpy).toHaveBeenCalled()
+        })
 
-      enhanceUserContent(document, opts)
+        it('with a hash', () => {
+          const showFilePreviewSpy = jest
+            .spyOn(instructureHelper, 'showFilePreview')
+            .mockImplementation(() => {})
+          const url = '/courses/1/files/1#not-sure-what-this-even-does'
+          subject(`<a class="instructure_file_link inline_disabled" href="${url}">file</a>`)
+          enhanceUserContent()
+          expect(document.querySelector('.instructure_file_holder')).toBeInTheDocument()
+          document.querySelector('.instructure_file_holder > a').click()
+          expect(showFilePreviewSpy).toHaveBeenCalled()
+        })
 
-      expect(document.getElementById('iframe').getAttribute('src')).toEqual(
-        'https://canvas.is.here:2000/files/1?download_frd=1&parent_frame_context=toolid'
-      )
+        it('with a slash after the file ID', () => {
+          const showFilePreviewSpy = jest
+            .spyOn(instructureHelper, 'showFilePreview')
+            .mockImplementation(() => {})
+          const url = '/courses/1/files/1/media_tracks_for_some_reason'
+          subject(`<a class="instructure_file_link inline_disabled" href="${url}">file</a>`)
+          enhanceUserContent()
+          expect(document.querySelector('.instructure_file_holder')).toBeInTheDocument()
+          document.querySelector('.instructure_file_holder > a').click()
+          expect(showFilePreviewSpy).toHaveBeenCalled()
+        })
+
+        it('with cross-shard file IDs', () => {
+          const showFilePreviewSpy = jest
+            .spyOn(instructureHelper, 'showFilePreview')
+            .mockImplementation(() => {})
+          const url = '/courses/1~1/files/1~1'
+          subject(`<a class="instructure_file_link inline_disabled" href="${url}">file</a>`)
+          enhanceUserContent()
+          expect(document.querySelector('.instructure_file_holder')).toBeInTheDocument()
+          document.querySelector('.instructure_file_holder > a').click()
+          expect(showFilePreviewSpy).toHaveBeenCalled()
+        })
+      })
     })
 
-    it('does not add parent_frame_context to non-canvas urls', () => {
-      subject('<iframe id="iframe" src="https://canvas.is.not.here:3000/files/1?download_frd=1" />')
-
-      enhanceUserContent(document, opts)
-
-      expect(document.getElementById('iframe').getAttribute('src')).toEqual(
-        'https://canvas.is.not.here:3000/files/1?download_frd=1'
-      )
-    })
-  })
-
-  describe('when tool launch iframe has display=in_rce', () => {
-    const canvasOrigin = 'https://canvas.is.here:2000/'
-
-    it('replaces with display=borderless', () => {
-      subject(
-        `<iframe id="iframe" src="${canvasOrigin}courses/1/external_tools/retrieve?display=in_rce" />`
-      )
-
-      enhanceUserContent(document, {canvasOrigin})
-
-      expect(document.getElementById('iframe').getAttribute('src')).toEqual(
-        `${canvasOrigin}courses/1/external_tools/retrieve?display=borderless`
-      )
+    describe('does not enhance', () => {
+      it('instfs file links with UUIDs that start with a number', () => {
+        const showFilePreviewSpy = jest
+          .spyOn(instructureHelper, 'showFilePreview')
+          .mockImplementation(() => {})
+        const url = 'http://inst-fs.test/files/11111111-2222-3333-4444-555555555555'
+        subject(`<a class="instructure_file_link inline_disabled" href="${url}">file</a>`)
+        enhanceUserContent()
+        expect(document.querySelector('.instructure_file_holder')).not.toBeInTheDocument()
+        document.querySelector('.instructure_file_link').click()
+        expect(showFilePreviewSpy).not.toHaveBeenCalled()
+      })
     })
   })
 
   describe('when a link has an href that matches a canvas file path', () => {
+    beforeEach(() => {
+      jest.clearAllMocks()
+    })
+
     it('makes relative links absolute', () => {
       subject(
         '<a id="relative_link" class="instructure_file_link instructure_scribd_file" href="/courses/1/files/1">file</a>'
@@ -169,11 +193,16 @@ describe('enhanceUserContent()', () => {
     })
 
     it('enhances the link', () => {
+      const showFilePreviewSpy = jest
+        .spyOn(instructureHelper, 'showFilePreview')
+        .mockImplementation(() => {})
       subject(
         '<a class="instructure_file_link instructure_scribd_file" href="/courses/1/files/1">file</a>'
       )
       enhanceUserContent()
       expect(document.querySelector('.instructure_file_holder')).toBeInTheDocument()
+      document.querySelector('.instructure_file_holder > a').click()
+      expect(showFilePreviewSpy).toHaveBeenCalled()
     })
 
     it('adds download icon button', () => {
@@ -263,6 +292,59 @@ describe('enhanceUserContent()', () => {
       expect(document.getElementById('blank_target').getAttribute('target')).toEqual('open_here')
       expect(document.getElementById('no_target').getAttribute('target')).toEqual('open_here')
       expect(document.getElementById('a_target').getAttribute('target')).toEqual('a_target')
+    })
+  })
+
+  describe('when given a containingCanvasLtiToolId', () => {
+    const opts = {
+      canvasOrigin: 'https://canvas.is.here:2000/',
+      containingCanvasLtiToolId: 'toolid',
+    }
+
+    it('adds parent_frame_context to relative canvas urls', () => {
+      subject('<iframe id="iframe" src="/media_object_iframe" />')
+
+      enhanceUserContent(document, opts)
+
+      expect(document.getElementById('iframe').src).toEqual(
+        'https://canvas.is.here:2000/media_object_iframe?parent_frame_context=toolid'
+      )
+    })
+
+    it('adds parent_frame_context to absolute canvas urls', () => {
+      subject('<iframe id="iframe" src="https://canvas.is.here:2000/files/1?download_frd=1" />')
+
+      enhanceUserContent(document, opts)
+
+      expect(document.getElementById('iframe').getAttribute('src')).toEqual(
+        'https://canvas.is.here:2000/files/1?download_frd=1&parent_frame_context=toolid'
+      )
+    })
+
+    it('does not add parent_frame_context to non-canvas urls', () => {
+      subject('<iframe id="iframe" src="https://canvas.is.not.here:3000/files/1?download_frd=1" />')
+
+      enhanceUserContent(document, opts)
+
+      expect(document.getElementById('iframe').getAttribute('src')).toEqual(
+        'https://canvas.is.not.here:3000/files/1?download_frd=1'
+      )
+    })
+  })
+
+  describe('when tool launch iframe has display=in_rce', () => {
+    const canvasOrigin = 'https://canvas.is.here:2000/'
+
+    it('replaces with display=borderless', () => {
+      subject(
+        `<iframe id="iframe" src="${canvasOrigin}courses/1/external_tools/retrieve?display=in_rce" />`
+      )
+
+      enhanceUserContent(document, {canvasOrigin})
+
+      expect(document.getElementById('iframe').getAttribute('src')).toEqual(
+        `${canvasOrigin}courses/1/external_tools/retrieve?display=borderless`
+      )
     })
   })
 

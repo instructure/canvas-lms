@@ -16,7 +16,7 @@ instructor can view grades for any student in a course.
 
 ## Using GraphQL
 
-Canvas has included the tool GraphiQL (https://github.com/graphql/graphiql), an
+Canvas has included the tool [GraphiQL](https://github.com/graphql/graphiql), an
 in-browser graphical interface for interacting with GraphQL endpoints.
 
 The GraphiQL interface can be viewed by adding /graphiql to the end of your
@@ -52,19 +52,16 @@ All GraphQL queries are posted to this endpoint.
 <table class="request-params">
   <tr>
     <th class="param-name">Parameter</th>
-    <th class="param-req"></th>
     <th class="param-type">Type</th>
     <th class="param-desc">Description</th>
   </tr>
   <tr class="request-param">
     <td>query</td>
-    <td></td>
     <td>string</td>
     <td>the GraphQL query to execute</td>
   </tr>
   <tr class="request-param">
     <td>variables</td>
-    <td></td>
     <td>Hash</td>
     <td>variable values as required by the supplied query</td>
   </tr>
@@ -87,7 +84,7 @@ curl https://<canvas>/api/graphql \
 
 #### Example Response
 
-```js
+```json
 {
   "data": {
     "course": {
@@ -127,7 +124,7 @@ Most objects can be fetched by passing their  GraphQL  `id` to the
 A `legacyNode` field is also available to fetch objects via the
 REST-style ids:
 
-```
+```graphql
 {
   # object type must be specified when using legacyNode
   legacyNode(type: Course, _id: "1") {
@@ -141,7 +138,7 @@ REST-style ids:
 
 For commonly accessed object types, type-specific fields are provided:
 
-```
+```graphql
 {
   # NOTE: id arguments will always take either GraphQL or rest-style ids
   c1: course(id: "1") {
@@ -162,7 +159,7 @@ Spec](https://facebook.github.io/relay/graphql/connections.htm)
 for paginating collections.  Request reasonable page sizes to avoid
 being limited.
 
-```
+```graphql
 {
   course(id: "1") {
     assignmentsConnection(

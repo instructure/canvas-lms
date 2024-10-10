@@ -189,7 +189,13 @@ class ProfileController < ApplicationController
 
     if @user_data[:known_user] # if you can message them, you can see the profile
       js_env enable_gravatar: @domain_root_account&.enable_gravatar?
-      add_crumb(t("crumbs.settings_frd", "%{user}'s Profile", user: @user.short_name), user_profile_path(@user))
+      if @domain_root_account.try(:feature_enabled?, :instui_nav)
+        add_crumb(@user.short_name, user_profile_path(@user))
+        add_crumb(t("Profile"))
+      else
+        add_crumb(t("crumbs.settings_frd", "%{user}'s Profile", user: @user.short_name), user_profile_path(@user))
+      end
+      page_has_instui_topnav
       render
     else
       render :unauthorized

@@ -154,14 +154,14 @@ class CanvasSecurity::ServicesJwt
     end
 
     timestamp = Time.zone.now.to_i
-    payload_data.merge({
-                         iss: "Canvas",
-                         aud: ["Instructure"],
-                         exp: timestamp + 3600,  # token is good for 1 hour
-                         nbf: timestamp - 30,    # don't accept the token in the past
-                         iat: timestamp,         # tell when the token was issued
-                         jti: SecureRandom.uuid, # unique identifier
-                       })
+    payload_data.reverse_merge(
+      iss: CanvasSecurity.services_issuer,
+      aud: ["Instructure"],
+      exp: timestamp + 3600,  # token is good for 1 hour
+      nbf: timestamp - 30,    # don't accept the token in the past
+      iat: timestamp,         # tell when the token was issued
+      jti: SecureRandom.uuid # unique identifier
+    )
   end
 
   def self.decrypt(token, ignore_expiration: false)

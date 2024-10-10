@@ -17,17 +17,13 @@
  */
 
 import {useCallback, useEffect, useState} from 'react'
-import {useQuery} from 'react-apollo'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 
-import {GRADEBOOK_SUBMISSION_COMMENTS} from '../../queries/Queries'
-import {
-  ApiCallStatus,
-  type CommentConnection,
-  type GradebookSubmissionCommentsResponse,
-} from '../../types'
+import {fetchStudentSubmissionComments} from '../../queries/Queries'
+import {ApiCallStatus, type CommentConnection} from '../../types'
 import type {Submission} from '../../../../api.d'
+import {useQuery} from '@canvas/query'
 
 const I18n = useI18nScope('enhanced_individual_gradebook_submit_score')
 
@@ -37,15 +33,13 @@ type UseCommentsProps = {
 }
 export const useGetComments = ({courseId, submissionId}: UseCommentsProps) => {
   const [submissionComments, setSubmissionComments] = useState<CommentConnection[]>([])
+  const queryKey = ['individual-gradebook-student-comments', courseId ?? '', submissionId ?? '']
 
-  const {data, error, loading, refetch} = useQuery<GradebookSubmissionCommentsResponse>(
-    GRADEBOOK_SUBMISSION_COMMENTS,
-    {
-      variables: {courseId, submissionId},
-      fetchPolicy: 'cache-and-network',
-      skip: !submissionId || !courseId,
-    }
-  )
+  const {data, error, isLoading, refetch} = useQuery({
+    queryKey,
+    queryFn: fetchStudentSubmissionComments,
+    enabled: !!submissionId && !!courseId,
+  })
 
   useEffect(() => {
     if (error) {
@@ -57,7 +51,7 @@ export const useGetComments = ({courseId, submissionId}: UseCommentsProps) => {
     }
   }, [data, error])
 
-  return {submissionComments, loadingComments: loading, refetchComments: refetch}
+  return {submissionComments, loadingComments: isLoading, refetchComments: refetch}
 }
 
 export const usePostComment = () => {

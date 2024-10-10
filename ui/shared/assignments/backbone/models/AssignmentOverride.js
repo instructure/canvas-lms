@@ -103,6 +103,10 @@ export default AssignmentOverride = (function () {
       return this.get('course_section_id')
     }
 
+    getCourseID() {
+      return this.get('course_id')
+    }
+
     representsDefaultDueDate() {
       return this.getCourseSectionID() === Section.defaultDueDateSectionID
     }

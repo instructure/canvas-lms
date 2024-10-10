@@ -297,8 +297,9 @@ class GradingStandard < ActiveRecord::Base
   def standard_data=(params = {})
     params ||= {}
     res = {}
+    scaling_factor = points_based ? self.scaling_factor : 100.0
     params.each_value do |row|
-      res[row[:name]] = (row[:value].to_f / 100.0) if row[:name] && row[:value]
+      res[row[:name]] = (row[:value].to_f / scaling_factor) if row[:name] && row[:value]
     end
     self.data = res.to_a.sort_by { |_, lower_bound| lower_bound }.reverse
   end
@@ -359,6 +360,11 @@ class GradingStandard < ActiveRecord::Base
 
   def used_as_default?
     courses.active.any? || accounts.active.any? || assignments.active.any?
+  end
+
+  def data_with_calculated_value
+    scaling_factor = points_based ? self.scaling_factor : 100.0
+    data.map { |name, value| { name:, value:, calculated_value: (value * scaling_factor).round(2) } }
   end
 
   private

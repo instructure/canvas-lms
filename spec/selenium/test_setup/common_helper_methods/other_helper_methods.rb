@@ -102,6 +102,13 @@ module OtherHelperMethods
     [filename, fullpath, data, @file]
   end
 
+  def get_permanent_file(filename)
+    @file = File.new(filename)
+    fullpath = File.path(@file)
+    filename = File.basename(@file)
+    [filename, fullpath, @file]
+  end
+
   module EncryptedCookieStoreTestSecret
     cattr_accessor :test_secret
 

@@ -3713,9 +3713,9 @@ describe DiscussionTopic do
         expect(@topic.locked_for?(@student)).to be_falsey
       end
 
-      it "still enforces the topic's dates" do
+      it "prefers the assignment's dates" do
         @topic.update(unlock_at: 1.week.from_now)
-        expect(@topic.locked_for?(@student)).to be_truthy
+        expect(@topic.locked_for?(@student)).to be_falsey
       end
 
       it "does not enforce the topic's overrides" do
@@ -3748,6 +3748,15 @@ describe DiscussionTopic do
         expect(lock_info).to be_truthy
         expect(lock_info[:unlock_at]).to eq timestamp
       end
+
+      it "respects assignment's overrides when discussion is locked for everyone else" do
+        timestamp = 1.week.from_now
+        @topic.update!(lock_at: 1.week.ago)
+        ao = @assignment.assignment_overrides.create!(lock_at: timestamp, lock_at_overridden: true)
+        ao.assignment_override_students.create!(user: @student)
+        lock_info = @topic.locked_for?(@student)
+        expect(lock_info).to be_falsey
+      end
     end
   end
 
@@ -3774,6 +3783,97 @@ describe DiscussionTopic do
       topic.message = "Brand new shinny message"
       topic.save!
       expect(topic.edited_at).not_to be_nil
+    end
+  end
+
+  describe "show_in_search_for_user?" do
+    shared_examples_for "expected_values_for_teacher_student" do |teacher_expected, student_expected|
+      it "is #{teacher_expected} for teacher" do
+        expect(topic.show_in_search_for_user?(@teacher)).to eq(teacher_expected)
+      end
+
+      it "is #{student_expected} for student" do
+        expect(topic.show_in_search_for_user?(@student)).to eq(student_expected)
+      end
+    end
+
+    let(:topic) { @course.discussion_topics.create!(title: "topic") }
+
+    before(:once) do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+    end
+
+    include_examples "expected_values_for_teacher_student", true, true
+
+    context "topic is locked" do
+      let(:topic) { @course.discussion_topics.create!(title: "locked topic", unlock_at: 1.week.from_now) }
+
+      include_examples "expected_values_for_teacher_student", true, false
+
+      context "and was previously unlocked" do
+        before { topic.update!(lock_at: 1.week.ago, unlock_at: 2.weeks.ago) }
+
+        include_examples "expected_values_for_teacher_student", true, true
+      end
+    end
+
+    context "topic is delayed" do
+      let(:topic) { @course.discussion_topics.create!(title: "delayed topic", delayed_post_at: 1.week.from_now) }
+
+      include_examples "expected_values_for_teacher_student", true, false
+    end
+
+    context "topic is unpublished" do
+      let(:topic) { @course.discussion_topics.create!(title: "unpublished topic", workflow_state: "unpublished") }
+
+      include_examples "expected_values_for_teacher_student", true, false
+    end
+
+    context "topic is deleted" do
+      let(:topic) do
+        topic = @course.discussion_topics.create!(title: "deleted topic", workflow_state: "deleted")
+        topic.destroy!
+        topic
+      end
+
+      include_examples "expected_values_for_teacher_student", false, false
+    end
+
+    context "topic is in a module" do
+      let(:topic) { @course.discussion_topics.create!(title: "module topic") }
+
+      before do
+        @context_module = @course.context_modules.create!(name: "module")
+        @context_module.add_item(type: "discussion_topic", id: topic.id)
+        @context_module.save!
+
+        second_module = @course.context_modules.create!(name: "module", workflow_state: "unpublished")
+        second_module.add_item(type: "discussion_topic", id: topic.id)
+        second_module.save!
+      end
+
+      after do
+        @course.context_modules.destroy_all
+      end
+
+      include_examples "expected_values_for_teacher_student", true, true
+
+      context "and the module is unpublished" do
+        before do
+          @context_module.unpublish!
+        end
+
+        include_examples "expected_values_for_teacher_student", true, false
+      end
+
+      context "and the module is locked" do
+        before do
+          @context_module.update!(unlock_at: 1.week.from_now)
+        end
+
+        include_examples "expected_values_for_teacher_student", true, false
+      end
     end
   end
 end
