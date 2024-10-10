@@ -32,7 +32,6 @@ $(document).ready(() => {
 
   initializeTopNavPortalWithDefaults({
     getBreadCrumbSetter: handleBreadCrumbSetter,
-    useTutorial: false,
     useStudentView: true,
   })
 

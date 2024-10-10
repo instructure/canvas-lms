@@ -63,7 +63,6 @@ export default class RosterView extends Backbone.View {
     }
     initializeTopNavPortalWithDefaults({
       getBreadCrumbSetter: handleBreadCrumbSetter,
-      useTutorial: true,
       useStudentView: true,
     })
   }

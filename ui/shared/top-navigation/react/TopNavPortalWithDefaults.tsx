@@ -34,7 +34,6 @@ const getMountPoint = (): HTMLElement | null => document.getElementById('react-i
 interface WithProps extends ITopNavProps {
   actionItems?: ItemChild[]
   currentPageName?: string
-  useTutorial?: boolean
   useStudentView?: boolean
   courseId?: number
 }
@@ -101,14 +100,17 @@ const addTutorialActionItem = () => {
   )
 }
 
-const createDefaultActionItems = (
-  useStudentView: boolean,
-  useTutorial: boolean,
-  courseId?: number
-) => {
+const tutorialEnabled = () => {
+  // @ts-ignore
+  const env = window.ENV
+  const new_user_tutorial_on_off = env?.NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT?.is_enabled
+  return env?.NEW_USER_TUTORIALS?.is_enabled && new_user_tutorial_on_off
+}
+
+const createDefaultActionItems = (useStudentView: boolean, courseId?: number) => {
   return [
     useStudentView && !isStudent() ? addStudentViewActionItem(courseId) : null,
-    useTutorial ? addTutorialActionItem() : null,
+    tutorialEnabled() ? addTutorialActionItem() : null,
   ].filter((item): item is ItemChild => item !== null)
 }
 
@@ -117,13 +119,12 @@ const withDefaults = (Component: React.FC<ITopNavProps>) => {
     actionItems = [],
     currentPageName,
     getBreadCrumbSetter,
-    useTutorial = false,
     useStudentView = false,
     courseId = undefined,
     ...props
   }: WithProps) => {
     const combinedActionItems = [
-      ...createDefaultActionItems(useStudentView, useTutorial, courseId),
+      ...createDefaultActionItems(useStudentView, courseId),
       ...actionItems,
     ]
     return (

@@ -16,22 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ready from '@instructure/ready'
 import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('PriorUsers')
+const I18n = useI18nScope('RosterView')
 
 const handleBreadCrumbSetter = ({getCrumbs, setCrumbs}) => {
   const crumbs = getCrumbs()
-  crumbs.push({name: I18n.t('People'), url: document.referrer})
-  crumbs.push({name: I18n.t('Prior users'), url: ''})
+  crumbs.push({name: I18n.t('People'), url: ''})
   setCrumbs(crumbs)
 }
-
-ready(() => {
-  initializeTopNavPortalWithDefaults({
-    getBreadCrumbSetter: handleBreadCrumbSetter,
-    useStudentView: true,
-  })
+initializeTopNavPortalWithDefaults({
+  getBreadCrumbSetter: handleBreadCrumbSetter,
+  useStudentView: true,
 })

@@ -40,6 +40,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {VideoConferenceModal} from './react/components/VideoConferenceModal/VideoConferenceModal'
 import getCookie from '@instructure/get-cookie'
+import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 
 const I18n = useI18nScope('conferences')
 
@@ -102,7 +103,20 @@ const ConferencesRouter = Backbone.Router.extend({
       20000
     )
 
+    const handleBreadCrumbSetter = ({getCrumbs, setCrumbs}) => {
+      const currentCrumbs = getCrumbs()
+      currentCrumbs.at(-1).url = ''
+      setCrumbs(currentCrumbs)
+    }
+
+    initializeTopNavPortalWithDefaults({
+      getBreadCrumbSetter: handleBreadCrumbSetter,
+      useStudentView: true,
+    })
+
     $('.new-conference-btn').on('click', () => this.create())
+
+
   },
 
   index() {
