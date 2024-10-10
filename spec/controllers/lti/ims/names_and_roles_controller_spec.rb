@@ -708,6 +708,22 @@ describe Lti::IMS::NamesAndRolesController do
             expect(response_links).to have_correct_pagination_urls
           end
 
+          it "checks tool.can_access_content_tag?" do
+            checked_tool = nil
+            checked_tag = nil
+            expect_any_instance_of(ContextExternalTool).to receive(:can_access_content_tag?) do |tool, content_tag|
+              checked_tool = tool
+              checked_tag = content_tag
+              false
+            end
+
+            send_request
+
+            expect(checked_tag.context).to eq(assignment_with_rlid_1)
+            expect(checked_tool).to eq(tool)
+            expect(response).to have_http_status(:bad_request)
+          end
+
           context "and a student role param is specified" do
             let(:pass_thru_params) { super().merge(role: "http://purl.imsglobal.org/vocab/lis/v2/membership#Learner") }
             let(:total_items) { 5 }
