@@ -4053,7 +4053,7 @@ zh-Hans:
   applied_cc7be774: 已申请
   applied_filters_63a90ccd: 应用的过滤器：
   applies_account_branding_to_confetti_splashes_c5989dce: 将帐户品牌应用于放礼花效果
-  apply_781a2546: 申请
+  apply_781a2546: 应用
   apply_changes_b1dffc70: 应用更改
   apply_conditions_9e941010: 应用条件
   apply_date_range_selection_cc4351ed: 应用日期范围选择
@@ -5868,7 +5868,7 @@ zh-Hans:
   button_display_84bad037: 按钮显示
   buttons: 
     add_item: 添加项目
-    apply: 申请
+    apply: 应用
     authorize_google_docs: "授权 Google Docs 访问"
     authorize_google_drive: "授权访问 Google Drive"
     back_to_outcomes: 返回结果
