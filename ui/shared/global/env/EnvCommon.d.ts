@@ -224,6 +224,7 @@ export interface EnvCommon {
   breadcrumbs?: {name: string; url: string | null}[]
   enhanced_rubrics_enabled?: boolean
   enhanced_rubrics_copy_to?: boolean
+  rubric_imports_exports?: boolean
 
   /**
    * Used by ui/features/top_navigation_tools/react/TopNavigationTools.tsx
