@@ -24,7 +24,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {formatTimeAgoDate, formatTimeAgoTitle} from '@canvas/enhanced-user-content'
-import {useInfiniteQuery} from '@tanstack/react-query'
+import {useInfiniteQuery} from '@canvas/query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Alert} from '@instructure/ui-alerts'
 
@@ -42,6 +42,7 @@ export default function HistoryList() {
   const {data, fetchNextPage, isFetching, hasNextPage, error} = useInfiniteQuery({
     queryKey: ['history'],
     queryFn: fetchHistory,
+    fetchAtLeastOnce: true,
     getNextPageParam: lastPage => lastPage.nextPage,
   })
 
