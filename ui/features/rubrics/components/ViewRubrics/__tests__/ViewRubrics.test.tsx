@@ -24,6 +24,7 @@ import {RUBRICS_QUERY_RESPONSE, RUBRIC_PREVIEW_QUERY_RESPONSE} from './fixtures'
 import {QueryProvider, queryClient} from '@canvas/query'
 import {ViewRubrics, type ViewRubricsProps} from '../index'
 import * as ViewRubricQueries from '../../../queries/ViewRubricQueries'
+import useManagedCourseSearchApi from '@canvas/direct-sharing/react/effects/useManagedCourseSearchApi'
 
 jest.mock('react-router', () => ({
   ...jest.requireActual('react-router'),
@@ -37,6 +38,7 @@ jest.mock('../../../queries/ViewRubricQueries', () => ({
   archiveRubric: () => archiveRubricMock,
   unarchiveRubric: () => unarchiveRubricMock,
 }))
+jest.mock('@canvas/direct-sharing/react/effects/useManagedCourseSearchApi')
 
 describe('ViewRubrics Tests', () => {
   const renderComponent = (props?: Partial<ViewRubricsProps>) => {
