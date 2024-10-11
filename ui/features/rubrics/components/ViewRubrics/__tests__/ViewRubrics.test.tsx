@@ -43,7 +43,7 @@ describe('ViewRubrics Tests', () => {
     return render(
       <QueryProvider>
         <BrowserRouter>
-          <ViewRubrics canManageRubrics={true} {...props} />
+          <ViewRubrics canManageRubrics={true} {...props} canImportExportRubrics={true} />
         </BrowserRouter>
       </QueryProvider>
     )
