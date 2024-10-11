@@ -1205,6 +1205,75 @@ describe LearningObjectDatesController do
       end
     end
 
+    context "basic checkpointed discussions w/all dates" do
+      before do
+        @course.root_account.enable_feature! :discussion_checkpoints
+
+        @reply_to_topic_due_at = 7.days.from_now
+        @reply_to_entry_due_at = 14.days.from_now
+        @unlock_at = 5.days.from_now
+        @lock_at = 16.days.from_now
+
+        discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [
+            {
+              type: "everyone",
+              due_at: @reply_to_topic_due_at,
+              unlock_at: @unlock_at,
+              lock_at: @lock_at,
+            },
+          ],
+          points_possible: 5
+        )
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [
+            {
+              type: "everyone",
+              due_at: @reply_to_entry_due_at,
+              unlock_at: @unlock_at,
+              lock_at: @lock_at,
+            },
+          ],
+          points_possible: 15,
+          replies_required: 3
+        )
+
+        @discussion = discussion.reload
+
+        @default_params = {
+          course_id: @course.id,
+          discussion_topic_id: @discussion.id
+        }
+      end
+
+      it "clearing all dates updates as expected" do
+        put :update, params: { **@default_params, unlock_at: nil, lock_at: nil, reply_to_topic_due_at: nil, required_replies_due_at: nil }
+        expect(response).to be_no_content
+
+        @discussion.reload
+
+        reply_to_topic_checkpoint = @discussion.assignment.sub_assignments.find { |sa| sa.sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC }
+        reply_to_entry_checkpoint = @discussion.assignment.sub_assignments.find { |sa| sa.sub_assignment_tag == CheckpointLabels::REPLY_TO_ENTRY }
+
+        expect(reply_to_topic_checkpoint.due_at).to be_nil
+        expect(reply_to_topic_checkpoint.unlock_at).to be_nil
+        expect(reply_to_topic_checkpoint.lock_at).to be_nil
+        expect(reply_to_topic_checkpoint.only_visible_to_overrides).to be false
+
+        expect(reply_to_entry_checkpoint.due_at).to be_nil
+        expect(reply_to_entry_checkpoint.unlock_at).to be_nil
+        expect(reply_to_entry_checkpoint.lock_at).to be_nil
+        expect(reply_to_entry_checkpoint.only_visible_to_overrides).to be false
+      end
+    end
+
     context "graded discussions" do
       let_once(:learning_object) do
         discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "graded discussion")
