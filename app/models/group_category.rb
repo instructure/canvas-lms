@@ -540,7 +540,14 @@ class GroupCategory < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| context.grants_right?(user, session, :read) }
+    given do |user, session|
+      # For non_collaborative group_sets, we only give read access to users who can manage groups
+      if non_collaborative? && !context.grants_any_right?(user, session, :manage_groups, :manage_groups_manage)
+        false
+      else
+        context.grants_right?(user, session, :read)
+      end
+    end
     can :read
   end
 
