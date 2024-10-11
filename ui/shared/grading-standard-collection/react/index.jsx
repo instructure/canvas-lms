@@ -30,7 +30,9 @@ class GradingStandardCollection extends React.Component {
   state = {standards: null}
 
   UNSAFE_componentWillMount() {
-    $.getJSON(`${ENV.GRADING_STANDARDS_URL}.json`).done(this.gotStandards)
+    if (ENV.GRADING_STANDARDS_URL) {
+      $.getJSON(`${ENV.GRADING_STANDARDS_URL}.json`).done(this.gotStandards)
+    }
   }
 
   gotStandards = standards => {
@@ -84,6 +86,10 @@ class GradingStandardCollection extends React.Component {
   anyStandardBeingEdited = () => !!find(this.state.standards, standard => standard.editing)
 
   saveGradingStandard = standard => {
+    if (!ENV.GRADING_STANDARDS_URL) {
+      throw new Error('ENV.GRADING_STANDARDS_URL is not defined')
+    }
+
     const newStandards = $.extend(true, [], this.state.standards)
     const indexToUpdate = this.state.standards.indexOf(this.getStandardById(standard.id))
     let type, url, data
@@ -154,6 +160,11 @@ class GradingStandardCollection extends React.Component {
   deleteGradingStandard = (event, uniqueId) => {
     const self = this,
       $standard = $(event.target).parents('.grading_standard')
+
+    if (!ENV.GRADING_STANDARDS_URL) {
+      throw new Error('ENV.GRADING_STANDARDS_URL is not defined')
+    }
+
     $standard.confirmDelete({
       url: `${ENV.GRADING_STANDARDS_URL}/${uniqueId}`,
       message: I18n.t('Are you sure you want to delete this grading scheme?'),
