@@ -21,8 +21,10 @@ import ready from '@instructure/ready'
 import CollaborationsPage from './backbone/views/CollaborationsPage'
 import './jquery/index'
 import '@canvas/common/activateKeyClicks'
+import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 
 ready(() => {
   const page = new CollaborationsPage({el: $('body')})
   page.initPageState()
+  initializeTopNavPortalWithDefaults()
 })

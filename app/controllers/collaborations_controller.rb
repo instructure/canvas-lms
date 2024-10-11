@@ -167,6 +167,7 @@ class CollaborationsController < ApplicationController
              polymorphic_url([:api_v1, @context, :potential_collaborators])
 
     set_tutorial_js_env
+    page_has_instui_topnav
   end
 
   # @API List collaborations
