@@ -926,6 +926,7 @@ class DiscussionTopic < ActiveRecord::Base
           OR discussion_topic_participants.unread_entry_count > 0")
   }
   scope :published, -> { where("discussion_topics.workflow_state = 'active'") }
+  scope :published_or_post_delayed, -> { where("discussion_topics.workflow_state = 'active' OR discussion_topics.workflow_state = 'post_delayed'") }
 
   # TODO: this scope is appearing in a few models now with identical code.
   # Can this be extracted somewhere?
