@@ -37,8 +37,8 @@ const SignIn = () => {
   const {
     rememberMe,
     setRememberMe,
-    isLoading,
-    setIsLoading,
+    isUiActionPending,
+    setIsUiActionPending,
     otpRequired,
     setOtpRequired,
     loginHandleName,
@@ -68,7 +68,7 @@ const SignIn = () => {
       return
     }
 
-    setIsLoading(true)
+    setIsUiActionPending(true)
 
     try {
       const response = await performSignIn(username, password, rememberMe)
@@ -89,7 +89,7 @@ const SignIn = () => {
         type: 'error',
       })
     } finally {
-      setIsLoading(false)
+      setIsUiActionPending(false)
     }
   }
 
@@ -170,7 +170,7 @@ const SignIn = () => {
                 type="submit"
                 color="primary"
                 display="block"
-                disabled={!formValid || isLoading}
+                disabled={!formValid || isUiActionPending}
               >
                 {I18n.t('Sign In')}
               </Button>

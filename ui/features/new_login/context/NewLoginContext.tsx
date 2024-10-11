@@ -23,8 +23,8 @@ import {useNewLoginData} from '../hooks/useNewLoginData'
 interface NewLoginContextType {
   rememberMe: boolean
   setRememberMe: (value: boolean) => void
-  isLoading: boolean
-  setIsLoading: (value: boolean) => void
+  isUiActionPending: boolean
+  setIsUiActionPending: (value: boolean) => void
   otpRequired: boolean
   setOtpRequired: (value: boolean) => void
   showForgotPassword: boolean
@@ -44,7 +44,7 @@ interface NewLoginProviderProps {
 
 export const NewLoginProvider = ({children}: NewLoginProviderProps) => {
   const [rememberMe, setRememberMe] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isUiActionPending, setIsUiActionPending] = useState(false)
   const [otpRequired, setOtpRequired] = useState(false)
   const [showForgotPassword, setShowForgotPassword] = useState(false)
   const [otpCommunicationChannelId, setOtpCommunicationChannelId] = useState<string | null>(null)
@@ -57,8 +57,8 @@ export const NewLoginProvider = ({children}: NewLoginProviderProps) => {
       value={{
         rememberMe,
         setRememberMe,
-        isLoading,
-        setIsLoading,
+        isUiActionPending,
+        setIsUiActionPending,
         otpRequired,
         setOtpRequired,
         showForgotPassword,
