@@ -25,7 +25,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import axios from 'axios'
 import type {EnvCommon} from '@canvas/global/env/EnvCommon'
 import {TopNavBar} from '@instructure/ui-top-nav-bar'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 
 const I18n = useI18nScope('discussions_v2')
 const STUDENT_VIEW_URL_TEMPLATE = '/courses/{courseId}/student_view?redirect_to_referer=1'
@@ -61,8 +61,9 @@ const handleBreadCrumbSetter = (
   currentPageName?: string
 ) => {
   const existingCrumbs: Crumb[] = getCrumbs()
-  const pageName: string = currentPageName || ''
-  setCrumbs([...existingCrumbs, {name: pageName, url: ''}])
+  const allCrumbs = currentPageName
+    ? [...existingCrumbs, {name: currentPageName, url: ''}] : existingCrumbs
+  setCrumbs(allCrumbs)
 }
 
 const addStudentViewActionItem = (courseId?: number) => {
@@ -143,7 +144,8 @@ const TopNavPortalWithDefaults = withDefaults(TopNavPortal)
 export const initializeTopNavPortalWithDefaults = (props?: WithProps): void => {
   const mountPoint = getMountPoint()
   if (mountPoint) {
-    ReactDOM.render(<TopNavPortalWithDefaults {...props} />, mountPoint)
+    const root = createRoot(mountPoint)
+    root.render(<TopNavPortalWithDefaults {...props} />)
   }
 }
 export default TopNavPortalWithDefaults
