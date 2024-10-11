@@ -26,6 +26,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {useNewLogin} from '../context/NewLoginContext'
 import {cancelOtpRequest, initiateOtpRequest, verifyOtpRequest} from '../services'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {Spinner} from '@instructure/ui-spinner'
 
 const I18n = useI18nScope('new_login')
 
@@ -33,41 +34,63 @@ const OtpForm = () => {
   const {
     rememberMe,
     setRememberMe,
-    isLoading,
-    setIsLoading,
+    isUiActionPending,
+    setIsUiActionPending,
     setOtpRequired,
     otpCommunicationChannelId,
     setOtpCommunicationChannelId,
   } = useNewLogin()
   const [verificationCode, setVerificationCode] = useState('')
+  const [isRedirecting, setIsRedirecting] = useState(false)
+  // hide OTP form while handling redirection
+  const [isInitiatingOtp, setIsInitiatingOtp] = useState(true)
 
   useEffect(() => {
     const initiateOtp = async () => {
-      setIsLoading(true)
+      setIsUiActionPending(true)
 
       try {
         const response = await initiateOtpRequest()
-
         if (response.status === 200 && (response.data.otp_sent || response.data.otp_configuring)) {
-          setOtpCommunicationChannelId(response.data.otp_communication_channel_id || null)
+          if (response.data.otp_sent) {
+            setOtpCommunicationChannelId(response.data.otp_communication_channel_id || null)
+            setIsInitiatingOtp(false)
+            setIsUiActionPending(false)
+          } else {
+            setIsRedirecting(true)
+            setIsUiActionPending(false)
+            // redirect to the old otp configuration page
+            // TODO handle otp configuration with React
+            window.location.href = '/login/otp'
+          }
         } else {
+          // generic otp send failure or unexpected response
           showFlashAlert({
-            message: I18n.t('Failed to send code. Please try again.'),
+            message: I18n.t(
+              'Unable to send the verification code at the moment. Please check your connection or try again later.'
+            ),
             type: 'error',
           })
-          setIsLoading(false)
+          setOtpRequired(false)
+          setIsUiActionPending(false)
+          setIsInitiatingOtp(false)
         }
       } catch (_error: unknown) {
+        // network error(s) or unknown exception(s)
         showFlashAlert({
-          message: I18n.t('Failed to send code. Please try again.'),
+          message: I18n.t(
+            'Failed to send the code due to a network error. Please check your internet connection and try again.'
+          ),
           type: 'error',
         })
-        setIsLoading(false)
+        setOtpRequired(false)
+        setIsUiActionPending(false)
+        setIsInitiatingOtp(false)
       }
     }
 
     initiateOtp()
-  }, [setIsLoading, setOtpCommunicationChannelId])
+  }, [setIsUiActionPending, setOtpCommunicationChannelId, setOtpRequired])
 
   const handleOtpSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -80,7 +103,7 @@ const OtpForm = () => {
       return
     }
 
-    setIsLoading(true)
+    setIsUiActionPending(true)
 
     try {
       const response = await verifyOtpRequest(verificationCode, rememberMe)
@@ -92,38 +115,55 @@ const OtpForm = () => {
           message: I18n.t('The code you entered is incorrect. Please try again.'),
           type: 'error',
         })
-        setIsLoading(false)
+        setIsUiActionPending(false)
       }
     } catch (_error: unknown) {
       showFlashAlert({
         message: I18n.t('Something went wrong while verifying the code. Please try again.'),
         type: 'error',
       })
-      setIsLoading(false)
+      setIsUiActionPending(false)
     }
   }
 
   const handleCancelOtp = async () => {
+    setIsUiActionPending(true)
+
     try {
       const response = await cancelOtpRequest()
 
       if (response.status === 200) {
         setOtpRequired(false)
+        setIsUiActionPending(false)
       } else {
         showFlashAlert({
           message: I18n.t('Failed to cancel the verification process. Please try again.'),
           type: 'error',
         })
+        setIsUiActionPending(false)
       }
     } catch (_error: unknown) {
       showFlashAlert({
         message: I18n.t('Failed to cancel the verification process. Please try again.'),
         type: 'error',
       })
+      setIsUiActionPending(false)
     }
   }
 
-  return (
+  const loadingContent = (
+    <Flex justifyItems="center" alignItems="center" height="100vh">
+      <Spinner
+        renderTitle={
+          isRedirecting
+            ? I18n.t('Redirecting, please wait...')
+            : I18n.t('Loading page, please wait...')
+        }
+      />
+    </Flex>
+  )
+
+  const otpFormContent = (
     <Flex direction="column" gap="large">
       <Flex.Item overflowY="visible">
         <Heading level="h2" as="h1">
@@ -173,7 +213,7 @@ const OtpForm = () => {
                     type="submit"
                     color="primary"
                     display="block"
-                    disabled={isLoading || !verificationCode.trim()}
+                    disabled={isUiActionPending || !verificationCode.trim()}
                   >
                     {I18n.t('Verify')}
                   </Button>
@@ -184,7 +224,7 @@ const OtpForm = () => {
                     color="secondary"
                     onClick={handleCancelOtp}
                     display="block"
-                    disabled={isLoading}
+                    disabled={isUiActionPending}
                   >
                     {I18n.t('Cancel')}
                   </Button>
@@ -196,6 +236,8 @@ const OtpForm = () => {
       </Flex.Item>
     </Flex>
   )
+
+  return isInitiatingOtp || isRedirecting ? loadingContent : otpFormContent
 }
 
 export default OtpForm

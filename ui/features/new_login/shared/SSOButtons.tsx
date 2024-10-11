@@ -37,7 +37,7 @@ interface SSOButtonsProps {
 }
 
 const SSOButtons = ({providers}: SSOButtonsProps) => {
-  const {isLoading} = useNewLogin()
+  const {isUiActionPending} = useNewLogin()
 
   const getProviderIcon = (authType: string) => {
     switch (authType) {
@@ -63,7 +63,7 @@ const SSOButtons = ({providers}: SSOButtonsProps) => {
             <Button
               href={link}
               display="block"
-              disabled={isLoading}
+              disabled={isUiActionPending}
               renderIcon={() => (
                 <Img
                   src={getProviderIcon(provider.auth_type)}

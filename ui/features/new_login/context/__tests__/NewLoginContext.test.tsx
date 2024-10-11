@@ -37,7 +37,7 @@ const TestComponent = () => {
   return (
     <div>
       <span data-testid="rememberMe">{context.rememberMe.toString()}</span>
-      <span data-testid="isLoading">{context.isLoading.toString()}</span>
+      <span data-testid="isUiActionPending">{context.isUiActionPending.toString()}</span>
       <span data-testid="otpRequired">{context.otpRequired.toString()}</span>
       <span data-testid="showForgotPassword">{context.showForgotPassword.toString()}</span>
       <span data-testid="otpCommunicationChannelId">
@@ -67,7 +67,7 @@ describe('NewLoginContext', () => {
       </NewLoginProvider>
     )
     expect(screen.getByTestId('rememberMe')).toHaveTextContent('false')
-    expect(screen.getByTestId('isLoading')).toHaveTextContent('false')
+    expect(screen.getByTestId('isUiActionPending')).toHaveTextContent('false')
     expect(screen.getByTestId('otpRequired')).toHaveTextContent('false')
     expect(screen.getByTestId('showForgotPassword')).toHaveTextContent('false')
     expect(screen.getByTestId('otpCommunicationChannelId')).toHaveTextContent('null')
@@ -79,38 +79,35 @@ describe('NewLoginContext', () => {
     const ConsumerComponent = () => {
       const {
         setRememberMe,
-        setIsLoading,
+        setIsUiActionPending,
         setOtpRequired,
         setShowForgotPassword,
         setOtpCommunicationChannelId,
       } = useNewLogin()
-
       React.useEffect(() => {
         act(() => {
           setRememberMe(true)
-          setIsLoading(true)
+          setIsUiActionPending(true)
           setOtpRequired(true)
           setShowForgotPassword(true)
           setOtpCommunicationChannelId('12345')
         })
       }, [
         setRememberMe,
-        setIsLoading,
+        setIsUiActionPending,
         setOtpRequired,
         setShowForgotPassword,
         setOtpCommunicationChannelId,
       ])
-
       return <TestComponent />
     }
-
     render(
       <NewLoginProvider>
         <ConsumerComponent />
       </NewLoginProvider>
     )
     expect(screen.getByTestId('rememberMe')).toHaveTextContent('true')
-    expect(screen.getByTestId('isLoading')).toHaveTextContent('true')
+    expect(screen.getByTestId('isUiActionPending')).toHaveTextContent('true')
     expect(screen.getByTestId('otpRequired')).toHaveTextContent('true')
     expect(screen.getByTestId('showForgotPassword')).toHaveTextContent('true')
     expect(screen.getByTestId('otpCommunicationChannelId')).toHaveTextContent('12345')
