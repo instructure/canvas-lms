@@ -4076,7 +4076,7 @@ ca:
       points: Punts
       speed_grader: SpeedGrader
       submission_types: "Tipus de fitxers"
-      submitting: "S'està entregant"
+      submitting: "Tipus de lliurament:"
       turnitin: Turnitin
       turnitin_enabled: "S'ha habilitat el Turnitin per a aquesta activitat."
       until: "Fins a"
@@ -4091,7 +4091,7 @@ ca:
       no_points: Cap
       points: Punts
       submission_types: "Tipus de fitxers"
-      submitting: "S'està entregant"
+      submitting: "Tipus de lliurament:"
       turnitin_enabled_short: "(Turnitin habilitat)"
       vericite_enabled_short: "(VeriCite habilitat)"
     submission_sidebar: 
