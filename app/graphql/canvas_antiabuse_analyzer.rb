@@ -32,13 +32,22 @@ class CanvasAntiabuseAnalyzer < GraphQL::Analysis::Analyzer
 
   def result
     if @alias_count > GraphQLTuning.max_query_aliases
-      Sentry.capture_message("GraphQL: max query aliases exceeded", { alias_count: @alias_count }, level: :warning)
+      log_to_sentry("GraphQL: max query aliases exceeded", alias_count: @alias_count)
       return GraphQL::AnalysisError.new("max query aliases exceeded")
     end
 
     if @directive_count > GraphQLTuning.max_query_directives
-      Sentry.capture_message("GraphQL: max query aliases exceeded", { directive_count: @directive_count }, level: :warning)
+      log_to_sentry("GraphQL: max query directives exceeded", directive_count: @directive_count)
       GraphQL::AnalysisError.new("max query aliases exceeded")
+    end
+  end
+
+  private
+
+  def log_to_sentry(message, extra = {})
+    Sentry.with_scope do |scope|
+      scope.set_context("graphql", extra)
+      Sentry.capture_message(message, level: :warning)
     end
   end
 end
