@@ -1655,7 +1655,7 @@ nl:
         default_language: Standaardtaal
         default_time_zone: Standaardtijdzone
         disable_inbox_auto_response_for_students: "Automatische beantwoording van inbox voor cursisten uitschakelen"
-        disable_inbox_signature_block_for_students: "Handtekening blokkeren voor cursisten uitschakelen"
+        disable_inbox_signature_block_for_students: "Handtekeningblog voor inbox uitschakelen voor studenten"
         domain: "Domein:"
         edit_institution_email: "Gebruikers kunnen een aan hen toegewezen e-mailadres verwijderen"
         enable_alerts: "Waarschuwingen (beta)"
@@ -1664,7 +1664,7 @@ nl:
         enable_fullstory: "Bijhouden met FullStory toestaan"
         enable_google_analytics: "Bijhouden met Google Analytics toestaan"
         enable_inbox_auto_response: "Automatisch beantwoorden voor inbox inschakelen"
-        enable_inbox_signature_block: "Handtekening blokkeren voor inbox inschakelen"
+        enable_inbox_signature_block: "Handtekeningblok voor inbox inschakelen"
         enable_limited_access_for_students: "Voor dit account Beperkte toegang voor cursisten inschakelen"
         enable_name_pronunciation: "Naam uitspreken inschakelen"
         enable_profiles: "Profielen mogelijk maken"
@@ -21316,7 +21316,7 @@ nl:
   not_starred_no_subject_click_to_star_adfefe93: "'Niet met ster gemarkeerd \"(Geen Onderwerp)\", Klik om met ster te markeren."
   not_starred_no_subject_click_to_star_dc91380: "'Niet met ster gemarkeerd \"(Geen Onderwerp)\", Klik om met ster te markeren."
   not_starred_subject_click_to_star_4ea6eb64: "'Niet met ster gemarkeerd \"%{subject}\", Klik om met ster te markeren."
-  not_submitted_7d05fdb4: "Niet ingediend"
+  not_submitted_7d05fdb4: "Nog niet Beoordeeld"
   not_submitted_fff47f17: "Niet ingeleverd"
   not_synced_529cbf29: "Niet gesynchroniseerd"
   not_synced_message_a343fe5e: "Niet gesynchroniseerd: %{message}"
@@ -23407,14 +23407,14 @@ nl:
   prerequisite_completion_period_c562d63: "Periode voor voltooiing voorwaarde"
   prerequisite_f361cd61: Vereiste
   prerequisites_49659f16: "Eerste vereisten"
-  prerequisites_98b324e0: Vereisten
+  prerequisites_98b324e0: Voorwaarden
   prerequisites_list_62d66d12: "Eerste vereisten %{list}"
   prerequisites_lookup: 
     headers: 
       completion_prerequisites: "Voorwaarden voor voltooiing"
     labels: 
       requirements_must_be_completed: "De volgende voorwaarden moeten voldaan zijn, voordat deze pagina ontgrendeld zal worden"
-  prerequisites_names_e4fffb88: "Vereisten: %{names}"
+  prerequisites_names_e4fffb88: "Voorwaarden: %{names}"
   presentation_2d9387ca: Presentatie
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Toont de toetsinstelling om automatische inlevering van een tijdgebonden toets te voorkomen wanneer de beschikbare tijd is verstreken."
   press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "Druk op ALT + F8 om een lijst van toetsenbordsneltoetsen te zien"
@@ -23964,7 +23964,7 @@ nl:
   publish_all_3860b220: "Alle publiceren"
   publish_all_modules_and_items_8e954cb3: "Alle modules en items publiceren"
   publish_announcement_fec6d7e2: "Aankondiging publiceren"
-  publish_at_3fd340d1: "Publiceren bij"
+  publish_at_3fd340d1: "Publiceren vanaf"
   publish_btn_module: 
     buttons: 
       publish: Publiceren
@@ -25193,7 +25193,7 @@ nl:
           loading_in_lockdown: "Toets wordt geladen in Respondus LockDown Browser"
       show: 
         buttons: 
-          lock_quiz: "Deze cursus nu vergrendelen"
+          lock_quiz: "Deze toets nu vergrendelen"
           lock_survey: "Deze enquête nu vergrendelen"
           unlock_quiz: "Laat cursisten deze toets nu maken"
           unlock_survey: "Laat cursisten deze enquête nu invullen"
@@ -26172,8 +26172,8 @@ nl:
       labels: 
         enabled: "Ingeschakeld (moet ook QTI Converter inschakelen)"
   response_body_was_empty_c7034341: "Antwoordruimte was leeg"
-  response_off_8bab1e1b: "Reactie Uit"
-  response_on_a9dd65e6: "Reactie Aan"
+  response_off_8bab1e1b: "Beantwoorden Uit"
+  response_on_a9dd65e6: "Beantwoorden Aan"
   response_on_off_6039323b: "Reactie Aan/Uit"
   responsive_admin_settings_4f8670d7: "Responsieve beheerder/Instellingen"
   responsive_awareness_226843a: "Responsief bewustzijn"
@@ -27882,9 +27882,9 @@ nl:
       name: Naam
       name_pronunciation: "Naam uitspreken"
       name_pronunciation_header: "Naam uitspreken"
-      name_pronunciation_header_tip: "Je kunt de juiste uitspraak van je naam bevestigen foor een fonetische uitspraak in te voeren."
+      name_pronunciation_header_tip: "Je kunt de juiste uitspraak van je naam bevestigen door een fonetische uitspraak in te voeren."
       name_pronunciation_label: "Naam uitspreken:"
-      name_pronunciation_label_tip: "Je kunt de juiste uitspraak van je naam bevestigen foor een fonetische uitspraak in te voeren."
+      name_pronunciation_label_tip: "Je kunt de juiste uitspraak van je naam bevestigen door een fonetische uitspraak in te voeren."
       no_links: "Er zijn geen links toegevoegd"
       no_name_pronunciation: "Er is geen uitspraak gegeven"
       nothing_in_common: "Jullie hebben niets gemeenschappelijks"
