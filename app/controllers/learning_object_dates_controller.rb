@@ -282,7 +282,7 @@ class LearningObjectDatesController < ApplicationController
       base_override = { type: "override" }
 
       [:unlock_at, :lock_at].each do |date_field|
-        base_override[date_field] = override[date_field] if override[date_field]
+        base_override[date_field] = override[date_field] if override.key?(date_field)
       end
 
       # If student_ids, course_section_id, or group_id is provided, then we want to provide the correct set_type and set ids
@@ -300,15 +300,15 @@ class LearningObjectDatesController < ApplicationController
       # each checkpoint has the same base_override attributes
       reply_to_topic_date = base_override.dup
       reply_to_entry_date = base_override.dup
-      reply_to_topic_date[:due_at] = override[:reply_to_topic_due_at] if override[:reply_to_topic_due_at]
-      reply_to_entry_date[:due_at] = override[:required_replies_due_at] if override[:required_replies_due_at]
+      reply_to_topic_date[:due_at] = override[:reply_to_topic_due_at] if override.key?(:reply_to_topic_due_at)
+      reply_to_entry_date[:due_at] = override[:required_replies_due_at] if override.key?(:required_replies_due_at)
 
       # If the override is provided, we assume it is the parent override, and we need to find the correct child_override
       # That should get updated in the discussionCheckpointUpdaterService
       if override[:id]
         parent_override = AssignmentOverride.find(override[:id])
-        reply_to_topic_override = parent_override.child_overrides.find { |o| o.assignment.sub_assignment_tag == "reply_to_topic" }
-        reply_to_entry_override = parent_override.child_overrides.find { |o| o.assignment.sub_assignment_tag == "reply_to_entry" }
+        reply_to_topic_override = parent_override.child_overrides.find { |o| o.assignment.sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC }
+        reply_to_entry_override = parent_override.child_overrides.find { |o| o.assignment.sub_assignment_tag == CheckpointLabels::REPLY_TO_ENTRY }
 
         reply_to_topic_date[:id] = reply_to_topic_override&.id
         reply_to_entry_date[:id] = reply_to_entry_override&.id
@@ -323,15 +323,15 @@ class LearningObjectDatesController < ApplicationController
       base_everyone_date = { type: "everyone" }
 
       [:unlock_at, :lock_at].each do |date_field|
-        base_everyone_date[date_field] = params[date_field] if params[date_field]
+        base_everyone_date[date_field] = params[date_field] if params.key?(date_field)
       end
 
       reply_to_topic_date = base_everyone_date.dup
-      reply_to_topic_date[:due_at] = params[:reply_to_topic_due_at] if params[:reply_to_topic_due_at]
+      reply_to_topic_date[:due_at] = params[:reply_to_topic_due_at] if params.key?(:reply_to_topic_due_at)
       reply_to_topic_dates << reply_to_topic_date
 
       reply_to_entry_date = base_everyone_date.dup
-      reply_to_entry_date[:due_at] = params[:required_replies_due_at] if params[:required_replies_due_at]
+      reply_to_entry_date[:due_at] = params[:required_replies_due_at] if params.key?(:required_replies_due_at)
       reply_to_entry_dates << reply_to_entry_date
     end
 
