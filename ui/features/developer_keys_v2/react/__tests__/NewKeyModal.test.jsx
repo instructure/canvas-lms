@@ -224,6 +224,19 @@ describe('NewKeyModal', () => {
       return sentDevKey
     }
 
+    it('sets isSaving to true to disable the Save button', () => {
+      const createOrEditSpy = jest.fn()
+      const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
+      const {ref} = renderDeveloperKeyModal({
+        createOrEditDeveloperKeyState: createDeveloperKeyState,
+        actions: mergedFakeActions,
+      })
+
+      ref.current.submitForm()
+
+      expect(ref.current.state.isSaving).toBeTruthy()
+    })
+
     it('sends the contents of the form saving', () => {
       const developerKey2 = {
         ...developerKey,

@@ -187,18 +187,24 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
       return
     }
 
+    this.setState({isSaving: true})
     return dispatch(
       createOrEditDeveloperKey(
         {developer_key: toSubmit},
         this.developerKeyUrl(),
         method
       ) as unknown as AnyAction
-    ).then(() => {
-      if (this.keySavedSuccessfully) {
-        this.props.handleSuccessfulSave()
-      }
-      this.closeModal()
-    })
+    )
+      .then(() => {
+        this.setState({isSaving: false})
+        if (this.keySavedSuccessfully) {
+          this.props.handleSuccessfulSave()
+        }
+        this.closeModal()
+      })
+      .catch(() => {
+        this.setState({isSaving: false})
+      })
   }
 
   saveLTIKeyEdit(
