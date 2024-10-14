@@ -163,7 +163,7 @@ GEM
     mini_portile2 (2.8.7)
     minitest (5.25.1)
     mutex_m (0.2.0)
-    net-imap (0.4.16)
+    net-imap (0.4.17)
       date
       net-protocol
     net-pop (0.1.2)
