@@ -1194,7 +1194,7 @@ GEM
     yard (0.9.37)
     yard-appendix (0.1.8)
       yard (>= 0.8.0)
-    zeitwerk (2.6.18)
+    zeitwerk (2.7.1)
 
 PLATFORMS
   aarch64-linux
