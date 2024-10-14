@@ -52,6 +52,7 @@ RSpec.shared_context "lti_1_3_tool_configuration_spec_helper", shared_context: :
       "custom_fields" => { "has_expansion" => "$Canvas.user.id", "no_expansion" => "foo" },
       "public_jwk" => public_jwk,
       "oidc_initiation_url" => oidc_initiation_url,
+      "oidc_initiation_urls" => { "us-east-1" => "http://example.com" },
       "scopes" => scopes,
       "extensions" => [
         {
@@ -101,6 +102,7 @@ RSpec.shared_context "lti_1_3_tool_configuration_spec_helper", shared_context: :
       custom_fields: { has_expansion: "$Canvas.user.id", no_expansion: "foo" },
       public_jwk: public_jwk.deep_symbolize_keys,
       oidc_initiation_url:,
+      oidc_initiation_urls: { "us-east-1": "http://example.com" },
       redirect_uris: [target_link_uri],
       scopes:,
       domain: "lti13testtool.docker",

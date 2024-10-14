@@ -57,7 +57,7 @@ module Api::V1::Lti::Registration
         json["updated_by"] = user_json(registration.updated_by, user, session, [], context)
       end
       if includes.include?(:configuration)
-        json["configuration"] = registration.configuration
+        json["configuration"] = registration.internal_lti_configuration(context:)
       end
 
       if includes.include?(:account_binding) && (acct_binding = registration.account_binding_for(context))

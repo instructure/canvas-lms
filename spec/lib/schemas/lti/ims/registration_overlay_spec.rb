@@ -25,16 +25,16 @@ describe Schemas::Lti::IMS::RegistrationOverlay do
       disabledScopes: ["https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly",],
       disabledSubs: ["foo"], # not sure what these are actually, we can make more stringent later if needed
       icon_url: "https://example.com/icon.png",
-      launch_height: "100%",
-      launch_width: "100%",
+      launch_height: "400",
+      launch_width: 200,
       disabledPlacements: ["course_navigation"],
       placements: [
         {
           type: "account_navigation",
           icon_url: "https://example.com/icon.png",
           label: "foo",
-          launch_height: "100%",
-          launch_width: "100%",
+          launch_height: "700",
+          launch_width: 400,
           default: "enabled",
         },
       ],
@@ -106,6 +106,70 @@ describe Schemas::Lti::IMS::RegistrationOverlay do
           expect(first_err).to match a_string_matching(/#{field}/)
         end
       end
+    end
+  end
+
+  describe ".to_lti_overlay" do
+    subject { Schemas::Lti::IMS::RegistrationOverlay.to_lti_overlay(valid) }
+
+    let(:valid) do
+      super().tap do |v|
+        v[:placements] << {
+          type: "course_navigation",
+          icon_url: "https://different.png",
+        }
+        v[:placements] << {
+          type: "global_navigation",
+        }
+      end
+    end
+
+    let(:expected) do
+      {
+        title: "foo",
+        description: "foo",
+        privacy_level: "public",
+        disabled_scopes: ["https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly"],
+        disabled_placements: ["course_navigation"],
+        placements: {
+          account_navigation: {
+            icon_url: "https://example.com/icon.png",
+            text: "foo",
+            launch_height: 700,
+            launch_width: 400,
+            default: "enabled",
+          },
+          course_navigation: {
+            icon_url: "https://different.png",
+            launch_height: 400,
+            launch_width: 200,
+          },
+          global_navigation: {
+            icon_url: "https://example.com/icon.png",
+            launch_height: 400,
+            launch_width: 200,
+          },
+        }
+      }.with_indifferent_access
+    end
+
+    it "converts a valid Registration Overlay properly" do
+      expect(subject).to eq(expected)
+    end
+
+    it "returns a valid LTI Overlay" do
+      expect(Schemas::Lti::Overlay.simple_validation_errors(subject)).to be_nil
+    end
+
+    it "returns an empty hash if passed nothing" do
+      expect(Schemas::Lti::IMS::RegistrationOverlay.to_lti_overlay(nil)).to eq({})
+    end
+
+    it "doesn't interpret nil launch_heights and widths as 0" do
+      valid[:launch_height] = nil
+      valid[:launch_width] = nil
+
+      expect(subject[:placements][:global_navigation].key?(:launch_height)).to be false
     end
   end
 end

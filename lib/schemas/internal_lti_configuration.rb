@@ -47,7 +47,35 @@ module Schemas
       }.deep_symbolize_keys)
     end
 
+    # Transforms a hash conforming to the InternalLtiConfiguration schema into
+    # a hash that's suitable for importing using the ContextExternalToolImporter.
+    # @param [Hash] internal_config The internal configuration hash.
+    # @return [Hash] The importable configuration hash.
+    def self.to_deployment_configuration(internal_config, unified_tool_id: nil)
+      config = internal_config.deep_dup.with_indifferent_access
+      placements = config&.dig(:placements)
+
+      settings = {
+        **(config&.dig(:launch_settings) || {}),
+        placements:,
+      }
+
+      # legacy: add placements in both array and hash form
+      placements&.each do |p|
+        settings[p["placement"]] = p
+      end
+
+      config
+        .except(:redirect_uris, :launch_settings, :placements)
+        .merge({ settings:, unified_tool_id:, lti_version: "1.3", url: config[:target_link_uri] })
+        .with_indifferent_access.compact
+    end
+
     def schema
+      self.class.schema
+    end
+
+    def self.schema
       {
         type: "object",
         required: %w[
@@ -61,16 +89,16 @@ module Schemas
           launch_settings
         ],
         properties: {
-          **self.class.base_properties,
+          **base_properties,
           redirect_uris: { type: "array", items: { type: "string" }, minItems: 1 },
           domain: { type: "string" },
           tool_id: { type: "string" },
           privacy_level: { type: "string", enum: ::Lti::PrivacyLevelExpander::SUPPORTED_LEVELS },
           launch_settings: {
             type: "object",
-            properties: self.class.base_settings_properties
+            properties: base_settings_properties
           },
-          placements: self.class.placements_schema,
+          placements: placements_schema,
           # vendor_extensions: extensions with platform != "canvas.instructure.com", only currently copied during content migration. not present on 1.3 tools.
         }
       }.freeze
