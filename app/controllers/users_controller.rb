@@ -2164,7 +2164,7 @@ class UsersController < ApplicationController
     if @domain_root_account.enable_profiles?
       managed_attributes << :bio if @user.grants_right?(@current_user, :manage_user_details)
       managed_attributes << :title if @user.grants_right?(@current_user, :rename)
-      managed_attributes << :pronunciation if @domain_root_account.enable_name_pronunciation? && @user.grants_right?(@current_user, :manage_user_details)
+      managed_attributes << :pronunciation if @user.can_change_pronunciation?(@domain_root_account) && @user.grants_right?(@current_user, :manage_user_details)
     end
 
     can_admin_change_pronouns = @domain_root_account.can_add_pronouns? && @user.grants_right?(@current_user, :manage_user_details)
