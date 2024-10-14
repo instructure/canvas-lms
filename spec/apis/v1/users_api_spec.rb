@@ -2081,7 +2081,7 @@ describe "Users API", type: :request do
           end
 
           it "does not update when pronoun is not approved" do
-            @student.pronouns = "She/Her"
+            @student.reload.pronouns = "She/Her"
             @student.save!
             original_pronoun = @student.pronouns
             unapproved_pronoun = "Unapproved/Unapproved"
@@ -2342,7 +2342,7 @@ describe "Users API", type: :request do
             a.save!
           end
 
-          @student.pronouns = "She/Her"
+          @student.reload.pronouns = "She/Her"
           @student.save!
           original_pronoun = @student.pronouns
           test_pronoun = "He/Him"
