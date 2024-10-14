@@ -1162,7 +1162,7 @@ GEM
     thrift (0.9.3.0)
     timecop (0.9.10)
     timeout (0.4.1)
-    tins (1.33.0)
+    tins (1.36.1)
       bigdecimal
       sync
     trailblazer-option (0.1.2)
