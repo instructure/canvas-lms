@@ -19,9 +19,8 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import {useLocation, useNavigate} from 'react-router-dom'
-import {fetchProducts} from '../../../../../shared/lti-apps/queries/productsQuery'
-import {useQuery} from '@tanstack/react-query'
-import useProduct from './useProduct'
+import useProduct from './queries/useProduct'
+import useSimilarProducts from './queries/useSimilarProducts'
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
@@ -29,12 +28,12 @@ import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {Tag} from '@instructure/ui-tag'
 import {View} from '@instructure/ui-view'
-import {IconExternalLinkLine} from '@instructure/ui-icons/es/IconExternalLinkLine'
 import {Button} from '@instructure/ui-buttons'
 import GenericErrorPage from '@canvas/generic-error-page/react'
-import TruncateWithTooltip from '../../../../../shared/lti-apps/components/common/TruncateWithTooltip'
+import TruncateWithTooltip from '@canvas/lti-apps/components/common/TruncateWithTooltip'
 import {
   IconA11yLine,
+  IconExternalLinkLine,
   IconExpandStartLine,
   IconEyeLine,
   IconMessageLine,
@@ -45,11 +44,11 @@ import IntegrationDetailModal from './IntegrationDetailModal'
 import ProductCarousel from '../common/Carousels/ProductCarousel'
 import ImageCarousel from '../common/Carousels/ImageCarousel'
 import BadgeCarousel from '../common/Carousels/BadgeCarousel'
-import Disclaimer from '../../../../../shared/lti-apps/components/common/Disclaimer'
+import Disclaimer from '@canvas/lti-apps/components/common/Disclaimer'
+
+import type {Product} from '@canvas/lti-apps/models/Product'
 
 import {openDynamicRegistrationWizard} from '../../../manage/registration_wizard/RegistrationWizardModalState'
-
-import type {DiscoverParams} from '../../../../../shared/lti-apps/hooks/useDiscoverQueryParams'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -70,21 +69,18 @@ const ProductDetail = () => {
 
   const params = () => {
     return {
-      filters: {companies: [product?.company]},
+      filters: {companies: [{id: product?.company.id.toString(), name: product?.company.name}]},
     }
   }
 
-  const {data: otherProductsByCompany} = useQuery({
-    queryKey: ['lti_similar_products_by_company', product?.company],
-    queryFn: () => fetchProducts(params() as unknown as DiscoverParams),
-  })
+  const {otherProductsByCompany} = useSimilarProducts({params: params(), product})
 
   const ErrorPage = () => {
     return <GenericErrorPage errorMessage={I18n.t('Error loading product details')} />
   }
 
   const excludeCurrentProduct = otherProductsByCompany?.tools.filter(
-    otherProducts => otherProducts.global_product_id !== currentProductId
+    (otherProducts: Product) => otherProducts.global_product_id !== currentProductId
   )
 
   const renderTags = () => {
@@ -377,13 +373,6 @@ const ProductDetail = () => {
                 </Flex>
                 <Flex direction="column">{renderIntegrationResources()}</Flex>
               </>
-            )}
-
-            {(excludeCurrentProduct?.length ?? 0) > 0 && (
-              <ProductCarousel
-                products={excludeCurrentProduct}
-                companyName={product.company.name}
-              />
             )}
             <div style={{marginTop: '35px'}}>
               <Disclaimer />

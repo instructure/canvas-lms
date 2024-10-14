@@ -17,10 +17,10 @@
  */
 
 import getCookie from '@instructure/get-cookie'
-import type {Product, ToolsByDisplayGroup} from '../model/Product'
+import type {Product, ToolsByDisplayGroup} from '../models/Product'
 import {stringify} from 'qs'
-import type {DiscoverParams} from '../components/useDiscoverQueryParams'
-import type {LtiFilters} from '../model/Filter'
+import type {DiscoverParams} from '../hooks/useDiscoverQueryParams'
+import type {LtiFilters, FilterItem} from '../models/Filter'
 
 const accountId = window.location.pathname.split('/')[2]
 
@@ -31,7 +31,7 @@ type Meta = {
   num_pages: number
   per_page: number
 }
-type ProductResponse = {
+export type ProductResponse = {
   tools: Array<Product>
   meta: Meta
 }
@@ -44,13 +44,13 @@ export const fetchProducts = async (params: DiscoverParams): Promise<ProductResp
       ...(params.search && {search_terms_cont: params.search}),
       ...(params.filters.tags && {display_group_id_eq: params.filters.tags[0]?.id}),
       ...(params.filters.companies && {
-        company_id_in: params.filters.companies.map(company => company.id),
+        company_id_in: params.filters.companies.map((company: FilterItem) => company.id),
       }),
       ...(params.filters.audience && {
-        audience_id_in: params.filters.audience.map(audience => audience.id),
+        audience_id_in: params.filters.audience.map((audience: FilterItem) => audience.id),
       }),
       ...(params.filters.versions && {
-        version_id_in: params.filters.versions.map(version => version.id),
+        version_id_in: params.filters.versions.map((version: FilterItem) => version.id),
       }),
     },
   }

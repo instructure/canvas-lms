@@ -23,7 +23,14 @@ import ProductCarousel from '../Carousels/ProductCarousel'
 import BadgeCarousel from '../Carousels/BadgeCarousel'
 import ImageCarousel from '../Carousels/ImageCarousel'
 
-import type {Product, Company, LtiDetail, Lti, Badges, Tag} from '../../../model/Product'
+import type {
+  Product,
+  Company,
+  LtiDetail,
+  Lti,
+  Badges,
+  Tag,
+} from '../../../../../../shared/lti-apps/models/Product'
 
 const company: Company = {
   id: 2,
@@ -57,6 +64,7 @@ const product: Product[] = [
     updated_at: '2024-01-01',
     tool_integration_configurations,
     lti_configurations,
+    integration_resources: {comments: null, resources: []},
     badges,
     screenshots: ['greatimage'],
     terms_of_service_url: 'google.com',
