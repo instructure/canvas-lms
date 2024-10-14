@@ -502,28 +502,77 @@ describe Login::CanvasController do
   end
 
   context "otp" do
-    it "does not ask for verification of unenrolled, optional user" do
-      Account.default.settings[:mfa_settings] = :optional
-      Account.default.save!
-      user_with_pseudonym(active_all: 1, password: "qwertyuiop")
+    context "when mfa is optional in account level" do
+      before :once do
+        Account.default.settings[:mfa_settings] = :optional
+        Account.default.save!
+        user_with_pseudonym(active_all: 1, password: "qwertyuiop")
+      end
 
-      post :create, params: { pseudonym_session: { unique_id: @pseudonym.unique_id, password: "qwertyuiop" } }
-      expect(response).to redirect_to dashboard_url(login_success: 1)
+      context "and canvas mfa is set to enforce" do
+        before :once do
+          auth_provider = Account.default.canvas_authentication_provider
+          auth_provider.mfa_required = true
+          auth_provider.save!
+          @pseudonym.update(authentication_provider: auth_provider)
+        end
+
+        it "does ask for verification if the user has NOT configured mfa" do
+          post :create, params: { pseudonym_session: { unique_id: @pseudonym.unique_id, password: "qwertyuiop" } }
+
+          expect(response).to redirect_to otp_login_url
+        end
+
+        it "does ask for verification if the user has configured mfa" do
+          @user.otp_secret_key = ROTP::Base32.random
+          @user.save!
+
+          post :create, params: { pseudonym_session: { unique_id: @pseudonym.unique_id, password: "qwertyuiop" } }
+
+          expect(response).to redirect_to otp_login_url
+        end
+      end
+
+      context "and canvas mfa is set to opt in" do
+        before :once do
+          auth_provider = Account.default.canvas_authentication_provider
+          auth_provider.mfa_required = false
+          auth_provider.save!
+          @pseudonym.update(authentication_provider: auth_provider)
+        end
+
+        it "does NOT ask for verification if the user has NOT configured mfa" do
+          post :create, params: { pseudonym_session: { unique_id: @pseudonym.unique_id, password: "qwertyuiop" } }
+
+          expect(response).to redirect_to dashboard_url(login_success: 1)
+        end
+
+        it "does ask for verification if the user has configured mfa" do
+          @user.otp_secret_key = ROTP::Base32.random
+          @user.save!
+
+          post :create, params: { pseudonym_session: { unique_id: @pseudonym.unique_id, password: "qwertyuiop" } }
+
+          expect(response).to redirect_to otp_login_url
+        end
+      end
     end
 
-    it "does not ask for verification if mfa is required but disabled for the provider" do
-      Account.default.settings[:mfa_settings] = :required
-      Account.default.save!
-      user_with_pseudonym(active_all: 1, password: "qwertyuiop")
-      @user.otp_secret_key = ROTP::Base32.random
-      @user.save!
-      auth_provider = Account.default.canvas_authentication_provider
-      @pseudonym.update(authentication_provider: auth_provider)
-      auth_provider.skip_internal_mfa = true
-      auth_provider.save!
+    context "when mfa is required in account level" do
+      it "does NOT ask for verification if the mfa is disabled for the provider" do
+        Account.default.settings[:mfa_settings] = :required
+        Account.default.save!
+        user_with_pseudonym(active_all: 1, password: "qwertyuiop")
+        @user.otp_secret_key = ROTP::Base32.random
+        @user.save!
+        auth_provider = Account.default.canvas_authentication_provider
+        @pseudonym.update(authentication_provider: auth_provider)
+        auth_provider.skip_internal_mfa = true
+        auth_provider.save!
 
-      post :create, params: { pseudonym_session: { unique_id: @pseudonym.unique_id, password: "qwertyuiop" } }
-      expect(response).to redirect_to dashboard_url(login_success: 1)
+        post :create, params: { pseudonym_session: { unique_id: @pseudonym.unique_id, password: "qwertyuiop" } }
+        expect(response).to redirect_to dashboard_url(login_success: 1)
+      end
     end
   end
 
