@@ -23,6 +23,16 @@ import {LoginLayout} from '../LoginLayout'
 import '@testing-library/jest-dom'
 import {NewLoginProvider} from '../../context/NewLoginContext'
 
+jest.mock('react-router-dom', () => {
+  const originalModule = jest.requireActual('react-router-dom')
+  return {
+    ...originalModule,
+    // mock ScrollRestoration to avoid errors since this test uses MemoryRouter, which is not a data
+    // router and ScrollRestoration requires a data router to function properly
+    ScrollRestoration: () => null,
+  }
+})
+
 describe('LoginLayout', () => {
   it('renders without crashing', () => {
     render(

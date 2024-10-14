@@ -16,17 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import Background from './Background'
 import React from 'react'
-import {render} from '@testing-library/react'
-import {SignInLinks} from '../index'
-import {MemoryRouter} from 'react-router-dom'
+import classNames from 'classnames'
+import {View} from '@instructure/ui-view'
 
-describe('SignInLinks', () => {
-  it('mounts without crashing', () => {
-    render(
-      <MemoryRouter>
-        <SignInLinks />
-      </MemoryRouter>
-    )
-  })
-})
+// @ts-expect-error
+import styles from './ContentLayout.module.css'
+
+interface Props {
+  className?: string
+  children: React.ReactNode
+}
+
+const ContentLayout = ({className, children}: Props) => (
+  <View as="div" height="100%" position="relative" className={styles.contentLayout}>
+    <View
+      as="div"
+      className={classNames(className, styles.contentLayout__wrapper)}
+      background="primary"
+      position="relative"
+    >
+      {children}
+    </View>
+
+    <Background className={styles.contentLayout__background} />
+  </View>
+)
+
+export default ContentLayout

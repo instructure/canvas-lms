@@ -17,16 +17,28 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
-import {SignInLinks} from '../index'
-import {MemoryRouter} from 'react-router-dom'
+import {useNewLogin} from '../context/NewLoginContext'
 
-describe('SignInLinks', () => {
-  it('mounts without crashing', () => {
-    render(
-      <MemoryRouter>
-        <SignInLinks />
-      </MemoryRouter>
-    )
-  })
-})
+// @ts-expect-error
+import styles from './Background.module.css'
+import classNames from 'classnames'
+
+interface Props {
+  className?: string
+}
+
+const Background = ({className}: Props) => {
+  const {bodyBgColor, bodyBgImage} = useNewLogin()
+
+  return (
+    <div
+      className={classNames(styles.background, className)}
+      style={{
+        backgroundColor: bodyBgColor || undefined,
+        backgroundImage: bodyBgImage ? `url(${bodyBgImage})` : undefined,
+      }}
+    />
+  )
+}
+
+export default Background

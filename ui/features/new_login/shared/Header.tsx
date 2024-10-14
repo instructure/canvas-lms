@@ -17,16 +17,25 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
-import {SignInLinks} from '../index'
-import {MemoryRouter} from 'react-router-dom'
+import classNames from 'classnames'
+import {LoginLogo} from './index'
+import {View} from '@instructure/ui-view'
+import {useNewLogin} from '../context/NewLoginContext'
 
-describe('SignInLinks', () => {
-  it('mounts without crashing', () => {
-    render(
-      <MemoryRouter>
-        <SignInLinks />
-      </MemoryRouter>
-    )
-  })
-})
+interface Props {
+  className?: string
+}
+
+const Header = ({className}: Props) => {
+  const {loginLogoUrl} = useNewLogin()
+
+  if (!loginLogoUrl) return null
+
+  return (
+    <View as="header" className={classNames(className)}>
+      <LoginLogo />
+    </View>
+  )
+}
+
+export default Header

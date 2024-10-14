@@ -22,8 +22,22 @@ import {MemoryRouter, Routes} from 'react-router-dom'
 import {NewLoginRoutes} from '../NewLoginRoutes'
 import '@testing-library/jest-dom'
 
+jest.mock('../../assets/images/instructure-logo.svg', () => 'instructure-logo.svg')
 jest.mock('../../pages/SignIn', () => () => <div>Sign In Page</div>)
 jest.mock('../../pages/ForgotPassword', () => () => <div>Forgot Password Page</div>)
+jest.mock('@instructure/ui-img', () => {
+  const Img = ({src, alt}: {src: string; alt: string}) => <img src={src} alt={alt} />
+  return {Img}
+})
+jest.mock('react-router-dom', () => {
+  const originalModule = jest.requireActual('react-router-dom')
+  return {
+    ...originalModule,
+    // mock ScrollRestoration to avoid errors since this test uses MemoryRouter, which is not a data
+    // router and ScrollRestoration requires a data router to function properly
+    ScrollRestoration: () => null,
+  }
+})
 
 describe('NewLoginRoutes', () => {
   it('renders SignIn component at /login/canvas', async () => {

@@ -17,27 +17,32 @@
  */
 
 import React from 'react'
+import classNames from 'classnames'
 import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
+import {Img} from '@instructure/ui-img'
+import {useNewLogin} from '../context/NewLoginContext'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
 // @ts-expect-error
 import GoogleIcon from '../assets/images/google.svg'
 // @ts-expect-error
 import MicrosoftIcon from '../assets/images/microsoft.svg'
 // @ts-expect-error
 import PlaceholderIcon from '../assets/images/placeholder.svg'
-import {Img} from '@instructure/ui-img'
-import {Flex} from '@instructure/ui-flex'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {useNewLogin} from '../context/NewLoginContext'
-import type {AuthProvider} from '../types'
 
 const I18n = useI18nScope('new_login')
 
-interface SSOButtonsProps {
-  providers: AuthProvider[]
+interface Props {
+  className?: string
 }
 
-const SSOButtons = ({providers}: SSOButtonsProps) => {
-  const {isUiActionPending} = useNewLogin()
+const SSOButtons = ({className}: Props) => {
+  const {isUiActionPending, authProviders} = useNewLogin()
+
+  if (!authProviders || authProviders.length === 0) {
+    return null
+  }
 
   const getProviderIcon = (authType: string) => {
     switch (authType) {
@@ -51,9 +56,10 @@ const SSOButtons = ({providers}: SSOButtonsProps) => {
   }
 
   return (
-    <Flex direction="column" gap="small">
-      {providers.map(provider => {
-        const onlyOneOfType = providers.filter(p => p.auth_type === provider.auth_type).length < 2
+    <Flex className={classNames(className)} direction="column" gap="small">
+      {authProviders.map(provider => {
+        const onlyOneOfType =
+          authProviders.filter(p => p.auth_type === provider.auth_type).length < 2
         const authType = provider.auth_type || 'unknown'
         const displayName = authType.charAt(0).toUpperCase() + authType.slice(1)
         const link = `/login/${authType}${onlyOneOfType ? '' : `/${provider.id}`}`

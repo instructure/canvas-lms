@@ -109,15 +109,15 @@ const SignIn = () => {
     <Flex direction="column" gap="large">
       <Flex.Item overflowY="visible">
         <Heading level="h2" as="h1">
-          {I18n.t('Welcome to Canvas')}
+          {I18n.t('Welcome to Canvas LMS')}
         </Heading>
       </Flex.Item>
 
-      {authProviders.length > 0 && (
+      {authProviders && authProviders.length > 0 && (
         <Flex.Item overflowY="visible">
           <Flex direction="column" gap="large">
             <Flex.Item overflowY="visible">
-              <SSOButtons providers={authProviders} />
+              <SSOButtons />
             </Flex.Item>
 
             <Flex.Item overflowY="visible">

@@ -16,17 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {render} from '@testing-library/react'
-import {SignInLinks} from '../index'
-import {MemoryRouter} from 'react-router-dom'
+@media (min-width: 48rem) { /* 768px */
+    .footer__logo {
+        left: 50%;
+        position: absolute;
+        top: calc(100% + 3.4375rem); /* 55px */
+        transform: translateX(-50%);
+    }
+}
 
-describe('SignInLinks', () => {
-  it('mounts without crashing', () => {
-    render(
-      <MemoryRouter>
-        <SignInLinks />
-      </MemoryRouter>
-    )
-  })
-})
+@media (min-width: 80rem) { /* 1280px */
+    .footer__logo {
+        bottom: 3.75rem; /* 60px */
+        left: auto;
+        position: fixed;
+        right: 3.75rem; /* 60px */
+        top: unset;
+        transform: none;
+    }
+}

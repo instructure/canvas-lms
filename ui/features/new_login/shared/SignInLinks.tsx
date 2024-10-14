@@ -17,33 +17,47 @@
  */
 
 import React from 'react'
+import classNames from 'classnames'
 import {Flex} from '@instructure/ui-flex'
-import {NavLink, useMatch} from 'react-router-dom'
+import {Link} from '@instructure/ui-link'
+import {useNavigate, useMatch} from 'react-router-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import type {ViewOwnProps} from '@instructure/ui-view'
 
 const I18n = useI18nScope('new_login')
 
-const SignInLinks = () => {
+interface Props {
+  className?: string
+}
+
+const SignInLinks = ({className}: Props) => {
+  const navigate = useNavigate()
   const isSignIn = useMatch('/login/canvas')
   const isForgotPassword = useMatch('/login/canvas/forgot-password')
 
-  const getActiveClassName = ({isActive}: {isActive: boolean}) => (isActive ? 'active' : '')
+  const handleNavigate = (path: string) => (event: React.MouseEvent<ViewOwnProps, MouseEvent>) => {
+    event.preventDefault()
+    navigate(path)
+  }
 
   return (
-    <Flex direction="column" gap="small">
+    <Flex className={classNames(className)} direction="column" gap="small">
       {isSignIn && (
-        <Flex.Item>
-          <NavLink to="/login/canvas/forgot-password" className={getActiveClassName}>
+        <Flex.Item overflowY="visible">
+          <Link
+            href="/login/canvas/forgot-password"
+            onClick={handleNavigate('/login/canvas/forgot-password')}
+          >
             {I18n.t('Forgot password?')}
-          </NavLink>
+          </Link>
         </Flex.Item>
       )}
 
       {isForgotPassword && (
-        <Flex.Item>
-          <NavLink to="/login/canvas" className={getActiveClassName}>
+        <Flex.Item overflowY="visible">
+          <Link href="/login/canvas" onClick={handleNavigate('/login/canvas')}>
             {I18n.t('Sign in')}
-          </NavLink>
+          </Link>
         </Flex.Item>
       )}
     </Flex>

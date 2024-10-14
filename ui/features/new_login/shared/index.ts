@@ -16,6 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+export {default as AppNavBar} from './AppNavBar'
+export {default as Background} from './Background'
+export {default as ContentLayout} from './ContentLayout'
+export {default as FooterLinks} from './FooterLinks'
+export {default as Footer} from './Footer'
+export {default as Header} from './Header'
+export {default as InstructureLogo} from './InstructureLogo'
+export {default as LoginLogo} from './LoginLogo'
 export {default as OtpForm} from './OtpForm'
-export {default as SSOButtons} from './SSOButtons'
 export {default as SignInLinks} from './SignInLinks'
+export {default as SSOButtons} from './SSOButtons'
