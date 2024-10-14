@@ -128,9 +128,6 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
     if discussion_topic.unlock_at_changed? || discussion_topic.delayed_post_at_changed? || discussion_topic.lock_at_changed?
       # only apply post_delayed if the topic is set to published
       discussion_topic.workflow_state = (discussion_topic.should_not_post_yet && discussion_topic.workflow_state == "active") ? "post_delayed" : discussion_topic.workflow_state
-      unless discussion_topic.should_lock_yet
-        discussion_topic.unlock(without_save: true)
-      end
     end
   end
 
@@ -143,15 +140,12 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
   end
 
   def process_locked_parameter(locked, discussion_topic)
-    return unless locked != discussion_topic.locked? && !discussion_topic.lock_at_changed?
-
     # TODO: Remove this comment when reused for Create/Update...
     # This makes no sense now but will help in the future when we
     # want to update the locked state of a discussion topic
     if locked
       discussion_topic.lock(without_save: true)
     else
-      discussion_topic.lock_at = nil
       discussion_topic.unlock(without_save: true)
     end
   end
