@@ -3358,6 +3358,10 @@ class User < ActiveRecord::Base
     @all_active_pseudonyms ||= pseudonyms.shard(self).active.to_a
   end
 
+  def pseudonyms_visible_to(_user)
+    all_active_pseudonyms
+  end
+
   def preferred_gradebook_version
     get_preference(:gradebook_version) || "default"
   end

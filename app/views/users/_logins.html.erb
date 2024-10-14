@@ -30,13 +30,12 @@
       </h4>
     </legend>
     <table class="ic-Table">
-      <% pseudonyms = @user.all_active_pseudonyms + [nil] %>
+      <% pseudonyms = @user.pseudonyms_visible_to(@current_user) + [nil] %>
       <% pseudonyms.each do |pseudonym| %>
         <tr class="login<%= ' blank' unless pseudonym %>" <%= raw %Q(style="display: none") unless pseudonym %>>
           <td class="sso-icon" <%= raw %Q(data-pseudonym-id="#{pseudonym.id}") if pseudonym %>>
-            <% icon_file_path = Rails.root.join("app/views/shared/svg/_svg_icon_#{pseudonym.try(:authentication_provider).try(:auth_type)}.svg") %>
-            <% if File.exist?(icon_file_path) %>
-              <%= render(partial: "shared/svg/svg_icon_#{pseudonym.authentication_provider.auth_type}", formats: [:svg]) %>
+            <% if (partial = sso_icon_exists?(pseudonym)) %>
+              <%= render(partial:, formats: [:svg]) %>
               <span class="screenreader-only">
                 <%= t("This login is for %{provider}", provider: pseudonym.authentication_provider.class.display_name) %>
               </span>
@@ -70,33 +69,7 @@
             <% end %>
           </td>
           <td class='details'>
-
-            <ul class="login_details_list">
-              <li class='login_details'>
-                <span class="login_details_label"><%= before_label('last_request', 'Last request') %></span>
-                <span class="login_details_value"><%= datetime_string(pseudonym.try(:last_request_at)) || t('never', "never") %></span>
-              </li>
-              <li class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
-                <span class="login_details_label"><%= before_label('current_login', 'Current login') %></span>
-                <span class="login_details_value"><%= datetime_string(pseudonym.try(:current_login_at)) || t('never', "never") %></span>
-              </li>
-              <li class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
-                <span class="login_details_label"><%= before_label('current_ip', 'Current login IP') %></span>
-                <span class="login_details_value"><%= pseudonym.try(:current_login_ip) || t('none', "none") %></span>
-              </li>
-              <li class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
-                <span class="login_details_label"><%= before_label('last_login', 'Last login') %></span>
-                <span class="login_details_value"><%= datetime_string(pseudonym.try(:last_login_at)) || t('never', "never") %></span>
-              </li>
-              <li class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
-                <span class="login_details_label"><%= before_label('last_ip', 'Last login IP') %></span>
-                <span class="login_details_value"><%= pseudonym.try(:last_login_ip) || t('none', "none") %></span>
-              </li>
-            </ul>
-
-            <% if pseudonyms.length > 1 || !pseudonym %>
-              <a href="#" class="login_details_link"><%= t('more', 'more...') %></a>
-            <% end %>
+            <%= render partial: 'users/last_login', locals: { pseudonym: pseudonym } if pseudonyms.length > 2 && pseudonym %>
           </td>
           <% if !pseudonym || can_do(pseudonym, @current_user, :update) %>
             <td class='links <%= 'passwordable' if pseudonym && can_do(pseudonym, @current_user, :change_password) %> <%= 'delegated-auth' if pseudonym && !pseudonym.account.canvas_authentication? %>'>

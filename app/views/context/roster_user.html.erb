@@ -122,7 +122,7 @@
 <% can_manage_admins = can_do(@context, @current_user, manage_perm) %>
 
 <% if !@context.is_a?(Group) && (can_manage_students || can_manage_admins) %>
-<%= render :partial => 'users/name' %>
+<%= render :partial => 'users/name', locals: { login_history: false } %>
 <a href="#" class="more_user_information_link"><%= t('links.more_user_details', %{more user details...}) %></a>
   <div class="more_user_information" style="display: none;">
     <% if @context.is_a?(Course) %>

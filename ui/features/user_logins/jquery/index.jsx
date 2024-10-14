@@ -93,12 +93,12 @@ $(function () {
   $('#edit_pseudonym_form .cancel_button').on('click', () => {
     $form.dialog('close')
   })
+  $('.login_details_link').on('click', function (event) {
+    event.preventDefault()
+    $(this).parents('td').find('.login_details').show()
+    $(this).hide()
+  })
   $('#login_information')
-    .on('click', '.login_details_link', function (event) {
-      event.preventDefault()
-      $(this).parents('tr').find('.login_details').show()
-      $(this).hide()
-    })
     .on('click', '.edit_pseudonym_link', function (event) {
       event.preventDefault()
       $form.attr('action', $(this).attr('rel')).attr('method', 'PUT')
