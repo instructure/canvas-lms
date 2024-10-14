@@ -91,7 +91,7 @@
     "@instructure/ui-billboard": "8.56.4",
     "@instructure/ui-buttons": "8.56.4",
     "@instructure/ui-checkbox": "8.56.4",
-    "@instructure/ui-code-editor": "8.56.4",
+    "@instructure/ui-source-code-editor": "8.56.4",
     "@instructure/ui-color-utils": "8.56.4",
     "@instructure/ui-file-drop": "8.56.4",
     "@instructure/ui-flex": "8.56.4",

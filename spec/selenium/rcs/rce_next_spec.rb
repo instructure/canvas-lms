@@ -1550,7 +1550,7 @@ describe "RCE next tests", :ignore_js_errors do
         expect_new_page_load { f("#preview_quiz_button").click }
         switch_to_html_view
         expect(f(".RceHtmlEditor")).to be_displayed
-        f(".RceHtmlEditor .CodeMirror textarea").send_keys(quiz_content)
+        f(".RceHtmlEditor div[role=\"textbox\"]").send_keys(quiz_content)
         expect_new_page_load { submit_quiz }
         expect(f("#questions .essay_question .quiz_response_text").attribute("innerHTML")).to eq(
           quiz_content
