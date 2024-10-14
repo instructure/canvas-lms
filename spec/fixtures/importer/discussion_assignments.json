@@ -15,13 +15,25 @@
   "discussion_topics": [
     {
       "title": "discussion1",
+      "description": "<p>ads</p>",
       "migration_id": "g8bacee869e70bf19cd6784db3efade7e",
       "type": "topic",
       "reply_to_entry_required_count": 2,
       "assignment": {
         "migration_id": "g696f150ec4e25e87ac8347b3ef6f4e43",
         "assignment_group_migration_id": "g57308533ff82c2c4a8fd60f540f59ec9",
-        "title": "discussion1"
+        "title": "discussion1",
+        "sub_assignments": [{
+          "migration_id": "gcc1a4d49e59b3978bae07f390d424f42",
+          "submission_types": "discussion_topics",
+          "tag": "reply_to_entry",
+          "due_at": "1238219700000"
+        }, {
+          "migration_id": "g73b2832d904d6e9e5378e3ef5ab0dab8",
+          "submission_types": "discussion_topics",
+          "tag": "reply_to_topic",
+          "due_at": "1238219700000"
+        }]
       }
     }
   ]

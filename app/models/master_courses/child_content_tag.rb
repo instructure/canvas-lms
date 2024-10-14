@@ -40,6 +40,7 @@ class MasterCourses::ChildContentTag < ActiveRecord::Base
                                      :learning_outcome_group,
                                      :media_track,
                                      :rubric,
+                                     :sub_assignment,
                                      :wiki,
                                      :wiki_page,
                                      quiz: "Quizzes::Quiz"]

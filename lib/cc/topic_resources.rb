@@ -150,6 +150,8 @@ module CC
       unless topic.sub_assignments.empty?
         doc.sub_assignments do
           topic.sub_assignments.each do |sub_assignment|
+            add_exported_asset(sub_assignment)
+
             identifier = create_key(sub_assignment)
             tag = sub_assignment.sub_assignment_tag
             doc.sub_assignment(identifier:, tag:) do |sub_assignment_doc|

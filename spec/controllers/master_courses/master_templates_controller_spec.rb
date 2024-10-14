@@ -93,4 +93,54 @@ describe MasterCourses::MasterTemplatesController do
       end
     end
   end
+
+  describe "PUT restrict_item" do
+    subject do
+      put "restrict_item", params:
+    end
+
+    let(:params) do
+      {
+        course_id: @course.id,
+        template_id: "default",
+        content_type:,
+        content_id: content.id,
+        restricted: true,
+      }
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    context "discussion_topic as content" do
+      let(:content) { DiscussionTopic.create_graded_topic!(course: @course, title: "Graded Discussion") }
+      let(:content_type) { "discussion_topic" }
+
+      it "updates master tag for discussion topic" do
+        subject
+        expect(MasterCourses::MasterContentTag.find_by(content:).restrictions).to match(hash_including(@template.default_restrictions))
+      end
+
+      context "when provided restrictions is invalid" do
+        before do
+          params[:restrictions] = { invalid: "restriction" }
+        end
+
+        it "returns bad request if tag is invalid" do
+          subject
+          expect(response).to have_http_status(:bad_request)
+        end
+      end
+
+      context "with sub assignments" do
+        let!(:sub_assignment) { content.assignment.sub_assignments.create!(context: content.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC) }
+
+        it "updates master tag for sub assignments" do
+          subject
+          expect(MasterCourses::MasterContentTag.find_by(content: sub_assignment).restrictions).to match(hash_including(@template.default_restrictions))
+        end
+      end
+    end
+  end
 end

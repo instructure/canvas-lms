@@ -21,6 +21,8 @@ require_relative "cc_spec_helper"
 class TopicResourceTestClass
   include CC::TopicResources
 
+  delegate :add_exported_asset, to: :@manifest
+
   def initialize(user, manifest, course)
     @user = user
     @manifest = manifest

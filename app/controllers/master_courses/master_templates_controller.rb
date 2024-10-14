@@ -447,19 +447,21 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     end
 
     mc_tag = @template.content_tag_for(item)
-    if value_to_boolean(params[:restricted])
-      custom_restrictions = params[:restrictions] && params[:restrictions].to_unsafe_h.to_h { |k, v| [k.to_sym, value_to_boolean(v)] }
-      mc_tag.restrictions = custom_restrictions || @template.default_restrictions_for(item)
-      mc_tag.use_default_restrictions = !custom_restrictions
-    else
-      mc_tag.restrictions = {}
-      mc_tag.use_default_restrictions = false
+    update_tag(mc_tag, item)
+    all_created_tags_valid = mc_tag.valid?
+    tag_errors = mc_tag.errors.to_a
+    if item.is_a?(DiscussionTopic)
+      item.sub_assignments.each do |sub_assignment|
+        sub_tag = @template.content_tag_for(sub_assignment)
+        update_tag(sub_tag, sub_assignment)
+        all_created_tags_valid &&= sub_tag.valid?
+        tag_errors += sub_tag.errors.to_a
+      end
     end
-    mc_tag.save if mc_tag.changed?
-    if mc_tag.valid?
+    if all_created_tags_valid
       render json: { success: true }
     else
-      render json: mc_tag.errors, status: :bad_request
+      render json: tag_errors, status: :bad_request
     end
   end
 
@@ -787,5 +789,17 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       end
     end
     classes.uniq
+  end
+
+  def update_tag(master_content_tag, item)
+    if value_to_boolean(params[:restricted])
+      custom_restrictions = params[:restrictions] && params[:restrictions].to_unsafe_h.to_h { |k, v| [k.to_sym, value_to_boolean(v)] }
+      master_content_tag.restrictions = custom_restrictions || @template.default_restrictions_for(item)
+      master_content_tag.use_default_restrictions = !custom_restrictions
+    else
+      master_content_tag.restrictions = {}
+      master_content_tag.use_default_restrictions = false
+    end
+    master_content_tag.save if master_content_tag.changed?
   end
 end
