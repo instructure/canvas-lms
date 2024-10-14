@@ -108,7 +108,7 @@ class SubmissionLifecycleManager
     opts = {
       assignments: [assignment.id],
       inst_jobs_opts: {
-        singleton: "cached_due_date:calculator:Assignment:#{assignment.global_id}:UpdateGrades:#{update_grades ? 1 : 0}",
+        singleton: "cached_due_date:calculator:#{assignment.class.name}:#{assignment.global_id}:UpdateGrades:#{update_grades ? 1 : 0}",
         max_attempts: 10
       },
       update_grades:,
@@ -126,7 +126,6 @@ class SubmissionLifecycleManager
     inst_jobs_opts[:max_attempts] ||= 10
     inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Course:#{course.global_id}:UpdateGrades:#{update_grades ? 1 : 0}" if assignments.nil?
     inst_jobs_opts[:strand] ||= "cached_due_date:calculator:Course:#{course.global_id}"
-
     assignments_to_recompute = assignments || AbstractAssignment.active.where(context: course).pluck(:id)
     return if assignments_to_recompute.empty?
 
