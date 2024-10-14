@@ -49,7 +49,7 @@ GEM
       concurrent-ruby (~> 1.0)
     idn-ruby (0.1.5)
     io-console (0.7.2)
-    irb (1.14.0)
+    irb (1.14.1)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     mini_portile2 (2.8.7)
