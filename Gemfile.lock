@@ -766,7 +766,7 @@ GEM
       rdiscount
       rubyzip (>= 1.0.0)
       thor
-    msgpack (1.7.2)
+    msgpack (1.7.3)
     multi_json (1.15.0)
     multi_xml (0.7.1)
       bigdecimal (~> 3.1)
