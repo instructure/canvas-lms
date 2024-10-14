@@ -148,7 +148,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
     if developer_key.ims_registration.present?
       render json: ({
         tool_configuration: {
-          settings: developer_key.ims_registration.canvas_configuration
+          settings: developer_key.lti_registration.canvas_configuration(context: @context)
         }
       })
     else

@@ -449,4 +449,67 @@ describe Schemas::InternalLtiConfiguration do
       end
     end
   end
+
+  describe ".to_deployment_configuration" do
+    subject { Schemas::InternalLtiConfiguration.to_deployment_configuration(internal_configuration, unified_tool_id: "foo") }
+
+    # Taken from a previous test run where importable_configuration was already valid
+    # and then modified to remove fields that aren't actually used by ContextExternalToolImporter
+    let(:expected) do
+      { "title" => "LTI 1.3 Tool",
+        "description" => "1.3 Tool",
+        "target_link_uri" => "http://lti13testtool.docker/blti_launch",
+        "custom_fields" => { "has_expansion" => "$Canvas.user.id", "no_expansion" => "foo" },
+        "public_jwk" => internal_configuration[:public_jwk].deep_stringify_keys,
+        "oidc_initiation_url" => "http://lti13testtool.docker/blti_launch",
+        "scopes" => [],
+        "oidc_initiation_urls" => { "us-east-1" => "http://example.com" },
+        "privacy_level" => "public",
+        "tool_id" => "LTI 1.3 Test Tool",
+        "domain" => "lti13testtool.docker",
+        "unified_tool_id" => "foo",
+        "lti_version" => "1.3",
+        "url" => "http://lti13testtool.docker/blti_launch",
+        "settings" =>
+        { "icon_url" => "https://static.thenounproject.com/png/131630-200.png",
+          "selection_height" => 500,
+          "selection_width" => 500,
+          "text" => "LTI 1.3 Test Tool Extension text",
+          "placements" =>
+          [{ "placement" => "course_navigation",
+             "message_type" => "LtiResourceLinkRequest",
+             "canvas_icon_class" => "icon-pdf",
+             "icon_url" => "https://static.thenounproject.com/png/131630-211.png",
+             "text" => "LTI 1.3 Test Tool Course Navigation",
+             "target_link_uri" => "http://lti13testtool.docker/launch?placement=course_navigation",
+             "enabled" => true },
+           { "placement" => "account_navigation",
+             "message_type" => "LtiResourceLinkRequest",
+             "canvas_icon_class" => "icon-lti",
+             "icon_url" => "https://static.thenounproject.com/png/131630-211.png",
+             "target_link_uri" => "http://lti13testtool.docker/launch?placement=account_navigation",
+             "text" => "LTI 1.3 Test Tool Course Navigation",
+             "enabled" => true }],
+          "course_navigation" =>
+          { "placement" => "course_navigation",
+            "message_type" => "LtiResourceLinkRequest",
+            "canvas_icon_class" => "icon-pdf",
+            "icon_url" => "https://static.thenounproject.com/png/131630-211.png",
+            "text" => "LTI 1.3 Test Tool Course Navigation",
+            "target_link_uri" => "http://lti13testtool.docker/launch?placement=course_navigation",
+            "enabled" => true },
+          "account_navigation" =>
+          { "placement" => "account_navigation",
+            "message_type" => "LtiResourceLinkRequest",
+            "canvas_icon_class" => "icon-lti",
+            "icon_url" => "https://static.thenounproject.com/png/131630-211.png",
+            "target_link_uri" => "http://lti13testtool.docker/launch?placement=account_navigation",
+            "text" => "LTI 1.3 Test Tool Course Navigation",
+            "enabled" => true } } }
+    end
+
+    it "transforms as expected" do
+      expect(subject).to eq(expected)
+    end
+  end
 end

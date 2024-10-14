@@ -476,6 +476,33 @@ describe DeveloperKeysController do
         expect(expected_id).to eq root_account_key.global_id
       end
 
+      context "an overlay exists for one of the keys" do
+        # bring in tool_configuration
+        include_context "lti_1_3_spec_helper"
+        let(:developer_key) do
+          developer_key_model(account: test_domain_root_account, public_jwk_url: "http://example.com", is_lti_key: true)
+        end
+        let(:overlay) do
+          Lti::Overlay.create!(account: test_domain_root_account,
+                               registration: tool_configuration.lti_registration,
+                               updated_by: user_model,
+                               data: {
+                                 "placements" => {
+                                   "course_navigation" => {
+                                     "text" => "some great little text"
+                                   }
+                                 }
+                               })
+        end
+
+        it "applies the overlay to the returned configuration" do
+          overlay
+          get "index", params: { account_id: test_domain_root_account.id }, format: :json
+          result = json_parse.first.dig("tool_configuration", "extensions", 0, "settings", "placements")
+          expect(result.find { |p| p["placement"] == "course_navigation" }["text"]).to eq "some great little text"
+        end
+      end
+
       context 'with "inherited" parameter' do
         it "does not include account developer keys" do
           root_account_key

@@ -80,6 +80,40 @@ class Lti::Registration < ActiveRecord::Base
     Lti::RegistrationAccountBinding.find_by(registration: self, account:)
   end
 
+  # Searches for the applicable overlay for a context. Currently only supports
+  # overlays that are associated with the root account of the context. If no
+  # context is provided, the most recent overlay that is associated with this registration
+  # and this registration's account is returned.
+  #
+  # Overlays are different than account bindings in that we search in a bottom-to-top account
+  # order, rather than top-to-bottom.
+  #
+  # @param context [Account | Course | nil]
+  # @return [Lti::Overlay | nil]
+  def overlay_for(context)
+    # If subaccount support is needed in the future, reference
+    # DeveloperKey#account_binding_for and DeveloperKeyAccountBinding#find_in_account_priority.
+    account = if context.blank?
+                self.account
+              elsif context.is_a?(Account) && context.root_account?
+                context
+              else
+                context.root_account
+              end
+
+    # The most recent overlay takes precedence.
+    overlay = Lti::Overlay.find_by(registration: self, account:)
+
+    return overlay if overlay.present?
+
+    unless account.primary_settings_root_account?
+      overlay = overlay_for_federated_parent(account)
+      return overlay if overlay
+    end
+
+    Lti::Overlay.find_in_site_admin(self)
+  end
+
   def new_external_tool(context, existing_tool: nil)
     # disabled tools should stay disabled while getting updated
     # deleted tools are never updated during a dev key update so can be safely ignored
@@ -87,7 +121,7 @@ class Lti::Registration < ActiveRecord::Base
 
     tool = existing_tool || ContextExternalTool.new(context:)
     Importers::ContextExternalToolImporter.import_from_migration(
-      importable_configuration,
+      deployment_configuration(context:),
       context,
       nil,
       tool,
@@ -140,16 +174,60 @@ class Lti::Registration < ActiveRecord::Base
     ims_registration&.logo_uri || manual_configuration&.settings&.dig("extensions", 0, "settings", "icon_url")
   end
 
+  # Returns an LtiConfiguration-conforming Hash with the overlay appropriate
+  # for the provided context applied.
+  # @return [Hash] A Hash conforming to the LtiConfiguration schema
+  def canvas_configuration(context: nil)
+    Schemas::LtiConfiguration.from_internal_lti_configuration(internal_lti_configuration(context:))
+  end
+
+  # Returns a Hash conforming to the InternalLtiConfiguration schema. If a context is specified, the
+  # overlay for said context, if one exists, will be applied to the configuration.
+  # @param [Account | Course | nil] context The context for which to generate the configuration.
+  # @return [Hash] A Hash conforming to the InternalLtiConfiguration schema.
   # TODO: this will eventually need to account for 1.1 registrations
-  def configuration
+  def internal_lti_configuration(context: nil)
+    overlay = overlay_for(context)&.data
+
     # hack; remove the need to look for developer_key.tool_configuration and ensure that is
     # always available as manual_configuration. This would need to happen in an after_save
     # callback on the developer key.
-    ims_registration&.internal_lti_configuration || manual_configuration&.internal_configuration || developer_key&.tool_configuration&.internal_configuration || {}
+    internal_config = ims_registration&.internal_lti_configuration ||
+                      manual_configuration&.internal_lti_configuration ||
+                      developer_key&.tool_configuration&.internal_lti_configuration ||
+                      {}
+
+    # TODO: Remove this clause once we have backfilled all Lti::IMS::Registration overlays into the
+    # actual Lti::Overlay table.
+    if ims_registration.present? && overlay.blank?
+      overlay = Schemas::Lti::IMS::RegistrationOverlay
+                .to_lti_overlay(ims_registration.registration_overlay)
+    end
+
+    Lti::Overlay.apply_to(overlay, internal_config)
   end
 
-  def importable_configuration
-    ims_registration&.importable_configuration || manual_configuration&.importable_configuration || developer_key&.tool_configuration&.importable_configuration || {}
+  # Returns a Hash that's usable with the ContextExternalToolImporter to create a new ContextExternalTool.
+  # If a context is provided, the overlay for that context will be applied to the configuration. If no context
+  # is provided the configuration will be returned as is.
+  #
+  # @see ContextExternalToolImporter#import_from_migration
+  # @see Lti::Registration#configuration
+  # @param [Account | Course] context The context for which to generate the configuration
+  # @return [Hash] A Hash usable with the ContextExternalToolImporter
+  def deployment_configuration(context: nil)
+    base_config = internal_lti_configuration(context:).with_indifferent_access
+
+    base_config[:placements].each do |placement|
+      placement[:enabled] = false if registration_level_disabled_placements.include?(placement[:placement])
+    end
+
+    unified_tool_id = ims_registration&.unified_tool_id ||
+                      manual_configuration&.unified_tool_id ||
+                      developer_key&.tool_configuration&.unified_tool_id
+
+    Schemas::InternalLtiConfiguration
+      .to_deployment_configuration(base_config, unified_tool_id:)
   end
 
   def privacy_level
@@ -175,6 +253,24 @@ class Lti::Registration < ActiveRecord::Base
 
   private
 
+  # Returns which placements are disabled at the Lti::IMS::Registration or Lti::ToolConfiguration level.
+  # Note that this is legacy behavior, as moving forward, the overlay will be the source of truth. This method
+  # is only used for backwards compatibility.
+  #
+  # @return [Array<String>] An array of placement names that are disabled.
+  def registration_level_disabled_placements
+    @registration_level_disabled_placements ||=
+      if ims_registration.present?
+        ims_registration&.registration_overlay
+                        &.with_indifferent_access
+                        &.dig(:disabledPlacements) || []
+      else
+        manual_configuration&.disabled_placements ||
+          developer_key&.tool_configuration&.disabled_placements ||
+          []
+      end
+  end
+
   # For unknown reasons, adding dependent: :destroy to the ims_registration or developer_key
   # causes the destroy callbacks to fail, leaving the registration undeleted. Foreign key maybe?
   # The ims_registration and developer_key delete just fine, so we'll just handle it manually.
@@ -196,6 +292,11 @@ class Lti::Registration < ActiveRecord::Base
 
   # Overridden in MRA, where federated consortia are supported
   def account_binding_for_federated_parent(_account)
+    nil
+  end
+
+  # Overridden in MRA, where federated consortia are supported
+  def overlay_for_federated_parent(_account)
     nil
   end
 end
