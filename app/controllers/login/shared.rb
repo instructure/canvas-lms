@@ -33,9 +33,10 @@ module Login::Shared
     reset_authenticity_token!
     Auditors::Authentication.record(pseudonym, "login")
 
-    # Send metrics for successful login
-    auth_type = pseudonym&.authentication_provider&.auth_type
+    auth_provider = pseudonym&.authentication_provider
+    auth_type = auth_provider&.auth_type
     tags = { auth_type:, domain: request.host }
+
     InstStatsd::Statsd.increment("login.count", tags:) if auth_type
 
     # Since the user just logged in, we'll reset the context to include their info.
@@ -45,9 +46,9 @@ module Login::Shared
     Canvas::LiveEvents.logged_in(session, user, pseudonym)
 
     otp_passed ||= user.validate_otp_secret_key_remember_me_cookie(cookies["canvas_otp_remember_me"], request.remote_ip)
-    unless otp_passed || pseudonym.authentication_provider.skip_internal_mfa
+    unless otp_passed || auth_provider.skip_internal_mfa
       mfa_settings = user.mfa_settings(pseudonym_hint: @current_pseudonym)
-      if (user.otp_secret_key && mfa_settings == :optional) || mfa_settings == :required
+      if (mfa_settings == :optional && (user.otp_secret_key || auth_provider.mfa_required)) || mfa_settings == :required
         session[:pending_otp] = true
         respond_to do |format|
           format.html { redirect_to otp_login_url }
