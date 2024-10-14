@@ -451,7 +451,7 @@ GEM
     brakeman (6.2.1)
       racc
     brotli (0.6.0)
-    browser (5.3.1)
+    browser (6.0.0)
     builder (3.3.0)
     business_time (0.13.0)
       activesupport (>= 3.2.0)
@@ -1246,7 +1246,7 @@ DEPENDENCIES
   bootsnap (~> 1.16)
   brakeman (~> 6.0)
   broadcast_policy!
-  browser (~> 5.3)
+  browser (~> 6.0)
   bundler (~> 2.2)
   business_time (= 0.13.0)
   canvas_breach_mitigation!
