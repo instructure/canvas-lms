@@ -17,15 +17,16 @@
  */
 
 import {Img} from '@instructure/ui-img'
+import ConfettiExplosion from 'react-confetti-explosion'
+import React, {useState} from 'react'
+
 import {stickerContainerClass} from '../helpers/utils'
 import Api from '../helpers/api'
 import assetFactory, {stickerDescription} from '../helpers/assetFactory'
 import ClickableImage from './ClickableImage'
-import Confetti from '@canvas/confetti/react/Confetti'
-import React, {useState} from 'react'
+import Sparkles from '@canvas/sparkles/react/components/Sparkles'
 import StickerModal from './StickerModal'
 import type {StickerProps} from '../types/stickers.d'
-import Sparkles from '@canvas/sparkles/react/components/Sparkles'
 
 export default function Sticker({
   confetti,
@@ -91,15 +92,17 @@ export default function Sticker({
 
   if (confetti) {
     return (
-      <>
+      <span style={{position: 'relative'}}>
+        <span style={{position: 'absolute', top: '50%', left: '50%'}}>
+          {confettiShowing && <ConfettiExplosion zIndex={10} data-testid="confetti-explosion" />}
+        </span>
         <ClickableImage
           editable={editable}
           onClick={triggerConfetti}
           size={size}
           sticker={submission.sticker}
         />
-        {confettiShowing && <Confetti triggerCount={null} />}
-      </>
+      </span>
     )
   }
 

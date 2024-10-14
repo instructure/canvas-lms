@@ -93,12 +93,12 @@ describe('Sticker', () => {
         const {getByTestId} = renderComponent(props)
         const button = getByTestId('sticker-button')
         fireEvent.click(button)
-        expect(getByTestId('confetti-canvas')).toBeInTheDocument()
+        expect(getByTestId('confetti-explosion')).toBeInTheDocument()
       })
 
       it('does not show confetti prior to the button being clicked', () => {
         const {queryByTestId} = renderComponent(props)
-        expect(queryByTestId('confetti-canvas')).not.toBeInTheDocument()
+        expect(queryByTestId('confetti-explosion')).not.toBeInTheDocument()
       })
     })
   })
