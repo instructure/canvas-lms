@@ -74,7 +74,7 @@
 } %>
 
 <div id="user-info-fieldsets">
-  <%= render :partial => 'users/name' %>
+  <%= render :partial => 'users/name', locals: { login_history: true } %>
   <%= render :partial => 'users/logins' %>
   <% if @domain_root_account.feature_enabled?(:temporary_enrollments) &&
         @enrollments.detect(&:temporary_enrollment_source_user_id).present? &&
