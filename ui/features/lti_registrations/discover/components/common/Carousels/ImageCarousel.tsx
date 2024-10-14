@@ -61,7 +61,7 @@ function ImageCarousel(props: ImageCarouselProps) {
           ref={slider}
           {...updatedSettings}
           {...props.customSettings}
-          beforeChange={(currentSlide: number, nextSlide: number) =>
+          beforeChange={(_currentSlide: number, nextSlide: number) =>
             setCurrentSlideNumber(nextSlide)
           }
         >
