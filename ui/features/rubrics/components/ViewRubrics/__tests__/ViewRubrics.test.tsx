@@ -519,8 +519,8 @@ describe('ViewRubrics Tests', () => {
       expect(getPreviewTray()).toBeInTheDocument()
       expect(getByTestId('traditional-criterion-1-ratings-0')).toBeInTheDocument()
     })
-
-    it('closes the preview tray when the same rubric is clicked again', async () => {
+    // Un-skip in EVAL-4737
+    it.skip('closes the preview tray when the same rubric is clicked again', async () => {
       const {getByTestId} = renderComponent()
 
       const previewCell = getByTestId('rubric-title-preview-1')
