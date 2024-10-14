@@ -3310,6 +3310,14 @@ describe "Users API", type: :request do
       expect(json.length).to be 2
     end
 
+    it "returns unsubmitted assignments due in the past excluding manually changed to 'none'" do
+      assignment = @course.assignments.create!(due_at: 2.days.ago, workflow_state: "published", submission_types: "online_text_entry")
+      assignment.grade_student(@student, grade: nil, grader: @teacher, late_policy_status: "none")
+
+      json = api_call(:get, @path, @params)
+      expect(json.length).to be 2
+    end
+
     it "returns assignments in order of the submission time for the user" do
       assign = @course.assignments.create!(due_at: 5.days.ago, workflow_state: "published", submission_types: "online_text_entry")
       create_adhoc_override_for_assignment(assign, @student, due_at: 3.days.ago)
