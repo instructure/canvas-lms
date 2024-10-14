@@ -17,16 +17,30 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
-import {SignInLinks} from '../index'
-import {MemoryRouter} from 'react-router-dom'
+import classNames from 'classnames'
+import {Flex} from '@instructure/ui-flex'
+import {FooterLinks, InstructureLogo} from './index'
+import {View} from '@instructure/ui-view'
 
-describe('SignInLinks', () => {
-  it('mounts without crashing', () => {
-    render(
-      <MemoryRouter>
-        <SignInLinks />
-      </MemoryRouter>
-    )
-  })
-})
+// @ts-expect-error
+import styles from './Footer.module.css'
+
+interface Props {
+  className?: string
+}
+
+const Footer = ({className}: Props) => {
+  return (
+    <View as="footer" className={classNames(className)}>
+      <Flex as="div" direction="column" gap="large">
+        <FooterLinks />
+
+        <View as="div" className={styles.footer__logo}>
+          <InstructureLogo />
+        </View>
+      </Flex>
+    </View>
+  )
+}
+
+export default Footer

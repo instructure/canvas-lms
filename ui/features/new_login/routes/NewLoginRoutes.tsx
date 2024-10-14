@@ -18,7 +18,7 @@
 
 import React, {lazy, Suspense} from 'react'
 import {Route} from 'react-router-dom'
-import {LoginLayout} from '../layouts/LoginLayout'
+import {LoginLayout} from '../layouts'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {NewLoginProvider} from '../context/NewLoginContext'

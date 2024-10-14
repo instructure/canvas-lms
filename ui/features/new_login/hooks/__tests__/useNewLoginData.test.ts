@@ -19,7 +19,14 @@
 import {renderHook} from '@testing-library/react-hooks'
 import {useNewLoginData} from '../useNewLoginData'
 
-const createMockContainer = (authProviders: string | null, loginHandleName: string | null) => {
+const createMockContainer = (
+  authProviders: string | null,
+  loginHandleName: string | null,
+  loginLogoUrl: string | null,
+  loginLogoAlt: string | null,
+  bodyBgColor: string | null,
+  bodyBgImage: string | null
+) => {
   const container = document.createElement('div')
   container.id = 'new_login_data'
   if (authProviders !== null) {
@@ -27,6 +34,18 @@ const createMockContainer = (authProviders: string | null, loginHandleName: stri
   }
   if (loginHandleName !== null) {
     container.setAttribute('data-login-handle-name', loginHandleName)
+  }
+  if (loginLogoUrl !== null) {
+    container.setAttribute('data-login-logo-url', loginLogoUrl)
+  }
+  if (loginLogoAlt !== null) {
+    container.setAttribute('data-login-logo-alt', loginLogoAlt)
+  }
+  if (bodyBgColor !== null) {
+    container.setAttribute('data-body-bg-color', bodyBgColor)
+  }
+  if (bodyBgImage !== null) {
+    container.setAttribute('data-body-bg-image', bodyBgImage)
   }
   document.body.appendChild(container)
 }
@@ -44,33 +63,78 @@ describe('useNewLoginData', () => {
     expect(result.current).toBeDefined()
   })
 
-  it('returns default values when container is not present', () => {
+  it('returns default undefined values when container is not present at all', () => {
     const {result} = renderHook(() => useNewLoginData())
-    expect(result.current.authProviders).toEqual([])
-    expect(result.current.loginHandleName).toBe('')
+    expect(result.current.authProviders).toBeUndefined()
+    expect(result.current.loginLogoUrl).toBeUndefined()
+    expect(result.current.loginLogoAlt).toBeUndefined()
+    expect(result.current.loginHandleName).toBeUndefined()
+    expect(result.current.bodyBgColor).toBeUndefined()
+    expect(result.current.bodyBgImage).toBeUndefined()
   })
 
   it('returns parsed values from the container when present', () => {
     createMockContainer(
       JSON.stringify([{id: '1', name: 'Google', auth_type: 'google'}]),
-      'Username'
+      'Username',
+      'https://example.com/logo.png',
+      'Custom Alt Text',
+      '#ffffff',
+      'https://example.com/bg.png'
     )
     const {result} = renderHook(() => useNewLoginData())
     expect(result.current.authProviders).toEqual([{id: '1', name: 'Google', auth_type: 'google'}])
     expect(result.current.loginHandleName).toBe('Username')
+    expect(result.current.loginLogoUrl).toBe('https://example.com/logo.png')
+    expect(result.current.loginLogoAlt).toBe('Custom Alt Text')
+    expect(result.current.bodyBgColor).toBe('#ffffff')
+    expect(result.current.bodyBgImage).toBe('https://example.com/bg.png')
   })
 
-  it('returns default login handle name when data-login-handle-name attribute is missing', () => {
-    createMockContainer(JSON.stringify([{id: '1', name: 'Google', auth_type: 'google'}]), null)
+  it('returns undefined for missing attributes', () => {
+    createMockContainer(null, null, null, null, null, null)
     const {result} = renderHook(() => useNewLoginData())
-    expect(result.current.authProviders).toEqual([{id: '1', name: 'Google', auth_type: 'google'}])
-    expect(result.current.loginHandleName).toBe('Email')
+    expect(result.current.authProviders).toBeUndefined()
+    expect(result.current.loginHandleName).toBeUndefined()
+    expect(result.current.loginLogoUrl).toBeUndefined()
+    expect(result.current.loginLogoAlt).toBeUndefined()
+    expect(result.current.bodyBgColor).toBeUndefined()
+    expect(result.current.bodyBgImage).toBeUndefined()
   })
 
-  it('handles empty data-auth-providers attribute', () => {
-    createMockContainer('', 'Email')
+  it('returns undefined for empty string attributes', () => {
+    createMockContainer('', '', '', '', '', '')
     const {result} = renderHook(() => useNewLoginData())
-    expect(result.current.authProviders).toEqual([])
-    expect(result.current.loginHandleName).toBe('Email')
+    expect(result.current.authProviders).toBeUndefined()
+    expect(result.current.loginHandleName).toBeUndefined()
+    expect(result.current.loginLogoUrl).toBeUndefined()
+    expect(result.current.loginLogoAlt).toBeUndefined()
+    expect(result.current.bodyBgColor).toBeUndefined()
+    expect(result.current.bodyBgImage).toBeUndefined()
+  })
+
+  it('handles invalid JSON in data-auth-providers gracefully', () => {
+    const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation(() => {})
+    createMockContainer(
+      'invalid JSON',
+      'Username',
+      'https://example.com/logo.png',
+      'Custom Alt Text',
+      '#ffffff',
+      'https://example.com/bg.png'
+    )
+    const {result} = renderHook(() => useNewLoginData())
+    expect(result.current.authProviders).toBeUndefined()
+    expect(result.current.loginHandleName).toBe('Username')
+    expect(result.current.loginLogoUrl).toBe('https://example.com/logo.png')
+    expect(result.current.loginLogoAlt).toBe('Custom Alt Text')
+    expect(result.current.bodyBgColor).toBe('#ffffff')
+    expect(result.current.bodyBgImage).toBe('https://example.com/bg.png')
+    // eslint-disable-next-line no-console
+    expect(console.error).toHaveBeenCalledWith(
+      expect.stringContaining('Failed to parse data-auth-providers'),
+      expect.any(SyntaxError)
+    )
+    consoleErrorMock.mockRestore()
   })
 })

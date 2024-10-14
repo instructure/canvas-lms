@@ -31,9 +31,15 @@ interface NewLoginContextType {
   setShowForgotPassword: (value: boolean) => void
   otpCommunicationChannelId: string | null
   setOtpCommunicationChannelId: (id: string | null) => void
-  // define data attributes from hook
-  loginHandleName: string
-  authProviders: AuthProvider[]
+  // define optional data attributes from hook
+  loginHandleName?: string
+  authProviders?: AuthProvider[]
+  loginLogoUrl?: string
+  loginLogoAlt?: string
+  helpLinkUrl?: string
+  helpLinkName?: string
+  bodyBgColor?: string
+  bodyBgImage?: string
 }
 
 const NewLoginContext = createContext<NewLoginContextType | undefined>(undefined)
@@ -50,7 +56,16 @@ export const NewLoginProvider = ({children}: NewLoginProviderProps) => {
   const [otpCommunicationChannelId, setOtpCommunicationChannelId] = useState<string | null>(null)
 
   // get data attribute values from hook
-  const {loginHandleName, authProviders} = useNewLoginData()
+  const {
+    loginHandleName,
+    authProviders,
+    loginLogoUrl,
+    loginLogoAlt,
+    helpLinkUrl,
+    helpLinkName,
+    bodyBgColor,
+    bodyBgImage,
+  } = useNewLoginData()
 
   return (
     <NewLoginContext.Provider
@@ -68,6 +83,12 @@ export const NewLoginProvider = ({children}: NewLoginProviderProps) => {
         // pass data attribute hook values
         loginHandleName,
         authProviders,
+        loginLogoUrl,
+        loginLogoAlt,
+        helpLinkUrl,
+        helpLinkName,
+        bodyBgColor,
+        bodyBgImage,
       }}
     >
       {children}

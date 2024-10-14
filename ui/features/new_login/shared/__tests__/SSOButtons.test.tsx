@@ -18,21 +18,16 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import SSOButtons from '../SSOButtons'
+import {SSOButtons} from '../index'
 import {MemoryRouter} from 'react-router-dom'
-import type {AuthProvider} from '../../types'
 import {NewLoginProvider} from '../../context/NewLoginContext'
 
 describe('SSOButtons', () => {
   it('mounts without crashing', () => {
-    const mockProviders: AuthProvider[] = [
-      {id: 1, auth_type: 'google'},
-      {id: 2, auth_type: 'microsoft'},
-    ]
     render(
       <MemoryRouter>
         <NewLoginProvider>
-          <SSOButtons providers={mockProviders} />
+          <SSOButtons />
         </NewLoginProvider>
       </MemoryRouter>
     )

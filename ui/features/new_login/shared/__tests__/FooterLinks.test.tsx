@@ -18,29 +18,16 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import '@testing-library/jest-dom'
-import SignIn from '../SignIn'
 import {MemoryRouter} from 'react-router-dom'
+import {FooterLinks} from '../index'
 import {NewLoginProvider} from '../../context/NewLoginContext'
 
-jest.mock('../../context/NewLoginContext', () => {
-  const actualContext = jest.requireActual('../../context/NewLoginContext')
-  return {
-    ...actualContext,
-    useNewLogin: () => ({
-      ...actualContext.useNewLogin(),
-      // mock the data attribute default values that would normally be provided by the back-end
-      loginHandleName: 'Email',
-    }),
-  }
-})
-
-describe('SignIn', () => {
+describe('FooterLinks', () => {
   it('mounts without crashing', () => {
     render(
       <MemoryRouter>
         <NewLoginProvider>
-          <SignIn />
+          <FooterLinks />
         </NewLoginProvider>
       </MemoryRouter>
     )

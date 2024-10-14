@@ -17,20 +17,25 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {Flex} from '@instructure/ui-flex'
+import classNames from 'classnames'
 import {Button} from '@instructure/ui-buttons'
-import {TextInput} from '@instructure/ui-text-input'
 import {Checkbox} from '@instructure/ui-checkbox'
+import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {useNewLogin} from '../context/NewLoginContext'
+import {Spinner} from '@instructure/ui-spinner'
+import {TextInput} from '@instructure/ui-text-input'
 import {cancelOtpRequest, initiateOtpRequest, verifyOtpRequest} from '../services'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {Spinner} from '@instructure/ui-spinner'
+import {useNewLogin} from '../context/NewLoginContext'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('new_login')
 
-const OtpForm = () => {
+interface Props {
+  className?: string
+}
+
+const OtpForm = ({className}: Props) => {
   const {
     rememberMe,
     setRememberMe,
@@ -151,8 +156,9 @@ const OtpForm = () => {
     }
   }
 
+  // TODO make sure this is styled to conform to Figma designs
   const loadingContent = (
-    <Flex justifyItems="center" alignItems="center" height="100vh">
+    <Flex justifyItems="center" alignItems="center">
       <Spinner
         renderTitle={
           isRedirecting
@@ -164,7 +170,7 @@ const OtpForm = () => {
   )
 
   const otpFormContent = (
-    <Flex direction="column" gap="large">
+    <Flex className={classNames(className)} direction="column" gap="large">
       <Flex.Item overflowY="visible">
         <Heading level="h2" as="h1">
           {I18n.t('Multi-Factor Authentication')}
