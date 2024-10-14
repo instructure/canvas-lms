@@ -30,7 +30,7 @@ import {forgotPassword} from '../services'
 const I18n = useI18nScope('new_login')
 
 const ForgotPassword = () => {
-  const {isLoading, setIsLoading, loginHandleName} = useNewLogin()
+  const {isUiActionPending, setIsUiActionPending, loginHandleName} = useNewLogin()
   const [email, setEmail] = useState('')
   const [isEmailValid, setIsEmailValid] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
@@ -51,7 +51,7 @@ const ForgotPassword = () => {
       return
     }
 
-    setIsLoading(true)
+    setIsUiActionPending(true)
 
     try {
       const response = await forgotPassword(email)
@@ -78,7 +78,7 @@ const ForgotPassword = () => {
         type: 'error',
       })
     } finally {
-      setIsLoading(false)
+      setIsUiActionPending(false)
     }
   }
 
@@ -116,7 +116,7 @@ const ForgotPassword = () => {
                 type="submit"
                 color="primary"
                 display="block"
-                disabled={!isEmailValid || isLoading}
+                disabled={!isEmailValid || isUiActionPending}
               >
                 {I18n.t('Submit')}
               </Button>
