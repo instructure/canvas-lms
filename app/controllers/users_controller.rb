@@ -1207,6 +1207,7 @@ class UsersController < ApplicationController
                          .missing
                          .where(user_id: user.id,
                                 assignments: { context_id: shard_course_ids })
+                         .where("late_policy_status IS NULL OR late_policy_status != ?", "none")
                          .merge(Assignment.published)
         subs = subs.merge(Assignment.not_locked) if only_submittable
         subs = subs.in_current_grading_period_for_courses(shard_course_ids) if only_current_grading_period
