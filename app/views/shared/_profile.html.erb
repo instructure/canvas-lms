@@ -40,7 +40,7 @@
         <label class="show-if-editing ic-Label"><%= t('name', 'Name') %>:<span aria-hidden="true" title="<%= t('is_required', 'This field is required') %>">*</span>
           <input id="name_input" class="ic-Input" type="text" name="user[short_name]" value="<%= @user_data[:short_name] %>" required oninvalid="this.setCustomValidity('<%= t('Name is Required') %>')" oninput="setCustomValidity('')" title="<%= t('Name is Required') %>">
         </label>
-        <% if @domain_root_account.settings[:enable_name_pronunciation] %>
+        <% if @user.can_change_pronunciation?(@domain_root_account) %>
           <p class="show-if-editing">
             <label class="ic-Label"><%= t('name_pronunciation_label', 'Name Pronunciation:') %>
               <input id="name_pronunciation_input" class="ic-Input" type="text" name="user_profile[pronunciation]" value="<%= @user_data[:pronunciation] %>">
@@ -66,7 +66,7 @@
         </p>
       <% else %>
         <h2><%= @user_data[:short_name] %> <% if @user_data[:pronouns] %><i>(<%= @user_data[:pronouns] %>)</i><% end %></h2>
-        <% if @domain_root_account.settings[:enable_name_pronunciation] %>
+        <% if @user.can_change_pronunciation?(@domain_root_account) %>
           <div class="show-if-editing">
             <h3 id="profile_name_pronunciation_label" class="profileHeader"><%= t('name_pronunciation_header', 'Name Pronunciation') %></h3>
             <input id="name_pronunciation_input" class="ic-Input" type="text" name="user_profile[pronunciation]" value="<%= @user_data[:pronunciation] %>">

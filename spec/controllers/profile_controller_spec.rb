@@ -229,7 +229,11 @@ describe ProfileController do
 
     it "alert is set to failed when user profile validation fails" do
       Account.default.settings[:enable_name_pronunciation] = true
+      Account.default.settings[:allow_name_pronunciation_edit_for_students] = true
       Account.default.save!
+      # requires base role of student to edit
+      student_in_course(active_all: true)
+      user_session(@student)
       pronunciation = "a" * 1000
       put "update_profile",
           params: { user: { short_name: "Monsturd", name: "Jenkins" },

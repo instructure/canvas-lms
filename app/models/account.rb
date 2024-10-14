@@ -404,6 +404,9 @@ class Account < ActiveRecord::Base
 
   add_setting :allow_observers_in_appointment_groups, boolean: true, default: false, inheritable: true
   add_setting :enable_name_pronunciation, boolean: true, root_only: true, default: false
+  add_setting :allow_name_pronunciation_edit_for_admins, boolean: true, root_only: true, default: false
+  add_setting :allow_name_pronunciation_edit_for_students, boolean: true, root_only: true, default: false
+  add_setting :allow_name_pronunciation_edit_for_teachers, boolean: true, root_only: true, default: false
 
   add_setting :enable_inbox_signature_block, boolean: true, root_only: true, default: false
   add_setting :disable_inbox_signature_block_for_students, boolean: true, root_only: true, default: false

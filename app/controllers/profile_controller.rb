@@ -475,7 +475,7 @@ class ProfileController < ApplicationController
     if params[:user_profile] && @user.user_can_edit_profile?
       user_profile_params = params[:user_profile].permit(:title, :pronunciation, :bio)
       user_profile_params.delete(:title) unless @user.user_can_edit_name?
-      user_profile_params.delete(:pronunciation) unless @domain_root_account.enable_name_pronunciation?
+      user_profile_params.delete(:pronunciation) unless @user.can_change_pronunciation?(@domain_root_account)
       @profile.attributes = user_profile_params
     end
 

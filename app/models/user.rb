@@ -1456,6 +1456,20 @@ class User < ActiveRecord::Base
     can :moderate_user_content
   end
 
+  def can_change_pronunciation?(account)
+    return false unless account.root_account? && account.enable_name_pronunciation?
+
+    GuardRail.activate(:secondary) do
+      enrollment_types = enrollments.where(root_account: account, type: ["TeacherEnrollment", "StudentEnrollment"])
+                                    .active_by_date.distinct.pluck(:type)
+
+      return true if account.allow_name_pronunciation_edit_for_students? && enrollment_types.include?("StudentEnrollment")
+      return true if account.allow_name_pronunciation_edit_for_teachers? && enrollment_types.include?("TeacherEnrollment")
+
+      account.allow_name_pronunciation_edit_for_admins? && account_users.active.where(account:).exists?
+    end
+  end
+
   def can_masquerade?(masquerader, account)
     return true if self == masquerader
     # student view should only ever have enrollments in a single course
