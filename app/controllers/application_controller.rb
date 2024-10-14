@@ -348,9 +348,7 @@ class ApplicationController < ActionController::Base
   def group_information
     if @context.is_a?(Group) &&
        can_do(@context, @current_user, :manage) &&
-       @context.group_category &&
-       @context.group_category.groups &&
-       @context.group_category.groups.active
+       @context.group_category
 
       @context.group_category.groups.active.sort_by(&:name).pluck(:id, :name).map { |item| { id: item[0], label: item[1] } }
     end

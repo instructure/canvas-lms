@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Migration
-      class NonTransactional < Cop
+      class NonTransactional < Base
         def on_send(node)
           _receiver, method_name, *args = *node
 

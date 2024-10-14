@@ -92,7 +92,6 @@ describe GradebookImporter do
     it "expects and deals with invalid upload files" do
       user = user_model
       progress = Progress.create!(tag: "test", context: @user)
-      upload = GradebookUpload.new
       upload = GradebookUpload.create!(course: gradebook_course, user: gradebook_user, progress:)
       expect do
         GradebookImporter.create_from(progress, upload, user, invalid_gradebook_contents)

@@ -275,9 +275,9 @@ class GroupsController < ApplicationController
     return unless authorized_action(@context, @current_user, :read_roster)
 
     page_has_instui_topnav
-    @groups = all_groups = @context.groups.active
+    @groups = @context.groups.active
     unless params[:filter].nil?
-      @groups = all_groups = @groups.left_outer_joins(:users).where("groups.name ILIKE :query OR users.name ILIKE :query", query: "%#{ActiveRecord::Base.sanitize_sql_like(params[:filter])}%")
+      @groups = @groups.left_outer_joins(:users).where("groups.name ILIKE :query OR users.name ILIKE :query", query: "%#{ActiveRecord::Base.sanitize_sql_like(params[:filter])}%")
     end
     @groups = all_groups = @groups.order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
                                   .eager_load(:group_category).preload(:root_account)

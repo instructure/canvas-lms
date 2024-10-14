@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Migration
-      class ChangeColumnNull < Cop
+      class ChangeColumnNull < Base
         include RuboCop::Canvas::CurrentDef
         include RuboCop::Canvas::NonTransactional
 

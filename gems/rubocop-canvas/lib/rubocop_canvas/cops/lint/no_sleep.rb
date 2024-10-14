@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Lint
-      class NoSleep < Cop
+      class NoSleep < Base
         include RuboCop::Cop::FileMeta
 
         CONTROLLER_MSG = "Avoid using sleep, as it will tie up this process."

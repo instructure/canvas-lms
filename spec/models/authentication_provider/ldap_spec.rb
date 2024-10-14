@@ -73,7 +73,7 @@ describe AuthenticationProvider::LDAP do
 
     context "when the connection fails only with verification" do
       it "returns false, with the exception message" do
-        ldap = instance_double("Net::LDAP")
+        ldap = instance_double(Net::LDAP)
         allow(ldap).to receive_messages({ :host= => nil, :port= => nil, :base= => nil, :base => nil, :auth => nil })
         allow(ldap).to receive(:bind_as).and_invoke(->(_) { false }, ->(_) { raise Net::LDAP::Error, "Some error" })
         allow(Net::LDAP).to receive(:new).and_return(ldap)
@@ -83,7 +83,7 @@ describe AuthenticationProvider::LDAP do
 
     context "when the connection doesn't fail" do
       it "returns true, with no exception message" do
-        ldap = instance_double("Net::LDAP")
+        ldap = instance_double(Net::LDAP)
         allow(ldap).to receive_messages({ :host= => nil, :port= => nil, :base= => nil, :base => nil, :auth => nil })
         allow(ldap).to receive(:bind_as).and_return(false).twice
         allow(Net::LDAP).to receive(:new).and_return(ldap)

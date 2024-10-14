@@ -202,6 +202,8 @@ Style/ParallelAssignment:
   Enabled: false # most uses are legitimate deconstruction or value swapping
 Style/ReturnNil:
   Enabled: false # explicit nil is okay when a method is expected to have a return value
+Style/SafeNavigationChainLength:
+  Enabled: false # kind of Metrics-y, not clear it actually improves code quality
 Style/SoleNestedConditional:
   AllowModifier: true # it makes lines too long and complicated otherwise
 Style/SpecialGlobalVars:
@@ -374,8 +376,6 @@ RSpec/VerifiedDoubleReference:
 RSpec/VerifiedDoubles:
   Enabled: false
 
-Style/AccessModifierDeclarations:
-  Severity: convention
 Style/AccessorGrouping:
   Severity: convention
   AutoCorrect: false

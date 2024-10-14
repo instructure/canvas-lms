@@ -247,16 +247,16 @@ describe UsersController do
     it "handles google_drive oauth_success for a logged_in_user" do
       settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
-      authorization_mock = instance_double("Google::Auth::UserRefreshCredentials",
+      authorization_mock = instance_double(Google::Auth::UserRefreshCredentials,
                                            :code= => nil,
                                            :fetch_access_token! => nil,
                                            :refresh_token => "refresh_token",
                                            :access_token => "access_token")
-      about_mock = instance_double("Google::Apis::DriveV3::About",
-                                   user: instance_double("Google::Apis::DriveV3::User",
+      about_mock = instance_double(Google::Apis::DriveV3::About,
+                                   user: instance_double(Google::Apis::DriveV3::User,
                                                          email_address: "blah@blah.com",
                                                          permission_id: "permission_id"))
-      client_mock = instance_double("Google::Apis::DriveV3::DriveService",
+      client_mock = instance_double(Google::Apis::DriveV3::DriveService,
                                     get_about: about_mock,
                                     authorization: authorization_mock)
       allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
@@ -281,12 +281,12 @@ describe UsersController do
     it "handles google_drive oauth_success for a non logged in user" do
       settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
-      authorization_mock = instance_double("Google::Auth::UserRefreshCredentials",
+      authorization_mock = instance_double(Google::Auth::UserRefreshCredentials,
                                            :code= => nil,
                                            :fetch_access_token! => nil,
                                            :refresh_token => "refresh_token",
                                            :access_token => "access_token")
-      client_mock = instance_double("Google::Apis::DriveV3::DriveService",
+      client_mock = instance_double(Google::Apis::DriveV3::DriveService,
                                     get_about: nil,
                                     authorization: authorization_mock)
       allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
@@ -305,12 +305,12 @@ describe UsersController do
     it "rejects invalid state" do
       settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
-      authorization_mock = instance_double("Google::Auth::UserRefreshCredentials")
+      authorization_mock = instance_double(Google::Auth::UserRefreshCredentials)
       allow(authorization_mock).to receive_messages(:code= => nil,
                                                     :fetch_access_token! => nil,
                                                     :refresh_token => "refresh_token",
                                                     :access_token => "access_token")
-      client_mock = instance_double("Google::Apis::DriveV3::DriveService",
+      client_mock = instance_double(Google::Apis::DriveV3::DriveService,
                                     get_about: nil,
                                     authorization: authorization_mock)
       allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
@@ -325,11 +325,11 @@ describe UsersController do
     end
 
     it "handles auth failure gracefully" do
-      authorization_mock = instance_double("Google::Auth::UserRefreshCredentials", :code= => nil)
+      authorization_mock = instance_double(Google::Auth::UserRefreshCredentials, :code= => nil)
       allow(authorization_mock).to receive(:fetch_access_token!) do
         raise Signet::AuthorizationError, "{\"error\": \"invalid_grant\", \"error_description\": \"Bad Request\"}"
       end
-      client_mock = instance_double("Google::Apis::DriveV3::DriveService", authorization: authorization_mock)
+      client_mock = instance_double(Google::Apis::DriveV3::DriveService, authorization: authorization_mock)
       allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
       state = Canvas::Security.create_jwt({ "return_to_url" => "http://localhost.com/return",
                                             "nonce" => "abc123" })

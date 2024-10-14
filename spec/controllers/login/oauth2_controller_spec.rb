@@ -38,7 +38,7 @@ describe Login::OAuth2Controller do
   end
 
   describe "#create" do
-    let(:token) { instance_double("OAuth2::AccessToken", options: {}) }
+    let(:token) { instance_double(OAuth2::AccessToken, options: {}) }
     let(:root_account) { Account.default }
 
     before do

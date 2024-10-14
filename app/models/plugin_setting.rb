@@ -87,7 +87,7 @@ class PluginSetting < ActiveRecord::Base
   end
 
   def encrypt_settings
-    if settings && plugin && plugin.encrypted_settings
+    if settings && plugin&.encrypted_settings
       plugin.encrypted_settings.each do |key|
         next if settings[key].blank?
 

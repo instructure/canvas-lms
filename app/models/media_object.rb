@@ -219,7 +219,7 @@ class MediaObject < ActiveRecord::Base
   # typically call this in a delayed job, since it has to contact kaltura
   def self.create_if_id_exists(media_id, **create_opts)
     if media_id_exists?(media_id) && by_media_id(media_id).none?
-      create!(**create_opts.merge(media_id:))
+      create!(**create_opts, media_id:)
     end
   end
 

@@ -64,7 +64,6 @@ module DrDiff
                  command:,
                  include_git_dir_in_output: false,
                  severe_levels: SEVERE_LEVELS)
-
       command_comments = CommandCapture.run(format, command)
       diff = DiffParser.new(git.diff, raw: true, campsite:)
 

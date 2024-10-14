@@ -115,7 +115,6 @@ module CoursesHelper
     if submission.grade &&
        submission.workflow_state == "graded"
       if submission.grading_type == "points" &&
-         submission.assignment &&
          submission.assignment.respond_to?(:points_possible)
         score_out_of_points_possible(submission.grade, submission.assignment.points_possible)
       else

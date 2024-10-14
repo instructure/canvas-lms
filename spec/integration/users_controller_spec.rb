@@ -354,12 +354,12 @@ describe UsersController do
 
   context "media_download url" do
     let(:kaltura_client) do
-      kaltura_client = instance_double("CanvasKaltura::ClientV3")
+      kaltura_client = instance_double(CanvasKaltura::ClientV3)
       allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kaltura_client)
       kaltura_client
     end
 
-    let(:media_source_fetcher) { instance_double("MediaSourceFetcher") }
+    let(:media_source_fetcher) { instance_double(MediaSourceFetcher) }
 
     before do
       account = Account.create!

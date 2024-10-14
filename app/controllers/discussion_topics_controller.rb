@@ -497,7 +497,7 @@ class DiscussionTopicsController < ApplicationController
     root_topic_id = params[:root_discussion_topic_id]
 
     root_topic_id && @context.respond_to?(:context) &&
-      @context.context && @context.context.discussion_topics.find(root_topic_id)
+      @context.context&.discussion_topics&.find(root_topic_id)
   end
 
   def announcements_locked?

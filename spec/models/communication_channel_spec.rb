@@ -230,7 +230,7 @@ describe CommunicationChannel do
     expect(HostUrl).to receive(:context_host).and_return("test.canvas.com")
     expect(CanvasSlug).to receive(:generate).and_return("abc123")
     communication_channel_model
-    mock_request = instance_double("ActionDispatch::Request", host_with_port: "test.canvas.com")
+    mock_request = instance_double(ActionDispatch::Request, host_with_port: "test.canvas.com")
     presenter = CommunicationChannelPresenter.new(@cc, mock_request)
     expect(presenter.confirmation_url).to eql("https://test.canvas.com/register/abc123")
   end

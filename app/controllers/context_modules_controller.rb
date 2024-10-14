@@ -579,7 +579,7 @@ class ContextModulesController < ApplicationController
           locked: prog.locked?
         }
       end
-    elsif @module.require_sequential_progress && @progression.current_position && @tag && @tag.position && @progression.current_position < @tag.position
+    elsif @module.require_sequential_progress && @progression.current_position && @tag&.position && @progression.current_position < @tag.position
       res[:locked] = true
       pres = prerequisites_needing_finishing_for(@module, @progression, @tag)
       res[:modules] = [{

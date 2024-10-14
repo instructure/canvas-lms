@@ -959,14 +959,14 @@ class SisBatch < ActiveRecord::Base
   end
 
   def add_restore_statistics
-    statistics unless self&.data&.key? :statistics
-    stats = self.data[:statistics]
+    statistics unless data&.key? :statistics
+    stats = data[:statistics]
     stats ||= {}
     SisBatchRollBackData::RESTORE_ORDER.each do |type|
       stats[type.to_sym] ||= {}
       stats[type.to_sym][:restored] = roll_back_data.restored.where(context_type: type).count
     end
-    self.data[:statistics] = stats
+    data[:statistics] = stats
   end
 
   # returns values "(1,'deleted'),(2,'deleted'),(3,'other_state'),(4,'active')"

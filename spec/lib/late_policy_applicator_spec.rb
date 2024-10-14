@@ -51,7 +51,7 @@ describe LatePolicyApplicator do
         n_strand: ["LatePolicyApplicator", @course.root_account.global_id]
       }
 
-      applicator_double = instance_double("LatePolicyApplicator")
+      applicator_double = instance_double(LatePolicyApplicator)
       allow(LatePolicyApplicator).to receive(:new).and_return(applicator_double)
 
       expect(applicator_double).to receive(:delay_if_production).with(**queueing_args).and_return(applicator_double)
@@ -115,7 +115,7 @@ describe LatePolicyApplicator do
         n_strand: ["LatePolicyApplicator", @published_assignment.root_account.global_id]
       }
 
-      applicator_double = instance_double("LatePolicyApplicator")
+      applicator_double = instance_double(LatePolicyApplicator)
       allow(LatePolicyApplicator).to receive(:new).and_return(applicator_double)
 
       expect(applicator_double).to receive(:delay_if_production).with(**queueing_args).and_return(applicator_double)

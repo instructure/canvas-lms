@@ -56,12 +56,12 @@ describe "Translation" do
     allow(InstStatsd::Statsd).to receive(:increment)
 
     # Mock the runtime and the credential provider
-    @runtime_mock = instance_double("Aws::SageMakerRuntime::Client")
+    @runtime_mock = instance_double(Aws::SageMakerRuntime::Client)
     allow(Canvas::AwsCredentialProvider).to receive(:new).and_return(MockCredentials.new)
     allow(Aws::SageMakerRuntime::Client).to receive(:new).and_return(@runtime_mock)
 
     # Mock the response that the runtime returns.
-    @mock_response = instance_double("Response")
+    @mock_response = instance_double(Aws::SageMakerRuntime::Types::InvokeEndpointOutput)
     allow(@mock_response).to receive(:body).and_return(MockResponse.new)
     allow(@runtime_mock).to receive(:invoke_endpoint).and_return(@mock_response)
 
