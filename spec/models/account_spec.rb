@@ -2909,7 +2909,7 @@ describe Account do
 
     it "returns the recaptcha_client_key when root_account? and self_registration_captcha? are true" do
       allow(DynamicSettings).to receive(:find).with(tree: "private").and_return(
-        instance_double("DynamicSettingsResult", :[] => "test_key")
+        instance_double(DynamicSettings::PrefixProxy, :[] => "test_key")
       )
       expect(root_account.recaptcha_key).to eq("test_key")
     end
@@ -2926,7 +2926,7 @@ describe Account do
 
     it "returns nil if recaptcha_client_key is not present in DynamicSettings" do
       allow(DynamicSettings).to receive(:find).with(tree: "private").and_return(
-        instance_double("DynamicSettingsResult", :[] => nil)
+        instance_double(DynamicSettings::PrefixProxy, :[] => nil)
       )
       expect(root_account.recaptcha_key).to be_nil
     end

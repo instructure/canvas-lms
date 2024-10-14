@@ -21,7 +21,7 @@ describe RuboCop::Cop::Migration::PrimaryKey do
   subject(:cop) { described_class.new }
 
   it "catches explicit id disabled" do
-    inspect_source(%{
+    offenses = inspect_source(%{
       class CreateNotificationEndpoints < ActiveRecord::Migration
         tag :predeploy
 
@@ -41,8 +41,8 @@ describe RuboCop::Cop::Migration::PrimaryKey do
         end
       end
     })
-    expect(cop.offenses.size).to eq(1)
-    expect(cop.messages.first).to match(/include a primary key/)
-    expect(cop.offenses.first.severity.name).to eq(:warning)
+    expect(offenses.size).to eq(1)
+    expect(offenses.first.message).to match(/include a primary key/)
+    expect(offenses.first.severity.name).to eq(:warning)
   end
 end

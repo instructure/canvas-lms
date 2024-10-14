@@ -450,7 +450,7 @@ class Attachment < ActiveRecord::Base
 
     in_the_right_state = file_state == "available" && workflow_state !~ /^unattached/
     if in_the_right_state && media_entry_id == "maybe" &&
-       content_type && content_type.match(/\A(video|audio)/)
+       content_type&.match(/\A(video|audio)/)
       build_media_object
     end
   end
@@ -1054,54 +1054,6 @@ class Attachment < ActiveRecord::Base
   STREAMING_DOWNLOAD_RETRIES = 5
   CORRUPT_DOWNLOAD_RETRIES = 2
 
-  # GETs this attachment's public_url and streams the response to the
-  # passed block; this is a helper function for #open
-  # (you should call #open instead of this)
-  private def streaming_download(dest = nil, integrity_check: false, &block)
-    retries ||= 0
-    corrupt_retries ||= 0
-    bytes_read ||= 0
-
-    # avoid corrupting the output stream if we retry after data has been received
-    can_retry = -> { bytes_read == 0 || (!block && dest.respond_to?(:rewind) && dest.respond_to?(:truncate)) }
-    prep_retry = lambda do
-      if bytes_read > 0
-        dest.rewind
-        dest.truncate(0)
-        bytes_read = 0
-      end
-    end
-
-    validate_hash(enable: integrity_check) do |hash_context|
-      CanvasHttp.get(public_url(internal: true)) do |response|
-        raise FailedResponse, "Expected 200, got #{response.code}: #{response.body}" unless response.code.to_i == 200
-
-        response.read_body do |data|
-          bytes_read += data.size
-          dest << data if dest
-          yield(data) if block
-          hash_context.update(data) if hash_context
-        end
-      end
-    end
-  rescue FailedResponse, Net::ReadTimeout, Net::OpenTimeout, IOError, Errno::ECONNRESET, Errno::ECONNABORTED, Errno::ETIMEDOUT => e
-    if can_retry.call && (retries += 1) < STREAMING_DOWNLOAD_RETRIES
-      Canvas::Errors.capture_exception(:attachment, e, :info)
-      prep_retry.call
-      retry
-    else
-      raise e
-    end
-  rescue CorruptedDownload => e
-    if can_retry.call && (corrupt_retries += 1) < CORRUPT_DOWNLOAD_RETRIES
-      Canvas::Errors.capture_exception(:attachment, e, :info)
-      prep_retry.call
-      retry
-    else
-      raise e
-    end
-  end
-
   # used by #open or its dependencies with integrity_check: true
   def validate_hash(enable: true)
     # the md5 column is probably actually a SHA512 unless this file is old, in which case it
@@ -1206,7 +1158,7 @@ class Attachment < ActiveRecord::Base
                                file_state_changed? &&
                                file_state == "available" &&
                                context.respond_to?(:state) && context.state == :available &&
-                               folder && folder.visible?
+                               folder&.visible?
   end
 
   def notify_only_admins?
@@ -2010,25 +1962,6 @@ class Attachment < ActiveRecord::Base
     Attachment.where(root_attachment_id: self).where.not(id: child).in_batches.update_all(root_attachment_id: child.id)
   end
 
-  private def service_side_clone(destination)
-    return false unless shard.region == destination.shard.region
-
-    if Attachment.s3_storage? && filename && s3object.exists?
-      if destination.new_record? # the attachment id is part of the s3 object name
-        destination.content_type ||= content_type # needed for the validation
-        destination.save_without_broadcasting!
-      end
-      s3object.copy_to(destination.s3object) unless destination.s3object.exists?
-      destination.run_after_attachment_saved
-      true
-    elsif instfs_hosted?
-      destination.instfs_uuid = InstFS.duplicate_file(instfs_uuid)
-      true
-    else
-      false
-    end
-  end
-
   def copy_attachment_content(destination, split_root_attachment: false)
     # parent is broken; if child is probably broken too, make sure it gets marked as broken
     if file_state == "broken" && destination.md5.nil?
@@ -2595,7 +2528,7 @@ class Attachment < ActiveRecord::Base
 
       from_attachments.each do |attachment|
         match = to_attachments.detect { |a| attachment.matches_full_display_path?(a.full_display_path) }
-        next if match && (match.md5&.== attachment.md5)
+        next if match&.md5&.== attachment.md5
 
         if to_context.is_a? User
           attachment.user_id = to_context.id
@@ -2701,5 +2634,74 @@ class Attachment < ActiveRecord::Base
     vl = context.files_visibility_option if vl == "inherit"
     vl = "context" if vl == context.class.name.downcase
     vl
+  end
+
+  private
+
+  # GETs this attachment's public_url and streams the response to the
+  # passed block; this is a helper function for #open
+  # (you should call #open instead of this)
+  def streaming_download(dest = nil, integrity_check: false, &block)
+    retries ||= 0
+    corrupt_retries ||= 0
+    bytes_read ||= 0
+
+    # avoid corrupting the output stream if we retry after data has been received
+    can_retry = -> { bytes_read == 0 || (!block && dest.respond_to?(:rewind) && dest.respond_to?(:truncate)) }
+    prep_retry = lambda do
+      if bytes_read > 0
+        dest.rewind
+        dest.truncate(0)
+        bytes_read = 0
+      end
+    end
+
+    validate_hash(enable: integrity_check) do |hash_context|
+      CanvasHttp.get(public_url(internal: true)) do |response|
+        raise FailedResponse, "Expected 200, got #{response.code}: #{response.body}" unless response.code.to_i == 200
+
+        response.read_body do |data|
+          bytes_read += data.size
+          dest << data if dest
+          yield(data) if block
+          hash_context&.update(data)
+        end
+      end
+    end
+  rescue FailedResponse, Net::ReadTimeout, Net::OpenTimeout, IOError, Errno::ECONNRESET, Errno::ECONNABORTED, Errno::ETIMEDOUT => e
+    if can_retry.call && (retries += 1) < STREAMING_DOWNLOAD_RETRIES
+      Canvas::Errors.capture_exception(:attachment, e, :info)
+      prep_retry.call
+      retry
+    else
+      raise e
+    end
+  rescue CorruptedDownload => e
+    if can_retry.call && (corrupt_retries += 1) < CORRUPT_DOWNLOAD_RETRIES
+      Canvas::Errors.capture_exception(:attachment, e, :info)
+      prep_retry.call
+      retry
+    else
+      raise e
+    end
+  end
+
+  def service_side_clone(destination)
+    return false unless shard.region == destination.shard.region
+
+    if Attachment.s3_storage? && filename && s3object.exists?
+      if destination.new_record? # the attachment id is part of the s3 object name
+        destination.content_type ||= content_type # needed for the validation
+        destination.save_without_broadcasting!
+      end
+      s3object.copy_to(destination.s3object) unless destination.s3object.exists?
+      destination.run_after_attachment_saved
+      true
+    elsif instfs_hosted?
+      destination.instfs_uuid = InstFS.duplicate_file(instfs_uuid)
+      true
+    else
+      false
+    end
   end
 end

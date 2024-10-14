@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Specs
-      class NoSeleniumWebDriverWait < Cop
+      class NoSeleniumWebDriverWait < Base
         MSG = "Avoid using Selenium::WebDriver::Wait.\n" \
               "Our finders (f/fj and ff/ffj) will wait up to the implicit wait " \
               "(just like find_element, etc), and will raise a " \

@@ -21,52 +21,52 @@ describe RuboCop::Cop::Migration::Execute do
   subject(:cop) { described_class.new }
 
   it "flags calls to execute" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         def up
           execute("DROP TABLE users")
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 1
-    expect(cop.messages.first).to eq "Migration/Execute: Raw SQL in migrations must be approved by a migration reviewer"
-    expect(cop.offenses.first.severity.name).to eq(:convention)
+    expect(offenses.size).to eq 1
+    expect(offenses.first.message).to eq "Migration/Execute: Raw SQL in migrations must be approved by a migration reviewer"
+    expect(offenses.first.severity.name).to eq(:convention)
   end
 
   it "flags calls to execute with interpolation" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         def up
           execute("DROP TABLE \#{table}")
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 1
-    expect(cop.messages.first).to eq "Migration/Execute: Raw SQL in migrations must be approved by a migration reviewer"
-    expect(cop.offenses.first.severity.name).to eq(:convention)
+    expect(offenses.size).to eq 1
+    expect(offenses.first.message).to eq "Migration/Execute: Raw SQL in migrations must be approved by a migration reviewer"
+    expect(offenses.first.severity.name).to eq(:convention)
   end
 
   it "flags calls to connection.execute" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         def up
           ActiveRecord::Base.connection.execute("DROP TABLE users")
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 1
-    expect(cop.messages.first).to eq "Migration/Execute: Raw SQL in migrations must be approved by a migration reviewer"
-    expect(cop.offenses.first.severity.name).to eq(:convention)
+    expect(offenses.size).to eq 1
+    expect(offenses.first.message).to eq "Migration/Execute: Raw SQL in migrations must be approved by a migration reviewer"
+    expect(offenses.first.severity.name).to eq(:convention)
   end
 
   it "doesn't flag when execute isn't called" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         def up
           remove_table :users
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 0
+    expect(offenses.size).to eq 0
   end
 end

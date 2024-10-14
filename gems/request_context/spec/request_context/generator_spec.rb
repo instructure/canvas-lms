@@ -147,7 +147,7 @@ describe "RequestContext::Generator" do
     before do
       Thread.current[:context] = nil
 
-      rails_app = instance_double("Rails::Application", credentials: {
+      rails_app = instance_double(Rails::Application, credentials: {
                                     canvas_security: {
                                       signing_secret: shared_secret
                                     }

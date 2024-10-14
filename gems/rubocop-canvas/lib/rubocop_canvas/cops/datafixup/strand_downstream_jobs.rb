@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Datafixup
-      class StrandDownstreamJobs < Cop
+      class StrandDownstreamJobs < Base
         def on_send(node)
           _receiver, method_name, kwargs = *node
           return unless method_name == :delay

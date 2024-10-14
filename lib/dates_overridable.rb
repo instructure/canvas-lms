@@ -568,7 +568,7 @@ module DatesOverridable
       override_hash = override.respond_to?(:to_h) ? override.to_h : override
 
       everyone_override_ids << override_hash[:id] if default_options.include?("everyone")
-      section_options = default_options.filter { |o| /\Asection-\d+\z/.match?(o) }
+      section_options = default_options.grep(/\Asection-\d+\z/)
       section_override_ids.concat(section_options) unless section_options.empty?
 
       result << {

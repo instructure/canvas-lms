@@ -193,7 +193,7 @@ class Group < ActiveRecord::Base
   end
 
   def update_max_membership_from_group_category
-    if (!max_membership || max_membership == 0) && group_category && group_category.group_limit
+    if (!max_membership || max_membership == 0) && group_category&.group_limit
       self.max_membership = group_category.group_limit
     end
   end
@@ -262,8 +262,7 @@ class Group < ActiveRecord::Base
   end
 
   def should_add_creator?(creator)
-    group_category &&
-      (group_category.communities? || (group_category.student_organized? && context.user_is_student?(creator)))
+    group_category.communities? || (group_category&.student_organized? && context.user_is_student?(creator))
   end
 
   def submission?

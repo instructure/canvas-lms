@@ -72,7 +72,7 @@ describe AuthenticationProvider::OpenIDConnect do
   describe "#download_discovery" do
     it "works" do
       subject.discovery_url = "https://somewhere/.well-known/openid-configuration"
-      response = instance_double("Net::HTTPOK", value: 200, body: { issuer: "me" }.to_json)
+      response = instance_double(Net::HTTPOK, value: 200, body: { issuer: "me" }.to_json)
       expect(CanvasHttp).to receive(:get).and_yield(response)
       subject.valid?
       expect(subject.issuer).to eql "me"
@@ -96,7 +96,7 @@ describe AuthenticationProvider::OpenIDConnect do
 
     it "infers the discovery URL from the issuer" do
       subject.issuer = "https://somewhere"
-      response = instance_double("Net::HTTPOK", value: 200, body: { issuer: "me" }.to_json)
+      response = instance_double(Net::HTTPOK, value: 200, body: { issuer: "me" }.to_json)
       expect(CanvasHttp).to receive(:get).with("https://somewhere/.well-known/openid-configuration").and_yield(response)
       subject.valid?
       expect(subject.issuer).to eql "me"
@@ -105,7 +105,7 @@ describe AuthenticationProvider::OpenIDConnect do
 
     it "infers the discovery URL from a multi-tenant issuer" do
       subject.issuer = "https://somewhere/multitenant/"
-      response = instance_double("Net::HTTPOK", value: 200, body: { issuer: "me" }.to_json)
+      response = instance_double(Net::HTTPOK, value: 200, body: { issuer: "me" }.to_json)
       expect(CanvasHttp).to receive(:get).with("https://somewhere/multitenant/.well-known/openid-configuration").and_yield(response)
       subject.valid?
       expect(subject.issuer).to eql "me"
@@ -114,7 +114,7 @@ describe AuthenticationProvider::OpenIDConnect do
 
     it "does not infer a discovery URL when the provider doesn't support discovery" do
       subject.issuer = "https://somewhere"
-      response = instance_double("Net::HTTPOK", value: 404, body: "NOT FOUND")
+      response = instance_double(Net::HTTPOK, value: 404, body: "NOT FOUND")
       expect(CanvasHttp).to receive(:get).with("https://somewhere/.well-known/openid-configuration").and_yield(response)
       subject.valid?
       expect(subject.issuer).to eql "https://somewhere"
@@ -131,7 +131,7 @@ describe AuthenticationProvider::OpenIDConnect do
     it "does not modify an explicit discovery URL with a non-matching issuer" do
       subject.issuer = "https://somewhere"
       subject.discovery_url = "https://somewhere/openid-configuration"
-      response = instance_double("Net::HTTPOK", value: 200, body: { issuer: "me" }.to_json)
+      response = instance_double(Net::HTTPOK, value: 200, body: { issuer: "me" }.to_json)
       expect(CanvasHttp).to receive(:get).with("https://somewhere/openid-configuration").and_yield(response)
       subject.valid?
       expect(subject.issuer).to eql "me"
@@ -299,7 +299,7 @@ describe AuthenticationProvider::OpenIDConnect do
   end
 
   describe "#user_logout_url" do
-    let(:controller) { instance_double("ApplicationController", login_url: "http//www.example.com/login", session: {}) }
+    let(:controller) { instance_double(ApplicationController, login_url: "http//www.example.com/login", session: {}) }
 
     before do
       subject.account = Account.default
@@ -333,7 +333,7 @@ describe AuthenticationProvider::OpenIDConnect do
     it "downloads the jwks if jwks_uri is set" do
       subject.jwks_uri = "http://jwks"
       jwks = [jwk].to_json
-      expect(CanvasHttp).to receive(:get).with("http://jwks").and_return(instance_double("Net::HTTPOK", body: jwks))
+      expect(CanvasHttp).to receive(:get).with("http://jwks").and_return(instance_double(Net::HTTPOK, body: jwks))
       expect(subject.settings["jwks"]).to be_nil
       expect(subject.jwks[jwk[:kid]]).to eq jwk.as_json
       expect(subject.settings["jwks"]).to eq jwks
@@ -380,7 +380,7 @@ describe AuthenticationProvider::OpenIDConnect do
       keypair2 = OpenSSL::PKey::RSA.new(2048)
       jwk2 = JSON::JWK.new(keypair2.public_key)
 
-      expect(CanvasHttp).to receive(:get).with("http://new").and_return(instance_double("Net::HTTPOK", body: [jwk2].to_json))
+      expect(CanvasHttp).to receive(:get).with("http://new").and_return(instance_double(Net::HTTPOK, body: [jwk2].to_json))
 
       subject.jwks_uri = "http://new"
       subject.save!
@@ -394,7 +394,7 @@ describe AuthenticationProvider::OpenIDConnect do
       keypair2 = OpenSSL::PKey::RSA.new(2048)
       jwk2 = JSON::JWK.new(keypair2.public_key)
 
-      allow(CanvasHttp).to receive(:get).with("http://jwks").and_return(instance_double("Net::HTTPOK", body: [jwk2].to_json))
+      allow(CanvasHttp).to receive(:get).with("http://jwks").and_return(instance_double(Net::HTTPOK, body: [jwk2].to_json))
 
       subject.save!
       expect(subject.jwks[jwk2[:kid]]).to eq jwk2.as_json

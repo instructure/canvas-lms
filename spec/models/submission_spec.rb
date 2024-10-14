@@ -8573,7 +8573,7 @@ describe Submission do
   end
 
   describe "#filter_attributes_for_user" do
-    let(:user) { instance_double("User", id: 1) }
+    let(:user) { instance_double(User, id: 1) }
     let(:session) { {} }
     let(:submission) { @assignment.submissions.build(user_id: 2) }
 

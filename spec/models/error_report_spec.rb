@@ -55,10 +55,10 @@ describe ErrorReport do
     end
 
     it "plugs together with Canvas::Errors::Info to log the user" do
-      req = instance_double("request", request_method_symbol: "GET", format: "html")
+      req = instance_double(ActionDispatch::Request, request_method_symbol: "GET", format: "html")
       allow(Canvas::Errors::Info).to receive_messages(useful_http_env_stuff_from_request: {},
                                                       useful_http_headers: {})
-      user = instance_double("User", global_id: 5)
+      user = instance_double(User, global_id: 5)
       err = Exception.new("error")
       info = Canvas::Errors::Info.new(req, Account.default, user, {})
       report = described_class.log_exception_from_canvas_errors(err, info.to_h)
@@ -66,10 +66,10 @@ describe ErrorReport do
     end
 
     it "doesn't save the error report when we're out of region" do
-      req = instance_double("request", request_method_symbol: "GET", format: "html")
+      req = instance_double(ActionDispatch::Request, request_method_symbol: "GET", format: "html")
       allow(Canvas::Errors::Info).to receive_messages(useful_http_env_stuff_from_request: {},
                                                       useful_http_headers: {})
-      user = instance_double("User", global_id: 5)
+      user = instance_double(User, global_id: 5)
       err = Exception.new("error")
       info = Canvas::Errors::Info.new(req, Account.default, user, {})
       expect(Shard.current).to receive(:in_current_region?).and_return(false)

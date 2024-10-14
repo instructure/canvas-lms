@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Migration
-      class SetReplicaIdentityInSeparateTransaction < Cop
+      class SetReplicaIdentityInSeparateTransaction < Base
         MSG = <<~TEXT
           When setting replica identity, do it in a separate migration than the
           `create_table` call.

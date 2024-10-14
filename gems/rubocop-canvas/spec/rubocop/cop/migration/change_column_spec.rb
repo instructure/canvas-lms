@@ -21,39 +21,39 @@ describe RuboCop::Cop::Migration::ChangeColumn do
   subject(:cop) { described_class.new }
 
   it "flags calls to change_column" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         def up
           change_column :users, :karma, :float
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 1
-    expect(cop.messages.first).to include "Changing column names or types usually requires a multi-deploy process"
-    expect(cop.offenses.first.severity.name).to eq(:warning)
+    expect(offenses.size).to eq 1
+    expect(offenses.first.message).to include "Changing column names or types usually requires a multi-deploy process"
+    expect(offenses.first.severity.name).to eq(:warning)
   end
 
   it "flags calls to rename_column" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         def up
           rename_column :users, :karma, :chameleon
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 1
-    expect(cop.messages.first).to include "Changing column names or types usually requires a multi-deploy process"
-    expect(cop.offenses.first.severity.name).to eq(:warning)
+    expect(offenses.size).to eq 1
+    expect(offenses.first.message).to include "Changing column names or types usually requires a multi-deploy process"
+    expect(offenses.first.severity.name).to eq(:warning)
   end
 
   it "doesn't flag when subject method isn't called" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         def up
           add_column :users, :karma, :float, default: 0.0
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 0
+    expect(offenses.size).to eq 0
   end
 end

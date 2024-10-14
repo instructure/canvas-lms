@@ -2573,8 +2573,8 @@ describe Assignment do
     end
 
     describe "grade_posting_in_progress" do
-      let(:submission) { instance_double("Submission") }
-      let(:result) { instance_double("Lti::Result") }
+      let(:submission) { instance_double(Submission) }
+      let(:result) { instance_double(Lti::Result) }
 
       before do
         allow(assignment).to receive(:find_or_create_submissions)

@@ -561,7 +561,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def less_than_allotted_time?
-    started_at && end_at && quiz && quiz.time_limit && (end_at - started_at) < quiz.time_limit.minutes.to_i
+    started_at && end_at && quiz&.time_limit && (end_at - started_at) < quiz.time_limit.minutes.to_i
   end
 
   def completed?

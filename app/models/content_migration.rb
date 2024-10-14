@@ -428,7 +428,7 @@ class ContentMigration < ActiveRecord::Base
         # it's ready to be imported
         self.workflow_state = :importing
         save
-        delay(**queue_opts.merge(on_permanent_failure: :fail_with_error!)).import_content
+        delay(**queue_opts, on_permanent_failure: :fail_with_error!).import_content
       else
         # find worker and queue for conversion
         begin

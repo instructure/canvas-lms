@@ -21,7 +21,7 @@ describe RuboCop::Cop::Migration::SetReplicaIdentityInSeparateTransaction do
   subject(:cop) { described_class.new }
 
   it "complains if creating a table and setting its replica identity in the same transaction" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class MyMigration < ActiveRecord::Migration
         tag :predeploy
 
@@ -31,13 +31,13 @@ describe RuboCop::Cop::Migration::SetReplicaIdentityInSeparateTransaction do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(1)
-    expect(cop.messages.first).to include "replica identity"
-    expect(cop.offenses.first.severity.name).to eq(:error)
+    expect(offenses.size).to eq(1)
+    expect(offenses.first.message).to include "replica identity"
+    expect(offenses.first.severity.name).to eq(:error)
   end
 
   it "complains if creating a table and setting its replica identity in the same transaction with set_replica_identity" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class MyMigration < ActiveRecord::Migration
         tag :predeploy
 
@@ -47,13 +47,13 @@ describe RuboCop::Cop::Migration::SetReplicaIdentityInSeparateTransaction do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(1)
-    expect(cop.messages.first).to include "replica identity"
-    expect(cop.offenses.first.severity.name).to eq(:error)
+    expect(offenses.size).to eq(1)
+    expect(offenses.first.message).to include "replica identity"
+    expect(offenses.first.severity.name).to eq(:error)
   end
 
   it "is happy if the replica identity is for a different table" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class MyMigration < ActiveRecord::Migration
         tag :predeploy
 
@@ -63,11 +63,11 @@ describe RuboCop::Cop::Migration::SetReplicaIdentityInSeparateTransaction do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(0)
+    expect(offenses.size).to eq(0)
   end
 
   it "is happy if only creating a table" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class MyMigration < ActiveRecord::Migration
         tag :predeploy
 
@@ -76,11 +76,11 @@ describe RuboCop::Cop::Migration::SetReplicaIdentityInSeparateTransaction do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(0)
+    expect(offenses.size).to eq(0)
   end
 
   it "is happy if only setting the replica identity" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class MyMigration < ActiveRecord::Migration
         tag :predeploy
 
@@ -89,11 +89,11 @@ describe RuboCop::Cop::Migration::SetReplicaIdentityInSeparateTransaction do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(0)
+    expect(offenses.size).to eq(0)
   end
 
   it "does not complain in `down`" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class MyMigration < ActiveRecord::Migration
         tag :predeploy
 
@@ -103,6 +103,6 @@ describe RuboCop::Cop::Migration::SetReplicaIdentityInSeparateTransaction do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(0)
+    expect(offenses.size).to eq(0)
   end
 end

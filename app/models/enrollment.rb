@@ -629,7 +629,7 @@ class Enrollment < ActiveRecord::Base
   def short_name(length = nil, display_user = nil)
     return @short_name if @short_name
 
-    @short_name = course_section.display_name if course_section && root_account && root_account.show_section_name_as_course_name
+    @short_name = course_section.display_name if course_section && root_account&.show_section_name_as_course_name
     @short_name ||= course_name(display_user)
     @short_name = @short_name[0..length] if length
     @short_name

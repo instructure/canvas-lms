@@ -295,7 +295,7 @@ class ContentTag < ActiveRecord::Base
         is_student ? "lti-quiz" : "quiz"
       elsif content && content.submission_types == "discussion_topic"
         "discussion_topic"
-      elsif self&.content&.quiz_lti?
+      elsif content&.quiz_lti?
         "lti-quiz"
       else
         "assignment"
@@ -831,7 +831,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def check_for_restricted_content_changes
-    if !new_record? && title_changed? && !@importing_migration && content && content.respond_to?(:is_child_content?) &&
+    if !new_record? && title_changed? && !@importing_migration && content.respond_to?(:is_child_content?) &&
        content.is_child_content? && content.editing_restricted?(:content)
       errors.add(:title, "cannot change title - associated content locked by Master Course")
     end

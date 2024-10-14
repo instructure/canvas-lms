@@ -225,7 +225,7 @@ class RubricAssociation < ActiveRecord::Base
   end
 
   def update_assignment_points
-    if use_for_grading && !skip_updating_points_possible && association_object && association_object.respond_to?(:points_possible=) && rubric && rubric.points_possible && association_object.points_possible != rubric.points_possible
+    if use_for_grading && !skip_updating_points_possible && association_object.respond_to?(:points_possible=) && rubric&.points_possible && association_object.points_possible != rubric.points_possible
       association_object.points_possible = rubric.points_possible
       association_object.save
     end

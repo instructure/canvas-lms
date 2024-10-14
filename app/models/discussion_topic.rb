@@ -2112,7 +2112,6 @@ class DiscussionTopic < ActiveRecord::Base
                            end
     # Initialize dictionaries for different visibility scopes
     ungraded_differentiated_topic_ids_per_user = {}
-    ids_visible_to_sections = {}
     ids_visible_to_all = []
 
     # Get Section specific discussions:

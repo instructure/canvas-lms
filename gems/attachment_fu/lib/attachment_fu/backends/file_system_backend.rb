@@ -81,7 +81,7 @@ module AttachmentFu # :nodoc:
       end
 
       def sanitize_filename(filename)
-        if respond_to?(:root_attachment) && root_attachment && root_attachment.filename
+        if respond_to?(:root_attachment) && root_attachment&.filename
           filename = root_attachment.filename
         else
           filename = Attachment.truncate_filename(filename, 255)
