@@ -180,6 +180,7 @@
     "react": "^18",
     "react-apollo": "~3.0.1",
     "react-beautiful-dnd": "^13.1.1",
+    "react-confetti-explosion": "^2.1.2",
     "react-dnd": "6.0",
     "react-dnd-html5-backend": "6.0",
     "react-dom": "^18",
