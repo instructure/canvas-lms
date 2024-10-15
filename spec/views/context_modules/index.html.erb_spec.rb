@@ -122,6 +122,19 @@ describe "context_modules/index" do
     expect(page.css(".offline_web_export").length).to eq 1
   end
 
+  it "shows H3 for text header" do
+    course_factory
+    context_module = @course.context_modules.create!
+    module_item = context_module.add_item type: "context_module_sub_header"
+    module_item.publish! if module_item.unpublished?
+    view_context(@course, @user)
+    assign(:modules, @course.context_modules.active)
+    render "context_modules/index"
+    expect(response).not_to be_nil
+    page = Nokogiri("<document>" + response.body + "</document>")
+    expect(page.css("h3").length).to eq 1
+  end
+
   context "direct_share" do
     before :once do
       course_with_teacher
