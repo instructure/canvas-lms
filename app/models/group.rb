@@ -509,29 +509,37 @@ class Group < ActiveRecord::Base
   # if you modify this set_policy block, note that we've denormalized this
   # permission check for efficiency -- see User#cached_contexts
   set_policy do
-    # Participate means the user is connected to the group somehow and can be
-    given { |user| user && can_participate?(user) && has_member?(user) }
-    can :participate and
-      can :manage_calendar and
-      can :manage_content and
-      can :manage_course_content_add and
-      can :manage_course_content_edit and
-      can :manage_course_content_delete and
-      can :manage_files_add and
-      can :manage_files_edit and
-      can :manage_files_delete and
-      can :manage_wiki_create and
-      can :manage_wiki_delete and
-      can :manage_wiki_update and
-      can :post_to_forum and
-      can :create_collaborations and
-      can :create_forum
+    # Base permissions for users who can participate in the group
+    # Conditions:
+    # - The group is collaborative (`!non_collaborative?`)
+    # - A valid user is present (`user`)
+    # - The user can participate (`can_participate?(user)`)
+    # - The user is a member of the group (`has_member?(user)`)
+    given { |user| !non_collaborative? && user && can_participate?(user) && has_member?(user) }
+    can :participate,
+        :manage_calendar,
+        :manage_content,
+        :manage_course_content_add,
+        :manage_course_content_edit,
+        :manage_course_content_delete,
+        :manage_files_add,
+        :manage_files_edit,
+        :manage_files_delete,
+        :manage_wiki_create,
+        :manage_wiki_delete,
+        :manage_wiki_update,
+        :post_to_forum,
+        :create_collaborations,
+        :create_forum
 
     # Course-level groups don't grant any permissions besides :participate (because for a teacher to add a student to a
     # group, the student must be able to :participate, and the teacher should be able to add students while the course
     # is unpublished and therefore unreadable to said students) unless their containing context can be read by the user
     # in question
-    given { |user, session| context.is_a?(Account) || context&.grants_right?(user, session, :read) || false }
+    # Conditions:
+    # - The group is collaborative (`!non_collaborative?`)
+    # - The context is either an Account or grants read permission to the user
+    given { |user, session| !non_collaborative? && (context.is_a?(Account) || context&.grants_right?(user, session, :read) || false) }
 
     use_additional_policy do
       given { |user| user && has_member?(user) }
@@ -708,6 +716,81 @@ class Group < ActiveRecord::Base
 
       given { |user, session| context&.grants_right?(user, session, :read_email_addresses) }
       can :read_email_addresses
+    end
+
+    ##################### Non-Collaborative Group Permission Block ##########################
+    # Permissions for non-collaborative groups
+    # Conditions:
+    # - The group is non-collaborative (`non_collaborative?`)
+    # - The context grants read permission
+    # - The context grants manage_groups or manage_groups_manage rights
+    given { |user, session| non_collaborative? && context&.grants_right?(user, session, :read) && context&.grants_any_right?(user, session, :manage_groups, :manage_groups_manage) }
+    use_additional_policy do
+      # Base permissions for non-collaborative groups
+      given { |user| user }
+      can :read,
+          :update,
+          :manage,
+          :manage_admin_users,
+          :allow_course_admin_actions,
+          :manage_students,
+          :read_roster
+
+      # Permission to send messages
+      # Conditions:
+      # - A valid user is present
+      # - The context grants send_messages right
+      given do |user, session|
+        user && context.grants_right?(user, session, :send_messages)
+      end
+      can :send_messages
+
+      # Permission to send all messages
+      # Conditions:
+      # - A valid user is present
+      # - The context grants send_messages_all right
+      given do |user, session|
+        user && context.grants_right?(user, session, :send_messages_all)
+      end
+      can :send_messages_all
+
+      given { |user, session| context&.grants_right?(user, session, :view_group_pages) }
+      can %i[read read_roster read_files]
+
+      given { |user, session| context&.grants_right?(user, session, :read_as_admin) }
+      can :read_as_admin
+
+      given { |user, session| context&.grants_right?(user, session, :read_sis) }
+      can :read_sis
+
+      given { |user, session| context&.grants_right?(user, session, :view_user_logins) }
+      can :view_user_logins
+
+      given { |user, session| context&.grants_right?(user, session, :read_email_addresses) }
+      can :read_email_addresses
+
+      # Permissions purposely excluded from non_collaborative groups because Non_collaborative groups will NEVER
+      # be used as a context that owns content. So no user should ever be able to manage content in a non_collaborative group.
+      # %i[
+      #   manage_calendar
+      #   manage_content
+      #   manage_course_content_add
+      #   manage_course_content_edit
+      #   manage_course_content_delete
+      #   manage_files_add
+      #   manage_files_edit
+      #   manage_files_delete
+      #   manage_wiki_create
+      #   manage_wiki_delete
+      #   manage_wiki_update
+      #   moderate_forum
+      #   post_to_forum
+      #   create_forum
+      #   read_forum
+      #   read_announcements
+      #   view_unpublished_items
+      #   read_files
+      # ]
     end
   end
 
