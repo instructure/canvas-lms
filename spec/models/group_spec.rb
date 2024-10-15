@@ -938,15 +938,20 @@ describe Group do
   end
 
   describe "non_collaborative groups" do
-    let(:course) { Course.create! }
-    let(:account) { Account.create! }
-    let(:user) { User.create! }
-    let(:non_collaborative_category) { GroupCategory.create!(name: "Non-collab Category", context: course, non_collaborative: true) }
-    let(:collaborative_category) { GroupCategory.create!(name: "Collab Category", context: course, non_collaborative: false) }
+    before do
+      @course = Course.create!(name: "Test Course")
+      @teacher = User.create!(name: "Teacher")
+      @student = User.create!(name: "Student")
+      teacher_in_course(course: @course, user: @teacher, active_all: true)
+      student_in_course(course: @course, user: @student, active_all: true)
+
+      @non_collaborative_category = GroupCategory.create!(name: "Non-Collaborative Category", context: @course, non_collaborative: true)
+      @collaborative_category = GroupCategory.create!(name: "Collaborative Category", context: @course, non_collaborative: false)
+    end
 
     it "non_collaborative can be set on creation but cannot be changed afterwards" do
       # Set non_collaborative on creation
-      group = Group.create(context: course, group_category: non_collaborative_category, name: "Test Group")
+      group = Group.create(context: @course, group_category: @non_collaborative_category, name: "Test Group")
       expect(group).to be_valid
       expect(group.non_collaborative).to be true
 
@@ -960,7 +965,7 @@ describe Group do
       expect(group.reload.non_collaborative).to be true
 
       # Create a group without setting non_collaborative
-      another_group = Group.create(context: course, group_category: collaborative_category, name: "Another Test Group")
+      another_group = Group.create(context: @course, group_category: @collaborative_category, name: "Another Test Group")
       expect(another_group).to be_valid
       expect(another_group.non_collaborative).to be false
 
@@ -971,40 +976,77 @@ describe Group do
     end
 
     it "must belong to a course" do
-      course_group = Group.new(context: course, group_category: non_collaborative_category, name: "Course Group")
+      course_group = Group.new(context: @course, group_category: @non_collaborative_category, name: "Course Group")
       expect(course_group).to be_valid
 
-      account_group = Group.new(context: account, group_category: non_collaborative_category, name: "Account Group")
+      account_group = Group.new(context: @account, group_category: @non_collaborative_category, name: "Account Group")
       expect(account_group).not_to be_valid
       expect(account_group.errors[:base]).to include("Non-collaborative groups must belong to a course")
     end
 
     it "cannot have a leader" do
-      group_with_leader = Group.new(context: course, group_category: non_collaborative_category, name: "Group with Leader", leader: user)
+      group_with_leader = Group.new(context: @course, group_category: @non_collaborative_category, name: "Group with Leader", leader: @student)
       expect(group_with_leader).not_to be_valid
       expect(group_with_leader.errors[:base]).to include("Non-collaborative groups cannot have a leader")
 
-      group_without_leader = Group.new(context: course, group_category: non_collaborative_category, name: "Group without Leader")
+      group_without_leader = Group.new(context: @course, group_category: @non_collaborative_category, name: "Group without Leader")
       expect(group_without_leader).to be_valid
     end
 
     it "must match the non_collaborative status of its category" do
-      mismatched_group = Group.new(context: course, name: "Mismatched Group", group_category: collaborative_category, non_collaborative: true)
+      mismatched_group = Group.new(context: @course, name: "Mismatched Group", group_category: @collaborative_category, non_collaborative: true)
       expect(mismatched_group).not_to be_valid
       expect(mismatched_group.errors[:base]).to include("Group non_collaborative status must match its category")
 
-      matched_group = Group.new(context: course, name: "Matched Group", group_category: non_collaborative_category, non_collaborative: true)
+      matched_group = Group.new(context: @course, name: "Matched Group", group_category: @non_collaborative_category, non_collaborative: true)
       expect(matched_group).to be_valid
     end
 
     it "sets non_collaborative to true if the group_category is non_collaborative" do
-      group = Group.create!(name: "Non-Collaborative Group", group_category: non_collaborative_category, context: course)
+      group = Group.create!(name: "Non-Collaborative Group", group_category: @non_collaborative_category, context: @course)
       expect(group.non_collaborative).to be_truthy
     end
 
     it "sets non_collaborative to false if the group_category is collaborative" do
-      group = Group.create!(name: "Collaborative Group", group_category: collaborative_category, context: course)
+      group = Group.create!(name: "Collaborative Group", group_category: @collaborative_category, context: @course)
       expect(group.non_collaborative).to be_falsey
+    end
+
+    context "permissions" do
+      before do
+        @group = Group.create!(context: @course, group_category: @non_collaborative_category, name: "Test Group", non_collaborative: true)
+        allow(@course).to receive(:grants_any_right?).with(@teacher, anything, :manage_groups, :manage_groups_manage).and_return(true)
+      end
+
+      it "grants correct permissions to default teachers to non-collaborative groups" do
+        expect(@group.check_policy(@teacher)).to include(:read, :read_roster, :read_files, :send_messages, :send_messages_all, :manage, :manage_admin_users, :allow_course_admin_actions, :manage_students, :update, :read_as_admin, :read_sis, :view_user_logins, :read_email_addresses)
+      end
+
+      it "checks send_messages permission correctly" do
+        allow(@course).to receive(:grants_right?).and_return(true)
+        allow(@course).to receive(:grants_right?).with(@teacher, anything, :send_messages).and_return(false)
+        expect(@group.check_policy(@teacher)).not_to include(:send_messages)
+      end
+
+      it "checks send_messages_all permission correctly" do
+        allow(@course).to receive(:grants_right?).and_return(true)
+        allow(@course).to receive(:grants_right?).with(@teacher, anything, :send_messages_all).and_return(false)
+        expect(@group.check_policy(@teacher)).not_to include(:send_messages_all)
+      end
+
+      it "does not grant permissions to users without manage_groups or manage_groups_manage" do
+        user = User.create!(name: "Random User")
+        expect(@group.check_policy(user)).to be_empty
+      end
+
+      it "does not grant permissions to a student" do
+        expect(@group.check_policy(@student)).to be_empty
+      end
+
+      it "does not grant permissions to a student who is a group member" do
+        @group.add_user(@student)
+        expect(@group.reload.check_policy(@student)).to be_empty
+      end
     end
   end
 end
