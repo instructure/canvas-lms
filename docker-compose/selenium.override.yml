@@ -1,46 +1,39 @@
 # to use this add docker-compose/selenium.override.yml
 # to your COMPOSE_FILE var in .env
-
-version: '2.3'
 services:
-  web:
-    links:
-      - selenium-hub
-
 ## We list all of the different standalone containers as `selenium-hub` since Jenkins
 ##  will use the actual hub + node configuration instead of a standalone for performance
 ##  reasons. Listing all of them as selenium-hub saves a great deal of configuration issues
 
 ## Chrome
   selenium-hub:
-    image: selenium/standalone-chrome
-    # Use the seleniarm (not selenium) image on ARM architectures
-    # image: seleniarm/standalone-chromium:latest
-    # or
-    # image: seleniarm/standalone-chromium:4.16
-    environment:
-      SE_NODE_GRID_URL: selenium-hub:4444/wd/hub
-      VIRTUAL_HOST: seleniumch.docker
+    image: selenium/standalone-chromium:126.0-20240621
+    shm_size: 2gb
+    depends_on:
+      - web
     init: true
     ports:
-      - 5901:5900
+      - 4444:4444
+      - 7900:7900
 
 ## Firefox
 #  selenium-hub:
 #    image: selenium/standalone-firefox
-#    environment:
-#      SE_NODE_GRID_URL: selenium-hub:4444/wd/hub
-#      VIRTUAL_HOST: seleniumff.docker
+#    shm_size: 2gb
+#    depends_on:
+#      - web
 #    init: true
 #    ports:
-#      - 5900:5900
+#      - 4444:4444
+#      - 7900:7900
 
 ## Edge
 #  selenium-hub:
 #    image: selenium/standalone-edge
-#    environment:
-#      SE_NODE_GRID_URL: selenium-hub:4444/wd/hub
-#      VIRTUAL_HOST: seleniumedge.docker
+#    shm_size: 2gb
+#    depends_on:
+#      - web
 #    init: true
 #    ports:
-#      - 5902:5900
+#      - 4444:4444
+#      - 7900:7900
