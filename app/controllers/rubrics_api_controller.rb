@@ -457,11 +457,6 @@ class RubricsApiController < ApplicationController
             ]
           end
 
-          missing_ratings = max_ratings - criterion[:ratings].length
-          missing_ratings.times do
-            row += ["", "", ""]
-          end
-
           csv << row
         end
       end
