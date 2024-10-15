@@ -9054,6 +9054,7 @@ uk:
   invalid_url_in_xml: "Невірний url в xml. Амперсанди повинні були видалені."
   invalid_username_or_password_b60aa240: "Невірний логін або пароль."
   invalid_utf_8_13c76a6: "Невірний UTF-8"
+  invalid_verification_code_please_try_again_fcfc0bc: "Невірний код верифікації, будь ласка, спробуйте ще раз"
   invalid_xml_configuration_9c3f6bcf: "Невірна конфігурація XML"
   invalid_xml_syntax: "Невірний сінтаксис xml"
   invite_5b1fcbcd: Запросити
