@@ -2009,6 +2009,12 @@ class Course < ActiveRecord::Base
     completed? || soft_concluded?(enrollment_type)
   end
 
+  def set_concluded_assignments_grading_standard
+    ActiveRecord::Base.transaction do
+      assignments.where(grading_type: ["letter_grade", "gpa_scale"], grading_standard_id: nil).in_batches(of: 10_000).update_all(grading_standard_id: 0, updated_at: Time.now)
+    end
+  end
+
   def account_chain(include_site_admin: false, include_federated_parent: false)
     @account_chain ||= Account.account_chain(account_id).freeze
 
@@ -3985,6 +3991,8 @@ class Course < ActiveRecord::Base
         if Account.site_admin.feature_enabled?(:default_account_grading_scheme) && grading_standard_id.nil? && root_account.grading_standard_id
           self.grading_standard_id = root_account.grading_standard_id
           save!
+        elsif grading_standard_id.nil? && root_account.grading_standard_id.nil?
+          set_concluded_assignments_grading_standard
         end
         Auditors::Course.record_concluded(self, user, options)
       end

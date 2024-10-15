@@ -2721,6 +2721,17 @@ describe CoursesController do
       expect(@course.grading_standard_id).to eq gs.id
     end
 
+    it "sets the grading standard id to 0 when concluding courses on assignments using the canvas default grading scheme to avoid grades changing after conclusion if an account default is later set" do
+      expect(Auditors::Course).to receive(:record_concluded).once
+      @course.update!(grading_standard_id: nil)
+      @course.root_account.update!(grading_standard_id: nil)
+      letter_graded_assignment = @course.assignments.create!(name: "letter grade assignment", grading_type: "letter_grade", grading_standard_id: nil, points_possible: 10)
+      user_session(@teacher)
+      put "update", params: { id: @course.id, course: { event: "conclude" }, format: :json }
+
+      expect(letter_graded_assignment.reload.grading_standard_id).to eq 0
+    end
+
     it "concludes a course if given :manage_courses_conclude" do
       @course.root_account.role_overrides.create!(
         role: teacher_role,

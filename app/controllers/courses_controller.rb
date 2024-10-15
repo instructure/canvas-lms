@@ -1475,6 +1475,8 @@ class CoursesController < ApplicationController
       if (success = @context.save)
         if Account.site_admin.feature_enabled?(:default_account_grading_scheme) && @context.grading_standard_id.nil? && @context.root_account.grading_standard_id
           @context.update!(grading_standard_id: @context.root_account.grading_standard_id)
+        elsif @context.grading_standard_id.nil? && @context.root_account.grading_standard_id.nil?
+          @context.set_concluded_assignments_grading_standard
         end
         Auditors::Course.record_concluded(@context, @current_user, source: (api_request? ? :api : :manual))
         flash[:notice] = t("notices.concluded", "Course successfully concluded")
@@ -3492,6 +3494,8 @@ class CoursesController < ApplicationController
         when :complete
           if Account.site_admin.feature_enabled?(:default_account_grading_scheme) && @course.grading_standard_id.nil? && @course.root_account.grading_standard_id
             @course.update!(grading_standard_id: @course.root_account.grading_standard_id)
+          elsif @course.grading_standard_id.nil? && @course.root_account.grading_standard_id.nil?
+            @course.set_concluded_assignments_grading_standard
           end
           Auditors::Course.record_concluded(@course, @current_user, opts)
         when :delete

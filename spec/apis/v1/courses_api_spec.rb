@@ -2160,6 +2160,17 @@ describe CoursesController, type: :request do
           expect(@course.grading_standard_id).to eql gs.id
         end
 
+        it "sets the grading standard id to 0 when concluding courses on assignments using the canvas default grading scheme to avoid grades changing after conclusion" do
+          expect(Auditors::Course).to receive(:record_concluded).once
+          @course.update!(grading_standard_id: nil)
+          @course.root_account.update!(grading_standard_id: nil)
+          letter_graded_assignment = @course.assignments.create!(name: "letter grade assignment", grading_type: "letter_grade", grading_standard_id: nil, points_possible: 10)
+          json = api_call(:delete, @path, @params, { event: "conclude" })
+          expect(json).to eq({ "conclude" => true })
+
+          expect(letter_graded_assignment.reload.grading_standard_id).to be 0
+        end
+
         it "returns 400 if params[:event] is missing" do
           raw_api_call(:delete, @path, @params)
           expect(response).to have_http_status :bad_request
