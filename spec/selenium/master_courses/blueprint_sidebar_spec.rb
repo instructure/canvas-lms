@@ -54,6 +54,11 @@ shared_context "blueprint sidebar context" do
       .find_element(:xpath, "//span[text()[contains(., 'Send Notification')]]")
   end
 
+  def enable_item_notifications_checkbox
+    f(".bcs__body fieldset")
+      .find_element(:xpath, "//span[text()[contains(., 'Enable New Item Notification')]]")
+  end
+
   def add_message_checkbox
     f(".bcs__history-notification__add-message label")
   end
@@ -87,6 +92,7 @@ describe "master courses sidebar" do
 
   before :once do
     @master = course_factory(active_all: true)
+    Account.default.enable_feature!(:blueprint_item_notifications)
     @master_teacher = @teacher
     @template = MasterCourses::MasterTemplate.set_as_master_course(@master)
     @minion = @template.add_child_course!(course_factory(name: "Minion", active_all: true)).child_course
@@ -274,9 +280,16 @@ describe "master courses sidebar" do
         open_blueprint_sidebar
         send_notification_checkbox.click
         add_message_checkbox.click
+        enable_item_notifications_checkbox.click
         notification_message_text_box.send_keys("sync that!")
         sync_button.click
         run_jobs
+      end
+
+      it "accepts settings" do
+        mm = MasterCourses::MasterMigration.last
+        expect(mm.comment).to eq "sync that!"
+        expect(mm.migration_settings[:send_item_notifications]).to be true
       end
 
       it "removes sync button after sync", priority: "2" do
