@@ -19,7 +19,7 @@
 import React from 'react'
 import ready from '@instructure/ready'
 import {CertUploadForm} from './react/components/CertUploadForm'
-import ReactDOM from 'react-dom'
+import {render} from '@canvas/react'
 
 ready(() => {
   document.querySelectorAll("[id^='internal-ca-select-']").forEach(certUploadContainer => {
@@ -27,6 +27,6 @@ ready(() => {
 
     const inputField = id && (document.querySelector(`#internal_ca_${id}`) as HTMLInputElement)
 
-    if (inputField) ReactDOM.render(<CertUploadForm inputField={inputField} />, certUploadContainer)
+    if (inputField) render(<CertUploadForm inputField={inputField} />, certUploadContainer)
   })
 })
