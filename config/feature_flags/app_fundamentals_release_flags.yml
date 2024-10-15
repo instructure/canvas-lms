@@ -82,3 +82,8 @@ course_archival:
   applies_to: RootAccount
   display_name: Course Archival
   description: Allows for the ability to archive courses
+blueprint_item_notifications:
+  state: hidden
+  applies_to: Account
+  display_name: Blueprint Item Notifications
+  description: Adds an option that allows teachers and students to receive new-item notifications for content synced from the blueprint course

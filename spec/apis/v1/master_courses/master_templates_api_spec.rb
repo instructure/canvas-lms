@@ -244,6 +244,30 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       expect(migration).to be_queued
       expect(migration.send_notification).to be true
     end
+
+    describe "send_item_notifications option" do
+      context "with feature on" do
+        before :once do
+          Account.default.enable_feature!(:blueprint_item_notifications)
+        end
+
+        it "accepts the send_item_notifications option" do
+          json = api_call(:post, @url, @params.merge(send_item_notifications: true))
+          migration = @template.master_migrations.find(json["id"])
+          expect(migration).to be_queued
+          expect(migration.migration_settings[:send_item_notifications]).to be true
+        end
+      end
+
+      context "with feature off" do
+        it "ignores the send_item_notifications option" do
+          json = api_call(:post, @url, @params.merge(send_item_notifications: true))
+          migration = @template.master_migrations.find(json["id"])
+          expect(migration).to be_queued
+          expect(migration.migration_settings).not_to have_key(:send_item_notifications)
+        end
+      end
+    end
   end
 
   describe "migrations show/index" do
