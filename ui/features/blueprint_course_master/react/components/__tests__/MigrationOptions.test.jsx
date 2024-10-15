@@ -32,10 +32,13 @@ describe('MigrationOptions component', () => {
     willIncludeCustomNotificationMessage: false,
     willIncludeCourseSettings: false,
     notificationMessage: '',
+    willSendItemNotifications: false,
+    itemNotificationFeatureEnabled: false,
     enableSendNotification: noop,
     includeCustomNotificationMessage: noop,
     setNotificationMessage: noop,
     includeCourseSettings: noop,
+    enableItemNotifications: noop,
   }
 
   test('renders the MigrationOptions component', () => {
@@ -50,6 +53,15 @@ describe('MigrationOptions component', () => {
     expect(checkboxes.length).toEqual(2)
     expect(checkboxes[0].checked).toEqual(false)
     expect(checkboxes[1].checked).toEqual(false)
+  })
+
+  test('renders the item-notifications checkbox if the feature is enabled', () => {
+    const props = {...defaultProps}
+    props.itemNotificationFeatureEnabled = true
+    const tree = render(<MigrationOptions {...props} />)
+    const checkboxes = tree.container.querySelectorAll('input[type="checkbox"]')
+    expect(checkboxes.length).toEqual(3)
+    expect(checkboxes[2].checked).toEqual(false)
   })
 
   test('renders the add a message checkbox', () => {

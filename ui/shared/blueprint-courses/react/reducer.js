@@ -72,6 +72,7 @@ export default combineReducers({
   accountId: identity(),
   terms: identity([]),
   subAccounts: identity([]),
+  itemNotificationFeatureEnabled: identity(false),
   notifications: (state, action) => {
     let newState = notificationReducer(state, action)
 
@@ -272,6 +273,12 @@ export default combineReducers({
   willPublishCourses: handleActions(
     {
       [actionTypes.ENABLE_PUBLISH_COURSES]: (state, action) => action.payload,
+    },
+    false
+  ),
+  willSendItemNotifications: handleActions(
+    {
+      [actionTypes.ENABLE_ITEM_NOTIFICATIONS]: (state, action) => action.payload,
     },
     false
   ),

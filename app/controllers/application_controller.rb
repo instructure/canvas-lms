@@ -687,7 +687,8 @@ class ApplicationController < ActionController::Base
         subAccounts: @context.account.sub_accounts.pluck(:id, :name).map { |id, name| { id:, name: } },
         terms: @context.account.root_account.enrollment_terms.active.to_a.map { |term| { id: term.id, name: term.name } },
         canManageCourse: can_manage,
-        canAutoPublishCourses: can_manage
+        canAutoPublishCourses: can_manage,
+        itemNotificationFeatureEnabled: @context.account.feature_enabled?(:blueprint_item_notifications)
       )
     end
 
