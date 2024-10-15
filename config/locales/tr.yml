@@ -10479,6 +10479,7 @@ tr:
   invalid_url_in_xml: "xml dosyasında geçersiz url. & işaretleri kullanılmamalı."
   invalid_username_or_password_b60aa240: "Geçersiz kullanıcı adı ve şifre"
   invalid_utf_8_13c76a6: "UTF-8 Geçersiz"
+  invalid_verification_code_please_try_again_fcfc0bc: "Geçersiz onaylama kodu, lütfen tekrar deneyin"
   invalid_xml_syntax: "Geçersiz XML yazımı"
   invite_5b1fcbcd: "Davet et"
   ip_filter_is_not_valid_152a46d8: "IP filtresi geçersiz."
