@@ -126,8 +126,8 @@ describe('GroupEditModal', () => {
     const {getByDisplayValue, rerender} = render(<GroupEditModal {...defaultProps()} />)
     const titleField = getByDisplayValue('Group title')
     fireEvent.change(titleField, {target: {value: 'Updated title'}})
-    rerender(<GroupEditModal {...defaultProps({isOpen: false})} />)
-    rerender(<GroupEditModal {...defaultProps({isOpen: true})} />)
+    rerender(<MockedProvider><GroupEditModal {...defaultProps({isOpen: false})} /></MockedProvider>)
+    rerender(<MockedProvider><GroupEditModal {...defaultProps({isOpen: true})} /></MockedProvider>)
     expect(getByDisplayValue('Group title')).toBeInTheDocument()
   })
 

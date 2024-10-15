@@ -119,8 +119,8 @@ const useTreeBrowser = queryVariables => {
     fetchPolicy: 'cache-only',
     variables: queryVariables,
   })
-  const groups = cacheData.groups || []
-  const loadedGroups = loadedGroupsData.loadedGroups || []
+  const groups = cacheData?.groups || []
+  const loadedGroups = loadedGroupsData?.loadedGroups || []
 
   const addLoadedGroups = ids => {
     client.writeQuery({
@@ -364,7 +364,7 @@ export const useManageOutcomes = ({
     clearTreeBrowserCache()
   }
 
-  const rootGroupId = contextGroupLoadedData.rootGroupId
+  const rootGroupId = contextGroupLoadedData?.rootGroupId
 
   const {
     search: searchString,

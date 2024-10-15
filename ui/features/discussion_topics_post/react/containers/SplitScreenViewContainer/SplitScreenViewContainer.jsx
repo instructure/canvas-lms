@@ -404,7 +404,7 @@ export const SplitScreenViewContainer = props => {
       !fetchingMoreOlderReplies
     ) {
       const isOnSubentries =
-        splitScreenEntryOlderDirection.data.legacyNode?.discussionSubentriesConnection?.nodes.some(
+        splitScreenEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection?.nodes.some(
           entry => entry._id === props.highlightEntryId
         )
 
