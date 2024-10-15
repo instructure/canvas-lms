@@ -222,11 +222,6 @@ export const AddressBookContainer = props => {
   }, [props.activeCourseFilter])
 
   const menuData = useMemo(() => {
-    // If loading is true and there is no data, return an empty array.
-    if (loading && !data) {
-      return []
-    }
-
     // Extract contextData: { id, name, and context_type}
     let contextData = (data?.legacyNode?.recipients?.contextsConnection?.nodes || []).map(c => {
       return {

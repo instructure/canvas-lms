@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import {MockedProvider} from '@apollo/react-testing'
 import {render, fireEvent} from '@testing-library/react'
 
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
@@ -45,7 +46,7 @@ describe('TotalGradeOverrideTray Tests', () => {
       ...props,
     }
 
-    return render(<TotalGradeOverrideTray {...trayProps} />)
+    return render(<MockedProvider><TotalGradeOverrideTray {...trayProps} /></MockedProvider>)
   }
 
   beforeEach(() => {
