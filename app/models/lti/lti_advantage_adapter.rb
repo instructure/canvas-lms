@@ -169,11 +169,6 @@ module Lti
     end
 
     def generate_lti_params
-      if resource_type&.to_sym == :course_assignments_menu &&
-         !@context.root_account.feature_enabled?(:lti_multiple_assignment_deep_linking)
-        return resource_link_request.to_cached_hash
-      end
-
       if resource_type&.to_sym == :module_index_menu_modal &&
          !@context.root_account.feature_enabled?(:lti_deep_linking_module_index_menu_modal)
         return resource_link_request.to_cached_hash
