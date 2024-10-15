@@ -8610,6 +8610,7 @@ hy:
   invalid_url_cbde79f: "Սխալ URL"
   invalid_url_in_xml: "Սխալ Url -հասցե xml-ում: Անհրաժեշտ է խուսափել Ampersands-ից: "
   invalid_utf_8_13c76a6: "Սխալ UTF-8"
+  invalid_verification_code_please_try_again_fcfc0bc: "Ստուգման սխալ կոդ, փորձեք կրկին:"
   invalid_xml_syntax: "xml-ի սխալ սինտաքս"
   invite_5b1fcbcd: Հրավիրել
   is_invalid_702840b6: "սխալ է"
