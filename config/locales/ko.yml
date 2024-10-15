@@ -7193,6 +7193,7 @@ ko:
   invalid_file_type_881cc9b2: "유효하지 않은 파일 유형"
   invalid_url_cbde79f: "잘못된 URL"
   invalid_url_in_xml: "XML에 잘못된 URL이 있습니다. 앰퍼샌드는 이스케이프 처리를 해야 합니다."
+  invalid_verification_code_please_try_again_fcfc0bc: "유효하지 않은 인증코드입니다. 다시 시도하시기 바랍니다."
   invalid_xml_syntax: "유효하지 않은 XML 구문"
   invite_5b1fcbcd: 초대
   is_invalid_702840b6: "올바르지 않습니다"
