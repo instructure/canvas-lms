@@ -100,7 +100,12 @@
     </span>
 
     <div class="ig-info">
+
+    <% if module_item && module_item.content_type == 'ContextModuleSubHeader' %>
+      <h3 class="module-item-title">
+    <% else %>
       <div class="module-item-title">
+    <% end %>
         <span class="item_name">
           <% title = module_item&.title %>
           <% if module_item && module_item.content_type == 'ExternalUrl' && module_item.new_tab %>
@@ -218,7 +223,11 @@
         </div> <!-- requirement description end -->
         <div class="mc_objectives ig-details__item"></div>
       </div>
-    </div>
+      <% if module_item && module_item.content_type == 'ContextModuleSubHeader' %>
+        </h3>
+      <% else %>
+        </div>
+      <% end %>
     <% if !@can_view %>
       <div class="module-item-status-icon"></div> <%# going to set this in JS-land, not here %>
     <% end %>
