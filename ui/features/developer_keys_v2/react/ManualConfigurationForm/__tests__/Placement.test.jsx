@@ -194,17 +194,6 @@ it('requires icon_url for editor_button', async () => {
 const couldBeEither = ['assignment_selection']
 
 couldBeEither.forEach(placementName => {
-  if (['course_assignments_menu', 'module_menu_modal'].includes(placementName)) {
-    beforeAll(() => {
-      global.ENV.FEATURES ||= {}
-      global.ENV.FEATURES.lti_multiple_assignment_deep_linking = true
-    })
-
-    afterAll(() => {
-      global.ENV.FEATURES.lti_multiple_assignment_deep_linking = false
-    })
-  }
-
   if (placementName === 'module_index_menu_modal') {
     beforeAll(() => {
       global.ENV.FEATURES ||= {}

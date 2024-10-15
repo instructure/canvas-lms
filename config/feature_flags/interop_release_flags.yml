@@ -208,16 +208,6 @@ lti_migration_info:
       state: allowed_on
     ci:
       state: allowed_on
-lti_multiple_assignment_deep_linking:
-  state: hidden
-  display_name: LTI Multiple Assignment Deep Linking
-  description: If enabled, allows multiple deep link support for assignments and modules.
-  applies_to: RootAccount
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
 lti_overwrite_user_url_input_select_content_dialog:
   state: on
   applies_to: RootAccount
