@@ -552,6 +552,26 @@ module Lti
                       subject
                       expect(assigns.dig(:js_env, :deep_link_response, :reloadpage)).to be false
                     end
+
+                    context "with flag enabled" do
+                      before do
+                        course.root_account.enable_feature!(:lti_deep_linking_line_items)
+                      end
+
+                      it "creates a resource link" do
+                        # the resource link has an Assignment context, not course
+                        expect { subject }.to change { Lti::ResourceLink.count }.by 1
+                      end
+
+                      it "creates a module item" do
+                        expect { subject }.to change { context_module.content_tags.count }.by 1
+                      end
+
+                      it "asks to reload page" do
+                        subject
+                        expect(assigns.dig(:js_env, :deep_link_response, :reloadpage)).to be true
+                      end
+                    end
                   end
                 end
               end
