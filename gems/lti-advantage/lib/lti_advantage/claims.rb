@@ -8,5 +8,6 @@ module LtiAdvantage::Claims
   require_relative "claims/lti1p1"
   require_relative "claims/names_and_roles_service"
   require_relative "claims/platform"
+  require_relative "claims/platform_notification_service"
   require_relative "claims/resource_link"
 end

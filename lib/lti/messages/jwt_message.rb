@@ -66,6 +66,7 @@ module Lti::Messages
       add_context_claims! if include_claims?(:context)
       add_tool_platform_claims! if include_claims?(:tool_platform)
       add_launch_presentation_claims! if include_claims?(:launch_presentation)
+      add_platform_notification_service_claims! if include_platform_notification_service_claims?
       add_i18n_claims! if include_claims?(:i18n)
       add_roles_claims! if include_claims?(:roles)
       add_custom_params_claims! if include_claims?(:custom_params)
@@ -213,6 +214,13 @@ module Lti::Messages
         @tool.developer_key.scopes.intersect?(TokenScopes::LTI_AGS_SCOPES)
     end
 
+    # Follows 1EdTech Platform Notification Spec (not final/public as of Oct 2024)
+    def include_platform_notification_service_claims?
+      include_claims?(:platform_notification_service) &&
+        @tool.developer_key.scopes.include?(TokenScopes::LTI_PNS_SCOPE) &&
+        @tool.root_account.feature_enabled?(:platform_notification_service)
+    end
+
     # Follows the spec at https://www.imsglobal.org/spec/lti-ags/v2p0/#assignment-and-grade-service-claim
     # see ResourceLinkRequest#add_line_item_url_to_ags_claim! for adding the 'lineitem' properties
     def add_assignment_and_grade_service_claims!
@@ -222,6 +230,17 @@ module Lti::Messages
         @expander.controller.lti_line_item_index_url(
           host: @context.root_account.environment_specific_domain, course_id: course_id_for_ags_url
         )
+    end
+
+    def add_platform_notification_service_claims!
+      @message.platform_notification_service.service_versions = ["1.0"]
+      @message.platform_notification_service.platform_notification_service_url =
+        @expander.controller.lti_notice_handlers_url(
+          host: @context.root_account.environment_specific_domain,
+          context_external_tool_id: @tool.id
+        )
+      @message.platform_notification_service.scope = [TokenScopes::LTI_PNS_SCOPE]
+      @message.platform_notification_service.notice_types_supported = Lti::PlatformNotificationService::NOTICE_TYPES
     end
 
     def associated_1_1_tool

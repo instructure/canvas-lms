@@ -2919,10 +2919,10 @@ CanvasRails::Application.routes.draw do
       get "groups/:group_id/names_and_roles", controller: "lti/ims/names_and_roles", action: :group_index, as: :group_names_and_roles
     end
 
-    # Platform Notification service
+    # 1Edtech (IMS) LTI Platform Notification service (PNS)
     scope(controller: "lti/ims/notice_handlers") do
-      get "notice-handlers/:context_external_tool_id", action: :index
-      put "notice-handlers/:context_external_tool_id", action: :update
+      get "notice-handlers/:context_external_tool_id", action: :index, as: :lti_notice_handlers
+      put "notice-handlers/:context_external_tool_id", action: :update, as: :update_lti_notice_handlers
     end
 
     # Security
