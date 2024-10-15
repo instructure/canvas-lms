@@ -25,15 +25,16 @@ import React from 'react'
 import {fireEvent, render, screen, waitFor, act} from '@testing-library/react'
 import {type Enrollment, ITEMS_PER_PAGE, PROVIDER, RECIPIENT, type User} from '../types'
 import fetchMock from 'fetch-mock'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 const renderView = async (props: any) => {
   let result!: ReturnType<typeof render>
   await act(async () => {
     result = render(
-      <QueryProvider>
+      <MockedQueryProvider>
         <TempEnrollView {...props} />
-      </QueryProvider>
+      </MockedQueryProvider>
     )
   })
   return result

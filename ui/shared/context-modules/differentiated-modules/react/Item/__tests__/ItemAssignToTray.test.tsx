@@ -27,7 +27,8 @@ import {
   SECOND_GROUP_CATEGORY_DATA,
   ADHOC_WITHOUT_STUDENTS,
 } from '../../__tests__/mocks'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never, delay: null}
 
@@ -153,9 +154,9 @@ describe('ItemAssignToTray', () => {
 
   const renderComponent = (overrides: Partial<ItemAssignToTrayProps> = {}) =>
     render(
-      <QueryProvider>
+      <MockedQueryProvider>
         <ItemAssignToTray {...props} {...overrides} />
-      </QueryProvider>
+      </MockedQueryProvider>
     )
 
   const renderComponentAndGetElements = async (text: any, payload: any = undefined) => {
@@ -900,9 +901,9 @@ describe('ItemAssignToTray', () => {
         expect(queryByText(group.name)).not.toBeInTheDocument()
       })
       rerender(
-        <QueryProvider>
+        <MockedQueryProvider>
           <ItemAssignToTray {...props} defaultGroupCategoryId={SECOND_GROUP_CATEGORY_ID} />
-        </QueryProvider>
+        </MockedQueryProvider>
       )
 
       await findByText(SECOND_GROUP_CATEGORY_DATA[0].name)

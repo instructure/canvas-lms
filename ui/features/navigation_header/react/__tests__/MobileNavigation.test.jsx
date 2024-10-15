@@ -18,10 +18,11 @@ import React from 'react'
 import {render as testingLibraryRender, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import MobileNavigation from '../MobileNavigation'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import axios from 'axios'
 
-const render = children => testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
+const render = children => testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 jest.mock('axios')
 

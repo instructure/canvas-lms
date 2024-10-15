@@ -19,7 +19,7 @@
 import React from 'react'
 import $ from 'jquery'
 import axios from 'axios'
-import {QueryProvider} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {render, within, fireEvent} from '@testing-library/react'
 import {setGradebookOptions, setupCanvasQueries} from './fixtures'
 import {BrowserRouter, Route, Routes} from 'react-router-dom'
@@ -88,9 +88,9 @@ describe('Enhanced Individual Gradebook', () => {
           <Route
             path="/"
             element={
-              <QueryProvider>
+              <MockedQueryProvider>
                 <EnhancedIndividualGradebook />
-              </QueryProvider>
+              </MockedQueryProvider>
             }
           />
         </Routes>

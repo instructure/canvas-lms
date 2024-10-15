@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import userSettings from '@canvas/user-settings'
 import {fireEvent, render, within} from '@testing-library/react'
 import axios from 'axios'
@@ -84,9 +85,9 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
           <Route
             path="/"
             element={
-              <QueryProvider>
+              <MockedQueryProvider>
                 <LearningMasteryTabsView />
-              </QueryProvider>
+              </MockedQueryProvider>
             }
           />
         </Routes>

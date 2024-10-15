@@ -22,7 +22,8 @@ import ItemAssignToCard, {type ItemAssignToCardProps} from '../ItemAssignToCard'
 import {SECTIONS_DATA, STUDENTS_DATA} from '../../__tests__/mocks'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 const props: ItemAssignToCardProps = {
   courseId: '1',
@@ -44,9 +45,9 @@ const props: ItemAssignToCardProps = {
 
 const renderComponent = (overrides: Partial<ItemAssignToCardProps> = {}) =>
   render(
-    <QueryProvider>
+    <MockedQueryProvider>
       <ItemAssignToCard {...props} {...overrides} />
-    </QueryProvider>
+    </MockedQueryProvider>
   )
 
 const withWithGradingPeriodsMock = () => {

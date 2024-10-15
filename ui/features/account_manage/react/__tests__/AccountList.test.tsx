@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import {AccountList} from '../AccountList'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import fetchMock from 'fetch-mock'
 
 const accountFixture = {
@@ -47,9 +47,9 @@ describe('AccountLists', () => {
       accountFixture,
     ])
     const {queryAllByText} = render(
-      <QueryProvider>
+      <MockedQueryProvider>
         <AccountList />
-      </QueryProvider>
+      </MockedQueryProvider>
     )
     await waitFor(() => expect(queryAllByText('acc1')).toBeTruthy())
   })
@@ -62,9 +62,9 @@ describe('AccountLists', () => {
       }
     )
     const {queryAllByText} = render(
-      <QueryProvider>
+      <MockedQueryProvider>
         <AccountList />
-      </QueryProvider>
+      </MockedQueryProvider>
     )
     await waitFor(() => expect(queryAllByText('Accounts could not be found')).toBeTruthy())
   })
@@ -77,9 +77,9 @@ describe('AccountLists', () => {
       },
     })
     const {queryAllByText} = render(
-      <QueryProvider>
+      <MockedQueryProvider>
         <AccountList />
-      </QueryProvider>
+      </MockedQueryProvider>
     )
     await waitFor(() => expect(queryAllByText('acc1')).toBeTruthy())
   })

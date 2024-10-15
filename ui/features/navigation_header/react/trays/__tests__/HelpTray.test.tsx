@@ -19,7 +19,8 @@
 import React from 'react'
 import {render as testingLibraryRender, screen} from '@testing-library/react'
 import HelpTray from '../HelpTray'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 // Mock the API call
@@ -33,9 +34,9 @@ const props = {
 }
 const render = () => {
   return testingLibraryRender(
-    <QueryProvider>
+    <MockedQueryProvider>
       <HelpTray {...props} />
-    </QueryProvider>
+    </MockedQueryProvider>
   )
 }
 

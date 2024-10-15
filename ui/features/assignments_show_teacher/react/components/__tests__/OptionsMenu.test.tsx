@@ -20,14 +20,15 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {mockAssignment} from '../../test-utils'
 import AssignmentHeader from '../AssignmentHeader'
-import {QueryClientProvider, QueryClient} from '@tanstack/react-query'
+import {QueryClient} from '@tanstack/react-query'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 
 const setUp = (assignment = mockAssignment(), breakpoints = {}) => {
   const queryClient = new QueryClient()
   return render(
-    <QueryClientProvider client={queryClient}>
+    <MockedQueryClientProvider client={queryClient}>
       <AssignmentHeader assignment={assignment} breakpoints={breakpoints} />
-    </QueryClientProvider>
+    </MockedQueryClientProvider>
   )
 }
 

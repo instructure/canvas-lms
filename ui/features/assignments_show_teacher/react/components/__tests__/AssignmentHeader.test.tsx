@@ -20,7 +20,8 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import {mockAssignment} from '../../test-utils'
 import AssignmentHeader from '../AssignmentHeader'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {QueryClient} from '@tanstack/react-query'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 
 const setUp = (propOverrides = {}) => {
   const assignment = mockAssignment()
@@ -30,9 +31,9 @@ const setUp = (propOverrides = {}) => {
     ...propOverrides,
   }
   return render(
-    <QueryClientProvider client={new QueryClient()}>
+    <MockedQueryClientProvider client={new QueryClient()}>
       <AssignmentHeader {...props} />
-    </QueryClientProvider>
+    </MockedQueryClientProvider>
   )
 }
 
