@@ -17,13 +17,14 @@
 import React from 'react'
 import {fireEvent, render as testingLibraryRender, waitFor} from '@testing-library/react'
 import HelpLinks from '../HelpLinks'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 // Mock the API call
 jest.mock('@canvas/do-fetch-api-effect')
 
-const render = children => testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
+const render = children => testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 describe('HelpLinks', () => {
   const featuredLink = {

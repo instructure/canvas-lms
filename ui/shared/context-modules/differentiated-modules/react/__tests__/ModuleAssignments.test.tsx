@@ -21,7 +21,8 @@ import {act, fireEvent, render} from '@testing-library/react'
 import ModuleAssignments, {type ModuleAssignmentsProps} from '../ModuleAssignments'
 import fetchMock from 'fetch-mock'
 import {FILTERED_SECTIONS_DATA, FILTERED_STUDENTS_DATA, SECTIONS_DATA, STUDENTS_DATA} from './mocks'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 const props: ModuleAssignmentsProps = {
   courseId: '1',
@@ -59,9 +60,9 @@ describe('ModuleAssignments', () => {
 
   const renderComponent = (overrides?: Partial<typeof props>) =>
     render(
-      <QueryProvider>
+      <MockedQueryProvider>
         <ModuleAssignments {...props} {...overrides} />
-      </QueryProvider>
+      </MockedQueryProvider>
     )
 
   it('displays sections and students as options', async () => {

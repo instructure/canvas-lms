@@ -20,10 +20,11 @@ import React from 'react'
 import {render as testingLibraryRender} from '@testing-library/react'
 import {getByText as domGetByText} from '@testing-library/dom'
 import ProfileTray from '../ProfileTray'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 const render = (children: unknown) =>
-  testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
+  testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 const imageUrl = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
 

@@ -18,7 +18,8 @@
 
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {RubricForm, type RubricFormComponentProp} from '../index'
 import {RUBRIC_CRITERIA_IGNORED_FOR_SCORING, RUBRICS_QUERY_RESPONSE} from './fixtures'
 import * as RubricFormQueries from '../queries/RubricFormQueries'
@@ -59,7 +60,7 @@ describe('RubricForm Tests', () => {
 
   const renderComponent = (props?: Partial<RubricFormComponentProp>) => {
     return render(
-      <QueryProvider>
+      <MockedQueryProvider>
         <RubricForm
           rootOutcomeGroup={ROOT_OUTCOME_GROUP}
           criterionUseRangeEnabled={false}
@@ -69,7 +70,7 @@ describe('RubricForm Tests', () => {
           accountId="1"
           {...props}
         />
-      </QueryProvider>
+      </MockedQueryProvider>
     )
   }
 

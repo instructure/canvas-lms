@@ -23,7 +23,8 @@ import {ASSIGNMENT_OVERRIDES_DATA, SECTIONS_DATA, STUDENTS_DATA} from './mocks'
 import * as utils from '../../utils/assignToHelper'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 jest.mock('../../utils/assignToHelper', () => {
   const originalModule = jest.requireActual('../../utils/assignToHelper')
@@ -78,9 +79,9 @@ describe('AssignToPanel', () => {
 
   const renderComponent = (overrides = {}) =>
     render(
-      <QueryProvider>
+      <MockedQueryProvider>
         <AssignToPanel {...props} {...overrides} />
-      </QueryProvider>
+      </MockedQueryProvider>
     )
 
   it('renders', async () => {

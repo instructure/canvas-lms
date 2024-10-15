@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {QueryProvider} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {fireEvent, render} from '@testing-library/react'
 import {ImportRubric, type ImportRubricProps} from '..'
 import * as ViewRubricQueries from '../../../../queries/ViewRubricQueries'
@@ -34,7 +34,7 @@ describe('ImportRubric Tests', () => {
 
   const renderComponent = (props?: Partial<ImportRubricProps>) => {
     return render(
-      <QueryProvider>
+      <MockedQueryProvider>
         <ImportRubric
           isTrayOpen={true}
           handleImportSuccess={jest.fn()}
@@ -43,7 +43,7 @@ describe('ImportRubric Tests', () => {
           importFetchInterval={100}
           {...props}
         />
-      </QueryProvider>
+      </MockedQueryProvider>
     )
   }
 

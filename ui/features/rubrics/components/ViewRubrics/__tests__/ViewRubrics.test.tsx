@@ -21,7 +21,8 @@ import Router from 'react-router'
 import {BrowserRouter} from 'react-router-dom'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {RUBRICS_QUERY_RESPONSE, RUBRIC_PREVIEW_QUERY_RESPONSE} from './fixtures'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {ViewRubrics, type ViewRubricsProps} from '../index'
 import * as ViewRubricQueries from '../../../queries/ViewRubricQueries'
 import useManagedCourseSearchApi from '@canvas/direct-sharing/react/effects/useManagedCourseSearchApi'
@@ -44,11 +45,11 @@ jest.mock('@canvas/direct-sharing/react/effects/useManagedCourseSearchApi')
 describe('ViewRubrics Tests', () => {
   const renderComponent = (props?: Partial<ViewRubricsProps>) => {
     return render(
-      <QueryProvider>
+      <MockedQueryProvider>
         <BrowserRouter>
           <ViewRubrics canManageRubrics={true} {...props} canImportExportRubrics={true} />
         </BrowserRouter>
-      </QueryProvider>
+      </MockedQueryProvider>
     )
   }
 
