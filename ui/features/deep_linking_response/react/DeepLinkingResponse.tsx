@@ -28,6 +28,9 @@ import type {ContentItem} from '@canvas/deep-linking/models/ContentItem'
 import type {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'
 import {Pill} from '@instructure/ui-pill'
 import {View} from '@instructure/ui-view'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+
+declare const ENV: GlobalEnv
 
 const I18n = useI18nScope('external_content.success')
 
@@ -109,19 +112,13 @@ const buildContentItems = (items: ContentItem[]) =>
   }, [])
 
 type RetrievingContentProps = {
-  environment: Environment
+  environment: GlobalEnv
   parentWindow: Window
-}
-
-type Environment = {
-  deep_link_response: DeepLinkResponse
-  DEEP_LINKING_POST_MESSAGE_ORIGIN: string
-  deep_linking_use_window_parent: boolean
 }
 
 export const RetrievingContent = ({environment, parentWindow}: RetrievingContentProps) => {
   const subject = 'LtiDeepLinkingResponse'
-  const deepLinkResponse = environment.deep_link_response
+  const deepLinkResponse = environment.deep_link_response as DeepLinkResponse
   const [hasErrors, setHasErrors] = useState(false)
   const [contentItems, setContentItems] = useState<ContentItemDisplay[]>([])
 
@@ -210,16 +207,12 @@ export default class DeepLinkingResponse {
     // tools within tools to send content items to the tool,
     // not to Canvas. This assumes that tools are always only
     // "one level deep" in the frame hierarchy.
-    const environment: Environment = window.ENV as Environment
-    const shouldUseParent = environment.deep_linking_use_window_parent
-    return window.opener || (shouldUseParent && window.parent) || window.top
+    return window.opener || window.parent
   }
 
   static mount() {
     const parentWindow = this.targetWindow(window)
-    ReactDOM.render(
-      <RetrievingContent environment={window.ENV as Environment} parentWindow={parentWindow} />,
-      document.getElementById('deepLinkingContent')
-    )
+    const root = ReactDOM.createRoot(document.getElementById('deepLinkingContent'))
+    root.render(<RetrievingContent environment={ENV} parentWindow={parentWindow} />)
   }
 }
