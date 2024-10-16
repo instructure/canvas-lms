@@ -268,7 +268,13 @@
                       </span>
                     </div>
                     <div id="rubric_summary_container">
-                      <%= render :partial => "shared/rubric_summary", :object => @assignment.try_rescue(:rubric_association).try_rescue(:rubric), :locals => {:assessing => true } if @assignment.try_rescue(:rubric_association).try_rescue(:rubric) %>
+                      <%=
+                        locals = {
+                          assessing: true,
+                          checkpointed: @assignment.checkpoints_parent?,
+                        }
+                        render :partial => "shared/rubric_summary", :object => @assignment.try_rescue(:rubric_association).try_rescue(:rubric), :locals => locals if @assignment.try_rescue(:rubric_association).try_rescue(:rubric)
+                      %>
                     </div>
                   </div>
                 <% end %>
