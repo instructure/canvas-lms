@@ -28,7 +28,7 @@ import {
   IconUserLine,
   IconSpeedGraderLine,
 } from '@instructure/ui-icons'
-import WithBreakpoints, {type Breakpoints} from '@canvas/with-breakpoints'
+import {type Breakpoints} from '@canvas/with-breakpoints'
 import {Button} from '@instructure/ui-buttons'
 import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 import {Flex} from '@instructure/ui-flex'
@@ -150,4 +150,4 @@ const AssignmentHeader: React.FC<HeaderProps> = props => {
   )
 }
 
-export default WithBreakpoints(AssignmentHeader)
+export default AssignmentHeader
