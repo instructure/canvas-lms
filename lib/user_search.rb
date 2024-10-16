@@ -109,15 +109,24 @@ module UserSearch
         users_scope.order(Arel.sql("email#{order}"))
       when "sis_id", "integration_id"
         column = (options[:sort] == "sis_id") ? "sis_user_id" : "integration_id"
+        # sort pseudonyms based on pick_user_pseudonym in sis_pseudonym; grabs only the first pseudonym of each user
+        # after sorting based on collation_key
+
         users_scope = users_scope.select(User.send(:sanitize_sql, [
-                                                     "users.*, (SELECT #{column} FROM #{Pseudonym.quoted_table_name}
-          WHERE pseudonyms.user_id = users.id AND
-            pseudonyms.workflow_state <> 'deleted' AND
-            pseudonyms.account_id = ?
-          LIMIT 1) AS #{column}",
+                                                     "users.*,
+                                                    (SELECT #{column}
+                                                      FROM #{Pseudonym.quoted_table_name}
+                                                      WHERE pseudonyms.user_id = users.id
+                                                        AND pseudonyms.workflow_state <> 'deleted'
+                                                        AND pseudonyms.account_id = ?
+                                                      ORDER BY workflow_state,
+                                                              CASE WHEN pseudonyms.sis_user_id IS NOT NULL THEN 0 ELSE 1 END,
+                                                              #{Pseudonym.best_unicode_collation_key("unique_id")},
+                                                              position
+                                                      LIMIT 1) AS #{column}",
                                                      context.try(:resolved_root_account_id) || context.root_account_id
                                                    ]))
-        users_scope.order(Arel.sql("#{column}#{order}"))
+        users_scope.order(Arel.sql("#{column} #{order}"))
       else
         users_scope.select("users.*").order_by_sortable_name
       end
