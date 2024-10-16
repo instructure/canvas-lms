@@ -17,7 +17,7 @@
  */
 
 import {AnonymousUser} from './AnonymousUser'
-import {bool, number, shape, string} from 'prop-types'
+import {arrayOf, bool, number, shape, string} from 'prop-types'
 import {DiscussionEntryPermissions} from './DiscussionEntryPermissions'
 import {DiscussionEntryVersion} from './DiscussionEntryVersion'
 import gql from 'graphql-tag'
@@ -83,10 +83,8 @@ export const DiscussionEntry = {
         }
         deleted
       }
-      discussionEntryVersionsConnection {
-        nodes {
-          ...DiscussionEntryVersion
-        }
+      discussionEntryVersions {
+        ...DiscussionEntryVersion
       }
       reportTypeCounts {
         inappropriateCount
@@ -149,7 +147,7 @@ export const DiscussionEntry = {
       }),
       deleted: bool,
     }),
-    discussionEntryVersionsConnection: DiscussionEntryVersion.shape,
+    discussionEntryVersions: arrayOf(DiscussionEntryVersion.shape),
     reportTypeCounts: shape({
       inappropriateCount: number,
       offensiveCount: number,
@@ -199,14 +197,11 @@ export const DiscussionEntry = {
     rootEntryId = null,
     parentId = null,
     quotedEntry = null,
-    discussionEntryVersionsConnection = {
-      nodes: [
-        DiscussionEntryVersion.mock({
-          message: '<p>This is the parent reply</p>',
-        }),
-      ],
-      __typename: 'DiscussionEntryVersionConnection',
-    },
+    discussionEntryVersions = [
+      DiscussionEntryVersion.mock({
+        message: '<p>This is the parent reply</p>',
+      }),
+    ],
     reportTypeCounts = {
       inappropriateCount: 0,
       offensiveCount: 0,
@@ -238,7 +233,7 @@ export const DiscussionEntry = {
     rootEntryId,
     parentId,
     quotedEntry,
-    discussionEntryVersionsConnection,
+    discussionEntryVersions,
     reportTypeCounts,
     depth,
     __typename: 'DiscussionEntry',

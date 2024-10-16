@@ -359,10 +359,7 @@ export const getOptimisticResponse = ({
         attachment: attachment
           ? {...attachment, id: 'ATTACHMENT_PLACEHOLDER', __typename: 'File'}
           : null,
-        discussionEntryVersionsConnection: {
-          nodes: [],
-          __typename: 'DiscussionEntryVersionConnection',
-        },
+        discussionEntryVersions: [],
         reportTypeCounts: {
           inappropriateCount: 0,
           offensiveCount: 0,

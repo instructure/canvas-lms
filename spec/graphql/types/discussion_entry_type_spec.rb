@@ -517,7 +517,7 @@ describe Types::DiscussionEntryType do
     discussion_entry.message = "Hello! 3"
     discussion_entry.save!
 
-    discussion_entry_versions = discussion_entry_type.resolve("discussionEntryVersionsConnection { nodes { message } }")
+    discussion_entry_versions = discussion_entry_type.resolve("discussionEntryVersions { message }")
     expect(discussion_entry_versions).to eq(["Hello! 3", "Hello! 2", "Hello!"])
   end
 
@@ -531,7 +531,7 @@ describe Types::DiscussionEntryType do
     discussion_entry.message = "Hello! 3"
     discussion_entry.save!
 
-    discussion_entry_versions = discussion_entry_student_type.resolve("discussionEntryVersionsConnection { nodes { message } }")
+    discussion_entry_versions = discussion_entry_student_type.resolve("discussionEntryVersions { message }")
     expect(discussion_entry_versions).to be_nil
   end
 
@@ -549,7 +549,7 @@ describe Types::DiscussionEntryType do
     entry.message = "Hello! 3"
     entry.save!
 
-    discussion_entry_versions = discussion_entry_student_type.resolve("discussionEntryVersionsConnection { nodes { message } }")
+    discussion_entry_versions = discussion_entry_student_type.resolve("discussionEntryVersions{ message }")
     expect(discussion_entry_versions).to eq(["Hello! 3", "Hello! 2", "Hello!"])
   end
 
@@ -575,7 +575,7 @@ describe Types::DiscussionEntryType do
     entry.message = "Hello! 3"
     entry.save!
 
-    discussion_entry_versions = discussion_entry_teacher_type.resolve("discussionEntryVersionsConnection { nodes { message } }")
+    discussion_entry_versions = discussion_entry_teacher_type.resolve("discussionEntryVersions { message }")
     expect(discussion_entry_versions).to eq(["Hello! 3", "Hello! 2", "Hello!"])
   end
 
