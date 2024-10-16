@@ -510,7 +510,7 @@ class Quizzes::QuizzesController < ApplicationController
               old_assignment.id = @quiz.assignment.id
 
               @quiz.assignment.post_to_sis = params[:post_to_sis] == "1"
-              @quiz.assignment.validate_overrides_for_sis(overrides) unless overrides.nil?
+              @quiz.assignment.validate_overrides_for_sis(prepared_batch) if overrides
 
               @quiz.assignment.important_dates = value_to_boolean(params[:important_dates])
             end
