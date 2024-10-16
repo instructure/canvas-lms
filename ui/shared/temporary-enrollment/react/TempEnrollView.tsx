@@ -258,7 +258,7 @@ export function TempEnrollView(props: Props) {
             </Table.Cell>
             <Table.Cell>{firstEnrollment.type}</Table.Cell>
             <Table.Cell>{renderEnrollmentPairingStatus(group)}</Table.Cell>
-            {canEditOrDelete && <Table.Cell>{renderActionIcons(group)}</Table.Cell>}
+            {canEditOrDelete ? <Table.Cell>{renderActionIcons(group)}</Table.Cell>: <></>}
           </Table.Row>
         )
         usedKeys.push(pairingId)
@@ -330,13 +330,14 @@ export function TempEnrollView(props: Props) {
                     {I18n.t('Recipient Enrollment Type')}
                   </Table.ColHeader>
                   <Table.ColHeader id="usertable-status">{I18n.t('Status')}</Table.ColHeader>
-                  {(canEdit || canDelete) && (
+                 
+                  {(canEdit || canDelete)? (
                     <Table.ColHeader id="header-user-option-links">
                       <ScreenReaderContent>
                         {I18n.t('Temporary enrollment option links')}
                       </ScreenReaderContent>
                     </Table.ColHeader>
-                  )}
+                  ):<></>}
                 </Table.Row>
               </Table.Head>
               <Table.Body>{renderRows(data.enrollments)}</Table.Body>

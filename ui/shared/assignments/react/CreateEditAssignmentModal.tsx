@@ -507,6 +507,7 @@ const CreateEditAssignmentModal = ({
         </View>
         <View as="div">
           <NumberInput
+            allowStringValue={true}
             renderLabel={I18n.t('Points')}
             interaction={enablePointsInput ? 'enabled' : 'disabled'}
             showArrows={false}

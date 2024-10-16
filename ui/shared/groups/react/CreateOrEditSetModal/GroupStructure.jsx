@@ -71,6 +71,7 @@ const GroupStructureSelfSignup = ({onChange, errormsg}) => {
       <View as="span">
         <View as="div" padding="small">
           <NumberInput
+            allowStringValue={true}
             data-testid="initial-group-count"
             renderLabel={I18n.t('Create groups now')}
             min={0}
@@ -90,6 +91,7 @@ const GroupStructureSelfSignup = ({onChange, errormsg}) => {
         </View>
         <View as="div" padding="small">
           <NumberInput
+            allowStringValue={true}
             data-testid="group-member-limit"
             renderLabel={I18n.t('Limit group members to (leave blank for no limit)')}
             min={0}
@@ -157,6 +159,7 @@ const GroupStructureNoSelfSignup = ({onChange, errormsg}) => {
     if (inputId === '1') {
       return (
         <NumberInput
+          allowStringValue={true}
           data-testid="split-groups"
           min={0}
           value={groupNumber}
@@ -175,6 +178,7 @@ const GroupStructureNoSelfSignup = ({onChange, errormsg}) => {
     } else if (inputId === '2') {
       return (
         <NumberInput
+          allowStringValue={true}
           data-testid="num-students-per-group"
           min={0}
           value={studentNumber}

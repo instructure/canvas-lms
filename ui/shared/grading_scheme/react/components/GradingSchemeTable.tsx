@@ -106,7 +106,7 @@ export const GradingSchemeTable = ({
       >
         {I18n.t('Grading Scheme Name')}
       </Table.ColHeader>
-      {showUsedLocations && (
+      {showUsedLocations? (
         <Table.ColHeader
           id="locationsUsed"
           key="locationsUsed"
@@ -115,7 +115,7 @@ export const GradingSchemeTable = ({
         >
           {I18n.t('Locations Used')}
         </Table.ColHeader>
-      )}
+      ):<></>}
       <Table.ColHeader id="actions" key="actions" width="20%" />
     </Table.Row>
   )
@@ -177,7 +177,7 @@ export const GradingSchemeTable = ({
                         <TruncateText>{gradingSchemeCard.gradingScheme.title}</TruncateText>
                       </Link>
                     </Table.Cell>
-                    {showUsedLocations && (
+                    {showUsedLocations? (
                       <Table.Cell>
                         {gradingSchemeCard.gradingScheme.assessed_assignment ||
                         (defaultAccountGradingSchemeEnabled &&
@@ -195,7 +195,7 @@ export const GradingSchemeTable = ({
                           ''
                         )}
                       </Table.Cell>
-                    )}
+                    ):<></>}
                     <Table.Cell textAlign="end">
                       <IconButton
                         withBorder={false}

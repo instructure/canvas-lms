@@ -109,6 +109,7 @@ const ColumnsSectionToolbar = () => {
       <Flex gap="x-small">
         <Text>{I18n.t('Section Columns')}</Text>
         <NumberInput
+          allowStringValue={true}
           data-testid="columns-input"
           inputRef={el => {
             colInputRef.current = el

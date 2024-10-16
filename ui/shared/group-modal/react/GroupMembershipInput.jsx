@@ -81,6 +81,7 @@ export default function GroupMembershipInput({onChange, value, ...props}) {
 
   return (
     <NumberInput
+      allowStringValue={true}
       {...props}
       id="group_max_membership"
       renderLabel={I18n.t('Group Membership Limit')}

@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useState} from 'react'
-import {Navigation as SideNavBar} from '@instructure/ui-navigation'
+import {SideNavBar} from '@instructure/ui-side-nav-bar'
 import {Badge} from '@instructure/ui-badge'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'

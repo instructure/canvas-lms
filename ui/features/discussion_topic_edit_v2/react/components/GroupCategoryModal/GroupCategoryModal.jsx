@@ -194,6 +194,7 @@ export default function GroupCategoryModal({show, setShow, onSubmit}) {
             </SimpleSelect>
             {groupStructure === 'students-by-number-of-groups' ? (
               <NumberInput
+                allowStringValue={true}
                 renderLabel={I18N.t('Number of Groups')}
                 value={numberOfGroups}
                 // 200 is the default maximum number of groups in a set
@@ -215,6 +216,7 @@ export default function GroupCategoryModal({show, setShow, onSubmit}) {
               />
             ) : groupStructure === 'number-of-students-per-group' ? (
               <NumberInput
+                allowStringValue={true}
                 renderLabel={I18N.t('Number of Students Per Group')}
                 value={numberOfStudentsPerGroup}
                 // TODO: this should have a maximum of the number of students in the class

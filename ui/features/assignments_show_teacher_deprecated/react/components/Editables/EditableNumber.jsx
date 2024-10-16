@@ -178,6 +178,7 @@ export default class EditableNumber extends React.Component {
     const p = omitProps(this.props, EditableNumber.propTypes, ['mode'])
     return (
       <NumberInput
+        allowStringValue={true}
         {...p}
         value={`${this.props.value}`}
         placeholder={this.props.placeholder}

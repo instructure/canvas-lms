@@ -49,6 +49,7 @@ const BaseModalOptions = props => {
         <Flex.Item padding="medium">
           <span data-testid="duration-input">
             <NumberInput
+              allowStringValue={true}
               renderLabel={I18n.t('Duration in Minutes')}
               display="inline-block"
               value={noTimeLimit ? '' : props.duration}

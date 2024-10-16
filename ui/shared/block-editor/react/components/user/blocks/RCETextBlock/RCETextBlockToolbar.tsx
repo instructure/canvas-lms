@@ -46,7 +46,7 @@ const RCETextBlockToolbar = () => {
 
   const handleChangeSzVariant = useCallback(
     (
-      _e: React.MouseEvent<ViewOwnProps, MouseEvent>,
+      _e: any,
       value: MenuItemProps['value'] | MenuItemProps['value'][],
       _selected: MenuItemProps['selected'],
       _args: MenuItem

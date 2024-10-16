@@ -360,6 +360,7 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                 <Grid.Row>
                   <Grid.Col width="auto">
                     <NumberInput
+                      allowStringValue={true}
                       id="missing-submission-grade"
                       // @ts-expect-error
                       locale={this.props.locale}
@@ -428,6 +429,7 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                 <Grid.Row>
                   <Grid.Col width="auto">
                     <NumberInput
+                      allowStringValue={true}
                       id="late-submission-deduction"
                       // @ts-expect-error
                       locale={this.props.locale}
@@ -478,6 +480,7 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                 <Grid.Row>
                   <Grid.Col width="auto">
                     <NumberInput
+                      allowStringValue={true}
                       id="late-submission-minimum-percent"
                       // @ts-expect-error
                       locale={this.props.locale}

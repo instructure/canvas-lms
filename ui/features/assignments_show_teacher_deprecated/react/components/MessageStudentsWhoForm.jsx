@@ -115,6 +115,7 @@ export default class MessageStudentsWhoForm extends React.Component {
         this.props.pointsThreshold === null ? '' : this.props.pointsThreshold.toString()
       return (
         <NumberInput
+          allowStringValue={true}
           renderLabel={<ScreenReaderContent>{I18n.t('Points')}</ScreenReaderContent>}
           placeholder={I18n.t('Points')}
           value={points}

@@ -290,6 +290,7 @@ export default function RepeatPicker({
         >
           <span style={{flexShrink: 1}}>
             <NumberInput
+              allowStringValue={true}
               data-testid="repeat-interval"
               display="inline-block"
               renderLabel={<ScreenReaderContent>{I18n.t('every')}</ScreenReaderContent>}

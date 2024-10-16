@@ -108,9 +108,6 @@ const TopNav: React.FC<ITopNavProps> = ({actionItems, getBreadCrumbSetter}) => {
         <TopNavBar.Layout
           themeOverride={overrides}
           navLabel="Top Navigation"
-          desktopConfig={{
-            hideActionsUserSeparator: false,
-          }}
           smallViewportConfig={{
             dropdownMenuToggleButtonLabel: 'Toggle Menu',
             dropdownMenuLabel: 'Main Menu',

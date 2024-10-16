@@ -753,6 +753,7 @@ const MessageStudentsWhoDialog = ({
             {selectedCriterion.requiresCutoff && (
               <>
                 <NumberInput
+                  allowStringValue={true}
                   value={cutoff}
                   onChange={(_e, value) => {
                     // @ts-expect-error

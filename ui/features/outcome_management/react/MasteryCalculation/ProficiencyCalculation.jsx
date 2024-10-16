@@ -128,6 +128,7 @@ const CalculationIntInput = ({
   } else {
     return (
       <NumberInput
+        allowStringValue={true}
         renderLabel={() => I18n.t('Parameter')}
         value={typeof calculationInt === 'number' ? calculationInt : ''}
         messages={errorMessages}

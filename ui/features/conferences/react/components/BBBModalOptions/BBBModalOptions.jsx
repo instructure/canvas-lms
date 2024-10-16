@@ -72,6 +72,7 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
           <Flex.Item padding="small">
             <span data-testid="duration-input">
               <NumberInput
+                allowStringValue={true}
                 renderLabel={I18n.t('Duration in Minutes')}
                 display="inline-block"
                 value={noTimeLimit ? '' : props.duration}

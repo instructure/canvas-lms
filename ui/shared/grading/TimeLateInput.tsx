@@ -109,6 +109,7 @@ export default function TimeLateInput({
       <Flex direction={renderLabelBefore ? 'row-reverse' : 'row'}>
         <Flex.Item>
           <NumberInput
+            allowStringValue={true}
             value={numberInputValue}
             interaction={disabled ? 'disabled' : 'enabled'}
             display="inline-block"

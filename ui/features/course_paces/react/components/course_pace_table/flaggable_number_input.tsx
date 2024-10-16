@@ -82,6 +82,7 @@ export const FlaggableNumberInput = ({
         >
           {/* @ts-expect-error */}
           <NumberInput
+            allowStringValue={true}
             renderLabel={label}
             interaction={interaction}
             width="5.5rem"

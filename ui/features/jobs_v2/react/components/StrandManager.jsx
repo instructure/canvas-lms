@@ -162,6 +162,7 @@ export default function StrandManager({strand, jobs, onUpdate}) {
           <Flex direction="column">
             <Flex.Item padding="xx-small">
               <NumberInput
+                allowStringValue={true}
                 renderLabel={I18n.t('Priority')}
                 value={priority}
                 onChange={onChangePriority}
@@ -176,6 +177,7 @@ export default function StrandManager({strand, jobs, onUpdate}) {
               <>
                 <Flex.Item margin="medium 0 0 0" padding="xx-small">
                   <NumberInput
+                    allowStringValue={true}
                     renderLabel={I18n.t('Dynamic concurrency')}
                     value={maxConcurrent}
                     onChange={onChangeConcurrency}
@@ -186,6 +188,7 @@ export default function StrandManager({strand, jobs, onUpdate}) {
                 {numStrands && (
                   <Flex.Item margin="medium 0 0 0" padding="xx-small">
                     <NumberInput
+                      allowStringValue={true}
                       renderLabel={I18n.t('Permanent num_strands setting')}
                       value={numStrands}
                       onChange={onChangeNumStrands}

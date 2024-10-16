@@ -90,6 +90,7 @@ export default function AllowedAttempts({
 
       <div hidden={!limited} style={{marginTop: '16px'}}>
         <NumberInput
+          allowStringValue={true}
           renderLabel={I18n.t('Number of Attempts')}
           name="allowed_attempts"
           display="inline-block"

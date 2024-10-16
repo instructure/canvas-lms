@@ -87,7 +87,7 @@ export default function MoveDatesModal({onShiftDays, onRemoveDates, onCancel, ..
 
   function renderShiftDaysInput() {
     if (mode === 'shift') {
-      return <NumberInput width="200px" renderLabel="Days" {...shiftDaysProps} />
+      return <NumberInput allowStringValue={true} width="200px" renderLabel="Days" {...shiftDaysProps} />
     }
     return null
   }

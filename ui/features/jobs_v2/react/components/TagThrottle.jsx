@@ -166,6 +166,7 @@ export default function TagThrottle({tag, jobs, onUpdate}) {
           </Flex.Item>
           <Flex.Item padding="xx-small">
             <NumberInput
+              allowStringValue={true}
               renderLabel={I18n.t('New Concurrency')}
               value={maxConcurrent}
               onChange={onChangeConcurrency}

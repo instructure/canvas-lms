@@ -131,7 +131,7 @@ describe('EditUserDetails', () => {
       const shortName = screen.getByLabelText('Display Name')
       const sortableName = screen.getByLabelText('Sortable Name')
       const timezone = screen.getByLabelText('Time Zone')
-      const email = screen.getByLabelText('Default Email')
+      const email = screen.getByLabelText('Default Email *')
 
       expect(name).toBeInTheDocument()
       expect(shortName).toBeInTheDocument()
@@ -183,7 +183,7 @@ describe('EditUserDetails', () => {
       const shortName = screen.getByLabelText('Display Name')
       const sortableName = screen.getByLabelText('Sortable Name')
       const timezone = screen.getByLabelText('Time Zone')
-      const email = screen.getByLabelText('Default Email')
+      const email = screen.getByLabelText('Default Email *')
 
       fireEvent.input(name, {target: {value: newUserDetails.name}})
       fireEvent.input(shortName, {target: {value: newUserDetails.short_name}})

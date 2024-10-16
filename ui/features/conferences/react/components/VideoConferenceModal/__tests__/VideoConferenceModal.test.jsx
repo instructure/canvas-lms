@@ -18,23 +18,23 @@
  */
 
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
-import {VideoConferenceModal} from '../VideoConferenceModal'
+import { fireEvent, render } from '@testing-library/react'
+import { VideoConferenceModal } from '../VideoConferenceModal'
 import userEvent from '@testing-library/user-event'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 
 injectGlobalAlertContainers()
 
 const userList = [
-  {displayName: 'Allison Pitler', id: '7', assetCode: '7'},
-  {displayName: 'Caleb Guanzon', id: '3', assetCode: '3'},
-  {displayName: 'Chawn Neal', id: '2', assetCode: '2'},
-  {displayName: 'Drake Harper', id: '1', assetCode: '1'},
-  {displayName: 'Jason Gillet', id: '5', assetCode: '5'},
-  {displayName: 'Jeffrey Johnson', id: '0', assetCode: '0'},
-  {displayName: 'Jewel Pearson', id: '8', assetCode: '8'},
-  {displayName: 'Nic Nolan', id: '6', assetCode: '6'},
-  {displayName: 'Omar Soto Fortuno', id: '4', assetCode: '4'},
+  { displayName: 'Allison Pitler', id: '7', assetCode: '7' },
+  { displayName: 'Caleb Guanzon', id: '3', assetCode: '3' },
+  { displayName: 'Chawn Neal', id: '2', assetCode: '2' },
+  { displayName: 'Drake Harper', id: '1', assetCode: '1' },
+  { displayName: 'Jason Gillet', id: '5', assetCode: '5' },
+  { displayName: 'Jeffrey Johnson', id: '0', assetCode: '0' },
+  { displayName: 'Jewel Pearson', id: '8', assetCode: '8' },
+  { displayName: 'Nic Nolan', id: '6', assetCode: '6' },
+  { displayName: 'Omar Soto Fortuno', id: '4', assetCode: '4' },
 ]
 
 const startCalendarDate = new Date().toISOString()
@@ -96,8 +96,8 @@ describe('VideoConferenceModal', () => {
 
   it('do not submit without a conference name', async () => {
     const container = setup()
-    expect(container.getByLabelText('Name')).toHaveValue('Amazing Course Conference')
-    await userEvent.clear(container.getByLabelText('Name'))
+    expect(container.getByLabelText('Name *')).toHaveValue('Amazing Course Conference')
+    await userEvent.clear(container.getByLabelText('Name *'))
     fireEvent.click(container.getByTestId('submit-button'))
     expect(onSubmit).not.toHaveBeenCalled()
   })
@@ -105,8 +105,8 @@ describe('VideoConferenceModal', () => {
   it.skip('submit when correct fields are filled (flaky)', async () => {
     const container = setup()
 
-    await userEvent.clear(container.getByLabelText('Name'))
-    await userEvent.type(container.getByLabelText('Name'), 'A great video conference name')
+    await userEvent.clear(container.getByLabelText('Name *'))
+    await userEvent.type(container.getByLabelText('Name *'), 'A great video conference name')
     await userEvent.type(
       container.getByLabelText('Description'),
       'A great video conference description'
@@ -144,14 +144,14 @@ describe('VideoConferenceModal', () => {
       .querySelector("svg[name='IconArrowOpenDown']")
       .closest('button')
 
-    expect(container.getByLabelText('Duration in Minutes')).toHaveValue('60')
+    expect(container.getByLabelText('Duration in Minutes *')).toHaveValue('60')
 
     fireEvent.mouseDown(arrowUpButton)
     fireEvent.mouseDown(arrowUpButton)
-    expect(container.getByLabelText('Duration in Minutes')).toHaveValue('62')
+    expect(container.getByLabelText('Duration in Minutes *')).toHaveValue('62')
 
     fireEvent.mouseDown(arrowDownButton)
-    expect(container.getByLabelText('Duration in Minutes')).toHaveValue('61')
+    expect(container.getByLabelText('Duration in Minutes *')).toHaveValue('61')
   })
 
   it('shows attendees tab after clicking it', () => {
@@ -192,8 +192,8 @@ describe('VideoConferenceModal', () => {
 
     expect(container.getByText('Save')).toBeInTheDocument()
     expect(container.getByText('Edit Video Conference')).toBeInTheDocument()
-    expect(container.getByLabelText('Name')).toHaveValue('PHP Introduction')
-    expect(container.getByLabelText('Duration in Minutes')).toHaveValue('45')
+    expect(container.getByLabelText('Name *')).toHaveValue('PHP Introduction')
+    expect(container.getByLabelText('Duration in Minutes *')).toHaveValue('45')
     expect(container.getByLabelText('Enable recording for this conference').checked).toBeTruthy()
     expect(container.getByLabelText('Description')).toHaveValue('An introduction to PHP.')
 

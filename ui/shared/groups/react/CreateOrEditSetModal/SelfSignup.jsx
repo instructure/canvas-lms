@@ -82,7 +82,7 @@ export const SelfSignup = ({
         </Tooltip>
       </Flex.Item>
       <Flex.Item shouldGrow={true}>
-        <View display="block" padding="x-small x-small">
+        <View display="block" padding="x-small x-small" data-testid="allow-self-signup-wrapper">
           <Checkbox
             checked={selfSignup}
             label={I18n.t('Allow self sign-up')}
