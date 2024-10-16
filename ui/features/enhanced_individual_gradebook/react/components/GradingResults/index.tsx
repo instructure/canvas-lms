@@ -398,7 +398,7 @@ export default function GradingResults({
                 handleChangeReplyToEntryPassFailStatus={handleChangeReplyToEntryPassFailStatus}
               />
             ) : (
-              <Flex alignItems="end" gap="none large">
+              <Flex alignItems="end" gap="none x-large">
                 <Flex.Item>
                   <DefaultGradeInput
                     assignment={assignment}
@@ -415,10 +415,10 @@ export default function GradingResults({
                 </Flex.Item>
 
                 {showSticker && (
-                  <Flex.Item>
+                  <Flex.Item margin="none none small none">
                     <SubmissionSticker
                       confetti={false}
-                      size="medium"
+                      size="small"
                       submission={{...submission, courseId: assignment.courseId}}
                       onStickerChange={sticker => onSubmissionSaved({...submission, sticker})}
                       editable={true}

@@ -51,7 +51,11 @@ export default function ClickableImage({editable, onClick, size, sticker}: Click
   }
 
   return (
-    <Sparkles key={sticker} enabled={typeof sticker === 'string' && hovering}>
+    <Sparkles
+      key={sticker}
+      size={size === 'small' ? 'small' : 'medium'}
+      enabled={typeof sticker === 'string' && hovering}
+    >
       <button
         data-testid="sticker-button"
         className={stickerContainerClass(size)}
@@ -63,7 +67,9 @@ export default function ClickableImage({editable, onClick, size, sticker}: Click
         type="button"
       >
         <div
-          className={`StickerOverlay__Container ${size}${sticker && ' Sticker__ShinyContainer'}`}
+          className={`StickerOverlay__Container ${size}${
+            sticker ? ' Sticker__ShinyContainer' : ''
+          }`}
         >
           <Img
             data-testid="sticker-image"
