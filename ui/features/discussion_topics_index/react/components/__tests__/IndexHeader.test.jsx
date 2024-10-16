@@ -71,12 +71,12 @@ describe('IndexHeader', () => {
 
   it('renders create discussion button if we have create permissions', () => {
     render(<IndexHeader {...makeProps({permissions: {create: true}})} />)
-    expect(screen.getByText('Add discussion')).toBeInTheDocument()
+    expect(screen.getByText('Add Discussion')).toBeInTheDocument()
   })
 
   it('does not render create discussion button if we do not have create permissions', () => {
     render(<IndexHeader {...makeProps({permissions: {create: false}})} />)
-    expect(screen.queryByText('Add discussion')).not.toBeInTheDocument()
+    expect(screen.queryByText('Add Discussion')).not.toBeInTheDocument()
   })
 
   it('renders discussionSettings', () => {

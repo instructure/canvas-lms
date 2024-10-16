@@ -198,8 +198,7 @@ export default class IndexHeader extends Component {
             id="add_discussion"
             renderIcon={IconPlusLine}
           >
-            <ScreenReaderContent>{I18n.t('Add discussion')}</ScreenReaderContent>
-            <PresentationContent>{I18n.t('Discussion')}</PresentationContent>
+            {I18n.t('Add Discussion')}
           </Button>
         )}
         {Object.keys(this.props.userSettings).length ? (
