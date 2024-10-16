@@ -29,7 +29,9 @@ export const useAssignmentsQuery = (courseId: string) => {
       queryKey,
       queryFn: fetchAssignments,
       getNextPageParam: getNextAssignmentsPage,
-      fetchAtLeastOnce: true,
+      meta: {
+        fetchAtLeastOnce: true,
+      },
     })
 
   useEffect(() => {

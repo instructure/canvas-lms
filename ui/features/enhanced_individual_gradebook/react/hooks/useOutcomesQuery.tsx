@@ -28,7 +28,9 @@ export const useOutcomesQuery = (courseId: string) => {
       queryKey,
       queryFn: fetchOutcomes,
       getNextPageParam: getNextOutcomesPage,
-      fetchAtLeastOnce: true,
+      meta: {
+        fetchAtLeastOnce: true,
+      },
     })
 
   useEffect(() => {

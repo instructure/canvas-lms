@@ -95,26 +95,15 @@ window.BroadcastChannel =
 
 const broadcastChannel = new BroadcastChannel(CHANNEL_KEY)
 
-interface CustomUseQueryOptions<
-  TQueryFnData = unknown,
-  TError = unknown,
-  TData = TQueryFnData,
-  TQueryKey extends QueryKey = QueryKey
-> extends UseQueryOptions<TQueryFnData, TError, TData, TQueryKey> {
-  fetchAtLeastOnce?: boolean
-  broadcast?: boolean
-}
-
 export function useQuery<
   TQueryFnData = unknown,
   TError = unknown,
   TData = TQueryFnData,
   TQueryKey extends QueryKey = QueryKey
->(options: CustomUseQueryOptions<TQueryFnData, TError, TData, TQueryKey>) {
-  const ensureFetch = options.fetchAtLeastOnce || wasPageReloaded
+>(options: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>) {
+  const ensureFetch = options.meta?.fetchAtLeastOnce || wasPageReloaded
   const hashedKey = hashQueryKey(options.queryKey || [])
   const wasAlreadyFetched = queriesFetched.has(hashedKey)
-  queriesFetched.add(hashQueryKey(options.queryKey || []))
 
   const refetchOnMount = ensureFetch && !wasAlreadyFetched ? 'always' : options.refetchOnMount
 
@@ -124,33 +113,31 @@ export function useQuery<
     queryKey: options.queryKey,
     queryClient,
     channel: broadcastChannel,
-    enabled: options.broadcast,
+    enabled: Boolean(options.meta?.broadcast),
   })
 
-  const mergedOptions: CustomUseQueryOptions<TQueryFnData, TError, TData, TQueryKey> = {
+  const mergedOptions: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey> = {
     ...options,
     refetchOnMount,
   }
   const queryResult = baseUseQuery<TQueryFnData, TError, TData, TQueryKey>(mergedOptions)
 
+  if (
+    queryResult.isFetchedAfterMount &&
+    queryResult.fetchStatus === 'idle' &&
+    queryResult.isSuccess
+  ) {
+    setTimeout(() => queriesFetched.add(hashedKey), 0)
+  }
+
   useBroadcastWhenFetched({
     hashedKey,
     queryResult,
     channel: broadcastChannel,
-    enabled: options.broadcast,
+    enabled: Boolean(options.meta?.broadcast),
   })
 
   return queryResult
-}
-
-interface CustomUseInfiniteQueryOptions<
-  TQueryFnData = unknown,
-  TError = unknown,
-  TData = TQueryFnData,
-  TQueryKey extends QueryKey = QueryKey
-> extends UseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryFnData, TQueryKey> {
-  fetchAtLeastOnce?: boolean
-  broadcast?: boolean
 }
 
 export function useInfiniteQuery<
@@ -158,16 +145,22 @@ export function useInfiniteQuery<
   TError = unknown,
   TData = TQueryFnData,
   TQueryKey extends QueryKey = QueryKey
->(options: CustomUseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey>) {
-  const ensureFetch = options.fetchAtLeastOnce || wasPageReloaded
+>(options: UseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryFnData, TQueryKey>) {
+  const ensureFetch = options.meta?.fetchAtLeastOnce || wasPageReloaded
   const hashedKey = hashQueryKey(options.queryKey || [])
   const wasAlreadyFetched = queriesFetched.has(hashedKey)
   queriesFetched.add(hashQueryKey(options.queryKey || []))
 
   const refetchOnMount =
-    ensureFetch && !wasAlreadyFetched ? 'always' : options.refetchOnMount ?? false
+    ensureFetch && !wasAlreadyFetched ? 'always' : Boolean(options.meta?.refetchOnMount) ?? false
 
-  const mergedOptions: CustomUseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey> = {
+  const mergedOptions: UseInfiniteQueryOptions<
+    TQueryFnData,
+    TError,
+    TData,
+    TQueryFnData,
+    TQueryKey
+  > = {
     ...options,
     refetchOnMount,
   }

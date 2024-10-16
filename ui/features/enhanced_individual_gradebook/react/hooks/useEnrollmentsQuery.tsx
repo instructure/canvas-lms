@@ -28,7 +28,9 @@ export const useEnrollmentsQuery = (courseId: string) => {
       queryKey,
       queryFn: fetchEnrollments,
       getNextPageParam: getNextEnrollmentPage,
-      fetchAtLeastOnce: true,
+      meta: {
+        fetchAtLeastOnce: true,
+      },
     })
 
   useEffect(() => {

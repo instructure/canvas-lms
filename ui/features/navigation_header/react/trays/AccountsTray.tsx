@@ -31,7 +31,9 @@ export default function AccountsTray() {
   const {data, isLoading, isSuccess} = useQuery({
     queryKey: ['accounts', {pageIndex: 1}],
     queryFn: getAccounts,
-    fetchAtLeastOnce: true,
+    meta: {
+      fetchAtLeastOnce: true,
+    },
   })
 
   return (

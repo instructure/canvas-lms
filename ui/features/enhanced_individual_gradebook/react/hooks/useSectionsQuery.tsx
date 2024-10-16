@@ -28,7 +28,9 @@ export const useSectionsQuery = (courseId: string) => {
       queryKey,
       queryFn: fetchSections,
       getNextPageParam: getNextSectionsPage,
-      fetchAtLeastOnce: true,
+      meta: {
+        fetchAtLeastOnce: true,
+      },
     })
 
   useEffect(() => {

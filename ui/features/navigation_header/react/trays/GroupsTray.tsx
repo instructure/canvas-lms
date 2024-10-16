@@ -33,7 +33,9 @@ export default function GroupsTray() {
   const {data, isLoading, isSuccess} = useQuery<AccessibleGroup[], Error>({
     queryKey: ['groups', 'self', 'can_access'],
     queryFn: groupsQuery,
-    fetchAtLeastOnce: true,
+    meta: {
+      fetchAtLeastOnce: true,
+    },
   })
 
   return (

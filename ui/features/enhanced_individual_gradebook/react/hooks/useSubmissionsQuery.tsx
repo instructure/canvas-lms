@@ -28,7 +28,9 @@ export const useSubmissionsQuery = (courseId: string) => {
       queryKey,
       queryFn: fetchSubmissions,
       getNextPageParam: getNextSubmissionsPage,
-      fetchAtLeastOnce: true,
+      meta: {
+        fetchAtLeastOnce: true,
+      },
     })
 
   useEffect(() => {

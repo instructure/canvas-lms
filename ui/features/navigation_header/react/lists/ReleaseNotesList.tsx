@@ -48,7 +48,9 @@ export default function ReleaseNotesList() {
     queryKey: ['settings', 'release_notes_badge_disabled'],
     queryFn: getSetting,
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes,
-    fetchAtLeastOnce: true,
+    meta: {
+      fetchAtLeastOnce: true,
+    },
   })
 
   const mutation = useMutation({
@@ -70,7 +72,9 @@ export default function ReleaseNotesList() {
     queryKey: ['releaseNotes'],
     queryFn: releaseNotesQuery,
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes,
-    fetchAtLeastOnce: true,
+    meta: {
+      fetchAtLeastOnce: true,
+    },
   })
 
   const [wasFetchingReleaseNotes, setWasFetchingReleaseNotes] = useState(isFetching)

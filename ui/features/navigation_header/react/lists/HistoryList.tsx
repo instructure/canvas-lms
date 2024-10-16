@@ -42,7 +42,9 @@ export default function HistoryList() {
   const {data, fetchNextPage, isFetching, hasNextPage, error} = useInfiniteQuery({
     queryKey: ['history'],
     queryFn: fetchHistory,
-    fetchAtLeastOnce: true,
+    meta: {
+      fetchAtLeastOnce: true,
+    },
     getNextPageParam: lastPage => lastPage.nextPage,
   })
 
