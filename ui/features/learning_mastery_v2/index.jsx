@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import {render} from '@canvas/react'
+import ReactDOM from 'react-dom'
 import ready from '@instructure/ready'
 import LearningMastery from './react'
 
 ready(() => {
-  render(
+  ReactDOM.render(
     <LearningMastery courseId={ENV.GRADEBOOK_OPTIONS.context_id} />,
     document.getElementById('learning_mastery_gradebook')
   )

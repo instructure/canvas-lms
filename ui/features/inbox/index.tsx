@@ -18,9 +18,9 @@
 
 import {CanvasInboxApp} from './react/index'
 import React from 'react'
-import {render} from '@canvas/react'
+import ReactDOM from 'react-dom'
 import ready from '@instructure/ready'
 
 ready(() => {
-  render(<CanvasInboxApp />, document.getElementById('content'))
+  ReactDOM.render(<CanvasInboxApp />, document.getElementById('content'))
 })
