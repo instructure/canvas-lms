@@ -26,7 +26,7 @@ class EportfolioEntry < ActiveRecord::Base
   belongs_to :eportfolio_category
 
   acts_as_list scope: :eportfolio_category
-  before_save :infer_unique_slug
+  before_save :infer_unique_slug, if: ->(entry) { entry.slug.blank? || entry.will_save_change_to_name? }
   before_save :infer_comment_visibility
   after_save :check_for_spam, if: -> { eportfolio.needs_spam_review? }
 
@@ -140,7 +140,7 @@ class EportfolioEntry < ActiveRecord::Base
   def infer_unique_slug
     pages = eportfolio_category.eportfolio_entries rescue []
     self.name ||= t(:default_name, "Page Name")
-    self.slug = self.name.gsub(/\s+/, "_").gsub(/[^\w\d]/, "")
+    self.slug = self.name.to_url.presence || CanvasSlug.generate
     pages = pages.where("id<>?", self) unless new_record?
     match_cnt = pages.where(slug:).count
     if match_cnt > 0
