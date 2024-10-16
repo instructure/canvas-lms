@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import {render} from '@canvas/react'
+import ReactDOM from 'react-dom'
 import JobStats from './react/components/JobStats'
 import ready from '@instructure/ready'
 
 ready(() => {
-  render(<JobStats />, document.getElementById('content'))
+  ReactDOM.render(<JobStats />, document.getElementById('content'))
 })
