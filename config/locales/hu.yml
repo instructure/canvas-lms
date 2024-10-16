@@ -13206,6 +13206,7 @@ hu:
   invalid_value_a1b45937: "érvénytelen érték"
   invalid_value_for_name_i_4a7c601a: "Érvénytelen érték ehhez: %{name}: \"%{i}\""
   invalid_verification_code_16c22ba6: "Érvénytelen ellenőrző kód"
+  invalid_verification_code_please_try_again_fcfc0bc: "Helytelen ellenőrzőkód, kérjük, próbálja újra"
   invalid_xml_configuration_9c3f6bcf: "Érvénytelen XML Konfiguráció"
   invalid_xml_syntax: "Érvénytelen xml szintaxis"
   invitation_only_9a253f1d: "Csak meghívóval"
