@@ -101,6 +101,8 @@ class GroupCategory < ActiveRecord::Base
 
   scope :by_name, -> { order(Bookmarker.order_by) }
   scope :active, -> { where(deleted_at: nil) }
+  scope :collaborative, -> { where(non_collaborative: false) }
+  scope :non_collaborative, -> { where(non_collaborative: true) }
   scope :other_than, ->(cat) { where("group_categories.id<>?", cat.id || 0) }
 
   class << self
