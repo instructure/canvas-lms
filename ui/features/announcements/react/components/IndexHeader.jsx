@@ -369,7 +369,7 @@ export default class IndexHeader extends Component {
                 filters={getFilters()}
                 defaultSelectedFilter="all"
                 onSelectFilter={this.onFilterChange}
-                mobileHeader={breakpoints.mobileOnly}
+                mobileHeader={!breakpoints.ICEDesktop}
               />
             </Flex.Item>
             <Flex.Item width={flexBasis} size={containerSize} overflowY="visible">
