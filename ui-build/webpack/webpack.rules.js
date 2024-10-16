@@ -61,9 +61,12 @@ exports.webpack5Workaround =
     },
   }
 
+// inline CSS into JS with style-loader and css-loader
+// https://rspack.dev/guide/tech/css
 exports.css = {
   test: /\.css$/i,
-  type: 'css',
+  use: ['style-loader', 'css-loader'],
+  type: 'javascript/auto',
 }
 
 exports.images = {
