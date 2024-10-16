@@ -36,6 +36,8 @@ module.exports = {
     '^nanoid(/(.*)|$)': 'nanoid$1',
     '\\.(css)$': '<rootDir>/jest/styleMock.js',
     'crypto-es': '<rootDir>/packages/canvas-rce/src/rce/__mocks__/_mockCryptoEs.ts',
+    '@instructure/studio-player':
+      '<rootDir>/packages/canvas-rce/src/rce/__mocks__/_mockStudioPlayer.js',
   },
   roots: ['<rootDir>/ui', 'gems/plugins', 'public/javascripts'],
   moduleDirectories: ['public/javascripts', 'node_modules'],

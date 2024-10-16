@@ -40,6 +40,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {px} from '@instructure/ui-utils'
 import {MediaPlayer} from '@instructure/ui-media-player'
+import {StudioPlayer} from '@instructure/studio-player'
 import {TextInput} from '@instructure/ui-text-input'
 import formatMessage from './format-message'
 
@@ -64,6 +65,7 @@ export default function ComputerPanel({
   userLocale,
   bounds,
   mountNode,
+  useStudioPlayer,
 }) {
   const {ADD_CLOSED_CAPTIONS_OR_SUBTITLES, LOADING_MEDIA} =
     uploadMediaTranslations.UploadMediaStrings
@@ -147,7 +149,7 @@ export default function ComputerPanel({
             </Button>
           </Flex.Item>
         </Flex>
-        <View as="div" textAlign="center" margin="0 auto">
+        <View as="div" textAlign="center" margin="0 auto" width={useStudioPlayer ? width : undefined} height={useStudioPlayer ? height : undefined}>
           {/* avi, wma, and wmv files won't load from a blob URL */}
           {!(isPreviewable(theFile.type) && previewURL) ? (
             <>
@@ -156,6 +158,11 @@ export default function ComputerPanel({
                 {formatMessage('No preview is available for this file.')}
               </Text>
             </>
+          ) : useStudioPlayer ? (
+            <StudioPlayer
+              src={[{src: previewURL, type: theFile.type}]}
+              hideFullScreen={!(document.fullscreenEnabled || document.webkitFullscreenEnabled)}
+            />
           ) : (
             <MediaPlayer
               sources={[{label: theFile.name, src: previewURL, type: theFile.type}]}
@@ -252,4 +259,5 @@ ComputerPanel.propTypes = {
   }),
   userLocale: string.isRequired,
   mountNode: oneOfType([element, func]),
+  useStudioPlayer: bool,
 }

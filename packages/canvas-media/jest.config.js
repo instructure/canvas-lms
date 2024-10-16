@@ -44,4 +44,8 @@ module.exports = {
       },
     ],
   },
+  moduleNameMapper: {
+    '@instructure/studio-player':
+      '<rootDir>/__mocks__/@instructure/studio-player/_mockStudioPlayer.js',
+  },
 }
