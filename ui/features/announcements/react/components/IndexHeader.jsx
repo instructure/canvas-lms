@@ -176,8 +176,7 @@ export default class IndexHeader extends Component {
           renderIcon={IconPlusLine}
           key="addAnnouncementButton"
         >
-          <ScreenReaderContent>{I18n.t('Add announcement')}</ScreenReaderContent>
-          <PresentationContent>{I18n.t('Announcement')}</PresentationContent>
+          {I18n.t('Add Announcement')}
         </Button>
       )
     )
