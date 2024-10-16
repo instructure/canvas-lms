@@ -17,35 +17,43 @@
  */
 
 import React, {useState} from 'react'
-import {useParams} from 'react-router-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {Rubric} from '@canvas/rubrics/react/types/rubric'
-import {Table} from '@instructure/ui-table'
-import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {RubricPopover} from './RubricPopover'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {Flex} from '@instructure/ui-flex'
+import {Link} from '@instructure/ui-link'
 import {Pill} from '@instructure/ui-pill'
+import {Table} from '@instructure/ui-table'
+import {useParams} from 'react-router-dom'
+import {RubricPopover} from './RubricPopover'
 
 const I18n = useI18nScope('rubrics-list-table')
 
 const {Head, Row, Cell, ColHeader, Body} = Table
 
 export type RubricTableProps = {
+  active: boolean
+  canImportExportRubrics: boolean
   canManageRubrics: boolean
-  rubrics: Rubric[]
+  handleArchiveRubricChange: (rubricId: string) => void
+  handleCheckboxChange: (event: React.ChangeEvent<HTMLInputElement>, rubricId: string) => void
   onLocationsClick: (rubricId: string) => void
   onPreviewClick: (rubricId: string) => void
-  handleArchiveRubricChange: (rubricId: string) => void
-  active: boolean
+  rubrics: Rubric[]
+  selectedRubricIds: string[]
 }
 
 export const RubricTable = ({
-  canManageRubrics,
-  rubrics,
-  handleArchiveRubricChange,
   active,
+  canManageRubrics,
+  canImportExportRubrics,
+  handleArchiveRubricChange,
+  handleCheckboxChange,
   onLocationsClick,
   onPreviewClick,
+  rubrics,
+  selectedRubricIds,
 }: RubricTableProps) => {
   const {accountId, courseId} = useParams()
   const [sortDirection, setSortDirection] = useState<'ascending' | 'descending' | 'none'>('none')
@@ -136,16 +144,34 @@ export const RubricTable = ({
         {sortedRubrics.map((rubric, index) => (
           <Row key={rubric.id} data-testid={`rubric-row-${rubric.id}`}>
             <Cell data-testid={`rubric-title-${index}`}>
-              <Link
-                forceButtonRole={true}
-                isWithinText={false}
-                data-testid={`rubric-title-preview-${rubric.id}`}
-                onClick={() => onPreviewClick(rubric.id)}
-              >
-                {rubric.title}
-              </Link>
-              {rubric.workflowState === 'draft' && <Pill margin="x-small">{I18n.t('Draft')}</Pill>}
+              <Flex direction="row" alignItems="center">
+                {canImportExportRubrics && (
+                  <Flex.Item margin="0 small 0 0">
+                    <Checkbox
+                      label=""
+                      value={rubric.id}
+                      onChange={event => handleCheckboxChange(event, rubric.id)}
+                      checked={selectedRubricIds.includes(rubric.id)}
+                      data-testid={`rubric-select-checkbox-${rubric.id}`}
+                    />
+                  </Flex.Item>
+                )}
+                <Flex.Item>
+                  <Link
+                    forceButtonRole={true}
+                    isWithinText={false}
+                    data-testid={`rubric-title-preview-${rubric.id}`}
+                    onClick={() => onPreviewClick(rubric.id)}
+                  >
+                    {rubric.title}
+                  </Link>
+                  {rubric.workflowState === 'draft' && (
+                    <Pill margin="x-small">{I18n.t('Draft')}</Pill>
+                  )}
+                </Flex.Item>
+              </Flex>
             </Cell>
+
             <Cell data-testid={`rubric-points-${index}`}>{rubric.pointsPossible}</Cell>
             <Cell data-testid={`rubric-criterion-count-${index}`}>{rubric.criteriaCount}</Cell>
             <Cell data-testid={`rubric-locations-${index}`}>
