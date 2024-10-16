@@ -87,7 +87,10 @@ def postFn() {
     message = message + "\n" + mapSpecInfo
     // Only alert and push to s3 on periodic jobs, not ones resulting from manual tests
     if (env.CRYSTALBALL_MAP_PUSH_TO_S3 == '1' && env.GERRIT_EVENT_TYPE != 'comment-added') {
-      sh 'aws s3 cp crystalball_map.yml s3://instructure-canvas-ci/'
+      withCredentials([usernamePassword(credentialsId: 'INSENG_CANVAS_CI_AWS_ACCESS', usernameVariable: 'INSENG_AWS_ACCESS_KEY_ID', passwordVariable: 'INSENG_AWS_SECRET_ACCESS_KEY')]) {
+        def awsCreds = "AWS_DEFAULT_REGION=us-west-2 AWS_ACCESS_KEY_ID=${INSENG_AWS_ACCESS_KEY_ID} AWS_SECRET_ACCESS_KEY=${INSENG_AWS_SECRET_ACCESS_KEY}"
+        sh "$awsCreds aws s3 cp crystalball_map.yml s3://instructure-canvas-ci/"
+      }
     }
   } catch(e) {
     message = message + "\nMap Invalid!"
