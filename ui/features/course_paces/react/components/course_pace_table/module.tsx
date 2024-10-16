@@ -243,7 +243,7 @@ export const Module = (props: ComponentProps) => {
                       </Tooltip>
                     </Flex>
                   </Table.ColHeader>
-                  {renderDateColHeader()}
+                  {renderDateColHeader() as any}
                   <Table.ColHeader
                     data-testid="pp-status-columnheader"
                     id={`module-${props.module.id}-status`}

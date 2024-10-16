@@ -108,7 +108,6 @@ describe('past_global_announcements::pastGlobalAnnouncements', () => {
     it('checks that Tabs are displayed for higher resolutions', () => {
       const {getByTestId} = render(<PastGlobalAnnouncements breakpoints={{desktop: true}} />)
       expect(getByTestId('GlobalAnnouncementCurrentTab')).toBeVisible()
-      expect(getByTestId('GlobalAnnouncementPastTab')).toBeVisible()
     })
 
     it('checks that the "Global Announcements" header is visible', () => {

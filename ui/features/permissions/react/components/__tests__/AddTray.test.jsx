@@ -223,7 +223,7 @@ it('clears the empty role name error when text is entered', async () => {
   const props = defaultProps()
   render(<AddTray {...props} />)
   const save = screen.getByText('Save')
-  const roleNameInput = screen.getByLabelText('Role Name')
+  const roleNameInput = screen.getByLabelText('Role Name *')
 
   fireEvent.click(save)
 

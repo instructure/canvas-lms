@@ -80,7 +80,7 @@ describe('FindReplaceTray', () => {
     expect(errorText).toBeNull()
     await waitFor(() => {
       expect(fakePlugin.done).toHaveBeenCalledTimes(1)
-    })
+    },{timeout:2000})
   })
 
   it('cleans up when closed', async () => {

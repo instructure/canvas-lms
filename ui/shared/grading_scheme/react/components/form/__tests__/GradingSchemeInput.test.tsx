@@ -51,7 +51,7 @@ describe('GradingSchemeInput', () => {
       />
     )
 
-    const titleInput = screen.getByLabelText('Grading Scheme Name')
+    const titleInput = screen.getByLabelText('Grading Scheme Name *')
     expect(titleInput).toBeInTheDocument()
 
     const letterGradeInputs = screen.getAllByLabelText<HTMLInputElement>('Letter Grade')
@@ -93,7 +93,7 @@ describe('GradingSchemeInput', () => {
       />
     )
 
-    const titleInput = screen.getByLabelText('Grading Scheme Name')
+    const titleInput = screen.getByLabelText('Grading Scheme Name *')
     expect(titleInput).toBeInTheDocument()
 
     const letterGradeInputs = screen.getAllByLabelText<HTMLInputElement>('Letter Grade')
@@ -636,7 +636,7 @@ describe('GradingSchemeInput', () => {
       />
     )
 
-    const titleInput = screen.getByLabelText('Grading Scheme Name')
+    const titleInput = screen.getByLabelText('Grading Scheme Name *')
     expect(titleInput).toBeInTheDocument()
 
     const percentageRadioInput = screen.getByLabelText<HTMLInputElement>('Percentage')
@@ -684,7 +684,7 @@ describe('GradingSchemeInput', () => {
       />
     )
 
-    const titleInput = screen.getByLabelText('Grading Scheme Name')
+    const titleInput = screen.getByLabelText('Grading Scheme Name *')
     expect(titleInput).toBeInTheDocument()
 
     const percentageRadioInput = screen.getByLabelText<HTMLInputElement>('Percentage')
@@ -698,7 +698,7 @@ describe('GradingSchemeInput', () => {
     expect(pointsRadioInput).toBeChecked()
 
     // verify scheme changed from pct to points defaults
-    const titleInputPoints = screen.getByLabelText<HTMLInputElement>('Grading Scheme Name')
+    const titleInputPoints = screen.getByLabelText<HTMLInputElement>('Grading Scheme Name *')
     expect(titleInputPoints).toBeInTheDocument()
     expect(titleInputPoints.value).toEqual('A Grading Scheme') // title does not change when points / pct radio changes
 

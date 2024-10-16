@@ -72,10 +72,10 @@ describe('BaseModalOptions', () => {
     expect(container).toBeTruthy()
   })
 
-  it('should render with default props', () => {
+  it('should render with default props', () => { 
     const {getByLabelText, getAllByLabelText} = setup(defaultProps)
-    expect(getByLabelText('Name')).toHaveValue(defaultProps.name)
-    expect(getAllByLabelText('Duration in Minutes')[0]).toHaveValue(
+    expect(getByLabelText('Name *')).toHaveValue(defaultProps.name)
+    expect(getAllByLabelText('Duration in Minutes *')[0]).toHaveValue(
       defaultProps.duration.toString()
     )
     expect(getByLabelText('No time limit (for long-running conferences)').checked).toBeFalsy()

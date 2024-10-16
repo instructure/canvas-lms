@@ -15,7 +15,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import {cleanup, render, screen, waitFor} from '@testing-library/react'
+import {cleanup, render, screen, waitFor, waitForElementToBeRemoved} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import LoginHelp, {renderLoginHelp} from '../loginHelp'
@@ -54,9 +54,9 @@ describe('LoginHelp Component and Helpers', () => {
       userEvent.click(screen.getByText('Help'))
       expect(screen.getByText('Login Help for Canvas LMS')).toBeInTheDocument()
       await userEvent.click(screen.getByTestId('login-help-close-button'))
-      await waitFor(() => {
+      await waitForElementToBeRemoved(screen.queryByText('Login Help for Canvas LMS')).then(() =>
         expect(screen.queryByText('Login Help for Canvas LMS')).not.toBeInTheDocument()
-      })
+      )
     })
   })
 

@@ -532,7 +532,8 @@ const RatingRow = ({
                   {unassessed ? (
                     <Flex.Item>
                       <NumberInput
-                        renderLabel={
+                        allowStringValue={true}
+                      renderLabel={
                           <ScreenReaderContent>{I18n.t('Rating Points')}</ScreenReaderContent>
                         }
                         value={pointsInputText}

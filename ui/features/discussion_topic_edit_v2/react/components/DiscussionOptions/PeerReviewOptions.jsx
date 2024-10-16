@@ -74,6 +74,7 @@ export const PeerReviewOptions = ({
         <>
           <View as="div" margin="small 0 small large">
             <NumberInput
+              allowStringValue={true}
               data-testid="peer-review-count-input"
               renderLabel={I18n.t('Reviews Per Student')}
               onIncrement={() => setPeerReviewsPerStudent(peerReviewsPerStudent + 1)}

@@ -77,6 +77,7 @@ export const CheckpointsSettings = () => {
       </View>
       <View as="div" margin="0 0 medium 0">
         <NumberInput
+          allowStringValue={true}
           data-testid="reply-to-entry-required-count"
           renderLabel={
             <>

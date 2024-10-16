@@ -35,7 +35,7 @@ module DeveloperKeysCommon
   end
 
   def click_enforce_scopes
-    f("[data-automation='enforce_scopes'] div").click
+    f("[data-automation='enforce_scopes'] div div").click
   end
 
   def click_scope_group_checkbox

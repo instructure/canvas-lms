@@ -110,6 +110,7 @@ export default class OverrideAttempts extends React.Component {
       return (
         <Flex.Item margin="small 0 0" data-testid="OverrideAttempts-Attempts">
           <NumberInput
+            allowStringValue={true}
             readOnly={this.props.readOnly}
             display="inline-block"
             width="5.5rem"

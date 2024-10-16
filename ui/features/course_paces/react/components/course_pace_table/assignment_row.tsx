@@ -351,7 +351,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
               {this.renderDurationInput()}
             </View>
           </Table.Cell>
-          {(this.props.showProjections || this.props.datesVisible) && (
+          {(this.props.showProjections || this.props.datesVisible)? (
             <Table.Cell data-testid="pp-due-date-cell" textAlign="center">
               <View data-testid="assignment-due-date" margin={labelMargin}>
                 <span style={{whiteSpace: this.props.isStacked ? 'normal' : 'nowrap'}}>
@@ -359,7 +359,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
                 </span>
               </View>
             </Table.Cell>
-          )}
+          ):<></>}
           <Table.Cell
             data-testid="pp-status-cell"
             textAlign={this.props.isStacked ? 'start' : 'center'}

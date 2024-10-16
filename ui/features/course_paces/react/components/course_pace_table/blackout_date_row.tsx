@@ -115,7 +115,7 @@ class BlackoutDateRow extends React.Component<PassedProps, LocalState> {
           <Table.Cell colSpan={this.props.isStacked ? 2 : 1} textAlign="center">
             <View margin={labelMargin}>{this.renderDates()}</View>
           </Table.Cell>
-          {!this.props.isStacked && <Table.Cell />}
+          {!this.props.isStacked ? <Table.Cell /> : <></>}
         </Table.Row>
       </InstUISettingsProvider>
     )

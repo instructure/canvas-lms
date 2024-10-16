@@ -163,6 +163,7 @@ export default function RequirementSelector({
           <Flex padding="small 0">
             <Flex.Item shouldShrink={true}>
               <NumberInput
+                allowStringValue={true}
                 value={requirement.minimumScore}
                 width="4rem"
                 showArrows={false}

@@ -220,7 +220,7 @@ class StudentAssignmentPageV2
     end
 
     def similarity_pledge
-      f("div[data-testid='similarity-pledge']")
+      f("div[data-testid='similarity-pledge'] div div")
     end
 
     def submit_button

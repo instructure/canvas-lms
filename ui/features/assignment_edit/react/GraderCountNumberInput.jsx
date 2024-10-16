@@ -94,6 +94,7 @@ export default class GraderCountNumberInput extends React.Component {
     return (
       <div className="ModeratedGrading__GraderCountInputContainer">
         <NumberInput
+          allowStringValue={true}
           id="grader_count"
           value={this.state.graderCount.toString()}
           renderLabel={label}
