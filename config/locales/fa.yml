@@ -12946,6 +12946,7 @@ fa:
   invalid_utf_8_13c76a6: "UTF-8 معتبر نیست"
   invalid_value_a1b45937: "مقدار نامعتبر"
   invalid_value_for_name_i_4a7c601a: "مقدار نامعتبر برای %{name} : \"%{i}\""
+  invalid_verification_code_please_try_again_fcfc0bc: "رمز تأیید معتبر نیست، لطفا دوباره تلاش کنید"
   invalid_xml_configuration_9c3f6bcf: "پیکربندی xml معتبر نیست"
   invalid_xml_syntax: "قواعد xml معتبر نیست"
   invitation_only_9a253f1d: "فقط از طریق دعوت نامه"
