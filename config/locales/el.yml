@@ -7613,6 +7613,7 @@ el:
   invalid_url_cbde79f: "Μη έγκυρο URL"
   invalid_url_in_xml: "<mrk mid=\"5707\" mtype=\"seg\">Μη έγκυρο url στο xml.</mrk> <mrk mid=\"5708\" mtype=\"seg\">O χαρακτήρας «&amp;» δεν πρέπει να εμφανίζεται.</mrk>"
   invalid_utf_8_13c76a6: "Μη έγκυρο UTF-8"
+  invalid_verification_code_please_try_again_fcfc0bc: "Μη έγκυρος κωδικός επιβεβαίωσης, παρακαλώ δοκιμάστε ξανά"
   invalid_xml_syntax: "Μη έγκυρη συντακτική δομή xml"
   invite_5b1fcbcd: Πρόσκληση
   ip_filter_is_not_valid_152a46d8: "Το φίλτρο IP δεν είναι έγκυρο."
