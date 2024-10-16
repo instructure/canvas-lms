@@ -19,7 +19,7 @@
 #
 
 class CanvasAntiabuseAnalyzer < GraphQL::Analysis::Analyzer
-  def initialize(query_or_multiplex)
+  def initialize(subject)
     super
     @alias_count = 0
     @directive_count = 0
@@ -38,13 +38,20 @@ class CanvasAntiabuseAnalyzer < GraphQL::Analysis::Analyzer
 
     if @directive_count > GraphQLTuning.max_query_directives
       log_to_sentry("GraphQL: max query directives exceeded", directive_count: @directive_count)
-      GraphQL::AnalysisError.new("max query aliases exceeded")
+      GraphQL::AnalysisError.new("max query directives exceeded")
     end
   end
 
   private
 
+  def additional_context
+    # subject is either a query or a multiplex, and the parent class constructor assigns the subject to @query or
+    # @multiplex after a class check
+    { operation_name: (@query ? @query.operation_name : @multiplex.map(&:operation_name).join(", ")) }
+  end
+
   def log_to_sentry(message, extra = {})
+    extra = extra.merge(additional_context)
     Sentry.with_scope do |scope|
       scope.set_context("graphql", extra)
       Sentry.capture_message(message, level: :warning)
