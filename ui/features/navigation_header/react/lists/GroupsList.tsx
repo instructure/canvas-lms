@@ -31,7 +31,9 @@ export default function CoursesList() {
   const {data, isLoading, isSuccess} = useQuery({
     queryKey: ['groups', 'self', 'can_access'],
     queryFn: groupsQuery,
-    fetchAtLeastOnce: true,
+    meta: {
+      fetchAtLeastOnce: true,
+    },
   })
 
   return (

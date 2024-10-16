@@ -42,7 +42,9 @@ export default function HelpLinks({onClick}: Props) {
   const {data, isLoading, isSuccess} = useQuery<HelpLink[]>({
     queryKey: ['helpLinks'],
     queryFn: helpLinksQuery,
-    fetchAtLeastOnce: true,
+    meta: {
+      fetchAtLeastOnce: true,
+    },
   })
 
   const links = data || []
