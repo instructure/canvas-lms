@@ -10391,6 +10391,7 @@ he:
   invalid_url_in_xml: "כתובת אינטרנט שגויה ב XML. אין לכלול אמפרסנדים - &"
   invalid_username_or_password_b60aa240: "שם משתמש או סיסמה שגויים"
   invalid_utf_8_13c76a6: "UTF-8 לא תקין"
+  invalid_verification_code_please_try_again_fcfc0bc: "קוד אימות שגוי, יש לנסות שוב"
   invalid_xml_configuration_9c3f6bcf: "הגדרות XML לא תקינות"
   invalid_xml_syntax: "סינטקס ה XML אינו תקין"
   invite_5b1fcbcd: הזמנה
