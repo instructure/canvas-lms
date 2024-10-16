@@ -731,6 +731,15 @@ describe GroupCategory do
       expect(another_category.reload.non_collaborative).to be false
     end
 
+    it "can filter out collaborative and noncollaborative groups" do
+      non_collaborative_group_category = GroupCategory.create(name: "Test Category", context: @course, non_collaborative: true)
+      collaborative_group_category = GroupCategory.create(name: "Test Category 2", context: @course, non_collaborative: false)
+
+      expect(GroupCategory.non_collaborative).to eq [non_collaborative_group_category]
+      expect(GroupCategory.collaborative).to include(collaborative_group_category)
+      expect(GroupCategory.collaborative).not_to include(non_collaborative_group_category)
+    end
+
     it "can only be created for courses" do
       course_category = GroupCategory.new(name: "Course Category", context: @course, non_collaborative: true)
       expect(course_category).to be_valid

@@ -949,6 +949,15 @@ describe Group do
       @collaborative_category = GroupCategory.create!(name: "Collaborative Category", context: @course, non_collaborative: false)
     end
 
+    it "can filter out collaborative and noncollaborative groups" do
+      non_collaborative_group = Group.create(context: @course, group_category: @non_collaborative_category, name: "Non-Collaborative Group")
+      collaborative_group = Group.create(context: @course, group_category: @collaborative_category, name: "Collaborative Group")
+
+      expect(Group.non_collaborative).to eq [non_collaborative_group]
+      expect(Group.collaborative).to include(collaborative_group)
+      expect(Group.collaborative).not_to include(non_collaborative_group)
+    end
+
     it "non_collaborative can be set on creation but cannot be changed afterwards" do
       # Set non_collaborative on creation
       group = Group.create(context: @course, group_category: @non_collaborative_category, name: "Test Group")
