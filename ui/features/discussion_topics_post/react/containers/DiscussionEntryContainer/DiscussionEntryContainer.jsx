@@ -118,9 +118,7 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
                 lastReplyAtDisplay={props.lastReplyAtDisplay}
                 isTopic={props.isTopic}
                 isTopicAuthor={props.isTopicAuthor}
-                discussionEntryVersions={
-                  props.discussionEntry?.discussionEntryVersionsConnection?.nodes || []
-                }
+                discussionEntryVersions={props.discussionEntry?.discussionEntryVersions || []}
                 reportTypeCounts={props.discussionEntry?.reportTypeCounts}
                 threadMode={threadMode}
                 toggleUnread={props.toggleUnread}
