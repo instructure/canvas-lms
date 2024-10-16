@@ -92,7 +92,9 @@ export const HeadingMenu: React.FC<Props> = ({
       gap="small"
     >
       <Flex.Item width={mobileHeader ? 'min-content' : 'auto'}>
-        <Heading level="h1">{filters[selected_filter].title}</Heading>
+        <Heading as="h1" level={mobileHeader ? 'h2' : 'h1'} themeOverride={{h2FontWeight: 700}}>
+          {filters[selected_filter].title}
+        </Heading>
       </Flex.Item>
       <Flex.Item>
         <Menu

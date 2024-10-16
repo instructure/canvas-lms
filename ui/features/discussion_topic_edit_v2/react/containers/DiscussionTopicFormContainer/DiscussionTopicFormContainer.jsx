@@ -191,7 +191,7 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
     return instUINavEnabled() ? (
       <Flex margin={headerMargin} direction="column" as="div">
         <Flex.Item margin="0" overflow="hidden">
-          <Heading as="h1" level={breakpoints.desktop ? 'h1' : 'h2'}>
+          <Heading as="h1" level={breakpoints.ICEDesktop ? 'h1' : 'h2'} themeOverride={{h2FontWeight: 700}}>
             {titleContent}
           </Heading>
         </Flex.Item>

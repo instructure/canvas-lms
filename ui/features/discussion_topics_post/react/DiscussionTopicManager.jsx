@@ -48,6 +48,7 @@ import {flushSync} from 'react-dom'
 import {captureException} from '@sentry/react'
 import {LoadingSpinner} from './components/LoadingSpinner/LoadingSpinner'
 import useSpeedGrader from './hooks/useSpeedGrader'
+import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -410,6 +411,7 @@ const DiscussionTopicManager = props => {
                   >
                     <DiscussionTopicHeaderContainer
                       discussionTopicTitle={discussionTopicQuery.data.legacyNode.title}
+                      mobileHeader={!props.breakpoints.ICEDesktop}
                     />
                     <DiscussionTopicToolbarContainer
                       discussionTopic={discussionTopicQuery.data.legacyNode}
@@ -520,6 +522,7 @@ const DiscussionTopicManager = props => {
 
 DiscussionTopicManager.propTypes = {
   discussionTopicId: PropTypes.string.isRequired,
+  breakpoints: breakpointsShape,
 }
 
-export default DiscussionTopicManager
+export default WithBreakpoints(DiscussionTopicManager)
