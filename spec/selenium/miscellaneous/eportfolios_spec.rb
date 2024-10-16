@@ -76,7 +76,7 @@ describe "eportfolios" do
       get "/eportfolios/#{@eportfolio.id}"
       add_eportfolio_page(page_title)
       expect(f("#page_list")).to include_text(page_title)
-      get "/eportfolios/#{@eportfolio.id}/category/I_made_this_page"
+      get "/eportfolios/#{@eportfolio.id}/category/i-made-this-page"
       wait_for_ajaximations
       expect(pages.last).to include_text(page_title)
       expect(f("#content h2")).to include_text(page_title)
