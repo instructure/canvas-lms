@@ -38,6 +38,7 @@ import {View} from '@instructure/ui-view'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+import DownloadSubmissionsModal from '@canvas/download-submissions-modal'
 
 const I18n = useI18nScope('assignment_more_button')
 
@@ -48,12 +49,16 @@ const OptionsMenu = ({
   assignment: TeacherAssignmentType
   breakpoints: Breakpoints
 }): React.ReactElement => {
-  const [menuOpen, setMenuOpen, setMenuClose] = useBoolean(false)
   const [menuWidth, setMenuWidth] = useState(window.innerWidth)
   const buttonRef = useRef<HTMLButtonElement | null>(null)
   const [sendToModal, setSendToModalOpen, setSendToModalClose] = useBoolean(false)
   const [copyToTray, setCopyToTrayOpen, setCopyToTrayClose] = useBoolean(false)
   const [assignToTray, setAssignToTrayOpen, setAssignToTrayClose] = useBoolean(false)
+  const [
+    downloadSubmissionsModal,
+    setDownloadSubmissionsModalOpen,
+    setDownloadSubmissionsModalClose,
+  ] = useBoolean(false)
   const peerReviewLink = `/courses/${assignment.course.lid}/assignments/${assignment.lid}/peer_reviews`
   const editLink = `/courses/${assignment.course.lid}/assignments/${assignment.lid}/edit`
   const speedgraderLink = `/courses/${assignment.course.lid}/gradebook/speed_grader?assignment_id=${assignment.lid}`
@@ -75,20 +80,11 @@ const OptionsMenu = ({
     updateMenuWidth()
   }
 
-  const handleMenuToggle = (show: boolean, _menu: Menu): void => {
-    if (show && setMenuOpen instanceof Function) {
-      setMenuOpen()
-    } else if (!show && setMenuClose instanceof Function) {
-      setMenuClose()
-    }
-  }
-
   return (
     <>
       <Menu
         id="assignment_options_menu"
         label="assignment_options_menu"
-        onToggle={handleMenuToggle}
         themeOverride={
           breakpoints.mobileOnly
             ? {minWidth: `${menuWidth}px`, maxWidth: BREAKPOINTS.mobileOnly.maxWidth}
@@ -151,7 +147,11 @@ const OptionsMenu = ({
           </Menu.Item>
         )}
         {assignment.hasSubmittedSubmissions && (
-          <Menu.Item value="Download Submissions" data-testid="download-submissions-option">
+          <Menu.Item
+            value="Download Submissions"
+            onClick={setDownloadSubmissionsModalOpen}
+            data-testid="download-submissions-option"
+          >
             <Flex>
               <View margin="0 x-small 0 0">
                 <IconDownloadLine />
@@ -205,7 +205,6 @@ const OptionsMenu = ({
           </Flex>
         </Menu.Item>
       </Menu>
-
       <View margin="0">
         <ItemAssignToTray
           open={assignToTray}
@@ -220,7 +219,6 @@ const OptionsMenu = ({
           itemContentId={assignment.lid}
           pointsPossible={assignment.pointsPossible as number}
         />
-
         <DirectShareCourseTray
           data-testid="copy-to-tray"
           open={copyToTray}
@@ -231,7 +229,6 @@ const OptionsMenu = ({
             buttonRef.current?.focus()
           }}
         />
-
         <DirectShareUserModal
           data-testid="send-to-modal"
           open={sendToModal}
@@ -241,6 +238,12 @@ const OptionsMenu = ({
             setSendToModalClose()
             buttonRef.current?.focus()
           }}
+        />
+        <DownloadSubmissionsModal
+          open={downloadSubmissionsModal}
+          handleCloseModal={setDownloadSubmissionsModalClose}
+          assignmentId={assignment.lid}
+          courseId={assignment.course.lid}
         />
       </View>
     </>
