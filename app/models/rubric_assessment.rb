@@ -201,7 +201,9 @@ class RubricAssessment < ActiveRecord::Base
     case artifact_type
     when "Submission"
       assignment = rubric_association.association_object
-      return unless assignment.grants_right?(assessor, :grade)
+      # as part of the initial checkpoints release, we will not respect use for grading for checkpoints
+      # use for grading will be respected, when support for rubrics on checkpoints has been fleshed-out
+      return if !assignment.grants_right?(assessor, :grade) || assignment.checkpoints_parent?
 
       assignment.grade_student(
         artifact.student,
