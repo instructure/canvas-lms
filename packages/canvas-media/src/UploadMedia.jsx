@@ -101,6 +101,7 @@ export class UploadMediaModal extends React.Component {
     // for testing
     computerFile: instanceOf(File),
     userLocale: string,
+    useStudioPlayer: bool,
   }
 
   static defaultProps = {
@@ -332,6 +333,7 @@ export class UploadMediaModal extends React.Component {
                 }}
                 bounds={this.state.modalBodySize}
                 mountNode={this.props.mountNode}
+                useStudioPlayer={this.props.useStudioPlayer}
               />
             </Suspense>
           </Tabs.Panel>

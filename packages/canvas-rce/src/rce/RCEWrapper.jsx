@@ -318,6 +318,7 @@ class RCEWrapper extends React.Component {
       media_links_use_attachment_id = false,
       rce_find_replace = false,
       file_verifiers_for_quiz_links = false,
+      consolidated_media_player = false,
     } = this.props.features
 
     return {
@@ -327,6 +328,7 @@ class RCEWrapper extends React.Component {
       media_links_use_attachment_id,
       file_verifiers_for_quiz_links,
       rce_find_replace,
+      consolidated_media_player,
     }
   }
 

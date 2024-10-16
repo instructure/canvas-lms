@@ -381,6 +381,7 @@ class ApplicationController < ActionController::Base
     discussion_checkpoints
     speedgrader_studio_media_capture
     disallow_threaded_replies_fix_alert
+    consolidated_media_player
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
