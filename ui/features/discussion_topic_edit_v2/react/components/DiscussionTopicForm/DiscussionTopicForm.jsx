@@ -825,7 +825,10 @@ function DiscussionTopicForm({
         shouldMasteryPathsBeVisible={ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !isAnnouncement}
         shouldMasteryPathsBeEnabled={isGraded}
       />
-      <div style={{display: selectedView === Views.Details ? 'block' : 'none'}}>
+      <View
+        margin={breakpoints.mobileOnly ? 'mediumSmall 0 0 0' : '0'}
+        display={selectedView === Views.Details ? 'block' : 'none'}
+      >
         <FormFieldGroup description="" rowSpacing="small">
           {isUnpublishedAnnouncement && (
             <Alert variant={announcementAlertProps().variant}>
@@ -1247,7 +1250,7 @@ function DiscussionTopicForm({
               <div id="assignment_external_tools" data-testid="assignment-external-tools" />
             )}
         </FormFieldGroup>
-      </div>
+      </View>
       <div style={{display: selectedView === Views.MasteryPaths ? 'block' : 'none'}}>
         {ENV.CONDITIONAL_RELEASE_ENV && (
           <MasteryPathsReactWrapper type="discussion topic" env={ENV.CONDITIONAL_RELEASE_ENV} />
