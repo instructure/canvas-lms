@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-properties */
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -43,6 +44,7 @@ import type {
 import type {SubmissionOriginalityData} from '@canvas/grading/grading.d'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {Alert} from '@instructure/ui-alerts'
 import {IconButton} from '@instructure/ui-buttons'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
@@ -861,6 +863,19 @@ function renderCheckpoints(submission: Submission) {
         assignmentId={submission.assignment_id}
         studentId={submission.user_id}
       />,
+      mountPoint
+    )
+  }
+}
+
+function renderRubricsCheckpointsInfo() {
+  const mountPoint = document.getElementById('rubrics_checkpoints_info')
+
+  if (mountPoint) {
+    ReactDOM.render(
+      <Alert variant="info">
+        {I18n.t('Rubrics do not auto-populate grades for checkpoints.')}
+      </Alert>,
       mountPoint
     )
   }
@@ -3919,6 +3934,8 @@ EG = {
     }
 
     renderCheckpoints(submission)
+
+    renderRubricsCheckpointsInfo()
 
     EG.updateStatsInHeader()
   },
