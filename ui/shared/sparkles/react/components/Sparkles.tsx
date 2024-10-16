@@ -27,9 +27,12 @@ enum Layer {
   Upper = 3,
 }
 
+type Size = 'small' | 'medium'
+
 type SparklesProps = {
   enabled: boolean
   children: React.ReactNode
+  size: Size
 }
 
 type SparkleState = {
@@ -43,18 +46,22 @@ const CONSTANTS = {
   INTERVAL_MAX_MS: 400,
   PLACEMENT_MIN_PERCENT: 5,
   PLACEMENT_MAX_PERCENT: 90,
-  SIZE_MIN_PX: 18,
-  SIZE_MAX_PX: 38,
+  SMALL_SIZE_MIN_PX: 13.5,
+  SMALL_SIZE_MAX_PX: 28.5,
+  MEDIUM_SIZE_MIN_PX: 18,
+  MEDIUM_SIZE_MAX_PX: 38,
 }
 
-const generateSparkle = () => {
+const generateSparkle = (size: Size) => {
   const colors = ['hsl(50deg, 100%, 65%)', 'hsl(210deg, 100%, 65%)', 'hsl(340deg, 100%, 60%)']
   const randomPlacement = () =>
     `${_.random(CONSTANTS.PLACEMENT_MIN_PERCENT, CONSTANTS.PLACEMENT_MAX_PERCENT)}%`
+  const min = size === 'small' ? CONSTANTS.SMALL_SIZE_MIN_PX : CONSTANTS.MEDIUM_SIZE_MIN_PX
+  const max = size === 'small' ? CONSTANTS.SMALL_SIZE_MAX_PX : CONSTANTS.MEDIUM_SIZE_MAX_PX
   const props = {
     color: _.sample(colors) as string,
     key: _.uniqueId('sparkle-'),
-    size: _.random(CONSTANTS.SIZE_MIN_PX, CONSTANTS.SIZE_MAX_PX),
+    size: _.random(min, max),
     style: {
       top: randomPlacement(),
       left: randomPlacement(),
@@ -74,10 +81,10 @@ export default function Sparkles(props: SparklesProps) {
       const now = Date.now()
       return [
         ...prevSparkles.filter((s: SparkleState) => s.createdAt + CONSTANTS.LIFESPAN_MS > now),
-        {createdAt: now, component: generateSparkle()},
+        {createdAt: now, component: generateSparkle(props.size)},
       ]
     })
-  }, [])
+  }, [props.size])
 
   useRandomInterval(animate, CONSTANTS.INTERVAL_MIN_MS, CONSTANTS.INTERVAL_MAX_MS, props.enabled)
 

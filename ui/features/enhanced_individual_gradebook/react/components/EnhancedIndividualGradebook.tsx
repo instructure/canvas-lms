@@ -222,6 +222,7 @@ export default function EnhancedIndividualGradebook() {
     (newSubmission: GradebookUserSubmissionDetails) => {
       setAssignmentSubmissionsMap(prevAssignmentSubmissions => {
         const {assignmentId, id: submissionId} = newSubmission
+        prevAssignmentSubmissions[assignmentId] ||= {}
         prevAssignmentSubmissions[assignmentId][submissionId] = newSubmission
         return {...prevAssignmentSubmissions}
       })

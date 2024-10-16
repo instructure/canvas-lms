@@ -4359,7 +4359,7 @@ EG = {
         confetti={false}
         editable={isMostRecentAttempt}
         onStickerChange={changeSticker}
-        size="medium"
+        size="small"
         submission={submission}
       />,
       mountPoint
