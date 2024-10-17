@@ -778,21 +778,21 @@ describe GroupCategory do
 
       it "does not grant read permissions if non_collaborative and user lacks manage_groups rights" do
         @category.update!(non_collaborative: true)
-        allow(@course).to receive(:grants_any_right?).with(@teacher2, anything, :manage_groups, :manage_groups_manage).and_return(false)
+        allow(@course).to receive(:grants_any_right?).with(@teacher2, anything, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS).and_return(false)
 
         expect(@category.check_policy(@teacher2) & @relevant_permissions).to be_empty
       end
 
       it "grants read permissions if non_collaborative but user has manage_groups rights" do
         @category.update!(non_collaborative: true)
-        allow(@course).to receive(:grants_any_right?).with(@teacher2, anything, :manage_groups, :manage_groups_manage).and_return(true)
+        allow(@course).to receive(:grants_any_right?).with(@teacher2, anything, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS).and_return(true)
 
         expect(@category.check_policy(@teacher2) & @relevant_permissions).to eq @relevant_permissions
       end
 
       it "grants read permissions if not non_collaborative" do
         @category.update!(non_collaborative: false)
-        allow(@course).to receive(:grants_any_right?).with(@teacher2, anything, :manage_groups, :manage_groups_manage).and_return(false)
+        allow(@course).to receive(:grants_any_right?).with(@teacher2, anything, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS).and_return(false)
 
         expect(@category.check_policy(@teacher2) & @relevant_permissions).to eq @relevant_permissions
       end
