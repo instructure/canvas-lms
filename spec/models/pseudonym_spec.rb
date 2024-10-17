@@ -146,6 +146,46 @@ describe Pseudonym do
     expect(@user.user_account_associations).to eq []
   end
 
+  describe "#encryption_type" do
+    subject(:encryption_type) { pseudonym.encryption_type }
+
+    let(:pseudonym) { pseudonym_model }
+
+    context "when crypted_password is blank" do
+      before { pseudonym.update_column(:crypted_password, "") }
+
+      it { is_expected.to be_nil }
+    end
+
+    context "when sis_ssha is present" do
+      before { pseudonym.update_column(:sis_ssha, "$SSHA$Q0pF5X/UfUyxZQ2FZgFzYmFhZGViYTRkYTAyMzg3ZjE=$") }
+
+      it { is_expected.to eq :SSHA }
+    end
+
+    context "when crypted_password is scrypt" do
+      let(:scrypt_password) { ScryptProvider.new("4000$8$1$").encrypt("plaintext_password") }
+
+      before { pseudonym.update_column(:crypted_password, scrypt_password) }
+
+      it { is_expected.to eq :SCRYPT }
+    end
+
+    context "when crypted_password is sha512" do
+      let(:sha512_password) { Authlogic::CryptoProviders::Sha512.encrypt("plaintext_password") }
+
+      before { pseudonym.update_column(:crypted_password, sha512_password) }
+
+      it { is_expected.to eq :SHA512 }
+    end
+
+    context "when the encryption type is not recognized" do
+      before { pseudonym.update_column(:crypted_password, "unknown_encryption_type") }
+
+      it { is_expected.to eq :UNKNOWN }
+    end
+  end
+
   describe "#destroy" do
     it "allows deleting pseudonyms" do
       user_with_pseudonym(active_all: true)
