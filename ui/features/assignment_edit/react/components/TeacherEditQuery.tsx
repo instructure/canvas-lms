@@ -17,10 +17,47 @@
  */
 
 import React from 'react'
+import GenericErrorPage from '@canvas/generic-error-page'
 import TeacherCreateEditView from './TeacherCreateEditView'
+import {TEACHER_EDIT_QUERY} from '@canvas/assignments/graphql/teacher/Queries'
+import {Spinner} from '@instructure/ui-spinner'
+import {View} from '@instructure/ui-view'
+import {useQuery} from 'react-apollo'
+import {useScope as useI18nScope} from '@canvas/i18n'
+import errorShipUrl from '@canvas/images/ErrorShip.svg'
 
-const TeacherEditQuery = () => {
-  return <TeacherCreateEditView edit={true} />
+const I18n = useI18nScope('assignment_edit')
+
+interface TeacherEditQueryProps {
+  assignmentLid: string
+}
+
+const TeacherEditQuery: React.FC<TeacherEditQueryProps> = ({assignmentLid}) => {
+  const {loading, error, data} = useQuery(TEACHER_EDIT_QUERY, {
+    variables: {assignmentLid},
+  })
+
+  const ErrorPage = ({error}) => {
+    return (
+      <GenericErrorPage
+        imageUrl={errorShipUrl}
+        errorSubject={I18n.t('Edit Assignments 2 Teacher initial query error')}
+        errorCategory={I18n.t('Edit Assignments 2 Teacher Error Page')}
+        errorMessage={error.message}
+      />
+    )
+  }
+
+  if (loading) {
+    return (
+      <View as="div" textAlign="center" padding="large 0">
+        <Spinner size="large" renderTitle={I18n.t('Loading')} />
+      </View>
+    )
+  }
+  if (error) return <ErrorPage error={error} />
+
+  return <TeacherCreateEditView edit={true} assignment={data.assignment} />
 }
 
 export default TeacherEditQuery

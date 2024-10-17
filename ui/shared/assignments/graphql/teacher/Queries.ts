@@ -150,3 +150,16 @@ export const TEACHER_QUERY = gql`
   ${userFields}
   ${assignmentOverridesNodes}
 `
+
+export const TEACHER_EDIT_QUERY = gql`
+  query GetAssignment($assignmentLid: ID!) {
+    assignment(id: $assignmentLid) {
+      lid: _id
+      state
+      hasSubmittedSubmissions
+      course {
+        lid: _id
+      }
+    }
+  }
+`

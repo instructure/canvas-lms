@@ -789,7 +789,7 @@ class AssignmentsController < ApplicationController
 
     if @context.root_account.feature_enabled?(:assignment_edit_enhancements_teacher_view) &&
        authorized_action(@assignment, @current_user, @assignment.new_record? ? :create : :update)
-      js_env({ ASSIGNMENT_EDIT_ENHANCEMENTS_TEACHER_VIEW: true, ASSIGNMENT_ID: params[:id] })
+      js_env({ ASSIGNMENT_EDIT_ENHANCEMENTS_TEACHER_VIEW: true, ASSIGNMENT_ID: params[:id], COURSE_ID: @context.id })
       css_bundle :assignment_enhancements_teacher_view
       js_bundle :assignment_edit
       render html: "", layout: true

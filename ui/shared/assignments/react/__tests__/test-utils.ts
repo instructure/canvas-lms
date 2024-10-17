@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {TeacherAssignmentType} from '../graphql/AssignmentTeacherTypes'
-import {SET_WORKFLOW} from '../graphql/Mutations'
+import type {TeacherAssignmentType} from '../../graphql/teacher/AssignmentTeacherTypes'
+import {SET_WORKFLOW} from '../../graphql/teacher/Mutations'
 
 export function mockCourse(overrides = {}) {
   return {
-    lid: 'course-lid',
+    lid: '1',
     assignmentGroupsConnection: {
       pageInfo: mockPageInfo(),
       nodes: [],
@@ -111,6 +111,32 @@ export const mockSetWorkflowFailure = {
   request: {
     query: SET_WORKFLOW,
     variables: {id: 'assignment-lid', workflow: 'unpublished'},
+  },
+  error: new Error('An error occurred'),
+}
+
+export const mockDeleteAssignmentSuccess = {
+  request: {
+    query: SET_WORKFLOW,
+    variables: {id: 5, workflow: 'deleted'},
+  },
+  result: {
+    data: {
+      updateAssignment: {
+        assignment: {
+          __typename: 'Assignment',
+          id: 'assignment-gid',
+          state: 'deleted',
+        },
+      },
+    },
+  },
+}
+
+export const mockDeleteAssignmentFailure = {
+  request: {
+    query: SET_WORKFLOW,
+    variables: {id: '5', workflow: 'deleted'},
   },
   error: new Error('An error occurred'),
 }

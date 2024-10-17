@@ -21,8 +21,10 @@ import {useQuery} from 'react-apollo'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {TEACHER_QUERY} from '../../graphql/Queries'
+import {TEACHER_QUERY} from '@canvas/assignments/graphql/teacher/Queries'
+import GenericErrorPage from '@canvas/generic-error-page'
 import TeacherSavedView from './TeacherSavedView'
+import errorShipUrl from '@canvas/images/ErrorShip.svg'
 
 const I18n = useI18nScope('assignments_2')
 
@@ -35,6 +37,17 @@ const TeacherQuery: React.FC<TeacherQueryProps> = ({assignmentLid}) => {
     variables: {assignmentLid},
   })
 
+  const ErrorPage = ({error}) => {
+    return (
+      <GenericErrorPage
+        imageUrl={errorShipUrl}
+        errorSubject={I18n.t('Assignments 2 Teacher initial query error')}
+        errorCategory={I18n.t('Assignments 2 Teacher Error Page')}
+        errorMessage={error.message}
+      />
+    )
+  }
+
   if (loading) {
     return (
       <View as="div" textAlign="center" padding="large 0">
@@ -42,7 +55,7 @@ const TeacherQuery: React.FC<TeacherQueryProps> = ({assignmentLid}) => {
       </View>
     )
   }
-  if (error) return <pre>Error: {JSON.stringify(error, null, 2)}</pre>
+  if (error) return <ErrorPage error={error} />
 
   return <TeacherSavedView assignment={data.assignment} />
 }
