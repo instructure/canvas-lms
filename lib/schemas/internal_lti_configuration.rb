@@ -33,6 +33,7 @@ module Schemas
       canvas_ext, vendor_extensions = extensions.partition { |ext| ext[:platform] == "canvas.instructure.com" }
       canvas_ext = canvas_ext&.first || {}
       config[:vendor_extensions] = vendor_extensions if vendor_extensions.present?
+      config[:scopes] ||= []
 
       canvas_ext.delete(:platform)
       launch_settings = canvas_ext.delete(:settings)&.deep_symbolize_keys || {}
