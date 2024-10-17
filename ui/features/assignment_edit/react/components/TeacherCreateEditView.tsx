@@ -17,14 +17,28 @@
  */
 
 import React from 'react'
-import AssignmentHeader from './AssignmentHeader'
+import AssignmentHeader, {ASSIGNMENT_VIEW_TYPES} from '@canvas/assignments/react/AssignmentHeader'
+import WithBreakpoints, {type Breakpoints} from '@canvas/with-breakpoints/src'
+import type {TeacherAssignmentType} from '@canvas/assignments/graphql/teacher/AssignmentTeacherTypes'
 
 interface TeacherCreateEditViewProps {
   edit: boolean
+  assignment: TeacherAssignmentType
+  breakpoints?: Breakpoints
 }
 
-const TeacherCreateEditView: React.FC<TeacherCreateEditViewProps> = ({edit}) => {
-  return <AssignmentHeader edit={edit} />
+const TeacherCreateEditView: React.FC<TeacherCreateEditViewProps> = ({
+  edit,
+  assignment,
+  breakpoints = {},
+}) => {
+  return (
+    <AssignmentHeader
+      type={edit ? ASSIGNMENT_VIEW_TYPES.EDIT : ASSIGNMENT_VIEW_TYPES.CREATE}
+      assignment={assignment}
+      breakpoints={breakpoints}
+    />
+  )
 }
 
-export default TeacherCreateEditView
+export default WithBreakpoints(TeacherCreateEditView)

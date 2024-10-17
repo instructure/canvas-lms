@@ -17,38 +17,47 @@
  */
 
 import React, {useState, useRef} from 'react'
+import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import type {TeacherAssignmentType} from '../../graphql/AssignmentTeacherTypes'
-import AssignmentPublishButton from './AssignmentPublishButton'
-import {Pill} from '@instructure/ui-pill'
-import {useScope as useI18nScope} from '@canvas/i18n'
 import {
   IconPublishSolid,
   IconEditLine,
   IconUserLine,
   IconSpeedGraderLine,
+  IconNoLine,
 } from '@instructure/ui-icons'
-import {type Breakpoints} from '@canvas/with-breakpoints'
-import {Button} from '@instructure/ui-buttons'
-import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
-import {Flex} from '@instructure/ui-flex'
+import {Pill} from '@instructure/ui-pill'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import AssignmentPublishButton from './AssignmentPublishButton'
+import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 import OptionsMenu from './OptionsMenu'
+import {type Breakpoints} from '@canvas/with-breakpoints'
+import type {TeacherAssignmentType} from '../graphql/teacher/AssignmentTeacherTypes'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('assignment_teacher_header')
 
+export const ASSIGNMENT_VIEW_TYPES = {
+  SAVED: 'saved',
+  EDIT: 'edit',
+  CREATE: 'create',
+}
+
 interface HeaderProps {
+  type: string
   assignment: TeacherAssignmentType
   breakpoints: Breakpoints
 }
 
-const AssignmentHeader: React.FC<HeaderProps> = props => {
-  const isMobile = props.breakpoints.mobileOnly
+const AssignmentHeader: React.FC<HeaderProps> = ({type, assignment, breakpoints}) => {
+  const isMobile = breakpoints.mobileOnly
   const [assignToTray, setAssignToTray] = useState(false)
   const returnFocusTo = useRef(null)
-  const speedgraderLink = `/courses/${props.assignment.course.lid}/gradebook/speed_grader?assignment_id=${props.assignment.lid}`
-  const editLink = `/courses/${props.assignment.course.lid}/assignments/${props.assignment.lid}/edit`
+  const speedgraderLink = `/courses/${assignment.course?.lid}/gradebook/speed_grader?assignment_id=${assignment.lid}`
+  const editLink = `/courses/${assignment.course?.lid}/assignments/${assignment.lid}/edit`
+  const isSavedView = type === ASSIGNMENT_VIEW_TYPES.SAVED
 
   return (
     <Flex alignItems="start" direction="column" width="100%">
@@ -60,11 +69,15 @@ const AssignmentHeader: React.FC<HeaderProps> = props => {
         id="assignments-2-teacher-header"
       >
         <Flex direction="column" width={!isMobile ? '40%' : '100%'} alignItems="start">
-          <Heading data-testid="assignment-name" level="h1">
-            {props.assignment.name}
+          <Heading data-testid="assignment-heading" level="h1">
+            {type === ASSIGNMENT_VIEW_TYPES.EDIT
+              ? I18n.t('Edit Assignment')
+              : type === ASSIGNMENT_VIEW_TYPES.CREATE
+              ? I18n.t('Create Assignment')
+              : assignment.name}
           </Heading>
           <Flex id="submission-status">
-            {props.assignment.hasSubmittedSubmissions && (
+            {isSavedView && assignment.hasSubmittedSubmissions && (
               <Pill
                 renderIcon={<IconPublishSolid />}
                 color="success"
@@ -85,14 +98,32 @@ const AssignmentHeader: React.FC<HeaderProps> = props => {
           width={isMobile ? '100%' : 'auto'}
           id="header-buttons"
         >
-          {!props.assignment.hasSubmittedSubmissions && (
+          {isSavedView && !assignment.hasSubmittedSubmissions && (
             <AssignmentPublishButton
-              isPublished={props.assignment.state === 'published'}
-              assignmentLid={props.assignment.lid}
-              breakpoints={props.breakpoints}
+              isPublished={assignment.state === 'published'}
+              assignmentLid={assignment.lid}
+              breakpoints={breakpoints}
             />
           )}
-          {!isMobile && (
+          {!isSavedView && (
+            <Flex>
+              {assignment.state === 'published' ? (
+                <IconPublishSolid color="success" />
+              ) : (
+                <IconNoLine />
+              )}
+              <Flex margin="0 0 0 x-small">
+                {assignment.state === 'published' ? (
+                  <Text color="success" weight="bold">
+                    {I18n.t('Published')}
+                  </Text>
+                ) : (
+                  <Text>{I18n.t('Unpublished')}</Text>
+                )}
+              </Flex>
+            </Flex>
+          )}
+          {!isMobile && isSavedView && (
             <>
               <Button
                 data-testid="edit-button"
@@ -111,7 +142,7 @@ const AssignmentHeader: React.FC<HeaderProps> = props => {
               >
                 <Text>{I18n.t('Assign To')}</Text>
               </Button>
-              {props.assignment.state === 'published' && (
+              {assignment.state === 'published' && (
                 <Button
                   data-testid="speedgrader-button"
                   href={speedgraderLink}
@@ -124,7 +155,7 @@ const AssignmentHeader: React.FC<HeaderProps> = props => {
               )}
             </>
           )}
-          <OptionsMenu assignment={props.assignment} breakpoints={props.breakpoints} />
+          <OptionsMenu type={type} assignment={assignment} breakpoints={breakpoints} />
         </View>
       </Flex>
 
@@ -141,10 +172,10 @@ const AssignmentHeader: React.FC<HeaderProps> = props => {
         iconType="assignment"
         locale={ENV.LOCALE || 'env'}
         timezone={ENV.TIMEZONE || 'UTC'}
-        courseId={props.assignment.course.lid}
-        itemName={props.assignment.name}
-        itemContentId={props.assignment.lid}
-        pointsPossible={props.assignment.pointsPossible as number}
+        courseId={assignment.course?.lid}
+        itemName={assignment.name}
+        itemContentId={assignment?.lid}
+        pointsPossible={assignment.pointsPossible as number}
       />
     </Flex>
   )

@@ -32,11 +32,10 @@ import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {BaseButtonTheme} from '@instructure/shared-types'
 import {useMutation} from 'react-apollo'
-import {SET_WORKFLOW} from '../../graphql/Mutations'
+import {SET_WORKFLOW} from '@canvas/assignments/graphql/teacher/Mutations'
 import {BREAKPOINTS, type Breakpoints} from '@canvas/with-breakpoints'
 
 const I18n = useI18nScope('assignment_publish_button')
-
 const AssignmentPublishButton = ({
   isPublished,
   assignmentLid,
@@ -52,24 +51,20 @@ const AssignmentPublishButton = ({
   const [setWorkFlowState] = useMutation(SET_WORKFLOW)
   const [menuWidth, setMenuWidth] = useState(window.innerWidth)
   const buttonRef = useRef<HTMLButtonElement | null>(null)
-
   const updateMenuWidth = () => {
     if (buttonRef.current) {
       setMenuWidth(buttonRef.current.offsetWidth)
     }
   }
-
   useEffect(() => {
     const handleResize = () => updateMenuWidth()
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
-
   const buttonRefCallback = (element: HTMLButtonElement | null) => {
     buttonRef.current = element
     updateMenuWidth()
   }
-
   const handleMenuToggle = (show: boolean, _menu: Menu): void => {
     if (show && setMenuOpen instanceof Function) {
       setMenuOpen()
@@ -77,7 +72,6 @@ const AssignmentPublishButton = ({
       setMenuClose()
     }
   }
-
   const handleUpdatePublishFailure = (isPublishing: boolean) => {
     if (isPublishing) {
       showFlashError(I18n.t('This assignment has failed to publish.'))()
@@ -85,7 +79,6 @@ const AssignmentPublishButton = ({
       showFlashError(I18n.t('This assignment has failed to unpublish.'))()
     }
   }
-
   const handleUpdatePublishSuccess = (isPublishing: boolean) => {
     if (isPublishing && setAssignmentPublished instanceof Function) {
       setAssignmentPublished()
@@ -95,7 +88,6 @@ const AssignmentPublishButton = ({
       showFlashSuccess(I18n.t('This assignment has been unpublished.'))()
     }
   }
-
   const handlePublish = async (isPublishing: boolean) => {
     const workflowState = isPublishing ? 'published' : 'unpublished'
     setWorkFlowState({variables: {id: Number(assignmentLid), workflow: workflowState}})
@@ -108,7 +100,6 @@ const AssignmentPublishButton = ({
       })
       .catch(() => handleUpdatePublishFailure(isPublishing))
   }
-
   const getButtonLabel = (): React.ReactFragment => {
     return (
       <>
@@ -137,15 +128,12 @@ const AssignmentPublishButton = ({
       </>
     )
   }
-
   let buttonThemeOverride: Partial<BaseButtonTheme> = {
     borderStyle: 'none',
   }
-
   if (assignmentPublished) {
     buttonThemeOverride = {...buttonThemeOverride, primaryInverseColor: '#0B874B'}
   }
-
   return (
     <Menu
       id="assignment_publish_menu"

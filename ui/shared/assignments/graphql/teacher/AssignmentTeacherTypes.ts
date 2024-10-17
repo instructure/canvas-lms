@@ -116,30 +116,30 @@ type SubmissionsType = {
 }
 
 export type TeacherAssignmentType = {
-  __typename: string
-  id: string
-  gid: string
-  lid: string
-  name: string
+  __typename?: string
+  id?: string
+  gid?: string
+  lid?: string
+  name?: string
   pointsPossible?: number | string
   dueAt?: string
   lockAt?: string
   unlockAt?: string
   description?: string
-  state: 'published' | 'unpublished' | 'deleted'
+  state?: 'published' | 'unpublished' | 'deleted'
   needsGradingCount?: number
   onlyVisibleToOverrides?: boolean
   assignmentGroup?: AssignmentGroupType
-  modules: ModuleType[]
+  modules?: ModuleType[]
   course: CourseType
-  lockInfo: LockInfoType
-  peerReviews: peerReviewsType
-  submissionTypes: string[]
-  allowedExtensions: string[]
+  lockInfo?: LockInfoType
+  peerReviews?: peerReviewsType
+  submissionTypes?: string[]
+  allowedExtensions?: string[]
   allowedAttempts?: number
   anonymizeStudents?: boolean
-  assignmentOverrides: AssignmentOverridesType
-  hasSubmittedSubmissions: boolean
-  submissionsDownloads: number
-  submissions: SubmissionsType
+  assignmentOverrides?: AssignmentOverridesType
+  hasSubmittedSubmissions?: boolean
+  submissionsDownloads?: number
+  submissions?: SubmissionsType
 }

@@ -2715,6 +2715,13 @@ describe AssignmentsController do
         expect(assigns[:js_env][:HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED]).to be(false)
       end
     end
+
+    it "sets COURSE_ID in js_env if assignment_edit_enhancements_teacher_view FF is enabled" do
+      user_session(@teacher)
+      @course.root_account.enable_feature!(:assignment_edit_enhancements_teacher_view)
+      get "edit", params: { course_id: @course.id, id: @assignment.id }
+      expect(assigns[:js_env][:COURSE_ID]).to be(@course.id)
+    end
   end
 
   describe "DELETE 'destroy'" do
