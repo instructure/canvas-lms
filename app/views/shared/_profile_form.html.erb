@@ -15,25 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
-
-<%
-  css_bundle :profile_show, :tinymce
-  js_bundle :profile_show
-  add_body_class 'not-editing'
-  js_env PROFILE: @user_data if @user_data[:can_edit]
-  js_env(folder_id: @user.profile_pics_folder.id) if @user == @current_user
-%>
 <%= form_tag update_profile_profile_path, { :method => :put, :id => :edit_profile_form, :class => "ic-Form-control" } do %>
-  <div class="image-block">
-    <div class="image-block-image profile-avatar-wrapper">
-      <% if @user_data[:can_edit_avatar] %>
-        <%= avatar(@user_data[:id], size: 128, url: '#', edit: true, class: "profile-link",
-            sr_content: t('Click to change profile picture for %{display_name}', :display_name => @user.short_name)) %>
-      <% else %>
-        <%= avatar(@user_data[:id], size: 128, url: nil) %>
-      <% end %>
-    </div>
-
+  <div class="content-block">
     <div class="profileContent__Block">
       <% if @user_data[:can_edit_name] %>
         <h2 class="hide-if-editing"><%= @user_data[:short_name] %> <% if @user_data[:pronouns] %><i>(<%= @user_data[:pronouns] %>)</i><% end %></h2>
@@ -52,9 +35,9 @@
         <% if @user.pronouns || @domain_root_account.settings[:can_add_pronouns] %>
           <label for="pronouns"class="show-if-editing ic-Label"><%= t('Pronouns') %>:</label>
           <%= select_tag :pronouns,
-            options_for_select(([[t("None"), '']] + @domain_root_account.pronouns + [@user.pronouns]).compact.uniq, @user.pronouns),
-            class:"show-if-editing",
-            disabled:!@domain_root_account.can_change_pronouns? && (!@domain_root_account.can_add_pronouns? || !@domain_root_account.grants_right?(@current_user, :manage_courses_admin))
+                         options_for_select(([[t("None"), '']] + @domain_root_account.pronouns + [@user.pronouns]).compact.uniq, @user.pronouns),
+                         class:"show-if-editing",
+                         disabled:!@domain_root_account.can_change_pronouns? && (!@domain_root_account.can_add_pronouns? || !@domain_root_account.grants_right?(@current_user, :manage_courses_admin))
           %>
         <% end %>
         <p class="profileDetails">
@@ -101,29 +84,29 @@
 
       <div class="show-if-editing edit-contact-methods">
         <h3 class="profileHeader"><%= t('#profile.ways_to_contact_me', "Contact") %></h3>
-          <% if @user_data[:user_services].present? %>
-            <ul class="social-links">
+        <% if @user_data[:user_services].present? %>
+          <ul class="social-links">
+            <li>
+              <label for="social_message" class="social hide-text message ic-Label" title="<%= t :message_title, 'Message' %>" data-tooltip><%= t :message_me, 'message me in Canvas' %></label>
+            </li>
+            <% @user_data[:user_services].each do |s| %>
               <li>
-                <label for="social_message" class="social hide-text message ic-Label" title="<%= t :message_title, 'Message' %>" data-tooltip><%= t :message_me, 'message me in Canvas' %></label>
+                <% service_name = s[:service_name] || s[:service].to_s.titleize %>
+                <label for="social_<%= s[:service] %>" class="social hide-text <%= s[:service] %> ic-Label" title="<%= service_name %>" data-tooltip><%= t :service_contact, 'contact %{user} with %{service}', :user => @user_data[:short_name], :service => service_name %></label>
+                <input class="ic-Input" type="hidden" value="0" name="user_services[<%= s[:service] %>">
+                <%= check_box_tag "user_services[#{s[:service]}]", 1, s[:visible], :id => "social_#{s[:service]}" %>
               </li>
-              <% @user_data[:user_services].each do |s| %>
-                <li>
-                  <% service_name = s[:service_name] || s[:service].to_s.titleize %>
-                  <label for="social_<%= s[:service] %>" class="social hide-text <%= s[:service] %> ic-Label" title="<%= service_name %>" data-tooltip><%= t :service_contact, 'contact %{user} with %{service}', :user => @user_data[:short_name], :service => service_name %></label>
-                  <input class="ic-Input" type="hidden" value="0" name="user_services[<%= s[:service] %>">
-                  <%= check_box_tag "user_services[#{s[:service]}]", 1, s[:visible], :id => "social_#{s[:service]}" %>
-                </li>
-              <% end %>
-            </ul>
-            <div class="social-instructions">
-              <p>
-                <%= t(:social_instructions, "Check the contact methods you'd like to be visible to others on your profile.") %><br>
-                <%= link_to(t(:manage_settings, "Manage Registered Services"), settings_profile_path)  %>
-              </p>
-            </div>
-          <% else %>
-            <p><%= t('#profile.you_have_no_services', "No registered services, you can add some on the *settings* page.", :name => @user_data[:short_name], :wrapper => link_to('\1', settings_profile_path)) %></p>
-          <% end %>
+            <% end %>
+          </ul>
+          <div class="social-instructions">
+            <p>
+              <%= t(:social_instructions, "Check the contact methods you'd like to be visible to others on your profile.") %><br>
+              <%= link_to(t(:manage_settings, "Manage Registered Services"), settings_profile_path)  %>
+            </p>
+          </div>
+        <% else %>
+          <p><%= t('#profile.you_have_no_services', "No registered services, you can add some on the *settings* page.", :name => @user_data[:short_name], :wrapper => link_to('\1', settings_profile_path)) %></p>
+        <% end %>
       </div>
 
       <div class="hide-if-editing">
@@ -198,9 +181,9 @@
           <div class="show-if-editing">
             <table id="edit_links_table">
               <thead>
-                <th scope="col"><%= t :links_title, 'Title' %></th>
-                <th></th>
-                <th scope="col"><%= t :links_url, 'URL' %></th>
+              <th scope="col"><%= t :links_title, 'Title' %></th>
+              <th></th>
+              <th scope="col"><%= t :links_url, 'URL' %></th>
               </thead>
               <tbody id="profile_link_fields"></tbody>
             </table>
