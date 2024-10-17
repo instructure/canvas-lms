@@ -66,10 +66,6 @@ export default class FilePreview extends React.PureComponent {
     }
   }
 
-  componentDidMount() {
-    return codeToRemoveLater.hideFileTreeFromPreviewInJaws()
-  }
-
   UNSAFE_componentWillReceiveProps(newProps) {
     if (newProps.isOpen) {
       this.getItemsToView(newProps, items => this.setState(this.stateProperties(items)))
@@ -78,7 +74,6 @@ export default class FilePreview extends React.PureComponent {
 
   componentWillUnmount() {
     $(this.previewOverlay).on('keydown', this.handleKeyboardNavigation)
-    return codeToRemoveLater.revertJawsChangesBackToNormal()
   }
 
   getRouteIdentifier = () => {

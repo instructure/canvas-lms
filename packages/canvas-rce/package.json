@@ -32,7 +32,7 @@
     "demo": "scripts/demo.sh",
     "demo:clean": "rm -f github-pages/dist/*",
     "demo:build": "wp -c ./webpack.demo.config.js",
-    "demo:dev": "yarn demo:clean && mkdir -p ./github-pages/dist &&  cp ./github-pages/index.html ./github-pages/dist && wp -c ./webpack.dev.config.js",
+    "demo:dev": "yarn demo:clean && mkdir -p ./github-pages/dist && cp ./github-pages/index.html ./github-pages/dist && wp -c ./webpack.dev.config.js",
     "installTranslations": "scripts/installTranslations.js",
     "commitTranslations": "scripts/commitTranslations.sh",
     "build:all": "scripts/build.js",
