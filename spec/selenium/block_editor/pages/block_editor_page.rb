@@ -297,14 +297,6 @@ module BlockEditorPage
     f(".image-block")
   end
 
-  def section_menu
-    f(".section-menu")
-  end
-
-  def section_menu_menu
-    f(".section-menu ul[role='menu']")
-  end
-
   def kb_focus_block_toolbar
     driver.action.key_down(:control).send_keys(:f9).key_up(:control).perform
   end

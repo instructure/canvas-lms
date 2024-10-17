@@ -53,7 +53,7 @@ function renderEditor(props: Partial<BlockEditorProps> = {}) {
 describe('BlockEditor', () => {
   const can_edit_url = '/api/v1/courses/1/block_editor_templates/can_edit'
   const get_templates_url =
-    '/api/v1/courses/1/block_editor_templates?include[]=node_tree&drafts=false'
+    '/api/v1/courses/1/block_editor_templates?include[]=node_tree&include[]=thumbnail&sort=name&drafts=false'
   const template_url = '/api/v1/courses/1/block_editor_templates'
   beforeAll(() => {
     window.alert = jest.fn()

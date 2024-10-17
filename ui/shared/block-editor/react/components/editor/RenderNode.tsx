@@ -54,7 +54,6 @@ import {mountNode} from '../../utils'
 import {BlockResizer} from './BlockResizer'
 import {
   getToolbarPos as getToolbarPosUtil,
-  getMenuPos as getMenuPosUtil,
   findUpNode,
   findContainingSection,
 } from '../../utils/renderNodeHelpers'
@@ -85,7 +84,6 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
   })
 
   const [currentToolbarOrTagRef, setCurrentToolbarOrTagRef] = useState<HTMLDivElement | null>(null)
-  const [currentMenuRef, setCurrentMenuRef] = useState<HTMLDivElement | null>(null)
   const [sectionBrowserOpen, setSectionBrowserOpen] = useState<AddSectionPlacement>(undefined)
   const [mountPoint, setMountPoint] = useState(mountNode())
 
@@ -95,54 +93,7 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
     }
   }, [mountPoint])
 
-  // TODO: this commented out code is what implenents the click-once for section, again for the block
-  // useEffect(() => {
-  //   // get a newly dropped block selected
-  //   // select once will select it's section
-  //   // select again to get the block
-  //   // (see the following useEffect for details)
-  //   if (node.id !== 'ROOT') {
-  //     actions.selectNode(node.id)
-  //     requestAnimationFrame(() => {
-  //       actions.selectNode(node.id)
-  //     })
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [])
-
-  // // first click/select on a block will select its parent section
-  // // if the section is selected, a click on a block will select the block
-  // useEffect(() => {
-  //   if (selected) {
-  //     const parentSection = findContainingSection(node, query)
-  //     if (parentSection) {
-  //       const isMySectionSelected = RenderNode.globals.selectedSectionId === parentSection.id
-  //       if (!isMySectionSelected) {
-  //         RenderNode.globals.selectedSectionId = parentSection.id
-  //         actions.selectNode(parentSection.id)
-  //       } else if (node.data.custom?.noToolbar) {
-  //         const upnode = findUpNode(node, query)
-  //         if (upnode) {
-  //           actions.selectNode(upnode.id)
-  //         }
-  //       }
-  //     }
-  //   }
-  // }, [actions, node, nodeActions, query, selected])
-
-  // TODO: while this gets newly dropped blocks selected,
-  //       it interferes with kb nav selenium tests
-  //       To get tests written, comment this out, return to figure
-  //       out block focusing
-  // useEffect(() => {
-  //   // get a newly dropped block selected
-  //   if (node.id !== 'ROOT') {
-  //     actions.selectNode(node.id)
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [])
-
-  // the next 2 useEffects implemnt click just once to select the block
+  // the next 2 useEffects implemnt click once to select the block
   useEffect(() => {
     if (selected && node.data.custom?.noToolbar) {
       const upnode = findUpNode(node, query)
@@ -169,40 +120,12 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
     [currentToolbarOrTagRef, node.dom, mountPoint]
   )
 
-  const getMenuPos = useCallback(() => {
-    const {top, left} = getMenuPosUtil(node.dom, mountPoint, currentMenuRef)
-    return {top: `${top}px`, left: `${left}px`}
-  }, [currentMenuRef, node.dom, mountPoint])
-
   const renderBlockToolbar = () => {
     return ReactDOM.createPortal(
       <BlockToolbar templateEditor={RenderNode.globals.templateEditor} />,
       mountPoint
     )
   }
-
-  const handleAddSection = useCallback((where: AddSectionPlacement) => {
-    setSectionBrowserOpen(where)
-  }, [])
-
-  const renderSectionMenu = useCallback(() => {
-    if (!mountPoint) return null
-    if (node.related?.sectionMenu) {
-      const {left, top} = getMenuPos()
-
-      return ReactDOM.createPortal(
-        <div
-          ref={(el: HTMLDivElement) => setCurrentMenuRef(el)}
-          className="section-menu"
-          style={{left, top}}
-        >
-          {React.createElement(node.related.sectionMenu, {onAddSection: handleAddSection})}
-        </div>,
-        mountPoint
-      )
-    }
-    return null
-  }, [getMenuPos, handleAddSection, mountPoint, node.related.sectionMenu])
 
   const renderHoverTag = () => {
     if (node.data?.custom?.noToolbar) return null
@@ -240,12 +163,7 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
   }
 
   const renderRelated = () => {
-    return (
-      <>
-        {renderBlockToolbar()}
-        {renderSectionMenu()}
-      </>
-    )
+    return renderBlockToolbar()
   }
 
   const renderSectionAdder = () => {
