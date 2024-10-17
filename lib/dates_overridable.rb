@@ -580,6 +580,27 @@ module DatesOverridable
     result
   end
 
+  def merge_overrides_by_date(overrides)
+    result = {}
+
+    overrides.each do |override|
+      key = [override[:due_at], override[:unlock_at], override[:lock_at]]
+
+      unless result[key]
+        result[key] = {
+          due_at: override[:due_at],
+          unlock_at: override[:unlock_at],
+          lock_at: override[:lock_at],
+          options: []
+        }
+      end
+
+      result[key][:options].concat(override[:options])
+    end
+
+    result.values
+  end
+
   def base_due_date_hash
     without_overrides.due_date_hash.merge(base: true)
   end
