@@ -646,6 +646,15 @@ module Lti
         end
       end
 
+      context "when scopes is nil" do
+        let(:settings) { super().except("scopes", :scopes) }
+
+        it "sets scopes to []" do
+          expect(tool_configuration.scopes).to eq []
+          expect(tool_configuration.developer_key.scopes).to eq []
+        end
+      end
+
       context "with provided redirect_uris" do
         let(:redirect_uris) { [settings["target_link_uri"], "http://example.com"] }
         let(:tool_configuration) { described_class.create_tool_config_and_key!(account, params, redirect_uris) }
