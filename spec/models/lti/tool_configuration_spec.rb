@@ -144,6 +144,16 @@ module Lti
         end
       end
 
+      context "when updating settings to use a non-matching schema" do
+        it "causes a validation error and does not allow the update" do
+          tool_configuration.save!
+          settings = tool_configuration.settings.merge("scopes" => ["bogus"])
+          expect do
+            tool_configuration.update!(settings:)
+          end.to raise_error(ActiveRecord::RecordInvalid, /bogus/)
+        end
+      end
+
       context "when developer_key already has a tool_config" do
         before do
           described_class.create! settings:, developer_key:
