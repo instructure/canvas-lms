@@ -55,6 +55,11 @@ consolidated_media_player:
   display_name: Consolidated Media Player
   description: |-
     Enable the new consolidated media player in the Rich Content Editor.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
 
 explicit_latex_typesetting:
   state: hidden

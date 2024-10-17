@@ -23,6 +23,7 @@ import ReactDOM from 'react-dom'
 import {parse} from 'url'
 import ready from '@instructure/ready'
 import CanvasMediaPlayer from '@canvas/canvas-media-player'
+import StudioMediaPlayer from '@canvas/canvas-studio-player'
 import {captionLanguageForLocale} from '@instructure/canvas-media'
 
 const isStandalone = () => {
@@ -113,16 +114,31 @@ ready(() => {
   }
 
   const aria_label = !media_object.title ? undefined : media_object.title
-  ReactDOM.render(
-    <CanvasMediaPlayer
-      media_id={media_id}
-      media_sources={href_source || media_object.media_sources}
-      media_tracks={mediaTracks}
-      type={is_video ? 'video' : 'audio'}
-      aria_label={aria_label}
-      is_attachment={is_attachment}
-      attachment_id={attachment_id}
-    />,
-    document.getElementById('player_container')
-  )
+  if (window.ENV.FEATURES?.consolidated_media_player) {
+    ReactDOM.render(
+      <StudioMediaPlayer
+        media_id={media_id}
+        media_sources={href_source || media_object.media_sources}
+        media_tracks={mediaTracks}
+        type={is_video ? 'video' : 'audio'}
+        aria_label={aria_label}
+        is_attachment={is_attachment}
+        attachment_id={attachment_id}
+      />,
+      document.getElementById('player_container')
+    )
+  } else {
+    ReactDOM.render(
+      <CanvasMediaPlayer
+        media_id={media_id}
+        media_sources={href_source || media_object.media_sources}
+        media_tracks={mediaTracks}
+        type={is_video ? 'video' : 'audio'}
+        aria_label={aria_label}
+        is_attachment={is_attachment}
+        attachment_id={attachment_id}
+      />,
+      document.getElementById('player_container')
+    )
+  }
 })
