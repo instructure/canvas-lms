@@ -61,11 +61,34 @@ exports.webpack5Workaround =
     },
   }
 
-// inline CSS into JS with style-loader and css-loader
+// inline global and module CSS into JS using style-loader and css-loader
 // https://rspack.dev/guide/tech/css
 exports.css = {
   test: /\.css$/i,
-  use: ['style-loader', 'css-loader'],
+  oneOf: [
+    {
+      test: /\.module\.css$/i,
+      use: [
+        'style-loader',
+        {
+          loader: 'css-loader',
+          options: {
+            // https://rspack.dev/config/module
+            modules: {
+              // customizes class names for easier debugging by preserving the local name and adding
+              // a shortened 5-character hash, improving readability while keeping names unique;
+              // the default output is more complex (e.g. _1Aa3laeKiSGA1j6c1SlITH), whereas this
+              // change produces a simpler, easier-to-debug name (e.g. pageWrapper__1Aa3l)
+              localIdentName: '[local]__[hash:base64:5]',
+            },
+          },
+        },
+      ],
+    },
+    {
+      use: ['style-loader', 'css-loader'],
+    },
+  ],
   type: 'javascript/auto',
 }
 
