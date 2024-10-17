@@ -26,9 +26,9 @@ module Lti
     belongs_to :lti_registration, class_name: "Lti::Registration", inverse_of: :manual_configuration, optional: true
 
     before_validation :normalize_configuration
+    before_validation :transform_updated_settings
     before_save :update_privacy_level_from_extensions
     before_save :update_lti_registration
-    before_save :transform_updated_settings
     before_save :set_redirect_uris
 
     after_update :update_external_tools!, if: :configuration_changed?
