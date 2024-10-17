@@ -580,7 +580,6 @@ export const AddressBook = ({
               }}
               renderTrigger={
                 <TextInput
-                  id="search-address-input"
                   placeholder={selectedMenuItems.length === 0 ? searchPlaceholder : null}
                   renderLabel={
                     <ScreenReaderContent>
@@ -617,7 +616,7 @@ export const AddressBook = ({
                     onTextChange(e.target.value)
                     setIsMenuOpen(true)
                   }}
-                  data-testid="address-book-input"
+                  data-testid={`${props.renderingContext ?? ''}-address-book-input`}
                   messages={addressBookMessages}
                 />
               }
@@ -770,6 +769,7 @@ AddressBook.propTypes = {
    */
   placeholder: PropTypes.string,
   addressBookLabel: PropTypes.string,
+  renderingContext: PropTypes.string,
 }
 
 export default AddressBook
