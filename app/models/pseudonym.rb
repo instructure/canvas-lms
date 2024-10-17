@@ -90,6 +90,11 @@ class Pseudonym < ActiveRecord::Base
   validates_each :password, if: :require_password?, &:validate_password
   validates :password_confirmation, presence: true, if: :require_password?
 
+  ENCRYPTION_PATTERNS = {
+    scrypt: /^\d+\$\d+\$\d+\$[a-fA-F0-9]{64}\$[a-fA-F0-9]{64}$/,
+    sha512: /^[a-fA-F0-9]{128}$/
+  }.freeze
+
   class << self
     # we know these fields, and don't want authlogic to connect to the db at boot
     # to try and infer them
@@ -118,6 +123,36 @@ class Pseudonym < ActiveRecord::Base
   end
 
   attr_writer :require_password
+
+  # Determines the type of encryption used for the crypted_password.
+  #
+  # Prior to August 2019, Canvas used a SHA512 hash with salt as the key
+  # derivation function (KDF) for password storage.
+  #
+  # During August 2019, Canvas switched to using scrypt as the KDF.
+  #
+  # Canvas SIS imports additionally support a `ssha_password` field which Canvas
+  # directly stores in the `sis_ssha` field of the pseudonym if provided.
+  #
+  # @return [Symbol, nil] The encryption type, which can be one of the following:
+  #   - :SSHA if the sis_ssha is present (meaning `ssha_password` was provided in a SIS import)
+  #   - :SCRYPT if the crypted_password matches the scrypt pattern (pseudonyms post-August 2019)
+  #   - :SHA512 if the crypted_password matches the sha512 pattern
+  #   - :UNKNOWN if the crypted_password does not match any known patterns
+  #   - nil if the crypted_password is blank
+  def encryption_type
+    return nil if crypted_password.blank?
+
+    return :SSHA if sis_ssha.present?
+
+    if crypted_password.match?(ENCRYPTION_PATTERNS[:scrypt])
+      :SCRYPT
+    elsif crypted_password.match?(ENCRYPTION_PATTERNS[:sha512])
+      :SHA512
+    else
+      :UNKNOWN
+    end
+  end
 
   def require_password?
     # Change from auth_logic: don't require a password just because new_record?
