@@ -30,7 +30,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
 import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
-import './ForbiddenWordsFileUpload.module.css'
+import './ForbiddenWordsFileUpload.css'
 import type {PasswordSettingsResponse} from './types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
