@@ -1024,11 +1024,28 @@ describe Group do
     context "permissions" do
       before do
         @group = Group.create!(context: @course, group_category: @non_collaborative_category, name: "Test Group", non_collaborative: true)
-        allow(@course).to receive(:grants_any_right?).with(@teacher, anything, :manage_groups, :manage_groups_manage).and_return(true)
+        allow(@course).to receive(:grants_any_right?).with(@teacher, anything, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS).and_return(true)
       end
 
-      it "grants correct permissions to default teachers to non-collaborative groups" do
-        expect(@group.check_policy(@teacher)).to include(:read, :read_roster, :read_files, :send_messages, :send_messages_all, :manage, :manage_admin_users, :allow_course_admin_actions, :manage_students, :update, :read_as_admin, :read_sis, :view_user_logins, :read_email_addresses)
+      it "grants correct permissions to default teachers in non-collaborative groups" do
+        expect(@group.check_policy(@teacher)).to include(
+          :read,
+          :read_roster,
+          :read_files,
+          :send_messages,
+          :send_messages_all,
+          :manage,
+          :manage_admin_users,
+          :allow_course_admin_actions,
+          :manage_students,
+          :update,
+          :read_as_admin,
+          :read_sis,
+          :view_user_logins,
+          :read_email_addresses,
+          :delete,
+          :create
+        )
       end
 
       it "checks send_messages permission correctly" do
@@ -1041,6 +1058,25 @@ describe Group do
         allow(@course).to receive(:grants_right?).and_return(true)
         allow(@course).to receive(:grants_right?).with(@teacher, anything, :send_messages_all).and_return(false)
         expect(@group.check_policy(@teacher)).not_to include(:send_messages_all)
+      end
+
+      it "checks update and manage permissions correctly" do
+        allow(@course).to receive(:grants_right?).and_return(true)
+        allow(@course).to receive(:grants_right?).with(anything, anything, :manage_tags_manage).and_return(false)
+
+        expect(@group.check_policy(@teacher)).not_to include(:manage, :update, :manage_admin_users, :allow_course_admin_actions, :manage_students)
+      end
+
+      it "checks delete permission correctly" do
+        allow(@course).to receive(:grants_right?).and_return(true)
+        allow(@course).to receive(:grants_right?).with(@teacher, anything, :manage_tags_delete).and_return(false)
+        expect(@group.check_policy(@teacher)).not_to include(:delete)
+      end
+
+      it "checks create permission correctly" do
+        allow(@course).to receive(:grants_right?).and_return(true)
+        allow(@course).to receive(:grants_right?).with(@teacher, anything, :manage_tags_add).and_return(false)
+        expect(@group.check_policy(@teacher)).not_to include(:create)
       end
 
       it "does not grant permissions to users without manage_groups or manage_groups_manage" do

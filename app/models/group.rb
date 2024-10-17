@@ -725,17 +725,12 @@ class Group < ActiveRecord::Base
     # Conditions:
     # - The group is non-collaborative (`non_collaborative?`)
     # - The context grants read permission
-    # - The context grants manage_groups or manage_groups_manage rights
-    given { |user, session| non_collaborative? && context&.grants_right?(user, session, :read) && context&.grants_any_right?(user, session, :manage_groups, :manage_groups_manage) }
+    # - The context grants any manage_tag rights
+    given { |user, session| non_collaborative? && context&.grants_right?(user, session, :read) && context.grants_any_right?(user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS) }
     use_additional_policy do
       # Base permissions for non-collaborative groups
       given { |user| user }
       can :read,
-          :update,
-          :manage,
-          :manage_admin_users,
-          :allow_course_admin_actions,
-          :manage_students,
           :read_roster
 
       # Permission to send messages
@@ -755,6 +750,31 @@ class Group < ActiveRecord::Base
         user && context.grants_right?(user, session, :send_messages_all)
       end
       can :send_messages_all
+
+      # Permission to manage/update the group
+      # Conditions:
+      # - A valid user is present
+      # - The context grants manage_tags_manage right
+      given { |user, session| user && context&.grants_right?(user, session, :manage_tags_manage) }
+      can :update,
+          :manage,
+          :manage_admin_users,
+          :allow_course_admin_actions,
+          :manage_students
+
+      # Permission to delete the group
+      # Conditions:
+      # - A valid user is present
+      # - The context grants manage_tags_manage right
+      given { |user, session| user && context.grants_right?(user, session, :manage_tags_delete) }
+      can :delete
+
+      # Permission to create the group
+      # Conditions:
+      # - A valid user is present
+      # - The context grants manage_tags_add right
+      given { |user, session| user && context.grants_right?(user, session, :manage_tags_add) }
+      can :create
 
       given { |user, session| context&.grants_right?(user, session, :view_group_pages) }
       can %i[read read_roster read_files]
