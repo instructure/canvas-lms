@@ -138,6 +138,7 @@ const HeaderInputs = props => {
                 courseContextCode={props.selectedContext?.contextID || ''}
                 placeholder={I18n.t('Insert or Select Names')}
                 addressBookLabel={I18n.t('To')}
+                renderingContext="compose-modal-header"
               />
             }
             shouldGrow={true}

@@ -93,7 +93,7 @@ describe('HeaderInputs', () => {
     jest.useFakeTimers()
     const props = defaultProps({addressBookContainerOpen: true})
     const container = setup(props)
-    const input = await container.findByTestId('address-book-input')
+    const input = await container.findByTestId('compose-modal-header-address-book-input')
     fireEvent.change(input, {target: {value: 'Fred'}})
 
     // for debouncing
