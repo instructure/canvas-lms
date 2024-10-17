@@ -888,10 +888,9 @@ class Attachment < ActiveRecord::Base
           # update replacement pointers pointing at the overwritten file
           # (to a point. files that get overwritten thousands of times cause serious database pain,
           # so don't update beyond the first 50 overwrites)
-          context.attachments.where(replacement_attachment_id: a)
-                 .order(:id)
-                 .limit(50)
-                 .update_all(replacement_attachment_id: id)
+          # also plucking ids here because Postgres sometimes ignores the LIMIT clause in a subquery :(
+          ids = context.attachments.where(replacement_attachment_id: a).order(:id).limit(50).pluck(:id)
+          Attachment.where(id: ids).update_all(replacement_attachment_id: id)
           # delete the overwritten file (unless the caller is queueing them up)
           a.destroy unless opts[:caller_will_destroy]
           deleted_attachments << a
