@@ -92,5 +92,18 @@ describe "submission_graded" do
       sms = generate_message(:submission_graded, :sms, asset, user: @student)
       expect(sms.body).to include("grade: A")
     end
+
+    it "show which sub assignment was graded" do
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+      @reply_to_topic.submit_homework @student, body: "Test reply to topic for student"
+      submission = @reply_to_topic.grade_student(@student, grade: 5, grader: @teacher).first
+
+      email = generate_message(:submission_graded, :email, submission, user: @student)
+      expect(email.body).to include("Reply To Topic")
+      expect(email.html_body).to include("Reply To Topic")
+      sms = generate_message(:submission_graded, :sms, submission, user: @student)
+      expect(sms.body).to include("Reply To Topic")
+    end
   end
 end
