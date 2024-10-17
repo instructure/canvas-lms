@@ -126,4 +126,47 @@ describe ConversationsHelper do
       end
     end
   end
+
+  describe "trigger_out_of_office_auto_responses" do
+    before do
+      Account.site_admin.enable_feature!(:inbox_settings)
+    end
+
+    let(:participant_ids) { [user.id] }
+    let(:date) { Time.zone.now }
+    let(:author) { user_student }
+    let(:context) { account }
+    let(:root_account_id) { account.id }
+    let(:root_account_ids) { [account.id] } # This is a method in the ConversationHelper module, I just mock it here
+
+    context "when user is out of office" do
+      before do
+        inbox_settings_factory(user_id: user.id)
+      end
+
+      it "sends out of office auto response once" do
+        expect do
+          trigger_out_of_office_auto_responses(participant_ids, date, author, context.id, context.class.name, root_account_id)
+          trigger_out_of_office_auto_responses(participant_ids, date, author, context.id, context.class.name, root_account_id)
+        end.to change { Conversation.count }.by(1)
+      end
+
+      it "sends auto response to each author" do
+        expect do
+          trigger_out_of_office_auto_responses(participant_ids, date, author, context.id, context.class.name, root_account_id)
+          author = user_teacher
+          trigger_out_of_office_auto_responses(participant_ids, date, author, context.id, context.class.name, root_account_id)
+        end.to change { Conversation.count }.by(2)
+      end
+
+      it "sends auto response again if settings changed" do
+        expect do
+          trigger_out_of_office_auto_responses(participant_ids, date, author, context.id, context.class.name, root_account_id)
+          settings = Inbox::Repositories::InboxSettingsRepository::InboxSettingsRecord.find_by(user_id: user.id)
+          settings.update_attribute(:out_of_office_message, "New message")
+          trigger_out_of_office_auto_responses(participant_ids, date, author, context.id, context.class.name, root_account_id)
+        end.to change { Conversation.count }.by(2)
+      end
+    end
+  end
 end

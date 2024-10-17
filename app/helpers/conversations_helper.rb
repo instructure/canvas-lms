@@ -364,7 +364,7 @@ module ConversationsHelper
 
       # Find the most recent ooo message to the recipient since ooo start date
       last_sent_ooo_response = ConversationMessage
-                               .joins("JOIN #{ConversationParticipant.quoted_table_name} ON #{ConversationMessage.quoted_table_name}.conversation_id = #{ConversationMessage.quoted_table_name}.conversation_id")
+                               .joins("JOIN #{ConversationParticipant.quoted_table_name} ON #{ConversationParticipant.quoted_table_name}.conversation_id = #{ConversationMessage.quoted_table_name}.conversation_id")
                                .where("automated = TRUE AND author_id = :author_id AND user_id = :user_id AND conversation_messages.root_account_ids = :root_account_ids AND created_at >= :start",
                                       author_id: ooo_message_author.id,
                                       user_id: ooo_message_recipient.id,
