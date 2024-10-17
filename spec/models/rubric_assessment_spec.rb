@@ -947,6 +947,51 @@ describe RubricAssessment do
           expect(assignment.submission_for_student(other_student_in_group)).to be_posted
         end
       end
+
+      context "discussion_checkpoints" do
+        before do
+          Account.site_admin.enable_feature!(:discussion_checkpoints)
+        end
+
+        it "does not grade students for checkpointed discussions" do
+          topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+            dates: [{ type: "everyone", due_at: 1.week.from_now }],
+            points_possible: 5
+          )
+
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+            dates: [{ type: "everyone", due_at: 2.weeks.from_now }],
+            points_possible: 10,
+            replies_required: 2
+          )
+
+          cd_assignment = topic.assignment
+          cd_submission = cd_assignment.submissions.find_by!(user: @student)
+          cd_submission.score = 1
+
+          rubric = rubric_model
+          ra = RubricAssessment.new(
+            score: 2.0,
+            assessment_type: :grading,
+            rubric:,
+            artifact: cd_submission,
+            assessor: @teacher
+          )
+
+          ra.build_rubric_association(
+            use_for_grading: true,
+            association_object: cd_assignment
+          )
+
+          expect(cd_assignment).not_to receive(:grade_student)
+          ra.save!
+        end
+      end
     end
   end
 

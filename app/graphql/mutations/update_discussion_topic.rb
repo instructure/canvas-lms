@@ -21,6 +21,7 @@
 class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
   include Api
   include Api::V1::AssignmentOverride
+  include DiscussionTopicsHelper
 
   graphql_name "UpdateDiscussionTopic"
 
@@ -84,6 +85,12 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
 
     process_common_inputs(input, discussion_topic.is_announcement, discussion_topic)
     process_future_date_inputs(input.slice(:delayed_post_at, :lock_at), discussion_topic)
+
+    # If discussion topic has checkpoints, the sum of possible points cannot exceed the max for the assignment
+    if input[:checkpoints].present?
+      err_message = validate_possible_points_with_checkpoints(input)
+      return validation_error(err_message) unless err_message.nil?
+    end
 
     # Take care of Assignment update information
     if input[:assignment]

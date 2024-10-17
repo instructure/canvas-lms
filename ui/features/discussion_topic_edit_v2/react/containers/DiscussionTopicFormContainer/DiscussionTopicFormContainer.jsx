@@ -114,7 +114,6 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
   const handleFormSubmit = (formData, notifyUsers) => {
     const {usageRightsData, ...formDataWithoutUsageRights} = formData
     setUsageRightData(usageRightsData)
-
     if (isEditing) {
       updateDiscussionTopic({variables: {...formDataWithoutUsageRights, notifyUsers}})
     } else {
@@ -224,9 +223,10 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
         setOnFailure(I18n.t('Error updating file usage rights'))
       })
     },
-    onError: () => {
+    onError: err => {
+      const errMsg = (err?.graphQLErrors || []).map(error => error?.message).join(', ')
       setIsSubmitting(false)
-      setOnFailure(I18n.t('Error creating discussion topic'))
+      setOnFailure(errMsg || I18n.t('Error creating discussion topic'))
     },
   })
 

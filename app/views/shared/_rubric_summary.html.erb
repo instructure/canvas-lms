@@ -19,7 +19,7 @@
 <% rubric_summary ||= nil %>
 <% rubric = rubric_summary %>
 <% rubric_association ||= nil; editable ||= false; association_object = nil
-   edit ||= false; rubic ||= nil; assessing ||= false; assessment ||= nil; brief ||= false %>
+   edit ||= false; rubic ||= nil; assessing ||= false; assessment ||= nil; brief ||= false; checkpointed ||= false; %>
 <div class="rubric_container rubric rubric_summary <%= 'free_form' if rubric && rubric.free_form_criterion_comments %>" id="<%= rubric ? "rubric_summary_#{rubric.id}" : "default_rubric_summary" %>" style="<%= 'hidden' unless brief %>">
   <div class="screenreader-only"><h3><%= t 'rubric', "Rubric" %></h3></div>
   <div class="rubric_title" style="<%= hidden if brief %>">
@@ -65,4 +65,8 @@
 </div>
 <div class="button-container" style="<%= hidden if brief %>">
   <button class="toggle_full_rubric edit btn"><%= t 'buttons.edit_assessment', "Edit Assessment" %></button>
+  <% if checkpointed %>
+    <div id="rubrics_checkpoints_info">
+    </div>
+  <% end %>
 </div>

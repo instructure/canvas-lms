@@ -124,6 +124,10 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
               }
             }
           }
+          errors {
+            attribute
+            message
+          }
         }
       }
     GQL
@@ -246,6 +250,12 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       }
     )
     result.to_h.with_indifferent_access
+  end
+
+  def expect_error(result, message)
+    errors = result["errors"] || result.dig("data", "updateDiscussionTopic", "errors")
+    expect(errors).not_to be_nil
+    expect(errors[0]["message"]).to match(/#{message}/)
   end
 
   it "updates the discussion topic" do
@@ -938,6 +948,19 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(assignment.sub_assignments.count).to eq 0
       expect(DiscussionTopic.last.reply_to_entry_required_count).to eq 0
       expect(@graded_topic.reload.assignment).to be_nil
+    end
+
+    it "returns an error if the sum of points possible for the checkpoints exceeds the max for the assignment" do
+      result = run_mutation(id: @graded_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC,
+                                dates: [],
+                                pointsPossible: 999_999_999 },
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY,
+                                dates: [],
+                                pointsPossible: 1,
+                                repliesRequired: 2 }
+                            ])
+      expect_error(result, "The value of possible points for this assignment cannot exceed 999999999.")
     end
   end
 

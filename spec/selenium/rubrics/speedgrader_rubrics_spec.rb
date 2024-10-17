@@ -376,6 +376,46 @@ describe "Rubrics in speedgrader" do
     end
   end
 
+  context "discussion_checkpoints" do
+    before do
+      Account.site_admin.enable_feature!(:discussion_checkpoints)
+      course_with_teacher_logged_in
+      student_in_course
+    end
+
+    it "does not respect used for grading when checkpointed" do
+      checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: checkpointed_discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: 2.days.from_now }],
+        points_possible: 6
+      )
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: checkpointed_discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "everyone", due_at: 3.days.from_now }],
+        points_possible: 7,
+        replies_required: 2
+      )
+      cda = checkpointed_discussion.assignment
+      cda.find_or_create_submission(@student)
+      rubric = @course.rubrics.create!(title: "Rubric 1", user: @user, context: @course, data: smallest_rubric_data, points_possible: 30)
+      RubricAssociation.create!(rubric:, context: @course, association_object: @course, purpose: "grading")
+      rubric.associate_with(cda, @course, purpose: "grading", use_for_grading: true)
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{cda.id}"
+      expect(fj("div:contains('Rubrics do not auto-populate grades for checkpoints.')")).to be_present
+
+      fj("button:contains('View Rubric')").click
+      fj("div.rating-tier:contains('10 pts')").click
+      fj("button:contains('Save')").click
+      wait_for_ajaximations
+      expect(fj("span[data-testid='rubric-total']:contains('Total Points: 10')")).to be_present
+      expect(Speedgrader.grade_value).to be_empty
+    end
+  end
+
   describe "hide rubric total" do
     before do
       course_with_teacher_logged_in
