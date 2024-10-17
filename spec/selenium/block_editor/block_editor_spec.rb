@@ -17,31 +17,25 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 #
 # some if the specs in here include "ignore_js_errors: true". This is because
 # console errors are emitted for things that aren't really errors, like react
 # jsx attribute type warnings
 #
-
 # rubocop:disable Specs/NoNoSuchElementError, Specs/NoExecuteScript
 require_relative "../common"
 require_relative "pages/block_editor_page"
-
 describe "Block Editor", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include BlockEditorPage
-
   def drop_new_block(block_name, where)
     drag_and_drop_element(block_toolbox_box_by_block_name(block_name), where)
   end
-
   before do
     course_with_teacher_logged_in
     @course.account.enable_feature!(:block_editor)
     @context = @course
     @rce_page = @course.wiki_pages.create!(title: "RCE Page", body: "RCE Page Body")
-
     @block_page = build_wiki_page("page-with-apple-icon.json")
   end
 
@@ -134,11 +128,9 @@ describe "Block Editor", :ignore_js_errors do
       open_block_toolbox_to_tab("blocks")
       drop_new_block("text", group_block_dropzone)
       expect(block_toolbar).to be_displayed
-
       expect(block_resize_handle("se")).to be_displayed
       expect(text_block.size.height).to eq(19) # 1.2rem
       expect(text_block.size.width).to eq(160) # 10rem
-
       drag_and_drop_element_by(block_resize_handle("se"), 100, 0)
       drag_and_drop_element_by(block_resize_handle("se"), 0, 50)
       expect(text_block.size.width).to eq(260)
@@ -151,31 +143,24 @@ describe "Block Editor", :ignore_js_errors do
       open_block_toolbox_to_tab("blocks")
       drop_new_block("text", group_block_dropzone)
       expect(block_toolbar).to be_displayed
-
       expect(block_resize_handle("se")).to be_displayed
       expect(text_block.size.height).to eq(19)
       expect(text_block.size.width).to eq(160)
-
       f("body").send_keys(:alt, :arrow_down)
       expect(text_block.size.height).to eq(20)
       expect(text_block.size.width).to eq(160)
-
       f("body").send_keys(:alt, :arrow_right)
       expect(text_block.size.height).to eq(20)
       expect(text_block.size.width).to eq(161)
-
       f("body").send_keys(:alt, :arrow_left)
       expect(text_block.size.height).to eq(20)
       expect(text_block.size.width).to eq(160)
-
       f("body").send_keys(:alt, :arrow_up)
       expect(text_block.size.height).to eq(19)
       expect(text_block.size.width).to eq(160)
-
       f("body").send_keys(:alt, :shift, :arrow_right)
       expect(text_block.size.height).to eq(19)
       expect(text_block.size.width).to eq(170)
-
       f("body").send_keys(:alt, :shift, :arrow_down)
       expect(text_block.size.height).to eq(29)
       expect(text_block.size.width).to eq(170)
@@ -192,11 +177,9 @@ describe "Block Editor", :ignore_js_errors do
         path = File.expand_path(File.dirname(__FILE__) + "/../../../public/images/email.png")
         @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
         @image.save!
-
         get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
         wait_for_block_editor
         open_block_toolbox_to_tab("blocks")
-
         drop_new_block("image", group_block_dropzone)
         image_block_upload_button.click
         course_images_tab.click
@@ -212,11 +195,9 @@ describe "Block Editor", :ignore_js_errors do
         path = File.expand_path(File.dirname(__FILE__) + "/../../../public/images/email.png")
         @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
         @image.save!
-
         get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
         wait_for_block_editor
         open_block_toolbox_to_tab("blocks")
-
         drop_new_block("image", group_block_dropzone)
         image_block_upload_button.click
         user_images_tab.click
@@ -236,7 +217,6 @@ describe "Block Editor", :ignore_js_errors do
       @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
       @image.save!
       # image is 2000w x 1000h
-
       @block_page.update!(
         block_editor_attributes: {
           time: Time.now.to_i,
@@ -250,11 +230,9 @@ describe "Block Editor", :ignore_js_errors do
       it("is not possible with SizeVariant 'auto'") do
         get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
         wait_for_block_editor
-
         image_block.click  # select the section
         image_block.click  # select the block
         expect(block_resize_handle("se")).to be_displayed
-
         click_block_toolbar_menu_item("Image Size", "Auto")
         expect(block_editor_editor).not_to contain_css(block_resize_handle_selector("se"))
       end
@@ -263,13 +241,11 @@ describe "Block Editor", :ignore_js_errors do
         it "adjusts the width when the height is changed" do
           get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
           wait_for_block_editor
-
           image_block.click  # select the section
           image_block.click  # select the block
           expect(block_resize_handle("se")).to be_displayed
           expect(image_block.size.width).to eq(200)
           expect(image_block.size.height).to eq(100)
-
           f("body").send_keys(:alt, :shift, :arrow_down)
           expect(image_block.size.height).to eq(110)
           expect(image_block.size.width).to eq(220)
@@ -281,12 +257,10 @@ describe "Block Editor", :ignore_js_errors do
       it "can add alt text" do
         get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
         wait_for_block_editor
-
         image_block.click
         image_block_alt_text_button.click
         alt_input = image_block_alt_text_input
         expect(alt_input).to be_displayed
-
         alt_input.send_keys("I am alt text")
         alt_input.send_keys(:escape)
         expect(f("img", image_block).attribute("alt")).to eq("I am alt text")
@@ -294,5 +268,4 @@ describe "Block Editor", :ignore_js_errors do
     end
   end
 end
-
 # rubocop:enable Specs/NoNoSuchElementError, Specs/NoExecuteScript

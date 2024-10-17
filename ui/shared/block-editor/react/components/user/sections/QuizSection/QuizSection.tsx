@@ -30,7 +30,6 @@ import {MatchingQuestion} from './questions/MatchingQuestion'
 import {quizQuestions} from '../../../../assets/data/quizQuestions'
 import {IconQuizSolid} from '@instructure/ui-icons'
 import {useClassNames} from '../../../../utils'
-import {QuizSectionMenu} from './QuizSectionMenu'
 import {QuizModal} from './QuizModal'
 import {type QuizSectionProps} from './types'
 
@@ -159,9 +158,6 @@ QuizSection.craft = {
   displayName: 'Quiz Question',
   defaultProps: {
     questionId: undefined,
-  },
-  related: {
-    sectionMenu: QuizSectionMenu,
   },
   custom: {
     isSection: true,

@@ -22,7 +22,6 @@ import {Element, useEditor, useNode, type Node} from '@craftjs/core'
 import {Container} from '../../blocks/Container'
 import {ColumnsSectionToolbar} from './ColumnsSectionToolbar'
 import {useClassNames} from '../../../../utils'
-import {SectionMenu} from '../../../editor/SectionMenu'
 import {GroupBlock} from '../../blocks/GroupBlock'
 import {type ColumnsSectionProps} from './types'
 
@@ -127,6 +126,5 @@ ColumnsSection.craft = {
   },
   related: {
     toolbar: ColumnsSectionToolbar,
-    sectionMenu: SectionMenu,
   },
 }

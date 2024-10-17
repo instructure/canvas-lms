@@ -51,23 +51,6 @@ const getToolbarPos = (
   }
 }
 
-const getMenuPos = (
-  domNode: HTMLElement | null,
-  mountPoint: HTMLElement,
-  currentMenuRef: HTMLElement | null
-) => {
-  if (!domNode) return {top: 0, left: 0}
-
-  const nodeRect = domNode.getBoundingClientRect()
-  const refRect = mountPoint.getBoundingClientRect()
-
-  const top = nodeRect.top - refRect.top
-  const menuWidth = currentMenuRef ? currentMenuRef.getBoundingClientRect().width : 0
-  const left = nodeRect.left + nodeRect.width - refRect.left - menuWidth
-
-  return {top, left}
-}
-
 function findUpNode(
   node: Node,
   query: any,
@@ -96,4 +79,4 @@ const findContainingSection = (node: Node, query: any): Node | undefined => {
   return upnode && upnode.data.custom?.isSection ? upnode : undefined
 }
 
-export {getToolbarPos, getMenuPos, findUpNode, findDownNode, findContainingSection}
+export {getToolbarPos, findUpNode, findDownNode, findContainingSection}

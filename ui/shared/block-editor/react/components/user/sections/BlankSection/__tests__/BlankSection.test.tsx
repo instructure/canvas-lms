@@ -44,8 +44,4 @@ describe('BlankSection', () => {
   it('is tagged as a section', () => {
     expect(BlankSection.craft.custom.isSection).toBe(true)
   })
-
-  it('has a section menu', () => {
-    expect(BlankSection.craft.related.sectionMenu).toBeDefined()
-  })
 })

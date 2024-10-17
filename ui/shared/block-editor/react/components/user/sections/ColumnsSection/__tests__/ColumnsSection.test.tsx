@@ -66,10 +66,6 @@ describe('ColumnsSection', () => {
     expect(ColumnsSection.craft.custom.isSection).toBe(true)
   })
 
-  it('has a section menu', () => {
-    expect(ColumnsSection.craft.related.sectionMenu).toBeDefined()
-  })
-
   it('has "Columns" as the displayName', () => {
     expect(ColumnsSection.craft.displayName).toBe('Columns')
   })
