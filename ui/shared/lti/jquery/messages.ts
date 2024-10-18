@@ -53,6 +53,8 @@ const SUBJECT_ALLOW_LIST = [
   'lti.getPageSettings',
   'requestFullWindowLaunch',
   'toggleCourseNavigationMenu',
+  'showNavigationMenu',
+  'hideNavigationMenu',
 ] as const
 
 /**
@@ -152,6 +154,8 @@ const handlers: Record<
   'lti.getPageSettings': () => import(`./subjects/lti.getPageSettings`),
   requestFullWindowLaunch: () => import(`./subjects/requestFullWindowLaunch`),
   toggleCourseNavigationMenu: () => import(`./subjects/toggleCourseNavigationMenu`),
+  showNavigationMenu: () => import(`./subjects/showNavigationMenu`),
+  hideNavigationMenu: () => import(`./subjects/hideNavigationMenu`),
 }
 
 /**
