@@ -1119,6 +1119,9 @@ hy:
         admins_can_change_passwords: "Ադմինիստրատոների կողմից գաղտնաբառերի սահմանում"
         admins_can_view_notifications: "Ադմինիստրատորները կարող են դիտել ծանուցումները"
         allow_invitation_previews: "Հրավերների նախնական դիտում"
+        allow_name_pronunciation_edit_for_admins: Ադմինիստրատոր
+        allow_name_pronunciation_edit_for_students: Ունկնդիր
+        allow_name_pronunciation_edit_for_teachers: Դասավանդող
         allow_sending_scores_in_emails: "Ունկնդիրները կարող են ընտրել ծանուցումները էլ.փոստով ստանալու տարբերակը"
         allow_sis_import: "SIS ներմուծումներ"
         author_email_in_notifications: "Ցույց տալ ուղարկողի էլ.փոստի հասցեն օգտատերերի փոխգործողությունների մասին ծանուցումների ուղարկման համար "
