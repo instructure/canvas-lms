@@ -45,6 +45,23 @@ describe RubricAssessmentsController do
     end
   end
 
+  describe "GET 'export'" do
+    it "downloads a file" do
+      course_with_teacher_logged_in(active_all: true)
+      rubric_assessment_model(user: @user, context: @course, purpose: "grading")
+      get :export, params: {
+        course_id: @course.id,
+        assignment_id: @rubric_association.association_object.id,
+        format: :json
+      }
+
+      expect(response).to be_successful
+      expect(response.headers["Content-Type"]).to include("text/csv")
+      expect(response.headers["Content-Disposition"]).to include("attachment")
+      expect(response.headers["Content-Disposition"]).to include("export_rubric_assessments.csv")
+    end
+  end
+
   describe "PUT 'update'" do
     it "requires authorization" do
       course_with_teacher(active_all: true)
