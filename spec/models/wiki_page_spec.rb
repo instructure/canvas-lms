@@ -201,6 +201,15 @@ describe WikiPage do
     expect(p2.url).to eq("apples-2")
   end
 
+  it "rescues a RecordNotUnique error and throws a 409 if create_lookup tries to create a duplicate lookup" do
+    course_factory(active_all: true)
+    p1 = @course.wiki_pages.create!(title: "bananas")
+    p2 = @course.wiki_pages.create!(title: "bananas")
+    p1.save!
+    p2.update_column(:url, "bananas")
+    expect { p2.create_lookup }.to raise_error("wiki page with that url already exists")
+  end
+
   it "lets you reuse the title/url of a deleted page when permanent_page_links is disabled" do
     Account.site_admin.disable_feature! :permanent_page_links
     course_with_teacher(active_all: true)
