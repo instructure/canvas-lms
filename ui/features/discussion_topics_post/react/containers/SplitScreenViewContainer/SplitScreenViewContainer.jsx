@@ -50,7 +50,7 @@ import {SplitScreenThreadsContainer} from '../SplitScreenThreadsContainer/SplitS
 import {SplitScreenParent} from './SplitScreenParent'
 import PropTypes from 'prop-types'
 import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react'
-import {useMutation, useQuery} from 'react-apollo'
+import {useMutation, useQuery} from '@apollo/react-hooks'
 import {View} from '@instructure/ui-view'
 import * as ReactDOMServer from 'react-dom/server'
 import useCreateDiscussionEntry from '../../hooks/useCreateDiscussionEntry'

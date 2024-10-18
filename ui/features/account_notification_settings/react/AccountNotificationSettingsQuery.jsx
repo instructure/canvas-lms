@@ -24,7 +24,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import React from 'react'
 import {string} from 'prop-types'
-import {useQuery} from 'react-apollo'
+import {useQuery} from '@apollo/react-hooks'
 
 const I18n = useI18nScope('courses')
 

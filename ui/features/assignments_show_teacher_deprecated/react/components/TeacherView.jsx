@@ -19,7 +19,7 @@
 import React from 'react'
 import {bool, string} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {Mutation} from 'react-apollo'
+import {Mutation} from '@apollo/react-components'
 import classnames from 'classnames'
 import produce from 'immer'
 import get from 'lodash/get'

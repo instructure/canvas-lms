@@ -38,7 +38,7 @@ import {
   UPDATE_SPLIT_SCREEN_VIEW_DEEPLY_NESTED_ALERT,
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
 } from '../../../graphql/Mutations'
-import {useMutation} from 'react-apollo'
+import {useMutation} from '@apollo/react-hooks'
 import {View} from '@instructure/ui-view'
 import {ReportReply} from '../../components/ReportReply/ReportReply'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'

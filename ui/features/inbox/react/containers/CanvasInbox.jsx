@@ -25,7 +25,7 @@ import ConversationListContainer from './ConversationListContainer'
 import {NoSelectedConversation} from '../components/NoSelectedConversation/NoSelectedConversation'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {useMutation, useQuery} from 'react-apollo'
+import {useMutation, useQuery} from '@apollo/react-hooks'
 import {
   CREATE_USER_INBOX_LABEL,
   DELETE_CONVERSATIONS,

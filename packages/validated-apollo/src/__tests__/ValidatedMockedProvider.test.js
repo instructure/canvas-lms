@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import gql from 'graphql-tag'
-import {Query} from 'react-apollo'
+import {Query} from '@apollo/react-components'
 import {cleanupValidationErrors, checkForValidationErrors} from '../ValidatedApolloClient'
 import ValidatedMockedProvider from '../ValidatedMockedProvider'
 

@@ -50,7 +50,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import _ from 'lodash'
 import {OBSERVER_ENROLLMENTS_QUERY} from '../graphql/Queries'
 import Pill from './Pill'
-import {useQuery} from 'react-apollo'
+import {useQuery} from '@apollo/react-hooks'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {
   FileAttachmentUpload,

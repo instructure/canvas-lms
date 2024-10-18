@@ -31,7 +31,7 @@ import {View} from '@instructure/ui-view'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {BaseButtonTheme} from '@instructure/shared-types'
-import {useMutation} from 'react-apollo'
+import {useMutation} from '@apollo/react-hooks'
 import {SET_WORKFLOW} from '@canvas/assignments/graphql/teacher/Mutations'
 import {BREAKPOINTS, type Breakpoints} from '@canvas/with-breakpoints'
 
