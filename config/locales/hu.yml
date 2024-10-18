@@ -1466,6 +1466,9 @@ hu:
         admins_can_change_passwords: "Adminisztrátorok általi jelszóbeállítások"
         admins_can_view_notifications: "Az adminisztrátorok láthatják az értesítéseket"
         allow_invitation_previews: "Meghívó előnézete"
+        allow_name_pronunciation_edit_for_admins: Admin
+        allow_name_pronunciation_edit_for_students: Hallgató
+        allow_name_pronunciation_edit_for_teachers: Oktató
         allow_sending_scores_in_emails: "A hallgatóknak lehetőségük van az eredményeikről e-mail értesítést kérni"
         author_email_in_notifications: "Mutassa a küldő e-mail címét a felhasználói interakció értesítésekben"
         can_add_pronouns: "Személyes névmások engedélyezése"
