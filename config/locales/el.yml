@@ -1084,6 +1084,8 @@ el:
         admins_can_change_passwords: "Συνθηματικό που ρυθμίζεται απο τους διαχειριστές"
         admins_can_view_notifications: "Οι Διαχειριστές μπορούν να δουν τις ειδοποιήσεις"
         allow_invitation_previews: "Προεπισκοπίσεις Προσκλήσεων"
+        allow_name_pronunciation_edit_for_admins: Διαχειριστής
+        allow_name_pronunciation_edit_for_teachers: Δάσκαλος
         allow_sending_scores_in_emails: "Οι μαθητές μπορούν να επιλέξουν να λαμβάνουν τα αποτελέσματα μέσα σε ειδοποιήσεις ηλεκτρονικού ταχυδρομείου"
         author_email_in_notifications: "Εμφάνιση της ηλεκτρονικής διεύθυνσης του αποστολέα για Ειδοποιήσεις σχετικά με αλληλεπίδραση χρηστών"
         default_language: "Προεπιλεγμένη Γλώσσα"
@@ -1597,6 +1599,7 @@ el:
   add_an_assignment_fb73942e: "Προσθέστε μια εργασία"
   add_an_attachment_b2e9092f: "Προσθήκη επισύναψης"
   add_an_identity_provider_to_this_account_c2644478: "Προσθέστε έναν πάροχο αυθεντικοποίησης σε αυτόν τον λογαριασμό:"
+  add_announcement_e6de0fd: "Καταχώριση Ανακοίνωσης"
   add_another_assignment_fc5c908f: "Προσθέστε άλλη μια εργασία"
   add_app_baf540f: "Πρόσθεση Εφαρμογής"
   add_as_a_faculty_journal_entry_55a38a30: "Προσθήκη ως καταχώριση Ιστορικού Καθηγητή/ας"
