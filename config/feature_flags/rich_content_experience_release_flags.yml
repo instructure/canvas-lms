@@ -76,6 +76,13 @@ file_verifiers_for_quiz_links:
     Links to Canvas files created in New Quizzes will always add file verifiers to allow authentication
   applies_to: RootAccount
 
+files_a11y_rewrite:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Files a11y Rewrite
+  description: |-
+    Enables the new Files a11y Rewrite page.
+
 media_links_use_attachment_id:
   state: hidden
   display_name: Use Attachment IDs in Media Links
