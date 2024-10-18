@@ -17,7 +17,7 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {ApolloProvider} from 'react-apollo'
+import {ApolloProvider} from '@apollo/react-common'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {MessageDetailContainer} from '../MessageDetailContainer'
 import {Conversation} from '../../../../graphql/Conversation'

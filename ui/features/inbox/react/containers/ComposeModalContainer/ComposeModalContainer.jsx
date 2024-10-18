@@ -37,7 +37,7 @@ import {
   SelectStrings,
 } from '@canvas/upload-media-translations'
 import {ConversationContext} from '../../../util/constants'
-import {useLazyQuery, useQuery} from 'react-apollo'
+import {useLazyQuery, useQuery} from '@apollo/react-hooks'
 import {RECIPIENTS_OBSERVERS_QUERY, INBOX_SETTINGS_QUERY} from '../../../graphql/Queries'
 import {ModalBodyContext, translationSeparator} from '../../utils/constants'
 import {translateMessage, handleTranslatedModalBody, stripSignature} from '../../utils/inbox_translator'

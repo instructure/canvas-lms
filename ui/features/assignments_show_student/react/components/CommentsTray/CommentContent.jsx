@@ -32,7 +32,7 @@ import {
 } from '@canvas/assignments/graphql/student/Queries'
 import {SubmissionComment} from '@canvas/assignments/graphql/student/SubmissionComment'
 import SVGWithTextPlaceholder from '../../SVGWithTextPlaceholder'
-import {useMutation} from 'react-apollo'
+import {useMutation} from '@apollo/react-hooks'
 import {View} from '@instructure/ui-view'
 import {captureException} from '@sentry/react'
 

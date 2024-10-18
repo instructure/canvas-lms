@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {ApolloProvider} from 'react-apollo'
+import {ApolloProvider} from '@apollo/react-common'
 import TeacherQuery from './components/TeacherQuery'
 import {createClient} from '@canvas/apollo'
 import {ApolloClient} from 'apollo-client'
