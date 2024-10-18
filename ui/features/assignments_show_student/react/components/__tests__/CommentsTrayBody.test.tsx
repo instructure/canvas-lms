@@ -18,11 +18,13 @@
  */
 
 import $ from 'jquery'
-import * as apollo from 'react-apollo'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import CommentContent from '../CommentsTray/CommentContent'
 import CommentsTrayBody from '../CommentsTray/CommentsTrayBody'
-import {CREATE_SUBMISSION_COMMENT} from '@canvas/assignments/graphql/student/Mutations'
+import {
+  CREATE_SUBMISSION_COMMENT,
+  MARK_SUBMISSION_COMMENT_READ,
+} from '@canvas/assignments/graphql/student/Mutations'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/react-testing'
 import {act, fireEvent, render, waitFor} from '@testing-library/react'
@@ -84,6 +86,16 @@ async function mockComments(overrides = {}) {
   const queryResult = await mockSubmissionCommentQuery(overrides)
 
   return queryResult.result.data?.submissionComments.commentsConnection.nodes
+}
+
+async function mockMarkSubmissionCommentsRead(overrides) {
+  return {
+    request: {
+      query: MARK_SUBMISSION_COMMENT_READ,
+      variables: {commentIds: ['1'], submissionId: '1'},
+    },
+    ...overrides,
+  }
 }
 
 let mockedSetOnFailure: (alertMessage: string) => void
@@ -165,24 +177,18 @@ describe('CommentsTrayBody', () => {
           nodes: [{read: false}],
         },
       }
-      const mocks = [await mockSubmissionCommentQuery(overrides)]
 
-      const mockMutation = jest.fn()
-      // @ts-ignore
-      apollo.useMutation = jest.fn(() => [mockMutation, {called: true, error: null}])
+      const mockMutation = jest.fn().mockResolvedValue({data: {markSubmissionCommentsRead: {}}})
+      const mocks = [
+        await mockSubmissionCommentQuery(overrides),
+        await mockMarkSubmissionCommentsRead({newData: mockMutation}),
+      ]
 
       render(mockContext(<CommentsTrayBody {...props} />, mocks))
 
-      // @ts-ignore
-      act(() => jest.runAllTimers())
+      await act(() => jest.runAllTimers())
 
-      await waitFor(
-        () =>
-          expect(mockMutation).toHaveBeenCalledWith({
-            variables: {commentIds: ['1'], submissionId: '1'},
-          }),
-        {timeout: 3000}
-      )
+      await waitFor(() => expect(mockMutation).toHaveBeenCalledWith(), {timeout: 3000})
     })
 
     it('does not mark submission comments as read for observers', async () => {
@@ -197,11 +203,12 @@ describe('CommentsTrayBody', () => {
           nodes: [{read: false}],
         },
       }
-      const mocks = [await mockSubmissionCommentQuery(overrides)]
 
-      const mockMutation = jest.fn()
-      // @ts-ignore
-      apollo.useMutation = jest.fn(() => [mockMutation, {called: true, error: null}])
+      const mockMutation = jest.fn().mockResolvedValue({data: {markSubmissionCommentsRead: {}}})
+      const mocks = [
+        await mockSubmissionCommentQuery(overrides),
+        await mockMarkSubmissionCommentsRead({newData: mockMutation}),
+      ]
 
       render(
         mockContext(
@@ -214,8 +221,8 @@ describe('CommentsTrayBody', () => {
         )
       )
 
-      // @ts-ignore
-      act(() => jest.runAllTimers())
+      await act(() => jest.runAllTimers())
+
       expect(mockMutation).not.toHaveBeenCalled()
     })
 
@@ -232,13 +239,15 @@ describe('CommentsTrayBody', () => {
           nodes: [{read: false}],
         },
       }
-      const mocks = [await mockSubmissionCommentQuery(overrides)]
-      // @ts-ignore
-      apollo.useMutation = jest.fn(() => [jest.fn(), {called: true, error: true}])
+      const mocks = [
+        await mockSubmissionCommentQuery(overrides),
+        await mockMarkSubmissionCommentsRead({error: new Error('it failed!')}),
+      ]
 
       render(mockContext(<CommentsTrayBody {...props} />, mocks))
-      // @ts-ignore
-      act(() => jest.advanceTimersByTime(3000))
+
+      await act(() => jest.advanceTimersByTime(3000))
+      await act(() => jest.runAllTimers())
 
       expect(mockedSetOnFailure).toHaveBeenCalledWith(
         'There was a problem marking submission comments as read'
@@ -258,13 +267,21 @@ describe('CommentsTrayBody', () => {
           nodes: [{read: false}],
         },
       }
-      const mocks = [await mockSubmissionCommentQuery(overrides)]
-      // @ts-ignore
-      apollo.useMutation = jest.fn(() => [jest.fn(), {called: true, error: false}])
+
+      const result = await mockQuery(MARK_SUBMISSION_COMMENT_READ, [], {
+        commentIds: ['1'],
+        submissionId: '1',
+      })
+
+      const mocks = [
+        await mockSubmissionCommentQuery(overrides),
+        await mockMarkSubmissionCommentsRead({result}),
+      ]
 
       render(mockContext(<CommentsTrayBody {...props} />, mocks))
-      // @ts-ignore
-      act(() => jest.advanceTimersByTime(3000))
+
+      await act(() => jest.advanceTimersByTime(3000))
+      await act(() => jest.runAllTimers())
 
       expect(mockedSetOnSuccess).toHaveBeenCalledWith(
         'All submission comments have been marked as read'
@@ -488,13 +505,13 @@ describe('CommentsTrayBody', () => {
       },
     }
 
+    const cursorMock = await mockSubmissionCommentQuery(overrides, {cursor: 'Hello World'})
+
     const mocks = [
       await mockSubmissionCommentQuery(overrides),
-      await mockSubmissionCommentQuery(overrides, {cursor: 'Hello World'}),
+      {...cursorMock, result: undefined, newData: jest.fn().mockResolvedValue(cursorMock.result)},
     ]
     const props = await mockAssignmentAndSubmission()
-
-    const querySpy = jest.spyOn(apollo, 'useQuery')
 
     const {getByText} = render(
       <MockedProvider mocks={mocks}>
@@ -504,8 +521,7 @@ describe('CommentsTrayBody', () => {
 
     const loadMoreButton = await waitFor(() => getByText('Load Previous Comments'))
     fireEvent.click(loadMoreButton)
-
-    expect(querySpy).toHaveBeenCalledTimes(3)
+    expect(mocks[1].newData).toHaveBeenCalled()
   })
 
   it('renders CommentTextArea when the student can make changes to the submission', async () => {
