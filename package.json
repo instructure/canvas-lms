@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@apollo/client": "~3.11.8",
+    "@hookform/resolvers": "^3.9.0",
     "@instructure/brandable_css": "^3",
     "@instructure/canvas-media": "*",
     "@instructure/debounce": "8.56.4",
@@ -185,6 +186,7 @@
     "react-dnd-html5-backend": "6.0",
     "react-dom": "^18",
     "react-final-form": "^6.5.3",
+    "react-hook-form": "^7.53.0",
     "react-identicons": "^1.2.5",
     "react-immutable-proptypes": "^2.1.0",
     "react-lazy-load": "^4.0.1",

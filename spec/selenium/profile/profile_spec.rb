@@ -114,10 +114,9 @@ describe "profile" do
 
       get "/profile/settings"
       add_email_link
-      f('#communication_channels a[href="#register_email_address"]').click
-      form = f("#register_email_address")
+      form = f("[role=dialog][aria-label='Register Communication']")
       test_email = "nobody+1234@example.com"
-      form.find_element(:id, "communication_channel_email").send_keys(test_email)
+      form.find_element(:name, "email").send_keys(test_email)
       submit_form(form)
 
       confirmation_dialog = f("#confirm_email_channel")
@@ -217,8 +216,8 @@ describe "profile" do
         test_cell_number = "8017121011"
         get "/profile/settings"
         f(".add_contact_link").click
-        register_form = f("#register_sms_number")
-        register_form.find_element(:css, ".sms_number").send_keys(test_cell_number)
+        register_form = f("[role=dialog][aria-label='Register Communication']")
+        register_form.find_element(:name, "sms").send_keys(test_cell_number)
         driver.action.send_keys(:tab).perform
         submit_form(register_form)
         wait_for_ajaximations
@@ -234,10 +233,10 @@ describe "profile" do
         Account.default.save!
         get "/profile/settings"
         f(".add_contact_link").click
-        # ensure sms number registration form is not present
-        expect(element_exists?("#register_sms_number")).to be false
-        # ensure email address registration form is shown
-        expect(f("#register_email_address")).to be_present
+        # ensure sms number registration tab is not present
+        expect(element_exists?("[role=tab][aria-controls=sms]")).to be false
+        # ensure email address registration tab is shown
+        expect(f("[role=tab][aria-controls=email]")).to be_present
       end
 
       # scenario 2A: MFA disabled, in US region
@@ -248,10 +247,10 @@ describe "profile" do
         Account.default.save!
         get "/profile/settings"
         f(".add_contact_link").click
-        # ensure sms number registration form is not present
-        expect(element_exists?("#register_sms_number")).to be false
-        # ensure email address registration form is shown
-        expect(f("#register_email_address")).to be_present
+        # ensure sms number registration tab is not present
+        expect(element_exists?("[role=tab][aria-controls=sms]")).to be false
+        # ensure email address registration tab is shown
+        expect(f("[role=tab][aria-controls=email]")).to be_present
       end
 
       # scenario 2B: MFA disabled, NOT in US region
@@ -262,10 +261,10 @@ describe "profile" do
         Account.default.save!
         get "/profile/settings"
         f(".add_contact_link").click
-        # ensure sms number registration form is not present
-        expect(element_exists?("#register_sms_number")).to be false
-        # ensure email address registration form is shown
-        expect(f("#register_email_address")).to be_present
+        # ensure sms number registration tab is not present
+        expect(element_exists?("[role=tab][aria-controls=sms]")).to be false
+        # ensure email address registration tab is shown
+        expect(f("[role=tab][aria-controls=email]")).to be_present
       end
 
       # scenario 3A: MFA required for admins, in US region
@@ -277,8 +276,8 @@ describe "profile" do
         test_cell_number = "8017121011"
         get "/profile/settings"
         f(".add_contact_link").click
-        register_form = f("#register_sms_number")
-        register_form.find_element(:css, ".sms_number").send_keys(test_cell_number)
+        register_form = f("[role=dialog][aria-label='Register Communication']")
+        register_form.find_element(:name, "sms").send_keys(test_cell_number)
         driver.action.send_keys(:tab).perform
         submit_form(register_form)
         wait_for_ajaximations
@@ -294,10 +293,10 @@ describe "profile" do
         Account.default.save!
         get "/profile/settings"
         f(".add_contact_link").click
-        # ensure sms number registration form is not present
-        expect(element_exists?("#register_sms_number")).to be false
-        # ensure email address registration form is shown
-        expect(f("#register_email_address")).to be_present
+        # ensure sms number registration tab is not present
+        expect(element_exists?("[role=tab][aria-controls=sms]")).to be false
+        # ensure email address registration tab is shown
+        expect(f("[role=tab][aria-controls=email]")).to be_present
       end
 
       # scenario 4A: MFA required, in US region
@@ -309,8 +308,8 @@ describe "profile" do
         test_cell_number = "8017121011"
         get "/profile/settings"
         f(".add_contact_link").click
-        register_form = f("#register_sms_number")
-        register_form.find_element(:css, ".sms_number").send_keys(test_cell_number)
+        register_form = f("[role=dialog][aria-label='Register Communication']")
+        register_form.find_element(:name, "sms").send_keys(test_cell_number)
         driver.action.send_keys(:tab).perform
         submit_form(register_form)
         wait_for_ajaximations
@@ -326,10 +325,10 @@ describe "profile" do
         Account.default.save!
         get "/profile/settings"
         f(".add_contact_link").click
-        # ensure sms number registration form is not present
-        expect(element_exists?("#register_sms_number")).to be false
-        # ensure email address registration form is shown
-        expect(f("#register_email_address")).to be_present
+        # ensure sms number registration tab is not present
+        expect(element_exists?("[role=tab][aria-controls=sms]")).to be false
+        # ensure email address registration tab is shown
+        expect(f("[role=tab][aria-controls=email]")).to be_present
       end
     end
 
@@ -338,10 +337,9 @@ describe "profile" do
       test_slack_email = "sburnett@instructure.com"
       get "/profile/settings"
       f(".add_contact_link").click
-      f('a[href="#register_slack_handle"]').click
-      f("#communication_channel_slack").send_keys(test_slack_email)
-      driver.action.send_keys(:tab).perform
-      register_form = f("#register_slack_handle")
+      register_form = f("[role=dialog][aria-label='Register Communication']")
+      f("[role=tab][aria-controls=slack]", register_form).click
+      register_form.find_element(:name, "slack").send_keys(test_slack_email)
       submit_form(register_form)
       wait_for_ajaximations
       close_visible_dialog

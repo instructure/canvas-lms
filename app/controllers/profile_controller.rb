@@ -167,6 +167,7 @@ class ProfileController < ApplicationController
 
   include TextHelper
   include ProfileHelper
+  include Login::OtpHelper
 
   def show
     unless @current_user && @domain_root_account.enable_profiles?
@@ -230,7 +231,11 @@ class ProfileController < ApplicationController
     @password_pseudonyms = @pseudonyms.reject(&:managed_password?)
     @context = @user.profile
     set_active_tab "profile_settings"
-    js_env enable_gravatar: @domain_root_account&.enable_gravatar?
+    register_cc_tabs = ["email"]
+    register_cc_tabs.push("sms") if current_mfa_settings != :disabled && otp_via_sms_in_us_region?
+    register_cc_tabs.push("slack") if @user.account.feature_enabled?(:slack_notifications)
+    is_default_account = @domain_root_account == Account.default
+    js_env({ enable_gravatar: @domain_root_account&.enable_gravatar?, register_cc_tabs:, is_default_account: })
     respond_to do |format|
       format.html do
         @user.reload
