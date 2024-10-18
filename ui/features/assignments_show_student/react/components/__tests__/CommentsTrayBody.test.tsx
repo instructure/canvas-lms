@@ -90,7 +90,7 @@ let mockedSetOnFailure: (alertMessage: string) => void
 let mockedSetOnSuccess: (alertMessage: string) => void
 const originalENV = window.ENV
 
-function mockContext(children) {
+function mockContext(children, mocks = []) {
   return (
     <AlertManagerContext.Provider
       value={{
@@ -98,7 +98,7 @@ function mockContext(children) {
         setOnSuccess: mockedSetOnSuccess,
       }}
     >
-      {children}
+      <MockedProvider mocks={mocks}>{children}</MockedProvider>
     </AlertManagerContext.Provider>
   )
 }
@@ -171,13 +171,7 @@ describe('CommentsTrayBody', () => {
       // @ts-ignore
       apollo.useMutation = jest.fn(() => [mockMutation, {called: true, error: null}])
 
-      render(
-        mockContext(
-          <MockedProvider mocks={mocks}>
-            <CommentsTrayBody {...props} />
-          </MockedProvider>
-        )
-      )
+      render(mockContext(<CommentsTrayBody {...props} />, mocks))
 
       // @ts-ignore
       act(() => jest.runAllTimers())
@@ -242,13 +236,7 @@ describe('CommentsTrayBody', () => {
       // @ts-ignore
       apollo.useMutation = jest.fn(() => [jest.fn(), {called: true, error: true}])
 
-      render(
-        mockContext(
-          <MockedProvider mocks={mocks}>
-            <CommentsTrayBody {...props} />
-          </MockedProvider>
-        )
-      )
+      render(mockContext(<CommentsTrayBody {...props} />, mocks))
       // @ts-ignore
       act(() => jest.advanceTimersByTime(3000))
 
@@ -274,13 +262,7 @@ describe('CommentsTrayBody', () => {
       // @ts-ignore
       apollo.useMutation = jest.fn(() => [jest.fn(), {called: true, error: false}])
 
-      render(
-        mockContext(
-          <MockedProvider mocks={mocks}>
-            <CommentsTrayBody {...props} />
-          </MockedProvider>
-        )
-      )
+      render(mockContext(<CommentsTrayBody {...props} />, mocks))
       // @ts-ignore
       act(() => jest.advanceTimersByTime(3000))
 
@@ -432,11 +414,7 @@ describe('CommentsTrayBody', () => {
     const props = await mockAssignmentAndSubmission()
 
     const {getByPlaceholderText, getByText} = render(
-      mockContext(
-        <MockedProvider mocks={mocks}>
-          <CommentsTrayBody {...props} />
-        </MockedProvider>
-      )
+      mockContext(<CommentsTrayBody {...props} />, mocks)
     )
     const textArea = await waitFor(() => getByPlaceholderText('Submit a Comment'))
     fireEvent.change(textArea, {target: {value: 'lion'}})
@@ -573,11 +551,7 @@ describe('CommentsTrayBody', () => {
     const mocks = await Promise.all([mockSubmissionCommentQuery(), mockCreateSubmissionComment()])
     const props = await mockAssignmentAndSubmission()
     const {getByPlaceholderText, getByText} = render(
-      mockContext(
-        <MockedProvider mocks={mocks}>
-          <CommentsTrayBody {...props} />
-        </MockedProvider>
-      )
+      mockContext(<CommentsTrayBody {...props} />, mocks)
     )
     const textArea = await waitFor(() => getByPlaceholderText('Submit a Comment'))
     fireEvent.change(textArea, {target: {value: 'lion'}})
@@ -589,11 +563,7 @@ describe('CommentsTrayBody', () => {
     const mocks = await Promise.all([mockSubmissionCommentQuery(), mockCreateSubmissionComment()])
     const props = await mockAssignmentAndSubmission()
     const {findByPlaceholderText, getByText, findByText} = render(
-      mockContext(
-        <MockedProvider mocks={mocks}>
-          <CommentsTrayBody {...props} />
-        </MockedProvider>
-      )
+      mockContext(<CommentsTrayBody {...props} />, mocks)
     )
     const textArea = await findByPlaceholderText('Submit a Comment')
     fireEvent.change(textArea, {target: {value: 'lion'}})
@@ -606,11 +576,7 @@ describe('CommentsTrayBody', () => {
     const mocks = await Promise.all([mockSubmissionCommentQuery(), mockCreateSubmissionComment()])
     const props = await mockAssignmentAndSubmission()
     const {getByPlaceholderText, getByText, findByText} = render(
-      mockContext(
-        <MockedProvider mocks={mocks}>
-          <CommentsTrayBody {...props} />
-        </MockedProvider>
-      )
+      mockContext(<CommentsTrayBody {...props} />, mocks)
     )
     const textArea = await waitFor(() => getByPlaceholderText('Submit a Comment'))
     fireEvent.change(textArea, {target: {value: 'lion'}})
@@ -622,13 +588,7 @@ describe('CommentsTrayBody', () => {
   it('renders loading indicator when loading query', async () => {
     const mocks = [await mockSubmissionCommentQuery()]
     const props = await mockAssignmentAndSubmission()
-    const {getByTitle} = render(
-      mockContext(
-        <MockedProvider mocks={mocks}>
-          <CommentsTrayBody {...props} />
-        </MockedProvider>
-      )
-    )
+    const {getByTitle} = render(mockContext(<CommentsTrayBody {...props} />, mocks))
     expect(getByTitle('Loading')).toBeInTheDocument()
   })
 
@@ -636,13 +596,7 @@ describe('CommentsTrayBody', () => {
     const mocks = [await mockSubmissionCommentQuery()]
     mocks[0].result = {data: null}
     const props = await mockAssignmentAndSubmission()
-    const {getByText} = render(
-      mockContext(
-        <MockedProvider mocks={mocks}>
-          <CommentsTrayBody {...props} />
-        </MockedProvider>
-      )
-    )
+    const {getByText} = render(mockContext(<CommentsTrayBody {...props} />, mocks))
     expect(await waitFor(() => getByText('Sorry, Something Broke'))).toBeInTheDocument()
   })
 
@@ -651,13 +605,7 @@ describe('CommentsTrayBody', () => {
     // @ts-ignore
     mocks[0].error = new Error('aw shucks')
     const props = await mockAssignmentAndSubmission()
-    const {getByText} = render(
-      mockContext(
-        <MockedProvider mocks={mocks}>
-          <CommentsTrayBody {...props} />
-        </MockedProvider>
-      )
-    )
+    const {getByText} = render(mockContext(<CommentsTrayBody {...props} />, mocks))
 
     expect(await waitFor(() => getByText('Sorry, Something Broke'))).toBeInTheDocument()
   })
@@ -959,11 +907,7 @@ describe('CommentsTrayBody', () => {
       const props = await getDefaultPropsWithReviewerSubmission('completed')
       props.isPeerReviewEnabled = true
       const {findByPlaceholderText, getByText, findByText, queryByTestId} = render(
-        mockContext(
-          <MockedProvider mocks={mocks}>
-            <CommentsTrayBody {...props} />
-          </MockedProvider>
-        )
+        mockContext(<CommentsTrayBody {...props} />, mocks)
       )
       const textArea = await findByPlaceholderText('Submit a Comment')
       fireEvent.change(textArea, {target: {value: 'lion'}})
@@ -982,11 +926,7 @@ describe('CommentsTrayBody', () => {
       props.isPeerReviewEnabled = true
       props.reviewerSubmission.assignedAssessments[1].workflowState = 'completed'
       const {findByPlaceholderText, getByText, findByText, queryByTestId} = render(
-        mockContext(
-          <MockedProvider mocks={mocks}>
-            <CommentsTrayBody {...props} />
-          </MockedProvider>
-        )
+        mockContext(<CommentsTrayBody {...props} />, mocks)
       )
       const textArea = await findByPlaceholderText('Submit a Comment')
       fireEvent.change(textArea, {target: {value: 'lion'}})
@@ -1005,11 +945,7 @@ describe('CommentsTrayBody', () => {
       props.isPeerReviewEnabled = true
       props.reviewerSubmission.assignedAssessments[1].assetSubmissionType = null
       const {findByPlaceholderText, getByText, findByText, queryByTestId} = render(
-        mockContext(
-          <MockedProvider mocks={mocks}>
-            <CommentsTrayBody {...props} />
-          </MockedProvider>
-        )
+        mockContext(<CommentsTrayBody {...props} />, mocks)
       )
       const textArea = await findByPlaceholderText('Submit a Comment')
       fireEvent.change(textArea, {target: {value: 'lion'}})
@@ -1030,11 +966,7 @@ describe('CommentsTrayBody', () => {
       props.isPeerReviewEnabled = true
       props.reviewerSubmission.assignedAssessments[1].workflowState = 'completed'
       const {findByPlaceholderText, getByText, queryByTestId} = render(
-        mockContext(
-          <MockedProvider mocks={mocks}>
-            <CommentsTrayBody {...props} />
-          </MockedProvider>
-        )
+        mockContext(<CommentsTrayBody {...props} />, mocks)
       )
       const textArea = await findByPlaceholderText('Submit a Comment')
       fireEvent.change(textArea, {target: {value: 'lion'}})
@@ -1052,11 +984,7 @@ describe('CommentsTrayBody', () => {
       props.isPeerReviewEnabled = true
       props.assignment.rubric = {}
       const {findByPlaceholderText, getByText, queryByTestId} = render(
-        mockContext(
-          <MockedProvider mocks={mocks}>
-            <CommentsTrayBody {...props} />
-          </MockedProvider>
-        )
+        mockContext(<CommentsTrayBody {...props} />, mocks)
       )
       const textArea = await findByPlaceholderText('Submit a Comment')
       fireEvent.change(textArea, {target: {value: 'lion'}})
@@ -1077,11 +1005,7 @@ describe('CommentsTrayBody', () => {
       }
       props.isPeerReviewEnabled = true
       const {findByPlaceholderText, getByText} = render(
-        mockContext(
-          <MockedProvider mocks={mocks}>
-            <CommentsTrayBody {...props} />
-          </MockedProvider>
-        )
+        mockContext(<CommentsTrayBody {...props} />, mocks)
       )
       const textArea = await findByPlaceholderText('Submit a Comment')
       fireEvent.change(textArea, {target: {value: 'lion'}})
