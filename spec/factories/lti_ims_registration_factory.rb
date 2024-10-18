@@ -34,6 +34,7 @@ module Factories
         https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly
         https://purl.imsglobal.org/spec/lti-ags/scope/score
         https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly
+        https://purl.imsglobal.org/spec/lti/scope/noticehandlers
         https://canvas.instructure.com/lti/public_jwk/scope/update
         https://canvas.instructure.com/lti/account_lookup/scope/show
         https://canvas.instructure.com/lti-ags/progress/scope/show

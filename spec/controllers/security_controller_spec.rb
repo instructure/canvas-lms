@@ -88,32 +88,32 @@ RSpec.describe SecurityController, type: :request do
       allow(Lti::Oidc).to receive(:auth_domain).and_return("canvas.instructure.com")
     end
 
+    def make_jwt(time = nil)
+      time ||= 5.minutes.from_now
+      body = {
+        user_id: 1,
+        root_account_global_id: Account.default.global_id
+      }
+      Canvas::Security.create_jwt(body, time)
+    end
+
     it "rejects timed-out tokens" do
-      jwt = Canvas::Security.create_jwt({
-                                          user_id: 1,
-                                          root_account_uuid: Account.default.uuid
-                                        },
-                                        5.minutes.ago)
+      jwt = make_jwt(5.minutes.ago)
 
       get "/api/lti/security/openid-configuration", headers: { "Authorization" => "Bearer #{jwt}" }
       expect(response).to have_http_status :unauthorized
     end
 
     it "contains the correct information" do
-      jwt = Canvas::Security.create_jwt({
-                                          user_id: 1,
-                                          root_account_global_id: Account.default.global_id
-                                        },
-                                        5.minutes.from_now)
-
       messages = SecurityController.messages_supported
 
-      get "/api/lti/security/openid-configuration?registration_token=#{jwt}"
+      get "/api/lti/security/openid-configuration?registration_token=#{make_jwt}"
       expect(response).to have_http_status :ok
       parsed_body = response.parsed_body
       expect(parsed_body["issuer"]).to eq "https://canvas.instructure.com"
       expect(parsed_body["authorization_endpoint"]).to eq "http://canvas.instructure.com/api/lti/authorize_redirect"
       expect(parsed_body["registration_endpoint"]).to eq "http://localhost/api/lti/registrations"
+      expect(parsed_body["scopes_supported"]).to match_array(["openid", *TokenScopes::LTI_SCOPES.keys])
       expect(parsed_body["jwks_uri"]).to eq "http://canvas.instructure.com/api/lti/security/jwks"
       expect(parsed_body["token_endpoint"]).to eq "http://canvas.instructure.com/login/oauth2/token"
       lti_platform_configuration = parsed_body["https://purl.imsglobal.org/spec/lti-platform-configuration"]
@@ -121,16 +121,26 @@ RSpec.describe SecurityController, type: :request do
       expect(lti_platform_configuration["https://canvas.instructure.com/lti/account_name"]).to eq "Default Account"
       expect(lti_platform_configuration["messages_supported"]).to eq messages
     end
-  end
 
-  context "sharding" do
-    specs_require_sharding
+    context "when the platform_notification_service feature flag is off" do
+      before do
+        Account.default.disable_feature!(:platform_notification_service)
+      end
 
-    before do
-      allow(Lti::Oidc).to receive(:auth_domain).and_return("canvas.instructure.com")
+      it "contains the correct information" do
+        get "/api/lti/security/openid-configuration?registration_token=#{make_jwt}"
+        expect(response).to have_http_status :ok
+        expect(response.parsed_body["scopes_supported"]).to match_array(["openid", *TokenScopes::LTI_SCOPES.keys] - [TokenScopes::LTI_PNS_SCOPE])
+      end
     end
 
-    describe "openid_configuration" do
+    context "sharding" do
+      specs_require_sharding
+
+      before do
+        allow(Lti::Oidc).to receive(:auth_domain).and_return("canvas.instructure.com")
+      end
+
       it "works cross-shard" do
         account_name = "Shard 2 Account"
 
@@ -152,7 +162,7 @@ RSpec.describe SecurityController, type: :request do
         expect(parsed_body["issuer"]).to eq "https://canvas.instructure.com"
         expect(parsed_body["authorization_endpoint"]).to eq "http://canvas.instructure.com/api/lti/authorize_redirect"
         expect(parsed_body["registration_endpoint"]).to eq "http://localhost/api/lti/registrations"
-        expect(parsed_body["scopes_supported"]).to include(*["openid"].union(TokenScopes::LTI_SCOPES.keys))
+        expect(parsed_body["scopes_supported"]).to match_array(["openid", *TokenScopes::LTI_SCOPES.keys])
         lti_platform_configuration = parsed_body["https://purl.imsglobal.org/spec/lti-platform-configuration"]
         expect(lti_platform_configuration["product_family_code"]).to eq "canvas"
         expect(lti_platform_configuration["https://canvas.instructure.com/lti/account_name"]).to eq "Shard 2 Account"
