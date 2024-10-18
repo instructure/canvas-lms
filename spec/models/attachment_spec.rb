@@ -1658,6 +1658,13 @@ describe Attachment do
       expect(@course.attachments.find(@a1.id)).to eql @a
     end
 
+    it "finds replacement beyond replacement_attachment_id update threshold" do
+      files = Array.new(4) { attachment_with_context(@course, display_name: "foo") }
+      files.each_cons(2) { |a, b| a.update! replacement_attachment: b, file_state: "deleted" }
+
+      expect(@course.attachments.find(files.first.id)).to eql files.last
+    end
+
     it "preserves hidden state" do
       @a1.update_attribute(:file_state, "hidden")
       @a.update_attribute(:display_name, "a1")

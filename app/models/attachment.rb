@@ -232,7 +232,7 @@ class Attachment < ActiveRecord::Base
       end
 
       if att.deleted? && owner
-        new_att = owner.attachments.where(id: att.replacement_attachment_id).first if att.replacement_attachment_id
+        new_att = owner.attachments.active.where(id: att.replacement_attachment_id).first if att.replacement_attachment_id
         new_att ||= Folder.find_attachment_in_context_with_path(owner, att.full_display_path)
         new_att || att
       else
