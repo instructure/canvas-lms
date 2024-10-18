@@ -1224,6 +1224,9 @@ uk:
         admins_can_change_passwords: "Налаштування паролю адміністраторами"
         admins_can_view_notifications: "Адміністратори можуть бачити повідомлення"
         allow_invitation_previews: "Попередній перегляд запрошення"
+        allow_name_pronunciation_edit_for_admins: Адміністратор
+        allow_name_pronunciation_edit_for_students: Студент
+        allow_name_pronunciation_edit_for_teachers: Викладач
         allow_sending_scores_in_emails: "Студенти можуть відмовитися від отримання оцінок в поштових повідомленнях"
         author_email_in_notifications: "Показати адресу електронної пошти відправника для повідомлень взаємодії з користувачем"
         canvadocs_prefer_office_online: "Надати перевагу переглядачу файлів Office 365"
