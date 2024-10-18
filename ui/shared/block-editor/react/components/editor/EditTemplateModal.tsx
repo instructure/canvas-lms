@@ -33,7 +33,6 @@ type SaveMode = 'save' | 'edit'
 
 export type OnSaveTemplateCallback = (
   template: Partial<BlockTemplate>,
-  published: boolean,
   globalTemplate: boolean
 ) => void
 
