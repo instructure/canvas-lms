@@ -48,6 +48,21 @@ describe Types::SubmissionType do
     expect(submission_type.resolve("_id", current_user: other_student)).to be_nil
   end
 
+  describe "last_commented_by_user_at" do
+    it "returns the timestamp of the last comment by the current user" do
+      now = Time.zone.now
+      Timecop.freeze(3.hours.ago(now)) { @submission.submission_comments.create!(comment: "hi from teacher", author: @teacher) }
+      Timecop.freeze(2.hours.ago(now)) { @submission.submission_comments.create!(comment: "hi sooner from teacher", author: @teacher) }
+      Timecop.freeze(1.hour.ago(now)) { @submission.submission_comments.create!(comment: "hi soonest from student", author: @student) }
+
+      expect(submission_type.resolve("lastCommentedByUserAt")).to eq 2.hours.ago(now).iso8601
+    end
+
+    it "returns null if the user has no comments" do
+      expect(submission_type.resolve("lastCommentedByUserAt")).to be_nil
+    end
+  end
+
   describe "posted" do
     it "returns the posted status of the submission" do
       @submission.update!(posted_at: nil)
