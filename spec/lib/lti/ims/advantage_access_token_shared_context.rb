@@ -31,6 +31,7 @@ shared_context "advantage access token context" do
       https://purl.imsglobal.org/spec/lti-ags/scope/lineitem
       https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly
       https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly
+      https://purl.imsglobal.org/spec/lti/scope/noticehandlers
       https://canvas.instructure.com/lti/public_jwk/scope/update
       https://canvas.instructure.com/lti/data_services/scope/create
       https://canvas.instructure.com/lti/data_services/scope/show
