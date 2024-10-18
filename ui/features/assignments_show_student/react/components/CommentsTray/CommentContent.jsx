@@ -34,6 +34,7 @@ import {SubmissionComment} from '@canvas/assignments/graphql/student/SubmissionC
 import SVGWithTextPlaceholder from '../../SVGWithTextPlaceholder'
 import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
+import {captureException} from '@sentry/react'
 
 const I18n = useI18nScope('assignments_2')
 
@@ -88,12 +89,12 @@ export default function CommentContent(props) {
         }
         const cachedCurrentSubmission = cache.readFragment(submissionQueryVariables)
 
-        if (props.submission.attempt === cachedCurrentSubmission.attempt) {
+        if (cachedCurrentSubmission && props.submission.attempt === cachedCurrentSubmission.attempt) {
           const submission = JSON.parse(JSON.stringify(cachedCurrentSubmission))
           const newUnreadCount = Math.max(0, submission.unreadCommentCount - updatedCommentIDs.size)
           submission.unreadCommentCount = newUnreadCount
           cache.writeFragment({...submissionQueryVariables, data: submission})
-        } else {
+        } else if (cachedCurrentSubmission) {
           const cachedHistories = cache.readQuery({
             query: SUBMISSION_HISTORIES_QUERY,
             variables: {submissionID: props.submission.id},
@@ -127,7 +128,7 @@ export default function CommentContent(props) {
         .filter(comment => comment.read === false)
         .map(comment => comment._id)
       const timer = setTimeout(() => {
-        markCommentsRead({variables: {commentIds, submissionId: props.submission.id}})
+        markCommentsRead({variables: {commentIds, submissionId: props.submission.id}}).catch(captureException)
       }, 1000)
 
       return () => clearTimeout(timer)
