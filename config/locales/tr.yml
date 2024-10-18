@@ -1399,6 +1399,9 @@ tr:
         admins_can_change_passwords: "Yöneticiler tarafından parola ayarları"
         admins_can_view_notifications: "Yöneticiler bildirimleri görebilir"
         allow_invitation_previews: "Davetleri Görüntüle"
+        allow_name_pronunciation_edit_for_admins: Yönetici
+        allow_name_pronunciation_edit_for_students: Öğrenci
+        allow_name_pronunciation_edit_for_teachers: Öğretmen
         allow_sending_scores_in_emails: "Öğrenciler puanlarını eposta bildirimi olarak alabilirler"
         allow_sis_import: "ÖBS İçe Aktarımları"
         author_email_in_notifications: "Kullanıcı etkileşim Bildirimleri için gönderenin eposta adresini göster"
