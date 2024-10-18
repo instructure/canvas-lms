@@ -317,7 +317,11 @@ CanvasRails::Application.routes.draw do
 
       get :rubric
       resource :rubric_association, path: :rubric do
-        resources :rubric_assessments, path: :assessments
+        resources :rubric_assessments, path: :assessments do
+          collection do
+            get :export
+          end
+        end
       end
 
       get :peer_reviews

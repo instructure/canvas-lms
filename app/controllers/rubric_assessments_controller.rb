@@ -209,6 +209,21 @@ class RubricAssessmentsController < ApplicationController
     end
   end
 
+  def export
+    return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+
+    rubric_association = Assignment.find(params[:assignment_id]).rubric_association
+
+    options = { filter: params[:filter] }
+
+    send_data(
+      RubricAssessmentExport.new(rubric_association:, user: @current_user, options:).generate_file,
+      type: "text/csv",
+      filename: "export_rubric_assessments.csv",
+      disposition: "attachment"
+    )
+  end
+
   private
 
   def resolve_user_id
