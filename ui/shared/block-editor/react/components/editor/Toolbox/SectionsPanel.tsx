@@ -22,7 +22,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {type TemplatePanelProps, type KeyboardOrMouseEvent} from './types'
-import {type BlockTemplate, type TemplateNodeTree} from '../../../types'
+import {TemplateEditor, type BlockTemplate, type TemplateNodeTree} from '../../../types'
 import {createFromTemplate} from '../../../utils'
 import {EditTemplateButtons} from './EditTemplateButtons'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -117,6 +117,16 @@ const SectionsPanel = ({
   const renderSections = () => {
     return templates
       .filter(template => template.template_type === 'section')
+      .filter(template => {
+        if (
+          template.workflow_state !== 'active' &&
+          template.template_category === 'global' &&
+          templateEditor === TemplateEditor.LOCAL
+        ) {
+          return false
+        }
+        return true
+      })
       .sort((a, b) => {
         if (a.name === 'Blank') {
           return -1

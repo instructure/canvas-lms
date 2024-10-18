@@ -221,6 +221,9 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
 
       template.node_tree = getNodeTemplate(node.id, template.name as string, query)
       template.template_type = templateType
+      if (globalTemplate) {
+        template.template_category = 'global'
+      }
 
       let thumbnail: string | undefined
       if (['page', 'section'].includes(templateType) && node.dom) {
