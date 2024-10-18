@@ -1328,6 +1328,9 @@ he:
         admins_can_change_passwords: "הגדרות סיסמא ע\"י מנהלי המערכת"
         admins_can_view_notifications: "מנהל המערכת יכול לעיין בהודעות"
         allow_invitation_previews: "תצוגות מקדימות של הזמנות"
+        allow_name_pronunciation_edit_for_admins: "מנהל המערכת"
+        allow_name_pronunciation_edit_for_students: תלמיד
+        allow_name_pronunciation_edit_for_teachers: מורה
         allow_sending_scores_in_emails: "תלמידים יכולים להרשם לקבלת תוצאות בהתראות לדוא\"ל"
         allow_sis_import: "ייבוא SIS"
         author_email_in_notifications: "הצגת כתובת הדוא\"ל של השולח בהודעות תקשורת למשתמשים"
