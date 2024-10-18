@@ -1393,7 +1393,7 @@ describe MediaObjectsController do
       @media_object = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
       @attachment = @course.attachments.create! media_entry_id: "0_deadbeef", filename: "blah.flv", uploaded_data: StringIO.new("data")
       allow_any_instance_of(MediaObject).to receive(:media_sources).and_return(
-        [{ url: "whatever man", bitrate: 12_345 }]
+        [{ url: "http://instfs.test/redirect_to_media", bitrate: 12_345 }]
       )
     end
 
@@ -1403,8 +1403,8 @@ describe MediaObjectsController do
           {
             bitrate: 12_345,
             label: "12 kbps",
-            src: "whatever man",
-            url: "whatever man"
+            src: "http://instfs.test/redirect_to_media",
+            url: "http://instfs.test/redirect_to_media"
           }
         ]
       )
@@ -1452,6 +1452,48 @@ describe MediaObjectsController do
             }
           ]
         )
+      end
+
+      describe "with JWT access token" do
+        include_context "InstAccess setup"
+
+        before do
+          @media_object.attachment.update!(file_state: "hidden")
+          user_with_pseudonym
+          jwt_payload = {
+            resource: "/media_attachments_iframe/#{@media_object.attachment_id}?instfs_id=stuff",
+            aud: [@course.root_account.uuid],
+            sub: @user.uuid,
+            tenant_auth: { location: "location" },
+            iss: "instructure:inst_access",
+            exp: 1.hour.from_now.to_i,
+            iat: Time.now.to_i
+          }
+          @token_string = InstAccess::Token.send(:new, jwt_payload).to_unencrypted_token_string
+          allow(InstFS).to receive_messages(enabled?: true, app_host: "http://instfs.test")
+          stub_request(:get, "http://instfs.test/files/stuff/metadata").to_return(status: 200, body: { url: "http://instfs.test/stuff" }.to_json)
+          stub_request(:get, "http://instfs.test/redirect_to_media").to_return(status: 200)
+        end
+
+        it "allows access" do
+          expect(InstFS).to receive(:get_file_metadata).with(@media_object.attachment).and_return({ url: "http://instfs.test/stuff" })
+          get "media_object_redirect", params: { attachment_id: @media_object.attachment_id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
+
+          expect(response).to be_redirect
+        end
+
+        it "returns the media_attachment redirect url as the source when attachment is present and attached verifier if passed" do
+          expect(controller.media_sources_json(@media_object, attachment: @attachment, access_token: @token_string, instfs_id: "stuff")).to eq(
+            [
+              {
+                bitrate: 12_345,
+                label: "12 kbps",
+                src: "http://test.host/media_attachments/#{@attachment.id}/redirect?access_token=#{@token_string}&bitrate=12345&instfs_id=stuff",
+                url: "http://test.host/media_attachments/#{@attachment.id}/redirect?access_token=#{@token_string}&bitrate=12345&instfs_id=stuff"
+              }
+            ]
+          )
+        end
       end
     end
   end
