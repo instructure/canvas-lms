@@ -289,18 +289,6 @@ window.parent.postMessage(
 )
 ```
 
-## toggleCourseNavigationMenu
-
-Opens and closes the course navigation sidebar, giving more space for the tool to display.
-
-**Required properties:**
-
-- subject: "toggleCourseNavigationMenu"
-
-```js
-window.parent.postMessage({subject: 'toggleCourseNavigationMenu'}, '*')
-```
-
 ## lti.resourceImported
 
 Notifies the Canvas page holding the tool that a resource has finished importing.
@@ -508,4 +496,48 @@ Returning postMessage includes the following properties:
 
 ```js
 window.parent.postMessage({subject: 'lti.enableScrollEvents'}, '*')
+```
+
+## showNavigationMenu
+
+Opens the navigation sidebar, a replacement for toggleCourseNavigationMenu.
+Can be used on course, account or group page.
+
+**Required properties:**
+
+- subject: "showNavigationMenu"
+
+```js
+window.parent.postMessage({subject: 'showNavigationMenu'}, '*')
+```
+
+## hideNavigationMenu
+
+Closes the navigation sidebar, a replacement for toggleCourseNavigationMenu.
+Can be used on course, account or group page.
+
+**Required properties:**
+
+- subject: "hideNavigationMenu"
+
+```js
+window.parent.postMessage({subject: 'hideNavigationMenu'}, '*')
+```
+
+<div class="warning-message">
+    Deprecated Message Types
+</div>
+
+## toggleCourseNavigationMenu <span title="this message type is deprecated!">⚠️</span>
+
+**Use show or hideNavigationMenu instead!**
+
+Opens and closes the course navigation sidebar, giving more space for the tool to display.
+
+**Required properties:**
+
+- subject: "toggleCourseNavigationMenu"
+
+```js
+window.parent.postMessage({subject: 'toggleCourseNavigationMenu'}, '*')
 ```
