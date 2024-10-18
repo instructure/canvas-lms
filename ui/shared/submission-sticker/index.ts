@@ -27,11 +27,15 @@ type Assignment = {
   anonymizeStudents: boolean
   moderatedGrading: boolean
   gradesPublished: boolean
+  submissionTypes: string[]
 }
 
 export function stickersAvailable(features: Features, assignment: Assignment): boolean {
+  const unsupportedTypes = ['online_quiz', 'discussion_topic', 'wiki_page']
+
   if (!features.stickersEnabled) return false
   if (!features.assignmentEnhancementsEnabled) return false
+  if (assignment.submissionTypes.some(subType => unsupportedTypes.includes(subType))) return false
   if (assignment.anonymizeStudents) return false
   if (assignment.moderatedGrading && !assignment.gradesPublished) return false
 
