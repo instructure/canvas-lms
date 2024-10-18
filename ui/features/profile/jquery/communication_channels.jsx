@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
+import {createRoot} from 'react-dom/client'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -28,20 +30,13 @@ import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
 import 'jqueryui/tabs'
 import replaceTags from '@canvas/util/replaceTags'
+import RegisterCommunication from '../react/RegisterCommunication'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('profile')
 
 $(document).ready(function () {
-  $('#communication_channels')
-    .tabs()
-    .on('tabsactivate', function (_event, ui) {
-      // check if the tabs are visible
-      if ($(this).css('display') !== 'none') {
-        // pass id of the active tab panel
-        formatTabs(ui.newPanel.attr('id'))
-      }
-    })
-
   $('.channel_list tr').hover(
     function () {
       if ($(this).hasClass('unconfirmed')) {
@@ -65,109 +60,13 @@ $(document).ready(function () {
     }
   )
 
-  $('.add_email_link, .add_contact_link').on('click', function (event) {
-    const $communicationChannels = $('#communication_channels')
-    const $registerSmsNumber = $('#register_sms_number')
-    event.preventDefault()
-    $communicationChannels.show().dialog({
-      title: I18n.t('titles.register_communication', 'Register Communication'),
-      width: 600,
-      resizable: false,
-      modal: true,
-      zIndex: 1000,
-    })
-
-    // if user clicked add contact link and sms number tab exists, show it (otherwise show email tab)
-    const tabIndex =
-      $(this).hasClass('add_contact_link') && $registerSmsNumber.length > 0
-        ? $communicationChannels.find('a[href="#register_sms_number"]').parent().index()
-        : 0
-
-    $communicationChannels.tabs('option', 'active', tabIndex)
-    $communicationChannels.find('ul.ui-tabs-nav > li').eq(tabIndex).find('a').trigger('focus')
-  })
-
-  const formatTabs = function (id) {
-    const $form = $('#' + id)
-    if (!$form.length) return
-    if (id === 'register_sms_number') {
-      // convert number from 555-555-5555 to 5555555555
-      const sms_number = $form.find('.sms_number').val().replace(/\D/g, '')
-      // update the form input with only digits
-      $form.find('.sms_number').val(sms_number)
-      // display an error message if the number is not 10 digits
-      $form.find('.should_be_10_digits').showIf(sms_number && sms_number.length !== 10)
-    }
-  }
-
-  const $smsNumber = $('#register_sms_number .user_selected')
-  if ($smsNumber.length > 0) {
-    $smsNumber.on('change blur keyup focus', function () {
-      formatTabs('register_sms_number')
-    })
-  }
-
-  $('#register_sms_number,#register_email_address,#register_slack_handle').formSubmit({
-    object_name: 'communication_channel',
-    processData(data) {
-      let address
-      let type
-      if (data['communication_channel[type]'] === 'email') {
-        type = 'email'
-        address = data.communication_channel_email
-      } else if (data['communication_channel[type]'] === 'slack') {
-        type = 'slack'
-        address = data.communication_channel_slack
-      } else {
-        // sms channel using a phone number in the USA
-        type = 'sms_number'
-        address = data.communication_channel_sms_number
-      }
-
-      if (type === 'email' || type === 'slack') {
-        // Make sure it's a valid email address
-        const match = address.match(
-          /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
-        )
-        if (!match) {
-          // Not a valid email address. Show a message on the relevant field, then bail.
-          const errorMessage =
-            address === '' ? I18n.t('Email is required') : I18n.t('Email is invalid!')
-          if (type === 'email') {
-            $(this).formErrors({communication_channel_email: errorMessage})
-          }
-          return false
-        }
-      } else {
-        // Make sure it's a valid phone number. Validate the phone number they typed instead of the address because
-        // the address will already have the country code prepended, and this will result in our regex failing always
-        // because it's not expecting the leading plus sign (and it can't just be added to the regex because then
-        // we can't detect when they entered a blank phone number). libphonenumber plz
-        const match = data.communication_channel_sms_number.match(/^[0-9]+$/)
-        if (!match) {
-          const errorMessage =
-            address === '' ? I18n.t('Cell Number is required') : I18n.t('Cell Number is invalid!')
-          $(this).formErrors({communication_channel_sms_number: errorMessage})
-          return false
-        }
-      }
-
-      // Don't need these anymore
-      delete data.communication_channel_sms_number
-      delete data.communication_channel_slack
-
-      data['communication_channel[address]'] = address
-    },
-    beforeSubmit(data) {
+  const registerCommunicationForm = {
+    beforeSubmit: (address, type) => {
       let $list = $('.email_channels')
-      if (
-        $(this).attr('id') === 'register_sms_number' ||
-        $(this).attr('id') === 'register_slack_handle'
-      ) {
+      if (['sms', 'slack'].includes(type)) {
         $list = $('.other_channels')
       }
-      let path = data['communication_channel[address]']
-      $(this).data('email', path)
+      let path = address
       $list.find('.channel .path').each(function () {
         if ($(this).text() === path) {
           path = ''
@@ -177,7 +76,7 @@ $(document).ready(function () {
       let $channel = null
       if (path) {
         $channel = $list.find('.channel.blank').clone(true).removeClass('blank')
-        if (data['communication_channel[type]'] === 'slack') {
+        if (type === 'slack') {
           $channel.find('#communication_text_type').text('slack')
         }
         $channel
@@ -190,23 +89,35 @@ $(document).ready(function () {
           data: {path},
         })
         $list.find('.channel.blank').before($channel.show())
+      } else {
+        throw new Error(I18n.t('This contact information is already registered.'))
       }
-      if (!path) {
-        return false
-      }
-      $('#communication_channels').dialog('close')
-      $('#communication_channels').hide()
       $channel.loadingImage({image_size: 'small'})
       return $channel
     },
-    success(channel, $channel) {
-      $('#communication_channels').dialog('close')
-      $('#communication_channels').hide()
+    sendRequest: async (address, type, enableEmailLogin) => {
+      const body = {
+        communication_channel: {address, type},
+      }
+
+      if (enableEmailLogin) {
+        body.build_pseudonym = enableEmailLogin
+      }
+
+      const {json} = await doFetchApi({
+        path: `/communication_channels`,
+        method: 'POST',
+        body,
+      })
+
+      return json
+    },
+    success: (channel, $channel) => {
       $channel.loadingImage('remove')
 
       channel.channel_id = channel.id
       let select_type = 'email_select'
-      if ($(this).attr('id') === 'register_sms_number') {
+      if (channel.type === 'sms') {
         select_type = 'sms_select'
       }
       const $select = $('#select_templates .' + select_type)
@@ -228,13 +139,53 @@ $(document).ready(function () {
       })
       $channel.find('.path').triggerHandler('click')
     },
-    error(data, $channel) {
-      $channel.loadingImage('remove')
-      $channel.remove()
-    },
-  })
-  $(document).on('click', 'a.email_address_taken_learn_more', event => {
+  }
+
+  $('.add_email_link, .add_contact_link').on('click', function (event) {
     event.preventDefault()
+
+    const mountPoint = document.getElementById('register_communication_mount_point')
+    const target = event.target
+    const addContactLinkClicked = target.classList.contains('add_contact_link')
+    const availableTabs = ENV.register_cc_tabs ?? ['email']
+    const isDefaultAccount = ENV.is_default_account ?? false
+    const initiallySelectedTab =
+      availableTabs.includes('sms') && addContactLinkClicked ? 'sms' : 'email'
+    const root = createRoot(mountPoint)
+
+    root.render(
+      <RegisterCommunication
+        initiallySelectedTab={initiallySelectedTab}
+        availableTabs={availableTabs}
+        isDefaultAccount={isDefaultAccount}
+        onSubmit={async (address, type, enableEmailLogin) => {
+          let channelElement
+          try {
+            channelElement = registerCommunicationForm.beforeSubmit(address, type)
+            root.unmount()
+          } catch (error) {
+            showFlashError(error.message)()
+            throw error
+          }
+          try {
+            const channel = await registerCommunicationForm.sendRequest(
+              address,
+              type,
+              enableEmailLogin
+            )
+            registerCommunicationForm.success(channel, channelElement)
+          } catch {
+            channelElement?.loadingImage('remove')
+            channelElement?.remove()
+            showFlashError()()
+          }
+        }}
+        onClose={() => {
+          root.unmount()
+          target.focus()
+        }}
+      />
+    )
   })
 
   const manageAfterDeletingAnEmailFocus = function (currentElement) {
@@ -408,9 +359,7 @@ $(document).ready(function () {
       }
     )
   })
-  $('#communication_channels .cancel_button').click(_event => {
-    $('#communication_channels').dialog('close')
-  })
+
   $('#confirm_email_channel .cancel_button').click(() => {
     $('#confirm_email_channel').dialog('close')
   })
