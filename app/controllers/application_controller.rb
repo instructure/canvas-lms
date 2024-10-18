@@ -381,7 +381,6 @@ class ApplicationController < ActionController::Base
     discussion_checkpoints
     speedgrader_studio_media_capture
     disallow_threaded_replies_fix_alert
-    consolidated_media_player
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
@@ -415,7 +414,8 @@ class ApplicationController < ActionController::Base
     lti_apps_page_instructors
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
-    :embedded_release_notes
+    :embedded_release_notes,
+    :consolidated_media_player
   ].freeze
   JS_ENV_FEATURES_HASH = Digest::SHA256.hexdigest([JS_ENV_SITE_ADMIN_FEATURES + JS_ENV_ROOT_ACCOUNT_FEATURES + JS_ENV_BRAND_ACCOUNT_FEATURES].sort.join(",")).freeze
   def cached_js_env_account_features
