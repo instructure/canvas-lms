@@ -1413,6 +1413,9 @@ fa:
         admins_can_change_passwords: "تنظیم رمز عبور توسط مدیرها"
         admins_can_view_notifications: "مدیرها می توانند اطلاعیه ها را مشاهده کنند"
         allow_invitation_previews: "پیش نمایش دعوت نامه"
+        allow_name_pronunciation_edit_for_admins: مدیر
+        allow_name_pronunciation_edit_for_students: Student
+        allow_name_pronunciation_edit_for_teachers: استاد
         allow_sending_scores_in_emails: "دانشجویان می توانند انتخاب کنند که نمره های خود را در اطلاعیه های پست الکترونیکی دریافت نمایند"
         allow_sis_import: "ورودهای اطلاعات سامانه اطلاعات دانشجو"
         author_email_in_notifications: "نمایش نشانی پست الکترونیکی فرستنده برای اطلاعیه های مربوط به تعامل کاربر"
