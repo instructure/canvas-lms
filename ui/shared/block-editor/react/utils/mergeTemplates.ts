@@ -19,10 +19,13 @@
 import {type BlockTemplate} from '../types'
 
 export const mergeTemplates = (
-  apiTemplates: BlockTemplate[],
-  globalTemplates: BlockTemplate[]
+  apiTemplates: BlockTemplate[] | undefined,
+  globalTemplates: BlockTemplate[] | undefined
 ): BlockTemplate[] => {
-  const templates = apiTemplates.slice()
+  const templates = apiTemplates ? apiTemplates.slice() : []
+  if (!globalTemplates) {
+    globalTemplates = []
+  }
   globalTemplates.forEach(gt => {
     const index = templates.findIndex((t: BlockTemplate) => t.id === gt.id)
     if (index >= 0) {
@@ -31,6 +34,7 @@ export const mergeTemplates = (
       templates.push(gt)
     }
   })
+
   return templates.sort((a, b) => {
     if (a.name === 'Blank') {
       return b.name === 'Blank' ? 0 : -1

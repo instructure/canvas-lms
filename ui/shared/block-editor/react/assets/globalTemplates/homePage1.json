@@ -1,0 +1,887 @@
+{
+  "name": "Home Page",
+  "description": "Navigation, Images, Course Description, Instructor Details",
+  "workflow_state": "active",
+  "node_tree": {
+    "rootNodeId": "ROOT",
+    "nodes": {
+      "ROOT": {
+        "type": {
+          "resolvedName": "PageBlock"
+        },
+        "isCanvas": true,
+        "props": {},
+        "displayName": "Page",
+        "custom": {
+          "displayName": "Home Page"
+        },
+        "hidden": false,
+        "nodes": [
+          "YO1Q0J4P8u",
+          "NYlxty-yIT",
+          "HJpr5x-xea",
+          "23JpmsEM9p"
+        ],
+        "linkedNodes": {}
+      },
+      "YO1Q0J4P8u": {
+        "type": {
+          "resolvedName": "ColumnsSection"
+        },
+        "isCanvas": false,
+        "props": {
+          "columns": 4
+        },
+        "displayName": "Columns",
+        "custom": {
+          "isSection": true
+        },
+        "parent": "ROOT",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "columns__inner": "7f_rDU4Klq"
+        }
+      },
+      "7f_rDU4Klq": {
+        "type": {
+          "resolvedName": "ColumnsSectionInner"
+        },
+        "isCanvas": true,
+        "props": {},
+        "displayName": "Columns Inner",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "YO1Q0J4P8u",
+        "hidden": false,
+        "nodes": [
+          "VKTH9Jynqu",
+          "2O5nY3A3HB",
+          "ArwFrAIP7v",
+          "iIeW-Ehtuj"
+        ],
+        "linkedNodes": {}
+      },
+      "VKTH9Jynqu": {
+        "type": {
+          "resolvedName": "GroupBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "alignment": "center",
+          "verticalAlignment": "center",
+          "layout": "column",
+          "resizable": false,
+          "isColumn": true
+        },
+        "displayName": "Group",
+        "custom": {
+          "isResizable": false,
+          "isBlock": true,
+          "isExpanded": false,
+          "displayName": "Column"
+        },
+        "parent": "7f_rDU4Klq",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "group__inner": "yEN4BZ_KQj"
+        }
+      },
+      "yEN4BZ_KQj": {
+        "type": {
+          "resolvedName": "NoSections"
+        },
+        "isCanvas": true,
+        "props": {
+          "className": "group-block__inner",
+          "placeholderText": "Drop a block to add it here"
+        },
+        "displayName": "l",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "VKTH9Jynqu",
+        "hidden": false,
+        "nodes": [
+          "ML7fm0Y6pa"
+        ],
+        "linkedNodes": {}
+      },
+      "ML7fm0Y6pa": {
+        "type": {
+          "resolvedName": "ButtonBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "text": "Announcements",
+          "href": "",
+          "size": "medium",
+          "variant": "condensed",
+          "color": "primary",
+          "iconName": ""
+        },
+        "displayName": "Button",
+        "custom": {
+          "isBlock": true
+        },
+        "parent": "yEN4BZ_KQj",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "2O5nY3A3HB": {
+        "type": {
+          "resolvedName": "GroupBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "alignment": "center",
+          "verticalAlignment": "center",
+          "layout": "column",
+          "resizable": false,
+          "isColumn": true
+        },
+        "displayName": "Group",
+        "custom": {
+          "isResizable": false,
+          "isBlock": true,
+          "isExpanded": false,
+          "displayName": "Column"
+        },
+        "parent": "7f_rDU4Klq",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "group__inner": "chlSHOm9Us"
+        }
+      },
+      "chlSHOm9Us": {
+        "type": {
+          "resolvedName": "NoSections"
+        },
+        "isCanvas": true,
+        "props": {
+          "className": "group-block__inner",
+          "placeholderText": "Drop a block to add it here"
+        },
+        "displayName": "l",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "2O5nY3A3HB",
+        "hidden": false,
+        "nodes": [
+          "KGf0WF2nQp"
+        ],
+        "linkedNodes": {}
+      },
+      "KGf0WF2nQp": {
+        "type": {
+          "resolvedName": "ButtonBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "text": "Modules",
+          "href": "",
+          "size": "medium",
+          "variant": "condensed",
+          "color": "primary",
+          "iconName": ""
+        },
+        "displayName": "Button",
+        "custom": {
+          "isBlock": true
+        },
+        "parent": "chlSHOm9Us",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "ArwFrAIP7v": {
+        "type": {
+          "resolvedName": "GroupBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "alignment": "center",
+          "verticalAlignment": "center",
+          "layout": "column",
+          "resizable": false,
+          "isColumn": true
+        },
+        "displayName": "Group",
+        "custom": {
+          "isResizable": false,
+          "isBlock": true,
+          "isExpanded": false,
+          "displayName": "Column"
+        },
+        "parent": "7f_rDU4Klq",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "group__inner": "nj2CrG-UOb"
+        }
+      },
+      "nj2CrG-UOb": {
+        "type": {
+          "resolvedName": "NoSections"
+        },
+        "isCanvas": true,
+        "props": {
+          "className": "group-block__inner",
+          "placeholderText": "Drop a block to add it here"
+        },
+        "displayName": "l",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "ArwFrAIP7v",
+        "hidden": false,
+        "nodes": [
+          "dEbZFXqJf2"
+        ],
+        "linkedNodes": {}
+      },
+      "dEbZFXqJf2": {
+        "type": {
+          "resolvedName": "ButtonBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "text": "Resources",
+          "href": "",
+          "size": "medium",
+          "variant": "condensed",
+          "color": "primary",
+          "iconName": ""
+        },
+        "displayName": "Button",
+        "custom": {
+          "isBlock": true
+        },
+        "parent": "nj2CrG-UOb",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "iIeW-Ehtuj": {
+        "type": {
+          "resolvedName": "GroupBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "alignment": "center",
+          "verticalAlignment": "center",
+          "layout": "column",
+          "resizable": false,
+          "isColumn": true
+        },
+        "displayName": "Group",
+        "custom": {
+          "isResizable": false,
+          "isBlock": true,
+          "isExpanded": false,
+          "displayName": "Column"
+        },
+        "parent": "7f_rDU4Klq",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "group__inner": "zdBDKjOkVz"
+        }
+      },
+      "zdBDKjOkVz": {
+        "type": {
+          "resolvedName": "NoSections"
+        },
+        "isCanvas": true,
+        "props": {
+          "className": "group-block__inner",
+          "placeholderText": "Drop a block to add it here"
+        },
+        "displayName": "l",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "iIeW-Ehtuj",
+        "hidden": false,
+        "nodes": [
+          "pIRngy2I9v"
+        ],
+        "linkedNodes": {}
+      },
+      "pIRngy2I9v": {
+        "type": {
+          "resolvedName": "ButtonBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "text": "Support",
+          "href": "",
+          "size": "medium",
+          "variant": "condensed",
+          "color": "primary",
+          "iconName": ""
+        },
+        "displayName": "Button",
+        "custom": {
+          "isBlock": true
+        },
+        "parent": "zdBDKjOkVz",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "NYlxty-yIT": {
+        "type": {
+          "resolvedName": "ColumnsSection"
+        },
+        "isCanvas": false,
+        "props": {
+          "columns": 2
+        },
+        "displayName": "Columns",
+        "custom": {
+          "isSection": true
+        },
+        "parent": "ROOT",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "columns__inner": "F0PEw9duXP"
+        }
+      },
+      "F0PEw9duXP": {
+        "type": {
+          "resolvedName": "ColumnsSectionInner"
+        },
+        "isCanvas": true,
+        "props": {},
+        "displayName": "Columns Inner",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "NYlxty-yIT",
+        "hidden": false,
+        "nodes": [
+          "bqrRdOmlz2",
+          "2tveO1yV9M"
+        ],
+        "linkedNodes": {}
+      },
+      "bqrRdOmlz2": {
+        "type": {
+          "resolvedName": "GroupBlock"
+        },
+        "isCanvas": true,
+        "props": {
+          "alignment": "center",
+          "verticalAlignment": "center",
+          "layout": "column",
+          "resizable": false,
+          "isColumn": true,
+          "id": "columns-pEdeFvz6_0-1"
+        },
+        "displayName": "Group",
+        "custom": {
+          "isResizable": false,
+          "isBlock": true,
+          "isExpanded": false,
+          "displayName": "Column"
+        },
+        "parent": "F0PEw9duXP",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "group__inner": "y_-YIP5865"
+        }
+      },
+      "y_-YIP5865": {
+        "type": {
+          "resolvedName": "NoSections"
+        },
+        "isCanvas": true,
+        "props": {
+          "className": "",
+          "placeholderText": "Drop a block to add it here"
+        },
+        "displayName": "NoSections",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "bqrRdOmlz2",
+        "hidden": false,
+        "nodes": [
+          "HkyzISWiuf"
+        ],
+        "linkedNodes": {}
+      },
+      "HkyzISWiuf": {
+        "type": {
+          "resolvedName": "ImageBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "src": "https://structures.cd.instructure.com/courses/138/files/3150/preview",
+          "variant": "default",
+          "constraint": "contain",
+          "maintainAspectRatio": false,
+          "sizeVariant": "percent",
+          "alt": "",
+          "width": 358,
+          "height": 466
+        },
+        "displayName": "Image",
+        "custom": {
+          "isResizable": true,
+          "isBlock": true
+        },
+        "parent": "y_-YIP5865",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "2tveO1yV9M": {
+        "type": {
+          "resolvedName": "GroupBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "alignment": "center",
+          "verticalAlignment": "start",
+          "layout": "column",
+          "resizable": false,
+          "isColumn": true
+        },
+        "displayName": "Group",
+        "custom": {
+          "isResizable": false,
+          "isBlock": true,
+          "isExpanded": false,
+          "displayName": "Column"
+        },
+        "parent": "F0PEw9duXP",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "group__inner": "fCDKJwRUY8"
+        }
+      },
+      "fCDKJwRUY8": {
+        "type": {
+          "resolvedName": "NoSections"
+        },
+        "isCanvas": true,
+        "props": {
+          "className": "group-block__inner",
+          "placeholderText": "Drop a block to add it here"
+        },
+        "displayName": "l",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "2tveO1yV9M",
+        "hidden": false,
+        "nodes": [
+          "DvEF234SfL",
+          "vejflrY5eI",
+          "u87IWAFray"
+        ],
+        "linkedNodes": {}
+      },
+      "DvEF234SfL": {
+        "type": {
+          "resolvedName": "HeadingBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "text": "Welcome to [Course Title Here]",
+          "level": "h2"
+        },
+        "displayName": "Heading",
+        "custom": {
+          "isResizable": true,
+          "isBlock": true
+        },
+        "parent": "fCDKJwRUY8",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "vejflrY5eI": {
+        "type": {
+          "resolvedName": "ImageBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "src": "https://structures.cd.instructure.com/courses/138/files/3143/preview",
+          "variant": "default",
+          "constraint": "cover",
+          "maintainAspectRatio": false,
+          "sizeVariant": "percent",
+          "alt": "",
+          "width": 360,
+          "height": 173
+        },
+        "displayName": "Image",
+        "custom": {
+          "isResizable": true,
+          "isBlock": true
+        },
+        "parent": "fCDKJwRUY8",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "u87IWAFray": {
+        "type": {
+          "resolvedName": "TextBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "fontSize": "12pt",
+          "textAlign": "initial",
+          "color": "var(--ic-brand-font-color-dark)",
+          "text": "<p><span id=\"docs-internal-guid-7ff455b7-7fff-b4bc-6b83-df7622ebc12d\"></span></p><p dir=\"ltr\" style=\"line-height:1.2;margin-top:10pt;margin-bottom:0pt;\"><span style=\"font-size: 13pt; font-family: &quot;Proxima Nova&quot;, sans-serif; color: rgb(0, 0, 0); background-color: transparent; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-alternates: normal; font-variant-position: normal; vertical-align: baseline; white-space-collapse: preserve;\">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa.</span></p><p></p>"
+        },
+        "displayName": "Text",
+        "custom": {
+          "isResizable": true,
+          "isBlock": true
+        },
+        "parent": "fCDKJwRUY8",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "HJpr5x-xea": {
+        "type": {
+          "resolvedName": "ColumnsSection"
+        },
+        "isCanvas": false,
+        "props": {
+          "columns": 2
+        },
+        "displayName": "Columns",
+        "custom": {
+          "isSection": true
+        },
+        "parent": "ROOT",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "columns__inner": "grZ_miMNrk"
+        }
+      },
+      "grZ_miMNrk": {
+        "type": {
+          "resolvedName": "ColumnsSectionInner"
+        },
+        "isCanvas": true,
+        "props": {},
+        "displayName": "Columns Inner",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "HJpr5x-xea",
+        "hidden": false,
+        "nodes": [
+          "Q_N4Dn32Ee",
+          "NvBd5PErUm"
+        ],
+        "linkedNodes": {}
+      },
+      "Q_N4Dn32Ee": {
+        "type": {
+          "resolvedName": "GroupBlock"
+        },
+        "isCanvas": true,
+        "props": {
+          "alignment": "center",
+          "verticalAlignment": "center",
+          "layout": "column",
+          "resizable": false,
+          "isColumn": true,
+          "id": "columns-pEdeFvz6_0-1"
+        },
+        "displayName": "Group",
+        "custom": {
+          "isResizable": false,
+          "isBlock": true,
+          "isExpanded": false,
+          "displayName": "Column"
+        },
+        "parent": "grZ_miMNrk",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "group__inner": "b-NaUSFGZV"
+        }
+      },
+      "b-NaUSFGZV": {
+        "type": {
+          "resolvedName": "NoSections"
+        },
+        "isCanvas": true,
+        "props": {
+          "className": "",
+          "placeholderText": "Drop a block to add it here"
+        },
+        "displayName": "NoSections",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "Q_N4Dn32Ee",
+        "hidden": false,
+        "nodes": [
+          "fEwZnYkN2z"
+        ],
+        "linkedNodes": {}
+      },
+      "fEwZnYkN2z": {
+        "type": {
+          "resolvedName": "ImageBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "src": "https://structures.cd.instructure.com/courses/138/files/3148/preview",
+          "variant": "default",
+          "constraint": "cover",
+          "maintainAspectRatio": true,
+          "sizeVariant": "pixel",
+          "alt": "",
+          "width": 132,
+          "height": 114
+        },
+        "displayName": "Image",
+        "custom": {
+          "isResizable": true,
+          "isBlock": true
+        },
+        "parent": "b-NaUSFGZV",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "NvBd5PErUm": {
+        "type": {
+          "resolvedName": "GroupBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "alignment": "start",
+          "verticalAlignment": "start",
+          "layout": "column",
+          "resizable": false,
+          "isColumn": true
+        },
+        "displayName": "Group",
+        "custom": {
+          "isResizable": false,
+          "isBlock": true,
+          "isExpanded": false,
+          "displayName": "Column"
+        },
+        "parent": "grZ_miMNrk",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "group__inner": "o-jz-E1HKG"
+        }
+      },
+      "o-jz-E1HKG": {
+        "type": {
+          "resolvedName": "NoSections"
+        },
+        "isCanvas": true,
+        "props": {
+          "className": "group-block__inner",
+          "placeholderText": "Drop a block to add it here"
+        },
+        "displayName": "l",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "NvBd5PErUm",
+        "hidden": false,
+        "nodes": [
+          "zbvwtEG3qR",
+          "mEwzab772a"
+        ],
+        "linkedNodes": {}
+      },
+      "zbvwtEG3qR": {
+        "type": {
+          "resolvedName": "HeadingBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "text": "Meet Your Instructor",
+          "level": "h4"
+        },
+        "displayName": "Heading",
+        "custom": {
+          "isResizable": true,
+          "isBlock": true
+        },
+        "parent": "o-jz-E1HKG",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "mEwzab772a": {
+        "type": {
+          "resolvedName": "TextBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "fontSize": "12pt",
+          "textAlign": "initial",
+          "color": "var(--ic-brand-font-color-dark)",
+          "text": "<p>Instructor Name:</p><p>Office Hours:</p>"
+        },
+        "displayName": "Text",
+        "custom": {
+          "isResizable": true,
+          "isBlock": true
+        },
+        "parent": "o-jz-E1HKG",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "23JpmsEM9p": {
+        "type": {
+          "resolvedName": "ColumnsSection"
+        },
+        "isCanvas": false,
+        "props": {
+          "columns": 1
+        },
+        "displayName": "Columns",
+        "custom": {
+          "isSection": true
+        },
+        "parent": "ROOT",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "columns__inner": "AQaC7Wi571"
+        }
+      },
+      "AQaC7Wi571": {
+        "type": {
+          "resolvedName": "ColumnsSectionInner"
+        },
+        "isCanvas": true,
+        "props": {},
+        "displayName": "Columns Inner",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "23JpmsEM9p",
+        "hidden": false,
+        "nodes": [
+          "37CccFjekg"
+        ],
+        "linkedNodes": {}
+      },
+      "37CccFjekg": {
+        "type": {
+          "resolvedName": "GroupBlock"
+        },
+        "isCanvas": true,
+        "props": {
+          "alignment": "start",
+          "verticalAlignment": "start",
+          "layout": "column",
+          "resizable": false,
+          "isColumn": true,
+          "id": "columns-pEdeFvz6_0-1"
+        },
+        "displayName": "Group",
+        "custom": {
+          "isResizable": false,
+          "isBlock": true,
+          "isExpanded": false,
+          "displayName": "Column"
+        },
+        "parent": "AQaC7Wi571",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "group__inner": "ARw2z8OXa_"
+        }
+      },
+      "ARw2z8OXa_": {
+        "type": {
+          "resolvedName": "NoSections"
+        },
+        "isCanvas": true,
+        "props": {
+          "className": "",
+          "placeholderText": "Drop a block to add it here"
+        },
+        "displayName": "NoSections",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "37CccFjekg",
+        "hidden": false,
+        "nodes": [
+          "xNelTvf8Du",
+          "EQeryX8Bzt"
+        ],
+        "linkedNodes": {}
+      },
+      "xNelTvf8Du": {
+        "type": {
+          "resolvedName": "HeadingBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "text": "Instructor Bio",
+          "level": "h4"
+        },
+        "displayName": "Heading",
+        "custom": {
+          "isResizable": true,
+          "isBlock": true
+        },
+        "parent": "ARw2z8OXa_",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "EQeryX8Bzt": {
+        "type": {
+          "resolvedName": "TextBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "fontSize": "8pt",
+          "textAlign": "initial",
+          "color": "var(--ic-brand-font-color-dark)",
+          "text": "<p><span id=\"docs-internal-guid-3ee8626a-7fff-5cb8-25a2-af28ff9bd3b6\"></span></p><p dir=\"ltr\" style=\"line-height:1.2;margin-top:10pt;margin-bottom:0pt;\"><span style=\"font-size: 13pt; font-family: &quot;Proxima Nova&quot;, sans-serif; color: rgb(0, 0, 0); background-color: transparent; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-alternates: normal; font-variant-position: normal; vertical-align: baseline; white-space-collapse: preserve;\">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa.</span></p><p dir=\"ltr\" style=\"line-height:1.2;margin-top:10pt;margin-bottom:0pt;\"><span style=\"font-size: 13pt; font-family: &quot;Proxima Nova&quot;, sans-serif; color: rgb(0, 0, 0); background-color: transparent; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-alternates: normal; font-variant-position: normal; vertical-align: baseline; white-space-collapse: preserve;\">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris.</span></p><div><span style=\"font-size: 13pt; font-family: &quot;Proxima Nova&quot;, sans-serif; color: rgb(0, 0, 0); background-color: transparent; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-alternates: normal; font-variant-position: normal; vertical-align: baseline; white-space-collapse: preserve;\"><br></span></div><p></p>"
+        },
+        "displayName": "Text",
+        "custom": {
+          "isResizable": true,
+          "isBlock": true
+        },
+        "parent": "ARw2z8OXa_",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      }
+    }
+  },
+  "template_type": "page",
+  "template_category": "global",
+  "thumbnail": "",
+  "id": "9e745460-416b-43b6-84a3-64b649910aa4",
+  "global_id": "9e745460-416b-43b6-84a3-64b649910aa4"
+}

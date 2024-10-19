@@ -53,7 +53,7 @@ function renderEditor(props: Partial<BlockEditorProps> = {}) {
 describe('BlockEditor', () => {
   const can_edit_url = '/api/v1/courses/1/block_editor_templates/can_edit'
   const get_templates_url =
-    '/api/v1/courses/1/block_editor_templates?include[]=node_tree&include[]=thumbnail&sort=name&drafts=false'
+    '/api/v1/courses/1/block_editor_templates?include[]=node_tree&include[]=thumbnail&sort=name'
   const template_url = '/api/v1/courses/1/block_editor_templates'
   beforeAll(() => {
     window.alert = jest.fn()
@@ -67,68 +67,21 @@ describe('BlockEditor', () => {
     fetchMock.delete(`${template_url}/1`, 200)
   })
 
+  afterEach(() => jest.clearAllMocks())
+
   it('renders', () => {
     const {getByText, getByLabelText} = renderEditor()
     expect(getByText('Preview')).toBeInTheDocument()
     expect(getByText('Undo')).toBeInTheDocument()
     expect(getByText('Redo')).toBeInTheDocument()
     expect(getByLabelText('Block Toolbox')).not.toBeChecked()
-    expect(fetchMock.called(can_edit_url, 'GET')).toBe(true)
-    // I don't understand why, but this returns false even though
-    // I can put a console.log in in BlockEditor and see the response
-    // I speified in the mock.
-    // expect(fetchMock.called(templates_url, 'GET')).toBe(true)
+    expect(fetchMock.calls().map(call => call[0])).toEqual([can_edit_url])
   })
 
   it('warns on content version mismatch', () => {
     // @ts-expect-error - passing invalid version on purpose
     renderEditor({content: {id: '1', version: '2', blocks: blank_page}})
     expect(window.alert).toHaveBeenCalledWith('Unknown block data version "2", mayhem may ensue')
-  })
-
-  describe('New page stepper', () => {
-    it('opens the stepper when no content is provided', () => {
-      renderEditor({content: undefined})
-      expect(screen.getByText('Create a new page')).toBeInTheDocument()
-      expect(screen.getByText('Start from Scratch')).toBeInTheDocument()
-      expect(screen.getByText('Select a Template')).toBeInTheDocument()
-    })
-
-    it('calls onCancel when the stepper is canceled', () => {
-      const onCancel = jest.fn()
-      renderEditor({content: undefined, onCancel})
-      screen.getByText('Cancel').click()
-      expect(onCancel).toHaveBeenCalled()
-    })
-
-    it.skip('creates a new page when the stepper is completed', async () => {
-      // this passes locally, but fails in jenkins looking for "Blank Section"
-
-      // craft.js is currently emitting a console error
-      // "Cannot update a component (`RenderNode`) while rendering a different component"
-      // Supress the message for now so we pass jenkins.
-      // will address with RCX-2173
-      jest.spyOn(console, 'error').mockImplementation(() => {})
-      const {container, getByText} = renderEditor({content: undefined})
-      expect(screen.getByText('Create a new page')).toBeInTheDocument()
-
-      const nextButton = screen.getByText('Next').closest('button') as HTMLButtonElement
-      await user.click(nextButton)
-      await user.click(nextButton)
-      await user.click(nextButton)
-      await user.click(nextButton)
-      const startButton = screen.getByText('Start Creating').closest('button') as HTMLButtonElement
-      await user.click(startButton)
-
-      await waitFor(() => {
-        expect(screen.queryByText('Create a new page')).not.toBeInTheDocument()
-      })
-      await waitFor(() => {
-        expect(getByText('Blank Section')).toBeInTheDocument()
-        expect(container.querySelector('.section-menu')).toBeInTheDocument()
-      })
-      expect(screen.queryByLabelText('Toolbox')).toHaveAttribute('role', 'dialog')
-    })
   })
 
   describe('data transformations', () => {

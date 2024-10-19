@@ -653,4 +653,13 @@
   }
 }
 
+.block-template-preview-card {
+  background-position: left top;
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+  cursor: pointer;
 
+  > * { background-color: rgba(255, 255, 255, 0.7) }
+
+  &:not(:hover):not(:focus):not(:focus-within):not(.blank-card) > * { display: none; }
+}
