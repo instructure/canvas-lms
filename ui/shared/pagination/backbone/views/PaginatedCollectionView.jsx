@@ -170,9 +170,12 @@ PaginatedCollectionView.prototype.checkScroll = function () {
     (this.fetchItAll || distanceToBottom < this.options.buffer) &&
     this.collection.canFetch('next')
   ) {
-    return this.collection.fetch({
+    const fetchPromise = this.collection.fetch({
       page: 'next',
     })
+    if(this.collection.lastRequests)
+      this.collection.lastRequests.push(fetchPromise)
+    return fetchPromise
   } else {
     return this.hideLoadingIndicator()
   }

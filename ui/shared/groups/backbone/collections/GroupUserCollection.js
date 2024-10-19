@@ -61,6 +61,7 @@ GroupUserCollection.prototype.url = function () {
 GroupUserCollection.prototype.initialize = function (models) {
   GroupUserCollection.__super__.initialize.apply(this, arguments)
   this.loaded = this.loadedAll = models != null
+  this.lastRequests = []
   this.on('change:group', this.onChangeGroup)
   return (this.model = GroupUser.extend({
     defaults: {
@@ -76,8 +77,10 @@ GroupUserCollection.prototype.load = function (target) {
   }
   this.loadAll = target === 'all'
   this.loaded = true
+
   if (target !== 'none') {
-    this.fetch()
+    const fetchPromise = this.fetch()
+    this.lastRequests.push(fetchPromise)
   }
   return (this.load = function () {})
 }
