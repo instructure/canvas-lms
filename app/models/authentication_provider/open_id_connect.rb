@@ -348,7 +348,7 @@ class AuthenticationProvider
             if issuer.blank?
               raise OAuthValidationError, "No issuer configured for OpenID Connect provider"
             end
-            unless id_token["iss"] == issuer
+            unless issuer === id_token["iss"] # rubocop:disable Style/CaseEquality may be a string or a RegEx
               raise OAuthValidationError, "Invalid JWT issuer: #{id_token["iss"]}"
             end
           end
