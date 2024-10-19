@@ -43,4 +43,27 @@ describe('mergeTemplates', () => {
       {id: '3', global_id: 'c', name: 'DD Api 3'},
     ])
   })
+
+  it('can handle rejected promise results', () => {
+    const apiTemplates = [
+      {id: '1', global_id: 'a', name: 'Api 1'},
+      {id: '2', global_id: 'b', name: 'Api 2'},
+      {id: '3', global_id: 'c', name: 'Api 3'},
+    ]
+    const globalTemplates = undefined
+    // @ts-expect-error
+    const mergedTemplates = mergeTemplates(apiTemplates, globalTemplates)
+    expect(mergedTemplates).toEqual([
+      {id: '1', global_id: 'a', name: 'Api 1'},
+      {id: '2', global_id: 'b', name: 'Api 2'},
+      {id: '3', global_id: 'c', name: 'Api 3'},
+    ])
+
+    const mergedTemplates2 = mergeTemplates(undefined, apiTemplates)
+    expect(mergedTemplates2).toEqual([
+      {id: '1', global_id: 'a', name: 'Api 1'},
+      {id: '2', global_id: 'b', name: 'Api 2'},
+      {id: '3', global_id: 'c', name: 'Api 3'},
+    ])
+  })
 })

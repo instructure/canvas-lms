@@ -27,7 +27,6 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Toolbox} from './components/editor/Toolbox/Toolbox'
 import {Topbar} from './components/editor/Topbar'
 import {blocks} from './components/blocks'
-import {NewPageStepper} from './components/editor/NewPageStepper'
 import {RenderNode} from './components/editor/RenderNode'
 import {ErrorBoundary} from './components/editor/ErrorBoundary'
 import {closeExpandedBlocks} from './utils/cleanupBlocks'
@@ -36,10 +35,9 @@ import {
   LATEST_BLOCK_DATA_VERSION,
   type BlockEditorDataTypes,
   type BlockEditorData,
-  mergeTemplates,
+  getTemplates,
 } from './utils'
 import {saveGlobalTemplateToFile} from './utils/saveGlobalTemplate'
-import {getGlobalTemplates} from './assets/globalTemplates'
 import {
   type CanEditTemplates,
   type BlockTemplate,
@@ -49,6 +47,7 @@ import {
 } from './types'
 
 import './style.css'
+import CreateFromTemplate from '@canvas/block-editor/react/CreateFromTemplate'
 
 const I18n = useI18nScope('block-editor')
 
@@ -101,7 +100,6 @@ export type BlockEditorProps = {
   course_id: string
   container: HTMLElement // the element that will shrink when drawers open
   content: BlockEditorDataTypes
-  onCancel: () => void
 }
 
 export default function BlockEditor({
@@ -110,7 +108,6 @@ export default function BlockEditor({
   course_id,
   container,
   content,
-  onCancel,
 }: BlockEditorProps) {
   const [data] = useState<BlockEditorData>(() => {
     if (content?.blocks) {
@@ -119,7 +116,6 @@ export default function BlockEditor({
     return {version: '0.2', blocks: DEFAULT_CONTENT} as BlockEditorData
   })
   const [toolboxOpen, setToolboxOpen] = useState(false)
-  const [stepperOpen, setStepperOpen] = useState(!content?.blocks)
   const [templateEditor, setTemplateEditor] = useState<TemplateEditor>(TemplateEditor.UNKNOWN)
   const [blockTemplates, setBlockTemplates] = useState<BlockTemplate[]>([])
   const [blockEditorEditorEl, setBlockEditorEditorEl] = useState<HTMLDivElement | null>(null)
@@ -130,37 +126,11 @@ export default function BlockEditor({
   // currently imported from the assets folder (though this will eventually be replaced with an API call)
   const getBlockTemplates = useCallback(
     (editor: TemplateEditor) => {
-      const promiseApi = doFetchApi<BlockTemplate[]>({
-        path: `/api/v1/courses/${course_id}/block_editor_templates?include[]=node_tree&include[]=thumbnail&sort=name&drafts=${
-          editor > 0
-        }`,
-        method: 'GET',
-      })
-        .then((response: DoFetchApiResults<BlockTemplate[]>) => {
-          return response.json || []
-        })
+      getTemplates({course_id, drafts: editor > 0})
+        .then(setBlockTemplates)
         .catch((err: Error) => {
           showFlashError(I18n.t('Cannot get block custom templates'))(err)
         })
-
-      const promiseGlobal = getGlobalTemplates()
-
-      // eslint-disable-next-line promise/catch-or-return
-      Promise.allSettled([promiseApi, promiseGlobal]).then(
-        ([apiTemplatesResult, globalTemplatesResult]) => {
-          const apiTemplates =
-            apiTemplatesResult.status === 'fulfilled' ? apiTemplatesResult.value : []
-          const globalTemplates = (
-            globalTemplatesResult.status === 'fulfilled' ? globalTemplatesResult.value : []
-          ).map(t => {
-            t.template_category = 'global'
-            return t
-          })
-
-          const templates = mergeTemplates(apiTemplates || [], globalTemplates || [])
-          setBlockTemplates(templates)
-        }
-      )
     },
     [course_id]
   )
@@ -192,7 +162,7 @@ export default function BlockEditor({
     }
   }
 
-  const saveBlockTempate = useCallback(
+  const saveBlockTemplate = useCallback(
     (template: Partial<BlockTemplate>) => {
       const path = template.id
         ? `/api/v1/courses/${course_id}/block_editor_templates/${template.id}`
@@ -252,10 +222,10 @@ export default function BlockEditor({
         template.global_id = template.id = uuid.v4()
         saveGlobalTemplate(template)
       } else {
-        saveBlockTempate(template)
+        saveBlockTemplate(template)
       }
     },
-    [saveBlockTempate]
+    [saveBlockTemplate]
   )
 
   const handleDeleteTemplate = useCallback(
@@ -317,16 +287,6 @@ export default function BlockEditor({
     setToolboxOpen(open)
   }, [])
 
-  const handleCloseStepper = useCallback(() => {
-    setStepperOpen(false)
-    setToolboxOpen(true)
-  }, [])
-
-  const handleCancelStepper = useCallback(() => {
-    setStepperOpen(false)
-    onCancel()
-  }, [onCancel])
-
   return (
     <View
       elementRef={(el: Element | null) => setBlockEditorEditorEl(el as HTMLDivElement)}
@@ -381,11 +341,7 @@ export default function BlockEditor({
             onClose={handleCloseToolbox}
             templates={blockTemplates}
           />
-          <NewPageStepper
-            open={stepperOpen}
-            onFinish={handleCloseStepper}
-            onCancel={handleCancelStepper}
-          />
+          <CreateFromTemplate course_id={course_id} />
         </Editor>
       </ErrorBoundary>
     </View>

@@ -95,6 +95,9 @@ class BlockEditorTemplatesApiController < ApplicationController
   #   If true, include draft templates. If false or omitted
   #   only published templates will be returned.
   #
+  # @argument type[] [String, "page"|"section"|"block"]
+  #   What type of templates should be returned.
+  #
   # @argument include[] [String, "node_tree" | "thumbnail"]
   #
   # @example_request
@@ -117,13 +120,11 @@ class BlockEditorTemplatesApiController < ApplicationController
       scope_columns -= ["node_tree"] unless includes.include?("node_tree")
       scope_columns -= ["thumbnail"] unless includes.include?("thumbnail")
 
-      scope = @context.block_editor_templates.where.not(workflow_state: "deleted").select(scope_columns)
-      # scope = scope.where(context_type: 'Global').or(scope.where(context: @context)).or(scope.where(context: @context.account)).or(scope.where(context: @current_user))
+      where_clause = {}
+      where_clause[:template_type] = params[:type] if params[:type]
+      where_clause[:workflow_state] = (value_to_boolean(params[:drafts]) && template_editor?) ? %w[active unpublished] : "active"
 
-      # only editors can see draft templates
-      unless value_to_boolean(params[:drafts]) && template_editor?
-        scope = scope.active
-      end
+      scope = @context.block_editor_templates.where(where_clause).select(scope_columns)
 
       order_clause = case params[:sort]
                      when "name"

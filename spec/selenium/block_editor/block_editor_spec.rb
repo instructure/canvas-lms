@@ -45,44 +45,21 @@ describe "Block Editor", :ignore_js_errors do
     end
 
     context "Start from Scratch" do
-      it "creates a default empty page" do
-        expect(stepper_modal).to be_displayed
-        stepper_start_from_scratch.click
-        stepper_next_button.click
-        stepper_next_button.click
-        stepper_next_button.click
-        stepper_start_creating_button.click
-        expect(f("body")).not_to contain_css(stepper_modal_selector)
+      it "shows the template chooser modal with a default page block" do
+        expect(template_chooser).to be_displayed
+        template_chooser_new_blank_page.click
         expect(page_block).to be_displayed
-        expect(columns_section).to be_displayed
-        expect(group_blocks.count).to be(1)
-      end
-
-      it "walks through the stepper" do
-        expect(stepper_modal).to be_displayed
-        stepper_start_from_scratch.click
-        stepper_next_button.click
-        expect(stepper_select_page_sections).to be_displayed
-        stepper_hero_section_checkbox.click
-        stepper_next_button.click
-        expect(stepper_select_color_palette).to be_displayed
-        stepper_next_button.click
-        expect(stepper_select_font_pirings).to be_displayed
-        stepper_start_creating_button.click
-        expect(f("body")).not_to contain_css(stepper_modal_selector)
-        expect(hero_section).to be_displayed
       end
     end
 
-    context "Start from Template" do
-      it "walks through the stepper" do
-        expect(stepper_modal).to be_displayed
-        stepper_start_from_template.click
-        stepper_next_button.click
-        f("#template-1").click
-        stepper_start_editing_button.click
-        expect(f("body")).not_to contain_css(stepper_modal_selector)
-        expect(hero_section).to be_displayed
+    context "Load template" do
+      it "loads the clicked template to the editor" do
+        expect(template_chooser).to be_displayed
+        wait_for_ajax_requests
+        template_chooser_template_for_number(2).send_keys("")
+        template_chooser_active_customize_template.click
+        wait_for_ajax_requests
+        expect(page_block).to be_displayed
       end
     end
   end

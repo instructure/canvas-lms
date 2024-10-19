@@ -56,49 +56,33 @@ module BlockEditorPage
     f(".topbar")
   end
 
-  # Stepper
-  def stepper_modal_selector
-    '[role="dialog"][aria-label="Create a new page"]'
+  # Template Chooser
+  def template_chooser_selector
+    '[data-testid="template-chooser-modal"]'
   end
 
-  def stepper_modal
-    f(stepper_modal_selector)
+  def template_chooser
+    f(template_chooser_selector)
   end
 
-  def stepper_start_from_scratch
-    fxpath('//button[.//*[@aria-labelledby="start-from-scratch-desc"]]')
+  def template_chooser_new_blank_page
+    fj('button:contains("New Blank Page")')
   end
 
-  def stepper_start_from_template
-    fxpath('//button[.//*[@aria-labelledby="select-a-template-desc"]]')
+  def template_chooser_active_customize_template_selector
+    'button:contains("Customize"):visible:first'
   end
 
-  def stepper_next_button
-    fj('button:contains("Next")')
+  def template_chooser_active_customize_template
+    fj(template_chooser_active_customize_template_selector)
   end
 
-  def stepper_start_creating_button
-    fj('button:contains("Start Creating")')
+  def template_chooser_template_selector_for_number(number)
+    ".block-template-preview-card:nth-child(#{number + 1})" # Actual first-child is new blank page
   end
 
-  def stepper_start_editing_button
-    fj('button:contains("Start Editing")')
-  end
-
-  def stepper_select_page_sections
-    f('[data-testid="stepper-page-sections"]')
-  end
-
-  def stepper_hero_section_checkbox
-    fxpath('//*[@id="heroWithText"]/..')
-  end
-
-  def stepper_select_color_palette
-    f('[data-testid="stepper-color-palette"]')
-  end
-
-  def stepper_select_font_pirings
-    f('[data-testid="stepper-font-pairings"]')
+  def template_chooser_template_for_number(number)
+    f(template_chooser_template_selector_for_number(number))
   end
 
   # Block Toolbox

@@ -56,6 +56,11 @@ export type BlockTemplate = {
   workflow_state: WorkflowState
 }
 
+export type BlockTemplateGridItemProps = {
+  createAction: () => void
+  template?: BlockTemplate
+}
+
 export const SaveTemplateEvent = 'block-editor-save-block-template' as const
 export const DeleteTemplateEvent = 'block-editor-delete-block-template' as const
 export const PublishTemplateEvent = 'block-editor-publish-block-template' as const
