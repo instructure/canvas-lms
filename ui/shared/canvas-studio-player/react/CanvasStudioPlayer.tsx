@@ -75,7 +75,13 @@ export default function CanvasStudioPlayer({
     ? media_sources.sort(byBitrate)
     : media_sources
   const tracks = Array.isArray(media_tracks)
-    ? media_tracks.map(t => ({locale: t.language, language: t.label, inherited: t.inherited}))
+    ? media_tracks.map(t => ({
+        locale: t.language,
+        language: t.label,
+        inherited: t.inherited,
+        label: t.label,
+        src: t.src,
+      }))
     : undefined
   const [mediaSources, setMediaSources] = useState(sorted_sources)
   const [mediaTracks] = useState(tracks)
