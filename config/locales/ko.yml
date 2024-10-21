@@ -12768,6 +12768,31 @@ ko:
         click_to_change_profile_pic: "프로필 사진을 변경하려면 클릭"
       user_has_no_bio: "%{user}이/가 추가한 소개 없음"
       ways_to_contact_user: 연락처
+    profile_form: 
+      add_link_field: "다른 링크 추가"
+      bio: 소개
+      cancel: 취소
+      is_required: "이 필드가 필요함"
+      links: 링크
+      links_title: 직함
+      links_url: URL
+      manage_settings: "등록된 서비스 관리"
+      message_me: "Canvas에게 내게 메시지 보내기"
+      message_title: 메시지
+      message_user_canvas: "Canvas에서 %{user}에게 메시지 보내기"
+      name: 이름
+      nothing_in_common: "공통점이 없음"
+      save_profile: "프로필 저장"
+      service_contact: "%{service}(으)로 %{user}에게 연락"
+      social_instructions: "프로필에서 다른 사람에게 표시되는 연락 방법을 표시하십시오."
+      title: 직함
+      user_enrolled: 등록
+      ways_to_contact_user: 연락처
+    profile_main: 
+      cancel_editing: "편집 취소"
+      edit_profile: "프로필 편집"
+      links: 
+        user_account_details: "계정 세부 정보"
     recent_activity: 
       date_column: 날짜
       edit_group: "그룹 편집"
