@@ -17904,6 +17904,31 @@ tr:
       user_enrolled: Kayıtlar
       user_has_no_bio: "%{user} biyografisini eklememiş"
       ways_to_contact_user: İletişim
+    profile_form: 
+      add_link_field: "Farklı bağlantı ekle"
+      bio: Biyografi
+      cancel: İptal
+      is_required: "Bu alan zorunludur"
+      links: Bağlantılar
+      links_title: Başlık
+      links_url: URL
+      manage_settings: "Kayıtlı Servisleri Yönet"
+      message_me: "Canvas'tan mesaj"
+      message_title: Mesaj
+      message_user_canvas: "Canvas'tan %{user}'a mesaj"
+      name: İsim
+      nothing_in_common: "Ortak birşey yok"
+      save_profile: "Profili Kaydet"
+      service_contact: "%{user} kullanıcısının %{service} hizmeti ile iletişimini sağla"
+      social_instructions: "Profilinizde diğerleri tarafından görülmesini istediğiniz iletişim yöntemlerini seçin."
+      title: Başlık
+      user_enrolled: Kayıtlar
+      ways_to_contact_user: İletişim
+    profile_main: 
+      cancel_editing: "Düzenlemeyi İptal et"
+      edit_profile: "Profili Düzenle"
+      links: 
+        user_account_details: "Hesap Ayrıntıları"
     recent_activity: 
       date_column: Tarih
       edit_group: "Grubu Düzenle"

@@ -24090,6 +24090,36 @@ nn:
       user_enrolled: Påmeldingar
       user_has_no_bio: "%{user} har ikkje lagt til skildring"
       ways_to_contact_user: Kontakt
+    profile_form: 
+      add_link_field: "Legg til endå ei lenke"
+      bio: Biografi
+      cancel: Avbryt
+      is_required: "Dette feltet er obligatorisk"
+      links: Lenker
+      links_title: Tittel
+      links_url: URL
+      manage_settings: "Administrer registrerte tenester"
+      message_me: "send meg melding i Canvas"
+      message_title: Melding
+      message_user_canvas: "Melding %{user} i Canvas"
+      name: Namn
+      name_pronunciation: "Uttale av namn:"
+      name_pronunciation_header: "Uttale av namn:"
+      name_pronunciation_header_tip: "For å bekrefte korrekt uttale av namnet ditt kan du skrive inn dei fonetiske tegna"
+      name_pronunciation_label: "Uttale av namn"
+      name_pronunciation_label_tip: "For å bekrefte korrekt uttale av namnet ditt kan du skrive inn dei fonetiske tegna"
+      nothing_in_common: "De har ingenting felles"
+      save_profile: "Lagre profil"
+      service_contact: "kontakt %{user} med %{service}"
+      social_instructions: "Merk av for kontaktmetodane på profilen din du vil skal vere synlege for andre."
+      title: Tittel
+      user_enrolled: Påmeldingar
+      ways_to_contact_user: Kontakt
+    profile_main: 
+      cancel_editing: "Avbryt redigering"
+      edit_profile: "Rediger profil"
+      links: 
+        user_account_details: Kontodetaljar
     recent_activity: 
       date_column: Dato
       edit_group: "Rediger gruppe"

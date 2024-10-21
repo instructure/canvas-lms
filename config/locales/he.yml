@@ -17934,6 +17934,31 @@ he:
       user_enrolled: הרשמות
       user_has_no_bio: "%{user} לא הוסיף את קורות החיים"
       ways_to_contact_user: התקשרות
+    profile_form: 
+      add_link_field: "הוספת קישור נוסף"
+      bio: ביוגרפיה
+      cancel: ביטול
+      is_required: "חובה למלא שדה זה"
+      links: קישורים
+      links_title: כותרת
+      links_url: "כתובת דף אינטרנט"
+      manage_settings: "ניהול שרותים רשומים"
+      message_me: "שלח/י לי הודעה בקנבס"
+      message_title: הודעה
+      message_user_canvas: " שלח/י הודעה ל %{user} בקנבס"
+      name: שם
+      nothing_in_common: "אין לכם שום דבר במשותף"
+      save_profile: "שמירת פרופיל"
+      service_contact: "התקשרו ל %{user} בעזרת %{service}"
+      social_instructions: "סימון שיטות התקשורת בפרופיל שלך שהיית רוצה שיוצגו לאחרים."
+      title: כותרת
+      user_enrolled: הרשמות
+      ways_to_contact_user: התקשרות
+    profile_main: 
+      cancel_editing: "ביטול עריכה"
+      edit_profile: "עריכת פרופיל"
+      links: 
+        user_account_details: "פרטי חשבון"
     recent_activity: 
       date_column: תאריך
       edit_group: "עריכת קבוצה"
