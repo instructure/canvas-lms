@@ -46,6 +46,7 @@ export const Products = (props: {
     props
   const {queryParams, setQueryParams, updateQueryParams} = useDiscoverQueryParams()
   const isLarge = useMedia(`(min-width: ${breakpoints.large})`)
+  const isMobile = useMedia(`(min-width: ${breakpoints.mobile})`)
 
   const renderProducts = (products: Product[]) => {
     if (!isLarge) {
@@ -133,10 +134,13 @@ export const Products = (props: {
                 {group.tag_group.name}
               </Heading>
               <Flex justifyItems="space-between" margin="0 0 medium 0">
-                <View margin="x-small 0 small 0" padding="0 small 0 0">
+                <View margin="x-small 0 small 0" padding="0 small 0 0" maxWidth="70%">
                   {group.tag_group.description}
                 </View>
-                <CondensedButton onClick={() => setTag(group.tag_group)}>
+                <CondensedButton
+                  onClick={() => setTag(group.tag_group)}
+                  margin={isMobile ? '0 small 0 0' : '0'}
+                >
                   {I18n.t('See All')}
                 </CondensedButton>
               </Flex>
