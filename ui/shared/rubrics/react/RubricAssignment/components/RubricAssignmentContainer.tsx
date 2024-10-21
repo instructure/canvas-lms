@@ -34,24 +34,29 @@ import {Text} from '@instructure/ui-text'
 import {RubricCreateModal} from './RubricCreateModal'
 import type {Rubric, RubricAssociation} from '../../types/rubric'
 import {RubricAssessmentTray} from '../../RubricAssessment'
-import {addRubricToAssignment, removeRubricFromAssignment} from '../queries'
+import {addRubricToAssignment, removeRubricFromAssignment, type AssignmentRubric} from '../queries'
 import {RubricSearchTray} from './RubricSearchTray'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {CopyEditConfirmModal} from './CopyEditConfirmModal'
 
 const I18n = useI18nScope('enhanced-rubrics-assignment-container')
 
 export type RubricAssignmentContainerProps = {
+  accountMasterScalesEnabled: boolean
   assignmentId: string
-  assignmentRubric?: Rubric
+  assignmentRubric?: AssignmentRubric
   assignmentRubricAssociation?: RubricAssociation
   canManageRubrics: boolean
+  contextAssetString: string
   courseId: string
 }
 export const RubricAssignmentContainer = ({
+  accountMasterScalesEnabled,
   assignmentId,
   assignmentRubric,
   assignmentRubricAssociation,
   canManageRubrics,
+  contextAssetString,
   courseId,
 }: RubricAssignmentContainerProps) => {
   const [rubric, setRubric] = useState(assignmentRubric)
@@ -60,6 +65,8 @@ export const RubricAssignmentContainer = ({
   const [isPreviewTrayOpen, setIsPreviewTrayOpen] = useState(false)
   const [isSearchTrayOpen, setIsSearchTrayOpen] = useState(false)
   const [searchPreviewRubric, setSearchPreviewRubric] = useState<Rubric>()
+  const [canUpdateRubric, setCanUpdateRubric] = useState(assignmentRubric?.can_update)
+  const [copyEditConfirmModalOpen, setCopyEditConfirmModalOpen] = useState(false)
 
   const handleSaveRubric = (savedRubricResponse: SaveRubricResponse) => {
     setRubric(savedRubricResponse.rubric)
@@ -84,12 +91,22 @@ export const RubricAssignmentContainer = ({
         updatedAssociation
       )
       setRubric(response.rubric)
+      setCanUpdateRubric(response.rubric.can_update)
       setRubricAssociation(response.rubricAssociation)
       setIsSearchTrayOpen(false)
       showFlashSuccess(I18n.t('Rubric added to assignment'))()
-    } catch (error) {
+    } catch (_error) {
       showFlashError(I18n.t('Failed to add rubric to assignment'))()
     }
+  }
+
+  const handleEditClick = () => {
+    if (canUpdateRubric) {
+      setRubricCreateModalOpen(true)
+      return
+    }
+
+    setCopyEditConfirmModalOpen(true)
   }
 
   return (
@@ -122,7 +139,7 @@ export const RubricAssignmentContainer = ({
                 margin="0 0 0 small"
                 screenReaderLabel={I18n.t('Edit Rubric')}
                 data-testid="edit-assignment-rubric-button"
-                onClick={() => setRubricCreateModalOpen(true)}
+                onClick={handleEditClick}
               >
                 <IconEditLine />
               </IconButton>
@@ -159,6 +176,17 @@ export const RubricAssignmentContainer = ({
           </View>
         )}
       </View>
+      <CopyEditConfirmModal
+        accountMasterScalesEnabled={accountMasterScalesEnabled}
+        contextAssetString={contextAssetString}
+        isOpen={copyEditConfirmModalOpen}
+        onConfirm={() => {
+          setCopyEditConfirmModalOpen(false)
+          setRubricCreateModalOpen(true)
+        }}
+        onDismiss={() => setCopyEditConfirmModalOpen(false)}
+        rubric={rubric}
+      />
       <RubricCreateModal
         isOpen={rubricCreateModalOpen}
         rubric={rubric}

@@ -237,6 +237,7 @@ const RubricsForContext = ({
   const {data: rubricsForContext = [], isLoading: isRubricsLoading} = useQuery({
     queryKey: ['fetchGradingRubricsForContext', courseId, selectedContext],
     queryFn: getGradingRubricsForContext,
+    staleTime: 0,
     fetchAtLeastOnce: true,
   })
 

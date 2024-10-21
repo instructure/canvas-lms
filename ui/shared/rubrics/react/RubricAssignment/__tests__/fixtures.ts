@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {Rubric, RubricAssociation} from '../../types/rubric'
+import type {RubricAssociation} from '../../types/rubric'
+import type {AssignmentRubric} from '../queries'
 
-export const RUBRIC: Rubric = {
+export const RUBRIC: AssignmentRubric = {
   id: '1',
   criteriaCount: 1,
   pointsPossible: 10,
@@ -45,6 +46,7 @@ export const RUBRIC: Rubric = {
       ],
     },
   ],
+  can_update: true,
 }
 
 export const RUBRIC_ASSOCIATION: RubricAssociation = {

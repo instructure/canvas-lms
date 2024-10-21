@@ -39,6 +39,7 @@ export const removeRubricFromAssignment = async (courseId: string, rubricAssocia
   })
 }
 
+export type AssignmentRubric = Rubric & {can_update?: boolean}
 export const addRubricToAssignment = async (
   courseId: string,
   assignmentId: string,
@@ -74,9 +75,11 @@ export const addRubricToAssignment = async (
 
   const result = await response.json()
 
+  const mappedRubric = mapRubricUnderscoredKeysToCamelCase(result.rubric)
+
   return {
     rubricAssociation: result.rubric_association,
-    rubric: mapRubricUnderscoredKeysToCamelCase(result.rubric),
+    rubric: {...mappedRubric, can_update: result.rubric.permissions?.update} as AssignmentRubric,
   }
 }
 
