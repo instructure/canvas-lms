@@ -283,11 +283,12 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
     const discussionOrAnnouncement = isAnnouncement
       ? I18n.t('Announcements')
       : I18n.t('Discussions')
+    const discussionOrAnnouncementUrl= isAnnouncement ? 'announcements' : 'discussion_topics'
     const oldCrumbs = getCrumbs()
     const newCrumbs = [
       ...oldCrumbs,
       ...[
-        {name: discussionOrAnnouncement, url: oldCrumbs[0].url + '/discussion_topics'},
+        {name: discussionOrAnnouncement, url: oldCrumbs[0].url + '/' + discussionOrAnnouncementUrl},
         {name: isEditing ? currentDiscussionTopic?.title : I18n.t('Create new') || '', url: ''},
       ],
     ]
