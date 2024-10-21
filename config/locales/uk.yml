@@ -16118,6 +16118,31 @@ uk:
       user_enrolled: Реєстрації
       user_has_no_bio: "%{user} не додав біографію"
       ways_to_contact_user: Зв'язатися
+    profile_form: 
+      add_link_field: "Додати інше посилання "
+      bio: "Біографія "
+      cancel: Скачувати
+      is_required: "Це поле є обов'язковим."
+      links: Посилання
+      links_title: Назва
+      links_url: URL
+      manage_settings: "Управління зареєстрованими сервісами"
+      message_me: "написати мені в Canvas"
+      message_title: Повідомлення
+      message_user_canvas: "Повідомлення %{user} у Canvas"
+      name: ім'я
+      nothing_in_common: "У вас немає нічого спільного"
+      save_profile: "Зберегти Профіль"
+      service_contact: "зв'язатися %{user} з %{service}"
+      social_instructions: "Перевірте контактні методи в своєму профілі, які будуть доступні іншим."
+      title: Назва
+      user_enrolled: Реєстрації
+      ways_to_contact_user: Зв'язатися
+    profile_main: 
+      cancel_editing: "Скасувати редагування"
+      edit_profile: "Редагувати профіль"
+      links: 
+        user_account_details: "Деталі облікового запису"
     recent_activity: 
       date_column: Дата
       edit_group: "Редагувати групу"
