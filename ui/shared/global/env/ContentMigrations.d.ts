@@ -33,6 +33,7 @@ export interface EnvContentMigrations {
   QUIZZES_NEXT_ENABLED?: boolean
   NEW_QUIZZES_MIGRATION_DEFAULT?: boolean
   NEW_QUIZZES_MIGRATION_REQUIRED?: boolean
+  NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS?: boolean
   EXPORT_WARNINGS?: string[]
   SHOW_BP_SETTINGS_IMPORT_OPTION?: boolean
   OLD_START_DATE?: string

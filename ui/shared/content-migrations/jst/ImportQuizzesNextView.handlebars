@@ -1,8 +1,27 @@
 <label class="checkbox" for="importQuizzesNext" {{#unless quizzesNextEnabled}}style="color: #ccc;"{{/unless}}>
-        <input type="checkbox" id="importQuizzesNext" {{#if disableNQMigrationCheckbox}}disabled=true{{/if}} {{#if migrationDefault}}checked{{/if}}/>
-  {{#t "import_new_quizzes"}}Import existing quizzes as <b>New Quizzes</b>{{/t}}
-  <a href="#" class="element_toggler" style="margin-left: 10px" aria-controls="import_quizzesNext_helpDialog" aria-label="{{#t "import_quizzesNext_help_label"}}Import assessment as New Quizzes Help Icon{{/t}}" title="{{#t "import_quizzesNext_help_title_icon"}}Import assessment as New Quizzes Help Icon{{/t}}"><i class="icon-question"></i></a>
-    <div id="import_quizzesNext_helpDialog" data-read-on-open="true" data-turn-into-dialog='{width":600,"modal":true}' style="display:none" title={{#t "import_quizzesNext_help_title"}}New Quizzes{{/t}}>
-    {{#t "import_new_quizzes_help_text"}}New Quizzes is the new assessment engine for Canvas.<p></p>To learn more, please contact your system administrator or visit{{/t}} <a href="{{#t "#community.instructor_guide" }}{{/t}}">Canvas Instructor Guide</a>.
+  <input type="checkbox" id="importQuizzesNext" {{#if disableNQMigrationCheckbox}}disabled=true{{/if}} {{#if migrationDefault}}checked{{/if}}/>
+
+  {{#if unattachedBankMigrationsEnabled}}
+    {{#t "import_new_quizzes_all"}}Convert content to <b>New Quizzes</b>{{/t}}
+  {{else}}
+    {{#t "import_new_quizzes"}}Import existing quizzes as <b>New Quizzes</b>{{/t}}
+  {{/if}}
+
+  <a href="#" class="element_toggler" style="margin-left: 10px" aria-controls="import_quizzesNext_helpDialog" aria-label="{{#t "import_quizzesNext_help_label"}}Import assessment as New Quizzes Help Icon{{/t}}" title="{{#t "import_quizzesNext_help_title_icon"}}Import assessment as New Quizzes Help Icon{{/t}}">
+    <i class="icon-question"></i>
+  </a>
+
+  <div id="import_quizzesNext_helpDialog" data-read-on-open="true" data-turn-into-dialog='{"width":600,"modal":true}' style="display:none" 
+    title={{#if unattachedBankMigrationsEnabled}}
+      "{{#t "convert_to_nq_help_title"}}Convert Quizzes{{/t}}"
+    {{else}}
+      "{{#t "import_quizzesNext_help_title"}}New Quizzes{{/t}}"
+    {{/if}}
+  >
+    {{#if unattachedBankMigrationsEnabled}}
+      {{#t "convert_to_nq_help_text"}}Existing question banks and classic quizzes will be imported as Item Banks and New Quizzes.<p></p>To learn more, please contact your system administrator or visit{{/t}} <a href="{{#t "#community.instructor_guide_link" }}{{/t}}">Canvas Instructor Guide</a>.
+    {{else}}
+      {{#t "import_new_quizzes_help_text"}}New Quizzes is the new assessment engine for Canvas.<p></p>To learn more, please contact your system administrator or visit{{/t}} <a href="{{#t "#community.instructor_guide" }}{{/t}}">Canvas Instructor Guide</a>.
+    {{/if}}
   </div>
 </label>
