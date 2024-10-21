@@ -314,10 +314,12 @@ $(() => {
     const assignmentRubricAssociation = envRubricAssociation ? mapRubricAssociationUnderscoredKeysToCamelCase(ENV.rubric_association) : undefined
     ReactDOM.render(
       <RubricAssignmentContainer
+        accountMasterScalesEnabled={ENV.ACCOUNT_LEVEL_MASTERY_SCALES}
         assignmentId={ENV.ASSIGNMENT_ID}
-        assignmentRubric={assignmentRubric}
+        assignmentRubric={{...assignmentRubric, can_update: ENV.assigned_rubric.can_update}}
         assignmentRubricAssociation={assignmentRubricAssociation}
         canManageRubrics={ENV.PERMISSIONS.manage_rubrics}
+        contextAssetString={ENV.context_asset_string}
         courseId={ENV.COURSE_ID}
       />,
       $mountPoint

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useMemo, useRef, useState} from 'react'
+import {useMemo} from 'react'
 import type {GradebookQueryResponse} from '../../types/queries'
 import {useAssignmentGroupsQuery} from './useAssignmentGroupsQuery'
 import {useAssignmentsQuery} from './useAssignmentsQuery'
@@ -26,8 +26,6 @@ import {useSubmissionsQuery} from './useSubmissionsQuery'
 import {useOutcomesQuery} from './useOutcomesQuery'
 
 export const useGradebookQuery = (courseId: string) => {
-  // const [courseData, setCourseData] = useState<GradebookQueryResponse>()
-
   const {enrollments, enrollmentsLoading, enrollmentsSuccessful} = useEnrollmentsQuery(courseId)
 
   const {sections, sectionsLoading, sectionsSuccessful} = useSectionsQuery(courseId)

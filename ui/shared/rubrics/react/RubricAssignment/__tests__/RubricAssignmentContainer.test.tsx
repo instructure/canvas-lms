@@ -61,7 +61,14 @@ describe('RubricAssignmentContainer Tests', () => {
 
   const renderComponent = (props: Partial<RubricAssignmentContainerProps> = {}) => {
     return render(
-      <RubricAssignmentContainer assignmentId="1" courseId="1" canManageRubrics={true} {...props} />
+      <RubricAssignmentContainer
+        accountMasterScalesEnabled={false}
+        assignmentId="1"
+        courseId="1"
+        contextAssetString="course_1"
+        canManageRubrics={true}
+        {...props}
+      />
     )
   }
 
@@ -165,6 +172,38 @@ describe('RubricAssignmentContainer Tests', () => {
       expect(rubricTray).toBeInTheDocument()
       expect(getByTestId('traditional-criterion-1-ratings-0')).toBeInTheDocument()
       expect(getByTestId('traditional-criterion-1-ratings-1')).toBeInTheDocument()
+    })
+
+    it('should open the edit copy confirmation modal when the edit button is clicked and user cannot update rubric', () => {
+      const {getByTestId, queryByTestId} = renderComponent({
+        assignmentRubric: {...RUBRIC, can_update: false},
+        assignmentRubricAssociation: RUBRIC_ASSOCIATION,
+      })
+
+      getByTestId('edit-assignment-rubric-button').click()
+      expect(queryByTestId('copy-edit-confirm-modal')).toBeInTheDocument()
+    })
+
+    it('should not open the edit modal when the user does not confirm in the copy edit modal', () => {
+      const {getByTestId, queryByTestId} = renderComponent({
+        assignmentRubric: {...RUBRIC, can_update: false},
+        assignmentRubricAssociation: RUBRIC_ASSOCIATION,
+      })
+
+      getByTestId('edit-assignment-rubric-button').click()
+      getByTestId('copy-edit-cancel-btn').click()
+      expect(queryByTestId('rubric-assignment-create-modal')).not.toBeInTheDocument()
+    })
+
+    it('should continue to the edit modal when the user confirms in the copy edit modal', () => {
+      const {getByTestId, queryByTestId} = renderComponent({
+        assignmentRubric: {...RUBRIC, can_update: false},
+        assignmentRubricAssociation: RUBRIC_ASSOCIATION,
+      })
+
+      getByTestId('edit-assignment-rubric-button').click()
+      getByTestId('copy-edit-confirm-btn').click()
+      expect(queryByTestId('rubric-assignment-create-modal')).toBeInTheDocument()
     })
   })
 
