@@ -166,6 +166,14 @@ describe Lti::Messages::JwtMessage do
       end
     end
 
+    context "when target_link_uri is disabled" do
+      let(:opts) { super().merge({ claim_group_blacklist: [:target_link_uri] }) }
+
+      it "does not set target_link_uri claim" do
+        expect(decoded_jwt["https://purl.imsglobal.org/spec/lti/claim/target_link_uri"]).to be_nil
+      end
+    end
+
     context "when the target_link_uri is specified in the tool's placement settings" do
       it 'use the placement-specific "target_link_uri"' do
         # Just setting tool.course_navigation[:target_link_uri] doesn't seem to
@@ -719,7 +727,7 @@ describe Lti::Messages::JwtMessage do
 
       it "sets the PNS version and notice_types_supported" do
         expect(lti_advantage_service_claim["service_versions"]).to eq ["1.0"]
-        expect(lti_advantage_service_claim["notice_types_supported"]).to eq Lti::PlatformNotificationService::NOTICE_TYPES
+        expect(lti_advantage_service_claim["notice_types_supported"]).to eq Lti::Pns::NoticeTypes::ALL
       end
     end
 
@@ -1054,6 +1062,12 @@ describe Lti::Messages::JwtMessage do
 
       it { is_expected.to be_empty }
     end
+
+    context "when lti11_legacy_user_id is disabled" do
+      let(:opts) { super().merge({ claim_group_blacklist: [:lti11_legacy_user_id] }) }
+
+      it { is_expected.to be_nil }
+    end
   end
 
   describe "lti1p1 claims" do
@@ -1127,6 +1141,15 @@ describe Lti::Messages::JwtMessage do
       it "uses student_id from opts" do
         expect(subject).to eq({ "id" => student_lti_id })
       end
+    end
+  end
+
+  context "when the expander is not provided and only security claims are needed" do
+    let(:expander) { nil }
+    let(:opts) { super().merge({ claim_group_whitelist: [:security] }) }
+
+    it "generate_post_payload_message does not raise an error" do
+      expect { jwt_message.generate_post_payload_message }.not_to raise_error
     end
   end
 end

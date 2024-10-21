@@ -19,10 +19,6 @@
 
 module Lti
   module PlatformNotificationService
-    NOTICE_TYPES = %w[
-      LtiHelloWorldNotice
-    ].freeze
-
     module_function
 
     def subscribe_tool_for_notice(tool:, notice_type:, handler_url:)
@@ -33,8 +29,11 @@ module Lti
       handler = tool.lti_notice_handlers.create!(
         notice_type:,
         url: handler_url,
-        account: tool.account
+        account: tool.related_account
       )
+      if notice_type == Lti::Pns::NoticeTypes::HELLO_WORLD
+        send_notice(tool:, notice_handler: handler, builders: [Lti::Pns::LtiHelloWorldNoticeBuilder.new])
+      end
       handler_api_json(handler:)
     end
 
@@ -49,7 +48,7 @@ module Lti
       found_notice_handlers = tool.lti_notice_handlers.active.map do |handler|
         handler_api_json(handler:)
       end
-      types_without_handlers = NOTICE_TYPES - found_notice_handlers.pluck(:notice_type)
+      types_without_handlers = Lti::Pns::NoticeTypes::ALL - found_notice_handlers.pluck(:notice_type)
       found_notice_handlers + types_without_handlers.map do |notice_type|
         empty_api_json(notice_type:)
       end
@@ -63,8 +62,41 @@ module Lti
       { notice_type:, handler: "" }
     end
 
+    def notify_tools(account, *builders)
+      notice_type = get_notice_type(builders:)
+      Lti::NoticeHandler.active.where(notice_type:, account:).find_each do |notice_handler|
+        send_notice(tool: notice_handler.context_external_tool, notice_handler:, builders:)
+      end
+    end
+
+    def send_notice(tool:, notice_handler:, builders:)
+      global_id = generate_notification_uuid
+      notice_objects = builders.map { |builder| builder.build(tool) }
+      webhook_body = { notices: notice_objects }.to_json
+      Services::NotificationService.process(
+        global_id,
+        webhook_body,
+        "webhook",
+        { url: notice_handler.url }.to_json
+      )
+    end
+    private_class_method :send_notice
+
+    def get_notice_type(builders:)
+      notice_types = builders.map(&:notice_type).uniq
+      raise ArgumentError, "builders must have the same notice_type" unless notice_types.length == 1
+
+      notice_types.first
+    end
+    private_class_method :get_notice_type
+
+    def generate_notification_uuid
+      "pns-notify/#{SecureRandom.uuid}"
+    end
+    private_class_method :generate_notification_uuid
+
     def validate_notice_parameters(tool:, notice_type:, handler_url:)
-      raise ArgumentError, "unknown notice_type, it must be one of [#{NOTICE_TYPES.join(", ")}]" unless NOTICE_TYPES.include?(notice_type)
+      raise ArgumentError, "unknown notice_type, it must be one of [#{Lti::Pns::NoticeTypes::ALL.join(", ")}]" unless Lti::Pns::NoticeTypes::ALL.include?(notice_type)
       raise ArgumentError, "handler url should match tool's domain" unless handler_url.blank? || tool.matches_host?(handler_url)
     end
     private_class_method :validate_notice_parameters

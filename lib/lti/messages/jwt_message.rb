@@ -72,12 +72,12 @@ module Lti::Messages
       add_custom_params_claims! if include_claims?(:custom_params)
       add_assignment_and_grade_service_claims! if include_assignment_and_grade_service_claims?
       add_names_and_roles_service_claims! if include_names_and_roles_service_claims?
-      add_lti11_legacy_user_id!
+      add_lti11_legacy_user_id! if include_claims?(:lti11_legacy_user_id)
       add_lti1p1_claims! if include_lti1p1_claims?
       add_extension("placement", @opts[:resource_type])
       add_extension("lti_student_id", @opts[:student_id].to_s) if @opts[:student_id].present?
       add_extension("student_context", { "id" => @opts[:student_lti_id] }) if @opts[:student_lti_id].present?
-      @expander.expand_variables!(@message.extensions)
+      @expander&.expand_variables!(@message.extensions)
       @message.validate! if validate_launch
       @message
     end
@@ -114,7 +114,7 @@ module Lti::Messages
       @message.iss = Canvas::Security.config["lti_iss"]
       @message.nonce = SecureRandom.uuid
       @message.sub = @user&.lookup_lti_id(@context) if include_sub_claim?
-      @message.target_link_uri = target_link_uri
+      @message.target_link_uri = target_link_uri if include_claims?(:target_link_uri)
     end
 
     def include_sub_claim?
@@ -240,7 +240,7 @@ module Lti::Messages
           context_external_tool_id: @tool.id
         )
       @message.platform_notification_service.scope = [TokenScopes::LTI_PNS_SCOPE]
-      @message.platform_notification_service.notice_types_supported = Lti::PlatformNotificationService::NOTICE_TYPES
+      @message.platform_notification_service.notice_types_supported = Lti::Pns::NoticeTypes::ALL
     end
 
     def associated_1_1_tool

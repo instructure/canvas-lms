@@ -37,6 +37,7 @@ module LtiAdvantage::Serializers
       target_link_uri
       lti11_legacy_user_id
       lti1p1
+      notice
     ].freeze
 
     DEEP_LINKING_CLAIMS = %w[
