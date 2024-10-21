@@ -76,7 +76,7 @@ describe('DiscussionsSettings', () => {
   })
 
   it('should render discussion settings with buttonText', () => {
-    render(<DiscussionSettings {...makeProps({buttonText: 'Settings'})} />)
+    render(<DiscussionSettings {...makeProps()} />)
 
     const settingsButton = screen.getByTestId('discussion-setting-button')
     expect(settingsButton).toHaveTextContent('Settings')
