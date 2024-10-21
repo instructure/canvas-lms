@@ -210,7 +210,6 @@ export default class IndexHeader extends Component {
             toggleModalOpen={this.props.toggleModalOpen}
             isSettingsModalOpen={this.props.isSettingsModalOpen}
             isSavingSettings={this.props.isSavingSettings}
-            buttonText={!breakpoints.tablet ? I18n.t('Settings') : ''}
           />
         ) : null}
         {this.renderTrayToolsMenu()}
