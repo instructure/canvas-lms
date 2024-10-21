@@ -54,6 +54,7 @@ function formatHistoryItems(data) {
         gradingType: assignments[item.links.assignment].grading_type,
         muted: assignments[item.links.assignment].muted,
         name: assignments[item.links.assignment].name,
+        subAssignmentTag: assignments[item.links.assignment].sub_assignment_tag,
       }
     } else {
       assignment = {}
