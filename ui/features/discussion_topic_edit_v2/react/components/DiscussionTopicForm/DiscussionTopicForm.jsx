@@ -1275,6 +1275,7 @@ function DiscussionTopicForm({
           }}
           isSubmitting={isSubmitting}
           willAnnouncementPostRightAway={willAnnouncementPostRightAway}
+          breakpoints={breakpoints}
         />
       </FormFieldGroup>
       {shouldShowMissingSectionsWarning && (
