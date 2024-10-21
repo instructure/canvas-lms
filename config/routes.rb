@@ -2920,7 +2920,7 @@ CanvasRails::Application.routes.draw do
     end
 
     # Platform Notification service
-    scope(controller: "lti/notice_handler") do
+    scope(controller: "lti/ims/notice_handlers") do
       get "notice-handlers/:context_external_tool_id", action: :index
       put "notice-handlers/:context_external_tool_id", action: :update
     end
