@@ -21828,6 +21828,31 @@ fa:
       user_enrolled: "ثبت نام ها"
       user_has_no_bio: "%{user} یک شرح حال افزوده است"
       ways_to_contact_user: مخاطب
+    profile_form: 
+      add_link_field: "افزودن یک پیوند دیگر"
+      bio: "زندگی نامه"
+      cancel: لغو
+      is_required: "پر کردن این جای خالی لازم است"
+      links: پیوندها
+      links_title: Title
+      links_url: "نشانی اینترنتی"
+      manage_settings: "مدیریت سرویس های ثبت شده"
+      message_me: "ارسال پیام برای من در کانواس"
+      message_title: "ارسال پیام"
+      message_user_canvas: "ارسال پیام برای %{user} در کانواس"
+      name: Name
+      nothing_in_common: "هیچ چیز مشترکی ندارید"
+      save_profile: "ذخیره سازی رخ نما"
+      service_contact: "ارتباط با %{user} از طریق %{service}"
+      social_instructions: "روش های برقراری ارتباط که مایلید در رخ نمای شما برای دیگران قابل مشاهده باشند را علامت بزنید."
+      title: Title
+      user_enrolled: "ثبت نام ها"
+      ways_to_contact_user: مخاطب
+    profile_main: 
+      cancel_editing: "لغو ویرایش"
+      edit_profile: "ویرایش رخ نما"
+      links: 
+        user_account_details: "اطلاعات حساب"
     recent_activity: 
       date_column: تاریخ
       edit_group: "ویرایش گروه"
