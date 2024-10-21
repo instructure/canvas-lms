@@ -19,7 +19,7 @@
 
 require "spec_helper"
 
-describe DataFixup::AddMediaIdAttributeToIframes do
+describe DataFixup::AddMediaIdAndStyleDisplayAttributesToIframes do
   let(:course) { course_model }
   let(:assignment) { course.assignments.create!(submission_types: "online_text_entry", points_possible: 2) }
 
@@ -28,7 +28,7 @@ describe DataFixup::AddMediaIdAttributeToIframes do
       Attachment.create! context: course, media_entry_id: "m-fromattachment", filename: "whatever.flv", display_name: "whatever.flv", content_type: "audio/webm"
       MediaObject.create! media_id: "m-frommediaobject", data: { extensions: { mp4: { width: 640, height: 400 } } }, attachment_id: Attachment.last.id, media_type: "video/webm"
       assignment.update! description: "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}\" data-media-type=\"unknown\"></iframe>"
-      DataFixup::AddMediaIdAttributeToIframes.run
+      DataFixup::AddMediaIdAndStyleDisplayAttributesToIframes.run
       expect(assignment.reload.description).to eq "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}\" data-media-type=\"unknown\" data-media-id=\"#{Attachment.last.media_entry_id}\"></iframe>"
     end
 
@@ -71,7 +71,7 @@ describe DataFixup::AddMediaIdAttributeToIframes do
           { "id" => "3893", "text" => answer_text_6, "comments" => "", "comments_html" => "", "weight" => 0.0 }
         ],
       }
-      DataFixup::AddMediaIdAttributeToIframes.run
+      DataFixup::AddMediaIdAndStyleDisplayAttributesToIframes.run
       q.reload
       expect(q.description).to eq expected_body(first_matching_attachment.id, first_matching_attachment.media_entry_id)
       expect(q.quiz_data[0]["question_text"]).to eq expected_body(first_matching_attachment.id, first_matching_attachment.media_entry_id)
@@ -98,7 +98,7 @@ describe DataFixup::AddMediaIdAttributeToIframes do
       quiz = Quizzes::Quiz.create! context: another_course
       quiz_question = quiz.quiz_questions.create! question_data: { "question_text" => record_body }
       wiki_page = another_course.wiki_pages.create! title: "Whatevs", body: record_body
-      DataFixup::AddMediaIdAttributeToIframes.run
+      DataFixup::AddMediaIdAndStyleDisplayAttributesToIframes.run
       expect(another_course.reload.syllabus_body).to eq(expected_body(att.id, att.media_entry_id))
       expect(assignment.reload.description).to eq(expected_body(att.id, att.media_entry_id))
       expect(assessment_question.reload.question_data["question_text"]).to eq(expected_body(att.id, att.media_entry_id))
@@ -106,6 +106,22 @@ describe DataFixup::AddMediaIdAttributeToIframes do
       expect(discussion_entry.reload.message).to eq(expected_body(att.id, att.media_entry_id))
       expect(quiz_question.reload.question_data["question_text"]).to eq(expected_body(att.id, att.media_entry_id))
       expect(wiki_page.reload.body).to eq(expected_body(att.id, att.media_entry_id))
+    end
+
+    it "also adds display: inline-block to style" do
+      Attachment.create! context: course, media_entry_id: "m-fromattachment", filename: "whatever.flv", display_name: "whatever.flv", content_type: "audio/webm"
+      MediaObject.create! media_id: "m-frommediaobject", data: { extensions: { mp4: { width: 640, height: 400 } } }, attachment_id: Attachment.last.id, media_type: "video/webm"
+      assignment.update! description: "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}\" data-media-type=\"unknown\" style=\"width: 1364px; height: 767px;\"></iframe>"
+      DataFixup::AddMediaIdAndStyleDisplayAttributesToIframes.run
+      expect(assignment.reload.description).to eq "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}\" data-media-type=\"unknown\" style=\"width: 1364px; height: 767px; display: inline-block;\" data-media-id=\"#{Attachment.last.media_entry_id}\"></iframe>"
+    end
+
+    it "adds style properly even if it looks weird" do
+      Attachment.create! context: course, media_entry_id: "m-fromattachment", filename: "whatever.flv", display_name: "whatever.flv", content_type: "audio/webm"
+      MediaObject.create! media_id: "m-frommediaobject", data: { extensions: { mp4: { width: 640, height: 400 } } }, attachment_id: Attachment.last.id, media_type: "video/webm"
+      assignment.update! description: "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}\" data-media-type=\"unknown\" style=\"width: 1364px; height: 767px\"></iframe>"
+      DataFixup::AddMediaIdAndStyleDisplayAttributesToIframes.run
+      expect(assignment.reload.description).to eq "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}\" data-media-type=\"unknown\" style=\"width: 1364px; height: 767px; display: inline-block;\" data-media-id=\"#{Attachment.last.media_entry_id}\"></iframe>"
     end
   end
 
@@ -115,7 +131,7 @@ describe DataFixup::AddMediaIdAttributeToIframes do
       MediaObject.create! media_id: "m-frommediaobject", data: { extensions: { mp4: { width: 640, height: 400 } } }, attachment_id: Attachment.last.id, media_type: "video/webm"
       html = "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}\" data-media-type=\"unknown\" data-media-id=\"#{Attachment.last.media_entry_id}\"></iframe>"
       assignment.update! description: html
-      DataFixup::AddMediaIdAttributeToIframes.run
+      DataFixup::AddMediaIdAndStyleDisplayAttributesToIframes.run
       expect(assignment.reload.description).to eq html
     end
 
@@ -124,7 +140,7 @@ describe DataFixup::AddMediaIdAttributeToIframes do
       MediaObject.create! media_id: "m-frommediaobject", data: { extensions: { mp4: { width: 640, height: 400 } } }, attachment_id: Attachment.last.id, media_type: "video/webm"
       html = "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}\" data-media-type=\"unknown\" data-media-id=\"123456\"></iframe>"
       assignment.update! description: html
-      DataFixup::AddMediaIdAttributeToIframes.run
+      DataFixup::AddMediaIdAndStyleDisplayAttributesToIframes.run
       expect(assignment.reload.description).to eq html
     end
 
@@ -132,7 +148,7 @@ describe DataFixup::AddMediaIdAttributeToIframes do
       Attachment.create! context: course, filename: "whatever.flv", display_name: "whatever.flv", content_type: "unknown/unknown"
       html = "<iframe src=\"/media_attachments_iframe/nonexistent\" data-media-type=\"unknown\"></iframe><iframe src=\"/files/#{Attachment.last.id}/download?\"></iframe>"
       assignment.update! description: html
-      DataFixup::AddMediaIdAttributeToIframes.run
+      DataFixup::AddMediaIdAndStyleDisplayAttributesToIframes.run
       expect(assignment.reload.description).to eq html
     end
 
@@ -141,8 +157,24 @@ describe DataFixup::AddMediaIdAttributeToIframes do
       MediaObject.create! media_id: "m-frommediaobject", data: { extensions: { mp4: { width: 640, height: 400 } } }, attachment_id: Attachment.last.id, media_type: "video/webm"
       html = "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}\"></iframe>"
       assignment.update! description: html
-      DataFixup::AddMediaIdAttributeToIframes.run
+      DataFixup::AddMediaIdAndStyleDisplayAttributesToIframes.run
       expect(assignment.reload.description).to eq html
+    end
+
+    it "does not alter style if it already has display" do
+      Attachment.create! context: course, media_entry_id: "m-fromattachment", filename: "whatever.flv", display_name: "whatever.flv", content_type: "audio/webm"
+      MediaObject.create! media_id: "m-frommediaobject", data: { extensions: { mp4: { width: 640, height: 400 } } }, attachment_id: Attachment.last.id, media_type: "video/webm"
+      assignment.update! description: "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}\" data-media-type=\"unknown\" style=\"display: none\"></iframe>"
+      DataFixup::AddMediaIdAndStyleDisplayAttributesToIframes.run
+      expect(assignment.reload.description).to eq "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}\" data-media-type=\"unknown\" style=\"display: none\" data-media-id=\"#{Attachment.last.media_entry_id}\"></iframe>"
+    end
+
+    it "does not add style if it is not present" do
+      Attachment.create! context: course, media_entry_id: "m-fromattachment", filename: "whatever.flv", display_name: "whatever.flv", content_type: "audio/webm"
+      MediaObject.create! media_id: "m-frommediaobject", data: { extensions: { mp4: { width: 640, height: 400 } } }, attachment_id: Attachment.last.id, media_type: "video/webm"
+      assignment.update! description: "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}\" data-media-type=\"unknown\"></iframe>"
+      DataFixup::AddMediaIdAndStyleDisplayAttributesToIframes.run
+      expect(assignment.reload.description).to eq "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}\" data-media-type=\"unknown\" data-media-id=\"#{Attachment.last.media_entry_id}\"></iframe>"
     end
   end
 

@@ -19,7 +19,7 @@
 
 require "nokogiri"
 
-module DataFixup::AddMediaIdAttributeToIframes
+module DataFixup::AddMediaIdAndStyleDisplayAttributesToIframes
   CONTENT_MAP = [
     { AssessmentQuestion => :question_data },
     { Assignment => :description },
@@ -46,6 +46,13 @@ module DataFixup::AddMediaIdAttributeToIframes
 
       media_id = Attachment.where(id: att_id).last&.media_entry_id
       e.set_attribute("data-media-id", media_id) if media_id
+
+      existing_style = e.get_attribute("style")
+      next if !existing_style || existing_style.include?("display:")
+
+      ends_with_semicolon = existing_style&.strip&.end_with?(";")
+      display_style = ends_with_semicolon ? " display: inline-block;" : "; display: inline-block;"
+      e.set_attribute("style", "#{existing_style}#{display_style}")
     end
     doc.to_s
   end
@@ -98,10 +105,10 @@ module DataFixup::AddMediaIdAttributeToIframes
   def self.run
     CONTENT_MAP.each do |model_map|
       model_map.each do |model, field|
-        model.where("#{field} LIKE ? AND #{field} NOT LIKE ? AND #{field} NOT LIKE ?", "%<iframe%media_attachments_iframe%", "%data-media-id%", "%data-media-id%").find_ids_in_batches do |batch|
+        model.where("#{field} LIKE ? AND #{field} NOT LIKE ?", "%<iframe%media_attachments_iframe%", "%data-media-id%").find_ids_in_batches do |batch|
           delay_if_production(
             priority: Delayed::LOW_PRIORITY,
-            n_strand: ["DataFixup::AddMediaIdAttributeToIframes", Shard.current.database_server.id]
+            n_strand: ["DataFixup::AddMediaIdAndStyleDisplayAttributesToIframes", Shard.current.database_server.id]
           ).update_active_records(model, field, batch)
         end
       end
