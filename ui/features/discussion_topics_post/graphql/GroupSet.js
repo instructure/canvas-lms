@@ -45,16 +45,13 @@ export const GroupSet = {
     _id = '1',
     name = 'group set',
     currentGroup = null,
-    groupsConnection = {
-      nodes: [Group.mock()],
-      __typename: 'groupsConnection',
-    },
+    groups = [Group.mock()],
   } = {}) => ({
     id,
     _id,
     name,
     currentGroup,
-    groupsConnection,
+    groups,
     __typename: 'GroupSet',
   }),
 }
