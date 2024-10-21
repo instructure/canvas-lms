@@ -268,6 +268,11 @@ module Interfaces::SubmissionInterface
   end
 
   field :grading_status, Types::SubmissionGradingStatusType, null: true
+  field :last_commented_by_user_at, Types::DateTimeType, null: true
+  def last_commented_by_user_at
+    Loaders::LastCommentedByUserAtLoader.for(current_user:).load(submission.id)
+  end
+
   field :late_policy_status, LatePolicyStatusType, null: true
   field :late, Boolean, method: :late?, null: true
   field :missing, Boolean, method: :missing?, null: true
