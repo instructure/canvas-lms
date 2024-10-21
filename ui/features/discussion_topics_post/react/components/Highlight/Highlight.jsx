@@ -30,6 +30,9 @@ export function Highlight({...props}) {
   const {focusSelector, setFocusSelector} = useContext(DiscussionManagerUtilityContext)
 
   const triggerFocus = element => {
+    if (!element) {
+      return
+    }
     let eventType = "onfocusin" in element ? "focusin" : "focus";
     let bubbles = "onfocusin" in element;
     let event;
