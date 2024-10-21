@@ -140,6 +140,18 @@ export default function useSpeedGrader({
     }
   }, [highlightEntryId, onMessage])
 
+  // Set highlight default entry; we already set this in iframe for new student. only trigger on new student.
+  useEffect(() => {
+    const studentEntries =
+      studentTopicQuery?.data?.legacyNode?.discussionEntriesConnection?.nodes || []
+    const studentEntriesIds = studentEntries.map(entry => entry._id)
+    const currentEntryIndex = studentEntriesIds.indexOf(highlightEntryId)
+    if (studentEntries[currentEntryIndex]) {
+      navigateToEntry(studentEntries[currentEntryIndex])
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStudentId, studentTopicQuery?.data?.legacyNode?.discussionEntriesConnection?.nodes])
+
   const handleJumpFocusToSpeedGrader = () => {
     window.top.postMessage(
       {
