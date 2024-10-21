@@ -342,8 +342,7 @@ function DiscussionTopicForm({
     studentEnrollments,
     sections,
     groups:
-      groupCategories.find(groupCategory => groupCategory._id === groupCategoryId)?.groupsConnection
-        ?.nodes || [],
+      groupCategories.find(groupCategory => groupCategory._id === groupCategoryId)?.groups || [],
     groupCategoryId,
     gradedDiscussionRefMap,
     setGradedDiscussionRefMap,

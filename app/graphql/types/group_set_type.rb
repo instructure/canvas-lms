@@ -64,7 +64,24 @@ module Types
     field :auto_leader, AutoLeaderPolicyType, null: true
 
     field :groups_connection, GroupType.connection_type, null: true
+
     def groups_connection
+      Loaders::AssociationLoader.for(GroupCategory, :context).load(set).then do
+        # this permission matches the REST api, but is probably too strict.
+        # students are able to see groups in the canvas ui, so probably should
+        # be able to see them here too
+        if set.context.grants_any_right?(current_user, :manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
+          set.groups.active.by_name
+        else
+          nil
+        end
+      end
+    end
+
+    # this is a temporary fix for discussion, it should be efficiently paginated asap
+    field :groups, [GroupType], null: true
+
+    def groups
       Loaders::AssociationLoader.for(GroupCategory, :context).load(set).then do
         # this permission matches the REST api, but is probably too strict.
         # students are able to see groups in the canvas ui, so probably should
