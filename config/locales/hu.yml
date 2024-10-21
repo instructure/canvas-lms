@@ -22502,6 +22502,36 @@ hu:
       user_enrolled: Beiratkozások
       user_has_no_bio: "%{user} még nem adott hozzá életrajzot vagy bemutatkozást."
       ways_to_contact_user: Kapcsolat
+    profile_form: 
+      add_link_field: "Másik link hozzáadása"
+      bio: Életrajz
+      cancel: Mégse
+      is_required: "A mező kitöltése kötelező"
+      links: Linkek
+      links_title: Cím
+      links_url: URL
+      manage_settings: "Regisztrált szolgáltatások kezelése"
+      message_me: "küldjön üzenetet nekem a Canvasban"
+      message_title: Üzenet
+      message_user_canvas: "Üzenet %{user}-nak/nek a Canvasban"
+      name: Név
+      name_pronunciation: "Név kiejtése"
+      name_pronunciation_header: "Név kiejtése"
+      name_pronunciation_header_tip: "A név helyes kiejtésének megerősítéséhez adja meg a fonetikus kiejtést."
+      name_pronunciation_label: "A név kiejtése:"
+      name_pronunciation_label_tip: "A név helyes kiejtésének megerősítéséhez adja meg a fonetikus kiejtést."
+      nothing_in_common: "Nincs benne semmi közös"
+      save_profile: "Profil mentése"
+      service_contact: "kapcsolatba lépés %{user} felhasználóval, ezen keresztül: %{service}"
+      social_instructions: "Ellenőrizze a kapcsolattartási módokat, amelyeket szeretne megjeleníteni mások számára a profiljában."
+      title: Cím
+      user_enrolled: Beiratkozások
+      ways_to_contact_user: Kapcsolat
+    profile_main: 
+      cancel_editing: "Szerkesztés megszakítása"
+      edit_profile: "Profil szerkesztése"
+      links: 
+        user_account_details: "Fiók részletes adatai"
     recent_activity: 
       date_column: Dátum
       edit_group: "Csoport szerkesztése"
