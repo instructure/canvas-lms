@@ -115,6 +115,7 @@ const featureBundles: {
   file_show: () => import('./features/file_show/index'),
   file: () => import('./features/file/index'),
   files: () => import('./features/files/index'),
+  files_v2: () => import('./features/files_v2/index'),
   grade_summary: () => import('./features/grade_summary/index'),
   gradebook_history: () => import('./features/gradebook_history/index'),
   gradebook_uploads: () => import('./features/gradebook_uploads/index'),
