@@ -24,7 +24,7 @@ new_quizzes_assignment_build_button:
   state: hidden
 new_quizzes_bank_migrations:
   display_name: New Quizzes Banks Migrations
-  description: Enable migrating item banks to New Quizzes during course import/copy
+  description: Enable migrating question banks to New Quizzes during course import/copy
   applies_to: SiteAdmin
   state: hidden
   beta: true
@@ -92,3 +92,8 @@ new_quizzes_enable_quiz_visibility_after_course_conclusion:
   description: Enable quiz visibility after course conclusion
   applies_to: RootAccount
   shadow: true
+new_quizzes_unattached_bank_migrations:
+  display_name: New Quizzes Unattached Bank Migrations
+  description: Enable migrating all question banks to New Quizzes during course import/copy
+  applies_to: SiteAdmin
+  state: hidden

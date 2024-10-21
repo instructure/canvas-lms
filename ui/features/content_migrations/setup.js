@@ -170,6 +170,7 @@ ConverterViewControl.register({
       quizzesNextEnabled: ENV.QUIZZES_NEXT_ENABLED,
       migrationDefault: ENV.NEW_QUIZZES_MIGRATION_DEFAULT,
       disableNQMigrationCheckbox: !ENV.QUIZZES_NEXT_ENABLED || ENV.NEW_QUIZZES_MIGRATION_REQUIRED,
+      unattachedBankMigrationsEnabled: ENV.NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS,
       questionBank: null,
     }),
 
@@ -215,6 +216,7 @@ ConverterViewControl.register({
       quizzesNextEnabled: ENV.QUIZZES_NEXT_ENABLED,
       migrationDefault: ENV.NEW_QUIZZES_MIGRATION_DEFAULT,
       disableNQMigrationCheckbox: !ENV.QUIZZES_NEXT_ENABLED || ENV.NEW_QUIZZES_MIGRATION_REQUIRED,
+      unattachedBankMigrationsEnabled: ENV.NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS,
       questionBank: null,
     }),
 
@@ -248,6 +250,7 @@ ConverterViewControl.register({
       quizzesNextEnabled: ENV.QUIZZES_NEXT_ENABLED,
       migrationDefault: ENV.NEW_QUIZZES_MIGRATION_DEFAULT,
       disableNQMigrationCheckbox: !ENV.QUIZZES_NEXT_ENABLED || ENV.NEW_QUIZZES_MIGRATION_REQUIRED,
+      unattachedBankMigrationsEnabled: ENV.NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS,
       questionBank: questionBankView,
     }),
 
@@ -283,6 +286,7 @@ ConverterViewControl.register({
       quizzesNextEnabled: ENV.QUIZZES_NEXT_ENABLED,
       migrationDefault: ENV.NEW_QUIZZES_MIGRATION_DEFAULT,
       disableNQMigrationCheckbox: !ENV.QUIZZES_NEXT_ENABLED || ENV.NEW_QUIZZES_MIGRATION_REQUIRED,
+      unattachedBankMigrationsEnabled: ENV.NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS,
       questionBank: questionBankView,
     }),
 

@@ -60,6 +60,7 @@ ready(() => {
     migrationDefault: ENV.NEW_QUIZZES_MIGRATION_DEFAULT,
     disableNQMigrationCheckbox: !ENV.QUIZZES_NEXT_ENABLED || ENV.NEW_QUIZZES_MIGRATION_REQUIRED,
     questionBank: null,
+    unattachedBankMigrationsEnabled: ENV.NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS,
   })
   $('#new_quizzes_migrate').html(importQuizzesNextView.render().el)
   $('#importQuizzesNext').attr('name', 'settings[import_quizzes_next]')

@@ -79,6 +79,7 @@ describe ContentMigrationsController do
           expect(assigns[:js_env][:NEW_QUIZZES_MIGRATION]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_MIGRATION_DEFAULT]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_MIGRATION_REQUIRED]).not_to be_nil
+          expect(assigns[:js_env][:NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS]).not_to be_nil
           expect(assigns[:js_env][:SHOW_SELECTABLE_OUTCOMES_IN_IMPORT]).not_to be_nil
           expect(assigns[:js_env][:OLD_START_DATE]).to_not be_nil
           expect(assigns[:js_env][:OLD_END_DATE]).to_not be_nil
@@ -100,6 +101,7 @@ describe ContentMigrationsController do
           expect(assigns[:js_env][:NEW_QUIZZES_MIGRATION]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_MIGRATION_DEFAULT]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_MIGRATION_REQUIRED]).not_to be_nil
+          expect(assigns[:js_env][:NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS]).not_to be_nil
           expect(assigns[:js_env][:SHOW_SELECTABLE_OUTCOMES_IN_IMPORT]).to be_nil
           expect(assigns[:js_env][:OLD_START_DATE]).to_not be_nil
           expect(assigns[:js_env][:OLD_END_DATE]).to_not be_nil
