@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2018 - present Instructure, Inc.
+# Copyright (C) 2024 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,9 +17,32 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module LtiAdvantage
-  module Models
-    require_relative "models/deep_linking_setting"
-    require_relative "models/pns_notice_claim"
+require "active_model"
+
+module LtiAdvantage::Models
+  class PnsNoticeClaim
+    include ActiveModel::Model
+    include ActiveModel::Serializers::JSON
+
+    REQUIRED_ATTRIBUTES = %i[
+      id
+      timestamp
+      type
+    ].freeze
+
+    TYPED_ATTRIBUTES = {
+      id: String,
+      timestamp: String,
+      type: String
+    }.freeze
+
+    attr_accessor(*REQUIRED_ATTRIBUTES)
+
+    validates_presence_of(*REQUIRED_ATTRIBUTES)
+    validates_with LtiAdvantage::TypeValidator
+
+    def attributes
+      instance_values
+    end
   end
 end

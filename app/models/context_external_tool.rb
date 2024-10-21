@@ -150,6 +150,10 @@ class ContextExternalTool < ActiveRecord::Base
     can :read and can :delete
   end
 
+  def related_account
+    account || course&.account
+  end
+
   class << self
     # because global navigation tool visibility can depend on a user having particular permissions now
     # this needs to expand from being a simple "admins/members" check to something more full-fledged

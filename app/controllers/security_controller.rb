@@ -54,7 +54,7 @@ class SecurityController < ApplicationController
   end
 
   def self.notice_types_supported
-    Lti::PlatformNotificationService::NOTICE_TYPES
+    Lti::Pns::NoticeTypes::ALL
   end
 
   def self.key_storages_by_path
