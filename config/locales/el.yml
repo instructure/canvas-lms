@@ -1085,6 +1085,7 @@ el:
         admins_can_view_notifications: "Οι Διαχειριστές μπορούν να δουν τις ειδοποιήσεις"
         allow_invitation_previews: "Προεπισκοπίσεις Προσκλήσεων"
         allow_name_pronunciation_edit_for_admins: Διαχειριστής
+        allow_name_pronunciation_edit_for_students: "Μαθητής "
         allow_name_pronunciation_edit_for_teachers: Δάσκαλος
         allow_sending_scores_in_emails: "Οι μαθητές μπορούν να επιλέξουν να λαμβάνουν τα αποτελέσματα μέσα σε ειδοποιήσεις ηλεκτρονικού ταχυδρομείου"
         author_email_in_notifications: "Εμφάνιση της ηλεκτρονικής διεύθυνσης του αποστολέα για Ειδοποιήσεις σχετικά με αλληλεπίδραση χρηστών"
@@ -13791,6 +13792,10 @@ el:
       titles: 
         click_to_change_profile_pic: "Κάνετε κλίκ εδώ για να αλλάξετε την εικόνα του προφίλ"
       user_has_no_bio: "Ο χρήστης %{user} δεν έχει προσθέσει βιογραφικό"
+    profile_form: 
+      message_me: "στείλτε μου μήνυμα στο Canvas"
+    profile_main: 
+      edit_profile: "Διαμόρφωση Προφίλ"
     recent_activity: 
       date_column: Ημερομηνία
       edit_group: "Επεξεργασία Ομάδας"
