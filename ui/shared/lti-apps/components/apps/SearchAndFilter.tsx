@@ -42,7 +42,7 @@ export const SearchAndFilter = (props: {setIsTrayOpen: (isOpen: boolean) => void
 
   return (
     <Flex gap="small" margin="0 0 small 0" direction={isMobile ? 'column-reverse' : 'row'}>
-      <Flex.Item shouldGrow={true}>
+      <Flex.Item shouldGrow={true} overflowX="hidden" overflowY="hidden">
         <View as="div">
           <TextInput
             renderLabel={
