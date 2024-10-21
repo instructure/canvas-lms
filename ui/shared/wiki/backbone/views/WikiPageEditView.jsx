@@ -90,18 +90,7 @@ export default class WikiPageEditView extends ValidatedFormView {
   }
 
   setOnlyVisibleToOverrides() {
-    if (ENV.FEATURES?.selective_release_ui_api) {
-      const hasDefaultEveryone = this.overrides.assignment_overrides.length === 0
-      const contextModuleOverrides = this.overrides.assignment_overrides.filter(
-        info => info.context_module_id != null
-      )
-      return !(
-        hasDefaultEveryone ||
-        contextModuleOverrides.length === this.overrides.assignment_overrides.length
-      )
-    } else {
-      return this.overrides.only_visible_to_overrides
-    }
+    ENV.IN_PACED_COURSE ? false : this.overrides.only_visible_to_overrides
   }
 
   handleOverridesSave(page, redirect) {
