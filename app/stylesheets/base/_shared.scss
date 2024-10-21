@@ -1,7 +1,8 @@
 @import "mixins/typography";
 
 @mixin page_header_container {
-  margin-bottom: 36px;display: flex;
+  display: flex;
+  margin-bottom: 36px;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
