@@ -15456,6 +15456,29 @@ hy:
       titles: 
         click_to_change_profile_pic: "Սեղմել պրոֆիլի պատկերը փոխելու համար "
       user_has_no_bio: "%{user}ը կենսագրական տվյալներ չի ավելացրել"
+    profile_form: 
+      add_link_field: "Ավելացնել մեկ այլ հղում"
+      cancel: "Չեղյալ համարել"
+      is_required: "Անհրաժեշտ է լրացնել այս դաշտը"
+      links: Հղումներ
+      links_title: Վերնագիր
+      links_url: URL
+      manage_settings: "Գրանցված ծառայությունների կառավարում"
+      message_me: "ծանուցեք ինձ Canvas-ում"
+      message_title: Հաղորդագրություն
+      message_user_canvas: "Ծանուցեք %{user} Canvas-ում:"
+      name: Անվանումը
+      nothing_in_common: "Դուք ոչ մի ընդհանուր բան չունեք"
+      save_profile: "Պահպանել պրոֆիլը"
+      service_contact: "կապվել %{user} հետ %{service} միջոցով"
+      social_instructions: "Նշեք կապի այն եղանակները, որոնք կցանկանայիք տեսանելի լինեին մյուսներին ձեր պրոֆիլում:"
+      title: Վերնագիր
+      user_enrolled: Գրանցումներ
+    profile_main: 
+      cancel_editing: "Չեղյալ համարել խմբագրումը"
+      edit_profile: "Խմբագրել պրոֆիլը"
+      links: 
+        user_account_details: "Հաշվի տվյալներ"
     recent_activity: 
       date_column: Ամսաթիվ
       edit_group: "Խմբագրել խումբը"
