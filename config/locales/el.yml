@@ -13793,9 +13793,29 @@ el:
         click_to_change_profile_pic: "Κάνετε κλίκ εδώ για να αλλάξετε την εικόνα του προφίλ"
       user_has_no_bio: "Ο χρήστης %{user} δεν έχει προσθέσει βιογραφικό"
     profile_form: 
+      add_link_field: "Προσθήκη και άλλου συνδέσμου"
+      cancel: Ακύρωση
+      is_required: "Αυτό το πεδίο είναι υποχρεωτικό"
+      links: Σύνδεσμοι
+      links_title: Τίτλος
+      links_url: URL
+      manage_settings: "Διαχείριση Υπηρεσιών στις οποίες έχετε Εγγραφεί"
       message_me: "στείλτε μου μήνυμα στο Canvas"
+      message_title: Μήνυμα
+      message_user_canvas: "Στείλτε μήνυμα στον χρήστη %{user} στο Canvas"
+      name: Όνομα
+      nothing_in_common: "Δεν έχετε τίποτα κοινό"
+      save_profile: "Αποθήκευση Προφίλ"
+      service_contact: "επικοινωνήστε %{user} με %{service}"
+      social_instructions: "Τσεκάρετε τους τρόπους επικοινωνίας που θα μπορούν οι άλλοι να βλέπουν στο προφίλ σας."
+      title: Τίτλος
+      user_enrolled: Εγγραφές
+      ways_to_contact_user: "Τρόποι επικοινωνίας"
     profile_main: 
+      cancel_editing: "Ακύρωση Τροποποίησης"
       edit_profile: "Διαμόρφωση Προφίλ"
+      links: 
+        user_account_details: "Λεπτομέρειες Λογαριασμού"
     recent_activity: 
       date_column: Ημερομηνία
       edit_group: "Επεξεργασία Ομάδας"
