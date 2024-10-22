@@ -1058,7 +1058,11 @@ describe PlannerController do
         end
 
         it "shows new activity when a new discussion topic has been created" do
-          get :index, params: { start_date: @start_date, end_date: @end_date }
+          # the queries behind this be expensive, there is a 1.minute cache on some of them, we'll do our first get
+          # in a time longer ago than the cache length
+          Timecop.freeze(2.minutes.ago) do
+            get :index, params: { start_date: @start_date, end_date: @end_date }
+          end
           discussion_topic_model(context: @course, todo_date: 1.day.from_now)
           get :index, params: { start_date: @start_date, end_date: @end_date }
           topic_json = json_parse(response.body).find { |j| j["plannable_id"] == @topic.id && j["plannable_type"] == "discussion_topic" }
