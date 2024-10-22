@@ -22,6 +22,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import WikiPage from '@canvas/wiki/backbone/models/WikiPage'
 import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
 import WikiPageEditView from '@canvas/wiki/backbone/views/WikiPageEditView'
+import renderChooseEditorModal from '@canvas/block-editor/react/renderChooseEditorModal'
 import itemView from './WikiPageIndexItemView'
 import template from '../../jst/WikiPageIndex.handlebars'
 import {deletePages} from '../../react/apiClient'
@@ -45,12 +46,15 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     this.mixin({
       events: {
         'click .delete_pages': 'confirmDeletePages',
-        'click .new_page': 'createNewPage',
-        'keyclick .new_page': 'createNewPage',
+        'click .new_page': 'openChooseEditorModalMaybe',
+        'keyclick .new_page': 'openChooseEditorModalMaybe',
+        'click .new_rce_page': 'openRCE',
+        'keyclick .new_rce_page': 'openRCE',
+        'click .new_block_editor_page': 'openBlockEditor',
+        'keyclick .new_block_editor_page': 'openBlockEditor',
         'click .header-row a[data-sort-field]': 'sort',
         'click .header-bar-right .menu_tool_link': 'openExternalTool',
         'click .pages-mobile-header a[data-sort-mobile-field]': 'sortBySelect',
-        'click #toggle_block_editor': 'toggleBlockEditor',
       },
 
       els: {
@@ -104,8 +108,6 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     if (!this.selectedPages) this.selectedPages = {}
     this.itemViewOptions.selectedPages = this.selectedPages
 
-    this.createNewPageWithBlockEditor = !!ENV.FEATURES?.BLOCK_EDITOR
-
     this.collection.on('fetch', () => {
       if (!this.fetched) {
         this.fetched = true
@@ -146,6 +148,29 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
         node
       )
     }
+  }
+
+  openRCE(e) {
+    e.preventDefault()
+    this.createNewPage(e, 'rce')
+  }
+
+  openBlockEditor(e) {
+    e.preventDefault()
+    this.createNewPage(e, 'block_editor')
+  }
+
+  openChooseEditorModalMaybe(e) {
+    if (window.ENV.text_editor_preference != null) {
+      return this.createNewPage(e, window.ENV.text_editor_preference)
+    }
+
+    const createPageAction = editor => {
+      this.createNewPage(e, editor)
+    }
+    ENV.FEATURES?.BLOCK_EDITOR
+      ? renderChooseEditorModal(e, createPageAction)
+      : this.createNewPage(e)
   }
 
   sortBySelect(event) {
@@ -204,10 +229,6 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     }
   }
 
-  toggleBlockEditor(ev) {
-    this.createNewPageWithBlockEditor = ev.target.checked
-  }
-
   confirmDeletePages(ev) {
     if (ev != null) {
       ev.preventDefault()
@@ -237,7 +258,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     $('.delete_pages').focus()
   }
 
-  createNewPage(ev) {
+  createNewPage(ev, editor = 'rce') {
     if (ev != null) {
       ev.preventDefault()
     }
@@ -249,13 +270,14 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     this.editModel = new WikiPage(
       {
         editing_roles: this.default_editing_roles,
-        editor: this.createNewPageWithBlockEditor ? 'block_editor' : 'rce',
-        block_editor_attributes: this.createNewPageWithBlockEditor
-          ? {
-              version: '1',
-              blocks: undefined,
-            }
-          : null,
+        editor,
+        block_editor_attributes:
+          editor !== 'rce'
+            ? {
+                version: '0.2',
+                blocks: undefined,
+              }
+            : null,
       },
       {contextAssetString: this.contextAssetString}
     )
@@ -412,6 +434,10 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     json.collectionHasTodoDate = this.collectionHasTodoDate()
     json.hasWikiIndexPlacements = this.wikiIndexPlacements.length > 0
     json.wikiIndexPlacements = this.wikiIndexPlacements
+
+    json.block_editor_is_preferred = window.ENV.text_editor_preference === 'block_editor'
+    json.rce_is_preferred = window.ENV.text_editor_preference === 'rce'
+    json.no_preferred_editor = window.ENV.text_editor_preference === null
 
     json.block_editor = !!ENV.FEATURES?.BLOCK_EDITOR
     return json

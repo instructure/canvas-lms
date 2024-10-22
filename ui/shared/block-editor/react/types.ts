@@ -61,6 +61,11 @@ export type BlockTemplateGridItemProps = {
   template?: BlockTemplate
 }
 
+export type ChooseEditorModalProps = {
+  createPageAction: any
+  onClose: any
+}
+
 export const SaveTemplateEvent = 'block-editor-save-block-template' as const
 export const DeleteTemplateEvent = 'block-editor-delete-block-template' as const
 export const PublishTemplateEvent = 'block-editor-publish-block-template' as const
@@ -68,4 +73,9 @@ export const PublishTemplateEvent = 'block-editor-publish-block-template' as con
 export const dispatchTemplateEvent = (event: CustomEvent) => {
   const blockEditorEditor = document.querySelector('.block-editor-editor')
   blockEditorEditor?.dispatchEvent(event)
+}
+
+export type EditorTypes = 'rce' | 'block_editor' | ''
+export type EditorPrefEnv = {
+  text_editor_preference: EditorTypes
 }

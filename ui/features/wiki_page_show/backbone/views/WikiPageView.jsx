@@ -27,6 +27,7 @@ import template from '../../jst/WikiPage.handlebars'
 import StickyHeaderMixin from '@canvas/wiki/backbone/views/StickyHeaderMixin'
 import WikiPageDeleteDialog from '@canvas/wiki/backbone/views/WikiPageDeleteDialog'
 import WikiPageReloadView from '@canvas/wiki/backbone/views/WikiPageReloadView'
+import renderChooseEditorModal from '@canvas/block-editor/react/renderChooseEditorModal'
 import PublishButtonView from '@canvas/publish-button-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import htmlEscape from '@instructure/html-escape'
@@ -37,6 +38,7 @@ import DirectShareUserModal from '@canvas/direct-sharing/react/components/Direct
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import {renderFrontPagePill} from '@canvas/wiki/react/renderFrontPagePill'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
+import doFetchApi from "@canvas/do-fetch-api-effect";
 
 const I18n = useI18nScope('pages')
 
@@ -55,6 +57,8 @@ export default class WikiPageView extends Backbone.View {
 
     this.prototype.events = {
       'click .delete_page': 'deleteWikiPage',
+      'click .edit-wiki': 'openChooseEditorModalMaybe',
+      'keyclick .edit-wiki': 'openChooseEditorModalMaybe',
       'click .use-as-front-page-menu-item': 'useAsFrontPage',
       'click .unset-as-front-page-menu-item': 'unsetAsFrontPage',
       'click .direct-share-send-to-menu-item': 'openSendTo',
@@ -177,6 +181,35 @@ export default class WikiPageView extends Backbone.View {
     if (this.$sequenceFooter) this.$sequenceFooter.appendTo($('#module_navigation_target'))
 
     this.maybeRenderBlockEditorContent()
+  }
+
+  async openChooseEditorModalMaybe(e) {
+    if (
+      this.model.get('body') === null &&
+      !this.model.get('block_editor_attributes')?.blocks &&
+      ENV.FEATURES?.BLOCK_EDITOR
+    ) {
+      if (window.ENV.text_editor_preference == null) {
+        renderChooseEditorModal(e, async editor => {
+          if (editor === 'block_editor') {
+            await doFetchApi({
+              path: `/courses/${this.course_id}/pages/${this.model.get('url')}/create_block_editor`,
+              method: 'PUT',
+            })
+          }
+          window.location.href = `${window.location.href.split('?')[0]}/edit?editor=${editor}`
+        })
+      } else if (window.ENV.text_editor_preference === 'block_editor') {
+        e.preventDefault();
+        await doFetchApi({
+          path: `/courses/${this.course_id}/pages/${this.model.get('url')}/create_block_editor`,
+          method: 'PUT',
+        })
+        window.location.href = `${window.location.href.split('?')[0]}/edit${
+          window.location.href.split('?')[1] ? `?${window.location.href.split('?')[1]}` : ''
+        }`
+      }
+    }
   }
 
   navigateToLinkAnchor() {
