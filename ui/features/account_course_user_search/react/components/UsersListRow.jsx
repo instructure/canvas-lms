@@ -120,7 +120,7 @@ export default function UsersListRow({
         )}
         {permissions.can_create_dsr && (
           <CreateDSRModal
-            url={`/api/v1/accounts/${accountId}/users/${user.id}/dsr_request`}
+            accountId={accountId}
             user={user}
             afterSave={handleSubmitEditUserForm}
           >
