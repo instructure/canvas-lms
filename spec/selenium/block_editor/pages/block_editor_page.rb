@@ -33,7 +33,7 @@ module BlockEditorPage
     block_page.update!(
       block_editor_attributes: {
         time: Time.now.to_i,
-        version: "1",
+        version: "0.2",
         blocks: block_page_content
       }
     )

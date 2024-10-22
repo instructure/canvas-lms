@@ -104,8 +104,8 @@ export const Toolbox = ({open, container, templateEditor, templates, onClose}: T
   )
 
   const handleSaveTemplate: OnSaveTemplateCallback = useCallback(
-    ({name, description}, published, globalTemplate) => {
-      const newTemplate = {...editTemplate, name, description, published}
+    ({name, description, workflow_state}, globalTemplate) => {
+      const newTemplate = {...editTemplate, name, description, workflow_state}
       const event = new CustomEvent(SaveTemplateEvent, {
         detail: {template: newTemplate, globalTemplate},
       })
