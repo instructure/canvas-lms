@@ -16,30 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect, useMemo, useState} from 'react'
+import {useMemo, useState} from 'react'
 import {fetchSubmissions, getNextSubmissionsPage} from '../../queries/Queries'
-import {useInfiniteQuery} from '@canvas/query'
+import {useAllPages} from '@canvas/query'
 
 export const useSubmissionsQuery = (courseId: string) => {
   const [queryKey] = useState(['individual-gradebook-submissions', courseId])
 
-  const {data, fetchNextPage, hasNextPage, isFetchingNextPage, isError, isLoading} =
-    useInfiniteQuery({
-      queryKey,
-      queryFn: fetchSubmissions,
-      getNextPageParam: getNextSubmissionsPage,
-      meta: {
-        fetchAtLeastOnce: true,
-      },
-    })
-
-  useEffect(() => {
-    if (hasNextPage && !isFetchingNextPage) {
-      fetchNextPage({
-        cancelRefetch: true,
-      })
-    }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+  const {data, hasNextPage, isError, isLoading} = useAllPages({
+    queryKey,
+    queryFn: fetchSubmissions,
+    getNextPageParam: getNextSubmissionsPage,
+    meta: {
+      fetchAtLeastOnce: true,
+    },
+  })
 
   const submissions = useMemo(
     () => data?.pages.flatMap(page => page.course.submissionsConnection.nodes) ?? [],

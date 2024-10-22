@@ -16,30 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect, useMemo, useState} from 'react'
+import {useMemo, useState} from 'react'
 import {fetchSections, getNextSectionsPage} from '../../queries/Queries'
-import {useInfiniteQuery} from '@canvas/query'
+import {useAllPages} from '@canvas/query'
 
 export const useSectionsQuery = (courseId: string) => {
   const [queryKey] = useState(['individual-gradebook-sections', courseId])
 
-  const {data, fetchNextPage, hasNextPage, isFetchingNextPage, isError, isLoading} =
-    useInfiniteQuery({
-      queryKey,
-      queryFn: fetchSections,
-      getNextPageParam: getNextSectionsPage,
-      meta: {
-        fetchAtLeastOnce: true,
-      },
-    })
-
-  useEffect(() => {
-    if (hasNextPage && !isFetchingNextPage) {
-      fetchNextPage({
-        cancelRefetch: true,
-      })
-    }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+  const {data, hasNextPage, isError, isLoading} = useAllPages({
+    queryKey,
+    queryFn: fetchSections,
+    getNextPageParam: getNextSectionsPage,
+    meta: {
+      fetchAtLeastOnce: true,
+    },
+  })
 
   const sections = useMemo(
     () => data?.pages.flatMap(page => page.course.sectionsConnection.nodes) ?? [],
