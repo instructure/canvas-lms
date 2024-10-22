@@ -70,23 +70,7 @@ describe ApplicationHelper do
   context "show_user_create_course_button" do
     before(:once) { @domain_root_account = Account.default }
 
-    it "works (non-granular)" do
-      @domain_root_account.disable_feature!(:granular_permissions_manage_courses)
-      @domain_root_account.update_attribute(
-        :settings,
-        { teachers_can_create_courses: true, students_can_create_courses: true }
-      )
-      expect(show_user_create_course_button(nil)).to be_falsey
-      user_factory
-      expect(show_user_create_course_button(@user)).to be_falsey
-      course_with_teacher
-      expect(show_user_create_course_button(@teacher)).to be_truthy
-      account_admin_user
-      expect(show_user_create_course_button(@admin)).to be_truthy
-    end
-
-    it "works for no enrollments setting (granular permissions)" do
-      @domain_root_account.enable_feature!(:granular_permissions_manage_courses)
+    it "works for no enrollments setting" do
       @domain_root_account.update(settings: { no_enrollments_can_create_courses: true })
       expect(show_user_create_course_button(nil)).to be_falsey
       user_factory

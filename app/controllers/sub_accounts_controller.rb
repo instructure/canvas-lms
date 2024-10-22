@@ -53,8 +53,8 @@ class SubAccountsController < ApplicationController
 
     page_has_instui_topnav
     if !api_request? && params[:term]
-      # accept :manage_courses or :manage_courses_admin so course settings page can query subaccounts
-      require_account_management(permissions: [:manage_courses, :manage_courses_admin])
+      # accept :manage_courses_admin so course settings page can query subaccounts
+      require_account_management(permissions: [:manage_courses_admin])
     else
       require_account_management
     end

@@ -51,8 +51,7 @@ describe "courses/_settings_sidebar" do
   end
 
   describe "Reset course content" do
-    it "does not display the dialog contents under the button (granular permissions)" do
-      @course.account.enable_feature!(:granular_permissions_manage_courses)
+    it "does not display the dialog contents under the button" do
       @course.root_account.role_overrides.create!(
         permission: "manage_courses_reset",
         role: teacher_role,

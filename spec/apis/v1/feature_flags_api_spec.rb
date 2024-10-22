@@ -32,7 +32,7 @@ describe "Feature Flags API", type: :request do
 
   let(:granular_permissions_feature) do
     Feature.new(
-      feature: "granular_permissions_manage_courses",
+      feature: "granular_permissions_manage_groups",
       applies_to: "RootAccount",
       state: "allowed"
     )
@@ -244,7 +244,7 @@ describe "Feature Flags API", type: :request do
 
     it "operates on a course" do
       allow(Feature).to receive(:definitions).and_return({
-                                                           "granular_permissions_manage_courses" => granular_permissions_feature,
+                                                           "granular_permissions_manage_groups" => granular_permissions_feature,
                                                            "course_feature" => Feature.new(
                                                              feature: "course_feature",
                                                              applies_to: "Course",
@@ -396,7 +396,7 @@ describe "Feature Flags API", type: :request do
 
     it "creates a new flag with an audit log" do
       allow(Feature).to receive(:definitions).and_return({
-                                                           "granular_permissions_manage_courses" => granular_permissions_feature,
+                                                           "granular_permissions_manage_groups" => granular_permissions_feature,
                                                            "course_feature" => Feature.new(
                                                              feature: "course_feature",
                                                              applies_to: "Course",
@@ -711,7 +711,7 @@ describe "Feature Flags API", type: :request do
                                                                                                                      transitions["off"] = { "locked" => true, "message" => "don't ever turn this off" } if from_state == "on"
                                                                                                                      transitions["on"] = { "locked" => false, "message" => "this is permanent?!" } if transitions.key?("on")
                                                                                                                    end),
-                                                           "granular_permissions_manage_courses" => granular_permissions_feature
+                                                           "granular_permissions_manage_groups" => granular_permissions_feature
                                                          })
     end
 
@@ -775,7 +775,7 @@ describe "Feature Flags API", type: :request do
                                                                                            after_state_change_proc: lambda do |user, context, from_state, to_state|
                                                                                                                       t_state_changes << [user.id, context.id, from_state, to_state]
                                                                                                                     end),
-                                                           "granular_permissions_manage_courses" => granular_permissions_feature
+                                                           "granular_permissions_manage_groups" => granular_permissions_feature
                                                          })
     end
 

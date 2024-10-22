@@ -40,17 +40,6 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     end
 
     it "requires authorization" do
-      @account.disable_feature!(:granular_permissions_manage_courses)
-      @account.role_overrides.create!(
-        role: admin_role,
-        permission: "manage_courses",
-        enabled: false
-      )
-      api_call(:get, @url, @params, {}, {}, { expected_status: 401 })
-    end
-
-    it "requires authorization (granular permissions)" do
-      @account.enable_feature!(:granular_permissions_manage_courses)
       @account.role_overrides.create!(
         role: admin_role,
         permission: "manage_courses_admin",

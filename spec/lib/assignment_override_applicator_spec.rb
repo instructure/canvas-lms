@@ -1246,7 +1246,7 @@ describe AssignmentOverrideApplicator do
         expect(overrides.first).not_to be_deleted
       end
 
-      it "includes now-deleted overrides that weren't deleted yet as of the assignment version (with manage_courses permission)" do
+      it "includes now-deleted overrides that weren't deleted yet as of the assignment version (with manage_courses_admin permission)" do
         account_admin_user
 
         @override = assignment_override_model(assignment: @assignment)

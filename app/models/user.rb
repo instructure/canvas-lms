@@ -2079,7 +2079,7 @@ class User < ActiveRecord::Base
   def alternate_account_for_course_creation
     Rails.cache.fetch_with_batched_keys("alternate_account_for_course_creation", batch_object: self, batched_keys: :account_users) do
       account_users.active.detect do |au|
-        break au.account if au.root_account_id == account.id && au.account.grants_any_right?(self, :manage_courses, :manage_courses_add)
+        break au.account if au.root_account_id == account.id && au.account.grants_right?(self, :manage_courses_add)
       end
     end
   end
@@ -3527,7 +3527,7 @@ class User < ActiveRecord::Base
 
   def create_courses_right(account)
     return :admin if account.cached_account_users_for(self).any? do |au|
-                       au.permission_check(account, :manage_courses).success? || au.permission_check(account, :manage_courses_add).success?
+                       au.permission_check(account, :manage_courses_add).success?
                      end
     return nil if fake_student? || account.root_account.site_admin?
 

@@ -2044,21 +2044,7 @@ describe AccountsController do
       expect(accounts[2]["name"]).to eq "Account 2"
     end
 
-    it "does not include accounts where admin doesn't have manage_courses or create_courses permissions" do
-      Account.default.disable_feature!(:granular_permissions_manage_courses)
-      account3 = Account.create!(name: "Account 3", root_account: Account.default)
-      account_admin_user_with_role_changes(account: account3, user: @admin1, role_changes: { manage_courses: false, create_courses: false })
-      user_session @admin1
-      get "manageable_accounts"
-      accounts = json_parse(response.body)
-      expect(accounts.length).to be 3
-      accounts.each do |a|
-        expect(a["name"]).not_to eq "Account 3"
-      end
-    end
-
-    it "does not include accounts where admin doesn't have manage_courses_admin or create_courses permissions (granular permissions)" do
-      Account.default.enable_feature!(:granular_permissions_manage_courses)
+    it "does not include accounts where admin doesn't have manage_courses_admin or create_courses permissions" do
       account3 = Account.create!(name: "Account 3", root_account: Account.default)
       account_admin_user_with_role_changes(
         account: account3,

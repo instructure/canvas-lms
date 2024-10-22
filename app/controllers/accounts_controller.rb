@@ -365,7 +365,7 @@ class AccountsController < ApplicationController
     @accounts = @current_user ? @current_user.adminable_accounts : []
     @all_accounts = Set.new
     @accounts.each do |a|
-      if a.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin, :create_courses)
+      if a.grants_any_right?(@current_user, session, :manage_courses_admin, :create_courses)
         @all_accounts << a
         @all_accounts.merge Account.active.sub_accounts_recursive(a.id)
       end
@@ -383,7 +383,7 @@ class AccountsController < ApplicationController
     return render json: [] unless @current_user
 
     accounts = @current_user.adminable_accounts || []
-    accounts = accounts.select { |a| a.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin, :manage_courses_add) }
+    accounts = accounts.select { |a| a.grants_any_right?(@current_user, session, :manage_courses_admin, :manage_courses_add) }
     sub_accounts = []
     # Load and handle ids from now on to avoid excessive memory usage
     accounts.each { |a| sub_accounts.concat Account.active.sub_account_ids_recursive(a.id) }
@@ -395,7 +395,7 @@ class AccountsController < ApplicationController
 
       next unless a.root_account.students_can_create_courses_anywhere? ||
                   @current_user.active_k5_enrollments?(root_account: a.root_account) ||
-                  a.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin, :create_courses)
+                  a.grants_any_right?(@current_user, session, :manage_courses_admin, :create_courses)
 
       accounts << a.id
     end
@@ -405,7 +405,7 @@ class AccountsController < ApplicationController
 
       next unless a.root_account.teachers_can_create_courses_anywhere? ||
                   @current_user.active_k5_enrollments?(root_account: a.root_account) ||
-                  a.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin, :create_courses)
+                  a.grants_any_right?(@current_user, session, :manage_courses_admin, :create_courses)
 
       accounts << a.id
     end
@@ -1736,7 +1736,7 @@ class AccountsController < ApplicationController
       can_read_course_list:,
       can_read_roster:,
       can_create_dsr:,
-      can_create_courses: @account.grants_any_right?(@current_user, session, :manage_courses, :create_courses),
+      can_create_courses: @account.grants_right?(@current_user, session, :create_courses),
       can_create_users: @account.root_account.grants_right?(@current_user, session, :manage_user_logins),
       analytics: @account.service_enabled?(:analytics),
       can_read_sis: @account.grants_right?(@current_user, session, :read_sis),
