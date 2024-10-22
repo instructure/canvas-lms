@@ -2570,7 +2570,7 @@ class Course < ActiveRecord::Base
     if grading_standard_id
       grading_standard
     else
-      account.default_grading_standard
+      account.default_grading_standard unless concluded?
     end
   end
 
