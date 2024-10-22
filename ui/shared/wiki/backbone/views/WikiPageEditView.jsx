@@ -89,10 +89,6 @@ export default class WikiPageEditView extends ValidatedFormView {
     return (this.studentTodoAtDateValue = todoDate ? new Date(todoDate) : '')
   }
 
-  setOnlyVisibleToOverrides() {
-    ENV.IN_PACED_COURSE ? false : this.overrides.only_visible_to_overrides
-  }
-
   handleOverridesSave(page, redirect) {
     if (!page.page_id) return
     const url = itemTypeToApiURL(ENV.COURSE_ID, 'page', page.page_id)
@@ -102,7 +98,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     }
 
     const data = this.overrides
-    data.only_visible_to_overrides = this.setOnlyVisibleToOverrides()
+    data.only_visible_to_overrides = ENV.IN_PACED_COURSE ? false : this.overrides.only_visible_to_overrides
 
     $.ajaxJSON(url, 'PUT', JSON.stringify(data), redirect, errorCallBack, {
       contentType: 'application/json',
