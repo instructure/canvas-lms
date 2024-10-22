@@ -28,7 +28,7 @@ import {
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TranslationControls} from '../../components/TranslationControls/TranslationControls'
-import {useMutation} from 'react-apollo'
+import {useMutation} from '@apollo/react-hooks'
 import {UPDATE_DISCUSSION_SORT_ORDER} from '../../../graphql/Mutations'
 
 export const DiscussionTopicToolbarContainer = props => {
