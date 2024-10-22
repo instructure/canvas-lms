@@ -64,24 +64,9 @@ class AssignmentStudentVisibility < ActiveRecord::Base
     end
 
     if visible_to_everyone.any?
-      assignment_visibilities.merge!(
-        assignments_visible_to_all_students(visible_to_everyone)
-      )
+      assignment_visibilities.merge!(visible_to_everyone.map(&:id).index_with { [] })
     end
     assignment_visibilities
-  end
-
-  def self.assignments_visible_to_all_students(assignments_visible_to_everyone)
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      raise StandardError, "AssignmentStudentVisibility view should not be used when selective_release_backend site admin flag is on.  Use AssignmentVisibilityService instead"
-    end
-
-    assignments_visible_to_everyone.each_with_object({}) do |assignment, assignment_visibilities|
-      # if an assignment is visible to everyone, we do not care about the contents
-      # of its assignment_visibilities. instead of setting this to an array of every
-      # student's ID, we set it to an empty array to save time when calling to_json
-      assignment_visibilities[assignment.id] = []
-    end
   end
 
   def self.users_with_visibility_by_assignment(opts)

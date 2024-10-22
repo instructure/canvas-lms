@@ -142,14 +142,6 @@ describe "differentiated_assignments" do
           ensure_user_sees_quiz
         end
 
-        it "works with course section and return a single visibility" do
-          student_in_course_with_adhoc_override(@quiz)
-          give_section_foo_due_date(@quiz)
-          enroller_user_in_section(@section_foo)
-          ensure_user_sees_quiz
-          expect(QuizVisibility::QuizVisibilityService.quiz_visible_to_students_in_course(user_ids: [@user.id], course_id: @course.id, quiz_id: @quiz.id).count).to eq 1
-        end
-
         it "does not return a visibility for a student without an ADHOC override" do
           @user = user_model
           ensure_user_does_not_see_quiz

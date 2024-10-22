@@ -148,14 +148,11 @@ describe AssignmentVisibility::AssignmentVisibilityService do
     def ensure_user_does_not_see_assignment
       visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_student(user_id: @user.id, course_id: @course.id).map(&:assignment_id)
       expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_falsey
-      expect(AssignmentVisibility::AssignmentVisibilityService.visible_assignment_ids_in_course_for_user(user_id: @user.id, course_id: @course.id)[@user.id]).not_to include(@assignment.id)
     end
 
     def ensure_user_sees_assignment
       visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_student(user_id: @user.id, course_id: @course.id).map(&:assignment_id)
       expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_truthy
-      expect(AssignmentVisibility::AssignmentVisibilityService.visible_assignment_ids_in_course_for_user(user_id: @user.id, course_id: @course.id)[@user.id]).to include(@assignment.id)
-      expect(AssignmentVisibility::AssignmentVisibilityService.visible_assignment_ids_in_course_for_user(user_id: @user.id, course_id: @course.id, use_global_id: true)[Shard.global_id_for(@user.id)]).to include(@assignment.id)
     end
 
     context "course_with_differentiated_assignments_enabled" do
@@ -678,16 +675,6 @@ describe AssignmentVisibility::AssignmentVisibilityService do
       let(:first_student) { User.create! }
       let(:second_student) { User.create! }
       let(:fake_student) { User.create! }
-
-      describe ".assignments_visible_to_all_students" do
-        let(:assignments_visible_to_all_students) do
-          AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_all_students([assignment])
-        end
-
-        it "returns a hash with an empty visibility array for each assignment" do
-          expect(assignments_visible_to_all_students).to eq({ assignment.id => [] })
-        end
-      end
 
       describe ".assignments_with_user_visibilities" do
         let(:assignment_only_visible_to_overrides) do

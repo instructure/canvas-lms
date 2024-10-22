@@ -470,16 +470,6 @@ describe "differentiated_assignments" do
       Account.site_admin.disable_feature!(:selective_release_backend)
     end
 
-    describe ".assignments_visible_to_all_students" do
-      let(:assignments_visible_to_all_students) do
-        AssignmentStudentVisibility.assignments_visible_to_all_students([assignment])
-      end
-
-      it "returns a hash with an empty visibility array for each assignment" do
-        expect(assignments_visible_to_all_students).to eq({ assignment.id => [] })
-      end
-    end
-
     describe ".assignments_with_user_visibilities" do
       let(:assignment_only_visible_to_overrides) do
         assignment = course.assignments.create!({
