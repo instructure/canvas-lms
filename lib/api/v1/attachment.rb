@@ -94,6 +94,7 @@ module Api::V1::Attachment
         h = { download: "1", download_frd: "1" }
         h[:verifier] = options[:verifier] if options[:verifier].present?
         h[:verifier] ||= attachment.uuid unless options[:omit_verifier_in_app] && ((respond_to?(:in_app?, true) && in_app?) || @authenticated_with_jwt)
+        h.merge!(options.slice(:access_token, :instfs_id)) if options[:access_token].present? && options[:instfs_id].present?
         url = file_download_url(attachment, h.merge(url_options))
       end
       # and svg can stand in as its own thumbnail, but let's be reasonable about their size
@@ -145,7 +146,9 @@ module Api::V1::Attachment
         enable_annotations: options[:enable_annotations],
         enrollment_type: options[:enrollment_type],
         anonymous_instructor_annotations: options[:anonymous_instructor_annotations],
-        submission_id: options[:submission_id]
+        submission_id: options[:submission_id],
+        access_token: options[:access_token],
+        instfs_id: options[:instfs_id]
       }
       hash["preview_url"] = attachment.crocodoc_url(user, url_opts) ||
                             attachment.canvadoc_url(user, url_opts)
@@ -159,6 +162,9 @@ module Api::V1::Attachment
       }
       url_opts[:verifier] = options[:verifier] if options[:verifier].present?
       url_opts[:verifier] ||= attachment.uuid if downloadable && !options[:omit_verifier_in_app] && !((respond_to?(:in_app?, true) && in_app?) || @authenticated_with_jwt)
+      if options[:access_token].present? && options[:instfs_id].present?
+        url_opts.merge!(options.slice(:access_token, :instfs_id))
+      end
       hash["preview_url"] = context_url(attachment.context, :context_file_file_preview_url, attachment, url_opts)
     end
     if includes.include? "usage_rights"

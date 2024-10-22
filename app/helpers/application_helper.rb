@@ -1192,8 +1192,9 @@ module ApplicationHelper
     super
   end
 
-  def generate_access_verifier(return_url: nil, fallback_url: nil)
+  def generate_access_verifier(return_url: nil, fallback_url: nil, authorization: nil)
     Users::AccessVerifier.generate(
+      authorization:,
       user: @current_user,
       real_user: logged_in_user,
       developer_key: @access_token&.developer_key,
