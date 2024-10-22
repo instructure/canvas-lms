@@ -938,6 +938,8 @@ function initCommentBox() {
     if ($('.media_comment_link').hasClass('ui-state-disabled')) {
       return
     }
+    const studentIdAtTimeOfClick = EG.currentStudent[anonymizableId]
+
     $('#media_media_recording')
       .show()
       .find('.media_recording')
@@ -945,8 +947,12 @@ function initCommentBox() {
         'create',
         'any',
         (id: string, type: string) => {
-          $('#media_media_recording').data('comment_id', id).data('comment_type', type)
-          EG.addSubmissionComment()
+          const studentIdAtCreateComplete = EG.currentStudent[anonymizableId]
+          if (studentIdAtTimeOfClick === studentIdAtCreateComplete) {
+            $('#media_media_recording').data('comment_id', id).data('comment_type', type)
+          }
+
+          EG.addSubmissionComment(undefined, studentIdAtTimeOfClick)
         },
         () => {
           EG.revertFromFormSubmit()
@@ -3561,7 +3567,7 @@ EG = {
     )
   },
 
-  addSubmissionComment(draftComment) {
+  addSubmissionComment(draftComment, studentId) {
     // Avoid submitting additional comments if a request is already in progress.
     // This can happen if the user submits a comment and then switches students
     // (which attempts to save a draft comment) before the request finishes.
@@ -3599,7 +3605,7 @@ EG = {
       'submission[group_comment]': $('#submission_group_comment').prop('checked') ? '1' : '0',
       'submission[comment]': comment,
       'submission[draft_comment]': draftComment,
-      [`submission[${anonymizableId}]`]: EG.currentStudent[anonymizableId],
+      [`submission[${anonymizableId}]`]: studentId || EG.currentStudent[anonymizableId],
     }
 
     if (ENV.group_comments_per_attempt) {
