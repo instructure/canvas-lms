@@ -61,9 +61,10 @@ module LtiAdvantage::Serializers
       @object = object
     end
 
-    def serializable_hash
-      hash = apply_claim_prefixes(@object.as_json.compact)
-      promote_extensions(hash)
+    # TODO: remove without_validation_fields when we remove the remove_unwanted_lti_validation_claims flag
+    def serializable_hash(without_validation_fields: true)
+      hash = without_validation_fields ? @object.as_json(except: %w[validation_context errors]) : @object.as_json
+      promote_extensions(apply_claim_prefixes(hash.compact))
     end
 
     private
