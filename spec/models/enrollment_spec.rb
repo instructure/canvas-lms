@@ -3702,4 +3702,38 @@ describe Enrollment do
       end
     end
   end
+
+  describe ".all_student" do
+    before(:once) do
+      @student = @user
+      @enrollment = @course.enroll_student(@student, enrollment_state: :active)
+    end
+
+    context "course workflow_state" do
+      it "available" do
+        @course.update_attribute(:workflow_state, "available")
+        expect(Enrollment.all_student).to include(@enrollment)
+      end
+
+      it "completed" do
+        @course.update_attribute(:workflow_state, "completed")
+        expect(Enrollment.all_student).to include(@enrollment)
+      end
+
+      it "created" do
+        @course.update_attribute(:workflow_state, "created")
+        expect(Enrollment.all_student).to include(@enrollment)
+      end
+
+      it "claimed" do
+        @course.update_attribute(:workflow_state, "claimed")
+        expect(Enrollment.all_student).to include(@enrollment)
+      end
+
+      it "deleted" do
+        @course.update_attribute(:workflow_state, "deleted")
+        expect(Enrollment.all_student).not_to include(@enrollment)
+      end
+    end
+  end
 end
