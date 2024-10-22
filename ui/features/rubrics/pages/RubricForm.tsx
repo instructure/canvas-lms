@@ -67,6 +67,7 @@ export const Component = () => {
           canManageRubrics={ENV.PERMISSIONS?.manage_rubrics}
           criterionUseRangeEnabled={ENV.FEATURES.rubric_criterion_range}
           rootOutcomeGroup={ENV.ROOT_OUTCOME_GROUP}
+          showAdditionalOptions={ENV.enhanced_rubric_assignments_enabled}
           onLoadRubric={title => setRubricTitle(title)}
           onCancel={() => navigate(navigateUrl)}
           onSaveRubric={() => navigate(navigateUrl)}
