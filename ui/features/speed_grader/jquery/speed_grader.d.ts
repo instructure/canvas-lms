@@ -469,7 +469,7 @@ export type SpeedGrader = {
   handleGradeSubmit: (event: unknown, use_existing_score: boolean) => void
   addCommentDeletionHandler: (commentElement: JQuery, comment: SubmissionComment) => void
   addCommentSubmissionHandler: (commentElement: JQuery, comment: SubmissionComment) => void
-  addSubmissionComment: (comment?: boolean) => void
+  addSubmissionComment: (comment?: boolean, studentId?: string) => void
   onProvisionalGradesFetched: (data: {
     needs_provisional_grade: boolean
     provisional_grades: ProvisionalGrade[]
