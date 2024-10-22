@@ -19,6 +19,7 @@
 import getCookie from '@instructure/get-cookie'
 import introspectionQueryResultData from '@canvas/apollo/fragmentTypes.json'
 import {ApolloClient, InMemoryCache, HttpLink, ApolloLink} from '@apollo/client'
+import {ApolloProvider} from '@apollo/react-common'
 import {IntrospectionFragmentMatcher} from 'apollo-cache-inmemory'
 import {persistCache} from 'apollo-cache-persist'
 import {onError} from '@apollo/client/link/error'
@@ -124,4 +125,4 @@ function createClient(opts = {}) {
   return client
 }
 
-export {createClient, createCache, createPersistentCache}
+export {ApolloProvider, createClient, createCache, createPersistentCache}
