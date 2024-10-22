@@ -70,6 +70,7 @@ export const RubricCreateModal = ({
             criterionUseRangeEnabled={ENV.FEATURES.rubric_criterion_range}
             hideHeader={true}
             rootOutcomeGroup={ENV.ROOT_OUTCOME_GROUP}
+            showAdditionalOptions={true}
           />
         </View>
       </Modal.Body>

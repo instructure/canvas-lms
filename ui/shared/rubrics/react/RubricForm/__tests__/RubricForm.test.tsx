@@ -68,6 +68,7 @@ describe('RubricForm Tests', () => {
           onCancel={() => {}}
           onSaveRubric={() => {}}
           accountId="1"
+          showAdditionalOptions={true}
           {...props}
         />
       </MockedQueryProvider>
@@ -664,6 +665,18 @@ describe('RubricForm Tests', () => {
 
       expect(queryByTestId('rubric-points-possible-1')).not.toBeInTheDocument()
       expect(queryAllByTestId('rubric-criteria-row-points')).toHaveLength(0)
+    })
+
+    it('does not display options when showAdditionalOptions is set to false', () => {
+      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+
+      const {queryByTestId} = renderComponent({rubricId: '1', showAdditionalOptions: false})
+
+      expect(queryByTestId('rubric-rating-scoring-type-select')).not.toBeInTheDocument()
+      expect(queryByTestId('rubric-rating-type-select')).not.toBeInTheDocument()
+      expect(queryByTestId('hide-outcome-results-checkbox')).not.toBeInTheDocument()
+      expect(queryByTestId('use-for-grading-checkbox')).not.toBeInTheDocument()
+      expect(queryByTestId('hide-score-total-checkbox')).not.toBeInTheDocument()
     })
   })
 })
