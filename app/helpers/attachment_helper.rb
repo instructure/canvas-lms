@@ -62,6 +62,18 @@ module AttachmentHelper
     attrs.inject(+"") { |s, (attr, val)| s << "data-#{attr}=#{val} " }
   end
 
+  def jwt_resource_match(attachment)
+    # If we're getting a JWT token from New Quizzes, the file might be in a an item
+    # bank, which can be used in multiple contexts, and we need to give access to
+    # it in all of them, even if the user doesn't have access to the context the file
+    # original comes from.
+    @jwt_resource_match ||= if params[:sf_verifier]
+                              jwt_payload = Canvas::Security.decode_jwt(params[:sf_verifier], ignore_expiration: true)
+                              jwt_payload["permission"] == "download" && jwt_payload["attachment_id"] == attachment.global_id.to_s
+                            end
+    @jwt_resource_match ||= ensure_token_resource_link(@token, attachment)
+  end
+
   def ensure_token_resource_link(token, attachment)
     return false unless token.respond_to?(:jwt_payload)
     return false unless (resource = token.jwt_payload[:resource])
@@ -79,6 +91,7 @@ module AttachmentHelper
     # preview URL without having to ask InstFS if the file is linked to the tenant_auth location, but for now,
     # we need to ask InstFS before we show a file preview.
     metadata = InstFS.get_file_metadata(attachment)
+    @attachment_authorization = { attachment:, permission: :download } if metadata.present?
     metadata.present?
   rescue ActionController::RoutingError, InstFS::MetadataError
     false
@@ -137,7 +150,7 @@ module AttachmentHelper
   end
 
   def access_allowed(attachment, user, access_type)
-    return true if @instfs_verified_token ||= ensure_token_resource_link(@token, attachment)
+    return true if jwt_resource_match(attachment)
 
     if params[:verifier]
       verifier_checker = Attachments::Verification.new(attachment)
@@ -172,7 +185,8 @@ module AttachmentHelper
       redirect_to safe_domain_file_url(attachment,
                                        host_and_shard: @safer_domain_host,
                                        verifier:,
-                                       download: !inline)
+                                       download: !inline,
+                                       authorization: @attachment_authorization)
     elsif attachment.stored_locally?
       @headers = false if @files_domain
       send_file(attachment.full_filename, type: attachment.content_type_with_encoding, disposition: (inline ? "inline" : "attachment"), filename: attachment.display_name)

@@ -2403,7 +2403,7 @@ class ApplicationController < ActionController::Base
 
   # escape everything but slashes, see http://code.google.com/p/phusion-passenger/issues/detail?id=113
   FILE_PATH_ESCAPE_PATTERN = Regexp.new("[^#{URI::PATTERN::UNRESERVED}/]")
-  def safe_domain_file_url(attachment, host_and_shard: nil, verifier: nil, download: false, return_url: nil, fallback_url: nil) # TODO: generalize this
+  def safe_domain_file_url(attachment, host_and_shard: nil, verifier: nil, download: false, return_url: nil, fallback_url: nil, authorization: nil)
     host_and_shard ||= HostUrl.file_host_with_shard(@domain_root_account || Account.default, request.host_with_port)
     host, shard = host_and_shard
     config = DynamicSettings.find(tree: :private, cluster: attachment.shard.database_server.id)
@@ -2424,7 +2424,7 @@ class ApplicationController < ActionController::Base
       # let's throw an extra param in the fallback so we hopefully don't infinite loop
       fallback_url += (query.present? ? "&" : "?") + "fallback_ts=#{Time.now.to_i}"
 
-      opts = generate_access_verifier(return_url:, fallback_url:)
+      opts = generate_access_verifier(return_url:, fallback_url:, authorization:)
       opts[:verifier] = verifier if verifier.present?
 
       if download
