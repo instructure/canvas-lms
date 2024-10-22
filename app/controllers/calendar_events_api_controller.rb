@@ -425,7 +425,10 @@ class CalendarEventsApiController < ApplicationController
     assignment = @type == :assignment
     sub_assignment = @type == :sub_assignment
 
-    render json: [] if sub_assignment && !discussion_checkpoints_enabled?
+    if sub_assignment && !discussion_checkpoints_enabled?
+      render json: []
+      return
+    end
 
     GuardRail.activate(:secondary) do
       scope = if assignment || sub_assignment
