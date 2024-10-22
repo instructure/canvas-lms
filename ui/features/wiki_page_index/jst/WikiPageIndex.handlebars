@@ -4,31 +4,48 @@
   <div class="sticky-toolbar-with-right-side" data-sticky>
     <div class="header-bar">
       <div class="header-bar-right">
-        {{#if block_editor}}
-          <label class="checkbox" for="toggle_block_editor" style="margin-inline-end: 4px;">
-            <input type="checkbox" value="1" id="toggle_block_editor" aria-label="toggle block editor" checked>
-            {{#t}}Create with block editor{{/t}}
-          </label>
-        {{/if}}
-        {{#if CAN.DELETE}}
-          <button class="btn delete_pages" tabindex="0" aria-label="{{#t}}Delete selected pages{{/t}}" disabled>
-            <i class="icon-trash" role="presentation"></i>
-          </button>
-        {{/if}}
-        {{#if CAN.CREATE}}
-          <a class="btn btn-primary icon-plus new_page" role="button" tabindex="0" aria-label="{{#t 'buttons.new_page_label'}}Add a page{{/t}}">{{#t 'buttons.new_page'}}Page{{/t}}</a>
-          {{#if hasWikiIndexPlacements}}
-            <div class="inline-block">
-              <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
-                <i class="icon-more" aria-hidden="true"></i>
-                <span class="screenreader-only">{{#t}}Pages Settings{{/t}}</span>
-              </a>
-
-              <ul id="toolbar-1" class="al-options" role="menu" aria-hidden="true" aria-expanded="false">
-                {{>ui/shared/external-tools/jst/_external_tools_menu.handlebars wikiIndexPlacements}}
-              </ul>
-            </div>
+        <div>
+          {{#if CAN.DELETE}}
+            <button class="btn delete_pages" tabindex="0" aria-label="{{#t}}Delete selected pages{{/t}}" disabled>
+              <i class="icon-trash" role="presentation"></i>
+            </button>
           {{/if}}
+          {{#if CAN.CREATE}}
+            <a class="btn btn-primary icon-plus new_page" role="button" tabindex="0" aria-label="{{#t 'buttons.new_page_label'}}Add a page{{/t}}">
+              {{#if block_editor_is_preferred }} {{#t 'buttons.new_page'}}Page{{/t}} {{/if}}
+              {{#if no_preferred_editor }} {{#t 'buttons.new_page'}}Page{{/t}} {{/if}}
+              {{#if rce_is_preferred }} {{#t 'buttons.new_rce_page'}}RCE Page{{/t}} {{/if}}
+            </a>
+          {{/if}}
+        </div>
+
+        {{#if CAN.CREATE}}
+          <div style="margin-top: 15px; text-align: right;">
+            {{#if block_editor_is_preferred }}
+            <a href="#" class="new_rce_page">
+              {{#t 'buttons.use_the_rce'}}Use the RCE{{/t}}
+            </a>
+            {{/if}}
+
+            {{#if rce_is_preferred }}
+            <a href="#" class="new_block_editor_page">
+              {{#t 'buttons.try_the_block_editor'}}Try the Block Editor{{/t}}
+            </a>
+            {{/if}}
+          </div>
+        {{/if}}
+
+        {{#if hasWikiIndexPlacements}}
+          <div class="inline-block">
+          <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
+            <i class="icon-more" aria-hidden="true"></i>
+            <span class="screenreader-only">{{#t}}Pages Settings{{/t}}</span>
+          </a>
+
+          <ul id="toolbar-1" class="al-options" role="menu" aria-hidden="true" aria-expanded="false">
+            {{>ui/shared/external-tools/jst/_external_tools_menu.handlebars wikiIndexPlacements}}
+          </ul>
+        </div>
         {{/if}}
       </div>
     </div>
@@ -144,4 +161,5 @@
       {{/unless}}
     {{/if}}
   </div>
+  <div id="choose-editor-mount-point"></div>
 </div>
