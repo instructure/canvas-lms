@@ -57,5 +57,13 @@ module Types
         Loaders::AssociationLoader.for(AttachmentAssociation, :attachment).load_many(attachment_associations)
       end
     end
+
+    # Temporary fix for grahpql pagination
+    field :attachments, [Types::FileType], null: true
+    def attachments
+      load_association(:attachment_associations).then do |attachment_associations|
+        Loaders::AssociationLoader.for(AttachmentAssociation, :attachment).load_many(attachment_associations)
+      end
+    end
   end
 end

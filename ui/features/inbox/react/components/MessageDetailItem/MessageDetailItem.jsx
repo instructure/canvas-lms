@@ -173,9 +173,9 @@ export const MessageDetailItem = ({...props}) => {
             size={responsiveProps.messageBody}
             dangerouslySetInnerHTML={{__html: messageBody}}
           />
-          {props.conversationMessage.attachmentsConnection?.nodes?.length > 0 && (
+          {props.conversationMessage.attachments?.length > 0 && (
             <List isUnstyled={true} margin="medium auto small">
-              {props.conversationMessage.attachmentsConnection.nodes.map(attachment => {
+              {props.conversationMessage.attachments.map(attachment => {
                 return (
                   <List.Item as="div" key={attachment.id}>
                     <Link href={attachment.url} renderIcon={<IconPaperclipLine size="x-small" />}>
