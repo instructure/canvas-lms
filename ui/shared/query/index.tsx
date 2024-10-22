@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import {
   useMutation as baseUseMutation,
   useQuery as baseUseQuery,
@@ -164,7 +164,26 @@ export function useInfiniteQuery<
     ...options,
     refetchOnMount,
   }
-  const queryResult = baseUseInfiniteQuery<TQueryFnData, TError, TData, TQueryKey>(mergedOptions)
+  return baseUseInfiniteQuery<TQueryFnData, TError, TData, TQueryKey>(mergedOptions)
+}
+
+export function useAllPages<
+  TQueryFnData = unknown,
+  TError = unknown,
+  TData = TQueryFnData,
+  TQueryKey extends QueryKey = QueryKey
+>(options: UseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryFnData, TQueryKey>) {
+  const queryResult = useInfiniteQuery<TQueryFnData, TError, TData, TQueryKey>(options)
+
+  useEffect(() => {
+    if (queryResult.hasNextPage && !queryResult.isFetchingNextPage) {
+      queryResult.fetchNextPage({
+        cancelRefetch: false,
+      })
+    }
+    // it's already exhaustive
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryResult.hasNextPage, queryResult.isFetchingNextPage, queryResult.fetchNextPage])
 
   return queryResult
 }

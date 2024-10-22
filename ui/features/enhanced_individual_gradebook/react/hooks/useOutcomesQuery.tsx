@@ -16,30 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect, useMemo, useState} from 'react'
+import {useMemo, useState} from 'react'
 import {fetchOutcomes, getNextOutcomesPage} from '../../queries/Queries'
-import {useInfiniteQuery} from '@canvas/query'
+import {useAllPages} from '@canvas/query'
 
 export const useOutcomesQuery = (courseId: string) => {
   const [queryKey] = useState(['individual-gradebook-outcomes', courseId])
 
-  const {data, fetchNextPage, hasNextPage, isFetchingNextPage, isError, isLoading} =
-    useInfiniteQuery({
-      queryKey,
-      queryFn: fetchOutcomes,
-      getNextPageParam: getNextOutcomesPage,
-      meta: {
-        fetchAtLeastOnce: true,
-      },
-    })
-
-  useEffect(() => {
-    if (hasNextPage && !isFetchingNextPage) {
-      fetchNextPage({
-        cancelRefetch: true,
-      })
-    }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+  const {data, hasNextPage, isError, isLoading} = useAllPages({
+    queryKey,
+    queryFn: fetchOutcomes,
+    getNextPageParam: getNextOutcomesPage,
+    meta: {
+      fetchAtLeastOnce: true,
+    },
+  })
 
   const outcomes = useMemo(
     () => data?.pages.flatMap(page => page.course.rootOutcomeGroup.outcomes.nodes) ?? [],
