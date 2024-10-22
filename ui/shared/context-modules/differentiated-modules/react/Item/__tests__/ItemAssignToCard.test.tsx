@@ -374,6 +374,21 @@ describe('ItemAssignToCard', () => {
     })
   })
 
+  it('clears date field and time field when date field is manually cleared on blur', async () => {
+    const due_at = '2023-10-05T12:00:00Z'
+    const {getAllByLabelText, getByLabelText} = renderComponent({due_at})
+    const dateInput = getByLabelText('Due Date')
+    const timeInput = getAllByLabelText('Time')[0]
+
+    await userEvent.clear(dateInput)
+    await userEvent.tab()
+
+    await waitFor(async () => {
+      expect(dateInput).toHaveValue('')
+      expect(timeInput).toHaveValue('')
+    })
+  })
+
   it('renders all disabled when date falls in a closed grading period for teacher', () => {
     withWithGradingPeriodsMock()
 

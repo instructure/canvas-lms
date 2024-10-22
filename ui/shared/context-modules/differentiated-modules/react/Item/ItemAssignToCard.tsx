@@ -346,22 +346,30 @@ export default forwardRef(function ItemAssignToCard(
     (unparsedFieldKey: string) => (e: SyntheticEvent) => {
       const target = e.target as HTMLInputElement
 
-      const dateField = dateInputRefs.current[unparsedFieldKey]
-      const isEmpty = dateField.value.trim() === ''
-      const isValid = moment(dateField.value, 'll', commonDateTimeInputProps.locale).isValid()
+      const dateInputRef = dateInputRefs.current[unparsedFieldKey]
+      const timeInputRef = timeInputRefs.current[unparsedFieldKey]
+      const isDateInputEmpty = dateInputRef.value.trim() === ''
       const unparsedFieldExists = unparsedFieldKeys.has(unparsedFieldKey)
       const newUnparsedFieldKeys = new Set(Array.from(unparsedFieldKeys))
 
-      if (target && timeInputRefs.current[unparsedFieldKey].value.length > 0) {
-        if (isEmpty && !unparsedFieldExists) {
+      if (target === dateInputRef) {
+        // If blurred element is the date field
+        const isDateInputValid = moment(
+          dateInputRef.value,
+          'll',
+          commonDateTimeInputProps.locale
+        ).isValid()
+        if ((isDateInputEmpty || isDateInputValid) && unparsedFieldExists) {
+          // If date is empty or valid and had an error, it should be marked as solved
+          newUnparsedFieldKeys.delete(unparsedFieldKey)
+        } else if (!isDateInputEmpty && !isDateInputValid && !unparsedFieldExists) {
+          // If date is not empty, not valid and didn't have an error, it should be marked as error
           newUnparsedFieldKeys.add(unparsedFieldKey)
         }
-      }
-
-      if (target && target === dateInputRefs.current[unparsedFieldKey]) {
-        if ((isEmpty || isValid) && unparsedFieldExists) {
-          newUnparsedFieldKeys.delete(unparsedFieldKey)
-        } else if (!isEmpty && !isValid && !unparsedFieldExists) {
+      } else if (target === timeInputRef) {
+        // If blurred element is the time field
+        if (isDateInputEmpty && timeInputRef.value.length > 0 && !unparsedFieldExists) {
+          // If date is empty, time is empty and didn't have an error, it should be marked as error
           newUnparsedFieldKeys.add(unparsedFieldKey)
         }
       }
