@@ -109,26 +109,7 @@ describe "courses" do
         expect(f("#content")).not_to contain_css("#course_publish_button")
       end
 
-      it "allows publishing/unpublishing with only change_course_state permission" do
-        @course.root_account.disable_feature!(:granular_permissions_manage_courses)
-        @course.account.role_overrides.create!(permission: :manage_course_content, role: teacher_role, enabled: false)
-        @course.account.role_overrides.create!(permission: :manage_courses, role: teacher_role, enabled: false)
-
-        get "/courses/#{@course.id}"
-        expect_new_page_load do
-          f("#course_publish_button button").click
-          f("ul[role='menu'][aria-label='course_publish_menu'] button:not([aria-disabled])").click
-        end
-        validate_action_button("Publish")
-        expect_new_page_load do
-          f("#course_publish_button button").click
-          f("ul[role='menu'][aria-label='course_publish_menu'] button:not([aria-disabled])").click
-        end
-        validate_action_button("Unpublish")
-      end
-
-      it "allows publishing/unpublishing with only manage_courses_publish permission (granular permissions)" do
-        @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+      it "allows publishing/unpublishing with only manage_courses_publish permission" do
         @course.account.role_overrides.create!(
           permission: :manage_course_content,
           role: teacher_role,
@@ -153,16 +134,7 @@ describe "courses" do
         validate_action_button("Unpublish")
       end
 
-      it "does not allow publishing/unpublishing without change_course_state permission" do
-        @course.root_account.disable_feature!(:granular_permissions_manage_courses)
-        @course.account.role_overrides.create!(permission: :change_course_state, role: teacher_role, enabled: false)
-
-        get "/courses/#{@course.id}"
-        expect(f("#content")).not_to contain_css("#course_publish_button")
-      end
-
-      it "does not allow publishing/unpublishing without manage_courses_publish permission (granular permissions)" do
-        @course.root_account.disable_feature!(:granular_permissions_manage_courses)
+      it "does not allow publishing/unpublishing without manage_courses_publish permission" do
         @course.account.role_overrides.create!(
           permission: :manage_courses_publish,
           role: teacher_role,

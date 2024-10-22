@@ -81,7 +81,7 @@ class CourseForMenuPresenter
           presenter.to_h
         end
       end
-      hash[:canChangeCoursePublishState] = course.grants_any_right?(@user, :change_course_state, :manage_courses_publish)
+      hash[:canChangeCoursePublishState] = course.grants_right?(@user, :manage_courses_publish)
       hash[:defaultView] = course.default_view
       hash[:pagesUrl] = polymorphic_url([course, :wiki_pages])
       hash[:frontPageTitle] = course&.wiki&.front_page&.title

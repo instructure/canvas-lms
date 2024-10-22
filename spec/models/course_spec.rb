@@ -911,68 +911,6 @@ describe Course do
       # we have to reload the users after each course change here to catch the
       # enrollment changes that are applied directly to the db with update_all
       it "grants delete to the proper individuals" do
-        @course.root_account.disable_feature!(:granular_permissions_manage_courses)
-        @role1 = custom_account_role("managecourses", account: Account.default)
-        @role2 = custom_account_role("managesis", account: Account.default)
-        account_admin_user_with_role_changes(role: @role1, role_changes: { manage_courses: true, change_course_state: true })
-        @admin1 = @admin
-        account_admin_user_with_role_changes(role: @role2, role_changes: { manage_sis: true, change_course_state: true })
-        @admin2 = @admin
-        course_with_teacher(active_all: true)
-        @designer = user_factory(active_all: true)
-        @course.enroll_designer(@designer).accept!
-        @ta = user_factory(active_all: true)
-        @course.enroll_ta(@ta).accept!
-
-        # active, non-sis course
-        expect(@course.grants_right?(@teacher, :delete)).to be_truthy
-        expect(@course.grants_right?(@designer, :delete)).to be_truthy
-        expect(@course.grants_right?(@ta, :delete)).to be_falsey
-        expect(@course.grants_right?(@admin1, :delete)).to be_truthy
-        expect(@course.grants_right?(@admin2, :delete)).to be_falsey
-
-        # active, sis course
-        @course.sis_source_id = "sis_id"
-        @course.save!
-        [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
-
-        clear_permissions_cache
-        expect(@course.grants_right?(@teacher, :delete)).to be_falsey
-        expect(@course.grants_right?(@designer, :delete)).to be_falsey
-        expect(@course.grants_right?(@ta, :delete)).to be_falsey
-        expect(@course.grants_right?(@admin1, :delete)).to be_truthy
-        expect(@course.grants_right?(@admin2, :delete)).to be_truthy
-
-        # completed, non-sis course
-        @course.sis_source_id = nil
-        @course.complete!
-        [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
-
-        clear_permissions_cache
-        expect(@course.grants_right?(@teacher, :delete)).to be_truthy
-        expect(@course.grants_right?(@designer, :delete)).to be_truthy
-        expect(@course.grants_right?(@ta, :delete)).to be_falsey
-        expect(@course.grants_right?(@admin1, :delete)).to be_truthy
-        expect(@course.grants_right?(@admin2, :delete)).to be_falsey
-        @course.clear_permissions_cache(@user)
-
-        # completed, sis course
-        @course.sis_source_id = "sis_id"
-        @course.save!
-        [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
-
-        clear_permissions_cache
-        expect(@course.grants_right?(@teacher, :delete)).to be_falsey
-        expect(@course.grants_right?(@designer, :delete)).to be_falsey
-        expect(@course.grants_right?(@ta, :delete)).to be_falsey
-        expect(@course.grants_right?(@admin1, :delete)).to be_truthy
-        expect(@course.grants_right?(@admin2, :delete)).to be_truthy
-      end
-
-      # we have to reload the users after each course change here to catch the
-      # enrollment changes that are applied directly to the db with update_all
-      it "grants delete to the proper individuals (granular permissions)" do
-        @course.root_account.enable_feature!(:granular_permissions_manage_courses)
         @role1 = custom_account_role("managecourses", account: Account.default)
         @role2 = custom_account_role("managesis", account: Account.default)
         account_admin_user_with_role_changes(role: @role1, role_changes: { manage_courses_delete: true })
@@ -1035,124 +973,7 @@ describe Course do
         expect(@course.grants_right?(@admin2, :delete)).to be_falsey
       end
 
-      # :change_course_state is deprecated
-      it "does not grant delete to anyone without :change_course_state rights (non-granular)" do
-        @course.root_account.disable_feature!(:granular_permissions_manage_courses)
-        @role1 = custom_account_role("managecourses", account: Account.default)
-        @role2 = custom_account_role("managesis", account: Account.default)
-        account_admin_user_with_role_changes(role: @role1, role_changes: { manage_courses: true })
-        @admin1 = @admin
-        account_admin_user_with_role_changes(role: @role2, role_changes: { manage_sis: true })
-        @admin2 = @admin
-        course_with_teacher(active_all: true)
-        @designer = user_factory(active_all: true)
-        @course.enroll_designer(@designer).accept!
-
-        Account.default.role_overrides.create!(role: teacher_role, permission: :change_course_state, enabled: false)
-        Account.default.role_overrides.create!(role: designer_role, permission: :change_course_state, enabled: false)
-
-        # active, non-sis course
-        expect(@course.grants_right?(@teacher, :delete)).to be_falsey
-        expect(@course.grants_right?(@designer, :delete)).to be_falsey
-        expect(@course.grants_right?(@admin1, :delete)).to be_falsey
-        expect(@course.grants_right?(@admin2, :delete)).to be_falsey
-
-        # active, sis course
-        @course.sis_source_id = "sis_id"
-        @course.save!
-        [@course, @teacher, @designer, @admin1, @admin2].each(&:reload)
-
-        clear_permissions_cache
-        expect(@course.grants_right?(@teacher, :delete)).to be_falsey
-        expect(@course.grants_right?(@designer, :delete)).to be_falsey
-        expect(@course.grants_right?(@admin1, :delete)).to be_falsey
-        expect(@course.grants_right?(@admin2, :delete)).to be_falsey
-
-        # completed, non-sis course
-        @course.sis_source_id = nil
-        @course.complete!
-        [@course, @teacher, @designer, @admin1, @admin2].each(&:reload)
-
-        clear_permissions_cache
-        expect(@course.grants_right?(@teacher, :delete)).to be_falsey
-        expect(@course.grants_right?(@designer, :delete)).to be_falsey
-        expect(@course.grants_right?(@admin1, :delete)).to be_falsey
-        expect(@course.grants_right?(@admin2, :delete)).to be_falsey
-        @course.clear_permissions_cache(@user)
-
-        # completed, sis course
-        @course.sis_source_id = "sis_id"
-        @course.save!
-        [@course, @teacher, @designer, @admin1, @admin2].each(&:reload)
-
-        clear_permissions_cache
-        expect(@course.grants_right?(@teacher, :delete)).to be_falsey
-        expect(@course.grants_right?(@designer, :delete)).to be_falsey
-        expect(@course.grants_right?(@admin1, :delete)).to be_falsey
-        expect(@course.grants_right?(@admin2, :delete)).to be_falsey
-      end
-
       it "grants reset_content to the proper individuals" do
-        @course.root_account.disable_feature!(:granular_permissions_manage_courses)
-        @role1 = custom_account_role("managecourses", account: Account.default)
-        @role2 = custom_account_role("managesis", account: Account.default)
-        account_admin_user_with_role_changes(role: @role1, role_changes: { manage_courses: true })
-        @admin1 = @admin
-        account_admin_user_with_role_changes(role: @role2, role_changes: { manage_sis: true })
-        @admin2 = @admin
-        course_with_teacher(active_all: true)
-        @designer = user_factory(active_all: true)
-        @course.enroll_designer(@designer).accept!
-        @ta = user_factory(active_all: true)
-        @course.enroll_ta(@ta).accept!
-
-        # active, non-sis course
-        clear_permissions_cache
-        expect(@course.grants_right?(@teacher, :reset_content)).to be_truthy
-        expect(@course.grants_right?(@designer, :reset_content)).to be_truthy
-        expect(@course.grants_right?(@ta, :reset_content)).to be_falsey
-        expect(@course.grants_right?(@admin1, :reset_content)).to be_truthy
-        expect(@course.grants_right?(@admin2, :reset_content)).to be_falsey
-
-        # active, sis course
-        @course.sis_source_id = "sis_id"
-        @course.save!
-        [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
-
-        clear_permissions_cache
-        expect(@course.grants_right?(@teacher, :reset_content)).to be_truthy
-        expect(@course.grants_right?(@designer, :reset_content)).to be_truthy
-        expect(@course.grants_right?(@ta, :reset_content)).to be_falsey
-        expect(@course.grants_right?(@admin1, :reset_content)).to be_truthy
-        expect(@course.grants_right?(@admin2, :reset_content)).to be_falsey
-
-        # completed, non-sis course
-        @course.sis_source_id = nil
-        @course.complete!
-        [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
-
-        clear_permissions_cache
-        expect(@course.grants_right?(@teacher, :reset_content)).to be_falsey
-        expect(@course.grants_right?(@designer, :reset_content)).to be_falsey
-        expect(@course.grants_right?(@ta, :reset_content)).to be_falsey
-        expect(@course.grants_right?(@admin1, :reset_content)).to be_truthy
-        expect(@course.grants_right?(@admin2, :reset_content)).to be_falsey
-
-        # completed, sis course
-        @course.sis_source_id = "sis_id"
-        @course.save!
-        [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
-
-        clear_permissions_cache
-        expect(@course.grants_right?(@teacher, :reset_content)).to be_falsey
-        expect(@course.grants_right?(@designer, :reset_content)).to be_falsey
-        expect(@course.grants_right?(@ta, :reset_content)).to be_falsey
-        expect(@course.grants_right?(@admin1, :reset_content)).to be_truthy
-        expect(@course.grants_right?(@admin2, :reset_content)).to be_falsey
-      end
-
-      it "grants reset_content to the proper individuals (granular permissions)" do
-        @course.root_account.enable_feature!(:granular_permissions_manage_courses)
         @role1 = custom_account_role("managecourses", account: Account.default)
         @role2 = custom_account_role("managesis", account: Account.default)
         account_admin_user_with_role_changes(role: @role1, role_changes: { manage_courses_reset: true })
@@ -6064,16 +5885,7 @@ describe Course do
 
         it { is_expected.to include :read_prior_roster }
         it { is_expected.to include :view_all_grades }
-
-        it "without granular permissions" do
-          @course.root_account.disable_feature!(:granular_permissions_manage_courses)
-          expect(subject).to include :delete
-        end
-
-        it "with granular permissions" do
-          @course.root_account.enable_feature!(:granular_permissions_manage_courses)
-          expect(subject).not_to include :delete
-        end
+        it { is_expected.not_to include :delete }
       end
     end
 

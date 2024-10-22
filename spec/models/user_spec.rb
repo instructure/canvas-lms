@@ -4372,13 +4372,13 @@ describe User do
       @account = Account.default
     end
 
-    it "returns :admin for AccountUsers with :manage_courses" do
+    it "returns :admin for AccountUsers with :manage_courses_admin" do
       account_admin_user(user: @user)
       expect(@user.create_courses_right(@account)).to be(:admin)
     end
 
-    it "returns nil for AccountUsers without :manage_courses" do
-      account_admin_user_with_role_changes(user: @user, role_changes: { manage_courses_add: false })
+    it "returns nil for AccountUsers without :manage_courses_admin and manage_courses_add" do
+      account_admin_user_with_role_changes(user: @user, role_changes: { manage_courses_admin: false, manage_courses_add: false })
       expect(@user.create_courses_right(@account)).to be_nil
     end
 

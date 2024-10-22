@@ -621,7 +621,6 @@ describe "dashboard" do
       context "as a restricted root admin who is also a sub-admin" do
         it "show the proper picker regardless of lack of root permissions" do
           Account.default.update_attribute(:settings, { no_enrollments_can_create_courses: true })
-          Account.default.enable_feature!(:granular_permissions_manage_courses)
           acc_admin = account_admin_user_with_role_changes(account: Account.default, role_changes: { manage_courses_add: false })
           sub_acc = Account.create!(name: "sub_account", parent_account: Account.default)
           account_with_role_changes(account: sub_acc, role_changes: { manage_courses_add: true })

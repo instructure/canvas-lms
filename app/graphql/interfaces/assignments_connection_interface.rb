@@ -69,7 +69,7 @@ module Interfaces::AssignmentsConnectionInterface
 
   def can_current_user_read_given_user_submissions(course, user)
     is_current_user = user.id == current_user.id
-    course_submission_read_permissions = course.grants_any_right?(current_user, session, :manage_courses, :read_as_admin, :manage_grades)
+    course_submission_read_permissions = course.grants_any_right?(current_user, session, :read_as_admin, :manage_grades)
     observer_permissions = ObserverEnrollment.observed_students(course, current_user, include_restricted_access: false).keys.any? { |observed_user| observed_user.id == user.id }
     is_current_user || course_submission_read_permissions || observer_permissions
   end

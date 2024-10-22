@@ -752,17 +752,6 @@ describe Account do
     end
   end
 
-  # TODO: deprecated; need to look into removing this setting
-  it "allows no_enrollments_can_create_courses correctly" do
-    a = Account.default
-    a.disable_feature!(:granular_permissions_manage_courses)
-    a.settings = { no_enrollments_can_create_courses: true }
-    a.save!
-
-    user_factory
-    expect(a.manually_created_courses_account.grants_right?(@user, :create_courses)).to be_truthy
-  end
-
   it "does not allow create_courses even to admins on site admin and children" do
     a = Account.site_admin
     a.settings = { no_enrollments_can_create_courses: true }
@@ -778,20 +767,6 @@ describe Account do
     a = Account.default
     a.settings = { no_enrollments_can_create_courses: true }
     a.save!
-
-    manual = a.manually_created_courses_account
-    course = manual.courses.create!
-    user = course.student_view_student
-
-    expect(a.grants_right?(user, :create_courses)).to be false
-    expect(manual.grants_right?(user, :create_courses)).to be false
-  end
-
-  it "does not allow create courses for student view students (granular permissions)" do
-    a = Account.default
-    a.settings = { no_enrollments_can_create_courses: true }
-    a.save!
-    a.enable_feature!(:granular_permissions_manage_courses)
 
     manual = a.manually_created_courses_account
     course = manual.courses.create!
@@ -2295,19 +2270,6 @@ describe Account do
     let(:account) { account_model }
 
     it "returns expected roles with the given permission" do
-      account.disable_feature!(:granular_permissions_manage_courses)
-      role = account.roles.create name: "AssistantGrader"
-      role.base_role_type = "TaEnrollment"
-      role.workflow_state = "active"
-      role.save!
-      create_role_override("change_course_state", role, account)
-      expect(
-        account.roles_with_enabled_permission(:change_course_state).map(&:name).sort
-      ).to eq %w[AccountAdmin AssistantGrader DesignerEnrollment TeacherEnrollment]
-    end
-
-    it "returns expected roles with the given permission (granular permissions)" do
-      account.enable_feature!(:granular_permissions_manage_courses)
       role = account.roles.create name: "TeacherAdmin"
       role.base_role_type = "TeacherEnrollment"
       role.workflow_state = "active"
