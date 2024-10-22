@@ -162,7 +162,9 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def validate_password(attr, val)
-    Canvas::Security::PasswordPolicy.validate(self, attr, val)
+    unless password_auto_generated? && canvas_generated_password?
+      Canvas::Security::PasswordPolicy.validate(self, attr, val)
+    end
   end
 
   acts_as_list scope: :user
@@ -316,6 +318,10 @@ class Pseudonym < ActiveRecord::Base
     super
   end
 
+  def canvas_generated_password?
+    @canvas_generated_password == true
+  end
+
   def communication_channel
     user.communication_channels.by_path(unique_id).first
   end
@@ -328,6 +334,9 @@ class Pseudonym < ActiveRecord::Base
     self.account ||= Account.default
     if (!crypted_password || crypted_password == "") && !@require_password
       generate_temporary_password
+      # this helps us differentiate between a generated password and one that was
+      # provided in a SIS import with password_auto_generated set to true
+      @canvas_generated_password = true
     end
     # treat empty or whitespaced strings as nullable
     self.integration_id = nil if integration_id.blank?
