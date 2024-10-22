@@ -351,6 +351,19 @@ platform_notification_service:
       state: allowed_on
     ci:
       state: allowed_on
+remove_unwanted_lti_validation_claims:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Do not include validation_context and errors claims in LTI Launches
+  description: |-
+    If enabled, the unwanted LTI validation claims like validation_context and errors will not be included in every LTI launch.
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
 remove_submission_type_selection_from_dev_keys_edit_page:
   state: hidden
   shadow: true
