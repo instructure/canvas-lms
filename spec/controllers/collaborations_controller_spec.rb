@@ -134,6 +134,51 @@ describe CollaborationsController do
       expect(assigns[:collaborations]).to match_array [collab2, valid_collab]
       expect(assigns[:collaborations]).not_to include invalid_collab
     end
+
+    context "with external tools" do
+      render_views
+      let(:course) { @course }
+      let(:url) { "http://www.example.com/launch" }
+      let(:domain) { "example.com" }
+      let(:developer_key_1) { dev_key_model_1_3(account: @course.account) }
+      let(:developer_key_2) { dev_key_model_1_3(account: @course.account) }
+      let(:tool_1) { external_tool_1_3_model(context: @course, developer_key: developer_key_1, opts: { url:, name: "1.3 tool 1" }) }
+      let(:tool_2) { external_tool_1_3_model(context: @course, developer_key: developer_key_2, opts: { url:, name: "1.3 tool 2" }) }
+      let(:content_item_1) do
+        {
+          url: tool_1.url,
+          title: "Lti 1.3 Tool Title 1"
+        }
+      end
+      let(:content_item_2) do
+        {
+          url: tool_2.url,
+          title: "Lti 1.3 Tool Title 2"
+        }
+      end
+
+      it "allows client_id to be available for each collaboration" do
+        user_session(@teacher)
+
+        # Create first collaboration
+        post "create", params: { course_id: @course.id, contentItems: [content_item_1].to_json, tool_id: tool_1.id }
+        collab_1 = Collaboration.find(assigns[:collaboration].id)
+        collab_1.context = @course
+        collab_1.save!
+
+        # Create second collaboration
+        post "create", params: { course_id: @course.id, contentItems: [content_item_2].to_json, tool_id: tool_2.id }
+        collab_2 = Collaboration.find(assigns[:collaboration].id)
+        collab_2.context = @course
+        collab_2.save!
+
+        get "index", params: { course_id: @course.id }
+
+        # Verify client_id for each collaboration
+        expect(response.body).to include("client_id=#{developer_key_1.global_id}")
+        expect(response.body).to include("client_id=#{developer_key_2.global_id}")
+      end
+    end
   end
 
   describe "GET 'members'" do
