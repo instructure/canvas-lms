@@ -141,6 +141,10 @@ class WikiPagesController < ApplicationController
     end
   end
 
+  def create_block_editor
+    BlockEditor.create! root_account_id: @page.root_account_id, context: @page, editor_version: BlockEditor::LATEST_VERSION, blocks: BlockEditor::BLANK_PAGE
+  end
+
   def revisions
     if @page.grants_right?(@current_user, session, :read_revisions)
       if (!@context.conditional_release? && !Account.site_admin.feature_enabled?(:selective_release_backend)) || enforce_assignment_visible(@page)
@@ -175,6 +179,7 @@ class WikiPagesController < ApplicationController
       wiki_index_menu_tools: external_tools_display_hashes(:wiki_index_menu),
       DISPLAY_SHOW_ALL_LINK: tab_enabled?(context.class::TAB_PAGES, no_render: true) && !@k5_details_view,
       CAN_SET_TODO_DATE: context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit),
+      text_editor_preference: @current_user&.reload&.get_preference(:text_editor_preference)
     }
     if Account.site_admin.feature_enabled?(:permanent_page_links)
       title_availability_path = context.is_a?(Course) ? api_v1_course_page_title_availability_path : api_v1_group_page_title_availability_path

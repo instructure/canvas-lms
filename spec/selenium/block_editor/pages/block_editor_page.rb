@@ -22,6 +22,8 @@ module BlockEditorPage
   def create_wiki_page(course)
     get "/courses/#{course.id}/pages"
     f("a.new_page").click
+    click_INSTUI_Select_option(f("[data-testid=\"choose-an-editor-dropdown\"]"), "Try the Block Editor")
+    fj("button:contains('Continue')").click
     wait_for_block_editor
   end
 

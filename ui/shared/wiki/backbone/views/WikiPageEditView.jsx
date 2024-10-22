@@ -71,6 +71,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     super.initialize(...arguments)
     if (!this.WIKI_RIGHTS) this.WIKI_RIGHTS = {}
     if (!this.PAGE_RIGHTS) this.PAGE_RIGHTS = {}
+    this.queryParams = new URLSearchParams(window.location.search)
     this.enableAssignTo =
       window.ENV.FEATURES?.selective_release_ui_api &&
       ENV.COURSE_ID != null &&
@@ -147,6 +148,10 @@ export default class WikiPageEditView extends ValidatedFormView {
     json.content_is_locked = this.lockedItems.content
     json.show_assign_to = this.enableAssignTo
     json.edit_with_block_editor = this.model.get('editor') === 'block_editor'
+
+    if (this.queryParams.get('editor') === 'block_editor' && this.model.get('body') == null) {
+      json.edit_with_block_editor = true
+    }
 
     return json
   }

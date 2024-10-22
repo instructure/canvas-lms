@@ -157,6 +157,7 @@ CanvasRails::Application.routes.draw do
   concern :pages do
     resources :wiki_pages, path: :pages, except: %i[update destroy new], constraints: { id: %r{[^/]+} } do
       get "revisions" => "wiki_pages#revisions", :as => :revisions
+      put "create_block_editor" => "wiki_pages#create_block_editor", :as => :create_block_editor
     end
 
     get "wiki" => "wiki_pages#front_page", :as => :wiki
@@ -1627,6 +1628,8 @@ CanvasRails::Application.routes.draw do
       get "users/:id/colors", controller: "users", action: "get_custom_colors"
       get "users/:id/colors/:asset_string", controller: "users", action: "get_custom_color"
       put "users/:id/colors/:asset_string", controller: "users", action: "set_custom_color"
+
+      put "users/:id/text_editor_preference", controller: "users", action: "set_text_editor_preference"
 
       get "users/:id/new_user_tutorial_statuses", action: "get_new_user_tutorial_statuses"
       put "users/:id/new_user_tutorial_statuses/:page_name", action: "set_new_user_tutorial_status"
