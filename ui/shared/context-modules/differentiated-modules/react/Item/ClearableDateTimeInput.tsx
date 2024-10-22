@@ -119,11 +119,6 @@ function ClearableDateTimeInput({
     }
   }, [hasErrorBorder, height])
 
-  const onChangeHandler = (event: React.SyntheticEvent, value: string | undefined) => {
-    if (value === undefined) return
-    return onChange(event, value)
-  }
-
   const renderDateLabel = <Text elementRef={elementRefCallback}>{dateRenderLabel}</Text>
 
   const renderTimeLabel = (
@@ -163,7 +158,7 @@ function ClearableDateTimeInput({
           showMessages={showMessages}
           locale={locale}
           timezone={timezone}
-          onChange={onChangeHandler}
+          onChange={onChange}
           onBlur={onBlur}
           dateInputRef={dateInputRef}
           timeInputRef={timeInputRef}
