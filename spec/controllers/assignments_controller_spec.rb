@@ -1772,7 +1772,7 @@ describe AssignmentsController do
 
       context "assigned_rubric and rubric_association" do
         before do
-          @course.enable_feature!(:enhanced_rubrics_assignments)
+          Account.site_admin.enable_feature!(:enhanced_rubrics_assignments)
           @course.enable_feature!(:enhanced_rubrics)
           rubric = @course.rubrics.create! { |r| r.user = @teacher }
           rubric_association_params = ActiveSupport::HashWithIndifferentAccess.new({
@@ -1796,7 +1796,7 @@ describe AssignmentsController do
         end
 
         it "does not set assigned_rubric and rubric_association in the ENV when FF is OFF" do
-          @course.disable_feature!(:enhanced_rubrics_assignments)
+          Account.site_admin.disable_feature!(:enhanced_rubrics_assignments)
           get :show, params: { course_id: @course.id, id: @assignment.id }
           expect(assigns[:js_env][:assigned_rubric]).to be_nil
           expect(assigns[:js_env][:rubric_association]).to be_nil
