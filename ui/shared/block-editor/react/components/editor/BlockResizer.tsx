@@ -18,20 +18,17 @@
 
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useNode, type Node} from '@craftjs/core'
-import {getAspectRatio} from '../../utils/size'
-import {type ResizableProps} from './types'
 import Moveable, {type OnResize} from 'react-moveable'
-
-export type Sz = {
-  width: number
-  height: number
-}
+import {getAspectRatio, percentSize} from '../../utils'
+import {type ResizableProps, type SizeVariant, type Sz} from './types'
+import {px} from '@instructure/ui-utils'
 
 type BlockResizeProps = {
   mountPoint: HTMLElement
+  sizeVariant: SizeVariant
 }
 
-const BlockResizer = ({mountPoint}: BlockResizeProps) => {
+const BlockResizer = ({mountPoint, sizeVariant}: BlockResizeProps) => {
   const {
     actions: {setProp},
     maintainAspectRatio,
@@ -70,16 +67,34 @@ const BlockResizer = ({mountPoint}: BlockResizeProps) => {
       myblock.style.height = `${newHeight}px`
 
       setCurrSz({width: newWidth, height: newHeight})
+
+      let propWidth = newWidth,
+        propHeight = newHeight
+      if (sizeVariant === 'percent') {
+        const parent = node.dom?.offsetParent
+        if (parent) {
+          // assume all 4 sides have the same padding
+          const padding = px(window.getComputedStyle(parent).getPropertyValue('padding'))
+          const {width, height} = percentSize(
+            parent.clientWidth - padding,
+            parent.clientHeight - padding,
+            newWidth,
+            newHeight
+          )
+          propWidth = width
+          propHeight = height
+        }
+      }
       setProp((props: any) => {
-        props.width = newWidth
-        props.height = newHeight
+        props.width = propWidth
+        props.height = propHeight
       })
     },
-    [currSz.height, currSz.width, maintainAspectRatio, node.dom, setProp]
+    [currSz.height, currSz.width, maintainAspectRatio, node.dom, setProp, sizeVariant]
   )
 
   const handleResizeKeys = useCallback(
-    event => {
+    (event: KeyboardEvent) => {
       if (!node.dom) return
       if (!event.altKey) return
 
