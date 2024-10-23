@@ -3356,19 +3356,47 @@ describe CalendarEventsApiController, type: :request do
         expect(json.size).to be 2
       end
 
-      it "does not return assignments associated with discussions with checkpoints when the checkpoints FF is enabled" do
-        @course.root_account.enable_feature!(:discussion_checkpoints)
-        graded_discussion_topic_with_checkpoints(context: @course, title: "Discussion with Checkpoints")
+      context "discussion_checkpoints feature flag enabled" do
+        before do
+          @course.root_account.enable_feature!(:discussion_checkpoints)
+        end
 
-        json = api_call(:get, "/api/v1/calendar_events", {
-                          controller: "calendar_events_api",
-                          action: "index",
-                          format: "json",
-                          type: "assignment",
-                          context_codes: ["course_#{@course.id}"],
-                          all_events: "1"
-                        })
-        expect(json.size).to be 2
+        it "does not return assignments associated with discussions with checkpoints" do
+          graded_discussion_topic_with_checkpoints(context: @course, title: "Discussion with Checkpoints")
+
+          json = api_call(:get, "/api/v1/calendar_events", {
+                            controller: "calendar_events_api",
+                            action: "index",
+                            format: "json",
+                            type: "assignment",
+                            context_codes: ["course_#{@course.id}"],
+                            all_events: "1"
+                          })
+          expect(json.size).to be 2
+        end
+
+        it "does not throw error if context is not a course" do
+          api_call(:get, "/api/v1/calendar_events", {
+                     controller: "calendar_events_api",
+                     action: "index",
+                     format: "json",
+                     type: "assignment",
+                     context_codes: ["user_#{@teacher.id}"],
+                     all_events: "1"
+                   })
+          expect(response).to have_http_status :ok
+        end
+
+        it "does not throw error if context is not provided" do
+          api_call(:get, "/api/v1/calendar_events", {
+                     controller: "calendar_events_api",
+                     action: "index",
+                     format: "json",
+                     type: "assignment",
+                     all_events: "1"
+                   })
+          expect(response).to have_http_status :ok
+        end
       end
     end
 
@@ -4411,19 +4439,47 @@ describe CalendarEventsApiController, type: :request do
       submission_types
     ]
 
-    context "dicussion_checkpoints feature flag" do
-      it "returns sub_assignments when feature flag is enabled" do
-        @course.root_account.enable_feature!(:discussion_checkpoints)
-        json = api_call(:get, "/api/v1/calendar_events", {
-                          controller: "calendar_events_api",
-                          action: "index",
-                          format: "json",
-                          type: "sub_assignment",
-                          context_codes: ["course_#{@course.id}"],
-                          start_date: "2024-08-01",
-                          end_date: "2024-08-02"
-                        })
-        expect(json.size).to be 2
+    context "discussion_checkpoints feature flag" do
+      context "when feature flag is enabled" do
+        before do
+          @course.root_account.enable_feature!(:discussion_checkpoints)
+        end
+
+        it "returns sub_assignments" do
+          json = api_call(:get, "/api/v1/calendar_events", {
+                            controller: "calendar_events_api",
+                            action: "index",
+                            format: "json",
+                            type: "sub_assignment",
+                            context_codes: ["course_#{@course.id}"],
+                            start_date: "2024-08-01",
+                            end_date: "2024-08-02"
+                          })
+          expect(json.size).to be 2
+        end
+
+        it "does not throw error when context is not a course" do
+          api_call(:get, "/api/v1/calendar_events", {
+                     controller: "calendar_events_api",
+                     action: "index",
+                     format: "json",
+                     type: "sub_assignment",
+                     context_codes: ["user_#{@teacher.id}"],
+                     all_events: "1"
+                   })
+          expect(response).to have_http_status :ok
+        end
+
+        it "does not throw error when context is not provided" do
+          api_call(:get, "/api/v1/calendar_events", {
+                     controller: "calendar_events_api",
+                     action: "index",
+                     format: "json",
+                     type: "sub_assignment",
+                     all_events: "1"
+                   })
+          expect(response).to have_http_status :ok
+        end
       end
 
       it "does not return sub_assignments when feature flag is disabled" do
