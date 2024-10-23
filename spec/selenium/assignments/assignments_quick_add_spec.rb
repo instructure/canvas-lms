@@ -30,22 +30,17 @@ describe "assignments" do
 
   before do
     course_with_teacher_logged_in
+
+    @assignment_name = "pink panther"
+    @assignment_points = "3"
+    @assignment_date = "2015-07-31"
   end
 
   context "quick add" do
     def fill_out_quick_add_modal(type)
       get "/courses/#{@course.id}/assignments"
-      f(".add_assignment").click
 
-      @assignment_name = "pink panther"
-      @assignment_date = "2015-07-31"
-      @assignment_points = "3"
-
-      click_option(f('[name="submission_types"]'), type)
-
-      f("div.form-dialog-content.create_assignment_dialog > div.form-horizontal > div:nth-of-type(2) > div.controls > input").send_keys(@assignment_name)
-      f(".datetime_field").send_keys(@assignment_date)
-      f('input[name="points_possible"]').send_keys(@assignment_points)
+      build_assignment_with_type(type, name: "pink panther", points: "3", due_at: "2015-07-31")
     end
 
     it "opens quick add modal", priority: "1" do
@@ -53,14 +48,13 @@ describe "assignments" do
 
       f(".add_assignment").click
 
-      expect(f(".ui-dialog-title")).to include_text("Add Assignment to Assignments")
-      expect(f(".create_assignment_dialog")).to be
+      expect(f("[data-testid='modal-title']")).to include_text("Create Assignment")
     end
 
     context "more options button" do
       it "works for assignments and transfer values", priority: "1" do
         fill_out_quick_add_modal("Assignment")
-        f(".more_options").click
+        f("[data-testid='more-options-button']").click
 
         expect(f("#edit_assignment_header")).to be
         expect(f("#assignment_name").attribute(:value)).to include(@assignment_name)
@@ -72,7 +66,7 @@ describe "assignments" do
 
       it "works for discussions and transfer values", priority: "1" do
         fill_out_quick_add_modal("Discussion")
-        f(".more_options").click
+        f("[data-testid='more-options-button']").click
 
         expect(f(".discussion-edit-header")).to be
         expect(f("#discussion-title").attribute(:value)).to include(@assignment_name)
@@ -84,7 +78,7 @@ describe "assignments" do
 
       it "works for quizzes and transfer values", priority: "1" do
         fill_out_quick_add_modal("Quiz")
-        f(".more_options").click
+        f("[data-testid='more-options-button']").click
 
         expect(f("#quiz_edit_wrapper")).to be
         expect(f("#quiz_title").attribute(:value)).to include(@assignment_name)
@@ -101,26 +95,26 @@ describe "assignments" do
     end
 
     it "works with an assignment", priority: "1" do
-      assignment = @course.assignments.create!(title: "test assignment", name: @title, workflow_state: "published")
+      @course.assignments.create!(title: "test assignment", name: @title, workflow_state: "published")
       get "/courses/#{@course.id}/assignments"
       click_cog_to_edit
 
-      expect(f("#assign_#{assignment.id}_assignment_name").attribute(:value)).to include(@title)
+      expect(f("[data-testid='assignment-name-input']").attribute(:value)).to include(@title)
     end
 
     it "works with a quiz", priority: "1" do
-      assignment = @course.assignments.create(title: @title, submission_types: "online_quiz", workflow_state: "published")
+      @course.assignments.create(title: @title, submission_types: "online_quiz", workflow_state: "published")
       get "/courses/#{@course.id}/assignments"
       click_cog_to_edit
 
-      expect(f("#assign_#{assignment.id}_assignment_name").attribute(:value)).to include(@title)
+      expect(f("[data-testid='assignment-name-input']").attribute(:value)).to include(@title)
     end
 
     it "works with a graded discussion", priority: "1" do
-      assignment = @course.assignments.create!(name: @title, submission_types: "discussion_topic")
+      @course.assignments.create!(name: @title, submission_types: "discussion_topic")
       get "/courses/#{@course.id}/assignments"
       click_cog_to_edit
-      expect(f("#assign_#{assignment.id}_assignment_name").attribute(:value)).to include(@title)
+      expect(f("[data-testid='assignment-name-input']").attribute(:value)).to include(@title)
     end
   end
 end

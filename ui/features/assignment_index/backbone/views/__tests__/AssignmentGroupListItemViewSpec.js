@@ -282,7 +282,6 @@ test('does not parse response with multiple due dates', function () {
 test('initializes child views if can manage', function () {
   const view = createView(this.model)
   ok(view.editGroupView)
-  ok(view.createAssignmentView)
   ok(view.deleteGroupView)
 })
 

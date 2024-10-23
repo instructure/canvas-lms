@@ -234,35 +234,6 @@ test('the form is cleared after adding an assignment', function () {
   equal(view.$(`#ag_${this.group.id}_assignment_points`).val(), '0')
 })
 
-test('moreOptions redirects to new page for creation', function () {
-  sandbox.stub(CreateAssignmentView.prototype, 'newAssignmentUrl')
-  sandbox.stub(CreateAssignmentView.prototype, 'redirectTo')
-  const view = createView(this.group)
-  view.moreOptions()
-  ok(view.redirectTo.called)
-})
-
-test('moreOptions redirects to edit page for editing', function () {
-  sandbox.stub(CreateAssignmentView.prototype, 'redirectTo')
-  const view = createView(this.assignment1)
-  view.moreOptions()
-  ok(view.redirectTo.called)
-})
-
-test('moreOptions creates a quiz if submission_types is online_quiz', function () {
-  const newQuizUrl = 'http://example.com/course/1/quizzes/new'
-  const formData = {submission_types: 'online_quiz'}
-  sandbox.stub(CreateAssignmentView.prototype, 'getFormData').returns(formData)
-  sandbox.stub(CreateAssignmentView.prototype, 'newQuizUrl').returns(newQuizUrl)
-  sandbox.stub(CreateAssignmentView.prototype, 'redirectTo')
-  const quizEditUrl = 'http://example.com/course/1/quizzes/42/edit'
-  sandbox.stub($, 'post').returns($.Deferred().resolve({url: quizEditUrl}))
-  const view = createView(this.assignment1)
-  view.moreOptions()
-  ok($.post.calledWith(newQuizUrl, formData))
-  ok(view.redirectTo.calledWith(quizEditUrl))
-})
-
 test('generateNewAssignment builds new assignment model', function () {
   const view = createView(this.group)
   const assign = view.generateNewAssignment()

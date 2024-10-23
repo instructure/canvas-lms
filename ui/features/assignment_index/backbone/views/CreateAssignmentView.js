@@ -41,6 +41,7 @@ import {
 import * as tz from '@instructure/moment-utils'
 import {encodeQueryString} from '@instructure/query-string-encoding'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
+import CreateEditAssignmentModal from '@canvas/assignments/react/CreateEditAssignmentModal'
 
 const I18n = useI18nScope('CreateAssignmentView')
 
@@ -128,9 +129,8 @@ CreateAssignmentView.prototype.onSaveFail = function (xhr) {
   return CreateAssignmentView.__super__.onSaveFail.call(this, xhr)
 }
 
-CreateAssignmentView.prototype.moreOptions = function () {
+CreateAssignmentView.prototype.moreOptions = function (data) {
   const valid = ['submission_types', 'name', 'due_at', 'points_possible', 'assignment_group_id']
-  const data = this.getFormData()
   if (this.assignmentGroup) {
     data.assignment_group_id = this.assignmentGroup.get('id')
   }
@@ -140,6 +140,7 @@ CreateAssignmentView.prototype.moreOptions = function () {
       return (dataParams[key] = value)
     }
   })
+
   if (dataParams.submission_types === 'online_quiz') {
     const button = this.$('.more_options')
     button.prop('disabled', true)

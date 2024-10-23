@@ -25,7 +25,6 @@ import * as MoveItem from '@canvas/move-item-tray'
 import Cache from '../../cache'
 import DraggableCollectionView from './DraggableCollectionView'
 import AssignmentListItemView from './AssignmentListItemView'
-import CreateAssignmentView from './CreateAssignmentView'
 import CreateGroupView from './CreateGroupView'
 import DeleteGroupView from './DeleteGroupView'
 import preventDefault from '@canvas/util/preventDefault'
@@ -36,6 +35,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {ltiState} from '@canvas/lti/jquery/messages'
+import CreateAssignmentViewAdapter from './CreateAssignmentViewAdapter'
+import {createRoot} from 'react-dom/client'
 
 const I18n = useI18nScope('AssignmentGroupListItemView')
 
@@ -89,8 +90,6 @@ AssignmentGroupListItemView.prototype.itemView = AssignmentListItemView
 
 AssignmentGroupListItemView.prototype.template = template
 
-AssignmentGroupListItemView.child('createAssignmentView', '[data-view=createAssignment]')
-
 AssignmentGroupListItemView.child('editGroupView', '[data-view=editAssignmentGroup]')
 
 AssignmentGroupListItemView.child('deleteGroupView', '[data-view=deleteAssignmentGroup]')
@@ -111,6 +110,7 @@ AssignmentGroupListItemView.prototype.events = {
   'click .move_contents': 'onMoveContents',
   'click .move_group': 'onMoveGroup',
   'click .ag-header-controls .menu_tool_link': 'openExternalTool',
+  'click .add_assignment': 'addItem'
 }
 
 AssignmentGroupListItemView.prototype.messages = shimGetterShorthand(
@@ -127,9 +127,6 @@ AssignmentGroupListItemView.prototype.messages = shimGetterShorthand(
 // we need to make sure that all children view are also children dom
 // elements first.
 AssignmentGroupListItemView.prototype.render = function () {
-  if (this.createAssignmentView) {
-    this.createAssignmentView.remove()
-  }
   if (this.editGroupView) {
     this.editGroupView.remove()
   }
@@ -144,10 +141,6 @@ AssignmentGroupListItemView.prototype.render = function () {
 }
 
 AssignmentGroupListItemView.prototype.afterRender = function () {
-  if (this.createAssignmentView) {
-    this.createAssignmentView.hide()
-    this.createAssignmentView.setTrigger(this.$addAssignmentButton)
-  }
   if (this.editGroupView) {
     this.editGroupView.hide()
     this.editGroupView.setTrigger(this.$editGroupButton)
@@ -221,15 +214,11 @@ AssignmentGroupListItemView.prototype.initializeCollection = function () {
 
 AssignmentGroupListItemView.prototype.initializeChildViews = function () {
   this.editGroupView = false
-  this.createAssignmentView = false
   this.deleteGroupView = false
   if (this.canAdd()) {
     this.editGroupView = new CreateGroupView({
       assignmentGroup: this.model,
       userIsAdmin: this.userIsAdmin,
-    })
-    this.createAssignmentView = new CreateAssignmentView({
-      assignmentGroup: this.model,
     })
   }
   if (this.canDelete()) {
@@ -643,8 +632,25 @@ AssignmentGroupListItemView.prototype.goToPrevItem = function () {
   }
 }
 
+AssignmentGroupListItemView.prototype.renderCreateEditAssignmentModal = function () {
+  const mountPoint = document.getElementById('create-edit-mount-point')
+  const root = createRoot(mountPoint)
+  const onClose = () => {
+    root.unmount()
+
+    // re-render the group view
+    this.render()
+  }
+  root.render(
+    <CreateAssignmentViewAdapter
+      assignmentGroup={this.model}
+      closeHandler={onClose}
+    />
+  )
+}
+
 AssignmentGroupListItemView.prototype.addItem = function () {
-  return $('.add_assignment', '#assignment_group_' + this.model.id).click()
+  this.renderCreateEditAssignmentModal()
 }
 
 AssignmentGroupListItemView.prototype.editItem = function () {

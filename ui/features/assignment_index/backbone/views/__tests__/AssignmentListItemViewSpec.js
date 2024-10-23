@@ -202,7 +202,6 @@ test('initializes child views if can manage', function () {
   ok(view.publishIconView)
   ok(view.dateDueColumnView)
   ok(view.dateAvailableColumnView)
-  ok(view.editAssignmentView)
 })
 
 test("initializes no child views if can't manage", function () {
@@ -459,16 +458,6 @@ test('show not yet graded if submission type but no grade', function () {
     'sets correct non-screenreader text for not yet graded'
   )
   ok(nonScreenreaderText().match('Not Yet Graded')[0])
-})
-
-test('focus returns to cog after dismissing dialog', function () {
-  const view = createView(this.model, {canManage: true})
-  const trigger = view.$(`#assign_${this.model.id}_manage_link`)
-  ok(trigger.length, 'there is an a node with the correct id')
-  trigger.click()
-  view.$(`#assignment_${this.model.id}_settings_edit_item`).click()
-  view.editAssignmentView.close()
-  equal(document.activeElement, trigger.get(0))
 })
 
 test('disallows deleting frozen assignments', function () {
