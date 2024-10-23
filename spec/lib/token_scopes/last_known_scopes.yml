@@ -6,6 +6,8 @@
 - verb: PUT
   path: '/api/sis/courses/:course_id/disable_post_to_sis'
 - verb: GET
+  path: '/api/v1/acceptable_use_policy'
+- verb: GET
   path: '/api/v1/account_calendars'
 - verb: GET
   path: '/api/v1/account_calendars/:account_id'
@@ -2007,8 +2009,6 @@
   path: '/api/v1/support_helpers/turnitin/refresh_lti_attachment'
 - verb: GET
   path: '/api/v1/support_helpers/turnitin/shard'
-- verb: GET
-  path: '/api/v1/terms_of_service_custom_content'
 - verb: DELETE
   path: '/api/v1/users/:id'
 - verb: GET

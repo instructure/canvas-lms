@@ -32,6 +32,7 @@ import '@canvas/loading-image'
 import '@instructure/date-js' // Date.parse
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const I18n = useI18nScope('account_settings')
 
@@ -616,14 +617,27 @@ $(document).ready(function () {
         $('#terms_of_service_modal').show()
         $rce_container.show()
 
-        const url = '/api/v1/terms_of_service_custom_content'
-        const defaultContent = await (await fetch(url)).text()
+        try {
+          const {json, response} = await doFetchApi({
+            path: '/api/v1/acceptable_use_policy',
+          })
 
-        RichContentEditor.loadNewEditor($textarea, {
-          focus: true,
-          manageParent: true,
-          defaultContent,
-        })
+          if (response.ok) {
+            RichContentEditor.loadNewEditor($textarea, {
+              focus: true,
+              manageParent: true,
+              defaultContent: json?.content || '',
+            })
+          } else {
+            // eslint-disable-next-line no-console
+            console.error(
+              `Failed to load Acceptable Use Policy content: Received ${response.status} ${response.statusText}`
+            )
+          }
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error('Failed to load Acceptable Use Policy content:', error)
+        }
       } else {
         $rce_container.hide()
         $('#terms_of_service_modal').hide()

@@ -16,21 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ready from '@instructure/ready'
 import React from 'react'
-import ReactDOM from 'react-dom'
 import TermsOfServiceModal from './react/TermsOfServiceModal'
+import ready from '@instructure/ready'
+import {createRoot} from 'react-dom/client'
+
+const renderTermsModal = (container: Element | null, preview = false) => {
+  if (container instanceof HTMLElement) {
+    const root = createRoot(container)
+    root.render(<TermsOfServiceModal preview={preview} />)
+  }
+}
 
 ready(() => {
-  let container = document.querySelector('#terms_of_service_preview_link')
-  if (container) {
-    ReactDOM.render(<TermsOfServiceModal preview={true} />, container)
-  } else {
-    container = document.querySelectorAll('.terms_of_service_link')
-    if (container.length) {
-      for (let i = 0; i < container.length; i++) {
-        ReactDOM.render(<TermsOfServiceModal />, container[i])
-      }
-    }
-  }
+  renderTermsModal(document.querySelector('#terms_of_service_preview_link'), true)
+  document.querySelectorAll('.terms_of_service_link').forEach(container => {
+    renderTermsModal(container)
+  })
 })
