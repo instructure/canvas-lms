@@ -53,7 +53,7 @@ export default class FindDialog extends DialogBaseView {
         },
       ],
       modal: true,
-      zIndex: 1000,
+      zIndex: this.zIndex ?? 1000,
     }
   }
 
@@ -65,6 +65,7 @@ export default class FindDialog extends DialogBaseView {
     this.title = opts.title
     this.shouldImport = opts.shouldImport !== false
     this.disableGroupImport = opts.disableGroupImport
+    this.zIndex = opts.zIndex ?? 1000
 
     super.initialize(...arguments)
     this.render()

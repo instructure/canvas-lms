@@ -273,6 +273,7 @@ export const RubricForm = ({
         disableGroupImport: true,
         rootOutcomeGroup: new OutcomeGroup(rootOutcomeGroup),
         url: '/outcomes/find_dialog',
+        zIndex: 10000,
       })
       dialog?.show()
       ;(dialog as any).on('import', (outcomeData: any) => {
