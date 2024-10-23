@@ -21,13 +21,38 @@ import {calculateArrowDisableIndex} from '../Carousels/utils'
 describe('calculateArrowDisableIndex', () => {
   it('should return the correct index for a window size of 360 and 2 screenshots', () => {
     const screenshots = ['screenshot1', 'screenshot2']
-    const windowSize = 360
-    expect(calculateArrowDisableIndex(screenshots, windowSize)).toEqual({type: 1})
+    const isDesktop = false
+    const isTablet = false
+    const isMobile = true
+    expect(calculateArrowDisableIndex(screenshots, isDesktop, isTablet, isMobile)).toEqual({
+      type: 1,
+    })
   })
 
   it('should return the correct index for a window size <= 760 but > 360 and 5 screenshots', () => {
     const screenshots = ['screenshot1', 'screenshot2', 'screenshot3', 'screenshots4', 'screenshot5']
-    const windowSize = 760
-    expect(calculateArrowDisableIndex(screenshots, windowSize)).toEqual({type: 3})
+    const isDesktop = false
+    const isTablet = true
+    const isMobile = false
+    expect(calculateArrowDisableIndex(screenshots, isDesktop, isTablet, isMobile)).toEqual({
+      type: 3,
+    })
+  })
+
+  it('should return the correct index for a window size > 1200 and 6 screenshots', () => {
+    const screenshots = [
+      'screenshot1',
+      'screenshot2',
+      'screenshot3',
+      'screenshots4',
+      'screenshot5',
+      'screenshot6',
+    ]
+    const isDesktop = true
+    const isTablet = false
+    const isMobile = false
+    expect(calculateArrowDisableIndex(screenshots, isDesktop, isTablet, isMobile)).toEqual({
+      type: 3,
+    })
   })
 })
