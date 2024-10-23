@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom/client'
 import React from 'react'
 import {
   createBrowserRouter,
@@ -72,14 +72,14 @@ export function loadReactRouter() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const I18n = useI18nScope('main')
   if (mountNode) {
-    ReactDOM.render(
+    const root = ReactDOM.createRoot(mountNode)
+    root.render(
       <QueryProvider>
         <RouterProvider
           router={portalRouter}
           fallbackElement={<Spinner renderTitle={I18n.t('Loading page')} />}
         />
-      </QueryProvider>,
-      mountNode
+      </QueryProvider>
     )
   }
 }

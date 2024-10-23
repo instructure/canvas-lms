@@ -227,6 +227,7 @@ describe "Rubric form page" do
     RubricsForm.rubric_title_input.send_keys("Rubric 4")
     RubricsForm.add_criterion_button.click
     RubricsForm.criterion_name_input.send_keys("Criterion 1")
+    hover(RubricsForm.add_rating_row_button)
     RubricsForm.add_rating_row_button.click
     RubricsForm.rating_name_inputs[0].send_keys("new rating")
     RubricsForm.rating_description_inputs[0].send_keys("new rating description")
@@ -255,6 +256,7 @@ describe "Rubric form page" do
     RubricsForm.rubric_title_input.send_keys("Rubric 4")
     RubricsForm.add_criterion_button.click
     RubricsForm.criterion_name_input.send_keys("Criterion 1")
+    hover(RubricsForm.add_rating_row_button)
     RubricsForm.add_rating_row_button.click
     RubricsForm.save_criterion_button.click
 
