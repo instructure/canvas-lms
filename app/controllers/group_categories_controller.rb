@@ -184,6 +184,12 @@ class GroupCategoriesController < ApplicationController
   # @argument name [Required, String]
   #   Name of the group category
   #
+  # @argument non_collaborative [Boolean]
+  #  Can only be set by users with the Differentiated Tag Add permission
+  #
+  #  If set to true, groups in this category will be only be visible to users with the
+  #  Differentiated Tag Manage permission.
+  #
   # @argument self_signup [String, "enabled"|"restricted"]
   #   Allow students to sign up for a group themselves (Course Only).
   #   valid values are:
@@ -222,6 +228,13 @@ class GroupCategoriesController < ApplicationController
   # @returns GroupCategory
   def create
     if authorized_action(@context, @current_user, [:manage_groups, :manage_groups_add])
+      if (params[:category] && !!params[:category][:non_collaborative] && !@context.feature_enabled?(:differentiation_tags)) || !@context.grants_right?(@current_user, session, :manage_tags_add)
+        unless api_request?
+          flash.now[:notice] = t("notices.create_non_collaborative_group_unauthorized", "You do not have permission to create non_collaborative groups.")
+        end
+        return render json: { message: "You do not have permission to create non_collaborative groups." }, status: :unauthorized
+      end
+
       @group_category = @context.group_categories.build
       if populate_group_category_from_params
         if api_request?

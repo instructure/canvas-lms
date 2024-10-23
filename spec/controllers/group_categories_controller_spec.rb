@@ -159,6 +159,54 @@ describe GroupCategoriesController do
       expect(assigns[:group_category]).not_to be_nil
       expect(assigns[:group_category]).to be_restricted_self_signup
     end
+
+    context "differentiation_tags" do
+      before do
+        Account.default.enable_feature!(:differentiation_tags)
+      end
+
+      it "allows teachers with :manage_tags_add to create non_collaborative groups" do
+        @course.account.role_overrides.create!({
+                                                 role: teacher_role,
+                                                 permission: :manage_tags_add,
+                                                 enabled: true
+                                               })
+        user_session(@teacher)
+
+        post "create", params: { course_id: @course.id, category: { name: "Hidden GC", non_collaborative: true } }
+        expect(response).to be_successful
+        expect(assigns[:group_category]).to be_non_collaborative
+      end
+
+      it "prevents teachers without :manage_tags_add from creating non_collaborative groups" do
+        @course.account.role_overrides.create!({
+                                                 role: teacher_role,
+                                                 permission: :manage_tags_add,
+                                                 enabled: false
+                                               })
+        user_session(@teacher)
+
+        post "create", params: { course_id: @course.id, category: { name: "Hidden GC", non_collaborative: true } }
+
+        expect(response).to be_unauthorized
+        expect(response.body).to include("You do not have permission to create non_collaborative groups.")
+      end
+
+      it "prevents teachers from creating non_collaborative groups if differentiation_tags is disabled" do
+        Account.default.disable_feature!(:differentiation_tags)
+        @course.account.role_overrides.create!({
+                                                 role: teacher_role,
+                                                 permission: :manage_tags_add,
+                                                 enabled: true
+                                               })
+        user_session(@teacher)
+
+        post "create", params: { course_id: @course.id, category: { name: "Hidden GC", non_collaborative: true } }
+
+        expect(response).to be_unauthorized
+        expect(response.body).to include("You do not have permission to create non_collaborative groups.")
+      end
+    end
   end
 
   describe "PUT update" do
