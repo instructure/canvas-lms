@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState, useMemo} from 'react'
-import useWindowWidth from '../useWindowWidth'
+import useBreakpoints from '@canvas/lti-apps/hooks/useBreakpoints'
 import {PreviousArrow, NextArrow} from './Arrows'
 import {settings, calculateArrowDisableIndex} from './utils'
 import Slider from 'react-slick'
@@ -36,26 +36,28 @@ const I18n = useI18nScope('lti_registrations')
 
 type BadgeCarouselProps = {
   badges: Badges[]
+  isMaxMobile: boolean
+  isMaxTablet: boolean
   customSettings?: Partial<Settings>
 }
 
 function BadgeCarousel(props: BadgeCarouselProps) {
-  const {badges} = props
-  const slider = React.useRef<Slider>(null)
-  const windowSize = useWindowWidth()
+  const {badges, isMaxMobile, isMaxTablet} = props
   const updatedSettings = settings(badges)
-  const updatedArrowDisableIndex = calculateArrowDisableIndex(badges, windowSize)
+  const slider = React.useRef<Slider>(null)
+  const {isDesktop, isTablet, isMobile} = useBreakpoints()
+  const updatedArrowDisableIndex = calculateArrowDisableIndex(badges, isDesktop, isTablet, isMobile)
 
   const [currentSlideNumber, setCurrentSlideNumber] = useState(0)
 
   const sliderOffset = useMemo(() => {
-    if (windowSize <= 360) {
+    if (isMaxMobile) {
       return 1
-    } else if (windowSize <= 760) {
+    } else if (isMaxTablet) {
       return 2
     }
     return 3
-  }, [windowSize])
+  }, [isMaxMobile, isMaxTablet])
 
   const renderBadges = () => {
     return badges.map((badge, i) => (
@@ -103,7 +105,7 @@ function BadgeCarousel(props: BadgeCarouselProps) {
         )}
       </Flex>
       <Flex>
-        <Flex.Item>
+        <Flex.Item shouldGrow={true}>
           <Slider
             ref={slider}
             {...updatedSettings}

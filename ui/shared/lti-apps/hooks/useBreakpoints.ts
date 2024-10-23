@@ -16,20 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useLayoutEffect} from 'react'
+import {useMedia} from 'react-use'
+import {breakpoints} from '../breakpoints'
 
-function useWindowWidth() {
-  const [size, setSize] = useState(0)
+export default function useBreakpoints() {
+  const isDesktop = useMedia(`(min-width: ${breakpoints.desktop})`)
+  const isTablet = useMedia(`(min-width: ${breakpoints.tablet})`) && !isDesktop
+  const isMobile = useMedia(`(min-width: ${breakpoints.mobile})`) && !isTablet && !isDesktop
 
-  function updateSize() {
-    setSize(window.innerWidth)
-  }
-  useLayoutEffect(() => {
-    window.addEventListener('resize', updateSize)
-    updateSize()
-    return () => window.removeEventListener('resize', updateSize)
-  }, [])
-  return size
+  const isMaxMobile = useMedia(`(max-width: ${breakpoints.mobile})`)
+  const isMaxTablet = useMedia(`(max-width: ${breakpoints.tablet})`)
+
+  return {isDesktop, isTablet, isMobile, isMaxMobile, isMaxTablet}
 }
-
-export default useWindowWidth
