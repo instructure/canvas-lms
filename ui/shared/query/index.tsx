@@ -149,10 +149,11 @@ export function useInfiniteQuery<
   const ensureFetch = options.meta?.fetchAtLeastOnce || wasPageReloaded
   const hashedKey = hashQueryKey(options.queryKey || [])
   const wasAlreadyFetched = queriesFetched.has(hashedKey)
-  queriesFetched.add(hashQueryKey(options.queryKey || []))
 
   const refetchOnMount =
-    ensureFetch && !wasAlreadyFetched ? 'always' : Boolean(options.meta?.refetchOnMount) ?? false
+    process.env.NODE_ENV !== 'test' && ensureFetch && !wasAlreadyFetched
+      ? 'always'
+      : Boolean(options.meta?.refetchOnMount) ?? false
 
   const mergedOptions: UseInfiniteQueryOptions<
     TQueryFnData,
@@ -164,7 +165,17 @@ export function useInfiniteQuery<
     ...options,
     refetchOnMount,
   }
-  return baseUseInfiniteQuery<TQueryFnData, TError, TData, TQueryKey>(mergedOptions)
+  const queryResult = baseUseInfiniteQuery<TQueryFnData, TError, TData, TQueryKey>(mergedOptions)
+
+  if (
+    queryResult.isFetchedAfterMount &&
+    queryResult.fetchStatus === 'idle' &&
+    queryResult.isSuccess
+  ) {
+    setTimeout(() => queriesFetched.add(hashedKey), 0)
+  }
+
+  return queryResult
 }
 
 export function useAllPages<
