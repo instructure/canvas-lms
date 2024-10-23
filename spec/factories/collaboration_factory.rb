@@ -20,17 +20,17 @@
 
 module Factories
   def collaboration_model(opts = {})
-    @collaboration = factory_with_protected_attributes(Collaboration, valid_collaboration_attributes.merge(opts))
+    @collaboration = Collaboration.create!(valid_collaboration_attributes.merge(opts))
   end
 
   def external_tool_collaboration_model(opts = {})
     opts[:data] ||= nil
     opts[:type] ||= "ExternalToolCollaboration"
-    @collaboration = factory_with_protected_attributes(ExternalToolCollaboration, valid_collaboration_attributes.merge(opts))
+    @collaboration = ExternalToolCollaboration.create!(valid_collaboration_attributes.merge(opts))
   end
 
   def google_docs_collaboration_model(opts = {})
-    @collaboration = factory_with_protected_attributes(GoogleDocsCollaboration, valid_collaboration_attributes.merge(opts))
+    @collaboration = GoogleDocsCollaboration.create!(valid_collaboration_attributes.merge(opts))
   end
 
   def valid_collaboration_attributes

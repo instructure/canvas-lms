@@ -215,6 +215,7 @@ export type GradebookUserSubmissionDetails = {
   redoRequest: boolean
   score: null | number
   state: string
+  sticker: string | null
   submissionType?: string | null
   submittedAt: Date | null
   userId: string

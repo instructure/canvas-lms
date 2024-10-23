@@ -53,6 +53,6 @@ class DiscussionTopic::ScopedToSections < ScopeFilter
     # If a user if observing the full course, they should see all discussions
     return scope if User.observing_full_course(context).where(id: user).any?
 
-    context.is_a?(Course) ? scope.visible_to_ungraded_discussion_student_visibilities(user, context) : scope
+    context.is_a?(Course) ? scope.visible_to_student_sections(user) : scope
   end
 end

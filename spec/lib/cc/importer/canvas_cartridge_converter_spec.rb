@@ -656,8 +656,15 @@ describe "Canvas Cartridge importing" do
   end
 
   it "translates attachment links on import" do
-    attachment = Attachment.create!(filename: "ohai there.txt", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@copy_from), context: @copy_from)
-    attachment_import = factory_with_protected_attributes(Attachment, filename: "ohai there.txt", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@copy_to), context: @copy_to, migration_id: "ohai")
+    attachment = Attachment.create!(filename: "ohai there.txt",
+                                    uploaded_data: StringIO.new("ohai"),
+                                    folder: Folder.unfiled_folder(@copy_from),
+                                    context: @copy_from)
+    attachment_import = Attachment.create!(filename: "ohai there.txt",
+                                           uploaded_data: StringIO.new("ohai"),
+                                           folder: Folder.unfiled_folder(@copy_to),
+                                           context: @copy_to,
+                                           migration_id: "ohai")
     body_with_link = %{<p>Watup? <strong>eh?</strong>
       <a href="/courses/%s/files/%s/preview">Preview File</a>
       <a href="/courses/%s/files/%s/download">Download File</a>

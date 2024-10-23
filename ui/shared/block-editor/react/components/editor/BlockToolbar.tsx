@@ -18,15 +18,22 @@
 
 import React, {useCallback, useEffect, useState} from 'react'
 import {useEditor, useNode, type Node} from '@craftjs/core'
-import {IconArrowUpLine, IconTrashLine, IconDragHandleLine} from '@instructure/ui-icons'
+import {
+  IconArrowOpenStartLine,
+  IconArrowOpenEndLine,
+  IconTrashLine,
+  IconDragHandleLine,
+} from '@instructure/ui-icons'
+import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
-import {View, type ViewProps} from '@instructure/ui-view'
+import {type ViewProps} from '@instructure/ui-view'
 import {findFocusable} from '@instructure/ui-dom-utils'
 import {
   notDeletableIfLastChild,
   mountNode,
   findUpNode,
+  findDownNode,
   getToolbarPos,
   getArrowNext,
   getArrowPrev,
@@ -62,6 +69,7 @@ const BlockToolbar = (_props: BlockToolbarProps) => {
   const [mountPoint] = useState(mountNode())
   const [currentToolbarRef, setCurrentToolbarRef] = useState<HTMLDivElement | null>(null)
   const [upnodeId] = useState<string | undefined>(findUpNode(node, query)?.id)
+  const [downnodeId] = useState<string | undefined>(findDownNode(node, query)?.id)
   const [focusable, setFocusable] = useState<HTMLElement[]>([])
   const [currFocusedIndex, setCurrFocusedIndex] = useState<number>(0)
 
@@ -128,6 +136,17 @@ const BlockToolbar = (_props: BlockToolbarProps) => {
     [actions, query, upnodeId]
   )
 
+  const handleGoDown = useCallback(
+    (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps>) => {
+      e.stopPropagation()
+      actions.selectNode(downnodeId)
+      if (downnodeId) {
+        query.node(downnodeId).get()?.dom?.focus()
+      }
+    },
+    [actions, query, downnodeId]
+  )
+
   const handleDeleteNode = useCallback(
     (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps>) => {
       e.stopPropagation()
@@ -155,55 +174,73 @@ const BlockToolbar = (_props: BlockToolbarProps) => {
       onFocus={handleFocus}
       onKeyDown={focusable.length > 0 ? handleKey : undefined}
     >
-      <View as="div" background="brand" padding="0 xx-small" borderRadius="small">
-        <Text size="small">{name}</Text>
-      </View>
-      {moveable ? (
-        <IconButton
-          cursor="move"
-          size="small"
-          elementRef={el => el && drag(el as HTMLElement)}
-          screenReaderLabel="Drag to move"
-          withBackground={false}
-          withBorder={false}
-        >
-          <IconDragHandleLine size="x-small" />
-        </IconButton>
-      ) : null}
-      {upnodeId && (
-        <IconButton
-          cursor="pointer"
-          size="small"
-          onClick={handleGoUp}
-          screenReaderLabel="Go to parent"
-          withBackground={false}
-          withBorder={false}
-        >
-          <IconArrowUpLine size="x-small" />
-        </IconButton>
-      )}
-      {node.related.toolbar && (
-        <>
-          <div className="toolbar-separator" />
-          {React.createElement(node.related.toolbar)}
-        </>
-      )}
-      {deletable ? (
-        <>
-          <div className="toolbar-separator" />
+      <Flex as="div" padding="0 xx-small" gap="x-small">
+        {upnodeId && (
           <IconButton
             cursor="pointer"
             size="small"
-            onClick={handleDeleteNode}
-            screenReaderLabel="Delete"
+            onClick={handleGoUp}
+            screenReaderLabel="Go up"
             withBackground={false}
             withBorder={false}
-            color="danger"
           >
-            <IconTrashLine size="x-small" />
+            <IconArrowOpenStartLine />
           </IconButton>
-        </>
-      ) : null}
+        )}
+
+        <Text>{name}</Text>
+
+        {downnodeId && (
+          <IconButton
+            cursor="pointer"
+            size="small"
+            onClick={handleGoDown}
+            screenReaderLabel="Go down"
+            withBackground={false}
+            withBorder={false}
+          >
+            <IconArrowOpenEndLine />
+          </IconButton>
+        )}
+
+        {node.related.toolbar && (
+          <>
+            <div className="toolbar-separator" />
+            {React.createElement(node.related.toolbar)}
+          </>
+        )}
+        {moveable ? (
+          <>
+            <div className="toolbar-separator" />
+            <IconButton
+              cursor="move"
+              size="small"
+              elementRef={el => el && drag(el as HTMLElement)}
+              screenReaderLabel="Drag to move"
+              withBackground={false}
+              withBorder={false}
+            >
+              <IconDragHandleLine />
+            </IconButton>
+          </>
+        ) : null}
+        {deletable ? (
+          <>
+            <div className="toolbar-separator" />
+            <IconButton
+              cursor="pointer"
+              size="small"
+              onClick={handleDeleteNode}
+              screenReaderLabel="Delete"
+              withBackground={false}
+              withBorder={false}
+              color="danger"
+            >
+              <IconTrashLine />
+            </IconButton>
+          </>
+        ) : null}
+      </Flex>
     </div>
   )
 }

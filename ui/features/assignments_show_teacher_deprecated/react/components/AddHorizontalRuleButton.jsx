@@ -30,7 +30,7 @@ AddHorizontalRuleButton.propTypes = {
 const addHorizontalRuleButtonStyle = {
   boxSizing: 'border-box',
   position: 'relative',
-  height: theme.variables.forms.inputHeightMedium,
+  height: theme.forms.inputHeightMedium,
   textAlign: 'center',
 }
 const layoutStyle = {
@@ -43,8 +43,8 @@ const layoutStyle = {
 }
 const ruleStyle = {
   display: 'block',
-  height: theme.variables.borders.widthSmall,
-  color: theme.variables.colors.borderMedium,
+  height: theme.borders.widthSmall,
+  color: theme.colors.borderMedium,
   margin: 0,
 }
 

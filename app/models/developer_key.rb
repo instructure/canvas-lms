@@ -27,6 +27,9 @@ class DeveloperKey < ActiveRecord::Base
     end
   end
 
+  CONFIDENTIAL_CLIENT_TYPE = "confidential"
+  PUBLIC_CLIENT_TYPE = "public"
+
   include CustomValidations
   include Workflow
 
@@ -63,6 +66,7 @@ class DeveloperKey < ActiveRecord::Base
   after_update :destroy_external_tools!, if: :destroy_external_tools?
   after_update :update_lti_registration
 
+  validates :client_type, inclusion: { in: [PUBLIC_CLIENT_TYPE, CONFIDENTIAL_CLIENT_TYPE] }
   validates_as_url :redirect_uri, :oidc_initiation_url, :public_jwk_url, allowed_schemes: nil
   validate :validate_redirect_uris
   validate :validate_public_jwk
@@ -109,6 +113,14 @@ class DeveloperKey < ActiveRecord::Base
   def destroy
     self.workflow_state = "deleted"
     save
+  end
+
+  def confidential_client?
+    client_type == CONFIDENTIAL_CLIENT_TYPE
+  end
+
+  def public_client?
+    client_type == PUBLIC_CLIENT_TYPE
   end
 
   def usable?
@@ -373,7 +385,10 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def tokens_expire_in
-    return nil unless mobile_app?
+    return nil unless mobile_app? || public_client?
+
+    # By default, public clients have a two-hour rolling refresh window
+    return Setting.get("public_client_token_ttl", "120").to_f.minutes if public_client?
 
     sessions_settings = Canvas::Plugin.find("sessions").settings || {}
     sessions_settings[:mobile_timeout]&.to_f&.minutes

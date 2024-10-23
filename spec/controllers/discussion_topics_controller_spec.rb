@@ -2077,21 +2077,21 @@ describe DiscussionTopicsController do
 
     it "includes absolute path for rel='self' link" do
       get "public_feed", params: { feed_code: @course.feed_code }, format: "atom"
-      feed = Feedjira.parse(response.body) rescue nil
+      feed = Feedjira.parse(response.body)
       expect(feed).not_to be_nil
       expect(feed.feed_url).to match(%r{http://})
     end
 
     it "does not include entries in an anonymous feed" do
       get "public_feed", params: { feed_code: @course.feed_code }, format: "atom"
-      feed = Feedjira.parse(response.body) rescue nil
+      feed = Feedjira.parse(response.body)
       expect(feed).not_to be_nil
       expect(feed.entries).to be_empty
     end
 
     it "includes an author for each entry with an enrollment feed" do
       get "public_feed", params: { feed_code: @course.teacher_enrollments.first.feed_code }, format: "atom"
-      feed = Feedjira.parse(response.body) rescue nil
+      feed = Feedjira.parse(response.body)
       expect(feed).not_to be_nil
       expect(feed.entries).not_to be_empty
       expect(feed.entries.all? { |e| e.author.present? }).to be_truthy

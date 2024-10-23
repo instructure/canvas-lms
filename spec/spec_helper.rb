@@ -307,7 +307,11 @@ module RenderWithHelpers
   end
 
   def render(*args)
-    controller_class = ("#{@controller.controller_path.camelize}Controller".constantize rescue nil) || ApplicationController
+    controller_class = begin
+      "#{@controller.controller_path.camelize}Controller".constantize
+    rescue NameError
+      ApplicationController
+    end
 
     controller_class.instance_variable_set(:@js_env, nil)
     # this extends the controller's helper methods to the view
@@ -499,7 +503,6 @@ RSpec.configure do |config|
     ActiveRecord::Migration.verbose = false
     RequestStore.clear!
     MultiCache.reset
-    Course.enroll_user_call_count = 0
     TermsOfService.skip_automatic_terms_creation = true
     LiveEvents.clear_context!
     $spec_api_tokens = {}

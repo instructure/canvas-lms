@@ -26,7 +26,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {IconAddLine, IconSearchLine, IconImportLine} from '@instructure/ui-icons'
+import {IconAddLine, IconSearchLine, IconImportLine, IconDownloadLine} from '@instructure/ui-icons'
 import {TextInput} from '@instructure/ui-text-input'
 import {Tabs} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-view'
@@ -40,11 +40,13 @@ import {
   fetchRubricUsedLocations,
   archiveRubric,
   unarchiveRubric,
+  downloadRubrics,
 } from '../../queries/ViewRubricQueries'
 import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {type FetchUsedLocationResponse, UsedLocationsModal} from './UsedLocationsModal'
 import {ImportRubric} from './ImportRubric'
+import {colors} from '@instructure/canvas-theme'
 
 const {Item: FlexItem} = Flex
 
@@ -79,6 +81,20 @@ export const ViewRubrics = ({
   const [rubricIdForLocations, setRubricIdForLocations] = useState<string>()
   const [loadingUsedLocations, setLoadingUsedLocations] = useState(false)
   const [importTrayIsOpen, setImportTrayIsOpen] = useState(false)
+  const [selectedRubricIds, setSelectedRubricIds] = useState<string[]>([])
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, rubricId: string) => {
+    if (event.target.checked) {
+      setSelectedRubricIds([...selectedRubricIds, rubricId])
+    } else {
+      setSelectedRubricIds(selectedRubricIds.filter(id => id !== rubricId))
+    }
+  }
+
+  const handleDownloadRubrics = async () => {
+    await downloadRubrics(courseId, accountId, selectedRubricIds)
+  }
+
   const path = useRef<string | undefined>(undefined)
 
   const handleArchiveRubric = async (rubricId: string) => {
@@ -300,6 +316,9 @@ export const ViewRubrics = ({
         >
           <View as="div" margin="medium 0" data-testid="saved-rubrics-table">
             <RubricTable
+              canImportExportRubrics={canImportExportRubrics}
+              handleCheckboxChange={handleCheckboxChange}
+              selectedRubricIds={selectedRubricIds}
               canManageRubrics={canManageRubrics}
               rubrics={filteredActiveRubrics}
               onLocationsClick={rubricId => handleLocationsClick(rubricId)}
@@ -318,6 +337,9 @@ export const ViewRubrics = ({
         >
           <View as="div" margin="medium 0" data-testid="archived-rubrics-table">
             <RubricTable
+              canImportExportRubrics={canImportExportRubrics}
+              selectedRubricIds={selectedRubricIds}
+              handleCheckboxChange={handleCheckboxChange}
               canManageRubrics={canManageRubrics}
               rubrics={filteredArchivedRubrics}
               onLocationsClick={rubricId => handleLocationsClick(rubricId)}
@@ -328,6 +350,39 @@ export const ViewRubrics = ({
           </View>
         </Tabs.Panel>
       </Tabs>
+
+      {canImportExportRubrics && (
+        <div id="enhanced-rubric-builder-footer" style={{backgroundColor: colors.white}}>
+          <View
+            as="div"
+            margin="small large"
+            themeOverride={{marginLarge: '48px', marginSmall: '12px'}}
+          >
+            <Flex justifyItems="end">
+              <Flex.Item margin="0 medium 0 0">
+                <Button
+                  onClick={() => setSelectedRubricIds([])}
+                  data-testid="cancel-select-mode-button"
+                >
+                  {I18n.t('Cancel')}
+                </Button>
+              </Flex.Item>
+
+              <Flex.Item margin="0 medium 0 0">
+                <Button
+                  color="primary"
+                  renderIcon={IconDownloadLine}
+                  data-testid="download-rubrics"
+                  disabled={selectedRubricIds.length === 0}
+                  onClick={handleDownloadRubrics}
+                >
+                  {I18n.t('Download Selected Rubrics')}
+                </Button>
+              </Flex.Item>
+            </Flex>
+          </View>
+        </div>
+      )}
 
       <RubricAssessmentTray
         isLoading={isLoadingPreview}

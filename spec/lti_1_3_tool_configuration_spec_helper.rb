@@ -29,7 +29,7 @@ RSpec.shared_context "lti_1_3_tool_configuration_spec_helper", shared_context: :
   end
 
   let(:tool_config_public_jwk) { public_jwk }
-
+  let(:extension_privacy_level) { "public" }
   let(:public_jwk) do
     {
       "kty" => "RSA",
@@ -56,7 +56,7 @@ RSpec.shared_context "lti_1_3_tool_configuration_spec_helper", shared_context: :
       "extensions" => [
         {
           "platform" => "canvas.instructure.com",
-          "privacy_level" => "public",
+          "privacy_level" => extension_privacy_level,
           "tool_id" => "LTI 1.3 Test Tool",
           "domain" => "lti13testtool.docker",
           "settings" => {

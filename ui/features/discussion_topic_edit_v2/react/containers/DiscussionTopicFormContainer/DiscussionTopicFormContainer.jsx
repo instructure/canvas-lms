@@ -35,6 +35,7 @@ import {Pill} from '@instructure/ui-pill'
 import {SavingDiscussionTopicOverlay} from '../../components/SavingDiscussionTopicOverlay/SavingDiscussionTopicOverlay'
 import WithBreakpoints from '@canvas/with-breakpoints'
 import {flushSync} from 'react-dom'
+import TopNavPortalWithDefaults from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 
 const I18n = useI18nScope('discussion_create')
 const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
@@ -113,7 +114,6 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
   const handleFormSubmit = (formData, notifyUsers) => {
     const {usageRightsData, ...formDataWithoutUsageRights} = formData
     setUsageRightData(usageRightsData)
-
     if (isEditing) {
       updateDiscussionTopic({variables: {...formDataWithoutUsageRights, notifyUsers}})
     } else {
@@ -223,9 +223,10 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
         setOnFailure(I18n.t('Error updating file usage rights'))
       })
     },
-    onError: () => {
+    onError: err => {
+      const errMsg = (err?.graphQLErrors || []).map(error => error?.message).join(', ')
       setIsSubmitting(false)
-      setOnFailure(I18n.t('Error creating discussion topic'))
+      setOnFailure(errMsg || I18n.t('Error creating discussion topic'))
     },
   })
 
@@ -278,12 +279,30 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
     )
   }
 
+  const handleBreadCrumbSetter = ({getCrumbs, setCrumbs}) => {
+    const discussionOrAnnouncement = isAnnouncement
+      ? I18n.t('Announcements')
+      : I18n.t('Discussions')
+    const oldCrumbs = getCrumbs()
+    const newCrumbs = [
+      ...oldCrumbs,
+      ...[
+        {name: discussionOrAnnouncement, url: oldCrumbs[0].url + '/discussion_topics'},
+        {name: isEditing ? currentDiscussionTopic?.title : I18n.t('Create new') || '', url: ''},
+      ],
+    ]
+    setCrumbs(newCrumbs)
+  }
+
   return (
-    <Flex direction="column">
-      <Flex.Item>{renderHeading()}</Flex.Item>
-      {renderForm()}
-      <SavingDiscussionTopicOverlay open={isSubmitting} />
-    </Flex>
+    <>
+      <TopNavPortalWithDefaults getBreadCrumbSetter={handleBreadCrumbSetter} useTutorial={true} />
+      <Flex direction="column">
+        <Flex.Item>{renderHeading()}</Flex.Item>
+        {renderForm()}
+        <SavingDiscussionTopicOverlay open={isSubmitting} />
+      </Flex>
+    </>
   )
 }
 

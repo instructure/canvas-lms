@@ -51,6 +51,7 @@ jest.mock('@craftjs/core', () => {
         actions: {
           delete: deleteMock,
           addNodeTree: addNodeTreeMock,
+          selectNode: jest.fn(),
         },
         query: {
           node: jest.fn((_nodeid: string) => {
@@ -87,7 +88,7 @@ describe('ColumnsSectionToolbar', () => {
   it('should render', () => {
     const {getByText} = render(<ColumnsSectionToolbar />)
 
-    expect(getByText('Columns')).toBeInTheDocument()
+    expect(getByText('Section Columns')).toBeInTheDocument()
     expect(getByText('Columns 1-4')).toBeInTheDocument()
   })
 

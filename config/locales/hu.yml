@@ -1466,6 +1466,9 @@ hu:
         admins_can_change_passwords: "Adminisztrátorok általi jelszóbeállítások"
         admins_can_view_notifications: "Az adminisztrátorok láthatják az értesítéseket"
         allow_invitation_previews: "Meghívó előnézete"
+        allow_name_pronunciation_edit_for_admins: Admin
+        allow_name_pronunciation_edit_for_students: Hallgató
+        allow_name_pronunciation_edit_for_teachers: Oktató
         allow_sending_scores_in_emails: "A hallgatóknak lehetőségük van az eredményeikről e-mail értesítést kérni"
         author_email_in_notifications: "Mutassa a küldő e-mail címét a felhasználói interakció értesítésekben"
         can_add_pronouns: "Személyes névmások engedélyezése"
@@ -2082,6 +2085,7 @@ hu:
   add_an_attachment_b2e9092f: "Egy melléklet hozzáadása"
   add_an_identity_provider_to_this_account_c2644478: "Identitásszolgáltató hozzáadása ehhez a fiókhoz:"
   add_announcement_165c3b05: "Hirdetmény hozzáadása"
+  add_announcement_e6de0fd: "Hirdetmény hozzáadása"
   add_another_assignment_fc5c908f: "További feladat hozzáadása"
   add_app_baf540f: "Alkalmazás hozzáadása"
   add_as_a_faculty_journal_entry_55a38a30: "Intézményi hírlevél bejegyzésként való hozzáadás"
@@ -13206,6 +13210,7 @@ hu:
   invalid_value_a1b45937: "érvénytelen érték"
   invalid_value_for_name_i_4a7c601a: "Érvénytelen érték ehhez: %{name}: \"%{i}\""
   invalid_verification_code_16c22ba6: "Érvénytelen ellenőrző kód"
+  invalid_verification_code_please_try_again_fcfc0bc: "Helytelen ellenőrzőkód, kérjük, próbálja újra"
   invalid_xml_configuration_9c3f6bcf: "Érvénytelen XML Konfiguráció"
   invalid_xml_syntax: "Érvénytelen xml szintaxis"
   invitation_only_9a253f1d: "Csak meghívóval"
@@ -22497,6 +22502,36 @@ hu:
       user_enrolled: Beiratkozások
       user_has_no_bio: "%{user} még nem adott hozzá életrajzot vagy bemutatkozást."
       ways_to_contact_user: Kapcsolat
+    profile_form: 
+      add_link_field: "Másik link hozzáadása"
+      bio: Életrajz
+      cancel: Mégse
+      is_required: "A mező kitöltése kötelező"
+      links: Linkek
+      links_title: Cím
+      links_url: URL
+      manage_settings: "Regisztrált szolgáltatások kezelése"
+      message_me: "küldjön üzenetet nekem a Canvasban"
+      message_title: Üzenet
+      message_user_canvas: "Üzenet %{user}-nak/nek a Canvasban"
+      name: Név
+      name_pronunciation: "Név kiejtése"
+      name_pronunciation_header: "Név kiejtése"
+      name_pronunciation_header_tip: "A név helyes kiejtésének megerősítéséhez adja meg a fonetikus kiejtést."
+      name_pronunciation_label: "A név kiejtése:"
+      name_pronunciation_label_tip: "A név helyes kiejtésének megerősítéséhez adja meg a fonetikus kiejtést."
+      nothing_in_common: "Nincs benne semmi közös"
+      save_profile: "Profil mentése"
+      service_contact: "kapcsolatba lépés %{user} felhasználóval, ezen keresztül: %{service}"
+      social_instructions: "Ellenőrizze a kapcsolattartási módokat, amelyeket szeretne megjeleníteni mások számára a profiljában."
+      title: Cím
+      user_enrolled: Beiratkozások
+      ways_to_contact_user: Kapcsolat
+    profile_main: 
+      cancel_editing: "Szerkesztés megszakítása"
+      edit_profile: "Profil szerkesztése"
+      links: 
+        user_account_details: "Fiók részletes adatai"
     recent_activity: 
       date_column: Dátum
       edit_group: "Csoport szerkesztése"

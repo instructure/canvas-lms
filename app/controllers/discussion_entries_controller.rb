@@ -24,6 +24,7 @@ class DiscussionEntriesController < ApplicationController
 
   def show
     @entry = @context.discussion_entries.find(params[:id]).tap { |e| e.current_user = @current_user }
+    page_has_instui_topnav
     if @entry.deleted?
       flash[:notice] = t :deleted_entry_notice, "That entry has been deleted"
       redirect_to named_context_url(@context, :context_discussion_topic_url, @entry.discussion_topic_id)

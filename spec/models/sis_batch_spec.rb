@@ -465,11 +465,11 @@ test_1,TC 101,Test Course 101,,term1,deleted
       @previous_batch = @account.sis_batches.create!
       @old_batch = @account.sis_batches.create!
 
-      @c1 = factory_with_protected_attributes(@subacct.courses, name: "delete me", enrollment_term: @term1, sis_batch_id: @previous_batch.id)
+      @c1 = @subacct.courses.create!(name: "delete me", enrollment_term: @term1, sis_batch_id: @previous_batch.id)
       @c1.offer!
-      @c2 = factory_with_protected_attributes(@account.courses, name: "don't delete me", enrollment_term: @term1, sis_source_id: "my_course", root_account: @account)
+      @c2 = @account.courses.create!(name: "don't delete me", enrollment_term: @term1, sis_source_id: "my_course", root_account: @account)
       @c2.offer!
-      @c3 = factory_with_protected_attributes(@account.courses, name: "delete me if terms", enrollment_term: @term2, sis_batch_id: @previous_batch.id)
+      @c3 = @account.courses.create!(name: "delete me if terms", enrollment_term: @term2, sis_batch_id: @previous_batch.id)
       @c3.offer!
 
       # initial import of one course, to test courses that haven't changed at all between imports
@@ -480,17 +480,17 @@ test_1,TC 101,Test Course 101,,term1,deleted
       @c4 = @account.courses.where(course_code: "not-delete").first
 
       # sections are keyed off what term their course is in
-      @s1 = factory_with_protected_attributes(@c1.course_sections, name: "delete me", sis_batch_id: @old_batch.id)
-      @s2 = factory_with_protected_attributes(@c2.course_sections, name: "don't delete me", sis_source_id: "my_section")
-      @s3 = factory_with_protected_attributes(@c3.course_sections, name: "delete me if terms", sis_batch_id: @old_batch.id)
-      @s4 = factory_with_protected_attributes(@c2.course_sections, name: "delete me", sis_batch_id: @old_batch.id) # c2 won't be deleted, but this section should still be
+      @s1 = @c1.course_sections.create!(name: "delete me", sis_batch_id: @old_batch.id)
+      @s2 = @c2.course_sections.create!(name: "don't delete me", sis_source_id: "my_section")
+      @s3 = @c3.course_sections.create!(name: "delete me if terms", sis_batch_id: @old_batch.id)
+      @s4 = @c2.course_sections.create!(name: "delete me", sis_batch_id: @old_batch.id) # c2 won't be deleted, but this section should still be
 
       # enrollments are keyed off what term their course is in
-      @e1 = factory_with_protected_attributes(@c1.enrollments, workflow_state: "active", user: user_factory, sis_batch_id: @old_batch.id, type: "StudentEnrollment")
-      @e2 = factory_with_protected_attributes(@c2.enrollments, workflow_state: "active", user: user_factory, type: "StudentEnrollment")
-      @e3 = factory_with_protected_attributes(@c3.enrollments, workflow_state: "active", user: user_factory, sis_batch_id: @old_batch.id, type: "StudentEnrollment")
-      @e4 = factory_with_protected_attributes(@c2.enrollments, workflow_state: "active", user: user_factory, sis_batch_id: @old_batch.id, type: "StudentEnrollment") # c2 won't be deleted, but this enrollment should still be
-      @e5 = factory_with_protected_attributes(@c2.enrollments, workflow_state: "active", user: user_with_pseudonym, sis_batch_id: @old_batch.id, course_section: @s2, type: "StudentEnrollment") # c2 won't be deleted, and this enrollment sticks around because it's specified in the new csv
+      @e1 = @c1.enrollments.create!(workflow_state: "active", user: user_factory, sis_batch_id: @old_batch.id, type: "StudentEnrollment")
+      @e2 = @c2.enrollments.create!(workflow_state: "active", user: user_factory, type: "StudentEnrollment")
+      @e3 = @c3.enrollments.create!(workflow_state: "active", user: user_factory, sis_batch_id: @old_batch.id, type: "StudentEnrollment")
+      @e4 = @c2.enrollments.create!(workflow_state: "active", user: user_factory, sis_batch_id: @old_batch.id, type: "StudentEnrollment") # c2 won't be deleted, but this enrollment should still be
+      @e5 = @c2.enrollments.create!(workflow_state: "active", user: user_with_pseudonym, sis_batch_id: @old_batch.id, course_section: @s2, type: "StudentEnrollment") # c2 won't be deleted, and this enrollment sticks around because it's specified in the new csv
       @e5.user.pseudonym.update_attribute(:sis_user_id, "my_user")
       @e5.user.pseudonym.update_attribute(:account_id, @account.id)
 
@@ -540,29 +540,25 @@ s2,test_1,section2,active),
       @previous_batch = @account.sis_batches.create!
       @old_batch = @account.sis_batches.create!
 
-      @c1 = factory_with_protected_attributes(@subacct.courses,
-                                              name: "delete me",
-                                              enrollment_term: @term1,
-                                              sis_source_id: "my_first_course",
-                                              sis_batch_id: @previous_batch.id)
+      @c1 = @subacct.courses.create!(name: "delete me",
+                                     enrollment_term: @term1,
+                                     sis_source_id: "my_first_course",
+                                     sis_batch_id: @previous_batch.id)
       @c1.offer!
-      @c2 = factory_with_protected_attributes(@account.courses,
-                                              name: "don't delete me",
-                                              enrollment_term: @term1,
-                                              sis_source_id: "my_course",
-                                              root_account: @account)
+      @c2 = @account.courses.create!(name: "don't delete me",
+                                     enrollment_term: @term1,
+                                     sis_source_id: "my_course",
+                                     root_account: @account)
       @c2.offer!
-      @c3 = factory_with_protected_attributes(@account.courses,
-                                              name: "delete me if terms",
-                                              enrollment_term: @term2,
-                                              sis_source_id: "my_third_course",
-                                              sis_batch_id: @previous_batch.id)
+      @c3 = @account.courses.create!(name: "delete me if terms",
+                                     enrollment_term: @term2,
+                                     sis_source_id: "my_third_course",
+                                     sis_batch_id: @previous_batch.id)
       @c3.offer!
-      @c5 = factory_with_protected_attributes(@account.courses,
-                                              name: "don't delete me cause sis was removed",
-                                              enrollment_term: @term1,
-                                              sis_batch_id: @previous_batch.id,
-                                              sis_source_id: nil)
+      @c5 = @account.courses.create!(name: "don't delete me cause sis was removed",
+                                     enrollment_term: @term1,
+                                     sis_batch_id: @previous_batch.id,
+                                     sis_source_id: nil)
       @c5.offer!
 
       # initial import of one course, to test courses that haven't changed at all between imports
@@ -573,33 +569,28 @@ another_course,not-delete,not deleted not changed,,term1,active)
       @c4 = @account.courses.where(course_code: "not-delete").first
 
       # sections are keyed off what term their course is in
-      @s1 = factory_with_protected_attributes(@c1.course_sections,
-                                              name: "delete me",
-                                              sis_source_id: "s1",
-                                              sis_batch_id: @old_batch.id)
-      @s2 = factory_with_protected_attributes(@c2.course_sections,
-                                              name: "don't delete me",
-                                              sis_source_id: "my_section")
-      @s3 = factory_with_protected_attributes(@c3.course_sections,
-                                              name: "delete me if terms",
-                                              sis_source_id: "s3",
-                                              sis_batch_id: @old_batch.id)
+      @s1 = @c1.course_sections.create!(name: "delete me",
+                                        sis_source_id: "s1",
+                                        sis_batch_id: @old_batch.id)
+      @s2 = @c2.course_sections.create!(name: "don't delete me",
+                                        sis_source_id: "my_section")
+      @s3 = @c3.course_sections.create!(name: "delete me if terms",
+                                        sis_source_id: "s3",
+                                        sis_batch_id: @old_batch.id)
       # c2 won't be deleted, but this section should still be
-      @s4 = factory_with_protected_attributes(@c2.course_sections,
-                                              name: "delete me",
-                                              sis_source_id: "s4",
-                                              sis_batch_id: @old_batch.id)
-      @sn = factory_with_protected_attributes(@c2.course_sections,
-                                              name: "don't delete me, I've lost my sis",
-                                              sis_source_id: nil,
-                                              sis_batch_id: @old_batch.id)
+      @s4 = @c2.course_sections.create!(name: "delete me",
+                                        sis_source_id: "s4",
+                                        sis_batch_id: @old_batch.id)
+      @sn = @c2.course_sections.create!(name: "don't delete me, I've lost my sis",
+                                        sis_source_id: nil,
+                                        sis_batch_id: @old_batch.id)
 
       # enrollments are keyed off what term their course is in
-      @e1 = factory_with_protected_attributes(@c1.enrollments, workflow_state: "active", user: user_factory, sis_batch_id: @old_batch.id, type: "StudentEnrollment")
-      @e2 = factory_with_protected_attributes(@c2.enrollments, workflow_state: "active", user: user_factory, type: "StudentEnrollment")
-      @e3 = factory_with_protected_attributes(@c3.enrollments, workflow_state: "active", user: user_factory, sis_batch_id: @old_batch.id, type: "StudentEnrollment")
-      @e4 = factory_with_protected_attributes(@c2.enrollments, workflow_state: "active", user: user_factory, sis_batch_id: @old_batch.id, type: "StudentEnrollment") # c2 won't be deleted, but this enrollment should still be
-      @e5 = factory_with_protected_attributes(@c2.enrollments, workflow_state: "active", user: user_with_pseudonym, sis_batch_id: @old_batch.id, course_section: @s2, type: "StudentEnrollment") # c2 won't be deleted, and this enrollment sticks around because it's specified in the new csv
+      @e1 = @c1.enrollments.create!(workflow_state: "active", user: user_factory, sis_batch_id: @old_batch.id, type: "StudentEnrollment")
+      @e2 = @c2.enrollments.create!(workflow_state: "active", user: user_factory, type: "StudentEnrollment")
+      @e3 = @c3.enrollments.create!(workflow_state: "active", user: user_factory, sis_batch_id: @old_batch.id, type: "StudentEnrollment")
+      @e4 = @c2.enrollments.create!(workflow_state: "active", user: user_factory, sis_batch_id: @old_batch.id, type: "StudentEnrollment") # c2 won't be deleted, but this enrollment should still be
+      @e5 = @c2.enrollments.create!(workflow_state: "active", user: user_with_pseudonym, sis_batch_id: @old_batch.id, course_section: @s2, type: "StudentEnrollment") # c2 won't be deleted, and this enrollment sticks around because it's specified in the new csv
       @e5.user.pseudonym.update_attribute(:sis_user_id, "my_user")
       @e5.user.pseudonym.update_attribute(:account_id, @account.id)
 
@@ -652,7 +643,7 @@ s2,test_1,section2,active),
       @term2 = @account.enrollment_terms.create!(name: "term2")
       @previous_batch = @account.sis_batches.create!
 
-      @c1 = factory_with_protected_attributes(@account.courses, name: "delete me", enrollment_term: @term1, sis_batch_id: @previous_batch.id)
+      @c1 = @account.courses.create!(name: "delete me", enrollment_term: @term1, sis_batch_id: @previous_batch.id)
       @c1.offer!
 
       @batch = process_csv_data([
@@ -1318,25 +1309,22 @@ U001,,AccountAdmin,active
         @term1.update_attribute(:sis_source_id, "term1")
         @old_batch = @account.sis_batches.create!
 
-        @c1 = factory_with_protected_attributes(@account.courses,
-                                                name: "delete me maybe",
-                                                enrollment_term: @term1,
-                                                sis_source_id: "test_1",
-                                                sis_batch_id: @old_batch.id)
+        @c1 = @account.courses.create!(name: "delete me maybe",
+                                       enrollment_term: @term1,
+                                       sis_source_id: "test_1",
+                                       sis_batch_id: @old_batch.id)
 
         # enrollments are keyed off what term their course is in
         u1 = user_with_managed_pseudonym({ account: @account, sis_user_id: "u1", active_all: true })
         u2 = user_with_managed_pseudonym({ account: @account, sis_user_id: "u2", active_all: true })
-        @e1 = factory_with_protected_attributes(@c1.enrollments,
-                                                workflow_state: "active",
-                                                user: u1,
-                                                sis_batch_id: @old_batch.id,
-                                                type: "StudentEnrollment")
-        @e2 = factory_with_protected_attributes(@c1.enrollments,
-                                                workflow_state: "active",
-                                                user: u2,
-                                                sis_batch_id: @old_batch.id,
-                                                type: "StudentEnrollment")
+        @e1 = @c1.enrollments.create!(workflow_state: "active",
+                                      user: u1,
+                                      sis_batch_id: @old_batch.id,
+                                      type: "StudentEnrollment")
+        @e2 = @c1.enrollments.create!(workflow_state: "active",
+                                      user: u2,
+                                      sis_batch_id: @old_batch.id,
+                                      type: "StudentEnrollment")
       end
 
       it "does not delete batch mode above threshold" do
@@ -1416,11 +1404,10 @@ test_1,u1,student,active)
           @term2 = @account.enrollment_terms.first
           @term2.update_attribute(:sis_source_id, "term2")
 
-          @c2 = factory_with_protected_attributes(@account.courses,
-                                                  name: "delete me",
-                                                  enrollment_term: @term2,
-                                                  sis_source_id: "test_2",
-                                                  sis_batch_id: @old_batch.id)
+          @c2 = @account.courses.create!(name: "delete me",
+                                         enrollment_term: @term2,
+                                         sis_source_id: "test_2",
+                                         sis_batch_id: @old_batch.id)
         end
 
         it "uses multi_term_batch_mode" do

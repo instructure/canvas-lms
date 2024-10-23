@@ -91,7 +91,7 @@ type SubmissionAttemptProps = {
 function SubmissionAttemptComments({comments}: SubmissionAttemptProps) {
   if (!comments) return null
 
-  const {borders, colors, spacing} = canvas.variables
+  const {borders, colors, spacing} = canvas
 
   return (
     <>

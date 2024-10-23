@@ -21,10 +21,11 @@ import ReactDOM from 'react-dom'
 import BlockEditor from './BlockEditor'
 
 import BlockEditorView from './BlockEditorView'
+import {type BlockEditorDataTypes} from './utils/transformations'
 
-function renderBlockEditorView(content: string, container: HTMLElement) {
+function renderBlockEditorView(content: BlockEditorDataTypes, container: HTMLElement) {
   ReactDOM.render(<BlockEditorView content={content} />, container)
 }
 
-export {BlockEditor, BlockEditorView, renderBlockEditorView}
+export {BlockEditor, BlockEditorView, renderBlockEditorView, type BlockEditorDataTypes}
 export default BlockEditor

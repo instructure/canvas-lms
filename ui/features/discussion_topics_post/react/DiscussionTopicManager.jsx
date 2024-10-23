@@ -31,6 +31,7 @@ import {
   AllThreadsState,
   REPLY_TO_TOPIC,
   REPLY_TO_ENTRY,
+  isSpeedGraderInTopUrl,
 } from './utils/constants'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
@@ -87,9 +88,8 @@ const DiscussionTopicManager = props => {
     perPage: ENV.per_page,
   }
   const [userSplitScreenPreference, setUserSplitScreenPreference] = useState(
-    ENV.DISCUSSION?.preferences?.discussions_splitscreen_view || false
+    (!isSpeedGraderInTopUrl && ENV.DISCUSSION?.preferences?.discussions_splitscreen_view) || false
   )
-
   const goToTopic = () => {
     setSearchTerm('')
     closeView()
@@ -104,7 +104,8 @@ const DiscussionTopicManager = props => {
 
   // split screen view
   const [isSplitScreenViewOpen, setSplitScreenViewOpen] = useState(
-    ENV.DISCUSSION?.preferences?.discussions_splitscreen_view &&
+    !isSpeedGraderInTopUrl &&
+      ENV.DISCUSSION?.preferences?.discussions_splitscreen_view &&
       !!(ENV.discussions_deep_link?.parent_id
         ? ENV.discussions_deep_link?.parent_id
         : ENV.discussions_deep_link?.entry_id)
@@ -185,7 +186,7 @@ const DiscussionTopicManager = props => {
         setIsTopicHighlighted(false)
       }, HIGHLIGHT_TIMEOUT)
     }
-  }, [isTopicHighlighted])
+  }, [isPersistEnabled, isTopicHighlighted])
 
   /**
    * Opens a split-screen view for a discussion entry.
@@ -245,7 +246,7 @@ const DiscussionTopicManager = props => {
         setHighlightEntryId(null)
       }, HIGHLIGHT_TIMEOUT)
     }
-  }, [highlightEntryId, discussionTopicQuery.loading])
+  }, [highlightEntryId, discussionTopicQuery.loading, isPersistEnabled])
 
   useSpeedGrader({
     highlightEntryId,
@@ -397,15 +398,15 @@ const DiscussionTopicManager = props => {
                 <DrawerLayout.Content
                   label="Splitscreen View Content"
                   themeOverride={{
-                    overflowY: 'unset'
+                    overflowY: 'unset',
                   }}
                 >
                   <View
                     display="block"
                     height={isModuleItem ? '85vh' : '90vh'}
                     padding={responsiveProps.padding}
-                    overflowX='auto'
-                    overflowY='auto'
+                    overflowX="auto"
+                    overflowY="auto"
                   >
                     <DiscussionTopicHeaderContainer
                       discussionTopicTitle={discussionTopicQuery.data.legacyNode.title}
@@ -471,6 +472,7 @@ const DiscussionTopicManager = props => {
                           setHighlightEntryId={setHighlightEntryId}
                           isSearchResults={!!searchTerm}
                           userSplitScreenPreference={userSplitScreenPreference}
+                          refetchDiscussionEntries={discussionTopicQuery.refetch}
                         />
                       )
                     )}

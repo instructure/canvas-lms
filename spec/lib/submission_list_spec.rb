@@ -332,8 +332,8 @@ def interesting_submission_data(opts = {})
 
   @grader = user_model({ name: "some_grader" }.merge(opts[:grader]))
   @grader2 = user_model({ name: "another_grader" }.merge(opts[:grader]))
-  @student = factory_with_protected_attributes(User, { name: "studeñt", workflow_state: "registered" }.merge(opts[:user]))
-  @course = factory_with_protected_attributes(Course, { name: "some course", workflow_state: "available" }.merge(opts[:course]))
+  @student = User.create!({ name: "studeñt", workflow_state: "registered" }.merge(opts[:user]))
+  @course = Course.create!({ name: "some course", workflow_state: "available" }.merge(opts[:course]))
   [@grader, @grader2].each do |grader|
     e = @course.enroll_teacher(grader)
     e.accept

@@ -121,7 +121,7 @@ const ImageBlockToolbar = () => {
         onClick={handleShowUploadModal}
         data-testid="upload-image-button"
       >
-        <IconUploadLine size="x-small" />
+        <IconUploadLine />
       </IconButton>
       <Menu
         label={I18n.t('Constraint')}

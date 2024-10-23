@@ -113,6 +113,8 @@ module Importers
         item.send(:"#{attr}=", options[attr])
       end
 
+      item.reply_to_entry_required_count = options[:reply_to_entry_required_count] || 0
+
       type = item.is_a?(Announcement) ? :announcement : :discussion_topic
       item.locked = options[:locked] if !options[:locked].nil? && type == :announcement
       item.message = if options.message
@@ -184,6 +186,10 @@ module Importers
       return nil unless context.respond_to?(:assignments)
 
       if options[:assignment]
+        assignment_hash = options[:assignment]
+        assignment_hash[:sub_assignments]&.each do |sub_assignment|
+          sub_assignment[:description] = item.message
+        end
         Importers::AssignmentImporter.import_from_migration(options[:assignment], context, migration)
       elsif options[:grading]
         Importers::AssignmentImporter.import_from_migration({

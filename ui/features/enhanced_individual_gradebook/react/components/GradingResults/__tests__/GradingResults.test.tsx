@@ -37,32 +37,26 @@ import type {
   GradebookUserSubmissionDetails,
 } from 'features/enhanced_individual_gradebook/types'
 import type {GradingType} from '../../../../../../api'
+import {setupCanvasQueries} from '../../__tests__/fixtures'
+import {QueryProvider} from '@canvas/query'
 
 jest.mock('@canvas/do-fetch-api-effect/apiRequest', () => ({
   executeApiRequest: jest.fn(),
 }))
 
-const defaultMocks = (result = {data: {}}) => [
-  {
-    request: {
-      query: GRADEBOOK_SUBMISSION_COMMENTS,
-      variables: {},
-    },
-    result,
-  },
-]
-
 const renderGradingResults = (props: GradingResultsComponentProps) => {
   return render(
-    <MockedProvider mocks={defaultMocks()}>
+    <QueryProvider>
       <GradingResults {...props} />
-    </MockedProvider>
+    </QueryProvider>
   )
 }
 
 describe('Grading Results Tests', () => {
   beforeEach(() => {
     $.subscribe = jest.fn()
+
+    setupCanvasQueries()
   })
   describe('status pills', () => {
     it('renders late pill', () => {

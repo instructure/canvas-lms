@@ -20,6 +20,7 @@ import React from 'react'
 import {
   useMutation as baseUseMutation,
   useQuery as baseUseQuery,
+  useInfiniteQuery as baseUseInfiniteQuery,
   hashQueryKey,
   QueryClient,
 } from '@tanstack/react-query'
@@ -28,6 +29,7 @@ import type {
   QueryKey,
   QueryFunction,
   UseMutationOptions,
+  UseInfiniteQueryOptions,
 } from '@tanstack/react-query'
 import {PersistQueryClientProvider} from '@tanstack/react-query-persist-client'
 import {createSyncStoragePersister} from '@tanstack/query-sync-storage-persister'
@@ -57,7 +59,21 @@ export const persister = createSyncStoragePersister({
 
 export function QueryProvider({children}: {children: React.ReactNode}) {
   return (
-    <PersistQueryClientProvider client={queryClient} persistOptions={{persister}}>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{
+        persister,
+        dehydrateOptions: {
+          shouldDehydrateQuery: query => {
+            // don't persist cache on infinite queries
+            if (query.options?.getNextPageParam) {
+              return false
+            }
+            return query.state.status === 'success'
+          },
+        },
+      }}
+    >
       {children}
     </PersistQueryClientProvider>
   )
@@ -123,6 +139,39 @@ export function useQuery<
     channel: broadcastChannel,
     enabled: options.broadcast,
   })
+
+  return queryResult
+}
+
+interface CustomUseInfiniteQueryOptions<
+  TQueryFnData = unknown,
+  TError = unknown,
+  TData = TQueryFnData,
+  TQueryKey extends QueryKey = QueryKey
+> extends UseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryFnData, TQueryKey> {
+  fetchAtLeastOnce?: boolean
+  broadcast?: boolean
+}
+
+export function useInfiniteQuery<
+  TQueryFnData = unknown,
+  TError = unknown,
+  TData = TQueryFnData,
+  TQueryKey extends QueryKey = QueryKey
+>(options: CustomUseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey>) {
+  const ensureFetch = options.fetchAtLeastOnce || wasPageReloaded
+  const hashedKey = hashQueryKey(options.queryKey || [])
+  const wasAlreadyFetched = queriesFetched.has(hashedKey)
+  queriesFetched.add(hashQueryKey(options.queryKey || []))
+
+  const refetchOnMount =
+    ensureFetch && !wasAlreadyFetched ? 'always' : options.refetchOnMount ?? false
+
+  const mergedOptions: CustomUseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey> = {
+    ...options,
+    refetchOnMount,
+  }
+  const queryResult = baseUseInfiniteQuery<TQueryFnData, TError, TData, TQueryKey>(mergedOptions)
 
   return queryResult
 }

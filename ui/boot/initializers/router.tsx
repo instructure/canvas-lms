@@ -27,6 +27,7 @@ import {
 import {Spinner} from '@instructure/ui-spinner'
 import accountGradingSettingsRoutes from '../../features/account_grading_settings/routes/accountGradingSettingsRoutes'
 import {RubricRoutes} from '../../features/rubrics/routes/rubricRoutes'
+import {NewLoginRoutes} from '../../features/new_login/routes/NewLoginRoutes'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {QueryProvider} from '@canvas/query'
 
@@ -56,6 +57,8 @@ const portalRouter = createBrowserRouter(
             lazy={() => import('../../features/navigation_header/react/NavigationHeaderRoute')}
           />
         ))}
+
+      {window.ENV.FEATURES.login_registration_ui_identity && NewLoginRoutes}
 
       {window.ENV.enhanced_rubrics_enabled && RubricRoutes}
 

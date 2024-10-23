@@ -1224,6 +1224,9 @@ uk:
         admins_can_change_passwords: "Налаштування паролю адміністраторами"
         admins_can_view_notifications: "Адміністратори можуть бачити повідомлення"
         allow_invitation_previews: "Попередній перегляд запрошення"
+        allow_name_pronunciation_edit_for_admins: Адміністратор
+        allow_name_pronunciation_edit_for_students: Студент
+        allow_name_pronunciation_edit_for_teachers: Викладач
         allow_sending_scores_in_emails: "Студенти можуть відмовитися від отримання оцінок в поштових повідомленнях"
         author_email_in_notifications: "Показати адресу електронної пошти відправника для повідомлень взаємодії з користувачем"
         canvadocs_prefer_office_online: "Надати перевагу переглядачу файлів Office 365"
@@ -1777,6 +1780,7 @@ uk:
   add_an_attachment_b2e9092f: "Додати вкладення"
   add_an_identity_provider_to_this_account_c2644478: "Додати провайдера ідентифікації до цього облікового запису:"
   add_announcement_165c3b05: "Додати оголошення"
+  add_announcement_e6de0fd: "Додати оголошення"
   add_another_assignment_fc5c908f: "Додати інше завдання"
   add_app_baf540f: "Додати застосунок"
   add_as_a_faculty_journal_entry_55a38a30: "Додати як запис до Факультетського журналу"
@@ -9054,6 +9058,7 @@ uk:
   invalid_url_in_xml: "Невірний url в xml. Амперсанди повинні були видалені."
   invalid_username_or_password_b60aa240: "Невірний логін або пароль."
   invalid_utf_8_13c76a6: "Невірний UTF-8"
+  invalid_verification_code_please_try_again_fcfc0bc: "Невірний код верифікації, будь ласка, спробуйте ще раз"
   invalid_xml_configuration_9c3f6bcf: "Невірна конфігурація XML"
   invalid_xml_syntax: "Невірний сінтаксис xml"
   invite_5b1fcbcd: Запросити
@@ -16113,6 +16118,31 @@ uk:
       user_enrolled: Реєстрації
       user_has_no_bio: "%{user} не додав біографію"
       ways_to_contact_user: Зв'язатися
+    profile_form: 
+      add_link_field: "Додати інше посилання "
+      bio: "Біографія "
+      cancel: Скачувати
+      is_required: "Це поле є обов'язковим."
+      links: Посилання
+      links_title: Назва
+      links_url: URL
+      manage_settings: "Управління зареєстрованими сервісами"
+      message_me: "написати мені в Canvas"
+      message_title: Повідомлення
+      message_user_canvas: "Повідомлення %{user} у Canvas"
+      name: ім'я
+      nothing_in_common: "У вас немає нічого спільного"
+      save_profile: "Зберегти Профіль"
+      service_contact: "зв'язатися %{user} з %{service}"
+      social_instructions: "Перевірте контактні методи в своєму профілі, які будуть доступні іншим."
+      title: Назва
+      user_enrolled: Реєстрації
+      ways_to_contact_user: Зв'язатися
+    profile_main: 
+      cancel_editing: "Скасувати редагування"
+      edit_profile: "Редагувати профіль"
+      links: 
+        user_account_details: "Деталі облікового запису"
     recent_activity: 
       date_column: Дата
       edit_group: "Редагувати групу"

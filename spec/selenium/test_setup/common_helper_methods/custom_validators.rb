@@ -120,7 +120,11 @@ module CustomValidators
     wait_for(method: :wait_for_new_page_load) do
       raise if !accept_alert && alert_present?
 
-      driver.switch_to.alert.accept rescue Selenium::WebDriver::Error::NoSuchAlertError
+      begin
+        driver.switch_to.alert.accept
+      rescue Selenium::WebDriver::Error::NoSuchAlertError
+        # ignore
+      end
       driver.execute_script("return window.INST && INST.still_on_old_page !== true;")
     end or return false
     wait_for_initializers

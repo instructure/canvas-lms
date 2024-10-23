@@ -22,8 +22,8 @@ require "shellwords"
 
 module Qti
   PYTHON_MIGRATION_EXECUTABLE = "migrate.py"
-  EXPECTED_LOCATION = Rails.root.join("vendor/QTIMigrationTool", PYTHON_MIGRATION_EXECUTABLE).to_s rescue nil
-  EXPECTED_LOCATION_ALT = Rails.root.join("vendor/qti_migration_tool", PYTHON_MIGRATION_EXECUTABLE).to_s rescue nil
+  EXPECTED_LOCATION = Rails.root.join("vendor/QTIMigrationTool", PYTHON_MIGRATION_EXECUTABLE).to_s
+  EXPECTED_LOCATION_ALT = Rails.root.join("vendor/qti_migration_tool", PYTHON_MIGRATION_EXECUTABLE).to_s
   @migration_executable = nil
 
   if File.exist?(EXPECTED_LOCATION)

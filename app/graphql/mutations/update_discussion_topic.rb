@@ -21,6 +21,7 @@
 class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
   include Api
   include Api::V1::AssignmentOverride
+  include DiscussionTopicsHelper
 
   graphql_name "UpdateDiscussionTopic"
 
@@ -51,14 +52,6 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
       discussion_topic.anonymous_state = (input[:anonymous_state] == "off") ? nil : input[:anonymous_state]
     end
 
-    unless input[:published].nil?
-      input[:published] ? discussion_topic.publish! : discussion_topic.unpublish!
-    end
-
-    unless input[:locked].nil?
-      input[:locked] ? discussion_topic.lock! : discussion_topic.unlock!
-    end
-
     if (!input.key?(:ungraded_discussion_overrides) && !Account.site_admin.feature_enabled?(:selective_release_ui_api)) || discussion_topic.is_announcement
       # TODO: deprecate discussion_topic_section_visibilities for assignment_overrides LX-1498
       set_sections(input[:specific_sections], discussion_topic)
@@ -67,6 +60,14 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
       unless invalid_sections.empty?
         return validation_error(I18n.t("You do not have permissions to modify discussion for section(s) %{section_ids}", section_ids: invalid_sections.join(", ")))
       end
+    end
+
+    unless input[:published].nil?
+      input[:published] ? discussion_topic.publish! : discussion_topic.unpublish!
+    end
+
+    unless input[:locked].nil?
+      input[:locked] ? discussion_topic.lock! : discussion_topic.unlock!
     end
 
     if !input[:remove_attachment].nil? && input[:remove_attachment]
@@ -85,6 +86,12 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
     process_common_inputs(input, discussion_topic.is_announcement, discussion_topic)
     process_future_date_inputs(input.slice(:delayed_post_at, :lock_at), discussion_topic)
 
+    # If discussion topic has checkpoints, the sum of possible points cannot exceed the max for the assignment
+    if input[:checkpoints].present?
+      err_message = validate_possible_points_with_checkpoints(input)
+      return validation_error(err_message) unless err_message.nil?
+    end
+
     # Take care of Assignment update information
     if input[:assignment]
       assignment_id = discussion_topic&.assignment&.id || discussion_topic.old_assignment_id
@@ -102,6 +109,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
           assignment_mutation = Mutations::UpdateAssignment.new(object: nil, context:, field: nil)
           assignment_result = assignment_mutation.resolve(input: updated_assignment_args)
           discussion_topic.lock_at = input[:assignment][:lock_at] if input[:assignment][:lock_at]
+          discussion_topic.unlock_at = input[:assignment][:unlock_at] if input[:assignment][:unlock_at]
 
           if assignment_result[:errors]
             return { errors: assignment_result[:errors] }
@@ -128,6 +136,8 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
         end
 
         discussion_topic.assignment = assignment_create_result[:assignment]
+        discussion_topic.lock_at = input[:assignment][:lock_at] if input[:assignment][:lock_at]
+        discussion_topic.unlock_at = input[:assignment][:unlock_at] if input[:assignment][:unlock_at]
       end
 
       # Assignment must be present to set checkpoints

@@ -47,6 +47,7 @@ describe Importers::DiscussionTopicImporter do
       expect(topic.title).to eq data[:title]
       parsed_description = Nokogiri::HTML5.fragment(data[:description]).to_s
       expect(topic.message.index(parsed_description)).not_to be_nil
+      expect(topic.reply_to_entry_required_count).to eq(0)
 
       if data[:grading]
         expect(context.assignments.count).to eq 1
@@ -94,5 +95,61 @@ describe Importers::DiscussionTopicImporter do
 
     topic = DiscussionTopic.where(migration_id: data[:migration_id]).first
     expect(topic.attachment).to be_nil
+  end
+
+  describe "assignments" do
+    subject do
+      Importers::DiscussionTopicImporter.import_from_migration(data, context, migration)
+      DiscussionTopic.where(migration_id: data[:migration_id]).first
+    end
+
+    let(:data) { get_import_data("", "discussion_assignments")[:discussion_topics].first }
+    let(:context) { get_import_context }
+    let(:migration) { context.content_migrations.create! }
+
+    it "saves reply_to_entry_required_count" do
+      expect(subject.reply_to_entry_required_count).to eq(2)
+    end
+
+    it "saves assignment description" do
+      expect(subject.assignment.description).to eq(data[:description])
+    end
+
+    context "when discussion_checkpoints feature is enabled" do
+      before do
+        context.root_account.enable_feature!(:discussion_checkpoints)
+      end
+
+      it "saves the sub assignments" do
+        expect(subject.sub_assignments.count).to eq(2)
+      end
+
+      it "saves topic message to the sub assignments" do
+        topic = subject
+        topic.sub_assignments.each do |sub_assignment|
+          expect(sub_assignment.description).to eq(topic.message)
+        end
+      end
+
+      context "when sub_assignments are not present" do
+        before { data[:assignment].delete(:sub_assignments) }
+
+        it "imports assignment" do
+          expect(subject.assignment).to be_present
+        end
+
+        it "does not create sub assignments" do
+          expect(subject.sub_assignments).to be_empty
+        end
+      end
+    end
+
+    context "when reply_to_entry_required_count is not present" do
+      before { data.delete(:reply_to_entry_required_count) }
+
+      it "defaults to 0" do
+        expect(subject.reply_to_entry_required_count).to eq(0)
+      end
+    end
   end
 end

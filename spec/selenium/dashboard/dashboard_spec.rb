@@ -44,11 +44,9 @@ describe "dashboard" do
     end
 
     def create_announcement
-      factory_with_protected_attributes(Announcement, {
-                                          context: @course,
-                                          title: "hey all read this k",
-                                          message: "announcement"
-                                        })
+      Announcement.create!(context: @course,
+                           title: "hey all read this k",
+                           message: "announcement")
     end
 
     it "does not show announcement stream items without permissions" do

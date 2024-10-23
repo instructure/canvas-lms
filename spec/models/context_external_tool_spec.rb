@@ -3374,14 +3374,14 @@ describe ContextExternalTool do
       let(:admin) { account_admin_user(account: c.root_account) }
       let(:c) { course_factory(active_course: true) }
       let(:student) do
-        student = factory_with_protected_attributes(User, valid_user_attributes)
+        student = User.create!(valid_user_attributes)
         e = c.enroll_student(student)
         e.invite
         e.accept
         student
       end
       let(:teacher) do
-        teacher = factory_with_protected_attributes(User, valid_user_attributes)
+        teacher = User.create!(valid_user_attributes)
         e = c.enroll_teacher(teacher)
         e.invite
         e.accept
@@ -3585,14 +3585,7 @@ describe ContextExternalTool do
   describe "#default_icon_path" do
     it "references the lti_tool_default_icon_path, tool name, and tool developer key id" do
       tool = external_tool_1_3_model(opts: { name: "foo" })
-      expect(tool.developer_key.global_id).to be_a(Integer)
-      expect(tool.default_icon_path).to eq("/lti/tool_default_icon?id=#{tool.developer_key.global_id}&name=foo")
-    end
-
-    it "uses tool ID if there is no developer key id" do
-      tool = external_tool_model(opts: { name: "foo" })
-      expect(tool.global_id).to be_a(Integer)
-      expect(tool.default_icon_path).to eq("/lti/tool_default_icon?id=#{tool.global_id}&name=foo")
+      expect(tool.default_icon_path).to eq("/lti/tool_default_icon?name=foo")
     end
   end
 
@@ -4404,6 +4397,24 @@ describe ContextExternalTool do
         subject.save
         run_jobs
         expect(LearnPlatform::GlobalApi).not_to have_received(:get_unified_tool_id)
+      end
+    end
+
+    context "unified_tool_id backfill job" do
+      let(:tool) { external_tool_model }
+
+      it "can save last_udapted" do
+        now = Time.now
+        tool.unified_tool_id_last_updated_at = now
+        expect(tool.save).to be true
+        expect(tool.reload.unified_tool_id_last_updated_at).to eq(now)
+      end
+
+      it "can save needs_update" do
+        expect(tool.unified_tool_id_needs_update).to be false
+        tool.unified_tool_id_needs_update = true
+        expect(tool.save).to be true
+        expect(tool.reload.unified_tool_id_needs_update).to be true
       end
     end
   end

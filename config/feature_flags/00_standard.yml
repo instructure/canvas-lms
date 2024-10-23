@@ -396,3 +396,8 @@ site_admin_service_auth:
   description: When enabled, site admin account UI will allow associating
     a service User with a DeveloperKey and using that key/user with the
     client_credentials grant type
+pkce:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: PKCE in OAuth2 Authorization Code Flow
+  description: Enable PKCE in OAuth2 Authorization Code Flow

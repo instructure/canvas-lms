@@ -678,7 +678,7 @@ class ContentMigration < ActiveRecord::Base
   alias_method :import_content_without_send_later, :import_content
 
   def import!(data)
-    return import_quizzes_next!(data) if cc_qti_migration? || quizzes_next_migration?
+    return import_quizzes_next!(data) if quizzes_next_import_process?
 
     Importers.content_importer_for(context_type)
              .import_content(
@@ -687,6 +687,10 @@ class ContentMigration < ActiveRecord::Base
                migration_settings[:migration_ids_to_import],
                self
              )
+  end
+
+  def quizzes_next_import_process?
+    cc_qti_migration? || quizzes_next_migration?
   end
 
   def cc_qti_migration?

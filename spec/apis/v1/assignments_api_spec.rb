@@ -76,6 +76,107 @@ describe AssignmentsApiController, type: :request do
     override
   end
 
+  describe "GET courses/:course_id/assignments/:assignment_id/users/:user_id/group_members" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @student1 = user_factory(active_all: true)
+      @student2 = user_factory(active_all: true)
+      @student3 = user_factory(active_all: true)
+      @course.enroll_student(@student1).accept!
+      @course.enroll_student(@student2).accept!
+      @course.enroll_student(@student3).accept!
+      group_category = @course.group_categories.create!(name: "Category")
+      group1 = @course.groups.create!(name: "Group 1", group_category:)
+      group1.add_user(@student1)
+      group1.add_user(@student2)
+      group2 = @course.groups.create!(name: "Group 2", group_category:)
+      group2.add_user(@student3)
+      @assignment = @course.assignments.create!(name: "group assignment", group_category:)
+    end
+
+    it "returns not found if a bogus assignment id is requested" do
+      user_session(@teacher)
+
+      api_call(:get,
+               "/api/v1/courses/#{@course.id}/assignments/10987654321/users/#{@student1.id}/group_members",
+               {
+                 controller: "assignments_api",
+                 action: "student_group_members",
+                 format: "json",
+                 course_id: @course.id.to_s,
+                 assignment_id: 10_987_654_321,
+                 user_id: @student1.id.to_s
+               },
+               {},
+               {},
+               { expected_status: 404 })
+    end
+
+    it "returns unauthorized if...not authorized" do
+      original_course = @course
+      course_with_teacher(active_all: true)
+      user_session(@teacher)
+
+      api_call(:get,
+               "/api/v1/courses/#{original_course.id}/assignments/#{@assignment.id}/users/#{@student1.id}/group_members",
+               {
+                 controller: "assignments_api",
+                 action: "student_group_members",
+                 format: "json",
+                 course_id: original_course.id.to_s,
+                 assignment_id: @assignment.id.to_s,
+                 user_id: @student1.id.to_s
+               },
+               {},
+               {},
+               { expected_status: 401 })
+    end
+
+    it "returns the ids and names of users in the same group as the student" do
+      user_session(@teacher)
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/users/#{@student1.id}/group_members",
+                      {
+                        controller: "assignments_api",
+                        action: "student_group_members",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        assignment_id: @assignment.id,
+                        user_id: @student1.id.to_s
+                      },
+                      {},
+                      {},
+                      { expected_status: 200 })
+
+      expect(json).to contain_exactly(
+        { "id" => @student1.id.to_s, "name" => @student1.name },
+        { "id" => @student2.id.to_s, "name" => @student2.name }
+      )
+    end
+
+    it "returns an array with the student only if not a group assignment" do
+      @assignment = @course.assignments.create!(name: "individual assignment")
+      user_session(@teacher)
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/users/#{@student1.id}/group_members",
+                      {
+                        controller: "assignments_api",
+                        action: "student_group_members",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        assignment_id: @assignment.id,
+                        user_id: @student1.id.to_s
+                      },
+                      {},
+                      {},
+                      { expected_status: 200 })
+
+      expect(json).to contain_exactly({ "id" => @student1.id.to_s, "name" => @student1.name })
+    end
+  end
+
   describe "GET /courses/:course_id/assignments (#index)" do
     before :once do
       course_with_teacher(active_all: true)
@@ -695,13 +796,10 @@ describe AssignmentsApiController, type: :request do
 
     it "excludes deleted assignments in the list return" do
       @context = @course
-      @assignment = factory_with_protected_attributes(
-        @course.assignments,
-        {
-          title: "assignment1",
-          submission_types: "discussion_topic",
-          discussion_topic: discussion_topic_model
-        }
+      @assignment = @course.assignments.create!(
+        title: "assignment1",
+        submission_types: "discussion_topic",
+        discussion_topic: discussion_topic_model
       )
       @assignment.reload
       @assignment.destroy
@@ -1430,8 +1528,6 @@ describe AssignmentsApiController, type: :request do
           setup_graded_submissions
 
           @observer_enrollment.update_attribute(:associated_user_id, @students[5].id)
-
-          Course.enroll_user_call_count -= 2 # Total hack but can't eleminate any of the enroll_user calls -- we need them to test multiple enrollments
 
           observer_enrollment2 = @course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active", allow_multiple_enrollments: true)
           observer_enrollment2.update_attribute(:associated_user_id, @students[3].id)
@@ -5210,12 +5306,7 @@ describe AssignmentsApiController, type: :request do
       it "prevents setting group category ID on assignments with discussions" do
         course_with_teacher(active_all: true)
         group_category = @course.group_categories.create!(name: "foo")
-        @assignment = factory_with_protected_attributes(
-          @course.assignments,
-          {
-            title: "assignment1",
-          }
-        )
+        @assignment = @course.assignments.create!(title: "assignment1")
         @topic = @course.discussion_topics.build(assignment: @assignment, title: "asdf")
         @topic.save
         raw_api_update_assignment(@course, @assignment, {
@@ -5962,6 +6053,15 @@ describe AssignmentsApiController, type: :request do
         should_translate_user_content(@course) do |content|
           assignment = @course.assignments.create!(description: content)
           json = api_get_assignment_in_course(assignment, @course)
+          json["description"]
+        end
+      end
+
+      it "translates assignment descriptions without verifiers" do
+        course_with_teacher(active_all: true)
+        should_translate_user_content(@course, false) do |content|
+          assignment = @course.assignments.create!(description: content)
+          json = api_get_assignment_in_course(assignment, @course, no_verifiers: true)
           json["description"]
         end
       end

@@ -63,6 +63,8 @@ export function PostToolbar({repliesCount, unreadCount, ...props}) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.discussionTopic?.groupSet]) // disabling to use safe nav in dependencies
 
+  const subscriptionDisabled = props.discussionTopic?.subscriptionDisabledForUser
+
   return (
     <Responsive
       match="media"
@@ -109,14 +111,20 @@ export function PostToolbar({repliesCount, unreadCount, ...props}) {
                 <Flex.Item>
                   <span className="discussion-post-subscribe">
                     <ToggleButton
+                      disabled={subscriptionDisabled}
                       isEnabled={props.isSubscribed}
                       enabledIcon={<IconBookmarkSolid />}
                       disabledIcon={<IconBookmarkLine />}
                       enabledTooltipText={I18n.t('Unsubscribe')}
-                      disabledTooltipText={I18n.t('Subscribe')}
+                      disabledTooltipText={
+                        subscriptionDisabled ? I18n.t('Reply to subscribe') : I18n.t('Subscribe')
+                      }
                       enabledScreenReaderLabel={I18n.t('Subscribed')}
-                      disabledScreenReaderLabel={I18n.t('Unsubscribed')}
+                      disabledScreenReaderLabel={
+                        subscriptionDisabled ? I18n.t('Reply to subscribe') : I18n.t('Unsubscribed')
+                      }
                       onClick={props.onToggleSubscription}
+                      interaction={subscriptionDisabled ? 'disabled' : 'enabled'}
                     />
                   </span>
                 </Flex.Item>

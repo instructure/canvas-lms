@@ -27,15 +27,15 @@ import {mountNode} from '../../../utils'
 
 const user = userEvent.setup()
 
-let upNode: any = {
-  id: 'upnode',
-}
+let upNode: any
+let downNode: any
 let mountDiv: HTMLDivElement | null = null
 jest.mock('../../../utils', () => {
   return {
     ...jest.requireActual('../../../utils'),
     mountNode: jest.fn(() => mountDiv),
     findUpNode: jest.fn(() => upNode),
+    findDownNode: jest.fn(() => downNode),
   }
 })
 
@@ -129,6 +129,9 @@ describe('BlockToolbar', () => {
     upNode = {
       id: 'upnode',
     }
+    downNode = {
+      id: 'upnode',
+    }
     blockOwnToolbar = dummyBlockToolbar
   })
 
@@ -140,7 +143,8 @@ describe('BlockToolbar', () => {
     const {getByText} = render(<BlockToolbar />)
     expect(getByText('SomeBlock')).toBeInTheDocument()
     expect(getByText('Drag to move')).toBeInTheDocument()
-    expect(getByText('Go to parent')).toBeInTheDocument()
+    expect(getByText('Go up')).toBeInTheDocument()
+    expect(getByText('Go down')).toBeInTheDocument()
     expect(getByText('Delete')).toBeInTheDocument()
     expect(getByText('Dummy Block Toolbar')).toBeInTheDocument()
   })
@@ -164,11 +168,18 @@ describe('BlockToolbar', () => {
     expect(queryByText('Drag to move')).not.toBeInTheDocument()
   })
 
-  it('should not show the up arrow if there is no upnode', () => {
+  it('should not show the left arrow if there is no upnode', () => {
     upNode = undefined
     const {getByText, queryByText} = render(<BlockToolbar />)
     expect(getByText('SomeBlock')).toBeInTheDocument()
-    expect(queryByText('Go to parent')).not.toBeInTheDocument()
+    expect(queryByText('Go up')).not.toBeInTheDocument()
+  })
+
+  it('should not show the right arrow if there is no down node', () => {
+    downNode = undefined
+    const {queryByText, getByText} = render(<BlockToolbar />)
+    expect(getByText('Go up')).toBeInTheDocument()
+    expect(queryByText('Go down')).not.toBeInTheDocument()
   })
 
   it('should not show the delete button if deletable is false', () => {
@@ -185,24 +196,28 @@ describe('BlockToolbar', () => {
   })
 
   describe('keyboard navigation', () => {
+    beforeEach(() => {
+      downNode = undefined
+    })
+
     it('should default to the first focusable element', () => {
       const {getByText} = render(<BlockToolbar />)
-      const firstButton = getByText('Drag to move').closest('button')
+      const firstButton = getByText('Go up').closest('button')
       expect(firstButton?.getAttribute('tabindex')).toEqual('0')
     })
 
     it('should move to the next button on right arrow key', async () => {
       const {getByText} = render(<BlockToolbar />)
-      const firstButton = getByText('Drag to move').closest('button') as HTMLButtonElement
+      const firstButton = getByText('Go up').closest('button') as HTMLButtonElement
       await user.type(firstButton, '{ArrowRight}')
-      const secondButton = getByText('Go to parent').closest('button')
+      const secondButton = getByText('Drag to move').closest('button')
       expect(secondButton?.getAttribute('tabindex')).toEqual('0')
       expect(firstButton?.getAttribute('tabindex')).toEqual('-1')
     })
 
     it('should move to the previous button on left arrow key', async () => {
       const {getByText} = render(<BlockToolbar />)
-      const firstButton = getByText('Drag to move').closest('button') as HTMLButtonElement
+      const firstButton = getByText('Go up').closest('button') as HTMLButtonElement
       await user.type(activeElem() as Element, '{ArrowLeft}')
       await user.type(activeElem() as Element, '{ArrowRight}')
       expect(firstButton.getAttribute('tabindex')).toEqual('0')
@@ -210,7 +225,7 @@ describe('BlockToolbar', () => {
 
     it('should wrap around on left arrow from the first butotn', async () => {
       const {getByText} = render(<BlockToolbar />)
-      const firstButton = getByText('Drag to move').closest('button') as HTMLButtonElement
+      const firstButton = getByText('Go up').closest('button') as HTMLButtonElement
       await user.type(firstButton, '{ArrowLeft}')
       const lastButton = getByText('Delete').closest('button')
       expect(lastButton?.getAttribute('tabindex')).toEqual('0')
@@ -223,16 +238,16 @@ describe('BlockToolbar', () => {
       expect(lastButton?.getAttribute('tabindex')).toEqual('0')
 
       await user.type(lastButton, '{ArrowRight}')
-      const firstButton = getByText('Drag to move').closest('button')
+      const firstButton = getByText('Go up').closest('button')
       expect(firstButton?.getAttribute('tabindex')).toEqual('0')
     })
 
     it('should return focus to last focused button after leaving the toolbar', async () => {
       const {getByText} = render(<BlockToolbar />)
-      const firstButton = getByText('Drag to move').closest('button')
+      const firstButton = getByText('Go up').closest('button')
       firstButton?.focus()
       await user.type(activeElem(), '{ArrowRight}')
-      const button2 = getByText('Go to parent').closest('button')
+      const button2 = getByText('Drag to move').closest('button')
       expect(button2).toBe(activeElem())
 
       const domNode = document.getElementById('nodeid') as HTMLElement
@@ -245,7 +260,7 @@ describe('BlockToolbar', () => {
 
     it("should return focus to it's node's dom node on escape", async () => {
       const {getByText} = render(<BlockToolbar />)
-      const firstButton = getByText('Drag to move').closest('button') as HTMLElement
+      const firstButton = getByText('Go up').closest('button') as HTMLElement
       firstButton.focus()
       expect(firstButton).toBe(activeElem())
       await user.type(firstButton, '{Escape}')

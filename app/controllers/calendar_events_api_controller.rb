@@ -425,7 +425,10 @@ class CalendarEventsApiController < ApplicationController
     assignment = @type == :assignment
     sub_assignment = @type == :sub_assignment
 
-    render json: [] if sub_assignment && !discussion_checkpoints_enabled?
+    if sub_assignment && !discussion_checkpoints_enabled?
+      render json: []
+      return
+    end
 
     GuardRail.activate(:secondary) do
       scope = if assignment || sub_assignment
@@ -439,10 +442,19 @@ class CalendarEventsApiController < ApplicationController
                 calendar_event_scope(user)
               end
 
-      events = Api.paginate(scope, self, route_url)
+      events = Api.paginate(scope, self, route_url) unless assignment || sub_assignment
       ActiveRecord::Associations.preload(events, :child_events) if @type == :event
       if assignment || sub_assignment
+        events = if scope.is_a?(ActiveRecord::Relation)
+                   # If there is only one or zero Assignment or SubAssignment it is ActiveRecord::Relation
+                   scope
+                 else
+                   # If there are multiple Assignments or SubAssignments it is BookmarkedCollection::MergeProxy
+                   scope.paginate({ per_page: scope.collections.length })
+                 end
         events = apply_assignment_overrides(events, user, sub_assignment:)
+        pagination_args = Api.wrap_pagination_args!(params, self)
+        events, _meta = Api.jsonapi_paginate(events, self, route_url, pagination_args)
         mark_submitted_assignments(user, events)
         if includes.include?("submission")
           submissions = Submission.active.where(assignment_id: events, user_id: user)
@@ -1671,11 +1683,9 @@ class CalendarEventsApiController < ApplicationController
       # as a more sane default then natural DB order. No, it isn't perfect but much better.
       scope = assignment_context_scope(user, sub_assignment:)
 
-      # exclude undated assignments with sub assignments because the
-      # parent assignment does not have due date, only the sub assignments do
-      if @undated && !sub_assignment && discussion_checkpoints_enabled?
-        scope = scope.where(has_sub_assignments: false)
-      end
+      # exclude parent assignment when the discussion checkpoints FF is enabled
+      # because due dates and other relevant info is stored in the sub_assignments/checkpoints
+      scope = scope.where(has_sub_assignments: false) if discussion_checkpoints_enabled?
 
       next unless scope
 

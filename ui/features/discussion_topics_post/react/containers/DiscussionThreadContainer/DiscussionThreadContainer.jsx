@@ -67,8 +67,12 @@ import {useUpdateDiscussionThread} from '../../hooks/useUpdateDiscussionThread'
 const I18n = useI18nScope('discussion_topics_post')
 
 const defaultExpandedReplies = id => {
-  if (ENV.DISCUSSION?.preferences?.discussions_splitscreen_view) return false
-  if (id === ENV.discussions_deep_link?.entry_id) return false
+  if (
+    (ENV.DISCUSSION?.preferences?.discussions_splitscreen_view &&
+      !window.top.location.href.includes('speed_grader')) ||
+    id === ENV.discussions_deep_link?.entry_id
+  )
+    return false
   if (id === ENV.discussions_deep_link?.root_entry_id) return true
 
   return false
@@ -108,15 +112,7 @@ export const DiscussionThreadContainer = props => {
 
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
-    const variables = {
-      discussionEntryID: newDiscussionEntry.parentId,
-      first: ENV.per_page,
-      sort: 'asc',
-    }
-
     updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {repliesCountChange: 1})
-    const foundParentEntryQuery = addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
-    if (props.refetchDiscussionEntries && !foundParentEntryQuery) props.refetchDiscussionEntries()
     addReplyToAllRootEntries(cache, newDiscussionEntry)
     addSubentriesCountToParentEntry(cache, newDiscussionEntry)
     props.setHighlightEntryId(newDiscussionEntry._id)
@@ -156,6 +152,9 @@ export const DiscussionThreadContainer = props => {
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error while deleting the reply.'))
+    },
+    update: () => {
+      if (props.refetchDiscussionEntries) props.refetchDiscussionEntries()
     },
   })
 
@@ -210,7 +209,7 @@ export const DiscussionThreadContainer = props => {
     // If the entry is in threadMode, then we want the RCE to be aligned with the authorInfo
     const threadMode = props.discussionEntry?.depth > 1
     if (responsiveProp.padding === undefined || responsiveProp.padding === null || !threadMode) {
-      return `calc(${theme.variables.spacing.xxLarge} * ${props.depth + 1})`
+      return `calc(${theme.spacing.xxLarge} * ${props.depth + 1})`
     }
     // This assumes that the responsive prop is using the css short hand for padding with 3 variables to get the left padding value
     const responsiveLeftPadding = responsiveProp.padding.split(' ')[1] || ''
@@ -219,12 +218,12 @@ export const DiscussionThreadContainer = props => {
       nextLetter.toUpperCase()
     )
     // Retrieve the css value based on the canvas theme variable
-    const discussionEditLeftPadding = theme.variables.spacing[camelCaseResponsiveLeftPadding] || '0'
+    const discussionEditLeftPadding = theme.spacing[camelCaseResponsiveLeftPadding] || '0'
 
     // This assumes that the discussionEntryContainer left padding is small
-    const discussionEntryContainerLeftPadding = theme.variables.spacing.small || '0'
+    const discussionEntryContainerLeftPadding = theme.spacing.small || '0'
 
-    return `calc(${theme.variables.spacing.xxLarge} * ${props.depth} + ${discussionEntryContainerLeftPadding} + ${discussionEditLeftPadding})`
+    return `calc(${theme.spacing.xxLarge} * ${props.depth} + ${discussionEntryContainerLeftPadding} + ${discussionEditLeftPadding})`
   }
 
   // Condense SplitScreen to one variable & link with the SplitScreenButton
@@ -366,9 +365,11 @@ export const DiscussionThreadContainer = props => {
       !props.discussionEntry?.entryParticipant?.read &&
       !props.discussionEntry?.entryParticipant?.forcedReadState
     ) {
-      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight
       const observer = new IntersectionObserver(
-        ([entry]) => (entry.isIntersecting || entry.intersectionRatio > viewportHeight * 0.4) && updateReadState(props.discussionEntry),
+        ([entry]) =>
+          (entry.isIntersecting || entry.intersectionRatio > viewportHeight * 0.4) &&
+          updateReadState(props.discussionEntry),
         {
           root: null,
           rootMargin: '0px',
@@ -385,10 +386,10 @@ export const DiscussionThreadContainer = props => {
   }, [threadRefCurrent, props.discussionEntry.entryParticipant.read, props, updateReadState])
 
   useEffect(() => {
-    if (expandedThreads.includes(props.discussionEntry._id)){
+    if (expandedThreads.includes(props.discussionEntry._id)) {
       setExpandReplies(true)
     }
-  }, [expandedThreads])
+  }, [expandedThreads, props.discussionEntry._id])
 
   useEffect(() => {
     if (allThreadsStatus === AllThreadsState.Expanded && !expandReplies) {
@@ -456,13 +457,13 @@ export const DiscussionThreadContainer = props => {
       props={{
         // If you change the padding notation on these, please update the getReplyLeftMargin function
         mobile: {
-          marginDepth: `calc(${theme.variables.spacing.medium} * ${props.depth})`,
+          marginDepth: `calc(${theme.spacing.medium} * ${props.depth})`,
           padding: '0',
           toolbarLeftPadding: undefined,
           isMobile: true,
         },
         desktop: {
-          marginDepth: `calc(${theme.variables.spacing.xxLarge} * ${props.depth})`,
+          marginDepth: `calc(${theme.spacing.xxLarge} * ${props.depth})`,
           padding: '0 mediumSmall',
           toolbarLeftPadding: props.depth === 0 ? '0 0 0 xx-small' : undefined,
           isMobile: false,

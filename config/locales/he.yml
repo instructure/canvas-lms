@@ -1328,6 +1328,9 @@ he:
         admins_can_change_passwords: "הגדרות סיסמא ע\"י מנהלי המערכת"
         admins_can_view_notifications: "מנהל המערכת יכול לעיין בהודעות"
         allow_invitation_previews: "תצוגות מקדימות של הזמנות"
+        allow_name_pronunciation_edit_for_admins: "מנהל המערכת"
+        allow_name_pronunciation_edit_for_students: תלמיד
+        allow_name_pronunciation_edit_for_teachers: מורה
         allow_sending_scores_in_emails: "תלמידים יכולים להרשם לקבלת תוצאות בהתראות לדוא\"ל"
         allow_sis_import: "ייבוא SIS"
         author_email_in_notifications: "הצגת כתובת הדוא\"ל של השולח בהודעות תקשורת למשתמשים"
@@ -1928,6 +1931,7 @@ he:
   add_an_attachment_b2e9092f: "הוספת קובץ "
   add_an_identity_provider_to_this_account_c2644478: "הוספת מנגנון הזדהות לחשבון זה:"
   add_announcement_165c3b05: "הוספת הכרזה"
+  add_announcement_e6de0fd: "הוספת הכרזה"
   add_another_assignment_fc5c908f: "הוספת מטלה נוספת"
   add_app_baf540f: "הוספת אפליקציה"
   add_as_a_faculty_journal_entry_55a38a30: "הוספה כמופע ביומן הפקולטה"
@@ -10391,6 +10395,7 @@ he:
   invalid_url_in_xml: "כתובת אינטרנט שגויה ב XML. אין לכלול אמפרסנדים - &"
   invalid_username_or_password_b60aa240: "שם משתמש או סיסמה שגויים"
   invalid_utf_8_13c76a6: "UTF-8 לא תקין"
+  invalid_verification_code_please_try_again_fcfc0bc: "קוד אימות שגוי, יש לנסות שוב"
   invalid_xml_configuration_9c3f6bcf: "הגדרות XML לא תקינות"
   invalid_xml_syntax: "סינטקס ה XML אינו תקין"
   invite_5b1fcbcd: הזמנה
@@ -17929,6 +17934,31 @@ he:
       user_enrolled: הרשמות
       user_has_no_bio: "%{user} לא הוסיף את קורות החיים"
       ways_to_contact_user: התקשרות
+    profile_form: 
+      add_link_field: "הוספת קישור נוסף"
+      bio: ביוגרפיה
+      cancel: ביטול
+      is_required: "חובה למלא שדה זה"
+      links: קישורים
+      links_title: כותרת
+      links_url: "כתובת דף אינטרנט"
+      manage_settings: "ניהול שרותים רשומים"
+      message_me: "שלח/י לי הודעה בקנבס"
+      message_title: הודעה
+      message_user_canvas: " שלח/י הודעה ל %{user} בקנבס"
+      name: שם
+      nothing_in_common: "אין לכם שום דבר במשותף"
+      save_profile: "שמירת פרופיל"
+      service_contact: "התקשרו ל %{user} בעזרת %{service}"
+      social_instructions: "סימון שיטות התקשורת בפרופיל שלך שהיית רוצה שיוצגו לאחרים."
+      title: כותרת
+      user_enrolled: הרשמות
+      ways_to_contact_user: התקשרות
+    profile_main: 
+      cancel_editing: "ביטול עריכה"
+      edit_profile: "עריכת פרופיל"
+      links: 
+        user_account_details: "פרטי חשבון"
     recent_activity: 
       date_column: תאריך
       edit_group: "עריכת קבוצה"

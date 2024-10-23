@@ -66,6 +66,34 @@ describe Login::CanvasController do
     end
   end
 
+  describe "login_registration_ui_identity feature flag" do
+    before do
+      if feature_flag_enabled
+        Account.default.enable_feature!(:login_registration_ui_identity)
+      else
+        Account.default.disable_feature!(:login_registration_ui_identity)
+      end
+    end
+
+    context "when the feature flag is enabled" do
+      let(:feature_flag_enabled) { true }
+
+      it "renders the new login page" do
+        get "new"
+        expect(response).to render_template("login/canvas/new_login")
+      end
+    end
+
+    context "when the feature flag is disabled" do
+      let(:feature_flag_enabled) { false }
+
+      it "renders the old login page" do
+        get "new"
+        expect(response).to render_template(:new)
+      end
+    end
+  end
+
   context "manage_robots_meta" do
     it "enables robot indexing by default" do
       get "new"

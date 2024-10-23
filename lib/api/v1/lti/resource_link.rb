@@ -24,6 +24,12 @@ module Api::V1::Lti::ResourceLink
   def lti_resource_link_json(resource_link, user, session, type)
     api_json(resource_link, user, session).tap do |json|
       json["resource_type"] = type
+      launch_url = if type == :assignment
+                     course_assignment_url(resource_link.context.course, resource_link.context)
+                   else
+                     retrieve_course_external_tools_url(resource_link.context, resource_link_lookup_uuid: resource_link.lookup_uuid)
+                   end
+      json["canvas_launch_url"] = launch_url
     end
   end
 end

@@ -60,7 +60,9 @@ AssignmentOverrideCollection.prototype.comparator = function (override) {
 
 AssignmentOverrideCollection.prototype.getDefaultDueDate = function () {
   return this.detect(function (override) {
-    return override.getCourseSectionID() === Section.defaultDueDateSectionID
+    return (
+      override.getCourseSectionID() === Section.defaultDueDateSectionID || override.getCourseID()
+    )
   })
 }
 

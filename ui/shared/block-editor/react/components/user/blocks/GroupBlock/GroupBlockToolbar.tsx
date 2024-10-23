@@ -78,13 +78,13 @@ export const GroupBlockToolbar = () => {
     const align = vertical ? props.verticalAlignment : props.alignment
     switch (align) {
       case 'start':
-        icon = <IconTextStartLine size="x-small" />
+        icon = <IconTextStartLine />
         break
       case 'center':
-        icon = <IconTextCenteredLine size="x-small" />
+        icon = <IconTextCenteredLine />
         break
       case 'end':
-        icon = <IconTextEndLine size="x-small" />
+        icon = <IconTextEndLine />
     }
     return vertical ? <span style={rotate}>{icon}</span> : icon
   }

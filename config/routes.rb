@@ -537,6 +537,8 @@ CanvasRails::Application.routes.draw do
   get "external_content/retrieve/oembed" => "external_content#oembed_retrieve", :as => :external_content_oembed_retrieve
   get "external_content/cancel/:service" => "external_content#cancel", :as => :external_content_cancel
 
+  resources :block_editors, only: :show
+
   %w[account course group].each do |context|
     prefix = "#{context}s/:#{context}_id"
     post "#{prefix}/deep_linking_response", controller: "lti/ims/deep_linking", action: :deep_linking_response, as: "#{context}_deep_linking_response"
@@ -828,6 +830,7 @@ CanvasRails::Application.routes.draw do
   get "logout" => "login#logout_landing"
 
   get "login/canvas" => "login/canvas#new", :as => :canvas_login
+  get "login/canvas/forgot-password", to: "login/canvas#new"
   post "login/canvas" => "login/canvas#create"
 
   get "login/email_verify" => "login/email_verify#show", :as => :login_email_verify_show
@@ -1312,6 +1315,7 @@ CanvasRails::Application.routes.draw do
       get "users/:user_id/courses/:course_id/assignments", action: :user_index, as: "user_course_assignments"
       put "courses/:course_id/assignments/bulk_update", action: :bulk_update
       get "courses/:course_id/assignments/:id", action: :show, as: "course_assignment"
+      get "courses/:course_id/assignments/:assignment_id/users/:user_id/group_members", action: :student_group_members
       post "courses/:course_id/assignments", action: :create
       put "courses/:course_id/assignments/:id", action: :update
       post "courses/:course_id/assignments/:assignment_id/duplicate", action: :duplicate
@@ -1917,8 +1921,11 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: "lti/resource_links") do
       get "courses/:course_id/lti_resource_links", action: :index
+      post "courses/:course_id/lti_resource_links", action: :create
+      post "courses/:course_id/lti_resource_links/bulk", action: :bulk_create
       get "courses/:course_id/lti_resource_links/:id", action: :show
       put "courses/:course_id/lti_resource_links/:id", action: :update
+      delete "courses/:course_id/lti_resource_links/:id", action: :destroy
     end
 
     scope(controller: :immersive_reader) do
@@ -2476,6 +2483,8 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :rubrics_api) do
       get "rubrics/upload_template", action: "upload_template", as: "rubrics_account_upload_template"
+      post "courses/:course_id/rubrics/download_rubrics", action: "download_rubrics", as: "rubrics_account_download_rubrics"
+      post "accounts/:account_id/rubrics/download_rubrics", action: "download_rubrics", as: "rubrics_course_download_rubrics"
       get "accounts/:account_id/rubrics", action: :index, as: :account_rubrics
       get "accounts/:account_id/rubrics/:id", action: :show
       get "courses/:course_id/rubrics", action: :index, as: :course_rubrics
@@ -2571,7 +2580,6 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/csp_settings/domains", action: :add_domain
       post "accounts/:account_id/csp_settings/domains/batch_create", action: :add_multiple_domains
       delete "accounts/:account_id/csp_settings/domains", action: :remove_domain
-      get "accounts/:account_id/csp_log", action: :csp_log
     end
 
     scope(controller: :media_objects) do
@@ -2676,6 +2684,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :what_if_grades_api) do
       put "submissions/:id/what_if_grades", action: :update
+      put "courses/:course_id/what_if_grades/reset", action: :reset_for_student_course
     end
 
     scope(controller: :plugins) do

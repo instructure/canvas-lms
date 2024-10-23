@@ -40,7 +40,7 @@ describe "Submissions API", type: :request do
     sub.workflow_state = "submitted"
     yield(sub) if block_given?
     sub.with_versioning(explicit: true) do
-      update_with_protected_attributes!(sub, { submitted_at: @submit_homework_time, created_at: @submit_homework_time }.merge(opts))
+      sub.update!({ submitted_at: @submit_homework_time, created_at: @submit_homework_time }.merge(opts))
     end
     sub.versions.reload.each { |v| Version.where(id: v).update_all(created_at: v.model.created_at) }
     sub
@@ -51,7 +51,7 @@ describe "Submissions API", type: :request do
       @student1 = user_factory(active_all: true)
       course_with_teacher(active_all: true)
       @default_section = @course.default_section
-      @section = factory_with_protected_attributes(@course.course_sections, sis_source_id: "my-section-sis-id", name: "section2")
+      @section = @course.course_sections.create!(sis_source_id: "my-section-sis-id", name: "section2")
       @course.enroll_user(@student1, "StudentEnrollment", section: @section).accept!
 
       quiz = Quizzes::Quiz.create!(title: "quiz1", context: @course)
@@ -675,7 +675,9 @@ describe "Submissions API", type: :request do
     course_with_teacher(active_all: true)
     @course.enroll_student(@student).accept!
     @context = @course
-    @assignment = factory_with_protected_attributes(@course.assignments, { title: "assignment1", submission_types: "discussion_topic", discussion_topic: discussion_topic_model })
+    @assignment = @course.assignments.create!(title: "assignment1",
+                                              submission_types: "discussion_topic",
+                                              discussion_topic: discussion_topic_model)
 
     e1 = @topic.discussion_entries.create!(message: "main entry", user: @user)
     se1 = @topic.discussion_entries.create!(message: "sub 1", user: @student, parent_entry: e1)
@@ -756,7 +758,9 @@ describe "Submissions API", type: :request do
     @group = @course.groups.create(name: "Group", group_category:)
     @group.add_user(@student)
     @context = @course
-    @assignment = factory_with_protected_attributes(@course.assignments, { title: "assignment1", submission_types: "discussion_topic", discussion_topic: discussion_topic_model(group_category: @group.group_category) })
+    @assignment = @course.assignments.create!(title: "assignment1",
+                                              submission_types: "discussion_topic",
+                                              discussion_topic: discussion_topic_model(group_category: @group.group_category))
     @topic.refresh_subtopics # since the DJ won't happen in time
     @child_topic = @group.discussion_topics.where(root_topic_id: @topic).first
 
@@ -956,7 +960,9 @@ describe "Submissions API", type: :request do
     course_with_teacher(active_all: true)
     @course.enroll_student(@student).accept!
     @context = @course
-    @assignment = factory_with_protected_attributes(@course.assignments, { title: "assignment1", submission_types: "discussion_topic", discussion_topic: discussion_topic_model })
+    @assignment = @course.assignments.create!(title: "assignment1",
+                                              submission_types: "discussion_topic",
+                                              discussion_topic: discussion_topic_model)
 
     e1 = @topic.discussion_entries.create!(message: "main entry", user: @user)
     @topic.discussion_entries.create!(message: "sub 1", user: @student, parent_entry: e1)
@@ -1261,6 +1267,26 @@ describe "Submissions API", type: :request do
                         course_id: @course.id.to_s,
                         assignment_id: a1.id.to_s,
                         user_id: student1.id.to_s })
+      json["body"]
+    end
+  end
+
+  it "apis translate online_text_entry submissions without verifiers" do
+    student1 = user_factory(active_all: true)
+    course_with_teacher(active_all: true)
+    @course.enroll_student(student1).accept!
+    a1 = @course.assignments.create!(title: "assignment1", grading_type: "letter_grade", points_possible: 15)
+    should_translate_user_content(@course, false) do |content|
+      submit_homework(a1, student1, body: content)
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}.json",
+                      { controller: "submissions_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        assignment_id: a1.id.to_s,
+                        user_id: student1.id.to_s,
+                        no_verifiers: true })
       json["body"]
     end
   end
@@ -7035,6 +7061,22 @@ describe "Submissions API", type: :request do
         end
 
         it "includes action when action is passed to the include param" do
+          json = api_call_as_user(teacher, :get, path, params.merge(include: field))
+          expect(json).to all include field
+        end
+      end
+
+      describe "student_entered_score" do
+        let(:field) { "student_entered_score" }
+
+        it "is not included by default" do
+          json = api_call_as_user(teacher, :get, path, params)
+          json.each do |entry| # can't use `.not_to all`
+            expect(entry).not_to include field
+          end
+        end
+
+        it "included when passed to the include param" do
           json = api_call_as_user(teacher, :get, path, params.merge(include: field))
           expect(json).to all include field
         end

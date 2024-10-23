@@ -66,7 +66,8 @@ PactConfig::Consumers::ALL.each do |consumer|
           due_at: 2.days.from_now,
           points_possible: 10,
           allowed_extensions: ["txt"],
-          submission_types: ["online_text_entry"]
+          submission_types: ["online_text_entry"],
+          unlock_at: 2.days.from_now
         )
 
         # Create Topic 1: section specific, has an entry with ratings

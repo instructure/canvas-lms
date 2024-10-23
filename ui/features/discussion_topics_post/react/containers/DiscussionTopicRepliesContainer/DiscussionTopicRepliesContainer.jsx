@@ -136,6 +136,7 @@ export const DiscussionTopicRepliesContainer = props => {
             highlightEntryId={props.highlightEntryId}
             setHighlightEntryId={props.setHighlightEntryId}
             userSplitScreenPreference={props.userSplitScreenPreference}
+            refetchDiscussionEntries={props.refetchDiscussionEntries}
           />
         )
       })}
@@ -161,6 +162,7 @@ DiscussionTopicRepliesContainer.propTypes = {
   isSearchResults: PropTypes.bool,
   setHighlightEntryId: PropTypes.func,
   userSplitScreenPreference: PropTypes.bool,
+  refetchDiscussionEntries: PropTypes.func,
 }
 
 export default DiscussionTopicRepliesContainer

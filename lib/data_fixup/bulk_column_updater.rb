@@ -78,7 +78,9 @@ module DataFixup
       @temp_table_name = nil
       # Force close of session to delete the temporary table:
       begin
-        model_class.connection.reconnect!
+        model_class.connection.disconnect!
+
+        log "Disconnected from DB"
       rescue => e
         log "ERROR reconnecting: #{e.inspect}"
       end

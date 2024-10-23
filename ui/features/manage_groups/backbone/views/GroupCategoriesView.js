@@ -25,7 +25,10 @@ import tabTemplate from '../../jst/groupCategoryTab.handlebars'
 import awaitElement from '@canvas/await-element'
 import {renderCreateDialog} from '@canvas/groups/react/CreateOrEditSetModal'
 import 'jqueryui/tabs'
+import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
+const I18n = useI18nScope('GroupCategoriesView')
 export default class GroupCategoriesView extends CollectionView {
   static initClass() {
     this.prototype.template = groupCategoriesTemplate
@@ -53,6 +56,15 @@ export default class GroupCategoriesView extends CollectionView {
           id: this.model.id != null ? this.model.id : this.model.cid,
         })
       },
+    })
+    const handleBreadCrumbSetter = ({getCrumbs, setCrumbs}) => {
+      const crumbs = getCrumbs()
+      crumbs.push({name: I18n.t('People'), url: 'users'})
+      crumbs.push({name: I18n.t('Groups'), url: ''})
+      setCrumbs(crumbs)
+    }
+    initializeTopNavPortalWithDefaults({
+      getBreadCrumbSetter: handleBreadCrumbSetter,
     })
   }
 

@@ -39,8 +39,8 @@ import {
 import {ConversationContext} from '../../../util/constants'
 import {useLazyQuery, useQuery} from 'react-apollo'
 import {RECIPIENTS_OBSERVERS_QUERY, INBOX_SETTINGS_QUERY} from '../../../graphql/Queries'
-import {ModalBodyContext} from '../../utils/constants'
-import {translateMessage, handleTranslatedModalBody} from '../../utils/inbox_translator'
+import {ModalBodyContext, translationSeparator} from '../../utils/constants'
+import {translateMessage, handleTranslatedModalBody, stripSignature} from '../../utils/inbox_translator'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -82,7 +82,7 @@ const ComposeModalContainer = props => {
   // Translation features
   const [translating, setTranslating] = useState(false)
   const [messagePosition, setMessagePosition] = useState(null)
-  const [translationTargetLanguage, setTranslationTargetLanguage] = useState('')
+  const [translationTargetLanguage, setTranslationTargetLanguage] = useState('en')
 
   const [
     getRecipientsObserversQuery,
@@ -275,15 +275,18 @@ const ComposeModalContainer = props => {
 
   /** TRANSLATION CODE */
   const translateBody = isPrimary => {
+    translateBodyWith(isPrimary, body)
+  }
+
+  const translateBodyWith = (isPrimary, bodyText, { tgtLang } = {}) => {
     setTranslating(true)
     translateMessage({
       subject: subject,
-      body: body,
+      body: bodyText,
       signature: activeSignature,
-      srcLang: 'en',
-      tgtLang: translationTargetLanguage,
+      tgtLang: typeof tgtLang !== 'undefined' ? tgtLang : translationTargetLanguage,
       callback: translatedText => {
-        handleTranslatedModalBody(translatedText, isPrimary, activeSignature, setBody)
+        handleTranslatedModalBody(translatedText, isPrimary, activeSignature, setBody, bodyText)
         setTranslating(false)
       },
     })
@@ -436,10 +439,12 @@ const ComposeModalContainer = props => {
     setBody,
     translating,
     setTranslating,
+    translationTargetLanguage,
     setTranslationTargetLanguage,
     messagePosition,
     setMessagePosition,
     translateBody,
+    translateBodyWith
   }
 
   const shouldShowModalSpinner =
@@ -470,6 +475,7 @@ const ComposeModalContainer = props => {
               shouldCloseOnDocumentClick={false}
               onExited={resetState}
               data-testid={responsiveProps.dataTestId}
+              id="compose-message-modal"
             >
               <ModalHeader onDismiss={dismiss} headerTitle={props?.submissionCommentsHeader} />
               <ModalBody

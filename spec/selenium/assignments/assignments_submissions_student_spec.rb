@@ -44,7 +44,7 @@ describe "submissions" do
       user_session(@student)
     end
 
-    it "does not show score if RDQ" do
+    it "does not show score if RQD" do
       # truthy feature flag
       Account.default.enable_feature! :restrict_quantitative_data
 
@@ -102,7 +102,7 @@ describe "submissions" do
       expect(f("body")).not_to contain_jqcss("header#header")
     end
 
-    it "show score if not RDQ" do
+    it "show score if not RQD" do
       # truthy feature flag
       Account.default.enable_feature! :restrict_quantitative_data
 
@@ -675,6 +675,41 @@ describe "submissions" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(f("#content")).not_to contain_css("a.submit_assignment_link")
       expect(f("#assignment_show .assignment-title")).to include_text "assignment 1"
+    end
+  end
+
+  context "discussion_checkpoints" do
+    it "does not have keyboard-only next and previous buttons" do
+      Account.default.enable_feature! :react_discussions_post
+      Account.default.enable_feature! :discussion_checkpoints
+      teacher_in_course(active_all: true)
+      @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "Checkpointed Discussion")
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @checkpointed_discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: 2.days.from_now }],
+        points_possible: 6
+      )
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @checkpointed_discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "everyone", due_at: 3.days.from_now }],
+        points_possible: 7,
+        replies_required: 1
+      )
+
+      rr = @checkpointed_discussion.discussion_entries.create!(user: @student, message: "root reply")
+      @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to root", parent_entry: rr)
+      student_in_course(active_all: true)
+      user_session(@student)
+      get "/courses/#{@course.id}/assignments/#{@checkpointed_discussion.assignment.id}/submissions/#{@student.id}"
+
+      in_frame("preview_frame") do
+        in_frame("discussion_preview_iframe") do
+          wait_for_ajaximations
+          expect(f("body")).not_to contain_jqcss("[data-testid='jump-to-speedgrader-navigation']")
+        end
+      end
     end
   end
 end

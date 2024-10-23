@@ -27,7 +27,7 @@ RSpec.describe Types::SubmissionDraftType do
       submission: @submission,
       submission_attempt: @submission.attempt + 1
     )
-    @media_object = factory_with_protected_attributes(MediaObject, media_id: "m-123456", title: "CreedThoughts")
+    @media_object = MediaObject.create!(media_id: "m-123456", title: "CreedThoughts")
   end
 
   def resolve_submission_draft(body_rewrite_urls: nil)

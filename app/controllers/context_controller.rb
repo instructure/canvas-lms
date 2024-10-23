@@ -65,6 +65,7 @@ class ContextController < ApplicationController
   def roster
     return unless authorized_action(@context, @current_user, :read_roster)
 
+    page_has_instui_topnav
     log_asset_access(["roster", @context], "roster", "other")
 
     case @context
@@ -158,6 +159,7 @@ class ContextController < ApplicationController
   end
 
   def prior_users
+    page_has_instui_topnav
     manage_admins = if @context.root_account.feature_enabled?(:granular_permissions_manage_users)
                       :allow_course_admin_actions
                     else
@@ -180,6 +182,7 @@ class ContextController < ApplicationController
 
   def roster_user_services
     if authorized_action(@context, @current_user, :read_roster)
+      page_has_instui_topnav
       @users = @context.users.where(show_user_services: true).order_by_sortable_name
       @users_hash = {}
       @users_order_hash = {}
@@ -277,27 +280,16 @@ class ContextController < ApplicationController
       css_bundle :roster_user, :pairing_code
 
       enable_profiles = @domain_root_account.enable_profiles?
-      show_recent_messages_on_new_roster_user_page = Account.site_admin.feature_enabled?(:show_recent_messages_on_new_roster_user_page)
-      if (!enable_profiles || (enable_profiles && show_recent_messages_on_new_roster_user_page)) && @user.grants_right?(@current_user, session, :read_profile)
-        @topics = @context.discussion_topics.reject { |a| a.locked_for?(@current_user, check_policies: true) }
-        messages_temp = []
-        messages_count = MAX_MESSAGES_ON_PROFILE
-        while messages_temp.count <= messages_count
-          additional_messages = messages_count - messages_temp.count
-          messages = DiscussionEntry.active
-                                    .where(discussion_topic_id: @topics, user_id: @user)
-                                    .where.not(id: messages_temp.pluck(:id))
-                                    .limit(additional_messages)
-                                    .order(created_at: :desc)
-                                    .to_a
+      show_recent_messages_on_new_roster_user_page =
+        Account.site_admin.feature_enabled?(:show_recent_messages_on_new_roster_user_page)
+      if (!enable_profiles || (enable_profiles && show_recent_messages_on_new_roster_user_page)) &&
+         @user.grants_right?(@current_user, session, :read_profile)
 
-          break if messages.empty?
+        @topics = @context.active_discussion_topics.reject { |dt| dt.locked_for?(@current_user, check_policies: true) }
+        entries = DiscussionEntry.all_for_user(@user).all_for_topics(@topics).newest_first
+        filtered_entries = entries.select { |entry| entry.grants_right?(@current_user, session, :read) }
 
-          messages = messages.select { |m| m.grants_right?(@current_user, session, :read) }
-
-          messages_temp += messages
-        end
-        @messages = messages_temp
+        @messages = filtered_entries.take(MAX_MESSAGES_ON_PROFILE)
       end
 
       if enable_profiles

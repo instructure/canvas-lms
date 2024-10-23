@@ -174,5 +174,29 @@ describe "Student Gradebook - Assignment Details" do
         expect(f("svg[name='IconMuted']")).to be_present
       end
     end
+
+    context "discussion Checkpoints" do
+      before do
+        @course.enroll_student(@students[0], enrollment_state: "active")
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+      end
+
+      it "expands sub assignments on print" do
+        user_session @students[0]
+        get "/courses/#{@course.id}/grades"
+
+        cmd_ctrl = driver.capabilities.platform_name.include?("mac") ? :command : :control
+        driver.action
+              .key_down(cmd_ctrl)
+              .send_keys("p")
+              .key_up(cmd_ctrl)
+              .perform
+
+        expect(fj("tr.parent_assignment_id_#{@reply_to_topic.parent_assignment.id}")).to be_present
+        expect(fj("tr#sub_assignment_#{@reply_to_topic.id}")).to be_present
+        expect(fj("tr#sub_assignment_#{@reply_to_entry.id}")).to be_present
+      end
+    end
   end
 end

@@ -40,6 +40,7 @@ const renderUploadButtons = props => {
     <>
       <Tooltip renderTip={I18n.t('Add an attachment')} placement="top">
         <IconButton
+          id="upload-attachment-button"
           screenReaderLabel={I18n.t('Add an attachment')}
           onClick={handleAttachmentClick}
           margin="xx-small"
@@ -63,6 +64,7 @@ const renderUploadButtons = props => {
       {props.onMediaUpload && (
         <Tooltip renderTip={I18n.t('Record an audio or video comment')} placement="top">
           <IconButton
+            id="media-upload-button"
             screenReaderLabel={I18n.t('Record an audio or video comment')}
             onClick={props.onMediaUpload}
             margin="xx-small"
@@ -88,6 +90,7 @@ const renderMessageButtons = props => {
         {I18n.t('Cancel')}
       </Button>
       <Button
+        id="send-message-button"
         color={props.isSending ? 'secondary' : 'primary'}
         margin="xx-small"
         onClick={props.onSend}

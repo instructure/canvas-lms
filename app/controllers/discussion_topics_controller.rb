@@ -302,6 +302,7 @@ class DiscussionTopicsController < ApplicationController
   # @returns [DiscussionTopic]
   def index
     include_params = Array(params[:include])
+    page_has_instui_topnav
     if params[:only_announcements]
       return unless authorized_action(@context.announcements.temp_record, @current_user, :read)
     else
@@ -319,7 +320,9 @@ class DiscussionTopicsController < ApplicationController
     # Specify the shard context, because downstream we use `union` which isn't
     # cross-shard compatible.
     @context.shard.activate do
-      scope = DiscussionTopic::ScopedToUser.new(@context, @current_user, scope).scope
+      unless params[:only_announcements]
+        scope = DiscussionTopic::ScopedToUser.new(@context, @current_user, scope).scope
+      end
       # see context for this separation in ScopedToSections
       scope = DiscussionTopic::ScopedToSections.for(self, @context, @current_user, scope).scope
     end
@@ -501,15 +504,14 @@ class DiscussionTopicsController < ApplicationController
 
   def new
     @topic = @context.send(params[:is_announcement] ? :announcements : :discussion_topics).new
-    add_discussion_or_announcement_crumb
-    add_crumb t :create_new_crumb, "Create new"
+    page_has_instui_topnav
 
     edit
   end
 
   def edit
     @topic ||= @context.all_discussion_topics.find(params[:id])
-
+    page_has_instui_topnav
     if @topic.root_topic_id && @topic.has_group_category?
       return redirect_to edit_course_discussion_topic_url(@context.context_id, @topic.root_topic_id)
     end
@@ -713,6 +715,7 @@ class DiscussionTopicsController < ApplicationController
 
   def show
     @topic = @context.all_discussion_topics.find(params[:id])
+    page_has_instui_topnav
     # we still need the lock info even if the current user policies unlock the topic. check the policies manually later if you need to override the lockout.
     @locked = @topic.locked_for?(@current_user, check_policies: true, deep_check_if_needed: true)
 
@@ -889,6 +892,7 @@ class DiscussionTopicsController < ApplicationController
           render html: "", layout: (params[:embed] == "true") ? "mobile_embed" : true
         end
       end
+
       return
     end
 
@@ -1139,6 +1143,7 @@ class DiscussionTopicsController < ApplicationController
   #         -H 'Authorization: Bearer <token>'
   #
   def create
+    page_has_instui_topnav
     process_discussion_topic(is_new: true)
   end
 

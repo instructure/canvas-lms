@@ -16,22 +16,56 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-type Submission = {
-  sticker: string
-}
-
 export type ClickableImageProps = {
+  editable: boolean
   onClick: () => void
   size: 'medium' | 'large'
-  sticker: string
+  sticker: Sticker
 }
+
+export type IconOverlayProps = {
+  showIcon: boolean
+  sticker: Sticker
+}
+
+type BaseSubmission = {
+  assignmentId: string
+  courseId: string
+  sticker: Sticker
+}
+
+type AnonymousUserSubmission = BaseSubmission & {
+  anonymousId: string
+  userId?: never
+}
+
+type KnownUserSubmission = BaseSubmission & {
+  anonymousId?: never
+  userId: string
+}
+
+export type Submission = AnonymousUserSubmission | KnownUserSubmission
 
 export type StickerDescriptions = {
   [key: string]: string
 }
 
+type Sticker = string | null
+
+export type StickerModalProps = {
+  liveRegion: () => HTMLElement
+  onDismiss: () => void
+  onRemoveSticker: () => void
+  onSelectSticker: (sticker: Sticker) => void
+  open: boolean
+  sticker: Sticker
+}
+
 export type StickerProps = {
   confetti: boolean
-  submission: Submission
+  editable: boolean
+  liveRegion?: () => HTMLElement | null
+  onStickerChange?: (sticker: Sticker) => void
   size: 'medium' | 'large'
+  submission: Submission
 }

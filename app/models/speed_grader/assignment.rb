@@ -56,6 +56,7 @@ module SpeedGrader
         resource_link_lookup_uuid
         redo_request
         cached_due_date
+        sticker
       ]
 
       submission_json_fields <<

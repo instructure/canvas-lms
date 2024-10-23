@@ -54,10 +54,10 @@ arbitrary_name=$Canvas.api.domain
 ```
 
 ## Via API
-Custom fields can also be <a href="/doc/api/external_tools.html#method.external_tools.create">configured via API</a>.
+Custom fields can also be <a href="external_tools.html#method.external_tools.create">configured via API</a>.
 
 This would install a course-level tool with domain as a custom field:
-```
+```bash
 curl 'https://<domain>.instructure.com/api/v1/courses/<course_id>/external_tools' \
   -X POST \
   -H "Authorization: Bearer <token>;" \
@@ -74,7 +74,7 @@ JSON can be used to <a href="https://community.canvaslms.com/t5/Admin-Guide/How-
 
 The following JSON would create a developer key with the a placement specfic custom field and a tool-level custom field:
 
-```
+```json
 {  
    "title":"Variable Expansion Tool",
    "scopes":[  
@@ -123,11 +123,11 @@ The following JSON would create a developer key with the a placement specfic cus
 ```
 
 ## Via XML Configuration (LTI 1.1)
-Custom fields can also be <a href="/doc/api/file.tools_xml.html">configured via XML</a>.
+Custom fields can also be <a href="file.tools_xml.html">configured via XML</a>.
 
 This would create a tool in a course with custom fields, some of which are specific for a
 particular placement:
-```
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
    <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
        xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
@@ -159,6 +159,7 @@ particular placement:
      </blti:extensions>
    </cartridge_basiclti_link>
 ```
+
 # Supported Substitutions
 ## ResourceLink.id
 LTI - Custom parameter substitution: ResourceLink.id
@@ -1385,17 +1386,16 @@ Only available when launched as an assignment with a `lock_at` set.
 2018-02-20:00:00Z
 ```
 ## Canvas.assignment.dueAt.iso8601
-Returns the `due_at` date of the assignment that was launched. Only
-available when launched as an assignment with a `due_at` set. If the tool
-is launched as a student, this will be the date that assignment is due
-for that student (or unexpanded -- "$Canvas.assignment.dueAt.iso8601" --
-if there is no due date for the student). If the tool is launched as an
-instructor and there are multiple possible due dates (i.e., there are
-multiple sections and at least one has a due date override), this will be
-the LATEST effective due date of any section or student (or unexpanded if
-there is at least one section or student with no effective due date).
+Returns the `due_at` date of the assignment that was launched.
+If the tool is launched as a student, this will be the date that assignment
+is due for that student (or unexpanded -- "$Canvas.assignment.dueAt.iso8601" --
+if there is no due date for the student).
+If the tool is launched as an instructor and there are multiple
+possible due dates (i.e., there are multiple sections and at
+least one has a due date override), this will be the LATEST effective
+due date of any section or student.
 
-**Availability**: *always*  
+**Availability**: *when launched as an assignment*  
 
 
 ```

@@ -26,7 +26,7 @@ export const ZParams = z.object({
 })
 type Params = z.infer<typeof ZParams>
 
-export function reassignAssignmentMutation(params: Params): Promise<unknown> {
+export function reassignAssignment(params: Params): Promise<unknown> {
   ZParams.parse(params)
   return doFetchApi({
     path: `/courses/${params.courseId}/assignments/${params.assignmentId}/submissions/${params.userId}/reassign`,

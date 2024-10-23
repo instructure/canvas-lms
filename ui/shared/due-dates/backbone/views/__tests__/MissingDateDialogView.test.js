@@ -68,15 +68,6 @@ describe('MissingDateDialogView', () => {
     ok($('.ui-dialog:visible').length > 0)
   })
 
-  test('it should list the names of the sections w/o dates', function () {
-    dialog.render()
-    ok(
-      $('.ui-dialog')
-        .text()
-        .match(/Section one/)
-    )
-  })
-
   test('should not display a dialog if the given fields are valid', function () {
     $('input[name=date]').val('2013-01-01')
     equal(dialog.render(), false)
@@ -93,19 +84,5 @@ describe('MissingDateDialogView', () => {
     dialog.render()
     dialog.$dialog.find('.btn-primary').click()
     ok(dialog.options.success.calledOnce)
-  })
-
-  test('it displays the name for all invalid sections', function () {
-    $('#fixtures').append(
-      '<label for="date">Section two</label><input type="text" id="date-2" name="date" />'
-    )
-    $('#fixtures').append(
-      '<label for="date">Section three</label><input type="text" id="date-3" name="date" />'
-    )
-    dialog.render()
-    const dialogText = $('.ui-dialog').text()
-    ok(dialogText.match(/Section one/))
-    ok(dialogText.match(/Section two/))
-    ok(dialogText.match(/Section three/))
   })
 })

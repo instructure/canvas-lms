@@ -61,7 +61,8 @@ describe('BlockEditor', () => {
   })
 
   it('warns on content version mismatch', () => {
-    renderEditor({content: {version: '2', blocks: blank_page}})
+    // @ts-expect-error
+    renderEditor({content: {id: '1', version: '2', blocks: blank_page}})
     expect(window.alert).toHaveBeenCalledWith('Unknown block data version "2", mayhem may ensue')
   })
 
@@ -114,6 +115,7 @@ describe('BlockEditor', () => {
     it('can edit version 0.1 data', () => {
       renderEditor({
         content: {
+          id: '1',
           version: '0.1',
           blocks: [{data: blank_section_with_text}],
         },
@@ -126,7 +128,7 @@ describe('BlockEditor', () => {
     it('toggles the preview', async () => {
       // rebnder a page with a blank section containing a text block
       const {getByText} = renderEditor({
-        content: {version: '0.2', blocks: blank_section_with_text},
+        content: {id: '1', version: '0.2', blocks: blank_section_with_text},
       })
       await user.click(getByText('Preview').closest('button') as HTMLButtonElement)
 
@@ -149,7 +151,7 @@ describe('BlockEditor', () => {
     it('adjusts the view size', async () => {
       // rebnder a page with a blank section containing a text block
       const {getByText} = renderEditor({
-        content: {version: '0.2', blocks: blank_section_with_text},
+        content: {id: '1', version: '0.2', blocks: blank_section_with_text},
       })
       await user.click(getByText('Preview').closest('button') as HTMLButtonElement)
 

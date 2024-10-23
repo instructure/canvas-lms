@@ -133,13 +133,21 @@ export default class TrayController {
       // If the video just edited came from a file uploaded to canvas
       // and not notorious, we probably don't have a media_object_id.
       // If not, we can't update the MediaObject in the canvas db.
-      if (videoOptions.media_object_id && videoOptions.media_object_id !== 'undefined' && !videoOptions.editLocked) {
+      const hasMediaId =
+        (videoOptions.media_object_id && videoOptions.media_object_id !== 'undefined') ||
+        (data.attachment_id && data.attachment_id !== 'undefined')
+
+      if (hasMediaId && !videoOptions.editLocked) {
         videoOptions
           .updateMediaObject(data)
           .then(_r => {
             if (this.$videoContainer && videoOptions.displayAs === 'embed') {
               this.$videoContainer.contentWindow.postMessage(
-                {subject: 'reload_media', media_object_id: videoOptions.media_object_id},
+                {
+                  subject: 'reload_media',
+                  media_object_id: videoOptions.media_object_id,
+                  attachment_id: data.attachment_id,
+                },
                 bridge.canvasOrigin
               )
             }
@@ -165,11 +173,15 @@ export default class TrayController {
     if (!bridge.canvasOrigin) return
 
     this._subtitleListener = new AbortController()
-    window.addEventListener('message', (event) => {
-      if (event?.data?.subject === "media_tracks_response") {
-        cb(event?.data?.payload)
-      }
-    }, {signal: this._subtitleListener.signal})
+    window.addEventListener(
+      'message',
+      event => {
+        if (event?.data?.subject === 'media_tracks_response') {
+          cb(event?.data?.payload)
+        }
+      },
+      {signal: this._subtitleListener.signal}
+    )
 
     this.$videoContainer?.contentWindow?.postMessage(
       {subject: 'media_tracks_request'},
@@ -214,7 +226,7 @@ export default class TrayController {
             ? parseStudioOptions(this.$videoContainer)
             : null
         }
-        requestSubtitlesFromIframe={(cb) => this.requestSubtitlesFromIframe(cb)}
+        requestSubtitlesFromIframe={cb => this.requestSubtitlesFromIframe(cb)}
       />
     )
     ReactDOM.render(element, this.$container)

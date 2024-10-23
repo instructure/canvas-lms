@@ -60,9 +60,7 @@ module CanvasTextHelper
   end
 
   def self.indent(text, spaces = 2)
-    text = text.to_s rescue ""
-    indentation = " " * spaces
-    text.gsub("\n", "\n#{indentation}")
+    text.to_s.gsub("\n", "\n#{" " * spaces}")
   end
 
   # CGI escape a string, truncating it without breaking apart UTF-8 characters or other escape sequences

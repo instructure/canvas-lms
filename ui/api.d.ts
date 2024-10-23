@@ -430,6 +430,7 @@ export type Submission = Readonly<{
   redo_request: boolean
   score: null | number
   seconds_late: number
+  sticker: string | null
   similarityInfo: null | SimilarityScore
   submission_type: SubmissionType
   url?: null | string

@@ -297,13 +297,12 @@ describe Quizzes::Quiz do
   it_behaves_like "Canvas::DraftStateValidations"
 
   it "infers the times if none given" do
-    q = factory_with_protected_attributes(@course.quizzes,
-                                          title: "new quiz",
-                                          due_at: "Sep 3 2008 12:00am",
-                                          lock_at: "Sep 3 2008 12:00am",
-                                          unlock_at: "Sep 3 2008 12:00am",
-                                          quiz_type: "assignment",
-                                          workflow_state: "available")
+    q = @course.quizzes.create!(title: "new quiz",
+                                due_at: "Sep 3 2008 12:00am",
+                                lock_at: "Sep 3 2008 12:00am",
+                                unlock_at: "Sep 3 2008 12:00am",
+                                quiz_type: "assignment",
+                                workflow_state: "available")
     due_at = q.due_at
     expect(q.due_at).to eq Time.parse("Sep 3 2008 12:00am UTC")
     lock_at = q.lock_at
@@ -622,7 +621,7 @@ describe Quizzes::Quiz do
     q.generate_quiz_data
     q.save
     expect(q.quiz_data).not_to be_nil
-    data = q.quiz_data rescue nil
+    data = q.quiz_data
     expect(data).not_to be_nil
   end
 

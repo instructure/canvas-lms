@@ -20,7 +20,7 @@
 
 module Factories
   def group_model(opts = {})
-    @group = factory_with_protected_attributes(Group, valid_group_attributes.merge(opts))
+    @group = Group.create!(valid_group_attributes.merge(opts))
   end
 
   def valid_group_attributes

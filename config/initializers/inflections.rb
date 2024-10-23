@@ -29,5 +29,6 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.acronym "OAuth"
   inflect.acronym "OAuth2"
   inflect.acronym "LLM"
+  inflect.acronym "PKCE"
   inflect.irregular "feedback", "feedback"
 end

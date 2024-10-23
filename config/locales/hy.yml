@@ -1119,6 +1119,9 @@ hy:
         admins_can_change_passwords: "Ադմինիստրատոների կողմից գաղտնաբառերի սահմանում"
         admins_can_view_notifications: "Ադմինիստրատորները կարող են դիտել ծանուցումները"
         allow_invitation_previews: "Հրավերների նախնական դիտում"
+        allow_name_pronunciation_edit_for_admins: Ադմինիստրատոր
+        allow_name_pronunciation_edit_for_students: Ունկնդիր
+        allow_name_pronunciation_edit_for_teachers: Դասավանդող
         allow_sending_scores_in_emails: "Ունկնդիրները կարող են ընտրել ծանուցումները էլ.փոստով ստանալու տարբերակը"
         allow_sis_import: "SIS ներմուծումներ"
         author_email_in_notifications: "Ցույց տալ ուղարկողի էլ.փոստի հասցեն օգտատերերի փոխգործողությունների մասին ծանուցումների ուղարկման համար "
@@ -1627,6 +1630,7 @@ hy:
   add_an_assignment_fb73942e: "Ավելացնել հանձնարարություն"
   add_an_attachment_b2e9092f: "Ավելացնել ներդիր"
   add_an_identity_provider_to_this_account_c2644478: "Այս հաշվին ավելացնել նույնականացման տեղեկություններ տրամադրողին՝IdP "
+  add_announcement_e6de0fd: "Ավելացնել հայտարարություն"
   add_another_assignment_fc5c908f: "Ավելացնել մեկ այլ հանձնարարություն"
   add_app_baf540f: "Ավելացնել հավելված"
   add_as_a_faculty_journal_entry_55a38a30: "Ավելացնել որպես դասավանդողների մատյանում գրառումներ"
@@ -8610,6 +8614,7 @@ hy:
   invalid_url_cbde79f: "Սխալ URL"
   invalid_url_in_xml: "Սխալ Url -հասցե xml-ում: Անհրաժեշտ է խուսափել Ampersands-ից: "
   invalid_utf_8_13c76a6: "Սխալ UTF-8"
+  invalid_verification_code_please_try_again_fcfc0bc: "Ստուգման սխալ կոդ, փորձեք կրկին:"
   invalid_xml_syntax: "xml-ի սխալ սինտաքս"
   invite_5b1fcbcd: Հրավիրել
   is_invalid_702840b6: "սխալ է"
@@ -15451,6 +15456,29 @@ hy:
       titles: 
         click_to_change_profile_pic: "Սեղմել պրոֆիլի պատկերը փոխելու համար "
       user_has_no_bio: "%{user}ը կենսագրական տվյալներ չի ավելացրել"
+    profile_form: 
+      add_link_field: "Ավելացնել մեկ այլ հղում"
+      cancel: "Չեղյալ համարել"
+      is_required: "Անհրաժեշտ է լրացնել այս դաշտը"
+      links: Հղումներ
+      links_title: Վերնագիր
+      links_url: URL
+      manage_settings: "Գրանցված ծառայությունների կառավարում"
+      message_me: "ծանուցեք ինձ Canvas-ում"
+      message_title: Հաղորդագրություն
+      message_user_canvas: "Ծանուցեք %{user} Canvas-ում:"
+      name: Անվանումը
+      nothing_in_common: "Դուք ոչ մի ընդհանուր բան չունեք"
+      save_profile: "Պահպանել պրոֆիլը"
+      service_contact: "կապվել %{user} հետ %{service} միջոցով"
+      social_instructions: "Նշեք կապի այն եղանակները, որոնք կցանկանայիք տեսանելի լինեին մյուսներին ձեր պրոֆիլում:"
+      title: Վերնագիր
+      user_enrolled: Գրանցումներ
+    profile_main: 
+      cancel_editing: "Չեղյալ համարել խմբագրումը"
+      edit_profile: "Խմբագրել պրոֆիլը"
+      links: 
+        user_account_details: "Հաշվի տվյալներ"
     recent_activity: 
       date_column: Ամսաթիվ
       edit_group: "Խմբագրել խումբը"

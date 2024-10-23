@@ -39,6 +39,30 @@ module Canvas::OAuth
       end
     end
 
+    describe "#code_challenge" do
+      it "returns the code_challenge when pkce is set" do
+        provider = Provider.new("123", "", [], nil, pkce: { code_challenge: "challenge" })
+        expect(provider.code_challenge).to eq "challenge"
+      end
+
+      it "returns nil when pkce is not set" do
+        provider = Provider.new("123")
+        expect(provider.code_challenge).to be_nil
+      end
+    end
+
+    describe "#code_challenge_method" do
+      it "returns the code_challenge_method when pkce is set" do
+        provider = Provider.new("123", "", [], nil, pkce: { code_challenge_method: "S256" })
+        expect(provider.code_challenge_method).to eq "S256"
+      end
+
+      it "returns nil when pkce is not set" do
+        provider = Provider.new("123")
+        expect(provider.code_challenge_method).to be_nil
+      end
+    end
+
     describe "#has_valid_key?" do
       it "is true when there is a key and the key is active" do
         stub_dev_key(double(active?: true))

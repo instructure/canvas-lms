@@ -345,17 +345,24 @@ describe ContextController do
       end
 
       context "show_recent_messages_on_new_roster_user_page enabled" do
-        it "only shows 10 most recent messages" do
+        before do
           Account.site_admin.enable_feature!(:show_recent_messages_on_new_roster_user_page)
-          user_session(@admin)
           topic = @course.discussion_topics.create!(user: @student, message: "Discussion")
-          (1..15).each do |number|
-            topic.discussion_entries.create!(message: number, user: @student)
-          end
+          (1..11).each { |number| topic.discussion_entries.create!(message: number, user: @student) }
+          user_session(@admin)
+        end
+
+        it "only shows 10 most recent messages" do
           get "roster_user", params: { course_id: @course.id, id: @student.id }
           messages = assigns[:messages]
           expect(messages.count).to eq(10)
-          expect(messages.pluck(:message)).to eq(%w[15 14 13 12 11 10 9 8 7 6])
+          expect(messages.pluck(:message)).to eq(%w[11 10 9 8 7 6 5 4 3 2])
+        end
+
+        it "requires discussion entry :read permission" do
+          allow_any_instance_of(DiscussionEntry).to receive(:grants_right?).with(@admin, :read).and_return(false)
+          get "roster_user", params: { course_id: @course.id, id: @student.id }
+          expect(assigns[:messages]).to be_nil
         end
       end
     end

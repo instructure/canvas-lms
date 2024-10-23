@@ -420,6 +420,33 @@ describe "Pages API", type: :request do
         expect(json).to eq expected
       end
 
+      it "does add verifiers by default" do
+        file = attachment_model(context: @course)
+        page = @course.wiki_pages.create!(title: "hrup", body: "/courses/#{@course.id}/files/#{file.id}")
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/pages/#{page.url}",
+                        controller: "wiki_pages_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        url_or_id: page.url)
+        expect(json["body"]).to eq "/courses/#{@course.id}/files/#{file.id}?verifier=#{file.uuid}"
+      end
+
+      it "does not add verifiers when no_verifiers set" do
+        file = attachment_model(context: @course)
+        page = @course.wiki_pages.create!(title: "hrup", body: "/courses/#{@course.id}/files/#{file.id}")
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/pages/#{page.url}",
+                        controller: "wiki_pages_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        url_or_id: page.url,
+                        no_verifiers: true)
+        expect(json["body"]).to eq page.body
+      end
+
       it "retrieves front_page", priority: "1" do
         page = @course.wiki_pages.create!(title: "hrup", body: "blooop")
         page.set_as_front_page!

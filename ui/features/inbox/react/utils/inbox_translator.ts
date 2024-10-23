@@ -110,10 +110,16 @@ export function handleTranslatedModalBody(
   translatedText: string,
   isPrimary: boolean,
   activeSignature: string,
-  bodySetter: React.SetStateAction<string>
+  bodySetter: React.SetStateAction<string>,
+  newBody?: string
 ) {
   bodySetter(prevBody => {
-    let message = [translatedText, stripSignature(prevBody)]
+    let message
+    if (typeof newBody !== 'undefined') {
+      message = [translatedText, newBody]
+    } else {
+      message = [translatedText, stripSignature(prevBody)]
+    }
     if (!isPrimary) {
       message = message.reverse()
     }

@@ -21,6 +21,7 @@
 describe UserContent::FilesHandler do
   let(:is_public) { false }
   let(:in_app) { false }
+  let(:no_verifiers) { false }
   let(:course) { course_factory(active_all: true) }
   let(:attachment) do
     attachment_with_context(course, { filename: "test.mp4", content_type: "video" })
@@ -44,7 +45,7 @@ describe UserContent::FilesHandler do
   describe UserContent::FilesHandler::ProcessedUrl do
     subject(:processed_url) do
       UserContent::FilesHandler::ProcessedUrl.new(
-        match: uri_match, attachment:, is_public:, in_app:
+        match: uri_match, attachment:, is_public:, in_app:, no_verifiers:
       ).url
     end
 
@@ -108,6 +109,15 @@ describe UserContent::FilesHandler do
           expect(processed_url).not_to match(/#{attachment.context_type.tableize}/)
         end
       end
+
+      context "when no_verifiers is true" do
+        let(:no_verifiers) { true }
+
+        it "does not include verifier" do
+          query_string = processed_url.split("?")[1]
+          expect(Rack::Utils.parse_nested_query(query_string)).not_to have_key("verifier")
+        end
+      end
     end
   end
 
@@ -119,7 +129,8 @@ describe UserContent::FilesHandler do
         user: current_user,
         preloaded_attachments:,
         is_public:,
-        in_app:
+        in_app:,
+        no_verifiers:
       ).processed_url
     end
 

@@ -64,7 +64,7 @@ module Qti
           exact_node = or_node.at_css("stringMatch baseValue")
           next unless exact_node
 
-          exact = exact_node.text rescue "0.0"
+          exact = exact_node.text
 
           is_precision = false
           if (lower_node = or_node.at_css("and customOperator[class=vargt] baseValue")) &&
@@ -92,7 +92,7 @@ module Qti
             if (upper = or_node.at_css("and customOperator[class=varlte] baseValue"))
               # do margin computation with BigDecimal to avoid rounding errors
               # (this is also used when _scoring_ numeric range questions)
-              margin = BigDecimal(upper.text) - BigDecimal(exact) rescue "0.0"
+              margin = upper.text.to_d - exact.to_d
               answer[:margin] = margin.to_f
             end
           end
@@ -101,10 +101,10 @@ module Qti
           # range answer
           answer[:numerical_answer_type] = "range_answer"
           if (lower = and_node.at_css("customOperator[class=vargte] baseValue"))
-            answer[:start] = lower.text.to_f rescue 0.0
+            answer[:start] = lower.text.to_f
           end
           if (upper = and_node.at_css("customOperator[class=varlte] baseValue"))
-            answer[:end] = upper.text.to_f rescue 0.0
+            answer[:end] = upper.text.to_f
           end
           if upper || lower
             @question[:answers] << answer

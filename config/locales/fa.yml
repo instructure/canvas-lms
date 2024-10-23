@@ -1413,6 +1413,9 @@ fa:
         admins_can_change_passwords: "تنظیم رمز عبور توسط مدیرها"
         admins_can_view_notifications: "مدیرها می توانند اطلاعیه ها را مشاهده کنند"
         allow_invitation_previews: "پیش نمایش دعوت نامه"
+        allow_name_pronunciation_edit_for_admins: مدیر
+        allow_name_pronunciation_edit_for_students: Student
+        allow_name_pronunciation_edit_for_teachers: استاد
         allow_sending_scores_in_emails: "دانشجویان می توانند انتخاب کنند که نمره های خود را در اطلاعیه های پست الکترونیکی دریافت نمایند"
         allow_sis_import: "ورودهای اطلاعات سامانه اطلاعات دانشجو"
         author_email_in_notifications: "نمایش نشانی پست الکترونیکی فرستنده برای اطلاعیه های مربوط به تعامل کاربر"
@@ -2035,6 +2038,7 @@ fa:
   add_an_attachment_b2e9092f: "افزودن پیوست"
   add_an_identity_provider_to_this_account_c2644478: "افزودن ارائه دهنده هویت به این حساب:"
   add_announcement_165c3b05: "افزودن اطلاعیه"
+  add_announcement_e6de0fd: "افزودن اطلاعیه"
   add_another_assignment_fc5c908f: "افزودن تکلیف دیگر"
   add_app_baf540f: "افزودن برنامه"
   add_as_a_faculty_journal_entry_55a38a30: "افزودن به عنوان ورودی ژورنال هیأت علمی"
@@ -12946,6 +12950,7 @@ fa:
   invalid_utf_8_13c76a6: "UTF-8 معتبر نیست"
   invalid_value_a1b45937: "مقدار نامعتبر"
   invalid_value_for_name_i_4a7c601a: "مقدار نامعتبر برای %{name} : \"%{i}\""
+  invalid_verification_code_please_try_again_fcfc0bc: "رمز تأیید معتبر نیست، لطفا دوباره تلاش کنید"
   invalid_xml_configuration_9c3f6bcf: "پیکربندی xml معتبر نیست"
   invalid_xml_syntax: "قواعد xml معتبر نیست"
   invitation_only_9a253f1d: "فقط از طریق دعوت نامه"
@@ -21823,6 +21828,31 @@ fa:
       user_enrolled: "ثبت نام ها"
       user_has_no_bio: "%{user} یک شرح حال افزوده است"
       ways_to_contact_user: مخاطب
+    profile_form: 
+      add_link_field: "افزودن یک پیوند دیگر"
+      bio: "زندگی نامه"
+      cancel: لغو
+      is_required: "پر کردن این جای خالی لازم است"
+      links: پیوندها
+      links_title: Title
+      links_url: "نشانی اینترنتی"
+      manage_settings: "مدیریت سرویس های ثبت شده"
+      message_me: "ارسال پیام برای من در کانواس"
+      message_title: "ارسال پیام"
+      message_user_canvas: "ارسال پیام برای %{user} در کانواس"
+      name: Name
+      nothing_in_common: "هیچ چیز مشترکی ندارید"
+      save_profile: "ذخیره سازی رخ نما"
+      service_contact: "ارتباط با %{user} از طریق %{service}"
+      social_instructions: "روش های برقراری ارتباط که مایلید در رخ نمای شما برای دیگران قابل مشاهده باشند را علامت بزنید."
+      title: Title
+      user_enrolled: "ثبت نام ها"
+      ways_to_contact_user: مخاطب
+    profile_main: 
+      cancel_editing: "لغو ویرایش"
+      edit_profile: "ویرایش رخ نما"
+      links: 
+        user_account_details: "اطلاعات حساب"
     recent_activity: 
       date_column: تاریخ
       edit_group: "ویرایش گروه"

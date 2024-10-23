@@ -76,6 +76,7 @@ export const scratchPage = `{
       "alignment": "start",
       "layout": "column",
       "resizable": false,
+      "isColumn": true,
       "id": "columns-pEdeFvz6_0-1"
     },
     "displayName": "Group",

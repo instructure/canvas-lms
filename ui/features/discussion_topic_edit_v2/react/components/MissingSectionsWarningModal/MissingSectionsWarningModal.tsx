@@ -38,12 +38,11 @@ type Section = {
 }
 
 type Props = {
-  sections: Section[]
   onClose: () => void
   onContinue: () => void
 }
 
-export const MissingSectionsWarningModal = ({sections, onClose, onContinue}: Props) => {
+export const MissingSectionsWarningModal = ({onClose, onContinue}: Props) => {
   const renderCloseButton = () => {
     return <CloseButton onClick={onClose} screenReaderLabel={I18n.t('Close')} />
   }
@@ -70,16 +69,9 @@ export const MissingSectionsWarningModal = ({sections, onClose, onContinue}: Pro
       </Modal.Header>
       <Modal.Body padding="small">
         <p>
-          <Text>{I18n.t('Not all sections will be assigned this item.')}</Text>
+          <Text>{I18n.t('Not everyone will be assigned this item!')}</Text>
         </p>
-        <Text>{I18n.t('Would you like to go back to include:')}</Text>
-        <List margin="0 0 medium">
-          {sections.map(section => (
-            <List.Item key={section.id}>
-              <Text weight="bold">{section.name}</Text>
-            </List.Item>
-          ))}
-        </List>
+        <Text>{I18n.t('Would you like to continue?')}</Text>
       </Modal.Body>
       <Modal.Footer>
         <Button onClick={onClose} margin="0 x-small 0 0" data-testid="go-back-button">

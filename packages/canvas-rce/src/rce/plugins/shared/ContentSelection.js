@@ -18,9 +18,11 @@
 
 import {fromImageEmbed, fromVideoEmbed} from '../instructure_image/ImageEmbedOptions'
 import {isOnlyTextSelected} from '../../contentInsertionUtils'
+// eslint-disable-next-line import/no-nodejs-modules
 import * as url from 'url'
 import formatMessage from '../../../format-message'
 import {isStudioEmbeddedMedia} from './StudioLtiSupportUtils'
+import RCEGlobals from '../../RCEGlobals'
 
 const FILE_DOWNLOAD_PATH_REGEX = /^\/(courses\/\d+\/)?files\/\d+\/download$/
 
@@ -74,7 +76,7 @@ export function asLink($element, editor) {
   const fileName = $link.getAttribute('title')
   const published = $link.getAttribute('data-published') === 'true'
   const isPreviewable =
-    $link.hasAttribute('data-canvas-previewable') ||
+    $link.getAttribute('data-canvas-previewable') === 'true' ||
     $link.classList.contains('instructure_scribd_file') // needed to cover docs linked while there was a bug didn't add the data attr.
 
   return {
@@ -145,6 +147,15 @@ export function asAudioElement($element) {
       // eslint-disable-next-line no-empty
     } catch (e) {}
   }
+
+  if (RCEGlobals.getFeatures().media_links_use_attachment_id) {
+    const source = $audioIframe.getAttribute('src')
+    const matches = source?.match(/\/media_attachments_iframe\/(\d+)/)
+    if (matches) {
+      audioOptions.attachmentId = matches[1]
+    }
+  }
+
   return audioOptions
 }
 
@@ -230,7 +241,10 @@ function isMediaElement($element, mediaType) {
   }
 
   const media_obj_id = tinymceIframeShim.getAttribute('data-mce-p-data-media-id')
-  if (!media_obj_id) {
+  const is_media_attachment_iframe = tinymceIframeShim
+    .getAttribute('data-mce-p-src')
+    ?.includes('media_attachments_iframe')
+  if (!media_obj_id && !is_media_attachment_iframe) {
     return false
   }
 

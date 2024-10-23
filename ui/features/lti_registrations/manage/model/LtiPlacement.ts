@@ -179,14 +179,15 @@ export const ZLtiPlacement = z.enum(AllLtiPlacements)
 export type LtiPlacement = z.infer<typeof ZLtiPlacement>
 
 export const LtiPlacementsWithIcons = [
-  LtiPlacements.GlobalNavigation,
-  LtiPlacements.CourseHomeSubNavigation,
   LtiPlacements.AssignmentIndexMenu,
+  LtiPlacements.CourseHomeSubNavigation,
   LtiPlacements.CourseSettingsSubNavigation,
-  LtiPlacements.DiscussionTopicMenu,
   LtiPlacements.DiscussionTopicIndexMenu,
+  LtiPlacements.DiscussionTopicMenu,
   LtiPlacements.EditorButton,
   LtiPlacements.FileIndexMenu,
+  LtiPlacements.GlobalNavigation,
+  LtiPlacements.TopNavigation,
 ] as const
 
 /**
@@ -276,4 +277,8 @@ export type LtiPlacementWithIcon = (typeof LtiPlacementsWithIcons)[number]
 
 export const isLtiPlacement = (placement: unknown): placement is LtiPlacement => {
   return AllLtiPlacements.includes(placement as LtiPlacement)
+}
+
+export const isLtiPlacementWithIcon = (placement: unknown): placement is LtiPlacementWithIcon => {
+  return LtiPlacementsWithIcons.includes(placement as LtiPlacementWithIcon)
 }

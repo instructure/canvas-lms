@@ -62,7 +62,20 @@ export default class SyllabusCalendarEventsCollection extends PaginatedCollectio
           return ev
         }
         break
+      case 'sub_assignment':
+        normalize = function (ev) {
+          ev.related_id = ev.id
 
+          let overridden = false
+          each(ev.sub_assignment_overrides != null ? ev.sub_assignment_overrides : [], override => {
+            if (!overridden) {
+              ev.id = `${ev.id}_override_${override.id}`
+              return (overridden = true)
+            }
+          })
+          return ev
+        }
+        break
       case 'event':
         normalize = function (ev) {
           ev.related_id = ev.id = `${eventType}_${ev.id}`

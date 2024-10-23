@@ -150,8 +150,14 @@ $(document).ready(function () {
     event.preventDefault()
     ensureStudentsLoaded(() => {
       const submissionList = ENV.QUIZ_SUBMISSION_LIST
-      const unsubmittedStudents = submissionList.UNSUBMITTED_STUDENTS
-      const submittedStudents = submissionList.SUBMITTED_STUDENTS
+      const unsubmittedStudents = submissionList.UNSUBMITTED_STUDENTS.map(p => ({
+        ...p,
+        id: p.id.toString(),
+      }))
+      const submittedStudents = submissionList.SUBMITTED_STUDENTS.map(p => ({
+        ...p,
+        id: p.id.toString(),
+      }))
       const haveTakenQuiz = I18n.t(
         'students_who_have_taken_the_quiz',
         'Students who have taken the quiz'

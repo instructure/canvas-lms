@@ -64,6 +64,11 @@ class AccessToken < ActiveRecord::Base
       access_token.crypted_token_previously_changed? && access_token.manually_created? &&
         access_token.pending?
     end
+    p.dispatch :access_token_deleted
+    p.to(&:user)
+    p.whenever do |access_token|
+      access_token.manually_created? && access_token.deleted?
+    end
   end
 
   set_policy do
@@ -168,6 +173,11 @@ class AccessToken < ActiveRecord::Base
     end
   end
 
+  def set_permanent_expiration
+    expires_in = developer_key.tokens_expire_in
+    self.permanent_expires_at = Time.now.utc + expires_in if expires_in
+  end
+
   def usable?(token_key = :crypted_token)
     return false if expired? || pending?
 
@@ -265,8 +275,10 @@ class AccessToken < ActiveRecord::Base
     @plaintext_refresh_token = new_token
   end
 
-  def generate_refresh_token
-    self.refresh_token = CanvasSlug.generate(nil, TOKEN_SIZE) unless crypted_refresh_token
+  def generate_refresh_token(overwrite: false)
+    if !crypted_refresh_token || overwrite
+      self.refresh_token = CanvasSlug.generate(nil, TOKEN_SIZE)
+    end
   end
 
   def clear_plaintext_refresh_token!

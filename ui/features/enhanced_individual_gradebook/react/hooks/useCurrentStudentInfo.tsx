@@ -17,14 +17,13 @@
  */
 
 import {useCallback, useEffect, useState} from 'react'
-import {useQuery} from 'react-apollo'
 import type {
   GradebookStudentDetails,
-  GradebookStudentQueryResponse,
   GradebookUserSubmissionDetails,
   SubmissionGradeChange,
 } from '../../types'
-import {GRADEBOOK_STUDENT_QUERY} from '../../queries/Queries'
+import {fetchStudentSubmission} from '../../queries/Queries'
+import {useQuery} from '@canvas/query'
 
 type Response = {
   currentStudent?: GradebookStudentDetails
@@ -36,11 +35,12 @@ type Response = {
 export const useCurrentStudentInfo = (courseId: string, userId?: string | null): Response => {
   const [currentStudent, setCurrentStudent] = useState<GradebookStudentDetails>()
   const [studentSubmissions, setStudentSubmissions] = useState<GradebookUserSubmissionDetails[]>()
+  const queryKey = ['individual-gradebook-student', courseId, userId ?? '']
 
-  const {data, error, loading} = useQuery<GradebookStudentQueryResponse>(GRADEBOOK_STUDENT_QUERY, {
-    variables: {courseId, userIds: userId},
-    fetchPolicy: 'cache-and-network',
-    skip: !userId,
+  const {data, error, isLoading} = useQuery({
+    queryKey,
+    queryFn: fetchStudentSubmission,
+    enabled: !!userId,
   })
 
   useEffect(() => {
@@ -78,7 +78,7 @@ export const useCurrentStudentInfo = (courseId: string, userId?: string | null):
   return {
     currentStudent,
     studentSubmissions,
-    loadingStudent: loading,
+    loadingStudent: isLoading,
     updateSubmissionDetails,
   }
 }

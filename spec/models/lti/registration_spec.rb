@@ -75,8 +75,8 @@ RSpec.describe Lti::Registration do
         ims_registration # instantiate before test runs
       end
 
-      it "returns the registration_configuration" do
-        expect(subject).to eq(ims_registration.registration_configuration)
+      it "returns the internal_lti_configuration" do
+        expect(subject).to eq(ims_registration.internal_lti_configuration)
       end
     end
 

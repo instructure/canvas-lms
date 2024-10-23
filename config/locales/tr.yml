@@ -1399,6 +1399,9 @@ tr:
         admins_can_change_passwords: "Yöneticiler tarafından parola ayarları"
         admins_can_view_notifications: "Yöneticiler bildirimleri görebilir"
         allow_invitation_previews: "Davetleri Görüntüle"
+        allow_name_pronunciation_edit_for_admins: Yönetici
+        allow_name_pronunciation_edit_for_students: Öğrenci
+        allow_name_pronunciation_edit_for_teachers: Öğretmen
         allow_sending_scores_in_emails: "Öğrenciler puanlarını eposta bildirimi olarak alabilirler"
         allow_sis_import: "ÖBS İçe Aktarımları"
         author_email_in_notifications: "Kullanıcı etkileşim Bildirimleri için gönderenin eposta adresini göster"
@@ -2013,6 +2016,7 @@ tr:
   add_an_attachment_b2e9092f: "Bir dosya ekle"
   add_an_identity_provider_to_this_account_c2644478: "Bu hesap için bir kimlik sağlayıcı ekleyin:"
   add_announcement_165c3b05: "Duyuru ekle"
+  add_announcement_e6de0fd: "Duyuru Ekle"
   add_another_assignment_fc5c908f: "Başka ödev ekle"
   add_app_baf540f: "Uygulama Ekle"
   add_as_a_faculty_journal_entry_55a38a30: "Öğretim Üyesi Kayıt girişi olarak ekle"
@@ -10479,6 +10483,7 @@ tr:
   invalid_url_in_xml: "xml dosyasında geçersiz url. & işaretleri kullanılmamalı."
   invalid_username_or_password_b60aa240: "Geçersiz kullanıcı adı ve şifre"
   invalid_utf_8_13c76a6: "UTF-8 Geçersiz"
+  invalid_verification_code_please_try_again_fcfc0bc: "Geçersiz onaylama kodu, lütfen tekrar deneyin"
   invalid_xml_syntax: "Geçersiz XML yazımı"
   invite_5b1fcbcd: "Davet et"
   ip_filter_is_not_valid_152a46d8: "IP filtresi geçersiz."
@@ -17899,6 +17904,31 @@ tr:
       user_enrolled: Kayıtlar
       user_has_no_bio: "%{user} biyografisini eklememiş"
       ways_to_contact_user: İletişim
+    profile_form: 
+      add_link_field: "Farklı bağlantı ekle"
+      bio: Biyografi
+      cancel: İptal
+      is_required: "Bu alan zorunludur"
+      links: Bağlantılar
+      links_title: Başlık
+      links_url: URL
+      manage_settings: "Kayıtlı Servisleri Yönet"
+      message_me: "Canvas'tan mesaj"
+      message_title: Mesaj
+      message_user_canvas: "Canvas'tan %{user}'a mesaj"
+      name: İsim
+      nothing_in_common: "Ortak birşey yok"
+      save_profile: "Profili Kaydet"
+      service_contact: "%{user} kullanıcısının %{service} hizmeti ile iletişimini sağla"
+      social_instructions: "Profilinizde diğerleri tarafından görülmesini istediğiniz iletişim yöntemlerini seçin."
+      title: Başlık
+      user_enrolled: Kayıtlar
+      ways_to_contact_user: İletişim
+    profile_main: 
+      cancel_editing: "Düzenlemeyi İptal et"
+      edit_profile: "Profili Düzenle"
+      links: 
+        user_account_details: "Hesap Ayrıntıları"
     recent_activity: 
       date_column: Tarih
       edit_group: "Grubu Düzenle"

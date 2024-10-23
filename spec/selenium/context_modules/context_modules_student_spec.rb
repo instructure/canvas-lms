@@ -790,8 +790,8 @@ describe "context modules" do
       go_to_modules
 
       checkpoints = ff("div[data-testid='checkpoint']")
-      expect(checkpoints[0].text).to include("Reply to Topic\n#{datetime_string(@c1.due_at)}")
-      expect(checkpoints[1].text).to include("Required Replies (#{@topic.reply_to_entry_required_count})\n#{datetime_string(@c2.due_at)}")
+      expect(checkpoints[0].text).to include("Reply to Topic\n#{datetime_string(@c1.reload.due_at)}")
+      expect(checkpoints[1].text).to include("Required Replies (#{@topic.reply_to_entry_required_count})\n#{datetime_string(@c2.reload.due_at)}")
     end
 
     it "shows checkpoints (with applicable due date override when there is nothing but overrides)" do

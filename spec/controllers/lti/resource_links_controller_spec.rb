@@ -113,6 +113,15 @@ describe Lti::ResourceLinksController, type: :request do
                                                                                 })
     end
 
+    it "includes launch_url for each resource link" do
+      subject
+      launch_urls = response_json.to_h { |rl| [rl["id"], rl["canvas_launch_url"]] }
+      expect(launch_urls[assignment_rl.id]).to eq("http://www.example.com/courses/#{course.id}/assignments/#{assignment.id}")
+      expect(launch_urls[module_item_rl.id]).to eq("http://www.example.com/courses/#{course.id}/external_tools/retrieve?resource_link_lookup_uuid=#{module_item_rl.lookup_uuid}")
+      expect(launch_urls[collaboration_rl.id]).to eq("http://www.example.com/courses/#{course.id}/external_tools/retrieve?resource_link_lookup_uuid=#{collaboration_rl.lookup_uuid}")
+      expect(launch_urls[rich_content_rl.id]).to eq("http://www.example.com/courses/#{course.id}/external_tools/retrieve?resource_link_lookup_uuid=#{rich_content_rl.lookup_uuid}")
+    end
+
     context "with deleted link and content" do
       before do
         collaboration_rl.destroy
@@ -192,6 +201,11 @@ describe Lti::ResourceLinksController, type: :request do
     it "returns the resource link" do
       subject
       expect(response_json).to include({ id: })
+    end
+
+    it "includes the canvas launch url" do
+      subject
+      expect(response_json["canvas_launch_url"]).to eq(retrieve_course_external_tools_url(course, resource_link_lookup_uuid: resource_link.lookup_uuid))
     end
 
     context "with lookup_uuid" do
@@ -338,6 +352,361 @@ describe Lti::ResourceLinksController, type: :request do
           subject
           expect(response_json).to include({ id: resource_link.id })
         end
+      end
+    end
+  end
+
+  describe "POST #create" do
+    subject { post "/api/v1/courses/#{course.id}/lti_resource_links", params: }
+
+    let(:custom) { { "hello" => "world" } }
+    let(:url) { "https://example.com/lti/launch" }
+    let(:title) { "My LTI Link" }
+    let(:params) { { url:, custom:, title: } }
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      before { user_session(student_in_course(account:).user) }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with flag disabled" do
+      before { account.disable_feature!(:lti_resource_links_api) }
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    it "is successful" do
+      subject
+      expect(response).to be_successful
+    end
+
+    it "creates a resource link" do
+      expect { subject }.to change { course.lti_resource_links.count }.by(1)
+    end
+
+    it "returns the resource link" do
+      subject
+      expect(response_json).to include({ url:, title:, custom: }.stringify_keys)
+    end
+
+    context "with no matching tool" do
+      let(:url) { "https://othertool.com/lti/launch" }
+
+      it "returns 422" do
+        subject
+        expect(response).to be_unprocessable
+      end
+    end
+
+    context "with invalid url param" do
+      let(:url) { "hello world!" }
+
+      it "returns 422" do
+        subject
+        expect(response).to be_unprocessable
+      end
+    end
+
+    context "with invalid custom param" do
+      let(:custom) { "hello" }
+
+      it "returns 422" do
+        subject
+        expect(response).to be_unprocessable
+      end
+    end
+  end
+
+  describe "POST #bulk_create" do
+    subject { post "/api/v1/courses/#{course.id}/lti_resource_links/bulk", params:, as: :json }
+
+    let(:params) do
+      [
+        { url: "https://example.com/lti/launch", title: "My LTI Link 1" },
+        { url: "https://example.com/lti/launch", title: "My LTI Link 2", custom: { "hello" => "world" } }
+      ]
+    end
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      before { user_session(student_in_course(account:).user) }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with flag disabled" do
+      before { account.disable_feature!(:lti_resource_links_api) }
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    it "is successful" do
+      subject
+      expect(response).to be_successful
+    end
+
+    it "creates resource links" do
+      expect { subject }.to change { course.lti_resource_links.count }.by(2)
+      first = course.lti_resource_links.find_by(title: "My LTI Link 1")
+      expect(first.custom).to be_nil
+      expect(first.url).to eq("https://example.com/lti/launch")
+      second = course.lti_resource_links.find_by(title: "My LTI Link 2")
+      expect(second.custom).to eq({ "hello" => "world" })
+      expect(second.url).to eq("https://example.com/lti/launch")
+    end
+
+    it "returns the resource links" do
+      subject
+      expect(response_json.size).to eq(2)
+    end
+
+    context "with one invalid link" do
+      let(:params) do
+        [
+          { url: "hello world!", title: "My LTI Link 1" },
+        ]
+      end
+
+      it "returns 422" do
+        subject
+        expect(response).to be_unprocessable
+      end
+
+      it "does not create any links" do
+        expect { subject }.not_to change { course.lti_resource_links.count }
+      end
+    end
+
+    context "with some invalid links" do
+      let(:params) do
+        [
+          { url: "hello world!", title: "My LTI Link 1" },
+          { url: "https://example.com/lti/launch", title: "My LTI Link 2", custom: { "hello" => "world" } }
+        ]
+      end
+
+      it "returns 422" do
+        subject
+        expect(response).to be_unprocessable
+      end
+
+      it "does not create any links" do
+        expect { subject }.not_to change { course.lti_resource_links.count }
+      end
+    end
+
+    context "with more links than are allowed" do
+      let(:max_size) { 10 }
+      let(:params) { Array.new(12) { { url: "https://example.com/lti/launch", title: "My LTI Link" } } }
+
+      before do
+        stub_const("Lti::ResourceLinksController::MAX_BULK_CREATE", max_size)
+      end
+
+      it "returns 422" do
+        subject
+        expect(response).to be_unprocessable
+      end
+
+      it "creates no links" do
+        expect { subject }.not_to change { course.lti_resource_links.count }
+      end
+    end
+  end
+
+  describe "DELETE #destroy" do
+    subject { delete "/api/v1/courses/#{course.id}/lti_resource_links/#{id}" }
+
+    let(:resource_link) { resource_link_model(context: course) }
+    let(:id) { resource_link.id }
+    let(:url) { resource_link.url }
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      before { user_session(student_in_course(account:).user) }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with flag disabled" do
+      before { account.disable_feature!(:lti_resource_links_api) }
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    it "is successful" do
+      subject
+      expect(response).to be_successful
+    end
+
+    it "returns the resource link" do
+      subject
+      expect(response_json).to include({ id: })
+    end
+
+    it "deletes the resource link" do
+      subject
+      expect(resource_link.reload).to be_deleted
+    end
+
+    context "with lookup_uuid" do
+      let(:id) { "lookup_uuid:#{resource_link.lookup_uuid}" }
+
+      it "is successful" do
+        subject
+        expect(response).to be_successful
+      end
+
+      it "returns the resource link" do
+        subject
+        expect(response_json).to include({ id: resource_link.id })
+      end
+
+      it "deletes the resource link" do
+        subject
+        expect(resource_link.reload).to be_deleted
+      end
+    end
+
+    context "with resource_link_uuid" do
+      let(:id) { "resource_link_uuid:#{resource_link.resource_link_uuid}" }
+
+      it "is successful" do
+        subject
+        expect(response).to be_successful
+      end
+
+      it "returns the resource link" do
+        subject
+        expect(response_json).to include({ id: resource_link.id })
+      end
+
+      it "deletes the resource link" do
+        subject
+        expect(resource_link.reload).to be_deleted
+      end
+
+      context "with already deleted link" do
+        before { resource_link.destroy }
+
+        it "returns 404" do
+          subject
+          expect(response).to be_not_found
+        end
+      end
+    end
+
+    context "with already deleted link" do
+      before { resource_link.destroy }
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+
+      context "with include_deleted param" do
+        subject { delete "/api/v1/courses/#{course.id}/lti_resource_links/#{id}?include_deleted=true" }
+
+        it "returns 404" do
+          subject
+          expect(response).to be_not_found
+        end
+      end
+    end
+
+    context "with assignment resource link" do
+      let(:resource_link) { resource_link_model(context: assignment_model(course:)) }
+
+      it "returns 422" do
+        subject
+        expect(response).to be_unprocessable
+      end
+    end
+
+    context "with module item resource link" do
+      let_once(:context_module) do
+        ContextModule.create!(
+          context: course,
+          name: "External Tools"
+        )
+      end
+      let_once(:module_item) do
+        ContentTag.create!(
+          context: course,
+          context_module:,
+          tag_type: :context_module,
+          content: tool,
+          url:,
+          associated_asset: resource_link
+        )
+      end
+      let_once(:resource_link) { resource_link_model(context: course) }
+
+      it "returns 422" do
+        subject
+        expect(response).to be_unprocessable
+      end
+    end
+
+    context "with collaboration resource link" do
+      let_once(:collaboration) do
+        ExternalToolCollaboration.create!(
+          title: "my collab",
+          user: admin,
+          url:,
+          context: course,
+          resource_link_lookup_uuid: resource_link.lookup_uuid
+        )
+      end
+      let_once(:resource_link) { resource_link_model(context: course) }
+
+      it "returns 422" do
+        subject
+        expect(response).to be_unprocessable
       end
     end
   end

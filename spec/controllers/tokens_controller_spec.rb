@@ -77,6 +77,12 @@ describe TokensController do
         expect(assigns[:token].permanent_expires_at.to_date).to eq Time.zone.parse("jun 1 2011").to_date
       end
 
+      it "does not allow creating a token without a purpose param" do
+        post "create", params: { user_id: "self", token: { expires_at: "jun 1 2011" } }
+        assert_status(400)
+        expect(response.body).to match(/purpose/)
+      end
+
       it "allows deleting an access token" do
         token = @user.access_tokens.create!
         expect(token.user_id).to eq @user.id
@@ -146,6 +152,13 @@ describe TokensController do
         expect(assigns[:token].purpose).to eq "new purpose"
         expect(response.body).to match(/#{assigns[:token].token_hint}/)
         expect(assigns[:token]).to be_active
+      end
+
+      it "does not overwrite the token's permanent_expires_at on update if expires_at not provided" do
+        token = @user.access_tokens.create!(permanent_expires_at: 1.day.from_now)
+        put "update", params: { user_id: "self", id: token.id, token: { purpose: "test" } }
+        expect(assigns[:token].purpose).to eq "test"
+        expect(assigns[:token].permanent_expires_at).to eq token.permanent_expires_at
       end
 
       it "allows regenerating a manually generated token" do

@@ -943,6 +943,8 @@ ko:
         admins_can_change_passwords: "관리자가 설정한 암호"
         admins_can_view_notifications: "관리자가 알림을 볼 수 있음"
         allow_invitation_previews: "초대 미리 보기"
+        allow_name_pronunciation_edit_for_students: 학생
+        allow_name_pronunciation_edit_for_teachers: 교사
         allow_sending_scores_in_emails: "학생이 이메일 알림에 점수를 받도록 옵트인할 수 있습니다."
         allow_sis_import: "SIS 가져오기"
         canvas_authentication: "Canvas 인증"
@@ -1368,6 +1370,7 @@ ko:
   add_a_comment_48994930: "의견 추가"
   add_an_assignment_fb73942e: "과제 추가"
   add_an_attachment_b2e9092f: "첨부 추가"
+  add_announcement_e6de0fd: "공지 사항 추가"
   add_another_assignment_fc5c908f: "다른 과제 추가"
   add_app_baf540f: "앱 추가"
   add_as_a_faculty_journal_entry_55a38a30: "교원 일지 항목으로 추가"
@@ -7193,6 +7196,7 @@ ko:
   invalid_file_type_881cc9b2: "유효하지 않은 파일 유형"
   invalid_url_cbde79f: "잘못된 URL"
   invalid_url_in_xml: "XML에 잘못된 URL이 있습니다. 앰퍼샌드는 이스케이프 처리를 해야 합니다."
+  invalid_verification_code_please_try_again_fcfc0bc: "유효하지 않은 인증코드입니다. 다시 시도하시기 바랍니다."
   invalid_xml_syntax: "유효하지 않은 XML 구문"
   invite_5b1fcbcd: 초대
   is_invalid_702840b6: "올바르지 않습니다"
@@ -12764,6 +12768,31 @@ ko:
         click_to_change_profile_pic: "프로필 사진을 변경하려면 클릭"
       user_has_no_bio: "%{user}이/가 추가한 소개 없음"
       ways_to_contact_user: 연락처
+    profile_form: 
+      add_link_field: "다른 링크 추가"
+      bio: 소개
+      cancel: 취소
+      is_required: "이 필드가 필요함"
+      links: 링크
+      links_title: 직함
+      links_url: URL
+      manage_settings: "등록된 서비스 관리"
+      message_me: "Canvas에게 내게 메시지 보내기"
+      message_title: 메시지
+      message_user_canvas: "Canvas에서 %{user}에게 메시지 보내기"
+      name: 이름
+      nothing_in_common: "공통점이 없음"
+      save_profile: "프로필 저장"
+      service_contact: "%{service}(으)로 %{user}에게 연락"
+      social_instructions: "프로필에서 다른 사람에게 표시되는 연락 방법을 표시하십시오."
+      title: 직함
+      user_enrolled: 등록
+      ways_to_contact_user: 연락처
+    profile_main: 
+      cancel_editing: "편집 취소"
+      edit_profile: "프로필 편집"
+      links: 
+        user_account_details: "계정 세부 정보"
     recent_activity: 
       date_column: 날짜
       edit_group: "그룹 편집"

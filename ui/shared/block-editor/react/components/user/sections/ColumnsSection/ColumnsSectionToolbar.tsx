@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback} from 'react'
+import React, {useCallback, useEffect, useState, useRef} from 'react'
 import {useEditor, useNode, type Node} from '@craftjs/core'
 import {Flex} from '@instructure/ui-flex'
 import {NumberInput} from '@instructure/ui-number-input'
@@ -27,7 +27,7 @@ import {GroupBlock} from '../../blocks/GroupBlock'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/columnss-block')
+const I18n = useI18nScope('block-editor')
 
 const MIN_COLS = 1
 const MAX_COLS = 4
@@ -42,6 +42,15 @@ const ColumnsSectionToolbar = () => {
     props: n.data.props,
     node: n,
   }))
+  const [currColumns, setCurrColumns] = useState(props.columns)
+  const colInputRef = useRef<HTMLInputElement | null>(null)
+
+  useEffect(() => {
+    if (currColumns !== props.columns) {
+      setCurrColumns(props.columns)
+      colInputRef.current?.focus()
+    }
+  }, [currColumns, props.columns])
 
   const handleDecrementCols = useCallback(() => {
     if (props.columns > MIN_COLS) {
@@ -54,8 +63,13 @@ const ColumnsSectionToolbar = () => {
       setProp((prps: ColumnsSectionProps) => (prps.columns = props.columns + 1))
       const inner = query.node(query.node(node.id).linkedNodes()[0]).get()
       if (inner.data.nodes.length < props.columns + 1) {
-        const column = query.parseReactElement(<GroupBlock resizable={false} />).toNodeTree()
+        const column = query
+          .parseReactElement(<GroupBlock resizable={false} isColumn={true} />)
+          .toNodeTree()
         actions.addNodeTree(column, inner.id)
+        requestAnimationFrame(() => {
+          actions.selectNode(node.id)
+        })
       }
     }
   }, [actions, node.id, props.columns, query, setProp])
@@ -63,9 +77,12 @@ const ColumnsSectionToolbar = () => {
   return (
     <Flex gap="small">
       <Flex gap="x-small">
-        <Text>Columns</Text>
+        <Text>{I18n.t('Section Columns')}</Text>
         <NumberInput
           data-testid="columns-input"
+          inputRef={el => {
+            colInputRef.current = el
+          }}
           renderLabel={
             <ScreenReaderContent>{I18n.t('Columns 1-%{max}', {max: MAX_COLS})}</ScreenReaderContent>
           }

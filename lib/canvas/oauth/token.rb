@@ -94,8 +94,7 @@ module Canvas::OAuth
                                                })
         @access_token.real_user = real_user if real_user && real_user != user
 
-        expires_in = key.tokens_expire_in
-        @access_token.permanent_expires_at = Time.now.utc + expires_in if expires_in
+        @access_token.set_permanent_expiration
 
         @access_token.save!
 
@@ -173,6 +172,11 @@ module Canvas::OAuth
         REMEMBER_ACCESS => options[:remember_access]
       }
       Canvas.redis.setex("#{REDIS_PREFIX}#{code}", 10.minutes.to_i, code_data.to_json)
+
+      if Canvas::OAuth::PKCE.use_pkce_in_authorization?(options)
+        Canvas::OAuth::PKCE.store_code_challenge(options[:code_challenge], code)
+      end
+
       code
     end
 

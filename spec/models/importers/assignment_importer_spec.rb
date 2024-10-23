@@ -426,7 +426,7 @@ describe "Importing assignments" do
         peer_reviews_due_at: 2.days.from_now,
         migration_id:,
         submission_types: "external_tool",
-        external_tool_tag_attributes: { url: tool.url, content: tool },
+        external_tool_tag_attributes: { url: tool.url, content: tool, new_tab: tool_current_tab },
         points_possible: 10
       )
     end
@@ -445,9 +445,12 @@ describe "Importing assignments" do
         "lock_at" => nil,
         "unlock_at" => nil,
         "external_tool_url" => tool_url,
-        "external_tool_id" => tool_id
+        "external_tool_id" => tool_id,
+        "external_tool_new_tab" => tool_new_tab
       }
     end
+    let(:tool_current_tab) { false }
+    let(:tool_new_tab) { false }
 
     context "and a matching tool is installed in the destination" do
       let(:tool) { external_tool_model(context: course.root_account) }
@@ -467,6 +470,44 @@ describe "Importing assignments" do
 
         it "updates the URL" do
           expect { subject }.to change { assignment.external_tool_tag.url }.from(tool.url).to tool_url
+        end
+      end
+
+      context "and there is no new_tab setting" do
+        let(:tool_current_tab) { false }
+        let(:tool_new_tab) { nil }
+
+        it "does not change the setting" do
+          expect { subject }.not_to change { assignment.external_tool_tag.new_tab }.from(false)
+        end
+      end
+
+      context "and the new_tab setting is the same as the tool" do
+        let(:tool_current_tab) { false }
+        let(:tool_new_tab) { false }
+
+        it "does not change the setting" do
+          expect { subject }.not_to change { assignment.external_tool_tag.new_tab }.from(false)
+        end
+      end
+
+      context "but the matching tool has a different new_tab setting" do
+        context "when the old setting is false and the new is true" do
+          let(:tool_current_tab) { false }
+          let(:tool_new_tab) { true }
+
+          it "updates the setting to true" do
+            expect { subject }.to change { assignment.external_tool_tag.new_tab }.from(false).to true
+          end
+        end
+
+        context "when the old setting is true and the new is false" do
+          let(:tool_current_tab) { true }
+          let(:tool_new_tab) { false }
+
+          it "updates the setting to false" do
+            expect { subject }.to change { assignment.external_tool_tag.new_tab }.from(true).to false
+          end
         end
       end
     end
@@ -1449,6 +1490,136 @@ describe "Importing assignments" do
           issues = migration.migration_issues
           expect(issues.count).to eq(1)
           expect(migration.migration_issues.first.description).to eq(expected_issue_message)
+        end
+      end
+    end
+  end
+
+  describe "import sub assignments" do
+    subject do
+      Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+      course.assignments.find_by(migration_id:)
+    end
+
+    let(:course) { Course.create! }
+    let(:account) { course.root_account }
+    let(:migration) { course.content_migrations.create! }
+    let(:assignment_hash) do
+      {
+        migration_id:,
+        title: "with_subassignment",
+        post_to_sis: false,
+        date_shift_options: {
+          remove_dates: true
+        },
+        sub_assignments: [
+          {
+            id: 1337,
+            migration_id: "test_migration_id_1337",
+            title: "sub_assignment1",
+            tag: CheckpointLabels::REPLY_TO_TOPIC,
+          },
+          {
+            title: "sub_assignment2",
+            tag: CheckpointLabels::REPLY_TO_ENTRY,
+          }
+        ],
+      }
+    end
+
+    context "when the discussion_checkpoints feature flag is on" do
+      before do
+        account.enable_feature!(:discussion_checkpoints)
+      end
+
+      it "imports the two sub assignments from the hash" do
+        expect(subject.sub_assignments.length).to eq(2)
+      end
+
+      it "sets the has_sub_assignments" do
+        expect(subject.has_sub_assignments).to be_truthy
+      end
+
+      it "sets the proper tags for the sub assignments" do
+        expect(subject.sub_assignments.pluck(:sub_assignment_tag)).to match_array([CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY])
+      end
+
+      it "sets the same context for sub assignments" do
+        expect(subject.sub_assignments.all? { |sub_assignment| sub_assignment.context == subject.context }).to be_truthy
+      end
+
+      it "handles nil sub assignments" do
+        assignment_hash[:sub_assignments] = nil
+
+        expect(subject.sub_assignments.length).to eq(0)
+      end
+
+      it "handles empty sub assignments" do
+        assignment_hash[:sub_assignments] = []
+
+        expect(subject.sub_assignments.length).to eq(0)
+      end
+
+      it "raises error if any sub assignment is invalid" do
+        assignment_hash[:sub_assignments] = assignment_hash[:sub_assignments] + [{ title: "sub_assignment1" }]
+
+        expect do
+          subject
+        end.to raise_error(ActiveRecord::RecordInvalid)
+      end
+    end
+
+    context "when the discussion_checkpoints feature flag is off" do
+      it "does not import sub assignments" do
+        expect(subject.sub_assignments.length).to eq(0)
+      end
+    end
+
+    describe ".find_or_create_sub_assignment" do
+      subject do
+        Importers::AssignmentImporter.find_or_create_sub_assignment(sub_assignment_hash, parent_item)
+      end
+
+      let(:parent_item) { course.assignments.create!(title: "parent_assignment") }
+      let(:sub_assignment_hash) { assignment_hash[:sub_assignments].first }
+
+      context "when a sub assignment already exists with the same id" do
+        before do
+          @existing_sub_assignment = parent_item.sub_assignments.create!(
+            id: sub_assignment_hash[:id],
+            title: "sub_assignment1",
+            sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+            context: parent_item.context
+          )
+        end
+
+        it "does not create a new sub assignment" do
+          expect(subject).to eq(@existing_sub_assignment)
+        end
+      end
+
+      context "when a sub assignment already exists with the same migration id" do
+        before do
+          @existing_sub_assignment = parent_item.sub_assignments.create!(
+            migration_id: sub_assignment_hash[:migration_id],
+            title: "sub_assignment1",
+            sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+            context: parent_item.context
+          )
+        end
+
+        it "returns that sub assignment" do
+          expect(subject).to eq(@existing_sub_assignment)
+        end
+      end
+
+      context "when a sub assignment does not exist" do
+        it "creates a new sub assignment model instance" do
+          expect(subject.id).to be_nil
+        end
+
+        it "properly sets parent_assignment_id" do
+          expect(subject.parent_assignment_id).to eq(parent_item.id)
         end
       end
     end

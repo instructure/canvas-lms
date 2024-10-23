@@ -35,8 +35,8 @@ describe DataFixup::BulkColumnUpdater do
   end
 
   before do
-    # Reconnecting in Rails test env actually clears the table, so stop that
-    allow(ContextExternalTool.connection).to receive(:reconnect!)
+    # Disconnecting in Rails test env actually clears the table, so stop that
+    allow(ContextExternalTool.connection).to receive(:disconnect!)
   end
 
   describe "happy path" do
@@ -187,7 +187,7 @@ describe DataFixup::BulkColumnUpdater do
   end
 
   it "drops the temp table after the block is done" do
-    expect(ContextExternalTool.connection).to receive(:reconnect!).once.and_call_original
+    expect(ContextExternalTool.connection).to receive(:disconnect!).once.and_call_original
 
     bcu = described_class.new(ContextExternalTool, :unified_tool_id)
     temp_table_name = nil

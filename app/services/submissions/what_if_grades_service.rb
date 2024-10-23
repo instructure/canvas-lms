@@ -19,21 +19,24 @@
 
 module Submissions
   class WhatIfGradesService < ApplicationService
-    def initialize(current_user, submission, what_if_grade)
+    def initialize(current_user)
       super()
       @current_user = current_user
-      @submission = submission
-      @what_if_grade = what_if_grade
     end
 
-    def call
-      raise "Invalid submission" unless @submission
+    def update(submission, what_if_grade)
+      raise "Invalid submission" unless submission
 
-      if @submission.update_column(:student_entered_score, @what_if_grade)
-        GradeCalculator.new(@current_user, @submission.course, use_what_if_scores: true, emit_live_event: false).compute_scores
+      if submission.update_column(:student_entered_score, what_if_grade)
+        GradeCalculator.new(@current_user, submission.course, use_what_if_scores: true, emit_live_event: false).compute_scores
       else
         @submission.errors.add(:student_entered_score, "could not be updated")
       end
+    end
+
+    def reset_for_course(course)
+      Submission.where(user: @current_user, course:).update_all(student_entered_score: nil, updated_at: Time.zone.now)
+      GradeCalculator.new(@current_user, course, emit_live_event: false).compute_scores
     end
   end
 end

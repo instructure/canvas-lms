@@ -69,6 +69,14 @@ describe('DueDateList', () => {
     expect(dueDateList.containsSectionsWithoutOverrides()).toBe(false)
   })
 
+  test(`containsSectionsWithoutOverrides returns false when overrides contain a course override`, () => {
+    const overridesWithDefaultDueDate = new AssignmentOverrideCollection(partialOverrides.toJSON())
+    const courseOverride = new AssignmentOverride({course_id: '1'})
+    overridesWithDefaultDueDate.add(courseOverride)
+    const dueDateList = new DueDateList(overridesWithDefaultDueDate, sections, assignment)
+    expect(dueDateList.containsSectionsWithoutOverrides()).toBe(false)
+  })
+
   test(`containsSectionsWithoutOverrides returns false if all sections belong to an assignment override`, () => {
     expect(completeOverridesList.containsSectionsWithoutOverrides()).toBe(false)
   })

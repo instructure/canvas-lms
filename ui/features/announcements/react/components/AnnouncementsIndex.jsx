@@ -40,6 +40,7 @@ import masterCourseDataShape from '@canvas/courses/react/proptypes/masterCourseD
 import actions from '../actions'
 import propTypes from '../propTypes'
 import {ConnectedIndexHeader} from './IndexHeader'
+import TopNavPortalWithDefaults from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 
 const I18n = useI18nScope('announcements_v2')
 
@@ -178,20 +179,29 @@ export default class AnnouncementsIndex extends Component {
 
   render() {
     return (
-      <div className="announcements-v2__wrapper">
-        <ScreenReaderContent>
-          <Heading level="h1">{I18n.t('Announcements')}</Heading>
-        </ScreenReaderContent>
-        <ConnectedIndexHeader
-          searchInputRef={c => {
-            this.searchInput = c
-          }}
-        />
-        {this.renderSpinner(this.props.isLoadingAnnouncements, I18n.t('Loading Announcements'))}
-        {this.renderEmptyAnnouncements()}
-        {this.renderAnnouncements()}
-        {this.renderPagination()}
-      </div>
+      <>
+        {window.ENV.FEATURES?.instui_nav && (
+          <TopNavPortalWithDefaults
+            currentPageName={I18n.t('Announcements')}
+            useTutorial={true}
+            useStudentView={true}
+          />
+        )}
+        <div className="announcements-v2__wrapper">
+          <ScreenReaderContent>
+            <Heading level="h1">{I18n.t('Announcements')}</Heading>
+          </ScreenReaderContent>
+          <ConnectedIndexHeader
+            searchInputRef={c => {
+              this.searchInput = c
+            }}
+          />
+          {this.renderSpinner(this.props.isLoadingAnnouncements, I18n.t('Loading Announcements'))}
+          {this.renderEmptyAnnouncements()}
+          {this.renderAnnouncements()}
+          {this.renderPagination()}
+        </div>
+      </>
     )
   }
 }

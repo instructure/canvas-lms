@@ -196,7 +196,7 @@ describe "courses/settings" do
       expect(select).not_to be_nil
       # select.children.count.should == 3
 
-      option_ids = select.search("option").map { |c| c.attributes["value"].value.to_i rescue c.to_s }
+      option_ids = select.search("option").map { |c| c.attributes["value"].value.to_i }
       expect(option_ids.sort).to eq [@subaccount.id, @sub_subaccount1.id, @sub_subaccount2.id].sort
     end
 

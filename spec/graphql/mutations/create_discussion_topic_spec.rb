@@ -766,6 +766,41 @@ describe Mutations::CreateDiscussionTopic do
           expect_error(result, "If RQD is enabled, checkpoints cannot be created")
         end
       end
+
+      it "returns an error if the sum of possible points for the checkpoints exceeds the max for the assignment" do
+        context_type = "Course"
+        title = "Graded Discussion w/Checkpoints"
+        message = "Lorem ipsum..."
+        published = true
+
+        query = <<~GQL
+          contextId: "#{@course.id}"
+          contextType: #{context_type}
+          title: "#{title}"
+          message: "#{message}"
+          published: #{published}
+          assignment: {
+            courseId: "#{@course.id}",
+            name: "#{title}",
+            forCheckpoints: true,
+          }
+          checkpoints: [
+            {
+              checkpointLabel: reply_to_topic,
+              pointsPossible: 999999999,
+              dates: []
+            },
+            {
+              checkpointLabel: reply_to_entry,
+              pointsPossible: 1,
+              dates: [],
+              repliesRequired: 3
+            }
+          ]
+        GQL
+        result = execute_with_input_with_assignment(query)
+        expect_error(result, "The value of possible points for this assignment cannot exceed 999999999.")
+      end
     end
   end
 

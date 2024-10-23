@@ -123,7 +123,7 @@ const ButtonBlockToolbar = () => {
             withBorder={false}
             screenReaderLabel="Size"
           >
-            <IconBoxLine size="x-small" />
+            <IconBoxLine />
           </IconButton>
         }
         onSelect={handleSizeChange}
@@ -148,7 +148,7 @@ const ButtonBlockToolbar = () => {
             withBorder={false}
             screenReaderLabel="Style"
           >
-            <IconButtonAndIconMakerLine size="x-small" />
+            <IconButtonAndIconMakerLine />
           </IconButton>
         }
         onSelect={handleVariantChange}

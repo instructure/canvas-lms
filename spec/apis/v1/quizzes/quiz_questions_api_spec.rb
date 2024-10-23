@@ -251,6 +251,30 @@ describe Quizzes::QuizQuestionsController, type: :request do
           end
         end
 
+        it "translates question text without verifiers" do
+          should_translate_user_content(@course, false) do |content|
+            @question = @quiz.quiz_questions.create!(question_data: {
+                                                       "question_name" => "Example Question",
+                                                       "question_type" => "multiple_choice_question",
+                                                       "points_possible" => "1",
+                                                       "question_text" => content,
+                                                       "answers" => []
+                                                     })
+
+            json = api_call(:get,
+                            "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
+                            controller: "quizzes/quiz_questions",
+                            action: "show",
+                            format: "json",
+                            course_id: @course.id.to_s,
+                            quiz_id: @quiz.id.to_s,
+                            id: @question.id.to_s,
+                            no_verifiers: true)
+
+            json["question_text"]
+          end
+        end
+
         it "translates answer html" do
           should_translate_user_content(@course) do |content|
             plain_answer_txt = "plz don't & escape me"
@@ -270,6 +294,32 @@ describe Quizzes::QuizQuestionsController, type: :request do
                             course_id: @course.id.to_s,
                             quiz_id: @quiz.id.to_s,
                             id: @question.id.to_s)
+
+            expect(json["answers"][0]["text"]).to eq plain_answer_txt
+            json["answers"][1]["html"]
+          end
+        end
+
+        it "translates answer html without verifiers" do
+          should_translate_user_content(@course, false) do |content|
+            plain_answer_txt = "plz don't & escape me"
+            @question = @quiz.quiz_questions.create!(question_data: {
+                                                       "question_name" => "Example Question",
+                                                       "question_type" => "multiple_choice_question",
+                                                       "points_possible" => "1",
+                                                       "question_text" => "stuff",
+                                                       "answers" => [{ "text" => plain_answer_txt }, { "html" => content }]
+                                                     })
+
+            json = api_call(:get,
+                            "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
+                            controller: "quizzes/quiz_questions",
+                            action: "show",
+                            format: "json",
+                            course_id: @course.id.to_s,
+                            quiz_id: @quiz.id.to_s,
+                            id: @question.id.to_s,
+                            no_verifiers: true)
 
             expect(json["answers"][0]["text"]).to eq plain_answer_txt
             json["answers"][1]["html"]

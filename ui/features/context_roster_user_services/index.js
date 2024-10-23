@@ -18,9 +18,25 @@
 import $ from 'jquery'
 
 import '@canvas/jquery/jquery.ajaxJSON'
+import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-$(document).ready(() =>
-  $('.show_user_services_checkbox').change(function () {
+const I18n = useI18nScope('RegisteredServices')
+$(document).ready(() => {
+  const handleBreadCrumbSetter = ({getCrumbs, setCrumbs}) => {
+    const crumbs = getCrumbs()
+    crumbs.push({name: I18n.t('People'), url: document.referrer})
+    crumbs.push({name: I18n.t('Registered services'), url: ''})
+    setCrumbs(crumbs)
+  }
+
+  initializeTopNavPortalWithDefaults({
+    getBreadCrumbSetter: handleBreadCrumbSetter,
+    useTutorial: false,
+    useStudentView: true,
+  })
+
+  return $('.show_user_services_checkbox').change(function () {
     $.ajaxJSON(
       $('.profile_url').attr('href'),
       'PUT',
@@ -29,4 +45,4 @@ $(document).ready(() =>
       _data => {}
     )
   })
-)
+})

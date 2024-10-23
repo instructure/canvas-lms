@@ -20,7 +20,7 @@
 
 module Factories
   def folder_model(opts = {})
-    @folder = factory_with_protected_attributes(Folder, valid_folder_attributes.merge(opts))
+    @folder = Folder.create!(valid_folder_attributes.merge(opts))
   end
 
   def valid_folder_attributes

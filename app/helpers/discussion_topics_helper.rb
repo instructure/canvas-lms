@@ -31,4 +31,10 @@ module DiscussionTopicsHelper
       t("#title.edit_topic", "Edit Discussion Topic")
     end
   end
+
+  def validate_possible_points_with_checkpoints(input)
+    total_points_possible = 0
+    input[:checkpoints].each { |checkpoint| total_points_possible += checkpoint[:points_possible].to_i }
+    I18n.t("The value of possible points for this assignment cannot exceed 999999999.") unless total_points_possible < 1_000_000_000
+  end
 end

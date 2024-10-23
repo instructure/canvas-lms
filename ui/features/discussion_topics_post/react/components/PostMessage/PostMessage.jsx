@@ -67,13 +67,20 @@ export function PostMessage({...props}) {
       return
     }
 
-    getTranslation(translatedTitle, translateTargetLanguage, setTranslatedTitle, setIsTranslating)
-    getTranslation(
-      translatedMessage,
-      translateTargetLanguage,
-      setTranslatedMessage,
-      setIsTranslating
-    )
+    const translations = [
+      getTranslation(translatedTitle, translateTargetLanguage, setTranslatedTitle),
+      getTranslation(
+        translatedMessage,
+        translateTargetLanguage,
+        setTranslatedMessage
+      )
+    ]
+
+    // Begin translating, clear spinner when done.
+    setIsTranslating(true);
+    Promise.all(translations)
+           .then(() => setIsTranslating(false));
+
   }, [translateTargetLanguage, props.message])
 
   return (
@@ -96,7 +103,7 @@ export function PostMessage({...props}) {
           titleTextWeight: props.threadMode ? 'bold' : 'normal',
           messageLeftPadding:
             props.discussionEntry && props.discussionEntry.depth === 1 && !props.threadMode
-              ? theme.variables.spacing.xxSmall
+              ? theme.spacing.xxSmall
               : undefined,
           isMobile: false,
         },

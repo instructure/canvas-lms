@@ -36,10 +36,45 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {Editor, Frame} from '@craftjs/core'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import {Editor, Frame, useNode} from '@craftjs/core'
 import {Container} from '../../Container'
 import {GroupBlock, type GroupBlockProps} from '..'
 import {NoSections} from '../../../common'
+
+let customProps: any = {}
+
+const mockSetCustom = jest.fn((callback: (props: Record<string, any>) => void) => {
+  callback(customProps)
+})
+
+jest.mock('@craftjs/core', () => {
+  const module = jest.requireActual('@craftjs/core')
+  return {
+    ...module,
+    useNode: jest.fn(() => {
+      return {
+        actions: {
+          setCustom: mockSetCustom,
+        },
+        connectors: {
+          connect: jest.fn(),
+          drag: jest.fn(),
+        },
+        node: {
+          id: '1',
+          data: {
+            custom: customProps,
+            props: {},
+          },
+          events: {
+            selected: false,
+          },
+        },
+      }
+    }),
+  }
+})
 
 const renderBlock = (props: Partial<GroupBlockProps> = {}) => {
   return render(
@@ -51,7 +86,14 @@ const renderBlock = (props: Partial<GroupBlockProps> = {}) => {
   )
 }
 
-describe('ColumnsSection', () => {
+describe('GroupBlock', () => {
+  beforeEach(() => {
+    mockSetCustom.mockClear()
+    customProps = {
+      isResizable: false,
+    }
+  })
+
   it('should render ', () => {
     const {container} = renderBlock()
     expect(container.querySelector('.group-block')).toBeInTheDocument()
@@ -74,5 +116,21 @@ describe('ColumnsSection', () => {
     const {container} = renderBlock({verticalAlignment: 'center'})
     expect(container.querySelector('.group-block')).toBeInTheDocument()
     expect(container.querySelector('.group-block')).toHaveClass('center-valign')
+  })
+
+  it('should have "Group" as its displayName"', () => {
+    expect(GroupBlock.craft.displayName).toEqual('Group')
+  })
+
+  it('should set custom displayName to "Column" if isColumn prop is true', () => {
+    renderBlock({isColumn: true})
+    expect(mockSetCustom).toHaveBeenCalled()
+    expect(customProps.displayName).toEqual('Column')
+  })
+
+  it('should set custom isResizable to true if isResizable prop is true', () => {
+    renderBlock({resizable: true})
+    expect(mockSetCustom).toHaveBeenCalled()
+    expect(customProps.isResizable).toBeTruthy()
   })
 })

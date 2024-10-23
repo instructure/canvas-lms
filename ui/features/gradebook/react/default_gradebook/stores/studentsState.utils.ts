@@ -73,6 +73,7 @@ export const submissionsParams = {
     'redo_request',
     'score',
     'seconds_late',
+    'sticker',
     'submission_type',
     'submitted_at',
     'user_id',

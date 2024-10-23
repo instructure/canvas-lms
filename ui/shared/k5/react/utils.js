@@ -249,13 +249,15 @@ const formatGradeToRQD = (assignment, submission) => {
 export const getAssignmentGrades = (data, observedUserId) => {
   return data
     .map(group =>
-      group.assignments.map(a => {
+      group.assignments.reduce((assignments, a) => {
+        if (a.hide_in_gradebook) return assignments
+
         const submission = getSubmission(a, observedUserId)
         const rqd_grading_type = !['not_graded', 'pass_fail', 'gpa_scale'].includes(a.grading_type)
           ? 'letter_grade'
           : a.grading_type
         const rqdFormattedGrade = formatGradeToRQD(a, submission)
-        return {
+        assignments.push({
           id: a.id,
           assignmentName: a.name,
           url: a.html_url,
@@ -273,8 +275,9 @@ export const getAssignmentGrades = (data, observedUserId) => {
           excused: submission?.excused,
           missing: submission?.missing,
           hasComments: !!submission?.submission_comments?.length,
-        }
-      })
+        })
+        return assignments
+      }, [])
     )
     .flat(1)
     .sort((a, b) => {

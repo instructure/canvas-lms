@@ -370,6 +370,16 @@ describe UserSearch do
           expect(UserSearch.for_user_in_context(user.global_id, course, user)).to eq [user]
           expect(UserSearch.for_user_in_context(user.global_id, course.account, user)).to eq [user]
         end
+
+        it "doesn't try to query cross-shard when the search term is a foreign global id in account context with include_deleted_users" do
+          user = @shard1.activate { user_model }
+          course.enroll_student(user)
+          scope = UserSearch.for_user_in_context(user.global_id, Account.default, account_admin_user, nil, include_deleted_users: true)
+          sql = scope.to_sql
+          expect(sql).to include user.global_id.to_s
+          expect(sql).not_to include(@shard1.activate { User.quoted_table_name })
+          expect(scope).to include user
+        end
       end
     end
 

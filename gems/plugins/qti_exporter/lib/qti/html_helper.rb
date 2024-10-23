@@ -98,7 +98,11 @@ module Qti
     end
 
     def clear_html(text)
-      text.gsub(%r{</?[^>\n]*>}, "").gsub(/&#\d+;/) { |m| m[2..].to_i.chr(text.encoding) rescue "" }.gsub(/&\w+;/, "").gsub(/(?:\\r\\n)+/, "\n")
+      text.gsub(%r{</?[^>\n]*>}, "").gsub(/&#\d+;/) do |m|
+        m[2..].to_i.chr(text.encoding)
+      rescue RangeError
+        ""
+      end.gsub(/&\w+;/, "").gsub(/(?:\\r\\n)+/, "\n")
     end
 
     def find_best_path_match(path)

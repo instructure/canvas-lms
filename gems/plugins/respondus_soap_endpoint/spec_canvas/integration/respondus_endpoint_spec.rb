@@ -66,7 +66,7 @@ describe "Respondus SOAP API", type: :request do
                         username: "nobody@example.com",
                         password: "asdfasdf"
     @user.save!
-    @course = factory_with_protected_attributes(Course, course_valid_attributes)
+    @course = Course.create!(course_valid_attributes)
     @course.enroll_teacher(@user).accept
     @quiz = Quizzes::Quiz.create!(title: "quiz1", context: @course)
     @question_bank = AssessmentQuestionBank.create!(title: "questionbank1", context: @course)

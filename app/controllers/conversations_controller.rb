@@ -418,6 +418,8 @@ class ConversationsController < ApplicationController
     end
 
     params[:recipients].each do |recipient|
+      return render_error("recipients", "invalid") unless recipient.is_a?(String)
+
       if recipient =~ /\A(course_\d+)(?:_([a-z]+))?$/ && [nil, "students", "observers"].include?($2) &&
          !Context.find_by_asset_string($1).try(:grants_right?, @current_user, session, :send_messages_all)
         return render_error("recipients", "restricted by role")

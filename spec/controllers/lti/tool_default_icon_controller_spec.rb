@@ -22,7 +22,7 @@ describe Lti::ToolDefaultIconController do
     render_views
 
     it "generates an SVG icon" do
-      get :show, params: { name: "test", id: 1 }
+      get :show, params: { name: "test" }
       expect(response).to have_http_status(:ok)
       expect(response.content_type).to eq("image/svg+xml; charset=utf-8")
     end
@@ -38,18 +38,26 @@ describe Lti::ToolDefaultIconController do
       }
 
       expectations.each do |name, expected_glyph|
-        get :show, params: { name:, id: 1 }
+        get :show, params: { name: }
         expect(response.body).to include(">#{expected_glyph}</text>")
       end
     end
 
-    it "uses a color based on the hash of the developer key / tool (global) ID" do
-      id = 1
-      hash = id.to_s.hash
+    it "only requires a name to generate an icon" do
+      name = "foobarbaz"
+      hash = name.hash
+
       color = Lti::ToolDefaultIconController::COLORS[hash % Lti::ToolDefaultIconController::COLORS.length]
 
-      get :show, params: { name: "test", id: }
+      get :show, params: { name: }
+
       expect(response.body).to include("fill=\"#{color}\"")
+    end
+
+    it "returns a bad request if no name is provided" do
+      get :show
+
+      expect(response).to have_http_status(:bad_request)
     end
   end
 end
