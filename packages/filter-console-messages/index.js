@@ -22,6 +22,8 @@ const consoleMessagesToIgnore = {
 
     'Warning: [Focusable] Exactly one tabbable child is required (0 found).',
 
+    'Support for defaultProps will be removed from function components in a future major release.',
+
     // Remove when we've converted all ReactDOM.render to createRoot
     "Warning: ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17. Learn more: https://reactjs.org/link/switch-to-createroot",
 
