@@ -34,7 +34,7 @@ const consoleMessagesToIgnore = {
     // see https://github.com/instructure/instructure-ui/issues/815
     'Invalid prop `messages[0].text` of type `object` supplied to',
     /unknown pseudo-class selector/,
-    /or more breakpoints which are currently applied at the same time/,
+
     // until INSTUI fixes this in v8
     'Warning: Failed prop type: Invalid prop `color` of value `secondary` supplied to `CondensedButton`, expected one of ["primary","primary-inverse"].',
   ],
@@ -67,6 +67,8 @@ const consoleMessagesToIgnore = {
     /Warning: \[.*\] Did you forget to connect editorRef to your editor component\?/,
     // the block editor includes a ContentEditable and a delete button w/in an INSTUI Tab.
     '[Focusable] Exactly one focusable child is required',
+
+    /or more breakpoints which are currently applied at the same time/,
   ],
 }
 
