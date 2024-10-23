@@ -442,4 +442,65 @@ describe GroupCategoriesController do
       expect_imported_groups
     end
   end
+
+  describe "GET index" do
+    before :once do
+      @collaborative_category = @course.group_categories.create!(name: "Collaborative Groups", non_collaborative: false)
+      @non_collaborative_category = @course.group_categories.create!(name: "Non-Collaborative Groups", non_collaborative: true)
+    end
+
+    it "returns both collaborative and non-collaborative group categories when user has both group and tag management permissions" do
+      user_session(@teacher)
+
+      get "index", params: { course_id: @course.id }, format: :json
+      json = response.parsed_body
+
+      expect(response).to be_successful
+      expect(json.count).to eq 2
+      expect(json.pluck("name")).to include("Collaborative Groups", "Non-Collaborative Groups")
+    end
+
+    it "returns only collaborative group categories if tag management permissions are revoked" do
+      RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+        @course.account.role_overrides.create!(
+          permission:,
+          role: teacher_role,
+          enabled: false
+        )
+      end
+      user_session(@teacher)
+
+      get "index", params: { course_id: @course.id }, format: :json
+      json = response.parsed_body
+
+      expect(response).to be_successful
+      expect(json.count).to eq 1
+      expect(json[0]["name"]).to eq "Collaborative Groups"
+    end
+
+    it "returns only non-collaborative group categories if group management permissions are revoked" do
+      RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS.each do |permission|
+        @course.account.role_overrides.create!(
+          permission:,
+          role: teacher_role,
+          enabled: false
+        )
+      end
+      user_session(@teacher)
+
+      get "index", params: { course_id: @course.id }, format: :json
+      json = response.parsed_body
+
+      expect(response).to be_successful
+      expect(json.count).to eq 1
+      expect(json[0]["name"]).to eq "Non-Collaborative Groups"
+    end
+
+    it "returns unauthorized when user has no permissions" do
+      user_session(@student)
+
+      get "index", params: { course_id: @course.id }, format: :json
+      assert_unauthorized
+    end
+  end
 end
