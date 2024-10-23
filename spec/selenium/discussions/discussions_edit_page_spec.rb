@@ -19,6 +19,7 @@
 
 require_relative "../helpers/discussions_common"
 require_relative "../helpers/items_assign_to_tray"
+require_relative "../helpers/assignments_common"
 require_relative "../helpers/context_modules_common"
 require_relative "../../helpers/k5_common"
 require_relative "../dashboard/pages/k5_important_dates_section_page"
@@ -32,6 +33,7 @@ require_relative "../../helpers/selective_release_common"
 describe "discussions" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
+  include AssignmentsCommon
   include DiscussionHelpers
   include ItemsAssignToTray
   include ContextModulesCommon
@@ -552,10 +554,7 @@ describe "discussions" do
           it "able to save anon, not graded, quick added from assignments", :ignore_js_errors do
             get "/courses/#{course.id}/assignments"
 
-            f(".add_assignment").click
-            click_option(f('[name="submission_types"]'), "Discussion")
-            f(".create_assignment_dialog input[type=text]").send_keys("anon disc from assignment")
-            f(".more_options").click
+            build_assignment_with_type("Discussion", name: "anon disc from assignment", more_options: true)
 
             f("input[type=radio][value=partial_anonymity]").click
             f("input#use_for_grading").click

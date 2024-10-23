@@ -18,9 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../common"
+require_relative "../helpers/assignments_common"
 
 describe "external tool assignments" do
   include_context "in-process server selenium tests"
+  include AssignmentsCommon
 
   before do
     course_with_teacher_logged_in
@@ -34,18 +36,11 @@ describe "external tool assignments" do
 
   it "allows creating through index", priority: "2" do
     @course.root_account.enable_feature!(:instui_nav)
+    ag = @course.assignment_groups.create!(name: "Stuff")
     get "/courses/#{@course.id}/assignments"
     expect_no_flash_message :error
     # create assignment
-    f(".add_assignment").click
-    f(".ui-datepicker-trigger").click
-    f('.create_assignment_dialog input[name="name"]').send_keys("test1")
-    datepicker = datepicker_next
-    datepicker.find_element(:css, ".ui-datepicker-ok").click
-    replace_content(f('.create_assignment_dialog input[name="points_possible"]'), "5")
-    click_option('.create_assignment_dialog select[name="submission_types"]', "External Tool")
-    f(".create_assignment").click
-    wait_for_ajaximations
+    build_assignment_with_type("External Tool", assignment_group_id: ag.id, name: "name", points: "30", submit: true)
 
     a = @course.assignments.reload.last
     expect(a).to be_present
@@ -57,7 +52,7 @@ describe "external tool assignments" do
 
     # create assignment
     f(".add_assignment").click
-    expect_new_page_load { f(".more_options").click }
+    expect_new_page_load { f("[data-testid='more-options-button']").click }
 
     f("#assignment_name").send_keys("test1")
     click_option("#assignment_submission_type", "External Tool")

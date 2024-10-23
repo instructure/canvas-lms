@@ -280,10 +280,13 @@ describe "blueprint courses assignments" do
       get "/courses/#{@copy_to.id}/assignments"
 
       hover_and_click(".edit_assignment")
-      expect(f(".ui-dialog-titlebar .ui-dialog-title").text).to eq "Edit Assignment"
-      expect(f("#assign_#{@assmt_copy.id}_assignment_name").tag_name).to eq "h3"
-      expect(f("#assign_#{@assmt_copy.id}_assignment_due_at").attribute("readonly")).to eq "true"
-      expect(f("#assign_#{@assmt_copy.id}_assignment_points").attribute("readonly")).to eq "true"
+
+      expect(f("[data-testid='assignment-name-input']")).to be_disabled
+      expect(f("[data-testid='points-input']")).to be_disabled
+      # Date
+      expect(f("#Selectable_0")).to be_disabled
+      # Time
+      expect(f("#Select_0")).to be_disabled
     end
   end
 

@@ -371,13 +371,11 @@ describe "assignments" do
       f("#assignment_#{@assignment.id} .edit_assignment").click
       expect(f("#content")).not_to contain_jqcss(".form-dialog .ui-datepicker-trigger:visible")
       # be_disabled
-      expect(f(".multiple_due_dates input")).to be_disabled
-      assignment_title = f("#assign_#{@assignment.id}_assignment_name")
-      assignment_points_possible = f("#assign_#{@assignment.id}_assignment_points")
-      replace_content(assignment_title, "VDD Test Assignment Updated")
-      replace_content(assignment_points_possible, "100")
-      submit_form(fj(".form-dialog:visible"))
-      wait_for_ajaximations
+      expect(f("[data-testid='multiple-due-dates-message']")).to be_disabled
+
+      f("[data-testid='close-button']").click
+      edit_assignment(@assignment.id, name: "VDD Test Assignment Updated", points: 100, submit: true)
+
       expect(@assignment.reload.points_possible).to eq 100
       expect(@assignment.title).to eq "VDD Test Assignment Updated"
       # Assert the time didn't change
@@ -391,9 +389,7 @@ describe "assignments" do
       assignment_name = "test_assignment_thing_#{rand(10_000)}"
       get "/courses/#{@course.id}/assignments"
       group = @course.assignment_groups.first
-      f(".add_assignment").click
-      replace_content(f("#ag_#{group.id}_assignment_name"), assignment_name)
-      f(".create_assignment").click
+      build_assignment_with_type("Assignment", assignment_group_id: group.id, name: assignment_name, points: "10", submit: true)
       wait_for_ajaximations
       assignment = @course.assignments.where(title: assignment_name).last
       expect(assignment).not_to be_nil
@@ -413,12 +409,10 @@ describe "assignments" do
           group = @course.assignment_groups.first
           AssignmentGroup.where(id: group).update_all(updated_at: 1.hour.ago)
           first_stamp = group.reload.updated_at.to_i
-          f(".add_assignment").click
-          wait_for_ajaximations
-          replace_content(f("#ag_#{group.id}_assignment_name"), expected_text)
-          replace_content(f("#ag_#{group.id}_assignment_due_at"), due_at)
-          replace_content(f("#ag_#{group.id}_assignment_points"), points)
-          expect_new_page_load { f(".more_options").click }
+          build_assignment_with_type("Assignment", assignment_group_id: group.id, name: expected_text, points:, due_at:, due_time: "2:13 AM")
+
+          expect_new_page_load { f("[data-testid='more-options-button']").click }
+
           expect(f("#assignment_name").attribute(:value)).to include(expected_text)
           expect(f("#assignment_points_possible").attribute(:value)).to include(points)
 
@@ -463,14 +457,9 @@ describe "assignments" do
         end
 
         get "/courses/#{@course.id}/assignments"
-        wait_for_ajaximations
-        driver.execute_script "$('.edit_assignment').first().hover().click()"
-        assignment_title = f("#assign_#{@assignment.id}_assignment_name")
-        assignment_points_possible = f("#assign_#{@assignment.id}_assignment_points")
-        replace_content(assignment_title, "")
-        replace_content(assignment_points_possible, "")
-        wait_for_ajaximations
-        expect_new_page_load { fj(".more_options:eq(1)").click }
+        edit_assignment(@assignment.id, name: "", points: 0)
+
+        expect_new_page_load { f("[data-testid='more-options-button']").click }
         expect(f("#assignment_name").text).to match ""
         expect(f("#assignment_points_possible").text).to match ""
 
@@ -840,12 +829,8 @@ describe "assignments" do
         assignment
         get "/courses/#{@course.id}/assignments"
         wait_for_ajaximations
-        f("#assign_#{assignment.id}_manage_link").click
-        wait_for_ajaximations
-        f("#assignment_#{assignment.id} .edit_assignment").click
-        f("#assign_#{assignment.id}_assignment_points").send_keys("5")
 
-        submit_form(fj(".form-dialog:visible"))
+        edit_assignment(assignment.id, points: 5, submit: true)
 
         expect(assignment.reload.primary_resource_link.custom).to eq(custom_params)
       end
@@ -1502,9 +1487,12 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments"
       f("div#assignment_#{@checkpointed_discussion.assignment.id} button.al-trigger").click
       f("li a.edit_assignment").click
-      expect(f("input#assign_#{@checkpointed_discussion.assignment.id}_assignment_name")).to be_present
-      expect(f("body")).not_to contain_jqcss "label[for='#{@checkpointed_discussion.assignment.id}_assignment_due_at']"
-      expect(f("body")).not_to contain_jqcss "label[for='#{@checkpointed_discussion.assignment.id}_assignment_points']"
+      expect(f("[data-testid='assignment-name-input']")).not_to be_disabled
+      expect(f("[data-testid='points-input']")).to be_disabled
+      # Date
+      expect(f("#Selectable_0")).to be_disabled
+      # Time
+      expect(f("#Select_0")).to be_disabled
     end
 
     it "displays the correct date input fields in the assign to tray" do

@@ -31,14 +31,16 @@ describe('CreateEditAssignmentModal', () => {
   let onMoreOptionsHandlerMock: jest.Mock
 
   const assignmentData: ModalAssignment = {
-    type: 'assignment',
+    type: 'none',
     name: 'Test Assignment',
     dueAt: '2024-01-14T00:00:00Z',
     unlockAt: '2024-01-12T00:00:00Z',
     lockAt: '2024-01-20T00:00:00Z',
+    allDates: [],
     points: 100,
     isPublished: false,
     multipleDueDates: false,
+    differentiatedAssignment: false,
     frozenFields: [],
   }
 
@@ -51,6 +53,7 @@ describe('CreateEditAssignmentModal', () => {
     timezone: 'UTC',
     validDueAtRange: {},
     defaultDueTime: '23:59',
+    dueDateRequired: false,
     maxNameLength: 255,
     minNameLength: 1,
     syncGradesToSISFF: false,
@@ -86,13 +89,16 @@ describe('CreateEditAssignmentModal', () => {
 
     fireEvent.click(getByTestId('more-options-button'))
 
-    expect(onMoreOptionsHandlerMock).toHaveBeenCalledWith({
-      type: 'assignment',
-      name: 'Test Assignment',
-      dueAt: '2024-01-15T23:59:00.000Z',
-      points: 100,
-      syncToSIS: false,
-    })
+    expect(onMoreOptionsHandlerMock).toHaveBeenCalledWith(
+      {
+        type: 'none',
+        name: 'Test Assignment',
+        dueAt: '2024-01-15T23:59:00.000Z',
+        points: 100,
+        syncToSIS: false,
+      },
+      true
+    )
   })
 
   it('renders error messages when invalid input is present', () => {
@@ -193,7 +199,7 @@ describe('CreateEditAssignmentModal', () => {
       fireEvent.click(getByTestId('save-button'))
 
       expect(onSaveHandlerMock).toHaveBeenCalledWith({
-        type: 'assignment',
+        type: 'none',
         name: 'Test Assignment',
         dueAt: '',
         points: 100,
@@ -210,7 +216,7 @@ describe('CreateEditAssignmentModal', () => {
       fireEvent.click(getByTestId('save-and-publish-button'))
 
       expect(onSaveHandlerMock).toHaveBeenCalledWith({
-        type: 'assignment',
+        type: 'none',
         name: 'Test Assignment',
         dueAt: '',
         points: 100,
@@ -234,7 +240,7 @@ describe('CreateEditAssignmentModal', () => {
       fireEvent.click(getByTestId('save-button'))
 
       expect(onSaveHandlerMock).toHaveBeenCalledWith({
-        type: 'assignment',
+        type: 'none',
         name: 'Test Assignment',
         dueAt: '2024-01-15T23:59:00.000Z',
         points: 100,
@@ -258,7 +264,7 @@ describe('CreateEditAssignmentModal', () => {
       fireEvent.click(getByTestId('save-button'))
 
       expect(onSaveHandlerMock).toHaveBeenCalledWith({
-        type: 'assignment',
+        type: 'none',
         name: 'Test Assignment',
         dueAt: '2024-01-15T03:00:00.000Z',
         points: 100,
@@ -322,7 +328,7 @@ describe('CreateEditAssignmentModal', () => {
       fireEvent.click(getByTestId('save-button'))
 
       expect(onSaveHandlerMock).toHaveBeenCalledWith({
-        type: 'assignment',
+        type: 'none',
         name: 'Test Assignment',
         dueAt: '2024-01-15T00:00:00.000Z',
         points: 100,
@@ -340,7 +346,7 @@ describe('CreateEditAssignmentModal', () => {
       fireEvent.click(getByTestId('save-button'))
 
       expect(onSaveHandlerMock).toHaveBeenCalledWith({
-        type: 'assignment',
+        type: 'none',
         name: 'Test Assignment',
         dueAt: '2024-01-14T23:00:00Z',
         points: 100,
@@ -435,10 +441,23 @@ describe('CreateEditAssignmentModal', () => {
 
     describe('frozenFields', () => {
       it('Displays "Multiple Due Dates" message when assignment has multiple due dates', () => {
-        const assignment = {...assignmentData, multipleDueDates: true}
+        const assignment = {
+          ...assignmentData,
+          multipleDueDates: true,
+          differentiatedAssignment: true,
+        }
         const {getByTestId} = render(<CreateEditAssignmentModal {...defaultProps({assignment})} />)
 
         expect(getByTestId('multiple-due-dates-message')).toBeInTheDocument()
+        expect(getByTestId('multiple-due-dates-message')).toBeDisabled()
+      })
+
+      it('Displays "Differentiated Due Date" message when assignment is differentiated', () => {
+        const assignment = {...assignmentData, differentiatedAssignment: true}
+        const {getByTestId} = render(<CreateEditAssignmentModal {...defaultProps({assignment})} />)
+
+        expect(getByTestId('multiple-due-dates-message')).toBeInTheDocument()
+        expect(getByTestId('multiple-due-dates-message')).toHaveValue('Differentiated Due Date')
         expect(getByTestId('multiple-due-dates-message')).toBeDisabled()
       })
 

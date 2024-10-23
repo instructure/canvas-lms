@@ -36,15 +36,28 @@ import useInputFocus from '@canvas/outcomes/react/hooks/useInputFocus'
 
 const I18n = useI18nScope('CreateEditAssignmentModal')
 
+const setInitialAssignmentType = (isEditMode: boolean, type: string): string => {
+  if (isEditMode) {
+    if (type === 'assignment') {
+      return 'none'
+    } else {
+      return type
+    }
+  }
+  return 'none'
+}
+
 export type ModalAssignment = {
   type: string
   name: string
   dueAt: string | undefined
   lockAt: string | undefined
   unlockAt: string | undefined
+  allDates: any | undefined
   points: number
   isPublished: boolean
   multipleDueDates: boolean
+  differentiatedAssignment: boolean
   frozenFields: string[] | undefined
 }
 
@@ -69,11 +82,12 @@ export type CreateEditAssignmentModalProps = {
   assignment: ModalAssignment | undefined
   userIsAdmin: boolean
   onCloseHandler: () => void
-  onSaveHandler: (data: SaveProps) => void
-  onMoreOptionsHandler: (data: MoreOptionsProps) => void
+  onSaveHandler: (data: SaveProps) => Promise<void>
+  onMoreOptionsHandler: (data: MoreOptionsProps, isNewAssignment: boolean) => void
   timezone: string
   validDueAtRange: any | undefined
   defaultDueTime: string
+  dueDateRequired: boolean
   maxNameLength: number
   minNameLength: number
   syncGradesToSISFF: boolean
@@ -95,6 +109,7 @@ const CreateEditAssignmentModal = ({
   timezone,
   validDueAtRange,
   defaultDueTime = '23:59',
+  dueDateRequired = false,
   maxNameLength = 255,
   minNameLength = 1,
   syncGradesToSISFF = false,
@@ -106,12 +121,14 @@ const CreateEditAssignmentModal = ({
 
   // Modal state values
   const [assignmentType, setAssignmentType] = useState<string>(
-    isEditMode ? assignment.type : 'assignment'
+    setInitialAssignmentType(isEditMode, assignment?.type || '')
   )
   const [name, setName] = useState<string>(isEditMode ? assignment.name : '')
   const [dueAt, setDueAt] = useState<string>(isEditMode && assignment.dueAt ? assignment.dueAt : '')
   const [points, setPoints] = useState<number>(isEditMode ? assignment.points : 0)
   const [syncToSIS, setSyncToSIS] = useState<boolean>(shouldSyncGradesToSIS)
+
+  const [saveDisabled, setSaveDisabled] = useState<boolean>(false)
 
   // Modal input refs (only those that can show errors)
   const fields = ['name', 'due_at']
@@ -126,15 +143,15 @@ const CreateEditAssignmentModal = ({
   const [dueDateInputMessage, setDueDateInputMessage] = useState<FormMessage[]>([])
 
   const assignmentTypeOptions = [
-    'assignment',
-    'discussion',
+    'none',
+    'discussion_topic',
     'online_quiz',
     'external_tool',
     'not_graded',
   ]
   const assignmentTypeLabels: AssignmentTypeIndex = {
-    assignment: I18n.t('Assignment'),
-    discussion: I18n.t('Discussion'),
+    none: I18n.t('Assignment'),
+    discussion_topic: I18n.t('Discussion'),
     online_quiz: I18n.t('Quiz'),
     external_tool: I18n.t('External Tool'),
     not_graded: I18n.t('Not Graded'),
@@ -148,7 +165,7 @@ const CreateEditAssignmentModal = ({
   const enablePointsInput = !assignment?.frozenFields?.includes('points')
   const enableDueDateInput = !assignment?.frozenFields?.includes('due_at')
 
-  const showDueDateInput = !assignment?.multipleDueDates
+  const showDueDateInput = !assignment?.differentiatedAssignment
   const [showDueDatePreviewMessage, setShowDueDatePreviewMessage] = useState<boolean>(true)
 
   // Sanatize default due time (remove milliseconds if present)
@@ -240,6 +257,20 @@ const CreateEditAssignmentModal = ({
     return true
   }
 
+  const validateForSIS = () => {
+    if (!syncGradesToSISFF || !syncToSIS) return true
+
+    // The only thing we must check is if a due date is is required
+    if (dueDateRequired && !assignment?.multipleDueDates && (dueAt === '' || dueAt === undefined)) {
+      setDueDateInputMessage([
+        {text: I18n.t('Due date is required to enable "Sync to SIS"'), type: 'error'},
+      ])
+      return false
+    }
+
+    return true
+  }
+
   const setFocusToErrorField = (validName: boolean, validDueAt: boolean) => {
     let errorField = null
 
@@ -262,7 +293,7 @@ const CreateEditAssignmentModal = ({
     const validDueAt = validateAssignmentDueAt(dueAt)
     const validPoints = validateAssignmentPoints(points)
 
-    const valid = validType && validName && validDueAt && validPoints
+    const valid = validType && validName && validDueAt && validPoints && validateForSIS()
 
     // Put focus on inputs with errors if any
     if (!valid) {
@@ -314,22 +345,29 @@ const CreateEditAssignmentModal = ({
 
   // More Options
   const onMoreOptions = () => {
-    onMoreOptionsHandler({
-      type: assignmentType,
-      name,
-      dueAt,
-      points,
-      syncToSIS,
-    })
+    const isNewAssignment = !isEditMode
+
+    onMoreOptionsHandler(
+      {
+        type: assignmentType,
+        name,
+        dueAt,
+        points,
+        syncToSIS,
+      },
+      isNewAssignment
+    )
   }
 
   // Save Assignment
-  const onSaveButton = () => {
+  const onSaveButton = async () => {
     if (!validForm()) {
       return
     }
 
-    onSaveHandler({
+    setSaveDisabled(true)
+
+    await onSaveHandler({
       type: assignmentType,
       name,
       dueAt,
@@ -337,14 +375,18 @@ const CreateEditAssignmentModal = ({
       syncToSIS,
       publish: false,
     })
+
+    onCloseHandler()
   }
 
-  const onSaveAndPublishButton = () => {
+  const onSaveAndPublishButton = async () => {
     if (!validForm()) {
       return
     }
 
-    onSaveHandler({
+    setSaveDisabled(true)
+
+    await onSaveHandler({
       type: assignmentType,
       name,
       dueAt,
@@ -352,6 +394,8 @@ const CreateEditAssignmentModal = ({
       syncToSIS,
       publish: true,
     })
+
+    onCloseHandler()
   }
 
   return (
@@ -362,6 +406,7 @@ const CreateEditAssignmentModal = ({
       shouldCloseOnDocumentClick={false}
       overflow="scroll"
       label={modalLabel}
+      data-testid="create-edit-assignment-modal"
     >
       <Modal.Header>
         <Flex width="100%" justifyItems="space-between">
@@ -431,6 +476,7 @@ const CreateEditAssignmentModal = ({
                 dateRenderLabel={I18n.t('Date')}
                 dateInputRef={setDueAtRef}
                 timeRenderLabel={I18n.t('Time')}
+                allowNonStepInput={true}
                 invalidDateTimeMessage={showInvalidDateMessage}
                 messages={dueDateInputMessage}
                 showMessages={showDueDatePreviewMessage}
@@ -448,7 +494,11 @@ const CreateEditAssignmentModal = ({
             <TextInput
               renderLabel={I18n.t('Due at')}
               interaction="disabled"
-              value={I18n.t('Multiple Due Dates')}
+              value={
+                assignment.multipleDueDates
+                  ? I18n.t('Multiple Due Dates')
+                  : I18n.t('Differentiated Due Date')
+              }
               onChange={() => {}}
               data-testid="multiple-due-dates-message"
             />
@@ -461,7 +511,7 @@ const CreateEditAssignmentModal = ({
             interaction={enablePointsInput ? 'enabled' : 'disabled'}
             showArrows={false}
             value={points}
-            onChange={(event, value) => setPoints(parseInt(value, 10))}
+            onChange={(event, value) => (value ? setPoints(parseInt(value, 10)) : setPoints(0))}
             data-testid="points-input"
           />
         </View>
@@ -491,6 +541,7 @@ const CreateEditAssignmentModal = ({
               <Button
                 margin="xxx-small"
                 data-testid="save-and-publish-button"
+                disabled={saveDisabled}
                 onClick={onSaveAndPublishButton}
               >
                 {I18n.t('Save and Publish')}
@@ -500,6 +551,7 @@ const CreateEditAssignmentModal = ({
               margin="xxx-small"
               color="primary"
               data-testid="save-button"
+              disabled={saveDisabled}
               onClick={onSaveButton}
             >
               {I18n.t('Save')}
