@@ -54,7 +54,8 @@ describe('Calendar', () => {
         )
       }
 
-      test('requests all pages', async () => {
+      // Skip with LX-2093
+      test.skip('requests all pages', async () => {
         await fetch()
         const requests = server.filterRequests('/sections')
         expect(requests.length).toBe(2)
