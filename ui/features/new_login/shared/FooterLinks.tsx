@@ -65,7 +65,7 @@ const FooterLinks = ({className}: Props) => {
         </InlineList.Item>
 
         <InlineList.Item>
-          <Link href="#" onClick={handleClick}>
+          <Link href="/acceptable_use_policy" onClick={handleClick}>
             {I18n.t('Acceptable Use Policy')}
           </Link>
         </InlineList.Item>

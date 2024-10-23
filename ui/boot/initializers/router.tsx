@@ -30,6 +30,7 @@ import {RubricRoutes} from '../../features/rubrics/routes/rubricRoutes'
 import {NewLoginRoutes} from '../../features/new_login/routes/NewLoginRoutes'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {QueryProvider} from '@canvas/query'
+import {AUPRoutes} from '../../features/acceptable_use_policy/routes/AUPRoutes'
 
 const portalRouter = createBrowserRouter(
   createRoutesFromElements(
@@ -59,6 +60,8 @@ const portalRouter = createBrowserRouter(
         ))}
 
       {window.ENV.FEATURES.login_registration_ui_identity && NewLoginRoutes}
+
+      {AUPRoutes}
 
       {window.ENV.enhanced_rubrics_enabled && RubricRoutes}
 

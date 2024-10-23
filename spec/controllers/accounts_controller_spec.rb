@@ -1034,6 +1034,25 @@ describe AccountsController do
     end
   end
 
+  describe "#acceptable_use_policy" do
+    before do
+      @account = Account.create!
+      @controller.instance_variable_set(:@domain_root_account, @account)
+    end
+
+    it "returns a successful HTML response" do
+      get "acceptable_use_policy", format: :html
+      expect(response).to be_successful
+      expect(response.content_type).to eq "text/html; charset=utf-8"
+    end
+
+    it "returns a successful JSON response" do
+      get "acceptable_use_policy", format: :json
+      expect(response).to be_successful
+      expect(response.content_type).to eq "application/json; charset=utf-8"
+    end
+  end
+
   describe "#settings" do
     describe "js_env" do
       let(:account) do
