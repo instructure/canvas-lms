@@ -137,7 +137,7 @@ only stored in the user's browser, and is short-lived. Part of the LTI Platform 
 defined [here](https://www.imsglobal.org/spec/lti-pm-s/v0p1).
 
 The spec requires that this message's target origin be set to the platform's OIDC Authorization url
-as defined [here](file.lti_dev_key_config.html#step-2), so that the tool can be certain that Canvas
+as defined [here](file.lti_launch_overview.html#step-2), so that the tool can be certain that Canvas
 is the entity receiving the message. To enable this feature, Canvas also requires that messages
 with this target origin are sent to the `post_message_forwarding` frame, which is a sibling frame to the tool.
 For now, tools are also still allowed to send this message directly to the parent window and use the wildcard `*` origin, although this does not conform to the spec.
@@ -197,7 +197,7 @@ only stored in the user's browser, and is short-lived. Part of the LTI Platform 
 defined [here](https://www.imsglobal.org/spec/lti-pm-s/v0p1).
 
 The spec requires that this message's target origin be set to the platform's OIDC Authorization url
-as defined [here](file.lti_dev_key_config.html#step-2), so that the tool can be certain that Canvas
+as defined [here](file.lti_launch_overview.html#step-2), so that the tool can be certain that Canvas
 is the entity receiving the message. To enable this feature, Canvas also requires that messages
 with this target origin are sent to the `post_message_forwarding` frame, which is a sibling frame to the tool.
 For now, tools are also still allowed to send this message directly to the parent window and use the wildcard `*` origin, although this does not conform to the spec.
