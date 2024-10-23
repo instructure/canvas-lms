@@ -14,6 +14,7 @@ services:
     init: true
     ports:
       - 4444:4444
+      - 5901:5900
       - 7900:7900
 
 ## Firefox
