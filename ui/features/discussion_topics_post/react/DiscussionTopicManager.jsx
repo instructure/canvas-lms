@@ -366,6 +366,7 @@ const DiscussionTopicManager = props => {
         imageUrl={errorShipUrl}
         errorSubject={I18n.t('Discussion Topic initial query error')}
         errorCategory={I18n.t('Discussion Topic Post Error Page')}
+        errorMessage={discussionTopicQuery.error}
       />
     )
   }
