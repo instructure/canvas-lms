@@ -26,6 +26,7 @@ class LtiApiController < ApplicationController
 
   # this API endpoint passes all the existing tests for the LTI v1.1 outcome service specification
   def grade_passback
+    start_time = Time.now
     verify_oauth
 
     if request.content_type != "application/xml"
@@ -33,9 +34,19 @@ class LtiApiController < ApplicationController
     end
 
     @xml = Nokogiri::XML.parse(request.body)
-    puts "grade_passback triggered: body: #{request.body}"
 
     lti_response, status = check_outcome BasicLTI::BasicOutcomes.process_request(@tool, @xml)
+    end_time = Time.now
+    log = {
+      method: "grade_passback",
+      start_time: start_time,
+      end_time: end_time,
+      duration: end_time - start_time,
+      status: status,
+      lti_response: lti_response.to_json,
+      request_body: request.body.string
+    }
+    puts log.to_json
     render :body => lti_response.to_xml, :content_type => 'application/xml', :status => status
   end
 
