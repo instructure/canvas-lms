@@ -74,7 +74,7 @@
         },
         "isCanvas": true,
         "props": {
-          "className": "",
+          "className": "group-block__inner",
           "placeholderText": "Drop a block to add it here"
         },
         "displayName": "NoSections",

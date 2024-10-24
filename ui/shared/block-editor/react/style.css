@@ -351,6 +351,12 @@
     &.end-align > .group-block__inner {
       align-items: flex-end;
     }
+    &.center-valign > .group-block__inner {
+      justify-content: center;
+    }
+    &.end-valign > .group-block__inner {
+      justify-content: flex-end;
+    }
   }
 
   &.enabled { /* always show the outline for a column */
