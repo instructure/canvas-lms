@@ -27,6 +27,7 @@ import {PageBlock} from './user/blocks/PageBlock'
 import {ImageBlock} from './user/blocks/ImageBlock'
 import {RCEBlock} from './user/blocks/RCEBlock'
 import {GroupBlock} from './user/blocks/GroupBlock'
+import {DividerBlock} from './user/blocks/DividerBlock'
 
 // sections
 import {ResourcesSection, ResourcesSectionInner} from './user/sections/ResourcesSection'
@@ -71,6 +72,7 @@ const blocks = {
   TabsBlock,
   TabBlock,
   TabContent,
+  DividerBlock,
 }
 
 export {blocks}
