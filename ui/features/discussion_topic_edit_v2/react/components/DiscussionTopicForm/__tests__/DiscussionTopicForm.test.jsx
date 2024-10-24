@@ -507,13 +507,15 @@ describe('DiscussionTopicForm', () => {
       expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
     })
 
-    it('does not display "Allow Participants to Comment" when the setting is turned off', () => {
+    it('displays disabled "Allow Participants to Comment" when the setting is turned off', () => {
       window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
       window.ENV.ANNOUNCEMENTS_COMMENTS_DISABLED = true
 
-      const {queryByText} = setup()
+      const {queryByLabelText} = setup()
+      const component = queryByLabelText('Allow Participants to Comment')
 
-      expect(queryByText('Allow Participants to Comment')).not.toBeInTheDocument()
+      expect(component).toBeInTheDocument()
+      expect(component).toBeDisabled()
     })
 
     it('displays "Allow Participants to Comment" when the setting is turned on', () => {
@@ -541,6 +543,30 @@ describe('DiscussionTopicForm', () => {
 
       const checkbox = getByTestId('disallow_threaded_replies')
       expect(checkbox.disabled).toBe(true)
+      expect(checkbox.checked).toBe(false)
+    })
+
+    it('disallow threaded replies checkbox is disabled in announcements if "Allow participants to comment" is disabled', () => {
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.has_threaded_replies = false
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
+      window.ENV.ANNOUNCEMENTS_COMMENTS_DISABLED = true
+
+      const {getByTestId} = setup({currentDiscussionTopic: {discussionType: 'threaded'}})
+
+      const checkbox = getByTestId('disallow_threaded_replies')
+      expect(checkbox.disabled).toBe(true)
+      expect(checkbox.checked).toBe(false)
+    })
+
+    it('disallow threaded replies checkbox is enabled in dicussions if "Allow participants to comment" is disabled', () => {
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.has_threaded_replies = false
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = false
+      window.ENV.ANNOUNCEMENTS_COMMENTS_DISABLED = true
+
+      const {getByTestId} = setup({currentDiscussionTopic: {discussionType: 'threaded'}})
+
+      const checkbox = getByTestId('disallow_threaded_replies')
+      expect(checkbox.disabled).toBe(false)
       expect(checkbox.checked).toBe(false)
     })
   })

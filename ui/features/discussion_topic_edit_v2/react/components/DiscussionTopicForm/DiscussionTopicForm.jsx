@@ -875,6 +875,37 @@ function DiscussionTopicForm({
     )
   }
 
+  const renderAllowParticipantsToComment = useCallback(() => {
+    if (!isAnnouncement) return
+    if (!shouldShowAllowParticipantsToCommentOption) {
+      return (
+        <Tooltip renderTip={I18n.t('This setting is locked in course settings')}>
+          <Checkbox
+            label={I18n.t('Allow Participants to Comment')}
+            value="enable-participants-commenting"
+            inline={true}
+            checked={false}
+            disabled={true}
+          />
+        </Tooltip>
+      )
+    } else {
+      return (
+        <Checkbox
+          label={I18n.t('Allow Participants to Comment')}
+          value="enable-participants-commenting"
+          inline={true}
+          checked={!locked}
+          onChange={e => {
+            setLocked(!locked)
+            setRequireInitialPost(false)
+            e.target.checked === false && setIsThreaded(true)
+          }}
+        />
+      )
+    }
+  }, [isAnnouncement, locked, shouldShowAllowParticipantsToCommentOption])
+
   return (
     <>
       {((shouldMasteryPathsBeVisible && instUINavEnabled()) || !instUINavEnabled()) &&
@@ -996,31 +1027,26 @@ function DiscussionTopicForm({
             />
           )}
           <FormFieldGroup description="" rowSpacing="small">
-            {shouldShowAllowParticipantsToCommentOption && (
-              <Checkbox
-                label={I18n.t('Allow Participants to Comment')}
-                value="enable-participants-commenting"
-                inline={true}
-                checked={!locked}
-                onChange={() => {
-                  setLocked(!locked)
-                  setRequireInitialPost(false)
-                }}
-              />
-            )}
-
+            {renderAllowParticipantsToComment()}
             {!isStudent && (
-              <Checkbox
-                data-testid="disallow_threaded_replies"
-                label={I18n.t('Disallow threaded replies')}
-                value="disallow-threaded-replies"
-                inline={true}
-                checked={!isThreaded}
-                onChange={() => {
-                  setIsThreaded(!isThreaded)
-                }}
-                disabled={isCheckpoints || ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.has_threaded_replies}
-              />
+              <View {...(isAnnouncement && {margin: '0 0 0 medium'})}>
+                <Checkbox
+                  data-testid="disallow_threaded_replies"
+                  label={I18n.t('Disallow threaded replies')}
+                  value="disallow-threaded-replies"
+                  inline={true}
+                  checked={!locked && !isThreaded}
+                  onChange={() => {
+                    setIsThreaded(!isThreaded)
+                  }}
+                  disabled={
+                    isCheckpoints ||
+                    ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.has_threaded_replies ||
+                    (!shouldShowAllowParticipantsToCommentOption && isAnnouncement) ||
+                    locked
+                  }
+                />
+              </View>
             )}
 
             {!isGroupContext && (
