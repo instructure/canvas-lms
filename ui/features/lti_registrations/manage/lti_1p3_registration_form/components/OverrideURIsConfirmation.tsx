@@ -48,6 +48,7 @@ const I18n = useI18nScope('lti_registration.wizard')
 export type OverrideURIsConfirmationProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
   registration: InternalLtiConfiguration
+  reviewing: boolean
   onNextClicked: () => void
   onPreviousClicked: () => void
 }
@@ -55,6 +56,7 @@ export type OverrideURIsConfirmationProps = {
 export const OverrideURIsConfirmation = ({
   overlayStore,
   registration,
+  reviewing,
   onNextClicked,
   onPreviousClicked,
 }: OverrideURIsConfirmationProps) => {
@@ -104,7 +106,7 @@ export const OverrideURIsConfirmation = ({
           {I18n.t('Previous')}
         </Button>
         <Button onClick={onNextClicked} color="primary" margin="small" disabled={!allURIsValid}>
-          {I18n.t('Next')}
+          {reviewing ? I18n.t('Back to Review') : I18n.t('Next')}
         </Button>
       </Modal.Footer>
     </>

@@ -40,7 +40,7 @@ import {PostToolbar} from '../../components/PostToolbar/PostToolbar'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
 import {SearchContext} from '../../utils/constants'
-import {useApolloClient, useMutation} from 'react-apollo'
+import {useApolloClient, useMutation} from '@apollo/react-hooks'
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {DiscussionTopicAlertManager} from '../../components/DiscussionTopicAlertManager/DiscussionTopicAlertManager'
@@ -214,11 +214,12 @@ export const DiscussionTopicContainer = ({
     const discussionOrAnnouncement = isAnnouncement
       ? I18n.t('Announcements')
       : I18n.t('Discussions')
+    const discussionOrAnnouncementUrl= isAnnouncement ? 'announcements' : 'discussion_topics'
     const oldCrumbs = getCrumbs()
     const newCrumbs = [
       ...oldCrumbs,
       ...[
-        {name: discussionOrAnnouncement, url: oldCrumbs[0].url + '/discussion_topics'},
+        {name: discussionOrAnnouncement, url: oldCrumbs[0].url + '/' + discussionOrAnnouncementUrl},
         {name: props.discussionTopic.title || '', url: ''},
       ],
     ]

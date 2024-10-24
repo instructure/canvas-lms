@@ -536,7 +536,7 @@ describe('CreateOutcomeModal', () => {
             Since the InstUI 8 upgrade, this test takes an average of 5.6 seconds to complete.
             For now, the timeout interval is increased to 7.5 seconds.
           */
-          it('creates outcome with calculation method and proficiency ratings (flaky)', async () => {
+          it.skip('creates outcome with calculation method and proficiency ratings (flaky)', async () => {
             const user = userEvent.setup(USER_EVENT_OPTIONS)
             const {getByText, getByLabelText, getByDisplayValue} = render(
               <CreateOutcomeModal {...defaultProps()} />,

@@ -271,6 +271,13 @@ describe('Blueprint Courses reducer', () => {
     expect(newState.willIncludeCourseSettings).toBe(false)
   })
 
+  it('sets willSendItemNotifications on ENABLE_ITEM_NOTIFICATIONS', () => {
+    let newState = reduce(actions.enableItemNotifications(true))
+    expect(newState.willSendItemNotifications).toBe(true)
+    newState = reduce(actions.enableItemNotifications(false))
+    expect(newState.willSendItemNotifications).toBe(false)
+  })
+
   it('creates empty change log entry on SELECT_CHANGE_LOG', () => {
     const newState = reduce(actions.realSelectChangeLog({changeId: '5'}))
     expect(newState.changeLogs).toEqual({

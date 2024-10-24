@@ -44,7 +44,7 @@ const nameToSection = (name: string) => {
     case 'Callout Cards':
       return <ResourcesSection />
     case 'Blank':
-      return <ColumnsSection columns={2} />
+      return <ColumnsSection columns={1} />
     case 'Hero':
       return <HeroSection />
     case 'Navigation':

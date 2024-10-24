@@ -35,7 +35,7 @@ Teachers or students can set up group collaborations."
       <% if can_do(@context, @current_user, :create_collaborations) && !@hide_create_ui %>
         <a role="button" class="Button Button--primary add_collaboration_link" href="#">
           <i class="icon-add" aria-hidden="true"></i>
-          <%= t('links.collaboration', 'Collaboration') %>
+          <%= t('links.add_collaboration', 'Add Collaboration') %>
         </a>
       <% end %>
     </div>

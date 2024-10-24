@@ -316,6 +316,16 @@ describe Schemas::InternalLtiConfiguration do
       expect(internal_lti_config).to eq(internal_configuration)
     end
 
+    context "with no scopes" do
+      let(:settings) do
+        super().except("scopes", :scopes)
+      end
+
+      it "defaults scopes to empty array" do
+        expect(subject[:scopes]).to eq([])
+      end
+    end
+
     context "with no canvas extension" do
       before do
         settings[:extensions] = []

@@ -110,6 +110,7 @@ class RoleOverride < ActiveRecord::Base
     temporary_enrollments_edit
     temporary_enrollments_delete
   ].freeze
+  GRANULAR_MANAGE_TAGS_PERMISSIONS = %i[manage_tags_add manage_tags_manage manage_tags_delete].freeze
 
   ACCESS_TOKEN_SCOPE_PREFIX = "https://api.instructure.com/auth/canvas"
 

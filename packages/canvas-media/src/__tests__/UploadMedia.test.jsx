@@ -60,6 +60,7 @@ function makeProps(overrideProps = {}) {
     tabs: {record: false, upload: true},
     uploadMediaTranslations,
     userLocale: 'en',
+    useStudioPlayer: false,
     ...overrideProps,
   }
 }
@@ -161,6 +162,7 @@ describe('Upload Media', () => {
           tabs={{record: false, upload: false}}
           uploadMediaTranslations={uploadMediaTranslations}
           userLocale="en"
+          useStudioPlayer={false}
         />
       )
 
@@ -181,6 +183,7 @@ describe('Upload Media', () => {
           tabs={{record: false, upload: true}}
           uploadMediaTranslations={uploadMediaTranslations}
           userLocale="en"
+          useStudioPlayer={false}
         />
       )
 
@@ -209,6 +212,7 @@ describe('Upload Media', () => {
           tabs={{record: false, upload: true}}
           uploadMediaTranslations={uploadMediaTranslations}
           userLocale="en"
+          useStudioPlayer={false}
         />
       )
 
@@ -229,6 +233,7 @@ describe('Upload Media', () => {
           tabs={{record: true, upload: false}}
           uploadMediaTranslations={uploadMediaTranslations}
           userLocale="en"
+          useStudioPlayer={false}
         />
       )
 

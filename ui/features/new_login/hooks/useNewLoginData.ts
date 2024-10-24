@@ -17,44 +17,61 @@
  */
 
 import {useEffect, useState} from 'react'
-import type {AuthProvider} from '../utils/types'
-import {useScope as useI18nScope} from '@canvas/i18n'
-
-const I18n = useI18nScope('new_login')
+import type {AuthProvider} from '../types'
 
 interface NewLoginData {
-  authProviders: AuthProvider[]
-  loginHandleName: string
+  authProviders?: AuthProvider[]
+  loginHandleName?: string
+  loginLogoUrl?: string
+  loginLogoAlt?: string
+  helpLinkUrl?: string
+  helpLinkName?: string
+  bodyBgColor?: string
+  bodyBgImage?: string
 }
 
-const getLoginDataContainer = (): HTMLElement | null => {
-  return document.getElementById('new_login_data')
-}
+const getLoginDataContainer = (): HTMLElement | null => document.getElementById('new_login_data')
 
-const getAuthProviders = (container: HTMLElement): AuthProvider[] => {
-  const data = container.getAttribute('data-auth-providers')
-  return data ? (JSON.parse(data) as AuthProvider[]) : []
-}
+const getStringAttribute = (container: HTMLElement, attribute: string): string | undefined =>
+  container.getAttribute(attribute)?.trim() || undefined
 
-const getLoginHandleName = (container: HTMLElement): string => {
-  return container.getAttribute('data-login-handle-name') || I18n.t('Email')
+const getObjectAttribute = <T>(container: HTMLElement, attribute: string): T | undefined => {
+  const value = getStringAttribute(container, attribute)
+  if (value) {
+    try {
+      return JSON.parse(value) as T
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(`Failed to parse ${attribute} as JSON:`, e)
+    }
+  }
+  return undefined
 }
 
 export const useNewLoginData = (): NewLoginData => {
   const [newLoginData, setNewLoginData] = useState<NewLoginData>({
-    authProviders: [],
-    loginHandleName: '',
+    authProviders: undefined,
+    loginHandleName: undefined,
+    loginLogoUrl: undefined,
+    loginLogoAlt: undefined,
+    helpLinkUrl: undefined,
+    helpLinkName: undefined,
+    bodyBgColor: undefined,
+    bodyBgImage: undefined,
   })
 
   useEffect(() => {
     const container = getLoginDataContainer()
     if (container) {
-      const authProviders = getAuthProviders(container)
-      const loginHandleName = getLoginHandleName(container)
-
       setNewLoginData({
-        authProviders,
-        loginHandleName,
+        authProviders: getObjectAttribute<AuthProvider[]>(container, 'data-auth-providers'),
+        loginHandleName: getStringAttribute(container, 'data-login-handle-name'),
+        loginLogoUrl: getStringAttribute(container, 'data-login-logo-url'),
+        loginLogoAlt: getStringAttribute(container, 'data-login-logo-alt'),
+        helpLinkUrl: getStringAttribute(container, 'data-help-link-url'),
+        helpLinkName: getStringAttribute(container, 'data-help-link-name'),
+        bodyBgColor: getStringAttribute(container, 'data-body-bg-color'),
+        bodyBgImage: getStringAttribute(container, 'data-body-bg-image'),
       })
     }
   }, [])

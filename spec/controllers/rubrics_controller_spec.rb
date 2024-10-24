@@ -109,6 +109,15 @@ describe RubricsController do
         ]
         expect(assigns[:js_env][:breadcrumbs]).to eq(expected_breadcrumbs)
       end
+
+      it "sets correct env variables" do
+        @course.enable_feature!(:enhanced_rubrics)
+        Account.site_admin.enable_feature!(:enhanced_rubrics_assignments)
+        get "index", params: { course_id: @course.id }
+
+        expect(assigns[:js_env][:enhanced_rubrics_enabled]).to be true
+        expect(assigns[:js_env][:enhanced_rubric_assignments_enabled]).to be true
+      end
     end
   end
 

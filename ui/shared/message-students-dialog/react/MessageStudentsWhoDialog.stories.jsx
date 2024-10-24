@@ -18,7 +18,7 @@
 
 import React from 'react'
 import MessageStudentsWhoDialog from './MessageStudentsWhoDialog'
-import {ApolloProvider} from 'react-apollo'
+import {ApolloProvider} from '@apollo/react-common'
 import {createClient} from '@canvas/apollo'
 
 const students = [

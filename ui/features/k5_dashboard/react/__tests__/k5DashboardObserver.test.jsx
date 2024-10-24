@@ -32,7 +32,7 @@ import {resetCardCache} from '@canvas/dashboard-card'
 import {MOCK_CARDS, MOCK_CARDS_2} from '@canvas/k5/react/__tests__/fixtures'
 import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
-import {QueryProvider} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 injectGlobalAlertContainers()
 
@@ -42,7 +42,7 @@ jest.mock('@canvas/observer-picker/react/utils', () => ({
   fetchShowK5Dashboard: jest.fn(),
 }))
 
-const render = children => testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
+const render = children => testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 const currentUserId = defaultProps.currentUser.id
 const observedUserCookieName = `${OBSERVER_COOKIE_PREFIX}${currentUserId}`

@@ -17,7 +17,11 @@
  */
 
 import type {RubricAssessment} from '@canvas/grading/grading'
-import type {Rubric, RubricAssessmentData} from '@canvas/rubrics/react/types/rubric'
+import type {
+  Rubric,
+  RubricAssessmentData,
+  RubricAssociation,
+} from '@canvas/rubrics/react/types/rubric'
 
 export type RubricUnderscoreType = {
   title: string
@@ -133,4 +137,24 @@ export const mapRubricAssessmentDataUnderscoredKeysToCamelCase = (
       description: assessment.description,
     }
   })
+}
+
+type RubricAssociationUnderscore = {
+  id: string
+  rubric_id: string
+  use_for_grading: boolean
+  hide_points: boolean
+  hide_score_total: boolean
+  hide_outcome_results: boolean
+}
+export const mapRubricAssociationUnderscoredKeysToCamelCase = (
+  underscoreAssociation: RubricAssociationUnderscore
+): RubricAssociation => {
+  return {
+    id: underscoreAssociation.id,
+    hideOutcomeResults: underscoreAssociation.hide_outcome_results,
+    hidePoints: underscoreAssociation.hide_points,
+    hideScoreTotal: underscoreAssociation.hide_score_total,
+    useForGrading: underscoreAssociation.use_for_grading,
+  }
 }

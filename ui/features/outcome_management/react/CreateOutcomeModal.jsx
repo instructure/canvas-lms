@@ -40,7 +40,7 @@ import {
 } from '@canvas/outcomes/graphql/Management'
 import {useManageOutcomes} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
-import {useMutation} from 'react-apollo'
+import {useMutation} from '@apollo/react-hooks'
 import OutcomesRceField from './shared/OutcomesRceField'
 import ProficiencyCalculation, {
   defaultProficiencyCalculation,

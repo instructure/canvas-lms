@@ -77,7 +77,7 @@ describe('useCourseAlignmentStats', () => {
       wrapper,
     })
     expect(result.current.loading).toBe(true)
-    expect(result.current.data).toEqual({})
+    expect(result.current.data).toBeUndefined()
     await act(async () => jest.runAllTimers())
     expect(result.current.loading).toBe(false)
     expect(getStats(result)).toEqual([2, 1, 4, 5, 3, 3])
@@ -106,7 +106,7 @@ describe('useCourseAlignmentStats', () => {
       },
     })
     expect(hook.result.current.loading).toBe(true)
-    expect(hook.result.current.data).toEqual({})
+    expect(hook.result.current.data).toBeUndefined()
     await act(async () => jest.runAllTimers())
     expect(hook.result.current.loading).toBe(false)
     expect(getStats(hook.result)).toEqual([2, 1, 4, 5, 3, 3])

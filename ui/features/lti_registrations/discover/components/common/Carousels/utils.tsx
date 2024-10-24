@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {Badges, Product} from '../../../model/Product'
+import type {Badges, Product} from '../../../../../../shared/lti-apps/models/Product'
 
 interface Settings {
   [key: string]: number | boolean | Array<number> | Object

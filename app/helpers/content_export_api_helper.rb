@@ -69,7 +69,10 @@ module ContentExportApiHelper
     tz_identifier = ActiveSupport::TimeZone::MAPPING[Time.zone.name]
     export.settings[:user_time_zone] = tz_identifier if tz_identifier.present?
     if export.save
-      export.queue_api_job(opts)
+      export.initialize_job_progress
+
+      export.quizzes2_build_assignment(opts) if export.new_quizzes_page_enabled?
+      export.export(opts) unless export.waiting_for_external_tool?
     end
     export
   end

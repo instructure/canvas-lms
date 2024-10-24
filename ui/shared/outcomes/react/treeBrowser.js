@@ -18,7 +18,7 @@
 
 import {useEffect, useMemo, useState} from 'react'
 import {uniqBy, uniq} from 'lodash'
-import {useApolloClient, useQuery} from 'react-apollo'
+import {useApolloClient, useQuery} from '@apollo/react-hooks'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {CHILD_GROUPS_QUERY, groupFields, SEARCH_GROUP_OUTCOMES} from '../graphql/Management'
@@ -119,8 +119,8 @@ const useTreeBrowser = queryVariables => {
     fetchPolicy: 'cache-only',
     variables: queryVariables,
   })
-  const groups = cacheData.groups || []
-  const loadedGroups = loadedGroupsData.loadedGroups || []
+  const groups = cacheData?.groups || []
+  const loadedGroups = loadedGroupsData?.loadedGroups || []
 
   const addLoadedGroups = ids => {
     client.writeQuery({
@@ -364,7 +364,7 @@ export const useManageOutcomes = ({
     clearTreeBrowserCache()
   }
 
-  const rootGroupId = contextGroupLoadedData.rootGroupId
+  const rootGroupId = contextGroupLoadedData?.rootGroupId
 
   const {
     search: searchString,

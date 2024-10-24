@@ -38,10 +38,11 @@ import {
 import K5Dashboard from '../K5Dashboard'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import * as ReactQuery from '@tanstack/react-query'
 
-const render = children => testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
+const render = children => testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 const ASSIGNMENTS_URL = /\/api\/v1\/calendar_events\?type=assignment&important_dates=true&.*/
 const EVENTS_URL = /\/api\/v1\/calendar_events\?type=event&important_dates=true&.*/

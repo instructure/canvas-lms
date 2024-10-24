@@ -2098,6 +2098,9 @@ module Lti
 
         it "has substitution for $com.instructure.Person.pronouns" do
           user.pronouns = "She/Her"
+          user.account.settings[:can_add_pronouns] = true
+          user.account.save!
+
           expect(expand!("$com.instructure.Person.pronouns")).to eq "She/Her"
         end
 

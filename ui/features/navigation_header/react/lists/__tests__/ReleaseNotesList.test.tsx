@@ -20,10 +20,11 @@ import React from 'react'
 import {render as testingLibraryRender, act, waitFor} from '@testing-library/react'
 import ReleaseNotesList from '../ReleaseNotesList'
 import userEvent from '@testing-library/user-event'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 const render = (children: unknown) =>
-  testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
+  testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 const releaseNotes = [
   {

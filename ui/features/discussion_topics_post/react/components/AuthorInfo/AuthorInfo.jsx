@@ -130,7 +130,7 @@ const AuthorInfoBase = ({breakpoints, ...props}) => {
         <Flex direction="column" margin={authorInfoPadding}>
           {hasAuthor && (
             <Flex.Item overflowY="hidden">
-              <Flex wrap="wrap" gap="0 small">
+              <Flex wrap="wrap" gap="0 small" direction={breakpoints.mobileOnly ? 'column' : 'row'}>
                 <Text
                   weight="bold"
                   size={authorNameTextSize}
@@ -151,13 +151,18 @@ const AuthorInfoBase = ({breakpoints, ...props}) => {
                     />
                   )}
                 </Text>
-                <RolePillContainer
-                  discussionRoles={resolveAuthorRoles(
-                    props.isTopicAuthor,
-                    props.author?.courseRoles
-                  )}
-                  data-testid="pill-container"
-                />
+                <Flex.Item
+                  overflowX="hidden"
+                  padding={breakpoints.mobileOnly ? '0 0 0 xx-small' : '0'}
+                >
+                  <RolePillContainer
+                    discussionRoles={resolveAuthorRoles(
+                      props.isTopicAuthor,
+                      props.author?.courseRoles
+                    )}
+                    data-testid="pill-container"
+                  />
+                </Flex.Item>
                 {ENV.discussions_reporting &&
                   props.reportTypeCounts &&
                   props.reportTypeCounts.total && (
@@ -347,14 +352,18 @@ const Timestamps = props => {
       )}
       {delayedPostText && (
         <Flex.Item overflowX="hidden" padding={timestampsPadding}>
-          {createdAtText && ' | '}
-          <Text size={props.timestampTextSize}>{delayedPostText}</Text>
+          <Text size={props.timestampTextSize}>
+            {createdAtText && ' | '}
+            {delayedPostText}
+          </Text>
         </Flex.Item>
       )}
       {editText && (
         <Flex.Item overflowX="hidden" padding={timestampsPadding}>
-          {' | '}
-          <Text size={props.timestampTextSize}>{editText}</Text>
+          <Text size={props.timestampTextSize}>
+            {' | '}
+            {editText}
+          </Text>
         </Flex.Item>
       )}
       {props.lastReplyAtDisplay && (

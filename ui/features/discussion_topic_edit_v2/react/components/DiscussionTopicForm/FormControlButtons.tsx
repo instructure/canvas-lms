@@ -21,6 +21,8 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
+import type {Breakpoints} from '@canvas/with-breakpoints'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -32,6 +34,7 @@ export const FormControlButtons = ({
   submitForm,
   isSubmitting,
   willAnnouncementPostRightAway,
+  breakpoints,
 }: {
   isAnnouncement: boolean
   isEditing: boolean
@@ -40,50 +43,52 @@ export const FormControlButtons = ({
   submitForm: (publish: boolean | undefined) => void
   isSubmitting: boolean
   willAnnouncementPostRightAway: boolean
+  breakpoints: Breakpoints
 }) => {
   return (
     <View
       display="block"
       textAlign="end"
       borderWidth="small none none none"
-      margin="xx-large none"
+      margin="none none"
       padding="large none"
     >
-      <View margin="0 x-small 0 0">
+      <Button
+        type="button"
+        display={breakpoints.mobileOnly ? 'block' : 'inline-block'}
+        color="secondary"
+        margin={breakpoints.mobileOnly ? 'none none small none' : 'none xx-small none xx-small'}
+        onClick={() => {
+          // @ts-expect-error
+          window.location.assign(ENV?.CANCEL_TO)
+        }}
+        disabled={isSubmitting}
+      >
+        {I18n.t('Cancel')}
+      </Button>
+
+      {shouldShowSaveAndPublishButton && (
         <Button
-          type="button"
+          type="submit"
+          display={breakpoints.mobileOnly ? 'block' : 'inline-block'}
+          onClick={() => submitForm(true)}
           color="secondary"
-          onClick={() => {
-            // @ts-expect-error
-            window.location.assign(ENV?.CANCEL_TO)
-          }}
+          margin={breakpoints.mobileOnly ? 'none none small none' : 'none xx-small none xx-small'}
+          data-testid="save-and-publish-button"
           disabled={isSubmitting}
         >
-          {I18n.t('Cancel')}
+          {I18n.t('Save and Publish')}
         </Button>
-      </View>
-      {shouldShowSaveAndPublishButton && (
-        <View margin="0 x-small 0 0">
-          <Button
-            type="submit"
-            onClick={() => submitForm(true)}
-            color="secondary"
-            margin="xxx-small"
-            data-testid="save-and-publish-button"
-            disabled={isSubmitting}
-          >
-            {I18n.t('Save and Publish')}
-          </Button>
-        </View>
       )}
       {/* for announcements, show publish when the available until da */}
       {isAnnouncement ? (
         <Button
           type="submit"
+          display={breakpoints.mobileOnly ? 'block' : 'inline-block'}
           // don't publish delayed announcements
           onClick={() => submitForm(willAnnouncementPostRightAway ? true : undefined)}
           color="primary"
-          margin="xxx-small"
+          margin={breakpoints.mobileOnly ? 'none none small none' : 'none xx-small none xx-small'}
           data-testid="announcement-submit-button"
           disabled={isSubmitting}
         >
@@ -92,6 +97,7 @@ export const FormControlButtons = ({
       ) : (
         <Button
           type="submit"
+          display={breakpoints.mobileOnly ? 'block' : 'inline-block'}
           data-testid="save-button"
           // when editing, use the current published state, otherwise:
           // students will always save as published while for moderators in this case they
@@ -101,6 +107,7 @@ export const FormControlButtons = ({
             submitForm(isEditing ? published : !ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE)
           }
           color="primary"
+          margin={breakpoints.mobileOnly ? 'none none small none' : 'none xx-small none xx-small'}
           disabled={isSubmitting}
         >
           {I18n.t('Save')}

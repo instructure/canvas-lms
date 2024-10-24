@@ -32,7 +32,6 @@ const handleBreadCrumbSetter = ({getCrumbs, setCrumbs}) => {
 ready(() => {
   initializeTopNavPortalWithDefaults({
     getBreadCrumbSetter: handleBreadCrumbSetter,
-    useTutorial: false,
     useStudentView: true,
   })
 })

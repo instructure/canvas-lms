@@ -460,7 +460,11 @@ class FilesController < ApplicationController
 
       @page_title = t("files_page_title", "Files")
       @body_classes << "full-width padless-content"
-      js_bundle :files
+      if Account.site_admin.feature_enabled?(:files_a11y_rewrite)
+        js_bundle :files_v2
+      else
+        js_bundle :files
+      end
       css_bundle :react_files
       js_env({
                FILES_CONTEXTS: files_contexts,
@@ -1261,7 +1265,9 @@ class FilesController < ApplicationController
 
   def update
     @attachment = @context.attachments.find(params[:id])
-    @folder = @context.folders.active.find(params[:attachment][:folder_id]) rescue nil
+    if (folder_id = params.dig(:attachment, :folder_id))
+      @folder = @context.folders.active.find_by(id: folder_id)
+    end
     return if @folder && !authorized_action(@folder, @current_user, :manage_contents)
 
     @folder ||= @attachment.folder

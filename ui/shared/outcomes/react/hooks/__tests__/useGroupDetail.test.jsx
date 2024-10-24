@@ -176,6 +176,10 @@ describe('groupDetailHook', () => {
 
   it('refetches when id is in rhsGroupIdsToRefetch', async () => {
     mocks = [...groupDetailMocks(), ...groupDetailMocks({groupId: '200'})]
+
+    // Ensure the graphQL query gets preloaded with old data
+    renderHook(id => useGroupDetail({id}), {wrapper, initialProps: '200'})
+
     const {result, rerender} = renderHook(
       id => useGroupDetail({id, rhsGroupIdsToRefetch: ['200']}),
       {wrapper, initialProps: '1'}

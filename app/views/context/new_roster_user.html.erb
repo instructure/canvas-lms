@@ -71,7 +71,7 @@
   <a href="<%= user_profile_path(@current_user) %>" class="profile_url" style="display: none;">&nbsp;</a>
 <% end %>
 
-<%= render :partial => 'shared/profile' %>
+<%= render :partial => 'shared/profile_main', :locals => { :is_roster_user_page => true }%>
 
 <% manage_perm = @context.root_account.feature_enabled?(:granular_permissions_manage_users) ? :allow_course_admin_actions : :manage_admin_users %>
 <% can_manage_students = can_do(@context, @current_user, :manage_students) %>

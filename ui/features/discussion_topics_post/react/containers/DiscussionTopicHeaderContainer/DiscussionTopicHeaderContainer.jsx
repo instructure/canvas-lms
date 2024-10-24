@@ -23,7 +23,7 @@ import PropTypes from 'prop-types'
 
 const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
 
-export const DiscussionTopicHeaderContainer = props => {
+export const DiscussionTopicHeaderContainer = ({discussionTopicTitle, mobileHeader = false}) => {
   if (!instUINavEnabled()) {
     return null
   }
@@ -33,7 +33,9 @@ export const DiscussionTopicHeaderContainer = props => {
       <Flex.Item overflow="hidden">
         <Flex as="div" direction="row" justifyItems="start" wrap="wrap">
           <Flex.Item margin="0 0 x-small 0">
-            <Heading level="h1">{props.discussionTopicTitle}</Heading>
+            <Heading as="h1" level={mobileHeader ? 'h2' : 'h1'} themeOverride={{h2FontWeight: 700}}>
+              {discussionTopicTitle}
+            </Heading>
           </Flex.Item>
         </Flex>
       </Flex.Item>
@@ -43,6 +45,6 @@ export const DiscussionTopicHeaderContainer = props => {
 
 DiscussionTopicHeaderContainer.propTypes = {
   discussionTopicTitle: PropTypes.string,
+  mobileHeader: PropTypes.bool,
 }
-
 export default DiscussionTopicHeaderContainer

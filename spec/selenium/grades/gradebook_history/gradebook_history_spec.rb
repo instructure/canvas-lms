@@ -25,17 +25,17 @@ describe "Gradebook History Page" do
   include GradebookHistorySetup
   include CustomScreenActions
 
-  before(:once) do
-    gb_history_setup(2)
-  end
-
-  before do
-    user_session(@teacher)
-    GradeBookHistory.visit(@course)
-    wait_for_ajaximations
-  end
-
   context "shows the results table for a valid search" do
+    before(:once) do
+      gb_history_setup(2)
+    end
+
+    before do
+      user_session(@teacher)
+      GradeBookHistory.visit(@course)
+      wait_for_ajaximations
+    end
+
     it "with student name input and typeahead selection", priority: "1" do
       student_name = @course.students.first.name
       GradeBookHistory.search_with_student_name(
@@ -60,6 +60,42 @@ describe "Gradebook History Page" do
 
     it "and the current grade column has the same grade as related grade history rows", priority: "1" do
       expect(GradeBookHistory.check_current_col_for_history("assignment two")).to be true
+    end
+  end
+
+  context "discussion_checkpoints" do
+    before do
+      Account.default.enable_feature!(:discussion_checkpoints)
+    end
+
+    it "shows the results table with discussion checkpoint info" do
+      course_with_teacher_logged_in
+      student_in_course(active_all: true)
+
+      discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+
+      c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        points_possible: 5,
+        dates: [{ type: "everyone", due_at: 1.week.from_now }]
+      )
+
+      c2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        points_possible: 15,
+        replies_required: 3,
+        dates: [{ type: "everyone", due_at: 1.week.from_now }]
+      )
+
+      c1.grade_student(@course.students.first, grade: 5, grader: @teacher)
+      c2.grade_student(@course.students.first, grade: 15, grader: @teacher)
+
+      GradeBookHistory.visit(@course)
+      wait_for_ajaximations
+      expect(fj("span:contains('checkpointed discussion (Reply to Topic)')")).to be_present
+      expect(fj("span:contains('checkpointed discussion (Required Replies)')")).to be_present
     end
   end
 end

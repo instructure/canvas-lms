@@ -569,5 +569,27 @@ module Types
         end
       end
     end
+
+    field :total_submissions, Int, null: true
+    def total_submissions
+      load_association(:context).then do |context|
+        if context.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+          load_association(:submissions).then do |submissions|
+            submissions.where.not(workflow_state: "unsubmitted").count
+          end
+        end
+      end
+    end
+
+    field :total_graded_submissions, Int, null: true
+    def total_graded_submissions
+      load_association(:context).then do |context|
+        if context.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+          load_association(:submissions).then do |submissions|
+            submissions.graded.count
+          end
+        end
+      end
+    end
   end
 end

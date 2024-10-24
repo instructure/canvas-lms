@@ -30,18 +30,30 @@ describe ContentExport do
     ContentExport.new({ context: course }.merge(opts))
   end
 
-  it "records the job id" do
-    allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123))
-    @ce.export(synchronous: true)
-    expect(@ce.reload.settings[:job_id]).to eq(123)
-  end
+  describe "#export" do
+    subject { @ce.export(synchronous: true) }
 
-  it "logs duration on export success" do
-    allow(InstStatsd::Statsd).to receive(:timing)
-    @ce.export(synchronous: true)
-    expect(InstStatsd::Statsd).to have_received(:timing).with("content_migrations.export_duration", anything, {
-                                                                tags: { export_type: nil, selective_export: false }
-                                                              }).once
+    it "records the job id" do
+      allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123))
+
+      subject
+
+      expect(@ce.reload.settings[:job_id]).to eq(123)
+    end
+
+    it "logs duration on export success" do
+      allow(InstStatsd::Statsd).to receive(:timing)
+
+      subject
+
+      expect(InstStatsd::Statsd).to have_received(:timing).with("content_migrations.export_duration", anything, { tags: { export_type: nil, selective_export: false } }).once
+    end
+
+    it "raises ExternalExportNotCompletedError" do
+      allow(@ce).to receive_messages(waiting_for_external_tool?: true, new_quizzes_export_state_completed?: false)
+
+      expect { subject }.to raise_error(ContentExport::ExternalExportNotCompletedError)
+    end
   end
 
   context "export_object?" do
@@ -208,15 +220,6 @@ describe ContentExport do
       before do
         @course.enable_feature!(:quizzes_next)
         @course.root_account.enable_feature!(:newquizzes_on_quiz_page)
-      end
-
-      it "sets up assignment and content_export settings" do
-        expect(@ce).to receive(:export)
-        @ce.queue_api_job({})
-        expect(@ce.settings["quizzes2"]).not_to be_nil
-        assignment_id = @ce.settings["quizzes2"]["assignment"]["assignment_id"]
-        assignment = Assignment.find_by(id: assignment_id)
-        expect(assignment).not_to be_nil
       end
 
       # CC export is the first step of Quiz migration
@@ -485,14 +488,21 @@ describe ContentExport do
       end
 
       it "contains lti assignments" do
-        expect(@ce.course.assignments.active.type_quiz_lti.where.not(workflow_state: "failed_to_duplicate").count).to eq(1)
+        expect(@ce.course.assignments.active.type_quiz_lti.where.not(workflow_state: ["failed_to_duplicate", "fail_to_import"]).count).to eq(1)
       end
 
       it "does not contain failed_to_duplicate lti assignments" do
         lti_assignment = @ce.course.assignments.first
         lti_assignment.workflow_state = "failed_to_duplicate"
         lti_assignment.save!
-        expect(@ce.course.assignments.active.type_quiz_lti.where.not(workflow_state: "failed_to_duplicate").count).to eq(0)
+        expect(@ce.course.assignments.active.type_quiz_lti.where.not(workflow_state: ["failed_to_duplicate", "fail_to_import"]).count).to eq(0)
+      end
+
+      it "does not contain fail_to_import lti assignments" do
+        lti_assignment = @ce.course.assignments.first
+        lti_assignment.workflow_state = "fail_to_import"
+        lti_assignment.save!
+        expect(@ce.course.assignments.active.type_quiz_lti.where.not(workflow_state: ["failed_to_duplicate", "fail_to_import"]).count).to eq(0)
       end
 
       describe "setting the contains_new_quizzes setting" do

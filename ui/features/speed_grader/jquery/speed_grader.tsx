@@ -873,7 +873,7 @@ function renderRubricsCheckpointsInfo() {
 
   if (mountPoint) {
     ReactDOM.render(
-      <Alert variant="info">
+      <Alert variant="info" margin="medium none">
         {I18n.t('Rubrics do not auto-populate grades for checkpoints.')}
       </Alert>,
       mountPoint
@@ -4365,7 +4365,7 @@ EG = {
         confetti={false}
         editable={isMostRecentAttempt}
         onStickerChange={changeSticker}
-        size="medium"
+        size="small"
         submission={submission}
       />,
       mountPoint

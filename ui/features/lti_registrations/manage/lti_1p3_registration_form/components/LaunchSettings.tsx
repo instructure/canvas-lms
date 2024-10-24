@@ -39,6 +39,7 @@ const I18n = useI18nScope('lti_registrations')
 export type LaunchSettingsProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
   unregister: () => void
+  reviewing: boolean
   onNextClicked: () => void
 }
 
@@ -195,7 +196,7 @@ export const LaunchSettings = (props: LaunchSettingsProps) => {
           disabled={isNextDisabled}
           margin="small"
         >
-          {I18n.t('Next')}
+          {props.reviewing ? I18n.t('Back to Review') : I18n.t('Next')}
         </Button>
       </Modal.Footer>
     </>

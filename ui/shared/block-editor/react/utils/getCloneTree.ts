@@ -15,28 +15,25 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import {type NodeTree, type Node, type SerializedNode} from '@craftjs/core'
+import {getRandomId} from '@craftjs/utils'
+import {type TemplateNodeTree} from '../types'
 
-// code copied from https://github.com/prevwong/craft.js/issues/209#issuecomment-795221484
-// but with a couple modifications
+export type NodePair = [string, Node]
+export type SerializedNodePair = [string, SerializedNode]
 
-import {type Node} from '@craftjs/core'
-import {uid} from '@instructure/uid'
-
-export const getCloneTree = (idToClone: string, query: any) => {
-  const tree = query.node(idToClone).toNodeTree()
+export const getCloneTree = (tree: NodeTree, query: any): NodeTree => {
   const newNodes: Record<string, Node> = {}
-
   const changeNodeId = (node: Node, newParentId?: string) => {
-    const newNodeId = uid('node', 2)
+    const newNodeId = getRandomId()
     const childNodes = node.data.nodes.map(childId => changeNodeId(tree.nodes[childId], newNodeId))
-    const linkedNodes = Object.keys(node.data.linkedNodes).reduce((accum, id) => {
-      const linkedNodeId = changeNodeId(tree.nodes[node.data.linkedNodes[id]], newNodeId)
+    const linkedNodes = Object.keys(node.data.linkedNodes).reduce((acc, id) => {
+      const newLinkedNodeId = changeNodeId(tree.nodes[node.data.linkedNodes[id]], newNodeId)
       return {
-        ...accum,
-        [id]: linkedNodeId,
+        ...acc,
+        [id]: newLinkedNodeId,
       }
     }, {})
-
     const tmpNode = {
       ...node,
       id: newNodeId,
@@ -47,8 +44,8 @@ export const getCloneTree = (idToClone: string, query: any) => {
         linkedNodes,
       },
     }
-    const freshnode = query.parseFreshNode(tmpNode).toNode()
-    newNodes[newNodeId] = freshnode
+    const freshNode = query.parseFreshNode(tmpNode).toNode()
+    newNodes[newNodeId] = freshNode
     return newNodeId
   }
 
@@ -57,4 +54,45 @@ export const getCloneTree = (idToClone: string, query: any) => {
     rootNodeId,
     nodes: newNodes,
   }
+}
+
+export const getNodeTemplate = (id: string, name: string, query: any): TemplateNodeTree => {
+  const tree = query.node(id).toNodeTree()
+  const nodePairs: SerializedNodePair[] = Object.keys(tree.nodes).map(nid => [
+    nid,
+    query.node(nid).toSerializedNode(),
+  ])
+  const saveData: TemplateNodeTree = {
+    rootNodeId: tree.rootNodeId,
+    nodes: Object.fromEntries(nodePairs),
+  }
+  const rootNode = saveData.nodes[saveData.rootNodeId]
+  if (rootNode.custom) {
+    // nodes returned from toSerializedNode are still made of invariants
+    // copy to undo that
+    rootNode.custom = {...rootNode.custom}
+  } else {
+    rootNode.custom = {}
+  }
+  rootNode.custom.displayName = name
+  delete rootNode.props.isColumn
+
+  return saveData
+}
+
+export const createFromTemplate = (template: TemplateNodeTree, query: any): NodeTree => {
+  const newNodes = template.nodes
+  const nodePairs: NodePair[] = Object.keys(newNodes).map(id => {
+    const nodeId = id
+    return [
+      nodeId,
+      query.parseSerializedNode(newNodes[id]).toNode((node: Node) => (node.id = nodeId)),
+    ]
+  })
+  const tree: NodeTree = {
+    rootNodeId: template.rootNodeId,
+    nodes: Object.fromEntries(nodePairs),
+  }
+  const newTree = getCloneTree(tree, query)
+  return newTree
 }

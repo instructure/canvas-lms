@@ -23,7 +23,7 @@ import {
   ADDRESS_BOOK_RECIPIENTS,
   ADDRESS_BOOK_RECIPIENTS_WITH_COMMON_COURSES,
 } from '../../../graphql/Queries'
-import {useQuery} from 'react-apollo'
+import {useQuery} from '@apollo/react-hooks'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -222,11 +222,6 @@ export const AddressBookContainer = props => {
   }, [props.activeCourseFilter])
 
   const menuData = useMemo(() => {
-    // If loading is true and there is no data, return an empty array.
-    if (loading && !data) {
-      return []
-    }
-
     // Extract contextData: { id, name, and context_type}
     let contextData = (data?.legacyNode?.recipients?.contextsConnection?.nodes || []).map(c => {
       return {

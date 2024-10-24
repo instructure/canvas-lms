@@ -22,7 +22,7 @@ import {bool, func, string} from 'prop-types'
 import {IconCompleteLine, IconEmptyLine} from '@instructure/ui-icons'
 import React, {useState} from 'react'
 import {SET_MODULE_ITEM_COMPLETION} from '@canvas/assignments/graphql/student/Mutations'
-import {useMutation} from 'react-apollo'
+import {useMutation} from '@apollo/react-hooks'
 
 const I18n = useI18nScope('assignments_2_file_upload')
 

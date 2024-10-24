@@ -17,12 +17,14 @@
  */
 
 import {Img} from '@instructure/ui-img'
+import ConfettiExplosion from 'react-confetti-explosion'
+import React, {useState} from 'react'
+
 import {stickerContainerClass} from '../helpers/utils'
 import Api from '../helpers/api'
 import assetFactory, {stickerDescription} from '../helpers/assetFactory'
 import ClickableImage from './ClickableImage'
-import Confetti from '@canvas/confetti/react/Confetti'
-import React, {useState} from 'react'
+import Sparkles from '@canvas/sparkles/react/components/Sparkles'
 import StickerModal from './StickerModal'
 import type {StickerProps} from '../types/stickers.d'
 
@@ -36,6 +38,7 @@ export default function Sticker({
 }: StickerProps) {
   const [confettiShowing, setConfettiShowing] = useState(false)
   const [modalShowing, setModalShowing] = useState(false)
+  const [hovering, setHovering] = useState(false)
 
   const triggerConfetti = () => {
     if (!confettiShowing) {
@@ -89,25 +92,33 @@ export default function Sticker({
 
   if (confetti) {
     return (
-      <>
+      <span style={{position: 'relative'}}>
+        <span style={{position: 'absolute', top: '50%', left: '50%'}}>
+          {confettiShowing && <ConfettiExplosion zIndex={10} data-testid="confetti-explosion" />}
+        </span>
         <ClickableImage
           editable={editable}
           onClick={triggerConfetti}
           size={size}
           sticker={submission.sticker}
         />
-        {confettiShowing && <Confetti triggerCount={null} />}
-      </>
+      </span>
     )
   }
 
   return (
-    <div className={stickerContainerClass(size)}>
-      <Img
-        data-testid="sticker-image"
-        src={assetFactory(submission.sticker)}
-        alt={stickerDescription(submission.sticker)}
-      />
-    </div>
+    <Sparkles key={submission.sticker} enabled={typeof submission.sticker === 'string' && hovering}>
+      <div
+        className={stickerContainerClass(size)}
+        onMouseEnter={() => setHovering(true)}
+        onMouseLeave={() => setHovering(false)}
+      >
+        <Img
+          data-testid="sticker-image"
+          src={assetFactory(submission.sticker)}
+          alt={stickerDescription(submission.sticker)}
+        />
+      </div>
+    </Sparkles>
   )
 }

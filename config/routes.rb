@@ -889,6 +889,7 @@ CanvasRails::Application.routes.draw do
   get "login/otp" => "login/otp#new", :as => :otp_login
   post "login/otp/sms" => "login/otp#send_via_sms", :as => :send_otp_via_sms
   post "login/otp" => "login/otp#create"
+  delete "login/otp/cancel" => "login/otp#cancel_otp", :as => :cancel_otp
   get "users/self/otps" => "one_time_passwords#index", :as => :one_time_passwords
   delete "users/self/otps" => "one_time_passwords#destroy_all", :as => :destroy_all_one_time_passwords
 
@@ -2695,6 +2696,15 @@ CanvasRails::Application.routes.draw do
     scope(controller: :rich_content_api) do
       post "rich_content/generate", action: :generate
     end
+
+    scope(controller: :block_editor_templates_api) do
+      get "courses/:course_id/block_editor_templates", action: :index
+      post "courses/:course_id/block_editor_templates", action: :create
+      put "courses/:course_id/block_editor_templates/:id", action: :update
+      delete "courses/:course_id/block_editor_templates/:id", action: :destroy
+      post "courses/:course_id/block_editor_templates/:id/publish", action: :publish
+      get "courses/:course_id/block_editor_templates/can_edit", action: :can_edit
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented or
@@ -2907,6 +2917,12 @@ CanvasRails::Application.routes.draw do
     scope(controller: "lti/ims/names_and_roles") do
       get "courses/:course_id/names_and_roles", controller: "lti/ims/names_and_roles", action: :course_index, as: :course_names_and_roles
       get "groups/:group_id/names_and_roles", controller: "lti/ims/names_and_roles", action: :group_index, as: :group_names_and_roles
+    end
+
+    # 1Edtech (IMS) LTI Platform Notification service (PNS)
+    scope(controller: "lti/ims/notice_handlers") do
+      get "notice-handlers/:context_external_tool_id", action: :index, as: :lti_notice_handlers
+      put "notice-handlers/:context_external_tool_id", action: :update, as: :update_lti_notice_handlers
     end
 
     # Security

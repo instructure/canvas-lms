@@ -221,6 +221,9 @@ function DiscussionTopicForm({
   )
   const [addToTodo, setAddToTodo] = useState(!!currentDiscussionTopic?.todoDate || false)
   const [todoDate, setTodoDate] = useState(currentDiscussionTopic?.todoDate || null)
+  const [addToStudentToDoDateRef, setAddToStudentToDoDateRef] = useState()
+  const [addToStudentToDoTimeRef, setAddToStudentToDoTimeRef] = useState()
+
   const [isGroupDiscussion, setIsGroupDiscussion] = useState(
     !!currentDiscussionTopic?.groupSet || false
   )
@@ -424,6 +427,9 @@ function DiscussionTopicForm({
       new CustomEvent('triggerMasteryPathsUpdateAssignment', {detail: {assignmentInfo}})
     )
   }, [gradingSchemeId, displayGradeAs, pointsPossible, isGraded])
+
+  addToStudentToDoDateRef?.setAttribute('data-testid', 'add-to-student-to-do-date')
+  addToStudentToDoTimeRef?.setAttribute('data-testid', 'add-to-student-to-do-time')
 
   const {
     shouldShowTodoSettings,
@@ -776,6 +782,7 @@ function DiscussionTopicForm({
             setAvailableFrom={setAvailableFrom}
             availableUntil={availableUntil}
             setAvailableUntil={setAvailableUntil}
+            isAnnouncement={isAnnouncement}
             isGraded={isGraded}
             setAvailabilityValidationMessages={setAvailabilityValidationMessages}
             availabilityValidationMessages={availabilityValidationMessages}
@@ -818,7 +825,10 @@ function DiscussionTopicForm({
         shouldMasteryPathsBeVisible={ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !isAnnouncement}
         shouldMasteryPathsBeEnabled={isGraded}
       />
-      <div style={{display: selectedView === Views.Details ? 'block' : 'none'}}>
+      <View
+        margin={breakpoints.mobileOnly ? 'mediumSmall 0 0 0' : '0'}
+        display={selectedView === Views.Details ? 'block' : 'none'}
+      >
         <FormFieldGroup description="" rowSpacing="small">
           {isUnpublishedAnnouncement && (
             <Alert variant={announcementAlertProps().variant}>
@@ -826,6 +836,7 @@ function DiscussionTopicForm({
             </Alert>
           )}
           <TextInput
+            data-testid="discussion-topic-title"
             renderLabel={renderLabelWithPublishStatus()}
             type={I18n.t('text')}
             placeholder={I18n.t('Topic Title')}
@@ -1095,6 +1106,12 @@ function DiscussionTopicForm({
                       invalidDateTimeMessage={I18n.t('Invalid date and time')}
                       layout="columns"
                       allowNonStepInput={true}
+                      dateInputRef={ref => {
+                        setAddToStudentToDoDateRef(ref)
+                      }}
+                      timeInputRef={ref => {
+                        setAddToStudentToDoTimeRef(ref)
+                      }}
                     />
                   </View>
                 )}
@@ -1130,6 +1147,7 @@ function DiscussionTopicForm({
             {shouldShowGroupOptions && isGroupDiscussion && (
               <View display="block" padding="none none none large">
                 <SimpleSelect
+                  data-testid="select-discussion-group-category"
                   id="discussion_group_category_id"
                   renderLabel={I18n.t('Group Set')}
                   defaultValue=""
@@ -1232,7 +1250,7 @@ function DiscussionTopicForm({
               <div id="assignment_external_tools" data-testid="assignment-external-tools" />
             )}
         </FormFieldGroup>
-      </div>
+      </View>
       <div style={{display: selectedView === Views.MasteryPaths ? 'block' : 'none'}}>
         {ENV.CONDITIONAL_RELEASE_ENV && (
           <MasteryPathsReactWrapper type="discussion topic" env={ENV.CONDITIONAL_RELEASE_ENV} />
@@ -1257,6 +1275,7 @@ function DiscussionTopicForm({
           }}
           isSubmitting={isSubmitting}
           willAnnouncementPostRightAway={willAnnouncementPostRightAway}
+          breakpoints={breakpoints}
         />
       </FormFieldGroup>
       {shouldShowMissingSectionsWarning && (

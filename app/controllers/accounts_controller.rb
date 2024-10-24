@@ -1979,6 +1979,7 @@ class AccountsController < ApplicationController
 
   PERMITTED_SETTINGS_FOR_UPDATE = [:admins_can_change_passwords,
                                    :admins_can_view_notifications,
+                                   :allow_name_pronunciation_edit_for_admins,
                                    :allow_additional_email_at_registration,
                                    :allow_invitation_previews,
                                    :allow_sending_scores_in_emails,
@@ -2061,8 +2062,10 @@ class AccountsController < ApplicationController
                                    :strict_sis_check,
                                    :storage_quota,
                                    :students_can_create_courses,
+                                   :allow_name_pronunciation_edit_for_students,
                                    :sub_account_includes,
                                    :teachers_can_create_courses,
+                                   :allow_name_pronunciation_edit_for_teachers,
                                    :trusted_referers,
                                    :turnitin_host,
                                    :turnitin_account_id,

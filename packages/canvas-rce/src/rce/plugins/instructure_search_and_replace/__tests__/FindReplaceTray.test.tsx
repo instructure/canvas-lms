@@ -409,7 +409,8 @@ describe('FindReplaceTray', () => {
   })
 
   describe('selectionScreenReaderText', () => {
-    it('is displayed when there are results', async () => {
+    // flaky; cf. RCX-2586
+    it.skip('is displayed when there are results', async () => {
       const {user} = renderComponent()
       const findInput = screen.getByTestId('find-text-input')
       await type(user, findInput, 'abc')

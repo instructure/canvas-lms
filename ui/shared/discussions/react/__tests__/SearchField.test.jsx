@@ -31,7 +31,8 @@ jest.mock('lodash', () => ({
 
 jest.mock('@instructure/ui-text-input', () => ({
   TextInput: React.forwardRef((props, ref) => {
-    const {onSearchEvent, searchInputRef, renderLabel, renderBeforeInput, ...rest} = props
+    const {onSearchEvent, renderLabel, renderBeforeInput, ...rest} = props
+
     return (
       <div>
         {renderLabel}

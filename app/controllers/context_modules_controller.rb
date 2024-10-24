@@ -688,7 +688,7 @@ class ContextModulesController < ApplicationController
           end
         end
       end
-      result[:current_item].evaluate_for(@current_user) rescue nil
+      result[:current_item].try(:evaluate_for, @current_user)
       if result[:current_item]&.position
         result[:previous_item] = @tags.reverse.detect { |t| t.id != result[:current_item].id && t.context_module_id == result[:current_item].context_module_id && t.position && t.position <= result[:current_item].position && t.content_type != "ContextModuleSubHeader" }
         result[:next_item] = @tags.detect { |t| t.id != result[:current_item].id && t.context_module_id == result[:current_item].context_module_id && t.position && t.position >= result[:current_item].position && t.content_type != "ContextModuleSubHeader" }

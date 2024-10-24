@@ -80,6 +80,7 @@ export const RUBRICS_QUERY_RESPONSE: Rubric = {
       ],
     },
   ],
+  unassessed: true,
 }
 
 export const RUBRIC_CRITERIA_IGNORED_FOR_SCORING: Rubric = {

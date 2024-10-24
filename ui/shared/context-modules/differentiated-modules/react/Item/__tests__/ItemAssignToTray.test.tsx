@@ -15,9 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import React from 'react'
-import {act, fireEvent, render, waitFor} from '@testing-library/react'
+import {act, fireEvent, render, cleanup, waitFor, screen} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import ItemAssignToTray, {type ItemAssignToTrayProps} from '../ItemAssignToTray'
@@ -28,7 +27,8 @@ import {
   SECOND_GROUP_CATEGORY_DATA,
   ADHOC_WITHOUT_STUDENTS,
 } from '../../__tests__/mocks'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never, delay: null}
 
@@ -147,14 +147,34 @@ describe('ItemAssignToTray', () => {
     window.location = originalLocation
     fetchMock.resetHistory()
     fetchMock.restore()
+    cleanup()
   })
+
+  const CUSTOM_TIMEOUT_LIMIT = 3000
 
   const renderComponent = (overrides: Partial<ItemAssignToTrayProps> = {}) =>
     render(
-      <QueryProvider>
+      <MockedQueryProvider>
         <ItemAssignToTray {...props} {...overrides} />
-      </QueryProvider>
+      </MockedQueryProvider>
     )
+
+  const renderComponentAndGetElements = async (text: any, payload: any = undefined) => {
+    await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
+    if (payload) {
+      fetchMock.get(OVERRIDES_URL, payload, {
+        overwriteRoutes: true,
+      })
+    }
+    const {findByText, rerender} = renderComponent()
+    const assigneeSelector = await screen.findByTestId('assignee_selector')
+    act(() => assigneeSelector.click())
+    if (payload) {
+      await findByText(text)
+    }
+    await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
+    return {rerender}
+  }
 
   it('renders', async () => {
     const {getByTestId, getByText, getByLabelText, findAllByTestId, container} = renderComponent()
@@ -283,7 +303,7 @@ describe('ItemAssignToTray', () => {
         overwriteRoutes: true,
       }
     )
-    const {getByRole, findAllByTestId, getAllByTestId} = renderComponent()
+    const {findAllByTestId, getAllByTestId} = renderComponent()
     const cards = await findAllByTestId('item-assign-to-card')
     expect(cards).toHaveLength(1)
     act(() => getAllByTestId('add-card')[0].click())
@@ -322,7 +342,7 @@ describe('ItemAssignToTray', () => {
         overwriteRoutes: true,
       }
     )
-    const {getByRole, findAllByTestId, getAllByTestId} = renderComponent()
+    const {findAllByTestId, getAllByTestId} = renderComponent()
     const cards = await findAllByTestId('item-assign-to-card')
     expect(cards).toHaveLength(4)
     expect(getAllByTestId('add-card')).toHaveLength(2)
@@ -881,9 +901,9 @@ describe('ItemAssignToTray', () => {
         expect(queryByText(group.name)).not.toBeInTheDocument()
       })
       rerender(
-        <QueryProvider>
+        <MockedQueryProvider>
           <ItemAssignToTray {...props} defaultGroupCategoryId={SECOND_GROUP_CATEGORY_ID} />
-        </QueryProvider>
+        </MockedQueryProvider>
       )
 
       await findByText(SECOND_GROUP_CATEGORY_DATA[0].name)

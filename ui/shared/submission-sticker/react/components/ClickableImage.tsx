@@ -22,6 +22,7 @@ import assetFactory, {stickerDescription} from '../helpers/assetFactory'
 import {stickerContainerClass} from '../helpers/utils'
 import {IconEditSolid, IconAddSolid} from '@instructure/ui-icons'
 import {Img} from '@instructure/ui-img'
+import Sparkles from '@canvas/sparkles'
 
 function IconOverlay({showIcon, sticker}: IconOverlayProps) {
   return (
@@ -50,24 +51,34 @@ export default function ClickableImage({editable, onClick, size, sticker}: Click
   }
 
   return (
-    <button
-      data-testid="sticker-button"
-      className={stickerContainerClass(size)}
-      onBlur={stopHover}
-      onClick={onClick}
-      onFocus={startHover}
-      onMouseEnter={startHover}
-      onMouseLeave={stopHover}
-      type="button"
+    <Sparkles
+      key={sticker}
+      size={size === 'small' ? 'small' : 'medium'}
+      enabled={typeof sticker === 'string' && hovering}
     >
-      <div className={`StickerOverlay__Container ${size}${sticker && ' Sticker__ShinyContainer'}`}>
-        <Img
-          data-testid="sticker-image"
-          src={assetFactory(sticker)}
-          alt={stickerDescription(sticker)}
-        />
-        {editable && <IconOverlay sticker={sticker} showIcon={hovering} />}
-      </div>
-    </button>
+      <button
+        data-testid="sticker-button"
+        className={stickerContainerClass(size)}
+        onBlur={stopHover}
+        onClick={onClick}
+        onFocus={startHover}
+        onMouseEnter={startHover}
+        onMouseLeave={stopHover}
+        type="button"
+      >
+        <div
+          className={`StickerOverlay__Container ${size}${
+            sticker ? ' Sticker__ShinyContainer' : ''
+          }`}
+        >
+          <Img
+            data-testid="sticker-image"
+            src={assetFactory(sticker)}
+            alt={stickerDescription(sticker)}
+          />
+          {editable && <IconOverlay sticker={sticker} showIcon={hovering} />}
+        </div>
+      </button>
+    </Sparkles>
   )
 }

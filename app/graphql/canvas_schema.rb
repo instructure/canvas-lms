@@ -121,4 +121,11 @@ class CanvasSchema < GraphQL::Schema
   max_query_string_tokens GraphQLTuning.max_query_string_tokens
 
   query_analyzer(CanvasAntiabuseAnalyzer)
+
+  if Rails.env.development?
+    max_complexity GraphQLTuning.max_complexity
+    default_page_size GraphQLTuning.default_page_size
+    default_max_page_size GraphQLTuning.default_max_page_size
+    query_analyzer(LogQueryComplexity)
+  end
 end

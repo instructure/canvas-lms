@@ -505,6 +505,25 @@ module Types
       Loaders::CourseRoleLoader.for(course_id: resolved_course_id, role_types:, built_in_only:).load(object)
     end
 
+    field :course_progression, CourseProgressionType, <<~MD, null: true # rubocop:disable GraphQL/ExtractType
+      Returns null if either of these conditions are met:
+      * the course is not module based
+      * no module in it has completion requirements
+      * the queried user is not a student in the course
+      * insufficient permissions for the request
+    MD
+    def course_progression
+      target_user = object
+      course = context[:course]
+      return if course.nil?
+      return unless course.grants_right?(current_user, session, :view_all_grades) || target_user.grants_right?(current_user, session, :read)
+
+      progress = CourseProgress.new(context[:course], object, read_only: true)
+      return unless progress.can_evaluate_progression?
+
+      progress
+    end
+
     field :inbox_labels, [String], null: true
     def inbox_labels
       return unless object == current_user

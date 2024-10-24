@@ -62,6 +62,7 @@ export const AnonymousSelector = ({
           setDiscussionAnonymousState(value)
         }}
         disabled={isSelectDisabled}
+        data-testid="anonymous-discussion-options"
       >
         <RadioInput
           key="off"

@@ -145,7 +145,7 @@ class Lti::Registration < ActiveRecord::Base
     # hack; remove the need to look for developer_key.tool_configuration and ensure that is
     # always available as manual_configuration. This would need to happen in an after_save
     # callback on the developer key.
-    ims_registration&.internal_lti_configuration || manual_configuration&.settings || developer_key&.tool_configuration&.configuration || {}
+    ims_registration&.internal_lti_configuration || manual_configuration&.internal_configuration || developer_key&.tool_configuration&.internal_configuration || {}
   end
 
   def importable_configuration

@@ -17,7 +17,8 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import MobileGlobalMenu from '../MobileGlobalMenu'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {QueryClient} from '@tanstack/react-query'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {
   type ExternalTool,
   filterAndProcessTools,
@@ -41,9 +42,9 @@ describe('MobileGlobalMenu', () => {
     mockedGetExternalApps.mockResolvedValue(externalTools)
     const queryClient = new QueryClient()
     return render(
-      <QueryClientProvider client={queryClient}>
+      <MockedQueryClientProvider client={queryClient}>
         <MobileGlobalMenu onDismiss={() => {}} />
-      </QueryClientProvider>
+      </MockedQueryClientProvider>
     )
   }
 

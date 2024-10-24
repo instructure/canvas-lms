@@ -250,7 +250,7 @@ class Quizzes::QuizzesController < ApplicationController
 
       setup_attachments
       submission_counts if @quiz.grants_right?(@current_user, session, :grade) || @quiz.grants_right?(@current_user, session, :read_statistics)
-      @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
+      @stored_params = @submission.temporary_data if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
       @stored_params ||= {}
       hash = {
         ATTACHMENTS: @attachments.to_h { |_, a| [a.id, attachment_hash(a)] },
@@ -510,7 +510,7 @@ class Quizzes::QuizzesController < ApplicationController
               old_assignment.id = @quiz.assignment.id
 
               @quiz.assignment.post_to_sis = params[:post_to_sis] == "1"
-              @quiz.assignment.validate_overrides_for_sis(overrides) unless overrides.nil?
+              @quiz.assignment.validate_overrides_for_sis(prepared_batch) if overrides
 
               @quiz.assignment.important_dates = value_to_boolean(params[:important_dates])
             end
@@ -780,7 +780,11 @@ class Quizzes::QuizzesController < ApplicationController
       @students = @students.name_like(params[:search_term]) if params[:search_term].present?
       @students = @students.distinct.order_by_sortable_name
       @students = @students.order(:uuid) if @quiz.survey? && @quiz.anonymous_submissions
-      last_updated_at = Time.parse(params[:last_updated_at]) rescue nil
+      begin
+        last_updated_at = Time.parse(params[:last_updated_at]) if params[:last_updated_at]
+      rescue ArgumentError
+        # ignore
+      end
       respond_to do |format|
         format.html do
           @students = @students.paginate(page: params[:page], per_page: 50)

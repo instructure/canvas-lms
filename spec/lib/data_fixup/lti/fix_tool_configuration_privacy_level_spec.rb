@@ -17,26 +17,20 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require "lti_1_3_tool_configuration_spec_helper"
+require "lti_1_3_spec_helper"
 
 RSpec.describe DataFixup::Lti::FixToolConfigurationPrivacyLevel do
   subject { described_class.run }
 
-  include_context "lti_1_3_tool_configuration_spec_helper"
+  include_context "lti_1_3_spec_helper"
 
   let(:account) { Account.default }
-  let(:developer_key) do
-    tool_config_params = {
-      settings:
-    }.with_indifferent_access
-    Lti::ToolConfiguration.create_tool_config_and_key!(
-      account,
-      tool_config_params
-    )
-    dk = DeveloperKey.last
-    # Set the root privacy_level to without before_save hooks
-    dk.tool_configuration.update_column("privacy_level", root_privacy_level)
-    dk
+
+  before do
+    tool_configuration.untransform!
+    tool_configuration.settings["extensions"][0]["privacy_level"] = extension_privacy_level
+    tool_configuration.save!
+    tool_configuration.update_column("privacy_level", root_privacy_level)
   end
 
   context "tool_configuration with inconsistent privacy_level values" do
@@ -47,7 +41,7 @@ RSpec.describe DataFixup::Lti::FixToolConfigurationPrivacyLevel do
         let(:root_privacy_level) { nil }
 
         it "updates the privacy_level with the value of extension_privacy_level" do
-          expect { subject }.to change { developer_key.tool_configuration.reload["privacy_level"] }.from(nil).to("email_only")
+          expect { subject }.to change { tool_configuration.reload["privacy_level"] }.from(nil).to("email_only")
         end
       end
 
@@ -55,7 +49,7 @@ RSpec.describe DataFixup::Lti::FixToolConfigurationPrivacyLevel do
         let(:root_privacy_level) { "public" }
 
         it "updates the privacy_level with the value of extension_privacy_level" do
-          expect { subject }.to change { developer_key.tool_configuration.reload["privacy_level"] }.from(root_privacy_level).to(extension_privacy_level)
+          expect { subject }.to change { tool_configuration.reload["privacy_level"] }.from(root_privacy_level).to(extension_privacy_level)
         end
       end
 
@@ -70,9 +64,9 @@ RSpec.describe DataFixup::Lti::FixToolConfigurationPrivacyLevel do
 
     context "when settings->extensions->canvas_platform->privacy_level is not presen" do
       before do
-        setting = developer_key.tool_configuration.settings
+        setting = tool_configuration.settings
         setting["extensions"].first.delete("privacy_level")
-        developer_key.tool_configuration.update_column("settings", setting)
+        tool_configuration.update_column("settings", setting)
       end
 
       let(:root_privacy_level) { "anonymous" }

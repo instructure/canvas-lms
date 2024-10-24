@@ -48,6 +48,17 @@ describe('AccountDefaultSelector tests', () => {
     expect(getByText('Apply')).toBeInTheDocument()
   })
 
+  it('opens a confirmation modal when apply is clicked to change the default grading scheme', () => {
+    const {getByText, getByTestId} = renderAccountDefaultSelector()
+    const select = getByTestId('account-default-grading-scheme-select')
+    select.click()
+    const option = getByTestId('grading-scheme-1-option')
+    option.click()
+    const apply = getByText('Apply')
+    apply.click()
+    expect(getByText('Confirm Default Grading Scheme Change')).toBeInTheDocument()
+  })
+
   it('apply button text changes to applied after default grading scheme changes', () => {
     const {getByText, getByTestId} = renderAccountDefaultSelector()
     const select = getByTestId('account-default-grading-scheme-select')
@@ -56,7 +67,26 @@ describe('AccountDefaultSelector tests', () => {
     option.click()
     const apply = getByText('Apply')
     apply.click()
+    const confirm = getByText('Confirm')
+    confirm.click()
     expect(getByText('Applied')).toBeInTheDocument()
+  })
+
+  it('apply button does not change text if the confirmation modal is canceled or closed', () => {
+    const {getByText, getByTestId} = renderAccountDefaultSelector()
+    const select = getByTestId('account-default-grading-scheme-select')
+    select.click()
+    const option = getByTestId('grading-scheme-1-option')
+    option.click()
+    const apply = getByText('Apply')
+    apply.click()
+    const cancel = getByText('Cancel')
+    cancel.click()
+    expect(getByText('Apply')).toBeInTheDocument()
+    apply.click()
+    const close = getByTestId('confirm-default-grading-scheme-change-modal-close-button')
+    close.click()
+    expect(getByText('Apply')).toBeInTheDocument()
   })
 
   it('reselecting the current default changes the apply text to applied', () => {

@@ -30,7 +30,7 @@ module.exports = {
     ],
   ],
   setupFiles: ['jest-canvas-mock', '<rootDir>/jest/jest-setup.js'],
-  setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'],
+  setupFilesAfterEnv: ['@testing-library/jest-dom'],
   testEnvironment: '<rootDir>../../jest/strictTimeLimitEnvironment.js',
   testMatch: ['**/__tests__/**/?(*.)(spec|test).[jt]s?(x)'],
   testPathIgnorePatterns: ['<rootDir>/node_modules', '<rootDir>/lib', '<rootDir>/es'],
@@ -43,5 +43,9 @@ module.exports = {
         configFile: require.resolve('./babel.config.cjs.js'),
       },
     ],
+  },
+  moduleNameMapper: {
+    '@instructure/studio-player':
+      '<rootDir>/__mocks__/@instructure/studio-player/_mockStudioPlayer.js',
   },
 }

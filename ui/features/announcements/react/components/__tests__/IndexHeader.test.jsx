@@ -73,7 +73,7 @@ describe('IndexHeader', () => {
     render(
       <IndexHeader {...defaultProps()} permissions={{...defaultPermissions(), create: true}} />
     )
-    expect(screen.getByText('Add announcement')).toBeInTheDocument()
+    expect(screen.getByText('Add Announcement')).toBeInTheDocument()
   })
 
   it('lets me lock an announcement when I have the permission and it is unlocked', () => {

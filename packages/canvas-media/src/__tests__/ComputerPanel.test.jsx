@@ -20,6 +20,7 @@ import React from 'react'
 import {act, render, fireEvent, waitFor} from '@testing-library/react'
 import ComputerPanel from '../ComputerPanel'
 import {ACCEPTED_FILE_TYPES} from '../acceptedMediaFileTypes'
+import StudioPlayer from '@instructure/studio-player'
 
 const uploadMediaTranslations = {
   UploadMediaStrings: {
@@ -61,6 +62,7 @@ function createPanel(overrideProps) {
       userLocale="en"
       liveRegion={() => document.getElementById(LIVE_REGION_ID)}
       updateSubtitles={() => false}
+      useStudioPlayer={false}
       {...overrideProps}
     />
   )
@@ -71,6 +73,14 @@ function renderPanel(overrideProps = {}) {
 }
 
 describe('UploadMedia: ComputerPanel', () => {
+  jest.mock('@instructure/studio-player', () => {
+    const mockPlayer = jest.fn(() => null)
+    mockPlayer.propTypes = {}
+    return {
+      StudioPlayer: mockPlayer,
+    }
+  })
+
   beforeEach(() => {
     const liveRegion = document.createElement('div')
     liveRegion.id = LIVE_REGION_ID
@@ -143,6 +153,55 @@ describe('UploadMedia: ComputerPanel', () => {
       const {getAllByText} = renderPanel({theFile: aFile, hasUploadedFile: true})
       const playButton = await waitFor(() => getAllByText('Play'))
       expect(playButton[0].closest('button')).toBeInTheDocument()
+    })
+
+    it('Does not render the StudioPlayer if the flag is not enabled', async () => {
+      const playerSpy = jest.spyOn(StudioPlayer, 'StudioPlayer')
+      HTMLElement.prototype.scrollIntoView = jest.fn()
+      const aFile = new File(['foo'], 'foo.mov', {
+        type: 'video/quicktime',
+      })
+      const setFile = file =>
+        rerender(
+          createPanel({
+            setFile,
+            theFile: file,
+            hasUploadedFile: true,
+          })
+        )
+      const {rerender, getByLabelText} = renderPanel({setFile})
+      const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
+      fireEvent.change(dropZone, {
+        target: {
+          files: [aFile],
+        },
+      })
+      expect(playerSpy).not.toHaveBeenCalled()
+    })
+
+    it('Renders the StudioPlayer if the flag is enabled', async () => {
+      const playerSpy = jest.spyOn(StudioPlayer, 'StudioPlayer')
+      HTMLElement.prototype.scrollIntoView = jest.fn()
+      const aFile = new File(['foo'], 'foo.mov', {
+        type: 'video/quicktime',
+      })
+      const setFile = file =>
+        rerender(
+          createPanel({
+            setFile,
+            theFile: file,
+            hasUploadedFile: true,
+            useStudioPlayer: true,
+          })
+        )
+      const {rerender, getByLabelText} = renderPanel({setFile})
+      const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
+      fireEvent.change(dropZone, {
+        target: {
+          files: [aFile],
+        },
+      })
+      expect(playerSpy).toHaveBeenCalled()
     })
 
     it('Renders a video icon if afile type is a video/avi', async () => {

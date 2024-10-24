@@ -55,6 +55,7 @@ class SearchResultsComponent extends Component {
         assignment: shape({
           name: string.isRequired,
           muted: bool.isRequired,
+          subAssignmentTag: string,
         }),
         date: string.isRequired,
         displayAsPoints: bool.isRequired,

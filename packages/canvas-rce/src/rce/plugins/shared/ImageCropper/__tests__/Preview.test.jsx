@@ -100,7 +100,7 @@ describe('Preview', () => {
       const event = {deltaY: -25}
       fireEvent.wheel(container.firstChild.firstChild, event)
       await waitFor(() => {
-        expect(dispatch).toHaveBeenCalledWith({type: 'SetScaleRatio', payload: 1.13})
+        expect(dispatch).toHaveBeenCalledWith({type: 'SetScaleRatio', payload: 1})
       })
     })
 
@@ -110,7 +110,7 @@ describe('Preview', () => {
       const event = {deltaY: 25}
       fireEvent.wheel(container.firstChild.firstChild, event)
       await waitFor(() => {
-        expect(dispatch).toHaveBeenCalledWith({type: 'SetScaleRatio', payload: 1.88})
+        expect(dispatch).toHaveBeenCalledWith({type: 'SetScaleRatio', payload: 2})
       })
     })
   })
@@ -153,7 +153,7 @@ describe('Preview', () => {
         event.keyCode = 37
         fireEvent.keyDown(container.firstChild, event)
         await waitFor(() => {
-          expect(dispatch).toHaveBeenCalledWith({type: 'SetTranslateX', payload: -1})
+          expect(dispatch).toHaveBeenCalledWith({type: 'UpdateSettings', payload: {direction: 37}})
         })
       })
 
@@ -161,7 +161,7 @@ describe('Preview', () => {
         event.keyCode = 38
         fireEvent.keyDown(container.firstChild, event)
         await waitFor(() => {
-          expect(dispatch).toHaveBeenCalledWith({type: 'SetTranslateY', payload: -1})
+          expect(dispatch).toHaveBeenCalledWith({type: 'UpdateSettings', payload: {direction: 38}})
         })
       })
 
@@ -169,7 +169,7 @@ describe('Preview', () => {
         event.keyCode = 39
         fireEvent.keyDown(container.firstChild, event)
         await waitFor(() => {
-          expect(dispatch).toHaveBeenCalledWith({type: 'SetTranslateX', payload: 1})
+          expect(dispatch).toHaveBeenCalledWith({type: 'UpdateSettings', payload: {direction: 39}})
         })
       })
 
@@ -177,7 +177,7 @@ describe('Preview', () => {
         event.keyCode = 40
         fireEvent.keyDown(container.firstChild, event)
         await waitFor(() => {
-          expect(dispatch).toHaveBeenCalledWith({type: 'SetTranslateY', payload: 1})
+          expect(dispatch).toHaveBeenCalledWith({type: 'UpdateSettings', payload: {direction: 40}})
         })
       })
     })

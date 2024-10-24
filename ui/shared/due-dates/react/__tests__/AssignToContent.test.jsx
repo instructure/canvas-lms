@@ -21,7 +21,8 @@ import {render, act, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AssignToContent from '../AssignToContent'
 import AssignmentOverrideCollection from '@canvas/assignments/backbone/collections/AssignmentOverrideCollection'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import fetchMock from 'fetch-mock'
 
 const SECTIONS_DATA = [
@@ -88,9 +89,9 @@ describe('AssignToContent', () => {
 
   const setUp = (propOverrides = {}) =>
     render(
-      <QueryProvider>
+      <MockedQueryProvider>
         <AssignToContent {...props} {...propOverrides} />
-      </QueryProvider>
+      </MockedQueryProvider>
     )
 
   it('renders', () => {

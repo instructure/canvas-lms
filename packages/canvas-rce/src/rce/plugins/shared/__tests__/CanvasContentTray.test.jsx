@@ -86,6 +86,12 @@ describe('RCE Plugins > CanvasContentTray', () => {
     return props
   }
 
+  function printCurrentTime() {
+    const now = new Date()
+    // eslint-disable-next-line no-console
+    console.log(`Current time: ${now.toLocaleTimeString()}`)
+  }
+
   function renderComponent(trayprops) {
     getProps(trayprops)
     props.bridge.focusEditor(editor)
@@ -263,36 +269,43 @@ describe('RCE Plugins > CanvasContentTray', () => {
     beforeEach(() => {
       renderComponent()
     })
+
+    const advanceTimersAndPrintTime = async () => {
+      await jest.advanceTimersByTime(1000)
+      printCurrentTime()
+    }
+
     it('is the links panel for links content types', async () => {
       await showTrayForPlugin('links')
+      await advanceTimersAndPrintTime()
       await waitFor(() =>
         expect(component.getByTestId('instructure_links-LinksPanel')).toBeInTheDocument()
       )
     })
-
     it('is the documents panel for document content types', async () => {
       await showTrayForPlugin('course_documents')
+      await advanceTimersAndPrintTime()
       await waitFor(() =>
         expect(component.getByTestId('instructure_links-DocumentsPanel')).toBeInTheDocument()
       )
     })
-
     it('is the images panel for image content types', async () => {
       await showTrayForPlugin('course_images')
+      await advanceTimersAndPrintTime()
       await waitFor(() =>
         expect(component.getByTestId('instructure_links-ImagesPanel')).toBeInTheDocument()
       )
     })
-
     it('is the images panel for icon maker content types', async () => {
       await showTrayForPlugin('list_icon_maker_icons')
+      await advanceTimersAndPrintTime()
       await waitFor(() =>
         expect(component.getByTestId('instructure_links-ImagesPanel')).toBeInTheDocument()
       )
     })
-
     it('is the media panel for media content types', async () => {
       await showTrayForPlugin('course_media')
+      await advanceTimersAndPrintTime()
       await waitFor(() =>
         expect(component.getByTestId('instructure_links-MediaPanel')).toBeInTheDocument()
       )
@@ -300,6 +313,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
 
     it('is the file browser for the all content type', async () => {
       await showTrayForPlugin('all')
+      await advanceTimersAndPrintTime()
       await waitFor(() =>
         expect(component.getByTestId('instructure_links-FilesPanel')).toBeInTheDocument()
       )
@@ -309,6 +323,13 @@ describe('RCE Plugins > CanvasContentTray', () => {
   describe('focus', () => {
     beforeEach(() => {
       renderComponent()
+    })
+
+    it('is set on the Close button when the tray opens', async () => {
+      await showTrayForPlugin('links')
+      const close = await component.findByTestId('CloseButton_ContentTray')
+      const closeButton = close.querySelector('button')
+      expect(document.activeElement).toEqual(closeButton)
     })
 
     it('is set on tinymce after tray closes if focus was on the tray', async () => {
@@ -331,13 +352,15 @@ describe('RCE Plugins > CanvasContentTray', () => {
     })
 
     it('is not set on tinymce after tray closes if focus was elsewhere', async () => {
+      const btn = document.createElement('button')
+      document.body.appendChild(btn)
       const mockFocus = jest.fn()
       props.bridge.focusActiveEditor = mockFocus
 
       await showTrayForPlugin('links')
-      await waitFor(() =>
-        expect(component.getByTestId('instructure_links-LinksPanel')).toBeInTheDocument()
-      )
+      await waitFor(() => expect(component.getByTestId('CanvasContentTray')).toBeInTheDocument())
+      btn.focus()
+      await waitFor(() => expect(document.activeElement.tagName).toEqual('BUTTON'))
 
       act(() => props.bridge.hideTrays())
       // immediately after being asked to close, INSTUI Tray removes role='dialog' and

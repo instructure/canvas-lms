@@ -609,6 +609,8 @@ export const groupDetailMocks = ({
   const masteryPoints = defaultMasteryPoints
   const ratings = ratingsWithTypename(testRatings)
 
+  let wasFetchedOnce = false
+
   return [
     {
       request: {
@@ -858,37 +860,41 @@ export const groupDetailMocks = ({
           targetGroupId,
         },
       },
-      result: {
-        data: {
-          group: {
-            _id: groupId,
-            description: `${groupDescription} 4`,
-            title,
-            outcomesCount: numOfOutcomes,
-            notImportedOutcomesCount,
-            outcomes: {
-              pageInfo: {
-                hasNextPage: withMorePage,
-                endCursor: 'Mx',
-                __typename: 'PageInfo',
-              },
-              edges: createSearchGroupOutcomesOutcomeMocks(
-                canUnlink,
-                canEdit,
-                canArchive,
-                contextId,
-                contextType,
-                title,
-                numOfOutcomes
-              ),
-              __typename: 'ContentTagConnection',
-            },
-            __typename: 'LearningOutcomeGroup',
-          },
-        },
-      },
-      // for testing graphqls refetch in index.js
       newData: jest.fn(() => {
+        if (!wasFetchedOnce) {
+          wasFetchedOnce = true
+
+          return {
+            data: {
+              group: {
+                _id: groupId,
+                description: `${groupDescription} 4`,
+                title,
+                outcomesCount: numOfOutcomes,
+                notImportedOutcomesCount,
+                outcomes: {
+                  pageInfo: {
+                    hasNextPage: withMorePage,
+                    endCursor: 'Mx',
+                    __typename: 'PageInfo',
+                  },
+                  edges: createSearchGroupOutcomesOutcomeMocks(
+                    canUnlink,
+                    canEdit,
+                    canArchive,
+                    contextId,
+                    contextType,
+                    title,
+                    numOfOutcomes
+                  ),
+                  __typename: 'ContentTagConnection',
+                },
+                __typename: 'LearningOutcomeGroup',
+              },
+            },
+          }
+        }
+
         const outcome1 = {
           canUnlink,
           _id: '1',
@@ -2523,15 +2529,22 @@ export const courseAlignmentStatsMocks = ({
     },
   })
 
+  let wasFetchedOnce = false
+
   return [
     {
       request: {
         query: COURSE_ALIGNMENT_STATS,
         variables: {id},
       },
-      result: returnResult(),
-      // for testing data refetch
-      newData: () => returnResult(refetchIncrement),
+      newData: () => {
+        if (wasFetchedOnce) {
+          return returnResult(refetchIncrement)
+        } else {
+          wasFetchedOnce = true
+          return returnResult()
+        }
+      },
     },
   ]
 }
@@ -2628,15 +2641,22 @@ export const courseAlignmentMocks = ({
     },
   })
 
+  let wasFetchedOnce = false
+
   return [
     {
       request: {
         query: SEARCH_OUTCOME_ALIGNMENTS,
         variables,
       },
-      result: returnResult(),
-      // for testing data refetch
-      newData: () => returnResult(true),
+      newData: () => {
+        if (wasFetchedOnce) {
+          return returnResult(true)
+        } else {
+          wasFetchedOnce = true
+          return returnResult()
+        }
+      },
     },
     {
       request: {

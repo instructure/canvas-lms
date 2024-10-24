@@ -181,7 +181,6 @@ describe "Block Editor", :ignore_js_errors do
       driver.action.send_keys(:arrow_down).perform
       driver.action.send_keys(:arrow_right).perform
       driver.action.send_keys(:arrow_down).perform
-      driver.action.send_keys(:arrow_right).perform
       driver.action.send_keys(:arrow_down).perform
       driver.action.send_keys(:arrow_right).perform
       # empty group is nowopen
@@ -280,15 +279,6 @@ describe "Block Editor", :ignore_js_errors do
 
         kb_focus_block_toolbar
         expect(active_element).to eq(f("button", block_toolbar))
-      end
-
-      it "should focus the section menu on alt-F9" do
-        # first, select a section
-        columns_section.click
-        expect(section_menu).to be_displayed
-
-        driver.action.key_down(:alt).send_keys(:f9).key_up(:alt).perform
-        expect(active_element).to eq(section_menu_menu)
       end
 
       it "should focus the topbar on alt-F10" do

@@ -38,7 +38,7 @@ import type {
 } from 'features/enhanced_individual_gradebook/types'
 import type {GradingType} from '../../../../../../api'
 import {setupCanvasQueries} from '../../__tests__/fixtures'
-import {QueryProvider} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 jest.mock('@canvas/do-fetch-api-effect/apiRequest', () => ({
   executeApiRequest: jest.fn(),
@@ -46,9 +46,9 @@ jest.mock('@canvas/do-fetch-api-effect/apiRequest', () => ({
 
 const renderGradingResults = (props: GradingResultsComponentProps) => {
   return render(
-    <QueryProvider>
+    <MockedQueryProvider>
       <GradingResults {...props} />
-    </QueryProvider>
+    </MockedQueryProvider>
   )
 }
 

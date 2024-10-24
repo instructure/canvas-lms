@@ -33,6 +33,7 @@ import {
   ZInternalLtiConfiguration,
   type InternalLtiConfiguration,
 } from '../model/internal_lti_configuration/InternalLtiConfiguration'
+import type {LtiConfigurationOverlay} from '../model/internal_lti_configuration/LtiConfigurationOverlay'
 
 export type AppsSortProperty =
   | 'name'
@@ -121,5 +122,67 @@ export const deleteRegistration: DeleteRegistration = (accountId, registrationId
     fetch(`/api/v1/accounts/${accountId}/lti_registrations/${registrationId}`, {
       ...defaultFetchOptions(),
       method: 'DELETE',
+    })
+  )
+
+export type CreateRegistration = (
+  accountId: AccountId,
+  internalConfig: InternalLtiConfiguration,
+  overlay: LtiConfigurationOverlay,
+  unifiedToolId?: string
+) => Promise<ApiResult<unknown>>
+
+/**
+ * Creates an LTI registration
+ * @param accountId The account id to create the registration in
+ * @param internalConfig The internal configuration to use
+ * @param overlay An overlay to apply to the internal configuration
+ * @param unifiedToolId The unified tool id for the registration
+ * @returns An ApiResult with an unknown value. The value should be ignored.
+ */
+export const createRegistration: CreateRegistration = (
+  accountId,
+  internalConfig,
+  overlay,
+  unifiedToolId
+) =>
+  /* TODO: Implement this once INTEROP-8767 is done */ parseFetchResult(z.unknown())(
+    new Promise(resolve => {
+      setTimeout(() => {
+        resolve(new Response('{}', {status: 200}))
+      }, Math.random() * 2000)
+    })
+  )
+
+export type UpdateRegistration = (
+  accountId: AccountId,
+  registrationId: LtiRegistrationId,
+  internalConfig: InternalLtiConfiguration,
+  overlay: LtiConfigurationOverlay,
+  unifiedToolId?: string
+) => Promise<ApiResult<unknown>>
+
+/**
+ * Updates an LTI registration
+ * @param accountId The account id to update the registration in
+ * @param registrationId The id of the registration to update
+ * @param internalConfig The internal configuration to use
+ * @param overlay An overlay to apply to the internal configuration
+ * @param unifiedToolId The unified tool id for the registration
+ * @returns An ApiResult with an unknown value. The value should be ignored.
+ */
+export const updateRegistration: UpdateRegistration = (
+  accountId,
+  registrationId,
+  internalConfig,
+  overlay,
+  unifiedToolId
+) =>
+  /* TODO: Implement this once INTEROP-8768 is done */
+  parseFetchResult(z.unknown())(
+    new Promise(resolve => {
+      setTimeout(() => {
+        resolve(new Response('{}', {status: 200}))
+      }, Math.random() * 2000)
     })
   )

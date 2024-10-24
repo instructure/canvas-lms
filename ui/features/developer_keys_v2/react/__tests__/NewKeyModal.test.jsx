@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, cleanup} from '@testing-library/react'
+import {screen, render, cleanup} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import DeveloperKeyModal from '../NewKeyModal'
 import devKeyActions from '../actions/developerKeysActions'
 import moxios from 'moxios'
@@ -34,6 +35,7 @@ describe('NewKeyModal', () => {
       validLtiPlacements: [],
       validLtiScopes: {},
     }
+    userEvent.setup()
   })
 
   afterEach(() => {
@@ -223,6 +225,19 @@ describe('NewKeyModal', () => {
 
       return sentDevKey
     }
+
+    it('sets isSaving to true to disable the Save button', () => {
+      const createOrEditSpy = jest.fn()
+      const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
+      const {ref} = renderDeveloperKeyModal({
+        createOrEditDeveloperKeyState: createDeveloperKeyState,
+        actions: mergedFakeActions,
+      })
+
+      ref.current.submitForm()
+
+      expect(ref.current.state.isSaving).toBeTruthy()
+    })
 
     it('sends the contents of the form saving', () => {
       const developerKey2 = {
@@ -740,7 +755,7 @@ describe('NewKeyModal', () => {
   describe('redirect_uris automatic setting', () => {
     let ref
 
-    beforeEach(() => {
+    beforeEach(async () => {
       const {ref: reference} = renderDeveloperKeyModal({
         createOrEditDeveloperKeyState: {
           ...createDeveloperKeyState,
@@ -756,38 +771,49 @@ describe('NewKeyModal', () => {
       ref.current.updateToolConfiguration({})
     })
 
-    it('updates `redirect_uris` when updating the tool configuration', () => {
-      expect(ref.current.developerKey.redirect_uris).toBeFalsy()
+    it('updates `redirect_uris` when updating the tool configuration', async () => {
+      const redirectUris = screen.getByLabelText('* Redirect URIs:')
+      await userEvent.clear(redirectUris)
+      expect(redirectUris).toHaveValue('')
 
-      ref.current.updateToolConfiguration(validToolConfig)
+      const config = screen.getByLabelText('LTI 1.3 Configuration', {hidden: true})
+      await userEvent.clear(config)
+      await userEvent.click(config)
+      await userEvent.paste(JSON.stringify(validToolConfig))
 
-      expect(ref.current.developerKey.redirect_uris).toEqual(validToolConfig.target_link_uri)
+      expect(redirectUris).toHaveValue(validToolConfig.target_link_uri)
     })
 
-    it('does not update `redirect_uris` if already set when updating the tool configuration', () => {
-      ref.current.setState({
-        developerKey: {
-          ...developerKey,
-          redirect_uris: 'http://my_redirect_uri.com\nhttp://google.com\nhttp://msn.com',
-        },
-      })
-      ref.current.updateToolConfiguration(validToolConfig)
-      expect(ref.current.developerKey.redirect_uris).toEqual(
+    it('does not update `redirect_uris` if already set when updating the tool configuration', async () => {
+      const redirectUris = screen.getByLabelText('* Redirect URIs:')
+      await userEvent.clear(redirectUris)
+      await userEvent.click(redirectUris)
+      await userEvent.paste('http://my_redirect_uri.com\nhttp://google.com\nhttp://msn.com')
+
+      const config = screen.getByLabelText('LTI 1.3 Configuration')
+      await userEvent.clear(config)
+      await userEvent.click(config)
+      await userEvent.paste(JSON.stringify(validToolConfig))
+
+      expect(redirectUris).toHaveValue(
         'http://my_redirect_uri.com\nhttp://google.com\nhttp://msn.com'
       )
     })
 
-    it('does update `redirect_uris` if already set when using the `Sync URIs` button', () => {
-      ref.current.updateToolConfiguration(validToolConfig)
-      ref.current.setState({
-        developerKey: {
-          ...developerKey,
-          redirect_uris: 'http://my_redirect_uri.com\nhttp://google.com\nhttp://msn.com',
-          tool_configuration: validToolConfig,
-        },
-      })
-      ref.current.syncRedirectUris()
-      expect(ref.current.developerKey.redirect_uris).toEqual(validToolConfig.target_link_uri)
+    it('does update `redirect_uris` if already set when using the `Sync URIs` button', async () => {
+      const redirectUris = screen.getByLabelText('* Redirect URIs:')
+      await userEvent.clear(redirectUris)
+
+      const config = screen.getByLabelText('LTI 1.3 Configuration')
+      await userEvent.clear(config)
+      await userEvent.click(config)
+      await userEvent.paste(JSON.stringify(validToolConfig))
+
+      await userEvent.click(screen.getByRole('button', {name: /sync uris/i}))
+
+      expect(screen.getByLabelText(/\* Redirect URIs:/i)).toHaveValue(
+        validToolConfig.target_link_uri
+      )
     })
   })
 

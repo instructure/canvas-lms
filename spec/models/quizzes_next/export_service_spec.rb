@@ -127,8 +127,7 @@ describe QuizzesNext::ExportService do
         new_course_name: "Course Name",
         created_on_blueprint_sync: false,
         resource_map_url: "http://example.com/resource_map.json",
-        remove_alignments: false,
-        status: "duplicating"
+        remove_alignments: false
       }
 
       basic_import_content[:assignments] << {

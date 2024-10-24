@@ -69,6 +69,7 @@ export const breakpointsShape = PropTypes.shape({
   desktopNavOpen: PropTypes.bool,
   desktopOnly: PropTypes.bool,
   mobileOnly: PropTypes.bool,
+  ICEDesktop: PropTypes.bool,
 })
 
 export type Breakpoints = {
@@ -78,4 +79,5 @@ export type Breakpoints = {
   desktopNavOpen?: boolean
   desktopOnly?: boolean
   mobileOnly?: boolean
+  ICEDesktop?: boolean
 }

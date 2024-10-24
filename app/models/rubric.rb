@@ -600,6 +600,6 @@ class Rubric < ActiveRecord::Base
   end
 
   def self.enhanced_rubrics_assignments_enabled?(context_to_check)
-    context_to_check.feature_enabled?(:enhanced_rubrics_assignments) && context_to_check.feature_enabled?(:enhanced_rubrics)
+    Account.site_admin.feature_enabled?(:enhanced_rubrics_assignments) && context_to_check.feature_enabled?(:enhanced_rubrics)
   end
 end

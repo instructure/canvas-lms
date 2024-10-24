@@ -217,7 +217,9 @@ class UsersController < ApplicationController
                                         show
                                         terminate_sessions
                                         dashboard_stream_items
-                                        show_k5_dashboard]
+                                        show_k5_dashboard
+                                        bookmark_search
+                                        services]
   before_action :require_registered_user, only: [:delete_user_service,
                                                  :create_user_service]
   before_action :reject_student_view_student, only: %i[delete_user_service
@@ -1207,6 +1209,7 @@ class UsersController < ApplicationController
                          .missing
                          .where(user_id: user.id,
                                 assignments: { context_id: shard_course_ids })
+                         .where("late_policy_status IS NULL OR late_policy_status != ?", "none")
                          .merge(Assignment.published)
         subs = subs.merge(Assignment.not_locked) if only_submittable
         subs = subs.in_current_grading_period_for_courses(shard_course_ids) if only_current_grading_period
@@ -1340,9 +1343,9 @@ class UsersController < ApplicationController
   def services
     params[:service_types] ||= params[:service_type]
     json = Rails.cache.fetch(["user_services", @current_user, params[:service_type]].cache_key) do
-      @services = @current_user.user_services rescue []
+      @services = @current_user.user_services
       if params[:service_types]
-        @services = @services.of_type(params[:service_types].split(",")) rescue []
+        @services = @services.of_type(params[:service_types]&.split(","))
       end
       @services.map { |s| s.as_json(only: %i[service_user_id service_user_url service_user_name service type id]) }
     end
@@ -1350,10 +1353,8 @@ class UsersController < ApplicationController
   end
 
   def bookmark_search
-    @service = @current_user.user_services.where(type: "BookmarkService", service: params[:service_type]).first rescue nil
-    res = nil
-    res = @service.find_bookmarks if @service
-    render json: res
+    service = @current_user.user_services.where(type: "BookmarkService", service: params[:service_type]).first
+    render json: service&.find_bookmarks
   end
 
   def show
@@ -2037,13 +2038,16 @@ class UsersController < ApplicationController
       end
       return unless authorized_action(context, @current_user, :read)
 
-      position = Integer(val) rescue nil
-      if position.nil?
-        return render(json: { message: "Invalid position provided" }, status: :bad_request)
-      elsif position.abs > 1_000
-        # validate that the value used is less than unreasonable, but without any real effort
-        return render(json: { message: "Position #{position} is too high. Your dashboard cards can probably be sorted with numbers 1-5, you could even use a 0." }, status: :bad_request)
+      begin
+        position = Integer(val)
+        if position.abs > 1_000
+          # validate that the value used is less than unreasonable, but without any real effort
+          return render(json: { message: "Position #{position} is too high. Your dashboard cards can probably be sorted with numbers 1-5, you could even use a 0." }, status: :bad_request)
+        end
+      rescue ArgumentError
+        render(json: { message: "Invalid position provided" }, status: :bad_request)
       end
+      return if performed?
     end
 
     user.set_dashboard_positions(user.dashboard_positions.merge(params[:dashboard_positions].to_unsafe_h))
@@ -2160,7 +2164,7 @@ class UsersController < ApplicationController
     if @domain_root_account.enable_profiles?
       managed_attributes << :bio if @user.grants_right?(@current_user, :manage_user_details)
       managed_attributes << :title if @user.grants_right?(@current_user, :rename)
-      managed_attributes << :pronunciation if @domain_root_account.enable_name_pronunciation? && @user.grants_right?(@current_user, :manage_user_details)
+      managed_attributes << :pronunciation if @user.can_change_pronunciation?(@domain_root_account) && @user.grants_right?(@current_user, :manage_user_details)
     end
 
     can_admin_change_pronouns = @domain_root_account.can_add_pronouns? && @user.grants_right?(@current_user, :manage_user_details)
@@ -3295,20 +3299,26 @@ class UsersController < ApplicationController
 
       # if they passed a destination, and it matches the current canvas installation,
       # add a session_token to it for the newly created user and return it
-      if params[:destination] && password_provided &&
-         (_routes.recognize_path(params[:destination]) rescue false) &&
-         (uri = URI.parse(params[:destination]) rescue nil) &&
-         uri.host == request.host &&
-         uri.port == request.port
+      begin
+        if params[:destination] && password_provided &&
+           _routes.recognize_path(params[:destination]) &&
+           (uri = URI.parse(params[:destination])) &&
+           uri.host == request.host &&
+           uri.port == request.port
 
-        # add session_token to the query
-        qs = URI.decode_www_form(uri.query || "")
-        qs.delete_if { |(k, _v)| k == "session_token" }
-        qs << ["session_token", SessionToken.new(@pseudonym.id)]
-        uri.query = URI.encode_www_form(qs)
+          # add session_token to the query
+          qs = URI.decode_www_form(uri.query || "")
+          qs.delete_if { |(k, _v)| k == "session_token" }
+          qs << ["session_token", SessionToken.new(@pseudonym.id)]
+          uri.query = URI.encode_www_form(qs)
 
-        data["destination"] = uri.to_s
-      elsif (oauth = session[:oauth2])
+          data["destination"] = uri.to_s
+        end
+      rescue ActionController::RoutingError, URI::InvalidURIError
+        # ignore
+      end
+
+      if !data.key?("destination") && (oauth = session[:oauth2])
         provider = Canvas::OAuth::Provider.new(oauth[:client_id], oauth[:redirect_uri], oauth[:scopes], oauth[:purpose])
         data["destination"] = Canvas::OAuth::Provider.confirmation_redirect(self, provider, @user).to_s
       end

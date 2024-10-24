@@ -40,6 +40,8 @@ export const RegistrationModalBody = ({
     <Modal.Body padding={padding ?? 'medium'}>
       <View height={`calc(${MODAL_BODY_HEIGHT} - ${paddingMapping[padding ?? 'medium']})`} as="div">
         {children}
+        {/* Add some space at the bottom of the modal to make sure the content is not too close to the bottom of the modal. Nothing else seems to work */}
+        <div style={{height: '10px'}} />
       </View>
     </Modal.Body>
   )

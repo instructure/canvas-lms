@@ -3180,6 +3180,24 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe ".outcomes_retry_outcome_alignment_clone" do
+    it "triggers an outcome alignment clone retry live event" do
+      event_payload = {
+        original_course_uuid: "eXA43Cb5A8biA87cEPjcpByVwsaff4ULmEsRwM5s",
+        new_course_uuid: "8H3aGjEatiLI42zzV0ly8t5UGQAxYfvrI3MDlrCx",
+        domain: "canvas.instructure.com",
+        new_course_resource_link_id: "c9d7d100bb177c0e54f578e7ac538cd9f7a3e4ad",
+        original_assignment_resource_link_id: "bf950e2284bd720a28e407fe326dce68",
+        new_assignment_resource_link_id: "2ae6e5cac3081b0cc8515ad79ff114e3406169ef",
+        status: "outcome_alignment_cloning"
+      }
+
+      expect_event("outcomes.retry_outcome_alignment_clone", event_payload).once
+
+      Canvas::LiveEvents.outcomes_retry_outcome_alignment_clone(event_payload)
+    end
+  end
+
   describe "heartbeat" do
     context "when database region is not set (local/open source)" do
       it "sets region to not_configured" do

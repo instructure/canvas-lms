@@ -198,8 +198,7 @@ export default class IndexHeader extends Component {
             id="add_discussion"
             renderIcon={IconPlusLine}
           >
-            <ScreenReaderContent>{I18n.t('Add discussion')}</ScreenReaderContent>
-            <PresentationContent>{I18n.t('Discussion')}</PresentationContent>
+            {I18n.t('Add Discussion')}
           </Button>
         )}
         {Object.keys(this.props.userSettings).length ? (
@@ -211,7 +210,6 @@ export default class IndexHeader extends Component {
             toggleModalOpen={this.props.toggleModalOpen}
             isSettingsModalOpen={this.props.isSettingsModalOpen}
             isSavingSettings={this.props.isSavingSettings}
-            buttonText={!breakpoints.tablet ? I18n.t('Settings') : ''}
           />
         ) : null}
         {this.renderTrayToolsMenu()}
@@ -222,6 +220,7 @@ export default class IndexHeader extends Component {
   renderSearchField() {
     return (
       <SearchField
+        id="discussion-search"
         name="discussion_search"
         searchInputRef={this.props.searchInputRef}
         onSearchEvent={this.onSearchChange}
@@ -302,7 +301,7 @@ export default class IndexHeader extends Component {
                 filters={getFilters()}
                 defaultSelectedFilter="all"
                 onSelectFilter={this.onFilterChange}
-                mobileHeader={breakpoints.mobileOnly}
+                mobileHeader={!breakpoints.ICEDesktop}
               />
             </Flex.Item>
             <Flex.Item width={flexBasis} size={containerSize}>

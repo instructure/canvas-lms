@@ -1,6 +1,6 @@
 {
   "name": "@instructure/canvas-media",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "A component that will handle upload/record and displaying of media",
   "author": "Instructure, Inc.",
   "main": "es/index.js",
@@ -35,6 +35,7 @@
     "@instructure/emotion": "8.56.4",
     "@instructure/k5uploader": "*",
     "@instructure/media-capture": "^9.0.0",
+    "@instructure/studio-player": "^0.1.2",
     "@instructure/ui-a11y-content": "8.56.4",
     "@instructure/ui-alerts": "8.56.4",
     "@instructure/ui-billboard": "8.56.4",
@@ -69,12 +70,14 @@
     "format-message-generate-id": "^6",
     "lodash": "^4",
     "prop-types": "^15",
-    "react": "^16",
-    "react-dom": "^16"
+    "react": "^18",
+    "react-dom": "^18"
   },
   "devDependencies": {
     "@testing-library/dom": "^8",
+    "@testing-library/jest-dom": "^5",
     "@testing-library/react": "^12",
+    "@testing-library/user-event": "^14",
     "moxios": "^0.4",
     "shelljs": "^0.8.4",
     "sinon": "^7"

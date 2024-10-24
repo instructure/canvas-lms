@@ -406,7 +406,7 @@ const locale = {
   "files_c300e900": { "message": "Fitxers" },
   "files_index_af7c662b": { "message": "Índex de fitxers" },
   "find_8d605019": { "message": "Cerca" },
-  "find_and_replace_6e345933": { "message": "Cerca i substitueix" },
+  "find_and_replace_6e345933": { "message": "Cerca i substituir" },
   "finish_bc343002": { "message": "Finalitza" },
   "fix_heading_hierarchy_f60884c4": {
     "message": "Corregiu la jerarquia de capçaleres"

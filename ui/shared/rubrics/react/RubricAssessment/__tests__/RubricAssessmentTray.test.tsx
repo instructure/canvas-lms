@@ -290,6 +290,44 @@ describe('RubricAssessmentTray Tests', () => {
 
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('9 pts')
       })
+
+      it('should set comment text when multiple comments are available and selected', () => {
+        const {getByTestId} = renderFreeformComponent({
+          rubricSavedComments: {1: ['Great work!', 'Needs improvement', 'Excellent effort']},
+        })
+
+        const commentLibrary = getByTestId('comment-library-1')
+        fireEvent.click(commentLibrary)
+
+        const firstCommentOption = getByTestId('comment-library-option-1-0') as HTMLElement
+        fireEvent.click(firstCommentOption)
+
+        const commentTextArea = getByTestId('free-form-comment-area-1')
+        expect(commentTextArea).toHaveValue('Great work!')
+
+        fireEvent.click(commentLibrary)
+        const secondCommentOption = getByTestId('comment-library-option-1-1') as HTMLElement
+        fireEvent.click(secondCommentOption)
+
+        expect(commentTextArea).toHaveValue('Needs improvement')
+        fireEvent.click(commentLibrary)
+
+        const thirdCommentOption = getByTestId('comment-library-option-1-2') as HTMLElement
+        fireEvent.click(thirdCommentOption)
+
+        expect(commentTextArea).toHaveValue('Excellent effort')
+      })
+
+      it('should update comment text when a custom comment is typed', () => {
+        const {getByTestId} = renderFreeformComponent({
+          rubricSavedComments: {1: ['Good job', 'Needs improvement']},
+        })
+
+        const commentTextArea = getByTestId('free-form-comment-area-1')
+        fireEvent.change(commentTextArea, {target: {value: 'This is a custom comment'}})
+
+        expect(commentTextArea).toHaveValue('This is a custom comment')
+      })
     })
   })
 

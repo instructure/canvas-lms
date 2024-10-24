@@ -66,6 +66,7 @@ describe('DiscussionRow', () => {
           html_url: '',
           user_count: 10,
           last_reply_at: new Date(2018, 1, 14, 0, 0, 0, 0),
+          ungraded_discussion_overrides: [],
         },
         canPublish: false,
         canReadAsAdmin: true,
@@ -237,7 +238,7 @@ describe('DiscussionRow', () => {
   it('renders the publish ToggleIcon', () => {
     const discussion = {published: false}
     render(<DiscussionRow {...makeProps({canPublish: true, discussion})} />)
-    expect(screen.getByText('Publish Hello World')).toBeInTheDocument()
+    expect(screen.getAllByText('Publish Hello World', {exact: false}).length).toBe(2)
   })
 
   it('when feature flag is off, renders anonymous discussion lock explanation for read_as_admin', () => {
@@ -288,6 +289,31 @@ describe('DiscussionRow', () => {
     expect(screen.getAllByText('Available until', {exact: false}).length).toBe(2)
     // We need a relative date to ensure future-ness, so we can't really insist
     // on a given date element appearing this time
+  })
+
+  it('renders available until for ungraded overrides', () => {
+    const futureDate = new Date()
+    futureDate.setYear(futureDate.getFullYear() + 1)
+    const discussion = {
+      ungraded_discussion_overrides: [{assignment_override: {lock_at: futureDate}}],
+    }
+    render(<DiscussionRow {...makeProps({discussion})} />)
+    expect(screen.getAllByText(`Available until ${dateFormatter(futureDate)}`)).toBeTruthy()
+  })
+
+  it('renders the further available until date for ungraded overrides', () => {
+    const futureDate = new Date()
+    futureDate.setYear(futureDate.getFullYear() + 1)
+    const futureDate2 = new Date()
+    futureDate2.setYear(futureDate2.getFullYear() + 2)
+    const discussion = {
+      ungraded_discussion_overrides: [
+        {assignment_override: {lock_at: futureDate}},
+        {assignment_override: {lock_at: futureDate2}},
+      ],
+    }
+    render(<DiscussionRow {...makeProps({discussion})} />)
+    expect(screen.getAllByText(`Available until ${dateFormatter(futureDate2)}`)).toBeTruthy()
   })
 
   it('renders locked at if appropriate', () => {

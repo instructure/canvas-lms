@@ -33,7 +33,7 @@ module VisibilityPluckingHelper
         vis_hash[user_id] << column_val
       end
       # if users have no visibilities add their keys to the hash with an empty array
-      vis_hash.reverse_merge!(empty_id_hash(opts[:user_id]))
+      vis_hash.reverse_merge!(opts[:user_id].index_with { [] })
     end
 
     def users_with_visibility_by_object_id(column_to_pluck, opts)
@@ -45,12 +45,7 @@ module VisibilityPluckingHelper
       end
 
       # if assignment/quiz has no users with visibility, add their keys to the hash with an empty array
-      vis_hash.reverse_merge!(empty_id_hash(opts[column_to_pluck]))
-    end
-
-    def empty_id_hash(ids)
-      # [1,2,3] => {1:[],2:[],3:[]}
-      ids.zip(ids.map { [] }).to_h
+      vis_hash.reverse_merge!(opts[column_to_pluck].index_with { [] })
     end
 
     def check_args(opts, key)

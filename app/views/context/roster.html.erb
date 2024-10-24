@@ -24,7 +24,6 @@
   provide :page_title, join_title(translated_title, @context.name)
 
   css_bundle :roster, :addpeople
-
   is_teacher = can_do(@context, @current_user, :manage_students)
 %>
 
@@ -36,10 +35,13 @@
     <%= render :partial => 'context/roster_right_side' %>
   </div>
 </div>
-<% if @context.is_a?(Course) %>
+<% if @context.is_a?(Course)%>
   <% js_bundle :roster %>
   <% js_env :canManageCourse => can_do(@context, @current_user, :manage) %>
 <% else %>
+  <% if @context.is_a?(Group)%>
+    <% js_bundle :context_roster_groups %>
+  <% end %>
   <div class="roster-container">
     <div class="roster roster-column student_roster">
       <h2><%= @primary_users.keys.first %></h2>

@@ -29,14 +29,16 @@ module Schemas
     def self.from_lti_configuration(lti_config)
       config = lti_config.deep_dup.deep_symbolize_keys
 
-      extensions = config.delete(:extensions)
-      canvas_ext, vendor_extensions = extensions.map(&:deep_symbolize_keys).partition { |ext| ext[:platform] == "canvas.instructure.com" }
-      canvas_ext = canvas_ext.first || {}
+      extensions = config.delete(:extensions)&.map(&:deep_symbolize_keys) || []
+      canvas_ext, vendor_extensions = extensions.partition { |ext| ext[:platform] == "canvas.instructure.com" }
+      canvas_ext = canvas_ext&.first || {}
       config[:vendor_extensions] = vendor_extensions if vendor_extensions.present?
+      config[:scopes] ||= []
 
       canvas_ext.delete(:platform)
       launch_settings = canvas_ext.delete(:settings)&.deep_symbolize_keys || {}
       placements = launch_settings&.delete(:placements) || []
+      launch_settings&.reject! { |k, _| ::Lti::ResourcePlacement::PLACEMENTS.include?(k.to_sym) }
 
       config.merge({
         **canvas_ext,
@@ -53,8 +55,8 @@ module Schemas
           description
           target_link_uri
           oidc_initiation_url
-          scopes
           redirect_uris
+          scopes
           placements
           launch_settings
         ],

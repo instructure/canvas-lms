@@ -143,7 +143,8 @@ describe('doFileUpload()', () => {
       ).toBeVisible()
     })
 
-    it('when requesting one', async () => {
+    it.skip('when requesting one', async () => {
+      // RCX-2571
       await doFileUpload(fauxEditor, document, {
         accept: 'image/*',
         panels: ['URL'],

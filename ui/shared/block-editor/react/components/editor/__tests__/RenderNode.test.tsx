@@ -49,7 +49,6 @@ const getButton = () => document.querySelector('[data-testid="button-block"]') a
 const getHeading = () => document.querySelector('.block.heading-block') as HTMLElement
 const getBlankSection = () => document.querySelector('.section.blank-section') as HTMLElement
 const getBlockToolbar = () => document.querySelector('.block-toolbar') as HTMLElement
-const getSectionMenu = () => document.querySelector('.section-menu') as HTMLElement
 const getBlockTag = () => document.querySelector('.block-tag') as HTMLElement
 
 describe('BlockEditor', () => {
@@ -66,28 +65,24 @@ describe('BlockEditor', () => {
     expect(getHeading()).toBeInTheDocument()
 
     // TODO: why is it in the dom now, but not in canvas?
-    // expect(getSectionMenu()).not.toBeInTheDocument()
     // expect(getBlockToolbar()).not.toBeInTheDocument()
     expect(getBlockTag()).not.toBeInTheDocument()
   })
 
   it.skip('shows the section menu and toolbar on first click', async () => {
     renderEditor()
-    expect(getSectionMenu()).toBeInTheDocument()
     expect(getBlockToolbar()).toBeInTheDocument()
     expect(domGetByText(getBlockToolbar(), 'Blank Section')).toBeInTheDocument()
 
     const buttonBlock = getButton()
     await user.click(buttonBlock)
     await waitFor(() => {
-      expect(getSectionMenu()).toBeInTheDocument()
       expect(domGetByText(getBlockToolbar(), 'Blank Section')).toBeInTheDocument()
     })
   })
 
   it.skip('shows the block toolbar on second click', async () => {
     renderEditor()
-    expect(getSectionMenu()).toBeInTheDocument()
     expect(getBlockToolbar()).toBeInTheDocument()
     expect(domGetByText(getBlockToolbar(), 'Blank Section')).toBeInTheDocument()
 
@@ -95,7 +90,6 @@ describe('BlockEditor', () => {
     await user.click(buttonBlock)
     await user.click(buttonBlock)
     await waitFor(() => {
-      expect(getSectionMenu()).not.toBeInTheDocument()
       expect(domGetByText(getBlockToolbar(), 'Button')).toBeInTheDocument()
     })
     const toolbar = getBlockToolbar()
@@ -137,7 +131,6 @@ describe('BlockEditor', () => {
     await waitFor(() => {
       expect(domGetByText(getBlockToolbar(), 'Page')).toBeInTheDocument()
     })
-    expect(getSectionMenu()).not.toBeInTheDocument()
   })
 
   it('selects the parent section on clicking up button', async () => {
@@ -148,14 +141,12 @@ describe('BlockEditor', () => {
     await waitFor(() => {
       expect(domGetByText(getBlockToolbar(), 'Button')).toBeInTheDocument()
     })
-    expect(getSectionMenu()).not.toBeInTheDocument()
 
     const upButton = domGetByText(getBlockToolbar(), 'Go up').closest('button') as HTMLButtonElement
     await user.click(upButton)
     await waitFor(() => {
       expect(domGetByText(getBlockToolbar(), 'Blank Section')).toBeInTheDocument()
     })
-    expect(getSectionMenu()).toBeInTheDocument()
   })
 
   it('deletes the block on clicking delete button', async () => {
@@ -166,7 +157,6 @@ describe('BlockEditor', () => {
     await waitFor(() => {
       expect(domGetByText(getBlockToolbar(), 'Button')).toBeInTheDocument()
     })
-    expect(getSectionMenu()).not.toBeInTheDocument()
 
     const deleteButton = domGetByText(getBlockToolbar(), 'Delete').closest(
       'button'

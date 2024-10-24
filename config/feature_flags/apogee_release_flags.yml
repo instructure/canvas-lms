@@ -240,7 +240,8 @@ submission_stickers:
   state: hidden
   applies_to: Course
   display_name: Submission Stickers
-  description: Allows teachers to attach stickers to student submissions.
+  description: Allows teachers to attach stickers to student submissions. Requires the "Assignment Enhancements - Student" feature flag to be enabled.
+  custom_transition_proc: assignment_enhancements_prereq_for_stickers_hook
   environments:
     ci:
       state: allowed_on # enable for automated testing builds and local testing
@@ -378,7 +379,7 @@ rce_lite_enabled_speedgrader_comments:
 enhanced_rubrics_assignments:
   state: hidden
   beta: true
-  applies_to: Course
+  applies_to: SiteAdmin
   root_opt_in: true
   display_name: Enhanced Rubrics Assignments Page
   description: This feature allows users to create and search for rubrics while using the Enhanced Rubrics design on the Assignments page.
@@ -387,3 +388,9 @@ enhanced_rubrics_assignments:
       state: allowed
     development:
       state: allowed
+speedgrader_grade_by_student:
+  state: hidden
+  beta: true
+  applies_to: RootAccount
+  display_name: SpeedGrader Grade by Student
+  description: Allow instructors to view and traverse between students and assignments from within SpeedGrader

@@ -113,16 +113,12 @@ class PageView < ActiveRecord::Base
     page_view_method == :db
   end
 
-  def self.cassandra?
-    page_view_method == :cassandra
-  end
-
   def self.pv4?
     page_view_method == :pv4 || Setting.get("read_from_pv4", "false") == "true"
   end
 
   def self.global_storage_namespace?
-    cassandra? || pv4?
+    pv4?
   end
 
   def self.find_all_by_id(ids)

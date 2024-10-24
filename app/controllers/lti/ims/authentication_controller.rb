@@ -52,7 +52,18 @@ module Lti
       # track of institution-specific domain.
       def authorize_redirect
         Utils::InstStatsdUtils::Timing.track "lti.authorize_redirect" do
-          redirect_to authorize_redirect_url
+          if @domain_root_account.settings[:lti_oidc_missing_cookie_retry]
+            csp_frame_ancestors << canvas_domain
+            render template: "lti/ims/authentication/missing_cookie_fix",
+                   layout: false,
+                   formats: :html,
+                   locals: {
+                     url: authorize_redirect_url.split("?").first,
+                     oidc_params:
+                   }
+          else
+            redirect_to authorize_redirect_url
+          end
         end
       end
 

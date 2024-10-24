@@ -146,6 +146,12 @@ describe "as a teacher" do
       it "shows status pill when an assignment has recieved submissions" do
         expect(TeacherViewPageV2.status_pill).to be_displayed
       end
+
+      it "shows download submissions modal when Download Submissions option is clicked" do
+        TeacherViewPageV2.options_button.click
+        TeacherViewPageV2.download_submissions_option.click
+        expect(TeacherViewPageV2.download_submissions_button).to be_displayed
+      end
     end
   end
 end

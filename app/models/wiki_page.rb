@@ -162,12 +162,16 @@ class WikiPage < ActiveRecord::Base
 
   def create_lookup
     new_record = id_changed?
-    WikiPageLookup.unique_constraint_retry do
-      lookup = wiki_page_lookups.find_by(slug: self["url"]) unless new_record
-      lookup ||= wiki_page_lookups.build(slug: self["url"])
-      lookup.save
-      # this is kind of circular so we want to avoid triggering callbacks again
-      update_column(:current_lookup_id, lookup.id)
+    begin
+      WikiPageLookup.unique_constraint_retry do
+        lookup = wiki_page_lookups.find_by(slug: self["url"]) unless new_record
+        lookup ||= wiki_page_lookups.build(slug: self["url"])
+        lookup.save
+        # this is kind of circular so we want to avoid triggering callbacks again
+        update_column(:current_lookup_id, lookup.id)
+      end
+    rescue ActiveRecord::RecordNotUnique
+      raise RequestError.new("wiki page with that url already exists", 409)
     end
   end
 

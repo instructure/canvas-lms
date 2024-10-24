@@ -1,0 +1,203 @@
+<%
+# Copyright (C) 2012 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+<%= form_tag update_profile_profile_path, { :method => :put, :id => :edit_profile_form, :class => "ic-Form-control" } do %>
+  <div class="content-block">
+    <div class="profileContent__Block">
+      <% if @user_data[:can_edit_name] %>
+        <h2 class="hide-if-editing"><%= @user_data[:short_name] %> <% if @user_data[:pronouns] %><i>(<%= @user_data[:pronouns] %>)</i><% end %></h2>
+        <label class="show-if-editing ic-Label"><%= t('name', 'Name') %>:<span aria-hidden="true" title="<%= t('is_required', 'This field is required') %>">*</span>
+          <input id="name_input" class="ic-Input" type="text" name="user[short_name]" value="<%= @user_data[:short_name] %>" required oninvalid="this.setCustomValidity('<%= t('Name is Required') %>')" oninput="setCustomValidity('')" title="<%= t('Name is Required') %>">
+        </label>
+        <% if @user.can_change_pronunciation?(@domain_root_account) %>
+          <p class="show-if-editing">
+            <label class="ic-Label"><%= t('name_pronunciation_label', 'Name Pronunciation:') %>
+              <input id="name_pronunciation_input" class="ic-Input" type="text" name="user_profile[pronunciation]" value="<%= @user_data[:pronunciation] %>">
+            </label>
+            <span class="profile-tip"><%= t('name_pronunciation_label_tip', 'To confirm the correct pronunciation of your name, enter a phonetic pronunciation.') %></span>
+          </p>
+        <% end %>
+        <%# even if @domain_root_account.settings[:can_add_pronouns] is false, we still want to let someone that has pronouns set to see this so they can unset them  %>
+        <% if @user.pronouns || @domain_root_account.settings[:can_add_pronouns] %>
+          <label for="pronouns"class="show-if-editing ic-Label"><%= t('Pronouns') %>:</label>
+          <%= select_tag :pronouns,
+                         options_for_select(([[t("None"), '']] + @domain_root_account.pronouns + [@user.pronouns]).compact.uniq, @user.pronouns),
+                         class:"show-if-editing",
+                         disabled:!@domain_root_account.can_change_pronouns? && (!@domain_root_account.can_add_pronouns? || !@domain_root_account.grants_right?(@current_user, :manage_courses_admin))
+          %>
+        <% end %>
+        <p class="profileDetails">
+          <span class="hide-if-editing"><%= @user_data[:title] %></span>
+          <%# Do not convert these to inferred-key translations, "title" is most often used in canvas for things like document titles, but personal titles can be translated differently in some languages. %>
+          <label class="show-if-editing ic-Label"><%= t('title', 'Title') %>:
+            <input class="ic-Input" type="text" name="user_profile[title]" value="<%= @user_data[:title] %>">
+          </label>
+        </p>
+      <% else %>
+        <h2><%= @user_data[:short_name] %> <% if @user_data[:pronouns] %><i>(<%= @user_data[:pronouns] %>)</i><% end %></h2>
+        <% if @user.can_change_pronunciation?(@domain_root_account) %>
+          <div class="show-if-editing">
+            <h3 id="profile_name_pronunciation_label" class="profileHeader"><%= t('name_pronunciation_header', 'Name Pronunciation') %></h3>
+            <input id="name_pronunciation_input" class="ic-Input" type="text" name="user_profile[pronunciation]" value="<%= @user_data[:pronunciation] %>">
+            <span class="profile-tip"><%= t('name_pronunciation_header_tip', 'To confirm the correct pronunciation of your name, enter a phonetic pronunciation.') %></span>
+          </div>
+        <% end %>
+        <% if @user_data[:title] %>
+          <p><%= @user_data[:title] %></p>
+        <% end %>
+      <% end %>
+
+      <% if @user != @current_user %>
+        <% if can_do(@user, @current_user, :remove_avatar) %>
+          <a id="remove_avatar_link" href="<%= update_avatar_image_url(@user.id) %>"><%= I18n.t('Remove avatar picture') %></a>
+        <% elsif !session["reported_#{@user.id}"] %>
+          <a id="report_avatar_link" href="<%= report_avatar_image_url(@user.id) %>"><%= I18n.t('Report inappropriate picture') %></a>
+        <% else %>
+          <div id="avatar_is_reported"><%= I18n.t('This image has been reported.') %></div>
+        <% end %>
+      <% end %>
+
+      <% if @domain_root_account.settings[:enable_name_pronunciation] %>
+        <div class="hide-if-editing">
+          <h3 class="profileHeader"><%= t('name_pronunciation', 'Name Pronunciation') %></h3>
+          <% if @user_data[:pronunciation].present? && @user_data[:pronunciation] != "" %>
+            <p id="name_pronunciation"><%= @user_data[:pronunciation] %></p>
+          <% else %>
+            <p id="name_pronunciation_empty_message"><%= t('no_name_pronunciation', 'No name pronunciation provided') %></p>
+          <% end %>
+        </div>
+      <% end %>
+
+      <div class="show-if-editing edit-contact-methods">
+        <h3 class="profileHeader"><%= t('#profile.ways_to_contact_me', "Contact") %></h3>
+        <% if @user_data[:user_services].present? %>
+          <ul class="social-links">
+            <li>
+              <label for="social_message" class="social hide-text message ic-Label" title="<%= t :message_title, 'Message' %>" data-tooltip><%= t :message_me, 'message me in Canvas' %></label>
+            </li>
+            <% @user_data[:user_services].each do |s| %>
+              <li>
+                <% service_name = s[:service_name] || s[:service].to_s.titleize %>
+                <label for="social_<%= s[:service] %>" class="social hide-text <%= s[:service] %> ic-Label" title="<%= service_name %>" data-tooltip><%= t :service_contact, 'contact %{user} with %{service}', :user => @user_data[:short_name], :service => service_name %></label>
+                <input class="ic-Input" type="hidden" value="0" name="user_services[<%= s[:service] %>">
+                <%= check_box_tag "user_services[#{s[:service]}]", 1, s[:visible], :id => "social_#{s[:service]}" %>
+              </li>
+            <% end %>
+          </ul>
+          <div class="social-instructions">
+            <p>
+              <%= t(:social_instructions, "Check the contact methods you'd like to be visible to others on your profile.") %><br>
+              <%= link_to(t(:manage_settings, "Manage Registered Services"), settings_profile_path)  %>
+            </p>
+          </div>
+        <% else %>
+          <p><%= t('#profile.you_have_no_services', "No registered services, you can add some on the *settings* page.", :name => @user_data[:short_name], :wrapper => link_to('\1', settings_profile_path)) %></p>
+        <% end %>
+      </div>
+
+      <div class="hide-if-editing">
+        <h3 class="profileHeader"><%= t :ways_to_contact_user, "Contact" %></h3>
+        <% if @user_data[:user_services].blank? && @user == @current_user %>
+          <p><%= t('#profile.you_have_no_services', "No registered services, you can add some on the *settings* page.", :name => @user_data[:short_name], :wrapper => link_to('\1', settings_profile_path)) %></p>
+        <% else %>
+          <ul class="social-links">
+            <% if current_user_is_account_admin && @user != @current_user %>
+              <li><a href="<%= message_user_path(@user) %>" class="social hide-text message" title="<%= t :message_title, 'Message' %>" data-tooltip><%= t :message_user_canvas, 'Message %{user} in Canvas', :user => @user_data[:short_name] %></a></li>
+            <% end %>
+            <% if @user_data[:user_services].present? && @user.show_user_services %>
+              <% @user_data[:user_services].select{|s| s[:visible] }.each do |s| %>
+                <% service_name = s[:service_name] || s[:service].to_s.titleize %>
+                <li><a href="<%= s[:service_user_link] %>" class="social hide-text <%= s[:service] %>" title="<%= service_name %>" data-tooltip><%= t :service_contact, 'contact %{user} with %{service}', :user => @user_data[:short_name], :service => service_name %></a></li>
+              <% end %>
+            <% end %>
+          </ul>
+        <% end %>
+      </div>
+
+      <div>
+        <h3 id="profile_bio_label" class="profileHeader"><%= t :bio, "Biography" %></h3>
+        <% if @user_data[:bio] && @user_data[:bio] != "" %>
+          <div id="biography" class="hide-if-editing"><%= raw format_message(@user_data[:bio]).first %></div>
+        <% else %>
+          <p id="biography_empty_message" class="hide-if-editing"><%= t('user_has_no_bio', "No biography has been added") %></p>
+        <% end %>
+        <% if @user_data[:can_edit] %>
+          <div class="show-if-editing">
+            <textarea class="ic_Input" id="profile_bio" name="user_profile[bio]" aria-labelledby="profile_bio_label"><%= @user_data[:bio] %></textarea>
+          </div>
+        <% end %>
+      </div>
+
+      <div>
+        <% if @user != @current_user %>
+          <div class="hide-if-editing">
+            <h3 class="profileHeader"><%= t :user_enrolled, "Enrollments" %></h3>
+            <% if @user_data[:common_contexts] %>
+              <ul>
+                <% @user_data[:common_contexts].each do |context| %>
+                  <li class="profileEnrollment__Items"><%= context[:roles].join(', ') %> in <a href="<%= context[:html_url] %>"><%= context[:name] %></a></li>
+                <% end %>
+              </ul>
+            <% else %>
+              <p><%= t('nothing_in_common', "You don't have anything in common") %></p>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="profile_links">
+        <h3 class="profileHeader"><%= t :links, "Links" %></h3>
+        <div class="hide-if-editing">
+          <% if @user_data[:links].length > 0 %>
+            <ul class="profileLink">
+              <% @user_data[:links].each do |link| %>
+                <li class="profileLink__Item">
+                  <i class="icon-link" role="presentation"></i>
+                  <a href="<%= add_uri_scheme_name(link[:url]) %>"><%= link[:title] %></a>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p id="links_empty_message"><%= t  :no_links, "No links have been added" %></p>
+          <% end %>
+        </div>
+
+        <% if @user_data[:can_edit] %>
+          <input type="hidden" name="delete_links" value="1">
+          <div class="show-if-editing">
+            <table id="edit_links_table">
+              <thead>
+              <th scope="col"><%= t :links_title, 'Title' %></th>
+              <th></th>
+              <th scope="col"><%= t :links_url, 'URL' %></th>
+              </thead>
+              <tbody id="profile_link_fields"></tbody>
+            </table>
+            <button data-event="addLinkField" class="btn btn-small"><%= t :add_link_field, "Add another link" %></button>
+          </div>
+        <% end %>
+      </div>
+
+      <% if @user_data[:can_edit] %>
+        <div class="form-actions no-margin-bottom show-if-editing">
+          <button data-event="cancelEditProfile" class="btn"><%= t('cancel', 'Cancel') %></button>
+          <button class="btn btn-primary"><%= t('save_profile', 'Save Profile') %></button>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>

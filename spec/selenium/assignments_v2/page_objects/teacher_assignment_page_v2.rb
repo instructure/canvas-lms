@@ -96,5 +96,13 @@ class TeacherViewPageV2
     def copy_to_tray
       f("span[data-testid='copy-to-tray']")
     end
+
+    def download_submissions_option
+      f("button[data-testid='download-submissions-option']")
+    end
+
+    def download_submissions_button
+      f("a[data-testid='download_button']")
+    end
   end
 end

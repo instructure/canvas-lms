@@ -43,6 +43,8 @@ const I18n = useI18nScope('rubrics-criteria-row')
 
 type RubricCriteriaRowProps = {
   criterion: RubricCriterion
+  freeFormCriterionComments: boolean
+  hidePoints: boolean
   rowIndex: number
   unassessed: boolean
   onDeleteCriterion: () => void
@@ -52,7 +54,9 @@ type RubricCriteriaRowProps = {
 
 export const RubricCriteriaRow = ({
   criterion,
+  freeFormCriterionComments,
   rowIndex,
+  hidePoints,
   unassessed,
   onDeleteCriterion,
   onDuplicateCriterion,
@@ -146,7 +150,7 @@ export const RubricCriteriaRow = ({
                 )}
               </Flex.Item>
               <Flex.Item align="start">
-                {!ignoreForScoring && (
+                {!ignoreForScoring && !hidePoints && (
                   <Pill
                     color="info"
                     disabled={true}
@@ -212,6 +216,7 @@ export const RubricCriteriaRow = ({
               </Flex.Item>
             </Flex>
             <RatingScaleAccordion
+              hidePoints={hidePoints || freeFormCriterionComments}
               ratings={criterion.ratings}
               criterionUseRange={criterion.criterionUseRange}
             />
@@ -232,12 +237,15 @@ export const RubricCriteriaRow = ({
 }
 
 type RatingScaleAccordionProps = {
+  hidePoints: boolean
   ratings: RubricRating[]
   criterionUseRange: boolean
 }
-const RatingScaleAccordion = ({ratings, criterionUseRange}: RatingScaleAccordionProps) => {
-  const [ratingsOpen, setRatingsOpen] = useState(false)
-
+const RatingScaleAccordion = ({
+  hidePoints,
+  ratings,
+  criterionUseRange,
+}: RatingScaleAccordionProps) => {
   return (
     <View
       as="div"
@@ -254,6 +262,7 @@ const RatingScaleAccordion = ({ratings, criterionUseRange}: RatingScaleAccordion
           const min = criterionUseRange ? rangingFrom(ratings, index) : undefined
           return (
             <RatingScaleAccordionItem
+              hidePoints={hidePoints}
               rating={rating}
               // eslint-disable-next-line react/no-array-index-key
               key={`rating-scale-item-${rating.id}-${index}`}
@@ -269,12 +278,19 @@ const RatingScaleAccordion = ({ratings, criterionUseRange}: RatingScaleAccordion
 }
 
 type RatingScaleAccordionItemProps = {
+  hidePoints: boolean
   rating: RubricRating
   scale: number
   spacing: string
   min?: number
 }
-const RatingScaleAccordionItem = ({rating, scale, spacing, min}: RatingScaleAccordionItemProps) => {
+const RatingScaleAccordionItem = ({
+  hidePoints,
+  rating,
+  scale,
+  spacing,
+  min,
+}: RatingScaleAccordionItemProps) => {
   return (
     <View
       as="div"
@@ -310,11 +326,13 @@ const RatingScaleAccordionItem = ({rating, scale, spacing, min}: RatingScaleAcco
         </Flex.Item>
         <Flex.Item align="start">
           <View as="div" margin="0 0 0 medium" themeOverride={{marginMedium: '1.5rem'}}>
-            <Text>
-              {min != null
-                ? possibleStringRange(min, rating.points)
-                : possibleString(rating.points)}
-            </Text>
+            {!hidePoints && (
+              <Text>
+                {min != null
+                  ? possibleStringRange(min, rating.points)
+                  : possibleString(rating.points)}
+              </Text>
+            )}
           </View>
         </Flex.Item>
       </Flex>

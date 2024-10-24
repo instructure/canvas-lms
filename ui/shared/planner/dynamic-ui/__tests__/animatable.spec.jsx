@@ -41,15 +41,17 @@ it('passes trigger property functions and forwards the calls to the dynamic ui m
   }
 
   const ref = React.createRef()
+
   const wrapper = render(
     <DynamicUiProvider manager={mockManager}>
-      <Wrapped ref={ref} />
+      <Wrapped innerRef={ref} />
     </DynamicUiProvider>
   )
   expect(wrapper.getByTestId('mock-component')).toMatchSnapshot()
 
-  ref.current.registerAnimatable('type', 'component', 42, ['item'])
+  const mockComponentProps = ref.current.props
+  mockComponentProps.registerAnimatable('type', 'component', 42, ['item'])
   expect(mockManager.registerAnimatable).toHaveBeenCalledWith('type', 'component', 42, ['item'])
-  ref.current.deregisterAnimatable('type', 'component', ['item'])
+  mockComponentProps.deregisterAnimatable('type', 'component', ['item'])
   expect(mockManager.deregisterAnimatable).toHaveBeenCalledWith('type', 'component', ['item'])
 })

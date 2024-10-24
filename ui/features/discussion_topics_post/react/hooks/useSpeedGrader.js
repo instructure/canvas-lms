@@ -18,7 +18,7 @@
 
 import {useEffect, useState, useCallback} from 'react'
 import {STUDENT_DISCUSSION_QUERY} from '../../graphql/Queries'
-import {useQuery} from 'react-apollo'
+import {useQuery} from '@apollo/react-hooks'
 import {isSpeedGraderInTopUrl} from '../utils/constants'
 
 export default function useSpeedGrader({

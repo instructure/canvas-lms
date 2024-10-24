@@ -19,11 +19,12 @@
 import React from 'react'
 import {userEvent} from '@testing-library/user-event'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import {useEditor, useNode} from '@craftjs/core'
+import {useEditor, useNode, type Node} from '@craftjs/core'
 import {render} from '@testing-library/react'
-import {BlockToolbar} from '../BlockToolbar'
+import {BlockToolbar, isBlockSaveable} from '../BlockToolbar'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {mountNode} from '../../../utils'
+import {TemplateEditor} from '../../../types'
 
 const user = userEvent.setup()
 
@@ -44,7 +45,11 @@ const mockDelete = jest.fn()
 const mockFocus = jest.fn()
 let isMoveable = true
 let isDeletable = true
+let isSaveable = true
 let customNoToolbar = false
+let nodeCustomData: any = {
+  noToolbar: customNoToolbar,
+}
 const dummyBlockToolbar = () => {
   return <div>Dummy Block Toolbar</div>
 }
@@ -95,9 +100,7 @@ jest.mock('@craftjs/core', () => {
         node: {
           id: 'nodeid',
           data: {
-            custom: {
-              noToolbar: customNoToolbar,
-            },
+            custom: nodeCustomData,
           },
           related: {
             toolbar: blockOwnToolbar,
@@ -107,6 +110,7 @@ jest.mock('@craftjs/core', () => {
         name: 'SomeBlock',
         moveable: isMoveable,
         deletable: isDeletable,
+        saveable: isSaveable,
       }
     }),
   }
@@ -114,6 +118,10 @@ jest.mock('@craftjs/core', () => {
 
 const activeElem = () => {
   return document.activeElement as Element
+}
+
+const renderBlockToolbar = (editor = TemplateEditor.NONE) => {
+  return render(<BlockToolbar templateEditor={editor} />)
 }
 
 describe('BlockToolbar', () => {
@@ -125,6 +133,7 @@ describe('BlockToolbar', () => {
 
     isMoveable = true
     isDeletable = true
+    isSaveable = true
     customNoToolbar = false
     upNode = {
       id: 'upnode',
@@ -133,6 +142,9 @@ describe('BlockToolbar', () => {
       id: 'upnode',
     }
     blockOwnToolbar = dummyBlockToolbar
+    nodeCustomData = {
+      noToolbar: customNoToolbar,
+    }
   })
 
   afterEach(() => {
@@ -140,59 +152,66 @@ describe('BlockToolbar', () => {
   })
 
   it('should render', () => {
-    const {getByText} = render(<BlockToolbar />)
+    const {getByText} = renderBlockToolbar()
     expect(getByText('SomeBlock')).toBeInTheDocument()
     expect(getByText('Drag to move')).toBeInTheDocument()
     expect(getByText('Go up')).toBeInTheDocument()
     expect(getByText('Go down')).toBeInTheDocument()
     expect(getByText('Delete')).toBeInTheDocument()
+    expect(getByText('Save as template')).toBeInTheDocument()
     expect(getByText('Dummy Block Toolbar')).toBeInTheDocument()
   })
 
   it('should not render if no mount point', () => {
     mountDiv = null
-    const {queryByText} = render(<BlockToolbar />)
+    const {queryByText} = renderBlockToolbar()
     expect(queryByText('SomeBlock')).not.toBeInTheDocument()
   })
 
   it('should not render if custom.noToolbar is true', () => {
-    customNoToolbar = true
-    const {queryByText} = render(<BlockToolbar />)
+    nodeCustomData.noToolbar = true
+    const {queryByText} = renderBlockToolbar()
     expect(queryByText('SomeBlock')).not.toBeInTheDocument()
   })
 
   it('should not show the drag handle if moveable is false', () => {
     isMoveable = false
-    const {getByText, queryByText} = render(<BlockToolbar />)
+    const {getByText, queryByText} = renderBlockToolbar()
     expect(getByText('SomeBlock')).toBeInTheDocument()
     expect(queryByText('Drag to move')).not.toBeInTheDocument()
   })
 
   it('should not show the left arrow if there is no upnode', () => {
     upNode = undefined
-    const {getByText, queryByText} = render(<BlockToolbar />)
+    const {getByText, queryByText} = renderBlockToolbar()
     expect(getByText('SomeBlock')).toBeInTheDocument()
     expect(queryByText('Go up')).not.toBeInTheDocument()
   })
 
   it('should not show the right arrow if there is no down node', () => {
     downNode = undefined
-    const {queryByText, getByText} = render(<BlockToolbar />)
+    const {queryByText, getByText} = renderBlockToolbar()
     expect(getByText('Go up')).toBeInTheDocument()
     expect(queryByText('Go down')).not.toBeInTheDocument()
   })
 
   it('should not show the delete button if deletable is false', () => {
     isDeletable = false
-    const {getByText, queryByText} = render(<BlockToolbar />)
+    const {getByText, queryByText} = renderBlockToolbar()
     expect(getByText('SomeBlock')).toBeInTheDocument()
     expect(queryByText('Delete')).not.toBeInTheDocument()
   })
 
   it("should not show not the block's own toolbar if not defined", () => {
     blockOwnToolbar = null
-    const {queryByText} = render(<BlockToolbar />)
+    const {queryByText} = renderBlockToolbar()
     expect(queryByText('Block Own Toolbar')).not.toBeInTheDocument()
+  })
+
+  it('should not show save as template if saveable is false', () => {
+    isSaveable = false
+    const {queryByText} = renderBlockToolbar(TemplateEditor.GLOBAL)
+    expect(queryByText('Save as template')).not.toBeInTheDocument()
   })
 
   describe('keyboard navigation', () => {
@@ -201,13 +220,13 @@ describe('BlockToolbar', () => {
     })
 
     it('should default to the first focusable element', () => {
-      const {getByText} = render(<BlockToolbar />)
+      const {getByText} = renderBlockToolbar()
       const firstButton = getByText('Go up').closest('button')
       expect(firstButton?.getAttribute('tabindex')).toEqual('0')
     })
 
     it('should move to the next button on right arrow key', async () => {
-      const {getByText} = render(<BlockToolbar />)
+      const {getByText} = renderBlockToolbar()
       const firstButton = getByText('Go up').closest('button') as HTMLButtonElement
       await user.type(firstButton, '{ArrowRight}')
       const secondButton = getByText('Drag to move').closest('button')
@@ -216,7 +235,7 @@ describe('BlockToolbar', () => {
     })
 
     it('should move to the previous button on left arrow key', async () => {
-      const {getByText} = render(<BlockToolbar />)
+      const {getByText} = renderBlockToolbar()
       const firstButton = getByText('Go up').closest('button') as HTMLButtonElement
       await user.type(activeElem() as Element, '{ArrowLeft}')
       await user.type(activeElem() as Element, '{ArrowRight}')
@@ -224,7 +243,8 @@ describe('BlockToolbar', () => {
     })
 
     it('should wrap around on left arrow from the first butotn', async () => {
-      const {getByText} = render(<BlockToolbar />)
+      isSaveable = false
+      const {getByText} = renderBlockToolbar()
       const firstButton = getByText('Go up').closest('button') as HTMLButtonElement
       await user.type(firstButton, '{ArrowLeft}')
       const lastButton = getByText('Delete').closest('button')
@@ -232,7 +252,8 @@ describe('BlockToolbar', () => {
     })
 
     it('should wrap around on right arrow from the last button', async () => {
-      const {getByText} = render(<BlockToolbar />)
+      isSaveable = false
+      const {getByText} = renderBlockToolbar()
       const lastButton = getByText('Delete').closest('button') as HTMLButtonElement
       lastButton.focus()
       expect(lastButton?.getAttribute('tabindex')).toEqual('0')
@@ -243,7 +264,7 @@ describe('BlockToolbar', () => {
     })
 
     it('should return focus to last focused button after leaving the toolbar', async () => {
-      const {getByText} = render(<BlockToolbar />)
+      const {getByText} = renderBlockToolbar()
       const firstButton = getByText('Go up').closest('button')
       firstButton?.focus()
       await user.type(activeElem(), '{ArrowRight}')
@@ -259,12 +280,63 @@ describe('BlockToolbar', () => {
     })
 
     it("should return focus to it's node's dom node on escape", async () => {
-      const {getByText} = render(<BlockToolbar />)
+      const {getByText} = renderBlockToolbar()
       const firstButton = getByText('Go up').closest('button') as HTMLElement
       firstButton.focus()
       expect(firstButton).toBe(activeElem())
       await user.type(firstButton, '{Escape}')
       expect(activeElem()).toBe(nodeDomNode)
+    })
+  })
+
+  describe('isBlockSaveable', () => {
+    it('returns false if the user is not a template editor', () => {
+      const node = {} as Node
+      expect(isBlockSaveable(TemplateEditor.NONE, node)).toBe(false)
+    })
+
+    describe('when the user is a template editor', () => {
+      it('returns true if the node is a GroupBlock', () => {
+        const node = {data: {name: 'GroupBlock'}} as Node
+        expect(isBlockSaveable(TemplateEditor.LOCAL, node)).toBe(true)
+      })
+
+      it('returns false if the node is not a GroupBlock', () => {
+        const node = {data: {name: 'SomeBlock'}} as Node
+        expect(isBlockSaveable(TemplateEditor.LOCAL, node)).toBe(false)
+      })
+
+      it('returns true if the node is a section', () => {
+        const node = {data: {custom: {isSection: true}}} as Node
+        expect(isBlockSaveable(TemplateEditor.LOCAL, node)).toBe(true)
+      })
+
+      it('returns false of the node is the page', () => {
+        const node = {data: {name: 'PageBlock'}} as Node
+        expect(isBlockSaveable(TemplateEditor.LOCAL, node)).toBe(false)
+      })
+    })
+
+    describe('when the user is a global editor', () => {
+      it('returns true if the node is a GroupBlock', () => {
+        const node = {data: {name: 'GroupBlock'}} as Node
+        expect(isBlockSaveable(TemplateEditor.LOCAL, node)).toBe(true)
+      })
+
+      it('returns false if the node is not a GroupBlock', () => {
+        const node = {data: {name: 'SomeBlock'}} as Node
+        expect(isBlockSaveable(TemplateEditor.LOCAL, node)).toBe(false)
+      })
+
+      it('returns true if the node is a section', () => {
+        const node = {data: {custom: {isSection: true}}} as Node
+        expect(isBlockSaveable(TemplateEditor.LOCAL, node)).toBe(true)
+      })
+
+      it('returns true of the node is the page', () => {
+        const node = {data: {name: 'PageBlock'}} as Node
+        expect(isBlockSaveable(TemplateEditor.LOCAL, node)).toBe(false)
+      })
     })
   })
 })

@@ -234,6 +234,7 @@ describe Mutations::CreateDiscussionTopic do
     published = true
     require_initial_post = false
     locked = true
+    lock_at = 10.days.from_now.iso8601
 
     query = <<~GQL
       isAnnouncement: #{is_announcement}
@@ -245,6 +246,7 @@ describe Mutations::CreateDiscussionTopic do
       requireInitialPost: #{require_initial_post}
       anonymousState: off
       locked: #{locked}
+      lockAt: "#{lock_at}"
     GQL
 
     result = execute_with_input(query)
@@ -257,6 +259,7 @@ describe Mutations::CreateDiscussionTopic do
 
     expect(announcement.locked_announcement?).to be true
     expect(announcement.workflow_state).to eq "active"
+    expect(announcement.lock_at).to eq lock_at
     @teacher.reload
     expect(@teacher.create_announcements_unlocked?).to eq !locked
   end

@@ -973,16 +973,12 @@ class AssignmentsApiController < ApplicationController
                     assignment_json(target_assignment, @current_user, session)
                   end
     result_json["new_positions"] = { target_assignment.id => target_assignment.position }
-    Canvas::LiveEvents.quizzes_next_quiz_duplicated(
+    Canvas::LiveEvents.outcomes_retry_outcome_alignment_clone(
       {
         original_course_uuid: old_assignment.context.uuid,
         new_course_uuid: target_course.uuid,
         new_course_resource_link_id: target_course.lti_context_id,
         domain: target_course.root_account&.domain(ApplicationController.test_cluster_name),
-        new_course_name: target_course.name,
-        created_on_blueprint_sync: false,
-        resource_map_url: "",
-        remove_alignments: false,
         original_assignment_resource_link_id: old_assignment.lti_resource_link_id,
         new_assignment_resource_link_id: target_assignment.lti_resource_link_id,
         status: "outcome_alignment_cloning"

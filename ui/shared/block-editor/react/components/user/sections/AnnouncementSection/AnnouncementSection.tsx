@@ -22,7 +22,6 @@ import {useEditor, useNode} from '@craftjs/core'
 import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {AnnouncementModal} from './AnnouncementModal'
-import {AnnouncementSectionMenu} from './AnnouncementSectionMenu'
 import {AnnouncementView} from './AnnouncementView'
 
 import {IconAnnouncementSolid} from '@instructure/ui-icons'
@@ -124,9 +123,6 @@ AnnouncementSection.craft = {
   },
   custom: {
     isSection: true,
-  },
-  related: {
-    sectionMenu: AnnouncementSectionMenu,
   },
 }
 

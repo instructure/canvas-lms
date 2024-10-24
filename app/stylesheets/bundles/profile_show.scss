@@ -38,8 +38,6 @@
 }
 
 .profile-avatar-wrapper {
-  margin-#{direction(right)}: 20px !important;
-
   a {
     float: direction(left);
     position: relative;
@@ -146,102 +144,195 @@
     padding-#{direction(left)}: $ic-sp*0.5;
   }
 }
-.profileHeader {
-  padding: direction-sides($ic-sp 0 0 0);
-  line-height: 1.25;
-}
-.profile-tip {
-  @include fontSize(14px);
-}
-.stats {
-  text-align: direction(left);
-  width: 100%;
-  tr {
-    border-bottom: 1px solid #dfdfdf;
-  }
-  .stats-header {
-    border-bottom: 1px solid $borderColor;
-  }
-  td {
-    text-align: direction(right);
-    color: var(--ic-link-color);
-    font-weight: bold;
-  }
-}
-
-.social-header {
-  font-weight: bold;
-  margin: $gridGutterWidth 0 5px;
-}
-
-.social-links {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  li {
-    float: direction(left);
-    margin-#{direction(right)}: 10px;
-    text-align: center;
-    .social {
-      width: 30px;
-      height: 30px;
-      background-image: url(/images/social-icons.png);
-      display: block;
-    }
-  }
-}
-
-.message {
-  background-position: 0 0;
-  &:hover {
-    background-position: 0 -32px;
-  }
-}
-
-.google_docs {
-  background-position: -296px 0;
-  &:hover {
-    background-position: -296px -32px;
-  }
-}
-
-.twitter {
-  background-position: -34px 0;
-  &:hover {
-    background-position: -34px -32px;
-  }
-}
-
-.diigo {
-  background-position: -160px 0;
-  &:hover {
-    background-position: -160px -32px;
-  }
-}
-
-.skype {
-  background-position: -193px 0;
-  &:hover {
-    background-position: -193px -32px;
-  }
-}
 
 // implemented to make new profile page use flex for layout //
 .ic-Profile-layout {
   display: flex;
-  padding: $ic-sp;
+  flex-direction: column;
   box-sizing: border-box;
   width: 100%;
 }
 
-.ic-Profile-layout__Primary {
-  flex: 2;
+.ic-Profile-layout__Primary,
+.ic-Layout-contentMain {
+  text-align: direction(left);
+  .header-block {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 24px;
     @include breakpoint(desktop) {
-    flex: 3;
-  }
-}
+      flex-direction: row;
+    }
+    .account-info-block {
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      gap: 16px;
+      @include breakpoint(desktop) {
+        flex-direction: row;
+        align-items: end;
+      }
+      .account-text-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        .user-data-name {
+          font-weight: 700;
+          font-size: 1.75rem;
+          @include breakpoint(desktop) {
+            font-size: 2.375rem;
+          }
+        }
+        .user-data-main-info {
+          display: flex;
+          flex-direction: row;
+          span:first-child {
+            &:after {
+              content: "|";
+              margin: 0 3px;
+              @include mobile-only {
+                content: none;
+              }
+            }
+          }
+          @include mobile-only {
+            flex-direction: column;
+          }
+        }
+      }
 
-.ic-Profile-layout__Secondary {
-  flex: 1;
-  text-align: direction(right);
+      .image-block-image {
+        .avatar {
+          border: none;
+        }
+      }
+    }
+
+    .button-area-block {
+      display: flex;
+      flex-direction: row;
+      gap: 12px;
+      text-align: direction(right);
+      @include mobile-only {
+        flex-direction: column;
+        width: 100%;
+      }
+      button {
+        height: fit-content;
+      }
+      @include breakpoint(desktop) {
+        flex-direction: row-reverse;
+      }
+      form {
+        margin: 0;
+        button {
+          @include mobile-only {
+            width: 100%;
+          }
+        }
+      }
+    }
+    &.legacy {
+      flex-direction: row;
+      align-items: normal;
+      margin-bottom: 0;
+      .account-info-block {
+        flex: 1;
+        align-items: normal;
+      }
+      .button-area-block {
+        @include breakpoint(desktop) {
+          flex-direction: row;
+        }
+      }
+    }
+  }
+  .content-block {
+    width: 100%;
+    @include breakpoint(desktop) {
+      flex: 3;
+    }
+    .profileHeader {
+      padding: direction-sides($ic-sp 0 0 0);
+      line-height: 1.25;
+    }
+    .profile-tip {
+      @include fontSize(14px);
+    }
+    .stats {
+      text-align: direction(left);
+      width: 100%;
+      tr {
+        border-bottom: 1px solid #dfdfdf;
+      }
+      .stats-header {
+        border-bottom: 1px solid $borderColor;
+      }
+      td {
+        text-align: direction(right);
+        color: var(--ic-link-color);
+        font-weight: bold;
+      }
+    }
+
+    .social-header {
+      font-weight: bold;
+      margin: $gridGutterWidth 0 5px;
+    }
+
+    .social-links {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      li {
+        float: direction(left);
+        margin-#{direction(right)}: 10px;
+        text-align: center;
+        .social {
+          width: 30px;
+          height: 30px;
+          background-image: url(/images/social-icons.png);
+          display: block;
+        }
+      }
+    }
+
+    .message {
+      background-position: 0 0;
+      &:hover {
+        background-position: 0 -32px;
+      }
+    }
+
+    .google_docs {
+      background-position: -296px 0;
+      &:hover {
+        background-position: -296px -32px;
+      }
+    }
+
+    .twitter {
+      background-position: -34px 0;
+      &:hover {
+        background-position: -34px -32px;
+      }
+    }
+
+    .diigo {
+      background-position: -160px 0;
+      &:hover {
+        background-position: -160px -32px;
+      }
+    }
+
+    .skype {
+      background-position: -193px 0;
+      &:hover {
+        background-position: -193px -32px;
+      }
+    }
+  }
 }

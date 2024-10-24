@@ -741,6 +741,13 @@ class DiscussionTopic < ActiveRecord::Base
   end
   protected :change_child_topic_subscribed_state
 
+  def participant(opts = {})
+    current_user = opts[:current_user] || self.current_user
+    return nil unless current_user
+
+    discussion_topic_participants.find_by(user_id: current_user)
+  end
+
   def update_or_create_participant(opts = {})
     current_user = opts[:current_user] || self.current_user
     return nil unless current_user
@@ -758,6 +765,7 @@ class DiscussionTopic < ActiveRecord::Base
           topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
           topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
           topic_participant.subscribed = opts[:subscribed] if opts.key?(:subscribed)
+          topic_participant.sort_order = opts[:sort_order] if opts.key?(:sort_order)
           topic_participant.save
         end
       end
@@ -926,6 +934,7 @@ class DiscussionTopic < ActiveRecord::Base
           OR discussion_topic_participants.unread_entry_count > 0")
   }
   scope :published, -> { where("discussion_topics.workflow_state = 'active'") }
+  scope :published_or_post_delayed, -> { where("discussion_topics.workflow_state = 'active' OR discussion_topics.workflow_state = 'post_delayed'") }
 
   # TODO: this scope is appearing in a few models now with identical code.
   # Can this be extracted somewhere?
@@ -1643,12 +1652,24 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def active_participants_with_visibility
-    return active_participants_include_tas_and_teachers unless for_assignment?
+    return active_participants_include_tas_and_teachers unless for_assignment? || assignment_overrides.active.any?
 
-    users_with_visibility = assignment.students_with_visibility.pluck(:id)
+    users_with_visibility = for_assignment? ? assignment.students_with_visibility.pluck(:id) : []
+
+    assignment_overrides.select(&:active?).each do |override|
+      # specific user
+      if override.adhoc?
+        adhoc_users = users_with_visibility.concat(override.assignment_override_students.pluck(:user_id))
+        users_with_visibility.concat(adhoc_users)
+      elsif override.course_section?
+        users_in_section = User.joins(:enrollments).where(enrollments: { course_section_id: override.set_id }).pluck(:id)
+        users_with_visibility.concat(users_in_section)
+      end
+    end
 
     admin_ids = course.participating_admins.pluck(:id)
     users_with_visibility.concat(admin_ids)
+    users_with_visibility.uniq!
 
     # observers will not be returned, which is okay for the functions current use cases (but potentially not others)
     active_participants_include_tas_and_teachers.select { |p| users_with_visibility.include?(p.id) }
@@ -2122,6 +2143,36 @@ class DiscussionTopic < ActiveRecord::Base
     if (will_save_change_to_message? || will_save_change_to_title?) && !new_record?
       self.edited_at = Time.now.utc
     end
+  end
+
+  def ungraded_discussion_overrides(current_user = nil)
+    current_user ||= self.current_user
+    return unless current_user
+    return nil if assignment.present? || context_type == "Group" || is_announcement || !Account.site_admin.feature_enabled?(:selective_release_ui_api)
+
+    overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(self, current_user)
+
+    # this is a temporary check for any discussion_topic_section_visibilities until we eventually backfill that table
+    if is_section_specific
+      section_overrides = assignment_overrides.active.where(set_type: "CourseSection").select(:set_id)
+      section_visibilities = discussion_topic_section_visibilities.active.where.not(course_section_id: section_overrides)
+    end
+
+    if section_visibilities
+      section_overrides = section_visibilities.map do |section_visibility|
+        assignment_override = AssignmentOverride.new(
+          discussion_topic: section_visibility.discussion_topic,
+          course_section: section_visibility.course_section
+        )
+        assignment_override.unlock_at = unlock_at if unlock_at
+        assignment_override.lock_at = lock_at if lock_at
+        assignment_override
+      end
+    end
+
+    all_overrides = overrides.to_a
+    all_overrides += section_overrides if section_visibilities
+    all_overrides
   end
 
   private

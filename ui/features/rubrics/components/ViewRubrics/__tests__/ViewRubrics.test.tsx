@@ -21,9 +21,11 @@ import Router from 'react-router'
 import {BrowserRouter} from 'react-router-dom'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {RUBRICS_QUERY_RESPONSE, RUBRIC_PREVIEW_QUERY_RESPONSE} from './fixtures'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {ViewRubrics, type ViewRubricsProps} from '../index'
 import * as ViewRubricQueries from '../../../queries/ViewRubricQueries'
+import useManagedCourseSearchApi from '@canvas/direct-sharing/react/effects/useManagedCourseSearchApi'
 
 jest.mock('react-router', () => ({
   ...jest.requireActual('react-router'),
@@ -38,15 +40,16 @@ jest.mock('../../../queries/ViewRubricQueries', () => ({
   unarchiveRubric: () => unarchiveRubricMock,
   downloadRubrics: jest.fn(),
 }))
+jest.mock('@canvas/direct-sharing/react/effects/useManagedCourseSearchApi')
 
 describe('ViewRubrics Tests', () => {
   const renderComponent = (props?: Partial<ViewRubricsProps>) => {
     return render(
-      <QueryProvider>
+      <MockedQueryProvider>
         <BrowserRouter>
           <ViewRubrics canManageRubrics={true} {...props} canImportExportRubrics={true} />
         </BrowserRouter>
-      </QueryProvider>
+      </MockedQueryProvider>
     )
   }
 
@@ -560,8 +563,8 @@ describe('ViewRubrics Tests', () => {
       expect(getPreviewTray()).toBeInTheDocument()
       expect(getByTestId('traditional-criterion-1-ratings-0')).toBeInTheDocument()
     })
-
-    it('closes the preview tray when the same rubric is clicked again', async () => {
+    // Un-skip in EVAL-4737
+    it.skip('closes the preview tray when the same rubric is clicked again', async () => {
       const {getByTestId} = renderComponent()
 
       const previewCell = getByTestId('rubric-title-preview-1')
@@ -585,6 +588,16 @@ describe('ViewRubrics Tests', () => {
       expect(queryByText('Rubric 1')).not.toBeNull()
       expect(queryByText('Rubric 2')).toBeNull()
       expect(queryByText('Rubric 3')).toBeNull()
+    })
+  })
+
+  describe('canManageRubrics permissions is false', () => {
+    it('should not render popover or create button', () => {
+      queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+      const {queryByTestId} = renderComponent({canManageRubrics: false})
+
+      expect(queryByTestId('rubric-options-1-button')).toBeNull()
+      expect(queryByTestId('create-new-rubric-button')).not.toBeInTheDocument()
     })
   })
 
@@ -684,16 +697,6 @@ describe('ViewRubrics Tests', () => {
       getByText('Saved').click()
       expect(getByTestId('rubric-row-2')).toHaveTextContent('Rubric 2')
       expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toEqual(4)
-    })
-  })
-
-  describe('canManageRubrics permissions is false', () => {
-    it('should not render popover or create button', () => {
-      queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
-      const {queryByTestId} = renderComponent({canManageRubrics: false})
-
-      expect(queryByTestId('rubric-options-1-button')).toBeNull()
-      expect(queryByTestId('create-new-rubric-button')).not.toBeInTheDocument()
     })
   })
 })

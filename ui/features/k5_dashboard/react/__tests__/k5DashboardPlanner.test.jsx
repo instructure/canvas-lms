@@ -31,7 +31,7 @@ import {
 } from './mocks'
 import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
 import {enableFetchMocks} from 'jest-fetch-mock'
-import {QueryProvider} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 enableFetchMocks()
 
@@ -40,7 +40,7 @@ jest.mock('@canvas/observer-picker/react/utils', () => ({
   fetchShowK5Dashboard: jest.fn(),
 }))
 
-const render = children => testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
+const render = children => testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 const currentUserId = defaultProps.currentUser.id
 const moxiosWait = () => new Promise(resolve => moxios.wait(resolve))

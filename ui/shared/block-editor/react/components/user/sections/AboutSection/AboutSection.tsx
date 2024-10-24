@@ -24,7 +24,6 @@ import {AboutTextHalf} from './AboutTextHalf'
 import {ImageBlock} from '../../blocks/ImageBlock'
 import {NoSections} from '../../common'
 import {useClassNames, getContrastingColor} from '../../../../utils'
-import {SectionMenu} from '../../../editor/SectionMenu'
 import {SectionToolbar} from '../../common/SectionToolbar'
 
 type AboutSectionProps = {
@@ -84,7 +83,6 @@ AboutSection.craft = {
     isSection: true,
   },
   related: {
-    sectionMenu: SectionMenu,
     toolbar: SectionToolbar,
   },
 }

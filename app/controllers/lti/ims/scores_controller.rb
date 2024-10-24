@@ -619,8 +619,12 @@ module Lti::IMS
     def parse_timestamp(t)
       return nil unless t.present?
 
-      parsed = Time.zone.iso8601(t) rescue nil
-      parsed ||= (Time.zone.parse(t) rescue nil) if Setting.get("enforce_iso8601_for_lti_scores", "false") == "false"
+      begin
+        parsed = Time.zone.iso8601(t)
+      rescue ArgumentError
+        # ignore
+      end
+      parsed ||= Time.zone.parse(t) if Setting.get("enforce_iso8601_for_lti_scores", "false") == "false"
       parsed
     end
 

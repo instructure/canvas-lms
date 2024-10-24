@@ -17,7 +17,7 @@
 import React from 'react'
 import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {QueryProvider} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import LoginHelp, {renderLoginHelp} from '../loginHelp'
 
 jest.mock('@canvas/do-fetch-api-effect', () => ({
@@ -38,18 +38,18 @@ describe('LoginHelp Component and Helpers', () => {
   describe('LoginHelp Component', () => {
     it('renders the link text correctly', () => {
       render(
-        <QueryProvider>
+        <MockedQueryProvider>
           <LoginHelp linkText="Help" />
-        </QueryProvider>
+        </MockedQueryProvider>
       )
       expect(screen.getByText('Help')).toBeInTheDocument()
     })
 
     it('opens and closes the modal correctly', async () => {
       render(
-        <QueryProvider>
+        <MockedQueryProvider>
           <LoginHelp linkText="Help" />
-        </QueryProvider>
+        </MockedQueryProvider>
       )
       userEvent.click(screen.getByText('Help'))
       expect(screen.getByText('Login Help for Canvas LMS')).toBeInTheDocument()

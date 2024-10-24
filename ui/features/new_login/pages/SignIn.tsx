@@ -16,41 +16,51 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
-import SSOButtons from '../partials/SSOButtons'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import LoginLinks from '../partials/LoginLinks'
-import {useNewLoginData} from '../hooks/useNewLoginData'
-import {login} from '../utils/api'
-import type {LoginResponse} from '../utils/types'
+import {useNewLogin} from '../context/NewLoginContext'
+import SSOButtons from '../shared/SSOButtons'
+import SignInLinks from '../shared/SignInLinks'
+import OtpForm from '../shared/OtpForm'
+import {performSignIn} from '../services'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('new_login')
 
 const SignIn = () => {
+  const {
+    rememberMe,
+    setRememberMe,
+    isUiActionPending,
+    setIsUiActionPending,
+    otpRequired,
+    setOtpRequired,
+    loginHandleName,
+    authProviders,
+  } = useNewLogin()
+
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [rememberMe, setRememberMe] = useState(false)
   const [formValid, setFormValid] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const {authProviders, loginHandleName} = useNewLoginData()
+
+  const validateForm = useCallback(() => {
+    return username.trim() !== '' && password.trim() !== ''
+  }, [username, password])
 
   useEffect(() => {
-    const isUsernameValid = username.trim() !== ''
-    const isPasswordValid = password.trim() !== ''
-    setFormValid(isUsernameValid && isPasswordValid)
-  }, [username, password])
+    setFormValid(validateForm())
+  }, [validateForm])
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    if (!formValid) {
+    if (!validateForm()) {
       showFlashAlert({
         message: I18n.t('Please enter a username and password.'),
         type: 'error',
@@ -58,17 +68,28 @@ const SignIn = () => {
       return
     }
 
-    setIsSubmitting(true)
+    setIsUiActionPending(true)
 
     try {
-      const data: LoginResponse = await login(username, password, rememberMe)
-      window.location.href = data.location
-    } catch (error: any) {
+      const response = await performSignIn(username, password, rememberMe)
+
+      if (response.status === 200 && response.data?.otp_required) {
+        setOtpRequired(true)
+      } else if (response.status === 200 && response.data?.pseudonym) {
+        window.location.href = response.data.location || '/dashboard'
+      } else {
+        showFlashAlert({
+          message: I18n.t('There was an error logging in. Please try again.'),
+          type: 'error',
+        })
+      }
+    } catch (_error: unknown) {
       showFlashAlert({
-        message: error.message || I18n.t('There was an error logging in. Please try again.'),
+        message: I18n.t('There was an error logging in. Please try again.'),
         type: 'error',
       })
-      setIsSubmitting(false)
+    } finally {
+      setIsUiActionPending(false)
     }
   }
 
@@ -80,19 +101,23 @@ const SignIn = () => {
     setPassword(value)
   }
 
+  if (otpRequired) {
+    return <OtpForm />
+  }
+
   return (
     <Flex direction="column" gap="large">
       <Flex.Item overflowY="visible">
         <Heading level="h2" as="h1">
-          {I18n.t('Welcome to Canvas')}
+          {I18n.t('Welcome to Canvas LMS')}
         </Heading>
       </Flex.Item>
 
-      {authProviders.length > 0 && (
+      {authProviders && authProviders.length > 0 && (
         <Flex.Item overflowY="visible">
           <Flex direction="column" gap="large">
             <Flex.Item overflowY="visible">
-              <SSOButtons providers={authProviders} />
+              <SSOButtons />
             </Flex.Item>
 
             <Flex.Item overflowY="visible">
@@ -134,6 +159,7 @@ const SignIn = () => {
                     label={I18n.t('Stay signed in')}
                     checked={rememberMe}
                     onChange={() => setRememberMe(!rememberMe)}
+                    inline={true}
                   />
                 </Flex.Item>
               </Flex>
@@ -144,14 +170,14 @@ const SignIn = () => {
                 type="submit"
                 color="primary"
                 display="block"
-                disabled={!formValid || isSubmitting}
+                disabled={!formValid || isUiActionPending}
               >
                 {I18n.t('Sign In')}
               </Button>
             </Flex.Item>
 
             <Flex.Item overflowY="visible">
-              <LoginLinks />
+              <SignInLinks />
             </Flex.Item>
           </Flex>
         </form>

@@ -1444,6 +1444,38 @@ describe CalendarEventsApiController, type: :request do
       expect(json["title"]).to eql "ohai"
     end
 
+    it "creates a new event with a custom timezone" do
+      json = api_call(:post,
+                      "/api/v1/calendar_events",
+                      { controller: "calendar_events_api", action: "create", format: "json" },
+                      { calendar_event: {
+                        context_code: @course.asset_string,
+                        title: "ohai",
+                        all_day: true,
+                        start_at: "2024-05-22T04:00:00Z",
+                        end_at: "2024-05-22T04:00:00Z",
+                        time_zone_edited: "Europe/Budapest"
+                      } })
+      assert_status(201)
+
+      json_recurrent_event = api_call(:post,
+                                      "/api/v1/calendar_events",
+                                      { controller: "calendar_events_api", action: "create", format: "json" },
+                                      { calendar_event: {
+                                        context_code: @course.asset_string,
+                                        title: "ohai",
+                                        all_day: true,
+                                        start_at: "2024-05-22T04:00:00Z",
+                                        end_at: "2024-05-22T04:00:00Z",
+                                        rrule: "FREQ=WEEKLY;COUNT=52;INTERVAL=1;BYDAY=WE",
+                                        time_zone_edited: "Europe/Budapest"
+                                      } })
+      assert_status(201)
+
+      expect(json["start_at"]).to eql "2024-05-21T22:00:00Z"
+      expect(json_recurrent_event["start_at"]).to eql "2024-05-21T22:00:00Z"
+    end
+
     context "account calendars" do
       it "does not allow view-only users to create account calendar events" do
         @user = account_admin_user_with_role_changes(account: Account.default, role_changes: { manage_account_calendar_visibility: true, manage_account_calendar_events: false })

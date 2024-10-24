@@ -218,6 +218,7 @@ class User < ActiveRecord::Base
            class_name: "UsageRights",
            dependent: :destroy
   has_many :gradebook_csvs, dependent: :destroy, class_name: "GradebookCSV"
+  has_many :block_editor_templates, class_name: "BlockEditorTemplate", as: :context, inverse_of: :context
 
   has_one :profile, class_name: "UserProfile"
 
@@ -259,6 +260,7 @@ class User < ActiveRecord::Base
            foreign_key: :updated_by_id,
            inverse_of: :updated_by
   has_many :lti_overlays, class_name: "Lti::Overlay", foreign_key: :updated_by_id, inverse_of: :updated_by
+  has_many :lti_overlay_versions, class_name: "Lti::OverlayVersion", inverse_of: :created_by, dependent: :destroy
 
   has_many :comment_bank_items, -> { where("workflow_state<>'deleted'") }
   has_many :microsoft_sync_partial_sync_changes, class_name: "MicrosoftSync::PartialSyncChange", dependent: :destroy, inverse_of: :user
@@ -1452,6 +1454,20 @@ class User < ActiveRecord::Base
 
     given { |user| check_accounts_right?(user, :moderate_user_content) }
     can :moderate_user_content
+  end
+
+  def can_change_pronunciation?(account)
+    return false unless account.root_account? && account.enable_name_pronunciation?
+
+    GuardRail.activate(:secondary) do
+      enrollment_types = enrollments.where(root_account: account, type: ["TeacherEnrollment", "StudentEnrollment"])
+                                    .active_by_date.distinct.pluck(:type)
+
+      return true if account.allow_name_pronunciation_edit_for_students? && enrollment_types.include?("StudentEnrollment")
+      return true if account.allow_name_pronunciation_edit_for_teachers? && enrollment_types.include?("TeacherEnrollment")
+
+      account.allow_name_pronunciation_edit_for_admins? && account_users.active.where(account:).exists?
+    end
   end
 
   def can_masquerade?(masquerader, account)
@@ -3469,6 +3485,10 @@ class User < ActiveRecord::Base
   end
 
   def pronouns
+    # For jobs/rails consoles/specs where domain root account is not set
+    acc = Account.current_domain_root_account || account
+    return nil unless acc.can_add_pronouns?
+
     translate_pronouns(super)
   end
 

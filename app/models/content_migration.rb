@@ -888,13 +888,25 @@ class ContentMigration < ActiveRecord::Base
     end
   end
 
+  def send_item_notifications?
+    @send_item_notifications ||= Canvas::Plugin.value_to_boolean(migration_settings[:send_item_notifications])
+  end
+
   def date_shift_options
     migration_settings[:date_shift_options]
   end
 
   def valid_date_shift_options
-    if date_shift_options && Canvas::Plugin.value_to_boolean(date_shift_options[:shift_dates]) && Canvas::Plugin.value_to_boolean(date_shift_options[:remove_dates])
-      errors.add(:date_shift_options, t("errors.cannot_shift_and_remove", "cannot specify shift_dates and remove_dates simultaneously"))
+    if date_shift_options
+      shift_dates = Canvas::Plugin.value_to_boolean(date_shift_options[:shift_dates])
+      remove_dates = Canvas::Plugin.value_to_boolean(date_shift_options[:remove_dates])
+      if shift_dates && remove_dates
+        errors.add(:date_shift_options, t("errors.cannot_shift_and_remove", "cannot specify shift_dates and remove_dates simultaneously"))
+      end
+      send_item_notifications = Canvas::Plugin.value_to_boolean(migration_settings[:send_item_notifications])
+      if send_item_notifications && (shift_dates || remove_dates)
+        errors.add(:date_shift_options, t("shift_dates or remove_dates cannot be combined with send_item_notifications"))
+      end
     end
   end
 

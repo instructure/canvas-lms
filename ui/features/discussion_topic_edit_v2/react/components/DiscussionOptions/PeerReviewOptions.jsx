@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {DateTimeInput} from '@instructure/ui-date-time-input'
@@ -45,6 +45,12 @@ export const PeerReviewOptions = ({
   intraGroupPeerReviews,
   setIntraGroupPeerReviews,
 }) => {
+  const [reviewsDueDateRef, setReviewsDueDateRef] = useState(null)
+  const [reviewsDueTimeRef, setReviewsDueTimeRef] = useState(null)
+
+  reviewsDueDateRef?.setAttribute('data-testid', 'reviews-due-date')
+  reviewsDueTimeRef?.setAttribute('data-testid', 'reviews-due-time')
+
   return (
     <View as="div">
       <Text as="h3" weight="bold">
@@ -105,6 +111,12 @@ export const PeerReviewOptions = ({
               datePlaceholder={I18n.t('Select Date')}
               dateRenderLabel=""
               timeRenderLabel=""
+              dateInputRef={ref => {
+                setReviewsDueDateRef(ref)
+              }}
+              timeInputRef={ref => {
+                setReviewsDueTimeRef(ref)
+              }}
             />
             <Text as="p" size="small">
               {I18n.t('If left blank, uses due date')}

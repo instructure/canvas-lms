@@ -102,6 +102,75 @@ describe Login::OtpController do
         expect(session[:pending_otp_secret_key]).not_to eq @user.reload.otp_secret_key
       end
     end
+
+    context "when rendering JSON response" do
+      before do
+        request.headers["Accept"] = "application/json"
+        allow(controller).to receive(:configuring?).and_return(false)
+        # default state for session variables
+        session[:pending_otp_secret_key] = ROTP::Base32.random
+        session[:pending_otp] = true
+      end
+
+      it "returns otp_sent as true when pending OTP is set" do
+        get :new, format: :json
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body).to eq("otp_sent" => true)
+      end
+
+      it "returns an empty JSON object when pending OTP is not set" do
+        session[:pending_otp] = nil
+        get :new, format: :json
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body).to eq({})
+      end
+
+      it "returns otp_configuring as true when configuring is active" do
+        allow(controller).to receive(:configuring?).and_return(true)
+        get :new, format: :json
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body).to eq("otp_configuring" => true)
+      end
+
+      it "conditionally includes pending_otp_communication_channel_id in the JSON response based on session state" do
+        # when pending_otp_communication_channel_id is set
+        cc = @user.communication_channels.sms.create!(path: "1234567890")
+        session[:pending_otp_communication_channel_id] = cc.id
+        get :new, format: :json
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body).to eq("otp_sent" => true, "pending_otp_communication_channel_id" => cc.id)
+        # when pending_otp_communication_channel_id is nil
+        session[:pending_otp_communication_channel_id] = nil
+        get :new, format: :json
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body).to eq("otp_sent" => true)
+      end
+
+      it "returns a success response when OTP is verified and pending OTP is deleted" do
+        allow(controller).to receive(:configuring?).and_return(true)
+        verification_code = ROTP::TOTP.new(session[:pending_otp_secret_key]).now
+        post :create, params: { otp_login: { verification_code: } }
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body).to include("location" => dashboard_url(login_success: 1))
+        expect(session[:pending_otp]).to be_nil
+        expect(session[:pending_otp_secret_key]).to be_nil
+      end
+
+      it "returns a configuration notice if no OTP is pending" do
+        session[:pending_otp] = nil
+        verification_code = ROTP::TOTP.new(session[:pending_otp_secret_key]).now
+        post :create, params: { otp_login: { verification_code: } }
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body).to eq({ "otp_configured" => true })
+        expect(session[:pending_otp]).to be_nil
+      end
+
+      it "returns an error message if the OTP verification fails" do
+        post :create, params: { otp_login: { verification_code: "invalid_code" } }
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.parsed_body).to eq({ "error" => "Invalid verification code, please try again" })
+      end
+    end
   end
 
   describe "#create" do
@@ -251,6 +320,111 @@ describe Login::OtpController do
         expect_any_instance_of(ROTP::TOTP).not_to receive(:verify)
         post :create, params: { otp_login: { verification_code: "123456" } }
         expect(response).to redirect_to(otp_login_url)
+      end
+
+      it "shows a configuration success notice if no pending OTP and configuration is completed" do
+        session[:pending_otp] = nil
+        post :create, params: { otp_login: { verification_code: ROTP::TOTP.new(@user.otp_secret_key).now } }
+        expect(response).to redirect_to settings_profile_url
+        expect(flash[:notice]).to eq "Multi-factor authentication configured"
+      end
+
+      it "shows an error message and redirects to OTP login if verification code is invalid" do
+        post :create, params: { otp_login: { verification_code: "invalid_code" } }
+        expect(response).to redirect_to otp_login_url
+        expect(flash[:error]).to eq "Invalid verification code, please try again"
+      end
+
+      it "successfully logs in the user if session[:pending_otp] is deleted" do
+        session[:pending_otp] = true
+        post :create, params: { otp_login: { verification_code: ROTP::TOTP.new(@user.otp_secret_key).now } }
+        expect(response).to redirect_to dashboard_url(login_success: 1)
+      end
+
+      it "deletes session[:pending_otp] after successful verification" do
+        session[:pending_otp] = true
+        post :create, params: { otp_login: { verification_code: ROTP::TOTP.new(@user.otp_secret_key).now } }
+        expect(session[:pending_otp]).to be_nil
+      end
+
+      it "redirects to profile settings if configuration is complete and no pending OTP" do
+        session[:pending_otp] = nil
+        session[:pending_otp_secret_key] = nil
+        post :create, params: { otp_login: { verification_code: ROTP::TOTP.new(@user.otp_secret_key).now } }
+        expect(response).to redirect_to settings_profile_url
+        expect(flash[:notice]).to eq "Multi-factor authentication configured"
+      end
+
+      it "redirects to dashboard after successful OTP verification when MFA is fully configured" do
+        session[:pending_otp_secret_key] = ROTP::Base32.random
+        session[:pending_otp_communication_channel_id] = 123
+        @user.update(otp_secret_key: session[:pending_otp_secret_key])
+        verification_code = ROTP::TOTP.new(@user.otp_secret_key).now
+        post :create, params: { otp_login: { verification_code: } }
+        expect(response).to redirect_to dashboard_url(login_success: 1)
+        expect(session[:pending_otp]).to be_nil
+        expect(session[:pending_otp_secret_key]).to be_nil
+        expect(session[:pending_otp_communication_channel_id]).to be_nil
+      end
+
+      it "redirects to login/otp with an error message if OTP verification fails due to incomplete MFA configuration" do
+        session[:pending_otp] = true
+        session[:pending_otp_secret_key] = nil
+        session[:pending_otp_communication_channel_id] = nil
+        verification_code = "123456"
+        post :create, params: { otp_login: { verification_code: } }
+        expect(response).to redirect_to login_otp_url
+        expect(flash[:error]).to eq "Invalid verification code, please try again"
+        expect(session[:pending_otp]).to be true
+        expect(session[:pending_otp_secret_key]).to be_nil
+        expect(session[:pending_otp_communication_channel_id]).to be_nil
+      end
+    end
+  end
+
+  describe "#cancel_otp" do
+    before :once do
+      user_with_pseudonym(active_all: 1, password: "qwertyuiop")
+    end
+
+    context "when user is logged in" do
+      before do
+        user_session(@user, @pseudonym)
+        session[:pending_otp] = true
+        session[:pending_otp_secret_key] = "test_secret_key"
+        session[:pending_otp_communication_channel_id] = 1
+      end
+
+      it "should clear the pending OTP session and respond with success" do
+        delete :cancel_otp, format: :json
+        expect(response).to be_successful
+        expect(session[:pending_otp]).to be_nil
+        expect(session[:pending_otp_secret_key]).to be_nil
+        expect(session[:pending_otp_communication_channel_id]).to be_nil
+        json_response = response.parsed_body
+        expect(json_response["message"]).to eq "Multi-factor authentication process has been cancelled."
+      end
+
+      it "should respond with success even if there is no pending OTP" do
+        session[:pending_otp] = nil
+        delete :cancel_otp, format: :json
+        expect(response).to be_successful
+        json_response = response.parsed_body
+        expect(json_response["message"]).to eq "Multi-factor authentication process has been cancelled."
+      end
+    end
+
+    context "when user is logged out" do
+      before do
+        session.clear
+        request.headers["Accept"] = "application/json"
+        @current_user = nil
+        @current_pseudonym = nil
+      end
+
+      it "should return unauthorized status for a user not logged in" do
+        delete :cancel_otp, format: :json
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end

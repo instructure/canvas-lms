@@ -21,11 +21,16 @@
 // of its parent.
 // This is true of all sections (so this is called in RenderNode to
 // save you from having to add it to each section) and some blocks
-export const notDeletableIfLastChild = (nodeId: string, query: any) => {
+
+export const isNthChild = (nodeId: string, query: any, n: number) => {
   const target = query.node(nodeId).get()
   if (target.data.parent) {
     const siblings = query.node(target.data.parent).descendants()
-    return siblings.length > 1
+    return siblings.length === n
   }
   return false
+}
+
+export const isLastChild = (nodeId: string, query: any) => {
+  return isNthChild(nodeId, query, 1)
 }

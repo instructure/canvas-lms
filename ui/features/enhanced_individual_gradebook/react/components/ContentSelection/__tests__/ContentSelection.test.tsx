@@ -24,7 +24,7 @@ import {
   makeContentSelectionProps,
 } from './fixtures'
 import userEvent from '@testing-library/user-event'
-import {QueryProvider} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {setupCanvasQueries} from '../../__tests__/fixtures'
 
 describe('Content Selection', () => {
@@ -34,9 +34,9 @@ describe('Content Selection', () => {
 
   const renderComponent = (props: ContentSelectionComponentProps) => {
     return render(
-      <QueryProvider>
+      <MockedQueryProvider>
         <ContentSelection {...props} />
-      </QueryProvider>
+      </MockedQueryProvider>
     )
   }
 

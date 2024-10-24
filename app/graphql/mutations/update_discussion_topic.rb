@@ -66,10 +66,6 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
       input[:published] ? discussion_topic.publish! : discussion_topic.unpublish!
     end
 
-    unless input[:locked].nil?
-      input[:locked] ? discussion_topic.lock! : discussion_topic.unlock!
-    end
-
     if !input[:remove_attachment].nil? && input[:remove_attachment]
       discussion_topic.attachment_id = nil
     end
@@ -85,12 +81,17 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
 
     process_common_inputs(input, discussion_topic.is_announcement, discussion_topic)
     process_future_date_inputs(input.slice(:delayed_post_at, :lock_at), discussion_topic)
+    process_locked_parameter(input[:locked], discussion_topic) unless input[:locked].nil?
 
     # If discussion topic has checkpoints, the sum of possible points cannot exceed the max for the assignment
     if input[:checkpoints].present?
       err_message = validate_possible_points_with_checkpoints(input)
       return validation_error(err_message) unless err_message.nil?
     end
+
+    # Save the discussion topic before updating the assignment if the group category is being updated,
+    # because creating group assignment overrides are dependent on the group category being set
+    discussion_topic.save! if input.key?(:group_category_id)
 
     # Take care of Assignment update information
     if input[:assignment]
@@ -129,7 +130,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
 
         # Instantiate and execute CreateAssignment mutation
         assignment_create_mutation = Mutations::CreateAssignment.new(object:, context:, field: nil)
-        assignment_create_result = assignment_create_mutation.resolve(input: assignment_input)
+        assignment_create_result = assignment_create_mutation.resolve(input: assignment_input, submittable: discussion_topic)
 
         if assignment_create_result[:errors]
           return { errors: assignment_create_result[:errors] }

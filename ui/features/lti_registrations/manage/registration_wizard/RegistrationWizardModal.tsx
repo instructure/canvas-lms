@@ -44,6 +44,7 @@ import {isSuccessful, isUnsuccessful} from '../../common/lib/apiResult/ApiResult
 import {TextArea} from '@instructure/ui-text-area'
 import {isValidJson} from '../../common/lib/validators/isValidJson'
 import type {FormMessage} from '@instructure/ui-form-field'
+import type {Lti1p3RegistrationWizardService} from '../lti_1p3_registration_form/Lti1p3RegistrationWizardService'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -52,6 +53,7 @@ export const MODAL_BODY_HEIGHT = '50vh'
 export type RegistrationWizardModalProps = {
   accountId: AccountId
   dynamicRegistrationWizardService: DynamicRegistrationWizardService
+  lti1p3RegistrationWizardService: Lti1p3RegistrationWizardService
   jsonUrlWizardService: JsonUrlWizardService
 }
 
@@ -99,6 +101,7 @@ export const RegistrationWizardModal = (props: RegistrationWizardModalProps) => 
         state={state}
         accountId={props.accountId}
         dynamicRegistrationWizardService={props.dynamicRegistrationWizardService}
+        lti1p3RegistrationWizardService={props.lti1p3RegistrationWizardService}
         jsonUrlWizardService={props.jsonUrlWizardService}
       />
     </Modal>
@@ -109,11 +112,13 @@ const ModalBodyWrapper = ({
   state,
   accountId,
   dynamicRegistrationWizardService,
+  lti1p3RegistrationWizardService,
   jsonUrlWizardService,
 }: {
   state: RegistrationWizardModalState & RegistrationWizardModalStateActions
   accountId: AccountId
   dynamicRegistrationWizardService: DynamicRegistrationWizardService
+  lti1p3RegistrationWizardService: Lti1p3RegistrationWizardService
   jsonUrlWizardService: JsonUrlWizardService
 }) => {
   if (state.registering) {
@@ -125,6 +130,7 @@ const ModalBodyWrapper = ({
       return (
         <Lti1p3RegistrationWizard
           accountId={accountId}
+          service={lti1p3RegistrationWizardService}
           internalConfiguration={state.jsonFetch.result.data}
           unifiedToolId={state.unifiedToolId}
           onSuccessfulRegistration={() => {
@@ -158,6 +164,7 @@ const ModalBodyWrapper = ({
       return (
         <Lti1p3RegistrationWizard
           accountId={accountId}
+          service={lti1p3RegistrationWizardService}
           internalConfiguration={{
             title: state.manualAppName.trim(),
             target_link_uri: '',

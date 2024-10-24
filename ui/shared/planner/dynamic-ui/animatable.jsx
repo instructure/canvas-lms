@@ -56,6 +56,7 @@ export function animatable(WrappedComponent) {
     render() {
       return (
         <WrappedComponent
+          ref={this.props.innerRef}
           {...this.props}
           registerAnimatable={this.registerAnimatable}
           deregisterAnimatable={this.deregisterAnimatable}

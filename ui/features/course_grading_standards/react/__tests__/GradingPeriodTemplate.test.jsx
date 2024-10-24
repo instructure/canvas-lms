@@ -17,6 +17,7 @@
  */
 
 import React from 'react';
+import { createRoot } from 'react-dom/client';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import GradingPeriodTemplate from '../gradingPeriodTemplate';
@@ -43,6 +44,38 @@ const defaultProps = {
 function renderComponent(props = {}) {
   return render(<GradingPeriodTemplate {...{ ...defaultProps, ...props }} />);
 }
+
+describe('custom prop validation for editable periods', () => {
+  let consoleErrorSpy;
+  function render(props = {}) {
+    const root = createRoot(document.createElement('div'));
+    const component = <GradingPeriodTemplate {...{ ...defaultProps, ...props }} />;
+    root.render(component);
+  }
+
+  beforeEach(() => {
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation((error) => {console.log(error);});
+  });
+
+  afterEach(() => {
+    consoleErrorSpy.mockRestore();
+  });
+
+  it('does not warn of invalid props if all required props are present and of the correct type', () => {
+    render();
+    expect(consoleErrorSpy).not.toHaveBeenCalled();
+  });
+
+  it('warns if required props are missing', () => {
+    render({ disabled: null });
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('warns if required props are of the wrong type', () => {
+    render({ onDeleteGradingPeriod: 'invalid-type' });
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+  });
+});
 
 describe('GradingPeriod with read-only permissions', () => {
   const readOnlyProps = {
@@ -172,29 +205,3 @@ describe('editable GradingPeriod', () => {
   });
 });
 
-describe('custom prop validation for editable periods', () => {
-  let consoleErrorSpy;
-
-  beforeEach(() => {
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    consoleErrorSpy.mockRestore();
-  });
-
-  it('does not warn of invalid props if all required props are present and of the correct type', () => {
-    renderComponent();
-    expect(consoleErrorSpy).not.toHaveBeenCalled();
-  });
-
-  it('warns if required props are missing', () => {
-    renderComponent({ disabled: null });
-    expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
-  });
-
-  it('warns if required props are of the wrong type', () => {
-    renderComponent({ onDeleteGradingPeriod: 'invalid-type' });
-    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
-  });
-});

@@ -32,7 +32,7 @@ import {getGradingRubricContexts, getGradingRubricsForContext} from '../queries'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {RadioInput} from '@instructure/ui-radio-input'
 import type {GradingRubricContext} from '../types/rubricAssignment'
-import type {Rubric} from '../../types/rubric'
+import type {Rubric, RubricAssociation} from '../../types/rubric'
 import {possibleString} from '../../Points'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
@@ -43,7 +43,7 @@ type RubricSearchTrayProps = {
   isOpen: boolean
   onPreview: (rubric: Rubric) => void
   onDismiss: () => void
-  onAddRubric: (rubricId?: string) => void
+  onAddRubric: (rubricId: string, updatedAssociation: RubricAssociation) => void
 }
 export const RubricSearchTray = ({
   courseId,
@@ -54,55 +54,22 @@ export const RubricSearchTray = ({
 }: RubricSearchTrayProps) => {
   const [search, setSearch] = useState<string>('')
   const [selectedContext, setSelectedContext] = useState<string>()
-  const [selectedAssociationId, setSelectedAssociationId] = useState<string>()
+  const [selectedAssociation, setSelectedAssociation] = useState<RubricAssociation>()
   const [selectedRubricId, setSelectedRubricId] = useState<string>()
 
   useEffect(() => {
     if (isOpen) {
       setSearch('')
-      setSelectedAssociationId(undefined)
+      setSelectedAssociation(undefined)
       setSelectedRubricId(undefined)
     }
   }, [isOpen])
 
-  const {data: rubricContexts = []} = useQuery({
-    queryKey: [`fetch-grading-rubric-contexts-${courseId}`],
-    queryFn: async () => getGradingRubricContexts(courseId),
-    enabled: !!courseId,
-    onSuccess: async successResponse => {
-      setSelectedContext(successResponse[0]?.context_code)
-    },
-  })
-
-  const {data: rubricsForContext = [], isLoading: isRubricsLoading} = useQuery({
-    queryKey: ['fetch-grading-rubrics-for-context', courseId, selectedContext],
-    queryFn: async () => getGradingRubricsForContext(courseId, selectedContext),
-    enabled: !!courseId && !!selectedContext,
-  })
-
-  const contextPrefix = (contextCode: string) => {
-    if (contextCode.startsWith('account_')) {
-      return I18n.t('Account')
-    } else if (contextCode.startsWith('course_')) {
-      return I18n.t('Course')
-    }
-
-    return ''
-  }
-
-  const getContextName = (context: GradingRubricContext) => {
-    return `${context.name} (${contextPrefix(context.context_code)})`
-  }
-
   const handleChangeContext = (contextCode: string) => {
     setSelectedContext(contextCode)
-    setSelectedAssociationId(undefined)
+    setSelectedAssociation(undefined)
     setSelectedRubricId(undefined)
   }
-
-  const filteredContextRubrics = rubricsForContext?.filter(({rubric}) =>
-    rubric.title.toLowerCase().includes(search.toLowerCase())
-  )
 
   return (
     <Tray
@@ -140,28 +107,14 @@ export const RubricSearchTray = ({
         />
       </View>
 
-      {!rubricContexts ? (
-        <LoadingIndicator />
-      ) : (
+      {isOpen && (
         <View as="div" margin="medium 0 0" padding="0 small">
-          <SimpleSelect
-            renderLabel={
-              <ScreenReaderContent>{I18n.t('select account or course')}</ScreenReaderContent>
-            }
-            value={selectedContext}
-            onChange={(_, {value}) => handleChangeContext(value as string)}
-            data-testid="rubric-context-select"
-          >
-            {rubricContexts.map(context => (
-              <SimpleSelect.Option
-                key={context.context_code}
-                id={`opt-${context.context_code}`}
-                value={context.context_code}
-              >
-                {getContextName(context)}
-              </SimpleSelect.Option>
-            ))}
-          </SimpleSelect>
+          <RubricContextSelect
+            courseId={courseId}
+            selectedContext={selectedContext}
+            handleChangeContext={handleChangeContext}
+            setSelectedContext={setSelectedContext}
+          />
 
           <View
             as="div"
@@ -171,21 +124,20 @@ export const RubricSearchTray = ({
             padding="small 0"
             overflowY="auto"
           >
-            {isRubricsLoading ? (
-              <LoadingIndicator />
+            {selectedContext ? (
+              <RubricsForContext
+                courseId={courseId}
+                selectedAssociation={selectedAssociation}
+                selectedContext={selectedContext}
+                search={search}
+                onPreview={onPreview}
+                onSelect={(rubricAssociation, rubricId) => {
+                  setSelectedAssociation(rubricAssociation)
+                  setSelectedRubricId(rubricId)
+                }}
+              />
             ) : (
-              filteredContextRubrics?.map(({rubricAssociationId, rubric}) => (
-                <RubricSearchRow
-                  key={rubricAssociationId}
-                  rubric={rubric}
-                  checked={rubricAssociationId === selectedAssociationId}
-                  onPreview={onPreview}
-                  onSelect={() => {
-                    setSelectedAssociationId(rubricAssociationId)
-                    setSelectedRubricId(rubric.id)
-                  }}
-                />
-              ))
+              <LoadingIndicator />
             )}
           </View>
         </View>
@@ -195,11 +147,122 @@ export const RubricSearchTray = ({
         <View as="hr" margin="0" />
         <RubricSearchFooter
           disabled={!selectedRubricId}
-          onSubmit={() => onAddRubric(selectedRubricId)}
+          onSubmit={() => {
+            if (!selectedRubricId || !selectedAssociation) return
+
+            onAddRubric(selectedRubricId, selectedAssociation)
+          }}
           onCancel={onDismiss}
         />
       </View>
     </Tray>
+  )
+}
+
+type RubricContextSelectProps = {
+  courseId: string
+  selectedContext?: string
+  handleChangeContext: (context: string) => void
+  setSelectedContext: (context: string) => void
+}
+const RubricContextSelect = ({
+  courseId,
+  selectedContext,
+  handleChangeContext,
+  setSelectedContext,
+}: RubricContextSelectProps) => {
+  const {data: rubricContexts = [], isLoading} = useQuery({
+    queryKey: ['fetchGradingRubricContexts', courseId],
+    queryFn: getGradingRubricContexts,
+    fetchAtLeastOnce: true,
+    onSuccess: successResponse => {
+      setSelectedContext(successResponse[0]?.context_code)
+    },
+  })
+
+  const contextPrefix = (contextCode: string) => {
+    if (contextCode.startsWith('account_')) {
+      return I18n.t('Account')
+    } else if (contextCode.startsWith('course_')) {
+      return I18n.t('Course')
+    }
+
+    return ''
+  }
+
+  const getContextName = (context: GradingRubricContext) => {
+    return `${context.name} (${contextPrefix(context.context_code)})`
+  }
+
+  if (isLoading && !rubricContexts) {
+    return <LoadingIndicator />
+  }
+
+  return (
+    <SimpleSelect
+      renderLabel={<ScreenReaderContent>{I18n.t('select account or course')}</ScreenReaderContent>}
+      value={selectedContext}
+      onChange={(_, {value}) => handleChangeContext(value as string)}
+      data-testid="rubric-context-select"
+    >
+      {rubricContexts.map(context => (
+        <SimpleSelect.Option
+          key={context.context_code}
+          id={`opt-${context.context_code}`}
+          value={context.context_code}
+        >
+          {getContextName(context)}
+        </SimpleSelect.Option>
+      ))}
+    </SimpleSelect>
+  )
+}
+
+type RubricsForContextProps = {
+  courseId: string
+  selectedAssociation?: RubricAssociation
+  selectedContext: string
+  search: string
+  onPreview: (rubric: Rubric) => void
+  onSelect: (rubricAssociation: RubricAssociation, rubricId: string) => void
+}
+const RubricsForContext = ({
+  courseId,
+  selectedAssociation,
+  selectedContext,
+  search,
+  onPreview,
+  onSelect,
+}: RubricsForContextProps) => {
+  const {data: rubricsForContext = [], isLoading: isRubricsLoading} = useQuery({
+    queryKey: ['fetchGradingRubricsForContext', courseId, selectedContext],
+    queryFn: getGradingRubricsForContext,
+    staleTime: 0,
+    fetchAtLeastOnce: true,
+  })
+
+  if (isRubricsLoading) {
+    return <LoadingIndicator />
+  }
+
+  const filteredContextRubrics = rubricsForContext?.filter(({rubric}) =>
+    rubric.title.toLowerCase().includes(search.toLowerCase())
+  )
+
+  return (
+    <>
+      {filteredContextRubrics?.map(({rubricAssociation, rubric}) => (
+        <RubricSearchRow
+          key={rubricAssociation.id}
+          rubric={rubric}
+          checked={selectedAssociation?.id === rubricAssociation.id}
+          onPreview={onPreview}
+          onSelect={() => {
+            onSelect(rubricAssociation, rubric.id)
+          }}
+        />
+      ))}
+    </>
   )
 }
 

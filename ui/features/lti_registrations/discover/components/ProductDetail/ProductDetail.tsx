@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import {useLocation, useNavigate} from 'react-router-dom'
-import {fetchProducts} from '../../queries/productsQuery'
+import {fetchProducts} from '../../../../../shared/lti-apps/queries/productsQuery'
 import {useQuery} from '@tanstack/react-query'
 import useProduct from './useProduct'
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
@@ -28,9 +28,11 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {Tag} from '@instructure/ui-tag'
+import {View} from '@instructure/ui-view'
+import {IconExternalLinkLine} from '@instructure/ui-icons/es/IconExternalLinkLine'
 import {Button} from '@instructure/ui-buttons'
 import GenericErrorPage from '@canvas/generic-error-page/react'
-import TruncateWithTooltip from '../common/TruncateWithTooltip'
+import TruncateWithTooltip from '../../../../../shared/lti-apps/components/common/TruncateWithTooltip'
 import {
   IconA11yLine,
   IconExpandStartLine,
@@ -39,19 +41,24 @@ import {
   IconQuizTitleLine,
 } from '@instructure/ui-icons'
 import LtiDetailModal from './LtiDetailModal'
+import IntegrationDetailModal from './IntegrationDetailModal'
 import ProductCarousel from '../common/Carousels/ProductCarousel'
 import ImageCarousel from '../common/Carousels/ImageCarousel'
 import BadgeCarousel from '../common/Carousels/BadgeCarousel'
+import Disclaimer from '../../../../../shared/lti-apps/components/common/Disclaimer'
 
 import {openDynamicRegistrationWizard} from '../../../manage/registration_wizard/RegistrationWizardModalState'
 
-import type {DiscoverParams} from '../useDiscoverQueryParams'
+import type {DiscoverParams} from '../../../../../shared/lti-apps/hooks/useDiscoverQueryParams'
 
 const I18n = useI18nScope('lti_registrations')
 
 const ProductDetail = () => {
   const [isModalOpen, setModalOpen] = useState(false)
   const [clickedLtiTitle, setClickedLtiTitle] = useState('')
+  const [isIntDetailModalOpen, setIntDetailModalOpen] = useState(false)
+  const [intDetailTitle, setIntDetailTitle] = useState('')
+  const [intDetailContent, setIntDetailContent] = useState('')
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -124,6 +131,63 @@ const ProductDetail = () => {
   const dynamicRegistrationInformation = product?.tool_integration_configurations?.lti_13?.find(
     configuration => configuration.integration_type === 'lti_13_dynamic_registration'
   )
+
+  const intDetailClickHandler = (title: string, content: string) => {
+    setIntDetailModalOpen(true)
+    setIntDetailTitle(title)
+    setIntDetailContent(content)
+  }
+
+  const hasIntegrationResources = product?.integration_resources.resources?.length > 0
+
+  const renderIntegrationResources = () => {
+    if (!product) return null
+
+    const {comments, resources} = product.integration_resources
+
+    const renderComments = comments ? (
+      <Flex>
+        <Flex.Item direction="row">
+          <Text dangerouslySetInnerHTML={{__html: comments || ''}} />
+        </Flex.Item>
+      </Flex>
+    ) : null
+
+    const renderResources =
+      resources?.length === 0 ? (
+        <Flex.Item margin="small 0 large 0">
+          <Text>The tool provider did not include implementation resources for this tool.</Text>
+        </Flex.Item>
+      ) : (
+        resources?.map((resource, i) => (
+          <Flex.Item margin="0 0 large 0" key={`${i + 1}`}>
+            <Link
+              style={{alignItems: 'center', display: 'flex'}}
+              onClick={() => {
+                intDetailClickHandler(resource.name, resource.content)
+              }}
+              isWithinText={false}
+            >
+              <Text weight="bold">{resource.name}</Text>
+              <View margin="0 0 0 x-small">
+                <IconExternalLinkLine width={18} height={18} />
+              </View>
+            </Link>
+
+            <div>
+              <Text>{resource.description}</Text>
+            </div>
+          </Flex.Item>
+        ))
+      )
+
+    return (
+      <>
+        {renderComments}
+        {renderResources}
+      </>
+    )
+  }
 
   if (isError) {
     return <ErrorPage />
@@ -301,6 +365,29 @@ const ProductDetail = () => {
                 companyName={product.company.name}
               />
             )}
+
+            {hasIntegrationResources && (
+              <>
+                <Flex>
+                  <Flex.Item margin="medium 0 0 0">
+                    <Text weight="bold" size="x-large">
+                      {I18n.t('Implementation Resources')}
+                    </Text>
+                  </Flex.Item>
+                </Flex>
+                <Flex direction="column">{renderIntegrationResources()}</Flex>
+              </>
+            )}
+
+            {(excludeCurrentProduct?.length ?? 0) > 0 && (
+              <ProductCarousel
+                products={excludeCurrentProduct}
+                companyName={product.company.name}
+              />
+            )}
+            <div style={{marginTop: '35px'}}>
+              <Disclaimer />
+            </div>
           </>
         )
       )}
@@ -309,6 +396,12 @@ const ProductDetail = () => {
         integrationData={product?.lti_configurations}
         isModalOpen={isModalOpen}
         setModalOpen={setModalOpen}
+      />
+      <IntegrationDetailModal
+        title={intDetailTitle}
+        content={intDetailContent}
+        isModalOpen={isIntDetailModalOpen}
+        setModalOpen={setIntDetailModalOpen}
       />
     </div>
   )

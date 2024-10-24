@@ -133,5 +133,13 @@ module FeatureFlags
         transitions["on"]["message"] = I18n.t("The LTI Extensions Discover page won't be accessible unless the LTI Registrations page is enabled")
       end
     end
+
+    def self.assignment_enhancements_prereq_for_stickers_hook(_user, context, _old_state, new_state)
+      return if context.feature_allowed?(:assignments_2_student)
+
+      new_state["on"] ||= {}
+      new_state["on"]["locked"] = true
+      new_state["on"]["warning"] = I18n.t("'Assignment Enhancements - Student' must first be enabled in order to enable 'Submission Stickers'")
+    end
   end
 end

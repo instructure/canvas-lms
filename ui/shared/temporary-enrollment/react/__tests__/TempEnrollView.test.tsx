@@ -22,17 +22,21 @@ import {
   TempEnrollView,
 } from '../TempEnrollView'
 import React from 'react'
-import {fireEvent, render, screen, waitFor} from '@testing-library/react'
+import {fireEvent, render, screen, waitFor, act} from '@testing-library/react'
 import {type Enrollment, ITEMS_PER_PAGE, PROVIDER, RECIPIENT, type User} from '../types'
 import fetchMock from 'fetch-mock'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 
-const renderView = (props: any) => {
-  const result = render(
-    <QueryProvider>
-      <TempEnrollView {...props} />
-    </QueryProvider>
-  )
+const renderView = async (props: any) => {
+  let result!: ReturnType<typeof render>
+  await act(async () => {
+    result = render(
+      <MockedQueryProvider>
+        <TempEnrollView {...props} />
+      </MockedQueryProvider>
+    )
+  })
   return result
 }
 
@@ -93,7 +97,7 @@ describe('TempEnrollView component', () => {
         link: '<current_url>; rel="current"',
       },
     })
-    const container = renderView(props).container
+    const container = (await renderView(props)).container
 
     expect(await screen.findByText(props.user.name)).toBeInTheDocument()
 
@@ -113,7 +117,7 @@ describe('TempEnrollView component', () => {
           link: '<current_url>; rel="current"',
         },
       })
-      renderView(props)
+      await renderView(props)
 
       expect(await screen.findByText('Recipient Name')).toBeInTheDocument()
       expect(screen.getByText('Recipient Enrollment Period')).toBeInTheDocument()
@@ -129,7 +133,7 @@ describe('TempEnrollView component', () => {
           link: '<current_url>; rel="current"',
         },
       })
-      renderView({...props, enrollmentType: RECIPIENT})
+      await renderView({...props, enrollmentType: RECIPIENT})
 
       expect(await screen.findByText('Provider Name')).toBeInTheDocument()
       expect(screen.getByText('Recipient Enrollment Period')).toBeInTheDocument()
@@ -147,13 +151,13 @@ describe('TempEnrollView component', () => {
       })
       const newProps = {
         ...props,
-        tempEnrollPermissions: {
-          ...props.modifyPermissions,
-          canEdit: false,
+        modifyPermissions: {
+          canAdd: false,
           canDelete: false,
+          canEdit: false,
         },
       }
-      renderView(newProps)
+      await renderView(newProps)
 
       expect(
         await waitFor(() => screen.queryByText('Temporary enrollment option links'))
@@ -176,7 +180,7 @@ describe('TempEnrollView component', () => {
         },
       })
 
-      const {findByText} = renderView(props)
+      const {findByText} = await renderView(props)
       expect(await findByText('Future')).toBeInTheDocument()
     })
 
@@ -194,7 +198,7 @@ describe('TempEnrollView component', () => {
         },
       })
 
-      const {findByText} = renderView(props)
+      const {findByText} = await renderView(props)
       expect(await findByText('Active')).toBeInTheDocument()
     })
 
@@ -210,7 +214,7 @@ describe('TempEnrollView component', () => {
         },
       })
 
-      const {findByText} = renderView(props)
+      const {findByText} = await renderView(props)
       expect(await findByText('Active')).toBeInTheDocument()
     })
   })
@@ -226,7 +230,7 @@ describe('TempEnrollView component', () => {
     })
 
     it('shows Edit and Delete buttons based on canEdit and canDelete', async () => {
-      renderView(props)
+      await renderView(props)
 
       expect(await screen.findByTestId('edit-button')).toBeInTheDocument()
       expect(await screen.findByTestId('delete-button')).toBeInTheDocument()
@@ -241,7 +245,7 @@ describe('TempEnrollView component', () => {
         },
       }
 
-      renderView(newProps)
+      await renderView(newProps)
 
       expect(await screen.findByTestId('delete-button')).toBeInTheDocument()
       expect(screen.queryByTestId('edit-button')).not.toBeInTheDocument()
@@ -256,14 +260,14 @@ describe('TempEnrollView component', () => {
         },
       }
 
-      renderView(newProps)
+      await renderView(newProps)
 
       expect(await screen.findByTestId('edit-button')).toBeInTheDocument()
       expect(screen.queryByTestId('delete-button')).not.toBeInTheDocument()
     })
 
     it('shows "Add New" button based on canAdd and enrollmentType', async () => {
-      renderView(props)
+      await renderView(props)
 
       expect(await screen.findByTestId('add-button')).toBeInTheDocument()
     })
@@ -280,7 +284,7 @@ describe('TempEnrollView component', () => {
         },
       })
 
-      renderView(newProps)
+      await renderView(newProps)
 
       await waitFor(() => expect(screen.queryByTestId('add-button')).not.toBeInTheDocument())
     })
@@ -294,7 +298,7 @@ describe('TempEnrollView component', () => {
         },
       }
 
-      renderView(newProps)
+      await renderView(newProps)
 
       await waitFor(() => expect(screen.queryByTestId('add-button')).not.toBeInTheDocument())
     })
@@ -312,7 +316,7 @@ describe('TempEnrollView component', () => {
 
     describe('edit', () => {
       it('calls onEdit with correct enrollment data when clicked', async () => {
-        renderView(props)
+        await renderView(props)
         await waitFor(() => fireEvent.click(screen.getByTestId('edit-button')))
         expect(props.onEdit).toHaveBeenCalledWith(defaultEnrollment.user, [defaultEnrollment])
       })
@@ -328,20 +332,20 @@ describe('TempEnrollView component', () => {
       })
 
       it('opens a confirmation dialog when delete button is clicked', async () => {
-        renderView(props)
+        await renderView(props)
         await waitFor(() => fireEvent.click(screen.getByTestId('delete-button')))
         expect(window.confirm).toHaveBeenCalled()
       })
 
       it('does not perform deletion if user cancels confirmation', async () => {
         window.confirm = jest.fn(() => false)
-        renderView(props)
+        await renderView(props)
         await waitFor(() => fireEvent.click(screen.getByTestId('delete-button')))
         expect(await screen.findByText('Recipient User')).toBeInTheDocument()
       })
 
       it('alerts when deletion is successful after confirming', async () => {
-        renderView(props)
+        await renderView(props)
         await waitFor(() => fireEvent.click(screen.getByTestId('delete-button')))
         await waitFor(() =>
           expect(
@@ -353,7 +357,7 @@ describe('TempEnrollView component', () => {
 
     describe('add new', () => {
       it('calls onAddNew when clicked', async () => {
-        renderView(props)
+        await renderView(props)
         await waitFor(() => fireEvent.click(screen.getByTestId('add-button')))
 
         expect(props.onAddNew).toHaveBeenCalled()

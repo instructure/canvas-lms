@@ -132,7 +132,7 @@ module AccountReports
   end
 
   def self.retry_exception?(exception)
-    exception.is_a?(PG::ConnectionBad)
+    [PG::ConnectionBad, ActiveRecord::ConnectionFailed].any? { |e| exception.is_a?(e) }
   end
 
   def self.report_on_exception(exception, context, level: :error)

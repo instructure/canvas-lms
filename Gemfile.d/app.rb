@@ -45,7 +45,7 @@ gem "aws-sdk-sagemakerruntime", "~> 1.61", require: false
 gem "rqrcode", "~> 2.2", require: false
 gem "bcrypt", "~> 3.1"
 gem "bigdecimal", "~> 3.1"
-gem "browser", "~> 5.3", require: false
+gem "browser", "~> 6.0", require: false
 gem "business_time", "0.13.0"
 gem "canvas_connect", "0.3.16"
 gem "canvas_link_migrator", "~> 1.0.14"
@@ -79,6 +79,7 @@ gem "link_header", "0.0.8"
 gem "marginalia", "1.11.1", require: false
 gem "method_source", "~> 1.1"
 gem "mime-types", "~> 3.5"
+gem "mimemagic", "~> 0.4.3"
 gem "mini_magick", "~> 5.0"
 gem "multi_json", "1.15.0"
 gem "net-http", "~> 0.1", require: false

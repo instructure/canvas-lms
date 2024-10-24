@@ -35,6 +35,7 @@ export type RubricAssociation = {
   hidePoints: boolean
   hideScoreTotal: boolean
   useForGrading: boolean
+  hideOutcomeResults: boolean
   id: string
 }
 

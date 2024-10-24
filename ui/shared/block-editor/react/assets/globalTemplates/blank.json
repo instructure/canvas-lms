@@ -1,0 +1,95 @@
+{
+  "name": "Blank",
+  "description": "A blank section can support up to 4 columns. Block types can be added to blank sections to build a custom section.",
+  "template_type": "section",
+  "node_tree": {
+    "rootNodeId": "pEdeFvz6_0",
+    "nodes": {
+      "pEdeFvz6_0": {
+        "type": {
+          "resolvedName": "ColumnsSection"
+        },
+        "isCanvas": false,
+        "props": {
+          "columns": 1
+        },
+        "displayName": "Blank Section",
+        "custom": {
+          "isSection": true
+        },
+        "parent": "ROOT",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "columns__inner": "ax57suVCfC"
+        }
+      },
+      "ax57suVCfC": {
+        "type": {
+          "resolvedName": "ColumnsSectionInner"
+        },
+        "isCanvas": true,
+        "props": {},
+        "displayName": "Columns Inner",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "pEdeFvz6_0",
+        "hidden": false,
+        "nodes": [
+          "wasLLTTys-"
+        ],
+        "linkedNodes": {}
+      },
+      "wasLLTTys-": {
+        "type": {
+          "resolvedName": "GroupBlock"
+        },
+        "isCanvas": true,
+        "props": {
+          "alignment": "start",
+          "verticalAlignment": "start",
+          "layout": "column",
+          "resizable": false,
+          "isColumn": true,
+          "id": "columns-pEdeFvz6_0-1"
+        },
+        "displayName": "Group",
+        "custom": {
+          "isResizable": false,
+          "isBlock": true,
+          "isExpanded": false,
+          "displayName": "Column"
+        },
+        "parent": "ax57suVCfC",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "group__inner": "le254LKmwg"
+        }
+      },
+      "le254LKmwg": {
+        "type": {
+          "resolvedName": "NoSections"
+        },
+        "isCanvas": true,
+        "props": {
+          "className": "",
+          "placeholderText": "Drop a block to add it here"
+        },
+        "displayName": "NoSections",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "wasLLTTys-",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      }
+    }
+  },
+  "workflow_state": "active",
+  "thumbnail": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARAAAABXCAYAAADMIBp1AAAAAXNSR0IArs4c6QAAAoJJREFUeF7t1DsKw0AQBUFvLHz/gxrFI3DkH3jpuBSKfUkx9JqZufkIECAQBJaABDUTAgSeAgLiEAgQyAICkukMCRD4CsjjPKkQIEDgp8D9ON7+C4hDIUBgW0BAtqk8JEDgU0BA3AQBAllAQDKdIQECAuIGCBDIAgKS6QwJEBAQN0CAQBYQkExnSICAgLgBAgSygIBkOkMCBATEDRAgkAUEJNMZEiAgIG6AAIEsICCZzpAAAQFxAwQIZAEByXSGBAgIiBsgQCALCEimMyRAQEDcAAECWUBAMp0hAQIC4gYIEMgCApLpDAkQEBA3QIBAFhCQTGdIgICAuAECBLKAgGQ6QwIEBMQNECCQBQQk0xkSICAgboAAgSwgIJnOkAABAXEDBAhkAQHJdIYECAiIGyBAIAsISKYzJEBAQNwAAQJZQEAynSEBAgLiBggQyAICkukMCRAQEDdAgEAWEJBMZ0iAgIC4AQIEsoCAZDpDAgQExA0QIJAFBCTTGRIgICBugACBLCAgmc6QAAEBcQMECGQBAcl0hgQICIgbIEAgCwhIpjMkQEBA3AABAllAQDKdIQECAuIGCBDIAgKS6QwJEBAQN0CAQBYQkExnSICAgLgBAgSygIBkOkMCBATEDRAgkAUEJNMZEiAgIG6AAIEsICCZzpAAAQFxAwQIZAEByXSGBAgIiBsgQCALCEimMyRAQEDcAAECWUBAMp0hAQIC4gYIEMgCApLpDAkQEBA3QIBAFhCQTGdIgICAuAECBLKAgGQ6QwIEBMQNECCQBQQk0xkSICAgboAAgSwgIJnOkACBvwFBRIAAgV2BNTOz+9g7AgQIvAoIiHsgQCALCEimMyRA4AKST0gaxlj/4wAAAABJRU5ErkJggg==",
+  "id": "7a100cf4-10fc-449b-9fcb-b0f5f71d2406",
+  "global_id": "7a100cf4-10fc-449b-9fcb-b0f5f71d2406"
+}

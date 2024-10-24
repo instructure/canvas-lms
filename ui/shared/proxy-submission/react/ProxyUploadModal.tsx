@@ -17,7 +17,7 @@
  */
 
 import React, {useRef, useState} from 'react'
-import {useMutation} from 'react-apollo'
+import {useMutation} from '@apollo/react-hooks'
 import {CREATE_SUBMISSION} from '@canvas/assignments/graphql/student/Mutations'
 import axios from '@canvas/axios'
 import {useScope as useI18nScope} from '@canvas/i18n'

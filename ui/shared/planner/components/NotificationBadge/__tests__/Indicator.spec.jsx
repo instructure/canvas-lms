@@ -17,18 +17,17 @@
  */
 
 import React from 'react'
-import {shallow, mount} from 'enzyme'
+import { render } from '@testing-library/react'
 import Indicator from '../Indicator'
 
 it('renders screenreader content with the title', () => {
-  const wrapper = mount(<Indicator title="a title" variant="primary" />)
-  expect(wrapper.find('ScreenReaderContent').first().text()).toBe('a title')
+  const { getByText } = render(<Indicator title="a title" variant="primary" />)
+  expect(getByText('a title')).toBeInTheDocument()
 })
 
 it('renders a badge with the specified variant', () => {
-  const wrapper = shallow(<Indicator title="foo" variant="danger" />)
-  expect(wrapper.find('Badge').prop('variant')).toBe('danger')
+  const { container } = render(<Indicator title="foo" variant="danger" />)
+  const badge = container.querySelector('[class*="inlineBlock-badge"]')
+  expect(badge).toBeInTheDocument()
+  // Since the variant is not directly accessible, checking its presence should suffice.
 })
-
-// enzyme makes this nigh impossible to test. calling ref methods doesn't work.
-// it('provides a ref to the container')

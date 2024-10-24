@@ -180,6 +180,10 @@ module Api::V1::Assignment
       hash["checkpoints"] = assignment.sub_assignments.map { |sub_assignment| Checkpoint.new(sub_assignment, user).as_json }
     end
 
+    if assignment.checkpoint?
+      hash["sub_assignment_tag"] = assignment.sub_assignment_tag
+    end
+
     if opts[:overrides].present?
       hash["overrides"] = assignment_overrides_json(opts[:overrides], user)
     elsif opts[:include_overrides]

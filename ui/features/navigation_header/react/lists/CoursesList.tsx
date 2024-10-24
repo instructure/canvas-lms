@@ -32,7 +32,9 @@ export default function CoursesList() {
   const {data, isLoading, isSuccess} = useQuery({
     queryKey: ['courses'],
     queryFn: coursesQuery,
-    fetchAtLeastOnce: true,
+    meta: {
+      fetchAtLeastOnce: true,
+    },
     select: courses => courses.filter(hideHomeroomCourseIfK5Student),
   })
 

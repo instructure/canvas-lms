@@ -731,6 +731,15 @@ describe GroupCategory do
       expect(another_category.reload.non_collaborative).to be false
     end
 
+    it "can filter out collaborative and noncollaborative groups" do
+      non_collaborative_group_category = GroupCategory.create(name: "Test Category", context: @course, non_collaborative: true)
+      collaborative_group_category = GroupCategory.create(name: "Test Category 2", context: @course, non_collaborative: false)
+
+      expect(GroupCategory.non_collaborative).to eq [non_collaborative_group_category]
+      expect(GroupCategory.collaborative).to include(collaborative_group_category)
+      expect(GroupCategory.collaborative).not_to include(non_collaborative_group_category)
+    end
+
     it "can only be created for courses" do
       course_category = GroupCategory.new(name: "Course Category", context: @course, non_collaborative: true)
       expect(course_category).to be_valid
@@ -751,6 +760,42 @@ describe GroupCategory do
 
       normal = GroupCategory.new(name: "Normal", context: @course, non_collaborative: true)
       expect(normal).to be_valid
+    end
+
+    context "permissions" do
+      before do
+        @course = Course.create!(name: "Test Course")
+        @teacher1 = User.create!(name: "Teacher 1")
+        @teacher2 = User.create!(name: "Teacher 2")
+        @student = User.create!(name: "Student")
+        teacher_in_course(course: @course, user: @teacher1, active_all: true)
+        teacher_in_course(course: @course, user: @teacher2, active_all: true)
+        student_in_course(course: @course, user: @student, active_all: true)
+
+        @category = GroupCategory.create!(name: "Test Category", context: @course)
+        @relevant_permissions = %i[read]
+      end
+
+      it "does not grant read permissions if non_collaborative and user lacks manage_groups rights" do
+        @category.update!(non_collaborative: true)
+        allow(@course).to receive(:grants_any_right?).with(@teacher2, anything, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS).and_return(false)
+
+        expect(@category.check_policy(@teacher2) & @relevant_permissions).to be_empty
+      end
+
+      it "grants read permissions if non_collaborative but user has manage_groups rights" do
+        @category.update!(non_collaborative: true)
+        allow(@course).to receive(:grants_any_right?).with(@teacher2, anything, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS).and_return(true)
+
+        expect(@category.check_policy(@teacher2) & @relevant_permissions).to eq @relevant_permissions
+      end
+
+      it "grants read permissions if not non_collaborative" do
+        @category.update!(non_collaborative: false)
+        allow(@course).to receive(:grants_any_right?).with(@teacher2, anything, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS).and_return(false)
+
+        expect(@category.check_policy(@teacher2) & @relevant_permissions).to eq @relevant_permissions
+      end
     end
   end
 end

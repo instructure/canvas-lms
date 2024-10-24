@@ -19,10 +19,11 @@
 import React from 'react'
 import {render as testingLibraryRender} from '@testing-library/react'
 import AccountsTray from '../AccountsTray'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 const render = (children: unknown) =>
-  testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
+  testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 describe('AccountsTray', () => {
   const data = {

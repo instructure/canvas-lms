@@ -174,7 +174,11 @@ module Importers
         item.group_category = nil
       end
 
-      item.save_without_broadcasting!
+      if migration.send_item_notifications?
+        item.save!
+      else
+        item.save_without_broadcasting!
+      end
       import_migration_item
       item.saved_by = nil
       item

@@ -32,6 +32,7 @@ export const LtiScopes = {
   FeatureFlagsShow: 'https://canvas.instructure.com/lti/feature_flags/scope/show',
   NrpsContextMembershipReadonly:
     'https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly',
+  PnsNoticeHandlers: 'https://purl.imsglobal.org/spec/lti/scope/noticehandlers',
   PublicJwkUpdate: 'https://canvas.instructure.com/lti/public_jwk/scope/update',
   DataServicesCreate: 'https://canvas.instructure.com/lti/data_services/scope/create',
   DataServicesUpdate: 'https://canvas.instructure.com/lti/data_services/scope/update',
@@ -61,6 +62,7 @@ const AllLtiScopes = [
   LtiScopes.AgsProgressShow,
   LtiScopes.FeatureFlagsShow,
   LtiScopes.NrpsContextMembershipReadonly,
+  LtiScopes.PnsNoticeHandlers,
   LtiScopes.PublicJwkUpdate,
   LtiScopes.DataServicesCreate,
   LtiScopes.DataServicesUpdate,

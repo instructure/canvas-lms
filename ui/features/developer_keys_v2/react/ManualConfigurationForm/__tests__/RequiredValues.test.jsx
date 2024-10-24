@@ -90,8 +90,8 @@ it('is valid when valid', () => {
 })
 
 it('is invalid when invalid inputs', () => {
-  const flashError = jest.fn()
   const ref = React.createRef()
+  const flashError = jest.fn()
   render(
     <RequiredValues
       {...props({overrides: {flashError, ref}, configOverrides: {target_link_uri: ''}})}
@@ -102,8 +102,8 @@ it('is invalid when invalid inputs', () => {
 })
 
 it('is invalid when the public JWK is missing a field', () => {
-  const flashError = jest.fn()
   const ref = React.createRef()
+  const flashError = jest.fn()
   const overrides = {
     ref,
     flashError,
@@ -117,10 +117,10 @@ it('is invalid when the public JWK is missing a field', () => {
 })
 
 it('is valid if the public JWK is empty but a URL is given', () => {
+  const ref = React.createRef()
   const flashError = jest.fn()
   const public_jwk = {}
   const public_jwk_url = 'https://www.instructure.com/public_key_url'
-  const ref = React.createRef()
   const overrides = {
     flashError,
     ref,

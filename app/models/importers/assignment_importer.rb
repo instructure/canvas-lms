@@ -209,7 +209,13 @@ module Importers
         item.assignment_overrides.where.not(set_type: AssignmentOverride::SET_TYPE_NOOP).destroy_all
       end
       item.needs_update_cached_due_dates = true if new_record || item.update_cached_due_dates?
-      item.save_without_broadcasting!
+
+      if migration.send_item_notifications?
+        item.save!
+      else
+        item.save_without_broadcasting!
+      end
+
       # somewhere in the callstack, save! will call Quiz#update_assignment, and Rails will have helpfully
       # reloaded the quiz's assignment, so we won't know about the changes to the object (in particular,
       # workflow_state) that it did
@@ -304,8 +310,12 @@ module Importers
       end
 
       if hash[:has_group_category]
-        item.group_category = context.group_categories.active.where(name: hash[:group_category]).first
-        item.group_category ||= context.group_categories.active.where(name: t("Project Groups")).first_or_create
+        if migration.context.feature_enabled?(:migrate_assignment_group_categories)
+          item.group_category = context.group_categories.active.where(name: hash[:group_category]).first_or_create
+        else
+          item.group_category = context.group_categories.active.where(name: hash[:group_category]).first
+          item.group_category ||= context.group_categories.active.where(name: t("Project Groups")).first_or_create
+        end
       end
 
       if hash.key?(:moderated_grading) && context.feature_enabled?(:moderated_grading)

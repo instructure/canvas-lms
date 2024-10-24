@@ -1191,6 +1191,51 @@ Rails.application.config.to_prepare do
         acts_as_access_token_scope: true,
         account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_groups) }
       },
+      manage_tags_add: {
+        label: -> { I18n.t("Add Differentiated Tags") },
+        label_v2: -> { I18n.t("Differentiated Tags - add") },
+        group: "manage_differentiated_tags",
+        group_label: -> { I18n.t("Manage Differentiated Tags") },
+        available_to: %w[
+          TaEnrollment
+          DesignerEnrollment
+          TeacherEnrollment
+          AccountAdmin
+          AccountMembership
+        ],
+        true_for: %w[TeacherEnrollment AccountAdmin],
+        acts_as_access_token_scope: true,
+      },
+      manage_tags_manage: {
+        label: -> { I18n.t("Manage Differentiated Tags") },
+        label_v2: -> { I18n.t("Differentiated Tags - manage") },
+        group: "manage_differentiated_tags",
+        group_label: -> { I18n.t("Manage Differentiated Tags") },
+        available_to: %w[
+          TaEnrollment
+          DesignerEnrollment
+          TeacherEnrollment
+          AccountAdmin
+          AccountMembership
+        ],
+        true_for: %w[TeacherEnrollment AccountAdmin],
+        acts_as_access_token_scope: true,
+      },
+      manage_tags_delete: {
+        label: -> { I18n.t("Delete Differentiated Tags") },
+        label_v2: -> { I18n.t("Differentiated Tags - delete") },
+        group: "manage_differentiated_tags",
+        group_label: -> { I18n.t("Manage Differentiated Tags") },
+        available_to: %w[
+          TaEnrollment
+          DesignerEnrollment
+          TeacherEnrollment
+          AccountAdmin
+          AccountMembership
+        ],
+        true_for: %w[TeacherEnrollment AccountAdmin],
+        acts_as_access_token_scope: true,
+      },
       manage_interaction_alerts: {
         label: -> { I18n.t("permissions.manage_interaction_alerts", "Manage alerts") },
         label_v2: -> { I18n.t("Alerts - add / edit / delete") },
@@ -1804,6 +1849,18 @@ Rails.application.config.to_prepare do
         available_to: %w[AccountAdmin AccountMembership],
         true_for: %w[AccountAdmin],
         account_only: :root
+      },
+      block_editor_template_editor: {
+        label: -> { I18n.t("Block Editor Templates - edit") },
+        available_to: %w[TeacherEnrollment DesignerEnrollment AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin],
+        account_allows: ->(a) { a.feature_enabled?(:block_editor) && a.feature_enabled?(:block_template_editor) }
+      },
+      block_editor_global_template_editor: {
+        label: -> { I18n.t("Block Editor Global Templates - edit") },
+        available_to: %w[TeacherEnrollment DesignerEnrollment AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin],
+        account_allows: ->(a) { a.feature_enabled?(:block_editor) && a.feature_enabled?(:block_template_editor) }
       }
     }
   )

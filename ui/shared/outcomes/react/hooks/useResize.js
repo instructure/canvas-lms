@@ -94,8 +94,7 @@ const useResize = ({minWidth = 100, margin = 12, smallStep = 5, largeStep = 25} 
       containerRef.current.addEventListener('mousedown', onMouseDown)
       containerRef.current.addEventListener('mouseup', onMouseUp)
       containerRef.current.addEventListener('mousemove', onMouseMove)
-    }
-    return () => {
+    } else {
       containerRef.current.removeEventListener('mousedown', onMouseDown)
       containerRef.current.removeEventListener('mouseup', onMouseUp)
       containerRef.current.removeEventListener('mousemove', onMouseMove)

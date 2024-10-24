@@ -259,7 +259,13 @@ module Importers
         if item.changed?
           item.user = nil
         end
-        item.save_without_broadcasting!
+
+        if migration.send_item_notifications?
+          item.save!
+        else
+          item.save_without_broadcasting!
+        end
+
         migration.add_imported_item(item)
         item
       end

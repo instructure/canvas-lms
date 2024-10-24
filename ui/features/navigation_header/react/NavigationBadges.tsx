@@ -45,7 +45,9 @@ export default function NavigationBadges() {
     queryKey: ['settings', 'release_notes_badge_disabled'],
     queryFn: getSetting,
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes,
-    fetchAtLeastOnce: true,
+    meta: {
+      fetchAtLeastOnce: true,
+    },
   })
 
   const {data: unreadContentSharesCount, isSuccess: hasUnreadContentSharesCount} = useQuery({
@@ -61,7 +63,9 @@ export default function NavigationBadges() {
     queryFn: getUnreadCount,
     staleTime: 2 * 60 * 1000, // two minutes
     enabled: countsEnabled && !ENV.current_user_disabled_inbox,
-    broadcast: true,
+    meta: {
+      broadcast: true,
+    },
     refetchOnWindowFocus: true,
   })
 

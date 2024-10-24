@@ -22,7 +22,6 @@ import {Element, useEditor, useNode, type Node} from '@craftjs/core'
 import {Container} from '../../blocks/Container'
 import {ColumnsSectionToolbar} from './ColumnsSectionToolbar'
 import {useClassNames} from '../../../../utils'
-import {SectionMenu} from '../../../editor/SectionMenu'
 import {GroupBlock} from '../../blocks/GroupBlock'
 import {type ColumnsSectionProps} from './types'
 
@@ -51,7 +50,7 @@ export const ColumnsSectionInner = ({children}: ColumnsSectionInnerProps) => {
 }
 
 ColumnsSectionInner.craft = {
-  displayName: 'Columns',
+  displayName: 'Columns Inner',
   rules: {
     canMoveIn: (incomingNodes: Node[]) =>
       incomingNodes.every(incomingNode => incomingNode.data.type === GroupBlock),
@@ -64,38 +63,50 @@ ColumnsSectionInner.craft = {
   },
 }
 
-export const ColumnsSection = (_props: ColumnsSectionProps) => {
+export const ColumnsSection = ({columns}: ColumnsSectionProps) => {
   const {enabled} = useEditor(state => ({
     enabled: state.options.enabled,
   }))
-  const {id, node} = useNode((n: Node) => {
-    return {
-      node: n,
-    }
-  })
   const clazz = useClassNames(enabled, {empty: false}, [
     'section',
     'columns-section',
-    `columns-${node.data.props.columns}`,
+    `columns-${columns}`,
   ])
+
+  // To me, it this makes more sense than to handle adding GroupBlock columns
+  // in the toolbar, but from here it triggers a React warning about updating
+  // a component while rendering it.
+  // Interesting that it does not happen when building against the craft.js dev build.
+  //
+  // useEffect(() => {
+  //   const innerid = query.node(node.id).linkedNodes()[0]
+  //   const inner = query.node(innerid).get()
+
+  //   const missingCols = columns - inner.data.nodes.length
+  //   if (missingCols > 0) {
+  //     for (let i = 0; i < missingCols; i++) {
+  //       requestAnimationFrame(() => {
+  //         const column = query
+  //           .parseReactElement(<GroupBlock resizable={false} isColumn={true} />)
+  //           .toNodeTree()
+  //         actions.addNodeTree(column, inner.id)
+  //       })
+  //     }
+  //   }
+  // }, [actions, columns, node.id, query])
+
+  const renderColumns = () => {
+    const cols = []
+    for (let i = 0; i < columns; i++) {
+      cols.push(<GroupBlock key={i} resizable={false} isColumn={true} />)
+    }
+    return cols
+  }
 
   return (
     <Container className={clazz}>
-      <Element id={`columns-${id}__inner`} is={ColumnsSectionInner} canvas={true}>
-        <Element
-          id={`columns-${id}-1`}
-          is={GroupBlock}
-          canvas={true}
-          resizable={false}
-          isColumn={true}
-        />
-        <Element
-          id={`columns-${id}-2`}
-          is={GroupBlock}
-          canvas={true}
-          resizable={false}
-          isColumn={true}
-        />
+      <Element id="columns__inner" is={ColumnsSectionInner} canvas={true}>
+        {renderColumns()}
       </Element>
     </Container>
   )
@@ -104,7 +115,7 @@ export const ColumnsSection = (_props: ColumnsSectionProps) => {
 ColumnsSection.craft = {
   displayName: I18n.t('Columns'),
   defaultProps: {
-    columns: 2,
+    columns: 1,
   },
   rules: {
     // canMoveIn: (nodes: Node[]) => !nodes.some(node => node.data.custom.isSection || node.data.name !== 'GroupBlock'),
@@ -115,6 +126,5 @@ ColumnsSection.craft = {
   },
   related: {
     toolbar: ColumnsSectionToolbar,
-    sectionMenu: SectionMenu,
   },
 }

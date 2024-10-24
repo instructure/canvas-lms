@@ -17,20 +17,20 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render} from '@testing-library/react'
 import {notifier} from '../notifier'
 import {DynamicUiProvider} from '../provider'
 
 // eslint-disable-next-line react/prefer-stateless-function
 class MockComponent extends React.Component {
   render() {
-    return <div />
+    return <div data-testid="mockcomponent" />
   }
 }
 
 MockComponent.displayName = 'MockComponent'
 
-it('passes trigger property functions and forwards the calls to the dynamic ui manager', () => {
+it('passes trigger property functions and forwards the calls to the dynamic ui manager', async () => {
   const Wrapped = notifier(MockComponent)
   const mockManager = {
     handleAction: jest.fn(),
@@ -40,14 +40,19 @@ it('passes trigger property functions and forwards the calls to the dynamic ui m
     triggerUpdates: jest.fn(),
   }
 
-  const wrapper = mount(
+  const ref = React.createRef()
+
+  const wrapper = render(
     <DynamicUiProvider manager={mockManager}>
-      <Wrapped />
+      <Wrapped forwardedRef={ref} />
     </DynamicUiProvider>
   )
   expect(wrapper).toMatchSnapshot()
 
-  const mockComponentProps = wrapper.find('MockComponent').props()
+  expect(await wrapper.findByTestId('mockcomponent')).toBeInTheDocument()
+
+  const mockComponentProps = ref.current.props
+
   mockComponentProps.preTriggerDynamicUiUpdates('args')
   expect(mockManager.preTriggerUpdates).toHaveBeenCalledWith('args')
   mockComponentProps.triggerDynamicUiUpdates('args')

@@ -374,31 +374,7 @@ module Types
 
     field :ungraded_discussion_overrides, Types::AssignmentOverrideType.connection_type, null: true
     def ungraded_discussion_overrides
-      return nil if object.assignment.present? || object.context_type == "Group" || object.is_announcement || !Account.site_admin.feature_enabled?(:selective_release_ui_api)
-
-      overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(object, current_user)
-
-      # this is a temporary check for any discussion_topic_section_visibilities until we eventually backfill that table
-      if object.is_section_specific
-        section_overrides = object.assignment_overrides.active.where(set_type: "CourseSection").select(:set_id)
-        section_visibilities = object.discussion_topic_section_visibilities.active.where.not(course_section_id: section_overrides)
-      end
-
-      if section_visibilities
-        section_overrides = section_visibilities.map do |section_visibility|
-          assignment_override = AssignmentOverride.new(
-            discussion_topic: section_visibility.discussion_topic,
-            course_section: section_visibility.course_section
-          )
-          assignment_override.unlock_at = object.unlock_at if object.unlock_at
-          assignment_override.lock_at = object.lock_at if object.lock_at
-          assignment_override
-        end
-      end
-
-      all_overrides = overrides.to_a
-      all_overrides += section_overrides if section_visibilities
-      all_overrides
+      object.ungraded_discussion_overrides(current_user)
     end
 
     field :subscription_disabled_for_user, Boolean, null: true
@@ -408,18 +384,31 @@ module Types
       object.subscription_hold(current_user, session)
     end
 
-    def get_entries(search_term: nil, filter: nil, sort_order: :asc, root_entries: false, user_search_id: nil, unread_before: nil)
+    def get_entries(search_term: nil, filter: nil, sort_order: nil, root_entries: false, user_search_id: nil, unread_before: nil)
       return [] if object.initial_post_required?(current_user, session) || !available_for_user
 
-      Loaders::DiscussionEntryLoader.for(
-        current_user:,
-        search_term:,
-        filter:,
-        sort_order:,
-        root_entries:,
-        user_search_id:,
-        unread_before:
-      ).load(object)
+      sort_order(sort: sort_order).then do |resolved_sort_order|
+        Loaders::DiscussionEntryLoader.for(
+          current_user:,
+          search_term:,
+          filter:,
+          sort_order: resolved_sort_order,
+          root_entries:,
+          user_search_id:,
+          unread_before:
+        ).load(object)
+      end
+    end
+
+    field :sort_order, Types::DiscussionSortOrderType, null: true do
+      argument :sort, Types::DiscussionSortOrderType, required: false
+    end
+
+    def sort_order(sort: nil)
+      return sort.to_sym unless sort.nil?
+
+      participant = object.participant(current_user:)
+      participant&.sort_order&.to_sym || DiscussionTopicParticipant::SortOrder::DESC.to_sym
     end
   end
 end

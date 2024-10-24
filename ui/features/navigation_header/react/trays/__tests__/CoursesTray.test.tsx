@@ -19,13 +19,14 @@
 import React from 'react'
 import {render as testingLibraryRender} from '@testing-library/react'
 import CoursesTray from '../CoursesTray'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 
 declare const window: Window & {ENV: GlobalEnv}
 
 const render = (children: unknown) =>
-  testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
+  testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 describe('CoursesTray', () => {
   const courses = [

@@ -22,7 +22,8 @@ import ItemAssignToCard, {type ItemAssignToCardProps} from '../ItemAssignToCard'
 import {SECTIONS_DATA, STUDENTS_DATA} from '../../__tests__/mocks'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 const props: ItemAssignToCardProps = {
   courseId: '1',
@@ -44,9 +45,9 @@ const props: ItemAssignToCardProps = {
 
 const renderComponent = (overrides: Partial<ItemAssignToCardProps> = {}) =>
   render(
-    <QueryProvider>
+    <MockedQueryProvider>
       <ItemAssignToCard {...props} {...overrides} />
-    </QueryProvider>
+    </MockedQueryProvider>
   )
 
 const withWithGradingPeriodsMock = () => {
@@ -370,6 +371,21 @@ describe('ItemAssignToCard', () => {
     await waitFor(async () => {
       expect(timeInput).toHaveValue('3:30 PM')
       expect(await getAllByText('Invalid date')[0]).toBeInTheDocument()
+    })
+  })
+
+  it('clears date field and time field when date field is manually cleared on blur', async () => {
+    const due_at = '2023-10-05T12:00:00Z'
+    const {getAllByLabelText, getByLabelText} = renderComponent({due_at})
+    const dateInput = getByLabelText('Due Date')
+    const timeInput = getAllByLabelText('Time')[0]
+
+    await userEvent.clear(dateInput)
+    await userEvent.tab()
+
+    await waitFor(async () => {
+      expect(dateInput).toHaveValue('')
+      expect(timeInput).toHaveValue('')
     })
   })
 

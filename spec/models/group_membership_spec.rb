@@ -316,6 +316,22 @@ describe GroupMembership do
       community_group.add_user(@teacher, "accepted", false)
       expect(GroupMembership.where(group_id: community_group.id, user_id: @teacher.id).first.grants_right?(@admin, :delete)).to be_truthy
     end
+
+    it "does not allow students in group to have any membership permissions" do
+      student_in_course(active_all: true)
+      @category = @course.group_categories.build(name: "category 1", non_collaborative: true)
+      @category.save!
+      @group = @category.groups.create!(context: @course)
+      @membership = @group.add_user(@student)
+
+      expect(@membership.grants_right?(@student, :read)).to be_falsey
+      expect(@membership.grants_right?(@student, :delete)).to be_falsey
+      expect(@membership.grants_right?(@student, :update)).to be_falsey
+      expect(@membership.grants_right?(@student, :create)).to be_falsey
+      expect(@membership.check_policy(@student)).to be_empty
+
+      expect(@membership.user_id).to eq @student.id
+    end
   end
 
   it "updates group leadership as membership changes" do
