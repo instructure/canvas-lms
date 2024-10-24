@@ -55,7 +55,7 @@ describe('ToolbarColor', () => {
     expect(getByText('Previously chosen colors')).toBeInTheDocument()
     expect(getByTestId('color-mixer')).toBeInTheDocument()
     expect(getByTestId('color-preset')).toBeInTheDocument()
-    expect(getByTestId('color-contrast')).toBeInTheDocument()
+    expect(getByTestId('color-contrast-summary')).toBeInTheDocument()
   })
 
   it('includes the background tab', () => {
@@ -133,8 +133,8 @@ describe('ToolbarColor', () => {
       expect(getByDisplayValue(187)).toBeInTheDocument() // bb
       expect(getByDisplayValue(204)).toBeInTheDocument() // cc
 
-      expect(getByText('Color Contrast Ratio')).toBeInTheDocument()
-      expect(getByText('1.96:1')).toBeInTheDocument()
+      expect(getByText('Color Contrast')).toBeInTheDocument()
+      expect(getByText('FAIL')).toBeInTheDocument()
     })
 
     it('does not show the contrast ratio if the background is transparent', () => {
@@ -315,7 +315,25 @@ describe('ToolbarColor', () => {
       const tabs = screen.getAllByRole('tab')
       tabs[1].click()
 
-      expect(getByTestId('color-contrast')).toBeInTheDocument()
+      expect(getByTestId('color-contrast-summary')).toBeInTheDocument()
+    })
+  })
+
+  describe('color contrast', () => {
+    it('renders the color contrast', () => {
+      const {getByText, getByTestId, queryByTestId} = render(
+        <ToolbarColor tabs={{background: '#fff', foreground: '#000'}} onChange={jest.fn()} />
+      )
+      const button = getByText('Color').closest('button') as HTMLButtonElement
+      button.click()
+
+      const toggle = getByTestId('color-contrast-summary')
+      expect(toggle).toBeInTheDocument()
+      expect(queryByTestId('color-contrast')).not.toBeInTheDocument()
+
+      toggle.click()
+
+      expect(queryByTestId('color-contrast')).toBeInTheDocument()
     })
   })
 })

@@ -26,7 +26,7 @@ import {IconBlock} from './user/blocks/IconBlock'
 import {PageBlock} from './user/blocks/PageBlock'
 import {ImageBlock} from './user/blocks/ImageBlock'
 import {MediaBlock} from './user/blocks/MediaBlock'
-import {RCEBlock} from './user/blocks/RCEBlock'
+import {RCETextBlock} from './user/blocks/RCETextBlock/RCETextBlock'
 import {GroupBlock} from './user/blocks/GroupBlock'
 import {DividerBlock} from './user/blocks/DividerBlock'
 
@@ -54,8 +54,8 @@ const blocks = {
   IconBlock,
   ImageBlock,
   MediaBlock,
-  RCEBlock,
   KnowledgeCheckSection,
+  RCETextBlock,
   AnnouncementSection,
   ResourcesSection,
   ResourcesSectionInner,

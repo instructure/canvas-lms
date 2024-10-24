@@ -18,6 +18,9 @@
 
 import {type SerializedNode} from '@craftjs/core'
 
+// A custom type constraint that enforces at least one key is present
+export type AtLeastOne<T, U = {[K in keyof T]: Pick<T, K>}> = Partial<T> & U[keyof U]
+
 export type CanEditTemplates = {
   can_edit: boolean
   can_edit_global: boolean
