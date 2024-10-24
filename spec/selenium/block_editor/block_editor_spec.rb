@@ -56,7 +56,7 @@ describe "Block Editor", :ignore_js_errors do
       it "loads the clicked template to the editor" do
         expect(template_chooser).to be_displayed
         wait_for_ajax_requests
-        template_chooser_template_for_number(2).send_keys("")
+        template_chooser_template_for_number(1).send_keys("")
         template_chooser_active_customize_template.click
         wait_for_ajax_requests
         expect(page_block).to be_displayed

@@ -1,0 +1,112 @@
+{
+  "name": "Blank Page",
+  "description": "",
+  "workflow_state": "active",
+  "node_tree": {
+    "rootNodeId": "ROOT",
+    "nodes": {
+      "ROOT": {
+        "type": {
+          "resolvedName": "PageBlock"
+        },
+        "isCanvas": true,
+        "props": {},
+        "displayName": "Page",
+        "custom": {
+          "displayName": "Blank Page"
+        },
+        "hidden": false,
+        "nodes": [
+          "yue4mpUChN"
+        ],
+        "linkedNodes": {}
+      },
+      "yue4mpUChN": {
+        "type": {
+          "resolvedName": "ColumnsSection"
+        },
+        "isCanvas": false,
+        "props": {
+          "columns": 1
+        },
+        "displayName": "Columns",
+        "custom": {
+          "isSection": true
+        },
+        "parent": "ROOT",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "columns__inner": "_LWmxgLGU8"
+        }
+      },
+      "_LWmxgLGU8": {
+        "type": {
+          "resolvedName": "ColumnsSectionInner"
+        },
+        "isCanvas": true,
+        "props": {},
+        "displayName": "Columns Inner",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "yue4mpUChN",
+        "hidden": false,
+        "nodes": [
+          "13kQFSc-L3"
+        ],
+        "linkedNodes": {}
+      },
+      "13kQFSc-L3": {
+        "type": {
+          "resolvedName": "GroupBlock"
+        },
+        "isCanvas": true,
+        "props": {
+          "alignment": "start",
+          "verticalAlignment": "start",
+          "layout": "column",
+          "resizable": false,
+          "isColumn": true,
+          "id": "columns-pEdeFvz6_0-1"
+        },
+        "displayName": "Group",
+        "custom": {
+          "isResizable": false,
+          "isBlock": true,
+          "isExpanded": false,
+          "displayName": "Column"
+        },
+        "parent": "_LWmxgLGU8",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "group__inner": "Ef7hf8YVK5"
+        }
+      },
+      "Ef7hf8YVK5": {
+        "type": {
+          "resolvedName": "NoSections"
+        },
+        "isCanvas": true,
+        "props": {
+          "className": "",
+          "placeholderText": "Drop a block to add it here"
+        },
+        "displayName": "NoSections",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "13kQFSc-L3",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      }
+    }
+  },
+  "template_type": "page",
+  "template_category": "global",
+  "thumbnail": "",
+  "id": "blank_page",
+  "global_id": "blank_page"
+}

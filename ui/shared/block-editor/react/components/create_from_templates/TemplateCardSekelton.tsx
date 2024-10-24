@@ -29,23 +29,25 @@ export default function TemplateCardSkeleton({
   template,
   createAction,
 }: {
-  template?: BlockTemplate | undefined
-  createAction: () => void | undefined
+  template: BlockTemplate
+  createAction: () => void
 }) {
   return (
     <View
       as="div"
-      className={`block-template-preview-card ${template ? '' : 'blank-card'}`}
+      className={`block-template-preview-card ${template.id === 'blank_page' ? 'blank-card' : ''}`}
       display="flex"
+      position="relative"
       height="241px"
       shadow="above"
       tabIndex={0}
       style={{backgroundImage: template?.thumbnail && `url(${template.thumbnail})`}}
       width="341px"
     >
+      {template.id === 'blank_page' && <div className="curl" />}
       <Flex alignItems="center" height="241px" justifyItems="center" width="100%">
-        {template ? (
-          <>
+        {template.id !== 'blank_page' ? (
+          <div className="buttons">
             {/* Not yet */}
             {/* <Button color="secondary" margin="0 x-small 0 0" size="small"> */}
             {/*   {I18n.t('Quick Look')} */}
@@ -53,7 +55,7 @@ export default function TemplateCardSkeleton({
             <Button color="primary" size="small" onClick={createAction}>
               {I18n.t('Customize')}
             </Button>
-          </>
+          </div>
         ) : (
           <Button color="primary" size="small" onClick={createAction}>
             {I18n.t('New Blank Page')}
