@@ -33,6 +33,7 @@ import {IconBlock, IconBlockIcon} from '../../user/blocks/IconBlock'
 import {RCEBlock, RCEBlockIcon} from '../../user/blocks/RCEBlock'
 import {TabsBlock, TabsBlockIcon} from '../../user/blocks/TabsBlock'
 import {GroupBlock, GroupBlockIcon} from '../../user/blocks/GroupBlock'
+import {DividerBlock, DividerBlockIcon} from '../../user/blocks/DividerBlock'
 
 import {createFromTemplate} from '../../../utils'
 import {type BlockTemplate, type TemplateNodeTree} from '../../../types'
@@ -230,6 +231,7 @@ const BlocksPanel = ({
       {renderBox('Image', ImageBlockIcon, <ImageBlock />)}
       {renderBox('Group', GroupBlockIcon, <GroupBlock />)}
       {renderBox('Tabs', TabsBlockIcon, <TabsBlock />)}
+      {renderBox('Divider', DividerBlockIcon, <DividerBlock />)}
       {renderTemplateBoxes()}
     </Flex>
   )
