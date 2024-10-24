@@ -583,6 +583,14 @@
   line-height: 0;
 }
 
+.divider-block {
+  width: 95%;
+  height: 1px;
+  min-height: 1px;
+  margin: 0 auto;
+  border-top: 1px solid var(--ic-brand-font-color-dark);
+}
+
 @container block-editor-view (320px < width <= 768px) {
   .columns-section {
     &.columns-3,
@@ -697,7 +705,7 @@
   }
 }
 
-.block-template-preview-card {
+text-template-preview-card {
   background-position: left top;
   background-repeat: no-repeat;
   background-size: 100% auto;
