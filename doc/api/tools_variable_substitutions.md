@@ -1386,16 +1386,17 @@ Only available when launched as an assignment with a `lock_at` set.
 2018-02-20:00:00Z
 ```
 ## Canvas.assignment.dueAt.iso8601
-Returns the `due_at` date of the assignment that was launched.
-If the tool is launched as a student, this will be the date that assignment
-is due for that student (or unexpanded -- "$Canvas.assignment.dueAt.iso8601" --
-if there is no due date for the student).
-If the tool is launched as an instructor and there are multiple
-possible due dates (i.e., there are multiple sections and at
-least one has a due date override), this will be the LATEST effective
-due date of any section or student.
+Returns the `due_at` date of the assignment that was launched. Only
+available when launched as an assignment with a `due_at` set. If the tool
+is launched as a student, this will be the date that assignment is due
+for that student (or unexpanded -- "$Canvas.assignment.dueAt.iso8601" --
+if there is no due date for the student). If the tool is launched as an
+instructor and there are multiple possible due dates (i.e., there are
+multiple sections and at least one has a due date override), this will be
+the LATEST effective due date of any section or student (or unexpanded if
+there is at least one section or student with no effective due date).
 
-**Availability**: *when launched as an assignment*  
+**Availability**: *always*  
 
 
 ```

@@ -211,6 +211,7 @@ const MessageListActionContainer = props => {
                 width={responsiveProps.addressBookContainer.width}
                 limitTagCount={LIMIT_TAG_COUNT}
                 addressBookLabel="Search"
+                renderingContext="message-list-actions"
               />
             </Flex.Item>
             <Flex.Item padding={responsiveProps.messageActionButtons.padding}>

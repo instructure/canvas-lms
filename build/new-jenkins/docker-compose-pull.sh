@@ -9,6 +9,7 @@ set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 # to load them. This helps our build times to remain more consistent.
 
 REGISTRY_BASE=starlord.inscloudgate.net/jenkins
+ECR_BASE=948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io
 
 DOCKER_IMAGES=(
   $PATCHSET_TAG
@@ -17,8 +18,8 @@ DOCKER_IMAGES=(
   $POSTGRES_IMAGE_TAG
   $REGISTRY_BASE/canvas-rce-api
   $REGISTRY_BASE/redis:alpine
-  $REGISTRY_BASE/selenium-node-chrome:"${CHROME_VERSION:-120.0}"
-  $REGISTRY_BASE/selenium-hub:"${HUB_VERSION:-4.16}"
+  $ECR_BASE/selenium/node-chromium:"${CHROME_VERSION:-126.0-20240621}"
+  $ECR_BASE/selenium/hub:"${HUB_VERSION:-4.22.0}"
 )
 
 echo "${DOCKER_IMAGES[@]}" | xargs -P0 -n1 ./build/new-jenkins/docker-with-flakey-network-protection.sh pull &
