@@ -613,6 +613,50 @@
   }
 }
 
+.curl {
+	width: 75px;
+	height: 75px;
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	background:
+		linear-gradient(
+			135deg,
+			#fff,
+			#f3f3f3 45%,
+			#ddd 50%,
+			#aaa 50%,
+			#bbb 56%,
+			#ccc 62%,
+			#f3f3f3 80%,
+			#fff 100%
+		);
+	box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+	transition: all .5s ease;
+}
+.curl:before,
+.curl:after {
+	content: '';
+	position: absolute;
+	z-index: -1;
+	left: 12.5%;
+	bottom: 5.8%;
+	width: 70%;
+	max-width: 300px;
+	max-height: 100px;
+	height: 55%;
+	box-shadow: 0 12px 15px rgba(0, 0, 0, .3);
+	transform: skew(-10deg) rotate(-6deg);
+}
+.curl:after {
+	left: auto;
+	right: 5.8%;
+	bottom: auto;
+	top: 14.16%;
+	transform: skew(-15deg) rotate(-84deg);
+}
+
+
 @container block-editor-view (width <= 320px) {
   .page-block {
     padding: 0;
