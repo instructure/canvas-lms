@@ -18,44 +18,58 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Lti
-  class PlatformNotificationService
+  module PlatformNotificationService
     NOTICE_TYPES = %w[
       LtiHelloWorldNotice
     ].freeze
 
-    def self.subscribe_tool_for_notice(tool:, notice_type:, handler_url:)
+    module_function
+
+    def subscribe_tool_for_notice(tool:, notice_type:, handler_url:)
       raise ArgumentError, "handler must be a valid URL or an empty string" unless handler_url.match?(URI::DEFAULT_PARSER.make_regexp)
 
       validate_notice_parameters(tool:, notice_type:, handler_url:)
       destroy_notice_handlers(tool:, notice_type:)
-      tool.lti_notice_handlers.create!(
+      handler = tool.lti_notice_handlers.create!(
         notice_type:,
         url: handler_url,
         account: tool.account
       )
+      handler_api_json(handler:)
     end
 
-    def self.unsubscribe_tool_for_notice(tool:, notice_type:)
+    def unsubscribe_tool_for_notice(tool:, notice_type:)
       validate_notice_parameters(tool:, notice_type:, handler_url: "")
       destroy_notice_handlers(tool:, notice_type:)
+      empty_api_json(notice_type:)
     end
 
-    def self.list_handlers(tool:)
-      notices_with_handlers = tool
-                              .lti_notice_handlers
-                              .active
-                              .map { |handler| { notice_type: handler.notice_type, handler: handler.url } }
-      notices_without_handlers = NOTICE_TYPES - notices_with_handlers.pluck(:notice_type)
-      notices_with_handlers + notices_without_handlers.map { |notice_type| { notice_type:, handler: "" } }
+    # @return [Array<Hash>] list of notice handlers for the tool in api format
+    def list_handlers(tool:)
+      found_notice_handlers = tool.lti_notice_handlers.active.map do |handler|
+        handler_api_json(handler:)
+      end
+      types_without_handlers = NOTICE_TYPES - found_notice_handlers.pluck(:notice_type)
+      found_notice_handlers + types_without_handlers.map do |notice_type|
+        empty_api_json(notice_type:)
+      end
     end
 
-    def self.validate_notice_parameters(tool:, notice_type:, handler_url:)
+    def handler_api_json(handler:)
+      { notice_type: handler.notice_type, handler: handler.url }
+    end
+
+    def empty_api_json(notice_type:)
+      { notice_type:, handler: "" }
+    end
+
+    def validate_notice_parameters(tool:, notice_type:, handler_url:)
       raise ArgumentError, "unknown notice_type, it must be one of [#{NOTICE_TYPES.join(", ")}]" unless NOTICE_TYPES.include?(notice_type)
       raise ArgumentError, "handler url should match tool's domain" unless handler_url.blank? || tool.matches_host?(handler_url)
     end
     private_class_method :validate_notice_parameters
 
-    def self.destroy_notice_handlers(tool:, notice_type:)
+    def destroy_notice_handlers(tool:, notice_type:)
       tool.lti_notice_handlers.active.where(notice_type:).destroy_all
     end
     private_class_method :destroy_notice_handlers
