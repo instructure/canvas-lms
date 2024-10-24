@@ -19,6 +19,9 @@
 <%
      provide :page_title, t("Log in to Canvas")
 
+     # course catalog link boolean
+     enable_course_catalog = @domain_root_account.enable_course_catalog?
+
      # json-encoded array of authentication providers with each object containing id and auth_type
      auth_providers_json = @auth_providers.to_json
 
@@ -35,16 +38,17 @@
      body_bg_color = brand_variable("ic-brand-Login-body-bgd-shadow-color")
      body_bg_image = brand_variable("ic-brand-Login-body-bgd-image")
 
-     # theme editor preview mode
-     is_preview_mode = ERB::Util.h(params[:previewing_from_themeeditor])
+     # theme editor preview mode boolean
+     is_preview_mode = params[:previewing_from_themeeditor].to_s.downcase == "true"
 %>
 
 <div id="new_login_data"
+     <%= "data-enable-course-catalog='true'".html_safe if enable_course_catalog.present? %>
      <%= "data-auth-providers=#{raw auth_providers_json}" if auth_providers_json.present? %>
      <%= "data-login-handle-name='#{login_handle_name}'".html_safe if login_handle_name.present? %>
      <%= "data-login-logo-url='#{login_logo_url}'".html_safe if login_logo_url.present? %>
      <%= "data-login-logo-alt='#{login_logo_alt}'".html_safe if login_logo_alt.present? %>
      <%= "data-body-bg-color='#{body_bg_color}'".html_safe if body_bg_color.present? %>
      <%= "data-body-bg-image='#{body_bg_image}'".html_safe if body_bg_image.present? %>
-     <%= "data-is-preview-mode='#{is_preview_mode}'".html_safe if is_preview_mode.present? %>
+     <%= "data-is-preview-mode='true'".html_safe if is_preview_mode %>
 ></div>

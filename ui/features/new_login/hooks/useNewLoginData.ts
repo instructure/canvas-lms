@@ -20,6 +20,7 @@ import {useEffect, useState} from 'react'
 import type {AuthProvider} from '../types'
 
 interface NewLoginData {
+  enableCourseCatalog?: boolean
   authProviders?: AuthProvider[]
   loginHandleName?: string
   loginLogoUrl?: string
@@ -54,6 +55,7 @@ const getObjectAttribute = <T>(container: HTMLElement, attribute: string): T | u
 
 export const useNewLoginData = (): NewLoginData => {
   const [newLoginData, setNewLoginData] = useState<NewLoginData>({
+    enableCourseCatalog: undefined,
     authProviders: undefined,
     loginHandleName: undefined,
     loginLogoUrl: undefined,
@@ -67,6 +69,7 @@ export const useNewLoginData = (): NewLoginData => {
     const container = getLoginDataContainer()
     if (container) {
       setNewLoginData({
+        enableCourseCatalog: getBooleanAttribute(container, 'data-enable-course-catalog'),
         authProviders: getObjectAttribute<AuthProvider[]>(container, 'data-auth-providers'),
         loginHandleName: getStringAttribute(container, 'data-login-handle-name'),
         loginLogoUrl: getStringAttribute(container, 'data-login-logo-url'),

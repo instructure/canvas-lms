@@ -24,11 +24,12 @@ import type {AuthProvider} from '../../types'
 
 jest.mock('../../hooks/useNewLoginData', () => ({
   useNewLoginData: () => ({
-    loginHandleName: 'exampleLoginHandle',
+    enableCourseCatalog: true,
     authProviders: [
       {id: 1, auth_type: 'Google'},
       {id: 2, auth_type: 'Microsoft'},
     ] as AuthProvider[],
+    loginHandleName: 'exampleLoginHandle',
     loginLogoUrl: 'login/canvas-logo.svg',
     loginLogoAlt: 'Canvas by Instructure',
     bodyBgColor: '#ffffff',
@@ -48,10 +49,11 @@ const TestComponent = () => {
       <span data-testid="otpCommunicationChannelId">
         {context.otpCommunicationChannelId || 'null'}
       </span>
-      <span data-testid="loginHandleName">{context.loginHandleName}</span>
+      <span data-testid="enableCourseCatalog">{context.enableCourseCatalog?.toString()}</span>
       <span data-testid="authProviders">
         {context.authProviders?.map(provider => provider.auth_type).join(', ')}
       </span>
+      <span data-testid="loginHandleName">{context.loginHandleName}</span>
       <span data-testid="loginLogoUrl">{context.loginLogoUrl}</span>
       <span data-testid="loginLogoAlt">{context.loginLogoAlt}</span>
       <span data-testid="bodyBgColor">{context.bodyBgColor}</span>
@@ -86,8 +88,9 @@ describe('NewLoginContext', () => {
     expect(screen.getByTestId('showForgotPassword')).toHaveTextContent('false')
     expect(screen.getByTestId('otpCommunicationChannelId')).toHaveTextContent('null')
     // values from useNewLoginData hook
-    expect(screen.getByTestId('loginHandleName')).toHaveTextContent('exampleLoginHandle')
+    expect(screen.getByTestId('enableCourseCatalog')).toHaveTextContent('true')
     expect(screen.getByTestId('authProviders')).toHaveTextContent('Google, Microsoft')
+    expect(screen.getByTestId('loginHandleName')).toHaveTextContent('exampleLoginHandle')
     expect(screen.getByTestId('loginLogoUrl')).toHaveTextContent('login/canvas-logo.svg')
     expect(screen.getByTestId('loginLogoAlt')).toHaveTextContent('Canvas by Instructure')
     expect(screen.getByTestId('bodyBgColor')).toHaveTextContent('#ffffff')
@@ -137,8 +140,9 @@ describe('NewLoginContext', () => {
 
   it('handles optional values being undefined', () => {
     jest.spyOn(require('../../hooks/useNewLoginData'), 'useNewLoginData').mockReturnValue({
-      loginHandleName: undefined,
+      enableCourseCatalog: undefined,
       authProviders: undefined,
+      loginHandleName: undefined,
       loginLogoUrl: undefined,
       loginLogoAlt: undefined,
       bodyBgColor: undefined,
@@ -150,8 +154,9 @@ describe('NewLoginContext', () => {
         <TestComponent />
       </NewLoginProvider>
     )
-    expect(screen.getByTestId('loginHandleName')).toBeEmptyDOMElement()
+    expect(screen.getByTestId('enableCourseCatalog')).toBeEmptyDOMElement()
     expect(screen.getByTestId('authProviders')).toBeEmptyDOMElement()
+    expect(screen.getByTestId('loginHandleName')).toBeEmptyDOMElement()
     expect(screen.getByTestId('loginLogoUrl')).toBeEmptyDOMElement()
     expect(screen.getByTestId('loginLogoAlt')).toBeEmptyDOMElement()
     expect(screen.getByTestId('bodyBgColor')).toBeEmptyDOMElement()
