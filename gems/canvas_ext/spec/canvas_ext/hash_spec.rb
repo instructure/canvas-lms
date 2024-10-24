@@ -16,15 +16,19 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-class Lti::OverlayVersion < ActiveRecord::Base
-  extend RootAccountResolver
-  belongs_to :account, inverse_of: :lti_overlay_versions, optional: false
-  belongs_to :lti_overlay, class_name: "Lti::Overlay", inverse_of: :lti_overlay_versions, optional: false
-  belongs_to :created_by, class_name: "User", inverse_of: :lti_overlay_versions, optional: false
+describe "Hash#deep_sort_values" do
+  it "can handle top-level arrays" do
+    expect({ "a" => [3, 2, 1] }.deep_sort_values).to eq({ "a" => [1, 2, 3] })
+  end
 
-  # @see Hashdiff.diff for the format of the diff
-  validates :diff, presence: true
+  it "can handle nested arrays" do
+    expect({ "a" => { "b" => [3, 2, 1] } }.deep_sort_values).to eq({ "a" => { "b" => [1, 2, 3] } })
+  end
 
-  resolves_root_account through: :account
+  it "can handle nested hashes with arrays" do
+    expect({ "a" => { "b" => [3, 2, 1], "c" => [6, 5, 4] } }.deep_sort_values)
+      .to eq({ "a" => { "b" => [1, 2, 3], "c" => [4, 5, 6] } })
+  end
 end

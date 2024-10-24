@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require "hashdiff"
+
 class Lti::Overlay < ActiveRecord::Base
   extend RootAccountResolver
   include Canvas::SoftDeletable
@@ -32,11 +34,31 @@ class Lti::Overlay < ActiveRecord::Base
 
   validate :validate_data
 
+  before_update :create_version
+
+  def data=(data)
+    write_attribute(:data, data&.deep_sort_values) if data.is_a?(Hash)
+  end
+
   def validate_data
     schema_errors = Schemas::Lti::Overlay.validation_errors(data)
     return if schema_errors.blank?
 
     errors.add(:data, schema_errors.to_json)
     false
+  end
+
+  private
+
+  def create_version
+    diff = Hashdiff.diff(data_was, data)
+
+    return if diff.blank?
+
+    lti_overlay_versions.create!(
+      diff:,
+      account:,
+      created_by: updated_by
+    )
   end
 end

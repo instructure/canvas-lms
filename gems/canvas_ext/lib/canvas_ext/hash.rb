@@ -16,15 +16,19 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
-class Lti::OverlayVersion < ActiveRecord::Base
-  extend RootAccountResolver
-  belongs_to :account, inverse_of: :lti_overlay_versions, optional: false
-  belongs_to :lti_overlay, class_name: "Lti::Overlay", inverse_of: :lti_overlay_versions, optional: false
-  belongs_to :created_by, class_name: "User", inverse_of: :lti_overlay_versions, optional: false
-
-  # @see Hashdiff.diff for the format of the diff
-  validates :diff, presence: true
-
-  resolves_root_account through: :account
+#
+class Hash
+  # Recursively sort the values, when appropriate, in a hash.
+  # @return [Hash] A new hash with the values sorted
+  def deep_sort_values
+    to_h do |k, v|
+      if v.is_a?(Hash)
+        [k, v.deep_sort_values]
+      elsif v.is_a?(Array)
+        [k, v.sort]
+      else
+        [k, v]
+      end
+    end
+  end
 end
