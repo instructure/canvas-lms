@@ -30,6 +30,7 @@ class Mutations::UpdateDiscussionSortOrder < Mutations::BaseMutation
     raise GraphQL::ExecutionError, "insufficient permission" unless discussion_topic.grants_right?(current_user, session, :read)
 
     sort_order = input[:sort_order].to_s
+    sort_order = DiscussionTopicParticipant::SortOrder::DESC unless DiscussionTopicParticipant::SortOrder::TYPES.include?(sort_order)
     discussion_topic.update_or_create_participant(current_user:, sort_order:)
 
     { discussion_topic: }
