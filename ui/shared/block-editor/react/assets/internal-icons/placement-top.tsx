@@ -16,20 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import IconUndo from './undo'
-import IconRedo from './redo'
-import IconBackgroundColor from './background-color'
-import IconResize from './resize'
-import IconPlacementTop from './placement-top'
-import IconPlacementMiddle from './placement-middle'
-import IconPlacementBottom from './placement-bottom'
+import React from 'react'
+import {SVGIcon} from '@instructure/ui-svg-images'
+import {type IconProps} from '../iconTypes'
 
-export {
-  IconUndo,
-  IconRedo,
-  IconBackgroundColor,
-  IconResize,
-  IconPlacementTop,
-  IconPlacementMiddle,
-  IconPlacementBottom,
+export default ({elementRef, size = 'small'}: IconProps) => {
+  return (
+    <SVGIcon
+      elementRef={elementRef}
+      src={`<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M17 17V6H1V17H17ZM0 0H18V18H0V0Z" fill="#273540"/>
+</svg>`}
+      size={size}
+    />
+  )
 }

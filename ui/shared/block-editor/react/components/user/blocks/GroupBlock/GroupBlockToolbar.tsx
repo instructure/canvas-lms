@@ -18,19 +18,11 @@
 
 import React, {useCallback} from 'react'
 import {useNode, type Node} from '@craftjs/core'
-import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {Menu} from '@instructure/ui-menu'
-import {Text} from '@instructure/ui-text'
-import {
-  IconArrowOpenDownLine,
-  IconArrowOpenEndLine,
-  IconTextStartLine,
-  IconTextCenteredLine,
-  IconTextEndLine,
-} from '@instructure/ui-icons'
-import {useScope} from '@canvas/i18n'
 import {type GroupLayout, type GroupAlignment, type GroupBlockProps} from './types'
+import {ToolbarColor} from '../../common/ToolbarColor'
+import {ToolbarAlignment} from './toolbar/ToolbarAlignment'
+import {useScope} from '@canvas/i18n'
 
 const I18n = useScope('block-editor')
 
@@ -42,155 +34,54 @@ export const GroupBlockToolbar = () => {
     props: node.data.props,
   }))
 
-  const handleChangeDirection = useCallback(
-    (e, value) => {
+  const handleChangeColors = useCallback(
+    (fgcolor: string, bgcolor: string) => {
       setProp((prps: GroupBlockProps) => {
-        prps.layout = value as GroupLayout
+        prps.color = fgcolor
+        prps.background = bgcolor
       })
     },
     [setProp]
   )
 
-  const handleChangeAlignment = useCallback(
-    (e, value) => {
+  const handleSaveAlignment = useCallback(
+    (layout: GroupLayout, alignment: GroupAlignment, verticalAlignment: GroupAlignment) => {
       setProp((prps: GroupBlockProps) => {
-        prps.alignment = value as GroupAlignment
+        prps.layout = layout
+        prps.alignment = alignment
+        prps.verticalAlignment = verticalAlignment
       })
     },
     [setProp]
   )
 
-  const handleChangeVerticalAlignment = useCallback(
-    (e, value) => {
-      setProp((prps: GroupBlockProps) => {
-        prps.verticalAlignment = value as GroupAlignment
-      })
-    },
-    [setProp]
-  )
-
-  const rotate = {
-    rotate: '90deg',
+  const getCurrentColor = () => {
+    if (props.color) return props.color
+    return window
+      .getComputedStyle(document.documentElement)
+      .getPropertyValue('--ic-brand-font-color-dark')
   }
 
-  const renderAlignmentIcon = (vertical: boolean) => {
-    let icon
-    const align = vertical ? props.verticalAlignment : props.alignment
-    switch (align) {
-      case 'start':
-        icon = <IconTextStartLine />
-        break
-      case 'center':
-        icon = <IconTextCenteredLine />
-        break
-      case 'end':
-        icon = <IconTextEndLine />
-    }
-    return vertical ? <span style={rotate}>{icon}</span> : icon
+  const getCurrentBackgroundColor = () => {
+    return props.background || '#00000000'
   }
 
   return (
-    <Flex>
-      <Menu
-        trigger={
-          <IconButton
-            size="small"
-            withBorder={false}
-            withBackground={false}
-            screenReaderLabel={I18n.t('Layout direction')}
-          >
-            {props.layout === 'column' ? <IconArrowOpenDownLine /> : <IconArrowOpenEndLine />}
-          </IconButton>
-        }
-        onSelect={handleChangeDirection}
-      >
-        <Menu.Item type="checkbox" value="column" defaultSelected={props.layout === 'column'}>
-          {I18n.t('Column')}
-        </Menu.Item>
-        <Menu.Item type="checkbox" value="row" defaultSelected={props.layout === 'row'}>
-          {I18n.t('Row')}
-        </Menu.Item>
-      </Menu>
+    <Flex gap="small">
+      <ToolbarColor
+        fgcolorLabel={I18n.t('Group Color')}
+        bgcolorLabel={I18n.t('Group Background')}
+        fgcolor={getCurrentColor()}
+        bgcolor={getCurrentBackgroundColor()}
+        onChange={handleChangeColors}
+      />
 
-      <Menu
-        trigger={
-          <IconButton
-            size="small"
-            withBorder={false}
-            withBackground={false}
-            screenReaderLabel={I18n.t('Align Horizontally')}
-          >
-            {renderAlignmentIcon(false)}
-          </IconButton>
-        }
-        onSelect={handleChangeAlignment}
-      >
-        <Menu.Item type="checkbox" value="start" defaultSelected={props.alignment === 'start'}>
-          <Flex gap="x-small">
-            <IconTextStartLine size="x-small" />
-            <Text>{I18n.t('Align to start')}</Text>
-          </Flex>
-        </Menu.Item>
-        <Menu.Item type="checkbox" value="center" defaultSelected={props.alignment === 'center'}>
-          <Flex gap="x-small">
-            <IconTextCenteredLine size="x-small" />
-            <Text>{I18n.t('Align to center')}</Text>
-          </Flex>
-        </Menu.Item>
-        <Menu.Item type="checkbox" value="end" defaultSelected={props.alignment === 'end'}>
-          <Flex gap="x-small">
-            <IconTextEndLine size="x-small" />
-            <Text>{I18n.t('Align to end')}</Text>
-          </Flex>
-        </Menu.Item>
-      </Menu>
-
-      <Menu
-        trigger={
-          <IconButton
-            size="small"
-            withBorder={false}
-            withBackground={false}
-            screenReaderLabel={I18n.t('Align Vertically')}
-          >
-            {renderAlignmentIcon(true)}
-          </IconButton>
-        }
-        onSelect={handleChangeVerticalAlignment}
-      >
-        <Menu.Item
-          type="checkbox"
-          value="start"
-          defaultSelected={props.verticalAlignment === 'start'}
-        >
-          <Flex gap="x-small">
-            <span style={rotate}>
-              <IconTextStartLine size="x-small" />
-            </span>
-            <Text>{I18n.t('Align to start')}</Text>
-          </Flex>
-        </Menu.Item>
-        <Menu.Item
-          type="checkbox"
-          value="center"
-          defaultSelected={props.verticalAlignment === 'center'}
-        >
-          <Flex gap="x-small">
-            <span style={rotate}>
-              <IconTextCenteredLine size="x-small" />
-            </span>
-            <Text>{I18n.t('Align to center')}</Text>
-          </Flex>
-        </Menu.Item>
-        <Menu.Item type="checkbox" value="end" defaultSelected={props.verticalAlignment === 'end'}>
-          <Flex gap="x-small">
-            <span style={rotate}>
-              <IconTextEndLine size="x-small" />
-            </span>
-            <Text>{I18n.t('Align to end')}</Text>
-          </Flex>
-        </Menu.Item>
-      </Menu>
+      <ToolbarAlignment
+        layout={props.layout}
+        alignment={props.alignment}
+        verticalAlignment={props.verticalAlignment}
+        onSave={handleSaveAlignment}
+      />
     </Flex>
   )
 }

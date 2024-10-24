@@ -49,7 +49,7 @@
         "props": {
           "alignment": "start",
           "verticalAlignment": "start",
-          "layout": "column",
+          "layout": "row",
           "resizable": false,
           "isColumn": true,
           "id": "columns-pEdeFvz6_0-1"
