@@ -442,19 +442,10 @@ class CalendarEventsApiController < ApplicationController
                 calendar_event_scope(user)
               end
 
-      events = Api.paginate(scope, self, route_url) unless assignment || sub_assignment
+      events = Api.paginate(scope, self, route_url)
       ActiveRecord::Associations.preload(events, :child_events) if @type == :event
       if assignment || sub_assignment
-        events = if scope.is_a?(ActiveRecord::Relation)
-                   # If there is only one or zero Assignment or SubAssignment it is ActiveRecord::Relation
-                   scope
-                 else
-                   # If there are multiple Assignments or SubAssignments it is BookmarkedCollection::MergeProxy
-                   scope.paginate({ per_page: scope.collections.length })
-                 end
         events = apply_assignment_overrides(events, user, sub_assignment:)
-        pagination_args = Api.wrap_pagination_args!(params, self)
-        events, _meta = Api.jsonapi_paginate(events, self, route_url, pagination_args)
         mark_submitted_assignments(user, events)
         if includes.include?("submission")
           submissions = Submission.active.where(assignment_id: events, user_id: user)

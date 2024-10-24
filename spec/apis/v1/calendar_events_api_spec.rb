@@ -2819,89 +2819,6 @@ describe CalendarEventsApiController, type: :request do
       expect(json.pluck("id")).to eql(ids[20...25].map { |id| "assignment_#{id}" })
     end
 
-    it "sorts and paginate assignments with overrides" do
-      undated = (1..3).map { |i| create_assignments(@course.id, 1, title: "#{@course.id}:#{i}", due_at: nil).first }
-      dated = (1..3).map { |i| create_assignments(@course.id, 1, title: "#{@course.id}:#{i}", due_at: Time.parse("2012-01-20 12:00:00").advance(days: -i)).first }
-      ids = dated.reverse + undated
-
-      (1..6).each do |i|
-        user = @course.account.users.create!(name: "Student #{i}")
-        @course.enroll_student(user)
-      end
-
-      ids.each do |id|
-        @course.students.each do |student|
-          assignment = Assignment.find(id)
-          ao = assignment.assignment_overrides.create!
-          ao.assignment_override_students.create!(user: student)
-        end
-      end
-
-      json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course.id}&per_page=10", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        type: "assignment",
-                        context_codes: ["course_#{@course.id}"],
-                        all_events: 1,
-                        per_page: "10"
-                      })
-      expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=2.*>; rel="next",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=5.*>; rel="last"})
-      expect(json.pluck("id")).to eql((([ids[0]] * 7) + ([ids[1]] * 3)).map { |id| "assignment_#{id}" })
-
-      json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course.id}&per_page=10&page=2", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        type: "assignment",
-                        context_codes: ["course_#{@course.id}"],
-                        all_events: 1,
-                        per_page: "10",
-                        page: "2"
-                      })
-      expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=3.*>; rel="next",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="prev",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=5.*>; rel="last"})
-      expect(json.pluck("id")).to eql((([ids[1]] * 4) + ([ids[2]] * 6)).map { |id| "assignment_#{id}" })
-
-      json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course.id}&per_page=10&page=3", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        type: "assignment",
-                        context_codes: ["course_#{@course.id}"],
-                        all_events: 1,
-                        per_page: "10",
-                        page: "3"
-                      })
-      expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=4.*>; rel="next",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=2.*>; rel="prev",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=5.*>; rel="last"})
-      expect(json.pluck("id")).to eql((([ids[2]] * 1) + ([ids[3]] * 7) + ([ids[4]] * 2)).map { |id| "assignment_#{id}" })
-
-      json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course.id}&per_page=10&page=4", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        type: "assignment",
-                        context_codes: ["course_#{@course.id}"],
-                        all_events: 1,
-                        per_page: "10",
-                        page: "4"
-                      })
-      expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=5.*>; rel="next",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=3.*>; rel="prev",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=5.*>; rel="last"})
-      expect(json.pluck("id")).to eql((([ids[4]] * 5) + ([ids[5]] * 5)).map { |id| "assignment_#{id}" })
-
-      json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course.id}&per_page=10&page=5", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        type: "assignment",
-                        context_codes: ["course_#{@course.id}"],
-                        all_events: 1,
-                        per_page: "10",
-                        page: "5"
-                      })
-      expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=4.*>; rel="prev",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=5.*>; rel="last"})
-      expect(json.pluck("id")).to eql(([ids[5]] * 2).map { |id| "assignment_#{id}" })
-    end
-
     it "ignores invalid end_dates" do
       @course.assignments.create(title: "a", due_at: "2012-01-08 12:00:00")
       json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-08&end_date=2012-01-07&context_codes[]=course_#{@course.id}", {
@@ -4328,6 +4245,24 @@ describe CalendarEventsApiController, type: :request do
 
       let_once(:start_date) { Time.now }
       let_once(:end_date) { 1.week.from_now }
+
+      it "logs when event count exceeds page size" do
+        expect(InstStatsd::Statsd).to receive(:increment).with("calendar.events_api.per_page_exceeded.count").once
+        expect(InstStatsd::Statsd).to receive(:count).with("calendar.events_api.per_page_exceeded.value", 2).once
+        api_call_as_user(@teacher,
+                         :get,
+                         "/api/v1/calendar_events",
+                         {
+                           controller: "calendar_events_api",
+                           action: "index",
+                           format: "json",
+                           type: "assignment",
+                           context_codes: ["course_#{@course.id}"],
+                           start_date: start_date.iso8601,
+                           end_date: end_date.iso8601,
+                           per_page: 1
+                         })
+      end
 
       it "does not log if the page size is not exceeded" do
         expect(InstStatsd::Statsd).not_to receive(:increment).with("calendar.events_api.per_page_exceeded.count")
