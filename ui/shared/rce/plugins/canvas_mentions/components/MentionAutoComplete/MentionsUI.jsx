@@ -17,7 +17,7 @@
  */
 
 import PropTypes from 'prop-types'
-import {ApolloProvider, createClient} from '@canvas/apollo'
+import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import MentionDropdown from './MentionDropdown'
 import React from 'react'
 import GenericErrorPage from '@canvas/generic-error-page'

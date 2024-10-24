@@ -22,7 +22,7 @@ import type {InternalSettingsData} from '../types'
 import React from 'react'
 import {InternalSettingsView} from '../InternalSettingsView'
 import {render} from '@testing-library/react'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import {MockedProvider} from '@apollo/react-testing'
 // @ts-expect-error
 import type {ExecutionResult} from '@apollo/client'
@@ -45,6 +45,7 @@ describe('InternalSettingsView', () => {
     const internalSettingMocks = await mockInternalSettingsQuery()
 
     const {findAllByText} = render(
+      // @ts-expect-error
       <MockedProvider mocks={internalSettingMocks} cache={createCache()}>
         <InternalSettingsView />
       </MockedProvider>

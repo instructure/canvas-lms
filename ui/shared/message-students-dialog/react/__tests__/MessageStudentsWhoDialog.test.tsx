@@ -27,7 +27,7 @@ import MessageStudentsWhoDialog, {
 } from '../MessageStudentsWhoDialog'
 import {MockedProvider} from '@apollo/react-testing'
 import mockGraphqlQuery from '@canvas/graphql-query-mock'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import {OBSERVER_ENROLLMENTS_QUERY} from '../../graphql/Queries'
 
 const students: Student[] = [

@@ -23,7 +23,7 @@ import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {showImportOutcomesModal} from '@canvas/outcomes/react/ImportOutcomesModal'
 import CreateOutcomeModal from '../CreateOutcomeModal'
 import {MockedProvider} from '@apollo/react-testing'
-import {createCache} from '../../../../shared/apollo'
+import {createCache} from '../../../../shared/apollo-v3'
 import {smallOutcomeTree} from '../../../../shared/outcomes/mocks/Management'
 
 jest.mock('@canvas/rce/RichContentEditor')

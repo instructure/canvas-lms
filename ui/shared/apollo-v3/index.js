@@ -20,6 +20,7 @@ import getCookie from '@instructure/get-cookie'
 import possibleTypes from '@canvas/apollo-v3/possibleTypes.json'
 import {ApolloClient, InMemoryCache, HttpLink, ApolloLink, gql} from '@apollo/client'
 import {ApolloProvider} from '@apollo/react-common'
+import {Query} from '@apollo/react-components'
 import {persistCache} from 'apollo-cache-persist'
 import {onError} from '@apollo/client/link/error'
 
@@ -129,4 +130,4 @@ function createClient(opts = {}) {
   return client
 }
 
-export {ApolloProvider, createClient, createCache, createPersistentCache, gql}
+export {ApolloProvider, createClient, createCache, createPersistentCache, Query, gql}

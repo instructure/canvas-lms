@@ -19,7 +19,7 @@
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import SubmissionSticker, {stickersAvailable} from '@canvas/submission-sticker'
-import {ApolloProvider, createClient} from '@canvas/apollo'
+import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 import {InstUISettingsProvider} from '@instructure/emotion'

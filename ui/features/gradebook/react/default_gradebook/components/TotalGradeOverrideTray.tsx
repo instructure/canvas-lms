@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect} from 'react'
-import {ApolloProvider, createClient} from '@canvas/apollo'
+import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import {FinalGradeOverrideTextBox} from '@canvas/final-grade-override'
 import GradeOverrideInfo from '@canvas/grading/GradeEntry/GradeOverrideInfo'
 import {useScope as useI18nScope} from '@canvas/i18n'

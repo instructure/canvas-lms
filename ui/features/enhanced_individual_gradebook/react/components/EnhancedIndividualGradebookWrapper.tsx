@@ -18,7 +18,7 @@
 
 import React, {useEffect, useState} from 'react'
 
-import {ApolloProvider, createClient} from '@canvas/apollo'
+import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import GradebookMenu from '@canvas/gradebook-menu'
 import LoadingIndicator from '@canvas/loading-indicator'
