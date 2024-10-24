@@ -1762,14 +1762,15 @@ module Lti
                        -> { @assignment.lock_at.utc.iso8601 },
                        -> { @assignment && @assignment.lock_at.present? }
 
-    # Returns the `due_at` date of the assignment that was launched.
-    # If the tool is launched as a student, this will be the date that assignment
-    # is due for that student (or unexpanded -- "$Canvas.assignment.dueAt.iso8601" --
-    # if there is no due date for the student).
-    # If the tool is launched as an instructor and there are multiple
-    # possible due dates (i.e., there are multiple sections and at
-    # least one has a due date override), this will be the LATEST effective
-    # due date of any section or student.
+    # Returns the `due_at` date of the assignment that was launched. Only
+    # available when launched as an assignment with a `due_at` set. If the tool
+    # is launched as a student, this will be the date that assignment is due
+    # for that student (or unexpanded -- "$Canvas.assignment.dueAt.iso8601" --
+    # if there is no due date for the student). If the tool is launched as an
+    # instructor and there are multiple possible due dates (i.e., there are
+    # multiple sections and at least one has a due date override), this will be
+    # the LATEST effective due date of any section or student (or unexpanded if
+    # there is at least one section or student with no effective due date).
     #
     # @example
     #   ```
@@ -1777,8 +1778,8 @@ module Lti
     #   ```
     register_expansion "Canvas.assignment.dueAt.iso8601",
                        [],
-                       -> { latest_due_at&.utc&.iso8601 },
-                       ASSIGNMENT_GUARD
+                       -> { @assignment.due_at.utc.iso8601 },
+                       -> { @assignment && @assignment.due_at.present? }
 
     # Returns the `due_at` date of the assignment that was launched.
     # If the tool is launched as a student, this will be the date that
@@ -2101,29 +2102,15 @@ module Lti
 
     def earliest_due_at
       context = @assignment.context
+      # Mirrors logic in AssignmentOverrideApplicator to determine if user is a student or teacher.
       # If a user is a student, we return their due date. Otherwise, in our case here, we return
       # the earliest of all due dates for the assignment.
-      if course_admin?(context)
+      if context.user_has_been_admin?(current_user) || (context.user_has_no_enrollments?(current_user) &&
+                                               context.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS))
         @assignment.submissions.minimum(:cached_due_date)
       else
         @assignment.due_at
       end
-    end
-
-    def latest_due_at
-      context = @assignment.context
-      # We return the latest of all due dates for the assignment if the user is a course admin.
-      if course_admin?(context)
-        @assignment.submissions.maximum(:cached_due_date)
-      else
-        @assignment.due_at
-      end
-    end
-
-    def course_admin?(context)
-      # Mirrors logic in AssignmentOverrideApplicator to determine if user is a student or teacher.
-      context.user_has_been_admin?(current_user) ||
-        (context.user_has_no_enrollments?(current_user) && context.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS))
     end
 
     def sis_pseudonym
