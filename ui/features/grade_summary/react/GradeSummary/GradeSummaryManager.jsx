@@ -18,7 +18,7 @@
 
 // import PropTypes from 'prop-types'
 import React, {useEffect, useState} from 'react'
-import {ApolloProvider, createClient, createPersistentCache} from '@canvas/apollo'
+import {ApolloProvider, createClient, createPersistentCache} from '@canvas/apollo-v3'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import ErrorBoundary from '@canvas/error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page'

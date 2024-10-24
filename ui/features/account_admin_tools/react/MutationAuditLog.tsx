@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {ApolloProvider, Query, gql, createClient} from '@canvas/apollo'
+import {ApolloProvider, Query, gql, createClient} from '@canvas/apollo-v3'
 import React, {useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import * as tz from '@instructure/moment-utils'

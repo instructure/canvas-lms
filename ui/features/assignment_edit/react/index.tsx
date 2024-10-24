@@ -22,7 +22,7 @@ import {QueryProvider} from '@canvas/query'
 import {ApolloProvider} from '@apollo/react-common'
 import TeacherEditQuery from './components/TeacherEditQuery'
 import TeacherCreateQuery from './components/TeacherCreateQuery'
-import {createClient} from '@canvas/apollo'
+import {createClient} from '@canvas/apollo-v3'
 import {ApolloClient} from 'apollo-client'
 import type {InMemoryCache} from 'apollo-cache-inmemory'
 

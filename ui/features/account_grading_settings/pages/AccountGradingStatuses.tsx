@@ -18,7 +18,7 @@
 
 import React, {useEffect, useState} from 'react'
 import {useMatch} from 'react-router-dom'
-import {ApolloProvider, createClient} from '@canvas/apollo'
+import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {AccountStatusManagement} from '../components/account_grading_status/AccountStatusManagement'

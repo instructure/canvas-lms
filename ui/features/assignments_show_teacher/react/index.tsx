@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {ApolloProvider} from '@apollo/react-common'
 import TeacherQuery from './components/TeacherQuery'
-import {createClient} from '@canvas/apollo'
+import {createClient} from '@canvas/apollo-v3'
 import {ApolloClient} from 'apollo-client'
 import type {InMemoryCache} from 'apollo-cache-inmemory'
 
