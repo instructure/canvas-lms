@@ -22,9 +22,9 @@ import {
   IconArrowOpenStartLine,
   IconArrowOpenEndLine,
   IconTrashLine,
-  IconDragHandleLine,
   IconSaveLine,
 } from '@instructure/ui-icons'
+import {SVGIcon} from '@instructure/ui-svg-images'
 import {Flex} from '@instructure/ui-flex'
 import {CondensedButton, IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
@@ -55,6 +55,12 @@ import {
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('block-editor')
+
+const moveIcon = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M8.77359 0L5.00002 3.77358L5.77532 4.54998L8.22638 2.09893V15.901L5.77532 13.451L5.00002 14.2263L8.77359 17.9999L12.5472 14.2263L11.773 13.451L9.3219 15.901V2.09893L11.773 4.54998L12.5472 3.77358L8.77359 0Z" fill="#273540"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M18 8.77358L14.2264 5L13.45 5.77531L15.9011 8.22637L2.09904 8.22637L4.549 5.77531L3.77369 5L0.000108554 8.77358L3.77369 12.5472L4.549 11.7729L2.09904 9.32189L15.9011 9.32189L13.45 11.7729L14.2264 12.5472L18 8.77358Z" fill="#273540"/>
+</svg>
+`
 
 const Arrows = ['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft']
 
@@ -325,7 +331,7 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
               withBackground={false}
               withBorder={false}
             >
-              <IconDragHandleLine />
+              <SVGIcon src={moveIcon} />
             </IconButton>
           </>
         ) : null}
@@ -352,7 +358,7 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
             <CondensedButton
               size="small"
               onClick={handleSave}
-              renderIcon={IconSaveLine}
+              renderIcon={<IconSaveLine />}
               color="secondary"
               themeOverride={{secondaryGhostColor: '#0e68b3'}}
             >

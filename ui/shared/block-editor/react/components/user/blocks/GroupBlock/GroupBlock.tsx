@@ -22,7 +22,7 @@ import {Element, useEditor, useNode, type Node} from '@craftjs/core'
 import {NoSections} from '../../common'
 import {Container} from '../Container/Container'
 import {useClassNames, isNthChild} from '../../../../utils'
-import {type GroupBlockProps} from './types'
+import {type GroupBlockProps, defaultAlignment} from './types'
 import {GroupBlockToolbar} from './GroupBlockToolbar'
 import {BlockResizer} from '../../../editor/BlockResizer'
 
@@ -77,6 +77,12 @@ export const GroupBlock = (props: GroupBlockProps) => {
   if (node.data.props.height) {
     styl.height = `${node.data.props.height}px`
   }
+  if (node.data.props.color) {
+    styl.color = node.data.props.color
+  }
+  if (node.data.props.background) {
+    styl.backgroundColor = node.data.props.background
+  }
 
   return (
     <Container className={clazz} id={`group-${node.id}`} style={styl}>
@@ -88,9 +94,9 @@ export const GroupBlock = (props: GroupBlockProps) => {
 GroupBlock.craft = {
   displayName: I18n.t('Group'),
   defaultProps: {
-    alignment: 'start',
-    verticalAlignment: 'start',
-    layout: 'column',
+    layout: defaultAlignment.layout,
+    alignment: defaultAlignment.alignment,
+    verticalAlignment: defaultAlignment.verticalAlignment,
     resizable: true,
   },
   rules: {

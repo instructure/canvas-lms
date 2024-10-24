@@ -97,13 +97,13 @@ describe('GroupBlock', () => {
   it('should render ', () => {
     const {container} = renderBlock()
     expect(container.querySelector('.group-block')).toBeInTheDocument()
-    expect(container.querySelector('.group-block')).toHaveClass('column-layout')
+    expect(container.querySelector('.group-block')).toHaveClass('row-layout')
   })
 
-  it('should render with row direction', () => {
-    const {container} = renderBlock({layout: 'row'})
+  it('should render with column direction', () => {
+    const {container} = renderBlock({layout: 'column'})
     expect(container.querySelector('.group-block')).toBeInTheDocument()
-    expect(container.querySelector('.group-block')).toHaveClass('row-layout')
+    expect(container.querySelector('.group-block')).toHaveClass('column-layout')
   })
 
   it('should render with center horizontal alignment', () => {
