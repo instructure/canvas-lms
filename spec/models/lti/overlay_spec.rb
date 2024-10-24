@@ -72,12 +72,6 @@ describe Lti::Overlay do
       end
     end
 
-    context "without updated_by" do
-      it "fails" do
-        expect { Lti::Overlay.create!(registration:, account:, data:) }.to raise_error(ActiveRecord::RecordInvalid)
-      end
-    end
-
     context "with invalid data" do
       let(:data) do
         {

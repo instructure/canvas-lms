@@ -27,7 +27,7 @@ class Lti::Overlay < ActiveRecord::Base
   belongs_to :account, inverse_of: :lti_overlays, optional: false
   # Registration can be cross-shard
   belongs_to :registration, class_name: "Lti::Registration", inverse_of: :lti_overlays, optional: false
-  belongs_to :updated_by, class_name: "User", inverse_of: :lti_overlays, optional: false
+  belongs_to :updated_by, class_name: "User", inverse_of: :lti_overlays
 
   has_many :lti_overlay_versions, class_name: "Lti::OverlayVersion", inverse_of: :lti_overlay, dependent: :destroy
   resolves_root_account through: :account
