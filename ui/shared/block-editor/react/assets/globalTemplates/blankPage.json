@@ -65,7 +65,7 @@
         "props": {
           "alignment": "start",
           "verticalAlignment": "start",
-          "layout": "column",
+          "layout": "row",
           "resizable": false,
           "isColumn": true,
           "id": "columns-pEdeFvz6_0-1"
@@ -90,7 +90,7 @@
         },
         "isCanvas": true,
         "props": {
-          "className": "",
+          "className": "group-block__inner",
           "placeholderText": "Drop a block to add it here"
         },
         "displayName": "NoSections",
