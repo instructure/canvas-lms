@@ -32,8 +32,9 @@ interface NewLoginContextType {
   otpCommunicationChannelId: string | null
   setOtpCommunicationChannelId: (id: string | null) => void
   // define optional data attributes from hook
-  loginHandleName?: string
+  enableCourseCatalog?: boolean
   authProviders?: AuthProvider[]
+  loginHandleName?: string
   loginLogoUrl?: string
   loginLogoAlt?: string
   bodyBgColor?: string
@@ -56,8 +57,9 @@ export const NewLoginProvider = ({children}: NewLoginProviderProps) => {
 
   // get data attribute values from hook
   const {
-    loginHandleName,
+    enableCourseCatalog,
     authProviders,
+    loginHandleName,
     loginLogoUrl,
     loginLogoAlt,
     bodyBgColor,
@@ -79,8 +81,9 @@ export const NewLoginProvider = ({children}: NewLoginProviderProps) => {
         otpCommunicationChannelId,
         setOtpCommunicationChannelId,
         // pass data attribute hook values
-        loginHandleName,
+        enableCourseCatalog,
         authProviders,
+        loginHandleName,
         loginLogoUrl,
         loginLogoAlt,
         bodyBgColor,
