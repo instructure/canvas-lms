@@ -338,6 +338,7 @@ export const AddressBookContainer = props => {
       isOnObserverSubmenu={isOnObserverSubmenu()}
       placeholder={props.placeholder}
       addressBookLabel={props.addressBookLabel}
+      renderingContext={props.renderingContext}
     />
   )
 }
@@ -384,6 +385,7 @@ AddressBookContainer.propTypes = {
    */
   placeholder: PropTypes.string,
   addressBookLabel: PropTypes.string,
+  renderingContext: PropTypes.string,
 }
 
 AddressBookContainer.defaultProps = {

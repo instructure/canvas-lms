@@ -107,7 +107,7 @@ describe('Address Book Component', () => {
 
     it('Should render a text input', async () => {
       const {findByTestId} = setup(defaultProps)
-      const input = await findByTestId('address-book-input')
+      const input = await findByTestId('-address-book-input')
       expect(input).toBeTruthy()
     })
 
@@ -389,7 +389,7 @@ describe('Address Book Component', () => {
     it('Should send search input through onTextChange callback', async () => {
       const onChangeSpy = jest.fn()
       const {findByTestId} = setup({...defaultProps, onTextChange: onChangeSpy})
-      const input = await findByTestId('address-book-input')
+      const input = await findByTestId('-address-book-input')
       fireEvent.change(input, {target: {value: 'Test'}})
       expect(onChangeSpy.mock.calls.length).toBe(1)
     })

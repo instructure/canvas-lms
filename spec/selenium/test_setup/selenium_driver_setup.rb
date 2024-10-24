@@ -280,9 +280,11 @@ module SeleniumDriverSetup
       when :chrome
         options = Selenium::WebDriver::Options.chrome
         options.browser_version = CONFIG[:browser_version] if CONFIG[:browser_version]
-        options.args << "no-sandbox"
+        options.args << "--no-sandbox"
+        options.args << "--disable-search-engine-choice-screen"
         options.args << "start-maximized"
-        options.args << "disable-dev-shm-usage"
+        options.args << "--enable-automation"
+        options.args << "--disable-dev-shm-usage"
         if ENV["DISABLE_CORS"]
           options.args << "disable-web-security"
         end

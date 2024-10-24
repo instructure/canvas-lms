@@ -183,6 +183,14 @@ describe('MessageListActionContainer', () => {
     })
   })
 
+  describe('AddressBook', () => {
+    it('should render AddressBook', async () => {
+      const {findByTestId} = setup()
+      const addressBook = await findByTestId('message-list-actions-address-book-input')
+      expect(addressBook).toBeTruthy()
+    })
+  })
+
   describe('reply buttons', () => {
     it('should disable replying when no conversations are selected', async () => {
       const component = setup({
