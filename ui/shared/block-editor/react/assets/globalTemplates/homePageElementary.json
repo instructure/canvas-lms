@@ -114,7 +114,7 @@
       },
       "fnCfTyiE5O": {
         "type": {
-          "resolvedName": "RCEBlock"
+          "resolvedName": "RCETextBlock"
         },
         "isCanvas": false,
         "props": {
@@ -557,7 +557,7 @@
       },
       "Sqmp4IL7Q6": {
         "type": {
-          "resolvedName": "RCEBlock"
+          "resolvedName": "RCETextBlock"
         },
         "isCanvas": false,
         "props": {

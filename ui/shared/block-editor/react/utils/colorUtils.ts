@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {contrast} from '@instructure/ui-color-utils'
+import conversions, {contrast, type RGBAType} from '@instructure/ui-color-utils'
 import {white, black} from './constants'
 import tinycolor from 'tinycolor2'
 
@@ -38,4 +38,37 @@ const isTransparent = (color?: string) => {
   return c.isValid() && c.getAlpha() === 0
 }
 
-export {getContrastingColor, getContrastingButtonColor, isTransparent, white, black}
+// the following 2 functions are is copied from INSTUI ColorContrast
+// a function to handle this will eventually be exported
+// from @instructure/ui-color-utils
+const INSTUIcalcBlendedColor = (c1: RGBAType, c2: RGBAType) => {
+  const alpha = 1 - (1 - c1.a) * (1 - c2.a)
+  return {
+    r: (c2.r * c2.a) / alpha + (c1.r * c1.a * (1 - c2.a)) / alpha,
+    g: (c2.g * c2.a) / alpha + (c1.g * c1.a * (1 - c2.a)) / alpha,
+    b: (c2.b * c2.a) / alpha + (c1.b * c1.a * (1 - c2.a)) / alpha,
+    a: 1,
+  }
+}
+
+const INSTUIcalcContrast = (firstColor: string, secondColor: string): number => {
+  const c1RGBA = conversions.colorToRGB(firstColor)
+  const c2RGBA = conversions.colorToRGB(secondColor)
+  const c1OnWhite = INSTUIcalcBlendedColor({r: 255, g: 255, b: 255, a: 1}, c1RGBA)
+  const c2OnC1OnWhite = INSTUIcalcBlendedColor(c1OnWhite, c2RGBA)
+
+  return contrast(conversions.colorToHex8(c1OnWhite), conversions.colorToHex8(c2OnC1OnWhite), 2)
+}
+
+const getContrastStatus = (color1: string, color2: string): boolean => {
+  return INSTUIcalcContrast(color1, color2) >= 4.5
+}
+
+export {
+  getContrastingColor,
+  getContrastingButtonColor,
+  getContrastStatus,
+  isTransparent,
+  white,
+  black,
+}

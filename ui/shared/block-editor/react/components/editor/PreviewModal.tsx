@@ -15,13 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useLayoutEffect, useState} from 'react'
 import {useEditor} from '@craftjs/core'
 import {CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {View} from '@instructure/ui-view'
+import {enhanceUserContent} from '@instructure/canvas-rce'
 import BlockEditorView from '../../BlockEditorView'
 import {LATEST_BLOCK_DATA_VERSION} from '../../utils/transformations'
 import {IconDesktop, IconTablet, IconMobile} from '../../assets/internal-icons'
@@ -255,6 +256,8 @@ type PreviewModalProps = {
 const PreviewModal = ({open, onDismiss}: PreviewModalProps) => {
   const {query} = useEditor()
   const [viewSize, setViewSize] = useState<ViewSize>('desktop')
+  const [viewRef, setViewRef] = useState<HTMLElement | null>(null)
+  const [rendered, setRendered] = useState(false)
 
   const handleKey = useCallback(
     (event: KeyboardEvent) => {
@@ -264,6 +267,17 @@ const PreviewModal = ({open, onDismiss}: PreviewModalProps) => {
     },
     [onDismiss, open]
   )
+
+  const handleRendered = useCallback(() => {
+    setRendered(true)
+  }, [])
+
+  useEffect(() => {
+    if (viewRef && rendered) {
+      // @ts-expect-error enhandeUserContent is not typed
+      enhanceUserContent(viewRef, {canvasOrigin: window.location.origin})
+    }
+  }, [viewRef, rendered])
 
   useEffect(() => {
     document.addEventListener('keydown', handleKey)

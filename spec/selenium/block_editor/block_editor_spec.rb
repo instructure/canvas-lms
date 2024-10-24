@@ -115,44 +115,59 @@ describe "Block Editor", :ignore_js_errors do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
       open_block_toolbox_to_tab("blocks")
-      drop_new_block("text", group_block_dropzone)
+      drop_new_block("group", group_block_dropzone)
+      # the first .group-block is the column, the second is our block
+      the_block = f(".group-block .group-block")
+      expect(the_block).to be_displayed
       expect(block_toolbar).to be_displayed
       expect(block_resize_handle("se")).to be_displayed
-      expect(text_block.size.height).to eq(19) # 1.2rem
-      expect(text_block.size.width).to eq(160) # 10rem
+      h = the_block.size.height
+      w = the_block.size.width
       drag_and_drop_element_by(block_resize_handle("se"), 100, 0)
+      w += 100
       drag_and_drop_element_by(block_resize_handle("se"), 0, 50)
-      expect(text_block.size.width).to eq(260)
-      expect(text_block.size.height).to eq(69)
+      h += 50
+      expect(the_block.size.width).to eq(w)
+      expect(the_block.size.height).to eq(h)
     end
 
     it "can resize blocks with the keyboard" do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
       open_block_toolbox_to_tab("blocks")
-      drop_new_block("text", group_block_dropzone)
+      drop_new_block("group", group_block_dropzone)
+      the_block = f(".group-block .group-block")
+      expect(the_block).to be_displayed
       expect(block_toolbar).to be_displayed
       expect(block_resize_handle("se")).to be_displayed
-      expect(text_block.size.height).to eq(19)
-      expect(text_block.size.width).to eq(160)
+      h = the_block.size.height
+      w = the_block.size.width
+      expect(the_block.size.height).to eq(h)
+      expect(the_block.size.width).to eq(w)
       f("body").send_keys(:alt, :arrow_down)
-      expect(text_block.size.height).to eq(20)
-      expect(text_block.size.width).to eq(160)
+      h += 1
+      expect(the_block.size.height).to eq(h)
+      expect(the_block.size.width).to eq(w)
       f("body").send_keys(:alt, :arrow_right)
-      expect(text_block.size.height).to eq(20)
-      expect(text_block.size.width).to eq(161)
+      w += 1
+      expect(the_block.size.height).to eq(h)
+      expect(the_block.size.width).to eq(w)
       f("body").send_keys(:alt, :arrow_left)
-      expect(text_block.size.height).to eq(20)
-      expect(text_block.size.width).to eq(160)
+      w -= 1
+      expect(the_block.size.height).to eq(h)
+      expect(the_block.size.width).to eq(w)
       f("body").send_keys(:alt, :arrow_up)
-      expect(text_block.size.height).to eq(19)
-      expect(text_block.size.width).to eq(160)
+      h -= 1
+      expect(the_block.size.height).to eq(h)
+      expect(the_block.size.width).to eq(w)
       f("body").send_keys(:alt, :shift, :arrow_right)
-      expect(text_block.size.height).to eq(19)
-      expect(text_block.size.width).to eq(170)
+      w += 10
+      expect(the_block.size.height).to eq(h)
+      expect(the_block.size.width).to eq(w)
       f("body").send_keys(:alt, :shift, :arrow_down)
-      expect(text_block.size.height).to eq(29)
-      expect(text_block.size.width).to eq(170)
+      h += 10
+      expect(the_block.size.height).to eq(h)
+      expect(the_block.size.width).to eq(w)
     end
 
     context "image block" do

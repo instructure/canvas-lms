@@ -101,7 +101,7 @@ export const Topbar = ({toolboxOpen, onToolboxChange}: TopbarProps) => {
           </Button> */}
         </Flex.Item>
       </Flex>
-      {previewOpen && <PreviewModal open={previewOpen} onDismiss={handleClosePreview} />}
+      {previewOpen ? <PreviewModal open={previewOpen} onDismiss={handleClosePreview} /> : null}
     </View>
   )
 }
