@@ -1698,6 +1698,14 @@ describe "RCE next tests", :ignore_js_errors do
     # rubocop:enable Specs/NoSeleniumWebDriverWait
 
     describe "CanvasContentTray" do
+      it "opens and focuses the close button" do
+        visit_front_page_edit(@course)
+        document_toolbar_menubutton.click
+        course_documents_toolbar_menuitem.click
+        expect(tray_container).to be_displayed
+        expect(content_tray_close_button).to eq(driver.switch_to.active_element)
+      end
+
       it "displays all its dropdowns" do
         visit_front_page_edit(@course)
 

@@ -86,7 +86,7 @@ export default function CanvasContentTray(props) {
 
   const trayRef = useRef(null)
   const scrollingAreaRef = useRef(null)
-  const closeButtonRef = useRef(null)
+  const [closeButtonRef, setCloseButtonRef] = useState(null)
   const [filterSettings, setFilterSettings] = useFilterSettings()
   const [isEditTray, setIsEditTray] = useState(false)
   const [link, setLink] = useState(null)
@@ -104,6 +104,14 @@ export default function CanvasContentTray(props) {
     onTrayClosing && onTrayClosing(CanvasContentTray.globalOpenCount) // tell RCEWrapper we're closing if we're open
     setIsOpen(false)
   }, [bridge, onTrayClosing])
+
+  // this shouldn't be necessary, but INSTUI isn't focusing the close button
+  // like it should.
+  useEffect(() => {
+    if (isOpen && closeButtonRef) {
+      closeButtonRef.focus()
+    }
+  }, [closeButtonRef, isOpen])
 
   useEffect(() => {
     const controller = {
@@ -130,7 +138,6 @@ export default function CanvasContentTray(props) {
         } else {
           setIsEditTray(false)
         }
-        closeButtonRef.current?.focus()
       },
       hideTray(forceClose) {
         if (forceClose || hidingTrayOnAction) {
@@ -284,6 +291,22 @@ export default function CanvasContentTray(props) {
   function getHeader() {
     return isEditTray ? formatMessage('Edit Course Link') : formatMessage('Add')
   }
+
+  function renderLinkDisplay() {
+    return (
+      isEditTray && (
+        <LinkDisplay
+          linkText={linkText}
+          placeholderText={link?.title || placeholderText}
+          linkFileName={link?.title || ''}
+          published={link?.published || false}
+          handleTextChange={setLinkText}
+          linkType={link?.type}
+        />
+      )
+    )
+  }
+
   return (
     <Tray
       data-mce-component={true}
@@ -306,55 +329,46 @@ export default function CanvasContentTray(props) {
       onOpen={handleOpenTray}
       contentRef={el => (trayRef.current = el)}
     >
-      {isOpen && hasOpened ? (
-        <Flex
-          direction="column"
-          as="div"
-          height={getTrayHeight()}
-          overflowY="hidden"
-          tabIndex={-1}
-          data-canvascontenttray-content={true}
-        >
-          <Flex.Item padding="medium" shadow="above">
-            <View as="div" margin="none none medium none">
-              <Heading level="h2">{getHeader()}</Heading>
+      <Flex
+        direction="column"
+        as="div"
+        height={getTrayHeight()}
+        overflowY="hidden"
+        tabIndex={-1}
+        data-canvascontenttray-content={true}
+      >
+        <Flex.Item padding="medium" shadow="above">
+          <View as="div" margin="none none medium none">
+            <Heading level="h2">{getHeader()}</Heading>
 
-              <CloseButton
-                placement="end"
-                offset="medium"
-                onClick={handleDismissTray}
-                data-testid="CloseButton_ContentTray"
-                screenReaderLabel={formatMessage('Close')}
-                elementRef={el => (closeButtonRef.current = el)}
-              />
-            </View>
-            {isEditTray && (
-              <LinkDisplay
-                linkText={linkText}
-                placeholderText={link?.title || placeholderText}
-                linkFileName={link?.title || ''}
-                published={link?.published || false}
-                handleTextChange={setLinkText}
-                linkType={link?.type}
-              />
-            )}
-            <Filter
-              {...filterSettings}
-              mountNode={props.mountNode}
-              userContextType={props.contextType}
-              containingContextType={props.containingContext.contextType}
-              onChange={newFilter => {
-                handleFilterChange(
-                  newFilter,
-                  storeProps.onChangeContext,
-                  storeProps.onChangeSearchString,
-                  storeProps.onChangeSortBy
-                )
-              }}
-              isContentLoading={isLoading(storeProps)}
-              use_rce_icon_maker={props.use_rce_icon_maker}
+            <CloseButton
+              placement="end"
+              offset="medium"
+              onClick={handleDismissTray}
+              data-testid="CloseButton_ContentTray"
+              screenReaderLabel={formatMessage('Close')}
+              elementRef={el => setCloseButtonRef(el)}
             />
-          </Flex.Item>
+          </View>
+          {renderLinkDisplay()}
+          <Filter
+            {...filterSettings}
+            mountNode={props.mountNode}
+            userContextType={props.contextType}
+            containingContextType={props.containingContext.contextType}
+            onChange={newFilter => {
+              handleFilterChange(
+                newFilter,
+                storeProps.onChangeContext,
+                storeProps.onChangeSearchString,
+                storeProps.onChangeSortBy
+              )
+            }}
+            isContentLoading={isLoading(storeProps)}
+            use_rce_icon_maker={props.use_rce_icon_maker}
+          />
+        </Flex.Item>
+        {isOpen && hasOpened ? (
           <Flex.Item
             shouldGrow={true}
             shouldShrink={true}
@@ -381,8 +395,8 @@ export default function CanvasContentTray(props) {
               {isEditTray && renderFooter()}
             </Flex>
           </Flex.Item>
-        </Flex>
-      ) : null}
+        ) : null}
+      </Flex>
     </Tray>
   )
 }
