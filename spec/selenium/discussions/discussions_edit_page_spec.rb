@@ -467,7 +467,6 @@ describe "discussions" do
 
         context "usage rights" do
           before do
-            course.root_account.enable_feature!(:usage_rights_discussion_topics)
             course.update!(usage_rights_required: true)
           end
 
@@ -666,7 +665,6 @@ describe "discussions" do
 
         context "usage rights" do
           before do
-            course.root_account.enable_feature!(:usage_rights_discussion_topics)
             course.update!(usage_rights_required: true)
 
             usage_rights = @course.usage_rights.create! use_justification: "creative_commons", legal_copyright: "(C) 2014 XYZ Corp", license: "cc_by_nd"

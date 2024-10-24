@@ -1950,36 +1950,16 @@ describe DiscussionTopicsController do
         end
       end
 
-      context "with usage_rights_discussion_topics disabled" do
-        before { @course.root_account.disable_feature!(:usage_rights_discussion_topics) }
+      context "enabled on course" do
+        before { @course.update!(usage_rights_required: true) }
 
-        context "enabled on course" do
-          before { @course.update!(usage_rights_required: true) }
-
-          include_examples "no usage rights returned"
-        end
-
-        context "disabled on course" do
-          before { @course.update!(usage_rights_required: false) }
-
-          include_examples "no usage rights returned"
-        end
+        include_examples "usage rights returned"
       end
 
-      context "with usage_rights_discussion_topics enabled" do
-        before { @course.root_account.enable_feature!(:usage_rights_discussion_topics) }
+      context "disabled on course" do
+        before { @course.update!(usage_rights_required: false) }
 
-        context "enabled on course" do
-          before { @course.update!(usage_rights_required: true) }
-
-          include_examples "usage rights returned"
-        end
-
-        context "disabled on course" do
-          before { @course.update!(usage_rights_required: false) }
-
-          include_examples "no usage rights returned"
-        end
+        include_examples "no usage rights returned"
       end
     end
   end
@@ -2486,36 +2466,16 @@ describe DiscussionTopicsController do
         end
       end
 
-      context "with usage_rights_discussion_topics disabled" do
-        before { @course.root_account.disable_feature!(:usage_rights_discussion_topics) }
+      context "enabled on course" do
+        before { @course.update!(usage_rights_required: true) }
 
-        context "enabled on course" do
-          before { @course.update!(usage_rights_required: true) }
-
-          include_examples "no usage rights set"
-        end
-
-        context "disabled on course" do
-          before { @course.update!(usage_rights_required: false) }
-
-          include_examples "no usage rights set"
-        end
+        include_examples "usage rights set"
       end
 
-      context "with usage_rights_discussion_topics enabled" do
-        before { @course.root_account.enable_feature!(:usage_rights_discussion_topics) }
+      context "disabled on course" do
+        before { @course.update!(usage_rights_required: false) }
 
-        context "enabled on course" do
-          before { @course.update!(usage_rights_required: true) }
-
-          include_examples "usage rights set"
-        end
-
-        context "disabled on course" do
-          before { @course.update!(usage_rights_required: false) }
-
-          include_examples "no usage rights set"
-        end
+        include_examples "no usage rights set"
       end
     end
   end

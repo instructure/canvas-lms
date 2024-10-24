@@ -278,7 +278,6 @@ export type RootAccountFeatureId =
   | 'rce_transform_loaded_content'
   | 'scheduled_page_publication'
   | 'send_usage_metrics'
-  | 'usage_rights_discussion_topics'
   | 'account_level_mastery_scales'
   | 'non_scoring_rubrics'
   | 'rubric_criterion_range'

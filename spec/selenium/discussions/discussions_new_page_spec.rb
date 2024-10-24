@@ -515,7 +515,6 @@ describe "discussions" do
 
         context "usage rights" do
           before do
-            account.root_account.enable_feature!(:usage_rights_discussion_topics)
             account.settings = { "usage_rights_required" => {
               "value" => true
             } }
@@ -966,7 +965,6 @@ describe "discussions" do
 
       context "usage rights" do
         before do
-          course.root_account.enable_feature!(:usage_rights_discussion_topics)
           course.update!(usage_rights_required: true)
         end
 
