@@ -505,7 +505,6 @@ QUnit.module(
 QUnit.module('EditView - Usage Rights', {
   setup() {
     fakeENV.setup()
-    ENV.FEATURES.usage_rights_discussion_topics = true
     ENV.USAGE_RIGHTS_REQUIRED = true
     ENV.PERMISSIONS.manage_files = true
     this.server = sinon.fakeServer.create({respondImmediately: true})

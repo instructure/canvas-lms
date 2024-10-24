@@ -538,8 +538,7 @@ class DiscussionTopicsController < ApplicationController
     }
 
     usage_rights_required = @context.try(:usage_rights_required?)
-    include_usage_rights = usage_rights_required &&
-                           @context.root_account.feature_enabled?(:usage_rights_discussion_topics)
+    include_usage_rights = usage_rights_required
     course_published = if @context.is_a?(Course)
                          @context.published?
                        elsif @context.is_a?(Group) && @context.context.is_a?(Course)
@@ -1561,8 +1560,7 @@ class DiscussionTopicsController < ApplicationController
         @topic = DiscussionTopic.find(@topic.id)
         @topic.broadcast_notifications(prior_version)
 
-        include_usage_rights = @context.root_account.feature_enabled?(:usage_rights_discussion_topics) &&
-                               @context.try(:usage_rights_required?)
+        include_usage_rights = @context.try(:usage_rights_required?)
 
         if is_new
           InstStatsd::Statsd.increment("discussion_topic.created")
@@ -1816,7 +1814,6 @@ class DiscussionTopicsController < ApplicationController
   end
 
   def set_default_usage_rights(attachment)
-    return unless @context.root_account.feature_enabled?(:usage_rights_discussion_topics)
     return unless @context.try(:usage_rights_required?)
     return if @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
 

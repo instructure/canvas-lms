@@ -75,11 +75,7 @@ const validateUsageRights = (
   setOnFailure
 ) => {
   // if usage rights is not enabled or there are no attachments, there is no need to validate
-  if (
-    !ENV?.FEATURES?.usage_rights_discussion_topics ||
-    !ENV?.USAGE_RIGHTS_REQUIRED ||
-    !attachment
-  ) {
+  if (!ENV?.USAGE_RIGHTS_REQUIRED || !attachment) {
     return true
   }
 
