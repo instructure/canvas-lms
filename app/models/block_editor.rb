@@ -26,20 +26,10 @@ class BlockEditor < ActiveRecord::Base
 
   LATEST_VERSION = "0.2"
 
-  BLANK_PAGE = {
-    ROOT: {
-      type: {
-        resolvedName: "PageBlock"
-      },
-      isCanvas: true,
-      props: {},
-      displayName: "Page",
-      custom: {},
-      hidden: false,
-      nodes: [],
-      linkedNodes: {}
-    }
-  }.freeze
+  def self.blank_page
+    file_contents = File.read(File.join("ui", "shared", "block-editor", "react", "assets", "globalTemplates", "blankPage.json"))
+    JSON.parse(file_contents)["node_tree"]["nodes"].to_json
+  end
 
   def set_root_account_id
     self.root_account_id = context&.root_account_id unless root_account_id

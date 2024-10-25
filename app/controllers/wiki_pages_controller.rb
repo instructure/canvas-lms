@@ -142,7 +142,7 @@ class WikiPagesController < ApplicationController
   end
 
   def create_block_editor
-    BlockEditor.create! root_account_id: @page.root_account_id, context: @page, editor_version: BlockEditor::LATEST_VERSION, blocks: BlockEditor::BLANK_PAGE
+    BlockEditor.create! root_account_id: @page.root_account_id, context: @page, editor_version: BlockEditor::LATEST_VERSION, blocks: BlockEditor.blank_page
   end
 
   def revisions
