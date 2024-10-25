@@ -276,6 +276,12 @@ describe FilesController do
   end
 
   describe "GET 'show'" do
+    def enable_limited_access_for_students
+      @course.account.root_account.enable_feature!(:allow_limited_access_for_students)
+      @course.account.settings[:enable_limited_access_for_students] = true
+      @course.account.save!
+    end
+
     before :once do
       course_file
     end
@@ -305,6 +311,14 @@ describe FilesController do
 
       get "show", params: { assignment_id: assignment1.id, id: @attachment.id }, format: :json
       expect(response).not_to be_ok
+    end
+
+    it "renders files with limited access flag" do
+      enable_limited_access_for_students
+
+      user_session(@student)
+      get "show", params: { course_id: @course.id, id: @file.id }
+      expect(response).to be_successful
     end
 
     describe "with verifiers" do
