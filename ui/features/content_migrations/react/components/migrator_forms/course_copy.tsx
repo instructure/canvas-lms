@@ -28,6 +28,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import CommonMigratorControls from './common_migrator_controls'
 import type {onSubmitMigrationFormCallback} from '../types'
 import {Text} from '@instructure/ui-text'
+import moment from 'moment-timezone'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -35,12 +36,22 @@ type CourseOption = {
   id: string
   label: string
   term: string
+  start_at: string
+  end_at: string
 }
 
 type CourseCopyImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
   onCancel: () => void
   isSubmitting: boolean
+}
+
+export const parseDate = (date_string_field?: string): string | null | undefined => {
+  if (!date_string_field) {
+    return date_string_field
+  }
+
+  return moment.tz(date_string_field, 'DD MMM YYYY [at] HH:mm', ENV?.TIMEZONE).toISOString()
 }
 
 export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCopyImporterProps) => {
@@ -184,6 +195,10 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
         canImportBPSettings={
           selectedCourse && ENV.SHOW_BP_SETTINGS_IMPORT_OPTION ? selectedCourse.blueprint : false
         }
+        oldStartDate={parseDate(selectedCourse?.start_at)}
+        oldEndDate={parseDate(selectedCourse?.end_at)}
+        newStartDate={parseDate(ENV.OLD_START_DATE)}
+        newEndDate={parseDate(ENV.OLD_END_DATE)}
         onSubmit={handleSubmit}
         onCancel={onCancel}
       />

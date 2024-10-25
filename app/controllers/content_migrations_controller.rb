@@ -162,8 +162,8 @@ class ContentMigrationsController < ApplicationController
       js_env(NEW_QUIZZES_MIGRATION_REQUIRED: new_quizzes_require_migration?)
       js_env(NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS: new_quizzes_unattached_bank_migrations_enabled?)
 
-      js_env(OLD_START_DATE: @context.start_at)
-      js_env(OLD_END_DATE: @context.conclude_at)
+      js_env(OLD_START_DATE: datetime_string(@context.start_at, :verbose))
+      js_env(OLD_END_DATE: datetime_string(@context.conclude_at, :verbose))
     else
       scope = @context.content_migrations.where(child_subscription_id: nil).order("id DESC")
       @migrations = Api.paginate(scope, self, api_v1_course_content_migration_list_url(@context))
