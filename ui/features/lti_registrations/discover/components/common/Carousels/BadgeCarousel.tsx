@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import useWindowWidth from '../useWindowWidth'
 import {PreviousArrow, NextArrow} from './Arrows'
 import {settings, calculateArrowDisableIndex} from './utils'
@@ -48,6 +48,15 @@ function BadgeCarousel(props: BadgeCarouselProps) {
 
   const [currentSlideNumber, setCurrentSlideNumber] = useState(0)
 
+  const sliderOffset = useMemo(() => {
+    if (windowSize <= 360) {
+      return 1
+    } else if (windowSize <= 760) {
+      return 2
+    }
+    return 3
+  }, [windowSize])
+
   const renderBadges = () => {
     return badges.map((badge, i) => (
       <Flex key={`${i + 1}`} margin="0 xx-large large 0">
@@ -62,7 +71,7 @@ function BadgeCarousel(props: BadgeCarouselProps) {
           </Text>
           <Flex.Item>
             {badge.link && (
-              <div>
+              <div style={{display: currentSlideNumber + sliderOffset > i ? 'block' : 'none'}}>
                 <Link href={badge.link} isWithinText={false}>
                   <Text weight="bold">{I18n.t('Learn More')}</Text>
                 </Link>
