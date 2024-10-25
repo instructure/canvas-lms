@@ -6977,6 +6977,7 @@ hu:
   conversations_69a8dc26: Üzenetváltások
   conversations_send_messages_to_entire_class_3f414741: "Beszélgetések - üzenetek küldése egész osztálynak"
   conversations_send_messages_to_individual_course_m_733620b: "Beszélgetések - üzenetek küldése egyedi kurzusrésztvevőknek"
+  cookie_notice_fe4f182e: Cookie-közlemény
   copy_9748f9f: Másolás
   copy_announcement_title_9d23ddde: "Hirdetmény másolása %{title}"
   copy_assignment_name_to_another_course_b62d0a54: "Másolja a %{name} feladatot egy másik kurzusba"
@@ -8418,6 +8419,7 @@ hu:
   custom_status_savedname_updated_29ac1105: "Egyéni állapot %{savedName} frissítve"
   custom_statuses_14038f1e: "Egyéni állapotok"
   customizable_default_due_date_a987fbfa: "Testreszabható alapértelmezett esedékességi dátum"
+  customize_74cdc895: Testreszabás
   customize_course_details_26fd4afe: "A kurzus részleteinek testreszabása"
   customize_forbidden_words_termslist_see_default_li_4963beb0: "A tiltott szavak/kifejezések testreszabása (az alapértelmezett listát itt tekintheti meg)"
   customize_learning_mastery_ratings_4ace142a: "Jártassági szintek minősítéseinek testreszabása"
