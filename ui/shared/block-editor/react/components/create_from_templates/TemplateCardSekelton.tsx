@@ -28,9 +28,11 @@ const I18n = useI18nScope('block-editor')
 export default function TemplateCardSkeleton({
   template,
   createAction,
+  quickLookAction,
 }: {
   template: BlockTemplate
   createAction: () => void
+  quickLookAction?: () => void
 }) {
   return (
     <View
@@ -48,10 +50,9 @@ export default function TemplateCardSkeleton({
       <Flex alignItems="center" height="241px" justifyItems="center" width="100%">
         {template.id !== 'blank_page' ? (
           <div className="buttons">
-            {/* Not yet */}
-            {/* <Button color="secondary" margin="0 x-small 0 0" size="small"> */}
-            {/*   {I18n.t('Quick Look')} */}
-            {/* </Button> */}
+            <Button color="secondary" margin="0 x-small 0 0" size="small" onClick={quickLookAction}>
+              {I18n.t('Quick Look')}
+            </Button>
             <Button color="primary" size="small" onClick={createAction}>
               {I18n.t('Customize')}
             </Button>
