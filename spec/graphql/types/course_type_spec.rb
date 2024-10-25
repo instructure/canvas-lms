@@ -1059,4 +1059,66 @@ describe Types::CourseType do
       expect(cur_resolver.resolve("activityStream { summary { notificationCategory } } ")).to match_array [nil, nil]
     end
   end
+
+  describe "moderators" do
+    def execute_query(pagination_options: {}, user: @teacher)
+      options_string = pagination_options.empty? ? "" : "(#{pagination_options.map { |key, value| "#{key}: #{value.inspect}" }.join(", ")})"
+      CanvasSchema.execute(<<~GQL, context: { current_user: user }).dig("data", "course")
+        query {
+          course(id: #{course.id}) {
+            availableModerators#{options_string} {
+              edges {
+                node {
+                  _id
+                  name
+                }
+              }
+              pageInfo {
+                hasNextPage
+                endCursor
+              }
+            }
+            availableModeratorsCount
+          }
+        }
+      GQL
+    end
+
+    before(:once) do
+      @ta = User.create!
+      course.enroll_ta(@ta, enrollment_state: :active)
+    end
+
+    context "when user has permissions to manage assignments" do
+      it "returns availableModerators and availableModeratorsCount" do
+        result = execute_query
+
+        expect(result["availableModerators"]["edges"]).to match_array [
+          { "node" => { "_id" => @teacher.id.to_s, "name" => @teacher.name } },
+          { "node" => { "_id" => @ta.id.to_s, "name" => @ta.name } },
+        ]
+
+        expect(result["availableModeratorsCount"]).to eq 2
+      end
+
+      it "paginate available moderators" do
+        result = execute_query(pagination_options: { first: 1 })
+        expect(result["availableModerators"]["edges"].length).to eq 1
+        expect(result["availableModerators"]["pageInfo"]["hasNextPage"]).to be true
+
+        end_cursor = result["availableModerators"]["pageInfo"]["endCursor"]
+        result = execute_query(pagination_options: { first: 1, after: end_cursor })
+        expect(result["availableModerators"]["edges"].length).to eq 1
+        expect(result["availableModerators"]["pageInfo"]["hasNextPage"]).to be false
+      end
+    end
+
+    context "when user does not have permissions to manage assignments" do
+      it "returns nil" do
+        result = execute_query(user: @student)
+        expect(result["availableModerators"]).to be_nil
+        expect(result["availableModeratorsCount"]).to be_nil
+      end
+    end
+  end
 end

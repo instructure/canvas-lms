@@ -467,5 +467,19 @@ module Types
       context.scoped_set!(:context_type, "Course")
       object
     end
+
+    field :available_moderators, UserType.connection_type, null: true
+    def available_moderators
+      return unless course.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+
+      course.moderators
+    end
+
+    field :available_moderators_count, Integer, null: true
+    def available_moderators_count
+      return unless course.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+
+      course.moderators.size
+    end
   end
 end
