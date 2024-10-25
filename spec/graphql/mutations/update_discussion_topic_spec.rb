@@ -395,6 +395,36 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     expect(@topic.reload.locked).to be false
   end
 
+  context "message handling" do
+    it "does not update discussion message if in db its nil, and in request its empty string" do
+      @topic.update!(message: nil)
+      result = run_mutation(id: @topic.id, message: "")
+      expect(result["errors"]).to be_nil
+      expect(@topic.reload.message).to be_nil
+    end
+
+    it "does not update update discussion message if in db its empty string, and in request its nil" do
+      @topic.update!(message: "")
+      result = run_mutation(id: @topic.id, message: nil)
+      expect(result["errors"]).to be_nil
+      expect(@topic.reload.message).to eq ""
+    end
+
+    it "does update discussion message if in db its some value, and in request its empty string" do
+      @topic.update!(message: "Old Message")
+      result = run_mutation(id: @topic.id, message: "")
+      expect(result["errors"]).to be_nil
+      expect(@topic.reload.message).to eq ""
+    end
+
+    it "does update discussion message if in db its nil, and in request its some value" do
+      @topic.update!(message: nil)
+      result = run_mutation(id: @topic.id, message: "New Message")
+      expect(result["errors"]).to be_nil
+      expect(@topic.reload.message).to eq "New Message"
+    end
+  end
+
   context "discussion assignment" do
     before do
       @discussion_assignment = @course.assignments.create!(

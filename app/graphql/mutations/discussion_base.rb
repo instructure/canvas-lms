@@ -94,11 +94,21 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
   field :discussion_topic, Types::DiscussionType, null:
 
   # These are inputs that are allowed to be directly assigned from graphql to the model without additional processing or logic involved
-  ALLOWED_INPUTS = %i[title message require_initial_post allow_rating only_graders_can_rate only_visible_to_overrides podcast_enabled podcast_has_student_posts].freeze
+  ALLOWED_INPUTS = %i[title require_initial_post allow_rating only_graders_can_rate only_visible_to_overrides podcast_enabled podcast_has_student_posts].freeze
 
   def process_common_inputs(input, is_announcement, discussion_topic)
     model_attrs = input.to_h.slice(*ALLOWED_INPUTS)
     discussion_topic.assign_attributes(model_attrs)
+
+    # we have some corrupt data, where dt.message is nil, and input message empty string breaks the update in case content is locked
+    # due to all the rails hooks around validations, and content tag auto updates, its almost impossible to data fixup it
+    # we change the message only if client explicitly sent a message
+    if input.key?(:message)
+      # if input message or dt.message is a non empty string, we want the update (so we can clear the message)
+      should_change_message = input[:message].present? || discussion_topic.message.present?
+      # update with the input, or if its explicitly nil, set it to empty string
+      discussion_topic.message = input[:message] || "" if should_change_message
+    end
 
     discussion_topic.workflow_state = "active" if input.key?(:published) && (input[:published] || is_announcement)
 
