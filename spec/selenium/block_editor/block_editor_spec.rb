@@ -61,6 +61,16 @@ describe "Block Editor", :ignore_js_errors do
         wait_for_ajax_requests
         expect(page_block).to be_displayed
       end
+
+      it "loads template via quick look" do
+        expect(template_chooser).to be_displayed
+        wait_for_ajax_requests
+        template_chooser_template_for_number(1).send_keys("")
+        template_chooser_active_quick_look_template.click
+        wait_for_ajax_requests
+        expect(page_block).to be_displayed
+        expect(template_quick_look_header).to be_displayed
+      end
     end
   end
 

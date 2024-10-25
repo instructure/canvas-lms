@@ -79,6 +79,22 @@ module BlockEditorPage
     fj(template_chooser_active_customize_template_selector)
   end
 
+  def template_chooser_active_quick_look_template_selector
+    'button:contains("Quick Look"):visible:first'
+  end
+
+  def template_chooser_active_quick_look_template
+    fj(template_chooser_active_quick_look_template_selector)
+  end
+
+  def template_quick_look_header_selector
+    'h3:contains("Template: Quick Look")'
+  end
+
+  def template_quick_look_header
+    fj(template_quick_look_header_selector)
+  end
+
   def template_chooser_template_selector_for_number(number)
     ".block-template-preview-card:nth-child(#{number + 1})" # Actual first-child is new blank page
   end

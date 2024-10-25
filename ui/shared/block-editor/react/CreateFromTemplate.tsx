@@ -30,6 +30,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {getGlobalPageTemplates} from '@canvas/block-editor/react/assets/globalTemplates'
 import TemplateCardSkeleton from './components/create_from_templates/TemplateCardSekelton'
+import QuickLook from './components/create_from_templates/QuickLook'
 
 const I18n = useI18nScope('block-editor')
 
@@ -38,6 +39,7 @@ declare const ENV: GlobalEnv & {WIKI_PAGE: object}
 export default function CreateFromTemplate(props: {course_id: string}) {
   const {actions} = useEditor()
   const [isOpen, setIsOpen] = useState<boolean>(!ENV.WIKI_PAGE)
+  const [quickLookTemplate, setQuickLookTemplate] = useState<BlockTemplate | undefined>(undefined)
   const [blockTemplates, setBlockTemplates] = useState<BlockTemplate[]>([])
   const [blankPageTemplate, setBlankPageTemplate] = useState<BlockTemplate>(() => {
     return {node_tree: {}} as BlockTemplate
@@ -125,10 +127,25 @@ export default function CreateFromTemplate(props: {course_id: string}) {
                   }
                   close()
                 }}
+                quickLookAction={() => {
+                  setQuickLookTemplate(blockTemplate)
+                }}
               />
             )
           })}
         </Flex>
+        <QuickLook
+          template={quickLookTemplate}
+          close={() => {
+            setQuickLookTemplate(undefined)
+          }}
+          customize={() => {
+            if (quickLookTemplate && quickLookTemplate.node_tree) {
+              loadTemplateOnRoot(quickLookTemplate.node_tree)
+            }
+            close()
+          }}
+        />
       </Modal.Body>
     </Modal>
   )
