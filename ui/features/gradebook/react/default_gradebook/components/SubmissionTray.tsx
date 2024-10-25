@@ -352,6 +352,7 @@ export default class SubmissionTray extends React.Component<
       return (
         <View as="div" textAlign="center">
           <Button
+            id="submit-for-student-button" // EVAL-4243
             variant="link"
             onClick={this.toggleUploadModal}
             aria-label={I18n.t('Submit for Student %{name}', {name: this.props.student.name})}

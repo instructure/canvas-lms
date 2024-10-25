@@ -277,6 +277,7 @@ export default function FilterTrayPreset({
             <Flex.Item margin="0 0 0 small">
               <Button
                 color="secondary"
+                id="delete-preset-button" // EVAL-4234
                 data-testid="delete-filter-preset-button"
                 margin="small 0 0 0"
                 onClick={() => {
@@ -293,6 +294,7 @@ export default function FilterTrayPreset({
 
             <Flex.Item margin="0 0 0 small">
               <Button
+                id="save-filter-button" // EVAL-4233
                 color="primary"
                 data-testid="save-filter-button"
                 margin="small 0 0 0"

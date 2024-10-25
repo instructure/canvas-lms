@@ -373,6 +373,7 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
       )}
       {renderSyncDropdown()}
       <Button
+        id="import_btn" // EVAL-4230
         color="secondary"
         margin="0 small 0 0"
         renderIcon={IconGradebookImportLine}
@@ -383,6 +384,7 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
       </Button>
 
       <Menu
+        id="export_btn" // EVAL-4231
         trigger={
           <Button color="secondary" margin="0 small 0 0" renderIcon={IconGradebookExportLine}>
             <View margin="0 x-small 0 0" data-menu-id="export-dropdown" as="span">
