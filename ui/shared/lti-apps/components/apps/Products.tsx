@@ -140,6 +140,7 @@ export const Products = (props: {
                 <CondensedButton
                   onClick={() => setTag(group.tag_group)}
                   margin={isMobile ? '0 small 0 0' : '0'}
+                  aria-label={`See all ${group.tag_group.name}`}
                 >
                   {I18n.t('See All')}
                 </CondensedButton>
