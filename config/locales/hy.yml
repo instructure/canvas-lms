@@ -5453,6 +5453,7 @@ hy:
     ungrded_survey: "Չգնահատված հարցում"
     url: "URL հասցե"
   create_new_event_e9fb2fb6: "Ստեղծել նոր միջոցառում"
+  create_page_6093fb98: "Ստեղծել էջ"
   create_quiz_d08bb72a: "Ստեղծել ստուգողական աշխատանք"
   create_rubric_ec33ddf9: "Ստեղծել ռուբրիկ"
   create_users_view: 
@@ -5584,6 +5585,7 @@ hy:
     this_is_permanent: "Գնահատականների կորը հնարավոր չէ չեղյալ համարել: Գնահատականների շարքը նախքան կորի սահմանումը հասանելի է, սակայն կորի գծման գործողությունը անշրջելի է: "
   curving_assignments_e9479ee3: "Հանձնարարություննի գնահատման կորը"
   custom_fields_fc3e55af: "Օգտատիրոջ դաշտեր"
+  customize_74cdc895: Կարգաբերում
   cyan_c1d5f68a: Cyan
   d2l_display: Desire2Learn
   d2l_file_description: "D2L export .zip ֆորմատ"

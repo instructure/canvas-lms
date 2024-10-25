@@ -7583,6 +7583,7 @@ nn:
   conversations_69a8dc26: Samtalar
   conversations_send_messages_to_entire_class_3f414741: "Samtaler - send meldingar til alle på emnet"
   conversations_send_messages_to_individual_course_m_733620b: "Samtaler - send meldingar til individuelle emnedeltakarar"
+  cookie_notice_fe4f182e: "Varsel om informasjonskapslar"
   copy_9748f9f: Kopi
   copy_announcement_title_9d23ddde: "Kopier kunngjering %{title}"
   copy_assignment_name_to_another_course_b62d0a54: "Kopier oppgåve %{name} til eit anna emne"
@@ -9141,6 +9142,7 @@ nn:
   custom_status_savedname_added_3f102196: "Eigendefinert status %{savedName} lagt til"
   custom_status_savedname_updated_29ac1105: "Eigendefinert status %{savedName} oppdatert"
   custom_statuses_14038f1e: "Eigendefinerte statusar"
+  customize_74cdc895: Tilpass
   customize_configuration_69c22ef3: "Tilpass konfigurasjon"
   customize_course_details_26fd4afe: "Tilpass emnedetaljar"
   customize_help_link_62cd05eb: "Eigendefiner Hjelp-kopling"

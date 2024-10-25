@@ -6760,6 +6760,7 @@ tr:
   create_new_discussions_6ab69da2: "Yeni tartışma oluştur"
   create_new_e0946c49: "Yeni oluştur"
   create_new_event_e9fb2fb6: "Yeni Bir Olay Oluştur"
+  create_page_6093fb98: "Sayfa Oluştur"
   create_quiz_d08bb72a: "Kısa Sınav Oluştur"
   create_rubric_ec33ddf9: "Değerlendirme Listesi Oluştur"
   create_slots_71dbb2f8: "Aralıklar Oluştur"
@@ -6915,6 +6916,7 @@ tr:
   custom_fields_fc3e55af: "Varsayılan Alanlar"
   custom_link_details_35fd38fc: "Özelleştirilmiş bağlantı ayrıntıları"
   custom_outcomes_31a741f5: "Varsayılan Çıktılar"
+  customize_74cdc895: Özelleştir
   customize_learning_mastery_ratings_4ace142a: "Öğrenme Yeterlilik Düzeylerini Özelleştirin"
   customize_this_menu_efa72a9: "Bu menüyü özelleştir"
   cutoff_score_74254c89: "kesilme puanı"
