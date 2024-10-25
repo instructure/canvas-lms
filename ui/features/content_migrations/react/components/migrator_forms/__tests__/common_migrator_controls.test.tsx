@@ -225,4 +225,81 @@ describe('CommonMigratorControls', () => {
     )
     expect(setIsQuestionBankDisabled).toHaveBeenCalledWith(false)
   })
+
+  describe('Date fill in', () => {
+    const oldStartDateInputSting = '2024-08-08T08:00:00+00:00'
+    const oldStartDateExpectedDate = 'Aug 8 at 8am'
+    const oldEndDateInputSting = '2024-08-09T08:00:00+00:00'
+    const oldEndDateExpectedDate = 'Aug 9 at 8am'
+    const newStartDateInputSting = '2024-08-10T08:00:00+00:00'
+    const newStartDateExpectedDate = 'Aug 10 at 8am'
+    const newEndDateInputSting = '2024-08-11T08:00:00+00:00'
+    const newEndDateExpectedDate = 'Aug 11 at 8am'
+
+    const expectDateField = (label: string, value: string) => {
+      expect(screen.getByLabelText(label).closest('input')?.value).toBe(value)
+    }
+
+    describe('when dates are not provided', () => {
+      const props = {
+        canAdjustDates: true,
+        oldStartDate: undefined,
+        oldEndDate: undefined,
+        newStartDate: undefined,
+        newEndDate: undefined,
+      }
+
+      beforeEach(async () => {
+        const {getByRole} = renderComponent(props)
+        await userEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
+      })
+
+      it('not fills the original beginning date', () => {
+        expectDateField('Select original beginning date', '')
+      })
+
+      it('not fills the original end date', () => {
+        expectDateField('Select original end date', '')
+      })
+
+      it('not fills the new beginning date', () => {
+        expectDateField('Select new beginning date', '')
+      })
+
+      it('not fills the new end date', () => {
+        expectDateField('Select new end date', '')
+      })
+    })
+
+    describe('when dates are provided', () => {
+      const props = {
+        canAdjustDates: true,
+        oldStartDate: oldStartDateInputSting,
+        oldEndDate: oldEndDateInputSting,
+        newStartDate: newStartDateInputSting,
+        newEndDate: newEndDateInputSting,
+      }
+
+      beforeEach(async () => {
+        const {getByRole} = renderComponent(props)
+        await userEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
+      })
+
+      it('not fills the original beginning date', () => {
+        expectDateField('Select original beginning date', oldStartDateExpectedDate)
+      })
+
+      it('not fills the original end date', () => {
+        expectDateField('Select original end date', oldEndDateExpectedDate)
+      })
+
+      it('not fills the new beginning date', () => {
+        expectDateField('Select new beginning date', newStartDateExpectedDate)
+      })
+
+      it('not fills the new end date', () => {
+        expectDateField('Select new end date', newEndDateExpectedDate)
+      })
+    })
+  })
 })

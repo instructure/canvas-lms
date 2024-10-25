@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
-import CourseCopyImporter from '../course_copy'
+import CourseCopyImporter, {parseDate} from '../course_copy'
 import userEvent from '@testing-library/user-event'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
@@ -171,5 +171,28 @@ describe('CourseCopyImporter', () => {
       expect(getByLabelText('Select new end date')).toBeDisabled()
       expect(getByRole('button', {name: 'Add substitution'})).toBeDisabled()
     })
+  })
+})
+
+describe('parseDate', () => {
+  it('parses a valid date string correctly', () => {
+    const dateString = '01 Jan 2023 at 12:00'
+    const expectedDate = '2023-01-01T12:00:00.000Z'
+    expect(parseDate(dateString)).toBe(expectedDate)
+  })
+
+  it('not converts empty string', () => {
+    const dateString = ''
+    expect(parseDate(dateString)).toBe('')
+  })
+
+  it('not converts undefined', () => {
+    const dateString = undefined
+    expect(parseDate(dateString)).toBeUndefined()
+  })
+
+  it('converts wrong string to null', () => {
+    const dateString = 'oops'
+    expect(parseDate(dateString)).toBeNull()
   })
 })

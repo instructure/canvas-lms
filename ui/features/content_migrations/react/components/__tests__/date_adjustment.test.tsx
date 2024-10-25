@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import DateAdjustments from '../date_adjustments'
-import type {DateAdjustmentConfig} from '../types'
+import type {DateAdjustmentConfig, DateShifts} from '../types'
 import userEvent from '@testing-library/user-event'
 
 const dateAdjustments: DateAdjustmentConfig = {
@@ -57,39 +57,77 @@ const setDateAdjustments: (cfg: DateAdjustmentConfig) => void = jest.fn()
 describe('DateAdjustment', () => {
   afterEach(() => jest.clearAllMocks())
 
-  it('Renders proper date operation radio buttons', () => {
-    render(
-      <DateAdjustments dateAdjustments={dateAdjustments} setDateAdjustments={setDateAdjustments} />
-    )
-    expect(screen.getByRole('radio', {name: 'Shift dates', hidden: false})).toBeInTheDocument()
-    expect(screen.getByRole('radio', {name: 'Remove dates', hidden: false})).toBeInTheDocument()
-  })
-
   it('Fill in with empty values the start and end date fileds', () => {
     render(
-      <DateAdjustments dateAdjustments={dateAdjustments} setDateAdjustments={setDateAdjustments} />
+      <DateAdjustments
+        dateAdjustmentConfig={dateAdjustments}
+        setDateAdjustments={setDateAdjustments}
+      />
     )
     expect(screen.getByLabelText('Select new beginning date').closest('input')?.value).toBe('')
     expect(screen.getByLabelText('Select new end date').closest('input')?.value).toBe('')
   })
 
-  it('Fill in with start and end dates came from global', () => {
-    ENV.OLD_START_DATE = '2024-08-08T08:00:00+00:00'
-    ENV.OLD_END_DATE = '2024-08-09T08:00:00+00:00'
+  it('Renders proper date operation radio buttons', () => {
     render(
-      <DateAdjustments dateAdjustments={dateAdjustments} setDateAdjustments={setDateAdjustments} />
+      <DateAdjustments
+        dateAdjustmentConfig={dateAdjustments}
+        setDateAdjustments={setDateAdjustments}
+      />
     )
-    expect(screen.getByLabelText('Select new beginning date').closest('input')?.value).toBe(
-      'Aug 8 at 8am'
-    )
-    expect(screen.getByLabelText('Select new end date').closest('input')?.value).toBe(
-      'Aug 9 at 8am'
-    )
+    expect(screen.getByRole('radio', {name: 'Shift dates', hidden: false})).toBeInTheDocument()
+    expect(screen.getByRole('radio', {name: 'Remove dates', hidden: false})).toBeInTheDocument()
+  })
+
+  describe('Date fill in on initial data', () => {
+    const dateSting = '2024-08-08T08:00:00+00:00'
+    const expectedDate = 'Aug 8 at 8am'
+    const getComponent = (dateShiftOptionVariant: Partial<DateShifts>) => {
+      return (
+        <DateAdjustments
+          dateAdjustmentConfig={{
+            ...dateAdjustments,
+            date_shift_options: {
+              ...dateAdjustments.date_shift_options,
+              ...dateShiftOptionVariant,
+            },
+          }}
+          setDateAdjustments={setDateAdjustments}
+        />
+      )
+    }
+
+    const expectDateField = (label: string, value: string) => {
+      expect(screen.getByLabelText(label).closest('input')?.value).toBe(value)
+    }
+
+    it('Fill in original beginning date with old_start_date', () => {
+      render(getComponent({old_start_date: dateSting}))
+      expectDateField('Select original beginning date', expectedDate)
+    })
+
+    it('Fill in original end date with old_end_date', () => {
+      render(getComponent({old_end_date: dateSting}))
+      expectDateField('Select original end date', expectedDate)
+    })
+
+    it('Fill in new beginning date with new_start_date', () => {
+      render(getComponent({new_start_date: dateSting}))
+      expectDateField('Select new beginning date', expectedDate)
+    })
+
+    it('Fill in new end date with new_end_date', () => {
+      render(getComponent({new_end_date: dateSting}))
+      expectDateField('Select new end date', expectedDate)
+    })
   })
 
   it('Renders/hides date shifting UI when appropriate', async () => {
     render(
-      <DateAdjustments dateAdjustments={dateAdjustments} setDateAdjustments={setDateAdjustments} />
+      <DateAdjustments
+        dateAdjustmentConfig={dateAdjustments}
+        setDateAdjustments={setDateAdjustments}
+      />
     )
     await userEvent.click(screen.getByRole('radio', {name: 'Shift dates', hidden: false}))
     expect(screen.getByLabelText('Select original beginning date')).toBeInTheDocument()
@@ -105,7 +143,10 @@ describe('DateAdjustment', () => {
 
   it('Allows adding multiple weekday substitutions', async () => {
     render(
-      <DateAdjustments dateAdjustments={dateAdjustments} setDateAdjustments={setDateAdjustments} />
+      <DateAdjustments
+        dateAdjustmentConfig={dateAdjustments}
+        setDateAdjustments={setDateAdjustments}
+      />
     )
     await userEvent.click(screen.getByRole('radio', {name: 'Shift dates', hidden: false}))
     await userEvent.click(screen.getByRole('button', {name: 'Add substitution', hidden: false}))
@@ -115,7 +156,7 @@ describe('DateAdjustment', () => {
   it('Allows removing multiple weekday substitutions', async () => {
     render(
       <DateAdjustments
-        dateAdjustments={dateAdjustmentsWithSub}
+        dateAdjustmentConfig={dateAdjustmentsWithSub}
         setDateAdjustments={setDateAdjustments}
       />
     )
