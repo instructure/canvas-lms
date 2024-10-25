@@ -76,6 +76,7 @@ export const SearchAndFilter = (props: {setIsTrayOpen: (isOpen: boolean) => void
         </View>
       </Flex.Item>
       <Button
+        id="apply_filter" // EVAL-4232
         data-testid="apply-filters-button"
         renderIcon={() => <IconFilterLine />}
         onClick={() => props.setIsTrayOpen(true)}

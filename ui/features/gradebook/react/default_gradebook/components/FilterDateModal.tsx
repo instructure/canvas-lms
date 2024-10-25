@@ -168,7 +168,12 @@ export default function FilterNavDateModal({
         <Button onClick={onCloseDateModal} margin="0 x-small 0 0">
           {I18n.t('Cancel')}
         </Button>
-        <Button color="primary" type="submit" data-testid="apply-date-filter">
+        <Button
+          id="apply-date-filter" // EVAL-4235
+          color="primary"
+          type="submit"
+          data-testid="apply-date-filter"
+        >
           {I18n.t('Apply')}
         </Button>
       </Modal.Footer>

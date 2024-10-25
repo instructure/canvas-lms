@@ -53,7 +53,8 @@ export default function EnhancedIndividualGradebookWrapper() {
   }
 
   return (
-    <>
+    <View as="div" id="individual_gradebook">
+      {/* EVAL-4229 */}
       <GradebookMenu
         courseUrl={ENV.GRADEBOOK_OPTIONS.context_url}
         learningMasteryEnabled={Boolean(ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled)}
@@ -85,6 +86,6 @@ export default function EnhancedIndividualGradebookWrapper() {
           </View>
         )}
       </ApolloProvider>
-    </>
+    </View>
   )
 }

@@ -539,6 +539,7 @@ const ProxyUploadModal = ({
             Close
           </Button>
           <Button
+            id="proxySubmit" // EVAL-4244
             data-testid="proxySubmit"
             color="primary"
             type="submit"

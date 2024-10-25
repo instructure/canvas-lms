@@ -403,6 +403,7 @@ export default class AssignmentColumnHeader extends ColumnHeader<
 
         {this.props.postGradesAction.enabledForUser && (
           <MenuItem
+            id="post-grades"
             disabled={!this.props.postGradesAction.hasGradesOrCommentsToPost}
             onSelect={this.postGrades}
           >
@@ -458,7 +459,7 @@ export default class AssignmentColumnHeader extends ColumnHeader<
         {this.props.postGradesAction.enabledForUser && <MenuSeparator />}
 
         {this.props.postGradesAction.enabledForUser && (
-          <MenuItem onSelect={this.showGradePostingPolicy}>
+          <MenuItem id="save-grade-posting-policy" onSelect={this.showGradePostingPolicy}>
             {I18n.t('Grade Posting Policy')}
           </MenuItem>
         )}

@@ -293,6 +293,7 @@ export default function DefaultGradeModal({
       </ModalBody>
       <Modal.Footer>
         <Button
+          id="set-default-grade"
           data-testid="default-grade-submit-button"
           onClick={setDefaultGrade}
           type="submit"
