@@ -4778,6 +4778,7 @@ ko:
     this_is_permanent: "상대 평가를 실행 취소할 수 없습니다. 상대 평가 이전의 평점 이력은 사용할 수 있으나 상대 평가 동작은 되돌릴 수 없습니다."
   curving_assignments_e9479ee3: "과제 상대 평가"
   custom_fields_fc3e55af: "사용자 정의 필드"
+  customize_74cdc895: "사용자 정의"
   d2l_display: Desire2Learn
   d2l_file_description: "D2L 내보내기 .zip 형식"
   d2l_name: "D2L 변환기"
