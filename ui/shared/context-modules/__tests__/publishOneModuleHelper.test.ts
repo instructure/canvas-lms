@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getByText, getAllByText, waitFor} from '@testing-library/dom'
+import {getByText, findByText, getAllByText, waitFor} from '@testing-library/dom'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {updateModuleItem} from '../jquery/utils'
 import publishOneModuleHelperModule from '../utils/publishOneModuleHelper'
@@ -450,10 +450,10 @@ describe('publishOneModuleHelper', () => {
     beforeEach(() => {
       makeModuleWithItems(2, 'Lesson 2', [217, 219], false)
     })
-    it('renders the ContextModulesPublishIcon', () => {
+    it('renders the ContextModulesPublishIcon', async () => {
       renderContextModulesPublishIcon(1, 2, true, false, 'loading message')
       expect(
-        getByText(document.body, 'Lesson 2 module publish options, published')
+        await findByText(document.body, 'Lesson 2 module publish options, published')
       ).toBeInTheDocument()
     })
   })

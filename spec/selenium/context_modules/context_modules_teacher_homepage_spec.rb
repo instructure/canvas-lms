@@ -68,6 +68,25 @@ describe "context modules" do
         expect(mod).to be_unpublished
       end
 
+      it "keeps module workflow state after editing module", priority: "1" do
+        edit_text = "New Module Name"
+        mod = @course.context_modules.first
+        mod.workflow_state = "unpublished"
+        mod.save!
+        go_to_modules
+        expect(unpublished_module_icon(mod.id)).to be_present
+        publish_module_and_items(mod.id)
+        expect(published_module_icon(mod.id)).to be_present
+        manage_module_button(mod).click
+        module_index_menu_tool_link("Edit").click
+        expect(settings_tray_exists?).to be_truthy
+        update_module_name(edit_text)
+        click_settings_tray_update_module_button
+        expect(settings_tray_exists?).to be_falsey
+        expect(ff(".context_module > .header")[0]).to include_text(edit_text)
+        expect(published_module_icon(mod.id)).to be_present
+      end
+
       it "deletes a module", priority: "1" do
         skip_if_safari(:alert)
         f(".ig-header-admin .al-trigger").click
