@@ -19,6 +19,7 @@
 import {Alert} from '@instructure/ui-alerts'
 import React, {createContext, type PropsWithChildren} from 'react'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import WithBreakpoints, {breakpointsShape, type Breakpoints} from '@canvas/with-breakpoints'
 
 export type AlertManagerContextType = {
   setOnFailure: (alertMessage: string, screenReaderOnly?: boolean) => void
@@ -37,10 +38,19 @@ type AlertManagerState = {
   screenReaderOnly: boolean
 }
 
-export default class AlertManager extends React.Component<
-  PropsWithChildren<{}>,
-  AlertManagerState
-> {
+type AlertManagerProps = PropsWithChildren<{
+  breakpoints?: Breakpoints
+}>
+
+class AlertManager extends React.Component<AlertManagerProps, AlertManagerState> {
+  static propTypes = {
+    breakpoints: breakpointsShape,
+  }
+
+  static defaultProps = {
+    breakpoints: {} as Breakpoints,
+  }
+
   state: AlertManagerState = {
     key: 0,
     screenReaderOnly: true,
@@ -102,6 +112,28 @@ export default class AlertManager extends React.Component<
     }
   }
 
+  getStyle(): React.CSSProperties {
+    const style: React.CSSProperties = {position: 'fixed', zIndex: 101}
+    const additionalStyles: React.CSSProperties = this.props.breakpoints?.mobileOnly
+      ? {
+          left: '0',
+          maxWidth: '100%',
+          right: '0',
+          top: '0',
+          margin: '80px 20px',
+        }
+      : {
+          left: '26%',
+          maxWidth: '1125px',
+          position: 'fixed',
+          right: '120px',
+          top: '80px',
+          zIndex: 101,
+        }
+
+    return {...style, ...additionalStyles}
+  }
+
   render() {
     return (
       <AlertManagerContext.Provider
@@ -111,17 +143,7 @@ export default class AlertManager extends React.Component<
         }}
       >
         {this.state.alertStatus && (
-          <div
-            key={this.state.key}
-            style={{
-              left: '26%',
-              maxWidth: '1125px',
-              position: 'fixed',
-              right: '120px',
-              top: '80px',
-              zIndex: 101,
-            }}
-          >
+          <div key={this.state.key} style={this.getStyle()}>
             {this.renderAlert()}
           </div>
         )}
@@ -130,3 +152,6 @@ export default class AlertManager extends React.Component<
     )
   }
 }
+
+// @ts-ignore
+export default WithBreakpoints<AlertManagerProps>(AlertManager)
