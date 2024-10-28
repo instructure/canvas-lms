@@ -166,18 +166,22 @@ const SignIn = () => {
             </Flex.Item>
 
             <Flex.Item overflowY="visible">
-              <Button
-                type="submit"
-                color="primary"
-                display="block"
-                disabled={!formValid || isUiActionPending}
-              >
-                {I18n.t('Sign In')}
-              </Button>
-            </Flex.Item>
+              <Flex direction="column" gap="small">
+                <Flex.Item overflowY="visible">
+                  <Button
+                    type="submit"
+                    color="primary"
+                    display="block"
+                    disabled={!formValid || isUiActionPending}
+                  >
+                    {I18n.t('Sign In')}
+                  </Button>
+                </Flex.Item>
 
-            <Flex.Item overflowY="visible">
-              <SignInLinks />
+                <Flex.Item overflowY="visible" align="center">
+                  <SignInLinks />
+                </Flex.Item>
+              </Flex>
             </Flex.Item>
           </Flex>
         </form>

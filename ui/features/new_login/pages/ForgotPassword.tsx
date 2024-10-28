@@ -97,6 +97,7 @@ const ForgotPassword = () => {
           )}
         </p>
       </Flex.Item>
+
       <Flex.Item overflowY="visible">
         <form onSubmit={handleForgotPassword}>
           <Flex direction="column" gap="large">
@@ -111,15 +112,24 @@ const ForgotPassword = () => {
                 aria-describedby="emailHelp"
               />
             </Flex.Item>
+
             <Flex.Item overflowY="visible">
-              <Button
-                type="submit"
-                color="primary"
-                display="block"
-                disabled={!isEmailValid || isUiActionPending}
-              >
-                {I18n.t('Submit')}
-              </Button>
+              <Flex direction="column" gap="small">
+                <Flex.Item overflowY="visible">
+                  <Button
+                    type="submit"
+                    color="primary"
+                    display="block"
+                    disabled={!isEmailValid || isUiActionPending}
+                  >
+                    {I18n.t('Submit')}
+                  </Button>
+                </Flex.Item>
+
+                <Flex.Item overflowY="visible" align="center">
+                  <SignInLinks />
+                </Flex.Item>
+              </Flex>
             </Flex.Item>
           </Flex>
         </form>
@@ -128,14 +138,20 @@ const ForgotPassword = () => {
   )
 
   const confirmationMessage = (
-    <Flex.Item overflowY="visible">
-      <p>
-        {I18n.t(
-          'A recovery email has been sent to %{email}. Please check your inbox and follow the instructions to reset your password. This may take up to 30 minutes. If you don’t receive an email, be sure to check your spam folder.',
-          {email: submittedEmail}
-        )}
-      </p>
-    </Flex.Item>
+    <>
+      <Flex.Item overflowY="visible">
+        <p>
+          {I18n.t(
+            'A recovery email has been sent to %{email}. Please check your inbox and follow the instructions to reset your password. This may take up to 30 minutes. If you don’t receive an email, be sure to check your spam folder.',
+            {email: submittedEmail}
+          )}
+        </p>
+      </Flex.Item>
+
+      <Flex.Item overflowY="visible">
+        <SignInLinks />
+      </Flex.Item>
+    </>
   )
 
   return (
@@ -147,10 +163,6 @@ const ForgotPassword = () => {
       </Flex.Item>
 
       {emailSent ? confirmationMessage : passwordRecoveryForm}
-
-      <Flex.Item overflowY="visible">
-        <SignInLinks />
-      </Flex.Item>
     </Flex>
   )
 }
