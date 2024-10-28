@@ -88,70 +88,9 @@ module WikiPageVisibility
                             course_id_params:,
                             user_id_params:,
                             additional_id_params: wiki_page_id_params) do
-          if Account.site_admin.feature_enabled?(:selective_release_optimized_services_v3)
-            WikiPageVisibility::Repositories::WikiPageVisibleToStudentRepository.full_wiki_page_visibility_query(course_id_params:, user_id_params:, wiki_page_id_params:)
-          elsif Account.site_admin.feature_enabled?(:selective_release_optimized_services_v2)
-            visible_wiki_pages = []
-
-            # add wiki pages visible to everyone
-            wiki_pages_visible_to_all = WikiPageVisibility::Repositories::WikiPageVisibleToStudentRepository
-                                        .find_wiki_pages_visible_to_everyone(course_id_params:, user_id_params:, wiki_page_id_params:)
-            visible_wiki_pages |= wiki_pages_visible_to_all
-
-            # add wiki pages assigned to sections, students, or the course
-            wiki_pages_assigned_to_others = WikiPageVisibility::Repositories::WikiPageVisibleToStudentRepository
-                                            .find_wiki_pages_assigned_to_others(course_id_params:, user_id_params:, wiki_page_id_params:)
-
-            visible_wiki_pages | wiki_pages_assigned_to_others
-          else
-            visible_wiki_pages = []
-
-            # add wiki pages visible to everyone
-            wiki_pages_visible_to_all = WikiPageVisibility::Repositories::WikiPageVisibleToStudentRepository
-                                        .find_wiki_pages_visible_to_everyone(course_id_params:, user_id_params:, wiki_page_id_params:)
-            visible_wiki_pages |= wiki_pages_visible_to_all
-
-            if Account.site_admin.feature_enabled?(:selective_release_optimized_services)
-              # add wiki pages visible to sections (and related module section overrides) without unassign overrides
-              wiki_pages_assigned_to_sections = WikiPageVisibility::Repositories::WikiPageVisibleToStudentRepository
-                                                .find_wiki_pages_assigned_to_sections(course_id_params:, user_id_params:, wiki_page_id_params:)
-              visible_wiki_pages |= wiki_pages_assigned_to_sections
-            else
-              # add wiki pages visible to sections (and related module section overrides)
-              wiki_pages_visible_to_sections = WikiPageVisibility::Repositories::WikiPageVisibleToStudentRepository
-                                               .find_wiki_pages_visible_to_sections(course_id_params:, user_id_params:, wiki_page_id_params:)
-              visible_wiki_pages |= wiki_pages_visible_to_sections
-
-              # remove wiki pages for students with unassigned section overrides
-              wiki_pages_with_unassigned_section_overrides = WikiPageVisibility::Repositories::WikiPageVisibleToStudentRepository
-                                                             .find_wiki_pages_with_unassigned_section_overrides(course_id_params:, user_id_params:, wiki_page_id_params:)
-              visible_wiki_pages -= wiki_pages_with_unassigned_section_overrides
-            end
-
-            if Account.site_admin.feature_enabled?(:selective_release_optimized_services)
-              # add wiki pages visible due to ADHOC overrides (and related module ADHOC overrides) without unassign overrides
-              wiki_pages_assigned_to_adhoc_overrides = WikiPageVisibility::Repositories::WikiPageVisibleToStudentRepository
-                                                       .find_wiki_pages_assigned_to_adhoc_overrides(course_id_params:, user_id_params:, wiki_page_id_params:)
-              visible_wiki_pages |= wiki_pages_assigned_to_adhoc_overrides
-            else
-
-              # add wiki pages visible due to ADHOC overrides (and related module ADHOC overrides)
-              wiki_pages_visible_to_adhoc_overrides = WikiPageVisibility::Repositories::WikiPageVisibleToStudentRepository
-                                                      .find_wiki_pages_visible_to_adhoc_overrides(course_id_params:, user_id_params:, wiki_page_id_params:)
-              visible_wiki_pages |= wiki_pages_visible_to_adhoc_overrides
-
-              # remove wiki pages for students with unassigned ADHOC overrides
-              wiki_pages_with_unassigned_adhoc_overrides = WikiPageVisibility::Repositories::WikiPageVisibleToStudentRepository
-                                                           .find_wiki_pages_with_unassigned_adhoc_overrides(course_id_params:, user_id_params:, wiki_page_id_params:)
-              visible_wiki_pages -= wiki_pages_with_unassigned_adhoc_overrides
-            end
-
-            # add wiki pages visible due to course overrides
-            wiki_pages_visible_to_course_overrides = WikiPageVisibility::Repositories::WikiPageVisibleToStudentRepository
-                                                     .find_wiki_pages_visible_to_course_overrides(course_id_params:, user_id_params:, wiki_page_id_params:)
-
-            visible_wiki_pages | wiki_pages_visible_to_course_overrides
-          end
+          WikiPageVisibility::Repositories::WikiPageVisibleToStudentRepository.visibility_query(
+            course_id_params:, user_id_params:, wiki_page_id_params:
+          )
         end
       end
     end

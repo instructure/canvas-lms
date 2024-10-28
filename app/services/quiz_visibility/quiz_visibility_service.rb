@@ -91,69 +91,9 @@ module QuizVisibility
         end
 
         service_cache_fetch(service: name, course_id_params:, user_id_params:, additional_id_params: quiz_id_params) do
-          if Account.site_admin.feature_enabled?(:selective_release_optimized_services_v3)
-            QuizVisibility::Repositories::QuizVisibleToStudentRepository.full_quiz_visibility_query(course_id_params:, user_id_params:, quiz_id_params:)
-          elsif Account.site_admin.feature_enabled?(:selective_release_optimized_services_v2)
-            visible_quizzes = []
-
-            # add quizzes visible to everyone
-            quizzes_visible_to_all = QuizVisibility::Repositories::QuizVisibleToStudentRepository
-                                     .find_quizzes_visible_to_everyone(course_id_params:, user_id_params:, quiz_id_params:)
-            visible_quizzes |= quizzes_visible_to_all
-
-            # add quizzes assigned to sections, students, or the course
-            quizzes_assigned_to_others = QuizVisibility::Repositories::QuizVisibleToStudentRepository
-                                         .find_quizzes_assigned_to_others(course_id_params:, user_id_params:, quiz_id_params:)
-
-            visible_quizzes | quizzes_assigned_to_others
-          else
-            visible_quizzes = []
-
-            # add quizzes visible to everyone
-            quizzes_visible_to_all = QuizVisibility::Repositories::QuizVisibleToStudentRepository
-                                     .find_quizzes_visible_to_everyone(course_id_params:, user_id_params:, quiz_id_params:)
-            visible_quizzes |= quizzes_visible_to_all
-
-            if Account.site_admin.feature_enabled?(:selective_release_optimized_services)
-              # add quizzes visible to sections (and related module section overrides) without unassign overrides
-              quizzes_assigned_to_sections = QuizVisibility::Repositories::QuizVisibleToStudentRepository
-                                             .find_quizzes_assigned_to_sections(course_id_params:, user_id_params:, quiz_id_params:)
-              visible_quizzes |= quizzes_assigned_to_sections
-            else
-              # add quizzes visible to sections (and related module section overrides)
-              quizzes_visible_to_sections = QuizVisibility::Repositories::QuizVisibleToStudentRepository
-                                            .find_quizzes_visible_to_sections(course_id_params:, user_id_params:, quiz_id_params:)
-              visible_quizzes |= quizzes_visible_to_sections
-
-              # remove quizzes for students with unassigned section overrides
-              quizzes_with_unassigned_section_overrides = QuizVisibility::Repositories::QuizVisibleToStudentRepository
-                                                          .find_quizzes_with_unassigned_section_overrides(course_id_params:, user_id_params:, quiz_id_params:)
-              visible_quizzes -= quizzes_with_unassigned_section_overrides
-            end
-
-            if Account.site_admin.feature_enabled?(:selective_release_optimized_services)
-              # add quizzes visible due to ADHOC overrides (and related module ADHOC overrides) without unassign overrides
-              quizzes_assigned_to_adhoc_overrides = QuizVisibility::Repositories::QuizVisibleToStudentRepository
-                                                    .find_quizzes_assigned_to_adhoc_overrides(course_id_params:, user_id_params:, quiz_id_params:)
-              visible_quizzes |= quizzes_assigned_to_adhoc_overrides
-            else
-              # add quizzes visible due to ADHOC overrides (and related module ADHOC overrides)
-              quizzes_visible_to_adhoc_overrides = QuizVisibility::Repositories::QuizVisibleToStudentRepository
-                                                   .find_quizzes_visible_to_adhoc_overrides(course_id_params:, user_id_params:, quiz_id_params:)
-              visible_quizzes |= quizzes_visible_to_adhoc_overrides
-
-              # remove quizzes for students with unassigned ADHOC overrides
-              quizzes_with_unassigned_adhoc_overrides = QuizVisibility::Repositories::QuizVisibleToStudentRepository
-                                                        .find_quizzes_with_unassigned_adhoc_overrides(course_id_params:, user_id_params:, quiz_id_params:)
-              visible_quizzes -= quizzes_with_unassigned_adhoc_overrides
-            end
-
-            # add quizzes visible due to course overrides
-            quizzes_visible_to_course_overrides = QuizVisibility::Repositories::QuizVisibleToStudentRepository
-                                                  .find_quizzes_visible_to_course_overrides(course_id_params:, user_id_params:, quiz_id_params:)
-
-            visible_quizzes | quizzes_visible_to_course_overrides
-          end
+          QuizVisibility::Repositories::QuizVisibleToStudentRepository.visibility_query(
+            course_id_params:, user_id_params:, quiz_id_params:
+          )
         end
       end
     end

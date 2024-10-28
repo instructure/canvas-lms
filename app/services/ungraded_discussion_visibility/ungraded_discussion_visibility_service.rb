@@ -84,69 +84,9 @@ module UngradedDiscussionVisibility
                             course_id_params:,
                             user_id_params:,
                             additional_id_params: discussion_topic_id_params) do
-          if Account.site_admin.feature_enabled?(:selective_release_optimized_services_v3)
-            UngradedDiscussionVisibility::Repositories::UngradedDiscussionVisibleToStudentRepository.full_discussion_topic_visibility_query(course_id_params:, user_id_params:, discussion_topic_id_params:)
-          elsif Account.site_admin.feature_enabled?(:selective_release_optimized_services_v2)
-            visible_discussion_topics = []
-
-            # add discussion topics visible to everyone
-            discussion_topics_visible_to_all = UngradedDiscussionVisibility::Repositories::UngradedDiscussionVisibleToStudentRepository
-                                               .find_discussion_topics_visible_to_everyone(course_id_params:, user_id_params:, discussion_topic_id_params:)
-            visible_discussion_topics |= discussion_topics_visible_to_all
-
-            # add discussion topics assigned to sections, students, or the course
-            discussion_topics_assigned_to_others = UngradedDiscussionVisibility::Repositories::UngradedDiscussionVisibleToStudentRepository
-                                                   .find_discussion_topics_assigned_to_others(course_id_params:, user_id_params:, discussion_topic_id_params:)
-
-            visible_discussion_topics | discussion_topics_assigned_to_others
-          else
-            visible_discussion_topics = []
-
-            # add discussion topics visible to everyone
-            discussion_topics_visible_to_all = UngradedDiscussionVisibility::Repositories::UngradedDiscussionVisibleToStudentRepository
-                                               .find_discussion_topics_visible_to_everyone(course_id_params:, user_id_params:, discussion_topic_id_params:)
-            visible_discussion_topics |= discussion_topics_visible_to_all
-
-            if Account.site_admin.feature_enabled?(:selective_release_optimized_services)
-              # add discussion topics visible to sections (and related module section overrides) without unassign overrides
-              discussion_topics_assigned_to_sections = UngradedDiscussionVisibility::Repositories::UngradedDiscussionVisibleToStudentRepository
-                                                       .find_discussion_topics_assigned_to_sections(course_id_params:, user_id_params:, discussion_topic_id_params:)
-              visible_discussion_topics |= discussion_topics_assigned_to_sections
-            else
-              # add discussion topics visible to sections (and related module section overrides)
-              discussion_topics_visible_to_sections = UngradedDiscussionVisibility::Repositories::UngradedDiscussionVisibleToStudentRepository
-                                                      .find_discussion_topics_visible_to_sections(course_id_params:, user_id_params:, discussion_topic_id_params:)
-              visible_discussion_topics |= discussion_topics_visible_to_sections
-
-              # remove discussion topics for students with unassigned section overrides
-              discussion_topics_with_unassigned_section_overrides = UngradedDiscussionVisibility::Repositories::UngradedDiscussionVisibleToStudentRepository
-                                                                    .find_discussion_topics_with_unassigned_section_overrides(course_id_params:, user_id_params:, discussion_topic_id_params:)
-              visible_discussion_topics -= discussion_topics_with_unassigned_section_overrides
-            end
-
-            if Account.site_admin.feature_enabled?(:selective_release_optimized_services)
-              # add discussion topics visible due to ADHOC overrides (and related module ADHOC overrides) without unassign overrides
-              discussion_topics_assigned_to_adhoc_overrides = UngradedDiscussionVisibility::Repositories::UngradedDiscussionVisibleToStudentRepository
-                                                              .find_discussion_topics_assigned_to_adhoc_overrides(course_id_params:, user_id_params:, discussion_topic_id_params:)
-              visible_discussion_topics |= discussion_topics_assigned_to_adhoc_overrides
-            else
-              # add discussion topics visible due to ADHOC overrides (and related module ADHOC overrides)
-              discussion_topics_visible_to_adhoc_overrides = UngradedDiscussionVisibility::Repositories::UngradedDiscussionVisibleToStudentRepository
-                                                             .find_discussion_topics_visible_to_adhoc_overrides(course_id_params:, user_id_params:, discussion_topic_id_params:)
-              visible_discussion_topics |= discussion_topics_visible_to_adhoc_overrides
-
-              # remove discussion topics for students with unassigned ADHOC overrides
-              discussion_topics_with_unassigned_adhoc_overrides = UngradedDiscussionVisibility::Repositories::UngradedDiscussionVisibleToStudentRepository
-                                                                  .find_discussion_topics_with_unassigned_adhoc_overrides(course_id_params:, user_id_params:, discussion_topic_id_params:)
-              visible_discussion_topics -= discussion_topics_with_unassigned_adhoc_overrides
-            end
-
-            # add discussion topics visible due to course overrides
-            discussion_topics_visible_to_course_overrides = UngradedDiscussionVisibility::Repositories::UngradedDiscussionVisibleToStudentRepository
-                                                            .find_discussion_topics_visible_to_course_overrides(course_id_params:, user_id_params:, discussion_topic_id_params:)
-
-            visible_discussion_topics | discussion_topics_visible_to_course_overrides
-          end
+          UngradedDiscussionVisibility::Repositories::UngradedDiscussionVisibleToStudentRepository.visibility_query(
+            course_id_params:, user_id_params:, discussion_topic_id_params:
+          )
         end
       end
     end

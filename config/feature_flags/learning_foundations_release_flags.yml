@@ -154,32 +154,6 @@ selective_release_edit_page:
     development:
       state: allowed_on # enable for local development
 
-selective_release_optimized_services:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: 'Selective Release - Optimized Visibility Services - Five Queries'
-  description: |-
-    Optimized the visibility services used by Selective Release.
-
-selective_release_optimized_services_v2:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: 'Selective Release - Optimized Visibility Services - Three Queries'
-  description: |-
-    Optimized the visibility services used by Selective Release.
-
-selective_release_optimized_services_v3:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: 'Selective Release - Optimized Visibility Services - One Query'
-  description: |-
-    Optimized the visibility services used by Selective Release.
-  environments:
-    ci:
-      state: allowed_on
-    development:
-      state: allowed_on
-
 differentiated_files:
   state: hidden
   display_name: Selective Release - Files

@@ -174,6 +174,7 @@ module AssignmentVisibility
 
       def assignments_visible_to_students(course_id_params: nil, user_id_params: nil, assignment_id_params: nil)
         service_cache_fetch(service: name,
+
                             course_id_params:,
                             user_id_params:,
                             additional_id_params: assignment_id_params) do
@@ -183,79 +184,9 @@ module AssignmentVisibility
             raise ArgumentError, "at least one non nil course_id or assignment_id is required (for query performance reasons)"
           end
 
-          if Account.site_admin.feature_enabled?(:selective_release_optimized_services_v3)
-            AssignmentVisibility::Repositories::AssignmentVisibleToStudentRepository.full_assignment_visibility_query(course_id_params:, user_id_params:, assignment_id_params:)
-          elsif Account.site_admin.feature_enabled?(:selective_release_optimized_services_v2)
-            visible_assignments = []
-
-            # add assignments visible to everyone
-            assignments_visible_to_all = AssignmentVisibility::Repositories::AssignmentVisibleToStudentRepository
-                                         .find_assignments_visible_to_everyone(course_id_params:, user_id_params:, assignment_id_params:)
-            visible_assignments |= assignments_visible_to_all
-
-            # add assignments visible to groups (only assignments can have group overrides)
-            assignments_visible_to_groups = AssignmentVisibility::Repositories::AssignmentVisibleToStudentRepository
-                                            .find_assignments_visible_to_groups(course_id_params:, user_id_params:, assignment_id_params:)
-            visible_assignments |= assignments_visible_to_groups
-
-            # add assignments assigned to sections, students, or the course
-            assignments_assigned_to_others = AssignmentVisibility::Repositories::AssignmentVisibleToStudentRepository
-                                             .find_assignments_assigned_to_others(course_id_params:, user_id_params:, assignment_id_params:)
-
-            visible_assignments | assignments_assigned_to_others
-          else
-            visible_assignments = []
-
-            # add assignments visible to everyone
-            assignments_visible_to_all = AssignmentVisibility::Repositories::AssignmentVisibleToStudentRepository
-                                         .find_assignments_visible_to_everyone(course_id_params:, user_id_params:, assignment_id_params:)
-            visible_assignments |= assignments_visible_to_all
-
-            # add assignments visible to groups (only assignments can have group overrides)
-            assignments_visible_to_groups = AssignmentVisibility::Repositories::AssignmentVisibleToStudentRepository
-                                            .find_assignments_visible_to_groups(course_id_params:, user_id_params:, assignment_id_params:)
-            visible_assignments |= assignments_visible_to_groups
-
-            if Account.site_admin.feature_enabled?(:selective_release_optimized_services)
-              # add assignments visible to sections (and related module section overrides) without unassign overrides
-              assignments_assigned_to_sections = AssignmentVisibility::Repositories::AssignmentVisibleToStudentRepository
-                                                 .find_assignments_assigned_to_sections(course_id_params:, user_id_params:, assignment_id_params:)
-              visible_assignments |= assignments_assigned_to_sections
-            else
-              # add assignments visible to sections (and related module section overrides)
-              assignments_visible_to_sections = AssignmentVisibility::Repositories::AssignmentVisibleToStudentRepository
-                                                .find_assignments_visible_to_sections(course_id_params:, user_id_params:, assignment_id_params:)
-              visible_assignments |= assignments_visible_to_sections
-
-              # remove assignments for students with unassigned section overrides
-              assignments_with_unassigned_section_overrides = AssignmentVisibility::Repositories::AssignmentVisibleToStudentRepository
-                                                              .find_assignments_with_unassigned_section_overrides(course_id_params:, user_id_params:, assignment_id_params:)
-              visible_assignments -= assignments_with_unassigned_section_overrides
-            end
-
-            if Account.site_admin.feature_enabled?(:selective_release_optimized_services)
-              # add assignments visible due to ADHOC overrides (and related module ADHOC overrides) without unassign overrides
-              assignments_assigned_to_adhoc_overrides = AssignmentVisibility::Repositories::AssignmentVisibleToStudentRepository
-                                                        .find_assignments_assigned_to_adhoc_overrides(course_id_params:, user_id_params:, assignment_id_params:)
-              visible_assignments |= assignments_assigned_to_adhoc_overrides
-            else
-              # add assignments visible due to ADHOC overrides (and related module ADHOC overrides)
-              assignments_visible_to_adhoc_overrides = AssignmentVisibility::Repositories::AssignmentVisibleToStudentRepository
-                                                       .find_assignments_visible_to_adhoc_overrides(course_id_params:, user_id_params:, assignment_id_params:)
-              visible_assignments |= assignments_visible_to_adhoc_overrides
-
-              # remove assignments for students with unassigned ADHOC overrides
-              assignments_with_unassigned_adhoc_overrides = AssignmentVisibility::Repositories::AssignmentVisibleToStudentRepository
-                                                            .find_assignments_with_unassigned_adhoc_overrides(course_id_params:, user_id_params:, assignment_id_params:)
-              visible_assignments -= assignments_with_unassigned_adhoc_overrides
-            end
-
-            # add assignments visible due to course overrides
-            assignments_visible_to_course_overrides = AssignmentVisibility::Repositories::AssignmentVisibleToStudentRepository
-                                                      .find_assignments_visible_to_course_overrides(course_id_params:, user_id_params:, assignment_id_params:)
-
-            visible_assignments | assignments_visible_to_course_overrides
-          end
+          AssignmentVisibility::Repositories::AssignmentVisibleToStudentRepository.visibility_query(
+            course_id_params:, user_id_params:, assignment_id_params:
+          )
         end
       end
     end
