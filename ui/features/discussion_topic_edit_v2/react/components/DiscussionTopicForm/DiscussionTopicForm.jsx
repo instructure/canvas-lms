@@ -680,12 +680,8 @@ function DiscussionTopicForm({
     return continueSubmitForm(shouldPublish, shouldNotifyUsers)
   }
 
-  const renderLabelWithPublishStatus = () => {
-    if (instUINavEnabled()) {
-      return <></>
-    }
-
-    const publishStatus = published ? (
+  const getPublishStatus = () => {
+    return published ? (
       <Text color="success" weight="normal">
         <IconPublishSolid /> {I18n.t('Published')}
       </Text>
@@ -694,11 +690,13 @@ function DiscussionTopicForm({
         <IconUnpublishedLine /> {I18n.t('Not Published')}
       </Text>
     )
+  }
 
+  const renderLabelWithPublishStatus = () => {
     return (
       <Flex justifyItems="space-between">
         <Flex.Item>{I18n.t('Topic Title')}</Flex.Item>
-        {!isAnnouncement && <Flex.Item>{publishStatus}</Flex.Item>}
+        {!isAnnouncement && !instUINavEnabled() && <Flex.Item>{getPublishStatus()}</Flex.Item>}
       </Flex>
     )
   }

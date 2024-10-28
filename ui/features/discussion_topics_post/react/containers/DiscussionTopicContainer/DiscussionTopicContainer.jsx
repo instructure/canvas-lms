@@ -214,16 +214,13 @@ export const DiscussionTopicContainer = ({
     const discussionOrAnnouncement = isAnnouncement
       ? I18n.t('Announcements')
       : I18n.t('Discussions')
-    const discussionOrAnnouncementUrl= isAnnouncement ? 'announcements' : 'discussion_topics'
-    const oldCrumbs = getCrumbs()
-    const newCrumbs = [
-      ...oldCrumbs,
-      ...[
-        {name: discussionOrAnnouncement, url: oldCrumbs[0].url + '/' + discussionOrAnnouncementUrl},
-        {name: props.discussionTopic.title || '', url: ''},
-      ],
-    ]
-    setCrumbs(newCrumbs)
+    const discussionOrAnnouncementUrl = isAnnouncement ? 'announcements' : 'discussion_topics'
+    const crumbs = getCrumbs()
+    const baseUrl = `${crumbs[0].url}/${discussionOrAnnouncementUrl}`
+
+    crumbs.push({name: discussionOrAnnouncement, url: baseUrl})
+    crumbs.push({name: props.discussionTopic.title || '', url: ''})
+    setCrumbs(crumbs)
   }
 
   return (
