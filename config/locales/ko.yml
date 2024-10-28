@@ -3086,6 +3086,7 @@ ko:
     index: 
       how_to_start_a_new_collaboration: "특정 유형의 협업에 대한 자세한 정보를 찾으려면 \"새 협업 시작\"을 클릭하고 드롭다운 리스트에서 유형을 선택합니다."
       links: 
+        add_collaboration: "협업 추가"
         collaboration: 협업
         new: "새 협업 시작"
       page_title: 협업
