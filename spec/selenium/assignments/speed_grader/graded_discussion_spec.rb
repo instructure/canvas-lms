@@ -213,5 +213,16 @@ describe "Screenreader Gradebook grading" do
         end
       end
     end
+
+    it "sets default highlight entry if not set" do
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_assignment.id}&student_id=#{@student2.id}"
+      in_frame("speedgrader_iframe") do
+        in_frame("discussion_preview_iframe") do
+          wait_for(method: nil, timeout: 2) { f("div[data-testid='isHighlighted']").displayed? }
+          expect(f("div[data-testid='isHighlighted']").text).to include(@student2.name)
+          expect(f("div[data-testid='isHighlighted']").text).to include("reply to entry i0")
+        end
+      end
+    end
   end
 end

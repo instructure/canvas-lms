@@ -2406,8 +2406,9 @@ class User < ActiveRecord::Base
           submissions.first(limit)
 
           ActiveRecord::Associations.preload(submissions, [{ assignment: :context }, :user, :submission_comments])
+
           if exclude_parent_assignment_submissions
-            submissions.reject! { |s| s.assignment.has_sub_assignments? } || []
+            submissions.delete_if { |s| s.assignment.has_sub_assignments? }
           else
             submissions
           end
