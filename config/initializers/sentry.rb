@@ -63,6 +63,8 @@ Rails.configuration.to_prepare do
       # are login/auth exceptions.  Exceptions that are simply noisy/inconvenient
       # should probably be caught and solved...
       config.excluded_exceptions += %w[
+        AuthenticationMethods::RevokedAccessTokenError
+        AuthenticationMethods::ExpiredAccessTokenError
         AuthenticationMethods::AccessTokenError
         AuthenticationMethods::AccessTokenScopeError
         AuthenticationMethods::LoggedOutError

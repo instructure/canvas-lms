@@ -2024,6 +2024,12 @@ class ApplicationController < ActionController::Base
       data = errors.to_hash
     when ActiveRecord::RecordNotFound
       data = { errors: [{ message: "The specified resource does not exist." }] }
+    when AuthenticationMethods::RevokedAccessTokenError
+      add_www_authenticate_header
+      data = { errors: [{ message: "Revoked access token." }] }
+    when AuthenticationMethods::ExpiredAccessTokenError
+      add_www_authenticate_header
+      data = { errors: [{ message: "Expired access token." }] }
     when AuthenticationMethods::AccessTokenError
       add_www_authenticate_header
       data = { errors: [{ message: "Invalid access token." }] }
