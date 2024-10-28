@@ -5580,6 +5580,7 @@ fa:
           به تبادل نامه های الکترونیکی برای آنها (و شما) فراهم می کند.
       how_to_start_a_new_collaboration: "برای یافتن اطلاعات بیشتر درباره یک نوع خاص از همکاری، روی «شروع یک همکاری جدید» کلیک کنید و سپس نوع مورد نظر را در فهرست بازشونده انتخاب کنید."
       links: 
+        add_collaboration: "افزودن همکاری"
         collaboration: همکاری
         delete: "حذف این همکاری"
         edit: "ویرایش این همکاری"
@@ -5916,6 +5917,7 @@ fa:
     general_error_with_message: "در هنگام اتصال به کنفرانس خطایی رخ داد. پیام: '%{message}'"
     inactive_error: "این کنفرانس درحال حاضر فعال نیست"
     index: 
+      add_conference: "اضافه کردن کنفرانس"
       concluded_conferences: "کنفرانس های خاتمه یافته"
       conference: کنفرانس
       conference_header: "کنفرانس ها"
