@@ -223,3 +223,10 @@ modules_student_module_selection:
   description: |-
     If enabled, teachers will be able to a single module to show on the modules page for students.
   applies_to: Account
+
+calendar_events_api_pagination_enhancements:
+  state: hidden
+  display_name: Calendar Events API Pagination Enhancements
+  description: |-
+    Improves API pagination handling for assignment events on user calendar.
+  applies_to: RootAccount
