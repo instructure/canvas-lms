@@ -766,6 +766,7 @@ class DiscussionTopic < ActiveRecord::Base
           topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
           topic_participant.subscribed = opts[:subscribed] if opts.key?(:subscribed)
           topic_participant.sort_order = opts[:sort_order] if opts.key?(:sort_order)
+          topic_participant.expanded = opts[:expanded] if opts.key?(:expanded)
           topic_participant.save
         end
       end

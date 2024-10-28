@@ -278,3 +278,15 @@ export const UPDATE_DISCUSSION_SORT_ORDER = gql`
     }
   }
 `
+
+export const UPDATE_DISCUSSION_EXPANDED = gql`
+  mutation UpdateDiscussionExpanded($discussionTopicId: ID!, $expanded: Boolean!) {
+    updateDiscussionExpanded(input: {discussionTopicId: $discussionTopicId, expanded: $expanded}) {
+      discussionTopic {
+        _id
+        id
+        expanded
+      }
+    }
+  }
+`

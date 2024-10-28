@@ -61,6 +61,7 @@ export const Discussion = {
       contextType
       lockInformation
       subscriptionDisabledForUser
+      expanded
       editor {
         ...User
       }
@@ -150,6 +151,7 @@ export const Discussion = {
     entriesTotalPages: number,
     subscriptionDisabledForUser: bool,
     sortOrder: string,
+    expanded: bool,
   }),
 
   mock: ({
@@ -198,6 +200,7 @@ export const Discussion = {
     rootTopic = RootTopic.mock(),
     entriesTotalPages = 2,
     sortOrder = 'desc',
+    expanded = false,
     discussionEntriesConnection = {
       nodes: [DiscussionEntry.mock()],
       pageInfo: PageInfo.mock(),
@@ -248,6 +251,7 @@ export const Discussion = {
     discussionEntriesConnection,
     subscriptionDisabledForUser,
     sortOrder,
+    expanded,
     __typename: 'Discussion',
   }),
 }
