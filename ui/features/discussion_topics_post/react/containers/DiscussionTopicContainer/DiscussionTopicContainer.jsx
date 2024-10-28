@@ -336,7 +336,7 @@ export const DiscussionTopicContainer = ({
                             )
                           )}
                         </Flex.Item>
-                        <Flex.Item shouldShrink={true} shouldGrow={true} overflowY='hidden'>
+                        <Flex.Item shouldShrink={true} shouldGrow={true} overflowY='visible'>
                           <DiscussionEntryContainer
                             isTopic={true}
                             postUtilities={
