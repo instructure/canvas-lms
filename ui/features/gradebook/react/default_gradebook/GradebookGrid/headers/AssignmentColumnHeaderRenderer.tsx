@@ -169,6 +169,8 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
 
     removeGradebookElement: gradebook.keyboardNav?.removeGradebookElement,
     reuploadSubmissionsAction: gradebook.getReuploadSubmissionsAction(assignmentId),
+    rubricAssessmentImportsExportsEnabled:
+      gradebook.options.rubric_assessment_imports_exports_enabled,
     setDefaultGradeAction: gradebook.getSetDefaultGradeAction(assignmentId),
 
     showGradePostingPolicyAction: {
@@ -224,6 +226,7 @@ export default class AssignmentColumnHeaderRenderer {
 
   render(column: Column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, options)
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<AssignmentColumnHeader {...props} />, $container)
   }
 
