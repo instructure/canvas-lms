@@ -285,7 +285,11 @@ export const DiscussionPostToolbar = props => {
                 )}
                 {(!props.userSplitScreenPreference || isSpeedGraderInTopUrl) && (
                   <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
-                    <ExpandCollapseThreadsButton showText={!matches.includes('mobile')} />
+                    <ExpandCollapseThreadsButton
+                      showText={!matches.includes('mobile')}
+                      isExpanded={props.isExpanded}
+                      onCollapseRepliesToggle={props.onCollapseRepliesToggle}
+                    />
                   </Flex.Item>
                 )}
                 {ENV.user_can_summarize && !props.isSummaryEnabled && (
@@ -364,6 +368,7 @@ DiscussionPostToolbar.propTypes = {
   onSearchChange: PropTypes.func,
   onViewFilter: PropTypes.func,
   onSortClick: PropTypes.func,
+  onCollapseRepliesToggle: PropTypes.func,
   searchTerm: PropTypes.string,
   discussionTitle: PropTypes.string,
   discussionId: PropTypes.string,
@@ -379,4 +384,5 @@ DiscussionPostToolbar.propTypes = {
   manageAssignTo: PropTypes.bool,
   isGroupDiscussion: PropTypes.bool,
   isCheckpointed: PropTypes.bool,
+  isExpanded: PropTypes.bool,
 }

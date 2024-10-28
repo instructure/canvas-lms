@@ -29,7 +29,7 @@ import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TranslationControls} from '../../components/TranslationControls/TranslationControls'
 import {useMutation} from '@apollo/react-hooks'
-import {UPDATE_DISCUSSION_SORT_ORDER} from '../../../graphql/Mutations'
+import {UPDATE_DISCUSSION_SORT_ORDER, UPDATE_DISCUSSION_EXPANDED} from '../../../graphql/Mutations'
 
 export const DiscussionTopicToolbarContainer = props => {
   const {searchTerm, filter, sort, setSearchTerm, setFilter, setSort} = useContext(SearchContext)
@@ -51,6 +51,7 @@ export const DiscussionTopicToolbarContainer = props => {
   }
 
   const [updateDiscussionSortOrder] = useMutation(UPDATE_DISCUSSION_SORT_ORDER)
+  const [updateDiscussionExpanded] = useMutation(UPDATE_DISCUSSION_EXPANDED)
 
   const onSortClick = () => {
     let newOrder = null
@@ -64,6 +65,14 @@ export const DiscussionTopicToolbarContainer = props => {
       variables: {
         discussionTopicId: props.discussionTopic._id,
         sortOrder: newOrder,
+      },
+    })
+  }
+  const onExpandCollapseClick = bool => {
+    updateDiscussionExpanded({
+      variables: {
+        discussionTopicId: props.discussionTopic._id,
+        expanded: bool,
       },
     })
   }
@@ -96,11 +105,11 @@ export const DiscussionTopicToolbarContainer = props => {
         childTopics={getGroupsMenuTopics()}
         selectedView={filter}
         sortDirection={props.discussionTopic.sortOrder}
-        isCollapsedReplies={true}
+        isExpanded={props.discussionTopic.expanded}
         onSearchChange={value => setCurrentSearchValue(value)}
         onViewFilter={onViewFilter}
         onSortClick={onSortClick}
-        onCollapseRepliesToggle={() => {}}
+        onCollapseRepliesToggle={onExpandCollapseClick}
         onTopClick={() => {}}
         searchTerm={currentSearchValue}
         discussionAnonymousState={props.discussionTopic.anonymousState}
