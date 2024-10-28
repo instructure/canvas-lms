@@ -24,8 +24,6 @@ interface NewLoginData {
   loginHandleName?: string
   loginLogoUrl?: string
   loginLogoAlt?: string
-  helpLinkUrl?: string
-  helpLinkName?: string
   bodyBgColor?: string
   bodyBgImage?: string
 }
@@ -54,8 +52,6 @@ export const useNewLoginData = (): NewLoginData => {
     loginHandleName: undefined,
     loginLogoUrl: undefined,
     loginLogoAlt: undefined,
-    helpLinkUrl: undefined,
-    helpLinkName: undefined,
     bodyBgColor: undefined,
     bodyBgImage: undefined,
   })
@@ -68,8 +64,6 @@ export const useNewLoginData = (): NewLoginData => {
         loginHandleName: getStringAttribute(container, 'data-login-handle-name'),
         loginLogoUrl: getStringAttribute(container, 'data-login-logo-url'),
         loginLogoAlt: getStringAttribute(container, 'data-login-logo-alt'),
-        helpLinkUrl: getStringAttribute(container, 'data-help-link-url'),
-        helpLinkName: getStringAttribute(container, 'data-help-link-name'),
         bodyBgColor: getStringAttribute(container, 'data-body-bg-color'),
         bodyBgImage: getStringAttribute(container, 'data-body-bg-image'),
       })

@@ -36,8 +36,6 @@ interface NewLoginContextType {
   authProviders?: AuthProvider[]
   loginLogoUrl?: string
   loginLogoAlt?: string
-  helpLinkUrl?: string
-  helpLinkName?: string
   bodyBgColor?: string
   bodyBgImage?: string
 }
@@ -56,16 +54,8 @@ export const NewLoginProvider = ({children}: NewLoginProviderProps) => {
   const [otpCommunicationChannelId, setOtpCommunicationChannelId] = useState<string | null>(null)
 
   // get data attribute values from hook
-  const {
-    loginHandleName,
-    authProviders,
-    loginLogoUrl,
-    loginLogoAlt,
-    helpLinkUrl,
-    helpLinkName,
-    bodyBgColor,
-    bodyBgImage,
-  } = useNewLoginData()
+  const {loginHandleName, authProviders, loginLogoUrl, loginLogoAlt, bodyBgColor, bodyBgImage} =
+    useNewLoginData()
 
   return (
     <NewLoginContext.Provider
@@ -85,8 +75,6 @@ export const NewLoginProvider = ({children}: NewLoginProviderProps) => {
         authProviders,
         loginLogoUrl,
         loginLogoAlt,
-        helpLinkUrl,
-        helpLinkName,
         bodyBgColor,
         bodyBgImage,
       }}
