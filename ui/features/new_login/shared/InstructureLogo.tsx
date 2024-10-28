@@ -42,20 +42,13 @@ const InstructureLogo = ({className}: Props) => {
   return (
     <View as="div" className={classNames(className)} textAlign="center">
       <Link href="https://instructure.com" target="_blank" rel="external" onClick={handleClick}>
-        <picture>
-          <source
-            media="(max-width: 48rem)"
-            srcSet={require('../assets/images/instructure-logo-dark.svg')}
-          />
-
-          <Img
-            width="7.9375rem"
-            height="1.125rem"
-            constrain="contain"
-            src={require('../assets/images/instructure-logo.svg')}
-            alt={I18n.t('Instructure Logo')}
-          />
-        </picture>
+        <Img
+          width="7.9375rem"
+          height="1.125rem"
+          constrain="contain"
+          src={require('../assets/images/instructure-logo.svg')}
+          alt={I18n.t('Instructure Logo')}
+        />
       </Link>
     </View>
   )
