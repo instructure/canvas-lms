@@ -17,35 +17,60 @@
  */
 
 import React from 'react'
-import {Outlet, ScrollRestoration} from 'react-router-dom'
 import {AppNavBar, ContentLayout, Footer, Header} from '../shared'
 import {Flex} from '@instructure/ui-flex'
+import {Global, css} from '@instructure/emotion'
+import {Outlet, ScrollRestoration} from 'react-router-dom'
 import {View} from '@instructure/ui-view'
+
+// https://emotion.sh/docs/@emotion/css#global-styles
+export function GlobalStyle() {
+  return (
+    <Global
+      styles={css`
+        html,
+        body {
+          overflow-x: hidden;
+        }
+        html {
+          height: 100%;
+        }
+        body {
+          min-height: 100%;
+          margin: 0;
+        }
+      `}
+    />
+  )
+}
 
 export const LoginLayout = () => {
   return (
-    <View as="div">
+    <>
+      <GlobalStyle />
       <ScrollRestoration />
 
-      <Flex as="div" direction="column" height="100vh">
-        <Flex.Item as="header" width="100vw" overflowY="visible">
-          <AppNavBar />
-        </Flex.Item>
+      <View as="div" height="100vh">
+        <Flex as="div" direction="column" height="100%">
+          <Flex.Item as="header" width="100vw" overflowY="visible">
+            <AppNavBar />
+          </Flex.Item>
 
-        <Flex.Item as="div" shouldGrow={true} overflowY="visible">
-          <ContentLayout>
-            <Flex as="div" direction="column" gap="large">
-              <Header />
+          <Flex.Item as="div" shouldGrow={true} overflowY="visible">
+            <ContentLayout>
+              <Flex as="div" direction="column" gap="large">
+                <Header />
 
-              <main>
-                <Outlet />
-              </main>
+                <main>
+                  <Outlet />
+                </main>
 
-              <Footer />
-            </Flex>
-          </ContentLayout>
-        </Flex.Item>
-      </Flex>
-    </View>
+                <Footer />
+              </Flex>
+            </ContentLayout>
+          </Flex.Item>
+        </Flex>
+      </View>
+    </>
   )
 }
