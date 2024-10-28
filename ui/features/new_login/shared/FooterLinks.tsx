@@ -31,23 +31,24 @@ interface Props {
 }
 
 const FooterLinks = ({className}: Props) => {
-  const {helpLinkUrl, helpLinkName} = useNewLogin()
-
   return (
     <View as="div" className={classNames(className)} textAlign="center">
       <InlineList delimiter="pipe" size="small">
-        {helpLinkUrl && helpLinkName && (
-          <InlineList.Item>
-            <Link href={helpLinkUrl}>{helpLinkName}</Link>
-          </InlineList.Item>
-        )}
+        <InlineList.Item>
+          <Link href="https://community.canvaslms.com/" target="_blank">
+            Help
+          </Link>
+        </InlineList.Item>
 
         <InlineList.Item>
           <Link href="/privacy_policy">{I18n.t('Privacy Policy')}</Link>
         </InlineList.Item>
 
         <InlineList.Item>
-          <Link href="https://www.instructure.com/policies/canvas-lms-cookie-notice">
+          <Link
+            href="https://www.instructure.com/policies/canvas-lms-cookie-notice"
+            target="_blank"
+          >
             {I18n.t('Cookie Notice')}
           </Link>
         </InlineList.Item>

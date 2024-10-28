@@ -31,8 +31,6 @@ jest.mock('../../hooks/useNewLoginData', () => ({
     ] as AuthProvider[],
     loginLogoUrl: 'login/canvas-logo.svg',
     loginLogoAlt: 'Canvas by Instructure',
-    helpLinkUrl: 'https://example.com/help',
-    helpLinkName: 'Help Center',
     bodyBgColor: '#ffffff',
     bodyBgImage: 'https://example.com/background.jpg',
   }),
@@ -55,8 +53,6 @@ const TestComponent = () => {
       </span>
       <span data-testid="loginLogoUrl">{context.loginLogoUrl}</span>
       <span data-testid="loginLogoAlt">{context.loginLogoAlt}</span>
-      <span data-testid="helpLinkUrl">{context.helpLinkUrl}</span>
-      <span data-testid="helpLinkName">{context.helpLinkName}</span>
       <span data-testid="bodyBgColor">{context.bodyBgColor}</span>
       <span data-testid="bodyBgImage">{context.bodyBgImage}</span>
     </div>
@@ -92,8 +88,6 @@ describe('NewLoginContext', () => {
     expect(screen.getByTestId('authProviders')).toHaveTextContent('Google, Microsoft')
     expect(screen.getByTestId('loginLogoUrl')).toHaveTextContent('login/canvas-logo.svg')
     expect(screen.getByTestId('loginLogoAlt')).toHaveTextContent('Canvas by Instructure')
-    expect(screen.getByTestId('helpLinkUrl')).toHaveTextContent('https://example.com/help')
-    expect(screen.getByTestId('helpLinkName')).toHaveTextContent('Help Center')
     expect(screen.getByTestId('bodyBgColor')).toHaveTextContent('#ffffff')
     expect(screen.getByTestId('bodyBgImage')).toHaveTextContent(
       'https://example.com/background.jpg'
@@ -144,8 +138,6 @@ describe('NewLoginContext', () => {
       authProviders: undefined,
       loginLogoUrl: undefined,
       loginLogoAlt: undefined,
-      helpLinkUrl: undefined,
-      helpLinkName: undefined,
       bodyBgColor: undefined,
       bodyBgImage: undefined,
     })
@@ -158,8 +150,6 @@ describe('NewLoginContext', () => {
     expect(screen.getByTestId('authProviders')).toBeEmptyDOMElement()
     expect(screen.getByTestId('loginLogoUrl')).toBeEmptyDOMElement()
     expect(screen.getByTestId('loginLogoAlt')).toBeEmptyDOMElement()
-    expect(screen.getByTestId('helpLinkUrl')).toBeEmptyDOMElement()
-    expect(screen.getByTestId('helpLinkName')).toBeEmptyDOMElement()
     expect(screen.getByTestId('bodyBgColor')).toBeEmptyDOMElement()
     expect(screen.getByTestId('bodyBgImage')).toBeEmptyDOMElement()
   })
