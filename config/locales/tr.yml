@@ -4634,6 +4634,7 @@ tr:
           Belirli bir türde işbirliği hakkında billgi edinmek için "Yeni Bir İşbirliği Başlat" a tıklayıp sarkık menüden uygun
           plan türü seçin.
       links: 
+        add_collaboration: "İşbirliği Ekle"
         collaboration: İşbirliği
         delete: "Bu İşbirliğini Sil"
         edit: "Bu İşbirliğini Düzenle"
@@ -4808,6 +4809,7 @@ tr:
     general_error_with_message: "Canlı derse katılmada bir hata meydana geldi. Mesaj :  '%{message}'"
     inactive_error: "Canlı ders şu an aktif değil"
     index: 
+      add_conference: "Konferans Ekle"
       concluded_conferences: "Tamamlanmış Canlı Dersler"
       conference: "Canlı Ders"
       conference_header: "Canlı Dersler"
