@@ -95,6 +95,7 @@ export type AssignmentColumnHeaderProps = {
     onSelect: (onExited: any) => void
   }
   reuploadSubmissionsAction: any
+  rubricAssessmentImportsExportsEnabled: boolean
   setDefaultGradeAction: {
     disabled: boolean
     onSelect: (cb: any) => Promise<void>
@@ -459,6 +460,13 @@ export default class AssignmentColumnHeader extends ColumnHeader<
           <MenuItem onSelect={this.showGradePostingPolicy}>
             {I18n.t('Grade Posting Policy')}
           </MenuItem>
+        )}
+
+        {this.props.rubricAssessmentImportsExportsEnabled && (
+          <MenuItem onSelect={() => {}}>{I18n.t('Bulk Download Rubrics')}</MenuItem>
+        )}
+        {this.props.rubricAssessmentImportsExportsEnabled && (
+          <MenuItem onSelect={() => {}}>{I18n.t('Import Rubrics')}</MenuItem>
         )}
       </Menu>
     )

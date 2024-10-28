@@ -394,3 +394,14 @@ speedgrader_grade_by_student:
   applies_to: RootAccount
   display_name: SpeedGrader Grade by Student
   description: Allow instructors to view and traverse between students and assignments from within SpeedGrader
+rubric_assessment_imports_exports:
+  state: hidden
+  applies_to: SiteAdmin
+  root_opt_in: true
+  display_name: Rubric Assessments Imports and Exports
+  description: This feature allows users to import and export rubrics assessments from Gradebook in a CSV format. This feature is dependent on Enhanced Rubrics feature.
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed
