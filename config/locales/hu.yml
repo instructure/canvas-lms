@@ -5781,6 +5781,7 @@ hu:
           Ezen az oldalon könnyen nyomon követhetik (ahogy Ön is) az együttműködés alakulását, és még az e-mail címükre sincs szükség hozzá.
       how_to_start_a_new_collaboration: "Ha adott típusú együttműködésről szeretne bővebb információt, akkor az \"Új együttműködés kezdeményezése\" szakaszban válassza ki a kívánt típust a legördülő listából."
       links: 
+        add_collaboration: "Együttműködés hozzáadása"
         collaboration: Együttműködés
         new: "Új együttműködés kezdeményezése"
       page_title: Együttműködés
@@ -6129,6 +6130,7 @@ hu:
     general_error_with_message: "Hiba történt a konferenciához kapcsolódás közben. Hibaüzenet: '%{message}'"
     inactive_error: "Ez a konferencia jelenleg nem aktív"
     index: 
+      add_conference: "Konferencia hozzáadása"
       concluded_conferences: "Befejeződött konferenciák"
       conference: Konferencia
       conference_header: Konferenciák
