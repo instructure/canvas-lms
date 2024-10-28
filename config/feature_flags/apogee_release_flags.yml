@@ -333,8 +333,8 @@ customizable_default_due_time:
 platform_service_speedgrader:
   state: hidden
   applies_to: Course
-  display_name: "SpeedGrader 2: Steel Thread"
-  description: This feature provides a new SpeedGrader platform experience.
+  display_name: Modernized SpeedGrader Platform
+  description: This feature provides a new SpeedGrader platform experience with a focus on improved performance for large courses.
   environments:
     ci:
       state: allowed
