@@ -188,7 +188,7 @@ class FilesController < ApplicationController
   before_action { |c| c.active_tab = "files" }
 
   def services_jwt_auth_allowed
-    params[:action] == "show" && Account.site_admin.feature_enabled?(:rce_linked_file_urls)
+    %w[show api_show].include?(params[:action]) && Account.site_admin.feature_enabled?(:rce_linked_file_urls)
   end
 
   def verify_api_id
@@ -577,6 +577,11 @@ class FilesController < ApplicationController
     params[:include] = Array(params[:include])
     if access_allowed(@attachment, @current_user, :read)
       options = { include: params[:include], verifier: params[:verifier], omit_verifier_in_app: !value_to_boolean(params[:use_verifiers]) }
+      if params[:access_token].present? && params[:instfs_id].present?
+        options[:access_token] = params[:access_token]
+        options[:instfs_id] = params[:instfs_id]
+      end
+
       if options[:include].include?("blueprint_course_status")
         options[:context] = @context || @folder&.context || @attachment.context
         options[:can_view_hidden_files] = can_view_hidden_files?(options[:context], @current_user, session)
@@ -585,7 +590,7 @@ class FilesController < ApplicationController
 
       # Add canvadoc session URL if the file is unlocked
       json.merge!(
-        doc_preview_json(@attachment, locked_for_user: json[:locked_for_user])
+        doc_preview_json(@attachment, locked_for_user: json[:locked_for_user], access_token: params[:access_token])
       )
       render json:
     end
@@ -679,10 +684,9 @@ class FilesController < ApplicationController
         return redirect_to url_for(params.to_unsafe_h.except(:sf_verifier))
       end
 
-      @jwt_resource_match = ensure_token_resource_link(@token, @attachment)
       params[:download] ||= params[:preview]
       add_crumb(t("#crumbs.files", "Files"), named_context_url(@context, :context_files_url)) unless @skip_crumb
-      if @attachment.deleted? && !@jwt_resource_match
+      if @attachment.deleted? && !jwt_resource_match(@attachment)
         if @current_user.nil? || @attachment.user_id != @current_user.id
           @not_found_message = t("could_not_find_file", "This file has been deleted")
           render status: :not_found, template: "shared/errors/404_message", formats: [:html]
@@ -699,12 +703,12 @@ class FilesController < ApplicationController
         return
       end
 
-      if @jwt_resource_match || access_allowed(@attachment, @current_user, :read)
+      if access_allowed(@attachment, @current_user, :read)
         @attachment.ensure_media_object
         verifier_checker = Attachments::Verification.new(@attachment)
 
         if params[:download]
-          if @jwt_resource_match ||
+          if jwt_resource_match(@attachment) ||
              (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) ||
              @attachment.grants_right?(@current_user, session, :download)
             disable_page_views if params[:preview]
@@ -719,7 +723,7 @@ class FilesController < ApplicationController
                      formats: [:html]
             end
             return
-          elsif @jwt_resource_match || authorized_action(@attachment, @current_user, :read)
+          elsif authorized_action(@attachment, @current_user, :read)
             render_attachment(@attachment)
           end
           # This action is a callback used in our system to help record when
@@ -760,7 +764,7 @@ class FilesController < ApplicationController
             # so we know the user session has been set there and relative files from the html will work
             query = URI.parse(request.url).query
             return_url = request.url + (query.present? ? "&" : "?") + "fd_cookie_set=1"
-            redirect_to safe_domain_file_url(attachment, return_url:)
+            redirect_to safe_domain_file_url(attachment, authorization: @attachment_authorization, return_url:)
           else
             render :show
           end
@@ -777,7 +781,7 @@ class FilesController < ApplicationController
         json[:attachment][:media_entry_id] = attachment.media_entry_id if attachment.media_entry_id
 
         verifier_checker = Attachments::Verification.new(@attachment)
-        if @jwt_resource_match ||
+        if jwt_resource_match(attachment) ||
            (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) ||
            attachment.grants_right?(@current_user, session, :download)
           # Right now we assume if they ask for json data on the attachment
@@ -1720,6 +1724,8 @@ class FilesController < ApplicationController
   end
 
   def access_allowed(attachment, user, access_type)
+    return true if jwt_resource_match(attachment)
+
     if params[:verifier]
       verifier_checker = Attachments::Verification.new(attachment)
       return true if verifier_checker.valid_verifier_for_permission?(params[:verifier], access_type, session)

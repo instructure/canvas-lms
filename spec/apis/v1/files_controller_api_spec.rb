@@ -1196,6 +1196,39 @@ describe "Files API", type: :request do
       expect(json["preview_url"]).to eq context_url(@att.context, :context_file_file_preview_url, @att, annotate: 0, verifier: @att.uuid)
     end
 
+    describe "with JWT access token" do
+      include_context "InstAccess setup"
+
+      before do
+        @att.update!(instfs_uuid: "stuff", content_type: "application/pdf")
+        user_with_pseudonym
+        jwt_payload = {
+          resource: "/courses/#{@course.id}/files/#{@att.id}?instfs_id=stuff",
+          aud: [@course.root_account.uuid],
+          sub: @user.uuid,
+          tenant_auth: { location: "location" },
+          iss: "instructure:inst_access",
+          exp: 1.hour.from_now.to_i,
+          iat: Time.now.to_i
+        }
+        @token_string = InstAccess::Token.send(:new, jwt_payload).to_unencrypted_token_string
+        allow(Canvadocs).to receive(:enabled?).and_return(true)
+        allow(InstFS).to receive_messages(enabled?: true, app_host: "http://instfs.test")
+        stub_request(:get, "http://instfs.test/files/stuff/metadata").to_return(status: 200, body: { url: "http://instfs.test/stuff" }.to_json)
+      end
+
+      it "allows access" do
+        json = api_call(:get, "/api/v1/files/#{@att.id}", { controller: "files", action: "api_show", format: "json", id: @att.id.to_param, include: "enhanced_preview_url", instfs_id: "stuff", access_token: @token_string }, {})
+        expect(response).to be_successful
+
+        expect(json["preview_url"]).to include "/courses/#{@course.id}/files/#{@att.id}/file_preview?access_token=#{@token_string}&annotate=0&instfs_id=stuff"
+        expect(json["canvadoc_session_url"]).to include "access_token=#{@token_string}"
+        query_params = Addressable::URI.parse(json["preview_url"]).query_values
+        expect(query_params["access_token"]).to eq @token_string
+        expect(query_params["instfs_id"]).to eq "stuff"
+      end
+    end
+
     it "returns lock information" do
       one_month_ago, one_month_from_now = 1.month.ago, 1.month.from_now
       att2 = Attachment.create!(filename: "test.txt", display_name: "test.txt", uploaded_data: StringIO.new("file"), folder: @root, context: @course, locked: true)

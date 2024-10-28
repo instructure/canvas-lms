@@ -35,6 +35,10 @@ module Users
       root_account = claims[:root_account]
 
       jwt_claims = { user_id: user.global_id.to_s }
+      if (authorization = claims[:authorization])
+        jwt_claims[:attachment_id] = authorization[:attachment].global_id.to_s
+        jwt_claims[:permission] = authorization[:permission]
+      end
       jwt_claims[:real_user_id] = real_user.global_id.to_s if real_user
       jwt_claims[:developer_key_id] = developer_key.global_id.to_s if developer_key
       jwt_claims[:root_account_id] = root_account.global_id.to_s if root_account
@@ -49,6 +53,11 @@ module Users
       return {} if fields[:sf_verifier].blank?
 
       claims = Canvas::Security.decode_jwt(fields[:sf_verifier])
+
+      if claims[:attachment_id].present?
+        attachment_id = fields[:attachment_id] || fields[:file_id] || fields[:id]
+        raise InvalidVerifier unless attachment_id == Attachment.find_by(id: claims[:attachment_id])&.id&.to_s
+      end
 
       real_user = user = User.where(id: claims[:user_id]).first
       real_user = User.where(id: claims[:real_user_id]).first if claims[:real_user_id].present?
