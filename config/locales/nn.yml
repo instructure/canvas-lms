@@ -6307,6 +6307,7 @@ nn:
           utan å måtte utveksle e-postadresser.
       how_to_start_a_new_collaboration: "Dersom du vil vite meir om ein bestemt type samarbeid, kan du klikke på \"Start nytt samarbeid\" og deretter velje samarbeidstype i rullegardinmenyen."
       links: 
+        add_collaboration: "Legg til samarbeid"
         collaboration: Samarbeid
         new: "Start nytt samarbeid"
       page_title: Samarbeid
@@ -6663,6 +6664,7 @@ nn:
     general_error_with_message: "Det oppstod ein feil under tilkopling til konferansen. Melding: '%{message}'"
     inactive_error: "Konferansen er ikkje aktiv akkurat no"
     index: 
+      add_conference: "Legg til konferanse"
       concluded_conferences: "Ferdige konferansar"
       conference: Konferanse
       conference_header: Konferansar
