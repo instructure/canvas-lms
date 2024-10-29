@@ -23,7 +23,7 @@ module Canvas
     def lock_explanation(hash, type, context = nil, options = {})
       include_js = options.fetch(:include_js, true)
       url_options = options.key?(:only_path) ? { only_path: options[:only_path] } : {}
-      # Any additions to this function should also be made in javascripts/content_locks.js
+      # Any additions to this function should also be made in javascripts/lock_reason.js
       if hash[:lock_at]
         case type
         when "quiz"
