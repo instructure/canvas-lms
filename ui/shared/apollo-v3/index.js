@@ -18,7 +18,7 @@
 
 import getCookie from '@instructure/get-cookie'
 import introspectionQueryResultData from '@canvas/apollo/fragmentTypes.json'
-import {ApolloClient, InMemoryCache, HttpLink, ApolloLink} from '@apollo/client'
+import {ApolloClient, InMemoryCache, HttpLink, ApolloLink, gql} from '@apollo/client'
 import {ApolloProvider} from '@apollo/react-common'
 import {IntrospectionFragmentMatcher} from 'apollo-cache-inmemory'
 import {persistCache} from 'apollo-cache-persist'
@@ -115,7 +115,10 @@ function createClient(opts = {}) {
   // https://github.com/apollographql/apollo-client/blob/main/src/link/core/ApolloLink.ts
   const httpLinkOptions = opts.httpLinkOptions || {}
 
-  const links = [createConsoleErrorReportLink(), setHeadersLink(), createHttpLink(httpLinkOptions)]
+  const links =
+    createClient.mockLink == null
+      ? [createConsoleErrorReportLink(), setHeadersLink(), createHttpLink(httpLinkOptions)]
+      : [createConsoleErrorReportLink(), createClient.mockLink]
 
   const client = new ApolloClient({
     link: ApolloLink.from(links),
@@ -125,4 +128,4 @@ function createClient(opts = {}) {
   return client
 }
 
-export {ApolloProvider, createClient, createCache, createPersistentCache}
+export {ApolloProvider, createClient, createCache, createPersistentCache, gql}
