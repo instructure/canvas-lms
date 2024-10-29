@@ -21,11 +21,10 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Tray} from '@instructure/ui-tray'
 import {Heading} from '@instructure/ui-heading'
-import {Button, CloseButton} from '@instructure/ui-buttons'
-import {IconDownloadLine} from '@instructure/ui-icons'
+import {CloseButton} from '@instructure/ui-buttons'
 import {FileDrop} from '@instructure/ui-file-drop'
-import {Alert} from '@instructure/ui-alerts'
 import SVGWrapper from '@canvas/svg-wrapper'
+import useStore from '../stores'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ImportTable} from '@canvas/rubrics/react/RubricImport'
@@ -33,32 +32,34 @@ import {type RubricImport} from '@canvas/rubrics/react/types/rubric'
 
 const I18n = useI18nScope('rubrics-import')
 
-type ImportRubricTrayProps = {
+type RubricAssessmentImportTrayProps = {
   currentImports: RubricImport[]
-  isOpen: boolean
-  onClickImport: (rubricImport: RubricImport) => void
-  onClose: () => void
+  onClickImport: (rubricImport: any) => void
   onImport: (file: File) => void
 }
 
-export const ImportRubricTray = ({
+export const RubricAssessmentImportTray = ({
   currentImports,
-  isOpen,
   onClickImport,
-  onClose,
   onImport,
-}: ImportRubricTrayProps) => {
-  const handleDownloadTemplate = () => {
-    const link = document.createElement('a')
-    link.href = '/api/v1/rubrics/upload_template'
-    link.click()
+}: RubricAssessmentImportTrayProps) => {
+  const {rubricAssessmentImportTrayProps, toggleRubricAssessmentImportTray} = useStore()
+
+  const {isOpen, assignment} = rubricAssessmentImportTrayProps
+
+  const closeTray = () => {
+    toggleRubricAssessmentImportTray(false)
+  }
+
+  if (!assignment) {
+    return null
   }
 
   return (
     <Tray
-      label={I18n.t('Import Rubrics Tray')}
+      label={I18n.t('Import Rubrics')}
       open={isOpen}
-      onDismiss={onClose}
+      onDismiss={closeTray}
       placement="end"
       shouldCloseOnDocumentClick={true}
     >
@@ -69,30 +70,15 @@ export const ImportRubricTray = ({
         <CloseButton
           size="medium"
           placement="end"
-          onClick={onClose}
+          onClick={closeTray}
           screenReaderLabel={I18n.t('Close')}
         />
       </View>
-      <View as="div" margin="small small 0">
-        <Alert variant="info">
-          {I18n.t('This feature requires the use of our rubric template.')}
-        </Alert>
-      </View>
-      <View
-        as="div"
-        margin="medium xx-large 0"
-        textAlign="center"
-        overflowX="hidden"
-        overflowY="hidden"
-      >
-        <Button
-          renderIcon={IconDownloadLine}
-          color="secondary"
-          data-testid="download-template"
-          onClick={handleDownloadTemplate}
-        >
-          {I18n.t('Download Template')}
-        </Button>
+      <View as="div" margin="large small 0">
+        <Text>
+          {I18n.t('Import rubric assessments to ')}
+          <Text weight="bold">&quot;{assignment.name}&quot;</Text>
+        </Text>
       </View>
       <View as="div" height="410px" margin="large small 0">
         <FileDrop
