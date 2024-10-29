@@ -69,7 +69,7 @@ describe('PostPolicyApi', () => {
             variables: {courseId: BAD_RESPONSE_COURSE_ID, postManually: true},
           },
           result: {
-            data: {},
+            data: {setCoursePostPolicy: {errors: [], postPolicy: null}},
           },
         },
       ])

@@ -147,7 +147,7 @@ describe('PostAssignmentGradesTray Api', () => {
       try {
         await Api.postAssignmentGrades(BAD_ASSIGNMENT_ID)
       } catch (error) {
-        strictEqual(error.message, 'GraphQL error: a graphql error')
+        strictEqual(error.message, 'a graphql error')
       }
     })
   })
@@ -171,7 +171,7 @@ describe('PostAssignmentGradesTray Api', () => {
       try {
         await Api.postAssignmentGradesForSections(BAD_ASSIGNMENT_ID, SECTION_IDS)
       } catch (error) {
-        strictEqual(error.message, 'GraphQL error: a graphql error')
+        strictEqual(error.message, 'a graphql error')
       }
     })
   })

@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createClient, gql} from '@canvas/apollo'
+import {createClient, gql} from '@canvas/apollo-v3'
 
 export const SET_COURSE_POST_POLICY_MUTATION = gql`
   mutation SetCoursePostPolicy($courseId: ID!, $postManually: Boolean!) {
