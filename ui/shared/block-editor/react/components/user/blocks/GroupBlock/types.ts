@@ -21,9 +21,23 @@ import {type ResizableProps} from '../../../editor/types'
 export type GroupLayout = 'row' | 'column'
 export type GroupAlignment = 'start' | 'center' | 'end'
 
+interface AllAlignments {
+  layout: GroupLayout
+  alignment: GroupAlignment
+  verticalAlignment: GroupAlignment
+}
+
+export const defaultAlignment: AllAlignments = {
+  layout: 'row',
+  alignment: 'start',
+  verticalAlignment: 'start',
+}
+
 export type GroupBlockProps = {
   isColumn?: boolean
   layout?: GroupLayout
+  color?: string
+  background?: string
   alignment?: GroupAlignment
   verticalAlignment?: GroupAlignment
   resizable?: boolean

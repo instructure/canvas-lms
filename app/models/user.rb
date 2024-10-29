@@ -1995,6 +1995,10 @@ class User < ActiveRecord::Base
     !!preferences[:collapse_course_nav]
   end
 
+  def text_editor_preference
+    preferences[:text_editor_preference]
+  end
+
   # ***** OHI If you're going to add a lot of data into `preferences` here maybe take a look at app/models/user_preference_value.rb instead ***
   # it will store the data in a separate table on the db and lighten the load on poor `users`
 

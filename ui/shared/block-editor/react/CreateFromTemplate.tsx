@@ -39,18 +39,26 @@ export default function CreateFromTemplate(props: {course_id: string}) {
   const {actions} = useEditor()
   const [isOpen, setIsOpen] = useState<boolean>(!ENV.WIKI_PAGE)
   const [blockTemplates, setBlockTemplates] = useState<BlockTemplate[]>([])
+  const [blankPageTemplate, setBlankPageTemplate] = useState<BlockTemplate>(() => {
+    return {node_tree: {}} as BlockTemplate
+  })
   const close = () => {
     setIsOpen(false)
   }
 
   const loadTemplateOnRoot = (node_tree: TemplateNodeTree) => {
-    actions.deserialize(JSON.stringify(node_tree.nodes).replaceAll(node_tree.rootNodeId, 'ROOT'))
+    actions.deserialize(JSON.stringify(node_tree.nodes))
   }
 
   useEffect(() => {
     if (isOpen) {
       getGlobalPageTemplates()
-        .then(setBlockTemplates)
+        .then((templates: BlockTemplate[]) => {
+          const idx = templates.findIndex(template => template.id === 'blank_page')
+          const blankPage = templates.splice(idx, 1)[0]
+          setBlankPageTemplate(blankPage)
+          setBlockTemplates(templates)
+        })
         .catch((err: Error) => {
           showFlashError(I18n.t('Cannot get block custom templates'))(err)
         })
@@ -97,7 +105,15 @@ export default function CreateFromTemplate(props: {course_id: string}) {
       </Modal.Header>
       <Modal.Body>
         <Flex padding="small" wrap="wrap" gap="large">
-          <TemplateCardSkeleton createAction={close} />
+          <TemplateCardSkeleton
+            template={blankPageTemplate}
+            createAction={() => {
+              if (blankPageTemplate.node_tree) {
+                loadTemplateOnRoot(blankPageTemplate.node_tree)
+              }
+              close()
+            }}
+          />
           {blockTemplates.map(blockTemplate => {
             return (
               <TemplateCardSkeleton

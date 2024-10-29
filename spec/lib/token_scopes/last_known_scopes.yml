@@ -2047,6 +2047,8 @@
   path: '/api/v1/users/:id/settings'
 - verb: POST
   path: '/api/v1/users/:id/split'
+- verb: PUT
+  path: "/api/v1/users/:id/text_editor_preference"
 - verb: GET
   path: '/api/v1/users/:user_id/avatars'
 - verb: GET

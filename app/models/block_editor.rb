@@ -24,6 +24,23 @@ class BlockEditor < ActiveRecord::Base
 
   alias_attribute :version, :editor_version
 
+  LATEST_VERSION = "0.2"
+
+  BLANK_PAGE = {
+    ROOT: {
+      type: {
+        resolvedName: "PageBlock"
+      },
+      isCanvas: true,
+      props: {},
+      displayName: "Page",
+      custom: {},
+      hidden: false,
+      nodes: [],
+      linkedNodes: {}
+    }
+  }.freeze
+
   def set_root_account_id
     self.root_account_id = context&.root_account_id unless root_account_id
   end

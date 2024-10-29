@@ -1752,7 +1752,7 @@ class UsersController < ApplicationController
     create_user
   end
 
-  BOOLEAN_PREFS = %i[manual_mark_as_read collapse_global_nav collapse_course_nav hide_dashcard_color_overlays release_notes_badge_disabled comment_library_suggestions_enabled elementary_dashboard_disabled].freeze
+  BOOLEAN_PREFS = %i[manual_mark_as_read collapse_global_nav collapse_course_nav hide_dashcard_color_overlays release_notes_badge_disabled comment_library_suggestions_enabled elementary_dashboard_disabled default_to_block_editor].freeze
 
   # @API Update user settings.
   # Update an existing user's settings.
@@ -1972,6 +1972,41 @@ class UsersController < ApplicationController
           end
         end
       end
+    end
+  end
+
+  # @API Update text editor preference
+  # Updates a user's default choice for text editor.  This allows
+  # the Choose an Editor propmts to preload the user's preference.
+  #
+  #
+  # @argument text_editor_preference  [String, "block_editor"|"rce"|""]
+  #   The identifier for the editor.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/users/<user_id>/prefered_editor \
+  #     -X PUT \
+  #     -F 'text_editor_preference=rce'
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   {
+  #     "text_editor_preference": "rce"
+  #   }
+  def set_text_editor_preference
+    user = api_find(User, params[:id])
+
+    return unless authorized_action(user, @current_user, [:manage, :manage_user_details])
+
+    raise ActiveRecord::RecordInvalid if %w[rce block_editor].exclude?(params[:text_editor_preference]) && params[:text_editor_preference] != ""
+
+    params[:text_editor_preference] = nil if params[:text_editor_preference] == ""
+
+    if user.set_preference(:text_editor_preference, params[:text_editor_preference])
+      render(json: { text_editor_preference: user.reload.get_preference(:text_editor_preference) })
+    else
+      render(json: user.errors, status: :bad_request)
     end
   end
 

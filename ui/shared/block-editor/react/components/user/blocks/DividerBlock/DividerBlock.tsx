@@ -16,20 +16,39 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import IconUndo from './undo'
-import IconRedo from './redo'
-import IconBackgroundColor from './background-color'
-import IconResize from './resize'
-import IconPlacementTop from './placement-top'
-import IconPlacementMiddle from './placement-middle'
-import IconPlacementBottom from './placement-bottom'
+import React from 'react'
+import {useNode, type Node} from '@craftjs/core'
+import {useScope} from '@canvas/i18n'
 
-export {
-  IconUndo,
-  IconRedo,
-  IconBackgroundColor,
-  IconResize,
-  IconPlacementTop,
-  IconPlacementMiddle,
-  IconPlacementBottom,
+const I18n = useScope('block-editor')
+
+const DividerBlock = () => {
+  const {
+    connectors: {connect, drag},
+    node,
+  } = useNode((n: Node) => {
+    return {
+      node: n,
+    }
+  })
+
+  return (
+    <div
+      role="treeitem"
+      aria-label={node.data.displayName}
+      aria-selected={node.events.selected}
+      className="block divider-block"
+      ref={el => el && connect(drag(el as HTMLElement))}
+      tabIndex={-1}
+    />
+  )
 }
+
+DividerBlock.craft = {
+  displayName: I18n.t('Divider'),
+  custom: {
+    isBlock: true,
+  },
+}
+
+export {DividerBlock}
