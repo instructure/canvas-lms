@@ -26,9 +26,12 @@ import rceFormatMessage from '@instructure/canvas-rce/es/format-message'
 import {up as configureDateTime} from '@canvas/datetime/configureDateTime'
 import {up as configureDateTimeMomentParser} from '@canvas/datetime/configureDateTimeMomentParser'
 import {up as installNodeDecorations} from '../ui/boot/initializers/installNodeDecorations'
+import {loadErrorMessages, loadDevMessages} from '@apollo/client/dev'
 import {useTranslations} from '@canvas/i18n'
 import MockBroadcastChannel from './MockBroadcastChannel'
 
+loadDevMessages()
+loadErrorMessages()
 useTranslations('en', CoreTranslations)
 
 rceFormatMessage.setup({
