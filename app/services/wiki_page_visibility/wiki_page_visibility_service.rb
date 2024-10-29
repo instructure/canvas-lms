@@ -27,7 +27,7 @@ module WikiPageVisibility
         raise ArgumentError, "user_id cannot be nil" if user_id.nil?
         raise ArgumentError, "user_id must not be an array" if user_id.is_a?(Array)
 
-        wiki_pages_visible_to_students(course_id_params: course_id, user_id_params: user_id)
+        wiki_pages_visible_to_students(course_ids: course_id, user_ids: user_id)
       end
 
       def wiki_pages_visible_to_students_in_courses(course_ids:, user_ids:)
@@ -36,7 +36,7 @@ module WikiPageVisibility
         raise ArgumentError, "user_ids cannot be nil" if user_ids.nil?
         raise ArgumentError, "user_ids must be an array" unless user_ids.is_a?(Array)
 
-        wiki_pages_visible_to_students(course_id_params: course_ids, user_id_params: user_ids)
+        wiki_pages_visible_to_students(course_ids:, user_ids:)
       end
 
       def wiki_pages_visible_to_student_in_courses(user_id:, course_ids:)
@@ -45,7 +45,7 @@ module WikiPageVisibility
         raise ArgumentError, "user_id cannot be nil" if user_id.nil?
         raise ArgumentError, "user_id must not be an array" if user_id.is_a?(Array)
 
-        wiki_pages_visible_to_students(course_id_params: course_ids, user_id_params: user_id)
+        wiki_pages_visible_to_students(course_ids:, user_ids: user_id)
       end
 
       def wiki_page_visible_to_student(wiki_page_id:, user_id:)
@@ -54,7 +54,7 @@ module WikiPageVisibility
         raise ArgumentError, "user_id cannot be nil" if user_id.nil?
         raise ArgumentError, "user_id must not be an array" if user_id.is_a?(Array)
 
-        wiki_pages_visible_to_students(wiki_page_id_params: wiki_page_id, user_id_params: user_id)
+        wiki_pages_visible_to_students(wiki_page_ids: wiki_page_id, user_ids: user_id)
       end
 
       def wiki_page_visible_to_students(wiki_page_id:, user_ids:)
@@ -63,7 +63,7 @@ module WikiPageVisibility
         raise ArgumentError, "user_ids cannot be nil" if user_ids.nil?
         raise ArgumentError, "user_ids must be an array" unless user_ids.is_a?(Array)
 
-        wiki_pages_visible_to_students(wiki_page_id_params: wiki_page_id, user_id_params: user_ids)
+        wiki_pages_visible_to_students(wiki_page_ids: wiki_page_id, user_ids:)
       end
 
       def wiki_page_visible_to_students_in_course(wiki_page_id:, user_ids:, course_id:)
@@ -74,22 +74,22 @@ module WikiPageVisibility
         raise ArgumentError, "user_ids cannot be nil" if user_ids.nil?
         raise ArgumentError, "user_ids must be an array" unless user_ids.is_a?(Array)
 
-        wiki_pages_visible_to_students(course_id_params: course_id, wiki_page_id_params: wiki_page_id, user_id_params: user_ids)
+        wiki_pages_visible_to_students(course_ids: course_id, wiki_page_ids: wiki_page_id, user_ids:)
       end
 
       private
 
-      def wiki_pages_visible_to_students(course_id_params: nil, user_id_params: nil, wiki_page_id_params: nil)
-        if course_id_params.nil? && user_id_params.nil? && wiki_page_id_params.nil?
-          raise ArgumentError, "at least one non nil course_id, user_id, or wiki_page_id_params is required (for query performance reasons)"
+      def wiki_pages_visible_to_students(course_ids: nil, user_ids: nil, wiki_page_ids: nil)
+        if course_ids.nil? && user_ids.nil? && wiki_page_ids.nil?
+          raise ArgumentError, "at least one non nil course_id, user_id, or wiki_page_ids is required (for query performance reasons)"
         end
 
         service_cache_fetch(service: name,
-                            course_id_params:,
-                            user_id_params:,
-                            additional_id_params: wiki_page_id_params) do
+                            course_ids:,
+                            user_ids:,
+                            additional_ids: wiki_page_ids) do
           WikiPageVisibility::Repositories::WikiPageVisibleToStudentRepository.visibility_query(
-            course_id_params:, user_id_params:, wiki_page_id_params:
+            course_ids:, user_ids:, wiki_page_ids:
           )
         end
       end
