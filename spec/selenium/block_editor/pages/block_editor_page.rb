@@ -46,6 +46,10 @@ module BlockEditorPage
     driver.execute_script("return document.activeElement") # rubocop:disable Specs/NoExecuteScript
   end
 
+  def body
+    f("body")
+  end
+
   def block_editor
     f(".block-editor")
   end

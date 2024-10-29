@@ -711,7 +711,7 @@
   }
 }
 
-text-template-preview-card {
+.block-template-preview-card {
   background-position: left top;
   background-repeat: no-repeat;
   background-size: 100% auto;
