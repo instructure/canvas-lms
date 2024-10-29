@@ -25,6 +25,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 interface DiscussionSummaryGenerateButtonProps {
   onClick: () => void
   isEnabled: boolean
+  isMobile: boolean
 }
 
 const I18n = useI18nScope('discussions_posts')
@@ -37,6 +38,7 @@ export const DiscussionSummaryGenerateButton: React.FC<
   return (
     <Tooltip renderTip={buttonText} width="48px" data-testid="summary-generate-tooltip">
       <Button
+        display={props.isMobile ? 'block' : 'inline-block'}
         onClick={props.onClick}
         renderIcon={IconSyllabusLine}
         data-testid="summary-generate-button"

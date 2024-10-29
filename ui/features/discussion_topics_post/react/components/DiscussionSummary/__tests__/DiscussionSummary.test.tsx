@@ -29,6 +29,7 @@ jest.mock('@canvas/do-fetch-api-effect')
 const setup = (props = {}) => {
   const defaultProps = {
     onDisableSummaryClick: jest.fn(),
+    breakpoints: {mobileOnly: false},
     ...props,
   }
 

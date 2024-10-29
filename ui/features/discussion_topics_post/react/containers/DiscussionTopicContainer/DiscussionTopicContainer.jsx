@@ -299,8 +299,8 @@ export const DiscussionTopicContainer = ({
                     borderRadius={responsiveProps?.border?.radius}
                     borderStyle="solid"
                     borderColor="primary"
-                    padding="small"
-                    margin="0 0 small 0"
+                    padding={matches.includes('mobile') ? "small 0 medium 0" : "small"}
+                    margin={matches.includes('mobile') ? "0 0 medium 0" : "0 0 small 0"}
                   >
                     {!props.discussionTopic.availableForUser ? (
                       <LockedDiscussion title={props.discussionTopic.title} />
@@ -538,12 +538,13 @@ export const DiscussionTopicContainer = ({
                       borderRadius={responsiveProps?.border?.radius}
                       borderStyle="solid"
                       borderColor="primary"
-                      padding="small"
+                      padding={matches.includes('mobile') ? "0" : "small"}
                       margin="0 0 small 0"
                     >
                       <Flex direction="column" padding={responsiveProps?.container?.padding}>
                         <DiscussionSummary
                           onDisableSummaryClick={() => props.setIsSummaryEnabled(false)}
+                          isMobile={matches.includes('mobile') ? true : false}
                         />
                       </Flex>
                     </View>
