@@ -995,7 +995,7 @@ function DiscussionTopicForm({
               />
             )}
             {enablePodcastFeed && !isGroupContext && (
-              <View display="block" padding="none none none large">
+              <View display="block" padding="none none none medium">
                 <Checkbox
                   label={I18n.t('Include student replies in podcast feed')}
                   value="include-student-replies-in-podcast-feed"
@@ -1061,7 +1061,7 @@ function DiscussionTopicForm({
                   }}
                 />
                 {allowLiking && (
-                  <View display="block" padding="small none none large">
+                  <View display="block" padding="small none none medium">
                     <FormFieldGroup description="" rowSpacing="small">
                       <Checkbox
                         label={I18n.t('Only graders can like')}
@@ -1090,7 +1090,7 @@ function DiscussionTopicForm({
                 {addToTodo && (
                   <View
                     display="block"
-                    padding="none none none large"
+                    padding="none none none medium"
                     data-testid="todo-date-section"
                     margin="small 0 0 0"
                   >
@@ -1145,7 +1145,7 @@ function DiscussionTopicForm({
               />
             )}
             {shouldShowGroupOptions && isGroupDiscussion && (
-              <View display="block" padding="none none none large">
+              <View display="block" padding="none none none medium">
                 <SimpleSelect
                   data-testid="select-discussion-group-category"
                   id="discussion_group_category_id"
