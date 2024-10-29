@@ -28,6 +28,8 @@ let filesCollection: any
 let file1: any
 let file2: any
 let file3: any
+let file4: any
+let file5: any
 let currentFolder: any
 
 describe('File Preview Rendering', () => {
@@ -71,9 +73,37 @@ describe('File Preview Rendering', () => {
       },
       {preflightUrl: ''}
     )
+    file4 = new File(
+      {
+        id: '4',
+        cid: 'c4',
+        name: 'Test File.file4',
+        'content-type': 'unknown/unknown',
+        size: 1000000,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        preview_url: 'http://example.com',
+      },
+      {preflightUrl: ''}
+    )
+    file5 = new File(
+      {
+        id: '5',
+        cid: 'c5',
+        name: 'Test File.file5',
+        'content-type': 'text/html',
+        size: 1000000,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        preview_url: 'http://example.com',
+      },
+      {preflightUrl: ''}
+    )
     filesCollection.add(file1)
     filesCollection.add(file2)
     filesCollection.add(file3)
+    filesCollection.add(file4)
+    filesCollection.add(file5)
     currentFolder = new Folder()
     currentFolder.files = filesCollection
   })
@@ -155,5 +185,35 @@ describe('File Preview Rendering', () => {
     expect(closeButton).toBeInTheDocument()
     closeButton.click()
     expect(closePreviewCalled).toBe(true)
+  })
+
+  test('the file preview should include sandbox attributes if there is a preview_url', () => {
+    render(
+      <FilePreview
+        isOpen={true}
+        query={{
+          preview: '4',
+        }}
+        currentFolder={currentFolder}
+      />
+    )
+    const iframe = $('.ef-file-preview-frame')[0]
+    expect(iframe).toBeInTheDocument()
+    expect(iframe.getAttribute('sandbox')).toBe('allow-scripts allow-same-origin')
+  })
+
+  test('the file preview should not include allow-scripts in sandbox attributes for html files', () => {
+    render(
+      <FilePreview
+        isOpen={true}
+        query={{
+          preview: '5',
+        }}
+        currentFolder={currentFolder}
+      />
+    )
+    const iframe = $('.ef-file-preview-frame')[0]
+    expect(iframe).toBeInTheDocument()
+    expect(iframe.getAttribute('sandbox')).toBe('allow-same-origin')
   })
 })
