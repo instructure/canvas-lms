@@ -41,7 +41,7 @@ describe('FilesApp', () => {
     useQuery.mockReturnValue({data: null, isLoading: false, error: null})
     render(<FilesApp contextAssetString="course_12345" />)
 
-    const headingElement = screen.getByText(/Files/i)
+    const headingElement = screen.getByText('Files', {exact: true})
     expect(headingElement).toBeInTheDocument()
   })
 

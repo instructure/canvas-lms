@@ -23,17 +23,15 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {ProgressBar} from '@instructure/ui-progress'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {Flex} from '@instructure/ui-flex'
 import filesEnv from '@canvas/files/react/modules/filesEnv'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import formatMessage from '../../../../../packages/canvas-media/src/format-message'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
+import {Flex} from '@instructure/ui-flex'
+import {Responsive} from '@instructure/ui-responsive'
+import TopLevelButtons from './TopLevelButtons'
 
 const I18n = useI18nScope('files_v2')
-
-interface FilesAppProps {
-  contextAssetString: string
-}
 
 const fetchQuota = async (contextType: string, contextId: string) => {
   const response = await fetch(`/api/v1/${contextType}/${contextId}/files/quota`)
@@ -42,56 +40,89 @@ const fetchQuota = async (contextType: string, contextId: string) => {
   }
   return response.json()
 }
+interface FilesAppProps {
+  isUserContext: boolean
+  size: string
+}
 
-const FilesApp: React.FC<FilesAppProps> = ({contextAssetString}) => {
+const FilesApp = ({isUserContext, size}: FilesAppProps) => {
   const contextType = filesEnv.contextType
   const contextId = filesEnv.contextId
-  const isUserContext = contextAssetString?.startsWith('user_')
 
   const {data, error} = useQuery(['quota'], () => fetchQuota(contextType, contextId))
 
-  const renderFilesUsageValue = (percentage: number) => {
-    return (
-      <Text>
-        {I18n.t('%{percentUsed} of %{quota} used', {
-          percentUsed: I18n.n(percentage, {percentage: true}),
-          quota: friendlyBytes(data?.quota) || 0,
-        })}
-      </Text>
-    )
-  }
-
   const renderFilesUsageBar = () => {
     if (error) {
-      showFlashError(I18n.t('An error occurred while loading files usage data'))(error)
+      showFlashError(I18n.t('An error occurred while loading files usage data'))(error as Error)
     }
 
     const {quota_used = 0, quota = 1} = data || {quota_used: 0, quota: 1}
     const percentage = Math.round((quota_used / quota) * 100)
 
+    const filesUsageString = I18n.t('%{percentUsed} of %{quota} used', {
+      percentUsed: I18n.n(percentage, {percentage: true}),
+      quota: friendlyBytes(data?.quota) || 0,
+    })
+
     return (
       <ProgressBar
         meterColor="brand"
         screenReaderLabel={formatMessage('File Storage Quota Used')}
-        formatScreenReaderValue={() => renderFilesUsageValue(percentage)}
-        renderValue={renderFilesUsageValue(percentage)}
+        formatScreenReaderValue={() => filesUsageString}
+        renderValue={<Text>{filesUsageString}</Text>}
         size="x-small"
         valueMax={quota}
         valueNow={quota_used}
       />
     )
   }
-
   return (
-    <div>
-      <Heading level="h1">{isUserContext ? I18n.t('All My Files') : I18n.t('Files')}</Heading>
+    <View as="div">
+      <Flex justifyItems="center" padding="none">
+        <Flex.Item shouldShrink={true} shouldGrow={true} textAlign="center">
+          <Flex
+            wrap="wrap"
+            margin="0 0 medium"
+            justifyItems="space-between"
+            direction={size === 'small' ? 'column' : 'row'}
+          >
+            <Flex.Item padding="small small small none" align="start">
+              <Heading level="h1">
+                {isUserContext ? I18n.t('All My Files') : I18n.t('Files')}
+              </Heading>
+            </Flex.Item>
+            <Flex.Item padding="none" direction={size === 'small' ? 'column' : 'row'}>
+              <TopLevelButtons size={size} isUserContext={isUserContext} />
+            </Flex.Item>
+          </Flex>
+        </Flex.Item>
+      </Flex>
       <View as="div">
         <Flex>
           <Flex.Item size="50%">{renderFilesUsageBar()}</Flex.Item>
         </Flex>
       </View>
-    </div>
+    </View>
   )
 }
+interface ResponsiveFilesAppProps {
+  contextAssetString: string
+}
 
-export default FilesApp
+const ResponsiveFilesApp = ({contextAssetString}: ResponsiveFilesAppProps) => {
+  const isUserContext = contextAssetString.startsWith('user_')
+  return (
+    <Responsive
+      match="media"
+      query={{
+        small: {maxWidth: 325},
+        medium: {maxWidth: 767},
+        large: {minWidth: 767},
+      }}
+      render={(_props: any, matches: string[] | undefined) => (
+        <FilesApp isUserContext={isUserContext} size={matches ? matches[0] : ''} />
+      )}
+    />
+  )
+}
+export default ResponsiveFilesApp
