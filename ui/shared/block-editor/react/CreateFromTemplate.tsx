@@ -31,6 +31,7 @@ import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {getGlobalPageTemplates} from '@canvas/block-editor/react/assets/globalTemplates'
 import TemplateCardSkeleton from './components/create_from_templates/TemplateCardSekelton'
 import QuickLook from './components/create_from_templates/QuickLook'
+import DisplayLayoutButtons from '@canvas/block-editor/react/components/create_from_templates/DisplayLayoutButtons'
 
 const I18n = useI18nScope('block-editor')
 
@@ -39,6 +40,7 @@ declare const ENV: GlobalEnv & {WIKI_PAGE: object}
 export default function CreateFromTemplate(props: {course_id: string}) {
   const {actions} = useEditor()
   const [isOpen, setIsOpen] = useState<boolean>(!ENV.WIKI_PAGE)
+  const [displayType, setDisplayType] = useState<'grid' | 'rows'>('grid')
   const [quickLookTemplate, setQuickLookTemplate] = useState<BlockTemplate | undefined>(undefined)
   const [blockTemplates, setBlockTemplates] = useState<BlockTemplate[]>([])
   const [blankPageTemplate, setBlankPageTemplate] = useState<BlockTemplate>(() => {
@@ -104,10 +106,12 @@ export default function CreateFromTemplate(props: {course_id: string}) {
             {I18n.t('Back to Pages')}
           </Button>
         </div>
+        <DisplayLayoutButtons displayType={displayType} setDisplayType={setDisplayType} />
       </Modal.Header>
       <Modal.Body>
         <Flex padding="small" wrap="wrap" gap="large">
           <TemplateCardSkeleton
+            inLayout={displayType}
             template={blankPageTemplate}
             createAction={() => {
               if (blankPageTemplate.node_tree) {
@@ -119,6 +123,7 @@ export default function CreateFromTemplate(props: {course_id: string}) {
           {blockTemplates.map(blockTemplate => {
             return (
               <TemplateCardSkeleton
+                inLayout={displayType}
                 key={blockTemplate.id}
                 template={blockTemplate}
                 createAction={() => {

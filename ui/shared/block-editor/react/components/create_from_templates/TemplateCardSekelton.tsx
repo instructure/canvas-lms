@@ -29,10 +29,12 @@ export default function TemplateCardSkeleton({
   template,
   createAction,
   quickLookAction,
+  inLayout,
 }: {
   template: BlockTemplate
   createAction: () => void
   quickLookAction?: () => void
+  inLayout: 'grid' | 'rows'
 }) {
   return (
     <View
@@ -40,14 +42,14 @@ export default function TemplateCardSkeleton({
       className={`block-template-preview-card ${template.id === 'blank_page' ? 'blank-card' : ''}`}
       display="flex"
       position="relative"
-      height="241px"
+      height={inLayout === 'grid' ? '241px' : '40vh'}
       shadow="above"
       tabIndex={0}
       style={{backgroundImage: template?.thumbnail && `url(${template.thumbnail})`}}
-      width="341px"
+      width={inLayout === 'grid' ? '341px' : 'calc(50% - 2.25rem)'}
     >
       {template.id === 'blank_page' && <div className="curl" />}
-      <Flex alignItems="center" height="241px" justifyItems="center" width="100%">
+      <Flex alignItems="center" height="100%" justifyItems="center" width="100%">
         {template.id !== 'blank_page' ? (
           <div className="buttons">
             <Button color="secondary" margin="0 x-small 0 0" size="small" onClick={quickLookAction}>
