@@ -356,7 +356,7 @@ lti_variable_expansions_use_group_course_as_course:
   state: hidden
   shadow: true
   applies_to: RootAccount
-  display_name: 'LTI Variable Expansions: Use Group''s Course as Course'
+  display_name: "LTI Variable Expansions: Use Group's Course as Course"
   description: >-
     If enabled, if an LTI tool is launched in the context of Course-based Group (Group within a Course), Course-related LTI variable expansions will use
     the Group's Course as the Course. If disabled, legacy behavior will apply -- Course-related LTI variable expansions will only apply when the Course
@@ -381,7 +381,7 @@ platform_notification_service:
   applies_to: RootAccount
   display_name: Enable Platform Notification Service
   description: >-
-    When on, 1Edtech Platform Notfication service (used to subscribe tools for notices, list existing notice handlers, notify subscribed tools, etc.) will
+    When on, 1Edtech Platform Notification service (used to subscribe tools for notices, list existing notice handlers, notify subscribed tools, etc.) will
     be enabled.
   environments:
     development:
