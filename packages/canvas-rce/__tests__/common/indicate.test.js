@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {equal, ok} from 'assert'
 import sinon from 'sinon'
 import indicate from '../../src/common/indicate'
 
@@ -30,7 +29,7 @@ describe('indicate function', () => {
       left: 20,
       width: 30,
       height: 40,
-      zIndex: 50
+      zIndex: 50,
     }
     margin = 5
     indicator = indicate(region, margin)
@@ -41,45 +40,45 @@ describe('indicate function', () => {
   })
 
   it('appends a div to the body', () => {
-    equal(indicator.parentNode, document.body)
+    expect(indicator.parentNode).toEqual(document.body)
   })
 
   it('removes the div after 2 seconds', () => {
     clock.tick(2000)
-    equal(indicator.parentNode, null)
+    expect(indicator.parentNode).toBeNull()
   })
 
   describe('shape', () => {
     it('has dimensions of region plus margin', () => {
-      equal(indicator.style.width, '40px')
-      equal(indicator.style.height, '50px')
+      expect(indicator.style.width).toEqual('40px')
+      expect(indicator.style.height).toEqual('50px')
     })
 
     it('is positioned at region minus margin', () => {
-      equal(indicator.style.top, '5px')
-      equal(indicator.style.left, '15px')
+      expect(indicator.style.top).toEqual('5px')
+      expect(indicator.style.left).toEqual('15px')
     })
 
     it('has a default margin of 3', () => {
       region.left = 3
-      equal(indicate(region).style.left, '0px')
+      expect(indicate(region).style.left).toEqual('0px')
     })
   })
 
   describe('transitions', () => {
     it('div initially has enter and active classes', () => {
-      ok(/enter/.test(indicator.className))
-      ok(/active/.test(indicator.className))
+      expect(/enter/.test(indicator.className)).toBeTruthy()
+      expect(/active/.test(indicator.className)).toBeTruthy()
     })
 
     it('div has leave class after 900ms', () => {
       clock.tick(900)
-      ok(/leave/.test(indicator.className))
+      expect(/leave/.test(indicator.className)).toBeTruthy()
     })
 
     it('div gets leave fast class on mouse over', () => {
       indicator.dispatchEvent(new window.MouseEvent('mouseover'))
-      ok(/leaveFast/.test(indicator.className))
+      expect(/leaveFast/.test(indicator.className)).toBeTruthy()
     })
   })
 })

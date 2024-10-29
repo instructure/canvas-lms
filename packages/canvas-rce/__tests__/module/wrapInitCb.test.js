@@ -16,43 +16,41 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from 'assert'
-import sinon from 'sinon'
 import wrapInitCb from '../../src/rce/wrapInitCb'
 
 let mirroredAttrs, edOpts, setAttrStub, fakeEditor, elStub, origInitCB
 
 describe('wrapInitCb', () => {
-  before(() => {
+  beforeAll(() => {
     mirroredAttrs = {
-      foo: 'bar'
+      foo: 'bar',
     }
-    origInitCB = sinon.stub()
+    origInitCB = jest.fn()
     edOpts = {
-      init_instance_callback: origInitCB
+      init_instance_callback: origInitCB,
     }
-    setAttrStub = sinon.stub()
+    setAttrStub = jest.fn()
     elStub = {
       setAttribute: setAttrStub,
-      dataset: {rich_text: false}
+      dataset: {rich_text: false},
     }
     fakeEditor = {
       getElement: () => elStub,
       addVisual: () => {},
       on: () => {},
-      contentWindow: {}
+      contentWindow: {},
     }
   })
 
   it('tries to add attributes to el in cb', () => {
     const newEdOpts = wrapInitCb(mirroredAttrs, edOpts)
     newEdOpts.init_instance_callback(fakeEditor)
-    assert.ok(setAttrStub.calledWith('foo', 'bar'))
+    expect(setAttrStub).toHaveBeenCalledWith('foo', 'bar')
   })
 
   it('still calls old cb', () => {
     const newEdOpts = wrapInitCb(mirroredAttrs, edOpts)
     newEdOpts.init_instance_callback(fakeEditor)
-    assert.ok(origInitCB.calledWith(fakeEditor))
+    expect(origInitCB).toHaveBeenCalledWith(fakeEditor)
   })
 })

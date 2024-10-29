@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from 'assert'
 import {sanitizePlugins} from '../../src/rce/sanitizePlugins'
 
 describe('sanitizePlugins', () => {
@@ -25,25 +24,25 @@ describe('sanitizePlugins', () => {
       plugins: ['link', 'table'],
       toolbar: [
         'bold,italic,underline,indent,superscript,subscript,bullist,numlist',
-        'table,link,unlink,instructure_image,ltr,rtl'
-      ]
+        'table,link,unlink,instructure_image,ltr,rtl',
+      ],
     }
     const cleanOptions = sanitizePlugins(rawOptions)
 
-    assert.deepEqual(cleanOptions, rawOptions)
+    expect(cleanOptions).toEqual(rawOptions)
   })
 
   it('converts string to array removing spaces', () => {
     const rawOptions = 'bold,italic,underline,indent, superscript, subscript'
     const cleanOptions = sanitizePlugins(rawOptions)
 
-    assert.deepEqual(cleanOptions, [
+    expect(cleanOptions).toEqual([
       'bold',
       'italic',
       'underline',
       'indent',
       'superscript',
-      'subscript'
+      'subscript',
     ])
   })
 })

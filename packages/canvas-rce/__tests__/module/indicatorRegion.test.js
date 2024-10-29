@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {equal} from 'assert'
-import sinon from 'sinon'
 import indicatorRegion from '../../src/rce/indicatorRegion'
 
 describe('IndicatorRegion module', () => {
@@ -28,13 +26,15 @@ describe('IndicatorRegion module', () => {
     editor = {
       getContainer() {
         return {querySelector: () => iframe}
-      }
+      },
     }
-    offsetFake = sinon.stub().returns({
-      top: 1,
-      left: 2,
-      width: 3,
-      height: 4
+    offsetFake = jest.fn(() => {
+      return {
+        top: 1,
+        left: 2,
+        width: 3,
+        height: 4,
+      }
     })
     target = {
       getBoundingClientRect() {
@@ -42,9 +42,9 @@ describe('IndicatorRegion module', () => {
           top: 5,
           left: 6,
           right: 16,
-          bottom: 25
+          bottom: 25,
         }
-      }
+      },
     }
   })
 
@@ -56,20 +56,20 @@ describe('IndicatorRegion module', () => {
     })
 
     it('includes the width and height of the target', () => {
-      equal(region.height, 20)
-      equal(region.width, 10)
+      expect(region.height).toEqual(20)
+      expect(region.width).toEqual(10)
     })
 
     it('gets offset of iframe', () => {
-      sinon.assert.calledWithExactly(offsetFake, iframe)
+      expect(offsetFake).toHaveBeenCalledWith(iframe)
     })
 
     it('includes sum of the left offsets of the target and iframe', () => {
-      equal(region.left, 8)
+      expect(region.left).toEqual(8)
     })
 
     it('includes sum of the top offsets minus the iframe scroll', () => {
-      equal(region.top, 6)
+      expect(region.top).toEqual(6)
     })
   })
 })

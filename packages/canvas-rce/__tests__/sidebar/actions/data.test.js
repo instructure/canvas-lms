@@ -15,10 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import assert from 'assert'
 import * as actions from '../../../src/sidebar/actions/data'
 import RceApiSource from '../../../src/rcs/api'
-import sinon from 'sinon'
 import {spiedStore} from './utils'
 
 describe('Sidebar data actions', () => {
@@ -38,7 +36,7 @@ describe('Sidebar data actions', () => {
         resolve(successPage)
       })
     },
-    uriFor
+    uriFor,
   }
 
   // trivial "always fails" source
@@ -52,14 +50,14 @@ describe('Sidebar data actions', () => {
         throw brokenError
       })
     },
-    uriFor
+    uriFor,
   }
 
   // returns a "black hole" source that spies fetchLinks
   function stubbedSource() {
     const source = new RceApiSource()
-    sinon.stub(source, 'fetchPage').returns(new Promise(resolve => resolve(successPage)))
-    sinon.stub(source, 'uriFor').returns('uriFor/bookmark')
+    jest.spyOn(source, 'fetchPage').mockReturnValue(new Promise(resolve => resolve(successPage)))
+    jest.spyOn(source, 'uriFor').mockReturnValue('uriFor/bookmark')
     return source
   }
 
@@ -69,15 +67,15 @@ describe('Sidebar data actions', () => {
     links: [],
     bookmark: 'bookmark',
     isLoading: false,
-    searchString
+    searchString,
   }
   const defaults = {
     jwt: 'theJWT',
     source: successSource,
     searchString,
     collections: {
-      [`${collectionKey}`]: defaultCollection
-    }
+      [`${collectionKey}`]: defaultCollection,
+    },
   }
 
   // defaults and reshapes the given props into the shape needed by the store
@@ -94,36 +92,26 @@ describe('Sidebar data actions', () => {
       const state = setupState({source})
       const store = spiedStore(state)
       store.dispatch(actions.fetchPage(collectionKey))
-      sinon.assert.calledWith(source.fetchPage, defaultCollection.bookmark)
+      expect(source.fetchPage).toHaveBeenCalledWith(defaultCollection.bookmark)
     })
 
-    it('dispatches receivePage with page retrieved from source', done => {
+    it('dispatches receivePage with page retrieved from source', async () => {
       const store = spiedStore(setupState())
-      store
-        .dispatch(actions.fetchPage(collectionKey))
-        .then(() => {
-          const callArgs = store.spy.lastCall.args[0]
-          assert.strictEqual(callArgs.type, actions.RECEIVE_PAGE)
-          assert.strictEqual(callArgs.key, collectionKey)
-          assert.strictEqual(callArgs.links, successPage.links)
-          assert.strictEqual(callArgs.bookmark, successPage.bookmark)
-          done()
-        })
-        .catch(done)
+      await store.dispatch(actions.fetchPage(collectionKey))
+      const callArgs = store.spy.mock.lastCall[0]
+      expect(callArgs.type).toEqual(actions.RECEIVE_PAGE)
+      expect(callArgs.key).toEqual(collectionKey)
+      expect(callArgs.links).toEqual(successPage.links)
+      expect(callArgs.bookmark).toEqual(successPage.bookmark)
     })
 
-    it('dispatches failPage on error retrieving page from source', done => {
+    it('dispatches failPage on error retrieving page from source', async () => {
       const store = spiedStore(setupState({source: brokenSource}))
-      store
-        .dispatch(actions.fetchPage(collectionKey))
-        .then(() => {
-          const callArgs = store.spy.lastCall.args[0]
-          assert.strictEqual(callArgs.type, actions.FAIL_PAGE)
-          assert.strictEqual(callArgs.key, collectionKey)
-          assert.strictEqual(callArgs.error, brokenError)
-          done()
-        })
-        .catch(done)
+      await store.dispatch(actions.fetchPage(collectionKey))
+      const callArgs = store.spy.mock.lastCall[0]
+      expect(callArgs.type).toEqual(actions.FAIL_PAGE)
+      expect(callArgs.key).toEqual(collectionKey)
+      expect(callArgs.error).toEqual(brokenError)
     })
   })
 
@@ -131,32 +119,31 @@ describe('Sidebar data actions', () => {
     it('dispatches requestPage first', () => {
       const store = spiedStore(setupState())
       store.dispatch(actions.fetchNextPage(collectionKey))
-      const callArgs = store.spy.getCall(1).args[0]
-      assert.strictEqual(callArgs.type, actions.REQUEST_PAGE)
-      assert.strictEqual(callArgs.key, collectionKey)
+      const callArgs = store.spy.mock.calls[0][0]
+      expect(callArgs.type).toEqual(actions.REQUEST_PAGE)
+      expect(callArgs.key).toEqual(collectionKey)
     })
 
     it('fetches next page if collection has bookmark and is not loading', () => {
       const store = spiedStore(setupState())
       store.dispatch(actions.fetchNextPage(collectionKey))
-      sinon.assert.calledWith(store.spy, {
+      expect(store.spy).toHaveBeenCalledWith({
         type: actions.REQUEST_PAGE,
-        cancel: sinon.match.func,
-        key: collectionKey
+        cancel: expect.any(Function),
+        key: collectionKey,
       })
     })
 
     it('cancels previous fetch if collection is already loading', () => {
-      const cancel = sinon.spy()
+      const cancel = jest.fn()
       const store = spiedStore(setupState({}, {isLoading: true, cancel}))
       store.dispatch(actions.fetchNextPage(collectionKey))
 
-      sinon.assert.called(cancel)
-
-      sinon.assert.calledWith(store.spy, {
+      expect(cancel).toHaveBeenCalled()
+      expect(store.spy).toHaveBeenCalledWith({
         type: actions.REQUEST_PAGE,
-        cancel: sinon.match.func,
-        key: collectionKey
+        cancel: expect.any(Function),
+        key: collectionKey,
       })
     })
   })
@@ -165,22 +152,22 @@ describe('Sidebar data actions', () => {
     it('fetches initial page if collection is empty, has bookmark, and is not loading', () => {
       const store = spiedStore(setupState())
       store.dispatch(actions.fetchInitialPage(collectionKey))
-      sinon.assert.calledWith(store.spy, {
+      expect(store.spy).toHaveBeenCalledWith({
         type: actions.REQUEST_INITIAL_PAGE,
-        cancel: sinon.match.func,
+        cancel: expect.any(Function),
         key: collectionKey,
-        searchString
+        searchString,
       })
     })
 
     it('skips fetching initial page if collection is not empty', () => {
       const store = spiedStore(setupState({}, {links: [{href: 'link', title: 'A Link'}]}))
       store.dispatch(actions.fetchInitialPage(collectionKey))
-      sinon.assert.neverCalledWith(store.spy, {
+      expect(store.spy).not.toHaveBeenCalledWith({
         type: actions.REQUEST_INITIAL_PAGE,
-        cancel: sinon.match.func,
+        cancel: expect.any(Function),
         key: collectionKey,
-        searchString
+        searchString,
       })
     })
 
@@ -188,21 +175,21 @@ describe('Sidebar data actions', () => {
       const source = stubbedSource()
       const store = spiedStore(setupState({source}, {bookmark: null}))
       store.dispatch(actions.fetchInitialPage(collectionKey))
-      sinon.assert.calledWith(source.fetchPage, 'uriFor/bookmark')
+      expect(source.fetchPage).toHaveBeenCalledWith('uriFor/bookmark')
     })
 
     it('cancels previous fetch if collection is already loading', () => {
-      const cancel = sinon.spy()
+      const cancel = jest.fn()
       const store = spiedStore(setupState({}, {isLoading: true, cancel}))
       store.dispatch(actions.fetchInitialPage(collectionKey))
 
-      sinon.assert.called(cancel)
+      expect(cancel).toHaveBeenCalled()
 
-      sinon.assert.calledWith(store.spy, {
+      expect(store.spy).toHaveBeenCalledWith({
         type: actions.REQUEST_INITIAL_PAGE,
-        cancel: sinon.match.func,
+        cancel: expect.any(Function),
         key: collectionKey,
-        searchString
+        searchString,
       })
     })
   })

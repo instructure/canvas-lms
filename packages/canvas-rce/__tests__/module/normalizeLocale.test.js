@@ -16,32 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from 'assert'
 import normalizeLocale from '../../src/rce/normalizeLocale'
 
 describe('normalizeLocale', () => {
   it("returns 'en' for null/undefined", () => {
-    assert.equal(normalizeLocale(null), 'en')
-    assert.equal(normalizeLocale(undefined), 'en')
+    expect(normalizeLocale(null)).toEqual('en')
+    expect(normalizeLocale(undefined)).toEqual('en')
   })
 
   it('maps unknown region locale to the base locale', () => {
-    assert.equal(normalizeLocale('he-IL'), 'he')
+    expect(normalizeLocale('he-IL')).toEqual('he')
   })
 
   it('maps known substitutions', () => {
-    assert.equal(normalizeLocale('fa'), 'fa-IR')
+    expect(normalizeLocale('fa')).toEqual('fa-IR')
   })
 
   it('reduces unrecognized custom locales to the base locale', () => {
-    assert.equal(normalizeLocale('en-GB-x-bogus'), 'en-GB')
+    expect(normalizeLocale('en-GB-x-bogus')).toEqual('en-GB')
   })
 
   it("recognizes known custom locales and doesn't reduce them", () => {
-    assert.equal(normalizeLocale('en-GB-x-ukhe'), 'en-GB-x-ukhe')
+    expect(normalizeLocale('en-GB-x-ukhe')).toEqual('en-GB-x-ukhe')
   })
 
   it('otherwise just return en', () => {
-    assert.equal(normalizeLocale('some-locale'), 'en')
+    expect(normalizeLocale('some-locale')).toEqual('en')
   })
 })
