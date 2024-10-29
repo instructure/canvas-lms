@@ -28,7 +28,7 @@ module ModuleVisibility
         raise ArgumentError, "user_id cannot be nil" if user_id.nil?
         raise ArgumentError, "user_id must not be an array" if user_id.is_a?(Array)
 
-        modules_visible_to_students(course_id_params: course_id, user_id_params: user_id)
+        modules_visible_to_students(course_ids: course_id, user_ids: user_id)
       end
 
       def modules_visible_to_students_in_courses(course_ids:, user_ids:)
@@ -37,7 +37,7 @@ module ModuleVisibility
         raise ArgumentError, "user_ids cannot be nil" if user_ids.nil?
         raise ArgumentError, "user_ids must be an array" unless user_ids.is_a?(Array)
 
-        modules_visible_to_students(course_id_params: course_ids, user_id_params: user_ids)
+        modules_visible_to_students(course_ids:, user_ids:)
       end
 
       # this is seemingly only called in specs.
@@ -47,7 +47,7 @@ module ModuleVisibility
         raise ArgumentError, "user_id cannot be nil" if user_id.nil?
         raise ArgumentError, "user_id must not be an array" if user_id.is_a?(Array)
 
-        modules_visible_to_students(context_module_id_params: context_module_id, user_id_params: user_id)
+        modules_visible_to_students(context_module_ids: context_module_id, user_ids: user_id)
       end
 
       def module_visible_to_students(context_module_id:, user_ids:)
@@ -56,35 +56,35 @@ module ModuleVisibility
         raise ArgumentError, "user_ids cannot be nil" if user_ids.nil?
         raise ArgumentError, "user_ids must be an array" unless user_ids.is_a?(Array)
 
-        modules_visible_to_students(context_module_id_params: context_module_id, user_id_params: user_ids)
+        modules_visible_to_students(context_module_ids: context_module_id, user_ids:)
       end
 
       private
 
-      def modules_visible_to_students(course_id_params: nil, user_id_params: nil, context_module_id_params: nil)
-        if course_id_params.nil? && user_id_params.nil? && context_module_id_params.nil?
-          raise ArgumentError, "at least one non nil course_id, user_id, or context_module_id_params is required (for query performance reasons)"
+      def modules_visible_to_students(course_ids: nil, user_ids: nil, context_module_ids: nil)
+        if course_ids.nil? && user_ids.nil? && context_module_ids.nil?
+          raise ArgumentError, "at least one non nil course_id, user_id, or context_module_ids is required (for query performance reasons)"
         end
 
         service_cache_fetch(service: name,
-                            course_id_params:,
-                            user_id_params:,
-                            additional_id_params: context_module_id_params) do
+                            course_ids:,
+                            user_ids:,
+                            additional_ids: context_module_ids) do
           visible_modules = []
 
           # add modules visible to everyone
           modules_visible_to_all = ModuleVisibility::Repositories::ModuleVisibleToStudentRepository
-                                   .find_modules_visible_to_everyone(course_id_params:, user_id_params:, context_module_id_params:)
+                                   .find_modules_visible_to_everyone(course_ids:, user_ids:, context_module_ids:)
           visible_modules |= modules_visible_to_all
 
           # add modules visible to sections (and related module section overrides)
           modules_visible_to_sections = ModuleVisibility::Repositories::ModuleVisibleToStudentRepository
-                                        .find_modules_visible_to_sections(course_id_params:, user_id_params:, context_module_id_params:)
+                                        .find_modules_visible_to_sections(course_ids:, user_ids:, context_module_ids:)
           visible_modules |= modules_visible_to_sections
 
           # add modules visible due to ADHOC overrides (and related module ADHOC overrides)
           modules_visible_to_adhoc_overrides = ModuleVisibility::Repositories::ModuleVisibleToStudentRepository
-                                               .find_modules_visible_to_adhoc_overrides(course_id_params:, user_id_params:, context_module_id_params:)
+                                               .find_modules_visible_to_adhoc_overrides(course_ids:, user_ids:, context_module_ids:)
           visible_modules | modules_visible_to_adhoc_overrides
         end
       end

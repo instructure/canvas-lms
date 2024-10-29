@@ -19,8 +19,8 @@
 
 module VisibilityHelpers
   module Common
-    def service_cache_fetch(service:, course_id_params: nil, user_id_params: nil, additional_id_params: nil, &)
-      key = service_cache_key(service:, course_id_params:, user_id_params:, additional_id_params:)
+    def service_cache_fetch(service:, course_ids: nil, user_ids: nil, additional_ids: nil, &)
+      key = service_cache_key(service:, course_ids:, user_ids:, additional_ids:)
       Rails.cache.fetch(key, expires_in: 1.minute, &)
     end
 
@@ -30,11 +30,11 @@ module VisibilityHelpers
       Array(ids).map { |id| id.respond_to?(:id) ? id.id : id }.sort.join(",")
     end
 
-    def service_cache_key(service:, course_id_params: nil, user_id_params: nil, additional_id_params: nil)
+    def service_cache_key(service:, course_ids: nil, user_ids: nil, additional_ids: nil)
       # Sometimes we get ids, sometimes we get full AR objects, let's sanitize
-      c = sanitize_and_stringify_ids(course_id_params)
-      u = sanitize_and_stringify_ids(user_id_params)
-      a = sanitize_and_stringify_ids(additional_id_params)
+      c = sanitize_and_stringify_ids(course_ids)
+      u = sanitize_and_stringify_ids(user_ids)
+      a = sanitize_and_stringify_ids(additional_ids)
       Digest::SHA256.hexdigest("#{service}:c#{c}:u#{u}:a#{a}")
     end
   end
