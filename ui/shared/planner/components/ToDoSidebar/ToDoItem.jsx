@@ -100,12 +100,19 @@ const getContextShortName = (courses, courseId) => {
 }
 
 export default class ToDoItem extends React.Component {
+  constructor(props) {
+    super(props)
+    this.dismissed = false
+  }
+
   focus() {
     const focusable = this.linkRef || this.buttonRef
     if (focusable) focusable.focus()
   }
 
   handleClick = () => {
+    if (this.dismissed) return
+    this.dismissed = true
     this.props.handleDismissClick(this.props.item)
   }
 
