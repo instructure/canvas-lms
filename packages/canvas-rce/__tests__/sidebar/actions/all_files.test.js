@@ -15,14 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import assert from 'assert'
 import * as actions from '../../../src/sidebar/actions/all_files'
 
 describe('all_files actions', () => {
   it('alFilesLoading returns ALL_FILES_LOADING with the new value', () => {
-    assert.deepStrictEqual(actions.allFilesLoading(true), {
+    expect(actions.allFilesLoading(true)).toEqual({
       type: actions.ALL_FILES_LOADING,
-      payload: true
+      payload: true,
     })
   })
 })

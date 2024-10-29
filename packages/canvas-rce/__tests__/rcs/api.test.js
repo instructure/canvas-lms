@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from 'assert'
-import sinon from 'sinon'
 import RceApiSource, {headerFor, originFromHost} from '../../src/rcs/api'
 import fetchMock from 'fetch-mock'
 import * as fileUrl from '../../src/common/fileUrl'
@@ -32,11 +30,12 @@ describe('sources/api', () => {
     sortBy: {sort: 'date_added', dir: 'desc'},
     searchString: '',
   }
+  let setProps = {}
   let apiSource
   let alertFuncSpy
 
   beforeEach(() => {
-    alertFuncSpy = sinon.spy()
+    alertFuncSpy = jest.fn()
     apiSource = new RceApiSource({
       jwt: 'theJWT',
       refreshToken: callback => {
@@ -49,7 +48,7 @@ describe('sources/api', () => {
 
   afterEach(() => {
     fetchMock.restore()
-    alertFuncSpy.resetHistory()
+    jest.resetAllMocks()
   })
 
   describe('initializeCollection', () => {
@@ -59,12 +58,11 @@ describe('sources/api', () => {
     })
 
     it('creates a collection with no links', () => {
-      assert.deepEqual(collection.links, [])
+      expect(collection.links).toEqual([])
     })
 
     it('creates a collection with a bookmark derived from props', () => {
-      assert.strictEqual(
-        collection.bookmark,
+      expect(collection.bookmark).toEqual(
         `${window.location.protocol}//example.host/api/wikiPages?contextType=group&contextId=123&search_term=panda`
       )
     })
@@ -72,65 +70,63 @@ describe('sources/api', () => {
     it('bookmark omits host if not in props', () => {
       const noHostProps = {...props, host: undefined}
       collection = apiSource.initializeCollection(endpoint, noHostProps)
-      assert.strictEqual(
-        collection.bookmark,
+      expect(collection.bookmark).toEqual(
         '/api/wikiPages?contextType=group&contextId=123&search_term=panda'
       )
     })
 
     it('creates a collection that is not initially loading', () => {
-      assert.strictEqual(collection.isLoading, false)
+      expect(collection.isLoading).toEqual(false)
     })
 
     it('creates a collection that initially has more', () => {
-      assert.strictEqual(collection.hasMore, true)
+      expect(collection.hasMore).toEqual(true)
     })
   })
 
   describe('initializeImages', () => {
     it('sets hasMore to true', () => {
-      assert.strictEqual(apiSource.initializeImages(props)[props.contextType].hasMore, true)
+      expect(apiSource.initializeImages(props)[props.contextType].hasMore).toEqual(true)
     })
 
     it('sets searchString to an empty string', () => {
-      assert.strictEqual(apiSource.initializeImages(props).searchString, '')
+      expect(apiSource.initializeImages(props).searchString).toEqual('')
     })
   })
 
   describe('URI construction (baseUri)', () => {
     it('uses a protocol relative url when no window', () => {
       const uri = apiSource.baseUri('files', 'example.instructure.com', {})
-      assert.strictEqual(uri, '//example.instructure.com/api/files')
+      expect(uri).toEqual('//example.instructure.com/api/files')
     })
 
     it('uses a path for no-host url construction', () => {
       const uri = apiSource.baseUri('files')
-      assert.strictEqual(uri, '/api/files')
+      expect(uri).toEqual('/api/files')
     })
 
     it('gets protocol from window if available', () => {
       const fakeWindow = {location: {protocol: 'https:'}}
       const uri = apiSource.baseUri('files', 'example.instructure.com', fakeWindow)
-      assert.strictEqual(uri, 'https://example.instructure.com/api/files')
+      expect(uri).toEqual('https://example.instructure.com/api/files')
     })
 
     it('never applies protocol to path', () => {
       const fakeWindow = {location: {protocol: 'https:'}}
       const uri = apiSource.baseUri('files', null, fakeWindow)
-      assert.strictEqual(uri, '/api/files')
+      expect(uri).toEqual('/api/files')
     })
 
     it("will replace protocol if there's a mismatch from http to https", () => {
       const fakeWindow = {location: {protocol: 'https:'}}
       const uri = apiSource.normalizeUriProtocol('http://something.com', fakeWindow)
-      assert.strictEqual(uri, 'https://something.com')
+      expect(uri).toEqual('https://something.com')
     })
   })
 
   describe('more URI construction (uriFor)', () => {
-    let props = {}
     beforeEach(() => {
-      props = {
+      setProps = {
         host: undefined,
         contextType: 'course',
         contextId: '17',
@@ -140,89 +136,66 @@ describe('sources/api', () => {
     })
 
     it('gets documents', () => {
-      const uri = apiSource.uriFor('documents', props)
-      assert.strictEqual(
-        uri,
+      const uri = apiSource.uriFor('documents', setProps)
+      expect(uri).toEqual(
         '/api/documents?contextType=course&contextId=17&exclude_content_types=image,video,audio&sort=name&order=asc&search_term=hello%20world'
       )
     })
 
     it('gets images', () => {
-      const uri = apiSource.uriFor('images', props)
-      assert.strictEqual(
-        uri,
+      const uri = apiSource.uriFor('images', setProps)
+      expect(uri).toEqual(
         '/api/documents?contextType=course&contextId=17&content_types=image&sort=name&order=asc&search_term=hello%20world'
       )
     })
 
     // this endpoint isn't actually used yet, but could be if media_objects all had associated Attachments
     it('gets media', () => {
-      const uri = apiSource.uriFor('media', props)
-      assert.strictEqual(
-        uri,
+      const uri = apiSource.uriFor('media', setProps)
+      expect(uri).toEqual(
         '/api/documents?contextType=course&contextId=17&content_types=video,audio&sort=name&order=asc&search_term=hello%20world'
       )
     })
 
     it('gets media_objects', () => {
-      const uri = apiSource.uriFor('media_objects', props)
-      assert.strictEqual(
-        uri,
+      const uri = apiSource.uriFor('media_objects', setProps)
+      expect(uri).toEqual(
         '/api/media_objects?contextType=course&contextId=17&sort=title&order=asc&search_term=hello%20world'
       )
     })
   })
 
   describe('fetchPage', () => {
+    const uri = 'theURI'
     const fakePageBody =
       '{"bookmark":"newBookmark","links":[' +
       '{"href":"link1","title":"Link 1"},' +
       '{"href":"link2","title":"Link 2"}]}'
 
-    it('includes jwt in Authorization header', done => {
-      const uri = 'theURI'
+    it('includes jwt in Authorization header', async () => {
       fetchMock.mock(uri, '{}')
-      apiSource
-        .fetchPage(uri)
-        .then(() => {
-          assert.strictEqual(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
-          done()
-        })
-        .catch(done)
+      await apiSource.fetchPage(uri)
+      expect(fetchMock.lastOptions(uri).headers.Authorization).toEqual('Bearer theJWT')
     })
 
-    it('converts 400+ statuses to errors', done => {
-      const uri = 'theURI'
+    it('converts 400+ statuses to errors', async () => {
       fetchMock.mock(uri, 403)
-      apiSource
-        .fetchPage(uri)
-        .then(() => {
-          throw new Error('No error raised')
-        })
-        .catch(error => {
-          assert.strictEqual(error.message, 'Forbidden')
-          done()
-        })
-        .catch(done)
+      await expect(apiSource.fetchPage(uri)).rejects.toThrow('Forbidden')
     })
 
-    it('parses server response before handing it back', () => {
-      const uri = 'theURI'
+    it('parses server response before handing it back', async () => {
       fetchMock.mock(uri, fakePageBody)
-      return apiSource.fetchPage(uri).then(page => {
-        assert.deepEqual(page, {
-          bookmark: 'newBookmark',
-          links: [
-            {href: 'link1', title: 'Link 1'},
-            {href: 'link2', title: 'Link 2'},
-          ],
-        })
+      const page = await apiSource.fetchPage(uri)
+      expect(page).toEqual({
+        bookmark: 'newBookmark',
+        links: [
+          {href: 'link1', title: 'Link 1'},
+          {href: 'link2', title: 'Link 2'},
+        ],
       })
     })
 
-    it('retries once on 401 with a renewed token', () => {
-      const uri = 'theURI'
-
+    it('retries once on 401 with a renewed token', async () => {
       fetchMock.mock((fetchUrl, opts) => {
         return uri === fetchUrl && opts.headers.Authorization === 'Bearer theJWT'
       }, 401)
@@ -231,10 +204,9 @@ describe('sources/api', () => {
         return uri === fetchUrl && opts.headers.Authorization === 'Bearer freshJWT'
       }, fakePageBody)
 
-      return apiSource.fetchPage(uri, 'theJWT').then(page => {
-        assert.strictEqual(page.bookmark, 'newBookmark')
-        assert.strictEqual(apiSource.jwt, 'freshJWT')
-      })
+      const page = await apiSource.fetchPage(uri, 'theJWT')
+      expect(page.bookmark).toEqual('newBookmark')
+      expect(apiSource.jwt).toEqual('freshJWT')
     })
   })
 
@@ -246,81 +218,66 @@ describe('sources/api', () => {
       files = [{url: '/url1'}, {url: '/url2'}]
       wrapUrl = '/path?preview=1'
       const body = {bookmark, files}
-      sinon.stub(apiSource, 'fetchPage').returns(Promise.resolve(body))
-      sinon.stub(fileUrl, 'downloadToWrap').returns(wrapUrl)
+      jest.spyOn(apiSource, 'fetchPage').mockReturnValue(Promise.resolve(body))
+      jest.spyOn(fileUrl, 'downloadToWrap').mockReturnValue(wrapUrl)
     })
 
-    afterEach(() => {
-      apiSource.fetchPage.restore()
-      fileUrl.downloadToWrap.restore()
-    })
-
-    it('proxies the call to fetchPage', () => {
+    it('proxies the call to fetchPage', async () => {
       const uri = 'files-uri'
-      return apiSource.fetchFiles(uri).then(body => {
-        sinon.assert.calledWith(apiSource.fetchPage, uri)
-        assert.strictEqual(body.bookmark, bookmark)
-      })
+      const body = await apiSource.fetchFiles(uri)
+      expect(apiSource.fetchPage).toHaveBeenCalledWith(uri)
+      expect(body.bookmark).toEqual(bookmark)
     })
 
-    it('converts file urls from download to preview', () => {
-      return apiSource.fetchFiles('foo').then(body => {
-        files.forEach((file, i) => {
-          sinon.assert.calledWith(fileUrl.downloadToWrap, file.url)
-          assert.strictEqual(body.files[i].href, wrapUrl)
-        })
+    it('converts file urls from download to preview', async () => {
+      const body = await apiSource.fetchFiles('foo')
+      files.forEach((file, i) => {
+        expect(fileUrl.downloadToWrap).toHaveBeenCalledWith(file.url)
+        expect(body.files[i].href).toEqual(wrapUrl)
       })
     })
   })
 
   describe('fetchSubFolders()', () => {
-    let bookmark, props
-
-    const subject = () => apiSource.fetchSubFolders(props, bookmark)
+    let bookmark
 
     beforeEach(() => {
-      props = {host: 'canvas.rce', folderId: 2}
+      setProps = {host: 'canvas.rce', folderId: 2}
       bookmark = undefined
-      sinon.stub(apiSource, 'apiFetch').returns(Promise.resolve({}))
+      jest.spyOn(apiSource, 'apiFetch').mockReturnValue(Promise.resolve({}))
     })
 
-    afterEach(() => apiSource.apiFetch.reset())
-
     it('makes a request to the folders api with the given host and ID', () => {
-      subject()
-      sinon.assert.calledWith(apiSource.apiFetch, 'about://canvas.rce/api/folders/2', {
-        Authorization: 'Bearer theJWT',
-      })
+      apiSource.fetchSubFolders(setProps, bookmark)
+      expect(apiSource.apiFetch).toHaveBeenCalledWith(
+        `${window.location.protocol}//canvas.rce/api/folders/2`,
+        {
+          Authorization: 'Bearer theJWT',
+        }
+      )
     })
 
     describe('fetchFilesForFolder()', () => {
-      let bookmark, props
-
-      const subject = () => apiSource.fetchFilesForFolder(props, bookmark)
-
       beforeEach(() => {
-        props = {host: 'canvas.rce', filesUrl: 'https://canvas.rce/api/files/2'}
+        setProps = {host: 'canvas.rce', filesUrl: 'https://canvas.rce/api/files/2'}
         bookmark = undefined
       })
 
-      afterEach(() => apiSource.apiFetch.reset())
-
       it('makes a request to the files api with given host and folder ID', () => {
-        subject()
-        sinon.assert.calledWith(apiSource.apiFetch, 'https://canvas.rce/api/files/2', {
+        apiSource.fetchFilesForFolder(setProps, bookmark)
+        expect(apiSource.apiFetch).toHaveBeenCalledWith('https://canvas.rce/api/files/2', {
           Authorization: 'Bearer theJWT',
         })
       })
 
       describe('with perPage set', () => {
         beforeEach(() => {
-          props.perPage = 50
+          setProps.perPage = 50
         })
 
         it('includes the "per_page" query param', () => {
-          subject()
-          sinon.assert.calledWith(
-            apiSource.apiFetch,
+          apiSource.fetchFilesForFolder(setProps, bookmark)
+          expect(apiSource.apiFetch).toHaveBeenCalledWith(
             'https://canvas.rce/api/files/2?per_page=50',
             {
               Authorization: 'Bearer theJWT',
@@ -334,8 +291,8 @@ describe('sources/api', () => {
       beforeEach(() => (bookmark = 'https://canvas.rce/api/folders/2?page=2'))
 
       it('makes a request to the bookmark', () => {
-        subject()
-        sinon.assert.calledWith(apiSource.apiFetch, bookmark, {
+        apiSource.fetchSubFolders(props, bookmark)
+        expect(apiSource.apiFetch).toHaveBeenCalledWith(bookmark, {
           Authorization: 'Bearer theJWT',
         })
       })
@@ -346,47 +303,46 @@ describe('sources/api', () => {
     let fetchFunction, properties, onSuccess, onError
 
     beforeEach(() => {
-      fetchFunction = sinon
-        .stub()
-        .onFirstCall()
-        .returns(Promise.resolve({bookmark: 'https://canvas.rce/api/thing/1?page=2'}))
-        .onSecondCall()
-        .returns(Promise.resolve({data: 'foo'}))
+      fetchFunction = jest
+        .fn()
+        .mockReturnValueOnce(Promise.resolve({bookmark: 'https://canvas.rce/api/thing/1?page=2'}))
+        .mockReturnValueOnce(Promise.resolve({data: 'foo'}))
       properties = {foo: 'bar'}
-      onSuccess = sinon.stub()
-      onError = sinon.stub()
+      onSuccess = jest.fn()
+      onError = jest.fn()
     })
 
     afterEach(() => {
-      fetchFunction.reset()
-      onSuccess.reset()
-      onError.reset()
+      jest.resetAllMocks()
     })
 
     const subject = () =>
       apiSource.fetchBookmarkedData(fetchFunction, properties, onSuccess, onError)
 
-    it('calls the "fetchFunction", passing "properties"', () => {
-      subject().then(() => {
-        sinon.assert.alwaysCalledWith(fetchFunction, properties)
-        sinon.assert.calledTwice(fetchFunction)
-      })
+    it('calls the "fetchFunction", passing "properties"', async () => {
+      await subject()
+      expect(fetchFunction).toHaveBeenCalledWith(properties, undefined)
+      expect(fetchFunction).toHaveBeenCalledWith(
+        properties,
+        'https://canvas.rce/api/thing/1?page=2'
+      )
+      expect(fetchFunction).toHaveBeenCalledTimes(2)
     })
 
-    it('calls "onSuccess" for each page', () => {
-      return subject().then(() => {
-        sinon.assert.calledTwice(onSuccess)
-      })
+    it('calls "onSuccess" for each page', async () => {
+      await subject()
+      expect(onSuccess).toHaveBeenCalledTimes(2)
     })
 
     describe('when "fetchFunction" throws an exception', () => {
       beforeEach(() => {
-        fetchFunction.onFirstCall().returns(Promise.reject('error'))
+        jest.resetAllMocks()
+        fetchFunction.mockRejectedValue('error')
       })
 
       it('calls "onError"', () => {
         return subject().then(() => {
-          sinon.assert.calledOnce(onError)
+          expect(onError).toHaveBeenCalledTimes(1)
         })
       })
     })
@@ -398,11 +354,7 @@ describe('sources/api', () => {
     beforeEach(() => {
       folders = [{id: 24}]
       const body = {folders}
-      sinon.stub(apiSource, 'fetchPage').returns(Promise.resolve(body))
-    })
-
-    afterEach(() => {
-      apiSource.fetchPage.restore()
+      jest.spyOn(apiSource, 'fetchPage').mockReturnValue(Promise.resolve(body))
     })
 
     it('calls fetchPage with the proper params', () => {
@@ -412,8 +364,7 @@ describe('sources/api', () => {
           contextId: '22',
         })
         .then(() => {
-          sinon.assert.calledWith(
-            apiSource.fetchPage,
+          expect(apiSource.fetchPage).toHaveBeenCalledWith(
             '/api/folders/icon_maker?contextType=course&contextId=22'
           )
         })
@@ -425,12 +376,9 @@ describe('sources/api', () => {
     beforeEach(() => {
       files = [{id: 24}]
       const body = {files}
-      sinon.stub(apiSource, 'fetchPage').returns(Promise.resolve(body))
+      jest.spyOn(apiSource, 'fetchPage').mockReturnValue(Promise.resolve(body))
     })
 
-    afterEach(() => {
-      apiSource.fetchPage.restore()
-    })
     it('calls fetchPage with the proper params', () => {
       return apiSource
         .fetchMediaFolder({
@@ -438,8 +386,7 @@ describe('sources/api', () => {
           contextId: '22',
         })
         .then(() => {
-          sinon.assert.calledWith(
-            apiSource.fetchPage,
+          expect(apiSource.fetchPage).toHaveBeenCalledWith(
             '/api/folders/media?contextType=course&contextId=22'
           )
         })
@@ -452,7 +399,7 @@ describe('sources/api', () => {
     const apiProps = {}
 
     afterEach(() => {
-      fetchMock.restore
+      fetchMock.restore()
     })
 
     it('includes "onDuplicate"', () => {
@@ -460,7 +407,7 @@ describe('sources/api', () => {
 
       return apiSource.preflightUpload(fileProps, {onDuplicate: 'overwrite'}, apiProps).then(() => {
         const body = JSON.parse(fetchMock.lastOptions(uri).body)
-        assert.equal(body.onDuplicate, 'overwrite')
+        expect(body.onDuplicate).toEqual('overwrite')
       })
     })
 
@@ -471,7 +418,7 @@ describe('sources/api', () => {
         .preflightUpload(fileProps, {category: ICON_MAKER_ICONS}, apiProps)
         .then(() => {
           const body = JSON.parse(fetchMock.lastOptions(uri).body)
-          assert.equal(body.category, ICON_MAKER_ICONS)
+          expect(body.category).toEqual(ICON_MAKER_ICONS)
         })
     })
 
@@ -479,7 +426,7 @@ describe('sources/api', () => {
       fetchMock.mock(uri, '{}')
 
       return apiSource.preflightUpload(fileProps, apiProps).then(() => {
-        assert.strictEqual(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
+        expect(fetchMock.lastOptions(uri).headers.Authorization).toEqual('Bearer theJWT')
       })
     })
 
@@ -493,7 +440,7 @@ describe('sources/api', () => {
       }, '{"upload": "done"}')
 
       return apiSource.preflightUpload(fileProps, apiProps).then(response => {
-        assert.strictEqual(response.upload, 'done')
+        expect(response.upload).toEqual('done')
       })
     })
 
@@ -507,7 +454,7 @@ describe('sources/api', () => {
       }, '{"upload": "done"}')
 
       return apiSource.preflightUpload(fileProps, apiProps).then(() => {
-        assert.strictEqual(apiSource.jwt, 'freshJWT')
+        expect(apiSource.jwt).toEqual('freshJWT')
       })
     })
 
@@ -516,7 +463,7 @@ describe('sources/api', () => {
       return apiSource
         .preflightUpload(fileProps, apiProps)
         .then(() => {
-          sinon.assert.calledWith(alertFuncSpy, {
+          expect(alertFuncSpy).toHaveBeenCalledWith({
             text: 'Something went wrong uploading, check your connection and try again.',
             variant: 'error',
           })
@@ -529,7 +476,7 @@ describe('sources/api', () => {
     it('throws an exception when an error occurs', () => {
       fetchMock.mock(uri, 500)
       return apiSource.preflightUpload(fileProps, apiProps).catch(e => {
-        assert(e)
+        expect(e).not.toBeNull()
       })
     })
 
@@ -541,18 +488,16 @@ describe('sources/api', () => {
         fetchMock.mock(uri, {throws: error}, {overwriteRoutes: true})
       })
 
-      it('gives a "quota" error if quota is full', () => {
+      it('gives a "quota" error if quota is full', async () => {
         try {
-          return apiSource
-            .preflightUpload(fileProps, apiProps)
-            .then(() => {
-              sinon.assert.calledWith(alertFuncSpy, {
-                text: 'File storage quota exceeded',
-                variant: 'error',
-              })
-            })
-            .catch(e => {})
-        } catch (e) {} // This will re-throw so we just catch it here/
+          await apiSource.preflightUpload(fileProps, apiProps)
+          expect(alertFuncSpy).toHaveBeenCalledWith({
+            text: 'File storage quota exceeded',
+            variant: 'error',
+          })
+        } catch (e) {
+          return e
+        } // This will re-throw so we just catch it here/
       })
     })
   })
@@ -580,7 +525,7 @@ describe('sources/api', () => {
       return apiSource
         .uploadFRD(fileDomObject, preflightProps)
         .then(() => {
-          sinon.assert.calledWith(alertFuncSpy, {
+          expect(alertFuncSpy).toHaveBeenCalledWith({
             text: 'Something went wrong uploading, check your connection and try again.',
             variant: 'error',
           })
@@ -591,21 +536,19 @@ describe('sources/api', () => {
     describe('files', () => {
       beforeEach(() => {
         wrapUrl = '/groups/123/path?wrap=1'
-        sinon.stub(fileUrl, 'downloadToWrap').returns(wrapUrl)
-        sinon.stub(fileUrl, 'fixupFileUrl').returns(wrapUrl)
-        sinon.stub(apiSource, 'getFile').returns(Promise.resolve(file))
+        jest.spyOn(fileUrl, 'downloadToWrap').mockReturnValue(wrapUrl)
+        jest.spyOn(fileUrl, 'fixupFileUrl').mockReturnValue(wrapUrl)
+        jest.spyOn(apiSource, 'getFile').mockReturnValue(Promise.resolve(file))
       })
 
       afterEach(() => {
-        fileUrl.downloadToWrap.restore()
-        fileUrl.fixupFileUrl.restore()
-        apiSource.getFile.restore()
+        jest.restoreAllMocks()
       })
 
       it('includes credentials in non-S3 upload', () => {
         preflightProps.upload_params.success_url = undefined
         return apiSource.uploadFRD(fileDomObject, preflightProps).then(() => {
-          assert.strictEqual(fetchMock.lastOptions(uploadUrl).credentials, 'include')
+          expect(fetchMock.lastOptions(uploadUrl).credentials).toEqual('include')
         })
       })
 
@@ -615,7 +558,7 @@ describe('sources/api', () => {
         const s3File = {url: 's3-file-url'}
         fetchMock.mock(preflightProps.upload_params.success_url, s3File)
         return apiSource.uploadFRD(fileDomObject, preflightProps).then(() => {
-          assert.strictEqual(fetchMock.lastOptions(uploadUrl).credentials, undefined)
+          expect(fetchMock.lastOptions(uploadUrl).credentials).toBeUndefined()
         })
       })
 
@@ -625,7 +568,7 @@ describe('sources/api', () => {
         preflightProps.upload_url = crossOriginUploadUrl
         fetchMock.mock(crossOriginUploadUrl, file)
         return apiSource.uploadFRD(fileDomObject, preflightProps).then(() => {
-          assert.strictEqual(fetchMock.lastOptions(crossOriginUploadUrl).credentials, undefined)
+          expect(fetchMock.lastOptions(crossOriginUploadUrl).credentials).toBeUndefined()
         })
       })
 
@@ -634,7 +577,7 @@ describe('sources/api', () => {
         const s3File = {url: 's3-file-url'}
         fetchMock.mock(preflightProps.upload_params.success_url, s3File)
         const result = await apiSource.uploadFRD(fileDomObject, preflightProps)
-        assert.deepEqual(result, s3File)
+        expect(result).toEqual(s3File)
       })
 
       it('handles inst-fs post-flight', () => {
@@ -645,10 +588,10 @@ describe('sources/api', () => {
           uuid: 'xyzzy',
         }
         fetchMock.mock(preflightProps.upload_url, response)
-        return apiSource.uploadFRD(fileDomObject, preflightProps).then(response => {
-          sinon.assert.calledWith(apiSource.getFile, fileId)
-          assert.strictEqual(response.uuid, 'xyzzy')
-          assert.strictEqual(response.url, 'file-url')
+        return apiSource.uploadFRD(fileDomObject, preflightProps).then(resp => {
+          expect(apiSource.getFile).toHaveBeenCalledWith(fileId)
+          expect(resp.uuid).toEqual('xyzzy')
+          expect(resp.url).toEqual('file-url')
         })
       })
 
@@ -660,10 +603,10 @@ describe('sources/api', () => {
           uuid: 'xyzzy',
         }
         fetchMock.mock(preflightProps.upload_url, response)
-        return apiSource.uploadFRD(fileDomObject, preflightProps).then(response => {
-          sinon.assert.calledWith(apiSource.getFile, fileId)
-          assert.strictEqual(response.uuid, 'xyzzy')
-          assert.strictEqual(response.url, 'file-url')
+        return apiSource.uploadFRD(fileDomObject, preflightProps).then(resp => {
+          expect(apiSource.getFile).toHaveBeenCalledWith(fileId)
+          expect(resp.uuid).toEqual('xyzzy')
+          expect(resp.url).toEqual('file-url')
         })
       })
     })
@@ -684,37 +627,31 @@ describe('sources/api', () => {
     }
     props.searchString = 'panda'
 
-    it('can fetch folders', () => {
+    it('can fetch folders', async () => {
       fetchMock.mock(/\/folders\?/, {body})
-      return apiSource.fetchRootFolder(props).then(page => {
-        assert.deepEqual(page, body)
-        fetchMock.restore()
-      })
+      const page = await apiSource.fetchRootFolder(props)
+      expect(page).toEqual(body)
     })
 
-    it('requests images from API', () => {
+    it('requests images from API', async () => {
       fetchMock.mock(/\/documents\?.*content_types=image/, {body})
-      return apiSource.fetchImages(props).then(page => {
-        assert.deepStrictEqual(page, {
-          bookmark: 'mo.images',
-          files: [{href: '/some/where?wrap=1', uuid: 'xyzzy'}],
-          searchString: 'panda',
-        })
-        fetchMock.restore()
+      const page = await apiSource.fetchImages(props)
+      expect(page).toEqual({
+        bookmark: 'mo.images',
+        files: [{href: '/some/where?wrap=1', uuid: 'xyzzy'}],
+        searchString: 'panda',
       })
     })
 
-    it('requests subsequent page of images from API', () => {
+    it('requests subsequent page of images from API', async () => {
       props.images.group.bookmark = 'mo.images'
       fetchMock.mock(/\/documents\?.*content_types=image/, 'should not get here')
       fetchMock.mock(/mo.images/, {body})
-      return apiSource.fetchImages(props).then(page => {
-        assert.deepEqual(page, {
-          bookmark: 'mo.images',
-          files: [{href: '/some/where?wrap=1', uuid: 'xyzzy'}],
-          searchString: 'panda',
-        })
-        fetchMock.restore()
+      const page = await apiSource.fetchImages(props)
+      expect(page).toEqual({
+        bookmark: 'mo.images',
+        files: [{href: '/some/where?wrap=1', uuid: 'xyzzy'}],
+        searchString: 'panda',
       })
     })
   })
@@ -724,7 +661,7 @@ describe('sources/api', () => {
 
     it('includes jwt in Authorization header', () => {
       return apiSource.getSession().then(() => {
-        assert.strictEqual(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
+        expect(fetchMock.lastOptions(uri).headers.Authorization).toEqual('Bearer theJWT')
       })
     })
   })
@@ -740,14 +677,14 @@ describe('sources/api', () => {
 
     it('includes jwt in Authorization header', () => {
       return apiSource.setUsageRights(fileId, usageRights).then(() => {
-        assert.strictEqual(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
+        expect(fetchMock.lastOptions(uri).headers.Authorization).toEqual('Bearer theJWT')
       })
     })
 
     it('posts file id and usage rights to the api', () => {
       return apiSource.setUsageRights(fileId, usageRights).then(() => {
         const postBody = JSON.parse(fetchMock.lastOptions(uri).body)
-        assert.deepEqual(postBody, {
+        expect(postBody).toEqual({
           fileId,
           usageRight: usageRights.usageRight,
         })
@@ -758,14 +695,14 @@ describe('sources/api', () => {
   describe('getFile', () => {
     const id = 47
     const uri = `/api/file/${id}`
-    const url = '/file/url'
-    const props = {}
+    let url = '/file/url'
+    setProps = {}
 
     it('includes jwt in Authorization header', () => {
       fetchMock.mock(uri, {url})
 
-      return apiSource.getFile(id, props).then(() => {
-        assert.strictEqual(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
+      return apiSource.getFile(id, setProps).then(() => {
+        expect(fetchMock.lastOptions(uri).headers.Authorization).toEqual('Bearer theJWT')
       })
     })
 
@@ -781,8 +718,8 @@ describe('sources/api', () => {
         {upload: 'done', url}
       )
 
-      return apiSource.getFile(id, props).then(response => {
-        assert.strictEqual(response.upload, 'done')
+      return apiSource.getFile(id, setProps).then(response => {
+        expect(response.upload).toEqual('done')
       })
     })
 
@@ -798,32 +735,30 @@ describe('sources/api', () => {
         {upload: 'done', url}
       )
 
-      return apiSource.getFile(id, props).then(() => {
-        assert.strictEqual(apiSource.jwt, 'freshJWT')
+      return apiSource.getFile(id, setProps).then(() => {
+        expect(apiSource.jwt).toEqual('freshJWT')
       })
     })
 
     it('transforms file url with downloadToWrap', () => {
-      const url = '/file/url?download_frd=1'
+      url = '/file/url?download_frd=1'
       const wrapUrl = '/file/url?wrap=1'
       fetchMock.mock('*', {url})
-      sinon.stub(fileUrl, 'downloadToWrap').returns(wrapUrl)
+      jest.spyOn(fileUrl, 'downloadToWrap').mockReturnValue(wrapUrl)
       return apiSource.getFile(id).then(file => {
-        sinon.assert.calledWith(fileUrl.downloadToWrap, url)
-        assert.strictEqual(file.href, wrapUrl)
-        fileUrl.downloadToWrap.restore()
+        expect(fileUrl.downloadToWrap).toHaveBeenCalledWith(url)
+        expect(file.href).toEqual(wrapUrl)
         fetchMock.restore()
       })
     })
 
     it('defaults display_name to name', () => {
-      const url = '/file/url?download_frd=1'
+      url = '/file/url?download_frd=1'
       const name = 'filename'
       fetchMock.mock('*', {url, name})
-      sinon.stub(fileUrl, 'downloadToWrap')
+      jest.spyOn(fileUrl, 'downloadToWrap')
       return apiSource.getFile(id).then(file => {
-        assert.strictEqual(file.display_name, name)
-        fileUrl.downloadToWrap.restore()
+        expect(file.display_name).toEqual(name)
         fetchMock.restore()
       })
     })
@@ -838,15 +773,15 @@ describe('sources/api', () => {
           {},
           {media_object_id: 'm-id', title: 'new title'}
         )
-        assert.strictEqual(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
-        assert.deepEqual(response, {media_id: 'm-id', title: 'new title'})
+        expect(fetchMock.lastOptions(uri).headers.Authorization).toEqual('Bearer theJWT')
+        expect(response).toEqual({media_id: 'm-id', title: 'new title'})
       })
     })
   })
 
   describe('headerFor', () => {
     it('returns an authorization header', () => {
-      assert.deepStrictEqual(headerFor('the_jwt'), {
+      expect(headerFor('the_jwt')).toEqual({
         Authorization: 'Bearer the_jwt',
       })
     })
@@ -855,28 +790,30 @@ describe('sources/api', () => {
   describe('originFromHost', () => {
     // this logic was factored out from baseUri, so the logic is tested
     // there too.
-    it('uses the incoming http(s) protocol if present', () => {
-      assert.strictEqual(originFromHost('http://host:port'), 'http://host:port', 'echoes http')
-      assert.strictEqual(originFromHost('https://host:port'), 'https://host:port', 'echoes https')
-      assert.strictEqual(originFromHost('host:port', {}), '//host:port', 'no protocol')
+    it('uses the incoming http protocol if present', () => {
+      expect(originFromHost('http://host:port')).toEqual('http://host:port')
     })
 
-    it('uses the windowOverride protocol if present', () => {
+    it('uses the incoming https protocol if present', () => {
+      expect(originFromHost('https://host:port')).toEqual('https://host:port')
+    })
+
+    it('uses the provided protocol if present', () => {
       const win = {
         location: {
           protocol: 'https:',
         },
       }
-      assert.strictEqual(
-        originFromHost('http://host:port', win),
-        'http://host:port',
-        'use provided protocol'
-      )
-      assert.strictEqual(
-        originFromHost('host:port', win),
-        'https://host:port',
-        'use window protocol'
-      )
+      expect(originFromHost('http://host:port', win)).toEqual('http://host:port')
+    })
+
+    it('uses the window protocol if not present', () => {
+      const win = {
+        location: {
+          protocol: 'https:',
+        },
+      }
+      expect(originFromHost('host:port', win)).toEqual('https://host:port')
     })
   })
 })

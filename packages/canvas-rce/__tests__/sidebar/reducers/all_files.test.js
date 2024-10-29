@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2020 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,15 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from 'assert'
-import React from 'react'
-import Loading from '../../../src/common/components/Loading'
-import sd from 'skin-deep'
+import {allFilesLoading} from '../../../src/sidebar/reducers/all_files'
+import * as actions from '../../../src/sidebar/actions/all_files'
 
-describe('Loading', () => {
-  it('includes a screenreader-only message', () => {
-    const tree = sd.shallowRender(<Loading />)
-    const message = tree.subTree('ScreenReaderContent')
-    assert.equal([].join.call(message.props.children, ''), 'Loading...')
+describe('all_files reducer', () => {
+  it('sets isLoading', () => {
+    const state = {isLoading: false}
+    const newState = allFilesLoading(state, actions.allFilesLoading(true))
+    expect(newState.isLoading).toEqual(true)
   })
 })

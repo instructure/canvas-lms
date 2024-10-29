@@ -16,30 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from 'assert'
-import sinon from 'sinon'
 import normalizeProps from '../../src/rce/normalizeProps'
 
 describe('Rce normalizeProps', () => {
   let props
   const tinymce = {}
+  let mockEditorOptions
   beforeEach(() => {
-    props = {editorOptions: sinon.stub().returns({})}
+    mockEditorOptions = jest.fn(() => {
+      return {}
+    })
+    props = {editorOptions: mockEditorOptions}
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
   })
 
   it('calls editorOptions with provided tinymce', () => {
     normalizeProps(props, tinymce)
-    assert.ok(props.editorOptions.calledWith(tinymce))
+    expect(mockEditorOptions).toHaveBeenCalled()
   })
 
   it('sets tinymce as provided, even over prop', () => {
     const otherMCE = {}
     const normalized = normalizeProps({...props, tinymce: otherMCE}, tinymce)
-    assert.equal(normalized.tinymce, tinymce)
+    expect(normalized.tinymce).toEqual(tinymce)
   })
 
   it('retains other props', () => {
     const normalized = normalizeProps({...props, textareaId: 'textareaId'}, tinymce)
-    assert.equal(normalized.textareaId, 'textareaId')
+    expect(normalized.textareaId).toEqual('textareaId')
   })
 })
