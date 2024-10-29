@@ -29,6 +29,7 @@ import {TextBlock, TextBlockIcon} from '../../user/blocks/TextBlock'
 import {HeadingBlock, HeadingBlockIcon} from '../../user/blocks/HeadingBlock'
 import {ResourceCard, ResourceCardIcon} from '../../user/blocks/ResourceCard'
 import {ImageBlock, ImageBlockIcon} from '../../user/blocks/ImageBlock'
+import {MediaBlock, MediaBlockIcon} from '../../user/blocks/MediaBlock'
 import {IconBlock, IconBlockIcon} from '../../user/blocks/IconBlock'
 import {RCEBlock, RCEBlockIcon} from '../../user/blocks/RCEBlock'
 import {TabsBlock, TabsBlockIcon} from '../../user/blocks/TabsBlock'
@@ -229,6 +230,7 @@ const BlocksPanel = ({
       {renderBox('Heading', HeadingBlockIcon, <HeadingBlock />)}
       {renderBox('Resource Card', ResourceCardIcon, <ResourceCard />)}
       {renderBox('Image', ImageBlockIcon, <ImageBlock />)}
+      {renderBox('Media', MediaBlockIcon, <MediaBlock />)}
       {renderBox('Group', GroupBlockIcon, <GroupBlock />)}
       {renderBox('Tabs', TabsBlockIcon, <TabsBlock />)}
       {renderBox('Divider', DividerBlockIcon, <DividerBlock />)}

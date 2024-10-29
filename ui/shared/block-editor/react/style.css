@@ -571,7 +571,7 @@
 
 }
 
-.image-block {
+.image-block, .media-block {
   max-width: calc(100% - 4px);
   max-height: calc(100% - 4px);
   overflow: hidden;
