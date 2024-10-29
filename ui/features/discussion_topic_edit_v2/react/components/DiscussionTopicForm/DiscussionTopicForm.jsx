@@ -1021,7 +1021,7 @@ function DiscussionTopicForm({
             )}
             {shouldShowCheckpointsOptions && (
               <>
-                <View display="inline-block">
+                <View display="inline-block" padding="0 0 0 medium">
                   <Checkbox
                     data-testid="checkpoints-checkbox"
                     label={I18n.t('Assign graded checkpoints')}
@@ -1040,7 +1040,7 @@ function DiscussionTopicForm({
                     // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
                     tabIndex="0"
                   >
-                    <IconInfoLine />
+                    <IconInfoLine color="primary"/>
                     <ScreenReaderContent>{checkpointsToolTipText}</ScreenReaderContent>
                   </div>
                 </Tooltip>
