@@ -330,7 +330,8 @@ Rails.application.config.to_prepare do
         account_only: :root,
         true_for: [
           "AccountAdmin"
-        ]
+        ],
+        account_allows: ->(a) { Feature.exists?(:enable_dsr_requests) && a.feature_enabled?(:enable_dsr_requests) }
       },
       manage_user_observers: {
         label: -> { I18n.t("permissions.manage_user_observers", "Manage observers for users") },
