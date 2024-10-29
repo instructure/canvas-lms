@@ -25,6 +25,7 @@ import {ResourceCard} from './user/blocks/ResourceCard'
 import {IconBlock} from './user/blocks/IconBlock'
 import {PageBlock} from './user/blocks/PageBlock'
 import {ImageBlock} from './user/blocks/ImageBlock'
+import {MediaBlock} from './user/blocks/MediaBlock'
 import {RCEBlock} from './user/blocks/RCEBlock'
 import {GroupBlock} from './user/blocks/GroupBlock'
 import {DividerBlock} from './user/blocks/DividerBlock'
@@ -52,6 +53,7 @@ const blocks = {
   ResourceCard,
   IconBlock,
   ImageBlock,
+  MediaBlock,
   RCEBlock,
   KnowledgeCheckSection,
   AnnouncementSection,
