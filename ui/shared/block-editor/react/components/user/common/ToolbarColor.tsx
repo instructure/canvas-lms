@@ -18,46 +18,71 @@
 
 import React, {useCallback, useEffect, useState} from 'react'
 import {Button, IconButton} from '@instructure/ui-buttons'
-import {ColorPreset, ColorContrast} from '@instructure/ui-color-picker'
+import {ColorPreset, ColorMixer, ColorContrast} from '@instructure/ui-color-picker'
 import {Popover} from '@instructure/ui-popover'
+import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {Tabs} from '@instructure/ui-tabs'
 import {View, type ViewOwnProps} from '@instructure/ui-view'
 import {IconBackgroundColor} from '../../../assets/internal-icons'
+import {isTransparent} from '../../../utils'
 
 import {useScope} from '@canvas/i18n'
 
 const I18n = useScope('block-editor')
 
-type ToolbarColorProps = {
+// this will hold colors the user picks during this session
+const previouslyChosenColors: string[] = []
+
+type ColorTab = 'foreground' | 'background' | 'border'
+
+export type ColorSpec = {
   bgcolor: string
-  fgcolor: string
-  fgcolorLabel?: string
-  bgcolorLabel?: string
-  onChange: (fgcolor: string, bgcolor: string) => void
+  fgcolor?: string
+  bordercolor?: string
 }
 
-type ColorTab = 'foreground' | 'background'
+export type ToolbarColorProps = {
+  fgcolor?: string
+  bgcolor: string
+  bordercolor?: string
+  onChange: (newcolors: ColorSpec) => void
+}
 
-const ToolbarColor = ({
-  bgcolor,
-  fgcolor,
-  fgcolorLabel,
-  bgcolorLabel,
-  onChange,
-}: ToolbarColorProps) => {
+const ToolbarColor = ({bgcolor, onChange, fgcolor, bordercolor}: ToolbarColorProps) => {
   const [currFgColor, setCurrFgColor] = useState(fgcolor)
   const [currBgColor, setCurrBgColor] = useState(bgcolor)
-  const [activeTab, setActiveTab] = useState<ColorTab>('foreground')
+  const [currBorderColor, setCurrBorderColor] = useState(bordercolor || '#00000000')
+  const [activeTab, setActiveTab] = useState<ColorTab>(fgcolor ? 'foreground' : 'background')
+  const [customBackground, setCustomBackground] = useState<boolean>(false)
+  const [customBorder, setCustomBorder] = useState<boolean>(false)
   const [isShowingContent, setIsShowingContent] = useState(false)
+  const [recreateKey, setRecreateKey] = useState(0)
+  const [defaultColors] = useState(() => {
+    const fontcolor =
+      window
+        .getComputedStyle(document.documentElement)
+        .getPropertyValue('--ic-brand-font-color-dark') || '#000000'
+    return [fontcolor, '#FFFFFF']
+  })
 
   useEffect(() => {
     if (!isShowingContent) {
-      // reset
-      setCurrFgColor(fgcolor)
-      setCurrBgColor(bgcolor)
-      setActiveTab('foreground')
+      setRecreateKey(Date.now())
     }
-  }, [bgcolor, fgcolor, isShowingContent])
+  }, [isShowingContent])
+
+  const updatePreviousColors = useCallback(
+    (color: string) => {
+      if (previouslyChosenColors.includes(color)) return
+      if (defaultColors.includes(color)) return
+      if (color === `${defaultColors[0]}FF`) return
+      if (isTransparent(color)) return
+
+      previouslyChosenColors.unshift(color)
+      if (previouslyChosenColors.length > 8) previouslyChosenColors.pop()
+    },
+    [defaultColors]
+  )
 
   const handleFgColorChange = useCallback((newColor: string) => {
     setCurrFgColor(newColor)
@@ -65,6 +90,10 @@ const ToolbarColor = ({
 
   const handleBgColorChange = useCallback((newColor: string) => {
     setCurrBgColor(newColor)
+  }, [])
+
+  const handleBorderColorChange = useCallback((newColor: string) => {
+    setCurrBorderColor(newColor)
   }, [])
 
   const handleTabChange = useCallback(
@@ -86,59 +115,149 @@ const ToolbarColor = ({
     setActiveTab('foreground')
   }, [])
 
+  const handleChangePickAColor = useCallback(
+    (_e: React.ChangeEvent<HTMLInputElement>, value: string) => {
+      const isCustom = value === 'custom'
+      if (activeTab === 'background') {
+        setCustomBackground(isCustom)
+        if (!isCustom) {
+          setCurrBgColor('#00000000')
+        }
+      } else if (activeTab === 'border') {
+        setCustomBorder(isCustom)
+        if (!isCustom) {
+          setCurrBorderColor('#00000000')
+        }
+      }
+    },
+    [activeTab]
+  )
+
   const handleSubmit = useCallback(() => {
     setIsShowingContent(false)
-    onChange(currFgColor, currBgColor)
-  }, [currBgColor, currFgColor, onChange])
+    const newcolors: ColorSpec = {
+      bgcolor: customBackground ? currBgColor : '#00000000',
+    }
+    updatePreviousColors(newcolors.bgcolor)
 
-  const getPresetColors = (variant: ColorTab): string[] => {
-    const colors = [
-      '#ffffff',
-      '#6c7780',
-      '#394b58',
-      '#111111',
-      '#ec051f',
-      '#d34022',
-      '#e31c5b',
-      '#cb34af',
-      '#a34ae4',
-      '#6066e6',
-      '#027bc2',
-      '#1d8292',
-      '#05881f',
-    ]
+    if (currFgColor) {
+      newcolors.fgcolor = currFgColor
+      updatePreviousColors(currFgColor)
+    }
+    if (currBorderColor) {
+      newcolors.bordercolor =
+        customBorder && !isTransparent(currBorderColor) ? currBorderColor : undefined
+      if (newcolors.bordercolor) {
+        updatePreviousColors(newcolors.bordercolor)
+      }
+    }
+    onChange(newcolors)
+  }, [
+    currBgColor,
+    currBorderColor,
+    currFgColor,
+    customBackground,
+    customBorder,
+    onChange,
+    updatePreviousColors,
+  ])
+
+  const renderColorMixer = (variant: ColorTab, enabled: boolean) => {
+    let value = currBgColor
+    let onSelectColor = handleBgColorChange
+
     if (variant === 'foreground') {
-      const defaultTextColor = window
-        .getComputedStyle(document.documentElement)
-        .getPropertyValue('--ic-brand-font-color-dark')
-      colors.unshift(defaultTextColor)
+      value = currFgColor as string
+      onSelectColor = handleFgColorChange
     }
-    if (variant === 'background') {
-      colors.unshift('#00000000')
+    if (variant === 'border') {
+      value = currBorderColor as string
+      onSelectColor = handleBorderColorChange
     }
-    return colors
+    if (isTransparent(value)) value = '#fff' // or the ColorMixer will return a transparent color
+
+    return (
+      <ColorMixer
+        data-testid="color-mixer"
+        disabled={!enabled}
+        value={value}
+        withAlpha={false}
+        onChange={onSelectColor}
+        rgbRedInputScreenReaderLabel={I18n.t('Input field for red')}
+        rgbGreenInputScreenReaderLabel={I18n.t('Input field for green')}
+        rgbBlueInputScreenReaderLabel={I18n.t('Input field for blue')}
+        rgbAlphaInputScreenReaderLabel={I18n.t('Input field for alpha')}
+        colorSliderNavigationExplanationScreenReaderLabel={I18n.t(
+          "You are on a color slider. To navigate the slider left or right, use the 'A' and 'D' buttons respectively"
+        )}
+        alphaSliderNavigationExplanationScreenReaderLabel={I18n.t(
+          "You are on an alpha slider. To navigate the slider left or right, use the 'A' and 'D' buttons respectively"
+        )}
+        colorPaletteNavigationExplanationScreenReaderLabel={I18n.t(
+          "You are on a color palette. To navigate on the palette up, left, down or right, use the 'W', 'A', 'S' and 'D' buttons respectively"
+        )}
+      />
+    )
   }
 
-  const renderColorPreset = (variant: ColorTab) => {
-    const value = variant === 'foreground' ? currFgColor : currBgColor
-    const onSelectColor = variant === 'foreground' ? handleFgColorChange : handleBgColorChange
-    const label = variant === 'foreground' ? I18n.t('Color') : I18n.t('Background Color')
+  const renderColorPreset = (variant: ColorTab, enabled: boolean) => {
+    let currColor = bgcolor
+    if (variant === 'foreground') currColor = fgcolor || defaultColors[1]
+    if (variant === 'border') currColor = bordercolor || '#00000000'
+
+    let onSelectColor = handleBgColorChange
+    if (variant === 'foreground') onSelectColor = handleFgColorChange
+    if (variant === 'border') onSelectColor = handleBorderColorChange
+
     return (
       <ColorPreset
-        label={label}
-        colors={getPresetColors(variant)}
-        selected={value}
+        data-testid="color-preset"
+        disabled={!enabled}
+        label={I18n.t('Previously chosen colors')}
+        colors={[...defaultColors, ...previouslyChosenColors]}
+        selected={currColor}
         onSelect={onSelectColor}
       />
     )
   }
 
+  const renderTab = (variant: ColorTab) => {
+    let choosersEnabled = true
+    if (variant === 'background') {
+      choosersEnabled = customBackground
+    } else if (variant === 'border') {
+      choosersEnabled = customBorder
+    }
+
+    return (
+      <>
+        {variant !== 'foreground' && (
+          <View as="div" margin="0 0 small 0">
+            <RadioInputGroup
+              layout="columns"
+              name="pickcolor"
+              description={I18n.t('Pick a color')}
+              size="small"
+              value={choosersEnabled ? 'custom' : 'none'}
+              onChange={handleChangePickAColor}
+            >
+              <RadioInput label={I18n.t('None')} value="none" />
+              <RadioInput label={I18n.t('Custom')} value="custom" />
+            </RadioInputGroup>
+          </View>
+        )}
+        {renderColorMixer(variant, choosersEnabled)}
+        {renderColorPreset(variant, choosersEnabled)}
+      </>
+    )
+  }
+
   return (
     <Popover
+      key={recreateKey}
       renderTrigger={
         <IconButton
           color="secondary"
-          themeOverride={{secondaryGhostColor: fgcolor, secondaryGhostBackground: bgcolor}}
           size="small"
           withBackground={false}
           withBorder={false}
@@ -158,41 +277,57 @@ const ToolbarColor = ({
     >
       <View as="div" padding="small" data-mce-component={true}>
         <Tabs onRequestTabChange={handleTabChange}>
-          <Tabs.Panel
-            id="foreground"
-            renderTitle={fgcolorLabel || I18n.t('Color')}
-            isSelected={activeTab === 'foreground'}
-          >
-            {renderColorPreset('foreground')}
-          </Tabs.Panel>
+          {fgcolor && (
+            <Tabs.Panel
+              id="foreground"
+              renderTitle={I18n.t('Color')}
+              isSelected={activeTab === 'foreground'}
+            >
+              {renderTab('foreground')}
+            </Tabs.Panel>
+          )}
           <Tabs.Panel
             id="background"
-            renderTitle={bgcolorLabel || I18n.t('Background Color')}
+            renderTitle={I18n.t('Background')}
             isSelected={activeTab === 'background'}
           >
-            {renderColorPreset('background')}
+            {renderTab('background')}
           </Tabs.Panel>
+          {bordercolor && (
+            <Tabs.Panel
+              id="border"
+              renderTitle={I18n.t('Border')}
+              isSelected={activeTab === 'border'}
+            >
+              {renderTab('border')}
+            </Tabs.Panel>
+          )}
         </Tabs>
-        <div
-          style={{
-            borderTop: 'solid',
-            borderWidth: '1px',
-            borderColor: '#C7CDD1',
-            margin: '20px 0 20px 0',
-          }}
-        />
-        <ColorContrast
-          firstColor={currBgColor}
-          secondColor={currFgColor}
-          label="Color Contrast Ratio"
-          successLabel="PASS"
-          failureLabel="FAIL"
-          normalTextLabel="Normal text"
-          largeTextLabel="Large text"
-          graphicsTextLabel="Graphics text"
-          firstColorLabel="Background"
-          secondColorLabel="Foreground"
-        />
+        {currFgColor && !isTransparent(currBgColor) && (
+          <>
+            <div
+              style={{
+                borderTop: 'solid',
+                borderWidth: '1px',
+                borderColor: '#C7CDD1',
+                margin: '20px 0 20px 0',
+              }}
+            />
+            <ColorContrast
+              data-testid="color-contrast"
+              firstColor={currFgColor}
+              secondColor={currBgColor}
+              label={I18n.t('Color Contrast Ratio')}
+              successLabel={I18n.t('PASS')}
+              failureLabel={I18n.t('FAIL')}
+              normalTextLabel={I18n.t('Normal text')}
+              largeTextLabel={I18n.t('Large text')}
+              graphicsTextLabel={I18n.t('Graphics text')}
+              firstColorLabel={I18n.t('Foreground')}
+              secondColorLabel={I18n.t('Background')}
+            />
+          </>
+        )}
       </View>
       <View as="div" background="secondary" padding="small" textAlign="end">
         <Button onClick={() => setIsShowingContent(false)}>{I18n.t('Cancel')}</Button>
