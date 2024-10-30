@@ -359,6 +359,15 @@ class AuthenticationProvider
           if (signature_error = validate_signature(id_token))
             raise OAuthValidationError, "Invalid signature: #{signature_error}"
           end
+        elsif id_token != {}
+          issuers = settings["known_issuers"] ||= []
+          if issuers.length < 20 && !issuers.include?(id_token["iss"])
+            issuers << id_token["iss"]
+          end
+          alg = id_token.alg&.to_sym
+          algs = settings["known_signature_algorithms"] ||= []
+          algs << alg if algs.length < 20 && !algs.include?(alg)
+          save! if changed?
         end
 
         # we have a userinfo endpoint, and we don't have everything we want,
