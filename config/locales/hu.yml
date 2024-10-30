@@ -26506,6 +26506,16 @@ hu:
         all_users: "Összes felhasználó"
         choose_term: "Félév kiválasztása"
         search_results: "Keresés eredménye \"%{search_term}\" alapján"
+    last_login: 
+      labels: 
+        current_ip: "Aktuális belépés IP"
+        current_login: "Aktuális belépés"
+        last_ip: "Utolsó belépés IP"
+        last_login: "Legutóbbi belépés"
+        last_request: "Legutóbbi kérés"
+      more: "több információ..."
+      never: soha
+      none: nincs
     linkedin_added: "LinkedIn-fiók sikeresen hozzáadva!"
     linkedin_fail: "LinkedIn engedélyezése nem sikerült. Kérjük, próbálja újra!"
     logins: 
