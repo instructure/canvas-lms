@@ -26,12 +26,22 @@ import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jquery-tinypubsub'
 import '@canvas/util/jquery/fixDialogButtons'
+import React from 'react'
+import {createRoot} from 'react-dom/client'
 
 // # this is a partial needed by the 'SetDefaultGradeDialog' template
 // # since you cant declare a dependency in a handlebars file, we need to do it here
 import '../jst/_grading_box.handlebars'
+import CheckpointsGradeInputs from '@canvas/grading/react/CheckpointsGradeInputs'
+import {CheckpointsDefaultGradeInfo} from '@canvas/grading/react/CheckpointsDefaultGradeInfo'
 
 const I18n = useI18nScope('sharedSetDefaultGradeDialog')
+
+const REPLY_TO_TOPIC = 'reply_to_topic'
+const REPLY_TO_ENTRY = 'reply_to_entry'
+const DEFAULT_GRADE_WITH_CHECKPOINTS_MOUNT_POINT = 'default_grade_with_checkpoints_mount_point'
+const DEFAULT_GRADE_WITH_CHECKPOINTS_INFO_MOUNT_POINT =
+  'default_grade_with_checkpoints_info_mount_point'
 
 const noop = function () {}
 const slice = [].slice
@@ -59,8 +69,11 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
   if (onClose == null) {
     onClose = this.onClose
   }
+
+  const hasCheckpoints = this.assignment.has_sub_assignments
   const templateLocals = {
     assignment: this.assignment,
+    hasCheckpoints,
     showPointsPossible:
       (this.assignment.points_possible || this.assignment.points_possible === '0') &&
       this.assignment.grading_type !== 'gpa_scale',
@@ -90,11 +103,12 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
   $('.ui-dialog-titlebar-close').focus()
   $form.submit(
     (function (_this) {
-      return function (e) {
+      return async function (e) {
         let pages, postDfds, students, submittingDfd
         e.preventDefault()
         const formData = $form.getFormData()
-        if (_this.gradeIsExcused(formData.default_grade)) {
+        const defaultGrade = formData.default_grade
+        if (_this.gradeIsExcused(defaultGrade)) {
           return $.flashError(
             I18n.t('Default grade cannot be set to %{ex}', {
               ex: 'EX',
@@ -111,14 +125,36 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
             }
             return results
           }.call(_this)
-          postDfds = pages.map(function (page) {
-            const studentParams = getParams(page, formData.default_grade)
-            const params = {
-              ...studentParams,
-              dont_overwrite_grades: !formData.overwrite_existing_grades,
-            }
-            return $.ajaxJSON($form.attr('action'), 'POST', params)
-          })
+
+          const makeRequests = (grade, subAssignmentTag = null) => {
+            return pages.map(function (page) {
+              let finalGrade = grade
+
+              if (isString(grade)) {
+                finalGrade = grade.toLowerCase()
+              }
+
+              const studentParams = getParams(page, finalGrade)
+              const params = {
+                ...studentParams,
+                dont_overwrite_grades: !formData.overwrite_existing_grades,
+                ...(subAssignmentTag ? {sub_assignment_tag: subAssignmentTag} : {}),
+              }
+              return $.ajaxJSON($form.attr('action'), 'POST', params)
+            })
+          }
+
+          if (hasCheckpoints) {
+            const replyToTopicGrade = formData.reply_to_topic_input
+            const replyToEntryGrade = formData.reply_to_entry_input
+
+            await makeRequests(replyToTopicGrade, REPLY_TO_TOPIC)[0].promise()
+            // We only get the results of the last set of requests, that should have the submissions with both updates.
+            postDfds = makeRequests(replyToEntryGrade, REPLY_TO_ENTRY)
+          } else {
+            postDfds = makeRequests(defaultGrade)
+          }
+
           // eslint-disable-next-line prefer-spread
           return $.when.apply($, postDfds).then(function () {
             let responses = arguments.length >= 1 ? slice.call(arguments, 0) : []
@@ -127,7 +163,7 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
             }
             const submissions = getSubmissions(responses)
             $.publish('submissions_updated', [submissions])
-            if (_this.gradeIsMissingShortcut(formData.default_grade)) {
+            if (_this.gradeIsMissingShortcut(defaultGrade)) {
               _this.alert(
                 I18n.t(
                   {
@@ -192,6 +228,30 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
         .value()
     }
   })(this)
+
+  const mountPoint = document.getElementById(DEFAULT_GRADE_WITH_CHECKPOINTS_MOUNT_POINT)
+
+  if (mountPoint) {
+    const root = createRoot(mountPoint)
+    root.render(<CheckpointsGradeInputs assignment={this.assignment} />)
+  }
+
+  const overwriteExitingGrades = document.getElementsByName('overwrite_existing_grades')[0]
+  const infoMountPoint = document.getElementById(DEFAULT_GRADE_WITH_CHECKPOINTS_INFO_MOUNT_POINT)
+  const infoRoot = infoMountPoint ? createRoot(infoMountPoint) : null
+
+  overwriteExitingGrades.addEventListener(
+    'change',
+    () => {
+      if (!infoRoot) {
+        return
+      }
+
+      infoRoot.render(overwriteExitingGrades.checked ? <CheckpointsDefaultGradeInfo /> : <span />)
+    },
+    false
+  )
+
   // # uniq on id is required because for group assignments the api will
   // # return all submission in a group assignment leading to duplicates
   return (getSubmissions = (function (_this) {
