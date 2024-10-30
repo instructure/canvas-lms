@@ -95,7 +95,6 @@ module CanvasSanitize # :nodoc:
       "span",
       "strike",
       "strong",
-      "style",
       "sub",
       "sup",
       "abbr",
