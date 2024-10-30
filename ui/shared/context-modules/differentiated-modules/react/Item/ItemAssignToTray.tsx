@@ -400,7 +400,7 @@ export default function ItemAssignToTray({
   function Header() {
     const icon = itemTypeToIcon(iconType)
     return (
-      <Flex.Item margin="medium 0 small" padding="0 medium" width="100%">
+      <Flex.Item margin="x-large 0 small" padding="0 medium" width="100%">
         <CloseButton
           onClick={onClose}
           screenReaderLabel={I18n.t('Close')}
