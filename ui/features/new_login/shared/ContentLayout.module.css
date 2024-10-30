@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 .contentLayout {
     @media (min-width: 48rem) and (max-width: 80rem) { /* 768px – 1280px */
         padding: 5rem 0 8rem; /* 80px 128px */

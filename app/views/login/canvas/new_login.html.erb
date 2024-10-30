@@ -34,6 +34,9 @@
      # custom background
      body_bg_color = brand_variable("ic-brand-Login-body-bgd-shadow-color")
      body_bg_image = brand_variable("ic-brand-Login-body-bgd-image")
+
+     # theme editor preview mode
+     is_preview_mode = params[:previewing_from_themeeditor]
 %>
 
 <div id="new_login_data"
@@ -42,5 +45,6 @@
      <%= "data-login-logo-url='#{login_logo_url}'".html_safe if login_logo_url.present? %>
      <%= "data-login-logo-alt='#{login_logo_alt}'".html_safe if login_logo_alt.present? %>
      <%= "data-body-bg-color='#{body_bg_color}'".html_safe if body_bg_color.present? %>
-     <%= "data-body-bg-image='#{body_bg_image}'".html_safe if body_bg_image.present? %>>
-</div>
+     <%= "data-body-bg-image='#{body_bg_image}'".html_safe if body_bg_image.present? %>
+     <%= "data-is-preview-mode='#{is_preview_mode}'".html_safe if is_preview_mode.present? %>
+></div>

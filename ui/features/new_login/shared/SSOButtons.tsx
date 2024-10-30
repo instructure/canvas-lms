@@ -30,6 +30,7 @@ import GoogleIcon from '../assets/images/google.svg'
 import MicrosoftIcon from '../assets/images/microsoft.svg'
 // @ts-expect-error
 import PlaceholderIcon from '../assets/images/placeholder.svg'
+import type {ViewOwnProps} from '@instructure/ui-view'
 
 const I18n = useI18nScope('new_login')
 
@@ -38,7 +39,7 @@ interface Props {
 }
 
 const SSOButtons = ({className}: Props) => {
-  const {isUiActionPending, authProviders} = useNewLogin()
+  const {isUiActionPending, isPreviewMode, authProviders} = useNewLogin()
 
   if (!authProviders || authProviders.length === 0) {
     return null
@@ -52,6 +53,14 @@ const SSOButtons = ({className}: Props) => {
         return MicrosoftIcon
       default:
         return PlaceholderIcon
+    }
+  }
+
+  const handleClick = (
+    event: React.KeyboardEvent<ViewOwnProps> | React.MouseEvent<ViewOwnProps>
+  ) => {
+    if (isPreviewMode || isUiActionPending) {
+      event.preventDefault()
     }
   }
 
@@ -79,6 +88,7 @@ const SSOButtons = ({className}: Props) => {
                   display="block"
                 />
               )}
+              onClick={handleClick}
             >
               {I18n.t('Sign in with %{displayName}', {displayName})}
             </Button>

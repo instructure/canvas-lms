@@ -33,6 +33,7 @@ jest.mock('../../hooks/useNewLoginData', () => ({
     loginLogoAlt: 'Canvas by Instructure',
     bodyBgColor: '#ffffff',
     bodyBgImage: 'https://example.com/background.jpg',
+    isPreviewMode: true,
   }),
 }))
 
@@ -55,6 +56,7 @@ const TestComponent = () => {
       <span data-testid="loginLogoAlt">{context.loginLogoAlt}</span>
       <span data-testid="bodyBgColor">{context.bodyBgColor}</span>
       <span data-testid="bodyBgImage">{context.bodyBgImage}</span>
+      <span data-testid="isPreviewMode">{context.isPreviewMode?.toString()}</span>
     </div>
   )
 }
@@ -92,6 +94,7 @@ describe('NewLoginContext', () => {
     expect(screen.getByTestId('bodyBgImage')).toHaveTextContent(
       'https://example.com/background.jpg'
     )
+    expect(screen.getByTestId('isPreviewMode')).toHaveTextContent('true')
   })
 
   it('allows context values to be updated correctly', () => {
@@ -140,6 +143,7 @@ describe('NewLoginContext', () => {
       loginLogoAlt: undefined,
       bodyBgColor: undefined,
       bodyBgImage: undefined,
+      isPreviewMode: undefined,
     })
     render(
       <NewLoginProvider>
@@ -152,5 +156,6 @@ describe('NewLoginContext', () => {
     expect(screen.getByTestId('loginLogoAlt')).toBeEmptyDOMElement()
     expect(screen.getByTestId('bodyBgColor')).toBeEmptyDOMElement()
     expect(screen.getByTestId('bodyBgImage')).toBeEmptyDOMElement()
+    expect(screen.getByTestId('isPreviewMode')).toBeEmptyDOMElement()
   })
 })

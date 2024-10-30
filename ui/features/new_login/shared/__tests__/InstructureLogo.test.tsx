@@ -17,11 +17,16 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
 import {InstructureLogo} from '../index'
+import {NewLoginProvider} from '../../context/NewLoginContext'
+import {render} from '@testing-library/react'
 
 describe('InstructureLogo', () => {
   it('mounts without crashing', () => {
-    render(<InstructureLogo />)
+    render(
+      <NewLoginProvider>
+        <InstructureLogo />
+      </NewLoginProvider>
+    )
   })
 })
