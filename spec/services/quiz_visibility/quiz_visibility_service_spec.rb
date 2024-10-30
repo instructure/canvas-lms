@@ -111,13 +111,13 @@ describe "differentiated_assignments" do
   end
 
   def ensure_user_does_not_see_quiz
-    visible_quiz_ids = QuizVisibility::QuizVisibilityService.quizzes_visible_to_student(user_id: @user.id, course_id: @course.id).map(&:quiz_id)
+    visible_quiz_ids = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students(user_ids: @user.id, course_ids: @course.id).map(&:quiz_id)
     expect(visible_quiz_ids.map(&:to_i).include?(@quiz.id)).to be_falsey
     expect(QuizVisibility::QuizVisibilityService.visible_quiz_ids_in_course_by_user(user_ids: [@user.id], course_ids: [@course.id])[@user.id]).not_to include(@quiz.id)
   end
 
   def ensure_user_sees_quiz
-    visible_quiz_ids = QuizVisibility::QuizVisibilityService.quizzes_visible_to_student(user_id: @user.id, course_id: @course.id).map(&:quiz_id)
+    visible_quiz_ids = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students(user_ids: @user.id, course_ids: @course.id).map(&:quiz_id)
     expect(visible_quiz_ids.map(&:to_i).include?(@quiz.id)).to be_truthy
     expect(QuizVisibility::QuizVisibilityService.visible_quiz_ids_in_course_by_user(user_ids: [@user.id], course_ids: [@course.id])[@user.id]).to include(@quiz.id)
   end
