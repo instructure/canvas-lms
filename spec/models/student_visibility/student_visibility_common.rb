@@ -23,7 +23,7 @@ module StudentVisibilityCommon
     when "discussion_topic"
       UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible(course_ids: @course.id, user_ids: user.id).map(&:discussion_topic_id)
     when "wiki_page"
-      WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_student(course_id: @course.id, user_id: user.id).map(&:wiki_page_id)
+      WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students(course_ids: @course.id, user_ids: user.id).map(&:wiki_page_id)
     end
   end
 

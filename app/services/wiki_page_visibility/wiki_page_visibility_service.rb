@@ -21,73 +21,16 @@ module WikiPageVisibility
   class WikiPageVisibilityService
     extend VisibilityHelpers::Common
     class << self
-      def wiki_pages_visible_to_student(course_id:, user_id:)
-        raise ArgumentError, "course_id cannot be nil" if course_id.nil?
-        raise ArgumentError, "course_id must not be an array" if course_id.is_a?(Array)
-        raise ArgumentError, "user_id cannot be nil" if user_id.nil?
-        raise ArgumentError, "user_id must not be an array" if user_id.is_a?(Array)
-
-        wiki_pages_visible_to_students(course_ids: course_id, user_ids: user_id)
-      end
-
-      def wiki_pages_visible_to_students_in_courses(course_ids:, user_ids:)
-        raise ArgumentError, "course_ids cannot be nil" if course_ids.nil?
-        raise ArgumentError, "course_ids must be an array" unless course_ids.is_a?(Array)
-        raise ArgumentError, "user_ids cannot be nil" if user_ids.nil?
-        raise ArgumentError, "user_ids must be an array" unless user_ids.is_a?(Array)
-
-        wiki_pages_visible_to_students(course_ids:, user_ids:)
-      end
-
-      def wiki_pages_visible_to_student_in_courses(user_id:, course_ids:)
-        raise ArgumentError, "course_ids cannot be nil" if course_ids.nil?
-        raise ArgumentError, "course_ids must be an array" unless course_ids.is_a?(Array)
-        raise ArgumentError, "user_id cannot be nil" if user_id.nil?
-        raise ArgumentError, "user_id must not be an array" if user_id.is_a?(Array)
-
-        wiki_pages_visible_to_students(course_ids:, user_ids: user_id)
-      end
-
-      def wiki_page_visible_to_student(wiki_page_id:, user_id:)
-        raise ArgumentError, "wiki_page_id cannot be nil" if wiki_page_id.nil?
-        raise ArgumentError, "wiki_page_id must not be an array" if wiki_page_id.is_a?(Array)
-        raise ArgumentError, "user_id cannot be nil" if user_id.nil?
-        raise ArgumentError, "user_id must not be an array" if user_id.is_a?(Array)
-
-        wiki_pages_visible_to_students(wiki_page_ids: wiki_page_id, user_ids: user_id)
-      end
-
-      def wiki_page_visible_to_students(wiki_page_id:, user_ids:)
-        raise ArgumentError, "wiki_page_id cannot be nil" if wiki_page_id.nil?
-        raise ArgumentError, "wiki_page_id must not be an array" if wiki_page_id.is_a?(Array)
-        raise ArgumentError, "user_ids cannot be nil" if user_ids.nil?
-        raise ArgumentError, "user_ids must be an array" unless user_ids.is_a?(Array)
-
-        wiki_pages_visible_to_students(wiki_page_ids: wiki_page_id, user_ids:)
-      end
-
-      def wiki_page_visible_to_students_in_course(wiki_page_id:, user_ids:, course_id:)
-        raise ArgumentError, "course_id cannot be nil" if course_id.nil?
-        raise ArgumentError, "course_id must not be an array" if course_id.is_a?(Array)
-        raise ArgumentError, "wiki_page_id cannot be nil" if wiki_page_id.nil?
-        raise ArgumentError, "wiki_page_id must not be an array" if wiki_page_id.is_a?(Array)
-        raise ArgumentError, "user_ids cannot be nil" if user_ids.nil?
-        raise ArgumentError, "user_ids must be an array" unless user_ids.is_a?(Array)
-
-        wiki_pages_visible_to_students(course_ids: course_id, wiki_page_ids: wiki_page_id, user_ids:)
-      end
-
-      private
-
       def wiki_pages_visible_to_students(course_ids: nil, user_ids: nil, wiki_page_ids: nil)
-        if course_ids.nil? && user_ids.nil? && wiki_page_ids.nil?
+        unless course_ids || user_ids || wiki_page_ids
           raise ArgumentError, "at least one non nil course_id, user_id, or wiki_page_ids is required (for query performance reasons)"
         end
 
-        service_cache_fetch(service: name,
-                            course_ids:,
-                            user_ids:,
-                            additional_ids: wiki_page_ids) do
+        course_ids = Array(course_ids) if course_ids
+        user_ids = Array(user_ids) if user_ids
+        wiki_page_ids = Array(wiki_page_ids) if wiki_page_ids
+
+        service_cache_fetch(service: name, course_ids:, user_ids:, additional_ids: wiki_page_ids) do
           WikiPageVisibility::Repositories::WikiPageVisibleToStudentRepository.visibility_query(
             course_ids:, user_ids:, wiki_page_ids:
           )
