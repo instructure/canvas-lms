@@ -152,35 +152,9 @@ module UngradedDiscussionVisibility
         # Note that at least one of the params must be non nil
         def filter_condition_sql(course_ids: nil, user_ids: nil, discussion_topic_ids: nil)
           query_conditions = []
-
-          if discussion_topic_ids
-            query_conditions << if discussion_topic_ids.is_a?(Array)
-                                  "o.id IN (:discussion_topic_id)"
-                                else
-                                  "o.id = :discussion_topic_id"
-                                end
-          end
-
-          if user_ids
-            query_conditions << if user_ids.is_a?(Array)
-                                  "e.user_id IN (:user_id)"
-                                else
-                                  "e.user_id = :user_id"
-                                end
-          end
-
-          if course_ids
-            query_conditions << if course_ids.is_a?(Array)
-                                  "e.course_id IN (:course_id)"
-                                else
-                                  "e.course_id = :course_id"
-                                end
-          end
-
-          if query_conditions.empty?
-            raise ArgumentError, "UngradedDiscussionsVisibleToStudents must have a limiting where clause of at least one course_id, user_id, or discussion_topic_id (for performance reasons)"
-          end
-
+          query_conditions << "o.id IN (:discussion_topic_id)" if discussion_topic_ids
+          query_conditions << "e.user_id IN (:user_id)" if user_ids
+          query_conditions << "e.course_id IN (:course_id)" if course_ids
           query_conditions.join(" AND ")
         end
 
