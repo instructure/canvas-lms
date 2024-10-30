@@ -854,6 +854,9 @@ class SisBatch < ActiveRecord::Base
     count
   end
 
+  # Stub in case any extensions need to do post processing
+  def capture_ids_for_post_processing(type, ids) end
+
   def restore_workflow_states(scope, type, restore_progress, count, total)
     GuardRail.activate(:secondary) do
       scope.active.order(:context_id).find_in_batches(batch_size: 5_000) do |data|
@@ -862,6 +865,7 @@ class SisBatch < ActiveRecord::Base
             if retry_count == 0
               # restore the items and return the ids of the items that changed
               ids = type.constantize.connection.select_values(restore_sql(type, data.map(&:to_restore_array)))
+              capture_ids_for_post_processing(type, ids)
               finalize_enrollments(ids) if type == "Enrollment"
               count += update_restore_progress(restore_progress, data, count, total)
             else
@@ -878,6 +882,8 @@ class SisBatch < ActiveRecord::Base
                   end
                 end
               end
+
+              capture_ids_for_post_processing(type, successful_ids)
               finalize_enrollments(successful_ids) if type == "Enrollment"
               count += update_restore_progress(restore_progress, data - failed_data, count, total)
               roll_back_data.active.where(id: failed_data).update_all(workflow_state: "failed", updated_at: Time.zone.now)
