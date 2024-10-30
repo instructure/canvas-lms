@@ -25,7 +25,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import DefaultGradeInput from './DefaultGradeInput'
+import DefaultGradeInput from '@canvas/grading/react/DefaultGradeInput'
 import {
   ApiCallStatus,
   type AssignmentConnection,
