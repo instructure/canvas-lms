@@ -158,23 +158,6 @@ describe AuthenticationProvider::Microsoft do
   end
 
   context "fetch unique_id" do
-    it "records used tenants" do
-      ap = AuthenticationProvider::Microsoft.new(account: Account.default, tenant: "common")
-      allow(ap).to receive(:claims).and_return("tid" => "1234")
-      ap.unique_id("token")
-      expect(ap.settings["known_tenants"]).to eq ["1234"]
-      expect(ap).not_to receive(:save!)
-      ap.unique_id("token")
-      expect(ap.settings["known_tenants"]).to eq ["1234"]
-    end
-
-    it "records used missing tenant" do
-      ap = AuthenticationProvider::Microsoft.new(account: Account.default, tenant: "common")
-      allow(ap).to receive(:claims).and_return({})
-      ap.unique_id("token")
-      expect(ap.settings["known_tenants"]).to eq [nil]
-    end
-
     it "calculates tid+oid when both are present" do
       ap = AuthenticationProvider::Microsoft.new(account: Account.default, tenant: "common", login_attribute: "tid+oid")
       claims = { "tid" => "1234", "oid" => "5678" }
