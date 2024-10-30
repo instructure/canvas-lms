@@ -28369,6 +28369,16 @@ nn:
         all_users: "Alle brukarar"
         choose_term: "Vel semester"
         search_results: "Søkeresultat for \"%{search_term}\""
+    last_login: 
+      labels: 
+        current_ip: "Gjeldande påloggings-IP"
+        current_login: "Gjeldande pålogging"
+        last_ip: "Siste påloggings-IP"
+        last_login: "Siste pålogging"
+        last_request: "Siste førespurnad"
+      more: meir...
+      never: aldri
+      none: ingen
     linkedin_added: "LinkedIn-kontoen er lagd til."
     linkedin_fail: "LinkedIn-godkjenninga mislukkast. Prøv på nytt seinare"
     logins: 
