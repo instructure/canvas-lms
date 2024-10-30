@@ -1685,7 +1685,7 @@ class ContextExternalTool < ActiveRecord::Base
       allowed_domains.include?(domain) ||
       allowed_domains.any? do |allowed_domain|
         # wildcard domains: allowed_domain "*.foo.com" -> domain.end_with? ".foo.com"
-        allowed_domain.start_with?("*.") && domain.end_with?(allowed_domain[1..])
+        allowed_domain.start_with?("*.") && domain&.end_with?(allowed_domain[1..])
       end
   end
 
