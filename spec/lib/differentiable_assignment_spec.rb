@@ -204,7 +204,7 @@ end
 
 describe Quizzes::Quiz do
   let(:differentiable_service) { QuizVisibility::QuizVisibilityService }
-  let(:service_method) { :quiz_visible_to_students }
+  let(:service_method) { :quizzes_visible_to_students }
   let(:differentiable) { quiz_model(due_at: 5.days.ago, only_visible_to_overrides: true) }
 
   include_examples "a non-module differentiable object"

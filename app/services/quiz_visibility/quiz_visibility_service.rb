@@ -22,73 +22,24 @@ module QuizVisibility
     extend VisibilityHelpers::Common
     class << self
       def visible_quiz_ids_in_course_by_user(user_ids:, course_ids:, use_global_id: false)
-        raise ArgumentError, "course_ids cannot be nil" if course_ids.nil?
-        raise ArgumentError, "course_ids must be an array" unless course_ids.is_a?(Array)
-        raise ArgumentError, "user_ids cannot be nil" if user_ids.nil?
-        raise ArgumentError, "user_ids must be an array" unless user_ids.is_a?(Array)
+        vis_hash = quizzes_visible_to_students(user_ids:, course_ids:)
+                   .group_by(&:user_id)
+                   .transform_values { |a| a.map(&:quiz_id) }
 
-        vis_hash = {}
-        quizzes_visible_to_students(user_ids:, course_ids:).each do |quiz_visible_to_student|
-          user_id = quiz_visible_to_student.user_id
-          user_id = Shard.global_id_for(user_id) if use_global_id
-          vis_hash[user_id] ||= []
-          vis_hash[user_id] << quiz_visible_to_student.quiz_id
-        end
+        vis_hash.transform_keys! { |k| Shard.global_id_for(k) } if use_global_id
+
         # if users have no visibilities add their keys to the hash with an empty array
         vis_hash.reverse_merge!(user_ids.index_with { [] })
       end
 
-      def quizzes_visible_to_student(course_id:, user_id:)
-        raise ArgumentError, "course_id cannot be nil" if course_id.nil?
-        raise ArgumentError, "course_id must not be an array" if course_id.is_a?(Array)
-        raise ArgumentError, "user_id cannot be nil" if user_id.nil?
-        raise ArgumentError, "user_id must not be an array" if user_id.is_a?(Array)
-
-        quizzes_visible_to_students(course_ids: course_id, user_ids: user_id)
-      end
-
-      def quizzes_visible_to_students_in_courses(course_ids:, user_ids:)
-        raise ArgumentError, "course_ids cannot be nil" if course_ids.nil?
-        raise ArgumentError, "course_ids must be an array" unless course_ids.is_a?(Array)
-        raise ArgumentError, "user_ids cannot be nil" if user_ids.nil?
-        raise ArgumentError, "user_ids must be an array" unless user_ids.is_a?(Array)
-
-        quizzes_visible_to_students(course_ids:, user_ids:)
-      end
-
-      def quiz_visible_to_student(quiz_id:, user_id:)
-        raise ArgumentError, "quiz_id cannot be nil" if quiz_id.nil?
-        raise ArgumentError, "quiz_id must not be an array" if quiz_id.is_a?(Array)
-        raise ArgumentError, "user_id cannot be nil" if user_id.nil?
-        raise ArgumentError, "user_id must not be an array" if user_id.is_a?(Array)
-
-        quizzes_visible_to_students(quiz_ids: quiz_id, user_ids: user_id)
-      end
-
-      def quiz_visible_to_students(quiz_id:, user_ids:)
-        raise ArgumentError, "quiz_id cannot be nil" if quiz_id.nil?
-        raise ArgumentError, "quiz_id must not be an array" if quiz_id.is_a?(Array)
-        raise ArgumentError, "user_ids cannot be nil" if user_ids.nil?
-        raise ArgumentError, "user_ids must be an array" unless user_ids.is_a?(Array)
-
-        quizzes_visible_to_students(quiz_ids: quiz_id, user_ids:)
-      end
-
-      def quiz_visible_in_course(quiz_id:, course_id:)
-        raise ArgumentError, "course_id cannot be nil" if course_id.nil?
-        raise ArgumentError, "course_id must not be an array" if course_id.is_a?(Array)
-        raise ArgumentError, "quiz_id cannot be nil" if quiz_id.nil?
-        raise ArgumentError, "quiz_id must not be an array" if quiz_id.is_a?(Array)
-
-        quizzes_visible_to_students(course_ids: course_id, quiz_ids: quiz_id)
-      end
-
-      private
-
       def quizzes_visible_to_students(course_ids: nil, user_ids: nil, quiz_ids: nil)
-        if course_ids.nil? && user_ids.nil? && quiz_ids.nil?
-          raise ArgumentError, "at least one non nil course_id, user_id, or quiz_ids is required (for query performance reasons)"
+        unless course_ids || user_ids || quiz_ids
+          raise ArgumentError, "at least one non nil course_id, user_id, or quiz_id is required (for query performance reasons)"
         end
+
+        course_ids = Array(course_ids) if course_ids
+        user_ids = Array(user_ids) if user_ids
+        quiz_ids = Array(quiz_ids) if quiz_ids
 
         service_cache_fetch(service: name, course_ids:, user_ids:, additional_ids: quiz_ids) do
           QuizVisibility::Repositories::QuizVisibleToStudentRepository.visibility_query(

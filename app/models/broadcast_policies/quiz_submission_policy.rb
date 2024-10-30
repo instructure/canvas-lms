@@ -75,7 +75,7 @@ module BroadcastPolicies
       return false if quiz_submission.user_id.nil?
 
       if Account.site_admin.feature_enabled?(:selective_release_backend)
-        QuizVisibility::QuizVisibilityService.quiz_visible_to_student(quiz_id: quiz.id, user_id: quiz_submission.user_id).any?
+        QuizVisibility::QuizVisibilityService.quizzes_visible_to_students(quiz_ids: quiz.id, user_ids: quiz_submission.user_id).any?
       else
         Quizzes::QuizStudentVisibility.where(quiz_id: quiz.id, user_id: quiz_submission.user_id).any?
       end

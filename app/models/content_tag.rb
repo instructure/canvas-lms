@@ -649,7 +649,7 @@ class ContentTag < ActiveRecord::Base
 
   scope :for_differentiable_quizzes, lambda { |user_ids, course_ids|
     if Account.site_admin.feature_enabled?(:selective_release_backend)
-      visible_quiz_ids = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students_in_courses(user_ids:, course_ids:).map(&:quiz_id)
+      visible_quiz_ids = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students(user_ids:, course_ids:).map(&:quiz_id)
       where(content_id: visible_quiz_ids, context_id: course_ids, context_type: "Course", content_type: ["Quiz", "Quizzes::Quiz"])
     else
       joins("JOIN #{Quizzes::QuizStudentVisibility.quoted_table_name} as qsv ON qsv.quiz_id = content_tags.content_id")

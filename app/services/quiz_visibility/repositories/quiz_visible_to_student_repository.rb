@@ -141,9 +141,9 @@ module QuizVisibility
 
         def query_params(course_ids:, user_ids:, quiz_ids:)
           query_params = {}
-          query_params[:course_id] = course_ids unless course_ids.nil?
-          query_params[:user_id] = user_ids unless user_ids.nil?
-          query_params[:quiz_id] = quiz_ids unless quiz_ids.nil?
+          query_params[:course_id] = course_ids if course_ids
+          query_params[:user_id] = user_ids if user_ids
+          query_params[:quiz_id] = quiz_ids if quiz_ids
           query_params
         end
 
@@ -151,35 +151,9 @@ module QuizVisibility
         # Note that at least one of the params must be non nil
         def filter_condition_sql(course_ids: nil, user_ids: nil, quiz_ids: nil)
           query_conditions = []
-
-          if quiz_ids
-            query_conditions << if quiz_ids.is_a?(Array)
-                                  "o.id IN (:quiz_id)"
-                                else
-                                  "o.id = :quiz_id"
-                                end
-          end
-
-          if user_ids
-            query_conditions << if user_ids.is_a?(Array)
-                                  "e.user_id IN (:user_id)"
-                                else
-                                  "e.user_id = :user_id"
-                                end
-          end
-
-          if course_ids
-            query_conditions << if course_ids.is_a?(Array)
-                                  "e.course_id IN (:course_id)"
-                                else
-                                  "e.course_id = :course_id"
-                                end
-          end
-
-          if query_conditions.empty?
-            raise ArgumentError, "QuizzesVisibleToStudents must have a limiting where clause of at least one course_id, user_id, or quiz_id (for performance reasons)"
-          end
-
+          query_conditions << "o.id IN (:quiz_id)" if quiz_ids
+          query_conditions << "e.user_id IN (:user_id)" if user_ids
+          query_conditions << "e.course_id IN (:course_id)" if course_ids
           query_conditions.join(" AND ")
         end
 
