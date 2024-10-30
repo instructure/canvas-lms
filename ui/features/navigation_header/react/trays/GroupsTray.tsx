@@ -23,6 +23,7 @@ import {List} from '@instructure/ui-list'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Link} from '@instructure/ui-link'
+import {Text} from '@instructure/ui-text'
 import {useQuery} from '@canvas/query'
 import groupsQuery from '../queries/groupsQuery'
 import type {AccessibleGroup} from '../../../../api.d'
@@ -67,6 +68,11 @@ export default function GroupsTray() {
               <Link isWithinText={false} href={`/groups/${group.id}`}>
                 {group.name}
               </Link>
+              {group.context_type === 'Course' && (
+                <Text as="div" size="x-small" weight="light">
+                  {group.context_name}
+                </Text>
+              )}
             </List.Item>
           ))}
       </List>
