@@ -19865,6 +19865,16 @@ tr:
         all_users: "Tüm kullanıcılar"
         choose_term: "Dönem Seçiniz"
         search_results: "\"%{search_term}\" için arama sonuçları"
+    last_login: 
+      labels: 
+        current_ip: "Geçerli oturum IP numarası"
+        current_login: "Geçerli oturum"
+        last_ip: "Son oturum IP numarası"
+        last_login: "Son oturum"
+        last_request: "Son istek"
+      more: "daha fazla..."
+      never: asla
+      none: yok
     linkedin_added: "LinkedIn hesabı başarıyla eklendi!"
     linkedin_fail: "LinkedIn kimlik doğrulaması başarısız. Lütfen tekrar deneyin"
     logins: 
