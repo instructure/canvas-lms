@@ -69,4 +69,11 @@ describe('ColumnsSection', () => {
   it('has "Columns" as the displayName', () => {
     expect(ColumnsSection.craft.displayName).toBe('Columns')
   })
+
+  it('should render with a background color', () => {
+    const {container} = renderSection({background: '#AABBCC'})
+    expect(container.querySelector('.section.columns-section.columns-2')).toHaveStyle({
+      backgroundColor: '#AABBCC',
+    })
+  })
 })

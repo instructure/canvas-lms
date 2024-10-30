@@ -36,6 +36,12 @@ export const GroupBlock = (props: GroupBlockProps) => {
     verticalAlignment = GroupBlock.craft.defaultProps.verticalAlignment,
     layout = GroupBlock.craft.defaultProps.layout,
     resizable = GroupBlock.craft.defaultProps.resizable,
+    background,
+    borderColor,
+    roundedCorners = GroupBlock.craft.defaultProps.roundedCorners,
+    isColumn,
+    width,
+    height,
   } = props
   const {enabled} = useEditor(state => ({
     enabled: state.options.enabled,
@@ -46,6 +52,7 @@ export const GroupBlock = (props: GroupBlockProps) => {
     `${layout}-layout`,
     `${alignment}-align`,
     `${verticalAlignment}-valign`,
+    `${roundedCorners ? 'rounded-corners' : ''}`,
   ])
   const {actions, node} = useNode((n: Node) => {
     return {
@@ -54,12 +61,12 @@ export const GroupBlock = (props: GroupBlockProps) => {
   })
 
   useEffect(() => {
-    if (props.isColumn) {
+    if (isColumn) {
       actions.setCustom((custom: any) => {
         custom.displayName = I18n.t('Column')
       })
     }
-  }, [actions, props.isColumn])
+  }, [actions, isColumn])
 
   useEffect(() => {
     if (resizable !== node.data.custom.isResizable) {
@@ -71,21 +78,24 @@ export const GroupBlock = (props: GroupBlockProps) => {
   }, [actions, node.data.custom.isResizable, resizable])
 
   const styl: React.CSSProperties = {}
-  if (node.data.props.width) {
-    styl.width = `${node.data.props.width}px`
+  if (width) {
+    styl.width = `${width}px`
   }
-  if (node.data.props.height) {
-    styl.height = `${node.data.props.height}px`
+  if (height) {
+    styl.height = `${height}px`
   }
-  if (node.data.props.color) {
-    styl.color = node.data.props.color
+  if (background) {
+    styl.backgroundColor = background
   }
-  if (node.data.props.background) {
-    styl.backgroundColor = node.data.props.background
+  if (roundedCorners) {
+    styl.borderRadius = '8px'
+  }
+  if (borderColor) {
+    styl.borderColor = borderColor
   }
 
   return (
-    <Container className={clazz} id={`group-${node.id}`} style={styl}>
+    <Container className={clazz} style={styl}>
       <Element id="group__inner" is={NoSections} canvas={true} className="group-block__inner" />
     </Container>
   )
@@ -97,6 +107,7 @@ GroupBlock.craft = {
     layout: defaultAlignment.layout,
     alignment: defaultAlignment.alignment,
     verticalAlignment: defaultAlignment.verticalAlignment,
+    roundedCorners: false,
     resizable: true,
   },
   rules: {
@@ -124,7 +135,7 @@ GroupBlock.craft = {
             parent?.data.name !== 'ColumnsSectionInner' || !isNthChild(nodeId, query, columnCount)
           )
         } else {
-          return !isNthChild(nodeId, query, 1)
+          return true
         }
       }
       return false

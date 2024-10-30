@@ -21,7 +21,7 @@ import {Element, useEditor, useNode, type Node} from '@craftjs/core'
 
 import {Container} from '../../blocks/Container'
 import {ColumnsSectionToolbar} from './ColumnsSectionToolbar'
-import {useClassNames} from '../../../../utils'
+import {useClassNames, getContrastingColor} from '../../../../utils'
 import {GroupBlock} from '../../blocks/GroupBlock'
 import {type ColumnsSectionProps} from './types'
 
@@ -63,7 +63,7 @@ ColumnsSectionInner.craft = {
   },
 }
 
-export const ColumnsSection = ({columns}: ColumnsSectionProps) => {
+export const ColumnsSection = ({background, columns}: ColumnsSectionProps) => {
   const {enabled} = useEditor(state => ({
     enabled: state.options.enabled,
   }))
@@ -103,8 +103,14 @@ export const ColumnsSection = ({columns}: ColumnsSectionProps) => {
     return cols
   }
 
+  const styl: React.CSSProperties = {}
+  if (background) {
+    styl.backgroundColor = background
+    styl.color = getContrastingColor(background)
+  }
+
   return (
-    <Container className={clazz}>
+    <Container className={clazz} style={styl}>
       <Element id="columns__inner" is={ColumnsSectionInner} canvas={true}>
         {renderColumns()}
       </Element>

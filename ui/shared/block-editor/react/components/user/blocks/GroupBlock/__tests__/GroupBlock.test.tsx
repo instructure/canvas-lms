@@ -118,6 +118,18 @@ describe('GroupBlock', () => {
     expect(container.querySelector('.group-block')).toHaveClass('center-valign')
   })
 
+  it('should render with a background color', () => {
+    const {container} = renderBlock({background: '#FF00FF'})
+    expect(container.querySelector('.group-block')).toBeInTheDocument()
+    expect(container.querySelector('.group-block')).toHaveStyle({backgroundColor: '#FF00FF'})
+  })
+
+  it('should render with a border color', () => {
+    const {container} = renderBlock({borderColor: '#FF00FF'})
+    expect(container.querySelector('.group-block')).toBeInTheDocument()
+    expect(container.querySelector('.group-block')).toHaveStyle({borderColor: '#FF00FF'})
+  })
+
   it('should have "Group" as its displayName"', () => {
     expect(GroupBlock.craft.displayName).toEqual('Group')
   })

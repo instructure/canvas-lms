@@ -18,6 +18,7 @@
 
 import {contrast} from '@instructure/ui-color-utils'
 import {white, black} from './constants'
+import tinycolor from 'tinycolor2'
 
 const getContrastingColor = (color1: string) => {
   const color2 = contrast(color1, white) > contrast(color1, black) ? white : black
@@ -29,4 +30,9 @@ const getContrastingButtonColor = (color1: string) => {
   return buttonColor
 }
 
-export {getContrastingColor, getContrastingButtonColor, white, black}
+const isTransparent = (color: string) => {
+  const c = tinycolor(color)
+  return c.isValid() && c.getAlpha() === 0
+}
+
+export {getContrastingColor, getContrastingButtonColor, isTransparent, white, black}
