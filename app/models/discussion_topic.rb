@@ -774,7 +774,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   scope :joins_ungraded_discussion_student_visibilities, lambda { |user_ids, course_ids|
-    visible_discussion_topics = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible_to_students_in_courses(user_ids:, course_ids:).map(&:discussion_topic_id)
+    visible_discussion_topics = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible(user_ids:, course_ids:).map(&:discussion_topic_id)
     if visible_discussion_topics.any?
       where(id: visible_discussion_topics)
         .where(assignment_id: nil)
@@ -890,7 +890,7 @@ class DiscussionTopic < ActiveRecord::Base
     end
 
     user_ids = Array(users) | observed_student_ids
-    visible_differentiated_topic_ids = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible_to_students(user_ids:).map(&:discussion_topic_id)
+    visible_differentiated_topic_ids = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible(user_ids:).map(&:discussion_topic_id)
     merge(DiscussionTopic.where.not(context_type: "Course")
     .or(DiscussionTopic.where(id: visible_topic_ids))
     .or(DiscussionTopic.where(id: visible_differentiated_topic_ids, is_section_specific: false))
@@ -2119,7 +2119,7 @@ class DiscussionTopic < ActiveRecord::Base
     ids_visible_to_sections = topic_ids_per_user
 
     if Account.site_admin.feature_enabled?(:selective_release_backend)
-      visible_topic_user_id_pairs = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible_to_students_in_courses(user_ids: opts[:user_id], course_ids: opts[:course_id]).map { |visibility| [visibility.discussion_topic_id, visibility.user_id] }
+      visible_topic_user_id_pairs = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible(user_ids: opts[:user_id], course_ids: opts[:course_id]).map { |visibility| [visibility.discussion_topic_id, visibility.user_id] }
       eligible_topic_ids = DiscussionTopic.where(id: visible_topic_user_id_pairs.map(&:first)).where(assignment_id: nil).where.not(is_section_specific: true).pluck(:id)
       eligible_visible_topic_user_id_pairs = visible_topic_user_id_pairs.select { |discussion_topic_id, _user_id| eligible_topic_ids.include?(discussion_topic_id) }
       ungraded_differentiated_topic_ids_per_user = eligible_visible_topic_user_id_pairs.group_by(&:last).transform_values { |pairs| pairs.map(&:first) }
