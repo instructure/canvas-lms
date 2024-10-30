@@ -20175,6 +20175,16 @@ he:
         all_users: "כל המשתמשים "
         choose_term: "בחירת מחצית"
         search_results: "תוצאות חיפוש עבור \"%{search_term}\""
+    last_login: 
+      labels: 
+        current_ip: "כתובת ה IP של הלוג-אין הנוכחי"
+        current_login: "לוג-אין נוכחי"
+        last_ip: "כתובת ה IP של הלוג-אין האחרון"
+        last_login: "לוג-אין אחרון"
+        last_request: "בקשה אחרונה"
+      more: יותר...
+      never: "אף פעם "
+      none: "אף אחד"
     linkedin_added: "חשבון לינקדאין נתווסף בהצלחה!"
     linkedin_fail: "הרשאת לינקדאין נכשלה. יש לנסות שוב."
     logins: 
