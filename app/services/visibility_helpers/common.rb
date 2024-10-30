@@ -35,7 +35,7 @@ module VisibilityHelpers
       c = sanitize_and_stringify_ids(course_ids)
       u = sanitize_and_stringify_ids(user_ids)
       a = sanitize_and_stringify_ids(additional_ids)
-      Digest::SHA256.hexdigest("#{service}:c#{c}:u#{u}:a#{a}")
+      Digest::SHA256.hexdigest("#{service}:#{Shard.current.id}:c#{c}:u#{u}:a#{a}")
     end
   end
 end
