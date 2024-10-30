@@ -16,6 +16,17 @@
               {{#if no_preferred_editor }} {{#t 'buttons.new_page'}}Page{{/t}} {{/if}}
               {{#if rce_is_preferred }} {{#t 'buttons.new_rce_page'}}RCE Page{{/t}} {{/if}}
             </a>
+              {{#if hasWikiIndexPlacements}}
+                <div class="inline-block">
+                  <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
+                    <i class="icon-more" aria-hidden="true"></i>
+                    <span class="screenreader-only">{{#t}}Pages Settings{{/t}}</span>
+                  </a>
+                  <ul id="toolbar-1" class="al-options" role="menu" aria-hidden="true" aria-expanded="false">
+                    {{>ui/shared/external-tools/jst/_external_tools_menu.handlebars wikiIndexPlacements}}
+                  </ul>
+                </div>
+              {{/if}}
           {{/if}}
         </div>
 
@@ -33,19 +44,6 @@
             </a>
             {{/if}}
           </div>
-        {{/if}}
-
-        {{#if hasWikiIndexPlacements}}
-          <div class="inline-block">
-          <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
-            <i class="icon-more" aria-hidden="true"></i>
-            <span class="screenreader-only">{{#t}}Pages Settings{{/t}}</span>
-          </a>
-
-          <ul id="toolbar-1" class="al-options" role="menu" aria-hidden="true" aria-expanded="false">
-            {{>ui/shared/external-tools/jst/_external_tools_menu.handlebars wikiIndexPlacements}}
-          </ul>
-        </div>
         {{/if}}
       </div>
     </div>
