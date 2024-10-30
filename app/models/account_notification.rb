@@ -68,9 +68,7 @@ class AccountNotification < ActiveRecord::Base
                            context: self,
                            alert_type: "institution_announcement",
                            action_date: start_at,
-                           title: I18n.t('Institution announcement: "%{announcement_title}"', {
-                                           announcement_title: subject
-                                         }))
+                           title: subject)
     end
   end
 
