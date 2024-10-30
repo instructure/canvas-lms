@@ -14199,6 +14199,16 @@ ko:
         all_users: "모든 사용자"
         choose_term: "학기 선택"
         search_results: "\"%{search_term}\"에 대한 검색 결과"
+    last_login: 
+      labels: 
+        current_ip: "현재 로그인 IP"
+        current_login: "현재 로그인"
+        last_ip: "마지막 로그인 IP"
+        last_login: "마지막 로그인"
+        last_request: "마지막 요청"
+      more: 기타...
+      never: "한 적 없음"
+      none: 없음
     linkedin_added: "LinkedIn 계정을 성공적으로 추가함!"
     linkedin_fail: "LinkedIn 승인에 실패했습니다. 다시 시도하시기 바랍니다."
     logins: 
