@@ -18,10 +18,12 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import ForbiddenWordsFileUpload from '../ForbiddenWordsFileUpload'
+import ForbiddenWordsFileUpload, {createFolder} from '../ForbiddenWordsFileUpload'
 import userEvent from '@testing-library/user-event'
+import fetchMock from 'fetch-mock'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
-jest.mock('@canvas/do-fetch-api-effect/apiRequest')
+jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('../apiClient')
 
 describe('ForbiddenWordsFileUpload Component', () => {
@@ -62,6 +64,43 @@ describe('ForbiddenWordsFileUpload Component', () => {
       expect(defaultProps.setForbiddenWordsFilename).not.toHaveBeenCalled()
       expect(defaultProps.setForbiddenWordsUrl).not.toHaveBeenCalled()
       expect(defaultProps.onDismiss).toHaveBeenCalled()
+    })
+  })
+
+  describe('createFolder', () => {
+    it('should create a folder and return its ID on a successful API call', async () => {
+      const mockResponse = {
+        response: {status: 200},
+        text: JSON.stringify({id: 123}),
+      }
+      doFetchApi.mockResolvedValue(mockResponse)
+      const result = await createFolder()
+      expect(result).toBe(123)
+      expect(doFetchApi).toHaveBeenCalledWith({
+        method: 'POST',
+        path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/folders`,
+        body: expect.any(FormData),
+      })
+    })
+
+    it('should return null if the API call fails', async () => {
+      const mockErrorResponse = {
+        response: {status: 500},
+        text: 'Internal Server Error',
+      }
+      doFetchApi.mockResolvedValue(mockErrorResponse)
+      const result = await createFolder()
+      expect(result).toBeNull()
+      expect(doFetchApi).toHaveBeenCalled()
+    })
+
+    it('should return null if an error is thrown during execution', async () => {
+      doFetchApi.mockImplementation(() => {
+        throw new Error('Network Error')
+      })
+      const result = await createFolder()
+      expect(result).toBeNull()
+      expect(doFetchApi).toHaveBeenCalled()
     })
   })
 })
