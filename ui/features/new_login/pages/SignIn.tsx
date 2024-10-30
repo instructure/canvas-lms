@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import OtpForm from '../shared/OtpForm'
 import React, {useCallback, useEffect, useState} from 'react'
-import {Button} from '@instructure/ui-buttons'
-import {TextInput} from '@instructure/ui-text-input'
-import {Heading} from '@instructure/ui-heading'
-import {View} from '@instructure/ui-view'
-import {Flex} from '@instructure/ui-flex'
-import {Checkbox} from '@instructure/ui-checkbox'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {useNewLogin} from '../context/NewLoginContext'
 import SSOButtons from '../shared/SSOButtons'
 import SignInLinks from '../shared/SignInLinks'
-import OtpForm from '../shared/OtpForm'
+import {Button} from '@instructure/ui-buttons'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
+import {TextInput} from '@instructure/ui-text-input'
+import {View} from '@instructure/ui-view'
 import {performSignIn} from '../services'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {useNewLogin} from '../context/NewLoginContext'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('new_login')
 
@@ -43,6 +43,7 @@ const SignIn = () => {
     setOtpRequired,
     loginHandleName,
     authProviders,
+    isPreviewMode,
   } = useNewLogin()
 
   const [username, setUsername] = useState('')
@@ -59,6 +60,8 @@ const SignIn = () => {
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
+    if (isPreviewMode) return
 
     if (!validateForm()) {
       showFlashAlert({
@@ -94,14 +97,16 @@ const SignIn = () => {
   }
 
   const handleUsernameChange = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
+    if (isPreviewMode) return
     setUsername(value)
   }
 
   const handlePasswordChange = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
+    if (isPreviewMode) return
     setPassword(value)
   }
 
-  if (otpRequired) {
+  if (otpRequired && !isPreviewMode) {
     return <OtpForm />
   }
 
@@ -140,6 +145,7 @@ const SignIn = () => {
                     value={username}
                     onChange={handleUsernameChange}
                     autoComplete="username"
+                    disabled={isUiActionPending}
                   />
                 </Flex.Item>
 
@@ -151,6 +157,7 @@ const SignIn = () => {
                     value={password}
                     onChange={handlePasswordChange}
                     autoComplete="current-password"
+                    disabled={isUiActionPending}
                   />
                 </Flex.Item>
 
@@ -160,6 +167,7 @@ const SignIn = () => {
                     checked={rememberMe}
                     onChange={() => setRememberMe(!rememberMe)}
                     inline={true}
+                    disabled={isUiActionPending}
                   />
                 </Flex.Item>
               </Flex>

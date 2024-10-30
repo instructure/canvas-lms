@@ -18,14 +18,14 @@
 
 import React, {useState} from 'react'
 import {Button} from '@instructure/ui-buttons'
-import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {useNewLogin} from '../context/NewLoginContext'
 import {SignInLinks} from '../shared'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {TextInput} from '@instructure/ui-text-input'
 import {forgotPassword} from '../services'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {useNewLogin} from '../context/NewLoginContext'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('new_login')
 

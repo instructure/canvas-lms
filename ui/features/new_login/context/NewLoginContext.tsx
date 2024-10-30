@@ -38,6 +38,7 @@ interface NewLoginContextType {
   loginLogoAlt?: string
   bodyBgColor?: string
   bodyBgImage?: string
+  isPreviewMode?: boolean
 }
 
 const NewLoginContext = createContext<NewLoginContextType | undefined>(undefined)
@@ -54,8 +55,15 @@ export const NewLoginProvider = ({children}: NewLoginProviderProps) => {
   const [otpCommunicationChannelId, setOtpCommunicationChannelId] = useState<string | null>(null)
 
   // get data attribute values from hook
-  const {loginHandleName, authProviders, loginLogoUrl, loginLogoAlt, bodyBgColor, bodyBgImage} =
-    useNewLoginData()
+  const {
+    loginHandleName,
+    authProviders,
+    loginLogoUrl,
+    loginLogoAlt,
+    bodyBgColor,
+    bodyBgImage,
+    isPreviewMode,
+  } = useNewLoginData()
 
   return (
     <NewLoginContext.Provider
@@ -77,6 +85,7 @@ export const NewLoginProvider = ({children}: NewLoginProviderProps) => {
         loginLogoAlt,
         bodyBgColor,
         bodyBgImage,
+        isPreviewMode,
       }}
     >
       {children}

@@ -26,12 +26,18 @@ interface NewLoginData {
   loginLogoAlt?: string
   bodyBgColor?: string
   bodyBgImage?: string
+  isPreviewMode?: boolean
 }
 
 const getLoginDataContainer = (): HTMLElement | null => document.getElementById('new_login_data')
 
 const getStringAttribute = (container: HTMLElement, attribute: string): string | undefined =>
   container.getAttribute(attribute)?.trim() || undefined
+
+const getBooleanAttribute = (container: HTMLElement, attribute: string): boolean | undefined => {
+  const value = container.getAttribute(attribute)?.trim().toLowerCase()
+  return value === 'true' ? true : value === 'false' ? false : undefined
+}
 
 const getObjectAttribute = <T>(container: HTMLElement, attribute: string): T | undefined => {
   const value = getStringAttribute(container, attribute)
@@ -54,6 +60,7 @@ export const useNewLoginData = (): NewLoginData => {
     loginLogoAlt: undefined,
     bodyBgColor: undefined,
     bodyBgImage: undefined,
+    isPreviewMode: undefined,
   })
 
   useEffect(() => {
@@ -66,6 +73,7 @@ export const useNewLoginData = (): NewLoginData => {
         loginLogoAlt: getStringAttribute(container, 'data-login-logo-alt'),
         bodyBgColor: getStringAttribute(container, 'data-body-bg-color'),
         bodyBgImage: getStringAttribute(container, 'data-body-bg-image'),
+        isPreviewMode: getBooleanAttribute(container, 'data-is-preview-mode'),
       })
     }
   }, [])

@@ -18,11 +18,12 @@
 
 import React from 'react'
 import classNames from 'classnames'
+import type {ViewOwnProps} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import {useNavigate, useMatch} from 'react-router-dom'
+import {useNewLogin} from '../context/NewLoginContext'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import type {ViewOwnProps} from '@instructure/ui-view'
 
 const I18n = useI18nScope('new_login')
 
@@ -35,9 +36,14 @@ const SignInLinks = ({className}: Props) => {
   const isSignIn = useMatch('/login/canvas')
   const isForgotPassword = useMatch('/login/canvas/forgot-password')
 
-  const handleNavigate = (path: string) => (event: React.MouseEvent<ViewOwnProps, MouseEvent>) => {
+  const {isPreviewMode, isUiActionPending} = useNewLogin()
+
+  const handleNavigate = (path: string) => (event: React.MouseEvent<ViewOwnProps>) => {
     event.preventDefault()
-    navigate(path)
+
+    if (!(isPreviewMode || isUiActionPending)) {
+      navigate(path)
+    }
   }
 
   return (

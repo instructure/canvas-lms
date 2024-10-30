@@ -20,12 +20,15 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import {SignInLinks} from '../index'
 import {MemoryRouter} from 'react-router-dom'
+import {NewLoginProvider} from '../../context/NewLoginContext'
 
 describe('SignInLinks', () => {
   it('mounts without crashing', () => {
     render(
       <MemoryRouter>
-        <SignInLinks />
+        <NewLoginProvider>
+          <SignInLinks />
+        </NewLoginProvider>
       </MemoryRouter>
     )
   })
