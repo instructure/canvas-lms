@@ -18,4 +18,5 @@
 
 export type ColumnsSectionProps = {
   columns: number
+  background?: string
 }
