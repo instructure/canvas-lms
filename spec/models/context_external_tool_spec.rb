@@ -4217,6 +4217,12 @@ describe ContextExternalTool do
               expect(tool.placement_allowed?(placement)).to be false
             end
           end
+
+          context "and the tool's domain is nil" do
+            before { tool.update!(domain: nil) }
+
+            it { is_expected.to be false }
+          end
         end
 
         context "when the tool has no domain and domain list is containing an empty space" do
