@@ -112,7 +112,7 @@ class WikiPage < ActiveRecord::Base
     if Account.site_admin.feature_enabled?(:selective_release_backend)
       scope_assignments = context_pages.where.not(assignment_id: nil).pluck(:assignment_id)
       visible_wiki_pages = WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_student_in_courses(user_id:, course_ids:).map(&:wiki_page_id)
-      visible_assignments = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_student_by_assignment(user_id:, assignment_ids: scope_assignments).map(&:assignment_id)
+      visible_assignments = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: user_id, assignment_ids: scope_assignments).map(&:assignment_id)
 
       context_pages.where("wiki_pages.assignment_id IS NULL AND (wiki_pages.id IN (?) OR wiki_pages.context_type = 'Group')", visible_wiki_pages)
                    .or(context_pages.where("wiki_pages.assignment_id IS NOT NULL AND wiki_pages.assignment_id IN (?)", visible_assignments))
@@ -670,7 +670,7 @@ class WikiPage < ActiveRecord::Base
 
   def self.visible_ids_by_user(opts)
     assignment_page_visibilities = if Account.site_admin.feature_enabled?(:selective_release_backend)
-                                     visible_assignments = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students_in_courses(user_ids: opts[:user_id], course_ids: opts[:course_id])
+                                     visible_assignments = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: opts[:user_id], course_ids: opts[:course_id])
                                      # map the visibilities to a hash of assignment_id => [user_ids]
                                      assignment_user_map = visible_assignments.each_with_object(Hash.new { |hash, key| hash[key] = [] }) do |visibility, hash|
                                        hash[visibility.assignment_id] << visibility.user_id

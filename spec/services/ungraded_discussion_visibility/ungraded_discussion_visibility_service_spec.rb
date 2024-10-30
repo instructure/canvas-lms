@@ -23,7 +23,7 @@ describe "UngradedDiscussionVisibility" do
   include StudentVisibilityCommon
 
   def assignment_ids_visible_to_user(user)
-    AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_student(course_id: @course.id, user_id: user.id).map(&:assignment_id)
+    AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(course_ids: @course.id, user_ids: user.id).map(&:assignment_id)
   end
 
   before :once do

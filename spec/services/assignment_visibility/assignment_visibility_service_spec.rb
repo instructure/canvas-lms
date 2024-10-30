@@ -146,12 +146,12 @@ describe AssignmentVisibility::AssignmentVisibilityService do
     end
 
     def ensure_user_does_not_see_assignment
-      visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_student(user_id: @user.id, course_id: @course.id).map(&:assignment_id)
+      visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, course_ids: @course.id).map(&:assignment_id)
       expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_falsey
     end
 
     def ensure_user_sees_assignment
-      visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_student(user_id: @user.id, course_id: @course.id).map(&:assignment_id)
+      visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, course_ids: @course.id).map(&:assignment_id)
       expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_truthy
     end
 
@@ -175,7 +175,7 @@ describe AssignmentVisibility::AssignmentVisibilityService do
             give_section_due_date(@assignment, @section_foo)
             enroller_user_in_section(@section_foo)
             ensure_user_sees_assignment
-            expect(AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_student(user_id: @user.id, course_id: @course.id).count).to eq 1
+            expect(AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, course_ids: @course.id).count).to eq 1
           end
 
           it "does not return a visibility for a student without an ADHOC override" do
@@ -253,7 +253,7 @@ describe AssignmentVisibility::AssignmentVisibilityService do
             it "does not return duplicate visibilities with multiple visible sections" do
               enroll_user_in_group(@group_bar, { user: @user })
               give_group_due_date(@assignment, @group_bar)
-              visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_student(user_id: @user.id, course_id: @course.id)
+              visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, course_ids: @course.id)
               expect(visible_assignment_ids.count).to eq 1
             end
           end
@@ -354,7 +354,7 @@ describe AssignmentVisibility::AssignmentVisibilityService do
             it "does not return duplicate visibilities with multiple visible sections" do
               enroller_user_in_section(@section_bar, { user: @user })
               give_section_due_date(@assignment, @section_bar)
-              visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_student(user_id: @user.id, course_id: @course.id)
+              visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, course_ids: @course.id)
               expect(visible_assignment_ids.count).to eq 1
             end
           end
@@ -465,7 +465,7 @@ describe AssignmentVisibility::AssignmentVisibilityService do
 
             quiz.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
 
-            expect(AssignmentVisibility::AssignmentVisibilityService.assignment_visible_in_course(assignment_id: quiz.assignment, course_id: @course.id).map(&:user_id)).to include @user.id
+            expect(AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(assignment_ids: quiz.assignment, course_ids: @course.id).map(&:user_id)).to include @user.id
           end
 
           it "applies overrides from unpublished modules" do

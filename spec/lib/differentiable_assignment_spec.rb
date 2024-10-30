@@ -195,7 +195,7 @@ end
 
 describe Assignment do
   let(:differentiable_service) { AssignmentVisibility::AssignmentVisibilityService }
-  let(:service_method) { :assignment_visible_to_students }
+  let(:service_method) { :assignments_visible_to_students }
   let(:differentiable) { assignment_model(due_at: 5.days.ago, only_visible_to_overrides: true) }
 
   include_examples "a non-module differentiable object"
