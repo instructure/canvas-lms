@@ -15463,6 +15463,13 @@ el:
         all_users: "Όλοι οι Χρήστες"
         choose_term: "Επιλογή Εξαμήνου"
         search_results: "Αποτελέσματα αναζήτησης για «%{search_term}»"
+    last_login: 
+      labels: 
+        current_ip: "IP τρέχουσας σύνδεσης"
+        current_login: "Τρέχουσα σύνδεση"
+        last_ip: "IP τελευταίας σύνδεσης"
+        last_request: "Τελευταίο αίτημα"
+      more: περισσότερα...
     linkedin_added: "Ο λογαριασμός LinkedIn προστέθηκε επιτυχώς!"
     linkedin_fail: "<mrk mid=\"3300\" mtype=\"seg\">Η εξουσιοδότηση του LinkedIn απέτυχε.</mrk> <mrk mid=\"3301\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά</mrk>"
     logins: 
