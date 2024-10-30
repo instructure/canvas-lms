@@ -18319,6 +18319,16 @@ uk:
         all_users: "Усі користувачі"
         choose_term: "Обрати семестр"
         search_results: "Результати пошуку для \"%{search_term}\""
+    last_login: 
+      labels: 
+        current_ip: "Поточний IP облікового запису"
+        current_login: "Поточний обліковий запис"
+        last_ip: "IP адреса останнього входу"
+        last_login: "Останній вхід"
+        last_request: "Останній запит"
+      more: більше...
+      never: ніколи
+      none: жодного
     linkedin_added: "Обліковий запис LinkedIn успішно додано!"
     linkedin_fail: "Помилка авторизації LinkedIn. Будь ласка спробуйте ще раз"
     logins: 
