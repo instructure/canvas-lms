@@ -40,6 +40,7 @@ type Props = {
   onGradeInputChange: (gradeInput: string) => void
   header?: string
   outOfTextValue?: string
+  name?: string
 }
 export default function DefaultGradeInput({
   disabled,
@@ -47,6 +48,7 @@ export default function DefaultGradeInput({
   onGradeInputChange,
   header,
   outOfTextValue,
+  name,
 }: Props) {
   const [textInput, setTextInput] = useState<string>('')
   const [selectInput, setSelectInput] = useState<string>('')
@@ -106,6 +108,7 @@ export default function DefaultGradeInput({
             value={textInput}
             disabled={disabled}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTextInput(e.target.value)}
+            name={name}
           />
         </View>
       ) : (
@@ -129,6 +132,7 @@ export default function DefaultGradeInput({
                 setSelectInput(value)
               }
             }}
+            name={name}
           >
             <SimpleSelectOption id="emptyOption" value="">
               ---

@@ -983,6 +983,15 @@ class GradebooksController < ApplicationController
           current_user: @current_user,
           course: @context
         ).map { |c| { submission_comment: c } }
+
+        if assignment.root_account.feature_enabled?(:discussion_checkpoints)
+          submission_json[:has_sub_assignment_submissions] = assignment.has_sub_assignments
+          submission_json[:sub_assignment_submissions] = (assignment.has_sub_assignments &&
+            assignment.sub_assignments&.map do |sub_assignment|
+              sub_assignment_submission = sub_assignment.submissions.active.find_by(user_id: submission.user_id)
+              sub_assignnment_submission_json(sub_assignment_submission, sub_assignment_submission.assignment, @current_user, @session, @context)
+            end) || []
+        end
       end
       json
     end
