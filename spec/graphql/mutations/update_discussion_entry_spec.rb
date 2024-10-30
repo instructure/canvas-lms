@@ -81,6 +81,15 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
     expect(@entry.reload.message).to eq "New message"
   end
 
+  it "sanitizes the entry message" do
+    message = "<script>alert('hi')</script><style>button { color: white !important; }</style><p>Howdy</p>"
+    result = run_mutation(discussion_entry_id: @entry.id, message:)
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "updateDiscussionEntry", "errors")).to be_nil
+    expect(result.dig("data", "updateDiscussionEntry", "discussionEntry", "message")).to eq("<p>Howdy</p>")
+    expect(@entry.reload.message).to eq "<p>Howdy</p>"
+  end
+
   it "deletes discussion_entry_drafts for an edit" do
     delete_me = DiscussionEntryDraft.upsert_draft(user: @student, topic: @topic, message: "Howdy Hey", entry: @entry)
     run_mutation(discussion_entry_id: @entry.id, message: "New message")
