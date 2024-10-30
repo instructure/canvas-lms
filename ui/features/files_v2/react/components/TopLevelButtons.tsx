@@ -17,10 +17,11 @@
  */
 
 import React from 'react'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
-import {Flex} from '@instructure/ui-flex'
 import {IconAddLine, IconUploadLine} from '@instructure/ui-icons'
 
+const I18n = useI18nScope('files_v2')
 interface TopLevelButtonsProps {
   isUserContext: boolean
   size: string
@@ -31,44 +32,38 @@ const TopLevelButtons = ({isUserContext, size}: TopLevelButtonsProps) => {
 
   const uploadButton = () => {
     return (
-      <Flex.Item padding="none">
-        <Button
-          color="primary"
-          margin="none none small none"
-          renderIcon={<IconUploadLine />}
-          display={buttonDisplay}
-        >
-          Upload
-        </Button>
-      </Flex.Item>
+      <Button
+        color="primary"
+        margin="none none small none"
+        renderIcon={<IconUploadLine />}
+        display={buttonDisplay}
+      >
+        {I18n.t('Upload')}
+      </Button>
     )
   }
 
   const addFolderButton = () => {
     return (
-      <Flex.Item padding="small none small none">
-        <Button
-          color="secondary"
-          margin="none x-small small none"
-          renderIcon={<IconAddLine />}
-          display={buttonDisplay}
-        >
-          Folder
-        </Button>
-      </Flex.Item>
+      <Button
+        color="secondary"
+        margin="none x-small small none"
+        renderIcon={<IconAddLine />}
+        display={buttonDisplay}
+      >
+        {I18n.t('Folder')}
+      </Button>
     )
   }
 
   const allMyFilesButton = () => {
     if (isUserContext) return null
     return (
-      <Flex.Item padding="small none small none">
-        <a href="/files">
-          <Button color="secondary" margin="none x-small small none" display={buttonDisplay}>
-            All My Files
-          </Button>
-        </a>
-      </Flex.Item>
+      <a href="/files">
+        <Button color="secondary" margin="none x-small small none" display={buttonDisplay}>
+          {I18n.t('All My Files')}
+        </Button>
+      </a>
     )
   }
 

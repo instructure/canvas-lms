@@ -28,8 +28,11 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import formatMessage from '../../../../../packages/canvas-media/src/format-message'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
 import {Flex} from '@instructure/ui-flex'
+import {canvas} from '@instructure/ui-theme-tokens'
 import {Responsive} from '@instructure/ui-responsive'
+
 import TopLevelButtons from './TopLevelButtons'
+import FileFolderTable from './FileFolderTable'
 
 const I18n = useI18nScope('files_v2')
 
@@ -42,7 +45,7 @@ const fetchQuota = async (contextType: string, contextId: string) => {
 }
 interface FilesAppProps {
   isUserContext: boolean
-  size: string
+  size: 'small' | 'medium' | 'large'
 }
 
 const FilesApp = ({isUserContext, size}: FilesAppProps) => {
@@ -84,24 +87,28 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
             wrap="wrap"
             margin="0 0 medium"
             justifyItems="space-between"
-            direction={size === 'small' ? 'column' : 'row'}
+            direction={size === 'large' ? 'row' : 'column'}
           >
             <Flex.Item padding="small small small none" align="start">
               <Heading level="h1">
                 {isUserContext ? I18n.t('All My Files') : I18n.t('Files')}
               </Heading>
             </Flex.Item>
-            <Flex.Item padding="none" direction={size === 'small' ? 'column' : 'row'}>
+            <Flex.Item
+              padding="xx-small"
+              direction={size === 'small' ? 'column' : 'row'}
+              align={size === 'medium' ? 'start' : undefined}
+              overflowX="hidden"
+            >
               <TopLevelButtons size={size} isUserContext={isUserContext} />
             </Flex.Item>
           </Flex>
         </Flex.Item>
       </Flex>
-      <View as="div">
-        <Flex>
-          <Flex.Item size="50%">{renderFilesUsageBar()}</Flex.Item>
-        </Flex>
-      </View>
+      <FileFolderTable size={size} />
+      <Flex padding="small none none none">
+        <Flex.Item size="50%">{renderFilesUsageBar()}</Flex.Item>
+      </Flex>
     </View>
   )
 }
@@ -111,16 +118,19 @@ interface ResponsiveFilesAppProps {
 
 const ResponsiveFilesApp = ({contextAssetString}: ResponsiveFilesAppProps) => {
   const isUserContext = contextAssetString.startsWith('user_')
+
   return (
     <Responsive
       match="media"
       query={{
-        small: {maxWidth: 325},
-        medium: {maxWidth: 767},
-        large: {minWidth: 767},
+        small: {maxWidth: canvas.breakpoints.small},
+        medium: {maxWidth: canvas.breakpoints.tablet},
       }}
       render={(_props: any, matches: string[] | undefined) => (
-        <FilesApp isUserContext={isUserContext} size={matches ? matches[0] : ''} />
+        <FilesApp
+          isUserContext={isUserContext}
+          size={(matches?.[0] as 'small' | 'medium') || 'large'}
+        />
       )}
     />
   )
