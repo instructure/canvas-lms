@@ -363,7 +363,7 @@ class ContextModule < ActiveRecord::Base
     where("name ILIKE ?", "#{name}%")
   }
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
-    visible_module_ids = ModuleVisibility::ModuleVisibilityService.modules_visible_to_students_in_courses(course_ids:, user_ids:).map(&:context_module_id)
+    visible_module_ids = ModuleVisibility::ModuleVisibilityService.modules_visible_to_students(course_ids:, user_ids:).map(&:context_module_id)
     if visible_module_ids.any?
       where(id: visible_module_ids)
     else
