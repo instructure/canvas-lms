@@ -88,6 +88,11 @@
 #           "example": "Course",
 #           "type": "string"
 #         },
+#         "context_name": {
+#           "description": "The course or account name that the group belongs to.",
+#           "example": "Course 101",
+#           "type": "string"
+#         },
 #         "course_id": {
 #           "example": 3,
 #           "type": "integer"

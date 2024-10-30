@@ -338,6 +338,39 @@ describe GroupsController do
     end
   end
 
+  describe "group_json" do
+    it "should include context_name for group" do
+      group_with_user(group_context: @course, user: @student, active_all: true)
+      user_session(@student)
+
+      get "index", format: "json"
+      expect(response).to be_successful
+      parsed_json = json_parse(response.body)
+      expect(parsed_json.length).to eq 1
+      expect(parsed_json[0]["context_name"]).to eq @group.context.name
+    end
+
+    it "should include course_id and not account_id if group's context is course'" do
+      group_with_user(group_context: @course, user: @student, active_all: true)
+      user_session(@student)
+      get "index", format: "json"
+      parsed_json = json_parse(response.body)
+      expect(parsed_json.length).to eq 1
+      expect(parsed_json[0]["course_id"]).to eq @group.context.id
+      expect(parsed_json[0]["account_id"]).to be_nil
+    end
+
+    it "should include account_id and not course_id if group's context is account" do
+      group_with_user(group_context: @account, user: @student, active_all: true)
+      user_session(@student)
+      get "index", format: "json"
+      parsed_json = json_parse(response.body)
+      expect(parsed_json.length).to eq 1
+      expect(parsed_json[0]["account_id"]).to eq @group.context.id
+      expect(parsed_json[0]["course_id"]).to be_nil
+    end
+  end
+
   describe "GET index" do
     it "splits up current and previous groups" do
       course1 = @course

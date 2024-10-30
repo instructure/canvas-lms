@@ -36,6 +36,7 @@ describe "Groups API", type: :request do
       "members_count" => group.members_count,
       "max_membership" => group.max_membership,
       "avatar_url" => group.avatar_attachment && "http://www.example.com/images/thumbnails/#{group.avatar_attachment.id}/#{group.avatar_attachment.uuid}",
+      "context_name" => group.context.name,
       "context_type" => group.context_type,
       "#{group.context_type.downcase}_id" => group.context_id,
       "role" => group.group_category.role,
