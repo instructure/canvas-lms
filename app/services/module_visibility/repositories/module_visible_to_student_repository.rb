@@ -21,8 +21,6 @@ module ModuleVisibility
   module Repositories
     class ModuleVisibleToStudentRepository
       class << self
-        # NOTE: context module has a pretty different function for a few of the functions implemented here
-
         # if only_visible_to_overrides is false, or there's related modules with no overrides, then everyone can see it
         def find_modules_visible_to_everyone(course_ids:, user_ids:, context_module_ids:)
           filter_condition_sql = filter_condition_sql(course_ids:, user_ids:, context_module_ids:)
@@ -115,30 +113,9 @@ module ModuleVisibility
         # Note that at least one of the params must be non nil
         def filter_condition_sql(course_ids: nil, user_ids: nil, context_module_ids: nil)
           query_conditions = []
-
-          if context_module_ids
-            query_conditions << if context_module_ids.is_a?(Array)
-                                  "o.id IN (:context_module_id)"
-                                else
-                                  "o.id = :context_module_id"
-                                end
-          end
-
-          if user_ids
-            query_conditions << if user_ids.is_a?(Array)
-                                  "e.user_id IN (:user_id)"
-                                else
-                                  "e.user_id = :user_id"
-                                end
-          end
-
-          if course_ids
-            query_conditions << if course_ids.is_a?(Array)
-                                  "e.course_id IN (:course_id)"
-                                else
-                                  "e.course_id = :course_id"
-                                end
-          end
+          query_conditions << "o.id IN (:context_module_id)" if context_module_ids
+          query_conditions << "e.user_id IN (:user_id)" if user_ids
+          query_conditions << "e.course_id IN (:course_id)" if course_ids
 
           if query_conditions.empty?
             raise ArgumentError, "ModulesVisibleToStudents must have a limiting where clause of at least one course_id, user_id, or context_module_id (for performance reasons)"

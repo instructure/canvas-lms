@@ -213,7 +213,7 @@ end
 
 describe ContextModule do
   let(:differentiable_service) { ModuleVisibility::ModuleVisibilityService }
-  let(:service_method) { :module_visible_to_students }
+  let(:service_method) { :modules_visible_to_students }
   let(:differentiable) do
     course = course_factory(active_all: true)
     cm = course.context_modules.create!(name: "test module")

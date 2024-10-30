@@ -21,55 +21,16 @@ module ModuleVisibility
   class ModuleVisibilityService
     extend VisibilityHelpers::Common
     class << self
-      # this is seemingly only called in specs
-      def modules_visible_to_student(course_id:, user_id:)
-        raise ArgumentError, "course_id cannot be nil" if course_id.nil?
-        raise ArgumentError, "course_id must not be an array" if course_id.is_a?(Array)
-        raise ArgumentError, "user_id cannot be nil" if user_id.nil?
-        raise ArgumentError, "user_id must not be an array" if user_id.is_a?(Array)
-
-        modules_visible_to_students(course_ids: course_id, user_ids: user_id)
-      end
-
-      def modules_visible_to_students_in_courses(course_ids:, user_ids:)
-        raise ArgumentError, "course_ids cannot be nil" if course_ids.nil?
-        raise ArgumentError, "course_ids must be an array" unless course_ids.is_a?(Array)
-        raise ArgumentError, "user_ids cannot be nil" if user_ids.nil?
-        raise ArgumentError, "user_ids must be an array" unless user_ids.is_a?(Array)
-
-        modules_visible_to_students(course_ids:, user_ids:)
-      end
-
-      # this is seemingly only called in specs.
-      def module_visible_to_student(context_module_id:, user_id:)
-        raise ArgumentError, "context_module_id cannot be nil" if context_module_id.nil?
-        raise ArgumentError, "context_module_id must not be an array" if context_module_id.is_a?(Array)
-        raise ArgumentError, "user_id cannot be nil" if user_id.nil?
-        raise ArgumentError, "user_id must not be an array" if user_id.is_a?(Array)
-
-        modules_visible_to_students(context_module_ids: context_module_id, user_ids: user_id)
-      end
-
-      def module_visible_to_students(context_module_id:, user_ids:)
-        raise ArgumentError, "context_module_id cannot be nil" if context_module_id.nil?
-        raise ArgumentError, "context_module_id must not be an array" if context_module_id.is_a?(Array)
-        raise ArgumentError, "user_ids cannot be nil" if user_ids.nil?
-        raise ArgumentError, "user_ids must be an array" unless user_ids.is_a?(Array)
-
-        modules_visible_to_students(context_module_ids: context_module_id, user_ids:)
-      end
-
-      private
-
       def modules_visible_to_students(course_ids: nil, user_ids: nil, context_module_ids: nil)
-        if course_ids.nil? && user_ids.nil? && context_module_ids.nil?
+        unless course_ids || user_ids || context_module_ids
           raise ArgumentError, "at least one non nil course_id, user_id, or context_module_ids is required (for query performance reasons)"
         end
 
-        service_cache_fetch(service: name,
-                            course_ids:,
-                            user_ids:,
-                            additional_ids: context_module_ids) do
+        course_ids = Array(course_ids) if course_ids
+        user_ids = Array(user_ids) if user_ids
+        context_module_ids = Array(context_module_ids) if context_module_ids
+
+        service_cache_fetch(service: name, course_ids:, user_ids:, additional_ids: context_module_ids) do
           visible_modules = []
 
           # add modules visible to everyone
