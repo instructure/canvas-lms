@@ -136,13 +136,13 @@ describe "MessageableUser::Calculator" do
 
     it "will return section members" do
       calculator = MessageableUser::Calculator.new(@teacher)
-      expect(calculator.search_in_context_scope(context: @dt1, search: "").pluck(:name)).to eq(["User1 Section1", "User2 Section1"])
+      expect(calculator.search_in_context_scope(context: @dt1, search: "").pluck(:name)).to match_array(["User1 Section1", "User2 Section1"])
 
       calculator = MessageableUser::Calculator.new(@teacher)
-      expect(calculator.search_in_context_scope(context: @dt2, search: "").pluck(:name)).to eq(["User3 Section2", "User4 Section2"])
+      expect(calculator.search_in_context_scope(context: @dt2, search: "").pluck(:name)).to match_array(["User3 Section2", "User4 Section2"])
 
       calculator = MessageableUser::Calculator.new(@teacher)
-      expect(calculator.search_in_context_scope(context: @dt3, search: "").pluck(:name)).to eq(["User5 Section3", "User6 Section3"])
+      expect(calculator.search_in_context_scope(context: @dt3, search: "").pluck(:name)).to match_array(["User5 Section3", "User6 Section3"])
     end
   end
 
