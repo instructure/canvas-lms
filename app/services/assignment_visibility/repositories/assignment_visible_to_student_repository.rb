@@ -156,45 +156,19 @@ module AssignmentVisibility
 
         def query_params(course_ids:, user_ids:, assignment_ids:)
           query_params = {}
-          query_params[:course_id] = course_ids unless course_ids.nil?
-          query_params[:user_id] = user_ids unless user_ids.nil?
-          query_params[:assignment_id] = assignment_ids unless assignment_ids.nil?
+          query_params[:course_id] = course_ids if course_ids
+          query_params[:user_id] = user_ids if user_ids
+          query_params[:assignment_id] = assignment_ids if assignment_ids
           query_params
         end
 
         # Create a filter clause SQL from the params - something like: e.user_id IN ['1', '2'] AND course_id = '20'
         # Note that at least one of the params must be non nil
         def filter_condition_sql(course_ids: nil, user_ids: nil, assignment_ids: nil)
-          unless assignment_ids || course_ids
-            raise ArgumentError, "AssignmentsVisibleToStudents must have a limiting where clause of at least one course_id or assignment_id (for performance reasons)"
-          end
-
           query_conditions = []
-
-          if assignment_ids
-            query_conditions << if assignment_ids.is_a?(Array)
-                                  "o.id IN (:assignment_id)"
-                                else
-                                  "o.id = :assignment_id"
-                                end
-          end
-
-          if user_ids
-            query_conditions << if user_ids.is_a?(Array)
-                                  "e.user_id IN (:user_id)"
-                                else
-                                  "e.user_id = :user_id"
-                                end
-          end
-
-          if course_ids
-            query_conditions << if course_ids.is_a?(Array)
-                                  "e.course_id IN (:course_id)"
-                                else
-                                  "e.course_id = :course_id"
-                                end
-          end
-
+          query_conditions << "o.id IN (:assignment_id)" if assignment_ids
+          query_conditions << "e.user_id IN (:user_id)" if user_ids
+          query_conditions << "e.course_id IN (:course_id)" if course_ids
           query_conditions.join(" AND ")
         end
 
@@ -321,15 +295,11 @@ module AssignmentVisibility
 
           case tag_type
           when "assignment"
-            content_id_field = assignment_ids.is_a?(Array) ? "IN (:assignment_id)" : "= :assignment_id"
-            context_id_field = course_ids.is_a?(Array) ? "IN (:course_id)" : "= :course_id"
-            query_conditions << "t.content_id #{content_id_field}" if assignment_ids
-            query_conditions << "t.context_id #{context_id_field}" if course_ids
+            query_conditions << "t.content_id IN (:assignment_id)" if assignment_ids
+            query_conditions << "t.context_id IN (:course_id)" if course_ids
           when "quiz", "discussion", "page"
-            assignment_id_field = "#{tag_type[0]}." + (assignment_ids.is_a?(Array) ? "assignment_id IN (:assignment_id)" : "assignment_id = :assignment_id")
-            context_id_field = "#{tag_type[0]}t.context_id " + (course_ids.is_a?(Array) ? "IN (:course_id)" : "= :course_id")
-            query_conditions << assignment_id_field if assignment_ids
-            query_conditions << context_id_field if course_ids
+            query_conditions << "#{tag_type[0]}.assignment_id IN (:assignment_id)" if assignment_ids
+            query_conditions << "#{tag_type[0]}t.context_id IN (:course_id)" if course_ids
           end
 
           query_conditions.join(" AND ")
