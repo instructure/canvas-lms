@@ -25102,6 +25102,16 @@ fa:
         all_users: "همه کاربران"
         choose_term: "انتخاب نیمسال"
         search_results: "جستجوی نتایج برای \"%{search_term}\""
+    last_login: 
+      labels: 
+        current_ip: "آی پی ورود فعلی"
+        current_login: "ورود فعلی"
+        last_ip: "آی پی آخرین ورود"
+        last_login: "آخرین ورود"
+        last_request: "آخرین درخواست"
+      more: بیشتر...
+      never: هرگز
+      none: "هیچ کدام"
     linkedin_added: "حساب لینکدین با موفقیت افزوده شد!"
     linkedin_fail: "تأیید اعتبار لینکدین انجام نشد. لطفا دوباره تلاش کنید"
     logins: 
