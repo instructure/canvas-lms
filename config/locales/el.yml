@@ -15468,8 +15468,11 @@ el:
         current_ip: "IP τρέχουσας σύνδεσης"
         current_login: "Τρέχουσα σύνδεση"
         last_ip: "IP τελευταίας σύνδεσης"
+        last_login: "Τελευταία Σύνδεση"
         last_request: "Τελευταίο αίτημα"
       more: περισσότερα...
+      never: ποτέ
+      none: κανένα
     linkedin_added: "Ο λογαριασμός LinkedIn προστέθηκε επιτυχώς!"
     linkedin_fail: "<mrk mid=\"3300\" mtype=\"seg\">Η εξουσιοδότηση του LinkedIn απέτυχε.</mrk> <mrk mid=\"3301\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά</mrk>"
     logins: 
