@@ -36,6 +36,16 @@ export default class ContextGroupCollection extends PaginatedCollection {
     }
     return url_base + encodeQueryString(params)
   }
+
+  fetch(options = {}) {
+    if (this.options?.disableCache) {
+      options.headers = {
+        ...options.headers,
+        'Cache-Control': 'no-cache',
+      }
+    }
+    return super.fetch(options)
+  }
 }
 ContextGroupCollection.prototype.model = Group
 

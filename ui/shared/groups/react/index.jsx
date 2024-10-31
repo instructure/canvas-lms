@@ -54,7 +54,7 @@ const StudentView = createReactClass({
       userCollection: new UserCollection(null, {
         params: {enrollment_type: 'student', per_page: 15, sort: 'username'},
       }),
-      groupCollection: new ContextGroupCollection([], {course_id: ENV.course_id}),
+      groupCollection: new ContextGroupCollection([], {course_id: ENV.course_id, disableCache: true}),
     }
   },
 
