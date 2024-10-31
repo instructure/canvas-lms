@@ -66,6 +66,30 @@ interface Props {
 
 const initialFileDetails: FileDetails = {url: null, filename: null}
 
+export const createFolder = async (): Promise<number | null> => {
+  try {
+    const formData = new FormData()
+    formData.append('name', `password_policy`)
+    formData.append('parent_folder_path', 'files/')
+
+    const {response, text} = await doFetchApi<FolderResponse>({
+      method: 'POST',
+      path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/folders`,
+      body: formData,
+    })
+
+    const responseBodyParsed = JSON.parse(text)
+
+    if (response.status === 200) {
+      return responseBodyParsed.id
+    } else {
+      throw new Error('Failed to create folder')
+    }
+  } catch (error) {
+    return null
+  }
+}
+
 const ForbiddenWordsFileUpload = ({
   open,
   onDismiss,
@@ -89,28 +113,6 @@ const ForbiddenWordsFileUpload = ({
     setUploadAttempted(false)
     setModalClosing(false)
   }, [])
-
-  const createFolder = async (): Promise<number | null> => {
-    try {
-      const formData = new FormData()
-      formData.append('name', `password_policy`)
-      formData.append('parent_folder_path', 'files/')
-
-      const {status, data} = await executeApiRequest<FolderResponse>({
-        method: 'POST',
-        path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/folders`,
-        body: formData,
-      })
-
-      if (status === 200) {
-        return data.id
-      } else {
-        throw new Error('Failed to create folder')
-      }
-    } catch (error) {
-      return null
-    }
-  }
 
   const handleUpload = useCallback(async () => {
     const {url, filename} = fileDetails
