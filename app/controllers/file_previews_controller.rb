@@ -21,7 +21,6 @@ class FilePreviewsController < ApplicationController
   include AttachmentHelper
 
   before_action :get_context
-  before_action :check_limited_access_for_students, only: %i[show]
 
   def services_jwt_auth_allowed
     params[:action] == "show" && Account.site_admin.feature_enabled?(:rce_linked_file_urls)

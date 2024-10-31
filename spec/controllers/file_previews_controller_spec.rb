@@ -201,11 +201,11 @@ describe FilePreviewsController do
       @account.save!
     end
 
-    it "renders unauthorized" do
+    it "allows students to see individual files" do
       course_model
       attachment_model
       get :show, params: { course_id: @course.id, file_id: @attachment.id, verifier: @attachment.uuid }
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :ok
     end
   end
 end
