@@ -100,6 +100,7 @@ class Account < ActiveRecord::Base
   has_one :outcome_proficiency, -> { preload(:outcome_proficiency_ratings) }, as: :context, inverse_of: :context, dependent: :destroy
   has_one :outcome_calculation_method, as: :context, inverse_of: :context, dependent: :destroy
   has_many :rubric_imports, inverse_of: :root_account, foreign_key: :root_account_id
+  has_many :rubric_assessment_imports, inverse_of: :root_account, foreign_key: :root_account_id
 
   has_many :auditor_authentication_records,
            class_name: "Auditors::ActiveRecord::AuthenticationRecord",
