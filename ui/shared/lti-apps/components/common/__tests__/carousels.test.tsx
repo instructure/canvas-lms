@@ -23,14 +23,7 @@ import ProductCarousel from '../Carousels/ProductCarousel'
 import BadgeCarousel from '../Carousels/BadgeCarousel'
 import ImageCarousel from '../Carousels/ImageCarousel'
 
-import type {
-  Product,
-  Company,
-  LtiDetail,
-  Lti,
-  Badges,
-  Tag,
-} from '../../../../../../shared/lti-apps/models/Product'
+import type {Product, Company, LtiDetail, Lti, Badges, Tag} from '../../../models/Product'
 
 const company: Company = {
   id: 2,

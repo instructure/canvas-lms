@@ -23,7 +23,7 @@ import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {Tabs} from '@instructure/ui-tabs'
 import {List} from '@instructure/ui-list'
 import {Button} from '@instructure/ui-buttons'
-import type {LtiDetail} from '../../../../../shared/lti-apps/models/Product'
+import type {LtiDetail} from '../../models/Product'
 
 const I18n = useI18nScope('lti_registrations')
 interface LtiDetailModalProps {

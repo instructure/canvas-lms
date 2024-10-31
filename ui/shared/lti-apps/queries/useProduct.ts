@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {fetchProductDetails} from '../../../../../../shared/lti-apps/queries/productsQuery'
+import {fetchProductDetails} from './productsQuery'
 import type {UseQueryOptions} from '@tanstack/react-query'
-import type {Product} from '../../../../../../shared/lti-apps/models/Product'
+import type {Product} from '../models/Product'
 import {useQuery} from '@tanstack/react-query'
 
 export type UseProductProps = {

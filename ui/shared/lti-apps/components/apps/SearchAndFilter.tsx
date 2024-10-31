@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import {useMedia} from 'react-use'
 import {breakpoints} from '../../breakpoints'
 import {Flex} from '@instructure/ui-flex'
@@ -32,11 +32,17 @@ import useDiscoverQueryParams from '../../hooks/useDiscoverQueryParams'
 const I18n = useI18nScope('lti_registrations')
 
 export const SearchAndFilter = (props: {setIsTrayOpen: (isOpen: boolean) => void}) => {
+  const instructorAppsRoute = 'configurations'
+  const instructorAppsHash = '#tab-apps'
+  const disableQueryParams =
+    window.location.href.includes(instructorAppsRoute) &&
+    window.location.hash !== instructorAppsHash
   const {queryParams, updateQueryParams} = useDiscoverQueryParams()
   const {searchValue, handleSearchInputChange} = useDebouncedSearch({
     initialValue: queryParams.search,
     delay: 300,
     updateQueryParams,
+    isDisabled: disableQueryParams,
   })
   const isMobile = useMedia(`(max-width: ${breakpoints.mobile})`)
 

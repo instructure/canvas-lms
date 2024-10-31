@@ -20,11 +20,12 @@ import React, {useMemo, useState} from 'react'
 import {useQuery} from '@tanstack/react-query'
 import LtiFilterTray from './apps/LtiFilterTray'
 import FilterTags from './apps/FilterTags'
-import {fetchLtiFilters, fetchProducts, fetchToolsByDisplayGroups} from '../queries/productsQuery'
+import {fetchLtiFilters, fetchProductsByOrganization} from '../queries/productsQuery'
 import useDiscoverQueryParams from '../hooks/useDiscoverQueryParams'
 import Disclaimer from './common/Disclaimer'
 import {Products} from './apps/Products'
 import {SearchAndFilter} from './apps/SearchAndFilter'
+import type {Product} from '../models/Product'
 
 export const InstructorApps = () => {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
@@ -35,18 +36,15 @@ export const InstructorApps = () => {
   )
 
   const {
-    data: {tools = [], meta = {total_count: 0, current_page: 1, num_pages: 1}} = {},
+    data: {tools, meta},
     isLoading,
   } = useQuery({
     queryKey: ['lti_product_info', queryParams],
-    queryFn: () => fetchProducts(queryParams),
-    enabled: isFilterApplied,
-  })
-
-  const {data: displayGroups, isLoading: isLoadingDisplayGroups} = useQuery({
-    queryKey: ['lti_tool_display_groups'],
-    queryFn: () => fetchToolsByDisplayGroups(),
-    enabled: !isFilterApplied,
+    queryFn: () => fetchProductsByOrganization(queryParams, ENV.DOMAIN_ROOT_ACCOUNT_SFID),
+    initialData: {
+      tools: [] as Product[],
+      meta: {total_count: 0, current_page: 1, num_pages: 1, count: 0, per_page: 21},
+    },
   })
 
   const {data: filterData} = useQuery({
@@ -66,10 +64,8 @@ export const InstructorApps = () => {
       )}
 
       <Products
-        displayGroups={displayGroups || []}
-        isFilterApplied={isFilterApplied}
+        isFilterApplied={true}
         isLoading={isLoading}
-        isLoadingDisplayGroups={isLoadingDisplayGroups}
         numberOfPages={meta.num_pages}
         tools={tools}
       />

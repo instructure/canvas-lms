@@ -25,11 +25,11 @@ import {settings, calculateArrowDisableIndex} from './utils'
 import Slider from 'react-slick'
 import 'slick-carousel/slick/slick.css'
 
-import ProductCard from '../../../../../../shared/lti-apps/components/apps/ProductCard'
+import ProductCard from '../../apps/ProductCard'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 
-import type {Product} from '../../../../../../shared/lti-apps/models/Product'
+import type {Product} from '../../../models/Product'
 import type {Settings} from 'react-slick'
 
 const I18n = useI18nScope('lti_registrations')

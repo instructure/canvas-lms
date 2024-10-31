@@ -19,11 +19,11 @@
 import React from 'react'
 import {renderHook} from '@testing-library/react-hooks/dom'
 import {waitFor} from '@testing-library/react'
-import useProduct from '../useProduct'
+import useSimilarProducts from '../useSimilarProducts'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import type {Product} from '../../../../../../../shared/lti-apps/models/Product'
+import type {Product} from '../../models/Product'
 
-describe('isError, isLoading, and product return as expected', () => {
+describe('Promise resolution', () => {
   let mockedData: Product
   beforeEach(() => {
     mockedData = {
@@ -61,41 +61,22 @@ describe('isError, isLoading, and product return as expected', () => {
     })
   })
 
-  it("Doesn't return an error when provided with productId", () => {
-    const productId = '456'
+  it('Promise resolves successfully when provided a product', async () => {
+    const params = () => {
+      return {
+        filters: {
+          companies: [{id: mockedData?.company.id.toString(), name: mockedData?.company.name}],
+        },
+      }
+    }
+
     const queryClient = new QueryClient()
-    const {result} = renderHook(() => useProduct({productId}), {
+    const {result} = renderHook(() => useSimilarProducts({params: params(), product: mockedData}), {
       wrapper: ({children}: {children: React.ReactNode}) => (
         <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
       ),
     })
 
-    expect(result.current.isError).toEqual(false)
-  })
-
-  it('Returns isLoading while product is undefined/promise is being resolved', () => {
-    const productId = '789'
-    const queryClient = new QueryClient()
-    const {result} = renderHook(() => useProduct({productId}), {
-      wrapper: ({children}: {children: React.ReactNode}) => (
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-      ),
-    })
-
-    expect(result.current.isLoading).toEqual(true)
-  })
-
-  it('Promise resolves successfully', async () => {
-    const productId = '123'
-    const queryClient = new QueryClient()
-    const {result} = renderHook(() => useProduct({productId}), {
-      wrapper: ({children}: {children: React.ReactNode}) => (
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-      ),
-    })
-    expect(result.current.isLoading).toEqual(true)
-    await waitFor(() => expect(result.current.product).toBe(mockedData))
-    expect(result.current.isLoading).toEqual(false)
-    expect(result.current.isError).toEqual(false)
+    await waitFor(() => expect(result.current).not.toBeUndefined())
   })
 })

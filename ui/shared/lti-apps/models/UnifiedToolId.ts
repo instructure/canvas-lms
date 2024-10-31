@@ -16,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import type {RouteObject} from 'react-router-dom'
-import {Discover} from '../../../../shared/lti-apps/components/Discover'
+import {z} from 'zod'
 
-export const DiscoverRoute: RouteObject = {
-  path: '/',
-  element: <Discover />,
-}
+export const ZUnifiedToolId = z.string().brand('UnifiedToolId')
+
+/**
+ * A string that uniquely identifies a tool across Canvas instances.
+ * Defined & maintained in LP.
+ */
+export type UnifiedToolId = z.infer<typeof ZUnifiedToolId>

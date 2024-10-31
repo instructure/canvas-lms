@@ -140,3 +140,47 @@ export const fetchLtiFilters = async (): Promise<LtiFilters> => {
 
   return filters || {}
 }
+
+export const fetchProductsByOrganization = async (
+  params: DiscoverParams,
+  organizationSalesforceId: string
+): Promise<ProductResponse> => {
+  const apiParams = {
+    page: params.page,
+    per_page: 21,
+    q: {
+      ...(params.search && {search_terms_cont: params.search}),
+      ...(params.filters.tags && {display_group_id_eq: params.filters.tags[0]?.id}),
+      ...(params.filters.companies && {
+        company_id_in: params.filters.companies.map(company => company.id),
+      }),
+      ...(params.filters.audience && {
+        audience_id_in: params.filters.audience.map(audience => audience.id),
+      }),
+      ...(params.filters.versions && {
+        version_id_in: params.filters.versions.map(version => version.id),
+      }),
+    },
+  }
+
+  const url = `/api/v1/accounts/${accountId}/learn_platform/organizations/${organizationSalesforceId}/products?${stringify(
+    apiParams,
+    {
+      arrayFormat: 'brackets',
+    }
+  )}`
+
+  const response = await fetch(url, {
+    method: 'get',
+    headers: {
+      'X-CSRF-Token': getCookie('_csrf_token'),
+      'content-Type': 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch products by organization`)
+  }
+  const products: ProductResponse = await response.json()
+  return products
+}
