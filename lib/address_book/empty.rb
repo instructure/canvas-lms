@@ -35,7 +35,7 @@ module AddressBook
       {}
     end
 
-    def known_in_context(_context)
+    def known_in_context(_context, _options = {})
       []
     end
 

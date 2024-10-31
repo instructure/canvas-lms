@@ -26,7 +26,7 @@ module AddressBook
         user_ids = users.to_set { |user| Shard.global_id_for(user) }
         asset_string = options[:context].respond_to?(:asset_string) ? options[:context].asset_string : options[:context]
         known_users = @sender.messageable_user_calculator
-                             .messageable_users_in_context(asset_string, admin_context: admin_context?(options[:context]))
+                             .messageable_users_in_context(asset_string, admin_context: admin_context?(options[:context]), include_concluded: options[:include_concluded])
                              .select { |user| user_ids.include?(user.global_id) }
 
         # group members who are in different sections will not be included by
@@ -55,9 +55,9 @@ module AddressBook
       known_users
     end
 
-    def known_in_context(context)
+    def known_in_context(context, options = {})
       asset_string = context.respond_to?(:asset_string) ? context.asset_string : context
-      known_users = @sender.messageable_users_in_context(asset_string)
+      known_users = @sender.messageable_users_in_context(asset_string, options)
       known_users.each { |user| @cache.store(user, user.common_courses, user.common_groups) }
       known_users
     end
@@ -113,7 +113,8 @@ module AddressBook
         exclude_ids: options[:exclude_ids],
         context: asset_string,
         admin_context: admin_context?(options[:context]),
-        strict_checks: !options[:weak_checks]
+        strict_checks: !options[:weak_checks],
+        include_concluded: options[:include_concluded]
       )
       Collection.new(collection, @cache)
     end

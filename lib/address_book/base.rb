@@ -90,7 +90,7 @@ module AddressBook
     # returns the known users in the given context (passed as an asset string
     # such as `course_123` or `course_123_teachers` or as a Course,
     # CourseSection, or Group object).
-    def known_in_context(context)
+    def known_in_context(context, options = {})
       raise NotImplementedError
     end
 

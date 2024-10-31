@@ -369,7 +369,8 @@ describe ConversationsController do
 
       post "create", params: { recipients: [@teacher.id.to_s], body: "yo", context_code: @course.asset_string }
       expect(response).not_to be_successful
-      expect(response.body).to include("Unable to send messages")
+      expect(response.parsed_body[0]["attribute"]).to eq("recipients")
+      expect(response.parsed_body[0]["message"]).to eq("invalid")
     end
 
     it "allows creating conversations in concluded courses for teachers" do

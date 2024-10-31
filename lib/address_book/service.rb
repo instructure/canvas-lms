@@ -65,7 +65,7 @@ module AddressBook
       users
     end
 
-    def known_in_context(context)
+    def known_in_context(context, _options = {})
       # just query, hydrate, and cache
       user_ids, common_contexts = Services::AddressBook.known_in_context(@sender, context, nil, @ignore_result)
       users = hydrate(user_ids)
