@@ -292,7 +292,8 @@ module Types
           context:,
           synthetic_contexts: true,
           messageable_only: true,
-          base_url: self.context[:request].base_url
+          base_url: self.context[:request].base_url,
+          include_concluded: false
         )
 
         contexts_collection = collections.select { |c| c[0] == "contexts" }

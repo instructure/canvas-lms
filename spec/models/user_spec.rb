@@ -1712,12 +1712,16 @@ describe User do
         @course.enroll_user(@student, "StudentEnrollment", enrollment_state: "active")
         @course.complete!
 
-        expect(search_messageable_users(@this_section_user, context: "course_#{@course.id}").map(&:id)).not_to include @this_section_user.id
+        student_results = search_messageable_users(@this_section_user, context: "course_#{@course.id}", include_concluded: true).map(&:id)
+
+        expect(student_results).not_to include @this_section_user.id
         # if the course was a concluded, a student should be able to browse it and message an admin (if if the admin's enrollment concluded too)
-        expect(search_messageable_users(@this_section_user, context: "course_#{@course.id}").map(&:id)).to include @this_section_teacher.id
+        expect(student_results).to include @this_section_teacher.id
         expect(@this_section_user.count_messageable_users_in_course(@course)).to be 2 # just the admins
-        expect(search_messageable_users(@student, context: "course_#{@course.id}").map(&:id)).not_to include @this_section_user.id
-        expect(search_messageable_users(@student, context: "course_#{@course.id}").map(&:id)).to include @this_section_teacher.id
+
+        student2_results = search_messageable_users(@student, context: "course_#{@course.id}", include_concluded: true).map(&:id)
+        expect(student2_results).not_to include @this_section_user.id
+        expect(student2_results).to include @this_section_teacher.id
         expect(@student.count_messageable_users_in_course(@course)).to be 2
       end
 

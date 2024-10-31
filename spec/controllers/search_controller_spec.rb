@@ -236,7 +236,7 @@ describe SearchController do
           user_session(@teacher1)
         end
 
-        it "returns concluded teachers" do
+        it "does not return concluded teachers" do
           get "recipients", params: {
             search: "m",
             type: "user",
@@ -244,8 +244,8 @@ describe SearchController do
             context: "course_#{@course.id}_teachers"
           }
           expect(response).to be_successful
-          expect(response.body).to include("Mr. Teacher")
-          expect(response.body).to include("Mr. Professor")
+          expect(response.body).to include(@teacher1.name)
+          expect(response.body).not_to include(@concluded_teacher.name)
         end
 
         it "does not return concluded students" do
