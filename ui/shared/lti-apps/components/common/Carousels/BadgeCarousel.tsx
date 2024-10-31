@@ -29,7 +29,7 @@ import {Text} from '@instructure/ui-text'
 import {Img} from '@instructure/ui-img'
 import {Link} from '@instructure/ui-link'
 
-import type {Badges} from '../../../../../../shared/lti-apps/models/Product'
+import type {Badges} from '../../../models/Product'
 import type {Settings} from 'react-slick'
 
 const I18n = useI18nScope('lti_registrations')

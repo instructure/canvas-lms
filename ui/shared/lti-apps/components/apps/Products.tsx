@@ -36,9 +36,9 @@ const I18n = useI18nScope('lti_registrations')
 export const Products = (props: {
   isFilterApplied: boolean
   isLoading: boolean
-  isLoadingDisplayGroups: boolean
+  isLoadingDisplayGroups?: boolean
   tools: Product[]
-  displayGroups: ToolsByDisplayGroup
+  displayGroups?: ToolsByDisplayGroup
   numberOfPages: number
 }) => {
   const {isFilterApplied, isLoading, isLoadingDisplayGroups, tools, displayGroups, numberOfPages} =

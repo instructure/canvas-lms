@@ -186,6 +186,8 @@
 - verb: GET
   path: '/api/v1/accounts/:account_id/learn_platform/filters'
 - verb: GET
+  path: '/api/v1/accounts/:account_id/learn_platform/organizations/:organization_salesforce_id/products'
+- verb: GET
   path: '/api/v1/accounts/:account_id/learn_platform/products'
 - verb: GET
   path: '/api/v1/accounts/:account_id/learn_platform/products/:id'

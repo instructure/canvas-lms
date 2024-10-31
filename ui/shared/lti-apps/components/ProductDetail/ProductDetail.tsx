@@ -19,9 +19,9 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import {useLocation, useNavigate} from 'react-router-dom'
-import useProduct from './queries/useProduct'
-import useSimilarProducts from './queries/useSimilarProducts'
 import useBreakpoints from '@canvas/lti-apps/hooks/useBreakpoints'
+import useSimilarProducts from '../../queries/useSimilarProducts'
+import useProduct from '../../queries/useProduct'
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
@@ -29,9 +29,6 @@ import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {Tag} from '@instructure/ui-tag'
 import {View} from '@instructure/ui-view'
-import {Button} from '@instructure/ui-buttons'
-import GenericErrorPage from '@canvas/generic-error-page/react'
-import TruncateWithTooltip from '@canvas/lti-apps/components/common/TruncateWithTooltip'
 import {
   IconA11yLine,
   IconExpandStartLine,
@@ -40,20 +37,29 @@ import {
   IconMessageLine,
   IconQuizTitleLine,
 } from '@instructure/ui-icons'
+import {Button} from '@instructure/ui-buttons'
+import GenericErrorPage from '@canvas/generic-error-page/react'
+import TruncateWithTooltip from '../common/TruncateWithTooltip'
 import LtiDetailModal from './LtiDetailModal'
 import IntegrationDetailModal from './IntegrationDetailModal'
 import ProductCarousel from '../common/Carousels/ProductCarousel'
 import ImageCarousel from '../common/Carousels/ImageCarousel'
 import BadgeCarousel from '../common/Carousels/BadgeCarousel'
-import Disclaimer from '@canvas/lti-apps/components/common/Disclaimer'
-
-import type {Product} from '@canvas/lti-apps/models/Product'
-
-import {openDynamicRegistrationWizard} from '../../../manage/registration_wizard/RegistrationWizardModalState'
+import Disclaimer from '../common/Disclaimer'
+import type {Product} from '../../models/Product'
+import type {UnifiedToolId} from '../../models/UnifiedToolId'
 
 const I18n = useI18nScope('lti_registrations')
 
-const ProductDetail = () => {
+type ProductDetailProps = {
+  onConfigure?: (
+    dynamicRegistrationUrl: string,
+    unifiedToolId?: UnifiedToolId,
+    onSuccessfulInstallation?: () => void
+  ) => void
+}
+
+const ProductDetail = (props: ProductDetailProps) => {
   const [isModalOpen, setModalOpen] = useState(false)
   const [clickedLtiTitle, setClickedLtiTitle] = useState('')
   const [isIntDetailModalOpen, setIntDetailModalOpen] = useState(false)
@@ -64,8 +70,11 @@ const ProductDetail = () => {
   const location = useLocation()
 
   const currentProductId = location.pathname.replace('/product_detail/', '')
-  const previousPath = window.location.pathname.replace(/\product_detail.*/, '')
   const {isDesktop, isMobile, isMaxMobile, isMaxTablet} = useBreakpoints()
+  const previousPathRegexp = window.location.pathname.replace(/\product_detail.*/, '')
+  const previousPath = previousPathRegexp.endsWith('configurations/')
+    ? `${previousPathRegexp}#tab-apps`
+    : previousPathRegexp
 
   const {product, isLoading, isError} = useProduct({productId: currentProductId})
 
@@ -117,26 +126,28 @@ const ProductDetail = () => {
     return (
       <Flex margin={buttonMargins}>
         <Flex.Item shouldGrow={true} margin={tabletMargin}>
-          <Button
-            display={buttonWidth}
-            color="primary"
-            interaction={dynamicRegistrationInformation ? 'enabled' : 'disabled'}
-            onClick={() => {
-              if (!dynamicRegistrationInformation) return null
+          {props.onConfigure && (
+            <Button
+              display={buttonWidth}
+              color="primary"
+              interaction={dynamicRegistrationInformation ? 'enabled' : 'disabled'}
+              onClick={() => {
+                if (!dynamicRegistrationInformation) return null
 
-              openDynamicRegistrationWizard(
-                dynamicRegistrationInformation.url,
-                // @ts-ignore
-                dynamicRegistrationInformation.unified_tool_id,
-                () => {
-                  // redirect to apps page
-                  navigate('/manage')
-                }
-              )
-            }}
-          >
-            {I18n.t('Configure')}
-          </Button>
+                props.onConfigure!(
+                  dynamicRegistrationInformation.url,
+                  // @ts-ignore
+                  dynamicRegistrationInformation.unified_tool_id,
+                  () => {
+                    // redirect to apps page
+                    navigate('/manage')
+                  }
+                )
+              }}
+            >
+              {I18n.t('Configure')}
+            </Button>
+          )}
         </Flex.Item>
       </Flex>
     )

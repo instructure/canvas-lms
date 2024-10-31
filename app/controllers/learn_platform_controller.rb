@@ -61,4 +61,18 @@ class LearnPlatformController < ApplicationController
 
     render json: response
   end
+
+  def index_by_organization
+    options = {
+      page: params[:page] || 1,
+      per_page: params[:per_page] || 20
+    }
+    options[:q] = params[:q].to_unsafe_h if params[:q]
+
+    response = learnplatform_api.products_by_organization(params[:organization_salesforce_id], options)
+
+    return render json: response, status: :internal_server_error if response.key?(:lp_server_error)
+
+    render json: response
+  end
 end

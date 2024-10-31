@@ -2320,6 +2320,7 @@ CanvasRails::Application.routes.draw do
       get  "#{prefix}/products_categories", action: :index_by_category
       get  "#{prefix}/products/:id", action: :show
       get  "#{prefix}/filters", action: :filters
+      get  "#{prefix}/organizations/:organization_salesforce_id/products", action: :index_by_organization
     end
 
     scope(controller: :feature_flags) do

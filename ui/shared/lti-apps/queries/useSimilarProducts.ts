@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fetchProducts} from '../../../../../../shared/lti-apps/queries/productsQuery'
+import {fetchProducts} from './productsQuery'
 import type {UseQueryOptions} from '@tanstack/react-query'
-import type {Product} from '../../../../../../shared/lti-apps/models/Product'
-import type {DiscoverParams} from '../../../../../../shared/lti-apps/hooks/useDiscoverQueryParams'
-import type {ProductResponse} from '../../../../../../shared/lti-apps/queries/productsQuery'
+import type {Product} from '../models/Product'
+import type {DiscoverParams} from '../hooks/useDiscoverQueryParams'
+import type {ProductResponse} from './productsQuery'
 import {useQuery} from '@tanstack/react-query'
 
 export type UseSimilarProductsProps = {
