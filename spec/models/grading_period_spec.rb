@@ -1004,6 +1004,8 @@ describe GradingPeriod do
 
     it "updates course score when the grading period weight is changed" do
       grading_period.save!
+      # Changing the assinment due date, so there are scores to update in the course
+      @assignment.update!(due_at: 2.hours.from_now(now))
       grading_period_group.update!(weighted: true)
       expect { grading_period.update!(weight: 50) }.to change {
         Score.where(grading_period_id: nil).first.updated_at
