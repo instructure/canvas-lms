@@ -20,6 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import {bool, func, shape, string, element, oneOf} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
+import { IconCloudDownloadLine } from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
@@ -44,6 +45,7 @@ const initialState = {
   data: {
     request_name: null,
   },
+  latestRequest: null,
   errors: {},
 }
 
@@ -51,8 +53,9 @@ export default class CreateDSRModal extends React.Component {
   static propTypes = {
     // whatever you pass as the child, when clicked, will open the dialog
     children: element.isRequired,
-    url: string.isRequired,
+    accountId: string.isRequired,
     user: shape({
+      id: string.isRequired,
       name: string.isRequired,
       sortable_name: string,
       short_name: string,
@@ -82,6 +85,28 @@ export default class CreateDSRModal extends React.Component {
       }}))
   }
 
+  componentDidUpdate(_prevProps, prevState) {
+    if (this.state.open && !prevState.open) {
+      this.fetchDsrRequest()
+    }
+  }
+
+  fetchDsrRequest = () => {
+    const url = `/api/v1/accounts/${this.props.accountId}/users/${this.props.user.id}/dsr_request`
+    axios.get(url).then(
+      response => {
+        // if response is not no content, then we have a request
+        if (response.status !== 204) {
+          const dsrRequest = response.data
+          this.setState(update(this.state, {latestRequest: {$set: dsrRequest}}))
+        }
+      },
+      () => {
+        // do nothing
+      }
+    )
+  }
+
   onChange = (field, value) => {
     this.setState(prevState => {
       let newState = update(prevState, {
@@ -96,9 +121,10 @@ export default class CreateDSRModal extends React.Component {
 
   onSubmit = () => {
     if (!isEmpty(this.state.errors)) return
+    const url = `/api/v1/accounts/${this.props.accountId}/users/${this.props.user.id}/dsr_request`
     const method = 'POST'
     // eslint-disable-next-line promise/catch-or-return
-    axios({url: this.props.url, method, data: this.state.data}).then(
+    axios({url, method, data: this.state.data}).then(
       response => {
         const dsr_request = response.data
         const request_name = dsr_request.request_name
@@ -170,6 +196,18 @@ export default class CreateDSRModal extends React.Component {
                   </RadioInputGroup>
                 </View>
           </FormFieldGroup>
+          {this.state.latestRequest && (<View as="div" padding="small 0 0">
+            <hr />
+            <Text weight="bold">{I18n.t('Latest DSR: ')}</Text>
+            {this.state.latestRequest.progress_status === 'completed' ? (
+              <a href={this.state.latestRequest.download_url} target="_blank" rel="noopener noreferrer">
+                {this.state.latestRequest.request_name} <IconCloudDownloadLine title={I18n.t('Download')} />
+              </a>
+            ) : (<Text>
+                {I18n.t('In progress')}
+              </Text>
+            )}
+          </View>)}
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this.close}>{I18n.t('Cancel')}</Button> &nbsp;
