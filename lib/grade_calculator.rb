@@ -541,25 +541,21 @@ class GradeCalculator
     return @columns_to_insert_or_update if defined? @columns_to_insert_or_update
 
     # Use a hash with Array values to ensure ordering of data
-    column_list = { columns: [], insert_values: [], update_values: [] }
+    column_list = { columns: [], insert_values: [] }
 
     unless @only_update_points
       column_list[:columns] << current_score_column
       column_list[:insert_values] << insert_values_for(current_score_column, updates: @current_updates)
-      column_list[:update_values] << update_values_for(current_score_column, updates: @current_updates)
 
       column_list[:columns] << final_score_column
       column_list[:insert_values] << insert_values_for(final_score_column, updates: @final_updates)
-      column_list[:update_values] << update_values_for(final_score_column, updates: @final_updates)
     end
 
     column_list[:columns] << points_column(:current)
     column_list[:insert_values] << insert_values_for(points_column(:current), updates: @current_updates, key: :total)
-    column_list[:update_values] << update_values_for(points_column(:current), updates: @current_updates, key: :total)
 
     column_list[:columns] << points_column(:final)
     column_list[:insert_values] << insert_values_for(points_column(:final), updates: @final_updates, key: :total)
-    column_list[:update_values] << update_values_for(points_column(:final), updates: @final_updates, key: :total)
 
     @columns_to_insert_or_update = column_list
   end
@@ -576,10 +572,18 @@ class GradeCalculator
                         "(enrollment_id) WHERE course_score"
                       end
 
+    table = Score.quoted_table_name
+
+    update_columns, update_conditions = columns_to_insert_or_update[:columns]
+                                        .each_with_object([+"", +""]) do |c, (cols, conds)|
+      cols << %(#{cols.empty? ? "" : ", "}#{c} = excluded.#{c})
+      conds << %(#{conds.empty? ? "" : " OR "}#{table}.#{c} IS DISTINCT FROM excluded.#{c})
+    end
+
     # Update existing course and grading period Scores or create them if needed.
     Score.connection.with_max_update_limit(enrollments.length) do
       Score.connection.execute(<<~SQL.squish)
-        INSERT INTO #{Score.quoted_table_name}
+        INSERT INTO #{table}
             (
               enrollment_id, grading_period_id,
               #{columns_to_insert_or_update[:columns].join(", ")},
@@ -599,11 +603,15 @@ class GradeCalculator
             ORDER BY enrollment_id
         ON CONFLICT #{conflict_target}
         DO UPDATE SET
-            #{columns_to_insert_or_update[:update_values].join(", ")},
+            #{update_columns},
             updated_at = excluded.updated_at,
-            root_account_id = #{@course.root_account_id},
+            root_account_id = excluded.root_account_id,
             /* if workflow_state was previously deleted for some reason, update it to active */
             workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')
+        WHERE
+          #{update_conditions}
+          OR #{table}.root_account_id IS DISTINCT FROM excluded.root_account_id
+          OR #{table}.workflow_state IS DISTINCT FROM COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')
       SQL
     end
   rescue ActiveRecord::Deadlocked => e
@@ -618,8 +626,9 @@ class GradeCalculator
     # score metadata for unposted grades.
     return unless @ignore_muted
 
-    ScoreMetadata.connection.execute("
-      INSERT INTO #{ScoreMetadata.quoted_table_name}
+    table = ScoreMetadata.quoted_table_name
+    ScoreMetadata.connection.execute(<<~SQL.squish)
+      INSERT INTO #{table}
         (score_id, calculation_details, created_at, updated_at)
         SELECT
           scores.id AS score_id,
@@ -645,8 +654,10 @@ class GradeCalculator
       DO UPDATE SET
         calculation_details = excluded.calculation_details,
         updated_at = excluded.updated_at
-      ;
-    ")
+      WHERE
+        #{table}.calculation_details #>>'{current,dropped}' IS DISTINCT FROM excluded.calculation_details #>>'{current,dropped}' OR
+        #{table}.calculation_details #>>'{final,dropped}' IS DISTINCT FROM excluded.calculation_details #>>'{final,dropped}'
+    SQL
   end
 
   def assignment_group_columns_to_insert_or_update
@@ -662,30 +673,38 @@ class GradeCalculator
 
     unless @only_update_points
       column_list[:value_names] << "current_score"
-      column_list[:update_columns] << "#{current_score_column} = excluded.current_score"
+      column_list[:update_columns] << { column: current_score_column, target: "excluded.current_score" }
       column_list[:insert_columns] << "val.current_score AS #{current_score_column}"
 
       column_list[:value_names] << "final_score"
-      column_list[:update_columns] << "#{final_score_column} = excluded.final_score"
+      column_list[:update_columns] << { column: final_score_column, target: "excluded.final_score" }
       column_list[:insert_columns] << "val.final_score AS #{final_score_column}"
     end
 
     column_list[:value_names] << "current_points"
-    column_list[:update_columns] << "#{points_column(:current)} = excluded.current_points"
+    column_list[:update_columns] << { column: points_column(:current), target: "excluded.current_points" }
     column_list[:insert_columns] << "val.current_points AS #{points_column(:current)}"
 
     column_list[:value_names] << "final_points"
-    column_list[:update_columns] << "#{points_column(:final)} = excluded.final_points"
+    column_list[:update_columns] << { column: points_column(:final), target: "excluded.final_points" }
     column_list[:insert_columns] << "val.final_points AS #{points_column(:final)}"
 
     @assignment_group_columns_to_insert_or_update = column_list
   end
 
   def save_assignment_group_scores(score_values, dropped_values)
+    table = Score.quoted_table_name
+
+    update_columns, update_conditions = assignment_group_columns_to_insert_or_update[:update_columns]
+                                        .each_with_object([+"", +""]) do |uc, (cols, conds)|
+      cols << %(#{cols.empty? ? "" : ", "}#{uc[:column]} = #{uc[:target]})
+      conds << %(#{conds.empty? ? "" : " OR "}#{table}.#{uc[:column]} IS DISTINCT FROM #{uc[:target]})
+    end
+
     Score.connection.with_max_update_limit(score_values.length) do
       # Update existing assignment group Scores or create them if needed.
-      Score.connection.execute("
-        INSERT INTO #{Score.quoted_table_name} (
+      Score.connection.execute(<<~SQL.squish)
+        INSERT INTO #{table} (
           enrollment_id, assignment_group_id,
           #{assignment_group_columns_to_insert_or_update[:value_names].join(", ")},
           course_score, root_account_id, created_at, updated_at
@@ -707,11 +726,15 @@ class GradeCalculator
           ORDER BY assignment_group_id, enrollment_id
         ON CONFLICT (enrollment_id, assignment_group_id) WHERE assignment_group_id IS NOT NULL
         DO UPDATE SET
-          #{assignment_group_columns_to_insert_or_update[:update_columns].join(", ")},
+          #{update_columns},
           updated_at = excluded.updated_at,
-          root_account_id = #{@course.root_account_id},
+          root_account_id = excluded.root_account_id,
           workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')
-      ")
+        WHERE
+          #{update_conditions}
+          OR #{table}.root_account_id IS DISTINCT FROM excluded.root_account_id
+          OR #{table}.workflow_state IS DISTINCT FROM COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')
+      SQL
     end
 
     # We only save score metadata for posted grades. This means, if we're
@@ -719,9 +742,10 @@ class GradeCalculator
     # we don't want to update the score metadata. TODO: start storing the
     # score metadata for unposted grades.
     if @ignore_muted
+      table = ScoreMetadata.quoted_table_name
       Score.connection.with_max_update_limit(dropped_values.length) do
-        ScoreMetadata.connection.execute("
-          INSERT INTO #{ScoreMetadata.quoted_table_name}
+        ScoreMetadata.connection.execute(<<~SQL.squish)
+          INSERT INTO #{table}
             (score_id, calculation_details, created_at, updated_at)
             SELECT
               scores.id AS score_id,
@@ -738,8 +762,10 @@ class GradeCalculator
           DO UPDATE SET
             calculation_details = excluded.calculation_details,
             updated_at = excluded.updated_at
-          ;
-        ")
+          WHERE
+          #{table}.calculation_details #>>'{current,dropped}' IS DISTINCT FROM excluded.calculation_details #>>'{current,dropped}' OR
+          #{table}.calculation_details #>>'{final,dropped}' IS DISTINCT FROM excluded.calculation_details #>>'{final,dropped}'
+        SQL
       end
     end
   rescue ActiveRecord::Deadlocked => e
