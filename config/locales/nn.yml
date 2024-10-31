@@ -24929,6 +24929,7 @@ nn:
   spring_grading_period_current_score_7083cf0d: "Gjeldande resultat for vårens karaktersetjingperiode"
   spring_grading_period_final_score_386d92f7: "Sluttresultat for vårens karaktersetjingsperiode"
   spring_grading_period_id_61aec82c: "Karaktersetjingsperiode-ID for våren"
+  square_511eb3b3: Kvadrat
   sr_gradebook: 
     all_grading_periods: "Alle periodar for karaktersetjing"
     all_sections: "Alle seksjonar"
