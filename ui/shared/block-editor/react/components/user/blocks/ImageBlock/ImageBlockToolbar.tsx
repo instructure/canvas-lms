@@ -34,20 +34,24 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {Popover} from '@instructure/ui-popover'
 import {TextArea} from '@instructure/ui-text-area'
 
+import {changeSizeVariant} from '../../../../utils/resizeHelpers'
+
 const I18n = useI18nScope('block-editor/image-block')
 
 const ImageBlockToolbar = () => {
   const {
     actions: {setProp},
+    node,
     props,
   } = useNode((n: Node) => ({
+    node: n,
     props: n.data.props,
   }))
   const [showUploadModal, setShowUploadModal] = useState(false)
 
   const handleConstraintChange = useCallback(
     (
-      e: React.MouseEvent<ViewOwnProps, MouseEvent>,
+      _e: React.MouseEvent<ViewOwnProps, MouseEvent>,
       value: MenuItemProps['value'] | MenuItemProps['value'][],
       _selected: MenuItemProps['selected'],
       _args: MenuItem
@@ -70,16 +74,22 @@ const ImageBlockToolbar = () => {
 
   const handleChangeSzVariant = useCallback(
     (
-      e: React.MouseEvent<ViewOwnProps, MouseEvent>,
+      _e: React.MouseEvent<ViewOwnProps, MouseEvent>,
       value: MenuItemProps['value'] | MenuItemProps['value'][],
       _selected: MenuItemProps['selected'],
       _args: MenuItem
     ) => {
       setProp((prps: ImageBlockProps) => {
         prps.sizeVariant = value as SizeVariant
+
+        if (node.dom) {
+          const {width, height} = changeSizeVariant(node.dom, value as SizeVariant)
+          prps.width = width
+          prps.height = height
+        }
       })
     },
-    [setProp]
+    [node.dom, setProp]
   )
 
   const handleShowUploadModal = useCallback(() => {

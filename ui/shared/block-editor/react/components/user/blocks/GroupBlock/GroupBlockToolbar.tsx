@@ -19,9 +19,15 @@
 import React, {useCallback} from 'react'
 import {useNode, type Node} from '@craftjs/core'
 import {Flex} from '@instructure/ui-flex'
-import {type GroupLayout, type GroupAlignment, type GroupBlockProps} from './types'
-import {ToolbarColor} from '../../common/ToolbarColor'
+import {
+  type GroupLayout,
+  type GroupAlignment,
+  type GroupHorizontalAlignment,
+  type GroupBlockProps,
+} from './types'
+import {ToolbarColor, type ColorSpec} from '../../common/ToolbarColor'
 import {ToolbarAlignment} from './toolbar/ToolbarAlignment'
+import {ToolbarCorners} from './toolbar/ToolbarCorners'
 import {useScope} from '@canvas/i18n'
 
 const I18n = useScope('block-editor')
@@ -35,17 +41,21 @@ export const GroupBlockToolbar = () => {
   }))
 
   const handleChangeColors = useCallback(
-    (fgcolor: string, bgcolor: string) => {
+    ({bgcolor, bordercolor}: ColorSpec) => {
       setProp((prps: GroupBlockProps) => {
-        prps.color = fgcolor
         prps.background = bgcolor
+        prps.borderColor = bordercolor
       })
     },
     [setProp]
   )
 
   const handleSaveAlignment = useCallback(
-    (layout: GroupLayout, alignment: GroupAlignment, verticalAlignment: GroupAlignment) => {
+    (
+      layout: GroupLayout,
+      alignment: GroupHorizontalAlignment,
+      verticalAlignment: GroupAlignment
+    ) => {
       setProp((prps: GroupBlockProps) => {
         prps.layout = layout
         prps.alignment = alignment
@@ -55,11 +65,18 @@ export const GroupBlockToolbar = () => {
     [setProp]
   )
 
-  const getCurrentColor = () => {
-    if (props.color) return props.color
-    return window
-      .getComputedStyle(document.documentElement)
-      .getPropertyValue('--ic-brand-font-color-dark')
+  const handleSaveCorners = useCallback(
+    (rounded: boolean) => {
+      setProp((prps: GroupBlockProps) => {
+        prps.roundedCorners = rounded
+      })
+    },
+    [setProp]
+  )
+
+  const getCurrentBorderColor = () => {
+    if (props.Bordercolor) return props.borderColor
+    return window.getComputedStyle(document.documentElement).getPropertyValue('border-color')
   }
 
   const getCurrentBackgroundColor = () => {
@@ -69,12 +86,12 @@ export const GroupBlockToolbar = () => {
   return (
     <Flex gap="small">
       <ToolbarColor
-        fgcolorLabel={I18n.t('Group Color')}
-        bgcolorLabel={I18n.t('Group Background')}
-        fgcolor={getCurrentColor()}
         bgcolor={getCurrentBackgroundColor()}
+        bordercolor={getCurrentBorderColor()}
         onChange={handleChangeColors}
       />
+
+      <ToolbarCorners rounded={props.roundedCorners} onSave={handleSaveCorners} />
 
       <ToolbarAlignment
         layout={props.layout}

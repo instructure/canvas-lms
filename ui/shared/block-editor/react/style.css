@@ -160,7 +160,6 @@
 
 .empty::before {
   content: attr(data-placeholder);
-  color: #ababab;
   pointer-events: none;
   margin: 0 auto;
 }
@@ -316,6 +315,10 @@
 
 .group-block {
   overflow: visible; /* with auto I get 4px of overflow that shows a scrollbar */
+  border: 2px solid transparent;
+  &.rounded-corners {
+    border-radius: 8px;
+  }
   .no-sections {
     display: flex;
     align-items: flex-start;
@@ -334,6 +337,9 @@
     &.end-align > .group-block__inner {
       justify-content: flex-end;
     }
+    &.distribute-align > .group-block__inner {
+      justify-content: space-around;
+    }
     &.start-valign > .group-block__inner {
       align-items: flex-start;
     }
@@ -350,6 +356,12 @@
     }
     &.end-align > .group-block__inner {
       align-items: flex-end;
+    }
+    &.center-valign > .group-block__inner {
+      justify-content: center;
+    }
+    &.end-valign > .group-block__inner {
+      justify-content: flex-end;
     }
   }
 

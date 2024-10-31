@@ -27,13 +27,19 @@ import {
   IconTextStartLine,
   IconTextCenteredLine,
   IconTextEndLine,
+  IconMoreLine,
 } from '@instructure/ui-icons'
 import {
   IconPlacementTop,
   IconPlacementMiddle,
   IconPlacementBottom,
 } from '../../../../../assets/internal-icons'
-import {type GroupLayout, type GroupAlignment, defaultAlignment} from '../types'
+import {
+  type GroupLayout,
+  type GroupAlignment,
+  type GroupHorizontalAlignment,
+  defaultAlignment,
+} from '../types'
 
 import {useScope} from '@canvas/i18n'
 
@@ -45,7 +51,7 @@ type ToolbarAlignmentProps = {
   verticalAlignment?: GroupAlignment
   onSave: (
     layout: GroupLayout,
-    alignment: GroupAlignment,
+    alignment: GroupHorizontalAlignment,
     verticalAlignment: GroupAlignment
   ) => void
 }
@@ -58,7 +64,7 @@ const ToolbarAlignment = ({
 }: ToolbarAlignmentProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [currLayout, setCurrLayout] = useState<GroupLayout>(layout || defaultAlignment.layout)
-  const [currAlignment, setCurrAlignment] = useState<GroupAlignment>(
+  const [currAlignment, setCurrAlignment] = useState<GroupHorizontalAlignment>(
     alignment || defaultAlignment.alignment
   )
   const [currVerticalAlignment, setCurrVerticalAlignment] = useState<GroupAlignment>(
@@ -191,6 +197,18 @@ const ToolbarAlignment = ({
               <Flex gap="x-small">
                 <IconTextEndLine />
                 {I18n.t('Align to end')}
+              </Flex>
+            </Menu.Item>
+            <Menu.Item
+              value="distribute"
+              onSelect={() => setCurrAlignment('distribute')}
+              selected={currAlignment === 'distribute'}
+            >
+              <Flex gap="x-small">
+                <span style={{rotate: '90deg'}}>
+                  <IconMoreLine />
+                </span>
+                {I18n.t('Distribute')}
               </Flex>
             </Menu.Item>
           </Menu.Group>

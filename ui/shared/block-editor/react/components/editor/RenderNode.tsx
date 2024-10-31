@@ -159,7 +159,10 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
   const renderResizer = () => {
     if (!mountPoint) return null
 
-    return ReactDOM.createPortal(<BlockResizer mountPoint={mountPoint} />, mountPoint)
+    return ReactDOM.createPortal(
+      <BlockResizer mountPoint={mountPoint} sizeVariant={node.data.props.sizeVariant || 'pixel'} />,
+      mountPoint
+    )
   }
 
   const renderRelated = () => {

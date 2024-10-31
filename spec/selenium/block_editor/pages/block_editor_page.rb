@@ -35,7 +35,7 @@ module BlockEditorPage
     block_page.update!(
       block_editor_attributes: {
         time: Time.now.to_i,
-        version: "1",
+        version: "0.2",
         blocks: block_page_content
       }
     )
@@ -77,6 +77,22 @@ module BlockEditorPage
 
   def template_chooser_active_customize_template
     fj(template_chooser_active_customize_template_selector)
+  end
+
+  def template_chooser_active_quick_look_template_selector
+    'button:contains("Quick Look"):visible:first'
+  end
+
+  def template_chooser_active_quick_look_template
+    fj(template_chooser_active_quick_look_template_selector)
+  end
+
+  def template_quick_look_header_selector
+    'h3:contains("Template: Quick Look")'
+  end
+
+  def template_quick_look_header
+    fj(template_quick_look_header_selector)
   end
 
   def template_chooser_template_selector_for_number(number)
