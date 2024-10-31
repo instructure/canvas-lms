@@ -20,8 +20,12 @@
 module VisibilityHelpers
   module Common
     def service_cache_fetch(service:, course_ids: nil, user_ids: nil, additional_ids: nil, &)
-      key = service_cache_key(service:, course_ids:, user_ids:, additional_ids:)
-      Rails.cache.fetch(key, expires_in: 1.minute, &)
+      if Account.site_admin.feature_enabled?(:select_release_query_caching)
+        key = service_cache_key(service:, course_ids:, user_ids:, additional_ids:)
+        Rails.cache.fetch(key, expires_in: 1.minute, &)
+      else
+        yield
+      end
     end
 
     private

@@ -154,6 +154,18 @@ selective_release_edit_page:
     development:
       state: allowed_on # enable for local development
 
+select_release_query_caching:
+  state: hidden
+  display_name: Selective Release - Query Caching
+  description: |-
+    If enabled, the selective release feature will use cache the results of the heavy queries to improve performance.
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on # enable for automated testings builds and local testing
+    development:
+      state: allowed_on # enable for local development
+
 differentiated_files:
   state: hidden
   display_name: Selective Release - Files
