@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import OtpForm from '../shared/OtpForm'
 import React, {useCallback, useEffect, useState} from 'react'
+import OtpForm from '../shared/OtpForm'
 import SSOButtons from '../shared/SSOButtons'
 import SignInLinks from '../shared/SignInLinks'
 import {Button} from '@instructure/ui-buttons'

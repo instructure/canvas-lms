@@ -683,4 +683,23 @@ describe Login::CanvasController do
       expect(response.location).to match(%r{https://example.com})
     end
   end
+
+  describe "#render_new_login" do
+    before do
+      Account.default.enable_feature!(:login_registration_ui_identity)
+      facebook_provider = Account.default.authentication_providers.create!(auth_type: "facebook", id: 1)
+      google_provider = Account.default.authentication_providers.create!(auth_type: "google", id: 2)
+      allow(facebook_provider.class).to receive(:display_name).and_return("Facebook")
+      allow(google_provider.class).to receive(:display_name).and_return("Google")
+    end
+
+    it "renders the new login template and assigns auth providers with display names" do
+      get :new
+      expect(response).to render_template("login/canvas/new_login")
+      expect(assigns(:auth_providers)).to match_array([
+                                                        hash_including(id: 1, auth_type: "facebook", display_name: "Facebook"),
+                                                        hash_including(id: 2, auth_type: "google", display_name: "Google")
+                                                      ])
+    end
+  end
 end
