@@ -1182,6 +1182,21 @@ module Lti
         expect(tool_configuration.redirect_uris).to eq developer_key.redirect_uris
       end
 
+      context "with invalid model" do
+        before do
+          tool_configuration.settings["public_jwk"] = []
+        end
+
+        it "does not raise an error" do
+          expect { subject }.not_to raise_error
+        end
+
+        it "transforms the model" do
+          subject
+          expect(tool_configuration).to have_received(:transform_settings)
+        end
+      end
+
       context "with already transformed model" do
         before do
           allow(tool_configuration).to receive(:transformed?).and_return(true)
@@ -1197,12 +1212,18 @@ module Lti
     describe "#untransform!" do
       subject { tool_configuration.untransform! }
 
-      let(:tool_configuration) { untransformed_tool_configuration }
-
       context "with untransformed model" do
+        let(:tool_configuration) { untransformed_tool_configuration }
+
         it "does not change the model" do
           expect { subject }.not_to change { tool_configuration }
         end
+      end
+
+      it "reports as untransformed" do
+        expect(tool_configuration).to be_transformed
+        subject
+        expect(tool_configuration).not_to be_transformed
       end
 
       it "puts data back into settings hash" do
@@ -1221,6 +1242,22 @@ module Lti
 
       it "leaves existing columns" do
         expect { subject }.not_to change { tool_configuration[:privacy_level] }
+      end
+
+      context "with invalid model" do
+        before do
+          tool_configuration.public_jwk = []
+        end
+
+        it "does not raise an error" do
+          expect { subject }.not_to raise_error
+        end
+
+        it "puts data back into settings hash" do
+          settings = tool_configuration.settings
+          subject
+          expect(tool_configuration[:settings]).to eq settings
+        end
       end
     end
 

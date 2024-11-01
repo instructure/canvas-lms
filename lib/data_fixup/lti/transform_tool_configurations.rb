@@ -19,6 +19,14 @@
 
 module DataFixup::Lti::TransformToolConfigurations
   def self.run
-    Lti::ToolConfiguration.find_each(&:transform!)
+    Lti::ToolConfiguration.find_each do |tc|
+      tc.transform!
+    rescue => e
+      Sentry.with_scope do |scope|
+        scope.set_tags(tool_configuration_id: tc.global_id)
+        scope.set_context("exception", { name: e.class.name, message: e.message })
+        Sentry.capture_message("DataFixup::Lti#transform_tool_configurations", level: :warning)
+      end
+    end
   end
 end
