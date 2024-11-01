@@ -40,32 +40,33 @@ export type ImageMapping = {
 
 export type ImagesMapping = Record<string, string>
 
-const getImageFilename = (response: Response): string => {
-  const contentDisposition = response.headers.get('content-disposition')
-  const filenameMatch = contentDisposition && contentDisposition.match(/filename="(.+)"/)
-  let filename = filenameMatch ? filenameMatch[1] : ''
-  if (!filename) {
-    const contentType = response.headers.get('content-type')
-    // get the extension from the content type
-    // e.g. image/png -> .png and image/svg+xml -> .svg
-    const extension = (contentType ? `.${contentType.split('/')[1]}` : '').replace(/\+.*$/, '')
-    filename = `${uuid.v4()}${extension}`
+const getImageFilename = (src: string): Promise<string> => {
+  const fileid = src.match(/\/files\/(\d+)\//)?.[1]
+  if (fileid) {
+    return fetch(`/api/v1/files/${fileid}`)
+      .then(response => {
+        if (response.ok) {
+          return response.json()
+        }
+        throw new Error(`Failed to fetch file metadata for file ${fileid}`)
+      })
+      .then(data => {
+        return data.display_name || data.filename
+      })
+      .catch(err => {
+        return src.replace(window.origin, '').replaceAll('/', '_')
+      })
+  } else {
+    return Promise.resolve(src.replace(window.origin, '').replaceAll('/', '_'))
   }
-  return filename
 }
 
 // take the image src URL as input and return the
 // name of the file we saved it in
 const saveTemplateImage = async (src: string): Promise<ImageMapping> => {
-  const response = await fetch(src, {mode: 'cors'})
-  if (response.ok === false) {
-    throw new Error(`Failed to fetch image: ${src}`)
-  }
-  const filename = getImageFilename(response)
-
-  const blob = await response.blob()
+  const filename = await getImageFilename(src)
   const link = document.createElement('a')
-  link.href = window.URL.createObjectURL(blob)
+  link.href = src
   link.download = filename
   document.body.appendChild(link)
   link.click()
