@@ -49,7 +49,7 @@ const handleImageSubmit = async (
       }
       const tabContext = 'documents'
       const result = await storeProps?.startMediaUpload(tabContext, fileMetaData)
-      url = prepEmbedSrc(result.url)
+      url = prepEmbedSrc(result.href || result.url)
       break
     }
     case 'URL': {
