@@ -72,10 +72,6 @@ describe('Scopes', () => {
     let wrapper
 
     beforeEach(() => {
-      window.ENV = {
-        includesFeatureFlagEnabled: true,
-      }
-
       const {wrapper: innerWrapper} = renderScopes()
 
       wrapper = innerWrapper
