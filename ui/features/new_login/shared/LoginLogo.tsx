@@ -18,13 +18,12 @@
 
 import React from 'react'
 import classNames from 'classnames'
+import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
+import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
-import {View} from '@instructure/ui-view'
+import {TruncateText} from '@instructure/ui-truncate-text'
 import {useNewLogin} from '../context/NewLoginContext'
-
-// @ts-expect-error
-import styles from './LoginLogo.module.css'
 
 interface Props {
   className?: string
@@ -36,14 +35,43 @@ const LoginLogo = ({className}: Props) => {
   if (!src) return null
 
   return (
-    <View as="div" className={classNames(className, styles.loginLogo)}>
-      <Img src={src} alt={alt} />
-      {alt && (
-        <Text size="x-small" className={styles.loginLogo__desc}>
-          {alt}
-        </Text>
-      )}
-    </View>
+    <Responsive
+      match="media"
+      query={{
+        tablet: {minWidth: '48rem'},
+        desktop: {minWidth: '75rem'},
+      }}
+    >
+      {(_props, matches) => {
+        const largerScreen = matches?.includes('desktop')
+        return (
+          <Flex
+            as="div"
+            direction="column"
+            height={largerScreen ? '7.5rem' : '5rem'}
+            gap="small"
+            alignItems="center"
+            justifyItems="center"
+            className={classNames(className)}
+          >
+            <Flex.Item
+              style={{maxWidth: largerScreen ? '18.75rem' : '11.25rem'}}
+              shouldShrink={true}
+            >
+              <Img width="100%" height="100%" constrain="contain" src={src} alt={alt} />
+            </Flex.Item>
+
+            {alt && (
+              <Flex.Item textAlign="center">
+                <Text size="x-small">
+                  <TruncateText>{alt}</TruncateText>
+                </Text>
+              </Flex.Item>
+            )}
+          </Flex>
+        )
+      }}
+    </Responsive>
   )
 }
 
