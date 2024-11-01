@@ -20,8 +20,12 @@
 module VisibilityHelpers
   module Common
     def service_cache_fetch(service:, course_id_params: nil, user_id_params: nil, additional_id_params: nil, &)
-      key = service_cache_key(service:, course_id_params:, user_id_params:, additional_id_params:)
-      Rails.cache.fetch(key, expires_in: 1.minute, &)
+      if Account.site_admin.feature_enabled?(:select_release_query_caching)
+        key = service_cache_key(service:, course_id_params:, user_id_params:, additional_id_params:)
+        Rails.cache.fetch(key, expires_in: 1.minute, &)
+      else
+        yield
+      end
     end
 
     private
@@ -35,7 +39,7 @@ module VisibilityHelpers
       c = sanitize_and_stringify_ids(course_id_params)
       u = sanitize_and_stringify_ids(user_id_params)
       a = sanitize_and_stringify_ids(additional_id_params)
-      Digest::SHA256.hexdigest("#{service}:c#{c}:u#{u}:a#{a}")
+      Digest::SHA256.hexdigest("#{service}:#{Shard.current.id}:c#{c}:u#{u}:a#{a}")
     end
   end
 end
