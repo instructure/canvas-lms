@@ -306,4 +306,29 @@ module BlockEditorPage
   def kb_focus_block_toolbar
     driver.action.key_down(:control).send_keys(:f9).key_up(:control).perform
   end
+
+  def block_toolbar_action(action)
+    selector = "[data-testid='block-toolbar-icon-button-#{action}']"
+    element_visible?(selector) ? f(selector) : selector
+  end
+
+  def block_toolbar_menu_string(menu_items)
+    separators = {
+      "Color" => "\n\n\n\n\n\n\n\n\n",
+      "Drag to move" => "\n\n\n",
+      "Rouned corners" => "\n  \n"
+    }
+
+    menu_items.map { |item| "#{separators[item] || ""}#{item}" }.join
+  end
+
+  def expect_block_toolbar_menu(menu_items)
+    expect(block_toolbar.attribute("textContent")).to eq(block_toolbar_menu_string(menu_items))
+  end
+
+  def element_visible?(selector)
+    driver.find_element(:css, selector).displayed?
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+    false
+  end
 end

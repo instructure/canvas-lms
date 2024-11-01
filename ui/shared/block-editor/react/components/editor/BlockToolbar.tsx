@@ -293,6 +293,7 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
             screenReaderLabel={I18n.t('Go up')}
             withBackground={false}
             withBorder={false}
+            data-testid="block-toolbar-icon-button-go-up"
           >
             <IconArrowOpenStartLine />
           </IconButton>
@@ -308,6 +309,7 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
             screenReaderLabel={I18n.t('Go down')}
             withBackground={false}
             withBorder={false}
+            data-testid="block-toolbar-icon-button-go-down"
           >
             <IconArrowOpenEndLine />
           </IconButton>
