@@ -146,6 +146,14 @@ describe AuthenticationProvider::OpenIDConnect do
       expect { subject.unique_id(double(params: { "id_token" => id_token }, options: {})) }.not_to raise_error
     end
 
+    it "records the issuer(s)" do
+      subject.client_id = "abc"
+      payload = { sub: "some-login-attribute", aud: "abc", iss: "issuer" }
+      id_token = Canvas::Security.create_jwt(payload, nil, :unsigned)
+      subject.unique_id(double(params: { "id_token" => id_token }, options: {}))
+      expect(subject.settings["known_issuers"]).to eq ["issuer"]
+    end
+
     context "with oidc_full_token_validation feature flag on" do
       before do
         Account.default.enable_feature!(:oidc_full_token_validation)

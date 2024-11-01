@@ -48,6 +48,10 @@ class AuthenticationProvider::Google < AuthenticationProvider::OpenIDConnect
     Rails.cache
   end
 
+  def self.always_validate?
+    true
+  end
+
   def issuer
     # silly Google. their issuer may or may not include the scheme. against spec
     # (it should always include the scheme)
