@@ -8469,6 +8469,21 @@ describe Assignment do
       expect(assignment).to be_a2_enabled
     end
 
+    it "returns false when assignment is a new quiz" do
+      assignment.submission_types = "external_tool"
+      tool = @course.context_external_tools.create!(
+        name: "Quizzes.Next",
+        consumer_key: "test_key",
+        shared_secret: "test_secret",
+        tool_id: "Quizzes 2",
+        url: "http://example.com/launch"
+      )
+      assignment.external_tool_tag_attributes = { content: tool }
+      assignment.save!
+
+      expect(assignment).not_to be_a2_enabled
+    end
+
     describe "peer reviews enabled" do
       before do
         allow(@course).to receive(:feature_enabled?).with(:peer_reviews_for_a2).and_return(true)
