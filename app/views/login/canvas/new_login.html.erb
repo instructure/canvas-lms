@@ -36,7 +36,7 @@
      body_bg_image = brand_variable("ic-brand-Login-body-bgd-image")
 
      # theme editor preview mode
-     is_preview_mode = params[:previewing_from_themeeditor]
+     is_preview_mode = ERB::Util.h(params[:previewing_from_themeeditor])
 %>
 
 <div id="new_login_data"
