@@ -2211,7 +2211,7 @@ describe ExternalToolsController do
     it "does not create tool if user lacks create_tool_manually" do
       user_session(@student)
       post "create", params: { course_id: @course.id, external_tool: { name: "tool name", url: "http://example.com", consumer_key: "key", shared_secret: "secret" } }, format: "json"
-      assert_status(401)
+      assert_forbidden
     end
 
     it "creates tool if user is granted create_tool_manually" do

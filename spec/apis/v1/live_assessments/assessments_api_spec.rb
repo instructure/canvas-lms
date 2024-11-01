@@ -76,8 +76,8 @@ describe LiveAssessments::AssessmentsController, type: :request do
     end
 
     context "as a student" do
-      it "is unauthorized" do
-        create_assessments([assessment_hash], user: student, expected_status: 401)
+      it "is forbidden" do
+        create_assessments([assessment_hash], user: student, expected_status: 403)
       end
     end
   end
@@ -106,8 +106,8 @@ describe LiveAssessments::AssessmentsController, type: :request do
     end
 
     context "as a student" do
-      it "is unauthorized" do
-        index_assessments(user: student, expected_status: 401)
+      it "is forbidden" do
+        index_assessments(user: student, expected_status: 403)
       end
     end
   end

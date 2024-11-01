@@ -75,7 +75,7 @@ describe Quizzes::QuizIpFiltersController, type: :request do
       student_in_course
 
       get_index(true)
-      assert_status(401)
+      assert_forbidden
     end
 
     context "Pagination" do

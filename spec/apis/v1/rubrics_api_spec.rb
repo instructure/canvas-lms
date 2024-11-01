@@ -223,7 +223,7 @@ describe "Rubrics API", type: :request do
         create_rubric(@course)
         @user = teacher_in_other_course
         raw_rubric_call(@course)
-        assert_status(401)
+        assert_forbidden
       end
 
       it "returns not found status if rubric belongs to a course other than the one requested for" do

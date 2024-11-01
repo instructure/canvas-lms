@@ -289,9 +289,9 @@ describe GradingStandardsApiController, type: :request do
     end
 
     describe "grading standard creation" do
-      it "returns unauthorized for account grading standards" do
+      it "returns forbidden for account grading standards" do
         post_params = { "title" => "account grading standard", "grading_scheme_entry" => grading_scheme_entry }
-        api_call(:post, account_resources_path, account_create_params, post_params, {}, { expected_status: 401 })
+        api_call(:post, account_resources_path, account_create_params, post_params, {}, { expected_status: 403 })
       end
 
       it "returns ok for course grading standards" do

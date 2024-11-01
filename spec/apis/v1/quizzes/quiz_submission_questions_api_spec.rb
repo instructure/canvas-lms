@@ -244,7 +244,7 @@ describe Quizzes::QuizSubmissionQuestionsController, type: :request do
     it "denies access to another student" do
       student_in_course
       api_index({}, { raw: true })
-      assert_status(401)
+      assert_forbidden
     end
   end
 
@@ -748,7 +748,7 @@ describe Quizzes::QuizSubmissionQuestionsController, type: :request do
                    },
                    { raw: true })
 
-        assert_status(403)
+        assert_forbidden
         expect(response.body).to match(/requires the lockdown browser/i)
       end
 
@@ -802,7 +802,7 @@ describe Quizzes::QuizSubmissionQuestionsController, type: :request do
       @question = create_question("multiple_choice")
       student_in_course
       api_flag({}, { raw: true })
-      assert_status(403)
+      assert_forbidden
     end
   end
 
@@ -827,7 +827,7 @@ describe Quizzes::QuizSubmissionQuestionsController, type: :request do
       @question = create_question("multiple_choice")
       student_in_course
       api_unflag({}, { raw: true })
-      assert_status(403)
+      assert_forbidden
     end
   end
 end

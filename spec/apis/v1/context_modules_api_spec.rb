@@ -1167,7 +1167,7 @@ describe "Modules API", type: :request do
                  module_id: course_module.id.to_s },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     it "shows module progress" do
@@ -1321,7 +1321,7 @@ describe "Modules API", type: :request do
                    course_id: @course.id.to_s },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
 
       it "disallows publishing" do
@@ -1335,7 +1335,7 @@ describe "Modules API", type: :request do
                    course_id: @course.id.to_s },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
 
       it "disallows unpublishing" do
@@ -1349,7 +1349,7 @@ describe "Modules API", type: :request do
                    course_id: @course.id.to_s },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 
@@ -1364,7 +1364,7 @@ describe "Modules API", type: :request do
                  id: @module1.id.to_s },
                { module: { name: "new name" } },
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     it "disallows create" do
@@ -1376,7 +1376,7 @@ describe "Modules API", type: :request do
                  course_id: @course.id.to_s },
                { module: { name: "new name" } },
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     it "disallows destroy" do
@@ -1389,7 +1389,7 @@ describe "Modules API", type: :request do
                  id: @module1.id.to_s },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     it "does not show progress for other students" do
@@ -1405,7 +1405,7 @@ describe "Modules API", type: :request do
                  student_id: student.id.to_s },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
 
       api_call(:get,
                "/api/v1/courses/#{@course.id}/modules/#{@module1.id}?student_id=#{student.id}",
@@ -1417,7 +1417,7 @@ describe "Modules API", type: :request do
                  student_id: student.id.to_s },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     context "with the selective_release_backend flag enabled" do
@@ -1514,7 +1514,7 @@ describe "Modules API", type: :request do
                  course_id: @course.id.to_s },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
       api_call(:get,
                "/api/v1/courses/#{@course.id}/modules/#{@module2.id}",
                { controller: "context_modules_api",
@@ -1524,7 +1524,7 @@ describe "Modules API", type: :request do
                  id: @module2.id.to_s },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
       api_call(:put,
                "/api/v1/courses/#{@course.id}/modules?event=publish&module_ids[]=1",
                { controller: "context_modules_api",
@@ -1535,7 +1535,7 @@ describe "Modules API", type: :request do
                  course_id: @course.id.to_s },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
       api_call(:put,
                "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
                { controller: "context_modules_api",
@@ -1545,7 +1545,7 @@ describe "Modules API", type: :request do
                  id: @module1.id.to_s },
                { module: { name: "new name" } },
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
       api_call(:delete,
                "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
                { controller: "context_modules_api",
@@ -1555,7 +1555,7 @@ describe "Modules API", type: :request do
                  id: @module1.id.to_s },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
       api_call(:post,
                "/api/v1/courses/#{@course.id}/modules",
                { controller: "context_modules_api",
@@ -1564,7 +1564,7 @@ describe "Modules API", type: :request do
                  course_id: @course.id.to_s },
                { module: { name: "new name" } },
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
   end
 end

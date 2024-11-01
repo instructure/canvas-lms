@@ -1041,7 +1041,7 @@ describe TabsController, type: :request do
                                                                                     tab_id:,
                                                                                     format: "json",
                                                                                     position: 4 })
-      expect(result).to eq 401
+      expect(result).to eq 403
     end
 
     it "allows updating tabs to a new LTI position when the penultimate tab is hidden" do

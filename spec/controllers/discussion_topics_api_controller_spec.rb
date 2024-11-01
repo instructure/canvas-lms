@@ -355,7 +355,7 @@ describe DiscussionTopicsApiController do
 
       get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
 
-      expect(response).to be_unauthorized
+      expect(response).to be_forbidden
     end
 
     it "returns an error if there is no llm config" do
@@ -403,7 +403,7 @@ describe DiscussionTopicsApiController do
 
       post "summary_feedback", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, summary_id: @refined_summary.id, _action: "like" }, format: "json"
 
-      expect(response).to be_unauthorized
+      expect(response).to be_forbidden
     end
 
     it "returns an error if the summary is not found" do
@@ -454,7 +454,7 @@ describe DiscussionTopicsApiController do
 
       put "disable_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
 
-      expect(response).to be_unauthorized
+      expect(response).to be_forbidden
     end
 
     it "disables the summary" do

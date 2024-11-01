@@ -88,7 +88,7 @@ describe "EportfoliosApi", type: :request do
     end
 
     context "as a random other user" do
-      it "is unauthorized" do
+      it "is forbidden" do
         @user = @other_user
         api_call(:get,
                  "/api/v1/users/#{@eportfolio_user.id}/eportfolios",
@@ -100,7 +100,7 @@ describe "EportfoliosApi", type: :request do
                  },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
   end
@@ -127,7 +127,7 @@ describe "EportfoliosApi", type: :request do
         expect(json["spam_status"]).to be_nil
       end
 
-      it "is unauthorized for a deleted eportfolio" do
+      it "is forbidden for a deleted eportfolio" do
         @user = @admin
         api_call(:get,
                  "/api/v1/eportfolios/#{@deleted_eportfolio.id}",
@@ -139,7 +139,7 @@ describe "EportfoliosApi", type: :request do
                  },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 
@@ -164,7 +164,7 @@ describe "EportfoliosApi", type: :request do
         expect(json["spam_status"]).to be_nil
       end
 
-      it "is unauthorized for a deleted eportfolio" do
+      it "is forbidden for a deleted eportfolio" do
         @user = @other_user
         api_call(:get,
                  "/api/v1/eportfolios/#{@deleted_eportfolio.id}",
@@ -176,12 +176,12 @@ describe "EportfoliosApi", type: :request do
                  },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 
     context "as a random other user" do
-      it "is unauthorized" do
+      it "is forbidden" do
         @user = @other_user
         api_call(:get,
                  "/api/v1/eportfolios/#{@active_eportfolio.id}",
@@ -193,7 +193,7 @@ describe "EportfoliosApi", type: :request do
                  },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
   end
@@ -230,7 +230,7 @@ describe "EportfoliosApi", type: :request do
     end
 
     context "as a random other user" do
-      it "is unauthorized" do
+      it "is forbidden" do
         @user = @other_user
         api_call(:delete,
                  "/api/v1/eportfolios/#{@active_eportfolio.id}",
@@ -242,7 +242,7 @@ describe "EportfoliosApi", type: :request do
                  },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
   end
@@ -261,7 +261,7 @@ describe "EportfoliosApi", type: :request do
         expect(json.pluck("id").size).to eq 2
       end
 
-      it "is unauthorized for a deleted eportfolio" do
+      it "is forbidden for a deleted eportfolio" do
         @user = @admin
         api_call(:get,
                  "/api/v1/eportfolios/#{@deleted_eportfolio.id}/pages",
@@ -273,7 +273,7 @@ describe "EportfoliosApi", type: :request do
                  },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 
@@ -290,7 +290,7 @@ describe "EportfoliosApi", type: :request do
         expect(json.pluck("id").size).to eq 2
       end
 
-      it "is unauthorized for a deleted eportfolio" do
+      it "is forbidden for a deleted eportfolio" do
         @user = @eportfolio_user
         api_call(:get,
                  "/api/v1/eportfolios/#{@deleted_eportfolio.id}/pages",
@@ -302,12 +302,12 @@ describe "EportfoliosApi", type: :request do
                  },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 
     context "as a random other user" do
-      it "is unauthorized" do
+      it "is forbidden" do
         @user = @other_user
         api_call(:get,
                  "/api/v1/eportfolios/#{@active_eportfolio.id}/pages",
@@ -319,7 +319,7 @@ describe "EportfoliosApi", type: :request do
                  },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
   end
@@ -352,7 +352,7 @@ describe "EportfoliosApi", type: :request do
                  },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
 
       it "is not allowed for an invalid spam_status" do
@@ -373,7 +373,7 @@ describe "EportfoliosApi", type: :request do
     end
 
     context "as self" do
-      it "is unauthorized" do
+      it "is forbidden" do
         @user = @eportfolio_user
         api_call(:put,
                  "/api/v1/eportfolios/#{@active_eportfolio.id}/moderate?spam_status=marked_as_spam",
@@ -386,12 +386,12 @@ describe "EportfoliosApi", type: :request do
                  },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 
     context "as a random other user" do
-      it "is unauthorized" do
+      it "is forbidden" do
         @user = @other_user
         api_call(:put,
                  "/api/v1/eportfolios/#{@active_eportfolio.id}/moderate?spam_status=marked_as_spam",
@@ -404,7 +404,7 @@ describe "EportfoliosApi", type: :request do
                  },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
   end
@@ -446,7 +446,7 @@ describe "EportfoliosApi", type: :request do
     end
 
     context "as self" do
-      it "is unauthorized" do
+      it "is forbidden" do
         @user = @eportfolio_user
         api_call(:put,
                  "/api/v1/users/#{@eportfolio_user.id}/eportfolios?spam_status=marked_as_spam",
@@ -459,12 +459,12 @@ describe "EportfoliosApi", type: :request do
                  },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 
     context "as a random other user" do
-      it "is unauthorized" do
+      it "is forbidden" do
         @user = @other_user
         api_call(:put,
                  "/api/v1/users/#{@eportfolio_user.id}/eportfolios?spam_status=marked_as_spam",
@@ -477,7 +477,7 @@ describe "EportfoliosApi", type: :request do
                  },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
   end
@@ -499,7 +499,7 @@ describe "EportfoliosApi", type: :request do
     end
 
     context "as self" do
-      it "is unauthorized" do
+      it "is forbidden" do
         @user = @eportfolio_user
         api_call(:put,
                  "/api/v1/eportfolios/#{@deleted_eportfolio.id}/restore",
@@ -511,12 +511,12 @@ describe "EportfoliosApi", type: :request do
                  },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 
     context "as a random other user" do
-      it "is unauthorized" do
+      it "is forbidden" do
         @user = @other_user
         api_call(:put,
                  "/api/v1/eportfolios/#{@deleted_eportfolio.id}/restore",
@@ -528,7 +528,7 @@ describe "EportfoliosApi", type: :request do
                  },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
   end

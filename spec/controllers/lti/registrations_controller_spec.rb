@@ -366,9 +366,9 @@ describe Lti::RegistrationsController do
       context "with non-admin user" do
         before { user_session(student_in_course(account:).user) }
 
-        it "returns 401" do
+        it "returns 403" do
           subject
-          expect(response).to be_unauthorized
+          expect(response).to be_forbidden
         end
       end
 
@@ -495,9 +495,9 @@ describe Lti::RegistrationsController do
 
       before { user_session(student) }
 
-      it "returns 401" do
+      it "returns 403" do
         subject
-        expect(response).to be_unauthorized
+        expect(response).to be_forbidden
       end
     end
 
@@ -560,9 +560,9 @@ describe Lti::RegistrationsController do
 
       before { user_session(student) }
 
-      it "returns 401" do
+      it "returns 403" do
         subject
-        expect(response).to be_unauthorized
+        expect(response).to be_forbidden
       end
     end
 
@@ -631,9 +631,9 @@ describe Lti::RegistrationsController do
 
       before { user_session(student) }
 
-      it "returns 401" do
+      it "returns 403" do
         subject
-        expect(response).to be_unauthorized
+        expect(response).to be_forbidden
       end
     end
 
@@ -690,9 +690,9 @@ describe Lti::RegistrationsController do
 
       before { user_session(student) }
 
-      it "returns 401" do
+      it "returns 403" do
         subject
-        expect(response).to be_unauthorized
+        expect(response).to be_forbidden
       end
     end
 
@@ -750,9 +750,9 @@ describe Lti::RegistrationsController do
 
       before { user_session(student) }
 
-      it "returns 401" do
+      it "returns 403" do
         subject
-        expect(response).to be_unauthorized
+        expect(response).to be_forbidden
       end
     end
 
@@ -848,9 +848,9 @@ describe Lti::RegistrationsController do
 
       before { user_session(student) }
 
-      it "returns 401" do
+      it "returns 403" do
         subject
-        expect(response).to be_unauthorized
+        expect(response).to be_forbidden
       end
     end
 

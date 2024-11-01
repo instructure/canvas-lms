@@ -50,7 +50,7 @@ module ConditionalRelease
 
         it "requires grade viewing rights" do
           student_in_course(course: @course, active_all: true)
-          api_call(:get, @url, @base_params, {}, {}, { expected_status: 401 })
+          api_call(:get, @url, @base_params, {}, {}, { expected_status: 403 })
         end
 
         it "shows stats for export" do
@@ -88,7 +88,7 @@ module ConditionalRelease
 
         it "requires grade viewing rights" do
           @user = @student
-          api_call(:get, @url, @base_params, {}, {}, { expected_status: 401 })
+          api_call(:get, @url, @base_params, {}, {}, { expected_status: 403 })
         end
 
         it "requires a student id" do

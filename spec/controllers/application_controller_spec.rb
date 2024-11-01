@@ -3096,7 +3096,7 @@ RSpec.describe ApplicationController, "#render_unauthorized_action" do
     let(:format) { :json }
 
     specify { expect(response.headers["Content-Type"]).to match(%r{\Aapplication/json}) }
-    specify { expect(response).to have_http_status :unauthorized }
+    specify { expect(response).to have_http_status :forbidden }
     specify { expect(json_parse.fetch("status")).to eq "unauthorized" }
   end
 end

@@ -60,9 +60,9 @@ describe ContentMigrationsController, type: :request do
       expect(json.first["id"]).to eq @migration.id
     end
 
-    it "401s" do
+    it "403s" do
       course_with_student_logged_in(course: @course, active_all: true)
-      api_call(:get, @migration_url, @params, {}, {}, expected_status: 401)
+      api_call(:get, @migration_url, @params, {}, {}, expected_status: 403)
     end
 
     it "creates the course root folder" do
@@ -181,9 +181,9 @@ describe ContentMigrationsController, type: :request do
       api_call(:get, @migration_url + "000", @params.merge({ id: @migration.id.to_param + "000" }), {}, {}, expected_status: 404)
     end
 
-    it "401s" do
+    it "403s" do
       course_with_student_logged_in(course: @course, active_all: true)
-      api_call(:get, @migration_url, @params, {}, {}, expected_status: 401)
+      api_call(:get, @migration_url, @params, {}, {}, expected_status: 403)
     end
 
     it "does not return attachment for course copies" do
@@ -1013,7 +1013,7 @@ describe ContentMigrationsController, type: :request do
                    id: @migration.to_param },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
 
       it "maps ids" do

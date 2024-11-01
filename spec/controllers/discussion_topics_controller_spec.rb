@@ -2981,7 +2981,7 @@ describe DiscussionTopicsController do
     it "does not increment discussion_topic.created when topic is not successfully created" do
       user_session @observer
       post "create", params: topic_params(@course), format: :json
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
       expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created")
     end
 

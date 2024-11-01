@@ -106,7 +106,7 @@ RSpec.describe LatePolicyController do
         get :show, params: { id: course.to_param }
       end
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it { expect(response).to have_http_status(:forbidden) }
 
       it do
         expect(json_parse).to eql(
@@ -157,7 +157,7 @@ RSpec.describe LatePolicyController do
         post :create, params: { id: course.to_param, late_policy: valid_attributes }
       end
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it { expect(response).to have_http_status(:forbidden) }
 
       it do
         expect(json_parse).to eql(
@@ -223,7 +223,7 @@ RSpec.describe LatePolicyController do
           patch :update, params: { id: course.to_param, late_policy: new_attributes }
         end
 
-        it { expect(response).to have_http_status(:unauthorized) }
+        it { expect(response).to have_http_status(:forbidden) }
 
         it do
           expect(json_parse).to eql(

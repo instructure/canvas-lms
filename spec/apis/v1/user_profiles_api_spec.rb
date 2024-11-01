@@ -226,7 +226,7 @@ describe "User Profile API", type: :request do
                  action: "settings",
                  user_id: @admin.to_param,
                  format: "json")
-    assert_status(401)
+    assert_forbidden
   end
 
   context "user_services" do

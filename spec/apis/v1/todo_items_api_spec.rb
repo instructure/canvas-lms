@@ -99,7 +99,7 @@ describe UsersController, type: :request do
                  action: "todo_items",
                  format: "json",
                  course_id: @course.to_param)
-    assert_status(401)
+    assert_forbidden
   end
 
   it "returns a global user todo list" do

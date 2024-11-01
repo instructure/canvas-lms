@@ -1608,7 +1608,7 @@ describe "Module Items API", type: :request do
       end
 
       it "requires a student_id specified" do
-        call_select_mastery_path @assignment_tag, 100, nil, expected_status: 401
+        call_select_mastery_path @assignment_tag, 100, nil, expected_status: 403
       end
 
       it "requires an assignment_set_id specified" do
@@ -2109,7 +2109,7 @@ describe "Module Items API", type: :request do
                  id: @assignment_tag.id.to_s },
                { module_item: { title: "new name" } },
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     it "disallows create" do
@@ -2122,7 +2122,7 @@ describe "Module Items API", type: :request do
                  module_id: @module1.id.to_s },
                { module_item: { title: "new name" } },
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     it "disallows destroy" do
@@ -2136,7 +2136,7 @@ describe "Module Items API", type: :request do
                  id: @assignment_tag.id.to_s },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     it "does not show module item completion for other students" do
@@ -2153,7 +2153,7 @@ describe "Module Items API", type: :request do
                  module_id: @module1.id.to_s },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
 
       api_call(:get,
                "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}?student_id=#{student.id}",
@@ -2166,7 +2166,7 @@ describe "Module Items API", type: :request do
                  student_id: student.id.to_s },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     context "mark_as_done" do
@@ -2418,7 +2418,7 @@ describe "Module Items API", type: :request do
                    id: @assignment_tag.id.to_s },
                  { student_id: other_student.id, assignment_set_id: 100 },
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
 
       context "in a course that is public to auth users" do
@@ -2495,7 +2495,7 @@ describe "Module Items API", type: :request do
                  module_id: @module1.id.to_s },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
       api_call(:get,
                "/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items/#{@attachment_tag.id}",
                { controller: "context_module_items_api",
@@ -2506,7 +2506,7 @@ describe "Module Items API", type: :request do
                  id: @attachment_tag.id.to_s },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
       api_call(:get,
                "/api/v1/courses/#{@course.id}/module_item_redirect/#{@external_url_tag.id}",
                { controller: "context_module_items_api",
@@ -2516,7 +2516,7 @@ describe "Module Items API", type: :request do
                  id: @external_url_tag.id.to_s },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
       api_call(:put,
                "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
                { controller: "context_module_items_api",
@@ -2527,7 +2527,7 @@ describe "Module Items API", type: :request do
                  id: @assignment_tag.id.to_s },
                { module_item: { title: "new name" } },
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
       api_call(:post,
                "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
                { controller: "context_module_items_api",
@@ -2537,7 +2537,7 @@ describe "Module Items API", type: :request do
                  module_id: @module1.id.to_s },
                { module_item: { title: "new name" } },
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
       api_call(:delete,
                "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
                { controller: "context_module_items_api",
@@ -2548,7 +2548,7 @@ describe "Module Items API", type: :request do
                  id: @assignment_tag.id.to_s },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
       allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
       api_call(:post,
                "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}/select_mastery_path",
@@ -2560,7 +2560,7 @@ describe "Module Items API", type: :request do
                  id: @assignment_tag.id.to_s },
                { assignment_set_id: 100 },
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
   end
 end

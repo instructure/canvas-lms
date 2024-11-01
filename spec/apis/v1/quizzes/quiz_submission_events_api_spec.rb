@@ -71,7 +71,7 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
       @user = @teacher
       @quiz_submission = @quiz.quiz_submissions.last
       api_create({ raw: true }, {})
-      assert_status(401)
+      assert_forbidden
     end
 
     it "responds with no_content success" do
@@ -172,7 +172,7 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
       it "does not let me in" do
         @quiz_submission = @quiz.generate_submission(@student)
         api_index({ raw: true })
-        assert_status(401)
+        assert_forbidden
       end
     end
 
@@ -243,7 +243,7 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
 
       it "does not let me in" do
         api_index(raw: true)
-        assert_status(401)
+        assert_forbidden
       end
     end
   end

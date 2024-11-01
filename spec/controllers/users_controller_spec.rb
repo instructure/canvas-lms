@@ -548,7 +548,7 @@ describe UsersController do
 
         it "does not allow teachers to self register" do
           post "create", params: { pseudonym: { unique_id: "jane@example.com" }, user: { name: "Jane Teacher", terms_of_use: "1", initial_enrollment_type: "teacher" } }, format: "json"
-          assert_status(403)
+          assert_forbidden
         end
 
         it "does not allow students to self register" do
@@ -556,7 +556,7 @@ describe UsersController do
           @course.update_attribute(:self_enrollment, true)
 
           post "create", params: { pseudonym: { unique_id: "jane@example.com", password: "lolwut12", password_confirmation: "lolwut12" }, user: { name: "Jane Student", terms_of_use: "1", self_enrollment_code: @course.self_enrollment_code, initial_enrollment_type: "student" }, pseudonym_type: "username", self_enrollment: "1" }, format: "json"
-          assert_status(403)
+          assert_forbidden
         end
 
         it "allows observers to self register" do
@@ -2430,7 +2430,7 @@ describe UsersController do
       user_session(@user)
       put "update", params: { id: other_user.id }, format: "json"
       expect(response.body).not_to include "secret"
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
 
     it "overwrites stuck sis fields" do
@@ -3212,7 +3212,7 @@ describe UsersController do
 
       it "returns forbidden" do
         subject
-        assert_status(403)
+        assert_forbidden
         json = response.parsed_body
         expect(json["message"]).to eq "Developer key not authorized"
       end
@@ -3343,7 +3343,7 @@ describe UsersController do
       user_session(admin)
 
       delete "destroy", params: { id: user.id }, format: :json
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
 
     it "allows siteadmin users" do
@@ -3383,7 +3383,7 @@ describe UsersController do
       user_session(user2)
 
       delete "terminate_sessions", params: { id: user.id }, format: :json
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
 
     it "allows admin to terminate sessions" do
@@ -3443,7 +3443,7 @@ describe UsersController do
       @user1 = @user
       @user2 = user_factory(active_all: true)
       put "settings", params: { id: @user2.id, collapse_course_nav: true }, format: "json"
-      assert_unauthorized
+      assert_forbidden
     end
 
     it "updates collapse_course_nav preference to true" do

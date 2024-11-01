@@ -63,7 +63,7 @@ describe Quizzes::QuizStatisticsController, type: :request do
     it "denies unauthorized access" do
       student_in_course
       api_index raw: true
-      assert_status(401)
+      assert_forbidden
     end
 
     it "respects the all_versions parameter" do

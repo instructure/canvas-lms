@@ -20,16 +20,6 @@ ags_scores_multiple_files:
   environments:
     development:
       state: on
-api_auth_error_updates:
-  state: hidden
-  display_name: Updates to JSON API auth error HTTP code and JSON status field
-  description: |-
-    If enabled, an "unauthorized" response from the JSON API will return a 403
-    (Forbidden) instead of a 401 code, to be more in line with HTTP standards.
-    Also, when the API returns a unauthenticated or unauthorized JSON error,
-    the "status" field will not be localized; it will always be given in
-    English.
-  applies_to: SiteAdmin
 assignment_edit_placement_not_on_announcements:
   state: hidden
   applies_to: SiteAdmin

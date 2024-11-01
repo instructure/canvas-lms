@@ -74,10 +74,10 @@ describe "CommunicationChannels API", type: :request do
     end
 
     context "an unauthorized user" do
-      it "returns 401" do
+      it "returns 403" do
         user_with_pseudonym
         raw_api_call(:get, @path, @path_options)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
       it "does not list channels for a teacher's students" do
@@ -86,7 +86,7 @@ describe "CommunicationChannels API", type: :request do
         @user = @teacher
 
         raw_api_call(:get, @path, @path_options)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
   end
@@ -240,7 +240,7 @@ describe "CommunicationChannels API", type: :request do
                      @path_options.merge(user_id: @admin.to_param),
                      @post_params)
 
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
       context "not configured push" do
@@ -374,7 +374,7 @@ describe "CommunicationChannels API", type: :request do
                      "/api/v1/users/#{admin.id}/communication_channels/#{admin_channel.id}",
                      path_options.merge(user_id: admin.to_param, id: admin_channel.to_param))
 
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
       it "is able to delete by path, instead of id" do

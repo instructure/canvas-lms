@@ -1103,7 +1103,7 @@ describe AssignmentGroupsApiController, type: :request do
 
         it "cannot change group_weight" do
           params = { group_weight: 75 }
-          call_update.call(params, 401)
+          call_update.call(params, 403)
           expect(@assignment_group.reload.group_weight).to eq(50)
         end
 
@@ -1112,7 +1112,7 @@ describe AssignmentGroupsApiController, type: :request do
           @assignment_group.rules_hash = rules_hash
           @assignment_group.save
           rules_encoded = @assignment_group.rules
-          call_update.call({ rules: { drop_lowest: "1" } }, 401)
+          call_update.call({ rules: { drop_lowest: "1" } }, 403)
           expect(@assignment_group.reload.rules).to eq(rules_encoded)
         end
 

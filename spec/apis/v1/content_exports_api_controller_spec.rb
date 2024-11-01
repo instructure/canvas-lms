@@ -78,7 +78,7 @@ describe ContentExportsApiController, type: :request do
                        { controller: "content_exports_api", action: "index", format: "json", course_id: t_course.to_param },
                        {},
                        {},
-                       { expected_status: 401 })
+                       { expected_status: 403 })
     end
 
     it "returns the correct data" do
@@ -194,7 +194,7 @@ describe ContentExportsApiController, type: :request do
       expect(json["new_quizzes_export_state"]).to eql "completed"
     end
 
-    it "returns status 401 if the request is not from a site admin user" do
+    it "returns status 403 if the request is not from a site admin user" do
       @past = past_export
       api_call_as_user(t_teacher,
                        :put,
@@ -202,7 +202,7 @@ describe ContentExportsApiController, type: :request do
                        { controller: "content_exports_api", action: "update", format: "json", course_id: t_course.to_param, id: @past.to_param },
                        { new_quizzes_export_url: "https://some.url", new_quizzes_export_state: "completed" },
                        {},
-                       { expected_status: 401 })
+                       { expected_status: 403 })
     end
 
     context "when the new_quizzes_export_state param is set to 'failed'" do
@@ -249,7 +249,7 @@ describe ContentExportsApiController, type: :request do
                        { controller: "content_exports_api", action: "show", format: "json", course_id: t_course.to_param, id: @past.to_param },
                        {},
                        {},
-                       { expected_status: 401 })
+                       { expected_status: 403 })
     end
 
     it "returns the correct data" do
@@ -286,7 +286,7 @@ describe ContentExportsApiController, type: :request do
                        { controller: "content_exports_api", action: "show", format: "json", course_id: t_course.to_param, id: @zip_export.to_param },
                        {},
                        {},
-                       { expected_status: 401 })
+                       { expected_status: 403 })
     end
   end
 
@@ -298,7 +298,7 @@ describe ContentExportsApiController, type: :request do
                        { controller: "content_exports_api", action: "create", format: "json", course_id: t_course.to_param, export_type: "qti" },
                        {},
                        {},
-                       { expected_status: 401 })
+                       { expected_status: 403 })
     end
 
     it "requires an export_type parameter" do
@@ -1207,7 +1207,7 @@ describe ContentExportsApiController, type: :request do
                            { controller: "content_exports_api", action: "show", format: "json", course_id: t_course.to_param, id: cc_export.to_param },
                            {},
                            {},
-                           { expected_status: 401 })
+                           { expected_status: 403 })
         end
 
         it "excludes locked, deleted, and hidden folders and files from archive" do
@@ -1254,7 +1254,7 @@ describe ContentExportsApiController, type: :request do
                            { controller: "content_exports_api", action: "create", format: "json", course_id: t_course.to_param, export_type: "common_cartridge" },
                            {},
                            {},
-                           { expected_status: 401 })
+                           { expected_status: 403 })
         end
       end
     end
@@ -1273,7 +1273,7 @@ describe ContentExportsApiController, type: :request do
                          { controller: "content_exports_api", action: "create", format: "json", group_id: t_group.to_param, export_type: "zip" },
                          {},
                          {},
-                         { expected_status: 401 })
+                         { expected_status: 403 })
       end
 
       it "creates a group file export" do
@@ -1326,7 +1326,7 @@ describe ContentExportsApiController, type: :request do
                          { controller: "content_exports_api", action: "create", format: "json", user_id: t_student.to_param, export_type: "zip" },
                          {},
                          {},
-                         { expected_status: 401 })
+                         { expected_status: 403 })
       end
 
       it "creates a user file export" do
@@ -1379,7 +1379,7 @@ describe ContentExportsApiController, type: :request do
                          { controller: "content_exports_api", action: "show", format: "json", user_id: t_student.to_param, id: zip_export.to_param },
                          {},
                          {},
-                         expected_status: 401)
+                         expected_status: 403)
       end
     end
   end

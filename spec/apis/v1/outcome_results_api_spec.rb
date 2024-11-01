@@ -182,7 +182,7 @@ describe "Outcome Results API", type: :request do
                      action: "rollups",
                      format: "json",
                      course_id: outcome_course.id.to_s)
-        assert_status(403)
+        assert_forbidden
       end
 
       it "allows students to read their own results" do
@@ -206,13 +206,13 @@ describe "Outcome Results API", type: :request do
                      format: "json",
                      course_id: outcome_course.id.to_s,
                      user_ids: [outcome_students[1].id])
-        assert_status(403)
+        assert_forbidden
       end
 
       it "does not allow students to read other users' results via csv" do
         user_session outcome_students[0]
         get "/courses/#{@course.id}/outcome_rollups.csv"
-        assert_status(403)
+        assert_forbidden
       end
 
       it "requires an existing context" do

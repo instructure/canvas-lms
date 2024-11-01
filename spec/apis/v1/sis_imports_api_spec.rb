@@ -1081,7 +1081,7 @@ describe SisImportsApiController, type: :request do
              { import_type: "instructure_csv",
                attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv") },
              {},
-             expected_status: 401)
+             expected_status: 403)
   end
 
   it "works with import permissions" do

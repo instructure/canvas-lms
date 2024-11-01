@@ -200,14 +200,14 @@ describe JwtsController do
           generic_user = user_factory
           user_session(generic_user)
           post "create", params:, format: "json"
-          assert_unauthorized
+          assert_forbidden
         end
 
         it "generic user is unauthorized for Account context type" do
           generic_user = user_factory
           user_session(generic_user)
           post "create", params: params.merge(context_type: "Account", context_id: Account.last.id), format: "json"
-          assert_unauthorized
+          assert_forbidden
         end
       end
     end

@@ -237,7 +237,7 @@ describe "Pace Contexts API" do
 
       it "returns a 401" do
         get api_v1_pace_contexts_path(course.id), params: { format: :json }
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
 

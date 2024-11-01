@@ -203,7 +203,7 @@ describe "Outcome Groups API", type: :request do
                      action: "redirect",
                      account_id: @account.id.to_s,
                      format: "json")
-        assert_status(401)
+        assert_forbidden
       end
 
       it "redirects to the root group" do
@@ -701,7 +701,7 @@ describe "Outcome Groups API", type: :request do
                    account_id: @account.id.to_s,
                    id: @group.id.to_s,
                    format: "json")
-      assert_status(401)
+      assert_forbidden
     end
 
     it "requires manage_global_outcomes permission for global outcomes" do
@@ -715,7 +715,7 @@ describe "Outcome Groups API", type: :request do
                    action: "update",
                    id: @group.id.to_s,
                    format: "json")
-      assert_status(401)
+      assert_forbidden
     end
 
     it "fails for root groups" do
@@ -862,7 +862,7 @@ describe "Outcome Groups API", type: :request do
                    account_id: @account.id.to_s,
                    id: @group.id.to_s,
                    format: "json")
-      assert_status(401)
+      assert_forbidden
     end
 
     it "requires manage_global_outcomes permission for global outcomes" do
@@ -876,7 +876,7 @@ describe "Outcome Groups API", type: :request do
                    action: "destroy",
                    id: @group.id.to_s,
                    format: "json")
-      assert_status(401)
+      assert_forbidden
     end
 
     it "fails for root groups" do
@@ -1263,7 +1263,7 @@ describe "Outcome Groups API", type: :request do
                      id: @group.id.to_s,
                      outcome_id: @outcome.id.to_s,
                      format: "json")
-        assert_status(401)
+        assert_forbidden
       end
 
       it "requires manage_global_outcomes permission for global groups" do
@@ -1277,7 +1277,7 @@ describe "Outcome Groups API", type: :request do
                      id: @group.id.to_s,
                      outcome_id: @outcome.id.to_s,
                      format: "json")
-        assert_status(401)
+        assert_forbidden
       end
 
       it "fails if the outcome isn't available to the context" do
@@ -1698,7 +1698,7 @@ describe "Outcome Groups API", type: :request do
                    id: @group.id.to_s,
                    outcome_id: @outcome.id.to_s,
                    format: "json")
-      assert_status(401)
+      assert_forbidden
     end
 
     it "requires manage_global_outcomes permission for global groups" do
@@ -1713,7 +1713,7 @@ describe "Outcome Groups API", type: :request do
                    id: @group.id.to_s,
                    outcome_id: @outcome.id.to_s,
                    format: "json")
-      assert_status(401)
+      assert_forbidden
     end
 
     it "404s if the outcome isn't linked in the group" do
@@ -1913,7 +1913,7 @@ describe "Outcome Groups API", type: :request do
                    account_id: @account.id.to_s,
                    id: @group.id.to_s,
                    format: "json")
-      assert_status(401)
+      assert_forbidden
     end
 
     it "requires manage_global_outcomes permission for global groups" do
@@ -1926,7 +1926,7 @@ describe "Outcome Groups API", type: :request do
                    action: "create",
                    id: @group.id.to_s,
                    format: "json")
-      assert_status(401)
+      assert_forbidden
     end
 
     it "creates a new outcome group" do
@@ -2005,7 +2005,7 @@ describe "Outcome Groups API", type: :request do
                      id: @target_group.id.to_s,
                      format: "json" },
                    { source_outcome_group_id: @source_group.id.to_s })
-      assert_status(401)
+      assert_forbidden
     end
 
     it "requires manage_global_outcomes permission for global groups" do
@@ -2019,7 +2019,7 @@ describe "Outcome Groups API", type: :request do
                      id: @target_group.id.to_s,
                      format: "json" },
                    { source_outcome_group_id: @source_group.id.to_s })
-      assert_status(401)
+      assert_forbidden
     end
 
     it "fails if the source group doesn't exist (or is deleted)" do

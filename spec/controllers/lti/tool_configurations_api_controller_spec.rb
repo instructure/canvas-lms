@@ -77,7 +77,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
     context "when the user is not an admin" do
       before { user_session(student) }
 
-      it { is_expected.to be_unauthorized }
+      it { is_expected.to be_forbidden }
     end
 
     unless skip_404

@@ -165,7 +165,7 @@ describe Polling::PollSessionsController, type: :request do
 
         get_show(true)
 
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
         @poll_session.reload
         expect(@poll_session.poll_submissions.size).to be_zero
       end
@@ -339,7 +339,7 @@ describe Polling::PollSessionsController, type: :request do
     end
 
     context "as a student" do
-      it "is unauthorized" do
+      it "is forbidden" do
         student_in_course(active_all: true, course: @course)
         section = @course.course_sections.create!(name: "Another Section")
         original_id = @poll_session.course_section.id
@@ -347,7 +347,7 @@ describe Polling::PollSessionsController, type: :request do
         put_update({ course_section_id: section.id }, true)
 
         @poll_session.reload
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
         expect(@poll_session.course_section.id).not_to eq section.id
         expect(@poll_session.course_section.id).to eq original_id
       end
@@ -394,7 +394,7 @@ describe Polling::PollSessionsController, type: :request do
 
           get_open
 
-          expect(response).to have_http_status :unauthorized
+          expect(response).to have_http_status :forbidden
           @poll_session.reload
           expect(@poll_session.is_published).not_to be_truthy
         end
@@ -402,7 +402,7 @@ describe Polling::PollSessionsController, type: :request do
     end
 
     context "as a student" do
-      it "is unauthorized" do
+      it "is forbidden" do
         student_in_course(active_all: true, course: @course)
         @poll_session.update_attribute(:is_published, false)
         @poll_session.reload
@@ -411,7 +411,7 @@ describe Polling::PollSessionsController, type: :request do
         get_open
 
         @poll_session.reload
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
         expect(@poll_session.is_published).not_to be_truthy
       end
     end
@@ -454,7 +454,7 @@ describe Polling::PollSessionsController, type: :request do
 
           get_close
 
-          expect(response).to have_http_status :unauthorized
+          expect(response).to have_http_status :forbidden
           @poll_session.reload
           expect(@poll_session.is_published).not_to be_falsey
         end
@@ -462,13 +462,13 @@ describe Polling::PollSessionsController, type: :request do
     end
 
     context "as a student" do
-      it "is unauthorized" do
+      it "is forbidden" do
         student_in_course(active_all: true, course: @course)
 
         get_close
 
         @poll_session.reload
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
         expect(@poll_session.is_published).to be_truthy
       end
     end

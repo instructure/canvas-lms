@@ -2181,7 +2181,7 @@ describe "Accounts API", type: :request do
                  permissions: %w[become_user] },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
   end
 
@@ -2191,7 +2191,7 @@ describe "Accounts API", type: :request do
     let(:generic_user) { user_factory }
 
     it "does not allow regular users to see settings" do
-      api_call_as_user(generic_user, :get, show_settings_path, show_settings_header, {}, { expected_status: 401 })
+      api_call_as_user(generic_user, :get, show_settings_path, show_settings_header, {}, { expected_status: 403 })
     end
 
     it "allows account admins to see selected settings" do

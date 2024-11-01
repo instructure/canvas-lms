@@ -283,7 +283,7 @@ describe "Groups API", type: :request do
                  "/api/v1/accounts/#{@account.to_param}/groups.json",
                  @category_path_options.merge(action: "context_index",
                                               account_id: @account.to_param))
-    expect(response).to have_http_status :unauthorized
+    expect(response).to have_http_status :forbidden
   end
 
   it "shows students all groups" do
@@ -464,7 +464,7 @@ describe "Groups API", type: :request do
     project_groups.name = "Course Project Groups"
     project_groups.save
     raw_api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(action: "create", group_category_id: project_groups.to_param))
-    expect(response).to have_http_status :unauthorized
+    expect(response).to have_http_status :forbidden
   end
 
   it "allows an admin to create a group in a account" do
@@ -521,7 +521,7 @@ describe "Groups API", type: :request do
     project_groups.name = "test group category"
     project_groups.save
     raw_api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(action: "create", group_category_id: project_groups.to_param))
-    expect(response).to have_http_status :unauthorized
+    expect(response).to have_http_status :forbidden
   end
 
   it "allows a moderator to edit a group" do
@@ -568,7 +568,7 @@ describe "Groups API", type: :request do
       "is_public" => true,
       "join_level" => "parent_context_auto_join",
     }
-    api_call(:put, @community_path, @category_path_options.merge(group_id: @community.to_param, action: "update"), new_attrs, {}, expected_status: 401)
+    api_call(:put, @community_path, @category_path_options.merge(group_id: @community.to_param, action: "update"), new_attrs, {}, expected_status: 403)
   end
 
   it "allows a moderator to delete a group" do
@@ -579,7 +579,7 @@ describe "Groups API", type: :request do
 
   it "does not allow a member to delete a group" do
     @user = @member
-    api_call(:delete, @community_path, @category_path_options.merge(group_id: @community.to_param, action: "destroy"), {}, {}, expected_status: 401)
+    api_call(:delete, @community_path, @category_path_options.merge(group_id: @community.to_param, action: "destroy"), {}, {}, expected_status: 403)
   end
 
   describe "quota" do
@@ -680,7 +680,7 @@ describe "Groups API", type: :request do
 
       it "does not allow an unrelated user to read a membership by membership id" do
         @user = user_model
-        api_call(:get, "#{@memberships_path}/#{@membership.id}", @membership_path_options.merge(action: :show), {}, {}, expected_status: 401)
+        api_call(:get, "#{@memberships_path}/#{@membership.id}", @membership_path_options.merge(action: :show), {}, {}, expected_status: 403)
       end
 
       it "allows a member to read their membership by user id" do
@@ -697,7 +697,7 @@ describe "Groups API", type: :request do
 
       it "does not allow an unrelated user to read a membership by user id" do
         @user = user_model
-        api_call(:get, "#{@alternate_memberships_path}/#{@member.id}", @alternate_membership_path_options.merge(action: :show), {}, {}, expected_status: 401)
+        api_call(:get, "#{@alternate_memberships_path}/#{@member.id}", @alternate_membership_path_options.merge(action: :show), {}, {}, expected_status: 403)
       end
     end
 
@@ -737,7 +737,7 @@ describe "Groups API", type: :request do
                  user_id: @new_user.id
                },
                {},
-               expected_status: 401)
+               expected_status: 403)
     end
 
     it "allows accepting a join request by a moderator" do
@@ -818,7 +818,7 @@ describe "Groups API", type: :request do
                  workflow_state: "accepted"
                },
                {},
-               expected_status: 401)
+               expected_status: 403)
       expect(@membership.reload).to be_requested
     end
 
@@ -835,7 +835,7 @@ describe "Groups API", type: :request do
                  workflow_state: "accepted"
                },
                {},
-               expected_status: 401)
+               expected_status: 403)
       expect(@membership.reload).to be_requested
     end
 
@@ -877,7 +877,7 @@ describe "Groups API", type: :request do
                  moderator: false
                },
                {},
-               expected_status: 401)
+               expected_status: 403)
       expect(@membership.reload.moderator).to be_truthy
     end
 
@@ -891,7 +891,7 @@ describe "Groups API", type: :request do
                  moderator: false
                },
                {},
-               expected_status: 401)
+               expected_status: 403)
       expect(@membership.reload.moderator).to be_truthy
     end
 
@@ -947,7 +947,7 @@ describe "Groups API", type: :request do
     it "does not allow a member to invite people to a group" do
       @user = @member
       invitees = { invitees: ["leonard@example.com", "sheldon@example.com"] }
-      api_call(:post, "#{@community_path}/invite", @category_path_options.merge(group_id: @community.to_param, action: "invite"), invitees, {}, expected_status: 401)
+      api_call(:post, "#{@community_path}/invite", @category_path_options.merge(group_id: @community.to_param, action: "invite"), invitees, {}, expected_status: 403)
       @memberships = expect(@community.reload.group_memberships.where(workflow_state: "invited").order(:id).count).to eq 0
     end
 
@@ -1032,12 +1032,12 @@ describe "Groups API", type: :request do
       end
     end
 
-    it "returns 401 for users outside the group" do
+    it "returns 403 for users outside the group" do
       user_factory
       raw_api_call(:get,
                    "/api/v1/groups/#{@community.id}/users",
                    { controller: "groups", action: "users", group_id: @community.to_param, format: "json" })
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
 
     it "returns an error when search_term is fewer than 2 characters" do
@@ -1182,7 +1182,7 @@ describe "Groups API", type: :request do
                { controller: "groups", action: "preview_html", group_id: @group.to_param, format: "json" },
                { html: "" },
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
   end
 
@@ -1214,7 +1214,7 @@ describe "Groups API", type: :request do
                  permissions: %w[send_messages] },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
   end
 end

@@ -145,12 +145,12 @@ describe Polling::PollsController, type: :request do
         expect(response).to have_http_status :ok
       end
 
-      it "is unauthorized if there are no sessions that belong to a course or course section the user is enrolled in" do
+      it "is forbidden if there are no sessions that belong to a course or course section the user is enrolled in" do
         student_in_course(active_all: true, course: @course)
         unenrolled = Course.create!(name: "Unenrolled Course")
         @poll.poll_sessions.create!(course: unenrolled)
         get_show(true)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
   end
@@ -175,10 +175,10 @@ describe Polling::PollsController, type: :request do
     end
 
     context "as a student" do
-      it "is unauthorized" do
+      it "is forbidden" do
         student_in_course(active_all: true, course: @course)
         post_create({ question: "New Title" }, true)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
   end
@@ -210,10 +210,10 @@ describe Polling::PollsController, type: :request do
     end
 
     context "as a student" do
-      it "is unauthorized" do
+      it "is forbidden" do
         student_in_course(active_all: true, course: @course)
         put_update({ question: "New Title" }, true)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
   end
@@ -267,10 +267,10 @@ describe Polling::PollsController, type: :request do
     end
 
     context "as a student" do
-      it "is unauthorized" do
+      it "is forbidden" do
         student_in_course(active_all: true, course: @course)
         delete_destroy
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
         expect(Polling::Poll.where(id: @poll).first).to eq @poll
       end
     end
