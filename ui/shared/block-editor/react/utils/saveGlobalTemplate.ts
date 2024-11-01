@@ -57,7 +57,7 @@ const getImageFilename = (response: Response): string => {
 // take the image src URL as input and return the
 // name of the file we saved it in
 const saveTemplateImage = async (src: string): Promise<ImageMapping> => {
-  const response = await fetch(src)
+  const response = await fetch(src, {mode: 'cors'})
   if (response.ok === false) {
     throw new Error(`Failed to fetch image: ${src}`)
   }
