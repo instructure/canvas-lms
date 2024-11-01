@@ -123,14 +123,14 @@ describe PeerReviewsApiController, type: :request do
     end
 
     context "with student context" do
-      it "returns 401 unauthorized access" do
+      it "returns 403 forbidden access" do
         student3 = student_in_course(active_all: true).user
         api_call(:delete,
                  @resource_path,
                  @resource_params,
                  { user_id: student3.id },
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
   end
@@ -182,14 +182,14 @@ describe PeerReviewsApiController, type: :request do
     end
 
     context "with student context" do
-      it "returns 401 unauthorized access" do
+      it "returns 403 forbidden access" do
         student3 = student_in_course(active_all: true).user
         api_call(:post,
                  @resource_path,
                  @resource_params,
                  { user_id: student3.id },
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
   end

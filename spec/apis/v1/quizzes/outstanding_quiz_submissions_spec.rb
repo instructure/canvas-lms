@@ -50,7 +50,7 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
 
     it "denies unprivileged access" do
       api_index(raw: true)
-      assert_status(401)
+      assert_forbidden
     end
 
     context "with privileged access" do
@@ -99,7 +99,7 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
     it "denies unprivileged access" do
       student_in_course
       api_grade({ raw: true }, { quiz_submission_ids: [@submission.id] })
-      assert_status 401
+      assert_forbidden
     end
 
     context "with privileged access" do

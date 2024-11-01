@@ -1264,10 +1264,10 @@ describe SubmissionsController do
       }
     end
 
-    it "renders unauthorized if user does not have view_audit_trail permission" do
+    it "renders forbidden if user does not have view_audit_trail permission" do
       @teacher.account.role_overrides.where(permission: :view_audit_trail).destroy_all
       get :audit_events, params:, format: :json
-      expect(response).to have_http_status(:unauthorized)
+      expect(response).to have_http_status(:forbidden)
     end
 
     it "renders ok if user does have view_audit_trail permission" do

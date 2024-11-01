@@ -403,11 +403,11 @@ describe PlannerController do
           expect(sub_account_event["plannable"]["title"]).to eq @sub_account_event.title
         end
 
-        it "returns unauthorized if the context_code is not visible" do
+        it "returns forbidden if the context_code is not visible" do
           @sub_account1.account_calendar_visible = false
           @sub_account1.save!
           get :index, params: { context_codes: [@sub_account1.asset_string] }
-          assert_unauthorized
+          assert_forbidden
         end
 
         it "does not include account calendar events by default when filtering by context_codes" do
@@ -564,12 +564,12 @@ describe PlannerController do
           expect(response_hash.length).to be 6
         end
 
-        it "returns unauthorized if the user doesn't have read permission on a context_code" do
+        it "returns forbidden if the user doesn't have read permission on a context_code" do
           course_with_teacher(active_all: true)
           assignment_model(course: @course, due_at: 1.day.from_now)
 
           get :index, params: { context_codes: [@course.asset_string] }
-          assert_unauthorized
+          assert_forbidden
         end
 
         it "filters ungraded_todo_items" do
@@ -644,7 +644,7 @@ describe PlannerController do
             )
           end
 
-          it "returns unauthorized if the course isn't public syllabus" do
+          it "returns forbidden if the course isn't public syllabus" do
             user_session(user_factory)
             get :index, params: {
               filter: "all_ungraded_todo_items",
@@ -652,7 +652,7 @@ describe PlannerController do
               start_date: 2.weeks.ago.iso8601,
               end_date: 2.weeks.from_now.iso8601
             }
-            assert_unauthorized
+            assert_forbidden
           end
         end
 

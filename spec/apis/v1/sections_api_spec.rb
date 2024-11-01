@@ -412,7 +412,7 @@ describe SectionsController, type: :request do
       end
 
       it "disallows creating a section" do
-        api_call(:post, @path_prefix, @path_params, {}, {}, expected_status: 401)
+        api_call(:post, @path_prefix, @path_params, {}, {}, expected_status: 403)
       end
     end
 
@@ -523,7 +523,7 @@ describe SectionsController, type: :request do
       end
 
       it "disallows creating a section" do
-        api_call(:post, @path_prefix, @path_params, {}, {}, expected_status: 401)
+        api_call(:post, @path_prefix, @path_params, {}, {}, expected_status: 403)
       end
     end
   end
@@ -622,7 +622,7 @@ describe SectionsController, type: :request do
                  @path_params.merge(id: @section.to_param),
                  { course_section: { name: "New Name" } },
                  {},
-                 expected_status: 401)
+                 expected_status: 403)
       end
     end
 
@@ -730,7 +730,7 @@ describe SectionsController, type: :request do
                  @path_params.merge(id: @section.to_param),
                  { course_section: { name: "New Name" } },
                  {},
-                 expected_status: 401)
+                 expected_status: 403)
       end
     end
   end
@@ -784,7 +784,7 @@ describe SectionsController, type: :request do
       end
 
       it "disallows deleting a section" do
-        api_call(:delete, "#{@path_prefix}/#{@section.id}", @path_params.merge(id: @section.to_param), {}, {}, expected_status: 401)
+        api_call(:delete, "#{@path_prefix}/#{@section.id}", @path_params.merge(id: @section.to_param), {}, {}, expected_status: 403)
       end
     end
 
@@ -819,7 +819,7 @@ describe SectionsController, type: :request do
       end
 
       it "disallows deleting a section" do
-        api_call(:delete, "#{@path_prefix}/#{@section.id}", @path_params.merge(id: @section.to_param), {}, {}, expected_status: 401)
+        api_call(:delete, "#{@path_prefix}/#{@section.id}", @path_params.merge(id: @section.to_param), {}, {}, expected_status: 403)
       end
     end
   end
@@ -995,7 +995,7 @@ describe SectionsController, type: :request do
                  @params.merge(id: @section.to_param, new_course_id: @dest_course.to_param),
                  {},
                  {},
-                 expected_status: 401)
+                 expected_status: 403)
       end
     end
   end
@@ -1109,7 +1109,7 @@ describe SectionsController, type: :request do
                  @params.merge(id: @section.to_param),
                  {},
                  {},
-                 expected_status: 401)
+                 expected_status: 403)
       end
     end
   end

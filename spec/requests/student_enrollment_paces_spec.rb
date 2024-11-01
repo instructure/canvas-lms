@@ -35,7 +35,7 @@ describe "Student Enrollment Paces API" do
   def assert_grant_check
     user_session(student)
     yield
-    expect(response).to have_http_status :unauthorized
+    expect(response).to have_http_status :forbidden
   end
 
   describe "show" do

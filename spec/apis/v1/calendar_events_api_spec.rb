@@ -556,7 +556,7 @@ describe CalendarEventsApiController, type: :request do
       expect(response.headers["Link"]).to include "appointment_group_ids="
     end
 
-    it "fails with unauthorized if provided a context the user cannot access" do
+    it "fails with forbidden if provided a context the user cannot access" do
       contexts = [@course.asset_string]
 
       # second context the user cannot access
@@ -577,7 +577,7 @@ describe CalendarEventsApiController, type: :request do
                },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     it "allows specifying an unenrolled but accessible context" do
@@ -663,7 +663,7 @@ describe CalendarEventsApiController, type: :request do
                },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     def public_course_query(options = {})
@@ -1349,7 +1349,7 @@ describe CalendarEventsApiController, type: :request do
                              :get,
                              "/api/v1/calendar_events/#{@parent_event.id}/participants",
                              { controller: "calendar_events_api", action: "participants", id: @parent_event.id.to_s, format: "json" })
-            expect(response).to have_http_status :unauthorized
+            expect(response).to have_http_status :forbidden
           end
 
           it "returns empty participants for a teacher" do
@@ -1489,14 +1489,14 @@ describe CalendarEventsApiController, type: :request do
             ]
           end
 
-          it "returns 401 if not allowed to view participants" do
+          it "returns 403 if not allowed to view participants" do
             @ag.participant_visibility = "private"
             @ag.save!
             api_call_as_user(@student1,
                              :get,
                              "/api/v1/calendar_events/#{@event.id}/participants",
                              { controller: "calendar_events_api", action: "participants", id: @event.id.to_s, format: "json" })
-            expect(response).to have_http_status :unauthorized
+            expect(response).to have_http_status :forbidden
           end
         end
       end
@@ -1569,7 +1569,7 @@ describe CalendarEventsApiController, type: :request do
                  { controller: "calendar_events_api", action: "create", format: "json" },
                  { calendar_event: { context_code: "account_#{Account.default.id}", title: "API Test" } },
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 
@@ -2375,7 +2375,7 @@ describe CalendarEventsApiController, type: :request do
                  { controller: "calendar_events_api", action: "update", id: event.to_param, format: "json" },
                  { calendar_event: { context_code: other_course.asset_string } },
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 
@@ -5085,7 +5085,7 @@ describe CalendarEventsApiController, type: :request do
                },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     it "returns observee's calendar events in a group in the observed course" do
@@ -5121,7 +5121,7 @@ describe CalendarEventsApiController, type: :request do
                },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
   end
 

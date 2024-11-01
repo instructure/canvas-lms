@@ -63,10 +63,10 @@ describe Lti::TokenController do
         user_session(account_admin_user(account: root_account))
       end
 
-      it "returns unauthorized" do
+      it "returns forbidden" do
         send_request
 
-        expect(response).to be_unauthorized
+        expect(response).to be_forbidden
       end
     end
 
@@ -200,10 +200,10 @@ describe Lti::TokenController do
         user_session(account_admin_user)
       end
 
-      it "returns unauthorized" do
+      it "returns forbidden" do
         send_request
 
-        expect(response).to be_unauthorized
+        expect(response).to be_forbidden
       end
     end
 

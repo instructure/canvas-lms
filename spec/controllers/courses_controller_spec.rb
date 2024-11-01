@@ -2745,7 +2745,7 @@ describe CoursesController do
       expect(Auditors::Course).not_to receive(:record_concluded)
       user_session(@teacher)
       put "update", params: { id: @course.id, course: { event: "conclude" }, format: :json }
-      assert_unauthorized
+      assert_forbidden
     end
 
     it "publishes a course if given :manage_courses_publish" do
@@ -2774,7 +2774,7 @@ describe CoursesController do
       expect(Auditors::Course).not_to receive(:record_published)
       user_session(@teacher)
       put "update", params: { id: @course.id, course: { event: "offer" }, format: :json }
-      assert_unauthorized
+      assert_forbidden
     end
 
     it "deletes a course if given :manage_courses_delete" do
@@ -2801,7 +2801,7 @@ describe CoursesController do
       user_session(@teacher)
       expect(Auditors::Course).not_to receive(:record_deleted)
       put "update", params: { id: @course.id, course: { event: "delete" }, format: :json }
-      assert_unauthorized
+      assert_forbidden
     end
 
     it "doesn't allow a teacher to undelete a course" do
@@ -2809,7 +2809,7 @@ describe CoursesController do
       expect(Auditors::Course).not_to receive(:record_restored)
       user_session(@teacher)
       put "update", params: { id: @course.id, course: { event: "undelete" }, format: :json }
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
 
     it "undeletes a course" do
@@ -3186,7 +3186,7 @@ describe CoursesController do
       it "requires :manage_master_courses permission" do
         user_session @ta
         put "update", params: { id: @course.id, course: { blueprint: "1" } }, format: "json"
-        expect(response).to be_unauthorized
+        expect(response).to be_forbidden
       end
 
       it "sets a course as a master course" do
@@ -3254,7 +3254,7 @@ describe CoursesController do
                         course: { blueprint: "1",
                                   blueprint_restrictions: { "content" => "0", "due_dates" => "1" } } },
               format: "json"
-          expect(response).to be_unauthorized
+          expect(response).to be_forbidden
         end
 
         it "allows a non-admin to perform a no-op request" do

@@ -85,9 +85,9 @@ describe Polling::PollChoicesController, type: :request do
         student_in_course(active_all: true, course: @course)
       end
 
-      it "is unauthorized if there are no open sessions" do
+      it "is forbidden if there are no open sessions" do
         get_index(true)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
       it "doesn't display is_correct within the poll choices" do
@@ -135,9 +135,9 @@ describe Polling::PollChoicesController, type: :request do
         student_in_course(active_all: true, course: @course)
       end
 
-      it "is unauthorized if there are no existing sessions" do
+      it "is forbidden if there are no existing sessions" do
         get_show(true)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
       it "is authorized if there are existing sessions" do
@@ -206,10 +206,10 @@ describe Polling::PollChoicesController, type: :request do
     end
 
     context "as a student" do
-      it "is unauthorized" do
+      it "is forbidden" do
         student_in_course(active_all: true, course: @course)
         post_create({ text: "Poll Choice 1" }, true)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
   end
@@ -251,10 +251,10 @@ describe Polling::PollChoicesController, type: :request do
     end
 
     context "as a student" do
-      it "is unauthorized" do
+      it "is forbidden" do
         student_in_course(active_all: true, course: @course)
         put_update({ text: "New Text" }, true)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
   end
@@ -288,11 +288,11 @@ describe Polling::PollChoicesController, type: :request do
     end
 
     context "as a student" do
-      it "is unauthorized" do
+      it "is forbidden" do
         student_in_course(active_all: true, course: @course)
         delete_destroy
 
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
         expect(Polling::PollChoice.where(id: @poll_choice).first).to eq @poll_choice
       end
     end

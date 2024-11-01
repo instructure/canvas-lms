@@ -104,22 +104,6 @@ describe AuthenticationMethods do
     context "when there is a current_user but they are not authorized" do
       before { @controller.instance_variable_set(:@current_user, user_with_pseudonym) }
 
-      ### REMOVE THIS CODE WHEN REMOVING FEATURE FLAG ###
-      before { Account.site_admin.enable_feature! :api_auth_error_updates }
-
-      context "when the api_auth_error_updates flag is disabled" do
-        before { Account.site_admin.disable_feature! :api_auth_error_updates }
-
-        it "returns an unauthorized error response (401)" do
-          expect(render_hash).to eq(
-            status: :unauthorized,
-            json: { errors: [{ message: "user not authorized to perform that action" }],
-                    status: "unauthorized" }
-          )
-        end
-      end
-      ### END REMOVE THIS CODE WHEN REMOVING FEATURE FLAG ###
-
       it "returns an unauthorized error response (403)" do
         expect(render_hash).to eq(
           status: :forbidden,
@@ -132,32 +116,6 @@ describe AuthenticationMethods do
     context "when the account language is non-English" do
       let(:locale) { :es }
       let(:status_string) { render_hash[:json][:status] }
-
-      ### REMOVE THIS CODE WHEN REMOVING FEATURE FLAG ###
-      before { Account.site_admin.enable_feature! :api_auth_error_updates }
-
-      context "when the api_auth_error_updates flag is disabled" do
-        before { Account.site_admin.disable_feature! :api_auth_error_updates }
-
-        context "when there is no current_user" do
-          it 'localizes the "unauthenticated" status string' do
-            spanish = I18n.with_locale(:es) { I18n.t("lib.auth.status_unauthenticated", "unauthenticated") }
-            expect(status_string).to eq(spanish)
-            expect(status_string).not_to eq("unauthenticated")
-          end
-        end
-
-        context "when there is a current_user but they are not authorized" do
-          before { @controller.instance_variable_set(:@current_user, user_with_pseudonym) }
-
-          it 'localizes the "unauthorized" status string' do
-            spanish = I18n.with_locale(:es) { I18n.t("lib.auth.status_unauthorized", "unauthorized") }
-            expect(status_string).to eq(spanish)
-            expect(status_string).not_to eq("unauthorized")
-          end
-        end
-      end
-      ### END REMOVE THIS CODE WHEN REMOVING FEATURE FLAG ###
 
       context "when there is no current_user" do
         it 'does not localize the "unauthorized" status string (always gives it in English)' do

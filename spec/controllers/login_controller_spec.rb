@@ -186,7 +186,7 @@ describe LoginController do
       allow_any_instance_of(Account).to receive(:require_acceptance_of_terms?).and_return(false)
 
       get "session_token", format: :json, params: { return_to: "javascript://localhost/" }
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
   end
 

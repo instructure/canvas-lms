@@ -59,7 +59,7 @@ RSpec.describe DeveloperKeyAccountBindingsController do
     it 'renders unauthorized if the user does not have "manage_developer_keys"' do
       user_session(unauthorized_admin)
       post :create_or_update, params:, format: :json
-      expect(response).to be_unauthorized
+      expect(response).to be_forbidden
     end
 
     it 'succeeds if the user has "manage_developer_keys"' do
@@ -110,7 +110,7 @@ RSpec.describe DeveloperKeyAccountBindingsController do
     it 'renders unauthorized if the user does not have "manage_developer_keys"' do
       user_session(unauthorized_admin)
       post :create_or_update, params:, format: :json
-      expect(response).to be_unauthorized
+      expect(response).to be_forbidden
     end
 
     it "allows updating the workflow_state" do

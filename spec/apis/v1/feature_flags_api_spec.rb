@@ -60,7 +60,7 @@ describe "Feature Flags API", type: :request do
                        { controller: "feature_flags", action: "index", format: "json", account_id: t_root_account.to_param },
                        {},
                        {},
-                       { expected_status: 401 })
+                       { expected_status: 403 })
     end
 
     it "returns the correct format" do
@@ -279,7 +279,7 @@ describe "Feature Flags API", type: :request do
                        { controller: "feature_flags", action: "enabled_features", format: "json", account_id: t_root_account.to_param },
                        {},
                        {},
-                       { expected_status: 401 })
+                       { expected_status: 403 })
     end
 
     it "returns the correct format" do
@@ -300,7 +300,7 @@ describe "Feature Flags API", type: :request do
                        { controller: "feature_flags", action: "show", format: "json", account_id: t_root_account.to_param, feature: "root_account_feature" },
                        {},
                        {},
-                       { expected_status: 401 })
+                       { expected_status: 403 })
     end
 
     it "404s if the feature doesn't exist" do
@@ -381,7 +381,7 @@ describe "Feature Flags API", type: :request do
                        { controller: "feature_flags", action: "update", format: "json", account_id: t_root_account.to_param, feature: "root_account_feature" },
                        {},
                        {},
-                       { expected_status: 401 })
+                       { expected_status: 403 })
     end
 
     it "validates state" do
@@ -573,7 +573,7 @@ describe "Feature Flags API", type: :request do
                            { controller: "feature_flags", action: "update", format: "json", account_id: t_site_admin.id.to_s, feature: "hidden_feature" },
                            {},
                            {},
-                           { expected_status: 401 })
+                           { expected_status: 403 })
           expect(t_site_admin.feature_flags.where(feature: "hidden_feature")).not_to be_any
         end
 
@@ -660,7 +660,7 @@ describe "Feature Flags API", type: :request do
                        { controller: "feature_flags", action: "delete", format: "json", account_id: t_root_account.to_param, feature: "course_feature" },
                        {},
                        {},
-                       { expected_status: 401 })
+                       { expected_status: 403 })
     end
 
     it "deletes a feature flag" do

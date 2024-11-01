@@ -684,7 +684,7 @@ describe GroupCategoriesController do
       user_session(@student)
 
       get "index", params: { course_id: @course.id }, format: :json
-      assert_unauthorized
+      assert_forbidden
     end
   end
 

@@ -176,8 +176,8 @@ describe "Admins API", type: :request do
         @user = user_factory account: @account
       end
 
-      it "401s" do
-        api_call(:delete, @path, @path_opts, {}, {}, expected_status: 401)
+      it "403s" do
+        api_call(:delete, @path, @path_opts, {}, {}, expected_status: 403)
       end
     end
 
@@ -283,8 +283,8 @@ describe "Admins API", type: :request do
         @user = user_factory account: @account
       end
 
-      it "401s" do
-        api_call(:get, @path, @path_opts, {}, {}, expected_status: 401)
+      it "403s" do
+        api_call(:get, @path, @path_opts, {}, {}, expected_status: 403)
       end
     end
 
@@ -427,8 +427,8 @@ describe "Admins API", type: :request do
         @user = user_factory(account: @account)
       end
 
-      it "returns unauthorized" do
-        api_call(:get, @path, @path_opts, {}, {}, expected_status: 401)
+      it "returns forbidden" do
+        api_call(:get, @path, @path_opts, {}, {}, expected_status: 403)
       end
     end
 

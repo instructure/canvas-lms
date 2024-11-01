@@ -27,10 +27,10 @@ describe "ExternalFeedsController", type: :request do
     end
 
     it "does not allow access to unauthorized users" do
-      api_call_as_user(@denied_user, :get, @url_base, @url_params, {}, {}, expected_status: 401)
-      api_call_as_user(@denied_user, :post, @url_base, @url_params.merge(action: "create"), { url: "http://www.example.com/feed" }, {}, expected_status: 401)
+      api_call_as_user(@denied_user, :get, @url_base, @url_params, {}, {}, expected_status: 403)
+      api_call_as_user(@denied_user, :post, @url_base, @url_params.merge(action: "create"), { url: "http://www.example.com/feed" }, {}, expected_status: 403)
       @feed = external_feed_model(context: @context)
-      api_call_as_user(@denied_user, :delete, @url_base + "/#{@feed.id}", @url_params.merge(action: "destroy", external_feed_id: @feed.to_param), {}, {}, expected_status: 401)
+      api_call_as_user(@denied_user, :delete, @url_base + "/#{@feed.id}", @url_params.merge(action: "destroy", external_feed_id: @feed.to_param), {}, {}, expected_status: 403)
     end
 
     def feed_json(f)

@@ -39,7 +39,7 @@ describe UsersController, type: :request do
                  action: "activity_stream",
                  format: "json",
                  course_id: @course.to_param)
-    assert_status(401)
+    assert_status(403)
   end
 
   it "returns the activity stream" do

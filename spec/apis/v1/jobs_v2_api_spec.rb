@@ -700,7 +700,7 @@ describe "Jobs V2 API", type: :request do
                  { controller: "jobs_v2", action: "manage", format: "json" },
                  { strand: "foobar", max_concurrent: 11, priority: 23 },
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 

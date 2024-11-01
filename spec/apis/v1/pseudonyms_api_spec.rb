@@ -119,16 +119,16 @@ describe PseudonymsController, type: :request do
         @user = user_with_pseudonym
       end
 
-      it "returns 401 unauthorized when listing account pseudonyms" do
+      it "returns 403 forbidden when listing account pseudonyms" do
         raw_api_call(:get, @account_path, @account_path_options, {
                        user: { id: @student.id }
                      })
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
-      it "returns 401 unauthorized when listing user pseudonyms" do
+      it "returns 403 forbidden when listing user pseudonyms" do
         raw_api_call(:get, @user_path, @user_path_options)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
   end
@@ -212,7 +212,7 @@ describe PseudonymsController, type: :request do
     end
 
     context "an unauthorized user" do
-      it "returns 401" do
+      it "returns 403" do
         @user = @student
         raw_api_call(:post, @path, @path_options, {
                        user: { id: @admin.id },
@@ -222,7 +222,7 @@ describe PseudonymsController, type: :request do
                          unique_id: "test@example.com"
                        }
                      })
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
 
@@ -236,7 +236,7 @@ describe PseudonymsController, type: :request do
                      format: "json" },
                    user: { id: @user.id },
                    login: { unique_id: "user" })
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
   end
 
@@ -403,13 +403,13 @@ describe PseudonymsController, type: :request do
     end
 
     context "an unauthorized user" do
-      it "returns 401" do
+      it "returns 403" do
         @path = "/api/v1/accounts/#{@account.id}/logins/#{@teacher.pseudonym.id}"
         @user = @student
         raw_api_call(:put, @path, @path_options.merge({ id: @teacher.pseudonym.id.to_param }), {
                        login: { unique_id: "teacher+new@example.com" }
                      })
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
       it "is not able to update an authentication provider" do
@@ -422,7 +422,7 @@ describe PseudonymsController, type: :request do
         raw_api_call(:put, @path, @path_options.merge({ id: @student.pseudonym.id.to_param }), {
                        login: { authentication_provider_id: auth_provider.id.to_s }
                      })
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
   end
@@ -492,10 +492,10 @@ describe PseudonymsController, type: :request do
     end
 
     context "an unauthorized user" do
-      it "returns 401" do
+      it "returns 403" do
         user_with_pseudonym
         raw_api_call(:delete, @path, @path_options)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
   end
@@ -527,13 +527,13 @@ describe PseudonymsController, type: :request do
     end
 
     context "an unauthorized user" do
-      it "returns 401" do
+      it "returns 403" do
         @user = @teacher
         raw_api_call(:post, @path, @path_options, {
                        email: "student@example.com",
                        login: { unique_id: "teacher+new@example.com" }
                      })
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
   end

@@ -181,13 +181,13 @@ describe "Provisional Grades API", type: :request do
     it "is unauthorized when the user is not the assigned final grader" do
       assignment.update_attribute(:final_grader_id, nil)
       bulk_select(grades[0..1])
-      assert_status(401)
+      assert_forbidden
     end
 
     it 'is unauthorized when the user is an account admin without "Select Final Grade for Moderation" permission' do
       course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :select_final_grade)
       bulk_select(grades[0..1], account_admin_user)
-      assert_status(401)
+      assert_forbidden
     end
 
     it "is authorized when the user is the final grader" do
@@ -295,7 +295,7 @@ describe "Provisional Grades API", type: :request do
           role: Role.find_by(name: "TeacherEnrollment"),
           enabled: false
         )
-        api_call_as_user(@teacher, :post, @path, @params, {}, {}, expected_status: 401)
+        api_call_as_user(@teacher, :post, @path, @params, {}, {}, expected_status: 403)
       end
 
       it "fails if grades were already published" do

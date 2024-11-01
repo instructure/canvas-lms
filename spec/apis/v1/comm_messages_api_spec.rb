@@ -121,14 +121,14 @@ describe CommMessagesApiController, type: :request do
                                                role_changes: { read_messages: false })
         end
 
-        it "receives unauthorized" do
+        it "receives forbidden" do
           raw_api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
                          controller: "comm_messages_api",
                          action: "index",
                          format: "json",
                          user_id: @test_user.to_param
                        })
-          expect(response).to have_http_status :unauthorized
+          expect(response).to have_http_status :forbidden
         end
       end
     end
@@ -141,7 +141,7 @@ describe CommMessagesApiController, type: :request do
                                                role_changes: { view_notifications: true })
         end
 
-        it "receives unauthorized if account setting disabled" do
+        it "receives forbidden if account setting disabled" do
           Account.default.settings[:admins_can_view_notifications] = false
           Account.default.save!
           raw_api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
@@ -150,7 +150,7 @@ describe CommMessagesApiController, type: :request do
                          format: "json",
                          user_id: @test_user.to_param
                        })
-          expect(response).to have_http_status :unauthorized
+          expect(response).to have_http_status :forbidden
         end
 
         it "is only able to see associated account's messages" do
@@ -176,14 +176,14 @@ describe CommMessagesApiController, type: :request do
                                                role_changes: { view_notifications: false })
         end
 
-        it "receives unauthorized" do
+        it "receives forbidden" do
           raw_api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
                          controller: "comm_messages_api",
                          action: "index",
                          format: "json",
                          user_id: @test_user.to_param
                        })
-          expect(response).to have_http_status :unauthorized
+          expect(response).to have_http_status :forbidden
         end
       end
     end
@@ -194,14 +194,14 @@ describe CommMessagesApiController, type: :request do
         @user = user_factory(active_all: true)
       end
 
-      it "receives unauthorized" do
+      it "receives forbidden" do
         raw_api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
                        controller: "comm_messages_api",
                        action: "index",
                        format: "json",
                        user_id: @test_user.to_param
                      })
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
   end

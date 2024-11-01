@@ -1060,7 +1060,7 @@ describe Quizzes::QuizzesApiController, type: :request do
                    { "Accept" => "application/vnd.api+json" })
 
       # should be authorization error
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
 
     it "reorders a quiz's questions" do
@@ -1178,7 +1178,7 @@ describe Quizzes::QuizzesApiController, type: :request do
       get_index(quiz.context)
       expect(JSON.parse(response.body).to_s).not_to include(quiz.title.to_s)
       get_show(quiz)
-      assert_status(401)
+      assert_status(403)
     end
 
     def get_index(course)

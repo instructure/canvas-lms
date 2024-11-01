@@ -236,7 +236,7 @@ describe ObserverAlertsApiController, type: :request do
       user = user_model
       params = @params.merge(workflow_state: "read")
       api_call_as_user(user, :put, "#{@path}/read", params)
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
   end
 end

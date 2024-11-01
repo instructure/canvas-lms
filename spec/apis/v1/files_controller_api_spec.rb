@@ -433,7 +433,7 @@ describe "Files API", type: :request do
       raw_api_call(:post,
                    "/api/v1/files/capture?#{params.to_query}",
                    params.merge(controller: "files", action: "api_capture", format: "json"))
-      assert_status(403)
+      assert_forbidden
     end
 
     it "checks quota unless exempt" do
@@ -701,7 +701,7 @@ describe "Files API", type: :request do
       @f1.save!
       course_with_student_logged_in(course: @course)
       raw_api_call(:get, @files_path, @files_path_options, {}, {})
-      assert_status(401)
+      assert_forbidden
     end
 
     it "404s for no folder found" do
@@ -1155,13 +1155,13 @@ describe "Files API", type: :request do
       api_call(:get, "/api/v1/users/#{@teacher.id}/files/#{@att.id}", opts, {}, {}, expected_status: 200)
     end
 
-    it "401s with invalid verifier" do
+    it "403s with invalid verifier" do
       @att.context = @teacher
       @att.save!
       course_with_student(course: @course)
       user_session(@student)
       opts = @file_path_options.merge(user_id: @teacher.id.to_param, verifier: "nope")
-      api_call(:get, "/api/v1/users/#{@teacher.id}/files/#{@att.id}", opts, {}, {}, expected_status: 401)
+      api_call(:get, "/api/v1/users/#{@teacher.id}/files/#{@att.id}", opts, {}, {}, expected_status: 403)
     end
 
     it "omits verifiers when using session auth" do
@@ -1415,9 +1415,9 @@ describe "Files API", type: :request do
           @course.account.save!
         end
 
-        it "renders unauthorized if called via API" do
+        it "renders forbidden if called via API" do
           api_call(:get, @file_path, @file_path_options, {})
-          expect(response).to have_http_status :unauthorized
+          expect(response).to have_http_status :forbidden
         end
 
         it "returns expected json if called from UI" do
@@ -1438,7 +1438,7 @@ describe "Files API", type: :request do
 
     it "returns no permissions error for no context enrollment" do
       course_with_teacher(active_all: true, user: user_with_pseudonym)
-      api_call(:get, @file_path, @file_path_options, {}, {}, expected_status: 401)
+      api_call(:get, @file_path, @file_path_options, {}, {}, expected_status: 403)
     end
 
     it "returns a hidden file" do
@@ -1504,7 +1504,7 @@ describe "Files API", type: :request do
                  migration_id: @mig_id },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     it "404s if given a bad migration id" do
@@ -1572,7 +1572,7 @@ describe "Files API", type: :request do
     it "is not authorized to delete/replace a file" do
       course_with_teacher(active_all: true, user: user_with_pseudonym)
       @file_path_options[:replace] = true
-      api_call(:delete, @file_path, @file_path_options, {}, {}, expected_status: 401)
+      api_call(:delete, @file_path, @file_path_options, {}, {}, expected_status: 403)
     end
 
     it "returns 404" do
@@ -1636,7 +1636,7 @@ describe "Files API", type: :request do
       it "gives unauthorized errors if the user is not authorized to view the file" do
         @icon.update(locked: true)
         course_with_student_logged_in(course: @course)
-        api_call(:get, @file_path, @file_path_options, {}, {}, expected_status: 401)
+        api_call(:get, @file_path, @file_path_options, {}, {}, expected_status: 403)
       end
 
       it "gives bad request errors if the file is not an icon" do
@@ -1724,7 +1724,7 @@ describe "Files API", type: :request do
 
     it "does not let non-admin users reset verifiers" do
       course_with_teacher(course: @course, active_all: true, user: user_with_pseudonym)
-      api_call(:post, @file_path, @file_path_options, {}, {}, expected_status: 401)
+      api_call(:post, @file_path, @file_path_options, {}, {}, expected_status: 403)
     end
 
     context "as an admin without manage_files_edit or manage_files_delete permission" do
@@ -1737,7 +1737,7 @@ describe "Files API", type: :request do
 
       it "disallows letting admin users reset verifiers" do
         old_uuid = @att.uuid
-        api_call(:post, @file_path, @file_path_options, {}, {}, expected_status: 401)
+        api_call(:post, @file_path, @file_path_options, {}, {}, expected_status: 403)
         expect(@att.reload.uuid).to eq old_uuid
       end
     end
@@ -2037,7 +2037,7 @@ describe "Files API", type: :request do
                          { controller: "files", action: "api_update", format: "json", id: @file.to_param },
                          { parent_folder_id: @sub_folder.to_param },
                          {},
-                         { expected_status: 401 })
+                         { expected_status: 403 })
       end
 
       it "does not move a file out of a submissions folder" do
@@ -2047,13 +2047,13 @@ describe "Files API", type: :request do
                          { controller: "files", action: "api_update", format: "json", id: @sub_file.to_param },
                          { parent_folder_id: @root_folder.to_param },
                          {},
-                         { expected_status: 401 })
+                         { expected_status: 403 })
       end
     end
 
-    it "returns unauthorized error" do
+    it "returns forbidden error" do
       course_with_student(course: @course)
-      api_call(:put, @file_path, @file_path_options, { name: "new name" }, {}, expected_status: 401)
+      api_call(:put, @file_path, @file_path_options, { name: "new name" }, {}, expected_status: 403)
     end
 
     it "404s with invalid parent id" do
@@ -2116,7 +2116,7 @@ describe "Files API", type: :request do
         unlock = 1.day.from_now
         lock = 3.days.from_now
         new_params = { name: "newname.txt", locked: "true", hidden: true, unlock_at: unlock.iso8601, lock_at: lock.iso8601 }
-        api_call(:put, @file_path, @file_path_options, new_params, {}, expected_status: 401)
+        api_call(:put, @file_path, @file_path_options, new_params, {}, expected_status: 403)
       end
     end
   end
@@ -2157,7 +2157,7 @@ describe "Files API", type: :request do
                        { controller: "files", action: "api_quota", format: "json", course_id: t_course.to_param },
                        {},
                        {},
-                       { expected_status: 401 })
+                       { expected_status: 403 })
     end
 
     it "operates on groups" do
@@ -2206,7 +2206,7 @@ describe "Files API", type: :request do
                        action: "api_quota",
                        format: "json",
                        user_id: @student.id)
-      expect(response).to have_http_status(:unauthorized)
+      expect(response).to have_http_status(:forbidden)
     end
   end
 end

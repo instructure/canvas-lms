@@ -65,7 +65,7 @@ describe CustomGradebookColumnDataApiController, type: :request do
                    action: "index",
                    controller: "custom_gradebook_column_data_api",
                    format: "json"
-      assert_status(401)
+      assert_forbidden
     end
 
     it "only shows students you have permission for" do
@@ -167,7 +167,7 @@ describe CustomGradebookColumnDataApiController, type: :request do
                      format: "json" },
                    "column_data[content]" => "haha"
 
-      assert_status(401)
+      assert_forbidden
     end
 
     it "only lets you make notes for students you can see" do
@@ -313,7 +313,7 @@ describe CustomGradebookColumnDataApiController, type: :request do
       expect(json.fetch("workflow_state")).to eq "queued"
     end
 
-    it "throws 401 status when updating non existing student" do
+    it "throws 403 status when updating non existing student" do
       @user = @teacher
       contents = [
         {
@@ -324,7 +324,7 @@ describe CustomGradebookColumnDataApiController, type: :request do
       ]
 
       bulk_update(contents)
-      assert_status(401)
+      assert_forbidden
     end
 
     it "throws 400 status when passing empty input" do

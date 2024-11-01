@@ -130,11 +130,11 @@ describe ExternalToolsController, type: :request do
           expect(doc.at_css("form")["action"]).to eq tool.url
         end
 
-        it "returns 401 if the user is not authorized for the course" do
+        it "returns 403 if the user is not authorized for the course" do
           user_with_pseudonym
           params = { id: tool.id.to_s }
           code = get_raw_sessionless_launch_url(@course, params)
-          expect(code).to eq 401
+          expect(code).to eq 403
         end
 
         it "returns a service unavailable if redis isn't available" do
@@ -168,7 +168,7 @@ describe ExternalToolsController, type: :request do
             expect(json["errors"].first["message"]).to eq "The specified resource does not exist."
           end
 
-          it "returns an unauthorized response if the user can't read the assignment" do
+          it "returns an forbidden response if the user can't read the assignment" do
             assignment_model(course: @course, name: "tool assignment", submission_types: "external_tool", points_possible: 20, grading_type: "points")
             tag = @assignment.build_external_tool_tag(url: tool.url)
             tag.content_type = "ContextExternalTool"
@@ -177,7 +177,7 @@ describe ExternalToolsController, type: :request do
             student_in_course(course: @course)
             params = { id: tool.id.to_s, launch_type: "assessment", assignment_id: @assignment.id }
             code = get_raw_sessionless_launch_url(@course, params)
-            expect(code).to eq 401
+            expect(code).to eq 403
           end
 
           it "returns a bad request if the assignment doesn't have an external_tool_tag" do
@@ -497,7 +497,7 @@ describe ExternalToolsController, type: :request do
                    id: @root_tool.id.to_s },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
 
       it "requires a tool in the context" do
@@ -640,7 +640,7 @@ describe ExternalToolsController, type: :request do
                    id: @root_tool.id.to_s },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
 
       it "works with existing favorites configured with old column if not specified on account" do
@@ -881,7 +881,7 @@ describe ExternalToolsController, type: :request do
                    action: "index",
                    format: "json",
                    "#{type.singularize}_id": context.id.to_s })
-    expect(response).to have_http_status :unauthorized
+    expect(response).to have_http_status :forbidden
   end
 
   def authorized_call(context)

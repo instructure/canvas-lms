@@ -1477,7 +1477,7 @@ describe "Pages API", type: :request do
                  course_id: @course.to_param,
                  url_or_id: page.url },
                { wiki_page: { student_planner_checkbox: "0" } })
-      expect(response).to be_unauthorized
+      expect(response).to be_forbidden
       page.reload
       expect(page.todo_date).to eq todo_date
     end
@@ -1514,7 +1514,7 @@ describe "Pages API", type: :request do
                { controller: "wiki_pages_api", action: "show", format: "json", course_id: @course.id.to_s, url_or_id: @hidden_page.url },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     it "refuses to list pages in an unpublished course" do
@@ -1525,7 +1525,7 @@ describe "Pages API", type: :request do
                { controller: "wiki_pages_api", action: "index", format: "json", course_id: @course.id.to_s },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     it "denies access to wiki in an unenrolled course" do
@@ -1542,14 +1542,14 @@ describe "Pages API", type: :request do
                { controller: "wiki_pages_api", action: "index", format: "json", course_id: other_course.id.to_s },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
 
       api_call(:get,
                "/api/v1/courses/#{other_course.id}/pages/front-page",
                { controller: "wiki_pages_api", action: "show", format: "json", course_id: other_course.id.to_s, url_or_id: "front-page" },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     it "allows access to a wiki in a public unenrolled course" do
@@ -1662,7 +1662,7 @@ describe "Pages API", type: :request do
                  url_or_id: @front_page.url },
                { publish: false, wiki_page: { body: "!!!!" } },
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
       expect(@front_page.reload.body).not_to eq "!!!!"
     end
 
@@ -1762,7 +1762,7 @@ describe "Pages API", type: :request do
                  { controller: "wiki_pages_api", action: "create", format: "json", course_id: @course.to_param },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
 
       it "does not allow deleting pages" do
@@ -1775,7 +1775,7 @@ describe "Pages API", type: :request do
                    url_or_id: @editable_page.url },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 
@@ -1814,7 +1814,7 @@ describe "Pages API", type: :request do
                  { controller: "wiki_pages_api", action: "show", format: "json", course_id: @course.id.to_s, url_or_id: @unpublished_page.url },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
 
       it "does not show unpublished on public courses" do
@@ -1825,7 +1825,7 @@ describe "Pages API", type: :request do
                  { controller: "wiki_pages_api", action: "show", format: "json", course_id: @course.id.to_s, url_or_id: @unpublished_page.url },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 
@@ -1853,7 +1853,7 @@ describe "Pages API", type: :request do
                    url_or_id: @vpage.url },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
 
       it "refuses to retrieve a revision" do
@@ -1867,7 +1867,7 @@ describe "Pages API", type: :request do
                    revision_id: "3" },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
 
       it "refuses to revert a page" do
@@ -1881,7 +1881,7 @@ describe "Pages API", type: :request do
                    revision_id: "2" },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
 
       it "describes the latest version" do
@@ -1964,7 +1964,7 @@ describe "Pages API", type: :request do
                      revision_id: "3" },
                    {},
                    {},
-                   { expected_status: 401 })
+                   { expected_status: 403 })
         end
 
         it "does not revert page content" do
@@ -1978,7 +1978,7 @@ describe "Pages API", type: :request do
                      revision_id: "2" },
                    {},
                    {},
-                   { expected_status: 401 })
+                   { expected_status: 403 })
         end
       end
 
@@ -2208,7 +2208,7 @@ describe "Pages API", type: :request do
       get_index
       expect(JSON.parse(response.body).to_s).not_to include(page.title.to_s)
 
-      calls.each { |call| expect(send(call, page).to_s).to eq "401" }
+      calls.each { |call| expect(send(call, page).to_s).to eq "403" }
     end
 
     before :once do

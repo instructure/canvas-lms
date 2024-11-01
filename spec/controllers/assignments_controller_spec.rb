@@ -1922,7 +1922,7 @@ describe AssignmentsController do
 
         it "fails if grades are not published, and status is false" do
           put "toggle_mute", params: { course_id: @course.id, assignment_id: @assignment.id, status: false }, format: "json"
-          assert_unauthorized
+          assert_forbidden
         end
 
         it "mutes if grades are not published, and status is true" do

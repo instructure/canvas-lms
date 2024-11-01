@@ -153,7 +153,7 @@ describe AccountsController do
     it "does not allow users without login permissions to restore deleted users" do
       account_admin_user_with_role_changes(user: @admin, role_changes: { manage_user_logins: false })
       put "restore_user", params: { account_id: @account.id, user_id: @deleted_user.id }, format: "json"
-      expect(response).to be_unauthorized
+      expect(response).to be_forbidden
     end
 
     it "404s for non-existent users" do

@@ -83,8 +83,8 @@ describe LiveAssessments::ResultsController, type: :request do
     end
 
     context "as a student" do
-      it "is unauthorized" do
-        create_results([], user: student, expected_status: 401)
+      it "is forbidden" do
+        create_results([], user: student, expected_status: 403)
       end
     end
   end
@@ -137,8 +137,8 @@ describe LiveAssessments::ResultsController, type: :request do
     end
 
     context "as a student" do
-      it "is unauthorized" do
-        index_results({}, user: student, expected_status: 401)
+      it "is forbidden" do
+        index_results({}, user: student, expected_status: 403)
       end
     end
   end

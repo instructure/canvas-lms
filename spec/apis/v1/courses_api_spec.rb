@@ -656,13 +656,13 @@ describe CoursesController, type: :request do
             user_model
           end
 
-          it "returns 401 unauthorized access" do
+          it "returns 403 forbidden access" do
             api_call(:put,
                      @path,
                      @params,
                      { event: "offer", course_ids: [@course.id] },
                      {},
-                     { expected_status: 401 })
+                     { expected_status: 403 })
           end
         end
       end
@@ -760,7 +760,7 @@ describe CoursesController, type: :request do
                            format: "json" },
                          {},
                          {},
-                         { expected_status: 401 })
+                         { expected_status: 403 })
       end
 
       it "returns courses from observed user's shard if different than observer" do
@@ -989,7 +989,7 @@ describe CoursesController, type: :request do
                            format: "json" },
                          {},
                          {},
-                         { expected_status: 401 })
+                         { expected_status: 403 })
       end
     end
 
@@ -1014,7 +1014,7 @@ describe CoursesController, type: :request do
                            format: "json" },
                          {},
                          {},
-                         { expected_status: 401 })
+                         { expected_status: 403 })
       end
 
       it "returns an exception when the specified course has no modules" do
@@ -1542,7 +1542,7 @@ describe CoursesController, type: :request do
       end
 
       context "a user without permissions" do
-        it "returns 401 Unauthorized if a user lacks permissions" do
+        it "returns 403 Forbidden if a user lacks permissions" do
           course_with_student(active_all: true)
           account = Account.default
           raw_api_call(:post,
@@ -1554,7 +1554,7 @@ describe CoursesController, type: :request do
                            name: "Test Course"
                          }
                        })
-          assert_status(401)
+          assert_forbidden
         end
       end
     end
@@ -1915,7 +1915,7 @@ describe CoursesController, type: :request do
             @new_values["course"]["group_weighting_scheme"] = "percent"
             teacher_in_course(course: @course, active_all: true)
             raw_api_call(:put, @path, @params, @new_values)
-            expect(response).to have_http_status :unauthorized
+            expect(response).to have_http_status :forbidden
             @course.reload
             expect(@course.group_weighting_scheme).not_to eql("percent")
           end
@@ -2019,7 +2019,7 @@ describe CoursesController, type: :request do
             @term.grading_period_group = @grading_period_group
             @term.save!
             raw_api_call(:put, @path, @params, @new_values)
-            expect(response).to have_http_status :unauthorized
+            expect(response).to have_http_status :forbidden
             @course.reload
             expect(@course.group_weighting_scheme).to eql("equal")
           end
@@ -2028,7 +2028,7 @@ describe CoursesController, type: :request do
             @new_values["course"].delete("enrollment_term_id")
             @new_values["course"].delete("term_id")
             raw_api_call(:put, @path, @params, @new_values)
-            expect(response).to have_http_status :unauthorized
+            expect(response).to have_http_status :forbidden
             @course.reload
             expect(@course.group_weighting_scheme).to eql("equal")
           end
@@ -2039,7 +2039,7 @@ describe CoursesController, type: :request do
             @new_values["course"].delete("apply_assignment_group_weights")
             @new_values["course"]["group_weighting_scheme"] = "percent"
             raw_api_call(:put, @path, @params, @new_values)
-            expect(response).to have_http_status :unauthorized
+            expect(response).to have_http_status :forbidden
             @course.reload
             expect(@course.group_weighting_scheme).to eql("equal")
           end
@@ -2050,7 +2050,7 @@ describe CoursesController, type: :request do
             @new_values["course"].delete("apply_assignment_group_weights")
             @new_values["course"]["group_weighting_scheme"] = "percent"
             raw_api_call(:put, @path, @params, @new_values)
-            expect(response).to have_http_status :unauthorized
+            expect(response).to have_http_status :forbidden
             @course.reload
             expect(@course.group_weighting_scheme).to eql("equal")
           end
@@ -2085,9 +2085,9 @@ describe CoursesController, type: :request do
       context "an unauthorized user" do
         before { user_factory }
 
-        it "returns 401 unauthorized" do
+        it "returns 403 forbidden" do
           raw_api_call(:put, @path, @params, @new_values)
-          expect(response).to have_http_status :unauthorized
+          expect(response).to have_http_status :forbidden
         end
       end
 
@@ -2180,15 +2180,15 @@ describe CoursesController, type: :request do
           @course.enrollments.each(&:destroy)
           @course.update!(template: true)
           raw_api_call(:delete, @path, @params, { event: "delete" })
-          expect(response).to have_http_status :unauthorized
+          expect(response).to have_http_status :forbidden
         end
       end
 
       context "an unauthorized user" do
-        it "returns 401" do
+        it "returns 403" do
           @user = @student
           raw_api_call(:delete, @path, @params, { event: "conclude" })
-          expect(response).to have_http_status :unauthorized
+          expect(response).to have_http_status :forbidden
         end
       end
     end
@@ -2224,7 +2224,7 @@ describe CoursesController, type: :request do
           @course.enrollments.each(&:destroy)
           @course.update!(template: true)
           raw_api_call(:post, @path, @params)
-          expect(response).to have_http_status :unauthorized
+          expect(response).to have_http_status :forbidden
         end
       end
 
@@ -2232,7 +2232,7 @@ describe CoursesController, type: :request do
         it "returns 401" do
           @user = @student
           raw_api_call(:post, @path, @params)
-          expect(response).to have_http_status :unauthorized
+          expect(response).to have_http_status :forbidden
         end
       end
     end
@@ -2446,14 +2446,14 @@ describe CoursesController, type: :request do
       end
 
       context "an unauthorized user" do
-        it "returns 401" do
+        it "returns 403" do
           user_model
           api_call(:put,
                    @path,
                    @params,
                    { event: "offer", course_ids: [@course1.id] },
                    {},
-                   { expected_status: 401 })
+                   { expected_status: 403 })
         end
       end
     end
@@ -4429,7 +4429,7 @@ describe CoursesController, type: :request do
           user_with_pseudonym(user: @admin)
         end
 
-        it "401s for unauthorized users" do
+        it "403s for unauthorized users" do
           other_account = Account.create!
           other_course = other_account.courses.create!
           api_call(:get,
@@ -4437,7 +4437,7 @@ describe CoursesController, type: :request do
                    { controller: "courses", action: "show", id: other_course.to_param, format: "json", account_id: other_account.id.to_param },
                    {},
                    {},
-                   expected_status: 401)
+                   expected_status: 403)
         end
 
         it "404s for bad account id" do
@@ -4551,7 +4551,7 @@ describe CoursesController, type: :request do
                  { controller: "courses", action: "create_file", format: "json", course_id: @course.to_param, },
                  { name: "failboat.txt" },
                  {},
-                 expected_status: 401)
+                 expected_status: 403)
       end
 
       context "student in limited access account and has file creation permission" do
@@ -4559,7 +4559,7 @@ describe CoursesController, type: :request do
           @user = student_in_course(course: @course, active_all: true).user
         end
 
-        it "should render unauthorized if account setting is enabled" do
+        it "should render forbidden if account setting is enabled" do
           @course.root_account.enable_feature!(:allow_limited_access_for_students)
           @course.account.settings[:enable_limited_access_for_students] = true
           @course.account.save!
@@ -4568,7 +4568,7 @@ describe CoursesController, type: :request do
                    { controller: "courses", action: "create_file", format: "json", course_id: @course.to_param, },
                    { name: "failboat.txt" },
                    {},
-                   expected_status: 401)
+                   expected_status: 403)
         end
       end
 
@@ -4827,7 +4827,7 @@ describe CoursesController, type: :request do
                    { controller: "courses", action: "update_settings", course_id: @course.to_param, format: "json" },
                    { allow_student_discussion_topics: false },
                    {},
-                   expected_status: 401)
+                   expected_status: 403)
           expect(@course.reload.allow_student_discussion_topics).to be true
         end
       end
@@ -4893,7 +4893,7 @@ describe CoursesController, type: :request do
                  { controller: "courses", action: "preview_html", course_id: @course.to_param, format: "json" },
                  { html: "" },
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 
@@ -5063,7 +5063,7 @@ describe CoursesController, type: :request do
                             "/api/v1/courses/#{to_id}/course_copy",
                             { controller: "content_imports", action: "copy_course_content", course_id: to_id, format: "json" },
                             { source_course: from_id })
-      expect(status).to eq 401
+      expect(status).to eq 403
     end
 
     def run_not_found(to_id, from_id)
@@ -5245,7 +5245,7 @@ describe CoursesController, type: :request do
         it "does not allow teachers to from other courses to access the information" do
           new_course = Course.create!
           @user = course_with_teacher(course: new_course, active_all: true).user
-          api_call(:get, @effective_due_dates_path, @options, {}, {}, expected_status: 401)
+          api_call(:get, @effective_due_dates_path, @options, {}, {}, expected_status: 403)
         end
 
         it "allows TAs to access the information" do
@@ -5260,7 +5260,7 @@ describe CoursesController, type: :request do
 
         it "does not allow students to access the information" do
           @user = @test_student
-          api_call(:get, @effective_due_dates_path, @options, {}, {}, expected_status: 401)
+          api_call(:get, @effective_due_dates_path, @options, {}, {}, expected_status: 403)
         end
       end
 
