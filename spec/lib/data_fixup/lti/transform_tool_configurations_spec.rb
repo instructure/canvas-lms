@@ -36,6 +36,14 @@ RSpec.describe DataFixup::Lti::TransformToolConfigurations do
       privacy_level: "public"
     )
   end
+  let(:second_tool_configuration) do
+    tool_configuration.dup.tap do |tc|
+      dk = dev_key_model_1_3(account:)
+      dk.tool_configuration.delete
+      tc.developer_key = dk
+      tc.save!
+    end
+  end
 
   before do
     tool_configuration
@@ -50,5 +58,50 @@ RSpec.describe DataFixup::Lti::TransformToolConfigurations do
   it "removes data from settings" do
     subject
     expect(tool_configuration.reload[:settings]).to be_blank
+  end
+
+  context "when transformation errors" do
+    let(:scope) { double("scope") }
+
+    before do
+      second_tool_configuration
+
+      tool_configuration.settings["target_link_uri"] = "a" * 6000
+      tool_configuration.save!
+
+      allow(Sentry).to receive(:with_scope).and_yield(scope)
+      allow(Sentry).to receive(:capture_message)
+      allow(scope).to receive(:set_tags)
+      allow(scope).to receive(:set_context)
+    end
+
+    it "captures and reports the error" do
+      subject
+      expect(Sentry).to have_received(:capture_message).with("DataFixup::Lti#transform_tool_configurations", level: :warning)
+      expect(scope).to have_received(:set_tags).with(tool_configuration_id: tool_configuration.global_id)
+      expect(scope).to have_received(:set_context).with("exception", { name: "ActiveRecord::ValueTooLong", message: a_string_matching(/too long/) })
+      expect(tool_configuration.reload.target_link_uri).to be_nil
+    end
+
+    it "still migrates other tool configurations" do
+      subject
+      expect(second_tool_configuration.reload.target_link_uri).to eq(settings["target_link_uri"])
+    end
+  end
+
+  context "with invalid data" do
+    before do
+      tool_configuration.settings["public_jwk"] = []
+    end
+
+    it "still populates new columns" do
+      subject
+      expect(tool_configuration.reload.target_link_uri).to eq(settings["target_link_uri"])
+    end
+
+    it "still removes data from settings" do
+      subject
+      expect(tool_configuration.reload[:settings]).to be_blank
+    end
   end
 end
