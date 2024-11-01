@@ -105,11 +105,6 @@ describe DeveloperKeysController do
           expect(assigns.dig(:js_env, :validLtiPlacements)).to match_array Lti::ResourcePlacement.public_placements(Account.site_admin)
         end
 
-        it 'includes the "includes parameter" release flag' do
-          get "index", params: { account_id: Account.site_admin.id }
-          expect(assigns.dig(:js_env, :includesFeatureFlagEnabled)).to be false
-        end
-
         describe "js bundles" do
           render_views
 

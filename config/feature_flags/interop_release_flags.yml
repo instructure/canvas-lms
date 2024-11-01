@@ -59,11 +59,6 @@ deep_linking_use_window_parent:
       state: allowed_on
     ci:
       state: on
-developer_key_support_includes:
-  state: hidden
-  display_name: Developer Key Include Parameter Support
-  description: Provides a flag on the Developer Key to support Include Parameters on API requests
-  applies_to: SiteAdmin
 disable_graphql_authentication:
   state: hidden
   display_name: Disable authentication for GraphQL

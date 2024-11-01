@@ -131,7 +131,7 @@ export default class Scopes extends React.Component {
             </Grid.Col>
           ) : null}
         </Grid.Row>
-        {this.props.requireScopes && ENV.includesFeatureFlagEnabled && (
+        {this.props.requireScopes && (
           <Grid.Row>
             <Grid.Col>
               <Checkbox
