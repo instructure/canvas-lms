@@ -527,6 +527,23 @@ describe User do
           }.from([]).to([root_account.id])
         end
       end
+
+      context "and feature flags for the user exist" do
+        let(:feature_flag) do
+          user.enable_feature!(:high_contrast)
+          user.feature_flags.first
+        end
+
+        before { feature_flag.update(root_account_ids: []) }
+
+        it "updates root_account_ids on associated feature flags" do
+          expect do
+            user.update_root_account_ids
+          end.to change {
+            user.feature_flags.first.root_account_ids
+          }.from([]).to([root_account.id])
+        end
+      end
     end
 
     context "when there cross-shard root account associations" do
