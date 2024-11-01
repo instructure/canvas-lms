@@ -55,7 +55,7 @@ module Lti
 
       transform_settings
       self.redirect_uris = developer_key.redirect_uris.presence || [target_link_uri]
-      save!
+      save!(validate: false)
     end
 
     def untransform!
@@ -73,7 +73,7 @@ module Lti
       end
 
       @transformed = false
-      save!
+      save!(validate: false)
     end
 
     def transformed?
