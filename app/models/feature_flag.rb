@@ -29,6 +29,7 @@ class FeatureFlag < ActiveRecord::Base
 
   validate :valid_state, :feature_applies
   before_save :check_cache
+  before_save :infer_root_account_ids
   after_create :audit_log_create # to make sure we have an ID, must be after
   before_update :audit_log_update
   before_destroy :audit_log_destroy
@@ -141,5 +142,18 @@ class FeatureFlag < ActiveRecord::Base
 
   def check_cache
     clear_cache if changed?
+  end
+
+  def infer_root_account_ids
+    return if root_account_ids.present?
+
+    self.root_account_ids = case context
+                            when Account
+                              [context.resolved_root_account_id]
+                            when Course
+                              [context.root_account_id]
+                            when User
+                              context.root_account_ids
+                            end
   end
 end

@@ -617,8 +617,9 @@ class User < ActiveRecord::Base
     self.root_account_ids = refreshed_root_account_ids.to_a.sort
     if root_account_ids_changed?
       save!
-      # Update each communication channel associated with the user
+      # Update communication channel and feature flag records associated with the user
       communication_channels.update_all(root_account_ids:)
+      feature_flags.update_all(root_account_ids:)
     end
   end
 
