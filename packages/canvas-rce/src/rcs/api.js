@@ -388,7 +388,23 @@ class RceApiSource {
     }
     return fetch(preflightProps.upload_url, fetchOptions)
       .then(checkStatus)
-      .then(res => res.json())
+      .then(res => {
+        if (res.headers.get('content-type').includes('application/xml')) {
+          if (res.status === 201) {
+            return res.text().then(text => {
+              const xmldoc = new window.DOMParser().parseFromString(text, 'application/xml')
+              const location = xmldoc.querySelector('Location').textContent
+              return {
+                Location: location,
+              }
+            })
+          } else {
+            throw new Error('upload failed to create the file')
+          }
+        } else {
+          return res.json()
+        }
+      })
       .then(uploadResults => {
         return this.finalizeUpload(preflightProps, uploadResults)
       })
