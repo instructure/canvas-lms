@@ -438,7 +438,8 @@ class DeveloperKey < ActiveRecord::Base
                                              name: tool_configuration&.settings&.dig("title") || "Unnamed tool",
                                              workflow_state:,
                                              ims_registration:,
-                                             skip_lti_sync: true)
+                                             skip_lti_sync: true,
+                                             manual_configuration: referenced_tool_configuration)
     lti_registration.save!
   end
 
@@ -455,7 +456,8 @@ class DeveloperKey < ActiveRecord::Base
                              admin_nickname: name,
                              updated_by: current_user,
                              workflow_state:,
-                             skip_lti_sync: true)
+                             skip_lti_sync: true,
+                             manual_configuration: referenced_tool_configuration)
   end
 
   def validate_lti_fields
