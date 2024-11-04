@@ -518,7 +518,7 @@ class AccountsController < ApplicationController
   #   { "calendar_contexts_limit": true, "open_registration": false, ...}
   #
   def environment
-    render json: cached_js_env_account_settings
+    render json: cached_js_env_root_account_settings
   end
 
   # @API Permissions

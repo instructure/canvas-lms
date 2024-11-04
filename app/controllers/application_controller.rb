@@ -438,21 +438,35 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  JS_ENV_ROOT_ACCOUNT_SETTINGS = %i[
-    calendar_contexts_limit
-    open_registration
-  ].freeze
-  JS_ENV_ROOT_ACCOUNT_SETTINGS_HASH = Digest::SHA256.hexdigest(JS_ENV_ROOT_ACCOUNT_SETTINGS.sort.join(",")).freeze
+  def js_env_root_account_settings
+    default_settings = %i[calendar_contexts_limit open_registration]
+    if Account.site_admin.feature_enabled?(:inbox_settings)
+      inbox_settings = %i[
+        inbox_auto_response
+        inbox_signature_block
+        inbox_auto_response_for_students
+        inbox_signature_block_for_students
+      ]
+    end
+    settings = default_settings
+    settings += inbox_settings if inbox_settings
 
-  def cached_js_env_account_settings
+    settings.uniq.freeze
+  end
+
+  def cached_js_env_root_account_settings
+    js_env_settings = js_env_root_account_settings
+    js_env_settings_hash = Digest::SHA256.hexdigest(js_env_settings.sort.join(","))
+    account_settings_hash = Digest::SHA256.hexdigest(@domain_root_account[:settings].to_s)
+
     # can be invalidated by a settings change on the domain root account
-    # or updating the JS_ENV_ROOT_ACCOUNT_SETTINGS array
-    MultiCache.fetch(["js_env_account_settings",
-                      JS_ENV_ROOT_ACCOUNT_SETTINGS_HASH,
-                      @domain_root_account[:settings]].cache_key) do
+    # or an update to js_env_root_account_settings
+    MultiCache.fetch(["js_env_root_account_settings", js_env_settings_hash, account_settings_hash].cache_key) do
       results = {}
-      JS_ENV_ROOT_ACCOUNT_SETTINGS.each do |s|
-        results[s] = @domain_root_account&.setting_enabled?(s)
+      js_env_settings.each do |setting|
+        next unless @domain_root_account.settings.key?(setting.to_sym)
+
+        results[setting] = @domain_root_account.settings[setting.to_sym]
       end
       results
     end

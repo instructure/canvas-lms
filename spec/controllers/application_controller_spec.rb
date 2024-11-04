@@ -2752,6 +2752,70 @@ RSpec.describe ApplicationController do
       end
     end
   end
+
+  describe "#js_env_root_account_settings" do
+    subject { controller.js_env_root_account_settings }
+
+    before do
+      Account.default[:settings] = { calendar_contexts_limit: 5, open_registration: false }
+      Account.default.save!
+    end
+
+    context "when inbox settings feature is disabled" do
+      it "returns default settings" do
+        expect(subject).to match_array([:calendar_contexts_limit, :open_registration])
+      end
+    end
+
+    context "when inbox settings feature is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:inbox_settings)
+      end
+
+      it "returns default settings and inbox settings" do
+        expect(subject).to match_array(
+          %i[
+            calendar_contexts_limit
+            open_registration
+            inbox_auto_response
+            inbox_signature_block
+            inbox_auto_response_for_students
+            inbox_signature_block_for_students
+          ]
+        )
+      end
+    end
+  end
+
+  describe "#cached_js_env_root_account_settings" do
+    subject { controller.cached_js_env_root_account_settings }
+
+    before do
+      Account.default[:settings] = { calendar_contexts_limit: 10, open_registration: true }
+      Account.default.save!
+      controller.instance_variable_set(:@domain_root_account, Account.default)
+    end
+
+    context "when domain root account has settings attribute" do
+      it "fetches settings from cache" do
+        js_env_settings_hash = Digest::SHA256.hexdigest([:calendar_contexts_limit, :open_registration].sort.join(","))
+        account_settings_hash = Digest::SHA256.hexdigest(Account.default[:settings].to_s)
+        cache_key = ["js_env_root_account_settings", js_env_settings_hash, account_settings_hash].cache_key
+
+        expect(MultiCache).to receive(:fetch).and_call_original
+        expect(MultiCache).to receive(:fetch).with(cache_key).and_yield
+        expect(subject).to match(hash_including(calendar_contexts_limit: 10, open_registration: true))
+      end
+
+      it "returns only the available settings if some domain root account settings are not set" do
+        Account.default[:settings].delete(:calendar_contexts_limit)
+        Account.default.save!
+
+        expect(subject).to have_key(:open_registration)
+        expect(subject).not_to have_key(:calendar_contexts_limit)
+      end
+    end
+  end
 end
 
 describe WikiPagesController do
