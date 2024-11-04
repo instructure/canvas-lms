@@ -16,18 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef, useState, useCallback} from 'react'
+import React, {useRef, useState, useCallback, type ChangeEvent} from 'react'
 import {throttle} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {View} from '@instructure/ui-view'
 import {IconSearchLine} from '@instructure/ui-icons'
-import {Select} from '@instructure/ui-select'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import CommonMigratorControls from './common_migrator_controls'
 import type {onSubmitMigrationFormCallback} from '../types'
 import {Text} from '@instructure/ui-text'
+import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import {parseDateToISOString} from '../utils'
 import {RequiredFormLabel} from './form_label'
 import {ErrorFormMessage} from './error_form_message'
@@ -46,6 +46,10 @@ type CourseCopyImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
   onCancel: () => void
   isSubmitting: boolean
+}
+
+const getCourseOptionDescription = (option: CourseOption): string | null => {
+  return option.term ? I18n.t('Term: %{termName}', {termName: option.term}) : null
 }
 
 export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCopyImporterProps) => {
@@ -120,13 +124,13 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
   return (
     <>
       <View as="div" margin="medium none none none" width="100%" maxWidth="22.5rem">
-        <Select
+        <CanvasSelect
+          id="course-copy-select-course"
           inputValue={selectedCourse ? selectedCourse.label : searchParam}
           interaction={isSubmitting ? 'disabled' : 'enabled'}
           onInputChange={getCourseOptions}
-          onRequestSelectOption={(_e: any, data: {id?: string | undefined}) => {
-            const course_id = data.id as string
-            selectCourse(course_id)
+          onChange={(_e: ChangeEvent<HTMLSelectElement>, courseId: string) => {
+            selectCourse(courseId)
           }}
           placeholder={I18n.t('Search...')}
           isShowingOptions={courseOptions.length > 0}
@@ -150,24 +154,26 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
                 ]
               : []
           }
+          value={selectedCourse ? selectedCourse.id : null}
+          scrollToHighlightedOption={true}
         >
           {courseOptions.length > 0 ? (
             courseOptions.map((option: CourseOption) => {
               return (
-                <Select.Option id={option.id} key={option.id} value={option.id}>
+                <CanvasSelect.Option
+                  id={option.id}
+                  key={option.id}
+                  value={option.id}
+                  description={getCourseOptionDescription(option)}
+                >
                   {option.label}
-                  {!!option.term && (
-                    <Text as="div" size="x-small" color="secondary">
-                      {I18n.t('Term: %{termName}', {termName: option.term})}
-                    </Text>
-                  )}
-                </Select.Option>
+                </CanvasSelect.Option>
               )
             })
           ) : (
-            <Select.Option id="empty-option" key="empty-option" value="" />
+            <CanvasSelect.Option id="empty-option" key="empty-option" value="" />
           )}
-        </Select>
+        </CanvasSelect>
       </View>
       <View as="div" margin="small none none none">
         <Checkbox

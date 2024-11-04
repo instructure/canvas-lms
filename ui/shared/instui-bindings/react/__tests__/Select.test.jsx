@@ -20,7 +20,7 @@
 import '@instructure/canvas-theme'
 import React from 'react'
 import CanvasSelect from '../Select'
-import {render} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 
 function selectProps(override = {}) {
   return {
@@ -32,22 +32,20 @@ function selectProps(override = {}) {
   }
 }
 
-function selectOpts() {
-  return [
-    <CanvasSelect.Option key="1" id="1" value="one">
-      One
-    </CanvasSelect.Option>,
-    <CanvasSelect.Option key="2" id="2" value="two">
-      Two
-    </CanvasSelect.Option>,
-    <CanvasSelect.Option key="3" id="3" value="three">
-      Three
-    </CanvasSelect.Option>,
-  ]
-}
+const defaultOptions = [
+  <CanvasSelect.Option key="1" id="1" value="one">
+    One
+  </CanvasSelect.Option>,
+  <CanvasSelect.Option key="2" id="2" value="two">
+    Two
+  </CanvasSelect.Option>,
+  <CanvasSelect.Option key="3" id="3" value="three">
+    Three
+  </CanvasSelect.Option>,
+]
 
-function renderSelect(otherProps) {
-  return render(<CanvasSelect {...selectProps(otherProps)}>{selectOpts()}</CanvasSelect>)
+function renderSelect(otherProps, selectOptions = defaultOptions) {
+  return render(<CanvasSelect {...selectProps(otherProps)}>{selectOptions}</CanvasSelect>)
 }
 
 let liveRegion = null
@@ -152,6 +150,33 @@ describe('CanvasSelect component', () => {
 
     expect(getByText('No Options')).toBeInTheDocument()
   })
+
+  describe('CanvasSelectOption', () => {
+    it('renders', async () => {
+      const options = [
+        <CanvasSelect.Option id="1" key="1" value="one">
+          One
+        </CanvasSelect.Option>
+      ]
+      const {getByText} = renderSelect({}, options)
+      const label = getByText('Choose one')
+      await fireEvent.click(label)
+      expect(getByText('One')).toBeInTheDocument()
+    })
+
+    it('renders description', async () => {
+      const options = [
+        <CanvasSelect.Option id="1" key="1" value="one" description="description">
+          One
+        </CanvasSelect.Option>
+      ]
+      const {getByText} = renderSelect({}, options)
+      const label = getByText('Choose one')
+      await fireEvent.click(label)
+
+      expect(getByText('description')).toBeInTheDocument()
+    });
+  });
 
   describe('CanvasSelectGroups', () => {
     it('renders enumerated groups and options', () => {
