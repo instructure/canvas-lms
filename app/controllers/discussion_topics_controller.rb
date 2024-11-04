@@ -603,9 +603,9 @@ class DiscussionTopicsController < ApplicationController
       when :none
         []
       when :all
-        @context.course_sections.active.to_a
+        @context.course_sections.active.order(:name).to_a
       else
-        @context.course_sections.select { |s| s.active? && section_visibilities.include?(s.id) }
+        @context.course_sections.active.order(:name).select { |s| section_visibilities.include?(s.id) }
       end
 
     js_hash = {
