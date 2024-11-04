@@ -700,7 +700,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def import_quizzes_next?
-    !!Canvas::Plugin.value_to_boolean(migration_settings[:import_quizzes_next])
+    Canvas::Plugin.value_to_boolean(migration_settings[:import_quizzes_next])
   end
 
   def quizzes_next_migration?
