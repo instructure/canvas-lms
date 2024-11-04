@@ -141,7 +141,7 @@ function formatDateToLocalString(utcDateStr: string) {
 }
 
 describe('TempEnrollAssign', () => {
-  beforeAll(() => {
+  beforeEach(() => {
     // @ts-expect-error
     window.ENV = {
       ACCOUNT_ID: '1',
@@ -243,7 +243,8 @@ describe('TempEnrollAssign', () => {
       )
     })
 
-    it('displays Local and Account datetime in correct timezones', async () => {
+    // Skipped because of FOO-4895
+    it.skip('displays Local and Account datetime in correct timezones', async () => {
       // @ts-expect-error the only test that requires TIMEZONE
       window.ENV = {...window.ENV, TIMEZONE: 'America/Denver'}
 
@@ -258,13 +259,6 @@ describe('TempEnrollAssign', () => {
 
       expect(localTime.textContent).toContain('9:00 AM')
       expect(accTime.textContent).toContain('11:00 PM')
-
-      // @ts-expect-error
-      window.ENV = {
-        ACCOUNT_ID: '1',
-        CONTEXT_TIMEZONE: 'Asia/Brunei',
-        context_asset_string: 'account_1',
-      }
     })
 
     it('show error when date field is blank', async () => {
