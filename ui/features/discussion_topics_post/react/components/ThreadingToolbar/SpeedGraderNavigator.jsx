@@ -52,17 +52,7 @@ export const SpeedGraderNavigator = () => {
   const {sort, perPage, discussionID} = useContext(SearchContext)
 
   const {handlePreviousStudentReply, handleNextStudentReply, handleJumpFocusToSpeedGrader} =
-    useSpeedGrader({
-      highlightEntryId,
-      setHighlightEntryId,
-      setPageNumber,
-      expandedThreads,
-      setExpandedThreads,
-      setFocusSelector,
-      discussionID,
-      perPage,
-      sort,
-    })
+    useSpeedGrader()
 
   const handleFocus = () => {
     setIsVisible(true)
