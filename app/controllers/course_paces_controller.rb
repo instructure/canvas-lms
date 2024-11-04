@@ -51,6 +51,12 @@
 #           "example": true,
 #           "type": "boolean"
 #         },
+#         "selected_days_to_skip": {
+#           "description": "array of strings representing the days of the work week",
+#           "example": ["fri", "sat"],
+#           "type": "array",
+#           "items": {"type": "integer"}
+#         },
 #         "hard_end_dates": {
 #           "description": "set if the end date is set from course",
 #           "example": true,
@@ -463,6 +469,9 @@ class CoursePacesController < ApplicationController
   # @argument exclude_weekends [Boolean]
   #   Course pace dates excludes weekends if true
   #
+  # @argument selected_days_to_skip [Array<String>]
+  #   Course pace dates excludes weekends if true
+  #
   # @argument hard_end_dates [Boolean]
   #   Course pace uess hard end dates if true
   #
@@ -523,6 +532,9 @@ class CoursePacesController < ApplicationController
   #   End date of the course pace
   #
   # @argument exclude_weekends [Boolean]
+  #   Course pace dates excludes weekends if true
+  #
+  # @argument selected_days_to_skip [Array<String>]
   #   Course pace dates excludes weekends if true
   #
   # @argument hard_end_dates [Boolean]
@@ -711,6 +723,10 @@ class CoursePacesController < ApplicationController
     not_found unless @course.account.feature_enabled?(:course_paces) && @course.enable_course_paces
   end
 
+  def pace_skip_selected_days_feature_flag
+    @pace_skip_selected_days_feature_flag ||= @context.root_account.feature_enabled?(:course_paces_skip_selected_days)
+  end
+
   def pace_draft_feature_flag
     @draft_feature_flag_enabled = @context.root_account.feature_enabled?(:course_pace_draft_state)
   end
@@ -750,11 +766,13 @@ class CoursePacesController < ApplicationController
       :course_section_id,
       :user_id,
       :end_date,
-      :exclude_weekends,
       :hard_end_dates,
       :workflow_state,
-      course_pace_module_items_attributes: %i[id duration module_item_id root_account_id]
+      :exclude_weekends,
+      course_pace_module_items_attributes: %i[id duration module_item_id root_account_id],
+      selected_days_to_skip: []
     )
+
     set_context_ids
     @permitted_params
   end
@@ -767,11 +785,13 @@ class CoursePacesController < ApplicationController
       :course_section_id,
       :user_id,
       :end_date,
-      :exclude_weekends,
       :hard_end_dates,
       :workflow_state,
-      course_pace_module_items_attributes: %i[duration module_item_id root_account_id]
+      :exclude_weekends,
+      course_pace_module_items_attributes: %i[duration module_item_id root_account_id],
+      selected_days_to_skip: []
     )
+
     set_context_ids
     @permitted_params
   end

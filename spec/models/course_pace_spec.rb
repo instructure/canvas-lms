@@ -698,44 +698,122 @@ describe CoursePace do
       @tag = @assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
     end
 
-    it "increments on initial publish when exclude_weekends set to true" do
-      allow(InstStatsd::Statsd).to receive(:increment)
+    context "when add_selected_days_to_skip_param is enabled" do
+      before do
+        stub_const("SKIP_WEEKEND_DAYS", %w[sun sat])
+        stub_const("NOT_SKIP_WEEKEND_DAYS", [])
+        @course.root_account.enable_feature!(:course_paces_skip_selected_days)
+      end
 
-      @course_pace = @course.course_paces.create!(workflow_state: "active")
+      it "increments on initial publish when weekend days selected to be skipped" do
+        allow(InstStatsd::Statsd).to receive(:increment)
 
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+        @course_pace = @course.course_paces.create!(
+          workflow_state: "active",
+          selected_days_to_skip: SKIP_WEEKEND_DAYS
+        )
+
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+      end
+
+      it "does not decrement on initial publish when no days selected to skipped" do
+        allow(InstStatsd::Statsd).to receive(:decrement)
+
+        @course_pace = @course.course_paces.create!(
+          workflow_state: "active",
+          selected_days_to_skip: NOT_SKIP_WEEKEND_DAYS
+        )
+
+        expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course_pacing.weekends_excluded")
+      end
+
+      it "increments on subsequent publish when no days selected then weekend days selected to be skipped" do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+
+        @course_pace = @course.course_paces.create!(
+          workflow_state: "active",
+          selected_days_to_skip: NOT_SKIP_WEEKEND_DAYS
+        )
+        @course_pace.update!(selected_days_to_skip: SKIP_WEEKEND_DAYS)
+        @course_pace.publish
+
+        expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course_pacing.weekends_excluded")
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+      end
+
+      it "decrements on subsequent publish when weekend days initially selected then de selected to be skipped" do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+
+        @course_pace = @course.course_paces.create!(
+          selected_days_to_skip: SKIP_WEEKEND_DAYS,
+          workflow_state: "active"
+        )
+        @course_pace.update!(selected_days_to_skip: NOT_SKIP_WEEKEND_DAYS)
+        @course_pace.publish
+
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+        expect(InstStatsd::Statsd).to have_received(:decrement).with("course_pacing.weekends_excluded")
+      end
     end
 
-    it "does not decrement on initial publish when exclude_weekends set to false" do
-      allow(InstStatsd::Statsd).to receive(:decrement)
+    context "when add_selected_days_to_skip_param is disabled" do
+      before do
+        @course.root_account.disable_feature!(:course_paces_skip_selected_days)
+      end
 
-      @course_pace = @course.course_paces.create!(workflow_state: "active", exclude_weekends: false)
+      it "increments on initial publish when exclude_weekends set to true" do
+        allow(InstStatsd::Statsd).to receive(:increment)
 
-      expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course_pacing.weekends_excluded")
-    end
+        @course_pace = @course.course_paces.create!(
+          workflow_state: "active",
+          exclude_weekends: true
+        )
 
-    it "increments on subsequent publish when exclude_weekends initially false then set to true" do
-      allow(InstStatsd::Statsd).to receive(:increment)
-      allow(InstStatsd::Statsd).to receive(:decrement)
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+      end
 
-      @course_pace = @course.course_paces.create!(workflow_state: "active", exclude_weekends: false)
-      @course_pace.update!(exclude_weekends: true)
-      @course_pace.publish
+      it "does not decrement on initial publish when exclude_weekends set to false" do
+        allow(InstStatsd::Statsd).to receive(:decrement)
 
-      expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course_pacing.weekends_excluded")
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
-    end
+        @course_pace = @course.course_paces.create!(
+          workflow_state: "active",
+          exclude_weekends: false
+        )
 
-    it "decrements on subsequent publish when exclude_weekends initially true then set to false" do
-      allow(InstStatsd::Statsd).to receive(:increment)
-      allow(InstStatsd::Statsd).to receive(:decrement)
+        expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course_pacing.weekends_excluded")
+      end
 
-      @course_pace = @course.course_paces.create!(workflow_state: "active")
-      @course_pace.update!(exclude_weekends: false)
-      @course_pace.publish
+      it "increments on subsequent publish when exclude_weekends initially false then set to true" do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:decrement)
 
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
-      expect(InstStatsd::Statsd).to have_received(:decrement).with("course_pacing.weekends_excluded")
+        @course_pace = @course.course_paces.create!(
+          workflow_state: "active",
+          exclude_weekends: false
+        )
+        @course_pace.update!(exclude_weekends: true)
+        @course_pace.publish
+
+        expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course_pacing.weekends_excluded")
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+      end
+
+      it "increments on subsequent publish when exclude_weekends initially true then set to false" do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+
+        @course_pace = @course.course_paces.create!(
+          exclude_weekends: true,
+          workflow_state: "active"
+        )
+        @course_pace.update!(exclude_weekends: false)
+        @course_pace.publish
+
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+        expect(InstStatsd::Statsd).to have_received(:decrement).with("course_pacing.weekends_excluded")
+      end
     end
 
     it "logs the average module item duration as a count" do

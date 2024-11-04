@@ -25,7 +25,12 @@ describe CoursePaceHardEndDateCompressor do
     @course.root_account.enable_feature!(:course_paces)
     @course.enable_course_paces = true
     @course.save!
-    @course_pace = @course.course_paces.create!(workflow_state: "active", end_date: "2021-09-10", hard_end_dates: true, published_at: Time.zone.now)
+    @course_pace = @course.course_paces.create!(
+      workflow_state: "active",
+      end_date: "2021-09-10",
+      hard_end_dates: true,
+      published_at: Time.zone.now
+    )
     @module = @course.context_modules.create!
   end
 
@@ -43,77 +48,176 @@ describe CoursePaceHardEndDateCompressor do
         @course_pace.course_pace_module_items.last.update! duration: 6
       end
 
-      it "compresses the plan items by the required percentage to reach the hard end date" do
-        compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
-        expect(compressed.pluck(:duration)).to eq([5, 0, 2])
-      end
-
-      it "does nothing if the duration of the course pace is within the end date" do
-        @course_pace.update(end_date: "2022-09-10")
-        compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
-        expect(compressed.pluck(:duration)).to eq([10, 0, 6])
-      end
-
-      it "compresses to end on the hard end date" do
-        @course.update(start_at: "2021-12-27")
-        @course_pace.update(end_date: "2021-12-31", exclude_weekends: true, hard_end_dates: true)
-        @course_pace.course_pace_module_items.each_with_index do |item, index|
-          item.update(duration: (index + 1) * 2)
+      context "when add_selected_days_to_skip_param is enabled" do
+        before do
+          @course.root_account.enable_feature!(:course_paces_skip_selected_days)
+          @course_pace.update selected_days_to_skip: %w[sat sun]
+          @course_pace.course.root_account.reload
         end
-        compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
-        expect(compressed.pluck(:duration)).to eq([1, 1, 2])
+
+        it "compresses the plan items by the required percentage to reach the hard end date" do
+          compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
+          expect(compressed.pluck(:duration)).to eq([5, 0, 2])
+        end
+
+        it "does nothing if the duration of the course pace is within the end date" do
+          @course_pace.update(end_date: "2022-09-10")
+          compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
+          expect(compressed.pluck(:duration)).to eq([10, 0, 6])
+        end
+
+        it "compresses to end on the hard end date" do
+          @course.update(start_at: "2021-12-27")
+          @course_pace.update(end_date: "2021-12-31", hard_end_dates: true)
+          @course_pace.course_pace_module_items.each_with_index do |item, index|
+            item.update(duration: (index + 1) * 2)
+          end
+          compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
+          expect(compressed.pluck(:duration)).to eq([1, 1, 2])
+        end
+
+        it "respects course blackout dates" do
+          @course.blackout_dates.create!(event_title: "Blackout Test", start_date: "2021-09-01", end_date: "2021-09-01")
+          compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
+          expect(compressed.pluck(:duration)).to eq([4, 0, 2])
+        end
+
+        it "respects account blackout dates" do
+          @course.account.calendar_events.create!(title: "Blackout Test", start_at: "2021-09-01", end_at: "2021-09-01", blackout_date: true)
+          compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
+          expect(compressed.pluck(:duration)).to eq([4, 0, 2])
+        end
       end
 
-      it "respects course blackout dates" do
-        @course.blackout_dates.create!(event_title: "Blackout Test", start_date: "2021-09-01", end_date: "2021-09-01")
-        compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
-        expect(compressed.pluck(:duration)).to eq([4, 0, 2])
-      end
+      context "when add_selected_days_to_skip_param is disabled" do
+        before do
+          @course.root_account.disable_feature!(:course_paces_skip_selected_days)
+          @course_pace.update exclude_weekends: true
+          @course_pace.course.root_account.reload
+        end
 
-      it "respects account blackout dates" do
-        @course.account.calendar_events.create!(title: "Blackout Test", start_at: "2021-09-01", end_at: "2021-09-01", blackout_date: true)
-        compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
-        expect(compressed.pluck(:duration)).to eq([4, 0, 2])
+        it "compresses the plan items by the required percentage to reach the hard end date" do
+          compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
+          expect(compressed.pluck(:duration)).to eq([5, 0, 2])
+        end
+
+        it "does nothing if the duration of the course pace is within the end date" do
+          @course_pace.update(end_date: "2022-09-10")
+          compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
+          expect(compressed.pluck(:duration)).to eq([10, 0, 6])
+        end
+
+        it "compresses to end on the hard end date" do
+          @course.update(start_at: "2021-12-27")
+          @course_pace.update(end_date: "2021-12-31", hard_end_dates: true)
+          @course_pace.course_pace_module_items.each_with_index do |item, index|
+            item.update(duration: (index + 1) * 2)
+          end
+          compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
+          expect(compressed.pluck(:duration)).to eq([1, 1, 2])
+        end
+
+        it "respects course blackout dates" do
+          @course.blackout_dates.create!(event_title: "Blackout Test", start_date: "2021-09-01", end_date: "2021-09-01")
+          compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
+          expect(compressed.pluck(:duration)).to eq([4, 0, 2])
+        end
+
+        it "respects account blackout dates" do
+          @course.account.calendar_events.create!(title: "Blackout Test", start_at: "2021-09-01", end_at: "2021-09-01", blackout_date: true)
+          compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
+          expect(compressed.pluck(:duration)).to eq([4, 0, 2])
+        end
       end
 
       context "implicit end dates" do
         before :once do
           @course.update(start_at: "2021-12-27")
-          @course_pace.update(end_date: nil, hard_end_dates: false, exclude_weekends: true)
+          @course_pace.update(end_date: nil, hard_end_dates: false)
           @course_pace.course_pace_module_items.each_with_index do |item, index|
             item.update(duration: (index + 1) * 2)
           end
         end
 
-        it "supports implicit end dates from the course's term" do
-          @course.update(restrict_enrollments_to_course_dates: false)
-          @course.enrollment_term.update(start_at: "2021-12-27", end_at: "2021-12-31")
-          compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
-          expect(compressed.pluck(:duration)).to eq([1, 1, 2])
+        context "when add_selected_days_to_skip_param is enabled" do
+          before do
+            @course.root_account.enable_feature!(:course_paces_skip_selected_days)
+            @course_pace.update selected_days_to_skip: %w[sat sun]
+          end
+
+          it "supports implicit end dates from the course's term" do
+            @course.update(restrict_enrollments_to_course_dates: false)
+            @course.enrollment_term.update(start_at: "2021-12-27", end_at: "2021-12-31")
+            compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
+            expect(compressed.pluck(:duration)).to eq([1, 1, 2])
+          end
+
+          it "supports implicit end dates from the course" do
+            @course.update(conclude_at: "2021-12-31")
+            compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
+            expect(compressed.pluck(:duration)).to eq([1, 1, 2])
+          end
+
+          it "considers the end date the previous Friday if it falls on the weekend" do
+            @course.update(conclude_at: "2022-01-02") # Sunday
+            compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
+            expect(compressed.pluck(:duration)).to eq([1, 1, 2])
+          end
         end
 
-        it "supports implicit end dates from the course" do
-          @course.update(conclude_at: "2021-12-31")
-          compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
-          expect(compressed.pluck(:duration)).to eq([1, 1, 2])
-        end
+        context "when add_selected_days_to_skip_param is disabled" do
+          before do
+            @course.root_account.disable_feature!(:course_paces_skip_selected_days)
+            @course_pace.update exclude_weekends: true
+          end
 
-        it "considers the end date the previous Friday if it falls on the weekend" do
-          @course.update(conclude_at: "2022-01-02") # Sunday
-          compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
-          expect(compressed.pluck(:duration)).to eq([1, 1, 2])
+          it "supports implicit end dates from the course's term" do
+            @course.update(restrict_enrollments_to_course_dates: false)
+            @course.enrollment_term.update(start_at: "2021-12-27", end_at: "2021-12-31")
+            compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
+            expect(compressed.pluck(:duration)).to eq([1, 1, 2])
+          end
+
+          it "supports implicit end dates from the course" do
+            @course.update(conclude_at: "2021-12-31")
+            compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
+            expect(compressed.pluck(:duration)).to eq([1, 1, 2])
+          end
+
+          it "considers the end date the previous Friday if it falls on the weekend" do
+            @course.update(conclude_at: "2022-01-02") # Sunday
+            compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
+            expect(compressed.pluck(:duration)).to eq([1, 1, 2])
+          end
         end
       end
     end
 
-    it "paces assignments appropriately if there are too many" do
-      20.times do |_i|
-        assignment = @course.assignments.create!
-        assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
+    context "paces assignments appropriately if there are too many" do
+      before do
+        20.times do |_i|
+          assignment = @course.assignments.create!
+          assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
+        end
       end
-      @course_pace.course_pace_module_items.update(duration: 1)
-      compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
-      expect(compressed.pluck(:duration)).to eq([1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0])
+
+      it "add_selected_days_to_skip_param is enabled" do
+        @course.root_account.enable_feature!(:course_paces_skip_selected_days)
+        @course_pace.update selected_days_to_skip: %w[sat sun]
+
+        @course_pace.course_pace_module_items.update(duration: 1)
+        compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
+        expect(compressed.pluck(:duration)).to eq([1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0])
+      end
+
+      it "add_selected_days_to_skip_param is disabled" do
+        @course.root_account.disable_feature!(:course_paces_skip_selected_days)
+        @course_pace.update exclude_weekends: true
+
+        @course_pace.course_pace_module_items.update(duration: 1)
+        compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items.order(:id))
+        expect(compressed.pluck(:duration)).to eq([1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0])
+      end
     end
   end
 

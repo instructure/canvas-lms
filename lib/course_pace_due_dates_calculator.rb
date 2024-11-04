@@ -30,15 +30,15 @@ class CoursePaceDueDatesCalculator
     enrollment_start_date = enrollment&.start_at || [enrollment&.effective_start_at, enrollment&.created_at].compact.max
     start_date = start_date || enrollment_start_date&.utc&.to_date || course_pace.start_date.to_date
     # We have to make sure we start counting on a day that is enabled
-    unless CoursePacesDateHelpers.day_is_enabled?(start_date, course_pace.exclude_weekends, blackout_dates)
-      start_date = CoursePacesDateHelpers.first_enabled_day(start_date, course_pace.exclude_weekends, blackout_dates)
+    unless CoursePacesDateHelpers.day_is_enabled?(start_date, course_pace, blackout_dates)
+      start_date = CoursePacesDateHelpers.first_enabled_day(start_date, course_pace, blackout_dates)
     end
 
     items.each do |item|
       due_date = CoursePacesDateHelpers.add_days(
         start_date,
         item.duration,
-        course_pace.exclude_weekends,
+        course_pace,
         blackout_dates
       )
 

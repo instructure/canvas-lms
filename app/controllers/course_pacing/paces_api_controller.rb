@@ -85,10 +85,11 @@ class CoursePacing::PacesApiController < ApplicationController
   def update_params
     params.require(:pace).permit(
       :end_date,
-      :exclude_weekends,
       :hard_end_dates,
       :workflow_state,
-      course_pace_module_items_attributes: %i[id duration module_item_id root_account_id]
+      :exclude_weekends,
+      course_pace_module_items_attributes: %i[id duration module_item_id root_account_id],
+      selected_days_to_skip: []
     )
   end
 
