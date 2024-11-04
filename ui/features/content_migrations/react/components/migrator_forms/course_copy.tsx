@@ -48,7 +48,7 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
   const [courseOptions, setCourseOptions] = useState<any>([])
   const [selectedCourse, setSelectedCourse] = useState<any>(false)
   const [selectedCourseError, setSelectedCourseError] = useState<boolean>(false)
-  const [includeCompletedCourses, setIncludeCompletedCourses] = useState<boolean>(false)
+  const [includeCompletedCourses, setIncludeCompletedCourses] = useState<boolean>(true)
 
   const throttledCourseFetch = useRef(
     throttle(
@@ -166,6 +166,7 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
       <View as="div" margin="small none none none">
         <Checkbox
           disabled={isSubmitting}
+          checked={includeCompletedCourses}
           name="include_completed_courses"
           label={I18n.t('Include completed courses')}
           onChange={(e: React.SyntheticEvent<Element, Event>) => {
