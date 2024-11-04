@@ -927,7 +927,7 @@ class AccountsController < ApplicationController
 
   def quiz_ip_filters
     if authorized_action(@account, @current_user, :read)
-      available_filters = @account.available_ip_filters(params[:search_term]) || []
+      available_filters = @account.available_ip_filters(params[:course_uuid], params[:search_term]) || []
 
       paginated_set = Api.paginate(available_filters, self, api_v1_quiz_ip_filters_url)
       renderable = quiz_ip_filters_json(paginated_set, @context, @current_user, session)
