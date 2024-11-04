@@ -1496,7 +1496,23 @@ describe Canvas::LiveEvents do
           migration.migration_settings[:import_quizzes_next] = true
         end
 
-        it "does not send the resource map" do
+        it "sends the resource map" do
+          expect_event(
+            "content_migration_completed",
+            hash_including(resource_map_url: "http://example.com/resource_map.json"),
+            hash_including(context_id: course.global_id.to_s)
+          ).once
+
+          Canvas::LiveEvents.content_migration_completed(migration)
+        end
+      end
+
+      describe "importing new quizzes from new quiz QTI" do
+        before do
+          migration.migration_settings[:quiz_next_imported] = true
+        end
+
+        it "sends the resource map" do
           expect_event(
             "content_migration_completed",
             hash_including(resource_map_url: "http://example.com/resource_map.json"),
