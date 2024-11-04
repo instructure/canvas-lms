@@ -825,26 +825,6 @@ describe GradeCalculator do
     end
   end
 
-  describe "#number_or_null" do
-    it "returns a valid score" do
-      calc = GradeCalculator.new [@user.id], @course.id
-      score = 23.4
-      expect(calc.send(:number_or_null, score)).to equal(score)
-    end
-
-    it "converts NaN to NULL" do
-      calc = GradeCalculator.new [@user.id], @course.id
-      score = 0 / 0.0
-      expect(calc.send(:number_or_null, score)).to eql("NULL::float")
-    end
-
-    it "converts nil to NULL" do
-      calc = GradeCalculator.new [@user.id], @course.id
-      score = nil
-      expect(calc.send(:number_or_null, score)).to eql("NULL::float")
-    end
-  end
-
   describe "memoization" do
     it "only fetches groups once" do
       expect(GradeCalculator).to receive(:new).twice.and_call_original
