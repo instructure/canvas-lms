@@ -41,6 +41,7 @@ module Importers
       course_pace.end_date = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:end_date])
       course_pace.published_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:published_at])
       course_pace.exclude_weekends = hash[:exclude_weekends]
+      course_pace.selected_days_to_skip = hash[:selected_days_to_skip]
       course_pace.hard_end_dates = hash[:hard_end_dates]
       course_pace.save!
 

@@ -412,6 +412,7 @@ class ApplicationController < ActionController::Base
     lti_toggle_placements
     login_registration_ui_identity
     lti_apps_page_instructors
+    course_paces_skip_selected_days
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes,

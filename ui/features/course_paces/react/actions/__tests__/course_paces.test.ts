@@ -28,6 +28,7 @@ import {
   COURSE,
   DEFAULT_STORE_STATE,
   PRIMARY_PACE,
+  PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED,
   PROGRESS_FAILED,
   PROGRESS_RUNNING,
   PACE_CONTEXTS_DEFAULT_STATE,
@@ -219,9 +220,10 @@ describe('Course paces actions', () => {
   })
 
   describe('compressDates', () => {
-    it('Updates pace and manages loading state', async () => {
-      const updatedPace = {...PRIMARY_PACE}
-      const getState = mockGetState(updatedPace, PRIMARY_PACE)
+    const testCompressDates = async (featureFlag: boolean, pace: any, expectedBody: any) => {
+      window.ENV.FEATURES.course_paces_skip_selected_days = featureFlag
+      const updatedPace = {...pace}
+      const getState = mockGetState(updatedPace, pace)
       const compressResponse = {
         1: 'a date',
         2: 'another date',
@@ -236,23 +238,55 @@ describe('Course paces actions', () => {
       expect(dispatch.mock.calls[2]).toEqual([
         coursePaceActions.setCompressedItemDates(compressResponse),
       ])
-      // Compare dispatched functions by name since they won't be directly equal
       expect(dispatch.mock.calls[3]).toEqual([uiActions.hideLoadingOverlay()])
-      // compress() POSTs a flattened and stripped-down version of the course pace
-      expect(fetchMock.calls()[0][1]?.body).toEqual(
-        JSON.stringify({
-          blackout_dates: [
-            {
-              event_title: 'Spring break',
-              start_date: '2022-03-21T00:00:00.000-06:00',
-              end_date: '2022-03-25T00:00:00.000-06:00',
+      expect(fetchMock.calls()[0][1]?.body).toEqual(JSON.stringify(expectedBody))
+      expect(fetchMock.called(COMPRESS_API, 'POST')).toBe(true)
+    }
+
+    it('Updates pace and manages loading state. course_paces_skip_selected_days = false', async () => {
+      await testCompressDates(false, PRIMARY_PACE, {
+        blackout_dates: [
+          {
+            event_title: 'Spring break',
+            start_date: '2022-03-21T00:00:00.000-06:00',
+            end_date: '2022-03-25T00:00:00.000-06:00',
+          },
+        ],
+        course_pace: {
+          start_date: PRIMARY_PACE.start_date,
+          end_date: PRIMARY_PACE.end_date,
+          course_pace_module_items_attributes: PRIMARY_PACE.modules.reduce(
+            (runningValue: Array<any>, module) => {
+              return runningValue.concat(
+                module.items.map(item => ({
+                  id: item.id,
+                  duration: item.duration,
+                  module_item_id: item.module_item_id,
+                }))
+              )
             },
-          ],
-          course_pace: {
-            start_date: updatedPace.start_date,
-            end_date: updatedPace.end_date,
-            exclude_weekends: updatedPace.exclude_weekends,
-            course_pace_module_items_attributes: updatedPace.modules.reduce(
+            []
+          ),
+          selected_days_to_skip: PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED.selected_days_to_skip,
+          exclude_weekends: PRIMARY_PACE.exclude_weekends,
+        },
+      })
+    })
+
+    it('Updates pace and manages loading state. course_paces_skip_selected_days = true', async () => {
+      await testCompressDates(true, PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED, {
+        blackout_dates: [
+          {
+            event_title: 'Spring break',
+            start_date: '2022-03-21T00:00:00.000-06:00',
+            end_date: '2022-03-25T00:00:00.000-06:00',
+          },
+        ],
+        course_pace: {
+          start_date: PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED.start_date,
+          end_date: PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED.end_date,
+          course_pace_module_items_attributes:
+            PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED.modules.reduce(
               (runningValue: Array<any>, module) => {
                 return runningValue.concat(
                   module.items.map(item => ({
@@ -264,10 +298,10 @@ describe('Course paces actions', () => {
               },
               []
             ),
-          },
-        })
-      )
-      expect(fetchMock.called(COMPRESS_API, 'POST')).toBe(true)
+          selected_days_to_skip: PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED.selected_days_to_skip,
+          exclude_weekends: true,
+        },
+      })
     })
 
     it('Sets an error message if compression fails', async () => {

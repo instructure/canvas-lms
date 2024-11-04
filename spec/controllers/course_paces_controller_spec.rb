@@ -97,6 +97,7 @@ describe CoursePacesController do
   end
 
   before do
+    stub_const("SELECTED_DAYS_TO_SKIP", %w[mon tue thu])
     user_session(@teacher)
   end
 
@@ -166,7 +167,6 @@ describe CoursePacesController do
                                                              course_section_id: nil,
                                                              user_id: nil,
                                                              workflow_state: "active",
-                                                             exclude_weekends: true,
                                                              hard_end_dates: true,
                                                              context_id: @course.id,
                                                              context_type: "Course"
@@ -413,26 +413,59 @@ describe CoursePacesController do
   end
 
   describe "PUT #update" do
-    it "updates the CoursePace" do
-      put :update, params: { course_id: @course.id, id: @course_pace.id, course_pace: valid_update_params }
-      expect(response).to be_successful
-      expect(@course_pace.reload.end_date.to_date.to_s).to eq(valid_update_params[:end_date])
-      expect(@course_pace.workflow_state).to eq(valid_update_params[:workflow_state])
-      expect(
-        @course_pace.course_pace_module_items.joins(:module_item).find_by(content_tags: { content_id: @a1.id }).duration
-      ).to eq(valid_update_params[:course_pace_module_items_attributes][0][:duration])
-      expect(
-        @course_pace.course_pace_module_items.joins(:module_item).find_by(content_tags: { content_id: @a2.id }).duration
-      ).to eq(valid_update_params[:course_pace_module_items_attributes][1][:duration])
+    let(:update_params) { valid_update_params }
 
-      response_body = response.parsed_body
-      expect(response_body["course_pace"]["id"]).to eq(@course_pace.id)
+    shared_examples "successful update" do
+      it "updates the CoursePace" do
+        expect(response).to be_successful
+        expect(@course_pace.reload.end_date.to_date.to_s).to eq(valid_update_params[:end_date])
+        expect(@course_pace.workflow_state).to eq(valid_update_params[:workflow_state])
+        expect(
+          @course_pace.course_pace_module_items.joins(:module_item).find_by(content_tags: { content_id: @a1.id }).duration
+        ).to eq(valid_update_params[:course_pace_module_items_attributes][0][:duration])
+        expect(
+          @course_pace.course_pace_module_items.joins(:module_item).find_by(content_tags: { content_id: @a2.id }).duration
+        ).to eq(valid_update_params[:course_pace_module_items_attributes][1][:duration])
 
-      # Course pace's publish should be queued
-      progress = Progress.last
-      expect(progress.context).to eq(@course_pace)
-      expect(progress.workflow_state).to eq("queued")
-      expect(response_body["progress"]["id"]).to eq(progress.id)
+        response_body = response.parsed_body
+        expect(response_body["course_pace"]["id"]).to eq(@course_pace.id)
+
+        # Course pace's publish should be queued
+        progress = Progress.last
+        expect(progress.context).to eq(@course_pace)
+        expect(progress.workflow_state).to eq("queued")
+        expect(response_body["progress"]["id"]).to eq(progress.id)
+      end
+    end
+
+    context "when add_selected_days_to_skip_param is enabled" do
+      before do
+        @course.root_account.enable_feature!(:course_paces_skip_selected_days)
+        update_params[:selected_days_to_skip] = SELECTED_DAYS_TO_SKIP
+
+        put :update, params: { course_id: @course.id, id: @course_pace.id, course_pace: update_params }
+      end
+
+      it_behaves_like "successful update"
+
+      it "updates selected_days_to_skip" do
+        expect(@course_pace.reload.selected_days_to_skip).to eq(SELECTED_DAYS_TO_SKIP)
+      end
+    end
+
+    context "when add_selected_days_to_skip_param is disabled" do
+      before do
+        @course.root_account.disable_feature!(:course_paces_skip_selected_days)
+        update_params[:exclude_weekends] = false
+
+        put :update, params: { course_id: @course.id, id: @course_pace.id, course_pace: update_params }
+      end
+
+      it_behaves_like "successful update"
+
+      it "updates exclude_weekends" do
+        expect(@course_pace.reload.exclude_weekends).to be_falsy
+      end
     end
 
     it "overrides to active workflow_state and publishes, when passing unpublished workflow_state to an already published pace" do
@@ -528,35 +561,68 @@ describe CoursePacesController do
 
     let(:create_params) { valid_update_params.merge(course_id: @course.id, user_id: @student.id) }
 
-    it "creates the CoursePace and all the CoursePaceModuleItems" do
-      course_pace_count_before = CoursePace.count
-      course_pace_module_item_count_before = CoursePaceModuleItem.count
+    shared_examples "successful create" do
+      it "creates the CoursePace and all the CoursePaceModuleItems" do
+        expect(response).to be_successful
 
-      post :create, params: { course_id: @course.id, course_pace: create_params }
-      expect(response).to be_successful
+        expect(CoursePace.count).to eq(COURSE_PACE_COUNT_BEFORE + 1)
+        expect(CoursePaceModuleItem.count).to eq(COURSE_PACE_MODULE_ITEM_COUNT_BEFORE + 2)
 
-      expect(CoursePace.count).to eq(course_pace_count_before + 1)
-      expect(CoursePaceModuleItem.count).to eq(course_pace_module_item_count_before + 2)
+        course_pace = CoursePace.last
 
-      course_pace = CoursePace.last
+        response_body = response.parsed_body
+        expect(response_body["course_pace"]["id"]).to eq(course_pace.id)
 
-      response_body = response.parsed_body
-      expect(response_body["course_pace"]["id"]).to eq(course_pace.id)
+        expect(course_pace.end_date.to_date.to_s).to eq(valid_update_params[:end_date])
+        expect(course_pace.workflow_state).to eq(valid_update_params[:workflow_state])
+        expect(
+          course_pace.course_pace_module_items.joins(:module_item).find_by(content_tags: { content_id: @a1.id }).duration
+        ).to eq(valid_update_params[:course_pace_module_items_attributes][0][:duration])
+        expect(
+          course_pace.course_pace_module_items.joins(:module_item).find_by(content_tags: { content_id: @a2.id }).duration
+        ).to eq(valid_update_params[:course_pace_module_items_attributes][1][:duration])
+        expect(course_pace.course_pace_module_items.count).to eq(2)
+        # Course pace's publish should be queued
+        progress = Progress.last
+        expect(progress.context).to eq(course_pace)
+        expect(progress.workflow_state).to eq("queued")
+        expect(response_body["progress"]["id"]).to eq(progress.id)
+      end
+    end
 
-      expect(course_pace.end_date.to_date.to_s).to eq(valid_update_params[:end_date])
-      expect(course_pace.workflow_state).to eq(valid_update_params[:workflow_state])
-      expect(
-        course_pace.course_pace_module_items.joins(:module_item).find_by(content_tags: { content_id: @a1.id }).duration
-      ).to eq(valid_update_params[:course_pace_module_items_attributes][0][:duration])
-      expect(
-        course_pace.course_pace_module_items.joins(:module_item).find_by(content_tags: { content_id: @a2.id }).duration
-      ).to eq(valid_update_params[:course_pace_module_items_attributes][1][:duration])
-      expect(course_pace.course_pace_module_items.count).to eq(2)
-      # Course pace's publish should be queued
-      progress = Progress.last
-      expect(progress.context).to eq(course_pace)
-      expect(progress.workflow_state).to eq("queued")
-      expect(response_body["progress"]["id"]).to eq(progress.id)
+    before do
+      stub_const("COURSE_PACE_COUNT_BEFORE", CoursePace.count)
+      stub_const("COURSE_PACE_MODULE_ITEM_COUNT_BEFORE", CoursePaceModuleItem.count)
+    end
+
+    context "when add_selected_days_to_skip_param is enabled" do
+      before do
+        @course.root_account.enable_feature!(:course_paces_skip_selected_days)
+        create_params[:selected_days_to_skip] = SELECTED_DAYS_TO_SKIP
+        post :create, params: { course_id: @course.id, course_pace: create_params }
+      end
+
+      it_behaves_like "successful create"
+
+      it "updates selected_days_to_skip" do
+        course_pace = CoursePace.last
+        expect(course_pace.reload.selected_days_to_skip).to eq(SELECTED_DAYS_TO_SKIP)
+      end
+    end
+
+    context "when add_selected_days_to_skip_param is disabled" do
+      before do
+        @course.root_account.disable_feature!(:course_paces_skip_selected_days)
+        create_params[:exclude_weekends] = false
+        post :create, params: { course_id: @course.id, course_pace: create_params }
+      end
+
+      it_behaves_like "successful create"
+
+      it "updates exclude_weekends" do
+        course_pace = CoursePace.last
+        expect(course_pace.reload.exclude_weekends).to be_falsey
+      end
     end
 
     it "creates and publishes the CoursePace when course_pace_draft_state feature flag is disabled and workflow_state=unpublished" do
@@ -829,25 +895,9 @@ describe CoursePacesController do
   end
 
   describe "POST #compress_dates" do
-    it "returns a compressed list of dates" do
-      course_pace_params = @valid_params.merge(end_date: @course_pace.start_date + 5.days)
-      post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
-      expect(response).to be_successful
-      json_response = response.parsed_body
-      expect(json_response.values).to eq(%w[2021-09-30 2021-10-05])
-    end
-
-    it "supports changing durations and start dates" do
-      course_pace_params = @valid_params.merge(start_date: "2021-11-01", end_date: "2021-11-05")
-      post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
-      expect(response).to be_successful
-      json_response = response.parsed_body
-      expect(json_response.values).to eq(%w[2021-11-01 2021-11-05])
-    end
-
-    it "squishes proportionally and ends on the end date" do
-      course_pace_params = @valid_params.merge(
-        start_date: "2021-12-27",
+    let(:squishes_proportionally_course_pace_params) do
+      @valid_params.merge(
+        start_date: "2021-12-20",
         end_date: "2021-12-31",
         course_pace_module_items_attributes: [
           {
@@ -867,23 +917,12 @@ describe CoursePacesController do
           },
         ]
       )
-
-      post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
-      expect(response).to be_successful
-      json_response = response.parsed_body
-      expect(json_response.values).to eq(%w[2021-12-28 2021-12-29 2021-12-31])
     end
 
-    it "rolls over years properly" do
-      assignment = @course.assignments.create! name: "A4", workflow_state: "active"
-      @mod1.add_item id: assignment.id, type: "assignment"
-      tag = @mod1.add_item id: assignment.id, type: "assignment"
-      @course_pace.course_pace_module_items.create! module_item: tag, duration: 8
-
-      course_pace_params = @valid_params.merge(
+    let(:rolles_over_course_pace_params) do
+      @valid_params.merge(
         start_date: "2021-12-13",
         end_date: "2022-01-12",
-        exclude_weekends: true,
         course_pace_module_items_attributes: [
           {
             id: @course_pace.course_pace_module_items.first.id,
@@ -907,11 +946,165 @@ describe CoursePacesController do
           },
         ]
       )
+    end
 
-      post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
-      expect(response).to be_successful
-      json_response = response.parsed_body
-      expect(json_response.values).to eq(%w[2021-12-22 2021-12-28 2022-01-05 2022-01-12])
+    context "when add_selected_days_to_skip_param is enabled" do
+      before do
+        @course.root_account.enable_feature!(:course_paces_skip_selected_days)
+      end
+
+      it "returns a compressed list of dates" do
+        course_pace_params = @valid_params.merge(
+          end_date: @course_pace.start_date + 5.days,
+          selected_days_to_skip: SELECTED_DAYS_TO_SKIP
+        )
+        post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
+        expect(response).to be_successful
+        json_response = response.parsed_body
+        # Work week: [:sun, :wed, :fri, :sat]
+        # Sunday 3 is a blackout date so it should be skipped.
+        expect(json_response.values).to eq(%w[2021-10-01 2021-10-02])
+      end
+
+      it "supports changing durations and start dates" do
+        course_pace_params = @valid_params.merge(
+          start_date: "2021-11-01",
+          end_date: "2021-11-05",
+          selected_days_to_skip: SELECTED_DAYS_TO_SKIP
+        )
+        post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
+        expect(response).to be_successful
+        json_response = response.parsed_body
+        expect(json_response.values).to eq(%w[2021-11-03 2021-11-05])
+      end
+
+      it "squishes proportionally and ends on the end date" do
+        course_pace_params = squishes_proportionally_course_pace_params.merge(selected_days_to_skip: SELECTED_DAYS_TO_SKIP)
+        post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
+        expect(response).to be_successful
+        json_response = response.parsed_body
+        expect(json_response.values).to eq(%w[2021-12-24 2021-12-26 2021-12-31])
+      end
+
+      it "rolls over years properly" do
+        assignment = @course.assignments.create! name: "A4", workflow_state: "active"
+        @mod1.add_item id: assignment.id, type: "assignment"
+        tag = @mod1.add_item id: assignment.id, type: "assignment"
+        @course_pace.course_pace_module_items.create! module_item: tag, duration: 8
+
+        course_pace_params = rolles_over_course_pace_params.merge(selected_days_to_skip: SELECTED_DAYS_TO_SKIP)
+
+        post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
+        expect(response).to be_successful
+        json_response = response.parsed_body
+        expect(json_response.values).to eq(%w[2021-12-24 2021-12-29 2022-01-05 2022-01-12])
+      end
+
+      it "returns uncompressed items if the end date is not set" do
+        course_pace_params = @valid_params.merge(
+          selected_days_to_skip: SELECTED_DAYS_TO_SKIP, start_date: "2022-01-27", end_date: nil
+        )
+        post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
+        expect(response).to be_successful
+        json_response = response.parsed_body
+        expect(json_response.values).to eq(%w[2022-01-29 2022-02-16])
+      end
+
+      it "prefers incoming blackout dates over what is already on the course" do
+        # course starts at 2021-09-30
+        course_pace_params = @valid_params.merge(
+          selected_days_to_skip: SELECTED_DAYS_TO_SKIP,
+          end_date: @course_pace.start_date + 10.days
+        )
+        post :compress_dates, params: { course_id: @course.id,
+                                        course_pace: course_pace_params,
+                                        blackout_dates: [
+                                          {
+                                            event_title: "blackout dates 2",
+                                            start_date: "2021-09-30", # thurs
+                                            end_date: "2021-10-01" # fri
+                                          }
+                                        ] }
+        expect(response).to be_successful
+        json_response = response.parsed_body
+        # Work week: [:sun, :wed, :fri, :sat]
+        expect(json_response.values).to eq(%w[2021-10-02 2021-10-10])
+      end
+    end
+
+    context "when add_selected_days_to_skip_param is disabled" do
+      before do
+        @course.root_account.disable_feature!(:course_paces_skip_selected_days)
+      end
+
+      it "returns a compressed list of dates" do
+        course_pace_params = @valid_params.merge(end_date: @course_pace.start_date + 5.days, exclude_weekends: false)
+        post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
+        expect(response).to be_successful
+        json_response = response.parsed_body
+        expect(json_response.values).to eq(%w[2021-09-30 2021-10-05])
+      end
+
+      it "supports changing durations and start dates" do
+        course_pace_params = @valid_params.merge(start_date: "2021-11-01", end_date: "2021-11-05")
+        post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
+        expect(response).to be_successful
+        json_response = response.parsed_body
+        expect(json_response.values).to eq(%w[2021-11-01 2021-11-05])
+      end
+
+      it "squishes proportionally and ends on the end date" do
+        course_pace_params = squishes_proportionally_course_pace_params.merge(exclude_weekends: true)
+        post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
+        expect(response).to be_successful
+        json_response = response.parsed_body
+        expect(json_response.values).to eq(%w[2021-12-21 2021-12-27 2021-12-31])
+      end
+
+      it "rolls over years properly" do
+        assignment = @course.assignments.create! name: "A4", workflow_state: "active"
+        @mod1.add_item id: assignment.id, type: "assignment"
+        tag = @mod1.add_item id: assignment.id, type: "assignment"
+        @course_pace.course_pace_module_items.create! module_item: tag, duration: 8
+
+        course_pace_params = rolles_over_course_pace_params.merge(exclude_weekends: true)
+
+        post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
+        expect(response).to be_successful
+        json_response = response.parsed_body
+        expect(json_response.values).to eq(%w[2021-12-22 2021-12-28 2022-01-05 2022-01-12])
+      end
+
+      it "returns uncompressed items if the end date is not set" do
+        course_pace_params = @valid_params.merge(
+          exclude_weekends: false, start_date: "2022-01-27", end_date: nil
+        )
+        post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
+        expect(response).to be_successful
+        json_response = response.parsed_body
+        expect(json_response.values).to eq(%w[2022-01-28 2022-02-07])
+      end
+
+      it "prefers incoming blackout dates over what is already on the course" do
+        # course starts at 2021-09-30
+        course_pace_params = @valid_params.merge(
+          exclude_weekends: true,
+          end_date: @course_pace.start_date + 5.days
+        )
+        post :compress_dates, params: { course_id: @course.id,
+                                        course_pace: course_pace_params,
+                                        blackout_dates: [
+                                          {
+                                            event_title: "blackout dates 2",
+                                            start_date: "2021-09-30", # thurs
+                                            end_date: "2021-10-01" # fri
+                                          }
+                                        ] }
+        expect(response).to be_successful
+        json_response = response.parsed_body
+        # skip the weekend, then due dates are mon and tues
+        expect(json_response.values).to eq(%w[2021-10-04 2021-10-05])
+      end
     end
 
     it "returns an error if the start date is after the end date" do
@@ -920,14 +1113,6 @@ describe CoursePacesController do
       expect(response).not_to be_successful
       json_response = response.parsed_body
       expect(json_response["errors"]).to eq("End date cannot be before start date")
-    end
-
-    it "returns uncompressed items if the end date is not set" do
-      course_pace_params = @valid_params.merge(start_date: "2022-01-27", end_date: nil)
-      post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
-      expect(response).to be_successful
-      json_response = response.parsed_body
-      expect(json_response.values).to eq(%w[2022-01-28 2022-02-11])
     end
 
     it "returns the dates in the correct order" do
@@ -954,24 +1139,6 @@ describe CoursePacesController do
       expect(response).to be_successful
       json_response = response.parsed_body
       expect(json_response.keys).to eq(course_pace_module_items_attributes.map { |i| i[:module_item_id].to_s })
-    end
-
-    it "prefers incoming blackout dates over what is already on the course" do
-      # course starts at 2021-09-30
-      course_pace_params = @valid_params.merge(end_date: @course_pace.start_date + 5.days)
-      post :compress_dates, params: { course_id: @course.id,
-                                      course_pace: course_pace_params,
-                                      blackout_dates: [
-                                        {
-                                          event_title: "blackout dates 2",
-                                          start_date: "2021-09-30", # thurs
-                                          end_date: "2021-10-01" # fri
-                                        }
-                                      ] }
-      expect(response).to be_successful
-      json_response = response.parsed_body
-      # skip the weekend, then due dates are mon and tues
-      expect(json_response.values).to eq(%w[2021-10-04 2021-10-05])
     end
   end
 

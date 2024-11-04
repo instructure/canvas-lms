@@ -25,65 +25,140 @@ describe CoursePaceDueDatesCalculator do
     @module = @course.context_modules.create!
     @assignment = @course.assignments.create!
     @tag = @assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
-    @course_pace = @course.course_paces.create! workflow_state: "active", end_date: "2021-09-30"
+    @course_pace = @course.course_paces.create!(
+      workflow_state: "active",
+      end_date: "2021-09-30"
+    )
     @course_pace_module_item = @course_pace.course_pace_module_items.create! module_item: @tag
     @course_pace_module_items = @course_pace.course_pace_module_items.active
     @calculator = CoursePaceDueDatesCalculator.new(@course_pace)
+    @course.root_account.disable_feature!(:create_course_subaccount_picker)
   end
 
   context "get_due_dates" do
-    it "returns the next due date" do
-      expect(@calculator.get_due_dates(@course_pace_module_items)).to eq(
-        { @course_pace_module_item.id => Date.parse("2021-09-01") }
-      )
+    context "when add_selected_days_to_skip_param is enabled" do
+      before do
+        @course.root_account.enable_feature!(:course_paces_skip_selected_days)
+        @course_pace.update selected_days_to_skip: %w[mon sat sun]
+      end
+
+      it "returns the next due date" do
+        expect(@calculator.get_due_dates(@course_pace_module_items)).to eq(
+          { @course_pace_module_item.id => Date.parse("2021-09-01") }
+        )
+      end
+
+      it "respects blackout dates" do
+        @course.blackout_dates.create! event_title: "Blackout test", start_date: "2021-09-01", end_date: "2021-09-08"
+        expect(@calculator.get_due_dates(@course_pace_module_items)).to eq(
+          { @course_pace_module_item.id => Date.parse("2021-09-09") }
+        )
+      end
+
+      it "respects calendar event blackout dates" do
+        @course.calendar_events.create! title: "Calendar Event Blackout test",
+                                        start_at: "Wed, 1 Sep 2021 06:00:00.000000000 UTC +00:00",
+                                        end_at: "Wed, 8 Sep 2021 06:00:00.000000000 UTC +00:00",
+                                        blackout_date: true
+        expect(@calculator.get_due_dates(@course_pace_module_items)).to eq(
+          { @course_pace_module_item.id => Date.parse("2021-09-09") }
+        )
+      end
+
+      it "respects calendar event blackout dates and regular blackout dates" do
+        @course.calendar_events.create! title: "Calendar Event Blackout test",
+                                        start_at: "Wed, 1 Sep 2021 06:00:00.000000000 UTC +00:00",
+                                        end_at: "Wed, 8 Sep 2021 06:00:00.000000000 UTC +00:00",
+                                        blackout_date: true
+        @course.blackout_dates.create! event_title: "Blackout test",
+                                       start_date: "2021-09-09",
+                                       end_date: "2021-09-12"
+        expect(@calculator.get_due_dates(@course_pace_module_items)).to eq(
+          { @course_pace_module_item.id => Date.parse("2021-09-14") }
+        )
+      end
+
+      it "respects skipping weekends" do
+        @course.blackout_dates.create! event_title: "Blackout test", start_date: "2021-09-01", end_date: "2021-09-03"
+        @course_pace.update selected_days_to_skip: %w[sat sun]
+        expect(@calculator.get_due_dates(@course_pace_module_items)).to eq(
+          { @course_pace_module_item.id => Date.parse("2021-09-06") }
+        )
+        @course_pace.update selected_days_to_skip: []
+        expect(@calculator.get_due_dates(@course_pace_module_items)).to eq(
+          { @course_pace_module_item.id => Date.parse("2021-09-04") }
+        )
+      end
+
+      it "calculates from a given enrollment start date" do
+        enrollment = Enrollment.new(start_at: Date.parse("2021-09-09"))
+        expect(@calculator.get_due_dates(@course_pace_module_items, enrollment)).to eq(
+          { @course_pace_module_item.id => Date.parse("2021-09-09") }
+        )
+      end
     end
 
-    it "respects blackout dates" do
-      @course.blackout_dates.create! event_title: "Blackout test", start_date: "2021-09-01", end_date: "2021-09-08"
-      expect(@calculator.get_due_dates(@course_pace_module_items)).to eq(
-        { @course_pace_module_item.id => Date.parse("2021-09-09") }
-      )
-    end
+    context "when add_selected_days_to_skip_param is disabled" do
+      before do
+        @course.root_account.disable_feature!(:course_paces_skip_selected_days)
+        @course_pace.update exclude_weekends: true
+        @course_pace.reload
+      end
 
-    it "respects calendar event blackout dates" do
-      @course.calendar_events.create! title: "Calendar Event Blackout test",
-                                      start_at: "Wed, 1 Sep 2021 06:00:00.000000000 UTC +00:00",
-                                      end_at: "Wed, 8 Sep 2021 06:00:00.000000000 UTC +00:00",
-                                      blackout_date: true
-      expect(@calculator.get_due_dates(@course_pace_module_items)).to eq(
-        { @course_pace_module_item.id => Date.parse("2021-09-09") }
-      )
-    end
+      it "returns the next due date" do
+        expect(@calculator.get_due_dates(@course_pace_module_items)).to eq(
+          { @course_pace_module_item.id => Date.parse("2021-09-01") }
+        )
+      end
 
-    it "respects calendar event blackout dates and regular blackout dates" do
-      @course.calendar_events.create! title: "Calendar Event Blackout test",
-                                      start_at: "Wed, 1 Sep 2021 06:00:00.000000000 UTC +00:00",
-                                      end_at: "Wed, 8 Sep 2021 06:00:00.000000000 UTC +00:00",
-                                      blackout_date: true
-      @course.blackout_dates.create! event_title: "Blackout test",
-                                     start_date: "2021-09-09",
-                                     end_date: "2021-09-12"
-      expect(@calculator.get_due_dates(@course_pace_module_items)).to eq(
-        { @course_pace_module_item.id => Date.parse("2021-09-13") }
-      )
-    end
+      it "respects blackout dates" do
+        @course.blackout_dates.create! event_title: "Blackout test", start_date: "2021-09-01", end_date: "2021-09-08"
+        expect(@calculator.get_due_dates(@course_pace_module_items)).to eq(
+          { @course_pace_module_item.id => Date.parse("2021-09-09") }
+        )
+      end
 
-    it "respects skipping weekends" do
-      @course.blackout_dates.create! event_title: "Blackout test", start_date: "2021-09-01", end_date: "2021-09-03"
-      expect(@calculator.get_due_dates(@course_pace_module_items)).to eq(
-        { @course_pace_module_item.id => Date.parse("2021-09-06") }
-      )
-      @course_pace.update exclude_weekends: false
-      expect(@calculator.get_due_dates(@course_pace_module_items)).to eq(
-        { @course_pace_module_item.id => Date.parse("2021-09-04") }
-      )
-    end
+      it "respects calendar event blackout dates" do
+        @course.calendar_events.create! title: "Calendar Event Blackout test",
+                                        start_at: "Wed, 1 Sep 2021 06:00:00.000000000 UTC +00:00",
+                                        end_at: "Wed, 8 Sep 2021 06:00:00.000000000 UTC +00:00",
+                                        blackout_date: true
+        expect(@calculator.get_due_dates(@course_pace_module_items)).to eq(
+          { @course_pace_module_item.id => Date.parse("2021-09-09") }
+        )
+      end
 
-    it "calculates from a given enrollment start date" do
-      enrollment = Enrollment.new(start_at: Date.parse("2021-09-09"))
-      expect(@calculator.get_due_dates(@course_pace_module_items, enrollment)).to eq(
-        { @course_pace_module_item.id => Date.parse("2021-09-09") }
-      )
+      it "respects calendar event blackout dates and regular blackout dates" do
+        @course.calendar_events.create! title: "Calendar Event Blackout test",
+                                        start_at: "Wed, 1 Sep 2021 06:00:00.000000000 UTC +00:00",
+                                        end_at: "Wed, 8 Sep 2021 06:00:00.000000000 UTC +00:00",
+                                        blackout_date: true
+        @course.blackout_dates.create! event_title: "Blackout test",
+                                       start_date: "2021-09-09",
+                                       end_date: "2021-09-12"
+        expect(@calculator.get_due_dates(@course_pace_module_items)).to eq(
+          { @course_pace_module_item.id => Date.parse("2021-09-13") }
+        )
+      end
+
+      it "respects skipping weekends" do
+        @course.blackout_dates.create! event_title: "Blackout test", start_date: "2021-09-01", end_date: "2021-09-03"
+        expect(@calculator.get_due_dates(@course_pace_module_items)).to eq(
+          { @course_pace_module_item.id => Date.parse("2021-09-06") }
+        )
+        @course_pace.update exclude_weekends: false
+        @course_pace.reload
+        expect(@calculator.get_due_dates(@course_pace_module_items)).to eq(
+          { @course_pace_module_item.id => Date.parse("2021-09-04") }
+        )
+      end
+
+      it "calculates from a given enrollment start date" do
+        enrollment = Enrollment.new(start_at: Date.parse("2021-09-09"))
+        expect(@calculator.get_due_dates(@course_pace_module_items, enrollment)).to eq(
+          { @course_pace_module_item.id => Date.parse("2021-09-09") }
+        )
+      end
     end
   end
 end

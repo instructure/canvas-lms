@@ -30,6 +30,8 @@ describe "Student Enrollment Paces API" do
   before do
     Account.site_admin.enable_feature!(:course_paces_redesign)
     user_session(teacher)
+
+    stub_const("SELECTED_SKIP_DAYS", %w[fri sat])
   end
 
   def assert_grant_check
@@ -166,40 +168,89 @@ describe "Student Enrollment Paces API" do
   describe "update" do
     let!(:student_pace) { student_enrollment_pace_model(student_enrollment:) }
 
-    it "updates the pace" do
-      expect do
+    context "when add_selected_days_to_skip_param is enabled" do
+      before do
+        @course.root_account.enable_feature!(:course_paces_skip_selected_days)
+      end
+
+      it "updates the pace" do
+        expect do
+          patch api_v1_patch_student_enrollment_pace_path(course, student_enrollment), params: {
+            format: :json,
+            pace: {
+              selected_days_to_skip: SELECTED_SKIP_DAYS
+            }
+          }
+        end.to change { student_pace.reload.selected_days_to_skip }
+          .to(SELECTED_SKIP_DAYS)
+          .and change { Progress.count }.by(1)
+        expect(Progress.last.queued?).to be_truthy
+        expect(response).to have_http_status :ok
+      end
+
+      it "handles invalid update parameters" do
+        allow_any_instance_of(CoursePace).to receive(:update).and_return(false)
         patch api_v1_patch_student_enrollment_pace_path(course, student_enrollment), params: {
           format: :json,
           pace: {
-            exclude_weekends: false
+            selected_days_to_skip: "foobar"
           }
         }
-      end.to change { student_pace.reload.exclude_weekends }
-        .to(false)
-        .and change { Progress.count }.by(1)
-      expect(Progress.last.queued?).to be_truthy
-      expect(response).to have_http_status :ok
+        expect(response).to have_http_status :unprocessable_entity
+      end
+
+      it "returns a 401 if the user lacks permissions" do
+        assert_grant_check do
+          patch api_v1_patch_student_enrollment_pace_path(course, student_enrollment), params: {
+            format: :json,
+            pace: {
+              selected_days_to_skip: SELECTED_SKIP_DAYS
+            }
+          }
+        end
+      end
     end
 
-    it "handles invalid update parameters" do
-      allow_any_instance_of(CoursePace).to receive(:update).and_return(false)
-      patch api_v1_patch_student_enrollment_pace_path(course, student_enrollment), params: {
-        format: :json,
-        pace: {
-          exclude_weekends: "foobar"
-        }
-      }
-      expect(response).to have_http_status :unprocessable_entity
-    end
+    context "when add_selected_days_to_skip_param is disabled" do
+      before do
+        @course.root_account.disable_feature!(:course_paces_skip_selected_days)
+      end
 
-    it "returns a 401 if the user lacks permissions" do
-      assert_grant_check do
+      it "updates the pace" do
+        expect do
+          patch api_v1_patch_student_enrollment_pace_path(course, student_enrollment), params: {
+            format: :json,
+            pace: {
+              exclude_weekends: false
+            }
+          }
+        end.to change { student_pace.reload.exclude_weekends }
+          .to(false)
+          .and change { Progress.count }.by(1)
+        expect(Progress.last.queued?).to be_truthy
+        expect(response).to have_http_status :ok
+      end
+
+      it "handles invalid update parameters" do
+        allow_any_instance_of(CoursePace).to receive(:update).and_return(false)
         patch api_v1_patch_student_enrollment_pace_path(course, student_enrollment), params: {
           format: :json,
           pace: {
-            exclude_weekends: false
+            exclude_weekends: "foobar"
           }
         }
+        expect(response).to have_http_status :unprocessable_entity
+      end
+
+      it "returns a 401 if the user lacks permissions" do
+        assert_grant_check do
+          patch api_v1_patch_student_enrollment_pace_path(course, student_enrollment), params: {
+            format: :json,
+            pace: {
+              exclude_weekends: true
+            }
+          }
+        end
       end
     end
 
@@ -273,7 +324,7 @@ describe "Student Enrollment Paces API" do
         patch api_v1_patch_student_enrollment_pace_path(course, student_enrollment), params: {
           format: :json,
           pace: {
-            exclude_weekends: false
+            selected_days_to_skip: SELECTED_SKIP_DAYS
           }
         }
         expect(response).to have_http_status :not_found
