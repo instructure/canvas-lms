@@ -325,7 +325,9 @@ module Interfaces::SubmissionInterface
 
   field :custom_grade_status, String, null: true
   def custom_grade_status
-    submission.custom_grade_status&.name.to_s
+    load_association(:custom_grade_status).then do |status|
+      status&.name.to_s
+    end
   end
 
   field :media_object, Types::MediaObjectType, null: true
