@@ -46,6 +46,7 @@ import React, {type ReactElement, type ChangeEvent, type SyntheticEvent} from 'r
 import {compact, castArray, isEqual} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Select} from '@instructure/ui-select'
+import {Text} from '@instructure/ui-text'
 import {Alert} from '@instructure/ui-alerts'
 import {matchComponentTypes} from '@instructure/ui-react-utils'
 import getLiveRegion from './liveRegion'
@@ -78,6 +79,7 @@ type State = {
 type OptionProps = {
   id: string
   value: string
+  description?: string | null
   children?: string
 }
 
@@ -188,16 +190,27 @@ class CanvasSelect extends React.Component<CanvasSelectProps, State> {
   backupKey = 0
 
   renderOption(option: ReactElement): ReactElement {
-    const {id, children, ...optionProps} = option.props
+    const {id, description, children, ...optionProps} = option.props
+    const isHighlighted = id === this.state.highlightedOptionId
+    const isSelected = id === this.state.selectedOptionId
     return (
       <SelectOption
         id={id}
         key={option.key || id || ++this.backupKey}
-        isHighlighted={id === this.state.highlightedOptionId}
-        isSelected={id === this.state.selectedOptionId}
+        isHighlighted={isHighlighted}
+        isSelected={isSelected}
         {...optionProps}
       >
         {children}
+        {description && (
+          <Text
+            size="x-small"
+            as="div"
+            color={isHighlighted ? 'secondary-inverse' : 'secondary'}
+          >
+            {description}
+          </Text>
+        )}
       </SelectOption>
     )
   }
@@ -267,7 +280,7 @@ class CanvasSelect extends React.Component<CanvasSelectProps, State> {
     this.setState({
       highlightedOptionId: id,
       inputValue,
-      announcement: `${text} ${nowOpen}`,
+      announcement: `${this.getOptionTextForScreenReaderById(id)} ${nowOpen}`,
     })
   }
   /* eslint-enable react/no-access-state-in-setstate */
@@ -285,7 +298,7 @@ class CanvasSelect extends React.Component<CanvasSelectProps, State> {
         selectedOptionId: id,
         inputValue: text,
         isShowingOptions: false,
-        announcement: I18n.t('%{option} selected. List collapsed.', {option: text}),
+        announcement: I18n.t('%{option} selected. List collapsed.', {option: this.getOptionTextForScreenReaderById(id)}),
       })
       const option = this.getOptionByFieldValue('id', id)
       if (prevSelection !== id) {
@@ -293,6 +306,12 @@ class CanvasSelect extends React.Component<CanvasSelectProps, State> {
         this.props.onChange(ne as ChangeEvent<HTMLSelectElement>, option?.props.value)
       }
     }
+  }
+
+  getOptionTextForScreenReaderById(oid: string | undefined): string {
+    const option = this.getOptionByFieldValue('id', oid)
+    if (!option) return ''
+    return `${option.props.children} ${option.props.description || ''}`
   }
 
   getOptionLabelById(oid: string | undefined): string {
