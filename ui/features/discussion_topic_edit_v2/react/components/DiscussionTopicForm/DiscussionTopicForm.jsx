@@ -966,7 +966,7 @@ function DiscussionTopicForm({
               />
             )}
 
-            {!isGroupContext && !isAnnouncement && (
+            {!isGroupContext && (
               <Checkbox
                 data-testid="require-initial-post-checkbox"
                 label={I18n.t(
@@ -976,6 +976,7 @@ function DiscussionTopicForm({
                 inline={true}
                 checked={requireInitialPost}
                 onChange={() => setRequireInitialPost(!requireInitialPost)}
+                disabled={isAnnouncement && locked}
               />
             )}
 

@@ -138,6 +138,7 @@ describe('DiscussionTopicForm', () => {
     expect(document.queryByTestId('section-select')).toBeTruthy()
     expect(document.queryByLabelText('Allow Participants to Comment')).toBeInTheDocument()
     expect(document.queryByLabelText('Disallow threaded replies')).toBeInTheDocument()
+    expect(document.queryByTestId('require-initial-post-checkbox')).toBeTruthy()
     expect(document.queryByLabelText('Enable podcast feed')).toBeInTheDocument()
     expect(document.queryByLabelText('Allow liking')).toBeInTheDocument()
     expect(document.queryByTestId('non-graded-date-options')).toBeTruthy()
@@ -145,7 +146,6 @@ describe('DiscussionTopicForm', () => {
     expect(document.queryAllByText('Until')).toBeTruthy()
 
     // Hides discussion only options
-    expect(document.queryByTestId('require-initial-post-checkbox')).not.toBeInTheDocument()
     expect(document.queryByLabelText('Add to student to-do')).not.toBeInTheDocument()
     expect(document.queryByText('Anonymous Discussion')).not.toBeTruthy()
     expect(document.queryByTestId('graded-checkbox')).not.toBeTruthy()
