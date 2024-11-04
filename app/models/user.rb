@@ -1476,11 +1476,14 @@ class User < ActiveRecord::Base
     return false unless account.root_account? && account.enable_name_pronunciation?
 
     GuardRail.activate(:secondary) do
-      enrollment_types = enrollments.where(root_account: account, type: ["TeacherEnrollment", "StudentEnrollment"])
+      role_types = %w[TeacherEnrollment TaEnrollment DesignerEnrollment StudentEnrollment]
+      enrollment_types = enrollments.where(root_account: account, type: role_types)
                                     .active_by_date.distinct.pluck(:type)
 
       return true if account.allow_name_pronunciation_edit_for_students? && enrollment_types.include?("StudentEnrollment")
-      return true if account.allow_name_pronunciation_edit_for_teachers? && enrollment_types.include?("TeacherEnrollment")
+
+      course_admin_roles = %w[TeacherEnrollment TaEnrollment DesignerEnrollment]
+      return true if account.allow_name_pronunciation_edit_for_teachers? && enrollment_types.intersection(course_admin_roles).present?
 
       account.allow_name_pronunciation_edit_for_admins? && account_users.active.where(account:).exists?
     end
