@@ -118,7 +118,7 @@ function previewId() {
 function buildUrl(url) {
   try {
     return new URL(url)
-  } catch (e) {
+  } catch (_e) {
     // Don't raise an error
   }
 }
@@ -156,6 +156,7 @@ export function enhanceUserContent(container = document, opts = {}) {
     kalturaSettings,
     disableGooglePreviews,
     canvasLinksTarget,
+    rce_transform_iframe_sandbox_attributes,
 
     /**
      * For MathML configuration
@@ -235,7 +236,7 @@ export function enhanceUserContent(container = document, opts = {}) {
         for (const a of attributes) {
           const newLink = element.getAttribute(a)
 
-          if (newLink && newLink != oldLink) {
+          if (newLink && newLink !== oldLink) {
             element.setAttribute(a, oldLink)
           }
         }
@@ -436,13 +437,48 @@ export function enhanceUserContent(container = document, opts = {}) {
         $elem.classList.add('submitted')
       })
   }, 10)
-  // Remove sandbox attribute from user content iframes to fix busted
-  // third-party content, like Google Drive documents.
-  document
-    .querySelectorAll('.user_content iframe[sandbox="allow-scripts allow-forms allow-same-origin"]')
-    .forEach(frame => {
-      frame.removeAttribute('sandbox')
+  if (rce_transform_iframe_sandbox_attributes) {
+    const disallowedSandboxOptions = ['allow-scripts']
+    const allowedSandboxOptions = [
+      'allow-forms',
+      'allow-pointer-lock',
+      'allow-popups',
+      'allow-same-origin',
+      'allow-top-navigation',
+      'allow-modals',
+      'allow-orientation-lock',
+      'allow-popups-to-escape-sandbox',
+      'allow-presentation',
+      'allow-top-navigation-by-user-activation',
+    ]
+
+    document.querySelectorAll('.user_content iframe').forEach(frame => {
+      const sandboxAttr = frame.getAttribute('sandbox')
+      if (!sandboxAttr) {
+        frame.setAttribute('sandbox', allowedSandboxOptions.join(' '))
+      } else {
+        let sandboxOptions = sandboxAttr.split(' ')
+        sandboxOptions = sandboxOptions.filter(option => !disallowedSandboxOptions.includes(option))
+        if (sandboxOptions.length === 0) {
+          frame.setAttribute('sandbox', allowedSandboxOptions.join(' '))
+        } else {
+          frame.setAttribute('sandbox', sandboxOptions.join(' '))
+        }
+      }
       const src = frame.src
       frame.src = src
     })
+  } else {
+    // Remove sandbox attribute from user content iframes to fix busted
+    // third-party content, like Google Drive documents.
+    document
+      .querySelectorAll(
+        '.user_content iframe[sandbox="allow-scripts allow-forms allow-same-origin"]'
+      )
+      .forEach(frame => {
+        frame.removeAttribute('sandbox')
+        const src = frame.src
+        frame.src = src
+      })
+  }
 }
