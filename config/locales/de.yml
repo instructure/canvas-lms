@@ -4800,7 +4800,7 @@ de:
     new_assignment: "Neue Aufgabe"
     no_assignments: "[Keine Aufgaben vorhanden]"
     no_assignments_list_item: 
-      no_assignments_in_this_group: "Keine Aufgabenliste in dieser Gruppe"
+      no_assignments_in_this_group: "Dieser Aufgabengruppe sind keine Aufgaben zugeordnet"
     no_assignments_search: 
       aria_assignments: Aufgaben
       assignments: Aufgaben
