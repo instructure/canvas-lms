@@ -10213,7 +10213,7 @@ nl:
     registered_services: "Geregistreerde services"
     revisions: Revisies
     rubrics: Rubrieken
-    search: "Smart Search"
+    search: "Slimme Zoekfunctie"
     settings: ~
     site_admin: Sitebeheerder
     stats: Statistieken
@@ -22827,7 +22827,7 @@ nl:
   please_verify_your_username_or_password_and_try_ag_8988c9c6: "Bevestig je gebruikersnaam of wachtwoord en probeer het opnieuw. Problemen met inloggen? *Raadpleeg onze Inloggen FAQ's*."
   please_visit_your_modules_page_for_more_informatio_846c5e32: "Bezoek je *modulespagina* voor meer informatie."
   please_wait_2b646bc2: "Een ogenblik geduld."
-  please_wait_a_moment_while_we_get_smart_search_rea_99a77351: "Een ogenblik geduld... We maken Smart Search gereed voor deze cursus. Dat hoeft maar één keer te gebeuren."
+  please_wait_a_moment_while_we_get_smart_search_rea_99a77351: "Een ogenblik geduld... We maken Smart Search (Slimme Zoekfunctie) gereed voor deze cursus. Dat hoeft maar één keer te gebeuren."
   please_wait_as_we_upload_and_process_your_file_73c4b5a8: "Een ogenblik geduld terwijl we je bestand uploaden en verwerken."
   please_wait_e6355980: "Een ogenblik geduld..."
   please_wait_while_we_upload_attachments_59544216: "Even wachten terwijl we de bijlagen uploaden."
@@ -28643,11 +28643,11 @@ nl:
     threshold_36h: 36u
   smart_assignment_alerts_abc2224: "Slimme waarschuwingen voor opdrachten"
   smart_search_community_c2a115a2: "Smart Search Community"
-  smart_search_currently_in_development_for_canvas_u_541c3754: "Smart Search, de functie die op dit moment voor Canvas wordt ontwikkeld, maakt gebruik van semantische algoritmen en AI om de context van de zoekopdracht en de semantische betekenis te begrijpen, en niet alleen maar trefwoorden te matchen."
-  smart_search_employs_embeddings_to_mathematically__3c20cdd1: "Smart Search maakt gebruik van 'inbeddingen' om inhoud en zoekopdrachten wiskundig weer te geven zodat ze kunnen worden vergeleken en begrijpt dankzij het meertalige AI-model trefwoorden of algemene zoekopdrachten in elke taal. Stel zoekopdrachten op met trefwoorden, vragen, zinnen of wat het eerst in je opkomt wanneer je wilt beschrijven wat je probeert te vinden."
+  smart_search_currently_in_development_for_canvas_u_541c3754: "Smart Search (Slimme Zoekfunctie), de functie die op dit moment voor Canvas wordt ontwikkeld, maakt gebruik van semantische algoritmen en AI om de context van de zoekopdracht en de semantische betekenis te begrijpen, en niet alleen maar trefwoorden te matchen."
+  smart_search_employs_embeddings_to_mathematically__3c20cdd1: "\"Smart Search\" (Slimme Zoekfunctie) maakt gebruik van \"embeddings\" om inhoud en zoekopdrachten wiskundig te representeren voor vergelijking, waardoor het trefwoorden of algemene zoekopdrachten in elke taal kan begrijpen, dankzij het meertalige AI-model. Stel zoekopdrachten op met behulp van trefwoorden, vragen, zinnen of wat voor jou het meest natuurlijk is om te beschrijven wat je probeert te vinden."
   smart_search_fd7cd4: "Slimme zoekfunctie"
   smart_search_is_a_feature_of_canvas_that_is_curren_31f7d35d: "Smart Search is een functie van Canvas die nog in ontwikkeling is.  De nieuwe functie Smart Search, die gebruikmaakt van semantische algoritmen en AI, begrijpt de context van query's en levert daardoor nauwkeurigere en relevantere resultaten zonder dat er traditionele booleaanse operatoren of andere zoektools nodig zijn."
-  smart_search_is_in_feature_preview_feedback_can_be_7a80049d: "Smart Search is in de status functievoorbeeld. Feedback kan worden gegeven via beoordelingen en in het gedeelte voor Smart Search Beta in de Canvas Community. Het Canvas Community-gedeelte kan hier worden gevonden: "
+  smart_search_is_in_feature_preview_feedback_can_be_7a80049d: "Smart Search (Slimme Zoekfunctie) is in de status functievoorbeeld. Feedback kan worden gegeven via beoordelingen en in het gedeelte voor Smart Search Beta in de Canvas Community. Het Canvas Community-gedeelte kan hier worden gevonden: "
   smartbanner: 
     android_banner_author: "Instructure Inc."
     android_banner_in_google_play: "In Google Play"
@@ -29731,7 +29731,7 @@ nl:
     quizzes: Toetsen
     rubrics: Rubrieken
     schedule: Planning
-    search: "Smart Search"
+    search: "Slimme Zoekfunctie"
     settings: Instellingen
     syllabus: Syllabus
     tab_location_error: "Die locatie van tabblad is ongeldig"
