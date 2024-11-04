@@ -1,0 +1,508 @@
+{
+  "name": "Callout Card Section",
+  "description": "Four-column section with icons, text, buttons, and rounded borders",
+  "workflow_state": "active",
+  "node_tree": {
+    "rootNodeId": "a0yNRvza4s",
+    "nodes": {
+      "a0yNRvza4s": {
+        "type": {
+          "resolvedName": "ColumnsSection"
+        },
+        "isCanvas": false,
+        "props": {
+          "columns": 4
+        },
+        "displayName": "Columns",
+        "custom": {
+          "isSection": true,
+          "displayName": "Callout Card Section"
+        },
+        "parent": "ROOT",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "columns__inner": "-27pp27WiQ"
+        }
+      },
+      "-27pp27WiQ": {
+        "type": {
+          "resolvedName": "ColumnsSectionInner"
+        },
+        "isCanvas": true,
+        "props": {},
+        "displayName": "Columns Inner",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "a0yNRvza4s",
+        "hidden": false,
+        "nodes": [
+          "EqEE2r--xm",
+          "Z5zkkAHry4",
+          "gCkAEkqsQg",
+          "ZG9ARPFhBf"
+        ],
+        "linkedNodes": {}
+      },
+      "EqEE2r--xm": {
+        "type": {
+          "resolvedName": "GroupBlock"
+        },
+        "isCanvas": true,
+        "props": {
+          "layout": "column",
+          "alignment": "center",
+          "verticalAlignment": "center",
+          "roundedCorners": true,
+          "resizable": false,
+          "isColumn": true,
+          "id": "columns-pEdeFvz6_0-1",
+          "background": "#00000000",
+          "borderColor": "#22607DFF"
+        },
+        "displayName": "Group",
+        "custom": {
+          "isResizable": false,
+          "isBlock": true,
+          "isExpanded": false,
+          "displayName": "Column"
+        },
+        "parent": "-27pp27WiQ",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "group__inner": "YuKp5awUI-"
+        }
+      },
+      "YuKp5awUI-": {
+        "type": {
+          "resolvedName": "NoSections"
+        },
+        "isCanvas": true,
+        "props": {
+          "className": "group-block__inner",
+          "placeholderText": "Drop a block to add it here"
+        },
+        "displayName": "NoSections",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "EqEE2r--xm",
+        "hidden": false,
+        "nodes": [
+          "89Xzp4ZnPe",
+          "Puzq_2qBiZ",
+          "9KWvphu8VK"
+        ],
+        "linkedNodes": {}
+      },
+      "89Xzp4ZnPe": {
+        "type": {
+          "resolvedName": "IconBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "iconName": "communication",
+          "size": "medium"
+        },
+        "displayName": "Icon",
+        "custom": {
+          "isBlock": true
+        },
+        "parent": "YuKp5awUI-",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "Puzq_2qBiZ": {
+        "type": {
+          "resolvedName": "TextBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "fontSize": "24pt",
+          "textAlign": "initial",
+          "color": "var(--ic-brand-font-color-dark)",
+          "text": "<p>Contact Info</p>",
+          "width": 192,
+          "height": 41
+        },
+        "displayName": "Text",
+        "custom": {
+          "isResizable": true,
+          "isBlock": true
+        },
+        "parent": "YuKp5awUI-",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "9KWvphu8VK": {
+        "type": {
+          "resolvedName": "ButtonBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "text": "View Info",
+          "href": "",
+          "size": "medium",
+          "variant": "filled",
+          "color": "#407A6CFF",
+          "iconName": ""
+        },
+        "displayName": "Button",
+        "custom": {
+          "isBlock": true
+        },
+        "parent": "YuKp5awUI-",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "Z5zkkAHry4": {
+        "type": {
+          "resolvedName": "GroupBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "layout": "column",
+          "alignment": "center",
+          "verticalAlignment": "center",
+          "roundedCorners": true,
+          "resizable": false,
+          "isColumn": true,
+          "background": "#00000000",
+          "borderColor": "#22607DFF"
+        },
+        "displayName": "Group",
+        "custom": {
+          "isResizable": false,
+          "isBlock": true,
+          "isExpanded": false,
+          "displayName": "Column"
+        },
+        "parent": "-27pp27WiQ",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "group__inner": "oT4n2Mw1Jl"
+        }
+      },
+      "oT4n2Mw1Jl": {
+        "type": {
+          "resolvedName": "NoSections"
+        },
+        "isCanvas": true,
+        "props": {
+          "className": "group-block__inner",
+          "placeholderText": "Drop a block to add it here"
+        },
+        "displayName": "l",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "Z5zkkAHry4",
+        "hidden": false,
+        "nodes": [
+          "tmkyQsqi2x",
+          "hTtxxwN1tO",
+          "Vun-9R3Goz"
+        ],
+        "linkedNodes": {}
+      },
+      "tmkyQsqi2x": {
+        "type": {
+          "resolvedName": "IconBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "iconName": "resume",
+          "size": "medium"
+        },
+        "displayName": "Icon",
+        "custom": {
+          "isBlock": true
+        },
+        "parent": "oT4n2Mw1Jl",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "hTtxxwN1tO": {
+        "type": {
+          "resolvedName": "TextBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "fontSize": "24pt",
+          "textAlign": "initial",
+          "color": "var(--ic-brand-font-color-dark)",
+          "text": "<p>Workbook</p>",
+          "width": 160,
+          "height": 41
+        },
+        "displayName": "Text",
+        "custom": {
+          "isResizable": true,
+          "isBlock": true
+        },
+        "parent": "oT4n2Mw1Jl",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "Vun-9R3Goz": {
+        "type": {
+          "resolvedName": "ButtonBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "text": "Open Workbook",
+          "href": "",
+          "size": "medium",
+          "variant": "filled",
+          "color": "#427569FF",
+          "iconName": ""
+        },
+        "displayName": "Button",
+        "custom": {
+          "isBlock": true
+        },
+        "parent": "oT4n2Mw1Jl",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "gCkAEkqsQg": {
+        "type": {
+          "resolvedName": "GroupBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "layout": "column",
+          "alignment": "center",
+          "verticalAlignment": "center",
+          "roundedCorners": true,
+          "resizable": false,
+          "isColumn": true,
+          "background": "#00000000",
+          "borderColor": "#22607DFF"
+        },
+        "displayName": "Group",
+        "custom": {
+          "isResizable": false,
+          "isBlock": true,
+          "isExpanded": false,
+          "displayName": "Column"
+        },
+        "parent": "-27pp27WiQ",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "group__inner": "BmrKTbAvYz"
+        }
+      },
+      "BmrKTbAvYz": {
+        "type": {
+          "resolvedName": "NoSections"
+        },
+        "isCanvas": true,
+        "props": {
+          "className": "group-block__inner",
+          "placeholderText": "Drop a block to add it here"
+        },
+        "displayName": "l",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "gCkAEkqsQg",
+        "hidden": false,
+        "nodes": [
+          "0nd2-ULJzS",
+          "ncK_LOYKk_",
+          "mTdWa1iYmG"
+        ],
+        "linkedNodes": {}
+      },
+      "0nd2-ULJzS": {
+        "type": {
+          "resolvedName": "IconBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "iconName": "calendar",
+          "size": "medium"
+        },
+        "displayName": "Icon",
+        "custom": {
+          "isBlock": true
+        },
+        "parent": "BmrKTbAvYz",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "ncK_LOYKk_": {
+        "type": {
+          "resolvedName": "TextBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "fontSize": "24pt",
+          "textAlign": "initial",
+          "color": "var(--ic-brand-font-color-dark)",
+          "text": "<p>Due Dates</p>"
+        },
+        "displayName": "Text",
+        "custom": {
+          "isResizable": true,
+          "isBlock": true
+        },
+        "parent": "BmrKTbAvYz",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "mTdWa1iYmG": {
+        "type": {
+          "resolvedName": "ButtonBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "text": "View Due Dates",
+          "href": "",
+          "size": "medium",
+          "variant": "filled",
+          "color": "#467368FF",
+          "iconName": ""
+        },
+        "displayName": "Button",
+        "custom": {
+          "isBlock": true
+        },
+        "parent": "BmrKTbAvYz",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "ZG9ARPFhBf": {
+        "type": {
+          "resolvedName": "GroupBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "layout": "column",
+          "alignment": "center",
+          "verticalAlignment": "center",
+          "roundedCorners": true,
+          "resizable": false,
+          "isColumn": true,
+          "background": "#00000000",
+          "borderColor": "#22607DFF"
+        },
+        "displayName": "Group",
+        "custom": {
+          "isResizable": false,
+          "isBlock": true,
+          "isExpanded": false,
+          "displayName": "Column"
+        },
+        "parent": "-27pp27WiQ",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "group__inner": "OEnaJ78Ak2"
+        }
+      },
+      "OEnaJ78Ak2": {
+        "type": {
+          "resolvedName": "NoSections"
+        },
+        "isCanvas": true,
+        "props": {
+          "className": "group-block__inner",
+          "placeholderText": "Drop a block to add it here"
+        },
+        "displayName": "l",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "ZG9ARPFhBf",
+        "hidden": false,
+        "nodes": [
+          "tsWMK_1BDk",
+          "S3XBOjF1_m",
+          "w2fqv5qrd8"
+        ],
+        "linkedNodes": {}
+      },
+      "tsWMK_1BDk": {
+        "type": {
+          "resolvedName": "IconBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "iconName": "glasses",
+          "size": "medium"
+        },
+        "displayName": "Icon",
+        "custom": {
+          "isBlock": true
+        },
+        "parent": "OEnaJ78Ak2",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "S3XBOjF1_m": {
+        "type": {
+          "resolvedName": "TextBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "fontSize": "24pt",
+          "textAlign": "initial",
+          "color": "var(--ic-brand-font-color-dark)",
+          "text": "<p>Reading List</p>"
+        },
+        "displayName": "Text",
+        "custom": {
+          "isResizable": true,
+          "isBlock": true
+        },
+        "parent": "OEnaJ78Ak2",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "w2fqv5qrd8": {
+        "type": {
+          "resolvedName": "ButtonBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "text": "Open Reading List",
+          "href": "",
+          "size": "medium",
+          "variant": "filled",
+          "color": "#327868FF",
+          "iconName": ""
+        },
+        "displayName": "Button",
+        "custom": {
+          "isBlock": true
+        },
+        "parent": "OEnaJ78Ak2",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      }
+    }
+  },
+  "template_type": "section",
+  "template_category": "global",
+  "thumbnail": "data:image/png;base64,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",
+  "id": "e0373685-8654-451e-a7b3-a39c9b262dfc",
+  "global_id": "e0373685-8654-451e-a7b3-a39c9b262dfc"
+}

@@ -16,16 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const THUMBNAIL_WIDTH = 272
+import {type TemplateType} from '../types'
 
-const captureElementThumbnail = async (element: HTMLElement) => {
-  if (!element) return ''
+const THUMBNAIL_WIDTH = 272
+const PAGE_THUMBNAIL_WIDTH = 650
+
+const captureElementThumbnail = async (element: HTMLElement, templateType: TemplateType) => {
+  if (!element) return Promise.resolve('')
 
   try {
     const {default: html2canvas} = await import('html2canvas')
     const canvas = await html2canvas(element)
 
-    const width = THUMBNAIL_WIDTH
+    const width = templateType === 'page' ? PAGE_THUMBNAIL_WIDTH : THUMBNAIL_WIDTH
     const height = (canvas.height * width) / canvas.width
 
     resample_single(canvas, width, height, true)
@@ -36,7 +39,7 @@ const captureElementThumbnail = async (element: HTMLElement) => {
     // eslint-disable-next-line no-console
     console.error('Error capturing element thumbnail:', error)
   }
-  return ''
+  return Promise.resolve('')
 }
 
 // copied from https://stackoverflow.com/questions/2303690/resizing-an-image-in-an-html5-canvas
