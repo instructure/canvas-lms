@@ -2,6 +2,7 @@
   "name": "Blank",
   "description": "A blank section can support up to 4 columns. Block types can be added to blank sections to build a custom section.",
   "template_type": "section",
+  "template_category": "global",
   "node_tree": {
     "rootNodeId": "pEdeFvz6_0",
     "nodes": {

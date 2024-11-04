@@ -84,8 +84,6 @@ function isBlockSaveable(templateEditor: TemplateEditor, node: Node) {
   return false
 }
 
-type ActualNodeTreeNode = Node & {props: any; type: {resolvedName: string}}
-
 type BlockToolbarProps = {
   templateEditor: TemplateEditor
 }
@@ -233,7 +231,7 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
 
       let thumbnail: string | undefined
       if (['page', 'section'].includes(templateType) && node.dom) {
-        thumbnail = await captureElementThumbnail(node.dom)
+        thumbnail = await captureElementThumbnail(node.dom, templateType)
       }
       template.thumbnail = thumbnail
 
@@ -245,7 +243,8 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
 
         // update ImageBlocks to point to the saved images
         Object.values(template.node_tree.nodes).forEach(n => {
-          const n2 = n as ActualNodeTreeNode
+          const n2 = n
+          // @ts-expect-error rsolvedName DOES exist on n2.type. see node_modules/@craftjs/core/lib/interfaces/nodes.d.ts:55
           if (n2.type.resolvedName === 'ImageBlock') {
             const src: string = n2.props.src
             if (src && imgmap[src]) {
