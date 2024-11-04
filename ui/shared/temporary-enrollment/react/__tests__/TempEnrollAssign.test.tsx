@@ -243,14 +243,16 @@ describe('TempEnrollAssign', () => {
       )
     })
 
-    // Skipped because of FOO-4895
-    it.skip('displays Local and Account datetime in correct timezones', async () => {
+    it('displays Local and Account datetime in correct timezones', async () => {
       // @ts-expect-error the only test that requires TIMEZONE
       window.ENV = {...window.ENV, TIMEZONE: 'America/Denver'}
 
       const {findAllByLabelText, findAllByText} = render(<TempEnrollAssign {...props} />)
-      const startTime = (await findAllByLabelText('Time'))[0]
+      const startDate = (await findAllByLabelText('Begins On'))[0]
+      fireEvent.input(startDate, {target: {value: 'Oct 31 2024'}})
+      fireEvent.blur(startDate)
 
+      const startTime = (await findAllByLabelText('Time'))[0]
       fireEvent.input(startTime, {target: {value: '9:00 AM'}})
       fireEvent.blur(startTime)
 
