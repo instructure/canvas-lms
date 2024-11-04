@@ -47,7 +47,7 @@ import useCreateDiscussionEntry from './hooks/useCreateDiscussionEntry'
 import {flushSync} from 'react-dom'
 import {captureException} from '@sentry/react'
 import {LoadingSpinner} from './components/LoadingSpinner/LoadingSpinner'
-import useSpeedGrader from './hooks/useSpeedGrader'
+import useNavigateEntries from './hooks/useNavigateEntries'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 
 const I18n = useI18nScope('discussion_topics_post')
@@ -249,7 +249,7 @@ const DiscussionTopicManager = props => {
     }
   }, [highlightEntryId, discussionTopicQuery.loading, isPersistEnabled])
 
-  useSpeedGrader({
+  useNavigateEntries({
     highlightEntryId,
     setHighlightEntryId,
     setPageNumber,
