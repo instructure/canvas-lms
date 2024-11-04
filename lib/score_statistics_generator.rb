@@ -91,30 +91,42 @@ class ScoreStatisticsGenerator
     end
 
     connection = ScoreStatistic.connection
-    now = connection.quote(Time.now.utc)
+    now = Time.now.utc
     bulk_values = statistics.map do |assignment|
-      values =
-        [
-          assignment["id"],
-          assignment["max"],
-          assignment["min"],
-          assignment["avg"],
-          assignment["lower_q"],
-          assignment["median"],
-          assignment["upper_q"],
-          assignment["count"],
-          now,
-          now,
-          root_account_id
-        ].join(",")
-      "(#{values})"
+      [
+        assignment["id"],
+        assignment["max"],
+        assignment["min"],
+        assignment["avg"],
+        assignment["lower_q"],
+        assignment["median"],
+        assignment["upper_q"],
+        assignment["count"],
+        now,
+        now,
+        root_account_id
+      ]
     end
 
     bulk_values.each_slice(100) do |bulk_slice|
+      table = ScoreStatistic.quoted_table_name
       connection.execute(<<~SQL.squish)
-        INSERT INTO #{ScoreStatistic.quoted_table_name}
+        INSERT INTO #{table}
           (assignment_id, maximum, minimum, mean, lower_q, median, upper_q, count, created_at, updated_at, root_account_id)
-        VALUES #{bulk_slice.join(",")}
+          SELECT
+            (x->>0)::BIGINT AS assignment_id,
+            (x->>1)::DOUBLE PRECISION AS maximum,
+            (x->>2)::DOUBLE PRECISION AS minimum,
+            (x->>3)::DOUBLE PRECISION AS mean,
+            (x->>4)::DOUBLE PRECISION AS lower_q,
+            (x->>5)::DOUBLE PRECISION AS median,
+            (x->>6)::DOUBLE PRECISION AS upper_q,
+            (x->>7)::INT AS count,
+            (x->>8)::TIMESTAMP WITHOUT TIME ZONE AS created_at,
+            (x->>9)::TIMESTAMP WITHOUT TIME ZONE AS updated_at,
+            (x->>10)::BIGINT AS root_account_id
+          FROM
+            jsonb_array_elements('#{bulk_slice.to_json}') x
         ON CONFLICT (assignment_id)
         DO UPDATE SET
            minimum = excluded.minimum,
@@ -125,7 +137,16 @@ class ScoreStatisticsGenerator
            upper_q = excluded.upper_q,
            count = excluded.count,
            updated_at = excluded.updated_at,
-           root_account_id = #{root_account_id}
+           root_account_id = excluded.root_account_id
+        WHERE
+          #{table}.minimum IS DISTINCT FROM excluded.minimum OR
+          #{table}.maximum IS DISTINCT FROM excluded.maximum OR
+          #{table}.mean IS DISTINCT FROM excluded.mean OR
+          #{table}.lower_q IS DISTINCT FROM excluded.lower_q OR
+          #{table}.median IS DISTINCT FROM excluded.median OR
+          #{table}.upper_q IS DISTINCT FROM excluded.upper_q OR
+          #{table}.count IS DISTINCT FROM excluded.count OR
+          #{table}.root_account_id IS DISTINCT FROM excluded.root_account_id
       SQL
     end
   end
@@ -168,8 +189,9 @@ class ScoreStatisticsGenerator
       now
     ].join(",")
 
+    table = CourseScoreStatistic.quoted_table_name
     CourseScoreStatistic.connection.execute(<<~SQL.squish)
-      INSERT INTO #{CourseScoreStatistic.quoted_table_name}
+      INSERT INTO #{table}
         (course_id, average, score_count, created_at, updated_at)
       VALUES (#{values})
       ON CONFLICT (course_id)
@@ -177,6 +199,9 @@ class ScoreStatisticsGenerator
         average = excluded.average,
         score_count = excluded.score_count,
         updated_at = excluded.updated_at
+      WHERE
+        #{table}.average IS DISTINCT FROM excluded.average OR
+        #{table}.score_count IS DISTINCT FROM excluded.score_count
     SQL
   end
 end
