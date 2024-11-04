@@ -76,7 +76,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "lib/grade_calculator.rb",
-      "line": 636,
+      "line": 598,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "ScoreMetadata.connection.execute(\"INSERT INTO #{ScoreMetadata.quoted_table_name}\\n  (score_id, calculation_details, created_at, updated_at)\\n  SELECT\\n    scores.id AS score_id,\\n    CASE enrollments.user_id\\n      #{{ user_id => ({ :current => ({ :dropped => scores[:current][:dropped] }), :final => ({ :dropped => scores[:final][:dropped] }) }) }.map do\n \"WHEN #{user_id} THEN cast('#{dropped.to_json}' as json)\"\n end.join(\" \")}\\n      ELSE NULL\\n    END AS calculation_details,\\n    #{updated_at} AS created_at,\\n    #{updated_at} AS updated_at\\n  FROM #{Score.quoted_table_name} scores\\n  INNER JOIN #{Enrollment.quoted_table_name} enrollments ON\\n    enrollments.id = scores.enrollment_id\\n  LEFT OUTER JOIN #{ScoreMetadata.quoted_table_name} metadata ON\\n    metadata.score_id = scores.id\\n  WHERE\\n    scores.enrollment_id IN (#{joined_enrollment_ids}) AND\\n    scores.assignment_group_id IS NULL AND\\n    #{if opts.reverse_merge(:emit_live_event => true, :ignore_muted => true, :update_all_grading_period_scores => true, :update_course_score => true, :only_update_course_gp_metadata => false, :only_update_points => false, :use_what_if_scores => false, :include_discussion_checkpoints => false)[:grading_period] then\n  \"scores.grading_period_id = #{opts.reverse_merge(:emit_live_event => true, :ignore_muted => true, :update_all_grading_period_scores => true, :update_course_score => true, :only_update_course_gp_metadata => false, :only_update_points => false, :use_what_if_scores => false, :include_discussion_checkpoints => false)[:grading_period].id}\"\nelse\n  \"scores.course_score IS TRUE\"\nend}\\n  ORDER BY enrollment_id\\nON CONFLICT (score_id)\\nDO UPDATE SET\\n  calculation_details = excluded.calculation_details,\\n  updated_at = excluded.updated_at\\nWHERE\\n  #{ScoreMetadata.quoted_table_name}.calculation_details #>>'{current,dropped}' IS DISTINCT FROM excluded.calculation_details #>>'{current,dropped}' OR\\n  #{ScoreMetadata.quoted_table_name}.calculation_details #>>'{final,dropped}' IS DISTINCT FROM excluded.calculation_details #>>'{final,dropped}'\\n\".squish)",
       "render_path": null,
@@ -260,7 +260,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/controllers/calendar_events_api_controller.rb",
-      "line": 1377,
+      "line": 1386,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "InstStatsd::Statsd.count(\"account_calendars.modal.enabled_calendars\", params[:enabled_account_calendars].length)",
       "render_path": null,
@@ -329,7 +329,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "lib/grade_calculator.rb",
-      "line": 753,
+      "line": 723,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "ScoreMetadata.connection.execute(\"INSERT INTO #{ScoreMetadata.quoted_table_name}\\n  (score_id, calculation_details, created_at, updated_at)\\n  SELECT\\n    scores.id AS score_id,\\n    CAST(val.calculation_details as json) AS calculation_details,\\n    #{updated_at} AS created_at,\\n    #{updated_at} AS updated_at\\n  FROM (VALUES #{dropped_values.join(\",\")}) val\\n    (enrollment_id, assignment_group_id, calculation_details)\\n  LEFT OUTER JOIN #{Score.quoted_table_name} scores ON\\n    scores.enrollment_id = val.enrollment_id AND\\n    scores.assignment_group_id = val.assignment_group_id\\n  ORDER BY score_id\\nON CONFLICT (score_id)\\nDO UPDATE SET\\n  calculation_details = excluded.calculation_details,\\n  updated_at = excluded.updated_at\\nWHERE\\n#{ScoreMetadata.quoted_table_name}.calculation_details #>>'{current,dropped}' IS DISTINCT FROM excluded.calculation_details #>>'{current,dropped}' OR\\n#{ScoreMetadata.quoted_table_name}.calculation_details #>>'{final,dropped}' IS DISTINCT FROM excluded.calculation_details #>>'{final,dropped}'\\n\".squish)",
       "render_path": null,
@@ -739,7 +739,7 @@
       "check_name": "Redirect",
       "message": "Possible unprotected redirect",
       "file": "app/controllers/courses_controller.rb",
-      "line": 3509,
+      "line": 3510,
       "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
       "code": "redirect_to((params[:continue_to] or course_url(@course)))",
       "render_path": null,
@@ -1569,6 +1569,29 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
+      "fingerprint": "da5b2b78ae0fc9a43bf7e2588bf56849ff8b0c7c06e4ae1b67ce4cb62089d0e5",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/grade_calculator.rb",
+      "line": 676,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Score.connection.execute(\"INSERT INTO #{Score.quoted_table_name} (\\n  enrollment_id, assignment_group_id,\\n  #{assignment_group_columns_to_insert_or_update[:value_names].join(\", \")},\\n  course_score, root_account_id, created_at, updated_at\\n)\\n  SELECT\\n    val.enrollment_id AS enrollment_id,\\n    val.assignment_group_id as assignment_group_id,\\n    #{assignment_group_columns_to_insert_or_update[:insert_columns].join(\", \")},\\n    FALSE AS course_score,\\n    #{(course or Course.find(course)).root_account_id} AS root_account_id,\\n    #{updated_at} AS created_at,\\n    #{updated_at} AS updated_at\\n  FROM\\n    (\\n      SELECT\\n        (x->>0)::INT8 AS enrollment_id,\\n        (x->>1)::INT8 AS assignment_group_id,\\n        #{assignment_group_columns_to_insert_or_update[:value_names].map.with_index do\n \"(x->>#{(i + 2)})::FLOAT8 AS #{name}\"\n end.join(\", \")}\\n      FROM\\n        jsonb_array_elements('#{score_values.to_json}') x\\n    ) val\\n  ORDER BY assignment_group_id, enrollment_id\\nON CONFLICT (enrollment_id, assignment_group_id) WHERE assignment_group_id IS NOT NULL\\nDO UPDATE SET\\n  #{update_columns},\\n  updated_at = excluded.updated_at,\\n  root_account_id = excluded.root_account_id,\\n  workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')\\nWHERE\\n  #{update_conditions}\\n  OR #{Score.quoted_table_name}.root_account_id IS DISTINCT FROM excluded.root_account_id\\n  OR #{Score.quoted_table_name}.workflow_state IS DISTINCT FROM COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')\\n\".squish)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GradeCalculator",
+        "method": "save_assignment_group_scores"
+      },
+      "user_input": "assignment_group_columns_to_insert_or_update[:value_names].join(\", \")",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
       "fingerprint": "dabae4a777574d01b57b41ada118b10e493d7d4d45c89a12b71dd497869423e3",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -1602,6 +1625,29 @@
         "method": "batch_update"
       },
       "user_input": "params[:conversation_ids].length",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "dfad7ecb6632ebe768b264e0851c57b7de6b350f378a22b58a7ba66430048002",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/grade_calculator.rb",
+      "line": 545,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Score.connection.execute(\"INSERT INTO #{Score.quoted_table_name}\\n    (\\n      enrollment_id, grading_period_id,\\n      #{data_to_insert_or_update[:columns].join(\", \")},\\n      course_score, root_account_id, created_at, updated_at\\n    )\\n    SELECT\\n      enrollments.id as enrollment_id,\\n      #{(opts.reverse_merge(:emit_live_event => true, :ignore_muted => true, :update_all_grading_period_scores => true, :update_course_score => true, :only_update_course_gp_metadata => false, :only_update_points => false, :use_what_if_scores => false, :include_discussion_checkpoints => false)[:grading_period].id or \"NULL\")} AS grading_period_id,\\n      #{data_to_insert_or_update[:columns].each_with_object(Hash.new do\n h[k] = +\"\"\n end).with_index do\n join = (i > 0)\n(h[:insert_columns] << \"#{\", \" if (i > 0)}#{c}\")\n(h[:inner_selects] << \"#{\", \" if (i > 0)}(x->>#{(i + 1)})::FLOAT8 AS #{c}\")\n(h[:update_columns] << \"#{\", \" if (i > 0)}#{c} = excluded.#{c}\")\n(h[:update_conditions] << \"#{\" OR \" if (i > 0)}#{Score.quoted_table_name}.#{c} IS DISTINCT FROM excluded.#{c}\")\n end[:insert_columns]},\\n      #{if opts.reverse_merge(:emit_live_event => true, :ignore_muted => true, :update_all_grading_period_scores => true, :update_course_score => true, :only_update_course_gp_metadata => false, :only_update_points => false, :use_what_if_scores => false, :include_discussion_checkpoints => false)[:grading_period] then\n  \"FALSE\"\nelse\n  \"TRUE\"\nend} AS course_score,\\n      #{(course or Course.find(course)).root_account_id} AS root_account_id,\\n      #{updated_at} AS created_at,\\n      #{updated_at} AS updated_at\\n    FROM\\n        (\\n          SELECT\\n            (x->>0)::INT8 AS enrollment_id,\\n            #{data_to_insert_or_update[:columns].each_with_object(Hash.new do\n h[k] = +\"\"\n end).with_index do\n join = (i > 0)\n(h[:insert_columns] << \"#{\", \" if (i > 0)}#{c}\")\n(h[:inner_selects] << \"#{\", \" if (i > 0)}(x->>#{(i + 1)})::FLOAT8 AS #{c}\")\n(h[:update_columns] << \"#{\", \" if (i > 0)}#{c} = excluded.#{c}\")\n(h[:update_conditions] << \"#{\" OR \" if (i > 0)}#{Score.quoted_table_name}.#{c} IS DISTINCT FROM excluded.#{c}\")\n end[:inner_selects]}\\n          FROM\\n            jsonb_array_elements('#{data_to_insert_or_update[:values].to_json}') x\\n        ) j\\n    JOIN #{Enrollment.quoted_table_name} AS enrollments ON j.enrollment_id = enrollments.id\\nORDER BY enrollment_id\\nON CONFLICT #{(\"(enrollment_id, grading_period_id) WHERE grading_period_id IS NOT NULL\" or \"(enrollment_id) WHERE course_score\")}\\nDO UPDATE SET\\n    #{data_to_insert_or_update[:columns].each_with_object(Hash.new do\n h[k] = +\"\"\n end).with_index do\n join = (i > 0)\n(h[:insert_columns] << \"#{\", \" if (i > 0)}#{c}\")\n(h[:inner_selects] << \"#{\", \" if (i > 0)}(x->>#{(i + 1)})::FLOAT8 AS #{c}\")\n(h[:update_columns] << \"#{\", \" if (i > 0)}#{c} = excluded.#{c}\")\n(h[:update_conditions] << \"#{\" OR \" if (i > 0)}#{Score.quoted_table_name}.#{c} IS DISTINCT FROM excluded.#{c}\")\n end[:update_columns]},\\n    updated_at = excluded.updated_at,\\n    root_account_id = excluded.root_account_id,\\n    /* if workflow_state was previously deleted for some reason, update it to active */\\n    workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')\\nWHERE\\n  #{data_to_insert_or_update[:columns].each_with_object(Hash.new do\n h[k] = +\"\"\n end).with_index do\n join = (i > 0)\n(h[:insert_columns] << \"#{\", \" if (i > 0)}#{c}\")\n(h[:inner_selects] << \"#{\", \" if (i > 0)}(x->>#{(i + 1)})::FLOAT8 AS #{c}\")\n(h[:update_columns] << \"#{\", \" if (i > 0)}#{c} = excluded.#{c}\")\n(h[:update_conditions] << \"#{\" OR \" if (i > 0)}#{Score.quoted_table_name}.#{c} IS DISTINCT FROM excluded.#{c}\")\n end[:update_conditions]}\\n  OR #{Score.quoted_table_name}.root_account_id IS DISTINCT FROM excluded.root_account_id\\n  OR #{Score.quoted_table_name}.workflow_state IS DISTINCT FROM COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')\\n\".squish)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GradeCalculator",
+        "method": "save_course_and_grading_period_scores"
+      },
+      "user_input": "data_to_insert_or_update[:columns].join(\", \")",
       "confidence": "Medium",
       "cwe_id": [
         89
@@ -1744,6 +1790,6 @@
       "note": ""
     }
   ],
-  "updated": "2024-11-01 16:52:05 +0000",
+  "updated": "2024-11-04 19:01:37 +0000",
   "brakeman_version": "6.2.1"
 }
