@@ -52,6 +52,41 @@ describe Schemas::InternalLtiConfiguration do
       end
     end
 
+    context "public_jwk" do
+      let(:jwk) { nil }
+      let(:json) do
+        internal_configuration.tap do |c|
+          c[:public_jwk] = jwk
+        end
+      end
+
+      context "when not set" do
+        before do
+          json.delete(:public_jwk)
+        end
+
+        it "is valid" do
+          expect(subject).to be_empty
+        end
+      end
+
+      context "when object" do
+        let(:jwk) { { kty: "RSA" } }
+
+        it "is valid" do
+          expect(subject).to be_empty
+        end
+      end
+
+      context "when array" do
+        let(:jwk) { [] }
+
+        it "is valid" do
+          expect(subject).to be_empty
+        end
+      end
+    end
+
     context "windowTarget" do
       let(:window_target) { nil }
       let(:json) do
@@ -81,8 +116,16 @@ describe Schemas::InternalLtiConfiguration do
       context "when another value" do
         let(:window_target) { "_self" }
 
-        it "is invalid" do
-          expect(error_message).to include "windowTarget"
+        it "is valid" do
+          expect(subject).to be_empty
+        end
+      end
+
+      context "when null" do
+        let(:window_target) { nil }
+
+        it "is valid" do
+          expect(subject).to be_empty
         end
       end
     end
@@ -118,8 +161,8 @@ describe Schemas::InternalLtiConfiguration do
       context "when another value" do
         let(:default) { "invalid" }
 
-        it "is invalid" do
-          expect(error_message).to include "default"
+        it "is valid" do
+          expect(subject).to be_empty
         end
       end
     end
@@ -198,6 +241,41 @@ describe Schemas::InternalLtiConfiguration do
       end
     end
 
+    context "selection_height" do
+      let(:selection_height) { nil }
+      let(:json) do
+        internal_configuration.tap do |c|
+          c[:launch_settings][:selection_height] = selection_height
+        end
+      end
+
+      context "when not set" do
+        before do
+          json[:launch_settings].delete(:selection_height)
+        end
+
+        it "is valid" do
+          expect(subject).to be_empty
+        end
+      end
+
+      context "when number" do
+        let(:selection_height) { 100 }
+
+        it "is valid" do
+          expect(subject).to be_empty
+        end
+      end
+
+      context "when string" do
+        let(:selection_height) { "100" }
+
+        it "is valid" do
+          expect(subject).to be_empty
+        end
+      end
+    end
+
     context "placements" do
       context "when invalid" do
         let(:json) do
@@ -208,6 +286,41 @@ describe Schemas::InternalLtiConfiguration do
 
         it "is invalid" do
           expect(error_message).to include "placements"
+        end
+      end
+
+      context "enabled" do
+        let(:enabled) { nil }
+        let(:json) do
+          internal_configuration.tap do |c|
+            c[:placements] << { placement: "course_navigation", enabled: }
+          end
+        end
+
+        context "when not set" do
+          before do
+            json[:placements].last.delete(:enabled)
+          end
+
+          it "is valid" do
+            expect(subject).to be_empty
+          end
+        end
+
+        context "when boolean" do
+          let(:enabled) { true }
+
+          it "is valid" do
+            expect(subject).to be_empty
+          end
+        end
+
+        context "when string" do
+          let(:enabled) { "true" }
+
+          it "is valid" do
+            expect(subject).to be_empty
+          end
         end
       end
     end
