@@ -85,7 +85,7 @@ module Schemas
         oidc_initiation_url: { type: "string" },
         oidc_initiation_urls: { type: "object" },
         public_jwk_url: { type: "string" },
-        public_jwk: { type: "object" },
+        public_jwk: { type: ["object", "array"] }, # account for legacy invalid data
         scopes: { type: "array", items: { type: "string", enum: [*TokenScopes::LTI_SCOPES.keys, *TokenScopes::LTI_HIDDEN_SCOPES.keys] } },
       }.freeze
     end
@@ -96,14 +96,14 @@ module Schemas
         text: { type: "string" },
         labels: { type: "object" },
         custom_fields: { type: "object" },
-        selection_height: { type: "number" },
-        selection_width: { type: "number" },
-        launch_height: { type: "number", description: "Not standard everywhere yet" },
-        launch_width: { type: "number", description: "Not standard everywhere yet" },
+        selection_height: { type: ["number", "string"] },
+        selection_width: { type: ["number", "string"] },
+        launch_height: { type: ["number", "string"], description: "Not standard everywhere yet" },
+        launch_width: { type: ["number", "string"], description: "Not standard everywhere yet" },
         icon_url: { type: "string" },
         canvas_icon_class: { type: "string" },
         required_permissions: { type: "string" },
-        windowTarget: { type: "string", enum: %w[_blank] },
+        windowTarget: { type: ["string", "null"], description: "only '_blank' supported" }, # , enum: %w[_blank] },
         display_type: { type: "string", enum: VALID_DISPLAY_TYPES },
         url: { type: "string", description: "Defers to target_link_uri for 1.3 tools" },
         target_link_uri: { type: "string" },
@@ -122,7 +122,7 @@ module Schemas
           required: %w[placement],
           properties: {
             placement: { type: "string", enum: ::Lti::ResourcePlacement::PLACEMENTS.map(&:to_s) },
-            enabled: { type: "boolean" },
+            enabled: { type: ["boolean", "string"] },
             **base_settings_properties
           },
           allOf: [
@@ -144,7 +144,7 @@ module Schemas
               then: {
                 properties: {
                   root_account_only: { type: "boolean" },
-                  default: { type: "string", enum: %w[disabled enabled] },
+                  default: { type: "string" }, # , enum: %w[disabled enabled] },
                 }
               }
             },
@@ -169,7 +169,7 @@ module Schemas
                 properties: { placement: { const: "editor_button" } }
               },
               then: {
-                properties: { use_tray: { type: "boolean" } }
+                properties: { use_tray: { type: ["boolean", "string"] } }
               }
             }
           ]
@@ -182,9 +182,9 @@ module Schemas
     def self.placement_specific_settings_properties
       {
         icon_svg_path_64: { type: "string", description: "Used only by global_navigation" },
-        default: { type: "string", enum: %w[disabled enabled], description: "Used only by account_navigation and course_navigation" },
+        default: { type: "string", description: "Used only by account_navigation and course_navigation" }, # enum: %w[disabled enabled],
         accept_media_types: { type: "string", description: "Used only by file_menu" },
-        use_tray: { type: "boolean", description: "Used only by editor_button" },
+        use_tray: { type: ["boolean", "string"], description: "Used only by editor_button" },
       }.freeze
     end
   end
