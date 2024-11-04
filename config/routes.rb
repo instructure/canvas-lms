@@ -2323,6 +2323,7 @@ CanvasRails::Application.routes.draw do
       get  "#{prefix}/products/:id", action: :show
       get  "#{prefix}/filters", action: :filters
       get  "#{prefix}/organizations/:organization_salesforce_id/products", action: :index_by_organization
+      get  "#{prefix}/custom_filters", action: :custom_filters
     end
 
     scope(controller: :feature_flags) do

@@ -18,13 +18,17 @@
 
 import React, {useMemo, useState} from 'react'
 import {useQuery} from '@tanstack/react-query'
-import LtiFilterTray from './apps/LtiFilterTray'
 import FilterTags from './apps/FilterTags'
-import {fetchLtiFilters, fetchProductsByOrganization} from '../queries/productsQuery'
-import useDiscoverQueryParams from '../hooks/useDiscoverQueryParams'
-import Disclaimer from './common/Disclaimer'
+import LtiFilterTray from './apps/LtiFilterTray'
 import {Products} from './apps/Products'
 import {SearchAndFilter} from './apps/SearchAndFilter'
+import Disclaimer from './common/Disclaimer'
+import {
+  fetchCustomFilters,
+  fetchLtiFilters,
+  fetchProductsByOrganization,
+} from '../queries/productsQuery'
+import useDiscoverQueryParams from '../hooks/useDiscoverQueryParams'
 import type {Product} from '../models/Product'
 
 export const InstructorApps = () => {
@@ -52,6 +56,11 @@ export const InstructorApps = () => {
     queryFn: () => fetchLtiFilters(),
   })
 
+  const {data: customFilterData} = useQuery({
+    queryKey: ['custom_filters'],
+    queryFn: () => fetchCustomFilters(window.ENV.DOMAIN_ROOT_ACCOUNT_SFID),
+  })
+
   return (
     <>
       <SearchAndFilter setIsTrayOpen={setIsTrayOpen} />
@@ -75,7 +84,12 @@ export const InstructorApps = () => {
         <LtiFilterTray
           isTrayOpen={isTrayOpen}
           setIsTrayOpen={setIsTrayOpen}
-          filterValues={filterData}
+          filterValues={{
+            ...filterData,
+            'approval status': customFilterData?.approval_status || [],
+            'privacy status': customFilterData?.privacy_status || [],
+          }}
+          lpFilterValues={customFilterData?.organization_filters || []}
           queryParams={queryParams}
           setQueryParams={setQueryParams}
         />
