@@ -75,4 +75,12 @@ class LearnPlatformController < ApplicationController
 
     render json: response
   end
+
+  def custom_filters
+    response = learnplatform_api.custom_filters(params[:salesforce_id])
+
+    return render json: response, status: :internal_server_error if response.key?(:lp_server_error)
+
+    render json: response
+  end
 end

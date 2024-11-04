@@ -57,6 +57,10 @@ describe('isError, isLoading, and product return as expected', () => {
     }
 
     global.fetch = jest.fn().mockResolvedValue({
+      // in the productsQuery.ts file, the fetchResponse function checks for response.ok to see if the fetch was successful
+      // so we need to mock the response.ok property to be true otherwise the function will throw an error
+      // TODO: a better solution when we write negative tests
+      ok: true,
       json: jest.fn().mockResolvedValue(mockedData),
     })
   })
