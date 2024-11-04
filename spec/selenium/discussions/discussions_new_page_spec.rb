@@ -1140,6 +1140,7 @@ describe "discussions" do
         get "/courses/#{course.id}/discussion_topics/new?is_announcement=true"
         # Expect certain field to be present
         expect(f("body")).to contain_jqcss "input[value='enable-participants-commenting']"
+        expect(f("body")).to contain_jqcss "input[value='must-respond-before-viewing-replies']"
         expect(f("body")).to contain_jqcss "input[value='enable-podcast-feed']"
         expect(f("body")).to contain_jqcss "input[value='allow-liking']"
         expect(f("body")).to contain_jqcss "div[data-testid='non-graded-date-options']"
