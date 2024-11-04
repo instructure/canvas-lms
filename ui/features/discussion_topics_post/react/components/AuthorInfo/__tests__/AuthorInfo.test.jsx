@@ -16,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
+import {render} from '@testing-library/react'
+
 import {AnonymousUser} from '../../../../graphql/AnonymousUser'
 import {AuthorInfo} from '../AuthorInfo'
 import {CURRENT_USER, SearchContext} from '../../../utils/constants'
-import {render} from '@testing-library/react'
-import React from 'react'
 import {User} from '../../../../graphql/User'
 import {DiscussionEntryVersion} from '../../../../graphql/DiscussionEntryVersion'
 
@@ -238,7 +239,7 @@ describe('AuthorInfo', () => {
       const container = setup({
         createdAt: 'Jan 1 1:00pm',
         editedTimingDisplay: 'Jan 1 3:00pm',
-        delayedPostAt: 'Jan 1 5:00pm',
+        delayedPostAt: '2024-11-04T12:41:59+01:00',
       })
       expect(container.queryByTestId('editedByText')).toBeInTheDocument()
     })
@@ -248,7 +249,7 @@ describe('AuthorInfo', () => {
       const container = setup({
         createdAt: 'Jan 1 1:00pm',
         editedTimingDisplay: 'Jan 1 3:00pm',
-        delayedPostAt: 'Jan 1 5:00pm',
+        delayedPostAt: '2024-11-04T12:41:59+01:00',
       })
       expect(container.queryByTestId('editedByText')).not.toBeInTheDocument()
     })
@@ -256,8 +257,8 @@ describe('AuthorInfo', () => {
     it('render the last edited date if it is past the posted date', () => {
       const container = setup({
         createdAt: 'Jan 1 1:00pm',
-        editedTimingDisplay: 'Jan 1 6:00pm',
-        delayedPostAt: 'Jan 1 5:00pm',
+        editedTimingDisplay: 'Nov 4 6:00pm',
+        delayedPostAt: '2024-11-04T12:41:59+01:00',
       })
       expect(container.queryByTestId('editedByText')).toBeInTheDocument()
     })
@@ -287,10 +288,11 @@ describe('AuthorInfo', () => {
       window.ENV.current_user_roles = ['student']
       const container = setup({
         createdAt: 'Jan 1 1:00pm',
-        delayedPostAt: 'Jan 1 4:00pm',
+        delayedPostAt: '2024-11-04T12:41:59+01:00',
         isTopic: true,
       })
-      expect(container.queryByText('Posted Jan 1 4:00pm')).toBeInTheDocument()
+
+      expect(container.queryByText('Posted Nov 4 11:41am')).toBeInTheDocument()
       expect(container.queryByText('Created Jan 1 1:00pm')).not.toBeInTheDocument()
     })
   })
