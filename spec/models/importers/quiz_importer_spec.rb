@@ -116,6 +116,12 @@ describe "Importers::QuizImporter" do
             .and_return(true)
         end
 
+        it "updates the content migration to show that a new quiz was imported" do
+          data[:qti_new_quiz] = true
+          Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
+          expect(@migration.reload.migration_settings[:quiz_next_imported]).to be true
+        end
+
         it "marks the assignment as ready to migrate when qti_new_quiz" do
           data[:qti_new_quiz] = true
 
