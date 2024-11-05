@@ -250,6 +250,9 @@ shared_examples_for "item assign to tray during assignment creation/update" do
       expect(inherited_from.last.text).to eq("Inherited from #{@context_module.name}")
       expect(element_exists?(assign_to_in_tray_selector("Remove Everyone else"))).to be_falsey
 
+      click_add_assign_to_card
+      select_module_item_assignee(1, @section1.name)
+      update_due_date(1, "12/31/2024")
       click_save_button("Apply")
 
       keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }

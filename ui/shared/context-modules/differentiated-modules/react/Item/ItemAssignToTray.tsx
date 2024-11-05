@@ -209,6 +209,7 @@ export default function ItemAssignToTray({
   const initialLoadRef = useRef(false)
   const cardsRefs = useRef<{[cardId: string]: RefObject<ItemAssignToCardRef>}>({})
   const [isLoading, setIsLoading] = useState(false)
+  const [initialCardsState, setInitialCardsState] = useState<ItemAssignToCardSpec[]>([])
 
   const [assignToCards, setAssignToCardsInner] = useState<ItemAssignToCardSpec[]>(
     defaultCards ?? []
@@ -239,6 +240,11 @@ export default function ItemAssignToTray({
   const disabledOptionIdsRef = useRef(defaultDisabledOptionIds)
   const sectionViewRef = createRef<View>()
 
+  const handleInitialState = (state: ItemAssignToCardSpec[]) => {
+    onInitialStateSet?.(state)
+    setInitialCardsState(state)
+  }
+
   useEffect(() => {
     // When tray closes and the initial load already happened,
     // the next time it opens it will show the loading spinner
@@ -248,6 +254,12 @@ export default function ItemAssignToTray({
       setIsLoading(true)
     }
   }, [open])
+
+  useEffect(() => {
+    if (defaultCards && initialCardsState.length < 1) {
+      setInitialCardsState(defaultCards)
+    }
+  }, [defaultCards, initialCardsState.length])
 
   useEffect(() => {
     if (!ENV.FEATURES?.selective_release_edit_page || onChange === undefined) return
@@ -264,6 +276,10 @@ export default function ItemAssignToTray({
     )
     setAssignToCards(newCards)
   }, [assignToCards, defaultCards, hasModuleOverrides, moduleAssignees, onChange])
+
+  const hasChanges =
+    assignToCards.some(({highlightCard}) => highlightCard) ||
+    assignToCards.length < initialCardsState.length
 
   const everyoneOption = useMemo(() => {
     const hasOverrides =
@@ -318,6 +334,10 @@ export default function ItemAssignToTray({
 
   const handleUpdate = useCallback(() => {
     if (focusErrors()) return
+    if (!hasChanges) {
+      onDismiss()
+      return
+    }
     // compare original module assignees to see if they were removed for unassign_item overrides
     const deletedModuleAssignees = moduleAssignees.filter(
       override => !disabledOptionIdsRef.current.includes(override)
@@ -354,8 +374,10 @@ export default function ItemAssignToTray({
       })
     }
   }, [
-    assignToCardsRef,
+    focusErrors,
+    hasChanges,
     moduleAssignees,
+    onDismiss,
     onSave,
     hasModuleOverrides,
     itemContentId,
@@ -363,7 +385,6 @@ export default function ItemAssignToTray({
     itemType,
     itemName,
     handleDismiss,
-    focusErrors,
   ])
 
   const allCardsValid = useCallback(() => {
@@ -503,7 +524,7 @@ export default function ItemAssignToTray({
               initHasModuleOverrides={initHasModuleOverrides}
               removeDueDateInput={removeDueDateInput}
               isCheckpointed={isCheckpointed}
-              onInitialStateSet={onInitialStateSet}
+              onInitialStateSet={handleInitialState}
               defaultCards={defaultCards}
               defaultSectionId={defaultSectionId}
               defaultDisabledOptionIds={defaultDisabledOptionIds}
@@ -569,7 +590,7 @@ export default function ItemAssignToTray({
           initHasModuleOverrides={initHasModuleOverrides}
           removeDueDateInput={removeDueDateInput}
           isCheckpointed={isCheckpointed}
-          onInitialStateSet={onInitialStateSet}
+          onInitialStateSet={handleInitialState}
           defaultCards={defaultCards}
           defaultSectionId={defaultSectionId}
           defaultDisabledOptionIds={defaultDisabledOptionIds}
