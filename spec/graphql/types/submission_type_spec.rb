@@ -160,6 +160,105 @@ describe Types::SubmissionType do
     end
   end
 
+  describe "status_tag" do
+    let(:status_tag) { submission_type.resolve("statusTag") }
+
+    it "returns 'custom' when the submission has a custom grade status" do
+      custom_grade_status = @submission.root_account.custom_grade_statuses.create!(
+        name: "Potato",
+        color: "#FFE8E5",
+        created_by: @teacher
+      )
+
+      @submission.update!(custom_grade_status:)
+      expect(status_tag).to eq "custom"
+    end
+
+    it "returns 'excused' when the submission is excused" do
+      @submission.update!(excused: true)
+      expect(status_tag).to eq "excused"
+    end
+
+    it "returns 'late' when the submission is marked late" do
+      @submission.update!(late_policy_status: :late)
+      expect(status_tag).to eq "late"
+    end
+
+    it "returns 'late' when the submission is naturally late" do
+      @assignment.update!(due_at: 1.day.ago)
+      @assignment.submit_homework(@student, body: "foo")
+      expect(status_tag).to eq "late"
+    end
+
+    it "returns 'extended' when the submission is extended" do
+      @submission.update!(late_policy_status: :extended)
+      expect(status_tag).to eq "extended"
+    end
+
+    it "returns 'missing' when the submission is marked missing" do
+      @submission.update!(late_policy_status: :missing)
+      expect(status_tag).to eq "missing"
+    end
+
+    it "returns 'missing' when the submission is naturally missing" do
+      @assignment.update!(due_at: 1.day.ago)
+      # graded submission's aren't considered missing, so we need to ungrade it
+      @submission.update!(score: nil, grader: nil)
+      expect(status_tag).to eq "missing"
+    end
+
+    it "returns 'none' when the submission is marked 'none'" do
+      @assignment.update!(due_at: 1.day.ago)
+      @assignment.submit_homework(@student, body: "foo")
+      # the submission is naturally late, but marked as "none"
+      @submission.update!(late_policy_status: :none)
+      expect(status_tag).to eq "none"
+    end
+
+    it "returns 'none' when the submission has no special status" do
+      expect(status_tag).to eq "none"
+    end
+  end
+
+  describe "status" do
+    let(:status) { submission_type.resolve("status") }
+
+    it "returns the custom status name when the submission has a custom grade status" do
+      custom_grade_status = @submission.root_account.custom_grade_statuses.create!(
+        name: "Potato",
+        color: "#FFE8E5",
+        created_by: @teacher
+      )
+
+      @submission.update!(custom_grade_status:)
+      expect(status).to eq "Potato"
+    end
+
+    it "returns 'Excused' when the submission is excused" do
+      @submission.update!(excused: true)
+      expect(status).to eq "Excused"
+    end
+
+    it "returns 'Late' when the submission is late" do
+      @submission.update!(late_policy_status: :late)
+      expect(status).to eq "Late"
+    end
+
+    it "returns 'Extended' when the submission is extended" do
+      @submission.update!(late_policy_status: :extended)
+      expect(status).to eq "Extended"
+    end
+
+    it "returns 'Missing' when the submission is missing" do
+      @submission.update!(late_policy_status: :missing)
+      expect(status).to eq "Missing"
+    end
+
+    it "returns 'None' when the submission has no special status" do
+      expect(status).to eq "None"
+    end
+  end
+
   describe "grading period id" do
     it "returns the grading period id" do
       grading_period_group = GradingPeriodGroup.create!(title: "foo", course_id: @course.id)

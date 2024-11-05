@@ -323,6 +323,8 @@ module Interfaces::SubmissionInterface
       end
   end
 
+  field :custom_grade_status_id, ID, null: true
+
   field :custom_grade_status, String, null: true
   def custom_grade_status
     load_association(:custom_grade_status).then do |status|
