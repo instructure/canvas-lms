@@ -139,6 +139,7 @@ function DiscussionTopicForm({
   const isUnpublishedAnnouncement =
     isAnnouncement && !ENV.DISCUSSION_TOPIC?.ATTRIBUTES.course_published
   const published = currentDiscussionTopic?.published ?? false
+  const shouldMasteryPathsBeVisible = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !isAnnouncement
 
   const announcementAlertProps = () => {
     if (isUnpublishedAnnouncement) {
@@ -813,15 +814,22 @@ function DiscussionTopicForm({
     shouldShowAssignToForUngradedDiscussions,
   ])
 
-  return (
-    <>
+  const renderDiscussionTopicFormViewSelector = () => {
+    return (
       <DiscussionTopicFormViewSelector
         selectedView={selectedView}
         setSelectedView={setSelectedView}
         breakpoints={breakpoints}
-        shouldMasteryPathsBeVisible={ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !isAnnouncement}
+        shouldMasteryPathsBeVisible={shouldMasteryPathsBeVisible}
         shouldMasteryPathsBeEnabled={isGraded}
       />
+    )
+  }
+
+  return (
+    <>
+      {((shouldMasteryPathsBeVisible && instUINavEnabled()) || !instUINavEnabled()) &&
+        renderDiscussionTopicFormViewSelector()}
       <View
         margin={breakpoints.mobileOnly ? 'mediumSmall 0 0 0' : '0'}
         display={selectedView === Views.Details ? 'block' : 'none'}

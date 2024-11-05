@@ -1085,6 +1085,13 @@ describe "discussions" do
           expect(rule_assignment.id).to eq(dt.assignment.id)
           expect(rule_first_assignment.id).to eq(@assignment_for_mp.id)
         end
+
+        it "Use tab style filter element in normal view and dropdown in mobile view" do
+          get "/courses/#{course.id}/discussion_topics/new"
+          expect(f("div[role='tab']").text).to eq "Details"
+          resize_screen_to_mobile_width
+          expect(f("input[data-testid='view-select']").attribute("title")).to eq "Details"
+        end
       end
 
       context "when instui_nav feature flag on" do
@@ -1098,13 +1105,6 @@ describe "discussions" do
         it "create discussion header title rendered correctly" do
           get "/courses/#{course.id}/discussion_topics/new"
           expect(fj("h1:contains('#{page_header_title_discussion}')").text).to eq page_header_title_discussion
-        end
-
-        it "Use tab style filter element in normal view and dropdown in mobile view" do
-          get "/courses/#{course.id}/discussion_topics/new"
-          expect(f("div[role='tab']").text).to eq "Details"
-          resize_screen_to_mobile_width
-          expect(f("input[data-testid='view-select']").attribute("title")).to eq "Details"
         end
 
         it "After Save and publish need to see a publish pill in edit page" do
