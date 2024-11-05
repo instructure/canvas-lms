@@ -2790,6 +2790,7 @@ el:
   breadcrumb_2_95ba94be: "Ιχνηλάτηση 2"
   broken_file_link_found_in_your_course_7cc24395: "Βρέθηκε κατεστραμμένος σύνδεσμος προς κάποιο αρχείο στο μάθημά σας"
   brown_a82c3d0d: Καφέ
+  browse_courses_c8af1754: "Προσπελάστε μαθήματα"
   bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "Το όνομα του κάδου πρέπει να είναι κάποιο από τα ακόλουθα: %{bucket_names}"
   bulk_course_migration: 
     export_failed: "Παρουσιάστηκε σφάλμα κατά την εξαγωγή μαθήματος με αναγνωριστικό bb_lcid %{id} από το Blackboard"
