@@ -318,17 +318,20 @@ export const DiscussionPostToolbar = props => {
                     </Flex>
                   </Flex.Item>
                 )}
-                {props.manageAssignTo && ENV.FEATURES?.selective_release_ui_api && showAssignTo && (
-                  <Flex.Item shouldGrow={true} textAlign="end">
-                    <Button
-                      data-testid="manage-assign-to"
-                      renderIcon={IconPermissionsLine}
-                      onClick={() => setShowAssignToTray(!showAssignToTray)}
-                    >
-                      {I18n.t('Assign To')}
-                    </Button>
-                  </Flex.Item>
-                )}
+                {!isSpeedGraderInTopUrl &&
+                  props.manageAssignTo &&
+                  ENV.FEATURES?.selective_release_ui_api &&
+                  showAssignTo && (
+                    <Flex.Item shouldGrow={true} textAlign="end">
+                      <Button
+                        data-testid="manage-assign-to"
+                        renderIcon={IconPermissionsLine}
+                        onClick={() => setShowAssignToTray(!showAssignToTray)}
+                      >
+                        {I18n.t('Assign To')}
+                      </Button>
+                    </Flex.Item>
+                  )}
               </Flex>
             </Flex.Item>
           </Flex>

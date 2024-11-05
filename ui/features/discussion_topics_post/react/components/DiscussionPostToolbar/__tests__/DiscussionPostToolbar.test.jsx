@@ -26,10 +26,15 @@ import {ChildTopic} from '../../../../graphql/ChildTopic'
 import {waitFor} from '@testing-library/dom'
 import {MockedProvider} from '@apollo/react-testing'
 
+import * as constants from '../../../utils/constants'
+
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
   responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
+
+jest.mock('../../../utils/constants')
+
 const onFailureStub = jest.fn()
 const onSuccessStub = jest.fn()
 const openMock = jest.fn()
@@ -230,6 +235,22 @@ describe('DiscussionPostToolbar', () => {
       expect(getByRole('button', {name: 'Assign To'})).toBeInTheDocument()
     })
 
+    it('does not render the Assign To button if in speedGrader', () => {
+      constants.isSpeedGraderInTopUrl = jest.fn()
+      constants.isSpeedGraderInTopUrl.mockImplementation(() => {
+        return true
+      })
+      jest.spyOn(window.top, 'location', 'get').mockReturnValue({
+        href: 'http://localhost.com/courses/3/gradebook/speed_grader?assignment_id=113&student_id=40&entry_id=39',
+      })
+
+      const {queryByText} = setup({
+        manageAssignTo: true,
+        contextType: 'Course',
+      })
+      expect(queryByText('button', {name: 'Assign To'})).not.toBeInTheDocument()
+    })
+
     it('does not render the Assign To button if user can not manageAssignTo', () => {
       const {queryByRole} = setup({
         manageAssignTo: false,
@@ -239,11 +260,11 @@ describe('DiscussionPostToolbar', () => {
     })
 
     it('does not render the Assign To button if a group discussion', () => {
-      const {queryByRole} = setup({
+      const {queryByText} = setup({
         manageAssignTo: true,
         contextType: 'Group',
       })
-      expect(queryByRole('button', {name: 'Assign To'})).not.toBeInTheDocument()
+      expect(queryByText('Assign To')).not.toBeInTheDocument()
     })
 
     it('does not render the Assign To button if an ungraded group discussion in course context', () => {
