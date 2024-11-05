@@ -2884,6 +2884,7 @@ hy:
       permissions: "%{name} խմբագրման թույլտվություն"
     unpublished_title: "Հրապարակված չէ"
   broken_file_link_found_in_your_course_7cc24395: "Ձեր դասընթացում գտնվել է չաշխատող հղում"
+  browse_courses_c8af1754: "Բեռնել դասընթացներ"
   bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "ինտերվալի անվանումը պետք է հետևյալներից մեկը լինի՝%{bucket_names}"
   bulk_course_migration: 
     export_failed: "Սխալ է տեղի ունեցել Blackborad-ից դասընթացը bb_lcid%{id} հետ արտահանելիս "
