@@ -413,6 +413,15 @@ export default function ItemAssignToTray({
         <View data-testid="item-type-text" as="div" margin="medium 0 0 0">
           {renderItemType()} {pointsPossible != null && `| ${renderPointsPossible()}`}
         </View>
+        {(blueprintDateLocks?.length ?? 0) < 2 ? (
+          <Alert liveRegion={getLiveRegion} variant="info" margin="small 0 0">
+            <Text size="small">
+              {I18n.t(
+                'Select who should be assigned and use the drop-down menus or manually enter your date and time.'
+              )}
+            </Text>
+          </Alert>
+        ) : null}
         {blueprintDateLocks && blueprintDateLocks.length > 0 ? (
           <Alert liveRegion={getLiveRegion} variant="info" margin="small 0 0">
             <Text weight="bold" size="small">
