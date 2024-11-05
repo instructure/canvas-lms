@@ -4515,6 +4515,7 @@ fa:
       permissions: "مجوزهای ویرایش برای: %{name}"
     unpublished_title: "منتشر نشده"
   broken_file_link_found_in_your_course_7cc24395: "پیوند خراب فایل در درس شما موجود است"
+  browse_courses_c8af1754: "مرور کردن درس ها"
   browse_your_computer_9a735a4: "رایانه خود را مرور کنید"
   browse_your_computer_for_a_course_image_d7db2376: "رایانه خود را برای یافتن تصویر درس، مرور کنید"
   bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "نام سطل باید یکی از موارد زیر باشد: %{bucket_names}"
