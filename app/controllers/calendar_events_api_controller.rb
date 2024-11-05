@@ -1079,6 +1079,7 @@ class CalendarEventsApiController < ApplicationController
       dtstart_list.each_with_index do |dtstart, i|
         params_for_update = set_series_params(params_for_update, dtstart, duration)
         event = events[i]
+        event.update_all = true if which != "one" && event&.series_uuid && event&.series_head
         if event.nil?
           event = target_event.context.calendar_events.build(params_for_update)
           events << event

@@ -34,6 +34,7 @@ class CalendarEvent < ActiveRecord::Base
   restrict_columns :settings, %i[location_name location_address start_at end_at all_day all_day_date series_uuid rrule]
 
   attr_accessor :cancel_reason, :imported
+  attr_accessor :update_all
 
   sanitize_field :description, CanvasSanitize::SANITIZE
   copy_authorized_links(:description) { [effective_context, nil] }
@@ -480,7 +481,7 @@ class CalendarEvent < ActiveRecord::Base
         context.available? && (
         changed_in_state(:active, fields: :start_at) ||
         changed_in_state(:active, fields: :end_at)
-      ) && !hidden?
+      ) && !hidden? && (!in_a_series? || (update_all && !series_tail?))
     end
     data { course_broadcast_data }
 
