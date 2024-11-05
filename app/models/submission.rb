@@ -3047,6 +3047,33 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def status_tag
+    return :custom if custom_grade_status_id
+    return :excused if excused?
+    return :late if late?
+    return :extended if extended?
+    return :missing if missing?
+
+    :none
+  end
+
+  def status
+    case status_tag
+    when :custom
+      custom_grade_status.name
+    when :excused
+      I18n.t("Excused")
+    when :missing
+      I18n.t("Missing")
+    when :late
+      I18n.t("Late")
+    when :extended
+      I18n.t("Extended")
+    when :none
+      I18n.t("None")
+    end
+  end
+
   def submission_status
     if resubmitted?
       :resubmitted

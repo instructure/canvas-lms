@@ -851,6 +851,112 @@ describe Submission do
     end
   end
 
+  describe "#status_tag" do
+    before do
+      @assignment.update!(submission_types: "online_text_entry")
+      @submission = @assignment.submissions.find_by!(user: @student)
+    end
+
+    it "returns :custom when the submission has a custom grade status" do
+      custom_grade_status = @submission.root_account.custom_grade_statuses.create!(
+        name: "Potato",
+        color: "#FFE8E5",
+        created_by: @course.teachers.take
+      )
+
+      @submission.update!(custom_grade_status:)
+      expect(@submission.status_tag).to eq :custom
+    end
+
+    it "returns :excused when the submission is excused" do
+      @submission.update!(excused: true)
+      expect(@submission.status_tag).to eq :excused
+    end
+
+    it "returns :late when the submission is marked late" do
+      @submission.update!(late_policy_status: :late)
+      expect(@submission.status_tag).to eq :late
+    end
+
+    it "returns :late when the submission is naturally late" do
+      @assignment.update!(due_at: 1.day.ago)
+      @assignment.submit_homework(@submission.user, body: "foo")
+      @submission.reload
+      expect(@submission.status_tag).to eq :late
+    end
+
+    it "returns :extended when the submission is extended" do
+      @submission.update!(late_policy_status: :extended)
+      expect(@submission.status_tag).to eq :extended
+    end
+
+    it "returns :missing when the submission is marked missing" do
+      @submission.update!(late_policy_status: :missing)
+      expect(@submission.status_tag).to eq :missing
+    end
+
+    it "returns :missing when the submission is naturally missing" do
+      @assignment.update!(due_at: 1.day.ago)
+      @submission.update!(score: nil, grader: nil)
+      @submission.reload
+      expect(@submission.status_tag).to eq :missing
+    end
+
+    it "returns :none when the submission is marked none" do
+      @assignment.update!(due_at: 1.day.ago)
+      @assignment.submit_homework(@submission.user, body: "foo")
+      # the submission is naturally late, but marked as "none"
+      @submission.update!(late_policy_status: :none)
+      expect(@submission.status_tag).to eq :none
+    end
+
+    it "returns :none when the submission has no special status" do
+      expect(@submission.status_tag).to eq :none
+    end
+  end
+
+  describe "status" do
+    before do
+      @assignment.update!(submission_types: "online_text_entry")
+      @submission = @assignment.submissions.find_by!(user: @student)
+    end
+
+    it "returns the custom status name when the submission has a custom grade status" do
+      custom_grade_status = @submission.root_account.custom_grade_statuses.create!(
+        name: "Potato",
+        color: "#FFE8E5",
+        created_by: @course.teachers.take
+      )
+
+      @submission.update!(custom_grade_status:)
+      expect(@submission.status).to eq "Potato"
+    end
+
+    it "returns 'Excused' when the submission is excused" do
+      @submission.update!(excused: true)
+      expect(@submission.status).to eq "Excused"
+    end
+
+    it "returns 'Late' when the submission is late" do
+      @submission.update!(late_policy_status: :late)
+      expect(@submission.status).to eq "Late"
+    end
+
+    it "returns 'Extended' when the submission is extended" do
+      @submission.update!(late_policy_status: :extended)
+      expect(@submission.status).to eq "Extended"
+    end
+
+    it "returns 'Missing' when the submission is missing" do
+      @submission.update!(late_policy_status: :missing)
+      expect(@submission.status).to eq "Missing"
+    end
+
+    it "returns 'None' when the submission has no special status" do
+      expect(@submission.status).to eq "None"
+    end
+  end
+
   describe "#late_policy_status" do
     let(:submission) do
       submission = @assignment.submissions.find_by!(user: @student)
