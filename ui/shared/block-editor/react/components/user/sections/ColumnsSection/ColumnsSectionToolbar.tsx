@@ -84,13 +84,14 @@ const ColumnsSectionToolbar = () => {
     [setProp]
   )
 
-  const getCurrentBackgroundColor = () => {
-    return props.background || '#00000000'
-  }
-
   return (
     <Flex gap="small">
-      <ToolbarColor bgcolor={getCurrentBackgroundColor()} onChange={handleChangeColors} />
+      <ToolbarColor
+        tabs={{
+          background: props.background,
+        }}
+        onChange={handleChangeColors}
+      />
       <Flex gap="x-small">
         <Text>{I18n.t('Section Columns')}</Text>
         <NumberInput

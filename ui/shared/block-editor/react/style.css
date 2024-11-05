@@ -236,7 +236,7 @@
   min-height: 2rem;
   min-width: 2rem;
   &.page-block {
-    background: transparent;
+    background-color: transparent;
     padding: 8px;
     min-height: 10rem;
     margin: 3px;

@@ -107,6 +107,8 @@ export const ColumnsSection = ({background, columns}: ColumnsSectionProps) => {
   if (background) {
     styl.backgroundColor = background
     styl.color = getContrastingColor(background)
+  } else {
+    styl.backgroundColor = 'transparent'
   }
 
   return (
