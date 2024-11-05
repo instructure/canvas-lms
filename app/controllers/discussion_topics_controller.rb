@@ -614,7 +614,7 @@ class DiscussionTopicsController < ApplicationController
       CONTEXT_ID: @context.id,
       DISCUSSION_TOPIC: hash,
       GROUP_CATEGORIES: categories
-              .reject(&:student_organized?)
+              .reject { |c| c.student_organized? || c.non_collaborative? }
               .map { |category| { id: category.id, name: category.name } },
       HAS_GRADING_PERIODS: @context.grading_periods?,
       SECTION_LIST: sections.map { |section| { id: section.id, name: section.name } },
