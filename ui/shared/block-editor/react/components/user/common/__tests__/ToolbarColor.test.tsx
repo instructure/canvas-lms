@@ -28,7 +28,9 @@ const DEFAULT_FONT_COLOR = '#2D3B45'
 
 describe('ToolbarColor', () => {
   it('renders the button', () => {
-    const {getByText} = render(<ToolbarColor bgcolor="#fff" fgcolor="#000" onChange={jest.fn()} />)
+    const {getByText} = render(
+      <ToolbarColor tabs={{background: '#fff', foreground: '#000'}} onChange={jest.fn()} />
+    )
 
     const button = getByText('Color').closest('button')
 
@@ -37,7 +39,10 @@ describe('ToolbarColor', () => {
 
   it('renders the popup', () => {
     const {getAllByRole, getByText, getByTestId} = render(
-      <ToolbarColor bgcolor="#fff" fgcolor="#000" bordercolor="#ff0000" onChange={jest.fn()} />
+      <ToolbarColor
+        tabs={{background: '#fff', foreground: '#000', border: '#ff0000'}}
+        onChange={jest.fn()}
+      />
     )
     const button = getByText('Color').closest('button') as HTMLButtonElement
     button.click()
@@ -54,7 +59,9 @@ describe('ToolbarColor', () => {
   })
 
   it('includes the background tab', () => {
-    const {getAllByRole, getByText} = render(<ToolbarColor bgcolor="#fff" onChange={jest.fn()} />)
+    const {getAllByRole, getByText} = render(
+      <ToolbarColor tabs={{background: '#fff'}} onChange={jest.fn()} />
+    )
     const button = getByText('Color').closest('button') as HTMLButtonElement
     button.click()
 
@@ -65,7 +72,7 @@ describe('ToolbarColor', () => {
 
   it('includes the Border tab and omits the Color tab', () => {
     const {getAllByRole, getByText} = render(
-      <ToolbarColor bgcolor="#fff" bordercolor="#ff0000" onChange={jest.fn()} />
+      <ToolbarColor tabs={{background: '#fff', border: '#ff0000'}} onChange={jest.fn()} />
     )
     const button = getByText('Color').closest('button') as HTMLButtonElement
     button.click()
@@ -78,7 +85,7 @@ describe('ToolbarColor', () => {
 
   it('includes the Color tab and omits the Border tab', () => {
     const {getAllByRole, getByText} = render(
-      <ToolbarColor fgcolor="#000" bgcolor="#fff" onChange={jest.fn()} />
+      <ToolbarColor tabs={{foreground: '#000', background: '#fff'}} onChange={jest.fn()} />
     )
     const button = getByText('Color').closest('button') as HTMLButtonElement
     button.click()
@@ -93,7 +100,9 @@ describe('ToolbarColor', () => {
     window.getComputedStyle = jest.fn().mockReturnValue({
       getPropertyValue: jest.fn().mockReturnValue(DEFAULT_FONT_COLOR),
     })
-    const {getByText} = render(<ToolbarColor bgcolor="#fff" fgcolor="#000" onChange={jest.fn()} />)
+    const {getByText} = render(
+      <ToolbarColor tabs={{backgoound: '#fff', foreground: '#000'}} onChange={jest.fn()} />
+    )
     const button = getByText('Color').closest('button') as HTMLButtonElement
     button.click()
 
@@ -110,7 +119,7 @@ describe('ToolbarColor', () => {
   describe('color tab', () => {
     it('renders the color tab panel', () => {
       const {getAllByRole, getByText, getByDisplayValue} = render(
-        <ToolbarColor bgcolor="#fff" fgcolor="#aabbcc" onChange={jest.fn()} />
+        <ToolbarColor tabs={{background: '#fff', foreground: '#aabbcc'}} onChange={jest.fn()} />
       )
 
       const button = getByText('Color').closest('button') as HTMLButtonElement
@@ -130,7 +139,10 @@ describe('ToolbarColor', () => {
 
     it('does not show the contrast ratio if the background is transparent', () => {
       const {queryByTestId, getByText} = render(
-        <ToolbarColor bgcolor="transparent" fgcolor="#aabbcc" onChange={jest.fn()} />
+        <ToolbarColor
+          tabs={{background: 'transparent', foreground: '#aabbcc'}}
+          onChange={jest.fn()}
+        />
       )
 
       const button = getByText('Color').closest('button') as HTMLButtonElement
@@ -149,7 +161,7 @@ describe('ToolbarColor', () => {
 
     it('switches to the background tab', () => {
       const {getAllByRole, getByText} = render(
-        <ToolbarColor bgcolor="#fff" fgcolor="#000" onChange={jest.fn()} />
+        <ToolbarColor tabs={{background: '#fff', foreground: '#000'}} onChange={jest.fn()} />
       )
       const button = getByText('Color').closest('button') as HTMLButtonElement
       button.click()
@@ -164,7 +176,7 @@ describe('ToolbarColor', () => {
 
     it('renders the background tab panel', () => {
       const {getByText, getByDisplayValue, getByTestId} = render(
-        <ToolbarColor bgcolor="#aabbcc" fgcolor="#000" onChange={jest.fn()} />
+        <ToolbarColor tabs={{background: '#00000000', foreground: '#000'}} onChange={jest.fn()} />
       )
       const button = getByText('Color').closest('button') as HTMLButtonElement
       button.click()
@@ -182,7 +194,7 @@ describe('ToolbarColor', () => {
 
     it('enables the mixer when custom color is selectd', () => {
       const {getByText, getByTestId} = render(
-        <ToolbarColor bgcolor="#aabbcc" fgcolor="#000" onChange={jest.fn()} />
+        <ToolbarColor tabs={{background: '#aabbcc', foreground: '#000'}} onChange={jest.fn()} />
       )
       const button = getByText('Color').closest('button') as HTMLButtonElement
       button.click()
@@ -201,7 +213,10 @@ describe('ToolbarColor', () => {
       // the expect(onchange).toHaveBeenCalledWith is flakey
       const onchange = jest.fn()
       const {getByText, getByTestId, getByDisplayValue, rerender} = render(
-        <ToolbarColor bgcolor="#aabbcc" fgcolor={DEFAULT_FONT_COLOR} onChange={onchange} />
+        <ToolbarColor
+          tabs={{background: '#aabbcc', foreground: DEFAULT_FONT_COLOR}}
+          onChange={onchange}
+        />
       )
       const button = getByText('Color').closest('button') as HTMLButtonElement
       button.click()
@@ -235,7 +250,9 @@ describe('ToolbarColor', () => {
         bordercolor: undefined,
       })
 
-      rerender(<ToolbarColor bgcolor="#aa00cc" fgcolor="#000" onChange={jest.fn()} />)
+      rerender(
+        <ToolbarColor tabs={{background: '#aa00cc', foreground: '#000'}} onChange={jest.fn()} />
+      )
       getByText('Color').closest('button').click()
       screen.getAllByRole('tab')[1].click()
 
@@ -258,7 +275,7 @@ describe('ToolbarColor', () => {
   describe('border tab', () => {
     it('switches to the border tab', () => {
       const {getAllByRole, getByText} = render(
-        <ToolbarColor bgcolor="#fff" bordercolor="#000" onChange={jest.fn()} />
+        <ToolbarColor tabs={{background: '#fff', border: '#000'}} onChange={jest.fn()} />
       )
       const button = getByText('Color').closest('button') as HTMLButtonElement
       button.click()
@@ -273,7 +290,7 @@ describe('ToolbarColor', () => {
 
     it('renders the border tab panel', () => {
       const {getByText, getByDisplayValue, queryByTestId} = render(
-        <ToolbarColor bgcolor="#aabbcc" bordercolor="#000" onChange={jest.fn()} />
+        <ToolbarColor tabs={{background: '#aabbcc', border: '#00000000'}} onChange={jest.fn()} />
       )
       const button = getByText('Color').closest('button') as HTMLButtonElement
       button.click()
@@ -287,6 +304,18 @@ describe('ToolbarColor', () => {
       expect(queryByTestId('color-mixer')).toBeInTheDocument()
       expect(queryByTestId('color-preset')).toBeInTheDocument()
       expect(queryByTestId('color-contrast')).not.toBeInTheDocument()
+    })
+
+    it('renders color contrast when it and the background are not transparent', () => {
+      const {getByText, getByTestId} = render(
+        <ToolbarColor tabs={{background: '#aabbcc', border: '#ff0000'}} onChange={jest.fn()} />
+      )
+      const button = getByText('Color').closest('button') as HTMLButtonElement
+      button.click()
+      const tabs = screen.getAllByRole('tab')
+      tabs[1].click()
+
+      expect(getByTestId('color-contrast')).toBeInTheDocument()
     })
   })
 })
