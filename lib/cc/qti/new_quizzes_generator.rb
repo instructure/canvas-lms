@@ -43,7 +43,8 @@ module CC
             file_path = migration_ids_replacer.replace_in_string(f.sub("#{tmpdir}/", ""))
             file_dir = file_path.split("/").first
             file_name = file_path.split("/").last
-            dest_dir = File.join(export_dir, file_dir)
+            dest_sub_dir = (file_dir == "Uploaded Media") ? "web_resources/Uploaded Media" : file_dir
+            dest_dir = File.join(export_dir, dest_sub_dir)
 
             file_content = File.read(f)
 
@@ -54,7 +55,7 @@ module CC
 
             FileUtils.mkdir_p(dest_dir)
             File.binwrite(File.join(dest_dir, file_name), file_content)
-            file_path
+            File.join(dest_sub_dir, file_name)
           end
         end
       end
@@ -93,7 +94,7 @@ module CC
             ident = file_path.sub("non_cc_assessments/", "").split(".").first
           elsif file_path.end_with?("assessment_meta.xml")
             ident = file_path.split("/").first
-          elsif file_path.start_with?("Uploaded Media")
+          elsif file_path.start_with?("web_resources/Uploaded Media")
             ident = "uploaded_media"
           end
 
