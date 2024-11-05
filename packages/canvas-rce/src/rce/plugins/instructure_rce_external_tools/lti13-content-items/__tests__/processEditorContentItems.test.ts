@@ -131,6 +131,29 @@ describe('processEditorContentItems', () => {
       expect(dialog.close).not.toHaveBeenCalled()
     })
 
+    it('shows a message with showFlashAlert() if msg is present', async () => {
+      const ev = {data: {content_items: validContentItems, msg: 'test message'}}
+      const dialog = {close: jest.fn()}
+
+      await processEditorContentItems(ev, externalToolsEnvFor(editor), dialog)
+      expect(showFlashAlertSpy).toHaveBeenCalledTimes(1)
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: 'test message',
+      })
+    })
+
+    it('shows an error message with showFlashAlert() if errormsg is present', async () => {
+      const ev = {data: {content_items: validContentItems, errormsg: 'test error message'}}
+      const dialog = {close: jest.fn()}
+
+      await processEditorContentItems(ev, externalToolsEnvFor(editor), dialog)
+      expect(showFlashAlertSpy).toHaveBeenCalledTimes(1)
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: 'test error message',
+        type: 'error',
+      })
+    })
+
     it('handles an event with all unsupported items, showing a warning once and closing the dialog', async () => {
       const dialog = {close: jest.fn()}
 
