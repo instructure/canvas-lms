@@ -341,8 +341,13 @@ class AssignmentsController < ApplicationController
 
         env = js_env({
                        COURSE_ID: @context.id,
-                       ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session)
+                       ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
+                       HAS_GRADING_PERIODS: @context.grading_periods?,
+                       VALID_DATE_RANGE: CourseDateRange.new(@context),
+                       POST_TO_SIS: Assignment.sis_grade_export_enabled?(@context),
+                       DUE_DATE_REQUIRED_FOR_ACCOUNT: AssignmentUtil.due_date_required_for_account?(@context)
                      })
+        set_section_list_js_env
         submission = @assignment.submissions.find_by(user: @current_user)
         if submission
           js_env({ SUBMISSION_ID: submission.id })

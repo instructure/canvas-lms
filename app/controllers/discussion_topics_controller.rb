@@ -441,6 +441,9 @@ class DiscussionTopicsController < ApplicationController
         }
         if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :read) && @js_env&.dig(:COURSE_ID).blank?
           hash[:COURSE_ID] = @context.id.to_s
+          set_section_list_js_env
+          hash[:VALID_DATE_RANGE] = CourseDateRange.new(@context)
+          hash[:HAS_GRADING_PERIODS] = @context.grading_periods?
         end
         conditional_release_js_env(includes: :active_rules)
         append_sis_data(hash)
@@ -772,6 +775,9 @@ class DiscussionTopicsController < ApplicationController
       }
       unless @context.is_a?(Group)
         env_hash[:context_rubric_associations_url] = context_url(@context, :context_rubric_associations_url)
+        env_hash[:VALID_DATE_RANGE] = CourseDateRange.new(@context)
+        env_hash[:HAS_GRADING_PERIODS] = @context.grading_periods?
+        set_section_list_js_env
       end
       if params[:entry_id] && (entry = @topic.discussion_entries.find_by(id: params[:entry_id]))
         entry = @topic.discussion_entries.find(params[:entry_id])
@@ -878,7 +884,6 @@ class DiscussionTopicsController < ApplicationController
                discussion_cache_key: @current_user &&
                  Base64.encode64("#{@current_user.uuid}vyfW=;[p-0?:{P_=HUpgraqe;njalkhpvoiulkimmaqewg")
              })
-
       unless @locked
         InstStatsd::Statsd.increment("discussion_topic.visit.redesign")
         InstStatsd::Statsd.count("discussion_topic.visit.entries.redesign", @topic.discussion_entries.count)
@@ -1900,5 +1905,34 @@ class DiscussionTopicsController < ApplicationController
       { group:, topic: topics.find { |t| t.context == group } }
     end
     topics
+  end
+
+  def set_section_list_js_env
+    section_visibilities =
+      if @context.respond_to?(:course_section_visibility)
+        @context.course_section_visibility(@current_user)
+      else
+        :none
+      end
+
+    sections =
+      case section_visibilities
+      when :none
+        []
+      when :all
+        @context.course_sections.active.to_a
+      else
+        @context.course_sections.select { |s| s.active? && section_visibilities.include?(s.id) }
+      end
+
+    js_env SECTION_LIST: sections.map { |section|
+      {
+        id: section.id,
+        name: section.name,
+        start_at: section.start_at,
+        end_at: section.end_at,
+        override_course_and_term_dates: section.restrict_enrollments_to_section_dates
+      }
+    }
   end
 end
