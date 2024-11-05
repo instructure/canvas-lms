@@ -3723,6 +3723,7 @@ tr:
       permissions: "%{name} için izinler düzenleniyor"
     unpublished_title: Yayınlanmadı
   broken_file_link_found_in_your_course_7cc24395: "Dersinizde bozuk dosya bağlantısı var"
+  browse_courses_c8af1754: "Derslere gözat"
   browse_your_computer_9a735a4: "bilgisayara gözat"
   browse_your_computer_for_a_course_image_d7db2376: "Ders görseli için bilgisayarınıza gözatın"
   bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "birikim adı şunlardan biri olmalı: %{bucket_names}"
