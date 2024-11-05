@@ -117,6 +117,18 @@ shared_examples_for "selective_release assign to tray" do |context|
     expect(assign_to_until_time(0).attribute("value")).to eq("9:00 PM")
   end
 
+  it "does not Save assigment if no changes have been made" do
+    get @mod_url
+
+    click_manage_assignment_button(@assignment1.id)
+    click_assign_to_menu_link(@assignment1.id)
+
+    expect(item_tray_exists?).to be true
+    click_save_button
+    expect(element_exists?(loading_spinner_selector)).to be_falsey
+    expect(item_tray_exists?).to be false
+  end
+
   it "assigns student for a NQ quiz and saves" do
     new_quiz_assignment = @course.assignments.create!(title: "new quizzes assignment")
     new_quiz_assignment.quiz_lti!

@@ -1771,6 +1771,7 @@ describe "discussions" do
           end
 
           it "does not create an override if the modules override is not updated" do
+            skip("Assign to tray is no longer used in the edit page")
             graded_discussion = create_graded_discussion(course)
             module1 = course.context_modules.create!(name: "Module 1")
             graded_discussion.context_module_tags.create! context_module: module1, context: course, tag_type: "context_module"
@@ -1812,9 +1813,9 @@ describe "discussions" do
             # Expect there to be no highlighted cards
             expect(module_item_assign_to_card.count).to eq 1
             expect(f("body")).not_to contain_jqcss(highlighted_card_selector)
-            click_save_button("Apply")
+            click_cancel_button
 
-            # Expect that if no changes were made, that the apply button doens't highlight old cards
+            # Expect that if no changes were made, that the cancel button doens't highlight old cards
             Discussion.assign_to_button.click
             wait_for_assign_to_tray_spinner
             expect(module_item_assign_to_card.count).to eq 1
@@ -2957,6 +2958,7 @@ describe "discussions" do
           end
 
           it "checkpointed discussion assigned to Everyone with no dates appears correctly with assign to tray" do
+            skip("Assign to tray is no longer used in the edit page")
             Account.site_admin.disable_feature!(:selective_release_edit_page)
 
             get "/courses/#{course.id}/discussion_topics/new"

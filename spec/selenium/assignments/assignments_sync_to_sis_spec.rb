@@ -199,7 +199,7 @@ describe "assignments sync to sis" do
 
           expect(assign_to_date_and_time[0].text).not_to include("Please add a due date")
 
-          click_save_button("Apply")
+          click_cancel_button
           keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
 
           AssignmentCreateEditPage.click_post_to_sis_checkbox

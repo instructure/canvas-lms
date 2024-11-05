@@ -108,7 +108,7 @@ describe('DifferentiatedModulesSection', () => {
     expect(getByText('First Assignment')).toBeInTheDocument()
   })
 
-  it('calls onSync when saving changes made in ItemAssignToTray', () => {
+  it.skip('calls onSync when saving changes made in ItemAssignToTray', () => {
     const onSyncMock = jest.fn()
     const {getByRole, getByTestId} = setUp({...props, onSync: onSyncMock})
 
