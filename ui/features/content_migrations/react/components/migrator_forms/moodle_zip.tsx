@@ -88,6 +88,7 @@ const MoodleZipImporter = ({
         questionBankSettings={questionBankSettings}
       />
       <CommonMigratorControls
+        canSelectContent={true}
         fileUploadProgress={fileUploadProgress}
         isSubmitting={isSubmitting}
         canAdjustDates={true}

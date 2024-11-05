@@ -27,7 +27,7 @@ const onCancel = jest.fn()
 const renderComponent = (overrideProps?: any) =>
   render(<MoodleZipImporter onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
 
-describe('CanvasCartridgeImporter', () => {
+describe('MoodleZipImporter', () => {
   beforeAll(() => (window.ENV.UPLOAD_LIMIT = 1024))
 
   afterEach(() => jest.clearAllMocks())
@@ -69,6 +69,8 @@ describe('CanvasCartridgeImporter', () => {
       expect(screen.getByTestId('migrationFileUpload')).toBeDisabled()
       expect(screen.getByRole('button', {name: 'Cancel'})).toBeDisabled()
       expect(screen.getByRole('button', {name: /Adding.../})).toBeDisabled()
+      expect(screen.getByRole('radio', {name: /All content/})).toBeDisabled()
+      expect(screen.getByRole('radio', {name: 'Select specific content'})).toBeDisabled()
       expect(screen.getByRole('checkbox', {name: 'Adjust events and due dates'})).toBeDisabled()
     })
   })
