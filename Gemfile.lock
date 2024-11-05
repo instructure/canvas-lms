@@ -1277,6 +1277,7 @@ DEPENDENCIES
   graphql (~> 2.3.0)
   graphql-batch (~> 0.5)
   guardrail (~> 3.0)
+  hashdiff (~> 1.1)
   headless (= 2.3.1)
   highline (~> 3.0)
   html_text_helper!
