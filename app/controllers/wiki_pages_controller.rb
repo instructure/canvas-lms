@@ -181,6 +181,18 @@ class WikiPagesController < ApplicationController
       CAN_SET_TODO_DATE: context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit),
       text_editor_preference: @current_user&.reload&.get_preference(:text_editor_preference)
     }
+    if context.is_a?(Course)
+      @wiki_pages_env[:VALID_DATE_RANGE] = CourseDateRange.new(context)
+      @wiki_pages_env[:SECTION_LIST] = context.course_sections.active.map do |section|
+        {
+          id: section.id,
+          name: section.name,
+          start_at: section.start_at,
+          end_at: section.end_at,
+          override_course_and_term_dates: section.restrict_enrollments_to_section_dates
+        }
+      end
+    end
     if Account.site_admin.feature_enabled?(:permanent_page_links)
       title_availability_path = context.is_a?(Course) ? api_v1_course_page_title_availability_path : api_v1_group_page_title_availability_path
       @wiki_pages_env[:TITLE_AVAILABILITY_PATH] = title_availability_path
