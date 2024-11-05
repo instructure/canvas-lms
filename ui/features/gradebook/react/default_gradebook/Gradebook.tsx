@@ -120,7 +120,7 @@ import type {StatusColors} from './constants/colors'
 import type {ProxyDetails} from '@canvas/proxy-submission/react/ProxyUploadModal'
 import type TotalGradeColumnHeader from './GradebookGrid/headers/TotalGradeColumnHeader'
 import type {SendMessageArgs} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
-
+import {QueryProvider} from '@canvas/query'
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
 // @ts-expect-error
 import KeyboardNavTemplate from '@canvas/keyboard-nav-dialog/jst/KeyboardNavDialog.handlebars'
@@ -261,6 +261,7 @@ import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {TotalGradeOverrideTrayProvider} from './components/TotalGradeOverrideTray'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {RubricAssessmentImportTray} from './RubricAssessmentImport/RubricAssessmentImportTray'
+import {RubricAssessmentExportModal} from './RubricAssessmentExport/RubricAssessmentExportModal'
 
 const I18n = useI18nScope('gradebook')
 
@@ -5397,6 +5398,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
             onClickImport={() => {}}
             onImport={() => {}}
           />
+        )}
+
+        {this.options.rubric_assessment_imports_exports_enabled && (
+          <QueryProvider>
+            <RubricAssessmentExportModal />
+          </QueryProvider>
         )}
       </>
     )

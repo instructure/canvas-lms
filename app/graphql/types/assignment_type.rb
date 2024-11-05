@@ -121,6 +121,19 @@ module Types
       end
     end
 
+    class AssignmentRubricAssessmentType < ApplicationObjectType
+      description "RubricAssessments on an Assignment"
+
+      field :assessments_count,
+            Int,
+            "The count of RubricAssessments on an Assignment.",
+            null: true
+
+      def assessments_count
+        Loaders::AssignmentRubricAssessmentsCountLoader.load(object)
+      end
+    end
+
     class AssignmentScoreStatisticType < ApplicationObjectType
       graphql_name "AssignmentScoreStatistic"
       description "Statistics for an Assignment"
@@ -219,6 +232,11 @@ module Types
 
     field :moderated_grading, AssignmentModeratedGrading, null: true
     def moderated_grading
+      assignment
+    end
+
+    field :rubric_assessment, AssignmentRubricAssessmentType, null: true
+    def rubric_assessment
       assignment
     end
 
