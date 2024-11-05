@@ -213,7 +213,11 @@ class Quizzes::QuizQuestionsController < ApplicationController
     end
 
     if authorized_action(@quiz, @current_user, :update)
-      render_question_set(@quiz.active_quiz_questions)
+      # active_quiz_questions are primarily ordered by position, but since quiz_questions
+      # are not guaranteed to be unique by position (due to the way we position questions in groups),
+      # we also order by id here to ensure a consistent ordering. Without this secondary order,
+      # pagination can result in duplicates or omissions accross pages.
+      render_question_set(@quiz.active_quiz_questions.order(:id))
     end
   end
 
