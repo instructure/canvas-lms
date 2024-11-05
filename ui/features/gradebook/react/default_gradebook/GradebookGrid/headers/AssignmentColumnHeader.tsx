@@ -257,6 +257,11 @@ export default class AssignmentColumnHeader extends ColumnHeader<
     }
   }
 
+  selectBulkRubricExport() {
+    const {toggleRubricAssessmentExportModal} = useStore.getState()
+    toggleRubricAssessmentExportModal(true, this.props.allStudents.length, this.props.assignment)
+  }
+
   activeStudentDetails() {
     const activeStudents = this.props
       .getCurrentlyShownStudents()
@@ -465,7 +470,9 @@ export default class AssignmentColumnHeader extends ColumnHeader<
         )}
 
         {this.props.rubricAssessmentImportsExportsEnabled && (
-          <MenuItem onSelect={() => {}}>{I18n.t('Bulk Download Rubrics')}</MenuItem>
+          <MenuItem onSelect={() => this.selectBulkRubricExport()}>
+            {I18n.t('Bulk Download Rubrics')}
+          </MenuItem>
         )}
         {this.props.rubricAssessmentImportsExportsEnabled && (
           <MenuItem
