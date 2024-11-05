@@ -3215,6 +3215,7 @@ uk:
       до вашого курсу Canvas.
   bring_your_content_into_your_course_c0f3df7e: "Введіть свій контент в свій курс"
   broken_file_link_found_in_your_course_7cc24395: "В вашому курсі знайдено недійсне посилання на файл"
+  browse_courses_c8af1754: "Перегляд курсів"
   browse_your_computer_9a735a4: "Огляд Вашого комп'ютера"
   browse_your_computer_for_a_course_image_d7db2376: "Огляд Вашого комп'ютера для зображення курсу"
   bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "ім'я bucket має бути одним з наступних: %{bucket_names}"
