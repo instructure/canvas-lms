@@ -69,6 +69,10 @@ describe "profile" do
     wait_for_new_page_load { submit_form(edit_form) }
   end
 
+  def close_instui_dialog
+    f("[role=dialog] [class*='closeButton']").click
+  end
+
   it "gives error - wrong old password" do
     log_in_to_settings
     change_password("wrongoldpassword", "newpassword")
@@ -119,10 +123,11 @@ describe "profile" do
       form.find_element(:name, "email").send_keys(test_email)
       submit_form(form)
 
-      confirmation_dialog = f("#confirm_email_channel")
+      confirmation_dialog_selector = "[role=dialog][aria-label='Confirm Email Address']"
+      confirmation_dialog = f(confirmation_dialog_selector)
       expect(confirmation_dialog).to be_displayed
-      submit_dialog(confirmation_dialog, ".cancel_button")
-      expect(confirmation_dialog).not_to be_displayed
+      submit_form(confirmation_dialog)
+      expect(element_exists?(confirmation_dialog_selector)).to be_falsey
       expect(f(".email_channels")).to include_text(test_email)
     end
 
@@ -221,7 +226,7 @@ describe "profile" do
         driver.action.send_keys(:tab).perform
         submit_form(register_form)
         wait_for_ajaximations
-        close_visible_dialog
+        close_instui_dialog
         expect(f(".other_channels .path")).to include_text(test_cell_number)
       end
 
@@ -281,7 +286,7 @@ describe "profile" do
         driver.action.send_keys(:tab).perform
         submit_form(register_form)
         wait_for_ajaximations
-        close_visible_dialog
+        close_instui_dialog
         expect(f(".other_channels .path")).to include_text(test_cell_number)
       end
 
@@ -313,7 +318,7 @@ describe "profile" do
         driver.action.send_keys(:tab).perform
         submit_form(register_form)
         wait_for_ajaximations
-        close_visible_dialog
+        close_instui_dialog
         expect(f(".other_channels .path")).to include_text(test_cell_number)
       end
 
@@ -342,7 +347,7 @@ describe "profile" do
       register_form.find_element(:name, "slack").send_keys(test_slack_email)
       submit_form(register_form)
       wait_for_ajaximations
-      close_visible_dialog
+      close_instui_dialog
       expect(f(".other_channels .path")).to include_text(test_slack_email)
     end
 
