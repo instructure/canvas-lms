@@ -29,7 +29,11 @@ const QUERY = gql`
       ... on Course {
         id
         name
-        enrollmentsConnection(filter: {types: StudentEnrollment}, first: 100, after: $cursor) {
+        enrollmentsConnection(
+          filter: {types: StudentEnrollment, states: [invited, active]}
+          first: 100
+          after: $cursor
+        ) {
           edges {
             cursor
             node {
