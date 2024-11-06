@@ -1747,7 +1747,6 @@ class AccountsController < ApplicationController
         @account.grants_any_right?(
           @current_user,
           session,
-          :manage_groups,
           *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS
         ),
       can_create_enrollments: @account.grants_any_right?(@current_user, session, *add_enrollment_permissions(@account))

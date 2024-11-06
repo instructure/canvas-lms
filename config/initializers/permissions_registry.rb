@@ -1129,21 +1129,6 @@ Rails.application.config.to_prepare do
           AccountAdmin
         ]
       },
-      # lagacy role override
-      manage_groups: {
-        label: -> { I18n.t("Manage (create / edit / delete) groups") },
-        label_v2: -> { I18n.t("Groups - add / edit / delete") },
-        available_to: %w[
-          TaEnrollment
-          DesignerEnrollment
-          TeacherEnrollment
-          AccountAdmin
-          AccountMembership
-        ],
-        true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
-        acts_as_access_token_scope: true,
-        account_allows: ->(a) { !a.root_account.feature_enabled?(:granular_permissions_manage_groups) }
-      },
       manage_groups_add: {
         label: -> { I18n.t("Add groups") },
         label_v2: -> { I18n.t("Groups - add") },
@@ -1157,8 +1142,7 @@ Rails.application.config.to_prepare do
           AccountMembership
         ],
         true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
-        acts_as_access_token_scope: true,
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_groups) }
+        acts_as_access_token_scope: true
       },
       manage_groups_manage: {
         label: -> { I18n.t("Manage groups") },
@@ -1173,8 +1157,7 @@ Rails.application.config.to_prepare do
           AccountMembership
         ],
         true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
-        acts_as_access_token_scope: true,
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_groups) }
+        acts_as_access_token_scope: true
       },
       manage_groups_delete: {
         label: -> { I18n.t("Delete groups") },
@@ -1189,8 +1172,7 @@ Rails.application.config.to_prepare do
           AccountMembership
         ],
         true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
-        acts_as_access_token_scope: true,
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_groups) }
+        acts_as_access_token_scope: true
       },
       manage_tags_add: {
         label: -> { I18n.t("Add Differentiated Tags") },

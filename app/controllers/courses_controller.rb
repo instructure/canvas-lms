@@ -2378,7 +2378,7 @@ class CoursesController < ApplicationController
           load_announcements
         else
           set_active_tab "home"
-          if @context.grants_any_right?(@current_user, session, :manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
+          if @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
             @contexts += @context.groups
           elsif @user_groups
             @contexts += @user_groups
@@ -2452,10 +2452,7 @@ class CoursesController < ApplicationController
               manage: @context.grants_right?(@current_user, session, :manage),
               manage_groups: @context.grants_any_right?(@current_user,
                                                         session,
-                                                        :manage_groups,
-                                                        :manage_groups_add,
-                                                        :manage_groups_manage,
-                                                        :manage_groups_delete),
+                                                        *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS),
               read_as_admin: @context.grants_right?(@current_user, session, :read_as_admin),
               read_announcements: @context.grants_right?(@current_user, session, :read_announcements)
             },

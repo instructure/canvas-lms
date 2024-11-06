@@ -159,7 +159,6 @@ class CollaborationsController < ApplicationController
              @context.grants_any_right?(
                @current_user,
                session,
-               :manage_groups,
                *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS
              ),
            collaboration_types: Collaboration.collaboration_types,
