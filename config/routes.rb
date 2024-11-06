@@ -320,6 +320,7 @@ CanvasRails::Application.routes.draw do
         resources :rubric_assessments, path: :assessments do
           collection do
             get :export
+            post :import
           end
         end
       end

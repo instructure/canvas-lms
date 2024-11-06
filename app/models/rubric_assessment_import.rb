@@ -74,4 +74,82 @@ class RubricAssessmentImport < ApplicationRecord
       singleton: ["RubricAssessmentImport::run", assignment.global_id, attachment.global_id]
     ).run
   end
+
+  def run
+    assignment.root_account.shard.activate do
+      job_started!
+      error_data = process_assessments
+      unless error_data.empty?
+        update!(error_count: error_data.count, error_data:)
+        job_completed_with_errors!
+        track_error
+        return
+      end
+      job_completed!
+    rescue DataFormatError => e
+      ErrorReport.log_exception("rubric_assessments_import_data_format", e)
+      update!(error_count: 1, error_data: [{ message: e.message }])
+      track_error
+      job_failed!
+    rescue CSV::MalformedCSVError => e
+      ErrorReport.log_exception("rubric_assessments_import_csv", e)
+      update!(error_count: 1, error_data: [{ message: I18n.t("The file is not a valid CSV file."), exception: e.message }])
+      track_error
+    rescue => e
+      ErrorReport.log_exception("rubric_assessments_import", e)
+      update!(error_count: 1, error_data: [{ message: I18n.t("An error occurred while importing rubrics."), exception: e.message }])
+      track_error
+      job_failed!
+    end
+  end
+
+  def track_error
+    InstStatsd::Statsd.increment("#{assignment.class.to_s.downcase}.rubrics.csv_imported_with_error")
+  end
+
+  def process_assessments
+    error_data = []
+
+    rubric_association = assignment.rubric_association
+    rubric = rubric_association.rubric
+    assessments_by_student = RubricAssessmentCSVImporter.new(attachment, rubric, rubric_association).parse
+    raise DataFormatError, I18n.t("The file is empty or does not contain valid assessment data.") if assessments_by_student.empty?
+
+    total_assessments = assessments_by_student.keys.count
+
+    students = User.where(id: assessments_by_student.keys).index_by(&:id)
+    student_submissions = assignment.submissions.where(user_id: students.keys).index_by(&:user_id)
+
+    assessments_by_student.each_with_index do |(student_id, assessment), student_index|
+      student_to_assess = students[student_id.to_i]
+
+      raise DataFormatError, I18n.t("Student with ID %{student_id} not found.", student_id:) unless student_to_assess
+      raise UnauthorizedError unless rubric_association.user_can_assess_for?(assessor: user, assessee: student_to_assess)
+
+      assessment = assessment.each_with_object({}) do |criterion, hash|
+        hash[:"criterion_#{criterion[:id]}"] = {
+          points: criterion[:points],
+          comments: criterion[:comments],
+          description: criterion[:rating]
+        }
+      end
+      assessment[:assessment_type] = "grading"
+
+      rubric_association.assess(
+        assessor: user,
+        user: student_to_assess,
+        artifact: student_submissions[student_id.to_i],
+        assessment:,
+        graded_anonymously: false
+      )
+      update!(progress: ((student_index + 1) * 100 / total_assessments))
+    rescue DataFormatError => e
+      error_data << { message: e.message }
+    rescue UnauthorizedError => e
+      error_data << { message: I18n.t("Student ID %{student_id} unauthorized for assessment", student_id:), exception: e.message }
+    rescue ActiveRecord::StatementInvalid => e
+      error_data << { message: I18n.t("Student ID %{student_id} could not be assessed", student_id:), exception: e.message }
+    end
+    error_data
+  end
 end
