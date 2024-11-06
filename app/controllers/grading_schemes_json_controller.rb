@@ -163,7 +163,7 @@ class GradingSchemesJsonController < ApplicationController
 
     respond_to do |format|
       if @context.save
-        recompute_assignments_using_account_default(@context, @context.grading_standard)
+        recompute_assignments_using_account_default(@context, @context.grading_standard || GradingStandard.default_instance)
         format.json { render json: response }
       else
         format.json { render json: @context.errors, status: :bad_request }
