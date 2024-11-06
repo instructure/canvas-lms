@@ -119,7 +119,7 @@
         },
         "isCanvas": false,
         "props": {
-          "src": "/images/block_editor/templates/canvas_logo_black.svg",
+          "src": "/images/block_editor/templates/canvas_logo.svg",
           "variant": "default",
           "constraint": "cover",
           "maintainAspectRatio": true,
@@ -1059,7 +1059,7 @@
         },
         "isCanvas": false,
         "props": {
-          "src": "/images/block_editor/templates/canvas_logo_white.svg",
+          "src": "/images/block_editor/templates/canvas_logo.svg",
           "variant": "default",
           "constraint": "contain",
           "maintainAspectRatio": false,
