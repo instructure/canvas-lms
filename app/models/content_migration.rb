@@ -1231,7 +1231,6 @@ class ContentMigration < ActiveRecord::Base
     # mig_ids are md5 hashes (eg they have 32 digits), so there should be zero overlap with
     # the src_ids which are DB primary keys or global_ids and they can safely be stored on the same
     # hash.
-    #
     src_asset_fields[:id] = src_asset_fields[:id].to_s if src_asset_fields[:id]
     dest_asset_fields[:id] = dest_asset_fields[:id].to_s
 
@@ -1294,12 +1293,6 @@ class ContentMigration < ActiveRecord::Base
       next if mig_id_to_dest_id.empty?
 
       mapping[key] ||= {}
-      unless source_course.present?
-        mig_id_to_dest_id.each do |mig_id, mig_fields|
-          add_asset_pair_to_mapping(mapping, key, mig_id, {}, mig_fields)
-        end
-        next
-      end
 
       if master_template
         # migration_ids are complicated in blueprint courses; fortunately, we have a stored mapping
@@ -1338,16 +1331,16 @@ class ContentMigration < ActiveRecord::Base
         src_fields = [:id, *migration_data_fields_for(asset_type)]
         # with course copy, there is no stored mapping between source id and migration_id,
         # so we will need to recompute migration_ids to discover the mapping
-        source_course.shard.activate do
-          srcs = klass.where(context: source_course).pluck(*src_fields).map do |field_values|
-            src_fields.zip(Array.wrap(field_values)).to_h
+        srcs = {}
+        if source_course.present?
+          source_course.shard.activate do
+            srcs = klass.where(context: source_course).select(*src_fields).each_with_object({}) do |src, by_mig_id|
+              by_mig_id[CC::CCHelper.create_key(src.asset_string, global: global_ids)] = src.attributes.with_indifferent_access.slice(*src_fields)
+            end
           end
-          srcs.each do |src|
-            asset_string = klass.asset_string(src[:id])
-            mig_id = CC::CCHelper.create_key(asset_string, global: global_ids)
-
-            add_asset_pair_to_mapping(mapping, key, mig_id, src, mig_id_to_dest_id[mig_id]) if mig_id_to_dest_id[mig_id]
-          end
+        end
+        mig_id_to_dest_id.each do |mig_id, mig_fields|
+          add_asset_pair_to_mapping(mapping, key, mig_id, srcs[mig_id] || {}, mig_fields)
         end
       end
     end
