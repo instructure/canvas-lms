@@ -18,10 +18,11 @@
 
 import React, {useCallback, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {Text} from '@instructure/ui-text'
+import type {FormMessage} from '@instructure/ui-form-field'
 import CommonMigratorControls from './common_migrator_controls'
 import type {onSubmitMigrationFormCallback} from '../types'
 import MigrationFileInput from './file_input'
+import {noFileSelectedFormMessage} from '../utils'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -64,12 +65,8 @@ const CanvasCartridgeImporter = ({
         fileUploadProgress={fileUploadProgress}
         onChange={setFile}
         isSubmitting={isSubmitting}
+        externalFormMessage={fileError ? noFileSelectedFormMessage : undefined}
       />
-      {fileError && (
-        <p>
-          <Text color="danger">{I18n.t('You must select a file to import content from')}</Text>
-        </p>
-      )}
       <CommonMigratorControls
         fileUploadProgress={fileUploadProgress}
         isSubmitting={isSubmitting}

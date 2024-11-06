@@ -16,12 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {IconUploadSolid} from '@instructure/ui-icons'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {humanReadableSize} from '../utils'
 import {ProgressBar} from '@instructure/ui-progress'
 import type {FormMessage} from '@instructure/ui-form-field'
@@ -34,18 +33,26 @@ type MigrationFileInputProps = {
   accepts?: string | undefined
   fileUploadProgress: number | null
   isSubmitting?: boolean
+  externalFormMessage?: FormMessage
 }
+
+const getHintMessage = (text: string): FormMessage => ({text, type: 'hint'})
+const getErrorMessage = (text: string): FormMessage => ({text, type: 'error'})
 
 const MigrationFileInput = ({
   onChange,
   accepts,
   fileUploadProgress,
   isSubmitting,
+  externalFormMessage,
 }: MigrationFileInputProps) => {
-  const [alert, setAlert] = useState<FormMessage>({
-    text: I18n.t('No file chosen'),
-    type: 'hint',
-  })
+  const [formMessage, setFormMessage] = useState<FormMessage>(
+    externalFormMessage || {text: I18n.t('No file chosen'), type: 'hint'}
+  )
+
+  useEffect(() => {
+    externalFormMessage && setFormMessage(externalFormMessage)
+  }, [externalFormMessage])
 
   const handleDropAccepted = useCallback(
     (files: ArrayLike<DataTransferItem | File>) => {
@@ -59,24 +66,26 @@ const MigrationFileInput = ({
       }
       if (ENV.UPLOAD_LIMIT && selectedFile.size > ENV.UPLOAD_LIMIT) {
         onChange(null)
-        return showFlashError(
-          I18n.t('Your migration can not exceed %{upload_limit}', {
-            upload_limit: humanReadableSize(ENV.UPLOAD_LIMIT),
-          })
-        )()
+        return setFormMessage(
+          getErrorMessage(
+            I18n.t('Your migration can not exceed %{upload_limit}', {
+              upload_limit: humanReadableSize(ENV.UPLOAD_LIMIT),
+            })
+          )
+        )
       }
       if (selectedFile.name) {
-        setAlert({text: selectedFile.name, type: 'hint'})
+        setFormMessage(getHintMessage(selectedFile.name))
       }
       onChange(selectedFile)
     },
-    [onChange, setAlert]
+    [onChange, setFormMessage]
   )
 
   const handleDropRejected = useCallback(() => {
     onChange(null)
-    setAlert({text: I18n.t('Invalid file type'), type: 'error'})
-  }, [onChange, setAlert])
+    setFormMessage(getErrorMessage(I18n.t('Invalid file type')))
+  }, [onChange, setFormMessage])
 
   return (
     <>
@@ -91,7 +100,7 @@ const MigrationFileInput = ({
         interaction={isSubmitting ? 'disabled' : 'enabled'}
         data-testid="migrationFileUpload"
         onDropRejected={handleDropRejected}
-        messages={[alert]}
+        messages={[formMessage]}
         renderLabel={
           <View as="div" textAlign="center" padding="x-large large">
             <IconUploadSolid />

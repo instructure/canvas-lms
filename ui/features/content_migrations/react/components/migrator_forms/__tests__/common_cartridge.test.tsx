@@ -128,4 +128,16 @@ describe('CommonCartridgeImporter', () => {
       expect(queryByLabelText('New question bank')).not.toBeInTheDocument()
     })
   })
+
+  describe('submit error', () => {
+    describe('file input error', () => {
+      const expectedFileMissingError = 'You must select a file to import content from'
+
+      it('renders the file missing error', async () => {
+        renderComponent()
+        await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+        expect(screen.getByText(expectedFileMissingError)).toBeInTheDocument()
+      })
+    })
+  })
 })
