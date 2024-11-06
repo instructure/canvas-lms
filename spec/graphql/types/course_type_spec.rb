@@ -884,17 +884,94 @@ describe Types::CourseType do
     end
   end
 
-  describe "GroupSetsConnection" do
+  describe "groupSetsConnection" do
     before(:once) do
+      @teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: Account.default.id)
       @project_groups = course.group_categories.create! name: "Project Groups"
       @student_groups = GroupCategory.student_organized_for(course)
+      @non_collaborative_groups = course.group_categories.create! name: "NC Groups", non_collaborative: true
     end
 
-    it "returns project groups" do
+    it "returns project group sets (not student_organized, not non_collaborative) when not asked for" do
       expect(
         course_type.resolve("groupSetsConnection { edges { node { _id } } }",
                             current_user: @teacher)
       ).to eq [@project_groups.id.to_s]
+    end
+
+    it "includes non_collaborative group sets when asked for by someone with permissions" do
+      RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+        @course.account.role_overrides.create!(
+          permission:,
+          role: @teacher_role,
+          enabled: true
+        )
+      end
+
+      expect(
+        course_type.resolve("groupSetsConnection(includeNonCollaborative: true) { edges { node { _id } } }",
+                            current_user: @teacher)
+      ).to match_array [@project_groups.id.to_s, @non_collaborative_groups.id.to_s]
+    end
+
+    it "does not include non_collaborative group sets when asked for by someone without permissions" do
+      RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+        @course.account.role_overrides.create!(
+          permission:,
+          role: @teacher_role,
+          enabled: false
+        )
+      end
+      expect(
+        course_type.resolve("groupSetsConnection { edges { node { _id } } }",
+                            current_user: @teacher)
+      ).to eq [@project_groups.id.to_s]
+    end
+  end
+
+  describe "groupSets" do
+    before(:once) do
+      @teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: Account.default.id)
+      @project_groups = course.group_categories.create! name: "Project Groups"
+      @student_groups = GroupCategory.student_organized_for(course)
+      @non_collaborative_groups = course.group_categories.create! name: "NC Groups", non_collaborative: true
+    end
+
+    it "returns project group sets (not student_organized, not non_collaborative) when not asked for" do
+      expect(
+        course_type.resolve("groupSets { _id}",
+                            current_user: @teacher)
+      ).to eq [@project_groups.id.to_s]
+    end
+
+    it "includes non_collaborative group sets when asked for by someone with permissions" do
+      RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+        @course.account.role_overrides.create!(
+          permission:,
+          role: @teacher_role,
+          enabled: true
+        )
+      end
+
+      expect(
+        course_type.resolve("groupSets(includeNonCollaborative: true) { _id }",
+                            current_user: @teacher)
+      ).to match_array [@project_groups.id.to_s, @non_collaborative_groups.id.to_s]
+    end
+
+    it "excludes non_collaborative group sets when asked for by someone without permissions" do
+      RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+        @course.account.role_overrides.create!(
+          permission:,
+          role: @teacher_role,
+          enabled: false
+        )
+      end
+
+      expect(
+        course_type.resolve("groupSets(includeNonCollaborative: true) { _id }",
+                            current_user: @teacher)
+      ).to match_array [@project_groups.id.to_s]
     end
   end
 
