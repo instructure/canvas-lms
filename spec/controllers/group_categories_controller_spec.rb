@@ -61,8 +61,7 @@ describe GroupCategoriesController do
       assert_unauthorized
     end
 
-    it "requires teacher default enabled :manage_groups_add (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+    it "requires teacher default enabled :manage_groups_add" do
       user_session(@teacher)
       post "create", params: { course_id: @course.id, category: { name: "My Category" } }
       expect(response).to be_successful
@@ -124,8 +123,7 @@ describe GroupCategoriesController do
       expect(response).to be_successful
     end
 
-    it "is not authorized without :manage_groups_add enabled (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+    it "is not authorized without :manage_groups_add enabled" do
       @course.root_account.role_overrides.create!(
         permission: "manage_groups_add",
         role: teacher_role,
@@ -256,15 +254,6 @@ describe GroupCategoriesController do
       assert_unauthorized
     end
 
-    it "updates category" do
-      user_session(@teacher)
-      put "update", params: { course_id: @course.id, id: @group_category.id, category: { name: "Different Category", enable_self_signup: "1" } }
-      expect(response).to be_successful
-      expect(assigns[:group_category]).to eql(@group_category)
-      expect(assigns[:group_category].name).to eql("Different Category")
-      expect(assigns[:group_category]).to be_self_signup
-    end
-
     it "allows teachers to update both types of group categories by default" do
       Account.default.enable_feature!(:differentiation_tags)
 
@@ -315,8 +304,7 @@ describe GroupCategoriesController do
       expect(response).to be_successful
     end
 
-    it "updates category (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+    it "updates category" do
       user_session(@teacher)
       put "update", params: { course_id: @course.id, id: @group_category.id, category: { name: "Different Category", enable_self_signup: "1" } }
       expect(response).to be_successful
@@ -325,8 +313,7 @@ describe GroupCategoriesController do
       expect(assigns[:group_category]).to be_self_signup
     end
 
-    it "does not update category if :manage_groups_manage is not enabled (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+    it "does not update category if :manage_groups_manage is not enabled" do
       @course.account.role_overrides.create!(
         permission: "manage_groups_manage",
         role: teacher_role,
@@ -453,24 +440,7 @@ describe GroupCategoriesController do
       expect(response).to be_successful
     end
 
-    it "deletes the category and groups (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
-      user_session(@teacher)
-      category1 = @course.group_categories.create(name: "Study Groups")
-      category2 = @course.group_categories.create(name: "Other Groups")
-      @course.groups.create(name: "some group", group_category: category1)
-      @course.groups.create(name: "another group", group_category: category2)
-      delete "destroy", params: { course_id: @course.id, id: category1.id }
-      expect(response).to be_successful
-      @course.reload
-      expect(@course.all_group_categories.length).to be(4)
-      expect(@course.group_categories.length).to be(3)
-      expect(@course.groups.length).to be(2)
-      expect(@course.groups.active.length).to be(1)
-    end
-
-    it "does not delete the category/groups if :manage_groups_delete is not enabled (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+    it "does not delete the category/groups if :manage_groups_delete is not enabled" do
       @course.account.role_overrides.create!(
         permission: "manage_groups_delete",
         role: teacher_role,
@@ -640,7 +610,7 @@ describe GroupCategoriesController do
       expect(response).to be_successful
     end
 
-    it "renders progress_json" do
+    it "initiates import" do
       user_session(@teacher)
       post "import", params: {
         course_id: @course.id,
@@ -654,23 +624,7 @@ describe GroupCategoriesController do
       expect(json["completion"]).to eq 0
     end
 
-    it "initiates import (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
-      user_session(@teacher)
-      post "import", params: {
-        course_id: @course.id,
-        group_category_id: @category.id,
-        attachment: fixture_file_upload("group_categories/test_group_categories.csv", "text/csv")
-      }
-      expect(response).to be_successful
-      json = JSON.parse(response.body) # rubocop:disable Rails/ResponseParsedBody
-      expect(json["context_type"]).to eq "GroupCategory"
-      expect(json["tag"]).to eq "course_group_import"
-      expect(json["completion"]).to eq 0
-    end
-
-    it "does not initiate import if :manage_groups_add is not enabled (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+    it "does not initiate import if :manage_groups_add is not enabled" do
       @course.account.role_overrides.create!(
         permission: "manage_groups_add",
         role: teacher_role,

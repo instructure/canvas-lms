@@ -105,13 +105,11 @@ describe "Group Categories API", type: :request do
 
       context "granular permissions" do
         it "succeeds" do
-          @course.root_account.enable_feature!(:granular_permissions_manage_groups)
           status = raw_api_call(:get, api_url, api_route)
           expect(status).to eq 200
         end
 
         it "does not succeed if :manage_groups_add is not enabled" do
-          @course.root_account.enable_feature!(:granular_permissions_manage_groups)
           @course.account.role_overrides.create!(
             permission: "manage_groups_manage",
             role: teacher_role,

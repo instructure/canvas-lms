@@ -249,10 +249,11 @@ describe Group do
   it "grants manage permissions for associated objects to group managers" do
     e = course_with_teacher(active_course: true)
     course = e.context
-    course.root_account.disable_feature!(:granular_permissions_manage_groups)
     teacher = e.user
     group = course.groups.create
-    expect(course.grants_right?(teacher, :manage_groups)).to be_truthy
+    expect(course.grants_right?(teacher, :manage_groups_add)).to be_truthy
+    expect(course.grants_right?(teacher, :manage_groups_manage)).to be_truthy
+    expect(course.grants_right?(teacher, :manage_groups_delete)).to be_truthy
     expect(group.grants_right?(teacher, :manage_wiki_create)).to be_truthy
     expect(group.grants_right?(teacher, :manage_wiki_update)).to be_truthy
     expect(group.grants_right?(teacher, :manage_wiki_delete)).to be_truthy
@@ -262,31 +263,6 @@ describe Group do
     expect(group.wiki.grants_right?(teacher, :update_page)).to be_truthy
     attachment = group.attachments.build
     expect(attachment.grants_right?(teacher, :create)).to be_truthy
-  end
-
-  context "with granular permissions enabled" do
-    before do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
-    end
-
-    it "grants manage permissions for associated objects to group managers" do
-      e = course_with_teacher(active_course: true)
-      course = e.context
-      teacher = e.user
-      group = course.groups.create
-      expect(course.grants_right?(teacher, :manage_groups_add)).to be_truthy
-      expect(course.grants_right?(teacher, :manage_groups_manage)).to be_truthy
-      expect(course.grants_right?(teacher, :manage_groups_delete)).to be_truthy
-      expect(group.grants_right?(teacher, :manage_wiki_create)).to be_truthy
-      expect(group.grants_right?(teacher, :manage_wiki_update)).to be_truthy
-      expect(group.grants_right?(teacher, :manage_wiki_delete)).to be_truthy
-      expect(group.grants_right?(teacher, :manage_files_add)).to be_truthy
-      expect(group.grants_right?(teacher, :manage_files_edit)).to be_truthy
-      expect(group.grants_right?(teacher, :manage_files_delete)).to be_truthy
-      expect(group.wiki.grants_right?(teacher, :update_page)).to be_truthy
-      attachment = group.attachments.build
-      expect(attachment.grants_right?(teacher, :create)).to be_truthy
-    end
   end
 
   it "does not allow a concluded student to participate" do

@@ -237,28 +237,10 @@ class GroupMembership < ActiveRecord::Base
   end
 
   set_policy do
-    #################### Begin legacy permission block #########################
-
-    given do |user, session|
-      !group.context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
-        user && self.user && group && !group.group_category.try(:communities?) &&
-        (
-          (user == self.user && group.grants_right?(user, session, :join)) ||
-            (
-              group.can_join?(self.user) && group.context &&
-                group.context.grants_right?(user, session, :manage_groups)
-            )
-        )
-    end
-    can :create
-
-    ##################### End legacy permission block ##########################
-
     # for non-communities, people can be placed into groups by users who can
     # manage groups at the context level, but not moderators (hence :manage_groups_manage)
     given do |user, session|
-      group.context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
-        user && self.user && group && !group.group_category.try(:communities?) &&
+      user && self.user && group && !group.group_category.try(:communities?) &&
         (
           (user == self.user && group.grants_right?(user, session, :join)) ||
             (

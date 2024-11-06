@@ -361,8 +361,8 @@ module Types
     end
 
     def get_group_sets(course, include_non_collaborative)
-      if course&.grants_any_right?(current_user, :manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
-        if include_non_collaborative && course.grants_any_right?(current_user, :manage_groups, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+      if course&.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
+        if include_non_collaborative && course.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
           course.group_categories.where(role: nil)
         else
           course.group_categories.where(role: nil, non_collaborative: false)
