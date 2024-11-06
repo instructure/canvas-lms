@@ -28,10 +28,12 @@ import blankPage from './blankPage.json'
 import herosectiontwocolumn from './herosectiontwocolumn.json'
 import herosectionfullwidth from './herosectionfullwidth.json'
 import herosectionwithnavigation from './herosectionwithnavigation.json'
-import calloutcardsection from './calloutcardsection.json'
+import cardssection from './cardssection.json'
 import navigationsection from './navigationsection.json'
 
-import homepage1 from './homePage1.json'
+import homepageyellow from './homePageYellow.json'
+import homepageblue from './homePageBlue.json'
+import homepageelementary from './homePageElementary.json'
 
 // returning a promise will make this easier to replace with a real API call
 export const getGlobalTemplates = (): Promise<BlockTemplate[]> => {
@@ -41,12 +43,12 @@ export const getGlobalTemplates = (): Promise<BlockTemplate[]> => {
     herosectiontwocolumn as unknown as BlockTemplate,
     herosectionfullwidth as unknown as BlockTemplate,
     herosectionwithnavigation as unknown as BlockTemplate,
-    calloutcardsection as unknown as BlockTemplate,
+    cardssection as unknown as BlockTemplate,
     navigationsection as unknown as BlockTemplate,
   ])
 }
 
 export const getGlobalPageTemplates = (): Promise<BlockTemplate[]> => {
   // @ts-expect-error
-  return Promise.resolve([blankPage, homepage1])
+  return Promise.resolve([blankPage, homepageyellow, homepageblue, homepageelementary])
 }
