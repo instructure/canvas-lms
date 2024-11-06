@@ -322,7 +322,10 @@ class AuthenticationProvider
         # only record an error for an explicit discovery url
         unless self.discovery_url.blank?
           ::Canvas::Errors.capture_exception(:oidc_discovery_refresh, e)
-          errors.add(:discovery_url, e.message)
+          # JSON parse errors can include an entire HTML document;
+          # don't show it all
+          message = e.is_a?(JSON::ParserError) ? t("Invalid JSON") : e.message
+          errors.add(:discovery_url, message)
         end
       end
     end
