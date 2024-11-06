@@ -25,7 +25,8 @@ const I18n = useI18nScope('block-editor/add-media-modal')
 
 const handleMediaSubmit = async (uploadData: UploadData) => {
   if (uploadData?.fileUrl) {
-    return uploadData.fileUrl
+    const attachment_id = uploadData.fileUrl.match(/\/media_attachments_iframe\/(\d+)/)?.[1]
+    return {attachment_id, iframe_url: uploadData.fileUrl}
   } else {
     throw new Error('Selected Panel is invalid') // Should never get here
   }
@@ -33,7 +34,7 @@ const handleMediaSubmit = async (uploadData: UploadData) => {
 
 interface AddMediaModalProps {
   open: boolean
-  onSubmit: (url: string) => void
+  onSubmit: ({attachment_id, iframe_url}: {attachment_id?: string; iframe_url?: string}) => void
   onDismiss: () => void
   accept?: string
   panels?: UploadFilePanelId[]
@@ -59,9 +60,9 @@ export const SelectMediaModal = ({
     _storeProps: any
   ) => {
     setUploading(true)
-    const url = await handleMediaSubmit(uploadData)
+    const {attachment_id, iframe_url} = await handleMediaSubmit(uploadData)
     setUploading(false)
-    onSubmit(url)
+    onSubmit({attachment_id, iframe_url})
   }
 
   const defaultPanels: UploadFilePanelId[] = ['course_media', 'user_media']

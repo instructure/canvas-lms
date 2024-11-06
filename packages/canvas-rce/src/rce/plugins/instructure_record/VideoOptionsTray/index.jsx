@@ -61,6 +61,7 @@ export default function VideoOptionsTray({
   onExited = null,
   id = 'video-options-tray',
   studioOptions = null,
+  forBlockEditorUse = false
 }) {
   const {naturalHeight, naturalWidth} = videoOptions
   const currentHeight = videoOptions.appliedHeight || naturalHeight
@@ -78,9 +79,8 @@ export default function VideoOptionsTray({
   const [loading, setLoading] = useState(true)
 
   const isStudio = !!studioOptions
-  const showDisplayOptions = !isStudio || studioOptions.convertibleToLink
-  const showSizeControls = !isStudio || studioOptions.resizable
-
+  const showDisplayOptions = (!isStudio || studioOptions.convertibleToLink) && !forBlockEditorUse
+  const showSizeControls = (!isStudio || studioOptions.resizable) && !forBlockEditorUse
   const dimensionsState = useDimensionsState(videoOptions, {minHeight, minWidth, minPercentage})
   const api = new RceApiSource(trayProps)
 
