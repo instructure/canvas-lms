@@ -650,12 +650,19 @@ function DiscussionTopicForm({
       ENV.FEATURES.selective_release_ui_api &&
       ENV.FEATURES.selective_release_edit_page
     ) {
-      sectionViewRef = document.getElementById('manage-assign-to-container')?.reactComponentInstance
       const aDueDateMissing = assignedInfoList.some(assignee => !assignee.dueDate)
       const postToSisEnabled = isGraded && postToSis && ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
-      // Runs custom validation for all cards with the current post to sis selection without re-renders
-      formIsValid =
-        formIsValid && sectionViewRef?.allCardsValidCustom({dueDateRequired: postToSisEnabled})
+
+      const isPacedDiscussion = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.in_paced_course
+      if (!isPacedDiscussion) {
+        sectionViewRef = document.getElementById(
+          'manage-assign-to-container'
+        )?.reactComponentInstance
+        // Runs custom validation for all cards with the current post to sis selection without re-renders
+        formIsValid =
+          formIsValid && sectionViewRef?.allCardsValidCustom({dueDateRequired: postToSisEnabled})
+      }
+
       // If hasAfterRenderIssue is true, a useEffect hook will be responsible to run the focus logic
       hasAfterRenderIssue = postToSisEnabled && aDueDateMissing
     }
