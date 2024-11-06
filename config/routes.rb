@@ -1994,6 +1994,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :folders) do
       get "folders/:id", action: :show
       get "folders/:id/folders", action: :api_index, as: "list_folders"
+      get "folders/:id/all", action: :list_folders_and_files, as: "list_folders_and_files"
       get "folders/:id/files", controller: :files, action: :api_index, as: "list_files"
       delete "folders/:id", action: :api_destroy
       put "folders/:id", action: :update

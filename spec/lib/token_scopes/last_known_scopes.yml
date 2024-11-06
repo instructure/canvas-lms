@@ -1464,6 +1464,8 @@
 - verb: PUT
   path: '/api/v1/folders/:id'
 - verb: GET
+  path: '/api/v1/folders/:id/all'
+- verb: GET
   path: '/api/v1/folders/:id/files'
 - verb: GET
   path: '/api/v1/folders/:id/folders'

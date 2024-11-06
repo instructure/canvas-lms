@@ -48,7 +48,7 @@ module Api::V1::Attachment
     hash = attachment.slice("id", "uuid", "folder_id", "display_name", "filename")
     hash["upload_status"] = AttachmentUploadStatus.upload_status(attachment)
 
-    if options[:can_view_hidden_files] && options[:context] && options[:include].include?("blueprint_course_status") && !options[:master_course_status]
+    if options[:can_view_hidden_files] && options[:context] && options[:include]&.include?("blueprint_course_status") && !options[:master_course_status]
       options[:master_course_status] = setup_master_course_restrictions([attachment], options[:context])
     end
 
