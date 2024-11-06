@@ -44,7 +44,13 @@ export type Company = {
 }
 
 export type Lti = {
-  lti_13?: {id: number; integration_type: string; url: string; unified_tool_id: string}[]
+  lti_13?: Array<{
+    id: number
+    integration_type: string
+    url?: string
+    global_inherited_key?: string
+    unified_tool_id: string
+  }>
   lti_11?: {id: number; integration_type: string; url: string; unified_tool_id: string}[]
 }
 
