@@ -17,14 +17,12 @@
  */
 
 import React, {useCallback, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {Text} from '@instructure/ui-text'
+
 import CommonMigratorControls from './common_migrator_controls'
 import type {onSubmitMigrationFormCallback} from '../types'
 import QuestionBankSelector, {type QuestionBankSettings} from './question_bank_selector'
 import MigrationFileInput from './file_input'
-
-const I18n = useI18nScope('content_migrations_redesign')
+import {noFileSelectedFormMessage} from '../utils'
 
 type MoodleZipImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
@@ -75,12 +73,8 @@ const MoodleZipImporter = ({
         fileUploadProgress={fileUploadProgress}
         onChange={setFile}
         isSubmitting={isSubmitting}
+        externalFormMessage={fileError ? noFileSelectedFormMessage : undefined}
       />
-      {fileError && (
-        <p>
-          <Text color="danger">{I18n.t('You must select a file to import content from')}</Text>
-        </p>
-      )}
       <QuestionBankSelector
         onChange={setQuestionBankSettings}
         questionBankError={questionBankError}

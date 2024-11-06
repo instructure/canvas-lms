@@ -74,6 +74,7 @@ describe('CanvasCartridgeImporter', () => {
       expect(screen.getByRole('checkbox', {name: 'Adjust events and due dates'})).toBeDisabled()
     })
   })
+
   it('disable "Adjust events and due dates" inputs while uploading', async () => {
     const {getByRole, rerender, getByLabelText} = renderComponent()
 
@@ -97,6 +98,18 @@ describe('CanvasCartridgeImporter', () => {
       expect(getByLabelText('Select original end date')).toBeDisabled()
       expect(getByLabelText('Select new end date')).toBeDisabled()
       expect(getByRole('button', {name: 'Add substitution'})).toBeDisabled()
+    })
+  })
+
+  describe('submit error', () => {
+    describe('file input error', () => {
+      const expectedFileMissingError = 'You must select a file to import content from'
+
+      it('renders the file missing error', async () => {
+        renderComponent()
+        await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+        expect(screen.getByText(expectedFileMissingError)).toBeInTheDocument()
+      })
     })
   })
 })

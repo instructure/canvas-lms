@@ -19,7 +19,7 @@
 import React, {createRef, useCallback, useEffect, useState} from 'react'
 
 import CommonMigratorControls from './common_migrator_controls'
-import {humanReadableSize} from '../utils'
+import {humanReadableSize, noFileSelectedFormMessage} from '../utils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -35,6 +35,7 @@ import type {onSubmitMigrationFormCallback} from '../types'
 import MigrationFileInput from './file_input'
 
 import type {TreeBrowserProps} from '@instructure/ui-tree-browser'
+import type {FormMessage} from '@instructure/ui-form-field'
 
 type Collection = TreeBrowserProps['collections'][0]
 type CollectionClickArgs = TreeBrowserProps['onCollectionClick']
@@ -247,12 +248,8 @@ const ZipFileImporter = ({
         accepts=".zip"
         onChange={setFile}
         isSubmitting={isSubmitting}
+        externalFormMessage={fileError ? noFileSelectedFormMessage : undefined}
       />
-      {fileError && (
-        <p>
-          <Text color="danger">{I18n.t('You must select a file to import content from')}</Text>
-        </p>
-      )}
       {!isSubmitting && (
         <View as="div" margin="medium none none none" width="100%">
           {folders.length > 0 ? (
@@ -290,7 +287,9 @@ const ZipFileImporter = ({
       )}
       {folderError && (
         <p>
-          <Text color="danger">{I18n.t('You must select a folder to import content to')}</Text>
+          <Text color="danger" size="small">
+            {I18n.t('You must select a folder to import content to')}
+          </Text>
         </p>
       )}
       <CommonMigratorControls
