@@ -24,6 +24,7 @@ import type {LtiRegistrationAccountBindingId} from '../../../model/LtiRegistrati
 import type {LtiRegistrationId} from '../../../model/LtiRegistrationId'
 import {ZUserId} from '../../../model/UserId'
 import type {DeveloperKeyId} from '../../../model/developer_key/DeveloperKeyId'
+import type {InternalLtiConfiguration} from '../../../model/internal_lti_configuration/InternalLtiConfiguration'
 
 export const mockPageOfRegistrations = (
   ...names: Array<string>
@@ -35,9 +36,13 @@ export const mockPageOfRegistrations = (
 }
 
 const mockRegistrations = (...names: Array<string>): Array<LtiRegistration> =>
-  names.map(mockRegistration)
+  names.map((n, i) => mockRegistration(n, i))
 
-export const mockRegistration = (n: string, i: number): LtiRegistration => {
+export const mockRegistration = (
+  n: string,
+  i: number,
+  configuration: Partial<InternalLtiConfiguration> = {}
+): LtiRegistration => {
   const id = i.toString()
   const date = new Date()
   const user = {
@@ -71,8 +76,26 @@ export const mockRegistration = (n: string, i: number): LtiRegistration => {
     developer_key_id: id as DeveloperKeyId,
     internal_service: false,
     ims_registration_id: ZLtiImsRegistrationId.parse(id),
-    admin_nickname: n,
     icon_url: null,
     vendor: null,
+    admin_nickname: n,
+    configuration: {
+      custom_fields: null,
+      placements: [],
+      description: null,
+      domain: null,
+      launch_settings: null,
+      oidc_initiation_url: 'https://example.com',
+      oidc_initiation_urls: null,
+      privacy_level: null,
+      public_jwk: null,
+      public_jwk_url: null,
+      scopes: [],
+      title: n,
+      tool_id: null,
+      redirect_uris: null,
+      target_link_uri: 'https://example.com',
+      ...configuration,
+    },
   }
 }

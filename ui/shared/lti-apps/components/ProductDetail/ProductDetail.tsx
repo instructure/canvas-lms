@@ -37,7 +37,6 @@ import {
   IconMessageLine,
   IconQuizTitleLine,
 } from '@instructure/ui-icons'
-import {Button} from '@instructure/ui-buttons'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import TruncateWithTooltip from '../common/TruncateWithTooltip'
@@ -48,18 +47,14 @@ import ProductCarousel from '../common/Carousels/ProductCarousel'
 import ImageCarousel from '../common/Carousels/ImageCarousel'
 import BadgeCarousel from '../common/Carousels/BadgeCarousel'
 import Disclaimer from '../common/Disclaimer'
-import type {Product} from '../../models/Product'
+import type {Lti, Product} from '../../models/Product'
 import type {UnifiedToolId} from '../../models/UnifiedToolId'
 import {instructorAppsRoute} from '@canvas/lti-apps/utils/route'
 
 const I18n = useI18nScope('lti_registrations')
 
 type ProductDetailProps = {
-  onConfigure?: (
-    dynamicRegistrationUrl: string,
-    unifiedToolId?: UnifiedToolId,
-    onSuccessfulInstallation?: () => void
-  ) => void
+  renderConfigureButton?: (buttonWidth: 'block' | 'inline-block', lti: Lti) => JSX.Element
 }
 
 const ProductDetail = (props: ProductDetailProps) => {
@@ -71,7 +66,6 @@ const ProductDetail = (props: ProductDetailProps) => {
   const [isTruncated, setIsTruncated] = useState(false)
   const [showTrucatedDescription, setShowTruncatedDescription] = useState(true)
 
-  const navigate = useNavigate()
   const location = useLocation()
 
   const currentProductId = location.pathname.replace('/product_detail/', '')
@@ -100,9 +94,7 @@ const ProductDetail = (props: ProductDetailProps) => {
     (otherProducts: Product) => otherProducts.global_product_id !== currentProductId
   )
 
-  const dynamicRegistrationInformation = product?.tool_integration_configurations?.lti_13?.find(
-    configuration => configuration.integration_type === 'lti_13_dynamic_registration'
-  )
+  const ltiConfiguration = product?.tool_integration_configurations
 
   const ltiDataClickHandle = (title: string) => {
     setModalOpen(true)
@@ -132,28 +124,9 @@ const ProductDetail = (props: ProductDetailProps) => {
     return (
       <Flex margin={buttonMargins}>
         <Flex.Item shouldGrow={true} margin={tabletMargin}>
-          {props.onConfigure && (
-            <Button
-              display={buttonWidth}
-              color="primary"
-              interaction={dynamicRegistrationInformation ? 'enabled' : 'disabled'}
-              onClick={() => {
-                if (!dynamicRegistrationInformation) return null
-
-                props.onConfigure!(
-                  dynamicRegistrationInformation.url,
-                  // @ts-expect-error
-                  dynamicRegistrationInformation.unified_tool_id,
-                  () => {
-                    // redirect to apps page
-                    navigate('/manage')
-                  }
-                )
-              }}
-            >
-              {I18n.t('Configure')}
-            </Button>
-          )}
+          {props.renderConfigureButton && ltiConfiguration
+            ? props.renderConfigureButton(buttonWidth, ltiConfiguration)
+            : null}
         </Flex.Item>
       </Flex>
     )
