@@ -29,7 +29,7 @@ interface Props {
 const Footer = ({className}: Props) => {
   return (
     <View as="footer" className={classNames(className)}>
-      <Flex as="div" direction="column" gap="large">
+      <Flex direction="column" gap="large">
         <FooterLinks />
 
         <InstructureLogo />

@@ -112,88 +112,68 @@ const SignIn = () => {
 
   return (
     <Flex direction="column" gap="large">
-      <Flex.Item overflowY="visible">
-        <Heading level="h2" as="h1">
-          {I18n.t('Welcome to Canvas LMS')}
-        </Heading>
-      </Flex.Item>
+      <Heading level="h2" as="h1">
+        {I18n.t('Welcome to Canvas LMS')}
+      </Heading>
 
       {authProviders && authProviders.length > 0 && (
-        <Flex.Item overflowY="visible">
-          <Flex direction="column" gap="large">
-            <Flex.Item overflowY="visible">
-              <SSOButtons />
-            </Flex.Item>
+        <Flex direction="column" gap="large">
+          <SSOButtons />
 
-            <Flex.Item overflowY="visible">
-              <View as="hr" borderWidth="small none none none" margin="small none" />
-            </Flex.Item>
-          </Flex>
-        </Flex.Item>
+          <View as="hr" borderWidth="small none none none" margin="small none" />
+        </Flex>
       )}
 
-      <Flex.Item overflowY="visible">
-        <form onSubmit={handleLogin}>
-          <Flex direction="column" gap="large">
-            <Flex.Item overflowY="visible">
-              <Flex direction="column" gap="small">
-                <Flex.Item overflowY="visible">
-                  <TextInput
-                    id="username"
-                    renderLabel={loginHandleName}
-                    type="text"
-                    value={username}
-                    onChange={handleUsernameChange}
-                    autoComplete="username"
-                    disabled={isUiActionPending}
-                  />
-                </Flex.Item>
+      <form onSubmit={handleLogin}>
+        <Flex direction="column" gap="large">
+          <Flex direction="column" gap="small">
+            <TextInput
+              id="username"
+              renderLabel={loginHandleName}
+              type="text"
+              value={username}
+              onChange={handleUsernameChange}
+              autoComplete="username"
+              disabled={isUiActionPending}
+            />
 
-                <Flex.Item overflowY="visible">
-                  <TextInput
-                    id="password"
-                    renderLabel={I18n.t('Password')}
-                    type="password"
-                    value={password}
-                    onChange={handlePasswordChange}
-                    autoComplete="current-password"
-                    disabled={isUiActionPending}
-                  />
-                </Flex.Item>
+            <TextInput
+              id="password"
+              renderLabel={I18n.t('Password')}
+              type="password"
+              value={password}
+              onChange={handlePasswordChange}
+              autoComplete="current-password"
+              disabled={isUiActionPending}
+            />
 
-                <Flex.Item overflowY="visible">
-                  <Checkbox
-                    label={I18n.t('Stay signed in')}
-                    checked={rememberMe}
-                    onChange={() => setRememberMe(!rememberMe)}
-                    inline={true}
-                    disabled={isUiActionPending}
-                  />
-                </Flex.Item>
-              </Flex>
-            </Flex.Item>
-
-            <Flex.Item overflowY="visible">
-              <Flex direction="column" gap="small">
-                <Flex.Item overflowY="visible">
-                  <Button
-                    type="submit"
-                    color="primary"
-                    display="block"
-                    disabled={!formValid || isUiActionPending}
-                  >
-                    {I18n.t('Sign In')}
-                  </Button>
-                </Flex.Item>
-
-                <Flex.Item overflowY="visible" align="center">
-                  <SignInLinks />
-                </Flex.Item>
-              </Flex>
+            <Flex.Item overflowY="visible" overflowX="visible">
+              <Checkbox
+                label={I18n.t('Stay signed in')}
+                checked={rememberMe}
+                onChange={() => setRememberMe(!rememberMe)}
+                inline={true}
+                disabled={isUiActionPending}
+              />
             </Flex.Item>
           </Flex>
-        </form>
-      </Flex.Item>
+
+          <Flex direction="column" gap="small">
+            <Button
+              type="submit"
+              color="primary"
+              display="block"
+              disabled={!formValid || isUiActionPending}
+            >
+              {I18n.t('Sign In')}
+            </Button>
+
+            <Flex.Item align="center">
+              <SignInLinks />
+            </Flex.Item>
+          </Flex>
+        </Flex>
+      </form>
     </Flex>
   )
 }

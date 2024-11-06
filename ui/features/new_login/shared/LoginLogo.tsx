@@ -46,7 +46,6 @@ const LoginLogo = ({className}: Props) => {
         const largerScreen = matches?.includes('desktop')
         return (
           <Flex
-            as="div"
             direction="column"
             height={largerScreen ? '7.5rem' : '5rem'}
             gap="small"
