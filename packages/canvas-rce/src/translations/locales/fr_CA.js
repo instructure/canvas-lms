@@ -1111,7 +1111,7 @@ const locale = {
   "switch_to_the_rich_text_editor_63c1ecf6": {
     "message": "Basculez vers l’éditeur de texte enrichi"
   },
-  "syllabus_f191f65b": { "message": "Programme" },
+  "syllabus_f191f65b": { "message": "Plan de cours" },
   "system_audio_allowed_b2508f8c": { "message": "Système audio autorisé" },
   "system_audio_disabled_c177bd13": { "message": "Système audio désactivé" },
   "tab_arrows_4cf5abfc": { "message": "TABULATION/flèches" },
