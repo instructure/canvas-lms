@@ -360,23 +360,31 @@ module Types
       end
     end
 
-    field :group_sets_connection, GroupSetType.connection_type, <<~MD, null: true
-      Project group sets for this course.
-    MD
-    def group_sets_connection
-      if course.grants_any_right?(current_user, :manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
-        course.group_categories.where(role: nil)
+    def get_group_sets(course, include_non_collaborative)
+      if course&.grants_any_right?(current_user, :manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
+        if include_non_collaborative && course.grants_any_right?(current_user, :manage_groups, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+          course.group_categories.where(role: nil)
+        else
+          course.group_categories.where(role: nil, non_collaborative: false)
+        end
       end
     end
 
+    field :group_sets_connection, GroupSetType.connection_type, null: true do
+      description "Project group sets for this course."
+      argument :include_non_collaborative, Boolean, required: false, default_value: false
+    end
+    def group_sets_connection(include_non_collaborative: false)
+      get_group_sets(course, include_non_collaborative)
+    end
+
     # TODO: this is only temporary until the group_sets_connection gets paginated
-    field :group_sets, [GroupSetType], <<~MD, null: true
-      Project group sets for this course.
-    MD
-    def group_sets
-      if course.grants_any_right?(current_user, :manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
-        course.group_categories.where(role: nil)
-      end
+    field :group_sets, [GroupSetType], null: true do
+      description "Project group sets for this course."
+      argument :include_non_collaborative, Boolean, required: false, default_value: false
+    end
+    def group_sets(include_non_collaborative: false)
+      get_group_sets(course, include_non_collaborative)
     end
 
     field :external_tools_connection, ExternalToolType.connection_type, null: true do
