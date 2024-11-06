@@ -1925,6 +1925,7 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/lti_registrations/configuration/validate", action: :validate_lti_configuration
       delete "accounts/:account_id/lti_registrations/:id", action: :destroy
       get "accounts/:account_id/lti_registrations/:id", action: :show
+      get "accounts/:account_id/lti_registration_by_client_id/:client_id", action: :show_by_client_id
       put "accounts/:account_id/lti_registrations/:id", action: :update
       post "accounts/:account_id/lti_registrations/:id/bind", action: :bind
     end

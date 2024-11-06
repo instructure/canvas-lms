@@ -540,6 +540,66 @@ describe Lti::RegistrationsController do
     end
   end
 
+  describe "GET show_by_client_id", type: :request do
+    subject { get "/api/v1/accounts/#{account.id}/lti_registration_by_client_id/#{developer_key.id}" }
+
+    let(:developer_key) { dev_key_model_1_3(account:) }
+    let(:registration) { developer_key.lti_registration }
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      let(:student) { student_in_course(account:).user }
+
+      before { user_session(student) }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with flag disabled" do
+      before { account.disable_feature!(:lti_registrations_page) }
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    context "for nonexistent developer key" do
+      it "returns 404" do
+        get "/api/v1/accounts/#{account.id}/lti_registrations/#{developer_key.id + 1}"
+        expect(response).to be_not_found
+      end
+    end
+
+    it "is successful" do
+      subject
+      expect(response).to be_successful
+    end
+
+    it "returns the registration" do
+      subject
+      expect(response_json).to include({
+                                         id: registration.id,
+                                       })
+    end
+
+    it "includes the configuration" do
+      subject
+      expect(response_json).to have_key(:configuration)
+    end
+  end
+
   describe "PUT update", type: :request do
     subject { put "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}", params: { admin_nickname: } }
 

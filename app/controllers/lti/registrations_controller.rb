@@ -755,6 +755,32 @@ class Lti::RegistrationsController < ApplicationController
     raise e
   end
 
+  # @API Show an LTI Registration (via the client_id)
+  # Returns details about the specified LTI registration, including the
+  # configuration and account binding.
+  #
+  # @returns Lti::Registration
+  #
+  # @example_request
+  #
+  #   This would return the specified LTI registration
+  #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/lti_registration_by_client_id/<client_id>' \
+  #        -H "Authorization: Bearer <token>"
+  def show_by_client_id
+    GuardRail.activate(:secondary) do
+      developer_key = DeveloperKey.find(params[:client_id])
+      unless developer_key&.lti_registration.present?
+        return render json: { errors: "LTI registration not found" }, status: :not_found
+      end
+
+      registration = developer_key.lti_registration
+      render json: lti_registration_json(registration, @current_user, session, @context, includes: [:account_binding, :configuration])
+    end
+  rescue => e
+    report_error(e)
+    raise e
+  end
+
   # @API Update an LTI Registration
   # Update the specified LTI registration with the provided parameters
   #
