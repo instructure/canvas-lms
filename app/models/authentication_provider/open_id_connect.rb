@@ -364,7 +364,7 @@ class AuthenticationProvider
           if issuers.length < 20 && !issuers.include?(id_token["iss"])
             issuers << id_token["iss"]
           end
-          alg = id_token.alg&.to_sym
+          alg = id_token.alg&.to_s
           algs = settings["known_signature_algorithms"] ||= []
           algs << alg if algs.length < 20 && !algs.include?(alg)
           save! if changed?
