@@ -19,9 +19,9 @@
 import React from 'react'
 import {AppNavBar, ContentLayout, Footer, Header} from '../shared'
 import {Flex} from '@instructure/ui-flex'
-import {Global, css} from '@instructure/emotion'
 import {Outlet, ScrollRestoration} from 'react-router-dom'
 import {View} from '@instructure/ui-view'
+import {css, Global} from '@instructure/emotion'
 
 // https://emotion.sh/docs/@emotion/css#global-styles
 export function GlobalStyle() {
@@ -51,14 +51,14 @@ export const LoginLayout = () => {
       <ScrollRestoration />
 
       <View as="div" height="100vh">
-        <Flex as="div" direction="column" height="100%">
-          <Flex.Item as="header" width="100vw" overflowY="visible">
+        <Flex direction="column" height="100%">
+          <Flex.Item as="header" width="100vw">
             <AppNavBar />
           </Flex.Item>
 
-          <Flex.Item as="div" shouldGrow={true} overflowY="visible">
+          <Flex.Item shouldGrow={true}>
             <ContentLayout>
-              <Flex as="div" direction="column" gap="large">
+              <Flex direction="column" gap="large">
                 <Header />
 
                 <main>
