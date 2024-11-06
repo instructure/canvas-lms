@@ -41,6 +41,13 @@ module CanvasErrors
     private
 
     def extras_hash
+      # avoid exception raised during exception handling
+      shard_id = begin
+        @job.try(:current_shard)&.id
+      rescue
+        nil
+      end
+
       # if the shape of a job changes, we don't want to hard-fail.
       # ATTEMPT to extract these values, but silently use nil
       # if it's not possible, better less context then a failed report.
@@ -57,7 +64,7 @@ module CanvasErrors
         handler: @job.try(:handler),
         run_at: @job.try(:run_at),
         max_attempts: @job.try(:max_attempts),
-        shard_id: @job.try(:current_shard)&.id,
+        shard_id:,
       }
     end
   end
