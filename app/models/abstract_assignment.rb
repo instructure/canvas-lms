@@ -478,12 +478,45 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def self.clean_up_duplicating_assignments
-    duplicating_for_too_long.in_batches(of: 10_000).update_all(
+    should_report_to_sentry = Account.site_admin.feature_enabled?(:new_quizzes_report_failed_duplicates)
+    batch_size = 10_000
+    update_params = {
       duplication_started_at: nil,
       workflow_state: "failed_to_duplicate",
       updated_at: Time.zone.now
-    )
+    }
+
+    if should_report_to_sentry
+      duplicating_for_too_long.in_batches(of: batch_size) do |batch|
+        begin
+          report_failed_duplicates_to_sentry(batch)
+        rescue => e
+          Rails.logger.error("Failed to report failed duplicates to Sentry: #{e.message}")
+        end
+
+        ActiveRecord::Base.transaction do
+          batch.update_all(update_params)
+        end
+      end
+    else
+      duplicating_for_too_long.in_batches(of: batch_size).update_all(update_params)
+    end
   end
+
+  def self.report_failed_duplicates_to_sentry(batch)
+    assignment_count_by_root_account_id = batch.each_with_object({}) do |record, hash|
+      hash[record.root_account_id] ||= 0
+      hash[record.root_account_id] += 1
+    end
+    Sentry.with_scope do |scope|
+      scope.set_context(
+        "context",
+        assignment_count_by_root_account_id
+      )
+      Sentry.capture_message("Failed to duplicate assignments")
+    end
+  end
+  private_class_method :report_failed_duplicates_to_sentry
 
   def self.clean_up_cloning_alignments
     cloning_alignments_for_too_long.in_batches(of: 10_000).update_all(
