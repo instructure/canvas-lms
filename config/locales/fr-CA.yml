@@ -4819,7 +4819,7 @@ fr-CA:
         : oui
       links: 
         submission: 
-          details: "Informations de l’envoi"
+          details: "Détails sur la soumission"
           download_attachment: "Télécharger %{attachment_display_name}"
           view_original_page: "Afficher la page d’origine"
           view_quiz: "Afficher l’envoi du questionnaire"
@@ -6265,8 +6265,8 @@ fr-CA:
   can_t_enable_anonymous_grading_and_group_assignmen_9938416e: "Impossible d’activer la notation anonyme et les tâches de groupe ensemble"
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Ne peut effectuer de comparaison sur plus d'un seul fichier du même type"
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: "Ne peut être retiré de la publication si des étudiants ont envois"
-  can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "Ne peut retirer %{item_name} de la publication si des étudiants ont envois"
-  can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "Ne peut retirer %{name} de la publication si des étudiants ont envois"
+  can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "Impossible d’annuler la publication de %{item_name} si des étudiant ont déjà soumis un travail"
+  can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "Impossible d’annuler la publication de %{name} si des étudiant ont déjà soumis un travail"
   can_update_external_tools_168c1abe: "Peut mettre à jour des outils externes."
   can_update_external_tools_5c2ba614: "Peut mettre à jour des outils externes"
   can_update_public_jwk_for_lti_services_26037129: "Peut mettre à jour jwk public pour les services LTI."
@@ -9948,7 +9948,7 @@ fr-CA:
       assign_blanks: "Attribuer un zéro aux tâches non envoyées"
     out_of_points_possible: "sur %{assignment.points_possible}"
     this_is_permanent: "La courbe de notation ne peut pas être annulée. Les historiques restent disponibles, mais l’action relative à la courbe est irréversible."
-  curving_assignments_e9479ee3: "Courbe des tâches"
+  curving_assignments_e9479ee3: "La courbe des tâches"
   custom_6979cd81: Personnalisé
   custom_6ed5c8b7: personnalisé
   custom_access_84b29d73: "Accès personnalisé"
@@ -11564,7 +11564,7 @@ fr-CA:
   either_course_or_student_c42bb055: "Soit « cours », soit « étudiant »"
   either_groupid_or_outcomeid_values_are_required_1ea29e33: "Les valeurs groupId ou outcomeId sont requises"
   either_the_url_or_domain_should_be_set_c29cf8c1: "Vous devez définir l’URL ou le domaine."
-  either_you_re_a_new_user_or_the_terms_of_use_has_c_29797cc2: "Soit vous êtes un nouvel utilisateur ou les *conditions d'utilisation* ont changées depuis la dernière fois que vous les avez acceptées. Veuillez accepter les *conditions d'utilisation* avant de continuer."
+  either_you_re_a_new_user_or_the_terms_of_use_has_c_29797cc2: "Soit vous êtes un nouvel utilisateur ou soit les *conditions d'utilisation* ont changées depuis la dernière fois que vous les avez acceptées. Veuillez accepter les *conditions d'utilisation* avant de continuer."
   either_you_re_a_new_user_or_the_terms_of_use_have__14f0d0d0: "Soit vous êtes un nouvel utilisateur, soit les *conditions d’utilisation* ont changé depuis votre dernier accord s'y rapportant. Veuillez accepter les *conditions d’utilisation* et la **déclaration de confidentialité** avant de continuer."
   either_you_re_a_new_user_or_the_terms_of_use_have__2bbebdef: "Soit vous êtes un nouvel utilisateur ou les *conditions d'utilisation* ont changé depuis la dernière fois que vous les avez acceptées. Veuillez accepter les *conditions d'utilisation* avant de continuer."
   el_salvador_503_b0907d30: "El Salvador (+503)"
@@ -13382,7 +13382,7 @@ fr-CA:
   grade_calculator_performance_improvements_564af0de: "Améliorations des performances du calculateur de notes"
   grade_change_activity_75fb525: "Activité de modification des notes"
   grade_change_log_231f90e4: "Journal de modification de notation"
-  grade_change_notifications_98461261: "Notifications de changement de notes"
+  grade_change_notifications_98461261: "Les notifications de changement de notes"
   grade_changes_and_comments_have_been_released_for__3978b741: "Les changements de note et les commentaires ont été publiés pour toutes les personnes."
   grade_changes_and_comments_have_been_released_for__5d6a01a0: "Les changements de notes et les commentaires ont été publiés pour toutes les personnes dans les sections : %{section_names}."
   grade_changes_and_comments_have_been_released_for__624411ff: "Les changements de notes et les commentaires ont été publiés pour toutes les personnes notées dans les sections : %{section_names}."
@@ -23789,7 +23789,7 @@ fr-CA:
           current_score: "Note actuelle"
           kept_score: "Note conservée"
           last_attempt_details: "Détails sur la dernière tentative"
-          submission_details: "Informations de l’envoi"
+          submission_details: "Détails sur la soumission"
           time: Heure
         links: 
           preview_quiz_again: "Nouvel aperçu du questionnaire"
@@ -25269,7 +25269,7 @@ fr-CA:
   scope_to_a_specific_course_deb646df: "Portée d’un cours spécifique"
   score_68107950: "%{score}%"
   score_at_least_1141bb81: "Obtenir une note minimale de"
-  score_change_notifications_6b94f27f: "Notifications de changement de notes"
+  score_change_notifications_6b94f27f: "Les notifications de changement de notes"
   score_details_2995369: "Détails des résultats"
   score_distribution_graph_title_45e8fe7e: "Graphique de distribution des scores - %{title}"
   score_does_not_include_groups_because_they_have_no_80d12f42: 
@@ -27743,7 +27743,7 @@ fr-CA:
   submission_comment_updated_8d917ded: "Commentaire d’envoi mis à jour"
   submission_comment_user_name_assignment_title_cour_d88ba875: "Commentaire sur l’envoi : %{user_name}, %{assignment_title}, %{course_name}"
   submission_comments_4fa03a17: "Commentaires sur l’envoi"
-  submission_comments_b6d65841: "Commentaires sur l’envoi"
+  submission_comments_b6d65841: "Les commentaires sur l’envoi"
   submission_comments_sei_a10bc997: "Commentaires de soumission — SEI"
   submission_comments_tray_290fad59: "Plateau des commentaires des envois"
   submission_comments_tray_893d0267: "Plateau des commentaires des envois"
@@ -27772,7 +27772,7 @@ fr-CA:
     this_was_submitted_multiple_times_choose_a_submission_to_view: "Il y a eu plusieurs envois, veuillez choisir l’envoi à afficher :"
     update_grade: "Actualiser la note"
     view_rubric_assessment_in_the_speedgrader: "Afficher l’évaluation par barème dans SpeedGrader"
-  submission_details_f3975756: "Informations de l’envoi"
+  submission_details_f3975756: "Détails sur la soumission"
   submission_details_pass_fail_grade_options_8bcc58ea: "Détails l’envoi Options de notation (réussite/échec)"
   submission_draft_cannot_be_more_then_one_attempt_a_43f45197: "l'ébauche de l’envoi ne peut pas être plus d'une tentative avant l’envoi actuel"
   submission_draft_updated_e953166a: "Ébauche d’envoi mise à jour"
@@ -27868,7 +27868,7 @@ fr-CA:
       show_rubric: "Afficher le barème"
       speedgrader: SpeedGrader
       student_mute_notification: "Les notes ne sont pas disponibles car le formateur travaille dessus."
-      submission_details: "Informations de l’envoi"
+      submission_details: "Détails sur la soumission"
       submitted_at: "envoyé %{submit_date}"
       teachers_notified_of_comments: "Les enseignants et les expéditeurs de l’envoi seront informés de tous les commentaires"
     show_preview: 
@@ -32084,9 +32084,9 @@ fr-CA:
   which_account_will_this_subject_be_associated_with_921d6bac: "À quel compte ce sujet sera-t-il associé?"
   which_canvas_account_would_you_like_to_use_to_log__c3718dc6: "Quel compte Canvas souhaitez-vous utiliser pour vous connecter?"
   which_course_is_this_question_about_f819a158: "À quel cours cette question se rapporte-t-elle?"
-  while_the_grades_for_an_assignment_are_set_to_manu_457c38ff: "Tant que les notes d'une tâche sont définies à Manuel, les étudiants ne recevront pas de nouvelles notifications ni ne pourront les afficher:"
-  while_the_grades_for_this_assignment_are_hidden_st_c5d1992b: "Tant que les notes pour cette tâche sont masquées, les étudiants ne recevront pas de nouvelles notifications ni ne pourront les afficher :"
-  while_the_grades_for_this_assignment_are_set_to_ma_cb716ede: "Tant que les notes d'une tâche sont définies à Manuel, les étudiants ne recevront pas de nouvelles notifications ni ne pourront les afficher :"
+  while_the_grades_for_an_assignment_are_set_to_manu_457c38ff: "Tant que les notes d'une tâche sont définies à Manuel, les étudiants ne recevront pas de nouvelles notifications ni ne pourront voir:"
+  while_the_grades_for_this_assignment_are_hidden_st_c5d1992b: "Tant que les notes pour cette tâche sont masquées, les étudiants ne recevront pas de nouvelles notifications ni ne pourront voir :"
+  while_the_grades_for_this_assignment_are_set_to_ma_cb716ede: "Tant que les notes d'une tâche sont définies à Manuel, les étudiants ne recevront pas de nouvelles notifications ni ne pourront voir :"
   white_87fa64fd: Blanc
   whitelist_count_max_26a270f: "Liste blanche (%{count}/%{max})"
   whitelist_e88fd8ed: "Liste blanche"
