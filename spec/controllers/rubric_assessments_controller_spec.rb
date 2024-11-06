@@ -555,6 +555,44 @@ describe RubricAssessmentsController do
     end
   end
 
+  describe "POST 'import'" do
+    before do
+      course_with_teacher_logged_in(active_all: true)
+      @assignment = @course.assignments.create!(title: "Some Assignment")
+      rubric_association_model(user: @user, context: @course, association_object: @assignment, purpose: "grading")
+      assessor = User.create!
+      @course.enroll_student(assessor)
+      @attachment = fixture_file_upload("rubric/assessments.csv", "text/csv")
+    end
+
+    it "returns bad request if file attachment not passed in" do
+      post :import, params: { course_id: @course.id, assignment_id: @assignment.id }
+      expect(response).to be_bad_request
+    end
+
+    it "returns bad request if assignment does not exist" do
+      post :import, params: { course_id: @course.id, assignment_id: "some-bad-id", attachment: @attachment }
+      expect(response).to be_not_found
+    end
+
+    it "returns bad request if rubric association for assignment does not exist" do
+      assignment_2 = @course.assignments.create!(title: "Some Assignment")
+      post :import, params: { course_id: @course.id, assignment_id: assignment_2.id, attachment: @attachment }
+
+      expect(response).to be_bad_request
+      error_message = json_parse(response.body)["message"]
+      expect(error_message).to eq("Assignment not found or does not have a rubric association")
+    end
+
+    it "returns the rubric assessment import job id" do
+      post :import, params: { course_id: @course.id, assignment_id: @assignment.id, attachment: @attachment }
+      expect(response).to be_successful
+      response_body = json_parse(response.body)
+      expect(response_body["assignment_id"]).to eq(@assignment.id)
+      expect(response_body["workflow_state"]).to eq("created")
+    end
+  end
+
   def setup_course_assessment
     course_with_teacher_logged_in(active_all: true)
     @student1 = User.create!(name: "student 1", workflow_state: "registered")
