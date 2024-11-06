@@ -26,7 +26,7 @@ import React from 'react'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
-import {ApolloProvider} from 'react-apollo'
+import {ApolloProvider} from '@apollo/react-common'
 
 jest.mock('../../../../util/utils', () => ({
   ...jest.requireActual('../../../../util/utils'),

@@ -5137,6 +5137,7 @@ nn:
   bring_your_content_into_your_course_c0f3df7e: "Hent innhaldet ditt inn i emnet"
   broken_file_link_found_in_your_course_7cc24395: "Broten fillenke på emnet"
   brown_a82c3d0d: Brun
+  browse_courses_c8af1754: "Bla gjennom emne"
   browse_e78c4413: utforsk
   browse_your_computer_9a735a4: "Bla gjennom innhald på datamaskinen"
   browse_your_computer_for_a_course_image_d7db2376: "Bla gjennom innhald på datamaskinen etter eit emnebilde"
@@ -6307,6 +6308,7 @@ nn:
           utan å måtte utveksle e-postadresser.
       how_to_start_a_new_collaboration: "Dersom du vil vite meir om ein bestemt type samarbeid, kan du klikke på \"Start nytt samarbeid\" og deretter velje samarbeidstype i rullegardinmenyen."
       links: 
+        add_collaboration: "Legg til samarbeid"
         collaboration: Samarbeid
         new: "Start nytt samarbeid"
       page_title: Samarbeid
@@ -6663,6 +6665,7 @@ nn:
     general_error_with_message: "Det oppstod ein feil under tilkopling til konferansen. Melding: '%{message}'"
     inactive_error: "Konferansen er ikkje aktiv akkurat no"
     index: 
+      add_conference: "Legg til konferanse"
       concluded_conferences: "Ferdige konferansar"
       conference: Konferanse
       conference_header: Konferansar
@@ -7583,6 +7586,7 @@ nn:
   conversations_69a8dc26: Samtalar
   conversations_send_messages_to_entire_class_3f414741: "Samtaler - send meldingar til alle på emnet"
   conversations_send_messages_to_individual_course_m_733620b: "Samtaler - send meldingar til individuelle emnedeltakarar"
+  cookie_notice_fe4f182e: "Varsel om informasjonskapslar"
   copy_9748f9f: Kopi
   copy_announcement_title_9d23ddde: "Kopier kunngjering %{title}"
   copy_assignment_name_to_another_course_b62d0a54: "Kopier oppgåve %{name} til eit anna emne"
@@ -9141,6 +9145,7 @@ nn:
   custom_status_savedname_added_3f102196: "Eigendefinert status %{savedName} lagt til"
   custom_status_savedname_updated_29ac1105: "Eigendefinert status %{savedName} oppdatert"
   custom_statuses_14038f1e: "Eigendefinerte statusar"
+  customize_74cdc895: Tilpass
   customize_configuration_69c22ef3: "Tilpass konfigurasjon"
   customize_course_details_26fd4afe: "Tilpass emnedetaljar"
   customize_help_link_62cd05eb: "Eigendefiner Hjelp-kopling"
@@ -24925,6 +24930,7 @@ nn:
   spring_grading_period_current_score_7083cf0d: "Gjeldande resultat for vårens karaktersetjingperiode"
   spring_grading_period_final_score_386d92f7: "Sluttresultat for vårens karaktersetjingsperiode"
   spring_grading_period_id_61aec82c: "Karaktersetjingsperiode-ID for våren"
+  square_511eb3b3: Kvadrat
   sr_gradebook: 
     all_grading_periods: "Alle periodar for karaktersetjing"
     all_sections: "Alle seksjonar"
@@ -28365,6 +28371,16 @@ nn:
         all_users: "Alle brukarar"
         choose_term: "Vel semester"
         search_results: "Søkeresultat for \"%{search_term}\""
+    last_login: 
+      labels: 
+        current_ip: "Gjeldande påloggings-IP"
+        current_login: "Gjeldande pålogging"
+        last_ip: "Siste påloggings-IP"
+        last_login: "Siste pålogging"
+        last_request: "Siste førespurnad"
+      more: meir...
+      never: aldri
+      none: ingen
     linkedin_added: "LinkedIn-kontoen er lagd til."
     linkedin_fail: "LinkedIn-godkjenninga mislukkast. Prøv på nytt seinare"
     logins: 

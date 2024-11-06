@@ -36,7 +36,7 @@ import React, {useContext, useState} from 'react'
 import StudentViewContext from '../Context'
 import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
-import {useQuery} from 'react-apollo'
+import {useQuery} from '@apollo/react-hooks'
 import {bool, func} from 'prop-types'
 import PeerReviewPromptModal from '../PeerReviewPromptModal'
 import {

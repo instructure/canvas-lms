@@ -540,6 +540,32 @@ describe MasterCourses::MasterMigration do
       expect(cm2.migration_settings[:imported_assets]["WikiPage"]).to eq page_to.id.to_s
     end
 
+    describe "send_item_notifications" do
+      it "does not perform imports with send_item_notifications by default" do
+        @copy_to = course_factory
+        @sub = @template.add_child_course!(@copy_to)
+
+        run_master_migration
+
+        expect(@sub.child_course.content_migrations
+                   .where(migration_type: "master_course_import")
+                   .last
+                   .send_item_notifications?).to be false
+      end
+
+      it "performs imports with send_item_notifications if the option is provided" do
+        @copy_to = course_factory
+        @sub = @template.add_child_course!(@copy_to)
+
+        run_master_migration(send_item_notifications: true)
+
+        expect(@sub.child_course.content_migrations
+                   .where(migration_type: "master_course_import")
+                   .last
+                   .send_item_notifications?).to be true
+      end
+    end
+
     it "syncs deletions in incremental updates (except items modified downstream, unless locked)" do
       @copy_to = course_factory
       @template.add_child_course!(@copy_to)

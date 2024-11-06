@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ApolloProvider} from 'react-apollo'
+import {ApolloProvider} from '@apollo/react-common'
 import ConversationListContainer from '../ConversationListContainer'
 import {handlers} from '../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../shared/msw/mswClient'

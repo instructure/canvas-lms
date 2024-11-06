@@ -94,6 +94,24 @@ describe Lti::IMS::AuthenticationController do
         sent_params = Rack::Utils.parse_nested_query(subject.query)
         expect(sent_params).to eq params
       end
+
+      context "when lti_oidc_missing_cookie_retry is enabled" do
+        subject do
+          post(:authorize_redirect, params:)
+        end
+
+        before do
+          account = Account.default
+          account.settings[:lti_oidc_missing_cookie_retry] = true
+          account.save!
+        end
+
+        it "renders html redirect" do
+          subject
+          expect(response).to have_http_status :ok
+          expect(response).to render_template("lti/ims/authentication/missing_cookie_fix")
+        end
+      end
     end
 
     shared_examples_for "lti_message_hint error" do

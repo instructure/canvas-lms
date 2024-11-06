@@ -879,6 +879,7 @@ class SubmissionsApiController < ApplicationController
         end
 
         if params[:submission].key?(:sticker)
+          InstStatsd::Statsd.increment("submission_stickers.sticker_applied")
           submission[:sticker] = params[:submission].delete(:sticker)
         end
 

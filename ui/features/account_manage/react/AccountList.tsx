@@ -50,7 +50,9 @@ export function AccountList() {
   const {data, error, isLoading, isError} = useQuery({
     queryKey: ['accounts', {pageIndex}],
     queryFn: getAccounts,
-    fetchAtLeastOnce: true,
+    meta: {
+      fetchAtLeastOnce: true,
+    },
   })
 
   const last = parseInt(String(data?.link?.last?.page || ''), 10)

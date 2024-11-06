@@ -125,13 +125,6 @@
   z-index: 9999;
 }
 
-.block-editor-editor .section-menu {
-  position: absolute;
-  border-radius: 0.25rem;
-  z-index: 9999;
-  box-shadow: rgba(0, 0, 0, 0.1) 0px 0.375rem 0.4375rem, rgba(0, 0, 0, 0.25) 0px 0.625rem 1.75rem;
-}
-
 .block-editor-editor .block-resizer {
   position: absolute;
   z-index: 9999;
@@ -167,7 +160,6 @@
 
 .empty::before {
   content: attr(data-placeholder);
-  color: #ababab;
   pointer-events: none;
   margin: 0 auto;
 }
@@ -323,6 +315,10 @@
 
 .group-block {
   overflow: visible; /* with auto I get 4px of overflow that shows a scrollbar */
+  border: 2px solid transparent;
+  &.rounded-corners {
+    border-radius: 8px;
+  }
   .no-sections {
     display: flex;
     align-items: flex-start;
@@ -341,6 +337,9 @@
     &.end-align > .group-block__inner {
       justify-content: flex-end;
     }
+    &.distribute-align > .group-block__inner {
+      justify-content: space-around;
+    }
     &.start-valign > .group-block__inner {
       align-items: flex-start;
     }
@@ -357,6 +356,12 @@
     }
     &.end-align > .group-block__inner {
       align-items: flex-end;
+    }
+    &.center-valign > .group-block__inner {
+      justify-content: center;
+    }
+    &.end-valign > .group-block__inner {
+      justify-content: flex-end;
     }
   }
 
@@ -590,6 +595,14 @@
   line-height: 0;
 }
 
+.divider-block {
+  width: 95%;
+  height: 1px;
+  min-height: 1px;
+  margin: 0 auto;
+  border-top: 1px solid var(--ic-brand-font-color-dark);
+}
+
 @container block-editor-view (320px < width <= 768px) {
   .columns-section {
     &.columns-3,
@@ -613,6 +626,56 @@
     border: 2px solid var(--ic-brand-primary);
   }
 }
+
+.preview-section {
+  .section-thumbnail {
+    width: 100%
+  }
+}
+
+.curl {
+	width: 75px;
+	height: 75px;
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	background:
+		linear-gradient(
+			135deg,
+			#fff,
+			#f3f3f3 45%,
+			#ddd 50%,
+			#aaa 50%,
+			#bbb 56%,
+			#ccc 62%,
+			#f3f3f3 80%,
+			#fff 100%
+		);
+	box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+	transition: all .5s ease;
+}
+.curl:before,
+.curl:after {
+	content: '';
+	position: absolute;
+	z-index: -1;
+	left: 12.5%;
+	bottom: 5.8%;
+	width: 70%;
+	max-width: 300px;
+	max-height: 100px;
+	height: 55%;
+	box-shadow: 0 12px 15px rgba(0, 0, 0, .3);
+	transform: skew(-10deg) rotate(-6deg);
+}
+.curl:after {
+	left: auto;
+	right: 5.8%;
+	bottom: auto;
+	top: 14.16%;
+	transform: skew(-15deg) rotate(-84deg);
+}
+
 
 @container block-editor-view (width <= 320px) {
   .page-block {
@@ -654,4 +717,13 @@
   }
 }
 
+text-template-preview-card {
+  background-position: left top;
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+  cursor: pointer;
 
+  > * { background-color: rgba(255, 255, 255, 0.7) }
+
+  &:not(:hover):not(:focus):not(:focus-within):not(.blank-card) > * { display: none; }
+}

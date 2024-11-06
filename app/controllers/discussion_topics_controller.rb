@@ -771,7 +771,9 @@ class DiscussionTopicsController < ApplicationController
         split_screen_view_initial_page_size: 5,
         current_page: 0
       }
-      env_hash[:context_rubric_associations_url] = context_url(@context, :context_rubric_associations_url) rescue nil
+      unless @context.is_a?(Group)
+        env_hash[:context_rubric_associations_url] = context_url(@context, :context_rubric_associations_url)
+      end
       if params[:entry_id] && (entry = @topic.discussion_entries.find_by(id: params[:entry_id]))
         entry = @topic.discussion_entries.find(params[:entry_id])
         env_hash[:discussions_deep_link] = {
@@ -897,7 +899,7 @@ class DiscussionTopicsController < ApplicationController
     end
 
     @assignment = @topic.for_assignment? ? AssignmentOverrideApplicator.assignment_overridden_for(@topic.assignment, @current_user) : nil
-    @context.require_assignment_group rescue nil
+    @context.try(:require_assignment_group)
 
     if can_read_and_visible
       @headers = !params[:headless]

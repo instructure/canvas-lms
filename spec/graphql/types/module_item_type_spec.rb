@@ -61,8 +61,12 @@ describe Types::ModuleItemType do
   context "Module Progressions" do
     let_once(:assign2) { course.assignments.create(title: "a2", workflow_state: "published") }
     let_once(:assign3) { course.assignments.create(title: "a3", workflow_state: "published") }
+    let_once(:assign4) { course.assignments.create(title: "a4", workflow_state: "published") }
+    let_once(:assign5) { course.assignments.create(title: "a5", workflow_state: "published") }
     let_once(:module_item2) { module1.add_item({ type: "assignment", id: assign2.id }, nil, position: 2) }
     let_once(:module_item3) { module1.add_item({ type: "assignment", id: assign3.id }, nil, position: 3) }
+    let_once(:module_item4) { module1.add_item({ type: "assignment", id: assign4.id }, nil, position: 4) }
+    let_once(:module_item5) { module1.add_item({ type: "assignment", id: assign5.id }, nil, position: 5) }
 
     it "works" do
       resolver = GraphQLTypeTester.new(module_item2, current_user: @teacher)
@@ -72,8 +76,25 @@ describe Types::ModuleItemType do
     end
 
     it "returns null for next it does not exist" do
-      resolver = GraphQLTypeTester.new(module_item3, current_user: @teacher)
-      expect(resolver.resolve("_id")).to eq module_item3.id.to_s
+      resolver = GraphQLTypeTester.new(module_item5, current_user: @teacher)
+      expect(resolver.resolve("_id")).to eq module_item5.id.to_s
+      expect(resolver.resolve("next { _id }")).to be_nil
+    end
+
+    it "returns empty array for next items if there is none" do
+      resolver = GraphQLTypeTester.new(module_item5, current_user: @teacher)
+      expect(resolver.resolve("_id")).to eq module_item5.id.to_s
+      expect(resolver.resolve("nextItemsConnection { nodes { _id } }")).to eq []
+    end
+
+    it "does not return an item not visible to the user" do
+      course.assignments.create(title: "a6", workflow_state: "unpublished")
+      module1.add_item({ type: "assignment", id: course.assignments.last.id }, nil, position: 6)
+      student = student_in_course(course:).user
+
+      resolver = GraphQLTypeTester.new(module_item5, current_user: student)
+      expect(resolver.resolve("_id")).to eq module_item5.id.to_s
+      expect(resolver.resolve("nextItemsConnection { nodes { _id } }")).to eq []
       expect(resolver.resolve("next { _id }")).to be_nil
     end
 
@@ -81,6 +102,26 @@ describe Types::ModuleItemType do
       resolver = GraphQLTypeTester.new(module_item1, current_user: @teacher)
       expect(resolver.resolve("_id")).to eq module_item1.id.to_s
       expect(resolver.resolve("previous { _id }")).to be_nil
+    end
+
+    it "returns empty array for previous items if there is none" do
+      resolver = GraphQLTypeTester.new(module_item1, current_user: @teacher)
+      expect(resolver.resolve("_id")).to eq module_item1.id.to_s
+      expect(resolver.resolve("previousItemsConnection { nodes { _id } }")).to eq []
+    end
+
+    it "returns all previous items starting from the closest one" do
+      resolver = GraphQLTypeTester.new(module_item5, current_user: @teacher)
+      expect(resolver.resolve("previousItemsConnection { nodes { _id } }")).to eq(
+        [module_item4, module_item3, module_item2, module_item1].map { |i| i.id.to_s }
+      )
+    end
+
+    it "returns all next items starting from the closest one" do
+      resolver = GraphQLTypeTester.new(module_item1, current_user: @teacher)
+      expect(resolver.resolve("nextItemsConnection { nodes { _id } }")).to eq(
+        [module_item2, module_item3, module_item4, module_item5].map { |i| i.id.to_s }
+      )
     end
   end
 

@@ -77,6 +77,7 @@ describe "wiki pages show page assign to" do
 
       keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
       expect(@page.assignment_overrides.last.assignment_override_students.count).to eq(1)
+      expect(@page.only_visible_to_overrides?).to be_falsey
       # TODO: check that the dates are saved with date under the title of the item
     end
 

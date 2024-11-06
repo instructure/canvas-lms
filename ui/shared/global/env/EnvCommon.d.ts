@@ -288,7 +288,7 @@ export type RootAccountFeatureId =
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES
  */
-export type BrandAccountFeatureId = 'embedded_release_notes'
+export type BrandAccountFeatureId = 'embedded_release_notes' | 'consolidated_media_player'
 
 /**
  * Feature id exported in ApplicationController that aren't mentioned in

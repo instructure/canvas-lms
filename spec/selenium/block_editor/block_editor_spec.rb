@@ -17,31 +17,25 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 #
 # some if the specs in here include "ignore_js_errors: true". This is because
 # console errors are emitted for things that aren't really errors, like react
 # jsx attribute type warnings
 #
-
 # rubocop:disable Specs/NoNoSuchElementError, Specs/NoExecuteScript
 require_relative "../common"
 require_relative "pages/block_editor_page"
-
 describe "Block Editor", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include BlockEditorPage
-
   def drop_new_block(block_name, where)
     drag_and_drop_element(block_toolbox_box_by_block_name(block_name), where)
   end
-
   before do
     course_with_teacher_logged_in
     @course.account.enable_feature!(:block_editor)
     @context = @course
     @rce_page = @course.wiki_pages.create!(title: "RCE Page", body: "RCE Page Body")
-
     @block_page = build_wiki_page("page-with-apple-icon.json")
   end
 
@@ -51,44 +45,31 @@ describe "Block Editor", :ignore_js_errors do
     end
 
     context "Start from Scratch" do
-      it "creates a default empty page" do
-        expect(stepper_modal).to be_displayed
-        stepper_start_from_scratch.click
-        stepper_next_button.click
-        stepper_next_button.click
-        stepper_next_button.click
-        stepper_start_creating_button.click
-        expect(f("body")).not_to contain_css(stepper_modal_selector)
+      it "shows the template chooser modal with a default page block" do
+        expect(template_chooser).to be_displayed
+        template_chooser_new_blank_page.click
         expect(page_block).to be_displayed
-        expect(columns_section).to be_displayed
-        expect(group_blocks.count).to be(1)
-      end
-
-      it "walks through the stepper" do
-        expect(stepper_modal).to be_displayed
-        stepper_start_from_scratch.click
-        stepper_next_button.click
-        expect(stepper_select_page_sections).to be_displayed
-        stepper_hero_section_checkbox.click
-        stepper_next_button.click
-        expect(stepper_select_color_palette).to be_displayed
-        stepper_next_button.click
-        expect(stepper_select_font_pirings).to be_displayed
-        stepper_start_creating_button.click
-        expect(f("body")).not_to contain_css(stepper_modal_selector)
-        expect(hero_section).to be_displayed
       end
     end
 
-    context "Start from Template" do
-      it "walks through the stepper" do
-        expect(stepper_modal).to be_displayed
-        stepper_start_from_template.click
-        stepper_next_button.click
-        f("#template-1").click
-        stepper_start_editing_button.click
-        expect(f("body")).not_to contain_css(stepper_modal_selector)
-        expect(hero_section).to be_displayed
+    context "Load template" do
+      it "loads the clicked template to the editor" do
+        expect(template_chooser).to be_displayed
+        wait_for_ajax_requests
+        template_chooser_template_for_number(1).send_keys("")
+        template_chooser_active_customize_template.click
+        wait_for_ajax_requests
+        expect(page_block).to be_displayed
+      end
+
+      it "loads template via quick look" do
+        expect(template_chooser).to be_displayed
+        wait_for_ajax_requests
+        template_chooser_template_for_number(1).send_keys("")
+        template_chooser_active_quick_look_template.click
+        wait_for_ajax_requests
+        expect(page_block).to be_displayed
+        expect(template_quick_look_header).to be_displayed
       end
     end
   end
@@ -111,7 +92,7 @@ describe "Block Editor", :ignore_js_errors do
     it "can drag and drop blocks from the toolbox" do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
-      block_toolbox_toggle.click
+      open_block_toolbox_to_tab("blocks")
       expect(block_toolbox).to be_displayed
       drop_new_block("button", group_block_dropzone)
       expect(fj("#{group_block_inner_selector} a:contains('Click me')")).to be_displayed
@@ -120,7 +101,7 @@ describe "Block Editor", :ignore_js_errors do
     it "cannot resize an image with no src" do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
-      block_toolbox_toggle.click
+      open_block_toolbox_to_tab("blocks")
       drop_new_block("image", group_block_dropzone)
       image_block.click  # select the section
       image_block.click  # select the block
@@ -131,14 +112,12 @@ describe "Block Editor", :ignore_js_errors do
     it "can resize blocks with the mouse" do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
-      block_toolbox_toggle.click
+      open_block_toolbox_to_tab("blocks")
       drop_new_block("text", group_block_dropzone)
       expect(block_toolbar).to be_displayed
-
       expect(block_resize_handle("se")).to be_displayed
       expect(text_block.size.height).to eq(19) # 1.2rem
       expect(text_block.size.width).to eq(160) # 10rem
-
       drag_and_drop_element_by(block_resize_handle("se"), 100, 0)
       drag_and_drop_element_by(block_resize_handle("se"), 0, 50)
       expect(text_block.size.width).to eq(260)
@@ -148,34 +127,27 @@ describe "Block Editor", :ignore_js_errors do
     it "can resize blocks with the keyboard" do
       get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
       wait_for_block_editor
-      block_toolbox_toggle.click
+      open_block_toolbox_to_tab("blocks")
       drop_new_block("text", group_block_dropzone)
       expect(block_toolbar).to be_displayed
-
       expect(block_resize_handle("se")).to be_displayed
       expect(text_block.size.height).to eq(19)
       expect(text_block.size.width).to eq(160)
-
       f("body").send_keys(:alt, :arrow_down)
       expect(text_block.size.height).to eq(20)
       expect(text_block.size.width).to eq(160)
-
       f("body").send_keys(:alt, :arrow_right)
       expect(text_block.size.height).to eq(20)
       expect(text_block.size.width).to eq(161)
-
       f("body").send_keys(:alt, :arrow_left)
       expect(text_block.size.height).to eq(20)
       expect(text_block.size.width).to eq(160)
-
       f("body").send_keys(:alt, :arrow_up)
       expect(text_block.size.height).to eq(19)
       expect(text_block.size.width).to eq(160)
-
       f("body").send_keys(:alt, :shift, :arrow_right)
       expect(text_block.size.height).to eq(19)
       expect(text_block.size.width).to eq(170)
-
       f("body").send_keys(:alt, :shift, :arrow_down)
       expect(text_block.size.height).to eq(29)
       expect(text_block.size.width).to eq(170)
@@ -192,11 +164,9 @@ describe "Block Editor", :ignore_js_errors do
         path = File.expand_path(File.dirname(__FILE__) + "/../../../public/images/email.png")
         @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
         @image.save!
-
         get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
         wait_for_block_editor
-        block_toolbox_toggle.click
-
+        open_block_toolbox_to_tab("blocks")
         drop_new_block("image", group_block_dropzone)
         image_block_upload_button.click
         course_images_tab.click
@@ -212,11 +182,9 @@ describe "Block Editor", :ignore_js_errors do
         path = File.expand_path(File.dirname(__FILE__) + "/../../../public/images/email.png")
         @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
         @image.save!
-
         get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
         wait_for_block_editor
-        block_toolbox_toggle.click
-
+        open_block_toolbox_to_tab("blocks")
         drop_new_block("image", group_block_dropzone)
         image_block_upload_button.click
         user_images_tab.click
@@ -236,7 +204,6 @@ describe "Block Editor", :ignore_js_errors do
       @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
       @image.save!
       # image is 2000w x 1000h
-
       @block_page.update!(
         block_editor_attributes: {
           time: Time.now.to_i,
@@ -250,11 +217,9 @@ describe "Block Editor", :ignore_js_errors do
       it("is not possible with SizeVariant 'auto'") do
         get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
         wait_for_block_editor
-
         image_block.click  # select the section
         image_block.click  # select the block
         expect(block_resize_handle("se")).to be_displayed
-
         click_block_toolbar_menu_item("Image Size", "Auto")
         expect(block_editor_editor).not_to contain_css(block_resize_handle_selector("se"))
       end
@@ -263,13 +228,11 @@ describe "Block Editor", :ignore_js_errors do
         it "adjusts the width when the height is changed" do
           get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
           wait_for_block_editor
-
           image_block.click  # select the section
           image_block.click  # select the block
           expect(block_resize_handle("se")).to be_displayed
           expect(image_block.size.width).to eq(200)
           expect(image_block.size.height).to eq(100)
-
           f("body").send_keys(:alt, :shift, :arrow_down)
           expect(image_block.size.height).to eq(110)
           expect(image_block.size.width).to eq(220)
@@ -281,12 +244,10 @@ describe "Block Editor", :ignore_js_errors do
       it "can add alt text" do
         get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
         wait_for_block_editor
-
         image_block.click
         image_block_alt_text_button.click
         alt_input = image_block_alt_text_input
         expect(alt_input).to be_displayed
-
         alt_input.send_keys("I am alt text")
         alt_input.send_keys(:escape)
         expect(f("img", image_block).attribute("alt")).to eq("I am alt text")
@@ -294,5 +255,4 @@ describe "Block Editor", :ignore_js_errors do
     end
   end
 end
-
 # rubocop:enable Specs/NoNoSuchElementError, Specs/NoExecuteScript

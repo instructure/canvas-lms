@@ -4617,6 +4617,7 @@ hu:
   bring_your_content_into_your_course_c0f3df7e: "Hozza be saját tartalmait a kurzusába"
   broken_file_link_found_in_your_course_7cc24395: "Törött fájl hivatkozást találtunk az Ön kurzusában"
   brown_a82c3d0d: Barna
+  browse_courses_c8af1754: "Kurzusok áttekintése"
   browse_e78c4413: böngészés
   browse_your_computer_9a735a4: "Böngésszen a számítógépén"
   browse_your_computer_for_a_course_image_d7db2376: "Böngésszen a számítógépén egy kurzus kép kiválasztásához"
@@ -5781,6 +5782,7 @@ hu:
           Ezen az oldalon könnyen nyomon követhetik (ahogy Ön is) az együttműködés alakulását, és még az e-mail címükre sincs szükség hozzá.
       how_to_start_a_new_collaboration: "Ha adott típusú együttműködésről szeretne bővebb információt, akkor az \"Új együttműködés kezdeményezése\" szakaszban válassza ki a kívánt típust a legördülő listából."
       links: 
+        add_collaboration: "Együttműködés hozzáadása"
         collaboration: Együttműködés
         new: "Új együttműködés kezdeményezése"
       page_title: Együttműködés
@@ -6129,6 +6131,7 @@ hu:
     general_error_with_message: "Hiba történt a konferenciához kapcsolódás közben. Hibaüzenet: '%{message}'"
     inactive_error: "Ez a konferencia jelenleg nem aktív"
     index: 
+      add_conference: "Konferencia hozzáadása"
       concluded_conferences: "Befejeződött konferenciák"
       conference: Konferencia
       conference_header: Konferenciák
@@ -6977,6 +6980,7 @@ hu:
   conversations_69a8dc26: Üzenetváltások
   conversations_send_messages_to_entire_class_3f414741: "Beszélgetések - üzenetek küldése egész osztálynak"
   conversations_send_messages_to_individual_course_m_733620b: "Beszélgetések - üzenetek küldése egyedi kurzusrésztvevőknek"
+  cookie_notice_fe4f182e: Cookie-közlemény
   copy_9748f9f: Másolás
   copy_announcement_title_9d23ddde: "Hirdetmény másolása %{title}"
   copy_assignment_name_to_another_course_b62d0a54: "Másolja a %{name} feladatot egy másik kurzusba"
@@ -8418,6 +8422,7 @@ hu:
   custom_status_savedname_updated_29ac1105: "Egyéni állapot %{savedName} frissítve"
   custom_statuses_14038f1e: "Egyéni állapotok"
   customizable_default_due_date_a987fbfa: "Testreszabható alapértelmezett esedékességi dátum"
+  customize_74cdc895: Testreszabás
   customize_course_details_26fd4afe: "A kurzus részleteinek testreszabása"
   customize_forbidden_words_termslist_see_default_li_4963beb0: "A tiltott szavak/kifejezések testreszabása (az alapértelmezett listát itt tekintheti meg)"
   customize_learning_mastery_ratings_4ace142a: "Jártassági szintek minősítéseinek testreszabása"
@@ -23264,6 +23269,7 @@ hu:
   spring_grading_period_current_score_7083cf0d: "Tavaszi osztályzási időszak jelenlegi eredménye"
   spring_grading_period_final_score_386d92f7: "Tavaszi osztályzás időszak végső eredménye"
   spring_grading_period_id_61aec82c: "Tavaszi osztályzási időszak azonosítója"
+  square_511eb3b3: Négyzet
   sr_gradebook: 
     all_grading_periods: "Minden osztályzási időszak"
     all_sections: "Összes szekció"
@@ -26502,6 +26508,16 @@ hu:
         all_users: "Összes felhasználó"
         choose_term: "Félév kiválasztása"
         search_results: "Keresés eredménye \"%{search_term}\" alapján"
+    last_login: 
+      labels: 
+        current_ip: "Aktuális belépés IP"
+        current_login: "Aktuális belépés"
+        last_ip: "Utolsó belépés IP"
+        last_login: "Legutóbbi belépés"
+        last_request: "Legutóbbi kérés"
+      more: "több információ..."
+      never: soha
+      none: nincs
     linkedin_added: "LinkedIn-fiók sikeresen hozzáadva!"
     linkedin_fail: "LinkedIn engedélyezése nem sikerült. Kérjük, próbálja újra!"
     logins: 

@@ -18,7 +18,7 @@
 
 import React, {useEffect, useState, useRef, useCallback} from 'react'
 import PropTypes from 'prop-types'
-import {useQuery, useMutation, useLazyQuery} from 'react-apollo'
+import {useQuery, useMutation, useLazyQuery} from '@apollo/react-hooks'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'

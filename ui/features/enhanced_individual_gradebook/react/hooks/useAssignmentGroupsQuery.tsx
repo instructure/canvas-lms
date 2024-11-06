@@ -16,28 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect, useMemo, useState} from 'react'
+import {useMemo, useState} from 'react'
 import {fetchAssignmentGroups, getNextAssignmentGroupsPage} from '../../queries/Queries'
-import {useInfiniteQuery} from '@canvas/query'
+import {useAllPages} from '@canvas/query'
 
 export const useAssignmentGroupsQuery = (courseId: string) => {
   const [queryKey] = useState(['individual-gradebook-assignmentGroups', courseId])
 
-  const {data, fetchNextPage, hasNextPage, isFetchingNextPage, isError, isLoading} =
-    useInfiniteQuery({
-      queryKey,
-      queryFn: fetchAssignmentGroups,
-      getNextPageParam: getNextAssignmentGroupsPage,
+  const {data, hasNextPage, isError, isLoading} = useAllPages({
+    queryKey,
+    queryFn: fetchAssignmentGroups,
+    getNextPageParam: getNextAssignmentGroupsPage,
+    meta: {
       fetchAtLeastOnce: true,
-    })
-
-  useEffect(() => {
-    if (hasNextPage && !isFetchingNextPage) {
-      fetchNextPage({
-        cancelRefetch: true,
-      })
-    }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+    },
+  })
 
   const assignmentGroups = useMemo(
     () => data?.pages.flatMap(page => page.course.assignmentGroupsConnection.nodes) ?? [],

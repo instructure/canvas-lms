@@ -19,7 +19,7 @@
 export type ClickableImageProps = {
   editable: boolean
   onClick: () => void
-  size: 'medium' | 'large'
+  size: 'small' | 'medium' | 'large'
   sticker: Sticker
 }
 
@@ -66,6 +66,6 @@ export type StickerProps = {
   editable: boolean
   liveRegion?: () => HTMLElement | null
   onStickerChange?: (sticker: Sticker) => void
-  size: 'medium' | 'large'
+  size: 'small' | 'medium' | 'large'
   submission: Submission
 }

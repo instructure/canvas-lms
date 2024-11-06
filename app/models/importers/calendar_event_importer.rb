@@ -64,7 +64,12 @@ module Importers
       item.series_head = hash[:series_head]
       item.imported = true
 
-      item.save_without_broadcasting!
+      if migration.send_item_notifications?
+        item.save!
+      else
+        item.save_without_broadcasting!
+      end
+
       migration.add_imported_item(item)
       if hash[:all_day]
         item.all_day = hash[:all_day]

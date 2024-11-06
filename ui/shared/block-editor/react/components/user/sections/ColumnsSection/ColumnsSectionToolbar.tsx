@@ -24,6 +24,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {type ColumnsSectionProps} from './types'
 import {GroupBlock} from '../../blocks/GroupBlock'
+import {ToolbarColor, type ColorSpec} from '../../common/ToolbarColor'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -36,8 +37,8 @@ const ColumnsSectionToolbar = () => {
   const {actions, query} = useEditor()
   const {
     actions: {setProp},
-    props,
     node,
+    props,
   } = useNode((n: Node) => ({
     props: n.data.props,
     node: n,
@@ -74,8 +75,22 @@ const ColumnsSectionToolbar = () => {
     }
   }, [actions, node.id, props.columns, query, setProp])
 
+  const handleChangeColors = useCallback(
+    ({bgcolor}: ColorSpec) => {
+      setProp((prps: ColumnsSectionProps) => {
+        prps.background = bgcolor
+      })
+    },
+    [setProp]
+  )
+
+  const getCurrentBackgroundColor = () => {
+    return props.background || '#00000000'
+  }
+
   return (
     <Flex gap="small">
+      <ToolbarColor bgcolor={getCurrentBackgroundColor()} onChange={handleChangeColors} />
       <Flex gap="x-small">
         <Text>{I18n.t('Section Columns')}</Text>
         <NumberInput

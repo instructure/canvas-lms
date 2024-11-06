@@ -318,6 +318,7 @@ class RCEWrapper extends React.Component {
       media_links_use_attachment_id = false,
       rce_find_replace = false,
       file_verifiers_for_quiz_links = false,
+      consolidated_media_player = false,
     } = this.props.features
 
     return {
@@ -327,6 +328,7 @@ class RCEWrapper extends React.Component {
       media_links_use_attachment_id,
       file_verifiers_for_quiz_links,
       rce_find_replace,
+      consolidated_media_player,
     }
   }
 
@@ -761,16 +763,6 @@ class RCEWrapper extends React.Component {
         this.mceInstance().focus()
         break
       case PRETTY_HTML_EDITOR_VIEW:
-        {
-          const cmta = this._elementRef.current.querySelector('.CodeMirror textarea')
-          if (cmta) {
-            cmta.focus()
-          } else {
-            window.setTimeout(() => {
-              this._elementRef.current.querySelector('.CodeMirror textarea')?.focus()
-            }, 200)
-          }
-        }
         break
       case RAW_HTML_EDITOR_VIEW:
         this.getTextarea().focus()
@@ -904,10 +896,6 @@ class RCEWrapper extends React.Component {
     const ifr = this.iframe
     ifr && ifr.parentElement.classList.add('active')
 
-    this.handleFocus(event)
-  }
-
-  handleFocusHtmlEditor = event => {
     this.handleFocus(event)
   }
 
@@ -1766,16 +1754,12 @@ class RCEWrapper extends React.Component {
 
   setEditorView(view) {
     switch (view) {
-      case RAW_HTML_EDITOR_VIEW:
-        this.mceInstance().hide()
-        break
-      case PRETTY_HTML_EDITOR_VIEW:
-        this.mceInstance().hide()
-        this._elementRef.current.querySelector('.CodeMirror')?.CodeMirror.setCursor(0, 0)
-        break
       case WYSIWYG_VIEW:
         this.setCode(this.textareaValue())
         this.mceInstance().show()
+        break
+      default:
+        this.mceInstance().hide()
     }
   }
 
@@ -1831,7 +1815,6 @@ class RCEWrapper extends React.Component {
               this.getTextarea().value = value
               this.handleTextareaChange()
             }}
-            onFocus={this.handleFocusHtmlEditor}
           />
         </View>
       </Suspense>

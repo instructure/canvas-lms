@@ -20,11 +20,27 @@ import {type ResizableProps} from '../../../editor/types'
 
 export type GroupLayout = 'row' | 'column'
 export type GroupAlignment = 'start' | 'center' | 'end'
+export type GroupHorizontalAlignment = GroupAlignment | 'distribute'
+
+interface AllAlignments {
+  layout: GroupLayout
+  alignment: GroupHorizontalAlignment
+  verticalAlignment: GroupAlignment
+}
+
+export const defaultAlignment: AllAlignments = {
+  layout: 'row',
+  alignment: 'start',
+  verticalAlignment: 'start',
+}
 
 export type GroupBlockProps = {
   isColumn?: boolean
   layout?: GroupLayout
-  alignment?: GroupAlignment
+  background?: string
+  borderColor?: string
+  roundedCorners?: boolean
+  alignment?: GroupHorizontalAlignment
   verticalAlignment?: GroupAlignment
   resizable?: boolean
 } & ResizableProps

@@ -146,6 +146,46 @@ describe Pseudonym do
     expect(@user.user_account_associations).to eq []
   end
 
+  describe "#encryption_type" do
+    subject(:encryption_type) { pseudonym.encryption_type }
+
+    let(:pseudonym) { pseudonym_model }
+
+    context "when crypted_password is blank" do
+      before { pseudonym.update_column(:crypted_password, "") }
+
+      it { is_expected.to be_nil }
+    end
+
+    context "when sis_ssha is present" do
+      before { pseudonym.update_column(:sis_ssha, "$SSHA$Q0pF5X/UfUyxZQ2FZgFzYmFhZGViYTRkYTAyMzg3ZjE=$") }
+
+      it { is_expected.to eq :SSHA }
+    end
+
+    context "when crypted_password is scrypt" do
+      let(:scrypt_password) { ScryptProvider.new("4000$8$1$").encrypt("plaintext_password") }
+
+      before { pseudonym.update_column(:crypted_password, scrypt_password) }
+
+      it { is_expected.to eq :SCRYPT }
+    end
+
+    context "when crypted_password is sha512" do
+      let(:sha512_password) { Authlogic::CryptoProviders::Sha512.encrypt("plaintext_password") }
+
+      before { pseudonym.update_column(:crypted_password, sha512_password) }
+
+      it { is_expected.to eq :SHA512 }
+    end
+
+    context "when the encryption type is not recognized" do
+      before { pseudonym.update_column(:crypted_password, "unknown_encryption_type") }
+
+      it { is_expected.to eq :UNKNOWN }
+    end
+  end
+
   describe "#destroy" do
     it "allows deleting pseudonyms" do
       user_with_pseudonym(active_all: true)
@@ -863,6 +903,76 @@ describe Pseudonym do
       end
       expect(@pseudonym.reload.verification_token).not_to eq token
       expect(@user.messages.where(notification_name: "Account Verification").count).to eq 2
+    end
+  end
+
+  describe "#validate_password" do
+    let(:pseudonym) { Pseudonym.new }
+    let(:attr) { :password }
+    let(:val) { "new_password" }
+
+    before do
+      allow(Canvas::Security::PasswordPolicy).to receive(:validate)
+    end
+
+    context "when password_auto_generated? is true and canvas_generated_password? is true" do
+      before do
+        allow(pseudonym).to receive_messages(password_auto_generated?: true, canvas_generated_password?: true)
+      end
+
+      it "does not call Canvas::Security::PasswordPolicy.validate" do
+        pseudonym.validate_password(attr, val)
+        expect(Canvas::Security::PasswordPolicy).not_to have_received(:validate)
+      end
+    end
+
+    context "when password_auto_generated? is false" do
+      before do
+        allow(pseudonym).to receive_messages(password_auto_generated?: false, canvas_generated_password?: true)
+      end
+
+      it "calls Canvas::Security::PasswordPolicy.validate" do
+        pseudonym.validate_password(attr, val)
+        expect(Canvas::Security::PasswordPolicy).to have_received(:validate).with(pseudonym, attr, val)
+      end
+    end
+
+    context "when canvas_generated_password? is false" do
+      before do
+        allow(pseudonym).to receive_messages(password_auto_generated?: true, canvas_generated_password?: false)
+      end
+
+      it "calls Canvas::Security::PasswordPolicy.validate" do
+        pseudonym.validate_password(attr, val)
+        expect(Canvas::Security::PasswordPolicy).to have_received(:validate).with(pseudonym, attr, val)
+      end
+    end
+  end
+
+  describe "#infer_defaults" do
+    let(:pseudonym) do
+      Pseudonym.new.tap do |p|
+        p.user = user_model
+        p.account = Account.default
+        p.unique_id = "some_unique_id"
+      end
+    end
+
+    before do
+      expect(pseudonym).to receive(:infer_defaults).once.and_call_original
+    end
+
+    it "sets @canvas_generated_password to true if generate temporary password conditions are met" do
+      pseudonym.save!
+      expect(pseudonym.instance_variable_get(:@canvas_generated_password)).to be true
+    end
+
+    it "does not set @canvas_generated_password if generate temporary password conditions are not met" do
+      pseudonym.password = "password"
+      pseudonym.password_confirmation = "password"
+      pseudonym.save!
+
+      expect(pseudonym.instance_variable_get(:@canvas_generated_password)).to be_nil
     end
   end
 end

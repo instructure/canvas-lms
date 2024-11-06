@@ -21,8 +21,6 @@ module LtiAdvantage::Serializers
   class JwtMessageSerializer
     IMS_CLAIM_PREFIX = "https://purl.imsglobal.org/spec/lti/claim/"
     DL_CLAIM_PREFIX = "https://purl.imsglobal.org/spec/lti-dl/claim/"
-    NRPS_CLAIM_URL = "https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice"
-    AGS_CLAIM_URL = "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"
 
     STANDARD_IMS_CLAIMS = %w[
       context
@@ -46,8 +44,17 @@ module LtiAdvantage::Serializers
       content_items
     ].freeze
 
-    NAMES_AND_ROLES_SERVICE_CLAIM = "names_and_roles_service"
-    ASSIGNMENT_AND_GRADE_SERVICE_CLAIM = "assignment_and_grade_service"
+    CLAIM_MAPPING = [
+      *STANDARD_IMS_CLAIMS.map { [_1, IMS_CLAIM_PREFIX + _1] },
+      *DEEP_LINKING_CLAIMS.map { [_1, DL_CLAIM_PREFIX + _1] },
+    ].to_h.merge(
+      "names_and_roles_service" =>
+        "https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice",
+      "assignment_and_grade_service" =>
+        "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint",
+      "platform_notification_service" =>
+        "https://purl.imsglobal.org/spec/lti/claim/platformnotificationservice"
+    ).freeze
 
     def initialize(object)
       @object = object
@@ -66,19 +73,7 @@ module LtiAdvantage::Serializers
     end
 
     def apply_claim_prefixes(hash)
-      hash.transform_keys do |key|
-        if STANDARD_IMS_CLAIMS.include?(key)
-          "#{IMS_CLAIM_PREFIX}#{key}"
-        elsif DEEP_LINKING_CLAIMS.include?(key)
-          "#{DL_CLAIM_PREFIX}#{key}"
-        elsif key == NAMES_AND_ROLES_SERVICE_CLAIM
-          NRPS_CLAIM_URL
-        elsif key == ASSIGNMENT_AND_GRADE_SERVICE_CLAIM
-          AGS_CLAIM_URL
-        else
-          key
-        end
-      end
+      hash.transform_keys { |key| CLAIM_MAPPING[key] || key }
     end
   end
 end

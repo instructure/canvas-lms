@@ -20,7 +20,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import AsyncComponents from '../default_gradebook/AsyncComponents'
-import {ApolloProvider} from 'react-apollo'
+import {ApolloProvider} from '@apollo/react-common'
 import {createClient} from '@canvas/apollo'
 
 export const showMessageStudentsWithObserversModal = async (props, focusAtEnd) => {

@@ -228,6 +228,31 @@ describe PlannerController do
         expect(disc_json["planner_override"]["plannable_type"]).to eq "discussion_topic"
       end
 
+      context "ungraded discussions" do
+        before do
+          @discussion = discussion_topic_model(context: @course, title: "discussion ghost", delayed_post_at: 3.days.ago, lock_at: 3.days.from_now, todo_date: 1.day.from_now)
+          PlannerOverride.create!(plannable_id: @discussion.id, plannable_type: DiscussionTopic, user_id: @student.id)
+        end
+
+        it "includes ungraded discussions for students" do
+          get :index, params: { filter: "all_ungraded_todo_items", context_codes: ["course_#{@course.id}"] }
+          response_json = json_parse(response.body)
+          expect(response_json.pluck("plannable").pluck("title")).to include @discussion.title
+        end
+
+        context "delayed post discussion" do
+          before do
+            @discussion.update!(delayed_post_at: 1.day.from_now, workflow_state: "post_delayed")
+          end
+
+          it "includes delayed post discussions for students" do
+            get :index, params: { filter: "all_ungraded_todo_items", context_codes: ["course_#{@course.id}"] }
+            response_json = json_parse(response.body)
+            expect(response_json.pluck("plannable").pluck("title")).to include @discussion.title
+          end
+        end
+      end
+
       it "shows planner overrides created on wiki pages" do
         page = wiki_page_model(course: @course, todo_date: 1.day.from_now)
         PlannerOverride.create!(plannable_id: page.id, plannable_type: WikiPage, user_id: @student.id)
@@ -1033,7 +1058,11 @@ describe PlannerController do
         end
 
         it "shows new activity when a new discussion topic has been created" do
-          get :index, params: { start_date: @start_date, end_date: @end_date }
+          # the queries behind this be expensive, there is a 1.minute cache on some of them, we'll do our first get
+          # in a time longer ago than the cache length
+          Timecop.freeze(2.minutes.ago) do
+            get :index, params: { start_date: @start_date, end_date: @end_date }
+          end
           discussion_topic_model(context: @course, todo_date: 1.day.from_now)
           get :index, params: { start_date: @start_date, end_date: @end_date }
           topic_json = json_parse(response.body).find { |j| j["plannable_id"] == @topic.id && j["plannable_type"] == "discussion_topic" }

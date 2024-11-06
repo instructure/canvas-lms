@@ -40,7 +40,7 @@ import {NamingConfirmationWrapper} from './components/NamingConfirmationWrapper'
 import {PermissionConfirmationWrapper} from './components/PermissionConfirmationWrapper'
 import {PlacementsConfirmationWrapper} from './components/PlacementsConfirmationWrapper'
 import {PrivacyConfirmationWrapper} from './components/PrivacyConfirmationWrapper'
-import {ReviewScreen} from './components/ReviewScreen'
+import {ReviewScreenWrapper} from './components/ReviewScreenWrapper'
 import {isUnsuccessful} from '../../common/lib/apiResult/ApiResult'
 
 const I18n = useI18nScope('lti_registrations')
@@ -380,15 +380,13 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
       return (
         <>
           {progressBar(state)}
-          <RegistrationModalBody>
-            <ReviewScreen
-              overlayStore={state.overlayStore}
-              registration={state.registration}
-              transitionToConfirmationState={
-                dynamicRegistrationWizardState.transitionToConfirmationState
-              }
-            />
-          </RegistrationModalBody>
+          <ReviewScreenWrapper
+            overlayStore={state.overlayStore}
+            registration={state.registration}
+            transitionToConfirmationState={
+              dynamicRegistrationWizardState.transitionToConfirmationState
+            }
+          />
           <Modal.Footer>
             <Button
               color="secondary"

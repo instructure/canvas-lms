@@ -39,7 +39,7 @@ const defaultMocks = (result = {data: {}}) => [
     result,
   },
 ]
-
+const CUSTOM_TIMEOUT_LIMIT = 1000
 describe('ContentTabs', () => {
   beforeAll(() => {
     window.INST = window.INST || {}
@@ -93,6 +93,7 @@ describe('ContentTabs', () => {
           <AttemptTab {...props} focusAttemptOnInit={false} />
         </MockedProvider>
       )
+      await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
       expect(await findByTestId('assignments_2_submission_preview')).toBeInTheDocument()
     })
 
@@ -114,6 +115,7 @@ describe('ContentTabs', () => {
           <AttemptTab {...props} focusAttemptOnInit={false} />
         </MockedProvider>
       )
+      await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
       expect(await findByTestId('assignments_2_submission_preview')).toBeInTheDocument()
     })
 
@@ -130,6 +132,7 @@ describe('ContentTabs', () => {
           <AttemptTab {...props} focusAttemptOnInit={false} />
         </MockedProvider>
       )
+      await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
       expect(await findByTestId('assignments_2_submission_preview')).toBeInTheDocument()
     })
 
@@ -229,6 +232,7 @@ describe('ContentTabs', () => {
           <AttemptTab {...props} focusAttemptOnInit={false} />
         </MockedProvider>
       )
+      await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
       expect(await waitFor(() => getByTestId('canvadocs-pane'))).toBeInTheDocument()
     })
   })

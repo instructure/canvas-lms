@@ -35,6 +35,7 @@ describe('CriterionModal tests', () => {
         criterionUseRangeEnabled={true}
         onDismiss={() => {}}
         onSave={() => {}}
+        hidePoints={false}
         {...props}
       />
     )
@@ -356,6 +357,27 @@ describe('CriterionModal tests', () => {
 
       fireEvent.mouseOver(addRatingRow)
       expect(addRatingRow).toBeEmptyDOMElement()
+    })
+  })
+
+  describe('Hide Points Tests', () => {
+    it('does not render points input if hidePoints is true', () => {
+      const {queryByTestId, queryAllByTestId} = renderComponent({hidePoints: true})
+
+      expect(queryByTestId('enable-range-checkbox')).toBeNull()
+      expect(queryAllByTestId('rating-points').length).toEqual(0)
+      expect(queryAllByTestId('rating-points-assessed').length).toEqual(0)
+    })
+
+    it('does not render points read-only text if hidePoints is true', () => {
+      const {queryByTestId, queryAllByTestId} = renderComponent({
+        unassessed: false,
+        hidePoints: true,
+      })
+
+      expect(queryByTestId('enable-range-checkbox')).toBeNull()
+      expect(queryAllByTestId('rating-points').length).toEqual(0)
+      expect(queryAllByTestId('rating-points-assessed').length).toEqual(0)
     })
   })
 })

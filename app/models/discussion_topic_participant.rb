@@ -21,6 +21,12 @@
 class DiscussionTopicParticipant < ActiveRecord::Base
   include Workflow
 
+  module SortOrder
+    DESC = "desc"
+    ASC = "asc"
+    TYPES = SortOrder.constants.map { |c| SortOrder.const_get(c) }
+  end
+
   belongs_to :discussion_topic
   belongs_to :user
 

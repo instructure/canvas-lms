@@ -237,6 +237,15 @@ describe WikiPagesController do
       end
     end
 
+    describe "PUT 'create_block_editor'" do
+      it "calls the block editor creator with the proper blank page body" do
+        allow(BlockEditor).to receive(:create!).and_call_original
+        page = @course.wiki_pages.create! title: "A Page", root_account_id: @course.root_account_id
+        expect(BlockEditor).to receive(:create!).with(root_account_id: @course.root_account_id, context: page, editor_version: BlockEditor::LATEST_VERSION, blocks: BlockEditor.blank_page)
+        put :create_block_editor, params: { course_id: @course.id, wiki_page_id: page.url }
+      end
+    end
+
     it "js_env has placements for Commons Favorites Import" do
       allow(controller).to receive(:external_tools_display_hashes).and_return(["tool 1", "tool 2"])
       get "show", params: { course_id: @course.id, id: @page.url }

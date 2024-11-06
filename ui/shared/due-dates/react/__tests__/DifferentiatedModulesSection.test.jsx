@@ -21,7 +21,8 @@ import {render, act} from '@testing-library/react'
 import DifferentiatedModulesSection from '../DifferentiatedModulesSection'
 import AssignmentOverrideCollection from '@canvas/assignments/backbone/collections/AssignmentOverrideCollection'
 import fetchMock from 'fetch-mock'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 const SECTIONS_DATA = [
   {id: '1', course_id: '1', name: 'Course 1', start_at: null, end_at: null},
@@ -89,9 +90,9 @@ describe('DifferentiatedModulesSection', () => {
 
   const setUp = params => {
     return render(
-      <QueryProvider>
+      <MockedQueryProvider>
         <DifferentiatedModulesSection {...params} />
-      </QueryProvider>
+      </MockedQueryProvider>
     )
   }
 
@@ -153,9 +154,9 @@ describe('DifferentiatedModulesSection', () => {
     // skipping for now, since the pill is being validated in selenium specs
     it.skip('reverts highlighted style when changes are removed', async () => {
       const {getByTestId, findByTestId, findByText, getByText, queryByTestId} = render(
-        <QueryProvider>
+        <MockedQueryProvider>
           <DifferentiatedModulesSection {...props} />
-        </QueryProvider>
+        </MockedQueryProvider>
       )
       await addAssignee(getByTestId, findByTestId, findByText)
       expect(getByTestId('highlighted_card')).toBeInTheDocument()
@@ -167,9 +168,9 @@ describe('DifferentiatedModulesSection', () => {
     // skipping for now, since the pill is being validated in selenium specs
     it.skip('shows pending changes pill', async () => {
       const {getByTestId, findByTestId, findByText, getByRole} = render(
-        <QueryProvider>
+        <MockedQueryProvider>
           <DifferentiatedModulesSection {...props} />
-        </QueryProvider>
+        </MockedQueryProvider>
       )
       await addAssignee(getByTestId, findByTestId, findByText)
       expect(getByTestId('highlighted_card')).toBeInTheDocument()

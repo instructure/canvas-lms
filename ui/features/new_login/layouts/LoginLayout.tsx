@@ -17,8 +17,35 @@
  */
 
 import React from 'react'
-import {Outlet} from 'react-router-dom'
+import {Outlet, ScrollRestoration} from 'react-router-dom'
+import {AppNavBar, ContentLayout, Footer, Header} from '../shared'
+import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
 
 export const LoginLayout = () => {
-  return <Outlet />
+  return (
+    <View as="div">
+      <ScrollRestoration />
+
+      <Flex as="div" direction="column" height="100vh">
+        <Flex.Item as="header" width="100vw" overflowY="visible">
+          <AppNavBar />
+        </Flex.Item>
+
+        <Flex.Item as="div" shouldGrow={true} overflowY="visible">
+          <ContentLayout>
+            <Flex as="div" direction="column" gap="large">
+              <Header />
+
+              <main>
+                <Outlet />
+              </main>
+
+              <Footer />
+            </Flex>
+          </ContentLayout>
+        </Flex.Item>
+      </Flex>
+    </View>
+  )
 }

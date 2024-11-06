@@ -97,28 +97,24 @@ module Lti::IMS::Providers
 
     def resource_link
       return nil unless rlid?
+      return @resource_link if defined?(@resource_link)
 
-      @resource_link ||= begin
-        rl = Lti::ResourceLink.find_by(resource_link_uuid: rlid)
-        # context here is a decorated context, we want the original
-        if rl.present? && rl.current_external_tool(Lti::IMS::Providers::MembershipsProvider.unwrap(context))&.id != tool.id
-          raise Lti::IMS::AdvantageErrors::InvalidResourceLinkIdFilter.new(
-            "Tool does not have access to rlid #{rlid}",
-            api_message: "Tool does not have access to rlid or rlid does not exist"
-          )
-        end
-        rl
+      rl = Lti::ResourceLink.find_by(resource_link_uuid: rlid)
+      # context here is a decorated context, we want the original
+      if rl.present? && rl.current_external_tool(Lti::IMS::Providers::MembershipsProvider.unwrap(context))&.id != tool.id
+        raise Lti::IMS::AdvantageErrors::InvalidResourceLinkIdFilter.new(
+          "Tool does not have access to rlid #{rlid}",
+          api_message: "Tool does not have access to rlid or rlid does not exist"
+        )
       end
-    end
 
-    def resource_link?
-      resource_link&.present?
+      @resource_link = rl
     end
 
     def content_tag
-      return nil unless resource_link?
+      return nil unless resource_link
 
-      ContentTag.find_by(associated_asset_id: resource_link&.id)
+      ContentTag.find_by(associated_asset: resource_link)
     end
 
     def role
@@ -141,12 +137,13 @@ module Lti::IMS::Providers
 
     def assignment
       return nil unless rlid?
+      return @assignment if defined?(@assignment)
 
-      @assignment ||= Assignment.active.for_course(course.id)
-                                .joins(line_items: :resource_link)
-                                .where(lti_resource_links: { id: resource_link&.id })
-                                .distinct
-                                .take
+      @assignment = Assignment.active.for_course(course.id)
+                              .joins(line_items: :resource_link)
+                              .where(lti_resource_links: { id: resource_link&.id })
+                              .distinct
+                              .take
     end
 
     def assignment?
@@ -154,7 +151,7 @@ module Lti::IMS::Providers
     end
 
     def validate_tool!
-      raise Lti::IMS::AdvantageErrors::InvalidResourceLinkIdFilter unless resource_link?
+      raise Lti::IMS::AdvantageErrors::InvalidResourceLinkIdFilter unless resource_link
 
       if assignment? && !assignment.external_tool?
         raise Lti::IMS::AdvantageErrors::InvalidResourceLinkIdFilter.new(
@@ -176,7 +173,8 @@ module Lti::IMS::Providers
           api_message: "Requested ResourceLink has an unexpected content type"
         )
       end
-      if tool_tag.content_id != tool.id
+
+      unless tool.can_access_content_tag?(tool_tag)
         raise Lti::IMS::AdvantageErrors::InvalidResourceLinkIdFilter.new(
           "ResourceLink (rlid: #{rlid}) needs binding to external tool #{tool.id} but found #{tool_tag.content_id}",
           api_message: "Requested ResourceLink bound to unexpected external tool"

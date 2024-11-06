@@ -3519,6 +3519,7 @@ he:
   bring_your_content_into_your_course_c0f3df7e: "הבאת התוכן שלך לקורס שלך"
   broken_file_link_found_in_your_course_7cc24395: "קישור שגוי לקובץ נמצא בקורס שלך"
   brown_a82c3d0d: חום
+  browse_courses_c8af1754: "עיון ברשימת הקורסים "
   browse_your_computer_9a735a4: "סרוק/סרקי במחשבך"
   browse_your_computer_for_a_course_image_d7db2376: "סרוק/סרקי במחשבך אחר תמונת הקורס"
   bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "שם הסל צריך להיות אחד מהרשימה הבאה: %{bucket_names}"
@@ -4409,6 +4410,7 @@ he:
             description: "כדי להכנס לשיתוף זה עליך להרשות לקנבס לגשת לחשבון הגוגל שלך."
       how_to_start_a_new_collaboration: "כדי ללמוד עוד על סוג שיתוף פעולה כלשהו, יש להקליק על \"התחלת שיתוף פעולה חדש\" ואז לבחור את הסוג מתוך רשימה נפתחת."
       links: 
+        add_collaboration: "הוספת שיתוף פעולה"
         collaboration: "שיתוף פעולה "
         delete: "ביטול שיתוף פעולה זה"
         edit: "עריכת שיתוף פעולה זה"
@@ -6610,6 +6612,7 @@ he:
   custom_fields_fc3e55af: "שדות להגדרה גמישה"
   custom_link_details_35fd38fc: "פרטי קישור מותאם"
   custom_links_to_include_in_the_help_dialog_popup_e48ff8b6: "קישורים מותאמים על מנת לכלול את חלון השיחה של עזרה."
+  customize_74cdc895: התאמה
   customize_this_menu_efa72a9: "התאמת תפריט זה"
   cutoff_score_74254c89: "ציון רף"
   cyan_c1d5f68a: ירקרק-כחול
@@ -20173,6 +20176,16 @@ he:
         all_users: "כל המשתמשים "
         choose_term: "בחירת מחצית"
         search_results: "תוצאות חיפוש עבור \"%{search_term}\""
+    last_login: 
+      labels: 
+        current_ip: "כתובת ה IP של הלוג-אין הנוכחי"
+        current_login: "לוג-אין נוכחי"
+        last_ip: "כתובת ה IP של הלוג-אין האחרון"
+        last_login: "לוג-אין אחרון"
+        last_request: "בקשה אחרונה"
+      more: יותר...
+      never: "אף פעם "
+      none: "אף אחד"
     linkedin_added: "חשבון לינקדאין נתווסף בהצלחה!"
     linkedin_fail: "הרשאת לינקדאין נכשלה. יש לנסות שוב."
     logins: 

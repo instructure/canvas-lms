@@ -17,7 +17,7 @@
  */
 
 import {useEffect, useState} from 'react'
-import {useMutation, useQuery} from 'react-apollo'
+import {useMutation, useQuery} from '@apollo/react-hooks'
 import type {GradeStatus, StandardStatusAllowedName} from '@canvas/grading/accountGradingStatus'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {

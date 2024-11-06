@@ -32,7 +32,13 @@ class DeveloperKeysController < ApplicationController
         js_env(
           accountEndpoint: api_v1_account_developer_keys_path(@context),
           enableTestClusterChecks: DeveloperKey.test_cluster_checks_enabled?,
-          validLtiScopes: TokenScopes::LTI_SCOPES,
+          validLtiScopes: (
+            if @domain_root_account.feature_enabled?(:platform_notification_service)
+              TokenScopes::LTI_SCOPES
+            else
+              TokenScopes::LTI_SCOPES.except(TokenScopes::LTI_PNS_SCOPE)
+            end
+          ),
           validLtiPlacements: Lti::ResourcePlacement.public_placements(@domain_root_account),
           includesFeatureFlagEnabled: Account.site_admin.feature_enabled?(:developer_key_support_includes)
         )

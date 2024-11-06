@@ -20,7 +20,6 @@ import React, {useState} from 'react'
 import {Element, useEditor} from '@craftjs/core'
 import {NoSections} from '../../common'
 import {Container} from '../../blocks/Container'
-import {SectionMenu} from '../../../editor/SectionMenu'
 import {useClassNames} from '../../../../utils'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -50,8 +49,5 @@ BlankSection.craft = {
   displayName: I18n.t('Blank Section'),
   custom: {
     isSection: true,
-  },
-  related: {
-    sectionMenu: SectionMenu,
   },
 }

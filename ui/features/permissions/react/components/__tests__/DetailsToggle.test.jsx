@@ -17,23 +17,30 @@
  */
 
 import React from 'react'
-import {shallow, mount} from 'enzyme'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
 import DetailsToggle from '../DetailsToggle'
 
 const defaultProps = () => ({
   title: "Aaron's best toggler",
-  detailItems: [],
+  detailItems: [
+    {
+      title: 'Account Settings:',
+      description:
+        'Allows user to view and manage the Settings and Notifications tabs in account settings.',
+    },
+  ],
 })
 
 it('renders DetailsToggle component', () => {
   const props = defaultProps()
-  const tree = mount(<DetailsToggle {...props} />)
-  const node = tree.find('DetailsToggle')
-  expect(node.exists()).toBeTruthy()
+  const tree = render(<DetailsToggle {...props} />)
+  const node = tree.getByText(props.title)
+  expect(node).toBeInTheDocument()
 })
 
-it('renders correct number of permission details when given list of permissions', () => {
+it('renders correct number of permission details when given list of permissions', async () => {
   const props = defaultProps()
   props.permissionName = 'super_fake_permissions_name_that_should_not_exist'
   props.detailItems = [
@@ -59,7 +66,11 @@ it('renders correct number of permission details when given list of permissions'
       description: 'Allows user to access the Theme Editor.',
     },
   ]
-  const tree = shallow(<DetailsToggle {...props} />)
-  const node = tree.find('View')
-  expect(node).toHaveLength(5)
+  const {getByText} = render(<DetailsToggle {...props} />)
+  const toggle = getByText(props.title).closest('button')
+  await userEvent.click(toggle)
+  props.detailItems.forEach(item => {
+    expect(getByText(item.title)).toBeInTheDocument()
+    expect(getByText(item.description)).toBeInTheDocument()
+  })
 })

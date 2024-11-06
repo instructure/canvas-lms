@@ -36,7 +36,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import ModalSpinner from './ModalSpinner'
 import PropTypes from 'prop-types'
 import React, {useContext, useState, useEffect} from 'react'
-import {useMutation, useQuery} from 'react-apollo'
+import {useMutation, useQuery} from '@apollo/react-hooks'
 import {ConversationContext} from '../../../util/constants'
 
 const I18n = useI18nScope('conversations_2')

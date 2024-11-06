@@ -22,8 +22,13 @@ const consoleMessagesToIgnore = {
 
     'Warning: [Focusable] Exactly one tabbable child is required (0 found).',
 
+    'Support for defaultProps will be removed from function components in a future major release.',
+
+    // Remove when we've converted all ReactDOM.render to createRoot
+    "Warning: ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17. Learn more: https://reactjs.org/link/switch-to-createroot",
+
     // This is from @instructure/ui-menu, nothing we can do about it ourselves
-    /Function components cannot be given refs\. Attempts to access this ref will fail[\s\S]*in (CanvasInstUIModal|PopoverTrigger)/,
+    /Function components cannot be given refs\. Atte˚qπmpts to access this ref will fail[\s\S]*in (CanvasInstUIModal|PopoverTrigger)/,
     /.*A theme registry has already been initialized.*/,
     // from an old discussions edit page
     /Error: Not implemented: navigation \(except hash changes\)/,
@@ -31,7 +36,7 @@ const consoleMessagesToIgnore = {
     // see https://github.com/instructure/instructure-ui/issues/815
     'Invalid prop `messages[0].text` of type `object` supplied to',
     /unknown pseudo-class selector/,
-    /or more breakpoints which are currently applied at the same time/,
+
     // until INSTUI fixes this in v8
     'Warning: Failed prop type: Invalid prop `color` of value `secondary` supplied to `CondensedButton`, expected one of ["primary","primary-inverse"].',
   ],
@@ -61,9 +66,11 @@ const consoleMessagesToIgnore = {
 
     // https://github.com/reactwg/react-18/discussions/82
     /Can't perform a React state update on an unmounted component/,
-
+    /Warning: \[.*\] Did you forget to connect editorRef to your editor component\?/,
     // the block editor includes a ContentEditable and a delete button w/in an INSTUI Tab.
     '[Focusable] Exactly one focusable child is required',
+
+    /or more breakpoints which are currently applied at the same time/,
   ],
 }
 

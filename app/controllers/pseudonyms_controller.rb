@@ -111,7 +111,7 @@ class PseudonymsController < ApplicationController
       if @domain_root_account
         @domain_root_account.pseudonyms.active_only.by_unique_id(email).each do |p|
           cc = p.communication_channel if p.communication_channel && p.user
-          cc ||= p.user.communication_channel rescue nil
+          cc ||= p.user.communication_channel
           @ccs << cc
         end
       end
@@ -119,7 +119,7 @@ class PseudonymsController < ApplicationController
 
     @ccs = @ccs.flatten.compact.uniq.select do |cc|
       if cc.user
-        cc.pseudonym ||= cc.user.pseudonym rescue nil
+        cc.pseudonym ||= cc.user.pseudonym
         cc.save if cc.changed?
         found = false
         Shard.partition_by_shard([@domain_root_account.id] + @domain_root_account.trusted_account_ids) do |account_ids|

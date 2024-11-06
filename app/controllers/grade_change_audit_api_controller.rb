@@ -285,8 +285,7 @@ class GradeChangeAuditApiController < AuditorApiController
     render_events(events, api_v1_audit_grade_change_url, course:, remove_anonymous: params[:student_id].present?)
   end
 
-  # TODO: remove Cassandra cruft and make Gradebook History use the admin search above
-  # once OSS users have been given the opportunity to migrate to Postgres auditors
+  # TODO: make Gradebook History use the admin search above
   def for_course_and_other_parameters
     begin
       course = Course.find(params[:course_id])
@@ -416,13 +415,13 @@ class GradeChangeAuditApiController < AuditorApiController
     return if override_events.blank?
 
     current_scores = current_override_scores_query(override_events).each_with_object({}) do |score, hash|
-      key = key_from_ids(score.enrollment.course_id, score.enrollment.user_id, score.grading_period_id)
+      key = [score.enrollment.course_id, score.enrollment.user_id, score.grading_period_id]
       hash[key] = score
     end
 
     override_events.each do |event|
       grading_period_id = event.in_grading_period? ? event.grading_period_id : nil
-      key = key_from_ids(event.context_id, event.student_id, grading_period_id)
+      key = [event.context_id, event.student_id, grading_period_id]
 
       current_score = current_scores[key]
       event.grade_current = if current_score&.override_grade
@@ -440,7 +439,7 @@ class GradeChangeAuditApiController < AuditorApiController
     events_with_grading_period = events.select(&:in_grading_period?)
     if events_with_grading_period.present?
       values = events_with_grading_period.map do |event|
-        key = key_from_ids(event.context_id, event.student_id, event.grading_period_id).join(",")
+        key = [event.context_id, event.student_id, event.grading_period_id].join(",")
         "(#{key})"
       end.join(", ")
 
@@ -451,7 +450,7 @@ class GradeChangeAuditApiController < AuditorApiController
     events_without_grading_period = events.reject(&:in_grading_period?)
     if events_without_grading_period.present?
       values = events_without_grading_period.map do |event|
-        key = key_from_ids(event.context_id, event.student_id).join(",")
+        key = [event.context_id, event.student_id].join(",")
         "(#{key})"
       end.join(", ")
 
@@ -461,15 +460,6 @@ class GradeChangeAuditApiController < AuditorApiController
     end
 
     scopes.reduce { |result, scope| result.union(scope) }
-  end
-
-  def key_from_ids(*ids)
-    # If we fetched our override change records from Postgres, the relevant ID
-    # fields will already be relative to the current shard and so the below
-    # method won't change them. If we got them from Cassandra, however, we have
-    # to adjust them before searching.
-
-    ids.map { |id| Shard.relative_id_for(id, Shard.current, Shard.current) }
   end
 
   def include_override_grades?(course: nil)

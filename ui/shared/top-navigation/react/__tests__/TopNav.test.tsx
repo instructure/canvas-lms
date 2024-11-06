@@ -16,7 +16,8 @@
 import {render} from '@testing-library/react'
 import TopNav from '../TopNav'
 import React from 'react'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {QueryClient} from '@tanstack/react-query'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {TopNavBar} from '@instructure/ui-top-nav-bar'
 
 // with this program. If not, see <http://www.gnu.org/licenses/>.
@@ -44,18 +45,18 @@ describe('TopNav', () => {
   it('renders', () => {
     expect(() =>
       render(
-        <QueryClientProvider client={queryClient}>
+        <MockedQueryClientProvider client={queryClient}>
           <TopNav />
-        </QueryClientProvider>
+        </MockedQueryClientProvider>
       )
     ).not.toThrow()
   })
 
   it('renders with breadcrumbs', () => {
     const {getByText} = render(
-      <QueryClientProvider client={queryClient}>
+      <MockedQueryClientProvider client={queryClient}>
         <TopNav />
-      </QueryClientProvider>
+      </MockedQueryClientProvider>
     )
 
     expect(getByText('crumb')).toBeInTheDocument()
@@ -66,9 +67,9 @@ describe('TopNav', () => {
 
     it('returns an object with getter and setter functions', () => {
       render(
-        <QueryClientProvider client={queryClient}>
+        <MockedQueryClientProvider client={queryClient}>
           <TopNav getBreadCrumbSetter={callback} />
-        </QueryClientProvider>
+        </MockedQueryClientProvider>
       )
 
       expect(callback).toHaveBeenCalledWith({
@@ -79,9 +80,9 @@ describe('TopNav', () => {
 
     it('provides a getter function that actually returns the crumbs', () => {
       render(
-        <QueryClientProvider client={queryClient}>
+        <MockedQueryClientProvider client={queryClient}>
           <TopNav getBreadCrumbSetter={callback} />
-        </QueryClientProvider>
+        </MockedQueryClientProvider>
       )
 
       const {getCrumbs} = callback.mock.calls[0][0]
@@ -94,9 +95,9 @@ describe('TopNav', () => {
     // makes some of the stuff we want to test here meaningless.
     it.skip('provides a setter function that can set the last crumb', async () => {
       const {findByText} = render(
-        <QueryClientProvider client={queryClient}>
+        <MockedQueryClientProvider client={queryClient}>
           <TopNav getBreadCrumbSetter={callback} />
-        </QueryClientProvider>
+        </MockedQueryClientProvider>
       )
 
       const {setCrumbs} = callback.mock.calls[0][0]
@@ -110,7 +111,7 @@ describe('TopNav', () => {
 
   it('shows action buttons when sent through prop', () => {
     const {getByText} = render(
-      <QueryClientProvider client={queryClient}>
+      <MockedQueryClientProvider client={queryClient}>
         <TopNav
           actionItems={[
             <TopNavBar.Item id="button1" key="button1">
@@ -121,7 +122,7 @@ describe('TopNav', () => {
             </TopNavBar.Item>,
           ]}
         />
-      </QueryClientProvider>
+      </MockedQueryClientProvider>
     )
 
     expect(getByText('button1')).toBeInTheDocument()
@@ -131,9 +132,9 @@ describe('TopNav', () => {
   it('should not show a breadCrumb when there is one or less', () => {
     window.ENV.breadcrumbs = [{name: 'crumb', url: 'crumb'}]
     const {queryByText} = render(
-      <QueryClientProvider client={queryClient}>
+      <MockedQueryClientProvider client={queryClient}>
         <TopNav />
-      </QueryClientProvider>
+      </MockedQueryClientProvider>
     )
 
     expect(queryByText('crumb')).not.toBeInTheDocument()

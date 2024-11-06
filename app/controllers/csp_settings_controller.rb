@@ -134,7 +134,11 @@ class CspSettingsController < ApplicationController
   def add_multiple_domains
     domains = params.require(:domains)
 
-    invalid_domains = domains.reject { |domain| URI.parse(domain) rescue nil }
+    invalid_domains = domains.reject do |domain|
+      URI.parse(domain)
+    rescue URI::InvalidURIError
+      false
+    end
     unless invalid_domains.empty?
       render json: { message: "invalid domains: #{invalid_domains.join(", ")}" }, status: :bad_request
       return false

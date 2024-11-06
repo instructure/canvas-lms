@@ -20,6 +20,7 @@ import * as z from 'zod'
 import {ZLtiPrivacyLevel} from '../LtiPrivacyLevel'
 import {ZLtiMessageType} from '../LtiMessageType'
 import {ZLtiPlacement} from '../LtiPlacement'
+import {ZLtiScope} from '@canvas/lti/model/LtiScope'
 
 export const ZLtiPlacementOverlay = z.object({
   text: z.string().optional(),
@@ -27,6 +28,8 @@ export const ZLtiPlacementOverlay = z.object({
   message_type: ZLtiMessageType.optional(),
   launch_height: z.string().optional(),
   launch_width: z.string().optional(),
+  icon_url: z.string().optional(),
+  default: z.enum(['enabled', 'disabled']).optional(),
 })
 
 export const ZLtiConfigurationOverlay = z.object({
@@ -38,9 +41,13 @@ export const ZLtiConfigurationOverlay = z.object({
   redirect_uris: z.array(z.string()).optional(),
   public_jwk: z.any().optional(),
   public_jwk_url: z.string().optional(),
-  disabled_scopes: z.string().optional(),
+  disabled_scopes: z.array(ZLtiScope).optional(),
   domain: z.string().optional(),
   privacy_level: ZLtiPrivacyLevel.optional(),
   disabled_placements: z.array(ZLtiPlacement).optional(),
-  placements: z.array(ZLtiPlacement).optional(),
+  placements: z.record(ZLtiPlacement, ZLtiPlacementOverlay.optional()).optional(),
+  scopes: z.array(ZLtiScope).optional(),
 })
+
+export interface LtiPlacementOverlay extends z.infer<typeof ZLtiPlacementOverlay> {}
+export interface LtiConfigurationOverlay extends z.infer<typeof ZLtiConfigurationOverlay> {}

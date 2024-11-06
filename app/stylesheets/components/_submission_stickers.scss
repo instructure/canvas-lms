@@ -19,10 +19,16 @@
 .Sticker__Container {
   background: none;
   border: none;
-  filter: drop-shadow(4px 4px 6px rgba(0, 0, 0, 0.4));
+  filter: drop-shadow(3px 3px 5px rgba(0, 0, 0, 0.3));
   overflow: hidden;
   position: relative;
   padding: 0;
+
+  &.small {
+    height: 60px;
+    width: 60px;
+  }
+
   &.medium {
     height: 80px;
     width: 80px;
@@ -56,6 +62,16 @@
 
   &:hover:before,&:focus-within:before {
     background: rgba(255, 255, 255, 0.2);
+  }
+
+  &.small {
+    &:before {
+      #{direction(left)}: -86px;
+    }
+
+    &:hover:before,&:focus-within:before {
+      #{direction(left)}: 86px;
+    }
   }
 
   &.medium {
@@ -95,7 +111,7 @@
   transition: opacity .2s ease-in-out;
   background-color: rgba(32,33,36,0.75);
   bottom: 0;
-  height: 33%;
+  height: 40%;
   #{direction(left)}: 0;
   #{direction(right)}: 0;
   opacity: 0;
@@ -104,10 +120,6 @@
   &.showing {
     opacity: 1
   }
-}
-
-.Sticker__Icon {
-  padding-top: 2px;
 }
 
 .StickerSearch__images {
@@ -128,7 +140,7 @@
   height: 100px;
   width: 100px;
   border: none;
-  filter: drop-shadow(4px 4px 6px rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(3px 3px 5px rgba(0, 0, 0, 0.3));
   position: relative;
 }
 

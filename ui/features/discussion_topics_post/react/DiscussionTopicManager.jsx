@@ -37,7 +37,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
 import PropTypes from 'prop-types'
 import React, {useEffect, useRef, useState, useCallback} from 'react'
-import {useQuery} from 'react-apollo'
+import {useQuery} from '@apollo/react-hooks'
 import {SplitScreenViewContainer} from './containers/SplitScreenViewContainer/SplitScreenViewContainer'
 import {DrawerLayout} from '@instructure/ui-drawer-layout'
 import {Mask} from '@instructure/ui-overlays'
@@ -48,6 +48,7 @@ import {flushSync} from 'react-dom'
 import {captureException} from '@sentry/react'
 import {LoadingSpinner} from './components/LoadingSpinner/LoadingSpinner'
 import useSpeedGrader from './hooks/useSpeedGrader'
+import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -55,7 +56,7 @@ const DiscussionTopicManager = props => {
   const [searchTerm, setSearchTerm] = useState('')
   const [filter, setFilter] = useState('all')
   const [unreadBefore, setUnreadBefore] = useState('')
-  const [sort, setSort] = useState('desc')
+  const [sort, setSort] = useState(null)
   const [pageNumber, setPageNumber] = useState(ENV.current_page)
   const [searchPageNumber, setSearchPageNumber] = useState(0)
   const [allThreadsStatus, setAllThreadsStatus] = useState(AllThreadsState.None)
@@ -410,6 +411,7 @@ const DiscussionTopicManager = props => {
                   >
                     <DiscussionTopicHeaderContainer
                       discussionTopicTitle={discussionTopicQuery.data.legacyNode.title}
+                      mobileHeader={!props.breakpoints.ICEDesktop}
                     />
                     <DiscussionTopicToolbarContainer
                       discussionTopic={discussionTopicQuery.data.legacyNode}
@@ -520,6 +522,7 @@ const DiscussionTopicManager = props => {
 
 DiscussionTopicManager.propTypes = {
   discussionTopicId: PropTypes.string.isRequired,
+  breakpoints: breakpointsShape,
 }
 
-export default DiscussionTopicManager
+export default WithBreakpoints(DiscussionTopicManager)

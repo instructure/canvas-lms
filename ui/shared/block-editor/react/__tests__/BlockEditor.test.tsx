@@ -24,8 +24,10 @@ import {
   getByLabelText as domGetByLabelText,
 } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
+import fetchMock from 'fetch-mock'
 import BlockEditor, {type BlockEditorProps} from '../BlockEditor'
 import {blank_page, blank_section_with_text} from './test-content'
+import {dispatchTemplateEvent, SaveTemplateEvent, DeleteTemplateEvent} from '../types'
 
 const user = userEvent.setup()
 
@@ -37,6 +39,7 @@ function renderEditor(props: Partial<BlockEditorProps> = {}) {
 
   return render(
     <BlockEditor
+      course_id="1"
       container={container}
       enableResizer={false} // jsdom doesn't render enough for BlockResizer to work
       content={{version: '0.2', blocks: blank_page}}
@@ -48,9 +51,23 @@ function renderEditor(props: Partial<BlockEditorProps> = {}) {
 }
 
 describe('BlockEditor', () => {
+  const can_edit_url = '/api/v1/courses/1/block_editor_templates/can_edit'
+  const get_templates_url =
+    '/api/v1/courses/1/block_editor_templates?include[]=node_tree&include[]=thumbnail&sort=name'
+  const template_url = '/api/v1/courses/1/block_editor_templates'
   beforeAll(() => {
     window.alert = jest.fn()
+
+    fetchMock.get(can_edit_url, {
+      can_edit: false,
+      can_edit_global: false,
+    })
+    fetchMock.get(get_templates_url, [{id: '1'}])
+    fetchMock.post(template_url, {global_id: 'g1'})
+    fetchMock.delete(`${template_url}/1`, 200)
   })
+
+  afterEach(() => jest.clearAllMocks())
 
   it('renders', () => {
     const {getByText, getByLabelText} = renderEditor()
@@ -58,57 +75,13 @@ describe('BlockEditor', () => {
     expect(getByText('Undo')).toBeInTheDocument()
     expect(getByText('Redo')).toBeInTheDocument()
     expect(getByLabelText('Block Toolbox')).not.toBeChecked()
+    expect(fetchMock.calls().map(call => call[0])).toEqual([can_edit_url])
   })
 
   it('warns on content version mismatch', () => {
-    // @ts-expect-error
+    // @ts-expect-error - passing invalid version on purpose
     renderEditor({content: {id: '1', version: '2', blocks: blank_page}})
     expect(window.alert).toHaveBeenCalledWith('Unknown block data version "2", mayhem may ensue')
-  })
-
-  describe('New page stepper', () => {
-    it('opens the stepper when no content is provided', () => {
-      renderEditor({content: undefined})
-      expect(screen.getByText('Create a new page')).toBeInTheDocument()
-      expect(screen.getByText('Start from Scratch')).toBeInTheDocument()
-      expect(screen.getByText('Select a Template')).toBeInTheDocument()
-    })
-
-    it('calls onCancel when the stepper is canceled', () => {
-      const onCancel = jest.fn()
-      renderEditor({content: undefined, onCancel})
-      screen.getByText('Cancel').click()
-      expect(onCancel).toHaveBeenCalled()
-    })
-
-    it.skip('creates a new page when the stepper is completed', async () => {
-      // this passes locally, but fails in jenkins looking for "Blank Section"
-
-      // craft.js is currently emitting a console error
-      // "Cannot update a component (`RenderNode`) while rendering a different component"
-      // Supress the message for now so we pass jenkins.
-      // will address with RCX-2173
-      jest.spyOn(console, 'error').mockImplementation(() => {})
-      const {container, getByText} = renderEditor({content: undefined})
-      expect(screen.getByText('Create a new page')).toBeInTheDocument()
-
-      const nextButton = screen.getByText('Next').closest('button') as HTMLButtonElement
-      await user.click(nextButton)
-      await user.click(nextButton)
-      await user.click(nextButton)
-      await user.click(nextButton)
-      const startButton = screen.getByText('Start Creating').closest('button') as HTMLButtonElement
-      await user.click(startButton)
-
-      await waitFor(() => {
-        expect(screen.queryByText('Create a new page')).not.toBeInTheDocument()
-      })
-      await waitFor(() => {
-        expect(getByText('Blank Section')).toBeInTheDocument()
-        expect(container.querySelector('.section-menu')).toBeInTheDocument()
-      })
-      expect(screen.queryByLabelText('Toolbox')).toHaveAttribute('role', 'dialog')
-    })
   })
 
   describe('data transformations', () => {
@@ -178,6 +151,43 @@ describe('BlockEditor', () => {
       expect(mobile).toBeChecked()
       expect(view).toHaveClass('mobile')
       expect(view).toHaveStyle({width: '320px'})
+    })
+  })
+
+  describe('saving templates', () => {
+    it('saves a template', async () => {
+      renderEditor({
+        content: {id: '1', version: '0.2', blocks: blank_page},
+      })
+      const template = {
+        name: 'test',
+        node_tree: {
+          rootNodeId: '1',
+          nodes: {1: {custom: {displayName: 'foo'}}},
+        },
+      }
+      const saveTemplateEvent = new CustomEvent(SaveTemplateEvent, {
+        detail: {
+          template,
+          globalTemplate: false,
+        },
+      })
+      dispatchTemplateEvent(saveTemplateEvent)
+
+      expect(fetchMock.called(template_url, 'POST')).toBe(true)
+    })
+
+    it('deletes a template', async () => {
+      window.confirm = jest.fn(() => true)
+      renderEditor({
+        content: {id: '1', version: '0.2', blocks: blank_page},
+      })
+      const deleteTemplateEvent = new CustomEvent(DeleteTemplateEvent, {
+        detail: '1',
+      })
+      dispatchTemplateEvent(deleteTemplateEvent)
+
+      expect(fetchMock.called(`${template_url}/1`, 'DELETE')).toBe(true)
     })
   })
 })

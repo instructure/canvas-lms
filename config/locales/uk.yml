@@ -3215,6 +3215,7 @@ uk:
       до вашого курсу Canvas.
   bring_your_content_into_your_course_c0f3df7e: "Введіть свій контент в свій курс"
   broken_file_link_found_in_your_course_7cc24395: "В вашому курсі знайдено недійсне посилання на файл"
+  browse_courses_c8af1754: "Перегляд курсів"
   browse_your_computer_9a735a4: "Огляд Вашого комп'ютера"
   browse_your_computer_for_a_course_image_d7db2376: "Огляд Вашого комп'ютера для зображення курсу"
   bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "ім'я bucket має бути одним з наступних: %{bucket_names}"
@@ -4033,6 +4034,7 @@ uk:
       description_teacher: "**Що ми розуміємо під  засобами взаємодії?**  Ми говоримо про веб-засоби, з якими найбільш імовірно ваші студенти вже знайомі  Студенти можуть використовувати такі ресурси як [Google Docs](%{google_url}) для спільної роботи над завданнями на кшталт групової статті або конспектування.  Ця сторінка дає їм (та вам) зручне місце для відстеження цих спільних дій, а також налаштовує їх без необхідності обмінюватися електронними листами."
       how_to_start_a_new_collaboration: "Щоб дізнатися більше про конкретний тип співробітництва, натисніть кнопку \"Почати нову співпрацю\", а потім вибрати цей тип в списку."
       links: 
+        add_collaboration: "Додати співробітництво"
         collaboration: "Сумісна робота"
         new: "Почати нове співробітництво"
       page_title: "Сумісна робота"
@@ -6017,6 +6019,7 @@ uk:
   custom_css_and_javascript_may_cause_accessibility__93d2a823: "Призначені для користувача CSS і Javascript може викликати проблеми доступності або конфлікти з майбутніми оновленнями Canvas!"
   custom_fields_fc3e55af: "Поля користувача"
   custom_link_details_35fd38fc: "Подробиці посилання на замовлення "
+  customize_74cdc895: Налаштувати
   customize_this_menu_efa72a9: "Налаштувати це меню"
   cutoff_score_74254c89: "Округлити оцінку"
   cyan_c1d5f68a: "Зелено-синій колір"
@@ -18317,6 +18320,16 @@ uk:
         all_users: "Усі користувачі"
         choose_term: "Обрати семестр"
         search_results: "Результати пошуку для \"%{search_term}\""
+    last_login: 
+      labels: 
+        current_ip: "Поточний IP облікового запису"
+        current_login: "Поточний обліковий запис"
+        last_ip: "IP адреса останнього входу"
+        last_login: "Останній вхід"
+        last_request: "Останній запит"
+      more: більше...
+      never: ніколи
+      none: жодного
     linkedin_added: "Обліковий запис LinkedIn успішно додано!"
     linkedin_fail: "Помилка авторизації LinkedIn. Будь ласка спробуйте ще раз"
     logins: 

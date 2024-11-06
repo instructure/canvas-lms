@@ -579,7 +579,7 @@ class CalendarEventsApiController < ApplicationController
         rr = validate_and_parse_rrule(
           rrule,
           dtstart: start_at,
-          tzid: @current_user.time_zone&.tzinfo&.name || "UTC"
+          tzid: params_for_create[:time_zone_edited] || @current_user.time_zone&.tzinfo&.name || "UTC"
         )
         return false if rr.nil?
 
@@ -1674,11 +1674,11 @@ class CalendarEventsApiController < ApplicationController
       # as a more sane default then natural DB order. No, it isn't perfect but much better.
       scope = assignment_context_scope(user, sub_assignment:)
 
+      next unless scope
+
       # exclude parent assignment when the discussion checkpoints FF is enabled
       # because due dates and other relevant info is stored in the sub_assignments/checkpoints
       scope = scope.where(has_sub_assignments: false) if discussion_checkpoints_enabled?
-
-      next unless scope
 
       scope = scope.order(:due_at, :id)
       scope = scope.active

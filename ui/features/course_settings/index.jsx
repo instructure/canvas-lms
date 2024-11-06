@@ -34,6 +34,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import ready from '@instructure/ready'
 import QuantitativeDataOptions from './react/components/QuantitativeDataOptions'
 import CourseDefaultDueTime from './react/components/CourseDefaultDueTime'
+import {CourseApps} from './react/components/CourseApps'
 
 const I18n = useI18nScope('course_settings')
 
@@ -169,6 +170,16 @@ ready(() => {
         <Integrations />
       </Suspense>,
       integrationsContainer
+    )
+  }
+
+  const appsMountpoint = document.getElementById('tab-apps')
+  if (appsMountpoint) {
+    ReactDOM.render(
+      <Suspense fallback={<Loading />}>
+        <CourseApps />
+      </Suspense>,
+      appsMountpoint
     )
   }
 })

@@ -45,6 +45,8 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :discussion_entry_participants
     set_replica_identity :discussion_topic_participants
     set_replica_identity :discussion_topics
+    set_replica_identity :discussion_topic_summaries
+    set_replica_identity :discussion_topic_summary_feedback
     set_replica_identity :enrollment_dates_overrides
     set_replica_identity :enrollment_states
     set_replica_identity :enrollment_terms
@@ -57,6 +59,8 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :inbox_settings
     set_replica_identity :lti_ims_registrations
     set_replica_identity :lti_line_items
+    set_replica_identity :lti_registrations
+    set_replica_identity :lti_registration_account_bindings
     set_replica_identity :lti_resource_links
     set_replica_identity :lti_results
     set_replica_identity :mentions

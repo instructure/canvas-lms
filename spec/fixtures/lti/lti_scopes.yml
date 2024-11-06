@@ -77,10 +77,12 @@
 - scope: https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly
   description: Can retrieve user data associated with the context the tool is installed in
 
+- scope: https://purl.imsglobal.org/spec/lti/scope/noticehandlers
+  description: Can register event notice handlers using the Platform Notification Service
+
 - scope: https://canvas.instructure.com/lti/public_jwk/scope/update
   description: Can update public jwk for LTI services
 
 - scope: https://canvas.instructure.com/lti/replace_editor_contents
   description: Can replace the entire contents of the RCE
   undocumented: true
-

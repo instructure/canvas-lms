@@ -157,6 +157,7 @@ CanvasRails::Application.routes.draw do
   concern :pages do
     resources :wiki_pages, path: :pages, except: %i[update destroy new], constraints: { id: %r{[^/]+} } do
       get "revisions" => "wiki_pages#revisions", :as => :revisions
+      put "create_block_editor" => "wiki_pages#create_block_editor", :as => :create_block_editor
     end
 
     get "wiki" => "wiki_pages#front_page", :as => :wiki
@@ -889,6 +890,7 @@ CanvasRails::Application.routes.draw do
   get "login/otp" => "login/otp#new", :as => :otp_login
   post "login/otp/sms" => "login/otp#send_via_sms", :as => :send_otp_via_sms
   post "login/otp" => "login/otp#create"
+  delete "login/otp/cancel" => "login/otp#cancel_otp", :as => :cancel_otp
   get "users/self/otps" => "one_time_passwords#index", :as => :one_time_passwords
   delete "users/self/otps" => "one_time_passwords#destroy_all", :as => :destroy_all_one_time_passwords
 
@@ -1626,6 +1628,8 @@ CanvasRails::Application.routes.draw do
       get "users/:id/colors", controller: "users", action: "get_custom_colors"
       get "users/:id/colors/:asset_string", controller: "users", action: "get_custom_color"
       put "users/:id/colors/:asset_string", controller: "users", action: "set_custom_color"
+
+      put "users/:id/text_editor_preference", controller: "users", action: "set_text_editor_preference"
 
       get "users/:id/new_user_tutorial_statuses", action: "get_new_user_tutorial_statuses"
       put "users/:id/new_user_tutorial_statuses/:page_name", action: "set_new_user_tutorial_status"
@@ -2695,6 +2699,15 @@ CanvasRails::Application.routes.draw do
     scope(controller: :rich_content_api) do
       post "rich_content/generate", action: :generate
     end
+
+    scope(controller: :block_editor_templates_api) do
+      get "courses/:course_id/block_editor_templates", action: :index
+      post "courses/:course_id/block_editor_templates", action: :create
+      put "courses/:course_id/block_editor_templates/:id", action: :update
+      delete "courses/:course_id/block_editor_templates/:id", action: :destroy
+      post "courses/:course_id/block_editor_templates/:id/publish", action: :publish
+      get "courses/:course_id/block_editor_templates/can_edit", action: :can_edit
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented or
@@ -2907,6 +2920,12 @@ CanvasRails::Application.routes.draw do
     scope(controller: "lti/ims/names_and_roles") do
       get "courses/:course_id/names_and_roles", controller: "lti/ims/names_and_roles", action: :course_index, as: :course_names_and_roles
       get "groups/:group_id/names_and_roles", controller: "lti/ims/names_and_roles", action: :group_index, as: :group_names_and_roles
+    end
+
+    # 1Edtech (IMS) LTI Platform Notification service (PNS)
+    scope(controller: "lti/ims/notice_handlers") do
+      get "notice-handlers/:context_external_tool_id", action: :index, as: :lti_notice_handlers
+      put "notice-handlers/:context_external_tool_id", action: :update, as: :update_lti_notice_handlers
     end
 
     # Security

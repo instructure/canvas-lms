@@ -19,6 +19,7 @@
 import {type Node} from '@craftjs/core'
 import {ROOT_NODE} from '@craftjs/utils'
 import {findFirstChildBlock} from './KBNavigator'
+import {TemplateEditor} from '../types'
 
 const getToolbarPos = (
   domNode: HTMLElement | null,
@@ -50,33 +51,22 @@ const getToolbarPos = (
   }
 }
 
-const getMenuPos = (
-  domNode: HTMLElement | null,
-  mountPoint: HTMLElement,
-  currentMenuRef: HTMLElement | null
-) => {
-  if (!domNode) return {top: 0, left: 0}
-
-  const nodeRect = domNode.getBoundingClientRect()
-  const refRect = mountPoint.getBoundingClientRect()
-
-  const top = nodeRect.top - refRect.top
-  const menuWidth = currentMenuRef ? currentMenuRef.getBoundingClientRect().width : 0
-  const left = nodeRect.left + nodeRect.width - refRect.left - menuWidth
-
-  return {top, left}
-}
-
-const findUpNode = (node: Node, query: any): Node | undefined => {
+function findUpNode(
+  node: Node,
+  query: any,
+  templateEditor: TemplateEditor = TemplateEditor.NONE
+): Node | undefined {
   let upnode = node.data.parent ? query.node(node.data.parent).get() : undefined
   while (upnode && upnode.data.parent && upnode.data.custom?.noToolbar) {
     upnode = upnode.data.parent ? query.node(upnode.data.parent).get() : undefined
   }
-  return upnode && upnode.id !== ROOT_NODE ? upnode : undefined
+  return upnode && (!query.node(upnode.id).isRoot() || templateEditor === TemplateEditor.GLOBAL)
+    ? upnode
+    : undefined
 }
 
-const findDownNode = (node: Node, query: any): Node | undefined => {
-  if (!node.data.custom?.isSection) return undefined
+function findDownNode(node: Node, query: any): Node | undefined {
+  if (!(node.data.custom?.isSection || query.node(node.id).isRoot())) return undefined
   return findFirstChildBlock(node, query) || undefined
 }
 
@@ -89,4 +79,4 @@ const findContainingSection = (node: Node, query: any): Node | undefined => {
   return upnode && upnode.data.custom?.isSection ? upnode : undefined
 }
 
-export {getToolbarPos, getMenuPos, findUpNode, findDownNode, findContainingSection}
+export {getToolbarPos, findUpNode, findDownNode, findContainingSection}

@@ -18,7 +18,7 @@
 
 import {useEffect, useState, useCallback} from 'react'
 import {STUDENT_DISCUSSION_QUERY} from '../../graphql/Queries'
-import {useQuery} from 'react-apollo'
+import {useQuery} from '@apollo/react-hooks'
 import {isSpeedGraderInTopUrl} from '../utils/constants'
 
 export default function useSpeedGrader({
@@ -139,6 +139,18 @@ export default function useSpeedGrader({
       window.removeEventListener('message', onMessage)
     }
   }, [highlightEntryId, onMessage])
+
+  // Set highlight default entry; we already set this in iframe for new student. only trigger on new student.
+  useEffect(() => {
+    const studentEntries =
+      studentTopicQuery?.data?.legacyNode?.discussionEntriesConnection?.nodes || []
+    const studentEntriesIds = studentEntries.map(entry => entry._id)
+    const currentEntryIndex = studentEntriesIds.indexOf(highlightEntryId)
+    if (studentEntries[currentEntryIndex]) {
+      navigateToEntry(studentEntries[currentEntryIndex])
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStudentId, studentTopicQuery?.data?.legacyNode?.discussionEntriesConnection?.nodes])
 
   const handleJumpFocusToSpeedGrader = () => {
     window.top.postMessage(

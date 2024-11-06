@@ -17,7 +17,7 @@
  */
 
 import {useEffect, useRef} from 'react'
-import {useApolloClient, useQuery} from 'react-apollo'
+import {useApolloClient, useQuery} from '@apollo/react-hooks'
 import useCanvasContext from './useCanvasContext'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'

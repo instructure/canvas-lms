@@ -114,7 +114,7 @@ export default props => (
   <ApolloProvider client={client}>
     <Query query={SCC_QUERY} variables={{courseId: props.courseId, studentId: props.studentId}}>
       {({data, loading}) => {
-        const {course, user} = data
+        const {course, user} = data || {}
         return (
           <StudentContextTray
             data={{loading, course: course || placeholderCourse(props.courseId), user}}

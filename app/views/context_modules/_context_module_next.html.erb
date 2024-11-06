@@ -221,7 +221,7 @@
       </div>
       <% if @can_edit && Account.site_admin.feature_enabled?(:selective_release_ui_api) %>
         <div class="view_assign">
-          <% if context_module && @module_ids_with_overrides.include?(context_module.id) %>
+          <% if context_module && @module_ids_with_overrides&.include?(context_module.id) %>
             <i aria-hidden="true" class="icon-group"></i>
             <button
               class="btn view_assign_link"

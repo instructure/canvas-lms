@@ -27,7 +27,7 @@ import {MessageDetailItem} from '../../components/MessageDetailItem/MessageDetai
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState, useMemo, useCallback} from 'react'
 import {Spinner} from '@instructure/ui-spinner'
-import {useMutation, useQuery} from 'react-apollo'
+import {useMutation, useQuery} from '@apollo/react-hooks'
 import {View} from '@instructure/ui-view'
 import {inboxMessagesWrapper} from '../../../util/utils'
 

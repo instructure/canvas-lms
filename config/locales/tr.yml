@@ -3723,6 +3723,7 @@ tr:
       permissions: "%{name} için izinler düzenleniyor"
     unpublished_title: Yayınlanmadı
   broken_file_link_found_in_your_course_7cc24395: "Dersinizde bozuk dosya bağlantısı var"
+  browse_courses_c8af1754: "Derslere gözat"
   browse_your_computer_9a735a4: "bilgisayara gözat"
   browse_your_computer_for_a_course_image_d7db2376: "Ders görseli için bilgisayarınıza gözatın"
   bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "birikim adı şunlardan biri olmalı: %{bucket_names}"
@@ -4634,6 +4635,7 @@ tr:
           Belirli bir türde işbirliği hakkında billgi edinmek için "Yeni Bir İşbirliği Başlat" a tıklayıp sarkık menüden uygun
           plan türü seçin.
       links: 
+        add_collaboration: "İşbirliği Ekle"
         collaboration: İşbirliği
         delete: "Bu İşbirliğini Sil"
         edit: "Bu İşbirliğini Düzenle"
@@ -4808,6 +4810,7 @@ tr:
     general_error_with_message: "Canlı derse katılmada bir hata meydana geldi. Mesaj :  '%{message}'"
     inactive_error: "Canlı ders şu an aktif değil"
     index: 
+      add_conference: "Konferans Ekle"
       concluded_conferences: "Tamamlanmış Canlı Dersler"
       conference: "Canlı Ders"
       conference_header: "Canlı Dersler"
@@ -6760,6 +6763,7 @@ tr:
   create_new_discussions_6ab69da2: "Yeni tartışma oluştur"
   create_new_e0946c49: "Yeni oluştur"
   create_new_event_e9fb2fb6: "Yeni Bir Olay Oluştur"
+  create_page_6093fb98: "Sayfa Oluştur"
   create_quiz_d08bb72a: "Kısa Sınav Oluştur"
   create_rubric_ec33ddf9: "Değerlendirme Listesi Oluştur"
   create_slots_71dbb2f8: "Aralıklar Oluştur"
@@ -6915,6 +6919,7 @@ tr:
   custom_fields_fc3e55af: "Varsayılan Alanlar"
   custom_link_details_35fd38fc: "Özelleştirilmiş bağlantı ayrıntıları"
   custom_outcomes_31a741f5: "Varsayılan Çıktılar"
+  customize_74cdc895: Özelleştir
   customize_learning_mastery_ratings_4ace142a: "Öğrenme Yeterlilik Düzeylerini Özelleştirin"
   customize_this_menu_efa72a9: "Bu menüyü özelleştir"
   cutoff_score_74254c89: "kesilme puanı"
@@ -19861,6 +19866,16 @@ tr:
         all_users: "Tüm kullanıcılar"
         choose_term: "Dönem Seçiniz"
         search_results: "\"%{search_term}\" için arama sonuçları"
+    last_login: 
+      labels: 
+        current_ip: "Geçerli oturum IP numarası"
+        current_login: "Geçerli oturum"
+        last_ip: "Son oturum IP numarası"
+        last_login: "Son oturum"
+        last_request: "Son istek"
+      more: "daha fazla..."
+      never: asla
+      none: yok
     linkedin_added: "LinkedIn hesabı başarıyla eklendi!"
     linkedin_fail: "LinkedIn kimlik doğrulaması başarısız. Lütfen tekrar deneyin"
     logins: 

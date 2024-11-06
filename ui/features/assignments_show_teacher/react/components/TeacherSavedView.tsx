@@ -17,20 +17,26 @@
  */
 
 import React from 'react'
-import type {TeacherAssignmentType} from '../../graphql/AssignmentTeacherTypes'
-import AssignmentHeader from './AssignmentHeader'
+import type {TeacherAssignmentType} from '@canvas/assignments/graphql/teacher/AssignmentTeacherTypes'
+import AssignmentHeader, {ASSIGNMENT_VIEW_TYPES} from '@canvas/assignments/react/AssignmentHeader'
 import {QueryProvider} from '@canvas/query'
+import WithBreakpoints, {type Breakpoints} from '@canvas/with-breakpoints'
 
 interface TeacherViewProps {
   assignment: TeacherAssignmentType
+  breakpoints?: Breakpoints
 }
 
-const TeacherSavedView: React.FC<TeacherViewProps> = props => {
+const TeacherSavedView: React.FC<TeacherViewProps> = ({assignment, breakpoints = {}}) => {
   return (
     <QueryProvider>
-      <AssignmentHeader assignment={props.assignment} breakpoints={{}} />
+      <AssignmentHeader
+        type={ASSIGNMENT_VIEW_TYPES.SAVED}
+        assignment={assignment}
+        breakpoints={breakpoints}
+      />
     </QueryProvider>
   )
 }
 
-export default TeacherSavedView
+export default WithBreakpoints(TeacherSavedView)

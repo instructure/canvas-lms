@@ -29,7 +29,7 @@ export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = 
     querySizes.tablet = {minWidth: mobile ? '768px' : '0px'}
   }
   if (desktop) {
-    querySizes.desktop = {minWidth: tablet ? '1024px' : '768px'}
+    querySizes.desktop = {minWidth: tablet ? '1024px' : '769px'}
   }
   return querySizes
 }

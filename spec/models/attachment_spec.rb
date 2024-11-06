@@ -1547,6 +1547,26 @@ describe Attachment do
       expect(@a1.reload.replacement_attachment).to eql again
     end
 
+    it "updates a maximum of 50 replacement pointers" do
+      attachments = [
+        { display_name: "dummy",
+          context_type: "Course",
+          context_id: @course.id,
+          replacement_attachment_id: @a1.id }
+      ] * 51
+      Attachment.bulk_insert(attachments)
+
+      @a.update_attribute(:display_name, "a1")
+      @a.handle_duplicates(:overwrite)
+
+      expect(@course.attachments.where(display_name: "dummy").group(:replacement_attachment_id).count).to eq({
+                                                                                                               @a.id => 50,
+                                                                                                               @a1.id => 1
+                                                                                                             })
+      expect(@course.attachments.where(display_name: "dummy").order(:id).last.replacement_attachment_id).to eq @a1.id
+      expect(@a1.reload.replacement_attachment_id).to eq @a.id
+    end
+
     it "handles renaming duplicates" do
       @a.display_name = "a1"
       deleted = @a.handle_duplicates(:rename)
@@ -1636,6 +1656,13 @@ describe Attachment do
       @a.handle_duplicates(:overwrite)
       @a1.update_attribute(:replacement_attachment_id, nil)
       expect(@course.attachments.find(@a1.id)).to eql @a
+    end
+
+    it "finds replacement beyond replacement_attachment_id update threshold" do
+      files = Array.new(4) { attachment_with_context(@course, display_name: "foo") }
+      files.each_cons(2) { |a, b| a.update! replacement_attachment: b, file_state: "deleted" }
+
+      expect(@course.attachments.find(files.first.id)).to eql files.last
     end
 
     it "preserves hidden state" do

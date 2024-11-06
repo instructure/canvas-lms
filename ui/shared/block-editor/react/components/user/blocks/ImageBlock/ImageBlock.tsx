@@ -16,11 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {CSSProperties, useCallback, useEffect, useRef, useState} from 'react'
-import {useEditor, useNode, type Node} from '@craftjs/core'
-
-import {Img} from '@instructure/ui-img'
-
+import React, {type CSSProperties, useCallback, useEffect, useRef, useState} from 'react'
+import {useEditor, useNode} from '@craftjs/core'
 import {ImageBlockToolbar} from './ImageBlockToolbar'
 import {useClassNames} from '../../../../utils'
 import {type ImageBlockProps, type ImageVariant, type ImageConstraint} from './types'
@@ -44,26 +41,22 @@ const ImageBlock = ({
     enabled: state.options.enabled,
   }))
   const {
-    actions: {setProp, setCustom},
+    actions: {setCustom},
     connectors: {connect, drag},
-  } = useNode((n: Node) => {
-    return {
-      node: n,
-    }
-  })
+  } = useNode()
   const clazz = useClassNames(enabled, {empty: !src}, ['block', 'image-block'])
   const [styl, setStyl] = useState<any>({})
   const [imageLoaded, setImageLoaded] = useState(false)
-  const [currSzVariant, setCurrSzVariant] = useState(sizeVariant)
-  const [currKeepAR, setCurrKeepAR] = useState(maintainAspectRatio)
   const [aspectRatio, setAspectRatio] = useState(1)
   // in preview mode, node.dom is null, so use a ref to the element
   const [blockRef, setBlockRef] = useState<HTMLDivElement | null>(null)
   const imgRef = useRef<HTMLImageElement | null>(null)
   const loadingStyle = {
     position: 'absolute',
-    left: 'calc(50% - 24px)',
-    top: 'calc(50% - 24px)',
+    left: '10px',
+    top: '10px',
+    width: '100px',
+    height: '100px',
   } as CSSProperties
 
   const setSize = useCallback(() => {
@@ -77,19 +70,14 @@ const ImageBlock = ({
       return
     }
     const sty: any = {}
+    const unit = sizeVariant === 'percent' ? '%' : 'px'
     if (width) {
-      if (sizeVariant === 'percent') {
-        const parent = blockRef.offsetParent
-        const pctw = parent ? (width / parent.clientWidth) * 100 : 100
-        sty.width = `${pctw}%`
-      } else {
-        sty.width = `${width}px`
-      }
+      sty.width = `${width}${unit}`
     }
     if (maintainAspectRatio) {
       sty.height = 'auto'
-    } else if (sizeVariant === 'pixel' || sizeVariant === 'percent') {
-      sty.height = `${height}px`
+    } else {
+      sty.height = `${height}${unit}`
     }
     setStyl(sty)
   }, [blockRef, height, maintainAspectRatio, sizeVariant, src, width])
@@ -104,36 +92,16 @@ const ImageBlock = ({
       const img = imgRef.current
       setImageLoaded(true)
       setAspectRatio(img.naturalWidth / img.naturalHeight)
-      setProp((props: any) => {
-        props.width = img.width
-        props.height = img.height
-      })
       clearInterval(loadTimer)
     }, 10)
     return () => {
       clearInterval(loadTimer)
     }
-  }, [imageLoaded, setProp, src])
+  }, [imageLoaded, src])
 
   useEffect(() => {
     setSize()
   }, [width, height, aspectRatio, setSize])
-
-  useEffect(() => {
-    if (currSzVariant !== sizeVariant || currKeepAR !== maintainAspectRatio) {
-      setCurrSzVariant(sizeVariant)
-      setCurrKeepAR(maintainAspectRatio)
-      setSize()
-      if (!maintainAspectRatio) {
-        setProp((props: any) => {
-          if (imgRef.current) {
-            props.width = imgRef.current.clientWidth
-            props.height = imgRef.current.clientHeight
-          }
-        })
-      }
-    }
-  }, [currKeepAR, currSzVariant, maintainAspectRatio, setProp, setSize, sizeVariant])
 
   useEffect(() => {
     setCustom((ctsm: any) => {
@@ -161,29 +129,24 @@ const ImageBlock = ({
         aria-label={ImageBlock.craft.displayName}
         tabIndex={-1}
         className={clazz}
-        style={styl}
+        style={{...styl, position: 'relative'}}
         ref={el => {
           el && connect(drag(el as HTMLDivElement))
           setBlockRef(el)
         }}
       >
-        <div style={{position: 'relative'}}>
-          {!imgRef?.current?.complete ? (
-            <div style={loadingStyle}>
-              <Spinner renderTitle={I18n.t('Loading')} size="small" />
-            </div>
-          ) : null}
-          <div style={!imgRef?.current?.complete ? {opacity: '0.2'} : {}}>
-            <Img
-              elementRef={el => (imgRef.current = el as HTMLImageElement)}
-              display="inline-block"
-              src={src || ImageBlock.craft.defaultProps.src}
-              constrain={imgConstrain}
-              alt={alt || ''}
-              style={styl}
-            />
+        {!imgRef?.current?.complete ? (
+          <div style={loadingStyle}>
+            <Spinner renderTitle={I18n.t('Loading')} size="x-small" />
           </div>
-        </div>
+        ) : null}
+
+        <img
+          ref={imgRef}
+          src={src || ImageBlock.craft.defaultProps.src}
+          alt={alt || ''}
+          style={{width: '100%', height: '100%', objectFit: imgConstrain, display: 'inline-block'}}
+        />
       </div>
     )
   }

@@ -1,0 +1,54 @@
+/*
+ * Copyright (C) 2024 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* TODO make mostly/fully InstUI? */
+.loginLogo {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem; /* 12px */
+    justify-content: center;
+    margin: 0 auto;
+    text-align: center;
+
+    img {
+        display: block;
+        height: 3.4375rem; /* 55px */
+        object-fit: contain;
+        width: 11.25rem; /* 180px */
+    }
+
+    .loginLogo__desc {
+        font-size: 0.875rem; /* 14px */
+        margin-top: 0.5rem; /* 8px */
+    }
+
+    @media (min-width: 48rem) {
+        img {
+            height: 4.0625rem; /* 65px */
+            width: 13.75rem; /* 220px */
+        }
+    }
+
+    @media (min-width: 80rem) {
+        img {
+            height: 5.3125rem; /* 85px */
+            width: 16.25rem; /* 260px */
+        }
+    }
+}

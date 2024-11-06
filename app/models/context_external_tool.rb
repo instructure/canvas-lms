@@ -1056,6 +1056,18 @@ class ContextExternalTool < ActiveRecord::Base
     )
   end
 
+  def can_access_content_tag?(content_tag)
+    return false unless content_tag.is_a?(ContentTag)
+    return true if content_tag.content == self
+    return false unless use_1_3? && developer_key
+
+    # LTI 1.3: dev key ids match
+    context = content_tag.context
+    context = context.context if context.is_a?(Assignment)
+
+    developer_key_id == ContextExternalTool.from_content_tag(content_tag, context)&.developer_key_id
+  end
+
   def self.contexts_to_search(context, include_federated_parent: false)
     case context
     when Course

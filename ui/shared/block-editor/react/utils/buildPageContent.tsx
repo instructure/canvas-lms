@@ -24,8 +24,7 @@ import {AboutSection} from '../components/user/sections/AboutSection'
 import {FooterSection} from '../components/user/sections/FooterSection'
 import {QuizSection} from '../components/user/sections/QuizSection'
 import {AnnouncementSection} from '../components/user/sections/AnnouncementSection'
-// import {ColumnsSection} from '../components/user/sections/ColumnsSection'
-import {scratchPage} from '../assets/data/scratchPage'
+import {ColumnsSection} from '../components/user/sections/ColumnsSection'
 
 import {type PageSection} from '../components/editor/NewPageStepper/types'
 
@@ -37,8 +36,7 @@ export const buildPageContent = (
   _fontName: string
 ) => {
   if (selectedSections.length === 0) {
-    actions.deserialize(scratchPage)
-    return
+    selectedSections.push('blank')
   }
   selectedSections.forEach(section => {
     let nodeTree
@@ -64,6 +62,8 @@ export const buildPageContent = (
       case 'announcement':
         nodeTree = query.parseReactElement(<AnnouncementSection />).toNodeTree()
         break
+      case 'blank':
+        nodeTree = query.parseReactElement(<ColumnsSection columns={1} />).toNodeTree()
     }
     if (nodeTree) {
       actions.addNodeTree(nodeTree, 'ROOT')

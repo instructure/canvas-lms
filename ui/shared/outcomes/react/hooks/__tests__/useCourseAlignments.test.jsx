@@ -31,13 +31,13 @@ const outcomeTitles = result =>
   (result?.current?.rootGroup?.outcomes?.edges || []).map(edge => edge.node.title)
 
 describe('useCourseAlignments', () => {
-  let cache, mocks, showFlashAlertSpy
-  const searchMocks = [...courseAlignmentMocks(), ...courseAlignmentMocks({searchQuery: 'TEST'})]
+  let cache, mocks, searchMocks, showFlashAlertSpy
 
   beforeEach(() => {
     jest.useFakeTimers()
     cache = createCache()
     mocks = courseAlignmentMocks()
+    searchMocks = [...courseAlignmentMocks(), ...courseAlignmentMocks({searchQuery: 'TEST'})]
     showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
   })
 

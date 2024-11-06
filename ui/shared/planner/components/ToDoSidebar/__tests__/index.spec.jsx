@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {shallow, mount} from 'enzyme'
 import React from 'react'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import moment from 'moment-timezone'
 import {ToDoSidebar} from '../index'
 
@@ -31,20 +32,20 @@ const defaultProps = {
 }
 
 it('displays a spinner when the loaded prop is false', () => {
-  const wrapper = shallow(<ToDoSidebar {...defaultProps} loaded={false} />)
-  expect(wrapper.find('Spinner').exists()).toBe(true)
+  const {getByText} = render(<ToDoSidebar {...defaultProps} loaded={false} />)
+  expect(getByText('To Do Items Loading')).toBeInTheDocument()
 })
 
 it('calls loadItems prop on mount', () => {
   const fakeLoadItems = jest.fn()
-  mount(<ToDoSidebar {...defaultProps} sidebarLoadInitialItems={fakeLoadItems} />)
+  render(<ToDoSidebar {...defaultProps} sidebarLoadInitialItems={fakeLoadItems} />)
   expect(fakeLoadItems).toHaveBeenCalled()
 })
 
 it('includes course_id in call loadItems prop on mount', () => {
   const fakeLoadItems = jest.fn()
   const course_id = '17'
-  mount(
+  render(
     <ToDoSidebar {...defaultProps} sidebarLoadInitialItems={fakeLoadItems} forCourse={course_id} />
   )
   expect(fakeLoadItems).toHaveBeenCalled()
@@ -66,8 +67,10 @@ it('renders out ToDoItems for each item', () => {
       title: 'Glory to Rome',
     },
   ]
-  const wrapper = shallow(<ToDoSidebar {...defaultProps} items={items} />)
-  expect(wrapper.find('ToDoItem')).toHaveLength(2)
+  const {container, getAllByText} = render(<ToDoSidebar {...defaultProps} items={items} />)
+  expect(container.querySelectorAll('.ToDoSidebarItem').length).toBe(items.length)
+  expect(getAllByText(items[0].title).length).toBeGreaterThan(0)
+  expect(getAllByText(items[1].title).length).toBeGreaterThan(0)
 })
 
 it('initially renders out 7 ToDoItems', () => {
@@ -128,11 +131,11 @@ it('initially renders out 7 ToDoItems', () => {
     },
   ]
 
-  const wrapper = shallow(<ToDoSidebar {...defaultProps} items={items} />)
-  expect(wrapper.find('ToDoItem')).toHaveLength(7)
+  const {container} = render(<ToDoSidebar {...defaultProps} items={items} />)
+  expect(container.querySelectorAll('.ToDoSidebarItem')).toHaveLength(7)
 })
 
-it('invokes change dashboard view when link is clicked', () => {
+it('invokes change dashboard view when link is clicked', async () => {
   const changeDashboardView = jest.fn()
   // becasue the show all button is only rendered if there are items
   const items = [
@@ -143,10 +146,12 @@ it('invokes change dashboard view when link is clicked', () => {
       title: 'Glory to Rome',
     },
   ]
-  const wrapper = shallow(
+  const {getByText} = render(
     <ToDoSidebar {...defaultProps} items={items} changeDashboardView={changeDashboardView} />
   )
-  wrapper.find('Link').simulate('click')
+  const link = getByText('Show All')
+  await userEvent.click(link)
+
   expect(changeDashboardView).toHaveBeenCalledWith('planner')
 })
 
@@ -167,25 +172,25 @@ it('does not render out items that are completed', () => {
       title: 'Glory to Rome',
     },
   ]
-  const wrapper = shallow(<ToDoSidebar {...defaultProps} items={items} />)
-  expect(wrapper.find('ToDoItem')).toHaveLength(0)
+  const wrapper = render(<ToDoSidebar {...defaultProps} items={items} />)
+  expect(wrapper.container.querySelectorAll('.ToDoSidebarItem')).toHaveLength(0)
 })
 
 it('can handles no items', () => {
   // suppress Show All button and display "Nothing for now" instead of list
-  const wrapper = shallow(<ToDoSidebar {...defaultProps} changeDashboardView={null} />)
+  const wrapper = render(<ToDoSidebar {...defaultProps} changeDashboardView={null} />)
   expect(wrapper).toMatchSnapshot()
 })
 
 it('renders an error message when loading fails', () => {
   const error = 'Request failed with status code 404'
-  const wrapper = mount(<ToDoSidebar {...defaultProps} loadingError={error} />)
+  const {getByText} = render(<ToDoSidebar {...defaultProps} loadingError={error} />)
 
-  expect(wrapper.text()).toContain('Failure loading the To Do list')
+  expect(getByText('Failure loading the To Do list')).toBeInTheDocument()
 })
 
 it('renders additional context title', () => {
-  const wrapper = mount(<ToDoSidebar {...defaultProps} additionalTitleContext={true} />)
+  const {getByText} = render(<ToDoSidebar {...defaultProps} additionalTitleContext={true} />)
 
-  expect(wrapper.text()).toContain('Student To Do')
+  expect(getByText('Student To Do')).toBeInTheDocument()
 })

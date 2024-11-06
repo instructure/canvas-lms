@@ -1170,7 +1170,11 @@ module ApplicationHelper
       @context.is_a?(Course) && tutorials_enabled? &&
       @context.grants_right?(@current_user, session, :manage)
 
+    is_user_tutorial_enabled =
+      @current_user&.feature_enabled?(:new_user_tutorial_on_off)
+
     js_env NEW_USER_TUTORIALS: { is_enabled: }
+    js_env NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT: { is_enabled: is_user_tutorial_enabled }
   end
 
   def planner_enabled?
@@ -1188,8 +1192,9 @@ module ApplicationHelper
     super
   end
 
-  def generate_access_verifier(return_url: nil, fallback_url: nil)
+  def generate_access_verifier(return_url: nil, fallback_url: nil, authorization: nil)
     Users::AccessVerifier.generate(
+      authorization:,
       user: @current_user,
       real_user: logged_in_user,
       developer_key: @access_token&.developer_key,

@@ -16,10 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// fixed: the number of columns is fixes. the user drops blocks into each column
-// fluid: there is a given number of columns, but blocks will organize themselves
-//        into columns based on the space available
-
 export type ColumnsSectionProps = {
   columns: number
+  background?: string
 }

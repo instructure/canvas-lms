@@ -183,7 +183,6 @@ export default class AnnouncementsIndex extends Component {
         {window.ENV.FEATURES?.instui_nav && (
           <TopNavPortalWithDefaults
             currentPageName={I18n.t('Announcements')}
-            useTutorial={true}
             useStudentView={true}
           />
         )}

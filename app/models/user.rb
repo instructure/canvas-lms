@@ -218,6 +218,7 @@ class User < ActiveRecord::Base
            class_name: "UsageRights",
            dependent: :destroy
   has_many :gradebook_csvs, dependent: :destroy, class_name: "GradebookCSV"
+  has_many :block_editor_templates, class_name: "BlockEditorTemplate", as: :context, inverse_of: :context
 
   has_one :profile, class_name: "UserProfile"
 
@@ -259,6 +260,7 @@ class User < ActiveRecord::Base
            foreign_key: :updated_by_id,
            inverse_of: :updated_by
   has_many :lti_overlays, class_name: "Lti::Overlay", foreign_key: :updated_by_id, inverse_of: :updated_by
+  has_many :lti_overlay_versions, class_name: "Lti::OverlayVersion", inverse_of: :created_by, dependent: :destroy
 
   has_many :comment_bank_items, -> { where("workflow_state<>'deleted'") }
   has_many :microsoft_sync_partial_sync_changes, class_name: "MicrosoftSync::PartialSyncChange", dependent: :destroy, inverse_of: :user
@@ -1454,6 +1456,23 @@ class User < ActiveRecord::Base
     can :moderate_user_content
   end
 
+  def can_change_pronunciation?(account)
+    return false unless account.root_account? && account.enable_name_pronunciation?
+
+    GuardRail.activate(:secondary) do
+      role_types = %w[TeacherEnrollment TaEnrollment DesignerEnrollment StudentEnrollment]
+      enrollment_types = enrollments.where(root_account: account, type: role_types)
+                                    .active_by_date.distinct.pluck(:type)
+
+      return true if account.allow_name_pronunciation_edit_for_students? && enrollment_types.include?("StudentEnrollment")
+
+      course_admin_roles = %w[TeacherEnrollment TaEnrollment DesignerEnrollment]
+      return true if account.allow_name_pronunciation_edit_for_teachers? && enrollment_types.intersection(course_admin_roles).present?
+
+      account.allow_name_pronunciation_edit_for_admins? && account_users.active.where(account:).exists?
+    end
+  end
+
   def can_masquerade?(masquerader, account)
     return true if self == masquerader
     # student view should only ever have enrollments in a single course
@@ -1979,6 +1998,10 @@ class User < ActiveRecord::Base
     !!preferences[:collapse_course_nav]
   end
 
+  def text_editor_preference
+    preferences[:text_editor_preference]
+  end
+
   # ***** OHI If you're going to add a lot of data into `preferences` here maybe take a look at app/models/user_preference_value.rb instead ***
   # it will store the data in a separate table on the db and lighten the load on poor `users`
 
@@ -2390,8 +2413,9 @@ class User < ActiveRecord::Base
           submissions.first(limit)
 
           ActiveRecord::Associations.preload(submissions, [{ assignment: :context }, :user, :submission_comments])
+
           if exclude_parent_assignment_submissions
-            submissions.reject! { |s| s.assignment.has_sub_assignments? } || []
+            submissions.delete_if { |s| s.assignment.has_sub_assignments? }
           else
             submissions
           end
@@ -3469,6 +3493,10 @@ class User < ActiveRecord::Base
   end
 
   def pronouns
+    # For jobs/rails consoles/specs where domain root account is not set
+    acc = Account.current_domain_root_account || account
+    return nil unless acc.can_add_pronouns?
+
     translate_pronouns(super)
   end
 

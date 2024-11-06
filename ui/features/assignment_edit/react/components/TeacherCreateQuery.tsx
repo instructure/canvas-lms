@@ -19,8 +19,8 @@
 import React from 'react'
 import TeacherCreateEditView from './TeacherCreateEditView'
 
-const TeacherCreateQuery = () => {
-  return <TeacherCreateEditView edit={false} />
+const TeacherCreateQuery = ({courseId}: {courseId: string}) => {
+  return <TeacherCreateEditView edit={false} assignment={{course: {lid: courseId}}} />
 }
 
 export default TeacherCreateQuery

@@ -19,7 +19,7 @@
 import React from 'react'
 import $ from 'jquery'
 import {render} from '@testing-library/react'
-import {QueryProvider} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {setGradebookOptions, setupCanvasQueries} from './fixtures'
 import EnhancedIndividualGradebookWrapper from '../EnhancedIndividualGradebookWrapper'
 import axios from 'axios'
@@ -33,6 +33,16 @@ jest.mock('@canvas/do-fetch-api-effect/apiRequest', () => ({
 }))
 
 const mockedAxios = axios as jest.Mocked<typeof axios>
+
+const mockSearchParams = (defaultSearchParams = {}) => {
+  const setSearchParamsMock = jest.fn()
+  const searchParamsMock = new URLSearchParams(defaultSearchParams)
+  jest
+    .spyOn(ReactRouterDom, 'useSearchParams')
+    .mockReturnValue([searchParamsMock, setSearchParamsMock])
+  return {searchParamsMock, setSearchParamsMock}
+}
+
 describe('Enhanced Individual Wrapper Gradebook', () => {
   beforeEach(() => {
     ;(window.ENV as any) = setGradebookOptions()
@@ -43,10 +53,10 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
     $.subscribe = jest.fn()
 
     setupCanvasQueries()
+    mockSearchParams()
   })
   afterEach(() => {
-    jest.spyOn(ReactRouterDom, 'useSearchParams').mockClear()
-    jest.resetAllMocks()
+    jest.clearAllMocks()
   })
 
   const renderEnhancedIndividualGradebookWrapper = (mockOverrides = []) => {
@@ -56,9 +66,9 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
           <Route
             path="/"
             element={
-              <QueryProvider>
+              <MockedQueryProvider>
                 <EnhancedIndividualGradebookWrapper />
-              </QueryProvider>
+              </MockedQueryProvider>
             }
           />
         </Routes>

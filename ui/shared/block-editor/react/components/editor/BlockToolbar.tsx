@@ -22,34 +22,82 @@ import {
   IconArrowOpenStartLine,
   IconArrowOpenEndLine,
   IconTrashLine,
-  IconDragHandleLine,
+  IconSaveLine,
 } from '@instructure/ui-icons'
+import {SVGIcon} from '@instructure/ui-svg-images'
 import {Flex} from '@instructure/ui-flex'
-import {IconButton} from '@instructure/ui-buttons'
+import {CondensedButton, IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {type ViewProps} from '@instructure/ui-view'
 import {findFocusable} from '@instructure/ui-dom-utils'
 import {
-  notDeletableIfLastChild,
+  captureElementThumbnail,
+  isLastChild,
   mountNode,
   findUpNode,
   findDownNode,
   getToolbarPos,
   getArrowNext,
   getArrowPrev,
+  getNodeTemplate,
+  saveTemplateImages,
+  type ImagesMapping,
 } from '../../utils'
+import {EditTemplateModal} from './EditTemplateModal'
+import {
+  type BlockTemplate,
+  type TemplateType,
+  SaveTemplateEvent,
+  dispatchTemplateEvent,
+  TemplateEditor,
+} from '../../types'
+
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor')
+
+const moveIcon = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M8.77359 0L5.00002 3.77358L5.77532 4.54998L8.22638 2.09893V15.901L5.77532 13.451L5.00002 14.2263L8.77359 17.9999L12.5472 14.2263L11.773 13.451L9.3219 15.901V2.09893L11.773 4.54998L12.5472 3.77358L8.77359 0Z" fill="#273540"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M18 8.77358L14.2264 5L13.45 5.77531L15.9011 8.22637L2.09904 8.22637L4.549 5.77531L3.77369 5L0.000108554 8.77358L3.77369 12.5472L4.549 11.7729L2.09904 9.32189L15.9011 9.32189L13.45 11.7729L14.2264 12.5472L18 8.77358Z" fill="#273540"/>
+</svg>
+`
 
 const Arrows = ['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft']
 
-type BlockToolbarProps = {}
+function isBlockSaveable(templateEditor: TemplateEditor, node: Node) {
+  if (templateEditor <= 0) return false
+  if (
+    templateEditor === TemplateEditor.LOCAL &&
+    node.data.name !== 'PageBlock' &&
+    (node.data.custom?.isSection || node.data.name === 'GroupBlock')
+  ) {
+    return true
+  }
+  if (
+    templateEditor === TemplateEditor.GLOBAL &&
+    (node.data.name === 'PageBlock' ||
+      node.data.custom?.isSection ||
+      node.data.name === 'GroupBlock')
+  ) {
+    return true
+  }
+  return false
+}
 
-const BlockToolbar = (_props: BlockToolbarProps) => {
+type ActualNodeTreeNode = Node & {props: any; type: {resolvedName: string}}
+
+type BlockToolbarProps = {
+  templateEditor: TemplateEditor
+}
+
+const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
   const {actions, query} = useEditor()
   const {
     node,
     name,
     moveable,
     deletable,
+    saveable,
     connectors: {drag},
   } = useNode((n: Node) => {
     const node_helpers = query.node(n.id)
@@ -58,20 +106,23 @@ const BlockToolbar = (_props: BlockToolbarProps) => {
       name: n.data.custom.displayName || n.data.displayName,
       moveable: node_helpers.isDraggable(),
       deletable: n.data.custom?.isSection
-        ? notDeletableIfLastChild(n.id, query)
+        ? !isLastChild(n.id, query)
         : (typeof n.data.custom?.isDeletable === 'function'
             ? n.data.custom.isDeletable?.(n.id, query)
             : true) && node_helpers.isDeletable(),
+      saveable: isBlockSaveable(templateEditor, n),
     }
   })
   const [arrowNext] = useState<string[]>(getArrowNext())
   const [arrowPrev] = useState<string[]>(getArrowPrev())
   const [mountPoint] = useState(mountNode())
   const [currentToolbarRef, setCurrentToolbarRef] = useState<HTMLDivElement | null>(null)
-  const [upnodeId] = useState<string | undefined>(findUpNode(node, query)?.id)
+  const [upnodeId] = useState<string | undefined>(findUpNode(node, query, templateEditor)?.id)
   const [downnodeId] = useState<string | undefined>(findDownNode(node, query)?.id)
   const [focusable, setFocusable] = useState<HTMLElement[]>([])
   const [currFocusedIndex, setCurrFocusedIndex] = useState<number>(0)
+  const [showEditTemplateModal, setShowEditTemplateModal] = useState(false)
+  const [templateType, setTemplateType] = useState<TemplateType>('block')
 
   useEffect(() => {
     setFocusable(findFocusable(currentToolbarRef) as HTMLElement[])
@@ -155,6 +206,66 @@ const BlockToolbar = (_props: BlockToolbarProps) => {
     [actions, node.id]
   )
 
+  const handleSave = useCallback(
+    (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps>) => {
+      e.stopPropagation()
+      let type: TemplateType = 'block'
+      if (node.data.name === 'PageBlock') {
+        type = 'page'
+      } else if (node.data.custom?.isSection) {
+        type = 'section'
+      }
+      setTemplateType(type)
+      setShowEditTemplateModal(true)
+    },
+    [node.data.custom.isSection, node.data.name]
+  )
+
+  const handleSaveTemplate = useCallback(
+    async (template: Partial<BlockTemplate>, globalTemplate: boolean) => {
+      setShowEditTemplateModal(false)
+
+      template.node_tree = getNodeTemplate(node.id, template.name as string, query)
+      template.template_type = templateType
+      if (globalTemplate) {
+        template.template_category = 'global'
+      }
+
+      let thumbnail: string | undefined
+      if (['page', 'section'].includes(templateType) && node.dom) {
+        thumbnail = await captureElementThumbnail(node.dom)
+      }
+      template.thumbnail = thumbnail
+
+      if (globalTemplate) {
+        // for now, we have to extract images from the template and save as files
+        const imgmap: ImagesMapping = await saveTemplateImages(
+          query.node(node.id)?.get().dom as HTMLElement
+        )
+
+        // update ImageBlocks to point to the saved images
+        Object.values(template.node_tree.nodes).forEach(n => {
+          const n2 = n as ActualNodeTreeNode
+          if (n2.type.resolvedName === 'ImageBlock') {
+            const src: string = n2.props.src
+            if (src && imgmap[src]) {
+              n2.props.src = imgmap[src]
+            }
+          }
+        })
+      }
+
+      const saveTemplateEvent = new CustomEvent(SaveTemplateEvent, {
+        detail: {
+          template,
+          globalTemplate: globalTemplate && ['page', 'section'].includes(templateType),
+        },
+      })
+      dispatchTemplateEvent(saveTemplateEvent)
+    },
+    [node.dom, node.id, query, templateType]
+  )
+
   if (node.data?.custom?.noToolbar) return null
   if (!mountPoint) return null
 
@@ -180,7 +291,7 @@ const BlockToolbar = (_props: BlockToolbarProps) => {
             cursor="pointer"
             size="small"
             onClick={handleGoUp}
-            screenReaderLabel="Go up"
+            screenReaderLabel={I18n.t('Go up')}
             withBackground={false}
             withBorder={false}
           >
@@ -195,7 +306,7 @@ const BlockToolbar = (_props: BlockToolbarProps) => {
             cursor="pointer"
             size="small"
             onClick={handleGoDown}
-            screenReaderLabel="Go down"
+            screenReaderLabel={I18n.t('Go down')}
             withBackground={false}
             withBorder={false}
           >
@@ -216,14 +327,15 @@ const BlockToolbar = (_props: BlockToolbarProps) => {
               cursor="move"
               size="small"
               elementRef={el => el && drag(el as HTMLElement)}
-              screenReaderLabel="Drag to move"
+              screenReaderLabel={I18n.t('Drag to move')}
               withBackground={false}
               withBorder={false}
             >
-              <IconDragHandleLine />
+              <SVGIcon src={moveIcon} />
             </IconButton>
           </>
         ) : null}
+
         {deletable ? (
           <>
             <div className="toolbar-separator" />
@@ -231,7 +343,7 @@ const BlockToolbar = (_props: BlockToolbarProps) => {
               cursor="pointer"
               size="small"
               onClick={handleDeleteNode}
-              screenReaderLabel="Delete"
+              screenReaderLabel={I18n.t('Delete')}
               withBackground={false}
               withBorder={false}
               color="danger"
@@ -240,9 +352,32 @@ const BlockToolbar = (_props: BlockToolbarProps) => {
             </IconButton>
           </>
         ) : null}
+        {saveable ? (
+          <>
+            <div className="toolbar-separator" />
+            <CondensedButton
+              size="small"
+              onClick={handleSave}
+              renderIcon={<IconSaveLine />}
+              color="secondary"
+              themeOverride={{secondaryGhostColor: '#0e68b3'}}
+            >
+              {I18n.t('Save as template')}
+            </CondensedButton>
+          </>
+        ) : null}
+        {showEditTemplateModal ? (
+          <EditTemplateModal
+            mode="save"
+            templateType={templateType}
+            isGlobalEditor={templateEditor === TemplateEditor.GLOBAL}
+            onDismiss={() => setShowEditTemplateModal(false)}
+            onSave={handleSaveTemplate}
+          />
+        ) : null}
       </Flex>
     </div>
   )
 }
 
-export {BlockToolbar}
+export {BlockToolbar, isBlockSaveable}

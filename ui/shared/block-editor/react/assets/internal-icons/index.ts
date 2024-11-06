@@ -20,5 +20,16 @@ import IconUndo from './undo'
 import IconRedo from './redo'
 import IconBackgroundColor from './background-color'
 import IconResize from './resize'
+import IconPlacementTop from './placement-top'
+import IconPlacementMiddle from './placement-middle'
+import IconPlacementBottom from './placement-bottom'
 
-export {IconUndo, IconRedo, IconBackgroundColor, IconResize}
+export {
+  IconUndo,
+  IconRedo,
+  IconBackgroundColor,
+  IconResize,
+  IconPlacementTop,
+  IconPlacementMiddle,
+  IconPlacementBottom,
+}

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {arrayOf, bool, element, object, oneOfType, string} from 'prop-types'
-import {ApolloProvider} from 'react-apollo'
+import {ApolloProvider} from '@apollo/react-common'
 import ValidatedApolloClient from './ValidatedApolloClient'
 
 export default class ValidatedMockedProvider extends React.Component {

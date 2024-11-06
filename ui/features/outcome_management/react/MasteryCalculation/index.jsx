@@ -27,7 +27,7 @@ import {
   COURSE_OUTCOME_CALCULATION_QUERY,
   SET_OUTCOME_CALCULATION_METHOD,
 } from '@canvas/outcomes/graphql/MasteryCalculation'
-import {useQuery, useMutation} from 'react-apollo'
+import {useQuery, useMutation} from '@apollo/react-hooks'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 

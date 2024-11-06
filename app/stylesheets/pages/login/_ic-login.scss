@@ -365,9 +365,8 @@ body.body--login-confirmation {
   box-sizing: border-box;
   border-radius: $baseBorderRadius;
   box-shadow: 0 1px 4px 1px rgba(black, 0.4);
-  width: 400px;
   margin: $ic-sp*3 auto 0;
-  width: 696px;
+  max-width: 696px;
   form { margin-bottom: 0; } //override default margin on forms
 }
 

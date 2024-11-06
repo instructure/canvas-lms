@@ -189,6 +189,7 @@ class ConferencesController < ApplicationController
     return unless tab_enabled?(@context.class::TAB_CONFERENCES)
     return unless @current_user
 
+    page_has_instui_topnav
     log_api_asset_access(["conferences", @context], "conferences", "other")
     conferences = if @context.grants_any_right?(@current_user, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
                     @context.web_conferences.active

@@ -39,7 +39,9 @@ export default function CoursesTray() {
   const {data, isLoading, isSuccess} = useQuery<Course[], Error>({
     queryKey: ['courses'],
     queryFn: coursesQuery,
-    fetchAtLeastOnce: true,
+    meta: {
+      fetchAtLeastOnce: true,
+    },
     refetchOnMount: false,
     select: courses => courses.filter(hideHomeroomCourseIfK5Student),
   })

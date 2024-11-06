@@ -52,6 +52,7 @@ describe User do
 
     it { is_expected.to have_many(:created_lti_registrations).class_name("Lti::Registration").with_foreign_key("created_by_id") }
     it { is_expected.to have_many(:updated_lti_registrations).class_name("Lti::Registration").with_foreign_key("updated_by_id") }
+    it { is_expected.to have_many(:block_editor_templates).class_name("BlockEditorTemplate").inverse_of(:context) }
   end
 
   describe "notifications" do
@@ -847,6 +848,27 @@ describe User do
 
         expect(@student.recent_feedback(exclude_parent_assignment_submissions: true)).not_to include(
           parent_assignment_submission
+        )
+      end
+
+      it "does include assignment submissions with recent feedback" do
+        assignment = @course.assignments.create!(points_possible: 10)
+        assignment_submission = assignment.submissions.find_by!(user: @student)
+        assignment_submission.update!(last_comment_at: 1.day.ago, posted_at: nil)
+        expect(@student.recent_feedback(exclude_parent_assignment_submissions: true)).to contain_exactly(assignment_submission)
+      end
+
+      it "includes both assignment submissions and discussion checkpoint submissions with recent feedback" do
+        assignment = @course.assignments.create!(points_possible: 10)
+        assignment_submission = assignment.submissions.find_by!(user: @student)
+        assignment_submission.update!(last_comment_at: 1.day.ago, posted_at: nil)
+
+        @reply_to_topic.grade_student(@student, grade: 5, grader: @teacher)
+        @reply_to_entry.grade_student(@student, grade: 8, grader: @teacher)
+        expect(@student.recent_feedback(exclude_parent_assignment_submissions: true)).to contain_exactly(
+          assignment_submission,
+          @reply_to_topic.submission_for_student(@student),
+          @reply_to_entry.submission_for_student(@student)
         )
       end
     end

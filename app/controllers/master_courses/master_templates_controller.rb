@@ -359,12 +359,20 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   #
   # @argument comment [Optional, String]
   #     An optional comment to be included in the sync history.
+  #
   # @argument send_notification [Optional, Boolean]
   #     Send a notification to the calling user when the sync completes.
   #
   # @argument copy_settings [Optional, Boolean]
   #     Whether course settings should be copied over to associated courses.
   #     Defaults to true for newly associated courses.
+  #
+  # @argument send_item_notifications [Optional, Boolean]
+  #     By default, new-item notifications are suppressed in blueprint syncs.
+  #     If this option is set, teachers and students may receive notifications
+  #     for items such as announcements and assignments that are created
+  #     in associated courses (subject to the usual notification settings).
+  #     This option requires the Blueprint Item Notifications feature to be enabled.
   #
   # @argument publish_after_initial_sync [Optional, Boolean]
   #     If set, newly associated courses will be automatically published after the sync completes
@@ -385,8 +393,12 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     end
 
     options = params.permit(:comment, :send_notification).to_unsafe_h
-    [:copy_settings, :publish_after_initial_sync].each do |bool_key|
+    %i[copy_settings publish_after_initial_sync].each do |bool_key|
       options[bool_key] = value_to_boolean(params[bool_key]) if params.key?(bool_key)
+    end
+
+    if params.key?(:send_item_notifications) && @course.account.feature_enabled?(:blueprint_item_notifications)
+      options[:send_item_notifications] = value_to_boolean(params[:send_item_notifications])
     end
 
     migration = MasterCourses::MasterMigration.start_new_migration!(@template, @current_user, options)

@@ -50,6 +50,9 @@ export const LtiScopeTranslations: Record<LtiScope, string> = {
   [LtiScopes.NrpsContextMembershipReadonly]: I18n.t(
     'Can retrieve user data associated with the context the tool is installed in'
   ),
+  [LtiScopes.PnsNoticeHandlers]: I18n.t(
+    'Can register event notice handlers using the Platform Notification Service'
+  ),
   [LtiScopes.PublicJwkUpdate]: I18n.t('Can update public jwk for LTI services'),
   [LtiScopes.AccountLookupShow]: I18n.t('Can lookup Account information'),
   [LtiScopes.AgsProgressShow]: I18n.t(

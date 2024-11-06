@@ -31,7 +31,9 @@ export default function AccountsList() {
   const {data, isLoading, isSuccess} = useQuery({
     queryKey: ['accounts', {pageIndex: 1}],
     queryFn: getAccounts,
-    fetchAtLeastOnce: true,
+    meta: {
+      fetchAtLeastOnce: true,
+    },
   })
 
   const accounts = data?.json || []

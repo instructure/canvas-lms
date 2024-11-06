@@ -19,7 +19,7 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {bool, string} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {useMutation} from 'react-apollo'
+import {useMutation} from '@apollo/react-hooks'
 import NotificationPreferences from '@canvas/notification-preferences'
 import {NotificationPreferencesShape} from '@canvas/notification-preferences/react/Shape'
 import React, {useContext} from 'react'

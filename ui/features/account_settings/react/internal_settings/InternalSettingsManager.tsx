@@ -19,7 +19,7 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {useMutation} from 'react-apollo'
+import {useMutation} from '@apollo/react-hooks'
 import React, {useContext, useEffect, useState} from 'react'
 import {
   CreateInternalSettingData,

@@ -4424,4 +4424,43 @@ describe ContextExternalTool do
       end
     end
   end
+
+  describe "#can_access_content_tag?" do
+    it "returns true for a 1.1 content tag with the same tool" do
+      tool = external_tool_model
+
+      content_tag = ContentTag.create!(context: @course, content: tool)
+      expect(tool.can_access_content_tag?(content_tag)).to be true
+    end
+
+    context "when the content tag was created by a 1.1 tool that now corresponds to a 1.3 tool" do
+      let(:domain) { "example.instructure.com" }
+      let(:url) { "https://example.instructure.com" }
+      let(:opts) { { domain:, url: } }
+      let(:old_tool) { external_tool_model(opts:) }
+      let(:developer_key) { DeveloperKey.create! }
+      let(:new_tool1) { external_tool_1_3_model(opts:, developer_key:) }
+      let(:new_tool2) { external_tool_1_3_model(opts:, developer_key:) }
+
+      it "returns true if the 1.3 tool matches on developer_key (module item)" do
+        content_tag = ContentTag.create!(context: @course, content: old_tool, url:)
+        expect(ContextExternalTool).to receive(:from_content_tag).with(content_tag, content_tag.context).and_return(new_tool1)
+        expect(new_tool2.can_access_content_tag?(content_tag)).to be true
+      end
+
+      it "returns true if the 1.3 tool matches on developer_key (assignment)" do
+        assignment = assignment_model(context: @course, submission_types: "external_tool")
+        content_tag = ContentTag.create!(context: assignment, content: old_tool, url:)
+        expect(ContextExternalTool).to receive(:from_content_tag).with(content_tag, content_tag.context.context).and_return(new_tool1)
+        expect(new_tool2.can_access_content_tag?(content_tag)).to be true
+      end
+
+      it "returns false if the 1.3 tool does not match on developer_key" do
+        content_tag = ContentTag.create!(context: @course, content: old_tool, url:)
+        new_tool1.update!(developer_key: DeveloperKey.create!)
+        expect(ContextExternalTool).to receive(:from_content_tag).with(content_tag, content_tag.context).and_return(new_tool1)
+        expect(new_tool2.can_access_content_tag?(content_tag)).to be false
+      end
+    end
+  end
 end

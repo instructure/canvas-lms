@@ -31,6 +31,7 @@ interface CustomTextInput extends TextInput {
 }
 
 type Props = {
+  id: string
   name: string
   onSearchEvent: (data: {searchTerm: string}) => void
   searchInputRef?: (input: TextInput | null) => void
@@ -39,6 +40,7 @@ type Props = {
 }
 
 export const SearchField: React.FC<Props> = ({
+  id,
   name,
   onSearchEvent,
   searchInputRef,
@@ -93,6 +95,7 @@ export const SearchField: React.FC<Props> = ({
       ref={handleRef}
       onChange={handleSearch}
       name={name}
+      id={id}
     />
   )
 }

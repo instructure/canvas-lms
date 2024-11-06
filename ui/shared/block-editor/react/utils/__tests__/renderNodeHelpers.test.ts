@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getToolbarPos, getMenuPos} from '../renderNodeHelpers'
+import {getToolbarPos} from '../renderNodeHelpers'
 
 const createDOM = () => {
   const mountPoint = document.createElement('div')
@@ -39,16 +39,6 @@ const createDOM = () => {
   return {mountPoint, domNode}
 }
 
-const createMenu = (mountPoint: HTMLElement) => {
-  const theMenu = document.createElement('div')
-  theMenu.style.position = 'absolute'
-  theMenu.style.width = '25px'
-  mountPoint.appendChild(theMenu)
-  // @ts-expect-error
-  theMenu.getBoundingClientRect = jest.fn(() => ({width: 25}))
-  return theMenu
-}
-
 const createToolbar = (mountPoint: HTMLElement) => {
   const theToolbar = document.createElement('div')
   theToolbar.style.position = 'absolute'
@@ -61,31 +51,6 @@ const createToolbar = (mountPoint: HTMLElement) => {
 }
 
 describe('renderNodeHelpers', () => {
-  describe('getMenuPos', () => {
-    it('returns the correct position', () => {
-      const {mountPoint, domNode} = createDOM()
-      const theMenu = createMenu(mountPoint)
-
-      const result = getMenuPos(domNode, mountPoint, theMenu)
-      expect(result).toEqual({top: 16, left: 91})
-    })
-
-    it('returns 0, 0 if domNode is null', () => {
-      const {mountPoint} = createDOM()
-      const theMenu = createMenu(mountPoint)
-
-      const result = getMenuPos(null, mountPoint, theMenu)
-      expect(result).toEqual({top: 0, left: 0})
-    })
-
-    it('copes with the menu not being present', () => {
-      const {mountPoint, domNode} = createDOM()
-
-      const result = getMenuPos(domNode, mountPoint, null)
-      expect(result).toEqual({top: 16, left: 116})
-    })
-  })
-
   describe('getToolbarPos', () => {
     it('returns the correct position', () => {
       const {mountPoint, domNode} = createDOM()

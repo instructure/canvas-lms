@@ -521,6 +521,7 @@ describe Lti::Messages::JwtMessage do
       ]
     end
     let_once(:nrps_scopes) { ["https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly"] }
+    let_once(:pns_scopes) { ["https://purl.imsglobal.org/spec/lti/scope/noticehandlers"] }
     let(:lti_advantage_tool) do
       tool = course.context_external_tools.new(
         name: "bob",
@@ -690,6 +691,66 @@ describe Lti::Messages::JwtMessage do
       it_behaves_like "assignment and grade service claim check"
       it_behaves_like "lti advantage service claim group disabled check"
       it_behaves_like "lti advantage scopes missing from developer key"
+    end
+  end
+
+  describe "platform notification service" do
+    include_context "lti advantage service claims context"
+    let(:lti_advantage_developer_key_scopes) { pns_scopes }
+    let(:lti_advantage_service_claim) { decoded_jwt["https://purl.imsglobal.org/spec/lti/claim/platformnotificationservice"] }
+    let(:lti_advantage_service_claim_group) { :platform_notification_service }
+
+    before do
+      allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical_domain")
+      allow(controller).to receive(:lti_notice_handlers_url)
+        .with({ host: "canonical_domain", context_external_tool_id: lti_advantage_tool.id })
+        .and_return("lti_notice_handlers_url")
+    end
+
+    shared_examples "all PNS claim presence and absence checks" do
+      it_behaves_like "lti advantage service claim group disabled check"
+      it_behaves_like "lti advantage scopes missing from developer key"
+
+      it "sets the PNS url using the Account#domain" do
+        expect(
+          lti_advantage_service_claim["platform_notification_service_url"]
+        ).to eq("lti_notice_handlers_url")
+      end
+
+      it "sets the PNS version and notice_types_supported" do
+        expect(lti_advantage_service_claim["service_versions"]).to eq ["1.0"]
+        expect(lti_advantage_service_claim["notice_types_supported"]).to eq Lti::PlatformNotificationService::NOTICE_TYPES
+      end
+    end
+
+    context "when context is a course" do
+      it_behaves_like "all PNS claim presence and absence checks"
+    end
+
+    context "when context is an account" do
+      include_context "with lti advantage account context"
+      it_behaves_like "all PNS claim presence and absence checks"
+    end
+
+    context "when context is a group" do
+      include_context "with lti advantage group context"
+      it_behaves_like "all PNS claim presence and absence checks"
+    end
+
+    context "when the platform_notification_service feature flag is disabled" do
+      before do
+        context.root_account.disable_feature!(:platform_notification_service)
+      end
+
+      %w[course account group].each do |context_type|
+        context "when context is a #{context_type}" do
+          unless context_type == "course"
+            include_context "with lti advantage #{context_type} context"
+          end
+
+          it_behaves_like "absent lti advantage service claim check"
+        end
+      end
     end
   end
 

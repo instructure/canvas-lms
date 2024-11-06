@@ -2884,6 +2884,7 @@ hy:
       permissions: "%{name} խմբագրման թույլտվություն"
     unpublished_title: "Հրապարակված չէ"
   broken_file_link_found_in_your_course_7cc24395: "Ձեր դասընթացում գտնվել է չաշխատող հղում"
+  browse_courses_c8af1754: "Բեռնել դասընթացներ"
   bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "ինտերվալի անվանումը պետք է հետևյալներից մեկը լինի՝%{bucket_names}"
   bulk_course_migration: 
     export_failed: "Սխալ է տեղի ունեցել Blackborad-ից դասընթացը bb_lcid%{id} հետ արտահանելիս "
@@ -5453,6 +5454,7 @@ hy:
     ungrded_survey: "Չգնահատված հարցում"
     url: "URL հասցե"
   create_new_event_e9fb2fb6: "Ստեղծել նոր միջոցառում"
+  create_page_6093fb98: "Ստեղծել էջ"
   create_quiz_d08bb72a: "Ստեղծել ստուգողական աշխատանք"
   create_rubric_ec33ddf9: "Ստեղծել ռուբրիկ"
   create_users_view: 
@@ -5584,6 +5586,7 @@ hy:
     this_is_permanent: "Գնահատականների կորը հնարավոր չէ չեղյալ համարել: Գնահատականների շարքը նախքան կորի սահմանումը հասանելի է, սակայն կորի գծման գործողությունը անշրջելի է: "
   curving_assignments_e9479ee3: "Հանձնարարություննի գնահատման կորը"
   custom_fields_fc3e55af: "Օգտատիրոջ դաշտեր"
+  customize_74cdc895: Կարգաբերում
   cyan_c1d5f68a: Cyan
   d2l_display: Desire2Learn
   d2l_file_description: "D2L export .zip ֆորմատ"
@@ -17273,6 +17276,16 @@ hy:
         all_users: "Բոլոր օգտատերերը"
         choose_term: "Ընտրել ժամանակահատվածը"
         search_results: "\"%{search_term}\" -ի համար որոնումների արդյունքները"
+    last_login: 
+      labels: 
+        current_ip: "Ընթացիկ IP-հասցեն"
+        current_login: "Ընթացիկ մուտքանունը"
+        last_ip: "Մուտքի վերջին IP-հասցեն"
+        last_login: "Վերջին մուտքանունը"
+        last_request: "Վերջին հարցումը"
+      more: "ավելի շատ..."
+      never: երբեք
+      none: Չկա
     linkedin_added: "LinkedIn հաշիվը հաջողությամբ ավելացվել է:"
     linkedin_fail: "LinkedIn արտոնագրումը չհաջողվեց: Փորձեք կրկին"
     logins: 

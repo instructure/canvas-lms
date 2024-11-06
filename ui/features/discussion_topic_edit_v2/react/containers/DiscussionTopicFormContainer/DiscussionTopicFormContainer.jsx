@@ -18,7 +18,7 @@
 
 import React, {useCallback, useContext, useEffect, useState} from 'react'
 
-import {useQuery, useMutation} from 'react-apollo'
+import {useQuery, useMutation} from '@apollo/react-hooks'
 import {DISCUSSION_TOPIC_QUERY} from '../../../graphql/Queries'
 import {CREATE_DISCUSSION_TOPIC, UPDATE_DISCUSSION_TOPIC} from '../../../graphql/Mutations'
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -191,7 +191,7 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
     return instUINavEnabled() ? (
       <Flex margin={headerMargin} direction="column" as="div">
         <Flex.Item margin="0" overflow="hidden">
-          <Heading as="h1" level={breakpoints.desktop ? 'h1' : 'h2'}>
+          <Heading as="h1" level={breakpoints.ICEDesktop ? 'h1' : 'h2'} themeOverride={{h2FontWeight: 700}}>
             {titleContent}
           </Heading>
         </Flex.Item>
@@ -283,11 +283,12 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
     const discussionOrAnnouncement = isAnnouncement
       ? I18n.t('Announcements')
       : I18n.t('Discussions')
+    const discussionOrAnnouncementUrl= isAnnouncement ? 'announcements' : 'discussion_topics'
     const oldCrumbs = getCrumbs()
     const newCrumbs = [
       ...oldCrumbs,
       ...[
-        {name: discussionOrAnnouncement, url: oldCrumbs[0].url + '/discussion_topics'},
+        {name: discussionOrAnnouncement, url: oldCrumbs[0].url + '/' + discussionOrAnnouncementUrl},
         {name: isEditing ? currentDiscussionTopic?.title : I18n.t('Create new') || '', url: ''},
       ],
     ]
@@ -296,7 +297,7 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
 
   return (
     <>
-      <TopNavPortalWithDefaults getBreadCrumbSetter={handleBreadCrumbSetter} useTutorial={true} />
+      <TopNavPortalWithDefaults getBreadCrumbSetter={handleBreadCrumbSetter} />
       <Flex direction="column">
         <Flex.Item>{renderHeading()}</Flex.Item>
         {renderForm()}

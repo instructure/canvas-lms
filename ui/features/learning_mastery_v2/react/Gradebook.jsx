@@ -46,9 +46,13 @@ const Gradebook = ({
 
   useEffect(() => {
     const handleGridScroll = e => (headerRow.current.scrollLeft = e.target.scrollLeft)
-    gridRef.current.addEventListener('scroll', handleGridScroll)
+    if (gridRef.current) {
+      gridRef.current.addEventListener('scroll', handleGridScroll)
+    }
     return function cleanup() {
-      gridRef.current.removeEventListener('scroll', handleGridScroll)
+      if (gridRef.current) {
+        gridRef.current.removeEventListener('scroll', handleGridScroll)
+      }
     }
   }, [])
 

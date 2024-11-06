@@ -276,6 +276,12 @@ describe FilesController do
   end
 
   describe "GET 'show'" do
+    def enable_limited_access_for_students
+      @course.account.root_account.enable_feature!(:allow_limited_access_for_students)
+      @course.account.settings[:enable_limited_access_for_students] = true
+      @course.account.save!
+    end
+
     before :once do
       course_file
     end
@@ -305,6 +311,14 @@ describe FilesController do
 
       get "show", params: { assignment_id: assignment1.id, id: @attachment.id }, format: :json
       expect(response).not_to be_ok
+    end
+
+    it "renders files with limited access flag" do
+      enable_limited_access_for_students
+
+      user_session(@student)
+      get "show", params: { course_id: @course.id, id: @file.id }
+      expect(response).to be_successful
     end
 
     describe "with verifiers" do
@@ -395,6 +409,18 @@ describe FilesController do
 
         get "show", params: { course_id: @course.id, id: @file.id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
         expect(response).to be_unauthorized
+      end
+
+      it "allows download" do
+        get "show", params: { course_id: @course.id, id: @file.id, access_token: @token_string, instfs_id: "stuff", download: "1" }
+        expect(response).to be_redirect
+        expect(response.location).to include "/courses/#{@course.id}/files/#{@file.id}/course%20files"
+        expect(response.location).to include "sf_verifier"
+
+        sf_verifier = Addressable::URI.parse(response.location).query_values["sf_verifier"]
+        claims = Canvas::Security.decode_jwt(sf_verifier)
+        expect(claims["attachment_id"]).to eq @file.global_id.to_s
+        expect(claims["permission"]).to eq "download"
       end
     end
 
@@ -1115,6 +1141,43 @@ describe FilesController do
         other_params = { download: 1, inline: 1, verifier: file_verifier, account_id: @account.id, file_id: @file.id, file_path: @file.full_path }
         get "show_relative", params: user_verifier.merge(other_params)
         assert_unauthorized
+      end
+    end
+
+    describe "with the sf_verifier" do
+      before do
+        @file.update!(file_state: "hidden", instfs_uuid: "stuff")
+        user_with_pseudonym
+        allow(InstFS).to receive(:enabled?).and_return(true)
+        allow_any_instance_of(FilesController).to receive(:safer_domain_available?).and_return(false)
+      end
+
+      it "does not allow access if the user can't see the file" do
+        sf_verifier = Users::AccessVerifier.generate(
+          user: @user,
+          real_user: @user,
+          root_account: Account.last,
+          return_url: nil,
+          fallback_url: "http://test.host/fallback"
+        )
+
+        get "show_relative", params: { course_id: @course.id, file_id: @file.id, file_path: @file.full_display_path, **sf_verifier }
+        expect(response).to be_unauthorized
+      end
+
+      it "allows access if the sf_verifier includes the file authorization information" do
+        sf_verifier = Users::AccessVerifier.generate(
+          authorization: { attachment: @file, permission: "download" },
+          user: @user,
+          real_user: @user,
+          root_account: Account.last,
+          return_url: nil,
+          fallback_url: "http://test.host/fallback"
+        )
+
+        get "show_relative", params: { course_id: @course.id, file_id: @file.id, file_path: @file.full_display_path, **sf_verifier }
+        expect(response).to be_redirect
+        expect(response.location).to include "/files/stuff/doc.doc?download=1&token="
       end
     end
   end

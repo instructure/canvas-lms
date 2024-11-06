@@ -1,0 +1,56 @@
+/*
+ * Copyright (C) 2024 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+.contentLayout {
+    @media (min-width: 48rem) and (max-width: 80rem) { /* 768px – 1280px */
+        padding: 5rem 0 8rem; /* 80px 128px */
+    }
+}
+
+.contentLayout__wrapper {
+    height: 100%;
+    padding: 2.25rem 1.5rem; /* 36px 24px */
+
+    @media (min-width: 48rem) { /* 768px */
+        height: unset;
+        margin: 0 auto;
+        padding: 3.75rem 6.25rem; /* 60px 100px */
+        width: 35.75rem; /* 572px */
+    }
+
+    @media (min-width: 80rem) { /* 1280px */
+        height: 100%;
+        margin: unset;
+        padding: 5rem; /* 80px */
+        width: 45rem; /* 720px */
+    }
+}
+
+.contentLayout__background {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: -1;
+
+    @media (min-width: 80rem) { /* 1280px */
+        left: 45rem; /* 720px */
+    }
+}

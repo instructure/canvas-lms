@@ -84,7 +84,7 @@ class PeopleReadyList extends React.Component {
 
   render() {
     return (
-      <div className="addpeople__peoplereadylist">
+      <div className="addpeople__peoplereadylist" data-testid="people_ready_list">
         <div className="peoplereadylist__pad-box">{this.renderNotice()}</div>
         {this.renderUserTable()}
       </div>

@@ -28,6 +28,8 @@ import {
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TranslationControls} from '../../components/TranslationControls/TranslationControls'
+import {useMutation} from '@apollo/react-hooks'
+import {UPDATE_DISCUSSION_SORT_ORDER} from '../../../graphql/Mutations'
 
 export const DiscussionTopicToolbarContainer = props => {
   const {searchTerm, filter, sort, setSearchTerm, setFilter, setSort} = useContext(SearchContext)
@@ -48,8 +50,22 @@ export const DiscussionTopicToolbarContainer = props => {
     setFilter(value.value)
   }
 
+  const [updateDiscussionSortOrder] = useMutation(UPDATE_DISCUSSION_SORT_ORDER)
+
   const onSortClick = () => {
-    sort === 'asc' ? setSort('desc') : setSort('asc')
+    let newOrder = null
+    if (sort === null) {
+      newOrder = props.discussionTopic.sortOrder === 'asc' ? 'desc' : 'asc'
+    } else {
+      newOrder = sort === 'asc' ? 'desc' : 'asc'
+    }
+    setSort(newOrder)
+    updateDiscussionSortOrder({
+      variables: {
+        discussionTopicId: props.discussionTopic._id,
+        sortOrder: newOrder,
+      },
+    })
   }
 
   const onSummarizeClick = () => {
@@ -79,7 +95,7 @@ export const DiscussionTopicToolbarContainer = props => {
         canEdit={props.discussionTopic.permissions.update}
         childTopics={getGroupsMenuTopics()}
         selectedView={filter}
-        sortDirection={sort}
+        sortDirection={props.discussionTopic.sortOrder}
         isCollapsedReplies={true}
         onSearchChange={value => setCurrentSearchValue(value)}
         onViewFilter={onViewFilter}

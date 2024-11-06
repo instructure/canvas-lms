@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {shallow, mount} from 'enzyme'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {Pill} from '@instructure/ui-pill'
 import {Opportunity} from '../index'
 
@@ -38,43 +39,46 @@ function defaultProps(options = {}) {
 }
 
 it('renders the base component correctly', () => {
-  const wrapper = shallow(<Opportunity {...defaultProps()} />)
-  expect(wrapper).toMatchSnapshot()
+  const wrapper = render(<Opportunity {...defaultProps()} />)
+  expect(wrapper.container).toMatchSnapshot()
 })
 
-it('calls the onClick prop when dismissed is clicked', () => {
+it('calls the onClick prop when dismissed is clicked', async () => {
   const tempProps = defaultProps()
   tempProps.dismiss = jest.fn()
-  const wrapper = mount(<Opportunity {...tempProps} />)
-  wrapper.find('button').simulate('click')
+  const wrapper = render(<Opportunity {...tempProps} />)
+  const dismissButton = wrapper.getByText('Dismiss this is a description about the opportunity').closest('button')
+  await userEvent.click(dismissButton)
   expect(tempProps.dismiss).toHaveBeenCalled()
 })
 
 it('renders the base component correctly without points', () => {
   const tempProps = defaultProps()
   tempProps.points = null
-  const wrapper = shallow(<Opportunity {...tempProps} />)
-  expect(wrapper).toMatchSnapshot()
+  const wrapper = render(<Opportunity {...tempProps} />)
+  expect(wrapper.container).toMatchSnapshot()
 })
 
 // to distinguish between no point and 0 points
 it('renders the base component correctly with 0 points', () => {
   const props = defaultProps({points: 0})
-  const wrapper = shallow(<Opportunity {...props} />)
-  expect(wrapper).toMatchSnapshot()
+  const wrapper = render(<Opportunity {...props} />)
+  expect(wrapper.container).toMatchSnapshot()
 })
 
 it('renders a Pill if in the past', () => {
   const props = defaultProps()
-  const wrapper = shallow(<Opportunity {...props} />)
-  expect(wrapper.find(Pill).length).toEqual(1)
+  const wrapper = render(<Opportunity {...props} />)
+  expect(wrapper.getAllByText('Missing')).toHaveLength(1)
 })
 
 it('registers itself as animatable', () => {
   const fakeRegister = jest.fn()
   const fakeDeregister = jest.fn()
-  const wrapper = mount(
+  const ref = React.createRef()
+  const wrapper = render(
     <Opportunity
+      ref={ref}
       {...defaultProps()}
       id="1"
       registerAnimatable={fakeRegister}
@@ -82,25 +86,39 @@ it('registers itself as animatable', () => {
       animatableIndex={42}
     />
   )
-  const instance = wrapper.instance()
-  expect(fakeRegister).toHaveBeenCalledWith('opportunity', instance, 42, ['1'])
+  expect(fakeRegister).toHaveBeenCalledWith('opportunity', ref.current, 42, ['1'])
 
-  wrapper.setProps({id: '2', animatableIndex: 43})
-  expect(fakeDeregister).toHaveBeenCalledWith('opportunity', instance, ['1'])
-  expect(fakeRegister).toHaveBeenCalledWith('opportunity', instance, 43, ['2'])
-
+  wrapper.rerender(
+    <Opportunity
+      ref={ref}
+      {...defaultProps()}
+      id="2"
+      registerAnimatable={fakeRegister}
+      deregisterAnimatable={fakeDeregister}
+      animatableIndex={43}
+    />
+  )
+  expect(fakeDeregister).toHaveBeenCalledWith('opportunity', ref.current, ['1'])
+  expect(fakeRegister).toHaveBeenCalledWith('opportunity', ref.current, 43, ['2'])
+  const instance = ref.current
   wrapper.unmount()
   expect(fakeDeregister).toHaveBeenCalledWith('opportunity', instance, ['2'])
 })
 
+it('renders a close icon', () => {
+  const props = defaultProps()
+  const wrapper = render(<Opportunity {...props} />)
+  expect(wrapper.queryByText(`Dismiss ${props.opportunityTitle}`)).toBeInTheDocument()
+})
+
 it('renders no close icon if dismissed', () => {
   const props = defaultProps({plannerOverride: {dismissed: true}})
-  const wrapper = mount(<Opportunity {...props} />)
-  expect(wrapper.find('button').length).toEqual(0)
+  const wrapper = render(<Opportunity {...props} />)
+  expect(wrapper.queryByText(`Dismiss ${props.opportunityTitle}`)).toBeNull()
 })
 
 it('renders no close icon if user is observing a student', () => {
   const props = defaultProps({isObserving: true})
-  const wrapper = mount(<Opportunity {...props} />)
-  expect(wrapper.find('button').length).toEqual(0)
+  const wrapper = render(<Opportunity {...props} />)
+  expect(wrapper.queryByText(`Dismiss ${props.opportunityTitle}`)).toBeNull()
 })

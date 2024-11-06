@@ -28,7 +28,7 @@ class ModuleProgressionVisibleLoader < GraphQL::Batch::Loader
   def perform(contexts)
     GuardRail.activate(:secondary) do
       contexts.each do |context|
-        # Use sequential_ids to insure the modules are in the correct oreder
+        # Use sequential_ids to ensure the modules are in the correct order
         sequential_ids = context.sequential_module_item_ids
         ids = sequential_ids & context.module_items_visible_to(@user).reorder(nil).pluck(:id)
         fulfill(context, ids)
@@ -77,6 +77,23 @@ module Types
       end
     end
 
+    field :next_items_connection,
+          Types::ModuleItemType.connection_type,
+          "Items are ordered based on distance to the current item, starting with the next item directly following it.",
+          null: true
+    def next_items_connection
+      Loaders::AssociationLoader.for(ContentTag, :context).load(content_tag).then do |context|
+        ModuleProgressionVisibleLoader.for(current_user).load(context).then do |visible_tag_ids|
+          index = visible_tag_ids.index(content_tag.id)
+          next nil if index.nil?
+          next [] if index == visible_tag_ids.size - 1
+
+          previous_ids = visible_tag_ids[index + 1..]
+          previous_ids.map { |id| Loaders::IDLoader.for(ContentTag).load(id) }
+        end
+      end
+    end
+
     field :previous, Types::ModuleItemType, null: true
     def previous
       Loaders::AssociationLoader.for(ContentTag, :context).load(content_tag).then do |context|
@@ -87,6 +104,23 @@ module Types
 
           previous_id = visible_tag_ids[index - 1]
           Loaders::IDLoader.for(ContentTag).load(previous_id)
+        end
+      end
+    end
+
+    field :previous_items_connection,
+          Types::ModuleItemType.connection_type,
+          "Items are ordered based on distance to the current item, starting with the previous item directly preceding it.",
+          null: true
+    def previous_items_connection
+      Loaders::AssociationLoader.for(ContentTag, :context).load(content_tag).then do |context|
+        ModuleProgressionVisibleLoader.for(current_user).load(context).then do |visible_tag_ids|
+          index = visible_tag_ids.index(content_tag.id)
+          next nil if index.nil?
+          next [] if index == 0
+
+          previous_ids = visible_tag_ids[0...index].reverse
+          previous_ids.map { |id| Loaders::IDLoader.for(ContentTag).load(id) }
         end
       end
     end

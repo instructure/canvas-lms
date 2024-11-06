@@ -17,7 +17,7 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {ApolloProvider} from 'react-apollo'
+import {ApolloProvider} from '@apollo/react-common'
 import CanvasInbox from '../CanvasInbox'
 import {handlers, inboxSettingsHandlers} from '../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../shared/msw/mswClient'
@@ -80,7 +80,7 @@ describe('CanvasInbox App Container', () => {
     return render(
       <ApolloProvider client={mswClient}>
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
-          <CanvasInbox />
+          <CanvasInbox breakpoints={{desktopOnly: true}}/>
         </AlertManagerContext.Provider>
       </ApolloProvider>
     )

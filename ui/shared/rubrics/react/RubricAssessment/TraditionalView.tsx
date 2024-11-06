@@ -39,7 +39,7 @@ import {Link} from '@instructure/ui-link'
 const I18n = useI18nScope('rubrics-assessment-tray')
 const {shamrock, tiara} = colors
 
-type TraditionalViewProps = {
+export type TraditionalViewProps = {
   criteria: RubricCriterion[]
   hidePoints: boolean
   isPreviewMode: boolean
@@ -51,6 +51,7 @@ type TraditionalViewProps = {
   rubricSavedComments?: Record<string, string[]>
   onUpdateAssessmentData: (params: UpdateAssessmentData) => void
 }
+
 export const TraditionalView = ({
   criteria,
   hidePoints,

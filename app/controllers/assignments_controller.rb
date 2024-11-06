@@ -449,8 +449,10 @@ class AssignmentsController < ApplicationController
         assigned_rubric = nil
         if @assignment.active_rubric_association? && Rubric.enhanced_rubrics_assignments_enabled?(@context)
           rubric_association = @assignment.rubric_association
+          can_update_rubric = can_do(rubric_association.rubric, @current_user, :update)
           assigned_rubric = rubric_json(rubric_association.rubric, @current_user, session, style: "full")
           assigned_rubric[:unassessed] = Rubric.active.unassessed.where(id: rubric_association.rubric.id).exists?
+          assigned_rubric[:can_update] = can_update_rubric
           rubric_association = rubric_association_json(rubric_association, @current_user, session)
         end
 
@@ -789,7 +791,7 @@ class AssignmentsController < ApplicationController
 
     if @context.root_account.feature_enabled?(:assignment_edit_enhancements_teacher_view) &&
        authorized_action(@assignment, @current_user, @assignment.new_record? ? :create : :update)
-      js_env({ ASSIGNMENT_EDIT_ENHANCEMENTS_TEACHER_VIEW: true, ASSIGNMENT_ID: params[:id] })
+      js_env({ ASSIGNMENT_EDIT_ENHANCEMENTS_TEACHER_VIEW: true, ASSIGNMENT_ID: params[:id], COURSE_ID: @context.id })
       css_bundle :assignment_enhancements_teacher_view
       js_bundle :assignment_edit
       render html: "", layout: true

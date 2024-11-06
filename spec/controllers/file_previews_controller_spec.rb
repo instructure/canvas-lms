@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require "webmock/rspec"
+
 describe FilePreviewsController do
   before(:once) do
     @account = Account.default
@@ -27,6 +29,39 @@ describe FilePreviewsController do
 
   before do
     user_session(@student)
+  end
+
+  describe "with JWT access token" do
+    include_context "InstAccess setup"
+
+    before do
+      attachment_model.update!(file_state: "hidden", instfs_uuid: "stuff")
+      user_with_pseudonym
+      jwt_payload = {
+        resource: "/courses/#{@course.id}/files/#{@attachment.id}?instfs_id=stuff",
+        aud: [@course.root_account.uuid],
+        sub: @user.uuid,
+        tenant_auth: { location: "location" },
+        iss: "instructure:inst_access",
+        exp: 1.hour.from_now.to_i,
+        iat: Time.now.to_i
+      }
+      @token_string = InstAccess::Token.send(:new, jwt_payload).to_unencrypted_token_string
+      allow(Canvadocs).to receive(:enabled?).and_return(true)
+      allow(InstFS).to receive_messages(enabled?: true, app_host: "http://instfs.test")
+      stub_request(:get, "http://instfs.test/files/stuff/metadata").to_return(status: 200, body: { url: "http://instfs.test/stuff" }.to_json)
+    end
+
+    it "allows access" do
+      get :show, params: { course_id: @course.id, file_id: @attachment.id, access_token: @token_string, instfs_id: "stuff" }
+      expect(response).to be_successful
+    end
+
+    it "does not allow access if the file doesn't match" do
+      attachment_model.update!(file_state: "hidden", instfs_uuid: "otherstuff")
+      get :show, params: { course_id: @course.id, file_id: @attachment.id, access_token: @token_string, instfs_id: "stuff" }
+      expect(response).to be_unauthorized
+    end
   end
 
   it "requires authorization to view the file" do
@@ -166,11 +201,11 @@ describe FilePreviewsController do
       @account.save!
     end
 
-    it "renders unauthorized" do
+    it "allows students to see individual files" do
       course_model
       attachment_model
       get :show, params: { course_id: @course.id, file_id: @attachment.id, verifier: @attachment.uuid }
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :ok
     end
   end
 end

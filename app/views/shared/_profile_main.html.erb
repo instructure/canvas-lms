@@ -1,0 +1,93 @@
+<%
+# Copyright (C) 2012 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<%
+  css_bundle :profile_show, :tinymce
+  js_bundle :profile_show
+  add_body_class 'not-editing'
+  js_env PROFILE: @user_data if @user_data[:can_edit]
+  js_env(folder_id: @user.profile_pics_folder.id) if @user == @current_user
+
+  is_roster_page = is_roster_user_page ||= false
+  inst_env_feature_enabled = @domain_root_account.feature_enabled?(:instui_nav)
+  legacy_view = !inst_env_feature_enabled || is_roster_page ? "legacy" : ""
+  image_size = inst_env_feature_enabled && !is_roster_page  ? 80 : 128
+  primary_button = inst_env_feature_enabled ? "btn btn-primary" : ""
+
+%>
+  <div class="header-block <%= legacy_view %>">
+    <div  class="account-info-block">
+      <% if service_enabled?(:avatars) %>
+        <div class="image-block-image profile-avatar-wrapper">
+          <% if @user_data[:can_edit_avatar] %>
+            <%= avatar(@user_data[:id], size: image_size, url: '#', edit: true, class: "profile-link",
+                       sr_content: t('Click to change profile picture for %{display_name}', :display_name => @user.short_name)) %>
+          <% else %>
+            <%= avatar(@user_data[:id], size: image_size, url: nil) %>
+          <% end %>
+        </div>
+      <% end %>
+      <% if inst_env_feature_enabled && !is_roster_page %>
+        <div class="account-text-info">
+          <h2 class="user-data-name"><%= @user_data[:short_name] %> <% if @user_data[:pronouns] %><i>(<%= @user_data[:pronouns] %>)</i><% end %></h2>
+          <div class="user-data-main-info">
+            <span><%= @user_data[:primary_email] %></span>
+            <span><%= @user_data[:id] %></span>
+          </div>
+        </div>
+        <% elsif !inst_env_feature_enabled || (!inst_env_feature_enabled && is_roster_page) %>
+          <%= render 'shared/profile_form' %>
+        <% end %>
+    </div>
+    <div  class="button-area-block">
+      <% if @user_data[:can_edit] && !can_do(@domain_root_account, @current_user, :manage) %>
+        <button data-event="editProfile" class="hide-if-editing Button <%= primary_button %>"><i class="icon-edit"></i> <%= t('edit_profile', 'Edit Profile') %></button>
+        <button data-event="cancelEditProfile" class="show-if-editing Button">
+          <% if !inst_env_feature_enabled %>
+            <i class="icon-edit"></i>
+          <% end %>
+          <%= t('cancel_editing', 'Cancel Editing') %></button>
+      <% elsif @user_data[:can_edit] && can_do(@domain_root_account, @current_user, :manage) %>
+        <% if inst_env_feature_enabled %>
+          <button tabindex="1" data-event="editProfile" class="hide-if-editing Button <%= primary_button %>"><i class="icon-edit"></i> <%= t('edit_profile', 'Edit Profile') %></button>
+          <button tabindex="1" data-event="cancelEditProfile" class="show-if-editing Button"><%= t('cancel_editing', 'Cancel Editing') %></button>
+          <%= button_to user_path(@user.id), method: :get, role: 'menuitem', class: 'btn', tabindex: '2' do %>
+            <i class="icon-info"></i> <%= t('links.user_account_details', %{Account Details}) %>
+          <% end %>
+        <% else %>
+          <div class="al-dropdown__container">
+            <a class="al-trigger btn" role="button" href="#" id="profileDropdown">
+              <i class="icon-more" role="presentation"></i>
+              <span class="screenreader-only">More</span>
+            </a>
+            <ul aria-labeledby="profileDropdown" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" >
+              <li class="hide-if-editing"><a data-event="editProfile" role="menuitem"><%= t('edit_profile', 'Edit Profile') %></a></li>
+              <li class="show-if-editing"><a data-event="cancelEditProfile" role="menuitem"><%= t('cancel_editing', 'Cancel Editing') %></a></li>
+              <li><a href="<%= user_path(@user.id) %>"role="menuitem"><%= t('links.user_account_details', %{Account Details}) %></a></li>
+              <% if @user != @current_user %>
+                <li><a href="<%= user_profile_url(@user, :become_user_id => @user) %>"role="menuitem"> <%= t('Act as User') %></a></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+<% if inst_env_feature_enabled %>
+  <%= render 'shared/profile_form' %>
+<% end %>

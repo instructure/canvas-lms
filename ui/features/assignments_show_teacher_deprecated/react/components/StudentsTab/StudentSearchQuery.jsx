@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {func} from 'prop-types'
-import {Query} from 'react-apollo'
+import {Query} from '@apollo/react-components'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 

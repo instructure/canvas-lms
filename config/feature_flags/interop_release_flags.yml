@@ -116,6 +116,20 @@ external_tool_drawer:
       state: allowed_on
     ci:
       state: allowed_on
+import_numeric_lti_custom_params_as_string:
+  state: hidden
+  shadow: true
+  applies_to: SiteAdmin
+  display_name: Copy numeric lti custom params as strings on imports.
+  description: |-
+    Prevent ResourceLink custom parameters from being converted to numbers during course copy.
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_ags_remove_top_submitted_at:
   state: hidden
   applies_to: RootAccount
@@ -267,6 +281,14 @@ lti_registrations_discover_page:
     development:
       state: hidden
   custom_transition_proc: lti_registrations_discover_page_hook
+lti_apps_page_instructors:
+  state: hidden
+  applies_to: RootAccount
+  display_name: LTI Apps Page for Instructors
+  description: When enabled, the LTI Apps page will be available in the Course navigation sidebar.
+  environments:
+    development:
+      state: hidden
 lti_registrations_next:
   state: hidden
   applies_to: RootAccount
@@ -274,6 +296,8 @@ lti_registrations_next:
   description: When enabled, the LTI Apps page will have features that are currently in-development.
   environments:
     development:
+      state: allowed_on
+    ci:
       state: allowed_on
 lti_registrations_page:
   state: hidden
@@ -356,8 +380,9 @@ platform_notification_service:
   shadow: true
   applies_to: RootAccount
   display_name: Enable Platform Notification Service
-  description: |-
-    When on, 1Edtech Platform Notfication service (used to subscribe tools for notices, list existing notice handlers, notify subscribed tools, etc.) will be enabled.
+  description: >-
+    When on, 1Edtech Platform Notfication service (used to subscribe tools for notices, list existing notice handlers, notify subscribed tools, etc.) will
+    be enabled.
   environments:
     development:
       state: allowed_on

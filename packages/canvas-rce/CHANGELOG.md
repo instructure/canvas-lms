@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 5.14.0 - 2024-10-18
+
+### Added
+
+- New optional media player for upload previews
+
+### Fixed
+
+- Keyboard trap when switching to the HTML Editor
+
+### Changed
+
+- Upgraded React to 18
+
 ## 5.13.6 - 2024-09-25
 
 ### Fixed

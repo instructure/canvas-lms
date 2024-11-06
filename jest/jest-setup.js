@@ -54,8 +54,19 @@ const ignoredErrors = [
   /The above error occurred in the <.*> component/,
   /You seem to have overlapping act\(\) calls/,
   /Warning: `value` prop on `%s` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.%s/,
+  /Invalid prop `color` of value `secondary` supplied to `CondensedButton`, expected one of \["primary","primary-inverse"\]./,
   /Warning: This synthetic event is reused for performance reasons/,
   /Invalid prop `value` supplied to `MenuItem`/, // https://instructure.atlassian.net/browse/INSTUI-4054
+  /Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s/,
+  /Warning: `ReactDOMTestUtils.act` is deprecated in favor of `React.act`. Import `act` from `react` instead of `react-dom\/test-utils`./,
+  /Warning: unmountComponentAtNode is deprecated and will be removed in the next major release. Switch to the createRoot API. Learn more: https:\/\/reactjs.org\/link\/switch-to-createroot/,
+  /Warning: findDOMNode is deprecated and will be removed in the next major release. Instead, add a ref directly to the element you want to reference./,
+  /Warning: %s uses the legacy childContextTypes API which is no longer supported and will be removed in the next major release. Use React.createContext\(\) instead/,
+  /Warning: %s uses the legacy contextTypes API which is no longer supported and will be removed in the next major release. Use React.createContext\(\) with static contextType instead./,
+  /Warning: Component "%s" contains the string ref "%s". Support for string refs will be removed in a future major release. We recommend using useRef\(\) or createRef\(\) instead. Learn more about using refs safely here:/,
+  /Warning: ReactDOMTestUtils is deprecated and will be removed in a future major release, because it exposes internal implementation details that are highly likely to change between releases. Upgrade to a modern testing library/,
+  /Warning: %s: Support for defaultProps will be removed from memo components in a future major release. Use JavaScript default parameters instead./,
+  /Warning: Component "%s" contains the string ref "%s". Support for string refs will be removed in a future major release. We recommend using useRef\(\) or createRef\(\) instead. Learn more about using refs safely here: https:\/\/reactjs.org\/link\/strict-mode-string-ref/,
 ]
 const globalWarn = global.console.warn
 const ignoredWarnings = [
@@ -72,16 +83,16 @@ global.console = {
     ) {
       return
     }
-    globalError(error)
+    globalError(error, rest)
     throw new Error(
       `Looks like you have an unhandled error. Keep our test logs clean by handling or filtering it. ${error}`
     )
   },
-  warn: warning => {
+  warn: (warning, ...rest) => {
     if (ignoredWarnings.some(regex => regex.test(warning))) {
       return
     }
-    globalWarn(warning)
+    globalWarn(warning, rest)
     throw new Error(
       `Looks like you have an unhandled warning. Keep our test logs clean by handling or filtering it. ${warning}`
     )

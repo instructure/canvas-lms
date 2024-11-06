@@ -371,7 +371,7 @@ class MissingPeopleSection extends React.Component {
   // render the list of login_ids where we did not find users
   render() {
     return (
-      <div className="addpeople__missing namelist">
+      <div className="addpeople__missing namelist" data-testid="addpeople__missing-namelist">
         <Table
           caption={<ScreenReaderContent>{I18n.t('Unmatched login list')}</ScreenReaderContent>}
         >

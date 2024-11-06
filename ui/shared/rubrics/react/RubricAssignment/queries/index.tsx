@@ -19,8 +19,12 @@
 import getCookie from '@instructure/get-cookie'
 import qs from 'qs'
 import type {GradingRubricContext} from '../types/rubricAssignment'
-import type {Rubric} from '../../types/rubric'
-import {mapRubricUnderscoredKeysToCamelCase} from '../../utils'
+import type {Rubric, RubricAssociation} from '../../types/rubric'
+import {
+  mapRubricUnderscoredKeysToCamelCase,
+  mapRubricAssociationUnderscoredKeysToCamelCase,
+} from '../../utils'
+import type {QueryOptions} from '@tanstack/react-query'
 
 export const removeRubricFromAssignment = async (courseId: string, rubricAssociationId: string) => {
   return fetch(`/courses/${courseId}/rubric_associations/${rubricAssociationId}`, {
@@ -35,11 +39,15 @@ export const removeRubricFromAssignment = async (courseId: string, rubricAssocia
   })
 }
 
+export type AssignmentRubric = Rubric & {can_update?: boolean}
 export const addRubricToAssignment = async (
   courseId: string,
   assignmentId: string,
-  rubricId: string
+  rubricId: string,
+  updatedAssociation: RubricAssociation
 ) => {
+  const {hidePoints, hideOutcomeResults, hideScoreTotal, useForGrading} = updatedAssociation
+
   const response = await fetch(`/courses/${courseId}/rubric_associations`, {
     headers: {
       'X-CSRF-Token': getCookie('_csrf_token'),
@@ -53,6 +61,10 @@ export const addRubricToAssignment = async (
         association_id: assignmentId,
         rubric_id: rubricId,
         purpose: 'grading',
+        hide_points: hidePoints ? 1 : 0,
+        hide_outcome_results: hideOutcomeResults ? 1 : 0,
+        hide_score_total: hideScoreTotal ? 1 : 0,
+        use_for_grading: useForGrading ? 1 : 0,
       },
     }),
   })
@@ -63,15 +75,23 @@ export const addRubricToAssignment = async (
 
   const result = await response.json()
 
+  const mappedRubric = mapRubricUnderscoredKeysToCamelCase(result.rubric)
+
   return {
     rubricAssociation: result.rubric_association,
-    rubric: mapRubricUnderscoredKeysToCamelCase(result.rubric),
+    rubric: {...mappedRubric, can_update: result.rubric.permissions?.update} as AssignmentRubric,
   }
 }
 
-export const getGradingRubricContexts = async (
-  courseId: string
-): Promise<GradingRubricContext[]> => {
+export const getGradingRubricContexts = async ({
+  queryKey,
+}: QueryOptions): Promise<GradingRubricContext[]> => {
+  if (!queryKey) {
+    throw Error('Query key is required')
+  }
+
+  const [_, courseId] = queryKey
+
   const contexts = await fetch(`/courses/${courseId}/grading_rubrics`, {
     headers: {
       'X-CSRF-Token': getCookie('_csrf_token'),
@@ -86,13 +106,18 @@ export const getGradingRubricContexts = async (
 }
 
 type GradingRubricForContextResponse = {
-  rubricAssociationId: string
+  rubricAssociation: RubricAssociation
   rubric: Rubric
 }
-export const getGradingRubricsForContext = async (
-  courseId: string,
-  contextCode?: string
-): Promise<GradingRubricForContextResponse[]> => {
+export const getGradingRubricsForContext = async ({
+  queryKey,
+}: QueryOptions): Promise<GradingRubricForContextResponse[]> => {
+  if (!queryKey) {
+    throw Error('Query key is required')
+  }
+
+  const [_, courseId, contextCode] = queryKey
+
   if (!contextCode) {
     throw Error('Context code is required')
   }
@@ -111,7 +136,7 @@ export const getGradingRubricsForContext = async (
 
   return results.map((result: {rubric_association: any}) => {
     return {
-      rubricAssociationId: result.rubric_association?.id,
+      rubricAssociation: mapRubricAssociationUnderscoredKeysToCamelCase(result.rubric_association),
       rubric: mapRubricUnderscoredKeysToCamelCase(result.rubric_association?.rubric),
     }
   })

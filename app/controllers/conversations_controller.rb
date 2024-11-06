@@ -262,6 +262,7 @@ class ConversationsController < ApplicationController
   # @returns [Conversation]
   #
   def index
+    page_has_instui_topnav
     respond_to do |format|
       format.json do
         @conversations_scope = @conversations_scope.where("message_count > 0")

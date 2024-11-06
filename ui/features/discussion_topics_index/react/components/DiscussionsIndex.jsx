@@ -352,7 +352,6 @@ export default class DiscussionsIndex extends Component {
       <>
         <TopNavPortalWithDefaults
           currentPageName={I18n.t('Discussions')}
-          useTutorial={true}
           useStudentView={true}
         />
         <div className="discussions-v2__wrapper">

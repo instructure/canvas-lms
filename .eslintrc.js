@@ -180,6 +180,12 @@ module.exports = {
         property: '__defineSetter__',
         message: 'Please use Object.defineProperty instead.',
       },
+      {
+        object: 'ReactDOM',
+        property: 'render',
+        message:
+          'React 18 deprecates ReactDOM.render, try using ReactDOM.createRoot and render instead.',
+      },
     ],
 
     'no-restricted-syntax': [

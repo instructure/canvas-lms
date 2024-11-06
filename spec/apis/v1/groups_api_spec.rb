@@ -44,7 +44,8 @@ describe "Groups API", type: :request do
       "leader" => group.leader,
       "has_submission" => group.submission?,
       "concluded" => group.context.concluded? || group.context.deleted?,
-      "created_at" => group.created_at.iso8601
+      "created_at" => group.created_at.iso8601,
+      "non_collaborative" => false
     }
     if opts[:include_users]
       json["users"] = users_json(group.users, **opts)

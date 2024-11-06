@@ -18,7 +18,7 @@
 
 import React from 'react'
 import type {RouteObject} from 'react-router-dom'
-import {Discover} from './Discover'
+import {Discover} from '../../../../shared/lti-apps/components/Discover'
 
 export const DiscoverRoute: RouteObject = {
   path: '/',

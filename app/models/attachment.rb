@@ -232,7 +232,7 @@ class Attachment < ActiveRecord::Base
       end
 
       if att.deleted? && owner
-        new_att = owner.attachments.where(id: att.replacement_attachment_id).first if att.replacement_attachment_id
+        new_att = owner.attachments.active.where(id: att.replacement_attachment_id).first if att.replacement_attachment_id
         new_att ||= Folder.find_attachment_in_context_with_path(owner, att.full_display_path)
         new_att || att
       else
@@ -540,8 +540,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def assert_file_extension
-    self.content_type = nil if content_type == "application/x-unknown" || content_type&.include?("ERROR")
-    self.content_type ||= mimetype(filename)
+    self.content_type = mimetype(filename) if content_type.blank? || content_type == "application/x-unknown" || content_type&.include?("ERROR")
     if filename && filename.split(".").length < 2
       # we actually have better luck assuming zip files without extensions
       # are docx files than assuming they're zip files
@@ -553,9 +552,8 @@ class Attachment < ActiveRecord::Base
 
   def extension
     res = (filename || "").match(/(\.[^.]*)\z/).to_s
-    res = nil if res == ""
-    if !res || res == ""
-      res = File.mime_types[self.content_type].to_s rescue nil
+    if res.blank?
+      res = File.mime_types[content_type]&.to_s
       res = "." + res if res
     end
     res = nil if res == "."
@@ -888,7 +886,11 @@ class Attachment < ActiveRecord::Base
             ContextModule.where(id: ContentTag.where(content_id: id, content_type: "Attachment").select(:context_module_id)).touch_all
           end
           # update replacement pointers pointing at the overwritten file
-          context.attachments.where(replacement_attachment_id: a).in_batches(of: 10_000).update_all(replacement_attachment_id: id)
+          # (to a point. files that get overwritten thousands of times cause serious database pain,
+          # so don't update beyond the first 50 overwrites)
+          # also plucking ids here because Postgres sometimes ignores the LIMIT clause in a subquery :(
+          ids = context.attachments.where(replacement_attachment_id: a).order(:id).limit(50).pluck(:id)
+          Attachment.where(id: ids).update_all(replacement_attachment_id: id)
           # delete the overwritten file (unless the caller is queueing them up)
           a.destroy unless opts[:caller_will_destroy]
           deleted_attachments << a
@@ -925,7 +927,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def inline_content?
-    self.content_type.start_with?("text") || extension == ".html" || extension == ".htm" || extension == ".swf"
+    content_type.start_with?("text") || extension == ".html" || extension == ".htm" || extension == ".swf"
   end
 
   def self.shared_secret
@@ -2038,7 +2040,7 @@ class Attachment < ActiveRecord::Base
     else
       begin
         if split_root_attachment
-          old_content_type = self.content_type
+          old_content_type = content_type
           scope = Attachment.where(md5:, namespace:, root_attachment_id: nil)
           # prevents find_existing_attachment_for_md5 from reattaching the child to the old root
           scope.where.not(content_type: "invalid/invalid")
@@ -2187,8 +2189,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.mimetype(filename)
-    res = nil
-    res = File.mime_type(filename) if !res || res == "unknown/unknown"
+    res = File.mime_type(filename)
     res ||= "unknown/unknown"
     res
   end
@@ -2473,7 +2474,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def previewable_media?
-    self.content_type && (self.content_type.match(/\A(video|audio)/) || self.content_type == "application/x-flash-video")
+    content_type && (content_type.match(/\A(video|audio)/) || content_type == "application/x-flash-video")
   end
 
   def preview_params(user, type, opts = {}, access_token: nil)

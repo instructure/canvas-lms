@@ -53,6 +53,7 @@ const setup = ({
   discussionEntryVersions = [],
   toggleUnread = () => {},
   published = true,
+  isAnnouncement = false,
 } = {}) =>
   render(
     <SearchContext.Provider value={{searchTerm}}>
@@ -74,6 +75,7 @@ const setup = ({
         discussionEntryVersions={discussionEntryVersions}
         toggleUnread={toggleUnread}
         published={published}
+        isAnnouncement={isAnnouncement}
       />
     </SearchContext.Provider>
   )
@@ -266,7 +268,7 @@ describe('AuthorInfo', () => {
         createdAt: 'Jan 1 1:00pm',
         isTopic: true,
       })
-      expect(container.queryByText('Posted Jan 1 1:00pm')).toBeInTheDocument()
+      expect(container.queryByText('Posted Jan 1 1:00pm', {exact: false})).toBeInTheDocument()
       expect(container.queryByText('Created Jan 1 1:00pm')).toBeInTheDocument()
     })
 

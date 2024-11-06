@@ -71,6 +71,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     super.initialize(...arguments)
     if (!this.WIKI_RIGHTS) this.WIKI_RIGHTS = {}
     if (!this.PAGE_RIGHTS) this.PAGE_RIGHTS = {}
+    this.queryParams = new URLSearchParams(window.location.search)
     this.enableAssignTo =
       window.ENV.FEATURES?.selective_release_ui_api &&
       ENV.COURSE_ID != null &&
@@ -89,21 +90,6 @@ export default class WikiPageEditView extends ValidatedFormView {
     return (this.studentTodoAtDateValue = todoDate ? new Date(todoDate) : '')
   }
 
-  setOnlyVisibleToOverrides() {
-    if (ENV.FEATURES?.selective_release_ui_api) {
-      const hasDefaultEveryone = this.overrides.assignment_overrides.length === 0
-      const contextModuleOverrides = this.overrides.assignment_overrides.filter(
-        info => info.context_module_id != null
-      )
-      return !(
-        hasDefaultEveryone ||
-        contextModuleOverrides.length === this.overrides.assignment_overrides.length
-      )
-    } else {
-      return this.overrides.only_visible_to_overrides
-    }
-  }
-
   handleOverridesSave(page, redirect) {
     if (!page.page_id) return
     const url = itemTypeToApiURL(ENV.COURSE_ID, 'page', page.page_id)
@@ -113,7 +99,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     }
 
     const data = this.overrides
-    data.only_visible_to_overrides = this.setOnlyVisibleToOverrides()
+    data.only_visible_to_overrides = ENV.IN_PACED_COURSE ? false : this.overrides.only_visible_to_overrides
 
     $.ajaxJSON(url, 'PUT', JSON.stringify(data), redirect, errorCallBack, {
       contentType: 'application/json',
@@ -162,6 +148,10 @@ export default class WikiPageEditView extends ValidatedFormView {
     json.content_is_locked = this.lockedItems.content
     json.show_assign_to = this.enableAssignTo
     json.edit_with_block_editor = this.model.get('editor') === 'block_editor'
+
+    if (this.queryParams.get('editor') === 'block_editor' && this.model.get('body') == null) {
+      json.edit_with_block_editor = true
+    }
 
     return json
   }
@@ -257,6 +247,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       ReactDOM.render(
         <Suspense fallback={<div>{I18n.t('Loading...')}</div>}>
           <BlockEditor
+            course_id={ENV.COURSE_ID}
             container={container}
             content={blockEditorData}
             onCancel={this.cancel.bind(this)}

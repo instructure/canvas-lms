@@ -19,11 +19,12 @@
 import React from 'react'
 import {render as testingLibraryRender, act} from '@testing-library/react'
 import NavigationBadges from '../NavigationBadges'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import fetchMock from 'fetch-mock'
 
 const render = (children: unknown) =>
-  testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
+  testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 const unreadComponent = jest.fn(() => <></>)
 

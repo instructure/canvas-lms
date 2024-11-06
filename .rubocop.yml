@@ -71,7 +71,6 @@ Migration/Tagged:
   AllowedTags:
     - predeploy
     - postdeploy
-    - cassandra
     - dynamodb
 
 Naming:

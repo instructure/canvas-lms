@@ -43,6 +43,25 @@ class AuthenticationProvider::Google < AuthenticationProvider::OpenIDConnect
   end
   validates :login_attribute, inclusion: login_attributes
 
+  # few enough schools use Apple auth, that we can just use the regular cache
+  def self.jwks_cache
+    Rails.cache
+  end
+
+  def self.always_validate?
+    true
+  end
+
+  def issuer
+    # silly Google. their issuer may or may not include the scheme. against spec
+    # (it should always include the scheme)
+    %r{(?:https://)?accounts.google.com}
+  end
+
+  def jwks_uri
+    "https://www.googleapis.com/oauth2/v3/certs"
+  end
+
   def self.recognized_federated_attributes
     %w[
       email
@@ -108,5 +127,14 @@ class AuthenticationProvider::Google < AuthenticationProvider::OpenIDConnect
 
   def hosted_domains
     hosted_domain.split(",").map(&:strip)
+  end
+
+  private
+
+  def download_jwks
+    # cache against the default shard
+    Shard.default.activate do
+      super
+    end
   end
 end

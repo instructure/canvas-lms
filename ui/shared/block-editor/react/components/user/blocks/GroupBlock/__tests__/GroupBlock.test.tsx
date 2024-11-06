@@ -97,13 +97,13 @@ describe('GroupBlock', () => {
   it('should render ', () => {
     const {container} = renderBlock()
     expect(container.querySelector('.group-block')).toBeInTheDocument()
-    expect(container.querySelector('.group-block')).toHaveClass('column-layout')
+    expect(container.querySelector('.group-block')).toHaveClass('row-layout')
   })
 
-  it('should render with row direction', () => {
-    const {container} = renderBlock({layout: 'row'})
+  it('should render with column direction', () => {
+    const {container} = renderBlock({layout: 'column'})
     expect(container.querySelector('.group-block')).toBeInTheDocument()
-    expect(container.querySelector('.group-block')).toHaveClass('row-layout')
+    expect(container.querySelector('.group-block')).toHaveClass('column-layout')
   })
 
   it('should render with center horizontal alignment', () => {
@@ -116,6 +116,18 @@ describe('GroupBlock', () => {
     const {container} = renderBlock({verticalAlignment: 'center'})
     expect(container.querySelector('.group-block')).toBeInTheDocument()
     expect(container.querySelector('.group-block')).toHaveClass('center-valign')
+  })
+
+  it('should render with a background color', () => {
+    const {container} = renderBlock({background: '#FF00FF'})
+    expect(container.querySelector('.group-block')).toBeInTheDocument()
+    expect(container.querySelector('.group-block')).toHaveStyle({backgroundColor: '#FF00FF'})
+  })
+
+  it('should render with a border color', () => {
+    const {container} = renderBlock({borderColor: '#FF00FF'})
+    expect(container.querySelector('.group-block')).toBeInTheDocument()
+    expect(container.querySelector('.group-block')).toHaveStyle({borderColor: '#FF00FF'})
   })
 
   it('should have "Group" as its displayName"', () => {

@@ -18,7 +18,8 @@
 
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {RubricForm, type RubricFormComponentProp} from '../index'
 import {RUBRIC_CRITERIA_IGNORED_FOR_SCORING, RUBRICS_QUERY_RESPONSE} from './fixtures'
 import * as RubricFormQueries from '../queries/RubricFormQueries'
@@ -59,7 +60,7 @@ describe('RubricForm Tests', () => {
 
   const renderComponent = (props?: Partial<RubricFormComponentProp>) => {
     return render(
-      <QueryProvider>
+      <MockedQueryProvider>
         <RubricForm
           rootOutcomeGroup={ROOT_OUTCOME_GROUP}
           criterionUseRangeEnabled={false}
@@ -67,9 +68,10 @@ describe('RubricForm Tests', () => {
           onCancel={() => {}}
           onSaveRubric={() => {}}
           accountId="1"
+          showAdditionalOptions={true}
           {...props}
         />
-      </QueryProvider>
+      </MockedQueryProvider>
     )
   }
 
@@ -77,7 +79,7 @@ describe('RubricForm Tests', () => {
 
   describe('without rubricId', () => {
     it('loads rubric data and populates appropriate fields', () => {
-      queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
 
       const {getByTestId, getByText} = renderComponent()
       expect(getByText('Create New Rubric')).toBeInTheDocument()
@@ -94,7 +96,7 @@ describe('RubricForm Tests', () => {
     })
 
     it('loads rubric data and populates appropriate fields', () => {
-      queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
 
       const {getByTestId} = renderComponent({rubricId: '1'})
       expect(getByTestId('rubric-form-title')).toHaveValue('Rubric 1')
@@ -203,6 +205,7 @@ describe('RubricForm Tests', () => {
           rubricAssociation: {
             hidePoints: false,
             hideScoreTotal: false,
+            hideOutcomeResults: false,
             id: '1',
             useForGrading: true,
           },
@@ -225,7 +228,7 @@ describe('RubricForm Tests', () => {
     })
 
     it('does not display save as draft button if rubric has associations', () => {
-      queryClient.setQueryData(['fetch-rubric-1'], {
+      queryClient.setQueryData(['fetch-rubric', '1'], {
         ...RUBRICS_QUERY_RESPONSE,
         hasRubricAssociations: true,
       })
@@ -237,7 +240,7 @@ describe('RubricForm Tests', () => {
 
   describe('rubric criteria', () => {
     it('renders all criteria rows for a rubric', () => {
-      queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
 
       const {criteria = []} = RUBRICS_QUERY_RESPONSE
 
@@ -261,7 +264,7 @@ describe('RubricForm Tests', () => {
     })
 
     it('renders the criteria rows without pill if is ignore for scoring', () => {
-      queryClient.setQueryData(['fetch-rubric-1'], RUBRIC_CRITERIA_IGNORED_FOR_SCORING)
+      queryClient.setQueryData(['fetch-rubric', '1'], RUBRIC_CRITERIA_IGNORED_FOR_SCORING)
 
       const {queryAllByTestId} = renderComponent({rubricId: '1'})
       const criteriaRows = queryAllByTestId('rubric-criteria-row')
@@ -272,7 +275,7 @@ describe('RubricForm Tests', () => {
     })
 
     it('renders the criterion ratings accordion button', () => {
-      queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
 
       const {criteria = []} = RUBRICS_QUERY_RESPONSE
 
@@ -288,7 +291,7 @@ describe('RubricForm Tests', () => {
     })
 
     it('renders the criterion ratings accordion items when button is clicked', () => {
-      queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
 
       const {criteria = []} = RUBRICS_QUERY_RESPONSE
 
@@ -300,7 +303,7 @@ describe('RubricForm Tests', () => {
     })
 
     it('does not render the criterion ratings accordion items when accordion is closed', () => {
-      queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
 
       const {queryAllByTestId} = renderComponent({rubricId: '1'})
       const ratingScaleAccordion = queryAllByTestId('criterion-row-rating-accordion')
@@ -395,7 +398,7 @@ describe('RubricForm Tests', () => {
     })
 
     it('renders a lock icon with a tooltip next to the outcome name', async () => {
-      queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
 
       const {queryAllByTestId, getByTestId} = renderComponent({rubricId: '1'})
 
@@ -432,7 +435,7 @@ describe('RubricForm Tests', () => {
           // @ts-ignore
           ;(this as FindDialog).trigger('import', {...outcomeData})
         })
-        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
         const {getByTestId, getByText, queryAllByTestId} = renderComponent()
         fireEvent.click(getByTestId('create-from-outcome-button'))
         fireEvent.click(getByText('Import'))
@@ -471,7 +474,7 @@ describe('RubricForm Tests', () => {
           // @ts-ignore
           ;(this as FindDialog).trigger('import', {...outcomeData})
         })
-        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
         const {getByTestId, getByText, queryAllByTestId} = renderComponent()
         fireEvent.click(getByTestId('create-from-outcome-button'))
         fireEvent.click(getByText('Import'))
@@ -500,7 +503,7 @@ describe('RubricForm Tests', () => {
           // @ts-ignore
           ;(this as FindDialog).trigger('import', {...outcomeData})
         })
-        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
         const {getByTestId, getByText, getAllByText} = renderComponent()
         fireEvent.click(getByTestId('create-from-outcome-button'))
         fireEvent.click(getByText('Import'))
@@ -513,7 +516,7 @@ describe('RubricForm Tests', () => {
 
     describe('criterion modal', () => {
       it('opens the criterion modal when the add criterion button is clicked', async () => {
-        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryByTestId} = renderComponent({rubricId: '1'})
         expect(queryByTestId('rubric-criterion-modal')).toBeNull()
@@ -524,7 +527,7 @@ describe('RubricForm Tests', () => {
       })
 
       it('does not save new criterion when the cancel button is clicked', async () => {
-        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
         fireEvent.click(getByTestId('add-criterion-button'))
@@ -538,7 +541,7 @@ describe('RubricForm Tests', () => {
       })
 
       it('saves new criterion when the save button is clicked', async () => {
-        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
         expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
@@ -557,7 +560,7 @@ describe('RubricForm Tests', () => {
       })
 
       it('updates existing criterion when the save button is clicked', async () => {
-        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
         expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
@@ -576,7 +579,7 @@ describe('RubricForm Tests', () => {
       })
 
       it('does not update existing criterion when the cancel button is clicked', async () => {
-        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
         expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
@@ -603,7 +606,7 @@ describe('RubricForm Tests', () => {
 
     it('only renders text inputs for an assessed rubric', () => {
       const rubricQueryResponse = {...RUBRICS_QUERY_RESPONSE, unassessed: false}
-      queryClient.setQueryData(['fetch-rubric-1'], rubricQueryResponse)
+      queryClient.setQueryData(['fetch-rubric', '1'], rubricQueryResponse)
 
       const {getByTestId, queryByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
       expect(getByTestId('rubric-form-title')).toHaveValue('Rubric 1')
@@ -612,6 +615,68 @@ describe('RubricForm Tests', () => {
       expect(queryByTestId('add-criterion-button')).toBeNull()
       expect(queryAllByTestId('rubric-criteria-row-delete-button')).toHaveLength(0)
       expect(queryAllByTestId('rubric-criteria-row-duplicate-button')).toHaveLength(0)
+    })
+  })
+
+  describe('rubric assessment options', () => {
+    it('renders the rubric assessment options', () => {
+      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+
+      const {getByTestId} = renderComponent({rubricId: '1'})
+      expect(getByTestId('rubric-rating-scoring-type-select')).toBeInTheDocument()
+      expect(getByTestId('rubric-rating-type-select')).toBeInTheDocument()
+      expect(getByTestId('hide-outcome-results-checkbox')).toBeInTheDocument()
+      expect(getByTestId('use-for-grading-checkbox')).toBeInTheDocument()
+      expect(getByTestId('hide-score-total-checkbox')).toBeInTheDocument()
+    })
+
+    it('hides use useForGrading and hideScoreTotal checkboxes when scoring type is unscored', () => {
+      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+
+      const {getByTestId, queryByTestId} = renderComponent({rubricId: '1'})
+
+      const scoringTypeSelect = getByTestId('rubric-rating-scoring-type-select')
+      fireEvent.click(scoringTypeSelect)
+      fireEvent.click(getByTestId('scoring_type_unscored'))
+
+      expect(queryByTestId('use-for-grading-checkbox')).not.toBeInTheDocument()
+      expect(queryByTestId('hide-score-total-checkbox')).not.toBeInTheDocument()
+    })
+
+    it('hides hideScoreTotal checkbox when useForGrading checkbox checked', () => {
+      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+
+      const {getByTestId, queryByTestId} = renderComponent({rubricId: '1'})
+
+      const useForGradingCheckbox = getByTestId('use-for-grading-checkbox')
+      fireEvent.click(useForGradingCheckbox)
+
+      expect(queryByTestId('hide-score-total-checkbox')).not.toBeInTheDocument()
+    })
+
+    it('hides points when scoring type is set to unscored', () => {
+      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+
+      const {getByTestId, queryByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
+
+      const scoringTypeSelect = getByTestId('rubric-rating-scoring-type-select')
+      fireEvent.click(scoringTypeSelect)
+      fireEvent.click(getByTestId('scoring_type_unscored'))
+
+      expect(queryByTestId('rubric-points-possible-1')).not.toBeInTheDocument()
+      expect(queryAllByTestId('rubric-criteria-row-points')).toHaveLength(0)
+    })
+
+    it('does not display options when showAdditionalOptions is set to false', () => {
+      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+
+      const {queryByTestId} = renderComponent({rubricId: '1', showAdditionalOptions: false})
+
+      expect(queryByTestId('rubric-rating-scoring-type-select')).not.toBeInTheDocument()
+      expect(queryByTestId('rubric-rating-type-select')).not.toBeInTheDocument()
+      expect(queryByTestId('hide-outcome-results-checkbox')).not.toBeInTheDocument()
+      expect(queryByTestId('use-for-grading-checkbox')).not.toBeInTheDocument()
+      expect(queryByTestId('hide-score-total-checkbox')).not.toBeInTheDocument()
     })
   })
 })

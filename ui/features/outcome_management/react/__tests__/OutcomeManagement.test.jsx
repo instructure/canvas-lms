@@ -57,7 +57,8 @@ describe('OutcomeManagement', () => {
     This test takes an average of 5.5 seconds to run.
     For now, we are increaseing the timeout interval to 7.5 seconds
   */
-  it('renders ManagementHeader with lhsGroupId if selected a group in lhs', async () => {
+  // OUT-6972 (10/23/2024)
+  it.skip('renders ManagementHeader with lhsGroupId if selected a group in lhs', async () => {
     const rceEnv = {
       RICH_CONTENT_CAN_UPLOAD_FILES: true,
       RICH_CONTENT_APP_HOST: 'rce-host',

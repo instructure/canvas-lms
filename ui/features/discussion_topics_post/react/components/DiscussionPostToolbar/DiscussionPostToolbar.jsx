@@ -380,7 +380,3 @@ DiscussionPostToolbar.propTypes = {
   isGroupDiscussion: PropTypes.bool,
   isCheckpointed: PropTypes.bool,
 }
-
-DiscussionPostToolbar.defaultProps = {
-  sortDirection: 'desc',
-}

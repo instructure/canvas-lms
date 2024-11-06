@@ -23,4 +23,5 @@ export type Breakpoints = {
   desktopNavOpen?: boolean
   desktopOnly?: boolean
   mobileOnly?: boolean
+  ICEDesktop?: boolean
 }

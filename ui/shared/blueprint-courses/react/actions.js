@@ -64,6 +64,7 @@ const types = [
   'CLEAR_NOTIFICATION',
   'INCLUDE_COURSE_SETTINGS',
   'ENABLE_PUBLISH_COURSES',
+  'ENABLE_ITEM_NOTIFICATIONS',
 ]
 const actions = createActions(...types)
 

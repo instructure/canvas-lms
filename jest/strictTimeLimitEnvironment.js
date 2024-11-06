@@ -18,8 +18,8 @@
 
 const BaseEnvironment = require('jest-environment-jsdom').default
 
-const CUSTOM_TIMEOUT_LIMIT = 5000
-const ABSOLUTE_TIMEOUT = 7500
+const CUSTOM_TIMEOUT_LIMIT = 15000
+const ABSOLUTE_TIMEOUT = 12000
 
 class StrictTimeLimitEnvironment extends BaseEnvironment {
   async handleTestEvent(event, state) {

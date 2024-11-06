@@ -1772,7 +1772,7 @@ describe AssignmentsController do
 
       context "assigned_rubric and rubric_association" do
         before do
-          @course.enable_feature!(:enhanced_rubrics_assignments)
+          Account.site_admin.enable_feature!(:enhanced_rubrics_assignments)
           @course.enable_feature!(:enhanced_rubrics)
           rubric = @course.rubrics.create! { |r| r.user = @teacher }
           rubric_association_params = ActiveSupport::HashWithIndifferentAccess.new({
@@ -1792,11 +1792,12 @@ describe AssignmentsController do
           get :show, params: { course_id: @course.id, id: @assignment.id }
           expect(assigns[:js_env][:assigned_rubric][:id]).to eq @assignment.rubric_association.rubric_id
           expect(assigns[:js_env][:assigned_rubric][:title]).to eq "Unnamed Course Rubric"
+          expect(assigns[:js_env][:assigned_rubric][:can_update]).to be_truthy
           expect(assigns[:js_env][:rubric_association][:id]).to eq @assignment.rubric_association.id
         end
 
         it "does not set assigned_rubric and rubric_association in the ENV when FF is OFF" do
-          @course.disable_feature!(:enhanced_rubrics_assignments)
+          Account.site_admin.disable_feature!(:enhanced_rubrics_assignments)
           get :show, params: { course_id: @course.id, id: @assignment.id }
           expect(assigns[:js_env][:assigned_rubric]).to be_nil
           expect(assigns[:js_env][:rubric_association]).to be_nil
@@ -2714,6 +2715,13 @@ describe AssignmentsController do
         get "edit", params: { course_id: @course.id, id: @assignment.id }
         expect(assigns[:js_env][:HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED]).to be(false)
       end
+    end
+
+    it "sets COURSE_ID in js_env if assignment_edit_enhancements_teacher_view FF is enabled" do
+      user_session(@teacher)
+      @course.root_account.enable_feature!(:assignment_edit_enhancements_teacher_view)
+      get "edit", params: { course_id: @course.id, id: @assignment.id }
+      expect(assigns[:js_env][:COURSE_ID]).to be(@course.id)
     end
   end
 

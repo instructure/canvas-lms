@@ -169,6 +169,156 @@ describe CourseProgress do
                              })
     end
 
+    describe "#current_module" do
+      it "returns the first incomplete module" do
+        # turn in first two assignments (module 1)
+        submit_homework(@assignment)
+        submit_homework(@assignment2)
+
+        progress = CourseProgress.new(@course, @user)
+        expect(progress.current_module).to eq @module2
+      end
+    end
+
+    describe "#incomplete_modules" do
+      it "returns all modules that are not complete" do
+        # turn in first two assignments (module 1)
+        submit_homework(@assignment)
+        submit_homework(@assignment2)
+
+        progress = CourseProgress.new(@course, @user)
+        expect(progress.incomplete_modules).to eq [@module2, @module3]
+      end
+    end
+
+    describe "#visible_tags_for_module" do
+      it "returns only visible tags" do
+        @tag.unpublish
+        progress = CourseProgress.new(@course, @user)
+        expect(progress.visible_tags_for_module(@module)).to eq [@tag2]
+      end
+
+      it "returns empty array if there are no visible tags" do
+        @tag.unpublish
+        @tag2.unpublish
+        progress = CourseProgress.new(@course, @user)
+        expect(progress.visible_tags_for_module(@module)).to eq []
+      end
+    end
+
+    describe "#progress_percent" do
+      it "returns 0 if there are no requirements" do
+        [@module, @module2, @module3].each do |mod|
+          mod.update(completion_requirements: {})
+        end
+
+        progress = CourseProgress.new(@course, @user)
+
+        expect(progress.requirement_count).to eq 0
+        expect(progress.normalized_requirement_count).to eq 0
+        expect(progress.progress_percent).to eq 0
+      end
+
+      it "returns 0 if there are no visible requirements" do
+        [@tag, @tag2, @tag3, @tag4, @tag5].each(&:unpublish)
+
+        progress = CourseProgress.new(@course, @user)
+
+        expect(progress.requirement_count).to eq 0
+        expect(progress.normalized_requirement_count).to eq 0
+        expect(progress.progress_percent).to eq 0
+      end
+
+      it "returns 0 if there are no requirements completed" do
+        progress = CourseProgress.new(@course, @user)
+
+        expect(progress.requirement_count).to eq 5
+        expect(progress.normalized_requirement_count).to eq 5
+        expect(progress.progress_percent).to eq 0
+      end
+
+      it "returns correct percentage in Float based on requirement completion" do
+        # turn in first two assignments (module 1)
+        submit_homework(@assignment)
+        submit_homework(@assignment2)
+
+        progress = CourseProgress.new(@course, @user)
+
+        expect(progress.progress_percent).to eq 40.0
+      end
+    end
+
+    describe "#incomplete_items_for_modules" do
+      it "returns the incomplete items for each module" do
+        submit_homework(@assignment)
+        submit_homework(@assignment5)
+
+        progress = CourseProgress.new(@course, @user)
+        expect(progress.incomplete_items_for_modules).to eq [
+          {
+            module: @module,
+            items: [@tag2]
+          },
+          {
+            module: @module2,
+            items: [@tag3, @tag4]
+          }
+        ]
+      end
+
+      it "does not return items that are not visible to the user" do
+        @tag.unpublish
+        @tag2.unpublish
+        @tag3.unpublish
+        @tag4.unpublish
+
+        progress = CourseProgress.new(@course, @user)
+        expect(progress.incomplete_items_for_modules).to eq [
+          {
+            module: @module3,
+            items: [@tag5]
+          }
+        ]
+      end
+
+      it "does not return items that are not required" do
+        @module.update(completion_requirements: {
+                         @tag2.id => { type: "must_submit" }
+                       })
+
+        progress = CourseProgress.new(@course, @user)
+        expect(progress.incomplete_items_for_modules).to include(
+          {
+            module: @module,
+            items: [@tag2]
+          }
+        )
+      end
+    end
+
+    describe "#can_evalute_progression?" do
+      it "returns true if the user is a student in a module based course" do
+        user = student_in_course(course: @course, active_all: true).user
+        allow(@course).to receive(:module_based?).and_return(true)
+        progress = CourseProgress.new(@course, user)
+        expect(progress.can_evaluate_progression?).to be_truthy
+      end
+
+      it "returns false for non module_based courses" do
+        user = student_in_course(active_all: true).user
+        allow(@course).to receive(:module_based?).and_return(false)
+        progress = CourseProgress.new(@course, user)
+        expect(progress.can_evaluate_progression?).to be_falsy
+      end
+
+      it "returns false for non student users" do
+        user = user_model
+        allow(@course).to receive(:module_based?).and_return(true)
+        progress = CourseProgress.new(@course, user)
+        expect(progress.can_evaluate_progression?).to be_falsy
+      end
+    end
+
     it "does not count obsolete requirements" do
       # turn in first two assignments
       submit_homework(@assignment)
@@ -350,6 +500,78 @@ describe CourseProgress do
                                next_requirement_url: nil,
                                completed_at: @user.context_module_progressions.maximum(:completed_at).iso8601
                              })
+    end
+
+    describe("requirement counting with modules requiring one item to complete") do
+      before(:once) do
+        @module1 = @course.context_modules.create!(name: "module 01", requirement_count: nil)
+        @module2 = @course.context_modules.create!(name: "module 02", requirement_count: 1)
+
+        @assignment1 = @course.assignments.create!(title: "some assignment1")
+        @assignment2 = @course.assignments.create!(title: "some assignment2")
+        @assignment3 = @course.assignments.create!(title: "some assignment3")
+        @assignment4 = @course.assignments.create!(title: "some assignment4")
+        @assignment5 = @course.assignments.create!(title: "some assignment5")
+
+        @tag1 = @module1.add_item({ id: @assignment1.id, type: "assignment" })
+        @tag2 = @module1.add_item({ id: @assignment2.id, type: "assignment" })
+        @tag3 = @module1.add_item({ id: @assignment3.id, type: "assignment" })
+
+        @tag4 = @module2.add_item({ id: @assignment4.id, type: "assignment" })
+        @tag5 = @module2.add_item({ id: @assignment5.id, type: "assignment" })
+
+        @module1.completion_requirements = {
+          @tag1.id => { type: "must_submit" },
+          @tag2.id => { type: "must_submit" },
+          @tag3.id => { type: "must_submit" }
+        }
+        @module2.completion_requirements = {
+          @tag4.id => { type: "must_submit" },
+          @tag5.id => { type: "must_submit" }
+        }
+
+        [@module1, @module2].each do |m|
+          m.publish
+          m.save!
+        end
+
+        student_in_course(active_all: true)
+      end
+
+      it "returns requirement count with respect to a module requiring only one item to complete" do
+        progress = CourseProgress.new(@course, @user)
+        expect(progress.normalized_requirement_count).to eq 3 + 1
+      end
+
+      it "does not increase completed requirements if no item was completed in the module" do
+        submit_homework(@assignment1)
+        submit_homework(@assignment2)
+        submit_homework(@assignment3)
+
+        progress = CourseProgress.new(@course, @user)
+        expect(progress.normalized_requirement_completed_count).to eq 3 + 0
+      end
+
+      it "increases completed requirements by one if one item was completed in the module" do
+        submit_homework(@assignment1)
+        submit_homework(@assignment2)
+        submit_homework(@assignment3)
+        submit_homework(@assignment4)
+
+        progress = CourseProgress.new(@course, @user)
+        expect(progress.normalized_requirement_completed_count).to eq 3 + 1
+      end
+
+      it "increases completed requirements by one even if all items were completed in the module" do
+        submit_homework(@assignment1)
+        submit_homework(@assignment2)
+        submit_homework(@assignment3)
+        submit_homework(@assignment4)
+        submit_homework(@assignment5)
+
+        progress = CourseProgress.new(@course, @user)
+        expect(progress.normalized_requirement_completed_count).to eq 3 + 1
+      end
     end
 
     it "is not complete if not each module complete" do

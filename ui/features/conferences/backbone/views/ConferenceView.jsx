@@ -29,7 +29,8 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import ReactDOM from 'react-dom'
 import React from 'react'
-import '@canvas/jquery/jquery.instructure_forms' // formSubmit
+import '@canvas/jquery/jquery.instructure_forms'
+import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 
 const I18n = useI18nScope('conferences')
 
@@ -59,6 +60,17 @@ ConferenceView.prototype.events = {
 
 ConferenceView.prototype.initialize = function () {
   ConferenceView.__super__.initialize.apply(this, arguments)
+
+  const handleBreadCrumbSetter = ({getCrumbs, setCrumbs}) => {
+    const currentCrumbs = getCrumbs()
+    currentCrumbs.at(-1).url = ''
+    setCrumbs(currentCrumbs)
+  }
+
+  initializeTopNavPortalWithDefaults({
+    getBreadCrumbSetter: handleBreadCrumbSetter,
+  })
+
   return this.model.on('change', this.render)
 }
 

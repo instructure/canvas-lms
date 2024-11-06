@@ -16,35 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 <% provide :page_title, "User Profile" %>
+<% css_bundle :profile_show %>
 <% if flash.key?(:success) %>
   <div id="profile_alert_holder_<%= flash[:success] ? 'success' : 'failed'%>"></div>
 <% end %>
 <div class="ic-Profile-layout">
   <h1 class="screenreader-only"><%= t("User Profile") %></h1>
+
   <div class="ic-Profile-layout__Primary">
-    <%= render 'shared/profile' %>
+    <%= render 'shared/profile_main' %>
   </div>
-
-  <div class="ic-Profile-layout__Secondary">
-    <% if @user_data[:can_edit] && !can_do(@domain_root_account, @current_user, :manage) %>
-      <button data-event="editProfile" class="hide-if-editing Button"><i class="icon-edit"></i> <%= t('edit_profile', 'Edit Profile') %></button>
-      <button data-event="cancelEditProfile" class="show-if-editing Button"><i class="icon-edit"></i> <%= t('cancel_editing', 'Cancel Editing') %></button>
-    <% elsif @user_data[:can_edit] && can_do(@domain_root_account, @current_user, :manage) %>
-        <div class="al-dropdown__container">
-          <a class="al-trigger btn" role="button" href="#" id="profileDropdown">
-            <i class="icon-more" role="presentation"></i>
-            <span class="screenreader-only">More</span>
-          </a>
-          <ul aria-labeledby="profileDropdown" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" >
-            <li class="hide-if-editing"><a data-event="editProfile" role="menuitem"><%= t('edit_profile', 'Edit Profile') %></a></li>
-            <li class="show-if-editing"><a data-event="cancelEditProfile" role="menuitem"><%= t('cancel_editing', 'Cancel Editing') %></a></li>
-            <li><a href="<%= user_path(@user.id) %>"role="menuitem"><%= t('links.user_account_details', %{Account Details}) %></a></li>
-            <% if @user != @current_user %>
-              <li><a href="<%= user_profile_url(@user, :become_user_id => @user) %>"role="menuitem"> <%= t('Act as User') %></a></li>
-            <% end %>
-          </ul>
-        </div>
-    <% end %>
-  </div>
-
 </div>

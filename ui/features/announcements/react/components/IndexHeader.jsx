@@ -176,8 +176,7 @@ export default class IndexHeader extends Component {
           renderIcon={IconPlusLine}
           key="addAnnouncementButton"
         >
-          <ScreenReaderContent>{I18n.t('Add announcement')}</ScreenReaderContent>
-          <PresentationContent>{I18n.t('Announcement')}</PresentationContent>
+          {I18n.t('Add Announcement')}
         </Button>
       )
     )
@@ -284,6 +283,7 @@ export default class IndexHeader extends Component {
   renderSearchField() {
     return (
       <SearchField
+        id="announcements-search"
         name="announcements_search"
         searchInputRef={this.props.searchInputRef}
         onSearchEvent={this.onSearchChange}
@@ -369,7 +369,7 @@ export default class IndexHeader extends Component {
                 filters={getFilters()}
                 defaultSelectedFilter="all"
                 onSelectFilter={this.onFilterChange}
-                mobileHeader={breakpoints.mobileOnly}
+                mobileHeader={!breakpoints.ICEDesktop}
               />
             </Flex.Item>
             <Flex.Item width={flexBasis} size={containerSize} overflowY="visible">

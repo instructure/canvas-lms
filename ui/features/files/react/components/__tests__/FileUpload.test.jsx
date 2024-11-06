@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {shallow, mount} from 'enzyme'
+import {render} from '@testing-library/react'
 import sinon from 'sinon'
 import FileUpload from '../FileUpload'
 import Folder from '@canvas/files/backbone/models/Folder'
@@ -49,36 +49,42 @@ describe('FileUpload', () => {
   }
 
   it('renders the FileUpload component', () => {
-    const component = shallow(<FileUpload {...defaultProps()} />)
-    expect(component.exists()).toBe(true)
+    const ref = React.createRef()
+    render(<FileUpload {...defaultProps()} ref={ref} />)
+    expect(ref.current).not.toBeNull()
   })
 
   it('sets isDragging to false when a file has been dropped', () => {
-    const wrapper = shallow(<FileUpload {...defaultProps()} />)
-    wrapper.instance().setState({isDragging: true})
-    wrapper.instance().handleDrop([], [{file: 'foo'}], {})
-    expect(wrapper.instance().state.isDragging).toEqual(false)
+    const ref = React.createRef()
+    render(<FileUpload {...defaultProps()} ref={ref} />)
+    ref.current.setState({isDragging: true})
+    ref.current.handleDrop([], [{file: 'foo'}], {})
+    expect(ref.current.state.isDragging).toEqual(false)
   })
 
   it('renders a FileDrop when there are no files', () => {
     const props = defaultProps()
     sandbox.stub(props.currentFolder, 'isEmpty').returns(true)
-    const wrapper = mount(<FileUpload {...props} />)
-    expect(wrapper.find('Billboard')).toHaveLength(2)
-    expect(wrapper.find('FileDrop')).toHaveLength(3)
-    expect(wrapper.find('.FileUpload__full')).toHaveLength(1)
+    const wrapper = render(<FileUpload {...props} />)
+    // the Billboard
+    expect(wrapper.getByText('Drop files here to upload')).toBeInTheDocument()
+    // the FileDrop
+    expect(wrapper.getByText('Drop files here to upload')).toBeInTheDocument()
+    // the FileUpload
+    expect(wrapper.getByTestId('fileUpload')).toBeInTheDocument()
   })
 
   it('renders fileDrop when isDragging is true', () => {
-    const wrapper = shallow(<FileUpload {...defaultProps()} />)
-    wrapper.instance().setState({isDragging: true})
-    expect(wrapper.find('.FileUpload__dragging')).toHaveLength(1)
+    const ref = React.createRef()
+    const wrapper = render(<FileUpload {...defaultProps()} ref={ref} />)
+    ref.current.setState({isDragging: true})
+    expect(wrapper.container.querySelectorAll('.FileUpload__dragging')).toHaveLength(1)
   })
 
   it('does not render a full sized FileDrop when the currentFolder is not empty', () => {
     const props = defaultProps()
     sandbox.stub(props.currentFolder, 'isEmpty').returns(false)
-    const wrapper = shallow(<FileUpload {...props} />)
-    expect(wrapper.find('.FileUpload__full')).toHaveLength(0)
+    const wrapper = render(<FileUpload {...props} />)
+    expect(wrapper.container.querySelectorAll('.FileUpload__full')).toHaveLength(0)
   })
 })

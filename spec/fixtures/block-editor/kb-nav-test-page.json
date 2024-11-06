@@ -9,83 +9,73 @@
     "custom": {},
     "hidden": false,
     "nodes": [
-      "pEdeFvz6_0"
+      "UqNhI9OIZ9"
     ],
     "linkedNodes": {}
   },
-  "le254LKmwg": {
+  "UqNhI9OIZ9": {
     "type": {
-      "resolvedName": "NoSections"
+      "resolvedName": "ColumnsSection"
+    },
+    "isCanvas": false,
+    "props": {
+      "columns": 2
+    },
+    "displayName": "Columns",
+    "custom": {
+      "isSection": true
+    },
+    "parent": "ROOT",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {
+      "columns__inner": "QwwShV5wWV"
+    }
+  },
+  "QwwShV5wWV": {
+    "type": {
+      "resolvedName": "ColumnsSectionInner"
     },
     "isCanvas": true,
-    "props": {
-      "className": "",
-      "placeholderText": "Drop a block to add it here"
-    },
-    "displayName": "NoSections",
+    "props": {},
+    "displayName": "Columns Inner",
     "custom": {
       "noToolbar": true
     },
-    "parent": "wasLLTTys-",
+    "parent": "UqNhI9OIZ9",
     "hidden": false,
-    "nodes": [],
+    "nodes": [
+      "dT-1cIuBgw",
+      "-NdoFPF9Y_"
+    ],
     "linkedNodes": {}
   },
-  "19FZlPv0ip": {
+  "dT-1cIuBgw": {
     "type": {
-      "resolvedName": "IconBlock"
+      "resolvedName": "GroupBlock"
     },
     "isCanvas": false,
     "props": {
-      "iconName": "apple",
-      "size": "small"
+      "alignment": "start",
+      "verticalAlignment": "start",
+      "layout": "row",
+      "resizable": false,
+      "isColumn": true
     },
-    "displayName": "Icon",
+    "displayName": "Group",
     "custom": {
-      "isBlock": true
+      "isResizable": false,
+      "isBlock": true,
+      "displayName": "Column"
     },
-    "parent": "x2R701ix0i",
+    "parent": "QwwShV5wWV",
     "hidden": false,
     "nodes": [],
-    "linkedNodes": {}
+    "linkedNodes": {
+      "group__inner": "zYinVC3Soa"
+    }
   },
-  "82_pwtLkUy": {
-    "type": {
-      "resolvedName": "IconBlock"
-    },
-    "isCanvas": false,
-    "props": {
-      "iconName": "apple",
-      "size": "small"
-    },
-    "displayName": "Icon",
-    "custom": {
-      "isBlock": true
-    },
-    "parent": "BnT5eI1NTo",
-    "hidden": false,
-    "nodes": [],
-    "linkedNodes": {}
-  },
-  "h8Z0p_5kko": {
-    "type": {
-      "resolvedName": "IconBlock"
-    },
-    "isCanvas": false,
-    "props": {
-      "iconName": "apple",
-      "size": "small"
-    },
-    "displayName": "Icon",
-    "custom": {
-      "isBlock": true
-    },
-    "parent": "BnT5eI1NTo",
-    "hidden": false,
-    "nodes": [],
-    "linkedNodes": {}
-  },
-  "BnT5eI1NTo": {
+  "zYinVC3Soa": {
     "type": {
       "resolvedName": "NoSections"
     },
@@ -98,15 +88,81 @@
     "custom": {
       "noToolbar": true
     },
-    "parent": "pj2-2ElnvO",
+    "parent": "dT-1cIuBgw",
     "hidden": false,
     "nodes": [
-      "82_pwtLkUy",
-      "h8Z0p_5kko"
+      "6qRDX24wK0",
+      "WOSEqqpzYO",
+      "RnfyWYndUU"
     ],
     "linkedNodes": {}
   },
-  "pj2-2ElnvO": {
+  "-NdoFPF9Y_": {
+    "type": {
+      "resolvedName": "GroupBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "alignment": "start",
+      "verticalAlignment": "start",
+      "layout": "row",
+      "resizable": false,
+      "isColumn": true
+    },
+    "displayName": "Group",
+    "custom": {
+      "isResizable": false,
+      "isBlock": true,
+      "displayName": "Column"
+    },
+    "parent": "QwwShV5wWV",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {
+      "group__inner": "rBOZXn8SYG"
+    }
+  },
+  "rBOZXn8SYG": {
+    "type": {
+      "resolvedName": "NoSections"
+    },
+    "isCanvas": true,
+    "props": {
+      "className": "group-block__inner",
+      "placeholderText": "Drop a block to add it here"
+    },
+    "displayName": "NoSections",
+    "custom": {
+      "noToolbar": true
+    },
+    "parent": "-NdoFPF9Y_",
+    "hidden": false,
+    "nodes": [
+      "FAJEmYwVmz",
+      "Mqx0wAUvHD",
+      "B2RUo8N41A"
+    ],
+    "linkedNodes": {}
+  },
+  "6qRDX24wK0": {
+    "type": {
+      "resolvedName": "IconBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "iconName": "apple",
+      "size": "small"
+    },
+    "displayName": "Icon",
+    "custom": {
+      "isBlock": true
+    },
+    "parent": "zYinVC3Soa",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  },
+  "WOSEqqpzYO": {
     "type": {
       "resolvedName": "GroupBlock"
     },
@@ -122,32 +178,14 @@
       "isResizable": true,
       "isBlock": true
     },
-    "parent": "x2R701ix0i",
+    "parent": "zYinVC3Soa",
     "hidden": false,
     "nodes": [],
     "linkedNodes": {
-      "group-block__inner": "BnT5eI1NTo"
+      "group__inner": "qM7g-gDhps"
     }
   },
-  "bbacglgLMO": {
-    "type": {
-      "resolvedName": "IconBlock"
-    },
-    "isCanvas": false,
-    "props": {
-      "iconName": "apple",
-      "size": "small"
-    },
-    "displayName": "Icon",
-    "custom": {
-      "isBlock": true
-    },
-    "parent": "x2R701ix0i",
-    "hidden": false,
-    "nodes": [],
-    "linkedNodes": {}
-  },
-  "x2R701ix0i": {
+  "qM7g-gDhps": {
     "type": {
       "resolvedName": "NoSections"
     },
@@ -160,41 +198,51 @@
     "custom": {
       "noToolbar": true
     },
-    "parent": "wasLLTTys-",
+    "parent": "WOSEqqpzYO",
     "hidden": false,
     "nodes": [
-      "19FZlPv0ip",
-      "pj2-2ElnvO",
-      "bbacglgLMO"
+      "8Yzfaup-QH",
+      "EfM_7H1OPA"
     ],
     "linkedNodes": {}
   },
-  "wasLLTTys-": {
+  "8Yzfaup-QH": {
     "type": {
-      "resolvedName": "GroupBlock"
+      "resolvedName": "IconBlock"
     },
-    "isCanvas": true,
+    "isCanvas": false,
     "props": {
-      "alignment": "start",
-      "verticalAlignment": "start",
-      "layout": "row",
-      "resizable": false,
-      "id": "columns-pEdeFvz6_0-1"
+      "iconName": "apple",
+      "size": "small"
     },
-    "displayName": "Group",
+    "displayName": "Icon",
     "custom": {
-      "isResizable": false,
       "isBlock": true
     },
-    "parent": "ax57suVCfC",
+    "parent": "qM7g-gDhps",
     "hidden": false,
     "nodes": [],
-    "linkedNodes": {
-      "group-wasLLTTys-_inner": "le254LKmwg",
-      "group-block__inner": "x2R701ix0i"
-    }
+    "linkedNodes": {}
   },
-  "Gf-VVaO6hW": {
+  "EfM_7H1OPA": {
+    "type": {
+      "resolvedName": "IconBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "iconName": "apple",
+      "size": "small"
+    },
+    "displayName": "Icon",
+    "custom": {
+      "isBlock": true
+    },
+    "parent": "qM7g-gDhps",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  },
+  "FAJEmYwVmz": {
     "type": {
       "resolvedName": "IconBlock"
     },
@@ -207,112 +255,12 @@
     "custom": {
       "isBlock": true
     },
-    "parent": "j4zjeVNAzu",
+    "parent": "rBOZXn8SYG",
     "hidden": false,
     "nodes": [],
     "linkedNodes": {}
   },
-  "VnkkqQNVS4": {
-    "type": {
-      "resolvedName": "IconBlock"
-    },
-    "isCanvas": false,
-    "props": {
-      "iconName": "alarm",
-      "size": "small"
-    },
-    "displayName": "Icon",
-    "custom": {
-      "isBlock": true
-    },
-    "parent": "j4zjeVNAzu",
-    "hidden": false,
-    "nodes": [],
-    "linkedNodes": {}
-  },
-  "j4zjeVNAzu": {
-    "type": {
-      "resolvedName": "NoSections"
-    },
-    "isCanvas": true,
-    "props": {
-      "className": "group-block__inner",
-      "placeholderText": "Drop a block to add it here"
-    },
-    "displayName": "NoSections",
-    "custom": {
-      "noToolbar": true
-    },
-    "parent": "M398oEn_uF",
-    "hidden": false,
-    "nodes": [
-      "Gf-VVaO6hW",
-      "r5D-8fvHmd",
-      "VnkkqQNVS4"
-    ],
-    "linkedNodes": {}
-  },
-  "M398oEn_uF": {
-    "type": {
-      "resolvedName": "GroupBlock"
-    },
-    "isCanvas": false,
-    "props": {
-      "alignment": "start",
-      "verticalAlignment": "start",
-      "layout": "row",
-      "resizable": false
-    },
-    "displayName": "Group",
-    "custom": {
-      "isResizable": false,
-      "isBlock": true
-    },
-    "parent": "ax57suVCfC",
-    "hidden": false,
-    "nodes": [],
-    "linkedNodes": {
-      "group-block__inner": "j4zjeVNAzu"
-    }
-  },
-  "ax57suVCfC": {
-    "type": {
-      "resolvedName": "ColumnsSectionInner"
-    },
-    "isCanvas": true,
-    "props": {},
-    "displayName": "Columns",
-    "custom": {
-      "noToolbar": true
-    },
-    "parent": "pEdeFvz6_0",
-    "hidden": false,
-    "nodes": [
-      "wasLLTTys-",
-      "M398oEn_uF"
-    ],
-    "linkedNodes": {}
-  },
-  "pEdeFvz6_0": {
-    "type": {
-      "resolvedName": "ColumnsSection"
-    },
-    "isCanvas": false,
-    "props": {
-      "columns": 2
-    },
-    "displayName": "Blank Section",
-    "custom": {
-      "isSection": true
-    },
-    "parent": "ROOT",
-    "hidden": false,
-    "nodes": [],
-    "linkedNodes": {
-      "columns-pEdeFvz6_0__inner": "ax57suVCfC"
-    }
-  },
-  "r5D-8fvHmd": {
+  "Mqx0wAUvHD": {
     "type": {
       "resolvedName": "GroupBlock"
     },
@@ -328,14 +276,14 @@
       "isResizable": true,
       "isBlock": true
     },
-    "parent": "j4zjeVNAzu",
+    "parent": "rBOZXn8SYG",
     "hidden": false,
     "nodes": [],
     "linkedNodes": {
-      "group-block__inner": "4lJ2nYk0sO"
+      "group__inner": "qNrcZKb6ub"
     }
   },
-  "4lJ2nYk0sO": {
+  "qNrcZKb6ub": {
     "type": {
       "resolvedName": "NoSections"
     },
@@ -348,7 +296,43 @@
     "custom": {
       "noToolbar": true
     },
-    "parent": "r5D-8fvHmd",
+    "parent": "Mqx0wAUvHD",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  },
+  "B2RUo8N41A": {
+    "type": {
+      "resolvedName": "IconBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "iconName": "alarm",
+      "size": "small"
+    },
+    "displayName": "Icon",
+    "custom": {
+      "isBlock": true
+    },
+    "parent": "rBOZXn8SYG",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  },
+  "RnfyWYndUU": {
+    "type": {
+      "resolvedName": "IconBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "iconName": "apple",
+      "size": "small"
+    },
+    "displayName": "Icon",
+    "custom": {
+      "isBlock": true
+    },
+    "parent": "zYinVC3Soa",
     "hidden": false,
     "nodes": [],
     "linkedNodes": {}

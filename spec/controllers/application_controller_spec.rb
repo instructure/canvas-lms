@@ -1799,6 +1799,7 @@ RSpec.describe ApplicationController do
 
         context "lti_placement_restrictions FF on" do
           before do
+            allow(Account.site_admin).to receive(:feature_enabled?).with(:instructure_identity_global_flag)
             expect(Account.site_admin).to receive(:feature_enabled?).with(:lti_placement_restrictions).and_return(true)
           end
 
@@ -1814,6 +1815,7 @@ RSpec.describe ApplicationController do
 
         context "lti_placement_restrictions FF off" do
           before do
+            allow(Account.site_admin).to receive(:feature_enabled?).with(:instructure_identity_global_flag)
             expect(Account.site_admin).to receive(:feature_enabled?).with(:lti_placement_restrictions).and_return(false)
           end
 

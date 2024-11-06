@@ -22,7 +22,6 @@ import {Container} from '../../blocks/Container'
 import {ButtonBlock} from '../../blocks/ButtonBlock'
 import {ImageBlock} from '../../blocks/ImageBlock'
 import {NoSections} from '../../common'
-import {SectionMenu} from '../../../editor/SectionMenu'
 
 import {useClassNames, getContrastingColor, getContrastingButtonColor} from '../../../../utils'
 
@@ -78,9 +77,6 @@ FooterSection.craft = {
   },
   custom: {
     isSection: true,
-  },
-  related: {
-    sectionMenu: SectionMenu,
   },
 }
 

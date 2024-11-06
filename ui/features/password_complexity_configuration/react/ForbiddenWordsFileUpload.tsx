@@ -30,7 +30,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
 import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
-import './ForbiddenWordsFileUpload.module.css'
+import './ForbiddenWordsFileUpload.css'
 import type {PasswordSettingsResponse} from './types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
@@ -66,6 +66,30 @@ interface Props {
 
 const initialFileDetails: FileDetails = {url: null, filename: null}
 
+export const createFolder = async (): Promise<number | null> => {
+  try {
+    const formData = new FormData()
+    formData.append('name', `password_policy`)
+    formData.append('parent_folder_path', 'files/')
+
+    const {response, text} = await doFetchApi<FolderResponse>({
+      method: 'POST',
+      path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/folders`,
+      body: formData,
+    })
+
+    const responseBodyParsed = JSON.parse(text)
+
+    if (response.status === 200) {
+      return responseBodyParsed.id
+    } else {
+      throw new Error('Failed to create folder')
+    }
+  } catch (error) {
+    return null
+  }
+}
+
 const ForbiddenWordsFileUpload = ({
   open,
   onDismiss,
@@ -89,28 +113,6 @@ const ForbiddenWordsFileUpload = ({
     setUploadAttempted(false)
     setModalClosing(false)
   }, [])
-
-  const createFolder = async (): Promise<number | null> => {
-    try {
-      const formData = new FormData()
-      formData.append('name', `password_policy`)
-      formData.append('parent_folder_path', 'files/')
-
-      const {status, data} = await executeApiRequest<FolderResponse>({
-        method: 'POST',
-        path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/folders`,
-        body: formData,
-      })
-
-      if (status === 200) {
-        return data.id
-      } else {
-        throw new Error('Failed to create folder')
-      }
-    } catch (error) {
-      return null
-    }
-  }
 
   const handleUpload = useCallback(async () => {
     const {url, filename} = fileDetails

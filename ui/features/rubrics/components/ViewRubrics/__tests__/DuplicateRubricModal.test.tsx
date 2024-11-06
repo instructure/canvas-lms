@@ -19,7 +19,7 @@ import React from 'react'
 import Router from 'react-router'
 import {BrowserRouter} from 'react-router-dom'
 import {render, waitFor} from '@testing-library/react'
-import {QueryProvider} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {DuplicateRubricModal} from '../DuplicateRubricModal'
 import * as ViewRubricQueries from '../../../queries/ViewRubricQueries'
 
@@ -45,7 +45,7 @@ describe('RubricForm Tests', () => {
 
   const renderComponent = (isOpen = true) => {
     return render(
-      <QueryProvider>
+      <MockedQueryProvider>
         <BrowserRouter>
           <DuplicateRubricModal
             id="1"
@@ -109,7 +109,7 @@ describe('RubricForm Tests', () => {
             ratingOrder="ascending"
           />
         </BrowserRouter>
-      </QueryProvider>
+      </MockedQueryProvider>
     )
   }
 

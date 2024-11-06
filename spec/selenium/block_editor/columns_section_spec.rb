@@ -46,7 +46,7 @@ describe "Block Editor", :ignore_js_errors do
     @block_page.update!(
       block_editor_attributes: {
         time: Time.now.to_i,
-        version: "1",
+        version: "0.2",
         blocks: block_page_content
       }
     )
@@ -80,16 +80,21 @@ describe "Block Editor", :ignore_js_errors do
       expect(columns_section).to be_displayed
       expect(columns_section.attribute("class")).to include("columns-1")
       expect(ff(".group-block").count).to eq 1
-      columns_section.click # shows the toolbar
-      block_toolbar_up_button.click # now the columns-section toolbar
+      columns_section.click # shows the column toolbar
+      block_toolbar_up_button.click # shows the section toolbar
 
       columns_input_increment.click
       expect(ff(".group-block").count).to eq 2
       expect(columns_section.attribute("class")).to include("columns-2")
 
+      columns_input_decrement.click
+      expect(ff(".group-block").count).to eq 2 # there are still 2 column blocks
+
       f(".group-block").click
       expect(block_toolbar_delete_button).to be_displayed
       block_toolbar_delete_button.click
+      expect(ff(".group-block").count).to eq 1
+
       f(".group-block").click
       expect(block_toolbar).to be_displayed
       expect(find_all_with_jquery(block_toolbar_delete_button_selector).present?).to be false

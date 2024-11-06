@@ -30,6 +30,34 @@ describe "new groups" do
       course_with_teacher_logged_in
     end
 
+    context "differentiation_tags" do
+      before :once do
+        Account.default.enable_feature!(:differentiation_tags)
+      end
+
+      it "does not have Visit Group Homepage option in group actions for non_collaborative groups" do
+        category = @course.group_categories.build(name: "category 1", non_collaborative: true)
+        category.save!
+        category.groups.create!(context: @course)
+
+        get "/courses/#{@course.id}/groups"
+        f("a[id*='actions']").click
+        expect(fj("li a:contains('Edit')")).to be_present
+        expect(f("body")).not_to contain_jqcss("li a:contains('Visit Group Homepage')")
+      end
+
+      it "has Visit Group Homepage option in group actions for regular groups" do
+        category = @course.group_categories.build(name: "category 1")
+        category.save!
+        category.groups.create!(context: @course)
+
+        get "/courses/#{@course.id}/groups"
+        f("a[id*='actions']").click
+        expect(fj("li a:contains('Edit')")).to be_present
+        expect(fj("li a:contains('Visit Group Homepage')")).to be_present
+      end
+    end
+
     it "allows teachers to add a group set", priority: "1" do
       get "/courses/#{@course.id}/groups"
       click_add_group_set

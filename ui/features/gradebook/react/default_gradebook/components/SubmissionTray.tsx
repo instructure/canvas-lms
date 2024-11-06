@@ -302,22 +302,6 @@ export default class SubmissionTray extends React.Component<
     )
   }
 
-  renderSticker() {
-    return (
-      <Flex justifyItems="center">
-        <Flex.Item>
-          <SubmissionSticker
-            confetti={false}
-            size="medium"
-            submission={{...this.props.submission, courseId: this.props.courseId}}
-            onStickerChange={sticker => this.props.onStickerChange(this.props.submission, sticker)}
-            editable={true}
-          />
-        </Flex.Item>
-      </Flex>
-    )
-  }
-
   renderSpeedGraderLink(speedGraderProps) {
     const buttonProps: {
       disabled?: boolean
@@ -706,19 +690,42 @@ export default class SubmissionTray extends React.Component<
                   replyToEntrySubmission,
                   I18n.t('Required Replies')
                 )}
-                <GradeInput
-                  assignment={this.props.assignment}
-                  disabled={this.props.gradingDisabled || hasCheckpoints}
-                  enterGradesAs={this.props.enterGradesAs}
-                  gradingScheme={this.props.gradingScheme}
-                  pointsBasedGradingScheme={this.props.pointsBasedGradingScheme}
-                  pendingGradeInfo={this.props.pendingGradeInfo}
-                  onSubmissionUpdate={this.props.onGradeSubmission}
-                  scalingFactor={this.props.scalingFactor}
-                  submission={this.props.submission}
-                  submissionUpdating={this.props.submissionUpdating}
-                  header={hasCheckpoints ? I18n.t('Current Total') : undefined}
-                />
+                <Flex
+                  margin="none small none xx-small"
+                  gap="none x-large"
+                  alignItems="start"
+                  justifyItems="space-between"
+                >
+                  <Flex.Item flex="2" shouldShrink={true}>
+                    <GradeInput
+                      assignment={this.props.assignment}
+                      disabled={this.props.gradingDisabled || hasCheckpoints}
+                      enterGradesAs={this.props.enterGradesAs}
+                      gradingScheme={this.props.gradingScheme}
+                      pointsBasedGradingScheme={this.props.pointsBasedGradingScheme}
+                      pendingGradeInfo={this.props.pendingGradeInfo}
+                      onSubmissionUpdate={this.props.onGradeSubmission}
+                      scalingFactor={this.props.scalingFactor}
+                      submission={this.props.submission}
+                      submissionUpdating={this.props.submissionUpdating}
+                      header={hasCheckpoints ? I18n.t('Current Total') : undefined}
+                    />
+                  </Flex.Item>
+
+                  {showSticker && (
+                    <Flex.Item flex="1" margin="xx-small none none none">
+                      <SubmissionSticker
+                        confetti={false}
+                        size="small"
+                        submission={{...this.props.submission, courseId: this.props.courseId}}
+                        onStickerChange={sticker =>
+                          this.props.onStickerChange(this.props.submission, sticker)
+                        }
+                        editable={true}
+                      />
+                    </Flex.Item>
+                  )}
+                </Flex>
                 {!!this.props.submission.pointsDeducted && (
                   <View as="div" margin="small 0 0 0">
                     <LatePolicyGrade
@@ -760,20 +767,6 @@ export default class SubmissionTray extends React.Component<
                     {this.renderSubmissionComments(submissionCommentsProps)}
                   </div>
                 </View>
-
-                {showSticker && (
-                  <>
-                    <View as="div" margin="small 0" className="hr" />
-                    <View
-                      as="div"
-                      id="SubmissionTray__Sticker"
-                      padding="xx-small"
-                      margin="none none medium none"
-                    >
-                      {this.renderSticker()}
-                    </View>
-                  </>
-                )}
               </div>
             </div>
           </div>

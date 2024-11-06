@@ -3086,6 +3086,7 @@ ko:
     index: 
       how_to_start_a_new_collaboration: "특정 유형의 협업에 대한 자세한 정보를 찾으려면 \"새 협업 시작\"을 클릭하고 드롭다운 리스트에서 유형을 선택합니다."
       links: 
+        add_collaboration: "협업 추가"
         collaboration: 협업
         new: "새 협업 시작"
       page_title: 협업
@@ -4778,6 +4779,7 @@ ko:
     this_is_permanent: "상대 평가를 실행 취소할 수 없습니다. 상대 평가 이전의 평점 이력은 사용할 수 있으나 상대 평가 동작은 되돌릴 수 없습니다."
   curving_assignments_e9479ee3: "과제 상대 평가"
   custom_fields_fc3e55af: "사용자 정의 필드"
+  customize_74cdc895: "사용자 정의"
   d2l_display: Desire2Learn
   d2l_file_description: "D2L 내보내기 .zip 형식"
   d2l_name: "D2L 변환기"
@@ -14197,6 +14199,16 @@ ko:
         all_users: "모든 사용자"
         choose_term: "학기 선택"
         search_results: "\"%{search_term}\"에 대한 검색 결과"
+    last_login: 
+      labels: 
+        current_ip: "현재 로그인 IP"
+        current_login: "현재 로그인"
+        last_ip: "마지막 로그인 IP"
+        last_login: "마지막 로그인"
+        last_request: "마지막 요청"
+      more: 기타...
+      never: "한 적 없음"
+      none: 없음
     linkedin_added: "LinkedIn 계정을 성공적으로 추가함!"
     linkedin_fail: "LinkedIn 승인에 실패했습니다. 다시 시도하시기 바랍니다."
     logins: 

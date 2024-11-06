@@ -1069,4 +1069,63 @@ describe Types::AssignmentType do
       end
     end
   end
+
+  describe "submission stats" do
+    let_once(:student2) { student_in_course(course:, active_all: true).user }
+    let(:assignment2) do
+      course.assignments.create(title: "another assignment",
+                                points_possible: 10,
+                                submission_types: ["online_text_entry"],
+                                workflow_state: "published")
+    end
+    let(:teacher_assignment2_type) { GraphQLTypeTester.new(assignment2, current_user: teacher) }
+
+    before do
+      assignment.submit_homework(student, { body: "submission 1", submission_type: "online_text_entry" })
+      assignment.submit_homework(student2, { body: "submission 2", submission_type: "online_text_entry" })
+    end
+
+    context "total_submissions" do
+      context "when user has permissions to manage assignments" do
+        it "returns the total submissions for an assignment" do
+          expect(teacher_assignment_type.resolve("totalSubmissions")).to eq 2
+        end
+
+        it "calculates properly the total submissions for an assignment" do
+          assignment2.submit_homework(student, { body: "submission 1, assignment 2", submission_type: "online_text_entry" })
+          expect(teacher_assignment2_type.resolve("totalSubmissions")).to eq 1
+        end
+      end
+
+      context "when user does not have permissions to manage assignments" do
+        it "returns nil" do
+          expect(assignment_type.resolve("totalSubmissions")).to be_nil
+        end
+      end
+    end
+
+    context "total_graded_submissions" do
+      before do
+        assignment.grade_student(student, grade: 5, grader: teacher)
+      end
+
+      context "when user has permissions to manage assignments" do
+        it "returns the total graded submissions for an assignment" do
+          expect(teacher_assignment_type.resolve("totalGradedSubmissions")).to eq 1
+        end
+
+        it "calculates properly the total graded submissions for an assignment" do
+          assignment2.submit_homework(student, { body: "submission 1, assignment 2", submission_type: "online_text_entry" })
+          assignment2.grade_student(student, grade: 5, grader: teacher)
+          expect(teacher_assignment2_type.resolve("totalGradedSubmissions")).to eq 1
+        end
+      end
+
+      context "when user does not have permissions to manage assignments" do
+        it "returns nil" do
+          expect(assignment_type.resolve("totalGradedSubmissions")).to be_nil
+        end
+      end
+    end
+  end
 end

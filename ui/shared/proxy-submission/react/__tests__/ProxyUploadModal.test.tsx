@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import {MockedProvider} from '@apollo/react-testing'
 import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ProxyUploadModal, {type ProxyUploadModalProps} from '../ProxyUploadModal'
@@ -40,7 +41,7 @@ const defaultProps: ProxyUploadModalProps = {
 
 function renderComponent(overrideProps = {}) {
   const props = {...defaultProps, ...overrideProps}
-  return render(<ProxyUploadModal {...props} />)
+  return render(<MockedProvider><ProxyUploadModal {...props} /></MockedProvider>)
 }
 
 describe('ProxyUploadModal', () => {

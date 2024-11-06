@@ -23,7 +23,7 @@ import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {RubricForm} from '@canvas/rubrics/react/RubricForm'
-import type {Rubric} from '../../types/rubric'
+import type {Rubric, RubricAssociation} from '../../types/rubric'
 import type {SaveRubricResponse} from '../../../../../features/rubrics/queries/RubricFormQueries'
 
 const I18n = useI18nScope('rubrics-form')
@@ -31,12 +31,14 @@ const I18n = useI18nScope('rubrics-form')
 type RubricCreateModalProps = {
   isOpen: boolean
   rubric?: Rubric
+  rubricAssociation?: RubricAssociation
   onDismiss: () => void
   onSaveRubric: (savedRubricResponse: SaveRubricResponse) => void
 }
 export const RubricCreateModal = ({
   isOpen,
   rubric,
+  rubricAssociation,
   onDismiss,
   onSaveRubric,
 }: RubricCreateModalProps) => {
@@ -59,6 +61,7 @@ export const RubricCreateModal = ({
         <View as="div" width="80%" margin="0 auto">
           <RubricForm
             rubric={rubric}
+            rubricAssociation={rubricAssociation}
             courseId={ENV.COURSE_ID}
             assignmentId={ENV.ASSIGNMENT_ID}
             onCancel={onDismiss}
@@ -67,6 +70,7 @@ export const RubricCreateModal = ({
             criterionUseRangeEnabled={ENV.FEATURES.rubric_criterion_range}
             hideHeader={true}
             rootOutcomeGroup={ENV.ROOT_OUTCOME_GROUP}
+            showAdditionalOptions={true}
           />
         </View>
       </Modal.Body>

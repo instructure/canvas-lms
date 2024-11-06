@@ -48,9 +48,9 @@ describe('RubricAssignmentContainer Tests', () => {
       })
     )
 
-    queryClient.setQueryData(['fetch-grading-rubric-contexts-1'], RUBRIC_CONTEXTS)
+    queryClient.setQueryData(['fetchGradingRubricContexts', '1'], RUBRIC_CONTEXTS)
     queryClient.setQueryData(
-      ['fetch-grading-rubrics-for-context', '1', 'course_2'],
+      ['fetchGradingRubricsForContext', '1', 'course_2'],
       RUBRICS_FOR_CONTEXT
     )
   })
@@ -60,13 +60,28 @@ describe('RubricAssignmentContainer Tests', () => {
   })
 
   const renderComponent = (props: Partial<RubricAssignmentContainerProps> = {}) => {
-    return render(<RubricAssignmentContainer assignmentId="1" courseId="1" {...props} />)
+    return render(
+      <RubricAssignmentContainer
+        accountMasterScalesEnabled={false}
+        assignmentId="1"
+        courseId="1"
+        contextAssetString="course_1"
+        canManageRubrics={true}
+        {...props}
+      />
+    )
   }
 
   describe('non associated rubric', () => {
     it('should render the create and search buttons', () => {
       const {getByTestId} = renderComponent()
       expect(getByTestId('create-assignment-rubric-button')).toHaveTextContent('Create Rubric')
+      expect(getByTestId('find-assignment-rubric-button')).toHaveTextContent('Find Rubric')
+    })
+
+    it('should not render the create when manage_rubrics permissions is false', () => {
+      const {getByTestId, queryByTestId} = renderComponent({canManageRubrics: false})
+      expect(queryByTestId('create-assignment-rubric-button')).toBeNull()
       expect(getByTestId('find-assignment-rubric-button')).toHaveTextContent('Find Rubric')
     })
 
@@ -113,6 +128,17 @@ describe('RubricAssignmentContainer Tests', () => {
       expect(getByTestId('remove-assignment-rubric-button')).toBeInTheDocument()
     })
 
+    it('will not render the edit button when can_manage_rubrics is false', () => {
+      const {getByTestId, queryByTestId} = renderComponent({
+        assignmentRubric: RUBRIC,
+        assignmentRubricAssociation: RUBRIC_ASSOCIATION,
+        canManageRubrics: false,
+      })
+      expect(getByTestId('preview-assignment-rubric-button')).toBeInTheDocument()
+      expect(queryByTestId('edit-assignment-rubric-button')).toBeNull()
+      expect(getByTestId('remove-assignment-rubric-button')).toBeInTheDocument()
+    })
+
     it('should render the create modal when the edit button is clicked', () => {
       const {getByTestId} = renderComponent({
         assignmentRubric: RUBRIC,
@@ -146,6 +172,38 @@ describe('RubricAssignmentContainer Tests', () => {
       expect(rubricTray).toBeInTheDocument()
       expect(getByTestId('traditional-criterion-1-ratings-0')).toBeInTheDocument()
       expect(getByTestId('traditional-criterion-1-ratings-1')).toBeInTheDocument()
+    })
+
+    it('should open the edit copy confirmation modal when the edit button is clicked and user cannot update rubric', () => {
+      const {getByTestId, queryByTestId} = renderComponent({
+        assignmentRubric: {...RUBRIC, can_update: false},
+        assignmentRubricAssociation: RUBRIC_ASSOCIATION,
+      })
+
+      getByTestId('edit-assignment-rubric-button').click()
+      expect(queryByTestId('copy-edit-confirm-modal')).toBeInTheDocument()
+    })
+
+    it('should not open the edit modal when the user does not confirm in the copy edit modal', () => {
+      const {getByTestId, queryByTestId} = renderComponent({
+        assignmentRubric: {...RUBRIC, can_update: false},
+        assignmentRubricAssociation: RUBRIC_ASSOCIATION,
+      })
+
+      getByTestId('edit-assignment-rubric-button').click()
+      getByTestId('copy-edit-cancel-btn').click()
+      expect(queryByTestId('rubric-assignment-create-modal')).not.toBeInTheDocument()
+    })
+
+    it('should continue to the edit modal when the user confirms in the copy edit modal', () => {
+      const {getByTestId, queryByTestId} = renderComponent({
+        assignmentRubric: {...RUBRIC, can_update: false},
+        assignmentRubricAssociation: RUBRIC_ASSOCIATION,
+      })
+
+      getByTestId('edit-assignment-rubric-button').click()
+      getByTestId('copy-edit-confirm-btn').click()
+      expect(queryByTestId('rubric-assignment-create-modal')).toBeInTheDocument()
     })
   })
 

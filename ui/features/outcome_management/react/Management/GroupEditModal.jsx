@@ -23,7 +23,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import GroupEditForm from './GroupEditForm'
 import {UPDATE_LEARNING_OUTCOME_GROUP} from '@canvas/outcomes/graphql/Management'
-import {useMutation} from 'react-apollo'
+import {useMutation} from '@apollo/react-hooks'
 import {outcomeGroupShape} from './shapes'
 
 const I18n = useI18nScope('FindOutcomesModal')

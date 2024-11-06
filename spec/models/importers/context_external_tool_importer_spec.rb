@@ -146,15 +146,14 @@ describe Importers::ContextExternalToolImporter do
     subject do
       Importers::ContextExternalToolImporter.import_from_migration(
         tool_hash,
-        course.account,
+        @course.account,
         migration,
         tool
       )
     end
 
-    let(:course) { @course }
-    let(:migration) { course.content_migrations.create! }
-    let(:tool) { external_tool_model(context: course) }
+    let(:migration) { @course.content_migrations.create! }
+    let(:tool) { external_tool_model(context: @course) }
     let(:tool_hash) do
       {
         title: "test tool",
@@ -197,6 +196,50 @@ describe Importers::ContextExternalToolImporter do
       it "does not change" do
         subject
         expect(tool).to have_received(:settings=)
+      end
+    end
+  end
+
+  context "unified_tool_id" do
+    subject do
+      Importers::ContextExternalToolImporter.import_from_migration(
+        tool_hash,
+        @course.account,
+        migration,
+        tool
+      )
+    end
+
+    let(:migration) { @course.content_migrations.create! }
+    let(:tool) do
+      t = external_tool_model(context: @course)
+      t.unified_tool_id = "222"
+      t
+    end
+    let(:unified_tool_id) { "utid" }
+    let(:tool_hash) do
+      {
+        title: "test tool",
+        settings: {
+          oauth_compliant: true
+        },
+        unified_tool_id:
+      }
+    end
+
+    context "when unified_tool_id is present in the hash" do
+      it "updates the unified_tool_id" do
+        subject
+        expect(tool.unified_tool_id).to eq "utid"
+      end
+    end
+
+    context "when unified_tool_id is not present in hash" do
+      let(:unified_tool_id) { nil }
+
+      it "keeps the tool's unified_tool_id" do
+        subject
+        expect(tool.unified_tool_id).to eq "222"
       end
     end
   end

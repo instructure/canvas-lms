@@ -411,9 +411,11 @@ class ApplicationController < ActionController::Base
     rce_lite_enabled_speedgrader_comments
     lti_toggle_placements
     login_registration_ui_identity
+    lti_apps_page_instructors
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
-    :embedded_release_notes
+    :embedded_release_notes,
+    :consolidated_media_player
   ].freeze
   JS_ENV_FEATURES_HASH = Digest::SHA256.hexdigest([JS_ENV_SITE_ADMIN_FEATURES + JS_ENV_ROOT_ACCOUNT_FEATURES + JS_ENV_BRAND_ACCOUNT_FEATURES].sort.join(",")).freeze
   def cached_js_env_account_features
@@ -685,7 +687,8 @@ class ApplicationController < ActionController::Base
         subAccounts: @context.account.sub_accounts.pluck(:id, :name).map { |id, name| { id:, name: } },
         terms: @context.account.root_account.enrollment_terms.active.to_a.map { |term| { id: term.id, name: term.name } },
         canManageCourse: can_manage,
-        canAutoPublishCourses: can_manage
+        canAutoPublishCourses: can_manage,
+        itemNotificationFeatureEnabled: @context.account.feature_enabled?(:blueprint_item_notifications)
       )
     end
 
@@ -788,9 +791,7 @@ class ApplicationController < ActionController::Base
     opts.push({}) unless opts[-1].is_a?(Hash)
     include_host = opts[-1].delete(:include_host)
     unless include_host
-      # rubocop:disable Style/RescueModifier
-      opts[-1][:host] = context.host_name rescue nil
-      # rubocop:enable Style/RescueModifier
+      opts[-1][:host] = context.try(:host_name)
       opts[-1][:only_path] = true unless name.end_with?("_path")
     end
     send name, *opts
@@ -942,8 +943,12 @@ class ApplicationController < ActionController::Base
     user = not_fake_student_user
     if user && user.time_zone.present?
       Time.zone = user.time_zone
-      if Time.zone && Time.zone.name == "UTC" && user.time_zone && user.time_zone.name.match(/\s/)
-        Time.zone = user.time_zone.name.split(/\s/)[1..].join(" ") rescue nil
+      if Time.zone&.name == "UTC" && user.time_zone&.name&.match?(/\s/)
+        begin
+          Time.zone = user.time_zone.name.split(/\s/)[1..].join(" ")
+        rescue ArgumentError
+          # ignore
+        end
       end
     else
       Time.zone = @domain_root_account && @domain_root_account.default_time_zone
@@ -994,8 +999,16 @@ class ApplicationController < ActionController::Base
 
   def check_pending_otp
     if session[:pending_otp] && params[:controller] != "login/otp"
-      return render plain: "Please finish logging in", status: :forbidden if request.xhr?
+      # handle api json requests for feature flag
+      if request.format.json? && @domain_root_account.feature_enabled?(:login_registration_ui_identity)
+        render json: { message: I18n.t("Verification required. Please complete multi-factor authentication by entering the code sent to your device.") }, status: :forbidden
+        return
+      end
 
+      # handle non-api xhr (ajax) requests
+      return render plain: I18n.t("Please finish logging in"), status: :forbidden if request.xhr?
+
+      # handle all other requests
       destroy_session
       redirect_to login_url
     end
@@ -1556,7 +1569,7 @@ class ApplicationController < ActionController::Base
       end
       if !@context
         @problem = t "#application.errors.invalid_verification_code", "The verification code is invalid."
-      elsif (!@context.is_public rescue false) && (!@context.respond_to?(:uuid) || pieces[1] != @context.uuid)
+      elsif (@context.respond_to?(:is_public) && !@context.is_public) && (!@context.respond_to?(:uuid) || pieces[1] != @context.uuid)
         @problem = case @context_type
                    when "course"
                      t "#application.errors.feed_private_course", "The matching course has gone private, so public feeds like this one will no longer be visible."
@@ -1674,7 +1687,7 @@ class ApplicationController < ActionController::Base
     # page_view.
     return unless @current_user && !request.xhr? && request.get? && page_views_enabled?
 
-    ENV["RAILS_HOST_WITH_PORT"] ||= request.host_with_port rescue nil
+    ENV["RAILS_HOST_WITH_PORT"] ||= request.host_with_port
     generate_page_view
   end
 
@@ -1833,7 +1846,7 @@ class ApplicationController < ActionController::Base
 
   def log_gets
     if @page_view && !request.xhr? && request.get? && ((response.media_type || "").to_s.include?("html") || api_request?)
-      @page_view.render_time ||= (Time.now.utc - @page_before_render) rescue nil
+      @page_view.render_time ||= (Time.now.utc - @page_before_render) if @page_before_render
       @page_view_update = true
     end
   end
@@ -1946,7 +1959,7 @@ class ApplicationController < ActionController::Base
   end
 
   def render_xhr_exception(error, message = nil, status = "500 Internal Server Error", status_code = 500)
-    message ||= "Unexpected error, ID: #{error.id rescue "unknown"}"
+    message ||= "Unexpected error, ID: #{error&.id || "unknown"}"
     render status: status_code, json: {
       errors: {
         base: message
@@ -1959,7 +1972,7 @@ class ApplicationController < ActionController::Base
     clear_crumbs
     @headers = nil
     load_account unless @domain_root_account
-    session[:last_error_id] = error.id rescue nil
+    session[:last_error_id] = error&.id
     if request.xhr? || request.format == :text
       message = exception.xhr_message if exception.respond_to?(:xhr_message)
       render_xhr_exception(error, message, status, status_code)
@@ -2391,7 +2404,7 @@ class ApplicationController < ActionController::Base
 
   # escape everything but slashes, see http://code.google.com/p/phusion-passenger/issues/detail?id=113
   FILE_PATH_ESCAPE_PATTERN = Regexp.new("[^#{URI::PATTERN::UNRESERVED}/]")
-  def safe_domain_file_url(attachment, host_and_shard: nil, verifier: nil, download: false, return_url: nil, fallback_url: nil) # TODO: generalize this
+  def safe_domain_file_url(attachment, host_and_shard: nil, verifier: nil, download: false, return_url: nil, fallback_url: nil, authorization: nil)
     host_and_shard ||= HostUrl.file_host_with_shard(@domain_root_account || Account.default, request.host_with_port)
     host, shard = host_and_shard
     config = DynamicSettings.find(tree: :private, cluster: attachment.shard.database_server.id)
@@ -2412,7 +2425,7 @@ class ApplicationController < ActionController::Base
       # let's throw an extra param in the fallback so we hopefully don't infinite loop
       fallback_url += (query.present? ? "&" : "?") + "fallback_ts=#{Time.now.to_i}"
 
-      opts = generate_access_verifier(return_url:, fallback_url:)
+      opts = generate_access_verifier(return_url:, fallback_url:, authorization:)
       opts[:verifier] = verifier if verifier.present?
 
       if download
@@ -2635,13 +2648,13 @@ class ApplicationController < ActionController::Base
 
   def destroy_session
     logger.info "Destroying session: #{session[:session_id]}"
-    @pseudonym_session.destroy rescue true
+    @pseudonym_session.try(:destroy)
     reset_session
   end
 
   def logout_current_user
-    logged_in_user.try(:stamp_logout_time!)
-    InstFS.logout(logged_in_user) rescue nil
+    logged_in_user&.stamp_logout_time!
+    InstFS.logout(logged_in_user)
     destroy_session
   end
 

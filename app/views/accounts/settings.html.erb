@@ -475,8 +475,23 @@
               <% end %>
               <% if !@account.site_admin? && @account.root_account? %>
                 <div>
-                  <%= settings.check_box :enable_name_pronunciation, :checked => @account.enable_name_pronunciation? %>
+                  <%= settings.check_box :enable_name_pronunciation, :checked => @account.enable_name_pronunciation?, class: "element_toggler", "aria-controls": "name_pronunciation_options" %>
                   <%= settings.label :enable_name_pronunciation, :en => "Enable name pronunciation" %>
+                  <div id="name_pronunciation_options" <%= hidden(true) unless @account.settings[:enable_name_pronunciation]%>>
+                    <div style="font-size: 0.8em;"><%= t(:pronunciation_change_description, "Limit name pronunciation editing by base role") %></div>
+                      <div>
+                        <%= settings.check_box :allow_name_pronunciation_edit_for_admins, :checked => @account.allow_name_pronunciation_edit_for_admins? %>
+                        <%= settings.label :allow_name_pronunciation_edit_for_admins, :en => "Admin" %>
+                      </div>
+                      <div>
+                        <%= settings.check_box :allow_name_pronunciation_edit_for_teachers, :checked => @account.allow_name_pronunciation_edit_for_teachers? %>
+                        <%= settings.label :allow_name_pronunciation_edit_for_teachers, :en => "Course Admin (includes Teachers, TAs, and Designers)" %>
+                      </div>
+                      <div>
+                        <%= settings.check_box :allow_name_pronunciation_edit_for_students, :checked => @account.allow_name_pronunciation_edit_for_students? %>
+                        <%= settings.label :allow_name_pronunciation_edit_for_students, :en => "Student" %>
+                      </div>
+                  </div>
                 </div>
               <% end %>
               <% if !@account.site_admin?  %>

@@ -187,18 +187,24 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
       return
     }
 
+    this.setState({isSaving: true})
     return dispatch(
       createOrEditDeveloperKey(
         {developer_key: toSubmit},
         this.developerKeyUrl(),
         method
       ) as unknown as AnyAction
-    ).then(() => {
-      if (this.keySavedSuccessfully) {
-        this.props.handleSuccessfulSave()
-      }
-      this.closeModal()
-    })
+    )
+      .then(() => {
+        this.setState({isSaving: false})
+        if (this.keySavedSuccessfully) {
+          this.props.handleSuccessfulSave()
+        }
+        this.closeModal()
+      })
+      .catch(() => {
+        this.setState({isSaving: false})
+      })
   }
 
   saveLTIKeyEdit(
@@ -312,15 +318,11 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
     this.setState({toolConfigurationUrl})
   }
 
-  updateToolConfiguration = (update: any, field: string | null = null, sync = false) => {
+  updateToolConfiguration = (update: any, field: string | null = null) => {
     if (field) {
       this.setState(state => ({toolConfiguration: {...state.toolConfiguration, [field]: update}}))
     } else {
       this.setState({toolConfiguration: update})
-    }
-
-    if (sync) {
-      this.updateDeveloperKey('redirect_uris', this.developerKey.tool_configuration.target_link_uri)
     }
 
     if (!this.hasRedirectUris) {
@@ -329,7 +331,7 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
   }
 
   syncRedirectUris = () => {
-    this.updateToolConfiguration(this.toolConfiguration, null, true)
+    this.updateDeveloperKey('redirect_uris', this.state.toolConfiguration?.target_link_uri)
   }
 
   updateDeveloperKey = (field: string, update: any) => {

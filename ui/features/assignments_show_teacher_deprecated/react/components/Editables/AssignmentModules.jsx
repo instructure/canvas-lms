@@ -22,7 +22,8 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import produce from 'immer'
 import get from 'lodash/get'
 import set from 'lodash/set'
-import {Query, withApollo} from 'react-apollo'
+import {Query} from '@apollo/react-components'
+import {withApollo} from '@apollo/react-hoc'
 
 import {Text} from '@instructure/ui-text'
 
