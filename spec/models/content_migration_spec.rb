@@ -1643,6 +1643,27 @@ describe ContentMigration do
                              "attachment_path_id_lookup" => nil })
       end
 
+      it "shows files that were created for quizzes that aren't in Canvas in the asset map" do
+        old = attachment_model(context: @src, filename: "foo.txt")
+        attachment_model(context: @dst, filename: "foo.txt", migration_id: CC::CCHelper.create_key(old, global: true))
+        att = attachment_model(context: @dst, filename: "bar.txt", migration_id: "what_quizzes_put_in_here")
+
+        @cm.asset_map_url(generate_if_needed: true)
+
+        @cm.reload
+        json = JSON.parse(@cm.asset_map_attachment.open.read)
+        expect(json["resource_mapping"]["files"]).to include({
+                                                               "what_quizzes_put_in_here" => {
+                                                                 "source" => {},
+                                                                 "destination" => {
+                                                                   "id" => att.id.to_s,
+                                                                   "media_entry_id" => nil,
+                                                                   "uuid" => att.uuid
+                                                                 },
+                                                               },
+                                                             })
+      end
+
       context "when the permanent_page_links flag is on" do
         before do
           Account.site_admin.enable_feature!(:permanent_page_links)
