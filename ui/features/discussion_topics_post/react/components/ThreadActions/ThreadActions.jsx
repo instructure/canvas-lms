@@ -35,7 +35,8 @@ import {
 import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-import {ReadIcon, UnreadIcon} from '../ThreadingToolbar/MarkAsReadIcons'
+import ReadIcon from '@canvas/read-icon'
+import UnreadIcon from '@canvas/unread-icon'
 
 const I18n = useI18nScope('discussion_posts')
 

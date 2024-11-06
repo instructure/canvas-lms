@@ -26,7 +26,8 @@ import {Link} from '@instructure/ui-link'
 import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {ReadIcon, UnreadIcon} from './MarkAsReadIcons'
+import ReadIcon from '@canvas/read-icon'
+import UnreadIcon from '@canvas/unread-icon'
 
 const I18n = useI18nScope('discussion_posts')
 const markAsReadText = I18n.t('Mark as Read')
