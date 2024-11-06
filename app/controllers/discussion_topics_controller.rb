@@ -704,14 +704,20 @@ class DiscussionTopicsController < ApplicationController
     set_master_course_js_env_data(@topic, @context)
     conditional_release_js_env(@topic.assignment)
 
-    if @context.root_account.feature_enabled?(:discussion_create) && @context.feature_enabled?(:react_discussions_post)
-      @page_title = topic_page_title(@topic)
+    respond_to do |format|
+      if @context.root_account.feature_enabled?(:discussion_create) && @context.feature_enabled?(:react_discussions_post)
+        @page_title = topic_page_title(@topic)
 
-      js_bundle :discussion_topic_edit_v2
-      css_bundle :discussions_index, :learning_outcomes, :conditional_release_editor
-      render html: "", layout: (params[:embed] == "true") ? "mobile_embed" : true
-    else
-      render :edit, layout: (params[:embed] == "true") ? "mobile_embed" : true
+        js_bundle :discussion_topic_edit_v2
+        css_bundle :discussions_index, :learning_outcomes, :conditional_release_editor
+        format.html do
+          render html: "", layout: (params[:embed] == "true") ? "mobile_embed" : true
+        end
+      else
+        format.html do
+          render :edit, layout: (params[:embed] == "true") ? "mobile_embed" : true
+        end
+      end
     end
   end
 
