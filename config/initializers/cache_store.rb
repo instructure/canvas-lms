@@ -58,7 +58,11 @@ load_cache_config = lambda do
       cache_map[cluster] = if last_cluster_cache_config == config
                              Switchman.config[:cache_map][cluster]
                            else
-                             Canvas.lookup_cache_store(config, cluster)
+                             store = Canvas.lookup_cache_store(config, cluster)
+                             # The `.client` method is reserved for the actual redis CLIENT command, but we need the RubyClient object
+                             # which is represented by `_client`.`
+                             store.redis._client.ring = cluster
+                             store
                            end
     end
 
