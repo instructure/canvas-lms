@@ -25,4 +25,5 @@ export type MediaBlockProps = {
   maintainAspectRatio?: boolean
   sizeVariant?: MediaVariant
   title?: string
+  attachmentId?: string
 }

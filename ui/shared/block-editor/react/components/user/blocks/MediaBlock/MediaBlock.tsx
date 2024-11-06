@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {useEditor, useNode} from '@craftjs/core'
 import {MediaBlockToolbar} from './MediaBlockToolbar'
+import {MediaBlockPreviewThumbnail} from './MediaBlockPreviewThumbnail'
 import {useClassNames} from '../../../../utils'
 import {type MediaBlockProps, type MediaVariant, type MediaConstraint} from './types'
 import {BlockResizer} from '../../../editor/BlockResizer'
@@ -27,83 +28,15 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('block-editor/media-block')
 
-const MediaBlock = ({
-  src,
-  width,
-  height,
-  constraint,
-  maintainAspectRatio,
-  sizeVariant,
-  title,
-}: MediaBlockProps) => {
+const MediaBlock = ({src, title, attachmentId}: MediaBlockProps) => {
   const {enabled} = useEditor(state => ({
     enabled: state.options.enabled,
   }))
   const {
-    actions: {setCustom},
     connectors: {connect, drag},
   } = useNode()
   const clazz = useClassNames(enabled, {empty: !src}, ['block', 'media-block'])
-  const [styl, setStyl] = useState<any>({})
-  const [mediaLoaded, setMediaLoaded] = useState(false)
-  const [aspectRatio, setAspectRatio] = useState(1)
-  // in preview mode, node.dom is null, so use a ref to the element
-  const [blockRef, setBlockRef] = useState<HTMLDivElement | null>(null)
-  const mediaRef = useRef<HTMLMediaElement | null>(null)
 
-  const setSize = useCallback(() => {
-    if (!blockRef) return
-
-    if (!src || sizeVariant === 'auto') {
-      setStyl({
-        width: 'auto',
-        height: 'auto',
-      })
-      return
-    }
-    const sty: any = {}
-    const unit = sizeVariant === 'percent' ? '%' : 'px'
-    if (width) {
-      sty.width = `${width}${unit}`
-    }
-    if (maintainAspectRatio) {
-      sty.height = 'auto'
-    } else {
-      sty.height = `${height}${unit}`
-    }
-    setStyl(sty)
-  }, [blockRef, height, maintainAspectRatio, sizeVariant, src, width])
-
-  useEffect(() => {
-    if (!src) return
-    if (mediaLoaded) return
-
-    const loadTimer = window.setInterval(() => {
-      if (!mediaRef.current) return
-      if (!mediaRef.current.complete) return
-
-      const media = mediaRef.current
-      setMediaLoaded(true)
-      setAspectRatio(media.naturalWidth / media.naturalHeight)
-      clearInterval(loadTimer)
-    }, 10)
-    return () => {
-      clearInterval(loadTimer)
-    }
-  }, [mediaLoaded, src])
-
-  useEffect(() => {
-    setSize()
-  }, [width, height, aspectRatio, setSize])
-
-  useEffect(() => {
-    setCustom((ctsm: any) => {
-      ctsm.isResizable = !!src && sizeVariant !== 'auto'
-    })
-  }, [setCustom, sizeVariant, src])
-
-  const tagConstraint =
-    (maintainAspectRatio ? 'cover' : constraint) || MediaBlock.craft.defaultProps.constraint
   if (!src) {
     return (
       <div
@@ -111,7 +44,6 @@ const MediaBlock = ({
         aria-label={MediaBlock.craft.displayName}
         tabIndex={-1}
         className={clazz}
-        style={styl}
         ref={el => el && connect(drag(el as HTMLDivElement))}
       />
     )
@@ -122,22 +54,28 @@ const MediaBlock = ({
         aria-label={MediaBlock.craft.displayName}
         tabIndex={-1}
         className={clazz}
-        style={{...styl, position: 'relative'}}
+        style={{position: 'relative'}}
         ref={el => {
           el && connect(drag(el as HTMLDivElement))
-          setBlockRef(el)
         }}
       >
-        <iframe
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: tagConstraint,
-            display: 'inline-block',
-          }}
-          title={title || ''}
-          src={src || MediaBlock.craft.defaultProps.src}
-        />
+        {enabled ? (
+          <MediaBlockPreviewThumbnail
+            src={src || MediaBlock.craft.defaultProps.src}
+            attachmentId={attachmentId}
+            title={title || ''}
+          />
+        ) : (
+          <iframe
+            style={{
+              width: '320px',
+              height: '14.25rem',
+              display: 'inline-block',
+            }}
+            title={title || ''}
+            src={src || MediaBlock.craft.defaultProps.src}
+          />
+        )}
       </div>
     )
   }
@@ -152,6 +90,7 @@ MediaBlock.craft = {
     maintainAspectRatio: false,
     sizeVariant: 'auto',
     title: '',
+    attachmentId: '',
   },
   related: {
     toolbar: MediaBlockToolbar,

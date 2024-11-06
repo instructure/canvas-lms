@@ -25,8 +25,11 @@ import {
 } from '@canvas/upload-media-translations'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {type GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
 const I18n = useI18nScope('block-editor/add-media-modal')
+
+declare const ENV: GlobalEnv
 
 export function UploadRecordMediaModal({
   open,
@@ -34,17 +37,20 @@ export function UploadRecordMediaModal({
   onDismiss,
 }: {
   open: boolean
-  onSubmit: () => void
+  onSubmit: ({attachment_id, iframe_url}: {attachment_id?: string; iframe_url?: string}) => void
   onDismiss: () => void
 }) {
   return (
     <>
       <UploadMedia
-        onUploadComplete={(err, data) => {
+        onUploadComplete={(err: any, data: any) => {
           if (err) {
-            return showFlashError(I18n.t('Cannot get block custom templates'))(err)
+            return showFlashError(I18n.t('Media upload failed'))(err)
           }
-          onSubmit(data.mediaObject.embedded_iframe_url)
+          onSubmit({
+            attachment_id: data.mediaObject.media_object.attachment_id,
+            iframe_url: data.mediaObject.embedded_iframe_url,
+          })
         }}
         onDismiss={onDismiss}
         rcsConfig={{

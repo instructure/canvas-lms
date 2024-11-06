@@ -27,7 +27,7 @@ import {
   SelectMediaModal,
   UploadRecordMediaModal,
 } from '@canvas/block-editor/react/components/editor/AddMediaModals'
-import {MediaBlockProps} from '@canvas/block-editor/react/components/user/blocks/MediaBlock/types'
+import {type MediaBlockProps} from './types'
 import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('block-editor/media-block')
@@ -36,9 +36,10 @@ export const AddMediaButton = ({setProp}: {setProp: (args: any) => void}) => {
   const [showAllMediaUploadModal, setShowAllMediaUploadModal] = useState(false)
   const [showUploadRecordMediaModal, setShowUploadRecordMediaModal] = useState(false)
   const handleSave = useCallback(
-    (mediaURL: string | null) => {
+    ({attachment_id, iframe_url}: {attachment_id?: string; iframe_url?: string}) => {
       setProp((prps: MediaBlockProps) => {
-        prps.src = mediaURL || undefined
+        prps.src = iframe_url || undefined
+        prps.attachmentId = attachment_id
       })
       setShowAllMediaUploadModal(false)
     },

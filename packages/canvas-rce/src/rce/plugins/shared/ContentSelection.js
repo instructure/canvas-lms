@@ -55,7 +55,7 @@ export function asLink($element, editor) {
   if ($link?.tagName !== 'A') {
     // the user may have selected some text that is w/in a link
     // but didn't include the <a>. Let's see if that's true
-    $link = editor.dom.getParent($link, 'a[href]')
+    $link = editor && editor.dom.getParent($link, 'a[href]')
   }
 
   if (!$link || $link.tagName !== 'A' || !$link.href) {
