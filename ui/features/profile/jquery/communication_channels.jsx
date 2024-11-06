@@ -29,10 +29,12 @@ import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
 import 'jqueryui/tabs'
-import replaceTags from '@canvas/util/replaceTags'
-import RegisterCommunication from '../react/RegisterCommunication'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import RegisterCommunication from '../react/RegisterCommunication'
+import ConfirmCommunicationChannel from '../react/ConfirmCommunicationChannel'
+import ConfirmEmailAddress from '../react/ConfirmEmailAddress'
+import ResendConfirmation from '../react/ResendConfirmation'
 
 const I18n = useI18nScope('profile')
 
@@ -225,101 +227,74 @@ $(document).ready(function () {
       $.flashMessage(I18n.t('Bounce count reset!'))
     })
   })
-  $('#confirm_communication_channel .cancel_button').click(_event => {
-    $('#confirm_communication_channel').dialog('close')
-  })
+
+  const confirmCommunicationChannelForm = {
+    success: data => {
+      const channelElement = $('#channel_' + data.communication_channel.id)
+      channelElement.removeClass('unconfirmed')
+      channelElement.find('.confirm_channel_link').remove()
+
+      const pseudonym_id = data.communication_channel.pseudonym_id
+      $('.channel.pseudonym_' + pseudonym_id).removeClass('unconfirmed')
+
+      showFlashSuccess(I18n.t('notices.contact_confirmed', 'Contact successfully confirmed!'))()
+    },
+    error: () => {
+      showFlashError(I18n.t('Confirmation failed. Please try again.'))()
+    },
+  }
+
   $('.email_channels .channel .path,.other_channels .channel .path').click(function (event) {
     event.preventDefault()
     const $channel = $(this).parents('.channel')
     if ($channel.hasClass('unconfirmed')) {
-      let type = 'email address',
-        confirm_title = I18n.t('titles.confirm_email_address', 'Confirm Email Address')
-      if ($(this).parents('.channel_list').hasClass('other_channels')) {
-        type = 'sms number'
-        confirm_title = I18n.t('Confirm Communication Channel')
-      }
-      let $box = $('#confirm_communication_channel')
-
-      if ($channel.parents('.email_channels').length > 0) {
-        $box = $('#confirm_email_channel')
-      }
-      const data = $channel.getTemplateData({textValues: ['user_id', 'pseudonym_id', 'channel_id']})
-      let path = $(this).text()
-
-      $.ajaxJSON(
-        `/confirmations/${data.user_id}/limit_reached/${data.channel_id}`,
-        'GET',
-        {},
-        data_ => {
-          if (data_.confirmation_limit_reached) {
-            $box.find('.re_send_confirmation_link').css('visibility', 'hidden')
-          } else {
-            $box.find('.re_send_confirmation_link').css('visibility', 'visible')
-          }
-        },
-        _ => {}
-      )
-
-      if (type === 'sms number') {
-        path = path.split('@')[0]
-      }
-      data.code = ''
-
-      $box.fillTemplateData({
-        data: {
-          path,
-          path_type: type,
-          user_id: data.user_id,
-          channel_id: data.channel_id,
-        },
+      const {user_id, channel_id, pseudonym_id} = $channel.getTemplateData({
+        textValues: ['user_id', 'pseudonym_id', 'channel_id'],
       })
-      $box.find('.status_message').css('visibility', 'hidden')
-      let url = $('.re_send_confirmation_url').attr('href')
-      url = replaceTags(url, 'id', data.channel_id)
-      url = replaceTags(url, 'pseudonym_id', data.pseudonym_id)
-      url = replaceTags(url, 'user_id', data.user_id)
+      const isCommunicationListItemClicked = $(this)
+        .parents('.channel_list')
+        .hasClass('other_channels')
+      const resendConfirmation = <ResendConfirmation userId={user_id} channelId={channel_id} />
 
-      $box
-        .find('.re_send_confirmation_link')
-        .attr('href', url)
-        .text(I18n.t('links.resend_confirmation', 'Re-Send Confirmation'))
-      $box.fillFormData(data)
-      $box.show().dialog({
-        title: confirm_title,
-        width: 350,
-        open() {
-          $(this).closest('.ui-dialog').focus()
-        },
-      })
+      if (isCommunicationListItemClicked) {
+        const mountPoint = document.getElementById('confirm_communication_channel_mount_point')
+        const root = createRoot(mountPoint)
+        const smsOrEmail = event.target.innerText
+
+        root.render(
+          <ConfirmCommunicationChannel
+            communicationChannel={{user_id, pseudonym_id, channel_id}}
+            phoneNumberOrEmail={smsOrEmail}
+            onSubmit={data => {
+              confirmCommunicationChannelForm.success(data)
+
+              root.unmount()
+            }}
+            onClose={() => root.unmount()}
+            onError={() => confirmCommunicationChannelForm.error()}
+          >
+            {resendConfirmation}
+          </ConfirmCommunicationChannel>
+        )
+      } else {
+        const mountPoint = document.getElementById('confirm_email_address_mount_point')
+        const root = createRoot(mountPoint)
+        const email = event.target.innerText
+
+        root.render(
+          <ConfirmEmailAddress
+            email={email}
+            onClose={() => {
+              root.unmount()
+            }}
+          >
+            {resendConfirmation}
+          </ConfirmEmailAddress>
+        )
+      }
     }
   })
-  $('#confirm_communication_channel').formSubmit({
-    formErrors: false,
-    processData(data) {
-      let url = $(this).find('.register_channel_link').attr('href')
-      url = replaceTags(url, 'id', data.channel_id)
-      url = replaceTags(url, 'code', data.code)
-      $(this).attr('action', url)
-    },
-    beforeSubmit(_data) {
-      $(this)
-        .find('.status_message')
-        .text(I18n.t('confirming_contact', 'Confirming...'))
-        .css('visibility', 'visible')
-    },
-    success(data) {
-      $(this).find('.status_message').css('visibility', 'hidden')
-      const pseudonym_id = data.communication_channel.pseudonym_id
-      $('#channel_' + data.communication_channel.id).removeClass('unconfirmed')
-      $('.channel.pseudonym_' + pseudonym_id).removeClass('unconfirmed')
-      $('#confirm_communication_channel').dialog('close')
-      $.flashMessage(I18n.t('notices.contact_confirmed', 'Contact successfully confirmed!'))
-    },
-    error(_data) {
-      $(this).find('.status_message').css('visibility', 'hidden')
-      $.flashError(I18n.t('Confirmation failed. Please try again.'))
-    },
-  })
+
   $('.channel_list .channel .default_link').click(function (event) {
     event.preventDefault()
     const channel_id = $(this)
@@ -342,25 +317,5 @@ $(document).ready(function () {
         )
       $('.default_email.display_data').text(data.user.communication_channel.path)
     })
-  })
-  $('.dialog .re_send_confirmation_link').click(function (event) {
-    event.preventDefault()
-    const $link = $(this)
-    $link.text(I18n.t('links.resending_confirmation', 'Re-Sending...'))
-    $.ajaxJSON(
-      $link.attr('href'),
-      'POST',
-      {},
-      _data => {
-        $link.text(I18n.t('links.resent_confirmation', 'Done! Message may take a few minutes.'))
-      },
-      _data => {
-        $link.text(I18n.t('links.resend_confirmation_failed', 'Request failed. Try again.'))
-      }
-    )
-  })
-
-  $('#confirm_email_channel .cancel_button').click(() => {
-    $('#confirm_email_channel').dialog('close')
   })
 })

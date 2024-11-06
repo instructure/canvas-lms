@@ -177,47 +177,8 @@
 </div>
 </div>
 <div id="register_communication_mount_point"></div>
-<div id="confirm_email_channel" style="display: none;" class="dialog" role="dialog">
-  <div style="text-align: center;"><%= t(<<~TEXT, :email_address => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
-    We emailed a confirmation link to %{email_address}. Click the link in that
-    email to finish registering. Make sure to check your spam box in case it
-    got filtered.
-    TEXT
-  %></div>
-  <div style="text-align: center; margin: 10px 0; font-weight: bold;">
-    <a href="#" class="re_send_confirmation_link"><%= t('links.resend_confirmation', "Re-Send Confirmation") %></a>
-    <a href="<%= re_send_confirmation_url("{{ user_id }}", "{{ id }}") %>" class="re_send_confirmation_url" style="display: none;">&nbsp;</a>
-  </div>
-  <div class="button-container">
-    <button type="button" class="btn cancel_button"><%= t('buttons.ok_thanks', "Ok, Thanks") %></button>
-  </div>
-</div>
-<%= form_tag "", {:id => "confirm_communication_channel", :style => "display: none;", :class => "dialog", :role => "dialog"} do %>
-  <input type="hidden" name="pseudonym_id" value=""/>
-  <input type="hidden" name="channel_id" value=""/>
-  <input type="hidden" name="user_id" value=""/>
-  <div id='sms_confirmation_instructions' style="text-align: center;">
-  <%= t(<<~TEXT, :sms_number => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
-    To activate this communication channel, enter the four-character confirmation code sent to %{sms_number}.
-    TEXT
-  %>
-  <br>
-  <%= t("Code is case sensitive.")%>
-  </div>
-  <div style="text-align: center;">
-    <label for="code" class="screenreader-only"><%= t("Confirmation code (required)") %></label>
-    <input type="text" style="width: 100px; font-size: 1.5em;" name="code" id="code" aria-describedby='sms_confirmation_instructions' required="true"/><br/>
-    <span style="display: none;" class="channel_id">&nbsp;</span>
-    <a href="<%= registration_confirmation_path("{{ code }}") %>" style="display: none;" class="register_channel_link">&nbsp;</a>
-  </div>
-  <div style="margin: 0 0 5px; text-align: center; font-size: 0.8em;">
-    <a href="#" class="re_send_confirmation_link"><%= t('links.resend_confirmation', "Re-Send Confirmation") %></a>
-  </div>
-  <div class="status_message" role="status" aria-live="polite" style="visibility: hidden; text-align: center; color: #444; font-weight: bold"><%= t(:confirming_contact, "Confirming...") %></div>
-  <div class="button-container">
-    <button type="submit" class="btn"><%= t('buttons.confirm', "Confirm") %></button>
-  </div>
-<% end %>
+<div id="confirm_email_address_mount_point"></div>
+<div id="confirm_communication_channel_mount_point"></div>
 <div style="display: none;" id="select_templates">
   <%= render :partial => "email_select" %>
   <%= render :partial => "sms_select" %>
