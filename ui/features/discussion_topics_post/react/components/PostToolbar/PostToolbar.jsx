@@ -43,7 +43,8 @@ import {IconButton, ToggleButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
-import {ReadIcon, UnreadIcon} from '../ThreadingToolbar/MarkAsReadIcons'
+import ReadIcon from '@canvas/read-icon'
+import UnreadIcon from '@canvas/unread-icon'
 
 const I18n = useI18nScope('discussion_posts')
 
