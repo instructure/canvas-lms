@@ -51,4 +51,15 @@ module Api::V1::Folders
     end
     json
   end
+
+  def folders_or_files_json(items, user, session, opts = {})
+    items.map do |item|
+      case item
+      when Folder
+        folder_json(item, user, session, opts)
+      when Attachment
+        attachment_json(item, user, {}, opts)
+      end
+    end
+  end
 end
