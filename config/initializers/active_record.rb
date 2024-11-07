@@ -1518,21 +1518,21 @@ module UpdateAndDeleteAllWithLimit
   def delete_all(*args)
     if limit_value || offset_value
       scope = lock_for_subquery_update.except(:select).select(primary_key)
-      deleted_rows_count = base_class.unscoped.where(primary_key => scope).delete_all
-      track_limit_clause_anomaly(scope.class.to_s, deleted_rows_count, limit_value)
-      return deleted_rows_count
+      filter = materialize_subquery_filter(scope)
+      base_class.unscoped.where(filter).delete_all
+    else
+      super
     end
-    super
   end
 
   def update_all(updates, *args)
     if limit_value || offset_value
       scope = lock_for_subquery_update.except(:select).select(primary_key)
-      updated_rows_count = base_class.unscoped.where(primary_key => scope).update_all(updates)
-      track_limit_clause_anomaly(scope.class.to_s, updated_rows_count, limit_value)
-      return updated_rows_count
+      filter = materialize_subquery_filter(scope)
+      base_class.unscoped.where(filter).update_all(updates)
+    else
+      super
     end
-    super
   end
 
   private
@@ -1544,18 +1544,10 @@ module UpdateAndDeleteAllWithLimit
     lock("#{lock_type} OF #{connection.quote_local_table_name(klass.table_name)}")
   end
 
-  # Introduced temporarily by BUDA-26 to monitor whether the limit clause is ignored or not by the update_all or delete_all functions.
-  def track_limit_clause_anomaly(scope_class, affected_rows_count, limit_value)
-    return unless affected_rows_count > limit_value
-
-    Sentry.with_scope do |scope|
-      scope.set_context("Anomaly details", {
-                          affected_rows: affected_rows_count,
-                          limit: limit_value,
-                          scope_class:
-                        })
-      Sentry.capture_message("Limit clause got ignored", level: :warning)
-    end
+  # Using limit and lock at the same time can cause unreliable behavior unless the subquery is materialized
+  # For more info, see FOO-4747
+  def materialize_subquery_filter(scope)
+    Arel.sql("#{table_name}.#{primary_key} IN (WITH cte AS MATERIALIZED (#{scope.to_sql}) SELECT #{primary_key} FROM cte)")
   end
 end
 Switchman::ActiveRecord::Relation.include(UpdateAndDeleteAllWithLimit)
