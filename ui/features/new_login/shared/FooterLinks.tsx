@@ -20,7 +20,7 @@ import React from 'react'
 import classNames from 'classnames'
 import {InlineList} from '@instructure/ui-list'
 import {Link} from '@instructure/ui-link'
-import {View} from '@instructure/ui-view'
+import {View, type ViewOwnProps} from '@instructure/ui-view'
 import {useNewLogin} from '../context/NewLoginContext'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -31,29 +31,43 @@ interface Props {
 }
 
 const FooterLinks = ({className}: Props) => {
-  const {helpLinkUrl, helpLinkName} = useNewLogin()
+  const {isUiActionPending, isPreviewMode} = useNewLogin()
+
+  const handleClick = (event: React.MouseEvent<ViewOwnProps>) => {
+    if (isPreviewMode || isUiActionPending) {
+      event.preventDefault()
+    }
+  }
 
   return (
     <View as="div" className={classNames(className)} textAlign="center">
       <InlineList delimiter="pipe" size="small">
-        {helpLinkUrl && helpLinkName && (
-          <InlineList.Item>
-            <Link href={helpLinkUrl}>{helpLinkName}</Link>
-          </InlineList.Item>
-        )}
-
         <InlineList.Item>
-          <Link href="/privacy_policy">{I18n.t('Privacy Policy')}</Link>
+          <Link href="https://community.canvaslms.com/" target="_blank" onClick={handleClick}>
+            Help
+          </Link>
         </InlineList.Item>
 
         <InlineList.Item>
-          <Link href="https://www.instructure.com/policies/canvas-lms-cookie-notice">
+          <Link href="/privacy_policy" onClick={handleClick}>
+            {I18n.t('Privacy Policy')}
+          </Link>
+        </InlineList.Item>
+
+        <InlineList.Item>
+          <Link
+            href="https://www.instructure.com/policies/canvas-lms-cookie-notice"
+            target="_blank"
+            onClick={handleClick}
+          >
             {I18n.t('Cookie Notice')}
           </Link>
         </InlineList.Item>
 
         <InlineList.Item>
-          <Link href="#">{I18n.t('Acceptable Use Policy')}</Link>
+          <Link href="/acceptable_use_policy" onClick={handleClick}>
+            {I18n.t('Acceptable Use Policy')}
+          </Link>
         </InlineList.Item>
       </InlineList>
     </View>

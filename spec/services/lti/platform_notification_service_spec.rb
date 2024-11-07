@@ -51,6 +51,15 @@ describe Lti::PlatformNotificationService do
           )
         end.to change { Lti::NoticeHandler.count }.by(1)
       end
+
+      it "returns API JSON of the created notice handler" do
+        handler = Lti::PlatformNotificationService.subscribe_tool_for_notice(
+          tool:,
+          notice_type: @valid_notice_type,
+          handler_url: @valid_handler_url
+        )
+        expect(handler).to eq({ notice_type: @valid_notice_type, handler: @valid_handler_url })
+      end
     end
 
     context "with invalid notice_type" do
@@ -109,6 +118,13 @@ describe Lti::PlatformNotificationService do
             notice_type: @valid_notice_type
           )
         end.to change { Lti::NoticeHandler.active.count }.by(-1)
+      end
+
+      it "returns an empty api json" do
+        expect(Lti::PlatformNotificationService.unsubscribe_tool_for_notice(
+                 tool:,
+                 notice_type: @valid_notice_type
+               )).to eq({ notice_type: @valid_notice_type, handler: "" })
       end
     end
 

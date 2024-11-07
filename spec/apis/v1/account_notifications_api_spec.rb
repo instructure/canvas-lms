@@ -79,6 +79,26 @@ describe "Account Notification API", type: :request do
       expect(json.length).to eq 2
     end
 
+    describe "include_all param" do
+      it "includes all announcements for an admin" do
+        student_role = @account.get_role_by_name("StudentEnrollment")
+        @user.close_announcement(second_announcement)
+        account_notification(message: "student_only", role_ids: [student_role.id])
+        json = api_call(:get, @path, @api_params.merge(include_all: true))
+
+        expect(json.length).to eq 3
+        messages = json.pluck("message")
+        expect(messages).to match_array(%w[default second student_only])
+      end
+
+      it "returns bad request if non admin user tries to call with include_all" do
+        non_admin = user_with_managed_pseudonym(account: @admin.account)
+        api_call_as_user(non_admin, :get, @path, @api_params.merge(include_all: true))
+
+        expect(response).to have_http_status :unauthorized
+      end
+    end
+
     it "does not include dismissed past announcements by default" do
       @user.close_announcement(second_announcement)
       json = api_call(:get, @path, @api_params)

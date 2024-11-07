@@ -141,20 +141,8 @@ describe('DeepLinkingResponse', () => {
       }
     })
 
-    describe('when flag is disabled', () => {
-      it('uses window.top', () => {
-        expect(DeepLinkingResponse.targetWindow(windowMock)).toBe(windowMock.top)
-      })
-    })
-
-    describe('when flag is enabled', () => {
-      beforeEach(() => {
-        windowMock.ENV.deep_linking_use_window_parent = true
-      })
-
-      it('uses window.parent', () => {
-        expect(DeepLinkingResponse.targetWindow(windowMock)).toBe(windowMock.parent)
-      })
+    it('uses window.parent', () => {
+      expect(DeepLinkingResponse.targetWindow(windowMock)).toBe(windowMock.parent)
     })
 
     describe('when tool is opened in new tab', () => {

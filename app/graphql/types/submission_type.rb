@@ -49,17 +49,30 @@ module Types
 
     global_id_field :id
 
-    field :custom_grade_status, String, null: true
-    def custom_grade_status
-      CustomGradeStatus.find(object.custom_grade_status_id).name if object.custom_grade_status_id
-    end
-
     field :read_state, String, null: true
     def read_state
       object.read_state(current_user)
     end
 
     field :grading_period_id, ID, null: true
+
+    field :status, String, null: false
+    def status
+      Promise.all([load_association(:assignment), load_association(:custom_grade_status)]).then do
+        Loaders::AssociationLoader.for(Assignment, :external_tool_tag).load(object.assignment).then do
+          object.status
+        end
+      end
+    end
+
+    field :status_tag, SubmissionStatusTagType, null: false
+    def status_tag
+      load_association(:assignment).then do
+        Loaders::AssociationLoader.for(Assignment, :external_tool_tag).load(object.assignment).then do
+          object.status_tag
+        end
+      end
+    end
 
     field :student_entered_score, Float, null: true
 

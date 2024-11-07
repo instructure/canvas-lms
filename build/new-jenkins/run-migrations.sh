@@ -28,13 +28,13 @@ fi
 ./build/new-jenkins/docker-compose-setup-databases.sh
 
 # Ensure that the DB shuts down cleanly and saves everything to disk.
-docker stop $(docker ps -q --filter 'name=dynamodb_' --filter 'name=postgres_')
+docker stop $(docker ps -q --filter 'name=dynamodb-' --filter 'name=postgres-')
 
 DYNAMODB_MESSAGE="Dynamodb migrated image for MD5SUM $MIGRATIONS_CACHE_MD5 with $TAG_THREADS_SUFFIX threads."
-docker commit -m "$DYNAMODB_MESSAGE" $(docker ps -aq --filter 'name=dynamodb_') ${DYNAMODB_TAGS[UNIQUE_TAG]}
+docker commit -m "$DYNAMODB_MESSAGE" $(docker ps -aq --filter 'name=dynamodb-') ${DYNAMODB_TAGS[UNIQUE_TAG]}
 
 POSTGRES_MESSAGE="Postgres migrated image for MD5SUM $MIGRATIONS_CACHE_MD5 with $TAG_THREADS_SUFFIX threads."
-docker commit -m "$POSTGRES_MESSAGE" $(docker ps -aq --filter 'name=postgres_') ${POSTGRES_TAGS[UNIQUE_TAG]}
+docker commit -m "$POSTGRES_MESSAGE" $(docker ps -aq --filter 'name=postgres-') ${POSTGRES_TAGS[UNIQUE_TAG]}
 
 [ ! -z "$CACHE_SAVE_SCOPE" ] && docker tag ${DYNAMODB_TAGS[UNIQUE_TAG]} ${DYNAMODB_TAGS[SAVE_TAG]}
 [ ! -z "$CACHE_SAVE_SCOPE" ] && docker tag ${POSTGRES_TAGS[UNIQUE_TAG]} ${POSTGRES_TAGS[SAVE_TAG]}

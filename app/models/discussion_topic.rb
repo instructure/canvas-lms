@@ -766,6 +766,7 @@ class DiscussionTopic < ActiveRecord::Base
           topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
           topic_participant.subscribed = opts[:subscribed] if opts.key?(:subscribed)
           topic_participant.sort_order = opts[:sort_order] if opts.key?(:sort_order)
+          topic_participant.expanded = opts[:expanded] if opts.key?(:expanded)
           topic_participant.save
         end
       end
@@ -774,7 +775,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   scope :joins_ungraded_discussion_student_visibilities, lambda { |user_ids, course_ids|
-    visible_discussion_topics = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible_to_students_in_courses(user_ids:, course_ids:).map(&:discussion_topic_id)
+    visible_discussion_topics = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible(user_ids:, course_ids:).map(&:discussion_topic_id)
     if visible_discussion_topics.any?
       where(id: visible_discussion_topics)
         .where(assignment_id: nil)
@@ -890,7 +891,7 @@ class DiscussionTopic < ActiveRecord::Base
     end
 
     user_ids = Array(users) | observed_student_ids
-    visible_differentiated_topic_ids = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible_to_students(user_ids:).map(&:discussion_topic_id)
+    visible_differentiated_topic_ids = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible(user_ids:).map(&:discussion_topic_id)
     merge(DiscussionTopic.where.not(context_type: "Course")
     .or(DiscussionTopic.where(id: visible_topic_ids))
     .or(DiscussionTopic.where(id: visible_differentiated_topic_ids, is_section_specific: false))
@@ -2079,7 +2080,7 @@ class DiscussionTopic < ActiveRecord::Base
   def self.visible_ids_by_user(opts)
     # Discussions with an assignment: pluck id, assignment_id, and user_id from items joined with the SQL view
     plucked_visibilities = if Account.site_admin.feature_enabled?(:selective_release_backend)
-                             visible_assignments = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students_in_courses(user_ids: opts[:user_id], course_ids: opts[:course_id])
+                             visible_assignments = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: opts[:user_id], course_ids: opts[:course_id])
                              # map the visibilities to a hash of assignment_id => [user_ids]
                              assignment_user_map = visible_assignments.each_with_object(Hash.new { |hash, key| hash[key] = [] }) do |visibility, hash|
                                hash[visibility.assignment_id] << visibility.user_id
@@ -2119,7 +2120,7 @@ class DiscussionTopic < ActiveRecord::Base
     ids_visible_to_sections = topic_ids_per_user
 
     if Account.site_admin.feature_enabled?(:selective_release_backend)
-      visible_topic_user_id_pairs = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible_to_students_in_courses(user_ids: opts[:user_id], course_ids: opts[:course_id]).map { |visibility| [visibility.discussion_topic_id, visibility.user_id] }
+      visible_topic_user_id_pairs = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible(user_ids: opts[:user_id], course_ids: opts[:course_id]).map { |visibility| [visibility.discussion_topic_id, visibility.user_id] }
       eligible_topic_ids = DiscussionTopic.where(id: visible_topic_user_id_pairs.map(&:first)).where(assignment_id: nil).where.not(is_section_specific: true).pluck(:id)
       eligible_visible_topic_user_id_pairs = visible_topic_user_id_pairs.select { |discussion_topic_id, _user_id| eligible_topic_ids.include?(discussion_topic_id) }
       ungraded_differentiated_topic_ids_per_user = eligible_visible_topic_user_id_pairs.group_by(&:last).transform_values { |pairs| pairs.map(&:first) }

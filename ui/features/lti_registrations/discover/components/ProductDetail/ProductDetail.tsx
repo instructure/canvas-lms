@@ -19,9 +19,9 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import {useLocation, useNavigate} from 'react-router-dom'
-import {fetchProducts} from '../../../../../shared/lti-apps/queries/productsQuery'
-import {useQuery} from '@tanstack/react-query'
-import useProduct from './useProduct'
+import useProduct from './queries/useProduct'
+import useSimilarProducts from './queries/useSimilarProducts'
+import useBreakpoints from '@canvas/lti-apps/hooks/useBreakpoints'
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
@@ -29,13 +29,13 @@ import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {Tag} from '@instructure/ui-tag'
 import {View} from '@instructure/ui-view'
-import {IconExternalLinkLine} from '@instructure/ui-icons/es/IconExternalLinkLine'
 import {Button} from '@instructure/ui-buttons'
 import GenericErrorPage from '@canvas/generic-error-page/react'
-import TruncateWithTooltip from '../../../../../shared/lti-apps/components/common/TruncateWithTooltip'
+import TruncateWithTooltip from '@canvas/lti-apps/components/common/TruncateWithTooltip'
 import {
   IconA11yLine,
   IconExpandStartLine,
+  IconExternalLinkLine,
   IconEyeLine,
   IconMessageLine,
   IconQuizTitleLine,
@@ -45,11 +45,11 @@ import IntegrationDetailModal from './IntegrationDetailModal'
 import ProductCarousel from '../common/Carousels/ProductCarousel'
 import ImageCarousel from '../common/Carousels/ImageCarousel'
 import BadgeCarousel from '../common/Carousels/BadgeCarousel'
-import Disclaimer from '../../../../../shared/lti-apps/components/common/Disclaimer'
+import Disclaimer from '@canvas/lti-apps/components/common/Disclaimer'
+
+import type {Product} from '@canvas/lti-apps/models/Product'
 
 import {openDynamicRegistrationWizard} from '../../../manage/registration_wizard/RegistrationWizardModalState'
-
-import type {DiscoverParams} from '../../../../../shared/lti-apps/hooks/useDiscoverQueryParams'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -65,37 +65,236 @@ const ProductDetail = () => {
 
   const currentProductId = location.pathname.replace('/product_detail/', '')
   const previousPath = window.location.pathname.replace(/\product_detail.*/, '')
+  const {isDesktop, isMobile, isMaxMobile, isMaxTablet} = useBreakpoints()
 
   const {product, isLoading, isError} = useProduct({productId: currentProductId})
 
   const params = () => {
     return {
-      filters: {companies: [product?.company]},
+      filters: {companies: [{id: product?.company.id.toString(), name: product?.company.name}]},
     }
   }
 
-  const {data: otherProductsByCompany} = useQuery({
-    queryKey: ['lti_similar_products_by_company', product?.company],
-    queryFn: () => fetchProducts(params() as unknown as DiscoverParams),
-  })
+  const {otherProductsByCompany} = useSimilarProducts({params: params(), product})
 
   const ErrorPage = () => {
     return <GenericErrorPage errorMessage={I18n.t('Error loading product details')} />
   }
 
   const excludeCurrentProduct = otherProductsByCompany?.tools.filter(
-    otherProducts => otherProducts.global_product_id !== currentProductId
+    (otherProducts: Product) => otherProducts.global_product_id !== currentProductId
   )
 
-  const renderTags = () => {
-    return product?.tags.map((t, i) => (
-      <Tag text={t.name} margin="0 x-small 0 0" key={`${i + 1}`} />
-    ))
-  }
+  const dynamicRegistrationInformation = product?.tool_integration_configurations?.lti_13?.find(
+    configuration => configuration.integration_type === 'lti_13_dynamic_registration'
+  )
 
   const ltiDataClickHandle = (title: string) => {
     setModalOpen(true)
     setClickedLtiTitle(title)
+  }
+
+  const intDetailClickHandler = (title: string, content: string) => {
+    setIntDetailModalOpen(true)
+    setIntDetailTitle(title)
+    setIntDetailContent(content)
+  }
+
+  const formattedUpdatedAt = () => {
+    const date = new Date(product?.updated_at as string)
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    })
+  }
+
+  const renderConfigureButton = () => {
+    const buttonMargins = !isDesktop ? '0 0 medium 0' : '0 0 xx-large 0'
+    const tabletMargin = isMaxTablet ? '0 0 0 small' : '0'
+    const buttonWidth = isMaxMobile ? 'block' : 'inline-block'
+
+    return (
+      <Flex margin={buttonMargins}>
+        <Flex.Item shouldGrow={true} margin={tabletMargin}>
+          <Button
+            display={buttonWidth}
+            color="primary"
+            interaction={dynamicRegistrationInformation ? 'enabled' : 'disabled'}
+            onClick={() => {
+              if (!dynamicRegistrationInformation) return null
+
+              openDynamicRegistrationWizard(
+                dynamicRegistrationInformation.url,
+                // @ts-ignore
+                dynamicRegistrationInformation.unified_tool_id,
+                () => {
+                  // redirect to apps page
+                  navigate('/manage')
+                }
+              )
+            }}
+          >
+            {I18n.t('Configure')}
+          </Button>
+        </Flex.Item>
+      </Flex>
+    )
+  }
+
+  const renderHeader = () => {
+    return (
+      <div>
+        {!isDesktop && (
+          <Flex.Item margin="0 0 0 small">
+            <div style={{borderRadius: '8px'}}>
+              <img alt="" src={product.logo_url} width={80} height={80} style={{borderRadius: 8}} />
+            </div>
+          </Flex.Item>
+        )}
+        <Flex>
+          {isDesktop && (
+            <Flex.Item>
+              <div style={{borderRadius: '8px'}}>
+                <img
+                  alt=""
+                  src={product.logo_url}
+                  width={80}
+                  height={80}
+                  style={{borderRadius: 8}}
+                />
+              </div>
+            </Flex.Item>
+          )}
+          <Flex.Item shouldGrow={true} shouldShrink={true} padding="small 0 0 small">
+            <Text weight="bold" size="x-large">
+              {product.name}
+            </Text>
+            <Flex.Item shouldGrow={true} shouldShrink={true}>
+              <div style={{marginBottom: '.5rem'}}>
+                <TruncateWithTooltip
+                  linesAllowed={2}
+                  horizontalOffset={-150}
+                  backgroundColor="primary"
+                >
+                  <Text>{product.tagline}</Text>
+                </TruncateWithTooltip>
+              </div>
+            </Flex.Item>
+          </Flex.Item>
+          {isDesktop && renderConfigureButton()}
+        </Flex>
+      </div>
+    )
+  }
+
+  const renderBylineAndUpdatedAt = () => {
+    return !isMobile ? (
+      <Flex margin={isDesktop ? '0 0 0 large' : '0 0 0 small'}>
+        <Flex.Item margin={isDesktop ? '0 0 0 xx-large' : '0'}>
+          <Text color="secondary">
+            {I18n.t('by')} {product.company.name}
+          </Text>{' '}
+          |{' '}
+          <Text color="secondary">
+            {I18n.t('Updated')}: {formattedUpdatedAt()}
+          </Text>
+        </Flex.Item>
+      </Flex>
+    ) : (
+      <Flex direction="column">
+        <Flex.Item margin="0 0 0 small">
+          <Text color="secondary">
+            {I18n.t('by')} {product.company.name}
+          </Text>
+        </Flex.Item>
+        <Flex.Item margin="0 0 0 small">
+          <Text color="secondary">
+            {I18n.t('Updated')}: {formattedUpdatedAt()}
+          </Text>
+        </Flex.Item>
+      </Flex>
+    )
+  }
+
+  const renderTags = () => {
+    return product?.tags.map((t, i) => (
+      <Tag text={t.name} margin="x-small x-small 0 0" key={`${i + 1}`} />
+    ))
+  }
+
+  const Links = () => {
+    const contentDirection = isMaxMobile ? 'column' : 'row'
+    const contentMargin = 'small 0 0 0'
+
+    return (
+      <div>
+        <Flex>
+          <Flex.Item>
+            <Text weight="bold" size="large">
+              {I18n.t('External Links')}
+            </Text>
+          </Flex.Item>
+        </Flex>
+        <Flex direction={contentDirection} justifyItems="space-between" width="90%">
+          {product.company.company_url && (
+            <Flex.Item margin={contentMargin}>
+              <Link
+                href={product.company.company_url}
+                isWithinText={false}
+                renderIcon={<IconExpandStartLine />}
+              >
+                <Text weight="bold">{I18n.t('Website')}</Text>
+              </Link>
+            </Flex.Item>
+          )}
+          {product.privacy_policy_url && (
+            <Flex.Item margin={contentMargin}>
+              <Link
+                href={product.privacy_policy_url}
+                isWithinText={false}
+                renderIcon={<IconEyeLine />}
+              >
+                <Text weight="bold">{I18n.t('Privacy Policy')}</Text>
+              </Link>
+            </Flex.Item>
+          )}
+          {product.terms_of_service_url && (
+            <Flex.Item margin={contentMargin}>
+              <Link
+                href={product.terms_of_service_url}
+                isWithinText={false}
+                renderIcon={<IconQuizTitleLine />}
+              >
+                <Text weight="bold">{I18n.t('Terms of Service')}</Text>
+              </Link>
+            </Flex.Item>
+          )}
+          {product.accessibility_url && (
+            <Flex.Item margin={contentMargin}>
+              <Link
+                href={product.accessibility_url}
+                isWithinText={false}
+                renderIcon={<IconA11yLine />}
+              >
+                <Text weight="bold">{I18n.t('Accessibility')}</Text>
+              </Link>
+            </Flex.Item>
+          )}
+          {product.support_link && (
+            <Flex.Item margin={contentMargin}>
+              <Link
+                href={product.support_link}
+                isWithinText={false}
+                renderIcon={<IconMessageLine />}
+              >
+                <Text weight="bold">{I18n.t('Contact')}</Text>
+              </Link>
+            </Flex.Item>
+          )}
+        </Flex>
+      </div>
+    )
   }
 
   const renderLtiTitle = () => {
@@ -117,25 +316,6 @@ const ProductDetail = () => {
         </Link>
       </Flex.Item>
     ))
-  }
-
-  const formattedUpdatedAt = () => {
-    const date = new Date(product?.updated_at as string)
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    })
-  }
-
-  const dynamicRegistrationInformation = product?.tool_integration_configurations?.lti_13?.find(
-    configuration => configuration.integration_type === 'lti_13_dynamic_registration'
-  )
-
-  const intDetailClickHandler = (title: string, content: string) => {
-    setIntDetailModalOpen(true)
-    setIntDetailTitle(title)
-    setIntDetailContent(content)
   }
 
   const hasIntegrationResources = product?.integration_resources.resources?.length > 0
@@ -160,7 +340,7 @@ const ProductDetail = () => {
         </Flex.Item>
       ) : (
         resources?.map((resource, i) => (
-          <Flex.Item margin="0 0 large 0" key={`${i + 1}`}>
+          <Flex.Item margin="0 0 medium 0" key={`${i + 1}`}>
             <Link
               style={{alignItems: 'center', display: 'flex'}}
               onClick={() => {
@@ -204,70 +384,15 @@ const ProductDetail = () => {
               <Breadcrumb.Link href={previousPath}>{I18n.t('Apps')}</Breadcrumb.Link>
               <Breadcrumb.Link>{product.name}</Breadcrumb.Link>
             </Breadcrumb>
-            <Flex margin="small 0 0 0">
-              <Flex.Item>
-                <div style={{borderRadius: '8px'}}>
-                  <img
-                    alt=""
-                    src={product.logo_url}
-                    width={80}
-                    height={80}
-                    style={{borderRadius: 8}}
-                  />
-                </div>
-              </Flex.Item>
-              <Flex.Item shouldGrow={true} shouldShrink={true} padding="small 0 0 small">
-                <Text weight="bold" size="x-large">
-                  {product.name}
-                </Text>
-                <Flex.Item shouldGrow={true} shouldShrink={true}>
-                  <div style={{marginBottom: '.5rem'}}>
-                    <TruncateWithTooltip
-                      linesAllowed={2}
-                      horizontalOffset={-150}
-                      backgroundColor="primary"
-                    >
-                      <Text>{product.tagline}</Text>
-                    </TruncateWithTooltip>
-                  </div>
-                </Flex.Item>
-              </Flex.Item>
-              <Flex.Item align="start" margin="small 0 0 0">
-                <Button
-                  color="primary"
-                  interaction={dynamicRegistrationInformation ? 'enabled' : 'disabled'}
-                  onClick={() => {
-                    if (!dynamicRegistrationInformation) return null
-
-                    openDynamicRegistrationWizard(
-                      dynamicRegistrationInformation.url,
-                      // @ts-ignore
-                      dynamicRegistrationInformation.unified_tool_id,
-                      () => {
-                        // redirect to apps page
-                        navigate('/manage')
-                      }
-                    )
-                  }}
-                >
-                  {I18n.t('Configure')}
-                </Button>
-              </Flex.Item>
+            {renderHeader()}
+            {renderBylineAndUpdatedAt()}
+            <Flex
+              padding="small 0 0 small"
+              margin={isDesktop ? '0 medium medium medium' : '0 medium medium 0'}
+            >
+              <Flex.Item margin={isDesktop ? '0 0 0 xx-large' : '0'}>{renderTags()}</Flex.Item>
             </Flex>
-            <Flex margin="0 0 0 xx-large">
-              <Flex.Item padding="0 0 0 x-small" margin="0 0 0 medium">
-                <Text color="secondary">
-                  {I18n.t('by')} {product.company.name}
-                </Text>{' '}
-                |{' '}
-                <Text color="secondary">
-                  {I18n.t('Updated')}: {formattedUpdatedAt()}
-                </Text>
-              </Flex.Item>
-            </Flex>
-            <Flex padding="small 0 0 small" margin="0 medium large xx-large">
-              <Flex.Item margin="0 0 0 small">{renderTags()}</Flex.Item>
-            </Flex>
+            {!isDesktop && renderConfigureButton()}
             <ImageCarousel screenshots={product.screenshots} />
             <Flex margin="medium 0 0 0">
               <Flex.Item>
@@ -275,76 +400,13 @@ const ProductDetail = () => {
                   {I18n.t('Overview')}
                 </Text>
               </Flex.Item>
-            </Flex>
+            </Flex>{' '}
             <Flex>
-              <Flex.Item margin="small 0 small 0">
+              <Flex.Item margin="0 0 small 0">
                 <Text dangerouslySetInnerHTML={{__html: product.description}} />
               </Flex.Item>
             </Flex>
-            <Flex>
-              <Flex.Item margin="medium 0 small 0">
-                <Text weight="bold" size="large">
-                  {I18n.t('External Links')}
-                </Text>
-              </Flex.Item>
-            </Flex>
-            <Flex>
-              {product.company.company_url && (
-                <Flex.Item margin="0 large 0 0">
-                  <Link
-                    href={product.company.company_url}
-                    isWithinText={false}
-                    renderIcon={<IconExpandStartLine />}
-                  >
-                    <Text weight="bold">{I18n.t('Website')}</Text>
-                  </Link>
-                </Flex.Item>
-              )}
-              {product.privacy_policy_url && (
-                <Flex.Item>
-                  <Link
-                    href={product.privacy_policy_url}
-                    isWithinText={false}
-                    renderIcon={<IconEyeLine />}
-                  >
-                    <Text weight="bold">{I18n.t('Privacy Policy')}</Text>
-                  </Link>
-                </Flex.Item>
-              )}
-              {product.terms_of_service_url && (
-                <Flex.Item margin="0 0 0 large">
-                  <Link
-                    href={product.terms_of_service_url}
-                    isWithinText={false}
-                    renderIcon={<IconQuizTitleLine />}
-                  >
-                    <Text weight="bold">{I18n.t('Terms of Service')}</Text>
-                  </Link>
-                </Flex.Item>
-              )}
-              {product.accessibility_url && (
-                <Flex.Item margin="0 0 0 large">
-                  <Link
-                    href={product.accessibility_url}
-                    isWithinText={false}
-                    renderIcon={<IconA11yLine />}
-                  >
-                    <Text weight="bold">{I18n.t('Accessibility')}</Text>
-                  </Link>
-                </Flex.Item>
-              )}
-              {product.support_link && (
-                <Flex.Item margin="0 0 0 large">
-                  <Link
-                    href={product.support_link}
-                    isWithinText={false}
-                    renderIcon={<IconMessageLine />}
-                  >
-                    <Text weight="bold">{I18n.t('Contact')}</Text>
-                  </Link>
-                </Flex.Item>
-              )}
-            </Flex>
+            <Links />
             <Flex>
               <Flex.Item margin="medium 0 small 0">
                 <Text weight="bold" size="large">
@@ -355,22 +417,21 @@ const ProductDetail = () => {
             <Text weight="bold" size="medium">
               {I18n.t('Integrations')}
             </Text>
-            <Flex direction="column" margin="small 0 0 0">
+            <Flex direction="column" margin="small 0 x-small 0">
               {renderLtiTitle()}
             </Flex>
-            {product.badges.length > 0 && <BadgeCarousel badges={product?.badges} />}
-            {(excludeCurrentProduct?.length ?? 0) > 0 && (
-              <ProductCarousel
-                products={excludeCurrentProduct ?? []}
-                companyName={product.company.name}
+            {product.badges.length > 0 && (
+              <BadgeCarousel
+                badges={product?.badges}
+                isMaxMobile={isMaxMobile}
+                isMaxTablet={isMaxTablet}
               />
             )}
-
             {hasIntegrationResources && (
               <>
-                <Flex>
-                  <Flex.Item margin="medium 0 0 0">
-                    <Text weight="bold" size="x-large">
+                <Flex margin="small 0 0 0">
+                  <Flex.Item margin="0 0 small 0">
+                    <Text weight="bold" size="large">
                       {I18n.t('Implementation Resources')}
                     </Text>
                   </Flex.Item>
@@ -378,10 +439,9 @@ const ProductDetail = () => {
                 <Flex direction="column">{renderIntegrationResources()}</Flex>
               </>
             )}
-
             {(excludeCurrentProduct?.length ?? 0) > 0 && (
               <ProductCarousel
-                products={excludeCurrentProduct}
+                products={excludeCurrentProduct ?? []}
                 companyName={product.company.name}
               />
             )}

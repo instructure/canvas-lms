@@ -18,18 +18,32 @@
 
 import React from 'react'
 import classNames from 'classnames'
+import type {AuthProvider} from '../types'
+import type {ViewOwnProps} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
-import {Flex} from '@instructure/ui-flex'
+import {Grid, GridCol, GridRow} from '@instructure/ui-grid'
 import {Img} from '@instructure/ui-img'
 import {useNewLogin} from '../context/NewLoginContext'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 // @ts-expect-error
-import GoogleIcon from '../assets/images/google.svg'
+import iconApple from '../assets/images/apple.svg'
 // @ts-expect-error
-import MicrosoftIcon from '../assets/images/microsoft.svg'
+import iconClasslink from '../assets/images/classlink.svg'
 // @ts-expect-error
-import PlaceholderIcon from '../assets/images/placeholder.svg'
+import iconClever from '../assets/images/clever.svg'
+// @ts-expect-error
+import iconFacebook from '../assets/images/facebook.svg'
+// @ts-expect-error
+import iconGithub from '../assets/images/github.svg'
+// @ts-expect-error
+import iconGoogle from '../assets/images/google.svg'
+// @ts-expect-error
+import iconLinkedin from '../assets/images/linkedin.svg'
+// @ts-expect-error
+import iconMicrosoft from '../assets/images/microsoft.svg'
+// @ts-expect-error
+import iconX from '../assets/images/x.svg'
 
 const I18n = useI18nScope('new_login')
 
@@ -37,55 +51,69 @@ interface Props {
   className?: string
 }
 
+const providerIcons: Record<string, string> = {
+  apple: iconApple,
+  classlink: iconClasslink,
+  clever: iconClever,
+  facebook: iconFacebook,
+  github: iconGithub,
+  google: iconGoogle,
+  linkedin: iconLinkedin,
+  microsoft: iconMicrosoft,
+  twitter: iconX,
+}
+
 const SSOButtons = ({className}: Props) => {
-  const {isUiActionPending, authProviders} = useNewLogin()
+  const {isUiActionPending, isPreviewMode, authProviders} = useNewLogin()
 
   if (!authProviders || authProviders.length === 0) {
     return null
   }
 
-  const getProviderIcon = (authType: string) => {
-    switch (authType) {
-      case 'google':
-        return GoogleIcon
-      case 'microsoft':
-        return MicrosoftIcon
-      default:
-        return PlaceholderIcon
+  const handleClick = (
+    event: React.KeyboardEvent<ViewOwnProps> | React.MouseEvent<ViewOwnProps>
+  ) => {
+    if (isPreviewMode || isUiActionPending) {
+      event.preventDefault()
     }
   }
 
-  return (
-    <Flex className={classNames(className)} direction="column" gap="small">
-      {authProviders.map(provider => {
-        const onlyOneOfType =
-          authProviders.filter(p => p.auth_type === provider.auth_type).length < 2
-        const authType = provider.auth_type || 'unknown'
-        const displayName = authType.charAt(0).toUpperCase() + authType.slice(1)
-        const link = `/login/${authType}${onlyOneOfType ? '' : `/${provider.id}`}`
+  const renderProviderButton = (provider: AuthProvider) => {
+    if (!provider.auth_type || !provider.display_name) return null
 
-        return (
-          <Flex.Item key={provider.id} overflowY="visible">
-            <Button
-              href={link}
+    const onlyOneOfType = authProviders.filter(p => p.auth_type === provider.auth_type).length < 2
+    const authType = provider.auth_type
+    const displayName = provider.display_name
+    const link = `/login/${authType}${onlyOneOfType ? '' : `/${provider.id}`}`
+    const iconSrc = providerIcons[authType]
+
+    return (
+      <GridCol key={provider.id} width={{small: 12, large: 6}}>
+        <Button
+          href={link}
+          display="block"
+          disabled={isUiActionPending}
+          renderIcon={() => (
+            <Img
+              src={iconSrc}
+              alt={displayName}
+              width="1.125rem"
+              height="1.125rem"
               display="block"
-              disabled={isUiActionPending}
-              renderIcon={() => (
-                <Img
-                  src={getProviderIcon(provider.auth_type)}
-                  alt={displayName}
-                  width="18"
-                  height="18"
-                  display="block"
-                />
-              )}
-            >
-              {I18n.t('Sign in with %{displayName}', {displayName})}
-            </Button>
-          </Flex.Item>
-        )
-      })}
-    </Flex>
+            />
+          )}
+          onClick={handleClick}
+        >
+          {I18n.t('Sign in with %{displayName}', {displayName})}
+        </Button>
+      </GridCol>
+    )
+  }
+
+  return (
+    <Grid startAt="x-large" colSpacing="small" rowSpacing="small" className={classNames(className)}>
+      <GridRow hAlign="space-around">{authProviders.map(renderProviderButton)}</GridRow>
+    </Grid>
   )
 }
 

@@ -11,7 +11,7 @@ if [[ -n "${COMMON_LIB_LOADED-}" ]]; then
      return
 fi
 COMMON_LIB_LOADED=i_am_here
-DOCKER_COMMAND=${DOCKER_COMMAND:-"docker-compose"}
+DOCKER_COMMAND=${DOCKER_COMMAND:-"docker compose"}
 
 function trap_result {
   exit_code=$?
@@ -43,7 +43,7 @@ function is_git_dir {
 # If DOCKER var set true, run with docker-compose
 function run_command {
   if is_running_on_jenkins; then
-    docker-compose exec -T web "$@"
+    docker compose exec -T web "$@"
   elif is_docker; then
     # -T needed until https://github.com/docker/compose/issues/9104 is fixed
     $DOCKER_COMMAND exec -T -e TELEMETRY_OPT_IN web "$@"
@@ -54,7 +54,7 @@ function run_command {
 # remove once https://github.com/docker/compose/issues/9104 is fixed
 function run_command_tty {
   if is_running_on_jenkins; then
-    docker-compose exec -T web "$@"
+    docker compose exec -T web "$@"
   elif is_docker; then
     # -T needed until https://github.com/docker/compose/issues/9104 is fixed
     $DOCKER_COMMAND exec -e TELEMETRY_OPT_IN web "$@"
@@ -186,7 +186,7 @@ function check_dockerfile {
 function rebuild_docker_images {
   start_spinner "Rebuilding docker images..."
     if [[ "${OS:-}" == 'Linux' && -z "${CANVAS_SKIP_DOCKER_USERMOD:-}" ]]; then
-      _canvas_lms_track_with_log docker-compose build --pull --build-arg USER_ID=$(id -u)
+      _canvas_lms_track_with_log docker compose build --pull --build-arg USER_ID=$(id -u)
     else
       _canvas_lms_track_with_log $DOCKER_COMMAND build --pull
     fi

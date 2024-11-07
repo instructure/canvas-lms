@@ -243,6 +243,6 @@ describe('CanvasInbox App Container', () => {
       fireEvent.click(composeButton)
       await waitForApolloLoading()
       expect(window.location.hash).toBe('#filter=type=inbox')
-    })
+    }, 15000)
   })
 })

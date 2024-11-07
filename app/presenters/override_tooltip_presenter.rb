@@ -50,7 +50,7 @@ class OverrideTooltipPresenter < OverrideListPresenter
   end
 
   def total_dates
-    visible_due_dates.length
+    grouped_and_sorted_by_visible_due_dates.length
   end
 
   def dates_visible
@@ -66,7 +66,7 @@ class OverrideTooltipPresenter < OverrideListPresenter
   end
 
   def due_date_summary
-    visible_due_dates[0...dates_visible].map do |date|
+    grouped_and_sorted_by_visible_due_dates[0...dates_visible].map do |date|
       { due_for: date[:due_for], due_at: date[:due_at] }
     end
   end

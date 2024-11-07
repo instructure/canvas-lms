@@ -112,19 +112,20 @@ describe CC::Qti::NewQuizzesGenerator do
           new_quizzes_generator = CC::Qti::NewQuizzesGenerator.new(@manifest, resource_node)
 
           expected_files = [
-            "Uploaded Media/someuuid1",
-            "Uploaded Media/someuuid2",
             "g7a6297c8c5fe5c3dabc42d0ee182dcb8/assessment_meta.xml",
             "g7a6297c8c5fe5c3dabc42d0ee182dcb8/assessment_qti.xml",
             "gdbb1b3860016ed4d2392d017a493f0ec/assessment_meta.xml",
             "gdbb1b3860016ed4d2392d017a493f0ec/assessment_qti.xml",
             "non_cc_assessments/g7a6297c8c5fe5c3dabc42d0ee182dcb8.xml.qti",
-            "non_cc_assessments/gdbb1b3860016ed4d2392d017a493f0ec.xml.qti"
+            "non_cc_assessments/gdbb1b3860016ed4d2392d017a493f0ec.xml.qti",
+            "web_resources/Uploaded Media",
+            "web_resources/Uploaded Media/someuuid1",
+            "web_resources/Uploaded Media/someuuid2"
           ]
 
           new_quizzes_generator.write_new_quizzes_content
 
-          extracted_files = Dir.glob(File.join(new_quizzes_generator.export_dir, "*", "**")).map do |f|
+          extracted_files = Dir.glob(File.join(new_quizzes_generator.export_dir, "*", "**", "**/*")).map do |f|
             f.sub("#{new_quizzes_generator.export_dir}/", "")
           end.sort
 
@@ -285,11 +286,11 @@ describe CC::Qti::NewQuizzesGenerator do
               <file href="gdbb1b3860016ed4d2392d017a493f0ec/assessment_meta.xml"/>
               <file href="non_cc_assessments/gdbb1b3860016ed4d2392d017a493f0ec.xml.qti"/>
             </resource>
-            <resource identifier="i931e933d0a559fbb7319e5b3c5d3be8e" type="webcontent" href="Uploaded Media/someuuid1">
-              <file href="Uploaded Media/someuuid1"/>
+            <resource identifier="i931e933d0a559fbb7319e5b3c5d3be8e" type="webcontent" href="web_resources/Uploaded Media/someuuid1">
+              <file href="web_resources/Uploaded Media/someuuid1"/>
             </resource>
-            <resource identifier="ic1f6093310b4f2923606824ecd90811f" type="webcontent" href="Uploaded Media/someuuid2">
-              <file href="Uploaded Media/someuuid2"/>
+            <resource identifier="ic1f6093310b4f2923606824ecd90811f" type="webcontent" href="web_resources/Uploaded Media/someuuid2">
+              <file href="web_resources/Uploaded Media/someuuid2"/>
             </resource>
           </resources>
         XML

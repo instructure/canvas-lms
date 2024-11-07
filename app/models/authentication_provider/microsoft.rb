@@ -93,8 +93,6 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
 
   def unique_id(token)
     id_token = claims(token)
-    settings["known_tenants"] ||= []
-    (settings["known_tenants"] << id_token["tid"]).uniq!
     allowed_tenants = mapped_allowed_tenants
     if allowed_tenants.empty? || allowed_tenants.include?("common") || settings["skip_tenant_verification"]
       # allow anyone
@@ -106,11 +104,6 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
     elsif !allowed_tenants.include?(id_token["tid"])
       raise OAuthValidationError, t("User is from unacceptable tenant %{tenant}.", tenant: id_token["tid"].inspect)
     end
-
-    settings["known_idps"] ||= []
-    idp = id_token["idp"] || id_token["iss"]
-    (settings["known_idps"] << idp).uniq!
-    save! if changed?
 
     ids = id_token.as_json
     ids["tid+oid"] = "#{ids["tid"]}##{ids["oid"]}" if ids["tid"] && ids["oid"]

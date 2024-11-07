@@ -410,5 +410,12 @@ module Types
       participant = object.participant(current_user:)
       participant&.sort_order&.to_sym || DiscussionTopicParticipant::SortOrder::DESC.to_sym
     end
+
+    field :expanded, Boolean, null: true
+
+    def expanded
+      participant = object.participant(current_user:)
+      participant&.expanded || false
+    end
   end
 end

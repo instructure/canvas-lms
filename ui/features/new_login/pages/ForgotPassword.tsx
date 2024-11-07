@@ -18,14 +18,15 @@
 
 import React, {useState} from 'react'
 import {Button} from '@instructure/ui-buttons'
-import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {useNewLogin} from '../context/NewLoginContext'
 import {SignInLinks} from '../shared'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {TextInput} from '@instructure/ui-text-input'
+import {Text} from '@instructure/ui-text'
 import {forgotPassword} from '../services'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {useNewLogin} from '../context/NewLoginContext'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('new_login')
 
@@ -89,68 +90,66 @@ const ForgotPassword = () => {
 
   const passwordRecoveryForm = (
     <>
-      <Flex.Item overflowY="visible">
-        <p>
-          {I18n.t(
-            'Enter your %{loginHandleName} and we’ll send you a link to change your password.',
-            {loginHandleName}
-          )}
-        </p>
-      </Flex.Item>
-      <Flex.Item overflowY="visible">
-        <form onSubmit={handleForgotPassword}>
-          <Flex direction="column" gap="large">
-            <Flex.Item overflowY="visible">
-              <TextInput
-                id="email"
-                renderLabel={loginHandleName}
-                type="email"
-                value={email}
-                onChange={handleEmailChange}
-                autoComplete="email"
-                aria-describedby="emailHelp"
-              />
-            </Flex.Item>
-            <Flex.Item overflowY="visible">
-              <Button
-                type="submit"
-                color="primary"
-                display="block"
-                disabled={!isEmailValid || isUiActionPending}
-              >
-                {I18n.t('Submit')}
-              </Button>
+      <Text>
+        {I18n.t(
+          'Enter your %{loginHandleName} and we’ll send you a link to change your password.',
+          {loginHandleName}
+        )}
+      </Text>
+
+      <form onSubmit={handleForgotPassword}>
+        <Flex direction="column" gap="large">
+          <TextInput
+            id="email"
+            renderLabel={loginHandleName}
+            type="email"
+            value={email}
+            onChange={handleEmailChange}
+            autoComplete="email"
+            aria-describedby="emailHelp"
+          />
+
+          <Flex direction="column" gap="small">
+            <Button
+              type="submit"
+              color="primary"
+              display="block"
+              disabled={!isEmailValid || isUiActionPending}
+            >
+              {I18n.t('Submit')}
+            </Button>
+
+            <Flex.Item align="center">
+              <SignInLinks />
             </Flex.Item>
           </Flex>
-        </form>
-      </Flex.Item>
+        </Flex>
+      </form>
     </>
   )
 
   const confirmationMessage = (
-    <Flex.Item overflowY="visible">
-      <p>
+    <>
+      <Text>
         {I18n.t(
           'A recovery email has been sent to %{email}. Please check your inbox and follow the instructions to reset your password. This may take up to 30 minutes. If you don’t receive an email, be sure to check your spam folder.',
           {email: submittedEmail}
         )}
-      </p>
-    </Flex.Item>
+      </Text>
+
+      <Flex.Item align="center" overflowY="visible" overflowX="visible">
+        <SignInLinks />
+      </Flex.Item>
+    </>
   )
 
   return (
     <Flex direction="column" gap="large">
-      <Flex.Item overflowY="visible">
-        <Heading level="h2" as="h1">
-          {I18n.t('Forgot Password')}
-        </Heading>
-      </Flex.Item>
+      <Heading level="h2" as="h1">
+        {I18n.t('Forgot Password')}
+      </Heading>
 
       {emailSent ? confirmationMessage : passwordRecoveryForm}
-
-      <Flex.Item overflowY="visible">
-        <SignInLinks />
-      </Flex.Item>
     </Flex>
   )
 }

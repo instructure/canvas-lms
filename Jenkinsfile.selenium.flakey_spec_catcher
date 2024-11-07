@@ -181,7 +181,7 @@ def executeFlakeySpecCatcher() {
   } finally {
     sh """
     rm -vrf tmp && mkdir -p tmp
-    docker cp flakey-spec-catcher_canvas_1:/usr/src/app/tmp/fsc.out tmp/fsc-${env.NODE_NUMBER}.out || true
+    docker cp flakey-spec-catcher-canvas-1:/usr/src/app/tmp/fsc.out tmp/fsc-${env.NODE_NUMBER}.out || true
     """
     archiveArtifacts artifacts: "tmp/fsc-${env.NODE_NUMBER}.out", allowEmptyArchive: true
   }

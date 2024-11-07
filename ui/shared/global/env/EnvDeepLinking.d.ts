@@ -22,6 +22,5 @@
 export interface EnvDeepLinking {
   deep_link_response?: any
   DEEP_LINKING_POST_MESSAGE_ORIGIN?: string
-  deep_linking_use_window_parent?: boolean
   lti_overwrite_user_url_input_select_content_dialog?: boolean
 }

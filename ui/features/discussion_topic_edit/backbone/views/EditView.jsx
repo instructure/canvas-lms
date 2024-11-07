@@ -403,7 +403,6 @@ EditView.prototype.render = function () {
 
 EditView.prototype.shouldRenderUsageRights = function () {
   return (
-    ENV.FEATURES.usage_rights_discussion_topics &&
     ENV.USAGE_RIGHTS_REQUIRED &&
     ENV.PERMISSIONS.manage_files &&
     this.permissions.CAN_ATTACH

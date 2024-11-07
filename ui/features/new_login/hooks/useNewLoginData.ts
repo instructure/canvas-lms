@@ -20,20 +20,25 @@ import {useEffect, useState} from 'react'
 import type {AuthProvider} from '../types'
 
 interface NewLoginData {
+  enableCourseCatalog?: boolean
   authProviders?: AuthProvider[]
   loginHandleName?: string
   loginLogoUrl?: string
   loginLogoAlt?: string
-  helpLinkUrl?: string
-  helpLinkName?: string
   bodyBgColor?: string
   bodyBgImage?: string
+  isPreviewMode?: boolean
 }
 
 const getLoginDataContainer = (): HTMLElement | null => document.getElementById('new_login_data')
 
 const getStringAttribute = (container: HTMLElement, attribute: string): string | undefined =>
   container.getAttribute(attribute)?.trim() || undefined
+
+const getBooleanAttribute = (container: HTMLElement, attribute: string): boolean | undefined => {
+  const value = container.getAttribute(attribute)?.trim().toLowerCase()
+  return value === 'true' ? true : value === 'false' ? false : undefined
+}
 
 const getObjectAttribute = <T>(container: HTMLElement, attribute: string): T | undefined => {
   const value = getStringAttribute(container, attribute)
@@ -50,28 +55,28 @@ const getObjectAttribute = <T>(container: HTMLElement, attribute: string): T | u
 
 export const useNewLoginData = (): NewLoginData => {
   const [newLoginData, setNewLoginData] = useState<NewLoginData>({
+    enableCourseCatalog: undefined,
     authProviders: undefined,
     loginHandleName: undefined,
     loginLogoUrl: undefined,
     loginLogoAlt: undefined,
-    helpLinkUrl: undefined,
-    helpLinkName: undefined,
     bodyBgColor: undefined,
     bodyBgImage: undefined,
+    isPreviewMode: undefined,
   })
 
   useEffect(() => {
     const container = getLoginDataContainer()
     if (container) {
       setNewLoginData({
+        enableCourseCatalog: getBooleanAttribute(container, 'data-enable-course-catalog'),
         authProviders: getObjectAttribute<AuthProvider[]>(container, 'data-auth-providers'),
         loginHandleName: getStringAttribute(container, 'data-login-handle-name'),
         loginLogoUrl: getStringAttribute(container, 'data-login-logo-url'),
         loginLogoAlt: getStringAttribute(container, 'data-login-logo-alt'),
-        helpLinkUrl: getStringAttribute(container, 'data-help-link-url'),
-        helpLinkName: getStringAttribute(container, 'data-help-link-name'),
         bodyBgColor: getStringAttribute(container, 'data-body-bg-color'),
         bodyBgImage: getStringAttribute(container, 'data-body-bg-image'),
+        isPreviewMode: getBooleanAttribute(container, 'data-is-preview-mode'),
       })
     }
   }, [])

@@ -24,7 +24,20 @@
          :user => submission_comment_submittor(asset, user),
          :assignment => asset.submission.assignment.title %></p>
 
-<%= format_message(asset.comment).first %>
+<%= html_to_simple_html(asset.comment,
+                        :base_url => dashboard_url,
+                        :tags => ['p', 'span', 'h2', 'h3', 'h4' 'ul', 'ol', 'li', 'code'],
+                        :attributes => { 
+                          'p' => ['style'],
+                          'span' => ['style'],
+                          'h2' => ['style'],
+                          'h3' => ['style'],
+                          'h4' => ['style'],
+                          'ul' => ['style'],
+                          'ol' => ['style'],
+                          'li' => ['style'],
+                          'code' => ['style'],
+                           }) %>
 
 <% if asset.can_read_author?(user, nil) %>
   <% if avatar_enabled? %>

@@ -342,8 +342,7 @@ function DiscussionTopicForm({
     studentEnrollments,
     sections,
     groups:
-      groupCategories.find(groupCategory => groupCategory._id === groupCategoryId)?.groupsConnection
-        ?.nodes || [],
+      groupCategories.find(groupCategory => groupCategory._id === groupCategoryId)?.groups || [],
     groupCategoryId,
     gradedDiscussionRefMap,
     setGradedDiscussionRefMap,
@@ -680,12 +679,8 @@ function DiscussionTopicForm({
     return continueSubmitForm(shouldPublish, shouldNotifyUsers)
   }
 
-  const renderLabelWithPublishStatus = () => {
-    if (instUINavEnabled()) {
-      return <></>
-    }
-
-    const publishStatus = published ? (
+  const getPublishStatus = () => {
+    return published ? (
       <Text color="success" weight="normal">
         <IconPublishSolid /> {I18n.t('Published')}
       </Text>
@@ -694,11 +689,13 @@ function DiscussionTopicForm({
         <IconUnpublishedLine /> {I18n.t('Not Published')}
       </Text>
     )
+  }
 
+  const renderLabelWithPublishStatus = () => {
     return (
       <Flex justifyItems="space-between">
         <Flex.Item>{I18n.t('Topic Title')}</Flex.Item>
-        {!isAnnouncement && <Flex.Item>{publishStatus}</Flex.Item>}
+        {!isAnnouncement && !instUINavEnabled() && <Flex.Item>{getPublishStatus()}</Flex.Item>}
       </Flex>
     )
   }
@@ -995,7 +992,7 @@ function DiscussionTopicForm({
               />
             )}
             {enablePodcastFeed && !isGroupContext && (
-              <View display="block" padding="none none none large">
+              <View display="block" padding="none none none medium">
                 <Checkbox
                   label={I18n.t('Include student replies in podcast feed')}
                   value="include-student-replies-in-podcast-feed"
@@ -1023,7 +1020,7 @@ function DiscussionTopicForm({
             )}
             {shouldShowCheckpointsOptions && (
               <>
-                <View display="inline-block">
+                <View display="inline-block" padding="0 0 0 medium">
                   <Checkbox
                     data-testid="checkpoints-checkbox"
                     label={I18n.t('Assign graded checkpoints')}
@@ -1042,7 +1039,7 @@ function DiscussionTopicForm({
                     // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
                     tabIndex="0"
                   >
-                    <IconInfoLine />
+                    <IconInfoLine color="primary"/>
                     <ScreenReaderContent>{checkpointsToolTipText}</ScreenReaderContent>
                   </div>
                 </Tooltip>
@@ -1061,7 +1058,7 @@ function DiscussionTopicForm({
                   }}
                 />
                 {allowLiking && (
-                  <View display="block" padding="small none none large">
+                  <View display="block" padding="small none none medium">
                     <FormFieldGroup description="" rowSpacing="small">
                       <Checkbox
                         label={I18n.t('Only graders can like')}
@@ -1090,7 +1087,7 @@ function DiscussionTopicForm({
                 {addToTodo && (
                   <View
                     display="block"
-                    padding="none none none large"
+                    padding="none none none medium"
                     data-testid="todo-date-section"
                     margin="small 0 0 0"
                   >
@@ -1145,7 +1142,7 @@ function DiscussionTopicForm({
               />
             )}
             {shouldShowGroupOptions && isGroupDiscussion && (
-              <View display="block" padding="none none none large">
+              <View display="block" padding="none none none medium">
                 <SimpleSelect
                   data-testid="select-discussion-group-category"
                   id="discussion_group_category_id"

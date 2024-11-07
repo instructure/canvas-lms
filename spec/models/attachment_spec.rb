@@ -3208,6 +3208,12 @@ describe Attachment do
         @attachment.update_word_count
         expect(@attachment.word_count).to eq 0
       end
+
+      it "applies a memory limit" do
+        attachment_model(filename: "test.pdf", uploaded_data: fixture_file_upload("example.pdf", "application/pdf"))
+        expect(MemoryLimit).to receive(:apply).with(4.gigabytes).and_call_original
+        @attachment.update_word_count
+      end
     end
   end
 

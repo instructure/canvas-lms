@@ -3285,6 +3285,21 @@ describe GradebooksController do
           expect(js_env[:rubric_outcome_data]).to eq []
         end
       end
+
+      describe "rubric_assessment_imports_exports" do
+        it "sets rubric_assessment_imports_exports_enabled feature flag value" do
+          Account.site_admin.enable_feature!(:enhanced_rubrics)
+          Account.site_admin.enable_feature!(:rubric_assessment_imports_exports)
+          get :show, params: { course_id: @course.id }
+          expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:rubric_assessment_imports_exports_enabled]).to be(true)
+        end
+
+        it "sets rubric_assessment_imports_exports_enabled to false when enhanced_rubrics not set" do
+          Account.site_admin.enable_feature!(:rubric_assessment_imports_exports)
+          get :show, params: { course_id: @course.id }
+          expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:rubric_assessment_imports_exports_enabled]).to be(false)
+        end
+      end
     end
 
     describe "current_anonymous_id" do

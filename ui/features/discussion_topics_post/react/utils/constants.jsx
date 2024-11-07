@@ -48,7 +48,6 @@ const searchFilter = {
   setAllThreadsStatus: () => {},
   expandedThreads: [],
   setExpandedThreads: () => {},
-  sort: 'desc',
   perPage: '',
   discussionID: '',
 }

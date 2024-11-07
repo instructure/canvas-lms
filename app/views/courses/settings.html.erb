@@ -692,8 +692,10 @@
               <% end %>
               <% unless @context.elementary_subject_course? %>
                 <div class="checkbox-flex-container">
-                <%= f.check_box :lock_all_announcements, :disabled => !can_manage || @context.account.lock_all_announcements[:locked] %>
-                <%= f.label :lock_all_announcements, :en => 'Disable comments on announcements' %><br />
+                  <span <%= 'data-tooltip' if @context.account.lock_all_announcements[:locked] %> title="<%= t("This setting is locked on the account level")%>">
+                    <%= f.check_box :lock_all_announcements, :disabled => !can_manage || @context.account.lock_all_announcements[:locked] %>
+                    <%= f.label :lock_all_announcements, :en => 'Disable comments on announcements' %><br />
+                  </span>
                 </div>
               <% end %>
               <%= f.select :default_wiki_editing_roles, [

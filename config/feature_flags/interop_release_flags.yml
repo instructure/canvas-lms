@@ -45,25 +45,6 @@ assignment_submission_type_card:
       state: allowed_on
     ci:
       state: allowed_on
-deep_linking_use_window_parent:
-  state: hidden
-  display_name: Use window.parent in Deep Linking Response
-  description: |-
-    If enabled, the deep linking response JS will send postMessages
-    to window.parent instead of window.top. This enables the deep linking
-    response to correctly send content items to New Quizzes, when a tool is
-    launched from NQ.
-  applies_to: SiteAdmin
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: on
-developer_key_support_includes:
-  state: hidden
-  display_name: Developer Key Include Parameter Support
-  description: Provides a flag on the Developer Key to support Include Parameters on API requests
-  applies_to: SiteAdmin
 disable_graphql_authentication:
   state: hidden
   display_name: Disable authentication for GraphQL
@@ -227,16 +208,6 @@ lti_migration_info:
       state: allowed_on
     ci:
       state: allowed_on
-lti_multiple_assignment_deep_linking:
-  state: hidden
-  display_name: LTI Multiple Assignment Deep Linking
-  description: If enabled, allows multiple deep link support for assignments and modules.
-  applies_to: RootAccount
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
 lti_overwrite_user_url_input_select_content_dialog:
   state: on
   applies_to: RootAccount
@@ -356,7 +327,7 @@ lti_variable_expansions_use_group_course_as_course:
   state: hidden
   shadow: true
   applies_to: RootAccount
-  display_name: 'LTI Variable Expansions: Use Group''s Course as Course'
+  display_name: "LTI Variable Expansions: Use Group's Course as Course"
   description: >-
     If enabled, if an LTI tool is launched in the context of Course-based Group (Group within a Course), Course-related LTI variable expansions will use
     the Group's Course as the Course. If disabled, legacy behavior will apply -- Course-related LTI variable expansions will only apply when the Course
@@ -381,7 +352,7 @@ platform_notification_service:
   applies_to: RootAccount
   display_name: Enable Platform Notification Service
   description: >-
-    When on, 1Edtech Platform Notfication service (used to subscribe tools for notices, list existing notice handlers, notify subscribed tools, etc.) will
+    When on, 1Edtech Platform Notification service (used to subscribe tools for notices, list existing notice handlers, notify subscribed tools, etc.) will
     be enabled.
   environments:
     development:

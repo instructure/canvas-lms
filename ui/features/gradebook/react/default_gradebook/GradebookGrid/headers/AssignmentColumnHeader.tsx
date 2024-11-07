@@ -34,6 +34,7 @@ import {Text} from '@instructure/ui-text'
 import type {CamelizedAssignment, PartialStudent} from '@canvas/grading/grading.d'
 import {showMessageStudentsWithObserversModal} from '../../../shared/MessageStudentsWithObserversModal'
 import {MSWLaunchContext} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
+import useStore from '../../stores'
 
 const {Separator: MenuSeparator, Item: MenuItem, Group: MenuGroup} = Menu as any
 
@@ -95,6 +96,7 @@ export type AssignmentColumnHeaderProps = {
     onSelect: (onExited: any) => void
   }
   reuploadSubmissionsAction: any
+  rubricAssessmentImportsExportsEnabled: boolean
   setDefaultGradeAction: {
     disabled: boolean
     onSelect: (cb: any) => Promise<void>
@@ -458,6 +460,20 @@ export default class AssignmentColumnHeader extends ColumnHeader<
         {this.props.postGradesAction.enabledForUser && (
           <MenuItem onSelect={this.showGradePostingPolicy}>
             {I18n.t('Grade Posting Policy')}
+          </MenuItem>
+        )}
+
+        {this.props.rubricAssessmentImportsExportsEnabled && (
+          <MenuItem onSelect={() => {}}>{I18n.t('Bulk Download Rubrics')}</MenuItem>
+        )}
+        {this.props.rubricAssessmentImportsExportsEnabled && (
+          <MenuItem
+            onSelect={() => {
+              const {toggleRubricAssessmentImportTray} = useStore.getState()
+              toggleRubricAssessmentImportTray(true, this.props.assignment)
+            }}
+          >
+            {I18n.t('Import Rubrics')}
           </MenuItem>
         )}
       </Menu>

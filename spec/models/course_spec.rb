@@ -8311,4 +8311,38 @@ describe Course do
       expect(dates).to include(context_module_unlock_at_date.to_date)
     end
   end
+
+  describe "#get_assignment_ids_from_module_items" do
+    let(:course) { Course.create }
+    let(:context_module) { ContextModule.create(course:) }
+    let(:assignment) { assignment_model(course:) }
+    let(:module_item) { context_module.add_item(assignment) }
+
+    it "returns the assignment from the module item" do
+      expect(course.get_assignment_ids_from_module_items([module_item.id])).to eq([assignment.id])
+    end
+
+    it "returns nil if module_items is nil" do
+      expect(course.get_assignment_ids_from_module_items(nil)).to be_nil
+    end
+  end
+
+  describe "#get_assignment_ids_from_modules" do
+    let(:course) { Course.create }
+    let(:context_module) { ContextModule.create(course:) }
+    let(:assignment) { assignment_model(course:) }
+    let(:export) { ContentExport.create(course:) }
+
+    before do
+      context_module.add_item(assignment)
+    end
+
+    it "returns the assignment from the module" do
+      expect(course.get_assignment_ids_from_modules([context_module.id])).to eq([assignment.id])
+    end
+
+    it "returns nil if modules is nil" do
+      expect(course.get_assignment_ids_from_modules(nil)).to be_nil
+    end
+  end
 end

@@ -2637,33 +2637,35 @@ class Attachment < ActiveRecord::Base
   end
 
   def calculate_words
-    word_count_regex = /\S+/
-    @word_count ||= if mime_class == "pdf"
-                      reader = PDF::Reader.new(self.open)
-                      reader.pages.sum do |page|
-                        page.text.scan(word_count_regex).count
+    MemoryLimit.apply(Setting.get("attachment_calculate_words_memory_limit", 4.gigabytes.to_s).to_i) do
+      word_count_regex = /\S+/
+      @word_count ||= if mime_class == "pdf"
+                        reader = PDF::Reader.new(self.open)
+                        reader.pages.sum do |page|
+                          page.text.scan(word_count_regex).count
+                        end
+                      elsif [
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        "application/x-docx"
+                      ].include?(mimetype)
+                        doc = Docx::Document.open(self.open)
+                        doc.paragraphs.sum do |paragraph|
+                          paragraph.text.scan(word_count_regex).count
+                        end
+                      elsif [
+                        "application/rtf",
+                        "text/rtf"
+                      ].include?(mimetype)
+                        parser = RubyRTF::Parser.new(unknown_control_warning_enabled: false)
+                        parser.parse(self.open.read).sections.sum do |section|
+                          section[:text].scan(word_count_regex).count
+                        end
+                      elsif mime_class == "text"
+                        open.read.scan(word_count_regex).count
+                      else
+                        0
                       end
-                    elsif [
-                      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                      "application/x-docx"
-                    ].include?(mimetype)
-                      doc = Docx::Document.open(self.open)
-                      doc.paragraphs.sum do |paragraph|
-                        paragraph.text.scan(word_count_regex).count
-                      end
-                    elsif [
-                      "application/rtf",
-                      "text/rtf"
-                    ].include?(mimetype)
-                      parser = RubyRTF::Parser.new(unknown_control_warning_enabled: false)
-                      parser.parse(self.open.read).sections.sum do |section|
-                        section[:text].scan(word_count_regex).count
-                      end
-                    elsif mime_class == "text"
-                      open.read.scan(word_count_regex).count
-                    else
-                      0
-                    end
+    end
   rescue => e
     # If there is an error processing the file just log the error and return 0
     Canvas::Errors.capture_exception(:word_count, e, :info)

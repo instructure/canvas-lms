@@ -17,19 +17,19 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import {Button} from '@instructure/ui-buttons'
-import {TextInput} from '@instructure/ui-text-input'
-import {Heading} from '@instructure/ui-heading'
-import {View} from '@instructure/ui-view'
-import {Flex} from '@instructure/ui-flex'
-import {Checkbox} from '@instructure/ui-checkbox'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {useNewLogin} from '../context/NewLoginContext'
+import OtpForm from '../shared/OtpForm'
 import SSOButtons from '../shared/SSOButtons'
 import SignInLinks from '../shared/SignInLinks'
-import OtpForm from '../shared/OtpForm'
+import {Button} from '@instructure/ui-buttons'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
+import {TextInput} from '@instructure/ui-text-input'
+import {View} from '@instructure/ui-view'
 import {performSignIn} from '../services'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {useNewLogin} from '../context/NewLoginContext'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('new_login')
 
@@ -43,6 +43,7 @@ const SignIn = () => {
     setOtpRequired,
     loginHandleName,
     authProviders,
+    isPreviewMode,
   } = useNewLogin()
 
   const [username, setUsername] = useState('')
@@ -59,6 +60,8 @@ const SignIn = () => {
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
+    if (isPreviewMode) return
 
     if (!validateForm()) {
       showFlashAlert({
@@ -94,94 +97,83 @@ const SignIn = () => {
   }
 
   const handleUsernameChange = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
+    if (isPreviewMode) return
     setUsername(value)
   }
 
   const handlePasswordChange = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
+    if (isPreviewMode) return
     setPassword(value)
   }
 
-  if (otpRequired) {
+  if (otpRequired && !isPreviewMode) {
     return <OtpForm />
   }
 
   return (
     <Flex direction="column" gap="large">
-      <Flex.Item overflowY="visible">
-        <Heading level="h2" as="h1">
-          {I18n.t('Welcome to Canvas LMS')}
-        </Heading>
-      </Flex.Item>
+      <Heading level="h2" as="h1">
+        {I18n.t('Welcome to Canvas LMS')}
+      </Heading>
 
       {authProviders && authProviders.length > 0 && (
-        <Flex.Item overflowY="visible">
-          <Flex direction="column" gap="large">
-            <Flex.Item overflowY="visible">
-              <SSOButtons />
-            </Flex.Item>
+        <Flex direction="column" gap="large">
+          <SSOButtons />
 
-            <Flex.Item overflowY="visible">
-              <View as="hr" borderWidth="small none none none" margin="small none" />
-            </Flex.Item>
-          </Flex>
-        </Flex.Item>
+          <View as="hr" borderWidth="small none none none" margin="small none" />
+        </Flex>
       )}
 
-      <Flex.Item overflowY="visible">
-        <form onSubmit={handleLogin}>
-          <Flex direction="column" gap="large">
-            <Flex.Item overflowY="visible">
-              <Flex direction="column" gap="small">
-                <Flex.Item overflowY="visible">
-                  <TextInput
-                    id="username"
-                    renderLabel={loginHandleName}
-                    type="text"
-                    value={username}
-                    onChange={handleUsernameChange}
-                    autoComplete="username"
-                  />
-                </Flex.Item>
+      <form onSubmit={handleLogin}>
+        <Flex direction="column" gap="large">
+          <Flex direction="column" gap="small">
+            <TextInput
+              id="username"
+              renderLabel={loginHandleName}
+              type="text"
+              value={username}
+              onChange={handleUsernameChange}
+              autoComplete="username"
+              disabled={isUiActionPending}
+            />
 
-                <Flex.Item overflowY="visible">
-                  <TextInput
-                    id="password"
-                    renderLabel={I18n.t('Password')}
-                    type="password"
-                    value={password}
-                    onChange={handlePasswordChange}
-                    autoComplete="current-password"
-                  />
-                </Flex.Item>
+            <TextInput
+              id="password"
+              renderLabel={I18n.t('Password')}
+              type="password"
+              value={password}
+              onChange={handlePasswordChange}
+              autoComplete="current-password"
+              disabled={isUiActionPending}
+            />
 
-                <Flex.Item overflowY="visible">
-                  <Checkbox
-                    label={I18n.t('Stay signed in')}
-                    checked={rememberMe}
-                    onChange={() => setRememberMe(!rememberMe)}
-                    inline={true}
-                  />
-                </Flex.Item>
-              </Flex>
+            <Flex.Item overflowY="visible" overflowX="visible">
+              <Checkbox
+                label={I18n.t('Stay signed in')}
+                checked={rememberMe}
+                onChange={() => setRememberMe(!rememberMe)}
+                inline={true}
+                disabled={isUiActionPending}
+              />
             </Flex.Item>
+          </Flex>
 
-            <Flex.Item overflowY="visible">
-              <Button
-                type="submit"
-                color="primary"
-                display="block"
-                disabled={!formValid || isUiActionPending}
-              >
-                {I18n.t('Sign In')}
-              </Button>
-            </Flex.Item>
+          <Flex direction="column" gap="small">
+            <Button
+              type="submit"
+              color="primary"
+              display="block"
+              disabled={!formValid || isUiActionPending}
+            >
+              {I18n.t('Sign In')}
+            </Button>
 
-            <Flex.Item overflowY="visible">
+            <Flex.Item align="center">
               <SignInLinks />
             </Flex.Item>
           </Flex>
-        </form>
-      </Flex.Item>
+        </Flex>
+      </form>
     </Flex>
   )
 }

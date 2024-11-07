@@ -441,6 +441,9 @@ class DiscussionTopicsController < ApplicationController
         }
         if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :read) && @js_env&.dig(:COURSE_ID).blank?
           hash[:COURSE_ID] = @context.id.to_s
+          set_section_list_js_env
+          hash[:VALID_DATE_RANGE] = CourseDateRange.new(@context)
+          hash[:HAS_GRADING_PERIODS] = @context.grading_periods?
         end
         conditional_release_js_env(includes: :active_rules)
         append_sis_data(hash)
@@ -538,8 +541,7 @@ class DiscussionTopicsController < ApplicationController
     }
 
     usage_rights_required = @context.try(:usage_rights_required?)
-    include_usage_rights = usage_rights_required &&
-                           @context.root_account.feature_enabled?(:usage_rights_discussion_topics)
+    include_usage_rights = usage_rights_required
     course_published = if @context.is_a?(Course)
                          @context.published?
                        elsif @context.is_a?(Group) && @context.context.is_a?(Course)
@@ -612,7 +614,7 @@ class DiscussionTopicsController < ApplicationController
       CONTEXT_ID: @context.id,
       DISCUSSION_TOPIC: hash,
       GROUP_CATEGORIES: categories
-              .reject(&:student_organized?)
+              .reject { |c| c.student_organized? || c.non_collaborative? }
               .map { |category| { id: category.id, name: category.name } },
       HAS_GRADING_PERIODS: @context.grading_periods?,
       SECTION_LIST: sections.map { |section| { id: section.id, name: section.name } },
@@ -702,14 +704,20 @@ class DiscussionTopicsController < ApplicationController
     set_master_course_js_env_data(@topic, @context)
     conditional_release_js_env(@topic.assignment)
 
-    if @context.root_account.feature_enabled?(:discussion_create) && @context.feature_enabled?(:react_discussions_post)
-      @page_title = topic_page_title(@topic)
+    respond_to do |format|
+      if @context.root_account.feature_enabled?(:discussion_create) && @context.feature_enabled?(:react_discussions_post)
+        @page_title = topic_page_title(@topic)
 
-      js_bundle :discussion_topic_edit_v2
-      css_bundle :discussions_index, :learning_outcomes, :conditional_release_editor
-      render html: "", layout: (params[:embed] == "true") ? "mobile_embed" : true
-    else
-      render :edit, layout: (params[:embed] == "true") ? "mobile_embed" : true
+        js_bundle :discussion_topic_edit_v2
+        css_bundle :discussions_index, :learning_outcomes, :conditional_release_editor
+        format.html do
+          render html: "", layout: (params[:embed] == "true") ? "mobile_embed" : true
+        end
+      else
+        format.html do
+          render :edit, layout: (params[:embed] == "true") ? "mobile_embed" : true
+        end
+      end
     end
   end
 
@@ -773,6 +781,9 @@ class DiscussionTopicsController < ApplicationController
       }
       unless @context.is_a?(Group)
         env_hash[:context_rubric_associations_url] = context_url(@context, :context_rubric_associations_url)
+        env_hash[:VALID_DATE_RANGE] = CourseDateRange.new(@context)
+        env_hash[:HAS_GRADING_PERIODS] = @context.grading_periods?
+        set_section_list_js_env
       end
       if params[:entry_id] && (entry = @topic.discussion_entries.find_by(id: params[:entry_id]))
         entry = @topic.discussion_entries.find(params[:entry_id])
@@ -879,7 +890,6 @@ class DiscussionTopicsController < ApplicationController
                discussion_cache_key: @current_user &&
                  Base64.encode64("#{@current_user.uuid}vyfW=;[p-0?:{P_=HUpgraqe;njalkhpvoiulkimmaqewg")
              })
-
       unless @locked
         InstStatsd::Statsd.increment("discussion_topic.visit.redesign")
         InstStatsd::Statsd.count("discussion_topic.visit.entries.redesign", @topic.discussion_entries.count)
@@ -1561,8 +1571,7 @@ class DiscussionTopicsController < ApplicationController
         @topic = DiscussionTopic.find(@topic.id)
         @topic.broadcast_notifications(prior_version)
 
-        include_usage_rights = @context.root_account.feature_enabled?(:usage_rights_discussion_topics) &&
-                               @context.try(:usage_rights_required?)
+        include_usage_rights = @context.try(:usage_rights_required?)
 
         if is_new
           InstStatsd::Statsd.increment("discussion_topic.created")
@@ -1816,7 +1825,6 @@ class DiscussionTopicsController < ApplicationController
   end
 
   def set_default_usage_rights(attachment)
-    return unless @context.root_account.feature_enabled?(:usage_rights_discussion_topics)
     return unless @context.try(:usage_rights_required?)
     return if @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
 
@@ -1903,5 +1911,34 @@ class DiscussionTopicsController < ApplicationController
       { group:, topic: topics.find { |t| t.context == group } }
     end
     topics
+  end
+
+  def set_section_list_js_env
+    section_visibilities =
+      if @context.respond_to?(:course_section_visibility)
+        @context.course_section_visibility(@current_user)
+      else
+        :none
+      end
+
+    sections =
+      case section_visibilities
+      when :none
+        []
+      when :all
+        @context.course_sections.active.to_a
+      else
+        @context.course_sections.select { |s| s.active? && section_visibilities.include?(s.id) }
+      end
+
+    js_env SECTION_LIST: sections.map { |section|
+      {
+        id: section.id,
+        name: section.name,
+        start_at: section.start_at,
+        end_at: section.end_at,
+        override_course_and_term_dates: section.restrict_enrollments_to_section_dates
+      }
+    }
   end
 end

@@ -28,9 +28,6 @@ import {
 import {ToolbarColor, type ColorSpec} from '../../common/ToolbarColor'
 import {ToolbarAlignment} from './toolbar/ToolbarAlignment'
 import {ToolbarCorners} from './toolbar/ToolbarCorners'
-import {useScope} from '@canvas/i18n'
-
-const I18n = useScope('block-editor')
 
 export const GroupBlockToolbar = () => {
   const {
@@ -75,8 +72,7 @@ export const GroupBlockToolbar = () => {
   )
 
   const getCurrentBorderColor = () => {
-    if (props.Bordercolor) return props.borderColor
-    return window.getComputedStyle(document.documentElement).getPropertyValue('border-color')
+    return props.borderColor || '#00000000'
   }
 
   const getCurrentBackgroundColor = () => {
@@ -86,8 +82,10 @@ export const GroupBlockToolbar = () => {
   return (
     <Flex gap="small">
       <ToolbarColor
-        bgcolor={getCurrentBackgroundColor()}
-        bordercolor={getCurrentBorderColor()}
+        tabs={{
+          background: getCurrentBackgroundColor(),
+          border: getCurrentBorderColor(),
+        }}
         onChange={handleChangeColors}
       />
 

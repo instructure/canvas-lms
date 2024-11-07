@@ -259,8 +259,10 @@ module Types
       load_association(:root_entry)
     end
 
-    field :discussion_entry_versions_connection, Types::DiscussionEntryVersionType.connection_type, null: true
-    def discussion_entry_versions_connection
+    # Temporary fix, it should be properly paginated
+    field :discussion_entry_versions, [Types::DiscussionEntryVersionType], null: true
+
+    def discussion_entry_versions
       is_course_teacher = object.context.is_a?(Course) && object.context.user_is_instructor?(current_user)
       is_group_teacher = object.context.is_a?(Group) && object.context&.course&.user_is_instructor?(current_user)
       return nil unless is_course_teacher || is_group_teacher || object.user == current_user

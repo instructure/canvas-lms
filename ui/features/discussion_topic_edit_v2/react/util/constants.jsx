@@ -111,7 +111,6 @@ export const useShouldShowContent = (
 
   const shouldShowUsageRightsOption =
     ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_ATTACH &&
-    ENV?.FEATURES?.usage_rights_discussion_topics &&
     ENV?.USAGE_RIGHTS_REQUIRED &&
     ENV?.PERMISSIONS?.manage_files
 

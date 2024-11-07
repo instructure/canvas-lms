@@ -32,7 +32,6 @@ module Lti
       before_action :require_context_update_rights
       before_action :require_tool
       before_action :set_extra_csp_frame_ancestor!
-      before_action :set_feature_flag
 
       def deep_linking_response
         Utils::InstStatsdUtils::Timing.track "lti.deep_linking.response" do
@@ -164,12 +163,6 @@ module Lti
         end
 
         render layout: "bare"
-      end
-
-      def set_feature_flag
-        js_env({
-                 deep_linking_use_window_parent: Account.site_admin.feature_enabled?(:deep_linking_use_window_parent)
-               })
       end
 
       def require_context_update_rights

@@ -299,14 +299,34 @@ class AuthenticationProvider
     end
 
     def download_discovery
+      discovery_url = self.discovery_url
+      download = discovery_url.present? && discovery_url_changed?
+
+      # infer the discovery url from the issuer if possible
+      if discovery_url.blank? && issuer_changed? && issuer.present?
+        download = true
+        discovery_url = issuer
+        discovery_url = discovery_url[0...-1] if discovery_url.end_with?("/")
+        discovery_url += "/.well-known/openid-configuration"
+      end
+
       return if discovery_url.blank?
-      return unless discovery_url_changed?
+      return unless download
 
       begin
         populate_from_discovery_url(discovery_url)
+        # we may have inferred the discovery url from the issuer, so
+        # make sure it's assigned
+        self.discovery_url = discovery_url
       rescue => e
-        ::Canvas::Errors.capture_exception(:oidc_discovery_refresh, e)
-        errors.add(:discovery_url, e.message)
+        # only record an error for an explicit discovery url
+        unless self.discovery_url.blank?
+          ::Canvas::Errors.capture_exception(:oidc_discovery_refresh, e)
+          # JSON parse errors can include an entire HTML document;
+          # don't show it all
+          message = e.is_a?(JSON::ParserError) ? t("Invalid JSON") : e.message
+          errors.add(:discovery_url, message)
+        end
       end
     end
 
@@ -364,7 +384,7 @@ class AuthenticationProvider
           if issuers.length < 20 && !issuers.include?(id_token["iss"])
             issuers << id_token["iss"]
           end
-          alg = id_token.alg&.to_sym
+          alg = id_token.alg&.to_s
           algs = settings["known_signature_algorithms"] ||= []
           algs << alg if algs.length < 20 && !algs.include?(alg)
           save! if changed?

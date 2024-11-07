@@ -145,6 +145,32 @@ RSpec.describe Mutations::CreateConversation do
     ).to eq "yo"
   end
 
+  it "does not send message to concluded users" do
+    concluded_student = User.create
+    concluded_teacher = User.create
+    student_enrollment = @course.enroll_student(concluded_student)
+    teacher_enrollment = @course.enroll_teacher(concluded_teacher)
+    student_enrollment.complete
+    teacher_enrollment.complete
+
+    result = run_mutation(
+      {
+        recipients: [
+          @course.asset_string
+        ],
+        body: "yo",
+        group_conversation: true,
+        context_code: @course.asset_string
+      },
+      @user
+    )
+    expect(result.dig("data", "createConversation", "errors")).to be_nil
+    conversation_id = result.dig("data", "createConversation", "conversations", 0, "conversation", "_id")
+    participants = Conversation.find(conversation_id).conversation_participants.pluck(:user_id)
+    expect(participants).not_to include(concluded_student.id)
+    expect(participants).not_to include(concluded_teacher.id)
+  end
+
   it "creates a conversation with an attachment" do
     new_user = User.create
     attachment = @user.conversation_attachments_folder.attachments.create!(filename: "somefile.doc", context: @user, uploaded_data: StringIO.new("test"))
@@ -195,7 +221,7 @@ RSpec.describe Mutations::CreateConversation do
     expect(result.dig("data", "createConversation", "conversations")).to be_nil
     expect(
       result.dig("data", "createConversation", "errors", 0, "message")
-    ).to eq "Unable to send messages to users in #{@course.name}"
+    ).to eq "Invalid recipients"
   end
 
   it "does not allow creating conversations in concluded courses for teachers" do

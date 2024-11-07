@@ -103,6 +103,21 @@ describe "Account Reports API", type: :request do
       assert_status(400)
     end
 
+    it "accepts a numeric enrollment term id in the request body" do
+      term_id = Account.default.enrollment_terms.pick(:id)
+      report = api_call(:post,
+                        "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}",
+                        { controller: "account_reports",
+                          action: "create",
+                          format: "json",
+                          account_id: @admin.account.id.to_s,
+                          report: @report.report_type },
+                        { parameters: { "enrollment_term_id" => term_id } },
+                        {},
+                        as: :json)
+      expect(report["parameters"]).to eq({ "enrollment_term_id" => term_id })
+    end
+
     it "accepts comma-separated enrollment_term_id param" do
       Account.default.enrollment_terms.create!
       report = api_call(:post,

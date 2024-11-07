@@ -123,6 +123,10 @@ class ContentTag < ActiveRecord::Base
   scope :active, -> { where(workflow_state: "active") }
   scope :not_deleted, -> { where("content_tags.workflow_state<>'deleted'") }
   scope :nondeleted, -> { not_deleted }
+  scope :content_type, ->(type) { where(content_type: type) }
+  scope :not_deleted_assignments, -> { content_type("Assignment").not_deleted }
+  scope :assignments_for_modules, ->(modules) { not_deleted_assignments.where(context_module_id: modules) }
+  scope :assignments_for_module_items, ->(module_items) { not_deleted_assignments.where(id: module_items) }
 
   attr_accessor :skip_touch
   attr_accessor :reassociate_external_tool
@@ -645,7 +649,7 @@ class ContentTag < ActiveRecord::Base
 
   scope :for_differentiable_quizzes, lambda { |user_ids, course_ids|
     if Account.site_admin.feature_enabled?(:selective_release_backend)
-      visible_quiz_ids = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students_in_courses(user_ids:, course_ids:).map(&:quiz_id)
+      visible_quiz_ids = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students(user_ids:, course_ids:).map(&:quiz_id)
       where(content_id: visible_quiz_ids, context_id: course_ids, context_type: "Course", content_type: ["Quiz", "Quizzes::Quiz"])
     else
       joins("JOIN #{Quizzes::QuizStudentVisibility.quoted_table_name} as qsv ON qsv.quiz_id = content_tags.content_id")
@@ -663,7 +667,7 @@ class ContentTag < ActiveRecord::Base
 
   scope :for_differentiable_assignments, lambda { |user_ids, course_ids|
     if Account.site_admin.feature_enabled?(:selective_release_backend)
-      visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students_in_courses(user_ids:, course_ids:).map(&:assignment_id)
+      visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids:, course_ids:).map(&:assignment_id)
       where(content_id: visible_assignment_ids, context_id: course_ids, context_type: "Course", content_type: "Assignment")
     else
       joins("JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv ON asv.assignment_id = content_tags.content_id")
@@ -683,7 +687,7 @@ class ContentTag < ActiveRecord::Base
     if Account.site_admin.feature_enabled?(:selective_release_backend)
       unfiltered_discussion_ids = where(content_type: "DiscussionTopic").pluck(:content_id)
       assignment_ids = DiscussionTopic.where(id: unfiltered_discussion_ids).where.not(assignment_id: nil).pluck(:assignment_id)
-      visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignment_visible_to_students_in_course(user_ids:, course_ids:, assignment_ids:).map(&:assignment_id)
+      visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids:, course_ids:, assignment_ids:).map(&:assignment_id)
       discussion_topic_ids = DiscussionTopic.where(assignment_id: visible_assignment_ids).pluck(:id)
       joins("JOIN #{DiscussionTopic.quoted_table_name} ON discussion_topics.id = content_tags.content_id
              AND content_tags.content_type = 'DiscussionTopic'")
@@ -710,7 +714,7 @@ class ContentTag < ActiveRecord::Base
     if Account.site_admin.feature_enabled?(:selective_release_backend) # TODO: I feel like this could be better
       unfiltered_page_ids = where(content_type: "WikiPage").pluck(:content_id)
       assignment_ids = WikiPage.where(id: unfiltered_page_ids).where.not(assignment_id: nil).pluck(:assignment_id)
-      visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignment_visible_to_students_in_course(user_ids:, course_ids:, assignment_ids:).map(&:assignment_id)
+      visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids:, course_ids:, assignment_ids:).map(&:assignment_id)
       page_ids = WikiPage.where(assignment_id: visible_assignment_ids).pluck(:id)
       joins("JOIN #{WikiPage.quoted_table_name} ON wiki_pages.id = content_tags.content_id
             AND content_tags.content_type = 'WikiPage'")

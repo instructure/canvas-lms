@@ -22,6 +22,12 @@ module AuthenticationMethods
   class AccessTokenError < RuntimeError
   end
 
+  class RevokedAccessTokenError < RuntimeError
+  end
+
+  class ExpiredAccessTokenError < RuntimeError
+  end
+
   class AccessTokenScopeError < RuntimeError
   end
 
@@ -142,8 +148,11 @@ module AuthenticationMethods
     token_string = AuthenticationMethods.access_token(request)
 
     if token_string
-      @access_token = AccessToken.authenticate(token_string)
-      raise AccessTokenError unless @access_token
+      @access_token = AccessToken.authenticate(token_string, load_pseudonym_from_access_token: true)
+
+      raise ExpiredAccessTokenError if @access_token&.expired?
+      raise RevokedAccessTokenError if @access_token&.deleted?
+      raise AccessTokenError unless @access_token&.usable?
 
       account = access_token_account(@domain_root_account, @access_token)
       raise AccessTokenError unless @access_token.authorized_for_account?(account)

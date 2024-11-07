@@ -50,6 +50,8 @@ module CanvasRails
     config.encoding = "utf-8"
     require "logging_filter"
     config.filter_parameters.concat LoggingFilter.filtered_parameters
+    config.action_dispatch.rescue_responses["AuthenticationMethods::RevokedAccessTokenError"] = 401
+    config.action_dispatch.rescue_responses["AuthenticationMethods::ExpiredAccessTokenError"] = 401
     config.action_dispatch.rescue_responses["AuthenticationMethods::AccessTokenError"] = 401
     config.action_dispatch.rescue_responses["AuthenticationMethods::AccessTokenScopeError"] = 401
     config.action_dispatch.rescue_responses["AuthenticationMethods::LoggedOutError"] = 401

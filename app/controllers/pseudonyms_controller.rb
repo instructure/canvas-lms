@@ -320,9 +320,9 @@ class PseudonymsController < ApplicationController
     end
 
     @pseudonym = @account.pseudonyms.build(user: @user)
-    return unless authorized_action(@pseudonym, @current_user, :create)
     return unless find_authentication_provider
     return unless update_pseudonym_from_params
+    return unless authorized_action(@pseudonym, @current_user, :create)
 
     @pseudonym.generate_temporary_password unless params[:pseudonym][:password]
     if Pseudonym.unique_constraint_retry { @pseudonym.save_without_session_maintenance }
@@ -434,9 +434,9 @@ class PseudonymsController < ApplicationController
       raise ActiveRecord::RecordNotFound unless @pseudonym.user_id == @user.id
     end
 
-    return unless authorized_action(@pseudonym, @current_user, [:update, :change_password])
     return unless find_authentication_provider
     return unless update_pseudonym_from_params
+    return unless authorized_action(@pseudonym, @current_user, [:update, :change_password])
 
     if @pseudonym.save_without_session_maintenance
       flash[:notice] = t "notices.account_updated", "Account updated!"

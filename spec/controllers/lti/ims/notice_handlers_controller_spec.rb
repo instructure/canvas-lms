@@ -60,24 +60,21 @@ describe Lti::IMS::NoticeHandlersController do
     let(:handler_url) { "https://valid.url" }
 
     describe "with a valid handler url" do
-      let(:body_overrides) { { notice_type:, handler: handler_url }.to_json }
+      let(:handler_object) { { notice_type:, handler: handler_url } }
+      let(:body_overrides) { handler_object.to_json }
 
       before do
         allow(Lti::PlatformNotificationService).to receive(:list_handlers).with(tool: cet).and_return(handlers)
         allow(Lti::PlatformNotificationService).to receive(:subscribe_tool_for_notice)
           .with(tool: cet, notice_type:, handler_url:)
-          .and_return(nil)
+          .and_return(handler_object)
       end
 
-      it "subscribes the tool for given notice and returns the correct JSON response" do
+      it "subscribes the tool for given notice and returns the created handler" do
         send_request
         expect(response).to have_http_status(:ok)
         expect(Lti::PlatformNotificationService).to have_received(:subscribe_tool_for_notice).with(tool: cet, notice_type:, handler_url:)
-        expect(response.parsed_body).to eq({
-                                             "client_id" => client_id,
-                                             "deployment_id" => deployment_id,
-                                             "notice_handlers" => handlers
-                                           })
+        expect(response.parsed_body).to eq(JSON.parse(handler_object.to_json))
       end
     end
 
@@ -89,18 +86,14 @@ describe Lti::IMS::NoticeHandlersController do
         allow(Lti::PlatformNotificationService).to receive(:list_handlers).with(tool: cet).and_return(handlers)
         allow(Lti::PlatformNotificationService).to receive(:unsubscribe_tool_for_notice)
           .with(tool: cet, notice_type:)
-          .and_return(nil)
+          .and_return({ notice_type:, handler: "" })
       end
 
-      it "unsubscribes the tool for given notice and returns the correct JSON response" do
+      it "unsubscribes the tool for given notice and returns an empty handler JSON response" do
         send_request
         expect(response).to have_http_status(:ok)
         expect(Lti::PlatformNotificationService).to have_received(:unsubscribe_tool_for_notice).with(tool: cet, notice_type:)
-        expect(response.parsed_body).to eq({
-                                             "client_id" => client_id,
-                                             "deployment_id" => deployment_id,
-                                             "notice_handlers" => handlers
-                                           })
+        expect(response.parsed_body).to eq({ "handler" => "", "notice_type" => notice_type })
       end
     end
 

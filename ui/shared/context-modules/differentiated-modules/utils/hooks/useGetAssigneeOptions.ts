@@ -63,6 +63,10 @@ export const useGetAssigneeOptions = ({
       showFlashError(I18n.t('An error occurred while fetching students'))
       setHasErrors(true)
     },
+    // Override the staleTime and cacheTime values to 15 minutes. This will make newly
+    // enrolled students available after few minutes of being added to the course
+    staleTime: 15 * (60 * 1000),
+    cacheTime: 15 * (60 * 1000),
   })
 
   const {data: groupsParsedResult, isFetching: isGroupsLoading} = useQuery({

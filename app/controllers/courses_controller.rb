@@ -2754,6 +2754,7 @@ class CoursesController < ApplicationController
     js_env(NEW_QUIZZES_MIGRATION: new_quizzes_migration_enabled?)
     js_env(NEW_QUIZZES_MIGRATION_DEFAULT: new_quizzes_migration_default)
     js_env(NEW_QUIZZES_MIGRATION_REQUIRED: new_quizzes_require_migration?)
+    js_env(NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS: new_quizzes_unattached_bank_migrations_enabled?)
   end
 
   def copy_course

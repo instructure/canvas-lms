@@ -20,7 +20,8 @@ import React from 'react'
 import classNames from 'classnames'
 import {Img} from '@instructure/ui-img'
 import {Link} from '@instructure/ui-link'
-import {View} from '@instructure/ui-view'
+import {View, type ViewOwnProps} from '@instructure/ui-view'
+import {useNewLogin} from '../context/NewLoginContext'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('new_login')
@@ -30,23 +31,24 @@ interface Props {
 }
 
 const InstructureLogo = ({className}: Props) => {
+  const {isPreviewMode, isUiActionPending} = useNewLogin()
+
+  const handleClick = (event: React.MouseEvent<ViewOwnProps>) => {
+    if (isPreviewMode || isUiActionPending) {
+      event.preventDefault()
+    }
+  }
+
   return (
     <View as="div" className={classNames(className)} textAlign="center">
-      <Link href="https://instructure.com" target="_blank" rel="external noreferrer">
-        <picture>
-          <source
-            media="(max-width: 48rem)"
-            srcSet={require('../assets/images/instructure-logo-dark.svg')}
-          />
-
-          <Img
-            width="7.9375rem"
-            height="1.125rem"
-            constrain="contain"
-            src={require('../assets/images/instructure-logo.svg')}
-            alt={I18n.t('Instructure Logo')}
-          />
-        </picture>
+      <Link href="https://instructure.com" target="_blank" rel="external" onClick={handleClick}>
+        <Img
+          width="7.9375rem"
+          height="1.125rem"
+          constrain="contain"
+          src={require('../assets/images/instructure-logo.svg')}
+          alt={I18n.t('Instructure Logo')}
+        />
       </Link>
     </View>
   )

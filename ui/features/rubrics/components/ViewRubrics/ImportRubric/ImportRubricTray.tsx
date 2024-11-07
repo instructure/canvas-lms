@@ -28,8 +28,8 @@ import {Alert} from '@instructure/ui-alerts'
 import SVGWrapper from '@canvas/svg-wrapper'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {ImportTable} from './ImportTable'
-import {type RubricImport} from '../../../types/Rubric'
+import {ImportTable} from '@canvas/rubrics/react/RubricImport'
+import {type RubricImport} from '@canvas/rubrics/react/types/rubric'
 
 const I18n = useI18nScope('rubrics-import')
 

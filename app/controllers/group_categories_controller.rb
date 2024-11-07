@@ -100,6 +100,7 @@ class GroupCategoriesController < ApplicationController
   include Api::V1::GroupCategory
   include Api::V1::Group
   include Api::V1::Progress
+  include GroupPermissionHelper
 
   SETTABLE_GROUP_ATTRIBUTES = %w[name description join_level is_public group_category avatar_attachment].freeze
 
@@ -169,7 +170,12 @@ class GroupCategoriesController < ApplicationController
   def show
     respond_to do |format|
       format.json do
-        if authorized_action(@group_category.context, @current_user, [:manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS])
+        if check_group_authorization(
+          context: @group_category.context,
+          current_user: @current_user,
+          action_category: :view,
+          non_collaborative: @group_category.non_collaborative?
+        )
           includes = ["progress_url"]
           includes.concat(params[:includes]) if params[:includes]
           render json: group_category_json(@group_category, @current_user, session, include: includes)
@@ -183,6 +189,12 @@ class GroupCategoriesController < ApplicationController
   #
   # @argument name [Required, String]
   #   Name of the group category
+  #
+  # @argument non_collaborative [Boolean]
+  #  Can only be set by users with the Differentiated Tag Add permission
+  #
+  #  If set to true, groups in this category will be only be visible to users with the
+  #  Differentiated Tag Manage permission.
   #
   # @argument self_signup [String, "enabled"|"restricted"]
   #   Allow students to sign up for a group themselves (Course Only).
@@ -221,7 +233,13 @@ class GroupCategoriesController < ApplicationController
   #
   # @returns GroupCategory
   def create
-    if authorized_action(@context, @current_user, [:manage_groups, :manage_groups_add])
+    non_collaborative_group_category = determine_non_collaborative_status_from_params(params)
+    if check_group_authorization(
+      context: @context,
+      current_user: @current_user,
+      action_category: :add,
+      non_collaborative: non_collaborative_group_category
+    )
       @group_category = @context.group_categories.build
       if populate_group_category_from_params
         if api_request?
@@ -290,7 +308,13 @@ class GroupCategoriesController < ApplicationController
   #
   # @returns Progress
   def import
-    if authorized_action(@context, @current_user, [:manage_groups, :manage_groups_add])
+    if check_group_authorization(
+      context: @context,
+      current_user: @current_user,
+      action_category: :add,
+      non_collaborative: @group_category.non_collaborative?
+    )
+
       # let teachers import into student created groups
       if @group_category.protected? && !@group_category.student_organized?
         return render(json: { "status" => "unauthorized" }, status: :unauthorized)
@@ -351,7 +375,13 @@ class GroupCategoriesController < ApplicationController
   #
   # @returns GroupCategory
   def update
-    if authorized_action(@context, @current_user, [:manage_groups, :manage_groups_manage])
+    if check_group_authorization(
+      context: @context,
+      current_user: @current_user,
+      action_category: :manage,
+      non_collaborative: @group_category.non_collaborative?
+    )
+
       @group_category ||= @context.group_categories.where(id: params[:category_id]).first
       if api_request?
         if populate_group_category_from_params
@@ -392,7 +422,13 @@ class GroupCategoriesController < ApplicationController
   #           -H 'Authorization: Bearer <token>'
   #
   def destroy
-    if authorized_action(@context, @current_user, [:manage_groups, :manage_groups_delete])
+    if check_group_authorization(
+      context: @context,
+      current_user: @current_user,
+      action_category: :delete,
+      non_collaborative: @group_category.non_collaborative?
+    )
+
       @group_category ||= @context.group_categories.where(id: params[:category_id]).first
       return render(json: { "status" => "not found" }, status: :not_found) unless @group_category
       return render(json: { "status" => "unauthorized" }, status: :unauthorized) if @group_category.protected?
@@ -421,7 +457,13 @@ class GroupCategoriesController < ApplicationController
   #
   # @returns [Group]
   def groups
-    if authorized_action(@context, @current_user, [:manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS])
+    if check_group_authorization(
+      context: @context,
+      current_user: @current_user,
+      action_category: :view,
+      non_collaborative: @group_category.non_collaborative?
+    )
+
       @groups = @group_category.groups.active.by_name.preload(:root_account)
       @groups = Api.paginate(@groups, self, api_v1_group_category_groups_url)
       render json: @groups.map { |g| group_json(g, @current_user, session) }
@@ -438,7 +480,13 @@ class GroupCategoriesController < ApplicationController
   #          -H 'Authorization: Bearer <token>'
   def export
     GuardRail.activate(:secondary) do
-      if authorized_action(@context, @current_user, [:manage_groups, :manage_groups_manage])
+      if check_group_authorization(
+        context: @context,
+        current_user: @current_user,
+        action_category: :manage,
+        non_collaborative: @group_category.non_collaborative?
+      )
+
         include_sis_id = @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis)
         csv_string = CSV.generate do |csv|
           section_names = @context.course_sections.select(:id, :name).index_by(&:id)
@@ -531,6 +579,17 @@ class GroupCategoriesController < ApplicationController
     search_params[:enrollment_type] = "student" if @context.is_a? Course
 
     @group_category ||= @context.group_categories.where(id: params[:group_category_id]).first
+    non_collaborative_group_category = @group_category.non_collaborative?
+    # We have additional permissions to view users inside of a non_collaborative group
+    if non_collaborative_group_category
+      return unless check_group_authorization(
+        context: @context,
+        current_user: @current_user,
+        action_category: :manage,
+        non_collaborative: true
+      )
+    end
+
     exclude_groups = value_to_boolean(params[:unassigned]) ? @group_category.groups.active.pluck(:id) : []
     search_params[:exclude_groups] = exclude_groups
 
@@ -647,7 +706,12 @@ class GroupCategoriesController < ApplicationController
   #
   # @returns GroupMembership | Progress
   def assign_unassigned_members
-    return unless authorized_action(@context, @current_user, [:manage_groups, :manage_groups_manage])
+    return unless check_group_authorization(
+      context: @context,
+      current_user: @current_user,
+      action_category: :manage,
+      non_collaborative: @group_category.non_collaborative?
+    )
 
     # option disabled for student organized groups or section-restricted
     # self-signup groups. (but self-signup is ignored for non-Course groups)
@@ -685,7 +749,13 @@ class GroupCategoriesController < ApplicationController
   end
 
   def clone_with_name
-    if authorized_action(get_category_context, @current_user, [:manage_groups, :manage_groups_add])
+    if check_group_authorization(
+      context: get_category_context,
+      current_user: @current_user,
+      action_category: :add,
+      non_collaborative: @group_category.non_collaborative?
+    )
+
       GroupCategory.transaction do
         group_category = GroupCategory.active.find(params[:id])
         new_group_category = group_category.dup
@@ -757,5 +827,11 @@ class GroupCategoriesController < ApplicationController
                                    request2.media_type)
       file_obj
     end
+  end
+
+  def determine_non_collaborative_status_from_params(request_parameters)
+    has_non_collab_category = request_parameters.dig(:category, :non_collaborative)
+    accepted_values = ["1", "true", true]
+    accepted_values.include?(has_non_collab_category)
   end
 end

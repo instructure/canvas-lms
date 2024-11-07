@@ -27,95 +27,105 @@
     account ||= managed_accounts.first
     root_account = account.root_account if account
   end
+  login_history ||= nil
 %>
 <% js_bundle :user_name %>
   <fieldset id="name_and_email">
     <legend><%= t('titles.name_and_email', 'Name and Email') %></legend>
-    <table class="profile_table details user_details">
+    <table class="ic-table">
       <tr>
-        <th><%= before_label('full_name', 'Full Name') %></th>
-        <td class="name"><%=h @user.name %></td>
-      </tr>
-      <tr>
-        <th><%= before_label('display_name', 'Display Name') %></th>
-        <td class="short_name"><%=h @user.short_name %></td>
-      </tr>
-      <tr>
-        <th><%= before_label('sortable_name', 'Sortable Name') %></th>
-        <td class="sortable_name"><%=h @user.sortable_name %></td>
-      </tr>
-      <% if service_enabled?(:avatars) %>
-        <tr>
-          <th><%= before_label('profile_picture', 'Profile Picture') %></th>
-          <td>
-            <span class="avatar_image">
-              <%= avatar @user, url: nil %>
-            </span>
-            <% if can_do(@user, @current_user, :remove_avatar) %>
-              <a href="<%= update_avatar_image_url(@user.id) %>" class="remove_avatar_picture_link"><%= t('remove_avatar', 'Remove avatar picture') %></a>
-            <% elsif !session["reported_#{@user.id}"] %>
-              <a href="<%= report_avatar_image_url(@user.id) %>" class="report_avatar_picture_link"><%= t('report_naughtiness', 'Report inappropriate picture') %></a>
+        <td>
+          <table class="profile_table details user_details">
+            <tr>
+              <th><%= before_label('full_name', 'Full Name') %></th>
+              <td class="name"><%=h @user.name %></td>
+            </tr>
+            <tr>
+              <th><%= before_label('display_name', 'Display Name') %></th>
+              <td class="short_name"><%=h @user.short_name %></td>
+            </tr>
+            <tr>
+              <th><%= before_label('sortable_name', 'Sortable Name') %></th>
+              <td class="sortable_name"><%=h @user.sortable_name %></td>
+            </tr>
+            <% if service_enabled?(:avatars) %>
+              <tr>
+                <th><%= before_label('profile_picture', 'Profile Picture') %></th>
+                <td>
+                  <span class="avatar_image">
+                    <%= avatar @user, url: nil %>
+                  </span>
+                  <% if can_do(@user, @current_user, :remove_avatar) %>
+                    <a href="<%= update_avatar_image_url(@user.id) %>" class="remove_avatar_picture_link"><%= t('remove_avatar', 'Remove avatar picture') %></a>
+                  <% elsif !session["reported_#{@user.id}"] %>
+                    <a href="<%= report_avatar_image_url(@user.id) %>" class="report_avatar_picture_link"><%= t('report_naughtiness', 'Report inappropriate picture') %></a>
+                  <% end %>
+                </td>
+              </tr>
             <% end %>
-          </td>
-        </tr>
-      <% end %>
-      <% if @context.grants_right? @current_user, :read_email_addresses %>
-        <tr>
-          <th><%= before_label('default_email', 'Default Email') %></th>
-          <td style="word-break: break-all"><%=h @user.email %></td>
-        </tr>
-      <% end %>
-      <tr>
-        <th><%= before_label('time_zone', 'Time Zone') %></th>
-        <td class="time_zone"><%= @user.time_zone.try(:name) || t('none', "None") %></td>
-      </tr>
-      <% unless @read_only %>
-      <%# order important: the can_do(...) check filters out contexts that don't respond to root_account (e.g. User) %>
-        <% first = true %>
-        <td class="links" colspan="2" style="text-align: <%= direction('right') %>; font-size: 0.8em; padding-top: 10px;">
-          <% if @user.grants_right?(@current_user, :rename) %>
-            <% first = false %>
-            <a href="#" class="edit_user_link"><%= t('edit', 'Edit') %></a>
-          <% end %>
-
-          <% if @user != @current_user && @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account) %>
-            <%= "|" unless first %><% first = false %>
-            <% if @context && !@context.is_a?(Account) && !@context.is_a?(User) %>
-              <a href="<%= context_url(@context, :context_url, :become_user_id => @user.id) %>"> <%= t('Act as User') %></a>
-            <% else %>
-              <a href="<%= dashboard_url(:become_user_id => @user.id) %>"> <%= t('Act as User') %></a>
+            <% if @context.grants_right? @current_user, :read_email_addresses %>
+              <tr>
+                <th><%= before_label('default_email', 'Default Email') %></th>
+                <td style="word-break: break-all"><%=h @user.email %></td>
+              </tr>
             <% end %>
-          <% end %>
+            <tr>
+              <th><%= before_label('time_zone', 'Time Zone') %></th>
+              <td class="time_zone"><%= @user.time_zone.try(:name) || t('none', "None") %></td>
+            </tr>
+            <% unless @read_only %>
+            <%# order important: the can_do(...) check filters out contexts that don't respond to root_account (e.g. User) %>
+              <% first = true %>
+              <td class="links" colspan="2" style="text-align: <%= direction('right') %>; font-size: 0.8em; padding-top: 10px;">
+                <% if @user.grants_right?(@current_user, :rename) %>
+                  <% first = false %>
+                  <a href="#" class="edit_user_link"><%= t('edit', 'Edit') %></a>
+                <% end %>
 
-          <% if @user.grants_right?(@current_user, :merge) %>
-            <%= "|" unless first %><% first = false %>
-            <a class="merge_user_link" href="<%= user_admin_merge_url(@user.id) %>"><%= t('merge_with_another_user', 'Merge with Another User')%></a>
-            <% if UserMergeData.active.splitable.where(user_id: @user).shard(@user).exists? %>
-              | <a class="split_user_link" href="<%= user_admin_split_url(@user) %>"><%= t('Split Merged Users')%></a>
+                <% if @user != @current_user && @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account) %>
+                  <%= "|" unless first %><% first = false %>
+                  <% if @context && !@context.is_a?(Account) && !@context.is_a?(User) %>
+                    <a href="<%= context_url(@context, :context_url, :become_user_id => @user.id) %>"> <%= t('Act as User') %></a>
+                  <% else %>
+                    <a href="<%= dashboard_url(:become_user_id => @user.id) %>"> <%= t('Act as User') %></a>
+                  <% end %>
+                <% end %>
+
+                <% if @user.grants_right?(@current_user, :merge) %>
+                  <%= "|" unless first %><% first = false %>
+                  <a class="merge_user_link" href="<%= user_admin_merge_url(@user.id) %>"><%= t('merge_with_another_user', 'Merge with Another User')%></a>
+                  <% if UserMergeData.active.splitable.where(user_id: @user).shard(@user).exists? %>
+                    | <a class="split_user_link" href="<%= user_admin_split_url(@user) %>"><%= t('Split Merged Users')%></a>
+                  <% end %>
+                <% end %>
+
+                <% if @user.grants_right?(@current_user, :manage_user_details) %>
+                  <%= "|" unless first %><% first = false %>
+                  <div style="display: inline;" id="suspend-reactivate-link"></div>
+                <% end %>
+
+                <% if ((@context.is_a?(User) || @context.is_a?(Account)) && root_account) && @user.allows_user_to_remove_from_account?(root_account, @current_user) %>
+                  <%= "|" unless first %><% first = false %>
+                  <a href="<%= account_confirm_delete_user_url(root_account.id, @user.id) %>"><%= t('delete_from_account', 'Delete from %{account}', :account => root_account.name) %></a>
+                <% end %>
+
+                <% if @domain_root_account.grants_right?(@current_user, :manage_site_settings) %>
+                  <%= "|" unless first %><% first = false %>
+                  <a class="destroy_user_link" href="<%= api_v1_destroy_user_url(@user) %>"><%= t('Delete from ALL accounts') %></a>
+                <% end %>
+
+                <% if Canvas::CacheRegister.enabled? && @domain_root_account.grants_right?(@current_user, :manage_site_settings) %>
+                  <%= "|" unless first %><% first = false %>
+                  <a class="clear_user_cache_link" href="<%= api_v1_clear_cache_url(@user) %>"><%= t('Clear User Cache') %></a>
+                <% end %>
+              </td>
             <% end %>
-          <% end %>
-
-          <% if @user.grants_right?(@current_user, :manage_user_details) %>
-            <%= "|" unless first %><% first = false %>
-            <div style="display: inline;" id="suspend-reactivate-link"></div>
-          <% end %>
-
-          <% if ((@context.is_a?(User) || @context.is_a?(Account)) && root_account) && @user.allows_user_to_remove_from_account?(root_account, @current_user) %>
-            <%= "|" unless first %><% first = false %>
-            <a href="<%= account_confirm_delete_user_url(root_account.id, @user.id) %>"><%= t('delete_from_account', 'Delete from %{account}', :account => root_account.name) %></a>
-          <% end %>
-
-          <% if @domain_root_account.grants_right?(@current_user, :manage_site_settings) %>
-            <%= "|" unless first %><% first = false %>
-            <a class="destroy_user_link" href="<%= api_v1_destroy_user_url(@user) %>"><%= t('Delete from ALL accounts') %></a>
-          <% end %>
-
-          <% if Canvas::CacheRegister.enabled? && @domain_root_account.grants_right?(@current_user, :manage_site_settings) %>
-            <%= "|" unless first %><% first = false %>
-            <a class="clear_user_cache_link" href="<%= api_v1_clear_cache_url(@user) %>"><%= t('Clear User Cache') %></a>
-          <% end %>
+          </table>
         </td>
-      <% end %>
+        <td>
+          <%= render partial: "users/last_login", locals: { pseudonym: aggregated_login_details(@user.all_active_pseudonyms) } if login_history %>
+        </td>
+      </tr>
     </table>
   </fieldset>
 <% unless @read_only %>

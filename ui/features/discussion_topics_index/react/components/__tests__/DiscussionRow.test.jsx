@@ -265,9 +265,47 @@ describe('DiscussionRow', () => {
   it('renders "Delayed until" date label if discussion is delayed', () => {
     const delayedDate = new Date()
     delayedDate.setYear(delayedDate.getFullYear() + 1)
-    const discussion = {delayed_post_at: delayedDate.toISOString()}
+    const discussion = {delayed_post_at: delayedDate}
     render(<DiscussionRow {...makeProps({discussion})} />)
-    expect(screen.getAllByText('Not available until', {exact: false}).length).toBe(2)
+    expect(screen.getAllByText(`Not available until ${dateFormatter(delayedDate)}`)).toBeTruthy()
+  })
+
+  it('renders "Delayed until" date label for ungraded overrides', () => {
+    const delayedDate = new Date()
+    delayedDate.setYear(delayedDate.getFullYear() + 1)
+    const discussion = {
+      ungraded_discussion_overrides: [{assignment_override: {unlock_at: delayedDate}}],
+    }
+    render(<DiscussionRow {...makeProps({discussion})} />)
+    expect(screen.getAllByText(`Not available until ${dateFormatter(delayedDate)}`)).toBeTruthy()
+  })
+
+  it('renders "Delayed until" date label for ungraded overrides even if has discussion has "everyone" dates', () => {
+    const delayedDate = new Date()
+    delayedDate.setYear(delayedDate.getFullYear() + 1)
+    const delayedDate2 = new Date()
+    delayedDate2.setYear(delayedDate.getFullYear() + 1)
+    const discussion = {
+      delayed_post_at: delayedDate,
+      ungraded_discussion_overrides: [{assignment_override: {unlock_at: delayedDate2}}],
+    }
+    render(<DiscussionRow {...makeProps({discussion})} />)
+    expect(screen.getAllByText(`Not available until ${dateFormatter(delayedDate2)}`)).toBeTruthy()
+  })
+
+  it('renders the further "Delayed until" date for ungraded overrides', () => {
+    const delayedDate = new Date()
+    delayedDate.setYear(delayedDate.getFullYear() + 1)
+    const delayedDate2 = new Date()
+    delayedDate2.setYear(delayedDate.getFullYear() + 1)
+    const discussion = {
+      ungraded_discussion_overrides: [
+        {assignment_override: {unlock_at: delayedDate}},
+        {assignment_override: {unlock_at: delayedDate2}},
+      ],
+    }
+    render(<DiscussionRow {...makeProps({discussion})} />)
+    expect(screen.getAllByText(`Not available until ${dateFormatter(delayedDate2)}`)).toBeTruthy()
   })
 
   it('renders a last reply at date', () => {
@@ -299,6 +337,19 @@ describe('DiscussionRow', () => {
     }
     render(<DiscussionRow {...makeProps({discussion})} />)
     expect(screen.getAllByText(`Available until ${dateFormatter(futureDate)}`)).toBeTruthy()
+  })
+
+  it('renders available until for ungraded overrides even if has discussion has "everyone" dates', () => {
+    const futureDate = new Date()
+    futureDate.setYear(futureDate.getFullYear() + 1)
+    const futureDate2 = new Date()
+    futureDate2.setYear(futureDate2.getFullYear() + 2)
+    const discussion = {
+      lock_at: futureDate,
+      ungraded_discussion_overrides: [{assignment_override: {lock_at: futureDate2}}],
+    }
+    render(<DiscussionRow {...makeProps({discussion})} />)
+    expect(screen.getAllByText(`Available until ${dateFormatter(futureDate2)}`)).toBeTruthy()
   })
 
   it('renders the further available until date for ungraded overrides', () => {

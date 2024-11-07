@@ -106,6 +106,7 @@ RSpec.describe SecurityController, type: :request do
 
     it "contains the correct information" do
       messages = SecurityController.messages_supported
+      notice_types = SecurityController.notice_types_supported
 
       get "/api/lti/security/openid-configuration?registration_token=#{make_jwt}"
       expect(response).to have_http_status :ok
@@ -120,6 +121,7 @@ RSpec.describe SecurityController, type: :request do
       expect(lti_platform_configuration["product_family_code"]).to eq "canvas"
       expect(lti_platform_configuration["https://canvas.instructure.com/lti/account_name"]).to eq "Default Account"
       expect(lti_platform_configuration["messages_supported"]).to eq messages
+      expect(lti_platform_configuration["notice_types_supported"]).to eq notice_types
     end
 
     context "when the platform_notification_service feature flag is off" do

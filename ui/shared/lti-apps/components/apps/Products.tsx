@@ -17,8 +17,6 @@
  */
 
 import React from 'react'
-import {breakpoints} from '../../breakpoints'
-import {useMedia} from 'react-use'
 import type {Product, TagGroup, ToolsByDisplayGroup} from '../../models/Product'
 import {Flex} from '@instructure/ui-flex'
 import ProductCard from './ProductCard'
@@ -27,6 +25,7 @@ import {uniqueId} from 'lodash'
 import {Spinner} from '@instructure/ui-spinner'
 import {Pagination} from '@instructure/ui-pagination'
 import useDiscoverQueryParams from '../../hooks/useDiscoverQueryParams'
+import useBreakpoints from '../../hooks/useBreakpoints'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {CondensedButton} from '@instructure/ui-buttons'
@@ -45,10 +44,10 @@ export const Products = (props: {
   const {isFilterApplied, isLoading, isLoadingDisplayGroups, tools, displayGroups, numberOfPages} =
     props
   const {queryParams, setQueryParams, updateQueryParams} = useDiscoverQueryParams()
-  const isLarge = useMedia(`(min-width: ${breakpoints.large})`)
+  const {isDesktop, isMobile} = useBreakpoints()
 
   const renderProducts = (products: Product[]) => {
-    if (!isLarge) {
+    if (!isDesktop) {
       return (
         <Flex gap="medium" wrap="wrap" alignItems="stretch">
           {products.map((product: Product) => (
@@ -133,10 +132,14 @@ export const Products = (props: {
                 {group.tag_group.name}
               </Heading>
               <Flex justifyItems="space-between" margin="0 0 medium 0">
-                <View margin="x-small 0 small 0" padding="0 small 0 0">
+                <View margin="x-small 0 small 0" padding="0 small 0 0" maxWidth="70%">
                   {group.tag_group.description}
                 </View>
-                <CondensedButton onClick={() => setTag(group.tag_group)}>
+                <CondensedButton
+                  onClick={() => setTag(group.tag_group)}
+                  margin={isMobile ? '0 small 0 0' : '0'}
+                  aria-label={`See all ${group.tag_group.name}`}
+                >
                   {I18n.t('See All')}
                 </CondensedButton>
               </Flex>

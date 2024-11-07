@@ -171,12 +171,14 @@ export const AddressBook = ({
     setMenuItemCurrent(refCurrent)
   }, [])
 
-  // useEffect to call set on success when browser is safari with highlighted option text
+  const selectedItemName = selectedItem?.name
+
+  // read out every item for screenreader
   useEffect(() => {
-    if (isMenuOpen && /^apple\s/i.test(navigator?.vendor)) {
-      setOnSuccess(selectedItem?.name)
+    if (selectedItemName && isMenuOpen) {
+      setOnSuccess(selectedItemName)
     }
-  }, [isMenuOpen, selectedItem, setOnSuccess])
+  }, [isMenuOpen, selectedItemName, setOnSuccess])
 
   // Update width to match componentViewRef width
   useEffect(() => {
@@ -201,8 +203,10 @@ export const AddressBook = ({
 
   // Reset selected item when data changes
   useEffect(() => {
-    if (isSubMenuSelection) setSelectedItem(data[0])
-  }, [data, isSubMenuSelection])
+    if (isSubMenuSelection && isMenuOpen) {
+      setSelectedItem(data[0])
+    }
+  }, [data, isSubMenuSelection, isMenuOpen])
 
   // Limit amount of selected tags and close menu when limit reached
   useEffect(() => {
@@ -324,7 +328,9 @@ export const AddressBook = ({
           isKeyboardFocus={focusType === KEYBOARD_FOCUS_TYPE}
           observerEnrollments={observerEnrollments}
           isOnObserverSubmenu={isOnObserverSubmenu}
-          pronouns =  {ENV?.SETTINGS?.can_add_pronouns && itemType === USER_TYPE ? menuItem.pronouns : null}
+          pronouns={
+            ENV?.SETTINGS?.can_add_pronouns && itemType === USER_TYPE ? menuItem.pronouns : null
+          }
         >
           {menuItemName}
         </AddressBookItem>
@@ -608,6 +614,7 @@ export const AddressBook = ({
                     .map(u => `address-book-label-${u?.id}-${u?.itemType}`)
                     .join(' ')}`}
                   aria-autocomplete="list"
+                  autoComplete="off"
                   inputRef={ref => {
                     textInputRef.current = ref
                   }}

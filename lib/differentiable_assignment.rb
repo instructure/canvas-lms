@@ -61,15 +61,15 @@ module DifferentiableAssignment
   def visible(conditions)
     case differentiable.class_name
     when "Assignment"
-      AssignmentVisibility::AssignmentVisibilityService.assignment_visible_to_students(user_ids: conditions[:user_id], assignment_id: conditions[:assignment_id])
+      AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: conditions[:user_id], assignment_ids: conditions[:assignment_id])
     when "ContextModule"
-      ModuleVisibility::ModuleVisibilityService.module_visible_to_students(user_ids: conditions[:user_id], context_module_id: conditions[:context_module_id])
+      ModuleVisibility::ModuleVisibilityService.modules_visible_to_students(user_ids: conditions[:user_id], context_module_ids: conditions[:context_module_id])
     when "WikiPage"
-      WikiPageVisibility::WikiPageVisibilityService.wiki_page_visible_to_students(user_ids: conditions[:user_id], wiki_page_id: conditions[:wiki_page_id])
+      WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students(user_ids: conditions[:user_id], wiki_page_ids: conditions[:wiki_page_id])
     when "DiscussionTopic", "Announcement"
-      UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topic_visible_to_students(user_ids: conditions[:user_id], discussion_topic_id: conditions[:discussion_topic_id])
+      UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible(user_ids: conditions[:user_id], discussion_topic_ids: conditions[:discussion_topic_id])
     else
-      QuizVisibility::QuizVisibilityService.quiz_visible_to_students(quiz_id: conditions[:quiz_id], user_ids: conditions[:user_id])
+      QuizVisibility::QuizVisibilityService.quizzes_visible_to_students(quiz_ids: conditions[:quiz_id], user_ids: conditions[:user_id])
     end
   end
 

@@ -29,8 +29,8 @@ module AddressBook
       super
     end
 
-    def known_in_context(context)
-      @service_tap.known_in_context(context)
+    def known_in_context(context, options = {})
+      @service_tap.known_in_context(context, options)
       super
     end
 

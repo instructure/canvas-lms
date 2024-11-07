@@ -562,6 +562,7 @@ class GradebooksController < ApplicationController
       re_upload_submissions_url: named_context_url(@context, :submissions_upload_context_gradebook_url, "{{ assignment_id }}"),
       restrict_quantitative_data: @context.restrict_quantitative_data?(@current_user),
       reorder_custom_columns_url: api_v1_custom_gradebook_columns_reorder_url(@context),
+      rubric_assessment_imports_exports_enabled: Rubric.rubric_assessment_import_export_enabled?(@context),
       sections: sections_json(visible_sections, @current_user, session, [], allow_sis_ids: true),
       setting_update_url: api_v1_course_settings_url(@context),
       settings: gradebook_settings(@context.global_id),

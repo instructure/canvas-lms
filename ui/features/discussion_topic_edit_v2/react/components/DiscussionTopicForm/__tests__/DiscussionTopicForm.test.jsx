@@ -393,7 +393,6 @@ describe('DiscussionTopicForm', () => {
 
     it('does not show usageRights when not enabled', () => {
       window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_ATTACH = true
-      window.ENV.FEATURES.usage_rights_discussion_topics = true
       window.ENV.USAGE_RIGHTS_REQUIRED = false
       window.ENV.PERMISSIONS.manage_files = true
 
@@ -403,7 +402,6 @@ describe('DiscussionTopicForm', () => {
 
     it('shows usageRights when enabled', () => {
       window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_ATTACH = true
-      window.ENV.FEATURES.usage_rights_discussion_topics = true
       window.ENV.USAGE_RIGHTS_REQUIRED = true
       window.ENV.PERMISSIONS.manage_files = true
 

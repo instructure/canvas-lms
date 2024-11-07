@@ -109,9 +109,9 @@ export const LtiAppsLayout = React.memo(() => {
               padding="large 0"
               href="/"
               renderTitle={
-                <Link style={{color: 'initial', textDecoration: 'initial'}} to="/">
+                <Text style={{color: 'initial', textDecoration: 'initial'}}>
                   {I18n.t('Discover')}
-                </Link>
+                </Text>
               }
               themeOverride={{defaultOverflowY: 'unset'}}
             >
@@ -120,9 +120,7 @@ export const LtiAppsLayout = React.memo(() => {
           )}
           <Tabs.Panel
             renderTitle={
-              <Link style={{color: 'initial', textDecoration: 'initial'}} to="/manage">
-                {I18n.t('Manage')}
-              </Link>
+              <Text style={{color: 'initial', textDecoration: 'initial'}}>{I18n.t('Manage')}</Text>
             }
             id="manage"
             padding="large x-small"

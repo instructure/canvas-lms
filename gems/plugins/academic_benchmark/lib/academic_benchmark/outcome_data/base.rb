@@ -41,8 +41,8 @@ module AcademicBenchmark::OutcomeData
       :base_download_dir,
       :common_core_guid,
       :content_export_id,
-      :content_migration,
       :content_migration_id,
+      :content_migration,
       :converter_class,
       :copy_options,
       :course_archive_download_url,
@@ -63,6 +63,7 @@ module AcademicBenchmark::OutcomeData
       :insert_into_module_id,
       :insert_into_module_position,
       :insert_into_module_type,
+      :is_discussion_checkpoints_enabled,
       :job_ids,
       :last_error,
       :master_course_export_id,
@@ -91,8 +92,8 @@ module AcademicBenchmark::OutcomeData
       :unzipped_file_path,
       :user_id,
       :valid_contexts,
-      :worker,
       :worker_class,
+      :worker,
       keyword_init: true
     )
 

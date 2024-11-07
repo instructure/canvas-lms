@@ -295,12 +295,18 @@ class Enrollment < ActiveRecord::Base
 
   scope :all_student, lambda {
                         eager_load(:course)
-                          .where("(enrollments.type = 'StudentEnrollment'
-              AND enrollments.workflow_state IN ('invited', 'active', 'completed')
-              AND courses.workflow_state IN ('available', 'completed')) OR
-              (enrollments.type = 'StudentViewEnrollment'
-              AND enrollments.workflow_state = 'active'
-              AND courses.workflow_state != 'deleted')")
+                          .where("
+                            (
+                              enrollments.type = 'StudentEnrollment'
+                              AND enrollments.workflow_state IN ('invited', 'active', 'completed')
+                            )
+                              OR
+                            (
+                              enrollments.type = 'StudentViewEnrollment'
+                              AND enrollments.workflow_state = 'active'
+                            )
+                          ")
+                          .merge(Course.active)
                       }
 
   scope :not_deleted, lambda {

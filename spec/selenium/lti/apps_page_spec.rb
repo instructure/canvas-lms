@@ -50,7 +50,7 @@ describe "Apps Page" do
 
       expect(f("#breadcrumbs")).to include_text("Discover")
 
-      f("#tab-manage > a").click
+      f("#tab-manage > span").click
 
       wait_for_ajaximations
       expect(f("#breadcrumbs")).to include_text("Manage")

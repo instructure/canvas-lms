@@ -99,9 +99,7 @@ describe('HideAssignmentGradesTray Api', () => {
     })
 
     it('consumers are required to handle when mutating rejects', async () => {
-      await expect(Api.hideAssignmentGrades(BAD_ASSIGNMENT_ID)).rejects.toThrow(
-        'GraphQL error: a graphql error'
-      )
+      await expect(Api.hideAssignmentGrades(BAD_ASSIGNMENT_ID)).rejects.toThrow('a graphql error')
     })
   })
 
@@ -115,7 +113,7 @@ describe('HideAssignmentGradesTray Api', () => {
     it('consumers are required to handle when mutating rejects', async () => {
       await expect(
         Api.hideAssignmentGradesForSections(BAD_ASSIGNMENT_ID, SECTION_IDS)
-      ).rejects.toThrow('GraphQL error: a graphql error')
+      ).rejects.toThrow('a graphql error')
     })
   })
 

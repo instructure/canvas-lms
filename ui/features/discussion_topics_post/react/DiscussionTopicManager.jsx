@@ -366,6 +366,7 @@ const DiscussionTopicManager = props => {
         imageUrl={errorShipUrl}
         errorSubject={I18n.t('Discussion Topic initial query error')}
         errorCategory={I18n.t('Discussion Topic Post Error Page')}
+        errorMessage={discussionTopicQuery.error}
       />
     )
   }
@@ -380,6 +381,7 @@ const DiscussionTopicManager = props => {
             mobile: {
               viewPortWidth: '100vw',
               padding: 'medium x-small 0',
+              isMobile: true,
             },
             desktop: {
               viewPortWidth: '480px',
@@ -404,7 +406,7 @@ const DiscussionTopicManager = props => {
                 >
                   <View
                     display="block"
-                    height={isModuleItem ? '85vh' : '90vh'}
+                    {...(!responsiveProps.isMobile && {height: isModuleItem ? '85vh' : '90vh'})}
                     padding={responsiveProps.padding}
                     overflowX="auto"
                     overflowY="auto"

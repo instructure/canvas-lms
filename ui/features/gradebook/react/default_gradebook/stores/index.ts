@@ -27,6 +27,9 @@ import finalGradeOverrides, {type FinalGradeOverrideState} from './finalGradeOve
 import {RequestDispatch} from '@canvas/network'
 import PerformanceControls from '../PerformanceControls'
 import type {FlashMessage} from '../gradebook.d'
+import rubricAssessmentImport, {
+  type RubricAssessmentImportState,
+} from './rubricAssessmentImportState'
 
 const defaultPerformanceControls = new PerformanceControls()
 
@@ -48,7 +51,8 @@ export type GradebookStore = State &
   StudentsState &
   AssignmentsState &
   FinalGradeOverrideState &
-  SisOverrideState
+  SisOverrideState &
+  RubricAssessmentImportState
 
 const store = create<GradebookStore>((set, get) => ({
   performanceControls: defaultPerformanceControls,
@@ -72,6 +76,8 @@ const store = create<GradebookStore>((set, get) => ({
   ...finalGradeOverrides(set, get),
 
   ...sisOverrides(set, get),
+
+  ...rubricAssessmentImport(set, get),
 }))
 
 export default store

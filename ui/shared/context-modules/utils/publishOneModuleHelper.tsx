@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom/client'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import ContextModulesPublishIcon from '../react/ContextModulesPublishIcon'
@@ -264,10 +264,19 @@ export function renderContextModulesPublishIcon(
 ) {
   const publishIcon = findModulePublishIcon(moduleId)
   if (publishIcon) {
+    const moduleElement = $(publishIcon).parents('.context_module')[0]
+    if (moduleElement) {
+      moduleElement.setAttribute('data-workflow-state', published ? 'active' : 'unpublished')
+    }
     const moduleName =
       publishIcon?.closest('.context_module')?.querySelector('.ig-header-title')?.textContent ||
       `module${moduleId}`
-    ReactDOM.render(
+    let root = publishIcon.reactRoot
+    if (root === undefined) {
+      root = ReactDOM.createRoot(publishIcon)
+      publishIcon.reactRoot = root
+    }
+    root?.render(
       <ContextModulesPublishIcon
         courseId={courseId}
         moduleId={moduleId}
@@ -275,8 +284,7 @@ export function renderContextModulesPublishIcon(
         isPublishing={isPublishing}
         published={published}
         loadingMessage={loadingMessage}
-      />,
-      publishIcon
+      />
     )
   }
 }

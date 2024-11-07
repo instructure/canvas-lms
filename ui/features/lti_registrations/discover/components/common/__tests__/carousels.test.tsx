@@ -23,7 +23,14 @@ import ProductCarousel from '../Carousels/ProductCarousel'
 import BadgeCarousel from '../Carousels/BadgeCarousel'
 import ImageCarousel from '../Carousels/ImageCarousel'
 
-import type {Product, Company, LtiDetail, Lti, Badges, Tag} from '../../../model/Product'
+import type {
+  Product,
+  Company,
+  LtiDetail,
+  Lti,
+  Badges,
+  Tag,
+} from '../../../../../../shared/lti-apps/models/Product'
 
 const company: Company = {
   id: 2,
@@ -57,6 +64,7 @@ const product: Product[] = [
     updated_at: '2024-01-01',
     tool_integration_configurations,
     lti_configurations,
+    integration_resources: {comments: null, resources: []},
     badges,
     screenshots: ['greatimage'],
     terms_of_service_url: 'google.com',
@@ -66,6 +74,22 @@ const product: Product[] = [
     tags,
   },
 ]
+
+beforeAll(() => {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: jest.fn().mockImplementation(query => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: jest.fn(), // deprecated
+      removeListener: jest.fn(), // deprecated
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+    })),
+  })
+})
 
 describe('Carousels render as expected', () => {
   const originalLocation = window.location
@@ -90,7 +114,16 @@ describe('Carousels render as expected', () => {
   })
 
   it('BadgeCarousel renders as expected', () => {
-    const {getByText} = render(<BadgeCarousel badges={product[0].badges} />)
+    const isMaxMobile = false
+    const isMaxTablet = true
+
+    const {getByText} = render(
+      <BadgeCarousel
+        isMaxMobile={isMaxMobile}
+        isMaxTablet={isMaxTablet}
+        badges={product[0].badges}
+      />
+    )
     expect(getByText('badge1')).toBeInTheDocument()
   })
 

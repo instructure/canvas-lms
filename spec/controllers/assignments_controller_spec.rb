@@ -2113,6 +2113,23 @@ describe AssignmentsController do
         expect(assigns[:_crumbs]).to include(["Quizzes", "/courses/#{@course.id}/quizzes", {}])
       end
     end
+
+    it "js_env GROUP_CATEGORIES excludes non_collaborative and student_organized categories regardless of :differentiation_tags ff state" do
+      Account.site_admin.enable_feature!(:differentiation_tags)
+
+      user_session(@teacher)
+      @course.group_categories.create!(name: "non_colaborative_category", non_collaborative: true)
+      @course.group_categories.create!(name: "student_organized_category", role: "student_organized")
+      regular_category = @course.group_categories.create!(name: "regular_category")
+
+      get :new, params: { course_id: @course.id }
+      expect(assigns[:js_env][:GROUP_CATEGORIES].pluck(:id)).to match_array [regular_category.id]
+
+      Account.site_admin.disable_feature!(:differentiation_tags)
+
+      get :new, params: { course_id: @course.id }
+      expect(assigns[:js_env][:GROUP_CATEGORIES].pluck(:id)).to match_array [regular_category.id]
+    end
   end
 
   describe "POST 'create'" do
@@ -2722,6 +2739,23 @@ describe AssignmentsController do
       @course.root_account.enable_feature!(:assignment_edit_enhancements_teacher_view)
       get "edit", params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:js_env][:COURSE_ID]).to be(@course.id)
+    end
+
+    it "js_env GROUP_CATEGORIES excludes non_collaborative and student_organized categories regardless of :differentiation_tags ff state" do
+      Account.site_admin.enable_feature!(:differentiation_tags)
+
+      user_session(@teacher)
+      @course.group_categories.create!(name: "non_colaborative_category", non_collaborative: true)
+      @course.group_categories.create!(name: "student_organized_category", role: "student_organized")
+      regular_category = @course.group_categories.create!(name: "regular_category")
+
+      get :edit, params: { course_id: @course.id, id: @assignment.id }
+      expect(assigns[:js_env][:GROUP_CATEGORIES].pluck(:id)).to match_array [regular_category.id]
+
+      Account.site_admin.disable_feature!(:differentiation_tags)
+
+      get :edit, params: { course_id: @course.id, id: @assignment.id }
+      expect(assigns[:js_env][:GROUP_CATEGORIES].pluck(:id)).to match_array [regular_category.id]
     end
   end
 

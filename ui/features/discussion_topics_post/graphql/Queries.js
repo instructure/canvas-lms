@@ -74,10 +74,8 @@ export const DISCUSSION_QUERY = gql`
         searchEntryCount(filter: $filter, searchTerm: $searchTerm)
         groupSet {
           ...GroupSet
-          groupsConnection {
-            nodes {
-              ...Group
-            }
+          groups {
+            ...Group
           }
         }
       }
