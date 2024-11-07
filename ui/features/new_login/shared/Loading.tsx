@@ -16,25 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {lazy} from 'react'
-import {LoginLayout} from '../layouts'
-import {NewLoginProvider} from '../context/NewLoginContext'
-import {Route} from 'react-router-dom'
+import React from 'react'
+import {Flex} from '@instructure/ui-flex'
+import {Spinner} from '@instructure/ui-spinner'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const SignIn = lazy(() => import('../pages/SignIn'))
-const ForgotPassword = lazy(() => import('../pages/ForgotPassword'))
+interface Props {
+  title?: string
+}
 
-export const NewLoginRoutes = (
-  <Route
-    path="/login/canvas"
-    element={
-      <NewLoginProvider>
-        <LoginLayout />
-      </NewLoginProvider>
-    }
-  >
-    <Route index={true} element={<SignIn />} />
-    <Route path="forgot-password" element={<ForgotPassword />} />
-    <Route path="*" element={<SignIn />} />
-  </Route>
-)
+const Loading = ({title}: Props) => {
+  const I18n = useI18nScope('main')
+
+  return (
+    <Flex justifyItems="center" alignItems="center">
+      <Spinner size="medium" renderTitle={title || I18n.t('Loading …')} />
+    </Flex>
+  )
+}
+
+export default Loading

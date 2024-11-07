@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Background from './Background'
-import React from 'react'
+import React, {Suspense} from 'react'
+import {Background, Loading} from './index'
 import classNames from 'classnames'
 import {View} from '@instructure/ui-view'
 
@@ -36,7 +36,7 @@ const ContentLayout = ({className, children}: Props) => (
       className={classNames(className, styles.contentLayout__wrapper)}
       background="primary"
     >
-      {children}
+      <Suspense fallback={<Loading renderTitle="Loading page …" />}>{children}</Suspense>
     </View>
 
     <Background className={styles.contentLayout__background} />

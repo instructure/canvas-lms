@@ -16,25 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {lazy} from 'react'
-import {LoginLayout} from '../layouts'
-import {NewLoginProvider} from '../context/NewLoginContext'
-import {Route} from 'react-router-dom'
+import React from 'react'
+import {Loading} from '../index'
+import {render, screen} from '@testing-library/react'
 
-const SignIn = lazy(() => import('../pages/SignIn'))
-const ForgotPassword = lazy(() => import('../pages/ForgotPassword'))
+describe('Loading Component', () => {
+  it('renders with default loading title', () => {
+    render(<Loading />)
+    expect(screen.getByTitle('Loading …')).toBeInTheDocument()
+  })
 
-export const NewLoginRoutes = (
-  <Route
-    path="/login/canvas"
-    element={
-      <NewLoginProvider>
-        <LoginLayout />
-      </NewLoginProvider>
-    }
-  >
-    <Route index={true} element={<SignIn />} />
-    <Route path="forgot-password" element={<ForgotPassword />} />
-    <Route path="*" element={<SignIn />} />
-  </Route>
-)
+  it('renders with a custom loading title', () => {
+    const customTitle = 'Fetching Data...'
+    render(<Loading title={customTitle} />)
+    expect(screen.getByTitle(customTitle)).toBeInTheDocument()
+  })
+})
