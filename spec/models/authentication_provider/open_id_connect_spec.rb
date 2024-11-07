@@ -194,6 +194,32 @@ describe AuthenticationProvider::OpenIDConnect do
         id_token = Canvas::Security.create_jwt(base_payload.dup, nil, "wrong_key")
         expect { subject.unique_id(double(params: { "id_token" => id_token }, options: { nonce: "nonce" })) }.to raise_error(OAuthValidationError)
       end
+
+      it "refreshes the keys if the kid is not found. once" do
+        id_token = Canvas::Security.create_jwt(base_payload.dup, nil, subject.client_secret)
+        tries = 1
+        parsed_token = Canvas::Security.decode_jwt(id_token, [:skip_verification])
+        allow(parsed_token).to receive(:verify!) do
+          tries += 1
+          raise JSON::JWK::Set::KidNotFound if tries == 2
+
+          true
+        end
+        allow(Canvas::Security).to receive(:decode_jwt).and_return(parsed_token)
+        expect(subject).to receive(:download_jwks).with(force: true)
+        expect(subject).to receive(:save!)
+        expect { subject.unique_id(double(params: { "id_token" => id_token }, options: { nonce: "nonce" })) }.not_to raise_error
+      end
+
+      it "fails if the key is still wrong" do
+        id_token = Canvas::Security.create_jwt(base_payload.dup, nil, subject.client_secret)
+        parsed_token = Canvas::Security.decode_jwt(id_token, [:skip_verification])
+        allow(parsed_token).to receive(:verify!).and_raise(JSON::JWK::Set::KidNotFound)
+        allow(Canvas::Security).to receive(:decode_jwt).and_return(parsed_token)
+        expect(subject).to receive(:download_jwks).with(force: true)
+        expect(subject).not_to receive(:save!)
+        expect { subject.unique_id(double(params: { "id_token" => id_token }, options: { nonce: "nonce" })) }.to raise_error(OAuthValidationError)
+      end
     end
   end
 
