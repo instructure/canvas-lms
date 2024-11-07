@@ -22,7 +22,7 @@ import {Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {Spinner} from '@instructure/ui-spinner'
+import {Loading} from './index'
 import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
 import {cancelOtpRequest, initiateOtpRequest, verifyOtpRequest} from '../services'
@@ -157,17 +157,14 @@ const OtpForm = ({className}: Props) => {
     }
   }
 
-  // TODO make sure this is styled to conform to Figma designs
   const loadingContent = (
-    <Flex justifyItems="center" alignItems="center">
-      <Spinner
-        renderTitle={
-          isRedirecting
-            ? I18n.t('Redirecting, please wait...')
-            : I18n.t('Loading page, please wait...')
-        }
-      />
-    </Flex>
+    <Loading
+      title={
+        isRedirecting
+          ? I18n.t('Redirecting, please wait...')
+          : I18n.t('Loading page, please wait...')
+      }
+    />
   )
 
   const otpFormContent = (
