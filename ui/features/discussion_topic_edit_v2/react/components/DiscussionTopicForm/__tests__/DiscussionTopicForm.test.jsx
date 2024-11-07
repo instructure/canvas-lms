@@ -443,7 +443,11 @@ describe('DiscussionTopicForm', () => {
       const document = setup({
         groupCategories: [{_id: '1', name: 'Mutant Power Training Group 1'}],
         isEditing: true,
-        currentDiscussionTopic: DiscussionTopic.mock({groupSet: GroupSet.mock(), canGroup: false, entryCounts: {repliesCount: 1}}),
+        currentDiscussionTopic: DiscussionTopic.mock({
+          groupSet: GroupSet.mock(),
+          canGroup: false,
+          entryCounts: {repliesCount: 1},
+        }),
       })
 
       expect(document.queryByTestId('group-category-not-editable')).toBeTruthy()
@@ -525,7 +529,7 @@ describe('DiscussionTopicForm', () => {
   describe('Disallow threaded replies', () => {
     it('disallow threaded replies checkbox is checked when discussion type is side comment and does not has threaded reply', () => {
       window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.has_threaded_replies = false
-      const {getByTestId} = setup({currentDiscussionTopic: {discussionType: "side_comment"}})
+      const {getByTestId} = setup({currentDiscussionTopic: {discussionType: 'side_comment'}})
 
       const checkbox = getByTestId('disallow_threaded_replies')
       expect(checkbox.checked).toBe(true)
@@ -533,7 +537,7 @@ describe('DiscussionTopicForm', () => {
 
     it('disallow threaded replies checkbox is disabled when discussion type is side comment and has threaded replies', () => {
       window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.has_threaded_replies = true
-      const {getByTestId} = setup({currentDiscussionTopic: {discussionType: "side_comment"}})
+      const {getByTestId} = setup({currentDiscussionTopic: {discussionType: 'side_comment'}})
 
       const checkbox = getByTestId('disallow_threaded_replies')
       expect(checkbox.disabled).toBe(true)
@@ -830,6 +834,25 @@ describe('DiscussionTopicForm', () => {
         expect(document.queryByLabelText('Delay Posting')).not.toBeInTheDocument()
         expect(document.queryByLabelText('Allow Participants to Comment')).not.toBeInTheDocument()
       })
+    })
+  })
+
+  describe('Special characters in RCE', () => {
+    const message = '<p><span>’</span></p>'
+
+    it('should be the original version if there is no user interaction', () => {
+      const onSubmit = jest.fn()
+      const document = setup({
+        onSubmit,
+        currentDiscussionTopic: DiscussionTopic.mock({
+          title: 'Test discussion',
+          message,
+        }),
+      })
+      const saveButton = document.getByText('Save')
+      saveButton.click()
+      expect(onSubmit).toHaveBeenCalled()
+      expect(onSubmit.mock.calls[0][0].message).toBe(message)
     })
   })
 })
