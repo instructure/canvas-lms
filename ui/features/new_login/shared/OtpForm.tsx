@@ -19,10 +19,9 @@
 import React, {useEffect, useState} from 'react'
 import classNames from 'classnames'
 import {Button} from '@instructure/ui-buttons'
-import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {Loading} from './index'
+import {Loading, RememberMeCheckbox} from './index'
 import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
 import {cancelOtpRequest, initiateOtpRequest, verifyOtpRequest} from '../services'
@@ -39,7 +38,6 @@ interface Props {
 const OtpForm = ({className}: Props) => {
   const {
     rememberMe,
-    setRememberMe,
     isUiActionPending,
     setIsUiActionPending,
     setOtpRequired,
@@ -196,12 +194,7 @@ const OtpForm = ({className}: Props) => {
             />
 
             <Flex.Item overflowY="visible" overflowX="visible">
-              <Checkbox
-                label={I18n.t('Stay signed in')}
-                checked={rememberMe}
-                onChange={() => setRememberMe(!rememberMe)}
-                inline={true}
-              />
+              <RememberMeCheckbox />
             </Flex.Item>
           </Flex>
 

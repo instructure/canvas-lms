@@ -21,9 +21,9 @@ import OtpForm from '../shared/OtpForm'
 import SSOButtons from '../shared/SSOButtons'
 import SignInLinks from '../shared/SignInLinks'
 import {Button} from '@instructure/ui-buttons'
-import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
+import {RememberMeCheckbox} from '../shared/index'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 import {performSignIn} from '../services'
@@ -36,7 +36,6 @@ const I18n = useI18nScope('new_login')
 const SignIn = () => {
   const {
     rememberMe,
-    setRememberMe,
     isUiActionPending,
     setIsUiActionPending,
     otpRequired,
@@ -148,13 +147,7 @@ const SignIn = () => {
             />
 
             <Flex.Item overflowY="visible" overflowX="visible">
-              <Checkbox
-                label={I18n.t('Stay signed in')}
-                checked={rememberMe}
-                onChange={() => setRememberMe(!rememberMe)}
-                inline={true}
-                disabled={isUiActionPending}
-              />
+              <RememberMeCheckbox />
             </Flex.Item>
           </Flex>
 
