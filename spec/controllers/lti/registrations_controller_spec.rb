@@ -352,6 +352,27 @@ describe Lti::RegistrationsController do
             end
           end
         end
+
+        context "with 'overlay' in include[] parameter" do
+          let(:url) { "/api/v1/accounts/#{account.id}/lti_registrations?include[]=overlay" }
+          let(:overlay) { lti_overlay_model(account:, registration:) }
+          let(:registration) { lti_registration_model(account:) }
+
+          before do
+            overlay
+          end
+
+          it "includes the overlay" do
+            subject
+            expect(response_data.first).to have_key("overlay")
+          end
+
+          it "only queries for overlays once" do
+            expect(Lti::Overlay).not_to receive(:find_in_site_admin)
+            expect(Lti::Overlay).not_to receive(:find_by)
+            subject
+          end
+        end
       end
 
       context "without user session" do
@@ -538,6 +559,21 @@ describe Lti::RegistrationsController do
       subject
       expect(response_json).to have_key(:configuration)
     end
+
+    context "with 'overlay' in include[] parameter" do
+      subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}?include[]=overlay" }
+
+      let(:overlay) { lti_overlay_model(account:, registration:) }
+
+      before do
+        overlay
+      end
+
+      it "includes the overlay" do
+        subject
+        expect(response_json).to have_key(:overlay)
+      end
+    end
   end
 
   describe "GET show_by_client_id", type: :request do
@@ -673,6 +709,8 @@ describe Lti::RegistrationsController do
 
     let_once(:registration) { lti_registration_model(account:) }
     let_once(:ims_registration) { lti_ims_registration_model(lti_registration: registration) }
+    let_once(:account_binding) { lti_registration_account_binding_model(registration:, account:) }
+    let_once(:overlay) { lti_overlay_model(account:, registration:) }
 
     before { ims_registration }
 
@@ -727,6 +765,21 @@ describe Lti::RegistrationsController do
     it "deletes the registration" do
       subject
       expect(registration.reload).to be_deleted
+    end
+
+    it "includes the account binding" do
+      subject
+      expect(response_json).to have_key(:account_binding)
+    end
+
+    it "includes the configuration" do
+      subject
+      expect(response_json).to have_key(:configuration)
+    end
+
+    it "includes the overlay" do
+      subject
+      expect(response_json).to have_key(:overlay)
     end
   end
 

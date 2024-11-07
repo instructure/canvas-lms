@@ -589,6 +589,102 @@ RSpec.describe Lti::Registration do
     end
   end
 
+  describe ".preload_overlays" do
+    subject { Lti::Registration.preload_overlays(registrations, account) }
+
+    let(:account) { account_model }
+    let(:registrations) { [] }
+    let(:overlay) { { title: "Test" } }
+
+    context "when account is nil" do
+      let(:account) { nil }
+
+      it "returns nil" do
+        expect(subject).to be_nil
+      end
+    end
+
+    context "when account is not root account" do
+      let(:root_account) { account_model }
+      let(:account) { account_model(parent_account: root_account) }
+
+      let(:registrations) { [lti_registration_model(account: root_account, overlay:)] }
+
+      it "preloads overlays for nearest root account" do
+        subject
+        expect(registrations).to all(have_attributes(overlay: be_present))
+      end
+    end
+
+    context "with account-level registrations" do
+      let(:registrations) do
+        [
+          lti_registration_model(account:, overlay:, name: "first"),
+          lti_registration_model(account:, overlay:, name: "second")
+        ]
+      end
+
+      it "preloads overlays on registrations" do
+        subject
+        expect(registrations).to all(have_attributes(overlay: be_present))
+      end
+    end
+
+    context "with site admin registrations" do
+      let(:registrations) do
+        [
+          lti_registration_model(account:, overlay:, name: "first"),
+          lti_registration_model(account: Account.site_admin, overlay:, name: "second")
+        ]
+      end
+
+      it "preloads overlays from site admin registrations" do
+        subject
+        expect(registrations).to all(have_attributes(overlay: be_present))
+      end
+
+      context "with sharding" do
+        specs_require_sharding
+
+        let(:account_registration) { @shard2.activate { lti_registration_model(account:, overlay:, name: "account") } }
+        let(:site_admin_registration) { Shard.default.activate { lti_registration_model(account: Account.site_admin, overlay:, name: "site admin") } }
+        let(:registrations) { [account_registration, site_admin_registration] }
+
+        it "preloads overlays from site admin registrations" do
+          @shard2.activate { subject }
+          expect(registrations).to all(have_attributes(overlay: be_present))
+        end
+      end
+    end
+  end
+
+  describe ".associate_overlays" do
+    subject { Lti::Registration.send :associate_overlays, registrations, overlays }
+
+    let(:registrations) { [lti_registration_model] }
+    let(:overlays) { [lti_overlay_model(registration: registrations.first)] }
+
+    context "when overlay has no matching registration" do
+      before do
+        overlays << lti_overlay_model
+      end
+
+      it "does not error" do
+        expect { subject }.not_to raise_error
+      end
+
+      it "associates overlays with registrations" do
+        subject
+        expect(registrations.first.overlay).to eq(overlays.first)
+      end
+    end
+
+    it "associates overlays with registrations" do
+      subject
+      expect(registrations.first.overlay).to eq(overlays.first)
+    end
+  end
+
   describe "#inherited?" do
     subject { registration.inherited_for?(account) }
 
