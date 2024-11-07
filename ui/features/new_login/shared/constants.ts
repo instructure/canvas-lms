@@ -16,20 +16,4 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {render} from '@testing-library/react'
-import {SSOButtons} from '..'
-import {MemoryRouter} from 'react-router-dom'
-import {NewLoginProvider} from '../../context/NewLoginContext'
-
-describe('SSOButtons', () => {
-  it('mounts without crashing', () => {
-    render(
-      <MemoryRouter>
-        <NewLoginProvider>
-          <SSOButtons />
-        </NewLoginProvider>
-      </MemoryRouter>
-    )
-  })
-})
+export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/

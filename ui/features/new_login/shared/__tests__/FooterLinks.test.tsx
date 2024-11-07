@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import {MemoryRouter} from 'react-router-dom'
-import {FooterLinks} from '../index'
+import {FooterLinks} from '..'
 import {NewLoginProvider} from '../../context/NewLoginContext'
 
 describe('FooterLinks', () => {

@@ -30,7 +30,7 @@ const Loading = ({title}: Props) => {
 
   return (
     <Flex justifyItems="center" alignItems="center">
-      <Spinner size="medium" renderTitle={title || I18n.t('Loading …')} />
+      <Spinner size="medium" delay={500} renderTitle={title || I18n.t('Loading …')} />
     </Flex>
   )
 }

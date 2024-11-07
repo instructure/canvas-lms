@@ -18,7 +18,7 @@
 
 import React from 'react'
 import classNames from 'classnames'
-import {LoginLogo} from './index'
+import {LoginLogo} from '.'
 import {View} from '@instructure/ui-view'
 import {useNewLogin} from '../context/NewLoginContext'
 

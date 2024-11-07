@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {LoginLogo} from '../index'
+import {LoginLogo} from '..'
 import {NewLoginProvider} from '../../context/NewLoginContext'
 
 describe('LoginLogo', () => {
