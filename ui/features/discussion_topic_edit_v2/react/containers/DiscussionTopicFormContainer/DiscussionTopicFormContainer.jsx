@@ -190,7 +190,11 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
     return instUINavEnabled() ? (
       <Flex margin={headerMargin} direction="column" as="div">
         <Flex.Item margin="0" overflow="hidden">
-          <Heading as="h1" level={breakpoints.ICEDesktop ? 'h1' : 'h2'} themeOverride={{h2FontWeight: 700}}>
+          <Heading
+            as="h1"
+            level={breakpoints.ICEDesktop ? 'h1' : 'h2'}
+            themeOverride={{h2FontWeight: 700}}
+          >
             {titleContent}
           </Heading>
         </Flex.Item>
@@ -279,7 +283,9 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
   }
 
   const handleBreadCrumbSetter = ({getCrumbs, setCrumbs}) => {
-    const discussionOrAnnouncement = isAnnouncement ? I18n.t('Announcements') : I18n.t('Discussions')
+    const discussionOrAnnouncement = isAnnouncement
+      ? I18n.t('Announcements')
+      : I18n.t('Discussions')
     const brUrlPart = isAnnouncement ? 'announcements' : 'discussion_topics'
     const crumbs = getCrumbs()
     const baseUrl = `${crumbs[0].url}/${brUrlPart}`
@@ -287,7 +293,10 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
     crumbs.push({name: discussionOrAnnouncement, url: baseUrl})
 
     if (isEditing && currentDiscussionTopic) {
-      crumbs.push({name: currentDiscussionTopic.title, url: `${baseUrl}/${currentDiscussionTopicId}`})
+      crumbs.push({
+        name: currentDiscussionTopic.title,
+        url: `${baseUrl}/${currentDiscussionTopicId}`,
+      })
     }
 
     crumbs.push({name: isEditing ? I18n.t('Edit') : I18n.t('Create new'), url: ''})
