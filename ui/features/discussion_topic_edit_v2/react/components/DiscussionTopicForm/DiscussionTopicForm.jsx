@@ -178,6 +178,16 @@ function DiscussionTopicForm({
 
   const [rceContent, setRceContent] = useState(currentDiscussionTopic?.message || '')
 
+  const isRceContentChanged = () => {
+    const originalContent = new DOMParser().parseFromString(
+      currentDiscussionTopic?.message || '',
+      'text/html'
+    ).body.innerHTML
+    const newContent = new DOMParser().parseFromString(rceContent, 'text/html').body.innerHTML
+
+    return originalContent !== newContent
+  }
+
   let sectionsDefault = []
   if (
     !currentDiscussionTopic?.isSectionSpecific ||
@@ -471,10 +481,16 @@ function DiscussionTopicForm({
   const canGroupDiscussion = !isEditing || currentDiscussionTopic?.canGroup || false
 
   const createSubmitPayload = shouldPublish => {
+    let message = currentDiscussionTopic?.message
+
+    if (isRceContentChanged()) {
+      message = rceContent
+    }
+
     const payload = {
       // Static payload properties
       title,
-      message: rceContent,
+      message,
       podcastEnabled: enablePodcastFeed,
       discussionType: isThreaded ? 'threaded' : 'not_threaded',
       podcastHasStudentPosts: includeRepliesInFeed,
