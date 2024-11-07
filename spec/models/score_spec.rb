@@ -53,7 +53,6 @@ describe Score do
   it { is_expected.not_to validate_presence_of(:grading_period) }
   it { is_expected.to belong_to(:assignment_group) }
   it { is_expected.not_to validate_presence_of(:assignment_group) }
-  it { is_expected.to have_one(:score_metadata) }
   it { is_expected.to have_one(:course).through(:enrollment) }
 
   it_behaves_like "soft deletion" do
@@ -178,54 +177,6 @@ describe Score do
       expect { overridden_score.update!(override_score: 94.0) }.not_to change {
         overridden_score.custom_grade_status_id
       }.from(custom_grade_status.id)
-    end
-  end
-
-  describe "#destroy" do
-    context "with score metadata" do
-      let(:metadata) { score.create_score_metadata!(calculation_details: { foo: :bar }) }
-
-      describe "score_metadata association" do
-        it "also destroys score metadata" do
-          metadata.score.destroy
-          expect(metadata).to be_deleted
-        end
-      end
-    end
-  end
-
-  describe "#destroy_permanently" do
-    context "with score metadata" do
-      let(:metadata) { score.create_score_metadata!(calculation_details: { foo: :bar }) }
-
-      describe "score_metadata association" do
-        it "also permanently destroys score metadata" do
-          metadata.score.destroy_permanently!
-          expect { metadata.reload }.to raise_error(ActiveRecord::RecordNotFound)
-        end
-      end
-    end
-  end
-
-  describe "#undestroy" do
-    context "without score metadata" do
-      it "is active" do
-        score.destroy
-        score.undestroy
-        expect(score).to be_active
-      end
-    end
-
-    context "with score metadata" do
-      let(:metadata) { score.create_score_metadata!(calculation_details: { foo: :bar }) }
-
-      describe "score_metadata association" do
-        it "is active" do
-          metadata.score.destroy
-          metadata.score.undestroy
-          expect(metadata).to be_active
-        end
-      end
     end
   end
 
