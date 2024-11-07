@@ -230,8 +230,6 @@ class AuthenticationProvider
     # used only from the refresher
     def metadata=(json)
       populate_from_discovery_json(json)
-      # force the JWKS to refresh
-      self.jwks = nil
     end
 
     def populate_from_discovery(json)
