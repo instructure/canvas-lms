@@ -65,6 +65,7 @@ QuotasView.prototype.initialize = function () {
   }
   this.on('success', this.submitSuccess)
   this.on('fail', this.submitFail)
+  this.model.on('change', this.render, this)
   return QuotasView.__super__.initialize.apply(this, arguments)
 }
 
