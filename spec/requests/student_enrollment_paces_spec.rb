@@ -146,6 +146,21 @@ describe "Student Enrollment Paces API" do
     it "returns a 401 if the user lacks permissions" do
       assert_grant_check { post api_v1_new_student_enrollment_pace_path(course, student_enrollment), params: { format: :json } }
     end
+
+    context "when course draft feature flag is enabled" do
+      before :once do
+        course.root_account.enable_feature!(:course_pace_draft_state)
+      end
+
+      it "can create a pace in an unpublished workflow_state" do
+        expect do
+          post api_v1_new_student_enrollment_pace_path(course, student_enrollment), params: { format: :json, workflow_state: "unpublished" }
+        end.to change {
+          student_enrollment.course_paces.reload.count
+        }.by(1)
+         .and not_change { Progress.count }
+      end
+    end
   end
 
   describe "update" do
@@ -185,6 +200,23 @@ describe "Student Enrollment Paces API" do
             exclude_weekends: false
           }
         }
+      end
+    end
+
+    context "when course draft feature flag is enabled" do
+      before :once do
+        course.root_account.enable_feature!(:course_pace_draft_state)
+      end
+
+      it "updates an unpublished pace and leave it as unpublished workflow_state" do
+        student_pace.workflow_state = "unpublished"
+        student_pace.save!
+
+        expect do
+          patch api_v1_patch_student_enrollment_pace_path(course, student_enrollment), params: { format: :json, workflow_state: "unpublished" }
+        end.to not_change { Progress.count }
+
+        expect(student_pace.reload.workflow_state).to eq("unpublished")
       end
     end
   end
