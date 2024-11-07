@@ -24,7 +24,7 @@ import useOutcomesRemove, {
   REMOVE_NOT_STARTED,
   REMOVE_PENDING,
 } from '../useOutcomesRemove'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import OutcomesContext from '../../contexts/OutcomesContext'
 import {deleteOutcomeMocks} from '../../../mocks/Management'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
