@@ -7607,6 +7607,7 @@ nn:
   copyright_and_license_information_must_be_provided_5feffaf: "Opphavsrett- og lisensinformasjon må vere på plass før filer kan publiserast."
   copyright_holder_386cc8b8: Rettshavar
   copyright_holder_66ee111: "Rettshavar:"
+  correct_7df6d875: Rett!
   correct_answer: "Svaret er korrekt."
   correct_answer_5a6a57d1: "Rett svar"
   correct_answer_comments_34ca671f: "Kommentarar til korrekt svar"
@@ -14214,6 +14215,7 @@ nn:
   input_event_location_39b0fbf3: "Legg inn stad for hending"
   input_event_title_1d4c8b10: "Legg inn tittel på hending"
   input_event_title_b2445e30: "Legg inn tittel på hending..."
+  insert_593145ef: "Set inn"
   insert_a_grade_change_record_when_the_periodic_mis_424139e5: "Sett inn ein vurderingsendringspost når den periodiske jobben MissingPolicyApplicator køyrer for ei innlevering."
   insert_above_row_de82d138: "Sett inn over %{row}"
   insert_below_row_55ed6f34: "Sett inn under %{row}"
@@ -15550,6 +15552,7 @@ nn:
   mastery_scale_saved_34c64b6b: "Meistringsskala lagra"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Resultatet reflekterer høgaste resultat i ei vurdert oppgåve eller quiz."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Resultatet reflekterer den siste vurderte oppgåva eller quizen."
+  matching_63f5af40: Matchar
   matching_left_side_900f860b: "Samsvarer venstre side"
   matching_right_side_920e71b2: "Samsvarer høgre side"
   math_ede93050: Matematikk
@@ -17788,6 +17791,7 @@ nn:
   multiple_are_marked_current_theme_because_the_same_3bdebbe1: "Fleire er merka 'Gjeldande tema' fordi dei same verdiane er lagra under ulike namn — f.eks. er dei like eins som dei som no er lagt til"
   multiple_ba5220cd: Fleire
   multiple_canvas_accounts_are_associated_with_cleve_c1739660: "Fleire Canvas-kontoar er knytta til Clever-distriktet %{district_id}"
+  multiple_choice_9f931ee6: Fleirvalsspørsmål
   multiple_dates_e3a122f7: "Fleire datoar"
   multiple_dropdowns_read_surrounding_text_f61274b3: "Fleirvalsmenyer, les ledetekst"
   multiple_due_dates_283dd861: "Fleire innlevringsfristar"
@@ -18198,6 +18202,7 @@ nn:
   no_placements_enabled_f705f28: "Ingen plasseringar er aktivert"
   no_points_possible_368669d: "Ingen moglege poeng"
   no_points_possible_72db3a55: "Ingen moglege poeng"
+  no_quizzes_found_c80c537a: "Ingen quizar funne"
   no_recent_announcements_abf950d5: "Ingen nylege kunngjeringar"
   no_restrictions_79a892d2: "Ingen restriksjonar"
   no_results_3cda4e72: "Ingen resultat"
@@ -27564,6 +27569,7 @@ nn:
     trophy_display_name: Trofé
   trophy_case_7a098a85: Trofékasse
   trophy_case_da3b25bb: Trofékasse
+  true_false_823761a9: Sann/Usann
   truncated_56b1a661: Avkorta
   trusted_account_669ba397: "Godkjent konto"
   trusted_account_url_e6200e41: "Godkjend konto-URL"
