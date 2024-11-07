@@ -750,4 +750,10 @@ class DiscussionEntry < ActiveRecord::Base
       self.edited_at = Time.now.utc
     end
   end
+
+  def highest_level_parent_or_self
+    return self if parent_entry.nil?
+
+    parent_entry.highest_level_parent_or_self
+  end
 end

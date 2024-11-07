@@ -756,6 +756,47 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:DISCUSSION][:TOPIC][:COURSE_SECTIONS].first["name"]).to eq(section1.name)
     end
 
+    context "js_env current_page is set correctly" do
+      before do
+        Account.site_admin.enable_feature! :react_discussions_post
+        user_session(@student)
+        course_topic
+        41.times do |i|
+          @topic.discussion_entries.create!(user: @teacher, message: (i + 1).to_s)
+        end
+        participant = @topic.participant(current_user: @student)
+        participant.sort_order = DiscussionTopicParticipant::SortOrder::ASC
+        participant.save!
+      end
+
+      it "top level entry are paginated" do
+        get "show", params: { course_id: @course.id, id: @topic.id, entry_id: @topic.discussion_entries.last.id }
+        expect(assigns[:js_env][:current_page]).to eq(2)
+        get "show", params: { course_id: @course.id, id: @topic.id, entry_id: @topic.discussion_entries.first.id }
+        expect(assigns[:js_env][:current_page]).to eq(0)
+      end
+
+      it "top level entry are paginated when desc" do
+        participant = @topic.participant(current_user: @student)
+        participant.sort_order = DiscussionTopicParticipant::SortOrder::DESC
+        participant.save!
+        get "show", params: { course_id: @course.id, id: @topic.id, entry_id: @topic.discussion_entries.last.id }
+        expect(assigns[:js_env][:current_page]).to eq(0)
+        get "show", params: { course_id: @course.id, id: @topic.id, entry_id: @topic.discussion_entries.first.id }
+        expect(assigns[:js_env][:current_page]).to eq(2)
+      end
+
+      it "child entry's parent page should be shown" do
+        @topic.discussion_entries.create!(user: @teacher, message: "42", parent_id: @topic.discussion_entries.last.id)
+        get "show", params: { course_id: @course.id, id: @topic.id, entry_id: @topic.discussion_entries.last.id }
+        expect(assigns[:js_env][:current_page]).to eq(2)
+
+        @topic.discussion_entries.create!(user: @teacher, message: "43", parent_id: @topic.discussion_entries.first.id)
+        get "show", params: { course_id: @course.id, id: @topic.id, entry_id: @topic.discussion_entries.last.id }
+        expect(assigns[:js_env][:current_page]).to eq(0)
+      end
+    end
+
     it "js_env COURSE_SECTIONS should have correct count" do
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")

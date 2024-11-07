@@ -160,18 +160,6 @@ const DiscussionTopicManager = props => {
   const urlParams = new URLSearchParams(window.location.search)
   const isPersistEnabled = urlParams.get('persist') === '1'
 
-  // Unread filter
-  // This introduces a double query for DISCUSSION_QUERY when filter changes
-  useEffect(() => {
-    if (filter === 'unread' && !unreadBefore) {
-      setUnreadBefore(new Date(Date.now()).toISOString())
-    } else if (filter !== 'unread') {
-      setUnreadBefore('')
-    }
-    setPageNumber(0)
-    setSearchPageNumber(0)
-  }, [filter, unreadBefore])
-
   // Reset search to 0 when inactive
   useEffect(() => {
     if (searchTerm && pageNumber !== 0) {
@@ -240,6 +228,25 @@ const DiscussionTopicManager = props => {
     fetchPolicy: searchTerm ? 'network-only' : 'cache-and-network',
     skip: waitForUnreadFilter,
   })
+
+  const [firstRequest, setFirstRequest] = useState(true)
+  useEffect(() => {
+    if (!discussionTopicQuery.data || !firstRequest) return
+    setFirstRequest(false)
+  }, [discussionTopicQuery])
+
+  // Unread filter
+  // This introduces a double query for DISCUSSION_QUERY when filter changes
+  useEffect(() => {
+    if (filter === 'unread' && !unreadBefore) {
+      setUnreadBefore(new Date(Date.now()).toISOString())
+    } else if (filter !== 'unread') {
+      setUnreadBefore('')
+    }
+    if (firstRequest && ENV.current_page !== 0) return
+    setPageNumber(0)
+    setSearchPageNumber(0)
+  }, [filter, unreadBefore])
 
   useEffect(() => {
     if (highlightEntryId && !isPersistEnabled) {
