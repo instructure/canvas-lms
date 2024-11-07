@@ -242,6 +242,7 @@ class AuthenticationProvider
     end
 
     def validate_signature(token)
+      tries ||= 1
       if token.alg&.to_sym == :none
         return "Token is not signed"
       elsif token.send(:hmac?)
@@ -252,7 +253,16 @@ class AuthenticationProvider
         token.verify!(jwks)
       end
 
+      save! if changed? && tries == 2
+
       nil
+    rescue JSON::JWK::Set::KidNotFound => e
+      tries += 1
+      if tries == 2
+        download_jwks(force: true)
+        retry
+      end
+      e.message
     rescue JSON::JWT::VerificationFailed => e
       e.message
     end
@@ -276,16 +286,18 @@ class AuthenticationProvider
 
     private
 
-    def download_jwks
+    def download_jwks(force: false)
       if jwks_uri.blank?
         self.jwks = nil
         return
       end
-      return unless settings["jwks"].nil? || jwks_uri_changed?
+      return unless force || settings["jwks"].nil? || jwks_uri_changed?
 
-      # just less than the discovery refresh interval, to ensure we pull it fresh
-      # but also avoid race conditions, etc.
-      self.jwks = self.class.jwks_cache.fetch(["jwks", jwks_uri].cache_key, expires: 55.minutes, race_condition_ttl: 12.hours) do
+      # this must be less than how often JwksRefresher runs (currently every 12 hours),
+      # but long enough that we aren't polling on every login request if there's a problem
+      # with their keys. Also add race_condition_ttl so we will have a value for a decent
+      # period of time
+      self.jwks = self.class.jwks_cache.fetch(["jwks", jwks_uri].cache_key, expires: 15.minutes, race_condition_ttl: 12.hours) do
         ::Canvas.timeout_protection("oidc_jwks_fetch") do
           CanvasHttp.get(jwks_uri) do |response|
             # raise error unless it's a 2xx
