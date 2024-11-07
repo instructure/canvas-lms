@@ -509,6 +509,7 @@ class User < ActiveRecord::Base
   validates :name, presence: { if: :require_presence_of_name }
   validates_locale :locale, :browser_locale, allow_nil: true
   validates :terms_of_use, acceptance: { if: :require_acceptance_of_terms, allow_nil: false }
+  validates :instructure_identity_id, uniqueness: true, allow_nil: true
   validates_each :self_enrollment_code do |record, attr, value|
     next unless record.require_self_enrollment_code
 
