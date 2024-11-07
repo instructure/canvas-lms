@@ -110,7 +110,7 @@ describe AuthenticationProvider::SAML::MetadataRefresher do
       expect(response).to receive(:is_a?).with(Net::HTTPNotModified).and_return(false)
       expect(response).to receive(:value)
       allow(response).to receive(:[]).with("ETag").and_return("NewETag")
-      expect(redis).to receive(:set).with("auth_provider_refresh_1_etag", "NewETag")
+      expect(redis).to receive(:set).with("auth_provider_refresh_572d4e421e5e6b9bc11d815e8a027112_etag", "NewETag")
       expect(response).to receive(:body).and_return("xml")
 
       expect(CanvasHttp).to receive(:get).with("url", {}).and_yield(response)
