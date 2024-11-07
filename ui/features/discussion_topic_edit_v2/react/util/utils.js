@@ -119,7 +119,7 @@ export const buildAssignmentOverrides = discussion => {
   let checkpointOverrides = []
   const everyoneDates = {}
   const hasCheckpoints = discussion?.assignment?.hasSubAssignments
-  if (hasCheckpoints) {
+  if (hasCheckpoints && ENV.DISCUSSION_CHECKPOINTS_ENABLED) {
     // we need an override for each 'assignee type: everyone, section, students,...'
     // to determine, count union of reply_to_topic and required_reply + 1 for everyone if checkpoint.due_at
     const allAssignees = getCheckpointAssignees(discussion.assignment.checkpoints)

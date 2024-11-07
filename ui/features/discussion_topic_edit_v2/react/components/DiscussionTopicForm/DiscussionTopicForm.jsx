@@ -280,8 +280,10 @@ function DiscussionTopicForm({
 
   // Checkpoints states
   const [isCheckpoints, setIsCheckpoints] = useState(
-    currentDiscussionTopic?.assignment?.hasSubAssignments || false
+    (currentDiscussionTopic?.assignment?.hasSubAssignments && ENV.DISCUSSION_CHECKPOINTS_ENABLED) ||
+      false
   )
+
   const getCheckpointsPointsPossible = checkpointLabel => {
     const checkpoint = currentDiscussionTopic?.assignment?.checkpoints?.find(
       c => c.tag === checkpointLabel
@@ -1048,7 +1050,7 @@ function DiscussionTopicForm({
                     // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
                     tabIndex="0"
                   >
-                    <IconInfoLine color="primary"/>
+                    <IconInfoLine color="primary" />
                     <ScreenReaderContent>{checkpointsToolTipText}</ScreenReaderContent>
                   </div>
                 </Tooltip>
