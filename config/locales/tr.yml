@@ -4421,6 +4421,7 @@ tr:
   chat_2153c6b7: Sohbet
   chcp_student_activity_report_5611dd39: "CHCP Öğrenci Aktivite Raporu"
   check_back_in_a_little_while_17756399: "Bir süre sonra tekrar kontrol edin."
+  check_f9bb054a: "Kontrol Et"
   check_submission_file_type_b3dbf3fd: "Gönderilen Dosya Türünü Kontrol Et"
   check_to_add_a_user_for_loginid_6cd25597: " %{loginid}'e kullanıcı eklemek için tik atın"
   check_to_select_all_98e484f1: "Tümünü seç"
@@ -5726,6 +5727,7 @@ tr:
   copying_628a9607: Kopyalanıyor...
   copyright_and_license_information_must_be_provided_5feffaf: "Yayınlanmadan önce dosyaların telif hakkı ve lisans bilgileri sağlanmalıdır."
   copyright_holder_66ee111: "Telif Sahibi:"
+  correct_7df6d875: Doğru!
   correct_answer: "Doğru cevap. "
   correct_answer_5a6a57d1: "Doğru Cevap"
   correct_answer_comments_34ca671f: "Doğru cevap yorumları"
@@ -10365,6 +10367,7 @@ tr:
   inherited_developer_keys_table_e4a65b67: "Kalıtsal Geliştirici Anahtar Tablosu"
   inner_box_background_6f9092f: "İçteki Kutu Arkaplanı"
   inner_box_border_d0524b03: "İçteki Kutu Kenarlığı"
+  insert_593145ef: Ekle
   insert_equella_links_49a8dacd: "Equella Bağlantısı Ekle"
   insert_here_ccdb022e: "buraya ekleyin"
   insert_math_equation_57c6e767: "Matematik Denklemi Ekle"
@@ -11078,6 +11081,7 @@ tr:
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Yeterlik puanı notlandırılmış ödev ya da kısa sınavın en yüksek puanını gösterir."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Yeterlik puanı en son notlandırılan ödev ya da kısa sınavı gösterir."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Yeterlik puanı en son notlandırılan ödev ya da kısa sınavı gösterir."
+  matching_63f5af40: Eşleştirme
   matching_left_side_900f860b: "Sol tarafı eşleştir"
   matching_right_side_920e71b2: "Sağ tarafı eşleştir"
   mathquill: 
@@ -13257,6 +13261,7 @@ tr:
   moving_a4d552df: Taşınıyor...
   multi_factor_authentication_1a6b3b3d: "Çoklu Kimlik Doğrulama"
   multi_factor_authentication_configured_865b1bde: "Çoklu kimlik doğrulama yapılandırıldı"
+  multiple_choice_9f931ee6: "Çoktan Seçmeli"
   multiple_dates_e3a122f7: "Çoklu Tarih"
   multiple_due_dates_6b0d75c6: "Çoklu bitiş tarihleri"
   multiple_modules_930713d4: "Çoklu Modüller"
@@ -19432,6 +19437,7 @@ tr:
   trinidad_and_tobago_1_fc2d8d1c: "Trinidad Tobago (+1)"
   trophy: 
     star_display_name: "Yıldız Ver"
+  true_false_823761a9: Doğru/Yanlış
   truncated_56b1a661: Kesik
   try_again_6ca44338: "Tekrar Deneyiniz"
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "Sağdan Solan yazılmayan dillerde bile Sağdan Sola özelliğini aç"

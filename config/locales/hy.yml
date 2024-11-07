@@ -4594,6 +4594,7 @@ hy:
   copy_to_folder_32ecc3c3: "Պատճենել Թղթապանակում"
   copying_628a9607: "Պատճենում է..."
   copyright_holder_66ee111: "Հեղինակային իրավունք ունեցող անձը՝"
+  correct_7df6d875: "Ճիշտ է:"
   correct_answer: "Դա ճիշտ պատասխան էր"
   correct_answer_comments_34ca671f: "Ճիշտ պատասխանի մեկնաբանությունները"
   correct_answers_are_available_until_date_df01cc5f: "Ճիշտ պատասխանները հասանելի են մինչև %{date}:"
@@ -8501,6 +8502,7 @@ hy:
       manage: Կառավարել
   info_8f47054a: Տեղեկատվություն
   info_panel_hidden_bf7c3b7b: "Տեղեկատվությունն անտեսանելի է"
+  insert_593145ef: Տեղադրել
   insert_equella_links_49a8dacd: "Insert Equella Links"
   insert_here_ccdb022e: "տեղադրել այստեղ"
   insert_math_equation_57c6e767: "Զետեղել մաթեմատիկական հավասարում"
@@ -9107,6 +9109,7 @@ hy:
   mastery_at_cf0c477b: "Յուրացվել է՝ "
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Հմտության միավորը գնահատված հանձնարարության կամ թեստի ամենաբարձր միավորն է:"
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Հմտության միավորը ամենավերջին հանձնարարության կամ թեստի գնահատականն է"
+  matching_63f5af40: Համընկնում
   matching_left_side_80_character_limit_bb12adf1: "Համընկնող ձախ մաս (80 գրանշանից վոչ ավել)"
   matching_right_side_80_character_limit_217edfe1: "Համընկնող աջ մաս (80 գրանշանից վոչ ավել)"
   mathquill: 
@@ -11199,6 +11202,7 @@ hy:
   moving_a4d552df: "Տեղափոխում է..."
   multi_factor_authentication_1a6b3b3d: "Իսկության բազմաֆակտորային ստուգում"
   multi_factor_authentication_configured_865b1bde: "Բազմագործոնային իսկության ստուգումը կարգաբերված է"
+  multiple_choice_9f931ee6: "Բազմապատիկ Ընտրություն"
   multiple_dates_e3a122f7: "Մի քանի ամսաթվեր"
   multiple_due_dates_6b0d75c6: "Կատարման մի քանի վերջնաժամկետ"
   multiple_modules_930713d4: "Բազմակի մոդուլներ"
@@ -16885,6 +16889,7 @@ hy:
     folder_tree_instructions: "Ծառի երկայնքով տեղափոխվելու համար օգտագործեք դեպի վերև և ներքև սլաքները: Սեղմեք աջ սլաքը թղթապանակները բացելու, ձախը՝ հեռացնելու համար, և մուտք՝ տարրը ընտրելու համար:"
   trophy: 
     star_display_name: "Նշել աստղիկով"
+  true_false_823761a9: "Ճիշտ է/Սխալ է"
   truncated_56b1a661: "Հատվել է"
   try_again_6ca44338: "Փորձեք նորից"
   turned_in_submission_date_e9180b8b: "ակտիվացվել է՝%{submission_date}"
