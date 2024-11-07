@@ -429,6 +429,70 @@ describe('ItemAssignToCard', () => {
     })
   })
 
+  describe('when course dates are set', () => {
+    beforeAll(() => {
+      window.ENV.VALID_DATE_RANGE = {
+        start_at: {date: '2025-02-09T00:00:00-06:00', date_context: 'course'},
+        end_at: {date: '2025-04-22T23:59:59-06:00', date_context: 'course'},
+      }
+      window.ENV.SECTION_LIST = [
+        {
+          id: '1',
+          override_course_and_term_dates: false,
+          start_at: '2025-02-09T00:00:00-06:00',
+          end_at: '2025-06-22T23:59:59-06:00',
+        },
+      ]
+    })
+
+    afterAll(() => {
+      window.ENV.VALID_DATE_RANGE = undefined
+      window.ENV.SECTION_LIST = undefined
+    })
+
+    it('renders error when date is outside of course dates', async () => {
+      const {getByLabelText, getAllByRole, getAllByText} = renderComponent()
+      const dateInput = getByLabelText('Due Date')
+      fireEvent.change(dateInput, {target: {value: 'May 4, 2025'}})
+      getAllByRole('option', {name: '4 May 2025'})[0].click()
+
+      await waitFor(async () => {
+        expect(dateInput).toHaveValue('May 4, 2025')
+        expect(getAllByText(/Due date cannot be after course end/).length).toBeGreaterThanOrEqual(1)
+      })
+    })
+
+    it('does not render error when date is outside of course dates but assignees are ADHOC', async () => {
+      const {getByLabelText, getAllByRole, queryByText} = renderComponent({
+        customAllOptions: [{id: 'student-1', value: 'John'}],
+        selectedAssigneeIds: ['student-1'],
+      })
+      const dateInput = getByLabelText('Due Date')
+      fireEvent.change(dateInput, {target: {value: 'May 4, 2025'}})
+      getAllByRole('option', {name: '4 May 2025'})[0].click()
+
+      await waitFor(async () => {
+        expect(dateInput).toHaveValue('May 4, 2025')
+        expect(queryByText(/Due date cannot be after course end/)).not.toBeInTheDocument()
+      })
+    })
+
+    it('does not render error when date is outside of course dates but inside section dates', async () => {
+      const {getByLabelText, getAllByRole, queryByText} = renderComponent({
+        customAllOptions: [{id: 'section-1', value: 'Section 1'}],
+        selectedAssigneeIds: ['section-1'],
+      })
+      const dateInput = getByLabelText('Due Date')
+      fireEvent.change(dateInput, {target: {value: 'May 4, 2025'}})
+      getAllByRole('option', {name: '4 May 2025'})[0].click()
+
+      await waitFor(async () => {
+        expect(dateInput).toHaveValue('May 4, 2025')
+        expect(queryByText(/Due date cannot be after course end/)).not.toBeInTheDocument()
+      })
+    })
+  })
+
   describe('when course and user timezones differ', () => {
     beforeAll(() => {
       window.ENV.TIMEZONE = 'America/Denver'
