@@ -5003,6 +5003,7 @@ uk:
   copy_to_folder_32ecc3c3: "Копіювати до каталогу"
   copying_628a9607: Копіювання...
   copyright_holder_66ee111: "Правовласник:"
+  correct_7df6d875: Правильно!
   correct_answer: "Це коректна відповідь."
   correct_answer_5a6a57d1: "Правильна відповідь"
   correct_answer_comments_34ca671f: "Коментарі правильної відповіді"
@@ -8931,6 +8932,7 @@ uk:
       Вносьте та розподіляйте оцінки для студентів. Відображайте оцінки у вигляді
       балів, відсотків, завершено або незавершено, здано або нездано, шкали GPA,
       та літер. Группові завдання для оцінювання на основі ваги.
+  insert_593145ef: Вставка
   insert_here_ccdb022e: "вставити сюди"
   insert_math_equation_57c6e767: "Вставити математичне рівняння"
   insert_row_below_25187f89: "Вставити рядок до"
@@ -9681,6 +9683,7 @@ uk:
   mastery_paths_cc4096c2: "Шляхи досягнення майстерності"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Оцінка майстерності  відображає найвищий бал оціненого завдання або контрольної роботи."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Оцінка майстерності відображає саму останню оцінку завдання або контрольної роботи."
+  matching_63f5af40: Відповідність
   matching_left_side_900f860b: "Відповідно лівій стороні"
   matching_right_side_920e71b2: "Відповідно правій стороні"
   mathquill: 
@@ -11667,6 +11670,7 @@ uk:
   multiple_are_marked_current_theme_because_the_same_3bdebbe1: "Декілька позначено як \"Поточна тема\" , тому що однакове значення було збержене під різними іменами—тобто , вони всі однакові, у поточному застосуванні"
   multiple_ba5220cd: Множинний
   multiple_canvas_accounts_are_associated_with_cleve_c1739660: "Декілька облікових записів Canvas пов'язано з Clever District %{district_id}"
+  multiple_choice_9f931ee6: "Множинний вибір"
   multiple_dates_e3a122f7: "Кілька дат"
   multiple_due_dates_283dd861: "Кілька термінів"
   multiple_modules_930713d4: "Кілька модулів"
@@ -17839,6 +17843,7 @@ uk:
   trinidad_and_tobago_1_fc2d8d1c: "Тринідад і Тобаго (+1)"
   trophy: 
     star_display_name: "Помітити зіркою"
+  true_false_823761a9: "Правда / Фальш"
   truncated_56b1a661: Скорочено
   try_again_6ca44338: "Спробуйте ще раз"
   turned_in_submission_date_e9180b8b: "здано: %{submission_date}"
