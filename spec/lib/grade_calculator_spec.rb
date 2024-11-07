@@ -979,7 +979,7 @@ describe GradeCalculator do
     end
 
     let(:student_enrollment) { @student.enrollments.first }
-    let(:scores) { @student.enrollments.first.scores.preload(:score_metadata).index_by(&:grading_period_id) }
+    let(:scores) { @student.enrollments.first.scores.index_by(&:grading_period_id) }
     let(:overall_course_score) { @student.enrollments.first.scores.find_by(course_score: true) }
     let(:submission_for_first_assignment) { Submission.find_by(user: @student, assignment: @assignments[1]) }
     let(:submission_for_second_assignment) { Submission.find_by(user: @student, assignment: @assignments[4]) }
@@ -1203,32 +1203,6 @@ describe GradeCalculator do
         GradeCalculator.new(@student.id, @course).compute_and_save_scores
         expect(scores[@first_period.id].current_score).to equal(95.13)
         expect(scores[@second_period.id].current_score).to equal(87.6)
-      end
-
-      it "updates all grading period score metadata" do
-        GradeCalculator.new(@student.id, @course).compute_and_save_scores
-        expected_metadata = [
-          {
-            "current" => {
-              "dropped" => [dropped_current_submissions[0].id]
-            },
-            "final" => {
-              # we dropped a muted submission, which won't be included here
-              "dropped" => []
-            }
-          },
-          {
-            "current" => {
-              "dropped" => [dropped_current_submissions[1].id]
-            },
-            "final" => {
-              # we dropped a muted submission, which won't be included here
-              "dropped" => []
-            }
-          }
-        ]
-        expect(scores[@first_period.id].score_metadata.calculation_details).to eq(expected_metadata[0])
-        expect(scores[@second_period.id].score_metadata.calculation_details).to eq(expected_metadata[1])
       end
 
       it "does not update grading period scores if update_all_grading_period_scores is false" do
@@ -1640,49 +1614,6 @@ describe GradeCalculator do
       end
     end
 
-    it "updates the overall course score metadata" do
-      expected_metadata = {
-        "current" => {
-          "dropped" => dropped_current_submissions.map(&:id)
-        },
-        "final" => {
-          # we dropped a muted submission, which won't be included here
-          "dropped" => []
-        }
-      }
-      metadata = overall_course_score.score_metadata
-      orig_updated_at = metadata.updated_at
-      GradeCalculator.new(@student.id, @course).compute_and_save_scores
-      metadata.reload
-      expect(metadata.calculation_details).to eq(expected_metadata)
-      expect(orig_updated_at).to be < metadata.updated_at
-    end
-
-    it "updates the overall course score metadata when only_update_course_gp_metadata: true" do
-      expected_metadata = {
-        "current" => {
-          "dropped" => dropped_current_submissions.map(&:id)
-        },
-        "final" => {
-          # we dropped a muted submission, which won't be included here
-          "dropped" => []
-        }
-      }
-      metadata = overall_course_score.score_metadata
-      orig_updated_at = metadata.updated_at
-      GradeCalculator.new(@student.id, @course, only_update_course_gp_metadata: true).compute_and_save_scores
-      metadata.reload
-      expect(metadata.calculation_details).to eq(expected_metadata)
-      expect(orig_updated_at).to be < metadata.updated_at
-    end
-
-    it "does not update the overall course score when only_update_course_gp_metadata: true" do
-      updated_at = overall_course_score.updated_at
-      GradeCalculator.new(@student.id, @course, only_update_course_gp_metadata: true).compute_and_save_scores
-      overall_course_score.reload
-      expect(overall_course_score.updated_at).to eq(updated_at)
-    end
-
     context "when given only_update_points: true" do
       before do
         GradeCalculator.new(@student.id, @course).compute_and_save_scores
@@ -1883,7 +1814,7 @@ describe GradeCalculator do
       it ".save_assignment_group_scores raises Delayed::RetriableError when deadlocked" do
         allow(Score.connection).to receive(:execute).and_raise(ActiveRecord::Deadlocked)
 
-        expect { calc.send(:save_assignment_group_scores, [], []) }.to raise_error(Delayed::RetriableError)
+        expect { calc.send(:save_assignment_group_scores, []) }.to raise_error(Delayed::RetriableError)
       end
 
       it ".save_course_and_grading_period_scores raises Delayed::RetriableError when deadlocked" do

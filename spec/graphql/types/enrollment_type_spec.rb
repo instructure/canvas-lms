@@ -87,7 +87,6 @@ describe Types::EnrollmentType do
     end
 
     it "works even when no scores exist" do
-      ScoreMetadata.delete_all
       Score.delete_all
 
       expect(
