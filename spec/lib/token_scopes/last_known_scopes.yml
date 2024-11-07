@@ -209,6 +209,8 @@
   path: '/api/v1/accounts/:account_id/lti_registration_by_client_id/:client_id'
 - verb: GET
   path: '/api/v1/accounts/:account_id/lti_registrations'
+- verb: POST
+  path: '/api/v1/accounts/:account_id/lti_registrations'
 - verb: DELETE
   path: '/api/v1/accounts/:account_id/lti_registrations/:id'
 - verb: GET
