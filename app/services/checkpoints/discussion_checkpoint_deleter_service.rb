@@ -27,8 +27,7 @@ class Checkpoints::DiscussionCheckpointDeleterService < ApplicationService
   end
 
   def call
-    validate_flag_enabled
-
+    # no need to validate the flag here, we will always allow checkpoint deletion
     checkpoints = find_checkpoints
     checkpoints.each do |checkpoint|
       checkpoint.active_assignment_overrides.destroy_all
@@ -51,12 +50,6 @@ class Checkpoints::DiscussionCheckpointDeleterService < ApplicationService
     raise Checkpoints::NoCheckpointsFoundError, "Checkpoints not found" unless checkpoints.any?
 
     checkpoints
-  end
-
-  def validate_flag_enabled
-    unless @discussion_topic.context.root_account.feature_enabled?(:discussion_checkpoints)
-      raise Checkpoints::FlagDisabledError, "discussion_checkpoints feature flag must be enabled"
-    end
   end
 
   def update_assignment_and_discussion

@@ -1915,6 +1915,42 @@ describe "discussions" do
           end
 
           context "checkpoints" do
+            context "when discussion_checkpoints feature flag is disabled after creation" do
+              before do
+                @course.root_account.enable_feature!(:discussion_checkpoints)
+                @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed topic")
+                @c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+                  discussion_topic: @topic,
+                  checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+                  dates: [{ type: "everyone", due_at: 5.years.ago }],
+                  points_possible: 5
+                )
+                @c2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+                  discussion_topic: @topic,
+                  checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+                  dates: [{ type: "everyone", due_at: 5.years.ago }],
+                  points_possible: 5,
+                  replies_required: 2
+                )
+
+                @course.root_account.disable_feature!(:discussion_checkpoints)
+              end
+
+              it "forces checkpointed discussions into regular graded discussions" do
+                get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+                expect(f("body")).not_to contain_jqcss("input[data-testid='checkpoints-checkbox']")
+                expect(f("body")).not_to contain_jqcss("div:contains('Checkpoint Settings')")
+                expect(f("body")).not_to contain_jqcss("div:contains('Reply to Topic Due Date')")
+                expect(f("body")).not_to contain_jqcss("div:contains('Required Replies Due Date')")
+                fj("button:contains('Save')").click
+                expect(fj("span[data-testid='message_title']:contains('#{@topic.title}')")).to be_truthy
+                expect(@c1.reload.workflow_state).to eq "deleted"
+                expect(@c2.reload.workflow_state).to eq "deleted"
+                expect(@topic.assignment.sub_assignments.count).to eq 0
+                expect(@topic.assignment.reload.has_sub_assignments).to be_falsey
+              end
+            end
+
             it "shows reply to topic input on graded discussion with sub assignments" do
               Account.site_admin.enable_feature!(:discussion_checkpoints)
               @course.root_account.enable_feature!(:discussion_checkpoints)
