@@ -486,13 +486,24 @@ class CoursePacesController < ApplicationController
   #     -H 'Authorization: Bearer <token>'
 
   def create
-    @course_pace = @context.course_paces.new(create_params)
+    create_params
+    pace_draft_feature_flag
+    @course_pace = @context.course_paces.new(@permitted_params)
 
     if @course_pace.save
-      publish_course_pace
+      @progress = nil
+      if @draft_feature_flag_enabled
+        if @permitted_params[:workflow_state].present? && @permitted_params[:workflow_state] == "active"
+          # only publishes the pace if workflow_state is explicitly set to active to allow creating paces in draft state
+          publish_course_pace
+        end
+      else
+        publish_course_pace
+      end
+
       render json: {
         course_pace: CoursePacePresenter.new(@course_pace).as_json,
-        progress: progress_json(@progress, @current_user, session)
+        progress: @progress.present? ? progress_json(@progress, @current_user, session) : nil
       }
     else
       render json: { success: false, errors: @course_pace.errors.full_messages }, status: :unprocessable_entity
@@ -531,15 +542,32 @@ class CoursePacesController < ApplicationController
   #     -H 'Authorization: Bearer <token>'
 
   def update
-    if @course_pace.update(update_params)
+    update_params
+    pace_draft_feature_flag
+    @progress = nil
+    should_publish = false
+
+    if @draft_feature_flag_enabled
+      if @course_pace.workflow_state == "active" || @permitted_params[:workflow_state] == "active"
+        should_publish = true
+        # override workflow state to ensure it's always active if we're publishing
+        @permitted_params = @permitted_params.merge(workflow_state: "active")
+      end
+    else
+      should_publish = true
+    end
+
+    if @course_pace.update(@permitted_params)
       # Force the updated_at to be updated, because if the update just changed the items the course pace's
       # updated_at doesn't get modified
       @course_pace.touch
+      if should_publish
+        publish_course_pace
+      end
 
-      publish_course_pace
       render json: {
         course_pace: CoursePacePresenter.new(@course_pace).as_json,
-        progress: progress_json(@progress, @current_user, session)
+        progress: @progress.present? ? progress_json(@progress, @current_user, session) : nil
       }
     else
       render json: { success: false, errors: @course_pace.errors.full_messages }, status: :unprocessable_entity
@@ -681,6 +709,10 @@ class CoursePacesController < ApplicationController
 
   def require_feature_flag
     not_found unless @course.account.feature_enabled?(:course_paces) && @course.enable_course_paces
+  end
+
+  def pace_draft_feature_flag
+    @draft_feature_flag_enabled = @context.root_account.feature_enabled?(:course_pace_draft_state)
   end
 
   def load_course_pace

@@ -36,6 +36,7 @@ class CoursePacing::StudentEnrollmentPacesApiController < CoursePacing::PacesApi
 
   def load_contexts
     @course = api_find(Course.active, params[:course_id])
+    @draft_feature_flag_enabled = @course.root_account.feature_enabled?(:course_pace_draft_state)
     if params[:student_enrollment_id]
       @student_enrollment = @course.student_enrollments.find(params[:student_enrollment_id])
     end
