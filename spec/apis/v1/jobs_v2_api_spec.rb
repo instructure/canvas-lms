@@ -771,7 +771,6 @@ describe "Jobs V2 API", type: :request do
 
       describe "throttle" do
         it "throttles selected jobs" do
-          skip "BUDA-26"
           json = api_call(:put,
                           "/api/v1/jobs2/throttle?term=Kernel.print&shard_id=101&max_concurrent=2",
                           { controller: "jobs_v2",
