@@ -135,6 +135,217 @@
 #       }
 #     }
 #
+# @model Lti::LegacyConfiguration
+#     {
+#       "id": "Lti::LegacyConfiguration",
+#       "description": "A legacy configuration format for LTI 1.3 tools.",
+#       "properties": {
+#         "title": {
+#           "description": "The display name of the tool",
+#           "example": "My Tool",
+#           "type": "string"
+#         },
+#         "description": {
+#           "description": "The description of the tool",
+#           "example": "My Tool is built by me, for me.",
+#           "type": "string"
+#         },
+#         "custom_fields": {
+#           "description": "A key-value listing of all custom fields the tool has requested",
+#           "example": { "context_title": "$Context.title", "special_tool_thing": "foo1234" },
+#           "type": "object"
+#         },
+#         "target_link_uri": {
+#           "description": "The default launch URL for the tool. Overridable by placements.",
+#           "example": "https://mytool.com/launch",
+#           "type": "string"
+#         },
+#         "oidc_initiation_url": {
+#           "description": "1.3 specific. URL used for initial login request",
+#           "example": "https://mytool.com/1_3/login",
+#           "type": "string"
+#         },
+#         "oidc_initiation_urls": {
+#           "description": "1.3 specific. Region-specific login URLs for data protection compliance",
+#           "example": { "eu-west-1": "https://dub.mytool.com/1_3/login" },
+#           "type": "object"
+#         },
+#         "public_jwk": {
+#           "description": "1.3 specific. The tool's public JWK in JSON format. Discouraged in favor of a url hosting a JWK set.",
+#           "example": { "e": "AQAB", "etc": "etc" },
+#           "type": "object"
+#         },
+#         "public_jwk_url": {
+#           "description": "1.3 specific. The tool-hosted URL containing its public JWK keyset.",
+#           "example": "https://mytool.com/1_3/jwks",
+#           "type": "string"
+#         },
+#         "scopes": {
+#           "description": "1.3 specific. List of LTI scopes requested by the tool",
+#           "example": ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"],
+#           "type": "array",
+#           "items": { "type": "string" }
+#         },
+#         "extensions": {
+#           "description": "Array of extensions for the tool",
+#           "type": "array",
+#           "items": {
+#             "type": "object",
+#             "required": ["platform", "settings"],
+#             "properties": {
+#               "platform": {
+#                 "description": "Must be canvas.instructure.com",
+#                 "example": "canvas.instructure.com",
+#                 "type": "string"
+#               },
+#               "domain": {
+#                 "description": "The domain of the tool",
+#                 "example": "legacytool.com",
+#                 "type": "string"
+#               },
+#               "tool_id": {
+#                 "description": "Tool-provided identifier, can be anything",
+#                 "example": "LegacyTool",
+#                 "type": "string"
+#               },
+#               "privacy_level": {
+#                 "description": "Canvas-defined privacy level for the tool",
+#                 "example": "public",
+#                 "type": "string",
+#                 "enum": ["public", "anonymous", "name_only", "email_only"]
+#               },
+#               "settings": {
+#                 "description": "Settings for the tool",
+#                 "type": "object",
+#                 "required": ["placements"],
+#                 "properties": {
+#                   "text": {
+#                     "description": "The text of the link to the tool (if applicable).",
+#                     "example": "Hello World",
+#                     "type": "object"
+#                   },
+#                   "labels": {
+#                     "description": "Canvas-specific i18n for placement text. See the Navigation Placement docs.",
+#                     "example": { "en": "Hello World", "es": "Hola Mundo" },
+#                     "type": "object"
+#                   },
+#                   "custom_fields": {
+#                     "description": "Placement-specific custom fields to send in the launch. Merged with tool-level custom fields.",
+#                     "example": { "special_placement_thing": "foo1234" },
+#                     "type": "object"
+#                   },
+#                   "selection_height": {
+#                     "description": "Default iframe height. Not valid for all placements. Overrides tool-level launch_height.",
+#                     "example": 800,
+#                     "type": "number"
+#                   },
+#                   "selection_width": {
+#                     "description": "Default iframe width. Not valid for all placements. Overrides tool-level launch_width.",
+#                     "example": 1000,
+#                     "type": "number"
+#                   },
+#                   "launch_height": {
+#                     "description": "Default iframe height. Not valid for all placements. Overrides tool-level launch_height.",
+#                     "example": 800,
+#                     "type": "number"
+#                   },
+#                   "launch_width": {
+#                     "description": "Default iframe width. Not valid for all placements. Overrides tool-level launch_width.",
+#                     "example": 1000,
+#                     "type": "number"
+#                   },
+#                   "icon_url": {
+#                     "description": "Default icon URL. Not valid for all placements. Overrides tool-level icon_url.",
+#                     "example": "https://mytool.com/icon.png",
+#                     "type": "string"
+#                   },
+#                   "canvas_icon_class": {
+#                     "description": "The HTML class name of an InstUI Icon. Used instead of an icon_url in select placements.",
+#                     "example": "icon-lti",
+#                     "type": "string"
+#                   },
+#                   "required_permissions": {
+#                     "description": "Comma-separated list of Canvas permission short names required for a user to launch from this placement.",
+#                     "example": "manage_course_content_edit,manage_course_content_read",
+#                     "type": "string"
+#                   },
+#                   "windowTarget": {
+#                     "description": "When set to '_blank', opens placement in a new tab.",
+#                     "example": "_blank",
+#                     "type": "string"
+#                   },
+#                   "display_type": {
+#                     "description": "The Canvas layout to use when launching the tool. See the Navigation Placement docs.",
+#                     "example": "full_width_in_context",
+#                     "type": "string",
+#                     "enum": [
+#                       "default",
+#                       "full_width",
+#                       "full_width_in_context",
+#                       "in_nav_context",
+#                       "borderless"
+#                     ]
+#                   },
+#                   "url": {
+#                     "description": "The 1.1 launch URL for this placement. Overrides tool-level url.",
+#                     "example": "https://mytool.com/launch?placement=course_navigation",
+#                     "type": "string"
+#                   },
+#                   "target_link_uri": {
+#                     "description": "The 1.3 launch URL for this placement. Overrides tool-level target_link_uri.",
+#                     "example": "https://mytool.com/launch?placement=course_navigation",
+#                     "type": "string"
+#                   },
+#                   "visibility": {
+#                     "description": "Specifies types of users that can see this placement. Only valid for some placements like course_navigation.",
+#                     "example": "admins",
+#                     "type": "string"
+#                   },
+#                   "prefer_sis_email": {
+#                     "description": "1.1 specific. If true, the tool will send the SIS email in the lis_person_contact_email_primary launch property",
+#                     "example": false,
+#                     "type": "boolean"
+#                   },
+#                   "oauth_compliant": {
+#                     "description": "1.1 specific. If true, query parameters from the launch URL will not be copied to the POST body.",
+#                     "example": true,
+#                     "type": "boolean"
+#                   },
+#                   "icon_svg_path_64": {
+#                     "description": "An SVG to use instead of an icon_url. Only valid for global_navigation.",
+#                     "example": "M100,37L70.1,10.5v176H37...",
+#                     "type": "string"
+#                   },
+#                   "default": {
+#                     "description": "Default display state for course_navigation. If 'enabled', will show in course sidebar. If 'disabled', will be hidden.",
+#                     "example": "disabled",
+#                     "type": "string"
+#                   },
+#                   "accept_media_types": {
+#                     "description": "Comma-separated list of media types that the tool can accept. Only valid for file_item.",
+#                     "example": "image/*,video/*",
+#                     "type": "string"
+#                   },
+#                   "use_tray": {
+#                     "description": "If true, the tool will be launched in the tray. Only used by the editor_button placement.",
+#                     "example": true,
+#                     "type": "boolean"
+#                   },
+#                   "placements": {
+#                     "description": "List of placements configured by the tool",
+#                     "type": "array",
+#                     "items": {
+#                       "$ref": "Lti::Placement"
+#                     }
+#                   }
+#                 }
+#               }
+#             }
+#           }
+#         }
+#       }
+#     }
+#
 # @model Lti::ToolConfiguration
 #     {
 #       "id": "Lti::ToolConfiguration",
@@ -302,6 +513,13 @@
 #           "description": "The Canvas layout to use when launching the tool. See the Navigation Placement docs.",
 #           "example": "full_width_in_context",
 #           "type": "string"
+#           "enum": [
+#             "default",
+#             "full_width",
+#             "full_width_in_context",
+#             "in_nav_context",
+#             "borderless"
+#           ]
 #         },
 #         "url": {
 #           "description": "The 1.1 launch URL for this placement. Overrides tool-level url.",
@@ -477,7 +695,14 @@
 #         "display_type": {
 #           "description": "The Canvas layout to use when launching the tool. See the Navigation Placement docs.",
 #           "example": "full_width_in_context",
-#           "type": "string"
+#           "type": "string",
+#           "enum": [
+#             "default",
+#             "full_width",
+#             "full_width_in_context",
+#             "in_nav_context",
+#             "borderless"
+#           ]
 #         },
 #         "url": {
 #           "description": "The 1.1 launch URL for this placement. Overrides tool-level url.",
@@ -492,7 +717,12 @@
 #         "visibility": {
 #           "description": "Specifies types of users that can see this placement. Only valid for some placements like course_navigation.",
 #           "example": "admins",
-#           "type": "string"
+#           "type": "string",
+#           "enum": [
+#             "admins",
+#             "members",
+#             "public"
+#           ]
 #         },
 #         "prefer_sis_email": {
 #           "description": "1.1 specific. If true, the tool will send the SIS email in the lis_person_contact_email_primary launch property",
@@ -670,8 +900,9 @@ class Lti::RegistrationsController < ApplicationController
   before_action :require_feature_flag
   before_action :require_manage_lti_registrations
   before_action :require_dynamic_registration, only: [:destroy, :update]
-  before_action :validate_workflow_state, only: :bind
+  before_action :validate_workflow_state, only: [:bind, :create]
   before_action :validate_list_params, only: :list
+  before_action :validate_registration_params, only: [:create]
 
   include Api::V1::Lti::Registration
 
@@ -912,6 +1143,126 @@ class Lti::RegistrationsController < ApplicationController
     raise e
   end
 
+  # @API Create an LTI Registration
+  # Create a new LTI Registration, as well as an associated Tool Configuration, Developer Key, and Registration Account
+  # binding.
+  # To install/create using Dynamic Registration, please use the
+  # <a href="/doc/api/registration.html">Dynamic Registration API.</a>
+  #
+  # @argument name [String] The name of the tool
+  # @argument admin_nickname [String] A friendly nickname set by admins to override the tool name
+  # @argument vendor [String] The vendor of the tool
+  # @argument configuration [Required, Lti::ToolConfiguration | Lti::LegacyConfiguration] The LTI 1.3 configuration for the tool
+  # @argument overlay [Lti::Overlay] The overlay configuration for the tool. Overrides values in the base configuration.
+  # @argument workflow_state [String, "on" | "off" | "allow"]
+  #   The desired state for this registration/account binding. "allow" is only valid for Site Admin registrations.
+  #   Defaults to "off".
+  #
+  # @example_request
+  #
+  #   This would create a new LTI Registration, as well as an associated Developer Key
+  #   and LTI Tool Configuration.
+  #
+  #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations' \
+  #       -H "Authorization: Bearer <token>" \
+  #       -H "Content-Type: application/json" \
+  #       -d '{
+  #             "vendor": "Example",
+  #             "name": "An Example Tool",
+  #             "admin_nickname": "A Great LTI Tool",
+  #             "configuration": {
+  #               "title": "Sample Tool",
+  #               "description": "A sample LTI tool",
+  #               "target_link_uri": "https://example.com/launch",
+  #               "oidc_initiation_url": "https://example.com/oidc",
+  #               "redirect_uris": ["https://example.com/redirect"],
+  #               "scopes": ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"],
+  #               "placements": [
+  #                 {
+  #                   "placement": "course_navigation",
+  #                   "enabled": true
+  #                 }
+  #               ],
+  #               "launch_settings": {}
+  #             }
+  #           }'
+  #
+  # @returns Lti::Registration
+  def create
+    registration = Lti::Registration.transaction do
+      vendor = params[:vendor]
+      name = params[:name] || configuration[:title]
+      admin_nickname = params[:admin_nickname] || configuration[:title]
+      scopes = configuration[:scopes]
+
+      registration = Lti::Registration.create!(
+        name:,
+        admin_nickname:,
+        vendor:,
+        account: @context,
+        workflow_state: "active",
+        created_by: @current_user,
+        updated_by: @current_user
+      )
+
+      if overlay.present?
+        Lti::Overlay.create!(
+          registration:,
+          account: @context,
+          updated_by: @current_user,
+          data: overlay
+        )
+        scopes = Lti::Overlay.apply_to(overlay, configuration)&.dig(:scopes) || []
+      end
+
+      dk = DeveloperKey.create!(
+        account: @context.site_admin? ? nil : @context,
+        icon_url: configuration.dig(:launch_settings, :icon_url),
+        name:,
+        public_jwk: configuration[:public_jwk],
+        public_jwk_url: configuration[:public_jwk_url],
+        redirect_uris: configuration[:redirect_uris] || [configuration[:target_link_uri]],
+        visible: !@context.site_admin?,
+        scopes:,
+        lti_registration: registration,
+        workflow_state: "active"
+      )
+
+      Lti::ToolConfiguration.create!(
+        developer_key: dk,
+        lti_registration: registration,
+        settings: {},
+        **configuration
+      )
+
+      if params[:workflow_state].present? && params[:workflow_state] != "off"
+        # This is automatically created when we create the developer key, but we need to update it
+        # with the correct workflow state.
+        account_binding = Lti::RegistrationAccountBinding.find_by(account: @context, registration:)
+
+        # We have to suspend_callbacks/avoid validations because we're still inside a transaction and the
+        # developer_key_account_binding will fail validations, as it will look to the secondary
+        # when trying to validate the presence of its developer key. The
+        # developer key doesn't exist in the secondary (yet), so it fails.
+        # See DeveloperKey::CacheOnAssociation for the offending code.
+        account_binding.suspend_callbacks(:update_developer_key_account_binding) do
+          account_binding.update!(workflow_state: params[:workflow_state],
+                                  created_by: @current_user,
+                                  updated_by: @current_user)
+        end
+        # Avoid validating developer key is present, we already know it is.
+        account_binding.developer_key_account_binding.update_column(:workflow_state, params[:workflow_state])
+      end
+      registration
+    end
+
+    render status: :created, json: lti_registration_json(registration,
+                                                         @current_user,
+                                                         session,
+                                                         @context,
+                                                         includes: %i[account_binding configuration overlay])
+  end
+
   # @API Show an LTI Registration (via the client_id)
   # Returns details about the specified LTI registration, including the
   # configuration and account binding.
@@ -1005,26 +1356,72 @@ class Lti::RegistrationsController < ApplicationController
   #        -H "Content-Type: application/json" \
   #        -d '{"workflow_state": "on"}'
   def bind
-    account_binding = Lti::RegistrationAccountBinding.find_or_initialize_by(account: @context, registration:)
+    account_binding = Lti::RegistrationAccountBinding
+                      .find_or_initialize_by(account: @context, registration:)
 
     if account_binding.new_record?
       account_binding.created_by = @current_user
     end
 
     account_binding.updated_by = @current_user
-    account_binding.workflow_state = params[:workflow_state]
+    account_binding.workflow_state = params.require(:workflow_state)
 
-    if account_binding.save
-      render json: lti_registration_account_binding_json(account_binding, @current_user, session, @context)
-    else
-      render json: account_binding.errors, status: :unprocessable_entity
-    end
+    account_binding.save!
+
+    render json: lti_registration_account_binding_json(account_binding, @current_user, session, @context)
   end
 
   private
 
   def render_configuration_errors(errors)
     render json: { errors: }, status: :unprocessable_entity
+  end
+
+  def configuration
+    return @configuration if defined?(@configuration)
+
+    @configuration = params.require(:configuration).to_unsafe_h
+
+    if @configuration[:extensions].present?
+      @configuration = Schemas::InternalLtiConfiguration.from_lti_configuration(@configuration)
+    end
+
+    @configuration = @configuration.slice(*Schemas::InternalLtiConfiguration.schema[:properties].keys)
+
+    @configuration
+  end
+
+  def overlay
+    @overlay ||= params[:overlay]&.to_unsafe_h
+  end
+
+  def validate_registration_params
+    configuration = params.require(:configuration)
+    overlay = params[:overlay]
+
+    configuration = configuration.to_unsafe_h if configuration.is_a?(ActionController::Parameters)
+    overlay = overlay.to_unsafe_h if overlay.is_a?(ActionController::Parameters)
+
+    unless configuration.is_a?(Hash)
+      return render_configuration_errors(["configuration must be an object"])
+    end
+
+    if overlay.present? && !overlay.is_a?(Hash)
+      return render_configuration_errors(["overlay must be an object"])
+    end
+
+    configuration_errors = if configuration[:extensions].present?
+                             Schemas::LtiConfiguration.validation_errors(configuration)
+                           else
+                             Schemas::InternalLtiConfiguration.validation_errors(configuration)
+                           end
+    overlay_errors = Schemas::Lti::Overlay.validation_errors(overlay) if overlay.present?
+
+    configuration_errors ||= []
+    overlay_errors ||= []
+    errors = configuration_errors + overlay_errors
+
+    render_configuration_errors(errors) if errors.present?
   end
 
   def update_params
@@ -1034,7 +1431,7 @@ class Lti::RegistrationsController < ApplicationController
   # At the model level, setting an invalid workflow_state will silently change it to the
   # initial state ("off") without complaining, so enforce this here as part of the API contract.
   def validate_workflow_state
-    return if %w[on off allow].include?(params.require(:workflow_state))
+    return if params[:workflow_state].nil? || %w[on off allow].include?(params[:workflow_state])
 
     render_error(:invalid_workflow_state, "workflow_state must be one of 'on', 'off', or 'allow'")
   end

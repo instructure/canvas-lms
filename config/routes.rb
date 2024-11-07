@@ -1924,6 +1924,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: "lti/registrations") do
       get "accounts/:account_id/lti_registrations", action: :list
+      post "accounts/:account_id/lti_registrations", action: :create
       post "accounts/:account_id/lti_registrations/configuration/validate", action: :validate_lti_configuration
       delete "accounts/:account_id/lti_registrations/:id", action: :destroy
       get "accounts/:account_id/lti_registrations/:id", action: :show
