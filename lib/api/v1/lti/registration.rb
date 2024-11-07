@@ -21,6 +21,7 @@
 module Api::V1::Lti::Registration
   include Api::V1::Json
   include Api::V1::User
+  include Api::V1::Lti::Overlay
   include Api::V1::Lti::RegistrationAccountBinding
 
   JSON_ATTRS = %w[
@@ -32,6 +33,9 @@ module Api::V1::Lti::Registration
   def lti_registrations_json(registrations, user, session, context, includes: [])
     if includes.include?(:account_binding)
       Lti::Registration.preload_account_bindings(registrations, context)
+    end
+    if includes.include?(:overlay)
+      Lti::Registration.preload_overlays(registrations, context)
     end
 
     registrations.map { |r| lti_registration_json(r, user, session, context, includes:) }
@@ -51,10 +55,10 @@ module Api::V1::Lti::Registration
       json["ims_registration_id"] = registration.ims_registration&.id
 
       if registration.created_by.present?
-        json["created_by"] = user_json(registration.created_by, user, session, [], context)
+        json["created_by"] = user_json(registration.created_by, user, session, [], context, nil, ["pseudonym"])
       end
       if registration.updated_by.present?
-        json["updated_by"] = user_json(registration.updated_by, user, session, [], context)
+        json["updated_by"] = user_json(registration.updated_by, user, session, [], context, nil, ["pseudonym"])
       end
       if includes.include?(:configuration)
         json["configuration"] = registration.internal_lti_configuration(context:)
@@ -62,6 +66,10 @@ module Api::V1::Lti::Registration
 
       if includes.include?(:account_binding) && (acct_binding = registration.account_binding_for(context))
         json["account_binding"] = lti_registration_account_binding_json(acct_binding, user, session, context)
+      end
+
+      if includes.include?(:overlay) && (overlay = registration.overlay_for(context))
+        json["overlay"] = lti_overlay_json(overlay, user, session, context)
       end
     end
   end

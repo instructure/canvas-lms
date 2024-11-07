@@ -24,8 +24,8 @@ class Lti::Registration < ActiveRecord::Base
   extend RootAccountResolver
   include Canvas::SoftDeletable
 
-  attr_accessor :skip_lti_sync, :account_binding
-  attr_writer :account_binding_loaded
+  attr_accessor :skip_lti_sync, :account_binding, :overlay
+  attr_writer :account_binding_loaded, :overlay_loaded
 
   belongs_to :account, inverse_of: :lti_registrations, optional: false
   belongs_to :created_by, class_name: "User", inverse_of: :created_lti_registrations, optional: true
@@ -91,12 +91,12 @@ class Lti::Registration < ActiveRecord::Base
   # @param context [Account | Course | nil]
   # @return [Lti::Overlay | nil]
   def overlay_for(context)
+    return overlay if @overlay_loaded
+
     # If subaccount support is needed in the future, reference
     # DeveloperKey#account_binding_for and DeveloperKeyAccountBinding#find_in_account_priority.
     account = if context.blank?
                 self.account
-              elsif context.is_a?(Account) && context.root_account?
-                context
               else
                 context.root_account
               end
@@ -160,6 +160,35 @@ class Lti::Registration < ActiveRecord::Base
     end
   end
   private_class_method :associate_bindings
+
+  def self.preload_overlays(registrations, account)
+    return nil unless account
+
+    # If subaccount support/overlays are needed in the future, reference
+    # DeveloperKey#account_binding_for and DeveloperKeyAccountBinding#find_in_account_priority
+    # for the correct priority searching logic.
+    unless account.root_account?
+      account = account.root_account
+    end
+
+    overlays = Lti::Overlay.where(account:, registration: registrations).preload(:updated_by) +
+               Lti::Overlay.find_all_in_site_admin(registrations)
+
+    associate_overlays(registrations, overlays)
+  end
+
+  def self.associate_overlays(registrations, overlays)
+    registrations_by_id = registrations.index_by(&:global_id)
+
+    registrations.each { |registration| registration.overlay_loaded = true }
+
+    overlays.each do |overlay|
+      global_registration_id = Shard.global_id_for(overlay.registration_id, Shard.current)
+      registration = registrations_by_id[global_registration_id]
+      registration&.overlay = overlay
+    end
+  end
+  private_class_method :associate_overlays
 
   # Returns true if this Registration is from a different account than the given account.
   #

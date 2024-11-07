@@ -35,6 +35,7 @@ class Lti::Overlay < ActiveRecord::Base
   validate :validate_data
 
   before_update :create_version
+  after_update :clear_cache_if_site_admin
 
   class << self
     def find_in_site_admin(registration)
@@ -47,9 +48,53 @@ class Lti::Overlay < ActiveRecord::Base
       end
     end
 
+    def find_all_in_site_admin(registrations)
+      registrations = registrations.select { |r| r.account.site_admin? }
+      return [] if registrations.empty?
+
+      Shard.default.activate do
+        list_cache_key = site_admin_list_cache_key(registrations)
+
+        MultiCache.fetch(list_cache_key) do
+          cache_pointers_for_clearing(registrations, list_cache_key)
+
+          GuardRail.activate(:secondary) do
+            where(account: Account.site_admin, registration: registrations).preload(:updated_by)
+          end
+        end
+      end
+    end
+
+    def cache_pointers_for_clearing(registrations, list_cache_key)
+      registrations.each { |r| MultiCache.fetch(pointer_to_list_key(r)) { list_cache_key } }
+    end
+
+    def clear_site_admin_cache(registration)
+      Shard.default.activate do
+        MultiCache.delete(site_admin_cache_key(registration))
+
+        list_key = MultiCache.fetch(pointer_to_list_key(registration), nil)
+        MultiCache.delete(list_key) if list_key
+        MultiCache.delete(pointer_to_list_key(registration))
+      end
+    end
+
+    def site_admin_list_cache_key(registrations)
+      ids_hash = Digest::SHA256.hexdigest(registrations.map(&:global_id).sort.join(","))
+      "accounts/site_admin/lti_overlays/for_registrations:#{ids_hash}"
+    end
+
+    def pointer_to_list_key(registration)
+      "accounts/site_admin/lti_overlays/for_registrations:#{registration.global_id}"
+    end
+
     def site_admin_cache_key(registration)
       "accounts/site_admin/lti_overlays/#{registration.global_id}"
     end
+  end
+
+  def clear_cache_if_site_admin
+    self.class.clear_site_admin_cache(registration) if account.site_admin?
   end
 
   def data=(data)

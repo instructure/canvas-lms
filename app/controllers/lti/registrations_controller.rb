@@ -138,7 +138,7 @@
 # @model Lti::ToolConfiguration
 #     {
 #       "id": "Lti::ToolConfiguration",
-#       "description": "A Registration's Canvas-specific tool configuration. Tool-provided and standardized.",
+#       "description": "A Registration's Canvas-specific tool configuration. Any Lti::Overlays returned are already applied to the configuration.",
 #       "properties": {
 #         "title": {
 #           "description": "The display name of the tool",
@@ -246,7 +246,7 @@
 #         "text": {
 #           "description": "The text of the link to the tool (if applicable).",
 #           "example": "Hello World",
-#           "type": "object"
+#           "type": "string"
 #         },
 #         "labels": {
 #           "description": "Canvas-specific i18n for placement text. See the Navigation Placement docs.",
@@ -422,7 +422,7 @@
 #         "text": {
 #           "description": "The text of the link to the tool (if applicable).",
 #           "example": "Hello World",
-#           "type": "object"
+#           "type": "string"
 #         },
 #         "labels": {
 #           "description": "Canvas-specific i18n for placement text. See the Navigation Placement docs.",
@@ -527,6 +527,144 @@
 #       }
 #     }
 #
+# @model Lti::Overlay
+#     {
+#       "id": "Lti::Overlay",
+#       "description": "Changes made by a Canvas admin to a tool's configuration.",
+#       "properties": {
+#         "title": {
+#           "description": "The display name of the tool",
+#           "example": "My Tool",
+#           "type": "string"
+#         },
+#         "description": {
+#           "description": "The description of the tool",
+#           "example": "My Tool is built by me, for me.",
+#           "type": "string"
+#         },
+#         "custom_fields": {
+#           "description": "A key-value listing of all custom fields the tool has requested",
+#           "example": { "context_title": "$Context.title", "special_tool_thing": "foo1234" },
+#           "type": "object"
+#         },
+#         "target_link_uri": {
+#           "description": "The default launch URL for the tool. Overridable by placements.",
+#           "example": "https://mytool.com/launch",
+#           "type": "string"
+#         },
+#         "domain": {
+#           "description": "The tool's main domain. Highly recommended for deep linking, used to match links to the tool.",
+#           "example": "mytool.com",
+#           "type": "string"
+#         },
+#         "privacy_level": {
+#           "description": "Canvas-defined privacy level for the tool",
+#           "example": "public",
+#           "type": "string",
+#           "enum":
+#           [
+#             "public",
+#             "anonymous",
+#             "name_only",
+#             "email_only"
+#           ]
+#         },
+#         "oidc_initiation_url": {
+#           "description": "1.3 specific. URL used for initial login request",
+#           "example": "https://mytool.com/1_3/login",
+#           "type": "string"
+#         },
+#         "public_jwk": {
+#           "description": "1.3 specific. The tool's public JWK in JSON format. Discouraged in favor of a url hosting a JWK set.",
+#           "example": { "e": "AQAB", "etc": "etc" },
+#           "type": "object"
+#         },
+#         "public_jwk_url": {
+#           "description": "1.3 specific. The tool-hosted URL containing its public JWK keyset.",
+#           "example": "https://mytool.com/1_3/jwks",
+#           "type": "string"
+#         },
+#         "scopes": {
+#           "description": "1.3 specific. List of LTI scopes requested by the tool",
+#           "example": ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"],
+#           "type": "array",
+#           "items": { "type": "string" }
+#         },
+#         "redirect_uris": {
+#           "description": "1.3 specific. List of possible launch URLs for after the Canvas authorize redirect step",
+#           "example": ["https://mytool.com/launch", "https://mytool.com/1_3/launch"],
+#           "type": "array",
+#           "items": { "type": "string" }
+#         },
+#         "disabled_scopes": {
+#           "description": "1.3 specific. List of LTI scopes that the tool has requested but an admin has disabled",
+#           "example": ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"],
+#           "type": "array",
+#           "items": { "type": "string" }
+#         },
+#         "disabled_placements": {
+#           "description": "List of placements that the tool has requested but an admin has disabled",
+#           "example": ["course_navigation"],
+#           "type": "array",
+#           "items": { "type": "string" }
+#         },
+#         "placements": {
+#           "description": "Placement-specific settings changed by an admin",
+#           "example": { "course_navigation": { "$ref": "Lti::Placement" } },
+#           "type": "object",
+#           "items": { "$ref": "Lti::PlacementOverlay" }
+#         }
+#       }
+#     }
+#
+# @model Lti::PlacementOverlay
+#     {
+#       "id": "Lti::PlacementOverlay",
+#       "description": "Changes made by a Canvas admin to a tool's configuration for a specific placement.",
+#       "properties": {
+#         "text": {
+#           "description": "The text of the link to the tool (if applicable).",
+#           "example": "Hello World",
+#           "type": "string"
+#         },
+#         "target_link_uri": {
+#           "description": "The default launch URL for the tool. Overridable by placements.",
+#           "example": "https://mytool.com/launch",
+#           "type": "string"
+#         },
+#         "message_type": {
+#           "description": "Default message type for all placements",
+#           "example": "LtiResourceLinkRequest",
+#           "type": "string",
+#           "enum":
+#           [
+#             "LtiResourceLinkRequest",
+#             "LtiDeepLinkingRequest"
+#           ]
+#         },
+#         "launch_height": {
+#           "description": "Default iframe height. Not valid for all placements. Overrides tool-level launch_height.",
+#           "example": 800,
+#           "type": "number"
+#         },
+#         "launch_width": {
+#           "description": "Default iframe width. Not valid for all placements. Overrides tool-level launch_width.",
+#           "example": 1000,
+#           "type": "number"
+#         },
+#         "icon_url": {
+#           "description": "Default icon URL. Not valid for all placements. Overrides tool-level icon_url.",
+#           "example": "https://mytool.com/icon.png",
+#           "type": "string"
+#         },
+#         "default": {
+#           "description": "Default display state for course_navigation. If 'enabled', will show in course sidebar. If 'disabled', will be hidden.",
+#           "example": "disabled",
+#           "type": "string"
+#         }
+#       }
+#     }
+#
 class Lti::RegistrationsController < ApplicationController
   before_action :require_account_context_instrumented
   before_action :require_feature_flag
@@ -574,6 +712,13 @@ class Lti::RegistrationsController < ApplicationController
   #
   # @argument dir [String, "asc"|"desc"]
   #   The order to sort the given column by. Defaults to desc.
+  #
+  # @argument include[] [String]
+  #   Array of additional data to include. Always includes [account_binding].
+  #
+  #   "account_binding":: the registration's binding to the given account
+  #   "configuration":: the registration's Canvas-style tool configuration
+  #   "overlay":: the registration's admin-defined configuration overlay
   #
   # @returns {"total": "integer", data: [Lti::Registration] }
   #
@@ -662,9 +807,10 @@ class Lti::RegistrationsController < ApplicationController
 
       per_page = Api.per_page_for(self, default: 15)
       paginated_registrations, _metadata = Api.jsonapi_paginate(sorted_registrations, self, url_for, { per_page: })
+      includes = [:account_binding] + Array(params[:include]).map(&:to_sym)
       render json: {
         total: all_registrations.size,
-        data: lti_registrations_json(paginated_registrations, @current_user, session, @context, includes: [:account_binding])
+        data: lti_registrations_json(paginated_registrations, @current_user, session, @context, includes:)
       }
     end
   rescue => e
@@ -738,6 +884,13 @@ class Lti::RegistrationsController < ApplicationController
   # Return details about the specified LTI registration, including the
   # configuration and account binding.
   #
+  # @argument include[] [String]
+  #   Array of additional data to include. Always includes [account_binding configuration].
+  #
+  #   "account_binding":: the registration's binding to the given account
+  #   "configuration":: the registration's Canvas-style tool configuration
+  #   "overlay":: the registration's admin-defined configuration overlay
+  #
   # @returns Lti::Registration
   #
   # @example_request
@@ -748,7 +901,8 @@ class Lti::RegistrationsController < ApplicationController
   def show
     GuardRail.activate(:secondary) do
       registration = Lti::Registration.active.find(params[:id])
-      render json: lti_registration_json(registration, @current_user, session, @context, includes: [:account_binding, :configuration])
+      includes = [:account_binding, :configuration] + Array(params[:include]).map(&:to_sym)
+      render json: lti_registration_json(registration, @current_user, session, @context, includes:)
     end
   rescue => e
     report_error(e)
@@ -814,7 +968,7 @@ class Lti::RegistrationsController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def destroy
     registration.destroy
-    render json: lti_registration_json(registration, @current_user, session, @context, includes: [:account_binding, :configuration])
+    render json: lti_registration_json(registration, @current_user, session, @context, includes: %i[account_binding configuration overlay])
   rescue => e
     report_error(e)
     raise e
