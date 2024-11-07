@@ -16,16 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export {default as AppNavBar} from './AppNavBar'
-export {default as Background} from './Background'
-export {default as ContentLayout} from './ContentLayout'
-export {default as FooterLinks} from './FooterLinks'
-export {default as Footer} from './Footer'
-export {default as Header} from './Header'
-export {default as InstructureLogo} from './InstructureLogo'
-export {default as Loading} from './Loading'
-export {default as LoginLogo} from './LoginLogo'
-export {default as OtpForm} from './OtpForm'
-export {default as RememberMeCheckbox} from './RememberMeCheckbox'
-export {default as SignInLinks} from './SignInLinks'
-export {default as SSOButtons} from './SSOButtons'
+import React from 'react'
+import {NewLoginProvider} from '../../context/NewLoginContext'
+import {RememberMeCheckbox} from '../index'
+import {render} from '@testing-library/react'
+
+describe('RememberMeCheckbox', () => {
+  it('mounts without crashing', () => {
+    render(
+      <NewLoginProvider>
+        <RememberMeCheckbox />
+      </NewLoginProvider>
+    )
+  })
+})
