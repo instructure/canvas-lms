@@ -30,6 +30,28 @@ describe User do
       expect(user_model).to be_valid
     end
 
+    context "when instructure_identity_id is not unique" do
+      before { user_model(instructure_identity_id: duplicate_id) }
+
+      let(:duplicate_id) { SecureRandom.uuid }
+      let(:user_two) { user_model(instructure_identity_id: duplicate_id) }
+
+      it "does not permit saving a record with a duplicate instructure_identity_id" do
+        expect { user_two }.to raise_error("Validation failed: Instructure identity has already been taken")
+      end
+
+      context "when the instructure_identity_id is nil" do
+        before { user_model(instructure_identity_id: duplicate_id) }
+
+        let(:duplicate_id) { nil }
+        let(:user_two) { user_model(instructure_identity_id: duplicate_id) }
+
+        it "does permit saving a record with a duplicate instructure_identity_id" do
+          expect { user_two }.not_to raise_error
+        end
+      end
+    end
+
     context "on update" do
       let(:user) { user_model }
 
