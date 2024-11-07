@@ -31,6 +31,13 @@ const renderBlock = (props: Partial<ImageBlockProps> = {}) => {
   )
 }
 describe('ImageBlock', () => {
+  beforeEach(() => {
+    fetchMock.get('*', 200)
+  })
+  afterEach(() => {
+    fetchMock.reset()
+  })
+
   it('should render with default props', () => {
     const {container} = renderBlock()
     const block = container.querySelector('.image-block.empty')
@@ -121,7 +128,12 @@ describe('ImageBlock', () => {
 
   describe('svg handling', () => {
     beforeEach(() => {
-      fetchMock.get('some-image.svg', '<svg></svg>')
+      fetchMock.reset()
+      fetchMock.get('some-image.svg', {
+        status: 201,
+        body: '<svg></svg>',
+        headers: {'Content-type': 'image/svg+xml'},
+      })
     })
 
     it('renders the svg inline', async () => {
