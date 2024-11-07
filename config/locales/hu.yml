@@ -7003,6 +7003,7 @@ hu:
   copyright_and_license_information_must_be_provided_5feffaf: "Meg kell adni a fájlokhoz a Copyright és licenc információkat, mielőtt publikálják őket."
   copyright_holder_386cc8b8: "Szerzői jog jogosultja"
   copyright_holder_66ee111: "Jog tulajdonosa:"
+  correct_7df6d875: Helyes!
   correct_answer: "Ez volt a helyes válasz."
   correct_answer_5a6a57d1: "Helyes válasz"
   correct_answer_comments_34ca671f: "A helyes válaszhoz kapcsolódó megjegyzések"
@@ -12917,6 +12918,7 @@ hu:
   input_event_title_1d4c8b10: "Esemény cím megadása"
   input_event_title_b2445e30: "Esemény cím megadása..."
   input_is_not_a_valid_number_5c1b572e: "%{INPUT} nem egy érvényes szám."
+  insert_593145ef: Beszúrás
   insert_above_row_de82d138: "beszúrás ez fölé: %{row}"
   insert_below_row_55ed6f34: "beszúrás ez alá: %{row}"
   insert_comment_from_library_57cddc75: "Hozzászólás beillesztése a könyvtárból"
@@ -14289,6 +14291,7 @@ hu:
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "A jártassági szint pontszám a legmagasabb pontszámot jelenti az értékelt feladatok vagy a kvízek vonatkozásában"
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "A jártassági szint pontszám a legfrissebb pontszámot jelenti az értékelt feladatok vagy a kvízek vonatkozásában"
   matched_jobs_jobs_with_tags_tags_1d1fddb6: "%{tags} címkékre illeszkedő %{jobs} jobok "
+  matching_63f5af40: Párosítás
   matching_left_side_900f860b: "Bal oldalra illesztés"
   matching_right_side_920e71b2: "Jobb oldalra illesztés"
   math_ede93050: Math
@@ -16475,6 +16478,7 @@ hu:
                 mindegyik ugyanaz, mint amit jelenleg alkalmaznak.
   multiple_ba5220cd: Többszörös
   multiple_canvas_accounts_are_associated_with_cleve_c1739660: "Több Canvas-fiók tartozik %{district_id} Clever-körzetbe"
+  multiple_choice_9f931ee6: Feleletválasztós
   multiple_dates_e3a122f7: "Többes határidő"
   multiple_dropdowns_read_surrounding_text_f61274b3: "Több legördülő menü, olvassa el a környező szöveget"
   multiple_due_dates_283dd861: "Több határidő"
@@ -16896,6 +16900,7 @@ hu:
   no_placements_enabled_f705f28: "Nincsenek engedélyezett elhelyezések"
   no_points_possible_368669d: "Nincsenek elérhető pontok"
   no_points_possible_72db3a55: "Nincsenek elérhető pontok"
+  no_quizzes_found_c80c537a: "Nem található kvíz."
   no_recent_announcements_abf950d5: "Nincsenek friss hirdetmények"
   no_restrictions_79a892d2: "Nincs korlátozás"
   no_results_3cda4e72: "Nincsenek eredmények"
@@ -25745,6 +25750,7 @@ hu:
   trinidad_and_tobago_1_fc2d8d1c: "Trinidad és Tobago (+1)"
   trophy: 
     star_display_name: Csillagozás
+  true_false_823761a9: Igaz/Hamis
   truncated_56b1a661: Rövidítve
   trusted_account_669ba397: "Megbízható fiók"
   trusted_account_url_e6200e41: "Megbízható fiók URL címe"
