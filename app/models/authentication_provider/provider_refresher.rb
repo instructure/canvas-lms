@@ -22,10 +22,10 @@ class AuthenticationProvider::ProviderRefresher
   class << self
     def refresh_providers(providers:, shard_scope: Shard.current)
       providers.each do |provider|
-        new_data = refresh_if_necessary(provider.global_id, provider.metadata_uri)
+        new_data = refresh_if_necessary(provider.global_id, uri_for(provider))
         next unless new_data
 
-        provider.metadata = new_data
+        assign_metadata(provider, new_data)
         provider.save! if provider.changed?
       rescue => e
         level = (e.is_a?(Net::HTTPClientException) && e.response.code.to_i == 404) ? :warn : :error
