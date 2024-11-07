@@ -19,7 +19,7 @@
 import React from 'react'
 import classNames from 'classnames'
 import type {AuthProvider} from '../types'
-import type {ViewOwnProps} from '@instructure/ui-view'
+import {View, type ViewOwnProps} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 import {Grid, GridCol, GridRow} from '@instructure/ui-grid'
 import {Img} from '@instructure/ui-img'
@@ -89,22 +89,26 @@ const SSOButtons = ({className}: Props) => {
 
     return (
       <GridCol key={provider.id} width={{small: 12, large: 6}}>
-        <Button
-          href={link}
-          display="block"
-          disabled={isUiActionPending}
-          renderIcon={() => (
-            <Img
-              src={iconSrc}
-              alt={displayName}
-              width="1.125rem"
-              height="1.125rem"
-              display="block"
-            />
+        <Button href={link} display="block" disabled={isUiActionPending} onClick={handleClick}>
+          {iconSrc && (
+            <View
+              position="absolute"
+              insetInlineStart="0.625rem"
+              insetBlockStart="50%"
+              style={{
+                transform: 'translateY(-50%)',
+              }}
+            >
+              <Img
+                src={iconSrc}
+                alt={displayName}
+                width="1.125rem"
+                height="1.125rem"
+                display="block"
+              />
+            </View>
           )}
-          onClick={handleClick}
-        >
-          {I18n.t('Sign in with %{displayName}', {displayName})}
+          {I18n.t('Log in with %{displayName}', {displayName})}
         </Button>
       </GridCol>
     )

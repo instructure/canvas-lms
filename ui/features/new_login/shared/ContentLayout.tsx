@@ -17,7 +17,7 @@
  */
 
 import React, {Suspense} from 'react'
-import {Background, Loading} from './index'
+import {Background, Loading} from '.'
 import classNames from 'classnames'
 import {View} from '@instructure/ui-view'
 
@@ -33,7 +33,7 @@ const ContentLayout = ({className, children}: Props) => (
   <View as="div" height="100%" position="relative" className={styles.contentLayout}>
     <View
       as="div"
-      className={classNames(className, styles.contentLayout__wrapper)}
+      className={classNames(className, styles.contentLayout__content)}
       background="primary"
     >
       <Suspense fallback={<Loading renderTitle="Loading page …" />}>{children}</Suspense>

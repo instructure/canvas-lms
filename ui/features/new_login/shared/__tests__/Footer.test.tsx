@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {Footer} from '../index'
+import {Footer} from '..'
 import {NewLoginProvider} from '../../context/NewLoginContext'
 
 describe('Footer', () => {

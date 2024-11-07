@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {NewLoginProvider} from '../../context/NewLoginContext'
-import {RememberMeCheckbox} from '../index'
+import {RememberMeCheckbox} from '..'
 import {render} from '@testing-library/react'
 
 describe('RememberMeCheckbox', () => {

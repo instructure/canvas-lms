@@ -17,18 +17,22 @@
  */
 
 import React from 'react'
-import {Loading} from '../index'
-import {render, screen} from '@testing-library/react'
+import {Loading} from '..'
+import {render, screen, waitFor} from '@testing-library/react'
 
 describe('Loading Component', () => {
-  it('renders with default loading title', () => {
+  it('renders with default loading title', async () => {
     render(<Loading />)
-    expect(screen.getByTitle('Loading …')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByTitle('Loading …')).toBeInTheDocument()
+    })
   })
 
-  it('renders with a custom loading title', () => {
+  it('renders with a custom loading title', async () => {
     const customTitle = 'Fetching Data...'
     render(<Loading title={customTitle} />)
-    expect(screen.getByTitle(customTitle)).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByTitle(customTitle)).toBeInTheDocument()
+    })
   })
 })

@@ -61,9 +61,9 @@ export const LoginLayout = () => {
               <Flex direction="column" gap="large">
                 <Header />
 
-                <main>
+                <View as="main" minHeight="300px">
                   <Outlet />
-                </main>
+                </View>
 
                 <Footer />
               </Flex>

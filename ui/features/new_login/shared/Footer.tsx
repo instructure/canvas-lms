@@ -19,7 +19,7 @@
 import React from 'react'
 import classNames from 'classnames'
 import {Flex} from '@instructure/ui-flex'
-import {FooterLinks, InstructureLogo} from './index'
+import {FooterLinks, InstructureLogo} from '.'
 import {View} from '@instructure/ui-view'
 
 interface Props {

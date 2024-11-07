@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {ContentLayout} from '../index'
+import {ContentLayout} from '..'
 import {NewLoginProvider} from '../../context/NewLoginContext'
 
 describe('ContentLayout', () => {

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {AppNavBar} from '../index'
+import {AppNavBar} from '..'
 import {MemoryRouter} from 'react-router-dom'
 import {NewLoginProvider} from '../../context/NewLoginContext'
 import {render} from '@testing-library/react'

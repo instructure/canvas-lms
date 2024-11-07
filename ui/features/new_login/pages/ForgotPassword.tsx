@@ -16,15 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {Button} from '@instructure/ui-buttons'
+import {EMAIL_REGEX} from '../shared'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {SignInLinks} from '../shared'
 import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
 import {forgotPassword} from '../services'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {useNavigate} from 'react-router-dom'
 import {useNewLogin} from '../context/NewLoginContext'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -32,25 +33,33 @@ const I18n = useI18nScope('new_login')
 
 const ForgotPassword = () => {
   const {isUiActionPending, setIsUiActionPending, loginHandleName} = useNewLogin()
+  const navigate = useNavigate()
+
   const [email, setEmail] = useState('')
-  const [isEmailValid, setIsEmailValid] = useState(false)
+  const [emailError, setEmailError] = useState('')
   const [emailSent, setEmailSent] = useState(false)
   const [submittedEmail, setSubmittedEmail] = useState('')
 
-  const validateEmail = (value: string) => {
-    setIsEmailValid(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()))
+  const emailInputRef = useRef<HTMLInputElement | undefined>(undefined)
+
+  useEffect(() => {
+    if (emailError && emailInputRef.current) {
+      emailInputRef.current.focus()
+    }
+  }, [emailError])
+
+  const validateEmail = (value: string): boolean => {
+    const isValid = EMAIL_REGEX.test(value)
+    setEmailError(
+      isValid ? '' : I18n.t('Please enter a valid %{loginHandleName}', {loginHandleName})
+    )
+    return isValid
   }
 
-  const handleForgotPassword = async (event: React.FormEvent) => {
+  const handleForgotPassword = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    if (!isEmailValid) {
-      showFlashAlert({
-        message: I18n.t('Please enter your email address.'),
-        type: 'error',
-      })
-      return
-    }
+    if (isUiActionPending || !validateEmail(email)) return
 
     setIsUiActionPending(true)
 
@@ -60,18 +69,9 @@ const ForgotPassword = () => {
       if (response.status === 200 && response.data?.requested) {
         setSubmittedEmail(email)
         setEmail('')
-        setIsEmailValid(false)
         setEmailSent(true)
-
-        showFlashAlert({
-          message: I18n.t('Password recovery email successfully sent.', {email}),
-          type: 'success',
-        })
       } else {
-        showFlashAlert({
-          message: I18n.t('No account found for this email address.'),
-          type: 'warning',
-        })
+        setEmailError(I18n.t('No account found for this email address'))
       }
     } catch (_error: unknown) {
       showFlashAlert({
@@ -83,21 +83,44 @@ const ForgotPassword = () => {
     }
   }
 
-  const handleEmailChange = (_: any, value: string) => {
-    setEmail(value)
-    validateEmail(value)
+  const handleEmailChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
+    const trimmedValue = value.trim()
+    setEmail(trimmedValue)
+    if (trimmedValue === '') {
+      setEmailError('')
+    } else if (emailError) {
+      validateEmail(trimmedValue)
+    }
+  }
+
+  const handleEmailBlur = () => {
+    if (email === '') {
+      setEmailError('')
+    } else {
+      validateEmail(email)
+    }
+  }
+
+  const handleCancel = () => {
+    navigate('/login/canvas')
   }
 
   const passwordRecoveryForm = (
     <>
-      <Text>
-        {I18n.t(
-          'Enter your %{loginHandleName} and we’ll send you a link to change your password.',
-          {loginHandleName}
-        )}
-      </Text>
+      <Flex direction="column" gap="small">
+        <Heading as="h1" level="h2">
+          {I18n.t('Forgot your password?')}
+        </Heading>
 
-      <form onSubmit={handleForgotPassword}>
+        <Text>
+          {I18n.t(
+            'Enter your %{loginHandleName} and we’ll send you a link to change your password.',
+            {loginHandleName}
+          )}
+        </Text>
+      </Flex>
+
+      <form onSubmit={handleForgotPassword} noValidate={true}>
         <Flex direction="column" gap="large">
           <TextInput
             id="email"
@@ -105,23 +128,29 @@ const ForgotPassword = () => {
             type="email"
             value={email}
             onChange={handleEmailChange}
+            onBlur={handleEmailBlur}
+            messages={emailError ? [{type: 'error', text: emailError}] : []}
             autoComplete="email"
+            disabled={isUiActionPending}
             aria-describedby="emailHelp"
+            inputRef={inputElement => {
+              emailInputRef.current = inputElement as HTMLInputElement | undefined
+            }}
           />
 
-          <Flex direction="column" gap="small">
+          <Flex direction="row" gap="small">
             <Button
-              type="submit"
-              color="primary"
+              color="secondary"
               display="block"
-              disabled={!isEmailValid || isUiActionPending}
+              onClick={handleCancel}
+              disabled={isUiActionPending}
             >
-              {I18n.t('Submit')}
+              {I18n.t('Back to Login')}
             </Button>
 
-            <Flex.Item align="center">
-              <SignInLinks />
-            </Flex.Item>
+            <Button type="submit" color="primary" display="block" disabled={isUiActionPending}>
+              {I18n.t('Next')}
+            </Button>
           </Flex>
         </Flex>
       </form>
@@ -130,25 +159,27 @@ const ForgotPassword = () => {
 
   const confirmationMessage = (
     <>
-      <Text>
-        {I18n.t(
-          'A recovery email has been sent to %{email}. Please check your inbox and follow the instructions to reset your password. This may take up to 30 minutes. If you don’t receive an email, be sure to check your spam folder.',
-          {email: submittedEmail}
-        )}
-      </Text>
+      <Flex direction="column" gap="small">
+        <Heading as="h1" level="h2">
+          {I18n.t('Check your email')}
+        </Heading>
 
-      <Flex.Item align="center" overflowY="visible" overflowX="visible">
-        <SignInLinks />
-      </Flex.Item>
+        <Text>
+          {I18n.t(
+            'A recovery email has been sent to %{email}. Please check your inbox and follow the instructions to reset your password. This may take up to 10 minutes. If you don’t receive an email, be sure to check your spam folder.',
+            {email: submittedEmail}
+          )}
+        </Text>
+      </Flex>
+
+      <Button color="secondary" display="block" onClick={handleCancel}>
+        {I18n.t('Back to login')}
+      </Button>
     </>
   )
 
   return (
     <Flex direction="column" gap="large">
-      <Heading level="h2" as="h1">
-        {I18n.t('Forgot Password')}
-      </Heading>
-
       {emailSent ? confirmationMessage : passwordRecoveryForm}
     </Flex>
   )
