@@ -21,7 +21,7 @@ import OutcomeMoveModal from './OutcomeMoveModal'
 import {MockedProvider} from '@apollo/react-testing'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {smallOutcomeTree, moveOutcomeMock} from '@canvas/outcomes/mocks/Management'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 
 const outcomesGenerator = (startId, count, canUnlink = true, title = '') =>
   new Array(count).fill(0).reduce(

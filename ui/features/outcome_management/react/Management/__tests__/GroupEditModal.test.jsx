@@ -19,7 +19,7 @@
 import React from 'react'
 import {render as realRender, fireEvent, act} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import GroupEditModal from '../GroupEditModal'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'

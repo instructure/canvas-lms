@@ -23,7 +23,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {SEARCH_GROUP_OUTCOMES} from '../../graphql/Management'
 import {uniqWith, uniqBy, uniq, isEqual} from 'lodash'
-import {gql} from '@canvas/apollo'
+import {gql} from '@canvas/apollo-v3'
 
 const I18n = useI18nScope('OutcomeManagement')
 
@@ -218,7 +218,7 @@ const useGroupDetail = ({
     return [...selectedIds]
       .map(linkId => {
         const link = client.readFragment({
-          id: `ContentTag${linkId}`,
+          id: `ContentTag:${linkId}`,
           fragment: gql`
             fragment LearningOutcomeFragment on ContentTag {
               _id
@@ -226,7 +226,6 @@ const useGroupDetail = ({
               node {
                 ... on LearningOutcome {
                   _id
-                  description
                   title
                 }
               }

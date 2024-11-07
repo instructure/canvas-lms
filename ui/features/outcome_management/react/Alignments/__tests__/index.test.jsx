@@ -19,7 +19,7 @@
 import React from 'react'
 import {render as realRender, act} from '@testing-library/react'
 import AlignmentSummary from '../index'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import {MockedProvider} from '@apollo/react-testing'
 import {courseAlignmentStatsMocks} from '@canvas/outcomes/mocks/Management'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'

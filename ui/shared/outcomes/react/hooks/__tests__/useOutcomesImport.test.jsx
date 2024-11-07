@@ -23,7 +23,7 @@ import useOutcomesImport, {
   IMPORT_FAILED,
   IMPORT_COMPLETED,
 } from '../useOutcomesImport'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import {MockedProvider} from '@apollo/react-testing'
 import OutcomesContext from '../../contexts/OutcomesContext'
 import {importGroupMocks, importOutcomeMocks} from '../../../mocks/Management'

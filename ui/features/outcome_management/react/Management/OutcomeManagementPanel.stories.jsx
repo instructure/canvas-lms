@@ -18,7 +18,7 @@
 
 import React from 'react'
 import OutcomeManagementPanel from '.'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import {accountMocks, smallOutcomeTree} from '@canvas/outcomes/mocks/Management'
 import {MockedProvider} from '@apollo/react-testing'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'

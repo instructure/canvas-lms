@@ -18,7 +18,7 @@
 
 import axios from '@canvas/axios'
 import pluralize from '@canvas/util/stringPluralize'
-import {gql} from '@canvas/apollo'
+import {gql} from '@canvas/apollo-v3'
 
 export const ACCOUNT_OUTCOME_PROFICIENCY_QUERY = gql`
   query GetOutcomeProficiencyData($contextId: ID!) {
