@@ -2937,6 +2937,7 @@ ko:
     prompts: 
       update_assignment_points: "이 과제는 %{assignmentPoints}점이 가능하지만 이 루브릭과 일치하도록 %{rubricPoints}점이 가능하도록 바꾸시겠습니까?"
   change_to_b757d327: "다음으로 변경"
+  check_f9bb054a: 확인
   child_s_username_dde3aa9: "자식의 사용자 이름"
   choose_a_course_home_page_8059c7b: "과목 홈 페이지 선택"
   choose_a_csv_file_to_upload_9644480c: "업로드할 CSV 파일 선택:"
@@ -3975,6 +3976,7 @@ ko:
     unstar: "별표 해제"
     unstar_conversation: "대화 별표 취소"
   conversations_69a8dc26: 대화
+  correct_7df6d875: 정답입니다!
   correct_answer: 정답입니다.
   correct_answer_comments_34ca671f: "정답 의견"
   correct_answers_are_available_until_date_df01cc5f: "정답은 %{date}까지 사용할 수 있습니다."
@@ -7097,6 +7099,7 @@ ko:
       start_a_group: "그룹 시작하기"
     styleguide: 
       manage: 관리
+  insert_593145ef: 삽입
   insert_equella_links_49a8dacd: "Insert Equella Links"
   insert_here_ccdb022e: "여기에 삽입"
   insert_math_equation_57c6e767: "Insert Math Equation"
@@ -7562,6 +7565,7 @@ ko:
   mark_as_read_47ec83dd: "읽음으로 표시"
   mark_as_unread_4ded3977: "읽지 않음으로 표시"
   mastery_at_cf0c477b: "숙달 점수"
+  matching_63f5af40: 짝짓기
   mathquill: 
     tabs: 
       arrows: 화살표
@@ -9475,6 +9479,7 @@ ko:
   move_to_1c208ae5: "다음으로 이동..."
   multi_factor_authentication_1a6b3b3d: "다단계 인증"
   multi_factor_authentication_configured_865b1bde: "다단계 인증 구성"
+  multiple_choice_9f931ee6: "여러 선택"
   multiple_dates_e3a122f7: "여러 날짜"
   multiple_modules_930713d4: "여러 모듈"
   must_be_255_characters_or_less_e8e7f25e: "255글자보다 적어야 함"
@@ -13894,6 +13899,7 @@ ko:
       got_it: 확인
   trophy: 
     star_display_name: "별표 표시"
+  true_false_823761a9: 맞음/틀림
   truncated_56b1a661: 잘림
   try_again_6ca44338: "다시 시도"
   turned_in_submission_date_e9180b8b: "제출일: %{submission_date}"
