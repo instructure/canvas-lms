@@ -47,28 +47,34 @@ const ImageBlock = ({
   const clazz = useClassNames(enabled, {empty: !src}, ['block', 'image-block'])
   const [styl, setStyl] = useState<any>({})
   const [imageLoaded, setImageLoaded] = useState(false)
-  const [aspectRatio, setAspectRatio] = useState(1)
   // in preview mode, node.dom is null, so use a ref to the element
   const [blockRef, setBlockRef] = useState<HTMLDivElement | null>(null)
   const imgRef = useRef<HTMLImageElement | null>(null)
 
   const [isSVG, setIsSVG] = useState(false)
   const [svg, setSVG] = useState<string | null>(null)
-  const [svgLoading, setSvgLoading] = useState(false)
 
   useEffect(() => {
     if (!src) return
-    if (!src.toLowerCase().endsWith('.svg')) return
 
-    setIsSVG(true)
-    setSvgLoading(true)
-    fetch(src)
-      .then(response => response.text())
+    fetch(src, {mode: 'cors'})
+      .then(response => {
+        if (response.headers.get('content-type')?.includes('image/svg')) {
+          setIsSVG(true)
+          return response.text()
+        } else {
+          setIsSVG(false)
+          return null
+        }
+      })
       .then(text => {
         setSVG(text)
       })
-      .finally(() => {
-        setSvgLoading(false)
+      .then(() => {
+        setImageLoaded(true)
+      })
+      .catch(_err => {
+        setIsSVG(false)
       })
   }, [src])
 
@@ -104,25 +110,8 @@ const ImageBlock = ({
   }, [blockRef, height, maintainAspectRatio, sizeVariant, src, width])
 
   useEffect(() => {
-    if (!src) return
-    if (imageLoaded) return
-
-    const loadTimer = window.setInterval(() => {
-      if (!imgRef.current) return
-      if (!imgRef.current.complete) return
-      const img = imgRef.current
-      setImageLoaded(true)
-      setAspectRatio(img.naturalWidth / img.naturalHeight)
-      clearInterval(loadTimer)
-    }, 10)
-    return () => {
-      clearInterval(loadTimer)
-    }
-  }, [imageLoaded, src])
-
-  useEffect(() => {
     setSize()
-  }, [width, height, aspectRatio, setSize])
+  }, [width, height, setSize])
 
   useEffect(() => {
     setCustom((ctsm: any) => {
@@ -146,7 +135,7 @@ const ImageBlock = ({
           setBlockRef(el)
         }}
       >
-        {!imgRef?.current?.complete ? (
+        {!imageLoaded ? (
           <div style={loadingStyle}>
             <Spinner renderTitle={I18n.t('Loading')} size="x-small" />
           </div>
@@ -157,6 +146,7 @@ const ImageBlock = ({
           src={src || ImageBlock.craft.defaultProps.src}
           alt={alt || ''}
           style={{width: '100%', height: '100%', objectFit: imgConstrain, display: 'inline-block'}}
+          onLoad={() => setImageLoaded(true)}
         />
       </div>
     )
@@ -175,7 +165,7 @@ const ImageBlock = ({
           setBlockRef(el)
         }}
       >
-        {svgLoading ? (
+        {!imageLoaded ? (
           <div style={loadingStyle}>
             <Spinner renderTitle={I18n.t('Loading')} size="x-small" />
           </div>
