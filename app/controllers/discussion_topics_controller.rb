@@ -786,18 +786,22 @@ class DiscussionTopicsController < ApplicationController
         env_hash[:HAS_GRADING_PERIODS] = @context.grading_periods?
         set_section_list_js_env
       end
-      if params[:entry_id] && (entry = @topic.discussion_entries.find_by(id: params[:entry_id]))
+      if params[:entry_id] && @topic.discussion_entries.find_by(id: params[:entry_id])
         entry = @topic.discussion_entries.find(params[:entry_id])
         env_hash[:discussions_deep_link] = {
           root_entry_id: entry.root_entry_id,
           parent_id: entry.parent_id,
           entry_id: entry.id
         }
-        if entry.root_entry_id.nil?
-          condition = ">="
-          count_before = @topic.root_discussion_entries.where("created_at #{condition}?", entry.created_at).count
-          env_hash[:current_page] = (count_before / env_hash[:per_page]).ceil
-        end
+
+        entry = entry.highest_level_parent_or_self
+        sort_order = @topic.participant(current_user: @current_user).sort_order
+        condition = (sort_order == DiscussionTopicParticipant::SortOrder::DESC) ? ">=" : "<="
+        count_before = @topic.root_discussion_entries
+                             .where(parent_id: nil)
+                             .where("created_at #{condition}?", entry.created_at).count
+        env_hash[:current_page] = ((1 + count_before) / env_hash[:per_page]).ceil
+
       end
       js_env(env_hash)
 
