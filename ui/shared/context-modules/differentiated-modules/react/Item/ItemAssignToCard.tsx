@@ -214,13 +214,15 @@ export default forwardRef(function ItemAssignToCard(
   const dateValidatorInputArgs = useMemo(() => {
     const section = selectedAssigneeIds.find(assignee => assignee.includes('section'))
     const sectionId = section?.split('-')[1] ?? null
+    const students = selectedAssigneeIds.filter(assignee => assignee.includes('student'))
+
     return {
       required_replies_due_at: requiredRepliesDueDate,
       reply_to_topic_due_at: replyToTopicDueDate,
       due_at: dueDate,
       unlock_at: availableFromDate,
       lock_at: availableToDate,
-      student_ids: [],
+      student_ids: students.length === selectedAssigneeIds.length ? students : [],
       course_section_id: sectionId,
       persisted: !dueAtHasChanged(),
       skip_grading_periods: dueDate === null,
