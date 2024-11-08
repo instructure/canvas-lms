@@ -106,4 +106,23 @@ describe AuthenticationProvider::Google do
     ap.hosted_domain = "canvaslms.com, instructure.com"
     expect(ap.send(:authorize_options)[:hd]).to eq "*"
   end
+
+  describe "#download_jwks" do
+    it "updates if nothing changed, but was forced" do
+      allow(subject).to receive(:jwks_uri).and_return("http://jwks")
+
+      keypair = OpenSSL::PKey::RSA.new(2048)
+      jwk = JSON::JWK.new(keypair.public_key)
+
+      allow(CanvasHttp).to receive(:get).with("http://jwks").and_return(instance_double("Net::HTTPOK", body: [jwk].to_json))
+
+      subject.save!
+      expect(subject.jwks[jwk[:kid]]).to eq jwk.as_json
+
+      subject.settings["jwks"] = { keys: [] }.to_json
+      expect(subject.jwks).to be_empty
+      subject.send(:download_jwks, force: true)
+      expect(subject.jwks[jwk[:kid]]).to eq jwk.as_json
+    end
+  end
 end
