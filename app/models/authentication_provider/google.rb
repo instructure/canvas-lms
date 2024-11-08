@@ -131,7 +131,7 @@ class AuthenticationProvider::Google < AuthenticationProvider::OpenIDConnect
 
   private
 
-  def download_jwks
+  def download_jwks(...)
     # cache against the default shard
     Shard.default.activate do
       super
