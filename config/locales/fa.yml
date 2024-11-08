@@ -6882,6 +6882,7 @@ fa:
   copying_628a9607: "در حال کپی کردن.."
   copyright_and_license_information_must_be_provided_5feffaf: "اطلاعات حق نشر و مجوز باید قبل از انتشار اطلاعات برای  فایل‌ها ارائه شود."
   copyright_holder_66ee111: "دارنده حق نشر:"
+  correct_7df6d875: "درست است!"
   correct_answer: "جواب درست بود."
   correct_answer_5a6a57d1: "پاسخ درست"
   correct_answer_comments_34ca671f: "نظرهای مربوط به پاسخ درست"
@@ -12776,6 +12777,7 @@ fa:
   inner_box_border_d0524b03: "مرز کادر داخلی"
   input_and_distribute_grades_for_students_display_g_9a2e46a0: "نمرات را برای دانشجویان وارد و توزیع کنید. نمرات را به صورت امتیاز، درصد، کامل یا ناقص، قبول یا مردود، مقیاس معدل و نمره به حروف نمایش دهید. تکالیف را برای وزن‌دار کردن نمرات گروه بندی کنید."
   input_event_title_1d4c8b10: "عنوان رویداد ورودی"
+  insert_593145ef: درج
   insert_above_row_de82d138: "درج در بالا %{row}"
   insert_below_row_55ed6f34: "درج در پایین%{row}"
   insert_equella_links_49a8dacd: "Insert Equella Links"
@@ -13812,6 +13814,7 @@ fa:
   mastery_points_f1672cc: "امتیازهای تسلط "
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "نمره تسلط بالاترین نمره یک تکلیف یا آزمون نمره گذاری شده را نشان می دهد."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "نمره تسلط جدیدترین تکلیف یا آزمون نمره گذاری شده را نشان می دهد."
+  matching_63f5af40: تطبیقی
   matching_left_side_900f860b: "در حال انطباق سمت چپ"
   matching_right_side_920e71b2: "در حال انطباق سمت راست"
   mathquill: 
@@ -16154,6 +16157,7 @@ fa:
   multiple_are_marked_current_theme_because_the_same_3bdebbe1: "چند مورد به عنوان \"زمینه فعلی\" علامت‌گذاری شده است، زیرا مقادیر یکسان تحت چند نام ذخیره شده‌اند، یعنی هر یک با آنچه در حال حاضر اعمال شده یکسان هستند"
   multiple_ba5220cd: "چند مورد"
   multiple_canvas_accounts_are_associated_with_cleve_c1739660: "چند حساب کانواس با Clever District %{district_id} در ارتباط است"
+  multiple_choice_9f931ee6: "چند گزینه ای"
   multiple_dates_e3a122f7: "چند تاریخ"
   multiple_dropdowns_read_surrounding_text_f61274b3: "دارای چند منوی بازشونده، متن‌های اطراف را بخوانید"
   multiple_due_dates_283dd861: "چند تاریخ مهلت"
@@ -24438,6 +24442,7 @@ fa:
   trinidad_and_tobago_1_fc2d8d1c: "ترینیداد و توباگو (+1)"
   trophy: 
     star_display_name: "ستاره دار کردن"
+  true_false_823761a9: درست/غلط
   truncated_56b1a661: "کوتاه شده"
   trusted_account_669ba397: "حساب تایید شده"
   trusted_account_url_e6200e41: "لینک حساب تاییدشده"
