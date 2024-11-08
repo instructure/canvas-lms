@@ -698,6 +698,12 @@
                   </span>
                 </div>
               <% end %>
+              <% if @context.account.feature_enabled?(:horizon_course_setting) %>
+                <div class="checkbox-flex-container">
+                  <%= f.check_box :horizon_course, :disabled => !can_manage_courses %>
+                  <%= f.label :horizon_course, :en => 'Horizon course' %><br />
+                </div>
+              <% end %>
               <%= f.select :default_wiki_editing_roles, [
                 [t('#course.wiki_permissions.only_teachers', "Only Teachers"), "teachers"],
                 [t('#course.wiki_permissions.teachers_students', "Teacher and Students"), "teachers,students"],

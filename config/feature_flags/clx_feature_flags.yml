@@ -1,0 +1,7 @@
+---
+horizon_course_setting:
+  applies_to: Account
+  state: hidden
+  display_name: Horizon course setting
+  description: |-
+    Enables the Horizon setting in the course settings page.
