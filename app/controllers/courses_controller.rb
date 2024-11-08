@@ -1800,7 +1800,8 @@ class CoursesController < ApplicationController
       :enable_course_paces,
       :conditional_release,
       :show_student_only_module_id,
-      :show_teacher_only_module_id
+      :show_teacher_only_module_id,
+      :horizon_course
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
 
@@ -3342,6 +3343,11 @@ class CoursesController < ApplicationController
         @course.errors.add(:enable_course_paces, pacing_message)
       end
 
+      if params[:course][:horizon_course].present? && !@course.account.feature_enabled?(:horizon_course_setting)
+        horizon_message = t("Horizon Course cannot be set without the feature flag enabled")
+        @course.errors.add(:horizon_course, horizon_message)
+      end
+
       changes = changed_settings(@course.changes, @course.settings, old_settings)
       changes.delete(:start_at) if changes.dig(:start_at, 0)&.to_s == changes.dig(:start_at, 1)&.to_s
       changes.delete(:conclude_at) if changes.dig(:conclude_at, 0)&.to_s == changes.dig(:conclude_at, 1)&.to_s
@@ -4259,7 +4265,8 @@ class CoursesController < ApplicationController
       :enable_course_paces,
       :default_due_time,
       :conditional_release,
-      :post_manually
+      :post_manually,
+      :horizon_course
     )
   end
 

@@ -2841,7 +2841,8 @@ class Course < ActiveRecord::Base
        homeroom_course
        course_color
        alt_name
-       restrict_quantitative_data]
+       restrict_quantitative_data
+       horizon_course]
   end
 
   def student_reporting?
