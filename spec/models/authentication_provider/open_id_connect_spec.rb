@@ -321,5 +321,23 @@ describe AuthenticationProvider::OpenIDConnect do
       subject.save!
       expect(subject.jwks[jwk2[:kid]]).to eq jwk2.as_json
     end
+
+    it "updates if nothing changed, but was forced" do
+      subject.jwks_uri = "http://jwks"
+      subject.jwks = [jwk].to_json
+
+      keypair2 = OpenSSL::PKey::RSA.new(2048)
+      jwk2 = JSON::JWK.new(keypair2.public_key)
+
+      allow(CanvasHttp).to receive(:get).with("http://jwks").and_return(instance_double("Net::HTTPOK", body: [jwk2].to_json))
+
+      subject.save!
+      expect(subject.jwks[jwk2[:kid]]).to eq jwk2.as_json
+
+      subject.settings["jwks"] = { keys: [] }.to_json
+      expect(subject.jwks).to be_empty
+      subject.send(:download_jwks, force: true)
+      expect(subject.jwks[jwk2[:kid]]).to eq jwk2.as_json
+    end
   end
 end
