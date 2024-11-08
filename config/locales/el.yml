@@ -4344,6 +4344,7 @@ el:
   copy_to_folder_32ecc3c3: "Αντιγραφή σε Φάκελο"
   copying_628a9607: Αντιγραφή...
   copyright_holder_66ee111: "Κάτοχος Πνευματικών Δικαιωμάτων:"
+  correct_7df6d875: Σωστά!
   correct_answer: "Αυτή ήταν η σωστή απάντηση."
   correct_answer_comments_34ca671f: "Σχόλια σωστής απάντησης"
   correct_answers_are_available_until_date_df01cc5f: "Οι σωστές απαντήσεις θα είναι διαθέσιμες μέχρι και %{date}."
@@ -7504,6 +7505,7 @@ el:
   information_816d9fa5: πληροφορίες
   inner_box_background_6f9092f: "Εσωτερικό Φόντο Κουτιού"
   inner_box_border_d0524b03: "Εσωτερικό Πλαίσιο Κουτιού"
+  insert_593145ef: Εισαγωγή
   insert_equella_links_49a8dacd: "Εισαγωγή Συνδέσμων τύπου Equella"
   insert_here_ccdb022e: "εισαγωγή εδώ"
   insert_math_equation_57c6e767: "Εισαγωγή Μαθηματικής Εξίσωσης"
@@ -8098,6 +8100,7 @@ el:
   marked_done_9fd646f: "Επισημάνθηκε ως ολοκληρωμένο"
   mastery_at_cf0c477b: "Επιδεξιότητα σε"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Η βαθμολογία επιδεξιότητας δείχνει την υψηλότερη βαθμολογία μιας βαθμολογημένης εργασίας ή ενός κουίζ."
+  matching_63f5af40: Αντιστοίχιση
   matching_left_side_900f860b: "Αριστερή πλευρά ταιριάζει"
   matching_right_side_920e71b2: "Δεξιά πλευρά ταιριάζει"
   mathquill: 
@@ -9932,6 +9935,7 @@ el:
   moving_a4d552df: Μετακίνηση...
   multi_factor_authentication_1a6b3b3d: "Έλεγχος Ταυτότητας Πολλών Παραγόντων"
   multi_factor_authentication_configured_865b1bde: "Ρυθμίστηκε ο έλεγχος ταυτότητας πολλών παραγόντων "
+  multiple_choice_9f931ee6: "Πολλαπλή Επιλογή"
   multiple_dates_e3a122f7: "Πολλαπλές Ημερομηνίες"
   multiple_modules_930713d4: "Πολλαπλά ένθετα"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -15095,6 +15099,7 @@ el:
     folder_tree_instructions: "<mrk mid=\"7366\" mtype=\"seg\">Χρησιμοποιήστε τα βελάκια πάνω και κάτω για να πλοηγηθείτε στο δέντρο.</mrk> <mrk mid=\"7367\" mtype=\"seg\">Πατήστε το δεξί βελάκι για ανάπτυξη των φακέλων, το αριστερό για σύμπτυξη και το Enter για να επιλέξετε το επιλεγμένο στοιχείο.</mrk>"
   trophy: 
     star_display_name: " "
+  true_false_823761a9: Σωστό/Λάθος
   truncated_56b1a661: Ελλιπές
   try_again_6ca44338: "Δοκιμάστε Ξανά"
   turned_in_submission_date_e9180b8b: "υποβλήθηκε στις: %{submission_date}"
