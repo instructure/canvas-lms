@@ -777,41 +777,49 @@ describe Types::CourseType do
       end
 
       it "returns nil for other users's initial totalActivityTime if current user does not have appropriate permissions" do
-        expect(
-          course_type.resolve(
-            "enrollmentsConnection { nodes { totalActivityTime } }",
-            current_user: @student1
-          )
-        ).to eq [nil, 0, nil, nil, nil, nil]
+        expected_total_activity_time = [nil, 0, nil, nil, nil, nil]
+
+        result_total_activity_time = course_type.resolve(
+          "enrollmentsConnection { nodes { totalActivityTime } }",
+          current_user: @student1
+        )
+
+        expect(result_total_activity_time).to match_array(expected_total_activity_time)
       end
 
       it "returns the sisRole of each user" do
-        expect(
-          course_type.resolve(
-            "enrollmentsConnection { nodes { sisRole } }",
-            current_user: @teacher
-          )
-        ).to eq %w[teacher student teacher student student student]
+        expected_sis_roles = %w[teacher student teacher student student student]
+
+        result_sis_roles = course_type.resolve(
+          "enrollmentsConnection { nodes { sisRole } }",
+          current_user: @teacher
+        )
+
+        expect(result_sis_roles).to match_array(expected_sis_roles)
       end
 
       it "returns an htmlUrl for each enrollment" do
-        expect(
-          course_type.resolve(
-            "enrollmentsConnection { nodes { htmlUrl } }",
-            current_user: @teacher,
-            request: ActionDispatch::TestRequest.create
-          )
-        ).to eq([@teacher, @student1, other_teacher, @student2, @inactive_user, @concluded_user]
-          .map { |user| "http://test.host/courses/#{@course.id}/users/#{user.id}" })
+        expected_urls = [@teacher, @student1, other_teacher, @student2, @inactive_user, @concluded_user]
+                        .map { |user| "http://test.host/courses/#{@course.id}/users/#{user.id}" }
+
+        result_urls = course_type.resolve(
+          "enrollmentsConnection { nodes { htmlUrl } }",
+          current_user: @teacher,
+          request: ActionDispatch::TestRequest.create
+        )
+
+        expect(result_urls).to match_array(expected_urls)
       end
 
       it "returns canBeRemoved boolean value for each enrollment" do
-        expect(
-          course_type.resolve(
-            "enrollmentsConnection { nodes { canBeRemoved } }",
-            current_user: @teacher
-          )
-        ).to eq [false, true, true, true, true, true]
+        expected_can_be_removed = [false, true, true, true, true, true]
+
+        result_can_be_removed = course_type.resolve(
+          "enrollmentsConnection { nodes { canBeRemoved } }",
+          current_user: @teacher
+        )
+
+        expect(result_can_be_removed).to match_array(expected_can_be_removed)
       end
 
       describe "filtering" do

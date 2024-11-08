@@ -73,11 +73,6 @@ module GroupPermissionHelper
   #   - If unauthorized, the method renders appropriate error messages and returns `false`.
   def check_group_authorization(context:, current_user:, action_category:, non_collaborative: nil)
     rights = determine_rights_for_type(action_category, non_collaborative)
-    restrict_actions_to_delete = !context&.feature_enabled?(:differentiation_tags) && non_collaborative
-
-    if restrict_actions_to_delete && action_category != :delete
-      rights = []
-    end
 
     authorized_action(context, current_user, rights)
   end
