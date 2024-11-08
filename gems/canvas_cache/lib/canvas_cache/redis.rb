@@ -174,6 +174,7 @@ module CanvasCache
         ::RedisClient.prepend(Client)
         ::RedisClient.prepend(TaggedRing)
         ::Redis::Cluster::Client.prepend(Cluster)
+        ::Redis::Cluster::Client.prepend(TaggedRing)
         ::RedisClient::Cluster.prepend(IgnorePipelinedKey)
         ::Redis::Client.prepend(Client)
         ::Redis::Distributed.prepend(Distributed)
