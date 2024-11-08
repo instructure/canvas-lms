@@ -29,7 +29,6 @@ import {Alert} from '@instructure/ui-alerts'
 import {completeUpload} from '@canvas/upload-file'
 import CourseCopyImporter from './migrator_forms/course_copy'
 import CanvasCartridgeImporter from './migrator_forms/canvas_cartridge'
-import LegacyMigratorWrapper from './migrator_forms/legacy_migrator_wrapper'
 import ZipFileImporter from './migrator_forms/zip_file'
 import type {
   AttachmentProgressResponse,
@@ -42,6 +41,9 @@ import type {
 import CommonCartridgeImporter from './migrator_forms/common_cartridge'
 import MoodleZipImporter from './migrator_forms/moodle_zip'
 import QTIZipImporter from './migrator_forms/qti_zip'
+import D2LImporter from './migrator_forms/d2l_importer'
+import AngelImporter from './migrator_forms/angel_importer'
+import BlackboardImporter from './migrator_forms/blackboard_importer'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -84,11 +86,12 @@ const renderMigrator = (props: MigratorProps) => {
       return <CommonCartridgeImporter {...props} />
     case 'qti_converter':
       return <QTIZipImporter {...props} />
-    case 'angel_exporter':
-    case 'blackboard_exporter':
     case 'd2l_exporter':
-      props.fileUploadProgress = null
-      return <LegacyMigratorWrapper {...props} />
+      return <D2LImporter {...props} />
+    case 'angel_exporter':
+      return <AngelImporter {...props} />
+    case 'blackboard_exporter':
+      return <BlackboardImporter {...props} />
     default:
       return null
   }
@@ -132,6 +135,7 @@ export const ContentMigrationsForm = ({
     },
     [setFileUploadProgress]
   )
+
   const onSubmitForm: onSubmitMigrationFormCallback = useCallback(
     async (formData, preAttachmentFile) => {
       const courseId = window.ENV.COURSE_ID

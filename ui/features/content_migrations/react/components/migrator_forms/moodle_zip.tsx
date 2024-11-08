@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React from 'react'
 
 import CommonMigratorControls from './common_migrator_controls'
 import type {onSubmitMigrationFormCallback} from '../types'
-import QuestionBankSelector, {type QuestionBankSettings} from './question_bank_selector'
+import QuestionBankSelector from './question_bank_selector'
 import MigrationFileInput from './file_input'
 import {noFileSelectedFormMessage} from '../utils'
+import {useSubmitHandlerWithQuestionBank} from '../../hooks/form_handler_hooks'
 
 type MoodleZipImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
@@ -37,35 +38,14 @@ const MoodleZipImporter = ({
   fileUploadProgress,
   isSubmitting,
 }: MoodleZipImporterProps) => {
-  const [file, setFile] = useState<File | null>(null)
-  const [fileError, setFileError] = useState<boolean>(false)
-  const [questionBankSettings, setQuestionBankSettings] = useState<QuestionBankSettings | null>()
-  const [questionBankError, setQuestionBankError] = useState<boolean>(false)
-
-  const handleSubmit = useCallback(
-    formData => {
-      if (!file) {
-        setFileError(true)
-      }
-      if (questionBankSettings) {
-        setQuestionBankError(questionBankSettings.question_bank_name === '')
-        if (questionBankSettings.question_bank_name === '') {
-          return
-        }
-        formData.settings = {...formData.settings, ...questionBankSettings}
-      }
-      if (file) {
-        setFileError(false)
-        formData.pre_attachment = {
-          name: file.name,
-          size: file.size,
-          no_redirect: true,
-        }
-        onSubmit(formData, file)
-      }
-    },
-    [onSubmit, file, questionBankSettings]
-  )
+  const {
+    setFile,
+    fileError,
+    questionBankSettings,
+    setQuestionBankSettings,
+    questionBankError,
+    handleSubmit,
+  } = useSubmitHandlerWithQuestionBank(onSubmit)
 
   return (
     <>

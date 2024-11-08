@@ -16,15 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import type {FormMessage} from '@instructure/ui-form-field'
+import React from 'react'
 import CommonMigratorControls from './common_migrator_controls'
 import type {onSubmitMigrationFormCallback} from '../types'
 import MigrationFileInput from './file_input'
 import {noFileSelectedFormMessage} from '../utils'
-
-const I18n = useI18nScope('content_migrations_redesign')
+import {useSubmitHandler} from '../../hooks/form_handler_hooks'
 
 type CanvasCartridgeImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
@@ -39,25 +36,7 @@ const CanvasCartridgeImporter = ({
   fileUploadProgress,
   isSubmitting,
 }: CanvasCartridgeImporterProps) => {
-  const [file, setFile] = useState<File | null>(null)
-  const [fileError, setFileError] = useState<boolean>(false)
-
-  const handleSubmit: onSubmitMigrationFormCallback = useCallback(
-    formData => {
-      if (file) {
-        setFileError(false)
-        formData.pre_attachment = {
-          name: file.name,
-          size: file.size,
-          no_redirect: true,
-        }
-        onSubmit(formData, file)
-      } else {
-        setFileError(true)
-      }
-    },
-    [file, onSubmit]
-  )
+  const {setFile, fileError, handleSubmit} = useSubmitHandler(onSubmit)
 
   return (
     <>
