@@ -197,10 +197,21 @@ test('does not show imported icon when sis_source_id is not set', () => {
   ok(!view.$(`#assignment_group_${model.id} .ig-header-title .icon-sis-imported`).length)
 })
 
-test('shows link icon when integration_data contains mapping', () => {
+test('shows link icon when integration_data contains sistemic mapping', () => {
   ENV.URLS = {sort_url: 'test'}
   const model = createAssignmentGroup()
   model.set('integration_data', {sistemic: {categoryMapping: {abc: {}}}})
+  const view = createView(model)
+  equal(
+    view.$(`#assignment_group_${model.id} .ig-header-title .icon-link`)[0].title,
+    'Grading category aligned with SIS'
+  )
+})
+
+test('shows link icon when integration_data contains syncedWithSisCategory flag', () => {
+  ENV.URLS = {sort_url: 'test'}
+  const model = createAssignmentGroup()
+  model.set('integration_data', {syncedWithSisCategory: true})
   const view = createView(model)
   equal(
     view.$(`#assignment_group_${model.id} .ig-header-title .icon-link`)[0].title,

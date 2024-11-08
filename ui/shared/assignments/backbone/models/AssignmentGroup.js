@@ -131,7 +131,12 @@ AssignmentGroup.prototype.hasSisSourceId = function () {
 }
 
 AssignmentGroup.prototype.syncedWithSisCategory = function () {
-  return has(this.get('integration_data'), 'sistemic.categoryMapping')
+  // Only the syncedWithSisCategory flag check should be kept, once
+  // all customers have migrated to the new integration_data format
+  return (
+    has(this.get('integration_data'), 'sistemic.categoryMapping') ||
+    has(this.get('integration_data'), 'syncedWithSisCategory')
+  )
 }
 
 export default AssignmentGroup
