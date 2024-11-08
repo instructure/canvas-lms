@@ -22,10 +22,10 @@ class AuthenticationProvider::ProviderRefresher
   class << self
     def refresh_providers(providers:, shard_scope: Shard.current)
       providers.each do |provider|
-        new_data = refresh_if_necessary(provider.global_id, provider.metadata_uri)
+        new_data = refresh_if_necessary(provider.global_id, uri_for(provider))
         next unless new_data
 
-        provider.metadata = new_data
+        assign_metadata(provider, new_data)
         provider.save! if provider.changed?
       rescue => e
         level = (e.is_a?(Net::HTTPClientException) && e.response.code.to_i == 404) ? :warn : :error
@@ -44,9 +44,10 @@ class AuthenticationProvider::ProviderRefresher
     end
 
     # returns the new data if it changed, or false if it has not
-    def refresh_if_necessary(provider_key, endpoint, force_fetch: false)
+    def refresh_if_necessary(_provider_key, endpoint, force_fetch: false)
+      etag_key = "auth_provider_refresh_#{Digest::MD5.hexdigest(endpoint)}_etag"
       if !force_fetch && Canvas.redis_enabled?
-        etag = Canvas.redis.get("auth_provider_refresh_#{provider_key}_etag")
+        etag = Canvas.redis.get(etag_key)
       end
 
       headers = {}
@@ -60,7 +61,7 @@ class AuthenticationProvider::ProviderRefresher
         response.value
         # store new data
         if Canvas.redis_enabled? && response["ETag"]
-          Canvas.redis.set("auth_provider_refresh_#{provider_key}_etag", response["ETag"])
+          Canvas.redis.set(etag_key, response["ETag"])
         end
         return response.body
       end

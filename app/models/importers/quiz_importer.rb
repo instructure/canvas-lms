@@ -254,6 +254,8 @@ module Importers
         item.assignment ||= context.assignments.temp_record
         item.assignment = ::Importers::AssignmentImporter.import_from_migration(hash[:assignment], context, migration, item.assignment, item)
         if migration.cc_qti_migration? && (migration.import_quizzes_next? || !!hash[:qti_new_quiz])
+          migration.migration_settings[:quiz_next_imported] = true
+          migration.save if migration.changed?
           item.assignment.mark_as_ready_to_migrate_to_quiz_next
           item.save!
         end
