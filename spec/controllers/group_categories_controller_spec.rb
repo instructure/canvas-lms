@@ -669,6 +669,30 @@ describe GroupCategoriesController do
   end
 
   describe "GET index" do
+    it "returns only collaborative group categories when differentiation tag FF is off" do
+      user_session(@teacher)
+
+      get "index", params: { course_id: @course.id }, format: :json
+      json = response.parsed_body
+
+      expect(response).to be_successful
+      expect(json.count).to eq 1
+      expect(json.pluck("name")).to include("Collaborative Groups")
+    end
+
+    it "returns unauthorized when user has no permissions" do
+      user_session(@student)
+
+      get "index", params: { course_id: @course.id }, format: :json
+      assert_unauthorized
+    end
+  end
+
+  context "Differentiation Tags" do
+    before do
+      Account.default.enable_feature!(:differentiation_tags)
+    end
+
     it "returns both collaborative and non-collaborative group categories when user has both group and tag management permissions" do
       user_session(@teacher)
 
@@ -716,65 +740,56 @@ describe GroupCategoriesController do
       expect(json[0]["name"]).to eq "Non-Collaborative Groups"
     end
 
-    it "returns unauthorized when user has no permissions" do
-      user_session(@student)
+    context "with differentiation tags disabled with existing hidden groups" do
+      before do
+        Account.default.disable_feature!(:differentiation_tags)
+      end
 
-      get "index", params: { course_id: @course.id }, format: :json
-      assert_unauthorized
-    end
-  end
+      it "prevents teachers from creating non_collaborative groups if differentiation_tags is disabled" do
+        @course.account.role_overrides.create!({
+                                                 role: teacher_role,
+                                                 permission: :manage_tags_add,
+                                                 enabled: true
+                                               })
+        user_session(@teacher)
 
-  context "Differentiation Tags disabled with existing non_collaborative group_sets" do
-    before do
-      Account.default.disable_feature!(:differentiation_tags)
-    end
+        post "create", params: { course_id: @course.id, category: { name: "Hidden GC", non_collaborative: true } }
 
-    it "prevents teachers from creating non_collaborative groups if differentiation_tags is disabled" do
-      Account.default.disable_feature!(:differentiation_tags)
-      @course.account.role_overrides.create!({
-                                               role: teacher_role,
-                                               permission: :manage_tags_add,
-                                               enabled: true
-                                             })
-      user_session(@teacher)
+        expect(response).to be_unauthorized
+      end
 
-      post "create", params: { course_id: @course.id, category: { name: "Hidden GC", non_collaborative: true } }
-
-      expect(response).to be_unauthorized
-    end
-
-    it "does not allow viewing non-collaborative group category" do
-      user_session(@teacher)
-      get "users", params: {
-        course_id: @course.id,
-        group_category_id: @non_collaborative_category.id
-      }
-      assert_unauthorized
-    end
-
-    it "does not allow adding non-collaborative group category" do
-      user_session(@teacher)
-      post "create", params: {
-        course_id: @course.id,
-        category: {
-          name: "New Non-Collaborative Group",
-          non_collaborative: "1"
+      it "does not allow viewing non-collaborative group category" do
+        user_session(@teacher)
+        get "users", params: {
+          course_id: @course.id,
+          group_category_id: @non_collaborative_category.id
         }
-      }
-      assert_unauthorized
-    end
+        assert_unauthorized
+      end
 
-    it "does not allow updating non-collaborative group category" do
-      user_session(@teacher)
-      put "update", params: { course_id: @course.id, id: @non_collaborative_category.id, category: { name: "Updated Non-Collaborative Group" } }
-      assert_unauthorized
-    end
+      it "does not allow adding non-collaborative group category" do
+        user_session(@teacher)
+        post "create", params: {
+          course_id: @course.id,
+          category: {
+            name: "New Non-Collaborative Group",
+            non_collaborative: "1"
+          }
+        }
+        assert_unauthorized
+      end
 
-    # Users are still able to delete non-collaborative group categories if the flag is off
-    it "allows deleting non-collaborative group category" do
-      user_session(@teacher)
-      delete "destroy", params: { course_id: @course.id, id: @non_collaborative_category.id }
-      expect(response).to be_successful
+      it "does not allow updating non-collaborative group category" do
+        user_session(@teacher)
+        put "update", params: { course_id: @course.id, id: @non_collaborative_category.id, category: { name: "Updated Non-Collaborative Group" } }
+        assert_unauthorized
+      end
+
+      it "does not allow deleting non-collaborative group category" do
+        user_session(@teacher)
+        delete "destroy", params: { course_id: @course.id, id: @non_collaborative_category.id }
+        assert_unauthorized
+      end
     end
   end
 end

@@ -209,4 +209,43 @@ describe "permissions index" do
       expect { PermissionsIndex.permissions_tray_viewable_permissions.count }.to become > 3
     end
   end
+
+  context "differentiation tags permission", :ignore_js_errors do
+    before do
+      @permission_name = "Manage Differentiated Tags"
+    end
+
+    it "shows when differentiation tags feature is enabled" do
+      Account.default.enable_feature!(:differentiation_tags)
+
+      user_session(@admin)
+      PermissionsIndex.visit(@account)
+      PermissionsIndex.enter_search(@permission_name)
+      expect(element_exists?("[data-testid='expand_manage_differentiated_tags']")).to be_truthy
+      expect(PermissionsIndex.permission_link("manage_differentiated_tags")).to be_displayed
+    end
+
+    it "does not show when differentiation tags feature is disabled" do
+      Account.default.disable_feature!(:differentiation_tags)
+
+      user_session(@admin)
+      PermissionsIndex.visit(@account)
+      PermissionsIndex.enter_search(@permission_name)
+      expect(element_exists?("[data-testid='expand_manage_differentiated_tags']")).to be_falsey
+    end
+
+    it "shows when differentiation tags feature is allowed_on but an accounts course is off" do
+      course_with_teacher(name: "First Course", active_all: true)
+      # Account level FF is set to OFF but UNLOCKED
+      @course.account.allow_feature!(:differentiation_tags)
+      # Course level FF is set to OFF
+      @course.disable_feature!(:differentiation_tags)
+
+      user_session(@admin)
+      PermissionsIndex.visit(@account)
+      PermissionsIndex.enter_search(@permission_name)
+      expect(element_exists?("[data-testid='expand_manage_differentiated_tags']")).to be_truthy
+      expect(PermissionsIndex.permission_link("manage_differentiated_tags")).to be_displayed
+    end
+  end
 end
