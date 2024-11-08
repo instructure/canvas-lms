@@ -59,7 +59,7 @@ const TopLevelButtons = ({isUserContext, size}: TopLevelButtonsProps) => {
   const allMyFilesButton = () => {
     if (isUserContext) return null
     return (
-      <a href="/files">
+      <a href="/files" tabIndex={-1}>
         <Button color="secondary" margin="none x-small small none" display={buttonDisplay}>
           {I18n.t('All My Files')}
         </Button>

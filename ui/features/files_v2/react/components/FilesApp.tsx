@@ -34,6 +34,8 @@ import {Responsive} from '@instructure/ui-responsive'
 import TopLevelButtons from './TopLevelButtons'
 import FileFolderTable from './FileFolderTable'
 
+import {FAKE_FOLDERS_AND_FILES} from '../../data/FakeData'
+
 const I18n = useI18nScope('files_v2')
 
 const fetchQuota = async (contextType: string, contextId: string) => {
@@ -43,6 +45,12 @@ const fetchQuota = async (contextType: string, contextId: string) => {
   }
   return response.json()
 }
+
+const fetchFilesAndFolders = async (contextType: string, contextId: string) => {
+  // TODO fetch real data
+  return FAKE_FOLDERS_AND_FILES
+}
+
 interface FilesAppProps {
   isUserContext: boolean
   size: 'small' | 'medium' | 'large'
@@ -53,6 +61,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
   const contextId = filesEnv.contextId
 
   const {data, error} = useQuery(['quota'], () => fetchQuota(contextType, contextId))
+  const tableResult = useQuery(['files'], () => fetchFilesAndFolders(contextType, contextId))
 
   const renderFilesUsageBar = () => {
     if (error) {
@@ -81,7 +90,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
   }
   return (
     <View as="div">
-      <Flex justifyItems="center" padding="none">
+      <Flex justifyItems="center" padding="medium none none none">
         <Flex.Item shouldShrink={true} shouldGrow={true} textAlign="center">
           <Flex
             wrap="wrap"
@@ -105,7 +114,11 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
           </Flex>
         </Flex.Item>
       </Flex>
-      <FileFolderTable size={size} />
+      <FileFolderTable
+        size={size}
+        rows={tableResult.isSuccess ? tableResult.data : undefined}
+        isLoading={tableResult.isLoading}
+      />
       <Flex padding="small none none none">
         <Flex.Item size="50%">{renderFilesUsageBar()}</Flex.Item>
       </Flex>
