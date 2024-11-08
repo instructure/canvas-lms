@@ -1,6 +1,6 @@
 # See doc/docker/README.md or https://github.com/instructure/canvas-lms/tree/master/doc/docker
 services:
-  web: &WEB
+  web:
     build:
       context: .
     links:
@@ -8,15 +8,31 @@ services:
       - redis
     environment:
       POSTGRES_PASSWORD: sekret
-
+    volumes:
+      - /Users/takahiro.tsukamoto/workspace/canvas-lms:/usr/src/canvas:cached
+      # - ./volumes/web:/usr/src/app
+      - ./volumes/nginx:/etc/nginx/conf.d
+    ports:
+      - 80:80
+      - 443:443
   jobs:
-    <<: *WEB
+    build:
+      context: .
+    links:
+      - postgres
+      - redis
+    environment:
+      POSTGRES_PASSWORD: sekret
     command: bundle exec script/delayed_job run
 
   postgres:
     build: ./docker-compose/postgres
     environment:
       POSTGRES_PASSWORD: sekret
+    command: postgres -c stats_temp_directory=/tmp
+    volumes:
+      - ./volumes/postgres/14:/home
+    # 永続化したらバグった。なぜ。web側の永続化が問題な可能性もある。切り分け前。
 
   redis:
     image: redis:alpine

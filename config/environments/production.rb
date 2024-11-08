@@ -69,7 +69,7 @@ Rails.application.configure do
 
   config.eager_load = true
 
-  config.force_ssl = true
+  config.force_ssl = false
   # We redirect at the apache layer; no reason to do it twice
   # We have historically not set hsts for subdomains, and don't want to increase the possibility of breakage
   config.ssl_options = { redirect: false, hsts: { subdomains: false } }

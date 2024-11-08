@@ -60,10 +60,7 @@ development:
         enabled_for_canvas: false
         url: 'http://127.0.0.1:9292/'
       rich-content-service:
-        # if you're running canvas-rce-api on its own
-        app-host: "rce.canvas.docker"
-        # if you're running canvas-rce-api with docker-compose/rce-api.override.yml in .env
-        app-host: "http://rce.canvas.docker:3000"
+        app-host: "http://canvas-lms-canvasrceapi-1:3000"
       common_cartridge_viewer:
         base_url: "http://localhost:3300"
       csp-logging:
@@ -162,3 +159,30 @@ test:
       live-events-subscription-service:
         # disabled: true
         app-host: http://live-event-service
+
+
+production:
+  # tree
+  config:
+    # service
+    canvas:
+      # environment
+      canvas:
+        # regexes for matching online meeting urls in calendar events
+        # one per line. will get | or'd together to form the regex
+        # that's eventually used.
+        # Values here override the default values in
+        # lib/api/v1/planner_item.rb:online_meeting_url
+        # The example values here match what is (currently) in planner_item.rb
+        online-meeting-url-regex: |-
+          https:\/\/[\w-]+\.zoom\.us\/\d+(\?[\w\/\-=%]*)?
+          https:\/\/[\w-]+\.zoom\.us\/my\/[\w.]+(\?[\w\/\-=%]*)?
+          https:\/\/[\w-]+\.zoom\.us\/j\/\d+(\?[\w\/\-=%]*)?
+          https:\/\/teams\.microsoft\.com\/l\/meetup-join\/[\w.\/\-=%]+(\?[\w\/\-=%]*)?
+          https:\/\/teams\.live\.com\/meet\/\d+(\?[\w\/\-=%]*)?
+          https:\/\/[\w-]+\.webex\.com\/meet\/[\w.\/\-=%]+(\?[\w\/\-=%]*)?
+          https:\/\/[\w-]+\.webex\.com\/\w+\/j\.php(\?[\w\/\-=%]*)?
+          https:\/\/meet\.google\.com\/[\w\/\-=%]+(\?[\w\/\-=%]*)?
+          https?:\/\/.*\/conferences\/\d+\/join
+      rich-content-service:
+        app-host: "http://canvas-lms-canvasrceapi-1:3000"

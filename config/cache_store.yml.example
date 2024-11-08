@@ -16,3 +16,6 @@ development:
   #   error_threshold: 1
   #   error_timeout: 2
   #
+production:
+  redis:
+    url: redis://canvas-lms-redis-1:6379/0

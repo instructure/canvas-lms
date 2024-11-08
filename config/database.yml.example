@@ -3,9 +3,9 @@ test:
   adapter: postgresql
   encoding: utf8
   database: canvas_test
-  host: localhost
-  username: canvas
-  password: your_password
+  host: canvas-lms-postgres-1
+  username: postgres
+  password: secret
   timeout: 5000
   shard1: canvas_test_shard_1
   shard2: canvas_test_shard_2
@@ -14,7 +14,9 @@ development:
   adapter: postgresql
   encoding: utf8
   database: canvas_development
-  password: your_password
+  host: canvas-lms-postgres-1
+  username: postgres
+  password: sekret
   timeout: 5000
   secondary:
     replica: true
@@ -24,7 +26,7 @@ production:
   adapter: postgresql
   encoding: utf8
   database: canvas_production
-  host: localhost
-  username: canvas
-  password: your_password
+  host: canvas-lms-postgres-1
+  username: postgres
+  password: sekret
   timeout: 5000

@@ -87,3 +87,10 @@ test:
     access_key: 'fake-access-key'
     secret_key: 'fake-secret-key'
     security_token: 'fake-security-token'
+
+production:
+  "app-canvas/data/secrets":
+    data:
+      canvas_security:
+        encryption_secret: "astringthatisactually32byteslong"
+        signing_secret: "astringthatisactually32byteslong"

@@ -11,7 +11,8 @@ services:
     ports:
       - "3000:80"
     environment:
-      VIRTUAL_HOST: rce.canvas.docker
+      # VIRTUAL_HOST: rce.canvas.docker
+      NODE_ENV: production
       VIRTUAL_PORT: 80
       HTTP_PROTOCOL_OVERRIDE: "http"
       PASSENGER_MIN_INSTANCES: 2
@@ -22,4 +23,6 @@ services:
       ECOSYSTEM_SECRET: "astringthatisactually32byteslong"
       ECOSYSTEM_KEY: "astringthatisactually32byteslong"
       CIPHER_PASSWORD: TEMP_PASSWORD
+    volumes:
+      - /Users/takahiro.tsukamoto/workspace/canvas-rce-api:/usr/src/canvas-rce-api:cached
     init: true
