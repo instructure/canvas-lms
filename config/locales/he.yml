@@ -5462,6 +5462,7 @@ he:
   copy_to_folder_32ecc3c3: "העתקה לתיקיה"
   copying_628a9607: מעתיק...
   copyright_holder_66ee111: "בעלים של זכויות יוצרים:"
+  correct_7df6d875: נכון!
   correct_answer: "זו היתה התשובה הנכונה"
   correct_answer_5a6a57d1: "תשובה נכונה"
   correct_answer_comments_34ca671f: "תיקון הערות תשובה"
@@ -10264,6 +10265,7 @@ he:
       הקלדת והפצת הערכות עבור התלמידים. הצגת ההערכות כציונים
       אחוזים או כלא הושלמו, עברו, נכשלו, או בסולם GPA והערכה מילולית
       ההערכה של משימות קבוצתיות ממתינה
+  insert_593145ef: הוספה
   insert_equella_links_49a8dacd: "הוספת קישורי Equella "
   insert_here_ccdb022e: "הוספה כאן"
   insert_math_equation_57c6e767: "הוספת משוואה מתימטית"
@@ -11064,6 +11066,7 @@ he:
   mastery_paths_cc4096c2: "מסלולי התמחות"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "ציון ההתמחות משקף את הציון הגבוה ביותר של המשימה המוערכת או הבוחן"
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "ניקוד התמחות משקף את הערכת המשימה או הבוחן המאוחר ביותר"
+  matching_63f5af40: התאמה
   matching_left_side_900f860b: "התאמה לצד שמאל"
   matching_right_side_920e71b2: "התאמה לצד ימין"
   mathquill: 
@@ -13145,6 +13148,7 @@ he:
   multi_factor_authentication_configured_865b1bde: "הזדהות רב מימדית קונפגה"
   multiple_ba5220cd: מרובים
   multiple_canvas_accounts_are_associated_with_cleve_c1739660: "חשבונות קנבס מרובים משויכים לאיזור ה Clever %{district_id}"
+  multiple_choice_9f931ee6: "בחירה מרובה"
   multiple_dates_e3a122f7: "תאריכים מרובים"
   multiple_due_dates_283dd861: "תאריכי יעד מרובים"
   multiple_due_dates_6b0d75c6: "תאריכי יעד מרובים"
@@ -19692,6 +19696,7 @@ he:
     folder_tree_instructions: "יש להשתמש בחיצי מעלה מטה כדי לנווט בעץ. לחיצת חץ ימיני כדי להרחיב ענף נבחר בעץ וחץ שמאלי כדי לכווץ ענף נבחר בעץ."
   trophy: 
     star_display_name: "הוספת כוכבית"
+  true_false_823761a9: "נכון/לא נכון"
   truncated_56b1a661: מקוצץ
   try_again_6ca44338: "יש לנסות שוב"
   turned_in_submission_date_e9180b8b: "הוגש בתאריך: %{submission_date}"
