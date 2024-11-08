@@ -122,7 +122,7 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
     result.join(" ")
   end
 
-  def download_jwks
+  def download_jwks(...)
     # cache against the default shard
     Shard.default.activate do
       super
