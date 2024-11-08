@@ -45,6 +45,7 @@ import {ReportsSummaryBadge} from '../ReportsSummaryBadge/ReportsSummaryBadge'
 import theme from '@instructure/canvas-theme'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import {parse} from '@instructure/moment-utils'
+import DateHelper from '@canvas/datetime/dateHelper'
 
 const I18n = useI18nScope('discussion_posts')
 
@@ -271,7 +272,7 @@ const Timestamps = props => {
     const editedDate = parse(props.editedTimingDisplay)
     const delayedDate = parse(props.delayedPostAt)
     // do not show edited by info for students if the post is edited before the delayed post date
-    if (!isTeacher && delayedDate && editedDate.isBefore(delayedDate)) {
+    if (!isTeacher && delayedDate && editedDate?.isBefore(delayedDate)) {
       return null
     }
 
@@ -325,14 +326,15 @@ const Timestamps = props => {
     if (!props.isTopic) return null
     // duplicate createdAt for teachers if the post is instant
     if (isTeacher && !props.delayedPostAt && props.createdAt && props.published) {
-      return I18n.t('Posted %{delayedPostAt}', {delayedPostAt: props.createdAt})
-    } else if (props.delayedPostAt) {
+      return I18n.t('Posted %{createdAt}', {createdAt: props.createdAt})
+    }
+    if (props.delayedPostAt) {
       // announcements are "published" always, so we need to compare dates
-      if (parse(props.delayedPostAt).isAfter(parse(Date.now())) && props.isAnnouncement) {
+      if (props.isAnnouncement && parse(props.delayedPostAt)?.isAfter(new Date())) {
         return null
       }
 
-      return I18n.t('Posted %{delayedPostAt}', {delayedPostAt: props.delayedPostAt})
+      return I18n.t('Posted %{delayedPostAt}', {delayedPostAt: DateHelper.formatDatetimeForDiscussions(props.delayedPostAt)})
     }
   }, [
     isTeacher,
