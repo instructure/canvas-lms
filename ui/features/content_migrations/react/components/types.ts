@@ -129,3 +129,8 @@ export type UpdateMigrationItemType = (
   data?: object,
   noXHR?: boolean
 ) => Promise<ContentMigrationItem | undefined>
+
+export type QuestionBankSettings = {
+  question_bank_id?: string | number
+  question_bank_name?: string
+}
