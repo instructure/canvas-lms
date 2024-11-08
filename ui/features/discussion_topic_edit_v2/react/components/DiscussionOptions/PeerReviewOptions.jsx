@@ -101,7 +101,7 @@ export const PeerReviewOptions = ({
           <View as="div" margin="small 0 small large" data-testid="peer-review-due-date-container">
             <DateTimeInput
               timezone={ENV.TIMEZONE}
-              description={I18n.t('Reviews Due')}
+              description={I18n.t('Assign Reviews')}
               prevMonthLabel={I18n.t('previous')}
               nextMonthLabel={I18n.t('next')}
               onChange={(_event, newDate) => setPeerReviewDueDate(newDate)}
