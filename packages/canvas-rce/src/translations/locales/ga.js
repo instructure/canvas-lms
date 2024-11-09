@@ -557,7 +557,7 @@ const locale = {
   "issue_num_total_f94536cf": { "message": "Eisiúint { num }/{ total }" },
   "kappa_2f14c816": { "message": "Capa" },
   "kappa_variant_eb64574b": { "message": "Capa (Athróg)" },
-  "keyboard_shortcuts_ed1844bd": { "message": "Aicearraí méarchláir" },
+  "keyboard_shortcuts_ed1844bd": { "message": "Aicearraí Méarchláir" },
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Déanann méarchláir nascleanúint chuig naisc ag baint úsáid as an eochair Táb. Is féidir le dhá nasc cóngaracha a dhíríon chuig an gceann scríbe céanna mearbhall a chur ar úsáideoirí méarchláir."
   },
