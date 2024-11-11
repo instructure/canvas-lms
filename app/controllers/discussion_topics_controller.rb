@@ -888,7 +888,9 @@ class DiscussionTopicsController < ApplicationController
                apollo_caching: @current_user &&
                  Account.site_admin.feature_enabled?(:apollo_caching),
                discussion_cache_key: @current_user &&
-                 Base64.encode64("#{@current_user.uuid}vyfW=;[p-0?:{P_=HUpgraqe;njalkhpvoiulkimmaqewg")
+                 Base64.encode64("#{@current_user.uuid}vyfW=;[p-0?:{P_=HUpgraqe;njalkhpvoiulkimmaqewg"),
+               checkpointed_discussion_without_feature_flag:
+                 @topic.assignment&.has_sub_assignments? && !@domain_root_account&.feature_enabled?(:discussion_checkpoints)
              })
       unless @locked
         InstStatsd::Statsd.increment("discussion_topic.visit.redesign")
