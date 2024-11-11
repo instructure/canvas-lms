@@ -52,7 +52,7 @@ GEM
     drb (2.2.1)
     i18n (1.14.6)
       concurrent-ruby (~> 1.0)
-    inst_statsd (3.0.5)
+    inst_statsd (3.0.6)
       aroi (>= 0.0.7)
       dogstatsd-ruby (>= 4.2, < 6.0, != 5.0.0)
       statsd-ruby (~> 1.0)
