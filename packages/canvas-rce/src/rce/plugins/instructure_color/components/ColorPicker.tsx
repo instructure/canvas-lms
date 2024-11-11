@@ -18,6 +18,7 @@
 
 import React, {useCallback, useState} from 'react'
 import tinycolor from 'tinycolor2'
+import formatMessage from '../../../../format-message'
 import {Button} from '@instructure/ui-buttons'
 import {ColorPreset, ColorMixer, ColorContrast} from '@instructure/ui-color-picker'
 import {Flex} from '@instructure/ui-flex'
@@ -27,12 +28,7 @@ import {Tabs} from '@instructure/ui-tabs'
 import {Text} from '@instructure/ui-text'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {View, type ViewOwnProps} from '@instructure/ui-view'
-import {isTransparent, getContrastStatus} from '../../../utils'
-import {type AtLeastOne} from '../../../types'
-
-import {useScope} from '@canvas/i18n'
-
-const I18n = useScope('block-editor')
+import {isTransparent, getContrastStatus} from './colorUtils'
 
 // this will hold colors the user picks during this session
 const previouslyChosenColors: string[] = []
@@ -44,6 +40,9 @@ export type ColorSpec = {
   fgcolor?: string
   bordercolor?: string
 }
+
+// A custom type constraint that enforces at least one key is present
+export type AtLeastOne<T, U = {[K in keyof T]: Pick<T, K>}> = Partial<T> & U[keyof U]
 
 export type TabSpec = AtLeastOne<Record<ColorTab, string | undefined>>
 
@@ -185,17 +184,17 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
         value={value}
         withAlpha={false}
         onChange={onSelectColor}
-        rgbRedInputScreenReaderLabel={I18n.t('Input field for red')}
-        rgbGreenInputScreenReaderLabel={I18n.t('Input field for green')}
-        rgbBlueInputScreenReaderLabel={I18n.t('Input field for blue')}
-        rgbAlphaInputScreenReaderLabel={I18n.t('Input field for alpha')}
-        colorSliderNavigationExplanationScreenReaderLabel={I18n.t(
+        rgbRedInputScreenReaderLabel={formatMessage('Input field for red')}
+        rgbGreenInputScreenReaderLabel={formatMessage('Input field for green')}
+        rgbBlueInputScreenReaderLabel={formatMessage('Input field for blue')}
+        rgbAlphaInputScreenReaderLabel={formatMessage('Input field for alpha')}
+        colorSliderNavigationExplanationScreenReaderLabel={formatMessage(
           "You are on a color slider. To navigate the slider left or right, use the 'A' and 'D' buttons respectively"
         )}
-        alphaSliderNavigationExplanationScreenReaderLabel={I18n.t(
+        alphaSliderNavigationExplanationScreenReaderLabel={formatMessage(
           "You are on an alpha slider. To navigate the slider left or right, use the 'A' and 'D' buttons respectively"
         )}
-        colorPaletteNavigationExplanationScreenReaderLabel={I18n.t(
+        colorPaletteNavigationExplanationScreenReaderLabel={formatMessage(
           "You are on a color palette. To navigate on the palette up, left, down or right, use the 'W', 'A', 'S' and 'D' buttons respectively"
         )}
       />
@@ -215,7 +214,7 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
       <ColorPreset
         data-testid="color-preset"
         disabled={!enabled}
-        label={I18n.t('Previously chosen colors')}
+        label={formatMessage('Previously chosen colors')}
         colors={[...defaultColors, ...previouslyChosenColors]}
         selected={currColor}
         onSelect={onSelectColor}
@@ -228,11 +227,11 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
     if ('foreground' in tabs) {
       if (isTransparent(currFgColor)) firstColor = null
       firstColor = currFgColor as string
-      firstColorLabel = I18n.t('Foreground')
+      firstColorLabel = formatMessage('Foreground')
     } else {
       if (!customBorder || isTransparent(currBorderColor)) firstColor = null
       firstColor = currBorderColor as string
-      firstColorLabel = I18n.t('Border')
+      firstColorLabel = formatMessage('Border')
     }
     return {firstColor, firstColorLabel}
   }
@@ -242,8 +241,10 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
     const ok = getContrastStatus(firstColor, currBgColor || '#fff')
     return (
       <Flex as="div" gap="x-large">
-        <Text weight="bold">{I18n.t('Color Contrast')}</Text>
-        <Pill color={ok ? 'success' : 'danger'}>{ok ? I18n.t('PASS') : I18n.t('FAIL')}</Pill>
+        <Text weight="bold">{formatMessage('Color Contrast')}</Text>
+        <Pill color={ok ? 'success' : 'danger'}>
+          {ok ? formatMessage('PASS') : formatMessage('FAIL')}
+        </Pill>
       </Flex>
     )
   }
@@ -264,14 +265,14 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
             data-testid="color-contrast"
             firstColor={firstColor}
             secondColor={currBgColor || '#fff'}
-            label={I18n.t('Color Contrast Ratio')}
-            successLabel={I18n.t('PASS')}
-            failureLabel={I18n.t('FAIL')}
-            normalTextLabel={I18n.t('Normal text')}
-            largeTextLabel={I18n.t('Large text')}
-            graphicsTextLabel={I18n.t('Graphics text')}
+            label={formatMessage('Color Contrast Ratio')}
+            successLabel={formatMessage('PASS')}
+            failureLabel={formatMessage('FAIL')}
+            normalTextLabel={formatMessage('Normal text')}
+            largeTextLabel={formatMessage('Large text')}
+            graphicsTextLabel={formatMessage('Graphics text')}
             firstColorLabel={firstColorLabel}
-            secondColorLabel={I18n.t('Background')}
+            secondColorLabel={formatMessage('Background')}
           />
         </View>
       </ToggleDetails>
@@ -293,13 +294,13 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
             <RadioInputGroup
               layout="columns"
               name="pickcolor"
-              description={I18n.t('Pick a color')}
+              description={formatMessage('Pick a color')}
               size="small"
               value={choosersEnabled ? 'custom' : 'none'}
               onChange={handleChangePickAColor}
             >
-              <RadioInput label={I18n.t('None')} value="none" />
-              <RadioInput label={I18n.t('Custom')} value="custom" />
+              <RadioInput label={formatMessage('None')} value="none" />
+              <RadioInput label={formatMessage('Custom')} value="custom" />
             </RadioInputGroup>
           </View>
         )}
@@ -316,7 +317,7 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
           {'foreground' in tabs && (
             <Tabs.Panel
               id="foreground"
-              renderTitle={I18n.t('Color')}
+              renderTitle={formatMessage('Color')}
               isSelected={activeTab === 'foreground'}
             >
               {renderTab('foreground')}
@@ -325,7 +326,7 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
           {'background' in tabs && (
             <Tabs.Panel
               id="background"
-              renderTitle={I18n.t('Background')}
+              renderTitle={formatMessage('Background')}
               isSelected={activeTab === 'background'}
             >
               {renderTab('background')}
@@ -334,7 +335,7 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
           {'border' in tabs && (
             <Tabs.Panel
               id="border"
-              renderTitle={I18n.t('Border')}
+              renderTitle={formatMessage('Border')}
               isSelected={activeTab === 'border'}
             >
               {renderTab('border')}
@@ -344,9 +345,9 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
         {renderColorContrast()}
       </View>
       <View as="div" background="secondary" padding="small" textAlign="end">
-        <Button onClick={handleCancel}>{I18n.t('Cancel')}</Button>
+        <Button onClick={handleCancel}>{formatMessage('Cancel')}</Button>
         <Button onClick={handleSubmit} margin="0 0 0 small" color="primary">
-          {I18n.t('Apply')}
+          {formatMessage('Apply')}
         </Button>
       </View>
     </View>

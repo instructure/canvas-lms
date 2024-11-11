@@ -20,7 +20,7 @@ import React, {useCallback, useEffect, useState} from 'react'
 import {IconButton} from '@instructure/ui-buttons'
 import {Popover} from '@instructure/ui-popover'
 import {IconBackgroundColor} from '../../../assets/internal-icons'
-import {ColorPicker, type ColorSpec, type TabSpec} from './ColorPicker'
+import {ColorPicker, type ColorSpec, type TabSpec} from '@instructure/canvas-rce'
 
 import {useScope} from '@canvas/i18n'
 

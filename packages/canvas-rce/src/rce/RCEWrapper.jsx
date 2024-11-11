@@ -1629,6 +1629,7 @@ class RCEWrapper extends React.Component {
           'lists',
           'textpattern',
           'hr',
+          'instructure_color',
           'instructure-ui-icons',
           'instructure_condensed_buttons',
           'instructure_links',

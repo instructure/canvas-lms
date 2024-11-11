@@ -24,6 +24,16 @@ import defaultTinymceConfig from './defaultTinymceConfig'
 import {setLocale} from './common/natcompare'
 import {Mathml} from './enhance-user-content/mathml'
 
+export {
+  getContrastStatus,
+  isTransparent,
+} from './rce/plugins/instructure_color/components/colorUtils'
+export {
+  ColorPicker,
+  type ColorSpec,
+  type TabSpec,
+} from './rce/plugins/instructure_color/components/ColorPicker'
+
 export * from './enhance-user-content/index'
 
 export const defaultConfiguration = defaultTinymceConfig

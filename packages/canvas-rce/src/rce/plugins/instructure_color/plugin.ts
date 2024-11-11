@@ -16,25 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {contrast} from '@instructure/ui-color-utils'
-import {white, black} from './constants'
-import {getContrastStatus, isTransparent} from '@instructure/canvas-rce'
+import tinymce from 'tinymce'
+import formatMessage from '../../../format-message'
+import clickCallback from './clickCallback'
 
-const getContrastingColor = (color1: string) => {
-  const color2 = contrast(color1, white) > contrast(color1, black) ? white : black
-  return color2
-}
+tinymce.PluginManager.add('instructure_color', function (editor) {
+  editor.addCommand('launch_instructure_color', () => {
+    clickCallback(editor)
+  })
 
-const getContrastingButtonColor = (color1: string) => {
-  const buttonColor = color1 === white ? 'primary-inverse' : 'secondary'
-  return buttonColor
-}
+  editor.ui.registry.addMenuItem('instructure_color', {
+    text: formatMessage('Color'),
+    icon: 'color',
+    onAction() {
+      editor.execCommand('launch_instructure_color')
+    },
+  })
 
-export {
-  getContrastingColor,
-  getContrastingButtonColor,
-  getContrastStatus,
-  isTransparent,
-  white,
-  black,
-}
+  editor.ui.registry.addButton('instructure_color', {
+    onAction() {
+      editor.execCommand('launch_instructure_color')
+    },
+    icon: 'color',
+    tooltip: formatMessage('Color'),
+  })
+})
