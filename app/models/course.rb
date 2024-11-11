@@ -2876,7 +2876,8 @@ class Course < ActiveRecord::Base
     [
       calendar_events.active.pluck(:start_at, :end_at),
       assignments.active.pluck(:due_at),
-      context_modules.not_deleted.pluck(:unlock_at)
+      context_modules.not_deleted.pluck(:unlock_at),
+      quizzes.active.pluck(:due_at),
     ].flatten.compact.map(&:to_date).uniq
   end
 
