@@ -55,6 +55,7 @@ import {View} from '@instructure/ui-view'
 import * as ReactDOMServer from 'react-dom/server'
 import useCreateDiscussionEntry from '../../hooks/useCreateDiscussionEntry'
 import {LoadingSpinner} from '../../components/LoadingSpinner/LoadingSpinner'
+import {useEventHandler, KeyboardShortcuts} from '../../KeyboardShortcuts/useKeyboardShortcut'
 
 const I18n = createI18nScope('discussion_topics_post')
 
@@ -545,6 +546,21 @@ export const SplitScreenViewContainer = props => {
     )
   }
 
+  const onSplitScreenClose = () => {
+    if (props.setRCEOpen) {
+      props.setRCEOpen(false)
+    }
+    if (props.onClose) {
+      props.onClose()
+    }
+  }
+
+  const onOpenTopicReply = () => {
+    onSplitScreenClose()
+  }
+
+  useEventHandler(KeyboardShortcuts.ON_OPEN_TOPIC_REPLY, onOpenTopicReply)
+
   return (
     <span
       className="discussions-split-screen-view-content"
@@ -564,14 +580,7 @@ export const SplitScreenViewContainer = props => {
             offset="small"
             screenReaderLabel="Close"
             data-testid="splitscreen-container-close-button"
-            onClick={() => {
-              if (props.setRCEOpen) {
-                props.setRCEOpen(false)
-              }
-              if (props.onClose) {
-                props.onClose()
-              }
-            }}
+            onClick={onSplitScreenClose}
             elementRef={el => {
               closeButtonRef.current = el
             }}

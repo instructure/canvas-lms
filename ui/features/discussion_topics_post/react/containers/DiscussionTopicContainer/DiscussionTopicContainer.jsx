@@ -57,6 +57,7 @@ import TopNavPortalWithDefaults, {
 } from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 import {assignLocation, openWindow} from '@canvas/util/globalUtils'
 import rubricEditing from '../../../../../shared/rubrics/jquery/edit_rubric'
+import {useEventHandler, KeyboardShortcuts} from '../../KeyboardShortcuts/useKeyboardShortcut'
 
 const I18n = createI18nScope('discussion_posts')
 
@@ -208,6 +209,19 @@ export const DiscussionTopicContainer = ({
       },
     })
   }
+
+  const onCancelTopicReply = () => {
+    setExpandedTopicReply(false)
+    setTimeout(() => {
+      document.querySelector('.discussion-topic-reply-button button')?.focus()
+    }, 0)
+  }
+
+  const onOpenTopicReply = () => {
+    setExpandedTopicReply(true)
+  }
+
+  useEventHandler(KeyboardShortcuts.ON_OPEN_TOPIC_REPLY, onOpenTopicReply)
 
   const podcast_url =
     document.querySelector(`link[title='${I18n.t('Discussion Podcast Feed')}' ]`) ||
@@ -467,9 +481,7 @@ export const DiscussionTopicContainer = ({
                                     <Button
                                       display={responsiveProps?.replyButton?.display}
                                       color="primary"
-                                      onClick={() => {
-                                        setExpandedTopicReply(!expandedTopicReply)
-                                      }}
+                                      onClick={onOpenTopicReply}
                                       data-testid="discussion-topic-reply"
                                     >
                                       <Text weight="bold" size={responsiveProps.textSize}>
@@ -517,14 +529,7 @@ export const DiscussionTopicContainer = ({
                                 }
                               }}
                               isSubmitting={props.isSubmitting}
-                              onCancel={() => {
-                                setExpandedTopicReply(false)
-                                setTimeout(() => {
-                                  document
-                                    .querySelector('.discussion-topic-reply-button button')
-                                    ?.focus()
-                                }, 0)
-                              }}
+                              onCancel={onCancelTopicReply}
                               isAnnouncement={isAnnouncement}
                             />
                           )}
@@ -624,4 +629,5 @@ DiscussionTopicContainer.propTypes = {
   setIsSummaryEnabled: PropTypes.func,
   expandedTopicReply: PropTypes.bool,
   setExpandedTopicReply: PropTypes.func,
+  isSubmitting: PropTypes.bool,
 }
