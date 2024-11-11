@@ -2159,7 +2159,7 @@ class AbstractAssignment < ActiveRecord::Base
     grade_group_students = !(grade_group_students_individually || opts[:excused])
 
     if has_sub_assignments? && root_account&.feature_enabled?(:discussion_checkpoints)
-      sub_assignment_tag = opts.delete(:sub_assignment_tag)
+      sub_assignment_tag = opts[:sub_assignment_tag]
       checkpoint_assignment = find_checkpoint(sub_assignment_tag)
       if sub_assignment_tag.blank? || checkpoint_assignment.nil?
         raise ::Assignment::GradeError, "Must provide a valid sub assignment tag when grading checkpointed discussions"
