@@ -24,5 +24,5 @@ services:
       ECOSYSTEM_KEY: "astringthatisactually32byteslong"
       CIPHER_PASSWORD: TEMP_PASSWORD
     volumes:
-      - /Users/takahiro.tsukamoto/workspace/canvas-rce-api:/usr/src/canvas-rce-api:cached
+      - ../canvas-rce-api:/usr/src/canvas-rce-api:cached
     init: true

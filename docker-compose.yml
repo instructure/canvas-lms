@@ -9,7 +9,7 @@ services:
     environment:
       POSTGRES_PASSWORD: sekret
     volumes:
-      - /Users/takahiro.tsukamoto/workspace/canvas-lms:/usr/src/canvas:cached
+      - ./:/usr/src/canvas:cached
       # - ./volumes/web:/usr/src/app
       - ./volumes/nginx:/etc/nginx/conf.d
     ports:
