@@ -223,7 +223,6 @@ export default class SubmissionTray extends React.Component<
         } else if (subSubmission.excused) {
           status = EXCUSED
         }
-
         return {
           label: subSubmission.sub_assignment_tag,
           status,
@@ -513,6 +512,32 @@ export default class SubmissionTray extends React.Component<
       }
     }
 
+    const checkLatePolicyStatus = (submission, gradeInfo) => {
+      const {status, secondsLate} = this.state.checkpointStates.find(
+        e => e.label === gradeInfo.subAssignmentTag
+      )
+      const subAssignmentFromProps = this.props.submission.subAssignmentSubmissions.find(
+        e => e.sub_assignment_tag === gradeInfo.subAssignmentTag
+      )
+      if (status !== subAssignmentFromProps.late_policy_status) {
+        const data: PendingUpdateData = {
+          subAssignmentTag: gradeInfo.subAssignmentTag,
+          postedGrade: gradeInfo.grade,
+        }
+        if (status === EXCUSED) {
+          data.excuse = true
+        } else {
+          data.excuse = false
+          data.latePolicyStatus = status
+        }
+        if (secondsLate !== 0) data.secondsLateOverride = secondsLate
+
+        this.props.updateSubmission(data)
+      } else {
+        this.props.onGradeSubmission(submission, gradeInfo)
+      }
+    }
+
     const renderInputsForCheckpoints = (
       hasCheckpoints,
       props,
@@ -531,7 +556,7 @@ export default class SubmissionTray extends React.Component<
           gradingScheme={props.gradingScheme}
           pointsBasedGradingScheme={props.pointsBasedGradingScheme}
           pendingGradeInfo={props.pendingGradeInfo}
-          onGradeSubmission={props.onGradeSubmission}
+          onGradeSubmission={checkLatePolicyStatus}
           scalingFactor={props.scalingFactor}
           submission={submission}
           submissionUpdating={props.submissionUpdating}
