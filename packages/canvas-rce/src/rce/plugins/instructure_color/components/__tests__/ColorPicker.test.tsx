@@ -130,8 +130,8 @@ describe('ColorPicker', () => {
 
     let presets = getByTestId('color-preset').querySelectorAll('button')
     expect(presets).toHaveLength(2)
-    expect(getPresetTooltip(presets[0]).textContent).toEqual('#000000')
-    expect(getPresetTooltip(presets[1]).textContent).toEqual('#FFFFFF')
+    expect(getPresetTooltip(presets[0])?.textContent).toEqual('#000000')
+    expect(getPresetTooltip(presets[1])?.textContent).toEqual('#FFFFFF')
 
     const mixer = getByTestId('color-mixer')
     const rgb = mixer.querySelectorAll('input')
@@ -142,7 +142,7 @@ describe('ColorPicker', () => {
     await user.keyboard('{Control>}a{/Control}40')
     await user.click(rgb[2])
     await user.keyboard('{Control>}a{/Control}40')
-    getByText('Apply').closest('button').click()
+    getByText('Apply').closest('button')?.click()
 
     rerender(
       <ColorPicker
@@ -157,9 +157,9 @@ describe('ColorPicker', () => {
 
     presets = getByTestId('color-preset').querySelectorAll('button')
     expect(presets).toHaveLength(3)
-    expect(getPresetTooltip(presets[0]).textContent).toEqual('#000000')
-    expect(getPresetTooltip(presets[1]).textContent).toEqual('#FFFFFF')
-    expect(getPresetTooltip(presets[2]).textContent).toEqual('#b82828')
+    expect(getPresetTooltip(presets[0])?.textContent).toEqual('#000000')
+    expect(getPresetTooltip(presets[1])?.textContent).toEqual('#FFFFFF')
+    expect(getPresetTooltip(presets[2])?.textContent).toEqual('#b82828')
   })
 
   it('calls onCancel when the cancel button is clicked', () => {
