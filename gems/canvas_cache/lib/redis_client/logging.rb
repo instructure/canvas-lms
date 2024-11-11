@@ -21,7 +21,6 @@
 class RedisClient
   module Logging
     COMPACT_LINE = "Redis (%{request_time_ms}ms) %{command} %{key} [%{host}]"
-    DATADOG_COMMANDS = %w[get set evalsha del].freeze
     NON_KEY_COMMANDS = %w[eval evalsha].freeze
     SET_COMMANDS = %w[set setex].freeze
 
@@ -80,24 +79,6 @@ class RedisClient
           message[:response_size] = 0
         else
           message[:response_size] = response&.size || 0
-        end
-
-        if defined?(InstStatsd)
-          by_dbcluster_tags = {
-            host: message[:host],
-            command: DATADOG_COMMANDS.include?(message[:command]) ? message[:command] : "other",
-            dbcluster: defined?(Switchman) ? Switchman::Shard.current.database_server.id : "unknown",
-          }
-
-          InstStatsd::Statsd.increment("canvas.redis.by_dbcluster", tags: by_dbcluster_tags)
-
-          by_controller_tags = {
-            ring: client.ring,
-            controller: message[:controller],
-            command: DATADOG_COMMANDS.include?(message[:command]) ? message[:command] : "other",
-          }
-
-          InstStatsd::Statsd.increment("canvas.redis.by_controller", tags: by_controller_tags)
         end
 
         logline = format_log_message(message, log_style)
