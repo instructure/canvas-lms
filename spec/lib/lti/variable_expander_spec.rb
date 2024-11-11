@@ -1993,21 +1993,38 @@ module Lti
             context "for teacher" do
               before do
                 course.enroll_user(user, "TeacherEnrollment")
-                course.enroll_user(User.create!, "StudentEnrollment")
-                course.enroll_user(User.create!, "StudentEnrollment")
               end
 
-              it "is expanded" do
-                subm1, subm2 = assignment.submissions.to_a
-                subm1.update! cached_due_date: right_now
-                subm2.update! cached_due_date: right_now - 1.day
-                expect(assignment.due_at).to be_nil
-                expect(expand!("$Canvas.assignment.dueAt.iso8601")).to eq right_now.utc.iso8601
+              context "with enrollments" do
+                before do
+                  course.enroll_user(User.create!, "StudentEnrollment")
+                  course.enroll_user(User.create!, "StudentEnrollment")
+                end
+
+                it "is expanded" do
+                  subm1, subm2 = assignment.submissions.to_a
+                  subm1.update! cached_due_date: right_now
+                  subm2.update! cached_due_date: right_now - 1.day
+                  expect(assignment.due_at).to be_nil
+                  expect(expand!("$Canvas.assignment.dueAt.iso8601")).to eq right_now.utc.iso8601
+                end
+
+                it "handles a nil due_at" do
+                  assignment.update!(due_at: nil)
+                  expect_unexpanded! "$Canvas.assignment.dueAt.iso8601"
+                end
               end
 
-              it "handles a nil due_at" do
-                assignment.update!(due_at: nil)
-                expect_unexpanded! "$Canvas.assignment.dueAt.iso8601"
+              context "without enrollments" do
+                it "is expanded if there is due date set" do
+                  assignment.update!(due_at: right_now)
+                  expect(expand!("$Canvas.assignment.dueAt.iso8601")).to eq right_now.utc.iso8601
+                end
+
+                it "handles a nil due_at" do
+                  assignment.update!(due_at: nil)
+                  expect_unexpanded! "$Canvas.assignment.dueAt.iso8601"
+                end
               end
             end
           end

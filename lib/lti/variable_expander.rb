@@ -2114,7 +2114,7 @@ module Lti
       context = @assignment.context
       # We return the latest of all due dates for the assignment if the user is a course admin.
       if course_admin?(context)
-        @assignment.submissions.maximum(:cached_due_date)
+        @assignment.submissions.maximum(:cached_due_date) || @assignment.due_at
       else
         @assignment.due_at
       end
