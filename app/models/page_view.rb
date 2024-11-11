@@ -214,7 +214,7 @@ class PageView < ActiveRecord::Base
     viewer = nil if viewer && Account.site_admin.grants_any_right?(viewer, :view_statistics, :manage_students)
     user.shard.activate do
       if PageView.pv4?
-        result = pv4_client.for_user(user.global_id, **options)
+        result = pv4_client.for_user(user, **options)
         result = AccountFilter.filter(result, viewer) if viewer
         result
       else
