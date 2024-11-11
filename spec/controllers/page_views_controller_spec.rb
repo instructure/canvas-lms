@@ -96,7 +96,7 @@ describe PageViewsController do
 
         expect_any_instance_of(PageView::Pv4Client).to receive(:fetch)
           .with(
-            @user.global_id,
+            @user,
             start_time: Time.zone.parse("2016-03-14T12:25:55Z"),
             end_time: Time.zone.parse("2016-03-15T00:00:00Z"),
             last_page_view_id: nil,
@@ -118,7 +118,7 @@ describe PageViewsController do
         Setting.set("page_views_csv_export_rows", "99")
         expect_any_instance_of(PageView::Pv4Client).to receive(:fetch)
           .with(
-            @user.global_id,
+            @user,
             start_time: Time.zone.parse("2016-03-14T12:25:55Z"),
             end_time: Time.zone.parse("2016-03-15T00:00:00Z"),
             last_page_view_id: nil,

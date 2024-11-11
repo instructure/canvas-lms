@@ -29,7 +29,7 @@ class PageView
 
     PRECISION = 3
 
-    def fetch(user_id,
+    def fetch(user,
               start_time: nil,
               end_time: Time.now.utc,
               last_page_view_id: nil,
@@ -39,10 +39,16 @@ class PageView
 
       params = "start_time=#{start_time.utc.iso8601(PRECISION)}"
       params << "&end_time=#{end_time.utc.iso8601(PRECISION)}"
+      root_account_uuids = user.shard.activate do
+        user.root_account_ids.map do |id|
+          Account.find_cached(id).uuid
+        end
+      end
+      params << "&root_account_uuids=#{root_account_uuids.join(",")}"
       params << "&last_page_view_id=#{last_page_view_id}" if last_page_view_id
       params << "&limit=#{limit}" if limit
       response = CanvasHttp.get(
-        @uri.merge("users/#{user_id}/page_views?#{params}").to_s,
+        @uri.merge("users/#{user.global_id}/page_views?#{params}").to_s,
         { "Authorization" => "Bearer #{@access_token}" }
       )
 
@@ -68,7 +74,7 @@ class PageView
       raise Pv4Timeout, "failed to load page view history due to service timeout"
     end
 
-    def for_user(user_id, oldest: nil, newest: nil)
+    def for_user(user, oldest: nil, newest: nil)
       bookmarker = Bookmarker.new(self)
       BookmarkedCollection.build(bookmarker) do |pager|
         bookmark = pager.current_bookmark
@@ -76,7 +82,7 @@ class PageView
           end_time, last_page_view_id = bookmark
           newest = Time.zone.parse(end_time)
         end
-        pager.replace(fetch(user_id,
+        pager.replace(fetch(user,
                             start_time: oldest,
                             end_time: newest,
                             last_page_view_id:,
