@@ -2906,6 +2906,26 @@ describe Course do
             expect(tabs).not_to include("hidden tool")
           end
 
+          it "does include external tools with default disabled which have been manually enabled" do
+            enabled_tool = @course.context_external_tools.create!(
+              url: "http://example.com/1",
+              consumer_key: "key",
+              shared_secret: "abcd",
+              name: "visible tool",
+              course_navigation: {
+                text: "visible tool",
+                url: "http://example.com/1",
+                default: "disabled"
+              }
+            )
+
+            @course.tab_configuration = [{ "id" => enabled_tool.asset_string }]
+            @course.save!
+
+            tabs = @course.tabs_available(@user, include_external: true).pluck(:label)
+            expect(tabs).to include("visible tool")
+          end
+
           context "with course_subject_tabs option" do
             it "returns subject tabs only by default" do
               length = Course.course_subject_tabs.length
