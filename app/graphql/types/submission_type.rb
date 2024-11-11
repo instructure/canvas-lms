@@ -56,24 +56,6 @@ module Types
 
     field :grading_period_id, ID, null: true
 
-    field :status, String, null: false
-    def status
-      Promise.all([load_association(:assignment), load_association(:custom_grade_status)]).then do
-        Loaders::AssociationLoader.for(Assignment, :external_tool_tag).load(object.assignment).then do
-          object.status
-        end
-      end
-    end
-
-    field :status_tag, SubmissionStatusTagType, null: false
-    def status_tag
-      load_association(:assignment).then do
-        Loaders::AssociationLoader.for(Assignment, :external_tool_tag).load(object.assignment).then do
-          object.status_tag
-        end
-      end
-    end
-
     field :student_entered_score, Float, null: true
 
     field :redo_request, Boolean, null: true
