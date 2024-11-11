@@ -644,6 +644,55 @@ describe Course do
     end
   end
 
+  describe "shift_date_options_from_migration" do
+    let(:course) { course_model }
+    let(:migration) do
+      course.content_migrations.create!(
+        migration_settings: {
+          date_shift_options: {}
+        },
+        source_course: Course.create!
+      )
+    end
+
+    before do
+      allow(course).to receive_messages(real_start_date: Date.parse("2023-01-01"), real_end_date: Date.parse("2023-12-31"))
+      allow(Importers::CourseContentImporter).to receive(:shift_date_options).and_call_original
+    end
+
+    describe "fill_missing_dates_from_source_course FF" do
+      context "when the feature flag is disabled" do
+        it "doesn't call shift_date_options with source_course if dates were not filled from course" do
+          allow(migration.course).to receive_messages(real_start_date: nil, real_end_date: nil)
+          Importers::CourseContentImporter.shift_date_options_from_migration(migration)
+          expect(Importers::CourseContentImporter).not_to have_received(:shift_date_options)
+            .with(migration.source_course, migration.date_shift_options)
+        end
+      end
+
+      context "when the feature flag is enabled" do
+        before do
+          Account.site_admin.enable_feature!(:fill_missing_dates_from_source_course)
+          allow(migration.source_course).to receive_messages(real_start_date: Date.parse("2024-01-01"), real_end_date: Date.parse("2024-12-31"))
+        end
+
+        it "doesn't call shift_date_options with source_course if dates were filled from course" do
+          Importers::CourseContentImporter.shift_date_options_from_migration(migration)
+          expect(Importers::CourseContentImporter).not_to have_received(:shift_date_options)
+            .with(migration.source_course, migration.date_shift_options)
+        end
+
+        it "call shift_date_options with source_course if dates were not filled from course" do
+          allow(course).to receive_messages(real_start_date: nil, real_end_date: nil)
+          Importers::CourseContentImporter.shift_date_options_from_migration(migration)
+          expect(Importers::CourseContentImporter).to have_received(:shift_date_options)
+            .with(migration.source_course, migration.date_shift_options)
+            .exactly(:once)
+        end
+      end
+    end
+  end
+
   describe "import_media_objects" do
     before do
       @kmh = double(KalturaMediaFileHandler)
@@ -948,6 +997,54 @@ describe Course do
       it "returns false" do
         expect(Importers::CourseContentImporter.error_on_dates?(item, attributes)).to be false
       end
+    end
+  end
+
+  describe "any_shift_date_missing?" do
+    it "returns false when all dates are present" do
+      options = {
+        old_start_date: "2023-01-01",
+        old_end_date: "2023-12-31",
+        new_start_date: "2024-01-01",
+        new_end_date: "2024-12-31"
+      }
+      expect(Importers::CourseContentImporter.any_shift_date_missing?(options)).to be false
+    end
+
+    it "returns true when old_start_date is missing" do
+      options = {
+        old_end_date: "2023-12-31",
+        new_start_date: "2024-01-01",
+        new_end_date: "2024-12-31"
+      }
+      expect(Importers::CourseContentImporter.any_shift_date_missing?(options)).to be true
+    end
+
+    it "returns true when old_end_date is missing" do
+      options = {
+        old_start_date: "2023-01-01",
+        new_start_date: "2024-01-01",
+        new_end_date: "2024-12-31"
+      }
+      expect(Importers::CourseContentImporter.any_shift_date_missing?(options)).to be true
+    end
+
+    it "returns true when new_start_date is missing" do
+      options = {
+        old_start_date: "2023-01-01",
+        old_end_date: "2023-12-31",
+        new_end_date: "2024-12-31"
+      }
+      expect(Importers::CourseContentImporter.any_shift_date_missing?(options)).to be true
+    end
+
+    it "returns true when new_end_date is missing" do
+      options = {
+        old_start_date: "2023-01-01",
+        old_end_date: "2023-12-31",
+        new_start_date: "2024-01-01"
+      }
+      expect(Importers::CourseContentImporter.any_shift_date_missing?(options)).to be true
     end
   end
 end
