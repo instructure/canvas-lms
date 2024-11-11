@@ -1072,6 +1072,72 @@ describe "Modules API", type: :request do
       expect(json["completed_at"]).not_to be_nil
       expect(json["items"].find { |i| i["id"] == @assignment_tag.id }["completion_requirement"]["completed"]).to be true
     end
+
+    it "shows module items a student has access to when requesting as a teacher using student_id" do
+      student_1 = User.create!(name: "Student 1")
+      @course.enroll_student(student_1).accept!
+      student_2 = User.create!(name: "Student 2")
+      @course.enroll_student(student_2).accept!
+
+      course_module = @course.context_modules.create!(name: "empty module", workflow_state: "published")
+      assignment = @course.assignments.create!(
+        name: "Suzaku Castle",
+        workflow_state: "published",
+        only_visible_to_overrides: true
+      )
+      course_module.add_item(id: assignment.id, type: "assignment")
+
+      ao = assignment_override_model(assignment:)
+      ao.assignment_override_students.create!(user: student_1)
+
+      json = api_call_as_user(student_1,
+                              :get,
+                              "/api/v1/courses/#{@course.id}/modules?include[]=items",
+                              controller: "context_modules_api",
+                              action: "index",
+                              format: "json",
+                              course_id: @course.id.to_s,
+                              student_id: student_1.id.to_s,
+                              include: ["items"])
+
+      expect(json.last["items"][0]["title"]).to eq "Suzaku Castle"
+
+      json = api_call_as_user(student_2,
+                              :get,
+                              "/api/v1/courses/#{@course.id}/modules?include[]=items",
+                              controller: "context_modules_api",
+                              action: "index",
+                              format: "json",
+                              course_id: @course.id.to_s,
+                              student_id: student_2.id.to_s,
+                              include: ["items"])
+
+      expect(json.last["items"].length).to be 0
+
+      json = api_call_as_user(@teacher,
+                              :get,
+                              "/api/v1/courses/#{@course.id}/modules?include[]=items&student_id=#{student_1.id}",
+                              controller: "context_modules_api",
+                              action: "index",
+                              format: "json",
+                              course_id: @course.id.to_s,
+                              student_id: student_1.id.to_s,
+                              include: ["items"])
+
+      expect(json.last["items"][0]["title"]).to eq "Suzaku Castle"
+
+      json = api_call_as_user(@teacher,
+                              :get,
+                              "/api/v1/courses/#{@course.id}/modules?include[]=items&student_id=#{student_2.id}",
+                              controller: "context_modules_api",
+                              action: "index",
+                              format: "json",
+                              course_id: @course.id.to_s,
+                              student_id: student_2.id.to_s,
+                              include: ["items"])
+
+      expect(json.last["items"].length).to be 0
+    end
   end
 
   context "as a student" do
