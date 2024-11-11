@@ -1622,6 +1622,7 @@ ko:
     default_imported_title: "가져온 질문"
     default_title: "이름 없음 - %{course}"
     default_unfiled_title: "내용 없는 문제"
+  assign_reviews_3fb2932a: "검토 할당"
   assignment: 
     assignment_group_must_have_group: "이 과제에 대한 과제 그룹을 선택하시기 바랍니다."
     at_least_one_file_type: "적어도 하나의 허용되는 파일 유형을 지정하십시오."
