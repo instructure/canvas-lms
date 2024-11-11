@@ -39,6 +39,7 @@ module DataFixup::PopulateRootAccountIdsOnFeatureFlags
 
     # shadow records exist only for feature flags in root-account context only
     FeatureFlag.where(root_account_ids: [], context_type: "Account")
+               .shard(Shard.current)
                .shadow
                .in_batches
                .update_all("root_account_ids=ARRAY[context_id]")
