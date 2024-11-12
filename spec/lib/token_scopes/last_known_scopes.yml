@@ -275,6 +275,8 @@
   path: '/api/v1/accounts/:account_id/reports/:report/:id'
 - verb: GET
   path: '/api/v1/accounts/:account_id/reports/:report/:id'
+- verb: PUT
+  path: '/api/v1/accounts/:account_id/reports/:report/:id/abort'
 - verb: GET
   path: '/api/v1/accounts/:account_id/roles'
 - verb: POST
