@@ -84,7 +84,7 @@ class RedisClient
 
         if defined?(InstStatsd) && InstStatsd::Statsd.initialized?
           by_dbcluster_tags = {
-            host: message[:host],
+            redishost: message[:host],
             command: DATADOG_COMMANDS.include?(message[:command]) ? message[:command] : "other",
             dbcluster: defined?(Switchman) ? Switchman::Shard.current.database_server.id : "unknown",
           }
