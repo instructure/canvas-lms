@@ -2505,6 +2505,15 @@ class UsersController < ApplicationController
             created_by_id: 1
           ) if params[:sis_user_note].present?
         end
+      rescue ActiveRecord::RecordNotUnique => e
+        errors = {
+          :errors => {
+            :user => @user.errors.as_json[:errors],
+            :pseudonym => @pseudonym.errors.as_json[:errors],
+            :observee => {}
+          }
+        }
+        return render :json => errors, :status => :conflict
       rescue ActiveRecord::RecordInvalid => e
         errors = {
           :errors => {
@@ -2513,9 +2522,6 @@ class UsersController < ApplicationController
             :observee => {}
           }
         }
-        # Intent is to verify whether or not the user is actually getting saved
-        # when we send a 400.
-        puts ("User create attempted: @user.id: #{@user.inspect}")
         return render :json => errors, :status => :bad_request
       end
 
