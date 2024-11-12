@@ -39,7 +39,9 @@ import {
 } from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import GenericErrorPage from '@canvas/generic-error-page/react'
+import {TruncateText} from '@instructure/ui-truncate-text'
 import TruncateWithTooltip from '../common/TruncateWithTooltip'
+import {stripHtmlTags} from '../common/stripHtmlTags'
 import LtiDetailModal from './LtiDetailModal'
 import IntegrationDetailModal from './IntegrationDetailModal'
 import ProductCarousel from '../common/Carousels/ProductCarousel'
@@ -65,6 +67,8 @@ const ProductDetail = (props: ProductDetailProps) => {
   const [isIntDetailModalOpen, setIntDetailModalOpen] = useState(false)
   const [intDetailTitle, setIntDetailTitle] = useState('')
   const [intDetailContent, setIntDetailContent] = useState('')
+  const [isTruncated, setIsTruncated] = useState(false)
+  const [showTrucatedDescription, setShowTruncatedDescription] = useState(true)
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -77,6 +81,7 @@ const ProductDetail = (props: ProductDetailProps) => {
     : previousPathRegexp
 
   const {product, isLoading, isError} = useProduct({productId: currentProductId})
+  const productDescription = stripHtmlTags(product?.description)
 
   const params = () => {
     return {
@@ -405,18 +410,43 @@ const ProductDetail = (props: ProductDetailProps) => {
             </Flex>
             {!isDesktop && renderConfigureButton()}
             <ImageCarousel screenshots={product.screenshots} />
-            <Flex margin="medium 0 0 0">
-              <Flex.Item>
-                <Text weight="bold" size="large">
-                  {I18n.t('Overview')}
-                </Text>
-              </Flex.Item>
-            </Flex>{' '}
+            <View
+              as="div"
+              width={100}
+              margin="small 0 medium 0"
+              position="relative"
+              withFocusOutline={!showTrucatedDescription}
+            >
+              <Text weight="bold" size="large">
+                {I18n.t('Overview')}
+              </Text>
+            </View>{' '}
             <Flex>
               <Flex.Item margin="0 0 small 0">
-                <Text dangerouslySetInnerHTML={{__html: product.description}} />
+                <TruncateText
+                  maxLines={showTrucatedDescription ? 4 : 50}
+                  truncate="word"
+                  ellipsis=" (...)"
+                  onUpdate={() => setIsTruncated(true)}
+                >
+                  <Text>{productDescription}</Text>
+                </TruncateText>
               </Flex.Item>
             </Flex>
+            {isTruncated && (
+              <Link
+                margin="0 medium medium 0"
+                forceButtonRole={true}
+                isWithinText={false}
+                onClick={() => setShowTruncatedDescription(!showTrucatedDescription)}
+                themeOverride={{
+                  focusOutlineColor: 'transparent',
+                  fontWeight: 600,
+                }}
+              >
+                {showTrucatedDescription ? 'See more' : 'See less'}
+              </Link>
+            )}
             <Links />
             <Flex>
               <Flex.Item margin="medium 0 small 0">
