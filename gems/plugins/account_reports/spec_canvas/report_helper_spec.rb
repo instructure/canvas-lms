@@ -57,7 +57,7 @@ end
 describe "report helper" do
   let(:account) { Account.default }
   let(:user) { User.create }
-  let(:account_report) { AccountReport.new(report_type: "test_report", account:, user:) }
+  let(:account_report) { AccountReport.create(report_type: "test_report", account:, user:) }
   let(:report) { AccountReports::TestReport.new(account_report) }
 
   it "handles basic math" do

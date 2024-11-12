@@ -1763,6 +1763,7 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/reports/:report/:id", action: :show
       post "accounts/:account_id/reports/:report", action: :create, as: "account_create_report"
       delete "accounts/:account_id/reports/:report/:id", action: :destroy
+      put "accounts/:account_id/reports/:report/:id/abort", action: :abort
     end
 
     scope(controller: :admins) do
