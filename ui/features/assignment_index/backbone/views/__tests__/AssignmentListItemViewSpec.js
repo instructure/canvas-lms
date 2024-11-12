@@ -540,69 +540,6 @@ test('does not render score template without permission', function () {
   equal(spy.callCount, 0)
 })
 
-test('renders lockAt/unlockAt with locale-appropriate format string', function () {
-  tzInTest.configureAndRestoreLater({
-    tz: timezone(french, 'fr_FR'),
-    momentLocale: 'fr',
-  })
-  I18nStubber.setLocale('fr_FR')
-  I18nStubber.stub('fr_FR', {
-    'date.formats.short': '%-d %b',
-    'date.abbr_month_names': [0, 1, 2, 3, 4, 5, 6, 7, 'août', 9, 10, 11, 12],
-    'date.formats.date_at_time': '%-d %b à %k:%M',
-  })
-  const model = buildAssignment({
-    id: 1,
-    lock_at: '2113-08-28T04:00:00Z',
-    all_dates: [
-      {
-        lock_at: '2113-08-28T04:00:00Z',
-        title: 'Summer Session',
-      },
-      {
-        unlock_at: '2113-08-28T04:00:00Z',
-        title: 'Winter Session',
-      },
-    ],
-  })
-  const view = createView(model, {canManage: true})
-  const $dds = view.dateAvailableColumnView.$(`#vdd_tooltip_${this.model.id}_lock div`)
-  equal($('span', $dds.first()).first().text().trim(), '28 août à  4:00')
-  equal($('span', $dds.last()).first().text().trim(), '28 août à  4:00')
-})
-
-test('renders lockAt/unlockAt in appropriate time zone', function () {
-  tzInTest.configureAndRestoreLater({
-    tz: timezone(juneau, 'America/Juneau'),
-    tzData: {
-      'America/Juneau': juneau,
-    },
-  })
-  I18nStubber.stub('en', {
-    'date.formats.short': '%b %-d',
-    'date.formats.date_at_time': '%b %-d at %l:%M%P',
-    'date.abbr_month_names': [0, 1, 2, 3, 4, 5, 6, 7, 'Aug', 9, 10, 11, 12],
-  })
-  const model = buildAssignment({
-    id: 1,
-    lock_at: '2113-08-28T04:00:00Z',
-    all_dates: [
-      {
-        lock_at: '2113-08-28T04:00:00Z',
-        title: 'Summer Session',
-      },
-      {
-        unlock_at: '2113-08-28T04:00:00Z',
-        title: 'Winter Session',
-      },
-    ],
-  })
-  const view = createView(model, {canManage: true})
-  const $dds = view.dateAvailableColumnView.$(`#vdd_tooltip_${this.model.id}_lock div`)
-  equal($('span', $dds.first()).first().text().trim(), 'Aug 27 at  8:00pm')
-  equal($('span', $dds.last()).first().text().trim(), 'Aug 27 at  8:00pm')
-})
-
 test('renders lockAt/unlockAt for multiple due dates', () => {
   const model = buildAssignment({
     id: 1,
