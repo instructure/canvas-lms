@@ -41,16 +41,16 @@ describe "threaded discussions" do
     )
     @second_reply = DiscussionEntry.create!(
       message: "2nd level reply",
-      discussion_topic_id: @first_reply.discussion_topic_id,
-      user_id: @first_reply.user_id,
+      discussion_topic_id: @topic.id,
+      user: @student,
       root_entry_id: @first_reply.id,
       parent_id: @first_reply.id
     )
 
     @deleted_reply = DiscussionEntry.create!(
       message: "1.2 reply",
-      discussion_topic_id: @first_reply.discussion_topic_id,
-      user_id: @first_reply.user_id,
+      discussion_topic_id: @topic.id,
+      user: @student,
       root_entry_id: @first_reply.id,
       parent_id: @first_reply.id
     )
@@ -58,7 +58,6 @@ describe "threaded discussions" do
   end
 
   it "does not render the SpeedGraderNavigator if not in the speedgrader" do
-    skip("VICE-4812")
     user_session(@teacher)
     Discussion.visit(@course, @topic)
 
@@ -68,7 +67,6 @@ describe "threaded discussions" do
   end
 
   it "toggles from inline to split-screen" do
-    skip("VICE-4812")
     # initially set user preference discussions_split_screen, so 'Inline will be the initial View'
     @teacher.preferences[:discussions_splitscreen_view] = false
     @teacher.save!
@@ -105,7 +103,6 @@ describe "threaded discussions" do
   end
 
   it "toggles from split-screen to inline" do
-    skip("VICE-4812")
     # initially set user preference discussions_split_screen, so 'Split-screen will be the initial View'
     @teacher.preferences[:discussions_splitscreen_view] = true
     @teacher.save!
@@ -134,7 +131,6 @@ describe "threaded discussions" do
   end
 
   it "auto reads inline entries" do
-    skip("VICE-4812")
     # initially set user preference discussions_split_screen, so 'Inline will be the initial View'
     @teacher.preferences[:discussions_splitscreen_view] = false
     @teacher.save!
@@ -159,7 +155,6 @@ describe "threaded discussions" do
   end
 
   it "auto reads splitscreen entries" do
-    skip("VICE-4812")
     # initially set user preference discussions_split_screen, so 'Inline will be the initial View'
     @teacher.preferences[:discussions_splitscreen_view] = true
     @teacher.save!

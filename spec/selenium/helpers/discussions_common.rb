@@ -35,7 +35,7 @@ module DiscussionsCommon
   end
 
   def create_discussion(discussion_name, discussion_type)
-    @course.discussion_topics.create!(title: discussion_name, discussion_type:)
+    @course.discussion_topics.create!(title: discussion_name, discussion_type:, message: "Discussion topic message")
   end
 
   def create_graded_discussion(discussion_course, assignment_options = {})

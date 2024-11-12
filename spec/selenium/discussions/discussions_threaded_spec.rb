@@ -42,7 +42,6 @@ describe "threaded discussions" do
     end
 
     it "replies with iframe element" do
-      skip("VICE-4812")
       user_session(@teacher)
       entry_text = "<iframe src='https://example.com'></iframe>"
       Discussion.visit(@course, @topic)
@@ -62,7 +61,6 @@ describe "threaded discussions" do
     end
 
     it "only respects the 'n' shortcut when no rce editors are open" do
-      skip("VICE-4812")
       @topic.discussion_entries.create!(
         user: @student,
         message: "new threaded reply from student"
@@ -86,7 +84,6 @@ describe "threaded discussions" do
     end
 
     it "allows edits to entries with replies", priority: "2" do
-      skip("VICE-4812")
       user_session(@teacher)
       edit_text = "edit message"
       entry = @topic.discussion_entries.create!(
@@ -144,7 +141,6 @@ describe "threaded discussions" do
     end
 
     it "allows edits to discussion with replies", priority: "1" do
-      skip("VICE-4812")
       user_session(@teacher)
       reply_depth = 3
       reply_depth.times do |i|
@@ -172,7 +168,6 @@ describe "threaded discussions" do
     end
 
     it "shows a reply time that is different from the creation time", priority: "2" do
-      skip("VICE-4812")
       user_session(@teacher)
       @enrollment.workflow_state = "active"
       @enrollment.save!
@@ -224,7 +219,6 @@ describe "threaded discussions" do
     end
 
     it "supports repeated editing", priority: "2" do
-      skip("VICE-4812")
       user_session(@teacher)
 
       entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
@@ -238,7 +232,6 @@ describe "threaded discussions" do
     end
 
     it "re-renders replies after editing", priority: "2" do
-      skip("VICE-4812")
       user_session(@teacher)
 
       edit_text = "edit message"
