@@ -415,8 +415,12 @@ module Types
 
       load_association(:groups).then do |groups|
         load_association(:favorites).then do
-          favorite_groups = groups.active.shard(object).where(id: object.favorite_context_ids("Group"))
-          favorite_groups.any? ? favorite_groups : object.groups.active.shard(object)
+          scope = groups.active.shard(object)
+          non_viewable_group_ids = scope.filter_map { |group| group.id unless group.grants_right?(object, :read) }
+          scope = scope.where.not(id: non_viewable_group_ids)
+
+          favorite_groups = scope.where(id: object.favorite_context_ids("Group"))
+          favorite_groups.any? ? favorite_groups : scope
         end
       end
     end
