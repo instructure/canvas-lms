@@ -186,6 +186,14 @@ describe GradingStandard do
       expect(standards[0].id).to eq @standard.id
     end
 
+    it "returns standards that match the context when archive is requested" do
+      grading_standard_for @course
+
+      standards = GradingStandard.for(@course, include_archived: true)
+      expect(standards.length).to eq 1
+      expect(standards[0].id).to eq @standard.id
+    end
+
     it "includes standards made in the parent account" do
       grading_standard_for @course.root_account
 
@@ -208,6 +216,14 @@ describe GradingStandard do
       standards = GradingStandard.for(@course, include_archived: true)
       expect(standards.length).to eq 1
       expect(standards[0].id).to eq @standard.id
+    end
+
+    it "excludes deleted when the parameter is true for archived grading schemes" do
+      Account.site_admin.enable_feature!(:archived_grading_schemes)
+      grading_standard_for @course
+      @standard.destroy
+      standards = GradingStandard.for(@course, include_archived: true)
+      expect(standards.length).to eq 0
     end
   end
 
