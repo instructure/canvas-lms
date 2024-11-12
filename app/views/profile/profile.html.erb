@@ -491,57 +491,7 @@ TEXT
       <i class="icon-plus" aria-hidden="true"></i> <%= t('buttons.new_access_token', "New Access Token") %>
     </a>
   </div>
-  <div id="token_details_dialog" style="display: none;" title="<%= t('titles.access_token_details', "Access Token Details") %>">
-    <p><%= t(<<~TEXT, :wrapper => '<a href="https://canvas.instructure.com/doc/api/index.html" target="_blank" class="external">\1</a>')
-      Access tokens can be used to allow other applications to make API calls
-      on your behalf.  You can also generate access tokens and *use the Canvas
-      Open API* to come up with your own integrations.
-      TEXT
-    %></p>
-
-    <div class="loading_message"><%= t(:loading_token_details, "Loading Token Details...") %></div>
-    <div class="error_loading_message"><%= t(:error_loading_token_details, "Error Loading Token Details") %></div>
-    <div class="results">
-      <table>
-        <tr>
-          <th scope="row"><%= before_label(:token, "Token") %></th>
-          <td>
-            <div class="visible_token">&nbsp;</div>
-            <div class="full_token_warning"><%= mt(:full_token_warning, <<~TEXT)
-**Copy this token down now**. Once you leave this page you won't be able to
-retrieve the full token anymore, you'll have to regenerate it to get a new
-value.
-TEXT
-            %></div>
-          </td>
-        </tr><tr>
-          <th scope="row"><%= before_label(:token_application, "App") %></th>
-          <td class="app_name">&nbsp;</td>
-        </tr><tr>
-          <th scope="row"><%= before_label(:token_purpose, "Purpose") %></th>
-          <td class="purpose">&nbsp;</td>
-        </tr><tr>
-          <th scope="row"><%= before_label(:token_created, "Created") %></th>
-          <td class="created">&nbsp;</td>
-        </tr><tr>
-          <th scope="row"><%= before_label(:token_last_used, "Last Used") %></th>
-          <td class="used">&nbsp;</td>
-        </tr><tr>
-          <th scope="row"><%= before_label(:token_expires, "Expires") %></th>
-          <td class="expires">&nbsp;</td>
-        </tr>
-        <% unless !@current_user.access_tokens.temp_record.grants_right?(logged_in_user, :update) %>
-          <tr class="refresh_token">
-            <td colspan="2">
-              <div class="button-container">
-                <button class="btn regenerate_token"><%= t('buttons.regenerate_token', "Regenerate Token") %></button>
-              </div>
-            </td>
-          </tr>
-        <% end %>
-      </table>
-    </div>
-  </div>
+  <div id='access_token_details_mount_point'></div>
   <div id="add_access_token_dialog" style="display: none;" title="<%= t('titles.new_access_token', "New Access Token") %>">
     <h2><%= t('headers.generate_access_token', "Generate an Access Token") %></h2>
     <%= mt(:generate_access_token_description, <<~TEXT, :documentation_url => 'https://canvas.instructure.com/doc/api/index.html')
