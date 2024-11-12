@@ -37,20 +37,23 @@ export type ProductResponse = {
 }
 
 export const fetchProducts = async (params: DiscoverParams): Promise<ProductResponse> => {
+  const {page, search} = params
+  const {tags, companies, audience, versions} = params.filters
+
   const apiParams = {
-    page: params.page,
+    page,
     per_page: 21,
     q: {
-      ...(params.search && {search_terms_cont: params.search}),
-      ...(params.filters.tags && {display_group_id_eq: params.filters.tags[0]?.id}),
-      ...(params.filters.companies && {
-        company_id_in: params.filters.companies.map((company: FilterItem) => company.id),
+      ...(search && {search_terms_cont: search}),
+      ...(tags && {display_group_id_eq: tags[0]?.id}),
+      ...(companies && {
+        company_id_in: companies.map((company: FilterItem) => company.id),
       }),
-      ...(params.filters.audience && {
-        audience_id_in: params.filters.audience.map((audience: FilterItem) => audience.id),
+      ...(audience && {
+        audience_id_in: audience.map((audience: FilterItem) => audience.id),
       }),
-      ...(params.filters.versions && {
-        version_id_in: params.filters.versions.map((version: FilterItem) => version.id),
+      ...(versions && {
+        version_id_in: versions.map((version: FilterItem) => version.id),
       }),
     },
   }
@@ -145,20 +148,23 @@ export const fetchProductsByOrganization = async (
   params: DiscoverParams,
   organizationSalesforceId: string
 ): Promise<ProductResponse> => {
+  const {page, search} = params
+  const {tags, companies, audience, versions} = params.filters
+
   const apiParams = {
-    page: params.page,
+    page,
     per_page: 21,
     q: {
-      ...(params.search && {search_terms_cont: params.search}),
-      ...(params.filters.tags && {display_group_id_eq: params.filters.tags[0]?.id}),
-      ...(params.filters.companies && {
-        company_id_in: params.filters.companies.map(company => company.id),
+      ...(search && {search_terms_cont: search}),
+      ...(tags && {display_group_id_eq: tags[0]?.id}),
+      ...(companies && {
+        company_id_in: companies.map(company => company.id),
       }),
-      ...(params.filters.audience && {
-        audience_id_in: params.filters.audience.map(audience => audience.id),
+      ...(audience && {
+        audience_id_in: audience.map(audience => audience.id),
       }),
-      ...(params.filters.versions && {
-        version_id_in: params.filters.versions.map(version => version.id),
+      ...(versions && {
+        version_id_in: versions.map(version => version.id),
       }),
     },
   }

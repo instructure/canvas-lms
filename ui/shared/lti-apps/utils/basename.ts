@@ -16,16 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useMedia} from 'react-use'
-import {breakpoints} from '../utils/breakpoints'
-
-export default function useBreakpoints() {
-  const isDesktop = useMedia(`(min-width: ${breakpoints.desktop})`)
-  const isTablet = useMedia(`(min-width: ${breakpoints.tablet})`) && !isDesktop
-  const isMobile = useMedia(`(min-width: ${breakpoints.mobile})`) && !isTablet && !isDesktop
-
-  const isMaxMobile = useMedia(`(max-width: ${breakpoints.mobile})`)
-  const isMaxTablet = useMedia(`(max-width: ${breakpoints.tablet})`)
-
-  return {isDesktop, isTablet, isMobile, isMaxMobile, isMaxTablet}
+export const getBasename = (base: string) => {
+  const path = window.location.pathname
+  const parts = path.split('/')
+  return parts.slice(0, parts.indexOf(base) + 1).join('/')
 }

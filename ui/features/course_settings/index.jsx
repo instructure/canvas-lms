@@ -121,11 +121,13 @@ ready(() => {
   if (availabilityOptionsContainer) {
     ReactDOM.render(
       <Suspense fallback={<Loading />}>
-        <CourseAvailabilityOptions
-          canManage={ENV.PERMISSIONS.edit_course_availability}
-          viewPastLocked={ENV.RESTRICT_STUDENT_PAST_VIEW_LOCKED}
-          viewFutureLocked={ENV.RESTRICT_STUDENT_FUTURE_VIEW_LOCKED}
-        />
+        <ErrorBoundary errorComponent={<Error />}>
+          <CourseAvailabilityOptions
+            canManage={ENV.PERMISSIONS.edit_course_availability}
+            viewPastLocked={ENV.RESTRICT_STUDENT_PAST_VIEW_LOCKED}
+            viewFutureLocked={ENV.RESTRICT_STUDENT_FUTURE_VIEW_LOCKED}
+          />
+        </ErrorBoundary>
       </Suspense>,
       availabilityOptionsContainer
     )
@@ -167,7 +169,9 @@ ready(() => {
   if (integrationsContainer) {
     ReactDOM.render(
       <Suspense fallback={<Loading />}>
-        <Integrations />
+        <ErrorBoundary errorComponent={<Error />}>
+          <Integrations />
+        </ErrorBoundary>
       </Suspense>,
       integrationsContainer
     )

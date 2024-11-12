@@ -16,9 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect} from 'react'
-import {useMedia} from 'react-use'
-import {breakpoints} from '../../breakpoints'
+import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
@@ -28,6 +26,7 @@ import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconEndSolid, IconFilterLine, IconSearchLine} from '@instructure/ui-icons'
 import useDebouncedSearch from '../../hooks/useDebouncedSearch'
 import useDiscoverQueryParams from '../../hooks/useDiscoverQueryParams'
+import useBreakpoints from '../../hooks/useBreakpoints'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -44,10 +43,10 @@ export const SearchAndFilter = (props: {setIsTrayOpen: (isOpen: boolean) => void
     updateQueryParams,
     isDisabled: disableQueryParams,
   })
-  const isMobile = useMedia(`(max-width: ${breakpoints.mobile})`)
+  const {isMaxMobile} = useBreakpoints()
 
   return (
-    <Flex gap="small" margin="0 0 small 0" direction={isMobile ? 'column-reverse' : 'row'}>
+    <Flex gap="small" margin="0 0 small 0" direction={isMaxMobile ? 'column-reverse' : 'row'}>
       <Flex.Item shouldGrow={true} overflowX="hidden" overflowY="hidden">
         <View as="div">
           <TextInput

@@ -21,14 +21,9 @@ import {createBrowserRouter, RouterProvider} from 'react-router-dom'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {InstructorApps} from '../../../../shared/lti-apps/components/InstructorApps'
 import ProductDetail from '../../../../shared/lti-apps/components/ProductDetail/ProductDetail'
+import {getBasename} from '@canvas/lti-apps/utils/basename'
 
 export const CourseApps = () => {
-  const getBasename = () => {
-    const path = window.location.pathname
-    const parts = path.split('/')
-    return parts.slice(0, parts.indexOf('configurations') + 1).join('/')
-  }
-
   const router = createBrowserRouter(
     [
       {
@@ -41,7 +36,7 @@ export const CourseApps = () => {
       },
     ],
     {
-      basename: getBasename(),
+      basename: getBasename('configurations'),
     }
   )
   const queryClient = new QueryClient()
