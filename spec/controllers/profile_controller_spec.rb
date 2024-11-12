@@ -471,6 +471,24 @@ describe ProfileController do
         end
       end
 
+      context "is_eligible_for_token_regeneration" do
+        it "should be 'true' if the user is eligible for token regeneration" do
+          user_session(@user)
+          get "settings"
+
+          expect(assigns[:js_env][:is_eligible_for_token_regeneration]).to be true
+        end
+
+        it "should be 'false' if the user is NOT eligible for token regeneration" do
+          @user.account.change_root_account_setting!(:limit_personal_access_tokens, true)
+          @user.account.enable_feature!(:admin_manage_access_tokens)
+          user_session(@user)
+          get "settings"
+
+          expect(assigns[:js_env][:is_eligible_for_token_regeneration]).to be false
+        end
+      end
+
       it "sets discussions_reporting to falsey if discussions_reporting is off" do
         Account.default.disable_feature! :discussions_reporting
         user_session(@user)

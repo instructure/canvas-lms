@@ -17,8 +17,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
+import {createRoot} from 'react-dom/client'
 import Pseudonym from '@canvas/pseudonyms/backbone/models/Pseudonym'
 import AvatarWidget from '@canvas/avatar-dialog-view'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -32,6 +34,7 @@ import '@canvas/loading-image'
 import '@canvas/util/templateData'
 import 'jqueryui/sortable'
 import '@canvas/rails-flash-notifications'
+import AccessTokenDetails from '../react/AccessTokenDetails'
 
 const I18n = useI18nScope('profile')
 
@@ -334,47 +337,6 @@ $('#access_token_form').formSubmit({
       .text(I18n.t('errors.generating_token_failed', 'Generating Token Failed'))
   },
 })
-$('#token_details_dialog .regenerate_token').click(function () {
-  const result = window.confirm(
-    I18n.t(
-      'confirms.regenerate_token',
-      'Are you sure you want to regenerate this token?  Anything using this token will have to be updated.'
-    )
-  )
-  if (!result) {
-    return
-  }
-
-  const $dialog = $('#token_details_dialog')
-  const $token = $dialog.data('token')
-  const url = $dialog.data('token_url')
-  const $button = $(this)
-  $button.text(I18n.t('buttons.regenerating_token', 'Regenerating token...')).prop('disabled', true)
-  $.ajaxJSON(
-    url,
-    'PUT',
-    {'token[regenerate]': '1'},
-    data => {
-      data.created = datetimeString(data.created_at) || '--'
-      data.expires = datetimeString(data.expires_at) || I18n.t('token_never_expires', 'never')
-      data.used = datetimeString(data.last_used_at) || '--'
-      data.visible_token = data.visible_token || 'protected'
-      data.workflow_state = localizeWorkflowState(data.workflow_state)
-      $dialog
-        .fillTemplateData({data})
-        .find('.full_token_warning')
-        .showIf(data.visible_token.length > 10)
-      $token.data('token', data)
-      $token.fillTemplateData({data})
-      $button.text(I18n.t('buttons.regenerate_token', 'Regenerate Token')).prop('disabled', false)
-    },
-    () => {
-      $button
-        .text(I18n.t('errors.regenerating_token_failed', 'Regenerating Token Failed'))
-        .prop('disabled', false)
-    }
-  )
-})
 $('.access_token .activate_token_link').click(function () {
   const $button = $(this)
   const url = $button.attr('rel')
@@ -395,58 +357,35 @@ $('.access_token .activate_token_link').click(function () {
 })
 $('.show_token_link').click(function (event) {
   event.preventDefault()
-  const $dialog = $('#token_details_dialog')
+
   const url = $(this).attr('rel')
-  $dialog.dialog({
-    width: 700,
-    modal: true,
-    zIndex: 1000,
-  })
-  const $token = $(this).parents('.access_token')
-  $dialog.data('token', $token)
-  $dialog.find('.loading_message').show().end().find('.results,.error_loading_message').hide()
-  function tokenLoaded(token) {
-    $dialog.fillTemplateData({data: token})
-    $dialog.data('token_url', url)
-    $dialog
-      .find('.refresh_token')
-      .showIf(token.visible_token && token.visible_token !== 'protected')
-      .find('.regenerate_token')
-      .text(I18n.t('buttons.regenerate_token', 'Regenerate Token'))
-      .prop('disabled', false)
-    $dialog
-      .find('.loading_message,.error_loading_message')
-      .hide()
-      .end()
-      .find('.results')
-      .show()
-      .end()
-      .find('.full_token_warning')
-      .showIf(token.visible_token.length > 10)
-    $dialog.find('.regenerate_token').focus()
-  }
-  const token = $token.data('token')
-  if (token) {
-    tokenLoaded(token)
-  } else {
-    $.ajaxJSON(
-      url,
-      'GET',
-      {},
-      data => {
-        data.created = datetimeString(data.created_at) || '--'
-        data.expires = datetimeString(data.expires_at) || I18n.t('token_never_expires', 'never')
-        data.used = datetimeString(data.last_used_at) || '--'
-        data.visible_token = data.visible_token || 'protected'
-        $token.data('token', data)
-        tokenLoaded(data)
-      },
-      () => {
-        $dialog.find('.error_loading_message').show().end().find('.results,.loading_message').hide()
-      }
-    )
-  }
+  const tokenElement = $(this).parents('.access_token')
+  const token = tokenElement.data('token')
+  const isEligibleForTokenRegeneration = ENV.is_eligible_for_token_regeneration ?? false
+  const mountPoint = document.getElementById('access_token_details_mount_point')
+  const root = createRoot(mountPoint)
+
+  root.render(
+    <AccessTokenDetails
+      url={url}
+      loadedToken={token}
+      isEligibleForTokenRegeneration={isEligibleForTokenRegeneration}
+      onTokenLoad={loadedToken => {
+        const data = {
+          ...loadedToken,
+          created: datetimeString(loadedToken.created_at) || '--',
+          expires: datetimeString(loadedToken.expires_at) || I18n.t('token_never_expires', 'never'),
+          used: datetimeString(loadedToken.last_used_at) || '--',
+          visible_token: loadedToken.visible_token || 'protected',
+          workflow_state: localizeWorkflowState(loadedToken.workflow_state),
+        }
+        tokenElement.data('token', data)
+      }}
+      onClose={() => root.unmount()}
+    />
+  )
 })
+
 $('.add_access_token_link').click(function (event) {
   event.preventDefault()
   $('#access_token_form')

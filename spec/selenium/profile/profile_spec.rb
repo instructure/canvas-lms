@@ -36,22 +36,18 @@ describe "profile" do
     expect(f("#registered_services")).to include_text("Skype")
   end
 
-  def generate_access_token(purpose = "testing", close_dialog = false)
-    generate_access_token_with_expiration(nil, purpose)
-    if close_dialog
-      close_visible_dialog
-    end
-  end
-
-  def generate_access_token_with_expiration(date, purpose = "testing")
+  def generate_access_token(expiration: nil, purpose: "testing", close_dialog: true)
     f(".add_access_token_link").click
     access_token_form = f("#access_token_form")
     access_token_form.find_element(:id, "token_purpose").send_keys(purpose)
-    access_token_form.find_element(:id, "token_expires_at").send_keys(date) unless date.nil?
+    access_token_form.find_element(:id, "token_expires_at").send_keys(expiration) unless expiration.nil?
     submit_dialog_form(access_token_form)
     wait_for_ajax_requests
-    details_dialog = f("#token_details_dialog")
+    details_dialog = f("[role=dialog][aria-label='Access Token Details']")
     expect(details_dialog).to be_displayed
+    if close_dialog
+      close_instui_dialog
+    end
   end
 
   def log_in_to_settings
@@ -385,15 +381,14 @@ describe "profile" do
 
     it "generates a new access token without an expiration", priority: "2" do
       get "/profile/settings"
-      generate_access_token("testing", true)
+      generate_access_token
       expect(fj(".access_token:visible .expires")).to include_text("never")
     end
 
     it "generates a new access token with an expiration", priority: "2" do
       Timecop.freeze do
         get "/profile/settings"
-        generate_access_token_with_expiration(format_date_for_view(2.days.from_now, :medium))
-        close_visible_dialog
+        generate_access_token(expiration: format_date_for_view(2.days.from_now, :medium))
       end
       expect(fj(".access_token:visible .expires")).to include_text(format_time_for_view(2.days.from_now.midnight))
     end
@@ -401,13 +396,14 @@ describe "profile" do
     it "regenerates a new access token", priority: "2" do
       skip_if_safari(:alert)
       get "/profile/settings"
-      generate_access_token
-      token = f(".visible_token").text
-      f(".regenerate_token").click
+      generate_access_token(close_dialog: false)
+      token_selector = "[data-testid='visible_token']"
+      token = f(token_selector).text
+      f("[type=submit][aria-label='Regenerate Token']").click
       expect(driver.switch_to.alert).not_to be_nil
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      new_token = f(".visible_token").text
+      new_token = f(token_selector).text
       expect(token).not_to eql(new_token)
     end
 
@@ -421,16 +417,16 @@ describe "profile" do
 
     it "views the details of an access token" do
       get "/profile/settings"
-      generate_access_token("testing", true)
+      generate_access_token
       # using :visible because we don't want to grab the template element
       fj("#access_tokens .show_token_link:visible").click
-      expect(f("#token_details_dialog")).to be_displayed
+      expect(f("[role=dialog][aria-label='Access Token Details']")).to be_displayed
     end
 
     it "deletes an access token", priority: "2" do
       skip_if_safari(:alert)
       get "/profile/settings"
-      generate_access_token("testing", true)
+      generate_access_token
       # using :visible because we don't want to grab the template element
       fj("#access_tokens .delete_key_link:visible").click
       expect(driver.switch_to.alert).not_to be_nil
