@@ -46,12 +46,7 @@ import {
 import type {JsonUrlWizardService} from './manage/registration_wizard/JsonUrlWizardService'
 import type {Lti1p3RegistrationWizardService} from './manage/lti_1p3_registration_form/Lti1p3RegistrationWizardService'
 import {openDynamicRegistrationWizard} from './manage/registration_wizard/RegistrationWizardModalState'
-
-const getBasename = () => {
-  const path = window.location.pathname
-  const parts = path.split('/')
-  return parts.slice(0, parts.indexOf('apps') + 1).join('/')
-}
+import {getBasename} from '@canvas/lti-apps/utils/basename'
 
 const queryClient = new QueryClient()
 
@@ -73,7 +68,7 @@ const router = createBrowserRouter(
   ],
 
   {
-    basename: getBasename(),
+    basename: getBasename('apps'),
   }
 )
 
