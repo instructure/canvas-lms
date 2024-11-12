@@ -25,6 +25,7 @@ import {humanReadableSize} from '../utils'
 import {ProgressBar} from '@instructure/ui-progress'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {FileDrop} from '@instructure/ui-file-drop'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -115,20 +116,21 @@ const MigrationFileInput = ({
         maxWidth="22.5rem"
       />
       {isSubmitting && (
-        <View as="div" margin="small 0 0" style={{position: 'relative'}}>
+        <View as="div" margin="small 0 0" maxWidth="22.5rem">
           {I18n.t('Uploading File')}
-          <ProgressBar
-            size="small"
-            meterColor="info"
-            screenReaderLabel={I18n.t('Loading completion')}
-            valueNow={fileUploadProgress || 0}
-            valueMax={100}
-            // @ts-ignore
-            shouldAnimate={true}
-          />
-          <span style={{top: '25px', right: '-45px', position: 'absolute'}}>
-            {fileUploadProgress}%
-          </span>
+          <Flex gap="x-small">
+            <ProgressBar
+              width="100%"
+              size="small"
+              meterColor="info"
+              screenReaderLabel={I18n.t('Loading completion')}
+              valueNow={fileUploadProgress || 0}
+              valueMax={100}
+              // @ts-ignore
+              shouldAnimate={true}
+            />
+            <span>{fileUploadProgress}%</span>
+          </Flex>
         </View>
       )}
     </>
