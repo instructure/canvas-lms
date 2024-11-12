@@ -3160,6 +3160,12 @@ describe GradebooksController do
         expect(js_env.fetch(:media_comment_asset_string)).to eq @teacher.asset_string
       end
 
+      it "sets rce_js_env" do
+        @course.root_account.enable_feature!(:rce_lite_enabled_speedgrader_comments)
+        get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+        expect(js_env).to have_key :RICH_CONTENT_APP_HOST
+      end
+
       describe "student group filtering" do
         before do
           @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)

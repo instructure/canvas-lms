@@ -1046,6 +1046,7 @@ class GradebooksController < ApplicationController
 
     return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
 
+    rce_js_env if @context.root_account.feature_enabled?(:rce_lite_enabled_speedgrader_comments)
     @assignment = if params[:assignment_id].blank?
                     nil
                   else
