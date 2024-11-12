@@ -17,76 +17,72 @@
  */
 
 import React from 'react'
-import {fireEvent, render, screen} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {Editor} from '@craftjs/core'
-import {PreviewModal} from '../PreviewModal'
+import {PreviewModal, getViewWidth} from '../PreviewModal'
 
 const user = userEvent.setup()
 
 describe('PreviewModal', () => {
   it('renders', () => {
-    const {getAllByText, getByText, getByLabelText} = render(
+    const {getByText} = render(
       <Editor enabled={false}>
         <PreviewModal open={true} onDismiss={() => {}} />)
       </Editor>
     )
-
     expect(getByText('Preview')).toBeInTheDocument()
-    expect(getAllByText('View Size')).toHaveLength(2)
-    expect(getByLabelText('Desktop')).toBeInTheDocument()
-    expect(getByLabelText('Tablet')).toBeInTheDocument()
-    expect(getByLabelText('Mobile')).toBeInTheDocument()
+    expect(getByText('Desktop')).toBeInTheDocument()
+    expect(getByText('Tablet')).toBeInTheDocument()
+    expect(getByText('Mobile')).toBeInTheDocument()
     expect(getByText('Close')).toBeInTheDocument()
   })
 
   it('defaults to Desktop size', () => {
-    render(
+    const {getByText} = render(
       <Editor enabled={false}>
         <PreviewModal open={true} onDismiss={() => {}} />
       </Editor>
     )
 
-    expect(screen.getByLabelText('Desktop')).toBeChecked()
+    expect(getByText('Desktop').closest('button')).toHaveAttribute('aria-current', 'true')
     const view = document.querySelector('.block-editor-view.desktop')
     expect(view).toBeInTheDocument()
-    expect(view).toHaveStyle({width: '1026px'})
+    expect(view).toHaveStyle({width: getViewWidth('desktop')})
   })
 
-  it('renders Tablet size', async () => {
-    render(
+  it('renders Tablet size', () => {
+    const {getByText} = render(
       <Editor enabled={false}>
         <PreviewModal open={true} onDismiss={() => {}} />)
       </Editor>
     )
 
-    user.click(screen.getByLabelText('Tablet'))
-    const tablet = screen.getByLabelText('Tablet')
-    expect(tablet).toBeInTheDocument()
+    const tabletButton = getByText('Tablet').closest('button') as HTMLButtonElement
+    expect(tabletButton).toBeInTheDocument()
+    tabletButton.click()
 
-    await user.click(tablet)
-
+    expect(tabletButton).toHaveAttribute('aria-current', 'true')
     const view = document.querySelector('.block-editor-view.tablet')
     expect(view).toBeInTheDocument()
-    expect(view).toHaveStyle({width: '768px'})
+    expect(view).toHaveStyle({width: getViewWidth('tablet')})
   })
 
   it('renders Mobile size', async () => {
-    render(
+    const {getByText} = render(
       <Editor enabled={false}>
         <PreviewModal open={true} onDismiss={() => {}} />)
       </Editor>
     )
 
-    user.click(screen.getByLabelText('Mobile'))
-    const mobile = screen.getByLabelText('Mobile')
-    expect(mobile).toBeInTheDocument()
+    const mobileButton = getByText('Mobile').closest('button') as HTMLButtonElement
+    expect(mobileButton).toBeInTheDocument()
+    mobileButton.click()
 
-    await user.click(mobile)
-
+    expect(mobileButton).toHaveAttribute('aria-current', 'true')
     const view = document.querySelector('.block-editor-view.mobile')
     expect(view).toBeInTheDocument()
-    expect(view).toHaveStyle({width: '320px'})
+    expect(view).toHaveStyle({width: getViewWidth('mobile')})
   })
 
   it('calls onDismiss on Escape key', async () => {
@@ -104,13 +100,13 @@ describe('PreviewModal', () => {
 
   it('calls OnDismiss on Close button click', async () => {
     const onDismiss = jest.fn()
-    render(
+    const {getByText} = render(
       <Editor enabled={false}>
         <PreviewModal open={true} onDismiss={onDismiss} />)
       </Editor>
     )
 
-    const closeButton = screen.getByText('Close').closest('button ') as HTMLButtonElement
+    const closeButton = getByText('Close').closest('button ') as HTMLButtonElement
     expect(closeButton).toBeInTheDocument()
 
     await user.click(closeButton)
