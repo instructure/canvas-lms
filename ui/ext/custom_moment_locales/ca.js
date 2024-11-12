@@ -30,7 +30,7 @@ const apply = () => {
   const origLocale = moment.locale()
 
   const monthsRegex =
-    /^(Gen|Feb|Març|Abr|Maig|Juny|Jul|Ag|Set|Oct|Nov|Des|de Gen|de Febr|de Març|d[’']Abr|de Maig|de Juny|de Jul|d[’']Ag|de Set|d[’']Oct|de Nov|de Des)/i
+    /^(Gen|Febr|Març|Abr|Maig|Juny|Jul|Ag|Set|Oct|Nov|Des|de Gen|de Febr|de Març|d[’']Abr|de Maig|de Juny|de Jul|d[’']Ag|de Set|d[’']Oct|de Nov|de Des)/i
 
   const monthsParse = [
     /^(de Gen|Gen)/i,
