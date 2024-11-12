@@ -153,6 +153,26 @@ export const DiscussionTopicAlertManager = props => {
             </Alert>
           )
         }
+
+        if (ENV.checkpointed_discussion_without_feature_flag) {
+          applicableAlerts.push(
+            <Alert
+              key="checkpointed-discussion-without-feature-flag"
+              variant="warning"
+              margin="0 0 x-small"
+            >
+              <Text
+                data-testid="checkpointed-discussion-without-feature-flag"
+                size={responsiveProps?.alert?.textSize}
+              >
+                {I18n.t(
+                  'This discussion includes graded checkpoints, but the Discussion Checkpoints feature flag is currently disabled at the root account level. To enable this functionality, please contact an administrator to activate the feature flag.'
+                )}
+              </Text>
+            </Alert>
+          )
+        }
+
         return applicableAlerts
       }}
     />

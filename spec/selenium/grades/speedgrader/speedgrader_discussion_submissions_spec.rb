@@ -253,6 +253,15 @@ describe "SpeedGrader - discussion submissions" do
           @replies_required.times { |i| @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to entry #{i}", parent_entry: resubmitted_rtt) }
         end
 
+        it "display the regular assignment grading interface after disabling checkpoints", :ignore_js_errors do
+          @course.root_account.disable_feature!(:discussion_checkpoints)
+
+          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
+          wait_for_ajaximations
+
+          expect(f("body")).to contain_jqcss("input[id='grading-box-extended']")
+        end
+
         it "displays the use same grade link for the previous submission" do
           # Loads Speedgrader for a student
           get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"

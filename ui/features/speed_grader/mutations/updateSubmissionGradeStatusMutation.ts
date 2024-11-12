@@ -48,20 +48,35 @@ export const ZUpdateSubmissionGradeStatusParams = z.object({
   courseId: z.string().nullable(),
 })
 
+const ZSubmissionWithGradingStatus = z.object({
+  gradingStatus: z.string(),
+})
+
+const ZUpdateSubmissionGradeStatusResult = z.object({
+  updateSubmissionGradeStatus: z.object({
+    submission: ZSubmissionWithGradingStatus,
+  }),
+})
+
 type UpdateSubmissionGradeStatusParams = z.infer<typeof ZUpdateSubmissionGradeStatusParams>
+type UpdateSubmissionGradeStatusResult = z.infer<typeof ZUpdateSubmissionGradeStatusResult>
+type SubmissionWithGradingStatus = z.infer<typeof ZSubmissionWithGradingStatus>
 
 export async function updateSubmissionGradeStatus({
   submissionId,
   latePolicyStatus,
   customGradeStatusId,
   courseId,
-}: UpdateSubmissionGradeStatusParams): Promise<any> {
-  const result: any = await executeQuery(UPDATE_SUBMISSION_GRADE_STATUS, {
-    submissionId,
-    latePolicyStatus,
-    customGradeStatusId,
-    courseId,
-  })
+}: UpdateSubmissionGradeStatusParams): Promise<SubmissionWithGradingStatus> {
+  const result: UpdateSubmissionGradeStatusResult = await executeQuery(
+    UPDATE_SUBMISSION_GRADE_STATUS,
+    {
+      submissionId,
+      latePolicyStatus,
+      customGradeStatusId,
+      courseId,
+    }
+  )
 
-  return result.createSubmissionComment.submission
+  return result.updateSubmissionGradeStatus.submission
 }
