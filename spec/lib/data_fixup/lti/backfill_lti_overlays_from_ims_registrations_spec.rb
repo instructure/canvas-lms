@@ -80,14 +80,23 @@ RSpec.describe DataFixup::Lti::BackfillLtiOverlaysFromIMSRegistrations do
   it "should set a context when an exception is raised" do
     fake_scope = double(Sentry::Scope)
 
-    expect(fake_scope).to receive(:set_context)
-      .with(
-        "DataFixup.backfill_lti_overlays",
-        { ims_registration_global_id: ims_registration.global_id }
-      )
-    expect(Sentry).to receive(:configure_scope).and_yield(fake_scope)
+    expect(fake_scope).to receive(:set_tags).with(ims_registration_global_id: ims_registration.global_id)
+    expect(fake_scope).to receive(:set_context).with("exception", { name: "ArgumentError", message: "ArgumentError" })
+    expect(Sentry).to receive(:with_scope).and_yield(fake_scope)
     expect(Schemas::Lti::IMS::RegistrationOverlay).to receive(:to_lti_overlay).and_raise(ArgumentError)
     ims_registration
-    expect { subject }.to raise_error(ArgumentError)
+    expect { subject }.not_to raise_error
+  end
+
+  it "should finish other registrations if one exception is raised" do
+    ims_registration.registration_overlay["disabledPlacements"] << "invalid_placement"
+    ims_registration.save!(validate: false)
+    second_ims_registration = lti_ims_registration_model(account:, registration_overlay:)
+
+    subject
+    # ims_registration has the invalid placement; overlay shouldn't have been created
+    expect(ims_registration.lti_registration.lti_overlays.count).to eq(0)
+    # second_ims_registration should have had an overlay created
+    expect(second_ims_registration.lti_registration.lti_overlays.count).to eq(1)
   end
 end

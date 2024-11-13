@@ -20,7 +20,7 @@
 module DataFixup
   module CreateLtiRegistrationsFromDeveloperKeys
     def self.run
-      DeveloperKey.where(workflow_state: "active", is_lti_key: true, lti_registration: nil).preload(:tool_configuration, :ims_registration).find_each do |developer_key|
+      DeveloperKey.where(is_lti_key: true, lti_registration: nil).preload(:tool_configuration, :ims_registration).find_each do |developer_key|
         registration_values = {
           admin_nickname: developer_key.name,
           account_id: developer_key.account_id.presence || Account.site_admin.global_id,
