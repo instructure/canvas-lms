@@ -163,7 +163,7 @@ const ProductDetail = (props: ProductDetailProps) => {
             </div>
           </Flex.Item>
         )}
-        <Flex>
+        <Flex margin={isDesktop ? 'small 0 0 0' : '0'}>
           {isDesktop && (
             <Flex.Item>
               <div style={{borderRadius: '8px'}}>
@@ -185,7 +185,7 @@ const ProductDetail = (props: ProductDetailProps) => {
               <div style={{marginBottom: '.5rem'}}>
                 <TruncateWithTooltip
                   linesAllowed={2}
-                  horizontalOffset={-150}
+                  horizontalOffset={isDesktop ? -150 : -10}
                   backgroundColor="primary"
                 >
                   <Text>{product.tagline}</Text>
