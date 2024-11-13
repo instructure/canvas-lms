@@ -35,6 +35,7 @@ import '@canvas/util/templateData'
 import 'jqueryui/sortable'
 import '@canvas/rails-flash-notifications'
 import AccessTokenDetails from '../react/AccessTokenDetails'
+import NewAccessToken from '../react/NewAccessToken'
 
 const I18n = useI18nScope('profile')
 
@@ -283,60 +284,6 @@ $('.delete_key_link').click(function (event) {
     },
   })
 })
-$('#add_access_token_dialog .cancel_button').click(() => {
-  $('#add_access_token_dialog').dialog('close')
-})
-$('#access_token_form').formSubmit({
-  object_name: 'token',
-  property_validations: {
-    purpose(value) {
-      if (!value || value === '') {
-        return I18n.t('purpose_required', 'Purpose is required')
-      }
-      if (value.length > maximumStringLength) {
-        return I18n.t('Exceeded the maximum length (%{number} characters)', {
-          number: maximumStringLength,
-        })
-      }
-    },
-  },
-  beforeSubmit() {
-    $(this)
-      .find('button')
-      .prop('disabled', true)
-      .filter('.submit_button')
-      .text(I18n.t('buttons.generating_token', 'Generating Token...'))
-  },
-  success(data) {
-    $(this)
-      .find('button')
-      .prop('disabled', false)
-      .filter('.submit_button')
-      .text(I18n.t('buttons.generate_token', 'Generate Token'))
-    $('#add_access_token_dialog').dialog('close')
-    $('#no_approved_integrations').hide()
-    $('#access_tokens_holder').show()
-    const $token = $('.access_token.blank:first').clone(true).removeClass('blank')
-    data.created = datetimeString(data.created_at) || '--'
-    data.expires = datetimeString(data.expires_at) || I18n.t('token_never_expires', 'never')
-    data.used = '--'
-    data.workflow_state = localizeWorkflowState(data.workflow_state)
-    $token.fillTemplateData({
-      data,
-      hrefValues: ['id'],
-    })
-    $token.data('token', data)
-    $('#access_tokens > tbody').append($token.show())
-    $token.find('.show_token_link').click()
-  },
-  error() {
-    $(this)
-      .find('button')
-      .prop('disabled', false)
-      .filter('.submit_button')
-      .text(I18n.t('errors.generating_token_failed', 'Generating Token Failed'))
-  },
-})
 $('.access_token .activate_token_link').click(function () {
   const $button = $(this)
   const url = $button.attr('rel')
@@ -388,24 +335,35 @@ $('.show_token_link').click(function (event) {
 
 $('.add_access_token_link').click(function (event) {
   event.preventDefault()
-  $('#access_token_form')
-    .find('button')
-    .prop('disabled', false)
-    .filter('.submit_button')
-    .text(I18n.t('buttons.generate_token', 'Generate Token'))
-  $('#add_access_token_dialog')
-    .find(':input')
-    .val('')
-    .end()
-    .dialog({
-      width: 500,
-      open() {
-        $(this).closest('.ui-dialog').focus()
-      },
-      modal: true,
-      zIndex: 1000,
-    })
-    .fixDialogButtons()
+
+  const mountPoint = document.getElementById('new_access_token_mount_point')
+  const root = createRoot(mountPoint)
+
+  root.render(
+    <NewAccessToken
+      onSubmit={data => {
+        root.unmount()
+
+        $('#no_approved_integrations').hide()
+        $('#access_tokens_holder').show()
+
+        const $token = $('.access_token.blank:first').clone(true).removeClass('blank')
+        data.created = datetimeString(data.created_at) || '--'
+        data.expires = datetimeString(data.expires_at) || I18n.t('token_never_expires', 'never')
+        data.used = '--'
+        data.workflow_state = localizeWorkflowState(data.workflow_state)
+
+        $token.fillTemplateData({
+          data,
+          hrefValues: ['id'],
+        })
+        $token.data('token', data)
+        $('#access_tokens > tbody').append($token.show())
+        $token.find('.show_token_link').click()
+      }}
+      onClose={() => root.unmount()}
+    />
+  )
 })
 $(document)
   .fragmentChange((event, hash) => {

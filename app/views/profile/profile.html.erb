@@ -492,49 +492,7 @@ TEXT
     </a>
   </div>
   <div id='access_token_details_mount_point'></div>
-  <div id="add_access_token_dialog" style="display: none;" title="<%= t('titles.new_access_token', "New Access Token") %>">
-    <h2><%= t('headers.generate_access_token', "Generate an Access Token") %></h2>
-    <%= mt(:generate_access_token_description, <<~TEXT, :documentation_url => 'https://canvas.instructure.com/doc/api/index.html')
-Access tokens are what allow third-party applications to access Canvas
-resources on your behalf. These tokens are normally created automatically for
-applications as needed, but if [you're developing a new or limited
-project](%{documentation_url}) you can just generate the token from here.
-TEXT
-    %>
-    <%= form_for :token, :url => api_v1_tokens_url("self"), :html => {:id => "access_token_form", :style => "margin-top: 10px;"} do |f| %>
-      <table class="formtable" role="presentation">
-        <tr>
-          <td><%= f.blabel :purpose, :en => "Purpose" %></td>
-          <td><%= f.text_field :purpose %></td>
-        </tr>
-        <tr>
-          <td>
-            <%= f.blabel :expires_at, en: "Expires", id: "token_expires_at_accessible_label" %>
-          </td>
-          <td>
-            <div>
-              <%= f.text_field :expires_at,
-                               class: "expires_field datetime_field",
-                               style: "width: 120px;",
-                               "aria-describedby" => "leave_blank_for_no_expiration",
-                               "data-tooltip" => "{\"position\":\"top\",\"force_position\":\"true\"}",
-                               title: accessible_date_format %>
-            </div>
-            <div style="font-size: 0.8em;" class="hint" id="leave_blank_for_no_expiration">
-              <%= t('hints.expires_at', "leave blank for no expiration") %>
-            </div>
-          </td>
-        </tr>
-          <td colspan="2">
-            <div class="button-container">
-              <button class="btn cancel_button" type="button"><%= t('#buttons.cancel', "Cancel") %></button>
-              <button class="btn btn-primary submit_button" type="submit"><%= t('buttons.generate_token', "Generate Token") %></button>
-            </div>
-          </td>
-        </tr>
-      </table>
-    <% end %>
-  </div>
+  <div id='new_access_token_mount_point'></div>
 </div>
 
 <h2 aria-hidden=true><%= t('Feature Options') %></h2>

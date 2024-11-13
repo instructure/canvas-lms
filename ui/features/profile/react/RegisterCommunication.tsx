@@ -29,6 +29,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
+import {focusFiled, getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
 
 const I18n = useI18nScope('profile')
 
@@ -102,16 +103,6 @@ const RegisterCommunication = ({
 
   const title = I18n.t('Register Communication')
 
-  const getErrorMessage = (field: Tab) => {
-    const errorMessage = errors[field]?.message
-
-    return errorMessage ? [{text: errorMessage, type: 'error'} as const] : []
-  }
-
-  const focusTextFiledForTab = (tab: Tab) => {
-    control._fields[tab]?._f.ref.focus?.()
-  }
-
   const handleTabChange = (id = Tab.EMAIL) => {
     reset()
     setSelectedTab(id)
@@ -126,7 +117,7 @@ const RegisterCommunication = ({
         selectedTab === Tab.EMAIL ? values.enableEmailLogin : undefined
       )
     } catch {
-      focusTextFiledForTab(selectedTab)
+      focusFiled(control, selectedTab)
     }
   }
 
@@ -170,7 +161,7 @@ const RegisterCommunication = ({
                       {...field}
                       width="200px"
                       renderLabel={I18n.t('Email Address')}
-                      messages={getErrorMessage(Tab.EMAIL)}
+                      messages={getFormErrorMessage(errors, Tab.EMAIL)}
                     />
                   )}
                 />
@@ -208,7 +199,7 @@ const RegisterCommunication = ({
                       {...field}
                       width="200px"
                       renderLabel={I18n.t('Mobile Number')}
-                      messages={getErrorMessage(Tab.SMS)}
+                      messages={getFormErrorMessage(errors, Tab.SMS)}
                       onChange={event => {
                         event.target.value = event.target.value.replace(/\D/g, '')
 
@@ -240,7 +231,7 @@ const RegisterCommunication = ({
                       {...field}
                       width="200px"
                       renderLabel={I18n.t('Slack Email')}
-                      messages={getErrorMessage(Tab.SLACK)}
+                      messages={getFormErrorMessage(errors, Tab.SLACK)}
                       data-testid="slack-email"
                     />
                   )}

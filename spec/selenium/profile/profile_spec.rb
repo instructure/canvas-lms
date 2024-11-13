@@ -38,10 +38,14 @@ describe "profile" do
 
   def generate_access_token(expiration: nil, purpose: "testing", close_dialog: true)
     f(".add_access_token_link").click
-    access_token_form = f("#access_token_form")
-    access_token_form.find_element(:id, "token_purpose").send_keys(purpose)
-    access_token_form.find_element(:id, "token_expires_at").send_keys(expiration) unless expiration.nil?
-    submit_dialog_form(access_token_form)
+    access_token_dialog = f("[role=dialog][aria-label='New Access Token']")
+    access_token_dialog.find_element(:name, "purpose").send_keys(purpose)
+    if expiration.present?
+      expiration_date = access_token_dialog.find_element(:css, "[data-testid='expiration-date']")
+      expiration_date.send_keys(expiration)
+      expiration_date.send_keys(:tab)
+    end
+    submit_form(access_token_dialog)
     wait_for_ajax_requests
     details_dialog = f("[role=dialog][aria-label='Access Token Details']")
     expect(details_dialog).to be_displayed
@@ -410,9 +414,10 @@ describe "profile" do
     it "tests canceling creating a new access token" do
       get "/profile/settings"
       f(".add_access_token_link").click
-      access_token_form = f("#access_token_form")
-      access_token_form.find_element(:xpath, "../..").find_element(:css, ".ui-dialog-buttonpane .cancel_button").click
-      expect(access_token_form).not_to be_displayed
+      access_token_dialog_selector = "[role=dialog][aria-label='New Access Token']"
+      access_token_dialog = f(access_token_dialog_selector)
+      access_token_dialog.find_element(:css, "[aria-label='Cancel']").click
+      expect(element_exists?(access_token_dialog_selector)).to be_falsey
     end
 
     it "views the details of an access token" do
