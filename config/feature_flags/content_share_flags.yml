@@ -6,3 +6,10 @@ pre_date_shift_for_assignment_importing:
     This feature flag enables the assignment and classic quiz creation with shifted dates during content migration.
     The original flow perform date shifting after the assignment creation as an update operation.
   applies_to: SiteAdmin
+
+instui_for_course_copy_page:
+  state: hidden
+  display_name: Use InstUI for the course copy page
+  description: |-
+    If enabled, the course copy page will use InstUI components
+  applies_to: SiteAdmin
