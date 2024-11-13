@@ -92,7 +92,7 @@ class RedisClient
           InstStatsd::Statsd.increment("canvas.redis.by_dbcluster", tags: by_dbcluster_tags)
 
           by_controller_tags = {
-            ring: client.ring,
+            ring: config.ring,
             controller: message[:controller],
             command: DATADOG_COMMANDS.include?(message[:command]) ? message[:command] : "other",
           }
