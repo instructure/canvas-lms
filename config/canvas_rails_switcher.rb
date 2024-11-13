@@ -49,10 +49,6 @@ unless defined?($canvas_rails)
 
       environment = YAML.safe_load_file(File.expand_path("consul.yml", __dir__)).dig(ENV["RAILS_ENV"] || "development", "environment")
 
-      keys = ($canvas_clusters || []).map do |canvas_cluster| # rubocop:disable Style/GlobalVars
-        "private/canvas/#{environment}/#{canvas_cluster}/rails_version"
-      end
-
       keys.push(
         ["private/canvas", environment, "rails_version"].compact.join("/"),
         ["private/canvas", "rails_version"].compact.join("/"),
