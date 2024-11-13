@@ -16,10 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-if (document.getElementById('instui_course_copy')) {
-  import('./reactLoader')
-} else {
-  import('./legacyLoader')
-}
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import ready from '@instructure/ready'
+import App from './react/app'
 
-export default () => {}
+ready(() => {
+  const root = document.getElementById('instui_course_copy')
+  if (root) {
+    ReactDOM.createRoot(root).render(<App />)
+  }
+})

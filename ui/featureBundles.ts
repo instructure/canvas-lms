@@ -60,6 +60,7 @@ const featureBundles: {
   confirm_email: () => import('./features/confirm_email/index'),
   content_exports: () => import('./features/content_exports/index'),
   content_migrations: () => import('./features/content_migrations/index'),
+  course_copy: () => import('./features/copy_course/index'),
   content_notices: () => import('./features/content_notices/index'),
   content_shares: () => import('./features/content_shares/index'),
   context_media_object_inline: () => import('./features/context_media_object_inline/index'),
