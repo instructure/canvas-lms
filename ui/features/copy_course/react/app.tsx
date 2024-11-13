@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-if (document.getElementById('instui_course_copy')) {
-  import('./reactLoader')
-} else {
-  import('./legacyLoader')
+import React from 'react'
+
+export const App = () => {
+  return <div>InstUI course copy</div>
 }
 
-export default () => {}
+export default App
