@@ -372,6 +372,7 @@
       const iframe = document.querySelector('.sm_iframe');
       if (iframe) {
         iframe.contentWindow.postMessage('parent-scrolled|' + window.scrollY, '*');
+        iframe.contentWindow.postMessage('parent-innerHeight|' + window.innerHeight, '*');
       }
     });
 </script>
