@@ -120,6 +120,14 @@ final_grades_override:
   applies_to: Course
   root_opt_in: true
   custom_transition_proc: final_grades_override_custom_transition_hook
+full_width_everywhere:
+  type: setting
+  state: hidden
+  display_name: Full Width Everywhere
+  description: |-
+    Allows use of full screen width without the New User Tutorial feature enabled.
+    Enabling the New User Tutorial feature will also use the full screen width.
+  applies_to: RootAccount
 google_docs_domain_restriction:
   state: hidden
   display_name:
