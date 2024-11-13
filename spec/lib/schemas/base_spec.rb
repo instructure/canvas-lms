@@ -69,8 +69,6 @@ module Schemas
       end
     end
 
-    # TODO: this method is to keep legacy behavior, should probably rename and
-    # modify it to return all errors and act more consistently, see the code
     describe "simple_validation_first_error" do
       it "returns nil if there are no errors" do
         good = { "some_str" => "foo", "some_num" => 42 }
@@ -87,6 +85,12 @@ module Schemas
           res = BaseSpecsTest.simple_validation_first_error(bad_str_and_num, error_format: :hash)
           expect(res).to be_a(Hash)
           expect(res.keys).to contain_exactly(*%i[error field schema])
+        end
+
+        it "returns a hash with the error details if required fields are missing" do
+          res = BaseSpecsTest.simple_validation_first_error({}, error_format: :hash)
+          expect(res).to be_a(Hash)
+          expect(res.keys).to contain_exactly(*%i[error schema details])
         end
       end
     end

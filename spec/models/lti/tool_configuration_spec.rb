@@ -104,6 +104,7 @@ module Lti
           let(:settings) do
             s = super()
             s.delete("target_link_uri")
+            s["public_jwk"]["alg"] = "WRONG"
             s
           end
 
@@ -111,7 +112,13 @@ module Lti
 
           it "contains a message about a missing target_link_uri" do
             tool_configuration.valid?
-            expect(tool_configuration.errors[:configuration].first.message).to include("target_link_uri,")
+            error_msgs = tool_configuration.errors[:configuration].map(&:message)
+            expect(error_msgs).to include(a_string_including("target_link_uri"))
+          end
+
+          it "contains a multiple error messages" do
+            tool_configuration.valid?
+            expect(tool_configuration.errors.size).to eq 2
           end
         end
 

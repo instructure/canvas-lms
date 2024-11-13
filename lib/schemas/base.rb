@@ -23,9 +23,8 @@ module Schemas
     delegate :validate, :valid?, to: :schema_checker
 
     class << self
-      # TODO: Legacy behavior -- eventually update usage to return
-      # an array of error hashes instead of the first error, and
-      # each error should always be ahash instead of sometimes a string
+      # TODO: deprecated, use simple_validation_errors instead
+      # Remove this method if the lti_report_multiple_schema_validation_errors feature flag is turned on in production
       def simple_validation_first_error(json_hash, error_format: :string)
         err = new.validate(json_hash).to_a.first
         err && simple_validation_error(err, error_format:)
@@ -55,9 +54,14 @@ module Schemas
           end
         end
 
-        # TODO: Legacy behavior -- consider changing to return a hash,
-        # make sure use of simple_validation_first_error_as_hash is OK with it
-        "The following fields are required: #{raw_error.dig("schema", "required").join(", ")}"
+        if Account.site_admin.feature_enabled?(:lti_report_multiple_schema_validation_errors) && error_format == :hash
+          return {
+            error: raw_error["error"],
+            schema: raw_error["schema"],
+            details: raw_error["details"]
+          }
+        end
+        "The following fields are required: #{raw_error["error"]}"
       end
 
       # Filters to the defined properties only at the top level of the hash.
