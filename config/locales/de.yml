@@ -26214,7 +26214,7 @@ de:
   required_end_date_22dd9ce3: "Erforderliches Enddatum"
   required_fields_include_key_name_owner_email_tool__b8e42174: "Erforderliche Felder sind Schlüsselname, Besitzer-E-Mail, Tool-ID, URL-Umleitung und Symbol-URL."
   required_input_message_all_unassigned_students_1e721442: "Erforderliche Eingabe Benachrichtigen Sie alle nicht zugewiesenen Studierende."
-  required_peer_review_index_b186729c: "Erforderliche Prüfung durch Kollegen %{index}"
+  required_peer_review_index_b186729c: "Erforderliche Peer Review %{index}"
   required_peer_reviews_23bea465: "Erforderliche Peer Reviews"
   required_replies_8ec3e238: "Erforderliche Antworten"
   required_replies_due_date_f976c9af: "Fälligkeitsdatum für erforderliche Antworten"
