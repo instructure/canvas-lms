@@ -729,51 +729,53 @@ class Lti::RegistrationsController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def list
     GuardRail.activate(:secondary) do
-      eager_load_models = [
+      preload_models = [
         { lti_registration_account_bindings: [:created_by, :updated_by] },
         :ims_registration,
+        :manual_configuration,
+        :developer_key,
         :created_by, # registration's created_by
         :updated_by  # registration's updated_by
       ]
+      # eager loaded instead of preloaded for use in where queries
+      eager_load_models = [:lti_registration_account_bindings]
+      all_active_registrations = Lti::Registration.active.preload(preload_models).eager_load(eager_load_models)
 
       # Get all registrations on this account, regardless of their bindings
-      account_registrations = Lti::Registration.active
-                                               .where(account_id: params[:account_id])
-                                               .eager_load(eager_load_models)
+      account_registrations = all_active_registrations.where(account_id: params[:account_id])
 
       # Get all registration account bindings that are bound to the site admin account and that are "on,"
       # since they will apply to this account (and all accounts)
-      forced_on_in_site_admin = Shard.default.activate do
-        Lti::Registration.active
-                         .where(account: Account.site_admin)
-                         .where(lti_registration_account_bindings: { workflow_state: "on", account_id: Account.site_admin.id })
-                         .eager_load(eager_load_models)
-      end
+      forced_on_in_site_admin = all_active_registrations
+                                .shard(Shard.default)
+                                .where(account: Account.site_admin)
+                                .where(lti_registration_account_bindings: { workflow_state: "on", account_id: Account.site_admin.id })
 
       consortia_registrations = if @account.root_account.primary_settings_root_account? || @account.root_account.consortium_parent_account.blank?
                                   Lti::RegistrationAccountBinding.none
                                 else
-                                  @account.root_account.consortium_parent_account.shard.activate do
-                                    Lti::Registration.active
-                                                     .where(account: @account.consortium_parent_account)
-                                                     .where(lti_registration_account_bindings: {
-                                                              workflow_state: "on",
-                                                              account: @account.consortium_parent_account
-                                                            })
-                                                     .eager_load(eager_load_models)
-                                  end
+                                  consortium_parent = @account.root_account.consortium_parent_account
+                                  all_active_registrations
+                                    .shard(consortium_parent.shard)
+                                    .where(account: consortium_parent)
+                                    .where(lti_registration_account_bindings: {
+                                             workflow_state: "on",
+                                             account: consortium_parent
+                                           })
                                 end
 
       # Get all registration account bindings in this account, then fetch the registrations from their own shards
       # Omit registrations that were found in the "account_registrations" list; we're only looking for ones that
       # are uniquely being inherited from a different account.
-      inherited_on_registration_bindings = Lti::RegistrationAccountBinding.where(workflow_state: "on")
-                                                                          .where(account_id: params[:account_id])
-                                                                          .where.not(registration_id: account_registrations.map(&:id))
+      inherited_on_registration_ids = Lti::RegistrationAccountBinding
+                                      .where(workflow_state: "on")
+                                      .where(account_id: params[:account_id])
+                                      .where.not(registration_id: account_registrations.map(&:id))
+                                      .pluck(:registration_id)
+                                      .uniq
 
-      registration_ids = inherited_on_registration_bindings.map(&:registration_id)
-      inherited_on_registrations = Shard.partition_by_shard(registration_ids) do |registration_ids_for_shard|
-        Lti::Registration.active.where(id: registration_ids_for_shard).eager_load(eager_load_models)
+      inherited_on_registrations = Shard.partition_by_shard(inherited_on_registration_ids) do |registration_ids_for_shard|
+        all_active_registrations.where(id: registration_ids_for_shard)
       end.flatten
 
       all_registrations = account_registrations + forced_on_in_site_admin + inherited_on_registrations + consortia_registrations
