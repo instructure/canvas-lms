@@ -80,5 +80,5 @@ blueprint_item_notifications:
 migrate_assignment_group_categories:
   state: hidden
   applies_to: Course
-  display_name: Migrate assignment group categories
+  display_name: Preserve Group Set During Assignment Copy
   description: Include group categories when copying group assignments in course copies or blueprint syncs
