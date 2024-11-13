@@ -2289,19 +2289,22 @@ class UsersController < ApplicationController
 
     @user.sortable_name_explicitly_set = user_params[:sortable_name].present?
 
-    if (event = user_params.delete(:event)) && %w[suspend unsuspend].include?(event) &&
-       @user != @current_user
-      @user.pseudonyms.active.shard(@user).each do |p|
-        next unless p.grants_right?(@current_user, :delete)
-        next if p.active? && event == "unsuspend"
-        next if p.suspended? && event == "suspend"
+    user_updated = User.transaction do
+      if (event = user_params.delete(:event)) && %w[suspend unsuspend].include?(event) &&
+         @user != @current_user
+        @user.pseudonyms.active.shard(@user).each do |p|
+          next unless p.grants_right?(@current_user, :delete)
+          next if p.active? && event == "unsuspend"
+          next if p.suspended? && event == "suspend"
 
-        p.update!(workflow_state: (event == "suspend") ? "suspended" : "active")
+          p.update!(workflow_state: (event == "suspend") ? "suspended" : "active")
+        end
       end
+      @user.update(user_params)
     end
 
     respond_to do |format|
-      if @user.update(user_params)
+      if user_updated
         if admin_avatar_update
           avatar_state = (old_avatar_state == :locked) ? old_avatar_state : "approved"
           @user.avatar_state = user_params[:avatar_image][:state] || avatar_state
@@ -3313,6 +3316,7 @@ class UsersController < ApplicationController
       else # automagically logged in
         PseudonymSession.new(@pseudonym).save unless @pseudonym.new_record?
       end
+
       @user.save!
 
       if @observee && !@user.as_observer_observation_links.where(user_id: @observee, root_account: @context).exists?
