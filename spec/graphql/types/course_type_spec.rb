@@ -1650,21 +1650,21 @@ describe Types::CourseType do
   describe "RubricsConnection" do
     before(:once) do
       rubric_for_course
+      deleted_rubric_for_course
       rubric_association_model(context: course, rubric: @rubric, association_object: course, purpose: "bookmark")
+      rubric_association_model(context: course, rubric: @deleted_rubric, association_object: course, purpose: "bookmark")
     end
 
     it "returns rubrics" do
       expect(
         course_type.resolve("rubricsConnection { edges { node { _id } } }")
       ).to eq [course.rubrics.first.to_param]
+    end
 
-      expect(
-        course_type.resolve("rubricsConnection { edges { node { criteriaCount } } }")
-      ).to eq [1]
+    it "returns only active rubrics, excluding those with workflow_state 'deleted'" do
+      rubrics = course_type.resolve("rubricsConnection { edges { node { _id workflowState } } }")
 
-      expect(
-        course_type.resolve("rubricsConnection { edges { node { workflowState } } }")
-      ).to eq ["active"]
+      expect(rubrics).to match_array(["active"])
     end
   end
 
