@@ -5631,7 +5631,7 @@ nl:
   belgium_32_e5f5b598: "België (+32)"
   belgium_ef8739b6: België
   bell_97c77ba4: klok
-  below_81d4dceb: Hieronder
+  below_81d4dceb: "Net niet voldoende"
   below_is_an_example_of_how_students_will_see_their_8f7e7971: "Hieronder is een voorbeeld van hoe cursisten hun planning zullen zien"
   below_mastery_abd1dca5: "Beneden vakbeheersing"
   below_min_rating_78a742c3: "Beneden minimale beoordeling"
@@ -13047,7 +13047,7 @@ nl:
   example_item_scores_6726c689: "Voorbeeld item scores"
   example_school_of_rock_41f32c31: "voorbeeld: \"School of Rock\""
   exceeded_the_maximum_length_number_characters_2d25611e: "Heeft de maximumlengte overschreden (%{number} tekens)"
-  exceeds_1dfdae30: Overschrijdt
+  exceeds_1dfdae30: "Overstijgt verwachting"
   exceeds_expectations_5910fc3a: "Overtreft verwachtingen"
   exceeds_mastery_1f995dce: "Overtreft Meesterschap"
   exceeds_max_events_28f19b04: "Overschrijdt %{max} gebeurtenissen."
@@ -18245,7 +18245,7 @@ nl:
   master_courses_2aaa4841: Hoofdcursussen
   master_lock_590266b6: Hoofdvergrendeling
   mastered_34d4c857: Behaald
-  mastery_7ec348b5: Vakbeheersing
+  mastery_7ec348b5: Goed
   mastery_at_cf0c477b: "Vakbeheersing bij"
   mastery_at_e804b49: "Vakbeheersing bij:"
   mastery_calculation_5fd5f5fe: Vakbeheersingsberekening
@@ -21050,7 +21050,7 @@ nl:
   navigation_icon_45db938e: "Navigatie icoon"
   navigation_menu_fd782ff8: Navigatiemenu
   navigation_sections_help_visitors_move_around_the__5ea18acf: "Navigatiesecties helpen bezoekers op efficiënte wijze door de cursus te navigeren.  Goede navigatie is essentieel voor het verbeteren van de gebruikerservaring omdat het het snel en zonder frustratie vinden van informatie vergemakkelijkt."
-  near_3282280c: Dichtbij
+  near_3282280c: Voldoende
   near_mastery_f25174a4: "Bijna Meesterschap"
   need_a_canvas_account_221d18ed: "Heb je een Canvas-account nodig?"
   need_help_setting_up_your_course_2b763141: "Hulp nodig bij het instellen van je cursus?"
@@ -21298,7 +21298,7 @@ nl:
   no_end_date_2608075c: "Geen einddatum"
   no_errors_1ac47724: "Geen fouten"
   no_events_were_found_to_update_22604f3a: "Geen evenementen gevonden om bij te werken"
-  no_evidence_75853352: "Geen bewijs"
+  no_evidence_75853352: Onvoldoende
   no_existing_user_provided_for_login_with_sis_id_us_6bcde71f: "Geen bestaande gebruiker opgegeven voor aanmelding met SIS-ID %{user_id}"
   no_explainer_text_available_9d9a2f3c: "Geen verklarende tekst beschikbaar"
   no_exports_to_display_7f1b630b: "Geen exportbewerkingen om weer te geven"
@@ -23573,7 +23573,7 @@ nl:
       Laad je pagina vooraf met plaatshouders voor secties. Je kunt de secties later bewerken, verwijderen of er meer
                 toevoegen.
   prerequisite_completion_period_c562d63: "Periode voor voltooiing voorwaarde"
-  prerequisite_f361cd61: Vereiste
+  prerequisite_f361cd61: Voorwaarde
   prerequisites_49659f16: "Eerste vereisten"
   prerequisites_98b324e0: Voorwaarden
   prerequisites_list_62d66d12: "Eerste vereisten %{list}"
@@ -31237,7 +31237,7 @@ nl:
       one: "1 minuut geleden"
       other: "%{count} minuten geleden"
     due_date: "%{date} om %{time}"
-    event: "%{date} op %{time}"
+    event: "%{date} om %{time}"
     formats: 
       default: "%a, %d %b %Y %H:%M:%S %z"
       long: "%B %d, %Y %H:%M"
