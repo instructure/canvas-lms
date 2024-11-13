@@ -145,6 +145,7 @@ class Submission < ActiveRecord::Base
 
   belongs_to :quiz_submission, class_name: "Quizzes::QuizSubmission"
   has_many :all_submission_comments, -> { order(:created_at) }, class_name: "SubmissionComment", dependent: :destroy
+  has_many :all_submission_comments_for_groups, -> { for_groups.order(:created_at) }, class_name: "SubmissionComment"
   has_many :group_memberships, through: :assignment
   has_many :submission_comments, -> { order(:created_at).where(provisional_grade_id: nil) }
   has_many :visible_submission_comments,
@@ -2408,7 +2409,6 @@ class Submission < ActiveRecord::Base
                else
                  super
                end
-    comments.preload(submission: :assignment)
 
     if @comment_limiting_user
       comments.select { |comment| comment.grants_right?(@comment_limiting_user, @comment_limiting_session, :read) }
@@ -2419,17 +2419,21 @@ class Submission < ActiveRecord::Base
 
   def visible_submission_comments_for(current_user)
     displayable_comments = if assignment.grade_as_group?
-                             all_submission_comments.for_groups
+                             all_submission_comments_for_groups
                            elsif assignment.moderated_grading? && assignment.grades_published?
                              # When grades are published for a moderated assignment, provisional
                              # comments made by the chosen grader are duplicated as non-provisional
                              # comments. Ignore the provisional copies of that grader's comments.
-                             all_submission_comments.where.not("author_id = ? AND provisional_grade_id IS NOT NULL", grader_id)
+                             if association(:all_submission_comments).loaded?
+                               all_submission_comments.reject { |comment| comment.provisional_grade_id.present? && comment.author_id == grader_id }
+                             else
+                               all_submission_comments.where.not("author_id = ? AND provisional_grade_id IS NOT NULL", grader_id)
+                             end
                            else
                              all_submission_comments
                            end
 
-    displayable_comments.preload(submission: :assignment).select do |submission_comment|
+    displayable_comments.select do |submission_comment|
       submission_comment.grants_right?(current_user, :read)
     end
   end

@@ -47,7 +47,6 @@ module SpeedGrader
         score
         points_deducted
         assignment_id
-        submission_comments
         grading_period_id
         excused
         updated_at
@@ -167,15 +166,7 @@ module SpeedGrader
         :assignment,
         { originality_reports: :lti_link }
       ]
-      includes << {
-        all_submission_comments: {
-          submission: {
-            assignment: {
-              context: :root_account
-            }
-          }
-        }
-      }
+      includes << (assignment.grade_as_group? ? :all_submission_comments_for_groups : :all_submission_comments)
       submissions = assignment.submissions.where(user_id: students).preload(*includes)
 
       student_json_fields =
@@ -317,19 +308,17 @@ module SpeedGrader
             json.merge! provisional_grade_to_json(provisional_grade)
           end
 
-          json[:has_postable_comments] =
-            sub.all_submission_comments.any?(&:allows_posting_submission?)
-
+          submission_comments = sub.visible_submission_comments_for(current_user)
           json[:submission_comments] =
             anonymous_moderated_submission_comments_json(
               assignment:,
               course:,
               current_user:,
               avatars: display_avatars?,
-              submission_comments: sub.visible_submission_comments_for(current_user),
+              submission_comments:,
               submissions:
             )
-
+          json[:has_postable_comments] = submission_comments.any?(&:allows_posting_submission?)
           json[:proxy_submitter] = sub.proxy_submitter&.short_name
           json[:proxy_submitter_id] = sub.proxy_submitter_id
 
