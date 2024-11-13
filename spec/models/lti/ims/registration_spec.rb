@@ -174,6 +174,16 @@ module Lti::IMS
           it { is_expected.to be false }
         end
       end
+
+      context "multiple errors" do
+        let(:scopes) { ["asdf"] }
+        let(:policy_uri) { "asdf" }
+
+        it do
+          expect(registration.valid?).to be false
+          expect(registration.errors.size).to eq 2
+        end
+      end
     end
 
     describe "canvas_configuration" do

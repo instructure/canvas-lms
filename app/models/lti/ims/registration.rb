@@ -272,17 +272,24 @@ class Lti::IMS::Registration < ApplicationRecord
   end
 
   def lti_tool_configuration_is_valid
-    config_errors = Schemas::Lti::IMS::LtiToolConfiguration.simple_validation_first_error(
-      lti_tool_configuration,
-      error_format: :hash
-    )
-    return if config_errors.blank?
+    if Account.site_admin.feature_enabled?(:lti_report_multiple_schema_validation_errors)
+      Schemas::Lti::IMS::LtiToolConfiguration.simple_validation_errors(
+        lti_tool_configuration,
+        error_format: :hash
+      )&.each { |error| errors.add(:lti_tool_configuration, error.to_json) }
+    else
+      config_errors = Schemas::Lti::IMS::LtiToolConfiguration.simple_validation_first_error(
+        lti_tool_configuration,
+        error_format: :hash
+      )
+      return if config_errors.blank?
 
-    errors.add(
-      :lti_tool_configuration,
-      # Convert errors represented as a Hash to JSON
-      config_errors.is_a?(Hash) ? config_errors.to_json : config_errors
-    )
+      errors.add(
+        :lti_tool_configuration,
+        # Convert errors represented as a Hash to JSON
+        config_errors.is_a?(Hash) ? config_errors.to_json : config_errors
+      )
+    end
   end
 
   def validate_overlay

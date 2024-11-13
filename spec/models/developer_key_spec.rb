@@ -733,6 +733,7 @@ describe DeveloperKey do
     describe "public_jwk validations" do
       subject do
         developer_key_saved.save
+        developer_key_saved.errors
       end
 
       before { developer_key_saved.generate_rsa_keypair! }
@@ -740,19 +741,19 @@ describe DeveloperKey do
       context 'when the kty is not "RSA"' do
         before { developer_key_saved.public_jwk["kty"] = "foo" }
 
-        it { is_expected.to be false }
+        it { is_expected.not_to be_empty }
       end
 
       context 'when the alg is not "RS256"' do
         before { developer_key_saved.public_jwk["alg"] = "foo" }
 
-        it { is_expected.to be false }
+        it { is_expected.not_to be_empty }
       end
 
       context "when required claims are missing" do
-        before { developer_key_saved.update public_jwk: { foo: "bar" } }
+        before { developer_key_saved.update public_jwk: { foo: "bar", alg: "MYALG" } }
 
-        it { is_expected.to be false }
+        it { expect(subject.size).to eq 2 }
       end
     end
 
