@@ -29,6 +29,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {zodResolver} from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import {Controller, useForm} from 'react-hook-form'
+import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
 
 const I18n = useI18nScope('profile')
 
@@ -129,7 +130,7 @@ const ConfirmCommunicationChannel = ({
                 {...field}
                 width="200px"
                 renderLabel={I18n.t('Code')}
-                messages={errors.code?.message ? [{text: errors.code.message, type: 'error'}] : []}
+                messages={getFormErrorMessage(errors, 'code')}
               />
             )}
           />

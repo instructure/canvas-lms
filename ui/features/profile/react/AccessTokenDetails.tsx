@@ -29,19 +29,11 @@ import './AccessTokenDetails.css'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Spinner} from '@instructure/ui-spinner'
+import type {Token} from './types'
 
 const I18n = useI18nScope('profile')
 
 type NetworkState = 'loaded' | 'loading' | 'error' | 'submitting'
-
-export interface Token {
-  visible_token: string
-  app_name: string
-  purpose: string
-  created_at: string
-  expires_at: string
-  last_used_at: string
-}
 
 export interface AccessTokenDetailsProps {
   url: string
