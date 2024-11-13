@@ -202,6 +202,7 @@ export const RubricTable = ({
                   freeFormCriterionComments={rubric.freeFormCriterionComments}
                   hasRubricAssociations={rubric.hasRubricAssociations}
                   onArchiveRubricChange={() => handleArchiveRubricChange(rubric.id)}
+                  workflowState={rubric.workflowState}
                   active={active}
                 />
               )}
