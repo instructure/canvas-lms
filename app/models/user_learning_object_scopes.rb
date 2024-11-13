@@ -450,6 +450,8 @@ module UserLearningObjectScopes
         .for_courses_and_groups(shard_course_ids, shard_group_ids)
         .todo_date_between(due_after, due_before)
         .visible_to_ungraded_discussion_student_visibilities(self)
+        # announcements are not shown if lock_at is in the past
+        .where.not("discussion_topics.type IS NOT NULL AND discussion_topics.type = 'Announcement' AND discussion_topics.lock_at IS NOT NULL AND discussion_topics.lock_at < ?", Time.zone.now)
     end
   end
 
