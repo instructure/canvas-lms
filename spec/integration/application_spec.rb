@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require "nokogiri"
+
 describe "site-wide" do
   around do |example|
     consider_all_requests_local(false, &example)
@@ -238,6 +240,55 @@ describe "site-wide" do
            headers: { "Accept" => "application/json+canvas-string-ids" }
       json = JSON.parse response.body
       expect(json["users"][0]["user_id"]).to be_a String
+    end
+  end
+
+  context "full width everywhere" do
+    before do
+      @course = course_factory(active_all: true)
+      course_with_teacher_logged_in(active_all: true, new_user: true)
+      @course.root_account.disable_feature!(:new_user_tutorial)
+      @course.root_account.disable_feature!(:full_width_everywhere)
+    end
+
+    it "does not display full width when disabled and new user tutorial is disabled" do
+      get "/"
+      html = Nokogiri::HTML5(response.body)
+      expect(html.at_css("body.full-width")).to be_nil
+      get "/courses/#{@course.id}/"
+      html = Nokogiri::HTML5(response.body)
+      expect(html.at_css("body.full-width")).to be_nil
+    end
+
+    it "displays the content at full width when disabled, but new user tutorial is enabled" do
+      @course.root_account.enable_feature!(:new_user_tutorial)
+      get "/"
+      html = Nokogiri::HTML5(response.body)
+      expect(html.at_css("body.full-width")).not_to be_nil
+      get "/courses/#{@course.id}/"
+      html = Nokogiri::HTML5(response.body)
+      expect(html.at_css("body.full-width")).not_to be_nil
+    end
+
+    it "displays the content at full width when enabled and new user tutorial is disabled" do
+      @course.root_account.enable_feature!(:full_width_everywhere)
+      get "/"
+      html = Nokogiri::HTML5(response.body)
+      expect(html.at_css("body.full-width")).not_to be_nil
+      get "/courses/#{@course.id}/"
+      html = Nokogiri::HTML5(response.body)
+      expect(html.at_css("body.full-width")).not_to be_nil
+    end
+
+    it "displays the content at full width when enabled and new user tutorial is enabled" do
+      @course.root_account.enable_feature!(:new_user_tutorial)
+      @course.root_account.enable_feature!(:full_width_everywhere)
+      get "/"
+      html = Nokogiri::HTML5(response.body)
+      expect(html.at_css("body.full-width")).not_to be_nil
+      get "/courses/#{@course.id}/"
+      html = Nokogiri::HTML5(response.body)
+      expect(html.at_css("body.full-width")).not_to be_nil
     end
   end
 end
