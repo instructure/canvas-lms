@@ -3096,6 +3096,7 @@ class ApplicationController < ActionController::Base
              current_user_has_been_observer_in_this_course:,
              observed_student_ids: ObserverEnrollment.observed_student_ids(@context, @current_user),
              apply_assignment_group_weights: @context.apply_group_weights?,
+             DISCUSSION_CHECKPOINTS_ENABLED: @domain_root_account.feature_enabled?(:discussion_checkpoints),
            })
 
     conditional_release_js_env(includes: :active_rules)
@@ -3119,6 +3120,7 @@ class ApplicationController < ActionController::Base
                              }
                            end,
              DUE_DATE_REQUIRED_FOR_ACCOUNT: AssignmentUtil.due_date_required_for_account?(@context),
+             DISCUSSION_CHECKPOINTS_ENABLED: @domain_root_account.feature_enabled?(:discussion_checkpoints),
            })
     js_env(active_grading_periods: GradingPeriod.json_for(@context, @current_user)) if @context.grading_periods?
   end

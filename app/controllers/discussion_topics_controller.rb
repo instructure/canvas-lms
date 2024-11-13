@@ -422,6 +422,7 @@ class DiscussionTopicsController < ApplicationController
         hash = {
           USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
           FEATURE_FLAGS_URL: feature_flags_url,
+          DISCUSSION_CHECKPOINTS_ENABLED: @domain_root_account.feature_enabled?(:discussion_checkpoints),
           HAS_SIDE_COMMENT_DISCUSSIONS: Account.site_admin.feature_enabled?(:disallow_threaded_replies_fix_alert) ? @context.active_discussion_topics.only_discussion_topics.where(discussion_type: DiscussionTopic::DiscussionTypes::SIDE_COMMENT).exists? : false,
           totalDiscussions: scope.count,
           permissions: {
@@ -890,7 +891,8 @@ class DiscussionTopicsController < ApplicationController
                discussion_cache_key: @current_user &&
                  Base64.encode64("#{@current_user.uuid}vyfW=;[p-0?:{P_=HUpgraqe;njalkhpvoiulkimmaqewg"),
                checkpointed_discussion_without_feature_flag:
-                 @topic.assignment&.has_sub_assignments? && !@domain_root_account&.feature_enabled?(:discussion_checkpoints)
+                 @topic.assignment&.has_sub_assignments? && !@domain_root_account&.feature_enabled?(:discussion_checkpoints),
+               DISCUSSION_CHECKPOINTS_ENABLED: @domain_root_account.feature_enabled?(:discussion_checkpoints),
              })
       unless @locked
         InstStatsd::Statsd.increment("discussion_topic.visit.redesign")

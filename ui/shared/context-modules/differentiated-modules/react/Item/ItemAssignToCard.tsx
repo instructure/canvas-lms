@@ -442,7 +442,7 @@ export default forwardRef(function ItemAssignToCard(
           disabledOptionIdsRef={disabledOptionIdsRef}
           itemType={itemType}
         />
-        {!removeDueDateInput && !isCheckpointed && (
+        {!removeDueDateInput && (!isCheckpointed || !ENV.DISCUSSION_CHECKPOINTS_ENABLED) && (
           <DueDateTimeInput
             {...{
               dueDate,
@@ -460,7 +460,7 @@ export default forwardRef(function ItemAssignToCard(
             disabledWithGradingPeriod={isInClosedGradingPeriod}
           />
         )}
-        {isCheckpointed && (
+        {isCheckpointed && ENV.DISCUSSION_CHECKPOINTS_ENABLED && (
           <ReplyToTopicDueDateTimeInput
             {...{
               replyToTopicDueDate,
@@ -480,7 +480,7 @@ export default forwardRef(function ItemAssignToCard(
             disabledWithGradingPeriod={isInClosedGradingPeriod}
           />
         )}
-        {isCheckpointed && (
+        {isCheckpointed && ENV.DISCUSSION_CHECKPOINTS_ENABLED && (
           <RequiredRepliesDueDateTimeInput
             {...{
               requiredRepliesDueDate,
