@@ -20,7 +20,9 @@
 
 module DataFixup::Lti::BackfillLtiOverlaysFromIMSRegistrations
   def self.run
-    Lti::IMS::Registration.preload(:lti_registration, :developer_key).find_each do |ims_registration|
+    Lti::IMS::Registration.preload(:developer_key, lti_registration: :lti_overlays).find_each do |ims_registration|
+      next if ims_registration.lti_registration.lti_overlays.any?
+
       overlay_data = Schemas::Lti::IMS::RegistrationOverlay.to_lti_overlay(ims_registration.registration_overlay)
 
       Lti::Overlay.create!(
@@ -29,16 +31,12 @@ module DataFixup::Lti::BackfillLtiOverlaysFromIMSRegistrations
         data: overlay_data,
         updated_by: nil
       )
-    rescue
-      Sentry.configure_scope do |scope|
-        scope.set_context(
-          "DataFixup.backfill_lti_overlays",
-          {
-            ims_registration_global_id: ims_registration.global_id,
-          }
-        )
+    rescue => e
+      Sentry.with_scope do |scope|
+        scope.set_tags(ims_registration_global_id: ims_registration.global_id)
+        scope.set_context("exception", { name: e.class.name, message: e.message })
+        Sentry.capture_message("Datafixup.backfill_lti_overlays", level: :warning)
       end
-      raise
     end
   end
 end
