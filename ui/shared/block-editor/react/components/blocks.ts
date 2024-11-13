@@ -40,7 +40,7 @@ import {FooterSection} from './user/sections/FooterSection'
 import {KnowledgeCheckSection} from './user/sections/KnowledgeCheckSection'
 import {AnnouncementSection} from './user/sections/AnnouncementSection'
 import {BlankSection} from './user/sections/BlankSection'
-import {TabsBlock, TabBlock, TabContent} from './user/blocks/TabsBlock'
+import {TabsBlock} from './user/blocks/TabsBlock'
 
 import {NoSections} from './user/common'
 
@@ -72,8 +72,6 @@ const blocks = {
   FooterSection,
   BlankSection,
   TabsBlock,
-  TabBlock,
-  TabContent,
   DividerBlock,
 }
 

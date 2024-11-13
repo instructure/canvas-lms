@@ -483,6 +483,10 @@
   }
 }
 
+.tabs-block {
+  width: 100%
+}
+
 .heading-block {
   overflow: auto;
 }

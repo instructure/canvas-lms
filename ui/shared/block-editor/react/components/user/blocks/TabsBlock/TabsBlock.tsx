@@ -17,9 +17,10 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import {Element, useNode, useEditor} from '@craftjs/core'
+import {Element, useNode, useEditor, type Node} from '@craftjs/core'
 import ContentEditable from 'react-contenteditable'
 
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
 import {Tabs} from '@instructure/ui-tabs'
@@ -28,8 +29,8 @@ import {IconXLine} from '@instructure/ui-icons'
 import {uid} from '@instructure/uid'
 
 import {Container} from '../Container'
-import {TabBlock} from './TabBlock'
-import {useClassNames} from '../../../../utils'
+import {GroupBlock} from '../GroupBlock'
+import {useClassNames, getContrastingColor, getEffectiveBackgroundColor} from '../../../../utils'
 import type {TabsBlockTab, TabsBlockProps} from './types'
 import {TabsBlockToolbar} from './TabsBlockToolbar'
 
@@ -43,16 +44,17 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
   }))
   const {
     actions: {setProp},
-    id,
+    node,
     selected,
-  } = useNode(state => ({
-    id: state.id,
-    selected: state.events.selected,
+  } = useNode((n: Node) => ({
+    node: n,
+    selected: n.events.selected,
   }))
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0)
   const [editable, setEditable] = useState(false)
   const [blockid] = useState(() => uid('tabs-block-', 2))
-  const clazz = useClassNames(enabled, {empty: !tabs?.length}, ['block', 'tabs-block'])
+  const clazz = useClassNames(enabled, {empty: !tabs?.length, selected}, ['block', 'tabs-block'])
+  const [containerRef, setContainerRef] = useState<HTMLElement | null>(null)
 
   useEffect(() => {
     if (!tabs || tabs.length === 0) {
@@ -67,10 +69,19 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
       _event: React.MouseEvent<ViewOwnProps> | React.KeyboardEvent<ViewOwnProps>,
       tabData: {index: number}
     ) => {
+      if (tabData.index === activeTabIndex) return
       setActiveTabIndex(tabData.index)
-      actions.selectNode(id)
+      // on switching tabs, craft will select the GroupBlock in the Tabs.Panel
+      // we want to keep the TabsBlock selected
+      window.setTimeout(() => {
+        actions.selectNode(node.id)
+        if (node.dom) {
+          const theTab = node.dom.querySelector('[role="tab"][aria-selected="true"]') as HTMLElement
+          theTab?.focus()
+        }
+      }, 10)
     },
-    [actions, id]
+    [actions, activeTabIndex, node.dom, node.id]
   )
 
   const handleTabTitleChange = useCallback(
@@ -83,23 +94,33 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
     [activeTabIndex, setProp]
   )
 
-  const handleTabTitleKey = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      e.stopPropagation()
-    }
-  }, [])
+  const handleTabTitleKey = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        e.stopPropagation()
+      } else if (e.key === 'Escape') {
+        e.preventDefault()
+        e.stopPropagation()
+        setEditable(false)
+        document.getElementById(`tab-${tabs[activeTabIndex].id}`)?.focus()
+      } else if (['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        e.stopPropagation()
+      }
+    },
+    [activeTabIndex, tabs]
+  )
 
   const handleTabTitleFocus = useCallback(
     (tabIndex: number) => {
       setActiveTabIndex(tabIndex)
-      actions.selectNode(id)
+      actions.selectNode(node.id)
     },
-    [actions, id]
+    [actions, node.id]
   )
 
   const handleDeleteTab = useCallback(
-    tabIndex => {
+    (tabIndex: number) => {
       if (!tabs) return
       const newTabs = [...tabs]
       newTabs.splice(tabIndex, 1)
@@ -132,8 +153,14 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
     [blockid, editable, selected, tabs]
   )
 
+  let color: string | undefined
+  if (containerRef) {
+    const gbcolor = getEffectiveBackgroundColor(containerRef)
+    color = getContrastingColor(gbcolor)
+  }
+
   const renderTabTitle = (title: string, index: number) => {
-    return enabled ? (
+    return enabled && editable ? (
       <Flex gap="small">
         <ContentEditable
           data-placeholder={I18n.t('Tab Title')}
@@ -144,9 +171,10 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
           onKeyDown={handleTabTitleKey}
         />
         {tabs && tabs.length > 1 && (
-          <div style={{marginBlockStart: '-.5rem'}}>
+          <div style={{marginBlockStart: '-.5rem', color}}>
             <IconButton
-              themeOverride={{smallHeight: '.75rem'}}
+              color="secondary"
+              themeOverride={{smallHeight: '.75rem', secondaryGhostColor: color}}
               screenReaderLabel={I18n.t('Delete Tab')}
               size="small"
               withBackground={false}
@@ -172,26 +200,42 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
           renderTitle={renderTabTitle(tab.title, index)}
           isSelected={activeTabIndex === index}
         >
-          <Element
-            id={`${tab.id}_nosection1`}
-            tabId={tab.id}
-            is={TabBlock}
-            canvas={true}
-            hidden={activeTabIndex !== index}
-          />
+          <Element id={`${tab.id}_group`} is={GroupBlock} hidden={activeTabIndex !== index} />
         </Tabs.Panel>
       )
     })
   }
 
   return (
-    <Container id={blockid} className={clazz} onKeyDown={handleKey}>
-      <Tabs
-        variant={variant === 'classic' ? 'secondary' : 'default'}
-        onRequestTabChange={handleTabChange}
+    <Container
+      id={blockid}
+      className={clazz}
+      onKeyDown={handleKey}
+      style={{color}}
+      ref={setContainerRef}
+    >
+      <InstUISettingsProvider
+        theme={{
+          componentOverrides: {
+            'Tabs.Tab': {
+              defaultColor: color,
+            },
+            'Tabs.Panel': {
+              background: 'transparent',
+            },
+            Tabs: {
+              defaultBackground: 'transparent',
+            },
+          },
+        }}
       >
-        {renderTabs()}
-      </Tabs>
+        <Tabs
+          variant={variant === 'classic' ? 'secondary' : 'default'}
+          onRequestTabChange={handleTabChange}
+        >
+          {renderTabs()}
+        </Tabs>
+      </InstUISettingsProvider>
     </Container>
   )
 }
