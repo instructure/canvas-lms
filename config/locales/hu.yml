@@ -4489,6 +4489,7 @@ hu:
   back_to_app_center_95420d83: "Vissza az Alkalmazásközpontba"
   back_to_assignment_1df86a69: "Vissza a feladathoz"
   back_to_attempt_attempt_ffb22bb8: "Vissza a próbálkozáshoz %{attempt}"
+  back_to_login_e4b5f663: "Vissza a bejelentkezéshez"
   back_to_production_fed09f33: "Vissza a gyártáshoz"
   back_to_ref_title_377ea1f0: "Vissza ide:  %{ref_title}"
   back_to_subject_80a1eb: "Vissza a tárgyhoz"
