@@ -142,7 +142,7 @@ class Lti::Registration < ActiveRecord::Base
       account = account.root_account
     end
 
-    account_bindings = Lti::RegistrationAccountBinding.where(account:, registration: registrations) +
+    account_bindings = Lti::RegistrationAccountBinding.where(account:, registration: registrations).preload(:created_by, :updated_by) +
                        Lti::RegistrationAccountBinding.find_all_in_site_admin(registrations)
 
     associate_bindings(registrations, account_bindings)

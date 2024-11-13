@@ -69,7 +69,7 @@ class Lti::RegistrationAccountBinding < ActiveRecord::Base
         cache_pointers_for_clearing(registrations, list_cache_key)
 
         GuardRail.activate(:secondary) do
-          where.not(workflow_state: :allow).where(account: Account.site_admin, registration: registrations)
+          where.not(workflow_state: :allow).where(account: Account.site_admin, registration: registrations).preload(:created_by, :updated_by)
         end
       end
     end
