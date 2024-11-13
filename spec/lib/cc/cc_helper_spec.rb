@@ -279,6 +279,26 @@ describe CC::CCHelper do
       expect(doc.at_css("script")).to be_nil
     end
 
+    it "can handle deeply nested content" do
+      # The default is Nokogiri::Gumbo::DEFAULT_MAX_TREE_DEPTH = 400. Here we are testing that
+      # we are overriding that default with our own value of 10,000.
+      depth = 500
+      html = "<!DOCTYPE html><html><head><title>Deeply Nested HTML</title></head><body>"
+      depth.times do
+        html += "<div>"
+      end
+      html += "<p>Deeply nested content</p>"
+      depth.times do
+        html += "</div>"
+      end
+      html += "</body></html>"
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+      exported = @exporter.html_page(html, "Deeply Nested HTML")
+      doc = Nokogiri::HTML5(exported, nil, max_tree_depth: 10_000)
+      expect(doc.title).to eq "Deeply Nested HTML"
+      expect(doc.at_css("p").text).to eq "Deeply nested content"
+    end
+
     it "only translates course when trying to translate /cousers/x/users/y type links" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: true)
       orig = <<~HTML

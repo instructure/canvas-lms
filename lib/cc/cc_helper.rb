@@ -391,7 +391,7 @@ module CC
         html = @rewriter.translate_content(html)
         return html if html.blank?
 
-        doc = Nokogiri::HTML5.fragment(html)
+        doc = Nokogiri::HTML5.fragment(html, nil, max_tree_depth: 10_000)
         # keep track of found media comments, and translate them into links into the files tree
         # if imported back into canvas, they'll get uploaded to the media server
         # and translated back into media comments
