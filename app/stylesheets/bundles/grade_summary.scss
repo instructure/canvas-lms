@@ -795,3 +795,9 @@ $outcome-border: 1px solid #BCC2CA;
   border-bottom: none;
   cursor: default;
  }
+
+ #grades_summary tr.last_sub_assignment_row {
+  border-bottom: 1px solid;
+  border-color: #C7CDD1;
+  border-collapse: collapse;
+ }
