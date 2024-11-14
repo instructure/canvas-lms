@@ -702,20 +702,22 @@ export default class SubmissionTray extends React.Component<
                   isNotCountedForScore={this.props.isNotCountedForScore}
                   submission={this.props.submission}
                 />
-                {renderInputsForCheckpoints(
-                  hasCheckpoints,
-                  this.props,
-                  REPLY_TO_TOPIC,
-                  replyToTopicSubmission,
-                  I18n.t('Reply to Topic')
-                )}
-                {renderInputsForCheckpoints(
-                  hasCheckpoints,
-                  this.props,
-                  REPLY_TO_ENTRY,
-                  replyToEntrySubmission,
-                  I18n.t('Required Replies')
-                )}
+                <View as="div" margin="none xx-small">
+                  {renderInputsForCheckpoints(
+                    hasCheckpoints,
+                    this.props,
+                    REPLY_TO_TOPIC,
+                    replyToTopicSubmission,
+                    I18n.t('Reply to Topic')
+                  )}
+                  {renderInputsForCheckpoints(
+                    hasCheckpoints,
+                    this.props,
+                    REPLY_TO_ENTRY,
+                    replyToEntrySubmission,
+                    I18n.t('Required Replies')
+                  )}
+                </View>
                 <Flex
                   margin="none small none xx-small"
                   gap="none x-large"
