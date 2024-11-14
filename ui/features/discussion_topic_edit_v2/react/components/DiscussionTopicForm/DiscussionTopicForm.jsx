@@ -430,6 +430,13 @@ function DiscussionTopicForm({
     )
   }, [gradingSchemeId, displayGradeAs, pointsPossible, isGraded])
 
+  useEffect(() => {
+    if (isCheckpoints) {
+      setIsGroupDiscussion(false)
+      setGroupCategoryId(null)
+    }
+  }, [isCheckpoints])
+
   addToStudentToDoDateRef?.setAttribute('data-testid', 'add-to-student-to-do-date')
   addToStudentToDoTimeRef?.setAttribute('data-testid', 'add-to-student-to-do-time')
 
@@ -457,7 +464,8 @@ function DiscussionTopicForm({
     discussionAnonymousState,
     isEditing,
     isStudent,
-    published
+    published,
+    isCheckpoints
   )
 
   const canGroupDiscussion = !isEditing || currentDiscussionTopic?.canGroup || false

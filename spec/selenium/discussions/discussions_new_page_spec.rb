@@ -2486,6 +2486,19 @@ describe "discussions" do
             expect(sub_assignment2.sub_assignment_tag).to eq "reply_to_entry"
             expect(sub_assignment2.points_possible).to eq 7
           end
+
+          it "disallows setting the group discussion checkbox" do
+            get "/courses/#{course.id}/discussion_topics/new"
+
+            expect(element_exists?("input[data-testid='group-discussion-checkbox']")).to be_truthy
+
+            force_click_native('input[type=checkbox][value="graded"]')
+            wait_for_ajaximations
+
+            force_click_native('input[type=checkbox][value="checkpoints"]')
+
+            expect(element_exists?("input[data-testid='group-discussion-checkbox']")).to be_falsey
+          end
         end
       end
     end
