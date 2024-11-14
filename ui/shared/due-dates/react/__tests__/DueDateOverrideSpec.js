@@ -147,6 +147,16 @@ QUnit.module('DueDateOverride#validateDatetimes', () => {
       const errors = view.validateDatetimes(data, {})
       strictEqual(errors.due_at.message, 'Due date cannot be after course end')
     })
+
+    test('does not validate dates for an assignment in a paced course', () => {
+      const view = new DueDateOverrideView({inPacedCourse: true, isModuleItem: true})
+      const dueDate = new Date('Nov 30, 2018').toISOString()
+      const overrides = [{rowKey: '1', student_ids: [1], due_at: dueDate}]
+      const data = {assignment_overrides: overrides}
+
+      const errors = view.validateBeforeSave(data, {})
+      strictEqual(Object.keys(errors).length, 0)
+    })
   })
 
   QUnit.module('with course pacing', () => {
