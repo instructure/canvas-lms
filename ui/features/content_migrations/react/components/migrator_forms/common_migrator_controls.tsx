@@ -114,7 +114,7 @@ export const CommonMigratorControls = ({
   newStartDate,
   newEndDate,
 }: CommonMigratorControlsProps) => {
-  const [selectiveImport, setSelectiveImport] = useState<null | boolean>(null)
+  const [selectiveImport, setSelectiveImport] = useState<null | boolean>(false)
   const [importBPSettings, setImportBPSettings] = useState<null | boolean>(null)
   const [importAsNewQuizzes, setImportAsNewQuizzes] = useState<boolean>(false)
   const [overwriteAssessmentContent, setOverwriteAssessmentContent] = useState<boolean>(false)
@@ -253,6 +253,7 @@ export const CommonMigratorControls = ({
             name={I18n.t('Selective import')}
             layout="stacked"
             description={I18n.t('Content')}
+            defaultValue="non_selective"
           >
             <RadioInput
               name="selective_import"

@@ -64,7 +64,7 @@ describe('CourseCopyImporter', () => {
     await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
     await waitFor(() => {
       expect(doFetchApi).toHaveBeenCalledWith({
-        path: '/users/0/manageable_courses?term=math&include=concluded'
+        path: '/users/0/manageable_courses?term=math&include=concluded',
       })
     })
     expect(screen.getByText('Mathmatics')).toBeInTheDocument()
@@ -75,7 +75,7 @@ describe('CourseCopyImporter', () => {
     await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
     await waitFor(() => {
       expect(doFetchApi).toHaveBeenCalledWith({
-        path: '/users/0/manageable_courses?term=math&include=concluded'
+        path: '/users/0/manageable_courses?term=math&include=concluded',
       })
     })
     expect(screen.getByText('Term: Default term')).toBeInTheDocument()
@@ -118,27 +118,24 @@ describe('CourseCopyImporter', () => {
   // So instead of mocking it here and testing the prop being passed to the mock
   // we're following the precedent and testing all the way to the child in this suite
   it('Renders BP settings import option if appropriate', async () => {
-    const {getByLabelText} = renderComponent()
+    renderComponent()
     await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
     await userEvent.click(await screen.findByText('Mathmatics'))
-    await userEvent.click(getByLabelText(/All content/))
     await expect(await screen.getByText('Import Blueprint Course settings')).toBeInTheDocument()
   })
 
   it('Does not renders BP settings import option when the destination course is marked ineligible', async () => {
     window.ENV.SHOW_BP_SETTINGS_IMPORT_OPTION = false
-    const {getByLabelText} = renderComponent()
+    renderComponent()
     await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
     await userEvent.click(await screen.findByText('Mathmatics'))
-    await userEvent.click(getByLabelText(/All content/))
     expect(screen.queryByText('Import Blueprint Course settings')).toBeNull()
   })
 
   it('Does not render BP settings import option when the selected course is not a blueprint', async () => {
-    const {getByLabelText} = renderComponent()
+    renderComponent()
     await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'biol')
     await userEvent.click(await screen.findByText('Biology'))
-    await userEvent.click(getByLabelText(/All content/))
     expect(screen.queryByText('Import Blueprint Course settings')).toBeNull()
   })
 
