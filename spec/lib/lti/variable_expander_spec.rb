@@ -2362,6 +2362,15 @@ module Lti
           expander = VariableExpander.new(root_account, account, controller, current_user: user, tool: ToolProxy.new)
           expect(expand!("$ToolConsumerProfile.url", expander:)).to eq "url"
         end
+
+        it "has substitution for $com.instructure.user.lti_1_1_id.history" do
+          course.save!
+          user.lti_context_id = "current_context_id"
+          UserPastLtiId.create!(user:, context: account, user_lti_id: "old_lti_id", user_lti_context_id: "old_context_id", user_uuid: "old_uuid")
+          UserPastLtiId.create!(user:, context: course, user_lti_id: "old_lti_id", user_lti_context_id: "old_context_id", user_uuid: "old_uuid")
+          UserPastLtiId.create!(user: User.new, context: account, user_lti_id: "old_lti_id2", user_lti_context_id: "", user_uuid: "old_uuid2")
+          expect(expand!("$com.instructure.user.lti_1_1_id.history")).to eq "old_context_id,current_context_id"
+        end
       end
 
       it "has substitution for $Canvas.membership.permissions" do
