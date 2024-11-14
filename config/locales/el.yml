@@ -2754,6 +2754,7 @@ el:
   back_to_announcements_1036e43e: "Πίσω στις Ανακοινώσεις"
   back_to_app_center_95420d83: "Πίσω στο Κέντρο Εφαρμογών"
   back_to_assignment_1df86a69: "Επιστροφή στην Εργασία"
+  back_to_login_e4b5f663: "Πίσω στη Σύνδεση"
   back_to_ref_title_377ea1f0: "Πίσω σε %{ref_title}"
   back_to_table_of_contents_d878b315: "Πίσω στον Πίνακα Περιεχομένων"
   back_to_title_39e7a8f4: "Πίσω σε %{title}"
