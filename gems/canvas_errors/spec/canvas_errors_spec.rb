@@ -111,6 +111,14 @@ describe CanvasErrors do
     expect(outputs[:test_thing]).to eq("ERROR_BLOCK_RESPONSE")
   end
 
+  it "avoids re-entering .capture" do
+    allow(CanvasErrors).to receive(:check_for_job_context) do
+      CanvasErrors.capture("yo dawg")
+      {}
+    end
+    expect { CanvasErrors.capture("boom") }.not_to raise_error
+  end
+
   describe "with an owned class" do
     it "sets the team tag" do
       begin
