@@ -369,6 +369,7 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
               renderIcon={<IconSaveLine />}
               color="secondary"
               themeOverride={{secondaryGhostColor: '#0e68b3'}}
+              data-testid="block-toolbar-icon-button-save-template"
             >
               {I18n.t('Save as template')}
             </CondensedButton>

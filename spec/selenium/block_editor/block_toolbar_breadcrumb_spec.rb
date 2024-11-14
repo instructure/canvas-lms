@@ -37,19 +37,6 @@ describe "Block Editor", :ignore_js_errors do
     file.read
   end
 
-  block_toolbar_menus = {
-    icon: ["Go up", "Icon", "Size", "Select Icon", "Drag to move", "Delete"],
-    column: ["Go up", "Column", "Color", "Rouned corners", "Alignment Options", "Drag to move"],
-    columns: ["Columns", "Go down", "Color", "Section Columns", "Columns 1-4", "Drag to move"],
-  }
-
-  block_toolbar_menus_global_privileges = {
-    icon: block_toolbar_menus[:icon],
-    column: block_toolbar_menus[:column] + ["Save as template"],
-    columns: ["Go up"] + block_toolbar_menus[:columns] + ["Save as template"],
-    page: ["Page", "Go down", "Save as template"]
-  }
-
   before do
     course_with_teacher_logged_in
     @course.account.enable_feature!(:block_editor)
@@ -81,8 +68,8 @@ describe "Block Editor", :ignore_js_errors do
       icon_block.click
       expect(block_toolbar).to be_displayed
       expect(active_element).to eq(icon_block)
-      expect(body).not_to contain_css(block_toolbar_action("go-down"))
-      expect(block_toolbar_action("go-up")).to be_displayed
+      expect(body).not_to contain_css(block_toolbar_selector("go-down"))
+      expect(f(block_toolbar_selector("go-up"))).to be_displayed
       expect_block_toolbar_menu(block_toolbar_menus[:icon])
 
       block_toolbar_action("go-up").click
@@ -109,8 +96,8 @@ describe "Block Editor", :ignore_js_errors do
       icon_block.click
       expect(block_toolbar).to be_displayed
       expect(active_element).to eq(icon_block)
-      expect(body).not_to contain_css(block_toolbar_action("go-down"))
-      expect(block_toolbar_action("go-up")).to be_displayed
+      expect(body).not_to contain_css(block_toolbar_selector("go-down"))
+      expect(f(block_toolbar_selector("go-up"))).to be_displayed
       expect_block_toolbar_menu(block_toolbar_menus_global_privileges[:icon])
 
       block_toolbar_action("go-up").click
