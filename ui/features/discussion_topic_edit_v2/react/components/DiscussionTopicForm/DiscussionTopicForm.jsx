@@ -558,6 +558,15 @@ function DiscussionTopicForm({
           masteryPathsOption
         )
       )
+    } else if (isGraded && ENV.FEATURES?.selective_release_ui_api && !isGroupDiscussion && ENV.context_type !== 'Group') {
+      // Well, its fairly lame to call prepUngraded inside if isGraded, but availableUntil/From is ignored by selective release, so we need to fetch it somehow.
+      const { delayedPostAt, lockAt } = prepareUngradedDiscussionOverridesPayload(
+        assignedInfoList,
+        defaultEveryoneOption,
+        defaultEveryoneElseOption,
+        masteryPathsOption
+      )
+      Object.assign(payload, { delayedPostAt, lockAt })
     }
 
     const previousAnonymousState = !currentDiscussionTopic?.anonymousState

@@ -134,7 +134,11 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
       if working_assignment[:errors].present?
         return validation_error(working_assignment[:errors])
       elsif working_assignment.present?
-        discussion_topic.assignment = working_assignment&.[](:assignment)
+        created_assignment = working_assignment[:assignment]
+
+        discussion_topic.assignment = created_assignment
+        discussion_topic.lock_at = created_assignment.lock_at unless input[:lock_at]
+        discussion_topic.unlock_at = created_assignment.unlock_at unless input[:unlock_at]
       end
 
       # Assignment must be present to set checkpoints
