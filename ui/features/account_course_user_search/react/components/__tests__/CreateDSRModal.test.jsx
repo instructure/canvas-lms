@@ -19,9 +19,6 @@
 import React from 'react'
 import {render, fireEvent, waitFor} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import {Tooltip} from '@instructure/ui-tooltip'
-import {IconButton} from '@instructure/ui-buttons'
-import {IconExportLine} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import CreateDSRModal from '../CreateDSRModal'
 import axios from '@canvas/axios'
@@ -33,7 +30,6 @@ jest.mock('@canvas/axios')
 const mockUser = {
   id: '1',
   name: 'John Doe',
-  email: 'john.doe@example.com',
 }
 
 const mockAccountId = '123'
@@ -41,32 +37,22 @@ const mockAccountId = '123'
 describe('CreateDSRModal', () => {
   const afterSave = jest.fn()
 
-  beforeAll(() => {
-    window.ENV.ROOT_ACCOUNT_NAME = 'Root Account'
-  })
-
   const renderComponent = (props = {}) =>
     render(
       <CreateDSRModal accountId={mockAccountId} user={mockUser} afterSave={afterSave} {...props}>
-        <span>
-          <Tooltip
-            data-testid="user-list-row-tooltip"
-            renderTip={I18n.t('Create DSR Request for %{name}', {name: mockUser.name})}
-          >
-            <IconButton
-              withBorder={false}
-              withBackground={false}
-              size="small"
-              screenReaderLabel={I18n.t('Create DSR Request for %{name}', {name: mockUser.name})}
-            >
-              <IconExportLine
-                title={I18n.t('Create DSR Request for %{name}', {name: mockUser.name})}
-              />
-            </IconButton>
-          </Tooltip>
-        </span>
+        <button title="Create DSR Request for John Doe" />
       </CreateDSRModal>
     )
+
+  it('uses the user\'s name in the default report name', () => {
+    axios.get.mockResolvedValueOnce({status: 204, data: {}})
+
+    const {getByTitle, getByTestId} = renderComponent()
+    fireEvent.click(getByTitle('Create DSR Request for John Doe'))
+
+    const input = getByTestId('DSR Request Name')
+    expect(input.value).toMatch(/John-Doe/)
+  })
 
   it('should not show latest request if there is none', async () => {
     axios.get.mockResolvedValueOnce({status: 204, data: {}})
