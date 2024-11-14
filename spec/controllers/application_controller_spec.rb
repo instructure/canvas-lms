@@ -40,7 +40,7 @@ RSpec.describe ApplicationController do
         controller.instance_variable_set(:@real_current_user, mock_real_current_user)
         controller.instance_variable_set(:@current_user, mock_current_user)
         session[:oauth_gdrive_refresh_token] = "session_token"
-        session[:oauth_gdrive_access_token] = "sesion_secret"
+        session[:oauth_gdrive_access_token] = "session_secret"
 
         expect(Rails.cache).to receive(:fetch).with(["google_drive_tokens", mock_real_current_user].cache_key).and_return(["real_current_user_token", "real_current_user_secret"])
 
@@ -54,7 +54,7 @@ RSpec.describe ApplicationController do
         controller.instance_variable_set(:@real_current_user, nil)
         controller.instance_variable_set(:@current_user, mock_current_user)
         session[:oauth_gdrive_refresh_token] = "session_token"
-        session[:oauth_gdrive_access_token] = "sesion_secret"
+        session[:oauth_gdrive_access_token] = "session_secret"
 
         expect(Rails.cache).to receive(:fetch).with(["google_drive_tokens", mock_current_user].cache_key).and_return(["current_user_token", "current_user_secret"])
 
@@ -67,7 +67,7 @@ RSpec.describe ApplicationController do
         controller.instance_variable_set(:@real_current_user, nil)
         controller.instance_variable_set(:@current_user, mock_current_user)
         session[:oauth_gdrive_refresh_token] = "session_token"
-        session[:oauth_gdrive_access_token] = "sesion_secret"
+        session[:oauth_gdrive_access_token] = "session_secret"
 
         mock_user_services = double("mock_user_services")
         expect(mock_current_user).to receive(:user_services).and_return(mock_user_services)
@@ -81,9 +81,9 @@ RSpec.describe ApplicationController do
         controller.instance_variable_set(:@real_current_user, nil)
         controller.instance_variable_set(:@current_user, nil)
         session[:oauth_gdrive_refresh_token] = "session_token"
-        session[:oauth_gdrive_access_token] = "sesion_secret"
+        session[:oauth_gdrive_access_token] = "session_secret"
 
-        expect(GoogleDrive::Connection).to receive(:new).with("session_token", "sesion_secret", 30)
+        expect(GoogleDrive::Connection).to receive(:new).with("session_token", "session_secret", 30)
 
         controller.send(:google_drive_connection)
       end
@@ -1207,20 +1207,22 @@ RSpec.describe ApplicationController do
             end
 
             shared_examples_for "a placement that caches the launch" do
+              let(:subject) { controller.send(:content_tag_redirect, course, content_tag, nil) }
               let(:verifier) { "e5e774d015f42370dcca2893025467b414d39009dfe9a55250279cca16f5f3c2704f9c56fef4cea32825a8f72282fa139298cf846e0110238900567923f9d057" }
               let(:redis_key) { "#{course.class.name}:#{Lti::RedisMessageClient::LTI_1_3_PREFIX}#{verifier}" }
               let(:cached_launch) { JSON.parse(Canvas.redis.get(redis_key)) }
 
               before do
                 allow(SecureRandom).to receive(:hex).and_return(verifier)
-                controller.send(:content_tag_redirect, course, content_tag, nil)
               end
 
               it "caches the LTI 1.3 launch" do
+                subject
                 expect(cached_launch["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
               end
 
               it "creates a login message" do
+                subject
                 expect(assigns[:lti_launch].params.keys).to match_array %w[
                   iss
                   login_hint
@@ -1229,20 +1231,45 @@ RSpec.describe ApplicationController do
                   canvas_region
                   canvas_environment
                   client_id
-                  deployment_id
+                  lti_deployment_id
                   lti_storage_target
                 ]
               end
 
+              context "with lti_deployment_id_in_login_request FF off" do
+                before do
+                  @course.root_account.disable_feature!(:lti_deployment_id_in_login_request)
+                end
+
+                it "creates a login message that includes deployment_id" do
+                  subject
+                  expect(assigns[:lti_launch].params.keys).to match_array %w[
+                    iss
+                    login_hint
+                    target_link_uri
+                    lti_message_hint
+                    canvas_region
+                    canvas_environment
+                    client_id
+                    deployment_id
+                    lti_deployment_id
+                    lti_storage_target
+                  ]
+                end
+              end
+
               it 'sets the "login_hint" to the current user lti id' do
+                subject
                 expect(assigns[:lti_launch].params["login_hint"]).to eq Lti::Asset.opaque_identifier_for(user)
               end
 
               it "does not use the oidc_initiation_url as the resource_url" do
+                subject
                 expect(assigns[:lti_launch].resource_url).to eq tool.url
               end
 
               it 'sets the "canvas_domain" to the request domain' do
+                subject
                 message_hint = JSON::JWT.decode(assigns[:lti_launch].params["lti_message_hint"], :skip_verification)
                 expect(message_hint["canvas_domain"]).to eq "localhost"
               end
@@ -1250,12 +1277,12 @@ RSpec.describe ApplicationController do
               context "when the developer key has an oidc_initiation_url" do
                 before do
                   tool.developer_key.update!(oidc_initiation_url:)
-                  controller.send(:content_tag_redirect, course, content_tag, nil)
                 end
 
                 let(:oidc_initiation_url) { "https://www.test.com/oidc/login" }
 
                 it "does use the oidc_initiation_url as the resource_url" do
+                  subject
                   expect(assigns[:lti_launch].resource_url).to eq oidc_initiation_url
                 end
               end
@@ -1265,10 +1292,10 @@ RSpec.describe ApplicationController do
 
                 before do
                   content_tag.update!(url: custom_url)
-                  controller.send(:content_tag_redirect, course, content_tag, nil)
                 end
 
                 it "uses the custom url as the target_link_uri" do
+                  subject
                   expect(assigns[:lti_launch].params["target_link_uri"]).to eq custom_url
                 end
               end
@@ -1282,7 +1309,7 @@ RSpec.describe ApplicationController do
 
                 before do
                   # assignments configured with LTI 1.1 will not have
-                  # LineItem or ResouceLink records prior to the LTI 1.3
+                  # LineItem or ResourceLink records prior to the LTI 1.3
                   # launch.
                   assignment.line_items.destroy_all
 
@@ -1317,6 +1344,7 @@ RSpec.describe ApplicationController do
 
               it_behaves_like "a placement that caches the launch" do
                 it "sets link-level custom parameters" do
+                  subject
                   expect(cached_launch["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/custom"]).to include("abc" => "def")
                 end
               end

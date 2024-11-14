@@ -22,10 +22,12 @@ module LtiAdvantage::Serializers
     IMS_CLAIM_PREFIX = "https://purl.imsglobal.org/spec/lti/claim/"
     DL_CLAIM_PREFIX = "https://purl.imsglobal.org/spec/lti-dl/claim/"
 
+    # Remove deployment_id when removing the lti_deployment_id_in_login_request FF
     STANDARD_IMS_CLAIMS = %w[
       context
       custom
       deployment_id
+      lti_deployment_id
       launch_presentation
       lis
       message_type

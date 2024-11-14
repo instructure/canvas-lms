@@ -35,6 +35,18 @@ assignment_submission_type_card:
       state: allowed_on
     ci:
       state: allowed_on
+lti_deployment_id_in_login_request:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Send lti_deployment_id in the LTI login request
+  description: |-
+    When enabled the lti_deployment_id will be sent in the LTI 1.3 login request.
+    When disabled both deployment_id and lti_deployment_id will be sent.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 disable_graphql_authentication:
   state: hidden
   display_name: Disable authentication for GraphQL
