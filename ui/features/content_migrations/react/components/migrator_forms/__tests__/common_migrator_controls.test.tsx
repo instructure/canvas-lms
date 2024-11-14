@@ -98,9 +98,7 @@ describe('CommonMigratorControls', () => {
   })
 
   it('calls onSubmit with import_blueprint_settings', async () => {
-    const {getByLabelText} = renderComponent({canSelectContent: true, canImportBPSettings: true})
-
-    await userEvent.click(getByLabelText(/All content/))
+    renderComponent({canSelectContent: true, canImportBPSettings: true})
     await userEvent.click(
       await screen.getByRole('checkbox', {name: 'Import Blueprint Course settings'})
     )
