@@ -1560,6 +1560,84 @@ describe Mutations::CreateDiscussionTopic do
 
       expect(student_ids).to match_array [student1.id, student2.id]
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "successfully creates a discussion topic with checkpoints and AdHoc overrides across shards" do
+        @shard1.activate do
+          @student1 = user_with_pseudonym(active_user: true, username: "test1@example.com")
+          @course.enroll_student(@student1, enrollment_state: "active")
+        end
+
+        @shard2.activate do
+          @student2 = user_with_pseudonym(active_user: true, username: "test2@example.com")
+          @course.enroll_student(@student2, enrollment_state: "active")
+        end
+
+        context_type = "Course"
+        title = "Graded Discussion w/Checkpoints and AdHoc overrides"
+        message = "Lorem ipsum..."
+        published = true
+
+        reply_to_entry_due_at = 12.days.from_now
+
+        query = <<~GQL
+          contextId: "#{@course.id}"
+          contextType: #{context_type}
+          title: "#{title}"
+          message: "#{message}"
+          published: #{published}
+          assignment: {
+            courseId: "#{@course.id}",
+            name: "#{title}",
+            forCheckpoints: true
+          }
+          checkpoints: [
+            {
+              checkpointLabel: reply_to_topic,
+              pointsPossible: 10,
+              dates: [{ type: everyone, dueAt: "#{5.days.from_now.iso8601}" }]
+            },
+            {
+              checkpointLabel: reply_to_entry,
+              pointsPossible: 15,
+              dates: [
+                { type: everyone, dueAt: "#{10.days.from_now.iso8601}" },
+                { type: override, dueAt: "#{reply_to_entry_due_at.iso8601}", setType: ADHOC, studentIds: [#{@student1.global_id}, #{@student2.global_id}] }
+              ],
+              repliesRequired: 3
+            }
+          ]
+        GQL
+
+        result = execute_with_input_with_assignment(query)
+        expect(result["errors"]).to be_nil
+
+        assignment = Assignment.last
+
+        expect(assignment.has_sub_assignments?).to be true
+
+        sub_assignments = SubAssignment.where(parent_assignment_id: assignment.id)
+        sub_assignment1 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+        sub_assignment2 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+
+        expect(sub_assignment1.sub_assignment_tag).to eq "reply_to_topic"
+        expect(sub_assignment1.points_possible).to eq 10
+        expect(sub_assignment2.sub_assignment_tag).to eq "reply_to_entry"
+        expect(sub_assignment2.points_possible).to eq 15
+
+        assignment_override = AssignmentOverride.find_by(assignment: sub_assignment2)
+
+        expect(assignment_override).to be_present
+        expect(assignment_override.set_type).to eq "ADHOC"
+        expect(assignment_override.due_at).to be_within(1.second).of reply_to_entry_due_at
+
+        student_ids = assignment_override.assignment_override_students.map { |o| o.user.global_id }
+
+        expect(student_ids).to match_array [@student1.global_id, @student2.global_id]
+      end
+    end
   end
 
   context "with selective_release_ui_api flag ON" do
