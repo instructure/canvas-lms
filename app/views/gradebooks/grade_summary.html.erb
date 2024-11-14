@@ -472,8 +472,9 @@
               <%
                 sa_submission = @presenter.submissions.detect{ |s| s.assignment_id == sub_assignment.id }
                 sub_assignment_presenter = GradeSummaryAssignmentPresenter.new(@presenter, @current_user, sub_assignment, sa_submission)
+                last_row = if sub_assignment.sub_assignment_tag == CheckpointLabels::REPLY_TO_ENTRY then "last_sub_assignment_row" else "" end
               %>
-              <tr id="sub_assignment_<%= sub_assignment.id %>" class="sub_assignment_row parent_assignment_id_<%= assignment.id %>" style="display: none;" aria-label="<%= t("discussion checkpoint row") %>">
+              <tr id="sub_assignment_<%= sub_assignment.id %>" class="sub_assignment_row parent_assignment_id_<%= "#{assignment.id} #{last_row}".strip %>" style="display: none;" aria-label="<%= t("discussion checkpoint row") %>">
                 <% if sub_assignment.sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC %>
                   <td class="title" scope="row"> <%= t "Reply To Topic" %> </td>
                 <% else%>
