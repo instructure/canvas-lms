@@ -59,7 +59,7 @@ export default class CreateDSRModal extends React.Component {
       short_name: string,
       email: string,
       time_zone: string,
-    }),
+    }).isRequired,
     afterSave: func.isRequired,
   }
 
@@ -71,7 +71,7 @@ export default class CreateDSRModal extends React.Component {
         data: {
           $set: {
             request_name:
-              ENV.ROOT_ACCOUNT_NAME.toString().replace(/\s+/g, '-') +
+              this.props.user.name.replace(/\s+/g, '-') +
               '-' +
               new Date().toISOString().split('T')[0],
             request_output: 'xlsx',
