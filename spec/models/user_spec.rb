@@ -333,6 +333,33 @@ describe User do
     end
   end
 
+  describe "#pseudonym_for_restoration_in" do
+    subject(:restore_pseudonym) { user.pseudonym_for_restoration_in(root_account) }
+
+    let(:user) { user_model }
+    let(:root_account) { account_model }
+    let(:pseudonym_one) { pseudonym_model(user:, account: root_account) }
+    let(:pseudonym_two) { pseudonym_model(user:, account: root_account) }
+
+    context "when pseudonym one is deleted before pseudonym two" do
+      before do
+        pseudonym_one.destroy!
+        pseudonym_two.destroy!
+      end
+
+      it { is_expected.to eq pseudonym_two }
+    end
+
+    context "when pseudonym two is deleted before pseudonym one" do
+      before do
+        pseudonym_two.destroy!
+        pseudonym_one.destroy!
+      end
+
+      it { is_expected.to eq pseudonym_one }
+    end
+  end
+
   describe "#recent_stream_items" do
     it "skips submission stream items" do
       course_with_teacher(active_all: true)

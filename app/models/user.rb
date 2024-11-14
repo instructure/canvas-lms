@@ -3623,4 +3623,8 @@ class User < ActiveRecord::Base
     accounts = Account.where(id: student_enrollments.active.joins(:course).select("#{Course.quoted_table_name}.account_id"))
     accounts.any?(&:limited_access_for_students?)
   end
+
+  def pseudonym_for_restoration_in(account)
+    account.pseudonyms.where(user_id: self).order(deleted_at: :desc).first!
+  end
 end

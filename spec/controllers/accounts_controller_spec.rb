@@ -183,6 +183,14 @@ describe AccountsController do
       put "restore_user", params: { account_id: @account.id, user_id: @active_user.id }
       expect(response).to be_bad_request
     end
+
+    it "restores the most recently deleted pseudonym" do
+      pseudonym = @deleted_user.pseudonym_for_restoration_in(@account)
+
+      expect do
+        put "restore_user", params: { account_id: @account.id, user_id: @deleted_user.id }
+      end.to change { pseudonym.reload.workflow_state }.from("deleted").to("active")
+    end
   end
 
   describe "add_account_user" do
