@@ -75,7 +75,8 @@ export const useShouldShowContent = (
   discussionAnonymousState,
   isEditing,
   isStudent,
-  published
+  published,
+  isCheckpoints
 ) => {
   const shouldShowTodoSettings =
     !isGraded &&
@@ -101,7 +102,8 @@ export const useShouldShowContent = (
     discussionAnonymousState === 'off' &&
     !isAnnouncement &&
     !isGroupContext &&
-    ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_SET_GROUP
+    ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_SET_GROUP &&
+    !isCheckpoints
 
   const shouldShowGradedDiscussionOptions =
     discussionAnonymousState === 'off' &&
