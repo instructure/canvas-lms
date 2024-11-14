@@ -1562,7 +1562,7 @@ class AccountsController < ApplicationController
     user = api_find(User, params[:user_id])
     raise ActiveRecord::RecordNotFound if user.try(:frd_deleted?)
 
-    pseudonym = user && @account.pseudonyms.where(user_id: user).order(deleted_at: :desc).first!
+    pseudonym = user.pseudonym_for_restoration_in(@account)
 
     is_permissible =
       pseudonym.account.grants_right?(@current_user, :manage_user_logins) &&
