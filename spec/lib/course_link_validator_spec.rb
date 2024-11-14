@@ -473,4 +473,32 @@ describe CourseLinkValidator do
       expect(@course_link_validator.valid_route?("/favicon.ico")).to be_truthy
     end
   end
+
+  describe "#find_invalid_links" do
+    before :once do
+      course_model
+      assignment_model(course: @course)
+      @course_link_validator = CourseLinkValidator.new(@course)
+    end
+
+    it "can handle deeply nested content" do
+      # The default is Nokogiri::Gumbo::DEFAULT_MAX_TREE_DEPTH = 400. Here we are testing that
+      # we are overriding that default with our own value of 10,000.
+      depth = 500
+      html = "<!DOCTYPE html><html><head><title>Deeply Nested HTML</title></head><body>"
+      depth.times do
+        html += "<div>"
+      end
+      nonsense_link = "/courses/#{@course.id}/external_tools/retrieve?url=#{CGI.escape("https://lolwut.beep")}"
+      html += "<a href='#{nonsense_link}'>link</a>"
+      depth.times do
+        html += "</div>"
+      end
+      html += "</body></html>"
+      @assignment.update(description: html)
+      @course_link_validator.find_invalid_links(@assignment.description) do |links|
+        expect(links).to eq([{ link_text: "link", reason: :missing_item, url: nonsense_link }])
+      end
+    end
+  end
 end
