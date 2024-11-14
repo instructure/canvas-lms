@@ -17,6 +17,7 @@
  */
 
 import getCookie from '@instructure/get-cookie'
+import gql from 'graphql-tag'
 import qs from 'qs'
 import type {GradingRubricContext} from '../types/rubricAssignment'
 import type {Rubric, RubricAssociation} from '../../types/rubric'
@@ -25,6 +26,7 @@ import {
   mapRubricAssociationUnderscoredKeysToCamelCase,
 } from '../../utils'
 import type {QueryOptions} from '@tanstack/react-query'
+import {executeQuery} from '@canvas/query/graphql'
 
 export const removeRubricFromAssignment = async (courseId: string, rubricAssociationId: string) => {
   return fetch(`/courses/${courseId}/rubric_associations/${rubricAssociationId}`, {
@@ -140,4 +142,44 @@ export const getGradingRubricsForContext = async ({
       rubric: mapRubricUnderscoredKeysToCamelCase(result.rubric_association?.rubric),
     }
   })
+}
+
+const SET_RUBRIC_SELF_ASSESSMENT = gql`
+  mutation SetRubricSelfAssessment($assignmentId: ID!, $enabled: Boolean!) {
+    setRubricSelfAssessment(
+      input: {assignmentId: $assignmentId, rubricSelfAssessmentEnabled: $enabled}
+    ) {
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
+
+type SelfAssessmentResponse = {
+  setRubricSelfAssessment: {
+    errors: {
+      attribute: string
+      message: string
+    }[]
+  }
+}
+export const setRubricSelfAssessment = async ({
+  assignmentId,
+  enabled,
+}: {
+  assignmentId: string
+  enabled: boolean
+}) => {
+  const {
+    setRubricSelfAssessment: {errors},
+  } = await executeQuery<SelfAssessmentResponse>(SET_RUBRIC_SELF_ASSESSMENT, {
+    assignmentId,
+    enabled,
+  })
+
+  if (errors) {
+    throw new Error('Failed to set rubric self assessment on assignment')
+  }
 }

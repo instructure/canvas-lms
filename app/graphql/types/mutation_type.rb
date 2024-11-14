@@ -90,6 +90,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :set_friendly_description, mutation: Mutations::SetFriendlyDescription
   field :set_module_item_completion, mutation: Mutations::SetModuleItemCompletion
   field :set_override_status, mutation: Mutations::SetOverrideStatus
+  field :set_rubric_self_assessment, mutation: Mutations::SetRubricSelfAssessment
   field :subscribe_to_discussion_topic, mutation: Mutations::SubscribeToDiscussionTopic
   field :update_assignment, mutation: Mutations::UpdateAssignment
   field :update_comment_bank_item, mutation: Mutations::UpdateCommentBankItem
