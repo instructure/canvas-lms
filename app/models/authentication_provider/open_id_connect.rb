@@ -107,8 +107,6 @@ class AuthenticationProvider
     alias_attribute :issuer, :idp_entity_id
 
     def generate_authorize_url(redirect_uri, state, nonce:, **authorize_options)
-      return super unless self.class.always_validate? || account.feature_enabled?(:oidc_full_token_validation)
-
       client.auth_code.authorize_url({ redirect_uri:, state:, nonce: }
                                      .merge(self.authorize_options)
                                      .merge(authorize_options))
@@ -387,9 +385,19 @@ class AuthenticationProvider
           end
 
           if (signature_error = validate_signature(id_token))
+            debug_set(:signature_error, signature_error) if instance_debugging
             raise OAuthValidationError, "Invalid signature: #{signature_error}"
           end
         elsif id_token != {}
+          missing_claims_persisted = settings["missing_claims"] ||= []
+          missing_claims = %w[aud iss iat exp nonce] - id_token.keys
+          missing_claims_persisted.replace(missing_claims_persisted | missing_claims)
+
+          audiences = settings["known_audiences"] ||= []
+          if audiences.length < 20 && !audiences.include?(id_token["aud"])
+            audiences << id_token["aud"]
+          end
+
           issuers = settings["known_issuers"] ||= []
           if issuers.length < 20 && !issuers.include?(id_token["iss"])
             issuers << id_token["iss"]
@@ -397,6 +405,20 @@ class AuthenticationProvider
           alg = id_token.alg&.to_s
           algs = settings["known_signature_algorithms"] ||= []
           algs << alg if algs.length < 20 && !algs.include?(alg)
+
+          nonce_valid_list = settings["nonce_valid"] ||= []
+          nonce_valid = id_token["nonce"] == token.options[:nonce]
+          nonce_valid_list << nonce_valid unless nonce_valid_list.include?(nonce_valid)
+
+          # validate the signature if we have enough information
+          sigs_valid_list = settings["sigs_valid"] ||= []
+          if id_token.send(:hmac?)
+            sig_valid = !!validate_signature(id_token) if client_secret
+          elsif id_token.alg&.to_sym != :none && jwks_uri
+            sig_valid = !!validate_signature(id_token)
+          end
+          sigs_valid_list << sig_valid unless sigs_valid_list.include?(sig_valid)
+
           save! if changed?
         end
 
