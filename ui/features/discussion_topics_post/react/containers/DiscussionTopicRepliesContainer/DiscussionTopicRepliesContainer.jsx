@@ -128,7 +128,7 @@ export const DiscussionTopicRepliesContainer = props => {
   }
 
   return (
-    <View as="div" padding="mediumSmall" data-testid="discussion-root-entry-container">
+    <View as="div" padding="mediumSmall mediumSmall large mediumSmall" data-testid="discussion-root-entry-container">
       {searchTerm && <SearchResultsCount resultsFound={props.discussionTopic.searchEntryCount} />}
       {props.discussionTopic.discussionEntriesConnection.nodes.map(thread => {
         return (

@@ -155,7 +155,6 @@ const DiscussionTopicManager = props => {
     setIsSummaryEnabled,
   }
 
-  const isModuleItem = ENV.SEQUENCE != null
   const urlParams = new URLSearchParams(window.location.search)
   const isPersistEnabled = urlParams.get('persist') === '1'
 
@@ -389,7 +388,6 @@ const DiscussionTopicManager = props => {
             mobile: {
               viewPortWidth: '100vw',
               padding: 'medium x-small 0',
-              isMobile: true,
             },
             desktop: {
               viewPortWidth: '480px',
@@ -414,10 +412,10 @@ const DiscussionTopicManager = props => {
                 >
                   <View
                     display="block"
-                    {...(!responsiveProps.isMobile && {height: isModuleItem ? '85vh' : '90vh'})}
                     padding={responsiveProps.padding}
                     overflowX="auto"
                     overflowY="auto"
+                    id="module_sequence_footer_container"
                   >
                     <DiscussionTopicToolbarContainer
                       discussionTopic={discussionTopicQuery.data.legacyNode}
