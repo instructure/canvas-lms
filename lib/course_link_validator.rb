@@ -194,7 +194,7 @@ class CourseLinkValidator
   # pretty much copied from CanvasImportedHtmlConverter
   def find_invalid_links(html)
     links = []
-    doc = Nokogiri::HTML5(html || "")
+    doc = Nokogiri::HTML5(html || "", nil, max_tree_depth: 10_000)
     attrs = %w[href src data value]
 
     doc.search("*").each do |node|
