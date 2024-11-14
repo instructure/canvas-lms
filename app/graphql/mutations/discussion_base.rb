@@ -47,7 +47,7 @@ class Mutations::DiscussionCheckpointDate < GraphQL::Schema::InputObject
   argument :lock_at, Types::DateTimeType, required: false
   argument :set_id, Integer, required: false
   argument :set_type, Types::DiscussionCheckpointDateSetType, required: false
-  argument :student_ids, [Integer], required: false
+  argument :student_ids, [ID], required: false
   argument :type, Types::DiscussionCheckpointDateType, required: true
   argument :unlock_at, Types::DateTimeType, required: false
 
