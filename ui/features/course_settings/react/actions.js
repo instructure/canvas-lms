@@ -197,7 +197,9 @@ const Actions = {
           })
       } else {
         dispatch(this.rejectedUpload(type))
-        $.flashWarning(I18n.t("'%{type}' is not a valid image type (try jpg, png, or gif)", {type}))
+        $.flashWarning(
+          I18n.t("'%{type}' is not a valid image type (try jpg, png, webp, or gif)", {type})
+        )
       }
     }
   },
