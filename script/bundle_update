@@ -4,7 +4,6 @@
 ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../Gemfile", __dir__)
 
 require "bundler"
-require "yaml"
 
 # parse the Gemfile, but don't actual set anything up
 # this ensures "base_gems" is valid
@@ -13,6 +12,7 @@ Bundler.definition
 base_gems = Gem.loaded_specs.keys.to_set
 
 require "shellwords"
+require "yaml"
 
 output = `git status --porcelain --untracked=no`.strip
 unless output.empty?
