@@ -254,7 +254,7 @@ export const DateAdjustments = ({
                 </View>
                 {dateAdjustmentConfig.date_shift_options.day_substitutions.map(substitution => (
                   <View as="div" margin="medium none none none" key={substitution.id}>
-                    <Text weight="bold">{I18n.t('Move to:')}</Text>
+                    <Text weight="bold">{I18n.t('Move from:')}</Text>
                     <Flex as="div" direction={matches?.includes('small') ? 'column' : 'row'}>
                       <SimpleSelect
                         autoFocus={true}
