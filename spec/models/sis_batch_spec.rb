@@ -1160,6 +1160,42 @@ test_4,TC 104,Test Course 104,,term1,active
       expect(b4.generated_diff_id).to_not be_nil
     end
 
+    it "does not diff against a batch after too many skipped intermediate batches" do
+      Setting.set("sis_diffing_max_skip", "2")
+
+      process_csv_data(
+        [
+          %(course_id,short_name,long_name,account_id,term_id,status
+            test_1,TC 101,Test Course 101,,term1,active
+            test_4,TC 104,Test Course 104,,term1,active)
+        ],
+        diffing_data_set_identifier: "foobar"
+      )
+
+      3.times do
+        process_csv_data(
+          [
+            %(course_id,short_name,long_name,account_id,term_id,status
+             )
+          ],
+          diffing_data_set_identifier: "foobar",
+          diff_row_count_threshold: 1
+        )
+      end
+
+      nb = process_csv_data(
+        [
+          %(course_id,short_name,long_name,account_id,term_id,status
+            test_1,TC 101,Test Course 101,,term1,active
+            test_4,TC 104,Test Course 104,,term1,active)
+        ],
+        diffing_data_set_identifier: "foobar"
+      )
+
+      expect(nb.diffing_threshold_exceeded).to be true
+      expect(nb.processing_warnings.first.last).to include("Diffing not performed because too many batches were skipped. Please do a remaster to re-enable diffing.")
+    end
+
     it "marks files separately when created for diffing" do
       f1 = %(course_id,short_name,long_name,account_id,term_id,status
         test_1,TC 101,Test Course 101,,term1,active)
