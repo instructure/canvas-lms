@@ -1673,3 +1673,14 @@ in Canvas-side GET request that triggers the LTI launch.
 
 
 
+## com.instructure.user.lti_1_1_id.history
+Returns a comma-separated list of historical `lti_context_id` of a user in chronological order including the current id.
+The `lti_context_id` of a user is the same that is sent as `user_id` in 1.1 launches.
+This variable helps tools handle the merged user's history.
+
+**Availability**: *when launched by a logged in user*  
+
+
+```
+123,456,789
+```
