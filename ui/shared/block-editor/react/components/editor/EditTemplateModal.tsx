@@ -102,6 +102,7 @@ const EditTemplateModal = ({
             placeholder={I18n.t('Enter template name')}
             value={name}
             onChange={handleNameChange}
+            data-testid="edit-template-modal-text-input-template-name"
           />
           <TextArea
             label={I18n.t('Description')}
@@ -110,25 +111,34 @@ const EditTemplateModal = ({
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
               setDescription(e.target.value)
             }}
+            data-testid="edit-template-modal-text-area-template-description"
           />
           <Checkbox
             label={I18n.t('Published')}
             checked={published}
             onChange={() => setPublished(!published)}
+            id="edit-template-modal-checkbox-published"
           />
           {isGlobalEditor && templateType !== 'block' && (
             <Checkbox
               label={I18n.t('Global template')}
               checked={globalTemplate}
               onChange={() => setGlobalTemplate(!globalTemplate)}
+              id="edit-template-modal-checkbox-global-template"
             />
           )}
         </Flex>
       </Modal.Body>
       <Modal.Footer>
         <Flex justifyItems="end" gap="small">
-          <Button onClick={onDismiss}>{I18n.t('Cancel')}</Button>
-          <Button color="primary" onClick={handleSave}>
+          <Button data-testid="edit-template-modal-button-cancel" onClick={onDismiss}>
+            {I18n.t('Cancel')}
+          </Button>
+          <Button
+            data-testid="edit-template-modal-button-save"
+            color="primary"
+            onClick={handleSave}
+          >
             {I18n.t('Save')}
           </Button>
         </Flex>
