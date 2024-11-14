@@ -321,8 +321,11 @@ $(() => {
         assignmentRubric={assignmentRubric}
         assignmentRubricAssociation={assignmentRubricAssociation}
         canManageRubrics={ENV.PERMISSIONS.manage_rubrics}
+        canUpdateSelfAssessment={ENV.can_update_rubric_self_assessment}
         contextAssetString={ENV.context_asset_string}
         courseId={ENV.COURSE_ID}
+        rubricSelfAssessmentEnabled={ENV.rubric_self_assessment_enabled}
+        rubricSelfAssessmentFFEnabled={ENV.rubric_self_assessment_ff_enabled}
       />,
       $mountPoint
     )

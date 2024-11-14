@@ -606,4 +606,8 @@ class Rubric < ActiveRecord::Base
   def self.rubric_assessment_import_export_enabled?(context_to_check)
     Account.site_admin.feature_enabled?(:rubric_assessment_imports_exports) && context_to_check.feature_enabled?(:enhanced_rubrics)
   end
+
+  def self.rubric_self_assessment_enabled?(context_to_check)
+    context_to_check.feature_enabled?(:enhanced_rubrics) && context_to_check.feature_enabled?(:platform_service_speedgrader)
+  end
 end

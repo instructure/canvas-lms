@@ -38,6 +38,7 @@ import {addRubricToAssignment, removeRubricFromAssignment, type AssignmentRubric
 import {RubricSearchTray} from './RubricSearchTray'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {CopyEditConfirmModal} from './CopyEditConfirmModal'
+import {RubricSelfAssessmentSettings} from './RubricSelfAssessmentSettings'
 
 const I18n = useI18nScope('enhanced-rubrics-assignment-container')
 
@@ -47,8 +48,11 @@ export type RubricAssignmentContainerProps = {
   assignmentRubric?: AssignmentRubric
   assignmentRubricAssociation?: RubricAssociation
   canManageRubrics: boolean
+  canUpdateSelfAssessment: boolean
   contextAssetString: string
   courseId: string
+  rubricSelfAssessmentEnabled: boolean
+  rubricSelfAssessmentFFEnabled: boolean
 }
 export const RubricAssignmentContainer = ({
   accountMasterScalesEnabled,
@@ -56,8 +60,11 @@ export const RubricAssignmentContainer = ({
   assignmentRubric,
   assignmentRubricAssociation,
   canManageRubrics,
+  canUpdateSelfAssessment,
   contextAssetString,
   courseId,
+  rubricSelfAssessmentEnabled,
+  rubricSelfAssessmentFFEnabled,
 }: RubricAssignmentContainerProps) => {
   const [rubric, setRubric] = useState(assignmentRubric)
   const [rubricAssociation, setRubricAssociation] = useState(assignmentRubricAssociation)
@@ -152,6 +159,16 @@ export const RubricAssignmentContainer = ({
             >
               <IconTrashLine />
             </IconButton>
+            {rubricSelfAssessmentFFEnabled && (
+              <>
+                <View as="hr" />
+                <RubricSelfAssessmentSettings
+                  assignmentId={assignmentId}
+                  canUpdateSelfAssessment={canUpdateSelfAssessment}
+                  rubricSelfAssessmentEnabled={rubricSelfAssessmentEnabled}
+                />
+              </>
+            )}
           </View>
         ) : (
           <View>
