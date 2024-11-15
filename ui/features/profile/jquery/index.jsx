@@ -36,6 +36,7 @@ import 'jqueryui/sortable'
 import '@canvas/rails-flash-notifications'
 import AccessTokenDetails from '../react/AccessTokenDetails'
 import NewAccessToken from '../react/NewAccessToken'
+import RegisterService from '../react/RegisterService'
 
 const I18n = useI18nScope('profile')
 
@@ -44,8 +45,6 @@ const $edit_settings_link = $('.edit_settings_link')
 const $profile_table = $('.profile_table'),
   $update_profile_form = $('#update_profile_form'),
   $default_email_id = $('#default_email_id')
-
-const maximumStringLength = 255
 
 const localizeWorkflowState = function (state) {
   switch (state) {
@@ -163,44 +162,22 @@ $('#default_email_id').change(function () {
 
 $('#unregistered_services li.service').click(function (event) {
   event.preventDefault()
-  $('#' + $(this).attr('id') + '_dialog').dialog({
-    width: 350,
-    open() {
-      $(this).dialog('widget').find('a').focus()
-    },
-  })
-})
-$('.create_user_service_form').formSubmit({
-  object_name: 'user_service',
-  property_validations: {
-    user_name(value) {
-      if (value && value.length > maximumStringLength) {
-        return I18n.t('Exceeded the maximum length (%{number} characters)', {
-          number: maximumStringLength,
-        })
-      }
-    },
-  },
-  beforeSubmit() {
-    $(this).loadingImage()
-  },
-  success() {
-    $(this).loadingImage('remove').parents('.content').dialog('close')
-    document.location.reload()
-  },
-  error() {
-    $(this)
-      .loadingImage('remove')
-      .errorBox(
-        I18n.t(
-          'errors.registration_failed',
-          'Registration failed. Check the user name and password, and try again.'
-        )
-      )
-  },
-})
-$('#unregistered_services li.service .content form .cancel_button').click(function () {
-  $(this).parents('.content').dialog('close')
+
+  const mountPoint = document.getElementById('register_service_mount_point')
+  const root = createRoot(mountPoint)
+  const serviceName = $(this).attr('id').replace('unregistered_service_', '')
+
+  root.render(
+    <RegisterService
+      serviceName={serviceName}
+      onSubmit={() => {
+        root.unmount()
+
+        document.location.reload()
+      }}
+      onClose={() => root.unmount()}
+    />
+  )
 })
 $('#registered_services li.service .delete_service_link').click(function (event) {
   event.preventDefault()

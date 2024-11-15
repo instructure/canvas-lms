@@ -357,93 +357,16 @@ TEXT
     <%= before_label(:other_services, "Click any service below to register") %>
     <% services = @user.user_services.map{|s| s.service} %>
     <ul id="unregistered_services" class="unstyled_list">
-
       <li id="unregistered_service_google_drive" class="service" style="<%= hidden if !feature_and_service_enabled?(:google_drive) || services.include?("google_drive") %>">
         <a href="#" class="btn btn-small"><%= image_tag "google_drive_icon.png", :alt => '' %> <%= t('links.google_drive', "Google Drive") %></a>
-        <div style="display: none; text-align: <%= direction('left') %>;" class="content" title="<%= t('titles.authorize_google_drive', "Authorize Google Drive") %>" id="unregistered_service_google_drive_dialog">
-          <div>
-            <%= image_tag "google_docs.png", :style => "float: #{direction('left')}; padding-#{ direction('right') }: 5px;", :alt => '' %>
-            <div style="font-size: 1.2em; font-weight: bold;"><%= t('headers.google_drive_access', "Google Drive Access") %></div>
-            <%= t(:google_drive_description, <<~TEXT)
-                Once you authorize us to see your Google Drive you'll be able to submit your assignments
-                            directly from Google Drive, and create and share documents with members of your classes.
-                TEXT
-            %>
-            <div class="clear"></div>
-          </div>
-          <div style="text-align: center; margin-top: 10px;">
-            <a class="btn" href="<%= oauth_url(:service => "google_drive", :return_to => settings_profile_url) %>"><%= t('buttons.authorize_google_drive', "Authorize Google Drive Access") %></a>
-          </div>
-        </div>
       </li>
-
       <li id="unregistered_service_skype" class="service" style="<%= hidden if services.include?("skype") || !service_enabled?(:skype) %>">
         <a href="#" class="btn btn-small"><%= image_tag "skype_icon.png", :alt => '' %> <%= t('links.skype', "Skype") %></a>
-        <div style="display: none; text-align: <%= direction('left') %>;" class="content" title="<%= t('titles.register_skype', "Register Skype") %>" id="unregistered_service_skype_dialog">
-          <div>
-            <%= image_tag "skype.png", :style => "float: #{direction('left')}; padding-#{ direction('right') }: 5px;", :alt => '' %>
-            <div style="font-size: 1.2em; font-weight: bold;"><%= t('headers.share_skype_id', "Share your Skype ID") %></div>
-            <%= t(:skype_description, <<~TEXT)
-            Skype offers free online voice and video calls.  Lots of students use
-            Skype as a free, easy way to communicate.  If you register your Skype Name
-            and enable visibility, then other students can easily find your contact
-            and call or add you using Skype.
-            TEXT
-            %>
-            <div class="clear"></div>
-          </div>
-          <div style="text-align: center; font-size: 1.2em; margin-top: 10px;">
-            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"}, :namespace => "skype" do |f| %>
-            <%= f.hidden_field :service, :value => "skype" %>
-            <table class="formtable" role="presentation">
-              <tr>
-                <td><%= f.blabel :user_name, :skype_name, :en => "Skype Name" %></td>
-                <td><%= f.text_field :user_name, :style => "width: 150px;" %></td>
-              </tr><tr>
-                <td colspan="2">
-                  <button type="submit" class="btn btn-primary"><%= t('buttons.save_skype_name', "Save Skype Name") %></button>
-                </td>
-              </tr>
-            </table>
-            <% end %>
-          </div>
-        </div>
       </li>
       <li id="unregistered_service_diigo" class="service" style="<%= hidden if services.include?("diigo") || !feature_and_service_enabled?(:diigo) %>">
         <a href="#" class="btn btn-small"><%= image_tag "diigo_icon.png", :alt => '' %> <%= t('links.diigo', "Diigo") %></a>
-        <div style="display: none; text-align: <%= direction('left') %>;" class="content" title="<%= t('titles.diigo_login', "Diigo Login") %>" id="unregistered_service_diigo_dialog">
-          <div>
-            <%= image_tag "diigo.png", :style => "float: #{direction('left')}; padding-#{ direction('right') }: 5px;", :alt => '' %>
-            <div style="font-size: 1.2em; font-weight: bold;"><%= t('headers.diigo_login', "Diigo Login") %></div>
-            <%= t(:diigo_description, <<~TEXT)
-            Diigo is a social bookmarking tool tailored specifically to research and
-            education.
-            Canvas's rich content editor will let you search your Diigo tags
-            to easily link from within Canvas to other resources you find useful.
-            TEXT
-            %>
-            <div class="clear"></div>
-          </div>
-          <div style="font-size: 1.0em; margin-top: 10px;">
-            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"}, :namespace => "diigo" do |f| %>
-            <%= f.hidden_field :service, :value => "diigo" %>
-            <table role="presentation" class="formtable">
-              <tr>
-                <td><%= f.blabel :user_name, :en => "User Name" %></td>
-                <td><%= f.text_field :user_name, :style => "width: 150px;" %></td>
-              </tr><tr>
-                <td><%= f.blabel :password, :en => "Password" %></td>
-                <td><%= f.password_field :password, :style => "width: 150px;" %></td>
-              </tr><tr>
-                <td colspan="2">
-                  <button type="submit" class="btn btn-primary"><%= t('buttons.save_login', "Save Login") %></button>
-                </td>
-              </tr>
-            </table>
-            <% end %>
-          </div>
-        </div>
       </li>
+      <div id="register_service_mount_point"></div>
     </ul>
     </div>
   </td>

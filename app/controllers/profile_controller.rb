@@ -236,7 +236,8 @@ class ProfileController < ApplicationController
     register_cc_tabs.push("slack") if @user.account.feature_enabled?(:slack_notifications)
     is_default_account = @domain_root_account == Account.default
     is_eligible_for_token_regeneration = @current_user.access_tokens.temp_record.grants_right?(logged_in_user, :update)
-    js_env({ enable_gravatar: @domain_root_account&.enable_gravatar?, register_cc_tabs:, is_default_account:, is_eligible_for_token_regeneration: })
+    google_drive_oauth_url = oauth_url(service: "google_drive", return_to: settings_profile_url)
+    js_env({ enable_gravatar: @domain_root_account&.enable_gravatar?, register_cc_tabs:, is_default_account:, is_eligible_for_token_regeneration:, google_drive_oauth_url: })
     respond_to do |format|
       format.html do
         @user.reload
