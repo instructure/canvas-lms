@@ -10566,6 +10566,7 @@ hu:
   excused_5877183c: Felmentve!
   excused_cf8792eb: Felmentve
   exit_d0c7b013: Kilépés
+  exit_fullscreen_b7eb0aa4: "Lépjen ki a teljes képernyőről"
   expand_2f2fadbd: Kinyit
   expand_all_8329940a: "Minden kinyitása"
   expand_all_bb64d2ea: "Kinyit mindent"
@@ -11184,6 +11185,7 @@ hu:
   full_name_83cf5453: "Teljes név"
   full_name_is_required_8efbdc84: "A teljes név megadása kötelező"
   full_student_names_and_profile_pictures_will_be_hi_ddfba94e: "Teljes: a tanulók nevei és profilképei el lesznek rejtve"
+  fullscreen_873bf53f: "Teljes képernyő"
   fun_quiz_47ab0b0: "Szórakoztató kvíz"
   future_5416ea92: Jövő
   future_jobs_cf2964a1: "Jövőbeli jobok"
