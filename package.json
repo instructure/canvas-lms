@@ -28,7 +28,7 @@
     "@instructure/react-crop": "^5.0.1",
     "@instructure/reactour": "https://github.com/instructure/reactour#b908434fe544703e26bc67c67c4111252c401f92",
     "@instructure/ready": "*",
-    "@instructure/studio-player": "^0.1.2",
+    "@instructure/studio-player": "^0.1.5",
     "@instructure/ui-a11y-content": "8.56.4",
     "@instructure/ui-a11y-utils": "8.56.4",
     "@instructure/ui-alerts": "8.56.4",
