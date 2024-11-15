@@ -30,9 +30,9 @@ describe "profile" do
 
   def add_skype_service
     f("#unregistered_service_skype > a").click
-    skype_dialog = f("#unregistered_service_skype_dialog")
-    skype_dialog.find_element(:id, "skype_user_service_user_name").send_keys("jakesorce")
-    wait_for_new_page_load { submit_dialog(skype_dialog, ".btn") }
+    skype_dialog = f("[role=dialog][aria-label='Register Skype']")
+    skype_dialog.find_element(:name, "username").send_keys("jakesorce")
+    wait_for_new_page_load { submit_form(skype_dialog) }
     expect(f("#registered_services")).to include_text("Skype")
   end
 
@@ -479,11 +479,19 @@ describe "profile" do
       course_with_teacher_logged_in
     end
 
-    it "links back to profile/settings in oauth callbacks" do
-      get "/profile/settings"
-      links = ff("#unregistered_services .service .content a")
-      links.each do |l|
-        expect(l).to have_attribute("href", "profile%2Fsettings")
+    context "google drive" do
+      it "links back to profile/settings in oauth callbacks" do
+        allow(Canvas::Plugin).to receive(:find).and_call_original
+        allow(Canvas::Plugin).to receive(:find).with(:google_drive).and_return(double(enabled?: true))
+        @user.account.enable_service(:google_drive)
+        @user.account.save!
+        get "/profile/settings"
+
+        f("#unregistered_service_google_drive > a").click
+
+        dialog = f("[role=dialog][aria-label='Authorize Google Drive']")
+        link = dialog.find_element(:css, "a[aria-label='Authorize Google Drive Access']")
+        expect(link).to have_attribute("href", "profile%2Fsettings")
       end
     end
   end
