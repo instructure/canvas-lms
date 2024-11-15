@@ -43,7 +43,6 @@ export const DISCUSSION_QUERY = gql`
         anonymousAuthor {
           ...AnonymousUser
         }
-        sortOrder(sort: $sort)
         discussionEntriesConnection(
           after: $page
           first: $perPage
@@ -101,7 +100,6 @@ export const STUDENT_DISCUSSION_QUERY = gql`
         anonymousAuthor {
           ...AnonymousUser
         }
-        sortOrder(sort: $sort)
         discussionEntriesConnection(sortOrder: $sort, userSearchId: $userSearchId) {
           nodes {
             _id

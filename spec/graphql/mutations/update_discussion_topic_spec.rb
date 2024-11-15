@@ -46,7 +46,11 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     set_checkpoints: nil,
     group_category_id: nil,
     ungraded_discussion_overrides: nil,
-    anonymous_state: nil
+    anonymous_state: nil,
+    sort_order: nil,
+    sort_order_locked: nil,
+    expanded: nil,
+    expanded_locked: nil
   )
     <<~GQL
       mutation {
@@ -68,12 +72,20 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
           #{"setCheckpoints: #{set_checkpoints}" unless set_checkpoints.nil?}
           #{"ungradedDiscussionOverrides: #{ungraded_discussion_overrides_str(ungraded_discussion_overrides)}" unless ungraded_discussion_overrides.nil?}
           #{"anonymousState: #{anonymous_state}" unless anonymous_state.nil?}
+          #{"sortOrder: #{sort_order}" unless sort_order.nil?}
+          #{"sortOrderLocked: #{sort_order_locked}" unless sort_order_locked.nil?}
+          #{"expanded: #{expanded}" unless expanded.nil?}
+          #{"expandedLocked: #{expanded_locked}" unless expanded_locked.nil?}
         }) {
           discussionTopic {
             _id
             published
             locked
             replyToEntryRequiredCount
+            expanded
+            expandedLocked
+            sortOrder
+            sortOrderLocked
             ungradedDiscussionOverrides {
               nodes {
                 _id
@@ -1113,5 +1125,23 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       new_override = DiscussionTopic.last.active_assignment_overrides.first
       expect(new_override).to be_nil
     end
+  end
+
+  it "updates the default sort order" do
+    result = run_mutation({ id: @topic.id, sort_order: :asc })
+    expect(result["errors"]).to be_nil
+    expect(result[:data][:updateDiscussionTopic][:discussionTopic][:sortOrder]).to eq("asc")
+    result = run_mutation({ id: @topic.id, sort_order_locked: true })
+    expect(result["errors"]).to be_nil
+    expect(result[:data][:updateDiscussionTopic][:discussionTopic][:sortOrderLocked]).to be true
+  end
+
+  it "updates the default expand fields" do
+    result = run_mutation({ id: @topic.id, expanded: true })
+    expect(result["errors"]).to be_nil
+    expect(@topic.reload.expanded).to be true
+    result = run_mutation({ id: @topic.id, expanded_locked: true })
+    expect(result["errors"]).to be_nil
+    expect(@topic.reload.expanded_locked).to be true
   end
 end
