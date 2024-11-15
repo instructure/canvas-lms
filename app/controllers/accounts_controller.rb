@@ -942,7 +942,7 @@ class AccountsController < ApplicationController
       includes = Array(params[:includes]) || []
       unauthorized = false
 
-      if params[:account].key?(:sis_account_id)
+      if params[:account]&.key?(:sis_account_id)
         sis_id = params[:account].delete(:sis_account_id)
         if @account.root_account.grants_right?(@current_user, session, :manage_sis) && !@account.root_account?
           @account.sis_source_id = sis_id.presence
@@ -956,7 +956,26 @@ class AccountsController < ApplicationController
         end
       end
 
-      if params[:account][:services] && authorized_action(@account, @current_user, :manage_account_settings)
+      if params[:account]&.key?(:parent_account_id)
+        if !@account.root_account? && @account.parent_account&.grants_right?(@current_user, session, :manage_account_settings)
+          new_parent_account = api_find(@account.root_account.all_accounts.active, params[:account][:parent_account_id])
+          if new_parent_account.grants_right?(@current_user, session, :manage_account_settings)
+            @account.parent_account = new_parent_account
+          else
+            @account.errors.add(:unauthorized, t("You are not authorized to manage the destination parent account."))
+            unauthorized = true
+          end
+        else
+          if @account.root_account?
+            @account.errors.add(:unauthorized, t("You cannot move a root account."))
+          else
+            @account.errors.add(:unauthorized, t("You are not authorized to manage the source parent account."))
+          end
+          unauthorized = true
+        end
+      end
+
+      if params[:account]&.key?(:services) && authorized_action(@account, @current_user, :manage_account_settings)
         params[:account][:services].slice(*Account.services_exposed_to_ui_hash(nil, @current_user, @account).keys).each do |key, value|
           @account.set_service_availability(key, value_to_boolean(value))
         end
@@ -1068,6 +1087,13 @@ class AccountsController < ApplicationController
   #   Empty means to inherit the setting from parent account, 0 means to not
   #   use a template even if a parent account has one set. The course must be
   #   marked as a template.
+  #
+  # @argument account[parent_account_id] [Integer|String]
+  #   The ID of a parent account to move the account to. The new parent account
+  #   must be in the same root account as the original. The hierarchy of
+  #   sub-accounts will be preserved in the new parent account. The caller must
+  #   be an administrator in both the original parent account and the new parent
+  #   account.
   #
   # @argument account[settings][restrict_student_past_view][value] [Boolean]
   #   Restrict students from viewing courses after end date
