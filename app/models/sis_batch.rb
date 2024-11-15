@@ -288,8 +288,13 @@ class SisBatch < ActiveRecord::Base
     require "sis"
     download_zip
     diff_result = generate_diff
-    if diff_result == :empty_diff_file
+    case diff_result
+    when :empty_diff_file
       finish(true)
+      return
+    when :too_many_over_threshold_batches
+      SisBatch.add_error(nil, "Too many consecutive batches exceeded the change threshold. A remaster is required.", sis_batch: self, failure: true)
+      finish(false)
       return
     end
 
@@ -321,16 +326,11 @@ class SisBatch < ActiveRecord::Base
     previous_batch ||= account.sis_batches
                               .succeeded.where(diffing_data_set_identifier:).order(:created_at).first
 
-    # avoid unpleasant surprises if, for example, the file size check suddenly passes after failing for years
-    # and we end up diffing against a very old import
-    if previous_batch && account.sis_batches
-                                .where(diffing_data_set_identifier:)
-                                .where("id > ? AND id < ?", previous_batch.id, id)
-                                .count > Setting.get("sis_diffing_max_skip", "5").to_i
-      self.diffing_threshold_exceeded = true
-      SisBatch.add_error(nil, "Diffing not performed because too many batches were skipped. Please do a remaster to re-enable diffing.", sis_batch: self)
-      return
-    end
+    # require a remaster if too many consecutive batches exceeded the threshold
+    return :too_many_over_threshold_batches if previous_batch && account.sis_batches
+                                                                        .where(diffing_data_set_identifier:)
+                                                                        .where("id > ? AND id < ?", previous_batch.id, id)
+                                                                        .count > Setting.get("sis_diffing_max_skip", "5").to_i
 
     previous_zip = previous_batch.try(:download_zip)
     return unless previous_zip
