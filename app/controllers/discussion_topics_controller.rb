@@ -796,7 +796,7 @@ class DiscussionTopicsController < ApplicationController
 
         entry = entry.highest_level_parent_or_self
         sort_order = @topic.participant(current_user: @current_user).sort_order
-        condition = (sort_order == DiscussionTopicParticipant::SortOrder::DESC) ? ">=" : "<="
+        condition = (sort_order == DiscussionTopic::SortOrder::DESC) ? ">=" : "<="
         count_before = @topic.root_discussion_entries
                              .where(parent_id: nil)
                              .where("created_at #{condition}?", entry.created_at).count

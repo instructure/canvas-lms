@@ -65,6 +65,8 @@ module Types
     field :delayed_post_at, Types::DateTimeType, null: true
     field :discussion_type, DiscussionTopicDiscussionType, null: true
     field :edited_at, Types::DateTimeType, null: true
+    field :expanded, Boolean, null: true
+    field :expanded_locked, Boolean, null: true
     field :is_announcement, Boolean, null: false
     field :is_anonymous_author, Boolean, null: true
     field :is_section_specific, Boolean, null: true
@@ -79,6 +81,7 @@ module Types
     field :posted_at, Types::DateTimeType, null: true
     field :require_initial_post, Boolean, null: true
     field :sort_by_rating, Boolean, null: true
+    field :sort_order_locked, Boolean, null: true
     field :title, String, null: true
     field :todo_date, GraphQL::Types::ISO8601DateTime, null: true
     field :visible_to_everyone, Boolean, null: true
@@ -387,7 +390,7 @@ module Types
     def get_entries(search_term: nil, filter: nil, sort_order: nil, root_entries: false, user_search_id: nil, unread_before: nil)
       return [] if object.initial_post_required?(current_user, session) || !available_for_user
 
-      sort_order(sort: sort_order).then do |resolved_sort_order|
+      resolve_sort_order(sort: sort_order).then do |resolved_sort_order|
         Loaders::DiscussionEntryLoader.for(
           current_user:,
           search_term:,
@@ -404,18 +407,24 @@ module Types
       argument :sort, Types::DiscussionSortOrderType, required: false
     end
 
-    def sort_order(sort: nil)
-      return sort.to_sym unless sort.nil?
-
-      participant = object.participant(current_user:)
-      participant&.sort_order&.to_sym || DiscussionTopicParticipant::SortOrder::DESC.to_sym
+    def sort_order
+      object.sort_order.to_sym || DiscussionTopic::SortOrder::DESC.to_sym
     end
 
-    field :expanded, Boolean, null: true
+    field :participant, Types::DiscussionParticipantType, null: true
 
-    def expanded
-      participant = object.participant(current_user:)
-      participant&.expanded || false
+    def participant
+      # TODO, if null, create one
+      object.participant(current_user:) || object.update_or_create_participant(current_user:)
+    end
+
+    private
+
+    def resolve_sort_order(sort: nil)
+      return object.sort_order.to_sym if Account.site_admin.feature_enabled?(:discussion_default_sort) && object.sort_order_locked
+      return sort.to_sym unless sort.nil?
+
+      object.participant(current_user:)&.sort_order&.to_sym || object.sort_order&.to_sym || DiscussionTopic::SortOrder::DESC.to_sym
     end
   end
 end

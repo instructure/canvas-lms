@@ -16,9 +16,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class AddSortOrderToDiscussionTopicParticipants < ActiveRecord::Migration[7.1]
+class AddExpandedSortOrderToDiscussionTopic < ActiveRecord::Migration[7.1]
   tag :predeploy
   def change
-    add_column :discussion_topic_participants, :sort_order, :string, null: false, default: DiscussionTopic::SortOrder::DESC
+    change_table :discussion_topics, bulk: true do |t|
+      t.string :sort_order, null: false, default: DiscussionTopic::SortOrder::DESC
+      t.boolean :sort_order_locked, null: false, default: false
+      t.boolean :expanded, null: false, default: false
+      t.boolean :expanded_locked, null: false, default: false
+    end
   end
 end

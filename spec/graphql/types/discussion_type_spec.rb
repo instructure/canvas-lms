@@ -215,6 +215,11 @@ RSpec.shared_examples "DiscussionType" do
     expect(discussion_type.resolve("lockAt")).to eq discussion.lock_at
     expect(discussion_type.resolve("userCount")).to eq discussion.course.users.count
     expect(discussion_type.resolve("replyToEntryRequiredCount")).to eq discussion.reply_to_entry_required_count
+
+    expect(discussion_type.resolve("sortOrder")).to eq discussion.sort_order
+    expect(discussion_type.resolve("sortOrderLocked")).to eq discussion.sort_order_locked
+    expect(discussion_type.resolve("expanded")).to eq discussion.expanded
+    expect(discussion_type.resolve("expandedLocked")).to eq discussion.expanded_locked
   end
 
   it "orders root_entries by their created_at" do

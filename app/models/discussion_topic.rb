@@ -60,6 +60,12 @@ class DiscussionTopic < ActiveRecord::Base
     TYPES        = DiscussionTypes.constants.map { |c| DiscussionTypes.const_get(c) }
   end
 
+  module SortOrder
+    DESC = "desc"
+    ASC = "asc"
+    TYPES = SortOrder.constants.map { |c| SortOrder.const_get(c) }
+  end
+
   module Errors
     class LockBeforeDueDate < StandardError; end
   end
@@ -765,8 +771,16 @@ class DiscussionTopic < ActiveRecord::Base
           topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
           topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
           topic_participant.subscribed = opts[:subscribed] if opts.key?(:subscribed)
-          topic_participant.sort_order = opts[:sort_order] if opts.key?(:sort_order)
-          topic_participant.expanded = opts[:expanded] if opts.key?(:expanded)
+          topic_participant.sort_order = if context.feature_enabled?(:discussion_default_sort)
+                                           sort_order_locked ? sort_order : opts[:sort_order]
+                                         else
+                                           opts[:sort_order] || sort_order || DiscussionTopic::SortOrder::DESC
+                                         end
+          topic_participant.expanded = if context.feature_enabled?(:discussion_default_expand)
+                                         expanded_locked ? expanded : opts[:expanded]
+                                       else
+                                         opts[:expanded] || expanded || false
+                                       end
           topic_participant.save
         end
       end

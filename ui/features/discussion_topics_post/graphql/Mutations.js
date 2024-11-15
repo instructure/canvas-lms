@@ -273,7 +273,9 @@ export const UPDATE_DISCUSSION_SORT_ORDER = gql`
       discussionTopic {
         _id
         id
-        sortOrder
+        participant {
+          sortOrder
+        }
       }
     }
   }
@@ -285,7 +287,9 @@ export const UPDATE_DISCUSSION_EXPANDED = gql`
       discussionTopic {
         _id
         id
-        expanded
+        participant {
+          expanded
+        }
       }
     }
   }

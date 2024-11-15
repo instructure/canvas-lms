@@ -765,7 +765,7 @@ describe DiscussionTopicsController do
           @topic.discussion_entries.create!(user: @teacher, message: (i + 1).to_s)
         end
         participant = @topic.participant(current_user: @student)
-        participant.sort_order = DiscussionTopicParticipant::SortOrder::ASC
+        participant.sort_order = DiscussionTopic::SortOrder::ASC
         participant.save!
       end
 
@@ -778,7 +778,7 @@ describe DiscussionTopicsController do
 
       it "top level entry are paginated when desc" do
         participant = @topic.participant(current_user: @student)
-        participant.sort_order = DiscussionTopicParticipant::SortOrder::DESC
+        participant.sort_order = DiscussionTopic::SortOrder::DESC
         participant.save!
         get "show", params: { course_id: @course.id, id: @topic.id, entry_id: @topic.discussion_entries.last.id }
         expect(assigns[:js_env][:current_page]).to eq(0)
