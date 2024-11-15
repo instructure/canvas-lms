@@ -1018,6 +1018,7 @@ describe Types::SubmissionType do
   describe "wordCount" do
     it "returns the word count" do
       @submission.update!(body: "word " * 100)
+      run_jobs
       expect(submission_type.resolve("wordCount")).to eq 100
     end
   end

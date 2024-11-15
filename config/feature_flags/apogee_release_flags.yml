@@ -411,3 +411,8 @@ rubric_self_assessment:
       state: allowed
     development:
       state: allowed
+use_body_word_count:
+  state: allowed_on # this is intentional. we want to enable this upon deploy so we start populating word count.
+  applies_to: SiteAdmin
+  display_name: Use body_word_count for displaying submission word count
+  description: For text entry submisisons, the word count is currently calculated on-the-fly which can lead to load time issues. With this flag enabled, the value will be read from the new body_word_count column.
