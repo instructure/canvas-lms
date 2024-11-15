@@ -18,17 +18,34 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class SisPseudonym
-  # type: :exact, :trusted, or :implicit
-  def self.for(user, context, type: :exact, require_sis: true, include_deleted: false, root_account: nil, in_region: false, include_all_pseudonyms: false)
-    raise ArgumentError("type must be :exact, :trusted, or :implicit") unless %i[exact trusted implicit].include?(type)
-    raise ArgumentError("invalid root_account") if root_account && !root_account.root_account?
-    raise ArgumentError("context must respond to .root_account") unless context.nil? || root_account&.root_account? || context.respond_to?(:root_account)
-    raise ArgumentError, "type must be :implicit if context is nil" if context.nil? && type != :implicit
-    raise ArgumentError, "require_sis must be false if context is nil" if context.nil? && require_sis
+  class << self
+    # type: :exact, :trusted, or :implicit
+    def for(user, context, type: :exact, require_sis: true, include_deleted: false, root_account: nil, in_region: false, include_all_pseudonyms: false)
+      raise ArgumentError("type must be :exact, :trusted, or :implicit") unless %i[exact trusted implicit].include?(type)
+      raise ArgumentError("invalid root_account") if root_account && !root_account.root_account?
+      raise ArgumentError("context must respond to .root_account") unless context.nil? || root_account&.root_account? || context.respond_to?(:root_account)
+      raise ArgumentError, "type must be :implicit if context is nil" if context.nil? && type != :implicit
+      raise ArgumentError, "require_sis must be false if context is nil" if context.nil? && require_sis
 
-    sis_pseudonym =
-      new(user, context, type, require_sis, include_deleted, root_account, in_region:, include_all_pseudonyms:)
-    include_all_pseudonyms ? sis_pseudonym.all_pseudonyms : sis_pseudonym.pseudonym
+      sis_pseudonym =
+        new(user, context, type, require_sis, include_deleted, root_account, in_region:, include_all_pseudonyms:)
+      include_all_pseudonyms ? sis_pseudonym.all_pseudonyms : sis_pseudonym.pseudonym
+    end
+
+    def order(relation, table_alias = nil)
+      relation.primary_shard.activate do
+        table_alias ||= Pseudonym.table_name
+        # false sorts before true
+        relation.merge(Pseudonym.order(Arel.sql("#{table_alias}.sis_user_id IS NULL"), Pseudonym.best_unicode_collation_key("#{table_alias}.unique_id"), "#{table_alias}.position"))
+      end
+    end
+
+    def collation_key(pseudonym)
+      [pseudonym.workflow_state,
+       pseudonym.sis_user_id ? 0 : 1,
+       Canvas::ICU.collation_key(pseudonym.unique_id),
+       pseudonym.position]
+    end
   end
 
   attr_reader :user, :context, :type, :require_sis, :include_deleted, :include_all_pseudonyms
@@ -173,16 +190,8 @@ class SisPseudonym
   def pick_pseudonym(account_ids)
     relation = Pseudonym.active.where(user_id: user)
     relation = relation.where(account_id: account_ids) if account_ids
-    relation =
-      if require_sis
-        relation.where.not(sis_user_id: nil)
-      else
-        # false sorts before true
-        relation.order(Arel.sql("sis_user_id IS NULL"))
-      end
-    relation.primary_shard.activate do
-      relation = relation.order(Pseudonym.best_unicode_collation_key(:unique_id), :position)
-    end
+    relation = relation.where.not(sis_user_id: nil) if require_sis
+    relation = self.class.order(relation)
 
     if root_account.nil? && include_all_pseudonyms
       relation.to_a
@@ -209,7 +218,7 @@ class SisPseudonym
       end
     else
       collection.sort_by do |p|
-        [p.workflow_state, p.sis_user_id ? 0 : 1, Canvas::ICU.collation_key(p.unique_id), p.position]
+        self.class.collation_key(p)
       end.detect do |p|
         next if account_ids && !account_ids.include?(p.account_id)
         next true if root_account.nil?
