@@ -72,12 +72,20 @@ export type DaySub = {
   id: number
 }
 
-export type DateShifts = {
-  substitutions: {}
-  old_start_date: string | false
-  new_start_date: string | false
-  old_end_date: string | false
-  new_end_date: string | false
+export type DateShiftsCommon = {
+  old_start_date: string
+  new_start_date: string
+  old_end_date: string
+  new_end_date: string
+}
+
+export type DateShiftsRequestBody = DateShiftsCommon & {
+  remove_dates?: boolean
+  shift_dates?: boolean
+  day_substitutions: Record<string, string>
+}
+
+export type DateShifts = DateShiftsCommon & {
   day_substitutions: DaySub[]
 }
 
@@ -100,22 +108,23 @@ export type submitMigrationFormData = {
   }
 }
 
+export type MigrationCreateRequestBody = {
+  course_id: string
+  migration_type: string
+  date_shift_options: DateShiftsRequestBody
+  selective_import: boolean
+  settings: {[key: string]: any}
+  pre_attachment?: {
+    name: string
+    no_redirect: boolean
+    size: number
+  }
+}
+
 export type onSubmitMigrationFormCallback = (
   formData: submitMigrationFormData,
   preAttachmentFile?: File
 ) => void
-
-export type ContentMigrationResponse = ContentMigrationItem & {
-  pre_attachment?: {
-    file_param: string
-    progress: number | null
-    upload_url: string
-    upload_params: {
-      filename: string
-      content_type: string
-    }
-  }
-}
 
 export type AttachmentProgressResponse = ContentMigrationItem & {
   type: string

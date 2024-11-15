@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {humanReadableSize} from '../utils'
+import {humanReadableSize, parseDateToISOString} from '../utils'
 
 describe('humanReadableSize', () => {
   it('returns Bytes', () => {
@@ -53,5 +53,20 @@ describe('humanReadableSize', () => {
 
   it('returns YB', () => {
     expect(humanReadableSize(1.1 * 1024 ** 8)).toBe('1.1 YB')
+  })
+})
+
+describe('parseDateToISOString', () => {
+  it('returns an empty string for null date', () => {
+    expect(parseDateToISOString(null)).toBe('')
+  })
+
+  it('returns an empty string for invalid date', () => {
+    expect(parseDateToISOString(new Date('invalid date'))).toBe('')
+  })
+
+  it('returns ISO string for valid date', () => {
+    const date = new Date('2023-01-01T00:00:00Z')
+    expect(parseDateToISOString(date)).toBe(date.toISOString())
   })
 })

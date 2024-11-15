@@ -18,6 +18,7 @@
 
 import type {FormMessage} from '@instructure/ui-form-field'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import * as tz from '@instructure/moment-utils'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -38,4 +39,18 @@ export const timeout = (delay: number) => {
 export const noFileSelectedFormMessage: FormMessage = {
   text: I18n.t('You must select a file to import content from'),
   type: 'error',
+}
+
+export const parseDateToISOString = (date: Date | null): string => {
+  if (!date) {
+    return ''
+  }
+
+  const adjustedDate = tz.parse(date)
+
+  if (!adjustedDate) {
+    return ''
+  }
+
+  return adjustedDate.toISOString()
 }

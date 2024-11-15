@@ -27,7 +27,7 @@ import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
 import {Button} from '@instructure/ui-buttons'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {InfoButton} from './info_button'
-import {DateAdjustments, remapSubstitutions} from '../date_adjustments'
+import {DateAdjustments} from '../date_adjustments'
 import type {onSubmitMigrationFormCallback, DateAdjustmentConfig} from '../types'
 
 const I18n = useI18nScope('content_migrations_redesign')
@@ -43,10 +43,10 @@ type CommonMigratorControlsProps = {
   fileUploadProgress: number | null
   isSubmitting: boolean
   setIsQuestionBankDisabled?: (isDisabled: boolean) => void
-  oldStartDate?: string
-  oldEndDate?: string
-  newStartDate?: string
-  newEndDate?: string
+  oldStartDate: string | null
+  oldEndDate: string | null
+  newStartDate: string | null
+  newEndDate: string | null
 }
 
 const generateNewQuizzesLabel = () => (
@@ -125,11 +125,10 @@ export const CommonMigratorControls = ({
       operation: 'shift_dates',
     },
     date_shift_options: {
-      substitutions: {},
-      old_start_date: oldStartDate || false,
-      new_start_date: newStartDate || false,
-      old_end_date: oldEndDate || false,
-      new_end_date: newEndDate || false,
+      old_start_date: oldStartDate || '',
+      new_start_date: newStartDate || '',
+      old_end_date: oldEndDate || '',
+      new_end_date: newEndDate || '',
       day_substitutions: [],
     },
   })
@@ -140,10 +139,10 @@ export const CommonMigratorControls = ({
       ...prevState,
       date_shift_options: {
         ...prevState.date_shift_options,
-        old_start_date: oldStartDate || false,
-        new_start_date: newStartDate || false,
-        old_end_date: oldEndDate || false,
-        new_end_date: newEndDate || false,
+        old_start_date: oldStartDate || '',
+        new_start_date: newStartDate || '',
+        old_end_date: oldEndDate || '',
+        new_end_date: newEndDate || '',
       },
     }))
   }, [oldStartDate, newStartDate, oldEndDate, newEndDate])
@@ -165,7 +164,7 @@ export const CommonMigratorControls = ({
     canImportBPSettings && (data.settings.import_blueprint_settings = importBPSettings)
     if (canAdjustDates && dateAdjustmentConfig) {
       dateAdjustmentConfig.adjust_dates && (data.adjust_dates = dateAdjustmentConfig.adjust_dates)
-      remapSubstitutions(data, dateAdjustmentConfig)
+      data.date_shift_options = dateAdjustmentConfig.date_shift_options
     }
     canImportAsNewQuizzes && (data.settings.import_quizzes_next = importAsNewQuizzes)
     canOverwriteAssessmentContent && (data.settings.overwrite_quizzes = overwriteAssessmentContent)

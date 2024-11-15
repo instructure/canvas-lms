@@ -19,6 +19,7 @@
 import {
   sharedBankTests,
   sharedContentTests,
+  sharedDateParsingTests,
   sharedFormTests,
   sharedMatchingAssessmentCheckboxTests,
 } from './shared_form_cases'
@@ -29,4 +30,5 @@ describe('BlackboardImporter', () => {
   sharedContentTests(BlackboardImporter)
   sharedBankTests(BlackboardImporter)
   sharedMatchingAssessmentCheckboxTests(BlackboardImporter)
+  sharedDateParsingTests(BlackboardImporter)
 })

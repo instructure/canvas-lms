@@ -78,11 +78,10 @@ describe('CommonMigratorControls', () => {
       expect.objectContaining({
         date_shift_options: {
           day_substitutions: [],
-          new_end_date: false,
-          new_start_date: false,
-          old_end_date: false,
-          old_start_date: false,
-          substitutions: {},
+          new_end_date: '',
+          new_start_date: '',
+          old_end_date: '',
+          old_start_date: '',
         },
       })
     )
@@ -130,11 +129,10 @@ describe('CommonMigratorControls', () => {
       selective_import: true,
       date_shift_options: {
         day_substitutions: [],
-        new_end_date: false,
-        new_start_date: false,
-        old_end_date: false,
-        old_start_date: false,
-        substitutions: {},
+        new_end_date: '',
+        new_start_date: '',
+        old_end_date: '',
+        old_start_date: '',
       },
       errored: false,
       settings: {import_quizzes_next: false, overwrite_quizzes: false},
