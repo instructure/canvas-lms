@@ -57,6 +57,8 @@ export type SubAssignmentSubmission = {
   sub_assignment_tag: 'reply_to_topic' | 'reply_to_entry' | null
   score: number
   excused: boolean
+  missing: boolean
+  late: boolean
   late_policy_status: string
   seconds_late: number
   custom_grade_status_id: null | string
