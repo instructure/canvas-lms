@@ -51,7 +51,9 @@ const generateAssignment = (
 const generateSubAssignmentSubmission = (
   sub_assignment_tag: 'reply_to_topic' | 'reply_to_entry' | null,
   user_id: string,
-  grade_matches_current_submission: boolean = true
+  grade_matches_current_submission: boolean = true,
+  missing: boolean = false,
+  late: boolean = false
 ): SubAssignmentSubmission => ({
   sub_assignment_tag,
   score: 0,
@@ -63,6 +65,8 @@ const generateSubAssignmentSubmission = (
   user_id,
   grade_matches_current_submission,
   entered_grade: '1',
+  missing,
+  late,
 })
 
 const getCustomGradeStatus = (id: string, name: string) => ({
@@ -75,13 +79,17 @@ const getDefaultProps = (
   subAssignmentTag: 'reply_to_topic' | 'reply_to_entry' = 'reply_to_topic',
   pointsPossible: number = 3,
   gradingType: string = 'points',
-  grade_matches_current_submission: boolean = true
+  grade_matches_current_submission: boolean = true,
+  missing: boolean = false,
+  late: boolean = false
 ) => ({
   assignment: generateAssignment('1', pointsPossible, gradingType),
   subAssignmentSubmission: generateSubAssignmentSubmission(
     subAssignmentTag,
     '1',
-    grade_matches_current_submission
+    grade_matches_current_submission,
+    missing,
+    late
   ),
   customGradeStatusesEnabled: true,
   customGradeStatuses: [
@@ -285,6 +293,32 @@ describe('SpeedGraderCheckpoint', () => {
       studentId: '1',
       grade: 'complete',
     })
+  })
+
+  it('renders the None status if there is no status', () => {
+    const props = getDefaultProps('reply_to_topic', 3, 'points')
+    const {queryByTestId, getByTestId} = setup(props)
+
+    const statusSelector = getByTestId('reply_to_topic-checkpoint-status-select')
+    expect(statusSelector).toHaveValue('None')
+    expect(queryByTestId('reply_to_topic-checkpoint-time-late-input')).toBeFalsy()
+  })
+
+  it('renders the Missing status if the submission is missing', () => {
+    const props = getDefaultProps('reply_to_topic', 3, 'points', true, true, false)
+    const {getByTestId} = setup(props)
+
+    const statusSelector = getByTestId('reply_to_topic-checkpoint-status-select')
+    expect(statusSelector).toHaveValue('Missing')
+  })
+
+  it('renders the Late status if the submission is late', () => {
+    const props = getDefaultProps('reply_to_topic', 3, 'points', true, false, true)
+    const {queryByTestId, getByTestId} = setup(props)
+
+    const statusSelector = getByTestId('reply_to_topic-checkpoint-status-select')
+    expect(statusSelector).toHaveValue('Late')
+    expect(queryByTestId('reply_to_topic-checkpoint-time-late-input')).toBeTruthy()
   })
 
   describe('UseSameGrade', () => {
