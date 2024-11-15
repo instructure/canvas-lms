@@ -114,7 +114,7 @@ ready(() => {
   }
 
   const aria_label = !media_object.title ? undefined : media_object.title
-  if (window.ENV.FEATURES?.consolidated_media_player) {
+  if (window.ENV.FEATURES?.consolidated_media_player_iframe) {
     ReactDOM.render(
       <StudioMediaPlayer
         media_id={media_id}
