@@ -17,6 +17,7 @@
 
 import $ from 'jquery'
 import React, {lazy, Suspense} from 'react'
+import {createRoot} from 'react-dom/client'
 import ReactDOM from 'react-dom'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import template from '../../jst/WikiPageEdit.handlebars'
@@ -99,7 +100,9 @@ export default class WikiPageEditView extends ValidatedFormView {
     }
 
     const data = this.overrides
-    data.only_visible_to_overrides = ENV.IN_PACED_COURSE ? false : this.overrides.only_visible_to_overrides
+    data.only_visible_to_overrides = ENV.IN_PACED_COURSE
+      ? false
+      : this.overrides.only_visible_to_overrides
 
     $.ajaxJSON(url, 'PUT', JSON.stringify(data), redirect, errorCallBack, {
       contentType: 'application/json',
@@ -244,7 +247,8 @@ export default class WikiPageEditView extends ValidatedFormView {
       container.style.width = '100%'
       container.style.transition = 'width 0.3s ease-in-out'
 
-      ReactDOM.render(
+      const root = createRoot(document.getElementById('block_editor'))
+      root.render(
         <Suspense fallback={<div>{I18n.t('Loading...')}</div>}>
           <BlockEditor
             course_id={ENV.COURSE_ID}
@@ -252,8 +256,7 @@ export default class WikiPageEditView extends ValidatedFormView {
             content={blockEditorData}
             onCancel={this.cancel.bind(this)}
           />
-        </Suspense>,
-        document.getElementById('block_editor')
+        </Suspense>
       )
     } else {
       RichContentEditor.loadNewEditor(this.$wikiPageBody, {

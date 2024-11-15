@@ -38,7 +38,7 @@ import DirectShareUserModal from '@canvas/direct-sharing/react/components/Direct
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import {renderFrontPagePill} from '@canvas/wiki/react/renderFrontPagePill'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
-import doFetchApi from "@canvas/do-fetch-api-effect";
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const I18n = useI18nScope('pages')
 
@@ -200,7 +200,7 @@ export default class WikiPageView extends Backbone.View {
           window.location.href = `${window.location.href.split('?')[0]}/edit?editor=${editor}`
         })
       } else if (window.ENV.text_editor_preference === 'block_editor') {
-        e.preventDefault();
+        e.preventDefault()
         await doFetchApi({
           path: `/courses/${this.course_id}/pages/${this.model.get('url')}/create_block_editor`,
           method: 'PUT',

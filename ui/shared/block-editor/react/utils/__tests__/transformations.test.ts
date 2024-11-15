@@ -16,44 +16,107 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type {BlockTemplate} from '../../types'
 import {
+  transformTemplate,
   transform,
   transform_0_1_to_0_2,
+  transform_0_2_to_0_3,
   LATEST_BLOCK_DATA_VERSION,
   type BlockEditorData,
   type BlockEditorDataTypes,
   type BlockEditorData_0_1,
+  type BlockEditorData_0_2,
 } from '../transformations'
 
+const nodes = '{"ROOT":{"type":{"resolvedName":"PageBlock"}}}'
+
 describe('transformations', () => {
-  it('returns the same data if the version is the latest', () => {
-    const data: BlockEditorData = {
-      version: LATEST_BLOCK_DATA_VERSION,
-      blocks: 'blocks',
+  let nodes2: any, nodes3: any
+  beforeAll(() => {
+    nodes2 = JSON.parse(nodes)
+    nodes2.foo = {
+      type: {
+        resolvedName: 'RCEBlock',
+      },
     }
-    expect(transform(data)).toEqual(data)
+    nodes3 = JSON.parse(JSON.stringify(nodes2))
+    nodes3.foo.type.resolvedName = 'RCETextBlock'
   })
 
-  it('transforms version 0.1 to the latest version', () => {
-    const data: BlockEditorDataTypes = {
-      version: '0.1',
-      blocks: [{data: 'blocks'}],
-    }
-    expect(transform(data)).toEqual({
-      version: LATEST_BLOCK_DATA_VERSION,
-      blocks: 'blocks',
+  describe('transform', () => {
+    it('returns the same data if the version is the latest', () => {
+      const data: BlockEditorData = {
+        version: LATEST_BLOCK_DATA_VERSION,
+        blocks: {},
+      }
+      expect(transform(data)).toEqual(data)
+    })
+
+    it('transforms version 0.1 to the latest version', () => {
+      const data: BlockEditorDataTypes = {
+        version: '0.1',
+        blocks: [{data: nodes}],
+      }
+      expect(transform(data)).toEqual({
+        version: LATEST_BLOCK_DATA_VERSION,
+        blocks: JSON.parse(nodes),
+      })
+    })
+
+    describe('transform 0.1 to 0.2', () => {
+      it('transforms data', () => {
+        const data: BlockEditorData_0_1 = {
+          version: '0.1',
+          blocks: [{data: nodes}],
+        }
+        expect(transform_0_1_to_0_2(data)).toEqual({
+          version: '0.2',
+          blocks: nodes,
+        })
+      })
+    })
+
+    describe('transform 0.2 to 0.3', () => {
+      it('transforms block data', () => {
+        const data: BlockEditorData_0_2 = {
+          version: '0.2',
+          blocks: JSON.stringify(nodes2),
+        }
+
+        const nodes3Transformed = JSON.parse(JSON.stringify(nodes3))
+        nodes3Transformed.foo.type.resolvedName = 'RCETextBlock'
+        expect(transform_0_2_to_0_3(data)).toEqual({
+          version: '0.3',
+          blocks: nodes3Transformed,
+        })
+      })
     })
   })
 
-  describe('transform 0.1 to 0.2', () => {
-    it('transforms data', () => {
-      const data: BlockEditorData_0_1 = {
-        version: '0.1',
-        blocks: [{data: 'blocks'}],
-      }
-      expect(transform_0_1_to_0_2(data)).toEqual({
-        version: '0.2',
-        blocks: 'blocks',
+  describe('transformTemplate', () => {
+    it('does nothing if the version is the latest', () => {
+      const template = {
+        editor_version: LATEST_BLOCK_DATA_VERSION,
+        node_tree: {},
+      } as unknown as BlockTemplate
+      expect(transformTemplate(template)).toEqual(template)
+    })
+
+    it('transforms version 0.2 to the latest version', () => {
+      const template = {
+        editor_version: '0.2',
+        node_tree: {
+          rootNodeId: 'ROOT',
+          nodes: nodes2,
+        },
+      } as unknown as BlockTemplate
+      expect(transformTemplate(template)).toEqual({
+        editor_version: LATEST_BLOCK_DATA_VERSION,
+        node_tree: {
+          rootNodeId: 'ROOT',
+          nodes: nodes3,
+        },
       })
     })
   })

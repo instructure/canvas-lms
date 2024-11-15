@@ -23,7 +23,7 @@ export const closeExpandedBlocks = (query: any) => {
     const node = nodes[k]
     delete node.custom?.isExpanded
   })
-  return JSON.stringify(nodes)
+  return nodes
 }
 
 // NOTE: this is not being used, but it is a good example
