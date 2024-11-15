@@ -29,25 +29,13 @@ import {View} from '@instructure/ui-view'
 import {IconAddLine, IconEndLine} from '@instructure/ui-icons'
 import {IconButton, Button} from '@instructure/ui-buttons'
 import {Responsive} from '@instructure/ui-responsive'
-import type {DateAdjustmentConfig, submitMigrationFormData, DaySub} from './types'
+import type {DateAdjustmentConfig, DaySub} from './types'
 
 const I18n = useI18nScope('content_migrations_redesign')
 let subs_id = 1
 
 const formatDate = (date: Date) => {
   return datetimeString(date, {timezone: ENV.CONTEXT_TIMEZONE})
-}
-
-export const remapSubstitutions = (
-  data: submitMigrationFormData,
-  dateShiftCfg: DateAdjustmentConfig
-) => {
-  const treated_subs: {[key: number]: number} = {}
-  data.date_shift_options = dateShiftCfg.date_shift_options
-  data.date_shift_options.day_substitutions.forEach((ds: DaySub) => {
-    treated_subs[ds.from] = ds.to
-  })
-  data.date_shift_options.substitutions = treated_subs
 }
 
 export const DateAdjustments = ({
@@ -59,28 +47,25 @@ export const DateAdjustments = ({
   setDateAdjustments: (arg0: DateAdjustmentConfig) => void
   disabled?: boolean
 }) => {
+  const old_start_date = dateAdjustmentConfig.date_shift_options.old_start_date
+  const new_start_date = dateAdjustmentConfig.date_shift_options.new_start_date
+  const old_end_date = dateAdjustmentConfig.date_shift_options.old_end_date
+  const new_end_date = dateAdjustmentConfig.date_shift_options.new_end_date
+
   const [dateOperation, setDateOperation] = useState<'shift_dates' | 'remove_dates'>('shift_dates')
-  const [start_from_date, setOldStartDate] = useState(
-    dateAdjustmentConfig.date_shift_options.old_start_date || ''
-  )
-  const [start_to_date, setStartToDate] = useState(
-    dateAdjustmentConfig.date_shift_options.new_start_date || ''
-  )
-  const [end_from_date, setEndFromDate] = useState(
-    dateAdjustmentConfig.date_shift_options.old_end_date || ''
-  )
-  const [end_to_date, setEndToDate] = useState(
-    dateAdjustmentConfig.date_shift_options.new_end_date || ''
-  )
+  const [start_from_date, setOldStartDate] = useState<string>(old_start_date || '')
+  const [start_to_date, setStartToDate] = useState<string>(new_start_date || '')
+  const [end_from_date, setEndFromDate] = useState<string>(old_end_date || '')
+  const [end_to_date, setEndToDate] = useState<string>(new_end_date || '')
 
   useEffect(() => {
     if (dateAdjustmentConfig) {
-      setOldStartDate(dateAdjustmentConfig.date_shift_options.old_start_date || '')
-      setStartToDate(dateAdjustmentConfig.date_shift_options.new_start_date || '')
-      setEndFromDate(dateAdjustmentConfig.date_shift_options.old_end_date || '')
-      setEndToDate(dateAdjustmentConfig.date_shift_options.new_end_date || '')
+      setOldStartDate(old_start_date || '')
+      setStartToDate(new_start_date || '')
+      setEndFromDate(old_end_date || '')
+      setEndToDate(new_end_date || '')
     }
-  }, [dateAdjustmentConfig])
+  }, [dateAdjustmentConfig, new_end_date, new_start_date, old_end_date, old_start_date])
 
   const handleSetDate = (date: Date | null, setter: any, key: string) => {
     const tmp = JSON.parse(JSON.stringify(dateAdjustmentConfig))

@@ -17,10 +17,16 @@
  */
 
 import AngelImporter from '../angel_importer'
-import {sharedBankTests, sharedContentTests, sharedFormTests} from './shared_form_cases'
+import {
+  sharedBankTests,
+  sharedContentTests,
+  sharedDateParsingTests,
+  sharedFormTests,
+} from './shared_form_cases'
 
 describe('AngelImporter', () => {
   sharedFormTests(AngelImporter)
   sharedContentTests(AngelImporter)
   sharedBankTests(AngelImporter)
+  sharedDateParsingTests(AngelImporter)
 })

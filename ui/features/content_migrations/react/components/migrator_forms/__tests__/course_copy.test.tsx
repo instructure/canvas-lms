@@ -21,6 +21,7 @@ import {render, screen, waitFor} from '@testing-library/react'
 import CourseCopyImporter, {parseDate} from '../course_copy'
 import userEvent from '@testing-library/user-event'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {sharedDateParsingTests} from './shared_form_cases'
 
 jest.mock('@canvas/do-fetch-api-effect')
 
@@ -45,6 +46,8 @@ describe('CourseCopyImporter', () => {
             label: 'Mathmatics',
             term: 'Default term',
             blueprint: true,
+            end_at: '16 Oct 2024 at 0:00',
+            start_at: '14 Oct 2024 at 0:00',
           },
           {
             id: '1',
@@ -169,27 +172,32 @@ describe('CourseCopyImporter', () => {
       expect(getByRole('button', {name: 'Add substitution'})).toBeDisabled()
     })
   })
-})
 
-describe('parseDate', () => {
-  it('parses a valid date string correctly', () => {
-    const dateString = '01 Jan 2023 at 12:00'
-    const expectedDate = '2023-01-01T12:00:00.000Z'
-    expect(parseDate(dateString)).toBe(expectedDate)
-  })
+  sharedDateParsingTests(CourseCopyImporter)
 
-  it('not converts empty string', () => {
-    const dateString = ''
-    expect(parseDate(dateString)).toBe('')
-  })
+  describe('source course adjust date field prefills', () => {
+    const expectDateField = (label: string, value: string) => {
+      expect(screen.getByLabelText(label).closest('input')?.value).toBe(value)
+    }
 
-  it('not converts undefined', () => {
-    const dateString = undefined
-    expect(parseDate(dateString)).toBeUndefined()
-  })
+    it('parse the date from found course start date', async () => {
+      const {getByRole} = renderComponent()
 
-  it('converts wrong string to null', () => {
-    const dateString = 'oops'
-    expect(parseDate(dateString)).toBeNull()
+      await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
+      await userEvent.click(await screen.findByText('Mathmatics'))
+      await userEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
+
+      expectDateField('Select original beginning date', 'Oct 14 at 8pm')
+    })
+
+    it('parse the date from found course end date', async () => {
+      const {getByRole} = renderComponent()
+
+      await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
+      await userEvent.click(await screen.findByText('Mathmatics'))
+      await userEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
+
+      expectDateField('Select original end date', 'Oct 16 at 8pm')
+    })
   })
 })

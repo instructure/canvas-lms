@@ -28,11 +28,10 @@ const dateAdjustments: DateAdjustmentConfig = {
     operation: 'shift_dates',
   },
   date_shift_options: {
-    substitutions: {},
-    old_start_date: false,
-    new_start_date: false,
-    old_end_date: false,
-    new_end_date: false,
+    old_start_date: '',
+    new_start_date: '',
+    old_end_date: '',
+    new_end_date: '',
     day_substitutions: [],
   },
 }
@@ -43,11 +42,10 @@ const dateAdjustmentsWithSub: DateAdjustmentConfig = {
     operation: 'shift_dates',
   },
   date_shift_options: {
-    substitutions: {},
-    old_start_date: false,
-    new_start_date: false,
-    old_end_date: false,
-    new_end_date: false,
+    old_start_date: '',
+    new_start_date: '',
+    old_end_date: '',
+    new_end_date: '',
     day_substitutions: [{from: 0, id: 1, to: 0}],
   },
 }
@@ -80,7 +78,7 @@ describe('DateAdjustment', () => {
   })
 
   describe('Date fill in on initial data', () => {
-    const dateSting = '2024-08-08T08:00:00+00:00'
+    const dateObject = new Date('2024-08-08T08:00:00+00:00')
     const expectedDate = 'Aug 8 at 8am'
     const getComponent = (dateShiftOptionVariant: Partial<DateShifts>) => {
       return (
@@ -102,22 +100,22 @@ describe('DateAdjustment', () => {
     }
 
     it('Fill in original beginning date with old_start_date', () => {
-      render(getComponent({old_start_date: dateSting}))
+      render(getComponent({old_start_date: dateObject}))
       expectDateField('Select original beginning date', expectedDate)
     })
 
     it('Fill in original end date with old_end_date', () => {
-      render(getComponent({old_end_date: dateSting}))
+      render(getComponent({old_end_date: dateObject}))
       expectDateField('Select original end date', expectedDate)
     })
 
     it('Fill in new beginning date with new_start_date', () => {
-      render(getComponent({new_start_date: dateSting}))
+      render(getComponent({new_start_date: dateObject}))
       expectDateField('Select new beginning date', expectedDate)
     })
 
     it('Fill in new end date with new_end_date', () => {
-      render(getComponent({new_end_date: dateSting}))
+      render(getComponent({new_end_date: dateObject}))
       expectDateField('Select new end date', expectedDate)
     })
   })

@@ -17,7 +17,7 @@
  */
 
 import CanvasCartridgeImporter from '../canvas_cartridge'
-import {sharedContentTests, sharedFormTests} from './shared_form_cases'
+import {sharedContentTests, sharedDateParsingTests, sharedFormTests} from './shared_form_cases'
 
 describe('CanvasCartridgeImporter', () => {
   beforeAll(() => (window.ENV.UPLOAD_LIMIT = 1024))
@@ -26,4 +26,5 @@ describe('CanvasCartridgeImporter', () => {
 
   sharedFormTests(CanvasCartridgeImporter)
   sharedContentTests(CanvasCartridgeImporter)
+  sharedDateParsingTests(CanvasCartridgeImporter)
 })
