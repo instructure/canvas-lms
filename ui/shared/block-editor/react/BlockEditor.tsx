@@ -79,21 +79,6 @@ class CustomEventHandlers extends DefaultEventHandlers {
   }
 }
 
-const DEFAULT_CONTENT = JSON.stringify({
-  ROOT: {
-    type: {
-      resolvedName: 'PageBlock',
-    },
-    isCanvas: true,
-    props: {},
-    displayName: 'Page',
-    custom: {},
-    hidden: false,
-    nodes: [],
-    linkedNodes: {},
-  },
-})
-
 export type BlockEditorProps = {
   enabled?: boolean
   enableResizer?: boolean
@@ -110,10 +95,7 @@ export default function BlockEditor({
   content,
 }: BlockEditorProps) {
   const [data] = useState<BlockEditorData>(() => {
-    if (content?.blocks) {
-      return transform(content)
-    }
-    return {version: '0.2', blocks: DEFAULT_CONTENT} as BlockEditorData
+    return transform(content)
   })
   const [toolboxOpen, setToolboxOpen] = useState(false)
   const [templateEditor, setTemplateEditor] = useState<TemplateEditor>(TemplateEditor.UNKNOWN)
@@ -126,7 +108,7 @@ export default function BlockEditor({
   // currently imported from the assets folder (though this will eventually be replaced with an API call)
   const getBlockTemplates = useCallback(
     (editor: TemplateEditor) => {
-      getTemplates({course_id, drafts: editor > 0})
+      getTemplates({course_id, drafts: editor > 0, globals_only: false})
         .then(setBlockTemplates)
         .catch((err: Error) => {
           showFlashError(I18n.t('Cannot get block custom templates'))(err)
@@ -168,7 +150,6 @@ export default function BlockEditor({
         ? `/api/v1/courses/${course_id}/block_editor_templates/${template.id}`
         : `/api/v1/courses/${course_id}/block_editor_templates`
       const method = template.id ? 'PUT' : 'POST'
-      template.editor_version = LATEST_BLOCK_DATA_VERSION
       doFetchApi<BlockTemplate>({
         path,
         method,
@@ -217,6 +198,7 @@ export default function BlockEditor({
       const template = saveTemplateEvent.detail.template
       const globalTemplate = saveTemplateEvent.detail.globalTemplate
       template.node_tree.nodes[template.node_tree.rootNodeId].custom.displayName = template.name
+      template.editor_version = LATEST_BLOCK_DATA_VERSION
 
       if (globalTemplate) {
         template.global_id = template.id = uuid.v4()
@@ -271,7 +253,7 @@ export default function BlockEditor({
         query,
         getBlocks: (): BlockEditorData => ({
           id: data.id || '',
-          version: '0.2',
+          version: LATEST_BLOCK_DATA_VERSION,
           blocks: closeExpandedBlocks(query),
         }),
       })

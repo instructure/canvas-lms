@@ -2,6 +2,7 @@
   "name": "Hero Section with Navigation",
   "description": "Full-width hero section with image, text, navigation, and divider",
   "workflow_state": "active",
+  "editor_version": "0.3",
   "node_tree": {
     "rootNodeId": "mS6aCZz96y",
     "nodes": {

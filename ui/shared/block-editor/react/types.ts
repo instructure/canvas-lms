@@ -36,9 +36,11 @@ export enum TemplateEditor {
   GLOBAL = 2,
 }
 
+export type NodeTreeNodes = Record<string, SerializedNode>
+
 export type TemplateNodeTree = {
   rootNodeId: string
-  nodes: Record<string, SerializedNode>
+  nodes: NodeTreeNodes
 }
 
 export type TemplateCategory = 'global' | 'local'

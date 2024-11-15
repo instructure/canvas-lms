@@ -2,6 +2,7 @@
   "name": "Course Home - Blue",
   "description": "Home page with images, navigation, callout cards, knowledge check, and footer",
   "workflow_state": "active",
+  "editor_version": "0.3",
   "node_tree": {
     "rootNodeId": "ROOT",
     "nodes": {

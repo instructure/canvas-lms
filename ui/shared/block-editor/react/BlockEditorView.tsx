@@ -38,10 +38,7 @@ type BlockEditorViewProps = {
 
 const BlockEditorView = ({content, onRendered}: BlockEditorViewProps) => {
   const [data] = useState<BlockEditorData>(() => {
-    if (content?.blocks) {
-      return transform(content)
-    }
-    return {version: '0.2', blocks: undefined} as BlockEditorData
+    return transform(content)
   })
 
   // onNodesChanged gets called once when first rendering the blocks
