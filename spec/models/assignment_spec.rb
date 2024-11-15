@@ -2327,7 +2327,7 @@ describe Assignment do
 
       @assignment.unpublish
       expect(@assignment).not_to be_valid
-      expect(@assignment.errors["workflow_state"]).to eq ["Can't unpublish if there are student submissions"]
+      expect(@assignment.errors["workflow_state"]).to include("Can't unpublish if there are student submissions")
     end
 
     it "does allow itself to be unpublished if it has nil submissions" do
@@ -2335,6 +2335,63 @@ describe Assignment do
       expect(@assignment).to be_can_unpublish
       @assignment.unpublish
       expect(@assignment.workflow_state).to eq "unpublished"
+    end
+  end
+
+  describe "#has_student_submissions_for_sub_assignments?" do
+    context "checkpointed assignment" do
+      before do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course, reply_to_entry_required_count: 2)
+      end
+
+      it "return true if there are student sub_assignment submissions" do
+        @reply_to_topic.submit_homework @student, body: "reply to topic submission for #{@student.name}"
+        expect(@assignment.has_student_submissions_for_sub_assignments?).to be true
+      end
+
+      it "does not allow assignment to be unpublished if there are student sub_assignment submissions" do
+        @reply_to_entry.submit_homework @student, body: "reply to entry submission for #{@student.name}"
+        expect(@assignment).not_to be_can_unpublish
+
+        @assignment.unpublish
+        expect(@assignment).not_to be_valid
+        expect(@assignment.errors["workflow_state"]).to eq ["Can't unpublish if there are student submissions for the assignment or its sub_assignments"]
+      end
+    end
+  end
+
+  describe "#can_unpublish?" do
+    context "checkpointed assignment" do
+      before do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @reply_to_topic, = graded_discussion_topic_with_checkpoints(context: @course)
+      end
+
+      it "return false if there are student sub_assignment submissions" do
+        @reply_to_topic.submit_homework @student, body: "reply to entry submission for #{@student.name}"
+        expect(@assignment.can_unpublish?).to be false
+      end
+    end
+  end
+
+  describe "#assignment_ids_with_sub_assignment_submissions" do
+    context "checkpointed assignment" do
+      before do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @reply_to_topic, = graded_discussion_topic_with_checkpoints(context: @course)
+        @other_assignment = @course.assignments.create(title: "other assignment", points_possible: 10)
+      end
+
+      it "returns assignment ids that have sub_assignment submissions" do
+        @reply_to_topic.submit_homework @student, body: "reply to entry submission for #{@student.name}"
+        expect(Assignment.assignment_ids_with_sub_assignment_submissions([@assignment.id, @other_assignment.id])).to match_array [@assignment.id]
+      end
+
+      it "does not return assignment ids that do not have sub_assignment submissions" do
+        @other_assignment.submit_homework @student, body: "assignment submission for #{@student.name}"
+        expect(Assignment.assignment_ids_with_sub_assignment_submissions([@assignment.id, @other_assignment.id])).to eq []
+      end
     end
   end
 

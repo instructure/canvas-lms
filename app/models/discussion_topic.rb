@@ -1079,7 +1079,7 @@ class DiscussionTopic < ActiveRecord::Base
     return @can_unpublish unless @can_unpublish.nil?
 
     @can_unpublish = if assignment
-                       !assignment.has_student_submissions?
+                       !assignment.has_student_submissions? && !assignment.has_student_submissions_for_sub_assignments?
                      else
                        student_ids = opts[:student_ids] || context.all_real_student_enrollments.select(:user_id)
                        if for_group_discussion?
@@ -1100,7 +1100,8 @@ class DiscussionTopic < ActiveRecord::Base
   def self.preload_can_unpublish(context, topics, assmnt_ids_with_subs = nil)
     return unless topics.any?
 
-    assmnt_ids_with_subs ||= Assignment.assignment_ids_with_submissions(topics.filter_map(&:assignment_id))
+    assignment_ids = topics.filter_map(&:assignment_id)
+    assmnt_ids_with_subs ||= (Assignment.assignment_ids_with_submissions(assignment_ids) + Assignment.assignment_ids_with_sub_assignment_submissions(assignment_ids)).uniq
 
     student_ids = context.all_real_student_enrollments.select(:user_id)
     topic_ids_with_entries = DiscussionEntry.active.where(discussion_topic_id: topics)
