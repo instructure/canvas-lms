@@ -2378,10 +2378,10 @@
   dependencies:
     prop-types "^15.8.1"
 
-"@instructure/studio-player@^0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@instructure/studio-player/-/studio-player-0.1.2.tgz#382dfa8f06b9b745e0ae01596446c2e2fc0ecf04"
-  integrity sha512-hwmDk/MgZ2XIgNftIpD5g3ftALmc2C7c4HB1pYCvwdsbHyJKXYwSWi/cqsGy0hb8xrnAkQAhuu25hyUhkppSDQ==
+"@instructure/studio-player@^0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@instructure/studio-player/-/studio-player-0.1.5.tgz#c8fa8e6355508bb024db772faf2a905fd895fc7a"
+  integrity sha512-HSyDI5z/7vlxxg5LttWWuiDmd8AaLYHq0jzvM6f+3ih8Fq3EtDXaNgxQWpYh8Ok5G1Prnmw21HYKn2jaCwmn/Q==
   dependencies:
     "@floating-ui/react" "^0.26.24"
     "@vidstack/react" "^1.12.11"
