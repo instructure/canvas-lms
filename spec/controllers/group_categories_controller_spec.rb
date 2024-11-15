@@ -680,6 +680,18 @@ describe GroupCategoriesController do
       expect(json.pluck("name")).to include("Collaborative Groups")
     end
 
+    it "returns an empty array when no data exists" do
+      course_with_teacher(active_all: true)
+
+      user_session(@teacher)
+
+      get "index", params: { course_id: @course.id }, format: :json
+      json = response.parsed_body
+
+      expect(response).to be_successful
+      expect(json.count).to eq 0
+    end
+
     it "returns unauthorized when user has no permissions" do
       user_session(@student)
 
