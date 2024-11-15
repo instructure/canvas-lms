@@ -121,6 +121,21 @@ describe "discussions index" do
       expect(discussion.published?).to be false
     end
 
+    context "discussion with checkpoints" do
+      before :once do
+        Account.site_admin.enable_feature! :discussion_checkpoints
+        @reply_to_topic, _, @topic = graded_discussion_topic_with_checkpoints(context: @course, title: "foo")
+      end
+
+      it "disables unpublish button if there are incomplete sub_assignment submissions" do
+        @reply_to_topic.submit_homework @student, body: "reply to topic submission for #{@student.name}"
+        expect(@topic.assignment.has_student_submissions_for_sub_assignments?).to be true
+        expect(@topic.assignment.has_student_submissions?).to be false
+        login_and_visit_course(@teacher, @course)
+        expect(DiscussionsIndex.publish_button("foo").find_element(:tag_name, "button")).to be_disabled
+      end
+    end
+
     it "clicking the subscribe button changes the subscribed status", priority: "1" do
       login_and_visit_course(@teacher, @course)
       expect(@discussion1.subscribed?(@teacher)).to be true
