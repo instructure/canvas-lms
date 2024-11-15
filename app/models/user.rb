@@ -1163,10 +1163,14 @@ class User < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    remove_from_root_account(:all)
-    self.workflow_state = "deleted"
-    self.deleted_at = Time.now.utc
-    if save
+    was_saved = User.transaction do
+      remove_from_root_account(:all)
+      self.workflow_state = "deleted"
+      self.deleted_at = Time.now.utc
+      save
+    end
+
+    if was_saved
       eportfolios.active.in_batches.destroy_all
       gradebook_filters.in_batches.destroy_all
       true
