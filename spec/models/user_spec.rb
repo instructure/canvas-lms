@@ -98,6 +98,44 @@ describe User do
     end
   end
 
+  describe "#fake_student?" do
+    subject(:is_fake_student) { user.fake_student? }
+
+    context "when the user has fake student preference and enrollment" do
+      let(:course) { course_model }
+      let(:user) { course.student_view_student }
+
+      it { is_expected.to be true }
+    end
+
+    context "when the user has fake student preference" do
+      let(:user) { user_model(preferences: { fake_student: true }) }
+
+      it { is_expected.to be false }
+    end
+
+    context "when the user has a blank `fake_student` preference key" do
+      let(:user) { user_model(preferences: { fake_student: "" }) }
+
+      it { is_expected.to be false }
+    end
+
+    context "when the user has fake student enrollment" do
+      let(:course) { course_model }
+      let(:user) { course.student_view_student }
+
+      before { user.update!(preferences: {}) }
+
+      it { is_expected.to be false }
+    end
+
+    context "when the user has neither fake student preference nor enrollment" do
+      let(:user) { user_model }
+
+      it { is_expected.to be false }
+    end
+  end
+
   describe "#speed_grader_settings" do
     it "stores the user's speed grader settings" do
       user = user_model

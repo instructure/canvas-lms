@@ -3120,7 +3120,7 @@ class User < ActiveRecord::Base
   end
 
   def fake_student?
-    preferences[:fake_student] && !!enrollments.where(type: "StudentViewEnrollment").first
+    !!preferences[:fake_student] && enrollments.where(type: "StudentViewEnrollment").exists?
   end
 
   def private?
