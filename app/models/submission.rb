@@ -437,6 +437,8 @@ class Submission < ActiveRecord::Base
   before_save :set_root_account_id
   before_save :reset_redo_request
   before_save :remove_sticker, if: :will_save_change_to_attempt?
+  before_save :clear_body_word_count, if: -> { body.nil? }
+  after_save :update_body_word_count_later, if: -> { saved_change_to_body? && get_word_count_from_body? }
   after_save :touch_user
   after_save :clear_user_submissions_cache
   after_save :touch_graders
@@ -3122,18 +3124,18 @@ class Submission < ActiveRecord::Base
   end
 
   def word_count
-    if body && submission_type != "online_quiz"
-      segments = body.split(%r{<br\s*/?>})
-      word_count = 0
-      segments.each do |segment|
-        tinymce_wordcount_count_regex = /(?:[\w\u2019\x27\-\u00C0-\u1FFF]+|(?<=<br>)([^<]+)|([^<]+)(?=<br>))/
-        words = ActionController::Base.helpers.strip_tags(segment).scan(tinymce_wordcount_count_regex).size
-        word_count += words
-      end
-
-      word_count
+    if get_word_count_from_body?
+      read_or_calc_body_word_count
     elsif versioned_attachments.present?
       Attachment.where(id: versioned_attachments.pluck(:id)).sum(:word_count)
+    end
+  end
+
+  def read_or_calc_body_word_count
+    if body_word_count.present? && Account.site_admin.feature_enabled?(:use_body_word_count)
+      body_word_count
+    else
+      calc_body_word_count
     end
   end
 
@@ -3169,6 +3171,43 @@ class Submission < ActiveRecord::Base
     tracked_attributes = Checkpoints::SubmissionAggregatorService::AggregateSubmission.members.map(&:to_s) - ["updated_at"]
     relevant_changes = tracked_attributes & saved_changes.keys
     relevant_changes.any?
+  end
+
+  def clear_body_word_count
+    self.body_word_count = nil
+  end
+
+  def get_word_count_from_body?
+    !body.nil? && submission_type != "online_quiz"
+  end
+
+  # For large body text, this can be SLOW. Call this method in a delayed job.
+  def calc_body_word_count
+    return 0 if body.nil?
+
+    tinymce_wordcount_count_regex = /(?:[\w\u2019\x27\-\u00C0-\u1FFF]+|(?<=<br>)([^<]+)|([^<]+)(?=<br>))/
+    segments = body.split(%r{<br\s*/?>})
+    segments.sum do |segment|
+      ActionController::Base.helpers.strip_tags(segment).scan(tinymce_wordcount_count_regex).size
+    end
+  end
+
+  def update_body_word_count_later
+    return unless Account.site_admin.feature_enabled?(:use_body_word_count)
+
+    delay(
+      n_strand: ["Submission#update_body_word_count", global_root_account_id],
+      singleton: "update_body_word_count#{global_id}",
+      on_permanent_failure: :set_body_word_count_to_zero
+    ).update_body_word_count
+  end
+
+  def set_body_word_count_to_zero(_error)
+    update(body_word_count: 0)
+  end
+
+  def update_body_word_count
+    update(body_word_count: calc_body_word_count)
   end
 
   def remove_sticker
