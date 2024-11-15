@@ -1580,7 +1580,7 @@ modules.initModuleManagement = async function (duplicate) {
             refreshDuplicateLinkStatus($currentModule)
           })
           $.flashMessage(
-            I18n.t('Module item %{module_item_name} was successfully deleted.', {
+            I18n.t('Module item %{module_item_name} was successfully removed.', {
               module_item_name: data.content_tag.title,
             })
           )
