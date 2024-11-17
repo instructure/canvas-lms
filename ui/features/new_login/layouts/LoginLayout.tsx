@@ -17,55 +17,52 @@
  */
 
 import React from 'react'
-import {AppNavBar, ContentLayout, Footer, Header} from '../shared'
+import {
+  AppNavBar,
+  ContentLayout,
+  FooterLinks,
+  GlobalStyle,
+  InstructureLogo,
+  LoginLogo,
+} from '../shared'
 import {Flex} from '@instructure/ui-flex'
 import {Outlet, ScrollRestoration} from 'react-router-dom'
 import {View} from '@instructure/ui-view'
-import {css, Global} from '@instructure/emotion'
-
-// https://emotion.sh/docs/@emotion/css#global-styles
-export function GlobalStyle() {
-  return (
-    <Global
-      styles={css`
-        html,
-        body {
-          overflow-x: hidden;
-        }
-        html {
-          height: 100%;
-        }
-        body {
-          min-height: 100%;
-          margin: 0;
-        }
-      `}
-    />
-  )
-}
+import {useNewLogin} from '../context/NewLoginContext'
 
 export const LoginLayout = () => {
+  const {loginLogoUrl} = useNewLogin()
+
   return (
     <>
       <GlobalStyle />
       <ScrollRestoration />
 
-      <View as="div" height="100vh">
+      <View as="div" background="primary" height="100vh">
         <Flex direction="column" height="100%">
-          <Flex.Item as="header" width="100vw">
+          <Flex.Item as="header" width="100%">
             <AppNavBar />
           </Flex.Item>
 
           <Flex.Item shouldGrow={true}>
             <ContentLayout>
               <Flex direction="column" gap="large">
-                <Header />
+                {loginLogoUrl && (
+                  <View as="header">
+                    <LoginLogo />
+                  </View>
+                )}
 
-                <View as="main" minHeight="300px">
+                <View as="main" minHeight="18.75rem">
                   <Outlet />
                 </View>
 
-                <Footer />
+                <View as="footer">
+                  <Flex direction="column" gap="large">
+                    <FooterLinks />
+                    <InstructureLogo />
+                  </Flex>
+                </View>
               </Flex>
             </ContentLayout>
           </Flex.Item>

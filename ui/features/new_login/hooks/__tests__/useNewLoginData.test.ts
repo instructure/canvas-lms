@@ -24,7 +24,7 @@ const createMockContainer = (
   authProviders: string | null,
   loginHandleName: string | null,
   loginLogoUrl: string | null,
-  loginLogoAlt: string | null,
+  loginLogoText: string | null,
   bodyBgColor: string | null,
   bodyBgImage: string | null,
   isPreviewMode: string | null
@@ -43,8 +43,8 @@ const createMockContainer = (
   if (loginLogoUrl !== null) {
     container.setAttribute('data-login-logo-url', loginLogoUrl)
   }
-  if (loginLogoAlt !== null) {
-    container.setAttribute('data-login-logo-alt', loginLogoAlt)
+  if (loginLogoText !== null) {
+    container.setAttribute('data-login-logo-text', loginLogoText)
   }
   if (bodyBgColor !== null) {
     container.setAttribute('data-body-bg-color', bodyBgColor)
@@ -77,7 +77,7 @@ describe('useNewLoginData', () => {
     expect(result.current.authProviders).toBeUndefined()
     expect(result.current.loginHandleName).toBeUndefined()
     expect(result.current.loginLogoUrl).toBeUndefined()
-    expect(result.current.loginLogoAlt).toBeUndefined()
+    expect(result.current.loginLogoText).toBeUndefined()
     expect(result.current.bodyBgColor).toBeUndefined()
     expect(result.current.bodyBgImage).toBeUndefined()
     expect(result.current.isPreviewMode).toBeUndefined()
@@ -99,7 +99,7 @@ describe('useNewLoginData', () => {
     expect(result.current.authProviders).toEqual([{id: '1', name: 'Google', auth_type: 'google'}])
     expect(result.current.loginHandleName).toBe('Username')
     expect(result.current.loginLogoUrl).toBe('https://example.com/logo.png')
-    expect(result.current.loginLogoAlt).toBe('Custom Alt Text')
+    expect(result.current.loginLogoText).toBe('Custom Alt Text')
     expect(result.current.bodyBgColor).toBe('#ffffff')
     expect(result.current.bodyBgImage).toBe('https://example.com/bg.png')
     expect(result.current.isPreviewMode).toBe(true)
@@ -112,7 +112,7 @@ describe('useNewLoginData', () => {
     expect(result.current.authProviders).toBeUndefined()
     expect(result.current.loginHandleName).toBeUndefined()
     expect(result.current.loginLogoUrl).toBeUndefined()
-    expect(result.current.loginLogoAlt).toBeUndefined()
+    expect(result.current.loginLogoText).toBeUndefined()
     expect(result.current.bodyBgColor).toBeUndefined()
     expect(result.current.bodyBgImage).toBeUndefined()
     expect(result.current.isPreviewMode).toBeUndefined()
@@ -125,7 +125,7 @@ describe('useNewLoginData', () => {
     expect(result.current.authProviders).toBeUndefined()
     expect(result.current.loginHandleName).toBeUndefined()
     expect(result.current.loginLogoUrl).toBeUndefined()
-    expect(result.current.loginLogoAlt).toBeUndefined()
+    expect(result.current.loginLogoText).toBeUndefined()
     expect(result.current.bodyBgColor).toBeUndefined()
     expect(result.current.bodyBgImage).toBeUndefined()
     expect(result.current.isPreviewMode).toBeUndefined()
@@ -148,7 +148,7 @@ describe('useNewLoginData', () => {
     expect(result.current.authProviders).toBeUndefined()
     expect(result.current.loginHandleName).toBe('Username')
     expect(result.current.loginLogoUrl).toBe('https://example.com/logo.png')
-    expect(result.current.loginLogoAlt).toBe('Custom Alt Text')
+    expect(result.current.loginLogoText).toBe('Custom Alt Text')
     expect(result.current.bodyBgColor).toBe('#ffffff')
     expect(result.current.bodyBgImage).toBe('https://example.com/bg.png')
     expect(result.current.isPreviewMode).toBe(true)

@@ -17,19 +17,15 @@
  */
 
 import React from 'react'
-import classNames from 'classnames'
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
 import {Responsive} from '@instructure/ui-responsive'
+import {canvas} from '@instructure/ui-theme-tokens'
 import {Text} from '@instructure/ui-text'
 import {useNewLogin} from '../context/NewLoginContext'
 
-interface Props {
-  className?: string
-}
-
-const LoginLogo = ({className}: Props) => {
-  const {loginLogoUrl: src, loginLogoAlt: alt} = useNewLogin()
+const LoginLogo = () => {
+  const {loginLogoUrl: src, loginLogoText: alt} = useNewLogin()
 
   if (!src) return null
 
@@ -37,8 +33,8 @@ const LoginLogo = ({className}: Props) => {
     <Responsive
       match="media"
       query={{
-        tablet: {minWidth: '48rem'}, // 768px
-        desktop: {minWidth: '75rem'}, // 1200px
+        tablet: {minWidth: canvas.breakpoints.tablet}, // 768px
+        desktop: {minWidth: canvas.breakpoints.desktop}, // 1024px
       }}
     >
       {(_props, matches) => {
@@ -54,9 +50,8 @@ const LoginLogo = ({className}: Props) => {
             gap="x-small"
             alignItems="center"
             justifyItems="center"
-            className={classNames(className)}
           >
-            <Flex.Item width={width} shouldShrink={true}>
+            <Flex.Item width={width} shouldShrink={true} shouldGrow={true}>
               <Img width="100%" height="100%" constrain="contain" src={src} alt={alt} />
             </Flex.Item>
 

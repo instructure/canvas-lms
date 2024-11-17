@@ -17,12 +17,13 @@
  */
 
 import React from 'react'
-import classNames from 'classnames'
 import type {AuthProvider} from '../types'
-import {View, type ViewOwnProps} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
-import {Grid, GridCol, GridRow} from '@instructure/ui-grid'
+import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
+import {Responsive} from '@instructure/ui-responsive'
+import {View, type ViewOwnProps} from '@instructure/ui-view'
+import {canvas} from '@instructure/ui-theme-tokens'
 import {useNewLogin} from '../context/NewLoginContext'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -38,10 +39,6 @@ import iconX from '../assets/images/x.svg'
 
 const I18n = useI18nScope('new_login')
 
-interface Props {
-  className?: string
-}
-
 const providerIcons: Record<string, string> = {
   apple: iconApple,
   classlink: iconClasslink,
@@ -54,7 +51,7 @@ const providerIcons: Record<string, string> = {
   twitter: iconX,
 }
 
-const SSOButtons = ({className}: Props) => {
+const SSOButtons = () => {
   const {isUiActionPending, isPreviewMode, authProviders} = useNewLogin()
 
   if (!authProviders || authProviders.length === 0) {
@@ -79,8 +76,20 @@ const SSOButtons = ({className}: Props) => {
     const iconSrc = providerIcons[authType]
 
     return (
-      <GridCol key={provider.id} width={{small: 12, large: 6}}>
-        <Button href={link} display="block" disabled={isUiActionPending} onClick={handleClick}>
+      <Flex.Item
+        key={provider.id}
+        overflowX="visible"
+        overflowY="visible"
+        shouldGrow={true}
+        size={`calc(50% - ${canvas.spacing.small})`}
+      >
+        <Button
+          href={link}
+          display="block"
+          disabled={isUiActionPending}
+          onClick={handleClick}
+          width="100%"
+        >
           {iconSrc && (
             <View
               position="absolute"
@@ -101,14 +110,33 @@ const SSOButtons = ({className}: Props) => {
           )}
           {I18n.t('Log in with %{displayName}', {displayName})}
         </Button>
-      </GridCol>
+      </Flex.Item>
     )
   }
 
   return (
-    <Grid startAt="x-large" colSpacing="small" rowSpacing="small" className={classNames(className)}>
-      <GridRow hAlign="space-around">{authProviders.map(renderProviderButton)}</GridRow>
-    </Grid>
+    <Responsive
+      match="media"
+      query={{
+        desktop: {minWidth: canvas.breakpoints.desktop}, // 1024px
+      }}
+    >
+      {(_props, matches) => {
+        const isDesktopOrLarger = matches?.includes('desktop')
+
+        return (
+          <Flex
+            direction={isDesktopOrLarger ? 'row' : 'column'}
+            wrap={isDesktopOrLarger ? 'wrap' : 'no-wrap'}
+            gap="small"
+            justifyItems={isDesktopOrLarger ? 'start' : 'center'}
+            alignItems="stretch"
+          >
+            {authProviders.map(renderProviderButton)}
+          </Flex>
+        )
+      }}
+    </Responsive>
   )
 }
 

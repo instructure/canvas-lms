@@ -17,16 +17,23 @@
  */
 
 import React from 'react'
+import {GlobalStyle} from '..'
+import {css} from '@emotion/react'
 import {render} from '@testing-library/react'
-import {Footer} from '..'
-import {NewLoginProvider} from '../../context/NewLoginContext'
 
-describe('Footer', () => {
-  it('mounts without crashing', () => {
-    render(
-      <NewLoginProvider>
-        <Footer />
-      </NewLoginProvider>
-    )
+const getGlobalStyle = () => {
+  const styleTags = document.querySelectorAll('style[data-emotion]')
+  return Array.from(styleTags)
+    .map(tag => tag.textContent)
+    .join('')
+}
+
+describe('GlobalStyle', () => {
+  it('applies the correct global styles', () => {
+    render(<GlobalStyle />)
+    const globalCSS = getGlobalStyle()
+    expect(globalCSS).toContain('html,body{overflow-x:hidden;}')
+    expect(globalCSS).toContain('html{height:100%;}')
+    expect(globalCSS).toContain('body{min-height:100%;margin:0;}')
   })
 })

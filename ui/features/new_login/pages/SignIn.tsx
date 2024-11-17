@@ -161,7 +161,6 @@ const SignIn = () => {
                 usernameInputRef.current = inputElement as HTMLInputElement | undefined
               }}
               renderLabel={loginHandleName}
-              type="text"
               value={username}
               onChange={handleUsernameChange}
               autoComplete="username"

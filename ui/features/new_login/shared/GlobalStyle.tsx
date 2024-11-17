@@ -16,9 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* TODO make mostly/fully InstUI? */
-.background {
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-}
+import React from 'react'
+import {css, Global} from '@instructure/emotion'
+
+// https://emotion.sh/docs/@emotion/css#global-styles
+const GlobalStyle = () => (
+  <Global
+    styles={css`
+      html,
+      body {
+        overflow-x: hidden;
+      }
+      html {
+        height: 100%;
+      }
+      body {
+        min-height: 100%;
+        margin: 0;
+      }
+    `}
+  />
+)
+
+export default GlobalStyle
