@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import classNames from 'classnames'
 import {Img} from '@instructure/ui-img'
 import {Link} from '@instructure/ui-link'
 import {View, type ViewOwnProps} from '@instructure/ui-view'
@@ -26,11 +25,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('new_login')
 
-interface Props {
-  className?: string
-}
-
-const InstructureLogo = ({className}: Props) => {
+const InstructureLogo = () => {
   const {isPreviewMode, isUiActionPending} = useNewLogin()
 
   const handleClick = (event: React.MouseEvent<ViewOwnProps>) => {
@@ -40,14 +35,19 @@ const InstructureLogo = ({className}: Props) => {
   }
 
   return (
-    <View as="div" className={classNames(className)} textAlign="center">
-      <Link href="https://instructure.com" target="_blank" rel="external" onClick={handleClick}>
+    <View as="div" textAlign="center">
+      <Link
+        href="https://instructure.com"
+        target="_blank"
+        aria-label={I18n.t('By Instructure')}
+        onClick={handleClick}
+      >
         <Img
           width="7.9375rem"
           height="1.125rem"
           constrain="contain"
           src={require('../assets/images/instructure-logo.svg')}
-          alt={I18n.t('Instructure Logo')}
+          alt=""
         />
       </Link>
     </View>

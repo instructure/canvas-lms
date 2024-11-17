@@ -24,7 +24,7 @@ interface NewLoginData {
   authProviders?: AuthProvider[]
   loginHandleName?: string
   loginLogoUrl?: string
-  loginLogoAlt?: string
+  loginLogoText?: string
   bodyBgColor?: string
   bodyBgImage?: string
   isPreviewMode?: boolean
@@ -59,7 +59,7 @@ export const useNewLoginData = (): NewLoginData => {
     authProviders: undefined,
     loginHandleName: undefined,
     loginLogoUrl: undefined,
-    loginLogoAlt: undefined,
+    loginLogoText: undefined,
     bodyBgColor: undefined,
     bodyBgImage: undefined,
     isPreviewMode: undefined,
@@ -73,7 +73,7 @@ export const useNewLoginData = (): NewLoginData => {
         authProviders: getObjectAttribute<AuthProvider[]>(container, 'data-auth-providers'),
         loginHandleName: getStringAttribute(container, 'data-login-handle-name'),
         loginLogoUrl: getStringAttribute(container, 'data-login-logo-url'),
-        loginLogoAlt: getStringAttribute(container, 'data-login-logo-alt'),
+        loginLogoText: getStringAttribute(container, 'data-login-logo-text'),
         bodyBgColor: getStringAttribute(container, 'data-body-bg-color'),
         bodyBgImage: getStringAttribute(container, 'data-body-bg-image'),
         isPreviewMode: getBooleanAttribute(container, 'data-is-preview-mode'),

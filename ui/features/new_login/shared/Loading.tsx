@@ -21,13 +21,13 @@ import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
+const I18n = useI18nScope('new_login')
+
 interface Props {
   title?: string
 }
 
 const Loading = ({title}: Props) => {
-  const I18n = useI18nScope('main')
-
   return (
     <Flex justifyItems="center" alignItems="center">
       <Spinner size="medium" delay={500} renderTitle={title || I18n.t('Loading …')} />

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import {act, render, screen} from '@testing-library/react'
 import '@testing-library/jest-dom'
 import {NewLoginProvider, useNewLogin} from '../NewLoginContext'
@@ -31,7 +31,7 @@ jest.mock('../../hooks/useNewLoginData', () => ({
     ] as AuthProvider[],
     loginHandleName: 'exampleLoginHandle',
     loginLogoUrl: 'login/canvas-logo.svg',
-    loginLogoAlt: 'Canvas by Instructure',
+    loginLogoText: 'Canvas by Instructure',
     bodyBgColor: '#ffffff',
     bodyBgImage: 'https://example.com/background.jpg',
     isPreviewMode: true,
@@ -55,7 +55,7 @@ const TestComponent = () => {
       </span>
       <span data-testid="loginHandleName">{context.loginHandleName}</span>
       <span data-testid="loginLogoUrl">{context.loginLogoUrl}</span>
-      <span data-testid="loginLogoAlt">{context.loginLogoAlt}</span>
+      <span data-testid="loginLogoText">{context.loginLogoText}</span>
       <span data-testid="bodyBgColor">{context.bodyBgColor}</span>
       <span data-testid="bodyBgImage">{context.bodyBgImage}</span>
       <span data-testid="isPreviewMode">{context.isPreviewMode?.toString()}</span>
@@ -92,7 +92,7 @@ describe('NewLoginContext', () => {
     expect(screen.getByTestId('authProviders')).toHaveTextContent('Google, Microsoft')
     expect(screen.getByTestId('loginHandleName')).toHaveTextContent('exampleLoginHandle')
     expect(screen.getByTestId('loginLogoUrl')).toHaveTextContent('login/canvas-logo.svg')
-    expect(screen.getByTestId('loginLogoAlt')).toHaveTextContent('Canvas by Instructure')
+    expect(screen.getByTestId('loginLogoText')).toHaveTextContent('Canvas by Instructure')
     expect(screen.getByTestId('bodyBgColor')).toHaveTextContent('#ffffff')
     expect(screen.getByTestId('bodyBgImage')).toHaveTextContent(
       'https://example.com/background.jpg'
@@ -109,7 +109,7 @@ describe('NewLoginContext', () => {
         setShowForgotPassword,
         setOtpCommunicationChannelId,
       } = useNewLogin()
-      React.useEffect(() => {
+      useEffect(() => {
         act(() => {
           setRememberMe(true)
           setIsUiActionPending(true)
@@ -144,7 +144,7 @@ describe('NewLoginContext', () => {
       authProviders: undefined,
       loginHandleName: undefined,
       loginLogoUrl: undefined,
-      loginLogoAlt: undefined,
+      loginLogoText: undefined,
       bodyBgColor: undefined,
       bodyBgImage: undefined,
       isPreviewMode: undefined,
@@ -158,7 +158,7 @@ describe('NewLoginContext', () => {
     expect(screen.getByTestId('authProviders')).toBeEmptyDOMElement()
     expect(screen.getByTestId('loginHandleName')).toBeEmptyDOMElement()
     expect(screen.getByTestId('loginLogoUrl')).toBeEmptyDOMElement()
-    expect(screen.getByTestId('loginLogoAlt')).toBeEmptyDOMElement()
+    expect(screen.getByTestId('loginLogoText')).toBeEmptyDOMElement()
     expect(screen.getByTestId('bodyBgColor')).toBeEmptyDOMElement()
     expect(screen.getByTestId('bodyBgImage')).toBeEmptyDOMElement()
     expect(screen.getByTestId('isPreviewMode')).toBeEmptyDOMElement()

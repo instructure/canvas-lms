@@ -16,12 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import classNames from 'classnames'
 import {useNewLogin} from '../context/NewLoginContext'
-
-// @ts-expect-error
-import styles from './Background.module.css'
 
 interface Props {
   className?: string
@@ -30,15 +27,18 @@ interface Props {
 const Background = ({className}: Props) => {
   const {bodyBgColor, bodyBgImage} = useNewLogin()
 
-  return (
-    <div
-      className={classNames(styles.background, className)}
-      style={{
-        backgroundColor: bodyBgColor || undefined,
-        backgroundImage: bodyBgImage ? `url(${bodyBgImage})` : undefined,
-      }}
-    />
+  const backgroundStyle = useMemo(
+    () => ({
+      backgroundColor: bodyBgColor || undefined,
+      backgroundImage: bodyBgImage ? `url(${bodyBgImage})` : undefined,
+      backgroundPosition: 'left center',
+      backgroundRepeat: 'no-repeat',
+      backgroundSize: 'cover',
+    }),
+    [bodyBgColor, bodyBgImage]
   )
+
+  return <div className={classNames(className)} style={backgroundStyle} />
 }
 
 export default Background

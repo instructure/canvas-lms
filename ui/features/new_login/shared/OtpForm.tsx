@@ -17,7 +17,6 @@
  */
 
 import React, {useCallback, useEffect, useRef, useState} from 'react'
-import classNames from 'classnames'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -31,11 +30,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('new_login')
 
-interface Props {
-  className?: string
-}
-
-const OtpForm = ({className}: Props) => {
+const OtpForm = () => {
   const {
     isUiActionPending,
     setIsUiActionPending,
@@ -172,7 +167,7 @@ const OtpForm = ({className}: Props) => {
   }
 
   const otpFormContent = (
-    <Flex className={classNames(className)} direction="column" gap="large">
+    <Flex direction="column" gap="large">
       <Heading level="h2" as="h1">
         {I18n.t('Multi-Factor Authentication')}
       </Heading>
@@ -191,7 +186,6 @@ const OtpForm = ({className}: Props) => {
             <TextInput
               id="otpCode"
               renderLabel={I18n.t('Verification Code')}
-              type="text"
               value={verificationCode}
               onChange={handleVerificationCodeChange}
               onBlur={handleVerificationCodeBlur}

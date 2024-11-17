@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import classNames from 'classnames'
 import type {ViewOwnProps} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
@@ -27,11 +26,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('new_login')
 
-interface Props {
-  className?: string
-}
-
-const SignInLinks = ({className}: Props) => {
+const SignInLinks = () => {
   const navigate = useNavigate()
   const isSignIn = useMatch('/login/canvas')
   const isForgotPassword = useMatch('/login/canvas/forgot-password')
@@ -47,7 +42,7 @@ const SignInLinks = ({className}: Props) => {
   }
 
   return (
-    <Flex className={classNames(className)} direction="column" gap="small">
+    <Flex direction="column" gap="small">
       {isSignIn && (
         <Flex.Item overflowX="visible" overflowY="visible">
           <Link

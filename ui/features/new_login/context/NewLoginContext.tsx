@@ -36,7 +36,7 @@ interface NewLoginContextType {
   authProviders?: AuthProvider[]
   loginHandleName?: string
   loginLogoUrl?: string
-  loginLogoAlt?: string
+  loginLogoText?: string
   bodyBgColor?: string
   bodyBgImage?: string
   isPreviewMode?: boolean
@@ -61,7 +61,7 @@ export const NewLoginProvider = ({children}: NewLoginProviderProps) => {
     authProviders,
     loginHandleName,
     loginLogoUrl,
-    loginLogoAlt,
+    loginLogoText,
     bodyBgColor,
     bodyBgImage,
     isPreviewMode,
@@ -85,7 +85,7 @@ export const NewLoginProvider = ({children}: NewLoginProviderProps) => {
         authProviders,
         loginHandleName,
         loginLogoUrl,
-        loginLogoAlt,
+        loginLogoText,
         bodyBgColor,
         bodyBgImage,
         isPreviewMode,
