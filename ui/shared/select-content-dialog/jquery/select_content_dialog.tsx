@@ -129,9 +129,11 @@ const isEqualOrIsArrayWithEqualValue = (
 ) => value === toCompare || (Array.isArray(value) && value[0] === toCompare)
 
 export const deepLinkingResponseHandler = (event: MessageEvent<DeepLinkResponse>) => {
+  // Handles lti_msg / lti_errormsg
+  contentItemProcessorPrechecks(event.data)
+
   if (event.data.content_items.length > 1) {
     try {
-      contentItemProcessorPrechecks(event.data)
       const result = event.data.content_items
 
       const $dialog = $('#resource_selection_dialog')
@@ -156,7 +158,6 @@ export const deepLinkingResponseHandler = (event: MessageEvent<DeepLinkResponse>
     }
   } else if (event.data.content_items.length === 1) {
     try {
-      contentItemProcessorPrechecks(event.data)
       const result = event.data.content_items[0]
       const $dialog = $('#resource_selection_dialog')
       $dialog.off('dialogbeforeclose', dialogCancelHandler)
@@ -307,9 +308,7 @@ export const Events = {
   },
 
   onContextExternalToolSelect(
-     
-    e: JQuery.ClickEvent<HTMLElement, undefined, any, any>,
-     
+    e: Pick<JQuery.ClickEvent<HTMLElement, undefined, any, any>, 'preventDefault'>,
     existingTool: JQuery<HTMLElement>
   ) {
     e.preventDefault()

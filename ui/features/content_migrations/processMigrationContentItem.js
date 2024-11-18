@@ -38,6 +38,13 @@ export default function processMigrationContentItem(event) {
 
   try {
     const result = processSingleContentItem(event)
+    if (result === undefined || result === null) {
+      if (!event.data.msg && !event.data.errormsg) {
+        $.flashWarning(I18n.t('No content was selected'))
+      }
+      postMessageExternalContentCancel(window)
+      return
+    }
     if (result.type !== 'file') {
       throw new Error(`Expected type "file" but received "${result.type}"`)
     }
