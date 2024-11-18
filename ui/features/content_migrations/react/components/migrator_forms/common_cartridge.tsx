@@ -21,8 +21,9 @@ import CommonMigratorControls from './common_migrator_controls'
 import type {onSubmitMigrationFormCallback} from '../types'
 import QuestionBankSelector from './question_bank_selector'
 import MigrationFileInput from './file_input'
-import {noFileSelectedFormMessage, parseDateToISOString} from '../utils'
+import {parseDateToISOString} from '../utils'
 import {useSubmitHandlerWithQuestionBank} from '../../hooks/form_handler_hooks'
+import {noFileSelectedFormMessage} from './error_form_message'
 
 type CommonCartridgeImporterProps = {
   onSubmit: onSubmitMigrationFormCallback

@@ -30,6 +30,7 @@ import type {onSubmitMigrationFormCallback} from '../types'
 import {Text} from '@instructure/ui-text'
 import {parseDateToISOString} from '../utils'
 import {RequiredFormLabel} from './form_label'
+import {ErrorFormMessage} from './error_form_message'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -143,11 +144,7 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
             selectedCourseError
               ? [
                   {
-                    text: (
-                      <Text color="danger">
-                        {I18n.t('You must select a course to copy content from')}
-                      </Text>
-                    ),
+                    text: <ErrorFormMessage>{I18n.t('You must select a course to copy content from')}</ErrorFormMessage>,
                     type: 'error',
                   },
                 ]
