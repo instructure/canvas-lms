@@ -506,6 +506,7 @@ describe Lti::IMS::DynamicRegistrationController do
     let(:overlay) do
       {
         disabledPlacements: ["course_navigation"],
+        disabledScopes: ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"],
         placements: [
           {
             type: "account_navigation",
@@ -526,6 +527,16 @@ describe Lti::IMS::DynamicRegistrationController do
           body: overlay.to_json
       expect(response).to be_successful
       expect(registration.reload.registration_overlay).to eq(overlay.deep_stringify_keys)
+    end
+
+    it "removes disabled scopes from the associated developer key" do
+      user_session(user)
+      put :update_registration_overlay,
+          params: { account_id: Account.default.id,
+                    registration_id: registration.id },
+          body: overlay.to_json
+      expect(response).to be_successful
+      expect(registration.reload.developer_key.scopes).not_to include("https://purl.imsglobal.org/spec/lti-ags/scope/lineitem")
     end
 
     it "returns a 422 if the request body does not meet the schema" do
@@ -564,6 +575,7 @@ describe Lti::IMS::DynamicRegistrationController do
       expect(Lti::Overlay.last.data)
         .to eq({
                  "disabled_placements" => overlay[:disabledPlacements],
+                 "disabled_scopes" => overlay[:disabledScopes],
                  "placements" => {
                    "account_navigation" => {
                      "icon_url" => "https://example.com/icon.jpg"
@@ -594,6 +606,7 @@ describe Lti::IMS::DynamicRegistrationController do
         expect(registration.reload.registration_overlay).to eq(overlay.deep_stringify_keys)
         expect(lti_overlay.reload.data).to eq({
                                                 "disabled_placements" => ["course_navigation"],
+                                                "disabled_scopes" => ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"],
                                                 "placements" => {
                                                   "account_navigation" => {
                                                     "icon_url" => "https://example.com/icon.jpg"
