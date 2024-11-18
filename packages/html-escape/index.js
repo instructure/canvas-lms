@@ -27,7 +27,7 @@ if (!('INST' in window)) window.INST = {}
  * in templating engines or other contexts where you have pre-escaped strings
  * or strings with HTML content that should be rendered as-is.
  */
-class SafeString {
+export class SafeString {
   /**
    * @param {string | any} string - The string or value to be marked as safe. If not a string, it will be converted to one.
    */
