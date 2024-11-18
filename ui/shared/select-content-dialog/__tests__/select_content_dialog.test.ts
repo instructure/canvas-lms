@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'
+
 import {
   Events,
   externalContentReadyHandler,
@@ -32,12 +35,17 @@ import 'jquery-migrate' // required
 // I couldn't seem to get it working by stubbing getClientRects, so I just mocked the visible pseudo-selector.
 function mockGetClientRects() {
   jest.spyOn($.expr.pseudos, 'visible').mockImplementation(function (el) {
-    let node = el
+    let node: Node | null = el
     while (node) {
-      if (node === document) {
+      if (node === document || !node) {
         break
       }
-      if (!node.style || node.style.display === 'none' || node.style.visibility === 'hidden') {
+      if (
+        !(node instanceof HTMLElement) ||
+        !node.style ||
+        node.style.display === 'none' ||
+        node.style.visibility === 'hidden'
+      ) {
         return false
       }
       node = node.parentNode
@@ -46,8 +54,8 @@ function mockGetClientRects() {
   })
 }
 
-let originalENV
-let fixtures = null
+let originalENV: GlobalEnv
+let fixtures: HTMLElement | null = null
 
 beforeEach(() => {
   originalENV = {...window.ENV}
@@ -63,24 +71,21 @@ afterEach(() => {
 })
 
 describe('SelectContentDialog', () => {
-  let clickEvent = {}
-  let allowances
+  const clickEvent = {
+    originalEvent: new MouseEvent('click', {bubbles: false}),
+    type: 'click',
+    timeStamp: 1433863761376,
+    jQuery17209791898143012077: true,
+    preventDefault() {},
+  }
+
+  const allowances = ['midi', 'media']
 
   beforeEach(() => {
-    allowances = ['midi', 'media']
     window.ENV.LTI_LAUNCH_FRAME_ALLOWANCES = allowances
-
-    fixtures.innerHTML = `<div id="context_external_tools_select"> \
+    fixtures!.innerHTML = `<div id="context_external_tools_select"> \
 <div class="tools"><div id="test-tool" class="tool resource_selection"></div></div></div>`
-    const $l = $(document.getElementById('test-tool'))
-
-    clickEvent = {
-      originalEvent: MouseEvent,
-      type: 'click',
-      timeStamp: 1433863761376,
-      jQuery17209791898143012077: true,
-      preventDefault() {},
-    }
+    const $l = $(document.getElementById('test-tool')!)
 
     $l.data('tool', {name: 'mytool', placements: {resource_selection: {}}})
     jest.spyOn(window, 'confirm').mockImplementation(() => true)
@@ -88,13 +93,16 @@ describe('SelectContentDialog', () => {
 
   afterEach(() => {
     $(window).off('beforeunload')
-    clickEvent = {}
     $('#resource_selection_dialog').remove()
   })
 
-  it('it creates a confirm alert before closing the modal', () => {
+  function callOnContextExternalToolSelect() {
     const l = document.getElementById('test-tool')
-    Events.onContextExternalToolSelect.bind(l)(clickEvent)
+    Events.onContextExternalToolSelect.bind(l)(clickEvent, $(l!))
+  }
+
+  it('it creates a confirm alert before closing the modal', () => {
+    callOnContextExternalToolSelect()
     const $dialog = $('#resource_selection_dialog')
     $dialog.dialog('close')
     expect(window.confirm).toHaveBeenCalledTimes(1)
@@ -104,24 +112,21 @@ describe('SelectContentDialog', () => {
   })
 
   it('sets the iframe allowances', function () {
-    const l = document.getElementById('test-tool')
-    Events.onContextExternalToolSelect.bind(l)(clickEvent)
+    callOnContextExternalToolSelect()
     const $dialog = $('#resource_selection_dialog')
     expect($dialog.find('#resource_selection_iframe').attr('allow')).toEqual(allowances.join('; '))
   })
 
   it("starts with focus on the 'x' button", function () {
-    const l = document.getElementById('test-tool')
-    Events.onContextExternalToolSelect.bind(l)(clickEvent)
+    callOnContextExternalToolSelect()
     expect(document.activeElement).toEqual(document.querySelector('.ui-dialog-titlebar-close'))
   })
 
   it('maintains the same size iframe after focusing and blurring the screen reader alerts', function () {
-    const l = document.getElementById('test-tool')
-    Events.onContextExternalToolSelect.bind(l)(clickEvent)
+    callOnContextExternalToolSelect()
     const $dialog = $('#resource_selection_dialog')
-    const closeButton = document.querySelector('.ui-dialog-titlebar-close')
-    const srAlert = document.querySelector('.before_external_content_info_alert')
+    const closeButton = document.querySelector('.ui-dialog-titlebar-close') as HTMLElement
+    const srAlert = document.querySelector('.before_external_content_info_alert') as HTMLElement
     // Something seems to be setting width to 0 in the test, probably because
     // width and eheight are messed up. We can just set the css width/height
     // again here.
@@ -139,16 +144,14 @@ describe('SelectContentDialog', () => {
   })
 
   it('sets the iframe "data-lti-launch" attribute', function () {
-    const l = document.getElementById('test-tool')
-    Events.onContextExternalToolSelect.bind(l)(clickEvent)
+    callOnContextExternalToolSelect()
     const $dialog = $('#resource_selection_dialog')
     expect($dialog.find('#resource_selection_iframe').attr('data-lti-launch')).toEqual('true')
     expect($dialog.find('#resource_selection_iframe').attr('title')).toEqual('mytool')
   })
 
   it('close dialog when 1.1 content items are empty', () => {
-    const l = document.getElementById('test-tool')
-    Events.onContextExternalToolSelect.bind(l)(clickEvent)
+    callOnContextExternalToolSelect()
     const $dialog = $('#resource_selection_dialog')
     expect($dialog.is(':visible')).toBe(true)
     const externalContentReadyEvent = {
@@ -163,31 +166,43 @@ describe('SelectContentDialog', () => {
         ],
       },
     }
-    externalContentReadyHandler(externalContentReadyEvent, l)
+
+    const mockTool = {
+      definition_type: 'ContextExternalTool',
+      definition_id: 'defid', // not actually sure what this is supposed to be
+      name: 'mytool',
+      url: 'https://www.my-tool.com/tool-url',
+      description: 'mytool description',
+      domain: 'my-tool.com',
+      placements: {},
+    } as const
+
+    externalContentReadyHandler(externalContentReadyEvent as MessageEvent, mockTool as any)
     expect($dialog.is(':visible')).toBe(false)
     expect(window.confirm).toHaveBeenCalledTimes(0)
   })
 
-  it('close dialog when 1.3 content items are empty', async () => {
-    const $testTool = document.getElementById('test-tool')
-    Events.onContextExternalToolSelect.bind($testTool)(clickEvent)
+  it('runs prechecks (flash messages) and closes dialog when 1.3 content items are empty', async () => {
+    jest.spyOn($, 'flashError')
+    callOnContextExternalToolSelect()
 
     const $resourceSelectionDialog = $('#resource_selection_dialog')
 
     expect($resourceSelectionDialog.is(':visible')).toBe(true)
 
-    const deepLinkingEvent = {
-      data: {
-        subject: 'LtiDeepLinkingResponse',
-        content_items: [],
-        ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking',
-      },
+    const data: DeepLinkResponse = {
+      content_items: [],
+      ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking',
+      errormsg: 'helloerror',
     }
+    const deepLinkingEvent = {data} as MessageEvent<DeepLinkResponse>
 
     deepLinkingResponseHandler(deepLinkingEvent)
 
     expect($resourceSelectionDialog.is(':visible')).toBe(false)
     expect(window.confirm).toHaveBeenCalledTimes(0)
+    expect($.flashError).toHaveBeenCalledTimes(1)
+    expect($.flashError).toHaveBeenCalledWith('helloerror')
   })
 })
 
@@ -300,7 +315,7 @@ describe('SelectContentDialog: deepLinkingResponseHandler', () => {
     text: 'Description text',
     'https://canvas.instructure.com/lti/preserveExistingAssignmentName': true,
   }
-  const makeDeepLinkingEvent = (additionalContentItemFields = {}, omitFields = []) => {
+  const makeDeepLinkingEvent = (additionalContentItemFields = {}, omitFields: string[] = []) => {
     const omittedContentItem = Object.fromEntries(
       Object.entries(contentItem).filter(([key]) => !omitFields.includes(key))
     )
@@ -322,14 +337,14 @@ describe('SelectContentDialog: deepLinkingResponseHandler', () => {
   })
 
   it('sets the tool url', async () => {
-    deepLinkingResponseHandler(deepLinkingEvent)
-    const {url} = deepLinkingEvent.data.content_items[0]
+    deepLinkingResponseHandler(deepLinkingEvent as MessageEvent)
+    const {url} = deepLinkingEvent.data.content_items[0] as any
     expect($('#external_tool_create_url').val()).toEqual(url)
   })
 
   it('sets the tool url without the optional title', async () => {
-    deepLinkingResponseHandler(deepLinkingEventWithoutTitle)
-    const {url} = deepLinkingEvent.data.content_items[0]
+    deepLinkingResponseHandler(deepLinkingEventWithoutTitle as MessageEvent)
+    const {url} = deepLinkingEvent.data.content_items[0] as any
     expect($('#external_tool_create_url').val()).toEqual(url)
   })
 
@@ -339,8 +354,8 @@ describe('SelectContentDialog: deepLinkingResponseHandler', () => {
         {
           title: 'My Tool',
         },
-        'url'
-      )
+        ['url']
+      ) as MessageEvent
     )
     expect($('#external_tool_create_url').val()).toEqual('https://www.my-tool.com/tool-url')
   })
@@ -352,20 +367,20 @@ describe('SelectContentDialog: deepLinkingResponseHandler', () => {
         {
           title: 'My Tool',
         },
-        'url'
-      )
+        ['url']
+      ) as MessageEvent
     )
     expect($('#external_tool_create_url').val()).toEqual('https://www.my-tool.com/tool-url')
   })
 
   it('sets the tool title', async () => {
-    deepLinkingResponseHandler(deepLinkingEvent)
-    const {title} = deepLinkingEvent.data.content_items[0]
+    deepLinkingResponseHandler(deepLinkingEvent as MessageEvent)
+    const {title} = deepLinkingEvent.data.content_items[0] as any
     expect($('#external_tool_create_title').val()).toEqual(title)
   })
 
   it('sets the tool title to the tool name if no content_item title is given', async () => {
-    deepLinkingResponseHandler(makeDeepLinkingEvent())
+    deepLinkingResponseHandler(makeDeepLinkingEvent() as MessageEvent)
     expect($('#external_tool_create_title').val()).toEqual('mytool')
   })
 
@@ -373,33 +388,33 @@ describe('SelectContentDialog: deepLinkingResponseHandler', () => {
     selectContentDialog({
       no_name_input: true,
     })
-    deepLinkingResponseHandler(makeDeepLinkingEvent())
+    deepLinkingResponseHandler(makeDeepLinkingEvent() as MessageEvent)
     expect($('#external_tool_create_title').val()).toEqual('')
   })
 
   it('sets the tool custom params', async () => {
-    deepLinkingResponseHandler(deepLinkingEvent)
+    deepLinkingResponseHandler(deepLinkingEvent as MessageEvent)
 
     expect($('#external_tool_create_custom_params').val()).toEqual(JSON.stringify(customParams))
   })
 
   it('sets the content item assignment id if given', async () => {
-    deepLinkingResponseHandler(deepLinkingEventWithAssignmentId)
+    deepLinkingResponseHandler(deepLinkingEventWithAssignmentId as MessageEvent)
     expect($('#external_tool_create_assignment_id').val()).toEqual(assignmentId)
   })
 
   it('sets the iframe width', async () => {
-    deepLinkingResponseHandler(deepLinkingEvent)
+    deepLinkingResponseHandler(deepLinkingEvent as MessageEvent)
     expect($('#external_tool_create_iframe_height').val()).toEqual('456')
   })
 
   it('sets the iframe height', async () => {
-    deepLinkingResponseHandler(deepLinkingEvent)
+    deepLinkingResponseHandler(deepLinkingEvent as MessageEvent)
     expect($('#external_tool_create_iframe_width').val()).toEqual('123')
   })
 
   it('recover item data from context external tool item', async () => {
-    deepLinkingResponseHandler(deepLinkingEvent)
+    deepLinkingResponseHandler(deepLinkingEvent as MessageEvent)
 
     const data = extractContextExternalToolItemData()
 
@@ -423,14 +438,16 @@ describe('SelectContentDialog: deepLinkingResponseHandler', () => {
   })
 
   it('recover assignment id from context external tool item data if given', async () => {
-    deepLinkingResponseHandler(deepLinkingEventWithAssignmentId)
+    deepLinkingResponseHandler(deepLinkingEventWithAssignmentId as MessageEvent)
 
     const data = extractContextExternalToolItemData()
     expect(data['item[assignment_id]']).toEqual(assignmentId)
   })
 
   it('checks the new tab checkbox if content item window.targetName is _blank', async () => {
-    deepLinkingResponseHandler(makeDeepLinkingEvent({window: {targetName: '_blank'}}))
+    deepLinkingResponseHandler(
+      makeDeepLinkingEvent({window: {targetName: '_blank'}}) as MessageEvent
+    )
 
     const data = extractContextExternalToolItemData()
     expect(data['item[new_tab]']).toEqual('1')
@@ -462,7 +479,7 @@ describe('SelectContentDialog: deepLinkingResponseHandler', () => {
   })
 
   it('close all dialogs when content items attribute is empty', async () => {
-    const deepLinkingEvent = {
+    const deepLinkingEv = {
       data: {
         subject: 'LtiDeepLinkingResponse',
         content_items: [],
@@ -470,7 +487,7 @@ describe('SelectContentDialog: deepLinkingResponseHandler', () => {
       },
     }
 
-    deepLinkingResponseHandler(deepLinkingEvent)
+    deepLinkingResponseHandler(deepLinkingEv as MessageEvent)
 
     expect($('#select_context_content_dialog').is(':visible')).toBe(false)
     expect(window.confirm).toHaveBeenCalledTimes(0)
