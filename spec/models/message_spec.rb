@@ -863,7 +863,7 @@ describe Message do
   end
 
   describe "Message.in_partition" do
-    let(:partition) { { "created_at" => DateTime.new(2020, 8, 25) } }
+    let(:partition) { { "created_at" => Time.new(2020, 8, 25) } }
 
     it "uses the specific partition table" do
       expect(Message.in_partition(partition).to_sql).to match(/^SELECT "messages_2020_35".* FROM .*"messages_2020_35"$/)

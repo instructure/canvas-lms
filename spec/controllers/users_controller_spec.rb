@@ -3297,9 +3297,8 @@ describe UsersController do
 
       it "has exp that matches expires_at" do
         subject
-        exp = DateTime.strptime(token["exp"].to_s, "%s")
-        expires_at = DateTime.strptime(response.parsed_body["expires_at"].to_s, "%Q")
-        expect(exp.to_s).to eq expires_at.to_s
+        expires_at = Time.strptime(response.parsed_body["expires_at"].to_s, "%Q")
+        expect(token["exp"]).to eq expires_at.to_i
       end
     end
 
@@ -3332,14 +3331,14 @@ describe UsersController do
         subject
         expires_at = response.parsed_body["expires_at"]
         expect(expires_at).to be_a Float
-        expires_at_date = DateTime.strptime(expires_at.to_s, "%Q")
-        expect(expires_at_date).to be_a DateTime
+        expires_at_date = Time.strptime(expires_at.to_s, "%Q")
+        expect(expires_at_date).to be_a Time
       end
 
       it "is ~1 day from now" do
         subject
         expires_at = response.parsed_body["expires_at"]
-        expect(DateTime.strptime(expires_at.to_s, "%Q").utc).to be_within(1.minute).of(1.day.from_now)
+        expect(Time.strptime(expires_at.to_s, "%Q").utc).to be_within(1.minute).of(1.day.from_now)
       end
     end
 
@@ -3353,8 +3352,8 @@ describe UsersController do
           get "pandata_events_token", params: { app_key: }
 
           token = CanvasSecurity.decode_jwt(response.parsed_body["auth_token"], ["secret"])
-          exp = DateTime.strptime(token["exp"].to_s, "%s").to_s
-          expires_at = DateTime.strptime(response.parsed_body["expires_at"].to_s, "%Q").to_s
+          exp = Time.zone.at(token["exp"])
+          expires_at = Time.strptime(response.parsed_body["expires_at"].to_s, "%Q").to_s
 
           expect(exp).to eq expires_at
         end
@@ -3363,8 +3362,8 @@ describe UsersController do
         get "pandata_events_token", params: { app_key: }
 
         token = CanvasSecurity.decode_jwt(response.parsed_body["auth_token"], ["secret"])
-        exp2 = DateTime.strptime(token["exp"].to_s, "%s").to_s
-        expires_at2 = DateTime.strptime(response.parsed_body["expires_at"].to_s, "%Q").to_s
+        exp2 = Time.zone.at(token["exp"])
+        expires_at2 = Time.strptime(response.parsed_body["expires_at"].to_s, "%Q").to_s
 
         expect(expires_at).not_to eq expires_at2
         expect(exp2).to eq expires_at2

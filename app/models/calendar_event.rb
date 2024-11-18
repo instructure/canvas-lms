@@ -111,7 +111,7 @@ class CalendarEvent < ActiveRecord::Base
       context = contexts[code] && contexts[code][0]
       new_event = events.detect { |e| e[:context_code] == context&.asset_string }
       existing_event = record.child_events.where(context:).first
-      event_unchanged = new_event && existing_event && DateTime.parse(new_event[:start_at]) == existing_event.start_at && DateTime.parse(new_event[:end_at]) == existing_event.end_at
+      event_unchanged = new_event && existing_event && Time.zone.parse(new_event[:start_at]) == existing_event.start_at && Time.zone.parse(new_event[:end_at]) == existing_event.end_at
       next if (context&.grants_right?(record.updating_user, :manage_calendar) || event_unchanged) && context.try(:parent_event_context) == record.context
 
       break record.errors.add(attr, t("errors.invalid_child_event_context", "Invalid child event context"))
@@ -752,8 +752,8 @@ class CalendarEvent < ActiveRecord::Base
       start_at = @event.is_a?(CalendarEvent) ? @event.start_at : @event.due_at
       end_at = @event.is_a?(CalendarEvent) ? @event.end_at : @event.due_at
 
-      event.dtstart = Icalendar::Values::DateTime.new(start_at.utc_datetime, "tzid" => "UTC") if start_at
-      event.dtend = Icalendar::Values::DateTime.new(end_at.utc_datetime, "tzid" => "UTC") if end_at
+      event.dtstart = Icalendar::Values::DateTime.new(start_at.utc.change(sec: 0), "tzid" => "UTC") if start_at
+      event.dtend = Icalendar::Values::DateTime.new(end_at.utc.change(sec: 0), "tzid" => "UTC") if end_at
 
       if @event.all_day && @event.all_day_date
         event.dtstart = Icalendar::Values::Date.new(@event.all_day_date)
@@ -795,7 +795,7 @@ class CalendarEvent < ActiveRecord::Base
       end
 
       event.location = loc_string
-      event.dtstamp = Icalendar::Values::DateTime.new(@event.updated_at.utc_datetime, "tzid" => "UTC") if @event.updated_at
+      event.dtstamp = Icalendar::Values::DateTime.new(@event.updated_at.utc.change(sec: 0), "tzid" => "UTC") if @event.updated_at
 
       tag_name = @event.class.name.underscore
 

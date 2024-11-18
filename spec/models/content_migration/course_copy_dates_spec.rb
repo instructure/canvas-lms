@@ -469,7 +469,7 @@ describe ContentMigration do
         end
 
         context "implicit start date" do
-          let(:old_date) { DateTime.new(2021, 3, 3) }
+          let(:old_date) { Time.new(2021, 3, 3) }
           let(:old_start_date) { nil }
           let(:old_end_date) { nil }
           let(:new_start_date) { nil }

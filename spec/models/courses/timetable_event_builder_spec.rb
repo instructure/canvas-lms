@@ -41,8 +41,8 @@ describe Courses::TimetableEventBuilder do
 
     it "requires valid weekdays" do
       builder.course.enrollment_term.tap do |term|
-        term.start_at = DateTime.parse("2016-05-06 1:00pm -0600")
-        term.end_at = DateTime.parse("2016-05-19 9:00am -0600")
+        term.start_at = Time.zone.parse("2016-05-06 1:00pm -0600")
+        term.end_at = Time.zone.parse("2016-05-19 9:00am -0600")
       end
 
       tt_hash = { weekdays: "wednesday,humpday", start_time: "11:30 am", end_time: "12:30 pm" }
@@ -56,8 +56,8 @@ describe Courses::TimetableEventBuilder do
 
     it "generates a bunch of event hashes" do
       builder.course.tap do |c|
-        c.start_at = DateTime.parse("2016-05-06 1:00pm -0600") # on a friday - should offset to thursday
-        c.conclude_at = DateTime.parse("2016-05-19 9:00am -0600") # on a thursday, but before the course time - shouldn't create an event that day
+        c.start_at = Time.zone.parse("2016-05-06 1:00pm -0600") # on a friday - should offset to thursday
+        c.conclude_at = Time.zone.parse("2016-05-19 9:00am -0600") # on a thursday, but before the course time - shouldn't create an event that day
         c.time_zone = "America/Denver"
       end
 
@@ -66,18 +66,18 @@ describe Courses::TimetableEventBuilder do
       expect(builder.errors).to be_blank
 
       expected_events = [
-        { start_at: DateTime.parse("2016-05-10 3:00 pm -0600"), end_at: DateTime.parse("2016-05-10 4:30 pm -0600") },
-        { start_at: DateTime.parse("2016-05-12 3:00 pm -0600"), end_at: DateTime.parse("2016-05-12 4:30 pm -0600") },
-        { start_at: DateTime.parse("2016-05-17 3:00 pm -0600"), end_at: DateTime.parse("2016-05-17 4:30 pm -0600") }
+        { start_at: Time.zone.parse("2016-05-10 3:00 pm -0600"), end_at: Time.zone.parse("2016-05-10 4:30 pm -0600") },
+        { start_at: Time.zone.parse("2016-05-12 3:00 pm -0600"), end_at: Time.zone.parse("2016-05-12 4:30 pm -0600") },
+        { start_at: Time.zone.parse("2016-05-17 3:00 pm -0600"), end_at: Time.zone.parse("2016-05-17 4:30 pm -0600") }
       ]
       expect(builder.generate_event_hashes([tt_hash])).to match_array(expected_events)
     end
 
     it "works across daylight savings time changes (sigh)" do
       builder.course.tap do |c|
-        c.start_at = DateTime.parse("2016-03-09 1:00pm -0600") # on a wednesday
+        c.start_at = Time.zone.parse("2016-03-09 1:00pm -0600") # on a wednesday
         # DST transition happened across March 13, 2016
-        c.conclude_at = DateTime.parse("2016-03-18 8:00pm -0600") # on a friday, but after the course time - should create an event that day
+        c.conclude_at = Time.zone.parse("2016-03-18 8:00pm -0600") # on a friday, but after the course time - should create an event that day
         c.time_zone = "America/Denver"
       end
 
@@ -88,9 +88,9 @@ describe Courses::TimetableEventBuilder do
       expect(tt_hash[:weekdays]).to eq "Mon,Fri"
 
       expected_events = [
-        { start_at: DateTime.parse("2016-03-11 11:30 am -0700"), end_at: DateTime.parse("2016-03-11 1:00 pm -0700") },
-        { start_at: DateTime.parse("2016-03-14 11:30 am -0600"), end_at: DateTime.parse("2016-03-14 1:00 pm -0600") },
-        { start_at: DateTime.parse("2016-03-18 11:30 am -0600"), end_at: DateTime.parse("2016-03-18 1:00 pm -0600") }
+        { start_at: Time.zone.parse("2016-03-11 11:30 am -0700"), end_at: Time.zone.parse("2016-03-11 1:00 pm -0700") },
+        { start_at: Time.zone.parse("2016-03-14 11:30 am -0600"), end_at: Time.zone.parse("2016-03-14 1:00 pm -0600") },
+        { start_at: Time.zone.parse("2016-03-18 11:30 am -0600"), end_at: Time.zone.parse("2016-03-18 1:00 pm -0600") }
       ]
       expect(builder.generate_event_hashes([tt_hash])).to match_array(expected_events)
     end

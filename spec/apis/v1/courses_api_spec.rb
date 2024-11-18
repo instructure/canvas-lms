@@ -4384,7 +4384,7 @@ describe CoursesController, type: :request do
 
       context "include[]=sections" do
         before :once do
-          @other_section = @course1.course_sections.create! name: "Other Section", start_at: DateTime.parse("2020-01-01T00:00:00Z")
+          @other_section = @course1.course_sections.create! name: "Other Section", start_at: Time.zone.parse("2020-01-01T00:00:00Z")
         end
 
         it "includes enrolled sections if requested" do

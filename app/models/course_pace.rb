@@ -233,7 +233,7 @@ class CoursePace < ActiveRecord::Base
 
       # Mark as published
       log_module_items_count
-      update(workflow_state: "active", published_at: DateTime.current)
+      update(workflow_state: "active", published_at: Time.zone.now)
     end
   end
 

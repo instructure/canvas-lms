@@ -195,7 +195,7 @@ describe CoursePace do
 
   context "publish" do
     def fancy_midnight_rounded_to_last_second(date)
-      CanvasTime.fancy_midnight(date.to_datetime).to_time.utc
+      CanvasTime.fancy_midnight(Time.zone.parse(date)).utc
     end
 
     before :once do

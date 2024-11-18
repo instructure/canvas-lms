@@ -139,7 +139,7 @@ describe UserMerge do
     end
 
     it "recalculates cached_due_date on unsubmitted placeholder submissions for the new user" do
-      due_date_timestamp = DateTime.now.iso8601
+      due_date_timestamp = Time.zone.now.iso8601
       course1.enroll_user(user2, "StudentEnrollment", enrollment_state: "active")
       assignment = course1.assignments.create!(
         title: "some assignment",
@@ -158,7 +158,7 @@ describe UserMerge do
     end
 
     it "recalculates cached_due_date on submissions for assignments with overrides" do
-      due_date_timestamp = DateTime.now.iso8601
+      due_date_timestamp = Time.zone.now.iso8601
       course1.enroll_user(user2, "StudentEnrollment", enrollment_state: "active")
       assignment = course1.assignments.create!(
         title: "Assignment with student due date override",
@@ -185,7 +185,7 @@ describe UserMerge do
     end
 
     it "deletes from user's assignment override student when both users have them" do
-      due_date_timestamp = DateTime.now.iso8601
+      due_date_timestamp = Time.zone.now.iso8601
       course1.enroll_user(user1, "StudentEnrollment", enrollment_state: "active")
       course1.enroll_user(user2, "StudentEnrollment", enrollment_state: "active")
       a1 = assignment_model(course: course1)
@@ -215,7 +215,7 @@ describe UserMerge do
     end
 
     it "moves and swap assignment override student to target user" do
-      due_date_timestamp = DateTime.now.iso8601
+      due_date_timestamp = Time.zone.now.iso8601
       course1.enroll_user(user2, "StudentEnrollment", enrollment_state: "active")
       assignment = course1.assignments.create!(
         title: "Assignment with student due date override",

@@ -600,11 +600,11 @@ module Importers
     end
 
     def self.remove_bad_end_dates!(options)
-      old_start = DateTime.parse(options[:old_start_date]) rescue nil
-      old_end   = DateTime.parse(options[:old_end_date]) rescue nil
+      old_start = Time.zone.parse(options[:old_start_date]) rescue nil
+      old_end   = Time.zone.parse(options[:old_end_date]) rescue nil
       options[:old_end_date] = nil if old_start && old_end && old_end < old_start
-      new_start = DateTime.parse(options[:new_start_date]) rescue nil
-      new_end   = DateTime.parse(options[:new_end_date]) rescue nil
+      new_start = Time.zone.parse(options[:new_start_date]) rescue nil
+      new_end   = Time.zone.parse(options[:new_end_date]) rescue nil
       options[:new_end_date] = nil if new_start && new_end && new_end < new_start
     end
 

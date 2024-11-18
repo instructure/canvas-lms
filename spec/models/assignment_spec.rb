@@ -6533,8 +6533,8 @@ describe Assignment do
         @course.enroll_user(@ta2, "TaEnrollment", section: @section2, enrollment_state: "active", limit_privileges_to_course_section: true)
 
         Time.zone = "Alaska"
-        default_due = DateTime.parse("01 Jan 2011 14:00 AKST")
-        section_2_due = DateTime.parse("02 Jan 2011 14:00 AKST")
+        default_due = Time.zone.parse("01 Jan 2011 14:00 AKST")
+        section_2_due = Time.zone.parse("02 Jan 2011 14:00 AKST")
         @assignment = @course.assignments.build(title: "some assignment", due_at: default_due, submission_types: ["online_text_entry"])
         @assignment.save_without_broadcasting!
         override = @assignment.assignment_overrides.build
@@ -6603,7 +6603,7 @@ describe Assignment do
         it "notifies appropriate parties when the default due date changes" do
           @assignment.update_attribute(:created_at, 1.day.ago)
 
-          @assignment.due_at = DateTime.parse("09 Jan 2011 14:00 AKST")
+          @assignment.due_at = Time.zone.parse("09 Jan 2011 14:00 AKST")
           @assignment.save!
 
           messages_sent = @assignment.messages_sent["Assignment Due Date Changed"]
@@ -6618,7 +6618,7 @@ describe Assignment do
           @assignment.update_attribute(:created_at, 1.day.ago)
 
           override = @assignment.assignment_overrides.first.reload
-          override.override_due_at(DateTime.parse("11 Jan 2011 11:11 AKST"))
+          override.override_due_at(Time.zone.parse("11 Jan 2011 11:11 AKST"))
           override.save!
 
           messages_sent = override.messages_sent["Assignment Due Date Changed"]
@@ -7310,7 +7310,7 @@ describe Assignment do
     before :once do
       course_factory
       @s2 = @course.course_sections.create! name: "other section"
-      @dates = (0..7).map { |x| DateTime.new(2020, 1, 10 + x, 12, 0, 0) }
+      @dates = (0..7).map { |x| Time.new(2020, 1, 10 + x, 12, 0, 0) }
       @a1 = @course.assignments.create!(title: "no due date")
       @a2 = @course.assignments.create!(title: "no overrides", due_at: @dates[0])
       @a3 = @course.assignments.create!(title: "latest is override", due_at: @dates[1])

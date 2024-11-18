@@ -373,8 +373,8 @@ describe SIS::CSV::CourseImporter do
       expect(c.name).to eq "Test Course 1"
       expect(c.course_code).to eq "TC 101"
       expect(c.enrollment_term).to eq EnrollmentTerm.where(sis_source_id: "T001").first
-      expect(c.start_at).to eq DateTime.parse("2011-04-14 00:00:00")
-      expect(c.conclude_at).to eq DateTime.parse("2011-05-14 00:00:00")
+      expect(c.start_at).to eq Time.zone.parse("2011-04-14 00:00:00")
+      expect(c.conclude_at).to eq Time.zone.parse("2011-05-14 00:00:00")
       expect(c.restrict_enrollments_to_course_dates).to be_truthy
     end
     process_csv_data_cleanly(
@@ -386,8 +386,8 @@ describe SIS::CSV::CourseImporter do
       expect(c.name).to eq "Test Course 2"
       expect(c.course_code).to eq "TC 102"
       expect(c.enrollment_term).to eq EnrollmentTerm.where(sis_source_id: "T002").first
-      expect(c.start_at).to eq DateTime.parse("2011-04-12 00:00:00")
-      expect(c.conclude_at).to eq DateTime.parse("2011-05-12 00:00:00")
+      expect(c.start_at).to eq Time.zone.parse("2011-04-12 00:00:00")
+      expect(c.conclude_at).to eq Time.zone.parse("2011-05-12 00:00:00")
       expect(c.restrict_enrollments_to_course_dates).to be_truthy
     end
     process_csv_data_cleanly(
@@ -408,8 +408,8 @@ describe SIS::CSV::CourseImporter do
       c.name = "Test Course 3"
       c.course_code = "TC 103"
       c.enrollment_term = EnrollmentTerm.where(sis_source_id: "T003").first
-      c.start_at = DateTime.parse("2011-04-13 00:00:00")
-      c.conclude_at = DateTime.parse("2011-05-13 00:00:00")
+      c.start_at = Time.zone.parse("2011-04-13 00:00:00")
+      c.conclude_at = Time.zone.parse("2011-05-13 00:00:00")
       c.restrict_enrollments_to_course_dates = true
       c.save!
     end
@@ -422,8 +422,8 @@ describe SIS::CSV::CourseImporter do
       expect(c.name).to eq "Test Course 3"
       expect(c.course_code).to eq "TC 103"
       expect(c.enrollment_term).to eq EnrollmentTerm.where(sis_source_id: "T003").first
-      expect(c.start_at).to eq DateTime.parse("2011-04-13 00:00:00")
-      expect(c.conclude_at).to eq DateTime.parse("2011-05-13 00:00:00")
+      expect(c.start_at).to eq Time.zone.parse("2011-04-13 00:00:00")
+      expect(c.conclude_at).to eq Time.zone.parse("2011-05-13 00:00:00")
       expect(c.restrict_enrollments_to_course_dates).to be_truthy
     end
     Course.where(sis_source_id: ["c2", "c3"]).each do |c|
@@ -471,8 +471,8 @@ describe SIS::CSV::CourseImporter do
       expect(c.name).to eq "Test Course 1"
       expect(c.course_code).to eq "TC 101"
       expect(c.enrollment_term).to eq EnrollmentTerm.where(sis_source_id: "T001").first
-      expect(c.start_at).to eq DateTime.parse("2011-04-14 00:00:00")
-      expect(c.conclude_at).to eq DateTime.parse("2011-05-14 00:00:00")
+      expect(c.start_at).to eq Time.zone.parse("2011-04-14 00:00:00")
+      expect(c.conclude_at).to eq Time.zone.parse("2011-05-14 00:00:00")
       expect(c.restrict_enrollments_to_course_dates).to be_truthy
     end
     process_csv_data_cleanly(
@@ -484,8 +484,8 @@ describe SIS::CSV::CourseImporter do
       expect(c.name).to eq "Test Course 2"
       expect(c.course_code).to eq "TC 102"
       expect(c.enrollment_term).to eq EnrollmentTerm.where(sis_source_id: "T002").first
-      expect(c.start_at).to eq DateTime.parse("2011-04-12 00:00:00")
-      expect(c.conclude_at).to eq DateTime.parse("2011-05-12 00:00:00")
+      expect(c.start_at).to eq Time.zone.parse("2011-04-12 00:00:00")
+      expect(c.conclude_at).to eq Time.zone.parse("2011-05-12 00:00:00")
       expect(c.restrict_enrollments_to_course_dates).to be_truthy
     end
     process_csv_data_cleanly(
@@ -506,8 +506,8 @@ describe SIS::CSV::CourseImporter do
       c.name = "Test Course 3"
       c.course_code = "TC 103"
       c.enrollment_term = EnrollmentTerm.where(sis_source_id: "T003").first
-      c.start_at = DateTime.parse("2011-04-13 00:00:00")
-      c.conclude_at = DateTime.parse("2011-05-13 00:00:00")
+      c.start_at = Time.zone.parse("2011-04-13 00:00:00")
+      c.conclude_at = Time.zone.parse("2011-05-13 00:00:00")
       c.restrict_enrollments_to_course_dates = true
       c.save!
     end
@@ -520,8 +520,8 @@ describe SIS::CSV::CourseImporter do
       expect(c.name).to eq "Test Course 3"
       expect(c.course_code).to eq "TC 103"
       expect(c.enrollment_term).to eq EnrollmentTerm.where(sis_source_id: "T003").first
-      expect(c.start_at).to eq DateTime.parse("2011-04-13 00:00:00")
-      expect(c.conclude_at).to eq DateTime.parse("2011-05-13 00:00:00")
+      expect(c.start_at).to eq Time.zone.parse("2011-04-13 00:00:00")
+      expect(c.conclude_at).to eq Time.zone.parse("2011-05-13 00:00:00")
       expect(c.restrict_enrollments_to_course_dates).to be_truthy
     end
     Course.where(sis_source_id: "c1").each do |c|
@@ -529,8 +529,8 @@ describe SIS::CSV::CourseImporter do
       expect(c.name).to eq "Test Course 4"
       expect(c.course_code).to eq "TC 104"
       expect(c.enrollment_term).to eq EnrollmentTerm.where(sis_source_id: "T004").first
-      expect(c.start_at).to eq DateTime.parse("2011-04-16 00:00:00")
-      expect(c.conclude_at).to eq DateTime.parse("2011-05-16 00:00:00")
+      expect(c.start_at).to eq Time.zone.parse("2011-04-16 00:00:00")
+      expect(c.conclude_at).to eq Time.zone.parse("2011-05-16 00:00:00")
       expect(c.restrict_enrollments_to_course_dates).to be_truthy
     end
   end
