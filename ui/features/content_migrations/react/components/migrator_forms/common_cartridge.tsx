@@ -54,6 +54,7 @@ const CommonCartridgeImporter = ({
         onChange={setFile}
         isSubmitting={isSubmitting}
         externalFormMessage={fileError ? noFileSelectedFormMessage : undefined}
+        isRequired={true}
       />
       <QuestionBankSelector
         onChange={setQuestionBankSettings}

@@ -29,6 +29,7 @@ import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {InfoButton} from './info_button'
 import {DateAdjustments} from '../date_adjustments'
 import type {onSubmitMigrationFormCallback, DateAdjustmentConfig} from '../types'
+import {RequiredFormLabel} from './form_label'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -251,7 +252,11 @@ export const CommonMigratorControls = ({
           <RadioInputGroup
             name={I18n.t('Selective import')}
             layout="stacked"
-            description={I18n.t('Content')}
+            description={
+              <RequiredFormLabel showErrorState={contentError}>
+                {I18n.t('Content')}
+              </RequiredFormLabel>
+            }
             defaultValue="non_selective"
           >
             <RadioInput
