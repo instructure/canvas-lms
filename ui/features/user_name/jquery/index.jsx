@@ -23,8 +23,6 @@ import $ from 'jquery'
 import htmlEscape from '@instructure/html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit */
-import 'jqueryui/dialog'
-import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData'
 import ready from '@instructure/ready'
