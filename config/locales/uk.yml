@@ -192,6 +192,7 @@ uk:
   access_report_80d28095: "Звіт про доступ"
   access_token_3be22221: "Маркер доступу"
   access_token_count_access_token_count_dfb5463c: "Кількість маркерів доступу: %{access_token_count}"
+  access_token_details_495d989: "Деталі маркерів доступу"
   accordion_section_1_7888782d: "Координаційний розділ 1"
   accordion_section_2_e1812997: "Координаційний розділ 2"
   accordion_section_3_96861901: "Координаційний розділ 3"
@@ -2271,6 +2272,7 @@ uk:
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "Ви впевнені, що хочете видалити Ваше резервування для цієї події?"
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "Ви впевнені, що хочете вимкнути синхронізацію %{sisName} для усіх завдань?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Ви впевнені, що хочете це зробити? Це не може бути скасоване і перевизначить існуючі оцінки в заліковій книжці."
+  are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "Ви дійсно хочете перегенерувати цей token? Все, що використовує цей token, повинно бути оновлено."
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Ви впевнені, що хочете видалити цей інструмент?"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "Ви впевнені, що хочете видалити цього користувача?"
   are_you_sure_you_want_to_remove_this_user_s_profil_6d703c4: "Ви впевнені, що хочете видалити зображення профілю цього користувача?"
@@ -4259,11 +4261,13 @@ uk:
   confirm_contact_method_29d6fe4b: "Підтвердити метод контактування"
   confirm_delete_6febeafb: "Підтвердити видалення"
   confirm_deletion_b2efe7d4: "Підтвердити видалення"
+  confirm_email_address_9072dd3c: "Підтвердити електронну адресу"
   confirm_removal_a9bb889: "Підтвердження видалення"
   confirm_reservation_removal_e6350e7c: "Підтвердження зарезервованого видалення"
   confirm_unenrollment_64333263: "Підтвердити дереєстрацію"
   confirmation_code_required_22984955: "Код підтвердження (обов'язково)"
   confirmation_failed_please_try_again_ae566d37: "Підтвердження не вдале.  Будь ласка, спробуйте ще раз."
+  confirming_2df4b68f: Підтвердження...
   consumer_key_6f94ba11: "Ключ клієнта"
   contact_a6e7f6da: Зв'язатися
   content_1440204b: Вміст
@@ -7495,6 +7499,7 @@ uk:
   expand_tutorial_tray_22630c49: "Розгорнути панель вказівок"
   expanded_f4493860: Розгонуто
   experimental_graphql_api_75c5eb8f: "EXPERIMENTAL GraphQL API."
+  expires_7019786e: Завершується
   export_an_existing_quiz_to_new_quizzes_2_format_8fd08a23: "Експортувати діючу контрольну роботу до нового формату Контрольних робіт 2"
   export_course_content_f4774b74: "Експортувати контент курсу"
   export_de71cd8e: Експортувати
@@ -7832,10 +7837,12 @@ uk:
   generate_epub_80e89ea4: "Згенерувати ePub"
   generate_item_analysis_report_statuslabel_16e02c8: "Згенерувати пункт аналітичного звіту %{statusLabel}"
   generate_student_analysis_report_statuslabel_aecdc4dc: "Згенерувати аналітичний звіт студента %{statusLabel}"
+  generate_token_393ab5b4: "Згенерувати маркер"
   generated_f26ee56b: "Згенеровано:"
   generating_5b5e20f8: "Генерується:"
   generating_c2aabc02: Генерується...
   generating_preview_45b53be0: "Генерується попередній перегляд..."
+  generating_token_42c29663: "Генерується Token..."
   germany_49_fc5b8179: "Німеччина (+49)"
   get_started_b9507525: Почати
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "Отримайте наступне від свого Salesforce Connected App"
@@ -9214,6 +9221,7 @@ uk:
   last_name_303122f3: Прізвище
   last_post_display_last_reply_at_b9896355: "Остання публікація %{display_last_reply_at}"
   last_pushed_update_last_export_at_9f634f7c: "Останнє прискорене оновлення: %{last_export_at}"
+  last_used_17553fed: "Останній раз використано"
   last_used_f9457313: "Востаннє використано:"
   last_user_access_title: "Останній доступ користувача"
   late_2be42b88: Пізніше
@@ -11771,6 +11779,7 @@ uk:
   never_1ed1244d: ніколи
   never_df100b49: Ніколи
   new_13daf639: Новий
+  new_access_token_e301d1fc: "Новий маркер доступу"
   new_account_role_6e5c4964: "Роль нового облікового запису"
   new_activity_8b84847d: "Нова діяльність"
   new_annotations_66932016: "Нові анотації"
@@ -12272,6 +12281,7 @@ uk:
   off_5385ef3f: Вимкнено
   ok_c47544a2: OK
   ok_ff1b646a: Ok
+  ok_thanks_6b1fc8ae: "Ок, дякуємо"
   okay_1772bbeb: Гаразд
   oldest_newest_4de86803: "Найстаріші - найновіші"
   oman_968_46f8d901: "Оман (+968)"
@@ -13279,6 +13289,8 @@ uk:
       regenerating_token_failed: "Не вдалося перегенерувати маркер"
       registration_failed: "Помилка при реєстрації. Перевірте ім'я користувача та пароль, та спробуйте знову."
     failed_resending: "Не вдалося виконати запит. Спробуйте ще раз."
+    labels: 
+      enable_login_for_email: "Я хочу увійти до Canvas, використовуючи цю електронну адресу "
     links: 
       resend_confirmation: "Повторна відправка підтвердження"
       resend_confirmation_failed: "Не вдалося виконати запит. Спробуйте ще раз."
@@ -13594,6 +13606,7 @@ uk:
   publishing_is_disabled_for_this_item_efa7803f: "Публікації відключено для цього предмету"
   publishing_item_name_is_disabled_8207a9e7: "Публікація %{item_name} відключена."
   purple_7678a9fc: Фіолетовий
+  purpose_5202a309: Мета
   push_notification_a6532ff3: "Відправити повідомлення"
   q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: |-
       Питання:  Що таке чорне, біле, чорне, біле? 
@@ -14915,6 +14928,8 @@ uk:
   ratio_responded_correctly_6d890107: "%{ratio}відповіли правильно"
   re_activate_user_f7d77c9a: "Повторно активувати користувача"
   re_reported_b9671073: "Повторно повідомлено"
+  re_send_confirmation_bcc66940: "Повторна відправка підтвердження"
+  re_sending_379a8580: "Повторна відправка..."
   re_submit_assignment_b3e2bd28: "Повторно надіслати завдання "
   re_upload_submissions_125e415d: "Повторно завантажити роботи"
   re_upload_submissions_form: 
@@ -15011,9 +15026,13 @@ uk:
   refresh_8a04b019: Оновити
   regenerate_3e4679f8: Відновити
   regenerate_epub_395c8e56: "Відновити ePub"
+  regenerate_token_7d4fb783: "Заново згенерувати маркер"
+  regenerating_token_42e5c747: "Заново генерується Token..."
   region_47e29025: "Область:"
   region_939f2a6c: Область
+  register_communication_ae935328: "Зареєструвати зв'язок"
   register_email_efc06d59: "Зареєструвати електронну адресу"
+  register_sms_7f87e50d: "Зареєструвати смс"
   register_tool_84de3186: "Зареєструвати інструмент"
   registration: 
     get_started: Почати
@@ -17809,6 +17828,7 @@ uk:
   toggle_editing_answer_text_as_html_9a93fe6: "Переключити редагування тексту відповіді на HTML"
   toggle_select_course_name_310fdee4: "Обрати курс %{name}"
   toggle_title_grading_period_visibility_462b2136: "Переключити %{title} видимість періоду оцінювання "
+  token_9a020862: Маркер
   tolerance_value_9e96573c: "Рівень толерантності"
   tomorrow_9a6c9a00: Завтра
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "Занадто багато невдалих спроб входу до системи. Будь ласка, спробуйте ще раз або зверніться до системного адміністратора."
