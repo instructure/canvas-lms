@@ -355,6 +355,7 @@ nn:
   access_token_3be22221: Tilgangstoken
   access_token_count_access_token_count_dfb5463c: "Tal på tilgangs-token %{access_token_count}"
   access_token_created_or_regenerated_4ce9ed1f: "Tilgangstoken er laga eller regenerert."
+  access_token_details_495d989: "Detaljar for tilgangstoken"
   access_token_is_valid_until_d2f048cf: "Tilgangstoken er gyldig til"
   access_token_manage_a626f071: "Tilgangstoken - administrer"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Tilgangstoken kan gi andre applikasjonar lov til å gjere API-kall på dine vegne. Du kan óg generere tilgangstoken og *bruke Canvas sine opne API-ar* til å sette opp eigne integrasjonar. "
@@ -3750,6 +3751,7 @@ nn:
   are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: "Er du sikker på at du vil vise vurderingane for denne oppgåva til studentane? "
   are_you_sure_you_want_to_proceed_changes_you_made__2f87f0e7: "Er du sikker på at du vil halde fram? Endringar du har gjort vil ikkje bli lagra."
   are_you_sure_you_want_to_publish_this_comment_26989c2f: "Er du sikker på at du vil publisere denne kommentaren?"
+  are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "Er du sikker på at du vil generere dette teiknet på nytt? Alt som brukar dette teiknet må oppdaterast."
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Er du sikker på at du vil fjerne karaktersetjingsperioden?"
   are_you_sure_you_want_to_remove_this_item_7887ce31: "Er du sikker på at du vil fjerne dette elementet? "
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Er du sikker på at du vil fjerne verktøyet?"
@@ -6744,6 +6746,7 @@ nn:
   confirm_dialog_component: 
     ok: OK
   confirm_edit_outcome_a9746c99: "Stadfest redigering av læringsmål"
+  confirm_email_address_9072dd3c: "Stadfest e-postadresse"
   confirm_mastery_calculation_19ad19f9: "Bekreft ekspertiseberekning"
   confirm_mastery_scale_9a779252: "Stadfest meistringskala"
   confirm_qr_code_display_49664fa3: "Bekreft QR-kode visning"
@@ -6758,6 +6761,7 @@ nn:
   confirm_unfavorite_course_fa01966d: "Bekreft fjerning av favoritt-merke"
   confirmation_code_required_22984955: "Kode for stadfesting (obligatorisk)"
   confirmation_failed_please_try_again_ae566d37: "Stadfesting mislukkast. Prøv på nytt seinare."
+  confirming_2df4b68f: Stadfestar...
   confused_panda_questioning_what_to_do_next_42941484: "Forvirra Panda funderar på kva han skal gjere no"
   consider_selecting_multiple_submission_types_to_ac_f7e624d5: "Vurder å velje fleire innleveringstypar for å tilpasse innleveringen for studentar som kanskje ikkje får til å lage merknader"
   consumer_key_57d9fcf1: Forbrukarnøkkel
@@ -11352,6 +11356,7 @@ nn:
   expanded_f4493860: Viser
   expected_array_of_objects_b09ead01: "Forventa tabell med objekt"
   experimental_graphql_api_75c5eb8f: "EXPERIMENTAL GraphQL API."
+  expires_7019786e: "Går ut"
   expires_at_6214b43f: "Går ut den"
   explanation_of_statuses_90a26d07: "Forklaring på statusar:"
   explicit_latex_typesetting_c1c569c9: "Eksplisitt LaTeX-typesetting"
@@ -11948,12 +11953,14 @@ nn:
   generate_epub_80e89ea4: "Generer EPUB"
   generate_item_analysis_report_statuslabel_16e02c8: "Generer elementanalyserapport %{statusLabel}"
   generate_student_analysis_report_statuslabel_aecdc4dc: "Generer studentanalyserapport %{statusLabel}"
+  generate_token_393ab5b4: "Generer teikn"
   generated_f26ee56b: "Generert:"
   generating_5b5e20f8: "Genererer:"
   generating_c2aabc02: Genererer...
   generating_pairing_code_251b7fc8: "Genererer paringskode..."
   generating_pairing_code_d480ccf4: "Genererer paringskode"
   generating_preview_45b53be0: "Genererer førehandsvising..."
+  generating_token_42c29663: "Genererer teikn..."
   german_3ec99bbb: Tysk
   germany_49_fc5b8179: "Tyskland (+49)"
   germany_b02d91c9: Tyskland
@@ -14718,6 +14725,7 @@ nn:
   last_synced_datetime_1c3e0295: "Sist synkronisert: %{datetime}"
   last_synced_right_now_f6c2ab00: "Sist synkronisert: No"
   last_updated_timestamp_1822e508: "Sist oppdatert %{timestamp}"
+  last_used_17553fed: "Sist brukt"
   last_used_f9457313: "Sist brukt:"
   last_user_access_title: "Siste brukartilgang"
   last_viewed_cfbbbc3a: "Sist vist"
@@ -17968,6 +17976,7 @@ nn:
   never_df100b49: Aldri
   never_should_have_made_it_here_ab72bdab: "Skulle aldri kome hit"
   new_13daf639: Ny
+  new_access_token_e301d1fc: "Nytt tilgangstoken"
   new_account_role_6e5c4964: "Ny kontorolle"
   new_activity_8b84847d: "Ny aktivitet"
   new_activity_for_title_c5cc74: "Ny aktivitet for%{title}"
@@ -18782,6 +18791,7 @@ nn:
   offline_score_8d7b4779: "Fråkopla Resultat:"
   ok_c47544a2: OK
   ok_ff1b646a: OK
+  ok_thanks_6b1fc8ae: Takk
   okay_1772bbeb: OK
   old_policy_39e4f77: "Gamle retningslinjar"
   old_quiz_e8dafede: "Gammal quiz"
@@ -20320,6 +20330,8 @@ nn:
       regenerating_token_failed: "Ny generering av teikn mislukkast"
       registration_failed: "Registrering mislukkast. Kontroller brukarnamn og passord før du prøver på nytt."
     failed_resending: "Førespurnad mislukkast Prøv på nytt seinare."
+    labels: 
+      enable_login_for_email: "Eg vil logge på Canvas med denne e-postadressa"
     links: 
       resend_confirmation: "Send stadfesting på nytt"
       resend_confirmation_failed: "Førespurnad mislukkast Prøv på nytt seinare."
@@ -20737,6 +20749,7 @@ nn:
     new: 
       payment_info: Betalingsinformasjon
   purple_7678a9fc: Lilla
+  purpose_5202a309: Formål
   push_notification_a6532ff3: Push-varsel
   q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: "Sp: Kva er svart, kvit, svart, kvit? Sv: Ein panda som rullar ned ei skråning."
   qatar_974_7e9684ca: "Qatar (+974)"
@@ -22088,7 +22101,9 @@ nn:
   rce_s_new_and_improved_equation_editor_dialog_380653be: "Rik teksteditor sin nye og forbetra likningseditor"
   re_activate_user_f7d77c9a: "Aktiver brukar på nytt"
   re_reported_b9671073: "Rapportert på nytt"
+  re_send_confirmation_bcc66940: "Send stadfesting på nytt"
   re_send_notification_directly_to_users_when_announ_c421cea5: "Send varsel på nytt direkte til brukar når kunngjeringa startar"
+  re_sending_379a8580: "Sender på nytt..."
   re_submission_user_name_assignment_title_621a1cb3: "Ny innlevering: %{user_name},%{assignment_title}"
   re_submit_assignment_b3e2bd28: "Lever oppgåve på nytt"
   re_upload_submissions_125e415d: "Last tilbake kommenterte filer"
@@ -22228,12 +22243,16 @@ nn:
   regenerate_3e4679f8: Regenerer
   regenerate_epub_395c8e56: "Regenerer EPUB"
   regenerate_summary_f189e9d: "Regenerer oppsummering"
+  regenerate_token_7d4fb783: "Generer teiknet på nytt"
   regenerating_themes_462e6cd9: "Genererer tema på nytt . . ."
+  regenerating_token_42e5c747: "Genererer teiknet på nytt..."
   region_47e29025: "Område:"
   region_939f2a6c: Område
   register_app_a8aaabdf: "Registrer app"
+  register_communication_ae935328: "Registrer kommunikasjon"
   register_email_efc06d59: "Registrer e-post"
   register_slack_email_1f6d7e6d: "Registrer Slack-epost"
+  register_sms_7f87e50d: "Registrer SMS"
   register_tool_84de3186: "Registrer verktøyet"
   registration: 
     get_started: "Kom i gang"
@@ -27453,6 +27472,7 @@ nn:
   toggle_tooltip_2447b4fa: "Vis/skjul tips"
   toggle_tooltip_d3b7cb86: "Vis/skjul tips"
   toggling_placement_ee1ab8b5: "Bytte plassering"
+  token_9a020862: Token
   tolerance_value_9e96573c: Toleranseverdi
   tomorrow_9a6c9a00: "I morgon"
   tomorrow_at_date_63a0d0d9: "I morgon på %{date}"
