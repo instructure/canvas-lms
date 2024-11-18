@@ -110,6 +110,7 @@ export function DiscussionDetails({...props}) {
                   delayedPostAt={props.discussionTopic.delayedPostAt}
                   anonymousState={props.discussionTopic.anonymousState}
                   groupSet={props.discussionTopic.groupSet}
+                  assignment={props.discussionTopic.assignment}
                 />
               </Flex.Item>
             </Flex>

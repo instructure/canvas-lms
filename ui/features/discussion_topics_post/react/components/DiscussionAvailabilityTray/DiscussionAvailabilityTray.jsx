@@ -84,15 +84,15 @@ export function DiscussionAvailabilityTray({...props}) {
                 </Table.Cell>
                 <Table.Cell>
                   <Text size={responsiveProps.textSize}>
-                    {props.delayedPostAt
-                      ? DateHelper.formatDatetimeForDiscussions(props.delayedPostAt)
+                    {item.delayedPostAt
+                      ? DateHelper.formatDatetimeForDiscussions(item.delayedPostAt)
                       : I18n.t('No Start Date')}
                   </Text>
                 </Table.Cell>
                 <Table.Cell>
                   <Text size={responsiveProps.textSize}>
-                    {props.lockAt
-                      ? DateHelper.formatDatetimeForDiscussions(props.lockAt)
+                    {item.lockAt
+                      ? DateHelper.formatDatetimeForDiscussions(item.lockAt)
                       : I18n.t('No End Date')}
                   </Text>
                 </Table.Cell>
@@ -107,6 +107,4 @@ export function DiscussionAvailabilityTray({...props}) {
 
 DiscussionAvailabilityTray.propTypes = {
   availabilities: PropTypes.array,
-  lockAt: PropTypes.string,
-  delayedPostAt: PropTypes.string,
 }
