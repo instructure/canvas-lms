@@ -25,7 +25,7 @@ module JsonTimeInUTC
   end
 end
 Time.prepend(JsonTimeInUTC)
-DateTime.prepend(JsonTimeInUTC)
+DateTime.prepend(JsonTimeInUTC) # rubocop:disable Style/DateTime
 ActiveSupport::TimeWithZone.prepend(JsonTimeInUTC)
 
 # Object#blank? calls respond_to?, which has to instantiate the time object
@@ -34,8 +34,6 @@ class ActiveSupport::TimeWithZone
   def blank?
     false
   end
-
-  delegate :utc_datetime, to: :comparable_time
 end
 
 module TimeZoneAsJson

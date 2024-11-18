@@ -607,7 +607,7 @@ class Account < ActiveRecord::Base
     return false unless terms_required?
     return true if user.nil? || user.new_record?
 
-    soc2_start_date = Setting.get("SOC2_start_date", Time.new(2015, 5, 16, 0, 0, 0).utc).to_datetime
+    soc2_start_date = Setting.get("SOC2_start_date", Time.new(2015, 5, 16, 0, 0, 0).utc).to_time
     return false if user.created_at < soc2_start_date
 
     terms_changed_at = root_account.terms_of_service.terms_of_service_content&.terms_updated_at || settings[:terms_changed_at]

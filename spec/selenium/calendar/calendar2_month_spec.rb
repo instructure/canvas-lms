@@ -242,14 +242,14 @@ describe "calendar2" do
 
           create_middle_day_event
           date_of_middle_day = find_middle_day.attribute("data-date")
-          date_of_next_day = (date_of_middle_day.to_datetime + 1.day).strftime("%Y-%m-%d")
+          date_of_next_day = (Time.zone.parse(date_of_middle_day) + 1.day).strftime("%Y-%m-%d")
           f(".fc-content-skeleton .fc-event-container .fc-resizer")
           next_day = fj("[data-date=#{date_of_next_day}]")
           drag_and_drop_element(f(".fc-content-skeleton .fc-event-container .fc-resizer"), next_day)
           fj(".fc-event:visible").click
           # observe the event details show date range from event start to date to end date
-          original_day_text = format_time_for_view(date_of_middle_day.to_datetime)
-          extended_day_text = format_time_for_view(date_of_next_day.to_datetime + 1.day)
+          original_day_text = format_time_for_view(Time.zone.parse(date_of_middle_day))
+          extended_day_text = format_time_for_view(Time.zone.parse(date_of_next_day) + 1.day)
           expect(f(".event-details-timestring .date-range").text).to eq("#{original_day_text} - #{extended_day_text}")
         end
 
@@ -697,7 +697,7 @@ describe "calendar2" do
       end
 
       it "loads events from adjacent months correctly" do
-        time = DateTime.parse("2016-04-01")
+        time = Time.zone.parse("2016-04-01")
         @course.calendar_events.create! title: "aprilfools", start_at: time, end_at: time + 5.minutes
 
         get "/calendar2"
@@ -710,7 +710,7 @@ describe "calendar2" do
       end
 
       it "doesn't duplicate events when enabling calendars" do
-        time = DateTime.parse("2016-04-01")
+        time = Time.zone.parse("2016-04-01")
         @course.calendar_events.create! title: "aprilfools", start_at: time, end_at: time + 5.minutes
         get "/calendar2?include_contexts=#{@course.asset_string}#view_name=month&view_start=2016-04-01"
         wait_for_ajaximations

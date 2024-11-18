@@ -52,7 +52,7 @@ module Lti
 
       def registration_token
         uuid = SecureRandom.uuid
-        current_time = DateTime.now.iso8601
+        current_time = Time.zone.now.iso8601
         user_id = @current_user.id
         root_account_global_id = account_context.global_id
         unified_tool_id = params[:unified_tool_id].presence

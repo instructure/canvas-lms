@@ -282,8 +282,8 @@ describe "Announcements API", type: :request do
                                   "/api/v1/announcements",
                                   @params.merge(context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"],
                                                 start_date: 10.days.ago.iso8601,
-                                                end_date: DateTime.now.utc.iso8601,
-                                                available_after: DateTime.now.utc.iso8601,
+                                                end_date: Time.now.utc.iso8601,
+                                                available_after: Time.now.utc.iso8601,
                                                 active_only: true,
                                                 page: 1,
                                                 per_page: 6))
@@ -361,13 +361,13 @@ describe "Announcements API", type: :request do
                                 "/api/v1/announcements",
                                 @params.merge(context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"],
                                               start_date: 10.days.ago.iso8601,
-                                              end_date: DateTime.now.utc.iso8601,
-                                              available_after: DateTime.now.utc.iso8601,
+                                              end_date: Time.now.utc.iso8601,
+                                              available_after: Time.now.utc.iso8601,
                                               active_only: true,
                                               page: 1,
                                               per_page: 6))
         0.upto(2) do |i|
-          expect(json[i]["lock_at"] > DateTime.now.utc.iso8601).to be_truthy unless json[i]["lock_at"].nil?
+          expect(json[i]["lock_at"] > Time.now.utc.iso8601).to be_truthy unless json[i]["lock_at"].nil?
         end
         expect(json.length).to eq 3
       end

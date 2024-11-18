@@ -214,11 +214,12 @@ module Canvas::OAuth
       end
 
       it "returns the expires_in parameter" do
-        allow(Time).to receive(:now).and_return(DateTime.parse("2015-07-10T09:29:00Z").utc.to_time)
-        access_token = token.access_token
-        access_token.expires_at = DateTime.parse("2015-07-10T10:29:00Z")
-        access_token.save!
-        expect(json["expires_in"]).to eq 3600
+        Timecop.freeze(Time.zone.parse("2015-07-10T09:29:00Z")) do
+          access_token = token.access_token
+          access_token.expires_at = Time.zone.parse("2015-07-10T10:29:00Z")
+          access_token.save!
+          expect(json["expires_in"]).to eq 3600
+        end
       end
 
       it "does not put anything else into the json" do

@@ -72,8 +72,8 @@ describe SIS::CSV::TermImporter do
     expect(EnrollmentTerm.where.not(sis_source_id: nil).count).to eq before_count + 1
     EnrollmentTerm.where.not(sis_source_id: nil).last.tap do |t|
       expect(t.name).to eq "Winter11"
-      expect(t.start_at).to eq DateTime.parse("2011-1-05 00:00:00")
-      expect(t.end_at).to eq DateTime.parse("2011-4-14 00:00:00")
+      expect(t.start_at).to eq Time.zone.parse("2011-1-05 00:00:00")
+      expect(t.end_at).to eq Time.zone.parse("2011-4-14 00:00:00")
     end
     process_csv_data(
       "term_id,name,status,start_date,end_date",
@@ -82,11 +82,11 @@ describe SIS::CSV::TermImporter do
     expect(EnrollmentTerm.where.not(sis_source_id: nil).count).to eq before_count + 1
     EnrollmentTerm.where.not(sis_source_id: nil).last.tap do |t|
       expect(t.name).to eq "Winter12"
-      expect(t.start_at).to eq DateTime.parse("2010-1-05 00:00:00")
-      expect(t.end_at).to eq DateTime.parse("2010-4-14 00:00:00")
+      expect(t.start_at).to eq Time.zone.parse("2010-1-05 00:00:00")
+      expect(t.end_at).to eq Time.zone.parse("2010-4-14 00:00:00")
       t.name = "Fall11"
-      t.start_at = DateTime.parse("2009-1-05 00:00:00")
-      t.end_at = DateTime.parse("2009-4-14 00:00:00")
+      t.start_at = Time.zone.parse("2009-1-05 00:00:00")
+      t.end_at = Time.zone.parse("2009-4-14 00:00:00")
       t.save!
     end
     process_csv_data(
@@ -96,8 +96,8 @@ describe SIS::CSV::TermImporter do
     expect(EnrollmentTerm.where.not(sis_source_id: nil).count).to eq before_count + 1
     EnrollmentTerm.where.not(sis_source_id: nil).last.tap do |t|
       expect(t.name).to eq "Fall11"
-      expect(t.start_at).to eq DateTime.parse("2009-1-05 00:00:00")
-      expect(t.end_at).to eq DateTime.parse("2009-4-14 00:00:00")
+      expect(t.start_at).to eq Time.zone.parse("2009-1-05 00:00:00")
+      expect(t.end_at).to eq Time.zone.parse("2009-4-14 00:00:00")
     end
   end
 
@@ -142,8 +142,8 @@ describe SIS::CSV::TermImporter do
 
     t1 = @account.enrollment_terms.where(sis_source_id: "T001").first
     override = t1.enrollment_dates_overrides.where(enrollment_type: "StudentEnrollment").first
-    expect(override.start_at).to eq DateTime.parse("2012-1-05 00:00:00")
-    expect(override.end_at).to eq DateTime.parse("2012-4-14 00:00:00")
+    expect(override.start_at).to eq Time.zone.parse("2012-1-05 00:00:00")
+    expect(override.end_at).to eq Time.zone.parse("2012-4-14 00:00:00")
 
     process_csv_data(
       "term_id,name,status,start_date,end_date,date_override_enrollment_type",
@@ -163,14 +163,14 @@ describe SIS::CSV::TermImporter do
 
     t1 = @account.enrollment_terms.where(sis_source_id: "T001").first
     override = t1.enrollment_dates_overrides.where(enrollment_type: "StudentEnrollment").first
-    override.end_at = DateTime.parse("2024-04-30 00:00:00")
+    override.end_at = Time.zone.parse("2024-04-30 00:00:00")
     override.save!
     process_csv_data(
       "term_id,name,status,start_date,end_date,date_override_enrollment_type",
       "T001,Winter24,active,2024-1-02 00:00:00,2024-04-26 00:00:00,StudentEnrollment"
     )
     override.reload
-    expect(override.end_at).to eq DateTime.parse("2024-04-30 00:00:00")
+    expect(override.end_at).to eq Time.zone.parse("2024-04-30 00:00:00")
     expect(t1.enrollment_dates_overrides.where(enrollment_type: "TeacherEnrollment").first).not_to be_nil
 
     process_csv_data(

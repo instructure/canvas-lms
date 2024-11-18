@@ -1519,9 +1519,9 @@ describe "discussions" do
             displayed_override_dates = all_displayed_assign_to_date_and_time
 
             # Check that the due dates are correctly displayed
-            expect(displayed_override_dates.include?(DateTime.parse(due_date))).to be_truthy
-            expect(displayed_override_dates.include?(DateTime.parse(unlock_at))).to be_truthy
-            expect(displayed_override_dates.include?(DateTime.parse(lock_at))).to be_truthy
+            expect(displayed_override_dates.include?(Time.zone.parse(due_date))).to be_truthy
+            expect(displayed_override_dates.include?(Time.zone.parse(unlock_at))).to be_truthy
+            expect(displayed_override_dates.include?(Time.zone.parse(lock_at))).to be_truthy
           end
 
           it "displays everyone and section and student overrides correctly", custom_timeout: 30 do
@@ -2286,9 +2286,9 @@ describe "discussions" do
             displayed_override_dates = all_displayed_assign_to_date_and_time
 
             # Check that the due dates are correctly displayed
-            expect(displayed_override_dates.include?(DateTime.parse(due_date))).to be_truthy
-            expect(displayed_override_dates.include?(DateTime.parse(unlock_at))).to be_truthy
-            expect(displayed_override_dates.include?(DateTime.parse(lock_at))).to be_truthy
+            expect(displayed_override_dates.include?(Time.zone.parse(due_date))).to be_truthy
+            expect(displayed_override_dates.include?(Time.zone.parse(unlock_at))).to be_truthy
+            expect(displayed_override_dates.include?(Time.zone.parse(lock_at))).to be_truthy
           end
 
           it "displays everyone and section and student overrides correctly", custom_timeout: 30 do

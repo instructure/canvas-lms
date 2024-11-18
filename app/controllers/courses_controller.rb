@@ -2781,9 +2781,9 @@ class CoursesController < ApplicationController
       @course.attributes = args
       %i[start_at conclude_at].each do |timestamp_field|
         if (timestamp = params.dig(:course, timestamp_field))
-          @course[timestamp_field] = DateTime.parse(timestamp).utc
+          @course[timestamp_field] = Time.zone.parse(timestamp)
         end
-      rescue Date::Error
+      rescue ArgumentError
         # ignore
       end
       @course.workflow_state = "claimed"

@@ -162,7 +162,7 @@ describe "assignment" do
 
     it "fills the due date field from a selection in the popup calendar" do
       differentiated_modules_off
-      time = DateTime.new(2023, 8, 9, 12, 0, 0, 0, 0) # this is a Wednesday
+      time = Time.new(2023, 8, 9, 12, 0, 0, 0) # this is a Wednesday
       Timecop.freeze(time) do
         @assignment = @course.assignments.create!(due_at: time, points_possible: 10)
 
@@ -174,7 +174,7 @@ describe "assignment" do
         f("td.ui-datepicker-current-day + td").click
         AssignmentCreateEditPage.due_date_picker_done_btn.click
         expect(AssignmentCreateEditPage.due_date_input.attribute("value")).to eq(
-          format_time_for_datepicker(DateTime.new(2023, 8, 10, 12, 0, 0, 0, 0))
+          format_time_for_datepicker(Time.new(2023, 8, 10, 12, 0, 0, 0))
         )
       end
     end

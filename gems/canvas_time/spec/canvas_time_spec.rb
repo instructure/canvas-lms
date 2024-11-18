@@ -48,19 +48,6 @@ describe "Time Marshal override" do
 end
 # rubocop:enable Security/MarshalLoad
 
-describe "utc_datetime" do
-  it "returns a DateTime" do
-    expect(Time.now.utc_datetime).to be_a(DateTime)
-  end
-
-  it "is initialized from the given time" do
-    t = Time.utc(2000, "jan", 3, 20, 15, 1)
-    utc_datetime = t.utc_datetime
-
-    expect(utc_datetime.iso8601).to eq "2000-01-03T20:15:00+00:00"
-  end
-end
-
 describe "fancy_midnight" do
   it "doesn't stomp on your Jenkins specs at midnight UTC" do
     time = Time.now.beginning_of_day + 4.seconds

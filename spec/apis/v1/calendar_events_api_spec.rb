@@ -3509,16 +3509,16 @@ describe CalendarEventsApiController, type: :request do
 
           it "returns an all-day override" do
             # make the assignment non-all day
-            @default_assignment.due_at = DateTime.parse("2012-01-12 04:42:00")
+            @default_assignment.due_at = Time.zone.parse("2012-01-12 04:42:00")
             @default_assignment.save!
             expect(@default_assignment.all_day).to be_falsey
-            expect(@default_assignment.all_day_date).to eq DateTime.parse("2012-01-12 04:42:00").to_date
+            expect(@default_assignment.all_day_date).to eq Time.zone.parse("2012-01-12 04:42:00").to_date
 
             assignment_override_model(assignment: @default_assignment,
                                       set: @course.default_section,
-                                      due_at: DateTime.parse("2012-01-21 23:59:00"))
+                                      due_at: Time.zone.parse("2012-01-21 23:59:00"))
             expect(@override.all_day).to be_truthy
-            expect(@override.all_day_date).to eq DateTime.parse("2012-01-21 23:59:00").to_date
+            expect(@override.all_day_date).to eq Time.zone.parse("2012-01-21 23:59:00").to_date
 
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-01&end_date=2012-01-31&per_page=25&context_codes[]=course_#{@course.id}", {
                               controller: "calendar_events_api",
@@ -3538,16 +3538,16 @@ describe CalendarEventsApiController, type: :request do
           end
 
           it "returns a non-all-day override" do
-            @default_assignment.due_at = DateTime.parse("2012-01-12 23:59:00")
+            @default_assignment.due_at = Time.zone.parse("2012-01-12 23:59:00")
             @default_assignment.save!
             expect(@default_assignment.all_day).to be_truthy
-            expect(@default_assignment.all_day_date).to eq DateTime.parse("2012-01-12 23:59:00").to_date
+            expect(@default_assignment.all_day_date).to eq Time.zone.parse("2012-01-12 23:59:00").to_date
 
             assignment_override_model(assignment: @default_assignment,
                                       set: @course.default_section,
-                                      due_at: DateTime.parse("2012-01-21 04:42:00"))
+                                      due_at: Time.zone.parse("2012-01-21 04:42:00"))
             expect(@override.all_day).to be_falsey
-            expect(@override.all_day_date).to eq DateTime.parse("2012-01-21 04:42:00").to_date
+            expect(@override.all_day_date).to eq Time.zone.parse("2012-01-21 04:42:00").to_date
 
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-01&end_date=2012-01-31&per_page=25&context_codes[]=course_#{@course.id}", {
                               controller: "calendar_events_api",
@@ -3584,11 +3584,11 @@ describe CalendarEventsApiController, type: :request do
           end
 
           it "returns an override when present" do
-            @default_assignment.due_at = DateTime.parse("2012-01-08 12:00:00")
+            @default_assignment.due_at = Time.zone.parse("2012-01-08 12:00:00")
             @default_assignment.save!
             assignment_override_model(assignment: @default_assignment,
                                       set: @course.default_section,
-                                      due_at: DateTime.parse("2012-01-14 12:00:00"))
+                                      due_at: Time.zone.parse("2012-01-14 12:00:00"))
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
                               controller: "calendar_events_api",
                               action: "index",
@@ -3606,11 +3606,11 @@ describe CalendarEventsApiController, type: :request do
           end
 
           it "returns assignment when override is in range but assignment is not" do
-            @default_assignment.due_at = DateTime.parse("2012-01-01 12:00:00") # out of range
+            @default_assignment.due_at = Time.zone.parse("2012-01-01 12:00:00") # out of range
             @default_assignment.save!
             assignment_override_model(assignment: @default_assignment,
                                       set: @course.default_section,
-                                      due_at: DateTime.parse("2012-01-08 12:00:00")) # in range
+                                      due_at: Time.zone.parse("2012-01-08 12:00:00")) # in range
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
                               controller: "calendar_events_api",
                               action: "index",
@@ -3628,7 +3628,7 @@ describe CalendarEventsApiController, type: :request do
           it "does not return an assignment when assignment due_at in range but override is out" do
             assignment_override_model(assignment: @default_assignment,
                                       set: @course.default_section,
-                                      due_at: DateTime.parse("2012-01-17 12:00:00")) # out of range
+                                      due_at: Time.zone.parse("2012-01-17 12:00:00")) # out of range
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
                               controller: "calendar_events_api",
                               action: "index",
@@ -3644,7 +3644,7 @@ describe CalendarEventsApiController, type: :request do
 
           it "returns user specific override" do
             override = assignment_override_model(assignment: @default_assignment,
-                                                 due_at: DateTime.parse("2012-01-12 12:00:00"))
+                                                 due_at: Time.zone.parse("2012-01-12 12:00:00"))
             override.assignment_override_students.create!(user: @user)
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
                               controller: "calendar_events_api",
@@ -3686,9 +3686,9 @@ describe CalendarEventsApiController, type: :request do
           end
 
           it "returns an override when present" do
-            @default_assignment.due_at = DateTime.parse("2012-01-08 12:00:00")
+            @default_assignment.due_at = Time.zone.parse("2012-01-08 12:00:00")
             @default_assignment.save!
-            override = assignment_override_model(assignment: @default_assignment, due_at: DateTime.parse("2012-01-14 12:00:00"))
+            override = assignment_override_model(assignment: @default_assignment, due_at: Time.zone.parse("2012-01-14 12:00:00"))
             override.set = @section2
             override.save!
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
@@ -3710,10 +3710,10 @@ describe CalendarEventsApiController, type: :request do
             # Setup assignment
             assignment_override_model(assignment: @default_assignment,
                                       set: @section1,
-                                      due_at: DateTime.parse("2012-01-12 12:00:00")) # later than assignment
+                                      due_at: Time.zone.parse("2012-01-12 12:00:00")) # later than assignment
             assignment_override_model(assignment: @default_assignment,
                                       set: @section2,
-                                      due_at: DateTime.parse("2012-01-14 12:00:00")) # latest
+                                      due_at: Time.zone.parse("2012-01-14 12:00:00")) # latest
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
                               controller: "calendar_events_api",
                               action: "index",
@@ -3732,13 +3732,13 @@ describe CalendarEventsApiController, type: :request do
             before do
               override = assignment_override_model(
                 assignment: @default_assignment,
-                due_at: DateTime.parse("2012-01-12 12:00:00")
+                due_at: Time.zone.parse("2012-01-12 12:00:00")
               )
               override.assignment_override_students.create!(user: @user)
               assignment_override_model(
                 assignment: @default_assignment,
                 set: @section2,
-                due_at: DateTime.parse("2012-01-14 12:00:00")
+                due_at: Time.zone.parse("2012-01-14 12:00:00")
               )
             end
 
@@ -3789,7 +3789,7 @@ describe CalendarEventsApiController, type: :request do
           skip "not sure what the desired behavior here is"
           override = assignment_override_model(assignment: @default_assignment,
                                                set: @course.default_section,
-                                               due_at: DateTime.parse("2012-01-14 12:00:00"))
+                                               due_at: Time.zone.parse("2012-01-14 12:00:00"))
           json = api_call(:get, "/api/v1/calendar_events/assignment_#{@default_assignment.id}", {
                             controller: "calendar_events_api", action: "show", id: "assignment_#{@default_assignment.id}", format: "json"
                           })
@@ -3813,10 +3813,10 @@ describe CalendarEventsApiController, type: :request do
             # Setup assignment
             override1 = assignment_override_model(assignment: @default_assignment,
                                                   set: @section1,
-                                                  due_at: DateTime.parse("2012-01-14 12:00:00"))
+                                                  due_at: Time.zone.parse("2012-01-14 12:00:00"))
             override2 = assignment_override_model(assignment: @default_assignment,
                                                   set: @section2,
-                                                  due_at: DateTime.parse("2012-01-18 12:00:00"))
+                                                  due_at: Time.zone.parse("2012-01-18 12:00:00"))
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-19&per_page=25&context_codes[]=course_#{@course.id}", {
                               controller: "calendar_events_api",
                               action: "index",
@@ -3840,15 +3840,15 @@ describe CalendarEventsApiController, type: :request do
 
           it "returns 1 assignment (override) when others are outside the range" do
             # Alter assignment
-            @default_assignment.due_at = DateTime.parse("2012-01-01 12:00:00") # outside range
+            @default_assignment.due_at = Time.zone.parse("2012-01-01 12:00:00") # outside range
             @default_assignment.save!
             # Setup overrides
             override1 = assignment_override_model(assignment: @default_assignment,
                                                   set: @section1,
-                                                  due_at: DateTime.parse("2012-01-12 12:00:00")) # in range
+                                                  due_at: Time.zone.parse("2012-01-12 12:00:00")) # in range
             assignment_override_model(assignment: @default_assignment,
                                       set: @section2,
-                                      due_at: DateTime.parse("2012-01-18 12:00:00")) # outside range
+                                      due_at: Time.zone.parse("2012-01-18 12:00:00")) # outside range
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
                               controller: "calendar_events_api",
                               action: "index",
@@ -3926,14 +3926,14 @@ describe CalendarEventsApiController, type: :request do
           end
 
           it "receives all assignments including other sections" do
-            @default_assignment.due_at = DateTime.parse("2012-01-08 12:00:00")
+            @default_assignment.due_at = Time.zone.parse("2012-01-08 12:00:00")
             @default_assignment.save!
             override1 = assignment_override_model(assignment: @default_assignment,
                                                   set: @section1,
-                                                  due_at: DateTime.parse("2012-01-12 12:00:00"))
+                                                  due_at: Time.zone.parse("2012-01-12 12:00:00"))
             override2 = assignment_override_model(assignment: @default_assignment,
                                                   set: @section2,
-                                                  due_at: DateTime.parse("2012-01-14 12:00:00"))
+                                                  due_at: Time.zone.parse("2012-01-14 12:00:00"))
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
                               controller: "calendar_events_api",
                               action: "index",
@@ -4018,7 +4018,7 @@ describe CalendarEventsApiController, type: :request do
             it "returns student specific overrides" do
               assignment_override_model(assignment: @default_assignment,
                                         set: @course.default_section,
-                                        due_at: DateTime.parse("2012-01-13 12:00:00"))
+                                        due_at: Time.zone.parse("2012-01-13 12:00:00"))
               json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
                                 controller: "calendar_events_api",
                                 action: "index",
@@ -4063,7 +4063,7 @@ describe CalendarEventsApiController, type: :request do
             it "returns linked student specific override" do
               assignment_override_model(assignment: @default_assignment,
                                         set: @section1,
-                                        due_at: DateTime.parse("2012-01-13 12:00:00"))
+                                        due_at: Time.zone.parse("2012-01-13 12:00:00"))
               json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
                                 controller: "calendar_events_api",
                                 action: "index",
@@ -4081,10 +4081,10 @@ describe CalendarEventsApiController, type: :request do
             it "returns only override for student section" do
               assignment_override_model(assignment: @default_assignment,
                                         set: @section1,
-                                        due_at: DateTime.parse("2012-01-13 12:00:00"))
+                                        due_at: Time.zone.parse("2012-01-13 12:00:00"))
               assignment_override_model(assignment: @default_assignment,
                                         set: @section2,
-                                        due_at: DateTime.parse("2012-01-14 12:00:00"))
+                                        due_at: Time.zone.parse("2012-01-14 12:00:00"))
 
               json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
                                 controller: "calendar_events_api",
@@ -4122,7 +4122,7 @@ describe CalendarEventsApiController, type: :request do
                 @user = @observer
                 assignment_override_model(assignment: @default_assignment,
                                           set: @section1,
-                                          due_at: DateTime.parse("2012-01-14 12:00:00"))
+                                          due_at: Time.zone.parse("2012-01-14 12:00:00"))
                 json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-01&end_date=2012-01-30&per_page=25&context_codes[]=course_#{@course.id}", {
                                   controller: "calendar_events_api",
                                   action: "index",
@@ -4153,10 +4153,10 @@ describe CalendarEventsApiController, type: :request do
                 @user = @observer
                 assignment_override_model(assignment: @default_assignment,
                                           set: @section1,
-                                          due_at: DateTime.parse("2012-01-14 12:00:00"))
+                                          due_at: Time.zone.parse("2012-01-14 12:00:00"))
                 assignment_override_model(assignment: @default_assignment,
                                           set: @section2,
-                                          due_at: DateTime.parse("2012-01-15 12:00:00"))
+                                          due_at: Time.zone.parse("2012-01-15 12:00:00"))
                 json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
                                   controller: "calendar_events_api",
                                   action: "index",
@@ -4194,8 +4194,8 @@ describe CalendarEventsApiController, type: :request do
               end
 
               it "returns two assignments" do
-                assignment_override_model(assignment: @assignment1, set: @course1.default_section, due_at: DateTime.parse("2012-01-14 12:00:00"))
-                assignment_override_model(assignment: @assignment2, set: @course2.default_section, due_at: DateTime.parse("2012-01-15 12:00:00"))
+                assignment_override_model(assignment: @assignment1, set: @course1.default_section, due_at: Time.zone.parse("2012-01-14 12:00:00"))
+                assignment_override_model(assignment: @assignment2, set: @course2.default_section, due_at: Time.zone.parse("2012-01-15 12:00:00"))
 
                 json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course1.id}&context_codes[]=course_#{@course2.id}", {
                                   controller: "calendar_events_api",
@@ -4246,7 +4246,7 @@ describe CalendarEventsApiController, type: :request do
         context "when viewing course calendar" do
           it "displays assignments and overrides" do # behave like teacher
             override = assignment_override_model(assignment: @default_assignment,
-                                                 due_at: DateTime.parse("2012-01-15 12:00:00"),
+                                                 due_at: Time.zone.parse("2012-01-15 12:00:00"),
                                                  set: @section2)
             json = api_call(:get, "/api/v1/calendar_events?&type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
                               controller: "calendar_events_api",
@@ -4377,14 +4377,14 @@ describe CalendarEventsApiController, type: :request do
         @other_student = user_factory(active_all: true, active_state: "active")
         @course.enroll_user(@other_student, "StudentEnrollment", enrollment_state: "active")
 
-        @course.assignments.create!(title: "important date", due_at: DateTime.current, important_dates: true)
+        @course.assignments.create!(title: "important date", due_at: Time.zone.now, important_dates: true)
         @course.assignments.create!(title: "important date without due", important_dates: true)
         overrides_assignment = @course.assignments.create!(title: "important date with override dates", important_dates: true)
-        overrides_assignment.assignment_overrides.create!(due_at_overridden: true, due_at: DateTime.current, set: @course.default_section)
+        overrides_assignment.assignment_overrides.create!(due_at_overridden: true, due_at: Time.zone.now, set: @course.default_section)
         specific_overrides_assignment = @course.assignments.create!(title: "important date with override for others", important_dates: true)
-        override = specific_overrides_assignment.assignment_overrides.create!(due_at_overridden: true, due_at: DateTime.current, set_type: "ADHOC")
+        override = specific_overrides_assignment.assignment_overrides.create!(due_at_overridden: true, due_at: Time.zone.now, set_type: "ADHOC")
         override.assignment_override_students.create!(user: @other_student)
-        @course.assignments.create!(title: "not important date", due_at: DateTime.current)
+        @course.assignments.create!(title: "not important date", due_at: Time.zone.now)
       end
 
       it "returns all assignments with important dates if the user is a teacher" do
@@ -4835,15 +4835,15 @@ describe CalendarEventsApiController, type: :request do
     context "date overrides" do
       it "returns an all-day override" do
         # make the assignment non-all day
-        @checkpoint_1.due_at = DateTime.parse("2024-08-03 05:15:00")
+        @checkpoint_1.due_at = Time.zone.parse("2024-08-03 05:15:00")
         @checkpoint_1.save!
         expect(@checkpoint_1.all_day).to be_falsey
-        expect(@checkpoint_1.all_day_date).to eq DateTime.parse("2024-08-03 05:15:00").to_date
+        expect(@checkpoint_1.all_day_date).to eq Time.zone.parse("2024-08-03 05:15:00").to_date
 
-        @override = create_section_override_for_assignment(@checkpoint_1, due_at: DateTime.parse("2024-08-05 23:59:00"))
+        @override = create_section_override_for_assignment(@checkpoint_1, due_at: Time.zone.parse("2024-08-05 23:59:00"))
 
         expect(@override.all_day).to be_truthy
-        expect(@override.all_day_date).to eq DateTime.parse("2024-08-05 23:59:00").to_date
+        expect(@override.all_day_date).to eq Time.zone.parse("2024-08-05 23:59:00").to_date
 
         json = api_call(:get, "/api/v1/calendar_events", {
                           controller: "calendar_events_api",
@@ -4863,14 +4863,14 @@ describe CalendarEventsApiController, type: :request do
       end
 
       it "returns a non-all-day override" do
-        @checkpoint_1.due_at = DateTime.parse("2024-08-03 23:59:00")
+        @checkpoint_1.due_at = Time.zone.parse("2024-08-03 23:59:00")
         @checkpoint_1.save!
         expect(@checkpoint_1.all_day).to be_truthy
-        expect(@checkpoint_1.all_day_date).to eq DateTime.parse("2024-08-03 23:59:00").to_date
-        @override = create_section_override_for_assignment(@checkpoint_1, due_at: DateTime.parse("2024-08-05 05:15:00"))
+        expect(@checkpoint_1.all_day_date).to eq Time.zone.parse("2024-08-03 23:59:00").to_date
+        @override = create_section_override_for_assignment(@checkpoint_1, due_at: Time.zone.parse("2024-08-05 05:15:00"))
 
         expect(@override.all_day).to be_falsey
-        expect(@override.all_day_date).to eq DateTime.parse("2024-08-05 05:15:00").to_date
+        expect(@override.all_day_date).to eq Time.zone.parse("2024-08-05 05:15:00").to_date
 
         json = api_call(:get, "/api/v1/calendar_events", {
                           controller: "calendar_events_api",
@@ -5540,8 +5540,8 @@ describe CalendarEventsApiController, type: :request do
   describe "#set_course_timetable" do
     before :once do
       @path = "/api/v1/courses/#{@course.id}/calendar_events/timetable"
-      @course.start_at = DateTime.parse("2016-05-06 1:00pm -0600")
-      @course.conclude_at = DateTime.parse("2016-05-19 9:00am -0600")
+      @course.start_at = Time.zone.parse("2016-05-06 1:00pm -0600")
+      @course.conclude_at = Time.zone.parse("2016-05-19 9:00am -0600")
       @course.time_zone = "America/Denver"
       @course.save!
     end
@@ -5585,9 +5585,9 @@ describe CalendarEventsApiController, type: :request do
       run_jobs
 
       expected_events = [
-        { start_at: DateTime.parse("2016-05-09 2:00 pm -0600"), end_at: DateTime.parse("2016-05-09 3:30 pm -0600") },
-        { start_at: DateTime.parse("2016-05-12 2:00 pm -0600"), end_at: DateTime.parse("2016-05-12 3:30 pm -0600") },
-        { start_at: DateTime.parse("2016-05-16 2:00 pm -0600"), end_at: DateTime.parse("2016-05-16 3:30 pm -0600") }
+        { start_at: Time.zone.parse("2016-05-09 2:00 pm -0600"), end_at: Time.zone.parse("2016-05-09 3:30 pm -0600") },
+        { start_at: Time.zone.parse("2016-05-12 2:00 pm -0600"), end_at: Time.zone.parse("2016-05-12 3:30 pm -0600") },
+        { start_at: Time.zone.parse("2016-05-16 2:00 pm -0600"), end_at: Time.zone.parse("2016-05-16 3:30 pm -0600") }
       ]
       events = @course.calendar_events.for_timetable.to_a
       expect(events.map { |e| { start_at: e.start_at, end_at: e.end_at } }).to match_array(expected_events)
@@ -5598,7 +5598,7 @@ describe CalendarEventsApiController, type: :request do
       section1 = @course.course_sections.create!
       section2 = @course.course_sections.new
       section2.sis_source_id = "sisss" # can even find by sis id, yay!
-      section2.end_at = DateTime.parse("2016-05-25 9:00am -0600") # and also extend dates on the section
+      section2.end_at = Time.zone.parse("2016-05-25 9:00am -0600") # and also extend dates on the section
       section2.save!
 
       timetables = {
@@ -5621,15 +5621,15 @@ describe CalendarEventsApiController, type: :request do
       run_jobs
 
       expected_events1 = [
-        { start_at: DateTime.parse("2016-05-09 2:00 pm -0600"), end_at: DateTime.parse("2016-05-09 3:30 pm -0600") },
-        { start_at: DateTime.parse("2016-05-16 2:00 pm -0600"), end_at: DateTime.parse("2016-05-16 3:30 pm -0600") }
+        { start_at: Time.zone.parse("2016-05-09 2:00 pm -0600"), end_at: Time.zone.parse("2016-05-09 3:30 pm -0600") },
+        { start_at: Time.zone.parse("2016-05-16 2:00 pm -0600"), end_at: Time.zone.parse("2016-05-16 3:30 pm -0600") }
       ]
       events1 = section1.calendar_events.for_timetable.to_a
       expect(events1.map { |e| { start_at: e.start_at, end_at: e.end_at } }).to match_array(expected_events1)
 
       expected_events2 = [
-        { start_at: DateTime.parse("2016-05-12 3:30 pm -0600"), end_at: DateTime.parse("2016-05-12 4:30 pm -0600") },
-        { start_at: DateTime.parse("2016-05-19 3:30 pm -0600"), end_at: DateTime.parse("2016-05-19 4:30 pm -0600") }
+        { start_at: Time.zone.parse("2016-05-12 3:30 pm -0600"), end_at: Time.zone.parse("2016-05-12 4:30 pm -0600") },
+        { start_at: Time.zone.parse("2016-05-19 3:30 pm -0600"), end_at: Time.zone.parse("2016-05-19 4:30 pm -0600") }
       ]
       events2 = section2.calendar_events.for_timetable.to_a
       expect(events2.map { |e| { start_at: e.start_at, end_at: e.end_at } }).to match_array(expected_events2)
@@ -5669,8 +5669,8 @@ describe CalendarEventsApiController, type: :request do
     before :once do
       @path = "/api/v1/courses/#{@course.id}/calendar_events/timetable_events"
       @events = [
-        { start_at: DateTime.parse("2016-05-09 2:00 pm -0600"), end_at: DateTime.parse("2016-05-09 3:30 pm -0600") },
-        { start_at: DateTime.parse("2016-05-12 2:00 pm -0600"), end_at: DateTime.parse("2016-05-12 3:30 pm -0600") },
+        { start_at: Time.zone.parse("2016-05-09 2:00 pm -0600"), end_at: Time.zone.parse("2016-05-09 3:30 pm -0600") },
+        { start_at: Time.zone.parse("2016-05-12 2:00 pm -0600"), end_at: Time.zone.parse("2016-05-12 3:30 pm -0600") },
       ]
     end
 

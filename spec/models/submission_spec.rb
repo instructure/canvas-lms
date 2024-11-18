@@ -540,7 +540,7 @@ describe Submission do
     end
 
     it "does not truncate seconds off of cached due dates" do
-      time = DateTime.parse("2018-12-24 23:59:59")
+      time = Time.zone.parse("2018-12-24 23:59:59")
       @assignment.update_attribute(:due_at, time)
       submission = @assignment.submissions.find_by!(user: @user)
       expect(submission.cached_due_date.to_i).to eq time.to_i

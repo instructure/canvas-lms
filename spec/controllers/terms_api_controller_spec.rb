@@ -28,7 +28,7 @@ describe TermsApiController do
 
     def create_terms_with_same_start(count)
       count.times do |i|
-        start_time = DateTime.new(2024, 9, 10, 14, 30, 45, "+00:00")
+        start_time = Time.new(2024, 9, 10, 14, 30, 45, "+00:00")
         @account.enrollment_terms.create!(name: "term #{i}", start_at: start_time)
       end
     end

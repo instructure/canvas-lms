@@ -236,7 +236,7 @@ module ActiveRecord
           "user_id" => -1,
           "pseudonym_id" => -1,
           "event_type" => "login",
-          "created_at" => DateTime.now.utc
+          "created_at" => Time.zone.now.utc
         }
         expect do
           Auditors::ActiveRecord::AuthenticationRecord.bulk_insert([attrs])
@@ -253,7 +253,7 @@ module ActiveRecord
           "user_id" => user.id,
           "pseudonym_id" => pseud.id,
           "event_type" => "login",
-          "created_at" => DateTime.now.utc
+          "created_at" => Time.zone.now.utc
         }
         attrs_2 = attrs_1.merge({
                                   "created_at" => 1.month.from_now

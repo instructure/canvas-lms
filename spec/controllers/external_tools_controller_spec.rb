@@ -1692,8 +1692,8 @@ describe ExternalToolsController do
                                                })
       end
 
-      let(:due_at) { "2021-07-29 08:26:56.000000000 +0000".to_datetime }
-      let(:due_at_diff) { "2021-07-30 08:26:56.000000000 +0000".to_datetime }
+      let(:due_at) { Time.zone.parse("2021-07-29 08:26:56.000000000 +0000") }
+      let(:due_at_diff) { Time.zone.parse("2021-07-30 08:26:56.000000000 +0000") }
 
       let(:retrieve_params) do
         {
@@ -1726,7 +1726,7 @@ describe ExternalToolsController do
         get :retrieve, params: retrieve_params
 
         expect(
-          assigns[:lti_launch].params["custom_canvas_assignment_due_at"].to_datetime
+          Time.zone.parse(assigns[:lti_launch].params["custom_canvas_assignment_due_at"])
         ).to eq due_at_diff
       end
 
@@ -1737,7 +1737,7 @@ describe ExternalToolsController do
         get :retrieve, params: retrieve_params
 
         expect(
-          assigns[:lti_launch].params["custom_canvas_assignment_due_at"].to_datetime
+          Time.zone.parse(assigns[:lti_launch].params["custom_canvas_assignment_due_at"])
         ).to eq due_at_diff
       end
 
