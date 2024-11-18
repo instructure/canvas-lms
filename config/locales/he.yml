@@ -211,6 +211,7 @@ he:
   access_report_80d28095: "דוח גישה"
   access_token_3be22221: "אסימון גישה"
   access_token_count_access_token_count_dfb5463c: "מונה אסימון גישה: %{access_token_count}"
+  access_token_details_495d989: "פרטי אסימון הגישה"
   access_token_is_valid_until_d2f048cf: "הרשאת אסימון הגישה בתוקף עד"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "ניתן להשתמש באסימוני גישה כדי לאפשר לאפליקציות אחרות לבצע קריאות API בעבורך. תוכל/י גם לייצר אסימוני גישה ו *להשתמש ב Canvas Open API* כדי לפתח אינטגרציות עצמיות."
   accordion_section_1_7888782d: "איזור נפתח 1"
@@ -2449,6 +2450,7 @@ he:
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "בטוחים שרוצים לבטל את הרשמתכם לאירוע זה?"
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "האם אתם בטוחים שרוצים למנוע את הסיכנכרוניזציה ל %{sisName} לכל המשימות האלו?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "בטוח/ה שרוצה לבצע פעולה זו? לא ניתן לשחזר זאת והפעולה תדרוס ציונים קיימים בספר הציונים."
+  are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "בטוח/ה שרוצה לייצר מחדש את האסימון? כל מי שמשתמש בו יצטרך להתעדכן"
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "בטוח/ה שרוצה להסיר את תקופת ההערכה הזו?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "בטוח/ה שרוצה להסיר כלי זה?"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "האם בטוחים שרוצים להסיר משתמש זה"
@@ -4643,11 +4645,13 @@ he:
     submit: שליחה
   confirm_dialog_component: 
     ok: OK
+  confirm_email_address_9072dd3c: "אישור כתובת דוא\"ל"
   confirm_removal_a9bb889: "אישור הסרה"
   confirm_reservation_removal_e6350e7c: "אישור הסרת רישום"
   confirm_unenrollment_64333263: "אישור הסרת הרשמה"
   confirmation_code_required_22984955: "קוד אישור (נדרש)"
   confirmation_failed_please_try_again_ae566d37: "אישור נכשל. יש לנסות שוב."
+  confirming_2df4b68f: "מאשר... "
   consumer_key_57d9fcf1: "מפתח מערכת הלקוח"
   consumer_key_6f94ba11: "מפתח מערכת הלקוח"
   contact_a6e7f6da: התקשרות
@@ -8181,6 +8185,7 @@ he:
   expand_tutorial_tray_22630c49: "הרחבת איזור המדריך"
   expanded_f4493860: הורחב
   experimental_graphql_api_75c5eb8f: "EXPERIMENTAL GraphQL API."
+  expires_7019786e: "פג תוקף "
   export_an_existing_quiz_to_new_quizzes_2_format_8fd08a23: "ייצוא בוחן קיים לפורמט הבחנים גירסה 2"
   export_course_content_f4774b74: "ייצוא תוכן קורס"
   export_de71cd8e: ייצוא
@@ -8646,10 +8651,12 @@ he:
   generate_epub_80e89ea4: "צור/י ePub"
   generate_item_analysis_report_statuslabel_16e02c8: "הפקת דוח ניתוח פריטים %{statusLabel}"
   generate_student_analysis_report_statuslabel_aecdc4dc: "הפקת דוח ניתוח תלמידים %{statusLabel}"
+  generate_token_393ab5b4: "יצירת אסימון "
   generated_f26ee56b: "נוצר:"
   generating_5b5e20f8: "מייצר:"
   generating_c2aabc02: "מייצר:"
   generating_preview_45b53be0: "מכין תצוגה מקדימה..."
+  generating_token_42c29663: "מייצר אסימון..."
   germany_49_fc5b8179: "גרמניה (+49)"
   germany_b02d91c9: גרמניה
   get_started_b9507525: "ניתן להתחיל"
@@ -10553,6 +10560,7 @@ he:
   last_name_303122f3: "שם משפחה"
   last_post_display_last_reply_at_b9896355: "הפרסום האחרון %{display_last_reply_at}"
   last_pushed_update_last_export_at_9f634f7c: "העדכון האחרון שנשלח: %{last_export_at}"
+  last_used_17553fed: "תאריך שימוש אחרון "
   last_used_f9457313: "שומש לאחרונה:"
   last_user_access_title: "כניסת משתמש אחרונה"
   late_2be42b88: איחור
@@ -13244,6 +13252,7 @@ he:
   never_1ed1244d: "אף פעם "
   never_df100b49: "אף פעם"
   new_13daf639: חדש
+  new_access_token_e301d1fc: "אסימון גישה חדש "
   new_account_role_6e5c4964: "תפקיד חדש בחשבון"
   new_activity_8b84847d: "פעילות חדשה"
   new_annotations_66932016: "ביאורים חדשים"
@@ -13732,6 +13741,7 @@ he:
   off_5385ef3f: מושבת
   ok_c47544a2: OK
   ok_ff1b646a: OK
+  ok_thanks_6b1fc8ae: "בסדר, תודה"
   okay_1772bbeb: בסדר
   okay_got_it_d686d4e8: "בסדר, הבנתי"
   oldest_newest_4de86803: "ישן ביותר - חדש ביותר"
@@ -14788,6 +14798,8 @@ he:
       regenerating_token_failed: "יצירה מחדש של אסימון נכשלה"
       registration_failed: "הרשמה נכשלה. יש לבדוק את שם המשתמש והסיסמה, ולנסות שנית"
     failed_resending: "הבקשה נכשלה. יש לנסות שוב"
+    labels: 
+      enable_login_for_email: "ברצוני להתחבר לקנבס עם הדוא\"ל הזה"
     links: 
       resend_confirmation: "שליחה מחדש של האישור"
       resend_confirmation_failed: "הבקשה נכשלה. יש לנסות שוב"
@@ -15144,6 +15156,7 @@ he:
     new: 
       payment_info: "מידע על תשלומים"
   purple_7678a9fc: סגול
+  purpose_5202a309: "מטרה "
   push_notification_a6532ff3: "דחיפת תזכורת"
   q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: "ש: מה הופך שחור, לבן, שחור, לבן? ת: דב פנדה מתגלגל במורד הגבעה"
   qatar_974_7e9684ca: "קטר (+974)"
@@ -16627,6 +16640,8 @@ he:
   ratio_responded_correctly_6d890107: "%{ratio}% הגיבו נכונה"
   re_activate_user_f7d77c9a: "החזרת משתמש למצב פעיל"
   re_reported_b9671073: "דווח מחדש"
+  re_send_confirmation_bcc66940: "שליחה מחדש של האישור "
+  re_sending_379a8580: "שולח שוב..."
   re_submit_assignment_b3e2bd28: "הגשה מחדש של משימה"
   re_upload_submissions_125e415d: "העלאה מחדש של הגשות"
   re_upload_submissions_form: 
@@ -16721,9 +16736,13 @@ he:
   reference_code_is_required_c32c757f: "קוד הפניה נדרש"
   refresh_8a04b019: רענן
   regenerate_epub_395c8e56: "יצירה מחדש של ePub"
+  regenerate_token_7d4fb783: "מייצר אסימון מחדש "
+  regenerating_token_42e5c747: "מייצר אסימון מחדש..."
   region_47e29025: "אזור:"
   region_939f2a6c: אזור
+  register_communication_ae935328: "רישום תקשורת"
   register_email_efc06d59: "רישום כתובת דוא\"ל"
+  register_sms_7f87e50d: "רישום מערכת המסרונים"
   register_tool_84de3186: "רישום כלי"
   registration: 
     get_started: "ניתן להתחיל"
@@ -19660,6 +19679,7 @@ he:
   today_76e10f9c: היום
   toggle_editing_answer_text_as_html_9a93fe6: "שינוי מצב עריכת תוכן תשובה ל HTML"
   toggle_select_course_name_310fdee4: "שינוי מצב בחירת קורס %{name}"
+  token_9a020862: אסימון
   tolerance_value_9e96573c: "ערך שולי הטעות"
   tomorrow_9a6c9a00: מחר
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "יותר מדי נסיונות כושלים להתחבר. נא לנסות מאוחר יותר או להקתשר למנהל המערכת שלך"
