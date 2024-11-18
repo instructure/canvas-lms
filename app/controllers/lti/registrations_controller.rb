@@ -809,7 +809,7 @@ class Lti::RegistrationsController < ApplicationController
 
       per_page = Api.per_page_for(self, default: 15)
       paginated_registrations, _metadata = Api.jsonapi_paginate(sorted_registrations, self, url_for, { per_page: })
-      includes = [:account_binding] + Array(params[:include]).map(&:to_sym)
+      includes = [:account_binding] + (Array(params[:include]).map(&:to_sym) - [:overlay_versions])
       render json: {
         total: all_registrations.size,
         data: lti_registrations_json(paginated_registrations, @current_user, session, @context, includes:)
@@ -892,6 +892,7 @@ class Lti::RegistrationsController < ApplicationController
   #   "account_binding":: the registration's binding to the given account
   #   "configuration":: the registration's Canvas-style tool configuration
   #   "overlay":: the registration's admin-defined configuration overlay
+  #   "overlay_versions":: the registration's overlay's edit history
   #
   # @returns Lti::Registration
   #
