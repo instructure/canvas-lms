@@ -22,7 +22,6 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */
-import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf */
 import '@canvas/loading-image'
