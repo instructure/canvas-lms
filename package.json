@@ -44,6 +44,7 @@
     "@instructure/ui-decorator": "8.56.4",
     "@instructure/ui-dialog": "8.56.4",
     "@instructure/ui-drawer-layout": "8.56.4",
+    "@instructure/ui-drilldown": "8.56.4",
     "@instructure/ui-editable": "8.56.4",
     "@instructure/ui-file-drop": "8.56.4",
     "@instructure/ui-flex": "8.56.4",

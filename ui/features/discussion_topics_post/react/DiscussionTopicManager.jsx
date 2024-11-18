@@ -17,9 +17,7 @@
  */
 
 import {DISCUSSION_QUERY} from '../graphql/Queries'
-import {DiscussionTopicToolbarContainer} from './containers/DiscussionTopicToolbarContainer/DiscussionTopicToolbarContainer'
 import {DiscussionTopicRepliesContainer} from './containers/DiscussionTopicRepliesContainer/DiscussionTopicRepliesContainer'
-import {DiscussionTopicHeaderContainer} from './containers/DiscussionTopicHeaderContainer/DiscussionTopicHeaderContainer'
 import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/DiscussionTopicContainer'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
@@ -36,7 +34,7 @@ import {
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
 import PropTypes from 'prop-types'
-import React, {useEffect, useRef, useState, useCallback} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {useQuery} from '@apollo/react-hooks'
 import {SplitScreenViewContainer} from './containers/SplitScreenViewContainer/SplitScreenViewContainer'
 import {DrawerLayout} from '@instructure/ui-drawer-layout'
@@ -49,6 +47,7 @@ import {captureException} from '@sentry/react'
 import {LoadingSpinner} from './components/LoadingSpinner/LoadingSpinner'
 import useNavigateEntries from './hooks/useNavigateEntries'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import DiscussionTopicToolbarContainer from './containers/DiscussionTopicToolbarContainer/DiscussionTopicToolbarContainer'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -420,10 +419,6 @@ const DiscussionTopicManager = props => {
                     overflowX="auto"
                     overflowY="auto"
                   >
-                    <DiscussionTopicHeaderContainer
-                      discussionTopicTitle={discussionTopicQuery.data.legacyNode.title}
-                      mobileHeader={!props.breakpoints.ICEDesktop}
-                    />
                     <DiscussionTopicToolbarContainer
                       discussionTopic={discussionTopicQuery.data.legacyNode}
                       setUserSplitScreenPreference={setUserSplitScreenPreference}
@@ -431,6 +426,7 @@ const DiscussionTopicManager = props => {
                       setIsSummaryEnabled={setIsSummaryEnabled}
                       isSummaryEnabled={isSummaryEnabled}
                       closeView={closeView}
+                      breakpoints={props.breakpoints}
                     />
                     <DiscussionTopicContainer
                       discussionTopic={discussionTopicQuery.data.legacyNode}

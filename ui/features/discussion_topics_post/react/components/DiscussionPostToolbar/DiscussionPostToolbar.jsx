@@ -46,8 +46,8 @@ import {View} from '@instructure/ui-view'
 import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
 import {ExpandCollapseThreadsButton} from './ExpandCollapseThreadsButton'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
-import {MoreMenuButton} from './MoreMenuButton'
 import {SummarizeButton} from './SummarizeButton'
+import MoreMenuButton from './MoreMenuButton'
 
 const I18n = useI18nScope('discussions_posts')
 
@@ -63,8 +63,8 @@ export const getMenuConfig = props => {
   return options
 }
 
-const getClearButton = props => {
-  if (!props.searchTerm?.length) return
+const getClearButton = buttonProperties => {
+  if (!buttonProperties.searchTerm?.length) return
 
   return (
     <IconButton
@@ -73,7 +73,7 @@ const getClearButton = props => {
       withBackground={false}
       withBorder={false}
       screenReaderLabel="Clear search"
-      onClick={props.handleClear}
+      onClick={buttonProperties.handleClear}
       data-testid="clear-search-button"
     >
       <IconTroubleLine />
@@ -83,12 +83,11 @@ const getClearButton = props => {
 
 export const DiscussionPostToolbar = props => {
   const [showAssignToTray, setShowAssignToTray] = useState(false)
-  const {translationLanguages} = useContext(DiscussionManagerUtilityContext)
-
-  const showAssignTo =
-    !props.isAnnouncement &&
-    props.contextType === 'Course' &&
-    (props.isGraded || (!props.isGraded && !props.isGroupDiscussion))
+  const {translationLanguages, setShowTranslationControl} = useContext(
+    DiscussionManagerUtilityContext
+  )
+  const [translationOptionText, setTranslationOptionText] = useState(I18n.t('Translate Text'))
+  const [hideTranslateText, setHideTranslateText] = useState(false)
 
   const clearButton = () => {
     return getClearButton({
@@ -104,6 +103,25 @@ export const DiscussionPostToolbar = props => {
     : I18n.t('Search entries or author...')
 
   const handleClose = () => setShowAssignToTray(false)
+
+  const toggleTranslateText = () => {
+    // Update local state
+    setHideTranslateText(!hideTranslateText)
+    setTranslationOptionText(
+      hideTranslateText ? I18n.t('Translate Text') : I18n.t('Hide Translate Text')
+    )
+    // Update context
+    setShowTranslationControl(!hideTranslateText)
+  }
+
+  const renderMore = () => {
+    const menuOptions = []
+    if (translationLanguages.current.length > 0) {
+      menuOptions.push({text: translationOptionText, clickItem: toggleTranslateText})
+    }
+
+    return menuOptions.length > 0 && <MoreMenuButton menuOptions={menuOptions} />
+  }
 
   return (
     <Responsive
@@ -213,7 +231,7 @@ export const DiscussionPostToolbar = props => {
                   shouldGrow={responsiveProps?.filter?.shouldGrow}
                   shouldShrink={false}
                 >
-                  <span className="discussions-filter-by-menu">
+                  <span data-testid="toggle-filter-menu">
                     <SimpleSelect
                       renderLabel={<ScreenReaderContent>{I18n.t('Filter by')}</ScreenReaderContent>}
                       defaultValue={props.selectedView}
@@ -302,7 +320,7 @@ export const DiscussionPostToolbar = props => {
                 )}
                 {translationLanguages.current.length > 0 && (
                   <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
-                    <MoreMenuButton />
+                    {renderMore()}
                   </Flex.Item>
                 )}
                 {props.discussionAnonymousState && ENV.current_user_roles?.includes('student') && (
@@ -321,7 +339,7 @@ export const DiscussionPostToolbar = props => {
                 {!isSpeedGraderInTopUrl &&
                   props.manageAssignTo &&
                   ENV.FEATURES?.selective_release_ui_api &&
-                  showAssignTo && (
+                  props.showAssignTo && (
                     <Flex.Item shouldGrow={true} textAlign="end">
                       <Button
                         data-testid="manage-assign-to"
@@ -363,7 +381,6 @@ export default DiscussionPostToolbar
 DiscussionPostToolbar.propTypes = {
   isAdmin: PropTypes.bool,
   canEdit: PropTypes.bool,
-  isAnnouncement: PropTypes.bool,
   isGraded: PropTypes.bool,
   childTopics: PropTypes.arrayOf(ChildTopic.shape),
   selectedView: PropTypes.string,
@@ -383,9 +400,8 @@ DiscussionPostToolbar.propTypes = {
   isSummaryEnabled: PropTypes.bool,
   closeView: PropTypes.func,
   pointsPossible: PropTypes.number,
-  contextType: PropTypes.oneOf(['Course', 'Group']),
   manageAssignTo: PropTypes.bool,
-  isGroupDiscussion: PropTypes.bool,
   isCheckpointed: PropTypes.bool,
   isExpanded: PropTypes.bool,
+  showAssignTo: PropTypes.bool,
 }
