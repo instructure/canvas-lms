@@ -22,11 +22,14 @@ module Api::V1::Lti::Registration
   include Api::V1::Json
   include Api::V1::User
   include Api::V1::Lti::Overlay
+  include Api::V1::Lti::OverlayVersion
   include Api::V1::Lti::RegistrationAccountBinding
 
   JSON_ATTRS = %w[
     id account_id root_account_id internal_service vendor name admin_nickname workflow_state created_at updated_at
   ].freeze
+
+  OVERLAY_VERSION_DEFAULT_LIMIT = 5
 
   # Serializes a list of LTI registrations.
   # @param includes [Array<Symbol>] Accepted values: [:configuration, :account_binding]
@@ -42,7 +45,7 @@ module Api::V1::Lti::Registration
   end
 
   # Serializes a single LTI registration.
-  # @param includes [Array<Symbol>] Accepted values: [:configuration, :account_binding]
+  # @param includes [Array<Symbol>] Accepted values: [:configuration, :account_binding, :overlay, :overlay_versions]
   def lti_registration_json(registration, user, session, context, includes: [])
     includes = includes.map(&:to_sym)
 
@@ -70,6 +73,10 @@ module Api::V1::Lti::Registration
 
       if includes.include?(:overlay) && (overlay = registration.overlay_for(context))
         json["overlay"] = lti_overlay_json(overlay, user, session, context)
+        if includes.include?(:overlay_versions)
+          versions = Lti::OverlayVersion.where(lti_overlay: overlay).order(created_at: :desc).limit(OVERLAY_VERSION_DEFAULT_LIMIT)
+          json["overlay"]["versions"] = lti_overlay_versions_json(versions, user, session, context)
+        end
       end
     end
   end

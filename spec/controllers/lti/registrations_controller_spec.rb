@@ -373,6 +373,30 @@ describe Lti::RegistrationsController do
         end
       end
 
+      context "with 'overlay_versions' in include[] parameter" do
+        let(:url) { "/api/v1/accounts/#{account.id}/lti_registrations?include[]=overlay&include[]=overlay_versions" }
+        let(:overlay) { lti_overlay_model(account:, registration:) }
+        let(:registration) { lti_registration_model(account:) }
+        let(:overlay_versions) do
+          lti_overlay_versions_model(
+            {
+              lti_overlay: overlay,
+              diff: [["+", "disabled_scopes[0]", "https://canvas.instructure.com/lti-ags/progress/scope/show"]],
+            },
+            6
+          )
+        end
+
+        before do
+          overlay_versions
+        end
+
+        it "does not include overlay_versions" do
+          subject
+          expect(response_data.first["overlay"]).not_to have_key("versions")
+        end
+      end
+
       context "with cross-shard SiteAdmin on registration" do
         specs_require_sharding
 
@@ -609,6 +633,31 @@ describe Lti::RegistrationsController do
       it "includes the overlay" do
         subject
         expect(response_json).to have_key(:overlay)
+      end
+    end
+
+    context "with 'overlay_versions' in include[] parameter" do
+      subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}?include[]=overlay&include[]=overlay_versions" }
+
+      let(:overlay) { lti_overlay_model(account:, registration:) }
+      let(:overlay_versions) do
+        lti_overlay_versions_model(
+          {
+            lti_overlay: overlay,
+            diff: [["+", "disabled_scopes[0]", "https://canvas.instructure.com/lti-ags/progress/scope/show"]],
+          },
+          6
+        )
+      end
+
+      before do
+        overlay_versions
+      end
+
+      it "includes the overlay versions" do
+        subject
+        expect(response_json[:overlay]).to have_key(:versions)
+        expect(response_json[:overlay][:versions].length).to eq(5)
       end
     end
   end
