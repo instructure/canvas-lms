@@ -35,6 +35,7 @@ import type {onSubmitMigrationFormCallback} from '../types'
 import MigrationFileInput from './file_input'
 
 import type {TreeBrowserProps} from '@instructure/ui-tree-browser'
+import {RequiredFormLabel} from './form_label'
 
 type Collection = TreeBrowserProps['collections'][0]
 type CollectionClickArgs = TreeBrowserProps['onCollectionClick']
@@ -224,13 +225,18 @@ const ZipFileImporter = ({
         onChange={setFile}
         isSubmitting={isSubmitting}
         externalFormMessage={fileError ? noFileSelectedFormMessage : undefined}
+        isRequired={true}
       />
       {!isSubmitting && (
         <View as="div" margin="medium none none none" width="100%">
           {folders.length > 0 ? (
             <>
               <TextInput
-                renderLabel={I18n.t('Upload to')}
+                renderLabel={
+                  <RequiredFormLabel showErrorState={folderError}>
+                    {I18n.t('Upload to')}
+                  </RequiredFormLabel>
+                }
                 placeholder={I18n.t('Search folders')}
                 value={searchValue}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {

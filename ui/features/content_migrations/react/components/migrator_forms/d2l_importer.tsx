@@ -49,6 +49,7 @@ const D2LImporter = ({onSubmit, onCancel, fileUploadProgress, isSubmitting}: D2L
         onChange={setFile}
         isSubmitting={isSubmitting}
         externalFormMessage={fileError ? noFileSelectedFormMessage : undefined}
+        isRequired={true}
       />
       <QuestionBankSelector
         onChange={setQuestionBankSettings}

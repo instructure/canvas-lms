@@ -29,6 +29,7 @@ import CommonMigratorControls from './common_migrator_controls'
 import type {onSubmitMigrationFormCallback} from '../types'
 import {Text} from '@instructure/ui-text'
 import {parseDateToISOString} from '../utils'
+import {RequiredFormLabel} from './form_label'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -128,7 +129,11 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
           }}
           placeholder={I18n.t('Search...')}
           isShowingOptions={courseOptions.length > 0}
-          renderLabel={I18n.t('Search for a course')}
+          renderLabel={
+            <RequiredFormLabel showErrorState={selectedCourseError}>
+              {I18n.t('Search for a course')}
+            </RequiredFormLabel>
+          }
           renderBeforeInput={<IconSearchLine inline={false} />}
           renderAfterInput={<span />}
           onBlur={() => {
