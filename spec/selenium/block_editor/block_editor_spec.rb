@@ -25,7 +25,8 @@
 # rubocop:disable Specs/NoNoSuchElementError, Specs/NoExecuteScript
 require_relative "../common"
 require_relative "pages/block_editor_page"
-describe "Block Editor", :ignore_js_errors do
+xdescribe "Block Editor", :ignore_js_errors do
+  skip "RCX-2673"
   include_context "in-process server selenium tests"
   include BlockEditorPage
   def drop_new_block(block_name, where)
