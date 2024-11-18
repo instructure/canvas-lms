@@ -17,25 +17,40 @@
  */
 
 import React from 'react'
-import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import PropTypes from 'prop-types'
+import {useScope as useI18nScope} from '@canvas/i18n'
+import {HeadingMenu} from '@canvas/discussions/react/components/HeadingMenu'
 
-const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
+const I18n = useI18nScope('discussions_v2')
 
-export const DiscussionTopicHeaderContainer = ({discussionTopicTitle, mobileHeader = false}) => {
-  if (!instUINavEnabled()) {
-    return null
+const getFilters = title => ({
+  all: {name: I18n.t('All Replies'), title},
+  unread: {name: I18n.t('Unread Replies'), title},
+})
+
+const DiscussionTopicTitleContainer = ({
+  discussionTopicTitle,
+  mobileHeader = false,
+  onViewFilter,
+  selectedView,
+}) => {
+  const onFilterChange = event => {
+    onViewFilter(event, {value: event.value})
   }
 
   return (
     <Flex direction="column" as="div" gap="medium">
-      <Flex.Item overflow="hidden">
+      <Flex.Item>
         <Flex as="div" direction="row" justifyItems="start" wrap="wrap">
-          <Flex.Item margin="0 0 x-small 0">
-            <Heading as="h1" level={mobileHeader ? 'h2' : 'h1'} themeOverride={{h2FontWeight: 700}}>
-              {discussionTopicTitle}
-            </Heading>
+          <Flex.Item margin="0 0 x-small 0" padding="xxx-small">
+            <HeadingMenu
+              name={I18n.t('Discussion Filter')}
+              filters={getFilters(discussionTopicTitle)}
+              defaultSelectedFilter={selectedView ?? 'all'}
+              onSelectFilter={onFilterChange}
+              mobileHeader={mobileHeader}
+            />
           </Flex.Item>
         </Flex>
       </Flex.Item>
@@ -43,8 +58,10 @@ export const DiscussionTopicHeaderContainer = ({discussionTopicTitle, mobileHead
   )
 }
 
-DiscussionTopicHeaderContainer.propTypes = {
+DiscussionTopicTitleContainer.propTypes = {
   discussionTopicTitle: PropTypes.string,
   mobileHeader: PropTypes.bool,
+  onViewFilter: PropTypes.func,
+  selectedView: PropTypes.string,
 }
-export default DiscussionTopicHeaderContainer
+export default DiscussionTopicTitleContainer

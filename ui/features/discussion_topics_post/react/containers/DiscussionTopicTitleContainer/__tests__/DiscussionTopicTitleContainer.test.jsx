@@ -17,7 +17,8 @@
  */
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import {DiscussionTopicHeaderContainer} from '../DiscussionTopicHeaderContainer'
+import DiscussionTopicTitleContainer from '../DiscussionTopicTitleContainer'
+
 
 const defaultProps = () => ({
   discussionTopicTitle: 'Test title',
@@ -36,7 +37,7 @@ describe('DiscussionTopicTitleContainer', () => {
     })
 
     it('renders title', () => {
-      render(<DiscussionTopicHeaderContainer {...defaultProps()} />)
+      render(<DiscussionTopicTitleContainer {...defaultProps()} />)
       expect(screen.getByText('Test title')).toBeInTheDocument()
     })
   })

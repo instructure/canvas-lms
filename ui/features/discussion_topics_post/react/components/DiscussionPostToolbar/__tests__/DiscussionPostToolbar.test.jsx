@@ -230,7 +230,7 @@ describe('DiscussionPostToolbar', () => {
     it('renders the Assign To button if user can manageAssignTo and in a course discussion', () => {
       const {getByRole} = setup({
         manageAssignTo: true,
-        contextType: 'Course',
+        showAssignTo: true,
       })
       expect(getByRole('button', {name: 'Assign To'})).toBeInTheDocument()
     })
@@ -246,7 +246,7 @@ describe('DiscussionPostToolbar', () => {
 
       const {queryByText} = setup({
         manageAssignTo: true,
-        contextType: 'Course',
+        showAssignTo: true,
       })
       expect(queryByText('button', {name: 'Assign To'})).not.toBeInTheDocument()
     })
