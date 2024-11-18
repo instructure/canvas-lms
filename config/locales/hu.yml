@@ -333,6 +333,7 @@ hu:
   access_token_3be22221: "Hozzáférési token"
   access_token_count_access_token_count_dfb5463c: "Elérési token száma:%{access_token_count}"
   access_token_created_or_regenerated_4ce9ed1f: "Hozzáférési token létrehozva vagy újragenerálva"
+  access_token_details_495d989: "Hozzáférési token részletei"
   access_token_manage_a626f071: "Hozzáférési Token – kezelés"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "A hozzáférési token arra használható, hogy egyes alkalmazások API hívásokat kezdeményezhessenek az Ön nevében. Önnek lehetősége van hozzáférési token generálására és *Canvas Open API* használatára a saját integrációs megoldások fejlesztése során."
   access_your_courses_and_groups_using_any_ios_or_an_cdb6ad63: "Bármely iOS vagy Android mobileszközzel elérheti kurzusait és csoportjait, és további információkat találhat a Súgó menüben."
@@ -3386,6 +3387,7 @@ hu:
   are_you_sure_you_want_to_permanently_remove_the_us_e6b84ce0: "Biztos benne, hogy véglegesen eltávolítja a felhasználót az ÖSSZES fiókból?"
   are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: "Biztosan közzé szeretné tenni a feladat érdemjegyeit a tanulóknak?"
   are_you_sure_you_want_to_proceed_changes_you_made__2f87f0e7: "Biztosan folytatja? A végrehajtott módosítások nem kerülnek mentésre."
+  are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "Biztos benne, hogy újragenerálja ezt a tokent? Mindent frissíteni kell, ami használja ezt a tokent. "
   are_you_sure_you_want_to_remove_this_item_7887ce31: "Biztosan eltávolítja ezt az elemet?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Biztos benne, hogy el szeretné távolítani ezt az eszközt?"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "Biztos benne, hogy szeretné törölni ezt a felhasználót?"
@@ -6201,6 +6203,7 @@ hu:
   confirm_delete_a5239715: "törlés jóváhagyása"
   confirm_deletion_b2efe7d4: "Törlés jóváhagyása"
   confirm_edit_outcome_a9746c99: "Erősítse meg az eredmény szerkesztését"
+  confirm_email_address_9072dd3c: "E-mail cím megerősítése"
   confirm_mastery_calculation_19ad19f9: "Erősítse meg a Jártassági számítást"
   confirm_mastery_scale_9a779252: "Erősítse meg a Jártassági szintet"
   confirm_qr_code_display_49664fa3: "Erősítse meg a QR-kód megjelenítését"
@@ -6215,6 +6218,7 @@ hu:
   confirm_unfavorite_course_fa01966d: "Erősítse meg a kurzus kedveltekből való eltávolítását"
   confirmation_code_required_22984955: "Megerősítő kód (kötelező)"
   confirmation_failed_please_try_again_ae566d37: "A megerősítés sikertelen. Kérjük, próbálja újra!"
+  confirming_2df4b68f: Jóváhagyás...
   confused_panda_questioning_what_to_do_next_42941484: "Zavart Panda azt kérdezi, mit tegyen ezután"
   consider_selecting_multiple_submission_types_to_ac_f7e624d5: "Fontolja meg több beküldési típus kiválasztását, hogy megfeleljen azoknak a hallgatóknak, akik esetleg nem tudnak megjegyzéseket létrehozni."
   consortium_parent_keys_803547b: "Konzorcium szülői kulcsok"
@@ -10587,6 +10591,7 @@ hu:
   expanded_f4493860: Kinyitva
   expected_array_of_objects_b09ead01: "Objektumok várt tömbje"
   expected_filter_param_to_be_one_of_visible_hidden_c658bc3: "A %{filter} paraméternek a következők egyike lehet:%{visible}, %{hidden}"
+  expires_7019786e: Lejár
   expires_at_6214b43f: "Lejár:"
   explanation_of_statuses_90a26d07: "Az állapotok magyarázata:"
   explicit_latex_typesetting_c1c569c9: "Explicit LaTeX tipizálás"
@@ -11201,12 +11206,14 @@ hu:
   generate_epub_80e89ea4: "ePub generálása"
   generate_item_analysis_report_statuslabel_16e02c8: "Elemanalízis-jelentés generálása %{statusLabel}"
   generate_student_analysis_report_statuslabel_aecdc4dc: "Hallgatói elemzési jelentés generálása %{statusLabel}"
+  generate_token_393ab5b4: "Token generálása"
   generated_f26ee56b: "Generálva: "
   generating_5b5e20f8: "Generálás: "
   generating_c2aabc02: Generálás...
   generating_pairing_code_251b7fc8: "Párosítási kód generálása..."
   generating_pairing_code_d480ccf4: "Párosítási kód generálása"
   generating_preview_45b53be0: "Előnézet generálása... "
+  generating_token_42c29663: "Token generálása... "
   german_3ec99bbb: Német
   germany_49_fc5b8179: "Németország (+49)"
   get_help_on_how_to_use_and_configure_conferences_i_e90d9ed5: "Kérjen segítséget a konferenciák Canvasban történő használatához és konfigurálásához."
@@ -13480,6 +13487,7 @@ hu:
   last_sync_5aac1ff1: "Utolsó szinkronizálás:"
   last_synced_datetime_1c3e0295: "Utoljára szinkronizálva:%{datetime}"
   last_synced_right_now_f6c2ab00: "Utoljára szinkronizálva:épp az imént"
+  last_used_17553fed: "Utoljára használt"
   last_used_f9457313: "Utoljára használt:"
   last_user_access_title: "Utolsó felhasználói hozzáférés"
   last_viewed_cfbbbc3a: "utoljára megtekintett"
@@ -16658,6 +16666,7 @@ hu:
   never_df100b49: Soha
   never_should_have_made_it_here_ab72bdab: "Soha nem lett volna szabad idekerülnie"
   new_13daf639: Új
+  new_access_token_e301d1fc: "Új hozzáférési jegyzék"
   new_account_role_6e5c4964: "Új fiókszerep"
   new_activity_8b84847d: "Új aktivitás"
   new_activity_for_title_c5cc74: "Új tevékenység ennél: %{title}"
@@ -17453,6 +17462,7 @@ hu:
   oid_cannot_be_used_with_multiple_tenants_22425636: "\"oid\" nem használható több bérlővel együtt"
   ok_c47544a2: OK
   ok_ff1b646a: OK
+  ok_thanks_6b1fc8ae: "Rendben, köszönöm"
   okay_1772bbeb: Rendben
   old_policy_39e4f77: "Régi Irányelv"
   oldest_first_ab166f62: "Legöregebb első"
@@ -18961,6 +18971,8 @@ hu:
       regenerating_token_failed: "Token generálása sikertelen "
       registration_failed: "A regisztráció sikertelen. Ellenőrizze a felhasználónevet és próbálja meg újra."
     failed_resending: "Nem sikerült teljesíteni a kérést. Próbálja újra."
+    labels: 
+      enable_login_for_email: "Be kívánok lépni a Canvasba ezzel az e-mail címmel"
     links: 
       resend_confirmation: "Megerősítés újraküldése"
       resend_confirmation_failed: "Nem sikerült teljesíteni a kérést. Próbálja újra."
@@ -19333,6 +19345,7 @@ hu:
   publishing_progress_is_progress_percent_complete_20482e3e: "A publikálás %{progress} százalékban befejeződött"
   pumpkin_904428d5: Sütőtök
   purple_7678a9fc: Lila
+  purpose_5202a309: Cél
   push_notification_a6532ff3: "Értesítő kiküldése"
   qatar_974_7e9684ca: "Katar (+974)"
   qr_code_display_was_canceled_96234bf2: "A QR-kód megjelenítése visszavonásra került"
@@ -20663,7 +20676,9 @@ hu:
   rce_icon_maker_2114f87: "RCE Icon Készítő"
   re_activate_user_f7d77c9a: "Felhasználó újbóli aktiválása"
   re_reported_b9671073: Újrajelentett
+  re_send_confirmation_bcc66940: "Megerősítés újraküldése"
   re_send_notification_directly_to_users_when_announ_c421cea5: "Közvetlen értesítés újraküldése a felhasználóknak, amikor a hirdetmény megkezdődik                        "
+  re_sending_379a8580: Újraküldés...
   re_submission_user_name_assignment_title_621a1cb3: "Újraküldés: %{user_name}, %{assignment_title}"
   re_submit_assignment_b3e2bd28: "Feladat újbóli beadása"
   re_upload_submissions_125e415d: "Beküldések újra feltöltése"
@@ -20799,12 +20814,16 @@ hu:
   regenerate_3e4679f8: Újragenerálás
   regenerate_epub_395c8e56: "ePub újragenerálása"
   regenerate_summary_f189e9d: "Összegzés újragenerálása"
+  regenerate_token_7d4fb783: "Token újragenerálása"
   regenerating_themes_462e6cd9: "Megújuló témák..."
+  regenerating_token_42e5c747: "Token újragenerálása..."
   region_47e29025: "Terület:"
   region_939f2a6c: Terület
   register_app_a8aaabdf: "Alkalmazás regisztrálása"
+  register_communication_ae935328: "Kommunikáció regisztrálása"
   register_email_efc06d59: "E-mail regisztrációja"
   register_slack_email_1f6d7e6d: "Slack Email Regisztráció"
+  register_sms_7f87e50d: "SMS regisztrálása"
   register_tool_84de3186: "Eszköz regisztrálása"
   registration: 
     get_started: "Vágjon bele!"
@@ -25685,6 +25704,7 @@ hu:
   toggle_tooltip_2447b4fa: "ToolTip átkapcsolása"
   toggle_tooltip_d3b7cb86: "Toggle tooltip"
   toggling_placement_ee1ab8b5: "Elhelyezés átkapcsolása"
+  token_9a020862: Token
   tolerance_value_9e96573c: Tűrésérték
   tomorrow_9a6c9a00: Holnap
   tomorrow_at_date_63a0d0d9: "Holnap ekkor: %{date}"
