@@ -19,20 +19,19 @@
 import React, {useCallback, useEffect, useState} from 'react'
 
 import CommonMigratorControls from './common_migrator_controls'
-import {noFileSelectedFormMessage} from '../utils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
-import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {TreeBrowser} from '@instructure/ui-tree-browser'
 import {View} from '@instructure/ui-view'
 import type {FetchLinkHeader} from '@canvas/do-fetch-api-effect/types'
 import type {onSubmitMigrationFormCallback} from '../types'
 import MigrationFileInput from './file_input'
+import {ErrorFormMessage, noFileSelectedFormMessage} from './error_form_message'
 
 import type {TreeBrowserProps} from '@instructure/ui-tree-browser'
 import {RequiredFormLabel} from './form_label'
@@ -268,9 +267,9 @@ const ZipFileImporter = ({
       )}
       {folderError && (
         <p>
-          <Text color="danger" size="small">
+          <ErrorFormMessage>
             {I18n.t('You must select a folder to import content to')}
-          </Text>
+          </ErrorFormMessage>
         </p>
       )}
       <CommonMigratorControls

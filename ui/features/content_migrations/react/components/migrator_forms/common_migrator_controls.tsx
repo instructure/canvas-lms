@@ -30,6 +30,7 @@ import {InfoButton} from './info_button'
 import {DateAdjustments} from '../date_adjustments'
 import type {onSubmitMigrationFormCallback, DateAdjustmentConfig} from '../types'
 import {RequiredFormLabel} from './form_label'
+import {ErrorFormMessage} from './error_form_message'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -299,7 +300,9 @@ export const CommonMigratorControls = ({
           </RadioInputGroup>
           {contentError && (
             <p>
-              <Text color="danger">{I18n.t('You must choose a content option')}</Text>
+              <ErrorFormMessage>
+                {I18n.t('You must choose a content option')}
+              </ErrorFormMessage>
             </p>
           )}
         </View>

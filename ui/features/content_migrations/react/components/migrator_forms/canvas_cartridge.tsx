@@ -20,7 +20,8 @@ import React from 'react'
 import CommonMigratorControls from './common_migrator_controls'
 import type {onSubmitMigrationFormCallback} from '../types'
 import MigrationFileInput from './file_input'
-import {noFileSelectedFormMessage, parseDateToISOString} from '../utils'
+import {noFileSelectedFormMessage} from './error_form_message'
+import {parseDateToISOString} from '../utils'
 import {useSubmitHandler} from '../../hooks/form_handler_hooks'
 
 type CanvasCartridgeImporterProps = {

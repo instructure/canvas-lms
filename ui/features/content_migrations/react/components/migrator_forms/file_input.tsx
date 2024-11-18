@@ -27,6 +27,7 @@ import type {FormMessage} from '@instructure/ui-form-field'
 import {FileDrop} from '@instructure/ui-file-drop'
 import {Flex} from '@instructure/ui-flex'
 import {FormLabel, RequiredFormLabel} from './form_label'
+import {ErrorFormMessage} from './error_form_message'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -40,7 +41,7 @@ type MigrationFileInputProps = {
 }
 
 const getHintMessage = (text: string): FormMessage => ({text, type: 'hint'})
-const getErrorMessage = (text: string): FormMessage => ({text, type: 'error'})
+const getErrorMessage = (text: string): FormMessage => ({text: <ErrorFormMessage>{text}</ErrorFormMessage> , type: 'error'})
 
 const formLabelText = I18n.t('Source')
 
