@@ -259,6 +259,7 @@ fa:
       تعداد نشانه دسترسی: 
       %{access_token_count}
   access_token_created_or_regenerated_4ce9ed1f: "توکن دسترسی ایجاد یا بازسازی شد"
+  access_token_details_495d989: "اطلاعات نشانه دسترسی"
   access_token_is_valid_until_d2f048cf: "نشانه دسترسی معتبر است تا"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "نشانه های دسترسی را می توان برای اجازه دادن به برنامه های دیگر برای برقراری تماس های API از جانب شما استفاده کرد. همچنین می توانید نشانه های دسترسی را ایجاد کنید و از *API باز کانواس* برای ایجاد یکپارچه سازی های خود استفاده کنید."
   access_your_courses_and_groups_using_any_ios_or_an_cdb6ad63: "با استفاده از هر دستگاه تلفن همراه iOS یا Android به درس‌ها و گروه‌های خود دسترسی پیدا کنید و اطلاعات بیشتری را در منوی راهنما بیابید."
@@ -3193,6 +3194,7 @@ fa:
   are_you_sure_you_want_to_permanently_remove_the_us_e6b84ce0: "آیا مطمئن هستید که می خواهید کاربر را برای همیشه از همه حساب ها حذف کنید"
   are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: "آیا مطمئن هستید که می خواهید نمرات این تکلیف را برای دانشجویان ارسال کنید؟"
   are_you_sure_you_want_to_proceed_changes_you_made__2f87f0e7: "آیا مطمئن هستید که می خواهید ادامه دهید؟ تغییراتی که ایجاد کرده اید ذخیره نمی شوند."
+  are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "مطمئنید که می خواهید این نشانه دوباره ایجاد شود؟ هرچیزی که از این نشانه استفاده می کند باید بهنگام سازی شود."
   are_you_sure_you_want_to_remove_this_item_7887ce31: "آیا مطمئن هستید که می خواهید این مورد را حذف کنید؟"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "مطمئنید که می خواهید این ابزار حذف شود؟"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "مطمئنید که می خواهید این کاربر حذف شود؟"
@@ -5987,6 +5989,7 @@ fa:
   confirm_dialog_component: 
     ok: تأیید
   confirm_edit_outcome_a9746c99: "ویرایش نتیجه را تأیید کنید"
+  confirm_email_address_9072dd3c: "تأیید نشانی پست الکترونیکی"
   confirm_mastery_calculation_19ad19f9: "محاسبه تسلط را تأیید کنید"
   confirm_mastery_scale_9a779252: "تایید مقیاس تسلط"
   confirm_qr_code_display_49664fa3: "نمایش کد QR را تأیید کنید"
@@ -5999,6 +6002,7 @@ fa:
   confirm_unfavorite_course_fa01966d: "دوره نامطلوب را تأیید کنید"
   confirmation_code_required_22984955: "رمز تأیید (لازم)"
   confirmation_failed_please_try_again_ae566d37: "تأیید انجام نشد. لطفا دوباره تلاش کنید."
+  confirming_2df4b68f: "درحال تأیید..."
   confused_panda_questioning_what_to_do_next_42941484: "پاندای سردرگم می‌پرسد که بعداً چه کاری انجام دهد"
   consider_selecting_multiple_submission_types_to_ac_f7e624d5: "انتخاب چندین نوع ارسال را در نظر بگیرید چون که ممکن است دانشجویانی قادر به ایجاد حاشیه نویسی نباشند."
   consumer_key_57d9fcf1: "کلید مصرف کننده"
@@ -10215,6 +10219,7 @@ fa:
   expand_tutorial_tray_22630c49: "گسترش سینی خودآموز"
   expanded_f4493860: "باز شده"
   experimental_graphql_api_75c5eb8f: "رابط برنامه نویسی برنامه GraphQL آزمایشی"
+  expires_7019786e: "منقضی می شود در"
   expires_at_6214b43f: "منقضی می‌شود در"
   explanation_of_statuses_90a26d07: "توضیح وضعیت ها:"
   export_an_existing_quiz_to_new_quizzes_2_format_8fd08a23: "صدور یک آزمون موجود به فرمت جدید Quizzes 2"
@@ -10872,12 +10877,14 @@ fa:
   generate_epub_80e89ea4: "ایجاد ePub"
   generate_item_analysis_report_statuslabel_16e02c8: "ایجاد گزارش تحلیل مورد %{statusLabel}"
   generate_student_analysis_report_statuslabel_aecdc4dc: "ایجاد گزارش تحلیل دانشجو %{statusLabel}"
+  generate_token_393ab5b4: "ایجاد نشانه"
   generated_f26ee56b: "ایجاد شد:"
   generating_5b5e20f8: "در حال ایجاد:"
   generating_c2aabc02: "در حال ایجاد..."
   generating_pairing_code_251b7fc8: "ایجاد کردن رمز جفتی  ..."
   generating_pairing_code_d480ccf4: "ایجاد کردن رمز جفتی "
   generating_preview_45b53be0: "در حال ایجاد پیش نمایش..."
+  generating_token_42c29663: "در حال ایجاد نشانه"
   german_3ec99bbb: آلمانی
   germany_49_fc5b8179: "آلمان (+49)"
   get_started_b9507525: "شروع به کار"
@@ -13158,6 +13165,7 @@ fa:
   last_synced_datetime_1c3e0295: "آخرین همگام شده: %{datetime}"
   last_synced_right_now_f6c2ab00: "آخرین همگام شده: اکنون"
   last_updated_timestamp_1822e508: "آخرین به روزرسانی %{timestamp}"
+  last_used_17553fed: "آخرین استفاده"
   last_used_f9457313: "آخرین استفاده:"
   last_user_access_title: "آخرین دسترسی کاربر"
   last_viewed_cfbbbc3a: "آخرین مشاهده"
@@ -16295,6 +16303,7 @@ fa:
   never_1ed1244d: هرگز
   never_df100b49: هرگز
   new_13daf639: جدید
+  new_access_token_e301d1fc: "نشانه دسترسی جدید"
   new_account_role_6e5c4964: "نقش حساب جدید"
   new_analytics_f6147886: "تحلیل جدید"
   new_annotations_66932016: "یادآوری های جدید"
@@ -16956,6 +16965,7 @@ fa:
   offline_score_8d7b4779: "امتیاز آفلاین:"
   ok_c47544a2: تأیید
   ok_ff1b646a: تأیید
+  ok_thanks_6b1fc8ae: "باشه، سپاسگزارم"
   okay_1772bbeb: "صحیح است"
   old_policy_39e4f77: "سیاست قبلی"
   old_quiz_e8dafede: "امتحان قبلی"
@@ -18245,6 +18255,8 @@ fa:
       regenerating_token_failed: "ایجاد دوباره ی نشانه انجام نشد"
       registration_failed: "ثبت نام انجام نشد. نام کاربری و رمز عبور را بررسی کنید و دوباره تلاش کنید."
     failed_resending: "درخواست انجام نشد. لطفا دوباره سعی کنید."
+    labels: 
+      enable_login_for_email: "می خواهم با استفاده از این نشانی پست الکترونیکی وارد کانواس شوم"
     links: 
       resend_confirmation: "ارسال دوباره تأییدیه"
       resend_confirmation_failed: "درخواست انجام نشد. دوباره تلاش کنید."
@@ -18649,6 +18661,7 @@ fa:
     new: 
       payment_info: "اطلاعات پرداخت"
   purple_7678a9fc: ارغوانی
+  purpose_5202a309: هدف
   push_notification_a6532ff3: "وارد کردن اطلاعیه"
   q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: "پرسش: چه چیزی سیاه، سفید، سیاه، سفید می شود؟ جواب: یک پاندا به که به پایین تپه غلت می‌خورد."
   qatar_974_7e9684ca: "قطر (+974)"
@@ -20157,6 +20170,8 @@ fa:
   rce_enhancements_5701e06: "ارتقای RCE"
   re_activate_user_f7d77c9a: "فعال سازی دوباره کاربر"
   re_reported_b9671073: "دوباره گزارش شده"
+  re_send_confirmation_bcc66940: "ارسال دوباره تأییدیه"
+  re_sending_379a8580: "در حال ارسال دوباره..."
   re_submission_user_name_assignment_title_621a1cb3: "ارسال مجدد: %{user_name}, %{assignment_title}"
   re_submit_assignment_b3e2bd28: "ارسال دوباره تکلیف"
   re_upload_submissions_125e415d: "بارگذاری دوباره موردهای ارسالی"
@@ -20270,10 +20285,14 @@ fa:
   regardless_of_whether_this_permission_is_enabled_o_a16e31b5: "صرف نظر از فعال یا غیرفعال بودن این مجوز، کاربران همچنان قادر به مدیریت رویدادها در تقویم شخصی خود خواهند بود."
   regenerate_3e4679f8: بازتولید
   regenerate_epub_395c8e56: "ایجاد دوباره ePub"
+  regenerate_token_7d4fb783: "ایجاد دوباره نشانه"
+  regenerating_token_42e5c747: "در حال ایجاد دوباره نشانه..."
   region_47e29025: "ناحیه:"
   region_939f2a6c: ناحیه
+  register_communication_ae935328: "ثبت ارتباط"
   register_email_efc06d59: "ثبت پست الکترونیکی"
   register_slack_email_1f6d7e6d: "ثبت پست الکترونیکی ضعیف"
+  register_sms_7f87e50d: "ثبت پیامک"
   register_tool_84de3186: "ثبت ابزار"
   registration: 
     get_started: "شروع به کار"
@@ -24387,6 +24406,7 @@ fa:
   toggle_tooltip_2447b4fa: "تغییر ابزار راهنما "
   toggle_tooltip_d3b7cb86: "تغییر ابزار راهنما"
   toggling_placement_ee1ab8b5: "تغییر مکان"
+  token_9a020862: نشانه
   tolerance_value_9e96573c: "میزان تحمل"
   tomorrow_9a6c9a00: فردا
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "تعداد تلاش های ناموفق برای ورود زیاد است. لطفا بعدا دوباره تلاش کنید، یا با مدیر سیستم خود تماس بگیرید."
