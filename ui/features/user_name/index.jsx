@@ -21,7 +21,6 @@ import ReactDOM from 'react-dom'
 import ready from '@instructure/ready'
 import UserSuspendLink from './react/UserSuspendLink'
 import './jquery/index'
-import '@canvas/user-sortable-name'
 
 ready(() => {
   const suspendPlaceholder = document.getElementById('suspend-reactivate-link')
