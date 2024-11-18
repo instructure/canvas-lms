@@ -18,14 +18,19 @@
 
 import {datetimeString} from '@canvas/datetime/date-functions'
 import $ from 'jquery'
-import htmlEscape, {raw} from '@instructure/html-escape'
+import htmlEscape, {SafeString, raw} from '@instructure/html-escape'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('content_locks')
 
-if (!('INST' in window)) window.INST = {}
-
-INST.lockExplanation = function (data, type) {
+export default function lockExplanation(
+  data: {
+    lock_at?: string | null
+    unlock_at?: string | null
+    context_module?: {name?: string}
+  },
+  type: 'quiz' | 'assignment' | 'topic' | 'file' | 'page'
+): string | SafeString {
   // Any additions to this function should also be added to similar logic in ApplicationController.rb
   if (data.lock_at) {
     const lock_at = datetimeString(data.lock_at)
