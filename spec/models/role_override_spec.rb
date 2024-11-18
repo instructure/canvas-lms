@@ -494,6 +494,40 @@ describe RoleOverride do
       end
     end
 
+    context "allowed custom site admin role" do
+      let_once(:site_admin_account) { Account.site_admin }
+      let_once(:root_account) { Account.default }
+      let(:role) { custom_account_role("OnTheList", account: site_admin_account) }
+      let(:admin_user) { site_admin_user(role:) }
+
+      before(:once) do
+        Setting.set("allowed_custom_site_admin_roles", "OnTheList")
+      end
+
+      it "permissions are default enabled for descendant non site admin root accounts" do
+        expect(root_account.grants_right?(admin_user, :become_user)).to be_truthy
+        expect(RoleOverride.permission_for(root_account, :become_user, role)[:enabled]).to eq [:self, :descendants]
+      end
+
+      it "is ignored when the permission's account is site admin" do
+        expect(site_admin_account.grants_right?(admin_user, :manage_account_memberships)).to be_falsey
+        expect(RoleOverride.permission_for(site_admin_account, :manage_account_memberships, role)[:enabled]).to be_falsey
+      end
+
+      it "is ignored when the associated account is site admin but the role is not on the allow list" do
+        role = custom_account_role("NotOnTheList", account: site_admin_account)
+        user = site_admin_user(role:)
+        expect(root_account.grants_right?(user, :manage_account_memberships)).to be_falsey
+        expect(RoleOverride.permission_for(root_account, :manage_account_memberships, role)[:enabled]).to be_falsey
+      end
+
+      it "can be disabled / overriden from the default enabled" do
+        Account.site_admin.role_overrides.create!(role:, enabled: false, permission: :become_user)
+        expect(root_account.grants_right?(admin_user, :become_user)).to be_falsey
+        expect(RoleOverride.permission_for(root_account, :become_user, role)[:enabled]).to be_falsey
+      end
+    end
+
     context "sharding" do
       specs_require_sharding
 
