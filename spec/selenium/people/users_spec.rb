@@ -373,4 +373,43 @@ describe "users" do
       expect(displayed_username).to eq("The Admin")
     end
   end
+
+  context "user details" do
+    def clear_input_and_send_keys(input, text)
+      driver.action.key_down(:control).send_keys(input, "a").send_keys(input, :backspace).key_up(:control).perform
+      input.send_keys(text)
+    end
+
+    context "when details changed successfully via form" do
+      it "should update the 'Name and Email' section" do
+        course_with_admin_logged_in
+        @student = student_in_course.user
+        input_values = {
+          name: "New Name",
+          short_name: "New Short Name",
+          sortable_name: "New Sortable Name",
+          time_zone: "Arizona",
+          email: "new@email.com"
+        }
+        get "/accounts/#{@student.account.id}/users/#{@student.id}"
+
+        f(".edit_user_link").click
+        dialog = f('[role="dialog"][aria-label="Edit User Details"]')
+        clear_input_and_send_keys(dialog.find_element(:name, "name"), input_values[:name])
+        clear_input_and_send_keys(dialog.find_element(:name, "short_name"), input_values[:short_name])
+        clear_input_and_send_keys(dialog.find_element(:name, "sortable_name"), input_values[:sortable_name])
+        dialog.find_element(:name, "time_zone").click
+        f("[role='option'][value='#{input_values[:time_zone]}']").click
+        clear_input_and_send_keys(dialog.find_element(:name, "email"), input_values[:email])
+        dialog.find_element(:css, "button[type='submit']").click
+
+        name_and_email = f("#name_and_email")
+        expect(name_and_email.find_element(:css, ".name").text).to eq input_values[:name]
+        expect(name_and_email.find_element(:css, ".short_name").text).to eq input_values[:short_name]
+        expect(name_and_email.find_element(:css, ".sortable_name").text).to eq input_values[:sortable_name]
+        expect(name_and_email.find_element(:css, ".time_zone").text).to eq input_values[:time_zone]
+        expect(name_and_email.find_element(:css, ".email").text).to eq input_values[:email]
+      end
+    end
+  end
 end

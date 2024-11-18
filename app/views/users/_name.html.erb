@@ -66,7 +66,7 @@
             <% if @context.grants_right? @current_user, :read_email_addresses %>
               <tr>
                 <th><%= before_label('default_email', 'Default Email') %></th>
-                <td style="word-break: break-all"><%=h @user.email %></td>
+                <td class="email" style="word-break: break-all"><%=h @user.email %></td>
               </tr>
             <% end %>
             <tr>
@@ -129,35 +129,5 @@
     </table>
   </fieldset>
 <% unless @read_only %>
-<div title="<%= t 'titles.edit_user_details', 'Edit User Details' %>" id="edit_student_dialog" style="display: none;">
-  <p><%= t('update_instructions', "You can update some of this user's information, but they can change it back if they choose.") %></p>
-  <%= form_for @user, :url => user_url(@user),
-               :html => {:id => "edit_student_form", :class => 'form-dialog form-horizontal'} do |f| %>
-    <table class="formtable">
-      <tr>
-        <td><%= f.blabel :name, :en => "Full Name" %></td>
-        <td><%= f.text_field :name %></td>
-      </tr><tr>
-        <td><%= f.blabel :short_name, :en => "Display Name" %></td>
-        <td><%= f.text_field :short_name %></td>
-      </tr><tr>
-        <td><%= f.blabel :sortable_name, :en => "Sortable Name" %></td>
-        <td><%= f.text_field :sortable_name %></td>
-      </tr>
-      <% if @user.grants_right?(@current_user, :manage_user_details) %>
-        <tr>
-          <td><%= f.blabel :time_zone, :en => "Time Zone" %></td>
-          <td><%= f.time_zone_select :time_zone, I18nTimeZone.us_zones, :model => I18nTimeZone, :default => (@domain_root_account.try(:default_time_zone) || "Mountain Time (US & Canada)") %></td>
-        </tr><tr>
-          <td><%= f.blabel :email, :en => "Default Email" %></td>
-          <td><%= f.email_field :email %></td>
-        </tr>
-      <% end %>
-    </table>
-    <div class='form-controls'>
-      <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', 'Cancel') %></button>
-      <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.update_details', 'Update Details') %></button>
-    </div>
-  <% end %>
-</div>
+<div id="edit_user_details_mount_point"></div>
 <% end %>
