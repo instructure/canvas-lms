@@ -115,6 +115,9 @@ module Lti
           # Let the registration validate the data they passed
           registration.update!(registration_overlay:)
 
+          # also update the DK scopes
+          registration.developer_key.update!(scopes: registration.scopes - registration_overlay["disabledScopes"])
+
           data = Schemas::Lti::IMS::RegistrationOverlay.to_lti_overlay(registration_overlay)
 
           if overlay.blank?
