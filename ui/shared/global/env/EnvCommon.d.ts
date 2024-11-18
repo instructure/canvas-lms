@@ -202,6 +202,8 @@ export interface EnvCommon {
   K5_SUBJECT_COURSE: string
   LOCALE_TRANSLATION_FILE: string
   DEFAULT_DUE_TIME?: string
+  TIMEZONES: Array<{name: string; name_with_hour_offset: string}>
+  DEFAULT_TIMEZONE_NAME: string
 
   FEATURES: Partial<
     Record<

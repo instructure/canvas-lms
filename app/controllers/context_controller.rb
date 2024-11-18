@@ -245,12 +245,23 @@ class ContextController < ApplicationController
         @membership = scope.first
         if @membership
           @enrollments = scope.to_a
-          js_env(COURSE_ID: @context.id,
-                 USER_ID: user_id,
-                 LAST_ATTENDED_DATE: @enrollments.first.last_attended_at,
-                 course: {
-                   id: @context.id,
-                   hideSectionsOnCourseUsersPage: @context.sections_hidden_on_roster_page?(current_user: @current_user)
+          user = @membership&.user
+          js_permissions = {
+            can_manage_user_details: user.grants_right?(@current_user, :manage_user_details)
+          }
+          timezones = I18nTimeZone.all.map { |tz| { name: tz.name, name_with_hour_offset: tz.to_s } }
+          default_timezone_name = @domain_root_account.try(:default_time_zone)&.name || "Mountain Time (US & Canada)"
+          js_env({
+                   COURSE_ID: @context.id,
+                   USER_ID: user_id,
+                   LAST_ATTENDED_DATE: @enrollments.first.last_attended_at,
+                   course: {
+                     id: @context.id,
+                     hideSectionsOnCourseUsersPage: @context.sections_hidden_on_roster_page?(current_user: @current_user)
+                   },
+                   PERMISSIONS: js_permissions,
+                   TIMEZONES: timezones,
+                   DEFAULT_TIMEZONE_NAME: default_timezone_name
                  })
 
           log_asset_access(@membership, "roster", "roster")

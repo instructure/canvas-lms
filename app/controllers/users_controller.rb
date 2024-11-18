@@ -1410,6 +1410,7 @@ class UsersController < ApplicationController
 
           js_permissions = {
             can_manage_sis_pseudonyms: @context_account.root_account.grants_right?(@current_user, :manage_sis),
+            can_manage_user_details: @user.grants_right?(@current_user, :manage_user_details)
           }
           if @context_account.root_account.feature_enabled?(:temporary_enrollments)
             js_permissions[:can_read_sis] = @context_account.grants_right?(@current_user, session, :read_sis)
@@ -1430,12 +1431,17 @@ class UsersController < ApplicationController
             end
           end
 
+          timezones = I18nTimeZone.all.map { |tz| { name: tz.name, name_with_hour_offset: tz.to_s } }
+          default_timezone_name = @domain_root_account.try(:default_time_zone)&.name || "Mountain Time (US & Canada)"
+
           js_env({
                    CONTEXT_USER_DISPLAY_NAME: @user.short_name,
                    USER_ID: @user.id,
                    COURSE_ROLES: Role.course_role_data_for_account(@context_account, @current_user),
                    PERMISSIONS: js_permissions,
                    ROOT_ACCOUNT_ID: @context_account.root_account.id,
+                   TIMEZONES: timezones,
+                   DEFAULT_TIMEZONE_NAME: default_timezone_name
                  })
           render status:
         end

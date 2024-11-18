@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
+import {createRoot} from 'react-dom/client'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from '@instructure/html-escape'
@@ -26,6 +28,7 @@ import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData'
 import ready from '@instructure/ready'
+import EditUserDetails from '../react/EditUserDetails'
 
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
 
@@ -34,45 +37,45 @@ const I18n = useI18nScope('user_name')
 ready(function () {
   $('#name_and_email').on('click', '.edit_user_link', event => {
     event.preventDefault()
-    $('#edit_student_dialog').dialog({
-      width: 450,
-      modal: true,
-      zIndex: 1000,
+
+    const mountPoint = document.getElementById('edit_user_details_mount_point')
+
+    if (!mountPoint) {
+      // This case happens when the page/partial is read only. See _name.html.erb "@read_only".
+      return
+    }
+
+    const root = createRoot(mountPoint)
+    const userId = ENV.USER_ID
+    const canManageUserDetails = ENV.PERMISSIONS.can_manage_user_details
+    const timezones = ENV.TIMEZONES
+    const defaultTimezoneName = ENV.DEFAULT_TIMEZONE_NAME
+    const userDetails = $('#name_and_email .user_details').getTemplateData({
+      textValues: ['name', 'email', 'short_name', 'sortable_name', 'time_zone'],
     })
-    $('#edit_student_form :text:visible:first').focus().select()
-  })
-  $('#edit_student_form').formSubmit({
-    beforeSubmit(_data) {
-      $(this)
-        .find('button')
-        .prop('disabled', true)
-        .filter('.submit_button')
-        .text(I18n.t('messages.updating_user_details', 'Updating User Details...'))
-    },
-    success(data) {
-      $(this)
-        .find('button')
-        .prop('disabled', false)
-        .filter('.submit_button')
-        .text(I18n.t('buttons.update_user', 'Update User'))
-      $('#name_and_email .user_details').fillTemplateData({data})
-      $('#edit_student_dialog').dialog('close')
-    },
-    error(_data) {
-      $(this)
-        .find('button')
-        .prop('disabled', false)
-        .filter('.submit_button')
-        .text(
-          I18n.t(
-            'errors.updating_user_details_failed',
-            'Updating user details failed, please try again'
-          )
-        )
-    },
-  })
-  $('#edit_student_dialog .cancel_button').on('click', () => {
-    $('#edit_student_dialog').dialog('close')
+    const closeModal = () => {
+      root.unmount()
+      event.target.focus()
+    }
+
+    root.render(
+      <EditUserDetails
+        userId={userId}
+        userDetails={{
+          ...userDetails,
+          time_zone:
+            userDetails.time_zone === I18n.t('None') ? defaultTimezoneName : userDetails.time_zone,
+        }}
+        timezones={timezones}
+        canManageUserDetails={canManageUserDetails}
+        onSubmit={data => {
+          $('#name_and_email .user_details').fillTemplateData({data})
+
+          closeModal()
+        }}
+        onClose={() => closeModal()}
+      />
+    )
   })
   $('.remove_avatar_picture_link').on('click', async function (event) {
     event.preventDefault()
