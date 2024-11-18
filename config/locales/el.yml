@@ -181,6 +181,7 @@ el:
   accepted_user_role_type_course_course_2ce91589: "Αποδέχτηκαν: %{user}, %{role_type}, course, %{course}"
   access_report_80d28095: "Αναφορά Πρόσβασης"
   access_token_3be22221: "Διακριτικό Πρόσβασης/Access Token"
+  access_token_details_495d989: "Λεπτομέρεις των Access Tokens"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Τα Διακριτικά Πρόσβασης/Access Tokens μπορούν να χρησιμοποιηθούν για να επιτρέψουν άλλες εφαρμογές να συνθέσουν κλήσεις τύπου API εκ μέρους σας. Μπορείτε, επίσης, να δημιουργήσετε διακριτικά πρόσβασης/Access Tokes και να *χρησιμοποιήσετε το Ανοιχτό API του Canvas* ώστε να υλοποιήσετε τις δικές σας ενσωματώσεις/συνδέσεις με το Canvas. "
   accordion_section_1_7888782d: "Τμήμα Ακορντεόν 1"
   accordion_section_2_e1812997: "Τμήμα Ακορντεόν 2"
@@ -3648,6 +3649,7 @@ el:
   confirm_unenrollment_64333263: "Επιβεβαίωση απεγγραφής"
   confirmation_code_required_22984955: "Κωδικός επιβεβαίωσης (απαιτείται)"
   confirmation_failed_please_try_again_ae566d37: "<mrk mid=\"5637\" mtype=\"seg\">Απέτυχε η επιβεβαίωση.</mrk>  <mrk mid=\"5638\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά.</mrk>"
+  confirming_2df4b68f: "Επικύρωση σε λειτουργία..."
   consumer_key_6f94ba11: "Κλειδί Καταναλωτή"
   contact_a6e7f6da: "Τρόποι επικοινωνίας"
   content_exports: 
@@ -6610,6 +6612,7 @@ el:
   generating_5b5e20f8: "Δημιουργία:"
   generating_c2aabc02: Δημιουργία...
   generating_preview_45b53be0: "Δημιουργία προεπισκόπησης..."
+  generating_token_42c29663: "Γίνεται Δημιουργία Token..."
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "Λάβετε τα ακόλουθα από τη Συνδεδεμένη σας Εφαρμογή Salesforce"
   get_your_users_error_reports_posted_to_salesforce__76f57839: "Λάβετε τις αναφορές σφαλμάτων χρηστών που έχουν δημοσιευθεί στο Service Cloud της Salesforce"
   get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: "Λάβετε τις αναφορές σφαλμάτων χρηστών που έχουν δημοσιευθεί στη Salesforce"
@@ -7751,6 +7754,7 @@ el:
   last_modified_by_ca4bb5e1: "Τελευταία Τροποποίηση Από"
   last_name_303122f3: Επώνυμο
   last_post_display_last_reply_at_b9896355: "Τελευταία δημοσίευση %{display_last_reply_at}"
+  last_used_17553fed: "Χρησιμοποιήθηκε τελεταία φορά"
   last_user_access_title: "Τελευταία Πρόσβαση Χρήστη"
   late_2be42b88: Πρόσφατο/α
   late_assignment_user_name_assignment_name_2df32e01: "<mrk mid=\"5564\" mtype=\"seg\">Εκπρόθεσμη Υποβολή:</mrk> <mrk mid=\"5565\" mtype=\"seg\">%{user_name}, %{assignment_name}</mrk>"
@@ -9997,6 +10001,7 @@ el:
   never_1ed1244d: ποτέ
   never_df100b49: Ποτέ
   new_13daf639: Νέο
+  new_access_token_e301d1fc: "Νέο Token Πρόσβασης"
   new_account_role_6e5c4964: "Νέος Ρόλος Λογαριασμού"
   new_annotations_66932016: "Καινούργιες Σημειώσεις"
   new_announcement_23af4598: "Νέα Ανακοίνωση"
@@ -12785,6 +12790,8 @@ el:
   ratio_answered_correctly_b0c1e7d: "%{ratio}% απάντησαν σωστά"
   ratio_responded_correctly_6d890107: "%{ratio}% απάντησαν σωστά"
   re_activate_user_f7d77c9a: "Επανενεργοποίηση Χρήστη"
+  re_send_confirmation_bcc66940: "Επαναποστολή Επιβεβαίωσης"
+  re_sending_379a8580: Επαναποστολή...
   re_submit_assignment_b3e2bd28: "Υποβάλετε ξανά την Εργασία"
   re_upload_submissions_form: 
     buttons: 
@@ -12861,6 +12868,8 @@ el:
   reference_code_is_required_c32c757f: "Απαιτείται κωδικός αναφοράς"
   refresh_8a04b019: Ανανέωση
   regenerate_epub_395c8e56: "Εκ νέου δημιουργία ePub"
+  regenerate_token_7d4fb783: "Εκ νέου Δημιουργία Token"
+  regenerating_token_42e5c747: "Γίνεται Εκ νέου Δημιουργία Token..."
   region_47e29025: "Περιοχή:"
   region_939f2a6c: Περιοχή
   register_email_efc06d59: "Εγγραφή Ηλεκτρονικής Διεύθυνσης"
@@ -15072,6 +15081,7 @@ el:
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "Για να περιορίσετε χρήστες από το συγκεκριμένο domain Google Apps, εισαγάγετε το domain εδώ."
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "Για να δείτε όλες τις ειδοποιήσεις που έχουν σταλεί σε ένα χρήστη του Canvas, επιλέξτε τον χρήστη και το εύρος ημερομηνιών για την αναζήτησή σας."
   toggle_editing_answer_text_as_html_9a93fe6: "Εναλλαγή της επεξεργασίας του κειμένου απάντησης σε HTML"
+  token_9a020862: Token
   tolerance_value_9e96573c: "Τιμή ανοχής"
   tomorrow_9a6c9a00: Αύριο
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "<mrk mid=\"3672\" mtype=\"seg\">Πάρα πολλές αποτυχημένες προσπάθειες σύνδεσης.</mrk> <mrk mid=\"3673\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά ή επικοινωνήστε με τον διαχειριστή των υπολογιστικών συστημάτων σας.</mrk>"
