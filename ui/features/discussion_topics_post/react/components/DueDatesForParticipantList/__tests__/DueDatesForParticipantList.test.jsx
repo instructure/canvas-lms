@@ -33,7 +33,7 @@ describe('DueDatesForParticipantList', () => {
     )
     const {getByText} = setup({
       assignmentOverride: AssignmentOverride.mock({
-        adhocStudents: AdhocStudents.mock({
+        set: AdhocStudents.mock({
           students,
         }),
       }),
@@ -56,7 +56,7 @@ describe('DueDatesForParticipantList', () => {
     )
     const {getByText} = setup({
       assignmentOverride: AssignmentOverride.mock({
-        adhocStudents: AdhocStudents.mock({
+        set: AdhocStudents.mock({
           students,
         }),
       }),
