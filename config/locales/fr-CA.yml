@@ -260,7 +260,7 @@ fr-CA:
   a_process_is_already_in_progress_f4495f5e: "Un processus est déjà en cours."
   a_public_privacy_level_will_send_the_launching_use_63bdbfaa: "Un niveau de confidentialité publique enverra les informations d'identification personnelle de l'utilisateur de lancement au fournisseur de l'outil. Le réglage de ce paramètre à Privé peut affecter négativement les outils qui dépendent de cette information."
   a_recovery_email_has_been_sent_please_check_your_i_172f83ea: "Un courriel de récupération a été envoyé. Veuillez vérifier votre boîte de réception."
-  a_recovery_email_has_been_sent_to_email_please_che_37426c8b: "Un courriel de récupération a été envoyé à %{email}. Veuillez vérifier votre boîte de réception et suivre les instructions pour réinitialiser votre mot de passe. Ceci peut prendre jusqu’à 30 minutes. Si vous ne recevez pas de courriel, vérifiez votre dossier de courrier indésirable."
+  a_recovery_email_has_been_sent_to_email_please_che_37426c8b: "Un courriel de récupération a été envoyé à %{email}. Veuillez vérifier votre boîte de réception et suivre les instructions pour réinitialiser votre mot de passe. Ceci peut prendre jusqu’à 30 minutes. Si vous ne recevez pas de courriel, vérifiez votre dossier de courrier indésirable."
   a_redirect_uri_is_required_please_supply_one_471908db: "Un redirect_uri est requis, veuillez en fournir un."
   a_role_name_is_required_47efd33: "Un nom de rôle est requis"
   a_rubric_that_has_been_used_for_grading_cannot_be__71b1314f: "Une rubrique qui a été utilisée pour la notation ne peut pas être écrasée."
@@ -1613,7 +1613,7 @@ fr-CA:
         allow_invitation_previews: "Aperçu des invitations"
         allow_name_pronunciation_edit_for_admins: Administrateur
         allow_name_pronunciation_edit_for_students: Étudiant
-        allow_name_pronunciation_edit_for_teachers: Enseignant
+        allow_name_pronunciation_edit_for_teachers: "Administration des cours (y compris les enseignants, les assistants techniques et les concepteurs)"
         allow_sending_scores_in_emails: "Les étudiants peuvent choisir de recevoir leurs notes par messagerie"
         author_email_in_notifications: "Afficher l’adresse courriel de l’expéditeur pour les notifications relatives aux interactions avec les utilisateurs"
         can_add_pronouns: "Activer les pronoms personnels"
@@ -2617,11 +2617,16 @@ fr-CA:
   alerts_must_be_configured_for_the_institution_aler_43bbacb1: "Les alertes doivent être configurées pour l'établissement. Les alertes sont une fonctionnalité rarement utilisée conçue pour envoyer une alerte pour les étudiants, les enseignants ou les administrateurs pour des déclencheurs spécifiques (p. ex., aucune interaction étudiant-enseignant pour 7 jours). Ceux-ci sont vérifiés chaque jour, et des notifications sont envoyées à l’étudiant ou l’enseignant jusqu’à ce que le problème soit résolu."
   align_horizontally_fce4bc3f: "Aligner horizontalement"
   align_outcomes_to_this_page_7d055196: "Aligner les acquis au questionnaire"
+  align_to_bottom_2d84ba5b: "Aligner en bas"
   align_to_center_e42b23db: "Aligner au centre"
   align_to_end_ef6b2fba: "S’aligner sur la fin"
+  align_to_middle_3a5bd230: "Aligner au milieu"
   align_to_start_3b1d5678: "S’aligner pour commencer"
+  align_to_top_f14e03c1: "Aligner en haut"
   align_vertically_584173b7: "Aligner verticalement"
   aligned_questions_125fd2ce: "Questions alignées"
+  alignment_f475ed5: Alignement
+  alignment_options_6d5762d1: "Options d’alignement"
   alignments_de5f20d8: Alignements
   all_4321c3a1: Tous
   all_account_types_e83c1516: "Tous les types de compte"
@@ -2858,7 +2863,7 @@ fr-CA:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Permet aux rôles d’enseignant/concepteur/AE d’accéder à l’outil de clavardage."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Permet aux rôles d’enseignant/AE d’accéder à l’outil de Participation."
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "Permet aux rôles d’enseignant/AE d’accéder à l’outil de Participation."
-  allows_teachers_to_attach_stickers_to_student_subm_14731483: "Permet aux enseignants d’apposer des autocollants sur les envois des étudiants. L’indicateur de fonctionnalité « Améliorations de tâche — Étudiant » doit être activé."
+  allows_teachers_to_attach_stickers_to_student_subm_14731483: "Permet aux enseignants d’apposer des autocollants sur les envois des étudiants. L’indicateur de fonctionnalité « Améliorations de tâche — Étudiant » doit être activé."
   allows_teachers_to_attach_stickers_to_student_subm_efb006c4: "Permet aux enseignants d’apposer des autocollants sur les envois des étudiants."
   allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Permet aux enseignants de masquer des sections de cours aux étudiants sur la page Personnes lorsqu’il y a plus d’une section dans le cours."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Permet aux enseignants de marquer les données de notes comme prêtes à une exportation globale pour leurs intégrations au système d'information des étudiants."
@@ -3066,6 +3071,7 @@ fr-CA:
   allows_user_to_create_course_pages_allows_user_to__2b7e4d48: "Permet à l'utilisateur de créer des pages de cours. Permet à l'utilisateur de modifier les paramètres de verrouillage de Modèle sur les pages dans un cours de maîtrise de Modèle."
   allows_user_to_create_course_pages_ec9c6647: "Permet à l’utilisateur de créer des pages de cours."
   allows_user_to_create_developer_keys_for_accounts_76bedd2b: "Permet à l'utilisateur de créer des clés de développeur pour les comptes."
+  allows_user_to_create_dsr_exports_dd1fef69: "Permet à l’utilisateur de créer des exportations DSR."
   allows_user_to_create_edit_and_delete_account_grou_abc8c12: "Permet à l'utilisateur de créer, de modifier et de supprimer des groupes de compte."
   allows_user_to_create_edit_and_delete_course_group_36097d72: "Permet à l’utilisateur de créer, de modifier et de supprimer des groupes de cours. Permet à l’utilisateur de créer, de modifier et de supprimer des groupes de cours créé par des étudiants."
   allows_user_to_create_edit_and_delete_course_group_40367907: "Permet à l’utilisateur de créer, de modifier et de supprimer des groupes de cours."
@@ -3119,6 +3125,7 @@ fr-CA:
       Permet à l'utilisateur d'ajouter les cours associés.
   allows_user_to_differentiate_assignments_to_indivi_37f701a5: "Permet à l'utilisateur de différencier les tâches à des étudiants à titre individuel."
   allows_user_to_download_all_comments_in_a_student__33b36d0a: "Permet à l'utilisateur de télécharger tous les commentaires dans un envoi de l'étudiant."
+  allows_user_to_download_completed_dsr_exports_3d335d00: "Permet à l’utilisateur de télécharger les exportations DSR terminées."
   allows_user_to_duplicate_assignments_in_a_course_a3bf4f54: "Permet à l’utilisateur de dupliquer des tâches dans un cours."
   allows_user_to_duplicate_quizzes_in_a_course_1d3437f2: "Permet à l’utilisateur de dupliquer des questionnaires dans un cours."
   allows_user_to_edit_a_list_of_assignment_blackout__9c734bf0: "Permet à l’utilisateur de modifier une liste de dates d’interdiction de tâches."
@@ -3647,6 +3654,7 @@ fr-CA:
   an_error_occurred_while_loading_course_outcomes_320ccc44: "Une erreur s'est produite lors du chargement des acquis du cours."
   an_error_occurred_while_loading_course_outcomes_er_accefe77: "Une erreur s'est produite lors du chargement des acquis du cours : %{error}"
   an_error_occurred_while_loading_courses_11d4571e: "Une erreur s'est produite lors du chargement des cours"
+  an_error_occurred_while_loading_files_usage_data_a8f7575d: "Une erreur s’est produite lors du chargement des données d’utilisation des fichiers"
   an_error_occurred_while_loading_late_policies_c415f676: "Une erreur s'est produite lors du chargement des dernières politiques"
   an_error_occurred_while_loading_outcome_alignments_5442d2d7: "Une erreur s’est produite lors du chargement des alignements des acquis."
   an_error_occurred_while_loading_selected_group_8b80d3d5: "Une erreur s’est produite lors du chargement du groupe sélectionné."
@@ -4320,7 +4328,7 @@ fr-CA:
     select_external_tool_dialog_title: "Configurer un outil externe"
     vericite_submission_types_validation: "VeriCite prends uniquement en charge les envois de fichier et la saisie de texte"
   assignment_enhancements_student_557372ab: "Améliorations des tâches — Étudiant"
-  assignment_enhancements_student_must_first_be_enab_57edfe7: "'L’option « Améliorations de tâche — Étudiant » doit d’abord être activée pour permettre l’activation des autocollants des envois.'"
+  assignment_enhancements_student_must_first_be_enab_57edfe7: "'L’option « Améliorations de tâche — Étudiant » doit d’abord être activée pour permettre l’activation des autocollants des envois.'"
   assignment_enhancements_teacher_view_b10534ca: "Améliorations de la tâche « Vue de l’enseignant »"
   assignment_enhancements_teacher_view_create_edit_a6fb5f3b: "Améliorations de la tâche — Vue de l’enseignant (Créer/Modifier)"
   assignment_enhancements_teacher_view_saved_fd8845d1: "Améliorations de la tâche — Vue de l’enseignant (Enregistré)"
@@ -5379,6 +5387,7 @@ fr-CA:
   back_to_subject_80a1eb: "Retour au sujet"
   back_to_table_of_contents_d878b315: "Retour à la table des matières"
   back_to_title_39e7a8f4: "Retour à %{title}"
+  background_1bc88842: Fond
   background_color_b92b52ac: "Couleur de fond"
   background_image_1a401e1a: "Image de fond"
   badges_e40b8880: Badges
@@ -5568,6 +5577,7 @@ fr-CA:
   bookmarking_for_enrollments_index_api_840be156: "Signets pour l’API d’index des inscriptions"
   bookmarks_5b5b81c9: Signets
   boone_assignment_submission_87d53fc0: "Envoi de tâches de Boones"
+  border_5b08b06d: Frontière
   boston_students_access_report_bd285b2e: "Rapport d'accès des étudiants de Boston"
   both_discussions_create_and_discussions_moderate_a_1c00baf0: "« Discussions — créer » et « Discussions — modérer » permettent à un utilisateur de créer une discussion dans la page de Discussions. Si cette autorisation est activée, « Discussions - Créer » n’est pas requis. Pour voir les discussions dans un cours, « Discussions — voir » doit être activé. Pour répondre à une discussion, « Discussions — publier » doit également être activé. Pour modifier les détails de la tâche sur une discussion, « Tâches et questionnaires — ajouter/modifier/supprimer » doit également être activé."
   both_discussions_create_and_discussions_moderate_a_41c29c37: "Ces deux discussions — créer et discussions — modérées permettent à un utilisateur de créer une discussion dans la page de Discussions. Si cette autorisation est activée, « Discussions - Créer » n’est pas requis. Pour voir les discussions dans un cours, « Discussions — voir » doit être activé. Pour répondre à une discussion, « Discussions — publier » doit également être activé. Pour modifier les détails de la tâche sur une discussion, « Tâches et questionnaires — ajouter/modifier/supprimer » doit également être activé."
@@ -5602,6 +5612,7 @@ fr-CA:
   bring_your_content_into_your_course_c0f3df7e: "Apportez votre contenu dans votre cours"
   broken_file_link_found_in_your_course_7cc24395: "Un lien inopérant a été détecté dans votre cours."
   brown_a82c3d0d: Brun
+  browse_courses_c8af1754: "Parcourir les cours"
   browse_e78c4413: parcourir
   browse_your_computer_9a735a4: "explorer votre ordinateur"
   browse_your_computer_for_a_course_image_d7db2376: "Explorer votre ordinateur pour une image de cours"
@@ -5676,6 +5687,7 @@ fr-CA:
       user_name: "Nom d’utilisateur"
       user_name_description: "Le nom d'utilisateur de l'utilisateur qui a un accès enseignant/concepteur au cours pour la ligne. Ce nom doit correspondre à l'un des noms d'utilisateur figurant dans les informations de connexion à Blackboard ci-dessus."
     only_one_bulk_migration: "Vous ne pouvez effectuer qu’une seule migration de cours en bloc à la fois."
+  bulk_download_rubrics_2c12b96a: "Téléchargement en masse des rubriques"
   bulk_edit_bc023ac5: "Modification en bloc"
   bulk_migration: 
     buttons: 
@@ -5752,6 +5764,7 @@ fr-CA:
   by_name_54daec42: "par %{name}"
   by_selecting_make_all_discussions_threaded_you_wil_cf286418: "En sélectionnant « Rendre toutes les discussions filiformes », vous mettrez à jour toutes les discussions non filiformes du cours pour les rendre filiformes. Cette action permet de décocher l’option « Ne pas autoriser les réponses groupées » et d’activer les réponses groupées pour toutes les discussions."
   by_url_a163275e: "Par URL"
+  bzzzzt_try_again_1eee9e8: "Bzzzzt, réessayez."
   c4e_analytics_66e0fc46: "Analyses C4E"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   cache_cleared_successfully_9ab84d5a: "Cache effacé avec succès"
@@ -6143,6 +6156,7 @@ fr-CA:
     ics_description_user: "Événements de calendrier pour l’utilisateur %{user_name}"
     ics_title: "Calendrier de %{course_or_group_name} (Canvas)"
     invalid_date_or_time: "Date ou date/heure non valide pour %{attr}"
+  calendar_events_api_pagination_enhancements_9107cb6b: "Amélioration de la pagination de l’API des événements du calendrier"
   calendar_feed_url_b7b91e7b: "URL du flux du calendrier"
   calendar_frequency_picker: 
     annually: "Annuellement le %{month} %{date}"
@@ -6449,6 +6463,7 @@ fr-CA:
   canvas_is_attempting_to_retreive_the_submissions_p_4d47973d: "Canvas tente de récupérer les soumissions. Veuillez revenir plus tard."
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas n'est pas configuré pour recevoir des connexions à partir de %{issuer}."
   canvas_lms_6ce68514: "Système de gestion d’apprentissage Canvas"
+  canvas_lms_logo_bd752156: "Logo LMS de Canvas"
   canvas_login_failure_message_4c922f2f: "Message d’échec de connexion Canvas"
   canvas_login_instructure_271b8d00: "Connexion à Canvas | Instructure"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "Codes de sauvegarde de l'authentification multifacteur de Canvas"
@@ -6602,6 +6617,7 @@ fr-CA:
   check_back_in_a_little_while_17756399: "Revenez un peu plus tard."
   check_back_later_c4234dbc: "Réessayer plus tard"
   check_back_later_to_view_feedback_b937200a: "Revenez plus tard pour voir les rétroactions."
+  check_f9bb054a: Vérifier
   check_permissions_when_masquerading_as_course_admi_ded7106c: "Vérifiez les autorisations lorsque vous personnifiez un administrateur de cours"
   check_services_to_enable_8877c451: "Vérifier les services à activer"
   check_submission_file_type_b3dbf3fd: "Vérifier le type de fichier d'envoi"
@@ -6609,6 +6625,7 @@ fr-CA:
   check_to_add_a_user_for_loginid_6cd25597: "Cocher cette case pour ajouter un utilisateur pour %{loginid}"
   check_to_select_all_98e484f1: "Cochez la case pour tout sélectionner"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Cocher cette case pour sauter l’action d’ajouter un utilisateur pour %{loginid}"
+  check_your_knowledge_9f655098: "Vérifiez vos connaissances"
   check_your_spelling_or_try_fewer_letters_70769a90: "Vérifiez votre orthographe ou essayez de réduire le nombre de lettres."
   checkbox_examples_dc790142: "Exemples de cases à cocher"
   checked_883b93fd: coché
@@ -6667,6 +6684,7 @@ fr-CA:
   choose_home_page_80cef4ee: "Choisir la page d’accueil"
   choose_image_242f727e: "Sélectionner une image"
   choose_image_e5ee5d7a: "Choisir une image"
+  choose_one_140f313f: "En choisir un"
   choose_one_2c4277df: "En choisir un"
   choose_one_submission_type_cf4eda5b: "Choisir un type d’envoi : "
   choose_student_1513fcd1: "-- Choisir un étudiant --"
@@ -7001,8 +7019,10 @@ fr-CA:
   color_a363e1b0: Couleur
   color_color_for_mastery_level_position_35079de: "Couleur %{color} pour le niveau de maîtrise %{position}"
   color_color_for_proficiency_rating_position_273414eb: "Couleur %{color} pour la notation de compétence %{position}"
+  color_contrast_ratio_687782f0: "Rapport de contraste des couleurs"
   color_option_colorlabel_hex_code_hexcode_ba314ad3: "Option de couleur %{colorLabel}, code hexagonal : %{hexcode}"
   color_overlay_fb5ecce7: "Superposition de couleurs"
+  color_popup_af39810f: "Fenêtre contextuelle de couleur"
   columbia_college_chicago_custom_canvas_usage_repor_b6e2ee88: "Columbia College - Rapport personnalisé d’utilisation de Canvas pour Chicago"
   column_e1ae5c64: Colonne
   column_style_427bdfc7: "Style de colonne"
@@ -7644,7 +7664,10 @@ fr-CA:
       import_blueprint_settings: 
         checkbox_label: "Importer les paramètres du cours modèle"
       import_quizzes_next_view: 
+        convert_to_nq_help_text: "Les banques de questions existantes et les questionnaires classiques seront importés en tant que banques de questions et nouveaux questionnaires.%{p_p}Pour en apprendre plus, veuillez contacter votre administrateur système ou visitez"
+        convert_to_nq_help_title: "Convertir les questionnaires"
         import_new_quizzes: "Importation des questionnaires existants comme *Nouveaux questionnaires*"
+        import_new_quizzes_all: "Convertir le contenu en *Nouveaux questionnaires*"
         import_new_quizzes_help_text: "Nouveaux questionnaires est le nouveau moteur d’évaluation pour Canvas.%{p_p}Pour en apprendre plus, veuillez communiquer avec votre administrateur de système"
         import_quizzesNext_help_label: "Importation d’évaluation comme icône d’aide de nouveaux questionnaires"
         import_quizzesNext_help_text: "Quizzes.Next est le nouveau moteur d’évaluation pour Canvas.%{p_p}Pour en apprendre plus, veuillez communiquer avec votre administrateur de système ou visitez"
@@ -8279,6 +8302,7 @@ fr-CA:
   copyright_and_license_information_must_be_provided_5feffaf: "Les informations sur le droit d'auteur et la licence doivent être fournies avant de publier des fichiers."
   copyright_holder_386cc8b8: "Titulaire du droit d’auteur"
   copyright_holder_66ee111: "Détenteur des droits d’auteur :"
+  correct_7df6d875: Correct!
   correct_answer: "Réponse correcte."
   correct_answer_5a6a57d1: "Réponse correcte"
   correct_answer_comments_34ca671f: "Commentaires pour une réponse correcte"
@@ -8312,6 +8336,7 @@ fr-CA:
   couldn_t_load_folder_options_cdf418f3: "Impossible de charger les options du dossier"
   couldn_t_load_migrators_a399c113: "Impossible de charger les migrateurs"
   couldn_t_load_previous_content_migrations_a0ef5d7a: "Impossible de charger les migrations de contenu précédentes"
+  couldn_t_load_quiz_items_97302a: "Impossible de charger les éléments du questionnaire"
   couldn_t_save_account_calendar_visibilities_343459d1: "Impossible d’enregistrer les visibilités du calendrier de compte"
   couldn_t_track_assigning_students_to_groups_but_it_b6510770: "Impossible de suivre l’affectation des étudiants aux groupes, mais c’est toujours en cours! Vérifiez le résultat manuellement plus tard. (%{errorMessage})"
   couldn_t_update_content_migrations_68777765: "Impossible de mettre à jour les migrations de contenu"
@@ -11093,6 +11118,8 @@ fr-CA:
   display_name_6c2cfc58: "Nom d’affichage :"
   display_name_b80c243e: "Nom d’affichage"
   display_student_filter_options_ab034cfa: "Afficher les options de filtre des étudiants"
+  display_templates_as_grid_931314b9: "Afficher les modèles sous forme de grille"
+  display_templates_as_rows_b7b8392f: "Afficher les modèles sous forme de lignes"
   display_to_students_e1301f99: "Afficher aux étudiants"
   display_total_grades_when_the_all_grading_periods__1d2b5cf: "Afficher les totaux des notes lorsque l'option 'toutes les périodes de notation' du menu déroulant est choisie (l'option « périodes de notations multiples » doit être activée)"
   display_total_grades_when_the_all_grading_periods__4e6add83: "Affichez toutes les notes lorsque l'option du menu déroulant « Toutes les périodes de notation » est sélectionnée (périodes de notation doivent exister)."
@@ -11113,11 +11140,13 @@ fr-CA:
       Affiche des confettis pour les utilisateurs qui retournent une tâche avant
       la date d’échéance définie.
   distance_a377c748: Distance
+  distribute_3148a03a: Distribuer
   district_id_6f408184: "ID du district"
   divide_into_equal_slots_of_input_value_minutes_fca83452: "Diviser en créneaux égaux de %{input_value} minutes. "
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "Diviser en créneaux horaires égaux de %{num_minutes} minutes. *Go*"
   divide_into_equal_slots_value_is_in_minutes_13fe14d2: "Diviser en créneaux égaux (valeur en minutes)"
   divide_into_equal_time_slots_in_minutes_234312fa: "Diviser en créneaux égaux (en minutes)"
+  divider_fe08b810: Séparateur
   division_cutoff_cutoff_value_e938bc9d: "Seuil de division %{cutoff_value}"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Ne pas compter cette tâche dans le calcul de la note finale"
   do_not_display_in_gradebook_or_the_student_s_grade_3de05e1c: "Ne pas afficher dans le carnet de notes ou la page de notes de l’étudiant"
@@ -11630,7 +11659,9 @@ fr-CA:
   enable_individual_learning_paths_for_students_base_5236d3bb: "Activer des parcours d’apprentissage individuels pour les étudiants en fonction de l’évaluation"
   enable_irish_language_support_in_canvas_fe7abaf8: "Activer la prise en charge de la langue irlandaise dans Canvas"
   enable_labels_on_the_new_inbox_page_485ce65a: "Activer les étiquettes sur la nouvelle page de la boîte de réception"
+  enable_migrating_all_question_banks_to_new_quizzes_63d26a55: "Permettre la migration de toutes les banques de questions vers les nouveaux questionnaires lors de l’importation/copie d’un cours"
   enable_migrating_item_banks_to_new_quizzes_during__af6ca020: "Activer la migration des banques d’éléments vers les nouveaux questionnaires lors de l’importation/copie du cours"
+  enable_migrating_question_banks_to_new_quizzes_dur_5bdd629e: "Permettre la migration des banques de questions vers les nouveaux questionnaires lors de l’importation/copie d’un cours"
   enable_moderated_grading_bacd20d8: "Activer la notation modérée."
   enable_moderated_grading_only_relevant_if_the_anon_1dcdc47b: "Activer la notation modérée. Seulement pertinent si le fanion de la notation modérée anonyme est activé."
   enable_multiple_grading_periods: |-
@@ -11704,7 +11735,7 @@ fr-CA:
   enables_support_for_observers_within_canvas_for_el_c5e31b5b: "Permet de prendre en charge les observateurs dans Canvas for Elementary."
   enables_the_course_templates_feature_globally_79d5302f: "Active la fonction de modèle de formation à l’échelle mondiale"
   enables_the_microsoft_immersive_reader_button_in_s_ab4af0cd: "Active le bouton Lecteur immersif Microsoft dans les zones prises en charge de Canvas. Le bouton peut toujours être activé dans un cours indépendamment de ce paramètre si l’administrateur du compte l’a activé pour tous les utilisateurs."
-  enables_the_new_files_a11y_rewrite_page_75d23b14: "Active la nouvelle page de réécriture des fichiers a11y."
+  enables_the_new_files_a11y_rewrite_page_75d23b14: "Active la nouvelle page de réécriture des fichiers a11y."
   enables_top_navigation_lti_placement_lti_1_3_only_f46e894: "Active le placement LTI top_navigation. (LTI 1.3 uniquement)"
   enables_ui_features_for_managing_extended_submissi_841f45bc: "Active les fonctionnalités de l’interface utilisateur pour la gestion des envois « étendus »."
   enabling_app_1d15f0ca: "Activation de l’application"
@@ -12670,6 +12701,7 @@ fr-CA:
   faculty_journal_has_been_deprecated_70c65772: "Le Journal des enseignants est obsolète!"
   faculty_journal_manage_entries_efc09599: "Journal des enseignants - gérer les entrées"
   faculty_journal_will_be_discontinued_on_deprecatio_d5d1e8b3: "Le Journal des enseignants sera supprimé le %{deprecationDate}."
+  fail_544e5dde: ÉCHEC
   fail_62dbb06a: échec
   failed_276786d: Échec
   failed_307449e1: "Échec :"
@@ -12742,6 +12774,7 @@ fr-CA:
   failed_to_fetch_content_for_import_a042cc27: "Échec de la récupération du contenu à importer."
   failed_to_fetch_latest_forbidden_words_4d2a7dd6: "Échec de la recherche des derniers mots interdits."
   failed_to_fetch_migration_issues_data_a896da98: "Échec de l’extraction des données relatives aux problèmes de migration."
+  failed_to_fetch_quizzes_6a469b90: "Échec de la récupération des questionnaires"
   failed_to_fetch_temporary_enrollment_data_9422003: "Échec de la récupération des données d’inscription temporaire"
   failed_to_gather_and_compress_files_7fab00aa: "Échec de la collecte et de la compression des fichiers."
   failed_to_get_new_activity_17e7ec7c: "Échec lors de l’obtention de la nouvelle activité"
@@ -12997,6 +13030,7 @@ fr-CA:
   files_2c1c604: fichiers
   files_a11y_rewrite_6ea6ccfd: "Fichiers a11y Rewrite"
   files_and_folder_contents_only_available_to_studen_944f9166: "Fichiers et contenu des dossiers disponibles uniquement via un lien pour les étudiants. Pas visibles dans les fichiers des étudiants."
+  files_and_folders_8a89d16b: "Fichiers et dossiers"
   files_c300e900: Fichiers
   files_drag_and_drop_enhancements_da55de57: "Améliorations du glisser-déplacer des fichiers"
   files_index_menu_c6961f14: "Menu Index des fichiers"
@@ -13197,6 +13231,7 @@ fr-CA:
               , c’est le meilleur choix.
   for_title_69d92b3a: "pour %{title}"
   forbidden_words_list_deleted_successfully_b9a0c5a4: "La liste des mots interdits a été supprimée avec succès."
+  foreground_3acfb942: "Premier plan"
   forgot_password_7232790f: "Vous avez oublié votre mot de passe?"
   forgot_password_9098c30d: "Mot de passe oublié"
   forgot_password_f0c3fbac: "Mot de passe oublié?"
@@ -13277,6 +13312,7 @@ fr-CA:
   generate_summary_6d3d3b14: "Générer un résumé"
   generated_f26ee56b: "Généré :"
   generated_icon_d004f211: "Icône générée"
+  generated_summary_63857c79: "Résumé généré"
   generating_5b5e20f8: "Génération de :"
   generating_c2aabc02: "Génération en cours..."
   generating_pairing_code_251b7fc8: "Génération de code de jumelage..."
@@ -14251,6 +14287,7 @@ fr-CA:
   graph_of_student_page_views_by_category_7cb49887: "Graphique des pages visitées par l'étudiant organisées par catégorie"
   graph_of_the_distribution_of_grades_in_the_departm_30445777: "Graphique de la distribution des notes dans le département"
   graph_showing_the_fraction_of_on_time_submissions__735e47db: "Graphique démontrant la fraction de soumissions effectuées dans le temps imparti pour chaque tâche"
+  graphics_text_bc9568bc: "Texte des graphiques"
   graphql_api_af4deb45: "GraphQL API"
   graphql_mutation_activity_5a47678b: "Activité de mutation GraphQL"
   graphql_mutation_log_25acc923: "Journal de mutation GraphQL"
@@ -14334,6 +14371,7 @@ fr-CA:
   group_is_not_available_at_this_time_d99f0eab: "Le groupe n'est pas disponible en ce moment"
   group_leader_selection_method_438f933a: "Méthode de sélection du chef de groupe"
   group_leader_user_name_6f24bebb: "responsable du groupe %{user_name}"
+  group_leaders_can_manage_members_and_edit_the_grou_ea94c329: "Les chefs de groupe peuvent gérer les membres et modifier le nom du groupe, mais pas sa taille."
   group_limit_87ae4421: group_limit
   group_limit_size_is_invalid_fc673cd2: "La taille limite du groupe n’est pas valide"
   group_members_ae5489ed: "membres du groupe"
@@ -14912,6 +14950,7 @@ fr-CA:
   hidden_available_with_a_link_click_to_modify_184990e7: "Masqué. Disponible avec un lien - Cliquez pour modifier"
   hidden_b1a6a352: (masqué)
   hidden_files_inside_will_be_available_with_links_9bdf702b: "Masqués. Les fichiers à l’intérieur sont disponibles via un lien."
+  hiddenchildrencount_more_726a470: "%{hiddenChildrenCount} de plus"
   hiddenchildrencount_more_actions_3739c11d: "%{hiddenChildrenCount} plus d’actions"
   hide_account_navigation_menu_ccdf9480: "Masquer le menu de navigation du compte"
   hide_admin_navigation_menu_5cab9c9e: "Masquer le menu de navigation de l’administrateur"
@@ -15321,6 +15360,7 @@ fr-CA:
       au lieu de les rediriger vers lui-même
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "Si activée, l'option sera présentée pour avoir des rubriques sans notation."
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: "Si cette option est activée, le formulaire d'inscription des parents exigera un code de jumelage des élèves au lieu du nom d'utilisateur et du mot de passe de l'enfant."
+  if_enabled_the_selective_release_feature_will_use__33b4f6ec: "Si cette option est activée, la fonction de libération sélective utilisera le cache des résultats des requêtes lourdes pour améliorer les performances."
   if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       Si cette option est activée, l’interface utilisateur de la clé de développement de l’administrateur du site n’affichera que
       les clés de développement de l’administrateur du site. Notez que cela n’affecte que
@@ -15600,6 +15640,7 @@ fr-CA:
   import_override_scores_in_gradebook_80d51a72: "Importer les notes de surclassement dans le Carnet de notes"
   import_queue_1fe82fe4: "Importation de la file d’attente"
   import_rubric_aa83d957: "Importer une rubrique"
+  import_rubric_assessments_to_cf75d794: "Importer les évaluations de rubriques vers "
   import_rubrics_135270f0: "Importer des rubriques"
   import_rubrics_tray_c4cbaa72: "Plateau d’importation des rubriques"
   import_sis_data_428cc803: "Importer des données SIS"
@@ -15658,6 +15699,7 @@ fr-CA:
   improved_support_for_taking_new_quizzes_from_withi_4dbc794e: "Prise en charge améliorée de la prise en charge des nouveaux questionnaires à partir des modules"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Amélioration des rappels visuels pour encourager les instructeurs à publier des cours"
   improvements_made_to_enhance_the_user_experience_w_5d07cd73: "Améliorations apportées pour améliorer l’expérience de l’utilisateur dans le Carnet de notes de la maîtrise de l’apprentissage."
+  improves_api_pagination_handling_for_assignment_ev_45e4b2dc: "Amélioration de la gestion de la pagination de l’API pour les événements de tâches dans le calendrier de l’utilisateur."
   in_a_few_seconds_538ddff3: "dans quelques secondes"
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "Dans %{asset_link}, les étudiants cliquent sur %{bad_link} vers une page inexistante dans votre cours."
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "Dans %{asset_link}, les étudiants cliquent sur %{bad_link} vers du contenu d'un cours différent."
@@ -15673,6 +15715,7 @@ fr-CA:
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Parcours de formation et visites guidées pour les enseignants"
   in_product_training_walkthrough_and_tourpoints_for_35aebb17: "Parcours de formation et visites guidées pour les administrateurs, les enseignants et les étudiants"
   in_progress_13b9e26f: "en cours"
+  in_progress_646a8aef: "En cours"
   in_progress_9d1ce8b9: "En cours"
   in_progress_c095d059: "En cours."
   in_some_accounts_with_a_large_number_of_content_mi_917a205b: |-
@@ -15814,7 +15857,12 @@ fr-CA:
   input_event_location_39b0fbf3: "Saisir le lieu de l’événement…"
   input_event_title_1d4c8b10: "Saisir le titre de l’événement"
   input_event_title_b2445e30: "Saisir le titre de l’événement…"
+  input_field_for_alpha_678265fd: "Champ de saisie pour alpha"
+  input_field_for_blue_561e020a: "Champ de saisie pour le bleu"
+  input_field_for_green_67f8b2b6: "Champ de saisie pour le vert"
+  input_field_for_red_86a84615: "Champ de saisie pour le rouge"
   input_is_not_a_valid_number_5c1b572e: "%{INPUT} n’est pas un chiffre valide."
+  insert_593145ef: Insérer
   insert_a_grade_change_record_when_the_periodic_mis_424139e5: "Insérez un enregistrement de changement de note lorsque le travail périodique MissingPolicyApplicator s’exécute sur un envoi."
   insert_above_row_de82d138: "insérer au-dessus de %{row}"
   insert_below_row_55ed6f34: "insérez sous %{row}"
@@ -16038,7 +16086,7 @@ fr-CA:
   invalid_date_or_datetime_for_field_b38fe386: "Date non valide ou horodatage non valide pour %{field}"
   invalid_date_or_invalid_datetime_for_attr_6661103f: "Date non valide ou horodatage non valide pour %{attr}"
   invalid_date_or_time_333acd43: "Format de date/heure non valide"
-  invalid_date_rawdatevalue_74006549: "Date non valide : %{rawDateValue}"
+  invalid_date_rawdatevalue_74006549: "Date non valide : %{rawDateValue}"
   invalid_date_time_3ae423f5: "Format de date/heure non valide"
   invalid_dates_were_found_please_correct_them_and_t_4140b318: "Dates non valides détectées. Veuillez les corriger et réessayer."
   invalid_datetime_for_graded_since_884cce5: "Horodatage non valide pour graded_since"
@@ -16063,6 +16111,7 @@ fr-CA:
   invalid_hexcode_9124519f: "Code hexadécimal non valide"
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "Code hexadécimal non valide. Saisir un code hexadécimal valide ici pour utiliser une couleur personnalisée."
   invalid_hexcode_provided_522ba223: "Code hexadécimal non valide"
+  invalid_json_7d2eebce: "JSON non valide"
   invalid_jwk_f8d46234: "JWK non valide"
   invalid_jwt_audience_audience_961899c6: "Audience JWT non valide : %{audience}"
   invalid_label_name_it_already_exists_e9a4712: "Nom de l’étiquette non valide. Cela existe déjà."
@@ -16366,6 +16415,7 @@ fr-CA:
   keyboard_shortcuts_ed1844bd: "Raccourcis clavier"
   kind_7f0a88c4: Type
   know_your_users_5c1323be: "Connaissez vos utilisateurs"
+  knowledge_check_4aade5c5: "Vérification des connaissances"
   korean_da812d9: Coréen
   label_3c9a991: "%{label} :"
   label_9fe386a0: "%{label}"
@@ -16389,6 +16439,7 @@ fr-CA:
   large_9c5e80e7: Large
   large_balsamiq_font_5fe45fae: "Grande police Balsamiq"
   large_course_db3d58b: "Grand cours:"
+  large_text_e7ba08cd: "Grand texte"
   last_7_days_bd411f1f: "Les 7 derniers jours"
   last_activity_a983e541: "Dernière activité"
   last_ae273283: dernier
@@ -16465,6 +16516,7 @@ fr-CA:
   late_submission_deduction_percent_52516a62: "Pourcentage de déduction d’envoi en retard"
   late_submittedat_2a07ea28: "En retard %{submittedAt}"
   latest_assessment_a85280ef: "Dernière évaluation"
+  latest_dsr_a0141d99: "Dernier DSR : "
   latest_f604a75: "La dernière"
   latest_outcome_import_context_is_not_self_300d5795: "latest_outcome_import le contexte n'est pas le même"
   latest_score_905aa87b: "Dernière note"
@@ -17066,6 +17118,7 @@ fr-CA:
   login_label_1dea0f9d: "Libellé de connexion"
   login_link_color_a887a109: "Couleur du lien de connexion"
   login_logo_5eecf564: "Logo de connexion"
+  login_page_navigation_a6fe5436: "Navigation de la page de connexion"
   login_screen_83518c07: "Écran de connexion"
   login_with_auth_type_a0aaa52a: "Se connecter avec *%{auth_type}*"
   login_with_provider_3fd3998e: "Se connecter avec %{provider}"
@@ -17352,6 +17405,7 @@ fr-CA:
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Le niveau de maîtrise reflète le dernier tâche ou questionnaire noté."
   match_aspect_ratio_529c9bd1: "Correspondance du rapport d’aspect"
   matched_jobs_jobs_with_tags_tags_1d1fddb6: "%{jobs} travaux correspondants avec %{tags} balises"
+  matching_63f5af40: Correspondance
   matching_left_side_900f860b: "Correspond au côté gauche"
   matching_right_side_920e71b2: "Correspond au côté droit"
   math_ede93050: Mathématiques
@@ -19429,6 +19483,7 @@ fr-CA:
   moderator_49b9f2e1: Modérateur
   moderator_sortorder_18063692: "Modérateur %{sortOrder}"
   modern_cf6cb815: Moderne
+  modernized_speedgrader_platform_11a5acae: "Plateforme SpeedGrader modernisée"
   modified_by_52d699e9: ", modifié par : "
   modified_by_c1584b3c: "Modifié par"
   modified_by_user_e6c8ade3: "modifié par : %{user}"
@@ -19642,6 +19697,7 @@ fr-CA:
   multiple_are_marked_current_theme_because_the_same_3bdebbe1: "Plusieurs sont marqués « thème actuel », car les mêmes valeurs ont été enregistrées sous plusieurs noms, c'est-à-dire, qu'ils sont chacun les mêmes que ce qui est actuellement appliqué"
   multiple_ba5220cd: Multiple
   multiple_canvas_accounts_are_associated_with_cleve_c1739660: "Plusieurs comptes Canvas sont associés avec Clever District %{district_id}"
+  multiple_choice_9f931ee6: "Choix multiples"
   multiple_dates_e3a122f7: "Dates multiples"
   multiple_dropdowns_read_surrounding_text_f61274b3: "Plusieurs listes déroulantes, lire le texte environnant"
   multiple_due_dates_283dd861: "Dates limites multiples"
@@ -19959,6 +20015,7 @@ fr-CA:
   new_quizzes_submission_history_d81b477b: "Historique d’envoi des  nouveaux questionnaires"
   new_quizzes_support_for_modules_7b81eee9: "Prise en charge des nouveaux questionnaires pour les modules"
   new_quizzes_third_party_importing_1e1b696d: "Importation de nouveaux questionnaires par un tiers"
+  new_quizzes_unattached_bank_migrations_17d731d1: "Migrations de banques non rattachées aux nouveaux questionnaires"
   new_rating_canceled_eed3c4ff: "Nouveau classement annulé"
   new_rating_created_54125331: "Nouvelle notation créée"
   new_release_note_37ec0ea7: "Nouvelles notes de version"
@@ -19982,6 +20039,7 @@ fr-CA:
   new_user_s_name_909b6267: "Nouveau nom de l'utilisateur"
   new_user_tutorial_cdd3a446: "Nouveau tutoriel d’utilisateur"
   new_video_conference_17817456: "Nouvelle conférence vidéo"
+  new_way_to_create_deeeff5e: "Une nouvelle façon de créer"
   new_zealand_64_f126cf2e: "Nouvelle Zélande (+64)"
   newest_first_87672763: "Les plus récents en premier"
   newest_oldest_d768cf1a: "Plus récent - plus ancien"
@@ -20131,6 +20189,9 @@ fr-CA:
   no_placements_enabled_f705f28: "Aucun placement n'est activé"
   no_points_possible_368669d: "Pas de point possible"
   no_points_possible_72db3a55: "Aucun point possible"
+  no_question_has_been_selected_a347f75d: "Aucune question n’a été sélectionnée"
+  no_questions_found_ab6f5992: "Aucune question n’a été trouvée."
+  no_quizzes_found_c80c537a: "Aucun questionnaire n’a été trouvé."
   no_recent_announcements_abf950d5: "Aucune annonce récente"
   no_redirect_uris_specified_7b47f4a4: "Aucun URI de redirection n’est spécifié"
   no_restrictions_79a892d2: "Aucune restriction"
@@ -20193,6 +20254,7 @@ fr-CA:
   none_3b5e34d2: Aucun
   none_9b6c9bec: aucun
   none_anonymized_e1ff7c45: "Aucun (anonymisé)"
+  normal_text_7b03da48: "Texte normal"
   northeast_community_college_course_syllabus_report_8124f969: "Rapport sur les syllabus de cours du Northeast Community College"
   norway_47_bc598662: "Norvège (+47)"
   norwegian_53f391ec: Norvégien
@@ -20955,6 +21017,7 @@ fr-CA:
   organize_course_content_11de8958: "Organisez le contenu du cours"
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "Organiser les fichiers epub par type de contenu (par défaut, ils sont organisés par module)"
   organize_your_course_content_c3c7ed03: "Organisez le contenu de votre cours"
+  orientation_1808cda7: Orientation
   original_job_id_d81afbb3: "ID de la tâche initial"
   originality_report_5d461681: "Rapport d’originalité"
   originality_reports_1e36b935: "Rapports de l’originalité"
@@ -21254,6 +21317,7 @@ fr-CA:
   page_menu_2f8bee0: "Menu de page"
   page_name_21defa75: "Nom de la page"
   page_name_is_required_d8c2736e: "Un nom de page est requis"
+  page_navigation_434d4aad: "Navigation dans les pages"
   page_not_found_2b0d05f5: "Page introuvable"
   page_page_59070cd8: "Page %{page}"
   page_pagenum_20dbfeb8: "Page %{pageNum}"
@@ -21364,6 +21428,7 @@ fr-CA:
   participants_must_respond_to_the_topic_before_view_27a0395a: "Les participants doivent répondre au sujet avant de consulter les autres réponses"
   participation_af2598: Participation
   participations_1823832d: Participations
+  pass_1c19a2b3: RÉUSSI
   pass_2a8c4f07: réussi
   pass_fail_3d9461b0: Reçu/Échec
   pass_fail_grade_options_f9b06a58: "Options de réussite ou d’échec"
@@ -21456,6 +21521,7 @@ fr-CA:
   percentdone_percent_edd66f1b: "%{percentDone} pour cent"
   percentused_of_bytesavailable_used_894e2327: "%{percentUsed} % sur %{bytesAvailable} utilisés"
   percentused_of_bytesavailable_used_a859a40d: "%{percentUsed} de %{bytesAvailable} utilisé"
+  percentused_of_quota_used_c68c828e: "%{percentUsed} de %{quota} utilisé"
   perform_dsr_exports_for_users_2fca6bf7: "Effectuer des exportations de DSR pour les utilisateurs"
   perform_full_validation_of_openid_connect_id_token_2105eec7: "Effectuer la validation complète des jetons d’identification OpenID Connect"
   performance_ac5f9e70: Rendement
@@ -21552,7 +21618,9 @@ fr-CA:
   personal_pronouns_7d271f52: "Pronoms personnels"
   peru_51_d3d38d1f: "Pérou (+51)"
   philippines_63_a4f62138: "Philippines (+63)"
+  pick_a_color_557abfb0: "Choisissez une couleur"
   pick_a_destination_we_ll_send_you_errors_fa0cb0e0: "choisissez une destination, nous vous y enverrons les erreurs"
+  pick_a_matching_answer_c551f6a0: "Choisissez une réponse correspondante"
   pick_a_name_to_save_this_theme_as_9773cb1a: "Choisir un nom sous lequel sauvegarder ce thème"
   pick_an_emoji_942adfc4: "Choisir un émoji..."
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "choisissez un point de terminaison, nous y afficherons vos erreurs"
@@ -21571,6 +21639,7 @@ fr-CA:
   place_section_before_5b45714e: "Placer  \"%{section}\" avant :"
   place_title_2c183274: "Placer « %{title} »\""
   placeholder_for_webhooks_access_in_canvas_catalog_b8c9d864: "Espace réservé pour l’accès des webhooks dans le catalogue Canvas."
+  placement_6b523587: Placement
   placement_active_click_to_deactivate_47f8cf45: "Placement actif; cliquez pour désactiver"
   placement_icon_1f87372: "%{placement} icône"
   placement_inactive_click_to_activate_f7fe8c30: "Placement inactif; cliquez pour activer"
@@ -21613,6 +21682,7 @@ fr-CA:
   please_allow_canvas_to_access_your_webcam_f66bacb1: "Veuillez autoriser Canvas à accéder à votre webcam."
   please_check_back_soon_37d45200: "Veuillez revenir plus tard."
   please_check_your_email_if_your_sms_code_does_not__732060c1: "Veuillez vérifier votre courrier électronique si votre code SMS ne vous parvient pas rapidement."
+  please_choose_an_editor_569f139e: "Veuillez choisir un éditeur"
   please_click_below_to_launch_the_tool_and_select_a_f66e14d: "Veuillez cliquer ci-dessous pour lancer l’outil et sélectionner une ressource."
   please_confirm_you_want_to_move_forward_with_these_69a3ed38: "Veuillez confirmer que vous souhaitez aller de l’avant avec ces changements."
   please_contact_your_lms_administrator_for_more_det_635afd97: "Veuillez contacter votre administrateur LMS pour plus de détails."
@@ -22374,6 +22444,7 @@ fr-CA:
   previous_student_899a6732: "Étudiant précédent"
   previous_time_cc96b361: "Précédent (%{time})"
   previous_timestamp_19343a58: "Précédent (%{timestamp})"
+  previously_chosen_colors_f1338315: "Couleurs choisies précédemment"
   primary_brand_color_db79b428: "Couleur principale de marquage"
   primary_button_3a98f4bc: "Bouton primaire"
   primary_button_text_1f55d27b: "Texte du bouton primaire"
@@ -23005,6 +23076,7 @@ fr-CA:
   questions_a955145c: Questions
   queued_d0e45c4b: "En file d'attente"
   queued_jobs_9a7a923e: "Travaux en file d’attente"
+  quick_look_9bd1a50d: "Coup d’œil rapide"
   quickly_share_course_content_and_templates_with_te_1cf3dc6f: "Partager rapidement le contenu et les modèles de cours avec les enseignants"
   quickly_share_course_content_and_templates_with_te_c70a5eeb: "Partager rapidement le contenu et les modèles de cours avec les enseignants"
   quiz: 
@@ -24296,6 +24368,7 @@ fr-CA:
   reactivate_user_e058db8b: "Réactiver l'utilisateur"
   reactivation_will_allow_all_logins_for_name_to_log_455df70: "La réactivation permettra à toutes les connexions de %{name} de se connecter à Canvas et de retrouver l'accès aux intégrations API précédemment autorisées."
   read_7cabda44: lu
+  read_about_key_features_and_discover_what_you_can__9a8e4c27: "Lisez les principales caractéristiques et découvrez ce que vous pouvez créer à l’aide de l’éditeur de blocs."
   read_comments_3fcc7590: "Lire les commentaires"
   read_context_membership_8068f3dd: "Lire l’adhésion au contexte"
   read_context_membership_data_cf406033: "Lire les données d’adhésion contextuelles"
@@ -24478,6 +24551,7 @@ fr-CA:
   reload_the_page_or_navigate_to_a_new_page_for_this_e6335972: "Rechargez la page ou accédez à une nouvelle page pour que cette modification prenne effet."
   remediation_feccc1fd: Remédiation
   remember_course_navigation_collapsed_state_60fe6c95: "Se souvenir de l'état réduit de la navigation du cours"
+  remember_my_choice_d74e8f60: "Se souvenir de mon choix"
   remember_my_choice_for_this_course_5a3b7206: "Se souvenir de mon choix pour ce cours"
   remember_whether_module_links_load_in_new_tab_91fccb4f: "Se souvenir si les liens du module se chargent dans le nouvel onglet"
   remember_your_settings_page_tab_a081121d: "Mémoriser l’onglet de votre page de paramètres"
@@ -24771,6 +24845,7 @@ fr-CA:
   reset_available_from_102b946: "Remise à zéro disponible depuis"
   reset_available_until_db5b42d6: "Réinitialisation disponible jusqu’au"
   reset_courses_fe29ddf9: "Réinitialiser les cours"
+  reset_default_alignment_6ce6df18: "Réinitialisation de l’alignement par défaut"
   reset_lti_provision_6d8e287f: "Réinitialiser la disposition LTI"
   reset_multi_factor_authentication_2b63a558: "Réinitialiser l’authentification multifacteur"
   reset_name_6a0aa0f: "Réinitialiser « %{name} »\""
@@ -24881,6 +24956,7 @@ fr-CA:
   rich_text_editor_a0491c6e: "Éditeur de texte enrichi"
   rich_text_f1b4274a: "Texte enrichi"
   right_sidebar_logo_5483dc0a: "Logo de la barre latérale droite"
+  rights_9d9d0a19: Droits
   rocketship_on_launchpad_4011ea8c: "fusée sur la rampe de lancement"
   role: 
     duplicate_role: "Il existe déjà un rôle avec ce nom"
@@ -25058,6 +25134,8 @@ fr-CA:
     filter_multiple_users_found: "%{userCount} utilisateurs trouvés."
     filter_no_users_found: "Aucun utilisateur correspondant n'a été trouvé."
     filter_one_user_found: "1 utilisateur trouvé."
+  rounded_2fc05c1: Arrondi
+  rouned_corners_e6ae98c0: "Coins arrondis"
   row_fc0944a7: Ligne
   row_row_message_e369e49e: "Ligne %{row} : %{message}"
   rsa_sha1_c457d751: RSA-SHA1
@@ -25082,6 +25160,7 @@ fr-CA:
   rubric_assessment_5f0e8a83: "Évaluation de rubrique"
   rubric_assessment_tray_df17d20b: "Plateau d’évaluation de rubrique"
   rubric_assessment_view_mode_1038db: "Mode d’affichage de l’évaluation des rubriques"
+  rubric_assessments_imports_and_exports_e0eaaef: "Importations et exportations des évaluations de rubrique"
   rubric_association: 
     no_details: "Aucune information"
   rubric_button_display_4e4a26fe: "Affichage des boutons de rubrique"
@@ -25491,6 +25570,9 @@ fr-CA:
   search_people_4782671a: "Rechercher des personnes"
   search_people_as_you_type_in_this_field_the_list_o_5755e8ad: "Rechercher des personnes. Lorsque vous écrivez dans ce champ, la liste de personnes est automatiquement filtrée pour n'y inclure que les noms qui correspondent à votre saisie."
   search_permissions_915bbd09: "Rechercher autorisations"
+  search_questions_836a821a: "Rechercher des questions"
+  search_questions_e3356d9f: "Recherche de questions…"
+  search_quizzes_8998b6d6: "Recherche de questionnaires"
   search_results_4d5af4eb: "Résultats de la recherche"
   search_results_for_62243f02: "résultats de recherche pour"
   search_rubrics_422e0f1a: "Recherche de rubriques"
@@ -25672,7 +25754,9 @@ fr-CA:
   select_a_outcome_to_view_additional_information_61a282f: "Sélectionnez un résultat pour obtenir des informations supplémentaires"
   select_a_predefined_color_c77ab2f5: "Choisir une couleur prédéfinie."
   select_a_provisional_grade_7106e3d5: "Sélectionner une note provisoire"
+  select_a_question_a6d8bece: "Sélectionner une question"
   select_a_question_bank_f346e5a0: "Sélectionner une banque de questions"
+  select_a_quiz_db052310: "Sélectionner un questionnaire"
   select_a_role_287e53e8: "Sélectionnez un rôle"
   select_a_section_37ac1694: "Sélectionner une section"
   select_a_student_adfcc348: "Sélectionner un étudiant"
@@ -25697,6 +25781,7 @@ fr-CA:
   select_an_assignment_optional_b58f7819: "Sélectionner une tâche (facultatif)"
   select_an_assignment_to_view_additional_informatio_de1370e1: "Sélectionnez une tâche pour afficher des informations complémentaires ici."
   select_an_edit_operation_ec1467d: "Choisir une opération de modification"
+  select_an_editor_e860f69: "Sélectionner un éditeur"
   select_an_icon_49906766: "Sélectionner une icône"
   select_an_icon_e9a2c858: "Sélectionner une icône"
   select_an_outcome_37fb2096: "Sélectionner un acquis"
@@ -25789,6 +25874,7 @@ fr-CA:
   select_prerequisite_module_57894963: "Sélectionnez un module prérequis"
   select_prerequite_module_e9042bb0: "Sélectionnez un module prérequis"
   select_question_bank_508e5c08: "Sélectionner une banque de questions"
+  select_quiz_f91522af: "Sélectionner un questionnaire"
   select_requirement_count_e0948936: "Sélectionner le nombre d’exigences"
   select_requirement_type_bf9a39d9: "Sélectionner le type d’exigence"
   select_role_aa5cfd69: "Sélectionner un rôle"
@@ -25874,6 +25960,7 @@ fr-CA:
   selective_release_optimized_visibility_services_fi_526eca8b: "Libération sélective — Services de visibilité optimisée — Cinq requêtes"
   selective_release_optimized_visibility_services_on_33c4304b: "Libération sélective — Services de visibilité optimisée — Une seule requête"
   selective_release_optimized_visibility_services_th_9fd12ca0: "Libération sélective — Services de visibilité optimisée — Trois requêtes"
+  selective_release_query_caching_fc32c65e: "Libération sélective - Mise en cache des requêtes"
   selective_release_ui_api_changes_a60b681a: "Publication sélective — Modifications de l’interface utilisateur et de l’API"
   self_enrollments: 
     already_enrolled: 
@@ -26441,7 +26528,7 @@ fr-CA:
       name_pronunciation: "Prononciation du nom"
       name_pronunciation_header: "Prononciation du nom"
       name_pronunciation_header_tip: "Pour confirmer la prononciation correcte de votre nom, saisissez une prononciation phonétique."
-      name_pronunciation_label: "Prononciation du nom :"
+      name_pronunciation_label: "Prononciation du nom :"
       name_pronunciation_label_tip: "Pour confirmer la prononciation correcte de votre nom, saisissez une prononciation phonétique."
       no_links: "Aucun lien n’a été ajouté"
       no_name_pronunciation: "Aucune prononciation du nom n’est fournie"
@@ -27318,6 +27405,7 @@ fr-CA:
   spring_grading_period_current_score_7083cf0d: "Note actuelle de la période de notation du printemps"
   spring_grading_period_final_score_386d92f7: "Note finale de la période de notation du printemps"
   spring_grading_period_id_61aec82c: "ID de la période de notation du printemps"
+  square_511eb3b3: Carré
   sr_gradebook: 
     all_grading_periods: "Toutes les périodes de notation"
     all_sections: "Toutes les sections"
@@ -28049,7 +28137,7 @@ fr-CA:
   supported_file_types_vtt_srt_8cb75c13: "Types de fichier pris en charge : .vtt, .srt"
   supported_format_txt_759fea2a: "Formats pris en charge : TXT"
   surfaces_the_block_editor_templates_edit_permissio_8db1b33: |-
-      ’ffiche l'autorisation « Mod’les de l'éditeur —e blocs - modifier’» dans l'interface utilisateur des autorisations.
+      ’ffiche l'autorisation « Mod’les de l'éditeur —e blocs - modifier’» dans l'interface utilisateur des autorisations.
       Les utilisateurs disposant de cette autorisation peuvent créer et modifier des modèles de blocs.
   suspend_db764978: Suspendre
   suspend_user_e19fa489: "Suspendre l'utilisateur"
@@ -28229,6 +28317,7 @@ fr-CA:
   template_account_is_not_a_template_account_d80200ae: "Le compte modèle n’est pas un compte modèle"
   template_account_not_found_7144542c: "Compte modèle non trouvé"
   template_name_fba74b9c: "Nom du modèle"
+  template_quick_look_734f92bc: "Modèle : Coup d'œil rapide"
   templates_4ca13d07: Modèles
   temporarily_enroll_a_user_into_a_course_this_tempo_990488f8: "Inscrire temporairement un utilisateur à un cours. Cette inscription temporaire est associée à une autre inscription dans le cours."
   temporarily_enroll_name_8acb66ce: "Inscription temporaire %{name}"
@@ -28390,6 +28479,7 @@ fr-CA:
   that_user_account_has_been_deleted_please_contact__350e0e0: "Ce compte utilisateur a été supprimé. Veuillez contacter votre administrateur système pour la réactivation de votre compte."
   the_ability_for_users_to_receive_notifications_fro_bbcf487b: "La possibilité pour les utilisateurs de recevoir des notifications de Slack"
   the_about_section_is_a_great_place_to_introduce_yo_7cccaca0: "La section « À propos » est un endroit idéal pour vous présenter ou présenter votre cours. "
+  the_acceptable_use_policy_is_currently_unavailable_a41c129f: "La politique d’utilisation acceptable est actuellement indisponible. Veuillez revenir plus tard ou contacter le service d’assistance si vous avez besoin d’aide."
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "L'ID de compte du compte auquel l'utilisateur effectuant une observation appartient"
   the_account_uuid_of_the_account_to_which_the_repor_dd3fcd79: "L’uuid de compte du compte auquel appartient l’utilisateur déclarant"
   the_account_wide_sync_settings_were_changed_while__90c48497: "Les paramètres de synchronisation à l’échelle du compte ont été modifiés pendant la synchronisation. Veuillez réessayer la synchronisation."
@@ -29091,6 +29181,7 @@ fr-CA:
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "Cette fonctionnalité permet aux enseignants de copier facilement des éléments individuels d'un cours à un autre, et de partager un seul élément de contenu avec d'autres utilisateurs afin qu'ils puissent importer ces éléments dans leurs cours également."
   this_feature_allows_users_to_create_and_search_for_15991ac8: "Cette fonctionnalité permet aux utilisateurs de créer et de rechercher des rubriques tout en utilisant la conception des rubriques améliorées sur la page des tâches."
   this_feature_allows_users_to_import_and_export_rub_340b5d30: "Cette fonction permet aux utilisateurs d’importer et d’exporter des rubriques à partir de fichiers CSV et XML."
+  this_feature_allows_users_to_import_and_export_rub_43a99d67: "Cette fonction permet aux utilisateurs d’importer et d’exporter des évaluations de rubriques du carnet de notes dans un format CSV. Cette fonction dépend de la fonction Rubriques améliorées."
   this_feature_allows_users_to_import_and_export_rub_b8cb0344: "Cette fonction permet aux utilisateurs d’importer et d’exporter des rubriques à partir de fichiers CSV et XML depuis les Rubriques améliorées."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Cette fonction ne peut pas être désactivée parce qu'il y a au moins un sous-compte ou cours avec cette fonction activée."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "Cette fonction ne peut pas être activée tant que la détection automatique des séparateurs de champs est activée"
@@ -29152,6 +29243,7 @@ fr-CA:
                                   Avant de l’activer pour une institution, assurez-vous de bien comprendre
                                   la fonctionnalité et les impacts possibles pour les utilisateurs.
   this_feature_provides_a_new_analytics_hub_platform_749d5f1a: "Cette fonctionnalité offre une nouvelle expérience de la plateforme Analytics Hub."
+  this_feature_provides_a_new_speedgrader_platform_e_b739c571: "Cette fonctionnalité offre une nouvelle SpeedGrader expérience de la plateforme  en mettant l'accen’ sur l'améli’ration des performances pour les cours de grande envergure."
   this_feature_provides_a_new_speedgrader_platform_e_e7d740bd: "Cette fonctionnalité offre une nouvelle expérience de plateforme SpeedGrader."
   this_feature_provides_the_ability_to_capture_media_918c06c6: "Cette fonction permet de capturer des supports dans SpeedGrader à l’aide de Studio Screen Capture."
   this_feature_provides_visual_and_functional_enhanc_e5e57a21: "Cette fonctionnalité fournit des améliorations visuelles et fonctionnelles aux rubriques dans Canvas."
@@ -29380,6 +29472,7 @@ fr-CA:
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Cette page exemple inclut les éléments communs de l'interface utilisateur de Canvas, afin de vous aider à établir votre marque personnalisée. Une fois que vous commencez à effectuer des changements sur les valeurs de couleurs et sur les images dans la barre latérale gauche, vous verrez alors le bouton *Prévisualiser vos changements*. Cliquez dessus pour réactualiser cette page et voir ce à quoi votre nouvelle page ressemble."
   this_sample_page_includes_common_ui_elements_in_ca_ef71449d: "Cette page exemple inclut les éléments communs de l’interface utilisateur de Canvas, afin de vous aider à établir votre marque personnalisée. Une fois que vous commencez à effectuer des changements sur les valeurs de couleurs et sur les images, vous verrez alors le bouton *Prévisualiser vos changements*. Cliquez dessus pour rafraîchir cette page et voir à quoi ressemblent vos changements."
   this_section_pace_will_be_removed_and_the_pace_wil_86093c26: "Le rythme de cette section sera retiré et le rythme reviendra au rythme par défaut."
+  this_setting_is_locked_on_the_account_level_d875b894: "Ce paramètre est verrouillé au niveau du compte"
   this_setting_only_affects_your_view_of_student_gra_8f58eb33: "Ce paramètre affecte uniquement votre vue des notes des étudiants et affiche les notes comme si toutes les tâches non notées avaient obtenu une note de zéro. Ce paramètre n'est qu'une modification visuelle et n'affecte pas les notes pour les étudiants ou les autres utilisateurs de ce Carnet de notes. Lorsque ce paramètre est activé, Canvas ne met pas de zéros dans le Carnet de notes pour les envois d'étudiants dans les tâches individuelles. Seuls les groupes de tâches et les colonnes totales factoriseront automatiquement des notes de zéro dans les pourcentages globaux pour chaque étudiant."
   this_setting_only_impacts_courses_it_will_include__1b2169a: "Ce paramètre n’a d’incidence que sur les cours. Il comprendra sis_batch_id et sis_batch_user_id"
   this_setting_significantly_changes_the_canvas_expe_a9e07674: "Ce paramètre modifie considérablement l’expérience Canvas pour les étudiants et les enseignants."
@@ -30473,6 +30566,7 @@ fr-CA:
     trophy_display_name: Trophée
   trophy_case_7a098a85: Présentoir
   trophy_case_da3b25bb: Présentoir
+  true_false_823761a9: Vrai/Faux
   truncated_56b1a661: Tronqué
   trusted_account_669ba397: "Compte de confiance"
   trusted_account_url_e6200e41: "URL du compte de confiance"
@@ -30483,6 +30577,8 @@ fr-CA:
   try_disabling_the_unread_filter_b8d9d77: "Essayez de désactiver le filtre « Non lu(s) »."
   try_entering_your_institution_s_complete_name_2013abab: "Essayez de saisir le nom complet de votre institution."
   try_out_canvas_for_free_e2265d30: "Essayez Canvas gratuitement!"
+  try_the_block_editor_ee65a02f: "Essayez l’éditeur de blocs"
+  try_the_new_block_editor_179e588: "Essayez le nouvel éditeur de blocs"
   ttml_tracks_are_not_allowed_because_they_are_susce_d40b654a: "Les pistes TTML ne sont pas autorisées, car elles sont sensibles aux attaques xss"
   tue_bb10b386: Mar
   tuesday_698a01b: Mardi
@@ -30589,6 +30685,7 @@ fr-CA:
   unable_to_load_messages_2b158fd0: "Impossible de charger les messages. "
   unable_to_load_messages_49a2942b: "Impossible de charger les messages."
   unable_to_load_results_4e15a097: "Impossible de charger les résultats"
+  unable_to_load_the_acceptable_use_policy_please_tr_bc8fa18b: "Impossible de charger la politique d’utilisation acceptable. Veuillez réessayer plus tard ou contacter l’assistance si le problème persiste."
   unable_to_load_this_control_543a8271: "Impossible de charger ce contrôle"
   unable_to_locate_sftp_key_selected_if_it_continues_c5768e01: |-
       Impossible de localiser la clé SFTP sélectionnée.
@@ -30664,6 +30761,7 @@ fr-CA:
   unenrolled_users_e7632d24: "Utilisateurs désinscrits"
   unexpected_error_while_performing_export_1e6b4207: "Erreur inattendue lors de l’exportation"
   unexpected_reponse_from_microsoft_api_got_status_c_cdbba851: "Réponse inattendue de l’API Microsoft : code d’état %{status_code}"
+  unexpected_response_format_e9c1df2e: "Format de réponse inattendu"
   unexpected_response_from_microsoft_api_got_status__86f7a95e: "Réponse inattendue de l’API Microsoft, code d’état : %{status_code}"
   unexpected_response_from_microsoft_api_this_is_lik_fc892bab: "Réponse inattendue de l’API Microsoft. Il s’agit probablement d’un bogue. Veuillez contacter le service d’assistance."
   unexpected_value_12f2d401: "Valeur inattendue"
@@ -30816,6 +30914,7 @@ fr-CA:
   unsupported_authentication_type_b07ad82d: "Type d’authentification non pris en charge"
   unsupported_bymonthday_only_a_single_day_is_permit_76e60fc9: "BYMONTHDAY non pris en charge, seul un jour unique est autorisé."
   unsupported_package: "Paquetage de contenu non pris en charge"
+  unsupported_question_type_58aedb6: "Type de question non prises en charge"
   unsyncable_4bf11ee6: "Impossible de synchroniser"
   unsyncable_message_95faa75d: "Impossible de synchroniser : %{message}"
   unsynced_changes_4ddaec76: "Modifications non synchronisées"
@@ -31052,6 +31151,7 @@ fr-CA:
   use_the_new_interface_for_managing_permissions_907e8e8f: "Utiliser la nouvelle interface pour la gestion des autorisations"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Utilisez le nouvel outil LTI de questionnaire à la place des questionnaires Canvas habituels"
   use_the_new_scheduler_1273b832: "Utiliser le nouveau planificateur"
+  use_the_rce_873ca281: "Utiliser le RCE"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Utiliser cette configuration pour l'inscription parentale/d'observateur"
   use_this_grading_scheme_52aa4ecf: "Utiliser ce système de notation"
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "Utiliser cette liste pour retirer les étudiants assignés Ajouter les nouveaux étudiants avec la zone de liste déroulante après la liste."
@@ -31394,6 +31494,16 @@ fr-CA:
         all_users: "Tous les utilisateurs"
         choose_term: "Choisir un trimestre"
         search_results: "Résultats de la recherche pour « %{search_term} »"
+    last_login: 
+      labels: 
+        current_ip: "IP de connexion actuel"
+        current_login: "Connexion actuelle"
+        last_ip: "Dernier IP de connexion"
+        last_login: "Dernière connexion"
+        last_request: "Dernière demande"
+      more: plus…
+      never: jamais
+      none: aucun
     linkedin_added: "Le compte LinkedIn a été ajouté."
     linkedin_fail: "Échec d’autorisation pour LinkedIn. Veuillez réessayer"
     logins: 
@@ -31814,6 +31924,7 @@ fr-CA:
   we_re_sending_your_message_d586da: "Nous envoyons votre message ..."
   we_re_sorry_a_login_error_has_occurred_please_chec_6dae02e2: "Nous sommes désolés, une erreur de connexion est survenue, veuillez vérifier les identifiants de votre enfant puis réessayer."
   we_suggest_using_firefox_to_test_lti_1_3_tools_wit_f51737e2: "Nous suggérons d’utiliser Firefox pour tester les outils LTI 1.3 avec HTTP Canvas."
+  we_ve_introduced_a_new_editor_to_give_you_more_fle_1fedb3b9: "Nous avons introduit un nouvel éditeur pour vous donner plus de flexibilité et de puissance dans la création de contenu. Choisissez l’éditeur qui convient le mieux à votre flux de travail."
   we_ve_let_your_instructor_know_to_review_this_link_f8d56088: "Nous avons informé votre instructeur de consulter ce lien dès que possible."
   we_ve_received_several_incorrect_username_or_passw_c62ccb92: "Nous avons reçu plusieurs entrées de nom d’utilisateur ou de mot de passe incorrects. Pour protéger votre compte, celui-ci a été verrouillé. Veuillez contacter votre administrateur de système."
   we_ve_run_into_a_problem_while_updating_all_discus_52ac7d70: "Nous avons rencontré un problème lors de la mise à jour de toutes les discussions. Veuillez réessayer ou nous contacter pour résoudre ce problème."
@@ -32049,6 +32160,7 @@ fr-CA:
   when_masquerading_as_course_admin_roles_teacher_ta_e3e3c0a9: "Lorsque l’utilisateur personnifie un administrateur de cours (rôle de base d’enseignant, d’AE ou de concepteur), Canvas s’assure que l’utilisateur personnifiant un administrateur a les mêmes autorisations (ou plus) que l’utilisateur cible."
   when_on_1edtech_platform_notfication_service_used__4800aa8f: "Lorsque cette option est activée, les services de notification de la plateforme 1Edtech (utilisés pour abonner les outils à la notification, répertorier les gestionnaires de notification existants, notifier les outils abonnés, etc)."
   when_on_1edtech_platform_notfication_services_used_6347510c: "Lorsque cette option est activée, les services de notification de la plateforme 1Edtech (utilisés pour abonner les outils à la notification, répertorier les gestionnaires de notification existants, notifier les outils abonnés, etc)."
+  when_on_1edtech_platform_notification_service_used_43761290: "Lorsque cette option est activée, les services de notification de la plateforme 1Edtech (utilisés pour abonner les outils à la notification, répertorier les gestionnaires de notification existants, notifier les outils abonnés, etc)."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Lorsque des internautes visitent le cours, ils voient cette page. Vous pouvez y afficher un flux d’activités, la liste des modules du cours, un plan de cours ou une page personnalisée créée par vos soins. Par défaut, c’est le flux d’activités du cours qui est présenté."
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
       Lorsque les gens visitent votre cours, ceci est la première page, qu’ils verront.
@@ -32180,6 +32292,9 @@ fr-CA:
       buttons: 
         new_page: Page
         new_page_label: "Ajouter une page"
+        new_rce_page: "Page du RCE"
+        try_the_block_editor: "Essayez l’éditeur de blocs"
+        use_the_rce: "Utiliser le RCE"
       headers: 
         creation_date: "Date de création"
         last_edit: "Dernière modification"
@@ -32386,6 +32501,9 @@ fr-CA:
   you_are_not_the_selected_moderator_for_this_assign_e57b483f: "Vous n'êtes pas le modérateur sélectionné pour cette tâche"
   you_are_now_able_to_submit_your_peer_review_4ae84901: "Vous êtes maintenant en mesure d’envoyer votre révision par les pairs"
   you_are_observing_observeduser_afd2f245: "Vous observez %{observedUser}"
+  you_are_on_a_color_palette_to_navigate_on_the_pale_b3feaa53: "Vous êtes sur une palette de couleurs. Pour naviguer dans la palette vers le haut, la gauche, le bas ou la droite, utiliser respectivement les boutons ‘W’, ‘A’, ‘S’ et ‘D’"
+  you_are_on_a_color_slider_to_navigate_the_slider_l_10afbbbc: "Vous êtes sur un curseur de couleur. Pour naviguer le curseur vers la gauche ou la droite, utilisez respectivement les boutons ‘A’, et ‘D’"
+  you_are_on_an_alpha_slider_to_navigate_the_slider__260e908a: "Vous êtes sur un curseur alpha. Pour naviguer le curseur vers la gauche ou la droite, utilisez respectivement les boutons ‘A’, et ‘D’"
   you_are_ready_to_sync_count_assignments_525eb8b1: 
     one: "Vous êtes prêt à synchroniser 1 tâche."
     other: "Vous êtes prêt à synchroniser %{count} tâches."
