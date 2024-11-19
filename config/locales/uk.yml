@@ -3121,6 +3121,8 @@ uk:
   author_215203d2: Автор
   author_s_name_b35e905a: "Ім'я автора"
   authorize_e3f25bb4: Авторизувати
+  authorize_google_drive_8ad056d5: "Авторизувати Google Drive"
+  authorize_google_drive_access_aefcf8d6: "Авторизація доступу до Google Drive"
   auto_leader_7791c30a: auto_leader
   automatically_apply_deduction_to_late_submissions_2b68166e: "Автоматично застосовувати відрахування для подань із запвзненням"
   automatically_apply_grade_for_missing_submissions_2b5c1a72: "Автоматично застосовувати оцінку для відсутніх подань"
@@ -6450,6 +6452,7 @@ uk:
     saving: Збереження...
   different_course_b875770e: "інший курс"
   diigo_993c4646: Diigo
+  diigo_is_a_social_bookmarking_tool_tailored_specif_1bff1643: "Diigo - це інструмент соціальних закладок, спеціально розроблений для досліджень та освіти. Редактор змісту Canvas дозволить вам шукати свої теги Diigo, щоб легко посилатись з Canvas на інші ресурси, які ви вважаєте корисними."
   disableWhileLoading: 
     loading: Завантаження...
   disable_a5c05db3: Відключити
@@ -12290,6 +12293,7 @@ uk:
   on_paper_87119532: "На папері"
   on_time_17ca5ad9: Вчасно
   on_time_percent_eebffe38: "Вчасно: %{percent}"
+  once_you_authorize_us_to_see_your_google_drive_you_9c4b2261: "Коли ви дозволите нам побачити свій Диск Google, ви зможете надсилати свої завдання безпосередньо з Google Диска, а також створювати документи та надавати до них доступ учасникам своїх класів."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Після надсилання відповіді ви не зможете її змінити пізніше. Ви не зможете переглянути попереднє запитання."
   one_or_more_items_are_currently_being_imported_the_186fe069: "Один або декілька елементів в даний час імпортуються. Вони будуть показані в курсі нижче, як тільки стануть доступними."
   one_per_line_format_name_value_79647700: "По одному на рядок. Формат: name=value"
@@ -15032,6 +15036,7 @@ uk:
   region_939f2a6c: Область
   register_communication_ae935328: "Зареєструвати зв'язок"
   register_email_efc06d59: "Зареєструвати електронну адресу"
+  register_skype_d5e2b3d3: "Реєстрація Skype"
   register_sms_7f87e50d: "Зареєструвати смс"
   register_tool_84de3186: "Зареєструвати інструмент"
   registration: 
@@ -15412,8 +15417,10 @@ uk:
   save_changes_698abe77: "Зберегти зміни"
   save_grading_period_daaaddea: "Зберегти період оцінювання"
   save_grading_period_set_e029fa88: "Зберегти налаштування періоду оцінювання"
+  save_login_bba1272: "Зберегти логін"
   save_publish_36440725: "Зберегти та опублікувати"
   save_settings_cafe79a5: "Зберегти налаштування"
+  save_skype_name_4de35a9: "Зберегти ім'я для скайпу"
   save_theme_f706116e: "Зберегти тему"
   save_this_comment_for_reuse_5eda0b70: "Зберегти коментарі для повторного використання"
   saving_associations_989bd4da: "Збереження асоціацій"
@@ -16592,6 +16599,8 @@ uk:
   skipped_file_filename_due_to_error_94f0194: "Файл %{filename} пропущено через помилку"
   skipping_unknown_file_type_cd1086ee: "Невідомий тип файлу пропущено"
   skype_18850ba7: Skype
+  skype_name_9eb890df: "Ім'я для Skype"
+  skype_offers_free_online_voice_and_video_calls_lot_35295baa: "Skype пропонує безкоштовні голосові та відеодзвінки. Багато студентів використовують Skype в якості вільного, простого способу спілкування. Якщо ви реєструєте ваше ім'я Skype і включите видимість, то інші студенти можуть легко знайти ваш контакт і подзвонити або додати вас за допомогою Skype."
   sms_f0ddceeb: смс
   snapshots_6e1806b4: Знімки
   snapshots_are_backups_of_your_canvas_trial_taking__f18bd571: "Знімки - це резервні копії вашої пробної версії Canvas. Знімок створить унікальну \"версію\", яка зробить точний запис стану вашої пробної версії на момент моментального знімка."
