@@ -336,6 +336,21 @@ describe GroupsController do
         end
       end
     end
+
+    context "self_signup_deadline_enabled ENV variable" do
+      it "set to true if enabled at account level" do
+        @course.account.enable_feature!(:self_signup_deadline)
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(assigns[:js_env][:self_signup_deadline_enabled]).to be_truthy
+      end
+
+      it "set to false if not enabled at account level" do
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(assigns[:js_env][:self_signup_deadline_enabled]).to be_falsey
+      end
+    end
   end
 
   describe "group_json" do

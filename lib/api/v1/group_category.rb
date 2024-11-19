@@ -25,7 +25,7 @@ module Api::V1::GroupCategory
   include Api::V1::Group
 
   API_GROUP_CATEGORY_JSON_OPTS = {
-    only: %w[id name role self_signup group_limit auto_leader created_at]
+    only: %w[id name role self_signup self_signup_end_at group_limit auto_leader created_at]
   }.freeze
 
   def group_category_json(group_category, user, session, options = {})

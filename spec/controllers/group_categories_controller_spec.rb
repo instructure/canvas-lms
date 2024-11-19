@@ -175,12 +175,15 @@ describe GroupCategoriesController do
     end
 
     it "respects enable_self_signup" do
+      @course.account.enable_feature!(:self_signup_deadline)
       user_session(@teacher)
-      post "create", params: { course_id: @course.id, category: { name: "Study Groups", enable_self_signup: "1" } }
+      end_date = Time.now.utc
+      post "create", params: { course_id: @course.id, category: { name: "Study Groups", enable_self_signup: "1", self_signup_end_at: end_date } }
       expect(response).to be_successful
       expect(assigns[:group_category]).not_to be_nil
       expect(assigns[:group_category]).to be_self_signup
       expect(assigns[:group_category]).to be_unrestricted_self_signup
+      expect(assigns[:group_category].self_signup_end_at).to be_within(1.second).of(end_date)
     end
 
     it "uses create_group_count when self-signup" do
@@ -305,12 +308,15 @@ describe GroupCategoriesController do
     end
 
     it "updates category" do
+      @course.account.enable_feature!(:self_signup_deadline)
       user_session(@teacher)
-      put "update", params: { course_id: @course.id, id: @group_category.id, category: { name: "Different Category", enable_self_signup: "1" } }
+      end_date = Time.now.utc
+      put "update", params: { course_id: @course.id, id: @group_category.id, category: { name: "Different Category", enable_self_signup: "1", self_signup_end_at: end_date } }
       expect(response).to be_successful
       expect(assigns[:group_category]).to eql(@group_category)
       expect(assigns[:group_category].name).to eql("Different Category")
       expect(assigns[:group_category]).to be_self_signup
+      expect(assigns[:group_category].self_signup_end_at).to be_within(1.second).of(end_date)
     end
 
     it "does not update category if :manage_groups_manage is not enabled" do
@@ -369,6 +375,26 @@ describe GroupCategoriesController do
       user_session(@teacher)
       put "update", params: { course_id: @course.id, id: @group_category.id, category: { enable_self_signup: "1", restrict_self_signup: "1" } }
       expect(response).not_to be_successful
+    end
+
+    it "clears self_signup_end_at if self_signup is disabled" do
+      @course.account.enable_feature!(:self_signup_deadline)
+      user_session(@teacher)
+      end_date = Time.now.utc
+      @group_category.self_signup_end_at = end_date
+      @group_category.save!
+      put "update", params: { course_id: @course.id, id: @group_category.id, category: { name: "Different Category", enable_self_signup: "0", self_signup_end_at: end_date } }
+      expect(response).to be_successful
+      expect(assigns[:group_category].self_signup_end_at).to be_nil
+    end
+
+    it "does not set self_signup_end_at if self_signup_deadline FF is disabled" do
+      user_session(@teacher)
+      end_date = Time.now.utc
+      put "update", params: { course_id: @course.id, id: @group_category.id, category: { name: "Different Category", enable_self_signup: "1", self_signup_end_at: end_date } }
+      expect(response).to be_successful
+      expect(assigns[:group_category]).to be_self_signup
+      expect(assigns[:group_category].self_signup_end_at).to be_nil
     end
   end
 

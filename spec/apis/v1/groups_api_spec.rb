@@ -76,6 +76,7 @@ describe "Groups API", type: :request do
       "name" => group_category.name,
       "role" => group_category.role,
       "self_signup" => group_category.self_signup,
+      "self_signup_end_at" => group_category.self_signup_end_at,
       "context_type" => group_category.context_type,
       "#{group_category.context_type.underscore}_id" => group_category.context_id,
       "protected" => group_category.protected?,
@@ -1006,6 +1007,42 @@ describe "Groups API", type: :request do
                       })
       expect(json.first["sis_import_id"]).to eq sis_batch.id
       expect(json.first).to eq membership_json(@community.group_memberships.where(workflow_state: "invited").first, true)
+    end
+
+    it "allows a user to join a group whose self sign-up is still open" do
+      course_with_student(active_all: true)
+      @course.account.enable_feature!(:self_signup_deadline)
+      @category = @course.group_categories.create!(name: "foo", self_signup: "enabled", self_signup_end_at: 1.day.from_now)
+      @group = group_model(group_category: @category, context: @course)
+      user_session(@student)
+
+      json = api_call(
+        :post,
+        "/api/v1/groups/#{@group.id}/memberships",
+        @memberships_path_options.merge(group_id: @group.to_param, action: "create"),
+        { user_id: @student.id }
+      )
+
+      @membership = GroupMembership.where(user_id: @student, group_id: @group).first
+      expect(@membership.workflow_state).to eq "accepted"
+      expect(json).to eq membership_json(@membership, true).merge("just_created" => true)
+    end
+
+    it "does not allow a user to join a group whose self sign-up is closed" do
+      course_with_student(active_all: true)
+      @course.account.enable_feature!(:self_signup_deadline)
+      @category = @course.group_categories.create!(name: "foo", self_signup: "enabled", self_signup_end_at: 1.day.ago)
+      @group = group_model(group_category: @category, context: @course)
+      user_session(@student)
+
+      api_call(
+        :post,
+        "/api/v1/groups/#{@group.id}/memberships",
+        @memberships_path_options.merge(group_id: @group.to_param, action: "create"),
+        { user_id: @student.id },
+        {},
+        expected_status: 403
+      )
     end
   end
 
