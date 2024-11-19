@@ -130,6 +130,7 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
           isShowingOptions={courseOptions.length > 0}
           renderLabel={I18n.t('Search for a course')}
           renderBeforeInput={<IconSearchLine inline={false} />}
+          renderAfterInput={<span />}
           onBlur={() => {
             setCourseOptions([])
           }}
