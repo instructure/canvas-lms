@@ -26,23 +26,14 @@ import {Img} from '@instructure/ui-img'
 import {useNewLogin} from '../context/NewLoginContext'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-// @ts-expect-error
 import iconApple from '../assets/images/apple.svg'
-// @ts-expect-error
 import iconClasslink from '../assets/images/classlink.svg'
-// @ts-expect-error
 import iconClever from '../assets/images/clever.svg'
-// @ts-expect-error
 import iconFacebook from '../assets/images/facebook.svg'
-// @ts-expect-error
 import iconGithub from '../assets/images/github.svg'
-// @ts-expect-error
 import iconGoogle from '../assets/images/google.svg'
-// @ts-expect-error
 import iconLinkedin from '../assets/images/linkedin.svg'
-// @ts-expect-error
 import iconMicrosoft from '../assets/images/microsoft.svg'
-// @ts-expect-error
 import iconX from '../assets/images/x.svg'
 
 const I18n = useI18nScope('new_login')

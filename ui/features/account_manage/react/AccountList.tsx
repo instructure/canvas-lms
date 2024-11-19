@@ -17,7 +17,6 @@
  */
 
 import React, {useState} from 'react'
-// @ts-expect-error
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {Spinner} from '@instructure/ui-spinner'
 import {AccountNavigation} from './AccountNavigation'

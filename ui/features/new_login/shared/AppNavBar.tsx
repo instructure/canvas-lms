@@ -23,9 +23,7 @@ import {TopNavBar} from '@instructure/ui-top-nav-bar'
 import {useNewLogin} from '../context/NewLoginContext'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-// @ts-expect-error
 import CanvasLmsLogoIcon from '../assets/images/canvas-logo-small.svg'
-// @ts-expect-error
 import CanvasLmsLogo from '../assets/images/canvas-logo.svg'
 
 const I18n = useI18nScope('new_login')
