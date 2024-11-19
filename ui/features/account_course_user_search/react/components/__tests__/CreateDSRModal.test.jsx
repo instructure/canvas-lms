@@ -19,11 +19,8 @@
 import React from 'react'
 import {render, fireEvent, waitFor} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import {useScope as useI18nScope} from '@canvas/i18n'
 import CreateDSRModal from '../CreateDSRModal'
 import axios from '@canvas/axios'
-
-const I18n = useI18nScope('account_course_user_search')
 
 jest.mock('@canvas/axios')
 
@@ -99,6 +96,26 @@ describe('CreateDSRModal', () => {
     await waitFor(() => {
       expect(
         getByText((_, element) => element.textContent === 'Latest DSR: In progress')
+      ).toBeInTheDocument()
+      expect(queryByText('Download:')).not.toBeInTheDocument()
+    })
+  })
+
+  it('should not have a download link and show the status when failed', async () => {
+    axios.get.mockResolvedValueOnce({
+      status: 200,
+      data: {
+        request_name: 'Latest Request',
+        progress_status: 'failed',
+      },
+    })
+
+    const {getByText, queryByText, getByTitle} = renderComponent()
+    fireEvent.click(getByTitle('Create DSR Request for John Doe'))
+
+    await waitFor(() => {
+      expect(
+        getByText((_, element) => element.textContent === 'Latest DSR: Failed')
       ).toBeInTheDocument()
       expect(queryByText('Download:')).not.toBeInTheDocument()
     })
