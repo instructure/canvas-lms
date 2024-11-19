@@ -3608,6 +3608,8 @@ tr:
   author_215203d2: Yazar
   author_s_name_b35e905a: "Yazar Adı"
   authorize_e3f25bb4: Yetkilendir
+  authorize_google_drive_8ad056d5: "Google Drive'a İzin Ver"
+  authorize_google_drive_access_aefcf8d6: "Google Drive Erişimine İzin Ver"
   authorize_url_f28167a3: "URL'yi yetkilendir"
   auto_leader_7791c30a: auto_leader
   autodetect_field_separators_in_compatible_spreadsh_768067e1: "Uyumlu e-tablo dışa aktarmalarında alan ayırıcıları otomatik algıla"
@@ -7323,6 +7325,7 @@ tr:
     saving: Kaydediliyor...
   different_course_b875770e: "farklı ders"
   diigo_993c4646: Diigo
+  diigo_is_a_social_bookmarking_tool_tailored_specif_1bff1643: "Diigo, özellikle araştırma ve eğitim için tasarlanmış bir sosyal yer imi oluşturma aracıdır. Canvas'ın zengin içerik editörü sayesinde Canvas içinden yararlı bulduğunuz diğer kaynaklara bağlantı eklemek için Diigo etiketleriniz içinde arama yapabilirsiniz."
   direct_share_80afd4a7: "Doğrudan Paylaşım"
   disableWhileLoading: 
     loading: Yükleniyor...
@@ -13842,6 +13845,7 @@ tr:
       
       Bir not manuel olarak yayınlandığında, otomatik olarak yeni bildirimler gönderir ve öğrenciler tarafından görülür.
       Yayınlanan notlar için gelecekteki not değişikliklerinin manuel olarak yayınlanmasına gerek yoktur.
+  once_you_authorize_us_to_see_your_google_drive_you_9c4b2261: "Google Drive ınızı görmemize yetki verdiğinizde ödevlerinizi doğrudan Google Drive'dan gönderebilecek ve sınıflarınızdaki arkadaşlarınızla belgeler oluşturup paylaşabieceksiniz."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Cevabınızı gönderdikten sonra değiştiremezsiniz. Bir önceki soruyu da göremezsiniz."
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Cevabı bir kere değiştirdiniz mi soruyu güncellemeden önce bir seçim yapmak zorunda kalacaksınız."
   one_or_more_items_are_currently_being_imported_the_186fe069: "Şu anda bir veya daha fazla öğe içe aktarılıyor. Hazır olduklarında aşağıdaki dersin içinde görünecekler."
@@ -16810,6 +16814,7 @@ tr:
   regenerating_token_42e5c747: "Yeniden Token Üretiliyor"
   register_communication_ae935328: "İletişim Kaydı"
   register_email_efc06d59: "E-Mail Kaydet"
+  register_skype_d5e2b3d3: "Skype'a Üye Ol"
   register_sms_7f87e50d: "SMS Kaydet"
   register_tool_84de3186: "Kayıt Aracı"
   registration: 
@@ -17171,8 +17176,10 @@ tr:
   save_changes_698abe77: "Değişiklikleri Kaydet"
   save_key_b4dede06: "Anahtarı Kaydet"
   save_learning_mastery_82889d8b: "Öğrenme Yeterliliğini Kaydet"
+  save_login_bba1272: "Oturumu Kaydet"
   save_publish_36440725: "Kaydet & Yayınla"
   save_settings_cafe79a5: "Ayarları Kaydet"
+  save_skype_name_4de35a9: "Skype İsmini Kaydet"
   save_theme_36c73e6a: "Temayı Kaydet"
   save_theme_f706116e: "Temayı Kaydet"
   saved_discussion_settings_successfully_ebd46a57: "Tartışma ayarları başarılı bir şekilde kaydedildi"
@@ -18420,6 +18427,8 @@ tr:
   skipped_file_filename_due_to_error_94f0194: "Hatadan dolayı %{filename} dosyası atlandı"
   skipping_unknown_file_type_cd1086ee: "Bilinmeyen dosya türü atlanıyor"
   skype_18850ba7: Skype
+  skype_name_9eb890df: "Skype Adı"
+  skype_offers_free_online_voice_and_video_calls_lot_35295baa: "Skype ücretsiz çevrimiçi ses ve video görüşmelerine izin veren uygulamadır. Birçok öğrenci ücretsiz Skype hizmetini kullanarak, iletişimin kolay yolunu keşvetmiş durumda. Eğer kayıtlı Skype isminizi kaydeder ve görünür kılarsanız, diğer öğrencilerin sizleri aradıklarında ulaşmaları kolay olur."
   slack_notifications_3a0288e6: "Slack Bildirimleri"
   slideshow: 
     titles: 
