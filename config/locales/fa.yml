@@ -4301,6 +4301,8 @@ fa:
   author_s_name_b35e905a: "نام نویسنده"
   author_sis_id_b59b62af: "شناسه نویسنده"
   authorize_e3f25bb4: "اجازه دادن"
+  authorize_google_drive_8ad056d5: "دادن اجازه دسترسی به Google Drive"
+  authorize_google_drive_access_aefcf8d6: "دادن اجازه دسترسی به Google Drive"
   authorize_url_f28167a3: "  URLرا مجاز کنید"
   auto_leader_7791c30a: auto_leader
   auto_show_closed_captions_e4cd7aff: " نمایش خودکار شرح‌های بسته"
@@ -8789,6 +8791,7 @@ fa:
     saving: "در حال ذخیره سازی..."
   different_course_b875770e: "درس دیگر"
   diigo_993c4646: Diigo
+  diigo_is_a_social_bookmarking_tool_tailored_specif_1bff1643: "Diigo یک ابزار نشانه گذار اجتماعی است که به طور خاص برای تحقیق و آموزش طراحی شده است. ویرایشگر محتوای غنی کانواس به شما اجازه می دهد برچسب های Diigo خود را جستجو کنید تا به راحتی از داخل کانواس به منابع دیگری که مفید تشخیص می دهید پیوند دهید."
   direct_share_80afd4a7: "اشتراک مستقیم"
   disableWhileLoading: 
     loading: "در حال بارگذاری..."
@@ -16996,6 +16999,7 @@ fa:
       تغییرات نمرات آتی برای نمرات ارسال شده نیازی به ارسال دستی ندارند.
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "هنگامی که نمره ای به صورت دستی ارسال می شود ، به طور خودکار اطلاعیه‌های جدید ارسال می کند و برای دانشجویان قابل مشاهده است."
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "وقتی این ویژگی فعال شود، نمی توانید آن را دوباره غیر فعال کنید.  قبل از ادامه مطمئن شوید که برای فعالسازی پوشه موردهای ارسالی آماده هستید."
+  once_you_authorize_us_to_see_your_google_drive_you_9c4b2261: "وقتی به ما اجازه می دهید که Google Drive تان را مشاهده کنیم، قادر خواهید بود تکلیف های خود را به طور مستقیم از Google Docs ارسال کنید و اسناد را ایجاد کنید و با همکلاسی های خود به اشتراک بگذارید."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "هنگامی که یک پاسخ ارسال کنید، نمی توانید آن را تغییر دهید. نمی‌توانید پرسش قبلی را مشاهده کنید."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "وقتی اشکال زدایی را شروع کردید، تمام اطلاعات مربوط به تلاش بعدی برای ورود به سیستم جمع آوری می‌شود. \"تازه کردن\" را کلیک کنید تا ببینید آیا داده‌های بیشتری جمع آوری شده است یا  اینکه برای پاک کردن اطلاعات جمع آوری شده و توقف تلاش برای رفع اشکال فعلی  \"متوقف کردن اشکال زدایی\" را کلیک کنید."
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "هنگامی که یک پاسخ را تغییر داده اید، باید قبل از بهنگام سازی پرسش یک گزینه را انتخاب کنید."
@@ -20291,6 +20295,7 @@ fa:
   region_939f2a6c: ناحیه
   register_communication_ae935328: "ثبت ارتباط"
   register_email_efc06d59: "ثبت پست الکترونیکی"
+  register_skype_d5e2b3d3: "ثبت اسکایپ"
   register_slack_email_1f6d7e6d: "ثبت پست الکترونیکی ضعیف"
   register_sms_7f87e50d: "ثبت پیامک"
   register_tool_84de3186: "ثبت ابزار"
@@ -20824,8 +20829,10 @@ fa:
   save_key_b4dede06: "ذخیره سازی کلید"
   save_label_6ed4a68e: "ذخیره برچسب"
   save_learning_mastery_82889d8b: "تسلط یادگیری را دخیره کنید"
+  save_login_bba1272: "ذخیره سازی ورود"
   save_publish_36440725: "ذخیره سازی و انتشار"
   save_settings_cafe79a5: "ذخیره سازی تنظیمات"
+  save_skype_name_4de35a9: "ذخیره سازی نام اسکایپ"
   save_successful_b2f64da4: "با موفقیت ذخیره شد."
   save_theme_36c73e6a: "ذخیره سازی زمینه"
   save_theme_f706116e: "ذخیره سازی زمینه"
@@ -22439,6 +22446,8 @@ fa:
   skipped_file_filename_due_to_error_94f0194: "به دلیل بروز خطا، از فایل %{filename} صرفنظر شد"
   skipping_unknown_file_type_cd1086ee: "صرفنظر از نوع فایل ناشناس"
   skype_18850ba7: اسکایپ
+  skype_name_9eb890df: "نام اسکایپ"
+  skype_offers_free_online_voice_and_video_calls_lot_35295baa: "اسکایپ تماس صوتی و تصویری رایگان ارائه می دهد .خیلی از دانشجویان از اسکایپ به عنوان یک روش آسان و مجانی برای برقراری ارتباط استفاده می کنند .اگر نام اسکایپ خود را ثبت کنید و قابلیت مشاهده را فعال کنید، دانشجویان دیگر به راحتی می توانند اطلاعات تماس شما را بیابند و با استفاده از اسکایپ با شما تماس بگیرند یا اینکه شما را در اسکایپ اضافه کنند."
   slack_1130ad43: ضعیف
   slack_api_key_92f0c667: "کلید Api ضعیف"
   slack_email_9204e2ea: " پست الکترونیکی ضعیف"
