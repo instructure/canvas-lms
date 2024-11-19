@@ -37,7 +37,7 @@ describe('PlacementsConfirmationWrapper', () => {
 
     expect(screen.queryByLabelText(/default to hidden/i)).not.toBeInTheDocument()
     expect(screen.getAllByRole('checkbox').length).toBe(
-      AllLtiPlacements.filter(p => !UNDOCUMENTED_PLACEMENTS.includes(p)).length
+      AllLtiPlacements.filter(p => !(UNDOCUMENTED_PLACEMENTS as Array<typeof p>).includes(p)).length
     )
   })
 

@@ -45,7 +45,9 @@ export const NamingConfirmationWrapper = ({
         toolName={config.title}
         adminNickname={state.naming.nickname}
         onUpdateAdminNickname={actions.setAdminNickname}
-        description={state.naming.description ?? config.description}
+        description={
+          state.naming.description ?? (config.description === null ? undefined : config.description)
+        }
         onUpdateDescription={actions.setDescription}
         placements={placements}
         onUpdatePlacementLabel={actions.setPlacementLabel}

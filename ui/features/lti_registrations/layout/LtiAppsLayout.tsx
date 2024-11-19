@@ -39,7 +39,7 @@ export const LtiAppsLayout = React.memo(() => {
   const isMobile = useMedia('(max-width: 767px)')
 
   const onTabClick = React.useCallback(
-    (_, tab: {id?: string}) => {
+    (_: any, tab: {id?: string}) => {
       navigate(tab.id === 'manage' ? '/manage' : '/')
     },
     [navigate]
