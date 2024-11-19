@@ -26,7 +26,7 @@ import {useScope} from '@canvas/i18n'
 
 const I18n = useScope('block-editor')
 
-export type ToolbarColorProps = {
+type ToolbarColorProps = {
   tabs: TabSpec
   onChange: (newcolors: ColorSpec) => void
 }
@@ -67,7 +67,6 @@ const ToolbarColor = ({tabs, onChange}: ToolbarColorProps) => {
       renderTrigger={
         <IconButton
           color="secondary"
-          size="small"
           withBackground={false}
           withBorder={false}
           screenReaderLabel={I18n.t('Color')}
@@ -89,4 +88,4 @@ const ToolbarColor = ({tabs, onChange}: ToolbarColorProps) => {
   )
 }
 
-export {ToolbarColor}
+export {ToolbarColor, type ColorSpec, type ToolbarColorProps}
