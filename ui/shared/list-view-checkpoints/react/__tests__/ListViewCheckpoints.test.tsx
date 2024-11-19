@@ -47,8 +47,8 @@ describe('ListViewCheckpoints', () => {
     it('renders the ListViewCheckpoints components with the formatted due dates if the checkpoint due_at field is populated', () => {
       const {getByTestId} = render(<ListViewCheckpoints {...checkpointedAssignmentWithDueDates} />)
 
-      expect(getByTestId('1_reply_to_topic_due_date').textContent).toEqual('Jun 2')
-      expect(getByTestId('1_reply_to_entry_due_date').textContent).toEqual('Jun 4')
+      expect(getByTestId('1_reply_to_topic_due_date').textContent).toEqual('Jun 2, 2023 at 5:43pm')
+      expect(getByTestId('1_reply_to_entry_due_date').textContent).toEqual('Jun 4, 2023 at 5:43pm')
     })
 
     // Once VICE-4350 is completed, modify this test to reflect the new changes for finding the due date from the checkpoint overrides
@@ -57,8 +57,8 @@ describe('ListViewCheckpoints', () => {
 
       const {getByTestId} = render(<ListViewCheckpoints {...checkpointedAssignmentWithOverrides} />)
 
-      expect(getByTestId('1_reply_to_topic_due_date').textContent).toEqual('Jun 2')
-      expect(getByTestId('1_reply_to_entry_due_date').textContent).toEqual('Jun 4')
+      expect(getByTestId('1_reply_to_topic_due_date').textContent).toEqual('Jun 2, 2023 at 5:43pm')
+      expect(getByTestId('1_reply_to_entry_due_date').textContent).toEqual('Jun 4, 2023 at 5:43pm')
     })
   })
 })
