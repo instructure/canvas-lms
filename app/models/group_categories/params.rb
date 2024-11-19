@@ -39,6 +39,11 @@ module GroupCategories
       "enabled"
     end
 
+    def self_signup_end_at
+      end_date = raw_params[:self_signup_end_at]
+      (end_date && self_signup == "enabled") ? Time.parse(end_date).utc : nil
+    end
+
     def auto_leader
       return nil if !enable_auto_leader.nil? && !enable_auto_leader
       return _auto_leader unless enable_auto_leader

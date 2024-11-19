@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {extend} from '@canvas/backbone/utils'
 import {extend as lodashExtend} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -23,6 +26,7 @@ import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import wrapperTemplate from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import template from '../../jst/groupCategoryEdit.handlebars'
 import h from '@instructure/html-escape'
+import SelfSignupEndDate from '../../react/CreateOrEditSetModal/SelfSignupEndDate'
 
 const I18n = useI18nScope('groups')
 
@@ -60,6 +64,20 @@ GroupCategoryEditView.prototype.events = lodashExtend({}, DialogFormView.prototy
   'click .auto-group-leader-toggle': 'toggleAutoGroupLeader',
 })
 
+GroupCategoryEditView.prototype.onSaveSuccess = function () {
+  this.shouldKeepNewDate = true
+  GroupCategoryEditView.__super__.onSaveSuccess.apply(this, arguments)
+}
+
+GroupCategoryEditView.prototype.close = function (event) {
+  // reset self sign up end date
+  if (!this.shouldKeepNewDate) {
+    const initialEndDate = this.model.get('initial_self_signup_end_at')
+    this.model.set('self_signup_end_at', initialEndDate)
+  }
+  return GroupCategoryEditView.__super__.close.apply(this, arguments)
+}
+
 GroupCategoryEditView.prototype.afterRender = function () {
   this.toggleSelfSignup()
   this.toggleAutoGroupLeader()
@@ -94,11 +112,27 @@ GroupCategoryEditView.prototype.toggleAutoGroupLeader = function () {
     .prop('disabled', !enabled)
 }
 
+GroupCategoryEditView.prototype.showSelfSignupEndDatePicker = function () {
+  const container = document.getElementById(`category_${this.model.id}_self_signup_end_at_picker`)
+  if (container) {
+    const root = createRoot(container)
+    const initialEndDate = this.model.get('self_signup_end_at')
+    this.model.set('initial_self_signup_end_at', initialEndDate)
+    const updateEndDate = (end) => {
+      this.model.set('self_signup_end_at', end)
+    }
+    root.render(<SelfSignupEndDate initialEndDate={initialEndDate} onDateChange={updateEndDate} />)
+  }
+}
+
 GroupCategoryEditView.prototype.toggleSelfSignup = function () {
   const disabled = !this.$selfSignupToggle.prop('checked')
   this.$selfSignupControls.css({
     opacity: disabled ? 0.5 : 1,
   })
+  if (ENV.self_signup_deadline_enabled) {
+    this.showSelfSignupEndDatePicker()
+  }
   return this.$selfSignupControls.find(':input').prop('disabled', disabled)
 }
 

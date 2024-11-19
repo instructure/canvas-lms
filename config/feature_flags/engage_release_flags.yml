@@ -14,4 +14,8 @@ differentiation_tags:
   applies_to: Course
   display_name: Differentiation Tags
   description: Differentiation Tags allows instructors to create groups of enrolled users that can be used to assign course content.
-
+self_signup_deadline:
+  state: hidden
+  applies_to: Account
+  display_name: Self Sign-up Group Deadline
+  description: Allows teachers to set a deadline for students to sign up for a group within a group set.

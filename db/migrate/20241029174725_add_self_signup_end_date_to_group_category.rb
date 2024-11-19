@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-#
-# Copyright (C) 2015 - present Instructure, Inc.
+# Copyright (C) 2024 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,12 +16,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Factories
-  VALID_GROUP_CATEGORY_ATTRIBUTES = %i[name context self_signup self_signup_end_at group_limit sis_source_id].freeze
-
-  def group_category(opts = {})
-    opts[:name] = opts[:name].presence || "foo"
-    context = opts[:context] || @course
-    @group_category = context.group_categories.create! opts.slice(*VALID_GROUP_CATEGORY_ATTRIBUTES)
+class AddSelfSignupEndDateToGroupCategory < ActiveRecord::Migration[7.1]
+  tag :predeploy
+  def change
+    add_column :group_categories, :self_signup_end_at, :datetime
   end
 end

@@ -28,6 +28,7 @@ describe "Group Categories API", type: :request do
       "name" => category.name,
       "role" => category.role,
       "self_signup" => category.self_signup,
+      "self_signup_end_at" => category.self_signup_end_at,
       "context_type" => category.context_type,
       "#{category.context_type.downcase}_id" => category.context_id,
       "created_at" => category.created_at.iso8601,

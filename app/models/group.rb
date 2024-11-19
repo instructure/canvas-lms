@@ -169,8 +169,9 @@ class Group < ActiveRecord::Base
 
   def allow_self_signup?(user)
     group_category &&
-      (group_category.unrestricted_self_signup? ||
-        (group_category.restricted_self_signup? && has_common_section_with_user?(user)))
+      (!group_category.past_self_signup_end_at? &&
+        (group_category.unrestricted_self_signup? ||
+          (group_category.restricted_self_signup? && has_common_section_with_user?(user))))
   end
 
   def full?

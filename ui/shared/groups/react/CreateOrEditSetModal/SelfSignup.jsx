@@ -25,8 +25,9 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconQuestionLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {func, string} from 'prop-types'
+import {bool, func, string} from 'prop-types'
 import {GroupContext} from './context'
+import SelfSignupEndDate from './SelfSignupEndDate'
 
 const I18n = useI18nScope('groups')
 
@@ -39,19 +40,23 @@ const HelpText = () => (
     </p>
     <p>
       {I18n.t(
-        'Note that as long as this option is enabled, students can move themselves from one group to another.'
+        'With this option enabled, students can move themselves from one group to another. However, you can set an end date to close self sign-up to prevent students from joining or changing groups after a certain date.'
       )}
     </p>
   </div>
 )
 
-export const SelfSignup = ({onChange, direction}) => {
+export const SelfSignup = ({onChange, selfSignupEndDateEnabled = false, endDateOnChange, direction}) => {
   const {selfSignup, bySection} = useContext(GroupContext)
 
   function handleChange(key, val) {
     const result = {selfSignup, bySection}
     result[key] = val
     onChange(result)
+  }
+
+  const handleEndDateUpdate = (value) => {
+    endDateOnChange(value)
   }
 
   return (
@@ -93,6 +98,11 @@ export const SelfSignup = ({onChange, direction}) => {
             }}
           />
         </View>
+        {selfSignup && selfSignupEndDateEnabled && (
+          <View display="block" padding="x-small x-small">
+            <SelfSignupEndDate onDateChange={handleEndDateUpdate} />
+          </View>
+        )}
       </Flex.Item>
     </Flex>
   )
@@ -100,5 +110,7 @@ export const SelfSignup = ({onChange, direction}) => {
 
 SelfSignup.propTypes = {
   onChange: func.isRequired,
+  selfSignupEndDateEnabled: bool,
+  endDateOnChange: func,
   direction: string,
 }

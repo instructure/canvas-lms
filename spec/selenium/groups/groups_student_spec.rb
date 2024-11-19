@@ -177,6 +177,42 @@ describe "student groups" do
         # Fourth student should remain group leader
         expect(fj(".group[data-id=\"#{@testgroup[0].id}\"] .group-leader:contains(\"#{@students[3].name}\")")).to be_displayed
       end
+
+      it "does not allow a user to leave the group if the self sign-up end date has passed" do
+        group_test_setup(1, 1, 1)
+        category = @group_category.first
+        category.configure_self_signup(true, false)
+        category.self_signup_end_at = 1.day.ago.utc
+        category.save!
+        add_user_to_group(@students[0], @testgroup.first, false)
+
+        user_session(@students[0])
+        get "/courses/#{@course.id}/groups"
+
+        f(".student-group-header .icon-mini-arrow-right").click
+        wait_for_ajaximations
+
+        expect(f('div[role="list"]')).to include_text(@students[0].name.to_s)
+        expect(f(".student-group-join")).not_to include_text("Leave")
+      end
+
+      it "does not allow a user to join the group if the self sign-up end date has passed" do
+        group_test_setup(2, 1, 1)
+        category = @group_category.first
+        category.configure_self_signup(true, false)
+        category.self_signup_end_at = 1.day.ago.utc
+        category.save!
+        add_user_to_group(@students[0], @testgroup.first, false)
+
+        user_session(@students[1])
+        get "/courses/#{@course.id}/groups"
+
+        f(".student-group-header .icon-mini-arrow-right").click
+        wait_for_ajaximations
+
+        expect(f('div[role="list"]')).to include_text(@students[0].name.to_s)
+        expect(f(".icon-lock")).to be_displayed
+      end
     end
 
     describe "student group index page" do
