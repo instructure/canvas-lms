@@ -179,27 +179,41 @@ module Lti
         # expect(json.detect {|j| j.key?('name') && j.key?('domain')}).not_to be_nil
       end
 
-      # Some tools like arc, gauge have visibility settings on global_navigation placements.
-      # For global_navigation we want to return all the launches, even if we are unsure what
-      # visibility the user should have access to.
-      it "returns global_navigation launches for a student even when visibility should not allow it" do
-        course_with_student(active_all: true, user: user_with_pseudonym, account:)
+      describe "student visiblity of global_navigation launches" do
+        before do
+          course_with_student(active_all: true, user: user_with_pseudonym, account:)
 
-        tool = new_valid_external_tool(@course.root_account)
-        tool.global_navigation = {
-          text: "Global Nav",
-          visibility: "admins"
-        }
-        tool.save!
+          @tool = new_valid_external_tool(@course.root_account)
+          @tool.global_navigation = {
+            text: "Global Nav",
+            visibility: "admins"
+          }
+          @tool.save!
+        end
 
-        json = api_call(:get,
-                        "/api/v1/accounts/#{account.id}/lti_apps/launch_definitions",
-                        { controller: "lti/lti_apps", action: "launch_definitions", account_id: account.id.to_param, format: "json" },
-                        placements: ["global_navigation"])
+        # Some tools like arc, gauge have visibility settings on global_navigation placements.
+        # For global_navigation we want to return all the launches, even if we are unsure what
+        # visibility the user should have access to.
+        it "returns global_navigation launches for a student even when visibility should not allow it" do
+          json = api_call(:get,
+                          "/api/v1/accounts/#{account.id}/lti_apps/launch_definitions",
+                          { controller: "lti/lti_apps", action: "launch_definitions", account_id: account.id.to_param, format: "json" },
+                          placements: ["global_navigation"])
 
-        expect(response).to have_http_status :ok
-        expect(json.count).to eq 1
-        expect(json.first["definition_id"]).to eq tool.id
+          expect(response).to have_http_status :ok
+          expect(json.count).to eq 1
+          expect(json.first["definition_id"]).to eq @tool.id
+        end
+
+        it "does not ignore visibility on global_navigation launches if only_visible is given" do
+          json = api_call(:get,
+                          "/api/v1/accounts/#{account.id}/lti_apps/launch_definitions?only_visible=true",
+                          { controller: "lti/lti_apps", action: "launch_definitions", account_id: account.id.to_param, format: "json", only_visible: "true" },
+                          placements: ["global_navigation"])
+
+          expect(response).to have_http_status :ok
+          expect(json).to be_empty
+        end
       end
 
       it "includes additional information for global navigation placements" do

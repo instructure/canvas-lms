@@ -30,7 +30,7 @@ export type ExternalTool = {
 
 export const getExternalApps = async (): Promise<ExternalTool[]> => {
   const {data: tools} = await axios.get(
-    `/api/v1/accounts/${window.ENV.ACCOUNT_ID}/lti_apps/launch_definitions?per_page=50&placements[]=global_navigation`
+    `/api/v1/accounts/${window.ENV.ACCOUNT_ID}/lti_apps/launch_definitions?per_page=50&placements[]=global_navigation&only_visible=true`
   )
   if (!Array.isArray(tools)) return []
   return tools
