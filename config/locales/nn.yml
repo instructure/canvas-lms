@@ -4876,6 +4876,8 @@ nn:
   author_s_name_b35e905a: "Forfattaren sitt namn"
   author_sis_id_b59b62af: author_sis_id
   authorize_e3f25bb4: Autoriser
+  authorize_google_drive_8ad056d5: "Godkjenn Google Drive"
+  authorize_google_drive_access_aefcf8d6: "Autoriser Google Drive-tilgang"
   authorize_url_f28167a3: "Godkjenn URL"
   auto_leader_7791c30a: auto_leader
   auto_show_closed_captions_e4cd7aff: "Vis undertekstar automatisk"
@@ -9746,6 +9748,7 @@ nn:
       i Canvas Data tenesteverktøyet
   differentiated_modules_5e2377d7: "Differensierte modular"
   diigo_993c4646: Diigo
+  diigo_is_a_social_bookmarking_tool_tailored_specif_1bff1643: "Diigo er eit sosialt bokmerkings-verktøy som er utforma spesielt for forsking og utdanning. Redigeringsprogrammet i Canvas gjer at du kan søke etter Diigo-taggar og enkelt legge til lenker frå Canvas til ressursar som er nyttige for deg."
   direct_share_80afd4a7: "Direct Share"
   disableWhileLoading: 
     loading: Lastar...
@@ -18834,6 +18837,7 @@ nn:
       Framtidige resultatendringar for vurderingar som allereie er posta, treng ikkje å postast manuelt.
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "Med ein gong ei vurdering er posta manuelt sendast det automatisk eit varsel og den er synleg for studentane."
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "Når denne funksjonen er slått på, kan den ikkje slåast av igjen. Ver sikker på at du er klar for å aktivere innleveringsmappa før du går vidare. "
+  once_you_authorize_us_to_see_your_google_drive_you_9c4b2261: "Når du har gitt tilgang til Google Drive, kan du levere inn oppgåvene direkte frå Google Drive og opprette og dele dokument med medlemmar i seksjonane."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Når du har levert eit svar, kan du ikkje endre på det seinare. Du kan ikkje lenger sjå førre spørsmål."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Når du byrjar å feilsøke blir all informasjon om neste SAML-påloggingsforsøk samla inn. Klikk på \"Oppdater\" for å sjå om det er samla inn fleire data, eller klikk på \"Stopp feilsøking\" for å fjerne innsamla data og stoppe gjeldande feilsøkingsforsøk."
   one_or_more_content_items_sent_by_this_external_ap_76a5ba2a: "Eitt eller fleire innhaldselement sende av denne eksterne appen vart ikkje behandla på riktig måte. Desse har ikkje vorte lagra av Canvas, og årsakene til feilen er oppført nedanfor."
@@ -22251,6 +22255,7 @@ nn:
   register_app_a8aaabdf: "Registrer app"
   register_communication_ae935328: "Registrer kommunikasjon"
   register_email_efc06d59: "Registrer e-post"
+  register_skype_d5e2b3d3: "Registrer Skype"
   register_slack_email_1f6d7e6d: "Registrer Slack-epost"
   register_sms_7f87e50d: "Registrer SMS"
   register_tool_84de3186: "Registrer verktøyet"
@@ -22942,12 +22947,14 @@ nn:
   save_key_b4dede06: "Lagre nøkkel"
   save_label_6ed4a68e: "Lagre etiketten"
   save_learning_mastery_82889d8b: "Lagre meistringsbasert læring"
+  save_login_bba1272: "Lagre pålogging"
   save_mastery_calculation_84fbeb0f: "Lagre ekspertiseberekning"
   save_mastery_scale_2b4dc13a: "Lagre ekspertisenivå"
   save_name_796fa6a2: "Lagre \"%{name}\""
   save_publish_36440725: "Lagre og publiser"
   save_rubric_1e4f6a44: "Lagre vurderingsskjema"
   save_settings_cafe79a5: "Lagre innstillingar"
+  save_skype_name_4de35a9: "Lagre Skype-namn"
   save_successful_b2f64da4: Lagra
   save_theme_36c73e6a: "Lagre tema"
   save_theme_f706116e: "Lagre tema"
@@ -24748,6 +24755,8 @@ nn:
   skipped_file_filename_due_to_error_94f0194: "Hoppa over fila %{filename} på grunn av feil"
   skipping_unknown_file_type_cd1086ee: "Hoppar over ukjent filtype"
   skype_18850ba7: Skype
+  skype_name_9eb890df: Skype-namn
+  skype_offers_free_online_voice_and_video_calls_lot_35295baa: "Skype tilbyr gratis nettbaserte tale- og videosamtalar. Mange studentar brukar Skype som ein gratis og enkel måte å kommunisere på. Dersom du registrerer Skype-namnet og aktiverer synlegheit, kan andre studentar enkelt finne deg og kontakte deg på Skype."
   slack_1130ad43: Slack
   slack_api_key_92f0c667: Slack-API-nøkkel
   slack_email_9204e2ea: Slack-epost
