@@ -1341,7 +1341,10 @@ EditView.prototype.getFormData = function () {
   data = this._filterAllowedExtensions(data)
   data = this._unsetGroupsIfExternalTool(data)
   data.ab_guid = this.assignment.get('ab_guid')
-  if (!(typeof ENV !== 'undefined' && ENV !== null ? ENV.IS_LARGE_ROSTER : void 0)) {
+  if (
+    this.groupCategorySelector &&
+    !(typeof ENV !== 'undefined' && ENV !== null ? ENV.IS_LARGE_ROSTER : void 0)
+  ) {
     data = this.groupCategorySelector.filterFormData(data)
   }
   if (!data.post_to_sis) {
@@ -1534,7 +1537,10 @@ EditView.prototype.validateBeforeSave = function (data, errors) {
   errors = this.assignmentGroupSelector.validateBeforeSave(data, errors)
   Object.assign(errors, this.validateFinalGrader(data))
   Object.assign(errors, this.validateGraderCount(data))
-  if (!(typeof ENV !== 'undefined' && ENV !== null ? ENV.IS_LARGE_ROSTER : void 0)) {
+  if (
+    this.groupCategorySelector &&
+    !(typeof ENV !== 'undefined' && ENV !== null ? ENV.IS_LARGE_ROSTER : void 0)
+  ) {
     errors = this.groupCategorySelector.validateBeforeSave(data, errors)
   }
   errors = this._validatePointsPossible(data, errors)

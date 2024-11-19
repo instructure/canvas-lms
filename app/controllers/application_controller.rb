@@ -324,6 +324,7 @@ class ApplicationController < ActionController::Base
         @js_env[:LOCALE_TRANSLATION_FILE] = ::Canvas::Cdn.registry.url_for("javascripts/translations/#{@js_env[:LOCALES].first}.json")
         @js_env[:ACCOUNT_ID] = effective_account_id(@context)
         @js_env[:user_cache_key] = Base64.encode64("#{@current_user.uuid}vyfW=;[p-0?:{P_=HUpgraqe;njalkhpvoiulkimmaqewg") if @current_user&.workflow_state
+        @js_env[:horizon_course] = @context.is_a?(Course) && @context.account.feature_enabled?(:horizon_course_setting) && @context.horizon_course?
         @js_env[:top_navigation_tools] = external_tools_display_hashes(:top_navigation) if !!@domain_root_account&.feature_enabled?(:top_navigation_placement)
         @js_env[:horizon_course] = @context.is_a?(Course) && @context.horizon_course?
         # partner context data
