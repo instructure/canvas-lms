@@ -763,12 +763,28 @@ describe "context modules" do
       modules[0].add_item({ id: @topic.id, type: "discussion_topic" })
     end
 
+    it "shows checkpoints with a submitted icon only when student has submitted" do
+      rtt = @topic.discussion_entries.create!(user: @student, message: "my reply to topic")
+      2.times do |i|
+        @topic.discussion_entries.create!(
+          user: @student, message: "my reply to entry #{i}", parent_entry: rtt
+        )
+      end
+      user_session(@student)
+      go_to_modules
+      checkpoints = ff("div[data-testid='checkpoint']")
+      expect(checkpoints[0].text).to include("submitted")
+      expect(checkpoints[1].text).to include("submitted")
+    end
+
     it "shows checkpoints (with applicable override for student) as child items in checkpointed discussions" do
       user_session(@student)
       go_to_modules
       checkpoints = ff("div[data-testid='checkpoint']")
       expect(checkpoints[0].text).to include("Reply to Topic\n#{datetime_string(@c1.overridden_for(@student).due_at)}")
+      expect(checkpoints[0].text).not_to include("submitted")
       expect(checkpoints[1].text).to include("Required Replies (#{@topic.reply_to_entry_required_count})\n#{datetime_string(@c2.overridden_for(@student).due_at)}")
+      expect(checkpoints[1].text).not_to include("submitted")
     end
 
     it "shows checkpoints (with default due date only when applicable) as child items in checkpointed discussions" do
