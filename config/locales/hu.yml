@@ -4427,6 +4427,8 @@ hu:
   author_s_name_b35e905a: "Szerző neve"
   author_sis_id_b59b62af: author_sis_id
   authorize_e3f25bb4: Engedélyezés
+  authorize_google_drive_8ad056d5: "Google Drive engedélyezése"
+  authorize_google_drive_access_aefcf8d6: "Google Drive-fiókhoz való hozzáférés engedélyezése"
   authorize_url_f28167a3: "Hitelesített URL"
   auto_leader_7791c30a: auto_leader
   auto_provision_new_quizzes_if_flagged_root_account_a19fbf5b: "Új kvízek automatikus biztosítása a megjelölt gyökérfiókokon."
@@ -8991,6 +8993,7 @@ hu:
   didn_t_find_what_you_are_looking_for_keep_trying_ee5b508c: "Nem találta, amit keres? Próbálkozzon!"
   different_course_b875770e: "másik kurzus"
   diigo_993c4646: Diigo
+  diigo_is_a_social_bookmarking_tool_tailored_specif_1bff1643: "A Diigo egy közösségi könyvjelzőeszköz kifejezetten kutatási és oktatási célra. A Canvas vizuális szövegszerkesztője segítségével keresést indíthat a Diigo címkéi között, hogy Canvasról más hasznos külső forrásra hivatkozhasson."
   direct_share_80afd4a7: "Közvetlen megosztás"
   disableWhileLoading: 
     loading: Betöltés...
@@ -17509,6 +17512,7 @@ hu:
       Ha egy osztályzatot manuálisan küldenek be, automatikusan új értesítések lesznek küldve,
                                     és láthatóvá válik a hallgatók számára.
   once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "Ha engedélyezve van, ez az opció látható az oktatók számára az osztálynaplóban."
+  once_you_authorize_us_to_see_your_google_drive_you_9c4b2261: "Amint engedélyezi, hogy lássuk az Ön Google Drive-ját, be tudja adni a beadandóit közvetlenül Google Drive-on keresztül, valamint készíthet és megoszthat dokumentumokat a csoporttársaival."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Ha egyszer elküldött egy választ, akkor később nem fogja tudni módosítani. Nem fogja tudni megnézni az előző kérdést."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: " A hibakeresés megkezdése után a következő bejelentkezési kísérletre vonatkozó összes\n\
       \x20                             információ összegyűjtésre kerül. "
@@ -20822,6 +20826,7 @@ hu:
   register_app_a8aaabdf: "Alkalmazás regisztrálása"
   register_communication_ae935328: "Kommunikáció regisztrálása"
   register_email_efc06d59: "E-mail regisztrációja"
+  register_skype_d5e2b3d3: "Skype regisztrálása"
   register_slack_email_1f6d7e6d: "Slack Email Regisztráció"
   register_sms_7f87e50d: "SMS regisztrálása"
   register_tool_84de3186: "Eszköz regisztrálása"
@@ -21487,12 +21492,14 @@ hu:
   save_grading_period_set_e029fa88: "Osztályzási időszak mentése"
   save_key_b4dede06: "Kulcs mentése"
   save_learning_mastery_82889d8b: "Tanulási jártasság mentése"
+  save_login_bba1272: "Bejelentkezési adatok mentése"
   save_mastery_calculation_84fbeb0f: "Jártassági számítás mentése"
   save_mastery_scale_2b4dc13a: "Jártassági számítás mentése"
   save_name_796fa6a2: "\"%{name} mentése\""
   save_publish_36440725: "Mentés és publikálás"
   save_rubric_1e4f6a44: "Értékelőtábla mentése"
   save_settings_cafe79a5: "Beállítások mentése"
+  save_skype_name_4de35a9: "Skype-név mentése"
   save_successful_b2f64da4: "Mentés sikeres."
   save_theme_36c73e6a: "Téma mentése"
   save_theme_f706116e: "Téma mentése"
@@ -23107,6 +23114,8 @@ hu:
   skipped_file_filename_due_to_error_94f0194: "%{filename} fájlhiba miatt kihagyva"
   skipping_unknown_file_type_cd1086ee: "Ismeretlen fájltípus kihagyása"
   skype_18850ba7: Skype
+  skype_name_9eb890df: Skype-azonosító
+  skype_offers_free_online_voice_and_video_calls_lot_35295baa: "A Skype ingyen hang- és videóhívásokat kínál. Számos hallgató használja a Skype-ot, mint a kommunikáció ingyenes és egyszerű módját. Ha regisztrálja a Skype-nevét, és engedélyezi a láthatóságot, akkor a hallgatók könnyedén megtalálhatják, és hívhatják, vagy hozzáadhatják a kapcsolatlistájukhoz. "
   slack_api_key_92f0c667: "Laza API kulcs"
   slack_email_9204e2ea: "Slack e-mail"
   slack_notifications_3a0288e6: "Slack értesítések"

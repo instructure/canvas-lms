@@ -3416,6 +3416,8 @@ he:
   author_215203d2: מחבר/ת
   author_s_name_b35e905a: "שם המחבר"
   authorize_e3f25bb4: הרשאה
+  authorize_google_drive_8ad056d5: "הרשאת גוגל דרייב"
+  authorize_google_drive_access_aefcf8d6: "הרשאת גישה לגוגל דרייב"
   auto_leader_7791c30a: auto_leader
   automatically_apply_deduction_to_late_submissions_2b68166e: "הפעלה אוטומטית של קנס על הגשות מאוחרות"
   automatically_apply_grade_for_missing_submissions_2b5c1a72: "מתן ציון אוטומטי להגשות חסרות"
@@ -7056,6 +7058,7 @@ he:
     saving: שומר...
   different_course_b875770e: "קורס שונה"
   diigo_993c4646: דייגו
+  diigo_is_a_social_bookmarking_tool_tailored_specif_1bff1643: "דייגו הנו כלי סימניות חברתי שעוצב במיוחד למטרות מחקר והוראה. עורך התוכן העשיר של קנבס יאפשר לך לחפש את תגי דייגו שלך כדי לקשר בקלות מתוך קנבס אל מקורות שימצאו מועילים,"
   disableWhileLoading: 
     loading: "בטעינה... "
   disable_a5c05db3: השבתה
@@ -13763,6 +13766,7 @@ he:
   on_time_17ca5ad9: בזמן
   on_time_percent_eebffe38: "בזמן: %{percent}"
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "היה ותכונה זו תשופעל, לא ניתן יהיה יותר לכבותה. יש לוודא שאכן אתם מוכנים לשפעל את תיקיית ההגשות לפני שממשיכים בתהליך."
+  once_you_authorize_us_to_see_your_google_drive_you_9c4b2261: "ברגע שנקבל הרשאה לראות את תוכן גוגל דרייב שלך ניתן יהיה להגיש משימות ישירות מגוגל דוקס, ולייצר ולשתף מסמכים עם חברים בכתותיך."
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "ברגע ששינית תשובה יש לבחור באפשרות לפני שמעדכנים את השאלה."
   one_or_more_items_are_currently_being_imported_the_186fe069: "פריט אחד או יותר מיובאים ברגעים אלה. הם יוצגו בקורס שבהמשך מיד כשהם זמינים"
   one_per_line_format_name_value_79647700: "אחד לשורה. הפורמט: שם=ערך"
@@ -16742,6 +16746,7 @@ he:
   region_939f2a6c: אזור
   register_communication_ae935328: "רישום תקשורת"
   register_email_efc06d59: "רישום כתובת דוא\"ל"
+  register_skype_d5e2b3d3: "רישום סקייפ"
   register_sms_7f87e50d: "רישום מערכת המסרונים"
   register_tool_84de3186: "רישום כלי"
   registration: 
@@ -17125,8 +17130,10 @@ he:
   save_grading_period_daaaddea: "שמירת תקופת הערכה"
   save_grading_period_set_e029fa88: "שמירת אוגדן תקופות הערכה"
   save_key_b4dede06: "שמירת מפתח"
+  save_login_bba1272: "שמירת לוג-אין"
   save_publish_36440725: "שמירה ופרסום"
   save_settings_cafe79a5: "שמירת הגדרות"
+  save_skype_name_4de35a9: "שמירת שם סקייפ"
   save_theme_f706116e: "שמירת ערכת נושא"
   save_your_type_to_begin_specifying_conditional_con_9e4f536a: "שמירת %{type} שלך כדי להתחיל להגדיר את התוכן המותנה."
   saving_associations_989bd4da: "שמירת פריטים נלווים"
@@ -18470,6 +18477,8 @@ he:
   skipped_file_filename_due_to_error_94f0194: "דילוג על קובץ %{filename} כתוצאה משגיאה"
   skipping_unknown_file_type_cd1086ee: "דילוג על סוג קובץ לא ידוע"
   skype_18850ba7: סקייפ
+  skype_name_9eb890df: "שם סקייפ"
+  skype_offers_free_online_voice_and_video_calls_lot_35295baa: "סקייפ מציעה שיחות קוליות ווידאו מקוונות. תלמידים רבים משתמשים בסקייפ חינם, כדרך פשוטה לתקשר. אם תרשום את שם הסקייפ שלך ותאפשר ניראות, תלמידים אחרים יוכלו בקלות למצוא אותך ולתקשר או להוסיפך בסקייפ."
   slideshow: 
     titles: 
       back: חזרה
