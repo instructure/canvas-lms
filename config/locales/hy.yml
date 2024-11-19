@@ -2824,6 +2824,8 @@ hy:
   authnresponse_from_idp_185037e9: "IdP-ից ստացված իսկության հաստատման պատասխան"
   author_215203d2: Հեղինակ
   authorize_e3f25bb4: Թույլատրել
+  authorize_google_drive_8ad056d5: "Թույլատրել Google Drive"
+  authorize_google_drive_access_aefcf8d6: "Թույլատրել Google Drive հասանելիությունը"
   automatically_assign_a_student_group_leader_29448649: "Ավտոմատ կերպով նշանակել ուսանողական խմբի ղեկավարին"
   available_8606e40c: Հասանելի
   available_after_unlock_at_b5682224: "Հասանելի է %{unlock_at}-ից հետո"
@@ -5919,6 +5921,7 @@ hy:
   different_course_b875770e: "այլ դասընթաց"
   differentiated_assignments_description: "Տարբերակված առաջադրանքները հանդիսանում են *բետա* ֆունկցիա, որը հնարավորություն է տալիս ընտրել, թե հանձնարարությունը որ բաժին(ներ)ին է առնչվում: Այն բաժին(ներ)ին, որոնց գծով հանձնարարություն չի տրված, չեն ներառվելու դասընթացի բովանդակության մեջ և ուսանողների վերջնական գնահատականը կհաշվարկվի առանց այդ միավորների:"
   diigo_993c4646: Diigo
+  diigo_is_a_social_bookmarking_tool_tailored_specif_1bff1643: "Diigo-ն էջանշանների հետ աշխատելու գործիք է, որ նախատեսված է ուսումնասիրությունների և կրթության համար: Canvas-ի մուլտիմեդիա բովանդակության խմբագիրը ձեզ հնարավորություն կտա որոնելու ձեր Diigo պիտակները՝ հեշտորեն կապվելու Canvas-ի և ձեզ համար օգտակար այլ ռեսուրսների հետ:"
   disableWhileLoading: 
     loading: "Բեռնում է..."
   disable_a5c05db3: Անջատել
@@ -11668,6 +11671,7 @@ hy:
   on_paper_46d0ba36: "Թղթային տարբերակով"
   on_paper_87119532: "Թղթի վրա"
   on_time_percent_eebffe38: "Ժամանակին՝ %{percent}"
+  once_you_authorize_us_to_see_your_google_drive_you_9c4b2261: "Ձեր Google Drive-ը տեսնելու թույլտվություն տալուց հետո Դուք կարող եք ուղարկել Ձեր հանձնարարությունները անմիջապես Google Drive-ից, ստեղծել և Ձեր դասընթացի անդամների հետ համատեղ օգտագործել փաստաթղթերը:  "
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Պատասխանը փոխելուց հետո դուք պետք է ընտրեք տարբերակ՝ նախքան հարցը թարմացնելը:"
   one_or_more_items_are_currently_being_imported_the_186fe069: "Մեկ կամ մի քանի տարրեր ներկայումս ներմուծվում են: Հասանելի լինելուն պես դրանք անմիջապես տեսանելի կլինեն այս դասընթացում: "
   one_per_line_format_name_value_79647700: "Մեկ տողին՝ մեկը: Ֆորմատ՝ անուն=մեծություն"
@@ -14421,6 +14425,7 @@ hy:
   region_939f2a6c: Տարածաշրջան
   register_communication_ae935328: "Գրանցել կապի տեսակը"
   register_email_efc06d59: "Էլեկտրոնային փոստի գրանցում"
+  register_skype_d5e2b3d3: "Գրանցում Skype-ում"
   register_sms_7f87e50d: "SMS գրանցում"
   register_tool_84de3186: "Գրանցել գործիքը"
   registration: 
@@ -14756,7 +14761,9 @@ hy:
   sample_data_e4fd01ff: "Ընտրանքային տվյալներ"
   save_11a80ec3: Պահպանել
   save_key_b4dede06: "Պահպանել բանալին"
+  save_login_bba1272: "Պահպանել մուտքի տվյալները"
   save_settings_cafe79a5: "Պահպանել կարգաբերումները"
+  save_skype_name_4de35a9: "Պահպանել Skype անունը"
   saving_d55dd90e: "Պահպանվում է..."
   saving_recording_e111cb05: "Ձայնագրառումը պահպանվում է..."
   schedule_student_availability_332154a: "Սահմանել ունկնդիրների հասանելիության ժամանակացույց"
@@ -15946,6 +15953,8 @@ hy:
   skipped_file_filename_due_to_error_94f0194: "բաց է թողնված ֆայլը %{filename} սխալի պատճառով"
   skipping_unknown_file_type_cd1086ee: "Բացթողնել անհայտ տեսակի ֆայլ"
   skype_18850ba7: Skype
+  skype_name_9eb890df: "Skype անունը"
+  skype_offers_free_online_voice_and_video_calls_lot_35295baa: "Skype առաջարկում է անվճար առցանց ձայնային և տեսաձայնային զանգեր: Շատ ունկնդիրներ օգտագործում են Skype որպես հաղորդակցության անվճար, հեշտ միջոց: Եթե գրանցեք ձեր անունը Skypy-ում և ակտիվացնեք տեսանելիությունը, ապա մյուս ունկնդիրները կարող են հեշտորեն գտնել ձեր կապի տվյալները և զանգել կամ ավելացնել ձեզ Skype-ի օգնությամբ: "
   slideshow: 
     titles: 
       back: Վերադառնալ
