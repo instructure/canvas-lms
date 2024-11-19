@@ -37,7 +37,9 @@ const DEFAULT_CONTENT = {
     isCanvas: true,
     props: {},
     displayName: 'Page',
-    custom: {},
+    custom: {
+      isDefaultPage: true,
+    },
     hidden: false,
     nodes: [],
     linkedNodes: {},

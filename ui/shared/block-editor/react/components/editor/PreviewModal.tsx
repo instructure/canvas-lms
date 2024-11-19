@@ -369,7 +369,7 @@ const PreviewModal = ({open, onDismiss}: PreviewModalProps) => {
         <View
           as="div"
           position="relative"
-          className={`block-editor-view ${viewSize}`}
+          className={`block-editor-previewview ${viewSize}`}
           padding="0"
           margin="0 auto"
           width={getViewWidth(viewSize)}
@@ -380,9 +380,9 @@ const PreviewModal = ({open, onDismiss}: PreviewModalProps) => {
               __html: `${frames[viewSize].clippath}${frames[viewSize].frame}`,
             }}
           />
-          <div style={viewStyle()}>
+          <div style={viewStyle()} className="block-editor-view">
             <BlockEditorView
-              content={{version: LATEST_BLOCK_DATA_VERSION, blocks: query.serialize()}}
+              content={{version: LATEST_BLOCK_DATA_VERSION, blocks: JSON.parse(query.serialize())}}
             />
           </div>
         </View>

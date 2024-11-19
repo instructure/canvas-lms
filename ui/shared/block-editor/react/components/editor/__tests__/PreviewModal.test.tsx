@@ -46,7 +46,7 @@ describe('PreviewModal', () => {
     )
 
     expect(getByText('Desktop').closest('button')).toHaveAttribute('aria-current', 'true')
-    const view = document.querySelector('.block-editor-view.desktop')
+    const view = document.querySelector('.block-editor-previewview.desktop')
     expect(view).toBeInTheDocument()
     expect(view).toHaveStyle({width: getViewWidth('desktop')})
   })
@@ -63,7 +63,7 @@ describe('PreviewModal', () => {
     tabletButton.click()
 
     expect(tabletButton).toHaveAttribute('aria-current', 'true')
-    const view = document.querySelector('.block-editor-view.tablet')
+    const view = document.querySelector('.block-editor-previewview.tablet')
     expect(view).toBeInTheDocument()
     expect(view).toHaveStyle({width: getViewWidth('tablet')})
   })
@@ -80,7 +80,7 @@ describe('PreviewModal', () => {
     mobileButton.click()
 
     expect(mobileButton).toHaveAttribute('aria-current', 'true')
-    const view = document.querySelector('.block-editor-view.mobile')
+    const view = document.querySelector('.block-editor-previewview.mobile')
     expect(view).toBeInTheDocument()
     expect(view).toHaveStyle({width: getViewWidth('mobile')})
   })

@@ -46,7 +46,7 @@ jest.mock('@craftjs/core', () => {
           },
         },
         query: {
-          serialize: () => '',
+          serialize: () => '{}',
         },
       }
     }),
