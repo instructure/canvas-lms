@@ -100,7 +100,6 @@ function SearchableSelect(props) {
   useEffect(() => {
     setMatcher(new RegExp(''))
     setSelectedOptionId(null)
-    setIsShowingOptions(false)
     setSearchResultMessage(true)
     if (!value || inputValue) return
     const initialValue = options.find(i => i.value === value)
