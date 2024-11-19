@@ -1300,6 +1300,7 @@ Assignment.prototype.toView = function () {
     'unlockAt',
     'vericiteAvailable',
     'vericiteEnabled',
+    'isHorizonCourse',
   ]
   const hash = {
     id: this.get('id'),
@@ -1733,4 +1734,9 @@ Assignment.prototype.getCheckpointGroup = function (checkpoint) {
 
   return 'past'
 }
+
+Assignment.prototype.isHorizonCourse = function () {
+  return ENV.horizon_course
+}
+
 export default Assignment
