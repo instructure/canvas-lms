@@ -257,7 +257,7 @@ import type {EnvGradebookCommon} from '@canvas/global/env/EnvGradebook'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {TotalGradeOverrideTrayProvider} from './components/TotalGradeOverrideTray'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {RubricAssessmentImportTray} from './RubricAssessmentImport/RubricAssessmentImportTray'
+import {RubricAssessmentImport} from './RubricAssessmentImport'
 import {RubricAssessmentExportModal} from './RubricAssessmentExport/RubricAssessmentExportModal'
 
 const I18n = useI18nScope('gradebook')
@@ -5396,11 +5396,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         )}
 
         {this.options.rubric_assessment_imports_exports_enabled && (
-          <RubricAssessmentImportTray
-            currentImports={[]}
-            onClickImport={() => {}}
-            onImport={() => {}}
-          />
+          <QueryProvider>
+            <RubricAssessmentImport />
+          </QueryProvider>
         )}
 
         {this.options.rubric_assessment_imports_exports_enabled && (
