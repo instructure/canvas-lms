@@ -152,6 +152,33 @@ describe "Excuse an Assignment" do
       expect(f("#combo_box_container .ui-selectmenu-item-icon i")).to have_class "icon-check"
       expect(f("#combo_box_container .ui-selectmenu-item-header").text).to eq "Student"
     end
+
+    it "excuses a checkpointed discussion correctly", :ignore_js_errors do
+      user_session(@teacher)
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      reply_to_topic, reply_to_entry, dt = graded_discussion_topic_with_checkpoints(context: @course)
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{dt.assignment.id}&student_id=#{@student.id}"
+
+      expect(reply_to_topic.submissions.find_by(user: @student).excused).to be_nil
+      expect(reply_to_entry.submissions.find_by(user: @student).excused).to be_nil
+
+      reply_to_topic_select = f("[data-testid='reply_to_topic-checkpoint-status-select']")
+      reply_to_topic_select.click
+      fj("span[role='option']:contains('Excused')").click
+
+      reply_to_entry_select = f("[data-testid='reply_to_entry-checkpoint-status-select']")
+      reply_to_entry_select.click
+      fj("span[role='option']:contains('Excused')").click
+
+      expect(reply_to_topic.submissions.find_by(user: @student).excused).to be true
+      expect(reply_to_entry.submissions.find_by(user: @student).excused).to be true
+
+      driver.navigate.refresh
+
+      expect(f("[data-testid='reply_to_topic-checkpoint-status-select']")).to have_attribute("value", "Excused")
+      expect(f("[data-testid='reply_to_entry-checkpoint-status-select']")).to have_attribute("value", "Excused")
+    end
   end
 
   shared_examples "Basic Behavior" do |view|
