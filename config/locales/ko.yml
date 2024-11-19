@@ -5052,6 +5052,7 @@ ko:
     save_settings: "설정 저장"
     saving: "저장 중..."
   diigo_993c4646: Diigo
+  diigo_is_a_social_bookmarking_tool_tailored_specif_1bff1643: "Diigo는 연구와 교육에 특화된 소셜 북마크 도구입니다. Canvas의 서식있는 내용 편집기에서는 Canvas에서 유용한 리소스로 쉽게 연결할 수 있도록 Diigo 태그를 검색할 수 있습니다."
   disableWhileLoading: 
     loading: "로드하는 중..."
   disable_a5c05db3: "사용 안 함"
@@ -11976,6 +11977,7 @@ ko:
   regenerating_token_42e5c747: "토큰 다시 생성 중..."
   register_communication_ae935328: "통신 등록"
   register_email_efc06d59: "이메일 등록"
+  register_skype_d5e2b3d3: "Skype 등록"
   register_sms_7f87e50d: "SMS 등록"
   registration: 
     get_started: 시작하기
@@ -12245,7 +12247,9 @@ ko:
   running_totals_d6f45b6b: "누적 합계"
   save_11a80ec3: 저장
   save_key_b4dede06: "키 저장"
+  save_login_bba1272: "로그인 저장"
   save_settings_cafe79a5: "설정 저장"
+  save_skype_name_4de35a9: "Skype 이름 저장"
   saving_d55dd90e: "저장 중..."
   scheduler_65b5ac91: "일정 관리"
   scheduling_5a3327e7: 일정
@@ -13205,6 +13209,8 @@ ko:
   size_b30e1077: 크기
   size_size_a77bd760: "크기: %{size}"
   skype_18850ba7: Skype
+  skype_name_9eb890df: "Skype 이름"
+  skype_offers_free_online_voice_and_video_calls_lot_35295baa: "Skype는 무료 온라인 음성 및 화상 통화를 제공합니다. 많은 학생이 Skype를 손쉬운 의사소통 방법으로 사용하고 있습니다. Skype 이름을 등록하고 표시하도록 설정하면 다른 학생이 연락처를 쉽게 찾아 Skype에 추가하거나 통화할 수 있습니다."
   slideshow: 
     titles: 
       back: 뒤로
