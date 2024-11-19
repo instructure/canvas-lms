@@ -482,6 +482,7 @@ const jsonFetchMessages = (state: RegistrationWizardModalState): Array<FormMessa
      */
     const configurationError =
       errorType === 'InvalidJson' || (errorType === 'ApiError' && jsonFetch.result.status === 422)
+
     return [
       {
         text: configurationError

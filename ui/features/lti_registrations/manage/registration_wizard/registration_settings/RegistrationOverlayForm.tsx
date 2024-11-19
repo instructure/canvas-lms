@@ -76,7 +76,7 @@ export const RegistrationOverlayForm = (props: {
         </Flex.Item>
         <Flex.Item>
           <Button
-            renderIcon={IconResetLine}
+            renderIcon={IconResetLine as unknown as React.ReactNode}
             margin="0 0 0 small"
             onClick={() => {
               resetOverlays(configuration)

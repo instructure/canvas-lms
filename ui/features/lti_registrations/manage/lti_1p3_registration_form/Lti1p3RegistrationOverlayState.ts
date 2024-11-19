@@ -356,9 +356,9 @@ const initialOverlayStateFromInternalConfig = (
       targetLinkURI: internalConfig.target_link_uri,
       openIDConnectInitiationURL: internalConfig.oidc_initiation_url,
       JwkMethod: internalConfig.public_jwk_url ? 'public_jwk_url' : 'public_jwk',
-      JwkURL: internalConfig.public_jwk_url,
+      JwkURL: internalConfig.public_jwk_url === null ? undefined : internalConfig.public_jwk_url,
       Jwk: JSON.stringify(internalConfig.public_jwk),
-      domain: internalConfig.domain,
+      domain: internalConfig.domain === null ? undefined : internalConfig.domain,
       customFields: internalConfig.custom_fields
         ? Object.entries(internalConfig.custom_fields).reduce((acc, [key, value]) => {
             return acc + `${key}=${value}\n`
@@ -369,7 +369,8 @@ const initialOverlayStateFromInternalConfig = (
       scopes: internalConfig.scopes,
     },
     data_sharing: {
-      privacy_level: internalConfig.privacy_level,
+      privacy_level:
+        internalConfig.privacy_level === null ? undefined : internalConfig.privacy_level,
     },
     placements: {
       placements: internalConfig.placements.map(p => p.placement) ?? [],

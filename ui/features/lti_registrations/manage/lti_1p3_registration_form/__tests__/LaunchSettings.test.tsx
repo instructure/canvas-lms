@@ -40,6 +40,7 @@ describe('LaunchSettings', () => {
         overlayStore={overlayStore}
         unregister={jest.fn()}
         onNextClicked={jest.fn()}
+        reviewing={false}
       />
     )
 
@@ -80,6 +81,7 @@ describe('LaunchSettings', () => {
         overlayStore={overlayStore}
         unregister={jest.fn()}
         onNextClicked={jest.fn()}
+        reviewing={false}
       />
     )
     const redirectURIs = screen.getByLabelText('Redirect URIs')
@@ -133,6 +135,7 @@ describe('LaunchSettings', () => {
         overlayStore={overlayStore}
         unregister={jest.fn()}
         onNextClicked={jest.fn()}
+        reviewing={false}
       />
     )
 

@@ -168,7 +168,9 @@ const IconOverrideInput = React.memo(
     if (inputUrl && !isValidHttpUrl(inputUrl)) {
       messages = [{type: 'error', text: I18n.t('Invalid URL')}]
     } else if (
-      [LtiPlacements.EditorButton, LtiPlacements.TopNavigation].includes(placement) &&
+      (
+        [LtiPlacements.EditorButton, LtiPlacements.TopNavigation] as Array<LtiPlacementWithIcon>
+      ).includes(placement) &&
       !inputUrl &&
       !defaultIconUrl
     ) {

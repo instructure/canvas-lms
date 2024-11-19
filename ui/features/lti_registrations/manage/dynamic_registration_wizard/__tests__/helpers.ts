@@ -24,6 +24,7 @@ import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRe
 import {ZLtiImsRegistrationId} from '../../model/lti_ims_registration/LtiImsRegistrationId'
 import type {LtiConfiguration} from '../../model/lti_tool_configuration/LtiConfiguration'
 import type {DynamicRegistrationWizardService} from '../DynamicRegistrationWizardService'
+import type {Lti1p3RegistrationWizardService} from '../../lti_1p3_registration_form/Lti1p3RegistrationWizardService'
 
 export const mockDynamicRegistrationWizardService = (
   mocked?: Partial<DynamicRegistrationWizardService>
@@ -37,6 +38,15 @@ export const mockDynamicRegistrationWizardService = (
   updateAdminNickname: jest.fn(),
   ...mocked,
 })
+
+export const mockLti1p3RegistrationWizardService = (
+  mocked?: Partial<Lti1p3RegistrationWizardService>
+): Lti1p3RegistrationWizardService => ({
+  createLtiRegistration: jest.fn(),
+  updateLtiRegistration: jest.fn(),
+  ...mocked,
+})
+
 export const mockToolConfiguration = (config?: Partial<LtiConfiguration>): LtiConfiguration => ({
   title: '',
   target_link_uri: '',
