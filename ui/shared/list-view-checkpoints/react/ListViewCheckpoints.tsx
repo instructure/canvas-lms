@@ -21,6 +21,7 @@ import {IconArrowNestLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {Assignment, Checkpoint} from '../../../api.d'
+import {datetimeString} from '@canvas/datetime/date-functions'
 
 const I18n = useI18nScope('assignment')
 
@@ -37,16 +38,6 @@ export type CheckpointProps = {
   assignment: AssignmentCheckpoints
   checkpoint: Checkpoint
 }
-
-const createDateTimeFormatter = () => {
-  return Intl.DateTimeFormat(ENV.LOCALE, {
-    month: 'short',
-    day: 'numeric',
-    timeZone: ENV.TIMEZONE,
-  })
-}
-
-const dateFormatter = createDateTimeFormatter()
 
 export const ListViewCheckpoints = ({assignment}: StudentViewCheckpointProps) => {
   const sortCheckpoints = (a: Checkpoint, b: Checkpoint) => {
@@ -74,7 +65,7 @@ export const ListViewCheckpoints = ({assignment}: StudentViewCheckpointProps) =>
 const CheckpointItem = React.memo(({checkpoint, assignment}: CheckpointProps) => {
   const getCheckpointDueDate = () => {
     if (checkpoint.due_at) {
-      return dateFormatter.format(new Date(checkpoint.due_at))
+      return datetimeString(checkpoint.due_at, {timezone: ENV.TIMEZONE})
     }
 
     // Once VICE-4350 is completed, modify this to find the due date from the checkpoint overrides
@@ -84,7 +75,7 @@ const CheckpointItem = React.memo(({checkpoint, assignment}: CheckpointProps) =>
         ENV.current_user_id &&
         override.student_ids.includes(ENV.current_user_id)
       ) {
-        return dateFormatter.format(new Date(override.due_at))
+        return datetimeString(override.due_at, {timezone: ENV.TIMEZONE})
       }
     }
 
