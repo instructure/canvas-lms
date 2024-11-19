@@ -22,6 +22,7 @@ import type {GradebookStore} from './index'
 type ImportAssignment = {
   id: string
   name: string
+  courseId: string
 }
 export type RubricAssessmentImportState = {
   rubricAssessmentImportTrayProps: {

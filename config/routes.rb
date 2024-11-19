@@ -319,8 +319,8 @@ CanvasRails::Application.routes.draw do
       resource :rubric_association, path: :rubric do
         resources :rubric_assessments, path: :assessments do
           collection do
+            resources :rubric_assessment_imports, path: :imports, only: %i[create show], defaults: { format: :json }
             get :export
-            post :import
           end
         end
       end
