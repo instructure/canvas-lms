@@ -33,6 +33,7 @@ $(document).on('mousedown click keydown', '.al-trigger', function (event) {
         my: $trigger.data('popup-my'),
         at: $trigger.data('popup-at'),
         within: $trigger.data('popup-within'),
+        collision: $trigger.data('popup-collision'),
       },
     },
   })
