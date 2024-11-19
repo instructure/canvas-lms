@@ -128,7 +128,8 @@ class RubricAssessmentsController < ApplicationController
       begin
         ensure_adjudication_possible(provisional:) do
           @asset, @user = @association_object.find_asset_for_assessment(@association, user_id, opts)
-          unless @association.user_can_assess_for?(assessor: @current_user, assessee: @user)
+          assessment_type = params.dig(:rubric_assessment, :assessment_type)
+          unless @association.user_can_assess_for?(assessor: @current_user, assessee: @user, assessment_type:)
             return render_unauthorized_action
           end
 

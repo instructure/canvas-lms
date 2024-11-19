@@ -62,6 +62,7 @@ export const RatingButton = ({
           color="primary-inverse"
           onClick={onClick}
           readOnly={isPreviewMode}
+          data-testid={`rubric-rating-button-${buttonDisplay}`}
           cursor={isPreviewMode ? 'not-allowed' : 'pointer'}
           themeOverride={{
             largeFontSize: '1rem',

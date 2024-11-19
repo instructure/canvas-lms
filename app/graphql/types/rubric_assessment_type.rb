@@ -25,6 +25,7 @@ module Types
     value "grading"
     value "peer_review"
     value "provisional_grade"
+    value "self_assessment"
   end
 
   class RubricAssessmentType < ApplicationObjectType

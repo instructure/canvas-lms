@@ -192,10 +192,19 @@ class RubricAssociation < ActiveRecord::Base
   end
   protected :update_values
 
-  def user_can_assess_for?(assessor: nil, assessee: nil)
+  def user_can_assess_for?(assessor: nil, assessee: nil, assessment_type: nil)
     raise "assessor and assessee required" unless assessor && assessee
 
-    context.grants_right?(assessor, :manage_grades) || assessment_requests.incomplete.for_assessee(assessee).pluck(:assessor_id).include?(assessor.id)
+    context.grants_right?(assessor, :manage_grades) ||
+      assessment_requests.incomplete.for_assessee(assessee).pluck(:assessor_id).include?(assessor.id) ||
+      user_can_self_assess_for?(assessor:, assessee:, assessment_type:)
+  end
+
+  def user_can_self_assess_for?(assessor: nil, assessee: nil, assessment_type: nil)
+    assessment_type == "self_assessment" &&
+      assignment&.rubric_self_assessment_enabled &&
+      assessor == assessee &&
+      rubric_assessments.where(assessment_type: "self_assessment", user_id: assessor).empty?
   end
 
   def user_did_assess_for?(assessor: nil, assessee: nil)
