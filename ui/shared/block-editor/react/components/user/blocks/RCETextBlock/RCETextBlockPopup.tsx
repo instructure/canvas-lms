@@ -50,6 +50,7 @@ const RCETextBlockPopup = ({nodeId, content, onClose, onSave}: RCETextBlockPopup
   const rceRef = useRef<any | null>(null) // the RceWrapper
   const [isFullscreen, setFullscreen] = useState(false)
   const [rceHeight, setRceHeight] = useState('300px')
+  const [currentContent, setCurrentContent] = useState(content)
   const modalBodyRef = useRef<HTMLElement | null>(null)
 
   const handleSave = useCallback(
@@ -110,6 +111,10 @@ const RCETextBlockPopup = ({nodeId, content, onClose, onSave}: RCETextBlockPopup
     [handleFullscreen, isFullscreen, mountNode]
   )
 
+  const handleContentChange = useCallback((content: string) => {
+    setCurrentContent(content)
+  }, [])
+
   const renderFullscreenButton = () => {
     const fullscreen = isFullscreen ? I18n.t('Exit Fullscreen') : I18n.t('Fullscreen')
     return (
@@ -151,7 +156,8 @@ const RCETextBlockPopup = ({nodeId, content, onClose, onSave}: RCETextBlockPopup
           key={isFullscreen ? 'fullscreen' : 'normal'}
           ref={rceRef}
           autosave={false}
-          defaultContent={content}
+          defaultContent={currentContent}
+          onContentChange={handleContentChange}
           height={rceHeight}
           textareaId={`RCETextBlock_text__${nodeId}`}
           variant="text-block"
