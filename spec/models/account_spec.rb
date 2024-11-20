@@ -854,6 +854,64 @@ describe Account do
     expect(account.group_categories.active.to_a).to eq [category2]
   end
 
+  describe "group and differentiation tag associations" do
+    before(:once) do
+      @account = Account.default
+      @collaborative_category = GroupCategory.create!(context: @account, name: "Collab Category")
+      @course = course_factory(account: @account)
+      @non_collab_category = GroupCategory.create!(context: @course, name: "Tag Category", non_collaborative: true)
+
+      @collaborative_group = Group.create!(context: @account, group_category: @collaborative_category, name: "Collab Group")
+      @differentiation_tag = Group.create!(context: @course, group_category: @non_collab_category, name: "Tag")
+
+      @deleted_collab_group = Group.create!(context: @account, group_category: @collaborative_category, name: "Deleted Collab")
+      @deleted_collab_group.destroy
+
+      @sub_account = @account.sub_accounts.create!
+      @sub_course = course_factory(account: @sub_account)
+      @sub_collab_group = Group.create!(context: @sub_account, group_category: @collaborative_category, name: "Sub Collab", root_account: @account)
+      @sub_tag = Group.create!(context: @sub_course, group_category: @non_collab_category, name: "Sub Tag", root_account: @account)
+    end
+
+    context "collaborative groups" do
+      it "filters group categories by collaborative flag" do
+        expect(@account.group_categories).to contain_exactly(@collaborative_category)
+        expect(@account.all_group_categories).to contain_exactly(@collaborative_category)
+      end
+
+      it "filters groups by collaborative flag" do
+        expect(@account.groups).to contain_exactly(@collaborative_group, @deleted_collab_group)
+        expect(@account.all_groups).to contain_exactly(@collaborative_group, @deleted_collab_group, @sub_collab_group)
+      end
+    end
+
+    context "differentiation tags" do
+      it "filters group categories by non-collaborative flag" do
+        expect(@account.differentiation_tag_categories).to be_empty
+        expect(@account.all_differentiation_tag_categories).to contain_exactly(@non_collab_category)
+      end
+
+      it "filters groups by non-collaborative flag" do
+        expect(@account.differentiation_tags).to be_empty
+        expect(@account.all_differentiation_tags).to contain_exactly(@differentiation_tag, @sub_tag)
+      end
+    end
+
+    describe "memberships" do
+      before(:once) do
+        @student2 = user_factory
+        @student = user_factory
+        @collaborative_group.add_user(@student)
+        @differentiation_tag.add_user(@student2)
+      end
+
+      it "accesses memberships through all_groups/all_differentiation_tags" do
+        expect(@account.all_group_memberships.map(&:user_id)).to contain_exactly(@student.id)
+        expect(@account.all_differentiation_tag_memberships.map(&:user_id)).to contain_exactly(@student2.id)
+      end
+    end
+  end
+
   it "returns correct values for login_handle_name_with_inference" do
     account = Account.default
     expect(account.login_handle_name_with_inference).to eq "Email"

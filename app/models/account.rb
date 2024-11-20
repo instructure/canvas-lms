@@ -42,11 +42,16 @@ class Account < ActiveRecord::Base
   has_many :all_courses, class_name: "Course", foreign_key: "root_account_id", inverse_of: :root_account
   has_one :terms_of_service, dependent: :destroy
   has_one :terms_of_service_content, dependent: :destroy
-  has_many :group_categories, -> { where(deleted_at: nil) }, as: :context, inverse_of: :context
-  has_many :all_group_categories, class_name: "GroupCategory", foreign_key: "root_account_id", inverse_of: :root_account
-  has_many :groups, as: :context, inverse_of: :context
-  has_many :all_groups, class_name: "Group", foreign_key: "root_account_id", inverse_of: :root_account
+  has_many :group_categories, -> { collaborative.where(deleted_at: nil) }, class_name: "GroupCategory", as: :context, inverse_of: :context
+  has_many :all_group_categories, -> { collaborative }, class_name: "GroupCategory", foreign_key: "root_account_id", inverse_of: :root_account
+  has_many :groups, -> { collaborative }, class_name: "Group", as: :context, inverse_of: :context
+  has_many :all_groups, -> { collaborative }, class_name: "Group", foreign_key: "root_account_id", inverse_of: :root_account
   has_many :all_group_memberships, source: "group_memberships", through: :all_groups
+  has_many :differentiation_tag_categories, -> { non_collaborative.where(deleted_at: nil) }, class_name: "GroupCategory", as: :context, inverse_of: :context
+  has_many :all_differentiation_tag_categories, -> { non_collaborative }, class_name: "GroupCategory", foreign_key: "root_account_id", inverse_of: :root_account
+  has_many :differentiation_tags, -> { non_collaborative }, class_name: "Group", as: :context, inverse_of: :context
+  has_many :all_differentiation_tags, -> { non_collaborative }, class_name: "Group", foreign_key: "root_account_id", inverse_of: :root_account
+  has_many :all_differentiation_tag_memberships, source: "group_memberships", through: :all_differentiation_tags
   has_many :enrollment_terms, foreign_key: "root_account_id", inverse_of: :root_account
   has_many :active_enrollment_terms, -> { where("enrollment_terms.workflow_state<>'deleted'") }, class_name: "EnrollmentTerm", foreign_key: "root_account_id", inverse_of: false
   has_many :grading_period_groups, inverse_of: :root_account, dependent: :destroy
