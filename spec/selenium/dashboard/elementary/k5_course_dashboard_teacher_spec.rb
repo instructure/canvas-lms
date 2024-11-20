@@ -69,6 +69,25 @@ describe "teacher k5 course dashboard" do
 
       expect(driver.current_url).to match(/#schedule/)
     end
+
+    it "shows recent announcements when teacher is also a student", :ignore_js_errors do
+      create_course(
+        enroll_user: @homeroom_teacher,
+        enrollment_type: "StudentEnrollment",
+        account_associations: true
+      )
+
+      announcement_heading = "Do science stuff"
+      announcement = new_announcement(@homeroom_course, announcement_heading, "it is super fun!")
+      announcement.update!(posted_at: 14.days.ago)
+
+      get "/"
+      wait_for_ajaximations
+
+      keep_trying_for_attempt_times(attempts: 2, sleep_interval: 0.5) do
+        expect(announcement_title(announcement_heading)).to be_displayed
+      end
+    end
   end
 
   context "home tab" do
