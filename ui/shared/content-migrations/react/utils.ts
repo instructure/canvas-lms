@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,18 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const humanReadableSize = (size: number): string => {
-  const units = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-  let i = 0
-  while (size >= 1024) {
-    size /= 1024
-    ++i
+import * as tz from '@instructure/moment-utils'
+
+export const parseDateToISOString = (
+  dateString: Date | string | null | undefined
+): string | null => {
+  if (!dateString) {
+    return null
   }
-  return size.toFixed(1) + ' ' + units[i]
-}
 
-export const timeout = (delay: number) => {
-  return new Promise(resolve => setTimeout(resolve, delay))
-}
+  const adjustedDate = tz.parse(dateString)
 
-export {parseDateToISOString} from '@canvas/content-migrations'
+  if (!adjustedDate) {
+    return null
+  }
+
+  return adjustedDate.toISOString()
+}

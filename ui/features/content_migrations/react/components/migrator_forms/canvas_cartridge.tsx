@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import CommonMigratorControls from './common_migrator_controls'
+import {CommonMigratorControls, noFileSelectedFormMessage} from '@canvas/content-migrations'
 import type {onSubmitMigrationFormCallback} from '../types'
 import MigrationFileInput from './file_input'
-import {noFileSelectedFormMessage} from './error_form_message'
 import {parseDateToISOString} from '../utils'
 import {useSubmitHandler} from '../../hooks/form_handler_hooks'
+import {ImportLabel} from './import_label'
 
 type CanvasCartridgeImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
@@ -58,8 +58,7 @@ const CanvasCartridgeImporter = ({
         onCancel={onCancel}
         newStartDate={parseDateToISOString(ENV.OLD_START_DATE)}
         newEndDate={parseDateToISOString(ENV.OLD_END_DATE)}
-        oldStartDate={null}
-        oldEndDate={null}
+        SubmitLabel={ImportLabel}
       />
     </>
   )

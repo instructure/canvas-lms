@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import DateAdjustments from '../date_adjustments'
+import DateAdjustments from '../DateAdjustments'
 import type {DateAdjustmentConfig, DateShifts} from '../types'
 import userEvent from '@testing-library/user-event'
 
@@ -78,7 +78,7 @@ describe('DateAdjustment', () => {
   })
 
   describe('Date fill in on initial data', () => {
-    const dateObject = new Date('2024-08-08T08:00:00+00:00')
+    const dateObject = '2024-08-08T08:00:00+00:00'
     const expectedDate = 'Aug 8 at 8am'
     const getComponent = (dateShiftOptionVariant: Partial<DateShifts>) => {
       return (

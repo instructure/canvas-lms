@@ -29,11 +29,7 @@ type RequiredFormLabelProps = {
 }
 
 export const FormLabel = ({children}: FormLabelProps) => {
-  return (
-    <Text weight="bold">
-      {children}
-    </Text>
-  )
+  return <Text weight="bold">{children}</Text>
 }
 
 export const RequiredFormLabel = ({children, showErrorState}: RequiredFormLabelProps) => {
