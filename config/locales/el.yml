@@ -2734,6 +2734,8 @@ el:
   author_215203d2: Συγγραφέας
   author_s_name_b35e905a: "Όνομα Συγγραφέα"
   authorize_e3f25bb4: Εξουσιοδότηση/Έγκριση
+  authorize_google_drive_8ad056d5: "Εξουσιοδότηση Google Drive"
+  authorize_google_drive_access_aefcf8d6: "Εξουσιοδότηση Πρόσβασης στο Google Drive"
   automatically_assign_a_student_group_leader_29448649: "Ορίστε αυτόματα κάποιον σπουδαστή ως αρχηγό της ομάδας"
   available_8606e40c: Διαθέσιμο
   available_after_unlock_at_b5682224: "Διαθέσιμο μετά από τις %{unlock_at}"
@@ -12884,6 +12886,7 @@ el:
   region_939f2a6c: Περιοχή
   register_communication_ae935328: "Εγγραφή Επικοινωνίας"
   register_email_efc06d59: "Εγγραφή Ηλεκτρονικής Διεύθυνσης"
+  register_skype_d5e2b3d3: "Καταχώριση Skype"
   register_sms_7f87e50d: "Εγγραφή SMS"
   register_tool_84de3186: "Καταχώριση Εργαλείου"
   registration: 
@@ -13211,7 +13214,9 @@ el:
   save_changes_698abe77: "Αποθήκευση Αλλαγών "
   save_grading_period_daaaddea: "Αποθήκευση Περιόδου Βαθμολόγησης"
   save_key_b4dede06: "Αποθήκευση Κλειδιού"
+  save_login_bba1272: "Αποθήκευση Σύνδεσης"
   save_settings_cafe79a5: "Αποθήκευση Ρυθμίσεων"
+  save_skype_name_4de35a9: "Αποθήκευση Ονόματος Skype"
   saving_d55dd90e: Αποθήκευση...
   saving_recording_e111cb05: "Αποθήκευση Ηχογράφησης..."
   schedule_student_availability_332154a: "Προγραμματισμός της διαθεσιμότητας σπουδαστή"
@@ -14198,6 +14203,8 @@ el:
   skipped_file_filename_due_to_error_94f0194: "Παραλήφθηκε το αρχείο %{filename} λόγω σφάλματος"
   skipping_unknown_file_type_cd1086ee: "Παράλειψη άγνωστου τύπου αρχείου"
   skype_18850ba7: Skype
+  skype_name_9eb890df: "Όνομα Skype"
+  skype_offers_free_online_voice_and_video_calls_lot_35295baa: "<mrk mid=\"2504\" mtype=\"seg\">Το Skype προσφέρει δωρεάν online φωνητικές κλήσεις και βιντεοκλήσεις.</mrk> <mrk mid=\"2505\" mtype=\"seg\">Πολλοί σπουδαστές χρησιμοποιούν το Skype ως έναν δωρεάν και εύκολο τρόπο επικοινωνίας.</mrk> <mrk mid=\"2506\" mtype=\"seg\">Αν καταχωρίσετε το Όνομα Skype σας και ενεργοποιήσετε την εμφάνισή του, άλλοι σπουδαστές θα μπορούν να βρουν εύκολα την επαφή σας και να σας καλέσουν μέσω Skype ή να σας προσθέσουν σε αυτό.</mrk>"
   sms_f0ddceeb: sms
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Μερικές συνεδρίες σε αυτή τη σελίδα είναι κρυφές λόγω σφαλμάτων κατά την ανάκτηση της κατάστασής τους"
   some_settings_have_been_administratively_locked_9e3ee880: "Κάποιες ρυθμίσεις έχουν κλειδωθεί απο τον διαχειριστή"
