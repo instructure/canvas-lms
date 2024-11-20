@@ -19,6 +19,7 @@
 #
 
 require_relative "../../lti_1_3_tool_configuration_spec_helper"
+require_relative "../../lti_1_3_spec_helper"
 
 RSpec.describe Lti::RegistrationsController do
   let(:response_json) do
@@ -725,32 +726,309 @@ RSpec.describe Lti::RegistrationsController do
   describe "PUT update", type: :request do
     subject do
       put "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}",
-          params: { admin_nickname:,
-                    configuration:,
-                    name: "foo" }
+          params:,
+          as: :json
+      response
     end
 
-    let_once(:other_admin) { account_admin_user(account:) }
-    let_once(:registration) { lti_registration_model(account:, created_by: other_admin, updated_by: other_admin) }
-    let_once(:ims_registration) { lti_ims_registration_model(lti_registration: registration) }
-    let_once(:admin_nickname) { "New Name" }
-    let_once(:configuration) { ims_registration.internal_lti_configuration }
+    # Includes settings and internal_configuration
+    include_context "lti_1_3_spec_helper"
 
-    before { ims_registration }
+    let(:params) do
+      {
+        admin_nickname:,
+        vendor:,
+        configuration: internal_configuration,
+        name:,
+        workflow_state: "on"
+      }
+    end
+
+    let(:other_admin) { account_admin_user(account:) }
+    let(:registration) { developer_key.lti_registration }
+    let(:admin_nickname) { "New Name" }
+    let(:name) { "foo" }
+    let(:vendor) { "vendor" }
+
+    before { tool_configuration }
 
     it "is successful" do
-      subject
-      expect(response).to be_successful
+      expect(subject).to be_successful
       expect(registration.reload.admin_nickname).to eq(admin_nickname)
       expect(registration.updated_by).to eq(admin)
+    end
+
+    it "updates the registration's attributes" do
+      expect(subject).to be_successful
+
+      registration.reload
+
+      expect(registration.admin_nickname).to eq(admin_nickname)
+      expect(registration.vendor).to eq(vendor)
+      expect(registration.name).to eq(name)
+    end
+
+    it "updates the associated developer key" do
+      expect(subject).to be_successful
+
+      attributes = registration.developer_key.reload
+                               .attributes
+                               .with_indifferent_access
+                               .slice(:name,
+                                      :public_jwk,
+                                      :public_jwk_url,
+                                      :scopes,
+                                      :redirect_uris,
+                                      :icon_url)
+                               .compact
+
+      expect(attributes).to eq(
+        {
+          name:,
+          icon_url: internal_configuration[:launch_settings][:icon_url],
+          **internal_configuration.slice(:public_jwk, :public_jwk_url, :scopes, :redirect_uris)
+        }.with_indifferent_access
+      )
+    end
+
+    it "updates the associated tool configuration" do
+      expect(subject).to be_successful
+
+      expect(tool_configuration.reload.internal_lti_configuration.except(:public_jwk_url).with_indifferent_access)
+        .to eq(internal_configuration.with_indifferent_access)
+    end
+
+    it "updates the associated registration account binding" do
+      expect(subject).to be_successful
+
+      expect(registration.account_binding_for(account).workflow_state).to eq("on")
+    end
+
+    it "returns the appropriate info" do
+      expect(subject).to be_successful
+
+      expect(response_json[:configuration].with_indifferent_access.except(:public_jwk_url))
+        .to eq(internal_configuration.with_indifferent_access)
+      expect(response_json[:account_binding]).to include({ workflow_state: "on" })
+    end
+
+    it "doesn't create an unnecessary overlay" do
+      expect { subject }.not_to change { Lti::Overlay.count }
+      expect(subject).to be_successful
+    end
+
+    context "attempting to update disallowed fields" do
+      let(:params) do
+        super().tap do |p|
+          p[:configuration][:developer_key_id] = -1234
+        end
+      end
+
+      it "ignores the disallowed fields" do
+        expect(subject).to be_successful
+
+        expect(tool_configuration.reload.developer_key_id).not_to eq(-1234)
+      end
+    end
+
+    context "updating a Dynamic Registration" do
+      let(:ims_registration) { lti_ims_registration_model(account:) }
+      let(:registration) { ims_registration.lti_registration }
+      let(:params) do
+        {
+          admin_nickname: "New Name",
+          vendor: "vendor",
+          overlay: { "name" => "overlay name" },
+        }
+      end
+
+      it { is_expected.to be_successful }
+
+      context "trying to update it's base configuration" do
+        let(:params) do
+          {
+            configuration: internal_configuration,
+          }
+        end
+
+        it { is_expected.to have_http_status(:unprocessable_entity) }
+      end
+    end
+
+    context "sending an overlay" do
+      let(:params) do
+        super().tap do |p|
+          p[:overlay] = { "name" => "overlay name" }
+        end
+      end
+
+      it "creates an overlay" do
+        expect { subject }.to change { Lti::Overlay.count }.by(1)
+        expect(subject).to be_successful
+
+        expect(registration.overlay_for(account).data.with_indifferent_access)
+          .to eq(params[:overlay].with_indifferent_access)
+      end
+
+      context "but an overlay already exists" do
+        before do
+          Lti::Overlay.create!(registration:, account:, data: { "name" => "old name" }, updated_by: admin)
+        end
+
+        it "updates the existing overlay" do
+          expect { subject }.not_to change { Lti::Overlay.count }
+
+          expect(subject).to be_successful
+          expect(registration.overlay_for(account).data.with_indifferent_access)
+            .to eq(params[:overlay].with_indifferent_access)
+        end
+
+        it "returns the overlay versions" do
+          expect(subject).to be_successful
+
+          expect(response_json[:overlay]).to include({ versions: an_instance_of(Array) })
+        end
+      end
+
+      context "an overlay exists in Site Admin but not for the current account" do
+        let(:site_admin_user) { account_admin_user(account: Account.site_admin) }
+        let(:site_admin_overlay) do
+          Lti::Overlay.create!(registration:, account: Account.site_admin, data: { "name" => "site admin overlay" }, updated_by: site_admin_user)
+        end
+
+        before do
+          site_admin_overlay
+        end
+
+        it { is_expected.to be_successful }
+
+        it "doesn't change the site admin overlay" do
+          expect { subject }.not_to change { site_admin_overlay.reload }
+        end
+
+        it "creates a new overlay for the current account" do
+          expect { subject }.to change { Lti::Overlay.count }.by(1)
+
+          expect(Lti::Overlay.find_by(registration:, account:).data.with_indifferent_access)
+            .to eq(params[:overlay].with_indifferent_access)
+        end
+      end
+    end
+
+    context "with a legacy configuration" do
+      let(:params) do
+        super().tap do |p|
+          p[:configuration] = registration.manual_configuration.settings.except(:public_jwk_url)
+        end
+      end
+
+      it { is_expected.to be_successful }
+
+      it "doesn't change the configuration" do
+        expect { subject }.not_to change { tool_configuration.reload.internal_lti_configuration }
+        expect(subject).to be_successful
+      end
+    end
+
+    context "when updating only the nickname" do
+      let(:params) { { admin_nickname: "A Great Partial Update" } }
+
+      it "is successful" do
+        expect { subject }.not_to change { tool_configuration.reload.internal_lti_configuration }
+        expect(subject).to be_successful
+        expect(registration.reload.admin_nickname).to eq(params[:admin_nickname])
+      end
+    end
+
+    context "when updating only the overlay" do
+      let(:params) do
+        {
+          overlay: {
+            disabled_placements: ["course_navigation"],
+          }
+        }
+      end
+
+      it "is successful" do
+        expect { subject }.not_to change { tool_configuration.reload.internal_lti_configuration }
+        expect(subject).to be_successful
+
+        expect(registration.overlay_for(account).data.with_indifferent_access)
+          .to eq(params[:overlay].with_indifferent_access)
+      end
+
+      it "still tries to update all installed external tools" do
+        expect_any_instance_of(DeveloperKey).to receive(:update_external_tools!).once
+
+        subject
+      end
+    end
+
+    context "when updating only the configuration" do
+      let(:params) do
+        {
+          configuration: {
+            **internal_configuration,
+            title: "A Great Partial Update",
+          }
+        }
+      end
+
+      it "is successful" do
+        expect(subject).to be_successful
+
+        expect(tool_configuration.reload.internal_lti_configuration.with_indifferent_access.except(:public_jwk_url))
+          .to eq(params[:configuration].with_indifferent_access)
+      end
+    end
+
+    context "when updating only the workflow state" do
+      let(:params) { { workflow_state: "off" } }
+
+      it "is successful" do
+        expect { subject }.not_to change { tool_configuration.reload.internal_lti_configuration }
+
+        expect(subject).to be_successful
+        expect(registration.account_binding_for(account).workflow_state).to eq(params[:workflow_state])
+      end
+    end
+
+    context "when updating only the name" do
+      let(:params) { { name: "A Great Partial Update" } }
+
+      it "is successful" do
+        expect { subject }.not_to change { tool_configuration.reload.internal_lti_configuration }
+
+        expect(subject).to be_successful
+        expect(registration.reload.name).to eq(params[:name])
+      end
+    end
+
+    context "with an invalid configuration" do
+      let(:params) do
+        super().tap do |p|
+          p[:configuration] = { "invalid" => "config" }
+        end
+      end
+
+      it { is_expected.to have_http_status(:unprocessable_entity) }
+    end
+
+    context "with an invalid overlay" do
+      let(:params) do
+        super().tap do |p|
+          p[:overlay] = { "scopes" => ["invalid"] }
+        end
+      end
+
+      it { is_expected.to have_http_status(:unprocessable_entity) }
     end
 
     context "without user session" do
       before { remove_user_session }
 
       it "returns 401" do
-        subject
-        expect(response).to be_unauthorized
+        expect(subject).to be_unauthorized
       end
     end
 
@@ -760,8 +1038,7 @@ RSpec.describe Lti::RegistrationsController do
       before { user_session(student) }
 
       it "returns 403" do
-        subject
-        expect(response).to be_forbidden
+        expect(subject).to be_forbidden
       end
     end
 
@@ -769,29 +1046,7 @@ RSpec.describe Lti::RegistrationsController do
       before { account.disable_feature!(:lti_registrations_page) }
 
       it "returns 404" do
-        subject
-        expect(response).to be_not_found
-      end
-    end
-
-    context "with non-dynamic registration" do
-      before { ims_registration.update!(lti_registration: nil) }
-
-      it "returns 422" do
-        subject
-        expect(response).to have_http_status(:unprocessable_entity)
-      end
-
-      it "does not modify the registration" do
-        expect { subject }.not_to change { registration.reload.admin_nickname }
-      end
-    end
-
-    context "with additional params" do
-      let(:registration_params) { { admin_nickname:, created_by: admin } }
-
-      it "only updates the nickname" do
-        expect { subject }.not_to change { registration.reload.created_by }
+        expect(subject).to be_not_found
       end
     end
   end
@@ -1354,6 +1609,8 @@ RSpec.describe Lti::RegistrationsController do
           p[:configuration] = settings
         end
       end
+
+      it { is_expected.to be_successful }
 
       it "creates a new LTI registration" do
         expect { subject }.to change { Lti::Registration.count }.by(1)
