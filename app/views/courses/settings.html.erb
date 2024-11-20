@@ -60,11 +60,10 @@
         <li id="navigation_tab"><a href="#tab-navigation"><%= t('tabs.navigation', %{Navigation}) %></a></li>
       <% end %>
       <% if can_do(@context, @current_user, :read_as_admin) %>
-        <li id="external_tools_tab"><a href="#tab-tools" id="tab-tools-link"><%= t('tabs.tools', %{Apps}) %></a></li>
+        <li id="external_tools_tab"><a href="#tab-tools" id="tab-tools-link"><%= t('tabs.tools', %{Apps (Legacy)}) %></a></li>
       <% end %>
       <% if can_do(@context, @current_user, :read_as_admin) && @context.root_account.feature_enabled?(:lti_apps_page_instructors) %>
-        <%# TODO: change name and deal with old apps? %>
-        <li id="apps_tab"><a href="#tab-apps" id="tab-apps-link">Apps (Discover)</a></li>
+        <li id="apps_tab"><a href="#tab-apps" id="tab-apps-link"><%= t('tabs.apps', %{Apps (New)}) %></a></li>
       <% end %>
       <% if @publishing_enabled %>
         <li id="grade_publishing_tab"><a href="#tab-grade-publishing" id="tab-grade-publishing-link"><%= t('Grade Syncing') %></a></li>

@@ -50,6 +50,7 @@ import BadgeCarousel from '../common/Carousels/BadgeCarousel'
 import Disclaimer from '../common/Disclaimer'
 import type {Product} from '../../models/Product'
 import type {UnifiedToolId} from '../../models/UnifiedToolId'
+import {instructorAppsRoute} from '@canvas/lti-apps/utils/route'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -76,8 +77,8 @@ const ProductDetail = (props: ProductDetailProps) => {
   const currentProductId = location.pathname.replace('/product_detail/', '')
   const {isDesktop, isMobile, isMaxMobile, isMaxTablet} = useBreakpoints()
   const previousPathRegexp = window.location.pathname.replace(/\product_detail.*/, '')
-  const previousPath = previousPathRegexp.endsWith('configurations/')
-    ? `${previousPathRegexp}#tab-apps`
+  const previousPath = previousPathRegexp.endsWith(`${instructorAppsRoute}/`)
+    ? `${previousPathRegexp.slice(0, -1)}#tab-apps`
     : previousPathRegexp
 
   const {product, isLoading, isError} = useProduct({productId: currentProductId})

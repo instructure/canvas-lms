@@ -27,12 +27,11 @@ import {IconEndSolid, IconFilterLine, IconSearchLine} from '@instructure/ui-icon
 import useDebouncedSearch from '../../hooks/useDebouncedSearch'
 import useDiscoverQueryParams from '../../hooks/useDiscoverQueryParams'
 import useBreakpoints from '../../hooks/useBreakpoints'
+import {instructorAppsHash, instructorAppsRoute} from '../../utils/route'
 
 const I18n = useI18nScope('lti_registrations')
 
 export const SearchAndFilter = (props: {setIsTrayOpen: (isOpen: boolean) => void}) => {
-  const instructorAppsRoute = 'configurations'
-  const instructorAppsHash = '#tab-apps'
   const disableQueryParams =
     window.location.href.includes(instructorAppsRoute) &&
     window.location.hash !== instructorAppsHash

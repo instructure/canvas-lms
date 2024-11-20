@@ -9911,13 +9911,14 @@ en-GB:
       tab_hidden_if_disabled_k5: "Tab disabled, won't appear in subject navigation"
       tabs: 
         alerts: Alerts
+        apps: Apps (New)
         details: "Course details"
         feature_options: "Feature Options"
         feature_previews: "Feature Previews"
         grade_publishing: "Grade publishing"
         navigation: Navigation
         sections: Sections
-        tools: Apps
+        tools: Apps (Legacy)
       titles: 
         edit_navigation: "Edit course navigation"
       tooltips: 
