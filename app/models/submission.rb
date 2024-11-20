@@ -367,6 +367,19 @@ class Submission < ActiveRecord::Base
       )
   end
 
+  def checkpoints_needs_grading?
+    return true if needs_grading?
+    return false if assignment.nil?
+    return false unless assignment.checkpoints_parent?
+
+    Submission.where(user_id:)
+              .where(assignment_id: SubAssignment.select(:id).where(parent_assignment_id: assignment_id))
+              .find_each do |sub_assignment_submission|
+      return true if sub_assignment_submission.needs_grading?
+    end
+    false
+  end
+
   def proxy_submission?
     proxy_submitter.present?
   end

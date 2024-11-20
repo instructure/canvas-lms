@@ -8091,6 +8091,41 @@ describe Submission do
     end
   end
 
+  describe "#checkpoints_needs_grading?" do
+    before(:once) do
+      @course = course_model
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @student = student_in_course(course: @course, active_all: true).user
+      @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic")
+      @topic.create_checkpoints(reply_to_topic_points: 3, reply_to_entry_points: 7)
+    end
+
+    it "returns true if one sub_assigment(REPLY_TO_ENTRY) needs grading" do
+      @topic.reply_to_topic_checkpoint.submit_homework(@student, submission_type: "discussion_topic")
+      @topic.assignment.grade_student(@student, grader: @teacher, score: 7, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+
+      expect(Submission.where(user_id: @student.id, assignment_id: @topic.assignment_id).first.checkpoints_needs_grading?).to be true
+    end
+
+    it "returns true if one sub_assigment(REPLY_TO_TOPIC) needs grading" do
+      @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+      @topic.reply_to_entry_checkpoint.submit_homework(@student, submission_type: "discussion_topic")
+
+      expect(Submission.where(user_id: @student.id, assignment_id: @topic.assignment_id).first.checkpoints_needs_grading?).to be true
+    end
+
+    it "returns false if one sub_assigments has been graded(other is unsubmitted)" do
+      @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+      expect(Submission.where(user_id: @student.id, assignment_id: @topic.assignment_id).first.checkpoints_needs_grading?).to be false
+    end
+
+    it "returns false if both sub_assigments have been graded" do
+      @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+      @topic.assignment.grade_student(@student, grader: @teacher, score: 7, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+      expect(Submission.where(user_id: @student.id, assignment_id: @topic.assignment_id).first.checkpoints_needs_grading?).to be false
+    end
+  end
+
   describe "#plagiarism_service_to_use" do
     it "returns nil when no service is configured" do
       submission = @assignment.submit_homework(@student,
