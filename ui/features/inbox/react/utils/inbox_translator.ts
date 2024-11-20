@@ -26,7 +26,6 @@ import type React from 'react'
 interface TranslateArgs {
   subject?: string
   body?: string
-  callback: (arg: string) => void
   srcLang: string
   tgtLang: string
 }
@@ -53,9 +52,7 @@ export function translateMessage(args: TranslateArgs) {
   }
 
   // Translate the payload, then with that text.
-  translateText(args, payload).then(text => {
-    args.callback(text)
-  })
+  return translateText(args, payload)
 }
 
 /**
