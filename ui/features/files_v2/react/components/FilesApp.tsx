@@ -60,6 +60,15 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
   const contextType = filesEnv.contextType
   const contextId = filesEnv.contextId
 
+  const canManageFilesForContext = (permission: string) => {
+    // @ts-expect-error
+    return filesEnv.userHasPermission({contextType, contextId}, permission)
+  }
+
+  const _userCanAddFilesForContext = canManageFilesForContext('manage_files_add')
+  const userCanEditFilesForContext = canManageFilesForContext('manage_files_edit')
+  const _userCanDeleteFilesForContext = canManageFilesForContext('manage_files_delete')
+
   const {data, error} = useQuery(['quota'], () => fetchQuota(contextType, contextId))
   const tableResult = useQuery(['files'], () => fetchFilesAndFolders(contextType, contextId))
 
@@ -118,6 +127,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
         size={size}
         rows={tableResult.isSuccess ? tableResult.data : undefined}
         isLoading={tableResult.isLoading}
+        userCanEditFilesForContext={userCanEditFilesForContext}
       />
       <Flex padding="small none none none">
         <Flex.Item size="50%">{renderFilesUsageBar()}</Flex.Item>

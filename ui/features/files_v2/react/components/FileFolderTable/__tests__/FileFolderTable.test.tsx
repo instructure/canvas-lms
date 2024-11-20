@@ -26,6 +26,7 @@ const defaultProps = {
   size: 'large' as 'large' | 'small' | 'medium',
   isLoading: false,
   rows: [],
+  userCanEditFilesForContext: true,
 }
 const renderComponent = (props = {}) => {
   return render(
