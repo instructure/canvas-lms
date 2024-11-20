@@ -52,7 +52,7 @@ describe "Sessions Timeout" do
     plugin_setting.save!
     user_with_pseudonym({ active_user: true })
     login_as
-    expect(f('[aria-label="Profile tray"] h2').text).to eq @user.primary_pseudonym.unique_id
+    expect(f('[aria-label="Profile tray"] h2').text).to eq @user.pseudonyms.first.unique_id
 
     Timecop.travel(61.seconds.from_now) do
       get "/courses"

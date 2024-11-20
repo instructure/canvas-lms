@@ -22,7 +22,9 @@ class SisPseudonym
   def self.for(user, context, type: :exact, require_sis: true, include_deleted: false, root_account: nil, in_region: false, include_all_pseudonyms: false)
     raise ArgumentError("type must be :exact, :trusted, or :implicit") unless %i[exact trusted implicit].include?(type)
     raise ArgumentError("invalid root_account") if root_account && !root_account.root_account?
-    raise ArgumentError("context must respond to .root_account") unless root_account&.root_account? || context.respond_to?(:root_account)
+    raise ArgumentError("context must respond to .root_account") unless context.nil? || root_account&.root_account? || context.respond_to?(:root_account)
+    raise ArgumentError, "type must be :implicit if context is nil" if context.nil? && type != :implicit
+    raise ArgumentError, "require_sis must be false if context is nil" if context.nil? && require_sis
 
     sis_pseudonym =
       new(user, context, type, require_sis, include_deleted, root_account, in_region:, include_all_pseudonyms:)
@@ -37,7 +39,7 @@ class SisPseudonym
     @type = type
     @require_sis = require_sis
     @include_deleted = include_deleted
-    @root_account = root_account
+    @root_account = root_account if root_account || context.nil?
     @in_region = in_region
     @include_all_pseudonyms = include_all_pseudonyms
   end
@@ -46,9 +48,9 @@ class SisPseudonym
     result = @context.sis_pseudonym if @context.class <= Enrollment
     result ||= find_on_enrollment_for_context
     result = nil if exclude_deleted?(result)
-    result ||= find_in_home_account
+    result ||= find_in_home_account if root_account
     result ||= find_in_other_accounts
-    if result && result.account_id == root_account.id
+    if result && result.account_id == root_account&.id
       result.account = root_account
     end
     result
@@ -58,13 +60,13 @@ class SisPseudonym
     results = []
     results << @context.sis_pseudonym if @context.class <= Enrollment
     results << find_on_enrollment_for_context
-    results << find_in_home_account
+    results << find_in_home_account if root_account
     results << find_in_other_accounts
     results = results.flatten.compact.uniq
     results.reject! { |result| exclude_deleted?(result) }
     if results.present?
       results.each do |result|
-        result.account = root_account if result.account_id == root_account.id
+        result.account = root_account if result.account_id == root_account&.id
       end
       return results
     end
@@ -161,12 +163,11 @@ class SisPseudonym
   end
 
   def root_account
-    @root_account ||= begin
-      account = context.root_account
-      raise "could not resolve root account" unless account.is_a?(Account)
-
-      account
+    unless instance_variable_defined?(:@root_account)
+      @root_account = context.root_account
+      raise "could not resolve root account" unless @root_account.is_a?(Account)
     end
+    @root_account
   end
 
   def pick_pseudonym(account_ids)
@@ -183,7 +184,9 @@ class SisPseudonym
       relation = relation.order(Pseudonym.best_unicode_collation_key(:unique_id), :position)
     end
 
-    if type == :implicit
+    if root_account.nil? && include_all_pseudonyms
+      relation.to_a
+    elsif type == :implicit && root_account
       if include_all_pseudonyms
         return relation.select { |p| p.works_for_account?(root_account, true) }
       end
@@ -198,6 +201,7 @@ class SisPseudonym
     if include_all_pseudonyms
       collection.select do |p|
         next if account_ids && !account_ids.include?(p.account_id)
+        next true if root_account.nil?
         next if !account_ids && !p.works_for_account?(root_account, type == :implicit)
         next if require_sis && !p.sis_user_id
 
@@ -208,6 +212,7 @@ class SisPseudonym
         [p.workflow_state, p.sis_user_id ? 0 : 1, Canvas::ICU.collation_key(p.unique_id), p.position]
       end.detect do |p|
         next if account_ids && !account_ids.include?(p.account_id)
+        next true if root_account.nil?
         next if !account_ids && !p.works_for_account?(root_account, type == :implicit)
         next if require_sis && !p.sis_user_id
 
