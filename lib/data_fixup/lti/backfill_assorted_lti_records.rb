@@ -18,12 +18,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class BackfillLtiOverlaysFromIMSRegistrations < ActiveRecord::Migration[7.1]
-  tag :postdeploy
+module DataFixup::Lti::BackfillAssortedLtiRecords
+  def self.run
+    # these fixups all need to be run in order
 
-  def up
-    DataFixup::Lti::BackfillLtiOverlaysFromIMSRegistrations
-      .delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: "long_datafixups")
-      .run
+    # 1. re-run: create Lti::Registrations from _deleted_ DeveloperKeys
+    DataFixup::CreateLtiRegistrationsFromDeveloperKeys.run
+    # 2. re-run: bind these new Registrations to their accounts
+    DataFixup::Lti::BackfillLtiRegistrationAccountBindings.run
+    # 3. backfill Lti::Overlays from _all_ IMS Registrations
+    DataFixup::Lti::BackfillLtiOverlaysFromIMSRegistrations.run
   end
 end
