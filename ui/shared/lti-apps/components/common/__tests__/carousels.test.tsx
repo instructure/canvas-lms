@@ -20,53 +20,8 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import ProductCarousel from '../Carousels/ProductCarousel'
-import BadgeCarousel from '../Carousels/BadgeCarousel'
 import ImageCarousel from '../Carousels/ImageCarousel'
-
-import type {Product, Company, LtiDetail, Lti, Badges, Tag} from '../../../models/Product'
-
-const company: Company = {
-  id: 2,
-  name: 'Instructure',
-  company_url: 'google.com',
-}
-
-const lti_configurations: LtiDetail = {
-  lti_13: {services: ['gk'], placements: ['dr']},
-  lti_11: {services: ['gk'], placements: ['dr']},
-}
-
-const tool_integration_configurations: Lti = {
-  lti_13: [{id: 3, integration_type: 'dr', url: 'google.com', unified_tool_id: '5'}],
-  lti_11: [{id: 4, integration_type: 'gk', url: 'google.com', unified_tool_id: '6'}],
-}
-
-const badges: Badges[] = [{name: 'badge1', image_url: 'google.com', link: 'google.com'}]
-
-const tags: Tag[] = [{id: '1', name: 'tag1'}]
-
-const product: Product[] = [
-  {
-    id: '1',
-    global_product_id: '1',
-    name: 'Product 1',
-    company,
-    logo_url: 'google.com',
-    tagline: 'Product 1 tagline',
-    description: 'Product 1 description',
-    updated_at: '2024-01-01',
-    tool_integration_configurations,
-    lti_configurations,
-    integration_resources: {comments: null, resources: []},
-    badges,
-    screenshots: ['greatimage'],
-    terms_of_service_url: 'google.com',
-    privacy_policy_url: 'google.com',
-    accessibility_url: 'google.com',
-    support_link: 'google.com',
-    tags,
-  },
-]
+import {product, company} from './data'
 
 beforeAll(() => {
   Object.defineProperty(window, 'matchMedia', {
@@ -104,20 +59,6 @@ describe('Carousels render as expected', () => {
 
     const {getByText} = render(<ProductCarousel products={product} companyName={company.name} />)
     expect(getByText('Product 1')).toBeInTheDocument()
-  })
-
-  it('BadgeCarousel renders as expected', () => {
-    const isMaxMobile = false
-    const isMaxTablet = true
-
-    const {getByText} = render(
-      <BadgeCarousel
-        isMaxMobile={isMaxMobile}
-        isMaxTablet={isMaxTablet}
-        badges={product[0].badges}
-      />
-    )
-    expect(getByText('badge1')).toBeInTheDocument()
   })
 
   it('ImageCarousel renders as expected', () => {
