@@ -48,7 +48,7 @@ describe('isError, isLoading, and product return as expected', () => {
       terms_of_service_url: 'http://tos.com',
       privacy_policy_url: 'http://privacy.com',
       accessibility_url: 'http://accessibility.com',
-      support_link: 'http://support.com',
+      support_url: 'http://support.com',
       tags: [{id: '4', name: 'tag1'}],
       integration_resources: {
         comments: null,
