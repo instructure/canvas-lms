@@ -161,7 +161,11 @@ module Lti::Messages
     end
 
     def add_roles_claims!
-      @message.roles = expand_variable("$com.instructure.User.allRoles").split ","
+      @message.roles = if @expander.present?
+                         expand_variable("$com.instructure.User.allRoles").split ","
+                       else
+                         Lti::SubstitutionsHelper.new(@context, @context.root_account, @user, @tool).all_roles("lti1_3").split ","
+                       end
     end
 
     def add_custom_params_claims!
@@ -235,13 +239,24 @@ module Lti::Messages
 
     def add_platform_notification_service_claims!
       @message.platform_notification_service.service_versions = ["1.0"]
-      @message.platform_notification_service.platform_notification_service_url =
+      @message.platform_notification_service.platform_notification_service_url = notification_service_url
+
+      @message.platform_notification_service.scope = [TokenScopes::LTI_PNS_SCOPE]
+      @message.platform_notification_service.notice_types_supported = Lti::Pns::NoticeTypes::ALL
+    end
+
+    def notification_service_url
+      if @expander&.controller.present?
         @expander.controller.lti_notice_handlers_url(
           host: @context.root_account.environment_specific_domain,
           context_external_tool_id: @tool.id
         )
-      @message.platform_notification_service.scope = [TokenScopes::LTI_PNS_SCOPE]
-      @message.platform_notification_service.notice_types_supported = Lti::Pns::NoticeTypes::ALL
+      else
+        Rails.application.routes.url_helpers.lti_notice_handlers_url(
+          context_external_tool_id: @tool.id,
+          host: @context.root_account.environment_specific_domain
+        )
+      end
     end
 
     def associated_1_1_tool
