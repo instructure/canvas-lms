@@ -52,7 +52,11 @@ const columnHeaders: ColumnHeader[] = [
 ]
 
 const columnRenderers: {
-  [key: string]: (row: File | Folder, isStacked: boolean) => React.ReactNode
+  [key: string]: (
+    row: File | Folder,
+    isStacked: boolean,
+    userCanEditFilesForContext: boolean
+  ) => React.ReactNode
 } = {
   name: (row, isStacked) => <NameLink isStacked={isStacked} item={row} />,
   created: row => <FriendlyDatetime dateTime={row.created_at} />,
@@ -61,17 +65,25 @@ const columnRenderers: {
   size: row =>
     'size' in row ? <Text>{friendlyBytes(row.size)}</Text> : <Text>{I18n.t('--')}</Text>,
   rights: _row => <RightsIconButton />,
-  published: _row => <PublishIconButton />,
+  published: (row, _isStacked, userCanEditFilesForContext) => (
+    <PublishIconButton item={row} userCanEditFilesForContext={userCanEditFilesForContext} />
+  ),
   actions: (_row, isStacked) => <ActionMenuButton isStacked={isStacked} />,
 }
 
 interface FileFolderTableProps {
   size: 'small' | 'medium' | 'large'
   isLoading: boolean
+  userCanEditFilesForContext: boolean
   rows?: (File | Folder)[]
 }
 
-const FileFolderTable = ({size, isLoading, rows = []}: FileFolderTableProps) => {
+const FileFolderTable = ({
+  size,
+  isLoading,
+  userCanEditFilesForContext,
+  rows = [],
+}: FileFolderTableProps) => {
   const isStacked = size !== 'large'
 
   return (
@@ -101,7 +113,7 @@ const FileFolderTable = ({size, isLoading, rows = []}: FileFolderTableProps) => 
             <Table.Row key={row.id} data-testid="table-row">
               {columnHeaders.map(column => (
                 <Table.Cell key={column.id} textAlign={isStacked ? undefined : column.textAlign}>
-                  {columnRenderers[column.id](row, isStacked)}
+                  {columnRenderers[column.id](row, isStacked, userCanEditFilesForContext)}
                 </Table.Cell>
               ))}
             </Table.Row>

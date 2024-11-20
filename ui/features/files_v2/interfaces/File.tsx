@@ -16,6 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+export interface UsageRights {
+  use_justification: string
+  license: string
+  legal_copyright: string
+  license_name: string
+}
 export interface User {
   id: string
   anonymous_id: string
@@ -49,9 +55,9 @@ export interface File {
   category: string
   locked_for_user: boolean
   visibility_level: string
-  user: User
+  user?: User
+  usage_rights?: UsageRights | null
   preview_url: string
-  usage_rights: string | null
   context_asset_string: string
   [key: string]: any
 }
