@@ -40,7 +40,11 @@ import {ConversationContext} from '../../../util/constants'
 import {useLazyQuery, useQuery} from '@apollo/react-hooks'
 import {RECIPIENTS_OBSERVERS_QUERY, INBOX_SETTINGS_QUERY} from '../../../graphql/Queries'
 import {ModalBodyContext, translationSeparator} from '../../utils/constants'
-import {translateMessage, handleTranslatedModalBody, stripSignature} from '../../utils/inbox_translator'
+import {
+  translateMessage,
+  handleTranslatedModalBody,
+  stripSignature,
+} from '../../utils/inbox_translator'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -278,18 +282,24 @@ const ComposeModalContainer = props => {
     translateBodyWith(isPrimary, body)
   }
 
-  const translateBodyWith = (isPrimary, bodyText, { tgtLang } = {}) => {
+  const translateBodyWith = async (isPrimary, bodyText, {tgtLang} = {}) => {
     setTranslating(true)
-    translateMessage({
-      subject: subject,
-      body: bodyText,
-      signature: activeSignature,
-      tgtLang: typeof tgtLang !== 'undefined' ? tgtLang : translationTargetLanguage,
-      callback: translatedText => {
-        handleTranslatedModalBody(translatedText, isPrimary, activeSignature, setBody, bodyText)
-        setTranslating(false)
-      },
-    })
+    try {
+      const translatedText = await translateMessage({
+        subject: subject,
+        body: bodyText,
+        signature: activeSignature,
+        tgtLang: typeof tgtLang !== 'undefined' ? tgtLang : translationTargetLanguage,
+      })
+      handleTranslatedModalBody(translatedText, isPrimary, activeSignature, setBody, bodyText)
+    } catch (err) {
+      props.setModalError(I18n.t('Error while trying to translate message'))
+      setTimeout(() => {
+        props.setModalError(null)
+      }, 2500)
+    } finally {
+      setTranslating(false)
+    }
   }
   /**  END TRANSLATION CODE */
 
@@ -444,7 +454,7 @@ const ComposeModalContainer = props => {
     messagePosition,
     setMessagePosition,
     translateBody,
-    translateBodyWith
+    translateBodyWith,
   }
 
   const shouldShowModalSpinner =
@@ -592,6 +602,7 @@ ComposeModalContainer.propTypes = {
   maxGroupRecipientsMet: PropTypes.bool,
   submissionCommentsHeader: PropTypes.string,
   modalError: PropTypes.string,
+  setModalError: PropTypes.func,
   isPrivateConversation: PropTypes.bool,
   currentCourseFilter: PropTypes.string,
   inboxSignatureBlock: PropTypes.bool,

@@ -374,6 +374,7 @@ const ComposeModalManager = props => {
       modalError={modalError}
       isPrivateConversation={!!props?.conversation?.isPrivate}
       currentCourseFilter={props.currentCourseFilter}
+      setModalError={setModalError}
     />
   )
 }
