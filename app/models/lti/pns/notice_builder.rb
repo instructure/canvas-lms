@@ -30,8 +30,9 @@ module Lti
       def default_claims(tool)
         Lti::Messages::PnsNotice.new(
           tool:,
-          context: tool.related_account,
-          notice: notice_claim
+          context: custom_context || tool.context,
+          notice: notice_claim,
+          user:
         ).generate_post_payload_message.to_h
       end
 
@@ -54,12 +55,36 @@ module Lti
         raise NotImplementedError, "notice_event_timestamp method must be implemented in subclass"
       end
 
-      def custom_claims(_tool)
-        raise NotImplementedError, "custom_claims method must be implemented in subclass"
+      def custom_claims(tool)
+        add_ims_prefix(custom_ims_claims(tool)).merge(add_instructure_prefix(custom_instructure_claims(tool)))
+      end
+
+      def custom_ims_claims(_tool)
+        raise NotImplementedError, "custom_ims_claims method must be implemented in subclass"
+      end
+
+      def custom_instructure_claims(_tool)
+        raise NotImplementedError, "custom_instructure_claims method must be implemented in subclass"
       end
 
       def notice_type
         raise NotImplementedError, "notice_type method must be implemented in subclass"
+      end
+
+      def user
+        raise NotImplementedError, "user method must be implemented in subclass"
+      end
+
+      def custom_context
+        nil
+      end
+
+      def add_ims_prefix(hash)
+        hash.transform_keys { |key| "#{LtiAdvantage::Serializers::JwtMessageSerializer::IMS_CLAIM_PREFIX}#{key}" }
+      end
+
+      def add_instructure_prefix(hash)
+        hash.transform_keys { |key| "#{Lti::Messages::JwtMessage::EXTENSION_PREFIX}#{key}" }
       end
     end
   end

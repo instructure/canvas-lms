@@ -731,6 +731,22 @@ describe Lti::Messages::JwtMessage do
       end
     end
 
+    context "when expander and controller is not present (called for pns notify)" do
+      let(:expander) { nil }
+      let(:opts) { super().merge({ claim_group_whitelist: [:platform_notification_service] }) }
+      let(:lti_advantage_service_claim) { decoded_jwt["https://purl.imsglobal.org/spec/lti/claim/platformnotificationservice"] }
+
+      before do
+        allow(Rails.application.routes.url_helpers).to receive(:lti_notice_handlers_url)
+          .with({ host: "canonical_domain", context_external_tool_id: lti_advantage_tool.id })
+          .and_return("lti_notice_handlers_url")
+      end
+
+      it "sets the PNS url using the Account#domain" do
+        expect(lti_advantage_service_claim["platform_notification_service_url"]).to eq("lti_notice_handlers_url")
+      end
+    end
+
     context "when context is a course" do
       it_behaves_like "all PNS claim presence and absence checks"
     end

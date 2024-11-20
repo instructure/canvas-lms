@@ -36,9 +36,12 @@ RSpec.describe Lti::Pns::NoticeBuilder, type: :model do
   describe "#build" do
     it "sets the tool and returns a signed JWT" do
       allow(SecureRandom).to receive(:uuid).and_return("uuid")
-      allow(notice_builder).to receive_messages(notice_type: "type", notice_event_timestamp: "timestamp", custom_claims: {
+      allow(notice_builder).to receive_messages(notice_type: "type",
+                                                notice_event_timestamp: "timestamp",
+                                                custom_claims: {
                                                   custom_claims: "custom_claims"
-                                                })
+                                                },
+                                                user: nil)
       allow(Lti::Messages::PnsNotice).to receive_message_chain(:new, :generate_post_payload_message, :to_h)
         .and_return({
                       default_claims: "default_claims"
@@ -59,11 +62,12 @@ RSpec.describe Lti::Pns::NoticeBuilder, type: :model do
 
   describe "#default_claims" do
     it "generates default claims" do
-      allow(notice_builder).to receive(:notice_claim).and_return({
-                                                                   type: "type",
-                                                                   id: "uuid",
-                                                                   notice: "notice"
-                                                                 })
+      allow(notice_builder).to receive_messages(notice_claim: {
+                                                  type: "type",
+                                                  id: "uuid",
+                                                  notice: "notice"
+                                                },
+                                                user: nil)
       allow(Lti::Messages::PnsNotice).to receive_message_chain(:new, :generate_post_payload_message, :to_h).and_return("default_claims")
       expect(notice_builder.send(:default_claims, tool)).to eq("default_claims")
       expect(Lti::Messages::PnsNotice).to have_received(:new).with({
@@ -73,7 +77,8 @@ RSpec.describe Lti::Pns::NoticeBuilder, type: :model do
                                                                        type: "type",
                                                                        id: "uuid",
                                                                        notice: "notice"
-                                                                     }
+                                                                     },
+                                                                     user: nil
                                                                    })
     end
   end
