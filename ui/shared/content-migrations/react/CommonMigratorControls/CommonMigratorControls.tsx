@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,21 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {type ComponentType, useCallback, useEffect, useState} from 'react'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {IconAddSolid} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
 import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
 import {Button} from '@instructure/ui-buttons'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
-import {InfoButton} from './info_button'
-import {DateAdjustments} from '../date_adjustments'
-import type {onSubmitMigrationFormCallback, DateAdjustmentConfig} from '../types'
-import {RequiredFormLabel} from './form_label'
-import {ErrorFormMessage} from './error_form_message'
+import {InfoButton} from './InfoButton'
+import {DateAdjustments} from './DateAdjustments'
+import type {onSubmitMigrationFormCallback, DateAdjustmentConfig} from './types'
+import {RequiredFormLabel} from './FormLabel'
+import {ErrorFormMessage} from '../errorFormMessage'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -45,10 +44,11 @@ type CommonMigratorControlsProps = {
   fileUploadProgress: number | null
   isSubmitting: boolean
   setIsQuestionBankDisabled?: (isDisabled: boolean) => void
-  oldStartDate: string | null
-  oldEndDate: string | null
-  newStartDate: string | null
-  newEndDate: string | null
+  oldStartDate?: string | null
+  oldEndDate?: string | null
+  newStartDate?: string | null
+  newEndDate?: string | null
+  SubmitLabel: ComponentType
 }
 
 const generateNewQuizzesLabel = () => {
@@ -127,6 +127,7 @@ export const CommonMigratorControls = ({
   oldEndDate,
   newStartDate,
   newEndDate,
+  SubmitLabel,
 }: CommonMigratorControlsProps) => {
   const [selectiveImport, setSelectiveImport] = useState<null | boolean>(false)
   const [importBPSettings, setImportBPSettings] = useState<null | boolean>(null)
@@ -312,9 +313,7 @@ export const CommonMigratorControls = ({
           </RadioInputGroup>
           {contentError && (
             <p>
-              <ErrorFormMessage>
-                {I18n.t('You must choose a content option')}
-              </ErrorFormMessage>
+              <ErrorFormMessage>{I18n.t('You must choose a content option')}</ErrorFormMessage>
             </p>
           )}
         </View>
@@ -357,10 +356,7 @@ export const CommonMigratorControls = ({
               {I18n.t('Adding...')}
             </>
           ) : (
-            <>
-              <IconAddSolid /> &nbsp;
-              {I18n.t('Add to Import Queue')}
-            </>
+            <SubmitLabel />
           )}
         </Button>
       </View>

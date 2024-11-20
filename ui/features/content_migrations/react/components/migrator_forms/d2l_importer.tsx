@@ -18,13 +18,13 @@
 
 import React from 'react'
 
-import CommonMigratorControls from './common_migrator_controls'
+import {CommonMigratorControls, noFileSelectedFormMessage} from '@canvas/content-migrations'
 import type {onSubmitMigrationFormCallback} from '../types'
 import QuestionBankSelector from './question_bank_selector'
 import MigrationFileInput from './file_input'
 import {parseDateToISOString} from '../utils'
-import {noFileSelectedFormMessage} from './error_form_message'
 import {useSubmitHandlerWithQuestionBank} from '../../hooks/form_handler_hooks'
+import {ImportLabel} from './import_label'
 
 type D2LImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
@@ -67,8 +67,7 @@ const D2LImporter = ({onSubmit, onCancel, fileUploadProgress, isSubmitting}: D2L
         onCancel={onCancel}
         newStartDate={parseDateToISOString(ENV.OLD_START_DATE)}
         newEndDate={parseDateToISOString(ENV.OLD_END_DATE)}
-        oldStartDate={null}
-        oldEndDate={null}
+        SubmitLabel={ImportLabel}
       />
     </>
   )

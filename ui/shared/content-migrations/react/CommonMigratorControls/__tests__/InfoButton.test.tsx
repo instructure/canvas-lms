@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -20,7 +20,7 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import {Text} from '@instructure/ui-text'
-import InfoButton from '../info_button'
+import InfoButton from '../InfoButton'
 
 const renderComponent = (overrideProps?: any) =>
   render(

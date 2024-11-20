@@ -18,29 +18,35 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {FormLabel, RequiredFormLabel} from '../form_label'
+import {FormLabel, RequiredFormLabel} from '../FormLabel'
 
 describe('FormLabel', () => {
   it('renders the label text', () => {
-    const { getByText } = render(<FormLabel>Test Label</FormLabel>)
+    const {getByText} = render(<FormLabel>Test Label</FormLabel>)
     expect(getByText('Test Label')).toBeInTheDocument()
   })
 })
 
 describe('RequiredFormLabel', () => {
   it('renders the label text with an asterisk', () => {
-    const { getByText } = render(<RequiredFormLabel showErrorState={false}>Test Label</RequiredFormLabel>)
+    const {getByText} = render(
+      <RequiredFormLabel showErrorState={false}>Test Label</RequiredFormLabel>
+    )
     expect(getByText('Test Label')).toBeInTheDocument()
     expect(getByText('*')).toBeInTheDocument()
   })
 
   it('displays the asterisk in primary color when showErrorState is false', () => {
-    const { getByText } = render(<RequiredFormLabel showErrorState={false}>Test Label</RequiredFormLabel>)
+    const {getByText} = render(
+      <RequiredFormLabel showErrorState={false}>Test Label</RequiredFormLabel>
+    )
     expect(getByText('*')).toHaveStyle('color: rgb(45, 59, 69)')
   })
 
   it('displays the asterisk in danger color when showErrorState is true', () => {
-    const { getByText } = render(<RequiredFormLabel showErrorState={true}>Test Label</RequiredFormLabel>)
+    const {getByText} = render(
+      <RequiredFormLabel showErrorState={true}>Test Label</RequiredFormLabel>
+    )
     expect(getByText('*')).toHaveStyle('color: rgb(224, 6, 31)')
   })
 })

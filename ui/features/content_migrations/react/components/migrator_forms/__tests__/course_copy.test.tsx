@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
-import CourseCopyImporter, {parseDate} from '../course_copy'
+import CourseCopyImporter from '../course_copy'
 import userEvent from '@testing-library/user-event'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {sharedDateParsingTests} from './shared_form_cases'

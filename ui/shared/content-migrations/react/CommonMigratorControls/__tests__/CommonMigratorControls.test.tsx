@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -19,14 +19,24 @@
 import React from 'react'
 import {render, screen, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import CommonMigratorControls from '../common_migrator_controls'
+import CommonMigratorControls from '../CommonMigratorControls'
+import {Text} from '@instructure/ui-text'
 
 const onSubmit = jest.fn()
 const onCancel = jest.fn()
 const setIsQuestionBankDisabled = jest.fn()
 
 const renderComponent = (overrideProps?: any) =>
-  render(<CommonMigratorControls onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
+  render(
+    <CommonMigratorControls
+      onSubmit={onSubmit}
+      onCancel={onCancel}
+      {...overrideProps}
+      SubmitLabel={TextLabel}
+    />
+  )
+
+const TextLabel = () => <Text>Add to Import Queue</Text>
 
 describe('CommonMigratorControls', () => {
   afterEach(() => jest.clearAllMocks())
@@ -162,6 +172,10 @@ describe('CommonMigratorControls', () => {
       canAdjustDates: true,
       canOverwriteAssessmentContent: true,
       canImportAsNewQuizzes: true,
+      oldStartDate: '',
+      oldEndDate: '',
+      newStartDate: '',
+      newEndDate: '',
     }
     const {rerender, getByLabelText, getByRole} = renderComponent(props)
     await userEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
@@ -172,6 +186,7 @@ describe('CommonMigratorControls', () => {
         {...props}
         isSubmitting={true}
         fileUploadProgress={10}
+        SubmitLabel={TextLabel}
       />
     )
     expect(getByRole('radio', {name: 'Shift dates'})).toBeInTheDocument()
@@ -190,6 +205,10 @@ describe('CommonMigratorControls', () => {
       canAdjustDates: true,
       canOverwriteAssessmentContent: true,
       canImportAsNewQuizzes: true,
+      oldStartDate: '',
+      oldEndDate: '',
+      newStartDate: '',
+      newEndDate: '',
     }
     const {rerender, getByLabelText, getByRole} = renderComponent(props)
     await userEvent.click(getByLabelText(/All content/))
@@ -201,6 +220,7 @@ describe('CommonMigratorControls', () => {
         {...props}
         isSubmitting={true}
         fileUploadProgress={10}
+        SubmitLabel={TextLabel}
       />
     )
     expect(getByRole('checkbox', {name: 'Import Blueprint Course settings'})).toBeDisabled()

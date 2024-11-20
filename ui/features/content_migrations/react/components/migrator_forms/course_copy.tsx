@@ -24,13 +24,15 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {View} from '@instructure/ui-view'
 import {IconSearchLine} from '@instructure/ui-icons'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import CommonMigratorControls from './common_migrator_controls'
+import {
+  CommonMigratorControls,
+  RequiredFormLabel,
+  ErrorFormMessage,
+} from '@canvas/content-migrations'
 import type {onSubmitMigrationFormCallback} from '../types'
-import {Text} from '@instructure/ui-text'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import {parseDateToISOString} from '../utils'
-import {RequiredFormLabel} from './form_label'
-import {ErrorFormMessage} from './error_form_message'
+import {ImportLabel} from './import_label'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -148,7 +150,11 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
             selectedCourseError
               ? [
                   {
-                    text: <ErrorFormMessage>{I18n.t('You must select a course to copy content from')}</ErrorFormMessage>,
+                    text: (
+                      <ErrorFormMessage>
+                        {I18n.t('You must select a course to copy content from')}
+                      </ErrorFormMessage>
+                    ),
                     type: 'error',
                   },
                 ]
@@ -202,6 +208,7 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
         newEndDate={parseDateToISOString(ENV.OLD_END_DATE)}
         onSubmit={handleSubmit}
         onCancel={onCancel}
+        SubmitLabel={ImportLabel}
       />
     </>
   )

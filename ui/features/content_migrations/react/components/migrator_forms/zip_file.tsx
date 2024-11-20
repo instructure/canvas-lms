@@ -18,7 +18,12 @@
 
 import React, {useCallback, useEffect, useState} from 'react'
 
-import CommonMigratorControls from './common_migrator_controls'
+import {
+  CommonMigratorControls,
+  RequiredFormLabel,
+  ErrorFormMessage,
+  noFileSelectedFormMessage,
+} from '@canvas/content-migrations'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -31,10 +36,8 @@ import {View} from '@instructure/ui-view'
 import type {FetchLinkHeader} from '@canvas/do-fetch-api-effect/types'
 import type {onSubmitMigrationFormCallback} from '../types'
 import MigrationFileInput from './file_input'
-import {ErrorFormMessage, noFileSelectedFormMessage} from './error_form_message'
-
 import type {TreeBrowserProps} from '@instructure/ui-tree-browser'
-import {RequiredFormLabel} from './form_label'
+import {ImportLabel} from './import_label'
 
 type Collection = TreeBrowserProps['collections'][0]
 type CollectionClickArgs = TreeBrowserProps['onCollectionClick']
@@ -278,6 +281,7 @@ const ZipFileImporter = ({
         canSelectContent={false}
         onSubmit={handleSubmit}
         onCancel={onCancel}
+        SubmitLabel={ImportLabel}
       />
     </>
   )

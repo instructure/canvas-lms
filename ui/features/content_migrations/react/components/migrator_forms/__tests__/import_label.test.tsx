@@ -18,17 +18,9 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
-import {ErrorFormMessage} from '../error_form_message'
+import {ImportLabel} from '../import_label'
 
-describe('ErrorFormMessage', () => {
-  it('renders the error message with the correct text', () => {
-    const { getByText } = render(<ErrorFormMessage>Test error message</ErrorFormMessage>)
-    expect(getByText('Test error message')).toBeInTheDocument()
-  })
-
-  it('renders the IconWarningSolid component', () => {
-    const { container } = render(<ErrorFormMessage>Test error message</ErrorFormMessage>)
-    expect(container.querySelector('svg')).toBeInTheDocument()
-  })
+test('renders ImportLabel with correct text', () => {
+  const {getByText} = render(<ImportLabel />)
+  expect(getByText('Add to Import Queue')).toBeInTheDocument()
 })

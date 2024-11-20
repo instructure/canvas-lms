@@ -16,6 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {
+  type AdjustDates,
+  type DaySub,
+  type DateShifts,
+  type DateShiftsCommon,
+  type DateAdjustmentConfig,
+} from '@canvas/content-migrations'
+
 export type ContentMigrationItemSettings = {
   source_course_id: string
   source_course_name: string
@@ -61,37 +69,10 @@ export type ContentMigrationItem = {
   created_at: string
 }
 
-export type AdjustDates = {
-  enabled: boolean
-  operation: 'shift_dates' | 'remove_dates'
-}
-
-export type DaySub = {
-  to: number
-  from: number
-  id: number
-}
-
-export type DateShiftsCommon = {
-  old_start_date: string
-  new_start_date: string
-  old_end_date: string
-  new_end_date: string
-}
-
 export type DateShiftsRequestBody = DateShiftsCommon & {
   remove_dates?: boolean
   shift_dates?: boolean
   day_substitutions: Record<string, string>
-}
-
-export type DateShifts = DateShiftsCommon & {
-  day_substitutions: DaySub[]
-}
-
-export type DateAdjustmentConfig = {
-  adjust_dates: AdjustDates
-  date_shift_options: DateShifts
 }
 
 export type submitMigrationFormData = {
@@ -143,3 +124,5 @@ export type QuestionBankSettings = {
   question_bank_id?: string | number
   question_bank_name?: string
 }
+
+export type {AdjustDates, DaySub, DateShifts, DateShiftsCommon, DateAdjustmentConfig}

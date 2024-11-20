@@ -20,7 +20,6 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ZipFileImporter from '../zip_file'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import fetchMock from 'fetch-mock'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
