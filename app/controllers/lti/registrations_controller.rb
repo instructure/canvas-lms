@@ -899,10 +899,12 @@ class Lti::RegistrationsController < ApplicationController
   before_action :require_account_context_instrumented
   before_action :require_feature_flag
   before_action :require_manage_lti_registrations
-  before_action :require_dynamic_registration, only: [:destroy, :update]
-  before_action :validate_workflow_state, only: [:bind, :create]
+  before_action :require_dynamic_registration, only: %i[destroy]
+  before_action :validate_workflow_state, only: %i[bind create update]
   before_action :validate_list_params, only: :list
-  before_action :validate_registration_params, only: [:create]
+  before_action :validate_registration_params, only: %i[create update]
+  before_action :restrict_dynamic_registration_updates, only: %i[update]
+  before_action :require_registration_params, only: :create
 
   include Api::V1::Lti::Registration
 
@@ -1191,9 +1193,9 @@ class Lti::RegistrationsController < ApplicationController
   def create
     registration = Lti::Registration.transaction do
       vendor = params[:vendor]
-      name = params[:name] || configuration[:title]
-      admin_nickname = params[:admin_nickname] || configuration[:title]
-      scopes = configuration[:scopes]
+      name = params[:name] || configuration_params[:title]
+      admin_nickname = params[:admin_nickname] || configuration_params[:title]
+      scopes = configuration_params[:scopes]
 
       registration = Lti::Registration.create!(
         name:,
@@ -1205,23 +1207,23 @@ class Lti::RegistrationsController < ApplicationController
         updated_by: @current_user
       )
 
-      if overlay.present?
+      if overlay_params.present?
         Lti::Overlay.create!(
           registration:,
           account: @context,
           updated_by: @current_user,
-          data: overlay
+          data: overlay_params
         )
-        scopes = Lti::Overlay.apply_to(overlay, configuration)&.dig(:scopes) || []
+        scopes = Lti::Overlay.apply_to(overlay_params, configuration_params)[:scopes]
       end
 
       dk = DeveloperKey.create!(
         account: @context.site_admin? ? nil : @context,
-        icon_url: configuration.dig(:launch_settings, :icon_url),
+        icon_url: configuration_params.dig(:launch_settings, :icon_url),
         name:,
-        public_jwk: configuration[:public_jwk],
-        public_jwk_url: configuration[:public_jwk_url],
-        redirect_uris: configuration[:redirect_uris] || [configuration[:target_link_uri]],
+        public_jwk: configuration_params[:public_jwk],
+        public_jwk_url: configuration_params[:public_jwk_url],
+        redirect_uris: configuration_params[:redirect_uris] || [configuration_params[:target_link_uri]],
         visible: !@context.site_admin?,
         scopes:,
         lti_registration: registration,
@@ -1232,7 +1234,7 @@ class Lti::RegistrationsController < ApplicationController
         developer_key: dk,
         lti_registration: registration,
         settings: {},
-        **configuration
+        **configuration_params
       )
 
       if params[:workflow_state].present? && params[:workflow_state] != "off"
@@ -1290,21 +1292,98 @@ class Lti::RegistrationsController < ApplicationController
   end
 
   # @API Update an LTI Registration
-  # Update the specified LTI registration with the provided parameters
+  # Update the specified LTI registration with the provided parameters. Note that updating the base tool configuration
+  # of a registration that is associated with a Dynamic Registration will return a 422. All other fields can be updated
+  # freely.
   #
+  # @argument name [String] The name of the tool
   # @argument admin_nickname [String] The admin-configured friendly display name for the registration
+  # @argument configuration [Lti::ToolConfiguration | Lti::LegacyConfiguration] The LTI 1.3 configuration for the tool. Note that updating the base tool configuration of a registration associated with a Dynamic Registration is not allowed.
+  # @argument overlay [Lti::Overlay] The overlay configuration for the tool. Overrides values in the base configuration.
+  # @argument workflow_state [String, "on" | "off" | "allow"]
+  #  The desired state for this registration/account binding. "allow" is only valid for Site Admin registrations.
   #
   # @example_request
   #
-  #   This would update the specified LTI registration
+  #   This would update the specified LTI Registration, as well as its associated Developer Key
+  #   and LTI Tool Configuration.
+  #
   #   curl -X PUT 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>' \
   #       -H "Authorization: Bearer <token>" \
-  #       -d 'admin_nickname=A New Nickname'
+  #       -H "Content-Type: application/json" \
+  #       -d '{
+  #             "vendor": "Example",
+  #             "name": "An Example Tool",
+  #             "admin_nickname": "A Great LTI Tool",
+  #             "configuration": {
+  #               "title": "Sample Tool",
+  #               "description": "A sample LTI tool",
+  #               "target_link_uri": "https://example.com/launch",
+  #               "oidc_initiation_url": "https://example.com/oidc",
+  #               "redirect_uris": ["https://example.com/redirect"],
+  #               "scopes": ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"],
+  #               "placements": [
+  #                 {
+  #                   "placement": "course_navigation",
+  #                   "enabled": true
+  #                 }
+  #               ],
+  #               "launch_settings": {}
+  #             }
+  #           }'
   #
   # @returns Lti::Registration
   def update
-    registration.update!(update_params)
-    render json: lti_registration_json(registration, @current_user, session, @context)
+    Lti::Registration.transaction do
+      name = params[:name]
+      reg_params = params.permit(:admin_nickname, :vendor, :name).to_h
+      registration.update!(reg_params.merge({ updated_by: @current_user })) if reg_params.present?
+
+      updated_overlay = if overlay_params.present?
+                          overlay = Lti::Overlay.find_or_initialize_by(registration:, account: @context)
+                          overlay.updated_by = @current_user
+                          overlay.data = overlay_params
+                          overlay.save!
+                          overlay
+                        end
+
+      scopes = if updated_overlay.present? && configuration_params.present?
+                 updated_overlay.apply_to(configuration_params)[:scopes]
+               elsif updated_overlay.blank? && configuration_params.present?
+                 configuration_params[:scopes]
+               else
+                 nil
+               end
+
+      if configuration_params.present?
+        tool_configuration.update!(**configuration_params) if configuration_params.present?
+      elsif overlay_params.present?
+        # Ensure that if only the overlay changes we still propagate the changes to all
+        # associated external tools
+        registration.developer_key.update_external_tools!
+      end
+
+      developer_key_update_params = {
+        icon_url: configuration_params&.dig(:launch_settings, :icon_url),
+        name:,
+        public_jwk: configuration_params&.dig(:public_jwk),
+        public_jwk_url: configuration_params&.dig(:public_jwk_url),
+        redirect_uris: configuration_params&.dig(:redirect_uris),
+        scopes:,
+      }.compact
+
+      registration.developer_key.update!(developer_key_update_params) if developer_key_update_params.present?
+
+      bind_registration_to_account(registration, params[:workflow_state]) if params[:workflow_state].present?
+    end
+    render json: lti_registration_json(registration,
+                                       @current_user,
+                                       session,
+                                       @context,
+                                       includes: %i[account_binding
+                                                    configuration
+                                                    overlay
+                                                    overlay_versions])
   rescue => e
     report_error(e)
     raise e
@@ -1356,18 +1435,7 @@ class Lti::RegistrationsController < ApplicationController
   #        -H "Content-Type: application/json" \
   #        -d '{"workflow_state": "on"}'
   def bind
-    account_binding = Lti::RegistrationAccountBinding
-                      .find_or_initialize_by(account: @context, registration:)
-
-    if account_binding.new_record?
-      account_binding.created_by = @current_user
-    end
-
-    account_binding.updated_by = @current_user
-    account_binding.workflow_state = params.require(:workflow_state)
-
-    account_binding.save!
-
+    account_binding = bind_registration_to_account(registration, params.require(:workflow_state))
     render json: lti_registration_account_binding_json(account_binding, @current_user, session, @context)
   end
 
@@ -1377,32 +1445,47 @@ class Lti::RegistrationsController < ApplicationController
     render json: { errors: }, status: :unprocessable_entity
   end
 
-  def configuration
-    return @configuration if defined?(@configuration)
+  def bind_registration_to_account(registration, workflow_state)
+    account_binding = Lti::RegistrationAccountBinding
+                      .find_or_initialize_by(account: @context, registration:)
 
-    @configuration = params.require(:configuration).to_unsafe_h
-
-    if @configuration[:extensions].present?
-      @configuration = Schemas::InternalLtiConfiguration.from_lti_configuration(@configuration)
+    if account_binding.new_record?
+      account_binding.created_by = @current_user
     end
 
-    @configuration = @configuration.slice(*Schemas::InternalLtiConfiguration.schema[:properties].keys)
+    account_binding.updated_by = @current_user
+    account_binding.workflow_state = workflow_state
 
-    @configuration
+    account_binding.save!
+    account_binding
   end
 
-  def overlay
-    @overlay ||= params[:overlay]&.to_unsafe_h
+  def configuration_params
+    return @configuration_params if defined?(@configuration_params)
+
+    @configuration_params = params[:configuration]&.to_unsafe_h
+
+    if @configuration_params&.dig(:extensions).present?
+      @configuration_params = Schemas::InternalLtiConfiguration.from_lti_configuration(@configuration_params)
+    end
+
+    @configuration_params = @configuration_params&.slice(*Schemas::InternalLtiConfiguration.schema[:properties].keys)
+
+    @configuration_params
+  end
+
+  def overlay_params
+    @overlay_params ||= params[:overlay]&.to_unsafe_h
   end
 
   def validate_registration_params
-    configuration = params.require(:configuration)
+    configuration = params[:configuration]
     overlay = params[:overlay]
 
     configuration = configuration.to_unsafe_h if configuration.is_a?(ActionController::Parameters)
     overlay = overlay.to_unsafe_h if overlay.is_a?(ActionController::Parameters)
 
-    unless configuration.is_a?(Hash)
+    if configuration.present? && !configuration.is_a?(Hash)
       return render_configuration_errors(["configuration must be an object"])
     end
 
@@ -1410,9 +1493,9 @@ class Lti::RegistrationsController < ApplicationController
       return render_configuration_errors(["overlay must be an object"])
     end
 
-    configuration_errors = if configuration[:extensions].present?
+    configuration_errors = if configuration&.dig(:extensions).present?
                              Schemas::LtiConfiguration.validation_errors(configuration)
-                           else
+                           elsif configuration.present?
                              Schemas::InternalLtiConfiguration.validation_errors(configuration)
                            end
     overlay_errors = Schemas::Lti::Overlay.validation_errors(overlay) if overlay.present?
@@ -1445,10 +1528,21 @@ class Lti::RegistrationsController < ApplicationController
     render_error("invalid_sort", "#{params[:sort]} is not a valid field for sorting") unless [*valid_sort_fields, nil].include?(params[:sort])
   end
 
+  def require_registration_params
+    params.require(:configuration)
+  end
+
   def require_dynamic_registration
     return if registration.dynamic_registration?
 
     render_error(:dynamic_registration_required, "Temporarily, only Registrations created using LTI Dynamic Registration can be modified")
+  end
+
+  def restrict_dynamic_registration_updates
+    return if configuration_params.blank?
+    return if registration.ims_registration.blank?
+
+    render_error(:tool_configuration_required, "Only manual configurations can be updated. Please create a new registration if you need to update the base tool configuration of a Dynamic Registration.")
   end
 
   def render_error(code, message, status: :unprocessable_entity)
@@ -1457,6 +1551,14 @@ class Lti::RegistrationsController < ApplicationController
 
   def registration
     @registration ||= Lti::Registration.active.find(params[:id])
+  end
+
+  def overlay
+    @overlay ||= registration.overlay_for(@context)
+  end
+
+  def tool_configuration
+    @tool_configuration ||= registration.manual_configuration
   end
 
   def require_account_context_instrumented
